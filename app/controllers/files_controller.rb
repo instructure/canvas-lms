@@ -27,9 +27,25 @@ require 'securerandom'
 #       "id": "File",
 #       "description": "",
 #       "properties": {
-#         "size": {
-#           "example": 4,
+#         "id": {
+#           "example": 569,
 #           "type": "integer"
+#         },
+#         "uuid": {
+#           "example": "SUj23659sdfASF35h265kf352YTdnC4",
+#           "type": "string"
+#         },
+#         "folder_id": {
+#           "example": 4207,
+#           "type": "integer"
+#         },
+#         "display_name": {
+#           "example": "file.txt",
+#           "type": "string"
+#         },
+#         "filename": {
+#           "example": "file.txt",
+#           "type": "string"
 #         },
 #         "content-type": {
 #           "example": "text/plain",
@@ -39,13 +55,10 @@ require 'securerandom'
 #           "example": "http://www.example.com/files/569/download?download_frd=1&verifier=c6HdZmxOZa0Fiin2cbvZeI8I5ry7yqD7RChQzb6P",
 #           "type": "string"
 #         },
-#         "id": {
-#           "example": 569,
-#           "type": "integer"
-#         },
-#         "display_name": {
-#           "example": "file.txt",
-#           "type": "string"
+#         "size": {
+#           "example": 43451,
+#           "type": "integer",
+#           "description": "file size in bytes"
 #         },
 #         "created_at": {
 #           "example": "2012-07-06T14:58:50Z",
@@ -56,10 +69,7 @@ require 'securerandom'
 #           "type": "datetime"
 #         },
 #         "unlock_at": {
-#           "type": "datetime"
-#         },
-#         "modified_at": {
-#           "example": "2012-07-06T14:58:50Z",
+#           "example": "2012-07-07T14:58:50Z",
 #           "type": "datetime"
 #         },
 #         "locked": {
@@ -71,7 +81,29 @@ require 'securerandom'
 #           "type": "boolean"
 #         },
 #         "lock_at": {
+#           "example": "2012-07-20T14:58:50Z",
 #           "type": "datetime"
+#         },
+#         "hidden_for_user": {
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "thumbnail_url": {
+#           "type": "string"
+#         },
+#         "modified_at": {
+#           "example": "2012-07-06T14:58:50Z",
+#           "type": "datetime"
+#         },
+#         "mime_class": {
+#           "type": "string",
+#           "example": "html",
+#           "description": "simplified content-type mapping"
+#         },
+#         "media_entry_id": {
+#           "type": "string",
+#           "example": "m-3z31gfpPf129dD3sSDF85SwSDFnwe",
+#           "description": "identifier for file in third-party transcoding service"
 #         },
 #         "locked_for_user": {
 #           "example": false,
@@ -83,21 +115,6 @@ require 'securerandom'
 #         "lock_explanation": {
 #           "example": "This assignment is locked until September 1 at 12:00am",
 #           "type": "string"
-#         },
-#         "hidden_for_user": {
-#           "example": false,
-#           "type": "boolean"
-#         },
-#         "thumbnail_url": {
-#           "type": "string"
-#         },
-#         "mime_class": {
-#           "type": "string",
-#           "description": "simplified content-type mapping"
-#         },
-#         "media_entry_id": {
-#           "type": "string",
-#           "description": "identifier for file in third-party transcoding service"
 #         },
 #         "preview_url": {
 #           "type": "string",

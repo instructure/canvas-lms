@@ -22,7 +22,8 @@
   <%= image_tag(brand_variable("ic-brand-right-sidebar-logo"), :class => "ic-sidebar-logo__image", :alt => "Canvas by Instructure") %>
 </div>
 <% end %>
-<% if planner_enabled? %>
+<%# Use the legacy to do list for non-students until it works for those roles %>
+<% if planner_enabled? && !@current_user.non_student_enrollment? %>
   <div class="Sidebar__TodoListContainer"></div>
 <% else %>
   <%= render :partial => 'courses/to_do_list', :locals => {:contexts => nil} %>

@@ -20,6 +20,9 @@ import { shallow, mount } from 'enzyme';
 import moment from 'moment-timezone';
 import {Day} from '../index';
 
+const user = {id: '1', displayName: 'Jane',
+  avatarUrl: '/picture/is/here', color: "#00AC18"};
+
 it('renders the base component with required props', () => {
   const wrapper = shallow(
     <Day timeZone="America/Denver" day="2017-04-25" />
@@ -44,49 +47,11 @@ it('renders the friendlyName in medium text when it is not today', () => {
   expect(wrapper.find('Text').first().props().size).toEqual('medium');
 });
 
-it('groups itemsForDay based on context type + context id', () => {
-  const items = [{
-    title: 'Black Friday',
-    context: {
-      type: 'Course',
-      id: 128,
-      inform_students_of_overdue_submissions: true
-    }
-  }, {
-    title: 'San Juan',
-    context: {
-      type: 'Course',
-      id: 256,
-      inform_students_of_overdue_submissions: true
-    }
-  }, {
-    title: 'Roll for the Galaxy',
-    context: {
-      type: 'Course',
-      id: 256,
-      inform_students_of_overdue_submissions: true
-    }
-  }, {
-      title: 'Same id, different type',
-      context: {
-        type: 'Group',
-        id: 256,
-        inform_students_of_overdue_submissions: false
-      }
-  }];
-
-  const wrapper = shallow(
-    <Day timeZone="America/Denver" day="2017-04-25" itemsForDay={items} />
-  );
-  const groupedItems = wrapper.state('groupedItems');
-  expect(groupedItems['Course128'].length).toEqual(1);
-  expect(groupedItems['Course256'].length).toEqual(2);
-  expect(groupedItems['Group256'].length).toEqual(1);
-});
-
 it('renders grouping correctly when having itemsForDay', () => {
+  const TZ = "America/Denver";
   const items = [{
     title: 'Black Friday',
+    date: moment.tz('2017-04-25T23:59:00Z', TZ),
     context: {
       type: 'Course',
       id: 128,
@@ -95,6 +60,7 @@ it('renders grouping correctly when having itemsForDay', () => {
     }
   }, {
     title: 'San Juan',
+    date: moment.tz('2017-04-25T23:59:00Z', TZ),
     context: {
       type: 'Course',
       id: 256,
@@ -103,6 +69,7 @@ it('renders grouping correctly when having itemsForDay', () => {
     }
   }, {
     title: 'Roll for the Galaxy',
+    date: moment.tz('2017-04-25T23:59:00Z', TZ),
     context: {
       type: 'Course',
       id: 256,
@@ -111,6 +78,7 @@ it('renders grouping correctly when having itemsForDay', () => {
     }
   }, {
       title: 'Same id, different type',
+      date: moment.tz('2017-04-25T23:59:00Z', TZ),
       context: {
         type: 'Group',
         id: 256,
@@ -119,13 +87,15 @@ it('renders grouping correctly when having itemsForDay', () => {
   }];
 
   const wrapper = shallow(
-    <Day timeZone="America/Denver" day="2017-04-25" itemsForDay={items} />
+    <Day timeZone={TZ} day="2017-04-25" itemsForDay={items} animatableIndex={1} currentUser={user}/>
   );
   expect(wrapper).toMatchSnapshot();
 });
 it('groups itemsForDay that have no context into the "Notes" category', () => {
+  const TZ = "America/Denver";
   const items = [{
     title: 'Black Friday',
+    date: moment.tz('2017-04-25T23:59:00Z', TZ),
     context: {
       type: 'Course',
       id: 128,
@@ -133,6 +103,7 @@ it('groups itemsForDay that have no context into the "Notes" category', () => {
     }
   }, {
     title: 'San Juan',
+    date: moment.tz('2017-04-25T23:59:00Z', TZ),
     context: {
       type: 'Course',
       id: 256,
@@ -140,6 +111,7 @@ it('groups itemsForDay that have no context into the "Notes" category', () => {
     }
   }, {
     title: 'Roll for the Galaxy',
+    date: moment.tz('2017-04-25T23:59:00Z', TZ),
     context: {
       type: 'Course',
       id: 256,
@@ -150,15 +122,16 @@ it('groups itemsForDay that have no context into the "Notes" category', () => {
   }];
 
   const wrapper = shallow(
-    <Day timeZone="America/Denver" day="2017-04-25" itemsForDay={items} />
+    <Day timeZone={TZ} day="2017-04-25" itemsForDay={items} currentUser={user}/>
   );
-  const groupedItems = wrapper.state('groupedItems');
-  expect(groupedItems.Notes.length).toEqual(1);
+  expect(wrapper).toMatchSnapshot();
 });
 
 it('groups itemsForDay that come in on prop changes', () => {
+  const TZ = "America/Denver";
   const items = [{
     title: 'Black Friday',
+    date: moment.tz('2017-04-25T23:59:00Z', TZ),
     context: {
       type: 'Course',
       id: 128,
@@ -166,6 +139,7 @@ it('groups itemsForDay that come in on prop changes', () => {
     }
   }, {
     title: 'San Juan',
+    date: moment.tz('2017-04-25T23:59:00Z', TZ),
     context: {
       type: 'Course',
       id: 256,
@@ -174,13 +148,14 @@ it('groups itemsForDay that come in on prop changes', () => {
   }];
 
   const wrapper = shallow(
-    <Day timeZone="America/Denver" day="2017-04-25" itemsForDay={items} registerAnimatable={() => {}} deregisterAnimatable={() => {}} />
+    <Day timeZone={TZ} day="2017-04-25" itemsForDay={items} registerAnimatable={() => {}}
+         deregisterAnimatable={() => {}} currentUser={user}/>
   );
-  let groupedItems = wrapper.state('groupedItems');
-  expect(Object.keys(groupedItems).length).toEqual(2);
+  expect(wrapper).toMatchSnapshot();
 
   const newItemsForDay = items.concat([{
     title: 'Roll for the Galaxy',
+    date: moment.tz('2017-04-25T23:59:00Z', TZ),
     context: {
       type: 'Course',
       id: 256,
@@ -191,33 +166,40 @@ it('groups itemsForDay that come in on prop changes', () => {
   }]);
 
   wrapper.setProps({ itemsForDay: newItemsForDay });
-  groupedItems = wrapper.state('groupedItems');
-  expect(Object.keys(groupedItems).length).toEqual(3);
+  expect(wrapper).toMatchSnapshot();
 });
 
 
 it('renders even when there are no items', () => {
   const date = moment.tz("Asia/Tokyo").add(13, 'days');
   const wrapper = shallow(
-    <Day timeZone="Asia/Tokyo" day={date.format('YYYY-MM-DD')} itemsForDay={[]} />
+    <Day timeZone="Asia/Tokyo" day={date.format('YYYY-MM-DD')} itemsForDay={[]} currentUser={user}/>
   );
   expect(wrapper.type).not.toBeNull();
 });
 
 it('registers itself as animatable', () => {
+  const TZ = "Asia/Tokyo";
   const fakeRegister = jest.fn();
   const fakeDeregister = jest.fn();
-  const firstItems = [{title: 'asdf', context: {id: 128, inform_students_of_overdue_submissions: true}, id: '1', uniqueId: 'first'}, {title: 'jkl', context: {id: 256, inform_students_of_overdue_submissions: true}, id: '2', uniqueId: 'second'}];
-  const secondItems = [{title: 'qwer', context: {id: 128, inform_students_of_overdue_submissions: true}, id: '3', uniqueId: 'third'}, {title: 'uiop', context: {id: 256, inform_students_of_overdue_submissions: true}, id: '4', uniqueId: 'fourth'}];
+  const firstItems = [
+    {title: 'asdf', date: moment.tz('2017-04-25T23:59:00Z', TZ), context: {id: 128, inform_students_of_overdue_submissions: true}, id: '1', uniqueId: 'first'},
+    {title: 'jkl',  date: moment.tz('2017-04-25T23:59:00Z', TZ), context: {id: 256, inform_students_of_overdue_submissions: true}, id: '2', uniqueId: 'second'}
+  ];
+  const secondItems = [
+    {title: 'qwer', date: moment.tz('2017-04-25T23:59:00Z', TZ), context: {id: 128, inform_students_of_overdue_submissions: true}, id: '3', uniqueId: 'third'},
+    {title: 'uiop', date: moment.tz('2017-04-25T23:59:00Z', TZ), context: {id: 256, inform_students_of_overdue_submissions: true}, id: '4', uniqueId: 'fourth'}
+  ];
   const wrapper = mount(
     <Day
       day={'2017-08-11'}
-      timeZone="Asia/Tokyo"
+      timeZone={TZ}
       animatableIndex={42}
       itemsForDay={firstItems}
       registerAnimatable={fakeRegister}
       deregisterAnimatable={fakeDeregister}
       updateTodo={() => {}}
+      currentUser={user}
     />
   );
   const instance = wrapper.instance();

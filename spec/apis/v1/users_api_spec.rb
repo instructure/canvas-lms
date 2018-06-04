@@ -2093,6 +2093,7 @@ describe "Users API", type: :request do
   describe 'POST pandata_token' do
     let(:fake_secrets){
       {
+        "pandata-url" => "https://example.com/pandata",
         "ios-pandata-key" => "IOS_pandata_key",
         "ios-pandata-secret" => "teamrocketblastoffatthespeedoflight",
         "android-pandata-key" => "ANDROID_pandata_key",
@@ -2106,20 +2107,34 @@ describe "Users API", type: :request do
     end
 
     it 'should return token and expiration' do
-      json = api_call(:post, "/api/v1/users/#{@user.id}/pandata_token",
+      Setting.set("pandata_token_allowed_developer_key_ids", DeveloperKey.default.global_id)
+      json = api_call(:post, "/api/v1/users/self/pandata_token",
           { controller: 'users', action: 'pandata_token', format:'json', id: @user.to_param },
           { app_key: 'IOS_pandata_key'}
       )
-      expect(json['token']).to be_present
+      expect(json['url']).to be_present
+      expect(json['auth_token']).to be_present
+      expect(json['props_token']).to be_present
       expect(json['expires_at']).to be_present
     end
 
-    it 'should return a bad request for incorrect app keys' do
-      json = raw_api_call(:post, "/api/v1/users/#{@user.id}/pandata_token",
+    it 'should return bad_request for incorrect app keys' do
+      Setting.set("pandata_token_allowed_developer_key_ids", DeveloperKey.default.global_id)
+      json = api_call(:post, "/api/v1/users/self/pandata_token",
           { controller: 'users', action: 'pandata_token', format:'json', id: @user.to_param },
           { app_key: 'IOS_not_right'}
       )
       assert_status(400)
+      expect(json['message']).to eq "Invalid app key"
+    end
+
+    it 'should return forbidden if the tokens key is not authorized' do
+      json = api_call(:post, "/api/v1/users/self/pandata_token",
+          { controller: 'users', action: 'pandata_token', format:'json', id: @user.to_param },
+          { app_key: 'IOS_pandata_key'}
+      )
+      assert_status(403)
+      expect(json['message']).to eq "Developer key not authorized"
     end
   end
 end

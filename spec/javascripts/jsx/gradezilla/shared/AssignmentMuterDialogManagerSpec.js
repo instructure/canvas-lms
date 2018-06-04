@@ -28,7 +28,7 @@ QUnit.module('AssignmentMuterDialogManager', suiteHooks => {
 
   suiteHooks.beforeEach(() => {
     anonymousModeratedMarkingEnabled = false
-    assignment = {anonymous_grading: false, grades_published: true, muted: true}
+    assignment = {moderated_grading: false, grades_published: true, muted: true}
     submissionsLoaded = false
   })
 
@@ -94,43 +94,43 @@ QUnit.module('AssignmentMuterDialogManager', suiteHooks => {
       strictEqual(createManager().isDialogEnabled(), false)
     })
 
-    test('returns false when the assignment cannot be unmuted', () => {
+    test('returns false when the assignment is moderated and grades have not been published', () => {
       anonymousModeratedMarkingEnabled = true
-      assignment.anonymous_grading = true
       assignment.grades_published = false
+      assignment.moderated_grading = true
       submissionsLoaded = true
       strictEqual(createManager().isDialogEnabled(), false)
     })
 
-    test('returns true for anonymous moderated assignment is not muted', () => {
-      anonymousModeratedMarkingEnabled = true
-      assignment.anonymous_grading = true
+    test('returns true for moderated assignments when Anonymous Moderated Marking is disabled', () => {
+      anonymousModeratedMarkingEnabled = false
       assignment.grades_published = false
+      assignment.moderated_grading = true
+      submissionsLoaded = true
+      strictEqual(createManager().isDialogEnabled(), true)
+    })
+
+    test('returns true for moderated assignments when grades have been published', () => {
+      anonymousModeratedMarkingEnabled = true
+      assignment.grades_published = true
+      assignment.moderated_grading = true
+      submissionsLoaded = true
+      strictEqual(createManager().isDialogEnabled(), true)
+    })
+
+    test('returns true for moderated assignments when not muted', () => {
+      anonymousModeratedMarkingEnabled = true
+      assignment.grades_published = false
+      assignment.moderated_grading = true
       assignment.muted = false
       submissionsLoaded = true
       strictEqual(createManager().isDialogEnabled(), true)
     })
 
-    test('returns true for anonymous assignments when Anonymous Moderated Marking is disabled', () => {
-      anonymousModeratedMarkingEnabled = false
-      assignment.anonymous_grading = true
-      assignment.grades_published = false
-      submissionsLoaded = true
-      strictEqual(createManager().isDialogEnabled(), true)
-    })
-
-    test('returns true for moderated assignments when not anonymous', () => {
+    test('returns true for assignments when not moderated', () => {
       anonymousModeratedMarkingEnabled = true
-      assignment.anonymous_grading = false
-      assignment.grades_published = false
-      submissionsLoaded = true
-      strictEqual(createManager().isDialogEnabled(), true)
-    })
-
-    test('returns true for anonymous assignments when not moderated', () => {
-      anonymousModeratedMarkingEnabled = true
-      assignment.anonymous_grading = true
       assignment.grades_published = true
+      assignment.moderated_grading = false
       submissionsLoaded = true
       strictEqual(createManager().isDialogEnabled(), true)
     })

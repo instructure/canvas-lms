@@ -551,7 +551,7 @@ describe Assignment::SpeedGrader do
     end
   end
 
-  describe "with moderated grading" do
+  describe "when moderated grading is enabled" do
     before(:once) do
       course_with_ta(:course => @course, :active_all => true)
       assignment_model(:course => @course, :submission_types => 'online_text_entry')
@@ -868,7 +868,7 @@ describe Assignment::SpeedGrader do
     end
   end
 
-  context "with anonymous moderated marking enabled" do
+  describe "student anonymity" do
     let_once(:course) { course_with_teacher(active_all: true, name: "Teacher").course }
     let_once(:teacher) { @teacher }
     let_once(:ta) do
@@ -883,7 +883,16 @@ describe Assignment::SpeedGrader do
     let_once(:student_2) { user_with_pseudonym(active_all: true, username: "student2@example.com") }
     let_once(:test_student) { course.student_view_student }
 
-    let_once(:assignment) { course.assignments.create!(title: "Example Assignment", submission_types: ['online_upload'], anonymous_grading: true) }
+    let_once(:assignment) do
+      course.assignments.create!(
+        anonymous_grading: true,
+        grader_count: 2,
+        graders_anonymous_to_graders: false,
+        moderated_grading: true,
+        submission_types: ['online_text_entry'],
+        title: "Example Assignment"
+      )
+    end
     let_once(:rubric_association) do
       rubric = rubric_model
       rubric.associate_with(assignment, course, purpose: "grading", use_for_grading: true)
@@ -896,11 +905,59 @@ describe Assignment::SpeedGrader do
     let(:submission_2) { assignment.submit_homework(student_2, submission_type: "online_upload", attachments: [attachment_2]) }
     let(:test_submission) { Submission.find_by(user_id: test_student.id, assignment_id: assignment.id) }
 
+    let(:teacher_pg) { submission_1.provisional_grade(teacher) }
+    let(:ta_pg) { submission_1.provisional_grade(ta) }
+
+    let(:json) { Assignment::SpeedGrader.new(assignment, teacher, avatars: true, grading_role: :moderator).json }
+    let(:grader_json) { Assignment::SpeedGrader.new(assignment, ta, avatars: true, grading_role: :grader).json }
+
     before :once do
       course.account.enable_feature!(:anonymous_moderated_marking)
 
       course.enroll_student(student_1, section: section_1).accept!
       course.enroll_student(student_2, section: section_2).accept!
+
+      assignment.moderation_graders.create!(user: teacher, anonymous_id: 'teach')
+      assignment.moderation_graders.create!(user: ta, anonymous_id: 'atata')
+
+      selection = assignment.moderated_grading_selections.find_by(student_id: student_1.id)
+
+      submission_1.add_comment(author: teacher, comment: 'comment by teacher', provisional: false)
+      submission_1.add_comment(author: teacher, comment: 'provisional comment by teacher', provisional: true)
+      teacher_pg.update_attribute(:score, 2)
+
+      rubric_association.assess(
+        artifact: teacher_pg,
+        assessment: {
+          assessment_type: 'grading',
+          criterion_crit1: {
+            comments: 'a comment',
+            points: 2
+          }
+        },
+        assessor: teacher,
+        user: student_1
+      )
+
+      selection.provisional_grade = teacher_pg
+      selection.save!
+
+      submission_1.add_comment(author: ta, comment: 'comment by ta', provisional: false)
+      submission_1.add_comment(author: ta, comment: 'provisional comment by ta', provisional: true)
+      ta_pg.update_attribute(:score, 3)
+
+      rubric_association.assess(
+        artifact: ta_pg,
+        assessment: {
+          assessment_type: 'grading',
+          criterion_crit1: {
+            comments: 'a comment',
+            points: 3
+          }
+        },
+        assessor: ta,
+        user: student_1
+      )
     end
 
     before :each do
@@ -912,145 +969,738 @@ describe Assignment::SpeedGrader do
 
       test_submission.anonymous_id = 'ccccc'
       test_submission.save!
+
+      allow(assignment).to receive(:can_view_other_grader_identities?).and_return(true)
     end
 
-    it "adds anonymous ids to student enrollments" do
-      json = Assignment::SpeedGrader.new(assignment, teacher).json
-      anonymous_ids = json['context']['enrollments'].map { |enrollment| enrollment['anonymous_id'] }
-      expect(anonymous_ids.uniq).to match_array(['aaaaa', 'bbbbb', 'ccccc'])
+    context "when the user can view student names" do
+      let(:submission_1_json) { json['submissions'].detect { |s| s['user_id'] == student_1.id.to_s } }
+      let(:student_comments) do
+        submission_1_json['submission_comments'].select do |comment|
+          comment['author_id'] == student_1.id.to_s || comment['author_id'] == student_2.id.to_s
+        end
+      end
+
+      before :each do
+        allow(assignment).to receive(:can_view_student_names?).with(teacher).and_return(true)
+        allow(assignment).to receive(:can_view_student_names?).with(ta).and_return(true)
+      end
+
+      it "includes user ids on student enrollments" do
+        user_ids = json['context']['enrollments'].map { |enrollment| enrollment['user_id'] }
+        expect(user_ids.uniq).to match_array([student_1.id, student_2.id, test_student.id].map(&:to_s))
+      end
+
+      it "excludes anonymous ids from student enrollments" do
+        expect(json['context']['enrollments']).to all(not_have_key('anonymous_id'))
+      end
+
+      it "includes ids on students" do
+        ids = json['context']['students'].map { |student| student['id'] }
+        expect(ids.uniq).to match_array([student_1.id, student_2.id, test_student.id].map(&:to_s))
+      end
+
+      it "excludes anonymous ids from students" do
+        expect(json['context']['students']).to all(not_have_key('anonymous_id'))
+      end
+
+      it "includes user ids on submissions" do
+        user_ids = json['submissions'].map { |submission| submission['user_id'] }
+        expect(user_ids.uniq).to match_array([student_1.id, student_2.id, test_student.id].map(&:to_s))
+      end
+
+      it "excludes anonymous ids from submissions" do
+        expect(json['submissions']).to all(not_have_key('anonymous_id'))
+      end
+
+      it "includes user ids on rubrics" do
+        student = json['context']['students'].detect { |s| s['id'] == student_1.id.to_s }
+        user_ids = student['rubric_assessments'].map {|assessment| assessment['user_id']}
+        expect(user_ids).to include(student_1.id.to_s)
+      end
+
+      it "includes user ids from rubrics on provisional grades" do
+        rubric_assessments = submission_1_json['provisional_grades'].map {|grade| grade['rubric_assessments']}.flatten
+        user_ids = rubric_assessments.map {|assessment| assessment['user_id']}
+        expect(user_ids).to include(student_1.id.to_s)
+      end
+
+      it "includes student author ids on submission comments" do
+        submission_1.add_comment(author: student_1, comment: "Example")
+        submission_1.add_comment(author: student_1, comment: "Sample")
+        expect(student_comments).not_to be_empty
+      end
+
+      it "excludes anonymous ids from submission comments" do
+        submission_1.add_comment(author: student_1, comment: "Example")
+        submission_1.add_comment(author: student_2, comment: "Sample")
+        expect(student_comments).to all(not_have_key('anonymous_id'))
+      end
+
+      it "includes student author names on submission comments" do
+        submission_1.add_comment(author: student_1, comment: "Example")
+        submission_1.add_comment(author: student_1, comment: "Sample")
+        expect(student_comments).to all(include("author_name" => student_1.name))
+      end
+
+      it "uses the user avatar for students on submission comments" do
+        submission_1.add_comment(author: student_1, comment: "Example")
+        submission_1.add_comment(author: student_2, comment: "Sample")
+        avatar_paths = student_comments.map {|s| s['avatar_path']}
+        expect(avatar_paths.uniq).to include(student_1.avatar_path, student_2.avatar_path)
+      end
+
+      it "optionally does not include avatars" do
+        submission_1.add_comment(author: student_1, comment: "Example")
+        json = Assignment::SpeedGrader.new(assignment, teacher, avatars: false).json
+        submission = json['submissions'].detect { |s| s['user_id'] == student_1.id.to_s }
+        expect(submission['submission_comments']).to all(not_have_key('avatar_path'))
+      end
+
+      it "includes student user ids on submission comments" do
+        submission_1.add_comment(author: student_1, comment: "Example")
+        submission_1.add_comment(author: student_2, comment: "Sample")
+        expect(student_comments).not_to be_empty
+      end
     end
 
-    it "excludes user ids from student enrollments" do
-      json = Assignment::SpeedGrader.new(assignment, teacher).json
-      expect(json['context']['enrollments']).to all(not_have_key('user_id'))
+    context "when the user cannot view student names" do
+      let(:submission_1_json) { json['submissions'].detect { |s| s['anonymous_id'] == 'aaaaa' } }
+      let(:student_comments) do
+        submission_1_json['submission_comments'].select do |comment|
+          comment['anonymous_id'] == 'aaaaa' || comment['anonymous_id'] == 'bbbbb'
+        end
+      end
+
+      before :each do
+        allow(assignment).to receive(:can_view_student_names?).with(teacher).and_return(false)
+        allow(assignment).to receive(:can_view_student_names?).with(ta).and_return(false)
+      end
+
+      it "adds anonymous ids to student enrollments" do
+        anonymous_ids = json['context']['enrollments'].map { |enrollment| enrollment['anonymous_id'] }
+        expect(anonymous_ids.uniq).to match_array(['aaaaa', 'bbbbb', 'ccccc'])
+      end
+
+      it "excludes user ids from student enrollments" do
+        expect(json['context']['enrollments']).to all(not_have_key('user_id'))
+      end
+
+      it "excludes ids from students" do
+        expect(json['context']['students']).to all(not_have_key('id'))
+      end
+
+      it "adds anonymous ids to students" do
+        anonymous_ids = json['context']['students'].map { |student| student['anonymous_id'] }
+        expect(anonymous_ids).to match_array(['aaaaa', 'bbbbb', 'ccccc'])
+      end
+
+      it "excludes user ids from submissions" do
+        expect(json['submissions']).to all(not_have_key('user_id'))
+      end
+
+      it "includes anonymous ids on submissions" do
+        anonymous_ids = json['submissions'].map { |submission| submission['anonymous_id'] }
+        expect(anonymous_ids).to match_array(['aaaaa', 'bbbbb', 'ccccc'])
+      end
+
+      it "excludes user ids on rubrics" do
+        student = json['context']['students'].detect {|s| s['anonymous_id'] == 'aaaaa'}
+        expect(student['rubric_assessments']).to all(not_have_key('user_id'))
+      end
+
+      it "excludes user ids from rubrics on provisional grades" do
+        rubric_assessments = submission_1_json['provisional_grades'].map {|grade| grade['rubric_assessments']}.flatten
+        expect(rubric_assessments).to all(not_have_key('user_id'))
+      end
+
+      it "includes anonymous ids on student submission comments" do
+        submission_1.add_comment(author: student_1, comment: "Example")
+        submission_1.add_comment(author: student_1, comment: "Sample")
+        expect(student_comments).not_to be_empty
+      end
+
+      it "excludes student author ids from submission comments" do
+        submission_1.add_comment(author: student_1, comment: "Example")
+        submission_1.add_comment(author: student_1, comment: "Sample")
+        expect(student_comments).to all(not_have_key('author_id'))
+      end
+
+      it "excludes student author names from submission comments" do
+        submission_1.add_comment(author: student_1, comment: "Example")
+        submission_1.add_comment(author: student_1, comment: "Sample")
+        expect(student_comments).to all(not_have_key('author_name'))
+      end
+
+      it "includes author ids of other graders on submission comments" do
+        submission = grader_json['submissions'].detect {|s| s['anonymous_id'] == "aaaaa"}
+        author_ids = submission['submission_comments'].map { |s| s['author_id'] }
+        expect(author_ids).to include(teacher.id.to_s, ta.id.to_s)
+      end
+
+      it "includes author names of other graders on submission comments" do
+        submission = grader_json['submissions'].detect {|s| s['anonymous_id'] == "aaaaa"}
+        author_names = submission['submission_comments'].map {|s| s['author_name']}
+        expect(author_names).to include(teacher.name, ta.name)
+      end
+
+      it "uses the default avatar for students on submission comments" do
+        submission_1.add_comment(author: student_1, comment: "Example")
+        submission_1.add_comment(author: student_1, comment: "Sample")
+        avatars = student_comments.map { |s| s['avatar_path'] }
+        expect(avatars).to all(eql(User.default_avatar_fallback))
+      end
+
+      it "uses the user avatar for other graders on submission comments" do
+        avatars = submission_1_json['submission_comments'].map { |s| s['avatar_path'] }
+        expect(avatars).to include(ta.avatar_path, teacher.avatar_path)
+      end
+
+      it "adds anonymous ids to submission comments" do
+        submission_1.add_comment(author: student_1, comment: "Example")
+        submission_1.add_comment(author: student_2, comment: "Sample")
+        anonymous_ids = student_comments.map { |s| s['anonymous_id'] }
+        expect(anonymous_ids).to match_array(['aaaaa', 'bbbbb'])
+      end
+
+      it "includes the current user's author ids on submission comments" do
+        expect(submission_1_json['submission_comments'].map { |s| s['author_id'] }).to include(teacher.id.to_s)
+      end
+
+      it "includes the current user's author name on submission comments" do
+        expect(submission_1_json['submission_comments'].map { |s| s['author_name'] }).to include(teacher.name)
+      end
+    end
+  end
+
+  describe "grader anonymity" do
+    let_once(:course) { course_with_teacher(active_all: true, name: "Teacher").course }
+    let_once(:teacher) { @teacher }
+    let_once(:ta) do
+      course_with_ta(course: course, active_all: true)
+      @ta
     end
 
-    it "excludes ids from students" do
-      json = Assignment::SpeedGrader.new(assignment, teacher).json
-      expect(json['context']['students']).to all(not_have_key('id'))
+    let_once(:section) { course.course_sections.create!(name: "Section 1") }
+    let_once(:student) { user_with_pseudonym(active_all: true, username: "student1@example.com") }
+
+    let_once(:assignment) do
+      course.assignments.create!(
+        anonymous_grading: true,
+        grader_count: 2,
+        moderated_grading: true,
+        submission_types: ['online_text_entry'],
+        title: "Example Assignment"
+      )
+    end
+    let_once(:rubric_association) do
+      rubric = rubric_model
+      rubric.associate_with(assignment, course, purpose: "grading", use_for_grading: true)
     end
 
-    it "adds anonymous ids to students" do
-      json = Assignment::SpeedGrader.new(assignment, teacher).json
-      anonymous_ids = json['context']['students'].map { |student| student['anonymous_id'] }
-      expect(anonymous_ids).to match_array(['aaaaa', 'bbbbb', 'ccccc'])
-    end
+    let_once(:submission) { assignment.submit_homework(student, submission_type: "online_text_entry") }
 
-    it "excludes user ids from submissions" do
-      json = Assignment::SpeedGrader.new(assignment, teacher).json
-      expect(json['submissions']).to all(not_have_key('user_id'))
-    end
+    let(:teacher_pg) { submission.provisional_grade(teacher) }
+    let(:ta_pg) { submission.provisional_grade(ta) }
 
-    it "includes anonymous ids on submissions" do
-      json = Assignment::SpeedGrader.new(assignment, teacher).json
-      anonymous_ids = json['submissions'].map { |submission| submission['anonymous_id'] }
-      expect(anonymous_ids).to match_array(['aaaaa', 'bbbbb', 'ccccc'])
-    end
+    let(:json) { Assignment::SpeedGrader.new(assignment, teacher, avatars: true, grading_role: :moderator).json }
 
-    it "excludes user ids from rubrics" do
-      submission_1.add_comment(author: teacher, comment: "provisional comment", provisional: true)
-      provisional_grade = submission_1.provisional_grade(teacher)
-      provisional_grade.update_attribute(:score, 2)
+    before :once do
+      course.account.enable_feature!(:anonymous_moderated_marking)
+
+      course.enroll_student(student, section: section).accept!
+      assignment.update_submission(student, comment: 'comment by student', commenter: student)
+
+      assignment.moderation_graders.create!(user: teacher, anonymous_id: 'teach')
+      assignment.moderation_graders.create!(user: ta, anonymous_id: 'atata')
+
+      selection = assignment.moderated_grading_selections.find_by(student_id: student.id)
+
+      submission.add_comment(author: teacher, comment: 'comment by teacher', provisional: false)
+      submission.add_comment(author: teacher, comment: 'provisional comment by teacher', provisional: true)
+      teacher_pg.update_attribute(:score, 2)
+
       rubric_association.assess(
-        artifact: provisional_grade,
+        artifact: teacher_pg,
         assessment: {
           assessment_type: 'grading',
           criterion_crit1: {
-            points: 2,
-            comments: 'Comment',
+            comments: 'a comment',
+            points: 2
           }
         },
         assessor: teacher,
-        user: student_1
+        user: student
       )
-      json = Assignment::SpeedGrader.new(assignment, teacher).json
-      student = json['context']['students'].detect { |s| s['anonymous_id'] == 'aaaaa' }
-      expect(student['rubric_assessments']).to all(not_have_key('user_id'))
+
+      selection.provisional_grade = teacher_pg
+      selection.save!
+
+      submission.add_comment(author: ta, comment: 'comment by ta', provisional: false)
+      submission.add_comment(author: ta, comment: 'provisional comment by ta', provisional: true)
+      ta_pg.update_attribute(:score, 3)
+
+      rubric_association.assess(
+        artifact: ta_pg,
+        assessment: {
+          assessment_type: 'grading',
+          criterion_crit1: {
+            comments: 'a comment',
+            points: 3
+          }
+        },
+        assessor: ta,
+        user: student
+      )
     end
 
-    it "excludes student author ids from submission comments" do
-      submission_1.add_comment(author: student_1, comment: "Example")
-      submission_1.add_comment(author: student_1, comment: "Sample")
-      json = Assignment::SpeedGrader.new(assignment, teacher).json
-      submission = json['submissions'].detect { |s| s['anonymous_id'] == 'aaaaa' }
-      expect(submission['submission_comments']).to all(not_have_key('author_id'))
+    before :each do
+      submission.anonymous_id = 'aaaaa'
+      submission.save!
+
+      allow(assignment).to receive(:can_view_student_names?).with(teacher).and_return(true)
     end
 
-    it "excludes student author names from submission comments" do
-      submission_1.add_comment(author: student_1, comment: "Example")
-      submission_1.add_comment(author: student_1, comment: "Sample")
-      json = Assignment::SpeedGrader.new(assignment, teacher).json
-      submission = json['submissions'].detect { |s| s['anonymous_id'] == 'aaaaa' }
-      expect(submission['submission_comments']).to all(not_have_key('author_name'))
+    context "when the grader cannot view other grader names" do
+      let(:submission_json) { json['submissions'][0] }
+
+      before :each do
+        allow(assignment).to receive(:can_view_other_grader_identities?).with(teacher).and_return(false)
+      end
+
+      it "excludes scorer_id from submissions when a final grade has been selected" do
+        expect(submission_json).not_to have_key('scorer_id')
+      end
+
+      it "includes anonymous_grader_id on submissions when a final grade has been selected" do
+        expect(submission_json['anonymous_grader_id']).to eq 'teach'
+      end
+
+      # submission comments
+
+      it "excludes author_id from grader comments" do
+        grader_comments = submission_json['submission_comments'].reject {|comment| comment['author_id'] == student.id.to_s}
+        expect(grader_comments).to all(not_have_key("author_id"))
+      end
+
+      it "includes anonymous_id on grader comments" do
+        grader_comments = submission_json['submission_comments'].reject {|comment| comment['author_id'] == student.id.to_s}
+        anonymous_ids = grader_comments.map {|comment| comment['anonymous_id']}
+        expect(anonymous_ids.uniq).to match_array ["teach", "atata"]
+      end
+
+      it "excludes author_name from other graders' comments" do
+        ta_comment = submission_json['submission_comments'].detect {|comment| comment['anonymous_id'] == 'atata'}
+        expect(ta_comment).not_to have_key('author_name')
+      end
+
+      it "includes author_name on the current graders' comments" do
+        teacher_comment = submission_json['submission_comments'].detect {|comment| comment['anonymous_id'] == 'teach'}
+        expect(teacher_comment['author_name']).to eq "Teacher"
+      end
+
+      it "uses the default avatar for other graders' comments" do
+        ta_comment = submission_json['submission_comments'].detect {|comment| comment['anonymous_id'] == 'atata'}
+        expect(ta_comment['avatar_path']).to eql(User.default_avatar_fallback)
+      end
+
+      it "uses the user avatar for the current grader's comments" do
+        ta_comment = submission_json['submission_comments'].detect {|comment| comment['anonymous_id'] == 'teach'}
+        expect(ta_comment['avatar_path']).to eql(teacher.avatar_path)
+      end
+
+      context "when the user can view student names" do
+        it "includes author_id on student comments" do
+          student_comments = submission_json['submission_comments'].select {|comment| comment['author_id'] == student.id.to_s}
+          expect(student_comments).not_to be_empty
+        end
+
+        it "excludes anonymous_id from student comments" do
+          student_comments = submission_json['submission_comments'].select {|comment| comment['author_id'] == student.id.to_s}
+          expect(student_comments).to all(not_have_key("anonymous_id"))
+        end
+
+        it "includes author_name on student comments" do
+          student_comment = submission_json['submission_comments'].detect {|comment| comment['author_id'] == student.id.to_s}
+          expect(student_comment['author_name']).to eql student.name
+        end
+
+        it "uses the user avatar for students on submission comments" do
+          student_comment = submission_json['submission_comments'].detect {|comment| comment['author_id'] == student.id.to_s}
+          expect(student_comment['avatar_path']).to eql(student.avatar_path)
+        end
+      end
+
+      context "when the user cannot view student names" do
+        before :each do
+          allow(assignment).to receive(:can_view_student_names?).with(teacher).and_return(false)
+        end
+
+        it "includes anonymous_id on student comments" do
+          student_comments = submission_json['submission_comments'].select {|comment| comment['anonymous_id'] == "aaaaa"}
+          expect(student_comments).not_to be_empty
+        end
+
+        it "excludes author_id from student comments" do
+          student_comments = submission_json['submission_comments'].select {|comment| comment['anonymous_id'] == "aaaaa"}
+          expect(student_comments).to all(not_have_key("author_id"))
+        end
+
+        it "excludes author_name from student comments" do
+          student_comment = submission_json['submission_comments'].detect {|comment| comment['anonymous_id'] == 'aaaaa'}
+          expect(student_comment).not_to have_key('author_name')
+        end
+
+        it "uses the default avatar for student comments" do
+          student_comment = submission_json['submission_comments'].detect {|comment| comment['anonymous_id'] == 'aaaaa'}
+          expect(student_comment['avatar_path']).to eql(User.default_avatar_fallback)
+        end
+      end
+
+      # current user's rubric assessments
+
+      it "includes assessor_name on the current grader's rubric assessments' on students" do
+        teacher_assessments = json['context']['students'][0]['rubric_assessments']
+        expect(teacher_assessments).to all(include("assessor_name" => "Teacher"))
+      end
+
+      it "excludes assessor_id from the current grader's rubric assessments on students" do
+        teacher_assessments = json['context']['students'][0]['rubric_assessments']
+        expect(teacher_assessments).to all(not_have_key("assessor_id"))
+      end
+
+      it "includes anonymous_assessor_id on the current grader's rubric assessments on students" do
+        teacher_assessments = json['context']['students'][0]['rubric_assessments']
+        expect(teacher_assessments).to all(include("anonymous_assessor_id" => "teach"))
+      end
+
+      # all provisional grades (current user)
+
+      it "includes anonymous_grader_id on provisional grades given by the current user'" do
+        teacher_grades = submission_json['provisional_grades'].select {|grade| grade['anonymous_grader_id'] == 'teach'}
+        expect(teacher_grades).not_to be_empty
+      end
+
+      it "excludes scorer_id from provisional grades given by the current user'" do
+        teacher_grades = submission_json['provisional_grades'].select {|grade| grade['anonymous_grader_id'] == 'teach'}
+        expect(teacher_grades).to all(not_have_key("scorer_id"))
+      end
+
+      # all provisional grades (other grader)
+
+      it "includes anonymous_grader_id on provisional grades given by another grader'" do
+        ta_grades = submission_json['provisional_grades'].select {|grade| grade['anonymous_grader_id'] == 'atata'}
+        expect(ta_grades).not_to be_empty
+      end
+
+      it "excludes scorer_id from provisional grades given by another grader'" do
+        ta_grades = submission_json['provisional_grades'].select {|grade| grade['anonymous_grader_id'] == 'atata'}
+        expect(ta_grades).to all(not_have_key("scorer_id"))
+      end
+
+      # all provisional grade rubric assessments (current user)
+
+      it "includes assessor_name on the current grader's rubric assessments on provisional grades'" do
+        teacher_grade = submission_json['provisional_grades'].detect {|grade| grade['anonymous_grader_id'] == 'teach'}
+        teacher_assessments = teacher_grade['rubric_assessments']
+        expect(teacher_assessments).to all(include("assessor_name" => "Teacher"))
+      end
+
+      it "excludes assessor_id from the current grader's rubric assessments on provisional grades" do
+        teacher_grade = submission_json['provisional_grades'].detect {|grade| grade['anonymous_grader_id'] == 'teach'}
+        teacher_assessments = teacher_grade['rubric_assessments']
+        expect(teacher_assessments).to all(not_have_key("assessor_id"))
+      end
+
+      it "includes anonymous_assessor_id on the current grader's rubric assessments on provisional grades" do
+        teacher_grade = submission_json['provisional_grades'].detect {|grade| grade['anonymous_grader_id'] == 'teach'}
+        teacher_assessments = teacher_grade['rubric_assessments']
+        expect(teacher_assessments).to all(include("anonymous_assessor_id" => "teach"))
+      end
+
+      # all provisional grade rubric assessments (other graders)
+
+      it "excludes assessor_name other grader's rubric assessments on provisional grades'" do
+        ta_grade = submission_json['provisional_grades'].detect {|grade| grade['anonymous_grader_id'] == 'atata'}
+        ta_assessments = ta_grade['rubric_assessments']
+        expect(ta_assessments).to all(not_have_key("assessor_name"))
+      end
+
+      it "excludes assessor_id from other grader's rubric assessments on provisional grades" do
+        ta_grade = submission_json['provisional_grades'].detect {|grade| grade['anonymous_grader_id'] == 'atata'}
+        ta_assessments = ta_grade['rubric_assessments']
+        expect(ta_assessments).to all(not_have_key("assessor_id"))
+      end
+
+      it "includes anonymous_assessor_id on other grader's rubric assessments on provisional grades" do
+        ta_grade = submission_json['provisional_grades'].detect {|grade| grade['anonymous_grader_id'] == 'atata'}
+        ta_assessments = ta_grade['rubric_assessments']
+        expect(ta_assessments).to all(include("anonymous_assessor_id" => "atata"))
+      end
+
+      # final provisional grade (current user)
+
+      it "excludes scorer_id from the final provisional grade when given by the current user'" do
+        teacher_pg.update!(final: true)
+        expect(submission_json['final_provisional_grade']).not_to have_key("scorer_id")
+      end
+
+      it "includes anonymous_grader_id on the final provisional grade when given by the current user'" do
+        teacher_pg.update!(final: true)
+        expect(submission_json['final_provisional_grade']['anonymous_grader_id']).to eql("teach")
+      end
+
+      # final provisional grade (other grader)
+
+      it "excludes scorer_id from the final provisional grade when given by another grader'" do
+        ta_pg.update!(final: true)
+        expect(submission_json['final_provisional_grade']).not_to have_key("scorer_id")
+      end
+
+      it "includes anonymous_grader_id on the final provisional grade when given by another grader'" do
+        ta_pg.update!(final: true)
+        expect(submission_json['final_provisional_grade']['anonymous_grader_id']).to eql("atata")
+      end
+
+      # final provisional grade rubric assessments (current user)
+
+      it "includes assessor_name on the current grader's rubric assessments on the final provisional grade'" do
+        teacher_pg.update!(final: true)
+        teacher_assessments = submission_json['final_provisional_grade']['rubric_assessments']
+        expect(teacher_assessments).to all(include("assessor_name" => "Teacher"))
+      end
+
+      it "excludes assessor_id from the current grader's rubric assessments on the final provisional grade" do
+        teacher_pg.update!(final: true)
+        teacher_assessments = submission_json['final_provisional_grade']['rubric_assessments']
+        expect(teacher_assessments).to all(not_have_key("assessor_id"))
+      end
+
+      it "includes anonymous_assessor_id on the current grader's rubric assessments on the final provisional grade" do
+        teacher_pg.update!(final: true)
+        teacher_assessments = submission_json['final_provisional_grade']['rubric_assessments']
+        expect(teacher_assessments).to all(include("anonymous_assessor_id" => "teach"))
+      end
+
+      # final provisional grade rubric assessments (other grader)
+
+      it "excludes assessor_name from the other grader's rubric assessments on the final provisional grade'" do
+        ta_pg.update!(final: true)
+        ta_assessments = submission_json['final_provisional_grade']['rubric_assessments']
+        expect(ta_assessments).to all(not_have_key("assessor_name"))
+      end
+
+      it "excludes assessor_id from the other grader's rubric assessments on the final provisional grade" do
+        ta_pg.update!(final: true)
+        ta_assessments = submission_json['final_provisional_grade']['rubric_assessments']
+        expect(ta_assessments).to all(not_have_key("assessor_id"))
+      end
+
+      it "includes anonymous_assessor_id on the other grader's rubric assessments on the final provisional grade" do
+        ta_pg.update!(final: true)
+        ta_assessments = submission_json['final_provisional_grade']['rubric_assessments']
+        expect(ta_assessments).to all(include("anonymous_assessor_id" => "atata"))
+      end
     end
 
-    it "includes author ids of other graders on submission comments" do
-      submission_1.add_comment(author: student_1, comment: "Example")
-      submission_1.add_comment(author: ta, comment: "Sample")
-      json = Assignment::SpeedGrader.new(assignment, teacher).json
-      submission = json['submissions'].detect { |s| s['anonymous_id'] == 'aaaaa' }
-      anonymous_ids = submission['submission_comments'].map { |s| s['author_id'] }
-      expect(anonymous_ids).to match_array([nil, ta.id.to_s])
-    end
+    context "when the grader can view other grader names" do
+      let(:submission_json) { json['submissions'][0] }
 
-    it "includes author names of other graders on submission comments" do
-      submission_1.add_comment(author: student_1, comment: "Example")
-      submission_1.add_comment(author: ta, comment: "Sample")
-      json = Assignment::SpeedGrader.new(assignment, teacher).json
-      submission = json['submissions'].detect { |s| s['anonymous_id'] == 'aaaaa' }
-      author_names = submission['submission_comments'].map { |s| s['author_name'] }
-      expect(author_names).to match_array([nil, ta.name])
-    end
+      before :each do
+        allow(assignment).to receive(:can_view_other_grader_identities?).with(teacher).and_return(true)
+      end
 
-    it "uses the default avatar for students on submission comments" do
-      submission_1.add_comment(author: student_1, comment: "Example")
-      submission_1.add_comment(author: student_1, comment: "Sample")
-      json = Assignment::SpeedGrader.new(assignment, teacher, avatars: true).json
-      submission = json['submissions'].detect { |s| s['anonymous_id'] == 'aaaaa' }
-      avatars = submission['submission_comments'].map { |s| s['avatar_path'] }
-      expect(avatars).to all(eql(User.default_avatar_fallback))
-    end
+      it "includes scorer_id on submissions when a final grade has been selected" do
+        expect(submission_json['scorer_id']).to eql(teacher.id.to_s)
+      end
 
-    it "uses the user avatar for other graders on submission comments" do
-      submission_1.add_comment(author: teacher, comment: "Example")
-      submission_1.add_comment(author: ta, comment: "Sample")
-      json = Assignment::SpeedGrader.new(assignment, teacher, avatars: true).json
-      submission = json['submissions'].detect { |s| s['anonymous_id'] == 'aaaaa' }
-      avatars = submission['submission_comments'].map { |s| s['avatar_path'] }
-      expect(avatars).to match_array([ta.avatar_path, teacher.avatar_path])
-    end
+      it "excludes anonymous_grader_id from submissions when a final grade has been selected" do
+        expect(submission_json).not_to have_key('anonymous_grader_id')
+      end
 
-    it "optionally does not include avatars" do
-      submission_1.add_comment(author: student_1, comment: "Example")
-      submission_1.add_comment(author: teacher, comment: "Sample")
-      json = Assignment::SpeedGrader.new(assignment, teacher, avatars: false).json
-      submission = json['submissions'].detect { |s| s['anonymous_id'] == 'aaaaa' }
-      expect(submission['submission_comments']).to all(not_have_key('avatar_path'))
-    end
+      # submission comments
 
-    it "adds anonymous ids to submission comments" do
-      submission_1.add_comment(author: student_1, comment: "Example")
-      submission_1.add_comment(author: student_2, comment: "Sample")
-      json = Assignment::SpeedGrader.new(assignment, teacher).json
-      submission = json['submissions'].detect { |s| s['anonymous_id'] == 'aaaaa' }
-      anonymous_ids = submission['submission_comments'].map { |s| s['anonymous_id'] }
-      expect(anonymous_ids).to match_array(['aaaaa', 'bbbbb'])
-    end
+      it "includes author_id on grader comments" do
+        grader_comments = submission_json['submission_comments'].reject {|comment| comment['author_id'] == student.id.to_s}
+        anonymous_ids = grader_comments.map {|comment| comment['author_id']}
+        expect(anonymous_ids.uniq).to match_array([teacher.id, ta.id].map(&:to_s))
+      end
 
-    it "includes the current user's author ids on submission comments" do
-      submission_1.add_comment(author: teacher, comment: "Example")
-      submission_1.add_comment(author: teacher, comment: "Sample")
-      json = Assignment::SpeedGrader.new(assignment, teacher).json
-      submission = json['submissions'].detect { |s| s['anonymous_id'] == 'aaaaa' }
-      expect(submission['submission_comments'].map { |s| s['author_id'] }).to match_array([teacher.id.to_s] * 2)
-    end
+      it "excludes anonymous_id from grader comments" do
+        grader_comments = submission_json['submission_comments'].reject {|comment| comment['author_id'] == student.id.to_s}
+        expect(grader_comments).to all(not_have_key("anonymous_id"))
+      end
 
-    it "includes the current user's author names on submission comments" do
-      submission_1.add_comment(author: teacher, comment: "Example")
-      submission_1.add_comment(author: teacher, comment: "Sample")
-      json = Assignment::SpeedGrader.new(assignment, teacher).json
-      submission = json['submissions'].detect { |s| s['anonymous_id'] == 'aaaaa' }
-      expect(submission['submission_comments'].map { |s| s['author_name'] }).to match_array(['Teacher'] * 2)
+      it "includes author_name on the all graders' comments" do
+        grader_comments = submission_json['submission_comments'].reject {|comment| comment['author_id'] == student.id.to_s}
+        grader_names = grader_comments.map {|comment| comment['author_name']}
+        expect(grader_names.uniq).to match_array([teacher, ta].map(&:name))
+      end
+
+      it "uses the user avatar for the all grader's comments" do
+        grader_comments = submission_json['submission_comments'].reject {|comment| comment['author_id'] == student.id.to_s}
+        grader_avatars = grader_comments.map {|comment| comment['avatar_path']}
+        expect(grader_avatars.uniq).to match_array([teacher, ta].map(&:avatar_path))
+      end
+
+      context "when the user can view student names" do
+        it "includes author_id on student comments" do
+          student_comments = submission_json['submission_comments'].select {|comment| comment['author_id'] == student.id.to_s}
+          expect(student_comments).not_to be_empty
+        end
+
+        it "excludes anonymous_id from student comments" do
+          student_comments = submission_json['submission_comments'].select {|comment| comment['author_id'] == student.id.to_s}
+          expect(student_comments).to all(not_have_key("anonymous_id"))
+        end
+
+        it "includes author_name on student comments" do
+          student_comment = submission_json['submission_comments'].detect {|comment| comment['author_id'] == student.id.to_s}
+          expect(student_comment['author_name']).to eql student.name
+        end
+
+        it "uses the user avatar for students on submission comments" do
+          student_comment = submission_json['submission_comments'].detect {|comment| comment['author_id'] == student.id.to_s}
+          expect(student_comment['avatar_path']).to eql(student.avatar_path)
+        end
+      end
+
+      context "when the user cannot view student names" do
+        before :each do
+          allow(assignment).to receive(:can_view_student_names?).with(teacher).and_return(false)
+        end
+
+        it "includes anonymous_id on student comments" do
+          student_comments = submission_json['submission_comments'].select {|comment| comment['anonymous_id'] == "aaaaa"}
+          expect(student_comments).not_to be_empty
+        end
+
+        it "excludes author_id from student comments" do
+          student_comments = submission_json['submission_comments'].select {|comment| comment['anonymous_id'] == "aaaaa"}
+          expect(student_comments).to all(not_have_key("author_id"))
+        end
+
+        it "excludes author_name from student comments" do
+          student_comment = submission_json['submission_comments'].detect {|comment| comment['anonymous_id'] == 'aaaaa'}
+          expect(student_comment).not_to have_key('author_name')
+        end
+
+        it "uses the default avatar for student comments" do
+          student_comment = submission_json['submission_comments'].detect {|comment| comment['anonymous_id'] == 'aaaaa'}
+          expect(student_comment['avatar_path']).to eql(User.default_avatar_fallback)
+        end
+      end
+
+      # current user's rubric assessments
+
+      it "includes assessor_name on the current grader's rubric assessments' on students" do
+        teacher_assessments = json['context']['students'][0]['rubric_assessments']
+        expect(teacher_assessments).to all(include("assessor_name" => "Teacher"))
+      end
+
+      it "includes assessor_id from the current grader's rubric assessments on students" do
+        teacher_assessments = json['context']['students'][0]['rubric_assessments']
+        expect(teacher_assessments).to all(include("assessor_id" => teacher.id.to_s))
+      end
+
+      it "excludes anonymous_assessor_id on the current grader's rubric assessments on students" do
+        teacher_assessments = json['context']['students'][0]['rubric_assessments']
+        expect(teacher_assessments).to all(not_have_key("anonymous_assessor_id"))
+      end
+
+      # all provisional grades
+
+      it "includes scorer_id on all provisional grades" do
+        scorer_ids = submission_json['provisional_grades'].map {|grade| grade['scorer_id']}
+        expect(scorer_ids.uniq).to match_array([teacher.id, ta.id].map(&:to_s))
+      end
+
+      it "excludes anonymous_grader_id from all provisional grades" do
+        expect(submission_json['provisional_grades']).to all(not_have_key("anonymous_grader_id"))
+      end
+
+      # all provisional grade rubric assessments
+
+      it "includes assessor_name on all graders' rubric assessments on provisional grades'" do
+        grader_assessments = submission_json['provisional_grades'].map {|grade| grade['rubric_assessments']}.flatten
+        grader_names = grader_assessments.map {|assessment| assessment['assessor_name']}
+        expect(grader_names.uniq).to match_array([teacher, ta].map(&:name))
+      end
+
+      it "includes assessor_id on all graders' rubric assessments on provisional grades" do
+        grader_assessments = submission_json['provisional_grades'].map {|grade| grade['rubric_assessments']}.flatten
+        assessor_ids = grader_assessments.map {|assessment| assessment['assessor_id']}
+        expect(assessor_ids.uniq).to match_array([teacher.id, ta.id].map(&:to_s))
+      end
+
+      it "excludes anonymous_assessor_id from all graders' rubric assessments on provisional grades" do
+        grader_assessments = submission_json['provisional_grades'].map {|grade| grade['rubric_assessments']}.flatten
+        expect(grader_assessments).to all(not_have_key("anonymous_assessor_id"))
+      end
+
+      # final provisional grade (current user)
+
+      it "includes scorer_id on the final provisional grade when given by the current user'" do
+        teacher_pg.update!(final: true)
+        expect(submission_json['final_provisional_grade']['scorer_id']).to eql(teacher.id.to_s)
+      end
+
+      it "excludes anonymous_grader_id from the final provisional grade when given by the current user'" do
+        teacher_pg.update!(final: true)
+        expect(submission_json['final_provisional_grade']).not_to have_key("anonymous_grader_id")
+      end
+
+      # final provisional grade (other grader)
+
+      it "includes scorer_id on the final provisional grade when given by another grader'" do
+        ta_pg.update!(final: true)
+        expect(submission_json['final_provisional_grade']['scorer_id']).to eql(ta.id.to_s)
+      end
+
+      it "excludes anonymous_grader_id from the final provisional grade when given by another grader'" do
+        ta_pg.update!(final: true)
+        expect(submission_json['final_provisional_grade']).not_to have_key("anonymous_grader_id")
+      end
+
+      # final provisional grade rubric assessments (current user)
+
+      it "includes assessor_name on the current grader's rubric assessments on the final provisional grade'" do
+        teacher_pg.update!(final: true)
+        teacher_assessments = submission_json['final_provisional_grade']['rubric_assessments']
+        expect(teacher_assessments).to all(include("assessor_name" => "Teacher"))
+      end
+
+      it "includes assessor_id on the current grader's rubric assessments on the final provisional grade" do
+        teacher_pg.update!(final: true)
+        teacher_assessments = submission_json['final_provisional_grade']['rubric_assessments']
+        expect(teacher_assessments).to all(include("assessor_id" => teacher.id.to_s))
+      end
+
+      it "excludes anonymous_assessor_id from the current grader's rubric assessments on the final provisional grade" do
+        teacher_pg.update!(final: true)
+        teacher_assessments = submission_json['final_provisional_grade']['rubric_assessments']
+        expect(teacher_assessments).to all(not_have_key("anonymous_assessor_id"))
+      end
+
+      # final provisional grade rubric assessments (other grader)
+
+      it "includes assessor_name on the other grader's rubric assessments on the final provisional grade'" do
+        ta_pg.update!(final: true)
+        ta_assessments = submission_json['final_provisional_grade']['rubric_assessments']
+        expect(ta_assessments).to all(include("assessor_name" => ta.name))
+      end
+
+      it "includes assessor_id on the other grader's rubric assessments on the final provisional grade" do
+        ta_pg.update!(final: true)
+        ta_assessments = submission_json['final_provisional_grade']['rubric_assessments']
+        expect(ta_assessments).to all(include("assessor_id" => ta.id.to_s))
+      end
+
+      it "excludes anonymous_assessor_id from the other grader's rubric assessments on the final provisional grade" do
+        ta_pg.update!(final: true)
+        ta_assessments = submission_json['final_provisional_grade']['rubric_assessments']
+        expect(ta_assessments).to all(not_have_key("anonymous_assessor_id"))
+      end
     end
   end
 

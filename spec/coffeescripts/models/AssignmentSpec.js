@@ -1171,6 +1171,7 @@ QUnit.module('Assignment#renderModeratedGradingFormFieldGroup', (hooks) => {
     fakeENV.setup({
       ANONYMOUS_MODERATED_MARKING_ENABLED: false,
       AVAILABLE_MODERATORS: availableModerators,
+      HAS_GRADED_SUBMISSIONS: false,
       LOCALE: 'en',
       MODERATED_GRADING_MAX_GRADER_COUNT: 7
     })
@@ -1232,6 +1233,15 @@ QUnit.module('Assignment#renderModeratedGradingFormFieldGroup', (hooks) => {
     assignment.renderModeratedGradingFormFieldGroup()
     const [,props] = React.createElement.getCall(0).args
     strictEqual(props.locale, ENV.LOCALE)
+    React.createElement.restore()
+  })
+
+  test('passes HAS_GRADED_SUBMISSIONS in the ENV as a prop to the component', () => {
+    const assignment = new Assignment()
+    sinon.spy(React, 'createElement')
+    assignment.renderModeratedGradingFormFieldGroup()
+    const [,props] = React.createElement.getCall(0).args
+    strictEqual(props.gradedSubmissionsExist, ENV.HAS_GRADED_SUBMISSIONS)
     React.createElement.restore()
   })
 

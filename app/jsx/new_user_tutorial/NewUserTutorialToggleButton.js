@@ -19,9 +19,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!new_user_tutorial'
-import Button from '@instructure/ui-core/lib/components/Button'
-import IconMoveLeftLine from 'instructure-icons/lib/Line/IconMoveLeftLine'
-import IconMoveRightLine from 'instructure-icons/lib/Line/IconMoveRightLine'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import IconMoveLeftLine from '@instructure/ui-icons/lib/Line/IconMoveLeft'
+import IconMoveRightLine from '@instructure/ui-icons/lib/Line/IconMoveRight'
 import plainStoreShape from '../shared/proptypes/plainStoreShape'
 
   class NewUserTutorialToggleButton extends React.Component {

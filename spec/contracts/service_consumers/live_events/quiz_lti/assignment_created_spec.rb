@@ -18,7 +18,7 @@
 
 require_relative '../live_events_pact_helper'
 
-RSpec.describe 'Canvas LMS Live Events', :pact do
+RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
   describe 'assignment_created' do
 
     let(:live_event) do

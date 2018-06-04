@@ -19,12 +19,12 @@
 import I18n from 'i18n!new_nav'
 import React from 'react'
 import {bool, string} from 'prop-types'
-import Avatar from '@instructure/ui-core/lib/components/Avatar'
-import Button from '@instructure/ui-core/lib/components/Button'
-import Container from '@instructure/ui-core/lib/components/Container'
-import Heading from '@instructure/ui-core/lib/components/Heading'
-import Link from '@instructure/ui-core/lib/components/Link'
-import List, {ListItem} from '@instructure/ui-core/lib/components/List'
+import Avatar from '@instructure/ui-elements/lib/components/Avatar'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import View from '@instructure/ui-layout/lib/components/View'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
+import Link from '@instructure/ui-elements/lib/components/Link'
+import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
 
 function readCookie(key) {
   return (document.cookie.match(`(^|; )${encodeURIComponent(key)}=([^;]*)`) || 0)[2]
@@ -37,8 +37,8 @@ export default function ProfileTray({
   eportfoliosEnabled
 }) {
   return (
-    <Container as="div" padding="medium">
-      <Container textAlign="center">
+    <View as="div" padding="medium">
+      <View textAlign="center">
         <Avatar
           name={userDisplayName}
           src={userAvatarURL}
@@ -54,7 +54,7 @@ export default function ProfileTray({
           <input name="authenticity_token" value={readCookie('_csrf_token')} type="hidden" />
           <Button type="submit" size="small" margin="medium 0">{I18n.t('Logout')}</Button>
         </form>
-      </Container>
+      </View>
       <hr role="presentation"/>
       <List variant="unstyled" margin="small 0" itemSpacing="small">
         {[
@@ -79,7 +79,7 @@ export default function ProfileTray({
           )
         ].filter(Boolean)}
       </List>
-    </Container>
+    </View>
   )
 }
 

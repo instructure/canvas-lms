@@ -405,6 +405,20 @@ describe SplitUsers do
         expect(@user2.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort).to eq user2_ccs
       end
 
+      it "should work with cross-shard submissions" do
+        @shard1.activate do
+          course_with_teacher(:account => account_model)
+        end
+
+        @course.enroll_student(user1, enrollment_state: 'active')
+        assignment = @course.assignments.create!(title: "some assignment", workflow_state: 'published', submission_types: "online_text_entry")
+        submission = assignment.submit_homework(user1, submission_type: 'online_text_entry', body: 'fooey')
+
+        UserMerge.from(user1).into(user2)
+        #expect(submission.reload.user).to eq user2
+        SplitUsers.split_db_users(user2)
+        expect(submission.reload.user).to eq user1
+      end
     end
   end
 end

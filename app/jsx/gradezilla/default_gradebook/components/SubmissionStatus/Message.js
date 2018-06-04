@@ -20,8 +20,8 @@ import React from 'react'
 import {oneOf, string} from 'prop-types'
 import Grid, { GridCol, GridRow } from '@instructure/ui-core/lib/components/Grid'
 import Text from '@instructure/ui-core/lib/components/Text'
-import IconInfoLine from 'instructure-icons/lib/Line/IconInfoLine'
-import IconWarningLine from 'instructure-icons/lib/Line/IconWarningLine'
+import IconInfoLine from '@instructure/ui-icons/lib/Line/IconInfo'
+import IconWarningLine from '@instructure/ui-icons/lib/Line/IconWarning'
 
 const VARIANT_MAP = {
   info: {color: 'primary', Icon: IconInfoLine},

@@ -22,6 +22,7 @@ import $ from 'jquery'
 import I18n from 'i18n!student_groups'
 import natcompare from 'compiled/util/natcompare'
 import Group from 'compiled/models/Group'
+import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import UserCollection from 'compiled/collections/UserCollection'
 import ContextGroupCollection from 'compiled/collections/ContextGroupCollection'
 import BackboneState from '../groups/mixins/BackboneState'
@@ -35,6 +36,7 @@ import ManageGroupDialog from '../groups/components/ManageGroupDialog'
     getInitialState () {
       return {
         filter: '',
+        loading: false,
         userCollection: new UserCollection(null, {
           params: { enrollment_type: 'student' },
           comparator: natcompare.byGet('sortable_name'),
@@ -127,7 +129,10 @@ import ManageGroupDialog from '../groups/components/ManageGroupDialog'
 
     _loadMore (collection) {
       if (!collection.loadedAll && !collection.fetchingNextPage) {
-        collection.fetch({ page: 'next' })
+        this.setState({loading: true})
+        collection.fetch({ page: 'next' }).done((resp, err) => {
+          this.setState({loading: false})
+        })
       }
     },
 
@@ -231,6 +236,11 @@ import ManageGroupDialog from '../groups/components/ManageGroupDialog'
             </div>
             <div className="roster-tab tab-panel" ref="panel">
               <Filter onChange={(e) => this.setState({filter: e.target.value})} />
+              {this.state.loading ?
+                <div className="spinner-container">
+                  <Spinner title="Loading" size="large" margin="0 0 0 medium" />
+                </div>
+              : null}
               <PaginatedGroupList loading={this.state.groupCollection.fetchingNextPage}
                                   groups={filteredGroups}
                                   filter={this.state.filter}

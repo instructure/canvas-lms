@@ -28,7 +28,7 @@ module Api::V1::PlannerNote
 
   API_JSON_OPTS = {
     :only => %w(id todo_date title details user_id course_id workflow_state created_at updated_at)
-  }
+  }.freeze
 
   def planner_note_json(note, user, session, opts = {})
     api_json(note, user, session, opts.merge(API_JSON_OPTS)).tap do |json|

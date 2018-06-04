@@ -22,7 +22,8 @@ import PropTypes from 'prop-types';
 export const userShape = {
   id: PropTypes.string,
   displayName: PropTypes.string,
-  avatarUrl: PropTypes.string
+  avatarUrl: PropTypes.string,
+  color: PropTypes.string
 };
 
 export const badgeShape = {

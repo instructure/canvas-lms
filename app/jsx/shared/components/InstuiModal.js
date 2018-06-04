@@ -28,11 +28,10 @@ export {ModalBody, ModalFooter, ModalHeader} from '@instructure/ui-overlays/lib/
 /*
 ---
 This is just a wrapper around the default instructure-ui Modal that:
- * sets an applicationElement that works with canvas's HTML
  * provides a translated close button label that works with Canvas's I18n
  * sets a title for you if you provide a `label` prop
 You should be able to use it exactly like you'd use an instUi Modal by changing:
-import Modal, {ModalBody, ModalFooter} from '@instructure/ui-core/lib/components/Modal'
+import Modal, {ModalBody, ModalFooter} from '@instructure/ui-overlays/lib/components/Modal'
 to
 import Modal, {ModalBody, ModalFooter} from '../shared/components/InstuiModal'
 ---

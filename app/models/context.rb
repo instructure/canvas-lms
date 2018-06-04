@@ -100,7 +100,7 @@ module Context
     contexts = associations.group_by(&:context_code).map do |code, code_associations|
       context_name = code_associations.first.context_name
       {
-        :rubrics => associations.length,
+        :rubrics => code_associations.length,
         :context_code => code,
         :name => context_name
       }
@@ -158,23 +158,22 @@ module Context
     "#{record.context_type.underscore}_#{record.context_id}"
   end
 
-  def self.find_polymorphic(context_type, context_id)
-    klass_name = context_type.classify.to_sym
-    if CONTEXT_TYPES.include?(klass_name)
-      type = Object.const_get(klass_name, false)
-      type.find(context_id)
-    else
-      nil
-    end
-  rescue => e
-    nil
+  def self.find_by_asset_string(string)
+    from_context_codes([string]).first
   end
 
-  def self.find_by_asset_string(string)
-    opts = string.split("_", -1)
-    id = opts.pop
-    type = opts.join('_')
-    Context.find_polymorphic(type, id)
+  def self.from_context_codes(context_codes)
+    contexts = {}
+    context_codes.each do |cc|
+      type, _, id = cc.rpartition('_')
+      if CONTEXT_TYPES.include?(type.camelize.to_sym)
+        contexts[type.camelize] = [] unless contexts[type.camelize]
+        contexts[type.camelize] << id
+      end
+    end
+    contexts.reduce([]) do |memo, (context, ids)|
+      memo + context.constantize.where(id: ids)
+    end
   end
 
   def self.asset_type_for_string(string)

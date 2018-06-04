@@ -25,58 +25,59 @@ class ObserverAlertThresholdsApiController < ApplicationController
 
   def index
     thresholds = if params[:student_id]
-                   student_id = params[:student_id]
-                   link = @current_user.as_observer_observation_links.active.where(student: student_id).take
-                   return render_unauthorized_action unless link
-                   link.observer_alert_thresholds.active
+                   @current_user.as_observer_observer_alert_thresholds.active.where(student: params[:student_id])
                  else
-                   links = @current_user.as_observer_observation_links.active
-                   return render_unauthorized_action unless links.count > 0
-                   links.map { |uol| uol.observer_alert_thresholds.active }.flatten
+                   @current_user.as_observer_observer_alert_thresholds.active
                  end
+
+    if thresholds.count > 0
+      thresholds = thresholds.select(&:users_are_still_linked?)
+      return render_unauthorized_action unless thresholds.count > 0
+    end
 
     render json: thresholds.map { |threshold| observer_alert_threshold_json(threshold, @current_user, session) }
   end
 
   def show
     threshold = ObserverAlertThreshold.active.find(params[:observer_alert_threshold_id])
-    link = @current_user.as_observer_observation_links.select { |uol| uol.id == threshold.user_observation_link.id }
-    return render_unauthorized_action unless link.count > 0
+    return render_unauthorized_action unless threshold.observer_id == @current_user.id && threshold.users_are_still_linked?
     render json: observer_alert_threshold_json(threshold, @current_user, session)
   end
 
   def create
-    student_id = params[:student_id]
-    link = UserObservationLink.where(observer_id: @current_user, user_id: student_id).take
-    return render_unauthorized_action unless link
+    attrs = create_params
 
-    attrs = create_params.merge(user_observation_link: link)
-    begin
-      threshold = link.observer_alert_thresholds.create(attrs)
+    threshold = ObserverAlertThreshold.active.where(observer: attrs[:observer_id], student: attrs[:user_id], alert_type: attrs[:alert_type]).take
+    if threshold
+      # update if duplicate
+      threshold.update(threshold: attrs[:threshold])
+    else
+      threshold = ObserverAlertThreshold.create(attrs)
+    end
+
+    if threshold.valid?
       render json: observer_alert_threshold_json(threshold, @current_user, session)
-    rescue ActiveRecord::NotNullViolation
-      render :json => ['missing required parameters'], :status => :bad_request
+    else
+      render json: threshold.errors, status: :bad_request
     end
   end
 
   def update
     threshold = ObserverAlertThreshold.active.find(params[:observer_alert_threshold_id])
-    link = @current_user.as_observer_observation_links.select { |uol| uol.id == threshold.user_observation_link.id }
-    return render_unauthorized_action unless link.count > 0
+    return render_unauthorized_action unless threshold.observer_id == @current_user.id && threshold.users_are_still_linked?
     threshold.update(update_params)
     render json: observer_alert_threshold_json(threshold.reload, @current_user, session)
   end
 
   def destroy
     threshold = ObserverAlertThreshold.active.find(params[:observer_alert_threshold_id])
-    link = @current_user.as_observer_observation_links.select { |uol| uol.id == threshold.user_observation_link.id }
-    return render_unauthorized_action unless link.count > 0
+    return render_unauthorized_action unless threshold.observer_id == @current_user.id && threshold.users_are_still_linked?
     threshold.destroy
     render json: observer_alert_threshold_json(threshold, @current_user, session)
   end
 
   def create_params
-    params.require(:observer_alert_threshold).permit(:alert_type, :threshold)
+    params.require(:observer_alert_threshold).permit(:alert_type, :threshold, :observer_id, :user_id)
   end
 
   def update_params

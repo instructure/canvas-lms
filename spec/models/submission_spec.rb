@@ -63,78 +63,6 @@ describe Submission do
     end
   end
 
-  describe '.generate_unique_anonymous_id' do
-    let(:assignment) { @assignment }
-    let(:short_id) { 'aB123' }
-
-    context 'given no existing_anonymous_ids' do
-      subject(:generate_unique_anonymous_id) do
-        -> { Submission.generate_unique_anonymous_id(assignment: assignment) }
-      end
-
-      it 'creates an anonymous_id' do
-        allow(Submission).to receive(:generate_short_id).and_return(short_id)
-        expect(generate_unique_anonymous_id.call).to eql short_id
-      end
-
-      it 'fetches existing_anonymous_ids' do
-        expect(Submission).to receive(:anonymous_ids_for).with(assignment).and_call_original
-        generate_unique_anonymous_id.call
-      end
-
-      it 'creates a unique anonymous_id when collisions happen' do
-        first_student = @student
-        second_student = student_in_course(course: @course, active_all: true).user
-        first_submission = submission_model(assignment: assignment, user: first_student)
-        second_submission = submission_model(assignment: assignment, user: second_student)
-        Submission.update_all(anonymous_id: nil)
-
-        first_anonymous_id = short_id
-        colliding_anonymous_id = first_anonymous_id
-        unused_anonymous_id = 'eeeee'
-
-        allow(Submission).to receive(:generate_short_id).exactly(3).times.and_return(
-          first_anonymous_id, colliding_anonymous_id, unused_anonymous_id
-        )
-
-        anonymous_ids = [first_submission, second_submission].map do |submission|
-          submission.update!(anonymous_id: generate_unique_anonymous_id.call)
-          submission.anonymous_id
-        end
-
-        expect(anonymous_ids).to contain_exactly(first_anonymous_id, unused_anonymous_id)
-      end
-    end
-
-    context 'given a list of existing_anonymous_ids' do
-      subject do
-        Submission.generate_unique_anonymous_id(
-          assignment: assignment,
-          existing_anonymous_ids: existing_anonymous_ids_fake
-        )
-      end
-
-      let(:existing_anonymous_ids_fake) { double('Array') }
-
-      before do
-        student_in_course(course: @course, active_all: true)
-      end
-
-      it 'queries the passed in existing_anonymous_ids' do
-        allow(Submission).to receive(:generate_short_id).and_return(short_id)
-        expect(existing_anonymous_ids_fake).to receive(:include?).with(short_id).and_return(false)
-        is_expected.to eql short_id
-      end
-    end
-  end
-
-  describe '.generate_short_id' do
-    it 'generates a short id' do
-      expect(SecureRandom).to receive(:base58).with(5)
-      Submission.generate_short_id
-    end
-  end
-
   describe '.anonymous_ids_for' do
     subject { Submission.anonymous_ids_for(@first_assignment) }
 
@@ -4123,6 +4051,41 @@ describe Submission do
         sub = @assignment.submit_homework(@user, attachments: [@attachment])
         expect(sub.attachments).to eq [@attachment]
       end
+    end
+  end
+
+  describe "#can_view_details" do
+    before :each do
+      @assignment.root_account.enable_feature!(:anonymous_moderated_marking)
+      @assignment.update!(anonymous_grading: true, muted: true)
+      @submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry', body: 'a body')
+    end
+
+    it "returns true if anonymous_moderated_marking is not enabled" do
+      @assignment.root_account.disable_feature!(:anonymous_moderated_marking)
+      expect(@submission.can_view_details?(@student)).to be true
+    end
+
+    it "returns true for submitting student if assignment anonymous grading and muted" do
+      expect(@submission.can_view_details?(@student)).to be true
+    end
+
+    it "returns false for non-submitting student if assignment anonymous grading and muted" do
+      new_student = User.create!
+      @context.enroll_student(new_student, enrollment_state: 'active')
+      expect(@submission.can_view_details?(@new_student)).to be false
+    end
+
+    it "returns false for teacher if assignment anonymous grading and muted" do
+      expect(@submission.can_view_details?(@teacher)).to be false
+    end
+
+    it "returns false for admin if assignment anonymous grading and muted" do
+      expect(@submission.can_view_details?(account_admin_user)).to be false
+    end
+
+    it "returns true for site admin if assignment anonymous grading and muted" do
+      expect(@submission.can_view_details?(site_admin_user)).to be true
     end
   end
 

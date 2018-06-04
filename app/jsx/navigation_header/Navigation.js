@@ -20,7 +20,7 @@ import _ from 'underscore'
 import $ from 'jquery'
 import I18n from 'i18n!new_nav'
 import React from 'react'
-import Tray from '@instructure/ui-core/lib/components/Tray'
+import Tray from '@instructure/ui-overlays/lib/components/Tray'
 import CoursesTray from './trays/CoursesTray'
 import GroupsTray from './trays/GroupsTray'
 import AccountsTray from './trays/AccountsTray'
@@ -94,6 +94,18 @@ export default class Navigation extends React.Component {
         preventDefault(this.handleMenuClick.bind(this, type))
       )
     })
+
+    // give the trays that slide out from the the nav bar
+    // a place to mount. It has to be outside the <div id=application>
+    // to aria-hide everything but the tray when open.
+    let portal = document.getElementById('nav-tray-portal');
+    if (!portal) {
+      portal = document.createElement('div');
+      portal.id = 'nav-tray-portal';
+      // the <header> has z-index: 100. This has to be behind it,
+      portal.setAttribute('style', 'position: relative; z-index: 99;');
+      document.body.appendChild(portal)
+    }
   }
 
   componentDidMount() {
@@ -276,9 +288,8 @@ export default class Navigation extends React.Component {
         size="small"
         open={this.state.isTrayOpen}
         onDismiss={this.closeTray}
-        applicationElement={() => document.getElementById('not_right_side')}
         shouldCloseOnDocumentClick
-        mountNode={document.getElementById('main')}
+        mountNode={document.getElementById('nav-tray-portal')}
         closeButtonRef={element => {
           // work around https://github.com/facebook/react/issues/6212 where in IE11, the <svg>
           // for the "x" grabs tab focus and breaks the shouldContainFocus logic

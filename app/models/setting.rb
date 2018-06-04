@@ -17,6 +17,8 @@
 #
 
 class Setting < ActiveRecord::Base
+  SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES = 'site_admin_access_to_new_dev_key_features'.freeze
+
   self.shard_category = :unsharded if self.respond_to?(:shard_category=)
 
   @@cache = {}

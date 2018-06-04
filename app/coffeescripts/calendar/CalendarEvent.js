@@ -17,7 +17,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Spinner from '@instructure/ui-core/lib/components/Spinner'
+import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from 'Backbone'

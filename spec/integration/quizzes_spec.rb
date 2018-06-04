@@ -114,6 +114,12 @@ describe Quizzes::QuizzesController do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
         expect(response.body).not_to match(%r{SpeedGrader})
       end
+
+      it "should not link to SpeedGrader when moderated grader limit is reached" do
+        allow_any_instance_of(Assignment).to receive(:can_view_speed_grader?).and_return(false)
+        get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+        expect(response.body).not_to match(%r{SpeedGrader})
+      end
     end
   end
 

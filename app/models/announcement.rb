@@ -139,15 +139,13 @@ class Announcement < DiscussionTopic
     return if !saved_changes.keys.include?('workflow_state') || saved_changes['workflow_state'][1] != 'active'
     return if self.context_type != 'Course'
 
-    observers = self.course.enrollments.active.where(type: 'ObserverEnrollment')
-    observers.each do |observer|
-      link = UserObservationLink.active.
-        where(user_id: observer.associated_user_id, observer_id: observer.user_id).first
+    observer_enrollments = self.course.enrollments.active.where(type: 'ObserverEnrollment')
+    observer_enrollments.each do |enrollment|
+      observer = enrollment.user
+      threshold = ObserverAlertThreshold.where(observer: observer, alert_type: 'course_announcement').first
+      next unless threshold
 
-      threshold = ObserverAlertThreshold.where(user_observation_link: link, alert_type: 'course_announcement').first
-      next if threshold.nil?
-
-      ObserverAlert.create!(user_observation_link: link, observer_alert_threshold: threshold,
+      ObserverAlert.create!(observer: observer, student: threshold.student, observer_alert_threshold: threshold,
                             context: self, alert_type: 'course_announcement', action_date: self.updated_at,
                             title: I18n.t("Announcement posted: %{title}", title: self.title))
     end

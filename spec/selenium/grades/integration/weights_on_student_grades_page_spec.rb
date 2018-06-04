@@ -24,17 +24,16 @@ describe 'gradezilla' do
   include WeightingSetup
 
   let(:total_grade) do
-    student_grades = StudentGradesPage.new
     grading_period_titles = ["All Grading Periods", @gp1.title, @gp2.title]
     user_session(@teacher)
-    student_grades.visit_as_teacher(@course, @student)
+    StudentGradesPage.visit_as_teacher(@course, @student)
 
     if @grading_period_index
       title = grading_period_titles[@grading_period_index]
-      student_grades.select_period_by_name(title)
-      student_grades.click_apply_button unless title == "All Grading Periods"
+      StudentGradesPage.select_period_by_name(title)
+      StudentGradesPage.click_apply_button unless title == "All Grading Periods"
     end
-    student_grades.final_grade.text
+    StudentGradesPage.final_grade.text
   end
 
   let(:individual_view) { false }

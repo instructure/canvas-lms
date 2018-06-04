@@ -614,7 +614,42 @@ describe SIS::CSV::CourseImporter do
       "course_id,short_name,long_name,account_id,term_id,status",
       "c1,TC 101,Test Course 1,A001,T001,unpublished"
     )
-    expect(Course.active.find_by_sis_source_id('c1')).to be_present
+    expect(Course.active.where(sis_source_id: 'c1').take).to be_present
+  end
+
+  it 'should create rollback data' do
+    @account.enable_feature!(:refactor_of_sis_imports)
+    batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "data_1,TC 101,Test Course 101,,,active",
+      "data_2,TC 102,Test Course 102,,,active",
+      batch: batch1
+    )
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "student_user,user1,User,Uno,user@example.com,active",
+    )
+    process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status,associated_user_id",
+      "data_2,student_user,student,,active,"
+    )
+    batch2 = @account.sis_batches.create! { |sb| sb.data = {} }
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "data_1,TC 101,Test Course 101,,,active",
+      "data_2,TC 102,Test Course 102,,,deleted",
+      batch: batch2
+    )
+    expect(batch1.roll_back_data.where(previous_workflow_state: 'non-existent').count).to eq 2
+    expect(batch2.roll_back_data.count).to eq 2
+    expect(batch2.roll_back_data.where(context_type: 'Course').first.previous_workflow_state).to eq 'claimed'
+    expect(batch2.roll_back_data.where(context_type: 'Course').first.updated_workflow_state).to eq 'deleted'
+    expect(batch2.roll_back_data.where(context_type: 'Enrollment').first.updated_workflow_state).to eq 'deleted'
+    batch2.restore_states_for_batch
+    course = @account.all_courses.where(sis_source_id: 'data_2').take
+    expect(course.workflow_state).to eq 'claimed'
+    expect(course.enrollments.take.workflow_state).to eq 'active'
   end
 
   context "blueprint courses" do

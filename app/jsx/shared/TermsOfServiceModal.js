@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Modal, {ModalHeader, ModalBody} from '@instructure/ui-core/lib/components/Modal'
+import Modal, {ModalHeader, ModalBody} from '@instructure/ui-overlays/lib/components/Modal'
 import $ from 'jquery'
-import Heading from '@instructure/ui-core/lib/components/Heading'
-import Link from '@instructure/ui-core/lib/components/Link'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
+import Link from '@instructure/ui-elements/lib/components/Link'
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!terms_of_service_modal'

@@ -94,7 +94,8 @@ module Api
       { :lookups => { 'sis_course_id' => 'sis_source_id',
                       'id' => 'id',
                       'sis_integration_id' => 'integration_id',
-                      'lti_context_id' => 'lti_context_id' }.freeze,
+                      'lti_context_id' => 'lti_context_id',
+                      'uuid' => 'uuid' }.freeze,
         :is_not_scoped_to_account => ['id'].freeze,
         :scope => 'root_account_id' }.freeze,
     'enrollment_terms' =>

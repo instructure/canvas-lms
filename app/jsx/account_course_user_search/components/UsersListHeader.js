@@ -18,11 +18,11 @@
 
 import React from 'react'
 import { string, func, shape } from 'prop-types'
-import ApplyTheme from '@instructure/ui-core/lib/components/ApplyTheme'
-import Tooltip from '@instructure/ui-core/lib/components/Tooltip'
+import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
+import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
 import IconMiniArrowUp from '@instructure/ui-icons/lib/Solid/IconMiniArrowUp'
 import IconMiniArrowDown from '@instructure/ui-icons/lib/Solid/IconMiniArrowDown'
-import Link from '@instructure/ui-core/lib/components/Link'
+import Link from '@instructure/ui-elements/lib/components/Link'
 import preventDefault from 'compiled/fn/preventDefault'
 
 export default function UsersListHeader(props) {

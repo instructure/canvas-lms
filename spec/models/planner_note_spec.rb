@@ -51,4 +51,24 @@ describe PlannerNote do
                                                       details: "Students Need Grading")
     expect(note.workflow_state).to eq 'active'
   end
+
+  describe ".before" do
+    it "returns planner notes with to do dates before the given date" do
+      expect(PlannerNote.before(5.days.from_now).order(:id)).to eq [@student_planner_note, @teacher_planner_note]
+    end
+
+    it "does not return planner notes with to do dates after the given date" do
+      expect(PlannerNote.before(3.days.from_now).order(:id)).to eq []
+    end
+  end
+
+  describe ".after" do
+    it "returns planner notes with to do dates after the given date" do
+      expect(PlannerNote.after(3.days.from_now).order(:id)).to eq [@student_planner_note, @teacher_planner_note]
+    end
+
+    it "does not return planner notes with to do dates before the given date" do
+      expect(PlannerNote.after(5.days.from_now).order(:id)).to eq []
+    end
+  end
 end

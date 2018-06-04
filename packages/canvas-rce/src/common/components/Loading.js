@@ -16,23 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { Component, PropTypes } from "react";
+import PropTypes from "prop-types";
+
+import React, { Component } from "react";
 import formatMessage from "../../format-message";
-import ScreenReaderContent from "@instructure/ui-core/lib/components/ScreenReaderContent";
+import ScreenReaderContent from "@instructure/ui-a11y/lib/components/ScreenReaderContent";
 import { StyleSheet, css } from "aphrodite";
 
-class Loading extends Component {
-  render() {
-    var className = (css(styles.loading) + " " + this.props.className).trim();
-    return (
-      <span className={className}>
-        <ScreenReaderContent>{formatMessage("Loading...")}</ScreenReaderContent>
-        <span className={css(styles.dot, styles.dot0)} />
-        <span className={css(styles.dot, styles.dot1)} />
-        <span className={css(styles.dot, styles.dot2)} />
-      </span>
-    );
-  }
+function Loading(props) {
+  var className = (css(styles.loading) + " " + props.className).trim();
+  return (
+    <span className={className}>
+      <ScreenReaderContent>{formatMessage("Loading...")}</ScreenReaderContent>
+      <span className={css(styles.dot, styles.dot0)} />
+      <span className={css(styles.dot, styles.dot1)} />
+      <span className={css(styles.dot, styles.dot2)} />
+    </span>
+  );
 }
 
 Loading.propTypes = {

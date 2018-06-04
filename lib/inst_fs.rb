@@ -18,7 +18,8 @@
 module InstFS
   class << self
     def enabled?
-      Canvas::Plugin.find('inst_fs').enabled?
+      # true if plugin is enabled AND all settings values are set
+      Canvas::Plugin.find('inst_fs').enabled? && !!app_host && !!jwt_secret
     end
 
     def login_pixel(user, session, oauth_host)
@@ -63,7 +64,10 @@ module InstFS
     end
 
     def jwt_secret
-      Base64.decode64(setting("secret"))
+      secret = setting("secret")
+      if secret
+        Base64.decode64(secret)
+      end
     end
 
     def upload_preflight_json(context:, user:, acting_as:, folder:, filename:, content_type:, quota_exempt:, on_duplicate:, capture_url:, target_url: nil, progress_json: nil, include_param: nil)
@@ -163,6 +167,10 @@ module InstFS
       "/thumbnails/#{attachment.instfs_uuid}"
     end
 
+    def service_jwt(claims, expires_in)
+      Canvas::Security.create_jwt(claims, expires_in.from_now, self.jwt_secret, :HS512)
+    end
+
     def access_jwt(resource, options={})
       expires_in = Setting.get('instfs.access_jwt.expiration_hours', '24').to_i.hours
       expires_in = options[:expires_in] || expires_in
@@ -175,7 +183,7 @@ module InstFS
       if options[:acting_as] && options[:acting_as] != options[:user]
         claims[:acting_as_user_id] = options[:acting_as].global_id.to_s
       end
-      Canvas::Security.create_jwt(claims, expires_in.from_now, self.jwt_secret)
+      service_jwt(claims, expires_in)
     end
 
     def upload_jwt(user, acting_as, capture_url, capture_params)
@@ -190,44 +198,44 @@ module InstFS
       unless acting_as == user
         claims[:acting_as_user_id] = acting_as.global_id.to_s
       end
-      Canvas::Security.create_jwt(claims, expires_in.from_now, self.jwt_secret)
+      service_jwt(claims, expires_in)
     end
 
     def direct_upload_jwt
       expires_in = Setting.get('instfs.upload_jwt.expiration_minutes', '10').to_i.minutes
-      Canvas::Security.create_jwt({
+      service_jwt({
         iat: Time.now.utc.to_i,
         user_id: nil,
         host: "canvas",
         resource: "/files",
-      }, expires_in.from_now, self.jwt_secret)
+      }, expires_in)
     end
 
     def session_jwt(user, host)
       expires_in = Setting.get('instfs.session_jwt.expiration_minutes', '5').to_i.minutes
-      Canvas::Security.create_jwt({
+      service_jwt({
         iat: Time.now.utc.to_i,
         user_id: user.global_id&.to_s,
         host: host,
         resource: '/session/ensure'
-      }, expires_in.from_now, self.jwt_secret)
+      }, expires_in)
     end
 
     def logout_jwt(user)
       expires_in = Setting.get('instfs.logout_jwt.expiration_minutes', '5').to_i.minutes
-      Canvas::Security.create_jwt({
+      service_jwt({
         iat: Time.now.utc.to_i,
         user_id: user.global_id&.to_s,
         resource: '/session'
-      }, expires_in.from_now, self.jwt_secret)
+      }, expires_in)
     end
 
     def export_references_jwt
       expires_in = Setting.get('instfs.logout_jwt.expiration_minutes', '5').to_i.minutes
-      Canvas::Security.create_jwt({
+      service_jwt({
         iat: Time.now.utc.to_i,
         resource: '/references'
-      }, expires_in.from_now, self.jwt_secret)
+      }, expires_in)
     end
   end
 

@@ -35,7 +35,7 @@ exports[`grouping contains link pointing to course url 1`] = `
   >
     <li>
       <Animatable(ResponsivePlannerItem)
-        animatableIndex={0}
+        animatableIndex={101}
         color="#5678"
         context={
           Object {
@@ -62,7 +62,7 @@ exports[`grouping contains link pointing to course url 1`] = `
     </li>
     <li>
       <Animatable(ResponsivePlannerItem)
-        animatableIndex={1}
+        animatableIndex={102}
         color="#5678"
         context={
           Object {
@@ -125,7 +125,7 @@ exports[`renders a CompletedItemsFacade when completed items are present by defa
   >
     <li>
       <Animatable(ResponsivePlannerItem)
-        animatableIndex={0}
+        animatableIndex={101}
         color="#5678"
         context={
           Object {
@@ -151,7 +151,7 @@ exports[`renders a CompletedItemsFacade when completed items are present by defa
     </li>
     <li>
       <Animatable(CompletedItemsFacade)
-        animatableIndex={1}
+        animatableIndex={102}
         animatableItemIds={
           Array [
             "five",
@@ -161,6 +161,11 @@ exports[`renders a CompletedItemsFacade when completed items are present by defa
         itemCount={1}
         notificationBadge="none"
         onClick={[Function]}
+        theme={
+          Object {
+            "labelColor": "#5678",
+          }
+        }
       />
     </li>
   </ol>
@@ -202,7 +207,7 @@ exports[`renders the base component with required props 1`] = `
   >
     <li>
       <Animatable(ResponsivePlannerItem)
-        animatableIndex={0}
+        animatableIndex={101}
         color="#5678"
         context={
           Object {
@@ -229,7 +234,7 @@ exports[`renders the base component with required props 1`] = `
     </li>
     <li>
       <Animatable(ResponsivePlannerItem)
-        animatableIndex={1}
+        animatableIndex={102}
         color="#5678"
         context={
           Object {
@@ -284,7 +289,7 @@ exports[`renders to do items correctly 1`] = `
   >
     <li>
       <Animatable(ResponsivePlannerItem)
-        animatableIndex={0}
+        animatableIndex={101}
         color={null}
         context={Object {}}
         courseName={null}

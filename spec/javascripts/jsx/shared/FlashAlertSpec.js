@@ -31,6 +31,12 @@ QUnit.module('FlashAlert', function (hooks) {
     // add 10ms for cushion
     clock.tick(10510);
     clock.restore();
+
+    // remove the screenreader alert holder or railsFlashNotificationsHelperSpec can fail
+    const sralertholder = document.getElementById('flash_screenreader_holder');
+    if (sralertholder) {
+      sralertholder.parentElement.removeChild(sralertholder);
+    }
   });
 
   function callShowFlashAlert (props = {}) {

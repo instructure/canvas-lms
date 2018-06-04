@@ -94,35 +94,35 @@
   version "4.8.0"
   resolved "https://registry.yarnpkg.com/@instructure/postcss-themeable-styles/-/postcss-themeable-styles-4.8.0.tgz#159ea432171ba4dc43d505fb1ff5204c838ce76f"
 
-"@instructure/ui-a11y@^5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-a11y/-/ui-a11y-5.7.0.tgz#1f1f35c4004114b752f052f13a394e69a37f9c25"
+"@instructure/ui-a11y@^5", "@instructure/ui-a11y@^5.10.0":
+  version "5.10.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-a11y/-/ui-a11y-5.10.0.tgz#b4259cb4bfa784a2a0e33b0e4ede0bd3fb6fbc6e"
   dependencies:
-    "@instructure/ui-layout" "^5.7.0"
-    "@instructure/ui-themeable" "^5.7.0"
-    "@instructure/ui-utils" "^5.7.0"
+    "@instructure/ui-layout" "^5.10.0"
+    "@instructure/ui-themeable" "^5.10.0"
+    "@instructure/ui-utils" "^5.10.0"
     keycode "^2.1.8"
     prop-types "^15.5.10"
 
-"@instructure/ui-buttons@^5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-buttons/-/ui-buttons-5.7.0.tgz#6a44aa70e894c9b8aa107e615c74de580d369b49"
+"@instructure/ui-buttons@^5.10.0":
+  version "5.10.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-buttons/-/ui-buttons-5.10.0.tgz#466b6db5d3e3f6f9dbeef262bec304da918a6d43"
   dependencies:
-    "@instructure/ui-a11y" "^5.7.0"
-    "@instructure/ui-icons" "^5.7.0"
-    "@instructure/ui-layout" "^5.7.0"
-    "@instructure/ui-themeable" "^5.7.0"
-    "@instructure/ui-utils" "^5.7.0"
+    "@instructure/ui-a11y" "^5.10.0"
+    "@instructure/ui-icons" "^5.10.0"
+    "@instructure/ui-layout" "^5.10.0"
+    "@instructure/ui-themeable" "^5.10.0"
+    "@instructure/ui-utils" "^5.10.0"
     classnames "^2.2.5"
     keycode "^2.1.8"
     prop-types "^15.5.10"
 
-"@instructure/ui-container@^5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-container/-/ui-container-5.7.0.tgz#6fc4b92c6c671013c53b67b82c990e05ae1b874d"
+"@instructure/ui-container@^5.10.0":
+  version "5.10.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-container/-/ui-container-5.10.0.tgz#345de01ba0d46dac1b4d6dc93f6600e98f5a7102"
   dependencies:
-    "@instructure/ui-themeable" "^5.7.0"
-    "@instructure/ui-utils" "^5.7.0"
+    "@instructure/ui-themeable" "^5.10.0"
+    "@instructure/ui-utils" "^5.10.0"
     classnames "^2.2.5"
     prop-types "^15.5.10"
 
@@ -142,97 +142,98 @@
     numeral "^2.0.6"
     prop-types "^15.5.10"
 
-"@instructure/ui-elements@^5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-elements/-/ui-elements-5.7.0.tgz#49d2afb3dea31b938b1803ab8631b897ad7817c0"
+"@instructure/ui-elements@^5.10.0":
+  version "5.10.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-elements/-/ui-elements-5.10.0.tgz#1470cc361b7a3f6c5ab91f280bd1ca3e7c4fb3e1"
   dependencies:
-    "@instructure/ui-a11y" "^5.7.0"
-    "@instructure/ui-container" "^5.7.0"
-    "@instructure/ui-icons" "^5.7.0"
-    "@instructure/ui-layout" "^5.7.0"
-    "@instructure/ui-motion" "^5.7.0"
-    "@instructure/ui-themeable" "^5.7.0"
-    "@instructure/ui-utils" "^5.7.0"
+    "@instructure/ui-a11y" "^5.10.0"
+    "@instructure/ui-container" "^5.10.0"
+    "@instructure/ui-icons" "^5.10.0"
+    "@instructure/ui-layout" "^5.10.0"
+    "@instructure/ui-motion" "^5.10.0"
+    "@instructure/ui-themeable" "^5.10.0"
+    "@instructure/ui-utils" "^5.10.0"
     classnames "^2.2.5"
     prop-types "^15.5.10"
 
-"@instructure/ui-forms@^5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-forms/-/ui-forms-5.7.0.tgz#0acf21dc0077f477188699560a6d2320ff330d9b"
+"@instructure/ui-forms@^5":
+  version "5.10.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-forms/-/ui-forms-5.10.0.tgz#e2be6611594c18f4db0755d7f4722ffb4010d4bf"
   dependencies:
-    "@instructure/ui-a11y" "^5.7.0"
-    "@instructure/ui-buttons" "^5.7.0"
-    "@instructure/ui-elements" "^5.7.0"
-    "@instructure/ui-i18n" "^5.7.0"
-    "@instructure/ui-icons" "^5.7.0"
-    "@instructure/ui-layout" "^5.7.0"
-    "@instructure/ui-overlays" "^5.7.0"
-    "@instructure/ui-themeable" "^5.7.0"
-    "@instructure/ui-utils" "^5.7.0"
+    "@instructure/ui-a11y" "^5.10.0"
+    "@instructure/ui-buttons" "^5.10.0"
+    "@instructure/ui-elements" "^5.10.0"
+    "@instructure/ui-i18n" "^5.10.0"
+    "@instructure/ui-icons" "^5.10.0"
+    "@instructure/ui-layout" "^5.10.0"
+    "@instructure/ui-overlays" "^5.10.0"
+    "@instructure/ui-themeable" "^5.10.0"
+    "@instructure/ui-utils" "^5.10.0"
     classnames "^2.2.5"
     deep-equal "^1.0.1"
     keycode "^2.1.8"
     prop-types "^15.6.0"
 
-"@instructure/ui-i18n@^5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-i18n/-/ui-i18n-5.7.0.tgz#a750a6e2add2aa584144a97d3fb5672f8b479b81"
+"@instructure/ui-i18n@^5.10.0":
+  version "5.10.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-i18n/-/ui-i18n-5.10.0.tgz#2b5bdf32423767a0e9626c261927051c904b3c3c"
   dependencies:
-    "@instructure/ui-utils" "^5.7.0"
+    "@instructure/ui-utils" "^5.10.0"
     decimal.js "^9.0.1"
     moment-timezone "^0.5.14"
     prop-types "^15.5.10"
 
-"@instructure/ui-icons@^5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-icons/-/ui-icons-5.7.0.tgz#a7706dfba2e65186be055c8e4e2aaa4dc03df216"
+"@instructure/ui-icons@^5.10.0":
+  version "5.10.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-icons/-/ui-icons-5.10.0.tgz#b7efa12279fe408aaae004c28ea26394ca2052f2"
   dependencies:
-    "@instructure/ui-svg-images" "^5.7.0"
+    "@instructure/ui-svg-images" "^5.10.0"
     prop-types "^15.5.10"
 
-"@instructure/ui-layout@^5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-layout/-/ui-layout-5.7.0.tgz#0d89c46435857a4bda8d134107d1c3ab6ccdff74"
+"@instructure/ui-layout@^5", "@instructure/ui-layout@^5.10.0":
+  version "5.10.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-layout/-/ui-layout-5.10.0.tgz#915fb9d015de58764a55e8e3275ad024213b6967"
   dependencies:
-    "@instructure/ui-i18n" "^5.7.0"
-    "@instructure/ui-motion" "^5.7.0"
-    "@instructure/ui-portal" "^5.7.0"
-    "@instructure/ui-themeable" "^5.7.0"
-    "@instructure/ui-utils" "^5.7.0"
+    "@instructure/ui-i18n" "^5.10.0"
+    "@instructure/ui-motion" "^5.10.0"
+    "@instructure/ui-portal" "^5.10.0"
+    "@instructure/ui-themeable" "^5.10.0"
+    "@instructure/ui-utils" "^5.10.0"
     classnames "^2.2.5"
     prop-types "^15.5.10"
 
-"@instructure/ui-motion@^5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-motion/-/ui-motion-5.7.0.tgz#2dec87cce75fb3b6a1a1030619c8a1b18d9e7a14"
+"@instructure/ui-motion@^5.10.0":
+  version "5.10.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-motion/-/ui-motion-5.10.0.tgz#219e4d3476308eb151c36c492bcce6a2c640f232"
   dependencies:
-    "@instructure/ui-themeable" "^5.7.0"
-    "@instructure/ui-utils" "^5.7.0"
+    "@instructure/ui-themeable" "^5.10.0"
+    "@instructure/ui-utils" "^5.10.0"
     prop-types "^15.5.10"
 
-"@instructure/ui-overlays@^5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-overlays/-/ui-overlays-5.7.0.tgz#a54c628d9e720e942b0821ca05bc7ac32053ac0d"
+"@instructure/ui-overlays@^5.10.0":
+  version "5.10.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-overlays/-/ui-overlays-5.10.0.tgz#2a7dbc06ecba2b63455dfafd7438487c62985028"
   dependencies:
-    "@instructure/ui-a11y" "^5.7.0"
-    "@instructure/ui-buttons" "^5.7.0"
-    "@instructure/ui-elements" "^5.7.0"
-    "@instructure/ui-i18n" "^5.7.0"
-    "@instructure/ui-layout" "^5.7.0"
-    "@instructure/ui-motion" "^5.7.0"
-    "@instructure/ui-portal" "^5.7.0"
-    "@instructure/ui-themeable" "^5.7.0"
-    "@instructure/ui-utils" "^5.7.0"
+    "@instructure/ui-a11y" "^5.10.0"
+    "@instructure/ui-buttons" "^5.10.0"
+    "@instructure/ui-elements" "^5.10.0"
+    "@instructure/ui-i18n" "^5.10.0"
+    "@instructure/ui-layout" "^5.10.0"
+    "@instructure/ui-motion" "^5.10.0"
+    "@instructure/ui-portal" "^5.10.0"
+    "@instructure/ui-themeable" "^5.10.0"
+    "@instructure/ui-utils" "^5.10.0"
     classnames "^2.2.5"
     keycode "^2.1.8"
     no-scroll "^2.1.0"
     prop-types "^15.5.10"
 
-"@instructure/ui-portal@^5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-portal/-/ui-portal-5.7.0.tgz#30852032897d32d9e3f484e432532af1b5ec3246"
+"@instructure/ui-portal@^5.10.0":
+  version "5.10.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-portal/-/ui-portal-5.10.0.tgz#affedfe35d89d3d0bb7b228c026b260bf37c6ee0"
   dependencies:
-    "@instructure/ui-utils" "^5.7.0"
+    "@instructure/ui-i18n" "^5.10.0"
+    "@instructure/ui-utils" "^5.10.0"
     prop-types "^15.5.10"
 
 "@instructure/ui-presets@^4.7.2":
@@ -303,12 +304,12 @@
     webpack-dev-server "^2.9.4"
     which "^1.3.0"
 
-"@instructure/ui-svg-images@^5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-svg-images/-/ui-svg-images-5.7.0.tgz#1769281fdc2911e7e63626d6c5734792b4b53e80"
+"@instructure/ui-svg-images@^5.10.0":
+  version "5.10.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-svg-images/-/ui-svg-images-5.10.0.tgz#46757c77d575490956d66aec389d676f6d277d96"
   dependencies:
-    "@instructure/ui-themeable" "^5.7.0"
-    "@instructure/ui-utils" "^5.7.0"
+    "@instructure/ui-themeable" "^5.10.0"
+    "@instructure/ui-utils" "^5.10.0"
     classnames "^2.2.5"
     prop-types "^15.5.10"
 
@@ -341,11 +342,11 @@
     prop-types "^15.5.10"
     tinycolor2 "^1.4.1"
 
-"@instructure/ui-themeable@^5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-themeable/-/ui-themeable-5.7.0.tgz#e91988a7d5c3df37b6bae5e4b105a392333baca7"
+"@instructure/ui-themeable@^5", "@instructure/ui-themeable@^5.10.0":
+  version "5.10.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-themeable/-/ui-themeable-5.10.0.tgz#cd4fb6a64e494aaac72ecffed101505f286ad964"
   dependencies:
-    "@instructure/ui-utils" "^5.7.0"
+    "@instructure/ui-utils" "^5.10.0"
     glamor "^2.20.37"
     prop-types "^15.5.10"
     tinycolor2 "^1.4.1"
@@ -354,15 +355,15 @@
   version "4.8.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-themes/-/ui-themes-4.8.0.tgz#37bf837e6497a2e75c75a1029318f993d0672579"
 
-"@instructure/ui-toggle-details@^5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-toggle-details/-/ui-toggle-details-5.7.0.tgz#f8bc58c83a91c193c0095db556880ffa55970b13"
+"@instructure/ui-toggle-details@^5":
+  version "5.10.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-toggle-details/-/ui-toggle-details-5.10.0.tgz#64175ce0648bfbc283d8ca57d5274fcd9f922fcd"
   dependencies:
-    "@instructure/ui-buttons" "^5.7.0"
-    "@instructure/ui-elements" "^5.7.0"
-    "@instructure/ui-icons" "^5.7.0"
-    "@instructure/ui-themeable" "^5.7.0"
-    "@instructure/ui-utils" "^5.7.0"
+    "@instructure/ui-buttons" "^5.10.0"
+    "@instructure/ui-elements" "^5.10.0"
+    "@instructure/ui-icons" "^5.10.0"
+    "@instructure/ui-themeable" "^5.10.0"
+    "@instructure/ui-utils" "^5.10.0"
     classnames "^2.2.5"
     prop-types "^15.5.10"
 
@@ -383,9 +384,9 @@
     prop-types "^15.5.10"
     shortid "^2.2.8"
 
-"@instructure/ui-utils@^5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-utils/-/ui-utils-5.7.0.tgz#b1804990ded8fdfb1d66a0d069f17627bec4ba5b"
+"@instructure/ui-utils@^5.10.0":
+  version "5.10.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-utils/-/ui-utils-5.10.0.tgz#cb706f9378d363a1ec6475cef034a8dfa00c1aa1"
   dependencies:
     bowser "^1.9.1"
     decimal.js "^9.0.1"

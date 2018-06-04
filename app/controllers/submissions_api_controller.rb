@@ -853,27 +853,23 @@ class SubmissionsApiController < ApplicationController
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])
       includes = Array(params[:include])
+      can_view_student_names = @assignment.can_view_student_names?(@current_user)
       student_scope = context.students_visible_to(@current_user, include: :inactive)
-      student_scope = @assignment.students_with_visibility(student_scope)
-      student_scope = student_scope.order(:id)
-      students = Api.paginate(student_scope, self, api_v1_course_assignment_gradeable_students_url(@context, @assignment))
+      submission_scope = @assignment.submissions.except(:preload).where(user_id: student_scope).
+        order(can_view_student_names ? :user_id : :anonymous_id)
+      submission_scope = submission_scope.preload(:user) if can_view_student_names
       if (include_pg = includes.include?('provisional_grades'))
-        return unless authorized_action(@context, @current_user, :moderate_grades)
-        submissions = @assignment.submissions.where(user_id: students).preload(:provisional_grades).index_by(&:user_id)
-        selections = @assignment.moderated_grading_selections.where(student_id: students).index_by(&:student_id)
+        render_unauthorized_action and return unless @assignment.permits_moderation?(@current_user)
+        submission_scope = submission_scope.preload(provisional_grades: :selection)
       end
-      render :json => students.map { |student|
-        json = user_display_json(student, @context)
+      submissions = Api.paginate(submission_scope, self, api_v1_course_assignment_gradeable_students_url(@context, @assignment))
+      render json: submissions.map { |submission|
+        json = can_view_student_names ? user_display_json(submission.user, @context) : anonymous_user_display_json(submission.anonymous_id)
         if include_pg
-          selection = selections[student.id]
+          selection = submission.provisional_grades.find(&:selection)
           json.merge!(in_moderation_set: selection.present?,
-                      selected_provisional_grade_id: selection && selection.selected_provisional_grade_id)
-          sub = submissions[student.id]
-          pg_list = if sub
-            submission_provisional_grades_json(sub, @assignment, @current_user, includes)
-          else
-            []
-          end
+                      selected_provisional_grade_id: selection&.provisional_grade_id)
+          pg_list = submission_provisional_grades_json(submission, @assignment, @current_user, includes)
           json.merge!({ provisional_grades: pg_list })
         end
         json

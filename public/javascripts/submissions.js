@@ -337,7 +337,10 @@ import './rubric_assessment' /*global rubricAssessment*/
             found = assessment;
           }
         }
-        rubricAssessment.populateRubric($("#rubric_holder .rubric"), found);
+
+        const container = $("#rubric_holder .rubric")
+        rubricAssessment.populateNewRubric(container, found, ENV.rubricAssociation);
+
         var current_user = (!found || found.assessor_id == ENV.RUBRIC_ASSESSMENT.assessor_id);
         $("#rubric_holder .save_rubric_button").showIf(current_user);
       }).change();

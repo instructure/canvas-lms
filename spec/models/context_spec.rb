@@ -19,21 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Context do
-  context "find_polymorphic" do
-    it "should find a valid context" do
-      course = Course.create!
-      expect(Context.find_polymorphic("course", course.id)).to eql(course)
-    end
-
-    it "should not find a context with invalid type" do
-      expect(Context.find_polymorphic("WRONG", 0)).to eql(nil)
-    end
-
-    it "should not find a context with invalid id" do
-      expect(Context.find_polymorphic("course", 0)).to eql(nil)
-    end
-  end
-
   context "find_by_asset_string" do
     it "should find a valid course" do
       course = Course.create!
@@ -41,7 +26,7 @@ describe Context do
     end
 
     it "should not find an invalid course" do
-      expect(Context.find_by_asset_string("course_0")).to eql(nil)
+      expect(Context.find_by_asset_string("course_0")).to be nil
     end
 
     it "should find a valid group" do
@@ -50,7 +35,7 @@ describe Context do
     end
 
     it "should not find an invalid group" do
-      expect(Context.find_by_asset_string("group_0")).to eql(nil)
+      expect(Context.find_by_asset_string("group_0")).to be nil
     end
 
     it "should find a valid account" do
@@ -59,7 +44,7 @@ describe Context do
     end
 
     it "should not find an invalid account" do
-      expect(Context.find_by_asset_string("account_0")).to eql(nil)
+      expect(Context.find_by_asset_string("account_0")).to be nil
     end
 
     it "should find a valid user" do
@@ -68,17 +53,46 @@ describe Context do
     end
 
     it "should not find an invalid user" do
-      expect(Context.find_by_asset_string("user_0")).to eql(nil)
+      expect(Context.find_by_asset_string("user_0")).to be nil
     end
 
     it "should not find an invalid asset string" do
-      expect(Context.find_by_asset_string("")).to eql(nil)
-      expect(Context.find_by_asset_string("loser_5")).to eql(nil)
+      expect(Context.find_by_asset_string("")).to be nil
+      expect(Context.find_by_asset_string("loser_5")).to be nil
     end
 
     it "should not find a valid asset" do
       assignment_model
-      Context.find_by_asset_string(@assignment.asset_string)
+      expect(Context.find_by_asset_string(@assignment.asset_string)).to be nil
+    end
+
+    it "should not find a context with invalid type" do
+      expect(Context.find_by_asset_string("WRONG_1")).to be nil
+    end
+  end
+
+  context "from_context_codes" do
+    it "should give contexts for all context_codes sent" do
+      account = Account.create!
+      user = User.create!
+      course = Course.create!
+      course2 = Course.create!
+      group = Group.create!(context: account)
+      context_codes = [account.asset_string, course.asset_string, course2.asset_string, group.asset_string, user.asset_string]
+      expect(Context.from_context_codes(context_codes)).to eq [account, course, course2, group, user]
+    end
+
+    it "should skip invalid context types" do
+      assignment_model
+      course = Course.create!
+      context_codes = [@assignment.asset_string, course.asset_string, "thing_1"]
+      expect(Context.from_context_codes(context_codes)).to eq [course]
+    end
+
+    it "should skip invalid context ids" do
+      account = Account.default
+      context_codes = ["course_hi", "group_0", "user_your_mom", "account_-1", account.asset_string]
+      expect(Context.from_context_codes(context_codes)).to eq [account]
     end
   end
 
@@ -96,14 +110,14 @@ describe Context do
     it "should not find a valid wiki page if told to ignore wiki pages" do
       course_model
       page = @course.wiki_pages.create!(:title => 'test')
-      expect(@course.find_asset(page.asset_string, [:assignment])).to eql(nil)
+      expect(@course.find_asset(page.asset_string, [:assignment])).to be nil
     end
     it "should not find an invalid assignment" do
       assignment_model
       @course2 = Course.create!
-      expect(@course2.find_asset(@assignment.asset_string)).to eql(nil)
-      expect(@course.find_asset("assignment_0")).to eql(nil)
-      expect(@course.find_asset("")).to eql(nil)
+      expect(@course2.find_asset(@assignment.asset_string)).to be nil
+      expect(@course.find_asset("assignment_0")).to be nil
+      expect(@course.find_asset("")).to be nil
     end
 
     describe "context" do
@@ -198,8 +212,12 @@ describe Context do
       course = Course.create!(:name => 'MMM', account: parent)
       add_rubric(course)
 
-      contexts = course.rubric_contexts(nil).map { |r| r[:name] }
-      expect(contexts).to eq(['AAA', 'MMM', 'ZZZ'])
+      contexts = course.rubric_contexts(nil).map { |c| c.slice(:name, :rubrics) }
+      expect(contexts).to eq([
+        { name: 'AAA', rubrics: 1},
+        { name: 'MMM', rubrics: 1},
+        { name: 'ZZZ', rubrics: 1}
+      ])
     end
   end
 end

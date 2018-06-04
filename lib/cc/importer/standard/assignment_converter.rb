@@ -119,7 +119,7 @@ module CC::Importer::Standard
        "automatic_peer_reviews", "anonymous_peer_reviews", "freeze_on_copy",
        "grade_group_students_individually", "external_tool_new_tab", "moderated_grading",
        "rubric_hide_points", "rubric_hide_outcome_results", "rubric_use_for_grading",
-       "rubric_hide_score_total", "muted", "has_group_category", "omit_from_final_grade",
+       "rubric_hide_score_total", "has_group_category", "omit_from_final_grade",
        "intra_group_peer_reviews", "only_visible_to_overrides", "post_to_sis"].each do |bool_val|
         val = get_bool_val(meta_doc, bool_val)
         assignment[bool_val] = val unless val.nil?

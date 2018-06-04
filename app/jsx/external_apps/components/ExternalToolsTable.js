@@ -23,7 +23,7 @@ import PropTypes from 'prop-types'
 import store from '../../external_apps/lib/ExternalAppsStore'
 import ExternalToolsTableRow from '../../external_apps/components/ExternalToolsTableRow'
 import InfiniteScroll from '../../external_apps/components/InfiniteScroll'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
 export default React.createClass({
     displayName: 'ExternalToolsTable',

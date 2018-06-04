@@ -20,7 +20,7 @@ module SIS
   class SectionImporter < BaseImporter
 
     def process
-      start = Time.now
+      start = Time.zone.now
       importer = Work.new(@batch, @root_account, @logger)
       CourseSection.suspend_callbacks(:delete_enrollments_later_if_deleted) do
         Course.skip_updating_account_associations do
@@ -32,25 +32,23 @@ module SIS
       Course.update_account_associations(importer.course_ids_to_update_associations.to_a) unless importer.course_ids_to_update_associations.empty?
       importer.sections_to_update_sis_batch_ids.in_groups_of(1000, false) do |batch|
         CourseSection.where(:id => batch).update_all(:sis_batch_id => @batch.id)
-      end if @batch
+      end
       # there could be a ton of deleted sections, and it would be really slow to do a normal find_each
       # that would order by id. So do it on the slave, to force a cursor that avoids the sort so that
       # it can run really fast
       Shackles.activate(:slave) do
         # ideally we change this to find_in_batches, and call (the currently non-existent) Enrollment.destroy_batch
-        Enrollment.where(course_section_id: importer.deleted_section_ids.to_a).active.find_each do |enrollment|
+        Enrollment.where(course_section_id: importer.deleted_section_ids.to_a).active.find_in_batches do |enrollments|
           Shackles.activate(:master) do
-            begin
-              enrollment.destroy
-            rescue => e
-              ::Canvas::Errors.capture(e, type: :sis_import, account: @batch.account)
-              raise ImportError, "Failed to remove enrollment #{enrollment.id} from section #{enrollment.course_section.sis_source_id}"
-            end
+            new_data = Enrollment::BatchStateUpdater.destroy_batch(enrollments, sis_batch: @batch)
+            importer.roll_back_data.push(*new_data)
+            SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data) if @batch.using_parallel_importers?
+            importer.roll_back_data = []
           end
         end
       end
-      @logger.debug("Sections took #{Time.now - start} seconds")
-      return importer.success_count
+      @logger.debug("Sections took #{Time.zone.now - start} seconds")
+      importer.success_count
     end
 
     class Work
@@ -58,7 +56,8 @@ module SIS
         :success_count,
         :sections_to_update_sis_batch_ids,
         :course_ids_to_update_associations,
-        :deleted_section_ids
+        :deleted_section_ids,
+        :roll_back_data
       )
 
       def initialize(batch, root_account, logger)
@@ -67,6 +66,7 @@ module SIS
         @logger = logger
         @success_count = 0
         @sections_to_update_sis_batch_ids = []
+        @roll_back_data = []
         @course_ids_to_update_associations = Set.new
         @deleted_section_ids = Set.new
       end
@@ -125,19 +125,23 @@ module SIS
           section.start_at = start_date
           section.end_at = end_date
         end
-        section.restrict_enrollments_to_section_dates = (section.start_at.present? || section.end_at.present?) unless section.stuck_sis_fields.include?(:restrict_enrollments_to_section_dates)
+        unless section.stuck_sis_fields.include?(:restrict_enrollments_to_section_dates)
+          section.restrict_enrollments_to_section_dates = (section.start_at.present? || section.end_at.present?)
+        end
 
         if section.changed?
-          section.sis_batch_id = @batch.id if @batch
+          section.sis_batch_id = @batch.id
           if section.valid?
             section.save
+            data = SisBatchRollBackData.build_data(sis_batch: @batch, context: section)
+            @roll_back_data << data if data
           else
             msg = "A section did not pass validation "
             msg += "(" + "section: #{section_id} / #{name}, course: #{course_id}, error: "
             msg += section.errors.full_messages.join(", ") + ")"
             raise ImportError, msg
           end
-        elsif @batch
+        else
           @sections_to_update_sis_batch_ids << section.id
         end
 

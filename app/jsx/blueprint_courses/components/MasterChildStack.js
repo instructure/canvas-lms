@@ -20,7 +20,7 @@ import I18n from 'i18n!blueprint_courses'
 import React, { Component } from 'react'
 import cx from 'classnames'
 
-import Text from '@instructure/ui-core/lib/components/Text'
+import Text from '@instructure/ui-elements/lib/components/Text'
 
 import propTypes from '../propTypes'
 

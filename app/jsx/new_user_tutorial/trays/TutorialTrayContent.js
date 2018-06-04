@@ -18,8 +18,8 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import Heading from '@instructure/ui-core/lib/components/Heading'
-import Image from '@instructure/ui-core/lib/components/Image'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
+import Image from '@instructure/ui-elements/lib/components/Img'
 import SVGWrapper from '../../shared/SVGWrapper'
 
 const TutorialTrayContent = props => (

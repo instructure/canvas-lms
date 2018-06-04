@@ -33,9 +33,12 @@ module UserLearningObjectScopes
   end
 
   def assignments_visible_in_course(course)
-    return course.active_assignments if course.grants_any_right?(self, :read_as_admin, :manage_grades, :manage_assignments)
+    return course.active_assignments if course.grants_any_right?(self, :read_as_admin,
+                                                                       :manage_grades,
+                                                                       :manage_assignments)
     published_visible_assignments = course.active_assignments.published
-    published_visible_assignments = DifferentiableAssignment.scope_filter(published_visible_assignments,self,course, is_teacher: false)
+    published_visible_assignments = DifferentiableAssignment.scope_filter(published_visible_assignments,
+                                                                          self, course, is_teacher: false)
     published_visible_assignments
   end
 
@@ -54,14 +57,18 @@ module UserLearningObjectScopes
         end
       end
 
-      if opts[:only_favorites]
-        course_ids &= favorite_context_ids("Course")
-      end
-
-      if opts[:contexts]
-        course_ids = Array(opts[:contexts]).map(&:id) & course_ids
-      end
+      course_ids &= opts[:course_ids] if opts[:course_ids]
+      course_ids &= opts[:contexts].select{|c| c.is_a? Course}.map(&:id) if opts[:contexts]
       course_ids
+    end
+  end
+
+  def group_ids_for_todo_lists(opts)
+    shard.activate do
+      group_ids = cached_current_group_memberships.map(&:group_id)
+      group_ids &= opts[:group_ids] if opts[:group_ids]
+      group_ids &= opts[:contexts].select{|g| g.is_a? Group}.map(&:id) if opts[:contexts]
+      group_ids
     end
   end
 
@@ -69,22 +76,40 @@ module UserLearningObjectScopes
     original_shard = Shard.current
     shard.activate do
       course_ids = course_ids_for_todo_lists(participation_type, opts)
-      opts = {limit: 15}.merge(opts.slice(:due_after, :due_before, :limit, :include_ungraded, :ungraded_quizzes, :include_ignored,
-        :include_locked, :include_concluded, :scope_only, :only_favorites, :needing_submitting, :role))
+      group_ids = group_ids_for_todo_lists(opts)
+      opts = {limit: 15}.merge(opts.slice(:due_after, :due_before, :limit, :include_ungraded, :ungraded_quizzes,
+                                          :include_ignored, :include_locked, :include_concluded, :scope_only,
+                                          :needing_submitting, :role))
+      ids_by_shard = Hash.new({course_ids: [], group_ids: []})
+      Shard.partition_by_shard(course_ids) do |shard_course_ids|
+        ids_by_shard[Shard.current] = { course_ids: shard_course_ids, group_ids: [] }
+      end
+      Shard.partition_by_shard(group_ids) do |shard_group_ids|
+        shard_hash = ids_by_shard[Shard.current]
+        shard_hash[:group_ids] = shard_group_ids
+        ids_by_shard[Shard.current] = shard_hash
+      end
 
       if opts[:scope_only]
-        Shard.partition_by_shard(course_ids) do |shard_course_ids|
-          next unless Shard.current == original_shard # only provide scope on current shard
-          return yield(*arguments_for_objects_needing(object_type, purpose, shard_course_ids, participation_type, opts))
+        original_shard.activate do
+          # only provide scope on current shard
+          shard_course_ids = ids_by_shard.dig(original_shard, :course_ids)
+          opts[:group_ids] = ids_by_shard.dig(original_shard, :group_ids)
+          if shard_course_ids.present? || opts[:group_ids].present?
+            return yield(*arguments_for_objects_needing(object_type, purpose, shard_course_ids, participation_type, opts))
+          end
+          return object_type.constantize.none # fallback
         end
-        return object_type.constantize.none # fallback
       else
         course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join('/'))
         cache_key = [self, "#{object_type}_needing_#{purpose}", course_ids_cache_key, opts].cache_key
         Rails.cache.fetch(cache_key, expires_in: expires_in) do
           result = Shackles.activate(:slave) do
-            Shard.partition_by_shard(course_ids) do |shard_course_ids|
-              yield(*arguments_for_objects_needing(object_type, purpose, shard_course_ids, participation_type, opts))
+            ids_by_shard.flat_map do |shard, shard_hash|
+              shard.activate do
+                opts[:group_ids] = shard_hash[:group_ids]
+                yield(*arguments_for_objects_needing(object_type, purpose, shard_hash[:course_ids], participation_type, opts))
+              end
             end
           end
           result = result[0...opts[:limit]] if opts[:limit]
@@ -156,8 +181,8 @@ module UserLearningObjectScopes
   def submissions_needing_peer_review(opts={})
     course_ids = Shackles.activate(:slave) do
       if opts[:contexts]
-        (Array(opts[:contexts]).map(&:id) &
-        participating_student_course_ids)
+        Array(opts[:contexts]).map(&:id) &
+        participating_student_course_ids
       else
         participating_student_course_ids
       end
@@ -236,7 +261,8 @@ module UserLearningObjectScopes
         expecting_submission.
         where(:moderated_grading => true).
         where("assignments.grades_published_at IS NULL").
-        where(:id => ModeratedGrading::ProvisionalGrade.joins(:submission).where("submissions.assignment_id=assignments.id").
+        where(:id => ModeratedGrading::ProvisionalGrade.joins(:submission).
+          where("submissions.assignment_id=assignments.id").
           where(Submission.needs_grading_conditions).distinct.select(:assignment_id)).
         preload(:context)
       if options[:scope_only]
@@ -252,7 +278,7 @@ module UserLearningObjectScopes
       topics_context.
         active.
         published.
-        for_courses_and_groups(options[:shard_course_ids], cached_current_group_memberships.pluck(:group_id)).
+        for_courses_and_groups(options[:shard_course_ids], options[:group_ids]).
         todo_date_between(opts[:due_after], opts[:due_before])
     end
   end
@@ -262,7 +288,7 @@ module UserLearningObjectScopes
       wiki_pages_context.
         available_to_planner.
         visible_to_user(self).
-        for_courses_and_groups(options[:shard_course_ids], cached_current_group_memberships.pluck(:group_id)).
+        for_courses_and_groups(options[:shard_course_ids], options[:group_ids]).
         todo_date_between(opts[:due_after], opts[:due_before])
     end
   end
@@ -282,7 +308,8 @@ module UserLearningObjectScopes
         needs_grading: Set.new(Submission.active.with_assignment.needs_grading.where(user_id: self).pluck(:assignment_id)),
         # distinguishes between assignment being graded and having feedback comments, but cannot discern
         # new feedback and new grades if there is already feedback. that's OK for now, since the "New" was
-        # removed from the "New Grades" and "New Feedback" pills in the UI to simply indicate if there is _any_ feedback or grade.
+        # removed from the "New Grades" and "New Feedback" pills in the UI to simply indicate if there
+        # is _any_ feedback or grade.
         has_feedback: Set.new((self.recent_feedback(start_at: opts[:due_after]).
           select { |feedback| feedback[:submission_comments_count].to_i > 0 }).pluck(:assignment_id)),
         new_activity: Set.new(Submission.active.with_assignment.unread_for(self).pluck(:assignment_id))

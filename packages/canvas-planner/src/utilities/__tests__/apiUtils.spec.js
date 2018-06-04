@@ -365,7 +365,7 @@ describe('transformApiToInternalItem', () => {
     expect(result).toMatchSnapshot();
   });
 
-  it('extracts and transforms the proper data for a assignment response', () => {
+  it('extracts and transforms the proper data for an assignment response', () => {
     const apiResponse = makeApiResponse({
       plannable_type: 'assignment',
       plannable: makeAssignment({
@@ -396,20 +396,6 @@ describe('transformApiToInternalItem', () => {
       plannable_type: 'planner_note',
       plannable: makePlannerNote({
         course_id: undefined
-      })
-    });
-
-    const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
-    expect(result).toMatchSnapshot();
-  });
-
-  it('extracts and transforms the proper data for an announcement response', () => {
-    const apiResponse = makeApiResponse({
-      plannable_type: 'announcement',
-      plannable: makeDiscussionTopic({ // TODO: Discussion topic is probably fine for now to simulate this, but probably should change later
-        due_at: undefined,
-        todo_date: undefined,
-        unread_count: 1
       })
     });
 

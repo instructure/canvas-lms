@@ -110,6 +110,10 @@ class GradeSummaryAssignmentPresenter
     assignment.special_class ? ("hard_coded " + assignment.special_class) : "editable"
   end
 
+  def show_submission_details_link?
+    is_assignment? && submission.can_view_details?(@current_user)
+  end
+
   def classes
     classes = ["student_assignment"]
     classes << "assignment_graded" if graded?

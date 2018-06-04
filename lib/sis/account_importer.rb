@@ -20,7 +20,7 @@ module SIS
   class AccountImporter < BaseImporter
 
     def process
-      start = Time.now
+      start = Time.zone.now
       importer = Work.new(@batch, @root_account, @logger)
       Account.suspend_callbacks(:update_account_associations_if_changed) do
         Account.process_as_sis(@sis_options) do
@@ -29,21 +29,21 @@ module SIS
       end
       importer.accounts_to_set_sis_batch_ids.to_a.in_groups_of(1000, false) do |batch|
         Account.where(:id => batch).update_all(:sis_batch_id => @batch.id)
-      end if @batch
+      end
+      SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data) if @batch.using_parallel_importers?
 
-      @logger.debug("Accounts took #{Time.now - start} seconds")
-      return importer.success_count
+      @logger.debug("Accounts took #{Time.zone.now - start} seconds")
+      importer.success_count
     end
 
-  private
-
     class Work
-      attr_reader :success_count, :accounts_to_set_sis_batch_ids
+      attr_reader :success_count, :accounts_to_set_sis_batch_ids, :roll_back_data
 
       def initialize(batch, root_account, logger)
         @batch = batch
         @root_account = root_account
         @accounts_cache = {}
+        @roll_back_data = []
         @logger = logger
         @success_count = 0
         @accounts_to_set_sis_batch_ids = Set.new
@@ -101,10 +101,12 @@ module SIS
           return
         end
 
-        account.sis_batch_id = @batch.id if @batch
+        account.sis_batch_id = @batch.id
 
         update_account_associations = account.root_account_id_changed? || account.parent_account_id_changed?
         if account.save
+          data = SisBatchRollBackData.build_data(sis_batch: @batch, context: account)
+          @roll_back_data << data if data
           account.update_account_associations if update_account_associations
 
           @success_count += 1

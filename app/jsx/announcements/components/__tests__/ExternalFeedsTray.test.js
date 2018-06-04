@@ -80,5 +80,5 @@ test('renders the external feeds link', () => {
 
 test('renders the RSS feed link', () => {
   const tree = shallow(<ExternalFeedsTray {...defaultProps()} />)
-  expect(tree.find('#rss-feed-link Container').prop('children')).toMatch('RSS Feed')
+  expect(tree.find('#rss-feed-link View').prop('children')).toMatch('RSS Feed')
 })

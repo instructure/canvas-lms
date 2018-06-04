@@ -22,9 +22,9 @@ import Button from '@instructure/ui-core/lib/components/Button'
 import {MenuItem} from '@instructure/ui-core/lib/components/Menu'
 import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
 import Text from '@instructure/ui-core/lib/components/Text'
-import IconArrowOpenDownLine from 'instructure-icons/lib/Line/IconArrowOpenDownLine'
-import IconCheckSolid from 'instructure-icons/lib/Solid/IconCheckSolid'
-import IconXSolid from 'instructure-icons/lib/Solid/IconXSolid'
+import IconArrowOpenDownLine from '@instructure/ui-icons/lib/Line/IconArrowOpenDown'
+import IconCheckSolid from '@instructure/ui-icons/lib/Solid/IconCheck'
+import IconEndSolid from '@instructure/ui-icons/lib/Solid/IconEnd'
 import I18n from 'i18n!gradebook'
 import GradeFormatHelper from '../../../../../gradebook/shared/helpers/GradeFormatHelper'
 import {parseTextValue} from '../../../../../grading/helpers/GradeInputHelper'
@@ -46,7 +46,7 @@ function componentForGrade(grade, options = {}) {
     case 'incomplete': {
       return (
         <Text>
-          <IconXSolid title={I18n.t('Incomplete')} />
+          <IconEndSolid title={I18n.t('Incomplete')} />
         </Text>
       )
     }

@@ -8,6 +8,18 @@ This documentation describes the resources that make up the API.
 To get started, you'll want to review the general basics, including the
 information below and the page on <a href="oauth.html">Authentication using OAuth2</a>.
 
+API Changes
+------
+
+To follow notable API changes, view the <a href="file.changelog.html">API Change Log</a>.
+
+For a summary of all deprecations, view the <a href="file.breaking.html">breaking changes API page</a>.
+
+API Terms of Service
+------
+
+Please carefully review <a href="http://www.instructure.com/policies/api-policy">The Canvas Cloud API Terms of Service</a> before using the API.
+
 Schema
 ------
 
@@ -65,11 +77,6 @@ curl "https://canvas.instructure.com/api/v1/courses?access_token=<ACCESS-TOKEN>"
 
 Read more about <a href="oauth.html">OAuth2 and how to get access tokens.</a>
 
-API Terms of Service
---------------------
-
-Please carefully review <a href="http://www.instructure.com/policies/api-policy">The Canvas Cloud API Terms of Service</a> before using the API.
-
 SSL
 ---
 
@@ -81,10 +88,9 @@ sure that you are using HTTPS.
 About this Documentation
 ------------------------
 
-This documentation is generated directly from the Canvas LMS code
-itself. You can generate this documentation yourself if you've set up a
-local Canvas environment following the instructions on <a href="https://www.github.com/instructure/canvas-lms/wiki">Github</a>,
-run the following command from your Canvas directory:
+This documentation is generated directly from the Canvas LMS code. You can generate this documentation yourself if you've set up a
+local Canvas environment following the instructions on <a href="https://www.github.com/instructure/canvas-lms/wiki">Github</a>.
+Run the following command from your Canvas directory:
 
 ```bash
 bundle exec rake doc:api

@@ -16,12 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { Component, PropTypes } from "react";
-import Checkbox from "@instructure/ui-core/lib/components/Checkbox";
-import Container from "@instructure/ui-core/lib/components/Container";
-import TextInput from "@instructure/ui-core/lib/components/TextInput";
+import PropTypes from "prop-types";
+
+import React, { Component } from "react";
+import Checkbox from "@instructure/ui-forms/lib/components/Checkbox";
+import Container from "@instructure/ui-layout/lib/components/View";
+import TextInput from "@instructure/ui-forms/lib/components/TextInput";
 import formatMessage from "../../format-message";
-import ScreenReaderContent from "@instructure/ui-core/lib/components/ScreenReaderContent";
+import ScreenReaderContent from "@instructure/ui-a11y/lib/components/ScreenReaderContent";
 
 export default class AltTextForm extends Component {
   static propTypes = {

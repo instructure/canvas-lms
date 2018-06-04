@@ -133,7 +133,6 @@ END
       description: -> { I18n.t('Allows creating discussions for a specific section') },
       applies_to: 'Account',
       state: 'hidden',
-      development: true,
     },
     'permissions_v2_ui' =>
     {
@@ -558,8 +557,7 @@ END
       display_name: -> { I18n.t('Account Course and User Search') },
       description: -> { I18n.t('Updated UI for searching and displaying users and courses within an account.') },
       applies_to: 'Account',
-      state: 'allowed',
-      beta: true,
+      state: 'on',
       root_opt_in: true,
       touch_context: true
     },
@@ -706,6 +704,12 @@ END
     'api_token_scoping' => {
       display_name: -> { I18n.t('API Token Scoping')},
       description: -> { I18n.t('If enabled, scopes will be validated on API requests if the developer key being used requires scopes.') },
+      applies_to: 'RootAccount',
+      state: 'hidden'
+    },
+    'non_scoring_rubrics' => {
+      display_name: -> { I18n.t('Non-scoring Rubrics')},
+      description: -> { I18n.t('If enabled, the option will be presented to have non-scoring rubrics.') },
       applies_to: 'RootAccount',
       state: 'hidden'
     }

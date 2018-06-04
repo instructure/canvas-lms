@@ -229,5 +229,9 @@ export function hasGradeChanged(submission, gradeInfo, options) {
     return submissionGradeInfo.grade !== gradeInfo.grade
   }
 
+  if (gradeInfo.enteredAs === 'passFail' && options.pointsPossible === 0) {
+    return submission.enteredGrade !== gradeInfo.grade
+  }
+
   return submission.enteredScore !== gradeInfo.score
 }

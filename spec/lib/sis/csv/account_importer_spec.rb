@@ -214,4 +214,27 @@ describe SIS::CSV::AccountImporter do
     expect(a1).not_to be_nil
     expect(a1.sis_batch_id).to eq batch.id
   end
+
+  it 'should create rollback data' do
+    @account.enable_feature!(:refactor_of_sis_imports)
+    batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
+    process_csv_data_cleanly(
+      "Account_ID,Parent_Account_ID,Name,Status",
+      "A1,,math,active",
+      "A2,A1,special,active",
+    batch: batch1
+    )
+    batch2 = @account.sis_batches.create! { |sb| sb.data = {} }
+    process_csv_data_cleanly(
+      "Account_ID,Parent_Account_ID,Name,Status",
+      "A1,,math,active",
+      "A2,A1,special,deleted",
+      batch: batch2
+    )
+    expect(batch1.roll_back_data.where(previous_workflow_state: 'non-existent').count).to eq 2
+    expect(batch2.roll_back_data.count).to eq 1
+    expect(@account.all_accounts.where(sis_source_id: 'A2').take.workflow_state).to eq 'deleted'
+    batch2.restore_states_for_batch
+    expect(@account.all_accounts.where(sis_source_id: 'A2').take.workflow_state).to eq 'active'
+  end
 end

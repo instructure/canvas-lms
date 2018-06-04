@@ -21,8 +21,8 @@ import _ from 'underscore'
 import template from 'jst/conversations/message'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Checkbox from '@instructure/ui-core/lib/components/Checkbox'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
 export default class MessageView extends View {
   initialize(...args) {

@@ -196,6 +196,10 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(AccountReport, :delete_old_rows_and_runners)
   end
 
+  Delayed::Periodic.cron 'SisBatchRollBackData.cleanup_expired_data', '*/15 * * * *', priority: Delayed::LOW_PRIORITY do
+    with_each_shard_by_database(SisBatchRollBackData, :cleanup_expired_data)
+  end
+
   Delayed::Periodic.cron 'EnrollmentState.recalculate_expired_states', '*/5 * * * *', priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(EnrollmentState, :recalculate_expired_states)
   end
@@ -206,6 +210,10 @@ Rails.configuration.after_initialize do
 
   Delayed::Periodic.cron 'Assignment.clean_up_duplicating_assignments', '*/5 * * * *', priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(Assignment, :clean_up_duplicating_assignments)
+  end
+
+  Delayed::Periodic.cron 'ObserverAlert.clean_up_old_alerts', '0 * * * *', priority: Delayed::LOW_PRIORITY do
+    with_each_shard_by_database(ObserverAlert, :clean_up_old_alerts)
   end
 
   Delayed::Periodic.cron 'abandoned job cleanup', '*/10 * * * *' do

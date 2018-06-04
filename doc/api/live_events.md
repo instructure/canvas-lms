@@ -577,3 +577,14 @@ by `asset_type` and `asset_id`.
 | `module_item_id` | The Canvas id of the module item. |
 | `position` | The position of the module item in the module. |
 | `workflow_state` | The workflow state of the module item. |
+
+#### `content_migration_completed`
+
+| Field | Description |
+| ----- | ----------- |
+| `content_migration_id` | The Canvas id of the content migration. |
+| `context_id` | The Canvas id of the context associated with the content migration. |
+| `context_type` | The type of context associated with the content migration. |
+| `lti_context_id` | The lti context id of the context associated with the content migration. |
+| `context_uuid` | The uuid of the context associated with the content migration. |
+| `import_quizzes_next` | Indicates whether the user requested that the quizzes in the content migration be created in Quizzes.Next (true) or in native Canvas (false). |

@@ -95,7 +95,7 @@ class CalendarEvent < ActiveRecord::Base
     return unless @child_event_data
     current_events = child_events.group_by{ |e| e[:context_code] }
     @child_event_data.each do |data|
-      if event = current_events.delete(data[:context_code]) and event = event[0]
+      if (event = current_events.delete(data[:context_code])&.first)
         event.updating_user = @updating_user
         event.update_attributes(:start_at => data[:start_at], :end_at => data[:end_at])
       else
@@ -270,11 +270,11 @@ class CalendarEvent < ActiveRecord::Base
     :description,
     :location_name,
     :location_address
-  ]
+  ].freeze
   LOCKED_ATTRIBUTES = CASCADED_ATTRIBUTES + [
     :start_at,
     :end_at
-  ]
+  ].freeze
 
   def sync_child_events
     locked_changes = LOCKED_ATTRIBUTES.select { |attr| saved_change_to_attribute?(attr) }
@@ -454,7 +454,6 @@ class CalendarEvent < ActiveRecord::Base
       participant.lock! # in case two people try to make a reservation for the same participant
 
       if options[:cancel_existing]
-        now = Time.now.utc
         context.reservations_for(participant).lock.each do |reservation|
           raise ReservationError, "cannot cancel past reservation" if reservation.end_at < Time.now.utc
           reservation.updating_user = user

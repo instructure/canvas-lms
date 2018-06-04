@@ -182,6 +182,13 @@ module Api::V1::User
     hash
   end
 
+  def anonymous_user_display_json(anonymous_id)
+    {
+     anonymous_id: anonymous_id,
+     avatar_image_url: User.default_avatar_fallback
+    }
+  end
+
   # optimization hint, currently user only needs to pull pseudonyms from the db
   # if a site admin is making the request or they can manage_students
   def user_json_is_admin?(context = @context, current_user = @current_user)

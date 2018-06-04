@@ -42,7 +42,6 @@ if (dashboardHeaderContainer) {
   ReactDOM.render(
     <DashboardHeader
       dashboard_view={ENV.PREFERENCES.dashboard_view}
-      hide_dashcard_color_overlays={ENV.PREFERENCES.hide_dashcard_color_overlays}
       planner_enabled={ENV.STUDENT_PLANNER_ENABLED}
       flashError={$.flashError}
       flashMessage={$.flashMessage}

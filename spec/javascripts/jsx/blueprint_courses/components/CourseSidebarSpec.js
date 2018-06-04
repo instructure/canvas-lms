@@ -23,16 +23,16 @@ import moxios from 'moxios'
 
 import {ConnectedCourseSidebar} from 'jsx/blueprint_courses/components/CourseSidebar'
 import MigrationStates from 'jsx/blueprint_courses/migrationStates'
-import sampleData from '../sampleData'
+import getSampleData from '../getSampleData'
 import mockStore from '../mockStore'
 
 let clock
 let sidebarContentRef = null
 
 const initialState = {
-  masterCourse: sampleData.masterCourse,
-  existingAssociations: sampleData.courses,
-  unsyncedChanges: sampleData.unsyncedChanges,
+  masterCourse: getSampleData().masterCourse,
+  existingAssociations: getSampleData().courses,
+  unsyncedChanges: getSampleData().unsyncedChanges,
   migrationStatus: MigrationStates.states.unknown,
   canManageCourse: true,
   hasLoadedAssociations: true,

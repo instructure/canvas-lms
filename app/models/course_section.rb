@@ -239,7 +239,9 @@ class CourseSection < ActiveRecord::Base
     end
     self.save!
     self.all_enrollments.update_all all_attrs
-    Assignment.where(context: [old_course, self.course]).touch_all
+    Assignment.suspend_due_date_caching do
+      Assignment.where(context: [old_course, self.course]).touch_all
+    end
     EnrollmentState.send_later_if_production(:invalidate_states_for_course_or_section, self)
     User.send_later_if_production(:update_account_associations, user_ids) if old_course.account_id != course.account_id && !User.skip_updating_account_associations?
     if old_course.id != self.course_id && old_course.id != self.nonxlist_course_id
@@ -297,6 +299,26 @@ class CourseSection < ActiveRecord::Base
     self.assignment_overrides.each(&:destroy)
     self.discussion_topic_section_visibilities&.each(&:destroy)
     save!
+  end
+
+  def self.destroy_batch(batch, sis_batch: nil, batch_mode: false)
+    raise ArgumentError, 'Cannot call with more than 1000 sections' if batch.count > 1000
+    cs = CourseSection.where(id: batch).select(:id, :workflow_state).to_a
+    data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: cs, updated_state: 'deleted', batch_mode_delete: batch_mode)
+    CourseSection.where(id: cs.map(&:id)).update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
+    Enrollment.not_fake.where(course_section_id: cs.map(&:id)).active.find_in_batches do |e_batch|
+      Shackles.activate(:master) do
+        new_data = Enrollment::BatchStateUpdater.destroy_batch(e_batch, sis_batch: sis_batch, batch_mode: batch_mode)
+        data.push(*new_data)
+        SisBatchRollBackData.bulk_insert_roll_back_data(data)
+        data = []
+      end
+    end
+    AssignmentOverride.where(set_type: 'CourseSection', set_id: cs.map(&:id)).find_each(&:destroy)
+    DiscussionTopicSectionVisibility.where(course_section_id: cs.map(&:id)).find_in_batches do |d_batch|
+      DiscussionTopicSectionVisibility.where(id: d_batch).update_all(workflow_state: 'deleted')
+    end
+    cs.count
   end
 
   scope :active, -> { where("course_sections.workflow_state<>'deleted'") }

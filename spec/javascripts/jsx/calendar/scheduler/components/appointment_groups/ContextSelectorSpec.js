@@ -276,47 +276,8 @@ define([
     ]
     props.appointmentGroup = { context_codes: ['course_1', 'course_section_1'] }
     const component = TestUtils.renderIntoDocument(<ContextSelector {...props} />)
-    const contextSelector = TestUtils.findRenderedDOMComponentWithClass(component, 'ContextSelector')
-    TestUtils.Simulate.click(contextSelector.childNodes[0])
-    const contextDropdown = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseListItem')
-    TestUtils.Simulate.click(contextDropdown.getElementsByClassName('icon-arrow-right')[0])
-    ok(contextDropdown.getElementsByClassName('icon-arrow-down'))
-  })
-
-  test('checkbox state when contexts are in an appointmentgroup', () => {
-    props.contexts = [
-      { id: '1',
-        name: 'testcourse',
-        asset_string: 'course_1',
-        sections: [
-          {
-            id: '1',
-            asset_string: 'course_section_1'
-          }
-        ]
-      }
-    ]
-    props.contexts = [
-      { id: '1',
-        name: 'testcourse',
-        asset_string: 'course_1',
-        sections: [
-          {
-            id: '1',
-            asset_string: 'course_section_1'
-          }
-        ]
-      }
-    ]
-    props.appointmentGroup = { context_codes: ['course_1'], sub_context_codes: ['course_section_1'] }
-    const component = TestUtils.renderIntoDocument(<ContextSelector {...props} />)
-    component.componentWillReceiveProps(props)
-    const contextSelector = TestUtils.findRenderedDOMComponentWithClass(component, 'ContextSelector')
-    TestUtils.Simulate.click(contextSelector.childNodes[0])
-    const sectionDropdown = TestUtils.findRenderedDOMComponentWithClass(component, 'sectionItem')
-    const contextDropdown = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseListItem')
-    ok(sectionDropdown.childNodes[0].checked)
-    ok(contextDropdown.childNodes[1].checked)
+    TestUtils.Simulate.click(TestUtils.scryRenderedComponentsWithType(component, 'button'))
+    ok(TestUtils.scryRenderedComponentsWithType(component, 'IconMiniArrowDown'))
   })
 
   test('renders button text correctly on already selected contexts', () => {

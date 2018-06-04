@@ -17,7 +17,7 @@
 
 import pluralize from 'str/pluralize'
 
-export default function splitAssetString (assetString, toPlural = true) {
+export default function splitAssetString (assetString = '', toPlural = true) {
   const match = assetString.match(/(.*)_(\d+)$/)
   if (match) {
     const contextType = toPlural ? pluralize(match[1]) : match[1]

@@ -55,5 +55,14 @@ module GraphQLHelpers
     end
   end
 
+  # TODO - move this into LockType after we switch to the class-based api
+  def self.make_lock_resolver(attr)
+    ->(lock, _, _) {
+      lock == false ?
+        nil :
+        lock[attr]
+    }
+  end
+
   class InvalidIDError < StandardError; end
 end

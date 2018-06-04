@@ -298,4 +298,32 @@ describe Rubric do
             "id" => "blank_2"}]}]
     )
   end
+
+  describe "#update_criteria" do
+    context "populates blank titles" do
+      before do
+        rubric_model
+        @rubric.update_criteria(
+          criteria: {
+            '0' => {
+              description: '',
+              ratings: {
+                '0' => {
+                  description: ''
+                }
+              }
+            }
+          }
+        )
+      end
+
+      it "populates blank criterion title" do
+        expect(@rubric.criteria[0][:description]).to eq 'No Description'
+      end
+
+      it "populates blank rating title" do
+        expect(@rubric.criteria[0][:ratings][0][:description]).to eq 'No Description'
+      end
+    end
+  end
 end

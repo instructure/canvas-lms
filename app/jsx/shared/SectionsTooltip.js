@@ -17,11 +17,11 @@
  */
 
 import React from 'react'
-import Tooltip from '@instructure/ui-core/lib/components/Tooltip'
-import Text from '@instructure/ui-core/lib/components/Text'
-import Link from '@instructure/ui-core/lib/components/Link'
-import Container from '@instructure/ui-core/lib/components/Container'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
+import Text from '@instructure/ui-elements/lib/components/Text'
+import Link from '@instructure/ui-elements/lib/components/Link'
+import View from '@instructure/ui-layout/lib/components/View'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import I18n from 'i18n!sections_tooltip'
 
 function sectionsOrTotalCount (props, propName, componentName) {
@@ -37,9 +37,9 @@ export default function SectionsTooltip ({ sections, totalUserCount}) {
   let sectionsCountText = ""
   if (sections) {
     tipContent = sections.map((sec) =>
-      <Container key={sec.id} as='div' margin='xx-small'>
+      <View key={sec.id} as='div' margin='xx-small'>
         <Text size='small'>{I18n.t('%{name} (%{count} Users)', {name: sec.name, count: sec.user_count})}</Text>
-      </Container>
+      </View>
     )
     sectionsCountText =  I18n.t({
         one: '1 Section',
@@ -47,9 +47,9 @@ export default function SectionsTooltip ({ sections, totalUserCount}) {
       }, { count: (sections ? sections.length : 0) })
   } else {
     tipContent = (
-      <Container as='div' margin='xx-small'>
+      <View as='div' margin='xx-small'>
         <Text size='small'>{I18n.t('(%{count} Users)', {count: totalUserCount})}</Text>
-      </Container>
+      </View>
     )
     sectionsCountText = I18n.t('All Sections')
   }

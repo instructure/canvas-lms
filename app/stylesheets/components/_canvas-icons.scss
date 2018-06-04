@@ -20,20 +20,20 @@
   /// How to update Icons
   //
   //  The Instructure Icons repo is available at
-  //  https://github.com/instructure/instructure-icons
+  //  https://instructure.design/#ui-icons
   //
   //  - Add your new icon to the repo and release
-  //  - Update the instructure-icons version in package.json
+  //  - Update the @instructure/ui-icons version in package.json
   //
 ///
 
 /* @styleguide Icons
 
-Canvas uses <a href="https://github.com/instructure/instructure-icons">Instructure Icons</a> for its icon library. There are various ways that you can bring icons into Canvas, including as a React component, or from our the icon font.
+Canvas uses <a href="https://instructure.design/#ui-icons">@instructure/ui-icons</a> for its icon library. There are various ways that you can bring icons into Canvas, including as a React component, or from our the icon font.
 
 ## Comprehensive Icon Listing
 
-For a complete list of Instructure Icons go to <a href="http://instructure.github.io/instructure-icons/">http://instructure.github.io/instructure-icons</a>
+For a complete list of Instructure Icons go to <a href="https://instructure.design/#iconography">https://instructure.design/#iconography</a>
 
 ## Light vs Solid
 
@@ -46,10 +46,10 @@ There are two weights to our icons: line or solid. Canvas defaults to solid, how
 ## Using as a React Component
 
 ```javascript
-import { IconAddLine } from 'instructure-icons'
+import IconAdd from '@instructure/ui-icons/lib/Line/IconAdd'
 
 function MyComponent () {
-  return <IconAddLine />
+  return <IconAdd />
 }
 ```
 
@@ -76,15 +76,15 @@ Either use `<a>` with icon desired icon class added or insert `<i>` inside `<but
 
 */
 
-@import "../../../node_modules/instructure-icons/fonts/Line/InstructureIcons-Line_icon-map.scss";
-@import "../../../node_modules/instructure-icons/fonts/Solid/InstructureIcons-Solid_icon-map.scss";
+@import "../../../node_modules/@instructure/ui-icons/lib/font/Line/InstructureIcons-Line_icon-map.scss";
+@import "../../../node_modules/@instructure/ui-icons/lib/font/Solid/InstructureIcons-Solid_icon-map.scss";
 
 $icon_default: "Line";
 
 // this could be refactored if/when sass allows for variable interpolation
 $icon_index: (
-  "Line": $icons-Line,
-  "Solid": $icons-Solid
+  "Line": $icons-line,
+  "Solid": $icons-solid
 );
 
 @mixin InstIconFontFace($variant) {
@@ -132,28 +132,6 @@ a[class^=icon-] {
     text-transform: none !important;
     font-weight: normal !important;
     font-style: normal !important;
-  }
-
-  // flip all the arrows around in RTL
-  @if $direction == 'rtl' {
-    &[class*=-right],
-    &[class*=-left] {
-      &:before {
-        transform: scale(-1, 1);
-      }
-    }
-  }
-}
-
-// TODO: this is not the best place for this, we should probably have instructure-ui
-// handle it itself, but until instUI fixes it, flip all the left & right
-// instructure-icons arrows in RTL
-// example of things this flips: IconArrowRightSolid as well a IconExpandLeftLine
-@if $direction == 'rtl' {
-  svg[name^="Icon"] {
-    &[name*="Right"], &[name*="Left"] {
-      transform: scale(-1, 1);
-    }
   }
 }
 

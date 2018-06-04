@@ -242,7 +242,7 @@ class Rubric < ActiveRecord::Base
 
   def criterion_rating(rating_data, criterion_id)
     {
-      description: (rating_data[:description] || t("No Description")).strip,
+      description: (rating_data[:description].presence || t("No Description")).strip,
       long_description: (rating_data[:long_description] || "").strip,
       points: rating_data[:points].to_f || 0,
       criterion_id: criterion_id,
@@ -270,7 +270,7 @@ class Rubric < ActiveRecord::Base
     criteria = []
     (params[:criteria] || {}).each do |idx, criterion_data|
       criterion = {}
-      criterion[:description] = (criterion_data[:description] || t('no_description', "No Description")).strip
+      criterion[:description] = (criterion_data[:description].presence || t('no_description', "No Description")).strip
       criterion[:long_description] = (criterion_data[:long_description] || "").strip
       criterion[:points] = criterion_data[:points].to_f || 0
       criterion_data[:id].strip! if criterion_data[:id]

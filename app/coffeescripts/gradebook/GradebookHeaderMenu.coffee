@@ -184,6 +184,6 @@ define [
       not (
         @gradebook.options.anonymous_moderated_marking_enabled and
         @assignment.muted and
-        @assignment.anonymous_grading and
+        @assignment.moderated_grading and
         not @assignment.grades_published
       )

@@ -22,8 +22,8 @@ import {continueLoadingInitialItems, loadFutureItems} from '../../actions';
 export class ContinueInitialLoad extends Animation {
   uiDidUpdate () {
     const moreItemsToLoad = !this.store().getState().loading.allFutureItemsLoaded;
-    const keepLoading = this.animator().isOnScreen(this.app().fixedElementForItemScrolling(), this.stickyOffset());
-    if (moreItemsToLoad && keepLoading) {
+    const keepLoading = moreItemsToLoad && this.animator().isOnScreen(this.app().fixedElementForItemScrolling(), this.stickyOffset());
+    if (keepLoading) {
       // we have to do this after this animation is complete,
       // because these actions can't be received recursively.
       this.window().setTimeout(() => {

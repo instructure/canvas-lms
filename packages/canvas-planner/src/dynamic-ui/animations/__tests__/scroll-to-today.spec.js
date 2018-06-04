@@ -18,6 +18,7 @@
 
 import MockDate from 'mockdate';
 import moment from 'moment-timezone';
+import {initialize} from '../../../utilities/alertUtils';
 import {ScrollToToday} from '../scroll-to-today';
 import {createAnimation, mockRegistryEntry} from './test-utils';
 
@@ -25,6 +26,11 @@ const TZ = 'Asia/Tokyo';
 
 beforeAll(() => {
   MockDate.set('2018-04-15', TZ);
+  initialize({
+    visualSuccessCallback: jest.fn(),
+    visualErrorCallback: jest.fn(),
+    srAlertCallback: jest.fn()
+  });
 });
 afterAll(() => {
   MockDate.reset();

@@ -70,17 +70,23 @@ const developerKeysHandlers = {
   },
   [ACTION_NAMES.LIST_DEVELOPER_KEYS_REPLACE]: (state, action) => ({
     ...state,
-    list: state.list.map((developerKey) => (action.payload.id === developerKey.id ? action.payload : developerKey)),
+    list: state.list.map(
+      developerKey => (action.payload.id === developerKey.id ? action.payload : developerKey)
+    )
   }),
   [ACTION_NAMES.LIST_DEVELOPER_KEYS_REPLACE_BINDING_STATE]: (state, action) => {
-    const newList = state.list.map((developerKey) => {
-      if (developerKey.id !== action.payload.developer_key_id.toString()) { return developerKey }
-      return Object.assign({}, developerKey, { developer_key_account_binding: action.payload })
+    const newList = state.list.map(developerKey => {
+      if (developerKey.id !== action.payload.developer_key_id.toString()) {
+        return developerKey
+      }
+      return Object.assign({}, developerKey, {developer_key_account_binding: action.payload})
     })
 
-    const newInheritedList = state.inheritedList.map((developerKey) => {
-      if (developerKey.id !== action.payload.developer_key_id.toString()) { return developerKey }
-      return Object.assign({}, developerKey, { developer_key_account_binding: action.payload })
+    const newInheritedList = state.inheritedList.map(developerKey => {
+      if (developerKey.id !== action.payload.developer_key_id.toString()) {
+        return developerKey
+      }
+      return Object.assign({}, developerKey, {developer_key_account_binding: action.payload})
     })
 
     return {
@@ -102,16 +108,16 @@ const developerKeysHandlers = {
     }
   },
   [ACTION_NAMES.LIST_DEVELOPER_KEYS_FAILED]: (state, action) => ({
-      ...state,
-      listDeveloperKeysPending: false,
-      listDeveloperKeysError: action.payload
+    ...state,
+    listDeveloperKeysPending: false,
+    listDeveloperKeysError: action.payload
   }),
   [ACTION_NAMES.LIST_INHERITED_DEVELOPER_KEYS_FAILED]: (state, action) => ({
-      ...state,
-      listInheritedDeveloperKeysPending: false,
-      listInheritedDeveloperKeysError: action.payload
-  }),
-};
+    ...state,
+    listInheritedDeveloperKeysPending: false,
+    listInheritedDeveloperKeysError: action.payload
+  })
+}
 
 export default (state = initialState, action) => {
   if (developerKeysHandlers[action.type]) {
@@ -120,4 +126,3 @@ export default (state = initialState, action) => {
     return state
   }
 }
-

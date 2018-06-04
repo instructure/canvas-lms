@@ -68,10 +68,7 @@
 #         }
 #       }
 #     }
-class ProvisionalGradesController < ApplicationController
-  before_action :require_user
-  before_action :load_assignment
-
+class ProvisionalGradesController < ProvisionalGradesBaseController
   include Api::V1::Submission
 
   # @API Show provisional grade status for a student
@@ -90,45 +87,8 @@ class ProvisionalGradesController < ApplicationController
   #       { "needs_provisional_grade": false }
   #
   def status
-    if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
-      unless @assignment.moderated_grading?
-        return render :json => { :message => "Assignment does not use moderated grading" }, :status => :bad_request
-      end
-      if @assignment.grades_published?
-        return render :json => { :message => "Assignment grades have already been published" }, :status => :bad_request
-      end
-
-      # in theory we could apply visibility here, but for now we would rather be performant
-      # e.g. @assignment.students_with_visibility(@context.students_visible_to(@current_user)).find(params[:student_id])
-      student = @context.students.find(params[:student_id])
-      json = {:needs_provisional_grade => @assignment.student_needs_provisional_grade?(student)}
-
-
-      if params[:last_updated_at] # check to see if the submission has been updated
-        last_updated = Time.zone.parse(params[:last_updated_at]) # this will be nil if there was originally no submission, so it should match a nil submission
-        submission = @assignment.submissions.where(:user_id => student).first
-
-        if ((submission && submission.updated_at).to_i != last_updated.to_i)
-          if authorized_action(@context, @current_user, :moderate_grades) # only do the permission check if it has changed
-            selection = @assignment.moderated_grading_selections.where(:student_id => student).first
-
-            json[:provisional_grades] = []
-            submission.provisional_grades.order(:id).each do |pg|
-              pg_json = provisional_grade_json(pg, submission, @assignment, @current_user, %w(submission_comments rubric_assessment))
-              pg_json[:selected] = !!(selection && selection.selected_provisional_grade_id == pg.id)
-              pg_json[:readonly] = !pg.final && (pg.scorer_id != @current_user.id)
-              if pg.final
-                json[:final_provisional_grade] = pg_json
-              else
-                json[:provisional_grades] << pg_json
-              end
-            end
-          end
-        end
-      end
-
-      render :json => json
-    end
+    @student = @context.students.find(params.fetch(:student_id))
+    super
   end
 
   # @API Select provisional grade
@@ -147,12 +107,18 @@ class ProvisionalGradesController < ApplicationController
     render_unauthorized_action and return unless @assignment.permits_moderation?(@current_user)
 
     pg = @assignment.provisional_grades.find(params[:provisional_grade_id])
-    selection = @assignment.moderated_grading_selections.where(student_id: pg.submission.user_id).first
+    submission = pg.submission
+    selection = @assignment.moderated_grading_selections.where(student_id: submission.user_id).first
     return render :json => { :message => 'student not in moderation set' }, :status => :bad_request unless selection
     selection.provisional_grade = pg
     selection.save!
-    pg.submission.touch # so the selection is reloaded for other moderators
-    render :json => selection.as_json(:include_root => false, :only => %w(assignment_id student_id selected_provisional_grade_id))
+    submission.touch # so the selection is reloaded for other moderators
+    json = selection.as_json(include_root: false, only: %w(assignment_id student_id selected_provisional_grade_id))
+    unless @assignment.can_view_student_names?(@current_user)
+      json.delete(:student_id)
+      json[:anonymous_id] = submission.anonymous_id
+    end
+    render json: json
   end
 
   # @API Copy provisional grade
@@ -247,12 +213,5 @@ class ProvisionalGradesController < ApplicationController
     @context.touch_admins_later # just in case nothing got published
     @assignment.update_attribute(:grades_published_at, Time.now.utc)
     render :json => { :message => "OK" }
-  end
-
-  private
-
-  def load_assignment
-    @context = api_find(Course, params[:course_id])
-    @assignment = @context.assignments.active.find(params[:assignment_id])
   end
 end

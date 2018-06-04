@@ -203,6 +203,36 @@ describe ExternalToolsController, type: :request do
             expect(response.code).to eq '200'
           end
 
+          it "returns sessionless launch URL for an assignment launch no URL is set on the tool" do
+            tool = @course.context_external_tools.create!(
+              name: "Example Tool",
+              consumer_key: "fakefake",
+              shared_secret: "sofakefake",
+              domain: "example.com"
+            )
+            assignment = assignment_model(
+              course: @course,
+              name: 'tool assignment',
+              submission_types: 'external_tool',
+              points_possible: 20,
+              grading_type: 'points'
+            )
+            assignment.create_external_tool_tag!(
+              url: 'http://www.example.com/ims/lti',
+              content_type: 'ContextExternalTool',
+              content_id: tool.id
+            )
+            params = {id: tool.id.to_s, launch_type: 'assessment', assignment_id: @assignment.id}
+            json = get_sessionless_launch_url(@course, 'course', params)
+            expect(json['url']).to include(course_external_tools_sessionless_launch_url(@course))
+          end
+
+          it "returns a json error if there is no matching tool" do
+            params = {url: 'http://my_non_esisting_tool_domain.com', id: -1}
+            json = get_sessionless_launch_url(@course, 'course', params)
+            expect(json["errors"]["external_tool"]).to eq "Unable to find a matching external tool"
+          end
+
         end
 
         it "returns a bad request response if there is no tool_id or url" do
@@ -212,25 +242,6 @@ describe ExternalToolsController, type: :request do
           json = JSON.parse(response.body)
           expect(json["errors"]["id"].first["message"]).to eq 'A tool id, tool url, or module item id must be provided'
           expect(json["errors"]["url"].first["message"]).to eq 'A tool id, tool url, or module item id must be provided'
-        end
-
-        it 'redirects if there is no matching tool for the launch_url, and tool id' do
-          params = {url: 'http://my_non_esisting_tool_domain.com', id: -1}
-          code = get_raw_sessionless_launch_url(@course, 'course', params)
-          expect(code).to eq 302
-        end
-
-        it 'redirects if there is no matching tool for the and tool id' do
-          params = { id: -1}
-          code = get_raw_sessionless_launch_url(@course, 'course', params)
-          expect(code).to eq 302
-        end
-
-        it 'redirects if there is no launch url associated with the tool' do
-          no_url_tool = tool.dup
-          no_url_tool.update_attributes!(url: nil)
-          get_raw_sessionless_launch_url(@course, 'course', {id: no_url_tool.id})
-          expect(response).to be_redirect
         end
       end
     end

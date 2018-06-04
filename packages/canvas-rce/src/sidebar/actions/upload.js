@@ -28,6 +28,7 @@ export const FAIL_FILE_UPLOAD = "FAIL_FILE_UPLOAD";
 export const COMPLETE_FILE_UPLOAD = "COMPLETE_FILE_UPLOAD";
 export const TOGGLE_UPLOAD_FORM = "TOGGLE_UPLOAD_FORM";
 export const PROCESSED_FOLDER_BATCH = "PROCESSED_FOLDER_BATCH";
+export const QUOTA_EXCEEDED_UPLOAD = "QUOTA_EXCEEDED_UPLOAD";
 
 export function receiveFolder({ id, name, parentId }) {
   return { type: RECEIVE_FOLDER, id, name, parentId };
@@ -43,6 +44,10 @@ export function startUpload(fileMetaProps) {
 
 export function failUpload(error) {
   return { type: FAIL_FILE_UPLOAD, error };
+}
+
+export function quotaExceeded(error) {
+  return { type: QUOTA_EXCEEDED_UPLOAD, error };
 }
 
 export function completeUpload(results) {
@@ -141,30 +146,30 @@ export function getFileUrlIfMissing(source, results) {
   });
 }
 
-const waitFunc = delayTime =>
-  new Promise(resolve => setTimeout(resolve, delayTime));
+function readUploadedFileAsDataURL(file, reader = new FileReader()) {
+  return new Promise((resolve, reject) => {
+    reader.onerror = () => {
+      reader.abort();
+      reject(new DOMException("Unable to parse file"));
+    };
 
-function getFileWithThumbnailFromSource(source, results, wait, attempts = 1) {
-  if (results.thumbnail_url || attempts > 5) {
-    return Promise.resolve(results);
-  }
-  return source.getFile(results.id).then(file => {
-    if (file.thumbnail_url) {
-      results.thumbnail_url = file.thumbnail_url;
-      return results;
-    } else {
-      return wait(attempts * 500).then(() =>
-        getFileWithThumbnailFromSource(source, results, wait, attempts + 1)
-      );
-    }
+    reader.onload = () => {
+      resolve(reader.result);
+    };
+
+    reader.readAsDataURL(file);
   });
 }
 
-export function getThumbnailUrlIfMissing(source, results, waitFunc) {
-  if (!/^image\//.test(results["content-type"]) || results.thumbnail_url) {
+export function generateThumbnailUrl(results, fileDOMObject, reader) {
+  if (/^image\//.test(results["content-type"])) {
+    return readUploadedFileAsDataURL(fileDOMObject, reader).then(result => {
+      results.thumbnail_url = result;
+      return results;
+    });
+  } else {
     return Promise.resolve(results);
   }
-  return getFileWithThumbnailFromSource(source, results, waitFunc);
 }
 
 export function setAltText(altText, results) {
@@ -174,9 +179,23 @@ export function setAltText(altText, results) {
   return results;
 }
 
+export function handleFailures(error, dispatch) {
+  return error.response
+  .json()
+  .then(resp => {
+    if (resp.message === "file size exceeds quota") {
+      dispatch(quotaExceeded(error));
+    } else {
+      dispatch(failUpload(error));
+    }
+  })
+  .catch(error => dispatch(failUpload(error)))
+}
+
 export function uploadPreflight(tabContext, fileMetaProps) {
   return (dispatch, getState) => {
     const { source, jwt, host, contextId, contextType } = getState();
+    const { fileReader } = fileMetaProps;
 
     dispatch(startUpload(fileMetaProps));
     return source
@@ -191,7 +210,11 @@ export function uploadPreflight(tabContext, fileMetaProps) {
         return getFileUrlIfMissing(source, results);
       })
       .then(results => {
-        return getThumbnailUrlIfMissing(source, results, waitFunc);
+        return generateThumbnailUrl(
+          results,
+          fileMetaProps.domObject,
+          fileReader
+        );
       })
       .then(results => {
         return setAltText(fileMetaProps.altText, results);
@@ -202,6 +225,6 @@ export function uploadPreflight(tabContext, fileMetaProps) {
       .then(results => {
         dispatch(allUploadCompleteActions(results, fileMetaProps));
       })
-      .catch(error => dispatch(failUpload(error)));
+      .catch(err => handleFailures(err, dispatch));
   };
 }

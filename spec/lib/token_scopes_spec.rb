@@ -34,21 +34,4 @@ describe TokenScopes do
 
   end
 
-  describe "GROUPED_SCOPES" do
-    it "groups the scopes by controller" do
-      expect(TokenScopes::GROUPED_DETAILED_SCOPES["demos"]).to include({
-                                                                resource: "demos",
-                                                                verb: "POST",
-                                                                path: "/api/v1/demos",
-                                                                scope: "url:POST|/api/v1/demos"
-                                                              })
-
-    end
-
-    it "includes the user_info scope" do
-      expect(TokenScopes::GROUPED_DETAILED_SCOPES["oauth"]).to include TokenScopes::USER_INFO_SCOPE
-    end
-
-  end
-
 end

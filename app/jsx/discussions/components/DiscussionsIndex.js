@@ -18,17 +18,17 @@
 
 import I18n from 'i18n!discussions_v2'
 import React, {Component} from 'react'
-import {func, bool, string, arrayOf} from 'prop-types'
+import {func, bool, string} from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import {DragDropContext} from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
 
-import Container from '@instructure/ui-core/lib/components/Container'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
-import Spinner from '@instructure/ui-core/lib/components/Spinner'
-import Heading from '@instructure/ui-core/lib/components/Heading'
-import Text from '@instructure/ui-core/lib/components/Text'
+import View from '@instructure/ui-layout/lib/components/View'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
+import Text from '@instructure/ui-elements/lib/components/Text'
 import {
   ConnectedDiscussionsContainer,
   DroppableConnectedDiscussionsContainer
@@ -132,7 +132,7 @@ export default class DiscussionsIndex extends Component {
 
   renderStudentView() {
     return (
-      <Container margin="medium">
+      <View margin="medium">
         {this.props.pinnedDiscussions.length ? (
           <div className="pinned-discussions-v2__wrapper">
             <ConnectedDiscussionsContainer
@@ -177,15 +177,14 @@ export default class DiscussionsIndex extends Component {
           onSubmit={this.state.deleteFunction}
           defaultOpen
           selectedCount={1}
-          applicationElement={() => document.getElementById('application')}
         />)}
-      </Container>
+      </View>
     )
   }
 
   renderTeacherView() {
     return (
-      <Container margin="medium">
+      <View margin="medium">
         <div className="pinned-discussions-v2__wrapper">
           <DroppableConnectedDiscussionsContainer
             title={I18n.t('Pinned Discussions')}
@@ -234,8 +233,7 @@ export default class DiscussionsIndex extends Component {
           onSubmit={this.state.deleteFunction}
           defaultOpen
           selectedCount={1}
-          applicationElement={() => document.getElementById('application')}
-        />)} </Container>
+        />)} </View>
     )
   }
 

@@ -44,6 +44,21 @@ module GraphQLNodeLoader
       end
     when "GradingPeriod"
       Loaders::IDLoader.for(GradingPeriod).load(id).then(check_read_permission)
+    when "Module"
+      Loaders::IDLoader.for(ContextModule).load(id).then do |mod|
+        Loaders::AssociationLoader.for(ContextModule, :context)
+          .load(mod)
+          .then(check_read_permission)
+      end
+    when "Page"
+      Loaders::IDLoader.for(WikiPage).load(id).then do |page|
+        # This association preload loads the requisite dependencies for
+        # checking :read permission.  This might be wasted work due to
+        # permissions caching???
+        Loaders::AssociationLoader.for(WikiPage, wiki: [:course, :group])
+          .load(page)
+          .then(check_read_permission)
+      end
     else
       raise UnsupportedTypeError.new("don't know how to load #{type}")
     end
@@ -51,7 +66,7 @@ module GraphQLNodeLoader
 
   def self.make_permission_check(ctx, *permissions)
     ->(o) {
-      o.grants_any_right?(ctx[:current_user], ctx[:session], *permissions) ? o : nil
+      o&.grants_any_right?(ctx[:current_user], ctx[:session], *permissions) ? o : nil
     }
   end
 

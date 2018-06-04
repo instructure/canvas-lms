@@ -38,14 +38,15 @@ class DeveloperKey < ActiveRecord::Base
   before_save :nullify_empty_icon_url
   before_save :protect_default_key
   after_save :clear_cache
+  after_update :invalidate_access_tokens_if_scopes_removed!
   after_create :create_default_account_binding
-  before_validation :set_require_scopes
   before_validation :validate_scopes!
 
   validates_as_url :redirect_uri, allowed_schemes: nil
   validate :validate_redirect_uris
 
   scope :nondeleted, -> { where("workflow_state<>'deleted'") }
+  scope :not_active, -> { where("workflow_state<>'active'") } # search for deleted & inactive keys
   scope :visible, -> { where(visible: true) }
 
   workflow do
@@ -210,28 +211,41 @@ class DeveloperKey < ActiveRecord::Base
     binding || DeveloperKeyAccountBinding.find_in_account_priority(accounts.reverse, self.id, false)
   end
 
-  private
-
-  def binding_on_in_account?(target_account)
-    return true unless target_account.root_account.feature_enabled?(:developer_key_management_ui_rewrite)
-    account_binding_for(target_account)&.workflow_state == DeveloperKeyAccountBinding::ON_STATE
-  end
-
-  def api_token_scoping_on?
-    owner_account.root_account.feature_enabled?(:api_token_scoping)
-  end
-
-  def create_default_account_binding
-    owner_account.developer_key_account_bindings.create!(developer_key: self)
-  end
-
   def owner_account
     account || Account.site_admin
   end
 
-  def set_require_scopes
+  private
+
+  def invalidate_access_tokens_if_scopes_removed!
     return unless api_token_scoping_on?
-    self.require_scopes = self.scopes.present?
+    return unless saved_change_to_scopes?
+    return if (scopes_before_last_save - scopes).blank?
+    send_later_if_production(:invalidate_access_tokens!)
+  end
+
+  def invalidate_access_tokens!
+    access_tokens.destroy_all
+  end
+
+  def binding_on_in_account?(target_account)
+    if target_account.site_admin?
+      return true unless Setting.get(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, nil).present?
+    else
+      return true unless target_account.root_account.feature_enabled?(:developer_key_management_ui_rewrite)
+    end
+
+    account_binding_for(target_account)&.workflow_state == DeveloperKeyAccountBinding::ON_STATE
+  end
+
+  def api_token_scoping_on?
+    owner_account.root_account.feature_enabled?(:api_token_scoping) || (
+      owner_account.site_admin? && Setting.get(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, nil).present?
+    )
+  end
+
+  def create_default_account_binding
+    owner_account.developer_key_account_bindings.create!(developer_key: self)
   end
 
   def validate_scopes!

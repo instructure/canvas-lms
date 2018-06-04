@@ -77,6 +77,7 @@ class Account < ActiveRecord::Base
   has_many :progresses, :as => :context, :inverse_of => :context
   has_many :content_migrations, :as => :context, :inverse_of => :context
   has_many :sis_batch_errors, foreign_key: :root_account_id, inverse_of: :root_account
+  has_one :outcome_proficiency, dependent: :destroy
 
   def inherited_assessment_question_banks(include_self = false, *additional_contexts)
     sql, conds = [], []
@@ -154,6 +155,10 @@ class Account < ActiveRecord::Base
     end
     result = nil unless I18n.locale_available?(result)
     result
+  end
+
+  def resolved_outcome_proficiency
+    outcome_proficiency || parent_account&.resolved_outcome_proficiency
   end
 
   include ::Account::Settings
@@ -236,7 +241,7 @@ class Account < ActiveRecord::Base
 
   add_setting :enable_gravatar, :boolean => true, :root_only => true, :default => true
 
-  # For Student Planner/List View
+  # For setting the default dashboard (e.g. Student Planner/List View, Activity Stream, Dashboard Cards)
   add_setting :default_dashboard_view, :inheritable => true
 
   def settings=(hash)
@@ -1451,12 +1456,9 @@ class Account < ActiveRecord::Base
 
     tabs << { :id => TAB_BRAND_CONFIGS, :label => t('#account.tab_brand_configs', "Themes"), :css_class => 'brand_configs', :href => :account_brand_configs_path } if manage_settings && branding_allowed?
 
-    if self.root_account.feature_enabled?(:developer_key_management)
-      tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :account_developer_keys_path, account_id: self.id } if self.grants_right?(user, :manage_developer_keys)
-    else
-      tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :account_developer_keys_path, account_id: root_account.id } if root_account? && self.grants_right?(user, :manage_developer_keys)
+    if root_account? && self.grants_right?(user, :manage_developer_keys)
+      tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :account_developer_keys_path, account_id: root_account.id }
     end
-
 
     tabs += external_tool_tabs(opts)
     tabs += Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::ACCOUNT_NAVIGATION], opts)
@@ -1730,16 +1732,32 @@ class Account < ActiveRecord::Base
 
   # Different views are available depending on feature flags
   def dashboard_views
-    ['activity', 'cards'].tap {|views| views << 'planner' if feature_enabled?(:student_planner)}
+    ['activity', 'cards'].tap {|views| views << 'planner' if root_account.feature_enabled?(:student_planner)}
   end
 
   # Getter/Setter for default_dashboard_view account setting
-  def default_dashboard_view=(default_dashboard_view)
-    return unless dashboard_views.include?(default_dashboard_view)
-    self.settings[:default_dashboard_view] = default_dashboard_view
+  def default_dashboard_view=(view)
+    return unless dashboard_views.include?(view)
+    self.settings[:default_dashboard_view] = view
   end
 
   def default_dashboard_view
-    self.settings[:default_dashboard_view]
+    @default_dashboard_view ||= self.settings[:default_dashboard_view]
   end
+
+  # Forces the default setting to overwrite each user's preference
+  def update_user_dashboards
+    User.where(id: self.user_account_associations.select(:user_id))
+        .where("#{User.table_name}.preferences LIKE ?", "%:dashboard_view:%")
+        .find_in_batches do |batch|
+      users = batch.reject { |user| user.preferences[:dashboard_view].nil? ||
+                                    user.dashboard_view(self) == default_dashboard_view }
+      users.each do |user|
+        user.preferences.delete(:dashboard_view)
+        user.save!
+      end
+    end
+  end
+  handle_asynchronously :update_user_dashboards, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
+
 end

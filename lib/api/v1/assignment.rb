@@ -697,6 +697,14 @@ module Api::V1::Assignment
       end
     end
 
+    if assignment_params.key?('cc_imported_successfully')
+      if value_to_boolean(assignment_params[:cc_imported_successfully])
+        assignment.finish_importing
+      else
+        assignment.fail_to_import
+      end
+    end
+
     apply_report_visibility_options!(assignment_params, assignment)
 
     assignment.updating_user = user

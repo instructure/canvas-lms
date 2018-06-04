@@ -76,7 +76,7 @@ module SIS
             @course.conclude_at = section.course.conclude_at
             @course.restrict_enrollments_to_course_dates = section.course.restrict_enrollments_to_course_dates
             @course.sis_source_id = xlist_course_id
-            @course.sis_batch_id = @batch.id if @batch
+            @course.sis_batch_id = @batch.id
             @course.workflow_state = 'claimed'
             @course.template_course = section.course
             @course.save_without_broadcasting!

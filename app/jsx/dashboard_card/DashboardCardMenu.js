@@ -19,8 +19,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!dashcards'
-import Popover, {PopoverTrigger, PopoverContent} from '@instructure/ui-core/lib/components/Popover'
-import TabList, {TabPanel} from '@instructure/ui-core/lib/components/TabList'
+import Popover, {PopoverTrigger, PopoverContent} from '@instructure/ui-overlays/lib/components/Popover'
+import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
 import ColorPicker from '../shared/ColorPicker'
 import DashboardCardMovementMenu from './DashboardCardMovementMenu'
 
@@ -36,7 +36,6 @@ export default class DashboardCardMenu extends React.Component {
     }).isRequired,
     trigger: PropTypes.node.isRequired,
     assetString: PropTypes.string.isRequired,
-    applicationElement: PropTypes.func,
     reorderingEnabled: PropTypes.bool,
     popoverContentRef: PropTypes.func,
     handleShow: PropTypes.func,
@@ -52,7 +51,6 @@ export default class DashboardCardMenu extends React.Component {
   }
 
   static defaultProps = {
-    applicationElement: () => document.getElementById('application'),
     reorderingEnabled: false,
     popoverContentRef: () => {},
     handleShow: () => {},
@@ -102,7 +100,6 @@ export default class DashboardCardMenu extends React.Component {
       currentColor,
       nicknameInfo,
       reorderingEnabled,
-      applicationElement,
       handleMove,
       handleShow,
       popoverContentRef,
@@ -163,7 +160,6 @@ export default class DashboardCardMenu extends React.Component {
         shouldReturnFocus
         closeButtonLabel={I18n.t('Close')}
         closeButtonRef={(c) => { this._closeButton = c }}
-        applicationElement={applicationElement}
         defaultFocusElement={() => reorderingEnabled ? this._colorTab : document.getElementById('NicknameInput')}
         onShow={handleShow}
         contentRef={popoverContentRef}

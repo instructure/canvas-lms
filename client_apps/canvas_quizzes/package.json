@@ -25,9 +25,9 @@
     "lms"
   ],
   "scripts": {
-    "start": "./node_modules/grunt-cli/bin/grunt",
-    "test": "./node_modules/grunt-cli/bin/grunt test",
-    "build": "./node_modules/grunt-cli/bin/grunt compile_js"
+    "start": "yarn grunt",
+    "test": "yarn grunt test",
+    "build": "yarn grunt compile_js"
   },
   "files": [
     "dist/canvas_quizzes.js",
@@ -68,5 +68,8 @@
     "requirejs": "~2.2.0",
     "react-tools": "0.11.2",
     "shelljs": "0.7.0"
+  },
+  "resolutions": {
+    "grunt-contrib-jasmine/jasmine-core": "2.6.4"
   }
 }

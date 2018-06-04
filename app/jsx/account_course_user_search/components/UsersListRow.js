@@ -18,11 +18,11 @@
 
 import React from 'react'
 import {string, func, shape, bool} from 'prop-types'
-import Button from '@instructure/ui-core/lib/components/Button'
-import Tooltip from '@instructure/ui-core/lib/components/Tooltip'
-import IconMasqueradeLine from 'instructure-icons/lib/Line/IconMasqueradeLine'
-import IconMessageLine from 'instructure-icons/lib/Line/IconMessageLine'
-import IconEditLine from 'instructure-icons/lib/Line/IconEditLine'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
+import IconMasqueradeLine from '@instructure/ui-icons/lib/Line/IconMasquerade'
+import IconMessageLine from '@instructure/ui-icons/lib/Line/IconMessage'
+import IconEditLine from '@instructure/ui-icons/lib/Line/IconEdit'
 import I18n from 'i18n!account_course_user_search'
 import FriendlyDatetime from '../../shared/FriendlyDatetime'
 import CreateOrUpdateUserModal from '../../shared/components/CreateOrUpdateUserModal'
@@ -46,7 +46,7 @@ export default function UsersListRow({accountId, user, permissions, handleSubmit
         {permissions.can_masquerade && (
           <Tooltip tip={I18n.t('Act as %{name}', {name: user.name})}>
             <Button variant="icon" size="small" href={`/users/${user.id}/masquerade`}>
-              <IconMasqueradeLine height="1.5em" title={I18n.t('Act as %{name}', {name: user.name})} />
+              <IconMasqueradeLine title={I18n.t('Act as %{name}', {name: user.name})} />
             </Button>
           </Tooltip>
         )}
@@ -57,7 +57,7 @@ export default function UsersListRow({accountId, user, permissions, handleSubmit
               size="small"
               href={`/conversations?user_name=${user.name}&user_id=${user.id}`}
             >
-              <IconMessageLine height="1.5em" title={I18n.t('Send message to %{name}', {name: user.name})} />
+              <IconMessageLine title={I18n.t('Send message to %{name}', {name: user.name})} />
             </Button>
           </Tooltip>
         )}

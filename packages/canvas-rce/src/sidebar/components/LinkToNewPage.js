@@ -16,21 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { Component, PropTypes } from "react";
+import PropTypes from "prop-types";
+
+import React, { Component } from "react";
 import ReactCSSTransitionGroup from "react-transition-group/CSSTransitionGroup";
 import formatMessage from "../../format-message";
-import Button from "@instructure/ui-core/lib/components/Button";
-import TextInput from "@instructure/ui-core/lib/components/TextInput";
-import IconAddSolid from "instructure-icons/lib/Solid/IconAddSolid";
+import Button from "@instructure/ui-buttons/lib/components/Button";
+import TextInput from "@instructure/ui-forms/lib/components/TextInput";
+import IconAddSolid from "@instructure/ui-icons/lib/Solid/IconAdd";
 import scroll from "../../common/scroll";
 import { StyleSheet, css } from "aphrodite";
 
 class LinkToNewPage extends Component {
-  constructor(props) {
-    super(props);
-    this.handleLinkClick = this.handleLinkClick.bind(this);
-  }
-
   validScrollTarget(target, parents) {
     return (
       parents.scrolled < 1 && //only want to scroll 1 parent
@@ -59,12 +56,12 @@ class LinkToNewPage extends Component {
     }
   }
 
-  handleLinkClick(e, link) {
+  handleLinkClick = (e, link) => {
     if (this.props.onLinkClick) {
       e.preventDefault();
       this.props.onLinkClick(link);
     }
-  }
+  };
 
   toggleForm(e) {
     e.preventDefault();

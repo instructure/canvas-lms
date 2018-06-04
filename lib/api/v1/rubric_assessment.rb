@@ -42,6 +42,9 @@ module Api::V1::RubricAssessment
     json_attributes = API_ALLOWED_RUBRIC_ASSESSMENT_OUTPUT_FIELDS
     hash = api_json(rubric_assessment, user, session, json_attributes)
     hash['data'] = rubric_assessment.data if opts[:style] == "full"
+    if opts[:style] == "full" && rubric_assessment.rubric_association.present?
+      hash['rubric_association'] = rubric_assessment.rubric_association.as_json['rubric_association']
+    end
     hash['comments'] = rubric_assessment.data.map{|rad| rad[:comments]} if opts[:style] == "comments_only"
     hash
   end
