@@ -286,6 +286,7 @@ window.rubricAssessment = {
 
   populateNewRubric: function(container, assessment, rubricAssociation) {
     if (ENV.nonScoringRubrics && ENV.rubric) {
+      const assessing = container.hasClass('assessing')
       const setCurrentAssessment = (currentAssessment) => {
         rubricAssessment.currentAssessment = currentAssessment
         render(currentAssessment)
@@ -293,7 +294,7 @@ window.rubricAssessment = {
 
       const render = (currentAssessment) => {
         ReactDOM.render(React.createElement(Rubric, {
-          onAssessmentChange: setCurrentAssessment,
+          onAssessmentChange: assessing ? setCurrentAssessment : null,
           rubric: ENV.rubric,
           rubricAssessment: currentAssessment,
           rubricAssociation

@@ -37,8 +37,9 @@ const pointString = (points, endOfRangePoints) => {
   }
 }
 
-const Rating = (props) => {
+export const Rating = (props) => {
   const {
+    assessing,
     description,
     long_description,
     points,
@@ -50,10 +51,10 @@ const Rating = (props) => {
   return (
     <div
       className={classes}
-      onClick={onClick}
+      onClick={assessing ? onClick : null}
       onKeyPress={(e) => e.key === 'Enter' ? onClick() : null}
       role="button"
-      tabIndex={0}
+      tabIndex={assessing ? 0 : null}
     >
       <div className="rating-points">
         <Text size="x-small">
@@ -85,6 +86,7 @@ const getMasteryLevel = (points, masteryThreshold) => {
 
 Rating.propTypes = {
   ...tierShape,
+  assessing: PropTypes.bool.isRequired,
   selected: PropTypes.bool
 }
 Rating.defaultProps = {
@@ -137,6 +139,7 @@ const Ratings = (props) => {
           return (
             <Rating
               key={index} // eslint-disable-line react/no-array-index-key
+              assessing={assessing}
               onClick={() => onPointChange(tier.points)}
               classes={classes}
               endOfRangePoints={useRange ? getRangePoints(tier.points, tiers[index + 1]) : null}
@@ -150,6 +153,7 @@ const Ratings = (props) => {
 }
 Ratings.propTypes = {
   ...ratingShape,
+  assessing: PropTypes.bool.isRequired,
   onPointChange: PropTypes.func
 }
 Ratings.defaultProps = {

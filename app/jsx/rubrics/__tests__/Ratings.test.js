@@ -18,10 +18,11 @@
 import React from 'react'
 import { shallow } from 'enzyme'
 import sinon from 'sinon'
-import Ratings from '../Ratings'
+import Ratings, { Rating } from '../Ratings'
 
 describe('The Ratings component', () => {
   const props = {
+    assessing: false,
     tiers: [
       { description: 'Superb', points: 10 },
       { description: 'Meh', long_description: 'More Verbosity', points: 5 },
@@ -72,5 +73,25 @@ describe('The Ratings component', () => {
     expect(mastery(10, 'full')).toEqual([true, false, false])
     expect(mastery(5, 'partial')).toEqual([false, true, false])
     expect(mastery(1, 'none')).toEqual([false, false, true])
+  })
+
+  describe('Rating component', () => {
+    it('is navigable and clickable when assessing', () => {
+      const onClick = sinon.spy()
+      const wrapper = shallow(<Rating {...props.tiers[0]} assessing onClick={onClick} />)
+      const div = wrapper.find('div').at(0)
+      expect(div.prop('tabIndex')).toEqual(0)
+      div.simulate('click')
+      expect(onClick.called).toBe(true)
+    })
+
+    it('is not navigable or clickable when not assessing', () => {
+      const onClick = sinon.spy()
+      const wrapper = shallow(<Rating {...props.tiers[0]} assessing={false} onClick={onClick} />)
+      const div = wrapper.find('div').at(0)
+      expect(div.prop('tabIndex')).toBeNull()
+      div.simulate('click')
+      expect(onClick.called).toBe(false)
+    })
   })
 })
