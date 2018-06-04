@@ -111,7 +111,7 @@ export const getInitialOpportunities = () => {
 
     axios({
       method: 'get',
-      url: getState().opportunities.nextUrl || '/api/v1/users/self/missing_submissions?include[]=planner_overrides',
+      url: getState().opportunities.nextUrl || '/api/v1/users/self/missing_submissions?include[]=planner_overrides&filter[]=submittable',
     }).then(response => {
       if(parseLinkHeader(response.headers.link).next) {
         dispatch(addOpportunities({items: response.data, nextUrl: parseLinkHeader(response.headers.link).next.url }));

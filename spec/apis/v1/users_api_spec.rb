@@ -2039,6 +2039,18 @@ describe "Users API", type: :request do
       expect(json.length).to eql 2
     end
 
+    it "should not return locked assignments if filter is set to 'submittable'" do
+      @course.assignments.create!(due_at: 3.days.ago,
+                                  workflow_state: 'published',
+                                  submission_types: 'online_text_entry',
+                                  lock_at: 2.days.ago)
+      json = api_call(:get, @path, @params)
+      expect(json.length).to eql 3
+
+      submittable_json = api_call(:get, @path, @params.merge(:filter => ["submittable"]))
+      expect(submittable_json.length).to eql 2
+    end
+
     it "should return course information if requested" do
       @params['include'] = ['course']
       json = api_call(:get, @path, @params)

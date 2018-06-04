@@ -998,21 +998,29 @@ class UsersController < ApplicationController
   #                         These will be returned under a +planner_override+ key
   #   "course":: Optionally include the assignments' courses
   #
+  # @argument filter[] [String, "submittable"]
+  #   "submittable":: Only return assignments that the current user can submit (i.e. filter out locked assignments)
+  #
   # @returns [Assignment]
   def missing_submissions
     user = api_find(User, params[:user_id])
     return render_unauthorized_action unless @current_user && user.grants_right?(@current_user, :read)
 
     submissions = []
+
+    filter = Array(params[:filter])
+    only_submittable = filter.include?('submittable')
+
     Shackles.activate(:slave) do
       course_ids = user.participating_student_course_ids
       Shard.partition_by_shard(course_ids) do |shard_course_ids|
         submissions = Submission.active.preload(:assignment).
-                      missing.
-                      where(user_id: user.id,
-                            assignments: {context_id: shard_course_ids}).
-                      merge(Assignment.published).
-                      order(:cached_due_date)
+          missing.
+          where(user_id: user.id,
+          assignments: {context_id: shard_course_ids}).
+          merge(Assignment.published)
+        submissions = submissions.merge(Assignment.not_locked) if only_submittable
+        submissions.order(:cached_due_date)
       end
     end
     assignments = Api.paginate(submissions, self, api_v1_user_missing_submissions_url).map(&:assignment)
