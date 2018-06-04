@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-module ApiScopeMapperLoader
+class ApiScopeMapperLoader
 
   # The ApiScopeMapper is a generated file that we don't commit.
   # This method ensures that if the file doesn't exist specs and canvas won't blow up.

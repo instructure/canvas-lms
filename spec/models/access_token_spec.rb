@@ -382,7 +382,7 @@ describe AccessToken do
     end
 
     describe 'adding scopes' do
-      let(:dev_key) { DeveloperKey.create! require_scopes: true, scopes: TokenScopes::ALL_SCOPES.slice(0,10)}
+      let(:dev_key) { DeveloperKey.create! require_scopes: true, scopes: TokenScopes.all_scopes.slice(0,10)}
 
       before do
         allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
@@ -390,12 +390,12 @@ describe AccessToken do
       end
 
       it 'is invalid when scopes requested are not included on dev key' do
-        access_token = AccessToken.new(user: user_model, developer_key: dev_key, scopes: [TokenScopes::ALL_SCOPES[12]])
+        access_token = AccessToken.new(user: user_model, developer_key: dev_key, scopes: [TokenScopes.all_scopes[12]])
         expect(access_token).not_to be_valid
       end
 
       it 'is valid when scopes requested are included on dev key' do
-        access_token = AccessToken.new(user: user_model, developer_key: dev_key, scopes: [TokenScopes::ALL_SCOPES[8], TokenScopes::ALL_SCOPES[7]])
+        access_token = AccessToken.new(user: user_model, developer_key: dev_key, scopes: [TokenScopes.all_scopes[8], TokenScopes.all_scopes[7]])
         expect(access_token).to be_valid
       end
     end
