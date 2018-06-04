@@ -91,55 +91,57 @@ export default class PermissionsIndex extends Component {
 
   renderHeader() {
     return (
-      <Container display="block">
-        <Grid>
-          <GridRow vAlign="middle">
-            <GridCol width={3}>
-              <TextInput
-                label={<ScreenReaderContent>{I18n.t('Search Permissions')}</ScreenReaderContent>}
-                placeholder={I18n.t('Search Permissions')}
-                icon={() => <IconSearchLine />}
-                onChange={this.onSearchStringChange}
-                name="permission_search"
-              />
-            </GridCol>
-            <GridCol width={8}>
-              <Select
-                id="permissions-role-filter"
-                label={<ScreenReaderContent>{I18n.t('Filter Roles')}</ScreenReaderContent>}
-                selectedOption={this.state.selectedRolesValue}
-                multiple
-                editable
-                onChange={this.onRoleFilterChange}
-                formatSelectedOption={tag => (
-                  <AccessibleContent
-                    alt={I18n.t(`Remove role filter %{label}`, {label: tag.label})}
-                  >
-                    {tag.label}
-                  </AccessibleContent>
-                )}
-              >
-                {this.props.roles
-                  .filter(role => role.contextType === this.state.contextType)
-                  .map(role => (
-                    <option key={`${role.id}`} value={`${role.id}`}>
-                      {role.label}
-                    </option>
-                  ))}
-              </Select>
-            </GridCol>
-            <GridCol width={2}>
-              <Button
-                variant="primary"
-                margin="0 x-small 0 0"
-                onClick={this.props.setAndOpenAddTray}
-              >
-                {I18n.t('Add Role')}
-              </Button>
-            </GridCol>
-          </GridRow>
-        </Grid>
-      </Container>
+      <div className="permissions-v2__header_contianer">
+        <Container display="block">
+          <Grid>
+            <GridRow vAlign="middle">
+              <GridCol width={3}>
+                <TextInput
+                  label={<ScreenReaderContent>{I18n.t('Search Permissions')}</ScreenReaderContent>}
+                  placeholder={I18n.t('Search Permissions')}
+                  icon={() => <IconSearchLine />}
+                  onChange={this.onSearchStringChange}
+                  name="permission_search"
+                />
+              </GridCol>
+              <GridCol width={8}>
+                <Select
+                  id="permissions-role-filter"
+                  label={<ScreenReaderContent>{I18n.t('Filter Roles')}</ScreenReaderContent>}
+                  selectedOption={this.state.selectedRolesValue}
+                  multiple
+                  editable
+                  onChange={this.onRoleFilterChange}
+                  formatSelectedOption={tag => (
+                    <AccessibleContent
+                      alt={I18n.t(`Remove role filter %{label}`, {label: tag.label})}
+                    >
+                      {tag.label}
+                    </AccessibleContent>
+                  )}
+                >
+                  {this.props.roles
+                    .filter(role => role.contextType === this.state.contextType)
+                    .map(role => (
+                      <option key={`${role.id}`} value={`${role.id}`}>
+                        {role.label}
+                      </option>
+                    ))}
+                </Select>
+              </GridCol>
+              <GridCol width={2}>
+                <Button
+                  variant="primary"
+                  margin="0 x-small 0 0"
+                  onClick={this.props.setAndOpenAddTray}
+                >
+                  {I18n.t('Add Role')}
+                </Button>
+              </GridCol>
+            </GridRow>
+          </Grid>
+        </Container>
+      </div>
     )
   }
 

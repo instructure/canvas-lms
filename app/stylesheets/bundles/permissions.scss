@@ -29,8 +29,8 @@ $darkRowBg: #f9f9f9;
 .ic-permissions__table-container {
   // dimensions of the table on screen, the table will scroll inside this container
   // might want to change to match design
-  width: 90%;
-  height: 530px;
+  width: 60vw;
+  height: 60vh;
 
   // needed for scrolling + sticky headers
   overflow: auto;
@@ -38,7 +38,12 @@ $darkRowBg: #f9f9f9;
 
   border: 1px solid $border-color;
 
-  margin: 20px;
+  margin: 20px 20px 20px 0px;
+}
+
+.permissions-v2__header_contianer {
+  width: 58vw;
+  margin: 20px 20px 20px 0px;
 }
 
 .ic-permissions_role_tray {
@@ -96,7 +101,7 @@ $darkRowBg: #f9f9f9;
     left: 0;
     top: 0;
     z-index: 100;
-    background-color: $faintRowBg;
+    background-color: $lightRowBg;
   }
   .ic-permission-corner-text{
     margin-#{direction(left)}: 10px;
@@ -148,7 +153,7 @@ $darkRowBg: #f9f9f9;
     position: sticky;
     top: 0;
     z-index: 8;
-    background: $faintRowBg;
+    background-color: $lightRowBg;
   }
 
   .ic-permissions__top-header__col-wrapper-th:after{
@@ -166,7 +171,7 @@ $darkRowBg: #f9f9f9;
     margin-right: auto;
     height: 50px;
     width: 140px;
-    background: $faintRowBg;
+    background: transparent;
   }
 
   // the left "fixed" header

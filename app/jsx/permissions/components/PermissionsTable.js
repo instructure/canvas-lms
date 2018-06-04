@@ -28,6 +28,8 @@ import Button from '@instructure/ui-buttons/lib/components/Button'
 import Link from '@instructure/ui-elements/lib/components/Link'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
+import View from '@instructure/ui-layout/lib/components/View'
+
 import actions from '../actions'
 import {ConnectedPermissionButton} from './PermissionButton'
 import propTypes from '../propTypes'
@@ -116,10 +118,12 @@ export default class PermissionsTable extends Component {
               {this.state.expanded[perm.permission_name] ? 'v' : '>'}
             </button>
             */}
-            {/* eslint-disable-next-line */}
-            <Link as="button" onClick={() => this.props.setAndOpenPermissionTray(perm)}>
-              <Text>{perm.label}</Text>
-            </Link>
+            <View margin="small">
+              {/* eslint-disable-next-line */}
+              <Link as="button" onClick={() => this.props.setAndOpenPermissionTray(perm)}>
+                <Text>{perm.label}</Text>
+              </Link>
+            </View>
           </div>
         </div>
       </th>
