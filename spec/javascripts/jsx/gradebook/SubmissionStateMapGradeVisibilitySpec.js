@@ -73,6 +73,27 @@ define([
     strictEqual(state.hideGrade, true);
   });
 
+  test ('submission has grade visible if not moderated', function() {
+    const assignment = { id: '1', moderated_grading: false, grades_published: false };
+    const map = createAndSetupMap(assignment);
+    const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
+    strictEqual(state.hideGrade, false);
+  });
+
+  test ('submission has grade visible if grades are published', function() {
+    const assignment = { id: '1', moderated_grading: false, grades_published: true };
+    const map = createAndSetupMap(assignment);
+    const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
+    strictEqual(state.hideGrade, false);
+  });
+
+  test ('submission has grade visible if moderated and not published', function() {
+    const assignment = { id: '1', moderated_grading: true, grades_published: false };
+    const map = createAndSetupMap(assignment);
+    const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
+    strictEqual(state.hideGrade, false);
+  });
+
   QUnit.module('SubmissionStateMap without grading periods');
 
   test('submission has grade hidden for a student without assignment visibility', function() {

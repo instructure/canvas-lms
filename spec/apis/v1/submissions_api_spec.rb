@@ -3039,6 +3039,103 @@ describe 'Submissions API', type: :request do
     assert_status(401)
   end
 
+  context "moderated grading" do
+    before :each do
+      student_in_course(active_all: true)
+      teacher_in_course(active_all: true)
+      @assignment = @course.assignments.create!(
+        title: 'assignment1',
+        moderated_grading: true,
+        grades_published_at: nil,
+        grader_count: 2,
+        final_grader: @teacher
+      )
+    end
+
+    it "allows posting grades of a non moderated assignment" do
+      @assignment.update_attribute(:moderated_grading, false)
+      api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: 'submissions_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        }, {
+          submission: {
+            posted_grade: 'B'
+          },
+        }
+      )
+      assert_status(200)
+    end
+
+    it "allows posting grades of an assignment whose grades have been published" do
+      @assignment.update_attribute(:grades_published_at, Time.zone.now)
+      api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: 'submissions_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        }, {
+          submission: {
+            posted_grade: 'B'
+          },
+        }
+      )
+      assert_status(200)
+    end
+
+    it "does not allow posting grades of a moderated assignment whose grades have not been published" do
+      api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: 'submissions_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        }, {
+          submission: {
+            posted_grade: 'B'
+          },
+        }
+      )
+      assert_status(401)
+    end
+
+    it "allows posting provisional grades of a moderated assignment whose grades have not been published" do
+      api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: 'submissions_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        }, {
+          submission: {
+            posted_grade: '100',
+            provisional: true
+          }
+        }
+      )
+      assert_status(200)
+    end
+  end
+
   it "does not return submissions for no-longer-enrolled students" do
     student = user_factory(active_all: true)
     course_with_teacher(:active_all => true)

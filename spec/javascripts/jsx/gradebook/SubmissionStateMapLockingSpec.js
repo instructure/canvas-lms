@@ -73,6 +73,27 @@ define([
     strictEqual(state.locked, true);
   });
 
+  test ('submission is unlocked if not moderated', function() {
+    const assignment = { id: '1', moderated_grading: false, grades_published: false };
+    const map = createAndSetupMap(assignment);
+    const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
+    strictEqual(state.locked, false);
+  });
+
+  test ('submission is unlocked if grades are published', function() {
+    const assignment = { id: '1', moderated_grading: false, grades_published: true };
+    const map = createAndSetupMap(assignment);
+    const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
+    strictEqual(state.locked, false);
+  });
+
+  test ('submission is locked if moderated and not published', function() {
+    const assignment = { id: '1', moderated_grading: true, grades_published: false };
+    const map = createAndSetupMap(assignment);
+    const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
+    strictEqual(state.locked, true);
+  });
+
   QUnit.module('SubmissionStateMap with no grading periods');
 
   test('submission is locked for a student without assignment visibility', function() {
