@@ -198,6 +198,7 @@ class Assignment
                                       end
 
         url_opts = {
+          anonymous_instructor_annotations: @assignment.anonymous_instructor_annotations,
           enable_annotations: true,
           moderated_grading_whitelist: moderated_grading_whitelist
         }

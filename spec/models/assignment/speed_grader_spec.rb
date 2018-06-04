@@ -276,6 +276,32 @@ describe Assignment::SpeedGrader do
       expect(canvadoc_url.include?("enable_annotations%22:false")).to eq true
     end
 
+    it "creates DocViewer session anonymous instructor annotations if assignment has it set" do
+      course = student_in_course(active_all: true).course
+      assignment = assignment_model(course: course)
+      attachment = attachment_model(
+        context: @student,
+        uploaded_data: stub_png_data,
+        filename: "homework.png"
+      )
+      assignment.anonymous_instructor_annotations = true
+      topic = course.discussion_topics.create!(assignment: assignment)
+      entry = topic.reply_from(user: @student, text: "entry")
+      entry.attachment = attachment
+      entry.save!
+      topic.ensure_submission(@student)
+
+      expect(Canvadocs).to receive(:enabled?).twice.and_return(true)
+      expect(Canvadocs).to receive(:config).and_return({ a: 1 })
+      expect(Canvadoc).to receive(:mime_types).and_return("image/png")
+
+      json = Assignment::SpeedGrader.new(assignment, @teacher).json
+      sub = json[:submissions].first[:submission_history].first[:submission]
+      canvadoc_url = sub[:versioned_attachments].first.fetch(:attachment).fetch(:canvadoc_url)
+
+      expect(canvadoc_url.include?("anonymous_instructor_annotations%22:true")).to eq true
+    end
+
     it "includes submission missing status in each submission history version" do
       json = Assignment::SpeedGrader.new(@assignment, @teacher).json
       json[:submissions].each do |submission|

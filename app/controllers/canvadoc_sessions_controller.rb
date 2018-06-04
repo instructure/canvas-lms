@@ -39,6 +39,7 @@ class CanvadocSessionsController < ApplicationController
       end
 
       opts[:enable_annotations] = blob["enable_annotations"] && !anonymous_grading_enabled?(attachment)
+      opts[:anonymous_instructor_annotations] = blob["anonymous_instructor_annotations"]
       # TODO: Remove the next line after the DocViewer Data Migration project RD-4702
       opts[:region] = attachment.shard.database_server.config[:region] || "none"
       attachment.submit_to_canvadocs(1, opts) unless attachment.canvadoc_available?

@@ -20,6 +20,7 @@ module AttachmentHelper
   # returns a string of html attributes suitable for use with $.loadDocPreview
   def doc_preview_attributes(attachment, attrs={})
     url_opts = {
+      anonymous_instructor_annotations: attrs.delete(:anonymous_instructor_annotations),
       moderated_grading_whitelist: attrs[:moderated_grading_whitelist],
       enable_annotations: attrs.delete(:enable_annotations)
     }

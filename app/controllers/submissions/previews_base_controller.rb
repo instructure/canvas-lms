@@ -39,6 +39,9 @@ module Submissions
         @moderated_grading_whitelist = @submission.moderated_grading_whitelist
       end
 
+      @anonymous_instructor_annotations = @context.grants_right?(@current_user, :manage_grades) &&
+                                          @assignment.anonymous_instructor_annotations
+
       unless @assignment.visible_to_user?(@current_user)
         flash[:notice] = t('This assignment will no longer count towards your grade.')
       end
