@@ -93,7 +93,11 @@ export default class PermissionsTable extends Component {
                 className="ic-permissions__header-content ic-permissions__header-content-col"
                 id={`ic-permissions__role-header-for-role-${role.id}`}
               >
-                <Button variant="link" onClick={() => this.openRoleTray(role)}>
+                <Button
+                  variant="link"
+                  onClick={() => this.openRoleTray(role)}
+                  id={`role_${role.id}`}
+                >
                   <Text size="small">{role.label} </Text>
                 </Button>
               </div>
@@ -121,7 +125,11 @@ export default class PermissionsTable extends Component {
             */}
             <View margin="small">
               {/* eslint-disable-next-line */}
-              <Link as="button" onClick={() => this.props.setAndOpenPermissionTray(perm)}>
+              <Link
+                as="button"
+                onClick={() => this.props.setAndOpenPermissionTray(perm)}
+                id={`permission_${perm.permission_name}`}
+              >
                 <Text>{perm.label}</Text>
               </Link>
             </View>
@@ -171,7 +179,7 @@ export default class PermissionsTable extends Component {
             <tr>
               {this.renderLeftHeader(perm)}
               {this.props.roles.map(role => (
-                <td key={role.id}>
+                <td key={role.id} id={`${perm.permission_name}_role_${role.id}`}>
                   <div className="ic-permissions__cell-content">
                     <ConnectedPermissionButton
                       permission={role.permissions[perm.permission_name]}
