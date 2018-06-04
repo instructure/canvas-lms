@@ -19,6 +19,7 @@
 import _ from 'underscore'
 import ModuleFile from 'compiled/models/ModuleFile'
 import PublishCloud from 'jsx/shared/PublishCloud'
+import ModuleDuplicationSpinner from 'jsx/modules/components/ModuleDuplicationSpinner'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import * as MoveItem from 'jsx/move_item'
@@ -64,16 +65,14 @@ function scrollTo ($thing, time = 500) {
 }
 
   function refreshDuplicateLinkStatus($module) {
-    // TODO: activiate the below "if" when we are ready to launch module
-    // duplication
-    $module.find('.duplicate_module_menu_item').hide();
-    // MAKE DEAD SURE THIS LINK DOESN'T SHOW UP UNTIL WE RELEASE MODULE DUPLICATION
-    // if (ENV.DUPLICATE_ENABLED && !$module.find('.context_module_item.quiz').length) {
-    //   $module.find('.duplicate_module_menu_item').show();
-    // } else {
-    //   $module.find('.duplicate_module_menu_item').hide();
-    // }
+    $module.find('.duplicate_module_menu_item').hide()
+    if (ENV.DUPLICATE_ENABLED && !$module.find('.context_module_item.quiz').length) {
+      $module.find('.duplicate_module_menu_item').show()
+    } else {
+      $module.find('.duplicate_module_menu_item').hide()
+    }
   }
+
   // TODO: AMD don't export global, use as module
   /*global modules*/
   window.modules = (function() {
@@ -1044,35 +1043,43 @@ function scrollTo ($thing, time = 500) {
     });
 
     $(".duplicate_module_link").live('click', function(event) {
-      event.preventDefault();
-      const duplicateRequestUrl = $(this).attr('href');
-      const duplicatedModuleElement = $(this).parents(".context_module");
-      const duplicatedModuleElementId = duplicatedModuleElement[0].id;
-
+      event.preventDefault()
+      const duplicateRequestUrl = $(this).attr('href')
+      const duplicatedModuleElement = $(this).parents(".context_module")
+      const spinner = React.createElement(ModuleDuplicationSpinner, {})
+      const $tempElement = $('<div id="temporary-spinner" class="item-group-condensed"></div>')
+      $tempElement.insertAfter(duplicatedModuleElement)
+      ReactDOM.render(spinner, $('#temporary-spinner')[0])
+      $.screenReaderFlashMessage(I18n.t('Duplicating Module, this may take some time'))
       const renderDuplicatedModule = function(response) {
+
         response.data.ENV_UPDATE.forEach((newAttachmentItem) => {
           ENV.MODULE_FILE_DETAILS[newAttachmentItem.id] = newAttachmentItem
         });
-        const contextModule = response.data.context_module;
-        const newModuleId = response.data.context_module.id;
-        var context_response = response;
-        axios.get(location.href).then((response) => {
-          const $newContent = $(response.data);
-          const $newModule = $newContent.find("#context_module_" + newModuleId);
-          $newModule.insertAfter(duplicatedModuleElement);
-          modules.updateAssignmentData();
-          // Without these two 'die' commands, the event handler happens twice after
+        const newModuleId = response.data.context_module.id
+        // This is terrible but then so is the whole file so it fits in
+        const contextId = response.data.context_module.context_id
+        const modulesPage = `/courses/${contextId}/modules`
+        axios.get(modulesPage).then((getResponse) => {
+          const $newContent = $(getResponse.data);
+          const $newModule = $newContent.find(`#context_module_${newModuleId}`)
+          $tempElement.remove()
+          $newModule.insertAfter(duplicatedModuleElement)
+          $newModule.find('.collapse_module_link').focus()
+          modules.updateAssignmentData()
+          // Without these 'die' commands, the event handler happens twice after
           // initModuleManagement is called.
-          $('.delete_module_link').die();
-          $('.duplicate_module_link').die();
-          $(".context_module").find(".expand_module_link,.collapse_module_link").bind('click keyclick', toggleModuleCollapse);
-          modules.initModuleManagement();
-        }).catch(showFlashError(I18n.t('Error rendering duplicated module')));
+          $('.delete_module_link').die()
+          $('.duplicate_module_link').die()
+          $('.add_module_link').die()
+          $(".context_module").find(".expand_module_link,.collapse_module_link").bind('click keyclick', toggleModuleCollapse)
+          modules.initModuleManagement()
+        }).catch(showFlashError(I18n.t('Error rendering duplicated module')))
       }
 
       axios.post(duplicateRequestUrl, {})
         .then(renderDuplicatedModule)
-        .catch(showFlashError(I18n.t('Error duplicating module')));
+        .catch(showFlashError(I18n.t('Error duplicating module')))
     });
 
     $(".delete_module_link").live('click', function(event) {
