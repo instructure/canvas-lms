@@ -146,24 +146,44 @@ describe('Criterion', () => {
     expect(el.find('Points').prop('allowExtraCredit')).toEqual(true)
   })
 
-  it('does shows points when hidePoints is false', () => {
-    const wrapper = shallow(
-      <Criterion assessment={assessments.points.data[1]}
-        criterion={rubrics.points.criteria[1]}
+  describe('the Points for a criterion', () => {
+    const points = (props) => shallow(
+      <Criterion
+        assessment={assessments.points.data[1]}
         freeForm={false}
+        {...props}
       />
-    )
-    expect(wrapper.find('Points')).toHaveLength(1)
-  })
+    ).find('Points')
 
-  it('does not show points when hidePoints is true', () => {
-    const wrapper = shallow(
-      <Criterion assessment={assessments.points.data[1]}
-        criterion={rubrics.points.criteria[1]}
-        freeForm={false}
-        hidePoints
-      />
-    )
-    expect(wrapper.find('Points')).toHaveLength(0)
+    const criterion = rubrics.points.criteria[1]
+    it('are visible by default', () => {
+      expect(points({ criterion })).toHaveLength(1)
+    })
+
+    it('are hidden when hidePoints is true', () => {
+      expect(points({ criterion, hidePoints: true })).toHaveLength(0)
+    })
+
+    describe('when ignore_for_scoring is set', () => {
+      const ignoredPoints = (props) => points({
+        criterion: {
+          ...rubrics.points.criteria[1],
+          ignore_for_scoring: true
+        },
+        ...props
+      })
+
+      it('are not shown by default', () =>
+        expect(ignoredPoints()).toHaveLength(0)
+      )
+
+      it('are not shown in summary mode', () =>
+        expect(ignoredPoints({ isSummary: true })).toHaveLength(0)
+      )
+
+      it('are not shown when assessing', () => {
+        expect(ignoredPoints({ onAssessmentChange: () => {} })).toHaveLength(0)
+      })
+    })
   })
 })

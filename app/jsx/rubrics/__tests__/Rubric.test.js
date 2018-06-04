@@ -118,4 +118,30 @@ describe('the Rubric component', () => {
       hasPointsColumn(true, { associationProps: { hide_points: true }})
     })
   })
+
+  it('ignores criteria scores when flagged as such', () => {
+    const ignoreOutcomeScore = setCloned(rubric, 'criteria.1.ignore_for_scoring', true)
+    const onAssessmentChange = sinon.spy()
+    const ignored = { ...pointsAssessment.data[1], points: 2, criterion_id: '_invalid' }
+    const assessment = setCloned(pointsAssessment, 'data.2', ignored)
+    const el = shallow(
+      <Rubric
+        onAssessmentChange={onAssessmentChange}
+        rubric={ignoreOutcomeScore}
+        rubricAssessment={assessment}
+        rubricAssociation={assessment.rubric_association}
+      />
+    )
+
+    const updated = { ...assessment.data[1], points: 2 }
+    el.find('Criterion').at(1).prop('onAssessmentChange')(updated)
+
+    expect(onAssessmentChange.args).toEqual([
+      [{
+        ...assessment,
+        data: [assessment.data[0], updated, ignored],
+        score: assessment.data[0].points
+      }]
+    ])
+  })
 })

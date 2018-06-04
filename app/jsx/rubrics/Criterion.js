@@ -128,6 +128,7 @@ export default class Criterion extends React.Component {
     const { dialogOpen } = this.state
     const isOutcome = criterion.learning_outcome_id !== undefined
     const useRange = criterion.criterion_use_range
+    const ignoreForScoring = criterion.ignore_for_scoring
     const assessing = onAssessmentChange !== null && assessment !== null
     const updatePoints = (text) => {
       let points = numberHelper.parse(text)
@@ -141,7 +142,7 @@ export default class Criterion extends React.Component {
 
     const pointsPossible = criterion.points
     const pointsElement = () => (
-      !hidePoints && (
+      (!hidePoints && !ignoreForScoring) && (
         <Points
           key="points"
           allowExtraCredit={!isOutcome || allowExtraCredit}

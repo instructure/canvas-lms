@@ -50,6 +50,7 @@ const Rubric = (props) => {
   const assessing = onAssessmentChange !== null
   const priorData = _.get(rubricAssessment, 'data', [])
   const byCriteria = _.keyBy(priorData, (ra) => ra.criterion_id)
+  const criteriaById = _.keyBy(rubric.criteria, (c) => c.id)
   const allComments = _.get(rubricAssociation, 'summary_data.saved_comments', {})
   const hidePoints = _.get(rubricAssociation, 'hide_points', false)
   const freeForm = rubric.free_form_criterion_comments
@@ -58,10 +59,16 @@ const Rubric = (props) => {
     const data = priorData.map((prior) => (
       prior.criterion_id === id ? { ...prior, ...update } : prior
     ))
+
+    const ignore = (c) => _.isUndefined(c) ? true : c.ignore_for_scoring
+    const points = data
+      .filter((result) => !ignore(criteriaById[result.criterion_id]))
+      .map((result) => result.points !== null ? result.points : 0)
+
     onAssessmentChange({
       ...rubricAssessment,
       data,
-      score: _.sum(data.map((result) => result.points !== null ? result.points : 0))
+      score: _.sum(points)
     })
   }
 
