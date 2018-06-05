@@ -808,6 +808,9 @@ import 'compiled/jquery.rails_flash_notifications'
           if (data.current_position && position && data.current_position < position) {
             $mod_item.addClass('after_current_position');
           }
+          if (!ENV.SEQUENCE_CONTROL)
+            $mod_item.addClass('unlock_links');
+        
           // set the status icon
           var $icon_container = $mod_item.find('.module-item-status-icon');
 
