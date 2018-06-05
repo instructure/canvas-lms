@@ -34,7 +34,7 @@ function addOnMagicFieldsLoaded(func) {
   }
 }
 
-function bzRetainedInfoSetup() {
+function bzRetainedInfoSetup(readonly) {
   function lockRelatedCheckboxes(el) {
     // or if we are a graded checkbox, disable other graded checkboxes inside the same bz-box since they are all related
     if(el.getAttribute("type") == "checkbox") {
@@ -173,10 +173,15 @@ function bzRetainedInfoSetup() {
       };
 
       el.className += " bz-retained-field-setup";
-      if (el.getAttribute("type") == "button")
-        el.addEventListener("click", save);
-      else
-        el.addEventListener("change", save);
+
+      if(readonly !== true) {
+        if (el.getAttribute("type") == "button")
+          el.addEventListener("click", save);
+        else
+          el.addEventListener("change", save);
+      } else {
+        el.className += " bz-retained-field-readonly";
+      }
 
       pendingMagicFieldLoads += 1;
       names.push(name);
