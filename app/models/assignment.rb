@@ -1618,7 +1618,7 @@ class Assignment < ActiveRecord::Base
 
     if did_grade
       submission.grade_matches_current_submission = true
-      submission.instance_variable_set(:@regraded, true)
+      submission.regraded = true
     end
 
     if (submission.score_changed? ||

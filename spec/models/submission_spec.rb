@@ -877,6 +877,22 @@ describe Submission do
       end
     end
 
+    context "with regraded" do
+      it "does not apply the deduction multiple times if submission saved multiple times" do
+        @late_policy.update!(course_id: @course)
+        Timecop.freeze(@date) do
+          @assignment.submit_homework(@student, body: 'a body')
+          # The submission is saved once in grade_student.  Using sub
+          # here to avoid masking/using the submission in the let
+          # above. I want to make sure I'm using the exact same object
+          # as returned by grade_student.
+          sub = @assignment.grade_student(@student, grade: 1000, grader: @teacher).first
+          sub.save!
+          expect(sub.score).to be 700.0
+        end
+      end
+    end
+
     context "assignment on paper" do
       before(:once) do
         @date = Time.zone.local(2017, 1, 15, 12)

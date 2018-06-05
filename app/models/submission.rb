@@ -64,6 +64,12 @@ class Submission < ActiveRecord::Base
                 :grade_posting_in_progress
   attr_writer :versioned_originality_reports,
               :text_entry_originality_reports
+  # This can be set to true to force late policy behaviour that would
+  # be skipped otherwise. See #late_policy_relevant_changes? and
+  # #score_late_or_none. It is reset to false in an after save so late
+  # policy deductions don't happen again if the submission object is
+  # saved again.
+  attr_writer :regraded
 
   belongs_to :attachment # this refers to the screenshot of the submission if it is a url submission
   belongs_to :assignment
@@ -314,6 +320,11 @@ class Submission < ActiveRecord::Base
   after_save :update_line_item_result
   after_save :delete_ignores
   after_save :create_alert
+  after_save :reset_regraded
+
+  def reset_regraded
+    @regraded = false
+  end
 
   def autograded?
     # AutoGrader == (quiz_id * -1)
