@@ -95,7 +95,11 @@ class Login::SamlController < ApplicationController
     end
 
     if !saml2_processing && legacy_response.is_valid? && !response.errors.empty?
-      logger.warn("Response valid via legacy SAML processing, but invalid according to SAML2 processing: #{response.errors.join("\n")}")
+      logger.warn("Response valid via legacy SAML processing from #{legacy_response.issuer}, but invalid according to SAML2 processing: #{response.errors.join("\n")}")
+      unless aac.settings[:first_saml_error]
+        aac.settings[:first_saml_error] = response.errors.join("\n")
+        aac.save!
+      end
     end
 
     if saml2_processing
