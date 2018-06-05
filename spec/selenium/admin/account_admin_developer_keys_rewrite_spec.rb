@@ -395,6 +395,11 @@ describe 'Developer Keys' do
         click_scope_checkbox
         expect(all_endpoints_readonly_checkbox_selected?).to eq true
       end
+
+      it "opens the developer key modal when open modal anchor is present" do
+        get "/accounts/#{Account.default.id}/developer_keys#key_modal_opened"
+        expect(find_button("Save Key")).to be_present
+      end
     end
   end
 

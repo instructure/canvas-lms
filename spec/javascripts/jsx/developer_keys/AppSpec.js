@@ -339,7 +339,7 @@ test('opens the modal when the create button is clicked', () => {
             created_at: "2012-06-07T20:36:50Z"
           }
         ]
-      },
+      }
     },
     actions: {
       developerKeysModalOpen: openSpy

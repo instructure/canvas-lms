@@ -29,6 +29,12 @@ import store from './store/store'
  */
 // ctx is context
 function renderShowDeveloperKeys(ctx) {
+  if (ctx.hash === 'key_modal_opened') {
+    store.dispatch(actions.developerKeysModalOpen())
+  } else {
+    store.dispatch(actions.developerKeysModalClose())
+  }
+
   store.dispatch(
     actions.getDeveloperKeys(`/api/v1/accounts/${ctx.params.contextId}/developer_keys`, true)
   )
