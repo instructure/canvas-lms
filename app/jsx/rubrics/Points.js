@@ -41,7 +41,8 @@ export const scoreString = (points, possible) =>
   })
 
 const invalid = () => [{ text: I18n.t('Invalid value'), type: 'error' }]
-const messages = (points) => points === null ? invalid() : undefined
+const messages = (points, pointsText) =>
+  (points === null && pointsText) ? invalid() : undefined
 
 const Points = (props) => {
   const {
@@ -72,7 +73,7 @@ const Points = (props) => {
           <TextInput
             inline
             label={<ScreenReaderContent>{I18n.t('Points')}</ScreenReaderContent>}
-            messages={messages(points)}
+            messages={messages(points, pointsText)}
             onChange={(e) => onPointChange(e.target.value)}
             value={pointsText || pointString(points)}
             width="4rem"

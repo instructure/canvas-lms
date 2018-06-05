@@ -53,17 +53,30 @@ describe('The Points component', () => {
     }).debug()).toMatchSnapshot()
   })
 
+  const withText = (pointsText, points) => component({
+    assessing: true,
+    assessment: {
+      ...id,
+      points: points === undefined ? null : points,
+      pointsText,
+    },
+    pointsPossible: 2
+  })
+
   it('renders an error when points is a string', () => {
-    const el = component({
-      assessing: true,
-      assessment: {
-        ...id,
-        points: null,
-        pointsText: 'stringy',
-      },
-      pointsPossible: 2
-    })
+    const el = withText('stringy')
     expect(el.debug()).toMatchSnapshot()
     expect(el.find('TextInput').prop('messages')).toHaveLength(1)
+  })
+
+  it('renders no error with a blank string', () => {
+    const expectNoErrorsWith = (t, p) =>
+      expect(withText(t, p).find('TextInput').prop('messages')).toHaveLength(0)
+
+    expectNoErrorsWith('')
+    expectNoErrorsWith(null)
+    expectNoErrorsWith(undefined)
+    expectNoErrorsWith('0', 0)
+    expectNoErrorsWith('2.2', 2.2)
   })
 })
