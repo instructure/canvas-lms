@@ -90,7 +90,8 @@ export default class PermissionsTable extends Component {
             <div className="ic-permissions__top-header__col-wrapper">
               <div
                 style={{top: `${this.state.topOffset}px`}}
-                className="ic-permissions__header-content ic-permissions__header-content-col "
+                className="ic-permissions__header-content ic-permissions__header-content-col"
+                id={`ic-permissions__role-header-for-role-${role.id}`}
               >
                 <Button variant="link" onClick={() => this.openRoleTray(role)}>
                   <Text size="small">{role.label} </Text>

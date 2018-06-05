@@ -53,6 +53,7 @@ export default class RoleTray extends Component {
     deletable: PropTypes.bool.isRequired,
     editable: PropTypes.bool.isRequired,
     hideTray: PropTypes.func.isRequired,
+    deleteRole: PropTypes.func.isRequired,
     label: PropTypes.string.isRequired,
     lastChanged: PropTypes.string.isRequired,
     updateRoleNameAndBaseType: PropTypes.func,
@@ -161,6 +162,10 @@ export default class RoleTray extends Component {
     )
   }
 
+  deleteRole = () => {
+    this.props.deleteRole(this.props.role, this.hideTray, this.hideDeleteAlert)
+  }
+
   // TODO maybe make this a whole other component we can use/reuse?
   renderConfirmationAlert = (children, onOk, onCancel) => (
     <div style={{zIndex: 10, position: 'absolute'}}>
@@ -169,10 +174,10 @@ export default class RoleTray extends Component {
           <Container as="block">
             {children}
             <Container as="block" margin="small 0 0 0">
-              <Button onClick={onOk} margin="none xx-small none none">
+              <Button onClick={onCancel} margin="none xx-small none none">
                 {I18n.t('Cancel')}
               </Button>
-              <Button onClick={onCancel} variant="primary">
+              <Button onClick={onOk} variant="primary">
                 {I18n.t('Ok')}
               </Button>
             </Container>
@@ -195,7 +200,7 @@ export default class RoleTray extends Component {
         <Text as="p">{I18n.t('Click "ok" to continue deleting this role.')}</Text>
       </div>
     )
-    return this.renderConfirmationAlert(text, this.hideDeleteAlert, this.hideTray)
+    return this.renderConfirmationAlert(text, this.deleteRole, this.hideDeleteAlert)
   }
 
   renderEditBaseRoleAlert = () => {
@@ -429,6 +434,7 @@ function mapStateToProps(state, ownProps) {
   //      or vice versa? If so, will need to figure out the logic for that and
   //      udpate the flags here to match.
   const stateProps = {
+    contextId: state.contextId,
     assignedPermissions: permissions.filter(p => p.enabled),
     assignedTo: 'todo',
     basedOn: isBaseRole ? null : getBaseRoleLabel(role, state),
@@ -448,7 +454,8 @@ function mapStateToProps(state, ownProps) {
 
 const mapDispatchToProps = {
   hideTray: actions.hideAllTrays,
-  updateRoleNameAndBaseType: actions.updateRoleNameAndBaseType
+  updateRoleNameAndBaseType: actions.updateRoleNameAndBaseType,
+  deleteRole: actions.deleteRole
 }
 
 export const ConnectedRoleTray = connect(

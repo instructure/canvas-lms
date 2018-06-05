@@ -314,3 +314,13 @@ it('HIDE_ALL_TRAYS sets the activePermissionTray in the store', () => {
   const newState = reduce(actions.hideAllTrays(), originalState)
   expect(newState.activeRoleTray).toBeNull()
 })
+
+it('DELETE_ROLE_SUCCESS deletes the proper role', () => {
+  const originalState = {roles: ROLES}
+  const roleToDelete = ROLES[1]
+  const newRoles = reduce(actions.deleteRoleSuccess(roleToDelete), originalState).roles
+  expect(newRoles).toHaveLength(3)
+  expect(newRoles[0].id).toEqual(ROLES[0].id)
+  expect(newRoles[1].id).toEqual(ROLES[2].id)
+  expect(newRoles[2].id).toEqual(ROLES[3].id)
+})

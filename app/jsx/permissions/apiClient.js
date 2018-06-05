@@ -35,3 +35,7 @@ export function postNewRole({contextId}, label, role) {
 export function updateRole({contextId}, role) {
   return axios.put(`/api/v1/accounts/${contextId}/roles/${role.id}`, role)
 }
+
+export function deleteRole(contextId, role) {
+  return axios.delete(`/api/v1/accounts/${contextId}/roles/${role.id}`)
+}

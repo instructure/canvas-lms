@@ -76,14 +76,15 @@ const roles = handleActions(
     },
     [actionTypes.UPDATE_PERMISSIONS]: (state, action) => {
       const {courseRoleId, permissionName, enabled, locked} = action.payload
-      const newState = state.map(
+      return state.map(
         p => (p.id === courseRoleId ? changePermission(p, permissionName, enabled, locked) : p)
       )
-      return newState
     },
     [actionTypes.ADD_NEW_ROLE]: (state, action) => roleSortedInsert(state, action.payload),
     [actionTypes.UPDATE_ROLE]: (state, action) =>
-      state.map(r => (r.id === action.payload.id ? {...r, ...action.payload} : r))
+      state.map(r => (r.id === action.payload.id ? {...r, ...action.payload} : r)),
+    [actionTypes.DELETE_ROLE_SUCCESS]: (state, action) =>
+      state.filter(role => action.payload.id !== role.id)
   },
   []
 )

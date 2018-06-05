@@ -136,6 +136,17 @@ it('updaterole calls updaterolenameandbasetype', () => {
   expect(mockFunction).toHaveBeenCalledWith('1', 'blah', null)
 })
 
+it('deleterole calls deleterole prop', () => {
+  const props = makeDefaultProps()
+  const mockFunction = jest.fn()
+  props.deleteRole = mockFunction
+  const tree = shallow(<RoleTray {...props} />)
+  const hideTray = tree.instance().hideTray
+  const hideDeleteAlert = tree.instance().hideDeleteAlert
+  tree.instance().deleteRole()
+  expect(mockFunction).toHaveBeenCalledWith(props.role, hideTray, hideDeleteAlert)
+})
+
 it('renders edit icon if editable is true', () => {
   const props = makeDefaultProps()
   props.editable = true

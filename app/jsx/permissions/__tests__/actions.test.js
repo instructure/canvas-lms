@@ -297,3 +297,45 @@ it('tabChanged dispatches permissionsTabChanged', () => {
   expect(dispatchMock).toHaveBeenCalledTimes(1)
   expect(dispatchMock).toHaveBeenCalledWith(expectedDispatch)
 })
+
+it('deleteRole action dispatches delete and calls success callback if good', () => {
+  moxios.install()
+  const state = {contextId: 1, permissions: PERMISSIONS, roles: ROLES}
+  const successCallbackMock = jest.fn()
+  const failCallbackMock = jest.fn()
+  const mockDispatch = jest.fn()
+  actions.deleteRole(ROLES[1], successCallbackMock, failCallbackMock)(mockDispatch, () => state)
+  return moxiosWait(() => {
+    const request = moxios.requests.mostRecent()
+    request.respondWith({status: 200, response: {data: 'who cares'}}).then(() => {
+      expect(successCallbackMock).toHaveBeenCalledTimes(1)
+      expect(failCallbackMock).toHaveBeenCalledTimes(0)
+      const expectedDeleteRoleDispatch = {
+        type: 'DELETE_ROLE_SUCCESS',
+        payload: ROLES[1]
+      }
+      expect(mockDispatch).toHaveBeenCalledTimes(1)
+      expect(mockDispatch).toHaveBeenCalledWith(expectedDeleteRoleDispatch)
+    })
+    moxios.uninstall()
+  })
+})
+
+it('deleteRole action doesnt dispatch and does fail callback on fail', () => {
+  moxios.install()
+  const state = {contextId: 1, permissions: PERMISSIONS, roles: ROLES}
+  const successCallbackMock = jest.fn()
+  const failCallbackMock = jest.fn()
+  const mockDispatch = jest.fn()
+  actions.deleteRole(1, ROLES[1], successCallbackMock, failCallbackMock)(mockDispatch, () => state)
+  return moxiosWait(() => {
+    const request = moxios.requests.mostRecent()
+    request.respondWith({status: 400, response: {data: 'who cares'}}).then(() => {
+      expect(successCallbackMock).toHaveBeenCalledTimes(0)
+      expect(failCallbackMock).toHaveBeenCalledTimes(1)
+      // Don't dispatch anything if api call fails
+      expect(mockDispatch).toHaveBeenCalledTimes(0)
+    })
+    moxios.uninstall()
+  })
+})
