@@ -3821,6 +3821,26 @@ describe Submission do
         expect(subject).to include(@teacher_assessment)
       end
 
+      it 'does not return rubric assessments if assignment has no rubric' do
+        @assignment.rubric_association.destroy!
+
+        expect(subject).not_to include(@teacher_assessment)
+      end
+
+      it 'only returns rubric assessments from associated rubrics' do
+        other = @rubric_association.dup
+        other.save!
+        other_assessment = other.rubric_assessments.create!({
+          artifact: @submission,
+          assessment_type: 'grading',
+          assessor: @teacher,
+          rubric: @rubric,
+          user: @assessed_user
+        })
+
+        expect(subject).to eq([other_assessment])
+      end
+
       it 'returns only student rubric assessment' do
         @viewing_user = @student
         expect(subject).not_to include(@teacher_assessment)

@@ -223,14 +223,8 @@ class GradeSummaryAssignmentPresenter
   end
 
   def rubric_assessments
-    @visible_rubric_assessments ||= begin
-      if submission && !assignment.muted?
-        assessments = submission.rubric_assessments.select { |a| a.grants_right?(@current_user, :read) }
-        assessments.sort_by { |a| [a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last, a.assessor_name] }
-      else
-        []
-      end
-    end
+    return [] unless submission
+    submission.visible_rubric_assessments_for(@current_user)
   end
 
   def group
