@@ -33,6 +33,7 @@ module Api::V1::PlannerItem
       :planner_override => planner_override_json(item.planner_override_for(user), user, session),
       :new_activity => new_activity(item, user, opts)
     }).merge(submission_statuses_for(user, item, opts)).tap do |hash|
+      assignment_opts = {exclude_response_fields: ['rubric']}
       if item.is_a?(::CalendarEvent)
         hash[:plannable_date] = item.start_at || item.created_at
         hash[:plannable_type] = 'calendar_event'
@@ -55,7 +56,7 @@ module Api::V1::PlannerItem
         item = item.wiki_page if item.respond_to?(:wiki_page?) && item.wiki_page?
         hash[:plannable_date] = item.todo_date || item.created_at
         hash[:plannable_type] = 'wiki_page'
-        hash[:plannable] = wiki_page_json(item, user, session)
+        hash[:plannable] = wiki_page_json(item, user, session, assignment_opts: assignment_opts)
         hash[:html_url] = named_context_url(item.context, :context_wiki_page_url, item.id)
         hash[:planner_override] ||= planner_override_json(item.planner_override_for(user), user, session)
       elsif item.is_a?(Announcement)
@@ -68,13 +69,13 @@ module Api::V1::PlannerItem
         hash[:plannable_id] = topic.id
         hash[:plannable_date] = item[:user_due_date] || topic.todo_date || topic.posted_at || topic.created_at
         hash[:plannable_type] = 'discussion_topic'
-        hash[:plannable] = discussion_topic_api_json(topic, topic.context, user, session)
+        hash[:plannable] = discussion_topic_api_json(topic, topic.context, user, session, assignment_opts: assignment_opts)
         hash[:html_url] = named_context_url(topic.context, :context_discussion_topic_url, topic.id)
         hash[:planner_override] ||= planner_override_json(topic.planner_override_for(user), user, session)
       else
         hash[:plannable_type] = 'assignment'
         hash[:plannable_date] = item[:user_due_date] || item.due_at
-        hash[:plannable] = assignment_json(item, user, session, include_discussion_topic: true)
+        hash[:plannable] = assignment_json(item, user, session, {include_discussion_topic: true}.merge(assignment_opts))
         hash[:html_url] = named_context_url(item.context, :context_assignment_url, item.id)
       end
     end
