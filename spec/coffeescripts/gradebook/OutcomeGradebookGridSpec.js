@@ -52,7 +52,7 @@ test('Grid.Math.mode', () => {
 })
 
 test('Grid.View.masteryColor', () => {
-  const outcome = {mastery_points: 5}
+  const outcome = {mastery_points: 5, points_possible: 10}
   const spy = sinon.spy(Grid.View, 'legacyMasteryColor')
   Grid.View.masteryColor(10, outcome)
   ok(
@@ -79,6 +79,48 @@ test('Grid.View.masteryColor', () => {
   ok(
     isEqual(Grid.View.masteryColor(4, outcome), ['rating_2', '#ff0000']),
     'returns color of third rating'
+  )
+  ok(
+    isEqual(Grid.View.masteryColor(0, outcome), ['rating_2', '#ff0000']),
+    'returns color of third rating'
+  )
+})
+
+test('Grid.View.masteryColor with scaling', () => {
+  const outcome = {points_possible: 5}
+  Grid.ratings = [
+    {points: 10, color: '00ff00'},
+    {points:  5, color: '0000ff'},
+    {points:  0, color: 'ff0000'}
+  ]
+  ok(
+    isEqual(Grid.View.masteryColor(5, outcome), ['rating_0', '#00ff00']),
+    'returns color of first rating'
+  )
+  ok(
+    isEqual(Grid.View.masteryColor(2.5, outcome), ['rating_1', '#0000ff']),
+    'returns color of second rating'
+  )
+  ok(
+    isEqual(Grid.View.masteryColor(0, outcome), ['rating_2', '#ff0000']),
+    'returns color of third rating'
+  )
+})
+
+test('Grid.View.masteryColor with scaling (points_possible 0)', () => {
+  const outcome = {mastery_points: 5, points_possible: 0}
+  Grid.ratings = [
+    {points: 10, color: '00ff00'},
+    {points:  5, color: '0000ff'},
+    {points:  0, color: 'ff0000'}
+  ]
+  ok(
+    isEqual(Grid.View.masteryColor(5, outcome), ['rating_0', '#00ff00']),
+    'returns color of first rating'
+  )
+  ok(
+    isEqual(Grid.View.masteryColor(2.5, outcome), ['rating_1', '#0000ff']),
+    'returns color of second rating'
   )
   ok(
     isEqual(Grid.View.masteryColor(0, outcome), ['rating_2', '#ff0000']),

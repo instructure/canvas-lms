@@ -373,8 +373,10 @@ define [
 
       masteryColor: (score, outcome) ->
         if Grid.ratings.length > 0
-          # Scaling the score against the points possible on an outcome will be fixed in OUT-2242
-          idx = Grid.ratings.findIndex((r) -> score >= r.points)
+          total_points = outcome.points_possible
+          total_points = outcome.mastery_points if total_points == 0
+          scaled = if total_points == 0 then score else (score / total_points) * Grid.ratings[0].points
+          idx = Grid.ratings.findIndex((r) -> scaled >= r.points)
           idx = if idx == -1 then Grid.ratings.length - 1 else idx
           ["rating_#{idx}", "\##{Grid.ratings[idx].color}"]
         else
