@@ -5735,7 +5735,7 @@ nl:
         course_offline_export: Offlinecursus
         course_section_name: "Een nieuwe gebruiker toevoegen"
         course_status_published: "Cursus is gepubliceerd"
-        course_status_unpublished: "Cursus is gepubliceerd"
+        course_status_unpublished: "Cursus is niet gepubliceerd"
         course_visibility: Zichtbaarheid
         custom_course_visibility: Aanpassen
         enrollment_term_id: Periode
