@@ -118,23 +118,17 @@ class GradebookSettingsModal extends React.Component {
   }
 
   render () {
-    const title = I18n.t('Gradebook Settings');
     const { isOpen, latePolicy } = this.state;
 
     return (
       <Modal
         size="large"
         open={isOpen}
-        label={title}
-        closeButtonLabel={I18n.t('Close')}
+        label={I18n.t('Gradebook Settings')}
         onOpen={this.fetchLatePolicy}
         onDismiss={this.close}
         onExited={this.props.onClose}
       >
-        <ModalHeader>
-          <Heading level="h3">{ I18n.t('Gradebook Settings') }</Heading>
-        </ModalHeader>
-
         <ModalBody>
           <TabList defaultSelectedIndex={0}>
             <TabPanel id="late-policies-tab" title={I18n.t('Late Policies')}>
