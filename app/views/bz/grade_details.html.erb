@@ -4,7 +4,7 @@
   <input type="hidden" name="module_item_id" value="<%= @module_item_id %>" />
   <select name="user_id">
 <%
-  @course.students.active.each do |student|
+  @course.students.active.order(:name).each do |student|
   %>
     <option value="<%=student.id%>" <%= (student.id == @user_id) ? "selected" : "" %>><%=student.name%></option>
   <%
