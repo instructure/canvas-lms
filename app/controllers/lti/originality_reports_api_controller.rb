@@ -359,7 +359,10 @@ module Lti
     end
 
     def attachment_in_history?(attachment, submission)
-      submission.submission_history.any? { |s| s.attachment_ids.include?(attachment.id.to_s) }
+      submission.submission_history.any? do |s|
+        s.attachment_ids.include?(attachment.id.to_s) ||
+        s.attachment_ids.include?(attachment.global_id.to_s)
+      end
     end
 
     def verify_submission_attachment(attachment, submission)

@@ -753,6 +753,7 @@ module Lti
       end
 
       it 'allows creating reports for any attachment in submission history' do
+        shard_two = Shard.create!
         a = @course.assignments.create!(
           title: "some assignment",
           assignment_group: @group,
@@ -762,7 +763,7 @@ module Lti
         a.tool_settings_tool = message_handler
         a.save!
 
-        first_attachment = attachment_model(context: @student)
+        first_attachment = shard_two.activate { attachment_model(context: @student) }
         Timecop.freeze(10.seconds.ago) do
           a.submit_homework(@student, attachments: [first_attachment])
         end
