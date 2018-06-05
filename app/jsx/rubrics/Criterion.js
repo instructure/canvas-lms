@@ -161,9 +161,11 @@ export default class Criterion extends React.Component {
     const updateComments = (partialComments) =>
       onAssessmentChange({ partialComments })
 
+    const currentComments = (a) =>
+      a.partialComments === undefined ? a.comments : a.partialComments
     const commentInput = assessment !== null ? (
       <CommentButton
-        comments={assessment.partialComments || assessment.comments}
+        comments={currentComments(assessment)}
         description={criterion.description}
         finalize={finalize}
         initialize={() => onAssessmentChange({ commentsOpen: true })}
@@ -172,7 +174,7 @@ export default class Criterion extends React.Component {
       />
     ) : null
 
-    const noComments = _.get(assessment, 'comments', '').length > 0
+    const noComments = (_.get(assessment, 'comments') || '').length > 0
     const pointsPossible = criterion.points
     const longDescription = criterion.long_description
     const threshold = criterion.mastery_points

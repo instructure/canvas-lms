@@ -222,7 +222,7 @@ window.rubricAssessment = {
         const points = numberHelper.parse(criteriaAssessment.points)
         data[section("[points]")] = !Number.isNaN(points) ? points : undefined
         data[section("[description]")] = criteriaAssessment.description
-        data[section("[comments]")] = criteriaAssessment.comments
+        data[section("[comments]")] = criteriaAssessment.comments || ''
         data[section("[save_comment]")] = criteriaAssessment.saveCommentsForLater === true ? "1" : "0";
       })
     } else {
