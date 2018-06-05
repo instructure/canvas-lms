@@ -18,6 +18,7 @@
 class Assignment
   class SpeedGrader
     include GradebookSettingsHelpers
+    include CoursesHelper
 
     def initialize(assignment, user, avatars: false, grading_role: :grader)
       @assignment = assignment
@@ -196,6 +197,10 @@ class Assignment
           enable_annotations: true,
           moderated_grading_whitelist: moderated_grading_whitelist
         }
+
+        if url_opts[:enable_annotations]
+          url_opts[:enrollment_type] = user_type(@course, @user)
+        end
 
         if json['submission_history'] && (@assignment.quiz.nil? || too_many)
           json['submission_history'] = json['submission_history'].map do |version|

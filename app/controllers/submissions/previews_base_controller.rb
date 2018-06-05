@@ -20,6 +20,7 @@ module Submissions
   class PreviewsBaseController < ApplicationController
     include KalturaHelper
     include Submissions::ShowHelper
+    include CoursesHelper
 
     before_action :require_context
 
@@ -29,6 +30,7 @@ module Submissions
       @assignment = @submission_for_show.assignment
       @user = @submission_for_show.user
       @submission = @submission_for_show.submission
+      @enrollment_type = user_type(@context, @current_user)
 
       prepare_js_env
 
