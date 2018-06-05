@@ -22,7 +22,7 @@ import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import IconCheckMark from '@instructure/ui-icons/lib/Solid/IconCheckMark'
-import IconExpandLeftLine from 'instructure-icons/lib/Line/IconExpandLeftLine'
+import IconExpandStart from '@instructure/ui-icons/lib/Line/IconExpandStart'
 import IconEnd from '@instructure/ui-icons/lib/Solid/IconEnd'
 import I18n from 'i18n!gradebook'
 import GradeFormatHelper from '../../../../../gradebook/shared/helpers/GradeFormatHelper'
@@ -165,7 +165,7 @@ export default class ReadOnlyCell extends Component {
                 size="small"
                 variant="icon"
               >
-                <IconExpandLeftLine title={I18n.t('Open submission tray')} />
+                <IconExpandStart title={I18n.t('Open submission tray')} />
               </Button>
             </div>
           </div>

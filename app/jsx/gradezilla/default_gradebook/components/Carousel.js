@@ -19,8 +19,8 @@
 import React, { Component } from 'react';
 import { bool, func, node, string } from 'prop-types';
 import Button from '@instructure/ui-buttons/lib/components/Button';
-import ArrowOpenLeft from '@instructure/ui-icons/lib/Line/IconArrowOpenLeft';
-import ArrowOpenRight from '@instructure/ui-icons/lib/Line/IconArrowOpenRight';
+import ArrowOpenStart from '@instructure/ui-icons/lib/Line/IconArrowOpenStart';
+import ArrowOpenEnd from '@instructure/ui-icons/lib/Line/IconArrowOpenEnd';
 
 export default class Carousel extends Component {
   componentDidUpdate (prevProps) {
@@ -53,7 +53,7 @@ export default class Carousel extends Component {
         onClick={this.handleLeftArrowClick}
         size="small"
       >
-        <ArrowOpenLeft title={this.props.leftArrowDescription} />
+        <ArrowOpenStart title={this.props.leftArrowDescription} />
       </Button>
     );
 
@@ -65,7 +65,7 @@ export default class Carousel extends Component {
         onClick={this.handleRightArrowClick}
         size="small"
       >
-        <ArrowOpenRight title={this.props.rightArrowDescription} />
+        <ArrowOpenEnd title={this.props.rightArrowDescription} />
       </Button>
     );
 
