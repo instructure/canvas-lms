@@ -23,16 +23,17 @@ describe ObserverAlertsApiController, type: :request do
   include Api::V1::ObserverAlert
 
   describe '#alerts_by_student' do
+    alerts = []
     before :once do
       @course = course_model
       @assignment = assignment_model(context: @course)
 
-      observer_alert_model(course: @course, alert_type: 'assignment_grade_high', context: @assignment)
+      alerts << observer_alert_model(course: @course, alert_type: 'assignment_grade_high', context: @assignment)
       observer_alert_threshold = @observer_alert_threshold
 
-      observer_alert_model(course: @course, observer: @observer, student: @student, link: @observation_link,
+      alerts << observer_alert_model(course: @course, observer: @observer, student: @student, link: @observation_link,
         alert_type: 'assignment_grade_low', context: @assignment)
-      observer_alert_model(course: @course, observer: @observer, student: @student, link: @observation_link,
+      alerts << observer_alert_model(course: @course, observer: @observer, student: @student, link: @observation_link,
         alert_type: 'course_grade_high', context: @course)
 
       @observer_alert_threshold = observer_alert_threshold
@@ -62,6 +63,8 @@ describe ObserverAlertsApiController, type: :request do
     it 'returns all alerts for student' do
       json = api_call_as_user(@observer, :get, @path, @params)
       expect(json.length).to eq 3
+
+      expect(json.map {|e| e['id'] }).to eq alerts.map(&:id).reverse
     end
 
     it 'doesnt return alerts for other students' do
