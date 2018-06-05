@@ -204,6 +204,7 @@ const mapDispatchToProps = {
   setAndOpenRoleTray: actions.setAndOpenRoleTray
 }
 
-export const ConnectedPermissionsTable = connect(mapStateToProps, mapDispatchToProps)(
-  PermissionsTable
-)
+export const ConnectedPermissionsTable = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(PermissionsTable)

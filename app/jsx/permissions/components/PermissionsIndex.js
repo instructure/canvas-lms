@@ -177,6 +177,7 @@ const mapDispatchToProps = {
   tabChanged: actions.tabChanged
 }
 
-export const ConnectedPermissionsIndex = connect(mapStateToProps, mapDispatchToProps)(
-  PermissionsIndex
-)
+export const ConnectedPermissionsIndex = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(PermissionsIndex)

@@ -145,6 +145,7 @@ const mapDispatchToProps = {
   handleClick: actions.modifyPermissions
 }
 
-export const ConnectedPermissionButton = connect(mapStateToProps, mapDispatchToProps)(
-  PermissionButton
-)
+export const ConnectedPermissionButton = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(PermissionButton)

@@ -428,4 +428,7 @@ const mapDispatchToProps = {
   hideTray: actions.hideAllTrays
 }
 
-export const ConnectedRoleTray = connect(mapStateToProps, mapDispatchToProps)(RoleTray)
+export const ConnectedRoleTray = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(RoleTray)

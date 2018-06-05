@@ -70,9 +70,9 @@ actions.createNewRole = function(label, baseRole) {
         dispatch(actions.displayRoleTray({role: createdRole}))
         showFlashSuccess(I18n.t('Successfully created new role'))()
       })
-      .catch(error => {
+      .catch(_error => {
         dispatch(actions.addTraySavingFail())
-        showFlashError(I18n.t('Failed to create new role: Role already exists'))()
+        showFlashError(I18n.t('Failed to create new role'))()
       })
   }
 }
