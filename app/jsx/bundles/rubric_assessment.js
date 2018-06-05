@@ -43,6 +43,7 @@ document.querySelectorAll(".react_rubric_container").forEach((rubricElement) => 
       rubric={findRubric(rubricElement.dataset.rubricId)}
       rubricAssessment={assessment}
       rubricAssociation={assessment.rubric_association}
+      customRatings={ENV.outcome_proficiency ? ENV.outcome_proficiency.ratings : []}
     />
   ), rubricElement)
 })

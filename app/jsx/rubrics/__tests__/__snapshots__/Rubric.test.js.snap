@@ -17,8 +17,8 @@ exports[`the Rubric component hides the score total when needed 1`] = `
       </tr>
     </thead>
     <tbody className=\\"criterions\\">
-      <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={{...}} savedComments={{...}} />
-      <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={{...}} savedComments={{...}} />
+      <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={{...}} savedComments={{...}} customRatings={{...}} />
+      <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={{...}} savedComments={{...}} customRatings={{...}} />
       <tr>
         <td colSpan=\\"3\\" className=\\"total-points\\" />
       </tr>
@@ -44,8 +44,8 @@ exports[`the Rubric component renders as expected 1`] = `
       </tr>
     </thead>
     <tbody className=\\"criterions\\">
-      <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={{...}} savedComments={{...}} />
-      <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={{...}} savedComments={{...}} />
+      <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={{...}} savedComments={{...}} customRatings={{...}} />
+      <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={{...}} savedComments={{...}} customRatings={{...}} />
       <tr>
         <td colSpan=\\"3\\" className=\\"total-points\\">
           Total Points: 6.0
@@ -73,8 +73,8 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
       </tr>
     </thead>
     <tbody className=\\"criterions\\">
-      <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={{...}} savedComments={{...}} />
-      <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={{...}} savedComments={{...}} />
+      <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={{...}} savedComments={{...}} customRatings={{...}} />
+      <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={{...}} savedComments={{...}} customRatings={{...}} />
       <tr>
         <td colSpan=\\"3\\" className=\\"total-points\\">
           Total Points: 11.0
@@ -102,8 +102,8 @@ exports[`the Rubric component updates the total score when an individual criteri
       </tr>
     </thead>
     <tbody className=\\"criterions\\">
-      <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={[Function]} savedComments={{...}} />
-      <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={[Function]} savedComments={{...}} />
+      <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={[Function]} savedComments={{...}} customRatings={{...}} />
+      <Criterion assessment={{...}} criterion={{...}} freeForm={false} onAssessmentChange={[Function]} savedComments={{...}} customRatings={{...}} />
       <tr>
         <td colSpan=\\"3\\" className=\\"total-points\\">
           Total Points: 5 out of 11.0

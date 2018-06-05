@@ -29,7 +29,7 @@ describe('The Ratings component', () => {
       { description: 'Subpar', points: 1 }
     ],
     points: 5,
-    masteryThreshold: 10,
+    defaultMasteryThreshold: 10,
     useRange: false
   }
 
@@ -67,12 +67,26 @@ describe('The Ratings component', () => {
     expect(onPointChange.args[0]).toEqual([10])
   })
 
-  it('uses the right mastery level', () => {
-    const mastery = (points, mastery_level) =>
-      component({ points }).find('Rating').map((el) => el.shallow().hasClass(mastery_level))
-    expect(mastery(10, 'full')).toEqual([true, false, false])
-    expect(mastery(5, 'partial')).toEqual([false, true, false])
-    expect(mastery(1, 'none')).toEqual([false, false, true])
+  it('uses the right default mastery level colors', () => {
+    const mastery = (points) =>
+      component({ points }).find('Rating').map((el) => el.prop('tierColor'))
+    expect(mastery(10)).toEqual(["#8aac53", 'transparent', 'transparent'])
+    expect(mastery(5)).toEqual(['transparent', "#e0d773", 'transparent'])
+    expect(mastery(1)).toEqual(['transparent', 'transparent', "#df5b59"])
+  })
+
+  it('uses the right custom rating colors', () => {
+    const customRatings = [
+      {points: 10, color: "09BCD3"},
+      {points: 5, color: "65499D"},
+      {points: 1, color: "F8971C"}
+    ]
+    const ratings = (points, useRange = false) =>
+      component({points, useRange, customRatings}).find('Rating').map((el) => el.prop('tierColor'))
+    expect(ratings(10)).toEqual(['#09BCD3', 'transparent', 'transparent'])
+    expect(ratings(5)).toEqual(['transparent', '#65499D', 'transparent'])
+    expect(ratings(1)).toEqual(['transparent', 'transparent', '#F8971C'])
+    expect(ratings(0, true)).toEqual(['transparent', 'transparent', '#F8971C'])
   })
 
   describe('Rating component', () => {

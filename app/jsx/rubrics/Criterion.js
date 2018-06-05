@@ -118,7 +118,8 @@ export default class Criterion extends React.Component {
       criterion,
       freeForm,
       onAssessmentChange,
-      savedComments
+      savedComments,
+      customRatings
     } = this.props
     const { dialogOpen } = this.state
     const isOutcome = criterion.learning_outcome_id !== undefined
@@ -150,7 +151,8 @@ export default class Criterion extends React.Component {
         onPointChange={onPointChange}
         points={_.get(assessment, 'points')}
         useRange={useRange}
-        masteryThreshold={isOutcome ? criterion.mastery_points : criterion.points}
+        defaultMasteryThreshold={isOutcome ? criterion.mastery_points : criterion.points}
+        customRatings={customRatings}
       />
     )
 
@@ -237,10 +239,12 @@ Criterion.propTypes = {
   criterion: PropTypes.shape(criterionShape).isRequired,
   freeForm: PropTypes.bool.isRequired,
   onAssessmentChange: PropTypes.func,
-  savedComments: PropTypes.arrayOf(PropTypes.string)
+  savedComments: PropTypes.arrayOf(PropTypes.string),
+  customRatings: PropTypes.arrayOf(PropTypes.object)
 }
 Criterion.defaultProps = {
   assessment: null,
   onAssessmentChange: null,
-  savedComments: []
+  savedComments: [],
+  customRatings: []
 }

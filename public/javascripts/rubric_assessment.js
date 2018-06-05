@@ -297,6 +297,7 @@ window.rubricAssessment = {
           onAssessmentChange: assessing ? setCurrentAssessment : null,
           rubric: ENV.rubric,
           rubricAssessment: currentAssessment,
+          customRatings: ENV.outcome_proficiency ? ENV.outcome_proficiency.ratings : [],
           rubricAssociation
         }, null), container.get(0))
       }

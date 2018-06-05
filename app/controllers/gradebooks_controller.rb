@@ -125,7 +125,8 @@ class GradebooksController < ApplicationController
       save_assignment_order_url: course_save_assignment_order_url(@context),
       student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
       student_id: @presenter.student_id,
-      students: @presenter.students.as_json(include_root: false)
+      students: @presenter.students.as_json(include_root: false),
+      outcome_proficiency: outcome_proficiency
     )
   end
 
@@ -652,7 +653,8 @@ class GradebooksController < ApplicationController
           nonScoringRubrics: @domain_root_account.feature_enabled?(:non_scoring_rubrics),
           can_comment_on_submission: @can_comment_on_submission,
           show_help_menu_item: show_help_link?,
-          help_url: help_link_url
+          help_url: help_link_url,
+          outcome_proficiency: outcome_proficiency
         }
         if grading_role == :moderator
           env[:provisional_copy_url] = api_v1_copy_to_final_mark_path(@context.id, @assignment.id, "{{provisional_grade_id}}")

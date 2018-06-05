@@ -36,7 +36,7 @@ const totalAssessingString = (score, possible) =>
     possible: I18n.toNumber(possible, { precision: 1 })
   })
 
-const Rubric = ({ onAssessmentChange, rubric, rubricAssessment, rubricAssociation }) => {
+const Rubric = ({ onAssessmentChange, rubric, rubricAssessment, rubricAssociation, customRatings }) => {
   const assessing = onAssessmentChange !== null
   const priorData = _.get(rubricAssessment, 'data', [])
   const byCriteria = _.keyBy(priorData, (ra) => ra.criterion_id)
@@ -61,6 +61,7 @@ const Rubric = ({ onAssessmentChange, rubric, rubricAssessment, rubricAssociatio
         freeForm={rubric.free_form_criterion_comments}
         onAssessmentChange={assessing ? onCriteriaChange(criterion.id) : undefined}
         savedComments={allComments[criterion.id]}
+        customRatings={customRatings}
       />
     )
   })
@@ -101,12 +102,14 @@ Rubric.propTypes = {
     const rubricAssessment = props.onAssessmentChange ? shape.isRequired : shape
     return PropTypes.checkPropTypes({ rubricAssessment }, props, 'prop', 'Rubric')
   },
-  rubricAssociation: PropTypes.shape(rubricAssociationShape)
+  rubricAssociation: PropTypes.shape(rubricAssociationShape),
+  customRatings: PropTypes.arrayOf(PropTypes.object)
 }
 Rubric.defaultProps = {
   onAssessmentChange: null,
   rubricAssessment: null,
-  rubricAssociation: {}
+  rubricAssociation: {},
+  customRatings: []
 }
 
 export default Rubric

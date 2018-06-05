@@ -36,7 +36,8 @@ class SubmissionsBaseController < ApplicationController
         js_env({
           nonScoringRubrics: @domain_root_account.feature_enabled?(:non_scoring_rubrics),
           rubric: rubric ? rubric_json(rubric, @current_user, session, style: 'full') : nil,
-          rubricAssociation: rubric_association_json ? rubric_association_json['rubric_association'] : nil
+          rubricAssociation: rubric_association_json ? rubric_association_json['rubric_association'] : nil,
+          outcome_proficiency: outcome_proficiency
         })
          render 'submissions/show'
       end
@@ -163,5 +164,11 @@ class SubmissionsBaseController < ApplicationController
     # intentionally skipping callbacks here to fix a bug where entering a
     # what-if grade for a quiz can put the submission back in a 'pending review' state
     @submission.update_column(:student_entered_score, new_score)
+  end
+
+  def outcome_proficiency
+    if @context.root_account.feature_enabled?(:non_scoring_rubrics)
+      @context.account.resolved_outcome_proficiency&.as_json
+    end
   end
 end

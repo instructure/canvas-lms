@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+import _ from 'lodash'
 import React from 'react'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
@@ -45,8 +47,12 @@ export const Rating = (props) => {
     points,
     onClick,
     endOfRangePoints,
-    classes
+    classes,
+    tierColor
   } = props
+
+  const shaderStyle = {backgroundColor: tierColor}
+  const triangleStyle = {borderBottomColor: tierColor}
 
   return (
     <div
@@ -69,18 +75,30 @@ export const Rating = (props) => {
       <Text size="x-small" fontStyle="italic" lineHeight="condensed">
         {long_description}
       </Text>
-      <div className='shader'><div className="triangle"/></div>
+      <div className='shader' style={shaderStyle}>
+        <div className="triangle" style={triangleStyle}/>
+      </div>
     </div>
   )
 }
 
-const getMasteryLevel = (points, masteryThreshold) => {
-  if (points >= masteryThreshold) {
-    return 'full'
-  } else if (points >= masteryThreshold/2) {
-    return 'partial'
+const getDefaultColor = (points, defaultMasteryThreshold) => {
+  if (points >= defaultMasteryThreshold) {
+    return '#8aac53'
+  } else if (points >= defaultMasteryThreshold/2) {
+    return '#e0d773'
   } else {
-    return 'none'
+    return '#df5b59'
+  }
+}
+
+const getCustomColor = (points, customRatings) => {
+  const sortedRatings = _.sortBy(customRatings, 'points').reverse()
+  const selectedRating = _.find(sortedRatings, (rating) => ( points >= rating.points ))
+  if (selectedRating) {
+    return `#${selectedRating.color}`
+  } else {
+    return `#${_.last(sortedRatings).color}`
   }
 }
 
@@ -100,8 +118,9 @@ const Ratings = (props) => {
     tiers,
     points,
     onPointChange,
-    masteryThreshold,
-    useRange
+    defaultMasteryThreshold,
+    useRange,
+    customRatings
   } = props
 
   const pairs = tiers.map((tier, index) => {
@@ -125,6 +144,15 @@ const Ratings = (props) => {
     return null
   }
 
+  const getTierColor = (selected) => {
+    if (!selected) { return 'transparent' }
+    if (customRatings && customRatings.length > 0) {
+      return getCustomColor(points, customRatings)
+    } else {
+      return getDefaultColor(points, defaultMasteryThreshold)
+    }
+  }
+
   const selectedIndex = points !== undefined ? currentIndex() : null
 
   return (
@@ -135,7 +163,7 @@ const Ratings = (props) => {
           const classes = classNames({
             'rating-tier': true,
             'selected': selected,
-          }, selected && getMasteryLevel(points, masteryThreshold))
+          })
           return (
             <Rating
               key={index} // eslint-disable-line react/no-array-index-key
@@ -143,6 +171,7 @@ const Ratings = (props) => {
               onClick={() => onPointChange(tier.points)}
               classes={classes}
               endOfRangePoints={useRange ? getRangePoints(tier.points, tiers[index + 1]) : null}
+              tierColor={getTierColor(selected)}
               {...tier}
             />
           )
