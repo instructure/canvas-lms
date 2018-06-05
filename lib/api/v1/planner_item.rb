@@ -81,6 +81,7 @@ module Api::V1::PlannerItem
   end
 
   def planner_items_json(items, user, session, opts = {})
+    ActiveRecord::Associations::Preloader.new.preload(items, :planner_overrides, ::PlannerOverride.where(user: user))
     _events, other_items = items.partition{|i| i.is_a?(::CalendarEvent)}
     notes, context_items = other_items.partition{|i| i.is_a?(::PlannerNote)}
     ActiveRecord::Associations::Preloader.new.preload(notes, :user => {:pseudonym => :account}) if notes.any?

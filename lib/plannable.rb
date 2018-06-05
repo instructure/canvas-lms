@@ -44,7 +44,11 @@ module Plannable
   end
 
   def planner_override_for(user)
-    self.planner_overrides.where(user_id: user).where.not(workflow_state: 'deleted').take
+    if self.association(:planner_overrides).loaded?
+      self.planner_overrides.find{|po| po.user_id == user.id && po.workflow_state != 'deleted'}
+    else
+      self.planner_overrides.where(user_id: user).where.not(workflow_state: 'deleted').take
+    end
   end
 
   class Bookmarker
