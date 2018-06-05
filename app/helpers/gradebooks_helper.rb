@@ -17,20 +17,16 @@
 #
 
 module GradebooksHelper
-  def anonymous_assignment?(assignment)
-    anonymous_assignment =
-      assignment.quiz &&
-      assignment.quiz.survey? &&
-      assignment.quiz.anonymous_submissions
-    !!anonymous_assignment
+  def anonymous_survey?(assignment)
+    !!assignment.quiz&.anonymous_survey?
   end
 
   def force_anonymous_grading?(assignment)
-    anonymous_assignment?(assignment) || assignment.anonymous_grading?
+    anonymous_survey?(assignment) || assignment.anonymous_grading?
   end
 
   def force_anonymous_grading_reason(assignment)
-    if anonymous_assignment?(assignment)
+    if anonymous_survey?(assignment)
       I18n.t("Student names must be hidden because this is an anonymous survey.")
     elsif assignment.anonymous_grading?
       I18n.t("Student names must be hidden because anonymous grading is required.")

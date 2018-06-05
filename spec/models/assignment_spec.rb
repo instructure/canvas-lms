@@ -2269,7 +2269,6 @@ describe Assignment do
   describe "#unmute!" do
     before :once do
       @assignment = assignment_model(course: @course)
-      @course.enable_feature! :anonymous_grading
     end
 
     it "returns falsey when assignment is not muted" do
@@ -5127,7 +5126,7 @@ describe Assignment do
     end
 
     it "excludes student names from filenames when anonymous grading is enabled" do
-      @course.enable_feature! :anonymous_grading
+      @assignment.update!(anonymous_grading: true)
 
       s1 = @students.first
       sub = submit_homework(s1)

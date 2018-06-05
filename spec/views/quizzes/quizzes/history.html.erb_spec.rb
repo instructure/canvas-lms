@@ -78,14 +78,9 @@ describe "/quizzes/quizzes/history" do
     end
   end
 
-  context 'with anonymous grading' do
-    before do
-      allow(@course).to receive(:feature_enabled?).and_call_original
-      allow(@course).to receive(:feature_enabled?).with(:anonymous_grading).and_return(true)
-    end
-
+  context 'for an anonymous survey' do
     it "doesn't display the user name" do
-      quiz = assign(:quiz, @course.quizzes.create!)
+      quiz = assign(:quiz, @course.quizzes.create!(quiz_type: 'survey', anonymous_submissions: true))
       submission = assign(:submission, quiz.generate_submission(@user))
       assign(:current_submission, submission)
       assign(:version_instances, submission.submitted_attempts)

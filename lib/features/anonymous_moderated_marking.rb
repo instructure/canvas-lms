@@ -31,10 +31,10 @@ Feature.register(
     development: true
   },
   anonymous_marking:  {
-    display_name: -> { I18n.t 'Anonymous Marking' },
+    display_name: -> { I18n.t 'Anonymous Grading' },
     description: -> {
       I18n.t <<~DESCRIPTION
-        Enable anonymous marking of assignments.
+        Enable anonymous grading of assignments.
       DESCRIPTION
     },
     applies_to: 'Course',

@@ -21,12 +21,20 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'nokogiri'
 
 describe GradebooksHelper do
-  FakeAssignment = Struct.new(:grading_type, :quiz, :points_possible).freeze
+  FakeAssignment = Struct.new(:grading_type, :quiz, :points_possible, :anonymous_grading) do
+    def anonymous_grading?
+      anonymous_grading
+    end
+  end.freeze
   FakeSubmission = Struct.new(:assignment, :score, :grade, :submission_type,
                               :workflow_state, :excused?).freeze
   FakeQuiz = Struct.new(:survey, :anonymous_submissions) do
     def survey?
       survey
+    end
+
+    def anonymous_survey?
+      survey? && anonymous_submissions
     end
   end.freeze
 
@@ -35,24 +43,24 @@ describe GradebooksHelper do
   let(:quiz) { assignment.quiz = FakeQuiz.new }
   let(:anonymous_survey) { assignment.quiz = FakeQuiz.new(true, true) }
 
-  describe '#anonymous_assignment?' do
+  describe '#anonymous_survey?' do
     it 'requires a quiz' do
-      expect(helper.anonymous_assignment?(assignment)).to eq false
+      expect(helper.anonymous_survey?(assignment)).to eq false
     end
 
     it 'is falsy with just a survey' do
       quiz.survey = true
-      expect(helper.anonymous_assignment?(assignment)).to eq false
+      expect(helper.anonymous_survey?(assignment)).to eq false
     end
 
     it 'is falsy with just anonymous_submissions' do
       quiz.anonymous_submissions = true
-      expect(helper.anonymous_assignment?(assignment)).to eq false
+      expect(helper.anonymous_survey?(assignment)).to eq false
     end
 
     it 'is truthy with an anonymous survey' do
       anonymous_survey
-      expect(helper.anonymous_assignment?(assignment)).to eq true
+      expect(helper.anonymous_survey?(assignment)).to eq true
     end
   end
 

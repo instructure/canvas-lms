@@ -2486,4 +2486,11 @@ describe Quizzes::Quiz do
       expect(@course.quizzes.need_submitting_info(@student, 1).length).to eql 1
     end
   end
+
+  describe '#anonymous_grading?' do
+    it 'returns the value of anonymous_submissions' do
+      quiz = @course.quizzes.create!(title: "hello", anonymous_submissions: true)
+      expect(quiz.anonymous_grading?).to be true
+    end
+  end
 end
