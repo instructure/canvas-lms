@@ -89,9 +89,7 @@ class Login::SamlController < ApplicationController
       aac.debug_set(:idp_in_response_to, saml2_processing ? response.is_a?(Response) && response.in_response_to : legacy_response.in_response_to)
       aac.debug_set(:idp_login_destination, saml2_processing ? response.destination : legacy_response.destination)
       aac.debug_set(:login_to_canvas_success, 'false')
-      if saml2_processing
-        aac.debug_set(:response_validation_result, response.errors)
-      else
+      unless saml2_processing
         aac.debug_set(:fingerprint_from_idp, legacy_response.fingerprint_from_idp)
       end
     end
@@ -122,7 +120,7 @@ class Login::SamlController < ApplicationController
         increment_saml_stat("errors.invalid_response")
         if debugging
           aac.debug_set(:is_valid_login_response, 'false')
-          aac.debug_set(:login_response_validation_error, legacy_response.validation_error)
+          aac.debug_set(:login_response_validation_error, response.errors.join("\n"))
         end
         logger.error "Failed to verify SAML signature: #{legacy_response.validation_error}"
         flash[:delegated_message] = login_error_message
