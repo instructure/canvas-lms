@@ -57,7 +57,8 @@ module PactConfig
     end
 
     def consumer_tag
-      jenkins_build? ? 'latest/master' : 'latest'
+      # jenkins_build? ? 'latest/master' : 'latest'
+      'latest'
     end
 
     def broker_password
