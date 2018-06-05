@@ -261,8 +261,8 @@ class SisImportsApiController < ApplicationController
   #   If set, only shows imports created after the specified date (use ISO8601 format)
   #
   # Example:
-  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/sis_imports' \
-  #     -H "Authorization: Bearer <token>"
+  #   curl https://<canvas>/api/v1/accounts/<account_id>/sis_imports \
+  #     -H 'Authorization: Bearer <token>'
   #
   # @returns [SisImport]
   def index
@@ -299,7 +299,7 @@ class SisImportsApiController < ApplicationController
   #
   #   Examples:
   #     curl -F attachment=@<filename> -H "Authorization: Bearer <token>" \
-  #         'https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv'
+  #         https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv
   #
   #   If you decide to do a raw post, you can skip the 'attachment' argument,
   #   but you will then be required to provide a suitable Content-Type header.
@@ -308,19 +308,19 @@ class SisImportsApiController < ApplicationController
   #   Examples:
   #     curl -H 'Content-Type: application/octet-stream' --data-binary @<filename>.zip \
   #         -H "Authorization: Bearer <token>" \
-  #         'https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv&extension=zip'
+  #         https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv&extension=zip
   #
   #     curl -H 'Content-Type: application/zip' --data-binary @<filename>.zip \
   #         -H "Authorization: Bearer <token>" \
-  #         'https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv'
+  #         https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv
   #
   #     curl -H 'Content-Type: text/csv' --data-binary @<filename>.csv \
   #         -H "Authorization: Bearer <token>" \
-  #         'https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv'
+  #         https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv
   #
   #     curl -H 'Content-Type: text/csv' --data-binary @<filename>.csv \
   #         -H "Authorization: Bearer <token>" \
-  #         'https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv&batch_mode=1&batch_mode_term_id=15'
+  #         https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv&batch_mode=1&batch_mode_term_id=15
   #
   # @argument extension [String]
   #   Recommended for raw post request style imports. This field will be used to
@@ -505,8 +505,8 @@ class SisImportsApiController < ApplicationController
   # Get the status of an already created SIS import.
   #
   #   Examples:
-  #     curl 'https://<canvas>/api/v1/accounts/<account_id>/sis_imports/<sis_import_id>' \
-  #         -H "Authorization: Bearer <token>"
+  #     curl https://<canvas>/api/v1/accounts/<account_id>/sis_imports/<sis_import_id> \
+  #         -H 'Authorization: Bearer <token>'
   #
   # @returns SisImport
   def show
@@ -536,8 +536,8 @@ class SisImportsApiController < ApplicationController
   #   items that were created or modified.
   #
   # @example_request
-  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/sis_imports/<sis_import_id>/restore_states' \
-  #     -H "Authorization: Bearer <token>"
+  #   curl https://<canvas>/api/v1/accounts/<account_id>/sis_imports/<sis_import_id>/restore_states \
+  #     -H 'Authorization: Bearer <token>'
   #
   # @returns SisImport
   def restore_states
