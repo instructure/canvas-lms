@@ -21,21 +21,18 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!course_images'
 import _ from 'underscore'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import IconXLine from '@instructure/ui-icons/lib/Line/IconX'
 import UploadArea from './UploadArea'
 import FlickrSearch from '../../shared/FlickrSearch'
 
 export default class CourseImagePicker extends React.Component {
   static propTypes = {
     courseId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    handleClose: PropTypes.func,
     handleFileUpload: PropTypes.func,
     handleFlickrUrlUpload: PropTypes.func,
     uploadingImage: PropTypes.bool
   }
 
   static defaultProps = {
-    handleClose: () => {},
     handleFileUpload: () => {},
     handleFlickrUrlUpload: () => {},
     uploadingImage: false

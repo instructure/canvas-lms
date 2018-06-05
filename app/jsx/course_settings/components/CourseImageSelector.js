@@ -30,21 +30,14 @@ import Actions from '../actions'
 import CourseImagePicker from './CourseImagePicker'
 
 export default class CourseImageSelector extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = props.store.getState()
-  }
+  state = this.props.store.getState()
 
   componentWillMount() {
-    this.props.store.subscribe(this.handleChange)
+    this.props.store.subscribe(() => this.setState(this.props.store.getState()))
     this.props.store.dispatch(Actions.getCourseImage(this.props.courseId))
     this.setState({gettingImage: true})
-    this.mountHere = document.createElement('span');
-    this.mountHere.setAttribute('style', 'position:absolute; z-index: 9999;');
-    document.body.appendChild(this.mountHere);
   }
 
-  handleChange = () => this.setState(this.props.store.getState())
   handleModalClose = () => this.props.store.dispatch(Actions.setModalVisibility(false))
   changeImage = () => this.props.store.dispatch(Actions.setModalVisibility(true))
   removeImage = () => this.props.store.dispatch(Actions.putRemoveImage(this.props.courseId))
@@ -84,7 +77,6 @@ export default class CourseImageSelector extends React.Component {
           size="fullscreen"
           label={I18n.t('Choose Image')}
           onDismiss={this.handleModalClose}
-          mountNode={this.mountHere}
         >
           <CourseImagePicker
             courseId={this.props.courseId}
