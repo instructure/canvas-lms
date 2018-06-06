@@ -61,7 +61,7 @@ class DeveloperKey extends React.Component {
     )
   }
 
-  developerName () {
+  getToolName () {
     return this.props.developerKey.name || I18n.t('Unnamed Tool')
   }
 
@@ -88,18 +88,21 @@ class DeveloperKey extends React.Component {
 
   makeImage (developerKey) {
     if (developerKey.icon_url) {
-      return <span>
+      return <FlexItem padding="0 xx-small 0 0">
         <Image
           src={developerKey.icon_url}
-          alt={I18n.t("%{developerName} Logo", {developerName: this.developerName()})}
+          cover
+          width="4rem"
+          height="4rem"
+          margin="xxx-small xx-small xxx-small"
+          alt={I18n.t("%{toolName} Logo", {toolName: this.getToolName()})}
         />
-      </span>
+      </FlexItem>
     }
     return <View
       as="div"
-      height="36px"
-      width="36px"
-      borderWidth="small"
+      height="4rem"
+      width="4rem"
     />
   }
 
@@ -139,11 +142,9 @@ class DeveloperKey extends React.Component {
       <tr>
         <td>
           <Flex>
-            <FlexItem padding="0 xx-small 0 0">
-              {this.makeImage(developerKey)}
-            </FlexItem>
-            <FlexItem>
-              {this.developerName(developerKey)}
+            {this.makeImage(developerKey)}
+            <FlexItem shrink="true">
+            {this.getToolName(developerKey)}
             </FlexItem>
           </Flex>
         </td>
@@ -185,7 +186,7 @@ class DeveloperKey extends React.Component {
                           I18n.t('Show Key')
                       }
                       <ScreenReaderContent>
-                        {this.developerName()}
+                        {this.getToolName()}
                       </ScreenReaderContent>
                     </Button>
                   </PopoverTrigger>
@@ -244,7 +245,7 @@ class DeveloperKey extends React.Component {
               {...this.props.actions}
               developerKey={this.props.developerKey}
               visible={this.props.developerKey.visible}
-              developerName={this.developerName()}
+              toolName={this.getToolName()}
               onDelete={this.handleDelete}
               showVisibilityToggle={this.isSiteAdmin}
             />
