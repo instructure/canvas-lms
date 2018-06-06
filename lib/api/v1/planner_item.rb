@@ -25,6 +25,7 @@ module Api::V1::PlannerItem
   include Api::V1::WikiPage
   include Api::V1::PlannerOverride
   include Api::V1::CalendarEvent
+  include Api::V1::PlannerNote
   include PlannerHelper
 
   def planner_item_json(item, user, session, opts = {})
@@ -41,7 +42,7 @@ module Api::V1::PlannerItem
       elsif item.is_a?(::PlannerNote)
         hash[:plannable_date] = item.todo_date || item.created_at
         hash[:plannable_type] = 'planner_note'
-        hash[:plannable] = api_json(item, user, session)
+        hash[:plannable] = planner_note_json(item, user, session)
         # TODO: We don't currently have an html_url for individual planner items.
         # hash[:html_url] = ???
       elsif item.is_a?(Quizzes::Quiz) || (item.respond_to?(:quiz?) && item.quiz?)
@@ -56,14 +57,14 @@ module Api::V1::PlannerItem
         item = item.wiki_page if item.respond_to?(:wiki_page?) && item.wiki_page?
         hash[:plannable_date] = item.todo_date || item.created_at
         hash[:plannable_type] = 'wiki_page'
-        hash[:plannable] = wiki_page_json(item, user, session, assignment_opts: assignment_opts)
+        hash[:plannable] = wiki_page_json(item, user, session, false, assignment_opts: assignment_opts)
         hash[:html_url] = named_context_url(item.context, :context_wiki_page_url, item.id)
         hash[:planner_override] ||= planner_override_json(item.planner_override_for(user), user, session)
       elsif item.is_a?(Announcement)
-        hash[:plannable_date] = item.todo_date || item.posted_at || item.created_at
+        hash[:plannable_date] = item.posted_at || item.created_at
         hash[:plannable_type] = 'announcement'
-        hash[:plannable] = discussion_topic_api_json(item.discussion_topic, item.discussion_topic.context, user, session)
-        hash[:html_url] = named_context_url(item.discussion_topic.context, :context_discussion_topic_url, item.discussion_topic.id)
+        hash[:plannable] = discussion_topic_api_json(item, item.context, user, session)
+        hash[:html_url] = named_context_url(item.context, :context_discussion_topic_url, item.id)
       elsif item.is_a?(DiscussionTopic) || (item.respond_to?(:discussion_topic?) && item.discussion_topic?)
         topic = item.is_a?(DiscussionTopic) ? item : item.discussion_topic
         hash[:plannable_id] = topic.id
@@ -85,10 +86,10 @@ module Api::V1::PlannerItem
     ActiveRecord::Associations::Preloader.new.preload(items, :planner_overrides, ::PlannerOverride.where(user: user))
     _events, other_items = items.partition{|i| i.is_a?(::CalendarEvent)}
     notes, context_items = other_items.partition{|i| i.is_a?(::PlannerNote)}
-    ActiveRecord::Associations::Preloader.new.preload(notes, :user => {:pseudonym => :account}) if notes.any?
-    wiki_pages, other_context_items = context_items.partition{|i| i.is_a?(::WikiPage)}
-    ActiveRecord::Associations::Preloader.new.preload(wiki_pages, :wiki => [{:course => :root_account}, {:group => :root_account}]) if wiki_pages.any?
-    ActiveRecord::Associations::Preloader.new.preload(other_context_items, :context => :root_account) if other_context_items.any?
+    ActiveRecord::Associations::Preloader.new.preload(notes, user: {pseudonym: :account}) if notes.any?
+    wiki_pages, other_context_items = context_items.partition{|i| i.is_a?(::WikiPage) || i.try(:wiki_page?)}
+    ActiveRecord::Associations::Preloader.new.preload(wiki_pages, wiki: [{course: :root_account}, {group: :root_account}]) if wiki_pages.any?
+    ActiveRecord::Associations::Preloader.new.preload(other_context_items, {context: :root_account}) if other_context_items.any?
     items.map do |item|
       planner_item_json(item, user, session, opts)
     end

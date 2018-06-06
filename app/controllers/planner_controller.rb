@@ -181,7 +181,8 @@ class PlannerController < ApplicationController
     #
     # grading = @current_user.assignments_needing_grading(default_opts) if @domain_root_account.grants_right?(@current_user, :manage_grades)
     # moderation = @current_user.assignments_needing_moderation(default_opts)
-    viewing = @current_user.assignments_for_student('viewing', default_opts).preload(:quiz, :discussion_topic)
+    viewing = @current_user.assignments_for_student('viewing', default_opts).
+      preload({quiz: :assignment_overrides}, :discussion_topic, :wiki_page, :assignment_overrides, :external_tool_tag)
     scopes = {viewing: viewing}
     # TODO: Add when ready (see above comment)
     # scopes[:grading] = grading if grading
