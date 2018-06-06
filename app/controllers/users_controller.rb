@@ -1014,13 +1014,13 @@ class UsersController < ApplicationController
     Shackles.activate(:slave) do
       course_ids = user.participating_student_course_ids
       Shard.partition_by_shard(course_ids) do |shard_course_ids|
-        submissions = Submission.active.preload(:assignment).
+        subs = Submission.active.preload(:assignment).
           missing.
           where(user_id: user.id,
           assignments: {context_id: shard_course_ids}).
           merge(Assignment.published)
-        submissions = submissions.merge(Assignment.not_locked) if only_submittable
-        submissions.order(:cached_due_date)
+        subs = subs.merge(Assignment.not_locked) if only_submittable
+        submissions = subs.order(:cached_due_date)
       end
     end
     assignments = Api.paginate(submissions, self, api_v1_user_missing_submissions_url).map(&:assignment)

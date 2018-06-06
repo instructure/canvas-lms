@@ -2039,6 +2039,15 @@ describe "Users API", type: :request do
       expect(json.length).to eql 2
     end
 
+    it "should return assignments in order of the submission time for the user" do
+      assign = @course.assignments.create!(due_at: 5.days.ago, workflow_state: 'published', submission_types: "online_text_entry")
+      create_adhoc_override_for_assignment(assign, @student, due_at: 3.days.ago)
+      DueDateCacher.recompute(assign)
+
+      json = api_call(:get, @path, @params)
+      expect(json[0]['id']).to eq assign.id
+    end
+
     it "should not return locked assignments if filter is set to 'submittable'" do
       @course.assignments.create!(due_at: 3.days.ago,
                                   workflow_state: 'published',
