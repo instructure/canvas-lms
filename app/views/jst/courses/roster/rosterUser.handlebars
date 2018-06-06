@@ -62,16 +62,9 @@
     </label>
     <script type="text/javascript">
       $.get(
-        "/enrollments/{{id}}/settings", function(data){
-          var setting = data.find(
-            function(setting){
-              return setting['setting'] == 'sequence_control'
-            }
-          )
-
-          if(setting){
-            $('#toggle_sequence_control_{{id}}').prop('checked', setting.value)
-          }
+        "/enrollments/{{id}}/settings", { "_": $.now() }, function(data){
+            var sequence_control = _.get(data, 'sequence_control', true)
+            $('#toggle_sequence_control_{{id}}').prop('checked', !sequence_control)
         }
       )
     </script>
