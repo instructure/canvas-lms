@@ -72,19 +72,9 @@ class Login::SamlController < ApplicationController
     if debugging
       aac.debug_set(:debugging, t('debug.redirect_from_idp', "Received LoginResponse from IdP"))
       aac.debug_set(:idp_response_encoded, params[:SAMLResponse])
-      aac.debug_set(:idp_response_xml_encrypted, encrypted_xml)
-      aac.debug_set(:idp_response_xml_decrypted, response.to_s)
-      aac.debug_set(:idp_in_response_to, response.in_response_to)
-      aac.debug_set(:idp_login_destination, response.destination)
-      aac.debug_set(:login_to_canvas_success, 'false')
-    end
-
-    if debugging
-      aac.debug_set(:debugging, t('debug.redirect_from_idp', "Received LoginResponse from IdP"))
-      aac.debug_set(:idp_response_encoded, params[:SAMLResponse])
       aac.debug_set(:idp_response_xml_encrypted, saml2_processing ? encrypted_xml : legacy_response.xml)
       aac.debug_set(:idp_response_xml_decrypted, saml2_processing ? response.to_s : legacy_response.decrypted_document.to_s)
-      aac.debug_set(:idp_in_response_to, saml2_processing ? response.is_a?(Response) && response.in_response_to : legacy_response.in_response_to)
+      aac.debug_set(:idp_in_response_to, saml2_processing ? response.try(:in_response_to) : legacy_response.in_response_to)
       aac.debug_set(:idp_login_destination, saml2_processing ? response.destination : legacy_response.destination)
       aac.debug_set(:login_to_canvas_success, 'false')
       unless saml2_processing
