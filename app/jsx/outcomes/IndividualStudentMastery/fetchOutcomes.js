@@ -94,17 +94,24 @@ const fetchOutcomes = (courseId, studentId) => {
         groupId: outcomeLink.outcome_group.id,
         ...outcomeLink.outcome
       }))
-      const outcomesById = _.keyBy(outcomes, (o) => o.id)
+
+      // filter empty outcome groups
+      const outcomesByGroup = _.groupBy(outcomes, (o) => o.groupId)
+      outcomeGroups = outcomeGroups.filter((g) => outcomesByGroup[g.id])
 
       // add rollup scores, mastered
+      const outcomesById = _.keyBy(outcomes, (o) => o.id)
       outcomeRollups.rollups[0].scores.forEach((scoreData) => {
         const outcome = outcomesById[scoreData.links.outcome]
-        outcome.score = scoreData.score
-        outcome.mastered = scoreData.score >= outcome.mastery_points
+        if (outcome) {
+          outcome.score = scoreData.score
+          outcome.mastered = scoreData.score >= outcome.mastery_points
+        }
       })
+
       // add results, assignments
       outcomes.forEach((outcome) => {
-        outcome.results = outcomeResultsByOutcomeId[outcome.id] // eslint-disable-line no-param-reassign
+        outcome.results = outcomeResultsByOutcomeId[outcome.id] || [] // eslint-disable-line no-param-reassign
         outcome.results.forEach((result) => {
           result.assignment = assignmentsByAssignmentId[result.links.assignment] // eslint-disable-line no-param-reassign
         })

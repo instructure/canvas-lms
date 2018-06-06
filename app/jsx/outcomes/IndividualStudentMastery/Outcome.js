@@ -83,10 +83,33 @@ export default class Outcome extends React.Component {
     )
   }
 
+  renderDetails () {
+    const { outcome } = this.props
+    const { results } = outcome
+    return (
+      <View as="div" borderWidth="small 0 0 0">
+        <List variant="unstyled" delimiter="dashed">
+        {
+            results.sort(natcompare.byKey('submitted_or_assessed_at')).reverse().map((result) => (
+              <ListItem key={result.id}><AssignmentResult result={result} outcome={outcome} /></ListItem>
+          ))
+        }
+        </List>
+      </View>
+    )
+  }
+
+  renderEmpty () {
+    return (
+      <View as="div" padding="small" borderWidth="small 0 0 0">
+        <Text>{ I18n.t('No alignments are available for this outcome.') }</Text>
+      </View>
+    )
+  }
+
   render () {
     const { outcome, expanded } = this.props
-    const { results } = outcome
-
+    const hasResults = outcome.results.length > 0
     return (
       <ToggleDetails
         divider="dashed"
@@ -97,15 +120,7 @@ export default class Outcome extends React.Component {
         onToggle={this.handleToggle}
         fluidWidth
       >
-        <View as="div" borderWidth="small 0 0 0">
-          <List variant="unstyled" delimiter="dashed">
-          {
-            results.sort(natcompare.byKey('submitted_or_assessed_at')).reverse().map((result) => (
-              <ListItem key={result.id}><AssignmentResult result={result} outcome={outcome} /></ListItem>
-            ))
-          }
-          </List>
-        </View>
+        { hasResults ? this.renderDetails() : this.renderEmpty() }
       </ToggleDetails>
     )
   }

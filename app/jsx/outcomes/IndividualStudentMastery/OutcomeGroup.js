@@ -60,7 +60,7 @@ export default class OutcomeGroup extends React.Component {
   }
 
   render () {
-    const { outcomes, outcomeGroup, expanded, expandedOutcomes, onExpansionChange } = this.props
+    const { outcomeGroup, outcomes, expanded, expandedOutcomes, onExpansionChange } = this.props
     const numMastered = outcomes.filter((o) => o.mastered).length
     const numGroup = outcomes.length
 
@@ -76,7 +76,7 @@ export default class OutcomeGroup extends React.Component {
           fluidWidth
         >
           <View as="div" borderWidth="small 0 0 0">
-            <List variant="unstyled" divider="solid">
+            <List variant="unstyled" delimiter="solid">
               {
                 outcomes.sort(natcompare.byKey('title')).map((outcome) => (
                   <ListItem key={outcome.id} margin="0">

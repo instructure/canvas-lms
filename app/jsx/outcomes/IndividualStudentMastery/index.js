@@ -131,7 +131,7 @@ class IndividualStudentMastery extends React.Component {
   }
 
   renderGroups () {
-    const { outcomes, outcomeGroups } = this.state
+    const { outcomeGroups, outcomes } = this.state
     return (
       <div>
         <List variant="unstyled">
@@ -155,6 +155,7 @@ class IndividualStudentMastery extends React.Component {
 
   render () {
     const { error, loading, outcomeGroups } = this.state
+
     if (loading) {
       return this.renderLoading()
     } else if (error) {

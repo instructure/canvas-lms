@@ -65,8 +65,15 @@ it('renders the Outcome component', () => {
   expect(wrapper.debug()).toMatchSnapshot()
 })
 
-it('renders correct expanded', () => {
+it('renders correctly expanded', () => {
   const wrapper = shallow(<Outcome {...defaultProps()} expanded />)
+  expect(wrapper.debug()).toMatchSnapshot()
+})
+
+it('renders correctly expanded with no results', () => {
+  const props = defaultProps()
+  props.outcome.results = []
+  const wrapper = shallow(<Outcome {...props} expanded />)
   expect(wrapper.debug()).toMatchSnapshot()
 })
 

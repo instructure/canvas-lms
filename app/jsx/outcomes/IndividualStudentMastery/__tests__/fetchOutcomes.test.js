@@ -161,6 +161,17 @@ describe('fetchOutcomes', () => {
       })
   })
 
+  it('removes empty outcome groups', (done) => {
+    const responses = defaultResponses()
+    responses.linksResponse = responses.linksResponse.slice(0, 1)
+    mockAll(responses)
+    fetchOutcomes(1, 2)
+      .then(({ outcomeGroups }) => {
+        expect(outcomeGroups).toHaveLength(1)
+        done()
+      })
+  })
+
   describe('fetchUrl', () => {
     const mockRequests = (first, second, third) => {
       fetchMock.mock('/first', {
