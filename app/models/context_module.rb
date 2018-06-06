@@ -250,7 +250,7 @@ class ContextModule < ActiveRecord::Base
   def available_for?(user, opts={})
     enrollment = Enrollment.where(user_id: user.id, course_id: context.id).first
     settings = SettingsService.get_enrollment_settings(id: enrollment.id)
-    sequence_control_off = settings.any? {|item| item['setting'] == "sequence_control" and item["value"] == "false" }
+    sequence_control_off = settings[:sequence_control] == false
     return true if sequence_control_off
 
     return true if self.active? && !self.to_be_unlocked && self.prerequisites.blank? &&

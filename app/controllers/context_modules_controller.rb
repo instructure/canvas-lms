@@ -76,8 +76,7 @@ class ContextModulesController < ApplicationController
       module_file_details = load_module_file_details if @context.grants_right?(@current_user, session, :manage_content)
       enrollment = Enrollment.find_by(course_id: @context.id, user_id: @current_user.id)
       settings = SettingsService.get_enrollment_settings(id: enrollment.id)
-      sequence_control = settings.any? {|item| item['setting'] == "sequence_control" and item["value"] == "true" }
-
+      sequence_control = settings["sequence_control"]
 
       js_env :course_id => @context.id,
         :CONTEXT_URL_ROOT => polymorphic_path([@context]),
@@ -127,7 +126,7 @@ class ContextModulesController < ApplicationController
       else
         @display_header_image = false
       end
-      
+
 
       set_tutorial_js_env
 
