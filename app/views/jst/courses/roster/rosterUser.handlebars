@@ -63,12 +63,7 @@
     <script type="text/javascript">
       $.get(
         "/enrollments/{{id}}/settings", function(data){
-          var setting = data.find(
-            function(setting){
-              return setting['setting'] == 'sequence_control'
-            }
-          )
-
+          var setting = data['sequence_control']
           if(setting){
             $('#toggle_sequence_control_{{id}}').prop('checked', setting.value)
           }
