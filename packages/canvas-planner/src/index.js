@@ -110,7 +110,7 @@ export function render (element, options) {
 }
 
 // This method allows you to render the header items into a separate DOM node
-export function renderHeader (element, options) {
+export function renderHeader (element, auxElement, options) {
   // Using this pattern because default params don't merge objects
   const opts = { ...defaultOptions, ...options };
   ReactDOM.render(applyTheme(
@@ -121,6 +121,7 @@ export function renderHeader (element, options) {
           timeZone={opts.timeZone}
           locale={opts.locale}
           ariaHideElement={opts.ariaHideElement}
+          auxElement={auxElement}
         />
       </Provider>
     </DynamicUiProvider>
@@ -141,6 +142,7 @@ function applyTheme (el, theme) {
 export default function loadPlannerDashboard ({changeToCardView, getActiveApp, flashError, flashMessage, srFlashMessage, externalFallbackFocusable, env}) {
   const element = document.getElementById('dashboard-planner');
   const headerElement = document.getElementById('dashboard-planner-header');
+  const headerAuxElement = document.getElementById('dashboard-planner-header-aux');
   const stickyElement = document.getElementById('dashboard_header_container');
   const courses = env.STUDENT_PLANNER_COURSES.map(dc => ({
     ...dc,
@@ -186,6 +188,6 @@ export default function loadPlannerDashboard ({changeToCardView, getActiveApp, f
   }
 
   if (headerElement) {
-    renderHeader(headerElement, options);
+    renderHeader(headerElement, headerAuxElement, options);
   }
 }

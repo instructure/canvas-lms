@@ -66,6 +66,7 @@ function defaultProps (options) {
     },
     todo: {
     },
+    auxElement: document.createElement("div"),
     ...options,
   };
 }

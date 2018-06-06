@@ -22,6 +22,7 @@ import Button from '@instructure/ui-buttons/lib/components/Button';
 import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton';
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import View from '@instructure/ui-layout/lib/components/View';
+import Portal from '@instructure/ui-portal/lib/components/Portal'
 import IconPlusLine from '@instructure/ui-icons/lib/Line/IconPlus';
 import IconAlertsLine from '@instructure/ui-icons/lib/Line/IconAlerts';
 import IconGradebookLine from '@instructure/ui-icons/lib/Line/IconGradebook';
@@ -99,7 +100,8 @@ export class PlannerHeader extends Component {
       gradesLoaded: PropTypes.bool,
       gradesLoadingError: PropTypes.string,
     }).isRequired,
-    ariaHideElement: PropTypes.instanceOf(Element).isRequired
+    ariaHideElement: PropTypes.instanceOf(Element).isRequired,
+    auxElement: PropTypes.instanceOf(Element).isRequired
   };
 
   static defaultProps = {
@@ -270,8 +272,8 @@ export class PlannerHeader extends Component {
   }
 
   renderNewActivity () {
-    if (this.newActivityAboveView()) {
-      return (
+    return (
+      <Portal mountNode={this.props.auxElement} open={this.newActivityAboveView()}>
         <StickyButton
           direction="up"
           hidden={true}
@@ -282,8 +284,8 @@ export class PlannerHeader extends Component {
         >
           {formatMessage("New Activity")}
         </StickyButton>
-      );
-    }
+      </Portal>
+    );
   }
 
   render () {

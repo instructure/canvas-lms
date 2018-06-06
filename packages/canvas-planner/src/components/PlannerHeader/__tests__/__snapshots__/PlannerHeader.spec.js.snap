@@ -242,6 +242,25 @@ exports[`new activity button does not show when there is no new activity 1`] = `
       />
     </View>
   </Tray>
+  <Portal
+    insertAt="bottom"
+    mountNode={<div />}
+    onClose={[Function]}
+    onOpen={[Function]}
+    open={false}
+  >
+    <StickyButton
+      buttonRef={[Function]}
+      className="StickyButton-styles__newActivityButton"
+      direction="up"
+      hidden={true}
+      offset="0"
+      onClick={[Function]}
+      zIndex={3}
+    >
+      New Activity
+    </StickyButton>
+  </Portal>
 </div>
 `;
 
@@ -487,17 +506,25 @@ exports[`new activity button shows when there is new activity 1`] = `
       />
     </View>
   </Tray>
-  <StickyButton
-    buttonRef={[Function]}
-    className="StickyButton-styles__newActivityButton"
-    direction="up"
-    hidden={true}
-    offset="0"
-    onClick={[Function]}
-    zIndex={3}
+  <Portal
+    insertAt="bottom"
+    mountNode={<div />}
+    onClose={[Function]}
+    onOpen={[Function]}
+    open={true}
   >
-    New Activity
-  </StickyButton>
+    <StickyButton
+      buttonRef={[Function]}
+      className="StickyButton-styles__newActivityButton"
+      direction="up"
+      hidden={true}
+      offset="0"
+      onClick={[Function]}
+      zIndex={3}
+    >
+      New Activity
+    </StickyButton>
+  </Portal>
 </div>
 `;
 
@@ -743,5 +770,24 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
       />
     </View>
   </Tray>
+  <Portal
+    insertAt="bottom"
+    mountNode={<div />}
+    onClose={[Function]}
+    onOpen={[Function]}
+    open={false}
+  >
+    <StickyButton
+      buttonRef={[Function]}
+      className="StickyButton-styles__newActivityButton"
+      direction="up"
+      hidden={true}
+      offset="0"
+      onClick={[Function]}
+      zIndex={3}
+    >
+      New Activity
+    </StickyButton>
+  </Portal>
 </div>
 `;
