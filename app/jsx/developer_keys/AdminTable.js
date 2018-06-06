@@ -91,7 +91,7 @@ class DeveloperKeysTable extends React.Component {
         <thead>
           <tr>
             <th scope="col">{I18n.t('Name')}</th>
-            {!inherited && <th scope="col">{I18n.t('User')}</th> }
+            {!inherited && <th scope="col">{I18n.t('Owner Email')}</th> }
             <th scope="col">{I18n.t('Details')}</th>
             {!inherited && <th scope="col">{I18n.t('Stats')}</th>}
             <th scope="col">{I18n.t('State')}</th>

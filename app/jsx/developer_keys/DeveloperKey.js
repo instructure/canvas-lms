@@ -65,13 +65,11 @@ class DeveloperKey extends React.Component {
     return this.props.developerKey.name || I18n.t('Unnamed Tool')
   }
 
-  userName (developerKey) {
-    if (developerKey.user_name) {
-      return developerKey.user_name
-    } else if(developerKey.email) {
-      return I18n.t('Name Missing')
+  ownerEmail (developerKey) {
+    if(developerKey.email) {
+      return developerKey.email
     }
-    return I18n.t('No User')
+    return I18n.t('No Email')
   }
 
   isActive (developerKey) {
@@ -101,9 +99,9 @@ class DeveloperKey extends React.Component {
   }
 
   makeUserLink (developerKey) {
-    const name = this.userName(developerKey)
-    if (!developerKey.user_id) { return name }
-    return (<Link href={`/users/${developerKey.user_id}`}>{name}</Link> );
+    const email = this.ownerEmail(developerKey)
+    if (!developerKey.user_id) { return email }
+    return (<Link href={`/users/${developerKey.user_id}`}>{email}</Link> );
   }
 
   redirectURI (developerKey) {
@@ -146,9 +144,6 @@ class DeveloperKey extends React.Component {
           <td>
             <div>
               {this.makeUserLink(developerKey)}
-            </div>
-            <div>
-              {developerKey.email}
             </div>
           </td>
         }
