@@ -8,12 +8,6 @@
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "Möchten Sie diesen Plan wirklich löschen?"
   },
-  "assignmenttype_title_is_complete_813e54f8": {
-    "message": "{ assignmentType } { title } Vollständig"
-  },
-  "assignmenttype_title_is_incomplete_a1d5fac0": {
-    "message": "{ assignmentType } { title } Unvollständig"
-  },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Beginn Ihrer Aufgabenhistorie"
   },
@@ -27,10 +21,10 @@
     "message": "Chancen-Popover schließen"
   },
   "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
-    "message": "{ count, plural,\n     =0 {# Gelegenheiten}\n    one {# Gelegenheit}\n  other {# Gelegenheiten}\n}"
+    "message": "{ count, plural,\n     =0 {# Gelegenheiten}\n    one {# Gelegenheit}\n  other {# Gelegenheiten}\n}"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-    "message": "{ count, plural,\n    one {# Fertiges Element anzeigen }\n  other {# Fertiges Element anzeigen}\n}"
+    "message": "{ count, plural,\n    one {# abgeschlossenes Element anzeigen}\n  other {# abgeschlossene Elemente anzeigen}\n}"
   },
   "course_8a63b4a3": {
     "message": "Kurs"
@@ -39,7 +33,7 @@
     "message": "{ course } ZU ERLEDIGEN"
   },
   "date_at_time_dbdb1b99": {
-    "message": "{ date } um { time }"
+    "message": "am { date } um { time }"
   },
   "date_ee500367": {
     "message": "Datum"
@@ -54,7 +48,7 @@
     "message": "Details"
   },
   "dismiss_opportunityname_5995176f": {
-    "message": "Verwerfen { opportunityName }"
+    "message": "{ opportunityName } verwerfen"
   },
   "due_5d7267be": {
     "message": "Fällig:"
@@ -63,7 +57,7 @@
     "message": "FÄLLIG: { date }"
   },
   "edit_title_72e5a21e": {
-    "message": "Ändern { title }"
+    "message": "{ title } ändern"
   },
   "error_loading_more_items_3f109d9f": {
     "message": "Fehler beim Laden weiterer Objekte"
@@ -105,7 +99,7 @@
     "message": "Frühere Termine laden"
   },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-    "message": "Geladene { count, plural,\n     =0{# Objekte}\n    one {# Objekt}\n  other {# Objekte}\n}"
+    "message": "Geladene { count, plural,\n     =0 {# Elemente}\n    one {# Element}\n  other {# Elemente}\n}"
   },
   "loading_25990131": {
     "message": "Wird geladen ..."
@@ -122,23 +116,14 @@
   "missing_1a256b3b": {
     "message": "Fehlt"
   },
-  "missing_items_for_5ef30cea": {
-    "message": "Fehlende Elemente für "
-  },
   "new_activity_8b84847d": {
-    "message": "Neue Tätigkeit"
-  },
-  "new_activity_for_ac84f6e6": {
-    "message": "Neue Aktivität für "
+    "message": "Neue Aktivität"
   },
   "next_month_749b1778": {
     "message": "Nächster Monat"
   },
   "no_due_dates_assigned_e8f5bac8": {
     "message": "Keine Fälligkeitsdaten zugewiesen"
-  },
-  "no_to_do_s_for_this_day_yet_90c5873d": {
-    "message": "Noch keine Aufgaben für diesen Tag"
   },
   "nothing_new_needs_attention_3ac548d4": {
     "message": "Nichts Neues, das beachtet werden muss"
@@ -183,19 +168,19 @@
     "message": "Heute"
   },
   "today_at_date_8ac30d6": {
-    "message": "Heute um { date }"
+    "message": "Heute, am { date }"
   },
   "tomorrow_9a6c9a00": {
     "message": "Morgen"
   },
   "tomorrow_at_date_b53f2cf1": {
-    "message": "Morgen um { date }"
+    "message": "Morgen, am { date }"
   },
   "unable_to_mark_as_complete_8141856d": {
     "message": "Kann nicht als fertiggestellt markiert werden."
   },
   "yesterday_at_date_1aa6d18e": {
-    "message": "Gestern um { date }"
+    "message": "Gestern, am { date }"
   },
   "yesterday_c6bd6abf": {
     "message": "Gestern"

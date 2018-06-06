@@ -8,14 +8,8 @@
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "Er du sikker på at du vil slette dette elementet fra planleggeren?"
   },
-  "assignmenttype_title_is_complete_813e54f8": {
-    "message": "{ assignmentType } { title } er fullført"
-  },
-  "assignmenttype_title_is_incomplete_a1d5fac0": {
-    "message": "{ assignmentType } { title } er ufullstendig"
-  },
   "beginning_of_your_to_do_history_61ef2dce": {
-    "message": "Begynnelsen av din gjøremålshistorie"
+    "message": "Begynnelsen av din gjøremålhistorie"
   },
   "canvas_planner_98ed106": {
     "message": "Canvas planlegger"
@@ -27,10 +21,10 @@
     "message": "Lukk mulighets-popover"
   },
   "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
-    "message": "{ count, plural,\n     =0 {# muligheter}\n    one {# mulighet}\n  other {# muligheter}\n}"
+    "message": "{ count, plural,\n     =0 {# Muligheter}\n    one {# mulighet}\n  other {# muligheter}\n}"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-    "message": "{ count, plural,\n    one {Vis # fullført element}\n  other {Vis # fullførte elementer}\n}"
+    "message": "{ count, plural,\n    one {Vis # fullført del}\n  other {Vis # fullførte deler}\n}"
   },
   "course_8a63b4a3": {
     "message": "Emne"
@@ -39,7 +33,7 @@
     "message": "{ course } Å GJØRE"
   },
   "date_at_time_dbdb1b99": {
-    "message": "{ date } den { time }"
+    "message": "{ date } i { time }"
   },
   "date_ee500367": {
     "message": "Dato"
@@ -105,7 +99,7 @@
     "message": "Last inn tidligere datoer"
   },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-    "message": "Lastet { count, plural,\n     =0{# elementer}\n    one {# element}\n  other {# elementer}\n}"
+    "message": "Lastet { count, plural,\n     =0 {# deler}\n    one {# del}\n  other {# deler}\n}"
   },
   "loading_25990131": {
     "message": "Laster..."
@@ -122,23 +116,14 @@
   "missing_1a256b3b": {
     "message": "Mangler"
   },
-  "missing_items_for_5ef30cea": {
-    "message": "Manglende elementer for "
-  },
   "new_activity_8b84847d": {
     "message": "Ny aktivitet"
-  },
-  "new_activity_for_ac84f6e6": {
-    "message": "Ny aktivitet for "
   },
   "next_month_749b1778": {
     "message": "Neste måned"
   },
   "no_due_dates_assigned_e8f5bac8": {
     "message": "Ingen forfallsdatoer tildelt"
-  },
-  "no_to_do_s_for_this_day_yet_90c5873d": {
-    "message": "Ingen gjøremål ennå i dag."
   },
   "nothing_new_needs_attention_3ac548d4": {
     "message": "Ingenting nytt trenger oppmerksomhet."
@@ -156,7 +141,7 @@
     "message": "Forrige måned"
   },
   "pts_699bd9aa": {
-    "message": "poeng"
+    "message": "Poeng"
   },
   "replies_4a8577c8": {
     "message": "Svar"
@@ -165,7 +150,7 @@
     "message": "Lagre"
   },
   "submitted_318fad53": {
-    "message": "Innlevert"
+    "message": "Sendt inn"
   },
   "task_16b0ef38": {
     "message": "Oppgave"
@@ -201,6 +186,6 @@
     "message": "I går"
   },
   "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
-    "message": "Du har rullet tilbake til din aller første gjøremålsliste!"
+    "message": "Du har rullet tilbake til din aller første gjøremålliste!"
   }
 }

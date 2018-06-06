@@ -2,29 +2,77 @@
   "all_day_fb42c4fc": {
     "message": "Tüm Gün"
   },
-  "course_8a63b4a3": {
-    "message": "Ders"
-  },
-  "pts_699bd9aa": {
-    "message": "not"
-  },
   "canvas_planner_98ed106": {
     "message": "Canvas Planlayıcı"
   },
-  "points_points_63e59cce": {
-    "message": "{ points } puan"
+  "close_d634289d": {
+    "message": "Kapat"
   },
-  "loading_planner_items_947a813d": {
-    "message": "Planlayıcı öğeleri yükleniyor"
+  "course_8a63b4a3": {
+    "message": "Ders"
+  },
+  "date_ee500367": {
+    "message": "Tarih"
+  },
+  "delete_a6efa79d": {
+    "message": "Sil"
+  },
+  "details_98a31b68": {
+    "message": "Ayrıntılar"
   },
   "due_5d7267be": {
     "message": "Bitiş:"
   },
+  "excused_cf8792eb": {
+    "message": "Mazeretli"
+  },
+  "go_to_dashboard_card_view_10398ef6": {
+    "message": "Kontrol Paneli Kartı Görünümüne Git"
+  },
+  "graded_25cd3fcd": {
+    "message": "Notlandırıldı"
+  },
+  "late_2be42b88": {
+    "message": "Geç"
+  },
+  "load_more_a36f9cf9": {
+    "message": "Daha fazla yükle"
+  },
   "loading_25990131": {
     "message": "Yükleniyor..."
   },
+  "loading_past_items_ca499e75": {
+    "message": "Önceki öğeler yükleniyor"
+  },
+  "loading_planner_items_947a813d": {
+    "message": "Planlayıcı öğeleri yükleniyor"
+  },
+  "missing_1a256b3b": {
+    "message": "Eksik"
+  },
+  "new_activity_8b84847d": {
+    "message": "Yeni Etkinlik"
+  },
   "next_month_749b1778": {
     "message": "Sonraki Hafta"
+  },
+  "optional_add_course_ef0d70fc": {
+    "message": "Tercihen: Kurs Ekle"
+  },
+  "points_bceb5005": {
+    "message": "puanlar"
+  },
+  "points_points_63e59cce": {
+    "message": "{ points } puan"
+  },
+  "previous_month_bb1e3c84": {
+    "message": "Önceki Hafta"
+  },
+  "pts_699bd9aa": {
+    "message": "not"
+  },
+  "save_11a80ec3": {
+    "message": "Kaydet"
   },
   "submitted_318fad53": {
     "message": "Gönderildi"
@@ -32,73 +80,25 @@
   "task_16b0ef38": {
     "message": "Görev"
   },
-  "excused_cf8792eb": {
-    "message": "Mazeretli"
-  },
-  "title_is_required_6ddcab69": {
-    "message": "başlık gereklidir"
-  },
-  "loading_past_items_ca499e75": {
-    "message": "Önceki öğeler yükleniyor"
-  },
-  "today_76e10f9c": {
-    "message": "Bugün"
-  },
-  "save_11a80ec3": {
-    "message": "Kaydet"
-  },
   "time_2b5aac58": {
     "message": "Süre"
-  },
-  "delete_a6efa79d": {
-    "message": "Sil"
-  },
-  "go_to_dashboard_card_view_10398ef6": {
-    "message": "Kontrol Paneli Kartı Görünümüne Git"
-  },
-  "points_bceb5005": {
-    "message": "puanlar"
   },
   "title_ee03d132": {
     "message": "Başlık"
   },
-  "date_ee500367": {
-    "message": "Tarih"
-  },
-  "late_2be42b88": {
-    "message": "Geç"
-  },
-  "yesterday_c6bd6abf": {
-    "message": "Dün"
-  },
-  "graded_25cd3fcd": {
-    "message": "Notlandırıldı"
+  "title_is_required_6ddcab69": {
+    "message": "başlık gereklidir"
   },
   "to_do_1d554f36": {
     "message": "Yapılacaklar"
   },
-  "missing_1a256b3b": {
-    "message": "Eksik"
-  },
-  "optional_add_course_ef0d70fc": {
-    "message": "Tercihen: Kurs Ekle"
-  },
-  "previous_month_bb1e3c84": {
-    "message": "Önceki Hafta"
-  },
-  "new_activity_8b84847d": {
-    "message": "Yeni Etkinlik"
+  "today_76e10f9c": {
+    "message": "Bugün"
   },
   "tomorrow_9a6c9a00": {
     "message": "Yarın"
   },
-  "load_more_a36f9cf9": {
-    "message": "Daha fazla yükle"
-  },
-  "details_98a31b68": {
-    "message": "Ayrıntılar"
-  },
-  "close_d634289d": {
-    "message": "Kapat"
+  "yesterday_c6bd6abf": {
+    "message": "Dün"
   }
 }

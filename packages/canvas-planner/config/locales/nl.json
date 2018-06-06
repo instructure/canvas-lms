@@ -8,12 +8,6 @@
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "Weet je zeker dat je dit planneritem wilt verwijderen?"
   },
-  "assignmenttype_title_is_complete_813e54f8": {
-    "message": "{ assignmentType } { title } is voltooid"
-  },
-  "assignmenttype_title_is_incomplete_a1d5fac0": {
-    "message": "{ assignmentType } { title } is onvolledig"
-  },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Begin van je To-do-historie"
   },
@@ -30,7 +24,7 @@
     "message": "{ count, plural,\n     =0 {# mogelijkheden}\n    one {# mogelijkheid}\n  other {# mogelijkheden}\n}"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-    "message": "{ count, plural,\n    one {Voltooid item # tonen}\n  other {Voltooide items # tonen}\n}"
+    "message": "{ count, plural,\n    one {Toon # voltooid item}\n  other {Toon # voltooide items}\n}"
   },
   "course_8a63b4a3": {
     "message": "Cursus"
@@ -39,7 +33,7 @@
     "message": "{ course } TO-DO"
   },
   "date_at_time_dbdb1b99": {
-    "message": "{ date } om { time }"
+    "message": "{ date } op { time }"
   },
   "date_ee500367": {
     "message": "Datum"
@@ -54,7 +48,7 @@
     "message": "Details"
   },
   "dismiss_opportunityname_5995176f": {
-    "message": "Afwijzen { opportunityName }"
+    "message": "{ opportunityName } afwijzen"
   },
   "due_5d7267be": {
     "message": "Inleverdatum:"
@@ -63,7 +57,7 @@
     "message": "VERVALDATUM: { date }"
   },
   "edit_title_72e5a21e": {
-    "message": "Bewerken { title }"
+    "message": "{ title } bewerken"
   },
   "error_loading_more_items_3f109d9f": {
     "message": "Fout bij het laden van meer items"
@@ -96,7 +90,7 @@
     "message": "Beoordeeld"
   },
   "late_2be42b88": {
-    "message": "Laat"
+    "message": "Te laat"
   },
   "load_more_a36f9cf9": {
     "message": "Meer laden"
@@ -105,7 +99,7 @@
     "message": "Eerdere datums laden"
   },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-    "message": "{ count, plural,\n     =0{# items}\n    one {# item}\n  other {# items geladen}\n}"
+    "message": "{ count, plural,\n     =0 {# items}\n    one {# item}\n  other {# items}\n} geladen"
   },
   "loading_25990131": {
     "message": "Bezig met laden..."
@@ -122,23 +116,14 @@
   "missing_1a256b3b": {
     "message": "Ontbrekend"
   },
-  "missing_items_for_5ef30cea": {
-    "message": "Ontbrekende items voor "
-  },
   "new_activity_8b84847d": {
     "message": "Nieuwe activiteit"
-  },
-  "new_activity_for_ac84f6e6": {
-    "message": "Nieuwe activiteit voor "
   },
   "next_month_749b1778": {
     "message": "Volgende maand"
   },
   "no_due_dates_assigned_e8f5bac8": {
     "message": "Geen inleverdatums toegewezen"
-  },
-  "no_to_do_s_for_this_day_yet_90c5873d": {
-    "message": "Nog niets in de To-Do-lijst voor vandaag."
   },
   "nothing_new_needs_attention_3ac548d4": {
     "message": "Er is niets nieuws waarnaar gekeken moet worden."
@@ -156,7 +141,7 @@
     "message": "Vorige maand"
   },
   "pts_699bd9aa": {
-    "message": "punten"
+    "message": "ptn"
   },
   "replies_4a8577c8": {
     "message": "Antwoorden"

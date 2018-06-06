@@ -8,12 +8,6 @@
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "Czy na pewno chcesz usunąć ten element planera?"
   },
-  "assignmenttype_title_is_complete_813e54f8": {
-    "message": "{ assignmentType } { title } jest ukończony"
-  },
-  "assignmenttype_title_is_incomplete_a1d5fac0": {
-    "message": "{ assignmentType } { title } jest nieukończony"
-  },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Początek historii listy zadań"
   },
@@ -30,7 +24,7 @@
     "message": "{ count, plural,\n     =0 {# okazje}\n    one {# okazja}\n  other {# okazji}\n}"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-    "message": "{ count, plural,\n    one {Pokaż # ukończony element}\n  other {Pokaż ukończone elementy: #}\n}"
+    "message": "{ count, plural,\n    one {Pokaż # ukończony element}\n  other {Pokaż # ukończone elementy }\n}"
   },
   "course_8a63b4a3": {
     "message": "Kurs"
@@ -105,7 +99,7 @@
     "message": "Wczytaj wcześniejsze daty"
   },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-    "message": "Wczytano { count, plural,\n     =0{# elementów}\n    one {# element}\n  other {# elementy}\n}"
+    "message": "Wczytano { count, plural,\n     =0 {# elementy}\n    one {# element}\n  other {# elementów}\n}"
   },
   "loading_25990131": {
     "message": "Wczytywanie..."
@@ -122,23 +116,14 @@
   "missing_1a256b3b": {
     "message": "Brak"
   },
-  "missing_items_for_5ef30cea": {
-    "message": "Brak elementów dla "
-  },
   "new_activity_8b84847d": {
     "message": "Nowa aktywność"
-  },
-  "new_activity_for_ac84f6e6": {
-    "message": "Nowa aktywność dla "
   },
   "next_month_749b1778": {
     "message": "Następny miesiąc"
   },
   "no_due_dates_assigned_e8f5bac8": {
     "message": "Brak ustawionych terminów"
-  },
-  "no_to_do_s_for_this_day_yet_90c5873d": {
-    "message": "Brak listy zadań ten dzień."
   },
   "nothing_new_needs_attention_3ac548d4": {
     "message": "Nic nie wymaga uwagi."
@@ -189,7 +174,7 @@
     "message": "Jutro"
   },
   "tomorrow_at_date_b53f2cf1": {
-    "message": "Dziś o godz. { date }"
+    "message": "Jutro o godz. { date }"
   },
   "unable_to_mark_as_complete_8141856d": {
     "message": "Nie można oznaczyć jako ukończone."

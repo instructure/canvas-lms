@@ -8,12 +8,6 @@
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "هل أنت متأكد أنك تريد حذف عنصر المخطط هذا؟"
   },
-  "assignmenttype_title_is_complete_813e54f8": {
-    "message": "{ assignmentType } { title } مكتمل"
-  },
-  "assignmenttype_title_is_incomplete_a1d5fac0": {
-    "message": "{ assignmentType } { title } غير مكتمل"
-  },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "بداية سجل قائمة المهام الخاصة بك"
   },
@@ -27,16 +21,16 @@
     "message": "إغلاق الصفحات المنبثقة العلوية للفرص"
   },
   "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
-    "message": "{ count, plural,\n     =0 {# فرص}\n    one {# فرصة}\n  other {# فرص}\n}"
+    "message": "{ count, plural,\n     =0 {# من الفرص}\n    one {# فرصة}\n  other {# من الفرص}\n}"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-    "message": "{ count, plural,\n    one {إظهار # عنصر مكتمل}\n  other {إظهار # عناصر مكتملة}\n}"
+    "message": "{ count, plural,\n    one {إظهار # عنصر مكتمل}\n  other {إظهار # من العناصر المكتملة}\n}"
   },
   "course_8a63b4a3": {
     "message": "المساق"
   },
   "course_to_do_bcbbab54": {
-    "message": "{ course } قائمة مهام"
+    "message": "قائمة مهام { course }"
   },
   "date_at_time_dbdb1b99": {
     "message": "{ date } في { time }"
@@ -93,7 +87,7 @@
     "message": "اذهب إلى طريقة عرض بطاقة لوحة المعلومات"
   },
   "graded_25cd3fcd": {
-    "message": "تم منح الدرجات"
+    "message": "تم تقييم الدرجة"
   },
   "late_2be42b88": {
     "message": "متأخر"
@@ -105,10 +99,10 @@
     "message": "تحميل تواريخ سابقة"
   },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-    "message": "{ count, plural,\n     =0{# عناصر}\n    one {# عنصر}\n  other {# عناصر تم تحميلها}\n}"
+    "message": "تم تحميل { count, plural,\n     =0 {# من العناصر}\n    one {# عنصر}\n  other {# من العناصر}\n}"
   },
   "loading_25990131": {
-    "message": "يتم الآن التحميل..."
+    "message": "جارٍ التحميل..."
   },
   "loading_past_items_ca499e75": {
     "message": "جارٍ تحميل العناصر السابقة"
@@ -122,23 +116,14 @@
   "missing_1a256b3b": {
     "message": "مفقود"
   },
-  "missing_items_for_5ef30cea": {
-    "message": "عناصر مفقودة لـ "
-  },
   "new_activity_8b84847d": {
     "message": "نشاط جديد"
-  },
-  "new_activity_for_ac84f6e6": {
-    "message": "نشاط جديد لـ "
   },
   "next_month_749b1778": {
     "message": "الشهر القادم"
   },
   "no_due_dates_assigned_e8f5bac8": {
     "message": "لم يتم تعيين تواريخ الاستحقاق"
-  },
-  "no_to_do_s_for_this_day_yet_90c5873d": {
-    "message": "لا توجد \"قوائم مهام\" في هذا اليوم حتى الآن."
   },
   "nothing_new_needs_attention_3ac548d4": {
     "message": "لا يوجد شيء جديد يستدعي الاهتمام."

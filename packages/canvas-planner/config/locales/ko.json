@@ -1,59 +1,59 @@
 {
+  "close_d634289d": {
+    "message": "닫기"
+  },
   "course_8a63b4a3": {
     "message": "과목"
-  },
-  "pts_699bd9aa": {
-    "message": "점"
-  },
-  "due_5d7267be": {
-    "message": "기한:"
-  },
-  "loading_25990131": {
-    "message": "로드하는 중..."
-  },
-  "submitted_318fad53": {
-    "message": "제출됨"
-  },
-  "today_76e10f9c": {
-    "message": "오늘"
-  },
-  "save_11a80ec3": {
-    "message": "저장"
-  },
-  "time_2b5aac58": {
-    "message": "시간"
-  },
-  "delete_a6efa79d": {
-    "message": "삭제"
-  },
-  "points_bceb5005": {
-    "message": "점수"
-  },
-  "title_ee03d132": {
-    "message": "제목"
   },
   "date_ee500367": {
     "message": "날짜"
   },
-  "yesterday_c6bd6abf": {
-    "message": "어제"
-  },
-  "graded_25cd3fcd": {
-    "message": "평가됨"
-  },
-  "to_do_1d554f36": {
-    "message": "할 일"
-  },
-  "tomorrow_9a6c9a00": {
-    "message": "내일"
-  },
-  "load_more_a36f9cf9": {
-    "message": "더 로드"
+  "delete_a6efa79d": {
+    "message": "삭제"
   },
   "details_98a31b68": {
     "message": "세부 정보"
   },
-  "close_d634289d": {
-    "message": "닫기"
+  "due_5d7267be": {
+    "message": "기한:"
+  },
+  "graded_25cd3fcd": {
+    "message": "평가됨"
+  },
+  "load_more_a36f9cf9": {
+    "message": "더 로드"
+  },
+  "loading_25990131": {
+    "message": "로드하는 중..."
+  },
+  "points_bceb5005": {
+    "message": "점수"
+  },
+  "pts_699bd9aa": {
+    "message": "점"
+  },
+  "save_11a80ec3": {
+    "message": "저장"
+  },
+  "submitted_318fad53": {
+    "message": "제출됨"
+  },
+  "time_2b5aac58": {
+    "message": "시간"
+  },
+  "title_ee03d132": {
+    "message": "제목"
+  },
+  "to_do_1d554f36": {
+    "message": "할 일"
+  },
+  "today_76e10f9c": {
+    "message": "오늘"
+  },
+  "tomorrow_9a6c9a00": {
+    "message": "내일"
+  },
+  "yesterday_c6bd6abf": {
+    "message": "어제"
   }
 }

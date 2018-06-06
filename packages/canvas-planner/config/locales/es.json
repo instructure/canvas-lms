@@ -1,18 +1,12 @@
 {
   "add_to_do_7def3c37": {
-    "message": "Agregar actividad por hacer"
+    "message": "Agregar tarea por hacer"
   },
   "all_items_loaded_aa256183": {
     "message": "Todos los elementos cargados"
   },
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
-    "message": "¿Está seguro de que desea eliminar este elemento del programador?"
-  },
-  "assignmenttype_title_is_complete_813e54f8": {
-    "message": "{ assignmentType } { title } está completa"
-  },
-  "assignmenttype_title_is_incomplete_a1d5fac0": {
-    "message": "{ assignmentType } { title } está incompleta"
+    "message": "¿Está seguro de que desea eliminar este elemento del planificador?"
   },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Inicio de su Historial de cosas por hacer"
@@ -24,13 +18,13 @@
     "message": "Cerrar"
   },
   "close_opportunities_popover_f4e50551": {
-    "message": "Cerrar menú popover de oportunidades"
+    "message": "Cerrar ventana popover de oportunidades"
   },
   "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
     "message": "{ count, plural,\n     =0 {# oportunidades}\n    one {# oportunidad}\n  other {# oportunidades}\n}"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-    "message": "{ count, plural,\n    one {Mostrar # de elementos completados}\n  other {Mostrar # de elementos completados}\n}"
+    "message": "{ count, plural,\n    one {Mostrar # elemento completado}\n  other {Mostrar # elementos completados}\n}"
   },
   "course_8a63b4a3": {
     "message": "Curso"
@@ -39,7 +33,7 @@
     "message": "{ course } POR HACER"
   },
   "date_at_time_dbdb1b99": {
-    "message": "{ date } en { time }"
+    "message": "{ date } a las { time }"
   },
   "date_ee500367": {
     "message": "Fecha"
@@ -57,10 +51,10 @@
     "message": "Descartar { opportunityName }"
   },
   "due_5d7267be": {
-    "message": "Hora límite:"
+    "message": "Fecha límite:"
   },
   "due_date_8ce289b6": {
-    "message": "VENCIMIENTO: { date }"
+    "message": "FECHA LÍMITE: { date }"
   },
   "edit_title_72e5a21e": {
     "message": "Editar { title }"
@@ -75,7 +69,7 @@
     "message": "Justificado"
   },
   "failed_to_delete_to_do_64edff49": {
-    "message": "Error al eliminar tareas pendientes"
+    "message": "Error al eliminar tareas por hacer"
   },
   "failed_to_get_new_activity_17e7ec7c": {
     "message": "Error al obtener nueva actividad"
@@ -84,13 +78,13 @@
     "message": "Error al cargar oportunidades"
   },
   "failed_to_save_to_do_ddc7503b": {
-    "message": "Error al guardar tareas pendientes"
+    "message": "Error al guardar tareas por hacer"
   },
   "feedback_6dcc1991": {
     "message": "Retroalimentación"
   },
   "go_to_dashboard_card_view_10398ef6": {
-    "message": "Vaya a la vista de la tarjeta del tablero de control"
+    "message": "Ir a la vista de la tarjeta del tablero de control"
   },
   "graded_25cd3fcd": {
     "message": "Calificado"
@@ -102,10 +96,10 @@
     "message": "Cargar más"
   },
   "load_prior_dates_f2b0f6f0": {
-    "message": "CarCargar fechas anteriores"
+    "message": "Cargar fechas anteriores"
   },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-    "message": "Cargó { count, plural,\n     =0{# elementos}\n    one {# elemento}\n  other {# elementos}\n}"
+    "message": "{ count, plural,\n     =0 {# elementos}\n    one {# elemento}\n  other {# elementos}\n} cargado(s)"
   },
   "loading_25990131": {
     "message": "Cargando..."
@@ -122,14 +116,8 @@
   "missing_1a256b3b": {
     "message": "Faltante"
   },
-  "missing_items_for_5ef30cea": {
-    "message": "Elementos faltantes para "
-  },
   "new_activity_8b84847d": {
     "message": "Nueva actividad"
-  },
-  "new_activity_for_ac84f6e6": {
-    "message": "Nueva actividad para "
   },
   "next_month_749b1778": {
     "message": "Mes siguiente"
@@ -137,11 +125,8 @@
   "no_due_dates_assigned_e8f5bac8": {
     "message": "No hay fechas límite asignadas"
   },
-  "no_to_do_s_for_this_day_yet_90c5873d": {
-    "message": "Aún sin “tareas pendientes” para este día."
-  },
   "nothing_new_needs_attention_3ac548d4": {
-    "message": "No hay nada nuevo que necesite atención."
+    "message": "No hay nada nuevo que requiera atención."
   },
   "optional_add_course_ef0d70fc": {
     "message": "Opcional: Agregar curso"
@@ -201,6 +186,6 @@
     "message": "Ayer"
   },
   "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
-    "message": "¡Ha retrocedido a su primer elemento por hacer!"
+    "message": "¡Ha retrocedido a su primera tarea por hacer!"
   }
 }

@@ -6,16 +6,10 @@
     "message": "Tutti gli elementi caricati"
   },
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
-    "message": "Vuoi eliminare questo elemento dell'agenda?"
-  },
-  "assignmenttype_title_is_complete_813e54f8": {
-    "message": "{ assignmentType } { title } completata"
-  },
-  "assignmenttype_title_is_incomplete_a1d5fac0": {
-    "message": "{ assignmentType } { title } non completata"
+    "message": "Vuoi eliminare questo elemento dell''agenda?"
   },
   "beginning_of_your_to_do_history_61ef2dce": {
-    "message": "Inizio della cronologia dell'elenco attività"
+    "message": "Inizio della cronologia elenco attività"
   },
   "canvas_planner_98ed106": {
     "message": "Canvas Planner"
@@ -36,7 +30,7 @@
     "message": "Corso"
   },
   "course_to_do_bcbbab54": {
-    "message": "{ course } ELENCO ATTIVITÀ"
+    "message": "ELENCO ATTIVITÀ { course }"
   },
   "date_at_time_dbdb1b99": {
     "message": "{ date } alle { time }"
@@ -96,7 +90,7 @@
     "message": "Valutato"
   },
   "late_2be42b88": {
-    "message": "Tardi"
+    "message": "In ritardo"
   },
   "load_more_a36f9cf9": {
     "message": "Carica altro"
@@ -105,7 +99,7 @@
     "message": "Carica date precedenti"
   },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-    "message": "Caricati { count, plural,\n     =0{# elementi}\n    one {# elemento}\n  other {# elementi}\n}"
+    "message": "{ count, plural,\n     =0 {# elementi caricati}\n    one {# elemento caricato}\n  other {# elementi caricati}\n}"
   },
   "loading_25990131": {
     "message": "Caricamento in corso..."
@@ -122,23 +116,14 @@
   "missing_1a256b3b": {
     "message": "Mancante"
   },
-  "missing_items_for_5ef30cea": {
-    "message": "Elementi mancanti per "
-  },
   "new_activity_8b84847d": {
     "message": "Nuova attività"
-  },
-  "new_activity_for_ac84f6e6": {
-    "message": "Nuova attività per "
   },
   "next_month_749b1778": {
     "message": "Mese successivo"
   },
   "no_due_dates_assigned_e8f5bac8": {
     "message": "Nessuna data di scadenza assegnata"
-  },
-  "no_to_do_s_for_this_day_yet_90c5873d": {
-    "message": "Ancora nessun elenco attività per oggi."
   },
   "nothing_new_needs_attention_3ac548d4": {
     "message": "Nulla di nuovo richiede attenzione."
@@ -183,24 +168,24 @@
     "message": "Oggi"
   },
   "today_at_date_8ac30d6": {
-    "message": "Oggi alle { date }"
+    "message": "Oggi { date }"
   },
   "tomorrow_9a6c9a00": {
     "message": "Domani"
   },
   "tomorrow_at_date_b53f2cf1": {
-    "message": "Domani alle { date }"
+    "message": "Domani { date }"
   },
   "unable_to_mark_as_complete_8141856d": {
     "message": "Impossibile contrassegnare come completato."
   },
   "yesterday_at_date_1aa6d18e": {
-    "message": "Ieri alle { date }"
+    "message": "Ieri { date }"
   },
   "yesterday_c6bd6abf": {
     "message": "Ieri"
   },
   "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
-    "message": "Hai raggiunto l'inizio dell'elenco attività."
+    "message": "Sei tornato al tuo primo elenco attività."
   }
 }

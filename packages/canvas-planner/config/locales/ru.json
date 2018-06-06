@@ -8,12 +8,6 @@
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "Вы уверены, что хотите удалить этот элемент планировщика?"
   },
-  "assignmenttype_title_is_complete_813e54f8": {
-    "message": "{ assignmentType } { title } завершено"
-  },
-  "assignmenttype_title_is_incomplete_a1d5fac0": {
-    "message": "{ assignmentType } { title } не завершено"
-  },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Начало вашей истории задач"
   },
@@ -30,7 +24,7 @@
     "message": "{ count, plural,\n     =0 {# возможности}\n    one {# возможность}\n  other {# возможности}\n}"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-    "message": "{ count, plural,\n    one {Показать # завершенное событие}\n  other {Показать # завершенные события}\n}"
+    "message": "{ count, plural,\n    one {Показать # завершенный элемент}\n  other {Показать # завершенные элементы}\n}"
   },
   "course_8a63b4a3": {
     "message": "Курс"
@@ -54,7 +48,7 @@
     "message": "Подробные сведения"
   },
   "dismiss_opportunityname_5995176f": {
-    "message": "Отклонить { opportunityName }"
+    "message": "Исключить { opportunityName }"
   },
   "due_5d7267be": {
     "message": "Срок выполнения:"
@@ -105,7 +99,7 @@
     "message": "Загрузить предыдущие даты"
   },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-    "message": "Загруженные { count, plural,\n     =0{# элементы}\n    one {# элемент}\n  other {# элементы}\n}"
+    "message": "Загруженные { count, plural,\n     =0 {# элементы}\n    one {# элемент}\n  other {# элементы}\n}"
   },
   "loading_25990131": {
     "message": "Выполняется загрузка..."
@@ -122,23 +116,14 @@
   "missing_1a256b3b": {
     "message": "Отсутствует"
   },
-  "missing_items_for_5ef30cea": {
-    "message": "Отсутствуют элементы для "
-  },
   "new_activity_8b84847d": {
     "message": "Новая активность"
-  },
-  "new_activity_for_ac84f6e6": {
-    "message": "Новая активность для "
   },
   "next_month_749b1778": {
     "message": "Следующий месяц"
   },
   "no_due_dates_assigned_e8f5bac8": {
     "message": "Даты выполнения не заданы"
-  },
-  "no_to_do_s_for_this_day_yet_90c5873d": {
-    "message": "Задачи на сегодняшний день пока отсутствуют."
   },
   "nothing_new_needs_attention_3ac548d4": {
     "message": "Нет новых пунктов, требующих внимания."
@@ -147,7 +132,7 @@
     "message": "Опционально: Добавить курс"
   },
   "points_bceb5005": {
-    "message": "баллов"
+    "message": "баллы"
   },
   "points_points_63e59cce": {
     "message": "{ points } баллов"

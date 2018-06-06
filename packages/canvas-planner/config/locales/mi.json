@@ -8,12 +8,6 @@
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "E pono ana koe kei te hiahia koe kia mukua tenei mahere tūemi?"
   },
-  "assignmenttype_title_is_complete_813e54f8": {
-    "message": "{ assignmentType } { title } Kua oti"
-  },
-  "assignmenttype_title_is_incomplete_a1d5fac0": {
-    "message": "{ assignmentType } { title } Kaore i te oti"
-  },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Te timatatanga o tō hītori Hei-Mahi"
   },
@@ -24,22 +18,22 @@
     "message": "Katia"
   },
   "close_opportunities_popover_f4e50551": {
-    "message": "Katia whai wāhitanga pakū ki runga"
+    "message": "Katia ngā whai wāhitanga pakū ki runga"
   },
   "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
-    "message": "{ count, plural,\n     =0 {# Ngā whaiwāhitanga}\n    one {# whaiwāhitanga}\n  other {# ngā whaiwāhitanga}\n}"
+    "message": "{ count, plural,\n     =0 {# ngā whai wāhanga}\n    one {# whai wāhanga}\n  other {# ngā whai wāhanga}\n}"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-    "message": "{ count, plural,\n    one {Whakaatu # tūemi kua oti}\n  other {Whakaatu # ngā tūemi kua oti}\n}"
+    "message": "{ count, plural,\n    one {Whakātu# tūemi kua oti}\n  other {Whakātu # ngā tūemi kua oti}\n}"
   },
   "course_8a63b4a3": {
-    "message": "akorangas"
+    "message": "akoranga"
   },
   "course_to_do_bcbbab54": {
-    "message": "{ course } Hei mahi"
+    "message": "{ course } HEI MAHI"
   },
   "date_at_time_dbdb1b99": {
-    "message": "{ date } ī { time }"
+    "message": "{ date } kī{ time }"
   },
   "date_ee500367": {
     "message": "Rā"
@@ -63,7 +57,7 @@
     "message": "E TIKA ANA: { date }"
   },
   "edit_title_72e5a21e": {
-    "message": "Whakatika { title }"
+    "message": "Whakatika{ title }"
   },
   "error_loading_more_items_3f109d9f": {
     "message": "He hapa i puta i te wā e uta ana nui atu tuemi"
@@ -72,7 +66,7 @@
     "message": "He hapa i puta i te wā e uta ana ngā tuemi o mua"
   },
   "excused_cf8792eb": {
-    "message": "Tukua"
+    "message": "Whakawātea"
   },
   "failed_to_delete_to_do_64edff49": {
     "message": "I rāhua ki te muku hei mahi"
@@ -81,7 +75,7 @@
     "message": "I rāhua ki te tiki mahi hou"
   },
   "failed_to_load_opportunities_52ab6404": {
-    "message": "I rāhua i te wā uta "
+    "message": "I rāhua i te wā uta"
   },
   "failed_to_save_to_do_ddc7503b": {
     "message": "I rāhua ki te whakaora hei mahi"
@@ -90,7 +84,7 @@
     "message": "Urupare"
   },
   "go_to_dashboard_card_view_10398ef6": {
-    "message": "Haere ki te Papatohu Kāri Tirohia"
+    "message": "Haere ki papatohu Kāri Titiro"
   },
   "graded_25cd3fcd": {
     "message": "mākahia"
@@ -105,7 +99,7 @@
     "message": "Uta ngā rā o mua"
   },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-    "message": "Utaina { count, plural,\n     =0{# ngā tuemi }\n    one {# tūemi }\n  other {# ngā tuemi}\n}"
+    "message": "Kua utaina { count, plural,\n     =0 {# ngā tūemi}\n    one {# tūemi}\n  other {# ngā tūemi}\n}"
   },
   "loading_25990131": {
     "message": "E Uta ana...."
@@ -122,23 +116,14 @@
   "missing_1a256b3b": {
     "message": "Ngaro"
   },
-  "missing_items_for_5ef30cea": {
-    "message": "Ngā mea ngaro mō "
-  },
   "new_activity_8b84847d": {
     "message": "Mahi hou"
-  },
-  "new_activity_for_ac84f6e6": {
-    "message": "He mahi hou mō "
   },
   "next_month_749b1778": {
     "message": "Tērā marama"
   },
   "no_due_dates_assigned_e8f5bac8": {
-    "message": "Kaore he rā tika i whakaritea"
-  },
-  "no_to_do_s_for_this_day_yet_90c5873d": {
-    "message": "Kaore he “Hei Mahi” mo tēnei rā anō."
+    "message": "Kaore ngā rā tika kia whakaritea"
   },
   "nothing_new_needs_attention_3ac548d4": {
     "message": "Kaore he mea hou hei aro atu"
@@ -150,7 +135,7 @@
     "message": "Ngā koinga"
   },
   "points_points_63e59cce": {
-    "message": "{ points } Ngā koinga"
+    "message": "{ points } ngā koinga"
   },
   "previous_month_bb1e3c84": {
     "message": "Te marama o muri nei"
@@ -177,25 +162,25 @@
     "message": "Te taitara e hiahiatia ana"
   },
   "to_do_1d554f36": {
-    "message": "hei mahi"
+    "message": "Hei mahi"
   },
   "today_76e10f9c": {
     "message": "Tēnei rā"
   },
   "today_at_date_8ac30d6": {
-    "message": "I tēnei rā ī { date }"
+    "message": "Tēnei rā kī { date }"
   },
   "tomorrow_9a6c9a00": {
     "message": "apopo"
   },
   "tomorrow_at_date_b53f2cf1": {
-    "message": "Apopo ī { date }"
+    "message": "Apopo kī { date }"
   },
   "unable_to_mark_as_complete_8141856d": {
     "message": "Kaore e taea te tohu kua oti."
   },
   "yesterday_at_date_1aa6d18e": {
-    "message": "Inānahi rā { date }"
+    "message": "Ī nanahi nei kī { date }"
   },
   "yesterday_c6bd6abf": {
     "message": "Inanahi"

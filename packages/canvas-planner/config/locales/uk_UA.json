@@ -1,6 +1,30 @@
 {
+  "add_to_do_7def3c37": {
+    "message": "Додайте до зробленого"
+  },
   "all_day_fb42c4fc": {
     "message": "Весь день"
+  },
+  "all_items_loaded_aa256183": {
+    "message": "Всі елементи завантажені"
+  },
+  "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
+    "message": "Ви впевнені, що хочете видалити цей елемент планувальника?"
+  },
+  "beginning_of_your_to_do_history_61ef2dce": {
+    "message": "Початок вашої історії завдання"
+  },
+  "canvas_planner_98ed106": {
+    "message": "Планувальник Canvas"
+  },
+  "close_d634289d": {
+    "message": "Закрити"
+  },
+  "close_opportunities_popover_f4e50551": {
+    "message": "Закрити можливості поповнення"
+  },
+  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
+    "message": "{ count, plural,\n     =0 {# opportunities}\n    one {# opportunity}\n  other {# opportunities}\n}"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Show # completed item}\n  other {Show # completed items}\n}"
@@ -8,56 +32,128 @@
   "course_8a63b4a3": {
     "message": "Курс"
   },
-  "pts_699bd9aa": {
-    "message": "бали"
-  },
-  "failed_to_save_to_do_ddc7503b": {
-    "message": "Не вдалося зберегти завдання"
-  },
   "course_to_do_bcbbab54": {
     "message": "Зробити { course }"
   },
-  "canvas_planner_98ed106": {
-    "message": "Планувальник Canvas"
+  "date_at_time_dbdb1b99": {
+    "message": "{ date } в { time }"
   },
-  "looks_like_there_isn_t_anything_here_d9bcef49": {
-    "message": "Виглядає наче тут нічого немає"
+  "date_ee500367": {
+    "message": "Дата"
   },
-  "points_points_63e59cce": {
-    "message": "{ points } балів"
+  "date_is_required_8660ec22": {
+    "message": "Потрібна дата"
   },
-  "loading_planner_items_947a813d": {
-    "message": "Завантаження елементів планувальника"
+  "delete_a6efa79d": {
+    "message": "Видалити"
   },
-  "add_to_do_7def3c37": {
-    "message": "Додайте до зробленого"
+  "details_98a31b68": {
+    "message": "Подробиці"
   },
-  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
-    "message": "{ count, plural,\n     =0 {# opportunities}\n    one {# opportunity}\n  other {# opportunities}\n}"
+  "dismiss_opportunityname_5995176f": {
+    "message": "Відхилити { opportunityName }"
   },
   "due_5d7267be": {
     "message": "Очікується:"
   },
+  "due_date_8ce289b6": {
+    "message": "DUE: { date }"
+  },
+  "edit_title_72e5a21e": {
+    "message": "Редагувати { title }"
+  },
+  "error_loading_more_items_3f109d9f": {
+    "message": "Помилка завантаження інших елементів"
+  },
+  "error_loading_past_items_2881dbb1": {
+    "message": "Помилка завантаження попередніх елементів"
+  },
+  "excused_cf8792eb": {
+    "message": "Поважно"
+  },
+  "failed_to_delete_to_do_64edff49": {
+    "message": "Не вдалося видалити завдання"
+  },
+  "failed_to_get_new_activity_17e7ec7c": {
+    "message": "Не вдалося отримати нову активність"
+  },
+  "failed_to_load_opportunities_52ab6404": {
+    "message": "Не вдалося завантажити можливості"
+  },
+  "failed_to_save_to_do_ddc7503b": {
+    "message": "Не вдалося зберегти завдання"
+  },
   "feedback_6dcc1991": {
     "message": "Зворотній зв''язок"
   },
-  "loading_25990131": {
-    "message": "Завантаження..."
+  "go_to_dashboard_card_view_10398ef6": {
+    "message": "Перейти на панель інструментів Card View"
   },
-  "next_month_749b1778": {
-    "message": "Наступний місяць"
+  "graded_25cd3fcd": {
+    "message": "Оцінено"
   },
-  "beginning_of_your_to_do_history_61ef2dce": {
-    "message": "Початок вашої історії завдання"
+  "late_2be42b88": {
+    "message": "Пізніше"
   },
-  "yesterday_at_date_1aa6d18e": {
-    "message": "Вчора в { date }"
+  "load_more_a36f9cf9": {
+    "message": "Завантажити більше"
   },
   "load_prior_dates_f2b0f6f0": {
     "message": "Завантажте попередні дати"
   },
-  "all_items_loaded_aa256183": {
-    "message": "Всі елементи завантажені"
+  "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
+    "message": "Loaded { count, plural,\n     =0 {# items}\n    one {# item}\n  other {# items}\n}"
+  },
+  "loading_25990131": {
+    "message": "Завантаження..."
+  },
+  "loading_725811ca": {
+    "message": "завантаження"
+  },
+  "loading_past_items_ca499e75": {
+    "message": "Завантаження попередніх елементів"
+  },
+  "loading_planner_items_947a813d": {
+    "message": "Завантаження елементів планувальника"
+  },
+  "looks_like_there_isn_t_anything_here_d9bcef49": {
+    "message": "Виглядає наче тут нічого немає"
+  },
+  "missing_1a256b3b": {
+    "message": "Втрачено"
+  },
+  "new_activity_8b84847d": {
+    "message": "Нова активність"
+  },
+  "next_month_749b1778": {
+    "message": "Наступний місяць"
+  },
+  "no_due_dates_assigned_e8f5bac8": {
+    "message": "Дату визначення не призначено "
+  },
+  "nothing_new_needs_attention_3ac548d4": {
+    "message": "Ніщо нове не потребує уваги."
+  },
+  "optional_add_course_ef0d70fc": {
+    "message": "Опціонально: Додати курс"
+  },
+  "points_bceb5005": {
+    "message": "бали"
+  },
+  "points_points_63e59cce": {
+    "message": "{ points } балів"
+  },
+  "previous_month_bb1e3c84": {
+    "message": "Попередній місяць"
+  },
+  "pts_699bd9aa": {
+    "message": "бали"
+  },
+  "replies_4a8577c8": {
+    "message": "Відповіді"
+  },
+  "save_11a80ec3": {
+    "message": "Зберегти"
   },
   "submitted_318fad53": {
     "message": "Підтверджено"
@@ -65,136 +161,40 @@
   "task_16b0ef38": {
     "message": "Завдання"
   },
-  "excused_cf8792eb": {
-    "message": "Поважно"
-  },
-  "replies_4a8577c8": {
-    "message": "Відповіді"
-  },
-  "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
-    "message": "Ви впевнені, що хочете видалити цей елемент планувальника?"
-  },
-  "dismiss_opportunityname_5995176f": {
-    "message": "Відхилити { opportunityName }"
-  },
-  "failed_to_get_new_activity_17e7ec7c": {
-    "message": "Не вдалося отримати нову активність"
-  },
-  "title_is_required_6ddcab69": {
-    "message": "титул обов''язковий"
-  },
-  "date_at_time_dbdb1b99": {
-    "message": "{ date } в { time }"
-  },
-  "loading_past_items_ca499e75": {
-    "message": "Завантаження попередніх елементів"
-  },
-  "tomorrow_at_date_b53f2cf1": {
-    "message": "Завтра в { date }"
-  },
-  "today_76e10f9c": {
-    "message": "Сьогодні"
-  },
-  "edit_title_72e5a21e": {
-    "message": "Редагувати { title }"
-  },
-  "error_loading_past_items_2881dbb1": {
-    "message": "Помилка завантаження попередніх елементів"
-  },
-  "no_due_dates_assigned_e8f5bac8": {
-    "message": "Дату визначення не призначено "
-  },
-  "save_11a80ec3": {
-    "message": "Зберегти"
-  },
   "time_2b5aac58": {
     "message": "Час"
-  },
-  "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
-    "message": "Ви прокрутили назад до самого першого завдання!"
-  },
-  "delete_a6efa79d": {
-    "message": "Видалити"
-  },
-  "go_to_dashboard_card_view_10398ef6": {
-    "message": "Перейти на панель інструментів Card View"
-  },
-  "unable_to_mark_as_complete_8141856d": {
-    "message": "Неможливо позначити як завершений."
-  },
-  "points_bceb5005": {
-    "message": "бали"
-  },
-  "nothing_new_needs_attention_3ac548d4": {
-    "message": "Ніщо нове не потребує уваги."
   },
   "title_ee03d132": {
     "message": "Заголовок"
   },
-  "date_ee500367": {
-    "message": "Дата"
-  },
-  "due_date_8ce289b6": {
-    "message": "DUE: { date }"
-  },
-  "late_2be42b88": {
-    "message": "Пізніше"
-  },
-  "yesterday_c6bd6abf": {
-    "message": "Вчора"
-  },
-  "graded_25cd3fcd": {
-    "message": "Оцінено"
+  "title_is_required_6ddcab69": {
+    "message": "титул обов''язковий"
   },
   "to_do_1d554f36": {
     "message": "Зробити"
   },
-  "missing_1a256b3b": {
-    "message": "Втрачено"
-  },
-  "date_is_required_8660ec22": {
-    "message": "Потрібна дата"
-  },
-  "error_loading_more_items_3f109d9f": {
-    "message": "Помилка завантаження інших елементів"
-  },
-  "optional_add_course_ef0d70fc": {
-    "message": "Опціонально: Додати курс"
-  },
-  "failed_to_load_opportunities_52ab6404": {
-    "message": "Не вдалося завантажити можливості"
-  },
-  "previous_month_bb1e3c84": {
-    "message": "Попередній місяць"
-  },
-  "new_activity_8b84847d": {
-    "message": "Нова активність"
-  },
-  "failed_to_delete_to_do_64edff49": {
-    "message": "Не вдалося видалити завдання"
-  },
-  "loading_725811ca": {
-    "message": "завантаження"
-  },
-  "close_opportunities_popover_f4e50551": {
-    "message": "Закрити можливості поповнення"
-  },
-  "tomorrow_9a6c9a00": {
-    "message": "Завтра"
-  },
-  "load_more_a36f9cf9": {
-    "message": "Завантажити більше"
+  "today_76e10f9c": {
+    "message": "Сьогодні"
   },
   "today_at_date_8ac30d6": {
     "message": "Сьогодні в { date }"
   },
-  "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-    "message": "Loaded { count, plural,\n     =0 {# items}\n    one {# item}\n  other {# items}\n}"
+  "tomorrow_9a6c9a00": {
+    "message": "Завтра"
   },
-  "details_98a31b68": {
-    "message": "Подробиці"
+  "tomorrow_at_date_b53f2cf1": {
+    "message": "Завтра в { date }"
   },
-  "close_d634289d": {
-    "message": "Закрити"
+  "unable_to_mark_as_complete_8141856d": {
+    "message": "Неможливо позначити як завершений."
+  },
+  "yesterday_at_date_1aa6d18e": {
+    "message": "Вчора в { date }"
+  },
+  "yesterday_c6bd6abf": {
+    "message": "Вчора"
+  },
+  "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
+    "message": "Ви прокрутили назад до самого першого завдання!"
   }
 }

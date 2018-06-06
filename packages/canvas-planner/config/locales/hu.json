@@ -2,79 +2,79 @@
   "all_day_fb42c4fc": {
     "message": "Egész nap"
   },
+  "close_d634289d": {
+    "message": "Bezár"
+  },
   "course_8a63b4a3": {
     "message": "Kurzus"
-  },
-  "pts_699bd9aa": {
-    "message": "pont"
-  },
-  "due_5d7267be": {
-    "message": "Határidő: "
-  },
-  "loading_25990131": {
-    "message": "Betöltés..."
-  },
-  "next_month_749b1778": {
-    "message": "Következő hónap"
-  },
-  "submitted_318fad53": {
-    "message": "Beadva"
-  },
-  "excused_cf8792eb": {
-    "message": "Felmentve"
-  },
-  "today_76e10f9c": {
-    "message": "Ma"
-  },
-  "save_11a80ec3": {
-    "message": "Mentés"
-  },
-  "time_2b5aac58": {
-    "message": "Idő"
-  },
-  "delete_a6efa79d": {
-    "message": "Törlés"
-  },
-  "points_bceb5005": {
-    "message": "pontszám"
-  },
-  "title_ee03d132": {
-    "message": "Cím"
   },
   "date_ee500367": {
     "message": "Dátum"
   },
-  "late_2be42b88": {
-    "message": "Késve"
-  },
-  "yesterday_c6bd6abf": {
-    "message": "Tegnap"
-  },
-  "graded_25cd3fcd": {
-    "message": "Értékelve"
-  },
-  "to_do_1d554f36": {
-    "message": "Teendők"
-  },
-  "missing_1a256b3b": {
-    "message": "Hiányzik"
-  },
-  "previous_month_bb1e3c84": {
-    "message": "Előző hónap"
-  },
-  "loading_725811ca": {
-    "message": "betöltés"
-  },
-  "tomorrow_9a6c9a00": {
-    "message": "Holnap"
-  },
-  "load_more_a36f9cf9": {
-    "message": "Továbbiak betöltése"
+  "delete_a6efa79d": {
+    "message": "Törlés"
   },
   "details_98a31b68": {
     "message": "Részletek"
   },
-  "close_d634289d": {
-    "message": "Bezár"
+  "due_5d7267be": {
+    "message": "Határidő: "
+  },
+  "excused_cf8792eb": {
+    "message": "Felmentve"
+  },
+  "graded_25cd3fcd": {
+    "message": "Értékelve"
+  },
+  "late_2be42b88": {
+    "message": "Késve"
+  },
+  "load_more_a36f9cf9": {
+    "message": "Továbbiak betöltése"
+  },
+  "loading_25990131": {
+    "message": "Betöltés..."
+  },
+  "loading_725811ca": {
+    "message": "betöltés"
+  },
+  "missing_1a256b3b": {
+    "message": "Hiányzik"
+  },
+  "next_month_749b1778": {
+    "message": "Következő hónap"
+  },
+  "points_bceb5005": {
+    "message": "pontszám"
+  },
+  "previous_month_bb1e3c84": {
+    "message": "Előző hónap"
+  },
+  "pts_699bd9aa": {
+    "message": "pont"
+  },
+  "save_11a80ec3": {
+    "message": "Mentés"
+  },
+  "submitted_318fad53": {
+    "message": "Beadva"
+  },
+  "time_2b5aac58": {
+    "message": "Idő"
+  },
+  "title_ee03d132": {
+    "message": "Cím"
+  },
+  "to_do_1d554f36": {
+    "message": "Teendők"
+  },
+  "today_76e10f9c": {
+    "message": "Ma"
+  },
+  "tomorrow_9a6c9a00": {
+    "message": "Holnap"
+  },
+  "yesterday_c6bd6abf": {
+    "message": "Tegnap"
   }
 }

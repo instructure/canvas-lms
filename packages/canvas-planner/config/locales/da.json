@@ -8,12 +8,6 @@
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "Er du sikker på, du vil slette dette planlægningselement?"
   },
-  "assignmenttype_title_is_complete_813e54f8": {
-    "message": "{ assignmentType } { title } er komplet"
-  },
-  "assignmenttype_title_is_incomplete_a1d5fac0": {
-    "message": "{ assignmentType } { title } er ufuldstændig"
-  },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Begyndelsen af ​​din Opgaveliste-historik"
   },
@@ -30,7 +24,7 @@
     "message": "{ count, plural,\n     =0 {# muligheder}\n    one {# mulighed}\n  other {# muligheder}\n}"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-    "message": "{ count, plural,\n    one {Vis # afsluttet emne}\n  other {Vis # afsluttede emner}\n}"
+    "message": "{ count, plural,\n    one {Vis # afsluttet element}\n  other {Vis # afsluttede elementer}\n}"
   },
   "course_8a63b4a3": {
     "message": "Fag"
@@ -39,7 +33,7 @@
     "message": "{ course } OPGAVELISTE"
   },
   "date_at_time_dbdb1b99": {
-    "message": "{ date } ved { time }"
+    "message": "{ date } kl. { time }"
   },
   "date_ee500367": {
     "message": "Dato"
@@ -105,7 +99,7 @@
     "message": "Indlæs tidligere datoer"
   },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-    "message": "indlæst { count, plural,\n     =0{# elementer}\n    one {# element}\n  other {# elementer}\n}"
+    "message": "Indlæst { count, plural,\n     =0 {# elementer}\n    one {# element}\n  other {# elementer}\n}"
   },
   "loading_25990131": {
     "message": "Indlæser ..."
@@ -122,23 +116,14 @@
   "missing_1a256b3b": {
     "message": "Mangler"
   },
-  "missing_items_for_5ef30cea": {
-    "message": "Manglende elementer for "
-  },
   "new_activity_8b84847d": {
     "message": "Ny aktivitet"
-  },
-  "new_activity_for_ac84f6e6": {
-    "message": "Ny aktivitet for "
   },
   "next_month_749b1778": {
     "message": "Næste måned"
   },
   "no_due_dates_assigned_e8f5bac8": {
     "message": "Ingen afleveringsdatoer tildelt"
-  },
-  "no_to_do_s_for_this_day_yet_90c5873d": {
-    "message": "Ingenting på opgavelisten for denne dag endnu."
   },
   "nothing_new_needs_attention_3ac548d4": {
     "message": "Intet nyt har brug for opmærksomhed."
@@ -165,7 +150,7 @@
     "message": "Gem"
   },
   "submitted_318fad53": {
-    "message": "Indsendt"
+    "message": "Afleveret"
   },
   "task_16b0ef38": {
     "message": "Opgave"
