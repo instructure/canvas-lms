@@ -140,6 +140,12 @@ import 'compiled/jquery.rails_flash_notifications'
           }
           return;
         }
+
+        if (!ENV.SEQUENCE_CONTROL)
+       {
+         $modules.removeClass('after_current_position');
+       }
+
         var url = $(".progression_list_url").attr('href');
         if($(".context_module_item.progression_requirement:visible").length > 0) {
           $(".loading_module_progressions_link").show().attr('disabled', true);
@@ -805,14 +811,10 @@ import 'compiled/jquery.rails_flash_notifications'
         $module.find(".context_module_item").each(function() {
           var $mod_item = $(this);
           var position = parseInt($mod_item.getTemplateData({textValues: ['position']}).position, 10);
-
           if (data.current_position && position && data.current_position < position) {
             $mod_item.addClass('after_current_position');
           }
 
-          if (!ENV.SEQUENCE_CONTROL) {
-            $mod_item.removeClass('after_current_position')
-          }
           // set the status icon
           var $icon_container = $mod_item.find('.module-item-status-icon');
 

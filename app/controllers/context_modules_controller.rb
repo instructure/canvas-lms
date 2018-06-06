@@ -74,19 +74,20 @@ class ContextModulesController < ApplicationController
       placements.select { |p| @menu_tools[p] = tools.select{|t| t.has_placement? p} }
 
       module_file_details = load_module_file_details if @context.grants_right?(@current_user, session, :manage_content)
+      sequence_control = true # True by default
       enrollment = Enrollment.find_by(course_id: @context.id, user_id: @current_user.id)
       settings = SettingsService.get_enrollment_settings(id: enrollment.id)
-      sequence_control = settings["sequence_control"]
+      sequence_control = settings["sequence_control"] && settings["sequence_control"] == "false"
 
       js_env :course_id => @context.id,
+        :SEQUENCE_CONTROL => sequence_control,
         :CONTEXT_URL_ROOT => polymorphic_path([@context]),
         :FILES_CONTEXTS => [{asset_string: @context.asset_string}],
         :MODULE_FILE_DETAILS => module_file_details,
         :MODULE_FILE_PERMISSIONS => {
            usage_rights_required: @context.feature_enabled?(:usage_rights_required),
            manage_files: @context.grants_right?(@current_user, session, :manage_files)
-        },
-        :SEQUENCE_CONTROL => sequence_control
+        }
 
       if master_courses?
         is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)

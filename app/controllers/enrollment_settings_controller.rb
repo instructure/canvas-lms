@@ -1,5 +1,8 @@
 class EnrollmentSettingsController < ApplicationController
   def update
+    if params[:id] == 'sequence_control'
+      params[:value] = ActiveRecord::Type::Boolean.new.deserialize(params[:value])
+    end
     SettingsService.update_enrollment_setting(
       id: params[:enrollment_id],
       setting: params[:id],
