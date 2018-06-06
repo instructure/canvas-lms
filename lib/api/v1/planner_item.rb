@@ -96,15 +96,15 @@ module Api::V1::PlannerItem
   def submission_statuses_for(user, item, opts = {})
     submission_status = {submissions: false}
     return submission_status unless item.is_a?(Assignment)
-    ss = user.submission_statuses(opts)
+    @ss ||= user.submission_statuses(opts)
     submission_status[:submissions] = {
-      submitted: ss[:submitted].include?(item.id),
-      excused: ss[:excused].include?(item.id),
-      graded: ss[:graded].include?(item.id),
-      late: ss[:late].include?(item.id),
-      missing: ss[:missing].include?(item.id),
-      needs_grading: ss[:needs_grading].include?(item.id),
-      has_feedback: ss[:has_feedback].include?(item.id)
+      submitted: @ss[:submitted].include?(item.id),
+      excused: @ss[:excused].include?(item.id),
+      graded: @ss[:graded].include?(item.id),
+      late: @ss[:late].include?(item.id),
+      missing: @ss[:missing].include?(item.id),
+      needs_grading: @ss[:needs_grading].include?(item.id),
+      has_feedback: @ss[:has_feedback].include?(item.id)
     }
 
     # planner will display the most recent comment not made by the user herself
@@ -131,8 +131,9 @@ module Api::V1::PlannerItem
 
   def new_activity(item, user, opts = {})
     if item.is_a?(Assignment) || item.try(:assignment)
+      @ss ||= user.submission_statuses(opts)
       assign = item.try(:assignment) || item
-      return true if user.submission_statuses(opts).dig(:new_activity).include?(assign.id)
+      return true if @ss.dig(:new_activity).include?(assign.id)
     end
     if item.is_a?(DiscussionTopic) || item.try(:discussion_topic)
       topic = item.try(:discussion_topic) || item
