@@ -37,6 +37,9 @@
         <a href="<%= one_time_passwords_path %>" class="btn button-sidebar-wide" id="otp_backup_codes_link" target="_blank"><i class="icon-lock" aria-hidden="true"></i> <%= t('links.otp_backup_codes', "Multi-Factor Authentication Backup Codes") %></a>
     <% end %>
     <a href="<%= dashboard_content_exports_path %>" class="btn button-sidebar-wide"><i class="icon-download" aria-hidden="true"></i> <%= t("Download Submissions") %></a>
+    <% if @user.has_student_enrollment? %>
+      <div id="pairing-code"></div>
+    <% end %>
     <% if @domain_root_account.feature_allowed?(:epub_export) && !@domain_root_account.enable_offline_web_export? %>
         <%= link_to  epub_exports_path, class: 'btn button-sidebar-wide' do %>
           <i class="icon-download" aria-hidden="true"></i> <%= t("Download Course Content") %>
