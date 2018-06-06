@@ -246,6 +246,7 @@ export default class ProficiencyTable extends React.Component {
                   color={rating.get('color')}
                   description={rating.get('description')}
                   descriptionError={rating.get('descriptionError')}
+                  disableDelete={this.state.rows.size === 1}
                   focusField={rating.get('focusField')}
                   points={rating.get('points').toString()}
                   pointsError={rating.get('pointsError')}

@@ -39,6 +39,7 @@ export default class ProficiencyRating extends React.Component {
     color: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
     descriptionError: PropTypes.string,
+    disableDelete: PropTypes.bool.isRequired,
     focusField: PropTypes.oneOf(['description', 'points']),
     mastery: PropTypes.bool.isRequired,
     onColorChange: PropTypes.func.isRequired,
@@ -116,6 +117,7 @@ export default class ProficiencyRating extends React.Component {
       color,
       description,
       descriptionError,
+      disableDelete,
       mastery,
       points,
       pointsError
@@ -182,7 +184,7 @@ export default class ProficiencyRating extends React.Component {
             </PopoverContent>
           </Popover>
           <div className="delete">
-            <Button variant="icon" onClick={this.handleDelete}>
+            <Button variant="icon" onClick={this.handleDelete} disabled={disableDelete}>
               <IconTrash title={I18n.t('Delete proficiency rating')} />
             </Button>
           </div>

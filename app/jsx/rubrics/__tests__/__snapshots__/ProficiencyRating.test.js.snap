@@ -28,7 +28,7 @@ exports[`renders the ProficiencyRating component 1`] = `
       </PopoverContent>
     </Popover>
     <div className=\\"delete\\">
-      <Button variant=\\"icon\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" fluidWidth={false} buttonRef={[Function]}>
+      <Button variant=\\"icon\\" onClick={[Function]} disabled={false} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" fluidWidth={false} buttonRef={[Function]}>
         <IconTrash title=\\"Delete proficiency rating\\" />
       </Button>
     </div>

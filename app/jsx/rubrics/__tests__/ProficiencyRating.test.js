@@ -24,6 +24,7 @@ const defaultProps = (props = {}) => (
   Object.assign({
     color: '00ff00',
     description: 'Stellar',
+    disableDelete: false,
     mastery: false,
     onColorChange: () => {},
     onDelete: () => {},
@@ -105,4 +106,19 @@ it('clicking delete button triggers delete', () => {
     </table>)
   wrapper.find('Button').at(1).simulate('click')
   expect(onDelete).toHaveBeenCalledTimes(1)
+})
+
+it('clicking disabled delete button does not triggers delete', () => {
+  const onDelete = jest.fn()
+  const wrapper = mount(
+    <table>
+      <tbody>
+        <ProficiencyRating {...defaultProps({
+          onDelete,
+          disableDelete: true
+        })}/>
+      </tbody>
+    </table>)
+  wrapper.find('Button').at(1).simulate('click')
+  expect(onDelete).toHaveBeenCalledTimes(0)
 })

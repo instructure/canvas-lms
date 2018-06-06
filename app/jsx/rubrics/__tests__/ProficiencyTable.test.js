@@ -85,7 +85,7 @@ describe('default proficiency', () => {
 })
 
 describe('custom proficiency', () => {
-  it('renders two ratings', () => {
+  it('renders two ratings that are deletable', () => {
     promise = Promise.resolve({
       status: 200,
       data: {ratings: [
@@ -108,6 +108,30 @@ describe('custom proficiency', () => {
     return promise.then(() => {
         spy.mockRestore()
         expect(wrapper.find('ProficiencyRating')).toHaveLength(2)
+        expect(wrapper.find('ProficiencyRating').first().prop('disableDelete')).toBeFalsy()
+        expect(wrapper.find('ProficiencyRating').last().prop('disableDelete')).toBeFalsy()
+      }
+    )
+  })
+
+  it('renders one rating that is not deletable', () => {
+    promise = Promise.resolve({
+      status: 200,
+      data: {ratings: [
+        {
+          description: 'Uno',
+          points: 1,
+          color: '0000ff',
+          mastery: true
+        }
+      ]}
+    })
+    const spy = jest.spyOn(axios,'get').mockImplementation(() => promise)
+    const wrapper = mount(<ProficiencyTable {...defaultProps()}/>)
+    return promise.then(() => {
+        spy.mockRestore()
+        expect(wrapper.find('ProficiencyRating')).toHaveLength(1)
+        expect(wrapper.find('ProficiencyRating').first().prop('disableDelete')).toBeTruthy()
       }
     )
   })
