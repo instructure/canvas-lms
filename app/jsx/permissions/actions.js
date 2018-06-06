@@ -96,6 +96,20 @@ actions.updateRoleName = function(id, label, baseType) {
   }
 }
 
+actions.updateRoleNameAndBaseType = function(id, label, baseType) {
+  return (dispatch, getState) => {
+    apiClient
+      .updateRole(getState(), {id, label, base_role_type: baseType})
+      .then(res => {
+        $.screenReaderFlashMessage(I18n.t('Successfully updated role name'))
+        dispatch(actions.updateRole(res.data))
+      })
+      .catch(_ => {
+        $.screenReaderFlashMessage(I18n.t('Failed to update role name'))
+      })
+  }
+}
+
 actions.setAndOpenRoleTray = function(role) {
   return dispatch => {
     dispatch(actions.hideAllTrays())
@@ -129,15 +143,35 @@ actions.tabChanged = function tabChanged(newContextType) {
   }
 }
 
-actions.modifyPermissions = function modifyPermissions(
-  permissionName,
-  courseRoleId,
-  enabled,
-  locked
-) {
-  return dispatch => {
-    dispatch(actions.updatePermissions({permissionName, courseRoleId, enabled, locked}))
-    dispatch(actions.fixFocus({permissionName, courseRoleId}))
+function changePermission(role, permissionName, enabled, locked, explicit) {
+  return {
+    ...role,
+    permissions: {
+      ...role.permissions,
+      [permissionName]: {
+        ...role.permissions[permissionName],
+        enabled,
+        locked,
+        explicit
+      }
+    }
+  }
+}
+
+actions.modifyPermissions = function modifyPermissions({name, id, enabled, locked, explicit}) {
+  return (dispatch, getState) => {
+    const role = getState().roles.find(r => r.id === id)
+    const updatedRole = changePermission(role, name, enabled, locked, explicit)
+    apiClient
+      .updateRole(getState(), updatedRole)
+      .then(res => {
+        const newRes = {...res.data, contextType: role.contextType, displayed: role.displayed}
+        dispatch(actions.updatePermissions({role: newRes}))
+        showFlashSuccess(I18n.t('Successfully updated permission'))()
+      })
+      .catch(_error => {
+        showFlashError(I18n.t('Failed to update permission'))()
+      })
   }
 }
 

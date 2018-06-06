@@ -199,21 +199,70 @@ it('ADD_TRAY_SAVING_FAIL sets the activeAddTray to false in the store', () => {
 
 it('UPDATE_PERMISSIONS sets enabled in the store', () => {
   const originalState = {
-    roles: [{id: '1', permissions: {become_user: {enabled: true, locked: true}}}]
+    roles: [{id: '1', permissions: {become_user: {enabled: true, locked: true, explicit: true}}}]
   }
-  const payload = {courseRoleId: '1', permissionName: 'become_user', enabled: false, locked: true}
+  const payload = {
+    role: {
+      id: '1',
+      permissions: {
+        become_user: {
+          enabled: false,
+          locked: true,
+          explicit: true
+        }
+      }
+    }
+  }
   const newState = reduce(actions.updatePermissions(payload), originalState)
-  const expectedState = [{id: '1', permissions: {become_user: {enabled: false, locked: true}}}]
+  const expectedState = [
+    {id: '1', permissions: {become_user: {enabled: false, locked: true, explicit: true}}}
+  ]
   expect(newState.roles).toEqual(expectedState)
 })
 
 it('UPDATE_PERMISSIONS sets locked in the store', () => {
   const originalState = {
-    roles: [{id: '1', permissions: {become_user: {enabled: true, locked: true}}}]
+    roles: [{id: '1', permissions: {become_user: {enabled: true, locked: true, explicit: true}}}]
   }
-  const payload = {courseRoleId: '1', permissionName: 'become_user', enabled: true, locked: false}
+  const payload = {
+    role: {
+      id: '1',
+      permissions: {
+        become_user: {
+          enabled: true,
+          locked: false,
+          explicit: true
+        }
+      }
+    }
+  }
   const newState = reduce(actions.updatePermissions(payload), originalState)
-  const expectedState = [{id: '1', permissions: {become_user: {enabled: true, locked: false}}}]
+  const expectedState = [
+    {id: '1', permissions: {become_user: {enabled: true, locked: false, explicit: true}}}
+  ]
+  expect(newState.roles).toEqual(expectedState)
+})
+
+it('UPDATE_PERMISSIONS sets explicit in the store', () => {
+  const originalState = {
+    roles: [{id: '1', permissions: {become_user: {enabled: true, locked: true, explicit: true}}}]
+  }
+  const payload = {
+    role: {
+      id: '1',
+      permissions: {
+        become_user: {
+          enabled: true,
+          locked: true,
+          explicit: false
+        }
+      }
+    }
+  }
+  const newState = reduce(actions.updatePermissions(payload), originalState)
+  const expectedState = [
+    {id: '1', permissions: {become_user: {enabled: true, locked: true, explicit: false}}}
+  ]
   expect(newState.roles).toEqual(expectedState)
 })
 

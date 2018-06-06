@@ -54,8 +54,10 @@ export default class PermissionButton extends Component {
     }
   }
 
-  checkedSelection(enabled, locked) {
-    if (enabled && !locked) {
+  checkedSelection(enabled, locked, explicit) {
+    if (!explicit) {
+      return 'Use Default'
+    } else if (enabled && !locked) {
       return 'Enable'
     } else if (enabled && locked) {
       return 'Enable and Lock'
@@ -89,13 +91,23 @@ export default class PermissionButton extends Component {
       <MenuItemGroup
         label=""
         selected={[
-          this.checkedSelection(this.props.permission.enabled, this.props.permission.locked)
+          this.checkedSelection(
+            this.props.permission.enabled,
+            this.props.permission.locked,
+            this.props.permission.explicit
+          )
         ]}
       >
         <MenuItem
           value={I18n.t('Enable')}
           onClick={() =>
-            this.props.handleClick(this.props.permissionName, this.props.courseRoleId, true, false)
+            this.props.handleClick({
+              name: this.props.permissionName,
+              id: this.props.courseRoleId,
+              enabled: true,
+              locked: false,
+              explicit: true
+            })
           }
         >
           <Text>{I18n.t('Enable')}</Text>
@@ -103,7 +115,13 @@ export default class PermissionButton extends Component {
         <MenuItem
           value={I18n.t('Enable and Lock')}
           onClick={() =>
-            this.props.handleClick(this.props.permissionName, this.props.courseRoleId, true, true)
+            this.props.handleClick({
+              name: this.props.permissionName,
+              id: this.props.courseRoleId,
+              enabled: true,
+              locked: true,
+              explicit: true
+            })
           }
         >
           <Text>{I18n.t('Enable and Lock')}</Text>
@@ -111,7 +129,13 @@ export default class PermissionButton extends Component {
         <MenuItem
           value={I18n.t('Disable')}
           onClick={() =>
-            this.props.handleClick(this.props.permissionName, this.props.courseRoleId, false, false)
+            this.props.handleClick({
+              name: this.props.permissionName,
+              id: this.props.courseRoleId,
+              enabled: false,
+              locked: false,
+              explicit: true
+            })
           }
         >
           <Text>{I18n.t('Disable')}</Text>
@@ -119,20 +143,37 @@ export default class PermissionButton extends Component {
         <MenuItem
           value={I18n.t('Disable and Lock')}
           onClick={() =>
-            this.props.handleClick(this.props.permissionName, this.props.courseRoleId, false, true)
+            this.props.handleClick({
+              name: this.props.permissionName,
+              id: this.props.courseRoleId,
+              enabled: false,
+              locked: true,
+              explicit: true
+            })
           }
         >
           <Text>{I18n.t('Disable and Lock')}</Text>
         </MenuItem>
+
+        <MenuItemSeparator />
+        {/* TO DO : enabled vs disabled? How do we know? This is just a placeholder! */}
+        <MenuItem
+          value={I18n.t('Use Default')}
+          onClick={() =>
+            this.props.handleClick({
+              name: this.props.permissionName,
+              id: this.props.courseRoleId,
+              enabled: this.props.permission.enabled,
+              locked: false,
+              explicit: false
+            })
+          }
+        >
+          <View as="div" textAlign="center">
+            <Text>{I18n.t('Use Default')}</Text>
+          </View>
+        </MenuItem>
       </MenuItemGroup>
-
-      <MenuItemSeparator />
-
-      <MenuItem value={I18n.t('Use Default')}>
-        <View as="div" textAlign="center">
-          <Text>{I18n.t('Use Default')}</Text>
-        </View>
-      </MenuItem>
     </Menu>
   )
 
@@ -145,7 +186,9 @@ export default class PermissionButton extends Component {
           <FlexItem size="25px">{this.renderMenu()}</FlexItem>
 
           <FlexItem size="20px">
-            <Text color="primary">{this.props.permission.locked ? <IconLock /> : ''}</Text>
+            <Text color="primary">
+              {this.props.permission.locked && this.props.permission.explicit ? <IconLock /> : ''}
+            </Text>
           </FlexItem>
         </Flex>
       </View>
