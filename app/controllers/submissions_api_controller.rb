@@ -524,6 +524,13 @@ class SubmissionsApiController < ApplicationController
       submissions = submissions.where("graded_at>?", graded_since_date) if graded_since_date
       submissions = submissions.preload(:user, :originality_reports, :quiz_submission)
 
+      # this will speed up pagination for large collections when order_direction is asc
+      if order_by == 'graded_at' && order_direction == 'asc'
+        submissions = BookmarkedCollection.wrap(Submission::GradedAtBookmarker, submissions)
+      elsif order_by == :id && order_direction == 'asc'
+        submissions = BookmarkedCollection.wrap(Submission::IdBookmarker, submissions)
+      end
+
       submissions = Api.paginate(submissions, self, polymorphic_url([:api_v1, @section || @context, :student_submissions]))
       Submission.bulk_load_versioned_attachments(submissions)
       Version.preload_version_number(submissions)
