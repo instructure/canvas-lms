@@ -2212,7 +2212,7 @@ class UsersController < ApplicationController
     render :json => {:invited_users => invited_users, :errored_users => errored_users}
   end
 
-  # @API Get a Pandata jwt token and its expiration date
+  # @API Get a Pandata Events jwt token and its expiration date
   #
   # Returns a jwt auth and props token that can be used to send events to
   # Pandata.
@@ -2220,24 +2220,24 @@ class UsersController < ApplicationController
   # NOTE: This is currently only available to the mobile developer keys.
   #
   # @argument app_key [String]
-  #   The pandata appKey for this mobile app
+  #   The pandata events appKey for this mobile app
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/users/self/pandata_token \
+  #     curl https://<canvas>/api/v1/users/self/pandata_events_token \
   #          -X POST \
   #          -H 'Authorization: Bearer <token>'
   #          -F 'app_key=MOBILE_APPS_KEY' \
   #
   # @example_response
   #   {
-  #     "url": "https://example.com/pandata"
+  #     "url": "https://example.com/pandata/events"
   #     "auth_token": "wek23klsdnsoieioeoi3of9deeo8r8eo8fdn",
   #     "props_token": "paowinefopwienpfiownepfiownepfownef",
   #     "expires_at": 1521667783000,
   #   }
-  def pandata_token
-    settings = Canvas::DynamicSettings.find(service: 'pandata')
-    dk_ids = Setting.get("pandata_token_allowed_developer_key_ids", "").split(",")
+  def pandata_events_token
+    settings = Canvas::DynamicSettings.find('events', service: 'pandata')
+    dk_ids = Setting.get("pandata_events_token_allowed_developer_key_ids", "").split(",")
 
     unless @access_token
       return render json: { :message => "Access token required" }, status: :bad_request
@@ -2247,12 +2247,12 @@ class UsersController < ApplicationController
       return render json: { :message => "Developer key not authorized" }, status: :forbidden
     end
 
-    if params[:app_key] == settings["ios-pandata-key"]
-      key = settings["ios-pandata-key"]
-      sekrit = settings["ios-pandata-secret"]
-    elsif params[:app_key] == settings["android-pandata-key"]
-      key = settings["android-pandata-key"]
-      sekrit = settings["android-pandata-secret"]
+    if params[:app_key] == settings["ios-key"]
+      key = settings["ios-key"]
+      sekrit = settings["ios-secret"]
+    elsif params[:app_key] == settings["android-key"]
+      key = settings["android-key"]
+      sekrit = settings["android-secret"]
     else
       return render json: { :message => "Invalid app key" }, status: :bad_request
     end
@@ -2275,7 +2275,7 @@ class UsersController < ApplicationController
     auth_token = Canvas::Security.create_jwt(auth_body, expires_at, sekrit)
     props_token = Canvas::Security.create_jwt(props_body, nil, sekrit)
     render json: {
-      url: settings["pandata-url"],
+      url: settings["url"],
       auth_token: auth_token,
       props_token: props_token,
       expires_at: expires_at.to_f * 1000

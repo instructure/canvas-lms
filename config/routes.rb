@@ -1321,7 +1321,7 @@ CanvasRails::Application.routes.draw do
       put 'users/:id/merge_into/accounts/:destination_account_id/users/:destination_user_id', controller: 'users', action: 'merge_into'
       post 'users/:id/split', controller: 'users', action: 'split'
 
-      post 'users/self/pandata_token', controller: 'users', action: 'pandata_token'
+      post 'users/self/pandata_events_token', controller: 'users', action: 'pandata_events_token'
 
       scope(controller: :user_observees) do
         get    'users/:user_id/observees', action: :index, as: 'user_observees'

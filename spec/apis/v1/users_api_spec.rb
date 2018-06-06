@@ -2111,27 +2111,29 @@ describe "Users API", type: :request do
     end
   end
 
-  describe 'POST pandata_token' do
+  describe 'POST pandata_events_token' do
     let(:fake_secrets){
       {
-        "pandata-url" => "https://example.com/pandata",
-        "ios-pandata-key" => "IOS_pandata_key",
-        "ios-pandata-secret" => "teamrocketblastoffatthespeedoflight",
-        "android-pandata-key" => "ANDROID_pandata_key",
-        "android-pandata-secret" => "surrendernoworpreparetofight"
+        "url" => "https://example.com/pandata/events",
+        "ios-key" => "IOS_key",
+        "ios-secret" => "teamrocketblastoffatthespeedoflight",
+        "android-key" => "ANDROID_key",
+        "android-secret" => "surrendernoworpreparetofight"
       }
     }
 
     before do
-      allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
-      allow(Canvas::DynamicSettings).to receive(:find).with(service: 'pandata').and_return(fake_secrets)
+      allow(Canvas::DynamicSettings).to receive(:find).
+        with(any_args).and_call_original
+      allow(Canvas::DynamicSettings).to receive(:find).
+        with('events', service: 'pandata').and_return(fake_secrets)
     end
 
     it 'should return token and expiration' do
-      Setting.set("pandata_token_allowed_developer_key_ids", DeveloperKey.default.global_id)
-      json = api_call(:post, "/api/v1/users/self/pandata_token",
-          { controller: 'users', action: 'pandata_token', format:'json', id: @user.to_param },
-          { app_key: 'IOS_pandata_key'}
+      Setting.set("pandata_events_token_allowed_developer_key_ids", DeveloperKey.default.global_id)
+      json = api_call(:post, "/api/v1/users/self/pandata_events_token",
+          { controller: 'users', action: 'pandata_events_token', format:'json', id: @user.to_param },
+          { app_key: 'IOS_key'}
       )
       expect(json['url']).to be_present
       expect(json['auth_token']).to be_present
@@ -2140,9 +2142,9 @@ describe "Users API", type: :request do
     end
 
     it 'should return bad_request for incorrect app keys' do
-      Setting.set("pandata_token_allowed_developer_key_ids", DeveloperKey.default.global_id)
-      json = api_call(:post, "/api/v1/users/self/pandata_token",
-          { controller: 'users', action: 'pandata_token', format:'json', id: @user.to_param },
+      Setting.set("pandata_events_token_allowed_developer_key_ids", DeveloperKey.default.global_id)
+      json = api_call(:post, "/api/v1/users/self/pandata_events_token",
+          { controller: 'users', action: 'pandata_events_token', format:'json', id: @user.to_param },
           { app_key: 'IOS_not_right'}
       )
       assert_status(400)
@@ -2150,9 +2152,9 @@ describe "Users API", type: :request do
     end
 
     it 'should return forbidden if the tokens key is not authorized' do
-      json = api_call(:post, "/api/v1/users/self/pandata_token",
-          { controller: 'users', action: 'pandata_token', format:'json', id: @user.to_param },
-          { app_key: 'IOS_pandata_key'}
+      json = api_call(:post, "/api/v1/users/self/pandata_events_token",
+          { controller: 'users', action: 'pandata_events_token', format:'json', id: @user.to_param },
+          { app_key: 'IOS_key'}
       )
       assert_status(403)
       expect(json['message']).to eq "Developer key not authorized"
