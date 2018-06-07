@@ -30,6 +30,11 @@ module Users
       it "includes an sf_verifier field in the response" do
         expect(Users::AccessVerifier.generate(user: user)).to have_key(:sf_verifier)
       end
+
+      it "builds it as a jwt" do
+        jwt = Users::AccessVerifier.generate(user: user)[:sf_verifier]
+        expect(Canvas::Security.decode_jwt(jwt)).to have_key(:user_id)
+      end
     end
 
     describe "validate" do
@@ -62,6 +67,24 @@ module Users
         verifier = Users::AccessVerifier.generate(user: user)
         tampered = verifier.merge(sf_verifier: 'tampered')
         expect{ Users::AccessVerifier.validate(tampered) }.to raise_exception(Users::AccessVerifier::InvalidVerifier)
+      end
+
+      describe "with a legacy verifier" do
+        let(:verifier) do
+          ts = Time.now.utc.to_i.to_s
+          signature = OpenSSL::HMAC.hexdigest(OpenSSL::Digest::MD5.new, user.uuid, ts)
+          { ts: ts, user_id: user.global_id, sf_verifier: signature }
+        end
+
+        it "validates" do
+          expect{ Users::AccessVerifier.validate(verifier) }.not_to raise_exception
+        end
+
+        it "returns verified user claim" do
+          verified = Users::AccessVerifier.validate(verifier)
+          expect(verified).to have_key(:user)
+          expect(verified[:user]).to eql(user)
+        end
       end
     end
   end
