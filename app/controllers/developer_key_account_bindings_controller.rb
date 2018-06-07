@@ -117,6 +117,7 @@ class DeveloperKeyAccountBindingsController < ApplicationController
   def account
     @_account ||= begin
       a = Account.site_admin if params[:account_id] == 'site_admin'
+      a = @domain_root_account if params[:account_id] == 'self'
       a || Account.find(params[:account_id])
     end
   end
