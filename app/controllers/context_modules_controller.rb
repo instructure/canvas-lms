@@ -77,7 +77,7 @@ class ContextModulesController < ApplicationController
       sequence_control = true # True by default
       enrollment = Enrollment.find_by(course_id: @context.id, user_id: @current_user.id)
       settings = SettingsService.get_enrollment_settings(id: enrollment.id)
-      sequence_control = settings["sequence_control"] && settings["sequence_control"] == "false"
+      sequence_control = false if settings["sequence_control"] && settings["sequence_control"] == false
 
       js_env :course_id => @context.id,
         :SEQUENCE_CONTROL => sequence_control,
