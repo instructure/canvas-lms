@@ -22,6 +22,7 @@ import WikiPageView from 'compiled/views/wiki/WikiPageView'
 import MarkAsDone from 'compiled/util/markAsDone'
 import LockManager from '../blueprint_courses/apps/LockManager'
 import 'compiled/jquery/ModuleSequenceFooter'
+import { monitorLtiMessages } from 'lti/messages'
 
 const lockManager = new LockManager()
 lockManager.init({ itemType: 'wiki_page', page: 'show' })
@@ -55,3 +56,5 @@ const wikiPageView = new WikiPageView({
 })
 
 wikiPageView.render()
+
+monitorLtiMessages()

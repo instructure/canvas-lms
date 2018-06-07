@@ -22,6 +22,7 @@ import './jquery.google-analytics'
 import 'compiled/jquery/ModuleSequenceFooter'
 import MarkAsDone from 'compiled/util/markAsDone'
 import ToolLaunchResizer from './lti/tool_launch_resizer'
+import { monitorLtiMessages } from './lti/messages'
 
 var $toolForm = $("#tool_form")
 
@@ -137,61 +138,4 @@ $(function() {
   })
 });
 
-window.addEventListener('message', function(e) {
-  try {
-    var message = JSON.parse(e.data);
-    switch (message.subject) {
-      case 'lti.frameResize':
-        const toolResizer = new ToolLaunchResizer();
-        var height = message.height;
-        if (height <= 0) height = 1;
-
-        const container = toolResizer.tool_content_wrapper(message.token || e.origin).data('height_overridden', true);
-        toolResizer.resize_tool_content_wrapper(height, container);
-        break;
-
-      case 'lti.showModuleNavigation':
-        if(message.show === true || message.show === false){
-          $('.module-sequence-footer').toggle(message.show);
-        }
-        break;
-
-      case 'lti.scrollToTop':
-        $('html,body').animate({
-           scrollTop: $('.tool_content_wrapper').offset().top
-         }, 'fast');
-        break;
-
-      case 'lti.setUnloadMessage':
-        setUnloadMessage(htmlEscape(message.message));
-        break;
-
-      case 'lti.removeUnloadMessage':
-        removeUnloadMessage();
-        break;
-
-      case 'lti.screenReaderAlert':
-        $.screenReaderFlashMessageExclusive(message.body.html || message.body)
-        break;
-    }
-  } catch(err) {
-    (console.error || console.log).call(console, 'invalid message received from');
-  }
-});
-
-var beforeUnloadHandler;
-function setUnloadMessage(msg) {
-  removeUnloadMessage();
-
-  beforeUnloadHandler = function(e) {
-    return (e.returnValue = msg || "");
-  }
-  window.addEventListener('beforeunload', beforeUnloadHandler);
-}
-
-function removeUnloadMessage() {
-  if (beforeUnloadHandler) {
-    window.removeEventListener('beforeunload', beforeUnloadHandler);
-    beforeUnloadHandler = null;
-  }
-}
+monitorLtiMessages()
