@@ -52,21 +52,7 @@
           <input value="1" type="checkbox" id="student_planner_checkbox" name="student_planner_checkbox" {{checkedIf todo_date}} />
             {{#t}}Add to student to-do{{/t}}
           </label>
-          <div id="todo_date_container">
-            <label class="screenreader-only" for="todo_date" id="student_planner_accessible_label">
-              {{#t}}Student Planner Date:{{/t}}
-              {{datepickerScreenreaderPrompt}}
-            </label>
-            <input type="text"
-                   class="datetime_field input-medium"
-                   name="student_todo_at"
-                   id="todo_date"
-                   aria-labelledby="student_planner_accessible_label"
-                   {{! TODO: what would be the best way to get this formatted right? }}
-                   value="{{datetimeFormatted todo_date}}"
-                   data-tooltip='{"position":"top","force_position":"true"}'
-                   title="{{accessibleDateFormat}}"/>
-          </div>
+          <div id="todo_date_container" />
         </div>
       {{/if}}
       {{#if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED}}

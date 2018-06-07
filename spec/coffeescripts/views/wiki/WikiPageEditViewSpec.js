@@ -39,7 +39,7 @@ QUnit.module('WikiPageEditView:Init', {
 })
 
 test('init wiki sidebar during render', function() {
-  const wikiPageEditView = new WikiPageEditView()
+  const wikiPageEditView = new WikiPageEditView({model: new WikiPage()})
   wikiPageEditView.render()
   ok(this.initSpy.calledOnce, 'Called richContentEditor.initSidebar once')
 })
@@ -53,7 +53,7 @@ test('renders escaped angle brackets properly', () => {
 })
 
 test('conditional content is hidden when disabled', () => {
-  const view = new WikiPageEditView({WIKI_RIGHTS: {manage: true}})
+  const view = new WikiPageEditView({model: new WikiPage(), WIKI_RIGHTS: {manage: true}})
   view.render()
 
   const conditionalToggle = view.$el.find('#conditional_content')
@@ -73,6 +73,7 @@ QUnit.module('WikiPageEditView:StudentPlanner', {
 
 test('student planner option hidden for insufficient rights', () => {
   const view = new WikiPageEditView({
+    model: new WikiPage(),
     WIKI_RIGHTS: {read: true},
     PAGE_RIGHTS: {
       read: true,
@@ -85,7 +86,7 @@ test('student planner option hidden for insufficient rights', () => {
 })
 
 test('student planner option appears', () => {
-  const view = new WikiPageEditView({WIKI_RIGHTS: {manage: true}})
+  const view = new WikiPageEditView({model: new WikiPage(), WIKI_RIGHTS: {manage: true}})
   view.render()
 
   const studentPlannerToggle = view.$el.find('#student_planner_checkbox')
@@ -108,7 +109,7 @@ test('student planner date picker appears', () => {
 })
 
 test('student planner option does stuff', () => {
-  const wikiPage = new WikiPage({todo_date: 'Jan 3'})
+  const wikiPage = new WikiPage({todo_date: '2012-01-03'})
   const view = new WikiPageEditView({
     model: wikiPage,
     WIKI_RIGHTS: {manage: true}
@@ -118,7 +119,7 @@ test('student planner option does stuff', () => {
   const studentPlannerToggle = view.$el.find('#student_planner_checkbox')
   const studentPlannerDateInput = view.$el.find('#todo_date')
   equal(studentPlannerToggle.prop('checked'), true, 'Toggle is checked')
-  equal(studentPlannerDateInput.val(), 'Jan 3 at 12am')
+  equal(studentPlannerDateInput.val(), 'Jan 3, 2012 12am')
 })
 
 test('add to student to-do requires date', () => {
@@ -154,6 +155,7 @@ QUnit.module('WikiPageEditView:ConditionalContent', {
 
 test('conditional content option hidden for insufficient rights', () => {
   const view = new WikiPageEditView({
+    model: new WikiPage(),
     WIKI_RIGHTS: {read: true},
     PAGE_RIGHTS: {
       read: true,
@@ -167,7 +169,7 @@ test('conditional content option hidden for insufficient rights', () => {
 })
 
 test('conditional content option appears', () => {
-  const view = new WikiPageEditView({WIKI_RIGHTS: {manage: true}})
+  const view = new WikiPageEditView({model: new WikiPage(), WIKI_RIGHTS: {manage: true}})
   view.render()
   const conditionalToggle = view.$el.find('#conditional_content')
   equal(conditionalToggle.length, 1, 'Toggle is visible')
@@ -176,6 +178,7 @@ test('conditional content option appears', () => {
 
 test('conditional content option appears populated', () => {
   const wikiPage = new WikiPage({
+    model: new WikiPage(),
     set_assignment: true,
     assignment: new Assignment({set_assignment: true})
   })
@@ -308,7 +311,7 @@ test('warn on leaving if unsaved changes', function() {
 QUnit.module('WikiPageEditView:Validate')
 
 test('validation of the title is only performed if the title is present', function() {
-  const view = new WikiPageEditView()
+  const view = new WikiPageEditView({model: new WikiPage()})
 
   let errors = view.validateFormData({body: 'blah'})
   strictEqual(errors.title, undefined, 'no error when title is omitted')
