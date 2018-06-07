@@ -22,21 +22,38 @@ module Users
     class InvalidVerifier < RuntimeError
     end
 
-    def self.generate(claims)
-      return {} unless claims[:user]
-      ts = Time.now.utc.to_i.to_s
-      user = claims[:user]
-      signature = OpenSSL::HMAC.hexdigest(OpenSSL::Digest::MD5.new, user.uuid, ts)
-      { ts: ts, user_id: user.global_id, sf_verifier: signature }
-    end
-
-    def self.validate(fields)
+    def self.validate_legacy(fields)
       return {} if fields[:sf_verifier].blank?
       ts = fields[:ts]&.to_i
       raise InvalidVerifier unless ts > 5.minutes.ago.to_i && ts < 1.minute.from_now.to_i
       user = User.where(id: fields[:user_id]).first
       raise InvalidVerifier unless user && fields[:sf_verifier] == OpenSSL::HMAC.hexdigest(OpenSSL::Digest::MD5.new, user.uuid, ts.to_s)
       return { user: user }
+    end
+
+    def self.generate(claims)
+      return {} unless claims[:user]
+      user = claims[:user]
+      jwt_claims = { user_id: user.global_id.to_s }
+      expires = 5.minutes.from_now
+      key = nil # use default key
+      { sf_verifier: Canvas::Security.create_jwt(jwt_claims, expires, key, :HS512) }
+    end
+
+    def self.validate(fields)
+      if fields[:user_id].present? && fields[:ts].present?
+        # validate legacy verifiers
+        return validate_legacy(fields)
+      end
+
+      return {} if fields[:sf_verifier].blank?
+      claims = Canvas::Security.decode_jwt(fields[:sf_verifier])
+      user = User.where(id: claims[:user_id]).first
+      raise InvalidVerifier unless user
+      return { user: user }
+
+    rescue Canvas::Security::TokenExpired, Canvas::Security::InvalidToken
+      raise InvalidVerifier
     end
   end
 end

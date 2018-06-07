@@ -668,7 +668,7 @@ class FilesController < ApplicationController
 
   def send_stored_file(attachment, inline=true)
     user = @current_user
-    user ||= api_find(User, params[:user_id]) if params[:user_id].present?
+    user ||= api_find(User, session['file_access_user_id']) if session['file_access_user_id'].present?
     attachment.context_module_action(user, :read) if user && !params[:preview]
     log_asset_access(@attachment, "files", "files") unless params[:preview]
     render_or_redirect_to_stored_file(
