@@ -56,6 +56,38 @@ module Users
         expect(verified[:user]).to eql(user)
       end
 
+      it "returns verified real user claim on success" do
+        real_user = user_model
+        verifier = Users::AccessVerifier.generate(user: user, real_user: real_user)
+        verified = Users::AccessVerifier.validate(verifier)
+        expect(verified).to have_key(:real_user)
+        expect(verified[:real_user]).to eql(real_user)
+      end
+
+      it "returns verified developer key claim on success" do
+        developer_key = DeveloperKey.create!
+        verifier = Users::AccessVerifier.generate(user: user, developer_key: developer_key)
+        verified = Users::AccessVerifier.validate(verifier)
+        expect(verified).to have_key(:developer_key)
+        expect(verified[:developer_key]).to eql(developer_key)
+      end
+
+      it "returns verified root account claim on success" do
+        account = Account.default
+        verifier = Users::AccessVerifier.generate(user: user, root_account: account)
+        verified = Users::AccessVerifier.validate(verifier)
+        expect(verified).to have_key(:root_account)
+        expect(verified[:root_account]).to eql(account)
+      end
+
+      it "returns verified oauth host claim on success" do
+        host = 'oauth-host'
+        verifier = Users::AccessVerifier.generate(user: user, oauth_host: host)
+        verified = Users::AccessVerifier.validate(verifier)
+        expect(verified).to have_key(:oauth_host)
+        expect(verified[:oauth_host]).to eql(host)
+      end
+
       it "raises InvalidVerifier if too old" do
         verifier = Users::AccessVerifier.generate(user: user)
         Timecop.freeze(10.minutes.from_now) do
