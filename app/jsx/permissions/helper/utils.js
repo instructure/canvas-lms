@@ -47,9 +47,7 @@ function roleComparisonFunction(roleOne, roleTwo) {
 }
 
 export function roleIsBaseRole(role) {
-  // TODO wonder if there is a better way to see if this is the case, or if there
-  //      are any situations where this isn't actually the case
-  return role.role === role.base_role_type
+  return role.role === role.base_role_type || role.role === 'AccountAdmin'
 }
 
 /*

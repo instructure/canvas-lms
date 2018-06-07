@@ -177,14 +177,14 @@ it('createNewRole dispatches addNewRole', () => {
   })
 })
 
-it('updateRoleNameAndBaseType dispatches updateRole', () => {
+it('updateRoleName dispatches updateRole', () => {
   moxios.install()
   window.ENV = {}
   window.ENV.flashAlertTimeout = 5
   const mockDispatch = jest.fn()
   const state = {contextId: 1, permissions: PERMISSIONS, roles: []}
   const getState = () => state
-  actions.updateRoleNameAndBaseType('1', 'steven', 'StudentRoll')(mockDispatch, getState)
+  actions.updateRoleName('1', 'steven', 'StudentRoll')(mockDispatch, getState)
   return moxiosWait(() => {
     const request = moxios.requests.mostRecent()
     request

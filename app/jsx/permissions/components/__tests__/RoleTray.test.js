@@ -29,11 +29,9 @@ function makeDefaultProps() {
   return {
     assignedPermissions: perms,
     id: '1',
-    assignedTo: '365',
     basedOn: null,
-    updateRoleNameAndBaseType: () => {},
+    updateRoleName: () => {},
     baseRoleLabels: ['Student', 'Teacher', 'TA'],
-    changedBy: 'Bob Dobbs',
     deletable: false,
     editable: false,
     hideTray: () => {},
@@ -79,14 +77,6 @@ it('renders unassigned permissions if any are present', () => {
   expect(node.props().title).toEqual('Unassigned Permissions')
 })
 
-it('renders assigned to', () => {
-  const props = makeDefaultProps()
-  const tree = shallow(<RoleTray {...props} />)
-  const node = tree.find('.role-tray-assigned-to')
-  expect(node.exists()).toBeTruthy()
-  expect(node.dive('Text').text()).toEqual('Assigned to: 365')
-})
-
 it('renders basedOn if it is set', () => {
   const props = makeDefaultProps()
   props.basedOn = 'Teacher'
@@ -101,14 +91,6 @@ it('does not render basedOn if it is not set', () => {
   const tree = shallow(<RoleTray {...props} />)
   const node = tree.find('.role-tray-based-on')
   expect(node.exists()).toBeFalsy()
-})
-
-it('renders changedBy', () => {
-  const props = makeDefaultProps()
-  const tree = shallow(<RoleTray {...props} />)
-  const node = tree.find('.role-tray-changed-by')
-  expect(node.exists()).toBeTruthy()
-  expect(node.dive('Text').text()).toEqual('Changed by: Bob Dobbs')
 })
 
 it('renders delete icon if deletable is true', () => {
@@ -130,7 +112,7 @@ it('does not render delete icon if deletable is false', () => {
 it('updaterole calls updaterolenameandbasetype', () => {
   const props = makeDefaultProps()
   const mockFunction = jest.fn()
-  props.updateRoleNameAndBaseType = mockFunction
+  props.updateRoleName = mockFunction
   const tree = shallow(<RoleTray {...props} />)
   tree.instance().updateRole({target: {value: 'blah'}})
   expect(mockFunction).toHaveBeenCalledWith('1', 'blah', null)
@@ -181,7 +163,6 @@ it('renders the last changed', () => {
   const tree = shallow(<RoleTray {...props} />)
   const node = tree.find('.role-tray-last-changed')
   expect(node.exists()).toBeTruthy()
-  expect(node.dive('Text').text()).toEqual('Last changed: 1/1/1970')
 })
 
 it('renders the close button when edit mode is not set', () => {
@@ -208,14 +189,16 @@ it('calls props.hideTray() and correctly sets state when hideTray is called', ()
   tree.setState({
     deleteAlertVisable: true,
     editBaseRoleAlertVisable: true,
-    editTrayVisable: true
+    editTrayVisable: true,
+    newTargetBaseRole: 'banana'
   })
   tree.instance().hideTray() // components hideTray, not props.hideTray method
 
   const expectedState = {
     deleteAlertVisable: false,
     editBaseRoleAlertVisable: false,
-    editTrayVisable: false
+    editTrayVisable: false,
+    newTargetBaseRole: null
   }
   expect(tree.state()).toEqual(expectedState)
   expect(hideTrayMock).toHaveBeenCalled()
@@ -248,5 +231,13 @@ it('does not render the edit confirmation alert if editBaseRoleAlertVisable stat
   const props = makeDefaultProps()
   const tree = shallow(<RoleTray {...props} />)
   const node = tree.find('.role-tray-edit-base-role-confirm')
+  expect(node.exists()).toBeFalsy()
+})
+
+// API does not currently support this, but the code is in place for it
+it('does not render the base role selector', () => {
+  const props = makeDefaultProps()
+  const tree = shallow(<RoleTray {...props} />)
+  const node = tree.find('Select')
   expect(node.exists()).toBeFalsy()
 })

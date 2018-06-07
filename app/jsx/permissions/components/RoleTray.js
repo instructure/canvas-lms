@@ -35,6 +35,7 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import Tray from '@instructure/ui-overlays/lib/components/Tray'
 
+import FriendlyDatetime from '../../shared/FriendlyDatetime'
 import actions from '../actions'
 import RoleTrayTable from './RoleTrayTable'
 import RoleTrayTableRow from './RoleTrayTableRow'
@@ -46,17 +47,16 @@ export default class RoleTray extends Component {
   static propTypes = {
     id: PropTypes.string,
     assignedPermissions: PropTypes.arrayOf(permissionPropTypes.permission).isRequired,
-    assignedTo: PropTypes.string.isRequired,
     baseRoleLabels: PropTypes.arrayOf(PropTypes.string),
     basedOn: PropTypes.string,
-    changedBy: PropTypes.string.isRequired,
     deletable: PropTypes.bool.isRequired,
     editable: PropTypes.bool.isRequired,
     hideTray: PropTypes.func.isRequired,
     deleteRole: PropTypes.func.isRequired,
     label: PropTypes.string.isRequired,
     lastChanged: PropTypes.string.isRequired,
-    updateRoleNameAndBaseType: PropTypes.func,
+    updateBaseRole: PropTypes.func,
+    updateRoleName: PropTypes.func,
     open: PropTypes.bool.isRequired,
     role: permissionPropTypes.role,
     unassignedPermissions: PropTypes.arrayOf(permissionPropTypes.permission).isRequired
@@ -67,13 +67,15 @@ export default class RoleTray extends Component {
     basedOn: null,
     role: null,
     id: null,
-    updateRoleNameAndBaseType: () => {}
+    updateBaseRole: () => {},
+    updateRoleName: () => {}
   }
 
   state = {
     deleteAlertVisable: false,
     editBaseRoleAlertVisable: false,
-    editTrayVisable: false
+    editTrayVisable: false,
+    newTargetBaseRole: null
   }
 
   // We need this so that if there is an alert displayed inside this tray
@@ -84,7 +86,8 @@ export default class RoleTray extends Component {
       this.setState({
         deleteAlertVisable: false,
         editTrayVisable: false,
-        editBaseRoleAlertVisable: false
+        editBaseRoleAlertVisable: false,
+        newTargetBaseRole: null
       })
     }
   }
@@ -94,7 +97,8 @@ export default class RoleTray extends Component {
     this.setState({
       deleteAlertVisable: false,
       editTrayVisable: false,
-      editBaseRoleAlertVisable: false
+      editBaseRoleAlertVisable: false,
+      newTargetBaseRole: null
     })
   }
 
@@ -103,14 +107,17 @@ export default class RoleTray extends Component {
       {
         deleteAlertVisable: false,
         editTrayVisable: true,
-        editBaseRoleAlertVisable: false
+        editBaseRoleAlertVisable: false,
+        newTargetBaseRole: null
       },
       () => this.closeButton.focus()
     )
   }
 
   updateRole = event => {
-    this.props.updateRoleNameAndBaseType(this.props.id, event.target.value, this.props.basedOn)
+    if (event.target.value && this.props.role.label !== event.target.value) {
+      this.props.updateRoleName(this.props.id, event.target.value, this.props.basedOn)
+    }
   }
 
   hideEditTray = () => {
@@ -118,7 +125,8 @@ export default class RoleTray extends Component {
       {
         deleteAlertVisable: false,
         editTrayVisable: false,
-        editBaseRoleAlertVisable: false
+        editBaseRoleAlertVisable: false,
+        newTargetBaseRole: null
       },
       () => this.editButton.focus()
     )
@@ -128,7 +136,8 @@ export default class RoleTray extends Component {
     this.setState({
       deleteAlertVisable: true,
       editTrayVisable: false,
-      editBaseRoleAlertVisable: false
+      editBaseRoleAlertVisable: false,
+      newTargetBaseRole: null
     })
   }
 
@@ -137,17 +146,19 @@ export default class RoleTray extends Component {
       {
         deleteAlertVisable: false,
         editTrayVisable: false,
-        editBaseRoleAlertVisable: false
+        editBaseRoleAlertVisable: false,
+        newTargetBaseRole: null
       },
       () => this.deleteButton.focus()
     )
   }
 
-  showEditBaseRoleAlert = () => {
+  showEditBaseRoleAlert = baseRoleLabel => {
     this.setState({
       deleteAlertVisable: false,
       editTrayVisable: true,
-      editBaseRoleAlertVisable: true
+      editBaseRoleAlertVisable: true,
+      newTargetBaseRole: baseRoleLabel
     })
   }
 
@@ -156,7 +167,8 @@ export default class RoleTray extends Component {
       {
         deleteAlertVisable: false,
         editTrayVisable: true,
-        editBaseRoleAlertVisable: false
+        editBaseRoleAlertVisable: false,
+        newTargetBaseRole: null
       },
       () => this.editRoleInput.focus()
     )
@@ -164,6 +176,18 @@ export default class RoleTray extends Component {
 
   deleteRole = () => {
     this.props.deleteRole(this.props.role, this.hideTray, this.hideDeleteAlert)
+  }
+
+  handleBaseRoleChange = () => {
+    const onSuccess = () => {
+      // TODO flash message?
+      this.hideEditBaseRoleAlert()
+    }
+    const onFail = () => {
+      // TODO flash message?
+      this.hideEditBaseRoleAlert()
+    }
+    this.props.updateBaseRole(this.props.role, this.state.newTargetBaseRole, onSuccess, onFail)
   }
 
   // TODO maybe make this a whole other component we can use/reuse?
@@ -211,11 +235,7 @@ export default class RoleTray extends Component {
         </Text>
       </div>
     )
-    return this.renderConfirmationAlert(
-      text,
-      this.hideEditBaseRoleAlert,
-      this.hideEditBaseRoleAlert
-    )
+    return this.renderConfirmationAlert(text, this.handleBaseRoleChange, this.hideEditBaseRoleAlert)
   }
 
   renderCloseButton = () => (
@@ -322,23 +342,32 @@ export default class RoleTray extends Component {
       <Container as="div" margin="small 0 medium 0">
         <Flex direction="column">
           <FlexItem>
-            <Text className="role-tray-assigned-to">
-              {I18n.t('Assigned to: %{count}', {count: this.props.assignedTo})}
-            </Text>
-          </FlexItem>
-          <FlexItem>
             <Text className="role-tray-last-changed">
-              {I18n.t('Last changed: %{date}', {date: this.props.lastChanged})}
-            </Text>
-          </FlexItem>
-          <FlexItem>
-            <Text className="role-tray-changed-by">
-              {I18n.t('Changed by: %{person}', {person: this.props.changedBy})}
+              <span>
+                {I18n.t('Last changed:')} <FriendlyDatetime dateTime={this.props.lastChanged} />
+              </span>
             </Text>
           </FlexItem>
         </Flex>
       </Container>
     </div>
+  )
+
+  renderBaseRoleSelector = () => (
+    <Container as="div" margin="medium 0 large 0">
+      <Select
+        label={I18n.t('Base Type')}
+        defaultOption={this.props.basedOn}
+        onChange={(_event, option) => this.showEditBaseRoleAlert(option.value)}
+        inputRef={c => (this.editRoleInput = c)}
+      >
+        {this.props.baseRoleLabels.map(label => (
+          <option key={label} value={label}>
+            {label}
+          </option>
+        ))}
+      </Select>
+    </Container>
   )
 
   renderEditHeader = () => (
@@ -347,7 +376,7 @@ export default class RoleTray extends Component {
         {I18n.t('Edit %{label}', {label: this.props.label})}
       </Heading>
 
-      <Container as="div" margin="medium 0 small 0">
+      <Container as="div" margin="medium 0 large 0">
         <TextInput
           label={I18n.t('Role Name')}
           defaultValue={this.props.label}
@@ -355,20 +384,12 @@ export default class RoleTray extends Component {
         />
       </Container>
 
-      <Container as="div" margin="medium 0 large 0">
-        <Select
-          label={I18n.t('Base Type')}
-          defaultOption={this.props.basedOn}
-          onChange={(_event, _option) => this.showEditBaseRoleAlert()}
-          inputRef={c => (this.editRoleInput = c)}
-        >
-          {this.props.baseRoleLabels.map(label => (
-            <option key={label} value={label}>
-              {label}
-            </option>
-          ))}
-        </Select>
-      </Container>
+      {/*
+        * this is not currently possible due to limitations in the api. once we
+        * update the API we should be able to uncomment this, update our apiClient,
+        * and have everything just work :fingers-crossed:
+        */}
+      {false && this.renderBaseRoleSelector()}
     </div>
   )
 
@@ -397,15 +418,17 @@ export default class RoleTray extends Component {
 }
 
 function getBaseRoleLabel(role, state) {
+  // Account roles do not have the whole based on inheritance thing going on.
+  if (role.base_role_type === 'AccountMembership') {
+    return null
+  }
   return state.roles.find(ele => ele.role === role.base_role_type).label
 }
 
 function mapStateToProps(state, ownProps) {
   if (state.activeRoleTray === null) {
     const stateProps = {
-      assignedTo: '',
       basedOn: null,
-      changedBy: '',
       deletable: false,
       editable: false,
       label: '',
@@ -436,15 +459,13 @@ function mapStateToProps(state, ownProps) {
   const stateProps = {
     contextId: state.contextId,
     assignedPermissions: permissions.filter(p => p.enabled),
-    assignedTo: 'todo',
     basedOn: isBaseRole ? null : getBaseRoleLabel(role, state),
     baseRoleLabels: allBaseRoles.map(r => r.label),
-    changedBy: 'todo',
     deletable: !isBaseRole,
     editable: !isBaseRole,
     label: role.label,
     id: role.id,
-    lastChanged: 'todo',
+    lastChanged: role.last_updated_at,
     open: true,
     role,
     unassignedPermissions: permissions.filter(p => !p.enabled)
@@ -454,7 +475,8 @@ function mapStateToProps(state, ownProps) {
 
 const mapDispatchToProps = {
   hideTray: actions.hideAllTrays,
-  updateRoleNameAndBaseType: actions.updateRoleNameAndBaseType,
+  updateRoleName: actions.updateRoleName,
+  updateBaseRole: actions.updateBaseRole,
   deleteRole: actions.deleteRole
 }
 

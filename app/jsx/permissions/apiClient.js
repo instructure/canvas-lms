@@ -39,3 +39,12 @@ export function updateRole({contextId}, role) {
 export function deleteRole(contextId, role) {
   return axios.delete(`/api/v1/accounts/${contextId}/roles/${role.id}`)
 }
+
+// TODO there does not currently exist an API for this, and because of
+//      reasons we cannot just change the individual permissions to be
+//      the same as the base role. This will need to be fixed on endpoint
+//      before we can do anything with it here.
+// eslint-disable-next-line
+export function updateBaseRole({contextId}, role, baseRole) {
+  throw new Error('API does not currently support updating the base role')
+}

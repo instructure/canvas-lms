@@ -27,6 +27,12 @@ class RoleOverride < ActiveRecord::Base
 
   validate :must_apply_to_something
 
+  after_save :update_role_changed_at
+
+  def update_role_changed_at
+    self.role.touch
+  end
+
   def self.v2_labels(context, has_v2)
     context.feature_enabled?(:permissions_v2_ui) && has_v2
   end

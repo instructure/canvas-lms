@@ -75,23 +75,23 @@ actions.createNewRole = function(label, baseRole) {
         dispatch(actions.displayRoleTray({role: createdRole}))
         showFlashSuccess(I18n.t('Successfully created new role'))()
       })
-      .catch(_error => {
+      .catch(error => {
         dispatch(actions.addTraySavingFail())
-        showFlashError(I18n.t('Failed to create new role'))()
+        showFlashError(I18n.t('Failed to create new role'))(error)
       })
   }
 }
 
-actions.updateRoleNameAndBaseType = function(id, label, baseType) {
+actions.updateRoleName = function(id, label, baseType) {
   return (dispatch, getState) => {
     apiClient
       .updateRole(getState(), {id, label, base_role_type: baseType})
       .then(res => {
-        $.screenReaderFlashMessage(I18n.t('Successfully updated role name'))
+        showFlashSuccess(I18n.t('Successfully updated role name'))()
         dispatch(actions.updateRole(res.data))
       })
-      .catch(_ => {
-        $.screenReaderFlashMessage(I18n.t('Failed to update role name'))
+      .catch(error => {
+        showFlashError(I18n.t('Failed to update role name'))(error)
       })
   }
 }
@@ -163,6 +163,22 @@ actions.deleteRole = function(role, successCallback, failCallback) {
       .catch(_error => {
         failCallback()
         showFlashError(I18n.t('Failed to delete role %{label}', {label: role.label}))()
+      })
+  }
+}
+
+actions.updateBaseRole = function updateBaseRole(role, baseRole, onSuccess, onFail) {
+  return (dispatch, getState) => {
+    const state = getState()
+    apiClient
+      .updateBaseRole(state, role, baseRole)
+      .then(res => {
+        const newRes = {...res.data, contextType: role.contextType, displayed: role.displayed}
+        dispatch(actions.updatePermissions({role: newRes}))
+        onSuccess()
+      })
+      .catch(() => {
+        onFail()
       })
   }
 }
