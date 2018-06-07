@@ -1,59 +1,59 @@
 {
-  "close_d634289d": {
-    "message": "Փակել"
-  },
   "course_8a63b4a3": {
     "message": "Դասընթաց"
-  },
-  "date_ee500367": {
-    "message": "Ամսաթիվ"
-  },
-  "delete_a6efa79d": {
-    "message": "Ջնջել"
-  },
-  "details_98a31b68": {
-    "message": "Մանրամասներ"
-  },
-  "due_5d7267be": {
-    "message": "Մինչև"
-  },
-  "excused_cf8792eb": {
-    "message": "Ներված է"
-  },
-  "graded_25cd3fcd": {
-    "message": "Գնահատվող"
-  },
-  "load_more_a36f9cf9": {
-    "message": "Բեռնել լրացուցիչ"
-  },
-  "loading_25990131": {
-    "message": "Բեռնում է..."
   },
   "pts_699bd9aa": {
     "message": "միավորներ"
   },
-  "save_11a80ec3": {
-    "message": "Պահպանել"
+  "due_5d7267be": {
+    "message": "Մինչև"
+  },
+  "loading_25990131": {
+    "message": "Բեռնում է..."
   },
   "submitted_318fad53": {
     "message": "Ներկայացված է "
   },
-  "time_2b5aac58": {
-    "message": "Ժամ"
-  },
-  "title_ee03d132": {
-    "message": "Վերնագիր"
-  },
-  "to_do_1d554f36": {
-    "message": "Անել"
+  "excused_cf8792eb": {
+    "message": "Ներված է"
   },
   "today_76e10f9c": {
     "message": "Այսօր"
   },
-  "tomorrow_9a6c9a00": {
-    "message": "Վաղը"
+  "save_11a80ec3": {
+    "message": "Պահպանել"
+  },
+  "time_2b5aac58": {
+    "message": "Ժամ"
+  },
+  "delete_a6efa79d": {
+    "message": "Ջնջել"
+  },
+  "title_ee03d132": {
+    "message": "Վերնագիր"
+  },
+  "date_ee500367": {
+    "message": "Ամսաթիվ"
   },
   "yesterday_c6bd6abf": {
     "message": "Երեկ"
+  },
+  "graded_25cd3fcd": {
+    "message": "Գնահատվող"
+  },
+  "to_do_1d554f36": {
+    "message": "Անել"
+  },
+  "tomorrow_9a6c9a00": {
+    "message": "Վաղը"
+  },
+  "load_more_a36f9cf9": {
+    "message": "Բեռնել լրացուցիչ"
+  },
+  "details_98a31b68": {
+    "message": "Մանրամասներ"
+  },
+  "close_d634289d": {
+    "message": "Փակել"
   }
 }
