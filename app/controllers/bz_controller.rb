@@ -169,7 +169,7 @@ class BzController < ApplicationController
   end
 
   def grades_download
-    download = BzController::ExportGrades.new(@current_user.email, params)
+    download = BzController::ExportGrades.new(@current_user.id, params)
     Delayed::Job.enqueue(download, max_attempts: 1)
   end
 
@@ -663,14 +663,14 @@ class BzController < ApplicationController
   # (private)
   
   class ExportGrades
-    def initialize(email, params)
-      @email = email
+    def initialize(user_id, params)
+      @user = User.find(user_id)
       @params = params
     end
     
     def perform
-      csv = Export::GradeDownload.csv(@params)
-      Mailer.bz_message(@email, "Export Success", "Attached is your export data", "grades_download" => csv).deliver
+      csv = Export::GradeDownload.csv(@user, @params)
+      Mailer.bz_message(@user.email, "Export Success", "Attached is your export data", "grades_download" => csv).deliver
       
       csv
     end
@@ -679,7 +679,7 @@ class BzController < ApplicationController
       er_id = Canvas::Errors.capture_exception("BzController::ExportGrades", error)[:error_report]
       # email us?
       Mailer.debug_message("Export FAIL", error.to_s).deliver
-      Mailer.bz_message(@email, "Export Failed :(", "Your grades download export didn't work. The tech team was also emailed to look into why.")
+      Mailer.bz_message(@user.email, "Export Failed :(", "Your grades download export didn't work. The tech team was also emailed to look into why.")
     end
   end
   
