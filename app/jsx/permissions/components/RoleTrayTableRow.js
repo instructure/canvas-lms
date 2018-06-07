@@ -21,10 +21,10 @@ import PropTypes from 'prop-types'
 import React from 'react'
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import Container from '@instructure/ui-core/lib/components/Container'
+import Container from '@instructure/ui-layout/lib/components/View'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import IconArrowOpenStart from '@instructure/ui-icons/lib/Solid/IconArrowOpenStart'
-import Text from '@instructure/ui-core/lib/components/Text'
+import Text from '@instructure/ui-elements/lib/components/Text'
 import {ConnectedPermissionButton} from './PermissionButton'
 import permissionPropTypes from '../propTypes'
 

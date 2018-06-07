@@ -21,8 +21,8 @@ import PropTypes from 'prop-types'
 import React from 'react'
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import Container from '@instructure/ui-core/lib/components/Container'
-import Heading from '@instructure/ui-core/lib/components/Heading'
+import Container from '@instructure/ui-layout/lib/components/View'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
 import IconX from '@instructure/ui-icons/lib/Solid/IconX'
 import Tray from '@instructure/ui-overlays/lib/components/Tray'
 
