@@ -32,6 +32,7 @@ class DeveloperKey < ActiveRecord::Base
   has_one :tool_consumer_profile, :class_name => 'Lti::ToolConsumerProfile'
   serialize :scopes, Array
 
+  before_validation :validate_scopes!
   before_create :generate_api_key
   before_create :set_auto_expire_tokens
   before_create :set_visible
@@ -40,7 +41,6 @@ class DeveloperKey < ActiveRecord::Base
   after_save :clear_cache
   after_update :invalidate_access_tokens_if_scopes_removed!
   after_create :create_default_account_binding
-  before_validation :validate_scopes!
 
   validates_as_url :redirect_uri, allowed_schemes: nil
   validate :validate_redirect_uris
@@ -57,6 +57,12 @@ class DeveloperKey < ActiveRecord::Base
       event :activate, transitions_to: :active
     end
     state :deleted
+  end
+
+  alias_method :destroy_permanently!, :destroy
+  def destroy
+    self.workflow_state = 'deleted'
+    self.save
   end
 
   def redirect_uri=(value)
@@ -83,12 +89,6 @@ class DeveloperKey < ActiveRecord::Base
     raise "Please never delete the default developer key" if workflow_state != 'active' && self == self.class.default
   end
 
-  alias_method :destroy_permanently!, :destroy
-  def destroy
-    self.workflow_state = 'deleted'
-    self.save
-  end
-
   def nullify_empty_icon_url
     self.icon_url = nil if icon_url.blank?
   end
@@ -98,34 +98,49 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def set_auto_expire_tokens
-    self.auto_expire_tokens = true if self.respond_to?(:auto_expire_tokens=)
-  end
-
-  def self.default
-    get_special_key("User-Generated")
+    self.auto_expire_tokens = true
   end
 
   def set_visible
     self.visible = !site_admin?
-    true
-  end
-
-  def authorized_for_account?(target_account)
-    return false unless binding_on_in_account?(target_account)
-    return true if account_id.blank?
-    return true if target_account.id == account_id
-    target_account.account_chain_ids.include?(account_id)
-  end
-
-  def account_name
-    account.try(:name)
-  end
-
-  def last_used_at
-    self.access_tokens.maximum(:last_used_at)
   end
 
   class << self
+    def default
+      get_special_key("User-Generated")
+    end
+
+    def get_special_key(default_key_name)
+      Shard.birth.activate do
+        @special_keys ||= {}
+
+        if Rails.env.test?
+          # TODO: we have to do this because tests run in transactions
+          return @special_keys[default_key_name] = DeveloperKey.where(name: default_key_name).first_or_create
+        end
+
+        key = @special_keys[default_key_name]
+        return key if key
+        if (key_id = Setting.get("#{default_key_name}_developer_key_id", nil)) && key_id.present?
+          key = DeveloperKey.where(id: key_id).first
+        end
+        return @special_keys[default_key_name] = key if key
+        key = DeveloperKey.create!(:name => default_key_name)
+        Setting.set("#{default_key_name}_developer_key_id", key.id)
+        return @special_keys[default_key_name] = key
+      end
+    end
+
+    # for now, only one AWS account for SNS is supported
+    def sns
+      if !defined?(@sns)
+        settings = ConfigFile.load('sns')
+        @sns = nil
+        @sns = Aws::SNS::Client.new(settings) if settings
+      end
+      @sns
+    end
+
     def find_cached(id)
       global_id = Shard.global_id_for(id)
       MultiCache.fetch("developer_key/#{global_id}") do
@@ -147,25 +162,19 @@ class DeveloperKey < ActiveRecord::Base
     MultiCache.delete("developer_keys/#{vendor_code}") if vendor_code.present?
   end
 
-  def self.get_special_key(default_key_name)
-    Shard.birth.activate do
-      @special_keys ||= {}
+  def authorized_for_account?(target_account)
+    return false unless binding_on_in_account?(target_account)
+    return true if account_id.blank?
+    return true if target_account.id == account_id
+    target_account.account_chain_ids.include?(account_id)
+  end
 
-      if Rails.env.test?
-        # TODO: we have to do this because tests run in transactions
-        return @special_keys[default_key_name] = DeveloperKey.where(name: default_key_name).first_or_create
-      end
+  def account_name
+    account.try(:name)
+  end
 
-      key = @special_keys[default_key_name]
-      return key if key
-      if (key_id = Setting.get("#{default_key_name}_developer_key_id", nil)) && key_id.present?
-        key = DeveloperKey.where(id: key_id).first
-      end
-      return @special_keys[default_key_name] = key if key
-      key = DeveloperKey.create!(:name => default_key_name)
-      Setting.set("#{default_key_name}_developer_key_id", key.id)
-      return @special_keys[default_key_name] = key
-    end
+  def last_used_at
+    self.access_tokens.maximum(:last_used_at)
   end
 
   # verify that the given uri has the same domain as this key's
@@ -183,16 +192,6 @@ class DeveloperKey < ActiveRecord::Base
     result
   rescue URI::Error
     return false
-  end
-
-  # for now, only one AWS account for SNS is supported
-  def self.sns
-    if !defined?(@sns)
-      settings = ConfigFile.load('sns')
-      @sns = nil
-      @sns = Aws::SNS::Client.new(settings) if settings
-    end
-    @sns
   end
 
   def account_binding_for(binding_account)
