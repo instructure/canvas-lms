@@ -1,17 +1,17 @@
 module Export
   module GradeDownload
     class << self
-      def csv params
+      def csv user, params
         assignments_info = []
 
         students = []
 
         if params[:assignment_id]
-          assignments_info << get_assignment_info(params[:assignment_id])
+          assignments_info << get_assignment_info(user, params[:assignment_id])
           students = Course.find(Assignment.find(params[:assignment_id]).context_id).students.active
         elsif params[:course_id]
           Course.find(params[:course_id]).assignments.active.each do |a|
-            assignments_info << get_assignment_info(a.id)
+            assignments_info << get_assignment_info(user, a.id)
           end
           students = Course.find(params[:course_id]).students.active
         end
@@ -130,11 +130,11 @@ module Export
         output
       end
     
-      def get_assignment_info(assignment_id)
+      def get_assignment_info(user, assignment_id)
         assignment = Assignment.find(assignment_id)
         sg = Assignment::SpeedGrader.new(
           assignment,
-          @current_user,
+          user,
           avatars: false,
           grading_role: :grader
         ).json
