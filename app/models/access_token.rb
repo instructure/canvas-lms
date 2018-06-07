@@ -88,13 +88,13 @@ class AccessToken < ActiveRecord::Base
 
   def usable?(token_key = :crypted_token)
     # true if
-    # developer key is active AND
+    # developer key is usable AND
     # there is a user id AND
     # its not expired OR Its a refresh token
     # since you need a refresh token to
     # refresh expired tokens
 
-    if !developer_key_id || cached_developer_key.try(:active?)
+    if !developer_key_id || cached_developer_key.try(:usable?)
       # we are a stand alone token, or a token with an active developer key
       # make sure we
       #   - have a user id

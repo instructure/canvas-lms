@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
 import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup'
 import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
 import I18n from 'i18n!react_developer_keys'
@@ -33,7 +34,8 @@ export default class DeveloperKeyFormFields extends React.Component {
 
     const { developerKey } = props
     this.state = {
-      requireScopes: developerKey && developerKey.require_scopes
+      requireScopes: developerKey && developerKey.require_scopes,
+      testClusterOnly: developerKey && developerKey.test_cluster_only
     }
   }
 
@@ -43,6 +45,10 @@ export default class DeveloperKeyFormFields extends React.Component {
 
   get requireScopes () {
     return this.state.requireScopes
+  }
+
+  get testClusterOnly () {
+    return this.state.testClusterOnly
   }
 
   setKeyFormRef = node => { this.keyFormRef = node }
@@ -57,6 +63,23 @@ export default class DeveloperKeyFormFields extends React.Component {
 
   handleRequireScopesChange = () => {
     this.setState({ requireScopes: !this.state.requireScopes })
+  }
+
+  handleTestClusterOnlyChange = () => {
+    this.setState({ testClusterOnly: !this.state.testClusterOnly })
+  }
+
+  renderTestClusterOnlyCheckbox() {
+    if (ENV.enableTestClusterChecks) {
+      return (
+        <Checkbox
+          label={I18n.t('Test Cluster Only')}
+          name="developer_key[test_cluster_only]"
+          checked={this.state.testClusterOnly}
+          onChange={this.handleTestClusterOnlyChange}
+        />
+      )
+    }
   }
 
   render() {
@@ -107,6 +130,7 @@ export default class DeveloperKeyFormFields extends React.Component {
                   defaultValue={this.fieldValue('notes')}
                   resize="both"
                 />
+                {this.renderTestClusterOnlyCheckbox()}
               </FormFieldGroup>
             </GridCol>
             <GridCol width={8}>

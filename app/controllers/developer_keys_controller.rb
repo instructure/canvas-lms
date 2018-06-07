@@ -29,7 +29,10 @@ class DeveloperKeysController < ApplicationController
     respond_to do |format|
       format.html do
         set_navigation
-        js_env(accountEndpoint: api_v1_account_developer_keys_path(@context))
+        js_env(
+          accountEndpoint: api_v1_account_developer_keys_path(@context),
+          enableTestClusterChecks: DeveloperKey.test_cluster_checks_enabled?
+        )
 
         if use_new_dev_key_features?
           render :index_react
@@ -147,6 +150,7 @@ class DeveloperKeysController < ApplicationController
         :redirect_uris,
         :vendor_code,
         :visible,
+        :test_cluster_only,
         :require_scopes,
         scopes: []
       )

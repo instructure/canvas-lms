@@ -31,11 +31,13 @@ module Api::V1::DeveloperKey
   def developer_key_json(key, user, session, context, show_bindings=false, inherited: false)
     context ||= Account.site_admin
     account_binding = key.account_binding_for(context) if show_bindings.present?
-    keys_to_show =  if inherited
+    keys_to_show = if inherited
       INHERITED_DEVELOPER_KEY_JSON_ATTRS
     else
       DEVELOPER_KEY_JSON_ATTRS
     end
+
+    keys_to_show += ['test_cluster_only'] if DeveloperKey.test_cluster_checks_enabled?
 
     api_json(key, user, session, :only => keys_to_show).tap do |hash|
       if (context.grants_right?(user, session, :manage_developer_keys) || user.try(:id) == key.user_id) && !inherited

@@ -52,6 +52,10 @@ export default class DeveloperKeyModal extends React.Component {
     return this.newForm && this.newForm.requireScopes
   }
 
+  get testClusterOnly () {
+    return this.newForm && this.newForm.testClusterOnly
+  }
+
   submitForm = () => {
     const method = this.developerKey() ? 'put' : 'post'
     const formData = new FormData(this.submissionForm)
@@ -70,6 +74,11 @@ export default class DeveloperKeyModal extends React.Component {
       })
       formData.append('developer_key[require_scopes]', true)
     }
+
+    if (!this.testClusterOnly) {
+      formData.append('developer_key[test_cluster_only]', false)
+    }
+
     this.props.store.dispatch(
       this.props.actions.createOrEditDeveloperKey(formData, this.developerKeyUrl(), method)
     )

@@ -25,7 +25,7 @@ module Lti::Ims::AccessTokenHelper
 
   def validate_access_token!
     access_token.validate!
-    raise Lti::Oauth2::InvalidTokenError 'Developer Key is not active' if developer_key && !developer_key.active?
+    raise Lti::Oauth2::InvalidTokenError 'Developer Key is not active or available in this environment' if developer_key && !developer_key.usable?
   rescue Lti::Oauth2::InvalidTokenError
     raise
   rescue StandardError => e
