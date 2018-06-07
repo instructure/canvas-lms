@@ -2290,6 +2290,14 @@ class ApplicationController < ActionController::Base
     nil
   end
 
+  def self.test_cluster_name
+    nil
+  end
+
+  def self.test_cluster?
+    false
+  end
+
   def setup_live_events_context
     ctx = {}
 

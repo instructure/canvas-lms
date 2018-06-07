@@ -60,7 +60,7 @@ class Feature
   end
 
   def self.production_environment?
-    Rails.env.production? && !(ApplicationController.respond_to?(:test_cluster?) && ApplicationController.test_cluster?)
+    Rails.env.production? && !ApplicationController.test_cluster?
   end
 
   # Register one or more features.  Must be done during application initialization.
