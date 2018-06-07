@@ -512,19 +512,24 @@ $context_module_bg_color: #FFF;
 
 #context_modules.editable, #context_modules.unlocked {
   .context_module_item {
+    opacity: 1;
     &.after_current_position {
       opacity: 1;
-      .title {
-        display: inline-block;
-      }
-      .locked_title {
-        display: none;
-      }
-      .item_name {
-        opacity: 1;
-      }
     }
   }
+  .completion_requirement {
+    color: var(--ic-brand-font-color-dark);
+  }
+  .title, .ig-title {
+    display: inline-block;
+  }
+  .locked_title {
+    display: none;
+  }
+  .item_name {
+    opacity: 1;
+  }
+
 }
 
 .module_item_select {
