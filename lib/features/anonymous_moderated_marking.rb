@@ -28,7 +28,7 @@ Feature.register(
     state: 'allowed',
     root_opt_in: true,
     beta: true,
-    development: true
+    development: false
   },
   anonymous_marking:  {
     display_name: -> { I18n.t 'Anonymous Marking' },
@@ -38,10 +38,10 @@ Feature.register(
       DESCRIPTION
     },
     applies_to: 'Course',
-    state: 'hidden',
+    state: 'allowed',
     root_opt_in: true,
     beta: true,
-    development: true,
+    development: false,
     visible_on: ->(context) do
       if context.is_a?(Account)
         context.feature_enabled?(:anonymous_moderated_marking)
