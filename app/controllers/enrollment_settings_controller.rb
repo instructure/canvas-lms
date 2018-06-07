@@ -8,6 +8,7 @@ class EnrollmentSettingsController < ApplicationController
       setting: params[:id],
       value: params[:value]
     )
+    render json: {'status': 'ok'}
   end
 
   def index
@@ -15,6 +16,4 @@ class EnrollmentSettingsController < ApplicationController
       id: params[:enrollment_id]
     )
   end
-
-
 end

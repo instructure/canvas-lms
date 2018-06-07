@@ -76,9 +76,10 @@ class ContextModulesController < ApplicationController
       module_file_details = load_module_file_details if @context.grants_right?(@current_user, session, :manage_content)
       sequence_control = true # True by default
       enrollment = Enrollment.find_by(course_id: @context.id, user_id: @current_user.id)
+
       if enrollment
         settings = SettingsService.get_enrollment_settings(id: enrollment.id)
-        sequence_control = !settings.any? {|item| item['setting'] == "sequence_control" and item["value"] == "false" }
+        sequence_control = false if !settings["sequence_control"].nil? && settings["sequence_control"] == false
       end
 
       js_env :course_id => @context.id,
@@ -129,7 +130,7 @@ class ContextModulesController < ApplicationController
       else
         @display_header_image = false
       end
-      
+
 
       set_tutorial_js_env
 

@@ -23,13 +23,18 @@ Dir["{gems,vendor}/plugins/*/config/pre_routes.rb"].each { |pre_routes|
 }
 
 CanvasRails::Application.routes.draw do
+  mount CanvasShim::Engine, at: "/canvas_shim"
   post "/api/graphql", to: "graphql#execute"
   get 'graphiql', to: 'graphql#graphiql'
 
   resources(:enrollments) do
     resources(:settings, controller: :enrollment_settings)
   end
-  
+
+  resources(:users) do
+    resources(:settings, controller: :user_settings)
+  end
+
   resources :submission_comments, only: [:update, :destroy]
 
   resources :epub_exports, only: [:index]

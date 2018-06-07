@@ -141,11 +141,6 @@ import 'compiled/jquery.rails_flash_notifications'
           return;
         }
 
-        if (!ENV.SEQUENCE_CONTROL)
-       {
-         $modules.removeClass('after_current_position');
-       }
-
         var url = $(".progression_list_url").attr('href');
         if($(".context_module_item.progression_requirement:visible").length > 0) {
           $(".loading_module_progressions_link").show().attr('disabled', true);
@@ -786,6 +781,11 @@ import 'compiled/jquery.rails_flash_notifications'
         var progression_state_capitalized = progression_state && progression_state.charAt(0).toUpperCase() + progression_state.substring(1);
 
         $module.addClass(progression_state);
+
+        if (!ENV.SEQUENCE_CONTROL)
+        {
+          $("#context_modules").addClass('unlocked');
+        }
 
         // Locked tooltip title is added in _context_module_next.html.erb
         if (progression_state != 'locked' && progression_state != 'unlocked') {
