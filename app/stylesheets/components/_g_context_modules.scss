@@ -510,7 +510,7 @@ $context_module_bg_color: #FFF;
   }
 }
 
-#context_modules.editable {
+#context_modules.editable, #context_modules.unlocked {
   .context_module_item {
     &.after_current_position {
       opacity: 1;
@@ -519,6 +519,9 @@ $context_module_bg_color: #FFF;
       }
       .locked_title {
         display: none;
+      }
+      .item_name {
+        opacity: 1;
       }
     }
   }
