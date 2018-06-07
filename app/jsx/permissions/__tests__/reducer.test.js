@@ -249,6 +249,59 @@ it('UPDATE_ROLE updates the label correct', () => {
   expect(newState.roles).toEqual(expectedState)
 })
 
+it('ADD_NEW_ROLE updates the label correct', () => {
+  const originalState = {
+    roles: [
+      {
+        base_role_type: 'StudentEnrollment',
+        id: '9',
+        label: 'steven',
+        role: 'StudentEnrollment',
+        workflow_state: 'active'
+      },
+      {
+        base_role_type: 'TeacherEnrollment',
+        id: '10',
+        label: 'aaron',
+        role: 'TeacherEnrollment',
+        workflow_state: 'active'
+      }
+    ]
+  }
+  const payload = {
+    base_role_type: 'StudentEnrollment',
+    id: '11',
+    label: 'venk angry',
+    role: 'venk angry',
+    workflow_state: 'active'
+  }
+  const newState = reduce(actions.addNewRole(payload), originalState)
+  const expectedState = [
+    {
+      base_role_type: 'StudentEnrollment',
+      id: '9',
+      label: 'steven',
+      role: 'StudentEnrollment',
+      workflow_state: 'active'
+    },
+    {
+      base_role_type: 'StudentEnrollment',
+      id: '11',
+      label: 'venk angry',
+      role: 'venk angry',
+      workflow_state: 'active'
+    },
+    {
+      base_role_type: 'TeacherEnrollment',
+      id: '10',
+      label: 'aaron',
+      role: 'TeacherEnrollment',
+      workflow_state: 'active'
+    }
+  ]
+  expect(newState.roles).toEqual(expectedState)
+})
+
 it('DISPLAY_PERMISSION_TRAY sets the activePermissionTray in the store', () => {
   const originalState = {activePermissionTray: null}
   const payload = {permission: {label: 'newRoleSim', permission_name: 'role2'}}

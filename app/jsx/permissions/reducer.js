@@ -25,6 +25,8 @@ import activeAddTrayReducer from './reducers/activeAddTrayReducer'
 import activePermissionTrayReducer from './reducers/activePermissionTrayReducer'
 import setFocusReducer from './reducers/setFocusReducer'
 
+import {roleSortedInsert} from './helper/utils'
+
 const permissions = handleActions(
   {
     [actionTypes.UPDATE_PERMISSIONS_SEARCH]: (state, action) => {
@@ -79,7 +81,7 @@ const roles = handleActions(
       )
       return newState
     },
-    [actionTypes.ADD_NEW_ROLE]: (state, action) => [...state, action.payload],
+    [actionTypes.ADD_NEW_ROLE]: (state, action) => roleSortedInsert(state, action.payload),
     [actionTypes.UPDATE_ROLE]: (state, action) =>
       state.map(r => (r.id === action.payload.id ? {...r, ...action.payload} : r))
   },

@@ -33,8 +33,64 @@ export function getPermissionsWithLabels(allPermissions, rolePermissions) {
   }, [])
 }
 
+/*
+ * @returns
+ * true: if roleOne is placed before roleTwo
+ * false: if roleOne is placed after roleTwo
+ */
+function roleComparisonFunction(roleOne, roleTwo) {
+  return (
+    roleOne.base_role_type !== roleTwo.base_role_type ||
+    (roleOne.base_role_type === roleTwo.base_role_type &&
+      parseInt(roleOne.id, 10) <= parseInt(roleTwo.id, 10))
+  )
+}
+
 export function roleIsBaseRole(role) {
   // TODO wonder if there is a better way to see if this is the case, or if there
   //      are any situations where this isn't actually the case
   return role.role === role.base_role_type
+}
+
+/*
+ * Takes a list of roles and a role to role to insert into the list
+ *
+ * @returns
+ * List of sorted roles
+ */
+export function roleSortedInsert(roles, roleToInsert) {
+  const orderedRoles = roles.slice()
+  const index = orderedRoles.findIndex(baseRole => baseRole.role === roleToInsert.base_role_type)
+
+  // Get the role of the matched index
+  let nextIndex = index + 1
+  let nextRole = orderedRoles[nextIndex]
+
+  // Runs as long as there is another role in the array
+  // and the role matches the role we are checking
+  while (nextRole) {
+    if (roleComparisonFunction(roleToInsert, nextRole)) {
+      // if role to be placed needs to be before the currentRole we push
+      // everything over
+      orderedRoles.splice(nextIndex, 0, roleToInsert)
+      return orderedRoles
+    } else {
+      nextIndex++
+      nextRole = orderedRoles[nextIndex]
+    }
+  }
+  orderedRoles.splice(nextIndex, 0, roleToInsert)
+  return orderedRoles
+}
+
+/*
+ * Sorts an array of roles based on role type
+ */
+export const getSortedRoles = roles => {
+  const nonBaseRoles = roles.filter(role => !roleIsBaseRole(role))
+  let orderedRoles = roles.filter(roleIsBaseRole) // Grabs all the base roles for the start
+  nonBaseRoles.forEach(roleToBePlaced => {
+    orderedRoles = roleSortedInsert(orderedRoles, roleToBePlaced)
+  })
+  return orderedRoles
 }
