@@ -60,7 +60,7 @@ gem 'canvas_webex', '0.17'
 gem 'inst-jobs', '0.14.8'
   gem 'rufus-scheduler', '3.4.2', require: false
     gem 'et-orbi', '1.0.8', require: false
-gem 'switchman-inst-jobs', '1.1.6'
+gem 'switchman-inst-jobs', '1.1.7'
 gem 'inst-jobs-autoscaling', '1.0.4'
   gem 'aws-sdk-autoscaling', '1.5.0', require: false
 # ffi 1.9.2x seem to have issues on RHEL & CentOS causing segfaults
