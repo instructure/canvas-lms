@@ -161,7 +161,7 @@
     "eslint-plugin-mocha": "4.11.0",
     "eslint-plugin-notice": "^0.7.7",
     "eslint-plugin-react": "4.3.0",
-    "fetch-mock": "5.12.2",
+    "fetch-mock": "^6",
     "format-message-cli": "^5.1.0",
     "format-message-parse": "^5.1.0",
     "jsdom": "^9",
