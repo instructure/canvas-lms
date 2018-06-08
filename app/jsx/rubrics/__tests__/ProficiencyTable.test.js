@@ -73,6 +73,42 @@ describe('default proficiency', () => {
     })
   })
 
+  it('setting blank description sets error', () => {
+    const wrapper = mount(<ProficiencyTable {...defaultProps()}/>)
+    return promise.then(() => {
+      wrapper.instance().handleDescriptionChange(0)("")
+      wrapper.find('Button').last().simulate('click')
+      expect(wrapper.find('ProficiencyRating').first().prop('descriptionError')).toBe('Missing required description')
+    })
+  })
+
+  it('setting blank points sets error', () => {
+    const wrapper = mount(<ProficiencyTable {...defaultProps()}/>)
+    return promise.then(() => {
+      wrapper.instance().handlePointsChange(0)("")
+      wrapper.find('Button').last().simulate('click')
+      expect(wrapper.find('ProficiencyRating').first().prop('pointsError')).toBe('Invalid points')
+    })
+  })
+
+  it('setting invalid points sets error', () => {
+    const wrapper = mount(<ProficiencyTable {...defaultProps()}/>)
+    return promise.then(() => {
+      wrapper.instance().handlePointsChange(0)("1.1.1")
+      wrapper.find('Button').last().simulate('click')
+      expect(wrapper.find('ProficiencyRating').first().prop('pointsError')).toBe('Invalid points')
+    })
+  })
+
+  it('setting negative points sets error', () => {
+    const wrapper = mount(<ProficiencyTable {...defaultProps()}/>)
+    return promise.then(() => {
+      wrapper.instance().handlePointsChange(0)("-1")
+      wrapper.find('Button').last().simulate('click')
+      expect(wrapper.find('ProficiencyRating').first().prop('pointsError')).toBe('Negative points')
+    })
+  })
+
   it('sends POST on submit', () => {
     const postSpy = jest.spyOn(axios,'post').mockImplementation(() => Promise.resolve({status: 200}))
     const wrapper = mount(<ProficiencyTable {...defaultProps()}/>)
@@ -152,5 +188,11 @@ it('empty rating points leaves state invalid', () => {
 it('invalid rating points leaves state invalid', () => {
   const wrapper = shallow(<ProficiencyTable {...defaultProps()}/>)
   wrapper.instance().handlePointsChange(0)("1.1.1")
+  expect(wrapper.instance().isStateValid()).toBe(false)
+})
+
+it('negative rating points leaves state invalid', () => {
+  const wrapper = shallow(<ProficiencyTable {...defaultProps()}/>)
+  wrapper.instance().handlePointsChange(0)("-1")
   expect(wrapper.instance().isStateValid()).toBe(false)
 })

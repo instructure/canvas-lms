@@ -142,7 +142,7 @@ export default class ProficiencyTable extends React.Component {
   handlePointsChange = _.memoize((index) => (value) => {
     const parsed = NumberHelper.parse(value)
     let rows = this.state.rows
-    if (!this.invalidPoints(parsed)) {
+    if (!this.invalidPoints(parsed) && parsed >= 0) {
       rows = rows.removeIn([index, 'pointsError'])
     }
     rows = rows.setIn([index, 'points'], parsed)
@@ -164,7 +164,7 @@ export default class ProficiencyTable extends React.Component {
   })
 
   isStateValid = () => !this.state.rows.some(row =>
-    this.invalidPoints(row.get('points')) || this.invalidDescription(row.get('description')))
+    this.invalidPoints(row.get('points')) || row.get('points') < 0 || this.invalidDescription(row.get('description')))
 
 
   stateToConfig = () => ({
@@ -204,6 +204,12 @@ export default class ProficiencyTable extends React.Component {
       }
       if (this.invalidPoints(row.get('points'))) {
         r = r.set('pointsError', I18n.t('Invalid points'))
+        if (firstError) {
+          r = r.set('focusField', 'points')
+          firstError = false
+        }
+      } else if (row.get('points') < 0) {
+        r = r.set('pointsError', I18n.t('Negative points'))
         if (firstError) {
           r = r.set('focusField', 'points')
           firstError = false
