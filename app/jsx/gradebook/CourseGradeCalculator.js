@@ -17,11 +17,25 @@
  */
 
 import _ from 'underscore'
+import Big from 'big.js'
 import round from 'compiled/util/round'
 import AssignmentGroupGradeCalculator from '../gradebook/AssignmentGroupGradeCalculator'
 
+function addWithPrecision (a, b) {
+  if (a == null && b == null) {
+    return new Big(0)
+  } else if (a == null) {
+    return new Big(b)
+  } else if (b == null) {
+    return new Big(a)
+  } else {
+    return new Big(a).plus(b)
+  }
+}
+
 function sum (collection) {
-  return _.reduce(collection, (total, value) => (total + value), 0);
+  const bigValue = _.reduce(collection, addWithPrecision, 0)
+  return Number.parseFloat(bigValue, 10)
 }
 
 function sumBy (collection, attr) {
