@@ -257,23 +257,29 @@ it('ADD_NEW_ROLE updates the label correct', () => {
         id: '9',
         label: 'steven',
         role: 'StudentEnrollment',
-        workflow_state: 'active'
+        workflow_state: 'active',
+        displayed: true,
+        contextType: COURSE
       },
       {
         base_role_type: 'TeacherEnrollment',
         id: '10',
         label: 'aaron',
         role: 'TeacherEnrollment',
-        workflow_state: 'active'
+        workflow_state: 'active',
+        displayed: false,
+        contextType: ACCOUNT
       }
     ]
   }
   const payload = {
     base_role_type: 'StudentEnrollment',
     id: '11',
-    label: 'venk angry',
-    role: 'venk angry',
-    workflow_state: 'active'
+    label: 'venk grumpy',
+    role: 'venk grumpy',
+    workflow_state: 'active',
+    displayed: false,
+    contextType: COURSE
   }
   const newState = reduce(actions.addNewRole(payload), originalState)
   const expectedState = [
@@ -282,21 +288,27 @@ it('ADD_NEW_ROLE updates the label correct', () => {
       id: '9',
       label: 'steven',
       role: 'StudentEnrollment',
-      workflow_state: 'active'
+      workflow_state: 'active',
+      displayed: true,
+      contextType: COURSE
     },
     {
       base_role_type: 'StudentEnrollment',
       id: '11',
-      label: 'venk angry',
-      role: 'venk angry',
-      workflow_state: 'active'
+      label: 'venk grumpy',
+      role: 'venk grumpy',
+      workflow_state: 'active',
+      displayed: true,
+      contextType: COURSE
     },
     {
       base_role_type: 'TeacherEnrollment',
       id: '10',
       label: 'aaron',
       role: 'TeacherEnrollment',
-      workflow_state: 'active'
+      workflow_state: 'active',
+      displayed: false,
+      contextType: ACCOUNT
     }
   ]
   expect(newState.roles).toEqual(expectedState)

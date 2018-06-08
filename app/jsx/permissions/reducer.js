@@ -19,6 +19,7 @@
 import {combineReducers} from 'redux'
 import {handleActions} from 'redux-actions'
 import {actionTypes} from './actions'
+import {COURSE} from './propTypes'
 
 import activeRoleTrayReducer from './reducers/activeRoleTrayReducer'
 import activeAddTrayReducer from './reducers/activeAddTrayReducer'
@@ -80,7 +81,13 @@ const roles = handleActions(
         p => (p.id === courseRoleId ? changePermission(p, permissionName, enabled, locked) : p)
       )
     },
-    [actionTypes.ADD_NEW_ROLE]: (state, action) => roleSortedInsert(state, action.payload),
+    [actionTypes.ADD_NEW_ROLE]: (state, action) => {
+      const displayedRole = state.find(role => !!role.displayed)
+      const currentContext = displayedRole.contextType
+      const displayed = currentContext === COURSE
+      const roleToAdd = {...action.payload, displayed, contextType: COURSE}
+      return roleSortedInsert(state, roleToAdd)
+    },
     [actionTypes.UPDATE_ROLE]: (state, action) =>
       state.map(r => (r.id === action.payload.id ? {...r, ...action.payload} : r)),
     [actionTypes.DELETE_ROLE_SUCCESS]: (state, action) =>
