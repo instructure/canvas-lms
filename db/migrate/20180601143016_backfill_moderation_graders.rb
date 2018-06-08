@@ -14,30 +14,21 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
-class ApiScopeMapperLoader
 
-  # The ApiScopeMapper is a generated file that we don't commit.
-  # This method ensures that if the file doesn't exist specs and canvas won't blow up.
-  def self.load
-    unless File.exist?(Rails.root.join('lib', 'api_scope_mapper.rb')) || defined? ApiScopeMapper
-      Object.const_set("ApiScopeMapper", api_scope_mapper_fallback)
+class BackfillModerationGraders < ActiveRecord::Migration[5.0]
+  tag :postdeploy
+
+  def self.up
+    Assignment.where(moderated_grading: true).where("grader_count = 0 or grader_count is null").find_ids_in_ranges do |start_at, end_at|
+      DataFixup::BackfillModerationGraders.send_later_if_production_enqueue_args(
+        :run,
+        {
+          priority: Delayed::LOW_PRIORITY,
+          n_strand: ["DataFixup::BackfillModerationGraders", Shard.current.database_server.id]
+        },
+        start_at,
+        end_at
+      )
     end
-    ApiScopeMapper
   end
-
-  def self.api_scope_mapper_fallback
-    klass = Class.new(Object)
-    klass.class_eval do
-      def self.lookup_resource(controller, _)
-        controller
-      end
-
-      def self.name_for_resource(resource)
-        resource
-      end
-    end
-    klass
-  end
-
 end

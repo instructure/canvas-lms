@@ -104,13 +104,10 @@ class Assignment < ActiveRecord::Base
     self.muted = true if moderated_grading? && anonymous_moderated_marking?
   end
 
-  validates :graders_anonymous_to_graders, absence: true, unless: :anonymous_grading?
-
   with_options unless: :moderated_grading? do
-    validates :grader_comments_visible_to_graders, absence: true
+    validates :graders_anonymous_to_graders, absence: true
     validates :grader_section, absence: true
     validates :final_grader, absence: true
-    validates :grader_names_visible_to_final_grader, absence: true
   end
 
   with_options if: -> { moderated_grading? && anonymous_moderated_marking? } do
@@ -2817,7 +2814,7 @@ class Assignment < ActiveRecord::Base
     return true if context.account_membership_allows(user, :select_final_grade)
     return false unless grader_comments_visible_to_graders?
 
-    !(anonymous_grading? && graders_anonymous_to_graders?)
+    !graders_anonymous_to_graders?
   end
 
   def can_view_other_grader_comments?(user)
@@ -2923,6 +2920,9 @@ class Assignment < ActiveRecord::Base
   def clear_moderated_grading_attributes(assignment)
     assignment.final_grader_id = nil
     assignment.grader_count = nil
+    assignment.grader_names_visible_to_final_grader = true
+    assignment.grader_comments_visible_to_graders = true
+    assignment.graders_anonymous_to_graders = false
   end
 
   def create_moderation_grader_if_needed(grader:)

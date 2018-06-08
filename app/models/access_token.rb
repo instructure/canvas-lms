@@ -230,7 +230,7 @@ class AccessToken < ActiveRecord::Base
 
   def must_only_include_valid_scopes
     return true if scopes.nil?
-    errors.add(:scopes, "must match accepted scopes") unless scopes.all? {|scope| TokenScopes::ALL_SCOPES.include?(scope)}
+    errors.add(:scopes, "must match accepted scopes") unless scopes.all? {|scope| TokenScopes.all_scopes.include?(scope)}
     if developer_key.owner_account.feature_enabled?(:api_token_scoping) && developer_key.require_scopes?
       errors.add(:scopes, 'requested scopes must match scopes on developer key') unless scopes.all? { |scope| developer_key.scopes.include?(scope) }
     end

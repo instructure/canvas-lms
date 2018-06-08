@@ -257,7 +257,7 @@ module SIS
         if next_importer_type == :account
           enqueue_args[:strand] = "sis_account_import:#{@root_account.global_id}" # run one at a time
         else
-          enqueue_args[:n_strand] = ["sis_parallel_import", @root_account.global_id]
+          enqueue_args[:n_strand] = ["sis_parallel_import", @batch.data[:strand_account_id] || @root_account.global_id]
         end
 
         importers_to_queue = @parallel_importers[next_importer_type]

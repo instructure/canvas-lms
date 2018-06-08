@@ -27,7 +27,7 @@ class Login::SamlController < ApplicationController
 
   def new
     increment_saml_stat("login_attempt")
-    session[:saml2_processing] = true if params[:saml2_processing]
+    session[:saml2_processing] = false if Canvas::Plugin.value_to_boolean(params[:saml2_processing], ignore_unrecognized: true) == false
     redirect_to delegated_auth_redirect_uri(aac.generate_authn_request_redirect(host: request.host_with_port,
                                                                                 parent_registration: session[:parent_registration]))
   end
@@ -36,7 +36,9 @@ class Login::SamlController < ApplicationController
     login_error_message = t("There was a problem logging in at %{institution}",
                             institution: @domain_root_account.display_name)
 
-    saml2_processing = session[:saml2_processing] || @domain_root_account.settings[:process_saml_responses_with_saml2]
+    saml2_processing = true
+    saml2_processing = false if session[:saml2_processing] == false
+    saml2_processing = false if @domain_root_account.settings[:process_saml_responses_with_saml2] == false
 
     legacy_response = Onelogin::Saml::Response.new(params[:SAMLResponse])
     response, relay_state = SAML2::Bindings::HTTP_POST.decode(request.request_parameters)
@@ -72,30 +74,22 @@ class Login::SamlController < ApplicationController
     if debugging
       aac.debug_set(:debugging, t('debug.redirect_from_idp', "Received LoginResponse from IdP"))
       aac.debug_set(:idp_response_encoded, params[:SAMLResponse])
-      aac.debug_set(:idp_response_xml_encrypted, encrypted_xml)
-      aac.debug_set(:idp_response_xml_decrypted, response.to_s)
-      aac.debug_set(:idp_in_response_to, response.in_response_to)
-      aac.debug_set(:idp_login_destination, response.destination)
-      aac.debug_set(:login_to_canvas_success, 'false')
-    end
-
-    if debugging
-      aac.debug_set(:debugging, t('debug.redirect_from_idp', "Received LoginResponse from IdP"))
-      aac.debug_set(:idp_response_encoded, params[:SAMLResponse])
       aac.debug_set(:idp_response_xml_encrypted, saml2_processing ? encrypted_xml : legacy_response.xml)
       aac.debug_set(:idp_response_xml_decrypted, saml2_processing ? response.to_s : legacy_response.decrypted_document.to_s)
-      aac.debug_set(:idp_in_response_to, saml2_processing ? response.is_a?(Response) && response.in_response_to : legacy_response.in_response_to)
+      aac.debug_set(:idp_in_response_to, saml2_processing ? response.try(:in_response_to) : legacy_response.in_response_to)
       aac.debug_set(:idp_login_destination, saml2_processing ? response.destination : legacy_response.destination)
       aac.debug_set(:login_to_canvas_success, 'false')
-      if saml2_processing
-        aac.debug_set(:response_validation_result, response.errors)
-      else
+      unless saml2_processing
         aac.debug_set(:fingerprint_from_idp, legacy_response.fingerprint_from_idp)
       end
     end
 
     if !saml2_processing && legacy_response.is_valid? && !response.errors.empty?
-      logger.warn("Response valid via legacy SAML processing, but invalid according to SAML2 processing: #{response.errors.join("\n")}")
+      logger.warn("Response valid via legacy SAML processing from #{legacy_response.issuer}, but invalid according to SAML2 processing: #{response.errors.join("\n")}")
+      unless aac.settings[:first_saml_error]
+        aac.settings[:first_saml_error] = response.errors.join("\n")
+        aac.save!
+      end
     end
 
     if saml2_processing
@@ -120,7 +114,7 @@ class Login::SamlController < ApplicationController
         increment_saml_stat("errors.invalid_response")
         if debugging
           aac.debug_set(:is_valid_login_response, 'false')
-          aac.debug_set(:login_response_validation_error, legacy_response.validation_error)
+          aac.debug_set(:login_response_validation_error, response.errors.join("\n"))
         end
         logger.error "Failed to verify SAML signature: #{legacy_response.validation_error}"
         flash[:delegated_message] = login_error_message
