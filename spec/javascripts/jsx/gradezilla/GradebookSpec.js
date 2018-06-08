@@ -7141,14 +7141,14 @@ QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
     strictEqual(props.enterGradesAs, 'points');
   });
 
-  test('sets isNotCountedForScore to false when the assignment is not counted toward final grade', () => {
+  test('sets isNotCountedForScore to false when the assignment is counted toward final grade', () => {
     gradebook.assignments[2301].omit_from_final_grade = false
     gradebook.setSubmissionTrayState(true, '1101', '2301')
     const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
     strictEqual(props.isNotCountedForScore, false)
   })
 
-  test('sets isNotCountedForScore to false when the assignment is counted toward final grade', () => {
+  test('sets isNotCountedForScore to true when the assignment is not counted toward final grade', () => {
     gradebook.assignments[2301].omit_from_final_grade = true
     gradebook.setSubmissionTrayState(true, '1101', '2301')
     const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
@@ -7157,18 +7157,33 @@ QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
 
   test('sets isNotCountedForScore to false when the assignment group weight is not zero', () => {
     gradebook.assignmentGroups[9000].group_weight = 100
-
     gradebook.setSubmissionTrayState(true, '1101', '2301')
     const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
     strictEqual(props.isNotCountedForScore, false)
   })
 
-  test('sets isNotCountedForScore to true when the assignmentgroup weight is zero', () => {
+  test('sets isNotCountedForScore to true when the assignment group weight is zero and weighting scheme is percent', () => {
     gradebook.assignmentGroups[9000].group_weight = 0
-
+    gradebook.options.group_weighting_scheme = 'percent'
     gradebook.setSubmissionTrayState(true, '1101', '2301')
     const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
     strictEqual(props.isNotCountedForScore, true)
+  })
+
+  test('sets isNotCountedForScore to false when the assignment group weight is not zero and weighting scheme is percent', () => {
+    gradebook.assignmentGroups[9000].group_weight = 100
+    gradebook.options.group_weighting_scheme = 'percent'
+    gradebook.setSubmissionTrayState(true, '1101', '2301')
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+    strictEqual(props.isNotCountedForScore, false)
+  })
+
+  test('sets isNotCountedForScore to false when assignment group weight is zero and weighting scheme is not percent', () => {
+    gradebook.assignmentGroups[9000].group_weight = 0
+    gradebook.options.group_weighting_scheme = 'equals'
+    gradebook.setSubmissionTrayState(true, '1101', '2301')
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+    strictEqual(props.isNotCountedForScore, false)
   })
 
   test('sets pendingGradeInfo when a pending grade exists for the current student/assignment', () => {
