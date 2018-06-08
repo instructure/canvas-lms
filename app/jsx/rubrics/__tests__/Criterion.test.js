@@ -131,4 +131,18 @@ describe('Criterion', () => {
 
     expect(el.find('td')).toHaveLength(1)
   })
+
+  it('allows extra credit for outcomes when enabled', () => {
+    const el = shallow(
+      <Criterion
+        allowExtraCredit
+        assessment={assessments.points.data[1]}
+        criterion={rubrics.points.criteria[1]}
+        freeForm={false}
+        onAssessmentChange={() => {}}
+      />
+    )
+
+    expect(el.find('Points').prop('allowExtraCredit')).toEqual(true)
+  })
 })

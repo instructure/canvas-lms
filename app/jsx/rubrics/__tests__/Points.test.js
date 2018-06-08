@@ -54,17 +54,24 @@ describe('The Points component', () => {
   })
 
   const withText = (pointsText, points) => component({
+    allowExtraCredit: false,
     assessing: true,
     assessment: {
       ...id,
       points,
       pointsText,
     },
-    pointsPossible: 2
+    pointsPossible: 5
   })
 
   it('renders an error when points is a string', () => {
     const el = withText('stringy')
+    expect(el.debug()).toMatchSnapshot()
+    expect(el.find('TextInput').prop('messages')).toHaveLength(1)
+  })
+
+  it('renders an error when extra credit cannot be given', () => {
+    const el = withText('30', 30)
     expect(el.debug()).toMatchSnapshot()
     expect(el.find('TextInput').prop('messages')).toHaveLength(1)
   })

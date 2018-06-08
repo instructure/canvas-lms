@@ -299,6 +299,7 @@ window.rubricAssessment = {
 
       const render = (currentAssessment) => {
         ReactDOM.render(React.createElement(Rubric, {
+          allowExtraCredit: ENV.outcome_extra_credit_enabled,
           onAssessmentChange: assessing ? setCurrentAssessment : null,
           rubric: ENV.rubric,
           rubricAssessment: currentAssessment,

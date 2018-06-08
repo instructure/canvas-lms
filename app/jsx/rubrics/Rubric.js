@@ -39,6 +39,7 @@ const totalAssessingString = (score, possible) =>
 
 const Rubric = (props) => {
   const {
+    allowExtraCredit,
     customRatings,
     onAssessmentChange,
     rubric,
@@ -64,6 +65,7 @@ const Rubric = (props) => {
     const assessment = byCriteria[criterion.id]
     return (
       <Criterion
+        allowExtraCredit={allowExtraCredit}
         key={criterion.id}
         assessment={assessment}
         criterion={criterion}
@@ -113,6 +115,7 @@ const Rubric = (props) => {
   )
 }
 Rubric.propTypes = {
+  allowExtraCredit: PropTypes.bool,
   customRatings: PropTypes.arrayOf(PropTypes.object),
   onAssessmentChange: PropTypes.func,
   rubric: PropTypes.shape(rubricShape).isRequired,
@@ -125,6 +128,7 @@ Rubric.propTypes = {
   isSummary: PropTypes.bool
 }
 Rubric.defaultProps = {
+  allowExtraCredit: false,
   customRatings: [],
   onAssessmentChange: null,
   rubricAssessment: null,

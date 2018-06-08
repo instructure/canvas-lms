@@ -35,6 +35,7 @@ class SubmissionsBaseController < ApplicationController
         rubric = rubric_association&.rubric
         js_env({
           nonScoringRubrics: @domain_root_account.feature_enabled?(:non_scoring_rubrics),
+          outcome_extra_credit_enabled: @context.feature_enabled?(:outcome_extra_credit),
           rubric: rubric ? rubric_json(rubric, @current_user, session, style: 'full') : nil,
           rubricAssociation: rubric_association_json ? rubric_association_json['rubric_association'] : nil,
           outcome_proficiency: outcome_proficiency

@@ -114,6 +114,7 @@ export default class Criterion extends React.Component {
 
   render () {
     const {
+      allowExtraCredit,
       assessment,
       criterion,
       customRatings,
@@ -140,6 +141,7 @@ export default class Criterion extends React.Component {
     const pointsElement = () => (
       <Points
         key="points"
+        allowExtraCredit={!isOutcome || allowExtraCredit}
         assessing={assessing}
         assessment={assessment}
         onPointChange={onPointChange}
@@ -259,6 +261,7 @@ export default class Criterion extends React.Component {
   }
 }
 Criterion.propTypes = {
+  allowExtraCredit: PropTypes.bool,
   assessment: PropTypes.shape(assessmentShape),
   customRatings: PropTypes.arrayOf(PropTypes.object),
   criterion: PropTypes.shape(criterionShape).isRequired,
@@ -268,6 +271,7 @@ Criterion.propTypes = {
   isSummary: PropTypes.bool
 }
 Criterion.defaultProps = {
+  allowExtraCredit: false,
   assessment: null,
   customRatings: [],
   onAssessmentChange: null,
