@@ -218,7 +218,7 @@ class DeveloperKey < ActiveRecord::Base
   private
 
   def invalidate_access_tokens_if_scopes_removed!
-    return unless api_token_scoping_on?
+    return unless developer_key_management_and_scoping_on?
     return unless saved_change_to_scopes?
     return if (scopes_before_last_save - scopes).blank?
     send_later_if_production(:invalidate_access_tokens!)
@@ -232,14 +232,14 @@ class DeveloperKey < ActiveRecord::Base
     if target_account.site_admin?
       return true unless Setting.get(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, nil).present?
     else
-      return true unless target_account.root_account.feature_enabled?(:developer_key_management_ui_rewrite)
+      return true unless target_account.root_account.feature_enabled?(:developer_key_management_and_scoping)
     end
 
     account_binding_for(target_account)&.workflow_state == DeveloperKeyAccountBinding::ON_STATE
   end
 
-  def api_token_scoping_on?
-    owner_account.root_account.feature_enabled?(:api_token_scoping) || (
+  def developer_key_management_and_scoping_on?
+    owner_account.root_account.feature_enabled?(:developer_key_management_and_scoping) || (
       owner_account.site_admin? && Setting.get(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, nil).present?
     )
   end
@@ -249,7 +249,7 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def validate_scopes!
-    return true unless api_token_scoping_on?
+    return true unless developer_key_management_and_scoping_on?
     return true if self.scopes.empty?
     invalid_scopes = self.scopes - TokenScopes.all_scopes
     return true if invalid_scopes.empty?

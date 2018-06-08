@@ -41,7 +41,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
 
   before do
     Setting.set(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, 'true')
-    root_account.enable_feature!(:developer_key_management_ui_rewrite)
+    root_account.enable_feature!(:developer_key_management_and_scoping)
   end
 
   shared_examples 'the developer key account binding create endpoint' do
@@ -64,7 +64,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
 
     it 'renders unauthorized if the flag is not enabled in the root account' do
       allow_any_instance_of(Account).to receive(:feature_enabled?)
-      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(false)
+      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(false)
       user_session(authorized_admin)
       post :create_or_update, params: params
       expect(response).to be_unauthorized
@@ -109,7 +109,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
 
     it 'renders unauthorized if the flag is not enabled in the root account' do
       allow_any_instance_of(Account).to receive(:feature_enabled?)
-      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(false)
+      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(false)
       user_session(unauthorized_admin)
       post :create_or_update, params: params, format: :json
       expect(response).to be_unauthorized
@@ -145,7 +145,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
 
     it 'renders unauthorized if the flag is not enabled in the root account' do
       allow_any_instance_of(Account).to receive(:feature_enabled?)
-      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(false)
+      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(false)
       user_session(unauthorized_admin)
       get :index, params: params, format: :json
       expect(response).to be_unauthorized

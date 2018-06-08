@@ -107,7 +107,7 @@ class DeveloperKeysController < ApplicationController
       requested_context = @context || account_from_params || @key&.owner_account
       return if requested_context.blank?
       has_site_admin_access?(requested_context) ||
-        requested_context.root_account.feature_enabled?(:developer_key_management_ui_rewrite)
+        requested_context.root_account.feature_enabled?(:developer_key_management_and_scoping)
     end
   end
 

@@ -171,7 +171,7 @@ class DeveloperKeyAccountBindingsController < ApplicationController
 
   def verify_feature_flags
     return if account.site_admin? && Setting.get(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, nil).present?
-    return if account.root_account.feature_enabled?(:developer_key_management_ui_rewrite)
+    return if account.root_account.feature_enabled?(:developer_key_management_and_scoping)
     head :unauthorized
   end
 end
