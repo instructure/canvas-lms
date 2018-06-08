@@ -18,6 +18,7 @@
 require_relative '../../common'
 require_relative '../../assignments/page_objects/assignment_page'
 require_relative '../pages/moderate_page'
+require_relative '../pages/gradebook_page'
 
 describe 'Moderated Marking' do
   include_context 'in-process server selenium tests'
@@ -120,6 +121,116 @@ describe 'Moderated Marking' do
       wait_for_ajaximations
 
       expect_flash_message :success, 'The maximum number of graders for this assignment has been reached.'
+    end
+  end
+
+  describe 'moderation page' do
+    before(:each) do
+      # enroll a third teacher
+      @teacher3 = User.create!(name: 'Teacher3')
+      @teacher3.register!
+      @moderated_course.enroll_teacher(@teacher3, enrollment_state: 'active')
+
+      # enroll two students
+      @student1 = User.create!(name: 'Some Student')
+      @student1.register!
+      @moderated_course.enroll_student(@student1, enrollment_state: 'active')
+
+      @student2 = User.create!(name: 'Some Other Student')
+      @student2.register!
+      @moderated_course.enroll_student(@student2, enrollment_state: 'active')
+
+      # update the grader count
+      @moderated_assignment.update(grader_count: 2)
+
+      # grade both students provisionally with teacher 2
+      user_session(@teacher2)
+      @moderated_assignment.grade_student(@student1, grade: 15, grader: @teacher2, provisional: true)
+      @moderated_assignment.grade_student(@student2, grade: 14, grader: @teacher2, provisional: true)
+
+      # grade both students provisionally with teacher 3
+      user_session(@teacher3)
+      @moderated_assignment.grade_student(@student1, grade: 13, grader: @teacher3, provisional: true)
+      @moderated_assignment.grade_student(@student2, grade: 12, grader: @teacher3, provisional: true)
+    end
+
+    it 'allows viewing provisional grades', priority: '1', test_id: 3503385 do
+      # visit the moderation page as teacher 1
+      user_session(@teacher1)
+      ModeratePage.visit(@moderated_course.id, @moderated_assignment.id)
+
+      # expect to see two students with two provisional grades
+      expect(ModeratePage.fetch_student_count).to eq 2
+      expect(ModeratePage.fetch_provisional_grade_count_for_student(@student1)).to eq 2
+      expect(ModeratePage.fetch_provisional_grade_count_for_student(@student2)).to eq 2
+    end
+
+    it 'allows viewing provisional grades and posting final grade', priority: '1', test_id: 3503385 do
+      # visit the moderation page as teacher 1
+      user_session(@teacher1)
+      ModeratePage.visit(@moderated_course.id, @moderated_assignment.id)
+
+      # # select a provisional grade for each student
+      ModeratePage.select_provisional_grade_for_student_by_position(@student1, 1)
+      ModeratePage.select_provisional_grade_for_student_by_position(@student2, 2)
+
+      # # post the grades
+      ModeratePage.click_post_grades_button
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+
+      # go to gradebook
+      Gradebook::MultipleGradingPeriods.visit_gradebook(@moderated_course)
+
+      # expect grades to be shown
+      expect(Gradebook::MultipleGradingPeriods.grading_cell_attributes(0, 0).text).to eq('15')
+      expect(Gradebook::MultipleGradingPeriods.grading_cell_attributes(0, 1).text).to eq('12')
+    end
+
+    it 'shows student names in row headers', priority: '1', test_id: 3503464 do
+      # visit the moderation page as teacher 1
+      user_session(@teacher1)
+      ModeratePage.visit(@moderated_course.id, @moderated_assignment.id)
+
+      # expect student names to be shown
+      student_names = ModeratePage.student_table_row_headers.map(&:text)
+      expect(student_names).to eql ['Some Student', 'Some Other Student']
+    end
+
+    it 'anonymizes students if anonymous grading is enabled', priority: '1', test_id: 3503464 do
+      # enable anonymous grading
+      @moderated_assignment.update(anonymous_grading: true)
+
+      # visit the moderation page as teacher 1
+      user_session(@teacher1)
+      ModeratePage.visit(@moderated_course.id, @moderated_assignment.id)
+
+      # expect student names to be replaced with anonymous stand ins
+      student_names = ModeratePage.student_table_row_headers.map(&:text)
+      expect(student_names).to eql ['Student 1', 'Student 2']
+    end
+
+    it 'shows grader names in table headers', priority: '1', test_id: 3503464 do
+      # visit the moderation page as teacher 1
+      user_session(@teacher1)
+      ModeratePage.visit(@moderated_course.id, @moderated_assignment.id)
+
+      # expect teacher names to be shown
+      grader_names = ModeratePage.student_table_headers.map(&:text)
+      expect(grader_names).to eql ['Teacher2', 'Teacher3']
+    end
+
+    it 'anonymizes graders if grader names visible to final grader is false', priority: '1', test_id: 3503464 do
+      # disable grader names visible to final grader
+      @moderated_assignment.update(grader_names_visible_to_final_grader: false)
+
+      # visit the moderation page as teacher 1
+      user_session(@teacher1)
+      ModeratePage.visit(@moderated_course.id, @moderated_assignment.id)
+
+      # expect teacher names to be replaced with anonymous stand ins
+      grader_names = ModeratePage.student_table_headers.map(&:text)
+      expect(grader_names).to eql ['Grader 1', 'Grader 2']
     end
   end
 end
