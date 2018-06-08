@@ -26,9 +26,65 @@ module Helper
       base_uri PactConfig.mock_provider_service_base_uri
       headers "Authorization" => "Bearer some_token"
 
-      # TODO: modify these to use params
+        # TODO: modify these to use params
       def list_your_courses
         JSON.parse(self.class.get('/api/v1/courses').body)
+      rescue
+        nil
+      end
+
+      def list_discussions(course_id)
+        JSON.parse(self.class.get("/api/v1/courses/#{course_id}/discussion_topics").body)
+      rescue
+        nil
+      end
+
+      def list_wiki_pages(course_id)
+        JSON.parse(self.class.get("/api/v1/courses/#{course_id}/pages/").body)
+      rescue
+        nil
+      end
+
+      def list_quizzes(course_id)
+        JSON.parse(self.class.get("/api/v1/courses/#{course_id}/quizzes").body)
+      rescue
+        nil
+      end
+
+      def list_sections(course_id)
+        JSON.parse(self.class.get("/api/v1/courses/#{course_id}/sections").body)
+      rescue
+        nil
+      end
+
+      def delete_course(course_id)
+        JSON.parse(self.class.delete("/api/v1/courses/#{course_id}", query: "event=delete").body)
+      rescue
+        nil
+      end
+
+      #TODO: Fix or Delete
+      def add_course(account_id, course_name, course_id)
+        JSON.parse(self.class.post("/api/v1/accounts/#{account_id}/courses", query: "course[name]=#{course_name}").body)
+      rescue
+        nil
+      end
+
+      def list(course_id, enrollment_type)
+        JSON.parse(self.class.get("/api/v1/courses/#{course_id}/users", query: "enrollment_type[]=#{enrollment_type}").body)
+      rescue
+        nil
+      end
+
+
+      def list_teachers(course_id)
+        JSON.parse(self.class.get("/api/v1/courses/#{course_id}/users", query: "enrollment_type[]=teacher").body)
+      rescue
+        nil
+      end
+
+      def list_tas(course_id)
+        JSON.parse(self.class.get("/api/v1/courses/#{course_id}/users", query: "enrollment_type[]=ta").body)
       rescue
         nil
       end
