@@ -1557,6 +1557,7 @@ class ApplicationController < ActionController::Base
       end
     else
       flash[:error] = t "#application.errors.invalid_tag_type", "Didn't recognize the item type for this tag"
+      raise([tag, params].inspect)
       redirect_to named_context_url(context, error_redirect_symbol)
     end
   end
