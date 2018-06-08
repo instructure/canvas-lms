@@ -337,12 +337,22 @@ describe('api actions', () => {
         }
       }
     }
+    const expectedFixFocusDispatch = {
+      type: 'FIX_FOCUS',
+      payload: {
+        permissionName: 'delete_course',
+        roleId: '3',
+        targetArea: 'table'
+      }
+    }
+
     actions.modifyPermissions({
       name: 'delete_course',
       id: '3',
       enabled: false,
       locked: true,
-      explicit: true
+      explicit: true,
+      inTray: false
     })(dispatchMock, () => state)
     return moxiosWait(() => {
       const request = moxios.requests.mostRecent()
@@ -356,7 +366,8 @@ describe('api actions', () => {
         })
         .then(() => {
           expect(dispatchMock).toHaveBeenCalledWith(expectedUpdatePermsDispatch)
-          expect(dispatchMock).toHaveBeenCalledTimes(1)
+          expect(dispatchMock).toHaveBeenCalledWith(expectedFixFocusDispatch)
+          expect(dispatchMock).toHaveBeenCalledTimes(2)
           done()
         })
     })

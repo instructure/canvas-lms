@@ -27,7 +27,7 @@ function createRowProps(title, roleId) {
   const role = ROLES.find(r => r.id === roleId)
   const permissionName = Object.keys(role.permissions)[0]
   const permission = role.permissions[permissionName]
-  return {title, role, permission, permissionName}
+  return {title, role, permission, permissionName, useCaching: false}
 }
 
 it('renders the component', () => {

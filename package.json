@@ -48,6 +48,7 @@
     "d3": "3.5.17",
     "formdata-polyfill": "^3.0.9",
     "fullcalendar": "https://github.com/instructure/fullcalendar.git#1108dd1c991a029ec6fd7de3337737ec5295ba97",
+    "html-react-parser": "^0.4.6",
     "graphiql": "^0.11.2",
     "graphql": "^0.13.2",
     "graphql-tag": "^2.8.0",

@@ -61,7 +61,8 @@ export default function PermissionTray(props) {
                 permissionName={props.permissionName}
                 permission={role.permissions[props.permissionName]}
                 role={role}
-                trayIcon
+                useCaching={props.useCaching}
+                inTray
               />
             ))}
           </RoleTrayTable>
@@ -78,7 +79,8 @@ export default function PermissionTray(props) {
                 permissionName={props.permissionName}
                 permission={role.permissions[props.permissionName]}
                 role={role}
-                trayIcon
+                useCaching={props.useCaching}
+                inTray
               />
             ))}
           </RoleTrayTable>
@@ -94,7 +96,12 @@ PermissionTray.propTypes = {
   label: PropTypes.string.isRequired,
   open: PropTypes.bool.isRequired,
   unassignedRoles: PropTypes.arrayOf(permissionPropTypes.role).isRequired,
-  permissionName: PropTypes.string.isRequired
+  permissionName: PropTypes.string.isRequired,
+  useCaching: PropTypes.bool
+}
+
+PermissionTray.defaultProps = {
+  useCaching: true
 }
 
 function mapStateToProps(state, ownProps) {

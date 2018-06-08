@@ -29,16 +29,23 @@ const defaultProps = () => ({
     {
       id: '1',
       label: 'Role 1',
-      permissions: {permission_1: 'permission_1', permission_2: 'permission_2'},
+      permissions: {
+        permission_1: 'permission_1',
+        permission_2: 'permission_2'
+      },
       displayed: true
     },
     {
       id: '2',
       label: 'Role 2',
-      permissions: {permission_1: 'permission_1', permission_2: 'permission_2'},
+      permissions: {
+        permission_1: 'permission_1',
+        permission_2: 'permission_2'
+      },
       displayed: true
     }
   ],
+  useCaching: false,
   setAndOpenRoleTray: () => {},
   setAndOpenPermissionTray: () => {},
   permissions: [
@@ -51,7 +58,12 @@ const store = {
   getState: () => ({
     contextId: 1,
     permissions: [],
-    roles: []
+    roles: [],
+    nextFocus: {
+      permissionName: null,
+      roleId: null,
+      targetArea: null
+    }
   }),
   dispatch() {},
   subscribe() {}

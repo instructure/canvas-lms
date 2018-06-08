@@ -158,7 +158,14 @@ function changePermission(role, permissionName, enabled, locked, explicit) {
   }
 }
 
-actions.modifyPermissions = function modifyPermissions({name, id, enabled, locked, explicit}) {
+actions.modifyPermissions = function modifyPermissions({
+  name,
+  id,
+  enabled,
+  locked,
+  explicit,
+  inTray
+}) {
   return (dispatch, getState) => {
     const role = getState().roles.find(r => r.id === id)
     const updatedRole = changePermission(role, name, enabled, locked, explicit)
@@ -167,6 +174,7 @@ actions.modifyPermissions = function modifyPermissions({name, id, enabled, locke
       .then(res => {
         const newRes = {...res.data, contextType: role.contextType, displayed: role.displayed}
         dispatch(actions.updatePermissions({role: newRes}))
+        dispatch(actions.fixButtonFocus({permissionName: name, roleId: id, inTray}))
         showFlashSuccess(I18n.t('Successfully updated permission'))()
       })
       .catch(_error => {
@@ -215,6 +223,11 @@ actions.updateBaseRole = function updateBaseRole(role, baseRole, onSuccess, onFa
         onFail()
       })
   }
+}
+
+actions.fixButtonFocus = function fixButtonFocus({permissionName, roleId, inTray}) {
+  const targetArea = inTray ? 'tray' : 'table'
+  return actions.fixFocus({permissionName, roleId, targetArea})
 }
 
 const actionTypes = types.reduce((acc, type) => {

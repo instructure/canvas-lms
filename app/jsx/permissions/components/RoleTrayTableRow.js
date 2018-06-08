@@ -38,7 +38,8 @@ export default function RoleTrayTableRow({
   permission,
   permissionName,
   role,
-  trayIcon
+  inTray,
+  useCaching
 }) {
   return (
     <Container as="div">
@@ -69,12 +70,15 @@ export default function RoleTrayTableRow({
         </FlexItem>
 
         <FlexItem>
-          <ConnectedPermissionButton
-            permission={permission}
-            permissionName={permissionName}
-            courseRoleId={role.id}
-            trayIcon={trayIcon}
-          />
+          <div className="ic-permissions__cell-content">
+            <ConnectedPermissionButton
+              permission={permission}
+              permissionName={permissionName}
+              roleId={role.id}
+              inTray={inTray}
+              useCaching={useCaching}
+            />
+          </div>
         </FlexItem>
       </Flex>
     </Container>
@@ -87,12 +91,14 @@ RoleTrayTableRow.propTypes = {
   permission: permissionPropTypes.rolePermission.isRequired,
   permissionName: PropTypes.string.isRequired,
   role: permissionPropTypes.role.isRequired,
-  trayIcon: PropTypes.bool,
-  title: PropTypes.string.isRequired
+  inTray: PropTypes.bool,
+  title: PropTypes.string.isRequired,
+  useCaching: PropTypes.bool
 }
 
 RoleTrayTableRow.defaultProps = {
   description: '',
   expandable: false,
-  trayIcon: false
+  inTray: false,
+  useCaching: true
 }

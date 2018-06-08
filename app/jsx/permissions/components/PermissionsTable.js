@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!permissions'
 import React, {Component} from 'react'
-import {arrayOf, func} from 'prop-types'
+import {arrayOf, bool, func} from 'prop-types'
 import {connect} from 'react-redux'
 import $ from 'jquery'
 // For screenreaderFlashMessageExclusive  Maybe there's a better way
@@ -39,7 +39,12 @@ export default class PermissionsTable extends Component {
     roles: arrayOf(propTypes.role).isRequired,
     permissions: arrayOf(propTypes.permission).isRequired,
     setAndOpenRoleTray: func.isRequired,
-    setAndOpenPermissionTray: func.isRequired
+    setAndOpenPermissionTray: func.isRequired,
+    useCaching: bool
+  }
+
+  static defaultProps = {
+    useCaching: true
   }
 
   state = {
@@ -184,7 +189,9 @@ export default class PermissionsTable extends Component {
                     <ConnectedPermissionButton
                       permission={role.permissions[perm.permission_name]}
                       permissionName={perm.permission_name}
-                      courseRoleId={role.id}
+                      roleId={role.id}
+                      useCaching={this.props.useCaching}
+                      inTray={false}
                     />
                   </div>
                 </td>

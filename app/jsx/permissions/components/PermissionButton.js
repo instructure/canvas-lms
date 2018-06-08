@@ -18,16 +18,16 @@
 
 import I18n from 'i18n!permission_button'
 import PropTypes from 'prop-types'
+import Parser from 'html-react-parser'
 import React, {Component} from 'react'
+import {renderToString} from 'react-dom/server'
 import {connect} from 'react-redux'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import IconPublish from '@instructure/ui-icons/lib/Solid/IconPublish'
 import IconTrouble from '@instructure/ui-icons/lib/Line/IconTrouble'
 import IconLock from '@instructure/ui-icons/lib/Solid/IconLock'
 import View from '@instructure/ui-layout/lib/components/View'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import Menu, {
   MenuItem,
   MenuItemGroup,
@@ -40,11 +40,23 @@ import propTypes from '../propTypes'
 export default class PermissionButton extends Component {
   static propTypes = {
     cleanFocus: PropTypes.func.isRequired,
+    fixButtonFocus: PropTypes.func.isRequired,
     handleClick: PropTypes.func.isRequired,
+    inTray: PropTypes.bool.isRequired,
     permission: propTypes.rolePermission.isRequired,
     permissionName: PropTypes.string.isRequired,
-    courseRoleId: PropTypes.string.isRequired,
-    setFocus: PropTypes.bool.isRequired
+    roleId: PropTypes.string.isRequired,
+    setFocus: PropTypes.bool.isRequired,
+    useCaching: PropTypes.bool // Allows disabling of cache for unit tests
+  }
+
+  static defaultProps = {
+    useCaching: true
+  }
+
+  state = {
+    showMenu: false,
+    useCaching: this.props.useCaching
   }
 
   componentDidMount = () => {
@@ -52,6 +64,81 @@ export default class PermissionButton extends Component {
       this.button.focus()
       this.props.cleanFocus()
     }
+  }
+
+  componentWillReceiveProps() {
+    // When updating an already rendered component we need to not use the
+    // caching, otherwise we could end up with a button that has a different
+    // react-id, and that just ruins everything. The caching is a speed up for
+    // initial page load, swapping between tabs, etc.
+    this.setState({useCaching: false})
+  }
+
+  componentDidUpdate = () => {
+    if (this.props.setFocus) {
+      this.button.focus()
+      this.props.cleanFocus()
+    }
+  }
+
+  setupButtonRef = c => {
+    this.button = c
+  }
+
+  getCachedButton = isEnabled => {
+    const storageKey = isEnabled ? 'enabledButton' : 'disabledButton'
+
+    if (this.state.useCaching) {
+      const retrievedObject = localStorage.getItem(storageKey)
+      if (retrievedObject) {
+        return Parser(retrievedObject)
+      }
+    }
+
+    const button = (
+      <Text color={isEnabled ? 'success' : 'error'}>
+        {isEnabled ? <IconPublish size="x-small" /> : <IconTrouble size="x-small" />}
+      </Text>
+    )
+
+    if (this.state.useCaching) {
+      localStorage.setItem(storageKey, renderToString(button))
+    }
+    return button
+  }
+
+  getCachedLockIcon = () => {
+    if (this.state.useCaching) {
+      const retrievedObject = localStorage.getItem('lockedIcon')
+      if (retrievedObject) {
+        return Parser(retrievedObject)
+      }
+    }
+
+    const icon = (
+      <Text color="primary">
+        <IconLock />
+      </Text>
+    )
+
+    if (this.state.useCaching) {
+      localStorage.setItem('lockedIcon', renderToString(icon))
+    }
+    return icon
+  }
+
+  openMenu = () => {
+    this.setState({showMenu: true})
+  }
+
+  closeMenu = () => {
+    this.setState({showMenu: false}, () =>
+      this.props.fixButtonFocus({
+        permissionName: this.props.permissionName,
+        roleId: this.props.roleId,
+        inTray: this.props.inTray
+      })
+    )
   }
 
   checkedSelection(enabled, locked, explicit) {
@@ -68,25 +155,26 @@ export default class PermissionButton extends Component {
     }
   }
 
-  renderMenu = () => (
+  renderButton = () => (
+    <button
+      ref={this.setupButtonRef}
+      onClick={this.state.showMenu ? this.closeMenu : this.openMenu}
+      className={this.props.permission.readonly ? 'ic-disabled_permission_button' : null}
+      disabled={this.props.permission.readonly}
+    >
+      {this.getCachedButton(this.props.permission.enabled)}
+    </button>
+  )
+
+  renderMenu = button => (
     <Menu
       placement="bottom center"
-      trigger={
-        <Button
-          disabled={this.props.permission.readonly}
-          variant="icon"
-          size="medium"
-          buttonRef={c => (this.button = c)}
-        >
-          <Text color={this.props.permission.enabled ? 'success' : 'error'}>
-            {this.props.permission.enabled ? (
-              <IconPublish size="x-small" />
-            ) : (
-              <IconTrouble size="x-small" />
-            )}
-          </Text>
-        </Button>
-      }
+      trigger={button}
+      defaultShow={!this.props.inTray}
+      onSelect={this.props.inTray ? () => {} : this.closeMenu}
+      onDismiss={this.props.inTray ? () => {} : this.closeMenu}
+      onBlur={this.props.inTray ? () => {} : this.closeMenu}
+      shouldFocusTriggerOnClose={false}
     >
       <MenuItemGroup
         label=""
@@ -103,10 +191,11 @@ export default class PermissionButton extends Component {
           onClick={() =>
             this.props.handleClick({
               name: this.props.permissionName,
-              id: this.props.courseRoleId,
+              id: this.props.roleId,
               enabled: true,
               locked: false,
-              explicit: true
+              explicit: true,
+              inTray: this.props.inTray
             })
           }
         >
@@ -117,10 +206,11 @@ export default class PermissionButton extends Component {
           onClick={() =>
             this.props.handleClick({
               name: this.props.permissionName,
-              id: this.props.courseRoleId,
+              id: this.props.roleId,
               enabled: true,
               locked: true,
-              explicit: true
+              explicit: true,
+              inTray: this.props.inTray
             })
           }
         >
@@ -131,10 +221,11 @@ export default class PermissionButton extends Component {
           onClick={() =>
             this.props.handleClick({
               name: this.props.permissionName,
-              id: this.props.courseRoleId,
+              id: this.props.roleId,
               enabled: false,
               locked: false,
-              explicit: true
+              explicit: true,
+              inTray: this.props.inTray
             })
           }
         >
@@ -145,10 +236,11 @@ export default class PermissionButton extends Component {
           onClick={() =>
             this.props.handleClick({
               name: this.props.permissionName,
-              id: this.props.courseRoleId,
+              id: this.props.roleId,
               enabled: false,
               locked: true,
-              explicit: true
+              explicit: true,
+              inTray: this.props.inTray
             })
           }
         >
@@ -156,16 +248,16 @@ export default class PermissionButton extends Component {
         </MenuItem>
 
         <MenuItemSeparator />
-        {/* TO DO : enabled vs disabled? How do we know? This is just a placeholder! */}
         <MenuItem
           value={I18n.t('Use Default')}
           onClick={() =>
             this.props.handleClick({
               name: this.props.permissionName,
-              id: this.props.courseRoleId,
+              id: this.props.roleId,
               enabled: this.props.permission.enabled,
               locked: false,
-              explicit: false
+              explicit: false,
+              inTray: this.props.inTray
             })
           }
         >
@@ -178,37 +270,47 @@ export default class PermissionButton extends Component {
   )
 
   render() {
+    // Note: for performance, we do not initialize the menu button at all until
+    //       the button is clicked, unless we are in a tray (which has significatnly
+    //       less buttons). The reason we do something different if the button is
+    //       in the tray is because focus is able to escape from the tray if we
+    //       do it the other way, and performance of the tray is not currently
+    //       an issue.
+    const button = this.renderButton()
     return (
-      <View as="div" textAlign="center">
-        <Flex justifyItems="center">
-          <FlexItem size="20px" />
-
-          <FlexItem size="25px">{this.renderMenu()}</FlexItem>
-
-          <FlexItem size="20px">
-            <Text color="primary">
-              {this.props.permission.locked && this.props.permission.explicit ? <IconLock /> : ''}
-            </Text>
-          </FlexItem>
-        </Flex>
-      </View>
+      <div className="ic-permissions__permission-button-container">
+        <div>{this.props.inTray || this.state.showMenu ? this.renderMenu(button) : button}</div>
+        <div
+          className={
+            this.props.permission.locked && this.props.permission.explicit
+              ? null
+              : 'ic-hidden-button'
+          }
+        >
+          {this.getCachedLockIcon()}
+        </div>
+      </div>
     )
   }
 }
 
 function mapStateToProps(state, ownProps) {
-  const setFocus =
-    ownProps.trayIcon &&
+  const targetFocusButton =
     ownProps.permissionName === state.nextFocus.permissionName &&
-    ownProps.courseRoleId === state.nextFocus.roleId
+    ownProps.roleId === state.nextFocus.roleId
+  const targetFocusArea =
+    (state.nextFocus.targetArea === 'tray' && ownProps.inTray) ||
+    (state.nextFocus.targetArea === 'table' && !ownProps.inTray)
+
   const stateProps = {
-    setFocus
+    setFocus: targetFocusButton && targetFocusArea
   }
   return {...stateProps, ...ownProps}
 }
 
 const mapDispatchToProps = {
   handleClick: actions.modifyPermissions,
+  fixButtonFocus: actions.fixButtonFocus,
   cleanFocus: actions.cleanFocus
 }
 

@@ -102,7 +102,8 @@ const DEFAULT_PROPS = () => ({
   searchPermissions: () => {},
   filterRoles: () => {},
   tabChanged: () => {},
-  setAndOpenAddTray: () => {}
+  setAndOpenAddTray: () => {},
+  useCaching: false
 })
 
 const STORE = {
@@ -114,7 +115,12 @@ const STORE = {
     permissionSearchString: '',
     selectedRoles: [],
     permissions: PERMISSIONS,
-    roles: ROLES
+    roles: ROLES,
+    nextFocus: {
+      permissionName: null,
+      roleId: null,
+      targetArea: null
+    }
   }),
   dispatch() {},
   subscribe() {}

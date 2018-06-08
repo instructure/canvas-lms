@@ -21,51 +21,64 @@ import {mount} from 'enzyme'
 
 import PermissionButton from '../PermissionButton'
 
-const handlingClick = jest.fn()
-
 const defaultProps = () => ({
   permission: {enabled: true, locked: false, readonly: false, explicit: true},
   permissionName: 'add',
   cleanFocus: () => {},
+  inTray: false,
   setFocus: false,
-  courseRoleId: '1',
-  handleClick: handlingClick
+  roleId: '1',
+  fixButtonFocus: () => {},
+  handleClick: () => {},
+  useCaching: false
 })
 
 const disabledProps = () => ({
   permission: {enabled: false, locked: false, readonly: false, explicit: true},
   permissionName: 'add',
   cleanFocus: () => {},
+  inTray: false,
   setFocus: false,
-  courseRoleId: '1',
-  handleClick: handlingClick
+  roleId: '1',
+  fixButtonFocus: () => {},
+  handleClick: () => {},
+  useCaching: false
 })
 
 const enabledAndLockedProps = () => ({
   permission: {enabled: true, locked: true, readonly: false, explicit: true},
   permissionName: 'add',
   cleanFocus: () => {},
+  inTray: false,
   setFocus: false,
-  courseRoleId: '1',
-  handleClick: handlingClick
+  roleId: '1',
+  fixButtonFocus: () => {},
+  handleClick: () => {},
+  useCaching: false
 })
 
 const disabledAndLockedProps = () => ({
   permission: {enabled: false, locked: true, readonly: false, explicit: true},
   permissionName: 'add',
   cleanFocus: () => {},
+  inTray: false,
   setFocus: false,
-  courseRoleId: '1',
-  handleClick: handlingClick
+  roleId: '1',
+  fixButtonFocus: () => {},
+  handleClick: () => {},
+  useCaching: false
 })
 
 const readOnly = () => ({
   permission: {enabled: false, locked: true, readonly: true, explicit: true},
   permissionName: 'add',
   cleanFocus: () => {},
+  inTray: false,
   setFocus: false,
-  courseRoleId: '1',
-  handleClick: handlingClick
+  roleId: '1',
+  fixButtonFocus: () => {},
+  handleClick: () => {},
+  useCaching: false
 })
 
 it('component renders', () => {
@@ -80,11 +93,11 @@ it('displays enabled correctly', () => {
 
   const check = tree.find('IconPublish')
   const x = tree.find('IconTrouble')
-  const lock = tree.find('IconLock')
+  const hideLock = tree.find('.ic-hidden-button')
 
   expect(check.exists()).toEqual(true)
   expect(x.exists()).toEqual(false)
-  expect(lock.exists()).toEqual(false)
+  expect(hideLock.exists()).toEqual(true)
 })
 
 it('displays disabled correctly', () => {
@@ -92,11 +105,11 @@ it('displays disabled correctly', () => {
 
   const check = tree.find('IconPublish')
   const x = tree.find('IconTrouble')
-  const lock = tree.find('IconLock')
+  const hideLock = tree.find('.ic-hidden-button')
 
   expect(check.exists()).toEqual(false)
   expect(x.exists()).toEqual(true)
-  expect(lock.exists()).toEqual(false)
+  expect(hideLock.exists()).toEqual(true)
 })
 
 it('displays enabled and locked correctly', () => {
@@ -104,11 +117,11 @@ it('displays enabled and locked correctly', () => {
 
   const check = tree.find('IconPublish')
   const x = tree.find('IconTrouble')
-  const lock = tree.find('IconLock')
+  const hideLock = tree.find('.ic-hidden-button')
 
   expect(check.exists()).toEqual(true)
   expect(x.exists()).toEqual(false)
-  expect(lock.exists()).toEqual(true)
+  expect(hideLock.exists()).toEqual(false)
 })
 
 it('displays disabled and locked correctly', () => {
@@ -116,15 +129,15 @@ it('displays disabled and locked correctly', () => {
 
   const check = tree.find('IconPublish')
   const x = tree.find('IconTrouble')
-  const lock = tree.find('IconLock')
+  const hideLock = tree.find('.ic-hidden-button')
 
   expect(check.exists()).toEqual(false)
   expect(x.exists()).toEqual(true)
-  expect(lock.exists()).toEqual(true)
+  expect(hideLock.exists()).toEqual(false)
 })
 
 it('displays disabled when permission is readonly', () => {
   const tree = mount(<PermissionButton {...readOnly()} />)
-  const button = tree.find('Button')
+  const button = tree.find('button')
   expect(button.props().disabled).toEqual(true)
 })
