@@ -26,7 +26,7 @@ describe 'classic gradebook' do
   let(:total_grade) do
     grading_period_ids = [0, @gp1.id, @gp2.id]
     user_session(@teacher)
-    Gradebook::MultipleGradingPeriods.visit_gradebook(@course,@teacher)
+    Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
 
     if @grading_period_index
       Gradebook::MultipleGradingPeriods.select_grading_period(grading_period_ids[@grading_period_index])

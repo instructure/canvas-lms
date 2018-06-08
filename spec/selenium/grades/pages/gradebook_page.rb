@@ -115,10 +115,7 @@ module Gradebook
       end
 
       # actions
-      def visit_gradebook(course, user = nil)
-        if user.present?
-          user.preferences[:gradebook_version] = '2'
-        end
+      def visit_gradebook(course)
         get "/courses/#{course.id}/gradebook"
       end
 

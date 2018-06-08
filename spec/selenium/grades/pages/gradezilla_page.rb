@@ -21,8 +21,6 @@ class Gradezilla
   class << self
     include SeleniumDependencies
 
-    private
-
     # Student Headings
     STUDENT_COLUMN_MENU_SELECTOR = '.container_0 .Gradebook__ColumnHeaderAction'.freeze
 
@@ -71,6 +69,10 @@ class Gradezilla
 
     def assignment_header_cell_label_element(title)
       select_assignment_header_cell_element(title).find('.assignment-name')
+    end
+
+    def assignment_menu_selector(menu_text)
+      fj("span[role='menuitem']:contains('#{menu_text}')")
     end
 
     # student header column elements
@@ -185,8 +187,6 @@ class Gradezilla
     def show_unpublished_assignments
       fj('li li:contains("Unpublished Assignments")')
     end
-
-    public
 
     def body
       f('body')
@@ -549,10 +549,6 @@ class Gradezilla
 
     # ASSIGNMENT COLUMN HEADER OPTIONS
     # css selectors
-    def assignment_header_menu_selector(id)
-      assignment_header_menu_element(id)
-    end
-
     def assignment_header_cell_element(title)
       f(assignment_header_cell_selector(title))
     end

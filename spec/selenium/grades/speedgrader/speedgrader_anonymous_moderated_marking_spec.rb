@@ -19,56 +19,91 @@ require_relative "../../common"
 require_relative "../../helpers/speed_grader_common"
 require_relative "../pages/speedgrader_page"
 
-describe "SpeedGrader with Anonymous Marking enabled" do
+describe "SpeedGrader" do
   include_context "in-process server selenium tests"
   include SpeedGraderCommon
 
-  before do
-    Account.default.enable_feature!(:anonymous_marking)
+  before(:each) do
+    # a course with 1 teacher
     course_with_teacher_logged_in
-    outcome_with_rubric
-    @assignment = @course.assignments.create!(
-      name: 'some topic',
-      points_possible: 10,
-      submission_types: 'discussion_topic',
-      description: 'a little bit of content',
-      anonymous_grading: true
-    )
-    student = user_with_pseudonym(
-      name: 'Fen',
-      active_user: true,
-      username: 'student@example.com',
-      password: 'qwertyuiop'
-    )
-    @course.enroll_user(student, "StudentEnrollment", enrollment_state: :active)
-    # create and enroll second student
-    student_2 = user_with_pseudonym(
-      name: 'Zaz',
-      active_user: true,
-      username: 'student2@example.com',
-      password: 'qwertyuiop'
-    )
-    @course.enroll_user(student_2, "StudentEnrollment", enrollment_state: :active)
-    Speedgrader.visit(@course.id, @assignment.id)
+
+    # enroll two students
+    @student1 = User.create!(name: 'Student1')
+    @student1.register!
+    @course.enroll_student(@student1, enrollment_state: 'active')
+
+    @student2 = User.create!(name: 'Student2')
+    @student2.register!
+    @course.enroll_student(@student2, enrollment_state: 'active')
   end
 
-  context "shows unique anonymous student IDs" do
-    it "when teacher visits the page", priority: "1", test_id: 3481048 do
+  context "with an anonymous assignment" do
+    before(:each) do
+      # an anonymous assignment
+      @assignment = @course.assignments.create!(
+        name: 'anonymous assignment',
+        points_possible: 10,
+        submission_types: 'text',
+        anonymous_grading: true
+      )
+
+      user_session(@teacher)
+      Speedgrader.visit(@course.id, @assignment.id)
+    end
+
+    it "student names are anonymous", priority: "1", test_id: 3481048 do
       Speedgrader.students_dropdown_button.click
       student_names = Speedgrader.students_select_menu_list.map(&:text)
       expect(student_names).to eql ['Student 1', 'Student 2']
     end
 
-    context "give a teacher as selected student two's submission" do
+    context "given a specific student" do
       before do
         Speedgrader.click_next_or_prev_student(:next)
         Speedgrader.students_dropdown_button.click
         @current_student = Speedgrader.selected_student
       end
 
-      it "when teacher selects a submission and refreshes page", priority: "1", test_id: 3481049 do
+      it "when their submission is selected and page reloaded", priority: "1", test_id: 3481049 do
         expect { refresh_page }.not_to change { Speedgrader.selected_student.text }.from('Student 2')
       end
+    end
+  end
+
+  context 'with a moderated assignment' do
+    before(:each) do
+      # enroll a second teacher
+      @teacher2 = User.create!(name: 'Teacher2')
+      @teacher2.register!
+      @course.enroll_teacher(@teacher2, enrollment_state: 'active')
+
+      # create moderated assignment
+      @moderated_assignment = @course.assignments.create!(
+        title: 'Moderated Assignment1',
+        grader_count: 2,
+        final_grader_id: @teacher.id,
+        grading_type: 'points',
+        points_possible: 15,
+        submission_types: 'online_text_entry',
+        moderated_grading: true
+      )
+
+      # switch session to non-final-grader
+      user_session(@teacher2)
+    end
+
+    it 'prevents unmuting the assignment before grades are posted', priority: '2', test_id: 3493531 do
+      Speedgrader.visit(@course.id, @moderated_assignment.id)
+
+      expect(Speedgrader.mute_button.attribute('data-muted')).to eq 'true'
+      expect(Speedgrader.mute_button.attribute('class')).to include 'disabled'
+    end
+
+    it 'allows unmuting the assignment after grades are posted', priority: '2', test_id: 3493531 do
+      @moderated_assignment.update!(grades_published_at: Time.zone.now)
+      Speedgrader.visit(@course.id, @moderated_assignment.id)
+
+      expect(Speedgrader.mute_button.attribute('class')).not_to include 'disabled'
     end
   end
 end

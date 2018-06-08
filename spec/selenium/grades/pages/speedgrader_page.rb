@@ -56,6 +56,10 @@ class Speedgrader
       fxpath('//ul[@role = "menu"]//span[text() = "Keyboard Shortcuts"]')
     end
 
+    def mute_button
+      f('button#mute_link')
+    end
+
     def hide_students_chkbox
       f('#hide_student_names')
     end

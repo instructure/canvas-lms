@@ -17,9 +17,7 @@
 
 require_relative '../../common'
 require_relative '../../assignments/page_objects/assignment_page'
-require_relative '../pages/speedgrader_page'
 require_relative '../pages/moderate_page'
-require_relative '../pages/gradebook_page'
 
 describe 'Moderated Marking' do
   include_context 'in-process server selenium tests'
