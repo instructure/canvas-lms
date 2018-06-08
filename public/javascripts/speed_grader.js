@@ -1173,6 +1173,7 @@ import './vendor/ui.selectmenu'
 
     showStudent: function(){
       $rightside_inner.scrollTo(0);
+      $('#submission_details_student_name').text(this.currentStudent.name);
       if (this.currentStudent.submission_state == 'not_gradeable' && ENV.grading_role == "provisional_grader") {
         $rightside_inner.hide();
         $not_gradeable_message.show();
