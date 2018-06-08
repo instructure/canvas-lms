@@ -237,7 +237,7 @@ test('it properly disables the elements we care about in the right bar', functio
   SpeedgraderHelpers.setRightBarDisabled(true)
   equal(
     this.testArea.innerHTML,
-    '<input type="text" id="grading-box-extended" class="ui-state-disabled" aria-disabled="true" readonly="readonly"><textarea id="speedgrader_comment_textarea" class="ui-state-disabled" aria-disabled="true" readonly="readonly"></textarea><button id="add_attachment" class="ui-state-disabled" aria-disabled="true" readonly="readonly"></button><button id="media_comment_button" class="ui-state-disabled" aria-disabled="true" readonly="readonly"></button><button id="comment_submit_button" class="ui-state-disabled" aria-disabled="true" readonly="readonly"></button>'
+    '<input type="text" id="grading-box-extended" class="ui-state-disabled" aria-disabled="true" readonly="readonly" disabled=""><textarea id="speedgrader_comment_textarea" class="ui-state-disabled" aria-disabled="true" readonly="readonly" disabled=""></textarea><button id="add_attachment" class="ui-state-disabled" aria-disabled="true" readonly="readonly" disabled=""></button><button id="media_comment_button" class="ui-state-disabled" aria-disabled="true" readonly="readonly" disabled=""></button><button id="comment_submit_button" class="ui-state-disabled" aria-disabled="true" readonly="readonly" disabled=""></button>'
   )
 })
 

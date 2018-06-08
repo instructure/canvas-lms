@@ -36,6 +36,10 @@ class Speedgrader
       f('#grading-box-extended')
     end
 
+    def grading_enabled?
+      grade_input.enabled?
+    end
+
     def top_bar
       f("#content")
     end

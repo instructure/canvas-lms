@@ -102,10 +102,12 @@ export function setupAnonymizableAuthorId (isAnonymous) {
           $(element).addClass('ui-state-disabled');
           $(element).attr('aria-disabled', true);
           $(element).attr('readonly', true);
+          $(element).prop('disabled', true);
         } else {
           $(element).removeClass('ui-state-disabled');
           $(element).removeAttr('aria-disabled');
           $(element).removeAttr('readonly');
+          $(element).removeProp('disabled');
         }
       });
     },

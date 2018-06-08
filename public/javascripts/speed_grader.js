@@ -1496,9 +1496,9 @@ EG = {
 
   setGradeReadOnly: function(readonly) {
     if (readonly) {
-      $grade.addClass('ui-state-disabled').attr('readonly', true).attr('aria-disabled', true);
+      $grade.addClass('ui-state-disabled').attr('readonly', true).attr('aria-disabled', true).prop('disabled', true);
     } else {
-      $grade.removeClass('ui-state-disabled').removeAttr('aria-disabled').removeAttr('readonly');
+      $grade.removeClass('ui-state-disabled').removeAttr('aria-disabled').removeAttr('readonly').removeProp('disabled');
     }
   },
 

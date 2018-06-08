@@ -892,11 +892,23 @@ test("hides non-current student name if shouldHideStudentNames is true", functio
   equal(result, 'Student 2 - graded');
 });
 
-QUnit.module('handleSubmissionSelectionChange', {
-  setup() {
-    fakeENV.setup();
-    this.originalWindowJSONData = window.jsonData;
-    this.originalStudent = SpeedGrader.EG.currentStudent;
+QUnit.module('handleSubmissionSelectionChange', (hooks) => {
+  let closedGradingPeriodNotice
+  let getFromCache
+  let originalWindowJSONData
+  let originalStudent
+
+  hooks.beforeEach(() => {
+    sinon.stub(SpeedGrader.EG, 'handleFragmentChanged')
+    originalWindowJSONData = window.jsonData
+    originalStudent = SpeedGrader.EG.currentStudent
+    fixtures.innerHTML =
+    `<span id="speedgrader-settings"></span>
+    <div id='grade_container'>
+      <input type='text' id='grading-box-extended' />
+    </div>`
+    SpeedGrader.setup()
+    fakeENV.setup()
     SpeedGrader.EG.currentStudent = {
       id: 4,
       name: "Guy B. Studying",
@@ -926,49 +938,85 @@ QUnit.module('handleSubmissionSelectionChange', {
           }
         ]
       }
-    };
+    }
 
     window.jsonData = {
       id: 27,
-      gradingPeriods: { 8: { id: 8, is_closed: true } },
+      context: {
+        active_course_sections: [],
+        enrollments: [
+          {
+            user_id: "4",
+            course_section_id: 1
+          }
+        ],
+        students: [
+          {
+            index: 0,
+            id: 4,
+            name: 'Guy B. Studying',
+            submission_state: 'not_graded'
+          }
+        ]
+      },
+      gradingPeriods: {
+        7: { id: 7, is_closed: false },
+        8: { id: 8, is_closed: true }
+      },
       GROUP_GRADING_MODE: false,
       points_possible: 10,
       studentMap : {
         4 : SpeedGrader.EG.currentStudent
-      }
-    };
-  },
+      },
+      studentsWithSubmissions: [],
+      submissions: []
+    }
 
-  teardown() {
-    SpeedGrader.EG.currentStudent = this.originalStudent;
-    fakeENV.teardown();
-    window.jsonData = this.originalWindowJSONData;
-  }
-});
+    SpeedGrader.EG.jsonReady()
+    closedGradingPeriodNotice = { showIf: sinon.stub() }
+    getFromCache = sinon.stub(JQuerySelectorCache.prototype, 'get')
+    getFromCache.withArgs('#closed_gp_notice').returns(closedGradingPeriodNotice)
+  })
 
-test('should use submission history lti launch url', () => {
-  const renderLtiLaunch = sinon.stub(SpeedGrader.EG, 'renderLtiLaunch');
-  SpeedGrader.EG.handleSubmissionSelectionChange();
-  ok(renderLtiLaunch.calledWith(sinon.match.any, sinon.match.any, "bar"));
-});
+  hooks.afterEach(() => {
+    getFromCache.restore()
+    window.jsonData = originalWindowJSONData
+    SpeedGrader.EG.currentStudent = originalStudent
+    fakeENV.teardown()
+    SpeedGrader.EG.handleFragmentChanged.restore()
+    fixtures.innerHTML = ''
+  })
 
-test('shows a "closed grading period" notice if the submission is in a closed period', () => {
-  const getFromCache = sinon.stub(JQuerySelectorCache.prototype, 'get')
-  const closedGradingPeriodNotice = { showIf: sinon.stub() }
-  getFromCache.withArgs('#closed_gp_notice').returns(closedGradingPeriodNotice)
-  SpeedGrader.EG.handleSubmissionSelectionChange()
-  ok(closedGradingPeriodNotice.showIf.calledWithExactly(true))
-  getFromCache.restore()
-})
+  test('should use submission history lti launch url', () => {
+    const renderLtiLaunch = sinon.stub(SpeedGrader.EG, 'renderLtiLaunch')
+    SpeedGrader.EG.handleSubmissionSelectionChange()
+    ok(renderLtiLaunch.calledWith(sinon.match.any, sinon.match.any, "bar"))
+  })
 
-test('does not show a "closed grading period" notice if the submission is not in a closed period', () => {
-  SpeedGrader.EG.currentStudent.submission.grading_period_id = null
-  const getFromCache = sinon.stub(JQuerySelectorCache.prototype, 'get')
-  const closedGradingPeriodNotice = { showIf: sinon.stub() }
-  getFromCache.withArgs('#closed_gp_notice').returns(closedGradingPeriodNotice)
-  SpeedGrader.EG.handleSubmissionSelectionChange()
-  notOk(closedGradingPeriodNotice.showIf.calledWithExactly(true))
-  getFromCache.restore()
+  test('shows a "closed grading period" notice if the submission is in a closed period', () => {
+    SpeedGrader.EG.handleSubmissionSelectionChange()
+    ok(closedGradingPeriodNotice.showIf.calledWithExactly(true))
+  })
+
+  test('does not show a "closed grading period" notice if the submission is not in a closed period', () => {
+    SpeedGrader.EG.currentStudent.submission.grading_period_id = null
+    SpeedGrader.EG.handleSubmissionSelectionChange()
+    notOk(closedGradingPeriodNotice.showIf.calledWithExactly(true))
+  })
+
+  test('disables the complete/incomplete select when grading period is closed', () => {
+    SpeedGrader.EG.currentStudent.submission.grading_period_id = 8
+    SpeedGrader.EG.handleSubmissionSelectionChange()
+    const select = document.getElementById('grading-box-extended')
+    ok(select.hasAttribute('disabled'))
+  })
+
+  test('does not disable the complete/incomplete select when grading period is open', () => {
+    SpeedGrader.EG.currentStudent.submission.grading_period_id = 7
+    SpeedGrader.EG.handleSubmissionSelectionChange()
+    const select = document.getElementById('grading-box-extended')
+    notOk(select.hasAttribute('disabled'))
+  })
 })
 
 QUnit.module('SpeedGrader#isGradingTypePercent', {
