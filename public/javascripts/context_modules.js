@@ -784,7 +784,7 @@ import 'compiled/jquery.rails_flash_notifications'
 
         if (!ENV.SEQUENCE_CONTROL)
         {
-          $("#context_modules").addClass('unlocked');
+            $("#context_modules").addClass('sm-unlocked');
         }
 
         // Locked tooltip title is added in _context_module_next.html.erb

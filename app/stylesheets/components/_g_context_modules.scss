@@ -510,7 +510,22 @@ $context_module_bg_color: #FFF;
   }
 }
 
-#context_modules.editable, #context_modules.unlocked {
+#context_modules.editable {
+  .context_module_item {
+    &.after_current_position {
+      opacity: 1;
+      .title {
+        display: inline-block;
+      }
+      .locked_title {
+        display: none;
+      }
+    }
+  }
+}
+
+
+#context_modules.sm-unlocked {
   .context_module_item {
     opacity: 1;
     &.after_current_position {
@@ -528,6 +543,15 @@ $context_module_bg_color: #FFF;
   }
   .item_name {
     opacity: 1;
+  }
+
+  .ContextModuleSubHeader_0 {
+    .title, .ig-title {
+      display: none;
+    }
+    .locked_title {
+      display: inline-block;
+    }
   }
 
 }
