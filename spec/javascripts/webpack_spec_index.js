@@ -19,6 +19,7 @@
 import { canvas } from '@instructure/ui-themes/lib'
 import './support/sinon/sinon-qunit-1.0.0'
 
+document.dir = 'ltr'
 const fixturesDiv = document.createElement('div')
 fixturesDiv.id = 'fixtures'
 document.body.appendChild(fixturesDiv)
