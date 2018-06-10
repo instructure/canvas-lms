@@ -317,7 +317,7 @@ describe "Outcome Reports" do
 
       context 'in a different locale' do
         before do
-          account.update(default_locale: :sv)
+          account.update(default_locale: :de)
         end
 
         it 'formats mastery points' do
