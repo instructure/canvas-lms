@@ -91,7 +91,7 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::Oauth2
       jwt_string = token.params['id_token']
       id_token = begin
         ::Canvas::Security.decode_jwt(jwt_string, [:skip_verification])
-      rescue Canvas::Security::InvalidToken
+      rescue ::Canvas::Security::InvalidToken
         Rails.logger.warning("Failed to decode OpenID Connect id_token: #{jwt_string.inspect}")
         raise
       end

@@ -10475,7 +10475,7 @@ es:
   lti: 
     lti_message: 
       load_tool_new_tab_button: "Cargar %{tool} en una ventana nueva"
-      new_tab: "Es necesario cargar este herramienta en una ventana nueva del navegador"
+      new_tab: "Es necesario cargar esta herramienta en una ventana nueva del navegador"
       new_tab_expired: "Ha caducado la sesión para esta herramienta. Vuelva a cargar la página para poder acceder de nuevo a ella."
       new_tab_loaded: "Esta herramienta se cargó correctamente en una ventana nueva del navegador. Vuelva a cargar la página para poder acceder a la herramienta otra vez."
   lti2: 

@@ -949,6 +949,45 @@ describe Assignment do
     end
   end
 
+  describe "scope: importing_for_too_long" do
+    subject { described_class.importing_for_too_long }
+
+    let_once(:unpublished_assignment) do
+      @course.assignments.create!(workflow_state: 'unpublished', **assignment_valid_attributes)
+    end
+    let_once(:new_importing_assignment) do
+      @course.assignments.create!(
+        workflow_state: 'importing',
+        importing_started_at: 5.seconds.ago,
+        **assignment_valid_attributes
+      )
+    end
+    let_once(:old_importing_assignment) do
+      @course.assignments.create!(
+        workflow_state: 'importing',
+        importing_started_at: 10.minutes.ago,
+        **assignment_valid_attributes
+      )
+    end
+
+    it { is_expected.to eq([old_importing_assignment]) }
+  end
+
+  describe ".cleanup_importing_assignments" do
+    before { allow(described_class).to receive(:importing_for_too_long) }
+
+    it "marks all assignments that have been importing for too long as failed_to_import" do
+      now = double('now')
+      expect(Time.zone).to receive(:now).and_return(now)
+      expect(described_class.importing_for_too_long).to receive(:update_all).with(
+        importing_started_at: nil,
+        workflow_state: 'failed_to_import',
+        updated_at: now
+      )
+      described_class.clean_up_importing_assignments
+    end
+  end
+
   describe "#representatives" do
     context "individual students" do
       it "sorts by sortable_name" do

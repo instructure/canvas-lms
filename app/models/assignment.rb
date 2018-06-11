@@ -264,6 +264,14 @@ class Assignment < ActiveRecord::Base
     )
   end
 
+  def self.clean_up_importing_assignments
+    importing_for_too_long.update_all(
+      importing_started_at: nil,
+      workflow_state: 'failed_to_import',
+      updated_at: Time.zone.now
+    )
+  end
+
   def group_category_changes_ok?
     return unless group_category_id_changed?
 
@@ -1618,7 +1626,7 @@ class Assignment < ActiveRecord::Base
 
     if did_grade
       submission.grade_matches_current_submission = true
-      submission.instance_variable_set(:@regraded, true)
+      submission.regraded = true
     end
 
     if (submission.score_changed? ||
@@ -2365,6 +2373,10 @@ class Assignment < ActiveRecord::Base
 
   scope :duplicating_for_too_long, -> {
     where("workflow_state = 'duplicating' AND duplication_started_at < ?", 5.minutes.ago)
+  }
+
+  scope :importing_for_too_long, -> {
+    where("workflow_state = 'importing' AND importing_started_at < ?", 5.minutes.ago)
   }
 
   def overdue?

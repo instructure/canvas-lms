@@ -212,6 +212,10 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(Assignment, :clean_up_duplicating_assignments)
   end
 
+  Delayed::Periodic.cron 'Assignment.clean_up_importing_assignments', '*/5 * * * *', priority: Delayed::LOW_PRIORITY do
+    with_each_shard_by_database(Assignment, :clean_up_importing_assignments)
+  end
+
   Delayed::Periodic.cron 'ObserverAlert.clean_up_old_alerts', '0 * * * *', priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(ObserverAlert, :clean_up_old_alerts)
   end

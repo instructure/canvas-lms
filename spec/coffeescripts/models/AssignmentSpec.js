@@ -1134,6 +1134,7 @@ test('returns true if submission_types are in frozenAttributes', () => {
   equal(assignment.submissionTypesFrozen(), true)
 })
 
+
 QUnit.module('Assignment#pollUntilFinishedDuplicating', {
   setup() {
     this.clock = sinon.useFakeTimers()
@@ -1161,6 +1162,35 @@ test('stops polling when the assignment has finished duplicating', function () {
   this.clock.tick(3000)
   ok(this.assignment.fetch.calledOnce)
 })
+
+QUnit.module('Assignment#pollUntilFinishedImporting', {
+  setup() {
+    this.clock = sinon.useFakeTimers()
+    this.assignment = new Assignment({ workflow_state: 'importing' })
+    this.stub(this.assignment, 'fetch').returns($.Deferred().resolve())
+  },
+  teardown() {
+    this.clock.restore()
+  }
+})
+
+test('polls for updates', function() {
+  this.assignment.pollUntilFinishedImporting()
+  this.clock.tick(2000)
+  notOk(this.assignment.fetch.called)
+  this.clock.tick(2000)
+  ok(this.assignment.fetch.called)
+})
+
+test('stops polling when the assignment has finished importing', function () {
+  this.assignment.pollUntilFinishedImporting()
+  this.assignment.set({ workflow_state: 'unpublished' })
+  this.clock.tick(3000)
+  ok(this.assignment.fetch.calledOnce)
+  this.clock.tick(3000)
+  ok(this.assignment.fetch.calledOnce)
+})
+
 
 QUnit.module('Assignment#renderModeratedGradingFormFieldGroup', (hooks) => {
   const fixtures = document.getElementById('fixtures')
