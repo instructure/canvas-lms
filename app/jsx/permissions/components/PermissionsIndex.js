@@ -71,7 +71,11 @@ export default class PermissionsIndex extends Component {
     if (newIndex === oldIndex) return
     const newContextType = newIndex === COURSE_TAB_INDEX ? COURSE : ACCOUNT
     this.setState(
-      {permissionSearchString: '', selectedRoles: [], contextType: newContextType},
+      {
+        permissionSearchString: '',
+        selectedRoles: [{value: '0', label: 'All Roles'}],
+        contextType: newContextType
+      },
       () => {
         this.props.tabChanged(newContextType)
       }
