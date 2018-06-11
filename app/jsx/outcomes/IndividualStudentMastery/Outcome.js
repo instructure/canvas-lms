@@ -21,23 +21,14 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!outcomes'
 import View from '@instructure/ui-layout/lib/components/View'
 import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
-import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleDetails'
+import ToggleGroup from '@instructure/ui-toggle-details/lib/components/ToggleGroup'
 import List, { ListItem } from '@instructure/ui-elements/lib/components/List'
 import Pill from '@instructure/ui-elements/lib/components/Pill'
 import Text from '@instructure/ui-elements/lib/components/Text'
-import IconArrowOpenDown from '@instructure/ui-icons/lib/Solid/IconArrowOpenDown'
-import IconArrowOpenEnd from '@instructure/ui-icons/lib/Solid/IconArrowOpenEnd'
 import IconOutcomes from '@instructure/ui-icons/lib/Line/IconOutcomes'
 import natcompare from 'compiled/util/natcompare'
 import AssignmentResult from './AssignmentResult'
 import * as shapes from './shapes'
-
-const spacyIcon = (expanded) => () => {
-  const Icon = expanded ? IconArrowOpenDown : IconArrowOpenEnd
-  return (
-    <View padding="0 0 0 small"><Icon /></View>
-  )
-}
 
 export default class Outcome extends React.Component {
   static propTypes = {
@@ -56,7 +47,7 @@ export default class Outcome extends React.Component {
     const numAlignments = results.length
 
     return (
-      <Flex direction="row" justifyItems='space-between' padding="small x-small">
+      <Flex direction="row" justifyItems="space-between">
         <FlexItem>
           <Flex direction="column">
             <FlexItem>
@@ -87,21 +78,19 @@ export default class Outcome extends React.Component {
     const { outcome } = this.props
     const { results } = outcome
     return (
-      <View as="div" borderWidth="small 0 0 0">
-        <List variant="unstyled" delimiter="dashed">
-        {
-            results.sort(natcompare.byKey('submitted_or_assessed_at')).reverse().map((result) => (
-              <ListItem key={result.id}><AssignmentResult result={result} outcome={outcome} /></ListItem>
-          ))
-        }
-        </List>
-      </View>
+      <List variant="unstyled" delimiter="dashed">
+      {
+          results.sort(natcompare.byKey('submitted_or_assessed_at')).reverse().map((result) => (
+            <ListItem key={result.id}><AssignmentResult result={result} outcome={outcome} /></ListItem>
+        ))
+      }
+      </List>
     )
   }
 
   renderEmpty () {
     return (
-      <View as="div" padding="small" borderWidth="small 0 0 0">
+      <View as="div" padding="small">
         <Text>{ I18n.t('No alignments are available for this outcome.') }</Text>
       </View>
     )
@@ -109,19 +98,18 @@ export default class Outcome extends React.Component {
 
   render () {
     const { outcome, expanded } = this.props
-    const hasResults = outcome.results.length > 0
+    const { results, title } = outcome
+    const hasResults = results.length > 0
     return (
-      <ToggleDetails
-        divider="dashed"
-        icon={spacyIcon(false)}
-        iconExpanded={spacyIcon(true)}
+      <ToggleGroup
         summary={this.renderHeader()}
+        toggleLabel={I18n.t('Toggle alignment details for %{title}', { title })}
         expanded={expanded}
         onToggle={this.handleToggle}
-        fluidWidth
+        border={false}
       >
         { hasResults ? this.renderDetails() : this.renderEmpty() }
-      </ToggleDetails>
+      </ToggleGroup>
     )
   }
 }

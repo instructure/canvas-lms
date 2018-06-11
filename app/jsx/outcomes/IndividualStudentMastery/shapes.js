@@ -19,7 +19,7 @@
 import PropTypes from 'prop-types'
 
 export const assignmentShape = PropTypes.shape({
-  id: PropTypes.number.isRequired,
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   name: PropTypes.string.isRequired,
   html_url: PropTypes.string.isRequired,
   submission_types: PropTypes.string.isRequired
@@ -27,8 +27,8 @@ export const assignmentShape = PropTypes.shape({
 
 export const outcomeResultShape = PropTypes.shape({
   assignment: assignmentShape.isRequired,
-  id: PropTypes.number.isRequired,
-  score: PropTypes.number.isRequired,
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  score: PropTypes.number,
   percent: PropTypes.number
 })
 

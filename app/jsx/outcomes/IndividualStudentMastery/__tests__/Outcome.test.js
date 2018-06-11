@@ -80,7 +80,7 @@ it('renders correctly expanded with no results', () => {
 describe('header', () => {
   it('includes the outcome name', () => {
     const wrapper = shallow(<Outcome {...defaultProps()}/>)
-    const header = wrapper.find('ToggleDetails')
+    const header = wrapper.find('ToggleGroup')
     const summary = render(header.prop('summary'))
     expect(summary.text()).toMatch('My outcome')
   })
@@ -89,21 +89,21 @@ describe('header', () => {
     const props = defaultProps()
     props.outcome.mastered = true
     const wrapper = shallow(<Outcome {...props} />)
-    const header = wrapper.find('ToggleDetails')
+    const header = wrapper.find('ToggleGroup')
     const summary = render(header.prop('summary'))
     expect(summary.text()).toMatch('Mastered')
   })
 
   it('includes non-mastery when not mastered', () => {
     const wrapper = shallow(<Outcome {...defaultProps()} />)
-    const header = wrapper.find('ToggleDetails')
+    const header = wrapper.find('ToggleGroup')
     const summary = render(header.prop('summary'))
     expect(summary.text()).toMatch('Not mastered')
   })
 
   it('shows correct number of alignments', () => {
     const wrapper = shallow(<Outcome {...defaultProps()} />)
-    const header = wrapper.find('ToggleDetails')
+    const header = wrapper.find('ToggleGroup')
     const summary = render(header.prop('summary'))
     expect(summary.text()).toMatch('1 alignment')
   })

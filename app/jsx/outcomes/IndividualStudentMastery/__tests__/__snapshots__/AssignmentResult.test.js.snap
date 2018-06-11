@@ -28,7 +28,7 @@ exports[`renders the AlignmentResult component 1`] = `
   <FlexItem borderWidth=\\"small\\" as=\\"span\\" grow={false} shrink={false}>
     <div className=\\"react-rubric\\">
       <div className=\\"ratings\\">
-        <Ratings tiers={{...}} points={1} footer={{...}} onPointChange={[Function]} />
+        <Ratings tiers={{...}} points={1} assessing={false} footer={{...}} onPointChange={[Function]} />
       </div>
     </div>
   </FlexItem>

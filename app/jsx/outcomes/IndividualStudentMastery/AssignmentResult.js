@@ -52,7 +52,11 @@ const AssignmentResult = ({ outcome, result }) => {
         </View>
       </FlexItem>
       <FlexItem borderWidth="small">
-        <div className="react-rubric"><div className="ratings"><Ratings tiers={ratings} points={result.score} /></div></div>
+        <div className="react-rubric">
+          <div className="ratings">
+            <Ratings tiers={ratings} points={result.score} assessing={false} />
+          </div>
+        </div>
       </FlexItem>
     </Flex>
   )

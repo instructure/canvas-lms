@@ -86,7 +86,7 @@ it('renders the OutcomeGroup component', () => {
 describe('header', () => {
   it('includes the outcome group name', () => {
     const wrapper = shallow(<OutcomeGroup {...defaultProps()}/>)
-    const header = wrapper.find('ToggleDetails')
+    const header = wrapper.find('ToggleGroup')
     const summary = render(header.prop('summary'))
     expect(summary.text()).toMatch('My group')
   })

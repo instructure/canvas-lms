@@ -31,8 +31,8 @@ import { Set } from 'immutable'
 // eslint-disable-next-line
 class IndividualStudentMastery extends React.Component {
   static propTypes = {
-    courseId: PropTypes.number.isRequired,
-    studentId: PropTypes.number.isRequired,
+    courseId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    studentId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     onExpansionChange: PropTypes.func
   }
 
