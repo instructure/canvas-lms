@@ -17,7 +17,7 @@
 #
 
 # @API API Token Scopes
-# @internal
+# @beta
 # API for retrieving API scopes
 #
 # @model Scope
