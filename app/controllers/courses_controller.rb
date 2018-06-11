@@ -1756,6 +1756,7 @@ class CoursesController < ApplicationController
         add_crumb(t('#crumbs.assignments', "Assignments"))
         set_js_assignment_data
         js_env(:SIS_NAME => AssignmentUtil.post_to_sis_friendly_name(@context))
+        js_env(:QUIZ_LTI_ENABLED => @context.feature_enabled?(:quizzes_next) && @context.quiz_lti_tool.present?)
         js_env(:COURSE_HOME => true)
         @upcoming_assignments = get_upcoming_assignments(@context)
       when 'modules'
