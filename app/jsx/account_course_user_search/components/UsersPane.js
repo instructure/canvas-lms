@@ -114,7 +114,7 @@ export default class UsersPane extends React.Component {
           roles={this.props.roles}
         />}
 
-        {!_.isEmpty(users) &&
+        {!_.isEmpty(users) && !isLoading &&
         <UsersList
           searchFilter={this.state.userList.searchFilter}
           onUpdateFilters={this.handleUpdateSearchFilter}
