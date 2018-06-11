@@ -688,7 +688,7 @@ END
       display_name: -> { I18n.t('Developer key management and scoping')},
       description: -> { I18n.t('If enabled, developer key management options and token scoping will be used.') },
       applies_to: 'RootAccount',
-      state: 'hidden'
+      state: 'allowed'
     },
     'non_scoring_rubrics' => {
       display_name: -> { I18n.t('Non-scoring Rubrics')},
