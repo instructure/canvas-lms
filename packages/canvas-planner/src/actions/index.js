@@ -140,6 +140,9 @@ export const dismissOpportunity = (id, plannerOverride) => {
         return opp.planner_override && !opp.planner_override.dismissed;
       }).length < 10)
         dispatch(getNextOpportunities());
+    })
+    .catch((error) => {
+      alert(formatMessage('An error occurred attempting to dismiss the opportunity.'), true);
     });
     return promise;
   };
