@@ -1174,6 +1174,7 @@ import './vendor/ui.selectmenu'
     showStudent: function(){
       $rightside_inner.scrollTo(0);
       var student_name = this.currentStudent.name;
+      $('#submission_details_student_accommodations').empty();
       $('#submission_details_student_name').text(this.currentStudent.name);
       if (this.currentStudent.settings && this.currentStudent.settings.accommodations) {
         $.each(this.currentStudent.settings.accommodations, function (i, accommodation) {
