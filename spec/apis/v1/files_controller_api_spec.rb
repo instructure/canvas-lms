@@ -927,7 +927,7 @@ describe "Files API", type: :request do
     end
 
     it "should return not found error" do
-      api_call(:get, "/api/v1/files/0", @file_path_options.merge(:id => '0'), {}, {}, :expected_status => 404)
+      expect{api_call(:get, "/api/v1/files/0", @file_path_options.merge(id: '0'), {}, {}, expected_status: 404)}.not_to change { ErrorReport.count }
     end
 
     it "should return not found for deleted attachment" do
