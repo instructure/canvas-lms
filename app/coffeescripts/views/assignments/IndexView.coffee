@@ -189,7 +189,7 @@ define [
 
     focusOnAssignments: (e) =>
       if 74 == e.keyCode
-        unless($(e.target).is("input"))
+        if(!($(e.target).is("input")||$(e.target).is("textarea")))
           $(".assignment_group").filter(":visible").first().attr("tabindex",-1).focus()
 
     canManage: ->
