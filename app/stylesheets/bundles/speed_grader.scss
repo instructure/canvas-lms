@@ -930,3 +930,23 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 .gradebook-icon-link:hover {
   text-decoration: none;
 }
+
+#submission_details_student_name {
+  font-weight: 600;
+}
+
+#multiple_submissions {
+  padding-top: 10px;
+}
+.accommodations {
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	background-color: #F1F1F1;
+	color: #215784;
+	width: 35px;
+	padding: 0 5px;
+
+	margin-right: 10px;
+	margin-left: 0px;
+}

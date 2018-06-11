@@ -86,7 +86,6 @@ class Assignment
                   :methods => submission_comment_methods,
                   :only => [:name, :id, :sortable_name])
         json['settings'] = SettingsService.get_user_settings(id: u.id)
-        json
 
         if preloaded_pg_counts
           json[:needs_provisional_grade] = @assignment.student_needs_provisional_grade?(u, preloaded_pg_counts)
