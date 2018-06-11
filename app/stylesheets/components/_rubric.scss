@@ -46,8 +46,7 @@
 
 .react-rubric .description-header {
   height: 100%;
-  display: flex;
-  flex-direction: column;
+  vertical-align: text-top;
 
   & .long-description button {
     margin: 0;
