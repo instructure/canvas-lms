@@ -206,7 +206,7 @@ export default class Criterion extends React.Component {
       />
     ) : null
 
-    const noComments = (_.get(assessment, 'comments') || '').length > 0
+    const noComments = _.isEmpty(_.get(assessment, 'comments'))
     const longDescription = criterion.long_description
     const threshold = criterion.mastery_points
 
@@ -235,7 +235,7 @@ export default class Criterion extends React.Component {
             threshold !== undefined ? <Threshold threshold={threshold} /> : null
           }
           {
-            (freeForm || assessing || noComments) ? null : (
+            (freeForm || assessing || isSummary || noComments) ? null : (
               <div className="assessment-comments">
                 <Text size="x-small" weight="normal">{I18n.t('Instructor Comments')}</Text>
                 {pointsComment()}

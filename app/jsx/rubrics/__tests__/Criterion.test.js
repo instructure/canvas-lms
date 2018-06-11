@@ -96,6 +96,29 @@ describe('Criterion', () => {
     expectState(false)
   })
 
+  it('only shows instructor comments in sidebar when relevant', () => {
+    // in particular, we only show the comment sidebar when:
+    // - there are comments
+    // - the rubric is not free-form
+    // - we are not assessing the rubric
+    // - the rubric is not in summary mode
+    const comments = (changes) => shallow(
+      <Criterion
+        assessment={assessments.points.data[1]}
+        criterion={rubrics.points.criteria[1]}
+        freeForm={false}
+        {...changes}
+      />
+    ).find('CommentText')
+
+    expect(comments()).toHaveLength(1)
+    const noComments = { ...assessments.points.data[1], comments: undefined }
+    expect(comments({ assessment: noComments })).toHaveLength(0)
+    expect(comments({ freeForm: true })).toHaveLength(0)
+    expect(comments({ onAssessmentChange: () => {} })).toHaveLength(0)
+    expect(comments({ isSummary: true })).toHaveLength(0)
+  })
+
   it('does not have a points column in summary mode', () => {
     const el = shallow(
       <Criterion

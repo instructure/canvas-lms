@@ -346,6 +346,12 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
     <div className=\\"long-description\\">
       <LongDescriptionDialog close={[Function]} longDescription=\\"\\" open={false} />
     </div>
+    <div className=\\"assessment-comments\\">
+      <Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+        Instructor Comments
+      </Text>
+      <CommentText assessment={{...}} weight=\\"light\\" placeholder=\\"\\" />
+    </div>
   </th>
   <td className=\\"ratings\\">
     <Ratings assessing={false} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={3.2} pointsPossible={8} defaultMasteryThreshold={8} isSummary={false} useRange={false} />
@@ -425,12 +431,6 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
     <div className=\\"long-description\\">
       <LongDescriptionDialog close={[Function]} longDescription=\\"\\" open={false} />
     </div>
-    <div className=\\"assessment-comments\\">
-      <Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
-        Instructor Comments
-      </Text>
-      <CommentText assessment={{...}} weight=\\"light\\" placeholder=\\"\\" />
-    </div>
   </th>
   <td className=\\"ratings\\">
     <Ratings assessing={false} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={[undefined]} pointsPossible={8} defaultMasteryThreshold={8} isSummary={false} useRange={false} />
@@ -497,6 +497,12 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
       <LongDescriptionDialog close={[Function]} longDescription=\\"sa Sivert.\\" open={false} />
     </div>
     <Threshold threshold={3} />
+    <div className=\\"assessment-comments\\">
+      <Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+        Instructor Comments
+      </Text>
+      <CommentText assessment={{...}} weight=\\"light\\" placeholder=\\"\\" />
+    </div>
   </th>
   <td className=\\"ratings\\">
     <Ratings assessing={false} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={3} pointsPossible={3} defaultMasteryThreshold={3} isSummary={false} useRange={false} />
@@ -630,12 +636,6 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
       <LongDescriptionDialog close={[Function]} longDescription=\\"sa Sivert.\\" open={false} />
     </div>
     <Threshold threshold={3} />
-    <div className=\\"assessment-comments\\">
-      <Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
-        Instructor Comments
-      </Text>
-      <CommentText assessment={{...}} weight=\\"light\\" placeholder=\\"\\" />
-    </div>
   </th>
   <td className=\\"ratings\\">
     <Ratings assessing={false} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={[undefined]} pointsPossible={3} defaultMasteryThreshold={3} isSummary={false} useRange={false} />
