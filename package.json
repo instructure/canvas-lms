@@ -9,8 +9,9 @@
   "private": true,
   "workspaces": {
     "packages": [
-      "gems/*",
-      "gems/plugins/*",
+      "gems/canvas_i18nliner",
+      "gems/selinimum",
+      "gems/plugins/analytics",
       "packages/*",
       "client_apps/*"
     ],
@@ -223,7 +224,7 @@
     "webpack": "gulp rev & webpack --progress --color --watch",
     "webpack-development": "gulp rev & webpack --progress --color",
     "webpack-production": "NODE_ENV=production gulp rev && node --max_old_space_size=4096 $(yarn bin)/webpack --color --config webpack.production.config.js && yarn lint:browser-code",
-    "workspace-run": "r() { wsrun $@ --fast-exit --exclude-missing --collect-logs --report 2>&1 | grep --invert-match \"is a directory, but has no package.json\"; exit $?; } && r",
+    "workspace-run": "r() { wsrun $@ --fast-exit --exclude-missing --collect-logs --report; exit $?; } && r",
     "jspec": "./spec/jspec.sh",
     "jspec-watch": "./spec/jspec.sh --watch",
     "a11y-report": "./spec/jspec.sh --a11y",

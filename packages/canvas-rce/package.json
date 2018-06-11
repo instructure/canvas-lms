@@ -167,7 +167,7 @@
     "jsdom": "^9",
     "jsdomify": "^3",
     "mocha": "^5",
-    "mocha-jsdom": "^1",
+    "mocha-jsdom": "^2",
     "nyc": "^11",
     "prettier": "^1.12.1",
     "proxyquire": "1.7.4",
