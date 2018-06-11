@@ -18763,7 +18763,7 @@ zh-Hant:
       one: "%{count}分鐘以前"
       other: "%{count} 分鐘以前"
     due_date: "於 %{date}，評分時間：%{time}"
-    event: "日期 %{date}，時間 %{time}"
+    event: "%{date} %{time}"
     formats: 
       default: "%a, %d %b %Y %H:%M:%S %z"
       long: "%B %d, %Y %H:%M"

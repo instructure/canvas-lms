@@ -210,6 +210,9 @@ class Submission < ActiveRecord::Base
     ")
   end
 
+  GradedAtBookmarker = BookmarkedCollection::SimpleBookmarker.new(Submission, :graded_at)
+  IdBookmarker = BookmarkedCollection::SimpleBookmarker.new(Submission, :id)
+
   scope :anonymized, -> { where.not(anonymous_id: nil) }
 
   workflow do

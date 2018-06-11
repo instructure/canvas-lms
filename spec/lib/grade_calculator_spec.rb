@@ -478,6 +478,18 @@ describe GradeCalculator do
       expect(current_groups[@group2.id][:grade]).to eq 100
     end
 
+    it "calculates the grade without floating point calculation errors" do
+      @course.update!(group_weighting_scheme: 'percent')
+      two_groups_two_assignments(50, 200, 50, 100)
+      @assignment.grade_student(@user, grade: 267.9, grader: @teacher)
+      @assignment2.grade_student(@user, grade: 53.7, grader: @teacher)
+      calc = GradeCalculator.new([@user.id], @course.id)
+      computed_scores = calc.compute_scores.first
+      # floating point calculation: 66.975 + 26.95 = 93.82499999999999 => 93.82%
+      # correct calcuation: 66.975 + 26.95 = 93.825 => 93.83%
+      expect(computed_scores.dig(:current, :grade)).to eq 93.83
+    end
+
     it "should compute a weighted grade when specified" do
       two_groups_two_assignments(50, 10, 50, 40)
       expect(@user.enrollments.first.computed_current_score).to eql(nil)
