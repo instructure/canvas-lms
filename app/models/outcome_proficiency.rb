@@ -24,6 +24,7 @@ class OutcomeProficiency < ApplicationRecord
   validates :account, uniqueness: true, presence: true
   validates :outcome_proficiency_ratings, presence: { message: t('Missing required ratings') }
   validate :single_mastery_rating
+  validate :strictly_decreasing_points
 
   def as_json(_options={})
     {
@@ -36,6 +37,15 @@ class OutcomeProficiency < ApplicationRecord
   def single_mastery_rating
     if self.outcome_proficiency_ratings.reject(&:marked_for_destruction?).count(&:mastery) != 1
       self.errors.add(:outcome_proficiency_ratings, t('Exactly one rating can have mastery'))
+    end
+  end
+
+  def strictly_decreasing_points
+    self.outcome_proficiency_ratings.each_cons(2) do |l, r|
+      if l.points <= r.points
+        self.errors.add(:outcome_proficiency_ratings,
+          t("Points should be strictly decreasing: %{l} <= %{r}", l: l.points, r: r.points))
+      end
     end
   end
 end

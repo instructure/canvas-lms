@@ -33,5 +33,22 @@ describe OutcomeProficiency, type: :model do
 
       it { is_expected.to validate_uniqueness_of(:account) }
     end
+
+    describe 'strictly descending points' do
+      it 'valid proficiency' do
+        proficiency = outcome_proficiency_model(account_model)
+        expect(proficiency.valid?).to be(true)
+      end
+
+      it 'invalid proficiency' do
+        proficiency = outcome_proficiency_model(account_model)
+        rating1 = OutcomeProficiencyRating.new(description: 'A', points: 4, mastery: false, color: '00ff00')
+        rating2 = OutcomeProficiencyRating.new(description: 'B', points: 3, mastery: false, color: '0000ff')
+        rating3 = OutcomeProficiencyRating.new(description: 'B', points: 3, mastery: false, color: '0000ff')
+        rating4 = OutcomeProficiencyRating.new(description: 'C', points: 2, mastery: true, color: 'ff0000')
+        proficiency.outcome_proficiency_ratings = [rating1, rating2, rating3, rating4]
+        expect(proficiency.valid?).to be(false)
+      end
+    end
   end
 end

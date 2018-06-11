@@ -173,22 +173,28 @@ describe('custom proficiency', () => {
   })
 })
 
-it('empty rating description leaves state invalid', () => {
+it('empty rating description generates errors', () => {
   const wrapper = shallow(<ProficiencyTable {...defaultProps()}/>)
   wrapper.instance().handleDescriptionChange(0)("")
-  expect(wrapper.instance().isStateValid()).toBe(false)
+  expect(wrapper.instance().checkForErrors()).toBe(true)
 })
 
-it('empty rating points leaves state invalid', () => {
+it('empty rating points generates errors', () => {
   const wrapper = shallow(<ProficiencyTable {...defaultProps()}/>)
   wrapper.instance().handlePointsChange(0)("")
-  expect(wrapper.instance().isStateValid()).toBe(false)
+  expect(wrapper.instance().checkForErrors()).toBe(true)
 })
 
-it('invalid rating points leaves state invalid', () => {
+it('invalid rating points generates errors', () => {
   const wrapper = shallow(<ProficiencyTable {...defaultProps()}/>)
   wrapper.instance().handlePointsChange(0)("1.1.1")
-  expect(wrapper.instance().isStateValid()).toBe(false)
+  expect(wrapper.instance().checkForErrors()).toBe(true)
+})
+
+it('increasing rating points generates errors', () => {
+  const wrapper = shallow(<ProficiencyTable {...defaultProps()}/>)
+  wrapper.instance().handlePointsChange(1)("100")
+  expect(wrapper.instance().checkForErrors()).toBe(true)
 })
 
 it('negative rating points leaves state invalid', () => {

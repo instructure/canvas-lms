@@ -177,9 +177,7 @@ export default class ProficiencyTable extends React.Component {
   })
 
   handleSubmit = () => {
-    if (!this.isStateValid()) {
-      this.checkForErrors()
-    } else {
+    if (!this.checkForErrors()) {
       saveProficiency(this.props.accountId, this.stateToConfig())
         .then((response) => {
           if (response.status === 200) {
@@ -192,6 +190,7 @@ export default class ProficiencyTable extends React.Component {
   }
 
   checkForErrors = () => {
+    let previousPoints = null
     let firstError = true
     const rows = this.state.rows.map((row) => {
       let r = row
@@ -203,6 +202,7 @@ export default class ProficiencyTable extends React.Component {
         }
       }
       if (this.invalidPoints(row.get('points'))) {
+        previousPoints = null
         r = r.set('pointsError', I18n.t('Invalid points'))
         if (firstError) {
           r = r.set('focusField', 'points')
@@ -215,9 +215,23 @@ export default class ProficiencyTable extends React.Component {
           firstError = false
         }
       }
+      else {
+        const currentPoints = row.get('points')
+        if (previousPoints !== null && previousPoints <= currentPoints) {
+          r = r.set('pointsError', I18n.t('Points must be less than previous rating'))
+          if (firstError) {
+            r = r.set('focusField', 'points')
+            firstError = false
+          }
+        }
+        previousPoints = currentPoints
+      }
       return r
     })
-    this.setState({ rows })
+    if (!firstError) {
+      this.setState({ rows })
+    }
+    return !firstError
   }
 
   invalidPoints = (points) => Number.isNaN(points)
