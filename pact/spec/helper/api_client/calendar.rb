@@ -17,7 +17,7 @@
 
 require 'httparty'
 require 'json'
-require_relative '../../../../pact_config'
+require_relative '../../../pact_config'
 
 module Helper
   module ApiClient
