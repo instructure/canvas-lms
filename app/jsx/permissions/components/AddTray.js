@@ -22,6 +22,8 @@ import {connect} from 'react-redux'
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
 
+import {COURSE} from '../propTypes'
+
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Container from '@instructure/ui-layout/lib/components/View'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
@@ -43,7 +45,8 @@ export default class AddTray extends Component {
     hideTray: PropTypes.func.isRequired,
     createNewRole: PropTypes.func.isRequired,
     open: PropTypes.bool.isRequired,
-    loading: PropTypes.bool.isRequired
+    loading: PropTypes.bool.isRequired,
+    tab: PropTypes.string.isRequired
   }
 
   constructor(props) {
@@ -84,6 +87,8 @@ export default class AddTray extends Component {
 
   handleSaveButton = () => {
     const newRole = this.state.selectedBaseType
+    newRole.base_role_type =
+      this.props.tab === COURSE ? newRole.base_role_type : 'AccountMembership'
     this.props.createNewRole(this.state.selectedRoleName, newRole)
   }
 
@@ -188,7 +193,7 @@ export default class AddTray extends Component {
           <Container>
             <Container as="div" padding="small small x-large small">
               {this.renderSelectRoleName()}
-              {this.renderSelectBaseRole()}
+              {this.props.tab === COURSE && this.renderSelectBaseRole()}
             </Container>
             {this.renderTrayFooter()}
           </Container>
@@ -203,7 +208,8 @@ function mapStateToProps(state, ownProps) {
     const stateProps = {
       allBaseRoles: [],
       open: false,
-      loading: false
+      loading: false,
+      tab: COURSE
     }
     return {...stateProps, ...ownProps}
   }
@@ -218,7 +224,8 @@ function mapStateToProps(state, ownProps) {
   const stateProps = {
     allBaseRoles,
     open: true,
-    loading: state.activeAddTray && state.activeAddTray.loading
+    loading: state.activeAddTray && state.activeAddTray.loading,
+    tab: state.roles.find(role => !!role.displayed).contextType
   }
   return {...ownProps, ...stateProps}
 }

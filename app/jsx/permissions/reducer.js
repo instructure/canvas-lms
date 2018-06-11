@@ -82,8 +82,8 @@ const roles = handleActions(
     [actionTypes.ADD_NEW_ROLE]: (state, action) => {
       const displayedRole = state.find(role => !!role.displayed)
       const currentContext = displayedRole.contextType
-      const displayed = currentContext === COURSE
-      const roleToAdd = {...action.payload, displayed, contextType: COURSE}
+      const displayed = true
+      const roleToAdd = {...action.payload, displayed, contextType: currentContext}
       return roleSortedInsert(state, roleToAdd)
     },
     [actionTypes.UPDATE_ROLE]: (state, action) =>
