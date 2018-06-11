@@ -97,10 +97,10 @@ class Login::SamlController < ApplicationController
       # and it's easier to not interweave them so the legacy code can be easily stripped
       # in the future
       assertion = response.assertions.first
-      provider_attributes = assertion.attribute_statements.first&.to_h
-      subject_name_id = assertion.subject.name_id
+      provider_attributes = assertion&.attribute_statements&.first&.to_h || {}
+      subject_name_id = assertion&.subject&.name_id
       unique_id = if aac.login_attribute == 'NameID'
-        subject_name_id.id
+        subject_name_id&.id
       else
         provider_attributes[aac.login_attribute]
       end
