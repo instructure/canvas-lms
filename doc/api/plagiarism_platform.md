@@ -232,7 +232,7 @@ For more details on creating originality reports see the <a href="originality_re
 
 Using the Originality Report and Submissions APIs requires a JWT access token be sent in the authorization header. For more information on using JWT tokens in Canvas see <a href="jwt_access_tokens.html">JWT access tokens</a>.
 
-### 4. Other Features
+### 4. Other Features and Considerations
 The following are optional features the tool provider may wish to implement.
 
 #### Course Copy
@@ -324,7 +324,12 @@ Response:
 ```
 {"tp_custom_setting": "some value"}
 ```
+#### Group Assignments
+When a student submits to a group assignment, Canvas will send a `submission_created` webhook for *each student in that group*. The tool provider need only respond to one of these webhooks per group.
 
+Canvas will copy any originality reports created for a group submission to every other student in the same group. Canvas will also propagate edits to any originality reports for a group submission to every other student in the same group.
+
+The `submission_created` and `subission_updated` webhooks each contain a `group_id` that identifies what group a submission belongs to. Tool providers may use this value to make sure they only create one originality report per group.
 
 #### End-User License Agreement Verification
 ##### Description
