@@ -31,6 +31,7 @@ describe('The Ratings component', () => {
     ],
     defaultMasteryThreshold: 10,
     points: 5,
+    pointsPossible: 10,
     isSummary: false,
     useRange: false
   }
@@ -89,6 +90,36 @@ describe('The Ratings component', () => {
     expect(ratings(5)).toEqual(['transparent', '#65499D', 'transparent'])
     expect(ratings(1)).toEqual(['transparent', 'transparent', '#F8971C'])
     expect(ratings(0, true)).toEqual(['transparent', 'transparent', '#F8971C'])
+  })
+
+  describe('custom ratings', () => {
+    const customRatings = [
+      {points: 100, color: "100100"},
+      {points: 60, color: "606060"},
+      {points: 10, color: "101010"},
+      {points: 1, color: "111111"}
+    ]
+    const ratings = (points, pointsPossible = 10) =>
+      component({ points, pointsPossible, customRatings, useRange: true }).find('Rating').map((el) => el.prop('tierColor'))
+
+    it('scales points to custom ratings', () => {
+      expect(ratings(10)).toEqual(['#100100', 'transparent', 'transparent'])
+      expect(ratings(6)).toEqual(['#606060', 'transparent', 'transparent'])
+      expect(ratings(5)).toEqual(['transparent', '#101010', 'transparent'])
+      expect(ratings(4.4)).toEqual(['transparent', '#101010', 'transparent'])
+      expect(ratings(1)).toEqual(['transparent', 'transparent', '#101010'])
+      expect(ratings(0.1)).toEqual(['transparent', 'transparent', '#111111'])
+      expect(ratings(0)).toEqual(['transparent', 'transparent', '#111111'])
+    })
+
+    it('does not scale points if pointsPossible is 0', () => {
+      expect(ratings(10, 0)).toEqual(['#101010', 'transparent', 'transparent'])
+      expect(ratings(4, 0)).toEqual(['transparent', '#111111', 'transparent'])
+    })
+  })
+
+  it('does not scale points if points possible is 0', () => {
+
   })
 
   it('is navigable and clickable when assessing', () => {

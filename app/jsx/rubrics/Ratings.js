@@ -105,9 +105,10 @@ const getDefaultColor = (points, defaultMasteryThreshold) => {
   }
 }
 
-const getCustomColor = (points, customRatings) => {
+const getCustomColor = (points, pointsPossible, customRatings) => {
   const sortedRatings = _.sortBy(customRatings, 'points').reverse()
-  const selectedRating = _.find(sortedRatings, (rating) => ( points >= rating.points ))
+  const scaledPoints = pointsPossible > 0 ? points * (sortedRatings[0].points / pointsPossible) : points
+  const selectedRating = _.find(sortedRatings, (rating) => ( scaledPoints >= rating.points ))
   if (selectedRating) {
     return `#${selectedRating.color}`
   } else {
@@ -136,6 +137,7 @@ const Ratings = (props) => {
     footer,
     tiers,
     points,
+    pointsPossible,
     onPointChange,
     isSummary,
     useRange
@@ -165,7 +167,7 @@ const Ratings = (props) => {
   const getTierColor = (selected) => {
     if (!selected) { return 'transparent' }
     if (customRatings && customRatings.length > 0) {
-      return getCustomColor(points, customRatings)
+      return getCustomColor(points, pointsPossible, customRatings)
     } else {
       return getDefaultColor(points, defaultMasteryThreshold)
     }
