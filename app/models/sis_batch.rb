@@ -161,10 +161,8 @@ class SisBatch < ActiveRecord::Base
   class Aborted < RuntimeError; end
 
   def self.queue_job_for_account(account, run_at=nil)
-    job_args = {:priority => Delayed::LOW_PRIORITY, :max_attempts => 1}
-
-    key = use_parallel_importers?(account) ? :strand : :singleton
-    job_args[key] = strand_for_account(account)
+    job_args = {:priority => Delayed::LOW_PRIORITY, :max_attempts => 1,
+      :singleton => strand_for_account(account)}
 
     if run_at
       job_args[:run_at] = run_at
@@ -273,28 +271,18 @@ class SisBatch < ActiveRecord::Base
   end
 
   def self.process_all_for_account(account)
-    if use_parallel_importers?(account)
-      if account.sis_batches.importing.exists?
-        delay = Setting.get('sis_batch_recheck_delay', 5.minutes).to_i
-        queue_job_for_account(account, delay.seconds.from_now) # requeue another job to check a little later
-      else
-        batch_to_run = account.sis_batches.needs_processing.order(:created_at).first
-        if batch_to_run
-          batch_to_run.process_without_send_later
-        end
-      end
-    else
-      start_time = Time.now
-      loop do
-        batches = account.sis_batches.needs_processing.limit(50).order(:created_at).to_a
-        break if batches.empty?
-        batches.each do |batch|
-          batch.process_without_send_later
-          if Time.now - start_time > Setting.get('max_time_per_sis_batch', 60).to_i
-            # requeue the job to continue processing more batches
-            queue_job_for_account(account)
-            return
-          end
+    return if use_parallel_importers?(account) && account.sis_batches.importing.exists? # will be requeued after the current batch finishes
+    start_time = Time.now
+    loop do
+      batches = account.sis_batches.needs_processing.limit(50).order(:created_at).to_a
+      break if batches.empty?
+      batches.each do |batch|
+        batch.process_without_send_later
+        return if batch.importing? # we'll requeue afterwards
+        if Time.now - start_time > Setting.get('max_time_per_sis_batch', 60).to_i
+          # requeue the job to continue processing more batches
+          queue_job_for_account(account)
+          return
         end
       end
     end
@@ -391,11 +379,8 @@ class SisBatch < ActiveRecord::Base
     self.ended_at = Time.now.utc
     self.save!
 
-    if self.class.use_parallel_importers?(account)
-      # set waiting jobs as available - or queue another job if there are none
-      if Delayed::Job.where(:strand => self.class.strand_for_account(account), :locked_by => nil).update_all(:run_at => Time.now.utc) == 0
-        self.class.queue_job_for_account(account)
-      end
+    if self.class.use_parallel_importers?(account) && !self.data[:running_immediately] && self.account.sis_batches.needs_processing.exists?
+      self.class.queue_job_for_account(account) # check if there's anything that needs to be run
     end
   end
 
