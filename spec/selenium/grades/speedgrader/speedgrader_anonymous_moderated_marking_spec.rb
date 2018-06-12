@@ -106,4 +106,42 @@ describe "SpeedGrader" do
       expect(Speedgrader.mute_button.attribute('class')).not_to include 'disabled'
     end
   end
+
+  context 'with a moderated anonymous assignment' do
+    before(:each) do
+      @teacher2 = course_with_teacher(course: @course, name: 'Teacher2', active_all: true).user
+      @teacher3 = course_with_teacher(course: @course, name: 'Teacher3', active_all: true).user
+
+      @moderated_anonymous_assignment = @course.assignments.create!(
+        title: 'Moderated Anonymous Assignment1',
+        grader_count: 2,
+        final_grader_id: @teacher.id,
+        moderated_grading: true,
+        grader_comments_visible_to_graders: true,
+        anonymous_grading: true,
+        graders_anonymous_to_graders: true
+      )
+
+      user_session(@teacher2)
+    end
+
+    it 'anonymizes grader comments', priority: '1', test_id: 3505165 do
+      skip 'fixed with GRADE-1126'
+
+      Speedgrader.visit(@course.id, @moderated_anonymous_assignment.id)
+
+      Speedgrader.enter_grade(15)
+      Speedgrader.add_comment_and_submit('Some comment text')
+      wait_for_ajaximations
+
+      user_session(@teacher3)
+      Speedgrader.visit(@course.id, @moderated_anonymous_assignment.id)
+
+      expect(Speedgrader.comments.length).to eq 1
+      comment_text = Speedgrader.comments.first.text
+      expect(comment_text).to include 'Some comment text'
+      expect(comment_text).not_to include 'Teacher2'
+      expect(comment_text).to include 'Grader 1'
+    end
+  end
 end

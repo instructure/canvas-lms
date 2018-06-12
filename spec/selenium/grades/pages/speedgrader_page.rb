@@ -104,6 +104,10 @@ class Speedgrader
       f('.delete_comment_link')
     end
 
+    def comments
+      ff('div.comment')
+    end
+
     def submission_file_name
       f('#submission_files_list .submission-file .display_name')
     end
