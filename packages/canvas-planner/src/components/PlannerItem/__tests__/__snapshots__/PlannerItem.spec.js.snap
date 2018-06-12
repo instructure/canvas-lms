@@ -3330,7 +3330,7 @@ exports[`renders feedback if available 1`] = `
       }
     }
   >
-    <IconAssignmentLine />
+    <IconAssignment />
   </div>
   <div>
     <div>

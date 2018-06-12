@@ -20,6 +20,7 @@ import { connect } from 'react-redux';
 import themeable from '@instructure/ui-themeable/lib';
 import Button from '@instructure/ui-buttons/lib/components/Button';
 import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton';
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import View from '@instructure/ui-layout/lib/components/View';
 import IconPlusLine from '@instructure/ui-icons/lib/Line/IconPlus';
 import IconAlertsLine from '@instructure/ui-icons/lib/Line/IconAlerts';
@@ -304,14 +305,16 @@ export class PlannerHeader extends Component {
           onClick={this.toggleUpdateItemTray}
           ref={(b) => { this.addNoteBtn = b; }}
         >
-          <IconPlusLine title={formatMessage("Add To Do")} />
+          <IconPlusLine/>
+          <ScreenReaderContent>{formatMessage("Add To Do")}</ScreenReaderContent>
         </Button>
         <Button
           variant="icon"
           margin="0 medium 0 0"
           onClick={this.toggleGradesTray}
         >
-          <IconGradebookLine title={formatMessage("Show My Grades")} />
+          <IconGradebookLine/>
+          <ScreenReaderContent>{formatMessage("Show My Grades")}</ScreenReaderContent>
         </Button>
         <Popover
           onDismiss={this.closeOpportunitiesDropdown}
@@ -329,7 +332,8 @@ export class PlannerHeader extends Component {
               buttonRef={(b) => { this.opportunitiesHtmlButton = b; }}
             >
               <Badge {...this.state.opportunities.length ? {count :this.state.opportunities.length} : {}}>
-                <IconAlertsLine title={this.opportunityTitle()} />
+                <IconAlertsLine/>
+                <ScreenReaderContent>{this.opportunityTitle()}</ScreenReaderContent>
               </Badge>
             </Button>
           </PopoverTrigger>

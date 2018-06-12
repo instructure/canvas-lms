@@ -25,9 +25,12 @@ exports[`new activity button does not show when there is no new activity 1`] = `
     type="button"
     variant="icon"
   >
-    <IconPlus
-      title="Add To Do"
-    />
+    <IconPlus />
+    <ScreenReaderContent
+      as="span"
+    >
+      Add To Do
+    </ScreenReaderContent>
   </Button>
   <Button
     as="button"
@@ -39,9 +42,12 @@ exports[`new activity button does not show when there is no new activity 1`] = `
     type="button"
     variant="icon"
   >
-    <IconGradebook
-      title="Show My Grades"
-    />
+    <IconGradebook />
+    <ScreenReaderContent
+      as="span"
+    >
+      Show My Grades
+    </ScreenReaderContent>
   </Button>
   <Popover
     alignArrow={false}
@@ -100,9 +106,12 @@ exports[`new activity button does not show when there is no new activity 1`] = `
           type="count"
           variant="primary"
         >
-          <IconAlerts
-            title="1 opportunity"
-          />
+          <IconAlerts />
+          <ScreenReaderContent
+            as="span"
+          >
+            1 opportunity
+          </ScreenReaderContent>
         </Badge>
       </Button>
     </PopoverTrigger>
@@ -261,9 +270,12 @@ exports[`new activity button shows when there is new activity 1`] = `
     type="button"
     variant="icon"
   >
-    <IconPlus
-      title="Add To Do"
-    />
+    <IconPlus />
+    <ScreenReaderContent
+      as="span"
+    >
+      Add To Do
+    </ScreenReaderContent>
   </Button>
   <Button
     as="button"
@@ -275,9 +287,12 @@ exports[`new activity button shows when there is new activity 1`] = `
     type="button"
     variant="icon"
   >
-    <IconGradebook
-      title="Show My Grades"
-    />
+    <IconGradebook />
+    <ScreenReaderContent
+      as="span"
+    >
+      Show My Grades
+    </ScreenReaderContent>
   </Button>
   <Popover
     alignArrow={false}
@@ -336,9 +351,12 @@ exports[`new activity button shows when there is new activity 1`] = `
           type="count"
           variant="primary"
         >
-          <IconAlerts
-            title="1 opportunity"
-          />
+          <IconAlerts />
+          <ScreenReaderContent
+            as="span"
+          >
+            1 opportunity
+          </ScreenReaderContent>
         </Badge>
       </Button>
     </PopoverTrigger>
@@ -508,9 +526,12 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
     type="button"
     variant="icon"
   >
-    <IconPlus
-      title="Add To Do"
-    />
+    <IconPlus />
+    <ScreenReaderContent
+      as="span"
+    >
+      Add To Do
+    </ScreenReaderContent>
   </Button>
   <Button
     as="button"
@@ -522,9 +543,12 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
     type="button"
     variant="icon"
   >
-    <IconGradebook
-      title="Show My Grades"
-    />
+    <IconGradebook />
+    <ScreenReaderContent
+      as="span"
+    >
+      Show My Grades
+    </ScreenReaderContent>
   </Button>
   <Popover
     alignArrow={false}
@@ -583,9 +607,12 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
           type="count"
           variant="primary"
         >
-          <IconAlerts
-            title="1 opportunity"
-          />
+          <IconAlerts />
+          <ScreenReaderContent
+            as="span"
+          >
+            1 opportunity
+          </ScreenReaderContent>
         </Badge>
       </Button>
     </PopoverTrigger>
