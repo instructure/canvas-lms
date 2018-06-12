@@ -28,6 +28,8 @@ QUnit.module('ModeratedGradingCheckbox', hooks => {
     props = {
       checked: false,
       gradedSubmissionsExist: false,
+      isGroupAssignment: false,
+      isPeerReviewAssignment: false,
       onChange: () => {}
     }
   })
@@ -56,13 +58,26 @@ QUnit.module('ModeratedGradingCheckbox', hooks => {
     strictEqual(checkbox().node.checked, true)
   })
 
-  test('enables the checkbox if no graded submissions exist', () => {
+  test('enables the checkbox if no graded submissions exist, it is not a peer ' +
+  'review assignment, and it is not a group assignment', () => {
     mountComponent()
     strictEqual(checkbox().node.disabled, false)
   })
 
   test('disables the checkbox if graded submissions exist', () => {
     props.gradedSubmissionsExist = true
+    mountComponent()
+    strictEqual(checkbox().node.disabled, true)
+  })
+
+  test('disables the checkbox if it is a peer review assignment', () => {
+    props.isPeerReviewAssignment = true
+    mountComponent()
+    strictEqual(checkbox().node.disabled, true)
+  })
+
+  test('disables the checkbox if it is a group assignment', () => {
+    props.isGroupAssignment = true
     mountComponent()
     strictEqual(checkbox().node.disabled, true)
   })

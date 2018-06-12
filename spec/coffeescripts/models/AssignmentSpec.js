@@ -1208,3 +1208,39 @@ QUnit.module('Assignment#gradersAnonymousToGraders', (hooks) => {
     equal(assignment.gradersAnonymousToGraders(), false)
   })
 })
+
+QUnit.module('Assignment#showGradersAnonymousToGradersCheckbox', (hooks) => {
+  let assignment
+
+  hooks.beforeEach(() => {
+    assignment = new Assignment()
+  })
+
+  test('returns false if grader_comments_visible_to_graders is false', () => {
+    assignment.set('grader_comments_visible_to_graders', false)
+    equal(assignment.showGradersAnonymousToGradersCheckbox(), false)
+  })
+
+  test('returns false if moderated_grading is false', () => {
+    assignment.set('moderated_grading', false)
+    equal(assignment.showGradersAnonymousToGradersCheckbox(), false)
+  })
+
+  test('returns false if grader_comments_visible_to_graders is false and moderated_grading is true', () => {
+    assignment.set('grader_comments_visible_to_graders', false)
+    assignment.set('moderated_grading', true)
+    equal(assignment.showGradersAnonymousToGradersCheckbox(), false)
+  })
+
+  test('returns false if grader_comments_visible_to_graders is true and moderated_grading is false', () => {
+    assignment.set('grader_comments_visible_to_graders', true)
+    assignment.set('moderated_grading', false)
+    equal(assignment.showGradersAnonymousToGradersCheckbox(), false)
+  })
+
+  test('returns true if grader_comments_visible_to_graders is true and moderated_grading is true', () => {
+    assignment.set('grader_comments_visible_to_graders', true)
+    assignment.set('moderated_grading', true)
+    equal(assignment.showGradersAnonymousToGradersCheckbox(), true)
+  })
+})

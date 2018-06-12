@@ -31,6 +31,8 @@ QUnit.module('ModeratedGradingFormFieldGroup', hooks => {
       graderCommentsVisibleToGraders: true,
       graderNamesVisibleToFinalGrader: true,
       gradedSubmissionsExist: false,
+      isGroupAssignment: false,
+      isPeerReviewAssignment: false,
       locale: 'en',
       maxGraderCount: 10,
       moderatedGradingEnabled: true

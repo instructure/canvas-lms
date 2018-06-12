@@ -453,7 +453,7 @@ define [
         'isImporting', 'failedToImport',
         'secureParams', 'inClosedGradingPeriod', 'dueDateRequired',
         'submissionTypesFrozen', 'anonymousInstructorAnnotations',
-        'anonymousGrading', 'gradersAnonymousToGraders'
+        'anonymousGrading', 'gradersAnonymousToGraders', 'showGradersAnonymousToGradersCheckbox'
       ]
 
       hash =
@@ -589,3 +589,6 @@ define [
 
     isRestrictedByMasterCourse: ->
       @get('is_master_course_child_content') && @get('restricted_by_master_course')
+
+    showGradersAnonymousToGradersCheckbox: =>
+      @moderatedGrading() && @get('grader_comments_visible_to_graders')

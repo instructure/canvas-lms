@@ -100,6 +100,14 @@ const editView = function(assignmentOpts = {}) {
   return app.render()
 }
 
+function checkCheckbox(id) {
+  document.getElementById(id).checked = true
+}
+
+function disableCheckbox(id) {
+  document.getElementById(id).disabled = true
+}
+
 QUnit.module('EditView', {
   setup() {
     fixtures.innerHTML = '<span data-component="ModeratedGradingFormFieldGroup"></span>'
@@ -474,7 +482,12 @@ test('rounds points_possible', function() {
 
 QUnit.module('EditView: handleGroupCategoryChange', {
   setup() {
-    fixtures.innerHTML = '<span data-component="ModeratedGradingFormFieldGroup"></span>'
+    fixtures.innerHTML = `
+      <span id="editor_tabs"></span>
+      <span data-component="ModeratedGradingFormFieldGroup"></span>
+      <input type="checkbox" id="has_group_category" >
+      <input type="checkbox" id="assignment_anonymous_grading">
+    `
     fakeENV.setup({
       AVAILABLE_MODERATORS: [],
       current_user_roles: ['teacher'],
@@ -497,12 +510,166 @@ QUnit.module('EditView: handleGroupCategoryChange', {
   }
 })
 
-test('calls handleModeratedGradingChange', function() {
+test('unchecks the group category checkbox if the anonymous grading checkbox is checked', function() {
   const view = this.editView()
-  sinon.spy(view, 'handleModeratedGradingChange')
+  checkCheckbox('assignment_anonymous_grading')
+  checkCheckbox('has_group_category')
   view.handleGroupCategoryChange()
-  ok(view.handleModeratedGradingChange.calledOnce)
-  view.handleModeratedGradingChange.restore()
+  const groupCategoryCheckbox = document.getElementById('has_group_category')
+  strictEqual(groupCategoryCheckbox.checked, false)
+})
+
+test('disables the anonymous grading checkbox if the group category checkbox is checked', function() {
+  const view = this.editView()
+  checkCheckbox('has_group_category')
+  view.handleGroupCategoryChange()
+  const anonymousGradingCheckbox = document.getElementById('assignment_anonymous_grading')
+  strictEqual(anonymousGradingCheckbox.disabled, true)
+})
+
+test('enables the anonymous grading checkbox if the group category checkbox is unchecked', function() {
+  const view = this.editView()
+  disableCheckbox('assignment_anonymous_grading')
+  view.handleGroupCategoryChange()
+  const anonymousGradingCheckbox = document.getElementById('assignment_anonymous_grading')
+  strictEqual(anonymousGradingCheckbox.disabled, false)
+})
+
+test('calls togglePeerReviewsAndGroupCategoryEnabled', function() {
+  const view = this.editView()
+  sinon.spy(view, 'togglePeerReviewsAndGroupCategoryEnabled')
+  view.handleGroupCategoryChange()
+  ok(view.togglePeerReviewsAndGroupCategoryEnabled.calledOnce)
+  view.togglePeerReviewsAndGroupCategoryEnabled.restore()
+})
+
+QUnit.module('#handleAnonymousGradingChange', (hooks) => {
+  let server
+  let view
+
+  hooks.beforeEach(() => {
+    fixtures.innerHTML = `
+      <span id="editor_tabs"></span>
+      <span data-component="ModeratedGradingFormFieldGroup"></span>
+      <input type="checkbox" id="has_group_category" >
+      <input type="checkbox" id="assignment_anonymous_grading">
+    `
+    fakeENV.setup({
+      AVAILABLE_MODERATORS: [],
+      current_user_roles: ['teacher'],
+      HAS_GRADED_SUBMISSIONS: false,
+      LOCALE: 'en',
+      MODERATED_GRADING_ENABLED: true,
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      VALID_DATE_RANGE: {},
+      COURSE_ID: 1
+    })
+    server = sinon.fakeServer.create()
+    view = editView()
+  })
+
+  hooks.afterEach(() => {
+    server.restore()
+    fakeENV.teardown()
+    fixtures.innerHTML = ''
+  })
+
+  test('unchecks the anonymous grading checkbox when the group category checkbox is checked', () => {
+    checkCheckbox('has_group_category')
+    checkCheckbox('assignment_anonymous_grading')
+    view.handleAnonymousGradingChange()
+    const anonymousGradingCheckbox = document.getElementById('assignment_anonymous_grading')
+    strictEqual(anonymousGradingCheckbox.checked, false)
+  })
+
+  test('disables the group category box if the anonymous grading checkbox is checked', () => {
+    checkCheckbox('assignment_anonymous_grading')
+    view.handleAnonymousGradingChange()
+    const groupCategoryCheckbox = document.getElementById('has_group_category')
+    strictEqual(groupCategoryCheckbox.disabled, true)
+  })
+
+  test('disables the group category box if graders anonymous to graders is true', () => {
+    view.assignment.gradersAnonymousToGraders(true)
+    view.handleAnonymousGradingChange()
+    const groupCategoryCheckbox = document.getElementById('has_group_category')
+    strictEqual(groupCategoryCheckbox.disabled, true)
+  })
+
+  test('enables the group category box if the assignment is not moderated', () => {
+    disableCheckbox('has_group_category')
+    view.handleAnonymousGradingChange()
+    const groupCategoryCheckbox = document.getElementById('has_group_category')
+    strictEqual(groupCategoryCheckbox.disabled, false)
+  })
+
+  test('leaves the group category box disabled if the assignment is moderated', () => {
+    view.assignment.moderatedGrading(true)
+    disableCheckbox('has_group_category')
+    view.handleAnonymousGradingChange()
+    const groupCategoryCheckbox = document.getElementById('has_group_category')
+    strictEqual(groupCategoryCheckbox.disabled, true)
+  })
+})
+
+QUnit.module('#togglePeerReviewsAndGroupCategoryEnabled', (hooks) => {
+  let server
+  let view
+
+  hooks.beforeEach(() => {
+    fixtures.innerHTML = `
+      <span id="editor_tabs"></span>
+      <span data-component="ModeratedGradingFormFieldGroup"></span>
+      <input type="checkbox" id="has_group_category" >
+      <input type="checkbox" id="assignment_peer_reviews">
+    `
+    fakeENV.setup({
+      AVAILABLE_MODERATORS: [],
+      current_user_roles: ['teacher'],
+      HAS_GRADED_SUBMISSIONS: false,
+      LOCALE: 'en',
+      MODERATED_GRADING_ENABLED: true,
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      VALID_DATE_RANGE: {},
+      COURSE_ID: 1
+    })
+    server = sinon.fakeServer.create()
+    view = editView()
+  })
+
+  hooks.afterEach(() => {
+    server.restore()
+    fakeENV.teardown()
+    fixtures.innerHTML = ''
+  })
+
+  test('disables the peer review checkbox if the assignment is moderated', () => {
+    view.assignment.moderatedGrading(true)
+    view.togglePeerReviewsAndGroupCategoryEnabled()
+    const peerReviewsCheckbox = document.getElementById('assignment_peer_reviews')
+    strictEqual(peerReviewsCheckbox.disabled, true)
+  })
+
+  test('disables the group category checkbox if the assignment is moderated', () => {
+    view.assignment.moderatedGrading(true)
+    view.togglePeerReviewsAndGroupCategoryEnabled()
+    const groupCategoryCheckbox = document.getElementById('has_group_category')
+    strictEqual(groupCategoryCheckbox.disabled, true)
+  })
+
+  test('enables the peer review checkbox if the assignment is not moderated', () => {
+    disableCheckbox('assignment_peer_reviews')
+    view.togglePeerReviewsAndGroupCategoryEnabled()
+    const peerReviewsCheckbox = document.getElementById('assignment_peer_reviews')
+    strictEqual(peerReviewsCheckbox.disabled, false)
+  })
+
+  test('enables the group category checkbox if the assignment is not moderated', () => {
+    disableCheckbox('has_group_category')
+    view.togglePeerReviewsAndGroupCategoryEnabled()
+    const peerReviewsCheckbox = document.getElementById('has_group_category')
+    strictEqual(peerReviewsCheckbox.disabled, false)
+  })
 })
 
 QUnit.module('EditView: group category inClosedGradingPeriod', {
@@ -1319,6 +1486,23 @@ QUnit.module('EditView#renderModeratedGradingFormFieldGroup', (suiteHooks) => {
       view.assignment.set('grader_names_visible_to_final_grader', true)
       view.renderModeratedGradingFormFieldGroup()
       strictEqual(props().graderNamesVisibleToFinalGrader, true)
+    })
+
+    test('passes peer_reviews as a prop to the component', () => {
+      view.assignment.set('peer_reviews', true)
+      view.renderModeratedGradingFormFieldGroup()
+      strictEqual(props().isPeerReviewAssignment, true)
+    })
+
+    test('passes true for isGroupAssignment to the component if it has a group_category_id', () => {
+      view.assignment.set('group_category_id', '2')
+      view.renderModeratedGradingFormFieldGroup()
+      strictEqual(props().isGroupAssignment, true)
+    })
+
+    test('passes false for isGroupAssignment to the component if it does not have a group_category_id', () => {
+      view.renderModeratedGradingFormFieldGroup()
+      strictEqual(props().isGroupAssignment, false)
     })
   })
 })

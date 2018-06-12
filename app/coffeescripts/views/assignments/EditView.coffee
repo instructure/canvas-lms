@@ -90,7 +90,6 @@ define [
     PEER_REVIEWS_BOX = '#assignment_peer_reviews'
     INTRA_GROUP_PEER_REVIEWS = '#intra_group_peer_reviews_toggle'
     GROUP_CATEGORY_BOX = '#has_group_category'
-    MODERATED_GRADING_BOX = '#assignment_moderated_grading'
     CONDITIONAL_RELEASE_TARGET = '#conditional_release_target'
     SIMILARITY_DETECTION_TOOLS = '#similarity_detection_tools'
     ANONYMOUS_GRADING_BOX = '#assignment_anonymous_grading'
@@ -120,7 +119,6 @@ define [
       els["#{EXTERNAL_TOOLS_CONTENT_ID}"] = '$externalToolsContentId'
       els["#{ASSIGNMENT_POINTS_POSSIBLE}"] = '$assignmentPointsPossible'
       els["#{ASSIGNMENT_POINTS_CHANGE_WARN}"] = '$pointsChangeWarning'
-      els["#{MODERATED_GRADING_BOX}"] = '$moderatedGradingBox'
       els["#{CONDITIONAL_RELEASE_TARGET}"] = '$conditionalReleaseTarget'
       els["#{SIMILARITY_DETECTION_TOOLS}"] = '$similarityDetectionTools'
       els["#{SECURE_PARAMS}"] = '$secureParams'
@@ -141,7 +139,7 @@ define [
       events["change #{ALLOW_FILE_UPLOADS}"] = 'toggleRestrictFileUploads'
       events["click #{EXTERNAL_TOOLS_URL}_find"] = 'showExternalToolsDialog'
       events["change #assignment_points_possible"] = 'handlePointsChange'
-      events["change #{PEER_REVIEWS_BOX}"] = 'handleModeratedGradingChange'
+      events["change #{PEER_REVIEWS_BOX}"] = 'togglePeerReviewsAndGroupCategoryEnabled'
       events["change #{GROUP_CATEGORY_BOX}"] = 'handleGroupCategoryChange'
       events["change #{ANONYMOUS_GRADING_BOX}"] = 'handleAnonymousGradingChange'
       if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
@@ -212,50 +210,34 @@ define [
       isAnonymous = @$anonymousGradingBox.prop('checked')
 
       if isAnonymous
-        @resetHasGroupCategory()
-      else
-        @updateHasGroupCategory(isGrouped)
-
-      @$intraGroupPeerReviews.toggleAccessibly(isGrouped)
-      @handleModeratedGradingChange()
-
-    handleAnonymousGradingChange: ->
-      isGrouped = @$groupCategoryBox.prop('checked')
-      isAnonymous = @$anonymousGradingBox.prop('checked')
-
-      if isGrouped
-        @resetAnonymousGrading()
-      else
-        @updateAnonymousGrading(isAnonymous)
-
-    resetHasGroupCategory: =>
-      @$groupCategoryBox.prop('checked', false)
-
-    updateHasGroupCategory: (setting) =>
-      if setting
+        @$groupCategoryBox.prop('checked', false)
+      else if isGrouped
         @disableCheckbox(@$anonymousGradingBox, I18n.t('Anonymous grading cannot be enabled for group assignments'))
       else
         @enableCheckbox(@$anonymousGradingBox)
 
-    resetAnonymousGrading: =>
-      @$anonymousGradingBox.prop('checked', false)
+      @$intraGroupPeerReviews.toggleAccessibly(isGrouped)
+      @togglePeerReviewsAndGroupCategoryEnabled()
 
-    updateAnonymousGrading: (setting) =>
-      if setting
+    handleAnonymousGradingChange: ->
+      isGrouped = @$groupCategoryBox.prop('checked')
+      isAnonymous = !isGrouped && @$anonymousGradingBox.prop('checked')
+      @assignment.anonymousGrading(isAnonymous)
+
+      if isGrouped
+        @$anonymousGradingBox.prop('checked', false)
+      else if @assignment.anonymousGrading() || @assignment.gradersAnonymousToGraders()
         @disableCheckbox(@$groupCategoryBox, I18n.t('Group assignments cannot be enabled for anonymously graded assignments'))
-      else
+      else if !@assignment.moderatedGrading()
         @enableCheckbox(@$groupCategoryBox)
 
-      @assignment.anonymousGrading(setting)
-
-    handleModeratedGradingChange: =>
-      if !ENV?.HAS_GRADED_SUBMISSIONS
-        if @$moderatedGradingBox.prop('checked')
-          @disableCheckbox(@$peerReviewsBox, I18n.t("Peer reviews cannot be enabled for moderated assignments"))
-          @disableCheckbox(@$groupCategoryBox, I18n.t("Group assignments cannot be enabled for moderated assignments"))
-        else
-          @enableCheckbox(@$peerReviewsBox)
-          @enableCheckbox(@$groupCategoryBox)
+    togglePeerReviewsAndGroupCategoryEnabled: =>
+      if @assignment.moderatedGrading()
+        @disableCheckbox(@$peerReviewsBox, I18n.t("Peer reviews cannot be enabled for moderated assignments"))
+        @disableCheckbox(@$groupCategoryBox, I18n.t("Group assignments cannot be enabled for moderated assignments"))
+      else
+        @enableCheckbox(@$peerReviewsBox)
+        @enableCheckbox(@$groupCategoryBox)
 
     setDefaultsIfNew: =>
       if @assignment.isNew()
@@ -349,7 +331,7 @@ define [
 
       @_attachEditorToDescription()
       @addTinyMCEKeyboardShortcuts()
-      @handleModeratedGradingChange()
+      @togglePeerReviewsAndGroupCategoryEnabled()
       @handleOnlineSubmissionTypeChange()
       @handleSubmissionTypeChange()
       @handleGroupCategoryChange()
@@ -685,6 +667,8 @@ define [
         graderCommentsVisibleToGraders: !!@assignment.get('grader_comments_visible_to_graders')
         graderNamesVisibleToFinalGrader: !!@assignment.get('grader_names_visible_to_final_grader')
         gradedSubmissionsExist: ENV.HAS_GRADED_SUBMISSIONS
+        isPeerReviewAssignment: !!@assignment.peerReviews()
+        isGroupAssignment: !!@assignment.groupCategoryId()
         moderatedGradingEnabled: @assignment.moderatedGrading()
         availableModerators: ENV.AVAILABLE_MODERATORS
         maxGraderCount: ENV.MODERATED_GRADING_MAX_GRADER_COUNT

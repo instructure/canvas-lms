@@ -26,15 +26,28 @@ export default function ModeratedGradingCheckbox(props) {
     props.onChange(!props.checked)
   }
 
+  function tooltipMessage() {
+    if (props.gradedSubmissionsExist) {
+      return I18n.t('Moderated grading setting cannot be changed if graded submissions exist')
+    } else if (props.isGroupAssignment) {
+      return I18n.t('Moderated grading cannot be enabled for group assignments')
+    } else if (props.isPeerReviewAssignment) {
+      return I18n.t('Moderated grading cannot be enabled for peer reviewed assignments')
+    }
+
+    return ''
+  }
+
+  const isDisabled = props.gradedSubmissionsExist || props.isGroupAssignment || props.isPeerReviewAssignment
   const body = (
     <label className="ModeratedGrading__CheckboxLabel" htmlFor="assignment_moderated_grading">
       <input type="hidden" name="moderated_grading" value={props.checked} />
 
       <input
-        aria-disabled={props.gradedSubmissionsExist}
+        aria-disabled={isDisabled}
         className="Assignment__Checkbox ModeratedGrading__Checkbox"
         checked={props.checked}
-        disabled={props.gradedSubmissionsExist}
+        disabled={isDisabled}
         id="assignment_moderated_grading"
         name="moderated_grading"
         onChange={handleChange}
@@ -49,11 +62,11 @@ export default function ModeratedGradingCheckbox(props) {
     </label>
   )
 
-  if (props.gradedSubmissionsExist) {
+  if (isDisabled) {
     return (
       <Tooltip
         on={['hover']}
-        tip={I18n.t('Moderated grading setting cannot be changed if graded submissions exist')}
+        tip={tooltipMessage()}
         variant="inverse"
       >
         {body}
@@ -67,5 +80,7 @@ export default function ModeratedGradingCheckbox(props) {
 ModeratedGradingCheckbox.propTypes = {
   checked: bool.isRequired,
   gradedSubmissionsExist: bool.isRequired,
+  isGroupAssignment: bool.isRequired,
+  isPeerReviewAssignment: bool.isRequired,
   onChange: func.isRequired
 }

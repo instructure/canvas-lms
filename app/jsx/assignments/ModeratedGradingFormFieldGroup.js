@@ -34,6 +34,8 @@ export default class ModeratedGradingFormFieldGroup extends React.Component {
     graderCommentsVisibleToGraders: bool.isRequired,
     graderNamesVisibleToFinalGrader: bool.isRequired,
     gradedSubmissionsExist: bool.isRequired,
+    isGroupAssignment: bool.isRequired,
+    isPeerReviewAssignment: bool.isRequired,
     locale: string.isRequired,
     maxGraderCount: number.isRequired,
     moderatedGradingEnabled: bool.isRequired
@@ -65,6 +67,8 @@ export default class ModeratedGradingFormFieldGroup extends React.Component {
             <ModeratedGradingCheckbox
               checked={this.state.moderatedGradingChecked}
               gradedSubmissionsExist={this.props.gradedSubmissionsExist}
+              isGroupAssignment={this.props.isGroupAssignment}
+              isPeerReviewAssignment={this.props.isPeerReviewAssignment}
               onChange={this.handleModeratedGradingChange}
             />
 
