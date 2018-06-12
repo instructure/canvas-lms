@@ -53,7 +53,7 @@ import IconUpdownLine from '@instructure/ui-icons/lib/Line/IconUpdown'
 import Pill from '@instructure/ui-elements/lib/components/Pill'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-elements/lib/components/Text'
-import { MenuItem } from '@instructure/ui-core/lib/components/Menu'
+import { MenuItem } from '@instructure/ui-menu/lib/components/Menu'
 
 import DiscussionModel from 'compiled/models/DiscussionTopic'
 import LockIconView from 'compiled/views/LockIconView'
