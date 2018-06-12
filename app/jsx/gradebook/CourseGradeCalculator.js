@@ -35,7 +35,7 @@ function addWithPrecision (a, b) {
 
 function sum (collection) {
   const bigValue = _.reduce(collection, addWithPrecision, 0)
-  return Number.parseFloat(bigValue, 10)
+  return parseFloat(bigValue, 10)
 }
 
 function sumBy (collection, attr) {
