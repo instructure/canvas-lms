@@ -26,7 +26,7 @@ module MasterCourses::TagHelper
   end
 
   def load_tags!(objects=nil)
-    return if @content_tag_index && objects
+    return if @content_tag_index && !objects # if we already loaded everything don't worry
     @content_tag_index ||= {}
     tag_scope = self.content_tags
 
