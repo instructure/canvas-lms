@@ -140,7 +140,7 @@ class SRGB
     end
 
     def speedgrader_link
-      f('#assignment-speedgrader-link a')
+      f('#assignment-speedgrader-link')
     end
 
     def assignment_scores

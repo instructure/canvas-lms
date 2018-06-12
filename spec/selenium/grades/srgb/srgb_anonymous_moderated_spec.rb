@@ -17,6 +17,7 @@
 
 require_relative '../../helpers/gradebook_common'
 require_relative '../pages/srgb_page'
+require_relative '../pages/speedgrader_page'
 
 describe "Individual View Gradebook" do
   include_context 'in-process server selenium tests'
@@ -138,6 +139,23 @@ describe "Individual View Gradebook" do
       expect(SRGB.assignment_dropdown).not_to include_text 'Anonymous Assignment'
       # unmuted anonymous assignment is displayed
       expect(SRGB.assignment_dropdown).to include_text 'Unmuted Anon Assignment'
+    end
+
+    it 'hides student names in speedgrader', priority: '2', test_id: 3505167 do
+      # Open screenreader gradebook
+      SRGB.visit(@course.id)
+
+      # Open speedgrader for the anonymous assignment
+      SRGB.select_assignment(@anonymous_assignment)
+      SRGB.speedgrader_link.click
+      wait_for_ajaximations
+
+      # open the student list dropdown
+      Speedgrader.students_dropdown_button.click
+
+      # ensure the student names are anonymized
+      student_names = Speedgrader.students_select_menu_list.map(&:text)
+      expect(student_names).to eql ['Student 1', 'Student 2']
     end
   end
 end
