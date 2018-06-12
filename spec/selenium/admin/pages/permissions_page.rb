@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2017 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,7 +17,7 @@
 
 require_relative '../../common'
 
-class GlobalGrades
+class PermissionsIndex
   class << self
     include SeleniumDependencies
 
@@ -27,7 +27,7 @@ class GlobalGrades
     end
 
     def set_permission_ui_flag(account, state)
-      account.set_feature_flag! :permission_ui, state
+      account.set_feature_flag! :permissions_v2_ui, state
     end
 
     # ---------------------- Controls ----------------------
