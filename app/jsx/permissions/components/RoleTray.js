@@ -48,6 +48,7 @@ export default class RoleTray extends Component {
     id: PropTypes.string,
     assignedPermissions: PropTypes.arrayOf(permissionPropTypes.permission).isRequired,
     baseRoleLabels: PropTypes.arrayOf(PropTypes.string),
+    allRoleLabels: PropTypes.objectOf(PropTypes.bool),
     basedOn: PropTypes.string,
     deletable: PropTypes.bool.isRequired,
     editable: PropTypes.bool.isRequired,
@@ -64,6 +65,7 @@ export default class RoleTray extends Component {
 
   static defaultProps = {
     baseRoleLabels: [],
+    allRoleLabels: {},
     basedOn: null,
     role: null,
     id: null,
@@ -75,7 +77,9 @@ export default class RoleTray extends Component {
     deleteAlertVisable: false,
     editBaseRoleAlertVisable: false,
     editTrayVisable: false,
-    newTargetBaseRole: null
+    newTargetBaseRole: null,
+    // There is only ever one  but TextInput expects an array
+    editRoleLabelErrorMessages: []
   }
 
   // We need this so that if there is an alert displayed inside this tray
@@ -83,23 +87,29 @@ export default class RoleTray extends Component {
   // on a different role then we are currently operating on.
   componentWillReceiveProps(nextProps) {
     if (this.props.id !== nextProps.id) {
-      this.setState({
-        deleteAlertVisable: false,
-        editTrayVisable: false,
-        editBaseRoleAlertVisable: false,
-        newTargetBaseRole: null
-      })
+      this.clearState()
     }
+  }
+
+  onChangeRoleLabel = event => {
+    const trimmedValue = event.target.value.trim()
+    const isError = trimmedValue !== this.props.label && this.props.allRoleLabels[trimmedValue]
+    let errorMessages = []
+    if (isError) {
+      const message = I18n.t('Cannot change role name to %{label}: already in use', {
+        label: trimmedValue
+      })
+      errorMessages = [{text: message, type: 'error'}]
+    }
+    this.setState({
+      editRoleLabelInput: event.target.value,
+      editRoleLabelErrorMessages: errorMessages
+    })
   }
 
   hideTray = () => {
     this.props.hideTray()
-    this.setState({
-      deleteAlertVisable: false,
-      editTrayVisable: false,
-      editBaseRoleAlertVisable: false,
-      newTargetBaseRole: null
-    })
+    this.clearState()
   }
 
   showEditTray = () => {
@@ -108,28 +118,43 @@ export default class RoleTray extends Component {
         deleteAlertVisable: false,
         editTrayVisable: true,
         editBaseRoleAlertVisable: false,
-        newTargetBaseRole: null
+        newTargetBaseRole: null,
+        editRoleLabelInput: this.props.role.label,
+        editRoleLabelErrorMessages: []
       },
       () => this.closeButton.focus()
     )
   }
 
-  updateRole = event => {
-    if (event.target.value && this.props.role.label !== event.target.value) {
-      this.props.updateRoleName(this.props.id, event.target.value, this.props.basedOn)
-    }
-  }
-
-  hideEditTray = () => {
+  clearState(callback) {
     this.setState(
       {
         deleteAlertVisable: false,
         editTrayVisable: false,
         editBaseRoleAlertVisable: false,
-        newTargetBaseRole: null
+        newTargetBaseRole: null,
+        editRoleLabelInput: '',
+        editRoleLabelErrorMessages: []
       },
-      () => this.editButton.focus()
+      callback
     )
+  }
+
+  updateRole = event => {
+    if (this.state.editRoleLabelErrorMessages && this.state.editRoleLabelErrorMessages.length > 0) {
+      // Don't try to post the edit if we are in error
+      return
+    }
+    const trimmedValue = event.target.value ? event.target.value.trim() : ''
+    if (trimmedValue === '') {
+      this.setState({editRoleLabelInput: this.props.role.label, editRoleLabelErrorMessages: []})
+    } else if (this.props.role.label !== trimmedValue) {
+      this.props.updateRoleName(this.props.id, trimmedValue, this.props.basedOn)
+    }
+  }
+
+  hideEditTray = () => {
+    this.clearState(() => this.editButton.focus())
   }
 
   showDeleteAlert = () => {
@@ -142,15 +167,7 @@ export default class RoleTray extends Component {
   }
 
   hideDeleteAlert = () => {
-    this.setState(
-      {
-        deleteAlertVisable: false,
-        editTrayVisable: false,
-        editBaseRoleAlertVisable: false,
-        newTargetBaseRole: null
-      },
-      () => this.deleteButton.focus()
-    )
+    this.clearState(() => this.deleteButton.focus())
   }
 
   showEditBaseRoleAlert = baseRoleLabel => {
@@ -380,7 +397,10 @@ export default class RoleTray extends Component {
         <TextInput
           label={I18n.t('Role Name')}
           defaultValue={this.props.label}
+          value={this.state.editRoleLabelInput}
+          messages={this.state.editRoleLabelErrorMessages}
           onBlur={this.updateRole}
+          onChange={this.onChangeRoleLabel}
         />
       </Container>
 
@@ -453,6 +473,11 @@ function mapStateToProps(state, ownProps) {
     return acc
   }, [])
 
+  const allRoleLabels = state.roles.reduce((obj, r) => {
+    obj[r.label] = true  // eslint-disable-line
+    return obj
+  }, {})
+
   // TODO is there ever a situation where a role is editable but not deletable,
   //      or vice versa? If so, will need to figure out the logic for that and
   //      udpate the flags here to match.
@@ -461,6 +486,7 @@ function mapStateToProps(state, ownProps) {
     assignedPermissions: permissions.filter(p => p.enabled),
     basedOn: isBaseRole ? null : getBaseRoleLabel(role, state),
     baseRoleLabels: allBaseRoles.map(r => r.label),
+    allRoleLabels,
     deletable: !isBaseRole,
     editable: !isBaseRole,
     label: role.label,

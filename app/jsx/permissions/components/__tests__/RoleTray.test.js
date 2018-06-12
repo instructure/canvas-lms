@@ -32,6 +32,7 @@ function makeDefaultProps() {
     basedOn: null,
     updateRoleName: () => {},
     baseRoleLabels: ['Student', 'Teacher', 'TA'],
+    deleteRole: () => {},
     deletable: false,
     editable: false,
     hideTray: () => {},
@@ -190,6 +191,7 @@ it('calls props.hideTray() and correctly sets state when hideTray is called', ()
     deleteAlertVisable: true,
     editBaseRoleAlertVisable: true,
     editTrayVisable: true,
+    editRoleLabelErrorMessages: [{text: 'ERROR', type: 'error'}],
     newTargetBaseRole: 'banana'
   })
   tree.instance().hideTray() // components hideTray, not props.hideTray method
@@ -198,7 +200,9 @@ it('calls props.hideTray() and correctly sets state when hideTray is called', ()
     deleteAlertVisable: false,
     editBaseRoleAlertVisable: false,
     editTrayVisable: false,
-    newTargetBaseRole: null
+    newTargetBaseRole: null,
+    editRoleLabelInput: '',
+    editRoleLabelErrorMessages: []
   }
   expect(tree.state()).toEqual(expectedState)
   expect(hideTrayMock).toHaveBeenCalled()
@@ -240,4 +244,65 @@ it('does not render the base role selector', () => {
   const tree = shallow(<RoleTray {...props} />)
   const node = tree.find('Select')
   expect(node.exists()).toBeFalsy()
+})
+
+it('onChangeRoleLabel sets error if role is used', () => {
+  const props = makeDefaultProps()
+  props.allRoleLabels = {student: true, teacher: true}
+  props.label = 'student'
+  const tree = shallow(<RoleTray {...props} />)
+  const event = {target: {value: ' teacher   '}} // make sure trimming happens
+  tree.instance().onChangeRoleLabel(event)
+  // We don't trim in the state; we only trim for purposes of error-checking
+  // and post requests
+  expect(tree.state().editRoleLabelInput).toEqual(' teacher   ')
+  expect(tree.state().editRoleLabelErrorMessages).toHaveLength(1)
+  expect(tree.state().editRoleLabelErrorMessages[0].text).toEqual(
+    'Cannot change role name to teacher: already in use'
+  )
+  expect(tree.state().editRoleLabelErrorMessages[0].type).toEqual('error')
+})
+
+it('onChangeRoleLabel, not an error if label === present', () => {
+  const props = makeDefaultProps()
+  props.allRoleLabels = {student: true, teacher: true}
+  props.label = 'student'
+  const tree = shallow(<RoleTray {...props} />)
+  const event = {target: {value: 'student'}}
+  tree.instance().onChangeRoleLabel(event)
+  expect(tree.state().editRoleLabelErrorMessages).toHaveLength(0)
+})
+
+it('updateRole will not try to update if error', () => {
+  const props = makeDefaultProps()
+  props.updateRole = jest.fn()
+  const tree = shallow(<RoleTray {...props} />)
+  tree.setState({editRoleLabelErrorMessage: [{text: 'ERROR', type: 'error'}]})
+  const event = {target: {value: 'student'}}
+  tree.instance().updateRole(event)
+  expect(props.updateRole).toHaveBeenCalledTimes(0)
+})
+
+it('updateRole will reset value and not try to edit if empty', () => {
+  const props = makeDefaultProps()
+  const mockUpdateRoleName = jest.fn()
+  props.updateRoleName = mockUpdateRoleName
+  const tree = shallow(<RoleTray {...props} />)
+  const input = '   '
+  const event = {target: {value: input}}
+  tree.instance().updateRole(event)
+  expect(tree.state().editRoleLabelInput).toEqual(props.role.label)
+  expect(tree.state().editRoleLabelErrorMessages).toHaveLength(0)
+  expect(mockUpdateRoleName).toHaveBeenCalledTimes(0)
+})
+
+it('if everything is happy then updateRole will call an update', () => {
+  const props = makeDefaultProps()
+  const mockUpdateRoleName = jest.fn()
+  props.updateRoleName = mockUpdateRoleName
+  const tree = shallow(<RoleTray {...props} />)
+  const event = {target: {value: '   grumpmaster '}}
+  tree.instance().updateRole(event)
+  expect(mockUpdateRoleName).toHaveBeenCalledTimes(1)
+  expect(mockUpdateRoleName).toHaveBeenCalledWith(props.id, 'grumpmaster', props.basedOn)
 })
