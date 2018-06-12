@@ -43,6 +43,7 @@ describe "Gradezilla - arrange by due date" do
 
     expect(first_row_cells[0]).to include_text expected_text
 
+    driver.action.send_keys(:escape).perform
     Gradezilla.open_view_menu_and_arrange_by_menu
 
     expect(Gradezilla.popover_menu_item_checked?('Due Date - Oldest to Newest')).to eq 'true'

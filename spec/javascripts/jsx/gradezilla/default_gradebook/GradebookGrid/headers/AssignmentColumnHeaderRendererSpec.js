@@ -375,7 +375,7 @@ QUnit.module('AssignmentColumnHeaderRenderer', function (suiteHooks) {
     test('includes a callback for closing the column header menu', function () {
       sinon.stub(gradebook, 'handleColumnHeaderMenuClose');
       render();
-      component.props.onMenuClose();
+      component.props.onMenuDismiss();
       strictEqual(gradebook.handleColumnHeaderMenuClose.callCount, 1);
     });
 
