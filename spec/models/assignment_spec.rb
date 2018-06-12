@@ -5380,6 +5380,30 @@ describe Assignment do
 
         it { is_expected.to be_in_closed_grading_period }
       end
+
+      context 'when there is a soft deleted closed grading period pointed at by concluded submissions' do
+        before do
+          # We need to set up a situation where a submission owned by
+          # a concluded enrollment points at a soft deleted grading
+          # period that would be considered closed.
+          student_enrollment = student_in_course(course: assignment.context, active_all: true, user_name: 'another student')
+          current_dup = @current.dup
+          assignment.update(due_at: 45.days.ago(Time.zone.now))
+          @current.update!(end_date: 1.month.ago(Time.zone.now))
+          student_enrollment.conclude
+          @current.destroy!
+          current_dup.save!
+        end
+
+        context "without preloaded submissions" do
+          it { is_expected.not_to be_in_closed_grading_period }
+        end
+
+        context "with preloaded submissions" do
+          before { assignment.submissions.load }
+          it { is_expected.not_to be_in_closed_grading_period }
+        end
+      end
     end
   end
 

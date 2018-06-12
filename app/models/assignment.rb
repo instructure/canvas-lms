@@ -2663,9 +2663,9 @@ class Assignment < ActiveRecord::Base
     elsif submissions.loaded?
       # no need to check grading_periods are loaded because of
       # submissions association preload(:grading_period)
-      submissions.map(&:grading_period).compact.any?(&:closed?)
+      submissions.map(&:grading_period).compact.any? { |gp| gp.workflow_state == 'active' && gp.closed? }
     else
-      GradingPeriod.joins(:submissions).where(submissions: { assignment: self }).closed.exists?
+      GradingPeriod.joins(:submissions).active.where(submissions: { assignment: self }).closed.exists?
     end
   end
 
