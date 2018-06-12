@@ -48,6 +48,16 @@ it('mastery checkbox is checked if mastery', () => {
   expect(radio.props().checked).toBe(true)
 })
 
+it('mastery checkbox receives focus if first rating', () => {
+  const wrapper = mount(
+    <table>
+      <tbody>
+        <ProficiencyRating {...defaultProps({firstRating: true})}/>
+      </tbody>
+    </table>)
+  expect(wrapper.find('RadioInput').find('input').node).toBe(document.activeElement)
+})
+
 it('clicking mastery checkbox triggers change', () => {
   const onMasteryChange = jest.fn()
   const wrapper = mount(

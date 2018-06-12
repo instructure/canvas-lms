@@ -27,13 +27,11 @@ const defaultProps = (props = {}) => (
   }, props)
 )
 
-let promise
 let getSpy
 
 describe('default proficiency', () => {
   beforeEach(() => {
-    promise = Promise.resolve({status: 404})
-    getSpy = jest.spyOn(axios,'get').mockImplementation(() => promise)
+    getSpy = jest.spyOn(axios,'get').mockImplementation(() => Promise.reject({response: {status: 404}}))
   })
 
   afterEach(() => {
@@ -50,79 +48,116 @@ describe('default proficiency', () => {
     expect(wrapper.find('Spinner')).toHaveLength(1)
   })
 
-  it('renders four ratings', () => {
+  it('render billboard after loading', (done) => {
     const wrapper = mount(<ProficiencyTable {...defaultProps()}/>)
-    return promise.then(() =>
-      expect(wrapper.find('ProficiencyRating')).toHaveLength(4)
-    )
+    setTimeout(() => {
+      expect(wrapper.find('Billboard')).toHaveLength(1)
+      done()
+    }, 1)
   })
 
-  it('clicking button adds rating', () => {
+  it('renders five ratings', (done) => {
     const wrapper = mount(<ProficiencyTable {...defaultProps()}/>)
-    return promise.then(() => {
-      wrapper.findWhere(n => n.prop('variant') === 'circle-primary').simulate('click')
+    setTimeout(() => {
+      wrapper.instance().removeBillboard()
       expect(wrapper.find('ProficiencyRating')).toHaveLength(5)
-    })
+      done()
+    }, 1)
   })
 
-  it('handling delete rating removes rating', () => {
+  it('sets firstRating prop on first rating only', (done) => {
     const wrapper = mount(<ProficiencyTable {...defaultProps()}/>)
-    return promise.then(() => {
+    setTimeout(() => {
+      wrapper.instance().removeBillboard()
+      expect(wrapper.find('ProficiencyRating').at(0).prop('firstRating')).toBe(true)
+      expect(wrapper.find('ProficiencyRating').at(1).prop('firstRating')).toBe(false)
+      expect(wrapper.find('ProficiencyRating').at(2).prop('firstRating')).toBe(false)
+      expect(wrapper.find('ProficiencyRating').at(3).prop('firstRating')).toBe(false)
+      expect(wrapper.find('ProficiencyRating').at(4).prop('firstRating')).toBe(false)
+      done()
+    }, 1)
+  })
+
+  it('clicking button adds rating', (done) => {
+    const wrapper = mount(<ProficiencyTable {...defaultProps()}/>)
+    setTimeout(() => {
+      wrapper.instance().removeBillboard()
+      wrapper.findWhere(n => n.prop('variant') === 'circle-primary').simulate('click')
+      expect(wrapper.find('ProficiencyRating')).toHaveLength(6)
+      done()
+    }, 1)
+  })
+
+  it('handling delete rating removes rating', (done) => {
+    const wrapper = mount(<ProficiencyTable {...defaultProps()}/>)
+    setTimeout(() => {
+      wrapper.instance().removeBillboard()
       wrapper.instance().handleDelete(0)()
-      expect(wrapper.find('ProficiencyRating')).toHaveLength(3)
-    })
+      expect(wrapper.find('ProficiencyRating')).toHaveLength(4)
+      done()
+    }, 1)
   })
 
-  it('setting blank description sets error', () => {
+  it('setting blank description sets error', (done) => {
     const wrapper = mount(<ProficiencyTable {...defaultProps()}/>)
-    return promise.then(() => {
+    setTimeout(() => {
+      wrapper.instance().removeBillboard()
       wrapper.instance().handleDescriptionChange(0)("")
       wrapper.find('Button').last().simulate('click')
       expect(wrapper.find('ProficiencyRating').first().prop('descriptionError')).toBe('Missing required description')
-    })
+      done()
+    }, 1)
   })
 
-  it('setting blank points sets error', () => {
+  it('setting blank points sets error', (done) => {
     const wrapper = mount(<ProficiencyTable {...defaultProps()}/>)
-    return promise.then(() => {
+    setTimeout(() => {
+      wrapper.instance().removeBillboard()
       wrapper.instance().handlePointsChange(0)("")
       wrapper.find('Button').last().simulate('click')
       expect(wrapper.find('ProficiencyRating').first().prop('pointsError')).toBe('Invalid points')
-    })
+      done()
+    }, 1)
   })
 
-  it('setting invalid points sets error', () => {
+  it('setting invalid points sets error', (done) => {
     const wrapper = mount(<ProficiencyTable {...defaultProps()}/>)
-    return promise.then(() => {
+    setTimeout(() => {
+      wrapper.instance().removeBillboard()
       wrapper.instance().handlePointsChange(0)("1.1.1")
       wrapper.find('Button').last().simulate('click')
       expect(wrapper.find('ProficiencyRating').first().prop('pointsError')).toBe('Invalid points')
-    })
+      done()
+    }, 1)
   })
 
-  it('setting negative points sets error', () => {
+  it('setting negative points sets error', (done) => {
     const wrapper = mount(<ProficiencyTable {...defaultProps()}/>)
-    return promise.then(() => {
+    setTimeout(() => {
+      wrapper.instance().removeBillboard()
       wrapper.instance().handlePointsChange(0)("-1")
       wrapper.find('Button').last().simulate('click')
       expect(wrapper.find('ProficiencyRating').first().prop('pointsError')).toBe('Negative points')
-    })
+      done()
+    }, 1)
   })
 
-  it('sends POST on submit', () => {
+  it('sends POST on submit', (done) => {
     const postSpy = jest.spyOn(axios,'post').mockImplementation(() => Promise.resolve({status: 200}))
     const wrapper = mount(<ProficiencyTable {...defaultProps()}/>)
-    return promise.then(() => {
+    setTimeout(() => {
+      wrapper.instance().removeBillboard()
       wrapper.find('Button').last().simulate('click')
       expect(axios.post).toHaveBeenCalledTimes(1)
       postSpy.mockRestore()
-    })
+      done()
+    }, 1)
   })
 })
 
 describe('custom proficiency', () => {
   it('renders two ratings that are deletable', () => {
-    promise = Promise.resolve({
+    const promise = Promise.resolve({
       status: 200,
       data: {ratings: [
         {
@@ -151,7 +186,7 @@ describe('custom proficiency', () => {
   })
 
   it('renders one rating that is not deletable', () => {
-    promise = Promise.resolve({
+    const promise = Promise.resolve({
       status: 200,
       data: {ratings: [
         {

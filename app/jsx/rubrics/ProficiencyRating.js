@@ -40,6 +40,7 @@ export default class ProficiencyRating extends React.Component {
     description: PropTypes.string.isRequired,
     descriptionError: PropTypes.string,
     disableDelete: PropTypes.bool.isRequired,
+    firstRating: PropTypes.bool,
     focusField: PropTypes.oneOf(['description', 'points']),
     mastery: PropTypes.bool.isRequired,
     onColorChange: PropTypes.func.isRequired,
@@ -53,6 +54,7 @@ export default class ProficiencyRating extends React.Component {
 
   static defaultProps = {
     descriptionError: null,
+    firstRating: false,
     focusField: null,
     pointsError: null
   }
@@ -69,6 +71,12 @@ export default class ProficiencyRating extends React.Component {
       this.descriptionInput.focus()
     } else if (this.props.focusField === 'points') {
       this.pointsInput.focus()
+    }
+  }
+
+  componentDidMount() {
+    if (this.props.firstRating) {
+      this.radioInput.focus()
     }
   }
 
@@ -127,6 +135,7 @@ export default class ProficiencyRating extends React.Component {
         <td style={{textAlign: 'center'}}>
           <div style={{display: 'inline-block'}}>
             <RadioInput
+              ref={(input) => { this.radioInput = input }}
               label={<ScreenReaderContent>{I18n.t('Change mastery')}</ScreenReaderContent>}
               checked={mastery}
               onChange={this.handleMasteryChange} />
