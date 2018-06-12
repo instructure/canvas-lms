@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!rubrics'
-import TabList, { TabPanel } from '@instructure/ui-core/lib/components/TabList'
+import TabList, { TabPanel } from '@instructure/ui-tabs/lib/components/TabList'
 import ProficiencyTable from 'jsx/rubrics/ProficiencyTable'
 import RubricPanel from 'jsx/rubrics/RubricPanel'
 
