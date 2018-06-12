@@ -20,7 +20,7 @@ module Outcomes
   module ResultAnalytics
 
     Rollup = Struct.new(:context, :scores)
-    Result = Struct.new(:learning_outcome, :score, :count)
+    Result = Struct.new(:learning_outcome, :score, :count, :hide_points)
 
     # Public: Queries learning_outcome_results for rollup.
     #
@@ -81,7 +81,7 @@ module Outcomes
       rollup_scores = rollups.map(&:scores).flatten
       outcome_results = rollup_scores.group_by(&:outcome).values
       aggregate_results = outcome_results.map do |scores|
-        scores.map{|score| Result.new(score.outcome, score.score, score.count)}
+        scores.map{|score| Result.new(score.outcome, score.score, score.count, score.hide_points)}
       end
       aggregate_rollups = aggregate_results.map do |result|
         RollupScore.new(result,{aggregate_score: true})
