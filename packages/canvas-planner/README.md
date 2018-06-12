@@ -46,6 +46,13 @@ This project uses [eslint-config-react-app](https://github.com/facebookincubator
 for linting JS files.  Linting is enforced at the build level.  ESLint errors will cause the build to fail.
 You can run the linter by running `yarn lint`.
 
+### Debugging
+
+In lieu of verbose console logging, planner uses the [Redux DevTools Extension](https://github.com/zalmoxisus/redux-devtools-extension).
+To use it, simply [install](https://github.com/zalmoxisus/redux-devtools-extension#installation) the extension for your
+browser of choice, then go to the planner and open your web inspector. From there, select the newly added `Redux` tab
+and a plethora of useful debugging tools and information will be displayed.
+
 ### Testing
 
 We use [Jest](http://facebook.github.io/jest/) for testing the codebase.  You can run it
