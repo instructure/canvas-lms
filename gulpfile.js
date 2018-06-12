@@ -146,7 +146,8 @@ function makeIE11Polyfill () {
     'es6.string.includes',
     'es6.string.starts-with',
     'es6.symbol',
-    'es6.map'
+    'es6.map',
+    'es6.number'
   ]
 
   return coreJsBuilder({
