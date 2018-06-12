@@ -12721,6 +12721,10 @@ redux-batch-middleware@0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/redux-batch-middleware/-/redux-batch-middleware-0.2.0.tgz#c61f7d6354a6422c8fcea6c8c36fb0fcb215ac84"
 
+redux-devtools-extension@^2.13.2:
+  version "2.13.2"
+  resolved "https://registry.yarnpkg.com/redux-devtools-extension/-/redux-devtools-extension-2.13.2.tgz#e0f9a8e8dfca7c17be92c7124958a3b94eb2911d"
+
 redux-logger@2.6.1:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/redux-logger/-/redux-logger-2.6.1.tgz#f558a40e3abd03feaf4e69ace4d71fec09803c74"

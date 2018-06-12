@@ -22,6 +22,7 @@ import createSagaMiddleware from 'redux-saga';
 import rootReducer from '../reducers';
 import {createDynamicUiMiddleware} from '../dynamic-ui';
 import allSagas from '../actions/sagas';
+import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly';
 
 export default function configureStore (uiManager, defaultState) {
   const sagaMiddleware = createSagaMiddleware();
@@ -32,16 +33,10 @@ export default function configureStore (uiManager, defaultState) {
     createDynamicUiMiddleware(uiManager),
   ];
 
-  if ((process.env.NODE_ENV !== 'production') &&
-     (process.env.NODE_ENV !== 'test')) {
-    const reduxLogger = require('redux-logger').default;
-    middlewares = [ ...middlewares, reduxLogger ];
-  }
-
   const store = createStore(
     rootReducer,
     defaultState,
-    applyMiddleware(...middlewares)
+    composeWithDevTools(applyMiddleware(...middlewares))
   );
   sagaMiddleware.run(allSagas);
   return store;
