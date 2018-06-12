@@ -279,7 +279,13 @@ describe 'Developer Keys' do
     end
 
     context "scopes" do
-      let(:expected_scopes) do
+      let(:api_token_scopes) do
+         [
+           "url:GET|/api/v1/accounts/:account_id/scopes"
+         ]
+      end
+
+      let(:assignment_groups_scopes) do
         [
           "url:GET|/api/v1/courses/:course_id/assignment_groups",
           "url:GET|/api/v1/courses/:course_id/assignment_groups/:assignment_group_id",
@@ -287,6 +293,14 @@ describe 'Developer Keys' do
           "url:PUT|/api/v1/courses/:course_id/assignment_groups/:assignment_group_id",
           "url:DELETE|/api/v1/courses/:course_id/assignment_groups/:assignment_group_id"
         ]
+      end
+
+      let(:developer_key_with_scopes) do
+        DeveloperKey.create!(
+          account: Account.default,
+          scopes: api_token_scopes + assignment_groups_scopes,
+          require_scopes: true
+        )
       end
 
       it "does not have enforce scopes toggle activated on initial dev key creation" do
@@ -350,7 +364,7 @@ describe 'Developer Keys' do
         click_scope_group_checkbox
         find_button("Save Key").click
         wait_for_ajaximations
-        expect(DeveloperKey.last.scopes).to eq expected_scopes
+        expect(DeveloperKey.last.scopes).to eq assignment_groups_scopes
       end
 
       it "adds scopes to backend developer key via UI in site admin" do
@@ -359,37 +373,23 @@ describe 'Developer Keys' do
         click_scope_group_checkbox
         find_button("Save Key").click
         wait_for_ajaximations
-        expect(DeveloperKey.last.scopes).to eq expected_scopes
+        expect(DeveloperKey.last.scopes).to eq assignment_groups_scopes
       end
 
-      it "removes scopes from backend developer key via UI" do
-        skip 'will be fixed in PLAT-3391'
-        expand_scope_group_by_filter('Assignment Groups', Account.default.id)
-        click_scope_group_checkbox
-        find_button("Save Key").click
-        click_edit_icon
-        filter_scopes_by_name 'Assignment Groups'
-        click_scope_group_checkbox
-        dk = DeveloperKey.last
-        find_button("Save Key").click
-        wait_for_ajaximations
-        expect(dk.reload.scopes).not_to eq expected_scopes
-      end
-
-      it "keeps all endpoints read only checkbox checked after save" do
-        skip 'will be fixed in PLAT-3391'
+      it "removes scopes from backend developer key through UI" do
+        developer_key_with_scopes
         get "/accounts/#{Account.default.id}/developer_keys"
-        find_button("Developer Key").click
-        click_enforce_scopes
-        select_all_readonly_checkbox.click
-        find_button("Save Key").click
         click_edit_icon
-        expect(all_endpoints_readonly_checkbox_selected?).to eq true
+        filter_scopes_by_name('Assignment Groups')
+        click_scope_group_checkbox
+        find_button("Save Key").click
+        wait_for_ajax_requests
+        expect(developer_key_with_scopes.reload.scopes).to eq api_token_scopes
       end
 
       it "keeps all endpoints read only checkbox checked if check/unchecking another http method" do
         expand_scope_group_by_filter('Assignment Groups', Account.default.id)
-        select_all_readonly_checkbox.click
+        click_select_all_readonly_checkbox
         click_scope_checkbox
         expect(f("[data-automation='toggle-scope-group'] input[type='checkbox']").selected?).to eq false
         click_scope_checkbox

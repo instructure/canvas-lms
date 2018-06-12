@@ -44,8 +44,8 @@ module DeveloperKeysRewriteCommon
     fxpath("//*[@data-automation='developer-key-scope']/span/span").click
   end
 
-  def select_all_readonly_checkbox
-    fxpath("//*[@data-automation='scopes-list']/span/div/span/span/span/span/div")
+  def click_select_all_readonly_checkbox
+    fxpath("//*[@data-automation='scopes-list']/span/div/span/span/span/span/div").click
   end
 
   def all_endpoints_readonly_checkbox_selected?

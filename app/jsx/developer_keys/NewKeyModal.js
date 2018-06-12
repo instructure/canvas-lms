@@ -59,9 +59,7 @@ export default class DeveloperKeyModal extends React.Component {
     if (!this.requireScopes) {
       formData.delete('developer_key[scopes][]')
       formData.append('developer_key[require_scopes]', false)
-    } else if (this.props.selectedScopes.length === 0 &&
-      this.props.createOrEditDeveloperKeyState.developerKey.scopes.length === 0
-    ) {
+    } else if (this.props.selectedScopes.length === 0) {
       $.flashError(I18n.t('At least one scope must be selected.'))
       return
     } else {
