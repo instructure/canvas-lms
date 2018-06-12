@@ -117,7 +117,7 @@
             <td style="width: 12%;" align="right">
             <% if enrollment.admin? ? (can_manage_admins && enrollment.user_id != @current_user.id) : can_manage_students %>
               <% unless @context.completed? %>
-                <p class="conclude_enrollment_link_holder" style="<%= hidden if enrollment.graded_at %>">
+                <p class="conclude_enrollment_link_holder" style="<%= hidden if enrollment.workflow_state == 'completed' %>">
                   <a class="conclude_enrollment_link btn btn-secondary" href="<%= context_url(@context, :controller => :courses, :action => :conclude_user, :id => enrollment.id) %>"><%= t('links.conclude_enrollment', %{Grade Out}) %></a>
                 </p>
                 <p class="unconclude_enrollment_link_holder" style="<%= hidden unless enrollment.explicitly_completed? || enrollment.inactive? %>">
