@@ -742,13 +742,14 @@ class RoleOverride < ActiveRecord::Base
       },
       :import_sis => {
         :label => lambda { t('Import SIS data') },
+        :label_v2 => lambda { t("SIS Data - import") },
         :account_only => :root,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
       },
       :manage_sis => {
         :label => lambda { t('permissions.manage_sis', "Manage SIS data") },
-        :label_v2 => lambda { t("SIS Data - import") },
+        :label_v2 => lambda { t("SIS Data - manage") },
         :account_only => :root,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
