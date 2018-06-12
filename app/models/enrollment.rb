@@ -1054,7 +1054,7 @@ class Enrollment < ActiveRecord::Base
   def graded_at
     score = find_score
     if score.present?
-      score.updated_at
+      score.updated_atta
     else
       # TODO: drop the graded_at column after the data fixup to populate
       # the scores table completes
