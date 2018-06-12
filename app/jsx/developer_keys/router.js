@@ -24,6 +24,7 @@ import DeveloperKeysApp from './App'
 import actions from './actions/developerKeysActions'
 import store from './store/store'
 
+let state = store.getState()
 /**
  * Route Handlers
  */
@@ -35,24 +36,27 @@ function renderShowDeveloperKeys(ctx) {
     store.dispatch(actions.developerKeysModalClose())
   }
 
-  store.dispatch(
-    actions.getDeveloperKeys(`/api/v1/accounts/${ctx.params.contextId}/developer_keys`, true)
-  )
-
-  store.dispatch(actions.listDeveloperKeyScopes(ctx.params.contextId))
-
-  const view = () => {
-    const state = store.getState()
-    ReactDOM.render(
-      <DeveloperKeysApp applicationState={state} actions={actions} store={store} ctx={ctx} />,
-      document.getElementById('reactContent')
+  if (!state.listDeveloperKeys.listDeveloperKeysSuccessful) {
+    store.dispatch(
+      actions.getDeveloperKeys(`/api/v1/accounts/${ctx.params.contextId}/developer_keys`, true)
     )
-  }
-  // returns A function that unsubscribes the change listener.
-  store.subscribe(view)
 
-  // renders the page
-  view()
+    if (!state.listDeveloperKeyScopes.listDeveloperKeyScopesSuccessful) {
+      store.dispatch(actions.listDeveloperKeyScopes(ctx.params.contextId))
+    }
+
+    const view = () => {
+      state = store.getState()
+      ReactDOM.render(
+        <DeveloperKeysApp applicationState={state} actions={actions} store={store} ctx={ctx} />,
+        document.getElementById('reactContent')
+      )
+    }
+    // returns A function that unsubscribes the change listener.
+    store.subscribe(view)
+    // renders the page
+    view()
+  }
 }
 
 /**
