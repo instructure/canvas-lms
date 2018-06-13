@@ -69,7 +69,7 @@ export const Rating = (props) => {
       className={classes}
       onClick={assessing ? onClick : null}
       onKeyPress={(e) => e.key === 'Enter' ? onClick() : null}
-      role="button"
+      role={assessing ? "button" : null}
       tabIndex={assessing ? 0 : null}
     >
       {isSummary ? null : ratingPoints()}

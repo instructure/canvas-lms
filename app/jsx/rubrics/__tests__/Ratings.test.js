@@ -136,6 +136,7 @@ describe('The Ratings component', () => {
     const wrapper = shallow(<Rating {...props.tiers[0]} assessing={false} onClick={onClick} />)
     const div = wrapper.find('div').at(0)
     expect(div.prop('tabIndex')).toBeNull()
+    expect(div.prop('role')).toBeNull()
     div.simulate('click')
     expect(onClick.called).toBe(false)
   })
