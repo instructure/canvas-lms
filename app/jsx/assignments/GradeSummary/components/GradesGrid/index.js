@@ -49,6 +49,9 @@ function studentsToPages(students) {
 
 export default class GradesGrid extends Component {
   static propTypes = {
+    finalGrader: shape({
+      graderId: string.isRequired
+    }),
     graders: arrayOf(
       shape({
         graderName: string,
@@ -67,6 +70,7 @@ export default class GradesGrid extends Component {
   }
 
   static defaultProps = {
+    finalGrader: null,
     onGradeSelect: null
   }
 
@@ -101,6 +105,7 @@ export default class GradesGrid extends Component {
         <FocusableView>
           {props => (
             <Grid
+              finalGrader={this.props.finalGrader}
               graders={this.props.graders}
               grades={this.props.grades}
               horizontalScrollRef={props.horizontalScrollRef}

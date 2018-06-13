@@ -38,6 +38,10 @@ QUnit.module('GradeSummary Header', suiteHooks => {
         muted: true,
         title: 'Example Assignment'
       },
+      currentUser: {
+        graderId: 'teach',
+        id: '1105'
+      },
       graders: [
         {graderId: '1101', graderName: 'Miss Frizzle'},
         {graderId: '1102', graderName: 'Mr. Keating'}

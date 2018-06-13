@@ -28,6 +28,9 @@ import GridRow from './GridRow'
 
 export default class Grid extends Component {
   static propTypes = {
+    finalGrader: shape({
+      graderId: string.isRequired
+    }),
     graders: arrayOf(
       shape({
         graderName: string,
@@ -47,6 +50,7 @@ export default class Grid extends Component {
   }
 
   static defaultProps = {
+    finalGrader: null,
     onGradeSelect: null
   }
 
@@ -88,6 +92,7 @@ export default class Grid extends Component {
           <tbody>
             {this.props.rows.map((row, index) => (
               <GridRow
+                finalGrader={this.props.finalGrader}
                 graders={this.props.graders}
                 grades={this.props.grades[row.studentId]}
                 key={index /* index used for performance reasons */}

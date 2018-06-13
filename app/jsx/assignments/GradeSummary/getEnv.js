@@ -38,6 +38,23 @@ function normalizeGraders() {
 }
 
 export default function getEnv() {
+  let finalGrader = null
+  if (ENV.FINAL_GRADER) {
+    finalGrader = {
+      graderId: ENV.FINAL_GRADER.grader_id || 'FINAL_GRADER',
+      id: ENV.FINAL_GRADER.id
+    }
+  }
+
+  const currentUser = {
+    graderId: ENV.CURRENT_USER.grader_id || null,
+    id: ENV.CURRENT_USER.id
+  }
+
+  if (currentUser.graderId == null && finalGrader && currentUser.id === finalGrader.id) {
+    currentUser.graderId = finalGrader.graderId
+  }
+
   return {
     assignment: {
       courseId: ENV.ASSIGNMENT.course_id,
@@ -46,6 +63,9 @@ export default function getEnv() {
       gradesPublished: ENV.ASSIGNMENT.grades_published,
       title: ENV.ASSIGNMENT.title
     },
+
+    currentUser,
+    finalGrader,
 
     graders: normalizeGraders()
   }

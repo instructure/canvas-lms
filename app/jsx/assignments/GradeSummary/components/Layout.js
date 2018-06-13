@@ -32,6 +32,9 @@ import Header from './Header'
 
 class Layout extends Component {
   static propTypes = {
+    finalGrader: shape({
+      graderId: string.isRequired
+    }),
     graders: arrayOf(
       shape({
         graderId: string.isRequired
@@ -47,6 +50,10 @@ class Layout extends Component {
         id: string.isRequired
       })
     ).isRequired
+  }
+
+  static defaultProps = {
+    finalGrader: null
   }
 
   componentDidMount() {
@@ -68,6 +75,7 @@ class Layout extends Component {
           <View as="div" margin="large 0 0 0">
             {this.props.students.length > 0 ? (
               <GradesGrid
+                finalGrader={this.props.finalGrader}
                 graders={this.props.graders}
                 grades={this.props.provisionalGrades}
                 onGradeSelect={onGradeSelect}
@@ -86,6 +94,7 @@ class Layout extends Component {
 
 function mapStateToProps(state) {
   return {
+    finalGrader: state.context.finalGrader,
     graders: state.context.graders,
     gradesPublished: state.assignment.assignment.gradesPublished,
     provisionalGrades: state.grades.provisionalGrades,

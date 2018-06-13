@@ -2773,6 +2773,14 @@ class Assignment < ActiveRecord::Base
     moderators
   end
 
+  def provisional_moderation_graders
+    if final_grader_id.present?
+      moderation_graders.where.not(user_id: final_grader_id)
+    else
+      moderation_graders
+    end
+  end
+
   def moderated_grading_max_grader_count
     max_course_count = course.moderated_grading_max_grader_count
     return max_course_count if grader_count.blank?
@@ -2926,14 +2934,6 @@ class Assignment < ActiveRecord::Base
     moderation_graders.create!(user: grader, anonymous_id: new_anonymous_id)
 
     true
-  end
-
-  def provisional_moderation_graders
-    if final_grader_id.present?
-      moderation_graders.where.not(user_id: final_grader_id)
-    else
-      moderation_graders
-    end
   end
 
   # This is a helper method intended to ensure the number of provisional graders

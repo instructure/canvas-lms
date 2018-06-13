@@ -45,6 +45,10 @@ function optionsForGraders(graders, grades) {
 export default class GradeSelect extends Component {
   static propTypes = {
     /* eslint-disable-next-line react/no-unused-prop-types */
+    finalGrader: shape({
+      graderId: string.isRequired
+    }),
+    /* eslint-disable-next-line react/no-unused-prop-types */
     graders: arrayOf(
       shape({
         graderName: string,
@@ -62,6 +66,7 @@ export default class GradeSelect extends Component {
   }
 
   static defaultProps = {
+    finalGrader: null,
     onClose() {},
     onOpen() {},
     onPositioned() {},
@@ -94,6 +99,23 @@ export default class GradeSelect extends Component {
   static getDerivedStateFromProps(props) {
     const graderOptions = optionsForGraders(props.graders, props.grades)
     const options = [...graderOptions]
+
+    if (props.finalGrader) {
+      const customGrade = props.grades[props.finalGrader.graderId]
+      if (customGrade) {
+        const customGradeOption = {
+          gradeInfo: customGrade,
+          label: `${I18n.n(customGrade.score)} (${I18n.t('Custom')})`,
+          value: props.finalGrader.graderId
+        }
+        options.push(customGradeOption)
+
+        if (customGrade.selected) {
+          selectedOption = customGradeOption
+        }
+      }
+    }
+
     let selectedOption = options.find(option => option.gradeInfo.selected)
     if (!selectedOption) {
       selectedOption = {gradeInfo: {}, label: '–', value: NO_SELECTION}
@@ -101,7 +123,6 @@ export default class GradeSelect extends Component {
     }
 
     return {
-      enteredOption: selectedOption,
       graderOptions,
       options,
       selectedOption

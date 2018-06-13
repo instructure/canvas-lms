@@ -191,7 +191,7 @@ class AssignmentsController < ApplicationController
 
     css_bundle :assignment_grade_summary
     js_bundle :assignment_grade_summary
-    js_env(new_moderate_env)
+    js_env(show_moderate_env)
 
     @page_title = @assignment.title
 
@@ -555,7 +555,22 @@ class AssignmentsController < ApplicationController
 
   protected
 
-  def new_moderate_env
+  def show_moderate_env
+    current_grader_id = @current_user.id
+    final_grader_id = @assignment.final_grader_id
+
+    unless @assignment.can_view_other_grader_identities?(@current_user)
+      moderation_graders_by_id = @assignment.moderation_graders.index_by(&:user_id)
+
+      # When the user cannot view other grader identities, the moderation page
+      # will be loaded with grader data that has been anonymized. This includes
+      # the current user's grader information. The relevant id must be provided
+      # to the front end in this case.
+
+      current_grader_id = moderation_graders_by_id[current_grader_id]&.anonymous_id
+      final_grader_id = moderation_graders_by_id[final_grader_id]&.anonymous_id
+    end
+
     {
       ASSIGNMENT: {
         course_id: @context.id,
@@ -563,6 +578,14 @@ class AssignmentsController < ApplicationController
         id: @assignment.id,
         muted: @assignment.muted?,
         title: @assignment.title
+      },
+      CURRENT_USER: {
+        grader_id: current_grader_id,
+        id: @current_user.id
+      },
+      FINAL_GRADER: @assignment.final_grader && {
+        grader_id: final_grader_id,
+        id: @assignment.final_grader_id
       },
       GRADERS: moderation_graders_json(@assignment, @current_user, session),
       STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)

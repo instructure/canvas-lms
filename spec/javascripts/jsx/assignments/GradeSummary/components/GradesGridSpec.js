@@ -28,6 +28,10 @@ QUnit.module('GradeSummary GradesGrid', suiteHooks => {
 
   suiteHooks.beforeEach(() => {
     props = {
+      finalGrader: {
+        graderId: 'teach',
+        id: '1105'
+      },
       graders: [
         {graderId: '1101', graderName: 'Miss Frizzle'},
         {graderId: '1102', graderName: 'Mr. Keating'}
@@ -114,6 +118,12 @@ QUnit.module('GradeSummary GradesGrid', suiteHooks => {
   test('includes a row for each student', () => {
     mountComponent()
     strictEqual(wrapper.find('tr.GradesGrid__BodyRow').length, 4)
+  })
+
+  test('sends finalGrader to the Grid', () => {
+    mountComponent()
+    const grid = wrapper.find(Grid)
+    strictEqual(grid.prop('finalGrader'), props.finalGrader)
   })
 
   test('sends graders to the Grid', () => {

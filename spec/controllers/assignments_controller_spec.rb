@@ -359,10 +359,83 @@ describe AssignmentsController do
         expect(env[:ASSIGNMENT][:title]).to eql(@assignment.title)
       end
 
+      describe "CURRENT_USER.grader_id" do
+        it "is the id of the user when the user can see other grader identities" do
+          @assignment.moderation_graders.create!(anonymous_id: "other", user: @other_teacher)
+          get :show_moderate, params: {course_id: @course.id, assignment_id: @assignment.id}
+          expect(env[:CURRENT_USER][:grader_id]).to eql(@other_teacher.id)
+        end
+
+        context "when the user cannot see other grader identities" do
+          before :each do
+            @assignment.update(grader_names_visible_to_final_grader: false)
+          end
+
+          it "is the anonymous_id of the associated moderation grader when the user has graded" do
+            @assignment.moderation_graders.create!(anonymous_id: "other", user: @other_teacher)
+            get :show_moderate, params: {course_id: @course.id, assignment_id: @assignment.id}
+            expect(env[:CURRENT_USER][:grader_id]).to eql("other")
+          end
+
+          it "is nil when the user has not graded" do
+            get :show_moderate, params: {course_id: @course.id, assignment_id: @assignment.id}
+            expect(env[:CURRENT_USER][:grader_id]).to be_nil
+          end
+        end
+      end
+
+      it "includes CURRENT_USER.id" do
+        get :show_moderate, params: {course_id: @course.id, assignment_id: @assignment.id}
+        expect(env[:CURRENT_USER][:id]).to eql(@other_teacher.id)
+      end
+
+      describe "FINAL_GRADER.grader_id" do
+        it "is the id of the final grader when the current user can see other grader identities" do
+          @assignment.moderation_graders.create!(anonymous_id: "other", user: @other_teacher)
+          get :show_moderate, params: {course_id: @course.id, assignment_id: @assignment.id}
+          expect(env[:FINAL_GRADER][:grader_id]).to eql(@other_teacher.id)
+        end
+
+        context "when the current user cannot see other grader identities" do
+          before :each do
+            @assignment.update(grader_names_visible_to_final_grader: false)
+          end
+
+          it "is the anonymous_id of the final grader's moderation grader when the final grader has graded" do
+            @assignment.moderation_graders.create!(anonymous_id: "other", user: @other_teacher)
+            get :show_moderate, params: {course_id: @course.id, assignment_id: @assignment.id}
+            expect(env[:FINAL_GRADER][:grader_id]).to eql("other")
+          end
+
+          it "is nil when the final grader has not graded" do
+            get :show_moderate, params: {course_id: @course.id, assignment_id: @assignment.id}
+            expect(env[:FINAL_GRADER][:grader_id]).to be_nil
+          end
+        end
+      end
+
+      it "includes FINAL_GRADER.id when the assignment has a final grader" do
+        get :show_moderate, params: {course_id: @course.id, assignment_id: @assignment.id}
+        expect(env[:FINAL_GRADER][:id]).to eql(@other_teacher.id)
+      end
+
+      it "sets FINAL_GRADER to nil when the assignment does not have a final grader" do
+        user_session(account_admin_user)
+        @assignment.update(final_grader: nil)
+        get :show_moderate, params: {course_id: @course.id, assignment_id: @assignment.id}
+        expect(env[:FINAL_GRADER]).to be(nil)
+      end
+
       it "includes moderation graders in GRADERS" do
         get :show_moderate, params: {course_id: @course.id, assignment_id: @assignment.id}
         moderation_grader_ids = @assignment.moderation_graders.map(&:id)
         expect(env[:GRADERS].map {|grader| grader[:id]}).to match_array(moderation_grader_ids)
+      end
+
+      it "does not include the final grader in GRADERS" do
+        @assignment.moderation_graders.create!(anonymous_id: "other", user: @other_teacher)
+        get :show_moderate, params: {course_id: @course.id, assignment_id: @assignment.id}
+        expect(env[:GRADERS].map {|grader| grader[:id].to_s}).not_to include(@other_teacher.id.to_s)
       end
     end
   end

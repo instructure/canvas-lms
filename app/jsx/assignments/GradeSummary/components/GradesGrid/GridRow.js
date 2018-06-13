@@ -26,6 +26,9 @@ import GradeSelect from './GradeSelect'
 
 export default class GridRow extends Component {
   static propTypes = {
+    finalGrader: shape({
+      graderId: string.isRequired
+    }),
     graders: arrayOf(
       shape({
         graderName: string,
@@ -42,6 +45,7 @@ export default class GridRow extends Component {
   }
 
   static defaultProps = {
+    finalGrader: null,
     grades: {},
     onGradeSelect: null,
     selectProvisionalGradeStatus: null
@@ -70,6 +74,7 @@ export default class GridRow extends Component {
 
         <td className="GradesGrid__FinalGradeCell" role="cell">
           <GradeSelect
+            finalGrader={this.props.finalGrader}
             graders={this.props.graders}
             grades={this.props.grades}
             onSelect={this.props.onGradeSelect}

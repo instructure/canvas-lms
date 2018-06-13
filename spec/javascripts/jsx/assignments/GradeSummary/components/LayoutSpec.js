@@ -40,6 +40,14 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
         muted: true,
         title: 'Example Assignment'
       },
+      currentUser: {
+        graderId: 'admin',
+        id: '1100'
+      },
+      finalGrader: {
+        graderId: 'teach',
+        id: '1105'
+      },
       graders: [
         {graderId: '1101', graderName: 'Miss Frizzle'},
         {graderId: '1102', graderName: 'Mr. Keating'}
@@ -139,6 +147,10 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
       store.dispatch(AssignmentActions.updateAssignment({gradesPublished: true}))
       const onGradeSelect = wrapper.find('GradesGrid').prop('onGradeSelect')
       strictEqual(onGradeSelect, null)
+    })
+
+    test('receives the final grader id from the assignment', () => {
+      strictEqual(wrapper.find('GradesGrid').prop('finalGrader'), storeEnv.finalGrader)
     })
 
     test('receives the selectProvisionalGradeStatuses from state', () => {
