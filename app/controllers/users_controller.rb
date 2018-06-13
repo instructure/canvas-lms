@@ -988,7 +988,7 @@ class UsersController < ApplicationController
 
   # @API List Missing Submissions
   # A paginated list of past-due assignments for which the student does not have a submission.
-  # The user sending the request must either be an admin or a parent observer using the parent app
+  # The user sending the request must either be the student, an admin or a parent observer using the parent app
   #
   # @argument user_id
   #   the student's ID

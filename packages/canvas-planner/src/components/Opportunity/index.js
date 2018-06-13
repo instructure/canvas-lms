@@ -36,7 +36,6 @@ export class Opportunity extends Component {
     id: string.isRequired,
     dueAt: string.isRequired,
     points: number,
-    showPill: bool.isRequired,
     courseName: string.isRequired,
     opportunityTitle: string.isRequired,
     timeZone: string.isRequired,
@@ -95,7 +94,7 @@ export class Opportunity extends Component {
         </div>
         <div className={styles.footer}>
           <div className={styles.status}>
-            {this.props.showPill && <Pill text={formatMessage('Missing')} variant="danger"/>}
+            <Pill text={formatMessage('Missing')} variant="danger"/>
             <div className={styles.due}>
               <span className={styles.dueText}>
                 {formatMessage('Due:')}</span> {this.fullDate}

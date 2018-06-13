@@ -30,7 +30,6 @@ describe "student planner" do
   end
 
   before :each do
-    @course.enable_feature!(:new_gradebook) # missing or late pill is only shown when new gradebook is enabled for the course
     user_session(@student1)
   end
 

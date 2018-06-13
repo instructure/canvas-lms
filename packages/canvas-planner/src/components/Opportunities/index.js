@@ -94,7 +94,6 @@ export class Opportunities extends Component {
             id={opportunity.id}
             dueAt={opportunity.due_at}
             points={opportunity.points_possible}
-            showPill={this.courseAttr(opportunity.course_id, 'informStudentsOfOverdueSubmissions')}
             courseName={this.courseAttr(opportunity.course_id, 'shortName')}
             opportunityTitle={opportunity.name}
             timeZone={this.props.timeZone}
