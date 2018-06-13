@@ -16,19 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {bool} from 'prop-types'
+import {bool, func} from 'prop-types'
 import React from 'react'
 import I18n from 'i18n!assignments'
 
 export default class GraderCommentVisibilityCheckbox extends React.Component {
   static propTypes = {
-    checked: bool.isRequired
+    checked: bool.isRequired,
+    onChange: func.isRequired
   }
 
   constructor(props) {
     super(props)
     this.handleChange = this.handleChange.bind(this)
     this.state = {checked: props.checked}
+  }
+
+  componentDidUpdate(_, prevState) {
+    if (this.state.checked !== prevState.checked) {
+      this.props.onChange(this.state.checked)
+    }
   }
 
   handleChange({target: checkbox}) {

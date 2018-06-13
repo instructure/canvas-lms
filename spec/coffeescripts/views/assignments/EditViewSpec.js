@@ -670,6 +670,13 @@ QUnit.module('#togglePeerReviewsAndGroupCategoryEnabled', (hooks) => {
     const peerReviewsCheckbox = document.getElementById('has_group_category')
     strictEqual(peerReviewsCheckbox.disabled, false)
   })
+
+  test('renders the moderated grading form field group', () => {
+    sinon.stub(view, 'renderModeratedGradingFormFieldGroup')
+    view.togglePeerReviewsAndGroupCategoryEnabled()
+    strictEqual(view.renderModeratedGradingFormFieldGroup.callCount, 1)
+    view.renderModeratedGradingFormFieldGroup.restore()
+  })
 })
 
 QUnit.module('EditView: group category inClosedGradingPeriod', {
@@ -1391,6 +1398,8 @@ QUnit.module('EditView#renderModeratedGradingFormFieldGroup', (suiteHooks) => {
     fixtures.innerHTML = `
       <span id="editor_tabs"></span>
       <span data-component="ModeratedGradingFormFieldGroup"></span>
+      <input id="assignment_peer_reviews" type="checkbox"></input>
+      <input id="has_group_category" type="checkbox"></input>
     `
     fakeENV.setup({
       AVAILABLE_MODERATORS: availableModerators,
@@ -1489,20 +1498,198 @@ QUnit.module('EditView#renderModeratedGradingFormFieldGroup', (suiteHooks) => {
     })
 
     test('passes peer_reviews as a prop to the component', () => {
-      view.assignment.set('peer_reviews', true)
+      $('#assignment_peer_reviews').prop('checked', true)
       view.renderModeratedGradingFormFieldGroup()
       strictEqual(props().isPeerReviewAssignment, true)
     })
 
-    test('passes true for isGroupAssignment to the component if it has a group_category_id', () => {
-      view.assignment.set('group_category_id', '2')
+    test('passes has_group_category as a prop to the component', () => {
+      $('#has_group_category').prop('checked', true)
       view.renderModeratedGradingFormFieldGroup()
       strictEqual(props().isGroupAssignment, true)
     })
 
-    test('passes false for isGroupAssignment to the component if it does not have a group_category_id', () => {
+    test('passes handleGraderCommentsVisibleToGradersChanged as a prop to the component', () => {
       view.renderModeratedGradingFormFieldGroup()
-      strictEqual(props().isGroupAssignment, false)
+      strictEqual(props().onGraderCommentsVisibleToGradersChange, view.handleGraderCommentsVisibleToGradersChanged)
     })
+
+    test('passes handleModeratedGradingChanged as a prop to the component', () => {
+      view.renderModeratedGradingFormFieldGroup()
+      strictEqual(props().onModeratedGradingChange, view.handleModeratedGradingChanged)
+    })
+  })
+})
+
+QUnit.module('EditView#handleModeratedGradingChanged', (hooks) => {
+  let server
+  let view
+
+  hooks.beforeEach(() => {
+    fixtures.innerHTML = `
+      <span id="editor_tabs"></span>
+      <span data-component="ModeratedGradingFormFieldGroup"></span>
+      <label for="assignment_graders_anonymous_to_graders" style="display: none;">
+        <input id="assignment_graders_anonymous_to_graders"></input>
+      </label>
+    `
+    fakeENV.setup({
+      AVAILABLE_MODERATORS: [],
+      current_user_roles: ['teacher'],
+      HAS_GRADED_SUBMISSIONS: false,
+      LOCALE: 'en',
+      MODERATED_GRADING_ENABLED: true,
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      VALID_DATE_RANGE: {},
+      COURSE_ID: 1
+    })
+    server = sinon.fakeServer.create()
+    view = editView()
+  })
+
+  hooks.afterEach(() => {
+    server.restore()
+    fakeENV.teardown()
+    fixtures.innerHTML = ''
+  })
+
+  test('sets the moderated grading attribute on the assignment', () => {
+    view.handleModeratedGradingChanged(true)
+    strictEqual(view.assignment.moderatedGrading(), true)
+  })
+
+  test('calls togglePeerReviewsAndGroupCategoryEnabled', () => {
+    sinon.stub(view, 'togglePeerReviewsAndGroupCategoryEnabled')
+    view.handleModeratedGradingChanged(true)
+    strictEqual(view.togglePeerReviewsAndGroupCategoryEnabled.callCount, 1)
+    view.togglePeerReviewsAndGroupCategoryEnabled.restore()
+  })
+
+  test('reveals the "Graders Anonymous to Graders" option when passed true and ' +
+  'grader comments are visible to graders', () => {
+    view.assignment.graderCommentsVisibleToGraders(true)
+    view.handleModeratedGradingChanged(true)
+    const label = document.querySelector('label[for="assignment_graders_anonymous_to_graders"]')
+    const isHidden = getComputedStyle(label).getPropertyValue('display') === 'none'
+    strictEqual(isHidden, false)
+  })
+
+  test('does not reveal the "Graders Anonymous to Graders" option when passed true and ' +
+  'grader comments are not visible to graders', () => {
+    view.handleModeratedGradingChanged(true)
+    const label = document.querySelector('label[for="assignment_graders_anonymous_to_graders"]')
+    const isHidden = getComputedStyle(label).getPropertyValue('display') === 'none'
+    strictEqual(isHidden, true)
+  })
+
+  test('calls uncheckAndHideGraderAnonymousToGraders when passed false', () => {
+    sinon.stub(view, 'uncheckAndHideGraderAnonymousToGraders')
+    view.handleModeratedGradingChanged(false)
+    strictEqual(view.uncheckAndHideGraderAnonymousToGraders.callCount, 1)
+    view.uncheckAndHideGraderAnonymousToGraders.restore()
+  })
+})
+
+QUnit.module('EditView#handleGraderCommentsVisibleToGradersChanged', (hooks) => {
+  let server
+  let view
+
+  hooks.beforeEach(() => {
+    fixtures.innerHTML = `
+      <span id="editor_tabs"></span>
+      <span data-component="ModeratedGradingFormFieldGroup"></span>
+      <label for="assignment_graders_anonymous_to_graders" style="display: none;">
+        <input id="assignment_graders_anonymous_to_graders"></input>
+      </label>
+    `
+    fakeENV.setup({
+      AVAILABLE_MODERATORS: [],
+      current_user_roles: ['teacher'],
+      HAS_GRADED_SUBMISSIONS: false,
+      LOCALE: 'en',
+      MODERATED_GRADING_ENABLED: true,
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      VALID_DATE_RANGE: {},
+      COURSE_ID: 1
+    })
+    server = sinon.fakeServer.create()
+    view = editView()
+  })
+
+  hooks.afterEach(() => {
+    server.restore()
+    fakeENV.teardown()
+    fixtures.innerHTML = ''
+  })
+
+  test('sets the graderCommentsVisibleToGraders attribute on the assignment', () => {
+    view.handleGraderCommentsVisibleToGradersChanged(true)
+    strictEqual(view.assignment.graderCommentsVisibleToGraders(), true)
+  })
+
+  test('reveals the "Graders Anonymous to Graders" option when passed true', () => {
+    view.handleGraderCommentsVisibleToGradersChanged(true)
+    const label = document.querySelector('label[for="assignment_graders_anonymous_to_graders"]')
+    const isHidden = getComputedStyle(label).getPropertyValue('display') === 'none'
+    strictEqual(isHidden, false)
+  })
+
+  test('calls uncheckAndHideGraderAnonymousToGraders when passed false', () => {
+    sinon.stub(view, 'uncheckAndHideGraderAnonymousToGraders')
+    view.handleGraderCommentsVisibleToGradersChanged(false)
+    strictEqual(view.uncheckAndHideGraderAnonymousToGraders.callCount, 1)
+    view.uncheckAndHideGraderAnonymousToGraders.restore()
+  })
+})
+
+QUnit.module('EditView#uncheckAndHideGraderAnonymousToGraders', (hooks) => {
+  let server
+  let view
+
+  hooks.beforeEach(() => {
+    fixtures.innerHTML = `
+      <span id="editor_tabs"></span>
+      <span data-component="ModeratedGradingFormFieldGroup"></span>
+      <label for="assignment_graders_anonymous_to_graders">
+        <input id="assignment_graders_anonymous_to_graders" checked></input>
+      </label>
+    `
+    fakeENV.setup({
+      AVAILABLE_MODERATORS: [],
+      current_user_roles: ['teacher'],
+      HAS_GRADED_SUBMISSIONS: false,
+      LOCALE: 'en',
+      MODERATED_GRADING_ENABLED: true,
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      VALID_DATE_RANGE: {},
+      COURSE_ID: 1
+    })
+    server = sinon.fakeServer.create()
+    view = editView()
+  })
+
+  hooks.afterEach(() => {
+    server.restore()
+    fakeENV.teardown()
+    fixtures.innerHTML = ''
+  })
+
+  test('sets gradersAnonymousToGraders to false on the assignment', () => {
+    view.assignment.gradersAnonymousToGraders(true)
+    view.uncheckAndHideGraderAnonymousToGraders()
+    strictEqual(view.assignment.gradersAnonymousToGraders(), false)
+  })
+
+  test('unchecks the "Graders anonymous to graders" checkbox', () => {
+    view.uncheckAndHideGraderAnonymousToGraders()
+    const checkbox = document.getElementById('assignment_graders_anonymous_to_graders')
+    strictEqual(checkbox.checked, false)
+  })
+
+  test('hides the "Graders anonymous to graders" checkbox', () => {
+    view.uncheckAndHideGraderAnonymousToGraders()
+    const label = document.querySelector('label[for="assignment_graders_anonymous_to_graders"]')
+    const isHidden = getComputedStyle(label).getPropertyValue('display') === 'none'
+    strictEqual(isHidden, true)
   })
 })

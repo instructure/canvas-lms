@@ -238,6 +238,7 @@ define [
       else
         @enableCheckbox(@$peerReviewsBox)
         @enableCheckbox(@$groupCategoryBox)
+      @renderModeratedGradingFormFieldGroup()
 
     setDefaultsIfNew: =>
       if @assignment.isNew()
@@ -320,6 +321,8 @@ define [
       @$groupCategoryBox = $("#{GROUP_CATEGORY_BOX}")
       @$anonymousGradingBox = $("#{ANONYMOUS_GRADING_BOX}")
       @renderModeratedGradingFormFieldGroup()
+      @$graderCommentsVisibleToGradersBox = $('#assignment_grader_comment_visibility')
+      @$gradersAnonymousToGradersLabel = $('label[for="assignment_graders_anonymous_to_graders"]')
 
       @similarityDetectionTools = SimilarityDetectionTools.attach(
             @$similarityDetectionTools.get(0),
@@ -658,21 +661,44 @@ define [
         this.value = lockedValue
         event.stopPropagation()
 
+    handleModeratedGradingChanged: (isModerated) =>
+      @assignment.moderatedGrading(isModerated)
+      @togglePeerReviewsAndGroupCategoryEnabled()
+
+      if isModerated
+        @$gradersAnonymousToGradersLabel.show() if @assignment.graderCommentsVisibleToGraders()
+      else
+        @uncheckAndHideGraderAnonymousToGraders()
+
+    handleGraderCommentsVisibleToGradersChanged: (commentsVisible) =>
+      @assignment.graderCommentsVisibleToGraders(commentsVisible)
+      if commentsVisible
+        @$gradersAnonymousToGradersLabel.show()
+      else
+        @uncheckAndHideGraderAnonymousToGraders()
+
+    uncheckAndHideGraderAnonymousToGraders: =>
+      @assignment.gradersAnonymousToGraders(false)
+      $('#assignment_graders_anonymous_to_graders').prop('checked', false)
+      @$gradersAnonymousToGradersLabel.hide()
+
     renderModeratedGradingFormFieldGroup: ->
       return if !ENV.MODERATED_GRADING_ENABLED || @assignment.isQuizLTIAssignment()
 
       props =
+        availableModerators: ENV.AVAILABLE_MODERATORS
         currentGraderCount: @assignment.get('grader_count')
         finalGraderID: @assignment.get('final_grader_id')
-        graderCommentsVisibleToGraders: !!@assignment.get('grader_comments_visible_to_graders')
+        graderCommentsVisibleToGraders: @assignment.graderCommentsVisibleToGraders()
         graderNamesVisibleToFinalGrader: !!@assignment.get('grader_names_visible_to_final_grader')
         gradedSubmissionsExist: ENV.HAS_GRADED_SUBMISSIONS
-        isPeerReviewAssignment: !!@assignment.peerReviews()
-        isGroupAssignment: !!@assignment.groupCategoryId()
-        moderatedGradingEnabled: @assignment.moderatedGrading()
-        availableModerators: ENV.AVAILABLE_MODERATORS
-        maxGraderCount: ENV.MODERATED_GRADING_MAX_GRADER_COUNT
+        isGroupAssignment: !!@$groupCategoryBox.prop('checked')
+        isPeerReviewAssignment: !!@$peerReviewsBox.prop('checked')
         locale: ENV.LOCALE
+        moderatedGradingEnabled: @assignment.moderatedGrading()
+        maxGraderCount: ENV.MODERATED_GRADING_MAX_GRADER_COUNT
+        onGraderCommentsVisibleToGradersChange: @handleGraderCommentsVisibleToGradersChanged
+        onModeratedGradingChange: @handleModeratedGradingChanged
 
       formFieldGroup = React.createElement(ModeratedGradingFormFieldGroup, props)
       mountPoint = document.querySelector("[data-component='ModeratedGradingFormFieldGroup']")

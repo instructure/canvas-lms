@@ -1209,6 +1209,25 @@ QUnit.module('Assignment#gradersAnonymousToGraders', (hooks) => {
   })
 })
 
+QUnit.module('Assignment#graderCommentsVisibleToGraders', (hooks) => {
+  let assignment
+
+  hooks.beforeEach(() => {
+    assignment = new Assignment()
+  })
+
+  test('returns grader_comments_visible_to_graders on the record if no arguments are passed', () => {
+    assignment.set('grader_comments_visible_to_graders', true)
+    equal(assignment.graderCommentsVisibleToGraders(), true)
+  })
+
+  test('sets the grader_comments_visible_to_graders value if an argument is passed', () => {
+    assignment.set('grader_comments_visible_to_graders', true)
+    assignment.graderCommentsVisibleToGraders(false)
+    equal(assignment.graderCommentsVisibleToGraders(), false)
+  })
+})
+
 QUnit.module('Assignment#showGradersAnonymousToGradersCheckbox', (hooks) => {
   let assignment
 

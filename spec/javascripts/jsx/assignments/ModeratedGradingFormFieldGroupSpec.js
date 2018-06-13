@@ -35,7 +35,9 @@ QUnit.module('ModeratedGradingFormFieldGroup', hooks => {
       isPeerReviewAssignment: false,
       locale: 'en',
       maxGraderCount: 10,
-      moderatedGradingEnabled: true
+      moderatedGradingEnabled: true,
+      onGraderCommentsVisibleToGradersChange() {},
+      onModeratedGradingChange() {}
     }
   })
 
@@ -102,6 +104,23 @@ QUnit.module('ModeratedGradingFormFieldGroup', hooks => {
       mountComponent()
       moderatedGradingCheckbox().simulate('change')
       strictEqual(content().length, 1)
+    })
+
+    test('calls onModeratedGradingChange when the checkbox is checked', () => {
+      props.moderatedGradingEnabled = false
+      sinon.stub(props, 'onModeratedGradingChange')
+      mountComponent()
+      moderatedGradingCheckbox().simulate('change')
+      strictEqual(props.onModeratedGradingChange.callCount, 1)
+      props.onModeratedGradingChange.restore()
+    })
+
+    test('calls onModeratedGradingChange when the checkbox is unchecked', () => {
+      sinon.stub(props, 'onModeratedGradingChange')
+      mountComponent()
+      moderatedGradingCheckbox().simulate('change')
+      strictEqual(props.onModeratedGradingChange.callCount, 1)
+      props.onModeratedGradingChange.restore()
     })
   })
 

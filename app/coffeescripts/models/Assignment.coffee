@@ -214,6 +214,10 @@ define [
       return @get('graders_anonymous_to_graders') unless arguments.length > 0
       @set 'graders_anonymous_to_graders', anonymousGraders
 
+    graderCommentsVisibleToGraders: (commentsVisible) =>
+      return !!@get('grader_comments_visible_to_graders') unless arguments.length > 0
+      @set 'grader_comments_visible_to_graders', commentsVisible
+
     peerReviews: (peerReviewBoolean) =>
       return @get 'peer_reviews' unless arguments.length > 0
       @set 'peer_reviews', peerReviewBoolean

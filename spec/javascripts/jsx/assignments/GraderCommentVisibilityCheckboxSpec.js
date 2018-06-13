@@ -25,7 +25,10 @@ QUnit.module('GraderCommentVisibilityCheckbox', hooks => {
   let wrapper
 
   hooks.beforeEach(() => {
-    props = {checked: false}
+    props = {
+      checked: false,
+      onChange() {}
+    }
   })
 
   function mountComponent() {
@@ -78,5 +81,22 @@ QUnit.module('GraderCommentVisibilityCheckbox', hooks => {
     mountComponent()
     checkbox().simulate('change', {target: {checked: false}})
     strictEqual(formField().value, 'false')
+  })
+
+  test('checking the checkbox calls onChange', () => {
+    sinon.stub(props, 'onChange')
+    mountComponent()
+    checkbox().simulate('change', {target: {checked: true}})
+    strictEqual(props.onChange.callCount, 1)
+    props.onChange.restore()
+  })
+
+  test('unchecking the checkbox calls onChange', () => {
+    props.checked = true
+    sinon.stub(props, 'onChange')
+    mountComponent()
+    checkbox().simulate('change', {target: {checked: false}})
+    strictEqual(props.onChange.callCount, 1)
+    props.onChange.restore()
   })
 })
