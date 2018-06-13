@@ -111,7 +111,7 @@ $darkRowBg: #f9f9f9;
 
   // content cell, aka a table cell with permission buttons inside it
   .ic-permissions__cell-content {
-    margin-left: 20px;
+    margin-#{direction(left)}: 20px;
     text-align: center;
   }
 
