@@ -129,11 +129,11 @@ export class PlannerHeader extends Component {
   componentWillReceiveProps(nextProps) {
     let opportunities = nextProps.opportunities.items.filter((opportunity) => this.isOpportunityVisible(opportunity));
 
-    if (!nextProps.loading.allOpportunitiesLoaded && !nextProps.loading.loadingOpportunities && opportunities.length < 10) {
+    if (!nextProps.loading.allOpportunitiesLoaded &&
+        !nextProps.loading.loadingOpportunities) {
       nextProps.getNextOpportunities();
     }
 
-    opportunities = opportunities.slice(0, 10);
     this.setUpdateItemTray(!!nextProps.todo.updateTodoItem);
     this.setState({opportunities});
   }
@@ -333,7 +333,7 @@ export class PlannerHeader extends Component {
               ref={(b) => { this.opportunitiesButton = b; }}
               buttonRef={(b) => { this.opportunitiesHtmlButton = b; }}
             >
-              <Badge {...this.state.opportunities.length ? {count :this.state.opportunities.length} : {}}>
+              <Badge {...this.props.loading.allOpportunitiesLoaded && this.state.opportunities.length ? {count :this.state.opportunities.length} : {}}>
                 <IconAlertsLine/>
                 <ScreenReaderContent>{this.opportunityTitle()}</ScreenReaderContent>
               </Badge>

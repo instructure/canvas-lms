@@ -52,7 +52,7 @@ function defaultProps (options) {
       isLoading: false,
       allPastItemsLoaded: false,
       allFutureItemsLoaded: false,
-      allOpportunitiesLoaded: false,
+      allOpportunitiesLoaded: true,
       setFocusAfterLoad: false,
       firstNewDayKey: null,
       futureNextUrl: null,
@@ -152,7 +152,7 @@ it('renders the tray with the name of an existing item when provided', () => {
   expect(findEditTray(wrapper).prop('label')).toBe('Edit abc');
 });
 
-it('does not call getNextOpportunities when component has 12 opportunities', () => {
+it('does not call getNextOpportunities when component has loaded all opportunities', () => {
   const mockDispatch = jest.fn();
   const props = defaultProps();
   props.courses = [
@@ -180,7 +180,7 @@ it('does not call getNextOpportunities when component has 12 opportunities', () 
     isLoading: false,
     allPastItemsLoaded: false,
     allFutureItemsLoaded: false,
-    allOpportunitiesLoaded: false,
+    allOpportunitiesLoaded: true,
     setFocusAfterLoad: false,
     firstNewDayKey: null,
     futureNextUrl: null,
@@ -282,7 +282,8 @@ it('opens tray if todo update item props is set', () => {
   expect(wrapper.state().trayOpen).toEqual(true);
 });
 
-it('shows only 10 opportunities badge when we over 10 items', () => {
+it('shows all opportunities on badge even when we have over 10 items', () => {
+  const mockDispatch = jest.fn();
   const props = defaultProps();
   props.courses = [
     {id: "1", shortName: "Course Short Name"},
@@ -305,13 +306,19 @@ it('shows only 10 opportunities badge when we over 10 items', () => {
     {id: "12", course_id: "3", due_at: "2017-16-09T20:40:35Z", html_url: "http://www.non_default_url.com", name: "learning object title"},
   ];
 
+  props.loading = {
+    loadingOpportunities: false,
+    allOpportunitiesLoaded: true,
+  };
+
   const fakeElement = document.createElement('div');
   const wrapper = mount(
     <PlannerHeader {...props} ariaHideElement={fakeElement} />
   );
+
   wrapper.setProps(props);
   expect(wrapper.find('Badge').filterWhere((item) => {
-    return item.prop('count') === 10; //src undefined
+    return item.prop('count') === props.opportunities.items.length; //src undefined
   }).length).toEqual(1);
 });
 
