@@ -36,6 +36,10 @@ class ModeratePage
       post_grades_button.click
     end
 
+    def click_page_number(page_number)
+      page_buttons.find {|e| e.text == page_number.to_s}.click
+    end
+
     # Methods
 
     def fetch_student_count
@@ -43,7 +47,19 @@ class ModeratePage
     end
 
     def fetch_provisional_grade_count_for_student(student)
-      ff('.GradesGrid__ProvisionalGradeCell', student_table_row_by_displayed_name(student.name)).size
+      grades(student).size
+    end
+
+    def fetch_grader_count
+      student_table_headers.size
+    end
+
+    def grader_names
+      student_table_headers.map(&:text)
+    end
+
+    def fetch_grades(student)
+      grades(student).map(&:text)
     end
 
     # Components
@@ -70,6 +86,14 @@ class ModeratePage
 
     def grades_posted_button
       fj("button:contains('Grades Posted')")
+    end
+
+    def page_buttons
+      ffxpath('//div[@role="navigation"]//button')
+    end
+
+    def grades(student)
+      ff('.GradesGrid__ProvisionalGradeCell', student_table_row_by_displayed_name(student.name))
     end
   end
 end
