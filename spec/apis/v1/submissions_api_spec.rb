@@ -3843,6 +3843,28 @@ describe 'Submissions API', type: :request do
         f = Attachment.last.folder
         expect(f.submission_context_code).to eq @course.asset_string
       end
+
+      context 'when InstFS is disabled' do
+        before { allow(InstFS).to receive(:enabled?).and_return(false) }
+
+        context "for a url submission" do
+          let(:url) { 'http://test.test/path' }
+          let(:result) { JSON.parse(response.body) }
+
+          before { preflight(name: 'test.txt', url: url) }
+
+          it "creates a Progress" do
+            expect(Progress.find(result['progress']['id'])).to be
+          end
+
+          it "creates a Progress worker" do
+            job = Delayed::Job.last
+            expect(job.tag).to eq 'Attachment#clone_url'
+            expect(job.priority).to eq Delayed::HIGH_PRIORITY
+            expect(job.handler).to match url
+          end
+        end
+      end
     end
 
     it "rejects invalid urls" do
