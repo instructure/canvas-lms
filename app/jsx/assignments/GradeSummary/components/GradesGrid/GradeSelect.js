@@ -24,17 +24,38 @@ import I18n from 'i18n!assignment_grade_summary'
 
 import {FAILURE, STARTED, SUCCESS} from '../../grades/GradeActions'
 
+const NO_SELECTION = 'no-selection'
+
+function optionsForGraders(graders, grades) {
+  const options = []
+  for (let i = 0; i < graders.length; i++) {
+    const grader = graders[i]
+    const gradeInfo = grades[grader.graderId]
+    if (gradeInfo) {
+      options.push({
+        gradeInfo,
+        label: `${I18n.n(gradeInfo.score)} (${grader.graderName})`,
+        value: gradeInfo.graderId
+      })
+    }
+  }
+  return options
+}
+
 export default class GradeSelect extends Component {
   static propTypes = {
+    /* eslint-disable-next-line react/no-unused-prop-types */
     graders: arrayOf(
       shape({
         graderName: string,
         graderId: string.isRequired
       })
     ).isRequired,
+    /* eslint-disable-next-line react/no-unused-prop-types */
     grades: shape({}).isRequired,
     onClose: func,
     onOpen: func,
+    onPositioned: func,
     onSelect: func,
     selectProvisionalGradeStatus: oneOf([FAILURE, STARTED, SUCCESS]),
     studentName: string.isRequired
@@ -43,6 +64,7 @@ export default class GradeSelect extends Component {
   static defaultProps = {
     onClose() {},
     onOpen() {},
+    onPositioned() {},
     onSelect() {},
     selectProvisionalGradeStatus: null
   }
@@ -50,69 +72,93 @@ export default class GradeSelect extends Component {
   constructor(props) {
     super(props)
 
-    this.handleSelect = this.handleSelect.bind(this)
+    this.bindMenu = ref => {
+      if (ref) {
+        this.$input = ref
+        const menuId = ref.getAttribute('aria-controls')
+        this.$menu = document.getElementById(menuId)
+      } else {
+        this.$menu = null
+      }
+    }
+    this.bindSelect = ref => {
+      this.select = ref
+    }
+
+    this.handleChange = this.handleChange.bind(this)
+    this.handleClose = this.handleClose.bind(this)
+
+    this.state = this.constructor.getDerivedStateFromProps(props)
   }
 
-  shouldComponentUpdate(nextProps) {
-    return Object.keys(nextProps).some(key => this.props[key] !== nextProps[key])
+  static getDerivedStateFromProps(props) {
+    const graderOptions = optionsForGraders(props.graders, props.grades)
+    const options = [...graderOptions]
+    let selectedOption = options.find(option => option.gradeInfo.selected)
+    if (!selectedOption) {
+      selectedOption = {gradeInfo: {}, label: '–', value: NO_SELECTION}
+      options.unshift(selectedOption)
+    }
+
+    return {
+      enteredOption: selectedOption,
+      graderOptions,
+      options,
+      selectedOption
+    }
   }
 
-  handleSelect(_event, option) {
-    const gradeInfo = this.props.grades[option.value]
-    if (!gradeInfo.selected && this.props.onSelect) {
-      this.props.onSelect(gradeInfo)
+  componentWillReceiveProps(nextProps) {
+    this.setState(this.constructor.getDerivedStateFromProps(nextProps))
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return (
+      Object.keys(nextProps).some(key => this.props[key] !== nextProps[key]) ||
+      Object.keys(nextState).some(key => this.state[key] !== nextState[key])
+    )
+  }
+
+  handleChange(_event, selectedOption) {
+    if (this.props.onSelect == null || selectedOption.value === NO_SELECTION) {
+      return
+    }
+
+    const optionMatch = this.state.options.find(option => option.value === selectedOption.value)
+    if (!optionMatch.gradeInfo.selected) {
+      this.props.onSelect(optionMatch.gradeInfo)
+    }
+  }
+
+  handleClose() {
+    if (this.$input === document.activeElement || this.$menu.contains(document.activeElement)) {
+      this.select.focus()
+    }
+
+    if (this.props.onClose) {
+      this.props.onClose()
     }
   }
 
   render() {
-    const {graders, grades} = this.props
-    const gradeOptions = []
-
-    let selectedOption
-    for (let i = 0; i < graders.length; i++) {
-      const grader = graders[i]
-      const gradeInfo = grades[grader.graderId]
-
-      if (gradeInfo != null) {
-        const option = {
-          label: `${I18n.n(gradeInfo.score)} (${grader.graderName})`,
-          value: gradeInfo.graderId
-        }
-        gradeOptions.push(option)
-
-        if (gradeInfo.selected) {
-          selectedOption = option
-        }
-      }
-    }
-
-    if (!selectedOption) {
-      gradeOptions.unshift({label: '–', value: 'no-selection'})
-      selectedOption = 'no-selection'
-    }
-
     return (
       <Select
         aria-readonly={!this.props.onSelect || this.props.selectProvisionalGradeStatus === STARTED}
-        key={
-          /*
-           * TODO: This forces a unique instance per-student, which hurts
-           * performance.  Remove this key entirely once the commit from
-           * INSTUI-1199 has been published to npm and pulled into Canvas.
-           */
-          this.props.studentName
-        }
+        filter={options => options}
+        inputRef={this.bindMenu}
         label={
           <ScreenReaderContent>
             {I18n.t('Grade for %{studentName}', {studentName: this.props.studentName})}
           </ScreenReaderContent>
         }
-        onChange={this.handleSelect}
-        onClose={this.props.onClose}
+        onChange={this.handleChange}
+        onClose={this.handleClose}
         onOpen={this.props.onOpen}
-        selectedOption={selectedOption}
+        onPositioned={this.props.onPositioned}
+        ref={this.bindSelect}
+        selectedOption={this.state.selectedOption}
       >
-        {gradeOptions.map(gradeOption => (
+        {this.state.options.map(gradeOption => (
           <option key={gradeOption.value} value={gradeOption.value}>
             {gradeOption.label}
           </option>

@@ -116,6 +116,12 @@ QUnit.module('GradeSummary GradesGrid', suiteHooks => {
     strictEqual(wrapper.find('tr.GradesGrid__BodyRow').length, 4)
   })
 
+  test('sends graders to the Grid', () => {
+    mountComponent()
+    const grid = wrapper.find(Grid)
+    strictEqual(grid.prop('graders'), props.graders)
+  })
+
   test('sends onGradeSelect to the Grid', () => {
     mountComponent()
     const grid = wrapper.find(Grid)

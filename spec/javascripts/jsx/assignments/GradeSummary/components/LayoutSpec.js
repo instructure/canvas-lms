@@ -135,7 +135,7 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
       strictEqual(gradeInfo.selected, true)
     })
 
-    test('is null when grades have not been published', () => {
+    test('is null when grades have been published', () => {
       store.dispatch(AssignmentActions.updateAssignment({gradesPublished: true}))
       const onGradeSelect = wrapper.find('GradesGrid').prop('onGradeSelect')
       strictEqual(onGradeSelect, null)

@@ -51,11 +51,9 @@ function startedButton(props) {
 }
 
 function successButton(props) {
-  const title = I18n.t('Grades Posted')
-
   return (
-    <Button {...props} variant="light">
-      <IconCheckMark title={title} /> <PresentationContent>{title}</PresentationContent>
+    <Button {...props} icon={IconCheckMark} variant="light">
+      {I18n.t('Grades Posted')}
     </Button>
   )
 }
