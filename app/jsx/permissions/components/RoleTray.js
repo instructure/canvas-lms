@@ -311,6 +311,7 @@ export default class RoleTray extends Component {
     <Button
       variant="icon"
       size="medium"
+      id="edit_button"
       onClick={this.showEditTray}
       buttonRef={c => (this.editButton = c)}
     >
@@ -338,7 +339,7 @@ export default class RoleTray extends Component {
       <Flex alignItems="start" justifyItems="space-between">
         <FlexItem>
           <Container as="div">
-            <Heading level="h3" as="h2">
+            <Heading id="general_tray_header" level="h3" as="h2">
               {this.props.label}
             </Heading>
             {this.props.basedOn && (
@@ -387,13 +388,14 @@ export default class RoleTray extends Component {
 
   renderEditHeader = () => (
     <div>
-      <Heading level="h3" as="h2">
+      <Heading level="h3" as="h2" id="edit_tray_header">
         {I18n.t('Edit %{label}', {label: this.props.label})}
       </Heading>
 
       <Container as="div" margin="medium 0 large 0">
         <TextInput
           label={I18n.t('Role Name')}
+          name="edit_name_box"
           defaultValue={this.props.label}
           value={this.state.editRoleLabelInput}
           messages={this.state.editRoleLabelErrorMessages}

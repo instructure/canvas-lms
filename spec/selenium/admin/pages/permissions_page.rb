@@ -69,6 +69,22 @@ class PermissionsIndex
       fj("button:contains('#{item_name}')")
     end
 
+    def new_role_name_input
+      f('#new_role_name')
+    end
+
+    def edit_role_icon
+      f("#edit_button")
+    end
+
+    def role_name(role)
+      f("#role_#{role.id}")
+    end
+
+    def edit_tray_header
+      f("#edit_tray_header")
+    end
+
     def permission_state(permission, role)
       state = string.Empty
       icons = ff('svg', permission_cell(permission, role))
@@ -89,6 +105,17 @@ class PermissionsIndex
     # ---------------------- Actions ----------------------
     def choose_tab(tab_name)
       permission_tab(tab_name).click
+    end
+
+    def open_edit_role_tray(role)
+      role_name(role).click
+      edit_role_icon.click
+    end
+
+    def edit_role(role, new_name)
+      open_edit_role_tray(role)
+      set_value(f('input[name="edit_name_box"]'), new_name)
+      driver.action.send_keys(:tab).perform
     end
 
     def enter_search(search_term)

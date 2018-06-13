@@ -20,7 +20,19 @@ require_relative './pages/permissions_page'
 describe "permissions index" do
   include_context "in-process server selenium tests"
 
-  it "dummy test" do
-    expect(true).to be true
+  describe "editing role names" do
+    before :each do
+      @account = Account.default
+      account_admin_user
+      user_session(@admin)
+      @custom_student_role = custom_student_role("A Kitty")
+      PermissionsIndex.visit(@account)
+    end
+
+    it "updates the permission to the new name after editing" do
+      PermissionsIndex.edit_role(@custom_student_role, "A Better Kitty")
+      expect{PermissionsIndex.role_name(@custom_student_role).text}.to become("A Better Kitty")
+      expect{PermissionsIndex.edit_tray_header.text}.to become("Edit A Better Kitty")
+    end
   end
 end
