@@ -17,7 +17,9 @@
 
 require_relative '../../common'
 require_relative '../../assignments/page_objects/assignment_page'
+require_relative '../pages/speedgrader_page'
 require_relative '../pages/moderate_page'
+require_relative '../pages/gradebook_page'
 
 describe 'Moderated Marking' do
   include_context 'in-process server selenium tests'
@@ -39,18 +41,15 @@ describe 'Moderated Marking' do
     @moderated_assignment = @moderated_course.assignments.create!(
       title: 'Moderated Assignment1',
       grader_count: 2,
+      final_grader_id: @teacher1.id,
       grading_type: 'points',
       points_possible: 15,
-      submission_types: 'online_upload',
+      submission_types: 'online_text_entry',
       moderated_grading: true
     )
-
-    # make Teacher1 the Final-Grader/Moderator for Assignment1
-    @moderated_assignment.final_grader_id = @teacher1.id
-    @moderated_assignment.save!
   end
 
-  context 'with a final grader in a moderated assignment' do
+  context 'with a final-grader in a moderated assignment' do
     it 'moderate option is visible for final-grader', priority: '1', test_id: 3490527 do
       user_session(@teacher1)
       AssignmentPage.visit(@moderated_course.id, @moderated_assignment.id)
@@ -78,10 +77,52 @@ describe 'Moderated Marking' do
       AssignmentPage.visit_assignment_edit_page(@moderated_course.id, @moderated_assignment.id)
     end
 
-    it 'user without the permission is not displayed in final grader dropdown', priority: '1', test_id: 3490529 do
+    it 'user without the permission is not displayed in final-grader dropdown', priority: '1', test_id: 3490529 do
       AssignmentPage.select_grader_dropdown.click
 
       expect(AssignmentPage.select_grader_dropdown).not_to include_text(@ta1.name)
+    end
+  end
+
+  context 'with max grader count reached' do
+    before(:each) do
+      # enroll a third teacher a student
+      @teacher3 = User.create!(name: 'Teacher3')
+      @teacher3.register!
+      @moderated_course.enroll_teacher(@teacher3, enrollment_state: 'active')
+
+      @student1 = User.create!(name: 'Student1')
+      @student1.register!
+      @moderated_course.enroll_student(@student1, enrollment_state: 'active')
+
+      # grader-count = 1, final_grader = Teacher1
+      @moderated_assignment.update(grader_count: 1)
+
+      # give a grade as non-final grader
+      @student1_submission = @moderated_assignment.submit_homework(@student1, :body => 'student 1 submission moderated assignment')
+      @student1_submission = @moderated_assignment.grade_student(@student1, grade: 13, grader: @teacher3, provisional: true).first
+    end
+
+    it 'final-grader can access speedgrader', priority: '1', test_id: 3496271 do
+      user_session(@teacher1)
+      AssignmentPage.visit(@moderated_course.id, @moderated_assignment.id)
+
+      expect(AssignmentPage.page_action_list.text).to include 'SpeedGrader™'
+    end
+
+    it 'speedgrader link not visible to non-final-grader' do # test_id: 3496271
+      user_session(@teacher2)
+      AssignmentPage.visit(@moderated_course.id, @moderated_assignment.id)
+
+      expect(AssignmentPage.page_action_list.text).not_to include 'SpeedGrader™'
+    end
+
+    it 'informs user that maximum number of grades has been reached for the submission' do # test_id: 3496271
+      user_session(@teacher2)
+      get "/courses/#{@moderated_course.id}/gradebook/speed_grader?assignment_id=#{@moderated_assignment.id}"
+      wait_for_ajaximations
+
+      expect_flash_message :success, 'The maximum number of graders for this assignment has been reached.'
     end
   end
 end

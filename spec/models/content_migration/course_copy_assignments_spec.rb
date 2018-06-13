@@ -196,7 +196,7 @@ describe ContentMigration do
       attrs = [:turnitin_enabled, :vericite_enabled, :turnitin_settings, :peer_reviews,
           :automatic_peer_reviews, :anonymous_peer_reviews,
           :grade_group_students_individually, :allowed_extensions,
-          :position, :peer_review_count, :muted, :omit_from_final_grade, :post_to_sis]
+          :position, :peer_review_count, :omit_from_final_grade, :post_to_sis]
 
       run_course_copy
 
@@ -208,6 +208,7 @@ describe ContentMigration do
           expect(@assignment[attr]).to eq new_assignment[attr]
         end
       end
+      expect(new_assignment.muted).to be_falsey
       expect(new_assignment.only_visible_to_overrides).to be_falsey
     end
 

@@ -73,6 +73,7 @@ module SIS
         end
         @rows_for_parallel = nil
         update_pause_vars
+        @batch.data[:use_parallel_imports] = true
         sleep(@pause_duration)
       end
 
@@ -180,12 +181,7 @@ module SIS
 
         queue_next_importer_set
       rescue => e
-        if @batch
-          fail_with_error!(e)
-        else
-          SisBatch.add_error(nil, e.message, sis_batch: @batch, failure: true, backtrace: e.backtrace)
-          raise e
-        end
+        fail_with_error!(e)
       ensure
         @tmp_dirs.each do |tmp_dir|
           FileUtils.rm_rf(tmp_dir, :secure => true) if File.directory?(tmp_dir)
@@ -193,9 +189,7 @@ module SIS
       end
 
       def errors
-        errors = @root_account.sis_batch_errors
-        errors = errors.where(sis_batch: @batch) if @batch
-        errors.order(:id).pluck(:file, :message)
+        @root_account.sis_batch_errors.where(sis_batch: @batch).order(:id).pluck(:file, :message)
       end
 
       def calculate_progress
@@ -203,7 +197,6 @@ module SIS
       end
 
       def update_progress
-        return unless @batch
         completed_count = @batch.parallel_importers.where(workflow_state: "completed").count
         current_progress = (completed_count.to_f * 100 / @parallel_importers.values.map(&:count).sum).round
         SisBatch.where(:id => @batch).where("progress IS NULL or progress < ?", current_progress).update_all(progress: current_progress)
@@ -264,7 +257,7 @@ module SIS
         if next_importer_type == :account
           enqueue_args[:strand] = "sis_account_import:#{@root_account.global_id}" # run one at a time
         else
-          enqueue_args[:n_strand] = ["sis_parallel_import", @root_account.global_id]
+          enqueue_args[:n_strand] = ["sis_parallel_import", @batch.data[:strand_account_id] || @root_account.global_id]
         end
 
         importers_to_queue = @parallel_importers[next_importer_type]
@@ -301,8 +294,6 @@ module SIS
       end
 
       def update_pause_vars
-        return unless @batch
-
         # throttling can be set on individual SisBatch instances, and also
         # site-wide in the Setting table.
         @batch.reload(:select => 'data') # update to catch changes to pause vars

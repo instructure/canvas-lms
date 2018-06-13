@@ -19,7 +19,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import I18n from 'i18n!gradebook_history';
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 import SearchForm from '../gradebook-history/SearchForm';
 import SearchResults from '../gradebook-history/SearchResults';
 

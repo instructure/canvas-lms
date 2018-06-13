@@ -86,7 +86,7 @@ test('commonEventFactory: finds a context for multi-context events', () => {
     },
     [{asset_string: 'course_2'}]
   )
-  notOk(event === null)
+  notEqual(event, null)
 })
 
 QUnit.module('CommonEvent#iconType', {
@@ -107,7 +107,7 @@ test('Returns "calendar-add" for non-filled groups', () => {
     },
     ['course_1']
   )
-  ok(event.iconType() === 'calendar-add')
+  equal(event.iconType(), 'calendar-add')
 })
 
 test('Returns "calendar-reserved" for filled groups', () => {
@@ -120,7 +120,7 @@ test('Returns "calendar-reserved" for filled groups', () => {
     },
     ['course_1']
   )
-  ok(event.iconType() === 'calendar-reserved')
+  equal(event.iconType(), 'calendar-reserved')
 })
 
 test('Returns "calendar-reserved" when the appointmentGroupEventStatus is "Reserved"', () => {
@@ -133,7 +133,7 @@ test('Returns "calendar-reserved" when the appointmentGroupEventStatus is "Reser
     ['course_1']
   )
   event.appointmentGroupEventStatus = 'Reserved'
-  ok(event.iconType() === 'calendar-reserved')
+  equal(event.iconType(), 'calendar-reserved')
 })
 
 test('Returns "calendar-month" for other situations', () => {
@@ -144,5 +144,29 @@ test('Returns "calendar-month" for other situations', () => {
     },
     ['course_1']
   )
-  ok(event.iconType() === 'calendar-month')
+  equal(event.iconType(), 'calendar-month')
+})
+
+test('Returns "discussion" for ungraded discussion objects with todo dates', () => {
+  const event = commonEventFactory(
+    {
+      title: 'some title',
+      start_at: '2016-12-01T12:30:00Z',
+      plannable_type: 'discussion_topic'
+    },
+    ['course_1']
+  )
+  equal(event.iconType(), 'discussion')
+})
+
+test('Returns "document" for wiki pages with todo dates', () => {
+  const event = commonEventFactory(
+    {
+      title: 'some title',
+      start_at: '2016-12-01T12:30:00Z',
+      plannable_type: 'wiki_page'
+    },
+    ['course_1']
+  )
+  equal(event.iconType(), 'document')
 })

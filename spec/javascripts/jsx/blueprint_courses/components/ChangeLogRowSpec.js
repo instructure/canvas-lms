@@ -19,7 +19,7 @@
 import React from 'react'
 import {mount, shallow} from 'enzyme'
 import ChangeLogRow, { ChangeRow } from 'jsx/blueprint_courses/components/ChangeLogRow'
-import sampleData from '../sampleData'
+import getSampleData from '../getSampleData'
 
 QUnit.module('ChangeLogRow component')
 
@@ -53,13 +53,13 @@ test('renders children inside content', () => {
 })
 
 test('renders the ChangeRow component', () => {
-  const tree = mount(<ChangeRow change={sampleData.history[0].changes[0]} />)
+  const tree = mount(<ChangeRow change={getSampleData().history[0].changes[0]} />)
   const node = tree.find('.bcs__history-item__change-log-row')
   ok(node.exists())
 })
 
 test('renders lock icon when its a ChangeRow component', () => {
-  const tree = mount(<ChangeRow change={sampleData.history[0].changes[0]} />)
+  const tree = mount(<ChangeRow change={getSampleData().history[0].changes[0]} />)
   const node = tree.find('.bcs__history-item__content .bcs__history-item__lock-icon')
   ok(node.exists())
 })

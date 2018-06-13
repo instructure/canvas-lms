@@ -22,11 +22,11 @@ import moment from 'moment'
 import axios from 'axios'
 import I18n from 'i18n!last_attended'
 
-import Container from '@instructure/ui-core/lib/components/Container'
-import DateInput from '@instructure/ui-core/lib/components/DateInput'
-import Text from '@instructure/ui-core/lib/components/Text'
-import Spinner from '@instructure/ui-core/lib/components/Spinner'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import View from '@instructure/ui-layout/lib/components/View'
+import DateInput from '@instructure/ui-forms/lib/components/DateInput'
+import Text from '@instructure/ui-elements/lib/components/Text'
+import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
 import {showFlashError} from '../shared/FlashAlert'
 
@@ -55,8 +55,8 @@ export default class StudentLastAttended extends React.Component {
     this.createCancelToken()
   }
 
-  onDateSubmit = (e, date) => {
-    const currentDate = new Date(date)
+  onDateSubmit = (e, isoValue) => {
+    const currentDate = new Date(isoValue)
     const messages = this.checkDateValidations(currentDate)
     if (!messages.length) {
       this.postDateToBackend(currentDate)
@@ -101,36 +101,37 @@ export default class StudentLastAttended extends React.Component {
 
   renderTitle() {
     return (
-      <Container display="block" margin="small 0">
+      <View display="block" margin="small 0">
         <Text margin="small 0">{I18n.t('Last day attended')}</Text>
-      </Container>
+      </View>
     )
   }
 
   render() {
     if (this.state.loading) {
       return (
-        <Container display="block" margin="small x-small">
+        <View display="block" margin="small x-small">
           {this.renderTitle()}
-          <Container display="block" margin="small">
+          <View display="block" margin="small">
             <Spinner
               margin="small 0"
               display="block"
               title={I18n.t('Loading last attended date')}
               size="small"
             />
-          </Container>
-        </Container>
+          </View>
+        </View>
       )
     }
     return (
-      <Container display="block" margin="small x-small">
+      <View display="block" margin="small x-small">
         {this.renderTitle()}
         <DateInput
           previousLabel={I18n.t('Previous Month')}
           nextLabel={I18n.t('Next Month')}
           label={<ScreenReaderContent>{I18n.t('Set Last Attended Date')}</ScreenReaderContent>}
           onDateChange={this.onDateSubmit}
+          invalidDateMessage={value => I18n.t('%{value} is not a valid date', {value})}
           messages={this.state.messages}
           dateValue={
             !this.state.selectedDate || this.state.selectedDate.toString() === 'Invalid Date'
@@ -139,7 +140,7 @@ export default class StudentLastAttended extends React.Component {
           }
           validationFeedback={false}
         />
-      </Container>
+      </View>
     )
   }
 }

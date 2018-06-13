@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Table from '@instructure/ui-core/lib/components/Table'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import Table from '@instructure/ui-elements/lib/components/Table'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import React from 'react'
 import {arrayOf, string, object, func} from 'prop-types'
 import I18n from 'i18n!account_course_user_search'

@@ -46,6 +46,6 @@ export class FocusPriorItemOnDelete extends Animation {
     this.window().setTimeout(() => {
       this.animator().focusElement(itemComponentToFocus.component.getFocusable('delete'));
       this.animator().scrollTo(itemComponentToFocus.component.getScrollable(), this.stickyOffset());
-    }, 25);
+    }, 250);
   }
 }

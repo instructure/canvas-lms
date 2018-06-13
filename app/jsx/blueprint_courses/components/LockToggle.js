@@ -20,14 +20,14 @@ import I18n from 'i18n!blueprint_courses'
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
-import Button from '@instructure/ui-core/lib/components/Button'
-import Tooltip from '@instructure/ui-core/lib/components/Tooltip'
-import Text from '@instructure/ui-core/lib/components/Text'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
-import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
+import Text from '@instructure/ui-elements/lib/components/Text'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
 
-import IconLock from 'instructure-icons/lib/Solid/IconBlueprintLockSolid'
-import IconUnlock from 'instructure-icons/lib/Solid/IconBlueprintSolid'
+import IconLock from '@instructure/ui-icons/lib/Solid/IconBlueprintLock'
+import IconUnlock from '@instructure/ui-icons/lib/Solid/IconBlueprint'
 
 const modes = {
   ADMIN_LOCKED: {

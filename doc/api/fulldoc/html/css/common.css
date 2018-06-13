@@ -163,6 +163,11 @@ h3.beta {
   border-left: 3px solid #0073ac;
 }
 
+.method_details code.scope {
+  background-color: #eee;
+  padding: 1px;
+}
+
 h2 .defined-in {
   float:right;
   font-size:10px;
@@ -184,6 +189,43 @@ table th {
 table th, table td {
   border: 1px inset gray;
   padding: 4px;
+}
+
+table.changelog {
+  border: 2px solid gray;
+  width: 100%
+}
+
+table.changelog th {
+  padding: 4px;
+  border: 1px inset gray;
+  border-spacing: 1px;
+  height: 30px;
+  text-align:left;
+  vertical-align: center;
+  font-weight: bold;
+  color: #333;
+  background-color: #DDD;
+}
+
+table.changelog tr td:nth-child(1) {
+     width:20%;
+}
+
+table.changelog tr td:nth-child(2) {
+     width:30%;
+}
+
+table.changelog tr td:last-child {
+     width:auto;
+}
+
+table.changelog td {
+  padding: 10px 8px 10px 5px;
+  border: 1px inset gray;
+  border-spacing: 1px;
+  vertical-align: top;
+  text-align: left;
 }
 
 table.sis_csv {

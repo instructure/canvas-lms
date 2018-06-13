@@ -20,22 +20,23 @@ module SIS
   class GroupCategoryImporter < BaseImporter
 
     def process
-      start = Time.now
+      start = Time.zone.now
       importer = Work.new(@batch, @root_account, @logger)
       yield importer
-      @logger.debug("Group categories took #{Time.now - start} seconds")
-      return importer.success_count
+      SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data) if @batch.using_parallel_importers?
+      @logger.debug("Group categories took #{Time.zone.now - start} seconds")
+      importer.success_count
     end
 
-    private
     class Work
-      attr_accessor :success_count
+      attr_accessor :success_count, :roll_back_data
 
       def initialize(batch, root_account, logger)
         @batch = batch
         @root_account = root_account
         @logger = logger
         @success_count = 0
+        @roll_back_data = []
         @accounts_cache = {}
       end
 
@@ -77,7 +78,7 @@ module SIS
         gc.context = context
         gc.root_account_id = @root_account.id
         gc.sis_source_id = sis_id
-        gc.sis_batch_id = @batch.id if @batch
+        gc.sis_batch_id = @batch.id
 
         case status
         when /active/i
@@ -87,12 +88,46 @@ module SIS
         end
 
         if gc.save
+          data = build_data(gc)
+          @roll_back_data << data if data
           @success_count += 1
         else
           msg = "A group category did not pass validation (group category: #{sis_id}, error: "
           msg += gc.errors.full_messages.join(",") + ")"
           raise ImportError, msg
         end
+      end
+
+      def build_data(group_category)
+        return unless should_build_roll_back_data?(group_category)
+        @batch.roll_back_data.build(context: group_category,
+                                    previous_workflow_state: old_status(group_category),
+                                    updated_workflow_state: current_status(group_category),
+                                    created_at: Time.zone.now,
+                                    updated_at: Time.zone.now,
+                                    batch_mode_delete: false,
+                                    workflow_state: 'active')
+      end
+
+      def should_build_roll_back_data?(group_category)
+        return false unless @batch.using_parallel_importers?
+        return true if group_category.id_before_last_save.nil?
+        return true if group_category.saved_change_to_deleted_at?
+        false
+      end
+
+      def old_status(group_category)
+        if group_category.id_before_last_save.nil?
+          'non-existent'
+        elsif group_category.deleted_at_before_last_save.nil?
+          group_category.deleted_at.nil? ? nil : 'active'
+        elsif !group_category.deleted_at_before_last_save.nil?
+          'deleted'
+        end
+      end
+
+      def current_status(group_category)
+        group_category.deleted_at.nil? ? 'active' : 'deleted'
       end
 
     end

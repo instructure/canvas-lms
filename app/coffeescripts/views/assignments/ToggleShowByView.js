@@ -24,9 +24,9 @@ import Backbone from 'Backbone'
 import Cache from '../../class/cache'
 import hasLocalStorage from '../../util/hasLocalStorage'
 import AssignmentGroup from '../../models/AssignmentGroup'
-import RadioInputGroup from '@instructure/ui-core/lib/components/RadioInputGroup'
-import RadioInput from '@instructure/ui-core/lib/components/RadioInput'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGroup'
+import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
 export default class ToggleShowByView extends Backbone.View {
   initialize(...args) {
@@ -125,7 +125,7 @@ export default class ToggleShowByView extends Backbone.View {
         name="show_by"
         variant="toggle"
         defaultValue={this.showByDate() ? 'date' : 'type'}
-        onChange={this.toggleShowBy.bind(this)}
+        onChange={(e, val) => this.toggleShowBy(val)}
       >
         <RadioInput id="show_by_date" label={I18n.t('Show by Date')} value="date" context="off" />
         <RadioInput id="show_by_type" label={I18n.t('Show by Type')} value="type" context="off" />

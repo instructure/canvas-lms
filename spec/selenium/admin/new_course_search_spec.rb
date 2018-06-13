@@ -22,7 +22,6 @@ describe "new account course search" do
 
   before :once do
     account_model
-    @account.enable_feature!(:course_user_search)
     account_admin_user(:account => @account, :active_all => true)
   end
 
@@ -77,13 +76,11 @@ describe "new account course search" do
     expect(f('[data-automation="courses list"]')).not_to include_text("course 16")
     expect(f("#content")).not_to contain_css('button[title="Previous Page"]')
 
-    f('button[title="Next Page"]').click
+    fj('nav button:contains("2")').click
     wait_for_ajaximations
 
     expect(get_rows.count).to eq 1
     expect(get_rows.first).to include_text("course 16")
-    expect(f("#content")).to contain_css('button[title="Previous Page"]')
-    expect(f("#content")).not_to contain_css('button[title="Next Page"]')
   end
 
   it "should search by term", test_id: 3454772, priority: 1 do
@@ -158,7 +155,7 @@ describe "new account course search" do
 
     get "/accounts/#{@account.id}"
 
-    el = get_rows.first.find('[name="IconPlusLine"]')
+    el = get_rows.first.find('[name="IconPlus"]')
     move_to_click_element(el)
 
     dialog = fj('#add_people_modal:visible')
@@ -175,7 +172,7 @@ describe "new account course search" do
     # when the "+ users" is clicked and not as part of the page load
     sections = ('A'..'Z').map { |i| course.course_sections.create!(:name => "Test Section #{i}") }
 
-    el = get_rows.first.find('[name="IconPlusLine"]')
+    el = get_rows.first.find('[name="IconPlus"]')
     move_to_click_element(el)
     section_options = ffj('#add_people_modal:visible #peoplesearch_select_section option')
     expect(section_options.map(&:text)).to eq(sections.map(&:name))
@@ -188,7 +185,7 @@ describe "new account course search" do
     get "/accounts/#{@account.id}"
 
     # fill out the form
-    fj('button:has([name="IconPlusLine"]):contains("Course")').click
+    fj('button:has([name="IconPlus"]):contains("Course")').click
     dialog = f('[aria-label="Add a New Course"]')
     expect(dialog).to be_displayed
     set_value(fj('label:contains("Course Name") input', dialog), 'Test Course Name')
@@ -212,7 +209,7 @@ describe "new account course search" do
     named_course = course_factory(:account => @account, :course_name => "course factory with name")
 
     get "/accounts/#{@account.id}"
-    el = get_rows.first.find('[name="IconPlusLine"]')
+    el = get_rows.first.find('[name="IconPlus"]')
     move_to_click_element(el)
     expect(f('#add_people_modal h2')).to include_text(named_course.name)
   end

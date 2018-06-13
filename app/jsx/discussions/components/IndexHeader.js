@@ -23,15 +23,15 @@ import { connect } from 'react-redux'
 import { debounce } from 'lodash'
 import { bindActionCreators } from 'redux'
 
-import Button from '@instructure/ui-core/lib/components/Button'
-import TextInput from '@instructure/ui-core/lib/components/TextInput'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import Select from '@instructure/ui-core/lib/components/Select'
-import Grid, { GridCol, GridRow } from '@instructure/ui-core/lib/components/Grid'
-import Container from '@instructure/ui-core/lib/components/Container'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
-import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent'
-import IconPlus from 'instructure-icons/lib/Line/IconPlusLine'
-import IconSearchLine from 'instructure-icons/lib/Line/IconSearchLine'
+import Grid, { GridCol, GridRow } from '@instructure/ui-layout/lib/components/Grid'
+import View from '@instructure/ui-layout/lib/components/View'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
+import IconPlus from '@instructure/ui-icons/lib/Line/IconPlus'
+import IconSearchLine from '@instructure/ui-icons/lib/Line/IconSearch'
 import DiscussionSettings from './DiscussionSettings'
 import select from '../../shared/select'
 import propTypes from '../propTypes'
@@ -94,8 +94,8 @@ export default class IndexHeader extends Component {
 
   render () {
     return (
-      <Container>
-        <Container display="block">
+      <View>
+        <View display="block">
           <Grid>
             <GridRow hAlign="space-between">
               <GridCol width={2}>
@@ -143,8 +143,8 @@ export default class IndexHeader extends Component {
               </GridCol>
             </GridRow>
           </Grid>
-        </Container>
-      </Container>
+        </View>
+      </View>
     )
   }
 }

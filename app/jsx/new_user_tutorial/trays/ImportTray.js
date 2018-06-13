@@ -18,7 +18,7 @@
 
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import Text from '@instructure/ui-core/lib/components/Text'
+import Text from '@instructure/ui-elements/lib/components/Text'
 import TutorialTrayContent from './TutorialTrayContent'
 
 const ImportTray = () => (

@@ -61,12 +61,12 @@ describe "master courses - child courses - sync history for teacher" do
 
     rows = ff(".bcs__history-item__change-log-row")
     assmt_row = rows.detect{|r| r.text.include?(assmt.title)}
-    expect(assmt_row).to contain_css("svg[name=IconBlueprintLockSolid]")
+    expect(assmt_row).to contain_css("svg[name=IconBlueprintLock]")
     expect(assmt_row).to include_text("Updated")
     expect(assmt_row).to include_text("Yes") # change applied
 
     topic_row = rows.detect{|r| r.text.include?(topic_to.title)}
-    expect(topic_row).to contain_css("svg[name=IconBlueprintSolid]")
+    expect(topic_row).to contain_css("svg[name=IconBlueprint]")
     expect(topic_row).to include_text("No") # change not applied
 
     page_row = rows.detect{|r| r.text.include?(page.title)}

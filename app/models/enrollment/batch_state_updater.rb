@@ -39,7 +39,7 @@ class Enrollment::BatchStateUpdater
   # after_commit :update_cached_due_dates - handled in update_cached_due_dates
   # after_save :update_assignment_overrides_if_needed - handled in update_assignment_overrides
   # after_save :needs_grading_count_updated -handled in needs_grading_count_updated
-  def self.destroy_batch(batch)
+  def self.destroy_batch(batch, sis_batch: nil, batch_mode: false)
     raise ArgumentError, 'Cannot call with more than 1000 enrollments' if batch.count > 1000
     Enrollment.transaction do
       # cache some data before the destroy that is needed after the destroy
@@ -49,8 +49,9 @@ class Enrollment::BatchStateUpdater
       user_ids = Enrollment.where(id: batch).distinct.pluck(:user_id)
       courses = Course.where(id: Enrollment.where(id: batch).select(:course_id).distinct).to_a
       root_account = courses.first.root_account
-      mark_enrollments_as_deleted(batch)
-      remove_group_memberships(batch, courses, user_ids)
+      data = mark_enrollments_as_deleted(batch, sis_batch: sis_batch, batch_mode: batch_mode)
+      gms = remove_group_memberships(batch, courses, user_ids, sis_batch: sis_batch, batch_mode: batch_mode)
+      data&.push(*gms) if gms
       # touch users after removing group_memberships to invalidate the cache.
       touch_and_update_associations(user_ids)
       clear_email_caches(invited_user_ids) unless invited_user_ids.empty?
@@ -63,15 +64,20 @@ class Enrollment::BatchStateUpdater
       needs_grading_count_updated(courses)
       recache_all_course_grade_distribution(courses)
       update_cached_due_dates(students, root_account)
+      return data if sis_batch
       batch.count
     end
   end
 
   # bulk version of Enrollment.destroy
-  def self.mark_enrollments_as_deleted(batch)
-    Enrollment.where(id: batch).update_all(workflow_state: 'deleted', updated_at: Time.now.utc)
+  def self.mark_enrollments_as_deleted(batch, sis_batch: nil, batch_mode: false)
+    data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: batch, updated_state: 'deleted', batch_mode_delete: batch_mode)
+    updates = {workflow_state: 'deleted', updated_at: Time.now.utc}
+    updates[sis_batch_id: sis_batch.id] if sis_batch
+    Enrollment.where(id: batch).update_all(updates)
     EnrollmentState.where(enrollment_id: batch).update_all(state: 'deleted', state_valid_until: nil)
     Score.where(enrollment_id: batch).update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
+    data
   end
 
   def self.touch_and_update_associations(user_ids)
@@ -79,17 +85,22 @@ class Enrollment::BatchStateUpdater
     User.update_account_associations(user_ids)
   end
 
-  def self.remove_group_memberships(batch, courses, user_ids)
+  def self.remove_group_memberships(batch, courses, user_ids, sis_batch: nil, batch_mode: false)
+    data = []
     courses.each do |c|
-      gm_ids = GroupMembership.active.joins(:group).
+      gms = GroupMembership.active.joins(:group).
         where(groups: {context_type: 'Course', context_id: c},
               user_id: user_ids).where.not(user_id: c.enrollments.where.not(id: batch).pluck(:user_id))
-      GroupMembership.where(id: gm_ids).update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
-      leader_change_groups = Group.joins(:group_memberships).where(group_memberships: {id: gm_ids}, leader_id: user_ids)
+      next unless gms.exists?
+      rollback = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: gms, updated_state: 'deleted', batch_mode_delete: batch_mode)
+      data.push(*rollback)
+      GroupMembership.where(id: gms).update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
+      leader_change_groups = Group.joins(:group_memberships).where(group_memberships: {id: gms}, leader_id: user_ids)
       leader_change_groups.update_all(leader_id: nil, updated_at: Time.zone.now)
       leader_change_groups.each(&:auto_reassign_leader)
-      Group.joins(:group_memberships).where(group_memberships: {id: gm_ids}).touch_all
+      Group.joins(:group_memberships).where(group_memberships: {id: gms}).touch_all
     end
+    data
   end
 
   def self.clear_email_caches(invited_user_ids)
@@ -151,14 +162,14 @@ class Enrollment::BatchStateUpdater
   end
 
   def self.needs_grading_count_updated(courses)
-    courses.each do |c|
-      c.assignments.touch_all
+    Assignment.where(context_id: courses).find_ids_in_batches(batch_size: 10_000) do |assignment_ids|
+      Assignment.where(id: assignment_ids).touch_all
     end
   end
 
   def self.recache_all_course_grade_distribution(courses)
     courses.each do |c|
-      c.recache_grade_distribution
+      c.recache_grade_distribution if c.respond_to?(:recache_grade_distribution)
     end
   end
 
@@ -170,4 +181,23 @@ class Enrollment::BatchStateUpdater
     end
   end
 
+  # this is to be used for enrollments that just changed workflow_states but are
+  # not deleted. This also skips notifying users.
+  def self.run_call_backs_for(batch)
+    raise ArgumentError, 'Cannot call with more than 1000 enrollments' if batch.count > 1_000
+    Enrollment.transaction do
+      students = Enrollment.of_student_type.where(id: batch).preload(user: :linked_observers).to_a
+      user_ids = Enrollment.where(id: batch).distinct.pluck(:user_id)
+      courses = Course.where(id: Enrollment.where(id: batch).select(:course_id).distinct).to_a
+      root_account = courses.first.root_account
+      touch_and_update_associations(user_ids)
+      update_linked_enrollments(students)
+      needs_grading_count_updated(courses)
+      recache_all_course_grade_distribution(courses)
+      update_cached_due_dates(students, root_account)
+      touch_all_graders_if_needed(students)
+      EnrollmentState.send_later_if_production(:force_recalculation, batch.map(&:id))
+      User.update_account_associations(user_ids)
+    end
+  end
 end

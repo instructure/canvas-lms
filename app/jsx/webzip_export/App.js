@@ -18,7 +18,7 @@
 
 import React from 'react'
 import axios from 'axios'
-import Spinner from '@instructure/ui-core/lib/components/Spinner'
+import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import I18n from 'i18n!webzip_exports'
 import splitAssetString from 'compiled/str/splitAssetString'
 import ExportList from '../webzip_export/components/ExportList'

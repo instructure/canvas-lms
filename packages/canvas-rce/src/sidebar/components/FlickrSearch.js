@@ -16,16 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { Component, PropTypes } from "react";
+import PropTypes from "prop-types";
+
+import React, { Component } from "react";
 import { renderImage as renderImageHtml } from "../../rce/contentRendering";
 import dragHtml from "../dragHtml";
 import ReactCSSTransitionGroup from "react-transition-group/CSSTransitionGroup";
 import formatMessage from "../../format-message";
 import Loading from "../../common/components/Loading";
-import Button from "@instructure/ui-core/lib/components/Button";
-import TextInput from "@instructure/ui-core/lib/components/TextInput";
-import IconSearchSolid from "instructure-icons/lib/Solid/IconSearchSolid";
-import IconMinimizeSolid from "instructure-icons/lib/Solid/IconMinimizeSolid";
+import Button from "@instructure/ui-buttons/lib/components/Button";
+import TextInput from "@instructure/ui-forms/lib/components/TextInput";
+import IconSearchSolid from "@instructure/ui-icons/lib/Solid/IconSearch";
+import IconMinimizeSolid from "@instructure/ui-icons/lib/Solid/IconMinimize";
 import { StyleSheet, css } from "aphrodite";
 
 class FlickrSearch extends Component {

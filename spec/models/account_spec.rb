@@ -23,6 +23,14 @@ describe Account do
 
   describe 'relationships' do
     it { is_expected.to have_many(:feature_flags) }
+    it { is_expected.to have_one(:outcome_proficiency).dependent(:destroy) }
+  end
+
+  it 'retrieves parent account\'s outcome proficiency' do
+    root_account = Account.create!
+    proficiency = outcome_proficiency_model(root_account)
+    subaccount = root_account.sub_accounts.create!
+    expect(subaccount.resolved_outcome_proficiency).to eq proficiency
   end
 
   it "should provide a list of courses" do
@@ -785,15 +793,6 @@ describe Account do
 
       tabs = account.tabs_available(nil)
       expect(tabs.map{|t| t[:id] }).not_to be_include(Account::TAB_DEVELOPER_KEYS)
-    end
-
-    it "should include 'Developer Keys' for the admin users of a sub account" do
-      account = Account.create!
-      account.enable_feature!(:developer_key_management)
-      sub_account = Account.create!(parent_account: account)
-      admin = account_admin_user(:account => sub_account)
-      tabs = sub_account.tabs_available(admin)
-      expect(tabs.map{|t| t[:id] }).to include(Account::TAB_DEVELOPER_KEYS)
     end
 
     it "should not include 'Developer Keys' for non-site_admin accounts" do
@@ -1685,6 +1684,34 @@ describe Account do
       @account.default_dashboard_view = "planner"
       @account.save!
       expect(@account.default_dashboard_view).to eq "planner"
+    end
+  end
+
+  describe "#update_user_dashboards" do
+    before :once do
+      @account = Account.create!
+
+      @user1 = user_factory(:active_all => true)
+      @account.account_users.create!(user: @user1)
+      @user1.dashboard_view = 'activity'
+      @user1.save
+
+      @user2 = user_factory(:active_all => true)
+      @account.account_users.create!(user: @user2)
+      @user2.dashboard_view = 'cards'
+      @user2.save
+    end
+
+    it "should add or overwrite all account users' dashboard_view preference" do
+      @account.enable_feature!(:student_planner)
+      @account.default_dashboard_view = 'planner'
+      @account.save!
+      @account.reload
+
+      expect([@user1.dashboard_view(@account), @user2.dashboard_view(@account)]).to match_array(['activity', 'cards'])
+      @account.update_user_dashboards_without_send_later
+      @account.reload
+      expect([@user1.reload.dashboard_view(@account), @user2.reload.dashboard_view(@account)]).to match_array(Array.new(2, 'planner'))
     end
   end
 

@@ -19,16 +19,16 @@
 import I18n from 'i18n!new_nav'
 import React from 'react'
 import {bool, arrayOf, shape, string} from 'prop-types'
-import Container from '@instructure/ui-core/lib/components/Container'
-import Heading from '@instructure/ui-core/lib/components/Heading'
-import Link from '@instructure/ui-core/lib/components/Link'
-import List, {ListItem} from '@instructure/ui-core/lib/components/List'
-import Spinner from '@instructure/ui-core/lib/components/Spinner'
-import Text from '@instructure/ui-core/lib/components/Text'
+import View from '@instructure/ui-layout/lib/components/View'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
+import Link from '@instructure/ui-elements/lib/components/Link'
+import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
+import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import Text from '@instructure/ui-elements/lib/components/Text'
 
 export default function CoursesTray({courses, hasLoaded}) {
   return (
-    <Container as="div" padding="medium">
+    <View as="div" padding="medium">
       <Heading level="h3" as="h2">{I18n.t('Courses')}</Heading>
       <hr role="presentation"/>
       <List variant="unstyled" margin="small 0" itemSpacing="small">
@@ -58,7 +58,7 @@ export default function CoursesTray({courses, hasLoaded}) {
           'Welcome to your courses! To customize the list of courses,  click on the "All Courses" link and star the courses to display.'
         )}
       </Text>
-    </Container>
+    </View>
   )
 }
 

@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../spec_helper"
+require_relative "../sharding_spec_helper"
 
 describe 'ActiveSupport::JSON' do
   it "encodes hash keys correctly" do
@@ -26,5 +26,16 @@ end
 describe ActiveSupport::TimeZone do
   it 'gives a simple JSON interpretation' do
     expect(ActiveSupport::TimeZone['America/Denver'].to_json).to eq "America/Denver".to_json
+  end
+end
+
+describe "enumerable pluck extension" do
+  specs_require_sharding
+
+  it "should transform ids" do
+    u = User.create!
+    @shard1.activate do
+      expect([u].pluck(:id)).to eq [u.global_id]
+    end
   end
 end

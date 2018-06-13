@@ -30,7 +30,8 @@ describe("Upload reducer", () => {
       formExpanded: false,
       folders: {},
       rootFolderId: null,
-      folderTree: {}
+      folderTree: {},
+      error: {}
     };
   });
 
@@ -67,6 +68,11 @@ describe("Upload reducer", () => {
       state.formExpanded = true;
       assert.equal(false, upload(state, action).formExpanded);
     });
+
+    it('resets the error state', () => {
+      state.error = { type: 'SOME_ERROR'}
+      assert.deepEqual({}, upload(state, action).error);
+    })
   });
 
   describe("FAIL_FILE_UPLOAD", () => {
@@ -81,6 +87,20 @@ describe("Upload reducer", () => {
     it("leaves the form state as it is", () => {
       assert.equal(state.formExpanded, upload(state, action).formExpanded);
     });
+  });
+
+  describe('QUOTA_EXCEEDED_UPLOAD', () => {
+    beforeEach(() => {
+      action = { type: actions.QUOTA_EXCEEDED_UPLOAD };
+    });
+
+    it('sets the error state type to QUOTA_EXCEEDED_UPLOAD', () => {
+      assert.equal(upload(state, action).error.type, 'QUOTA_EXCEEDED_UPLOAD');
+    });
+
+    it('sets the uploading state the false', () => {
+      assert.equal(false, upload(state, action).uploading);
+    })
   });
 
   describe("RECEIVE_FOLDER", () => {

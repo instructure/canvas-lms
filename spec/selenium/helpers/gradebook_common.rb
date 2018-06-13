@@ -124,16 +124,6 @@ module GradebookCommon
     wait_for_ajaximations
   end
 
-  def open_comment_dialog(x=0, y=0)
-    cell = f("#gradebook_grid .container_1 .slick-row:nth-child(#{y+1}) .slick-cell:nth-child(#{x+1})")
-    hover cell
-    fj('.gradebook-cell-comment:visible', cell).click
-    # the dialog fetches the comments async after it displays and then innerHTMLs the whole
-    # thing again once it has fetched them from the server, completely replacing it
-    wait_for_ajax_requests
-    fj('.submission_details_dialog:visible')
-  end
-
   def final_score_for_row(row)
     grade_grid = f('#gradebook_grid .container_1')
     cells = find_slick_cells(row, grade_grid)

@@ -22,8 +22,8 @@ import {string, bool, node} from 'prop-types'
 import cx from 'classnames'
 import shortId from '../../shared/shortid'
 
-import Grid, { GridRow, GridCol } from '@instructure/ui-core/lib/components/Grid'
-import Text from '@instructure/ui-core/lib/components/Text'
+import Grid, { GridRow, GridCol } from '@instructure/ui-layout/lib/components/Grid'
+import Text from '@instructure/ui-elements/lib/components/Text'
 import { IconLock, IconUnlock } from './BlueprintLocks'
 
 import propTypes from '../propTypes'

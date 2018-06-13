@@ -27,7 +27,7 @@ export default class AssignmentRowCellPropFactory {
   }
 
   getProps(editorOptions) {
-    const student = editorOptions.item
+    const student = this.gradebook.student(editorOptions.item.id)
     const assignment = this.gradebook.getAssignment(editorOptions.column.assignmentId)
     const submission = this.gradebook.getSubmission(student.id, assignment.id)
 
@@ -36,7 +36,10 @@ export default class AssignmentRowCellPropFactory {
       enteredGrade: submission.entered_grade,
       enteredScore: submission.entered_score,
       excused: !!submission.excused,
+      grade: submission.grade,
       id: submission.id,
+      rawGrade: submission.rawGrade,
+      score: submission.score,
       userId: student.id
     }
 
@@ -49,6 +52,8 @@ export default class AssignmentRowCellPropFactory {
       },
 
       enterGradesAs: this.gradebook.getEnterGradesAsSetting(assignment.id),
+      gradeIsEditable: this.gradebook.isGradeEditable(student.id, assignment.id),
+      gradeIsVisible: this.gradebook.isGradeVisible(student.id, assignment.id),
       gradingScheme: this.gradebook.getAssignmentGradingScheme(assignment.id).data,
       isSubmissionTrayOpen: isTrayOpen(this.gradebook, student, assignment),
 
@@ -58,6 +63,7 @@ export default class AssignmentRowCellPropFactory {
 
       onGradeSubmission: this.gradebook.gradeSubmission,
       pendingGradeInfo,
+      student,
       submission: cleanSubmission,
       submissionIsUpdating: !!pendingGradeInfo && pendingGradeInfo.valid
     }

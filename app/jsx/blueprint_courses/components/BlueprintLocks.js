@@ -18,15 +18,15 @@
 
 import I18n from 'i18n!blueprint_courses'
 import React from 'react'
-import Tooltip from '@instructure/ui-core/lib/components/Tooltip'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
-import IconBlueprintLockSolid from 'instructure-icons/lib/Solid/IconBlueprintLockSolid'
-import IconBlueprintSolid from 'instructure-icons/lib/Solid/IconBlueprintSolid'
+import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import IconBlueprintLock from '@instructure/ui-icons/lib/Solid/IconBlueprintLock'
+import IconBlueprint from '@instructure/ui-icons/lib/Solid/IconBlueprint'
 
 export const IconLock = () => (
   <Tooltip placement="start" variant="inverse" tip={I18n.t('Locked')}>
     <span>
-      <IconBlueprintLockSolid />
+      <IconBlueprintLock />
       <ScreenReaderContent>{I18n.t('Locked')}</ScreenReaderContent>
     </span>
   </Tooltip>
@@ -35,7 +35,7 @@ export const IconLock = () => (
 export const IconUnlock = () => (
   <Tooltip placement="start" variant="inverse" tip={I18n.t('Unlocked')}>
     <span>
-      <IconBlueprintSolid />
+      <IconBlueprint />
       <ScreenReaderContent>{I18n.t('Unlocked')}</ScreenReaderContent>
     </span>
   </Tooltip>

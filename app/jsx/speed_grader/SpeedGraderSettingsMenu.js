@@ -20,7 +20,7 @@ import React from 'react'
 import {bool, func, string} from 'prop-types'
 import MenuItem from '@instructure/ui-core/lib/components/Menu/MenuItem'
 import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
-import Text from '@instructure/ui-core/lib/components/Text'
+import Text from '@instructure/ui-elements/lib/components/Text'
 import I18n from 'i18n!gradebook'
 
 export default function SpeedGraderSettingsMenu(props) {

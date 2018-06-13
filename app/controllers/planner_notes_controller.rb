@@ -90,17 +90,20 @@ class PlannerNotesController < ApplicationController
   include PlannerHelper
 
   before_action :require_user
+  before_action :require_planner_enabled
 
   # @API List planner notes
   #
   # Retrieve the paginated list of planner notes
   #
-  # @argument start_date [Date]
+  # @argument start_date [DateTime]
   #   Only return notes with todo dates since the start_date (inclusive).
-  #   No default. The value should be formatted as: yyyy-mm-dd.
-  # @argument end_date [Date]
+  #   No default. The value should be formatted as: yyyy-mm-dd or
+  #   ISO 8601 YYYY-MM-DDTHH:MM:SSZ.
+  # @argument end_date [DateTime]
   #   Only return notes with todo dates before the end_date (inclusive).
-  #   No default. The value should be formatted as: yyyy-mm-dd.
+  #   No default. The value should be formatted as: yyyy-mm-dd or
+  #   ISO 8601 YYYY-MM-DDTHH:MM:SSZ.
   #   If end_date and start_date are both specified and equivalent,
   #   then only notes with todo dates on that day are returned.
   # @argument context_codes[] [String]
@@ -136,34 +139,31 @@ class PlannerNotesController < ApplicationController
   #
   # @returns [PlannerNote]
   def index
-    notes = PlannerNote.where(user: @current_user).active
+    notes = @current_user.planner_notes.active.exclude_deleted_courses
+    # Format & filter our notes by course code if passed
 
-    # Format & filter our notes by context code if passed
     if (context_codes = params.delete(:context_codes))
       # Append to our notes scope to include the context codes for courses
-      course_ids = context_codes.select{ |c| /course_\d+/.match? c }.map{ |c| c.split("_").last }
-      notes = notes.for_course(course_ids) if course_ids.present?
-
+      course_codes = Array(context_codes).select{|c| c =~ /course_\d+/}
+      contexts = Context.from_context_codes(course_codes)
+      accessible_courses = contexts&.select { |c| c.grants_right?(@current_user, :read) }
+      notes = notes.for_course(accessible_courses) if accessible_courses
       # Append to our notes scope to include the context codes for users that the requesting
       # user has permission to access
-      user_ids = context_codes.select { |c|
-        c.start_with?("user_") && Context.find_by_asset_string(c).grants_right?(@current_user, session, :read)
-      }.map{ |c| c.split("_").last }
-      notes = notes.or(PlannerNote.for_user(user_ids)) if user_ids.present?
+      user_codes = Array(context_codes).select{|c| c =~ /user_\d+/}
+      user_contexts = Context.from_context_codes(user_codes)
+      accessible_users = user_contexts&.select { |c| c.grants_right?(@current_user, :read) }
+      notes = notes.union(PlannerNote.for_user(accessible_users).where(course_id: nil)) if accessible_users
     end
 
-    # Grab our start_ and end_dates for filtering
-    start_date = formatted_planner_date('start_date', params.delete(:start_date))
-    end_date   = formatted_planner_date('end_date', params.delete(:end_date), end_of_day: true)
-
-    # Make sure that the dates passed in were correctly formatted
-    ensure_valid_planner_params or return
-
-    # Add the date filtering to our existing scope
-    notes = notes.where("todo_date >= :start_date", start_date: start_date) if start_date
-    notes = notes.where("todo_date <= :end_date", end_date: end_date) if end_date
+    start_at = formatted_planner_date('start_date', params.delete(:start_date))
+    end_at = formatted_planner_date('end_date', params.delete(:end_date), end_of_day: true)
+    notes = notes.after(start_at) if start_at
+    notes = notes.before(end_at) if end_at
 
     render :json => planner_notes_json(notes, @current_user, session)
+  rescue InvalidDates => e
+    render json: {errors: e.message.as_json}, status: :bad_request
   end
 
   # @API Show a PlannerNote
@@ -292,9 +292,5 @@ class PlannerNotesController < ApplicationController
 
   def planner_note_params
     params.permit(:start_date, :end_date, :context_codes)
-  end
-
-  def require_user
-    render_unauthorized_action if !@current_user || !@domain_root_account.feature_enabled?(:student_planner)
   end
 end

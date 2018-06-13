@@ -98,11 +98,11 @@ Object.entries({
 
     test(`sorting by ${columnID} ${sortOrder} puts ${expectedArrow}-arrow on ${label} only`, () => {
       const wrapper = mount(<UsersList {...props} />)
-      equal(wrapper.find(`IconMiniArrow${unexpectedArrow}Solid`).length, 0, `no columns have an ${unexpectedArrow} arrow`)
-      const icons = wrapper.find(`IconMiniArrow${expectedArrow}Solid`)
+      equal(wrapper.find(`IconMiniArrow${unexpectedArrow}`).length, 0, `no columns have an ${unexpectedArrow} arrow`)
+      const icons = wrapper.find(`IconMiniArrow${expectedArrow}`)
       equal(icons.length, 1, `only one ${expectedArrow} arrow`)
       const header = icons.closest('UsersListHeader')
-      ok(header.find('ScreenReaderContent').text().match(RegExp(expectedTip, 'i')), 'has right tooltip')
+      ok(header.find('Tooltip').prop('tip').match(RegExp(expectedTip, 'i')), 'has right tooltip')
       ok(header.text().includes(label), `${label} is the one that has the ${expectedArrow} arrow`)
     })
 

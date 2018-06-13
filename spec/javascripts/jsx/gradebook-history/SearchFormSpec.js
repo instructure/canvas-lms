@@ -20,9 +20,9 @@ import React from 'react';
 import { mount, shallow } from 'enzyme';
 import { SearchFormComponent } from 'jsx/gradebook-history/SearchForm';
 import Autocomplete from '@instructure/ui-core/lib/components/Autocomplete';
-import Button from '@instructure/ui-core/lib/components/Button';
-import DateInput from '@instructure/ui-core/lib/components/DateInput';
-import FormFieldGroup from '@instructure/ui-core/lib/components/FormFieldGroup';
+import Button from '@instructure/ui-buttons/lib/components/Button';
+import DateInput from '@instructure/ui-forms/lib/components/DateInput';
+import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup';
 import { destroyContainer } from 'jsx/shared/FlashAlert';
 import Fixtures from '../gradebook-history/Fixtures';
 

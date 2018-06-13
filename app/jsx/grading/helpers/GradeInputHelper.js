@@ -24,7 +24,7 @@ import numberHelper from '../../shared/helpers/numberHelper'
 const MAX_PRECISION = 15 // the maximum precision of a score persisted to the database
 
 function toNumber(bigValue) {
-  return Number.parseFloat(bigValue.round(MAX_PRECISION).toString(), 10)
+  return parseFloat(bigValue.round(MAX_PRECISION).toString(), 10)
 }
 
 function pointsFromPercentage(percentage, pointsPossible) {
@@ -227,6 +227,10 @@ export function hasGradeChanged(submission, gradeInfo, options) {
      */
     const submissionGradeInfo = parseTextValue(submission.enteredGrade, options)
     return submissionGradeInfo.grade !== gradeInfo.grade
+  }
+
+  if (gradeInfo.enteredAs === 'passFail' && options.pointsPossible === 0) {
+    return submission.enteredGrade !== gradeInfo.grade
   }
 
   return submission.enteredScore !== gradeInfo.score

@@ -17,38 +17,53 @@
 
 require File.expand_path('../spec_helper', File.dirname(__FILE__))
 
+# We want to force the usage of the fallback scope mapper here, not the generated version
+Object.const_set("ApiScopeMapper", ApiScopeMapperLoader.api_scope_mapper_fallback)
 
 describe TokenScopes do
-  describe "SCOPES" do
-    it "formats the scopes with url:http_verb|api_path" do
-      TokenScopes::SCOPES.sort.each do |scope|
-        expect(/^url:(?:GET|OPTIONS|POST|PUT|PATCH|DELETE)\|\/api\/.+/ =~ scope).not_to be_nil
-      end
+
+  describe ".named_scopes" do
+
+    let!(:user_info_scope){TokenScopes.named_scopes.find{|s| s[:scope] == TokenScopes::USER_INFO_SCOPE[:scope]}}
+
+    it "includes the resource_name" do
+      expect(user_info_scope[:resource_name].to_s).to eq 'oauth2'
     end
 
-    it "does not include the optional format part of the route path" do
-      TokenScopes::SCOPES.each do |scope|
-        expect(/\(\.:format\)/ =~ scope).to be_nil
-      end
+    it "includes the resource" do
+      expect(user_info_scope[:resource].to_s).to eq 'oauth2'
+    end
+
+    it "doesn't include scopes without a name" do
+      TokenScopes.instance_variable_set(:@_named_scopes, nil) # we need to make sure that we generate a new list
+      allow(ApiScopeMapperLoader.load).to receive(:name_for_resource).and_return(nil)
+      expect(TokenScopes.named_scopes).to eq []
+      TokenScopes.instance_variable_set(:@_named_scopes, nil) # we don't want to have this version stored
     end
 
   end
 
-  describe "GROUPED_SCOPES" do
-    it "groups the scopes by controller" do
-      expect(TokenScopes::GROUPED_DETAILED_SCOPES["demos"]).to include({
-                                                                resource: "demos",
-                                                                verb: "POST",
-                                                                path: "/api/v1/demos",
-                                                                scope: "url:POST|/api/v1/demos"
-                                                              })
+  describe ".all_scopes" do
 
+    it "includes the userinfo scope" do
+      expect(TokenScopes.all_scopes).to include TokenScopes::USER_INFO_SCOPE[:scope]
     end
 
-    it "includes the user_info scope" do
-      expect(TokenScopes::GROUPED_DETAILED_SCOPES["oauth"]).to include TokenScopes::USER_INFO_SCOPE
-    end
+    describe "generated_scopes" do
+      let!(:generated_scopes) {TokenScopes.all_scopes.reject {|s| s == TokenScopes::USER_INFO_SCOPE[:scope]}}
 
+      it "formats the scopes with url:http_verb|api_path" do
+        generated_scopes.each do |scope|
+          expect(/^url:(?:GET|OPTIONS|POST|PUT|PATCH|DELETE)\|\/api\/.+/ =~ scope).not_to be_nil
+        end
+      end
+
+      it "does not include the optional format part of the route path" do
+        generated_scopes.each do |scope|
+          expect(/\(\.:format\)/ =~ scope).to be_nil
+        end
+      end
+    end
   end
 
 end

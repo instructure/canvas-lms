@@ -18,19 +18,19 @@
 
 import React from 'react'
 import {string, func, shape, arrayOf} from 'prop-types'
-import IconGroupLine from 'instructure-icons/lib/Line/IconGroupLine'
-import IconMoreLine from 'instructure-icons/lib/Line/IconMoreLine'
-import IconPlusLine from 'instructure-icons/lib/Line/IconPlusLine'
-import IconStudentViewLine from 'instructure-icons/lib/Line/IconStudentViewLine'
+import IconGroupLine from '@instructure/ui-icons/lib/Line/IconGroup'
+import IconMoreLine from '@instructure/ui-icons/lib/Line/IconMore'
+import IconPlusLine from '@instructure/ui-icons/lib/Line/IconPlus'
+import IconStudentViewLine from '@instructure/ui-icons/lib/Line/IconStudentView'
 
-import Button from '@instructure/ui-core/lib/components/Button'
-import FormFieldGroup from '@instructure/ui-core/lib/components/FormFieldGroup'
-import {GridCol} from '@instructure/ui-core/lib/components/Grid'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup'
+import {GridCol} from '@instructure/ui-layout/lib/components/Grid'
 import Menu, { MenuItem } from '@instructure/ui-menu/lib/components/Menu'
 
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Select from '@instructure/ui-core/lib/components/Select'
-import TextInput from '@instructure/ui-core/lib/components/TextInput'
+import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 
 import I18n from 'i18n!account_course_user_search'
 import preventDefault from 'compiled/fn/preventDefault'

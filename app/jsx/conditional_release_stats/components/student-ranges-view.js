@@ -18,8 +18,8 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import TabList, { TabPanel, Tab } from '@instructure/ui-core/lib/components/TabList'
-import ApplyTheme from '@instructure/ui-core/lib/components/ApplyTheme'
+import TabList, { TabPanel, Tab } from '@instructure/ui-tabs/lib/components/TabList'
+import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
 import classNames from 'classnames'
 import I18n from 'i18n!cyoe_assignment_sidebar'
 import {transformScore} from '../../shared/conditional_release/score'

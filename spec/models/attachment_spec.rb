@@ -480,7 +480,7 @@ describe Attachment do
       a = attachment_model(uploaded_data: default_uploaded_data)
       expect(a.content_type).to eq 'application/msword'
       a.destroy_content_and_replace
-      expect(a.content_type).to eq 'unknown/unknown'
+      expect(a.content_type).to eq 'application/pdf'
     end
 
     it "should also destroy thumbnails" do
@@ -558,11 +558,21 @@ describe Attachment do
     shared_examples_for "purgatory" do
       it 'should save file in purgatory and then restore and back again' do
         a = attachment_model(uploaded_data: default_uploaded_data)
-        filename = a.filename
+        old_filename = a.filename
+        old_content_type = a.content_type
         a.destroy_content_and_replace
         purgatory = Purgatory.where(attachment_id: a).take
-        expect(purgatory.old_filename).to eq filename
+        expect(purgatory.old_filename).to eq old_filename
+        expect(purgatory.old_display_name).to eq old_filename
+        expect(purgatory.old_content_type).to eq old_content_type
+        a.reload
+        expect(a.filename).to eq 'file_removed.pdf'
+        expect(a.display_name).to eq 'file_removed.pdf'
         a.resurrect_from_purgatory
+        a.reload
+        expect(a.filename).to eq old_filename
+        expect(a.display_name).to eq old_filename
+        expect(a.content_type).to eq old_content_type
         expect(purgatory.reload.workflow_state).to eq 'restored'
         a.destroy_content_and_replace
         expect(purgatory.reload.workflow_state).to eq 'active'

@@ -168,6 +168,8 @@
   @include fontSize(20px);
 }
 
-.ModeratedGrading__Header-PublishBtn {
+.ModeratedGrading__Header-PublishBtn,
+.ModeratedGrading__Header-UnmuteBtn
+{
   margin-#{direction(left)}: 5px;
 }

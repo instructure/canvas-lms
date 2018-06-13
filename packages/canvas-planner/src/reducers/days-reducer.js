@@ -17,51 +17,14 @@
  */
 
 import { handleActions } from 'redux-actions';
-import { formatDayKey } from '../utilities/dateUtils';
-import { findPlannerItemById } from '../utilities/storeUtils';
-import { daysToDaysHash, daysHashToDays, mergeDaysIntoDaysHash, itemsToDays } from '../utilities/daysUtils';
-
-function savedPlannerItem (state, action) {
-  if (action.error) return state;
-  const newPlannerItem = action.payload.item;
-  const oldPlannerItem = newPlannerItem.id ? findPlannerItemById(state, newPlannerItem.id) : null;
-  let newState = state;
-  // if changing days, then we need to delete the old item from its current day
-  if (oldPlannerItem && !oldPlannerItem.dateBucketMoment.isSame(newPlannerItem.dateBucketMoment)) {
-    newState = _deletePlannerItem(newState, oldPlannerItem);
-  }
-  return gotDaysSuccess(newState, itemsToDays([newPlannerItem]));
-}
+import { mergeDays, deleteItemFromDays } from '../utilities/daysUtils';
 
 function deletedPlannerItem (state, action) {
   if (action.error) return state;
-  return _deletePlannerItem(state, action.payload);
-}
-
-function _deletePlannerItem(state, doomedPlannerItem) {
-  const plannerDateString = formatDayKey(doomedPlannerItem.dateBucketMoment);
-  const keyedState = new Map(state);
-  const existingDay = keyedState.get(plannerDateString);
-  if (existingDay == null) return state;
-
-  const newDay = existingDay.filter(item => item.id !== doomedPlannerItem.id);
-  if (newDay.length) {
-    keyedState.set(plannerDateString, newDay);
-  } else {
-    keyedState.delete(plannerDateString);
-  }
-  return [...keyedState.entries()];
-}
-
-
-function gotDaysSuccess (state, days) {
-  const oldDaysHash = daysToDaysHash(state);
-  const mergedDaysHash = mergeDaysIntoDaysHash(oldDaysHash, days);
-  return daysHashToDays(mergedDaysHash);
+  return deleteItemFromDays(state, action.payload);
 }
 
 export default handleActions({
-  GOT_DAYS_SUCCESS: (state, action) => gotDaysSuccess(state, action.payload.internalDays),
-  SAVED_PLANNER_ITEM: savedPlannerItem,
+  GOT_DAYS_SUCCESS: (state, action) => mergeDays(state, action.payload.internalDays),
   DELETED_PLANNER_ITEM: deletedPlannerItem,
 }, []);

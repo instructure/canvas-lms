@@ -16,237 +16,198 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { Component, PropTypes } from "react";
-import TabList from "@instructure/ui-core/lib/components/TabList";
-import TabPanel from "@instructure/ui-core/lib/components/TabList/TabPanel";
+import PropTypes from "prop-types";
+
+import React, { Component } from "react";
+import ToggleDetails from "@instructure/ui-toggle-details/lib/components/ToggleDetails";
+import View from "@instructure/ui-layout/lib/components/View";
 import LinkSet from "./LinkSet";
 import NavigationPanel from "./NavigationPanel";
 import LinkToNewPage from "./LinkToNewPage";
 import formatMessage from "../../format-message";
 
-class LinksPanel extends Component {
-  isCourse() {
-    return this.props.contextType === "course";
-  }
+function AccordionSection({
+  collection,
+  children,
+  onChange,
+  selectedIndex,
+  summary
+}) {
+  return (
+    <View as="div" margin="xx-small none">
+      <ToggleDetails
+        variant="filled"
+        summary={summary}
+        expanded={selectedIndex === collection}
+        onToggle={(e, expanded) => onChange(expanded ? collection : "")}
+      >
+        <View maxHeight="20em">{children}</View>
+      </ToggleDetails>
+    </View>
+  );
+}
 
-  isGroup() {
-    return this.props.contextType === "group";
-  }
+AccordionSection.propTypes = {
+  collection: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+  selectedIndex: PropTypes.string,
+  summary: ToggleDetails.propTypes.summary
+};
 
-  linkToText() {
-    switch (this.props.contextType) {
-      case "course":
-        return formatMessage("Link to other content in the course.");
-      case "group":
-        return formatMessage("Link to other content in the group.");
-      default:
-        // user
-        return "";
-    }
-  }
-
-  instructions() {
-    return (
-      <p>
-        {this.linkToText()}{" "}
-        {formatMessage("Click any page to insert a link to that page.")}
-      </p>
-    );
-  }
-
-  tabPanel(key, title, component) {
-    return (
-      <TabPanel maxHeight="20em" key={key} title={title}>
-        {component}
-      </TabPanel>
-    );
-  }
-
-  boundFetchInitialPage(collection) {
-    if (this.props.fetchInitialPage) {
-      return () => this.props.fetchInitialPage(collection);
-    } else {
-      return null;
-    }
-  }
-
-  boundFetchNextPage(collection) {
-    if (this.props.fetchNextPage) {
-      return () => this.props.fetchNextPage(collection);
-    } else {
-      return null;
-    }
-  }
-
-  newPageLink() {
-    return (
-      <LinkToNewPage
-        onLinkClick={this.props.onLinkClick}
-        toggleNewPageForm={this.props.toggleNewPageForm}
-        newPageLinkExpanded={this.props.newPageLinkExpanded}
-        contextId={this.props.contextId}
-        contextType={this.props.contextType}
+function CollectionPanel(props) {
+  return (
+    <AccordionSection {...props}>
+      <LinkSet
+        fetchInitialPage={
+          props.fetchInitialPage &&
+          (() => props.fetchInitialPage(props.collection))
+        }
+        fetchNextPage={
+          props.fetchNextPage && (() => props.fetchNextPage(props.collection))
+        }
+        collection={props.collections[props.collection]}
+        onLinkClick={props.onLinkClick}
+        suppressRenderEmpty={props.suppressRenderEmpty}
       />
-    );
-  }
-
-  collectionPanel(
-    collection,
-    title,
-    renderNewPageLink = false,
-    suppressRenderEmpty = false
-  ) {
-    return this.tabPanel(
-      collection,
-      title,
-      <div>
-        <LinkSet
-          fetchInitialPage={this.boundFetchInitialPage(collection)}
-          fetchNextPage={this.boundFetchNextPage(collection)}
-          collection={this.props.collections[collection]}
-          onLinkClick={this.props.onLinkClick}
-          suppressRenderEmpty={suppressRenderEmpty}
+      {props.renderNewPageLink && (
+        <LinkToNewPage
+          onLinkClick={props.onLinkClick}
+          toggleNewPageForm={props.toggleNewPageForm}
+          newPageLinkExpanded={props.newPageLinkExpanded}
+          contextId={props.contextId}
+          contextType={props.contextType}
         />
-        {renderNewPageLink && this.newPageLink()}
-      </div>
-    );
-  }
+      )}
+    </AccordionSection>
+  );
+}
 
-  wikiPagesPanel() {
-    const showCreatePageLink = this.props.canCreatePages !== false;
-    const suppressRenderEmpty = showCreatePageLink;
-    return this.collectionPanel(
-      "wikiPages",
-      formatMessage({
-        default: "Pages",
-        description:
-          "Title of Sidebar accordion tab containing links to wiki pages."
-      }),
-      showCreatePageLink,
-      suppressRenderEmpty
-    );
-  }
+CollectionPanel.propTypes = {
+  collection: PropTypes.string.isRequired,
+  renderNewPageLink: PropTypes.bool,
+  suppressRenderEmpty: PropTypes.bool
+};
 
-  assignmentsPanel() {
-    return this.collectionPanel(
-      "assignments",
-      formatMessage({
-        default: "Assignments",
-        description:
-          "Title of Sidebar accordion tab containing links to assignments."
-      })
-    );
-  }
+CollectionPanel.defaultProps = {
+  renderNewPageLink: false,
+  suppressRenderEmpty: false
+};
 
-  quizzesPanel() {
-    return this.collectionPanel(
-      "quizzes",
-      formatMessage({
-        default: "Quizzes",
-        description:
-          "Title of Sidebar accordion tab containing links to quizzes."
-      })
-    );
-  }
+function LinksPanel(props) {
+  const isCourse = props.contextType === "course";
+  const isGroup = props.contextType === "group";
 
-  announcementsPanel() {
-    return this.collectionPanel(
-      "announcements",
-      formatMessage({
-        default: "Announcements",
-        description:
-          "Title of Sidebar accordion tab containing links to announcements."
-      })
-    );
-  }
-
-  discussionsPanel() {
-    return this.collectionPanel(
-      "discussions",
-      formatMessage({
-        default: "Discussions",
-        description:
-          "Title of Sidebar accordion tab containing links to discussions."
-      })
-    );
-  }
-
-  modulesPanel() {
-    return this.collectionPanel(
-      "modules",
-      formatMessage({
-        default: "Modules",
-        description:
-          "Title of Sidebar accordion tab containing links to course modules."
-      })
-    );
-  }
-
-  navigationTitle() {
-    if (this.isGroup()) {
-      return formatMessage({
-        default: "Group Navigation",
-        description:
-          "Title of Sidebar accordion tab containing links to group pages."
-      });
-    } else {
-      // TODO what if contextType === 'user'?
-      return formatMessage({
+  const navigationSummary = isCourse
+    ? formatMessage({
         default: "Course Navigation",
         description:
           "Title of Sidebar accordion tab containing links to course pages."
-      });
-    }
-  }
+      })
+    : isGroup
+      ? formatMessage({
+          default: "Group Navigation",
+          description:
+            "Title of Sidebar accordion tab containing links to group pages."
+        })
+      : "";
 
-  navigationPanel() {
-    return this.tabPanel(
-      "navigation",
-      this.navigationTitle(),
-      <NavigationPanel
-        contextType={this.props.contextType}
-        contextId={this.props.contextId}
-        onLinkClick={this.props.onLinkClick}
-      />
-    );
-  }
-
-  tabPanels() {
-    let tabPanels = [];
-    if (this.isCourse() || this.isGroup()) {
-      tabPanels.push(this.wikiPagesPanel());
-      if (this.isCourse()) {
-        tabPanels.push(this.assignmentsPanel());
-        tabPanels.push(this.quizzesPanel());
-      }
-      tabPanels.push(this.announcementsPanel());
-      tabPanels.push(this.discussionsPanel());
-      if (this.isCourse()) {
-        tabPanels.push(this.modulesPanel());
-      }
-    }
-    tabPanels.push(this.navigationPanel());
-    return tabPanels;
-  }
-
-  render() {
-    return (
+  return (
+    <div>
+      <p>
+        {props.contextType === "course"
+          ? formatMessage("Link to other content in the course.")
+          : props.contextType === "group"
+            ? formatMessage("Link to other content in the group.")
+            : ""}
+        {formatMessage("Click any page to insert a link to that page.")}
+      </p>
       <div>
-        {this.instructions()}
-        <TabList
-          variant="accordion"
-          defaultSelectedIndex={this.props.selectedIndex}
-          onChange={this.props.onChange}
+        {(isCourse || isGroup) && (
+          <CollectionPanel
+            {...props}
+            collection="wikiPages"
+            summary={formatMessage({
+              default: "Pages",
+              description:
+                "Title of Sidebar accordion tab containing links to wiki pages."
+            })}
+            renderNewPageLink={props.canCreatePages !== false}
+            suppressRenderEmpty={props.canCreatePages !== false}
+          />
+        )}
+        {isCourse && (
+          <CollectionPanel
+            {...props}
+            collection="assignments"
+            summary={formatMessage({
+              default: "Assignments",
+              description:
+                "Title of Sidebar accordion tab containing links to assignments."
+            })}
+          />
+        )}
+        {isCourse && (
+          <CollectionPanel
+            {...props}
+            collection="quizzes"
+            summary={formatMessage({
+              default: "Quizzes",
+              description:
+                "Title of Sidebar accordion tab containing links to quizzes."
+            })}
+          />
+        )}
+        {(isCourse || isGroup) && (
+          <CollectionPanel
+            {...props}
+            collection="announcements"
+            summary={formatMessage({
+              default: "Announcements",
+              description:
+                "Title of Sidebar accordion tab containing links to announcements."
+            })}
+          />
+        )}
+        {(isCourse || isGroup) && (
+          <CollectionPanel
+            {...props}
+            collection="discussions"
+            summary={formatMessage({
+              default: "Discussions",
+              description:
+                "Title of Sidebar accordion tab containing links to discussions."
+            })}
+          />
+        )}
+        {isCourse && (
+          <CollectionPanel
+            {...props}
+            collection="modules"
+            summary={formatMessage({
+              default: "Modules",
+              description:
+                "Title of Sidebar accordion tab containing links to course modules."
+            })}
+          />
+        )}
+        <AccordionSection
+          {...props}
+          collection="navigation"
+          summary={navigationSummary}
         >
-          {this.tabPanels()}
-        </TabList>
+          <NavigationPanel
+            contextType={props.contextType}
+            contextId={props.contextId}
+            onLinkClick={props.onLinkClick}
+          />
+        </AccordionSection>
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 LinksPanel.propTypes = {
-  selectedIndex: PropTypes.number,
+  selectedIndex: PropTypes.string,
   onChange: PropTypes.func,
   contextType: PropTypes.string.isRequired,
   contextId: PropTypes.string.isRequired,
@@ -260,7 +221,7 @@ LinksPanel.propTypes = {
 };
 
 LinksPanel.defaultProps = {
-  selectedIndex: 0
+  selectedIndex: ""
 };
 
 export default LinksPanel;

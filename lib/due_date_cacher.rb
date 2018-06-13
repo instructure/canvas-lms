@@ -15,7 +15,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require 'anonymity'
+
 class DueDateCacher
+  include Moderation
+
   INFER_SUBMISSION_WORKFLOW_STATE_SQL = <<~SQL_FRAGMENT
     CASE
     WHEN grade IS NOT NULL OR excused IS TRUE THEN
@@ -107,15 +111,14 @@ class DueDateCacher
           where(user: students_without_priors).
           anonymous_ids_for(assignment_id)
 
+        create_moderation_selections_for_assignment(assignment_id, student_due_dates.keys, @user_ids)
+
         students_without_priors.each do |student_id|
           submission_info = student_due_dates[student_id]
           due_date = submission_info[:due_at] ? "'#{submission_info[:due_at].iso8601}'::timestamptz" : 'NULL'
           grading_period_id = submission_info[:grading_period_id] || 'NULL'
 
-          anonymous_id = Submission.generate_unique_anonymous_id(
-            assignment: assignment_id,
-            existing_anonymous_ids: existing_anonymous_ids
-          )
+          anonymous_id = Anonymity.generate_id(existing_ids: existing_anonymous_ids)
           existing_anonymous_ids << anonymous_id
           sql_ready_anonymous_id = Submission.connection.quote(anonymous_id)
           values << [assignment_id, student_id, due_date, grading_period_id, sql_ready_anonymous_id]

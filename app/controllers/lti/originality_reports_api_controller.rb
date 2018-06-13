@@ -358,9 +358,16 @@ module Lti
       verify_submission_attachment(@report.attachment, submission)
     end
 
+    def attachment_in_history?(attachment, submission)
+      submission.submission_history.any? do |s|
+        s.attachment_ids.include?(attachment.id.to_s) ||
+        s.attachment_ids.include?(attachment.global_id.to_s)
+      end
+    end
+
     def verify_submission_attachment(attachment, submission)
       raise ActiveRecord::RecordNotFound if submission.blank? || (attachment_required? && attachment.blank?)
-      if submission.assignment != assignment || (attachment_required? && !submission.attachments.include?(attachment))
+      if submission.assignment != assignment || (attachment_required? && !attachment_in_history?(attachment, submission))
         render_unauthorized_action
       end
     end

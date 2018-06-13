@@ -20,9 +20,9 @@ import I18n from 'i18n!announcements_on_home_page'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import axios from 'axios'
-import Spinner from '@instructure/ui-core/lib/components/Spinner'
-import Heading from '@instructure/ui-core/lib/components/Heading'
-import Container from '@instructure/ui-core/lib/components/Container'
+import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
+import View from '@instructure/ui-layout/lib/components/View'
 import AnnouncementRow from '../shared/components/AnnouncementRow'
 
 if (ENV.SHOW_ANNOUNCEMENTS) {
@@ -43,12 +43,12 @@ if (ENV.SHOW_ANNOUNCEMENTS) {
 
   axios.get(url, { params }).then(response => {
     ReactDOM.render(
-      <Container display="block" margin="0 0 medium">
+      <View display="block" margin="0 0 medium">
         <Heading level="h3" margin="0 0 small">{I18n.t('Recent Announcements')}</Heading>
         {response.data.map(announcement => (
           <AnnouncementRow key={announcement.id} announcement={announcement} />
         ))}
-      </Container>,
+      </View>,
     container)
   })
 }

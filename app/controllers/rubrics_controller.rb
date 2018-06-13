@@ -25,7 +25,11 @@ class RubricsController < ApplicationController
   def index
     permission = @context.is_a?(User) ? :manage : :manage_rubrics
     return unless authorized_action(@context, @current_user, permission)
-    js_env :ROOT_OUTCOME_GROUP => get_root_outcome
+    js_env :ROOT_OUTCOME_GROUP => get_root_outcome,
+      :PERMISSIONS => {
+        manage_outcomes: @context.grants_right?(@current_user, session, :manage_outcomes)
+      },
+      :NON_SCORING_RUBRICS => @domain_root_account.feature_enabled?(:non_scoring_rubrics)
     @rubric_associations = @context.rubric_associations.bookmarked.include_rubric.to_a
     @rubric_associations = Canvas::ICU.collate_by(@rubric_associations.select(&:rubric_id).uniq(&:rubric_id)) { |r| r.rubric.title }
     @rubrics = @rubric_associations.map(&:rubric)
@@ -99,7 +103,7 @@ class RubricsController < ApplicationController
 
   def update
     association_params = params[:rubric_association] ?
-      params[:rubric_association].permit(:use_for_grading, :title, :purpose, :url, :hide_score_total, :bookmarked) : {}
+      params[:rubric_association].permit(:use_for_grading, :title, :purpose, :url, :hide_score_total, :hide_points, :hide_outcome_results, :bookmarked) : {}
 
     @association_object = RubricAssociation.get_association_object(params[:rubric_association])
     params[:rubric][:user] = @current_user if params[:rubric]

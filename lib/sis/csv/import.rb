@@ -80,6 +80,7 @@ module SIS
         @parallel_queue = settings[:queue_for_parallel_jobs]
         @parallel_queue = nil if @parallel_queue.blank?
         update_pause_vars
+        @batch.data[:use_parallel_imports] = false
       end
 
       def self.process(root_account, opts = {})
@@ -151,19 +152,17 @@ module SIS
         # and don't do it more often than we have work to do
         @updates_every = [ [ @total_rows / @parallelism / 100, 500 ].min, 10 ].max
 
-        if @batch
-          @batch.data[:supplied_batches] = []
-          IMPORTERS.each do |importer|
-            @batch.data[:supplied_batches] << importer if @csvs[importer].present?
-          end
-          @batch.save!
+        @batch.data[:supplied_batches] = []
+        IMPORTERS.each do |importer|
+          @batch.data[:supplied_batches] << importer if @csvs[importer].present?
         end
+        @batch.save!
 
-        if (@parallelism > 1)
+        if @parallelism > 1
           # re-balance the CSVs
           @batch.data[:importers] = {}
           IMPORTERS.each do |importer|
-            if (importer != :account)
+            if importer != :account
               rebalance_csvs(importer)
             end
             @batch.data[:importers][importer] = @csvs[importer].length
@@ -188,31 +187,26 @@ module SIS
           @finished = true
         end
       rescue => e
-        if @batch
-          return @batch if @batch.workflow_state == 'aborted'
-          message = "Importing CSV for account"\
-            ": #{@root_account.id} (#{@root_account.name}) "\
-            "sis_batch_id: #{@batch.id}: #{e}"
-          err_id = Canvas::Errors.capture(e,{
-            type: :sis_import,
-            message: message,
-            during_tests: false
-          })[:error_report]
-          error_message = I18n.t("Error while importing CSV. Please contact support."\
-                                 " (Error report %{number})", number: err_id.to_s)
-          SisBatch.add_error(nil, error_message, sis_batch: @batch,failure: true)
-        else
-          SisBatch.add_error(nil, e.to_s, sis_batch: @batch,backtrace: e.backtrace, failure: true)
-          raise e
-        end
+        return @batch if @batch.workflow_state == 'aborted'
+        message = "Importing CSV for account"\
+          ": #{@root_account.id} (#{@root_account.name}) "\
+          "sis_batch_id: #{@batch.id}: #{e}"
+        err_id = Canvas::Errors.capture(e,{
+          type: :sis_import,
+          message: message,
+          during_tests: false
+        })[:error_report]
+        error_message = I18n.t("Error while importing CSV. Please contact support."\
+                               " (Error report %{number})", number: err_id.to_s)
+        SisBatch.add_error(nil, error_message, sis_batch: @batch,failure: true)
       ensure
         @tmp_dirs.each do |tmp_dir|
           FileUtils.rm_rf(tmp_dir, :secure => true) if File.directory?(tmp_dir)
         end
 
-        if @batch && @parallelism == 1
+        if @parallelism == 1
           @batch.data[:counts] = @counts
-          @batch.save
+          @batch.save!
         end
       end
 
@@ -221,9 +215,7 @@ module SIS
       end
 
       def errors
-        errors = @root_account.sis_batch_errors
-        errors = errors.where(sis_batch: @batch) if @batch
-        errors.order(:id).pluck(:file, :message)
+        @root_account.sis_batch_errors.where(sis_batch: @batch).order(:id).pluck(:file, :message)
       end
 
       def calculate_progress
@@ -233,7 +225,6 @@ module SIS
       def update_progress
         @current_row += 1
         @current_row_for_pause_vars += 1
-        return unless @batch
 
         if update_progress?
           if @parallelism > 1
@@ -251,9 +242,9 @@ module SIS
               return
             end
           else
-            @batch.fast_update_progress( (((@current_row.to_f/@total_rows) * @progress_multiplier) + @progress_offset) * 100)
+            @batch.fast_update_progress((((@current_row.to_f/@total_rows) * @progress_multiplier) + @progress_offset) * 100)
           end
-          @last_progress_update = Time.now
+          @last_progress_update = Time.zone.now
         end
 
         if @current_row_for_pause_vars % @pause_every == 0
@@ -263,7 +254,7 @@ module SIS
       end
 
       def update_progress?
-        @last_progress_update ||= Time.now
+        @last_progress_update ||= Time.zone.now
         update_interval = Setting.get('sis_batch_progress_interval', 2.seconds).to_i
         @last_progress_update < update_interval.seconds.ago
       end
@@ -312,9 +303,7 @@ module SIS
         @csvs[importer].each { |csv| self.send_later_enqueue_args(:run_single_importer, enqueue_args, importer, csv) }
       end
 
-
       def complete_importer(importer)
-        return unless @batch
         SisBatch.transaction do
           @batch.reload(:lock => true)
           @batch.data[:importers][importer] -= 1
@@ -339,8 +328,6 @@ module SIS
       end
 
       def update_pause_vars
-        return unless @batch
-
         # throttling can be set on individual SisBatch instances, and also
         # site-wide in the Setting table.
         @batch.reload(:select => 'data') # update to catch changes to pause vars

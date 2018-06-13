@@ -22,10 +22,17 @@ describe FileAuthenticator do
   before :each do
     @oauth_host = 'http://oauth.host/'
     @user = user_model
+    @access_token = @user.access_tokens.create!
     @acting_as = user_model
     @attachment = attachment_with_context(@user)
     @attachment.filename = "test.txt"
-    @authenticator = FileAuthenticator.new(@user, @acting_as, @oauth_host)
+    @authenticator = FileAuthenticator.new(
+      user: @user,
+      acting_as: @acting_as,
+      access_token: @access_token,
+      root_account: Account.default,
+      oauth_host: @oauth_host
+    )
   end
 
   describe "fingerprint" do
@@ -36,12 +43,24 @@ describe FileAuthenticator do
     it "should be stable across instances with the same parameters" do
       User.where(id: @user).update_all(updated_at: Time.now.utc)
       reloaded = User.where(id: @user).first
-      new_authenticator = FileAuthenticator.new(reloaded, @acting_as, @oauth_host)
+      new_authenticator = FileAuthenticator.new(
+        user: reloaded,
+        acting_as: @acting_as,
+        access_token: nil,
+        root_account: Account.default,
+        oauth_host: @oauth_host
+      )
       expect(new_authenticator.fingerprint).to eql(@authenticator.fingerprint)
     end
 
     it "should be unique across instances with different parameters" do
-      new_authenticator = FileAuthenticator.new(user_model, @acting_as, @oauth_host)
+      new_authenticator = FileAuthenticator.new(
+        user: user_model,
+        acting_as: @acting_as,
+        access_token: nil,
+        root_account: Account.default,
+        oauth_host: @oauth_host
+      )
       expect(new_authenticator.fingerprint).not_to eql(@authenticator.fingerprint)
     end
   end
@@ -65,6 +84,8 @@ describe FileAuthenticator do
           with(@attachment, include(
             user: @user,
             acting_as: @acting_as,
+            access_token: @access_token,
+            root_account: Account.default,
             oauth_host: @oauth_host
           ))
         @authenticator.download_url(@attachment)
@@ -85,6 +106,8 @@ describe FileAuthenticator do
           with(@attachment, include(
             user: @user,
             acting_as: @acting_as,
+            access_token: @access_token,
+            root_account: Account.default,
             oauth_host: @oauth_host
           ))
         @authenticator.inline_url(@attachment)
@@ -126,6 +149,8 @@ describe FileAuthenticator do
           with(@attachment, include(
             user: @user,
             acting_as: @acting_as,
+            access_token: @access_token,
+            root_account: Account.default,
             oauth_host: @oauth_host
           ))
         @authenticator.thumbnail_url(@attachment)

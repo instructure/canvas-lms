@@ -20,9 +20,9 @@ import I18n from 'i18n!blueprint_courses'
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 
-import Text from '@instructure/ui-core/lib/components/Text'
-import Spinner from '@instructure/ui-core/lib/components/Spinner'
-import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent'
+import Text from '@instructure/ui-elements/lib/components/Text'
+import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
 
 import ChangeLogRow, { ChangeRow } from './ChangeLogRow'
 import SyncHistoryItem from './SyncHistoryItem'

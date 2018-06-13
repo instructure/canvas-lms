@@ -25,8 +25,8 @@ import { string, func, bool } from 'prop-types'
 import I18n from 'i18n!discussions_v2'
 import moment from 'moment'
 
-import ToggleDetails from '@instructure/ui-core/lib/components/ToggleDetails'
-import Text from '@instructure/ui-core/lib/components/Text'
+import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleDetails'
+import Text from '@instructure/ui-elements/lib/components/Text'
 import update from 'immutability-helper'
 
 import select from '../../shared/select'

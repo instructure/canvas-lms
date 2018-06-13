@@ -98,7 +98,7 @@ export default class SaveThemeButton extends Component {
           size="small"
           label={I18n.t('Save Theme')}
           open={this.state.modalIsOpen}
-          handleCloseClick={() => this.setState({modalIsOpen: false})}
+          onDismiss={() => this.setState({modalIsOpen: false})}
         >
           <ModalBody>
             <div className="ic-Form-control">

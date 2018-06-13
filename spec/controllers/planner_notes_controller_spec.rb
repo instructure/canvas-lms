@@ -26,12 +26,10 @@ describe PlannerNotesController do
     @course_1 = @course
     course_with_student(user: @student, active_all: true)
     @course_2 = @course
-    @course_1.root_account.enable_feature!(:student_planner)
-    @course_2.root_account.enable_feature!(:student_planner)
-    @student_note = planner_note_model(user: @student, todo_date: (1.week.from_now))
-    @teacher_note = planner_note_model(user: @teacher, todo_date: (1.week.from_now))
-    @course_1_note = planner_note_model(user: @student, todo_date: (1.week.ago), course: @course_1)
-    @course_2_note = planner_note_model(user: @student, todo_date: (3.weeks.ago), course: @course_2)
+    @student_note = planner_note_model(user: @student, todo_date: 1.week.from_now)
+    @teacher_note = planner_note_model(user: @teacher, todo_date: 1.week.from_now)
+    @course_1_note = planner_note_model(user: @student, todo_date: 1.week.ago, course: @course_1)
+    @course_2_note = planner_note_model(user: @student, todo_date: 3.weeks.ago, course: @course_2)
   end
 
   context "unauthenticated" do
@@ -45,7 +43,26 @@ describe PlannerNotesController do
     end
   end
 
+  context "feature disabled" do
+    before :each do
+      user_session(@student)
+    end
+
+    it "should return forbidden" do
+      get :index
+      assert_forbidden
+
+      post :create, params: {title: 'thing', todo_date: 1.day.from_now}
+      assert_forbidden
+    end
+  end
+
   context "authenticated" do
+    before :once do
+      @course_1.root_account.enable_feature!(:student_planner)
+      @course_2.root_account.enable_feature!(:student_planner)
+    end
+
     context "as student" do
       before :each do
         user_session(@student)
@@ -55,6 +72,18 @@ describe PlannerNotesController do
         it "returns http success" do
           get :index
           expect(response).to have_http_status(:success)
+        end
+
+        it "excludes deleted courses" do
+          @course_1.destroy
+          get :index
+          note_ids = json_parse(response.body).map{|n| n["id"]}
+          expect(note_ids).to_not include(@course_1_note.id)
+          expect(note_ids).to include(@course_2_note.id)
+
+          get :index, params: {context_codes: ["course_#{@course_1.id}"]}
+          course_notes = json_parse(response.body)
+          expect(course_notes.length).to eq 0
         end
 
         it "filters by context codes when specified" do
@@ -86,12 +115,18 @@ describe PlannerNotesController do
           expect(all_notes.pluck("id").sort).to eq [@student_note.id, @course_1_note.id, @course_2_note.id].sort
         end
 
-        it 'should 400 for bad dates' do
-          get :index, params: {start_date: '123-456-7890', end_date: '98765-43210'}
-          expect(response.code).to eql '400'
+        it 'should 400 for bad start dates' do
+          get :index, params: {start_date: '123-456-7890'}
+          expect(response.code).to eq '400'
           json = json_parse(response.body)
-          expect(json['errors']['start_date']).to eq 'Invalid date or invalid datetime for start_date'
-          expect(json['errors']['end_date']).to eq 'Invalid date or invalid datetime for end_date'
+          expect(json['errors']).to eq 'Invalid date or datetime for start_date'
+        end
+
+        it 'should 400 for bad end dates' do
+          get :index, params: {end_date: '5678-90'}
+          expect(response.code).to eq '400'
+          json = json_parse(response.body)
+          expect(json['errors']).to eq 'Invalid date or datetime for end_date'
         end
       end
 

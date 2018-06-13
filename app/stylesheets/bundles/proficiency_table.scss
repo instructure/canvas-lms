@@ -1,0 +1,46 @@
+.masteryCol {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.description label {
+  padding: 0;
+}
+
+.pointsCol {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.points label {
+  padding: 0;
+}
+
+.colorCol {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.color {
+  white-space: nowrap;
+}
+
+.colorPickerIcon {
+  border-radius: 3px;
+  display: inline-block;
+  height: 18px;
+  width: 18px;
+  margin-left: 10px;
+  margin-right: 10px;
+  vertical-align: text-top;
+}
+
+.delete {
+  display: inline-block;
+  margin-left: 20px;
+}
+
+.save {
+  padding: 0.75rem 0 0 0;
+  text-align: right;
+}

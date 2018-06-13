@@ -40,35 +40,6 @@ Object {
 }
 `;
 
-exports[`transformApiToInternalItem extracts and transforms the proper data for a assignment response 1`] = `
-Object {
-  "completed": false,
-  "context": Object {
-    "color": "#abffaa",
-    "id": "1",
-    "image_url": "blah_url",
-    "inform_students_of_overdue_submissions": true,
-    "title": "blah",
-    "type": "Course",
-    "url": undefined,
-  },
-  "course_id": "1",
-  "date": "2018-03-27T18:58:51.000Z",
-  "dateBucketMoment": "2018-03-27T00:00:00.000Z",
-  "html_url": "/courses/1/assignments/10",
-  "id": "10",
-  "newActivity": false,
-  "overrideAssignId": undefined,
-  "overrideId": null,
-  "points": 50,
-  "status": false,
-  "title": "How to be neutral",
-  "toggleAPIPending": false,
-  "type": "Assignment",
-  "uniqueId": "assignment-10",
-}
-`;
-
 exports[`transformApiToInternalItem extracts and transforms the proper data for a calendar event response 1`] = `
 Object {
   "allDay": false,
@@ -302,7 +273,7 @@ Object {
 }
 `;
 
-exports[`transformApiToInternalItem extracts and transforms the proper data for an announcement response 1`] = `
+exports[`transformApiToInternalItem extracts and transforms the proper data for an assignment response 1`] = `
 Object {
   "completed": false,
   "context": Object {
@@ -314,23 +285,20 @@ Object {
     "type": "Course",
     "url": undefined,
   },
-  "course_id": undefined,
-  "date": "2017-05-15T16:32:34Z",
+  "course_id": "1",
+  "date": "2018-03-27T18:58:51.000Z",
   "dateBucketMoment": "2018-03-27T00:00:00.000Z",
-  "html_url": "/courses/1/discussion_topics/10",
-  "id": "1",
+  "html_url": "/courses/1/assignments/10",
+  "id": "10",
   "newActivity": false,
-  "overrideAssignId": 9,
+  "overrideAssignId": undefined,
   "overrideId": null,
-  "points": undefined,
-  "status": Object {
-    "unread_count": 1,
-  },
-  "title": "",
+  "points": 50,
+  "status": false,
+  "title": "How to be neutral",
   "toggleAPIPending": false,
-  "type": "Announcement",
-  "uniqueId": "announcement-1",
-  "unread_count": 1,
+  "type": "Assignment",
+  "uniqueId": "assignment-10",
 }
 `;
 
@@ -408,7 +376,7 @@ Object {
     "url": undefined,
   },
   "course_id": "1",
-  "date": "2017-06-21T18:58:51Z",
+  "date": "2017-06-21T18:58:51.000Z",
   "dateBucketMoment": "2017-06-21T18:58:51.000Z",
   "details": "asdfasdfasdf",
   "id": 14,
@@ -424,7 +392,7 @@ Object {
   "completed": false,
   "context": Object {},
   "course_id": null,
-  "date": "2017-06-21T18:58:51Z",
+  "date": "2017-06-21T18:58:51.000Z",
   "dateBucketMoment": "2017-06-21T18:58:51.000Z",
   "details": "asdfasdfasdf",
   "id": 14,

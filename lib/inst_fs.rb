@@ -18,7 +18,8 @@
 module InstFS
   class << self
     def enabled?
-      Canvas::Plugin.find('inst_fs').enabled?
+      # true if plugin is enabled AND all settings values are set
+      Canvas::Plugin.find('inst_fs').enabled? && !!app_host && !!jwt_secret
     end
 
     def login_pixel(user, session, oauth_host)
@@ -63,22 +64,33 @@ module InstFS
     end
 
     def jwt_secret
-      Base64.decode64(setting("secret"))
+      secret = setting("secret")
+      if secret
+        Base64.decode64(secret)
+      end
     end
 
-    def upload_preflight_json(context:, user:, acting_as:, folder:, filename:, content_type:, quota_exempt:, on_duplicate:, capture_url:, target_url: nil, progress_json: nil, include_param: nil)
+    def upload_preflight_json(context:, root_account:, user:, acting_as:, access_token:, folder:, filename:, content_type:, quota_exempt:, on_duplicate:, capture_url:, target_url: nil, progress_json: nil, include_param: nil)
       raise ArgumentError unless !!target_url == !!progress_json # these params must both be present or both absent
 
-      token = upload_jwt(user, acting_as, capture_url,
-        context_type: context.class.to_s,
-        context_id: context.global_id.to_s,
-        user_id: acting_as.global_id.to_s,
-        folder_id: folder&.global_id.to_s,
-        root_account_id: context.respond_to?(:root_account) && context.root_account.global_id.to_s,
-        quota_exempt: !!quota_exempt,
-        on_duplicate: on_duplicate,
-        progress_id: progress_json && progress_json[:id],
-        include: include_param)
+      token = upload_jwt(
+        user: user,
+        acting_as: acting_as,
+        access_token: access_token,
+        root_account: root_account,
+        capture_url: capture_url,
+        capture_params: {
+          context_type: context.class.to_s,
+          context_id: context.global_id.to_s,
+          user_id: acting_as.global_id.to_s,
+          folder_id: folder&.global_id&.to_s,
+          root_account_id: root_account.global_id.to_s,
+          quota_exempt: !!quota_exempt,
+          on_duplicate: on_duplicate,
+          progress_id: progress_json && progress_json[:id],
+          include: include_param
+        }
+      )
 
       upload_params = {
         filename: filename,
@@ -163,6 +175,10 @@ module InstFS
       "/thumbnails/#{attachment.instfs_uuid}"
     end
 
+    def service_jwt(claims, expires_in)
+      Canvas::Security.create_jwt(claims, expires_in.from_now, self.jwt_secret, :HS512)
+    end
+
     def access_jwt(resource, options={})
       expires_in = Setting.get('instfs.access_jwt.expiration_hours', '24').to_i.hours
       expires_in = options[:expires_in] || expires_in
@@ -175,10 +191,11 @@ module InstFS
       if options[:acting_as] && options[:acting_as] != options[:user]
         claims[:acting_as_user_id] = options[:acting_as].global_id.to_s
       end
-      Canvas::Security.create_jwt(claims, expires_in.from_now, self.jwt_secret)
+      amend_claims_for_access_token(claims, options[:access_token], options[:root_account])
+      service_jwt(claims, expires_in)
     end
 
-    def upload_jwt(user, acting_as, capture_url, capture_params)
+    def upload_jwt(user:, acting_as:, access_token:, root_account:, capture_url:, capture_params:)
       expires_in = Setting.get('instfs.upload_jwt.expiration_minutes', '10').to_i.minutes
       claims = {
         iat: Time.now.utc.to_i,
@@ -190,44 +207,68 @@ module InstFS
       unless acting_as == user
         claims[:acting_as_user_id] = acting_as.global_id.to_s
       end
-      Canvas::Security.create_jwt(claims, expires_in.from_now, self.jwt_secret)
+      amend_claims_for_access_token(claims, access_token, root_account)
+      service_jwt(claims, expires_in)
     end
 
     def direct_upload_jwt
       expires_in = Setting.get('instfs.upload_jwt.expiration_minutes', '10').to_i.minutes
-      Canvas::Security.create_jwt({
+      service_jwt({
         iat: Time.now.utc.to_i,
         user_id: nil,
         host: "canvas",
         resource: "/files",
-      }, expires_in.from_now, self.jwt_secret)
+      }, expires_in)
     end
 
     def session_jwt(user, host)
       expires_in = Setting.get('instfs.session_jwt.expiration_minutes', '5').to_i.minutes
-      Canvas::Security.create_jwt({
+      service_jwt({
         iat: Time.now.utc.to_i,
         user_id: user.global_id&.to_s,
         host: host,
         resource: '/session/ensure'
-      }, expires_in.from_now, self.jwt_secret)
+      }, expires_in)
     end
 
     def logout_jwt(user)
       expires_in = Setting.get('instfs.logout_jwt.expiration_minutes', '5').to_i.minutes
-      Canvas::Security.create_jwt({
+      service_jwt({
         iat: Time.now.utc.to_i,
         user_id: user.global_id&.to_s,
         resource: '/session'
-      }, expires_in.from_now, self.jwt_secret)
+      }, expires_in)
     end
 
     def export_references_jwt
       expires_in = Setting.get('instfs.logout_jwt.expiration_minutes', '5').to_i.minutes
-      Canvas::Security.create_jwt({
+      service_jwt({
         iat: Time.now.utc.to_i,
         resource: '/references'
-      }, expires_in.from_now, self.jwt_secret)
+      }, expires_in)
+    end
+
+    def amend_claims_for_access_token(claims, access_token, root_account)
+      return unless access_token
+      if whitelisted_access_token?(access_token)
+        # temporary workaround for legacy API consumers
+        claims[:legacy_api_developer_key_id] = access_token.global_developer_key_id.to_s
+        claims[:legacy_api_root_account_id] = root_account.global_id.to_s
+      else
+        # TODO: long term solution for updated API consumers goes here
+      end
+    end
+
+    def whitelisted_access_token?(access_token)
+      if access_token.nil?
+        false
+      elsif Setting.get('instfs.whitelist_all_developer_keys', 'false') == 'true'
+        true
+      else
+        whitelist = Setting.get('instfs.whitelisted_developer_key_global_ids', '')
+        whitelist = whitelist.split(',').map(&:to_i)
+        whitelist.include?(access_token.global_developer_key_id)
+      end
     end
   end
 

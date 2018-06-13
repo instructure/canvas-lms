@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders the Outcome component 1`] = `
+"<ToggleDetails divider=\\"dashed\\" icon={[Function]} iconExpanded={[Function]} summary={{...}} expanded={false} onToggle={[Function]} fluidWidth={true} variant=\\"default\\" size=\\"medium\\" iconPosition=\\"start\\" defaultExpanded={false}>
+  <View as=\\"div\\" borderWidth=\\"small 0 0 0\\" display=\\"auto\\">
+    <List variant=\\"unstyled\\" delimiter=\\"dashed\\" as=\\"ul\\" margin=\\"none\\" size=\\"medium\\">
+      <ListItem>
+        <AssignmentResult result={{...}} outcome={{...}} />
+      </ListItem>
+    </List>
+  </View>
+</ToggleDetails>"
+`;

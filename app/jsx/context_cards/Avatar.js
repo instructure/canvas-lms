@@ -19,9 +19,9 @@
 import I18n from 'i18n!student_context_tray'
 import React from 'react'
 import PropTypes from 'prop-types'
-import InstUIAvatar from '@instructure/ui-core/lib/components/Avatar'
-import Text from '@instructure/ui-core/lib/components/Text'
-import Link from '@instructure/ui-core/lib/components/Link'
+import InstUIAvatar from '@instructure/ui-elements/lib/components/Avatar'
+import Text from '@instructure/ui-elements/lib/components/Text'
+import Link from '@instructure/ui-elements/lib/components/Link'
 
 class Avatar extends React.Component {
   static propTypes = {

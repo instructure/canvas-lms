@@ -18,18 +18,25 @@
 
 import "@instructure/ui-themes/lib/canvas";
 import { renderIntoDiv, renderSidebarIntoDiv } from "../src/async";
+import locales from "../src/locales";
+
 import CanvasRce from "../src/rce/CanvasRce";
 import * as fakeSource from "../src/sidebar/sources/fake";
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
-import { Button, Select, TextInput } from "@instructure/ui-core/lib/components";
-import Url from "url";
+import Button from "@instructure/ui-buttons/lib/components/Button";
+import Select from "@instructure/ui-forms/lib/components/Select";
+import TextInput from "@instructure/ui-forms/lib/components/TextInput";
+import RadioInputGroup from "@instructure/ui-forms/lib/components/RadioInputGroup";
+import RadioInput from "@instructure/ui-forms/lib/components/RadioInput";
+import ToggleDetails from "@instructure/ui-toggle-details/lib/components/ToggleDetails";
 
-function getProps(textareaId, language = "en") {
+function getProps(textareaId, language = "en", textDirection = "ltr") {
   return {
     language,
     editorOptions: () => {
       return {
+        directionality: textDirection,
         height: "250px",
         plugins:
           "instructure_equation, instructure_image, instructure_equella, link, textcolor, instructure_external_tools, instructure_record, instructure_links, table",
@@ -53,28 +60,22 @@ function getProps(textareaId, language = "en") {
   };
 }
 
-function renderDemos(
-  host,
-  jwt,
-  language = "en",
-  contextType = "course",
-  contextId = 1
-) {
+function renderDemos({ host, jwt, lang, contextType, contextId, dir }) {
   renderIntoDiv(
     document.getElementById("editor1"),
-    getProps("textarea1", language)
+    getProps("textarea1", lang, dir)
   );
   renderIntoDiv(
     document.getElementById("editor2"),
-    getProps("textarea2", language)
+    getProps("textarea2", lang, dir)
   );
   ReactDOM.render(
-    <CanvasRce rceProps={getProps("textarea3")} />,
+    <CanvasRce rceProps={getProps("textarea3", lang, dir)} />,
     document.getElementById("editor3")
   );
 
-  const parsedUrl = Url.parse(window.location.href, true);
-  if (parsedUrl.query.sidebar === "no") {
+  const parsedUrl = new URL(window.location.href);
+  if (parsedUrl.searchParams.get("sidebar") === "no") {
     return;
   }
 
@@ -91,95 +92,83 @@ function renderDemos(
 }
 
 class DemoOptions extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      expanded: false
-    };
-    this.inputs = {};
-    this.handleChange = this.handleChange.bind(this);
-    this.toggle = this.toggle.bind(this);
-  }
+  state = {
+    dir: "ltr",
+    lang: "en",
+    host: "https://rich-content-iad.inscloudgate.net",
+    jwt: "",
+    contextType: "course",
+    contextId: "1"
+  };
 
-  handleChange() {
-    renderDemos(
-      this.inputs.host.value,
-      this.inputs.jwt.value,
-      this.inputs.language.value,
-      this.inputs.contextType.value,
-      this.inputs.contextId.value
-    );
-  }
+  handleChange = () => {
+    document.documentElement.setAttribute("dir", this.state.dir);
+    renderDemos(this.state);
+  };
 
   componentDidMount() {
     this.handleChange();
   }
 
-  toggle() {
-    this.setState({ expanded: !this.state.expanded });
-  }
-
   render() {
     return (
-      <div>
-        <Button size="small" onClick={this.toggle}>
-          {this.state.expanded ? "Hide Options" : "Show Options"}
-        </Button>
-        <div style={{ display: this.state.expanded ? undefined : "none" }}>
+      <ToggleDetails summary="Configuration Options">
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            this.handleChange();
+          }}
+        >
+          <RadioInputGroup
+            description="Text Direction"
+            variant="toggle"
+            name="dir"
+            value={this.state.dir}
+            onChange={(event, value) => this.setState({ dir: value })}
+          >
+            <RadioInput label="LTR" value="ltr" />
+            <RadioInput label="RTL" value="rtl" />
+          </RadioInputGroup>
           <Select
-            ref={r => (this.inputs.language = r)}
             label="Language"
-            defaultValue="en"
+            value={this.state.lang}
+            onChange={(_e, option) => this.setState({ lang: option.value })}
           >
-            <option>ar</option>
-            <option>da</option>
-            <option>de</option>
-            <option>en-AU</option>
-            <option>en-GB</option>
-            <option>en-GB-x-lbs</option>
-            <option>en</option>
-            <option>es</option>
-            <option>fa</option>
-            <option>fr</option>
-            <option>he</option>
-            <option>hy</option>
-            <option>ja</option>
-            <option>ko</option>
-            <option>mi</option>
-            <option>nb</option>
-            <option>nl</option>
-            <option>pl</option>
-            <option>pt-BR</option>
-            <option>pt</option>
-            <option>ru</option>
-            <option>sv</option>
-            <option>tr</option>
-            <option>zh-Hans</option>
-            <option>zh-Hant</option>
+            {["en", ...Object.keys(locales)].map(locale => (
+              <option key={locale} value={locale}>
+                {locale}
+              </option>
+            ))}
           </Select>
           <TextInput
-            ref={r => (this.inputs.host = r)}
             label="API Host"
-            defaultValue="https://rich-content-iad.inscloudgate.net"
+            value={this.state.host}
+            onChange={e => this.setState({ host: e.target.value })}
           />
-          <TextInput ref={r => (this.inputs.jwt = r)} label="Canvas JWT" />
+          <TextInput
+            label="Canvas JWT"
+            value={this.state.jwt}
+            onChange={e => this.setState({ jwt: e.target.value })}
+          />
           <Select
-            ref={r => (this.inputs.contextType = r)}
             label="Context Type"
-            defaultValue="course"
+            selectedOption={this.state.contextType}
+            onChange={(_e, option) =>
+              this.setState({ contextType: option.value })
+            }
           >
-            <option>course</option>
-            <option>group</option>
-            <option>user</option>
+            <option value="course">Course</option>
+            <option value="group">Group</option>
+            <option value="user">User</option>
           </Select>
           <TextInput
-            ref={r => (this.inputs.contextId = r)}
             label="Context ID"
-            defaultValue="1"
+            value={this.state.contextId}
+            onChange={e => this.setState({ contextId: e.target.value })}
           />
-          <Button onClick={this.handleChange}>Update</Button>
-        </div>
-      </div>
+          <Button type="submit">Update</Button>
+        </form>
+      </ToggleDetails>
     );
   }
 }

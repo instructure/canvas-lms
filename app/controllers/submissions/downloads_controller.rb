@@ -15,54 +15,25 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-module Submissions
-  class DownloadsController < ApplicationController
-    include Submissions::ShowHelper
-    before_action :require_context
 
+module Submissions
+  class DownloadsController < DownloadsBaseController
     def show
-      service = Submissions::SubmissionForShow.new(
-        @context, params.slice(:assignment_id, :id)
+      @submission_for_show = Submissions::SubmissionForShow.new(
+        assignment_id: params.fetch(:assignment_id),
+        context: @context,
+        id: params.fetch(:id),
+        preview: params.fetch(:preview, false),
+        version: params.fetch(:version, nil)
       )
       begin
-        @submission = service.submission
+        @submission = @submission_for_show.submission
       rescue ActiveRecord::RecordNotFound
-        @assignment = service.assignment
+        @assignment = @submission_for_show.assignment
         render_user_not_found and return
       end
 
-      if authorized_action(@submission, @current_user, :read)
-        @attachment = Submissions::AttachmentForSubmissionDownload.new(
-          @submission, params.slice(:comment_id, :download)
-        ).attachment
-        respond_to do |format|
-          format.html do
-            redirect_to redirect_path
-          end
-          format.json do
-            render json: @attachment.as_json({
-              permissions: {
-                user: @current_user
-              }
-            })
-          end
-        end
-      end
-    end
-
-    private
-    def download_params
-      { verifier: @attachment.uuid, inline: params[:inline] }.tap do |h|
-        h[:download_frd] = true unless params[:inline]
-      end
-    end
-
-    def redirect_path
-      if @attachment.context == @submission || @attachment.context == @submission.assignment
-        file_download_url(@attachment, download_params)
-      else
-        named_context_url(@attachment.context, :context_file_download_url, @attachment, download_params)
-      end
+      super
     end
   end
 end

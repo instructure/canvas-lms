@@ -249,14 +249,29 @@ CanvasRails::Application.routes.draw do
     concerns :discussions
     resources :assignments do
       get 'moderate' => 'assignments#show_moderate'
+
+      get 'anonymous_submissions/:anonymous_id', to: 'submissions/anonymous_previews#show',
+        constraints: ->(request) do
+          request.query_parameters.key?(:preview) && request.format == :html
+        end
+
+      get 'anonymous_submissions/:anonymous_id', to: 'submissions/anonymous_downloads#show',
+        constraints: ->(request) do
+          request.query_parameters.key?(:download)
+        end
+
+      get 'anonymous_submissions/:anonymous_id', to: 'anonymous_submissions#show', as: :anonymous_submission
+
       get 'submissions/:id', to: 'submissions/previews#show',
         constraints: ->(request) do
           request.query_parameters.key?(:preview) && request.format == :html
         end
+
       get 'submissions/:id', to: 'submissions/downloads#show',
         constraints: ->(request) do
           request.query_parameters.key?(:download)
         end
+
       resources :submissions do
         get 'originality_report/:asset_string' => 'submissions#originality_report', as: :originality_report
         post 'turnitin/resubmit' => 'submissions#resubmit_to_turnitin', as: :resubmit_to_turnitin
@@ -1100,7 +1115,10 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/assignments/:assignment_id/gradeable_students", action: :gradeable_students, as: "course_assignment_gradeable_students"
     end
 
-
+    scope(controller: :anonymous_provisional_grades) do
+      get "courses/:course_id/assignments/:assignment_id/anonymous_provisional_grades/status",
+        action: :status, as: "course_assignment_anonymous_provisional_status"
+    end
 
     scope(controller: :provisional_grades) do
       get "courses/:course_id/assignments/:assignment_id/provisional_grades/status", action: :status, as: "course_assignment_provisional_status"
@@ -1234,6 +1252,7 @@ CanvasRails::Application.routes.draw do
       get 'accounts/:account_id/sis_imports/:id', action: :show
       get 'accounts/:account_id/sis_imports', action: :index, as: "account_sis_imports"
       put 'accounts/:account_id/sis_imports/:id/abort', action: :abort
+      put 'accounts/:account_id/sis_imports/:id/restore_states', action: :restore_states
     end
 
     scope(controller: :sis_import_errors_api) do
@@ -1246,6 +1265,11 @@ CanvasRails::Application.routes.draw do
         post "#{context}s/:#{context}_id/outcome_imports", action: :create
         get "#{context}s/:#{context}_id/outcome_imports/:id", action: :show
       end
+    end
+
+    scope(controller: :outcome_proficiency_api) do
+      post "accounts/:account_id/outcome_proficiency", action: :create
+      get "accounts/:account_id/outcome_proficiency", action: :show
     end
 
     scope(controller: :users) do
@@ -1296,7 +1320,7 @@ CanvasRails::Application.routes.draw do
       put 'users/:id/merge_into/accounts/:destination_account_id/users/:destination_user_id', controller: 'users', action: 'merge_into'
       post 'users/:id/split', controller: 'users', action: 'split'
 
-      post 'users/:id/pandata_token', controller: 'users', action: 'pandata_token'
+      post 'users/self/pandata_events_token', controller: 'users', action: 'pandata_events_token'
 
       scope(controller: :user_observees) do
         get    'users/:user_id/observees', action: :index, as: 'user_observees'
@@ -1304,6 +1328,12 @@ CanvasRails::Application.routes.draw do
         get    'users/:user_id/observees/:observee_id', action: :show, as: 'user_observee'
         put    'users/:user_id/observees/:observee_id', action: :update
         delete 'users/:user_id/observees/:observee_id', action: :destroy
+      end
+
+      scope(controller: :observer_alerts_api) do
+        get 'users/:user_id/observer_alerts/unread_count', action: :alerts_count
+        get 'users/:user_id/observer_alerts/:student_id', action: :alerts_by_student, as: 'observer_alerts_by_student'
+        put 'users/:user_id/observer_alerts/:observer_alert_id/:workflow_state', action: :update
       end
 
       scope(controller: :observer_alert_thresholds_api) do

@@ -16,14 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { Component, PropTypes } from "react";
+import PropTypes from "prop-types";
+
+import React, { Component } from "react";
 import ReactCSSTransitionGroup from "react-transition-group/CSSTransitionGroup";
 import formatMessage from "../../format-message";
-import ScreenReaderContent from "@instructure/ui-core/lib/components/ScreenReaderContent";
-import Select from "@instructure/ui-core/lib/components/Select";
-import Button from "@instructure/ui-core/lib/components/Button";
-import IconAddSolid from "instructure-icons/lib/Solid/IconAddSolid";
-import IconMinimizeSolid from "instructure-icons/lib/Solid/IconMinimizeSolid";
+import ScreenReaderContent from "@instructure/ui-a11y/lib/components/ScreenReaderContent";
+import Select from "@instructure/ui-forms/lib/components/Select";
+import Button from "@instructure/ui-buttons/lib/components/Button";
+import Alert from "@instructure/ui-alerts/lib/components/Alert";
+import IconAddSolid from "@instructure/ui-icons/lib/Solid/IconAdd";
+import IconMinimizeSolid from "@instructure/ui-icons/lib/Solid/IconMinimize";
 import Loading from "../../common/components/Loading";
 import UsageRightsForm from "./UsageRightsForm";
 import AltTextForm from "./AltTextForm";
@@ -33,7 +36,6 @@ class UploadForm extends Component {
   constructor(props) {
     super(props);
     this.state = { file: {}, altResolved: false };
-    this.setAltResolved = this.setAltResolved.bind(this);
   }
 
   componentWillMount() {
@@ -226,13 +228,20 @@ class UploadForm extends Component {
     }
   }
 
-  setAltResolved(resolved) {
+  setAltResolved = resolved => {
     this.setState({ ...this.state, altResolved: resolved });
-  }
+  };
 
   renderForm() {
     if (this.props.upload.formExpanded) {
       let screenreaderMessage = formatMessage("Select a file");
+      let errorMessage =
+        this.props.upload.error &&
+        this.props.upload.error.type === "QUOTA_EXCEEDED_UPLOAD"
+          ? formatMessage(
+              "This upload exceeds the file storage quota. Please speak to your system administrator."
+            )
+          : null;
       return (
         <form
           onSubmit={this.handleUpload.bind(this)}
@@ -244,6 +253,7 @@ class UploadForm extends Component {
               <label htmlFor="upload-form-file-input">
                 <ScreenReaderContent>{screenreaderMessage}</ScreenReaderContent>
               </label>
+              {errorMessage && <Alert variant="error">{errorMessage}</Alert>}
               <input
                 className={css(styles.uploadedData)}
                 type="file"
@@ -307,7 +317,10 @@ UploadForm.propTypes = {
     uploading: PropTypes.bool.isRequired,
     formExpanded: PropTypes.bool.isRequired,
     rootFolderId: PropTypes.number,
-    folderTree: PropTypes.object.isRequired
+    folderTree: PropTypes.object.isRequired,
+    error: PropTypes.shape({
+      type: PropTypes.string
+    })
   }).isRequired,
   toggleUploadForm: PropTypes.func.isRequired,
   fetchFolders: PropTypes.func.isRequired,

@@ -16,25 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { Component, PropTypes } from "react";
+import PropTypes from "prop-types";
+
+import React, { Component } from "react";
 import FileTree from "../../common/components/FileTree";
 import formatMessage from "../../format-message";
 import UploadForm from "./UploadForm";
 
 export default class FilesPanel extends Component {
-  constructor(props) {
-    super(props);
-    this.handleSelect = this.handleSelect.bind(this);
-  }
-
-  handleSelect(id) {
+  handleSelect = id => {
     const file = this.props.files[id];
     this.props.onLinkClick({
       title: file.name,
       href: file.url,
       embed: file.embed
     });
-  }
+  };
 
   renderUploadForm() {
     if (this.props.withUploadForm) {

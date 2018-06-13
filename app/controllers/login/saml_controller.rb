@@ -27,7 +27,7 @@ class Login::SamlController < ApplicationController
 
   def new
     increment_saml_stat("login_attempt")
-    session[:saml2_processing] = true if params[:saml2_processing]
+    session[:saml2_processing] = false if Canvas::Plugin.value_to_boolean(params[:saml2_processing], ignore_unrecognized: true) == false
     redirect_to delegated_auth_redirect_uri(aac.generate_authn_request_redirect(host: request.host_with_port,
                                                                                 parent_registration: session[:parent_registration]))
   end
@@ -36,7 +36,9 @@ class Login::SamlController < ApplicationController
     login_error_message = t("There was a problem logging in at %{institution}",
                             institution: @domain_root_account.display_name)
 
-    saml2_processing = session[:saml2_processing] || @domain_root_account.settings[:process_saml_responses_with_saml2]
+    saml2_processing = true
+    saml2_processing = false if session[:saml2_processing] == false
+    saml2_processing = false if @domain_root_account.settings[:process_saml_responses_with_saml2] == false
 
     legacy_response = Onelogin::Saml::Response.new(params[:SAMLResponse])
     response, relay_state = SAML2::Bindings::HTTP_POST.decode(request.request_parameters)
@@ -95,10 +97,10 @@ class Login::SamlController < ApplicationController
       # and it's easier to not interweave them so the legacy code can be easily stripped
       # in the future
       assertion = response.assertions.first
-      provider_attributes = assertion.attribute_statements.first&.to_h
-      subject_name_id = assertion.subject.name_id
+      provider_attributes = assertion&.attribute_statements&.first&.to_h || {}
+      subject_name_id = assertion&.subject&.name_id
       unique_id = if aac.login_attribute == 'NameID'
-        subject_name_id.id
+        subject_name_id&.id
       else
         provider_attributes[aac.login_attribute]
       end

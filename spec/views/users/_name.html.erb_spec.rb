@@ -62,6 +62,32 @@ describe "/users/name" do
     expect(response.body).not_to match /Delete from #{Account.default.name}/
   end
 
+  describe "default email address" do
+    before :once do
+      course_with_teacher :active_all => true
+      student_in_course :active_all => true
+      @student.communication_channels.create!(:path_type => 'email', :path => 'secret@example.com').confirm!
+    end
+
+    it "includes email address for teachers by default" do
+      view_context(@course, @teacher)
+      assign(:user, @student)
+      assign(:enrollments, [])
+      render :partial => "users/name"
+      expect(response.body).to include 'secret@example.com'
+    end
+
+    it "does not include it if the permission is denied" do
+      RoleOverride.create!(:context => Account.default, :permission => 'read_email_addresses',
+                     :role => Role.get_built_in_role('TeacherEnrollment'), :enabled => false)
+      view_context(@course, @teacher)
+      assign(:user, @student)
+      assign(:enrollments, [])
+      render :partial => "users/name"
+      expect(response.body).not_to include 'secret@example.com'
+    end
+  end
+
   describe "merge_user_link" do
     let(:account) { Account.default }
     let(:sally) { account_admin_user(account: account) }

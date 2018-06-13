@@ -171,4 +171,62 @@ describe "legacyNode" do
       ).to be_nil
     end
   end
+
+  context "modules" do
+    before(:once) do
+      @module = @course.context_modules.create! name: "asdf"
+      @query = <<~GQL
+      query {
+        module: legacyNode(type: Module, _id: "#{@module.id}") {
+          ... on Module {
+            _id
+          }
+        }
+      }
+      GQL
+    end
+
+    it "works" do
+      expect(
+        run_query(@query, @student)["data"]["module"]["_id"]
+      ).to eq @module.id.to_s
+    end
+
+    it "requires read permission" do
+      @module.unpublish
+      expect(
+        run_query(@query, @student)["data"]["module"]
+      ).to be_nil
+    end
+  end
+
+  context "page" do
+    before(:once) do
+      @course.create_wiki! has_no_front_page: false, title: "asdf"
+      @page = @course.wiki.front_page
+      @page.save!
+      @query = <<~GQL
+      query {
+        page: legacyNode(type: Page, _id: "#{@page.id}") {
+          ... on Page {
+            _id
+          }
+        }
+      }
+      GQL
+    end
+
+    it "works" do
+      expect(
+        run_query(@query, @student)["data"]["page"]["_id"]
+      ).to eq @page.id.to_s
+    end
+
+    it "requires read permission" do
+      @page.unpublish
+      expect(
+        run_query(@query, @student)["data"]["page"]
+      ).to be_nil
+    end
+  end
 end

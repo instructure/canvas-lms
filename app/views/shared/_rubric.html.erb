@@ -34,6 +34,7 @@
          edit_view,
          assessing,
          show_grading,
+         @domain_root_account.feature_enabled?(:non_scoring_rubrics),
          @domain_root_account.feature_enabled?(:rubric_criterion_range)].join('/')) do %>
 <div
   class="rubric_container rubric <%= "assessing" if assessing %> <%= "for_grading" if rubric_association.try(:use_for_grading) %>"
@@ -84,6 +85,8 @@
         <div class="use_for_grading"><%= (rubric_association && rubric_association.use_for_grading) ? "true" : nbsp %></div>
         <div class="free_form_criterion_comments"><%= (rubric && rubric.free_form_criterion_comments) ? "true" : nbsp %></div>
         <div class="hide_score_total"><%= (rubric && rubric.hide_score_total) ? "true" : nbsp %></div>
+        <div class="hide_outcome_results"><%= (rubric_association&.hide_outcome_results) ? "true" : nbsp %></div>
+        <div class="hide_points"><%= (rubric_association&.hide_points) ? "true" : nbsp %></div>
         <div class="rubric_association_id"><%= rubric_association ? rubric_association.id : nbsp %></div>
         <div class="user_id"><%= assessment ? assessment.user_id : nbsp %></div>
         <div class="assessment_type"><%= assessment ? assessment.assessment_type : "" %></div>
@@ -136,7 +139,9 @@
   <tr>
     <th scope="col"><%= t 'headers.criteria', "Criteria" %></th>
     <th scope="col"><%= t 'headers.ratings', "Ratings" %></th>
-    <th scope="col"><%= t 'headers.points', "Pts" %></th>
+    <th scope="col" class="toggle_for_hide_points <%= rubric_association&.hide_points ? 'hidden' : '' %>">
+      <%= t 'headers.points', "Pts" %>
+    </th>
   </tr>
 </thead>
 <tbody>
@@ -149,7 +154,8 @@
   <%= render :partial => "shared/rubric_criterion", :object => nil %>
   <tr class="summary">
     <td colspan="4">
-      <div class="total_points_holder" style="float: <%= direction('right') %>; <%= hidden if rubric_association && rubric_association.hide_score_total %>">
+      <div class="total_points_holder toggle_for_hide_points <%= rubric_association&.hide_points ? 'hidden' : '' %>"
+        style="float: <%= direction('right') %>; <%= hidden if rubric_association && rubric_association.hide_score_total %>">
         <span><%= before_label :total_points, "Total Points" %>
           <% ot(:out_of, "%{points} *out of %{total}*", :points => capture { %>
             <span class="rubric_total">
@@ -179,8 +185,18 @@
       <form id="edit_rubric_form" class="edit-rubric-form no-margin-bottom">
         <div class="rubric_custom_ratings" style="<%= hidden unless @assignment %>">
           <input type="checkbox" id="rubric_custom_rating" class="rubric_custom_rating" <%= 'checked' if rubric && rubric.free_form_criterion_comments %>/>
-          <label for="rubric_custom_rating"><%= t 'labels.custom_rating', "I'll write free-form comments when assessing students" %></label>
+          <label for="rubric_custom_rating"><%= t "I'll write free-form comments when assessing students" %></label>
         </div>
+        <% if @domain_root_account.feature_enabled?(:non_scoring_rubrics) %>
+          <div class="hide_points" style="<%= hidden unless @assignment %>">
+            <input type="checkbox" id="hide_points" class="hide_points_checkbox" <%= 'checked' if rubric_association&.hide_points %>/>
+            <label for="hide_points"><%= t "Remove points from rubric" %></label>
+          </div>
+          <div class="hide_outcome_results" style="<%= hidden unless @assignment %>">
+            <input type="checkbox" id="hide_outcome_results" class="hide_outcome_results_checkbox" <%= 'checked' if rubric_association&.hide_outcome_results %>/>
+            <label for="hide_outcome_results"><%= t "Don't post Outcomes results to Learning Mastery Gradebook" %></label>
+          </div>
+        <% end %>
         <% if show_grading %>
           <div class="rubric_grading" style="<%= hidden unless @assignment %>">
             <input type="checkbox" id="grading_rubric" class="grading_rubric_checkbox" <%= 'checked' if rubric_association && rubric_association.use_for_grading %>/>
@@ -189,7 +205,7 @@
         <% end %>
         <div class="totalling_rubric" style="<%= hidden unless @assignment %>">
           <input type="checkbox" id="totalling_rubric" class="totalling_rubric_checkbox" <%= 'checked' if rubric_association && rubric_association.hide_score_total %>/>
-          <label for="totalling_rubric"><%= t 'labels.totallying_rubric', "Hide score total for assessment results" %></label>
+          <label for="totalling_rubric"><%= t "Hide score total for assessment results" %></label>
         </div>
         <div class="ic-Action-header ic-Action-header--half-margin">
           <div class="ic-Action-header__Primary">

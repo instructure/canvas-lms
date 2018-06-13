@@ -151,5 +151,21 @@ describe SIS::CSV::TermImporter do
     expect(t1.enrollment_dates_overrides.where(:enrollment_type => "StudentEnrollment").first).to be_nil
   end
 
+  it 'should create rollback data' do
+    @account.enable_feature!(:refactor_of_sis_imports)
+    process_csv_data_cleanly(
+      "term_id,name,status,start_date,end_date",
+      "T001,Winter11,active,2011-1-05 00:00:00,2011-4-14 00:00:00"
+    )
+    batch2 = @account.sis_batches.create! { |sb| sb.data = {} }
+    process_csv_data_cleanly(
+      "term_id,name,status,start_date,end_date",
+      "T001,Winter11,deleted,2011-1-05 00:00:00,2011-4-14 00:00:00",
+      batch: batch2
+    )
+    expect(batch2.roll_back_data.where(updated_workflow_state: 'deleted').count).to eq 1
+    batch2.restore_states_for_batch
+    expect(@account.enrollment_terms.where(sis_source_id: 'T001').take.workflow_state).to eq 'active'
+  end
 
 end

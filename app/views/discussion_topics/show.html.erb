@@ -127,7 +127,7 @@
                   <li><a href="<%= context_url(@context, :context_discussion_topic_url, @topic.id) %>" class="delete_discussion" data-method="delete" rel="nofollow" data-confirm="<%= t :confirm_delete_discussion, 'Are you sure you want to delete this discussion?' %>"><i class="icon-trash"></i> <%= t :delete, 'Delete' %></a></li>
                 <% end %>
 
-                <% if @presenter.can_grade?(@current_user) && @presenter.allows_speed_grader? %>
+                <% if @presenter.can_grade?(@current_user) && @presenter.allows_speed_grader? && @topic.assignment.can_view_speed_grader?(@current_user) %>
                   <li><a href="<%= context_url(@topic.assignment.context,
                                                :speed_grader_context_gradebook_url,
                                                :assignment_id => @topic.assignment.id) %>"

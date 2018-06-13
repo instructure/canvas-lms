@@ -77,6 +77,36 @@ describe SIS::CSV::GroupImporter do
     expect(groups.map(&:workflow_state)).to eq %w(available)
   end
 
+  it 'should create rollback data' do
+    @account.enable_feature!(:refactor_of_sis_imports)
+    batch1 = @account.sis_batches.create! {|sb| sb.data = {}}
+    process_csv_data_cleanly(
+      "group_id,name,status",
+      "G001,Group 1,available",
+      batch: batch1
+    )
+    batch2 = @account.sis_batches.create! { |sb| sb.data = {} }
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "U001,user1,User,Uno,user@example.com,active"
+    )
+    process_csv_data_cleanly(
+      "group_id,user_id,status",
+      "G001,U001,accepted",
+      batch: batch2
+    )
+    batch3 = @account.sis_batches.create! {|sb| sb.data = {}}
+    process_csv_data_cleanly(
+      "group_id,name,status",
+      "G001,Group 1,deleted",
+      batch: batch3
+    )
+    expect(batch1.roll_back_data.where(previous_workflow_state: 'non-existent').count).to eq 1
+    expect(batch3.roll_back_data.where(updated_workflow_state: 'deleted').count).to eq 2
+    batch3.restore_states_for_batch
+    expect(@account.all_groups.where(sis_source_id: 'G001').take.workflow_state).to eq 'available'
+  end
+
   it "should update group attributes" do
     sub = @account.sub_accounts.create!(name: 'sub')
     sub.update_attribute('sis_source_id', 'A002')

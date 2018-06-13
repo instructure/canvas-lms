@@ -19,8 +19,8 @@
 import React from 'react'
 import TestUtils from 'react-addons-test-utils'
 import ReactDOM from 'react-dom'
-import Image from '@instructure/ui-core/lib/components/Image'
-import Link from '@instructure/ui-core/lib/components/Link'
+import Image from '@instructure/ui-elements/lib/components/Img'
+import Link from '@instructure/ui-elements/lib/components/Link'
 
 import DeveloperKey from 'jsx/developer_keys/DeveloperKey';
 

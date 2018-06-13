@@ -20,12 +20,12 @@ import I18n from 'i18n!blueprint_settings'
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
-import Tray from '@instructure/ui-core/lib/components/Tray'
-import Button from '@instructure/ui-core/lib/components/Button'
-import Text from '@instructure/ui-core/lib/components/Text'
-import Heading from '@instructure/ui-core/lib/components/Heading'
-import IconBlueprintSolid from 'instructure-icons/lib/Solid/IconBlueprintSolid'
-import IconXSolid from 'instructure-icons/lib/Solid/IconXSolid'
+import Tray from '@instructure/ui-overlays/lib/components/Tray'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import Text from '@instructure/ui-elements/lib/components/Text'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
+import IconBlueprint from '@instructure/ui-icons/lib/Solid/IconBlueprint'
+import IconXSolid from '@instructure/ui-icons/lib/Solid/IconX'
 
 export default class BlueprintCourseSidebar extends Component {
   static propTypes = {
@@ -75,7 +75,7 @@ export default class BlueprintCourseSidebar extends Component {
         <div className="bcs__trigger">
           <Button buttonRef={(c) => { this.openBtn = c }} variant="icon-inverse" onClick={this.open}>
             <Text color="primary-inverse" size="large">
-              <IconBlueprintSolid title={I18n.t('Open sidebar')} />
+              <IconBlueprint title={I18n.t('Open sidebar')} />
             </Text>
           </Button>
         </div>
@@ -86,7 +86,6 @@ export default class BlueprintCourseSidebar extends Component {
           placement="end"
           onEntered={this.handleOpen}
           onExiting={this.handleClose}
-          applicationElement={() => document.getElementById('application')}
           contentRef={this.props.contentRef}
         >
           <div className="bcs__content">
@@ -99,7 +98,7 @@ export default class BlueprintCourseSidebar extends Component {
                 </Button>
               </div>
               <Heading color="primary-inverse" level="h3">
-                <IconBlueprintSolid /><span style={{marginLeft: '10px'}}>{I18n.t('Blueprint')}</span>
+                <IconBlueprint /><span style={{marginLeft: '10px'}}>{I18n.t('Blueprint')}</span>
               </Heading>
             </header>
             <div className="bcs__body">

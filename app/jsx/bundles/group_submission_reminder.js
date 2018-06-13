@@ -21,7 +21,7 @@ import I18n from 'i18n!assignments'
 import {string} from 'prop-types'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Alert from '@instructure/ui-core/lib/components/Alert'
+import Alert from '@instructure/ui-alerts/lib/components/Alert'
 
 
 export default function GroupSubmissionAlert ({groupType}) {

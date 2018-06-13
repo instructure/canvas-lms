@@ -142,4 +142,32 @@ describe SIS::CSV::GroupCategoryImporter do
       "Gc002,A001,Group Cat 2,deleted")
     expect(importer.errors).to eq []
   end
+
+  it 'should create rollback data' do
+    @account.enable_feature!(:refactor_of_sis_imports)
+    batch1 = @account.sis_batches.create! {|sb| sb.data = {}}
+    process_csv_data_cleanly(
+      "group_category_id,account_id,category_name,status",
+      "Gc003,A001,Group Cat 2,active",
+      batch: batch1
+    )
+    batch2 = @account.sis_batches.create! { |sb| sb.data = {} }
+    process_csv_data_cleanly(
+      "group_category_id,account_id,category_name,status",
+      "Gc003,A001,Group Cat 2,deleted",
+      batch: batch2
+    )
+    batch3 = @account.sis_batches.create! {|sb| sb.data = {}}
+    process_csv_data_cleanly(
+      "group_category_id,account_id,category_name,status",
+      "Gc003,A001,Group Cat 2,active",
+      batch: batch3
+    )
+    expect(batch1.roll_back_data.where(previous_workflow_state: 'non-existent').count).to eq 1
+    expect(batch2.roll_back_data.where(updated_workflow_state: 'deleted').count).to eq 1
+    expect(batch3.roll_back_data.where(updated_workflow_state: 'active').count).to eq 1
+    batch3.restore_states_for_batch
+    expect(@account.all_group_categories.where(sis_source_id: 'Gc003').take.deleted_at).not_to be_nil
+  end
+
 end

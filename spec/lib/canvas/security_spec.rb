@@ -55,6 +55,13 @@ describe Canvas::Security do
           allow(JSON::JWT).to receive_messages(new: jwt)
           Canvas::Security.create_jwt({ a: 1 }, nil, "mykey")
         end
+
+        it "should encode with supplied algorithm" do
+          jwt = double
+          expect(jwt).to receive(:sign).with("mykey", :HS512).and_return("sometoken")
+          allow(JSON::JWT).to receive_messages(new: jwt)
+          Canvas::Security.create_jwt({a: 1}, nil, "mykey", :HS512)
+        end
       end
 
       describe ".create_encrypted_jwt" do

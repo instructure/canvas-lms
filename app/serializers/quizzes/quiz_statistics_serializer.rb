@@ -166,7 +166,7 @@ module Quizzes
     private
 
     def show_speed_grader?
-      quiz.assignment.present? && quiz.published? && context.allows_speed_grader?
+      quiz.assignment.present? && quiz.published? && quiz.assignment.can_view_speed_grader?(current_user)
     end
 
     def student_analysis_report

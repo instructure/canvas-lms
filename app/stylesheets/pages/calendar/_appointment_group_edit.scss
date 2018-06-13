@@ -37,7 +37,10 @@
 }
 
 .sectionItem {
-  padding-#{direction(left)}: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-#{direction(left)}: 60px;
 }
 
 .AppointmentGroupList__List {
@@ -109,4 +112,42 @@
     display: inline-block;
     font-size: 0.9em;
   }
+}
+
+.CourseListItem {
+  font-family: "LatoWeb", "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.CourseListItem-horizontal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  word-break: break-all;
+}
+
+.CourseListItem-sections {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.CourseListItem-item {
+  padding: 0 8px;
+}
+
+.CourseListItem-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.CourseListItem-section-item {
+  padding: 0 12px;
+  word-break: break-all;
+}
+
+
+.CourseListItem-item-checkbox {
+  margin: 0 12px;
 }

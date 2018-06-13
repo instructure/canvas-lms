@@ -45,7 +45,8 @@
           <i class="icon-gradebook" aria-hidden="true"></i>
           <span class="screenreader-only" aria-hidden="true"><%= t("Gradebook") %></span>
         </a>
-        <button type="button" data-muted="<%= @assignment.muted? %>" id="mute_link" class="Button Button--icon-action gradebookActions__Button" title="<%= t('Mute/Unmute Assignment') %>">
+        <button type="button" data-muted="<%= @assignment.muted? %>" id="mute_link"
+          class="Button Button--icon-action gradebookActions__Button<%= @disable_unmute_assignment ? " disabled" : "" %>" title="<%= t('Mute/Unmute Assignment') %>">
           <i class=<%= @assignment.muted? ? "icon-muted" : "icon-unmuted"  %> aria-hidden="true"></i>
           <span class="screenreader-only" aria-hidden="true">
             <%= @assignment.muted? ? t("Unmute Assignment") : t("Mute Assignment") %>
@@ -229,9 +230,15 @@
             <label><%= t("Submitted Files") %>: <span class="labelText--not-bold"><%= t("(click to load)") %></span>&nbsp;</label>
             <div id="submission_files_list">
               <div id="submission_file_hidden"  class="submission-file" style='display:none;'>
-                <a class="submission-file-download icon-download" title="<%= t("Download this file") %>" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{submissionId}}", :download => "{{attachmentId}}") %>"></a>
+                <%
+                  resource = anonymous_grading ?  :context_assignment_anonymous_submission_url : :context_assignment_submission_url
+                  submission_id_or_anonymous_id = anonymous_grading ? "{{anonymousId}}" : "{{submissionId}}"
+                  download_url = context_url(@context, resource, @assignment.id, submission_id_or_anonymous_id, download: "{{attachmentId}}")
+                  preview_url = context_url(@context, resource, @assignment.id, submission_id_or_anonymous_id, download: "{{attachmentId}}", inline: 1)
+                %>
+                <a class="submission-file-download icon-download" title="<%= t("Download this file") %>" href="<%= download_url %>"></a>
                 <span class="turnitin_score_container"></span>
-                <a class="display_name no-hover" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{submissionId}}", :download => "{{attachmentId}}", :inline => 1) %>" title="<%= t('titles.preview_file', "Preview this File") %>">???</a>
+                <a class="display_name no-hover" href="<%= preview_url %>" title="<%= t('titles.preview_file', "Preview this File") %>">???</a>
               </div>
             </div>
             <% if @assignment.assignment_configuration_tool_lookup_ids.present? %>

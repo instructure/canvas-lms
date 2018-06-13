@@ -89,7 +89,9 @@ Object.assign(CalendarEvent.prototype, {
   },
 
   fullDetailsURL() {
-    if (this.isAppointmentGroupEvent()) {
+    if (this.object.plannable && this.object.plannable.html_url) {
+      return this.object.plannable.html_url
+    } else if (this.isAppointmentGroupEvent()) {
       return `/appointment_groups/${this.object.appointment_group_id}`
     } else {
       return $.replaceTags(

@@ -1,6 +1,7 @@
 begin
   require 'yard'
   require 'yard-appendix'
+  require 'doc/api/api_scope_markdown_writer.rb'
 
 namespace :doc do
   DOC_DIR     = File.join(%w[public doc api])
@@ -15,6 +16,7 @@ namespace :doc do
   YARD::Rake::YardocTask.new(:api) do |t|
     t.before = proc { FileUtils.rm_rf(API_DOC_DIR) }
     t.before = proc { `script/generate_lti_variable_substitution_markdown` }
+    t.before = proc { `script/generate_api_token_scopes_markdown` }
     t.files = %w[
       app/controllers/**/*.rb
       {gems,vendor}/plugins/*/app/controllers/*.rb
@@ -41,6 +43,12 @@ namespace :doc do
          "See #{DOC_DIR}/index.html"
   end
 
+  task :scopes => :environment do
+    scope_writer = ApiScopeMarkdownWriter.new(
+      TokenScopes.named_scopes.group_by {|route| route[:resource_name]}.freeze
+    )
+    scope_writer.generate_markdown!
+  end
 end
 
 rescue LoadError

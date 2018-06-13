@@ -72,6 +72,10 @@ module.exports = {
     {
       files: ['app/**/*', 'spec/**/*', 'public/**/*'],
       rules: {
+        // Turn off the "absolute-first" rule. Until we get rid of the `compiled/` and `jsx/`
+        // stuff and use real realitive paths it will tell you to do the wrong thing
+        "import/first": ["error", {"absolute-first": false}],
+
         "import/no-amd": "error",
         "import/no-commonjs": "error",
         "import/no-extraneous-dependencies": "off", // allows 'i18n!webzip_exports' and 'compiled/foo/bar'

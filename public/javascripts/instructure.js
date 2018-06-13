@@ -158,7 +158,7 @@ function handleYoutubeLink () {
         var $link = $(this);
         if ( $.trim($link.text()) ) {
           var $span = $("<span class='instructure_file_holder link_holder'/>"),
-                      $scribd_link = $("<a class='file_preview_link' aria-hidden='true' tabindex='-1' href='" + htmlEscape($link.attr('href')) + "' title='" + htmlEscape(I18n.t('titles.preview_document', "Preview the document")) +
+                      $scribd_link = $("<a class='file_preview_link' aria-hidden='true' href='" + htmlEscape($link.attr('href')) + "' title='" + htmlEscape(I18n.t('titles.preview_document', "Preview the document")) +
                           "' style='padding-left: 5px;'><img src='/images/preview.png' alt='" + htmlEscape(I18n.t('titles.preview_document', "Preview the document")) + "'/></a>");
                   $link.removeClass('instructure_scribd_file').before($span).appendTo($span);
                   $span.append($scribd_link);
@@ -359,15 +359,16 @@ function handleYoutubeLink () {
                 public_url: attachment.public_url,
                 attachment_preview_processing: attachment.workflow_state == 'pending_upload' || attachment.workflow_state == 'processing'
               })
-              .prepend(
-                $('<a href="#" style="font-size: 0.8em;" class="hide_file_preview_link">' + htmlEscape(I18n.t('links.minimize_file_preview', 'Minimize File Preview')) + '</a>')
-                .click(function(event) {
-                  event.preventDefault();
-                  $link.show();
-                  $div.remove();
-                  $.trackEvent('hide_embedded_content', 'hide_file_preview');
-                })
-              );
+            var $minimizeLink = $('<a href="#" style="font-size: 0.8em;" class="hide_file_preview_link">' + htmlEscape(I18n.t('links.minimize_file_preview', 'Minimize File Preview')) + '</a>')
+              .click(function(event) {
+                event.preventDefault();
+                $link.show();
+                $link.focus();
+                $div.remove();
+                $.trackEvent('hide_embedded_content', 'hide_file_preview');
+              });
+            $div.prepend($minimizeLink);
+            $minimizeLink.focus();
             $.trackEvent('show_embedded_content', 'show_file_preview');
           }
         }, function() {

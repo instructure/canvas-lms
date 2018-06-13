@@ -20,24 +20,26 @@ module SIS
   class GroupImporter < BaseImporter
 
     def process
-      start = Time.now
+      start = Time.zone.now
       importer = Work.new(@batch, @root_account, @logger)
       Group.process_as_sis(@sis_options) do
         yield importer
       end
-      @logger.debug("Groups took #{Time.now - start} seconds")
-      return importer.success_count
+      SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data) if @batch.using_parallel_importers?
+      @logger.debug("Groups took #{Time.zone.now - start} seconds")
+      importer.success_count
     end
 
-  private
+    private
     class Work
-      attr_accessor :success_count
+      attr_accessor :success_count, :roll_back_data
 
       def initialize(batch, root_account, logger)
         @batch = batch
         @root_account = root_account
         @logger = logger
         @success_count = 0
+        @roll_back_data = []
         @accounts_cache = {}
       end
 
@@ -102,10 +104,18 @@ module SIS
         # only update the name on groups that haven't had their name changed since the last sis import
         group.name = name if name.present? && !group.stuck_sis_fields.include?(:name)
         group.context = context
-        group.sis_batch_id = @batch.id if @batch
+        group.sis_batch_id = @batch.id
         group.workflow_state = status == 'deleted' ? 'deleted' : 'available'
 
         if group.save
+          data = SisBatchRollBackData.build_data(sis_batch: @batch, context: group)
+          @roll_back_data << data if data
+          if status == 'deleted'
+            gms = SisBatchRollBackData.build_dependent_data(sis_batch: @batch,
+                                                            contexts: group.group_memberships,
+                                                            updated_state: 'deleted')
+          end
+          @roll_back_data.push(*gms) if gms
           @success_count += 1
         else
           msg = "A group did not pass validation "

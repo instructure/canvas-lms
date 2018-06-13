@@ -872,7 +872,108 @@ describe ApplicationHelper do
     end
   end
 
+  describe "file_access_developer_key" do
+    context "not on the files domain" do
+      before :each do
+        @files_domain = false
+      end
+
+      it "should return token's developer_key with @access_token set" do
+        user = user_model
+        developer_key = DeveloperKey.create!
+        @access_token = user.access_tokens.where(developer_key_id: developer_key).create!
+        expect(file_access_developer_key).to eql developer_key
+      end
+
+      it "should return nil without @access_token set" do
+        expect(file_access_developer_key).to be nil
+      end
+    end
+
+    context "on the files domain" do
+      before :each do
+        @files_domain = true
+      end
+
+      it "should return developer key from session" do
+        developer_key = DeveloperKey.create!
+        session['file_access_developer_key_id'] = developer_key.id
+        expect(file_access_developer_key).to eql developer_key
+      end
+
+      it "should return nil if developer key in session not set" do
+        expect(file_access_developer_key).to eql nil
+      end
+    end
+  end
+
+  describe "file_access_root_account" do
+    context "not on the files domain" do
+      before :each do
+        @domain_root_account = Account.default
+        @files_domain = false
+      end
+
+      it "should return @domain_root_account" do
+        expect(file_access_root_account).to eql Account.default
+      end
+    end
+
+    context "on the files domain" do
+      before :each do
+        @files_domain = true
+      end
+
+      it "should return root account from session" do
+        session['file_access_root_account_id'] = Account.default.id
+        expect(file_access_root_account).to eql Account.default
+      end
+
+      it "should return nil if root account in session not set" do
+        expect(file_access_root_account).to eql nil
+      end
+    end
+  end
+
+  describe "file_access_oauth_host" do
+    let(:host) { "test.host" }
+
+    context "not on the files domain" do
+      let(:request) { double("request", host_with_port: host) }
+      let(:logged_in_user) { user_model }
+
+      before :each do
+        @files_domain = false
+      end
+
+      it "should return the request's host" do
+        expect(file_access_oauth_host).to eql host
+      end
+    end
+
+    context "on the files domain" do
+      let(:logged_in_user) { user_model }
+
+      before :each do
+        @files_domain = true
+      end
+
+      it "should return the host from the session" do
+        session['file_access_oauth_host'] = host
+        expect(file_access_oauth_host).to eql host
+      end
+
+      it "should return nil if no host in the session" do
+        expect(file_access_oauth_host).to eql nil
+      end
+    end
+  end
+
   describe "file_authenticator" do
+    before :each do
+      @domain_root_account = Account.default
+    end
+
     context "not on the files domain, logged in" do
       before :each do
         @files_domain = false
@@ -893,6 +994,15 @@ describe ApplicationHelper do
 
       it "creates an authenticator for the current host" do
         expect(file_authenticator.oauth_host).to eql current_host
+      end
+
+      it "creates an authenticator aware of the access token if present" do
+        @access_token = logged_in_user.access_tokens.create!
+        expect(file_authenticator.access_token).to eql @access_token
+      end
+
+      it "creates an authenticator aware of the root account" do
+        expect(file_authenticator.root_account).to eql @domain_root_account
       end
     end
 
@@ -916,11 +1026,16 @@ describe ApplicationHelper do
     context "on the files domain with access user" do
       let(:access_user) { user_model }
       let(:real_access_user) { user_model }
+      let(:developer_key) { DeveloperKey.create! }
+      let(:original_host) { 'non-files-domain' }
 
       before :each do
         @files_domain = true
         session['file_access_user_id'] = access_user.id
         session['file_access_real_user_id'] = real_access_user.id
+        session['file_access_root_account_id'] = Account.default.id
+        session['file_access_developer_key_id'] = developer_key.id
+        session['file_access_oauth_host'] = original_host
       end
 
       let(:logged_in_user) { nil }
@@ -935,10 +1050,17 @@ describe ApplicationHelper do
         expect(file_authenticator.acting_as).to eql access_user
       end
 
-      it "creates an authenticator without an oauth host" do
-        # i.e. inst-fs session must already exist. this is not an ideal
-        # limitation, but we don't know where to redirect them for oauth
-        expect(file_authenticator.oauth_host).to be nil
+      it "creates an authenticator with a fake access token for the developer key from the session" do
+        expect(file_authenticator.access_token).not_to eql nil
+        expect(file_authenticator.access_token.global_developer_key_id).to eql developer_key.global_id
+      end
+
+      it "creates an authenticator with the root account from the session" do
+        expect(file_authenticator.root_account).to eql Account.default
+      end
+
+      it "creates an authenticator with the original host from the session" do
+        expect(file_authenticator.oauth_host).to be original_host
       end
     end
 

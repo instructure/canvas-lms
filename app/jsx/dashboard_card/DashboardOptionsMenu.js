@@ -21,89 +21,76 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!dashboard'
 import axios from 'axios'
 
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
-import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
-import { MenuItem, MenuItemGroup, MenuItemSeparator } from '@instructure/ui-core/lib/components/Menu'
-import Button from '@instructure/ui-core/lib/components/Button'
-import IconMoreLine from 'instructure-icons/lib/Line/IconMoreLine'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import Menu, {
+  MenuItem,
+  MenuItemGroup,
+  MenuItemSeparator
+} from '@instructure/ui-menu/lib/components/Menu'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import IconMoreLine from '@instructure/ui-icons/lib/Line/IconMore'
 
 export default class DashboardOptionsMenu extends React.Component {
   static propTypes = {
     view: PropTypes.string,
-    hide_dashcard_color_overlays: PropTypes.bool,
     planner_enabled: PropTypes.bool,
     onDashboardChange: PropTypes.func.isRequired,
     menuButtonRef: PropTypes.func,
   }
 
   static defaultProps = {
-    hide_dashcard_color_overlays: false,
     planner_enabled: false,
     view: 'cards',
     menuButtonRef: () => {},
   }
 
-  constructor (props) {
-    super(props)
-
-    this.state = {
-      colorOverlays: props.hide_dashcard_color_overlays ? [] : ['colorOverlays'],
-    }
+  state = {
+    showColorOverlays: !(ENV && ENV.PREFERENCES && ENV.PREFERENCES.hide_dashcard_color_overlays)
   }
 
-  handleViewOptionSelect = (e, newSelected) => {
-    if (newSelected.length === 0) {
-      return
-    }
-    this.props.onDashboardChange(newSelected[0])
+  handleViewOptionSelect = (e, [newlySelectedView]) => {
+    if (this.props.view === newlySelectedView) return
+    this.props.onDashboardChange(newlySelectedView)
   }
 
-  handleColorOverlayOptionSelect = (e, newSelected) => {
-    this.setState({
-      colorOverlays: newSelected
-    }, this.toggleColorOverlays)
+  handleColorOverlayOptionSelect = showColorOverlays => {
+    if (showColorOverlays === this.state.showColorOverlays) return
 
-    this.postToggleColorOverlays()
+    this.setState({showColorOverlays}, () => {
+      this.toggleColorOverlays()
+      this.postToggleColorOverlays()
+    })
   }
 
-  toggleColorOverlays () {
-    const dashcardHeaders = Array.from(document.getElementsByClassName('ic-DashboardCard__header'))
-    dashcardHeaders.forEach((dashcardHeader) => {
-      const dashcardImageHeader = dashcardHeader.getElementsByClassName('ic-DashboardCard__header_image')[0]
+  toggleColorOverlays() {
+    document.querySelectorAll('.ic-DashboardCard__header').forEach(dashcardHeader => {
+      const dashcardImageHeader = dashcardHeader.querySelector('.ic-DashboardCard__header_image')
       if (dashcardImageHeader) {
-        const dashcardOverlay = dashcardImageHeader.getElementsByClassName('ic-DashboardCard__header_hero')[0]
-        dashcardOverlay.style.opacity = this.colorOverlays ? 0.6 : 0
+        const dashcardOverlay = dashcardImageHeader.querySelector('.ic-DashboardCard__header_hero')
+        dashcardOverlay.style.opacity = this.state.showColorOverlays ? 0.6 : 0
 
-        const headerButtonBg = dashcardHeader.getElementsByClassName('ic-DashboardCard__header-button-bg')[0]
-        headerButtonBg.style.opacity = this.colorOverlays ? 0 : 1
+        const headerButtonBg = dashcardHeader.querySelector('.ic-DashboardCard__header-button-bg')
+        headerButtonBg.style.opacity = this.state.showColorOverlays ? 0 : 1
       }
     })
   }
 
-  postToggleColorOverlays () {
-    axios.post('/users/toggle_hide_dashcard_color_overlays');
+  postToggleColorOverlays() {
+    axios.post('/users/toggle_hide_dashcard_color_overlays')
   }
 
-  get cardView () {
-    return this.props.view === 'cards'
-  }
-
-  get colorOverlays () {
-    return this.state.colorOverlays.includes('colorOverlays')
-  }
-
-  render () {
-    const { cardView } = this
+  render() {
+    const cardView = this.props.view === 'cards'
 
     return (
-      <PopoverMenu
+      <Menu
         trigger={
           <Button variant="icon" buttonRef={this.props.menuButtonRef}>
             <ScreenReaderContent>{I18n.t('Dashboard Options')}</ScreenReaderContent>
             <IconMoreLine />
           </Button>
         }
-        contentRef={(el) => { this.menuContentRef = el; }}
+        contentRef={el => (this.menuContentRef = el)}
       >
         <MenuItemGroup
           label={I18n.t('Dashboard View')}
@@ -126,15 +113,16 @@ export default class DashboardOptionsMenu extends React.Component {
                 {I18n.t('Toggle course card color overlays')}
               </ScreenReaderContent>
             }
-            onSelect={this.handleColorOverlayOptionSelect}
-            selected={this.state.colorOverlays}
           >
-            <MenuItem value="colorOverlays">
-              { I18n.t('Color Overlay') }
+            <MenuItem
+              onSelect={(_e, _, isSelected) => this.handleColorOverlayOptionSelect(isSelected)}
+              selected={this.state.showColorOverlays}
+            >
+              {I18n.t('Color Overlay')}
             </MenuItem>
           </MenuItemGroup>
         )}
-      </PopoverMenu>
+      </Menu>
     )
   }
 }

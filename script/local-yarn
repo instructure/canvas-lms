@@ -23,7 +23,12 @@ for path in $(ls -1 {gems/{,plugins/},packages/}*/package.json 2> /dev/null); do
     continue
   fi
 
-  echo "running yarn $1 for $path w/ NODE_ENV=$NODE_ENV"
-  yarn $1
+  if [[ $1 = "install" ]]; then
+    echo "running yarn $1 --pure-lockfile for $path w/ NODE_ENV=$NODE_ENV"
+    yarn $1 --pure-lockfile
+  else
+    echo "running yarn $1 for $path w/ NODE_ENV=$NODE_ENV"
+    yarn $1
+  fi
   popd > /dev/null
 done

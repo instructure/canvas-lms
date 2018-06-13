@@ -19,9 +19,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!new_user_tutorial'
-import Button from '@instructure/ui-core/lib/components/Button'
-import Heading from '@instructure/ui-core/lib/components/Heading'
-import Modal, { ModalHeader, ModalBody, ModalFooter } from '@instructure/ui-core/lib/components/Modal'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
+import Modal, { ModalHeader, ModalBody, ModalFooter } from '@instructure/ui-overlays/lib/components/Modal'
 import axios from 'axios'
 
   class ConfirmEndTutorialDialog extends React.Component {
@@ -58,7 +58,6 @@ import axios from 'axios'
           onDismiss={this.props.handleRequestClose}
           label={I18n.t('End Course Set-up Tutorial Dialog')}
           closeButtonLabel={I18n.t('Close')}
-          applicationElement={() => document.getElementById('application')}
         >
           <ModalHeader>
             <Heading>{I18n.t('End Course Set-up Tutorial')}</Heading>
