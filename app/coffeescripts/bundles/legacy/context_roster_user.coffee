@@ -35,10 +35,9 @@ define [
       event.preventDefault()
       $enrollment = $(this).parents(".enrollment")
       $.ajaxJSON $(this).attr("href"), "POST", {}, (data) ->
-        $enrollment.find(".conclude_enrollment_link_holder").slideDown()
-        $enrollment.find(".unconclude_enrollment_link_holder").slideUp()
-        $enrollment.find(".completed_at_holder").slideUp()
-
+        $(".conclude_enrollment_link_holder").show()
+        $(".unconclude_enrollment_link_holder").hide()
+        $(".completed_at_holder").hide()
 
     $(".conclude_enrollment_link").click (event) ->
       event.preventDefault()
@@ -47,8 +46,8 @@ define [
         url: $(this).attr("href")
         success: (data) ->
           $(this).undim()
-          $(this).find(".conclude_enrollment_link_holder").slideUp()
-          $(this).find(".unconclude_enrollment_link_holder").slideDown()
+          $(".conclude_enrollment_link_holder").hide()
+          $(".unconclude_enrollment_link_holder").show()
 
     $(".elevate_enrollment_link,.restrict_enrollment_link").click (event) ->
       limit = (if $(this).hasClass("restrict_enrollment_link") then "1" else "0")
@@ -77,5 +76,3 @@ define [
       event.preventDefault()
       $(".more_user_information").slideDown()
       $(this).hide()
-
-
