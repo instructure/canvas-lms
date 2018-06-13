@@ -70,6 +70,42 @@ PactConfig::Consumers::ALL.each do |consumer|
       end
     end
 
+    provider_state 'a user with a robust calendar event' do
+      set_up do
+        course_with_teacher(:active_all => true)
+        @ag = AppointmentGroup.create!(
+          title: "Rohan's Special Day",
+          location_name: "bollywood",
+          location_address: "420 Baker Street",
+          participants_per_appointment: 4,
+          contexts: [@course],
+          participant_visibility: "protected",
+          new_appointments: [
+            ["2012-01-01 12:59:59", "2012-01-01 13:59:59"],
+            ["2012-01-01 13:59:59", "2012-01-01 14:59:59"]
+          ]
+        )
+        course_with_student(course: @course, active_all: true)
+        @ag.publish!
+        @event = @ag.appointments.first
+        @event.update!(all_day: true, all_day_date: '2015-09-22', description: "", location_name: "", location_address: "")
+        @student1 = @student
+        cat = @course.group_categories.create(name: "foo")
+        g = cat.groups.create(:context => @course)
+        g.users << @student
+        @event.reserve_for(@student1, @student1)
+        course_with_student(course: @course, active_all: true)
+        @student2 = @student
+        @event.reserve_for(@student2, @student2)
+        
+        Pseudonym.create!(user: @student, unique_id: 'testuser@instructure.com')
+        token = @student.access_tokens.create!().full_token
+
+        provider_param :token, token
+        provider_param :event_id, @event.id.to_s
+      end
+    end
+
     provider_state 'a user with many calendar events' do
       set_up do
         user_factory(name: 'Bob', active_user: true)
@@ -91,25 +127,25 @@ PactConfig::Consumers::ALL.each do |consumer|
 
     provider_state 'a user with many notifications' do
       set_up do
-        user = user_factory(:active_all => true)
-        account = account_model
-        @account_user = AccountUser.create(:account => account, :user => user)
+        @user = user_factory(:active_all => true)
+        @account = account_model
+        @account_user = AccountUser.create(:account => @account, :user => @user)
 
-        Pseudonym.create!(user:user, unique_id: 'testaccountuser@instructure.com')
-        token = user.access_tokens.create!().full_token
+        Pseudonym.create!(user:@user, unique_id: 'testaccountuser@instructure.com')
+        token = @user.access_tokens.create!().full_token
 
         @notification1 = AccountNotification.create!(
-          account: account, subject: 'test subj1', message: 'test msg', start_at: Time.zone.now, end_at: 3.days.from_now
+          account: @account, subject: 'test subj1', message: 'test msg', start_at: Time.zone.now, end_at: 3.days.from_now
         )
         @notification2 = AccountNotification.create!(
-          account: account, subject: 'test subj2', message: 'test msg', start_at: Time.zone.now, end_at: 3.days.from_now
+          account: @account, subject: 'test subj2', message: 'test msg', start_at: Time.zone.now, end_at: 3.days.from_now
         )
         @notification3 = AccountNotification.create!(
-          account: account, subject: 'test subj3', message: 'test msg', start_at: Time.zone.now, end_at: 3.days.from_now
+          account: @account, subject: 'test subj3', message: 'test msg', start_at: Time.zone.now, end_at: 3.days.from_now
         )
 
         provider_param :token, token
-        provider_param :account_user_id, user.id.to_s
+        provider_param :account_user_id, @user.id.to_s
         provider_param :notification1_id, @notification1.id.to_s
         provider_param :notification2_id, @notification2.id.to_s
         provider_param :notification3_id, @notification3.id.to_s
