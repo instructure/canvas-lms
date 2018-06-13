@@ -1,4 +1,4 @@
-# This YAML file is auto-generated from a Transifex import.
+# This YAML file is auto-generated from a translation import.
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 sv-x-k12: 
@@ -11118,6 +11118,10 @@ sv-x-k12:
       description: "Diigo integrering"
       name: Diigo
     diigo_settings: 
+      description: |-
+          Du måste registrera en [ny app på Diigo](%{diigo_url}).
+          
+          * Skriv ner API-nyckeln efter att du sparat din app
       labels: 
         api_key: API-nyckel
     dim_dim_settings: 
