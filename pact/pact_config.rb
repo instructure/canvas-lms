@@ -77,11 +77,11 @@ module PactConfig
       1234
     end
 
-    private
-
     def jenkins_build?
       !ENV['JENKINS_URL'].nil?
     end
+
+    private
 
     def protocol
       protocol = jenkins_build? ? 'https' : 'http'
