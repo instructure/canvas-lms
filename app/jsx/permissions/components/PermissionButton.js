@@ -161,16 +161,26 @@ export default class PermissionButton extends Component {
     }
   }
 
-  renderButton = () => (
-    <button
-      ref={this.setupButtonRef}
-      onClick={this.state.showMenu ? this.closeMenu : this.openMenu}
-      className={this.props.permission.readonly ? 'ic-disabled_permission_button' : null}
-      disabled={this.props.permission.readonly}
-    >
-      {this.getCachedButton(this.props.permission.enabled)}
-    </button>
-  )
+  renderButton = () => {
+    // We cannot set this as the id, as when this button is a trigger for the
+    // instui menu component, it eats the id from this button and replaces it
+    // with it's own id. We only have this here for selenium testing
+    let classes = `${this.props.permissionName}_${this.props.inTray ? 'tray' : 'table'}_button`
+    if (this.props.permission.readonly) {
+      classes += ' ic-disabled_permission_button'
+    }
+
+    return (
+      <button
+        ref={this.setupButtonRef}
+        onClick={this.state.showMenu ? this.closeMenu : this.openMenu}
+        className={classes}
+        disabled={this.props.permission.readonly}
+      >
+        {this.getCachedButton(this.props.permission.enabled)}
+      </button>
+    )
+  }
 
   renderMenu = button => (
     <Menu
@@ -238,7 +248,7 @@ export default class PermissionButton extends Component {
             })
           }
         >
-          <Text>{I18n.t('Disable')}</Text>
+          <Text as="span">{I18n.t('Disable')}</Text>
         </MenuItem>
         <MenuItem
           id="permission_table_disable_and_lock_menu_item"

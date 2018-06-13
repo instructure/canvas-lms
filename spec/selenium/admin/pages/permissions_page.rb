@@ -54,14 +54,13 @@ class PermissionsIndex
     def role_header
       f('.ic-permissions__top-header')
     end
-
     def role_link(role)
       f("#user_#{role.id}")
     end
 
     # this is the button/link that opens the tray
-    def permission_link(permission)
-      f("##{permission.permission_name}")
+    def permission_link(permission_name)
+      f("#permission_#{permission_name}")
     end
 
     # this applies to parent permissions only
@@ -69,12 +68,16 @@ class PermissionsIndex
       f("##{permission_name}_role_#{role_id}")
     end
 
-    def permission_edit_tray_button(permission_name, role_id)
+    def permission_tray_button(permission_name, role_id)
       ff("##{permission_name}_#{role_id}").last
     end
 
     def permission_menu_item(item_name)
       f("#permission_table_#{item_name}_menu_item")
+    end
+
+    def permission_menu(permission_name)
+      f(".#{permission_name}_tray_button")
     end
 
     def new_role_name_input
@@ -101,7 +104,7 @@ class PermissionsIndex
       f("#permissions-add-tray-submit-button")
     end
 
-    def edit_role_tray_permissoin_state(permission, role)
+    def role_tray_permission_state(permission, role)
       icon = ff("##{permission}_#{role} svg").first.attribute('name')
       state = ""
       if icon == "IconTrouble"
@@ -112,9 +115,19 @@ class PermissionsIndex
       state
     end
 
-    def permission_state(permission, role)
+    def grid_permission_state(permission, role)
+      icons = ff("##{permission}_#{role} svg")
+      if icons[icons.length - 2].attribute('name') == "IconTrouble"
+        state = "Disabled"
+      elsif icons[cons.length - 2].attribute('name') == "IconPublish"
+        state = "Enabled"
+      end
+      state
+    end
+
+    def permission_state(permission_name, role)
       state = ""
-      icons = ff('svg', permission_cell(permission, role))
+      icons = ff('svg', permission_cell(permission_name, role))
       icons.each do |icon|
         if icon.name == "IconPublish"
           state = "Enabled" + state
@@ -126,7 +139,6 @@ class PermissionsIndex
       end
     end
 
-
     # eventually add a section for the expanded permissions
 
     # ---------------------- Actions ----------------------
@@ -134,8 +146,12 @@ class PermissionsIndex
       permission_tab(tab_name).click
     end
 
-    def disable_edit_tray_permission(permission_name, role_id)
-      permission_edit_tray_button(permission_name, role_id).click()
+    def close_tray
+      close_tray_button.click
+    end
+
+    def disable_tray_permission(permission_name, role_id)
+      permission_tray_button(permission_name, role_id).click()
       ff('[role="menuitemradio"]')[2].click()
     end
 
@@ -176,6 +192,10 @@ class PermissionsIndex
     def change_permission(permission, role_id, setting)
       permission_cell(permission, role_id).click
       permission_menu_item(setting).click
+    end
+
+    def open_permission_tray(permission_name)
+      permission_link(permission_name).click
     end
   end
 end

@@ -50,12 +50,12 @@ describe "permissions index" do
 
     it "updates the permission to the correct section" do
       skip("because landon said so")
-      button_state = PermissionsIndex.edit_role_tray_permissoin_state("read_announcements", @custom_student_role.id)
+      button_state = PermissionsIndex.role_tray_permission_state("read_announcements", @custom_student_role.id)
       expect(button_state).to eq('Enabled')
       PermissionsIndex.open_edit_role_tray(@custom_student_role)
-      PermissionsIndex.disable_edit_tray_permission("read_announcements", @custom_student_role.id)
+      PermissionsIndex.disable_tray_permission("read_announcements", @custom_student_role.id)
       wait_for_children("#flashalert_message_holder")
-      button_state = PermissionsIndex.edit_role_tray_permissoin_state("read_announcements", @custom_student_role.id)
+      button_state = PermissionsIndex.role_tray_permission_state("read_announcements", @custom_student_role.id)
       expect(button_state).to eq('Disabled')
     end
   end
@@ -150,6 +150,25 @@ describe "permissions index" do
       PermissionsIndex.visit(subaccount)
       expect(PermissionsIndex.permission_cell(permission_name, student_role.id).find('button')).
         to have_class('disabled')
+    end
+  end
+
+  context "in the permissions tray" do
+    before :each do
+      @account = Account.default
+      admin_logged_in
+      @role = custom_teacher_role('test role', account: @account)
+
+      @permission_name = 'manage_students'
+      PermissionsIndex.visit(@account)
+    end
+
+    it "updates a permission when changed in the tray" do
+      PermissionsIndex.open_permission_tray(@permission_name)
+      PermissionsIndex.disable_tray_permission(@permission_name, @role.id)
+
+      expect{PermissionsIndex.role_tray_permission_state(@permission_name, @role.id)}.to become('Disabled')
+      expect{PermissionsIndex.grid_permission_state(@permission_name, @role.id)}.to become('Disabled')
     end
   end
 end

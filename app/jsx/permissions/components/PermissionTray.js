@@ -41,7 +41,13 @@ export default function PermissionTray(props) {
       size="small"
       placement="end"
     >
-      <Button variant="icon" size="small" margin="small 0 0 xx-small" onClick={props.hideTray}>
+      <Button
+        id="close"
+        variant="icon"
+        size="small"
+        margin="small 0 0 xx-small"
+        onClick={props.hideTray}
+      >
         <IconX title={I18n.t('Close')} />
       </Button>
 
