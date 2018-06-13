@@ -27,7 +27,7 @@ describe('Sections Autocomplete', () => {
 
   it('renders SectionsAutocomplete', () => {
     const wrapper = shallow(<SectionsAutocomplete {...defaultProps()} />)
-    const renderedAutocomplete = wrapper.find('Autocomplete')
+    const renderedAutocomplete = wrapper.find('Select')
     expect(renderedAutocomplete).toHaveLength(1)
   })
 
