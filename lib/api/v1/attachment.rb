@@ -268,7 +268,11 @@ module Api::V1::Attachment
         progress.process_job(
           @attachment,
           :clone_url,
-          { n_strand: 'file_download', preserve_method_args: true },
+          {
+            n_strand: 'file_download',
+            preserve_method_args: true,
+            priority: Delayed::HIGH_PRIORITY
+          },
           params[:url],
           on_duplicate,
           opts[:check_quota],
