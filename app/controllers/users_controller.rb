@@ -1195,10 +1195,14 @@ class UsersController < ApplicationController
       @enrollments.each { |e| e.user = @user }
 
       respond_to do |format|
-        format.html
-        format.json {
+        format.html do
+          js_env(CONTEXT_USER_DISPLAY_NAME: @user.short_name,
+                 USER_ID: @user.id)
+        end
+        format.json do
           render :json => user_json(@user, @current_user, session, %w{locale avatar_url},
-                                    @current_user.pseudonym.account) }
+                                    @current_user.pseudonym.account)
+        end
       end
     end
   end

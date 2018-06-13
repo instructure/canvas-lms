@@ -21,11 +21,12 @@ import { shallow } from 'enzyme'
 import moxios from 'moxios'
 import GeneratePairingCode from 'jsx/profiles/GeneratePairingCode'
 
+const defaultProps = {
+  userId: '1'
+}
+
 beforeAll(() => {
   moxios.install()
-  window.ENV = {
-    current_user: { id: '1' }
-  }
 })
 
 afterAll(() => {
@@ -33,7 +34,7 @@ afterAll(() => {
 })
 
 it('renders the button and modal', () => {
-  const tree = shallow(<GeneratePairingCode />)
+  const tree = shallow(<GeneratePairingCode {...defaultProps} />)
 
   const button = tree.find('div > Button')
   expect(button.exists()).toEqual(true)
@@ -57,7 +58,7 @@ it('Shows the pairing code in the modal after clicking the button', () => {
     }
   })
 
-  const tree = shallow(<GeneratePairingCode />)
+  const tree = shallow(<GeneratePairingCode {...defaultProps} />)
 
   const button = tree.find('div > Button')
   button.simulate('click')
@@ -86,7 +87,7 @@ it('Show an error in the modal if the pairing code fails to generate', () => {
 })
 
 it('Shows the loading spinner while the pairing code is being generated', () => {
-  const tree = shallow(<GeneratePairingCode />)
+  const tree = shallow(<GeneratePairingCode {...defaultProps} />)
   tree.setState({ gettingPairingCode: true })
 
   const spinner = tree.find('Spinner')
@@ -109,4 +110,12 @@ it('clicking the ok button will close the modal', () => {
   const okButton = tree.find('ModalFooter Button')
   okButton.simulate('click')
   expect(tree.find('Modal').props().open).toEqual(false)
+})
+
+it('should use the name in the text when it is provided', () => {
+  const tree = shallow(<GeneratePairingCode {...defaultProps} name='George' />)
+  tree.setState({ showModal: true })
+
+  const text = tree.find('ModalBody > Text').props().children
+  expect(text.includes('George')).toEqual(true)
 })

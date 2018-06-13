@@ -59,7 +59,7 @@
           INTERNATIONAL_SMS_ENABLED: @user.account.feature_enabled?(:international_sms)
 %>
 <% js_bundle :profile %>
-<% css_bundle :profile_edit %>
+<% css_bundle :profile_edit, :pairing_code %>
 
 <% if service_enabled?(:avatars) %>
   <% if @user_data[:can_edit_avatar] %>

@@ -25,8 +25,7 @@ class ObserverPairingCodesApiController < ApplicationController
   def create
     user = api_find(User, params[:user_id])
     if authorized_action(user, @current_user, [:read, :read_reports])
-      enrollments = user.enrollments.active.where(type: 'StudentEnrollment').any?
-      return render_unauthorized_action unless enrollments
+      return render_unauthorized_action unless user.has_student_enrollment?
 
       code = user.generate_observer_pairing_code
       render json: presenter(code)

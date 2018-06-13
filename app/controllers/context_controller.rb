@@ -284,6 +284,8 @@ class ContextController < ApplicationController
         return
       end
 
+      js_env(CONTEXT_USER_DISPLAY_NAME: @user.short_name)
+
       if @domain_root_account.enable_profiles?
         @user_data = profile_data(
           @user.profile,

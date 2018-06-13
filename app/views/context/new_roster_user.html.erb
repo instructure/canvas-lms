@@ -74,12 +74,15 @@
         <%= link[:text] %>
       </a>
     <% end %>
+    <% if @context.account.grants_right?(@current_user, :read_roster) && @user.has_student_enrollment? %>
+      <div id="pairing-code"></div>
+    <% end %>
   </div>
   <a href="<%= user_profile_path(@current_user) %>" class="profile_url" style="display: none;">&nbsp;</a>
 <% end %>
 
 <% js_bundle :user_name %>
-<% css_bundle :roster_user %>
+<% css_bundle :roster_user, :pairing_code %>
 
 <%= render :partial => 'shared/profile' %>
 

@@ -35,5 +35,5 @@ view.collection.fetchAll()
 
 const container = document.querySelector('#pairing-code')
 if (container) {
-  ReactDOM.render(<GeneratePairingCode />, container)
+  ReactDOM.render(<GeneratePairingCode userId={ENV.current_user.id} />, container)
 }
