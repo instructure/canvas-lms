@@ -537,12 +537,6 @@ END
         end
       end
     },
-    'anonymous_grading' => {
-      display_name: -> { I18n.t('Anonymous Grading') },
-      description: -> { I18n.t("Anonymous grading forces student names to be hidden in SpeedGrader™") },
-      applies_to: 'Course',
-      state: 'allowed'
-    },
     'international_sms' => {
       display_name: -> { I18n.t('International SMS') },
       description: -> { I18n.t('Allows users with international phone numbers to receive text messages from Canvas.') },
