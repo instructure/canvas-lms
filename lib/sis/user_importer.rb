@@ -112,7 +112,7 @@ module SIS
       def process_batch
         return unless any_left_to_process?
           user_row = nil
-          while !@batched_users.empty? && tx_end_time > Time.now
+          while !@batched_users.empty?
             user_row = @batched_users.shift
             @logger.debug("Processing User #{user_row.inspect}")
 
