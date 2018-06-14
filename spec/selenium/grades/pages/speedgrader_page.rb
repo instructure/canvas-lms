@@ -176,6 +176,18 @@ class Speedgrader
       f("a[data-section-id=\"all\"]")
     end
 
+    def grading_details_container
+      f("div#grading_details_container")
+    end
+
+    def show_details_button
+      f("button", grading_details_container)
+    end
+
+    def provisional_grade_radio_buttons
+      ff("input", grading_details_container)
+    end
+
     # action
     def visit(course_id, assignment_id)
       get "/courses/#{course_id}/gradebook/speed_grader?assignment_id=#{assignment_id}"
@@ -191,7 +203,7 @@ class Speedgrader
     end
 
     def enter_grade(grade)
-      grade_input.send_keys(grade, :tab)
+      grade_input.send_keys(grade, :enter)
     end
 
     def current_grade

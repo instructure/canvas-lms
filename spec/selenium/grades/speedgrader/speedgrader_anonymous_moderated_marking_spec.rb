@@ -72,27 +72,23 @@ describe "SpeedGrader" do
 
   context 'with a moderated assignment' do
     before(:each) do
-      # enroll a second teacher
-      @teacher2 = User.create!(name: 'Teacher2')
-      @teacher2.register!
-      @course.enroll_teacher(@teacher2, enrollment_state: 'active')
+      @teacher1 = @teacher
+      @teacher2 = course_with_teacher(course: @course, name: 'Teacher2', active_all: true).user
+      @teacher3 = course_with_teacher(course: @course, name: 'Teacher3', active_all: true).user
 
-      # create moderated assignment
       @moderated_assignment = @course.assignments.create!(
         title: 'Moderated Assignment1',
         grader_count: 2,
-        final_grader_id: @teacher.id,
+        final_grader_id: @teacher1.id,
         grading_type: 'points',
         points_possible: 15,
         submission_types: 'online_text_entry',
         moderated_grading: true
       )
-
-      # switch session to non-final-grader
-      user_session(@teacher2)
     end
 
     it 'prevents unmuting the assignment before grades are posted', priority: '2', test_id: 3493531 do
+      user_session(@teacher2)
       Speedgrader.visit(@course.id, @moderated_assignment.id)
 
       expect(Speedgrader.mute_button.attribute('data-muted')).to eq 'true'
@@ -100,34 +96,57 @@ describe "SpeedGrader" do
     end
 
     it 'allows unmuting the assignment after grades are posted', priority: '2', test_id: 3493531 do
+      user_session(@teacher2)
       @moderated_assignment.update!(grades_published_at: Time.zone.now)
       Speedgrader.visit(@course.id, @moderated_assignment.id)
 
       expect(Speedgrader.mute_button.attribute('class')).not_to include 'disabled'
     end
+
+    it 'allows adding provisional grades', priority: '2', test_id: 3505172 do
+      user_session(@teacher2)
+      Speedgrader.visit(@course.id, @moderated_assignment.id)
+      Speedgrader.enter_grade(10)
+      wait_for_ajaximations
+      expect(@moderated_assignment.provisional_grades.first.scorer_id).to eq @teacher2.id
+    end
+
+    it 'shows multiple provisional grades', priority: '2', test_id: 3505172 do
+      @moderated_assignment.grade_student(@student1, grade: '2', grader: @teacher2, provisional: true)
+      @moderated_assignment.grade_student(@student1, grade: '3', grader: @teacher3, provisional: true)
+
+      user_session(@teacher1)
+      Speedgrader.visit(@course.id, @moderated_assignment.id)
+      Speedgrader.show_details_button.click
+      expect(Speedgrader.provisional_grade_radio_buttons.length).to eq 3
+      expect(Speedgrader.grading_details_container.text).to include 'Custom'
+      expect(Speedgrader.grading_details_container.text).to include 'Teacher2'
+      expect(Speedgrader.grading_details_container.text).to include 'Teacher3'
+    end
   end
 
   context 'with a moderated anonymous assignment' do
     before(:each) do
+      @teacher1 = @teacher
       @teacher2 = course_with_teacher(course: @course, name: 'Teacher2', active_all: true).user
       @teacher3 = course_with_teacher(course: @course, name: 'Teacher3', active_all: true).user
 
       @moderated_anonymous_assignment = @course.assignments.create!(
         title: 'Moderated Anonymous Assignment1',
         grader_count: 2,
-        final_grader_id: @teacher.id,
+        final_grader_id: @teacher1.id,
         moderated_grading: true,
         grader_comments_visible_to_graders: true,
         anonymous_grading: true,
-        graders_anonymous_to_graders: true
+        graders_anonymous_to_graders: true,
+        grader_names_visible_to_final_grader: false
       )
-
-      user_session(@teacher2)
     end
 
     it 'anonymizes grader comments', priority: '1', test_id: 3505165 do
       skip 'fixed with GRADE-1126'
 
+      user_session(@teacher2)
       Speedgrader.visit(@course.id, @moderated_anonymous_assignment.id)
 
       Speedgrader.enter_grade(15)
@@ -142,6 +161,21 @@ describe "SpeedGrader" do
       expect(comment_text).to include 'Some comment text'
       expect(comment_text).not_to include 'Teacher2'
       expect(comment_text).to include 'Grader 1'
+    end
+
+    it 'anonymizes graders for provisional grades', priority: '2', test_id: 3505172 do
+      @moderated_anonymous_assignment.grade_student(@student1, grade: '2', grader: @teacher2, provisional: true)
+      @moderated_anonymous_assignment.grade_student(@student1, grade: '3', grader: @teacher3, provisional: true)
+
+      @moderated_anonymous_assignment.grade_student(@student2, grade: '2', grader: @teacher2, provisional: true)
+      @moderated_anonymous_assignment.grade_student(@student2, grade: '3', grader: @teacher3, provisional: true)
+
+      user_session(@teacher1)
+      Speedgrader.visit(@course.id, @moderated_anonymous_assignment.id)
+      Speedgrader.show_details_button.click
+
+      expect(Speedgrader.grading_details_container.text).to include 'Grader 1'
+      expect(Speedgrader.grading_details_container.text).to include 'Grader 2'
     end
   end
 end
