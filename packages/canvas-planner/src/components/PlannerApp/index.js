@@ -331,16 +331,17 @@ export class PlannerApp extends Component {
   // ending at the last props.days (or today, whichever is later)
   // step a day at a time.
   // if the day is before yesterday, emit a <Day> only it if it has items
-  // always render yesterday, today, and tomorrow
+  // always render yesterday (if loaded), today, and tomorrow
   // starting with the day after tomorrow:
   //    if a day has items, emit a <Day>
   //    if we find a string of < 3 empty days, emit a <Day> for each
   //    if we find a string of 3 or more empty days, emit an <EmptyDays> for the interval
   renderDays () {
     const children = [];
-    let workingDay = moment.tz(this.props.days[0][0], this.props.timeZone);
-    let lastDay = moment.tz(this.props.days[this.props.days.length-1][0], this.props.timeZone);
     const today = moment.tz(this.props.timeZone).startOf('day');
+    let workingDay = moment.tz(this.props.days[0][0], this.props.timeZone);
+    if (workingDay.isAfter(today)) workingDay = today;
+    let lastDay = moment.tz(this.props.days[this.props.days.length-1][0], this.props.timeZone);
     let tomorrow = today.clone().add(1, 'day');
     const dayBeforeYesterday = today.clone().add(-2, 'day');
     if (lastDay.isBefore(today)) lastDay = today;

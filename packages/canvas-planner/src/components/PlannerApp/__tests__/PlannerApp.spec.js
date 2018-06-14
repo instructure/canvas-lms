@@ -58,6 +58,21 @@ describe('PlannerApp', () => {
     expect(wrapper).toMatchSnapshot();
   });
 
+  it('always renders today and tomorrow when only items are in the future', () => {
+    let days = [moment.tz(TZ).add(+5, 'day')];
+    days = days.map(d => [d.format('YYYY-MM-DD'), [{dateBucketMoment: d}]]);
+    const wrapper = shallow(<PlannerApp {...getDefaultValues({days})} />);
+    expect(wrapper).toMatchSnapshot();
+  });
+
+  it('only renders today when the only item is today', () => {
+    // because we don't know if we have all the items for tomorrow yet.
+    let days = [moment.tz(TZ)];
+    days = days.map(d => [d.format('YYYY-MM-DD'), [{dateBucketMoment: d}]]);
+    const wrapper = shallow(<PlannerApp {...getDefaultValues({days})} />);
+    expect(wrapper).toMatchSnapshot();
+  });
+
   it('shows only the loading component when the isLoading prop is true', () => {
     const wrapper = shallow(
       <PlannerApp

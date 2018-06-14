@@ -158,6 +158,7 @@ exports[`renders a CompletedItemsFacade when completed items are present by defa
           ]
         }
         badges={Array []}
+        date={"2017-04-25T06:00:00.000Z"}
         itemCount={1}
         notificationBadge="none"
         onClick={[Function]}
