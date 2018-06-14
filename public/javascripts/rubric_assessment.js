@@ -309,6 +309,8 @@ window.rubricAssessment = {
       }
 
       setCurrentAssessment(rubricAssessment.fillAssessment(ENV.rubric, assessment || {}))
+      const header = container.find('th').first()
+      header.attr('tabindex', -1).focus()
     } else {
       rubricAssessment.populateRubric(container, assessment);
     }
