@@ -19,6 +19,13 @@
 import { canvas } from '@instructure/ui-themes/lib'
 import './support/sinon/sinon-qunit-1.0.0'
 
+if (process.env.SENTRY_URL) {
+  // This should allow us to capture more errors rather than just
+  // "Script error"
+  const Raven = require('raven-js')
+  Raven.config(process.env.SENTRY_URL).install();
+}
+
 document.dir = 'ltr'
 const fixturesDiv = document.createElement('div')
 fixturesDiv.id = 'fixtures'
