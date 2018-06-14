@@ -62,6 +62,26 @@ describe 'New Gradebook' do
 
       expect(@non_anonymous_assignment.muted?).to be true
     end
+
+    context 'causes score cells to be' do
+      before(:each) do
+        user_session(@teacher)
+        Gradezilla.visit(@course)
+      end
+
+      it 'greyed out with grades invisible when assignment is muted', priority: '1', test_id: 3504000 do
+        grid_cell = Gradezilla::Cells.grid_assignment_row_cell(@student1, @anonymous_assignment)
+        class_attribute_fetched = grid_cell.attribute('class')
+        expect(class_attribute_fetched).to include 'grayed-out'
+        expect(Gradezilla::Cells.get_grade(@student1, @anonymous_assignment)).to eq ''
+      end
+
+      it 'not greyed out with grades visible when assignment is unmuted', priority: '1', test_id: 3504000 do
+        Gradezilla.toggle_assignment_muting(@anonymous_assignment.id)
+        Gradezilla::Cells.edit_grade(@student1, @anonymous_assignment, '12')
+        expect(Gradezilla::Cells.get_grade(@student1, @anonymous_assignment)).to eq '12'
+      end
+    end
   end
 
   context 'with a moderated assignment' do
