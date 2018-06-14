@@ -40,11 +40,11 @@ class PermissionsIndex
     end
 
     def filter_control
-      f('.filter_control')
+      f("#permissions-role-filter")
     end
 
     def filter_item(filter_item)
-      f(".#{filter_item}")
+      fj("li span:contains(#{filter_item})")
     end
 
     def add_role_button
@@ -54,8 +54,13 @@ class PermissionsIndex
     def role_header
       f('.ic-permissions__top-header')
     end
-    def role_link(role)
-      f("#user_#{role.id}")
+
+    def role_link_css(role_name)
+      "th[aria-label=#{role_name}] button"
+    end
+
+    def role_link(role_name)
+      f(role_link_css(role_name))
     end
 
     # this is the button/link that opens the tray
@@ -181,11 +186,9 @@ class PermissionsIndex
 
     # this may need to be implemented differently depending
     # on which control is used
-    def select_filter(filters)
+    def select_filter(filter)
       filter_control.click
-      filters.each do |filter|
-        filter_item(filter).click
-      end
+      filter_item(filter).click
     end
 
     # setting in the same format as on the menu items

@@ -48,15 +48,10 @@ describe "permissions index" do
       expect{PermissionsIndex.edit_tray_header.text}.to become("Edit A Better Kitty")
     end
 
-    it "updates the permission to the correct section" do
-      skip("because landon said so")
-      button_state = PermissionsIndex.role_tray_permission_state("read_announcements", @custom_student_role.id)
-      expect(button_state).to eq('Enabled')
+    it "updates the permission to the correct selection" do
       PermissionsIndex.open_edit_role_tray(@custom_student_role)
       PermissionsIndex.disable_tray_permission("read_announcements", @custom_student_role.id)
-      wait_for_children("#flashalert_message_holder")
-      button_state = PermissionsIndex.role_tray_permission_state("read_announcements", @custom_student_role.id)
-      expect(button_state).to eq('Disabled')
+      expect{PermissionsIndex.role_tray_permission_state("read_announcements", @custom_student_role.id)}.to become('Disabled')
     end
   end
 
@@ -169,6 +164,26 @@ describe "permissions index" do
 
       expect{PermissionsIndex.role_tray_permission_state(@permission_name, @role.id)}.to become('Disabled')
       expect{PermissionsIndex.grid_permission_state(@permission_name, @role.id)}.to become('Disabled')
+    end
+  end
+  context "main controls" do
+    before(:each) do
+      @account = Account.default
+      account_admin_user
+      user_session(@admin)
+      PermissionsIndex.visit(Account.default)
+    end
+    it "filter based on role" do
+      role_name = "Student"
+      PermissionsIndex.select_filter(role_name)
+      expect(PermissionsIndex.role_link(role_name)).to be_displayed
+      expect(f('#content')).not_to contain_css(PermissionsIndex.role_link_css("Teacher"))
+    end
+
+    it "search by permission name works correctly" do
+      PermissionsIndex.enter_search("Course State")
+      expect(PermissionsIndex.permission_link("change_course_state")).to be_displayed
+      expect(f('#content')).not_to contain_css("#permission_manage_interaction_alerts")
     end
   end
 end
