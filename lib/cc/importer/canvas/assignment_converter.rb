@@ -27,11 +27,22 @@ module CC::Importer::Canvas
         if meta_path = res.at_css('file[href$="assignment_settings.xml"]')
           meta_path = File.join @unzipped_file_path, meta_path['href']
           html_path = File.join @unzipped_file_path, res.at_css('file[href$="html"]')['href']
-          
+
           meta_node = open_file_xml(meta_path)
           html_node = open_file(html_path)
-
           mig_id = get_node_att(meta_node, 'assignment', 'identifier') || meta_node['identifier']
+          max_attempts = get_node_val(meta_node, 'max_attempts')
+
+          puts "==== assignment_settings ===="
+          assignment_settings = {
+            id: mig_id,
+            subject: 'cartrige',
+            setting: 'max_attempts',
+            value: max_attempts
+          }
+          pp assignment_settings
+          #SettingsService.update_assignment_settings(assignment_settings)
+
           assignment = assignments.detect{|a| a['migration_id'] && a['migration_id'] == mig_id}
           unless assignment
             assignment = {'migration_id' => mig_id}.with_indifferent_access
