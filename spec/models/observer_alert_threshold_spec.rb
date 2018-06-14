@@ -43,4 +43,10 @@ describe ObserverAlertThreshold do
 
     expect(threshold.valid?).to eq false
   end
+
+  it 'wont allow random threshold' do
+    threshold = ObserverAlertThreshold.create(student: @student, observer: @observer, alert_type: 'assignment_missing', threshold: 'jigglypuff')
+
+    expect(threshold.valid?).to eq false
+  end
 end

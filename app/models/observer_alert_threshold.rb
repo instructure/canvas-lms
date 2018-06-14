@@ -32,6 +32,7 @@ class ObserverAlertThreshold < ActiveRecord::Base
   validates :alert_type, inclusion: { in: ALERT_TYPES }
   validates :user_id, :observer_id, :alert_type, presence: true
   validates :alert_type, uniqueness: { scope: [:user_id, :observer_id] }
+  validates :threshold, numericality: true, allow_nil: true
   validate :validate_users_link
 
   scope :active, -> { where.not(workflow_state: 'deleted') }
