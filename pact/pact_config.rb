@@ -17,75 +17,13 @@
 #
 
 module PactConfig
-  # These constants ensure we use the correct strings and thus help avoid our
-  # accidentally breaking the contract tests
-
-  module Providers
-    CANVAS_LMS_API = 'Canvas LMS API'.freeze
-    CANVAS_API_VERSION = '0.10'.freeze
-    CANVAS_LMS_LIVE_EVENTS = 'Canvas LMS Live Events'.freeze
-    ALL = Providers.constants.map { |c| Providers.const_get(c) }.freeze
-  end
-
-  # Add new API and LiveEvents consumers to this Consumers module
-  module Consumers
-    GENERIC_CONSUMER = 'Generic Consumer'.freeze
-    QUIZ_LTI = 'Quiz LTI'.freeze
-    ALL = Consumers.constants.map { |c| Consumers.const_get(c) }.freeze
-  end
-
   class << self
-    def pact_uri(pact_path:)
-      URI::HTTP.build(
-        scheme: protocol,
-        userinfo: "#{broker_username}:#{broker_password}",
-        host: broker_host,
-        path: "/#{pact_path}/#{consumer_tag}"
-      ).to_s
-    end
-
-    def broker_uri
-      URI::HTTP.build(
-        scheme: protocol,
-        userinfo: "#{broker_username}:#{broker_password}",
-        host: broker_host
-      ).to_s
-    end
-
-    def broker_host
-      ENV.fetch('PACT_BROKER_HOST', 'pact-broker.docker')
-    end
-
-    def consumer_tag
-      # jenkins_build? ? 'latest/master' : 'latest'
-      'latest'
-    end
-
-    def broker_password
-      ENV.fetch('PACT_BROKER_PASSWORD', 'broker')
-    end
-
-    def broker_username
-      ENV.fetch('PACT_BROKER_USERNAME', 'pact')
-    end
-
     def mock_provider_service_base_uri
       "localhost:#{mock_provider_service_port}"
     end
 
     def mock_provider_service_port
       1234
-    end
-
-    def jenkins_build?
-      !ENV['JENKINS_URL'].nil?
-    end
-
-    private
-
-    def protocol
-      protocol = jenkins_build? ? 'https' : 'http'
-      ENV.fetch('PACT_BROKER_PROTOCOL', protocol)
     end
   end
 end

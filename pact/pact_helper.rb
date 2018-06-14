@@ -27,8 +27,8 @@ Pact.configure do |config|
   config.pactfile_write_order = :chronological
 end
 
-Pact.service_consumer PactConfig::Consumers::GENERIC_CONSUMER do
-  has_pact_with PactConfig::Providers::CANVAS_LMS_API do
+Pact.service_consumer 'Generic Consumer' do
+  has_pact_with 'Canvas LMS API' do
     mock_service :canvas_lms_api do
       port PactConfig.mock_provider_service_port
       pact_specification_version '2.0.0'
