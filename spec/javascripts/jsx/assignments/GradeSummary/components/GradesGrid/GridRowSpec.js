@@ -157,6 +157,12 @@ QUnit.module('GradeSummary GridRow', suiteHooks => {
       )
     })
 
+    test('receives the studentId prop from the row', () => {
+      mountComponent()
+      const gradeSelect = wrapper.find('GradeSelect')
+      strictEqual(gradeSelect.prop('studentId'), '1111')
+    })
+
     test('receives the studentName prop from the row', () => {
       mountComponent()
       const gradeSelect = wrapper.find('GradeSelect')

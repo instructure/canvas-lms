@@ -17,10 +17,22 @@
  */
 
 import axios from 'axios'
+import {camelize, underscore} from 'convert_case'
 
-/* eslint-disable import/prefer-default-export */
 export function selectProvisionalGrade(courseId, assignmentId, provisionalGradeId) {
   const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/provisional_grades/${provisionalGradeId}/select`
 
   return axios.put(url)
+}
+
+export function updateProvisionalGrade(courseId, submission) {
+  const url = `/courses/${courseId}/gradebook/update_submission`
+  const data = {
+    submission: {
+      ...underscore(submission),
+      provisional: true
+    }
+  }
+
+  return axios.post(url, data).then(response => camelize(response.data[0].submission))
 }

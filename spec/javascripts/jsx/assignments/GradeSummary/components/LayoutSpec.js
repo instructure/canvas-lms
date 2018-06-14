@@ -58,12 +58,12 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
       .stub(StudentActions, 'loadStudents')
       .returns(StudentActions.setLoadStudentsStatus(StudentActions.STARTED))
     sinon
-      .stub(GradeActions, 'selectProvisionalGrade')
+      .stub(GradeActions, 'selectFinalGrade')
       .callsFake(gradeInfo => GradeActions.setSelectedProvisionalGrade(gradeInfo))
   })
 
   suiteHooks.afterEach(() => {
-    GradeActions.selectProvisionalGrade.restore()
+    GradeActions.selectFinalGrade.restore()
     StudentActions.loadStudents.restore()
     wrapper.unmount()
   })

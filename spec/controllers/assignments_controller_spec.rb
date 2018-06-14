@@ -359,6 +359,30 @@ describe AssignmentsController do
         expect(env[:ASSIGNMENT][:title]).to eql(@assignment.title)
       end
 
+      it "optionally sets CURRENT_USER.can_view_grader_identities to true" do
+        @assignment.update(grader_names_visible_to_final_grader: true)
+        get :show_moderate, params: {course_id: @course.id, assignment_id: @assignment.id}
+        expect(env[:CURRENT_USER][:can_view_grader_identities]).to be(true)
+      end
+
+      it "optionally sets CURRENT_USER.can_view_grader_identities to false" do
+        @assignment.update(grader_names_visible_to_final_grader: false)
+        get :show_moderate, params: {course_id: @course.id, assignment_id: @assignment.id}
+        expect(env[:CURRENT_USER][:can_view_grader_identities]).to be(false)
+      end
+
+      it "optionally sets CURRENT_USER.can_view_student_identities to true" do
+        @assignment.update(anonymous_grading: false)
+        get :show_moderate, params: {course_id: @course.id, assignment_id: @assignment.id}
+        expect(env[:CURRENT_USER][:can_view_student_identities]).to be(true)
+      end
+
+      it "optionally sets CURRENT_USER.can_view_student_identities to false" do
+        @assignment.update(anonymous_grading: true)
+        get :show_moderate, params: {course_id: @course.id, assignment_id: @assignment.id}
+        expect(env[:CURRENT_USER][:can_view_student_identities]).to be(false)
+      end
+
       describe "CURRENT_USER.grader_id" do
         it "is the id of the user when the user can see other grader identities" do
           @assignment.moderation_graders.create!(anonymous_id: "other", user: @other_teacher)

@@ -558,6 +558,7 @@ class AssignmentsController < ApplicationController
   def show_moderate_env
     current_grader_id = @current_user.id
     final_grader_id = @assignment.final_grader_id
+    can_view_grader_identities = @assignment.can_view_other_grader_identities?(@current_user)
 
     unless @assignment.can_view_other_grader_identities?(@current_user)
       moderation_graders_by_id = @assignment.moderation_graders.index_by(&:user_id)
@@ -580,6 +581,8 @@ class AssignmentsController < ApplicationController
         title: @assignment.title
       },
       CURRENT_USER: {
+        can_view_grader_identities: can_view_grader_identities,
+        can_view_student_identities: @assignment.can_view_student_names?(@current_user),
         grader_id: current_grader_id,
         id: @current_user.id
       },

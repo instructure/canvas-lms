@@ -22,9 +22,31 @@ import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReade
 import Select from '@instructure/ui-forms/lib/components/Select'
 import I18n from 'i18n!assignment_grade_summary'
 
+import numberHelper from '../../../../shared/helpers/numberHelper'
 import {FAILURE, STARTED, SUCCESS} from '../../grades/GradeActions'
 
 const NO_SELECTION = 'no-selection'
+
+function filterOptions(options, filterText) {
+  const exactMatches = []
+  const partialMatches = []
+  const matchText = filterText.toLowerCase()
+
+  options.forEach(option => {
+    const score = String(option.gradeInfo.score)
+    const label = option.label.toLowerCase()
+
+    if (score === matchText) {
+      exactMatches.push(option)
+    } else if (score.includes(matchText)) {
+      partialMatches.push(option)
+    } else if (label.includes(matchText)) {
+      partialMatches.push(option)
+    }
+  })
+
+  return exactMatches.concat(partialMatches)
+}
 
 function optionsForGraders(graders, grades) {
   const options = []
@@ -40,6 +62,22 @@ function optionsForGraders(graders, grades) {
     }
   }
   return options
+}
+
+function buildCustomGradeOption(gradeInfo) {
+  return {
+    gradeInfo,
+    label: `${I18n.n(gradeInfo.score)} (${I18n.t('Custom')})`,
+    value: gradeInfo.graderId
+  }
+}
+
+function customGradeOptionFromProps({finalGrader, grades}) {
+  const customGrade = grades[finalGrader.graderId]
+  if (customGrade) {
+    return buildCustomGradeOption(customGrade)
+  }
+  return null
 }
 
 export default class GradeSelect extends Component {
@@ -62,6 +100,7 @@ export default class GradeSelect extends Component {
     onPositioned: func,
     onSelect: func,
     selectProvisionalGradeStatus: oneOf([FAILURE, STARTED, SUCCESS]),
+    studentId: string.isRequired,
     studentName: string.isRequired
   }
 
@@ -92,6 +131,7 @@ export default class GradeSelect extends Component {
 
     this.handleChange = this.handleChange.bind(this)
     this.handleClose = this.handleClose.bind(this)
+    this.handleInputChange = this.handleInputChange.bind(this)
 
     this.state = this.constructor.getDerivedStateFromProps(props)
   }
@@ -101,16 +141,11 @@ export default class GradeSelect extends Component {
     const options = [...graderOptions]
 
     if (props.finalGrader) {
-      const customGrade = props.grades[props.finalGrader.graderId]
-      if (customGrade) {
-        const customGradeOption = {
-          gradeInfo: customGrade,
-          label: `${I18n.n(customGrade.score)} (${I18n.t('Custom')})`,
-          value: props.finalGrader.graderId
-        }
+      const customGradeOption = customGradeOptionFromProps(props)
+      if (customGradeOption) {
         options.push(customGradeOption)
 
-        if (customGrade.selected) {
+        if (customGradeOption.gradeInfo.selected) {
           selectedOption = customGradeOption
         }
       }
@@ -141,13 +176,25 @@ export default class GradeSelect extends Component {
   }
 
   handleChange(_event, selectedOption) {
-    if (this.props.onSelect == null || selectedOption.value === NO_SELECTION) {
+    if (
+      this.props.onSelect == null ||
+      selectedOption == null ||
+      selectedOption.value === NO_SELECTION
+    ) {
+      if (_event.type === 'blur') {
+        this.$input.value = this.state.selectedOption.label
+      }
       return
     }
 
     const optionMatch = this.state.options.find(option => option.value === selectedOption.value)
     if (!optionMatch.gradeInfo.selected) {
       this.props.onSelect(optionMatch.gradeInfo)
+    } else {
+      const originalGrade = this.props.grades[optionMatch.value]
+      if (optionMatch.gradeInfo.score !== originalGrade.score) {
+        this.props.onSelect(optionMatch.gradeInfo)
+      }
     }
   }
 
@@ -161,10 +208,40 @@ export default class GradeSelect extends Component {
     }
   }
 
+  handleInputChange(event, value) {
+    if (event == null) {
+      return
+    }
+
+    const cleanValue = value.trim()
+    const options = filterOptions(this.state.graderOptions, cleanValue)
+    const score = numberHelper.parse(cleanValue)
+
+    let customGradeOption = customGradeOptionFromProps(this.props)
+
+    if (!Number.isNaN(score)) {
+      let gradeInfo = customGradeOption ? customGradeOption.gradeInfo : {}
+      gradeInfo = {
+        ...gradeInfo,
+        graderId: this.props.finalGrader.graderId,
+        score,
+        studentId: this.props.studentId
+      }
+      customGradeOption = buildCustomGradeOption(gradeInfo)
+    }
+
+    if (customGradeOption) {
+      options.push(customGradeOption)
+    }
+
+    this.setState({options})
+  }
+
   render() {
     return (
       <Select
         aria-readonly={!this.props.onSelect || this.props.selectProvisionalGradeStatus === STARTED}
+        editable={!!this.props.onSelect}
         filter={options => options}
         inputRef={this.bindMenu}
         label={
@@ -174,6 +251,7 @@ export default class GradeSelect extends Component {
         }
         onChange={this.handleChange}
         onClose={this.handleClose}
+        onInputChange={this.handleInputChange}
         onOpen={this.props.onOpen}
         onPositioned={this.props.onPositioned}
         ref={this.bindSelect}

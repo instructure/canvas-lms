@@ -31,6 +31,8 @@ QUnit.module('GradeSummary getEnv()', suiteHooks => {
         title: 'Example Assignment'
       },
       CURRENT_USER: {
+        can_view_grader_identities: true,
+        can_view_student_identities: false,
         grader_id: 'admin',
         id: '1100'
       },
@@ -73,6 +75,14 @@ QUnit.module('GradeSummary getEnv()', suiteHooks => {
   })
 
   QUnit.module('.currentUser', () => {
+    test('camel-cases .canViewGraderIdentities', () => {
+      strictEqual(getEnv().currentUser.canViewGraderIdentities, true)
+    })
+
+    test('camel-cases .canViewStudentIdentities', () => {
+      strictEqual(getEnv().currentUser.canViewStudentIdentities, false)
+    })
+
     test('camel-cases .graderId', () => {
       equal(getEnv().currentUser.graderId, 'admin')
     })
@@ -84,12 +94,12 @@ QUnit.module('GradeSummary getEnv()', suiteHooks => {
       strictEqual(getEnv().currentUser.graderId, 'FINAL_GRADER')
     })
 
-    test('defaults .graderId to null when the user is not the final grader', () => {
+    test('defaults .graderId to "CURRENT_USER" when the user is not the final grader', () => {
       // The user is likely an Admin in this scenario.
       delete ENV.FINAL_GRADER.grader_id
       delete ENV.CURRENT_USER.grader_id
       ENV.CURRENT_USER.id = '1100'
-      strictEqual(getEnv().currentUser.graderId, null)
+      strictEqual(getEnv().currentUser.graderId, 'CURRENT_USER')
     })
 
     test('includes .id', () => {

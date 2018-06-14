@@ -27,6 +27,8 @@ import * as StudentActions from 'jsx/assignments/GradeSummary/students/StudentAc
 import FlashMessageHolder from 'jsx/assignments/GradeSummary/components/FlashMessageHolder'
 import configureStore from 'jsx/assignments/GradeSummary/configureStore'
 
+/* eslint-disable qunit/no-identical-names */
+
 QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
   let storeEnv
   let store
@@ -148,6 +150,145 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
     mountComponent()
     store.dispatch(AssignmentActions.setPublishGradesStatus(AssignmentActions.STARTED))
     strictEqual(FlashAlert.showFlashAlert.callCount, 0)
+  })
+
+  QUnit.module('when updating a selected grade succeeds', hooks => {
+    hooks.beforeEach(() => {
+      mountComponent()
+      const gradeInfo = {
+        grade: 'A',
+        graderId: '1101',
+        id: '4601',
+        score: 10,
+        selected: true,
+        studentId: '1111'
+      }
+      store.dispatch(GradeActions.setUpdateGradeStatus(gradeInfo, GradeActions.SUCCESS))
+    })
+
+    test('displays a flash alert', () => {
+      strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+    })
+
+    test('uses the success type', () => {
+      const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
+      equal(type, 'success')
+    })
+
+    test('includes a "Grade saved" message', () => {
+      const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
+      equal(message, 'Grade saved.')
+    })
+  })
+
+  QUnit.module('when updating a selected grade', contextHooks => {
+    let gradeInfo
+
+    contextHooks.beforeEach(() => {
+      mountComponent()
+      gradeInfo = {
+        grade: 'A',
+        graderId: '1101',
+        id: '4601',
+        score: 10,
+        selected: true,
+        studentId: '1111'
+      }
+    })
+
+    test('does not display a flash alert when updating a selected grade starts', () => {
+      mountComponent()
+      store.dispatch(GradeActions.setUpdateGradeStatus(gradeInfo, GradeActions.STARTED))
+      strictEqual(FlashAlert.showFlashAlert.callCount, 0)
+    })
+
+    QUnit.module('when the update succeeds', hooks => {
+      hooks.beforeEach(() => {
+        store.dispatch(GradeActions.setUpdateGradeStatus(gradeInfo, GradeActions.SUCCESS))
+      })
+
+      test('displays a flash alert', () => {
+        strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+      })
+
+      test('uses the success type', () => {
+        const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
+        equal(type, 'success')
+      })
+
+      test('includes a "Grade saved" message', () => {
+        const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
+        equal(message, 'Grade saved.')
+      })
+    })
+
+    QUnit.module('when the update fails', hooks => {
+      hooks.beforeEach(() => {
+        store.dispatch(GradeActions.setUpdateGradeStatus(gradeInfo, GradeActions.FAILURE))
+      })
+
+      test('displays a flash alert', () => {
+        strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+      })
+
+      test('uses the error type', () => {
+        const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
+        equal(type, 'error')
+      })
+
+      test('includes a message about updating the grade', () => {
+        const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
+        equal(message, 'There was a problem updating the grade.')
+      })
+    })
+  })
+
+  QUnit.module('when updating a non-selected grade', contextHooks => {
+    let gradeInfo
+
+    contextHooks.beforeEach(() => {
+      mountComponent()
+      gradeInfo = {
+        grade: 'A',
+        graderId: '1101',
+        id: '4601',
+        score: 10,
+        selected: false,
+        studentId: '1111'
+      }
+    })
+
+    test('does not display a flash alert when the update starts', () => {
+      store.dispatch(GradeActions.setUpdateGradeStatus(gradeInfo, GradeActions.STARTED))
+      strictEqual(FlashAlert.showFlashAlert.callCount, 0)
+    })
+
+    test('does not display a flash alert when the update succeeds', () => {
+      // The action of selecting this grade continues and will be announced upon
+      // success or failure.
+      store.dispatch(GradeActions.setUpdateGradeStatus(gradeInfo, GradeActions.SUCCESS))
+      strictEqual(FlashAlert.showFlashAlert.callCount, 0)
+    })
+
+    QUnit.module('when the update fails', hooks => {
+      hooks.beforeEach(() => {
+        store.dispatch(GradeActions.setUpdateGradeStatus(gradeInfo, GradeActions.FAILURE))
+      })
+
+      test('displays a flash alert', () => {
+        strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+      })
+
+      test('uses the error type', () => {
+        const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
+        equal(type, 'error')
+      })
+
+      test('includes a message about updating the grade', () => {
+        const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
+        equal(message, 'There was a problem updating the grade.')
+      })
+    })
   })
 
   QUnit.module('when publishing grades succeeds', hooks => {

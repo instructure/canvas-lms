@@ -47,12 +47,18 @@ export default function getEnv() {
   }
 
   const currentUser = {
+    canViewGraderIdentities: ENV.CURRENT_USER.can_view_grader_identities,
+    canViewStudentIdentities: ENV.CURRENT_USER.can_view_student_identities,
     graderId: ENV.CURRENT_USER.grader_id || null,
     id: ENV.CURRENT_USER.id
   }
 
-  if (currentUser.graderId == null && finalGrader && currentUser.id === finalGrader.id) {
-    currentUser.graderId = finalGrader.graderId
+  if (currentUser.graderId == null) {
+    if (finalGrader && currentUser.id === finalGrader.id) {
+      currentUser.graderId = finalGrader.graderId
+    } else {
+      currentUser.graderId = 'CURRENT_USER'
+    }
   }
 
   return {

@@ -24,7 +24,7 @@ import View from '@instructure/ui-layout/lib/components/View'
 import I18n from 'i18n!assignment_grade_summary'
 
 import '../../../context_cards/StudentContextCardTrigger'
-import {selectProvisionalGrade} from '../grades/GradeActions'
+import {selectFinalGrade} from '../grades/GradeActions'
 import {loadStudents} from '../students/StudentActions'
 import FlashMessageHolder from './FlashMessageHolder'
 import GradesGrid from './GradesGrid'
@@ -110,7 +110,7 @@ function mapDispatchToProps(dispatch) {
     },
 
     selectGrade(gradeInfo) {
-      dispatch(selectProvisionalGrade(gradeInfo))
+      dispatch(selectFinalGrade(gradeInfo))
     }
   }
 }

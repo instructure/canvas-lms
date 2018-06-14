@@ -79,6 +79,7 @@ export default class GridRow extends Component {
             grades={this.props.grades}
             onSelect={this.props.onGradeSelect}
             selectProvisionalGradeStatus={this.props.selectProvisionalGradeStatus}
+            studentId={this.props.row.studentId}
             studentName={this.props.row.studentName}
           />
         </td>

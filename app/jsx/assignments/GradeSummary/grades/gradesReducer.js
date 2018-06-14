@@ -20,7 +20,10 @@ import buildReducer from '../buildReducer'
 import {
   ADD_PROVISIONAL_GRADES,
   SET_SELECTED_PROVISIONAL_GRADE,
-  SET_SELECT_PROVISIONAL_GRADE_STATUS
+  SET_SELECT_PROVISIONAL_GRADE_STATUS,
+  SET_UPDATE_GRADE_STATUS,
+  SUCCESS,
+  UPDATE_GRADE
 } from './GradeActions'
 
 function addProvisionalGrades(state, grades) {
@@ -51,6 +54,16 @@ function setSelectProvisionalGradeStatus(state, gradeInfo, status) {
   return {...state, selectProvisionalGradeStatuses}
 }
 
+function setUpdateGradeStatus(state, gradeInfo, status) {
+  const statuses = state.updateGradeStatuses.filter(
+    updateGradeStatus =>
+      // Remove existing items for the same student or for previous successes.
+      updateGradeStatus.gradeInfo.studentId !== gradeInfo.studentId && status !== SUCCESS
+  )
+  const updateGradeStatuses = statuses.concat([{gradeInfo, status}])
+  return {...state, updateGradeStatuses}
+}
+
 const handlers = {}
 
 handlers[ADD_PROVISIONAL_GRADES] = (state, {payload}) =>
@@ -62,7 +75,13 @@ handlers[SET_SELECTED_PROVISIONAL_GRADE] = (state, {payload}) =>
 handlers[SET_SELECT_PROVISIONAL_GRADE_STATUS] = (state, {payload}) =>
   setSelectProvisionalGradeStatus(state, payload.gradeInfo, payload.status)
 
+handlers[SET_UPDATE_GRADE_STATUS] = (state, {payload}) =>
+  setUpdateGradeStatus(state, payload.gradeInfo, payload.status)
+
+handlers[UPDATE_GRADE] = (state, {payload}) => addProvisionalGrades(state, [payload.gradeInfo])
+
 export default buildReducer(handlers, {
   provisionalGrades: {},
-  selectProvisionalGradeStatuses: {}
+  selectProvisionalGradeStatuses: {},
+  updateGradeStatuses: []
 })
