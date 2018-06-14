@@ -24,9 +24,11 @@ import IconArrowDownLine from '@instructure/ui-icons/lib/Line/IconArrowDown';
 
 import styles from './styles.css';
 import theme from './theme.js';
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 
 class StickyButton extends Component {
   static propTypes = {
+    id: string.isRequired,
     children: node.isRequired,
     onClick: func,
     disabled: bool,
@@ -35,6 +37,7 @@ class StickyButton extends Component {
     className: string,
     zIndex: number,
     buttonRef: func,
+    description: string,
   };
 
   static defaultProps = {
@@ -69,6 +72,21 @@ class StickyButton extends Component {
     }
   }
 
+  get descriptionId () {
+    return `${this.props.id}_desc`;
+  }
+
+  renderDescription () {
+    if (this.props.description) {
+      return (
+        <ScreenReaderContent id={this.descriptionId}>
+          {this.props.description}
+        </ScreenReaderContent>
+      );
+    }
+    return null;
+  }
+
   render () {
     const {
       children,
@@ -88,20 +106,24 @@ class StickyButton extends Component {
     };
 
     return (
-      <button
-        type="button"
-        onClick={this.handleClick}
-        className={classnames(classes, styles.newActivityButton)}
-        style={style}
-        aria-disabled={(disabled) ? 'true' : null}
-        aria-hidden={(hidden) ? 'true' : null}
-        ref={this.props.buttonRef}
-      >
-        <span className={styles.layout}>
-          {children}
-          {this.renderIcon()}
-        </span>
-      </button>
+      <span>
+        <button
+          type="button"
+          onClick={this.handleClick}
+          className={classnames(classes, styles.newActivityButton)}
+          style={style}
+          aria-disabled={(disabled) ? 'true' : null}
+          aria-hidden={(hidden) ? 'true' : null}
+          ref={this.props.buttonRef}
+          aria-describedby={this.props.description ? this.descriptionId : null}
+        >
+          <span className={styles.layout}>
+            {children}
+            {this.renderIcon()}
+          </span>
+        </button>
+        {this.renderDescription()}
+      </span>
     );
   }
 }

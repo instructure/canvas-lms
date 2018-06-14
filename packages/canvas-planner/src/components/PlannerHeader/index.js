@@ -275,12 +275,13 @@ export class PlannerHeader extends Component {
     return (
       <Portal mountNode={this.props.auxElement} open={this.newActivityAboveView()}>
         <StickyButton
+          id="new_activity_button"
           direction="up"
-          hidden={true}
           onClick={this.handleNewActivityClick}
           zIndex={this.props.stickyZIndex}
           buttonRef={ref => this.newActivityButtonRef = ref}
           className="StickyButton-styles__newActivityButton"
+          description={formatMessage("Scrolls up to the previous item with new activity.")}
         >
           {formatMessage("New Activity")}
         </StickyButton>
