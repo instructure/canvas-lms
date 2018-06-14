@@ -38,7 +38,6 @@ export default function RoleTrayTableRow({
   permission,
   permissionName,
   role,
-  inTray,
   useCaching
 }) {
   return (
@@ -75,8 +74,8 @@ export default function RoleTrayTableRow({
               permission={permission}
               permissionName={permissionName}
               roleId={role.id}
-              inTray={inTray}
               useCaching={useCaching}
+              inTray
             />
           </div>
         </FlexItem>
@@ -91,7 +90,6 @@ RoleTrayTableRow.propTypes = {
   permission: permissionPropTypes.rolePermission.isRequired,
   permissionName: PropTypes.string.isRequired,
   role: permissionPropTypes.role.isRequired,
-  inTray: PropTypes.bool,
   title: PropTypes.string.isRequired,
   useCaching: PropTypes.bool
 }
@@ -99,6 +97,5 @@ RoleTrayTableRow.propTypes = {
 RoleTrayTableRow.defaultProps = {
   description: '',
   expandable: false,
-  inTray: false,
   useCaching: true
 }

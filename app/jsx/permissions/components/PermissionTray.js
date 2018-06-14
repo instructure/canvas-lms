@@ -62,7 +62,6 @@ export default function PermissionTray(props) {
                 permission={role.permissions[props.permissionName]}
                 role={role}
                 useCaching={props.useCaching}
-                inTray
               />
             ))}
           </RoleTrayTable>
@@ -80,7 +79,6 @@ export default function PermissionTray(props) {
                 permission={role.permissions[props.permissionName]}
                 role={role}
                 useCaching={props.useCaching}
-                inTray
               />
             ))}
           </RoleTrayTable>
