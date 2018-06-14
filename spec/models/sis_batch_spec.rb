@@ -622,6 +622,16 @@ s2,test_1,section2,active},
       expect(batch1.workflow_state).to eq 'imported'
     end
 
+    it 'should not fail for completely empty files' do
+      batch0 = create_csv_data([], add_empty_file: true)
+      batch0.update_attributes(diffing_data_set_identifier: 'default', options: {diffing_drop_status: 'completed'})
+      batch0.process_without_send_later
+      batch1 = create_csv_data([], add_empty_file: true)
+      batch1.update_attributes(diffing_data_set_identifier: 'default', options: {diffing_drop_status: 'completed'})
+      batch1.process_without_send_later
+      expect(batch1.reload).to be_imported
+    end
+
     describe 'diffing_drop_status' do
       before :once do
         process_csv_data(

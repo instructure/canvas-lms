@@ -318,7 +318,11 @@ class SisBatch < ActiveRecord::Base
   def process_instructure_csv_zip
     require 'sis'
     download_zip
-    generate_diff
+    diff_result = generate_diff
+    if diff_result == :empty_diff_file
+      self.finish(true)
+      return
+    end
 
     use_parallel = self.class.use_parallel_importers?(self.account)
     import_class = use_parallel ? SIS::CSV::ImportRefactored : SIS::CSV::Import
@@ -350,7 +354,7 @@ class SisBatch < ActiveRecord::Base
     return if change_threshold && (1-previous_zip.size.to_f/@data_file.size.to_f).abs > (0.01 * change_threshold)
 
     diffed_data_file = SIS::CSV::DiffGenerator.new(self.account, self).generate(previous_zip.path, @data_file.path)
-    return unless diffed_data_file
+    return :empty_diff_file unless diffed_data_file # just end if there's nothing to import
 
     self.data[:diffed_against_sis_batch_id] = previous_batch.id
 
