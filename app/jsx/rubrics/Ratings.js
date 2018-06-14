@@ -50,7 +50,9 @@ export const Rating = (props) => {
     points,
     onClick,
     tierColor,
-    hidePoints
+    hidePoints,
+    isSummary,
+    selected
   } = props
 
   const shaderStyle = { backgroundColor: tierColor }
@@ -88,7 +90,8 @@ export const Rating = (props) => {
           </div>
         ) : null
       }
-      <div className='shader' style={shaderStyle}>
+      <div className='shader' style={shaderStyle}
+        aria-label={isSummary || !selected ? null : I18n.t('This rating is selected')}>
         <div className="triangle" style={triangleStyle}/>
       </div>
     </div>
@@ -121,7 +124,8 @@ Rating.propTypes = {
   assessing: PropTypes.bool.isRequired,
   footer: PropTypes.node,
   selected: PropTypes.bool,
-  hidePoints: PropTypes.bool
+  hidePoints: PropTypes.bool,
+  isSummary: PropTypes.bool.isRequired,
 }
 Rating.defaultProps = {
   footer: null,
@@ -194,6 +198,8 @@ const Ratings = (props) => {
         onClick={() => onPointChange(tier.points)}
         tierColor={getTierColor(selected)}
         hidePoints={isSummary || hidePoints}
+        isSummary={isSummary}
+        selected={selected}
         {...tier}
       />
     )
