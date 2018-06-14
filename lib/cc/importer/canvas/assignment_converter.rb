@@ -33,15 +33,14 @@ module CC::Importer::Canvas
           mig_id = get_node_att(meta_node, 'assignment', 'identifier') || meta_node['identifier']
           max_attempts = get_node_val(meta_node, 'max_attempts')
 
-          puts "==== assignment_settings ===="
-          assignment_settings = {
+          update_settings = {
             id: mig_id,
-            subject: 'cartrige',
+            subject: 'cartridge',
             setting: 'max_attempts',
-            value: max_attempts
+            value: max_attempts,
+            object: 'assigments'
           }
-          pp assignment_settings
-          #SettingsService.update_assignment_settings(assignment_settings)
+          #SettingsService.update_settings(update_settings)
 
           assignment = assignments.detect{|a| a['migration_id'] && a['migration_id'] == mig_id}
           unless assignment
