@@ -68,4 +68,16 @@ describe QuizzesNext::Service do
       expect(Service.assignment_not_in_export?(assignment_not_found)).to eq(true)
     end
   end
+
+  describe '.assignment_duplicated?' do
+    it 'returns true if assignment has data suggesting it is duplicated' do
+      assignment_hash = { original_assignment_id: '1234' }
+      expect(Service.assignment_duplicated?(assignment_hash)).to be_truthy
+    end
+
+    it 'returns false if assignment does not have data suggesting it is duplicated' do
+      assignment_hash = {}
+      expect(Service.assignment_duplicated?(assignment_hash)).to be_falsey
+    end
+  end
 end

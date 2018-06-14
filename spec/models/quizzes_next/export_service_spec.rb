@@ -112,10 +112,10 @@ describe QuizzesNext::ExportService do
 
     it 'emits live events for each copied assignment' do
       basic_import_content[:assignments] << {
-          'original_resource_link_id': 'link-5678',
-          '$canvas_assignment_id': new_assignment2.id,
-          'original_assignment_id': old_assignment2.id
-        }
+        'original_resource_link_id': 'link-5678',
+        '$canvas_assignment_id': new_assignment2.id,
+        'original_assignment_id': old_assignment2.id
+      }
 
       expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).twice
       ExportService.send_imported_content(new_course, basic_import_content)
@@ -123,9 +123,9 @@ describe QuizzesNext::ExportService do
 
     it 'ignores not found assignments' do
       basic_import_content[:assignments] << {
-          'original_resource_link_id': '5678',
-          '$canvas_assignment_id': Canvas::Migration::ExternalContent::Translator::NOT_FOUND
-        }
+        'original_resource_link_id': '5678',
+        '$canvas_assignment_id': Canvas::Migration::ExternalContent::Translator::NOT_FOUND
+      }
 
       expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).once
       ExportService.send_imported_content(new_course, basic_import_content)
@@ -157,6 +157,19 @@ describe QuizzesNext::ExportService do
 
       ExportService.send_imported_content(new_course, basic_import_content)
       expect(new_assignment1.reload.external_tool_tag).to eq(old_assignment1.external_tool_tag)
+    end
+
+    it 'skips assignments that are not duplicates' do
+      basic_import_content[:assignments] << {
+        'original_resource_link_id': '5678',
+        '$canvas_assignment_id': new_assignment2.id
+      }
+
+      expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).once
+      # The specific error I care about here is `KeyError`, because that is what
+      # is raised when we try to access a key that is not present in the
+      # assignment hash, which is what has led to this fix.
+      expect { ExportService.send_imported_content(new_course, basic_import_content) }.not_to raise_error
     end
   end
 end
