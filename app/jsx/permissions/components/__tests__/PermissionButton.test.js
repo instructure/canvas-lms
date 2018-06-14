@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {shallow} from 'enzyme'
 
 import PermissionButton from '../PermissionButton'
 
@@ -81,15 +81,8 @@ const readOnly = () => ({
   useCaching: false
 })
 
-it('component renders', () => {
-  const tree = mount(<PermissionButton {...defaultProps()} />)
-
-  const node = tree.find('PermissionButton')
-  expect(node.exists()).toEqual(true)
-})
-
 it('displays enabled correctly', () => {
-  const tree = mount(<PermissionButton {...defaultProps()} />)
+  const tree = shallow(<PermissionButton {...defaultProps()} />)
 
   const check = tree.find('IconPublish')
   const x = tree.find('IconTrouble')
@@ -101,7 +94,7 @@ it('displays enabled correctly', () => {
 })
 
 it('displays disabled correctly', () => {
-  const tree = mount(<PermissionButton {...disabledProps()} />)
+  const tree = shallow(<PermissionButton {...disabledProps()} />)
 
   const check = tree.find('IconPublish')
   const x = tree.find('IconTrouble')
@@ -113,7 +106,7 @@ it('displays disabled correctly', () => {
 })
 
 it('displays enabled and locked correctly', () => {
-  const tree = mount(<PermissionButton {...enabledAndLockedProps()} />)
+  const tree = shallow(<PermissionButton {...enabledAndLockedProps()} />)
 
   const check = tree.find('IconPublish')
   const x = tree.find('IconTrouble')
@@ -125,7 +118,7 @@ it('displays enabled and locked correctly', () => {
 })
 
 it('displays disabled and locked correctly', () => {
-  const tree = mount(<PermissionButton {...disabledAndLockedProps()} />)
+  const tree = shallow(<PermissionButton {...disabledAndLockedProps()} />)
 
   const check = tree.find('IconPublish')
   const x = tree.find('IconTrouble')
@@ -137,7 +130,7 @@ it('displays disabled and locked correctly', () => {
 })
 
 it('displays disabled when permission is readonly', () => {
-  const tree = mount(<PermissionButton {...readOnly()} />)
+  const tree = shallow(<PermissionButton {...readOnly()} />)
   const button = tree.find('button')
   expect(button.props().disabled).toEqual(true)
 })

@@ -102,28 +102,7 @@ const DEFAULT_PROPS = () => ({
   searchPermissions: () => {},
   filterRoles: () => {},
   tabChanged: () => {},
-  setAndOpenAddTray: () => {},
-  useCaching: false
+  setAndOpenAddTray: () => {}
 })
 
-const STORE = {
-  getState: () => ({
-    activeRoleTray: null,
-    activePermissionTray: null,
-    contextId: 1,
-    contextType: COURSE,
-    permissionSearchString: '',
-    selectedRoles: [],
-    permissions: PERMISSIONS,
-    roles: ROLES,
-    nextFocus: {
-      permissionName: null,
-      roleId: null,
-      targetArea: null
-    }
-  }),
-  dispatch() {},
-  subscribe() {}
-}
-
-export {DEFAULT_PROPS, PERMISSIONS, ROLES, STORE, BASIC_ROLE_PERMISSION}
+export {DEFAULT_PROPS, PERMISSIONS, ROLES, BASIC_ROLE_PERMISSION}

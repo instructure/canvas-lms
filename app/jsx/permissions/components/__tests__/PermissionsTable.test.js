@@ -18,8 +18,7 @@
 
 import '@instructure/ui-themes/lib/canvas'
 import React from 'react'
-import {Provider} from 'react-redux'
-import {mount} from 'enzyme'
+import {shallow} from 'enzyme'
 import PermissionsTable from '../PermissionsTable'
 
 import {COURSE} from '../../propTypes'
@@ -45,7 +44,6 @@ const defaultProps = () => ({
       displayed: true
     }
   ],
-  useCaching: false,
   setAndOpenRoleTray: () => {},
   setAndOpenPermissionTray: () => {},
   permissions: [
@@ -54,29 +52,26 @@ const defaultProps = () => ({
   ]
 })
 
-const store = {
-  getState: () => ({
-    contextId: 1,
-    permissions: [],
-    roles: [],
-    nextFocus: {
-      permissionName: null,
-      roleId: null,
-      targetArea: null
-    }
-  }),
-  dispatch() {},
-  subscribe() {}
-}
+it('calls setAndOpenRoleTray on clicking one of the top headers', () => {
+  const setAndOpenRoleTrayMock = jest.fn()
+  const props = defaultProps()
+  props.setAndOpenRoleTray = setAndOpenRoleTrayMock
 
-it('renders the Permissions Table', () => {
-  const tree = mount(
-    <Provider store={store}>
-      <PermissionsTable {...defaultProps()} />
-    </Provider>
-  )
-  const node = tree.find('PermissionsTable')
-  expect(node.exists()).toBe(true)
+  const tree = shallow(<PermissionsTable {...props} />)
+  const node = tree.find('Button')
+  expect(node).toHaveLength(2)
+  node.at(0).simulate('click')
+  expect(setAndOpenRoleTrayMock).toHaveBeenCalledWith(props.roles[0])
 })
 
-// TODO: add more once we get something more fleshed out
+it('calls setAndOpenPermissionTray on clicking one of the side headers', () => {
+  const setAndOpenPermissionTrayMock = jest.fn()
+  const props = defaultProps()
+  props.setAndOpenPermissionTray = setAndOpenPermissionTrayMock
+
+  const tree = shallow(<PermissionsTable {...props} />)
+  const node = tree.find('Link')
+  expect(node).toHaveLength(2)
+  node.at(0).simulate('click')
+  expect(setAndOpenPermissionTrayMock).toHaveBeenCalledWith(props.permissions[0])
+})

@@ -17,21 +17,10 @@
  */
 
 import React from 'react'
-import {Provider} from 'react-redux'
-import {mount, shallow} from 'enzyme'
+import {shallow} from 'enzyme'
 
-import {DEFAULT_PROPS, STORE} from '../../__tests__/examples'
+import {DEFAULT_PROPS} from '../../__tests__/examples'
 import PermissionsIndex from '../PermissionsIndex'
-
-it('renders the component', () => {
-  const tree = mount(
-    <Provider store={STORE}>
-      <PermissionsIndex {...DEFAULT_PROPS()} />
-    </Provider>
-  )
-  const node = tree.find('PermissionsIndex')
-  expect(node.exists()).toEqual(true)
-})
 
 it('sets selected roles correctly when there are no rolls selected', () => {
   const tree = shallow(<PermissionsIndex {...DEFAULT_PROPS()} />)

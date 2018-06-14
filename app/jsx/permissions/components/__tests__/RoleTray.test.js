@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount, shallow} from 'enzyme'
+import {shallow} from 'enzyme'
 
 import {getPermissionsWithLabels} from '../../helper/utils'
 import {ROLES, PERMISSIONS} from '../../__tests__/examples'
@@ -43,13 +43,6 @@ function makeDefaultProps() {
     unassignedPermissions: perms
   }
 }
-
-it('renders the component', () => {
-  const props = makeDefaultProps()
-  const tree = mount(<RoleTray {...props} />)
-  const node = tree.find('RoleTray')
-  expect(node.exists()).toBeTruthy()
-})
 
 it('renders assigned permissions if any are present', () => {
   const props = makeDefaultProps()

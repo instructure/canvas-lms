@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!permissions_v2'
 import React, {Component} from 'react'
-import {func, arrayOf, bool} from 'prop-types'
+import {func, arrayOf} from 'prop-types'
 import {connect} from 'react-redux'
 import {debounce} from 'lodash'
 
@@ -49,12 +49,7 @@ export default class PermissionsIndex extends Component {
     roles: arrayOf(propTypes.role).isRequired,
     searchPermissions: func.isRequired,
     setAndOpenAddTray: func.isRequired,
-    tabChanged: func.isRequired,
-    useCaching: bool
-  }
-
-  static defaultProps = {
-    useCaching: true
+    tabChanged: func.isRequired
   }
 
   state = {
@@ -176,11 +171,11 @@ export default class PermissionsIndex extends Component {
         <TabList onChange={this.onTabChanged}>
           <TabPanel title={I18n.t('Course Roles')}>
             {this.renderHeader()}
-            <ConnectedPermissionsTable useCaching={this.props.useCaching} />
+            <ConnectedPermissionsTable />
           </TabPanel>
           <TabPanel title={I18n.t('Account Roles')}>
             {this.renderHeader()}
-            <ConnectedPermissionsTable useCaching={this.props.useCaching} />
+            <ConnectedPermissionsTable />
           </TabPanel>
         </TabList>
       </div>

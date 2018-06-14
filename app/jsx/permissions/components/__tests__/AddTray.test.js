@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount, shallow} from 'enzyme'
+import {shallow} from 'enzyme'
 
 import AddTray from 'jsx/permissions/components/AddTray'
 
@@ -182,12 +182,6 @@ const defaultProps = () => ({
       }
     }
   ]
-})
-
-test('renders the component', () => {
-  const tree = mount(<AddTray {...defaultProps()} />)
-  const node = tree.find('AddTray')
-  expect(node.exists()).toBe(true)
 })
 
 it('renders proper loading state for component', () => {

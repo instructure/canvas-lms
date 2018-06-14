@@ -19,7 +19,6 @@
 import {combineReducers} from 'redux'
 import {handleActions} from 'redux-actions'
 import {actionTypes} from './actions'
-import {COURSE} from './propTypes'
 
 import activeRoleTrayReducer from './reducers/activeRoleTrayReducer'
 import activeAddTrayReducer from './reducers/activeAddTrayReducer'
