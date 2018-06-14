@@ -78,13 +78,13 @@ export default class PermissionsTable extends Component {
   renderTopHeader() {
     return (
       <tr className="ic-permissions__top-header">
-        <td className="ic-permissions__corner-stone">
+        <th className="ic-permissions__corner-stone">
           <span className="ic-permission-corner-text">
             <Text weight="bold" size="small">
               {I18n.t('Permissions')}
             </Text>
           </span>
-        </td>
+        </th>
         {this.props.roles.map(role => (
           <th
             key={role.id}
