@@ -569,7 +569,14 @@ class Quizzes::QuizzesApiController < ApplicationController
   private
 
   def render_json
-    render json: quiz_json(@quiz, @context, @current_user, session)
+    render json: quiz_json(
+      @quiz,
+      @context,
+      @current_user,
+      session,
+      {},
+      Quizzes::QuizApiSerializer
+    )
   end
 
   def render_create_error(status)
