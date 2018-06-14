@@ -15,16 +15,14 @@ namespace :broker do
   PactBroker::Client::PublicationTask.new(:jenkins_post_merge) do |task|
     format_rake_task(
         task,
-        ENV.fetch('PACT_BROKER_BASE_URL'),
-        ENV.fetch('PACT_BROKER_BASIC_AUTH_USERNAME'),
-        ENV.fetch('PACT_BROKER_BASIC_AUTH_PASSWORD'),
+        ENV.fetch('PACT_BROKER_HOST'),
+        ENV.fetch('PACT_BROKER_USERNAME'),
+        ENV.fetch('PACT_BROKER_PASSWORD'),
         'master'
     )
   end
 
   def format_rake_task(task, url, username, password, task_tag)
-    require 'quiz_api_client'
-
     task.consumer_version = CanvasApiClient::VERSION
     task.pattern = 'pacts/*.json'
 
