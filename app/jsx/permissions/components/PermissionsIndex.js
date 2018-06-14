@@ -148,6 +148,7 @@ export default class PermissionsIndex extends Component {
               </GridCol>
               <GridCol width={2}>
                 <Button
+                  id="add_role"
                   variant="primary"
                   margin="0 x-small 0 0"
                   onClick={this.props.setAndOpenAddTray}

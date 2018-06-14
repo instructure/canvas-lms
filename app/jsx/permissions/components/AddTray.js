@@ -120,6 +120,7 @@ export default class AddTray extends Component {
     <Container display="block" margin="medium 0">
       <TextInput
         onChange={this.onChangeRoleName}
+        id="add_role_input"
         value={this.state.selectedRoleName}
         label={<Text weight="light">{`${I18n.t('Role Name')}:`}</Text>}
       />

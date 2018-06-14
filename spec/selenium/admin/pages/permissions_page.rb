@@ -51,6 +51,10 @@ class PermissionsIndex
       f('#add_role')
     end
 
+    def role_header
+      f('.ic-permissions__top-header')
+    end
+
     def role_link(role)
       f("#user_#{role.id}")
     end
@@ -61,8 +65,12 @@ class PermissionsIndex
     end
 
     # this applies to parent permissions only
-    def permission_cell(permission, role)
-      f("##{permission.permission_name}_role_#{role.id}")
+    def permission_cell(permission_name, role_id)
+      f("##{permission_name}_role_#{role_id}")
+    end
+
+    def permission_edit_tray_button(permission_name, role_id)
+      ff("##{permission_name}_#{role_id}").last
     end
 
     def permission_menu_item(item_name)
@@ -77,6 +85,10 @@ class PermissionsIndex
       f("#edit_button")
     end
 
+    def add_role_input
+      f("#add_role_input")
+    end
+
     def role_name(role)
       f("#role_#{role.id}")
     end
@@ -85,8 +97,23 @@ class PermissionsIndex
       f("#edit_tray_header")
     end
 
+    def add_role_submit_button
+      f("#permissions-add-tray-submit-button")
+    end
+
+    def edit_role_tray_permissoin_state(permission, role)
+      icon = ff("##{permission}_#{role} svg").first.attribute('name')
+      state = ""
+      if icon == "IconTrouble"
+        state = "Disabled"
+      elsif icon == "IconPublish"
+        state = "Enabled"
+      end
+      state
+    end
+
     def permission_state(permission, role)
-      state = string.Empty
+      state = ""
       icons = ff('svg', permission_cell(permission, role))
       icons.each do |icon|
         if icon.name == "IconPublish"
@@ -107,9 +134,21 @@ class PermissionsIndex
       permission_tab(tab_name).click
     end
 
+    def disable_edit_tray_permission(permission_name, role_id)
+      permission_edit_tray_button(permission_name, role_id).click()
+      ff('[role="menuitemradio"]')[2].click()
+    end
+
     def open_edit_role_tray(role)
       role_name(role).click
       edit_role_icon.click
+    end
+
+    def add_role(name)
+      add_role_button.click()
+      set_value(add_role_input, name)
+      add_role_submit_button.click()
+      wait_for_ajaximations
     end
 
     def edit_role(role, new_name)

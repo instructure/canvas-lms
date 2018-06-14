@@ -20,7 +20,7 @@ require_relative './pages/permissions_page'
 describe "permissions index" do
   include_context "in-process server selenium tests"
 
-  describe "editing role names" do
+  describe "editing role info" do
     before :each do
       @account = Account.default
       account_admin_user
@@ -29,10 +29,34 @@ describe "permissions index" do
       PermissionsIndex.visit(@account)
     end
 
-    it "updates the permission to the new name after editing" do
+    it "updates the role to the new name after editing" do
       PermissionsIndex.edit_role(@custom_student_role, "A Better Kitty")
       expect{PermissionsIndex.role_name(@custom_student_role).text}.to become("A Better Kitty")
       expect{PermissionsIndex.edit_tray_header.text}.to become("Edit A Better Kitty")
+    end
+
+    it "updates the permission to the correct section" do
+      button_state = PermissionsIndex.edit_role_tray_permissoin_state("read_announcements", @custom_student_role.id)
+      expect(button_state).to eq('Enabled')
+      PermissionsIndex.open_edit_role_tray(@custom_student_role)
+      PermissionsIndex.disable_edit_tray_permission("read_announcements", @custom_student_role.id)
+      wait_for_children("#flashalert_message_holder")
+      button_state = PermissionsIndex.edit_role_tray_permissoin_state("read_announcements", @custom_student_role.id)
+      expect(button_state).to eq('Disabled')
+    end
+  end
+
+  describe "Add Role" do
+    before :each do
+      @account = Account.default
+      account_admin_user
+      user_session(@admin)
+      PermissionsIndex.visit(@account)
+    end
+
+    it "opens the edit tray when you click an edit icon" do
+      PermissionsIndex.add_role("best role name ever")
+      expect(PermissionsIndex.role_header).to include_text("Student\nbest role name ever\n")
     end
   end
 end
