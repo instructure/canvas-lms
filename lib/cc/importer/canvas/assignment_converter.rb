@@ -33,7 +33,7 @@ module CC::Importer::Canvas
           mig_id = get_node_att(meta_node, 'assignment', 'identifier') || meta_node['identifier']
           max_attempts = get_node_val(meta_node, 'max_attempts')
 
-          if !max_attempts.nil? && max_attempts > 0
+          if !max_attempts.nil? && max_attempts != '0'
             update_settings = {
               id: mig_id,
               setting: 'max_attempts',
