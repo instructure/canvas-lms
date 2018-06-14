@@ -37,6 +37,12 @@ import Menu, {
 import actions from '../actions'
 import propTypes from '../propTypes'
 
+const MENU_ID_DEFAULT = 1
+const MENU_ID_ENABLED = 2
+const MENU_ID_ENABLED_ANE_LOCKED = 3
+const MENU_ID_DISABLED = 4
+const MENU_ID_DISABLED_AND_LOCKED = 5
+
 export default class PermissionButton extends Component {
   static propTypes = {
     cleanFocus: PropTypes.func.isRequired,
@@ -143,15 +149,15 @@ export default class PermissionButton extends Component {
 
   checkedSelection(enabled, locked, explicit) {
     if (!explicit) {
-      return 'Use Default'
+      return MENU_ID_DEFAULT
     } else if (enabled && !locked) {
-      return 'Enable'
+      return MENU_ID_ENABLED
     } else if (enabled && locked) {
-      return 'Enable and Lock'
+      return MENU_ID_ENABLED_ANE_LOCKED
     } else if (!enabled && !locked) {
-      return 'Disable'
+      return MENU_ID_DISABLED
     } else {
-      return 'Disable and Lock'
+      return MENU_ID_DISABLED_AND_LOCKED
     }
   }
 
@@ -187,7 +193,7 @@ export default class PermissionButton extends Component {
         ]}
       >
         <MenuItem
-          value={I18n.t('Enable')}
+          value={MENU_ID_ENABLED}
           onClick={() =>
             this.props.handleClick({
               name: this.props.permissionName,
@@ -202,7 +208,7 @@ export default class PermissionButton extends Component {
           <Text>{I18n.t('Enable')}</Text>
         </MenuItem>
         <MenuItem
-          value={I18n.t('Enable and Lock')}
+          value={MENU_ID_ENABLED_ANE_LOCKED}
           onClick={() =>
             this.props.handleClick({
               name: this.props.permissionName,
@@ -217,7 +223,7 @@ export default class PermissionButton extends Component {
           <Text>{I18n.t('Enable and Lock')}</Text>
         </MenuItem>
         <MenuItem
-          value={I18n.t('Disable')}
+          value={MENU_ID_DISABLED}
           onClick={() =>
             this.props.handleClick({
               name: this.props.permissionName,
@@ -232,7 +238,7 @@ export default class PermissionButton extends Component {
           <Text>{I18n.t('Disable')}</Text>
         </MenuItem>
         <MenuItem
-          value={I18n.t('Disable and Lock')}
+          value={MENU_ID_DISABLED_AND_LOCKED}
           onClick={() =>
             this.props.handleClick({
               name: this.props.permissionName,
@@ -249,7 +255,7 @@ export default class PermissionButton extends Component {
 
         <MenuItemSeparator />
         <MenuItem
-          value={I18n.t('Use Default')}
+          value={MENU_ID_DEFAULT}
           onClick={() =>
             this.props.handleClick({
               name: this.props.permissionName,
