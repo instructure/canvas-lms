@@ -132,7 +132,7 @@ export default class ProficiencyRating extends React.Component {
     } = this.props
     return (
       <tr>
-        <td style={{textAlign: 'center'}}>
+        <td style={{textAlign: 'center', verticalAlign: 'top', padding: '1.1rem 0 0 0'}}>
           <div style={{display: 'inline-block'}}>
             <RadioInput
               ref={(input) => { this.radioInput = input }}
@@ -141,7 +141,7 @@ export default class ProficiencyRating extends React.Component {
               onChange={this.handleMasteryChange} />
           </div>
         </td>
-        <td className="description">
+        <td className="description" style={{verticalAlign: 'top'}}>
           <TextInput
             ref={this.setDescriptionRef}
             label={<ScreenReaderContent>{I18n.t('Change description')}</ScreenReaderContent>}
@@ -150,7 +150,7 @@ export default class ProficiencyRating extends React.Component {
             defaultValue={description}
           />
         </td>
-        <td className="points">
+        <td className="points" style={{verticalAlign: 'top'}}>
           <TextInput
             ref={this.setPointsRef}
             label={<ScreenReaderContent>{I18n.t('Change points')}</ScreenReaderContent>}
@@ -160,7 +160,7 @@ export default class ProficiencyRating extends React.Component {
             width="4rem"
           />
         </td>
-        <td className="color">
+        <td className="color" style={{verticalAlign: 'top'}}>
           <Popover
             on="click"
             show={this.state.showColorPopover}
