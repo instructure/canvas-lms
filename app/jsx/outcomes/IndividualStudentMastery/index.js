@@ -27,17 +27,20 @@ import natcompare from 'compiled/util/natcompare'
 import OutcomeGroup from './OutcomeGroup'
 import fetchOutcomes from './fetchOutcomes'
 import { Set } from 'immutable'
+import * as shapes from './shapes'
 
 // eslint-disable-next-line
 class IndividualStudentMastery extends React.Component {
   static propTypes = {
     courseId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     studentId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    onExpansionChange: PropTypes.func
+    onExpansionChange: PropTypes.func,
+    outcomeProficiency: shapes.outcomeProficiencyShape
   }
 
   static defaultProps = {
-    onExpansionChange: () => {}
+    onExpansionChange: () => {},
+    outcomeProficiency: null
   }
 
   constructor () {
@@ -132,6 +135,7 @@ class IndividualStudentMastery extends React.Component {
 
   renderGroups () {
     const { outcomeGroups, outcomes } = this.state
+    const { outcomeProficiency } = this.props
     return (
       <div>
         <List variant="unstyled">
@@ -144,6 +148,7 @@ class IndividualStudentMastery extends React.Component {
                   expanded={this.state.expandedGroups.has(outcomeGroup.id)}
                   expandedOutcomes={this.state.expandedOutcomes}
                   onExpansionChange={this.onElementExpansionChange}
+                  outcomeProficiency={outcomeProficiency}
                />
               </ListItem>
             ))

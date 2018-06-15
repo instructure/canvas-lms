@@ -25,6 +25,8 @@ const outcome = (id, title) => ({
   id,
   title,
   mastered: false,
+  mastery_points: 3,
+  points_possible: 5,
   ratings: [
     { description: 'My first rating' },
     { description: 'My second rating' }
@@ -33,9 +35,11 @@ const outcome = (id, title) => ({
     {
       id: 1,
       percent: 0.1,
-      alignment: {
+      assignment: {
+        id: 2,
+        name: 'My alignment',
         html_url: 'http://foo',
-        name: 'My alignment'
+        submission_types: ''
       }
     }
   ]
@@ -52,6 +56,8 @@ const defaultProps = (props = {}) => (
         id: 1,
         expansionId: 100,
         mastered: false,
+        mastery_points: 3,
+        points_possible: 5,
         ratings: [
           { description: 'My first rating' },
           { description: 'My second rating' }

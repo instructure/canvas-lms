@@ -24,8 +24,11 @@ const result = (id = 1, date = new Date()) => ({
   id,
   percent: 0.1,
   assignment: {
+    id: 1,
     html_url: 'http://foo',
-    name: 'My alignment'
+    name: 'My alignment',
+    submission_types: '',
+    score: 0
   },
   submitted_or_assessed_at: date.toISOString()
 })
@@ -36,6 +39,8 @@ const defaultProps = (props = {}) => (
       id: 1,
       expansionId: 100,
       mastered: false,
+      mastery_points: 3,
+      points_possible: 5,
       ratings: [
         { description: 'My first rating' },
         { description: 'My second rating' }
@@ -49,7 +54,8 @@ const defaultProps = (props = {}) => (
             id: 1,
             html_url: 'http://foo',
             name: 'My assignment',
-            submission_types: 'online_quiz'
+            submission_types: 'online_quiz',
+            score: 0
           }
         }
       ],

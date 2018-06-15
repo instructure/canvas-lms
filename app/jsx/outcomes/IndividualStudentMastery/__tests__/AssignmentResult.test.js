@@ -30,7 +30,9 @@ const defaultProps = (props = {}) => (
         { description: 'My second rating' }
       ],
       results: [],
-      title: 'foo'
+      title: 'foo',
+      mastery_points: 3,
+      points_possible: 5
     },
     result: {
       id: 1,

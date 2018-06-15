@@ -43,7 +43,12 @@ export default class OutcomeGroup extends React.Component {
     outcomes: PropTypes.arrayOf(shapes.outcomeShape).isRequired,
     expanded: PropTypes.bool.isRequired,
     expandedOutcomes: ImmutablePropTypes.set.isRequired,
-    onExpansionChange: PropTypes.func.isRequired
+    onExpansionChange: PropTypes.func.isRequired,
+    outcomeProficiency: shapes.outcomeProficiencyShape
+  }
+
+  static defaultProps = {
+    outcomeProficiency: null
   }
 
   handleToggle = (_event, expanded) => {
@@ -51,7 +56,7 @@ export default class OutcomeGroup extends React.Component {
   }
 
   render () {
-    const { outcomeGroup, outcomes, expanded, expandedOutcomes, onExpansionChange } = this.props
+    const { outcomeGroup, outcomes, expanded, expandedOutcomes, onExpansionChange, outcomeProficiency } = this.props
     const numMastered = outcomes.filter((o) => o.mastered).length
     const numGroup = outcomes.length
 
@@ -70,7 +75,8 @@ export default class OutcomeGroup extends React.Component {
                   <Outcome
                     outcome={outcome}
                     expanded={expandedOutcomes.has(outcome.expansionId)}
-                    onExpansionChange={onExpansionChange} />
+                    onExpansionChange={onExpansionChange}
+                    outcomeProficiency={outcomeProficiency} />
                 </ListItem>
               ))
             }

@@ -34,7 +34,12 @@ export default class Outcome extends React.Component {
   static propTypes = {
     outcome: shapes.outcomeShape.isRequired,
     expanded: PropTypes.bool.isRequired,
-    onExpansionChange: PropTypes.func.isRequired
+    onExpansionChange: PropTypes.func.isRequired,
+    outcomeProficiency: shapes.outcomeProficiencyShape
+  }
+
+  static defaultProps = {
+    outcomeProficiency: null
   }
 
   handleToggle = (_event, expanded) => {
@@ -75,13 +80,15 @@ export default class Outcome extends React.Component {
   }
 
   renderDetails () {
-    const { outcome } = this.props
+    const { outcome, outcomeProficiency } = this.props
     const { results } = outcome
     return (
       <List variant="unstyled" delimiter="dashed">
       {
           results.sort(natcompare.byKey('submitted_or_assessed_at')).reverse().map((result) => (
-            <ListItem key={result.id}><AssignmentResult result={result} outcome={outcome} /></ListItem>
+            <ListItem key={result.id}>
+              <AssignmentResult result={result} outcome={outcome} outcomeProficiency={outcomeProficiency} />
+            </ListItem>
         ))
       }
       </List>

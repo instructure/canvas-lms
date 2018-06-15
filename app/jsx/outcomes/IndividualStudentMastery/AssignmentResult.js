@@ -18,6 +18,7 @@
 
 import React from 'react'
 import I18n from 'i18n!outcomes'
+import _ from 'lodash'
 import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
 import View from '@instructure/ui-layout/lib/components/View'
 import Link from '@instructure/ui-elements/lib/components/Link'
@@ -27,7 +28,7 @@ import IconQuiz from '@instructure/ui-icons/lib/Line/IconQuiz'
 import * as shapes from './shapes'
 import Ratings from '../../rubrics/Ratings'
 
-const AssignmentResult = ({ outcome, result }) => {
+const AssignmentResult = ({ outcome, result, outcomeProficiency }) => {
   const { ratings } = outcome
   const { html_url: url, name, submission_types: types } = result.assignment
   const isQuiz = types && types.indexOf('online_quiz') >= 0
@@ -61,7 +62,9 @@ const AssignmentResult = ({ outcome, result }) => {
               points={result.score}
               hidePoints={result.hide_points}
               useRange={false}
-              masteryThreshold={outcome.mastery_points}
+              customRatings={_.get(outcomeProficiency, 'ratings')}
+              defaultMasteryThreshold={outcome.mastery_points}
+              pointsPossible={outcome.points_possible}
               assessing={false}
               isSummary={false}
             />
@@ -74,7 +77,12 @@ const AssignmentResult = ({ outcome, result }) => {
 
 AssignmentResult.propTypes = {
   result: shapes.outcomeResultShape.isRequired,
-  outcome: shapes.outcomeShape.isRequired
+  outcome: shapes.outcomeShape.isRequired,
+  outcomeProficiency: shapes.outcomeProficiencyShape
+}
+
+AssignmentResult.defaultProps = {
+  outcomeProficiency: null
 }
 
 export default AssignmentResult

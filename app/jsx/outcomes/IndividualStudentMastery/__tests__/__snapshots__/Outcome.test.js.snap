@@ -4,7 +4,7 @@ exports[`renders correctly expanded 1`] = `
 "<ToggleGroup summary={{...}} toggleLabel=\\"Toggle alignment details for My outcome\\" expanded={true} onToggle={[Function]} border={false} size=\\"medium\\" icon={[Function]} iconExpanded={[Function]} defaultExpanded={false} transition={true} as=\\"span\\" elementRef={[Function]}>
   <List variant=\\"unstyled\\" delimiter=\\"dashed\\" as=\\"ul\\" margin=\\"none\\" size=\\"medium\\">
     <ListItem>
-      <AssignmentResult result={{...}} outcome={{...}} />
+      <AssignmentResult result={{...}} outcome={{...}} outcomeProficiency={{...}} />
     </ListItem>
   </List>
 </ToggleGroup>"
@@ -24,7 +24,7 @@ exports[`renders the Outcome component 1`] = `
 "<ToggleGroup summary={{...}} toggleLabel=\\"Toggle alignment details for My outcome\\" expanded={false} onToggle={[Function]} border={false} size=\\"medium\\" icon={[Function]} iconExpanded={[Function]} defaultExpanded={false} transition={true} as=\\"span\\" elementRef={[Function]}>
   <List variant=\\"unstyled\\" delimiter=\\"dashed\\" as=\\"ul\\" margin=\\"none\\" size=\\"medium\\">
     <ListItem>
-      <AssignmentResult result={{...}} outcome={{...}} />
+      <AssignmentResult result={{...}} outcome={{...}} outcomeProficiency={{...}} />
     </ListItem>
   </List>
 </ToggleGroup>"
