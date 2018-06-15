@@ -38,8 +38,8 @@ describe 'Account Reports', :pact do
             'Version': 'HTTP/1.1'
           },
           'path' => Pact.provider_param(
-            "/api/v1/accounts/:{account_user_id}/reports",
-            {account_user_id: '1' }
+            "/api/v1/accounts/:{account_id}/reports",
+            {account_id: '1' }
           ),
           query: ''
         ).
@@ -73,8 +73,8 @@ describe 'Account Reports', :pact do
             'Version': 'HTTP/1.1'
           },
           'path' => Pact.provider_param(
-            "/api/v1/accounts/:{account_user_id}/reports/:{report_type}/:{report_id}",
-            {account_user_id: '1', report_type: 'report_type', report_id: '1'}
+            "/api/v1/accounts/:{account_id}/reports/:{report_type}/:{report_id}",
+            {account_id: '1', report_type: 'report_type', report_id: '1'}
           ),
           query: ''
         ).

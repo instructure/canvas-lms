@@ -37,8 +37,8 @@ describe 'Account Notifications', :pact do
             'Version': 'HTTP/1.1'
           },
           'path' => Pact.provider_param(
-            "/api/v1/accounts/:{account_user_id}/account_notifications",
-            { account_user_id: '1'}
+            "/api/v1/accounts/:{account_id}/account_notifications",
+            { account_id: '1'}
           ),
           query: ''
         ).
@@ -78,8 +78,8 @@ describe 'Account Notifications', :pact do
             'Version': 'HTTP/1.1'
           },
           'path' => Pact.provider_param(
-            "/api/v1/accounts/:{account_user_id}/account_notifications/:{notification1_id}",
-            { account_user_id: '1', notification1_id: '1'}
+            "/api/v1/accounts/:{account_id}/account_notifications/:{notification1_id}",
+            { account_id: '1', notification1_id: '1'}
           ),
           query: ''
         ).
@@ -119,8 +119,8 @@ describe 'Account Notifications', :pact do
             'Version': 'HTTP/1.1'
           },
           'path' => Pact.provider_param(
-            "/api/v1/accounts/:{account_user_id}/account_notifications/:{notification3_id}",
-            { account_user_id: '1', notification3_id: '3'}
+            "/api/v1/accounts/:{account_id}/account_notifications/:{notification3_id}",
+            { account_id: '1', notification3_id: '3'}
           ),
           query: ''
         ).
@@ -161,8 +161,8 @@ describe 'Account Notifications', :pact do
             'Content-Type': 'application/json'
           },
           'path' => Pact.provider_param(
-            "/api/v1/accounts/:{account_user_id}/account_notifications",
-            { account_user_id: '1'}
+            "/api/v1/accounts/:{account_id}/account_notifications",
+            { account_id: '1'}
           ),
           'body' =>
           {
@@ -213,8 +213,8 @@ describe 'Account Notifications', :pact do
             'Content-Type': 'application/json'
           },
           'path' => Pact.provider_param(
-            "/api/v1/accounts/:{account_user_id}/account_notifications/:{notification1_id}",
-            { account_user_id: '1', notification1_id: '1'}
+            "/api/v1/accounts/:{account_id}/account_notifications/:{notification1_id}",
+            { account_id: '1', notification1_id: '1'}
           ),
           'body' =>
           {

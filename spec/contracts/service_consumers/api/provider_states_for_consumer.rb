@@ -145,7 +145,7 @@ PactConfig::Consumers::ALL.each do |consumer|
         )
 
         provider_param :token, token
-        provider_param :account_user_id, @user.id.to_s
+        provider_param :account_id, @account.id.to_s
         provider_param :notification1_id, @notification1.id.to_s
         provider_param :notification2_id, @notification2.id.to_s
         provider_param :notification3_id, @notification3.id.to_s
@@ -174,7 +174,7 @@ PactConfig::Consumers::ALL.each do |consumer|
         @report.save!
 
         provider_param :token, token
-        provider_param :account_user_id, @admin.account.id.to_s
+        provider_param :account_id, @admin.account.id.to_s
         provider_param :report_type, @report.report_type.to_s
         provider_param :report_id, @report.id.to_s
       end
