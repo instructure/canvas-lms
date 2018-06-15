@@ -53,4 +53,45 @@ describe 'Assignments', :pact do
       expect(response[0]['name']).to eq 'Assignment1'
     end
   end
+
+  context 'Post Assignments' do
+    it 'should return JSON body' do
+      canvas_lms_api.given('a teacher in a course').
+        upon_receiving('Post Assignments').
+        with(
+          method: :post,
+          headers: {
+            'Authorization' => Pact.provider_param(
+              'Bearer :{token}',
+              { token: 'some_token' }
+            ),
+            'Connection': 'close',
+            'Host': PactConfig.mock_provider_service_base_uri,
+            'Version': 'HTTP/1.1',
+            'Content-Type': 'application/json'
+          },
+          'path' => Pact.provider_param(
+            "/api/v1/courses/:{course_id}/assignments",
+            { course_id: '1' }
+          ),
+          'body' =>
+            {
+              'assignment':
+                {
+                  'name': 'New Assignment'
+                }
+            },
+
+          query: ''
+        ).
+        will_respond_with(
+          status: 201,
+          body: Pact.like('id': 1, 'name': 'New Assignment')
+        )
+
+      response = assignments_api.post_assignments(1, 'New Assignment')
+      expect(response['id']).to eq 1
+      expect(response['name']).to eq 'New Assignment'
+    end
+  end
 end

@@ -32,6 +32,24 @@ module Helper
       rescue
         nil
       end
+
+      def post_assignments(course_id, course_name)
+        JSON.parse(
+          self.class.post(
+            "/api/v1/courses/#{course_id}/assignments",
+            :body =>
+              {
+                :assignment =>
+                  {
+                    :name => course_name
+                  }
+              }.to_json,
+            :headers => {'Content-Type' => 'application/json'}
+           ).body
+        )
+      rescue
+        nil
+      end
     end
   end
 end
