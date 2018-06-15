@@ -9,7 +9,8 @@ testWebpackConfig.entry = undefined
 testWebpackConfig.plugins.push(new webpack.EnvironmentPlugin({
   JSPEC_PATH: null,
   JSPEC_GROUP: null,
-  A11Y_REPORT: false
+  A11Y_REPORT: false,
+  SENTRY_URL: null
 }))
 
 // These externals are necessary for Enzyme
