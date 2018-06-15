@@ -2613,7 +2613,7 @@ nl:
       descriptions: 
         allowed_extensions: "Een lijst met geaccepteerde extensies invoegen, bijvoorbeeld: doc,xls,txt"
       external_tool_group_warning: "Groepsopdrachten kunnen geen Externe Tools gebruiken. De groepsinstelling wordt uitgevinkt als je opslaat."
-      external_tool_options: "Externe tool opties"
+      external_tool_options: "Opties externe tool"
       label: 
         external_tool_new_tab: "Dit hulprogramma in een nieuw tabblad laden"
         external_tool_url: "Externe hulpprogramma URL"
@@ -7294,7 +7294,7 @@ nl:
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "\"{{ACCOUNT_DOMAIN}}\" invoeren om het domein van het hoofdaccount van de gebruiker te vervangen"
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "\"{{CANVAS_USER_ID}}\" invoeren om het unieke Canvas-ID van de gebruiker te vervangen"
   enter_grades_as_e113e606: "Cijfers invoeren als"
-  enter_or_find_an_external_tool_url_6aebbd0d: "Een extern tool URL invoeren of zoeken"
+  enter_or_find_an_external_tool_url_6aebbd0d: "URL externe tool invoeren of zoeken"
   enter_specific_phrase_9b686755: "Specifieke woordgroep invoeren"
   enter_the_access_token_for_your_organization_from__cc77493d: "Voer het toegangstoken van je organisatie in van *eduappcenter.com*. Eenmaal toegepast, worden alleen apps die je organisatie goedgekeurd heeft in de EduAppCenter vermeld op de Externe Apps pagina. Leer hoe een **toegangstoken te genereren**."
   enter_the_email_addresses_of_the_users_you_would_l_17cef6a0: "Voer de e-mailadressen in van de gebruikers die je wilt toevoegen, gescheiden door een komma"
