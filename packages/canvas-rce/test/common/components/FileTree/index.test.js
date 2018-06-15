@@ -85,9 +85,14 @@ describe("FileTree/index", () => {
     beforeEach(() => {
       stopPropagation.reset();
       div = document.createElement("div");
+      document.body.appendChild(div);
       component = ReactDOM.render(<FileTree {...props} />, div);
       buttons = div.querySelectorAll("button");
     });
+
+    afterEach(() => {
+      document.body.removeChild(div);
+    })
 
     it("focus the next button when down is pushed", () => {
       buttons[0].focus();

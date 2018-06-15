@@ -9,7 +9,7 @@
     "integration-test": "nightwatch --env integration",
     "lint": "eslint \"src/**/*.js\" \"app/**/*.js\" \"test/**/*.js\" \"shared/**/*.js\"",
     "lint:fix": "eslint --fix \"src/**/*.js\" \"app/**/*.js\" \"test/**/*.js\" \"shared/**/*.js\"",
-    "test": "BABEL_ENV=test-node mocha 'test/**/*.test.js' --require @instructure/ui-themes/lib/canvas --compilers js:babel-core/register",
+    "test": "BABEL_ENV=test-node mocha 'test/**/*.test.js' --require @instructure/ui-themes/lib/canvas --compilers js:babel-core/register --timeout 5000",
     "test:watch": "BABEL_ENV=test-node mocha 'test/**/*.test.js' --require @instructure/ui-themes/lib/canvas --compilers js:babel-core/register --watch",
     "test-cov": "cross-env BABEL_ENV=test-node nyc -r html  node_modules/.bin/mocha -- 'test/**/*.test.js'",
     "debug": "BABEL_ENV=test-node inspect _mocha --no-timeouts --debug-brk 'test/**/*.test.js' --require @instructure/ui-themes/lib/canvas --compilers js:babel-core/register",
