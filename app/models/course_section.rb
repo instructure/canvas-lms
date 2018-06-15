@@ -165,7 +165,8 @@ class CourseSection < ActiveRecord::Base
 
   def update_account_associations_if_changed
     if (self.saved_change_to_course_id? || self.saved_change_to_nonxlist_course_id?) && !Course.skip_updating_account_associations?
-      Course.send_later_if_production(:update_account_associations,
+      Course.send_later_if_production_enqueue_args(:update_account_associations,
+                                      {:n_strand => ["update_account_associations", self.root_account_id]},
                                       [self.course_id, self.course_id_before_last_save, self.nonxlist_course_id, self.nonxlist_course_id_before_last_save].compact.uniq)
     end
   end
