@@ -121,6 +121,26 @@ test('student planner option does stuff', () => {
   equal(studentPlannerDateInput.val(), 'Jan 3 at 12am')
 })
 
+test('add to student to-do requires date', () => {
+  const wikiPage = new WikiPage({title: 'blah'})
+  const view = new WikiPageEditView({
+    model: wikiPage,
+    WIKI_RIGHTS: {manage: true}
+  })
+  view.render()
+  view.$el.find('#student_planner_checkbox').prop('checked', true)
+  view.$el.find('#student_planner_checkbox').trigger('change')
+  let data = view.getFormData()
+  let errors = view.validateFormData(data)
+  deepEqual(errors, {"student_todo_at": [{"message": "You must enter a date", "type": "required"}]})
+
+  view.$el.find('#todo_date').val('2018-01-01')
+  view.$el.find('#todo_date').trigger('change')
+  data = view.getFormData()
+  errors = view.validateFormData(data)
+  deepEqual(errors, {})
+})
+
 QUnit.module('WikiPageEditView:ConditionalContent', {
   setup() {
     fakeENV.setup({CONDITIONAL_RELEASE_SERVICE_ENABLED: true})

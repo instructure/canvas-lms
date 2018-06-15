@@ -39,6 +39,7 @@ define [
         '.help_dialog': '$helpDialog'
         '#todo_date': '$studentTodoAt'
         '#todo_date_container': '$studentTodoAtContainer'
+        '#student_planner_checkbox': '$studentPlannerCheckbox'
 
       events:
         'click a.switch_views': 'switchViews'
@@ -176,7 +177,7 @@ define [
           }
         ]
 
-      if data.student_planner_checkbox == '1' && !data.student_todo_at?
+      if data.student_planner_checkbox && !data.student_todo_at?
         errors['student_todo_at'] = [
           {
             type: 'required'
@@ -227,7 +228,7 @@ define [
       else
         page_data.assignment = @model.createAssignment(set_assignment: '0')
       page_data.set_assignment = page_data.assignment.get('set_assignment')
-      page_data.student_planner_checkbox = $("#student_planner_checkbox").is(":checked")
+      page_data.student_planner_checkbox = @$studentPlannerCheckbox.is(":checked")
       if page_data.student_planner_checkbox
         page_data.student_todo_at = @$studentTodoAt.data('unfudged-date')
       else
