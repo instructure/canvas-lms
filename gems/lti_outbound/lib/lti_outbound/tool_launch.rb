@@ -45,6 +45,7 @@ module LtiOutbound
 
     def for_assignment!(assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
       @assignment = assignment
+      active_record_assignment = Assignment.find(assignment.id)
       hash['lis_result_sourcedid'] = assignment.source_id if user.learner?
       hash['lis_outcome_service_url'] = outcome_service_url
       hash['ext_ims_lis_basic_outcome_url'] = legacy_outcome_service_url
@@ -52,9 +53,15 @@ module LtiOutbound
       hash['ext_outcome_result_total_score_accepted'] = true
       hash['ext_outcomes_tool_placement_url'] = lti_turnitin_outcomes_placement_url
 
+      assignment_settings = SettingsService.get_settings(id: active_record_assignment.migration_id, object: 'assignment')
+
       ### Temporary Ugly Hack ##
       if assignment.title.downcase == 'final exam'
         hash['custom_strongmind_max_assessment_attempts'] = 1
+      end
+
+      if assignment_settings and assignment_settings['max_attempts']
+        hash['custom_strongmind_max_assessment_attempts'] = assignment_settings['max_attempts'].to_i
       end
 
       add_assignment_substitutions!(assignment)
