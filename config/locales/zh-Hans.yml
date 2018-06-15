@@ -9527,7 +9527,7 @@ zh-Hans:
       x_new_in_peer_reviews: 
         one: "*%{count}* 项同伴审阅"
         other: "*%{count}* 项同伴审阅"
-    local: 本地
+    local: 当地时间
     select: 
       prompt: 请选择
     submit: 
