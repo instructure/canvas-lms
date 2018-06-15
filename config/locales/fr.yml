@@ -2550,7 +2550,7 @@ fr:
     select_assignment: "[Sélectionner une tâche]"
     show: 
       assignment_locked: "Cette tâche est actuellement verrouillée."
-      available_from: "Disponible depuis"
+      available_from: "Disponible depuis le"
       date_time_by: "%{date} à %{time}"
       defaults: 
         no_content: "Pas de contenu"
@@ -2960,11 +2960,11 @@ fr:
   available_8606e40c: Disponible
   available_after_unlock_at_b5682224: "Disponible après %{unlock_at}"
   available_after_unlock_at_until_lock_at_499e8092: "Disponible après %{unlock_at} et jusqu’à %{lock_at}"
-  available_from_587ce92f: "Disponible depuis"
+  available_from_587ce92f: "Disponible depuis le"
   available_from_date_43b5e11d: "Disponible à partir de la date"
   available_from_date_afc594fa: "Disponible à partir de la date : "
   available_from_date_must_precede_available_until_c9f9e533: "La date \"Disponible du\" doit être antérieure à celle \"Disponible jusqu'au\""
-  available_from_f84e4611: "Disponibles depuis"
+  available_from_f84e4611: "Disponibles depuis le"
   available_from_field_for_styleguide_7ced3861: "Champ 'Disponible Depuis' du guide stylistique"
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "Disponible dès - Formatez comme suit : AAAA-MM-JJ hh:mm"
   available_to_b7350e02: "Disponible pour"
@@ -6632,7 +6632,7 @@ fr:
   discussion_topic_will_show_on_student_to_do_list_f_1c9e6286: "Le sujet de discussion s’affichera sur la liste des choses à faire de l’étudiant"
   discussion_topics: 
     assignment_details: 
-      available_from: "Disponible depuis"
+      available_from: "Disponible depuis le"
       due: Échéance
       due_date: "à rendre le %{date}"
       for: Pour
@@ -6685,7 +6685,7 @@ fr:
       allow_liking: "Autoriser des rétroactions de type « J'aime »"
       allow_threaded_replies: "Autoriser les réponses thématiques"
       attachment: "Pièce jointe"
-      available_from: "Disponible depuis"
+      available_from: "Disponible depuis le"
       buttons: 
         not_published: "Non publiés"
         published: Publiés
@@ -9574,8 +9574,8 @@ fr:
   hide_admin_navigation_menu_5cab9c9e: "Masquer le menu de navigation de l’administrateur"
   hide_all_artifacts_d654fbd5: "Masquer tous les artéfacts"
   hide_all_details_61d7ebb: "Masquer tous les détails"
-  hide_correct_answers_at_2421b0aa: "Masquer les réponses correctes à"
-  hide_correct_answers_at_b1a59408: "Masquer les réponses correctes à"
+  hide_correct_answers_at_2421b0aa: "Masquer les réponses correctes le"
+  hide_correct_answers_at_b1a59408: "Masquer les réponses correctes le"
   hide_course_sections_for_course_name_bd1911af: "Cacher les sections de cours pour ce cours %{name}"
   hide_courses_menu_1b8ca649: "Cacher le menu des cours"
   hide_courses_navigation_menu_6f7c4cfd: "Masquer le menu de navigation de cours"
@@ -15756,7 +15756,7 @@ fr:
           due: Échéance
           points: Points
           questions: Questions
-          time_limit: "Limite de durée"
+          time_limit: "Limite de temps"
         multiple_due_dates: "Plusieurs dates d’échéance"
         no_due_date: "Pas d’échéance"
         none: Aucun
@@ -15793,7 +15793,7 @@ fr:
       quiz_show_teacher: 
         anonymous_submissions: "Envois anonymes"
         attempts: Tentatives
-        available_from: "Disponibles depuis"
+        available_from: "Disponibles depuis le"
         cant_go_back: "Verrouiller les questions après les réponses"
         code: "Code d’accès"
         due: Échéance
@@ -15801,7 +15801,7 @@ fr:
         for: Pour
         group: "Groupe de tâches"
         label: 
-          time_limit: "Limite de durée"
+          time_limit: "Limite de temps"
         multiple_attempts: "Plusieurs tentatives"
         no_time_limit: "Aucune limite de temps"
         one_question_at_a_time: "Une question à la fois"
@@ -15896,8 +15896,8 @@ fr:
           warning_icon: Avertissement
         links: 
           edit: Modifier
-          keep_editing_this_quiz: "Continuer de modifier ce questionnaire"
-          keep_editing_this_survey: "Continuer de modifier cette enquête"
+          keep_editing_this_quiz: "Continuer à modifier ce questionnaire"
+          keep_editing_this_survey: "Continuer à modifier cette enquête"
           message_students_who: "Envoyer un message aux étudiants qui..."
           moderate_this_quiz: "Modérer ce questionnaire"
           moderate_this_survey: "Modérer cette enquête"
@@ -15997,8 +15997,8 @@ fr:
           time_running: Chronomètre
         links: 
           hide_time_running: Masquer
-          keep_editing_quiz: "Continuer de modifier ce questionnaire"
-          keep_editing_survey: "Continuer de modifier cette enquête"
+          keep_editing_quiz: "Continuer à modifier ce questionnaire"
+          keep_editing_survey: "Continuer à modifier cette enquête"
     retrieving_filters: "Récupération des filtres..."
     rubric: 
       loading: Chargement...
@@ -16085,7 +16085,7 @@ fr:
       seconds_count: 
         one: 1 seconde
         other: "%{count} secondes"
-      show_time_link: Événement
+      show_time_link: Afficher
       titles: 
         come_back_later: "Vous avez marqué cette question pour y revenir ultérieurement"
         times_up: Terminé !
@@ -17820,8 +17820,8 @@ fr:
   show_by_type_c5d61732: "Afficher par type"
   show_calendar_events_in_the_month_view_on_multiple_e94c33ae: "Afficher les événements du calendrier dans la vue mensuelle sur plusieurs lignes si leurs titres ne tenaient pas sur une seule ligne."
   show_concluded_enrollments_6a05544c: "Afficher les inscriptions clôturées"
-  show_correct_answers_at_30c37e01: "Montrer les réponses correctes à"
-  show_correct_answers_at_a5475aa3: "Montrer les réponses correctes à"
+  show_correct_answers_at_30c37e01: "Montrer les réponses correctes le"
+  show_correct_answers_at_a5475aa3: "Montrer les réponses correctes le"
   show_course_sections_for_course_name_5f715702: "Montrer les sections de cours pour ce cours %{name}"
   show_courses_from_8a087f63: "Afficher les cours depuis"
   show_courses_menu_4e17e480: "Afficher le menu des cours"
@@ -18890,7 +18890,7 @@ fr:
   time_block_5a7cda5c: "Bloc de temps"
   time_left_in_your_instant_trial_5dd0392b: "%{time} restant pour votre Essai immédiat"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} restant pour votre Essai immédiat *(étendre maintenant)*"
-  time_limit_a6f1a51e: "Limite horaire"
+  time_limit_a6f1a51e: "Limite de temps"
   time_zone_f56f5183: "Fuseau horaire"
   time_zones: 
     abu_dhabi: "Abou Dhabi"
