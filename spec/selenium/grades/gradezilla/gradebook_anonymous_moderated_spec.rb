@@ -138,5 +138,26 @@ describe 'New Gradebook' do
 
       expect(Gradezilla.assignment_menu_selector('Unmute Assignment').attribute('aria-disabled')).to be nil
     end
+
+    context "causes editing grades to be" do
+      before(:each) do
+        user_session(@teacher)
+        Gradezilla.visit(@course)
+      end
+
+      it "not allowed until grades are posted", priority: "1", test_id: 3501496 do
+        grid_cell = Gradezilla::Cells.grid_assignment_row_cell(@student1, @moderated_assignment)
+        class_attribute_fetched = grid_cell.attribute('class')
+        expect(class_attribute_fetched).to include 'muted grayed-out cannot_edit'
+      end
+
+      it "allowed if grades are posted ",priority: "1", test_id: 3501496 do
+        @moderated_assignment.update!(grades_published_at: Time.zone.now)
+        @moderated_assignment.unmute!
+        refresh_page
+        Gradezilla::Cells.edit_grade(@student1, @moderated_assignment, '12')
+        expect(Gradezilla::Cells.get_grade(@student1, @moderated_assignment)).to eq '12'
+      end
+    end
   end
 end
