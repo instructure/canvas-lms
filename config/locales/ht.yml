@@ -3679,7 +3679,7 @@ ht:
           pwobableman elèv ou yo gentan abitye avèk li. Elèv yo kapab itilize resous tankou
           [Google Docs](%{google_url})
           pou travay an kolaborasyon sou tach tankou dokiman gwoup oswa pran nòt. Paj sa a ba yo
-          (ou menm you) yon kote ki fasil pou gade yon tras kolaborasyon sa yo, epi pou defini yo
+          (ou menm tou) yon kote ki fasil pou gade yon tras kolaborasyon sa yo, epi pou defini yo
           san w pa genyen pou voye imèl.
       how_to_start_a_new_collaboration: "Pou jwenn plis enfòmasyon sou yon tip de kolaborasyon patikilye, klike sou \"Kòmanse yon Nouvo Kolaborasyon\" epi chwazi tip sa a nan lis defilman an."
       links: 
@@ -13230,7 +13230,7 @@ ht:
     index: 
       account_question_banks: "Kont Bank Kesyon"
       add_bank: "Ajoute Bank Kesyon"
-      course_question_banks: "Kou Bank Kesyon"
+      course_question_banks: "Bank Kesyon Kou"
       labels: 
         title: "Non Bank"
       page_title: "Bank Kesyon"
