@@ -37,7 +37,7 @@ import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 
 import actions from '../actions'
 
-import {roleIsBaseRole} from '../helper/utils'
+import {roleIsCourseBaseRole} from '../helper/utils'
 
 export default class AddTray extends Component {
   static propTypes = {
@@ -204,7 +204,7 @@ export default class AddTray extends Component {
   }
 }
 
-function mapStateToProps(state, ownProps) {
+export function mapStateToProps(state, ownProps) {
   if (state.activeAddTray && !state.activeAddTray.show) {
     const stateProps = {
       allBaseRoles: [],
@@ -216,7 +216,7 @@ function mapStateToProps(state, ownProps) {
   }
 
   const allBaseRoles = state.roles.reduce((acc, r) => {
-    if (roleIsBaseRole(r)) {
+    if (roleIsCourseBaseRole(r)) {
       acc.push(r)
     }
     return acc

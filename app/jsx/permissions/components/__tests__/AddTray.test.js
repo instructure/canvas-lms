@@ -19,7 +19,7 @@
 import React from 'react'
 import {shallow} from 'enzyme'
 
-import AddTray from 'jsx/permissions/components/AddTray'
+import AddTray, {mapStateToProps} from 'jsx/permissions/components/AddTray'
 
 const defaultProps = () => ({
   permissions: [
@@ -222,4 +222,35 @@ it('save button is properly enabled if role name is set', () => {
   })
   const inst = tree.instance()
   expect(inst.isDoneSelecting()).toBeTruthy()
+})
+
+it('does not pass in the account admin base role in mapStateToProps', () => {
+  const ownProps = {}
+  const state = {
+    activeAddTray: {
+      show: true,
+      loading: false
+    },
+    roles: [
+      {
+        id: '1',
+        base_role_type: 'StudentEnrollment',
+        label: 'Student',
+        role: 'StudentEnrollment',
+        displayed: true,
+        contextType: 'Course'
+      },
+      {
+        id: '2',
+        base_role_type: 'AccountMembership',
+        label: 'Account Admin',
+        role: 'AccountAdmin',
+        displayed: false,
+        contextType: 'Account'
+      }
+    ]
+  }
+
+  const realProps = mapStateToProps(state, ownProps)
+  expect(realProps.allBaseRoles).toEqual([state.roles[0]])
 })

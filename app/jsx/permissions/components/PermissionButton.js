@@ -289,7 +289,10 @@ export default class PermissionButton extends Component {
     //       an issue.
     const button = this.renderButton()
     return (
-      <div id={`${this.props.permissionName}_${this.props.roleId}`} className="ic-permissions__permission-button-container">
+      <div
+        id={`${this.props.permissionName}_${this.props.roleId}`}
+        className="ic-permissions__permission-button-container"
+      >
         <div>{this.props.inTray || this.state.showMenu ? this.renderMenu(button) : button}</div>
         <div
           className={

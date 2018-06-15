@@ -47,7 +47,11 @@ function roleComparisonFunction(roleOne, roleTwo) {
 }
 
 export function roleIsBaseRole(role) {
-  return role.role === role.base_role_type || role.role === 'AccountAdmin'
+  return roleIsCourseBaseRole(role) || role.role === 'AccountAdmin'
+}
+
+export function roleIsCourseBaseRole(role) {
+  return role.role === role.base_role_type
 }
 
 /*
