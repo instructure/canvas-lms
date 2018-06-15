@@ -74,7 +74,7 @@ class PermissionsIndex
     end
 
     def permission_menu_item(item_name)
-      fj("button:contains('#{item_name}')")
+      f("#permission_table_#{item_name}_menu_item")
     end
 
     def new_role_name_input
@@ -173,8 +173,8 @@ class PermissionsIndex
     end
 
     # setting in the same format as on the menu items
-    def change_permission(permission, role, setting)
-      permission_cell(permission, role).click
+    def change_permission(permission, role_id, setting)
+      permission_cell(permission, role_id).click
       permission_menu_item(setting).click
     end
   end

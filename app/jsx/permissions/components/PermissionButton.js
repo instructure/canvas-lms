@@ -39,7 +39,7 @@ import propTypes from '../propTypes'
 
 const MENU_ID_DEFAULT = 1
 const MENU_ID_ENABLED = 2
-const MENU_ID_ENABLED_ANE_LOCKED = 3
+const MENU_ID_ENABLED_AND_LOCKED = 3
 const MENU_ID_DISABLED = 4
 const MENU_ID_DISABLED_AND_LOCKED = 5
 
@@ -153,7 +153,7 @@ export default class PermissionButton extends Component {
     } else if (enabled && !locked) {
       return MENU_ID_ENABLED
     } else if (enabled && locked) {
-      return MENU_ID_ENABLED_ANE_LOCKED
+      return MENU_ID_ENABLED_AND_LOCKED
     } else if (!enabled && !locked) {
       return MENU_ID_DISABLED
     } else {
@@ -193,6 +193,7 @@ export default class PermissionButton extends Component {
         ]}
       >
         <MenuItem
+          id="permission_table_enable_menu_item"
           value={MENU_ID_ENABLED}
           onClick={() =>
             this.props.handleClick({
@@ -208,7 +209,8 @@ export default class PermissionButton extends Component {
           <Text>{I18n.t('Enable')}</Text>
         </MenuItem>
         <MenuItem
-          value={MENU_ID_ENABLED_ANE_LOCKED}
+          id="permission_table_enable_and_lock_menu_item"
+          value={MENU_ID_ENABLED_AND_LOCKED}
           onClick={() =>
             this.props.handleClick({
               name: this.props.permissionName,
@@ -223,6 +225,7 @@ export default class PermissionButton extends Component {
           <Text>{I18n.t('Enable and Lock')}</Text>
         </MenuItem>
         <MenuItem
+          id="permission_table_disable_menu_item"
           value={MENU_ID_DISABLED}
           onClick={() =>
             this.props.handleClick({
@@ -238,6 +241,7 @@ export default class PermissionButton extends Component {
           <Text>{I18n.t('Disable')}</Text>
         </MenuItem>
         <MenuItem
+          id="permission_table_disable_and_lock_menu_item"
           value={MENU_ID_DISABLED_AND_LOCKED}
           onClick={() =>
             this.props.handleClick({
@@ -255,6 +259,7 @@ export default class PermissionButton extends Component {
 
         <MenuItemSeparator />
         <MenuItem
+          id="permission_table_use_default_menu_item"
           value={MENU_ID_DEFAULT}
           onClick={() =>
             this.props.handleClick({
