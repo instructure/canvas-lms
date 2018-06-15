@@ -197,10 +197,10 @@ test('avoids floating point rounding errors', function () {
     { id: 304, rules: {}, group_weight: 30, assignments: assignments.slice(3, 4) }
   ]
 
+  const floatingPointSum = 9.725 + 10 + 47.25 + 26.85
   const grades = calculateWithoutGradingPeriods('percent')
-  // floating point calculation: 9.725 + 10 + 47.25 + 26.85 => 93.824999 => 93.82
-  // correct calcuation: 9.725 + 10 + 47.25 + 26.85 => 93.825 => 93.83
-  equal(grades.current.score, 93.83)
+  strictEqual(floatingPointSum, 93.82499999999999)
+  strictEqual(grades.current.score, 93.83)
 })
 
 test('includes assignment group grades', function () {

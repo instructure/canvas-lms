@@ -17,31 +17,9 @@
  */
 
 import _ from 'underscore'
-import Big from 'big.js'
 import round from 'compiled/util/round'
 import AssignmentGroupGradeCalculator from '../gradebook/AssignmentGroupGradeCalculator'
-
-function addWithPrecision (a, b) {
-  if (a == null && b == null) {
-    return new Big(0)
-  } else if (a == null) {
-    return new Big(b)
-  } else if (b == null) {
-    return new Big(a)
-  } else {
-    return new Big(a).plus(b)
-  }
-}
-
-function sum (collection) {
-  const bigValue = _.reduce(collection, addWithPrecision, 0)
-  return parseFloat(bigValue, 10)
-}
-
-function sumBy (collection, attr) {
-  const values = _.map(collection, attr);
-  return sum(values);
-}
+import {sum, sumBy} from './shared/helpers/GradeCalculationHelper'
 
 function getWeightedPercent ({ score, possible, weight }) {
   return score ? (score / possible) * weight : 0;

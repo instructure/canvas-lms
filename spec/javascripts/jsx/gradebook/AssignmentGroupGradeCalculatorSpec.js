@@ -79,6 +79,15 @@ test('include the sum of points possible', function () {
   equal(grades.final.possible, 1284);
 });
 
+test('avoids floating point rounding errors', function () {
+  const pointsPossibleValues = [7, 6.1, 7, 6.9, 6.27]
+  pointsPossibleValues.forEach((value, index) => { assignments[index].points_possible = value })
+  const floatingPointSum = pointsPossibleValues.reduce((sum, value) => sum + value)
+  const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup);
+  strictEqual(floatingPointSum, 33.269999999999996)
+  strictEqual(grades.final.possible, 33.27);
+});
+
 QUnit.module('AssignmentGroupGradeCalculator.calculate with some assignments and submissions', {
   setup () {
     submissions = [
