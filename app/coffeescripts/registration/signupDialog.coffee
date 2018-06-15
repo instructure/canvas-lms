@@ -24,16 +24,17 @@ define [
   'jst/registration/teacherDialog'
   'jst/registration/studentDialog'
   'jst/registration/parentDialog'
+  'jst/registration/newParentDialog'
   'jst/registration/samlDialog'
   '../util/addPrivacyLinkToDialog'
   'str/htmlEscape'
   '../jquery/validate'
   'jquery.instructure_forms'
   'jquery.instructure_date_and_time'
-], ($, _, I18n, preventDefault, registrationErrors, teacherDialog, studentDialog, parentDialog, samlDialog, addPrivacyLinkToDialog, htmlEscape) ->
+], ($, _, I18n, preventDefault, registrationErrors, teacherDialog, studentDialog, parentDialog, newParentDialog, samlDialog, addPrivacyLinkToDialog, htmlEscape) ->
 
   $nodes = {}
-  templates = {teacherDialog, studentDialog, parentDialog, samlDialog}
+  templates = {teacherDialog, studentDialog, parentDialog, newParentDialog, samlDialog}
 
   # we do this in coffee because of this hbs 1.3 bug:
   # https://github.com/wycats/handlebars.js/issues/748

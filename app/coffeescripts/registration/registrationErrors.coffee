@@ -18,8 +18,9 @@
 define [
   '../models/User'
   '../models/Pseudonym'
+  'jsx/login/ObserverPairingCodeModel'
   '../object/flatten'
-], (User, Pseudonym, flatten) ->
+], (User, Pseudonym, ObserverPairingCode, flatten) ->
 
   # normalize errors we get from POST /user (user creation API)
   registrationErrors = (errors, passwordPolicy = ENV.PASSWORD_POLICY) ->
@@ -27,4 +28,5 @@ define [
       user: User::normalizeErrors(errors.user)
       pseudonym: Pseudonym::normalizeErrors(errors.pseudonym, passwordPolicy)
       observee: Pseudonym::normalizeErrors(errors.observee, passwordPolicy)
+      pairing_code: ObserverPairingCode::normalizeErrors(errors.pairing_code)
     , arrays: false

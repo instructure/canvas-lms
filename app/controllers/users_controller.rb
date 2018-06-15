@@ -2560,8 +2560,17 @@ class UsersController < ApplicationController
     end
 
     @invalid_observee_creds = nil
+    @invalid_observee_code = nil
     if @user.initial_enrollment_type == 'observer'
-      if (observee_pseudonym = authenticate_observee)
+      if @domain_root_account.feature_enabled?(:observer_pairing_code)
+        @pairing_code = ObserverPairingCode.active.where(code: params[:pairing_code][:code]).first
+        if !@pairing_code.nil?
+          @observee = @pairing_code.user
+        else
+          @invalid_observee_code = ObserverPairingCode.new
+          @invalid_observee_code.errors.add('code', 'invalid')
+        end
+      elsif (observee_pseudonym = authenticate_observee)
         @observee = observee_pseudonym.user
       else
         @invalid_observee_creds = Pseudonym.new
@@ -2605,7 +2614,7 @@ class UsersController < ApplicationController
       @cc.workflow_state = skip_confirmation ? 'active' : 'unconfirmed' unless @cc.workflow_state == 'confirmed'
     end
 
-    if @user.valid? && @pseudonym.valid? && @invalid_observee_creds.nil?
+    if @user.valid? && @pseudonym.valid? && @invalid_observee_creds.nil? & @invalid_observee_code.nil?
       # saving the user takes care of the @pseudonym and @cc, so we can't call
       # save_without_session_maintenance directly. we don't want to auto-log-in
       # unless the user is registered/pre_registered (if the latter, he still
@@ -2620,6 +2629,7 @@ class UsersController < ApplicationController
 
       if @observee && !@user.as_observer_observation_links.where(user_id: @observee, root_account: @context).exists?
         UserObservationLink.create_or_restore(student: @observee, observer: @user, root_account: @context)
+        @pairing_code&.destroy
       end
 
       if notify_policy.is_self_registration?
@@ -2656,7 +2666,8 @@ class UsersController < ApplicationController
           :errors => {
               :user => @user.errors.as_json[:errors],
               :pseudonym => @pseudonym ? @pseudonym.errors.as_json[:errors] : {},
-              :observee => @invalid_observee_creds ? @invalid_observee_creds.errors.as_json[:errors] : {}
+              :observee => @invalid_observee_creds ? @invalid_observee_creds.errors.as_json[:errors] : {},
+              :pairing_code => @invalid_observee_code ? @invalid_observee_code.errors.as_json[:errors] : {}
           }
       }
       render :json => errors, :status => :bad_request

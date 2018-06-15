@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 - present Instructure, Inc.
+ * Copyright (C) 2018 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,31 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Shared between:
-// - registration.scss
-// - login.sass
-// - otp_login.scss
-.registration-dialog {
-  margin: 2em 0;
-  font-size: 1.1em;
-  .registration-dialog .spinner {
-    width: 100px;
-  }
+import I18n from 'i18n!observer_pairing_code'
+import Backbone from 'backbone'
 
-  .ic-Label {
-    font-weight: normal;
-  }
-}
+export default class ObserverPairingCode extends Backbone.Model {}
 
-.terms-of-service__register {
-  .terms-of-service__link {
-    button: 14px !important;
+// no way of defining this in the class itself was making it work
+// with how coffeescript classes were expecting things to work
+ObserverPairingCode.prototype.errorMap = {
+  code: {
+    invalid: I18n.t('errors.invalid', 'Invalid pairing code')
   }
-  display: flex;
-  flex-direction: row;
-  line-height: 1;
-}
-
-.terms-of-service__link {
-  padding-#{direction(left)}: 4px;
 }
