@@ -26,6 +26,14 @@ if (process.env.SENTRY_DSN) {
   Raven.config(process.env.SENTRY_DSN, {
     release: process.env.GIT_COMMIT
   }).install();
+
+  // QUnit is assumed global
+  QUnit.testStart(({module, name}) => {
+    Raven.setExtraContext(); // Clear all extra data from the context.
+    Raven.setExtraContext({
+      spec: `${module}: ${name}`
+    });
+  })
 }
 
 document.dir = 'ltr'
