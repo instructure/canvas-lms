@@ -24,10 +24,12 @@ import PermissionButton from '../PermissionButton'
 const defaultProps = () => ({
   permission: {enabled: true, locked: false, readonly: false, explicit: true},
   permissionName: 'add',
+  permissionLabel: 'add',
   cleanFocus: () => {},
   inTray: false,
   setFocus: false,
   roleId: '1',
+  roleLabel: 'myRole',
   fixButtonFocus: () => {},
   handleClick: () => {},
   useCaching: false
@@ -36,10 +38,12 @@ const defaultProps = () => ({
 const disabledProps = () => ({
   permission: {enabled: false, locked: false, readonly: false, explicit: true},
   permissionName: 'add',
+  permissionLabel: 'add',
   cleanFocus: () => {},
   inTray: false,
   setFocus: false,
   roleId: '1',
+  roleLabel: 'myRole',
   fixButtonFocus: () => {},
   handleClick: () => {},
   useCaching: false
@@ -48,10 +52,12 @@ const disabledProps = () => ({
 const enabledAndLockedProps = () => ({
   permission: {enabled: true, locked: true, readonly: false, explicit: true},
   permissionName: 'add',
+  permissionLabel: 'add',
   cleanFocus: () => {},
   inTray: false,
   setFocus: false,
   roleId: '1',
+  roleLabel: 'myRole',
   fixButtonFocus: () => {},
   handleClick: () => {},
   useCaching: false
@@ -60,10 +66,12 @@ const enabledAndLockedProps = () => ({
 const disabledAndLockedProps = () => ({
   permission: {enabled: false, locked: true, readonly: false, explicit: true},
   permissionName: 'add',
+  permissionLabel: 'add',
   cleanFocus: () => {},
   inTray: false,
   setFocus: false,
   roleId: '1',
+  roleLabel: 'myRole',
   fixButtonFocus: () => {},
   handleClick: () => {},
   useCaching: false
@@ -72,10 +80,12 @@ const disabledAndLockedProps = () => ({
 const readOnly = () => ({
   permission: {enabled: false, locked: true, readonly: true, explicit: true},
   permissionName: 'add',
+  permissionLabel: 'add',
   cleanFocus: () => {},
   inTray: false,
   setFocus: false,
   roleId: '1',
+  roleLabel: 'myRole',
   fixButtonFocus: () => {},
   handleClick: () => {},
   useCaching: false
@@ -103,6 +113,53 @@ it('displays disabled correctly', () => {
   expect(check.exists()).toEqual(false)
   expect(x.exists()).toEqual(true)
   expect(hideLock.exists()).toEqual(true)
+})
+
+it('displays screenreader disabled correctly', () => {
+  const stateOfButton = 'Disabled'
+  const permissionLabel = 'Venks Awesome'
+  const props = disabledProps()
+  props.permissionLabel = 'Venks Awesome'
+  const tree = shallow(<PermissionButton {...props} />)
+
+  expect(tree.find('button').prop('aria-label')).toEqual(
+    `${stateOfButton} ${permissionLabel} myRole`
+  )
+})
+
+it('displays screenreader disabled and locked correctly', () => {
+  const stateOfButton = 'Disabled and Locked'
+  const permissionLabel = 'Venks Great'
+  const props = disabledAndLockedProps()
+  props.permissionLabel = 'Venks Great'
+  const tree = shallow(<PermissionButton {...props} />)
+
+  expect(tree.find('button').prop('aria-label')).toEqual(
+    `${stateOfButton} ${permissionLabel} myRole`
+  )
+})
+
+it('displays screenreader enabled and locked correctly', () => {
+  const stateOfButton = 'Enabled and Locked'
+  const permissionLabel = 'Venks Fun'
+  const props = enabledAndLockedProps()
+  props.permissionLabel = 'Venks Fun'
+  const tree = shallow(<PermissionButton {...props} />)
+
+  expect(tree.find('button').prop('aria-label')).toEqual(
+    `${stateOfButton} ${permissionLabel} myRole`
+  )
+})
+
+it('displays screenreader enabled correctly', () => {
+  const stateOfButton = 'Enabled'
+  const permissionLabel = 'Everything is Awesome!!'
+  const props = defaultProps()
+  props.permissionLabel = 'Everything is Awesome!!'
+  const tree = shallow(<PermissionButton {...props} />)
+  expect(tree.find('button').prop('aria-label')).toEqual(
+    `${stateOfButton} ${permissionLabel} myRole`
+  )
 })
 
 it('displays enabled and locked correctly', () => {

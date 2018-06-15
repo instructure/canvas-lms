@@ -65,6 +65,7 @@ export default function PermissionTray(props) {
                 description=""
                 expandable={false}
                 permissionName={props.permissionName}
+                permissionLabel={props.label}
                 permission={role.permissions[props.permissionName]}
                 role={role}
               />
@@ -81,6 +82,7 @@ export default function PermissionTray(props) {
                 description=""
                 expandable={false}
                 permissionName={props.permissionName}
+                permissionLabel={props.label}
                 permission={role.permissions[props.permissionName]}
                 role={role}
               />

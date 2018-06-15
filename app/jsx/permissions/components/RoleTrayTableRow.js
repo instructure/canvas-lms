@@ -37,6 +37,7 @@ export default function RoleTrayTableRow({
   title,
   permission,
   permissionName,
+  permissionLabel,
   role
 }) {
   return (
@@ -72,7 +73,9 @@ export default function RoleTrayTableRow({
             <ConnectedPermissionButton
               permission={permission}
               permissionName={permissionName}
+              permissionLabel={permissionLabel}
               roleId={role.id}
+              roleLabel={role.label}
               inTray
             />
           </div>
@@ -87,6 +90,7 @@ RoleTrayTableRow.propTypes = {
   expandable: PropTypes.bool,
   permission: permissionPropTypes.rolePermission.isRequired,
   permissionName: PropTypes.string.isRequired,
+  permissionLabel: PropTypes.string.isRequired,
   role: permissionPropTypes.role.isRequired,
   title: PropTypes.string.isRequired
 }

@@ -184,7 +184,9 @@ export default class PermissionsTable extends Component {
                     <ConnectedPermissionButton
                       permission={role.permissions[perm.permission_name]}
                       permissionName={perm.permission_name}
+                      permissionLabel={perm.label}
                       roleId={role.id}
+                      roleLabel={role.label}
                       inTray={false}
                     />
                   </div>

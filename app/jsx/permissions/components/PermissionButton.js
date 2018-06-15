@@ -51,13 +51,16 @@ export default class PermissionButton extends Component {
     inTray: PropTypes.bool.isRequired,
     permission: propTypes.rolePermission.isRequired,
     permissionName: PropTypes.string.isRequired,
+    permissionLabel: PropTypes.string.isRequired,
+    roleLabel: PropTypes.string,
     roleId: PropTypes.string.isRequired,
     setFocus: PropTypes.bool.isRequired,
     useCaching: PropTypes.bool // Allows disabling of cache for unit tests
   }
 
   static defaultProps = {
-    useCaching: true
+    useCaching: true,
+    roleLabel: ''
   }
 
   state = {
@@ -172,14 +175,34 @@ export default class PermissionButton extends Component {
 
     return (
       <button
+        aria-label={this.renderAllyScreenReaderTag({
+          permission: this.props.permission,
+          permissionLabel: this.props.permissionLabel,
+          roleLabel: this.props.roleLabel
+        })}
+        className={classes}
         ref={this.setupButtonRef}
         onClick={this.state.showMenu ? this.closeMenu : this.openMenu}
-        className={classes}
         disabled={this.props.permission.readonly}
       >
         {this.getCachedButton(this.props.permission.enabled)}
       </button>
     )
+  }
+
+  renderAllyScreenReaderTag = ({permission, permissionLabel, roleLabel}) => {
+    const {enabled, locked} = permission
+    let status = ''
+    if (enabled && !locked) {
+      status = I18n.t('Enabled')
+    } else if (enabled && locked) {
+      status = I18n.t('Enabled and Locked')
+    } else if (!enabled && !locked) {
+      status = I18n.t('Disabled')
+    } else {
+      status = I18n.t('Disabled and Locked')
+    }
+    return `${status} ${permissionLabel} ${roleLabel}`
   }
 
   renderMenu = button => (

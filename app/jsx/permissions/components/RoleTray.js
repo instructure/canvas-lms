@@ -284,6 +284,7 @@ export default class RoleTray extends Component {
               description=""
               expandable={false}
               role={this.props.role}
+              permissionLabel={perm.label}
               permissionName={perm.permissionName}
               permission={perm}
             />
@@ -300,6 +301,7 @@ export default class RoleTray extends Component {
               description=""
               expandable={false}
               role={this.props.role}
+              permissionLabel={perm.label}
               permissionName={perm.permissionName}
               permission={perm}
             />
