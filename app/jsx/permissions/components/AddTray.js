@@ -103,13 +103,13 @@ export default class AddTray extends Component {
           onClick={this.hideTray}
           buttonRef={c => (this.closeButton = c)}
         >
-          <IconX>Close</IconX>
+          <IconX title={I18n.t('Close')} />
         </Button>
       </FlexItem>
       <FlexItem>
         <Container as="div" margin="0 0 0 small">
           <Heading level="h3" as="h2">
-            {I18n.t('New Course Role')}
+            {this.props.tab === COURSE ? I18n.t('New Course Role') : I18n.t('New Account Role')}
           </Heading>
         </Container>
       </FlexItem>
