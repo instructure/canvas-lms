@@ -202,6 +202,18 @@ define([
     equalAssignment(createAssignmentRequest2.assignment, newAssignment2);
   });
 
+  test('sends calculate_grades: false as an argument when creating assignments', () => {
+    const gradebook = {
+      assignments: [
+        newAssignment1
+      ]
+    }
+    ProcessGradebookUpload.createAssignments(gradebook)
+
+    const createAssignmentRequest = JSON.parse(requests[0].requestBody)
+    strictEqual(createAssignmentRequest.calculate_grades, false)
+  })
+
   QUnit.module('ProcessGradebookUpload.mapLocalAssignmentsToDatabaseAssignments');
 
   test('properly pairs if length is 1 and responses is not an array of arrays', () => {

@@ -4821,6 +4821,91 @@ describe AssignmentsApiController, type: :request do
       expect(json.first["assignments"].first["overrides"].first["student_ids"]).to eq [@student.id]
     end
   end
+
+  context "when called with parameter calculate_grades" do
+    let(:course) { Account.default.courses.create!(workflow_state: 'available') }
+    let(:teacher) { course_with_teacher(course: course, active_all: true).user }
+
+    it "calls DueDateCacher with update_grades: false when passed calculate_grades: false" do
+      update_grade_value = nil
+      expect(DueDateCacher).to receive(:recompute).once do |update_grades:|
+        update_grade_value = update_grades
+      end
+
+      api_call_as_user(teacher,
+                       :post,
+                       "/api/v1/courses/#{course.id}/assignments.json",
+                       {
+                         controller: "assignments_api",
+                         action: "create",
+                         format: "json",
+                         course_id: course.id.to_s,
+                       },
+                       {
+                         assignment: {
+                           name: 'Some title',
+                           points_possible: 10,
+                           published: true
+                         },
+                         calculate_grades: false
+                       })
+
+      expect(update_grade_value).to be false
+    end
+
+    it "calls DueDateCacher with update_grades: true when passed calculate_grades: true" do
+      update_grade_value = nil
+      expect(DueDateCacher).to receive(:recompute).once do |update_grades:|
+        update_grade_value = update_grades
+      end
+
+      api_call_as_user(teacher,
+                       :post,
+                       "/api/v1/courses/#{course.id}/assignments.json",
+                       {
+                         controller: "assignments_api",
+                         action: "create",
+                         format: "json",
+                         course_id: course.id.to_s,
+                       },
+                       {
+                         assignment: {
+                           name: 'Some title',
+                           points_possible: 10,
+                           published: true
+                         },
+                         calculate_grades: true
+                       })
+
+      expect(update_grade_value).to be true
+    end
+
+    it "calls DueDateCacher with update_grades: true when not passed calculate_grades" do
+      update_grade_value = nil
+      expect(DueDateCacher).to receive(:recompute).once do |update_grades:|
+        update_grade_value = update_grades
+      end
+
+      api_call_as_user(teacher,
+                       :post,
+                       "/api/v1/courses/#{course.id}/assignments.json",
+                       {
+                         controller: "assignments_api",
+                         action: "create",
+                         format: "json",
+                         course_id: course.id.to_s,
+                       },
+                       {
+                         assignment: {
+                           name: 'Some title',
+                           points_possible: 10,
+                           published: true
+                         }
+                       })
+
+      expect(update_grade_value).to be true
+    end
+  end
 end
 
 def api_get_assignments_index_from_course(course)

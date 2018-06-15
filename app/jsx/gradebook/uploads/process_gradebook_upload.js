@@ -55,7 +55,8 @@ import 'jquery.ajaxJSON'
           name: assignment.title,
           points_possible: assignment.points_possible,
           published: true
-        }
+        },
+        calculate_grades: false
       }), null, null, {contentType: 'application/json'});
     },
 

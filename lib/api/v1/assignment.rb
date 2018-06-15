@@ -439,7 +439,7 @@ module Api::V1::Assignment
     store_in_index
   ).freeze
 
-  def create_api_assignment(assignment, assignment_params, user, context = assignment.context)
+  def create_api_assignment(assignment, assignment_params, user, context = assignment.context, calculate_grades: nil)
     return :forbidden unless grading_periods_allow_submittable_create?(assignment, assignment_params)
 
     prepared_create = prepare_assignment_create_or_update(assignment, assignment_params, user, context)
@@ -458,7 +458,8 @@ module Api::V1::Assignment
       end
     end
 
-    DueDateCacher.recompute(prepared_create[:assignment], update_grades: true)
+    calc_grades = calculate_grades ? value_to_boolean(calculate_grades) : true
+    DueDateCacher.recompute(prepared_create[:assignment], update_grades: calc_grades)
     response
   rescue ActiveRecord::RecordInvalid
     false
