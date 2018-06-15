@@ -117,7 +117,9 @@ describe ObserverAlert do
 
     it 'creates an alert when a user has a threshold for course announcements' do
       a = announcement_model(:context => @course)
-      alert = ObserverAlert.where(student: @student, observer: @observer).first
+      alert1 = ObserverAlert.where(student: @student, observer: @observer)
+      expect(alert1.count).to eq 1
+      alert = alert1.first
       expect(alert).not_to be_nil
       expect(alert.context).to eq a
       expect(alert.title).to include('Announcement posted: ')
@@ -159,8 +161,9 @@ describe ObserverAlert do
     before :once do
       @course = course_factory()
       @student1 = student_in_course(active_all: true, course: @course).user
-      @observer1 = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
-      observer_alert_threshold_model(student: @student, observer: @observer, alert_type: 'assignment_missing')
+      @observer1 = course_with_observer(course: @course, associated_user_id: @student1.id, active_all: true).user
+      observer_alert_threshold_model(student: @student1, observer: @observer1, alert_type: 'assignment_missing')
+      observer_alert_threshold_model(student: @student1, observer: @observer1, alert_type: 'course_announcement')
 
       @student2 = student_in_course(active_all: true, course: @course).user
       @observer2 = course_with_observer(course: @course, associated_user_id: @student2.id, active_all: true).user
@@ -171,6 +174,13 @@ describe ObserverAlert do
       @observer3 = course_with_observer(course: @course, associated_user_id: @student3.id, active_all: true).user
       observer_alert_threshold_model(student: @student3, observer: @observer3, alert_type: 'assignment_missing')
       @assignment.submit_homework(@student3, :submission_type => 'online_text_entry', :body => 'done')
+
+      # student with multiple observers
+      @student4 = student_in_course(active_all: true, course: @course).user
+      @observer4 = course_with_observer(course: @course, associated_user_id: @student4.id, active_all: true).user
+      @observer5 = course_with_observer(course: @course, associated_user_id: @student4.id, active_all: true).user
+      observer_alert_threshold_model(student: @student4, observer: @observer4, alert_type: 'assignment_missing')
+      observer_alert_threshold_model(student: @student4, observer: @observer5, alert_type: 'assignment_missing')
 
       ObserverAlert.create_assignment_missing_alerts
     end
@@ -196,6 +206,18 @@ describe ObserverAlert do
       alert = ObserverAlert.where(student: @student2).first
 
       expect(alert).to be_nil
+    end
+
+    it 'creates an alert for each observer' do
+      alert1 = ObserverAlert.active.where(student: @student4, alert_type: 'assignment_missing', observer: @observer4)
+      alert2 = ObserverAlert.active.where(student: @student4, alert_type: 'assignment_missing', observer: @observer5)
+      expect(alert1.count).to eq 1
+      expect(alert2.count).to eq 1
+    end
+
+    it 'only sends alerts for assignment_missing' do
+      alerts = ObserverAlert.active.where(student: @student1, alert_type: 'course_announcement', observer: @observer1)
+      expect(alerts).to be_empty
     end
   end
 
