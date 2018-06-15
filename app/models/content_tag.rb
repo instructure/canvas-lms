@@ -49,6 +49,7 @@ class ContentTag < ActiveRecord::Base
   validates_presence_of :context, :unless => proc { |tag| tag.context_id && tag.context_type }
   validates_presence_of :workflow_state
   validates_length_of :comments, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
+  before_save :associate_external_tool
   before_save :default_values
   after_save :update_could_be_locked
   after_save :touch_context_module_after_transaction
@@ -108,6 +109,11 @@ class ContentTag < ActiveRecord::Base
     if (self.tag_type == 'learning_outcome_association' || self.tag_type == 'learning_outcome') && skip_touch.blank?
       self.context_type.constantize.where(:id => self.context_id).update_all(:updated_at => Time.now.utc)
     end
+  end
+
+  def associate_external_tool
+    return if content.present? || content_type != 'ContextExternalTool' || context.blank? || url.blank?
+    self.content = ContextExternalTool.find_external_tool(url, context)
   end
 
   def default_values

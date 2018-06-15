@@ -54,22 +54,24 @@ class SisBatch < ActiveRecord::Base
   # do it in the block passed into this method, so that the changes are saved
   # before the batch is marked created and eligible for processing.
   def self.create_with_attachment(account, import_type, attachment, user = nil)
-    batch = SisBatch.new
-    batch.account = account
-    batch.progress = 0
-    batch.workflow_state = :initializing
-    batch.data = {:import_type => import_type}
-    batch.user = user
-    batch.save
+    account.shard.activate do
+      batch = SisBatch.new
+      batch.account = account
+      batch.progress = 0
+      batch.workflow_state = :initializing
+      batch.data = {:import_type => import_type}
+      batch.user = user
+      batch.save
 
-    att = create_data_attachment(batch, attachment, t(:upload_filename, "sis_upload_%{id}.zip", :id => batch.id))
-    batch.attachment = att
+      att = create_data_attachment(batch, attachment, t(:upload_filename, "sis_upload_%{id}.zip", :id => batch.id))
+      batch.attachment = att
 
-    yield batch if block_given?
-    batch.workflow_state = :created
-    batch.save!
+      yield batch if block_given?
+      batch.workflow_state = :created
+      batch.save!
 
-    batch
+      batch
+    end
   end
 
   def self.create_data_attachment(batch, data, display_name)

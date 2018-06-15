@@ -3701,7 +3701,7 @@ mi:
     by_nc_sa: "CC Huanga Non-Arumoni faaite Rite,"
     by_nd: "CC Huanga No Derivatives"
     by_sa: "CC Huanga Tiritiri Rite"
-    private: "Private (pupuri)"
+    private: "Tūmataiti (pupuri)"
     public_domain: "Public Domain"
   cell_number_is_invalid_bd6faee0: "He muhu Tau Cell! "
   cell_number_is_required_2edcee60: "Hiahiatia Tau Cell te "
@@ -4806,7 +4806,7 @@ mi:
     select_course: "Tīpako akoranga"
   conversation_message: 
     subject: "karere tūmataiti"
-    subject_specified: "Karere Private: %{subject}"
+    subject_specified: "Karere Tūmataiti: %{subject}"
     users_added: 
       one: "%{user} i honoa ki te aparauraa na roto i te %{current_user}"
       other: "%{list_of_users} i honoa ki te aparauraa na roto i te %{current_user}"
@@ -7417,7 +7417,7 @@ mi:
       headers: 
         add_content: "Tāpiri Ihirangi"
         export_progress: "Kohikohi rauemi ePortfolio. kia tango i tenei he ia ki te whai koe i te rota o te kōnae i roto i to koutou ePortfolio"
-        private_eportfolio: "Ko Private tō ePortfolio"
+        private_eportfolio: "Ko Tūmataiti tō ePortfolio"
         public_eportfolio: "Ko Public tō ePortfolio"
         recent_submissions: "Tukunga Tata"
         welcome: "Nau mai ki tou ePortfolio"
@@ -7534,7 +7534,7 @@ mi:
         body1: "Whakarārangitia Wāhanga e haere te taha maui o te matapihi (%{showme1}). Ka taea e ia wāhanga i ngā whārangi maha roto o reira. Hei whakarite i tāpiri wāhanga ranei, pāwhiri i te \"%{manage_sections}\" hono (%{showme2})."
         body2: ".Ka taea e koe te whakaingoa i tetahi wāhanga mā te pāwhiri i runga i te %{edit_icon} icon e puta, whakatikatika wāhanga mā te pāwhiri me te tō ratou, ranei muku wāhanga mā te pāwhiri i te %{delete_icon} icon."
       settings: 
-        body: "Hei huri i te tautuhinga mo koutou ePortfolio, pāwhiritia te hono \"ePortfolio Tautuhinga\" (%{showme}). Ka taea e koe te whakaingoa i te kōpaki me te huri i hoki ranei he mea tūmatanui, tūmataiti rānei. He kitea anake ki te hunga nei tukua mai e koe te uru Private pūkete."
+        body: "Hei huri i te tautuhinga mo koutou ePortfolio, pāwhiritia te hono \"ePortfolio Tautuhinga\" (%{showme}). Ka taea e koe te whakaingoa i te kōpaki me te huri i hoki ranei he mea tūmatanui, tūmataiti rānei. He kitea anake ki te hunga nei tukua mai e koe te uru Tūmataiti pūkete."
       submissions: 
         body1: "Paha outou i ite i te raro o tēnei whārangi ko te rārangi o ngā tāpaetanga tata i tou akomanga (%{showme}). Hohoro taea e koe te tāpiri i ngā tāpaetanga ki ngā whārangi hou i roto i to koutou kōpaki i tēnei whārangi. Pāwhiri noa i te tāpaetanga e hiahia ana koe ki te tāpiri me te ka pakū ake he kōrero māmā."
         body2: "He nui! Na ki te whakaoti tāpiri i te tāpaetanga, e hiahia ana koe ki te whiriwhiri i te wāhanga rite koe ki te tāpiri i te reira ki a hoatu i te whārangi he ingoa hiahia. I muri pāwhiri koe \"Tāpiri Whārangi\" ka kia tangohia e koe ki te whārangi hou kia taea e koe te whakatika i te reira i roto i te kōrero atu ki te rite ia koutou."
@@ -7894,7 +7894,7 @@ mi:
     multiple_grading_periods: "Takiwā māka Maha"
     new_quiz_statistics: "Quiz Tatauranga Whārangi New"
     post_grades: "Māka Post ki tātai"
-    quiz_log_auditing: "Aupŭpŭ Quiz Rangitaki"
+    quiz_log_auditing: "Arotaki Quiz Rangitaki"
     student_groups: "New Ākonga Rōpū Whārangi"
     student_outcome_gradebook: "Ākonga Learning Tape'araa pukamāka"
   features_2581da: "Ngā Āhuatanga"

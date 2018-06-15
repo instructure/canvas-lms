@@ -226,12 +226,7 @@ describe ApplicationController do
       # safe_domain_file_url wants to use request.protocol
       allow(controller).to receive(:request).and_return(double(:protocol => '', :host_with_port => ''))
 
-      @common_params = {
-        :user_id => nil,
-        :ts => nil,
-        :sf_verifier => nil,
-        :only_path => true
-      }
+      @common_params = { :only_path => true }
     end
 
     it "should include inline=1 in url by default" do
