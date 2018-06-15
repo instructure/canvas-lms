@@ -482,7 +482,7 @@ pl:
         activity: Aktywność
         date: Data
         no_item_found: "Nie znaleziono elementów"
-        time: Godzina
+        time: Czas
       comm_message_item: 
         created_at: "Utworzono o "
         from_name: Od
@@ -514,7 +514,7 @@ pl:
         event_type_label: Typ
         reset_from_label: "Resetuj od"
         reset_to_label: "Resetuj do"
-        time: Godzina
+        time: Czas
         user: Użytkownik
       course_logging_item: 
         blank_placeholder: "-"
@@ -525,7 +525,7 @@ pl:
         event_source: Źródło
         event_type: Typ
         no_item_found: "Nie znaleziono elementów"
-        time: Godzina
+        time: Czas
         user: Użytkownik
       course_search_form: 
         course_id: "Identyfikator kursu"
@@ -577,7 +577,7 @@ pl:
         date: Data
         from: Od
         no_item_found: "Nie znaleziono elementów"
-        time: Godzina
+        time: Czas
       logging_content_pane: 
         authentication: "Logowanie / Wylogowywanie"
         course: "Aktywność kursu"
@@ -3019,7 +3019,7 @@ pl:
   availableslots_more_available_be5193a8: "%{availableSlots} więcej dostępnych"
   avatar_for_author_2eabbf55: "Awatar dla %{author}"
   avatar_for_studentname_8ea511ae: "Awatar dla %{studentName}"
-  average_49c63f9b: Średnio
+  average_49c63f9b: Średnia
   back_2900f52a: Wstecz
   back_to_announcements_1036e43e: "Powrót do ogłoszeń"
   back_to_app_center_95420d83: "Powrót do centrum aplikacji"
@@ -5144,7 +5144,7 @@ pl:
     other: "%{count} wiadomości"
   count_minutes_a6eeeacb: 
     one: "1 minuta"
-    other: "%{count} minut"
+    other: "%{count} min"
     zero: "mniej niż 1 minutę"
   count_of_max_maximum_characters_fcb6ddf8: "%{count} z %{max} maks. znaków"
   count_options_190d6373: 
@@ -6355,7 +6355,7 @@ pl:
       - Mar
       - Kwi
       - Maj
-      - Czer
+      - Cze
       - Lip
       - Sie
       - Wrz
@@ -6456,7 +6456,7 @@ pl:
         few: "mniej niż %{count} minuty"
         many: "mniej niż %{count} minut"
         one: "mniej niż minuta"
-        other: "mniej niż %{count} minut"
+        other: "mniej niż %{count} min"
       less_than_x_seconds: 
         few: "mniej niż %{count} sekundy"
         many: "mniej niż %{count} sekund"
@@ -6930,7 +6930,7 @@ pl:
     points_possible_number: "Możliwe punkty do zdobycia muszą być wartością liczbową"
     published_button: 
       buttons: 
-        not_published: "Nie opublikowane"
+        not_published: Nieopublikowane
         published: Opublikowano
     reply_count_tooltip: 
       one: "1 odpowiedź."
@@ -8119,14 +8119,14 @@ pl:
     high_contrast: "Wysoki kontrast IU"
     html5_first_videos: "Wybieraj program HTML5 do odtwarzania plików wideo"
     k12: "Cechy szczególne K-12"
-    learning_mastery_gradebook: "Dzienniczek nauki poziomu biegłości"
+    learning_mastery_gradebook: "Dzienniczek poziomu biegłości"
     lor: "Zewnętrzne narzędzia LOR"
     multiple_grading_periods: "Wiele okresów rozliczeniowych"
     new_quiz_statistics: "Strona ze statystyką nowego testu"
     post_grades: "Wyślij oceny do SIS"
     quiz_log_auditing: "Inspekcja dziennika testów"
     student_groups: "Strona z nowymi grupami uczestników"
-    student_outcome_gradebook: "Dzienniczek nauki poziomu biegłości uczestnika"
+    student_outcome_gradebook: "Dzienniczek poziomu biegłości uczestnika"
   features_2581da: Funkcje
   federated_attributes_5cbe6441: "Stowarzyszone właściwości"
   federated_attributes_are_information_sent_from_you_2116fb61: "Stowarzyszone właściwości to informacje przesłane od dostawcy uwierzytelniającego, które mogą być wykorzystane do automatycznego zaktualizowania odpowiednich informacji użytkowników Canvas przy każdym logowaniu."
@@ -9888,7 +9888,7 @@ pl:
       *Upewnij się, że nazwy plików nie zostały zmienione, gdyż system może ich nie rozpoznać.*
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Możliwe, że chcesz przenieść swoje materiały z innego systemu zarządzania kursami do programu Canvas. Pomożemy Ci w łatwy sposób przenieść zawartość do systemu Canvas."
   if_you_wish_you_can_rename_sis_to_something_more_f_ac9ef13b: "W razie potrzeby można zmienić „SIS” na określenie bliższe kadrze nauczycielskiej"
-  if_you_would_like_to_keep_your_unsubmitted_comment_b7e349ce: "Jeśli chcesz zachować swoje nie opublikowane komentarze, zapisz je przed opuszczeniem tej strony."
+  if_you_would_like_to_keep_your_unsubmitted_comment_b7e349ce: "Jeśli chcesz zachować swoje nieopublikowane komentarze, zapisz je przed opuszczeniem tej strony."
   if_you_would_like_to_link_to_your_own_campus_suppo_85a94934: "Jeśli chcesz wstawić łącze do własnej strony pomocy w okienku pomocy, możesz to zrobić tutaj"
   ignore_91750df8: Ignoruj
   ignore_assignment_738b3c99: "Zignoruj zadanie"
@@ -10328,7 +10328,7 @@ pl:
   learning_mastery_5fc34276: "Nauka poziomu biegłości"
   learning_mastery_6ed4fd63: "Opanowywanie materiału..."
   learning_mastery_gradebook_description: |-
-      Dzienniczek nauki poziomu biegłości umożliwia nauczycielom szybki podgląd uczestników oraz poczyniony postęp
+      Dzienniczek poziomu biegłości umożliwia nauczycielom szybki podgląd uczestników oraz poczyniony postęp
       w wynikach nauczania. Wyniki są przedstawiane w formacie podobnym do dzienniczka
       , a postęp uczestników jest wyświetlony jako wynik numeryczny i przydzielony do kategorii biegły/
       w okolicach biegłości/wymagający poprawy.
@@ -13237,7 +13237,7 @@ pl:
   not_graded_e78bcd50: "Bez oceny"
   not_installed_37a21a76: "Nie zainstalowano"
   not_now_97efd947: "Nie teraz"
-  not_published_73f7079: "Nie opublikowane"
+  not_published_73f7079: Nieopublikowane
   not_signed_47acf472: "Nie podpisano"
   not_starred_no_subject_click_to_star_adfefe93: "'Nie wystąpił \"(Brak tematu)\", Kliknij aby wystąpić."
   not_starred_no_subject_click_to_star_dc91380: "'Nie wystąpił \"(Brak tematu)\", Kliknij aby wystąpić."
@@ -13506,7 +13506,7 @@ pl:
   notification_preferences_cf47083d: "Preferencje dotyczące powiadomień"
   notifications_cbfa7704: Powiadomienia
   notifications_search_results_80a0b06f: "Wyniki wyszukiwania powiadomień"
-  notify_users_this_quiz_has_changed_c5b05995: "Powiadom użytkowników, że ten quiz się zmienił"
+  notify_users_this_quiz_has_changed_c5b05995: "Powiadom użytkowników, że ten test się zmienił"
   now_click_the_agenda_button_607fb40e: "Kliknij teraz przycisk *Harmonogram*"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Teraz kiedy Twój kurs jest skonfigurowany i dostępny, prawdopodobnie nie będzie Ci już potrzebna ta lista kontrolna. Jednak zachowamy ją na wypadek, jeśli uświadomisz sobie później, że chcesz spróbować czegoś nowego lub po prostu chcesz uzyskać dodatkową pomoc podczas dokonywania zmian w zawartości kursu."
   num_messages_c1949bbc: 
@@ -16109,7 +16109,7 @@ pl:
         require_lockdown_browser_for_results: "Wymagany do wyświetlenia wyników testu"
         require_lockdown_browser_monitor: "Wymagana kamera internetowa"
         score_to_keep: "Wynik punktowy do zapisania"
-        show_correct_answers: "Pokaż Prawidłowe odpowiedzi"
+        show_correct_answers: "Pokaż prawidłowe odpowiedzi"
         shuffle_answers: "Pomieszaj odpowiedzi"
         time_limit: 
           few: "%{count} Minuty"
@@ -16300,7 +16300,7 @@ pl:
         labels: 
           attempt_due: "Termin dostarczenia próby"
           score: "Wynik punktowy"
-          time_elapsed: "Czas upłynął"
+          time_elapsed: "Czas, który upłynął"
           time_running: "Czas płynie"
         links: 
           hide_time_running: Ukryj
@@ -16378,7 +16378,7 @@ pl:
         one: "1 Godzina"
         other: "%{count} Godzin"
       labels: 
-        time_elapsed: "Czas upłynął"
+        time_elapsed: "Czas, który upłynął"
       login_failed: "Logowanie nie powiodło się."
       login_successful: "Logowanie zakończone pomyślnie."
       minutes_count: 
@@ -16402,7 +16402,7 @@ pl:
         submission_thirty_minutes_left: "Test zostanie przesłany za trzydzieści minut"
       question_answered: "Z udzieloną odpowiedzią"
       question_unanswered: "Nie udzielono jeszcze odpowiedzi"
-      saved_at: "Test zapisano w %{t}"
+      saved_at: "Test zapisano o godz. %{t}"
       saving: "Trwa zapisywanie..."
       saving_not_needed: "Brak nowych danych do zapisania. Termin ostatniego sprawdzenia: %{t}"
       seconds_count: 
@@ -16421,7 +16421,7 @@ pl:
         other: "%{count}  lat"
     timing: 
       labels: 
-        time_elapsed: "Czas upłynął"
+        time_elapsed: "Czas, który upłynął"
         time_remaining: "Pozostały czas"
     titles: 
       add_questions_as_group: "Dodaj pytania jako grupa"
@@ -18491,7 +18491,7 @@ pl:
   student_names_must_be_hidden_because_this_is_an_an_3c82287d: "Nazwy użytkowników muszą być ukryte ponieważ jest to badanie anonimowe."
   student_number_db6f06c1: "Uczestnik %{number}"
   student_outcome_gradebook_description: |-
-      Dzienniczek nauki poziomu biegłości uczestnika umożliwia uczestnikom szybki podgląd postępu
+      Dzienniczek poziomu biegłości uczestnika umożliwia uczestnikom szybki podgląd postępu
       w wynikach nauczania. Wyniki są przedstawiane w formacie podobnym do dzienniczka
       , a postęp uczestników jest wyświetlony jako wynik numeryczny i przydzielony do kategorii biegły/
       w okolicach biegłości/wymagający poprawy.
@@ -20437,7 +20437,7 @@ pl:
       published_indicator: Opublikowane
       toolbar_menu: 
         settings: Ustawienia
-      unpublished_indicator: "Nie opublikowane"
+      unpublished_indicator: Nieopublikowane
       view_page_history_wiki: "Wyświetl historię strony"
     wiki_page_content: 
       page_locked: "Ta strona jest zablokowana"
