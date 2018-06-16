@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!permissions_v2'
+import I18n from 'i18n!permissions_v2_add_tray'
 
 import {connect} from 'react-redux'
 import PropTypes from 'prop-types'

@@ -31,6 +31,7 @@ import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReade
 import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import Select from '@instructure/ui-forms/lib/components/Select'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
 
 import actions from '../actions'
 import propTypes, {COURSE, ACCOUNT} from '../propTypes'
@@ -166,6 +167,9 @@ export default class PermissionsIndex extends Component {
   render() {
     return (
       <div className="permissions-v2__wrapper">
+        <ScreenReaderContent>
+          <Heading level="h1">{I18n.t('Permissions')}</Heading>
+        </ScreenReaderContent>
         <ConnectedRoleTray />
         <ConnectedAddTray />
         <ConnectedPermissionTray />
