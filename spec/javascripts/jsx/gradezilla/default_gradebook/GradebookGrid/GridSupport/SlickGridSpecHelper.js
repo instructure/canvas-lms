@@ -48,6 +48,6 @@ export default class SlickGridSpecHelper {
   }
 
   getColumnHeaderNode (columnId) {
-    return this.grid.getHeaderRowColumn(columnId);
+    return this.grid.getColumnHeaderNode(columnId);
   }
 }
