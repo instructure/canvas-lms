@@ -17,7 +17,7 @@
  */
 
 import React, {Component} from 'react'
-import {arrayOf, func, shape, string} from 'prop-types'
+import {arrayOf, bool, func, shape, string} from 'prop-types'
 import View from '@instructure/ui-layout/lib/components/View'
 import I18n from 'i18n!assignment_grade_summary'
 
@@ -49,6 +49,7 @@ function studentsToPages(students) {
 
 export default class GradesGrid extends Component {
   static propTypes = {
+    disabledCustomGrade: bool.isRequired,
     finalGrader: shape({
       graderId: string.isRequired
     }),
@@ -105,6 +106,7 @@ export default class GradesGrid extends Component {
         <FocusableView>
           {props => (
             <Grid
+              disabledCustomGrade={this.props.disabledCustomGrade}
               finalGrader={this.props.finalGrader}
               graders={this.props.graders}
               grades={this.props.grades}

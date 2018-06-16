@@ -17,7 +17,7 @@
  */
 
 import React, {Component} from 'react'
-import {arrayOf, func, oneOf, shape, string} from 'prop-types'
+import {arrayOf, bool, func, oneOf, shape, string} from 'prop-types'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Select from '@instructure/ui-forms/lib/components/Select'
 import I18n from 'i18n!assignment_grade_summary'
@@ -82,7 +82,7 @@ function customGradeOptionFromProps({finalGrader, grades}) {
 
 export default class GradeSelect extends Component {
   static propTypes = {
-    /* eslint-disable-next-line react/no-unused-prop-types */
+    disabledCustomGrade: bool.isRequired,
     finalGrader: shape({
       graderId: string.isRequired
     }),
@@ -93,7 +93,6 @@ export default class GradeSelect extends Component {
         graderId: string.isRequired
       })
     ).isRequired,
-    /* eslint-disable-next-line react/no-unused-prop-types */
     grades: shape({}).isRequired,
     onClose: func,
     onOpen: func,
@@ -238,10 +237,12 @@ export default class GradeSelect extends Component {
   }
 
   render() {
+    const readOnly = !this.props.onSelect
+
     return (
       <Select
-        aria-readonly={!this.props.onSelect || this.props.selectProvisionalGradeStatus === STARTED}
-        editable={!!this.props.onSelect}
+        aria-readonly={readOnly || this.props.selectProvisionalGradeStatus === STARTED}
+        editable={!(this.props.disabledCustomGrade || readOnly)}
         filter={options => options}
         inputRef={this.bindMenu}
         label={

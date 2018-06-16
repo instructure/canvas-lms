@@ -60,6 +60,7 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
     selectedGrade = null
 
     props = {
+      disabledCustomGrade: false,
       finalGrader: {
         graderId: 'teach',
         id: '1105'
@@ -105,9 +106,9 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
       onPositioned() {
         resolvePositioned()
       },
-      onSelect(gradeInfo) {
+      onSelect: sinon.stub().callsFake(gradeInfo => {
         selectedGrade = gradeInfo
-      },
+      }),
       selectProvisionalGradeStatus: null,
       studentId: '1111',
       studentName: 'Adam Jones'
@@ -514,6 +515,7 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
 
   QUnit.module('when not given an onSelect prop (grades have been published)', hooks => {
     hooks.beforeEach(async () => {
+      props.grades.frizz.selected = true
       props.onSelect = null
       await mountComponent()
     })
@@ -527,6 +529,35 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
       await clickInputToOpenMenu()
       await clickOption(labelForGrader('robin'))
       ok('component gracefully ignores the event')
+    })
+  })
+
+  QUnit.module('when custom grades cannot be edited', hooks => {
+    /*
+     * This is temporary until users beyond provisional graders and the final
+     * grader are allowed to grade. Doing this will prevent as-yet-unexplored
+     * scenarios from causing as-yet-unconsidered problems.
+     */
+    hooks.beforeEach(async () => {
+      props.disabledCustomGrade = true
+      await mountComponent()
+      await clickInputToOpenMenu()
+    })
+
+    test('prevents adding custom options to the options list', async () => {
+      setInputText('5')
+      notOk(getOptionLabels().includes(customLabel('5')))
+    })
+
+    test('prevents entering text for custom options', async () => {
+      setInputText('5')
+      await keyDownOnInput(keyCodes.ENTER)
+      strictEqual(props.onSelect.callCount, 0)
+    })
+
+    test('does not prevent selecting existing grades', async () => {
+      await clickOption(labelForGrader('robin'))
+      strictEqual(props.onSelect.callCount, 1)
     })
   })
 
@@ -699,7 +730,6 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
 
   QUnit.module('when the input has focus and Escape is pressed', hooks => {
     hooks.beforeEach(async () => {
-      props.onSelect = sinon.spy()
       await mountComponent()
       await clickInputToOpenMenu()
     })

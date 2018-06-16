@@ -20,7 +20,6 @@ import React from 'react'
 import {mount} from 'enzyme'
 import {Provider} from 'react-redux'
 
-import * as AssignmentActions from 'jsx/assignments/GradeSummary/assignment/AssignmentActions'
 import * as GradeActions from 'jsx/assignments/GradeSummary/grades/GradeActions'
 import * as StudentActions from 'jsx/assignments/GradeSummary/students/StudentActions'
 import Layout from 'jsx/assignments/GradeSummary/components/Layout'
@@ -120,10 +119,10 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
     })
   })
 
-  QUnit.module('GradesGrid', hooks => {
+  QUnit.module('GradesGrid', () => {
     let grades
 
-    hooks.beforeEach(() => {
+    function mountAndInitialize() {
       mountComponent()
       const students = [
         {id: '1111', displayName: 'Adam Jones'},
@@ -134,28 +133,65 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
         {grade: 'A', graderId: '1101', id: '4601', score: 10, selected: false, studentId: '1111'}
       ]
       store.dispatch(GradeActions.addProvisionalGrades(grades))
-    })
-
-    test('onGradeSelect selects a provisional grade when grades have not been published', () => {
-      const onGradeSelect = wrapper.find('GradesGrid').prop('onGradeSelect')
-      onGradeSelect(grades[0])
-      const gradeInfo = store.getState().grades.provisionalGrades[1111][1101]
-      strictEqual(gradeInfo.selected, true)
-    })
-
-    test('is null when grades have been published', () => {
-      store.dispatch(AssignmentActions.updateAssignment({gradesPublished: true}))
-      const onGradeSelect = wrapper.find('GradesGrid').prop('onGradeSelect')
-      strictEqual(onGradeSelect, null)
-    })
+    }
 
     test('receives the final grader id from the assignment', () => {
+      mountAndInitialize()
       strictEqual(wrapper.find('GradesGrid').prop('finalGrader'), storeEnv.finalGrader)
     })
 
     test('receives the selectProvisionalGradeStatuses from state', () => {
+      mountAndInitialize()
       const statuses = wrapper.find('GradesGrid').prop('selectProvisionalGradeStatuses')
       strictEqual(statuses, store.getState().grades.selectProvisionalGradeStatuses)
+    })
+
+    QUnit.module('when grades have not been published', () => {
+      test('onGradeSelect prop selects a provisional grade', () => {
+        mountAndInitialize()
+        const onGradeSelect = wrapper.find('GradesGrid').prop('onGradeSelect')
+        onGradeSelect(grades[0])
+        const gradeInfo = store.getState().grades.provisionalGrades[1111][1101]
+        strictEqual(gradeInfo.selected, true)
+      })
+
+      test('allows editing custom grades when the current user is the final grader', () => {
+        storeEnv.currentUser = {...storeEnv.finalGrader}
+        mountAndInitialize()
+        const gradesGrid = wrapper.find('GradesGrid')
+        strictEqual(gradesGrid.prop('disabledCustomGrade'), false)
+      })
+
+      test('prevents editing custom grades when the current user is not the final grader', () => {
+        mountAndInitialize()
+        const gradesGrid = wrapper.find('GradesGrid')
+        strictEqual(gradesGrid.prop('disabledCustomGrade'), true)
+      })
+    })
+
+    QUnit.module('when grades have been published', contextHooks => {
+      contextHooks.beforeEach(() => {
+        storeEnv.assignment.gradesPublished = true
+      })
+
+      test('onGradeSelect prop is null when grades have been published', () => {
+        mountAndInitialize()
+        const onGradeSelect = wrapper.find('GradesGrid').prop('onGradeSelect')
+        strictEqual(onGradeSelect, null)
+      })
+
+      test('prevents editing custom grades when the current user is the final grader', () => {
+        storeEnv.currentUser = {...storeEnv.finalGrader}
+        mountAndInitialize()
+        const gradesGrid = wrapper.find('GradesGrid')
+        strictEqual(gradesGrid.prop('disabledCustomGrade'), true)
+      })
+
+      test('prevents editing custom grades when the current user is not the final grader', () => {
+        mountAndInitialize()
+        const gradesGrid = wrapper.find('GradesGrid')
+        strictEqual(gradesGrid.prop('disabledCustomGrade'), true)
+      })
     })
   })
 })

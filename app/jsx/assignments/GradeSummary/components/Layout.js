@@ -32,6 +32,7 @@ import Header from './Header'
 
 class Layout extends Component {
   static propTypes = {
+    canEditCustomGrades: bool.isRequired,
     finalGrader: shape({
       graderId: string.isRequired
     }),
@@ -75,6 +76,7 @@ class Layout extends Component {
           <View as="div" margin="large 0 0 0">
             {this.props.students.length > 0 ? (
               <GradesGrid
+                disabledCustomGrade={!this.props.canEditCustomGrades}
                 finalGrader={this.props.finalGrader}
                 graders={this.props.graders}
                 grades={this.props.provisionalGrades}
@@ -93,10 +95,14 @@ class Layout extends Component {
 }
 
 function mapStateToProps(state) {
+  const {currentUser, finalGrader} = state.context
+  const {gradesPublished} = state.assignment.assignment
+
   return {
-    finalGrader: state.context.finalGrader,
+    canEditCustomGrades: !gradesPublished && currentUser.id === finalGrader.id,
+    finalGrader,
     graders: state.context.graders,
-    gradesPublished: state.assignment.assignment.gradesPublished,
+    gradesPublished,
     provisionalGrades: state.grades.provisionalGrades,
     selectProvisionalGradeStatuses: state.grades.selectProvisionalGradeStatuses,
     students: state.students.list

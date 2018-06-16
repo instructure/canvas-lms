@@ -17,7 +17,7 @@
  */
 
 import React, {Component} from 'react'
-import {arrayOf, func, oneOf, shape, string} from 'prop-types'
+import {arrayOf, bool, func, oneOf, shape, string} from 'prop-types'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
 import {FAILURE, STARTED, SUCCESS} from '../../grades/GradeActions'
@@ -26,6 +26,7 @@ import GradeSelect from './GradeSelect'
 
 export default class GridRow extends Component {
   static propTypes = {
+    disabledCustomGrade: bool.isRequired,
     finalGrader: shape({
       graderId: string.isRequired
     }),
@@ -74,6 +75,7 @@ export default class GridRow extends Component {
 
         <td className="GradesGrid__FinalGradeCell" role="cell">
           <GradeSelect
+            disabledCustomGrade={this.props.disabledCustomGrade}
             finalGrader={this.props.finalGrader}
             graders={this.props.graders}
             grades={this.props.grades}

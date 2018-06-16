@@ -19,7 +19,7 @@
 /* eslint-disable react/no-array-index-key */
 
 import React, {Component} from 'react'
-import {arrayOf, func, shape, string} from 'prop-types'
+import {arrayOf, bool, func, shape, string} from 'prop-types'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import I18n from 'i18n!assignment_grade_summary'
@@ -28,6 +28,7 @@ import GridRow from './GridRow'
 
 export default class Grid extends Component {
   static propTypes = {
+    disabledCustomGrade: bool.isRequired,
     finalGrader: shape({
       graderId: string.isRequired
     }),
@@ -92,6 +93,7 @@ export default class Grid extends Component {
           <tbody>
             {this.props.rows.map((row, index) => (
               <GridRow
+                disabledCustomGrade={this.props.disabledCustomGrade}
                 finalGrader={this.props.finalGrader}
                 graders={this.props.graders}
                 grades={this.props.grades[row.studentId]}

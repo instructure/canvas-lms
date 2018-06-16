@@ -28,6 +28,7 @@ QUnit.module('GradeSummary GridRow', suiteHooks => {
 
   suiteHooks.beforeEach(() => {
     props = {
+      disabledCustomGrade: false,
       finalGrader: {
         graderId: 'teach',
         id: '1105'
@@ -124,6 +125,12 @@ QUnit.module('GradeSummary GridRow', suiteHooks => {
   })
 
   QUnit.module('GradeSelect', () => {
+    test('receives the disabledCustomGrade prop', () => {
+      mountComponent()
+      const gradeSelect = wrapper.find('GradeSelect')
+      strictEqual(gradeSelect.prop('disabledCustomGrade'), false)
+    })
+
     test('receives the finalGrader prop', () => {
       mountComponent()
       const gradeSelect = wrapper.find('GradeSelect')

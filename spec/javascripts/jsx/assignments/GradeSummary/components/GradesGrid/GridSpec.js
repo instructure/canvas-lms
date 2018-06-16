@@ -29,6 +29,7 @@ QUnit.module('GradeSummary Grid', suiteHooks => {
 
   suiteHooks.beforeEach(() => {
     props = {
+      disabledCustomGrade: false,
       finalGrader: {
         graderId: 'teach',
         id: '1105'
@@ -126,6 +127,13 @@ QUnit.module('GradeSummary Grid', suiteHooks => {
   test('includes a GridRow for each student', () => {
     mountComponent()
     strictEqual(wrapper.find(GridRow).length, 4)
+  })
+
+  test('sends disabledCustomGrade to each GridRow', () => {
+    mountComponent()
+    wrapper.find(GridRow).forEach(gridRow => {
+      strictEqual(gridRow.prop('disabledCustomGrade'), false)
+    })
   })
 
   test('sends finalGrader to each GridRow', () => {
