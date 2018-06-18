@@ -221,7 +221,7 @@ export default class Criterion extends React.Component {
     return (
       <tr className="rubric-criterion">
         <th scope="row" className="description-header">
-          <div className="description container">
+          <div className="description react-rubric-cell">
             {isOutcome ? <OutcomeIcon /> : ''}
             <Text size="small" weight="normal">
               {criterion.description}

@@ -23,7 +23,7 @@ exports[`Free-form Rubric with a custom criterion by default renders the LongDes
 exports[`Free-form Rubric with a custom criterion by default renders the root component as expected 1`] = `
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description container\\">
+    <div className=\\"description react-rubric-cell\\">
       <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Description of criterion
       </Text>
@@ -62,7 +62,7 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the Lon
 exports[`Free-form Rubric with a custom criterion when assessing renders the root component as expected 1`] = `
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description container\\">
+    <div className=\\"description react-rubric-cell\\">
       <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Description of criterion
       </Text>
@@ -101,7 +101,7 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
 exports[`Free-form Rubric with a custom criterion without an assessment renders the root component as expected 1`] = `
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description container\\">
+    <div className=\\"description react-rubric-cell\\">
       <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Description of criterion
       </Text>
@@ -164,7 +164,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the Thresh
 exports[`Free-form Rubric with a outcome criterion by default renders the root component as expected 1`] = `
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description container\\">
+    <div className=\\"description react-rubric-cell\\">
       <OutcomeIcon />
       <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
@@ -230,7 +230,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Th
 exports[`Free-form Rubric with a outcome criterion when assessing renders the root component as expected 1`] = `
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description container\\">
+    <div className=\\"description react-rubric-cell\\">
       <OutcomeIcon />
       <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
@@ -296,7 +296,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
 exports[`Free-form Rubric with a outcome criterion without an assessment renders the root component as expected 1`] = `
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description container\\">
+    <div className=\\"description react-rubric-cell\\">
       <OutcomeIcon />
       <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
@@ -338,7 +338,7 @@ exports[`Point Rubric with a custom criterion by default renders the LongDescrip
 exports[`Point Rubric with a custom criterion by default renders the root component as expected 1`] = `
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description container\\">
+    <div className=\\"description react-rubric-cell\\">
       <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Description of criterion
       </Text>
@@ -383,7 +383,7 @@ exports[`Point Rubric with a custom criterion when assessing renders the LongDes
 exports[`Point Rubric with a custom criterion when assessing renders the root component as expected 1`] = `
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description container\\">
+    <div className=\\"description react-rubric-cell\\">
       <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Description of criterion
       </Text>
@@ -423,7 +423,7 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
 exports[`Point Rubric with a custom criterion without an assessment renders the root component as expected 1`] = `
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description container\\">
+    <div className=\\"description react-rubric-cell\\">
       <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Description of criterion
       </Text>
@@ -486,7 +486,7 @@ exports[`Point Rubric with a outcome criterion by default renders the Threshold 
 exports[`Point Rubric with a outcome criterion by default renders the root component as expected 1`] = `
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description container\\">
+    <div className=\\"description react-rubric-cell\\">
       <OutcomeIcon />
       <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
@@ -558,7 +558,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the Thresh
 exports[`Point Rubric with a outcome criterion when assessing renders the root component as expected 1`] = `
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description container\\">
+    <div className=\\"description react-rubric-cell\\">
       <OutcomeIcon />
       <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
@@ -625,7 +625,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
 exports[`Point Rubric with a outcome criterion without an assessment renders the root component as expected 1`] = `
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description container\\">
+    <div className=\\"description react-rubric-cell\\">
       <OutcomeIcon />
       <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.

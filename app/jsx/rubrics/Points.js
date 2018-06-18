@@ -62,7 +62,7 @@ const Points = (props) => {
 
   if (assessment === null) {
     return (
-      <div className="container graded-points">
+      <div className="react-rubric-cell graded-points">
         {possibleString(pointsPossible)}
       </div>
     )
@@ -71,14 +71,14 @@ const Points = (props) => {
     const pointsText = _.get(assessment, 'pointsText')
     if (!assessing) {
       return (
-        <div className="container graded-points">
+        <div className="react-rubric-cell graded-points">
           {scoreString(points, pointsPossible)}
         </div>
       )
     } else {
       const usePointsText = pointsText !== null && pointsText !== undefined
       return (
-        <div className="container graded-points">
+        <div className="react-rubric-cell graded-points">
           <Flex alignItems="start">
             <FlexItem size="4rem">
               <TextInput
