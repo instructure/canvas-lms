@@ -30,7 +30,7 @@
 
     <div class="span6 right-align">
       <div class="discussion-pubdate">
-        <% if @assignment.has_active_overrides? && @presenter.can_grade?  %>
+        <% if @assignment.has_active_overrides? && @discussion_presenter.can_grade?  %>
           <a href="#" class="toggle_due_dates"><%= t(:show_due_dates, 'Show Due Dates') %></a>
 
         <% else %>
@@ -42,7 +42,7 @@
     </div>
   </div>
 
-  <% if @presenter.can_grade? %>
+  <% if @discussion_presenter.can_grade? %>
     <div class="row-fluid">
       <div class="span12 hidden due_date_wrapper">
         <table class="discussion-topic-due-dates">

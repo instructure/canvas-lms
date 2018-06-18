@@ -18,7 +18,7 @@
 
 <%
   content_for :page_title, join_title( t(:topic, "Topic"), @topic.title)
-  @presenter = DiscussionTopicPresenter.new(@topic, @current_user)
+  @discussion_presenter = DiscussionTopicPresenter.new(@topic, @current_user)
 %>
 
 <% content_for :auto_discovery do %>
@@ -127,7 +127,7 @@
                   <li><a href="<%= context_url(@context, :context_discussion_topic_url, @topic.id) %>" class="delete_discussion" data-method="delete" rel="nofollow" data-confirm="<%= t :confirm_delete_discussion, 'Are you sure you want to delete this discussion?' %>"><i class="icon-trash"></i> <%= t :delete, 'Delete' %></a></li>
                 <% end %>
 
-                <% if @presenter.can_grade?(@current_user) && @presenter.allows_speed_grader? && @topic.assignment.can_view_speed_grader?(@current_user) %>
+                <% if @topic.for_assignment? && @discussion_presenter.allows_speed_grader? && @assignment_presenter.can_view_speed_grader_link?(@current_user) %>
                   <li><a href="<%= context_url(@topic.assignment.context,
                                                :speed_grader_context_gradebook_url,
                                                :assignment_id => @topic.assignment.id) %>"
@@ -137,7 +137,7 @@
                   </a></li>
                 <% end %>
 
-                <% if @presenter.show_peer_reviews?(@current_user) %>
+                <% if @discussion_presenter.show_peer_reviews?(@current_user) %>
                   <li><a class="assignment_peer_reviews_link"
                      href="<%= context_url(@topic.assignment.context,
                                            :context_assignment_peer_reviews_url,
@@ -147,22 +147,22 @@
                   </a></li>
                 <% end %>
 
-                <% if @presenter.should_show_rubric?(@current_user) %>
+                <% if @discussion_presenter.should_show_rubric?(@current_user) %>
                   <li>
                     <a
                       class="rubric_dialog_trigger"
                       href="#"
-                      data-no-rubric-exists="<%= !@presenter.has_attached_rubric? %>"
+                      data-no-rubric-exists="<%= !@discussion_presenter.has_attached_rubric? %>"
                       data-url="<%= context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) %>"
                       data-focus-returns-to=".announcement_cog"
                     >
                       <i class="icon-rubric" aria-hidden="hidden"></i>
-                      <%= @presenter.has_attached_rubric? ? t(:show_rubric, "Show Rubric") : t(:add_rubric, "Add Rubric") %>
+                      <%= @discussion_presenter.has_attached_rubric? ? t(:show_rubric, "Show Rubric") : t(:add_rubric, "Add Rubric") %>
                     </a>
                   </li>
                 <% end %>
 
-                <% unless @presenter.comments_disabled? %>
+                <% unless @discussion_presenter.comments_disabled? %>
                   <% if @topic.locked? %>
                     <% if can_do(@context, @current_user, :moderate_forum) %>
                       <li><a href="#" data-mark-locked="false" class="discussion_locked_toggler"><i class="icon-unlock"></i> <%= t(:unlock_topic, %{Open for Comments}) %></a></li>
@@ -177,7 +177,7 @@
                 <% end %>
               </ul>
             </div>
-            <% if @presenter.should_show_rubric?(@current_user) %>
+            <% if @discussion_presenter.should_show_rubric?(@current_user) %>
               <%# HACK! this is here because edit_rubric.js expects there to be a #add_rubric_url on the page and sets it's <form action="..."> to it %>
               <% if can_do(@topic.assignment, @current_user, :update) %>
                 <a href="<%= context_url(@topic.assignment.context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;"></a>
@@ -194,7 +194,7 @@
       <div class="entry-content">
         <% if @topic.for_assignment? %>
           <%= render :partial => 'assignment_details' %>
-          <% if @presenter.has_peer_reviews?(@current_user) %>
+          <% if @discussion_presenter.has_peer_reviews?(@current_user) %>
             <%= render :partial => 'peer_reviews' %>
           <% end %>
         <% end %>
@@ -210,7 +210,7 @@
                 <% if @topic.user %>
                   <%= link_to context_user_name(@topic.context, @topic.user),
                                                 context_url(@topic.context, :context_user_url, @topic.user_id),
-                                                @presenter.author_link_attrs %>
+                                                @discussion_presenter.author_link_attrs %>
                 <% end %>
               </div>
               <div id="section_tooltip_root"></div>

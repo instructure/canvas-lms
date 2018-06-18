@@ -15,16 +15,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
+require_relative '../spec_helper'
+require_relative '../sharding_spec_helper'
 
 describe DiscussionTopicsController do
   before :once do
-    course_with_teacher(:active_all => true)
-    course_with_observer(:active_all => true, :course => @course)
+    course_with_teacher(active_all: true)
+    course_with_observer(active_all: true, course: @course)
     @observer_enrollment = @enrollment
-    student_in_course(:active_all => true)
+    ta_in_course(active_all: true, course: @course)
+    student_in_course(active_all: true, course: @course)
   end
 
   def course_topic(opts={})
@@ -255,7 +255,7 @@ describe DiscussionTopicsController do
       ann = @course.announcements.create!(message: "testing", is_section_specific: true, course_sections: [section1])
       ann.save!
       get 'show', params: {:course_id => @course.id, :id => ann}
-      expect(assigns[:js_env][:TOTAL_USER_COUNT]).to eq(4)
+      expect(assigns[:js_env][:TOTAL_USER_COUNT]).to eq(5)
     end
 
     it "js_env COURSE_SECTIONS is set correctly for section specific announcements" do
@@ -431,12 +431,38 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]).to be_nil
     end
 
-    it "should hide speedgrader when moderated graders limit is reached" do
+    it "shows speedgrader when user can view all grades but not manage grades" do
+      @course.account.role_overrides.create!(permission: 'manage_grades', role: ta_role, enabled: false)
+      user_session(@ta)
+      course_topic(user: @teacher, with_assignment: true)
+      get 'show', params: {course_id: @course.id, id: @topic.id}
+      expect(assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]).to be_truthy
+    end
+
+    it "shows speedgrader when user can manage grades but not view all grades" do
+      @course.account.role_overrides.create!(permission: 'view_all_grades', role: ta_role, enabled: false)
+      user_session(@ta)
+      course_topic(user: @teacher, with_assignment: true)
+      get 'show', params: {course_id: @course.id, id: @topic.id}
+      expect(assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]).to be_truthy
+    end
+
+    it "does not show speedgrader when user can neither view all grades nor manage grades" do
+      @course.account.role_overrides.create!(permission: 'view_all_grades', role: ta_role, enabled: false)
+      @course.account.role_overrides.create!(permission: 'manage_grades', role: ta_role, enabled: false)
+      user_session(@ta)
+      course_topic(user: @teacher, with_assignment: true)
+      get 'show', params: {course_id: @course.id, id: @topic.id}
+      expect(assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]).to be_nil
+    end
+
+    it "shows speedgrader when course concluded and user can read as admin" do
       user_session(@teacher)
       course_topic(user: @teacher, with_assignment: true)
-      allow_any_instance_of(Assignment).to receive(:can_be_moderated_grader?).and_return(false)
-      get 'show', params: {:course_id => @course.id, :id => @topic.id}
-      expect(assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]).to be_nil
+      @course.soft_conclude!
+      expect(@course.grants_right?(@teacher, :read_as_admin)).to be true
+      get 'show', params: {course_id: @course.id, id: @topic.id}
+      expect(assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]).to be_truthy
     end
 
     it "should setup speedgrader template for variable substitution" do

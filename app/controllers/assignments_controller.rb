@@ -79,6 +79,7 @@ class AssignmentsController < ApplicationController
   def show
     rce_js_env(:highrisk)
     @assignment ||= @context.assignments.find(params[:id])
+    @assignment_presenter = AssignmentPresenter.new(@assignment)
     if @assignment.deleted?
       respond_to do |format|
         flash[:notice] = t 'notices.assignment_delete', "This assignment has been deleted"

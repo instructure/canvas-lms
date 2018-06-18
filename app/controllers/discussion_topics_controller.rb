@@ -719,8 +719,9 @@ class DiscussionTopicsController < ApplicationController
                 :COURSE_ID => @sequence_asset.context.id,
               }
             end
+            @assignment_presenter = AssignmentPresenter.new(@topic.assignment)
             if @topic.for_assignment? && @presenter.allows_speed_grader? &&
-              @topic.assignment.can_view_speed_grader?(@current_user)
+              @assignment_presenter.can_view_speed_grader_link?(@current_user)
               env_hash[:SPEEDGRADER_URL_TEMPLATE] = named_context_url(@topic.assignment.context,
                                                                       :speed_grader_context_gradebook_url,
                                                                       :assignment_id => @topic.assignment.id,

@@ -18,23 +18,21 @@
 
 <% js_bundle 'module_sequence_footer' %>
 <% if @tag.context.is_a?(Assignment) %>
-  <% assignment = @tag.context %>
-  <% can_manage_assignments = can_do(assignment.context, @current_user, :manage_assignments) %>
-  <% can_view_grades = can_do(assignment.context, @current_user, :view_all_grades) %>
-  <% if can_manage_assignments || can_view_grades %>
-    <% content_for :right_side do %>
-      <% if can_manage_assignments %>
-        <a href="<%= context_url(assignment.context, :edit_context_assignment_url, assignment.id, :return_to => request.url) %>" class="btn button-sidebar-wide">
-          <i class="icon-edit"></i>
-          <%= t :edit_assignment_settings, "Edit Assignment Settings" %>
-        </a>
-      <% end %>
-      <% if can_view_grades %>
-        <a target="_blank" id="speedgrader_button" class="btn button-sidebar-wide" href="<%= context_url(assignment.context, :speed_grader_context_gradebook_url, :assignment_id => assignment.id) %>">
-          <i class="icon-speed-grader"></i>
-          <%= t :speed_grader, "Speed Grader™" %>
-        </a>
-      <% end %>
+  <% content_for :right_side do %>
+    <% assignment = @tag.context %>
+    <% course = assignment.context %>
+    <% assignment_presenter = AssignmentPresenter.new(assignment) %>
+    <% if course.grants_right?(@current_user, :manage_assignments) %>
+      <a href="<%= context_url(assignment.context, :edit_context_assignment_url, assignment.id, :return_to => request.url) %>" class="btn button-sidebar-wide">
+        <i class="icon-edit"></i>
+        <%= t :edit_assignment_settings, "Edit Assignment Settings" %>
+      </a>
+    <% end %>
+    <% if assignment_presenter.can_view_speed_grader_link?(@current_user) %>
+      <a target="_blank" id="speedgrader_button" class="btn button-sidebar-wide" href="<%= context_url(assignment.context, :speed_grader_context_gradebook_url, :assignment_id => assignment.id) %>">
+        <i class="icon-speed-grader"></i>
+        <%= t :speed_grader, "Speed Grader™" %>
+      </a>
     <% end %>
   <% end %>
 <% end %>
