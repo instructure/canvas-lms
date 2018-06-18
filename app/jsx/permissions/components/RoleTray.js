@@ -341,9 +341,11 @@ export default class RoleTray extends Component {
       <Flex alignItems="start" justifyItems="space-between">
         <FlexItem>
           <Container as="div">
-            <Heading id="general_tray_header" level="h3" as="h2">
-              {this.props.label}
-            </Heading>
+            <div style={{maxWidth: '225px'}}>
+              <Heading id="general_tray_header" level="h3" as="h2" ellipsis="true">
+                {this.props.label}
+              </Heading>
+            </div>
             {this.props.basedOn && (
               <Text size="small" className="role-tray-based-on">
                 {I18n.t('Based on: %{basedOn}', {basedOn: this.props.basedOn})}
