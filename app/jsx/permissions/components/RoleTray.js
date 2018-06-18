@@ -34,6 +34,7 @@ import Select from '@instructure/ui-forms/lib/components/Select'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import Tray from '@instructure/ui-overlays/lib/components/Tray'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
 import FriendlyDatetime from '../../shared/FriendlyDatetime'
 import actions from '../actions'
@@ -216,6 +217,7 @@ export default class RoleTray extends Component {
             {children}
             <Container as="block" margin="small 0 0 0">
               <Button onClick={onCancel} margin="none xx-small none none">
+                <ScreenReaderContent>{children}</ScreenReaderContent>
                 {I18n.t('Cancel')}
               </Button>
               <Button onClick={onOk} variant="primary">
