@@ -60,6 +60,7 @@ exports[`renders Announcement correctly with everything 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -191,6 +192,7 @@ exports[`renders Announcement correctly with just date 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -298,6 +300,7 @@ exports[`renders Announcement correctly with just points 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -429,6 +432,7 @@ exports[`renders Announcement correctly without right side content 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -536,6 +540,7 @@ exports[`renders Assignment correctly with everything 1`] = `
             as="button"
             ellipsis={false}
             href="http://www.non_default_url.com"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -667,6 +672,7 @@ exports[`renders Assignment correctly with just date 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -774,6 +780,7 @@ exports[`renders Assignment correctly with just points 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -905,6 +912,7 @@ exports[`renders Assignment correctly without right side content 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -1012,6 +1020,7 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -1119,6 +1128,7 @@ exports[`renders Calendar Event correctly with everything 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -1250,6 +1260,7 @@ exports[`renders Calendar Event correctly with just date 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -1357,6 +1368,7 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -1464,6 +1476,7 @@ exports[`renders Discussion correctly with everything 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -1595,6 +1608,7 @@ exports[`renders Discussion correctly with just date 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -1702,6 +1716,7 @@ exports[`renders Discussion correctly with just points 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -1833,6 +1848,7 @@ exports[`renders Discussion correctly without right side content 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -1940,6 +1956,7 @@ exports[`renders Note correctly with Group 1`] = `
             as="button"
             ellipsis={false}
             href="/groups/9/pages/this-is-an-account-level-group-page"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -2053,6 +2070,7 @@ exports[`renders Note correctly with everything 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -2166,6 +2184,7 @@ exports[`renders Note correctly without Course 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -2273,6 +2292,7 @@ exports[`renders Page correctly with everything 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -2404,6 +2424,7 @@ exports[`renders Page correctly with just date 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -2511,6 +2532,7 @@ exports[`renders Page correctly with just points 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -2642,6 +2664,7 @@ exports[`renders Page correctly without right side content 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -2749,6 +2772,7 @@ exports[`renders Quiz correctly with everything 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -2880,6 +2904,7 @@ exports[`renders Quiz correctly with just date 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -2987,6 +3012,7 @@ exports[`renders Quiz correctly with just points 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -3118,6 +3144,7 @@ exports[`renders Quiz correctly without right side content 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -3225,6 +3252,7 @@ exports[`renders correctly 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -3356,6 +3384,7 @@ exports[`renders feedback if available 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >
@@ -3490,6 +3519,7 @@ exports[`renders user-created Todo correctly 1`] = `
             as="button"
             ellipsis={false}
             href="#"
+            iconPlacement="start"
             linkRef={[Function]}
             variant="default"
           >

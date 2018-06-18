@@ -287,7 +287,7 @@ QUnit.module('SubmissionTray', function (hooks) {
 
   test('shows name', function () {
     mountComponent({ student: { id: '27', name: 'Sara', gradesUrl: 'http://gradeUrl/', isConcluded: false } });
-    strictEqual(studentNameDiv().innerHTML, 'Sara');
+    strictEqual(studentNameDiv().innerText, 'Sara');
   });
 
   QUnit.module('LatePolicyGrade', function () {

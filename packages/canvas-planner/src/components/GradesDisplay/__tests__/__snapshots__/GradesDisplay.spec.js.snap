@@ -42,6 +42,7 @@ exports[`does not render caveat if no courses have grading periods 1`] = `
         as="button"
         ellipsis={false}
         href="/courses/1"
+        iconPlacement="start"
         linkRef={[Function]}
         variant="default"
       >
@@ -184,6 +185,7 @@ exports[`renders some course grades 1`] = `
         as="button"
         ellipsis={false}
         href="/courses/1"
+        iconPlacement="start"
         linkRef={[Function]}
         variant="default"
       >
@@ -224,6 +226,7 @@ exports[`renders some course grades 1`] = `
         as="button"
         ellipsis={false}
         href="/courses/2"
+        iconPlacement="start"
         linkRef={[Function]}
         variant="default"
       >
@@ -264,6 +267,7 @@ exports[`renders some course grades 1`] = `
         as="button"
         ellipsis={false}
         href="/courses/3"
+        iconPlacement="start"
         linkRef={[Function]}
         variant="default"
       >

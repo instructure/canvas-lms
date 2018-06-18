@@ -3,7 +3,7 @@
 exports[`renders the AlignmentResult component 1`] = `
 "<Flex padding=\\"small\\" direction=\\"column\\" alignItems=\\"stretch\\" as=\\"span\\" justifyItems=\\"start\\" inline={false} visualDebug={false} wrapItems={false}>
   <FlexItem as=\\"span\\" grow={false} shrink={false}>
-    <Link href=\\"http://foo\\" variant=\\"default\\" as=\\"button\\" linkRef={[Function]} ellipsis={false}>
+    <Link href=\\"http://foo\\" variant=\\"default\\" as=\\"button\\" linkRef={[Function]} ellipsis={false} iconPlacement=\\"start\\">
       <Flex alignItems=\\"center\\" as=\\"span\\" direction=\\"row\\" justifyItems=\\"start\\" inline={false} visualDebug={false} wrapItems={false}>
         <FlexItem as=\\"span\\" grow={false} shrink={false}>
           <Text size=\\"medium\\" as=\\"span\\" letterSpacing=\\"normal\\">

@@ -11,6 +11,7 @@ exports[`renders the base component correctly 1`] = `
         as="button"
         ellipsis={false}
         href="http://www.non_default_url.com"
+        iconPlacement="start"
         linkRef={[Function]}
         variant="default"
       >
@@ -78,6 +79,7 @@ exports[`renders the base component correctly without points 1`] = `
         as="button"
         ellipsis={false}
         href="http://www.non_default_url.com"
+        iconPlacement="start"
         linkRef={[Function]}
         variant="default"
       >
