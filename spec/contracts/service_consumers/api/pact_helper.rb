@@ -20,7 +20,8 @@ ENV["RAILS_ENV"] = ENV["RACK_ENV"]= "test"
 require 'pact/provider/rspec'
 require_relative '../pact_config'
 require_relative '../../../spec_helper'
-require_relative 'provider_states_for_consumer'
+require_relative 'pact_setup'
+Dir[File.dirname(__FILE__) + "/provider_states_for_consumer/*.rb"].each {|f| require f }
 
 Pact.service_provider PactConfig::Providers::CANVAS_LMS_API do
   app { CanvasRails::Application }

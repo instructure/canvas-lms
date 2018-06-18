@@ -15,21 +15,21 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'httparty'
-require 'json'
-require_relative '../../../pact_config'
+# require_relative '../../pact_config'
+# require_relative '../pact_setup'
 
-module Helper
-  module ApiClient
-    class Calendar
-      include HTTParty
-      base_uri PactConfig.mock_provider_service_base_uri
-      headers "Authorization" => "Bearer some_token"
+PactConfig::Consumers::ALL.each do |consumer|
+  Pact.provider_states_for consumer do
+    provider_state 'a student in a course with an assignment' do
+      set_up do
+        course_with_student(active_all: true)
+        Assignment.create!(context: @course, title: "Assignment1")
+        Pseudonym.create!(user: @student, unique_id: 'testuser@instructure.com')
+        token = @student.access_tokens.create!().full_token
 
-      def show_calendar_event(event_id)
-        JSON.parse(self.class.get("/api/v1/calendar_events/#{event_id}").body)
-      rescue
-        nil
+        provider_param :token, token
+        provider_param :course_id, @course.id.to_s
+        provider_param :user_id, @student.id.to_s
       end
     end
   end

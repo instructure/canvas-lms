@@ -18,9 +18,9 @@
 require_relative 'helper'
 require_relative '../pact_helper'
 
-describe 'Calendar', :pact => true do
+describe 'Calendar Events', :pact => true do
 
-  subject(:calendar_api) {Helper::ApiClient::Calendar.new}
+  subject(:calendar_events_api) {Helper::ApiClient::CalendarEvents.new}
 
   context 'Show Calendar Event' do
     it 'should return JSON body' do
@@ -38,7 +38,8 @@ describe 'Calendar', :pact => true do
           },
           'path' => Pact.provider_param(
             "/api/v1/calendar_events/:{event_id}",
-            {event_id: '1'}),
+            {event_id: '1'}
+          ),
           query: '').will_respond_with(
             status: 200,
             body:
@@ -67,7 +68,7 @@ describe 'Calendar', :pact => true do
                 'all_context_codes': Pact.term(
                   generate: 'courses_1,save_me_1',
                   matcher: /(([a-zA-Z]+_)+\d+,?)*/
-                ),# regex comma separated string
+                ), # regex comma separated string
                 'workflow_state': Pact.like('active'), # string
                 'hidden': Pact.like(false), # bool
                 'child_events_count': Pact.like(1), # int
@@ -87,7 +88,7 @@ describe 'Calendar', :pact => true do
                 'all_day_date': Pact.term(
                   generate: '2012-07-19',
                   matcher: /\d{4}-\d{2}-\d{2}/
-                ),# date
+                ), # date
                 'all_day': Pact.like(false), # bool
                 'created_at': Pact.term(
                   generate: '2018-07-20T05:59:00Z',
@@ -106,7 +107,7 @@ describe 'Calendar', :pact => true do
                 'available_slots': Pact.like(1) # int or null
               }
           )
-      response = calendar_api.show_calendar_event(1)
+      response = calendar_events_api.show_calendar_event(1)
       expect(response['id']).to eq 1
       expect(response['title']).to eq 'something'
     end
