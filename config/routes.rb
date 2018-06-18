@@ -2195,6 +2195,11 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/line_items/:line_item_id/results/:id", action: :show, as: :lti_result_show
       get "courses/:course_id/line_items/:line_item_id/results", action: :index
     end
+
+    # Security
+    scope(controller: 'lti/ims/security') do
+      get "security/jwks", action: :jwks, as: :jwks_show
+    end
   end
 
   ApiRouteSet.draw(self, '/api/sis') do
