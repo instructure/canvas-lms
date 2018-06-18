@@ -400,6 +400,19 @@ describe 'Developer Keys' do
         get "/accounts/#{Account.default.id}/developer_keys#key_modal_opened"
         expect(find_button("Save Key")).to be_present
       end
+
+      it "displays flash alert if scopes aren't selected when enforce scopes toggled" do
+        get "/accounts/#{Account.default.id}/developer_keys"
+        find_button("Developer Key").click
+        wait_for_ajaximations
+        click_enforce_scopes
+        wait_for_ajaximations
+        find_button("Save Key").click
+        flash_holder = f("#flash_message_holder")
+        keep_trying_until do
+          expect(flash_holder.text).to eq 'At least one scope must be selected.' if flash_holder.text.present?
+        end
+      end
     end
   end
 
