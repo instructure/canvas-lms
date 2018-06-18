@@ -123,6 +123,24 @@ describe "SpeedGrader" do
       expect(Speedgrader.grading_details_container.text).to include 'Teacher2'
       expect(Speedgrader.grading_details_container.text).to include 'Teacher3'
     end
+
+    it 'allows selecting a custom grade', priority: '1', test_id: 3505172 do
+      @moderated_assignment.grade_student(@student1, grade: '2', grader: @teacher2, provisional: true)
+      @moderated_assignment.grade_student(@student1, grade: '3', grader: @teacher3, provisional: true)
+
+      user_session(@teacher1)
+      Speedgrader.visit(@course.id, @moderated_assignment.id)
+      Speedgrader.show_details_button.click
+      Speedgrader.select_provisional_grade_by_label('Custom')
+      Speedgrader.enter_grade(12)
+      wait_for_ajaximations
+
+      pg = @moderated_assignment.provisional_grades.last
+      selections = @moderated_assignment.moderated_grading_selections
+
+      expect(pg.score).to eq 12
+      expect(selections.exists?(selected_provisional_grade_id: pg.id)).to be true
+    end
   end
 
   context 'with a moderated anonymous assignment' do

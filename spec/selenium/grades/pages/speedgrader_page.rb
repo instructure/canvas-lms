@@ -185,7 +185,11 @@ class Speedgrader
     end
 
     def provisional_grade_radio_buttons
-      ff("input", grading_details_container)
+      ff("label", grading_details_container)
+    end
+
+    def provisional_grade_radio_button_by_label(label)
+      fj(":contains('#{label}')", provisional_grade_radio_buttons)
     end
 
     # action
@@ -193,6 +197,11 @@ class Speedgrader
       get "/courses/#{course_id}/gradebook/speed_grader?assignment_id=#{assignment_id}"
       visibility_check = grade_input
       keep_trying_until { visibility_check.displayed? }
+    end
+
+    def select_provisional_grade_by_label(label)
+      provisional_grade_radio_button_by_label(label).click
+      driver.action.send_keys(:space).perform
     end
 
     def visit_section(section)
