@@ -25,7 +25,7 @@
     "@instructure/ui-billboard": "^5",
     "@instructure/ui-breadcrumb": "^5",
     "@instructure/ui-buttons": "^5",
-    "@instructure/ui-core": "^4.8.0",
+    "@instructure/ui-core": "^5",
     "@instructure/ui-forms": "^5",
     "@instructure/ui-icons": "^5",
     "@instructure/ui-layout": "^5",

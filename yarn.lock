@@ -156,7 +156,7 @@
     keycode "^2.1.8"
     prop-types "^15.5.10"
 
-"@instructure/ui-alerts@^5":
+"@instructure/ui-alerts@^5", "@instructure/ui-alerts@^5.13.0":
   version "5.13.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-alerts/-/ui-alerts-5.13.0.tgz#7399eb9e4be1e1fc1c6d3f200ebec4620e83e5e2"
   dependencies:
@@ -171,7 +171,7 @@
     keycode "^2.1.8"
     prop-types "^15.5.10"
 
-"@instructure/ui-billboard@^5":
+"@instructure/ui-billboard@^5", "@instructure/ui-billboard@^5.13.0":
   version "5.13.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-billboard/-/ui-billboard-5.13.0.tgz#f1c82fdff74ad020a7ae80db3679e1046cf95469"
   dependencies:
@@ -182,7 +182,7 @@
     classnames "^2.2.5"
     prop-types "^15.5.10"
 
-"@instructure/ui-breadcrumb@^5":
+"@instructure/ui-breadcrumb@^5", "@instructure/ui-breadcrumb@^5.13.0":
   version "5.13.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-breadcrumb/-/ui-breadcrumb-5.13.0.tgz#a4efe0829ee46e0e7d5f99998180af3419a1fd86"
   dependencies:
@@ -216,7 +216,7 @@
     classnames "^2.2.5"
     prop-types "^15.5.10"
 
-"@instructure/ui-core@^4.7.3", "@instructure/ui-core@^4.8.0":
+"@instructure/ui-core@^4.7.3":
   version "4.8.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-core/-/ui-core-4.8.0.tgz#fb32698507f52fd77bb471c199018c1e8671d57b"
   dependencies:
@@ -230,6 +230,35 @@
     keycode "^2.1.8"
     no-scroll "^2.1.0"
     numeral "^2.0.6"
+    prop-types "^15.5.10"
+
+"@instructure/ui-core@^5":
+  version "5.13.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-core/-/ui-core-5.13.0.tgz#d3f9c61ce4a96c1ffd49373074f9a6641e05a22e"
+  dependencies:
+    "@instructure/ui-a11y" "^5.13.0"
+    "@instructure/ui-alerts" "^5.13.0"
+    "@instructure/ui-billboard" "^5.13.0"
+    "@instructure/ui-breadcrumb" "^5.13.0"
+    "@instructure/ui-buttons" "^5.13.0"
+    "@instructure/ui-container" "^5.13.0"
+    "@instructure/ui-elements" "^5.13.0"
+    "@instructure/ui-forms" "^5.13.0"
+    "@instructure/ui-i18n" "^5.13.0"
+    "@instructure/ui-icons" "^5.13.0"
+    "@instructure/ui-layout" "^5.13.0"
+    "@instructure/ui-menu" "^5.13.0"
+    "@instructure/ui-motion" "^5.13.0"
+    "@instructure/ui-overlays" "^5.13.0"
+    "@instructure/ui-pagination" "^5.13.0"
+    "@instructure/ui-portal" "^5.13.0"
+    "@instructure/ui-tabs" "^5.13.0"
+    "@instructure/ui-themeable" "^5.13.0"
+    "@instructure/ui-toggle-details" "^5.13.0"
+    "@instructure/ui-tree-browser" "^5.13.0"
+    "@instructure/ui-utils" "^5.13.0"
+    classnames "^2.2.5"
+    keycode "^2.1.8"
     prop-types "^15.5.10"
 
 "@instructure/ui-elements@^5", "@instructure/ui-elements@^5.13.0":
@@ -246,7 +275,7 @@
     classnames "^2.2.5"
     prop-types "^15.5.10"
 
-"@instructure/ui-forms@^5":
+"@instructure/ui-forms@^5", "@instructure/ui-forms@^5.13.0":
   version "5.13.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-forms/-/ui-forms-5.13.0.tgz#cfe3c0889d7247f7f29b0544b3d99f5dddd11814"
   dependencies:
@@ -333,7 +362,7 @@
     no-scroll "^2.1.0"
     prop-types "^15.5.10"
 
-"@instructure/ui-pagination@^5":
+"@instructure/ui-pagination@^5", "@instructure/ui-pagination@^5.13.0":
   version "5.13.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-pagination/-/ui-pagination-5.13.0.tgz#96f36a48f0d05f7076c46d694aeefc1898254106"
   dependencies:
@@ -438,7 +467,7 @@
     classnames "^2.2.5"
     prop-types "^15.5.10"
 
-"@instructure/ui-tabs@^5":
+"@instructure/ui-tabs@^5", "@instructure/ui-tabs@^5.13.0":
   version "5.13.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-tabs/-/ui-tabs-5.13.0.tgz#5de1a08a31fa4d092b80eaeb13fa0c392d4ba1de"
   dependencies:
@@ -478,7 +507,7 @@
   version "5.13.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-themes/-/ui-themes-5.13.0.tgz#a29f1164990d71e5edd9c818177779e2b1b1a3ef"
 
-"@instructure/ui-toggle-details@^5":
+"@instructure/ui-toggle-details@^5", "@instructure/ui-toggle-details@^5.13.0":
   version "5.13.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-toggle-details/-/ui-toggle-details-5.13.0.tgz#ba29076ed7a6ff407ac715b1217c0ed790b7dbd1"
   dependencies:
@@ -492,6 +521,17 @@
     "@instructure/ui-themeable" "^5.13.0"
     "@instructure/ui-utils" "^5.13.0"
     classnames "^2.2.5"
+    prop-types "^15.5.10"
+
+"@instructure/ui-tree-browser@^5.13.0":
+  version "5.13.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-tree-browser/-/ui-tree-browser-5.13.0.tgz#c4e78fa5bad91908121953e717893c6db8ba56dc"
+  dependencies:
+    "@instructure/ui-icons" "^5.13.0"
+    "@instructure/ui-themeable" "^5.13.0"
+    "@instructure/ui-utils" "^5.13.0"
+    classnames "^2.2.5"
+    keycode "^2.1.8"
     prop-types "^15.5.10"
 
 "@instructure/ui-utils@^4.8.0":
