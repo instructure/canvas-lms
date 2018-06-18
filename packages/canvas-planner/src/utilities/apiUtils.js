@@ -33,7 +33,7 @@ const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
       || apiResponse.submissions.graded)
     ),
     points: plannable.points_possible,
-    html_url: plannable.html_url,
+    html_url: apiResponse.html_url || plannable.html_url,
     overrideId: planner_override && planner_override.id,
     overrideAssignId: plannable.assignment_id,
     id: plannableId,

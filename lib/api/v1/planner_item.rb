@@ -58,7 +58,7 @@ module Api::V1::PlannerItem
         hash[:plannable_date] = item.todo_date || item.created_at
         hash[:plannable_type] = 'wiki_page'
         hash[:plannable] = wiki_page_json(item, user, session, false, assignment_opts: assignment_opts)
-        hash[:html_url] = named_context_url(item.context, :context_wiki_page_url, item.id)
+        hash[:html_url] = named_context_url(item.context, :context_wiki_page_url, item.url)
         hash[:planner_override] ||= planner_override_json(item.planner_override_for(user), user, session)
       elsif item.is_a?(Announcement)
         hash[:plannable_date] = item.posted_at || item.created_at
@@ -71,13 +71,13 @@ module Api::V1::PlannerItem
         hash[:plannable_date] = item[:user_due_date] || topic.todo_date || topic.posted_at || topic.created_at
         hash[:plannable_type] = 'discussion_topic'
         hash[:plannable] = discussion_topic_api_json(topic, topic.context, user, session, assignment_opts: assignment_opts)
-        hash[:html_url] = named_context_url(topic.context, :context_discussion_topic_url, topic.id)
+        hash[:html_url] = discussion_topic_html_url(topic, user, hash[:submissions])
         hash[:planner_override] ||= planner_override_json(topic.planner_override_for(user), user, session)
       else
         hash[:plannable_type] = 'assignment'
         hash[:plannable_date] = item[:user_due_date] || item.due_at
         hash[:plannable] = assignment_json(item, user, session, {include_discussion_topic: true}.merge(assignment_opts))
-        hash[:html_url] = named_context_url(item.context, :context_assignment_url, item.id)
+        hash[:html_url] = assignment_html_url(item, user, hash[:submissions])
       end
     end
   end
@@ -90,23 +90,24 @@ module Api::V1::PlannerItem
     wiki_pages, other_context_items = context_items.partition{|i| i.is_a?(::WikiPage) || i.try(:wiki_page?)}
     ActiveRecord::Associations::Preloader.new.preload(wiki_pages, wiki: [{course: :root_account}, {group: :root_account}]) if wiki_pages.any?
     ActiveRecord::Associations::Preloader.new.preload(other_context_items, {context: :root_account}) if other_context_items.any?
+    ss = user.submission_statuses(opts)
     items.map do |item|
-      planner_item_json(item, user, session, opts)
+      planner_item_json(item, user, session, opts.merge(submission_statuses: ss))
     end
   end
 
   def submission_statuses_for(user, item, opts = {})
     submission_status = {submissions: false}
     return submission_status unless item.is_a?(Assignment)
-    @ss ||= user.submission_statuses(opts)
+    ss = opts[:submission_statuses] || user.submission_statuses(opts)
     submission_status[:submissions] = {
-      submitted: @ss[:submitted].include?(item.id),
-      excused: @ss[:excused].include?(item.id),
-      graded: @ss[:graded].include?(item.id),
-      late: @ss[:late].include?(item.id),
-      missing: @ss[:missing].include?(item.id),
-      needs_grading: @ss[:needs_grading].include?(item.id),
-      has_feedback: @ss[:has_feedback].include?(item.id)
+      submitted: ss[:submitted].include?(item.id),
+      excused: ss[:excused].include?(item.id),
+      graded: ss[:graded].include?(item.id),
+      late: ss[:late].include?(item.id),
+      missing: ss[:missing].include?(item.id),
+      needs_grading: ss[:needs_grading].include?(item.id),
+      has_feedback: ss[:has_feedback].include?(item.id)
     }
 
     # planner will display the most recent comment not made by the user herself
@@ -133,14 +134,31 @@ module Api::V1::PlannerItem
 
   def new_activity(item, user, opts = {})
     if item.is_a?(Assignment) || item.try(:assignment)
-      @ss ||= user.submission_statuses(opts)
+      ss = opts[:submission_statuses] || user.submission_statuses(opts)
       assign = item.try(:assignment) || item
-      return true if @ss.dig(:new_activity).include?(assign.id)
+      return true if ss.dig(:new_activity).include?(assign.id)
     end
     if item.is_a?(DiscussionTopic) || item.try(:discussion_topic)
       topic = item.try(:discussion_topic) || item
       return true if topic && (topic.unread?(user) || topic.unread_count(user) > 0)
     end
     false
+  end
+
+  private
+
+  def assignment_feedback_url(assignment, user, submission_info)
+    return nil unless assignment
+    return nil unless submission_info
+    return nil unless submission_info[:submitted] || submission_info[:graded] || submission_info[:has_feedback]
+    context_url(assignment.context, :context_assignment_submission_url, assignment.id, user.id)
+  end
+
+  def assignment_html_url(assignment, user, submission_info)
+    assignment_feedback_url(assignment, user, submission_info) || named_context_url(assignment.context, :context_assignment_url, assignment.id)
+  end
+
+  def discussion_topic_html_url(topic, user, submission_info)
+    assignment_feedback_url(topic.assignment, user, submission_info) || named_context_url(topic.context, :context_discussion_topic_url, topic.id)
   end
 end

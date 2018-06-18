@@ -48,7 +48,6 @@ function makeApiResponse (overrides = {}, assignmentOverrides = {}) {
     ignore: `/api/v1/users/self/todo/assignment_10/submitting?permanent=0`,
     ignore_permanently: `/api/v1/users/self/todo/assignment_10/submitting?permanent=1`,
     planner_override: null,
-    html_url: `/courses/1/assignments/10#submit`,
     plannable_type: 'assignment',
     plannable: makeAssignment(assignmentOverrides),
     submissions: false,
