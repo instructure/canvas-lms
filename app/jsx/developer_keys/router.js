@@ -34,6 +34,7 @@ function renderShowDeveloperKeys(ctx) {
     store.dispatch(actions.developerKeysModalOpen())
   } else {
     store.dispatch(actions.developerKeysModalClose())
+    store.dispatch(actions.setEditingDeveloperKey())
   }
 
   if (!state.listDeveloperKeys.listDeveloperKeysSuccessful) {
