@@ -49,6 +49,7 @@ describe "permissions index" do
     end
 
     it "updates the permission to the correct section" do
+      skip("because landon said so")
       button_state = PermissionsIndex.edit_role_tray_permissoin_state("read_announcements", @custom_student_role.id)
       expect(button_state).to eq('Enabled')
       PermissionsIndex.open_edit_role_tray(@custom_student_role)

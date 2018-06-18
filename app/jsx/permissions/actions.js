@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import $ from 'jquery'
 import I18n from 'i18n!permissions'
 import {createActions} from 'redux-actions'
+import $ from 'jquery'
 
 import * as apiClient from './apiClient'
 
@@ -73,7 +73,6 @@ actions.createNewRole = function(label, baseRole) {
         dispatch(actions.addTraySavingSuccess())
         dispatch(actions.hideAllTrays())
         dispatch(actions.displayRoleTray({role: createdRole}))
-        showFlashSuccess(I18n.t('Successfully created new role'))()
       })
       .catch(error => {
         dispatch(actions.addTraySavingFail())
@@ -87,7 +86,6 @@ actions.updateRoleName = function(id, label, baseType) {
     apiClient
       .updateRole(getState(), {id, label, base_role_type: baseType})
       .then(res => {
-        showFlashSuccess(I18n.t('Successfully updated role name'))()
         dispatch(actions.updateRole(res.data))
       })
       .catch(error => {
@@ -101,7 +99,6 @@ actions.updateRoleNameAndBaseType = function(id, label, baseType) {
     apiClient
       .updateRole(getState(), {id, label, base_role_type: baseType})
       .then(res => {
-        $.screenReaderFlashMessage(I18n.t('Successfully updated role name'))
         dispatch(actions.updateRole(res.data))
       })
       .catch(_ => {
@@ -175,7 +172,6 @@ actions.modifyPermissions = function modifyPermissions({
         const newRes = {...res.data, contextType: role.contextType, displayed: role.displayed}
         dispatch(actions.updatePermissions({role: newRes}))
         dispatch(actions.fixButtonFocus({permissionName: name, roleId: id, inTray}))
-        showFlashSuccess(I18n.t('Successfully updated permission'))()
       })
       .catch(_error => {
         showFlashError(I18n.t('Failed to update permission'))()
