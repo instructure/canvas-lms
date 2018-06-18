@@ -294,7 +294,7 @@ type Course implements Node & Timestamped {
 
     # Returns the last _n_ elements from the list.
     last: Int
-    orderBy: [SubmissionOrderCriteria]
+    orderBy: [SubmissionOrderCriteria!]
 
     # Only return submissions for the given students.
     studentIds: [ID!]!
@@ -340,8 +340,8 @@ type CoursePermissions {
 }
 
 input CourseUsersFilter {
-  #       only return users with the given enrollment state. defaults
-  #       to `invited`, `creation_pending`, `active`
+  # only return users with the given enrollment state. defaults
+  # to `invited`, `creation_pending`, `active`
   enrollmentStates: [CourseFilterableEnrollmentState!]
 
   # only include users with the given ids
