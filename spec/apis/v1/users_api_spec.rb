@@ -2135,7 +2135,7 @@ describe "Users API", type: :request do
         with('events', service: 'pandata').and_return(fake_secrets)
     end
 
-    it 'should return token and expiration' do
+    it 'returns token and expiration' do
       Setting.set("pandata_events_token_allowed_developer_key_ids", DeveloperKey.default.global_id)
       json = api_call(:post, "/api/v1/users/self/pandata_events_token",
           { controller: 'users', action: 'pandata_events_token', format:'json', id: @user.to_param },
@@ -2147,7 +2147,7 @@ describe "Users API", type: :request do
       expect(json['expires_at']).to be_present
     end
 
-    it 'should return bad_request for incorrect app keys' do
+    it 'returns bad_request for incorrect app keys' do
       Setting.set("pandata_events_token_allowed_developer_key_ids", DeveloperKey.default.global_id)
       json = api_call(:post, "/api/v1/users/self/pandata_events_token",
           { controller: 'users', action: 'pandata_events_token', format:'json', id: @user.to_param },
@@ -2157,7 +2157,7 @@ describe "Users API", type: :request do
       expect(json['message']).to eq "Invalid app key"
     end
 
-    it 'should return forbidden if the tokens key is not authorized' do
+    it 'returns forbidden if the tokens key is not authorized' do
       json = api_call(:post, "/api/v1/users/self/pandata_events_token",
           { controller: 'users', action: 'pandata_events_token', format:'json', id: @user.to_param },
           { app_key: 'IOS_key'}
