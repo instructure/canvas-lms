@@ -2476,15 +2476,16 @@ class UsersController < ApplicationController
       @pseudonym = nil if @pseudonym && !['creation_pending', 'pending_approval'].include?(@pseudonym.user.workflow_state)
     end
 
-    @user ||= @pseudonym && @pseudonym.user
+    @user ||= @pseudonym&.user
     @user ||= @context.shard.activate { User.new }
 
+    use_pairing_code = @domain_root_account.feature_enabled?(:observer_pairing_code)
     force_validations = value_to_boolean(params[:force_validations])
     manage_user_logins = @context.grants_right?(@current_user, session, :manage_user_logins)
     self_enrollment = params[:self_enrollment].present?
     allow_non_email_pseudonyms = !force_validations && manage_user_logins || self_enrollment && params[:pseudonym_type] == 'username'
     require_password = self_enrollment && allow_non_email_pseudonyms
-    allow_password = require_password || manage_user_logins
+    allow_password = require_password || manage_user_logins || use_pairing_code
 
     notify_policy = Users::CreationNotifyPolicy.new(manage_user_logins, params[:pseudonym])
 
@@ -2562,7 +2563,7 @@ class UsersController < ApplicationController
     @invalid_observee_creds = nil
     @invalid_observee_code = nil
     if @user.initial_enrollment_type == 'observer'
-      if @domain_root_account.feature_enabled?(:observer_pairing_code)
+      if use_pairing_code
         @pairing_code = ObserverPairingCode.active.where(code: params[:pairing_code][:code]).first
         if !@pairing_code.nil?
           @observee = @pairing_code.user

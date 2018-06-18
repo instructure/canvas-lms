@@ -250,12 +250,15 @@ describe UsersController do
 
           post 'create', params: {
             pseudonym: {
-              unique_id: 'jon@example.com'
+              unique_id: 'jon@example.com',
+              password: 'password',
+              password_confirmation: 'password'
             },
             user: {
               name: 'Jon',
               terms_of_use: '1',
-              initial_enrollment_type: 'observer'
+              initial_enrollment_type: 'observer',
+              skip_registration: '1'
             },
             pairing_code: {
               code: pairing_code.code
