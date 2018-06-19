@@ -53,7 +53,10 @@ module LtiOutbound
       hash['ext_outcome_result_total_score_accepted'] = true
       hash['ext_outcomes_tool_placement_url'] = lti_turnitin_outcomes_placement_url
 
-      assignment_settings = SettingsService.get_settings(id: active_record_assignment.migration_id, object: 'assignment')
+
+      if active_record_assignment.migration_id
+        assignment_settings = SettingsService.get_settings(id: active_record_assignment.migration_id.to_s, object: 'assignment')
+      end
 
       ### Temporary Ugly Hack ##
       if assignment.title.downcase == 'final exam'
