@@ -870,9 +870,34 @@ class FilesController < ApplicationController
     if params[:progress_id]
       progress = Progress.find(params[:progress_id])
 
-      json = { "id" => @attachment.id }
-      progress.set_results(json)
-      progress.complete!
+      # TODO: The `submit_assignment` param is used to help in backwards compat for fixing auto submissions,
+      # can be removed in the next release.
+      if params[:submit_assignment].to_s == 'true'
+        if progress.tag == 'upload_via_url'
+          assignment = progress.context
+          begin
+            Services::SubmitHomeworkService.submit(
+              @attachment,
+              assignment,
+              progress.created_at,
+              params[:eula_agreement_timestamp]
+            )
+            Services::SubmitHomeworkService.successful_email(@attachment, assignment)
+          rescue => error
+            error_id = Canvas::Errors.capture_exception(self.class.name, error)[:error_report]
+            progress.message = "Unexpected error, ID: #{error_id || 'unknown'}"
+            progress.save
+            progress.fail
+            logger.error "Error submitting a file: #{error} - #{error.backtrace}"
+            Services::SubmitHomeworkService.failure_email(@attachment, assignment)
+          end
+        end
+      end
+
+      if progress.running?
+        progress.set_results('id' => @attachment.id)
+        progress.complete!
+      end
     end
 
     url_params = { include: [] }

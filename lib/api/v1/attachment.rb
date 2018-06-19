@@ -223,11 +223,19 @@ module Api::V1::Attachment
     # no permission check required to use the preferred folder
 
     folder ||= opts[:folder]
+    progress_context = opts[:assignment] || @current_user
     if InstFS.enabled?
-      progress_json = if params[:url]
-        progress = ::Progress.new(context: @current_user, tag: :upload_via_url)
+      additional_capture_params = {}
+      progress_json_result = if params[:url]
+        progress = ::Progress.new(context: progress_context, user_id: @current_user, tag: :upload_via_url)
         progress.start
         progress.save!
+
+        additional_capture_params = {
+          submit_assignment: params[:submit_assignment],
+          eula_agreement_timestamp: params[:eula_agreement_timestamp]
+        }
+
         progress_json(progress, @current_user, session)
       end
 
@@ -244,8 +252,9 @@ module Api::V1::Attachment
         quota_exempt: !opts[:check_quota],
         capture_url: api_v1_files_capture_url,
         target_url: params[:url],
-        progress_json: progress_json,
-        include_param: params[:success_include]
+        progress_json: progress_json_result,
+        include_param: params[:success_include],
+        additional_capture_params: additional_capture_params
       )
     else
       @attachment = Attachment.new
@@ -263,7 +272,7 @@ module Api::V1::Attachment
 
       on_duplicate = infer_on_duplicate(params)
       if params[:url]
-        progress = ::Progress.new(context: @current_user, tag: :upload_via_url)
+        progress = ::Progress.new(context: progress_context, user: @current_user, tag: :upload_via_url)
         progress.reset!
         progress.process_job(
           @attachment,

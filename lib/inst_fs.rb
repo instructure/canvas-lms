@@ -70,7 +70,9 @@ module InstFS
       end
     end
 
-    def upload_preflight_json(context:, root_account:, user:, acting_as:, access_token:, folder:, filename:, content_type:, quota_exempt:, on_duplicate:, capture_url:, target_url: nil, progress_json: nil, include_param: nil)
+    def upload_preflight_json(context:, root_account:, user:, acting_as:, access_token:, folder:, filename:,
+                              content_type:, quota_exempt:, on_duplicate:, capture_url:, target_url: nil,
+                              progress_json: nil, include_param: nil, additional_capture_params: {})
       raise ArgumentError unless !!target_url == !!progress_json # these params must both be present or both absent
 
       token = upload_jwt(
@@ -79,7 +81,7 @@ module InstFS
         access_token: access_token,
         root_account: root_account,
         capture_url: capture_url,
-        capture_params: {
+        capture_params: additional_capture_params.merge(
           context_type: context.class.to_s,
           context_id: context.global_id.to_s,
           user_id: acting_as.global_id.to_s,
@@ -89,7 +91,7 @@ module InstFS
           on_duplicate: on_duplicate,
           progress_id: progress_json && progress_json[:id],
           include: include_param
-        }
+        )
       )
 
       upload_params = {

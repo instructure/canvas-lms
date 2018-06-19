@@ -20,13 +20,14 @@ import Backbone from 'Backbone'
 import ExternalContentFileSubmissionView from 'compiled/views/assignments/ExternalContentFileSubmissionView'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
-import * as uploader from 'jsx/shared/upload_file'
+import axios from 'axios'
 
 const contentItem = {
   '@type': 'FileItem',
   url: 'http://lti.example.com/content/launch/42',
   name: 'FileDude',
-  comment: 'Foo all the bars!'
+  comment: 'Foo all the bars!',
+  eula_agreement_timestamp: 1522419910
 }
 
 let sandbox
@@ -56,7 +57,7 @@ QUnit.module('ExternalContentFileSubmissionView#uploadFileFromUrl', {
 })
 
 test("hits the course url", () => {
-  const spy = sandbox.spy(uploader, 'uploadFile')
+  const spy = sandbox.spy(axios, 'post')
   view.uploadFileFromUrl({}, model)
   ok(spy.calledWith('/api/v1/courses/42/assignments/24/submissions/5/files'))
 })
@@ -64,28 +65,14 @@ test("hits the course url", () => {
 test("hits the group url", () => {
   window.ENV.SUBMIT_ASSIGNMENT.GROUP_ID_FOR_USER = 2
 
-  const spy = sandbox.spy(uploader, 'uploadFile')
+  const spy = sandbox.spy(axios, 'post')
   view.uploadFileFromUrl({}, model)
   ok(spy.calledWith('/api/v1/groups/2/files'))
 })
 
 test("sends the eula agreement timestamp to the submission endpoint", () => {
-  const timestamp = 1522419910
-  const timestampNode = document.createElement('input')
-  const ajaxSpy = sinon.spy()
-  const submission = new Map()
-  const attachment = {
-    id: 23
-  }
-
-  timestampNode.id = 'eula_agreement_timestamp'
-  timestampNode.value = timestamp
-  document.querySelector('#fixtures').appendChild(timestampNode)
-
-  $.ajaxJSON = ajaxSpy
-  submission.set('comment', 'a comment')
-
-  view.assignmentSubmission = submission
-  view.submitAssignment(attachment)
-  equal(ajaxSpy.args[0][2].submission.eula_agreement_timestamp, timestamp)
+  const spy = sandbox.spy(axios, 'post')
+  view.uploadFileFromUrl({}, model)
+  equal(spy.args[0][1].eula_agreement_timestamp, model.get('eula_agreement_timestamp'))
+  ok(spy.calledWith('/api/v1/courses/42/assignments/24/submissions/5/files'))
 })

@@ -1212,125 +1212,168 @@ describe FilesController do
       assert_status(400)
     end
 
-    it "should create a new attachment" do
-      course = Course.create
-      folder = Folder.create!(:name => "test", :context => course)
-      user = User.create!(:name => "me")
-      params = {
-        id: 1,
-        user_id: user.id,
-        context_type: "Course",
-        context_id: course.id,
-        token: @token,
-        name: "test.txt",
-        size: 42,
-        content_type: "text/plain",
-        instfs_uuid: 1,
-        folder_id: folder.id,
-      }
-      post "api_capture", params: params
-      assert_status(201)
-      expect(folder.attachments.first).to_not be_nil
-    end
+    context 'with a course' do
+      let(:course) { Course.create }
+      let(:user) { User.create!(name: "me") }
+      let(:folder) { Folder.create!(name: "test", context: course) }
+      let(:params) do
+         {
+          id: 1,
+          user_id: user.id,
+          context_type: "Course",
+          context_id: course.id,
+          token: @token,
+          name: "test.txt",
+          size: 42,
+          content_type: "text/plain",
+          instfs_uuid: 1,
+          folder_id: folder.id,
+        }
+      end
 
-    it "works with a ContentMigration as the context" do
-      course = Course.create!
-      user = User.create!(:name => "me")
-      migration = course.content_migrations.create!
-      folder = course.folders.create!(name: "migrations")
+      it "should create a new attachment" do
+        post "api_capture", params: params
+        assert_status(201)
+        expect(folder.attachments.first).not_to be_nil
+      end
 
-      params = {
-        id: 1,
-        user_id: user.id,
-        context_type: "ContentMigration",
-        context_id: migration.id,
-        token: @token,
-        name: "test.txt",
-        size: 42,
-        content_type: "text/plain",
-        instfs_uuid: 1,
-        folder_id: folder.id
-      }
+      it "works with a ContentMigration as the context" do
+        migration = course.content_migrations.create!
+        request_params = params.merge(
+          context_id: migration.id,
+          context_type: "ContentMigration"
+        )
 
-      post "api_capture", params: params
-      assert_status(201)
-    end
+        post "api_capture", params: request_params
+        assert_status(201)
+      end
 
-    it "works with a Quizzes::QuizSubmission as the context" do
-      course = Course.create!
-      user = User.create!(name: "me")
-      quiz = course.quizzes.create!
-      submission = quiz.quiz_submissions.create!(user: user)
-      folder = course.folders.create!(name: "submissions")
+      it "works with a Quizzes::QuizSubmission as the context" do
+        quiz = course.quizzes.create!
+        submission = quiz.quiz_submissions.create!(user: user)
 
-      params = {
-        id: 1,
-        user_id: user.id,
-        context_type: "Quizzes::QuizSubmission",
-        context_id: submission.id,
-        token: @token,
-        name: "test.txt",
-        size: 42,
-        content_type: "text/plain",
-        instfs_uuid: 1,
-        folder_id: folder.id
-      }
+        request_params = params.merge(
+          context_type: "Quizzes::QuizSubmission",
+          context_id: submission.id
+        )
 
-      post "api_capture", params: params
-      assert_status(201)
-    end
+        post "api_capture", params: request_params
+        assert_status(201)
+      end
 
-    it "works with an Assignment as the context" do
-      course = Course.create!
-      user = User.create!(name: "me")
-      folder = course.folders.create!(name: "submissions")
-      assignment = course.assignments.create!
+      context 'with an Assignment' do
+        let(:assignment) { course.assignments.create! }
+        let(:assignment_params) do
+          params.merge(
+            context_type: "Assignment",
+            context_id: assignment.id
+          )
+        end
 
-      params = {
-        id: 1,
-        user_id: user.id,
-        context_type: "Assignment",
-        context_id: assignment.id,
-        token: @token,
-        name: "test.txt",
-        size: 42,
-        content_type: "text/plain",
-        instfs_uuid: 1,
-        folder_id: folder.id
-      }
+        before do
+          allow(Mailer).to receive(:deliver)
+        end
 
-      post "api_capture", params: params
-      assert_status(201)
-    end
+        it "works with an Assignment as the context" do
+          post "api_capture", params: assignment_params
+          assert_status(201)
+        end
 
-    it "completes the Progress object given in params[:progress_id], if any" do
-      user = User.create!(:name => "me")
+        context 'with a Progress' do
+          let(:progress) do
+            ::Progress.
+              new(context: assignment, user: user, tag: :test).
+              tap(&:start).
+              tap(&:save!)
+          end
+          let(:progress_params) do
+            assignment_params.merge(
+              progress_id: progress.id
+            )
+          end
+          let(:request) do
+            post "api_capture", params: progress_params
+            progress.reload
+          end
 
-      progress = ::Progress.new(context: user, tag: :upload_via_url)
-      progress.start
-      progress.save!
+          it "completes the Progress object" do
+            request
+            expect(progress).to be_completed
+          end
 
-      course = Course.create
-      folder = Folder.create!(:name => "test", :context => course)
-      params = {
-        id: 1,
-        user_id: user.id,
-        context_type: "Course",
-        context_id: course.id,
-        token: @token,
-        name: "test.txt",
-        size: 42,
-        content_type: "text/plain",
-        instfs_uuid: 1,
-        folder_id: folder.id,
-        progress_id: progress.id,
-      }
-      post "api_capture", params: params
-      assert_status(201)
+          it "sets the attachment id in the Progress#results" do
+            request
+            expect(progress.results["id"]).not_to be_nil
+          end
 
-      progress.reload
-      expect(progress).to be_completed
-      expect(progress.results["id"]).to_not be_nil
+          it "returns a 201 http status" do
+            request
+            assert_status(201)
+          end
+
+          it 'should not submit the attachment' do
+            expect(Services::SubmitHomeworkService).not_to receive(:submit)
+            request
+          end
+        end
+
+        context 'with Progress tagged as :upload_via_url' do
+          let(:progress) do
+            ::Progress.
+              new(context: assignment, user: user, tag: :upload_via_url).
+              tap(&:start).
+              tap(&:save!)
+          end
+          let(:progress_params) do
+            assignment_params.merge(
+              progress_id: progress.id,
+              submit_assignment: true,
+              eula_agreement_timestamp: "1522419910"
+            )
+          end
+          let(:request) { post "api_capture", params: progress_params }
+
+          before do
+            allow(Services::SubmitHomeworkService).to receive(:successful_email)
+            allow(Services::SubmitHomeworkService).to receive(:failure_email)
+          end
+
+          it 'should submit the attachment' do
+            expect(Services::SubmitHomeworkService).to receive(:submit).with(
+              kind_of(Attachment),
+              assignment,
+              progress.created_at,
+              "1522419910"
+            )
+            request
+          end
+
+          it 'should save the eula_agreement_timestamp' do
+            request
+            expect(Submission.where(assignment_id: progress.assignment.id).first.turnitin_data[:eula_agreement_timestamp]).to eq("1522419910")
+          end
+
+          it "returns a 201 http status" do
+            request
+            assert_status(201)
+          end
+
+          it 'should send a successful email' do
+            expect(Services::SubmitHomeworkService).to receive(:successful_email).with(kind_of(Attachment), kind_of(Assignment)).once
+            request
+
+            expect(progress.reload.workflow_state).to eq 'completed'
+          end
+
+          it 'should send a failure email' do
+            allow(Services::SubmitHomeworkService).to receive(:submit).and_raise('error')
+            expect(Services::SubmitHomeworkService).to receive(:failure_email).with(kind_of(Attachment), kind_of(Assignment)).once
+            request
+
+            expect(progress.reload.workflow_state).to eq 'failed'
+          end
+        end
+      end
     end
   end
 

@@ -1764,8 +1764,9 @@ class Assignment < ActiveRecord::Base
   end
   private :save_comment_to_submission
 
-  SUBMIT_HOMEWORK_ATTRS = %w[body url submission_type
-                             media_comment_id media_comment_type]
+  SUBMIT_HOMEWORK_ATTRS = %w[
+    body url submission_type media_comment_id media_comment_type submitted_at
+  ].freeze
   ALLOWABLE_SUBMIT_HOMEWORK_OPTS = (SUBMIT_HOMEWORK_ATTRS +
                                     %w[comment group_comment attachments]).to_set
 
@@ -1810,7 +1811,7 @@ class Assignment < ActiveRecord::Base
           :workflow_state => submitted ? "submitted" : "unsubmitted",
           :group => group
         })
-        homework.submitted_at = Time.zone.now
+        homework.submitted_at = opts[:submitted_at].nil? ? Time.zone.now : opts[:submitted_at]
         homework.lti_user_id = Lti::Asset.opaque_identifier_for(student)
         homework.turnitin_data[:eula_agreement_timestamp] = eula_timestamp if eula_timestamp.present?
         homework.with_versioning(:explicit => (homework.submission_type != "discussion_topic")) do
