@@ -225,7 +225,7 @@ describe "profile" do
       expect(f('#unregistered_services')).to include_text("Skype")
     end
 
-    it "should toggle service visibility" do
+    it "should toggle user services visibility" do
       get "/profile/settings"
       add_skype_service
       selector = "#show_user_services"

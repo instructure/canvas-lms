@@ -3,7 +3,7 @@
 <% end %>
 
 <% define_content :subject do %>
-  <%= t :subject, "Updated Wiki Page: %{title}, %{user}", :title => asset.title.titleize, :user => asset.context.name %>
+  <%= t :subject, "Updated Page: %{title}, %{user}", :title => asset.title.titleize, :user => asset.context.name %>
 <% end %>
 
 <% define_content :footer_link do %>
@@ -12,7 +12,7 @@
   </a>
 <% end %>
 
-<p><%= t :body, "A page has been updated on the wiki for %{title} that may make your life easier.", :title => asset.context.name %></p>
+<p><%= t :body, "The page %{title} has been updated.", :title => asset.context.name %></p>
 
 <p><strong><%= html_to_text(asset.title).titleize %></strong></p>
 

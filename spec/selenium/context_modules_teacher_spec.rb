@@ -329,7 +329,7 @@ describe "context modules" do
     it "publishes a newly created item" do
       @course.context_modules.create!(name: "Content Page")
       get "/courses/#{@course.id}/modules"
-      add_new_module_item('#wiki_pages_select', 'Content Page', '[ New Page ]', 'New Page Title')
+      add_new_module_item('#wiki_pages_select', 'Page', '[ New Page ]', 'New Page Title')
 
       tag = ContentTag.last
       item = f("#context_module_item_#{tag.id}")
