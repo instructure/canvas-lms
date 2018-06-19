@@ -31,11 +31,11 @@ export default function RoleTrayTable({title, children}) {
       <Heading as="h3">
         <Text weight="bold">{title}</Text>
       </Heading>
-      <hr />
+      <hr aria-hidden="true" />
       {sortedChildren.map(child => (
         <span key={child.props.title}>
           {child}
-          <hr />
+          <hr aria-hidden="true" />
         </span>
       ))}
     </Container>

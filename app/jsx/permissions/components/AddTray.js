@@ -147,7 +147,7 @@ export default class AddTray extends Component {
     return (
       <div className="permissions__add-tray-footer">
         <Container textAlign="end" display="block">
-          <hr />
+          <hr aria-hidden="true" />
           <Button
             id="permissions-add-tray-cancel-button"
             onClick={this.props.hideTray}
