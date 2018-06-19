@@ -26,6 +26,11 @@ export const ACCOUNT = 'Account'
 export const ALL_ROLES_VALUE = '0'
 export const ALL_ROLES_LABEL = I18n.t('All Roles')
 
+propTypes.permissionDetails = shape({
+  title: string.isRequired,
+  description: string.isRequired
+})
+
 propTypes.permission = shape({
   permission_name: string.isRequired,
   label: string.isRequired,
