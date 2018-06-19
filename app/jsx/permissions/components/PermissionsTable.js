@@ -48,6 +48,17 @@ export default class PermissionsTable extends Component {
     expanded: {}
   }
 
+  fixScroll = e => {
+    const sidebarWidth = 300
+    const leftOffset = e.target.offsetParent.offsetLeft
+    const leftScroll = this.contentWrapper.scrollLeft
+
+    if (leftOffset - sidebarWidth < leftScroll) {
+      const newScroll = Math.max(0, this.contentWrapper.scrollLeft - sidebarWidth)
+      this.contentWrapper.scrollLeft = newScroll
+    }
+  }
+
   toggleExpanded(id) {
     return () => {
       const expanded = Object.assign(this.state.expanded)
@@ -97,6 +108,7 @@ export default class PermissionsTable extends Component {
                   variant="link"
                   onClick={() => this.openRoleTray(role)}
                   id={`role_${role.id}`}
+                  onFocus={this.fixScroll}
                 >
                   <Text size="small">{role.label} </Text>
                 </Button>
@@ -188,6 +200,7 @@ export default class PermissionsTable extends Component {
                       roleId={role.id}
                       roleLabel={role.label}
                       inTray={false}
+                      onFocus={this.fixScroll}
                     />
                   </div>
                 </td>

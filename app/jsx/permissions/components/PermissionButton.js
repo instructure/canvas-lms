@@ -55,6 +55,7 @@ export default class PermissionButton extends Component {
     roleLabel: PropTypes.string,
     roleId: PropTypes.string.isRequired,
     setFocus: PropTypes.bool.isRequired,
+    onFocus: PropTypes.func.isRequired,
     useCaching: PropTypes.bool // Allows disabling of cache for unit tests
   }
 
@@ -184,6 +185,7 @@ export default class PermissionButton extends Component {
         ref={this.setupButtonRef}
         onClick={this.state.showMenu ? this.closeMenu : this.openMenu}
         disabled={this.props.permission.readonly}
+        onFocus={this.props.onFocus}
       >
         {this.getCachedButton(this.props.permission.enabled)}
       </button>
