@@ -167,9 +167,9 @@ export class PlannerHeader extends Component {
     this.props.deletePlannerItem(plannerItem);
   }
 
-  handleCancelPlannerItem = () => {
+  handleToggleTray = () => {
+    if (this.state.trayOpen) this.props.cancelEditingPlannerItem();
     this.toggleUpdateItemTray();
-    this.props.cancelEditingPlannerItem();
   }
 
   toggleAriaHiddenStuff = (hide) => {
@@ -304,7 +304,7 @@ export class PlannerHeader extends Component {
         <Button
           variant="icon"
           margin="0 medium 0 0"
-          onClick={this.toggleUpdateItemTray}
+          onClick={this.handleToggleTray}
           ref={(b) => { this.addNoteBtn = b; }}
         >
           <IconPlusLine/>
@@ -358,7 +358,7 @@ export class PlannerHeader extends Component {
           shouldContainFocus={true}
           shouldReturnFocus={false}
           applicationElement={() => document.getElementById('application') }
-          onDismiss={this.handleCancelPlannerItem}
+          onDismiss={this.handleToggleTray}
         >
           <UpdateItemTray
             locale={this.props.locale}

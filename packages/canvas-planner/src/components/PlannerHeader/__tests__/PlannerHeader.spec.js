@@ -45,6 +45,7 @@ function defaultProps (options) {
     dismissOpportunity: () => {},
     clearUpdateTodo: () => {},
     startLoadingGradesSaga: () => {},
+    cancelEditingPlannerItem: () => {},
     ariaHideElement: document.createElement('div'),
     stickyZIndex: 3,
     firstNewActivityDate: null,
@@ -89,14 +90,17 @@ it('renders the base component correctly with buttons and trays', () => {
 });
 
 it('toggles the new item tray', () => {
+  const mockCancel = jest.fn();
   const wrapper = mount(
-    <PlannerHeader {...defaultProps()} />
+    <PlannerHeader {...defaultProps()} cancelEditingPlannerItem={mockCancel} />
   );
   const button = wrapper.find('[children="Add To Do"]');
   button.simulate('click');
   expect(findEditTray(wrapper).props().open).toEqual(true);
+  expect(mockCancel).not.toHaveBeenCalled();
   button.simulate('click');
   expect(findEditTray(wrapper).props().open).toEqual(false);
+  expect(mockCancel).toHaveBeenCalled();
 });
 
 it('sends focus back to the add new item button', () => {
@@ -105,7 +109,7 @@ it('sends focus back to the add new item button', () => {
     <PlannerHeader {...defaultProps()} cancelEditingPlannerItem={mockCancel}/>
   );
   wrapper.instance().toggleUpdateItemTray();
-  wrapper.instance().handleCancelPlannerItem();
+  wrapper.instance().handleToggleTray();
   expect(mockCancel).toHaveBeenCalled();
 });
 
