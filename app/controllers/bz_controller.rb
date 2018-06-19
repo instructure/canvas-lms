@@ -670,7 +670,7 @@ class BzController < ApplicationController
     
     def perform
       csv = Export::GradeDownload.csv(@user, @params)
-      Mailer.bz_message(@user.email, "Export Success", "Attached is your export data", "grades_download.csv" => csv).deliver
+      Mailer.bz_message(@user.email, "Export Success: Course #{@params[:course_id]}", "Attached is your export data", "grades_download.csv" => csv).deliver
       
       csv
     end
