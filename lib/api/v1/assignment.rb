@@ -240,7 +240,7 @@ module Api::V1::Assignment
       hash['integration_data'] = assignment.integration_data
     end
 
-    if assignment.quiz
+    if assignment.quiz?
       hash['quiz_id'] = assignment.quiz.id
       hash['anonymous_submissions'] = !!(assignment.quiz.anonymous_submissions)
     end
@@ -282,7 +282,7 @@ module Api::V1::Assignment
       end
     end
 
-    if opts[:include_discussion_topic] && assignment.discussion_topic
+    if opts[:include_discussion_topic] && assignment.discussion_topic?
       extend Api::V1::DiscussionTopics
       hash['discussion_topic'] = discussion_topic_api_json(
         assignment.discussion_topic,

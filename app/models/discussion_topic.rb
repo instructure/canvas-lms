@@ -511,13 +511,17 @@ class DiscussionTopic < ActiveRecord::Base
   # Do not use the lock options unless you truly need
   # the lock, for instance to update the count.
   # Careless use has caused database transaction deadlocks
-  def unread_count(current_user = nil, lock: false)
+  def unread_count(current_user = nil, lock: false, opts: {})
     current_user ||= self.current_user
     return 0 unless current_user # default for logged out users
 
     environment = lock ? :master : :slave
     Shackles.activate(environment) do
-      topic_participant = discussion_topic_participants.where(user_id: current_user).select(:unread_entry_count).lock(lock).first
+      topic_participant = if opts[:use_preload] && self.association(:discussion_topic_participants).loaded?
+        self.discussion_topic_participants.find{|dtp| dtp.user_id == current_user.id}
+      else
+        discussion_topic_participants.where(user_id: current_user).select(:unread_entry_count).lock(lock).take
+      end
       topic_participant&.unread_entry_count || self.default_unread_count
     end
   end
@@ -539,16 +543,19 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
-  def subscribed?(current_user = nil)
+  def subscribed?(current_user = nil, opts: {})
     current_user ||= self.current_user
     return false unless current_user # default for logged out user
 
     if root_topic?
       participant = DiscussionTopicParticipant.where(user_id: current_user.id,
-        discussion_topic_id: child_topics.pluck(:id)).first
+        discussion_topic_id: child_topics.pluck(:id)).take
     end
-    participant ||= discussion_topic_participants.where(:user_id => current_user.id).first
-
+    participant ||= if opts[:use_preload] && self.association(:discussion_topic_participants).loaded?
+        self.discussion_topic_participants.find{|dtp| dtp.user_id == current_user.id}
+      else
+        discussion_topic_participants.where(user_id: current_user).take
+      end
     if participant
       if participant.subscribed.nil?
         # if there is no explicit subscription, assume the author and posters
