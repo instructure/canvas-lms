@@ -51,8 +51,8 @@ $darkRowBg: #f9f9f9;
 .ic-permissions__table-container {
   // dimensions of the table on screen, the table will scroll inside this container
   // might want to change to match design
-  width: 60vw;
-  height: 60vh;
+  width: 72vw;
+  height: 64vh;
 
   // needed for scrolling + sticky headers
   overflow: auto;
@@ -64,7 +64,7 @@ $darkRowBg: #f9f9f9;
 }
 
 .permissions-v2__header_contianer {
-  width: 58vw;
+  width: 70vw;
   margin: 20px 20px 20px 0px;
 }
 
