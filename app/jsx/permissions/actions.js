@@ -174,7 +174,7 @@ actions.modifyPermissions = function modifyPermissions({
         dispatch(actions.fixButtonFocus({permissionName: name, roleId: id, inTray}))
       })
       .catch(_error => {
-        showFlashError(I18n.t('Failed to update permission'))()
+        setTimeout(() => showFlashError(I18n.t('Failed to update permission'))(), 500)
       })
   }
 }
@@ -190,7 +190,10 @@ actions.deleteRole = function(role, successCallback, failCallback) {
       })
       .catch(_error => {
         failCallback()
-        showFlashError(I18n.t('Failed to delete role %{label}', {label: role.label}))()
+        setTimeout(
+          () => showFlashError(I18n.t('Failed to delete role %{label}', {label: role.label}))(),
+          500
+        )
       })
   }
 }

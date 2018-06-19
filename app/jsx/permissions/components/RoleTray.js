@@ -447,6 +447,7 @@ export default class RoleTray extends Component {
         onDismiss={this.hideTray}
         size="small"
         placement="end"
+        liveRegion={() => document.getElementById('flash_screenreader_holder')}
       >
         {/* TODO Once INSTUI-1269 is fixed and in canvas, use shouldReturnFocus
                  open, and defaultFocusElement dialog props instead of the &&
