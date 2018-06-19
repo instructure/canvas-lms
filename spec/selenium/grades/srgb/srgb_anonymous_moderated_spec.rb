@@ -69,13 +69,13 @@ describe "Individual View Gradebook" do
     end
 
     it 'prevents unmuting the assignment before grades are posted', priority: '2', test_id: 3504343 do
-      skip 'will be unskipped in https://instructure.atlassian.net/browse/GRADE-1051'
       SRGB.visit(@course.id)
       SRGB.select_assignment(@moderated_assignment)
       wait_for_ajaximations
+      scroll_into_view('#assignment_muted_check')
 
       expect(SRGB.assignment_muted_checkbox.attribute('checked')).to eq 'true'
-      expect(SRGB.assignment_muted_checkbox.attribute('aria-disabled')).to eq 'true'
+      expect(SRGB.assignment_muted_checkbox.attribute('disabled')).to eq 'true'
     end
 
     it 'allows unmuting the assignment after grades are posted', priority: '2', test_id: 3504343 do
@@ -84,17 +84,18 @@ describe "Individual View Gradebook" do
       SRGB.visit(@course.id)
       SRGB.select_assignment(@moderated_assignment)
       wait_for_ajaximations
+      scroll_into_view('#assignment_muted_check')
 
-      expect(SRGB.assignment_muted_checkbox.attribute('aria-disabled')).to be nil
+      expect(SRGB.assignment_muted_checkbox.attribute('disabled')).to be nil
     end
 
     it 'prevents grading for the assignment before grades are posted', priority: '2', test_id: 3505171 do
-      skip 'will be unskipped in https://instructure.atlassian.net/browse/GRADE-969'
       SRGB.visit(@course.id)
       SRGB.select_student(@student1)
       SRGB.select_assignment(@moderated_assignment)
+      scroll_into_view('#student_and_assignment_grade')
 
-      expect(SRGB.main_grade_input.attribute).to include 'disabled'
+      expect(SRGB.main_grade_input.attribute('disabled')).to eq 'true'
     end
 
     it 'allows grading for the assignment after grades are posted', priority: '2', test_id: 3505171 do
@@ -128,10 +129,10 @@ describe "Individual View Gradebook" do
       @unmuted_anonymous_assignment.unmute!
 
       user_session(@teacher)
+      SRGB.visit(@course.id)
     end
 
     it 'excludes the muted assignment from the assignment list', priority: '1', test_id: 3505168 do
-      SRGB.visit(@course.id)
       SRGB.select_student(@student1)
       SRGB.assignment_dropdown.click
 
@@ -142,11 +143,9 @@ describe "Individual View Gradebook" do
     end
 
     it 'hides student names in speedgrader', priority: '2', test_id: 3505167 do
-      # Open screenreader gradebook
-      SRGB.visit(@course.id)
-
       # Open speedgrader for the anonymous assignment
       SRGB.select_assignment(@anonymous_assignment)
+      scroll_into_view('#assignment-speedgrader-link')
       SRGB.speedgrader_link.click
       wait_for_ajaximations
 
