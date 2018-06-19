@@ -17,21 +17,10 @@
 
 PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
-    provider_state 'a student in a course' do
-      set_up do
-        course_with_student(active_all: true)
-        Pseudonym.create!(user: @student, unique_id: 'testuser@instructure.com')
-        token = @student.access_tokens.create!().full_token
-
-        provider_param :token, token
-        provider_param :course_id, @course.id.to_s
-      end
-    end
-
     provider_state 'a student in a course with a discussion' do
       set_up do
         course_with_teacher(active_all: true)
-        @course.discussion_topics.create!(:title => "title", :message => nil, :user => @teacher, :discussion_type => 'threaded')
+        @course.discussion_topics.create!(title: "title", message: nil, user: @teacher, discussion_type: 'threaded')
         Pseudonym.create!(user: @teacher, unique_id: 'testuser@instructure.com')
         token = @teacher.access_tokens.create!().full_token
 
@@ -43,7 +32,7 @@ PactConfig::Consumers::ALL.each do |consumer|
     provider_state 'a student in a course with a quiz' do
       set_up do
           course_with_teacher(active_all: true)
-          @course.quizzes.create(:title => 'Test Quiz', :description => 'Its a Quiz figure it out', :due_at=>'Whenever')
+          @course.quizzes.create(title:'Test Quiz', description: 'Its a Quiz figure it out', due_at: 'Whenever')
           Pseudonym.create!(user: @teacher, unique_id: 'testuser@instructure.com')
           token = @teacher.access_tokens.create!().full_token
 
@@ -94,6 +83,20 @@ PactConfig::Consumers::ALL.each do |consumer|
         token = u.access_tokens.create!().full_token
 
         provider_param :token, token
+        provider_param :course_id, @course.id.to_s
+      end
+    end
+
+    provider_state 'an admin in a course' do
+      set_up do
+        @admin = account_admin_user
+        @course = course_model
+
+        Pseudonym.create!(user:@admin, unique_id: 'testaccountuser@instructure.com')
+        token = @admin.access_tokens.create!().full_token
+        
+        provider_param :token, token
+        provider_param :account_id, @admin.id.to_s
         provider_param :course_id, @course.id.to_s
       end
     end

@@ -63,19 +63,11 @@ module Helper
         nil
       end
 
-      #TODO: Fix or Delete
-      def add_course(account_id, course_name, course_id)
-        JSON.parse(self.class.post("/api/v1/accounts/#{account_id}/courses", query: "course[name]=#{course_name}").body)
-      rescue
-        nil
-      end
-
       def list(course_id, enrollment_type)
         JSON.parse(self.class.get("/api/v1/courses/#{course_id}/users", query: "enrollment_type[]=#{enrollment_type}").body)
       rescue
         nil
       end
-
 
       def list_teachers(course_id)
         JSON.parse(self.class.get("/api/v1/courses/#{course_id}/users", query: "enrollment_type[]=teacher").body)
@@ -91,6 +83,40 @@ module Helper
 
       def list_students(course_id)
         JSON.parse(self.class.get("/api/v1/courses/#{course_id}/users", query: "enrollment_type[]=student").body)
+      rescue
+        nil
+      end
+
+      def create_new_course(account_id)
+        JSON.parse(
+          self.class.post("/api/v1/accounts/#{account_id}/courses",
+          :body =>
+          {
+            :course =>
+            {
+              :name => 'new course',
+              :start_at => '2014-01-01T00:00:00Z',
+              :conclude_at => '2015-01-02T00:00:00Z'
+            }
+          }.to_json,
+          :headers => {'Content-Type' => 'application/json'}).body
+        )
+      rescue
+        nil
+      end
+
+      def update_course(course_id)
+        JSON.parse(
+          self.class.put("/api/v1/courses/#{course_id}",
+          :body =>
+          {
+            :course =>
+            {
+              :name => 'updated course'
+            }
+          }.to_json,
+          :headers => {'Content-Type' => 'application/json'}).body
+        )
       rescue
         nil
       end

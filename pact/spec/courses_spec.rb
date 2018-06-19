@@ -19,7 +19,6 @@ require_relative 'helper'
 require_relative '../pact_helper'
 
 describe 'Courses', :pact do
-
   subject(:courses_api) { Helper::ApiClient::Courses.new }
 
   context 'List Courses' do
@@ -69,7 +68,6 @@ describe 'Courses', :pact do
             'restrict_enrollments_to_course_dates': false
           )
         )
-
       response = courses_api.list_your_courses()
       expect(response[0]['id']).to eq 9
       expect(response[0]['name']).to eq 'Course1A'
@@ -106,7 +104,6 @@ describe 'Courses', :pact do
             'short_name': 'student1'
           )
         )
-
       response = courses_api.list_students(2)
       expect(response[0]['id']).to eq 3
       expect(response[0]['name']).to eq 'student1'
@@ -143,7 +140,6 @@ describe 'Courses', :pact do
             'short_name': 'teacher1'
           )
         )
-
       response = courses_api.list_teachers(2)
       expect(response[0]['id']).to eq 2
       expect(response[0]['name']).to eq 'teacher1'
@@ -180,7 +176,6 @@ describe 'Courses', :pact do
             'short_name': 'ta1'
           )
         )
-
       response = courses_api.list_tas(2)
       expect(response[0]['id']).to eq 2
       expect(response[0]['name']).to eq 'ta1'
@@ -217,7 +212,6 @@ describe 'Courses', :pact do
             'short_name': 'observer1'
           )
         )
-
       response = courses_api.list(2, 'observer')
       expect(response[0]['id']).to eq 2
       expect(response[0]['name']).to eq 'observer1'
@@ -298,10 +292,8 @@ describe 'Courses', :pact do
             "can_group": true,
             "locked_for_user": false,
             "message": nil,
-            #"todo_date": nil
           )
         )
-
       response = courses_api.list_discussions(1)
       expect(response[0]['id']).to eq 1
       expect(response[0]['title']).to eq 'No Title'
@@ -407,13 +399,11 @@ describe 'Courses', :pact do
             "post_to_sis": nil
           )
         )
-
       response = courses_api.list_quizzes(1)
       expect(response[0]['id']).to eq 1
       expect(response[0]['title']).to eq 'Test Quiz'
     end
   end
-
 
   context 'Delete a Course' do
     it 'should return JSON body' do
@@ -486,6 +476,145 @@ describe 'Courses', :pact do
         )
       response = courses_api.list_wiki_pages(1)
       expect(response[0]['title']).to eq "WIKI Page"
+    end
+  end
+
+  context 'Create a Course' do
+    it 'should return JSON body' do
+      canvas_lms_api.given('an admin in a course').
+        upon_receiving('Create a Course').
+        with(
+          method: :post,
+          headers: {
+            'Authorization' => Pact.provider_param(
+              'Bearer :{token}',
+              { token: 'some_token' }
+            ),
+            'Connection': 'close',
+            'Host': PactConfig.mock_provider_service_base_uri,
+            'Version': 'HTTP/1.1',
+            'Content-Type': 'application/json'
+          },
+          'path' => Pact.provider_param(
+            '/api/v1/accounts/:{account_id}/courses',
+            { account_id: '1' }
+          ),
+          'body' =>
+          {
+            'course':
+            {
+              'name': 'new course',
+              'start_at': '2014-01-01T00:00:00Z',
+              'conclude_at': '2015-01-02T00:00:00Z'
+            }
+          },
+          query: ''
+        ).
+        will_respond_with(
+          status: 200,
+          body: Pact.like(
+            "id": 9,
+            "name": "new course",
+            "account_id": 1,
+            "uuid": "zQmOIIBHee7zRd4EwXAEDgmoWr8n9uLM2AhD8uZ5",
+            "start_at": "2014-01-01T00:00:00Z",
+            "conclude_at": "2015-01-01T00:00:00Z",
+            "grading_standard_id": nil,
+            "is_public": nil,
+            "allow_student_forum_attachments": false,
+            "course_code": "Unnamed",
+            "default_view": "modules",
+            "root_account_id": 1,
+            "enrollment_term_id": 1,
+            "open_enrollment": nil,
+            "allow_wiki_comments": nil,
+            "self_enrollment": nil,
+            "license": nil,
+            "restrict_enrollments_to_course_dates": false,
+            "end_at": "2015-01-01T00:00:00Z",
+            "public_syllabus": false,
+            "public_syllabus_to_auth": false,
+            "storage_quota_mb": 500,
+            "is_public_to_auth_users": false,
+            "hide_final_grades": false,
+            "apply_assignment_group_weights": false,
+            "calendar": {
+                "ics": "http://localhost:3000/feeds/calendars/course_zQmOIIBHee7zRd4EwXAEDgmoWr8n9uLM2AhD8uZ5.ics"
+            },
+            "time_zone": "America/Denver",
+            "sis_course_id": nil,
+            "sis_import_id": nil,
+            "integration_id": nil,
+            "workflow_state": "unpublished"
+          )
+        )
+      response = courses_api.create_new_course(1)
+      expect(response["name"]).to eq "new course"
+    end
+  end
+
+  context 'Update a Course' do
+    it 'should return JSON body' do
+      canvas_lms_api.given('an admin in a course').
+        upon_receiving('Update a Course').
+        with(
+          method: :put,
+          headers: {
+            'Authorization' => Pact.provider_param(
+              'Bearer :{token}',
+              { token: 'some_token' }
+            ),
+            'Connection': 'close',
+            'Host': PactConfig.mock_provider_service_base_uri,
+            'Version': 'HTTP/1.1',
+            'Content-Type': 'application/json'
+          },
+          'path' => Pact.provider_param(
+            '/api/v1/courses/:{course_id}',
+            { course_id: '1' }
+          ),
+          'body' =>
+          {
+            'course':
+            {
+              'name': 'updated course',
+            }
+          },
+          query: ''
+        ).
+        will_respond_with(
+          status: 200,
+          body: Pact.like(
+            "id": 9,
+            "name": "updated course",
+            "account_id": 1,
+            "uuid": "zQmOIIBHee7zRd4EwXAEDgmoWr8n9uLM2AhD8uZ5",
+            "start_at": "2014-01-01T00:00:00Z",
+            "is_public": true,
+            "grading_standard_id": nil,
+            "course_code": "Unnamed",
+            "default_view": "modules",
+            "root_account_id": 1,
+            "enrollment_term_id": 1,
+            "restrict_enrollments_to_course_dates": false,
+            "end_at": "2015-01-01T00:00:00Z",
+            "public_syllabus": false,
+            "public_syllabus_to_auth": false,
+            "storage_quota_mb": 500,
+            "is_public_to_auth_users": false,
+            "hide_final_grades": false,
+            "apply_assignment_group_weights": false,
+            "calendar": {
+                "ics": "http://localhost:3000/feeds/calendars/course_zQmOIIBHee7zRd4EwXAEDgmoWr8n9uLM2AhD8uZ5.ics"
+            },
+            "time_zone": "America/Denver",
+            "sis_course_id": nil,
+            "integration_id": nil,
+            "workflow_state": "unpublished"
+          )
+        )
+      response = courses_api.update_course(1)
+      expect(response["name"]).to eq "updated course"
     end
   end
 end
