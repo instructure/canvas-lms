@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 # shellcheck disable=1004
 echo '
   ________  ________  ________   ___      ___ ________  ________
@@ -33,15 +31,24 @@ DINGHY_CPUS='4'
 DINGHY_DISK='150'
 
 function installed {
-  type "$@" &> /dev/null
+  command -v "$@" > /dev/null 2>&1
 }
+
+installed systemctl && SERVICE_COMMAND='systemctl status docker' || SERVICE_COMMAND='service docker status'
 
 if [[ $OS == 'Darwin' ]]; then
   install='brew install'
   dependencies='docker docker-machine docker-compose dinghy'
 elif [[ $OS == 'Linux' ]]; then
-  install='sudo apt-get update && sudo apt-get install -y'
-  dependencies='docker docker-compose'
+  if installed apt-get; then # Debian-based systems
+    echo -e "\nFound Debian-based system! Using apt-get to install docker..."
+    install='sudo apt-get update && sudo apt-get install -y'
+    dependencies='docker docker-compose'
+  elif installed pacman; then # ArchLinux-based systems
+    echo -e "\nFound ArchLinux-based system! Using pacman to install docker..."
+    install='sudo pacman --noconfirm -Sy && sudo pacman --noconfirm -S'
+    dependencies='docker docker-compose'
+  fi
 else
   echo 'This script only supports MacOS and Linux :('
   exit 1
@@ -81,8 +88,10 @@ function install_dependencies {
     elif ! brew ls --versions dinghy > /dev/null; then
       brew tap codekitchen/dinghy
     fi
-  elif [[ $OS == 'Linux' ]] && ! installed apt-get; then
-    echo 'This script only supports Debian-based Linux (for now - contributions welcome!)'
+  elif [[ $OS == 'Linux' ]] && installed apt-get || installed pacman; then
+    echo 'Found valid Linux system.'
+  else
+    echo 'This script currently supports: Debian-based Linux (Ubuntu), ArchLinux - (for now - contributions welcome!)'
     exit 1
   fi
   confirm_command "$install ${packages[*]}"
@@ -124,7 +133,7 @@ function start_dinghy_vm {
 }
 
 function start_docker_daemon {
-  service docker status &> /dev/null && return 0
+  $SERVICE_COMMAND &> /dev/null && return 0
   prompt 'The docker daemon is not running. Start it? [y/n]' confirm
   [[ ${confirm:-n} == 'y' ]] || return 1
   sudo service docker start
@@ -150,7 +159,7 @@ function install_dory {
 
   if ! installed gem; then
     message "You need ruby to run dory (it's a gem). Install ruby and try again."
-    return 1
+    exit 1
   fi
 
   prompt "Use sudo to install dory gem? You may need this if using system ruby [y/n]" use_sudo
@@ -163,6 +172,11 @@ function install_dory {
 
 function start_dory {
   message 'Starting dory...'
+  if ! installed dory; then
+    echo 'Oops....something went wrong. Dory is still not installed.'
+    exit 1
+  fi
+
   if dory status | grep -q 'not running'; then
     confirm_command 'dory up'
   else
