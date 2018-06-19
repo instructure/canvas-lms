@@ -80,7 +80,7 @@ Rails.configuration.after_initialize do
   end
 
   Delayed::Periodic.cron 'Reporting::CountsReport.process', '0 11 * * 0' do
-    Reporting::CountsReport.process
+    with_each_shard_by_database(Reporting::CountsReport, :process_shard)
   end
 
   Delayed::Periodic.cron 'Account.update_all_update_account_associations', '0 10 * * 0' do

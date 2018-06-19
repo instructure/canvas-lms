@@ -18,7 +18,7 @@
 
 class ReportSnapshot < ActiveRecord::Base
   STATS_COLLECTION_URL = "https://stats.instructure.com/stats_collection"
-  REPORT_TO_SEND = "counts_progressive_overview"
+  REPORT_TO_SEND = "counts_progressive_detailed"
 
   belongs_to :account
 
@@ -74,12 +74,11 @@ class ReportSnapshot < ActiveRecord::Base
 
   scope :detailed, -> { where(:report_type => 'counts_detailed') }
   scope :progressive, -> { where(:report_type => 'counts_progressive_detailed') }
-  scope :overview, -> { where(:report_type => 'counts_overview') }
-  scope :progressive_overview, -> { where(:report_type => 'counts_progressive_overview') }
 
   def push_to_instructure_if_collection_enabled
     begin
       return if self.report_type != REPORT_TO_SEND
+      return if self.account != Account.default
       collection_type = Setting.get("usage_statistics_collection", "opt_out")
       return if collection_type  == "opt_out"
 
