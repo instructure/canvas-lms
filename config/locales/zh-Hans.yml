@@ -5121,6 +5121,9 @@ zh-Hans:
   count_people_successfully_enrolled_into_course_nam_db8eed18: 
     one: "%{count} 人已成功注册到*%{course_name}*。"
     other: "%{count} 人已成功注册到*%{course_name}*。"
+  count_permissions_found_1a926f7d: 
+    one: "%{count} 找到权限"
+    other: "%{count} 找到权限"
   count_points_4735a2e8: 
     one: "%{count} 分数"
     other: "%{count} 分"
