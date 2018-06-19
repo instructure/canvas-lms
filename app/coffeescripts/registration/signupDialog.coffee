@@ -88,7 +88,8 @@ define [
     $node.dialog
       resizable: false
       title: title
-      width: 550
+      width: Math.min(screen.width, 550)
+      height: if screen.height > 750 then 'auto' else screen.height
       open: ->
         $(this).find('a').eq(0).blur()
         $(this).find(':input').eq(0).focus()

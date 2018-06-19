@@ -31,7 +31,10 @@
     <div class="ic-Form-control">
       <input type="hidden" name="user[initial_enrollment_type]" value="observer" />
       <input type="hidden" name="user[skip_registration]" value="1" />
-      <button class="btn btn-primary" type="submit">{{#t "buttons.start_participating"}}Start Participating{{/t}}</button>
+      <div class='button-container'>
+        <button class="btn btn-secondary dialog_closer">{{#t "buttons.cancel"}}Cancel{{/t}}</button>
+        <button class="btn btn-primary" type="submit">{{#t "buttons.start_participating"}}Start Participating{{/t}}</button>
+      </div>
     </div>
   </form>
 </div>
