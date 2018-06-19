@@ -5228,6 +5228,11 @@ pl:
     many: "%{count} osób pomyślnie zarejestrowano na kurs *%{course_name}*."
     one: "%{user_name} pomyślnie zarejestrowano na kurs *%{course_name}*."
     other: "%{count} osób pomyślnie zarejestrowano na kurs *%{course_name}*."
+  count_permissions_found_1a926f7d: 
+    few: "%{count}  zezwoleń odnaleziono"
+    many: "%{count}  zezwoleń odnaleziono"
+    one: "Znaleziono jedno zezwolenie"
+    other: "%{count} zezwoleń odnaleziono"
   count_points_4735a2e8: 
     few: "%{count}  punktów"
     many: "%{count} Punktów"
