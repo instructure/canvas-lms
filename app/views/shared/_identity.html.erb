@@ -30,6 +30,14 @@
           <% end %>
         </a>
       </li>
+      <%
+        if @context && @context.is_a?(Course)
+          resources_module = @context.context_modules.where("name ILIKE '%Braven Resources%'").first
+          unless resources_module.nil?
+      %>
+            <li id="bz-header-resources-link"><%= link_to "Resources", "/courses/#{@context.id}/modules/#{resources_module.id}" %></li>
+        <% end %>
+      <% end %>
       <li><%= link_to t('links.settings', "Settings"), settings_profile_path %></li>
     <% end %>
     <li class="user_id" style="display: none;"><%= @current_user.id %></li>
