@@ -5126,6 +5126,9 @@ ja:
   count_people_successfully_enrolled_into_course_nam_db8eed18: 
     one: "%{count} 人々が*%{course_name}* に正常に登録されました。"
     other: "%{count} 人々が*%{course_name}* に正常に登録されました。"
+  count_permissions_found_1a926f7d: 
+    one: "%{count} 許可が見つかりました"
+    other: "%{count} 許可が見つかりました"
   count_points_4735a2e8: 
     one: "%{count} 点"
     other: "%{count} 点"
