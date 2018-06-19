@@ -21,6 +21,7 @@
 @import "components/ic-forms";
 @import "components/buttons";
 @import "components/show_hide_opacity";
+@import "pages/login/registration_dialog.scss";
 
 * {
   margin: 0px;
@@ -35,6 +36,7 @@ html, body {
   font-weight: normal;
   @include fontSize(16px);
   font-family: $ic-font-family !important;
+  min-width: auto !important;
 }
 
 #f1_container {
@@ -102,5 +104,22 @@ input::-webkit-input-placeholder {
   display: none;
 }
 .button_box .Button {
-  padding-bottom: $ic-sp/2;  
+  padding-bottom: $ic-sp/2;
+}
+
+#coenrollment_link {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  text-align: center;
+}
+
+.ic-Login__banner-title {
+  font-size: .9em;
+}
+
+.ic-Login__banner-subtitle {
+  font-size: .95em;
+  font-weight: 600;
 }
