@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
 import React from 'react'
 import axios from 'axios'
 import { mount, shallow } from 'enzyme'
@@ -65,15 +66,15 @@ describe('default proficiency', () => {
     }, 1)
   })
 
-  it('sets firstRating prop on first rating only', (done) => {
+  it('sets focusField on mastery on first rating only', (done) => {
     const wrapper = mount(<ProficiencyTable {...defaultProps()}/>)
     setTimeout(() => {
       wrapper.instance().removeBillboard()
-      expect(wrapper.find('ProficiencyRating').at(0).prop('firstRating')).toBe(true)
-      expect(wrapper.find('ProficiencyRating').at(1).prop('firstRating')).toBe(false)
-      expect(wrapper.find('ProficiencyRating').at(2).prop('firstRating')).toBe(false)
-      expect(wrapper.find('ProficiencyRating').at(3).prop('firstRating')).toBe(false)
-      expect(wrapper.find('ProficiencyRating').at(4).prop('firstRating')).toBe(false)
+      expect(wrapper.find('ProficiencyRating').at(0).prop('focusField')).toBe('mastery')
+      expect(wrapper.find('ProficiencyRating').at(1).prop('focusField')).toBeNull()
+      expect(wrapper.find('ProficiencyRating').at(2).prop('focusField')).toBeNull()
+      expect(wrapper.find('ProficiencyRating').at(3).prop('focusField')).toBeNull()
+      expect(wrapper.find('ProficiencyRating').at(4).prop('focusField')).toBeNull()
       done()
     }, 1)
   })
@@ -84,6 +85,18 @@ describe('default proficiency', () => {
       wrapper.instance().removeBillboard()
       wrapper.findWhere(n => n.prop('variant') === 'circle-primary').simulate('click')
       expect(wrapper.find('ProficiencyRating')).toHaveLength(6)
+      done()
+    }, 1)
+  })
+
+  it('clicking add rating button flashes SR message', (done) => {
+    const wrapper = mount(<ProficiencyTable {...defaultProps()}/>)
+    const flashMock = jest.spyOn($, 'screenReaderFlashMessage')
+    setTimeout(() => {
+      wrapper.instance().removeBillboard()
+      wrapper.findWhere(n => n.prop('variant') === 'circle-primary').simulate('click')
+      expect(flashMock).toHaveBeenCalledTimes(1)
+      flashMock.mockRestore()
       done()
     }, 1)
   })

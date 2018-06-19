@@ -111,11 +111,13 @@ export default class ProficiencyTable extends React.Component {
 
   fieldWithFocus = () => this.state.rows.some(row => row.get('focusField'))
 
-  createRating = (description, points, color) => fromJS({description,
-                                                         points,
-                                                         key: uuid(),
-                                                         color
-                                                        })
+  createRating = (description, points, color, focusField = null) =>
+    fromJS({description,
+     points,
+     key: uuid(),
+     color,
+     focusField
+    })
 
   addRow = () => {
     let points = 0.0
@@ -126,8 +128,9 @@ export default class ProficiencyTable extends React.Component {
     if (points < 0.0 || Number.isNaN(points)) {
       points = 0.0
     }
-    const newRow = this.createRating('', points, ADD_DEFAULT_COLOR)
+    const newRow = this.createRating('', points, ADD_DEFAULT_COLOR, 'mastery')
     this.setState({rows: this.state.rows.push(newRow)})
+    $.screenReaderFlashMessage(I18n.t('Added new proficiency rating'))
   }
 
   handleMasteryChange = _.memoize((index) => () => {
@@ -298,8 +301,7 @@ export default class ProficiencyTable extends React.Component {
                   description={rating.get('description')}
                   descriptionError={rating.get('descriptionError')}
                   disableDelete={this.state.rows.size === 1}
-                  firstRating={index === 0}
-                  focusField={rating.get('focusField')}
+                  focusField={rating.get('focusField') || (index === 0 ? 'mastery' : null)}
                   points={rating.get('points').toString()}
                   pointsError={rating.get('pointsError')}
                   mastery={index === masteryIndex}

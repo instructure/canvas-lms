@@ -48,11 +48,11 @@ it('mastery checkbox is checked if mastery', () => {
   expect(radio.props().checked).toBe(true)
 })
 
-it('mastery checkbox receives focus if first rating', () => {
+it('mastery checkbox receives focus', () => {
   const wrapper = mount(
     <table>
       <tbody>
-        <ProficiencyRating {...defaultProps({firstRating: true})}/>
+        <ProficiencyRating {...defaultProps({focusField: 'mastery'})}/>
       </tbody>
     </table>)
   expect(wrapper.find('RadioInput').find('input').node).toBe(document.activeElement)
