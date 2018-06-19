@@ -5134,6 +5134,9 @@ zh-Hant:
   count_people_successfully_enrolled_into_course_nam_db8eed18: 
     one: "%{count} 成員已成功註冊至 *%{course_name}*。"
     other: "%{count} 成員已成功註冊至 *%{course_name}*。"
+  count_permissions_found_1a926f7d: 
+    one: "%{count} 找到權限"
+    other: "%{count} 找到權限"
   count_points_4735a2e8: 
     one: "%{count} 點"
     other: "%{count}分數"
