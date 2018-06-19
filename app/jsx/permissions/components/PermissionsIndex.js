@@ -173,7 +173,13 @@ export default class PermissionsIndex extends Component {
         </ScreenReaderContent>
         <ConnectedRoleTray />
         <ConnectedAddTray />
-        <ConnectedPermissionTray />
+        <ConnectedPermissionTray
+          tab={
+            this.props.roles.length
+              ? this.props.roles.find(role => !!role.displayed).contextType
+              : COURSE
+          }
+        />
         <TabList onChange={this.onTabChanged}>
           <TabPanel title={I18n.t('Course Roles')}>
             {this.renderHeader()}

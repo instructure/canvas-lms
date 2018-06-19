@@ -23,6 +23,11 @@ const propTypes = {}
 export const COURSE = 'Course'
 export const ACCOUNT = 'Account'
 
+propTypes.permissionDetails = shape({
+  title: string.isRequired,
+  description: string.isRequired
+})
+
 propTypes.permission = shape({
   permission_name: string.isRequired,
   label: string.isRequired,
