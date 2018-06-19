@@ -79,8 +79,8 @@ const Points = (props) => {
       const usePointsText = pointsText !== null && pointsText !== undefined
       return (
         <div className="react-rubric-cell graded-points">
-          <Flex alignItems="start">
-            <FlexItem size="4rem">
+          <Flex alignItems="end" wrapItems>
+            <FlexItem size="4rem" margin="none small none none">
               <TextInput
                 inline
                 label={<ScreenReaderContent>{I18n.t('Points')}</ScreenReaderContent>}
@@ -93,7 +93,7 @@ const Points = (props) => {
                 width="4rem"
               />
             </FlexItem>
-            <FlexItem margin="small">
+            <FlexItem margin="small none none none">
               {`/ ${possibleString(pointsPossible)}`}
             </FlexItem>
           </Flex>

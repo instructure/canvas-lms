@@ -12,9 +12,11 @@ exports[`The Comments component renders a footer after the comment when provided
 `;
 
 exports[`The Comments component renders a placeholder when no assessment provided 1`] = `
-"<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
-  This area will be used by the assessor to leave comments related to this criterion.
-</Text>"
+"<span className=\\"react-rubric-break-words\\">
+  <Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+    This area will be used by the assessor to leave comments related to this criterion.
+  </Text>
+</span>"
 `;
 
 exports[`The Comments component renders the root component as expected when assessing 1`] = `"<FreeFormComments comments=\\"I award you no points, and may God have mercy on your soul.\\" saveLater={false} savedComments={{...}} setComments={[Function]} setSaveLater={[Function]} />"`;

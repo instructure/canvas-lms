@@ -32,6 +32,7 @@ describe('the Rubric component', () => {
       />
     )
     expect(modal.debug()).toMatchSnapshot()
+    expect(modal.find('.react-rubric').prop('style')).toEqual({ minWidth: '52.5rem' })
   })
 
   it('renders properly with no assessment', () => {
