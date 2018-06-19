@@ -28,8 +28,8 @@ class ModeratePage
     end
 
     def select_provisional_grade_for_student_by_position(student, position)
-      f('input', student_table_row_by_displayed_name(student.name)).click
-      ff('li', student_table_row_by_displayed_name(student.name))[position].click
+      grade_input(student).click
+      grade_input_dropdown_list(student)[position].click
     end
 
     def click_post_grades_button
@@ -38,6 +38,12 @@ class ModeratePage
 
     def click_page_number(page_number)
       page_buttons.find {|e| e.text == page_number.to_s}.click
+    end
+
+    def enter_custom_grade(student, grade)
+      grade_input(student).click
+      grade_input(student).send_keys(:backspace, grade)
+      grade_input_dropdown_list(student).find {|k| k.text == "#{grade} (Custom)"}.click
     end
 
     # Methods
@@ -60,6 +66,10 @@ class ModeratePage
 
     def fetch_grades(student)
       grades(student).map(&:text)
+    end
+
+    def fetch_dropdown_grades(student)
+      grade_input_dropdown_list(student).map(&:text)
     end
 
     # Components
@@ -94,6 +104,18 @@ class ModeratePage
 
     def grades(student)
       ff('.GradesGrid__ProvisionalGradeCell', student_table_row_by_displayed_name(student.name))
+    end
+
+    def grade_input(student)
+      f('input', student_table_row_by_displayed_name(student.name))
+    end
+
+    def grade_input_dropdown_list(student)
+      ff('li', student_table_row_by_displayed_name(student.name))
+    end
+
+    def grade_input_dropdown(student)
+      f('ul', student_table_row_by_displayed_name(student.name))
     end
   end
 end
