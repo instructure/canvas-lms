@@ -52,6 +52,15 @@ environment_configuration(defined?(config) && config) do |config|
 
   config.eager_load = false
 
+  config.after_initialize do
+    require 'bullet'
+
+    Bullet.enable = true
+    Bullet.unused_eager_loading_enable = false
+
+    Bullet.rails_logger = true
+  end
+
   # eval <env>-local.rb if it exists
   Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) }
 end

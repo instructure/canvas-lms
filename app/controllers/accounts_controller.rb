@@ -464,6 +464,7 @@ class AccountsController < ApplicationController
 
     ActiveRecord::Associations::Preloader.new.preload(@courses, [:account, :root_account])
     ActiveRecord::Associations::Preloader.new.preload(@courses, [:teachers]) if includes.include?("teachers")
+    ActiveRecord::Associations::Preloader.new.preload(@courses, [:enrollment_term]) if includes.include?("term")
 
     if includes.include?("total_students")
       student_counts = StudentEnrollment.not_fake.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')").

@@ -33,6 +33,7 @@ if ENV['COVERAGE'] == "1"
 end
 
 require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
+
 require 'rspec/rails'
 
 require 'webmock'
@@ -473,6 +474,17 @@ RSpec.configure do |config|
       Shackles.activate(:deploy) { Canvas.redis.flushdb }
     end
     Canvas.redis_used = false
+  end
+
+  if Bullet.enable?
+    config.before(:each) do
+      Bullet.start_request
+    end
+
+    config.after(:each) do
+      Bullet.perform_out_of_channel_notifications if Bullet.notification?
+      Bullet.end_request
+    end
   end
 
   #****************************************************************
