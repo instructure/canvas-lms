@@ -80,7 +80,7 @@ CommentDialog.propTypes = {
 const CommentButton = ({ initialize, ...props }) => (
   <div>
     <Button variant="icon" margin="0 x-small 0 0" onClick={() => initialize()}>
-      <IconFeedback title="Additional Comments" />
+      <IconFeedback title={I18n.t('Additional Comments')} />
     </Button>
     <CommentDialog {...props} />
   </div>
