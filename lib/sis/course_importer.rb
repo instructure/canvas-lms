@@ -20,7 +20,7 @@ module SIS
   class CourseImporter < BaseImporter
 
     def process(messages)
-      start = Time.zone.now
+      start = Time.now
       courses_to_update_sis_batch_id = []
       course_ids_to_update_associations = [].to_set
       blueprint_associations = {}
@@ -35,19 +35,20 @@ module SIS
       end
 
       Course.update_account_associations(course_ids_to_update_associations.to_a) unless course_ids_to_update_associations.empty?
-      courses_to_update_sis_batch_id.in_groups_of(1000, false) do |courses|
-        Course.where(:id => courses).update_all(:sis_batch_id => @batch.id)
-      end
+      courses_to_update_sis_batch_id.in_groups_of(1000, false) do |batch|
+        Course.where(:id => batch).update_all(:sis_batch_id => @batch.id)
+      end if @batch
 
-      SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data) if @batch.using_parallel_importers?
       MasterCourses::MasterTemplate.create_associations_from_sis(@root_account, blueprint_associations, messages, @batch_user)
 
-      @logger.debug("Courses took #{Time.zone.now - start} seconds")
-      importer.success_count
+      @logger.debug("Courses took #{Time.now - start} seconds")
+      return importer.success_count
     end
 
+  private
+
     class Work
-      attr_accessor :success_count, :roll_back_data
+      attr_accessor :success_count
 
       def initialize(batch, root_account, logger, a1, a2, m, batch_user, blueprint_associations)
         @batch = batch
@@ -55,7 +56,6 @@ module SIS
         @root_account = root_account
         @courses_to_update_sis_batch_id = a1
         @course_ids_to_update_associations = a2
-        @roll_back_data = []
         @blueprint_associations = blueprint_associations
         @messages = m
         @logger = logger
@@ -189,7 +189,7 @@ module SIS
               templated_course.conclude_at = course.conclude_at
               templated_course.restrict_enrollments_to_course_dates = course.restrict_enrollments_to_course_dates
             end
-            templated_course.sis_batch_id = @batch.id
+            templated_course.sis_batch_id = @batch.id if @batch
             @course_ids_to_update_associations.add(templated_course.id) if templated_course.account_id_changed? || templated_course.root_account_id_changed?
             if templated_course.valid?
               changes = templated_course.changes
@@ -202,13 +202,11 @@ module SIS
               raise ImportError, msg
             end
           end
-          course.sis_batch_id = @batch.id
+          course.sis_batch_id = @batch.id if @batch
           if course.valid?
             course_changes = course.changes
             course.save_without_broadcasting!
             auditor_state_changes(course, state_changes, course_changes)
-            data = SisBatchRollBackData.build_data(sis_batch: @batch, context: course)
-            @roll_back_data << data if data
           else
             msg = "A course did not pass validation "
             msg += "(" + "course: #{course_id} / #{short_name}, error: " +
@@ -216,7 +214,7 @@ module SIS
             raise ImportError, msg
           end
           @course_ids_to_update_associations.add(course.id) if update_account_associations
-        else
+        elsif @batch
           @courses_to_update_sis_batch_id << course.id
         end
 
@@ -230,18 +228,8 @@ module SIS
           end
         end
 
-        enrollment_data = course.update_enrolled_users(sis_batch: @batch) if update_enrollments
-        @roll_back_data.push(*enrollment_data) if enrollment_data
-        maybe_write_roll_back_data
-
+        course.update_enrolled_users if update_enrollments
         @success_count += 1
-      end
-
-      def maybe_write_roll_back_data
-        if @roll_back_data.count > 1000
-          SisBatchRollBackData.bulk_insert_roll_back_data(@roll_back_data)
-          @roll_back_data = []
-        end
       end
 
       def auditor_state_changes(course, state_changes, changes = {})

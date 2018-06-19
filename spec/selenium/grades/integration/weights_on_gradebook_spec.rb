@@ -24,14 +24,15 @@ describe 'classic gradebook' do
   include WeightingSetup
 
   let(:total_grade) do
+    gradebook = Gradebook::MultipleGradingPeriods.new
     grading_period_ids = [0, @gp1.id, @gp2.id]
     user_session(@teacher)
-    Gradebook::MultipleGradingPeriods.visit_gradebook(@course,@teacher)
+    gradebook.visit_gradebook(@course,@teacher)
 
     if @grading_period_index
-      Gradebook::MultipleGradingPeriods.select_grading_period(grading_period_ids[@grading_period_index])
+      gradebook.select_grading_period(grading_period_ids[@grading_period_index])
     end
-    Gradebook::MultipleGradingPeriods.total_score_for_row(1)
+    gradebook.total_score_for_row(1)
   end
 
   let(:individual_view) { false }

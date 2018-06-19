@@ -1134,7 +1134,6 @@ test('returns true if submission_types are in frozenAttributes', () => {
   equal(assignment.submissionTypesFrozen(), true)
 })
 
-
 QUnit.module('Assignment#pollUntilFinishedDuplicating', {
   setup() {
     this.clock = sinon.useFakeTimers()
@@ -1163,35 +1162,6 @@ test('stops polling when the assignment has finished duplicating', function () {
   ok(this.assignment.fetch.calledOnce)
 })
 
-QUnit.module('Assignment#pollUntilFinishedImporting', {
-  setup() {
-    this.clock = sinon.useFakeTimers()
-    this.assignment = new Assignment({ workflow_state: 'importing' })
-    this.stub(this.assignment, 'fetch').returns($.Deferred().resolve())
-  },
-  teardown() {
-    this.clock.restore()
-  }
-})
-
-test('polls for updates', function() {
-  this.assignment.pollUntilFinishedImporting()
-  this.clock.tick(2000)
-  notOk(this.assignment.fetch.called)
-  this.clock.tick(2000)
-  ok(this.assignment.fetch.called)
-})
-
-test('stops polling when the assignment has finished importing', function () {
-  this.assignment.pollUntilFinishedImporting()
-  this.assignment.set({ workflow_state: 'unpublished' })
-  this.clock.tick(3000)
-  ok(this.assignment.fetch.calledOnce)
-  this.clock.tick(3000)
-  ok(this.assignment.fetch.calledOnce)
-})
-
-
 QUnit.module('Assignment#renderModeratedGradingFormFieldGroup', (hooks) => {
   const fixtures = document.getElementById('fixtures')
   const availableModerators = [{ name: 'John Doe', id: '21' }, { name: 'Jane Doe', id: '89' }]
@@ -1201,7 +1171,6 @@ QUnit.module('Assignment#renderModeratedGradingFormFieldGroup', (hooks) => {
     fakeENV.setup({
       ANONYMOUS_MODERATED_MARKING_ENABLED: false,
       AVAILABLE_MODERATORS: availableModerators,
-      HAS_GRADED_SUBMISSIONS: false,
       LOCALE: 'en',
       MODERATED_GRADING_MAX_GRADER_COUNT: 7
     })
@@ -1263,15 +1232,6 @@ QUnit.module('Assignment#renderModeratedGradingFormFieldGroup', (hooks) => {
     assignment.renderModeratedGradingFormFieldGroup()
     const [,props] = React.createElement.getCall(0).args
     strictEqual(props.locale, ENV.LOCALE)
-    React.createElement.restore()
-  })
-
-  test('passes HAS_GRADED_SUBMISSIONS in the ENV as a prop to the component', () => {
-    const assignment = new Assignment()
-    sinon.spy(React, 'createElement')
-    assignment.renderModeratedGradingFormFieldGroup()
-    const [,props] = React.createElement.getCall(0).args
-    strictEqual(props.gradedSubmissionsExist, ENV.HAS_GRADED_SUBMISSIONS)
     React.createElement.restore()
   })
 

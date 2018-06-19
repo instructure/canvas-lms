@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import Autocomplete from '@instructure/ui-core/lib/components/Autocomplete'
-import View from '@instructure/ui-layout/lib/components/View'
-import AccessibleContent from '@instructure/ui-a11y/lib/components/AccessibleContent'
+import Container from '@instructure/ui-core/lib/components/Container'
+import AccessibleContent from '@instructure/ui-core/lib/components/AccessibleContent'
 import React from 'react'
 import I18n from 'i18n!sections_autocomplete'
 import PropTypes from 'prop-types'
@@ -83,7 +83,7 @@ export default class SectionsAutocomplete extends React.Component {
 
   render () {
     return (
-      <View
+      <Container
         display="block"
         margin="0 0 large 0"
       >
@@ -108,7 +108,7 @@ export default class SectionsAutocomplete extends React.Component {
             </option>
           ))}
         </Autocomplete>
-      </View>
+      </Container>
     )
   }
 }

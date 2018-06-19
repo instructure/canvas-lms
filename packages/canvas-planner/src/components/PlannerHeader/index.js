@@ -31,12 +31,9 @@ import Tray from '@instructure/ui-core/lib/components/Tray';
 import Badge from '@instructure/ui-core/lib/components/Badge';
 import Opportunities from '../Opportunities';
 import GradesDisplay from '../GradesDisplay';
-import StickyButton from '../StickyButton';
-
 import {
   addDay, savePlannerItem, deletePlannerItem, cancelEditingPlannerItem, openEditingPlannerItem, getNextOpportunities,
-  getInitialOpportunities, dismissOpportunity, clearUpdateTodo, startLoadingGradesSaga, scrollToToday,
-  scrollToNewActivity
+  getInitialOpportunities, dismissOpportunity, clearUpdateTodo, startLoadingGradesSaga, scrollToToday
 } from '../../actions';
 
 import { courseShape, opportunityShape } from '../plannerPropTypes';
@@ -44,8 +41,6 @@ import styles from './styles.css';
 import theme from './theme.js';
 import formatMessage from '../../format-message';
 import {notifier} from '../../dynamic-ui';
-import {getFirstLoadedMoment} from "../../utilities/dateUtils";
-import {momentObj} from "react-moment-proptypes";
 
 export class PlannerHeader extends Component {
 
@@ -59,7 +54,6 @@ export class PlannerHeader extends Component {
     triggerDynamicUiUpdates: PropTypes.func,
     preTriggerDynamicUiUpdates: PropTypes.func,
     scrollToToday: PropTypes.func,
-    scrollToNewActivity: PropTypes.func,
     locale: PropTypes.string.isRequired,
     timeZone: PropTypes.string.isRequired,
     opportunities: PropTypes.shape(opportunityShape).isRequired,
@@ -68,23 +62,12 @@ export class PlannerHeader extends Component {
     dismissOpportunity: PropTypes.func.isRequired,
     clearUpdateTodo: PropTypes.func.isRequired,
     startLoadingGradesSaga: PropTypes.func.isRequired,
-    firstNewActivityDate: momentObj,
-    days: PropTypes.arrayOf(
-      PropTypes.arrayOf(
-        PropTypes.oneOfType([/* date */ PropTypes.string, PropTypes.arrayOf(/* items */ PropTypes.object)])
-      )
-    ),
-    ui: PropTypes.shape({
-      naiAboveScreen: PropTypes.bool,
-    }),
     todo: PropTypes.shape({
       updateTodoItem: PropTypes.shape({
         title: PropTypes.string,
       }),
     }),
-    stickyZIndex: PropTypes.number,
     loading: PropTypes.shape({
-      isLoading: PropTypes.bool,
       allPastItemsLoaded: PropTypes.bool,
       allFutureItemsLoaded: PropTypes.bool,
       allOpportunitiesLoaded: PropTypes.bool,
@@ -104,7 +87,6 @@ export class PlannerHeader extends Component {
   static defaultProps = {
     triggerDynamicUiUpdates: () => {},
     preTriggerDynamicUiUpdates: () => {},
-    stickyZIndex: 0
   }
 
   constructor (props) {
@@ -131,7 +113,7 @@ export class PlannerHeader extends Component {
     }
 
     opportunities = opportunities.slice(0, 10);
-    this.setUpdateItemTray(!!nextProps.todo.updateTodoItem);
+    this.setUpdateItemTray(!!nextProps.todo.updateTodoItem || this.state.trayOpen);
     this.setState({opportunities});
   }
 
@@ -166,7 +148,10 @@ export class PlannerHeader extends Component {
 
   handleCancelPlannerItem = () => {
     this.toggleUpdateItemTray();
-    this.props.cancelEditingPlannerItem();
+    // let the dynamic ui manager manage focus on cancel.
+    if (this.props.cancelEditingPlannerItem) {
+      this.props.cancelEditingPlannerItem();
+    }
   }
 
   toggleAriaHiddenStuff = (hide) => {
@@ -205,10 +190,6 @@ export class PlannerHeader extends Component {
     }
   }
 
-  handleNewActivityClick = () => {
-    this.props.scrollToNewActivity();
-  }
-
   _doToggleOpportunitiesDropdown (openOrClosed) {
     this.setState({opportunitiesOpen: !!openOrClosed}, () => {
       this.toggleAriaHiddenStuff(this.state.opportunitiesOpen);
@@ -228,6 +209,10 @@ export class PlannerHeader extends Component {
     this._doToggleOpportunitiesDropdown(!this.state.opportunitiesOpen);
   }
 
+  noteBtnOnClose = () => {
+    this.props.clearUpdateTodo();
+  }
+
   opportunityTitle = () => {
     return (
       formatMessage(`{
@@ -240,7 +225,7 @@ export class PlannerHeader extends Component {
   }
 
   getTrayLabel = () => {
-    if (this.props.todo.updateTodoItem && this.props.todo.updateTodoItem.title) {
+    if (this.props.todo.updateTodoItem) {
       return formatMessage('Edit {title}', { title: this.props.todo.updateTodoItem.title });
     }
     return formatMessage("Add To Do");
@@ -259,39 +244,12 @@ export class PlannerHeader extends Component {
     return 'none';
   }
 
-  newActivityAboveView () {
-    if (this.props.loading.isLoading) return false;
-    if (!this.props.firstNewActivityDate) return false;
-
-    const firstLoadedMoment = getFirstLoadedMoment(this.props.days, this.props.timeZone);
-    const firstNewActivityLoaded = firstLoadedMoment.isSame(this.props.firstNewActivityDate) || firstLoadedMoment.isBefore(this.props.firstNewActivityDate);
-    return (!(firstNewActivityLoaded && !this.props.ui.naiAboveScreen));
-  }
-
-  renderNewActivity () {
-    if (this.newActivityAboveView()) {
-      return (
-        <StickyButton
-          direction="up"
-          hidden={true}
-          onClick={this.handleNewActivityClick}
-          zIndex={this.props.stickyZIndex}
-          buttonRef={ref => this.newActivityButtonRef = ref}
-          className="StickyButton-styles__newActivityButton"
-        >
-          {formatMessage("New Activity")}
-        </StickyButton>
-      );
-    }
-  }
-
   render () {
     const verticalRoom = this.getPopupVerticalRoom();
 
     return (
       <div className={styles.root}>
         <Button
-          id="planner-today-btn"
           variant="light"
           margin="0 medium 0 0"
           onClick={this.handleTodayClick}
@@ -352,6 +310,7 @@ export class PlannerHeader extends Component {
           shouldContainFocus={true}
           shouldReturnFocus={false}
           applicationElement={() => document.getElementById('application') }
+          onExited={this.noteBtnOnClose}
           onDismiss={this.handleCancelPlannerItem}
         >
           <UpdateItemTray
@@ -383,7 +342,6 @@ export class PlannerHeader extends Component {
             />
           </View>
         </Tray>
-        {this.renderNewActivity()}
       </div>
     );
   }
@@ -392,12 +350,10 @@ export class PlannerHeader extends Component {
 export const ThemedPlannerHeader = themeable(theme, styles)(PlannerHeader);
 export const NotifierPlannerHeader = notifier(ThemedPlannerHeader);
 
-const mapStateToProps = ({opportunities, loading, courses, todo, days, timeZone, ui, firstNewActivityDate}) =>
-  ({opportunities, loading, courses, todo, days, timeZone, ui, firstNewActivityDate});
+const mapStateToProps = ({opportunities, loading, courses, todo}) => ({opportunities, loading, courses, todo});
 const mapDispatchToProps = {
   addDay, savePlannerItem, deletePlannerItem, cancelEditingPlannerItem, openEditingPlannerItem,
-  getInitialOpportunities, getNextOpportunities, dismissOpportunity, clearUpdateTodo,
-  startLoadingGradesSaga, scrollToToday, scrollToNewActivity
+  getInitialOpportunities, getNextOpportunities, dismissOpportunity, clearUpdateTodo, startLoadingGradesSaga, scrollToToday
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(NotifierPlannerHeader);

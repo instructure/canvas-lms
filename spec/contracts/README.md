@@ -9,7 +9,7 @@ and the folks at Thoughtworks. This allows microservices to retain independent
 CI and deployment pipelines. We use [Pact] to make this happen.
 
 We use a Pact Broker web service to share Pact files between consumers and
-providers. Ours is hosted internally at [https://inst-pact-broker.inseng.net].
+providers. Ours is hosted internally at https://inst-pact-broker.inseng.net
 Ask for credentials in the #test_advisory_board Slack channel.
 
 ## Running the tests locally
@@ -33,7 +33,6 @@ files:
 
 ```sh
 cd path/to/quiz_lti # clone the repo first if necessary
-dinghy up # if not already running
 bin/dev-setup
 bin/contracts-generate
 ```
@@ -81,8 +80,7 @@ bin/contract-verify-live-events
 The spec(s) should pass. You're finished!
 
 Note: As of 3 May 2018, no API clients have published a Pact file for Canvas to
-verify. If you'd like to run the "Generic Consumer" Canvas API contract tests,
-follow the instructions in /spec/contracts/service_providers/canvas_lms/README.md
+verify. Once they do, we'll add a script to verify them also.
 
 ## More Info
 
@@ -94,5 +92,4 @@ You're also welcome to stop by the #test_advisory_board Slack channel!
 
 [Martin Fowler]: https://martinfowler.com/articles/microservice-testing/#testing-contract-introduction
 [Pact]: https://docs.pact.io/
-[https://inst-pact-broker.inseng.net]: https://inst-pact-broker.inseng.net
 [Test Advisory Board github repo]: https://github.com/instructure/test_advisory_board

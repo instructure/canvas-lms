@@ -45,24 +45,20 @@ describe("LinksPanel", () => {
 
   it("binds collection name into child LinkSets' fetchInitialPage", () => {
     let spy = sinon.spy();
-    let tree = sd.shallowRender(
-      <LinksPanel {...defaultProps} fetchInitialPage={spy} />
-    );
-    const wikiPages = tree
-      .dive(["CollectionPanel", "AccordionSection", "LinkSet"])
-      .getMountedInstance();
+    let props = { ...defaultProps, fetchInitialPage: spy };
+    let tree = sd.shallowRender(<LinksPanel {...props} />);
+    // returns first, which will be wikiPages
+    const wikiPages = tree.subTree("LinkSet");
     wikiPages.props.fetchInitialPage();
     assert.ok(spy.calledWith("wikiPages"));
   });
 
   it("binds collection name into child LinkSets' fetchNextPage", () => {
     let spy = sinon.spy();
-    let tree = sd.shallowRender(
-      <LinksPanel {...defaultProps} fetchNextPage={spy} />
-    );
-    const wikiPages = tree
-      .dive(["CollectionPanel", "AccordionSection", "LinkSet"])
-      .getMountedInstance();
+    let props = { ...defaultProps, fetchNextPage: spy };
+    let tree = sd.shallowRender(<LinksPanel {...props} />);
+    // returns first, which will be wikiPages
+    const wikiPages = tree.subTree("LinkSet");
     wikiPages.props.fetchNextPage();
     assert.ok(spy.calledWith("wikiPages"));
   });
@@ -74,46 +70,64 @@ describe("LinksPanel", () => {
     });
 
     it("has expected tabs", () => {
-      const panels = tree.everySubTree("CollectionPanel");
-      assert.equal(panels.length, 6);
-      assert.ok(panels[0].props.summary === "Pages");
-      assert.ok(panels[1].props.summary === "Assignments");
-      assert.ok(panels[2].props.summary === "Quizzes");
-      assert.ok(panels[3].props.summary === "Announcements");
-      assert.ok(panels[4].props.summary === "Discussions");
-      assert.ok(panels[5].props.summary === "Modules");
-
-      const otherPanels = tree.everySubTree("AccordionSection");
-      assert.equal(otherPanels.length, 1);
-
-      const navPanel = otherPanels[0];
-      assert.ok(navPanel.props.summary === "Course Navigation");
+      const panels = tree.everySubTree("TabPanel");
+      assert.equal(panels.length, 7);
+      assert.ok(
+        panels.some(tab => {
+          return tab.props.title === "Pages";
+        })
+      );
+      assert.ok(
+        panels.some(tab => {
+          return tab.props.title === "Assignments";
+        })
+      );
+      assert.ok(
+        panels.some(tab => {
+          return tab.props.title === "Quizzes";
+        })
+      );
+      assert.ok(
+        panels.some(tab => {
+          return tab.props.title === "Announcements";
+        })
+      );
+      assert.ok(
+        panels.some(tab => {
+          return tab.props.title === "Discussions";
+        })
+      );
+      assert.ok(
+        panels.some(tab => {
+          return tab.props.title === "Modules";
+        })
+      );
+      assert.ok(
+        panels.some(tab => {
+          return tab.props.title === "Course Navigation";
+        })
+      );
     });
 
     it("mentions the course in linkToText", () => {
-      assert.ok(tree.text().includes("Link to other content in the course."));
+      const instance = tree.getMountedInstance();
+      assert.ok(instance.linkToText().match("course"));
     });
 
     it("has 'link to new page' in Pages links", () => {
-      let pagesTabTree = tree.subTree(
-        "CollectionPanel",
-        n => n.props.summary === "Pages"
-      );
-      let linkToNewPage = pagesTabTree.dive([
-        "CollectionPanel",
-        "LinkToNewPage"
-      ]);
+      let pagesTabTree = tree.everySubTree("TabPanel").filter(tab => {
+        return tab.props.title === "Pages";
+      });
+      let linkToNewPage = pagesTabTree[0].dive(["div", "LinkToNewPage"]);
       assert.ok(linkToNewPage.findNode("#rcs-LinkToNewPage-btn-link"));
     });
 
     it("does not have 'link to new page' in Quizzes links", () => {
-      let quizzesTabTree = tree.subTree(
-        "CollectionPanel",
-        n => n.props.summary === "Quizzes"
-      );
-
+      let quizzesTabTree = tree.everySubTree("TabPanel").filter(tab => {
+        return tab.props.title === "Quizzes";
+      });
       assert.throws(() => {
-        pagesTabTree.dive(["CollectionPanel", "LinkToNewPage"]);
+        quizzesTabTree[0].dive(["div", "LinkToNewPage"]);
       });
     });
 
@@ -121,13 +135,11 @@ describe("LinksPanel", () => {
       tree = sd.shallowRender(
         <LinksPanel {...defaultProps} canCreatePages={false} />
       );
-      let pagesTabTree = tree.subTree(
-        "CollectionPanel",
-        n => n.props.summary === "Pages"
-      );
-
+      let pagesTabTree = tree.everySubTree("TabPanel").filter(tab => {
+        return tab.props.title === "Pages";
+      });
       assert.throws(() => {
-        pagesTabTree.dive(["CollectionPanel", "LinkToNewPage"])
+        pagesTabTree[0].dive(["div", "LinkToNewPage"]);
       });
     });
   });
@@ -140,30 +152,43 @@ describe("LinksPanel", () => {
     });
 
     it("skips Assigments, Quizzes, and Modules tabs", () => {
-      const panels = tree.everySubTree("CollectionPanel");
-      assert.ok(panels.every(tab => tab.props.summary !== "Assignments"));
-      assert.ok(panels.every(tab => tab.props.summary !== "Quizzes"));
-      assert.ok(panels.every(tab => tab.props.summary !== "Modules"));
+      const panels = tree.everySubTree("TabPanel");
+      assert.ok(
+        panels.every(tab => {
+          return tab.props.title !== "Assignments";
+        })
+      );
+      assert.ok(
+        panels.every(tab => {
+          return tab.props.title !== "Quizzes";
+        })
+      );
+      assert.ok(
+        panels.every(tab => {
+          return tab.props.title !== "Modules";
+        })
+      );
     });
 
     it("has Group Navigation tab", () => {
-      const panels = tree.everySubTree("AccordionSection");
-      assert.ok(panels.some(tab => tab.props.summary === "Group Navigation"));
+      const panels = tree.everySubTree("TabPanel");
+      assert.ok(
+        panels.some(tab => {
+          return tab.props.title === "Group Navigation";
+        })
+      );
     });
 
     it("mentions the group in linkToText", () => {
-      assert.ok(tree.text().includes("Link to other content in the group."));
+      const instance = tree.getMountedInstance();
+      assert.ok(instance.linkToText().match("group"));
     });
 
     it("has 'link to new page' in Pages links", () => {
-      let pagesTabTree = tree.subTree(
-        "CollectionPanel",
-        n => n.props.summary === "Pages"
-      );
-      let linkToNewPage = pagesTabTree.dive([
-        "CollectionPanel",
-        "LinkToNewPage"
-      ]);
+      let pagesTabTree = tree.everySubTree("TabPanel").filter(tab => {
+        return tab.props.title === "Pages";
+      });
+      let linkToNewPage = pagesTabTree[0].dive(["div", "LinkToNewPage"]);
       assert.ok(linkToNewPage.findNode("#rcs-LinkToNewPage-btn-link"));
     });
   });
@@ -177,30 +202,22 @@ describe("LinksPanel", () => {
 
     // TODO: came from canvas like this, may want to change
     it("only has Course Navigation tab", () => {
-      const panelsOnlyShownToCoursesAndGroups = tree.everySubTree(
-        "CollectionPanel"
-      );
-      assert.equal(panelsOnlyShownToCoursesAndGroups.length, 0);
-
-      const otherPanels = tree.everySubTree("AccordionSection");
-      assert.equal(otherPanels.length, 1);
-
-      const navPanel = otherPanels[0];
-      assert.ok(navPanel.props.summary === "");
+      const panels = tree.everySubTree("TabPanel");
+      assert.equal(panels.length, 1);
+      assert.equal(panels[0].props.title, "Course Navigation");
     });
 
     it("it has no linkToText", () => {
-      assert.ok(!tree.text().includes("Link to other content"));
+      const instance = tree.getMountedInstance();
+      assert.equal(instance.linkToText(), "");
     });
 
     it("does not have 'link to new page' in CourseNavigation links", () => {
-      let pagesTabTree = tree.subTree(
-        "CollectionPanel",
-        n => n.props.summary === "Pages"
-      );
-
+      let pagesTabTree = tree.everySubTree("TabPanel").filter(tab => {
+        return tab.props.title === "Course Navigation";
+      });
       assert.throws(() => {
-        pagesTabTree.dive(["CollectionPanel", "LinkToNewPage"]);
+        pagesTabTree[0].dive(["div", "LinkToNewPage"]);
       });
     });
   });

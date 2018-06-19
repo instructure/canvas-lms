@@ -35,13 +35,12 @@ module Api::V1::OutcomeResults
   def outcome_result_json(result)
     hash = api_json(result, @current_user, session, {
       methods: :submitted_or_assessed_at,
-      only: %w(id score mastery possible percent hide_points hidden)
+      only: %w(id score mastery possible percent)
     })
     hash[:links] = {
       user: result.user.id.to_s,
       learning_outcome: result.learning_outcome_id.to_s,
-      alignment: result.alignment.content.asset_string,
-      assignment: result.assignment&.asset_string
+      alignment: result.alignment.content.asset_string
     }
     hash
   end
@@ -120,17 +119,6 @@ module Api::V1::OutcomeResults
       html_url = polymorphic_url([alignment.context, alignment]) rescue nil
       hash[:html_url] = html_url if html_url
       hash
-    end
-  end
-
-  def outcome_results_assignments_json(assignments)
-    assignments.compact.map do |a|
-      {
-        id: a.asset_string,
-        name: a.title,
-        html_url: polymorphic_url([a.context, a]),
-        submission_types: a.submission_types
-      }
     end
   end
 

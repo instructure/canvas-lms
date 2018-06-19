@@ -25,7 +25,7 @@ import { createPaginationActions } from '../shared/reduxPagination'
 
 const getDiscussionOpts = {
   fetchAll: true,
-  totalCount: ENV.totalDiscussions,
+  headThunk: apiClient.headDiscussions,
 }
 const discussionActions = createPaginationActions('discussions', apiClient.getDiscussions, getDiscussionOpts)
 

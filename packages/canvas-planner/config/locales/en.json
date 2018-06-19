@@ -11,23 +11,11 @@
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "Are you sure you want to delete this planner item?"
   },
-  "assignmenttype_title_6612d008": {
-    "message": "{ assignmentType } { title }."
+  "assignmenttype_title_is_complete_813e54f8": {
+    "message": "{ assignmentType } { title } is complete"
   },
-  "assignmenttype_title_at_datetime_478f0709": {
-    "message": "{ assignmentType } { title }, at { datetime }."
-  },
-  "assignmenttype_title_due_datetime_a112d8ff": {
-    "message": "{ assignmentType } { title }, due { datetime }."
-  },
-  "assignmenttype_title_is_marked_as_done_a8dc46ef": {
-    "message": "{ assignmentType } { title } is marked as done."
-  },
-  "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
-    "message": "{ assignmentType } { title } is not marked as done."
-  },
-  "assignmenttype_title_on_datetime_446013fb": {
-    "message": "{ assignmentType } { title }, on { datetime }."
+  "assignmenttype_title_is_incomplete_a1d5fac0": {
+    "message": "{ assignmentType } { title } is incomplete"
   },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Beginning of Your To-Do History"
@@ -182,9 +170,6 @@
   "nothing_new_needs_attention_3ac548d4": {
     "message": "Nothing new needs attention."
   },
-  "nothing_planned_today_next_item_loaded_5a199868": {
-    "message": "Nothing planned today. Next item loaded."
-  },
   "nothing_planned_yet_8675ffe9": {
     "message": "Nothing Planned Yet"
   },
@@ -221,14 +206,14 @@
   "submitted_318fad53": {
     "message": "Submitted"
   },
-  "success_to_do_created_e34ed395": {
-    "message": "Success: To Do created"
-  },
   "task_16b0ef38": {
     "message": "Task"
   },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "The date and time this to do is due"
+  },
+  "there_s_nothing_today_heading_to_the_next_item_due_e4abf4bc": {
+    "message": "There''s nothing today.  Heading to the next item due."
   },
   "time_2b5aac58": {
     "message": "Time"

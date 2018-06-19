@@ -19,15 +19,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios'
-import Modal, {ModalHeader, ModalBody, ModalFooter} from '@instructure/ui-overlays/lib/components/Modal'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGroup'
-import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Link from '@instructure/ui-elements/lib/components/Link'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import AccessibleContent from '@instructure/ui-a11y/lib/components/AccessibleContent'
+import Modal, {ModalHeader, ModalBody, ModalFooter} from '@instructure/ui-core/lib/components/Modal'
+import Heading from '@instructure/ui-core/lib/components/Heading'
+import RadioInputGroup from '@instructure/ui-core/lib/components/RadioInputGroup'
+import RadioInput from '@instructure/ui-core/lib/components/RadioInput'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Text from '@instructure/ui-core/lib/components/Text'
+import Link from '@instructure/ui-core/lib/components/Link'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import AccessibleContent from '@instructure/ui-core/lib/components/AccessibleContent'
 import I18n from 'i18n!course_home_dialog'
 import plainStoreShape from '../shared/proptypes/plainStoreShape'
 
@@ -132,6 +132,7 @@ class CourseHomeDialog extends React.Component {
         transition="fade"
         label={I18n.t('Choose Course Home Page')}
         closeButtonLabel={I18n.t('Close')}
+        applicationElement={() => document.getElementById('application')}
         onDismiss={this.props.onRequestClose}
         onClose={this.onClose}
       >
@@ -149,7 +150,7 @@ class CourseHomeDialog extends React.Component {
           <RadioInputGroup
             description={<ScreenReaderContent>{instructions}</ScreenReaderContent>}
             name="course[default_view]"
-            onChange={(e, val) => this.onChange(val)}
+            onChange={this.onChange}
             defaultValue={selectedDefaultView}
           >
             {inputs.map(input =>

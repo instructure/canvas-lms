@@ -265,7 +265,7 @@ describe('sources/api', () => {
     jsdom()
 
     beforeEach(() => {
-      fileDomObject = new window.Blob()
+      fileDomObject = new Blob()
       uploadUrl = 'upload-url'
       preflightProps = {
         upload_params: {},

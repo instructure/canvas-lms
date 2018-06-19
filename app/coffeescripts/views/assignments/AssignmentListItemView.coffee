@@ -68,8 +68,7 @@ define [
       'click .icon-unlock': 'onLockAssignment'
       'click .move_assignment': 'onMove'
       'click .duplicate-failed-retry': 'onDuplicateFailedRetry'
-      'click .duplicate-failed-cancel': 'onDuplicateOrImportFailedCancel'
-      'click .import-failed-cancel': 'onDuplicateOrImportFailedCancel'
+      'click .duplicate-failed-cancel': 'onDuplicateFailedCancel'
 
     messages:
       confirm: I18n.t('Are you sure you want to delete this assignment?')
@@ -94,7 +93,7 @@ define [
         @model.on(observe, @render)
       @model.on 'change:submission', @updateScore
 
-      @model.pollUntilFinishedLoading()
+      @model.pollUntilFinishedDuplicating() if @model.isDuplicating()
 
     initializeChildViews: ->
       @publishIconView = false
@@ -273,7 +272,7 @@ define [
         @delete(silent: true)
       ).always -> $button.prop('disabled', false)
 
-    onDuplicateOrImportFailedCancel: (e) =>
+    onDuplicateFailedCancel: (e) =>
       e.preventDefault()
       @delete(silent: true)
 

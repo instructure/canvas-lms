@@ -59,11 +59,13 @@ wrong person in, as <a href="http://homakov.blogspot.com/2012/07/saferweb-most-c
     </tr>
     <tr>
       <td class="mono">scope<span class="label optional"></span></td>
-      <td>
-        This can be used to specify what information the access token will provide access to.
-        A complete list of available scopes can be found <a href="/doc/api/file.api_token_scopes.html">here</a>. Scopes may also be found beneath their corresponding endpoints in the "resources" documentation pages.
-        If the developer key does not require scopes and no scope parameter is specified, the access token will have access to all scopes. If the developer key does require scopes and no scope parameter is specified, Canvas will respond with "invalid_scope."
-      </td>
+      <td>This can be used to specify what information the access token
+      will provide access to.  By default an access token will have access to
+      all api calls that a user can make.  The only other accepted value
+      for this at present is '/auth/userinfo'. When used, this will return only
+      the current canvas user's identity. Some OAuth libraries may require a
+      scope parameter to be specified; if so, passing no value for the scope
+      parameter will behave as if no scope parameter was specified.</td>
     </tr>
     <tr>
       <td class="mono">purpose<span class="label optional"></span></td>

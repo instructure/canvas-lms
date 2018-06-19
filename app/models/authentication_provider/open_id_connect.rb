@@ -89,12 +89,7 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::Oauth2
   def claims(token)
     token.options[:claims] ||= begin
       jwt_string = token.params['id_token']
-      id_token = begin
-        ::Canvas::Security.decode_jwt(jwt_string, [:skip_verification])
-      rescue ::Canvas::Security::InvalidToken
-        Rails.logger.warning("Failed to decode OpenID Connect id_token: #{jwt_string.inspect}")
-        raise
-      end
+      id_token = ::Canvas::Security.decode_jwt(jwt_string, [:skip_verification])
       # we have a userinfo endpoint, and we don't have everything we want,
       # then request more
       if userinfo_endpoint.present? && !(id_token.keys - requested_claims).empty?

@@ -17,9 +17,6 @@
  */
 import I18n from 'i18n!rubric_assessment'
 import $ from 'jquery'
-import _ from 'lodash'
-import React from 'react'
-import ReactDOM from 'react-dom'
 import htmlEscape from './str/htmlEscape'
 import TextHelper from 'compiled/str/TextHelper'
 import round from 'compiled/util/round'
@@ -30,7 +27,6 @@ import './jquery.instructure_misc_plugins' /* showIf */
 import './jquery.templateData'
 import './vendor/jquery.scrollTo'
 import 'compiled/jquery.rails_flash_notifications' // eslint-disable-line
-import Rubric from 'jsx/rubrics/Rubric'
 
 // TODO: stop managing this in the view and get it out of the global scope submissions/show.html.erb
 /*global rubricAssessment*/
@@ -259,27 +255,6 @@ window.rubricAssessment = {
           }
         }
       }
-    }
-  },
-
-  populateNewRubric: function(container, assessment, rubricAssociation) {
-    if (ENV.nonScoringRubrics && ENV.rubric) {
-      const onAssessmentChange = (next) => {
-        render(next)
-      }
-
-      const render = (_assessment) => {
-        ReactDOM.render(React.createElement(Rubric, {
-          onAssessmentChange,
-          rubric: ENV.rubric,
-          rubricAssessment: _assessment,
-          rubricAssociation
-        }, null), container.get(0))
-      }
-
-      render(_.cloneDeep(assessment))
-    } else {
-      rubricAssessment.populateRubric(container, assessment);
     }
   },
 

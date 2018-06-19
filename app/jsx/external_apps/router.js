@@ -63,17 +63,13 @@ import regularizePathname from '../external_apps/lib/regularizePathname'
   };
 
   const renderConfigurations = (ctx) => {
-    // router.start is only called when loading the Apps tab
-    // so we don't want to try anything here that hasn't happened.
-    if (targetNodeToRenderIn) {
-      ReactDOM.render(
-        <Root>
-          <Configurations
-            pathname={ctx.pathname}
-            env={window.ENV} />
-        </Root>
-      , targetNodeToRenderIn);
-    }
+    ReactDOM.render(
+      <Root>
+        <Configurations
+          pathname={ctx.pathname}
+          env={window.ENV} />
+      </Root>
+    , targetNodeToRenderIn);
   }
 
   /**

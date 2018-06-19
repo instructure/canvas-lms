@@ -1466,28 +1466,6 @@ describe Quizzes::QuizzesController do
       expect(overrides.length).to eq 1
     end
 
-    it "can change a graded quiz with overrides into an ungraded quiz" do
-      user_session(@teacher)
-      quiz = @course.quizzes.create!(:title => 'blah', :quiz_type => 'assignment')
-      override = create_adhoc_override_for_assignment(quiz, @student)
-      post 'update', :params => {
-        :course_id => @course.id,
-        :id => quiz.id,
-        :quiz => {
-          :quiz_type => 'survey',
-          :assignment_overrides => [{
-            :id => override.id,
-            :assignment_id => quiz.assignment.id,
-            :title => '1 student',
-            :student_ids => [@student.id]
-          }]
-        }
-      }
-      expect(quiz.reload.assignment_id).to be_nil
-      expect(override.reload.assignment_id).to be_nil
-      expect(override.quiz_id).to eq quiz.id
-    end
-
     describe "DueDateCacher" do
       before :each do
         user_session(@teacher)

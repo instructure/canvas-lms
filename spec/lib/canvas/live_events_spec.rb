@@ -299,23 +299,7 @@ describe Canvas::LiveEvents do
       expect_event('grade_change',
         hash_including(
           assignment_id: submission.global_assignment_id.to_s,
-          user_id: @student.global_id.to_s,
-          student_id: @student.global_id.to_s,
-          student_sis_id: nil
-        ), course_context)
-      Canvas::LiveEvents.grade_changed(submission, 0)
-    end
-
-    it "should include the student_sis_id if present" do
-      course_with_student_submissions
-      user_with_pseudonym(user: @student)
-      @pseudonym.sis_user_id = 'sis-id-1'
-      @pseudonym.save!
-      submission = @course.assignments.first.submissions.first
-
-      expect_event('grade_change',
-        hash_including(
-          student_sis_id: 'sis-id-1'
+          user_id: @student.global_id.to_s
         ), course_context)
       Canvas::LiveEvents.grade_changed(submission, 0)
     end
@@ -636,37 +620,6 @@ describe Canvas::LiveEvents do
       ).once
 
       Canvas::LiveEvents.quiz_export_complete(content_export)
-    end
-  end
-
-  describe '.content_migration_completed' do
-    let(:course) { course_factory() }
-    let(:migration) { ContentMigration.create!(:context => course) }
-
-    before do
-      migration.migration_settings[:import_quizzes_next] = true
-    end
-
-    it 'sent events with expected payload' do
-      expect_event(
-        'content_migration_completed',
-        hash_including(
-          content_migration_id: migration.global_id.to_s,
-          context_id: course.global_id.to_s,
-          context_type: course.class.to_s,
-          context_uuid: course.uuid,
-          import_quizzes_next: true
-        ),
-        hash_including(
-          context_type: course.class.to_s,
-          context_id: course.global_id.to_s,
-          root_account_id: course.root_account.global_id.to_s,
-          root_account_uuid: course.root_account.uuid,
-          root_account_lti_guid: course.root_account.lti_guid.to_s
-        )
-      ).once
-
-      Canvas::LiveEvents.content_migration_completed(migration)
     end
   end
 

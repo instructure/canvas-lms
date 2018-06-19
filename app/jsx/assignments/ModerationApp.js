@@ -77,7 +77,6 @@ export default React.createClass({
         <FlashMessageHolder {...this.state.flashMessage} />
         <h1 className="screenreader-only">{I18n.t('Moderate %{assignment_name}', {assignment_name: this.state.assignment.title})}</h1>
         <Header
-          anonymousModeratedMarkingEnabled={this.state.assignment.anonymousModeratedMarkingEnabled}
           onPublishClick={
             () => {
               this.props.store.dispatch(Actions.publishStarted());
@@ -90,14 +89,7 @@ export default React.createClass({
               this.props.store.dispatch(Actions.addStudentToModerationSet());
             }
           }
-          onUnmuteClick={
-            () => {
-              this.props.store.dispatch(Actions.unmuteStarted());
-              this.props.store.dispatch(Actions.unmuteAssignment());
-            }
-          }
           published={this.state.assignment.published}
-          muted={this.state.assignment.muted}
           selectedStudentCount={this.state.studentList.selectedCount}
           inflightAction={this.state.inflightAction}
           permissions={this.props.permissions}

@@ -19,14 +19,14 @@
 import React from 'react'
 import * as enzyme from 'enzyme'
 import MasterChildStack from 'jsx/blueprint_courses/components/MasterChildStack'
-import getSampleData from '../getSampleData'
+import sampleData from '../sampleData'
 
 QUnit.module('MasterChildStack component')
 
 const defaultProps = () => ({
-  child: getSampleData().childCourse,
-  master: getSampleData().masterCourse,
-  terms: getSampleData().terms,
+  child: sampleData.childCourse,
+  master: sampleData.masterCourse,
+  terms: sampleData.terms,
 })
 
 test('renders the MasterChildStack component', () => {

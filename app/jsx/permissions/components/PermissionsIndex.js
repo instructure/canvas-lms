@@ -17,166 +17,82 @@
  */
 
 import I18n from 'i18n!permissions_v2'
-import React, {Component} from 'react'
-import {func, arrayOf} from 'prop-types'
-import {connect} from 'react-redux'
-import {debounce} from 'lodash'
+import React, { Component } from 'react'
+import { func, bool, number, arrayOf, string } from 'prop-types'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 
-import AccessibleContent from '@instructure/ui-a11y/lib/components/AccessibleContent'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Container from '@instructure/ui-layout/lib/components/View'
-import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import IconSearchLine from '@instructure/ui-icons/lib/Line/IconSearch'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
-import Select from '@instructure/ui-forms/lib/components/Select'
+import Spinner from '@instructure/ui-core/lib/components/Spinner'
+import Heading from '@instructure/ui-core/lib/components/Heading'
+import Text from '@instructure/ui-core/lib/components/Text'
 
+import select from '../../shared/select'
 import actions from '../actions'
-import propTypes, {COURSE, ACCOUNT} from '../propTypes'
-
-import {ConnectedPermissionsTable} from './PermissionsTable'
-import {ConnectedRoleTray} from './RoleTray'
-import {ConnectedAddTray} from './AddTray'
-
-const SEARCH_DELAY = 350
-const COURSE_TAB_INDEX = 0
 
 export default class PermissionsIndex extends Component {
   static propTypes = {
-    filterRoles: func.isRequired,
-    roles: arrayOf(propTypes.role).isRequired,
-    searchPermissions: func.isRequired,
-    setAndOpenAddTray: func.isRequired,
-    tabChanged: func.isRequired
+    permissions: arrayOf(string),
+    isLoadingPermissions: bool.isRequired,
+    hasLoadedPermissions: bool.isRequired,
+    getPermissions: func.isRequired,
+    contextId: number.isRequired
   }
 
-  state = {
-    permissionSearchString: '',
-    selectedRoles: [],
-    contextType: COURSE
+  static defaultProps = {
+    permissions: []
   }
 
-  onRoleFilterChange = (_, value) => {
-    this.setState({selectedRoles: value}, this.filterRoles)
+  componentDidMount () {
+    if (!this.props.hasLoadedPermissions) {
+      this.props.getPermissions(this.props.contextId)
+    }
   }
 
-  onSearchStringChange = e => {
-    this.setState({permissionSearchString: e.target.value}, this.filterPermissions)
+  renderSpinner () {
+    return this.props.isLoadingPermissions ? (
+      <div style={{textAlign: 'center'}}>
+        <Spinner size="small" title={I18n.t('Loading Permissions')} />
+        <Text size="small" as="p">
+          {I18n.t('Loading Permissions')}
+        </Text>
+      </div>
+    ) : null
   }
 
-  onTabChanged = (newIndex, oldIndex) => {
-    if (newIndex === oldIndex) return
-    const newContextType = newIndex === COURSE_TAB_INDEX ? COURSE : ACCOUNT
-    this.setState(
-      {permissionSearchString: '', selectedRoles: [], contextType: newContextType},
-      () => {
-        this.props.tabChanged(newContextType)
-      }
-    )
+  renderPermissions () {
+    if (this.props.hasLoadedPermissions) {
+      const permissionNames = this.props.permissions.map(name => ((
+        <span key={`permission-${name}`}> {name} </span>
+      )))
+      return (
+        <Text as="p">
+          {permissionNames}
+        </Text>
+      )
+    } else {
+      return null
+    }
   }
 
-  filterPermissions = debounce(() => this.props.searchPermissions(this.state), SEARCH_DELAY, {
-    leading: false,
-    trailing: true
-  })
-
-  filterRoles = () => {
-    this.props.filterRoles({
-      selectedRoles: this.state.selectedRoles,
-      contextType: this.state.contextType
-    })
-  }
-
-  renderHeader() {
-    return (
-      <Container display="block">
-        <Grid>
-          <GridRow vAlign="middle">
-            <GridCol width={3}>
-              <TextInput
-                label={<ScreenReaderContent>{I18n.t('Search Permissions')}</ScreenReaderContent>}
-                placeholder={I18n.t('Search Permissions')}
-                icon={() => <IconSearchLine />}
-                onChange={this.onSearchStringChange}
-                name="permission_search"
-              />
-            </GridCol>
-            <GridCol width={8}>
-              <Select
-                id="permissions-role-filter"
-                label={<ScreenReaderContent>{I18n.t('Filter Roles')}</ScreenReaderContent>}
-                selectedOption={this.state.selectedRolesValue}
-                multiple
-                editable
-                onChange={this.onRoleFilterChange}
-                formatSelectedOption={tag => (
-                  <AccessibleContent
-                    alt={I18n.t(`Remove role filter %{label}`, {label: tag.label})}
-                  >
-                    {tag.label}
-                  </AccessibleContent>
-                )}
-              >
-                {this.props.roles
-                  .filter(role => role.contextType === this.state.contextType)
-                  .map(role => (
-                    <option key={`${role.id}`} value={`${role.id}`}>
-                      {role.label}
-                    </option>
-                  ))}
-              </Select>
-            </GridCol>
-            <GridCol width={2}>
-              <Button
-                variant="primary"
-                margin="0 x-small 0 0"
-                onClick={this.props.setAndOpenAddTray}
-              >
-                {I18n.t('Add Role')}
-              </Button>
-            </GridCol>
-          </GridRow>
-        </Grid>
-      </Container>
-    )
-  }
-
-  render() {
+  render () {
     return (
       <div className="permissions-v2__wrapper">
-        <ConnectedRoleTray />
-        <ConnectedAddTray />
-        <TabList onChange={this.onTabChanged}>
-          <TabPanel title={I18n.t('Course Roles')}>
-            {this.renderHeader()}
-            <ConnectedPermissionsTable />
-          </TabPanel>
-          <TabPanel title={I18n.t('Account Roles')}>
-            {this.renderHeader()}
-            <ConnectedPermissionsTable />
-          </TabPanel>
-        </TabList>
+        <Heading>{I18n.t('Permissions V2 Page')}</Heading>
+        {this.renderSpinner()}
+        {this.renderPermissions()}
       </div>
     )
   }
 }
 
-// TODO: Maybe we don't need this, since there are no props coming from state?
-function mapStateToProps(state, ownProps) {
+function mapStateToProps(state) {
   return {
-    ...ownProps,
-    roles: state.roles
+    contextId: state.contextId,
+    isLoadingPermissions: state.isLoadingPermissions,
+    hasLoadedPermissions: state.hasLoadedPermissions,
+    permissions: state.permissions
   }
 }
 
-const mapDispatchToProps = {
-  filterRoles: actions.filterRoles,
-  searchPermissions: actions.searchPermissions,
-  setAndOpenAddTray: actions.setAndOpenAddTray,
-  tabChanged: actions.tabChanged
-}
-
-export const ConnectedPermissionsIndex = connect(mapStateToProps, mapDispatchToProps)(
-  PermissionsIndex
-)
+const connectActions = dispatch => bindActionCreators(select(actions, [ 'getPermissions' ]), dispatch)
+export const ConnectedPermissionsIndex = connect(mapStateToProps, connectActions)(PermissionsIndex)

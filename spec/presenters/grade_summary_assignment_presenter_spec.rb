@@ -165,33 +165,6 @@ describe GradeSummaryAssignmentPresenter do
     end
   end
 
-  describe "#show_submission_details_link?" do
-    before :each do
-      @assignment.root_account.enable_feature!(:anonymous_moderated_marking)
-      @submission_stub = double()
-      allow(@submission_stub).to receive(:originality_reports_for_display)
-    end
-
-    it "returns false when assignment is not an assignment" do
-      @assignment = {}
-      allow(@submission_stub).to receive(:can_view_details?).and_return(true)
-      presenter = GradeSummaryAssignmentPresenter.new(summary, @student, @assignment, @submission_stub)
-      expect(presenter.show_submission_details_link?).to be false
-    end
-
-    it "returns false when assignment is an assignment and user cannot view details on submission" do
-      allow(@submission_stub).to receive(:can_view_details?).and_return(false)
-      presenter = GradeSummaryAssignmentPresenter.new(summary, @student, @assignment, @submission_stub)
-      expect(presenter.show_submission_details_link?).to be false
-    end
-
-    it "returns true when assignment is an assignment and use can view details on submission" do
-      allow(@submission_stub).to receive(:can_view_details?).and_return(true)
-      presenter = GradeSummaryAssignmentPresenter.new(summary, @student, @assignment, @submission_stub)
-      expect(presenter.show_submission_details_link?).to be true
-    end
-  end
-
   describe "#missing?" do
     it "returns the value of the submission method" do
       expect(@submission).to receive(:missing?).and_return('foo')

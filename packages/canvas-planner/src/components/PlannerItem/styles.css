@@ -33,6 +33,7 @@
 
 .icon {
   color: var(--iconColor);
+  font-size: var(--iconFontSize);
   margin: 0 var(--gutterWidth);
 
   > svg { /* stylelint-disable-line selector-no-type */

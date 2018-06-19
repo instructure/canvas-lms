@@ -21,7 +21,7 @@ import {func} from 'prop-types'
 import Button from '@instructure/ui-core/lib/components/Button'
 import Text from '@instructure/ui-core/lib/components/Text'
 import Tooltip from '@instructure/ui-core/lib/components/Tooltip'
-import IconWarningLine from '@instructure/ui-icons/lib/Line/IconWarning'
+import IconWarningLine from 'instructure-icons/lib/Line/IconWarningLine'
 import I18n from 'i18n!gradebook'
 
 function InvalidGradeIndicator(props) {

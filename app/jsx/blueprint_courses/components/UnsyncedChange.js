@@ -18,8 +18,8 @@
 
 import React from 'react'
 
-import Text from '@instructure/ui-elements/lib/components/Text'
-import View from '@instructure/ui-layout/lib/components/View'
+import Text from '@instructure/ui-core/lib/components/Text'
+import Container from '@instructure/ui-core/lib/components/Container'
 
 import { IconLock, IconUnlock } from './BlueprintLocks'
 import propTypes from '../propTypes'
@@ -37,9 +37,9 @@ const UnsyncedChange = (props) => {
           <Text size="large" color="secondary">
             {locked ? <IconLock /> : <IconUnlock />}
           </Text>
-          <View padding="0 0 0 small">
+          <Container padding="0 0 0 small">
             <Text size="small" weight="bold">{asset_name}</Text>
-          </View>
+          </Container>
         </div>
       </td>
       <td>

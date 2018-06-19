@@ -18,7 +18,7 @@
 
 import BlueprintCourse from 'jsx/blueprint_courses/apps/BlueprintCourse'
 import select from 'jsx/shared/select'
-import getSampleData from '../getSampleData'
+import sampleData from '../sampleData'
 
 let blueprint = null
 const container = document.getElementById('fixtures')
@@ -33,7 +33,7 @@ QUnit.module('BlueprintCourse app', {
   }
 })
 
-const defaultData = () => Object.assign(select(getSampleData(), [
+const defaultData = () => Object.assign(select(sampleData, [
   'terms',
   'masterCourse',
   ['childCourse', 'course'],

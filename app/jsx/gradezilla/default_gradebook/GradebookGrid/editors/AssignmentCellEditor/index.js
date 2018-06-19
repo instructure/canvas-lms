@@ -19,7 +19,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import AssignmentRowCell from './AssignmentRowCell'
-import ReadOnlyCell from './ReadOnlyCell'
 
 /*
  * This editor is intended to be responsible for interfacing with SlickGrid and
@@ -45,8 +44,7 @@ export default class AssignmentCellEditor {
       }
     };
 
-    const Component = props.gradeIsEditable ? AssignmentRowCell : ReadOnlyCell
-    const element = React.createElement(Component, props, null)
+    const element = React.createElement(AssignmentRowCell, props, null);
     ReactDOM.render(element, this.container);
   }
 

@@ -240,6 +240,22 @@ describe Quizzes::QuizzesApiController, type: :request do
       end
     end
 
+    context "non-jsonapi style request" do
+      let(:quiz) { @course.quizzes.create! title: 'Test Quiz' }
+      let(:json) do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{quiz.id}",
+          { :controller=>"quizzes/quizzes_api", :action=>"show", :format=>"json", :course_id=>"#{@course.id}", :id => "#{quiz.id}"}, {})
+        json.with_indifferent_access
+      end
+
+      it "renders with QuizApiSerializer" do
+        expect(json).to eq(
+          Quizzes::QuizApiSerializer.new(quiz, scope: @user, controller: controller, session: session).
+          as_json[:quiz].with_indifferent_access
+        )
+      end
+    end
+
     context "non-existent quiz" do
       it "should return a not found error message" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/10101",

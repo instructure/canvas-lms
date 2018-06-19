@@ -84,7 +84,6 @@ describe SisBatch do
                                 course_1,course_1,course_1,term_1,active}])
     expect(batch.parallel_importers.count).to eq 2
     expect(batch.parallel_importers.pluck(:importer_type)).to match_array %w(course user)
-    expect(batch.data[:use_parallel_imports]).to eq true
   end
 
   it "should keep the batch in initializing state during create_with_attachment" do
@@ -591,22 +590,6 @@ s2,test_1,section2,active},
     expect(CSV.parse(error_file.open).map.to_a.size).to eq 4 # header and 3 errors
   end
 
-  it "should store error file in instfs if instfs is enabled" do
-    # enable instfs
-    allow(InstFS).to receive(:enabled?).and_return(true)
-    uuid = "1234-abcd"
-    allow(InstFS).to receive(:direct_upload).and_return(uuid)
-
-    # generate some errors
-    batch = @account.sis_batches.create!
-    3.times do |i|
-      batch.sis_batch_errors.create(root_account: @account, file: 'users.csv', message: "some error #{i}", row: i)
-    end
-    batch.finish(false)
-    error_file = batch.reload.errors_attachment
-    expect(error_file.instfs_uuid).to eq uuid
-  end
-
   context "with csv diffing" do
 
     it 'should not fail for empty diff file' do
@@ -890,7 +873,6 @@ test_1,u1,student,active}
         end
 
         it 'should use multi_term_batch_mode' do
-          @account.enable_feature!(:refactor_of_sis_imports)
           batch = create_csv_data([
                                     %{term_id,name,status
                                       term1,term1,active
@@ -909,15 +891,7 @@ test_1,u1,student,active}
           expect(@e2.reload).to be_deleted
           expect(@c1.reload).to be_deleted
           expect(@c2.reload).to be_deleted
-          expect(batch.roll_back_data.where(previous_workflow_state: 'created').count).to eq 2
-          expect(batch.roll_back_data.where(updated_workflow_state: 'deleted').count).to eq 6
           expect(batch.reload.workflow_state).to eq 'imported'
-          batch.restore_states_for_batch
-          expect(batch.reload).to be_restored
-          expect(@e1.reload).to be_active
-          expect(@e2.reload).to be_active
-          expect(@c1.reload).to be_created
-          expect(@c2.reload).to be_created
         end
 
         it 'should not use multi_term_batch_mode if no terms are passed' do

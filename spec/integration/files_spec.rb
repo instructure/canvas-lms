@@ -40,11 +40,10 @@ describe FilesController do
       get "http://test.host/files/#{@submission.attachment.id}/download", params: {:inline => '1', :verifier => @submission.attachment.uuid}
       expect(response).to be_redirect
       uri = URI.parse response['Location']
-      qs = Rack::Utils.parse_nested_query(uri.query).with_indifferent_access
+      qs = Rack::Utils.parse_nested_query(uri.query)
       expect(uri.host).to eq 'files-test.host'
       expect(uri.path).to eq "/files/#{@submission.attachment.id}/download"
-      expect{ Users::AccessVerifier.validate(qs) }.not_to raise_exception
-      expect(Users::AccessVerifier.validate(qs)[:user]).to eql(@me)
+      expect(@me.valid_access_verifier?(qs['ts'], qs['sf_verifier'])).to be_truthy
       expect(qs['verifier']).to eq @submission.attachment.uuid
       location = response['Location']
       remove_user_session
@@ -79,12 +78,11 @@ describe FilesController do
       get "http://test.host/users/#{@me.id}/files/#{@att.id}/download"
       expect(response).to be_redirect
       uri = URI.parse response['Location']
-      qs = Rack::Utils.parse_nested_query(uri.query).with_indifferent_access
+      qs = Rack::Utils.parse_nested_query(uri.query)
       expect(uri.host).to eq 'files-test.host'
       # redirects to a relative url, since relative files are available in user context
       expect(uri.path).to eq "/users/#{@me.id}/files/#{@att.id}/my%20files/unfiled/my-pic.png"
-      expect{ Users::AccessVerifier.validate(qs) }.not_to raise_exception
-      expect(Users::AccessVerifier.validate(qs)[:user]).to eql(@me)
+      expect(@me.valid_access_verifier?(qs['ts'], qs['sf_verifier'])).to be_truthy
       location = response['Location']
       remove_user_session
 
@@ -158,11 +156,10 @@ describe FilesController do
     get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", params: {:inline => '1'}
     expect(response).to be_redirect
     uri = URI.parse response['Location']
-    qs = Rack::Utils.parse_nested_query(uri.query).with_indifferent_access
+    qs = Rack::Utils.parse_nested_query(uri.query)
     expect(uri.host).to eq 'files-test.host'
     expect(uri.path).to eq "/courses/#{@course.id}/files/#{a1.id}/course%20files/test%20my%20file%3F%20hai!%26.png"
-    expect{ Users::AccessVerifier.validate(qs) }.not_to raise_exception
-    expect(Users::AccessVerifier.validate(qs)[:user]).to eql(@user)
+    expect(@user.valid_access_verifier?(qs['ts'], qs['sf_verifier'])).to be_truthy
     expect(qs['verifier']).to be_nil
     location = response['Location']
     remove_user_session
@@ -281,11 +278,10 @@ describe FilesController do
       get url
       expect(response).to be_redirect
       uri = URI.parse response['Location']
-      qs = Rack::Utils.parse_nested_query(uri.query).with_indifferent_access
+      qs = Rack::Utils.parse_nested_query(uri.query)
       expect(uri.host).to eq 'files-test.host'
       expect(uri.path).to eq "/files/#{@att.id}/download"
-      expect{ Users::AccessVerifier.validate(qs) }.not_to raise_exception
-      expect(Users::AccessVerifier.validate(qs)[:user]).to eql(@user)
+      expect(@user.valid_access_verifier?(qs['ts'], qs['sf_verifier'])).to be_truthy
       expect(qs['verifier']).to eq @att.uuid
       location = response['Location']
       remove_user_session
@@ -385,8 +381,8 @@ describe FilesController do
     user_factory(active_all: true)
     user_session(@user)
 
-    user_verifier = Users::AccessVerifier.generate(user: @user)
-    get "/files/#{att.id}", params: user_verifier # set the file access session tokens
+    ts, sf_verifier = @user.access_verifier
+    get "/files/#{att.id}", params: {:user_id => @user.id, :ts => ts, :sf_verifier => sf_verifier} # set the file access session tokens
     expect(session['file_access_user_id']).to be_present
 
     get "/courses/#{@course.id}/files/#{att.id}/file_preview"

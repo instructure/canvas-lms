@@ -15,80 +15,46 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+import I18n from 'i18n!announcements_v2'
+
 import $ from 'jquery'
-import I18n from 'i18n!permissions'
-import {createActions} from 'redux-actions'
+import * as apiClient from './apiClient'
+// We probably will want these eventually
+// import { notificationActions } from '../shared/reduxNotifications'
 
-const types = [
-  'DISPLAY_ADD_TRAY',
-  'DISPLAY_ROLE_TRAY',
-  'GET_PERMISSIONS_START',
-  'GET_PERMISSIONS_SUCCESS',
-  'HIDE_ALL_TRAYS',
-  'UPDATE_PERMISSIONS',
-  'UPDATE_PERMISSIONS_SEARCH',
-  'UPDATE_ROLE_FILTERS',
-  'PERMISSIONS_TAB_CHANGED'
-]
+const actionTypes = {
+  GET_PERMISSIONS_START: 'GET_PERMISSIONS_START',
+  GET_PERMISSIONS_SUCCESS: 'GET_PERMISSIONS_SUCCESS'
+}
 
-const actions = createActions(...types)
+const actions = {}
 
-actions.searchPermissions = function searchPermissions({permissionSearchString, contextType}) {
-  return (dispatch, getState) => {
-    dispatch(actions.updatePermissionsSearch({permissionSearchString, contextType}))
-    const markedPermissions = getState().permissions
-    const numDisplayedPermissions = markedPermissions.filter(p => p.displayed).length
-    const message = I18n.t(
-      {
-        one: 'One permission found',
-        other: '%{count} permissions found'
-      },
-      {count: numDisplayedPermissions}
-    )
-    $.screenReaderFlashMessageExclusive(message)
+actions.getPermissionsStart = function(contextId) {
+  return {
+    type: actionTypes.GET_PERMISSIONS_START,
+    payload: contextId
   }
 }
 
-actions.setAndOpenRoleTray = function(role) {
+actions.getPermissionsSuccess = function(response) {
+  return {
+    type: actionTypes.GET_PERMISSIONS_SUCCESS,
+    payload: response
+  }
+}
+
+actions.getPermissions = function(contextId) {
   return dispatch => {
-    dispatch(actions.hideAllTrays())
-    dispatch(actions.displayRoleTray({role}))
+    dispatch(actions.getPermissionsStart(contextId))
+    apiClient.getPermissions(contextId)
+      .then(response => {
+        dispatch(actions.getPermissionsSuccess(response.data))
+      })
+      .catch(_response => {
+        $.screenReaderFlashMessageExclusive(I18n.t('Loading permissions failed'))
+      })
   }
 }
 
-actions.setAndOpenAddTray = function() {
-  return dispatch => {
-    dispatch(actions.hideAllTrays())
-    dispatch(actions.displayAddTray())
-  }
-}
-
-actions.filterRoles = function filterRoles({selectedRoles, contextType}) {
-  return (dispatch, _getState) => {
-    dispatch(actions.updateRoleFilters({selectedRoles, contextType}))
-  }
-}
-
-actions.tabChanged = function tabChanged(newContextType) {
-  return (dispatch, _getState) => {
-    dispatch(actions.permissionsTabChanged(newContextType))
-  }
-}
-
-actions.modifyPermissions = function modifyPermissions(
-  permissionName,
-  courseRoleId,
-  enabled,
-  locked
-) {
-  return dispatch => {
-    dispatch(actions.updatePermissions({permissionName, courseRoleId, enabled, locked}))
-  }
-}
-
-const actionTypes = types.reduce((acc, type) => {
-  acc[type] = type
-  return acc
-}, {})
-
-export {actionTypes, actions as default}
+export { actionTypes, actions as default }

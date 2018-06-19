@@ -18,7 +18,7 @@
 
 import React from 'react';
 import { arrayOf, bool, func, oneOf, shape, string } from 'prop-types';
-import IconMoreSolid from '@instructure/ui-icons/lib/Solid/IconMore';
+import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid';
 import Button from '@instructure/ui-core/lib/components/Button';
 import Container from '@instructure/ui-core/lib/components/Container';
 import Grid, { GridCol, GridRow } from '@instructure/ui-core/lib/components/Grid';

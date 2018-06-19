@@ -28,8 +28,6 @@ module PlannerHelper
     'calendar_event' => 'CalendarEvent'
   }.freeze
 
-  class InvalidDates < StandardError; end
-
   def planner_meta_cache_key
     ['planner_items_meta', @current_user].cache_key
   end
@@ -46,14 +44,19 @@ module PlannerHelper
       elsif val =~ Api::ISO8601_REGEX
         Time.zone.parse(val)
       else
-        raise(InvalidDates, I18n.t("Invalid date or datetime for %{field}", field: input))
+        @errors[input] = t('Invalid date or invalid datetime for %{attr}', attr: input)
       end
     else
       default
     end
   end
 
-  def require_planner_enabled
-    render json: { message: "Feature disabled" }, status: :forbidden unless @domain_root_account.feature_enabled?(:student_planner)
+  def ensure_valid_planner_params
+    if @errors.empty?
+      true
+    else
+      render json: {errors: @errors.as_json}, status: :bad_request
+      false
+    end
   end
 end

@@ -18,9 +18,9 @@
 
 import I18n from 'i18n!discussions_v2'
 import React, { Component } from 'react'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Modal, { ModalHeader, ModalBody, ModalFooter } from '@instructure/ui-overlays/lib/components/Modal'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Modal, { ModalHeader, ModalBody, ModalFooter } from '@instructure/ui-core/lib/components/Modal'
+import Heading from '@instructure/ui-core/lib/components/Heading'
 import { bool, func, number, node } from 'prop-types'
 
 export default class DiscussionDeleteModal extends Component {
@@ -28,6 +28,7 @@ export default class DiscussionDeleteModal extends Component {
     onSubmit: func.isRequired,
     selectedCount: number,
     defaultOpen: bool,
+    applicationElement: node.isRequired
   }
 
   static defaultProps = {
@@ -67,6 +68,7 @@ export default class DiscussionDeleteModal extends Component {
         size="small"
         label={I18n.t('Confirm Delete Discussions')}
         closeButtonLabel={I18n.t('Close')}
+        applicationElement={this.props.applicationElement}
         ref={(c) => { this.confirmDeleteModal = c }}
       >
         <ModalHeader>

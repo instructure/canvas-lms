@@ -19,10 +19,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!outcomes'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Modal, { ModalHeader, ModalBody, ModalFooter } from '@instructure/ui-overlays/lib/components/Modal'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Modal, { ModalHeader, ModalBody, ModalFooter } from '@instructure/ui-core/lib/components/Modal'
+import Heading from '@instructure/ui-core/lib/components/Heading'
+import Text from '@instructure/ui-core/lib/components/Text'
 
 export default React.createClass({
     proptypes: {
@@ -44,6 +44,7 @@ export default React.createClass({
           size="auto"
           label={I18n.t("Modal Dialog: Add to course")}
           closeButtonLabel={I18n.t("Close")}
+          applicationElement={() => document.getElementById('application')}
           ref={this._saveModal}
           onEntering={this._fixFocus}
           onClose={this.props.onClose}

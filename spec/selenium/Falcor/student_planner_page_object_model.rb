@@ -34,7 +34,7 @@ module PlannerPageObject
 
   def navigate_to_course_object(object)
     expect_new_page_load do
-      flnpt(object.title.to_s).click
+      fln(object.title.to_s).click
     end
   end
 
@@ -97,7 +97,7 @@ module PlannerPageObject
     @student_to_do = @student1.planner_notes.create!(todo_date: Time.zone.now,
                                                      title: "Student to do", course_id: @course.id)
     go_to_list_view
-    flnpt(@student_to_do.title).click
+    fln(@student_to_do.title).click
     @modal = todo_sidebar_modal(@student_to_do.title)
   end
 
@@ -139,15 +139,10 @@ module PlannerPageObject
     fj("button:contains('New Activity')")
   end
 
-  def today_button
-    f("#planner-today-btn")
-  end
-
   def wait_for_planner_load
     wait_for_dom_ready
     wait_for_ajaximations
     todo_modal_button
-    f('.planner-day, .planner-empty-state') # one or the other will be rendered
   end
 
   def wait_for_dashboard_load
@@ -175,16 +170,12 @@ module PlannerPageObject
     f('textarea', modal)
   end
 
-  def todo_sidebar_modal_selector(title = nil)
-    if title
-      "[aria-label = 'Edit #{title}']"
-    else
-      "[aria-label = 'Add To Do']"
-    end
-  end
-
   def todo_sidebar_modal(title = nil)
-    f(todo_sidebar_modal_selector(title))
+    if title
+      f("[aria-label = 'Edit #{title}']")
+    else
+      f("[aria-label = 'Add To Do']")
+    end
   end
 
   def wait_for_spinner

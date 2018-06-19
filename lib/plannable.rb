@@ -70,6 +70,7 @@ module Plannable
     end
 
     def bookmark_for(object)
+      values = object.attributes.values_at *@columns
       bookmark = Bookmark.new
       bookmark.descending = @descending
       @columns.each do |col|
@@ -86,7 +87,7 @@ module Plannable
       string: -> (val) { val.is_a?(String) },
       integer: -> (val) { val.is_a?(Integer) },
       datetime: -> (val) { val.is_a?(String) && !!(DateTime.parse(val) rescue false) }
-    }.freeze
+    }
 
     def validate(bookmark)
       bookmark.is_a?(Array) &&
@@ -107,7 +108,7 @@ module Plannable
     end
 
     def restrict_scope(scope, pager)
-      if (bookmark = pager.current_bookmark)
+      if bookmark = pager.current_bookmark
         scope = scope.where(*comparison(bookmark))
       end
       scope.except(:order).order(order_by)

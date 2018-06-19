@@ -47,6 +47,13 @@ export class UpdateItemTray extends Component {
   constructor (props) {
     super(props);
     const updates = this.getNoteUpdates(props);
+    if (!updates.date) {
+      if (props.noteItem && props.noteItem.date) {
+        updates.date = props.noteItem.date;
+      } else {
+        updates.date =  moment.tz(props.timeZone).endOf('day');
+      }
+    }
     this.state = {
       updates,
       titleMessages: [],
@@ -66,9 +73,6 @@ export class UpdateItemTray extends Component {
     if (updates.context) {
       updates.courseId = updates.context.id;
       delete updates.context;
-    }
-    if (!updates.date) {
-       updates.date = moment.tz(props.timeZone).endOf('day');
     }
     return updates;
   }

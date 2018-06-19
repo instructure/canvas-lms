@@ -34,7 +34,6 @@ class DiscussionTopic < ActiveRecord::Base
   include Plannable
   include MasterCourses::Restrictor
   include DuplicatingObjects
-  include LockedFor
 
   restrict_columns :content, [:title, :message]
   restrict_columns :settings, [:delayed_post_at, :require_initial_post, :discussion_type,
@@ -1159,13 +1158,8 @@ class DiscussionTopic < ActiveRecord::Base
     return participants_in_section
   end
 
-  def visible_to_admins_only?
-    self.context.respond_to?(:available?) && !self.context.available? ||
-      unpublished? || not_available_yet? || not_available_anymore?
-  end
-
   def active_participants(include_observers=false)
-    if visible_to_admins_only? && self.context.respond_to?(:participating_admins)
+    if self.context.respond_to?(:available?) && !self.context.available? && self.context.respond_to?(:participating_admins)
       self.context.participating_admins
     else
       self.participants(include_observers)
@@ -1323,25 +1317,25 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
-  #         Determine if the discussion topic is locked for a specific user. The topic is locked when the
+  # Public: Determine if the discussion topic is locked for a specific user. The topic is locked when the
   #         delayed_post_at is in the future or the group assignment is locked. This does not determine
   #         the visibility of the topic to the user, only that they are unable to reply.
-  def low_level_locked_for?(user, opts={})
+  def locked_for?(user, opts={})
     return false if opts[:check_policies] && self.grants_right?(user, :read_as_admin)
 
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       if (self.delayed_post_at && self.delayed_post_at > Time.now)
-        locked = {object: self, unlock_at: delayed_post_at}
+        locked = {:asset_string => self.asset_string, :unlock_at => self.delayed_post_at}
       elsif (self.lock_at && self.lock_at < Time.now)
-        locked = {object: self, lock_at: lock_at, can_view: true}
-      elsif !opts[:skip_assignment] && (assignment && l = assignment.low_level_locked_for?(user, opts))
+        locked = {:asset_string => self.asset_string, :lock_at => self.lock_at, :can_view => true}
+      elsif !opts[:skip_assignment] && (self.assignment && l = self.assignment.locked_for?(user, opts))
         locked = l
       elsif self.could_be_locked && item = locked_by_module_item?(user, opts)
-        locked = {object: self, module: item.context_module}
+        locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
       elsif self.locked? # nothing more specific, it's just locked
-        locked = {object: self, can_view: true}
-      elsif (root_topic && l = root_topic.low_level_locked_for?(user, opts))
+        locked = {:asset_string => self.asset_string, :can_view => true}
+      elsif (self.root_topic && l = self.root_topic.locked_for?(user, opts))
         locked = l
       end
       locked

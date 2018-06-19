@@ -42,16 +42,14 @@ export function scrollAndFocusTodayItem (manager, todayElem) {
       manager.getAnimator().scrollTo(todayElem, manager.totalOffset(), () => {
         // then, if necessary, scroll today's or next todo item into view but not all the way to the top
         manager.getAnimator().scrollTo(component.getScrollable(), manager.totalOffset() + todayElem.offsetHeight, () => {
-          if (!isToday) {
-            // tell the user where we wound up
-            alert(formatMessage("Nothing planned today. Next item loaded."));
-          }
           // finally, focus the item
-          if (component.getFocusable()) {
-            manager.getAnimator().focusElement(component.getFocusable());
-          }
+          component.getFocusable() && component.getFocusable().focus();
         });
       });
+    }
+    if (!isToday) {
+      // tell the screenreader user where we wound up
+      alert(formatMessage("There's nothing today.  Heading to the next item due."));
     }
   } else {
     // there's nothing to focus. leave focus on Today button
@@ -60,7 +58,7 @@ export function scrollAndFocusTodayItem (manager, todayElem) {
 }
 
 function findTodayOrNext (registry) {
-  const today = moment().startOf('day');
+  const today = moment();
   const todayOrNextItem = registry.getAllItemsSorted().find(item => {
     return item.component.props.date >= today;
   });

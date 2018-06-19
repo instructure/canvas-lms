@@ -19,8 +19,8 @@
 import React, { Component } from 'react';
 import { bool, func, node, string } from 'prop-types';
 import Button from '@instructure/ui-core/lib/components/Button';
-import ArrowOpenLeft from '@instructure/ui-icons/lib/Line/IconArrowOpenLeft';
-import ArrowOpenRight from '@instructure/ui-icons/lib/Line/IconArrowOpenRight';
+import ArrowOpenLeft from 'instructure-icons/lib/Line/IconArrowOpenLeftLine';
+import ArrowOpenRight from 'instructure-icons/lib/Line/IconArrowOpenRightLine';
 
 export default class Carousel extends Component {
   componentDidUpdate (prevProps) {

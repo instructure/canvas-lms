@@ -24,8 +24,6 @@ class GradebooksController < ApplicationController
   include Api::V1::Submission
   include Api::V1::CustomGradebookColumn
   include Api::V1::Section
-  include Api::V1::Rubric
-  include Api::V1::RubricAssessment
 
   before_action :require_context
   before_action :require_user, only: [:speed_grader, :speed_grader_settings, :grade_summary]
@@ -119,9 +117,6 @@ class GradebooksController < ApplicationController
       courses_with_grades: courses_with_grades_json,
       effective_due_dates: effective_due_dates,
       exclude_total: @exclude_total,
-      non_scoring_rubrics_enabled: @context.root_account.feature_enabled?(:non_scoring_rubrics),
-      rubric_assessments: rubric_assessments_json(@presenter.submissions.flat_map(&:rubric_assessments), @current_user, session, style: 'full'),
-      rubrics: rubrics_json(@presenter.submissions.flat_map(&:rubric_assessments).map(&:rubric), @current_user, session, style: 'full'),
       save_assignment_order_url: course_save_assignment_order_url(@context),
       student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
       student_id: @presenter.student_id,
@@ -452,7 +447,6 @@ class GradebooksController < ApplicationController
       }).index_by(&:id)
 
       request_error_status = nil
-      error = nil
       @submissions = []
       submissions.compact.each do |submission|
         @assignment = assignments[submission[:assignment_id].to_i]
@@ -465,14 +459,13 @@ class GradebooksController < ApplicationController
         submission[:grader] = @current_user
         submission.delete(:provisional) unless @assignment.moderated_grading?
         if params[:attachments]
-          submission[:comment_attachments] = params[:attachments].keys.map do |idx|
-            attachment_json = params[:attachments][idx].permit(Attachment.permitted_attributes)
-            attachment_json[:user] = @current_user
-            attachment = @assignment.attachments.new(attachment_json.except(:uploaded_data))
-            Attachments::Storage.store_for_attachment(attachment, attachment_json[:uploaded_data])
-            attachment.save!
-            attachment
+          attachments = []
+          params[:attachments].keys.each do |idx|
+            attachment = params[:attachments][idx].permit(Attachment.permitted_attributes)
+            attachment[:user] = @current_user
+            attachments << @assignment.attachments.create(attachment)
           end
+          submission[:comment_attachments] = attachments
         end
         begin
           if [:grade, :score, :excuse, :excused].any? { |k| submission.key? k }
@@ -507,14 +500,15 @@ class GradebooksController < ApplicationController
           end
         rescue Assignment::GradeError => e
           logger.info "GRADES: grade_student failed because '#{e.message}'"
-          error = e
+          request_error_status = e.status_code
+          @error_message = e.to_s
         end
       end
       @submissions = @submissions.reverse.uniq.reverse
       @submissions = nil if submissions.empty?  # no valid submissions
 
       respond_to do |format|
-        if @submissions && error.nil?
+        if @submissions && !@error_message#&& !@submission.errors || @submission.errors.empty?
           flash[:notice] = t('notices.updated', 'Assignment submission was successfully updated.')
           format.html { redirect_to course_gradebook_url(@assignment.context) }
           format.json {
@@ -525,20 +519,12 @@ class GradebooksController < ApplicationController
                    :as_text => true
           }
         else
-          error_message = error&.to_s
-          flash[:error] = t(
-            'errors.submission_failed',
-            "Submission was unsuccessful: %{error}",
-            error: error_message || t('errors.submission_failed_default', 'Submission Failed')
-          )
-          request_error_status = error&.status_code || :bad_request
-
-          error_json = {base: error_message}
-          error_json[:error_code] = error.error_code if error
+          flash[:error] = t('errors.submission_failed', "Submission was unsuccessful: %{error}", :error => @error_message || t('errors.submission_failed_default', 'Submission Failed'))
+          request_error_status ||= :bad_request
 
           format.html { render :show, course_id: @assignment.context.id }
-          format.json { render json: { errors: error_json }, status: request_error_status }
-          format.text { render json: { errors: error_json }, status: request_error_status }
+          format.json { render json: { errors: { base: @error_message } }, status: request_error_status }
+          format.text { render json: { errors: { base: @error_message } }, status: request_error_status }
         end
       end
     end
@@ -583,12 +569,6 @@ class GradebooksController < ApplicationController
     return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
 
     @assignment = @context.assignments.active.find(params[:assignment_id])
-
-    unless @assignment.can_view_speed_grader?(@current_user)
-      flash[:notice] = t('The maximum number of graders for this assignment has been reached.')
-      return redirect_to(course_gradebook_path(@context))
-    end
-
     if @assignment.unpublished?
       flash[:notice] = t(:speedgrader_enabled_only_for_published_content,
                          'SpeedGrader is enabled only for published content.')
@@ -606,11 +586,9 @@ class GradebooksController < ApplicationController
     end
 
     @can_comment_on_submission = !@context.completed? && !@context_enrollment.try(:completed?)
-    @disable_unmute_assignment = @assignment.muted && !@assignment.grades_published? && anonymous_moderated_marking_enabled?
-    respond_to do |format|
 
+    respond_to do |format|
       format.html do
-        rubric = @assignment&.rubric_association&.rubric
         @headers = false
         @outer_frame = true
         @anonymous_moderated_marking_enabled = anonymous_moderated_marking_enabled?
@@ -628,12 +606,13 @@ class GradebooksController < ApplicationController
           course_id: @context.id,
           assignment_id: @assignment.id,
           assignment_title: @assignment.title,
-          rubric: rubric ? rubric_json(rubric, @current_user, session, style: 'full') : nil,
-          nonScoringRubrics: @domain_root_account.feature_enabled?(:non_scoring_rubrics),
           can_comment_on_submission: @can_comment_on_submission,
           show_help_menu_item: show_help_link?,
           help_url: help_link_url
         }
+        if [:moderator, :provisional_grader].include?(grading_role)
+          env[:provisional_status_url] = api_v1_course_assignment_provisional_status_path(@context.id, @assignment.id)
+        end
         if grading_role == :moderator
           env[:provisional_copy_url] = api_v1_copy_to_final_mark_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
           env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
@@ -646,9 +625,7 @@ class GradebooksController < ApplicationController
         end
         append_sis_data(env)
         js_env(env)
-
-        anonymous_grading = @assignment.anonymous_grading? && @anonymous_moderated_marking_enabled
-        render :speed_grader, locals: { anonymous_grading: anonymous_grading }
+        render
       end
 
       format.json do

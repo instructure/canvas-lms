@@ -1273,23 +1273,6 @@ describe GradebooksController do
       expect(assigns[:submissions][0].submission_comments[0].attachments[0].display_name).to eql("doc.doc")
     end
 
-    it "stores attached files in instfs if instfs is enabled" do
-      allow(InstFS).to receive(:enabled?).and_return(true)
-      uuid = "1234-abcd"
-      allow(InstFS).to receive(:direct_upload).and_return(uuid)
-      user_session(@teacher)
-      @assignment = @course.assignments.create!(:title => "some assignment")
-      @student = @course.enroll_user(User.create!(:name => "some user"))
-      data = fixture_file_upload("docs/doc.doc", "application/msword", true)
-      post 'update_submission',
-        params: {:course_id => @course.id,
-        :attachments => { "0" => { :uploaded_data => data } },
-        :submission => { :comment => "some comment",
-                         :assignment_id => @assignment.id,
-                         :user_id => @student.user_id }}
-      expect(assigns[:submissions][0].submission_comments[0].attachments[0].instfs_uuid).to eql(uuid)
-    end
-
     it "does not allow updating submissions for concluded courses" do
       user_session(@teacher)
       @teacher_enrollment.complete
@@ -1463,47 +1446,6 @@ describe GradebooksController do
         expect(json[0]['submission']['submission_comments'].first['submission_comment']['comment']).to eq 'provisional!'
       end
     end
-
-    describe 'provisional grade error handling for Anonymous Moderated Marking' do
-      before(:once) do
-        course_with_student(active_all: true)
-        teacher_in_course(active_all: true)
-        @course.root_account.enable_feature!(:anonymous_moderated_marking)
-
-        @assignment = @course.assignments.create!(
-          title: 'yet another assignment',
-          moderated_grading: true,
-          grader_count: 1
-        )
-      end
-
-      let(:submission_params) do
-        { provisional: true, assignment_id: @assignment.id, user_id: @student.id, score: 1 }
-      end
-      let(:request_params) { {course_id: @course.id, submission: submission_params} }
-
-      let(:response_json) { JSON.parse(response.body) }
-
-      it 'returns an error code of MAX_GRADERS_REACHED if a MaxGradersReachedError is raised' do
-        @assignment.grade_student(@student, provisional: true, grade: 5, grader: @teacher)
-        @previous_teacher = @teacher
-
-        teacher_in_course(active_all: true)
-        user_session(@teacher)
-
-        post 'update_submission', params: request_params, format: :json
-        expect(response_json.dig('errors', 'error_code')).to eq 'MAX_GRADERS_REACHED'
-      end
-
-      it 'returns a generic error if a GradeError is raised' do
-        invalid_submission_params = submission_params.merge(excused: true)
-        invalid_request_params = request_params.merge(submission: invalid_submission_params)
-        user_session(@teacher)
-
-        post 'update_submission', params: invalid_request_params, format: :json
-        expect(response_json.dig('errors', 'base')).to be_present
-      end
-    end
   end
 
   describe "GET 'speed_grader'" do
@@ -1517,26 +1459,12 @@ describe GradebooksController do
       user_session(@teacher)
     end
 
-    it 'renders speed_grader template with locals' do
-      @assignment.publish
-      get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
-      expect(response).to render_template(:speed_grader, locals: { anonymous_grading: false })
-    end
-
     it "redirects the user if course's large_roster? setting is true" do
       allow_any_instance_of(Course).to receive(:large_roster?).and_return(true)
 
       get 'speed_grader', params: {:course_id => @course.id, :assignment_id => @assignment.id}
       expect(response).to be_redirect
       expect(flash[:notice]).to eq 'SpeedGrader is disabled for this course'
-    end
-
-    it "redirects if the assignment's moderated grader limit is reached" do
-      allow_any_instance_of(Assignment).to receive(:moderated_grader_limit_reached?).and_return(true)
-
-      get 'speed_grader', params: {:course_id => @course.id, :assignment_id => @assignment.id}
-      expect(response).to be_redirect
-      expect(flash[:notice]).to eq 'The maximum number of graders for this assignment has been reached.'
     end
 
     it "redirects if the assignment is unpublished" do
@@ -1562,30 +1490,6 @@ describe GradebooksController do
     it 'includes the grading_type in the js_env' do
       get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
       expect(assigns[:js_env][:grading_type]).to eq('percent')
-    end
-
-    it 'sets disable_unmute_assignment to false if the assignment is not muted' do
-      @assignment.update!(muted: false)
-      get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
-      expect(assigns[:disable_unmute_assignment]).to eq false
-    end
-
-    it 'sets disable_unmute_assignment to false if anonymous moderated marking is disabled' do
-      get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
-      expect(assigns[:disable_unmute_assignment]).to eq false
-    end
-
-    it 'sets disable_unmute_assignment to false if assignment grades have been published' do
-      @assignment.update!(grades_published_at: Time.zone.now)
-      get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
-      expect(assigns[:disable_unmute_assignment]).to eq false
-    end
-
-    it 'sets disable_unmute_assignment to true if assignment muted, anonymous moderated marking enabled, and grades not published' do
-      @assignment.update!(muted: true, grades_published_at: nil, moderated_grading: true, grader_count: 1)
-      @assignment.root_account.enable_feature!(:anonymous_moderated_marking)
-      get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
-      expect(assigns[:disable_unmute_assignment]).to eq true
     end
   end
 

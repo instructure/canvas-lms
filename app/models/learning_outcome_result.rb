@@ -67,8 +67,6 @@ class LearningOutcomeResult < ActiveRecord::Base
       self.association_object
     elsif self.artifact.is_a?(RubricAssessment)
       self.artifact.rubric_association.association_object
-    elsif self.association_object.is_a? Quizzes::Quiz
-      self.association_object.assignment
     else
       nil
     end

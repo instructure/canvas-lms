@@ -3356,6 +3356,7 @@ describe 'Submissions API', type: :request do
     @submission = Submission.first
 
     comment = @submission.submission_comments.first
+    expect(comment).to be_present
     expect(comment.comment).to eq "Why U no submit"
   end
 
@@ -3514,6 +3515,7 @@ describe 'Submissions API', type: :request do
             :assignment_id => @assignment.id.to_s, :user_id => s1.user_id.to_s },
           { :submission => { :posted_grade => '10' } })
     @submission = @assignment.submission_for_student(s1.user)
+    expect(@submission).to be_present
     expect(@submission.grade).to eq '10'
 
     # grading s2 will fail because the teacher can't manipulate this student's section
@@ -3616,8 +3618,9 @@ describe 'Submissions API', type: :request do
 
     it "works with section ids" do
       @section = @course.default_section
-      api_call(:post, "/api/v1/sections/#{@section.id}/assignments/#{@assignment.id}/submissions", { :controller => "submissions", :action => "create", :format => "json", :section_id => @section.id.to_s, :assignment_id => @assignment.id.to_s }, { :submission => { :submission_type => "online_url", :url => "www.example.com/a/b?q=1" }}, {}, expected_status: 201)
-      @submission = @assignment.submissions.find_by!(user: @user)
+      api_call(:post, "/api/v1/sections/#{@section.id}/assignments/#{@assignment.id}/submissions", { :controller => "submissions", :action => "create", :format => "json", :section_id => @section.id.to_s, :assignment_id => @assignment.id.to_s }, { :submission => { :submission_type => "online_url", :url => "www.example.com/a/b?q=1" } })
+      @submission = @assignment.submissions.where(user_id: @user).first
+      expect(@submission).to be_present
       expect(@submission.url).to eq 'http://www.example.com/a/b?q=1'
     end
 
@@ -3625,7 +3628,8 @@ describe 'Submissions API', type: :request do
       def do_submit(opts)
         json = api_call(:post, @url, @args, { :submission => opts })
         expect(response['Location']).to eq "http://www.example.com/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}"
-        @submission = @assignment.submissions.find_by!(user: @user)
+        @submission = @assignment.submissions.where(user_id: @user).first
+        expect(@submission).to be_present
         expect(json.slice('user_id', 'assignment_id', 'score', 'grade')).to eq({
           'user_id' => @user.id,
           'assignment_id' => @assignment.id,
@@ -3643,7 +3647,7 @@ describe 'Submissions API', type: :request do
 
       it "creates with an initial comment" do
         json = api_call(:post, @url, @args, { :comment => { :text_comment => "ohai teacher" }, :submission => { :submission_type => "online_url", :url => "http://www.example.com/a/b" } })
-        @submission = @assignment.submissions.where(user: @user).first
+        @submission = @assignment.submissions.where(user_id: @user).first
         expect(@submission.submission_comments.size).to eq 1
         expect(@submission.submission_comments.first.attributes.slice('author_id', 'comment')).to eq({
           'author_id' => @user.id,
@@ -4222,28 +4226,6 @@ describe 'Submissions API', type: :request do
       expect(json.map { |el| el['id'] }).to match_array([@student1.id, @student2.id])
     end
 
-    it "anonymizes student ids if anonymously grading" do
-      allow_any_instance_of(Assignment).to receive(:can_view_student_names?).and_return false
-      json = api_call_as_user(@ta, :get, @path, @params)
-      expect(json.map { |el| el['anonymous_id'] }).to match_array([
-        @assignment.submission_for_student(@student1).anonymous_id, @assignment.submission_for_student(@student2).anonymous_id
-      ])
-    end
-
-    it "returns default avatars if anonymously grading" do
-      allow_any_instance_of(Assignment).to receive(:can_view_student_names?).and_return false
-      json = api_call_as_user(@ta, :get, @path, @params)
-      expect(json.map { |el| el['avatar_image_url'] }).to match_array([User.default_avatar_fallback, User.default_avatar_fallback])
-    end
-
-    it "does not return identifiable attributes if anonymously grading" do
-      allow_any_instance_of(Assignment).to receive(:can_view_student_names?).and_return false
-      json = api_call_as_user(@ta, :get, @path, @params)
-      expect(json.map { |el| el['id'] }).to match_array([nil, nil])
-      expect(json.map { |el| el['display_name'] }).to match_array([nil, nil])
-      expect(json.map { |el| el['html_url'] }).to match_array([nil, nil])
-    end
-
     it "paginates" do
       json = api_call_as_user(@teacher, :get, @path + "?per_page=1", @params.merge(:per_page => '1'))
       expect(json.size).to eq 1
@@ -4261,28 +4243,6 @@ describe 'Submissions API', type: :request do
 
       it "requires :moderate_grades permission" do
         api_call_as_user(@ta, :get, @path, @params, {}, {}, { :expected_status => 401 })
-      end
-
-      context "when Anonymous Moderated Marking is enabled" do
-        before(:once) { @course.root_account.enable_feature!(:anonymous_moderated_marking) }
-
-        it "is unauthorized when the user is not the assigned final grader" do
-          api_call_as_user(@teacher, :get, @path, @params, {}, {}, expected_status: 401)
-        end
-
-        it "is unauthorized when the user is an account admin without 'Select Final Grade for Moderation' permission" do
-          @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :select_final_grade)
-          api_call_as_user(account_admin_user, :get, @path, @params, {}, {}, expected_status: 401)
-        end
-
-        it "is authorized when the user is the final grader" do
-          @assignment.update!(final_grader: @teacher, grader_count: 2)
-          api_call_as_user(@teacher, :get, @path, @params, {}, {}, expected_status: 200)
-        end
-
-        it "is authorized when the user is an account admin with 'Select Final Grade for Moderation' permission" do
-          api_call_as_user(account_admin_user, :get, @path, @params, {}, {}, expected_status: 200)
-        end
       end
 
       it "includes provisional grades with selections" do
@@ -4309,7 +4269,7 @@ describe 'Submissions API', type: :request do
                 "grade_matches_current_submission"=>true,
                 "graded_anonymously"=>nil,
                 "final"=>false,
-                "speedgrader_url"=>"http://www.example.com/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#%7B%22provisional_grade_id%22:#{pg.id},%22student_id%22:#{@student1.id}%7D"}]},
+                "speedgrader_url"=>"http://www.example.com/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#%7B%22student_id%22:#{@student1.id},%22provisional_grade_id%22:#{pg.id}%7D"}]},
            {"id"=>@student2.id,
             "display_name"=>"User",
             "avatar_image_url"=>"http://www.example.com/images/messages/avatar-50.png",
@@ -4318,39 +4278,6 @@ describe 'Submissions API', type: :request do
             "selected_provisional_grade_id"=>nil,
             "provisional_grades"=>[]}]
         )
-      end
-
-      it "anonymizes speedgrader_url if anonymously grading" do
-        sub = @assignment.grade_student(@student1, :score => 90, :grader => @ta, :provisional => true).first
-        pg = sub.provisional_grades.first
-        sel = @assignment.moderated_grading_selections.build
-        sel.student_id = @student1.id
-        sel.selected_provisional_grade_id = pg.id
-        sel.save!
-        allow_any_instance_of(Assignment).to receive(:can_view_student_names?).and_return false
-        json = api_call_as_user(@teacher, :get, @path, @params)
-        anonymous_id = @assignment.submission_for_student(@student1).anonymous_id
-        json = json.map { |el| el['provisional_grades'][0] }.compact
-        expect(json[0]['speedgrader_url']).to eq(
-          "http://www.example.com/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#%7B%22provisional_grade_id%22:#{pg.id},%22anonymous_id%22:%22#{anonymous_id}%22%7D"
-        )
-        expect(json[0]['scorer_id']).to eq @ta.id
-        expect(json[0]['anonymous_grader_id']).to be_nil
-      end
-
-      it "anonymizes scorer id of provisional grade if grading double blind" do
-        sub = @assignment.grade_student(@student1, :score => 90, :grader => @ta, :provisional => true).first
-        pg = sub.provisional_grades.first
-        sel = @assignment.moderated_grading_selections.build
-        sel.student_id = @student1.id
-        sel.selected_provisional_grade_id = pg.id
-        sel.save!
-        allow_any_instance_of(Assignment).to receive(:can_view_student_names?).and_return false
-        allow_any_instance_of(Assignment).to receive(:can_view_other_grader_identities?).and_return false
-        json = api_call_as_user(@teacher, :get, @path, @params)
-        json = json.map { |el| el['provisional_grades'][0] }.compact
-        expect(json[0]['anonymous_grader_id']).to eq @assignment.grader_ids_to_anonymous_ids[@ta.id.to_s]
-        expect(json[0]['scorer_id']).to be_nil
       end
     end
   end

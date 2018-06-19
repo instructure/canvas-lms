@@ -34,7 +34,6 @@ class WikiPage < ActiveRecord::Base
   include Plannable
   include DuplicatingObjects
   include SearchTermHelper
-  include LockedFor
 
   include MasterCourses::Restrictor
   restrict_columns :content, [:body, :title]
@@ -234,14 +233,13 @@ class WikiPage < ActiveRecord::Base
 
   scope :order_by_id, -> { order(:id) }
 
-  def low_level_locked_for?(user, opts={})
+  def locked_for?(user, opts={})
     return false unless self.could_be_locked
     Rails.cache.fetch([locked_cache_key(user), opts[:deep_check_if_needed]].cache_key, :expires_in => 1.minute) do
       locked = false
       if item = locked_by_module_item?(user, opts)
-        locked = {object: self, :module => item.context_module}
-        unlock_at = locked[:module].unlock_at
-        locked[:unlock_at] = unlock_at if unlock_at && unlock_at > Time.now.utc
+        locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
+        locked[:unlock_at] = locked[:context_module]["unlock_at"] if locked[:context_module]["unlock_at"] && locked[:context_module]["unlock_at"] > Time.now.utc
       end
       locked
     end

@@ -24,19 +24,19 @@ import React, { Component } from 'react'
 import { bool, node, string, func, shape, arrayOf, oneOf } from 'prop-types'
 import cx from 'classnames'
 
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
-import View from '@instructure/ui-layout/lib/components/View'
-import Avatar from '@instructure/ui-elements/lib/components/Avatar'
-import Badge from '@instructure/ui-elements/lib/components/Badge'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Button from '@instructure/ui-buttons/lib/components/Button'
+import Heading from '@instructure/ui-core/lib/components/Heading'
+import Checkbox from '@instructure/ui-core/lib/components/Checkbox'
+import Container from '@instructure/ui-core/lib/components/Container'
+import Avatar from '@instructure/ui-core/lib/components/Avatar'
+import Badge from '@instructure/ui-core/lib/components/Badge'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import Text from '@instructure/ui-core/lib/components/Text'
+import Button from '@instructure/ui-core/lib/components/Button'
 import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
-import IconMore from '@instructure/ui-icons/lib/Line/IconMore'
+import IconMore from 'instructure-icons/lib/Line/IconMoreLine'
 
-import IconDragHandleLine from '@instructure/ui-icons/lib/Line/IconDragHandle'
-import IconPeerReviewLine from '@instructure/ui-icons/lib/Line/IconPeerReview'
+import IconDragHandleLine from 'instructure-icons/lib/Line/IconDragHandleLine'
+import IconPeerReviewLine from 'instructure-icons/lib/Line/IconPeerReviewLine'
 import LockIconView from 'compiled/views/LockIconView'
 import { author as authorShape } from '../proptypes/user'
 import masterCourseDataShape from '../proptypes/masterCourseData'
@@ -206,13 +206,13 @@ export default class CourseItemRow extends Component {
         </div>)}
         {
           !this.props.isRead ? (
-            <View display="block" margin="0 medium 0 0">
+            <Container display="block" margin="0 medium 0 0">
               <Badge margin="0 0 0 0" standalone type="notification" />
-            </View>
+            </Container>
           ) : this.props.hasReadBadge ? (
-            <View display="block" margin="0 small 0 0">
-              <View display="block" margin="0 medium 0 0" />
-            </View>
+            <Container display="block" margin="0 small 0 0">
+              <Container display="block" margin="0 medium 0 0" />
+            </Container>
           ) : null
         }
         {this.props.icon}

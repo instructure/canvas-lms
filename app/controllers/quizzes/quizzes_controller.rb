@@ -475,10 +475,7 @@ class Quizzes::QuizzesController < ApplicationController
               @quiz.assignment.save
             end
 
-            unless overrides.nil?
-              update_quiz_and_assignment_versions(@quiz, prepared_batch) # to prevent undoing Quiz#link_assignment_overrides
-              perform_batch_update_assignment_overrides(@quiz, prepared_batch)
-            end
+            perform_batch_update_assignment_overrides(@quiz, prepared_batch) unless overrides.nil?
 
             # quiz.rb restricts all assignment broadcasts if notify_of_update is
             # false, so we do the same here
@@ -497,7 +494,7 @@ class Quizzes::QuizzesController < ApplicationController
           end
         end
 
-        if @quiz.assignment && (@overrides_affected.to_i > 0 || cached_due_dates_changed)
+        if @overrides_affected.to_i > 0 || cached_due_dates_changed
           DueDateCacher.recompute(@quiz.assignment, update_grades: true)
         end
 
@@ -1007,12 +1004,5 @@ class Quizzes::QuizzesController < ApplicationController
 
   def get_quiz_params
     params[:quiz] ? params[:quiz].permit(API_ALLOWED_QUIZ_INPUT_FIELDS[:only]) : {}
-  end
-
-  def update_quiz_and_assignment_versions(quiz, prepared_batch)
-    params = { quiz_id: quiz.id, quiz_version: quiz.version_number,
-               assignment_id: quiz.assignment_id, assignment_version: quiz.assignment&.version_number }
-    prepared_batch[:overrides_to_create].each { |override| override.assign_attributes(params) }
-    prepared_batch[:overrides_to_update].each { |override| override.assign_attributes(params) }
   end
 end

@@ -44,7 +44,7 @@ export default class AssignmentMuterDialogManager {
     if (
       this.assignment.muted &&
       this.anonymousModeratedMarkingEnabled &&
-      this.assignment.moderated_grading
+      this.assignment.anonymous_grading
     ) {
       return this.assignment.grades_published
     }

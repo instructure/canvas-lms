@@ -17,19 +17,19 @@
  */
 
 import React from 'react';
-import Button from '@instructure/ui-buttons/lib/components/Button';
-import Link from '@instructure/ui-elements/lib/components/Link';
-import Text from '@instructure/ui-elements/lib/components/Text';
-import List from '@instructure/ui-elements/lib/components/List';
-import ListItem from '@instructure/ui-elements/lib/components/List/ListItem';
-import AssignmentIcon from '@instructure/ui-icons/lib/Line/IconAssignment';
-import QuizIcon from '@instructure/ui-icons/lib/Line/IconQuiz';
-import AnnouncementIcon from '@instructure/ui-icons/lib/Line/IconAnnouncement';
-import DiscussionIcon from '@instructure/ui-icons/lib/Line/IconDiscussion';
-import NoteIcon from '@instructure/ui-icons/lib/Line/IconNoteLight';
-import CalendarIcon from '@instructure/ui-icons/lib/Line/IconCalendarMonth';
-import PageIcon from '@instructure/ui-icons/lib/Line/IconMsWord';
-import XIcon from '@instructure/ui-icons/lib/Line/IconDiscussionX';
+import Button from '@instructure/ui-core/lib/components/Button';
+import Link from '@instructure/ui-core/lib/components/Link';
+import Text from '@instructure/ui-core/lib/components/Text';
+import List from '@instructure/ui-core/lib/components/List';
+import ListItem from '@instructure/ui-core/lib/components/List/ListItem';
+import AssignmentIcon from 'instructure-icons/lib/Line/IconAssignmentLine';
+import QuizIcon from 'instructure-icons/lib/Line/IconQuizLine';
+import AnnouncementIcon from 'instructure-icons/lib/Line/IconAnnouncementLine';
+import DiscussionIcon from 'instructure-icons/lib/Line/IconDiscussionLine';
+import NoteIcon from 'instructure-icons/lib/Line/IconNoteLightLine';
+import CalendarIcon from 'instructure-icons/lib/Line/IconCalendarMonthLine';
+import PageIcon from 'instructure-icons/lib/Line/IconMsWordLine';
+import XIcon from 'instructure-icons/lib/Line/IconDiscussionXLine';
 import I18n from 'i18n!todo_sidebar';
 import { func, object, arrayOf, number, string } from 'prop-types';
 import tz from 'timezone_core';

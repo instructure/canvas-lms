@@ -18,9 +18,16 @@
 
 class BackfillHidePointsAndHiddenToLearningOutcomeResults < ActiveRecord::Migration[5.1]
   tag :postdeploy
-  disable_ddl_transaction!
 
   def up
-    DataFixup::BackfillNulls.run(LearningOutcomeResult, [:hide_points, :hidden], default_value: false)
+    DataFixup::BackfillNulls.send_later_if_production_enqueue_args(
+      :run,
+      {priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups'},
+      LearningOutcomeResult,
+      {
+        hide_points: false,
+        hidden: false
+      }
+    )
   end
 end

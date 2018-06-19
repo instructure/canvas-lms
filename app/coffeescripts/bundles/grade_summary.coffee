@@ -19,17 +19,14 @@ require [
   'jquery'
   'underscore'
   'Backbone'
-  'react'
-  'react-dom'
   '../userSettings'
   '../collections/OutcomeSummaryCollection'
   '../views/grade_summary/OutcomeSummaryView'
-  '../views/grade_summary/IndividualStudentView'
   'jsx/grading/GradeSummary'
   'jqueryui/tabs'
   'jquery.disableWhileLoading'
-], ($, _, Backbone, React, ReactDOM, userSettings, OutcomeSummaryCollection,
-  OutcomeSummaryView, IndividualStudentView, GradeSummary) ->
+], ($, _, Backbone, userSettings, OutcomeSummaryCollection,
+  OutcomeSummaryView, GradeSummary) ->
   # Ensure the gradebook summary code has had a chance to setup all its handlers
   GradeSummary.setup()
 
@@ -44,18 +41,11 @@ require [
 
       course_id = ENV.context_asset_string.replace('course_', '')
       user_id = ENV.student_id
-
-      if ENV.non_scoring_rubrics_enabled
-        @outcomeView = new IndividualStudentView
-          el: $('#outcomes'),
-          course_id: course_id,
-          student_id: user_id
-      else
-        @outcomes = new OutcomeSummaryCollection([], course_id: course_id, user_id: user_id)
-        @outcomeView = new OutcomeSummaryView
-          el: $('#outcomes'),
-          collection: @outcomes,
-          toggles: $('.outcome-toggles')
+      @outcomes = new OutcomeSummaryCollection([], course_id: course_id, user_id: user_id)
+      @outcomeView = new OutcomeSummaryView
+        el: $('#outcomes'),
+        collection: @outcomes,
+        toggles: $('.outcome-toggles')
 
     tab: (tab, path) ->
       if tab != 'outcomes' && tab != 'assignments'

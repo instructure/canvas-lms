@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {shallow} from 'enzyme'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-addons-test-utils'
@@ -25,17 +24,13 @@ import Header from 'jsx/assignments/ModerationHeader'
 QUnit.module('ModerationHeader', {
   setup() {
     this.props = {
-      anonymousModeratedMarkingEnabled: false,
-      muted: false,
       onPublishClick() {},
       onReviewClick() {},
-      onUnmuteClick() {},
       published: false,
       selectedStudentCount: 0,
       inflightAction: {
         review: false,
-        publish: false,
-        unmute: false
+        publish: false
       },
       permissions: {editGrades: true}
     }
@@ -143,86 +138,4 @@ test('show information message when published', function() {
   const message = TestUtils.findRenderedDOMComponentWithClass(header, 'ic-notification')
   ok(message, 'found the flash messge')
   ReactDOM.unmountComponentAtNode(headerNode.parentNode)
-})
-
-QUnit.module('ModerationHeader#unmuteAssignmentButton', (hooks) => {
-  let props
-  let renderHeader
-  let wrapper
-  let unmuteButtonSelector
-
-  hooks.beforeEach(() => {
-    props = {
-      anonymousModeratedMarkingEnabled: true,
-      muted: true,
-      onPublishClick() {},
-      onReviewClick() {},
-      onUnmuteClick() {},
-      published: false,
-      selectedStudentCount: 0,
-      inflightAction: {
-        review: false,
-        publish: false,
-        unmute: false
-      },
-      permissions: {editGrades: true}
-    }
-
-    renderHeader = () => {
-      wrapper = shallow(<Header {...props} />)
-    }
-
-    unmuteButtonSelector = '.ModeratedGrading__Header-UnmuteBtn'
-  })
-
-  hooks.afterEach(() => {
-    wrapper.unmount()
-  })
-
-  test('renders the unmute button if Anonymous Moderated Marking is enabled', () => {
-    renderHeader()
-    strictEqual(wrapper.find(unmuteButtonSelector).exists(), true)
-  })
-
-  test('does not render the unmute button if Anonymous Moderated Marking is not enabled', () => {
-    props.anonymousModeratedMarkingEnabled = false
-
-    renderHeader()
-    strictEqual(wrapper.find(unmuteButtonSelector).exists(), false)
-  })
-
-  test('enables the unmute button if the assignment is published and muted', () => {
-    props.published = true
-    props.muted = true
-
-    renderHeader()
-    strictEqual(wrapper.find(unmuteButtonSelector).prop('disabled'), false)
-  })
-
-  test('disables the unmute button if the assignment is not published', () => {
-    props.published = false
-
-    renderHeader()
-    strictEqual(wrapper.find(unmuteButtonSelector).prop('disabled'), true)
-  })
-
-  test('disables the unmute button if the assignment is published but not muted', () => {
-    props.published = true
-    props.muted = false
-
-    renderHeader()
-    strictEqual(wrapper.find(unmuteButtonSelector).prop('disabled'), true)
-  })
-
-  test('disables the unmute button if the unmute action is in flight', () => {
-    props.inflightAction.unmute = true
-
-    renderHeader()
-    strictEqual(wrapper.find(unmuteButtonSelector).prop('disabled'), true)
-  })
-
-  test('has the text "Display to Students"', () => {
-    renderHeader()
-    strictEqual(wrapper.find(unmuteButtonSelector).first().text(), 'Display to Students')
-  })
 })

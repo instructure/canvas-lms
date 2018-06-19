@@ -40,10 +40,9 @@ describe "Api::V1::ObserverAlertThreshold" do
 
     it "returns json" do
       json = api.observer_alert_threshold_json(observer_alert_threshold, user, session)
-      expect(json['alert_type']).to eq('course_announcement')
+      expect(json['alert_type']).to eq('value for type')
       expect(json['workflow_state']).to eq('active')
-      expect(json['user_id']).to eq @student.id
-      expect(json['observer_id']).to eq @observer.id
+      expect(json['user_observation_link_id']).to eq @observation_link.id
     end
   end
 end

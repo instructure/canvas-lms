@@ -52,10 +52,14 @@ describe Login::CasController do
 
     session[:cas_session] = cas_ticket
     session[:login_aac] = Account.default.authentication_providers.first.id
+    @pseudonym.claim_cas_ticket(cas_ticket)
 
     post :destroy, params: {logoutRequest: request_text}
     expect(response.status).to eq 200
- end
+
+    post :destroy, params: {logoutRequest: request_text}
+    expect(response.status).to eq 404
+  end
 
   it "should accept extra attributes" do
     account = account_with_cas(account: Account.default)

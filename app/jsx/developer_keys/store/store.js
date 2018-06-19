@@ -16,24 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createStore, applyMiddleware, combineReducers} from 'redux'
+import { createStore, applyMiddleware, combineReducers } from 'redux'
 import ReduxThunk from 'redux-thunk'
 import listDeveloperKeysReducer from '../reducers/listDeveloperKeysReducer'
-import deactivateDeveloperKeyReducer from '../reducers/deactivateReducer'
-import activateDeveloperKeyReducer from '../reducers/activateReducer'
-import deleteDeveloperKeyReducer from '../reducers/deleteReducer'
-import createOrEditDeveloperKeyReducer from '../reducers/createOrEditReducer'
-import makeVisibleDeveloperKeyReducer from '../reducers/makeVisibleReducer'
-import makeInvisibleDeveloperKeyReducer from '../reducers/makeInvisibleReducer'
-import listDeveloperKeyScopesReducer from '../reducers/listScopesReducer'
+import deactivateDeveloperKeyReducer from '../reducers/deactivateDeveloperKeyReducer'
+import activateDeveloperKeyReducer from '../reducers/activateDeveloperKeyReducer'
+import deleteDeveloperKeyReducer from '../reducers/deleteDeveloperKeyReducer'
+import createOrEditDeveloperKeyReducer from '../reducers/createOrEditDeveloperKeyReducer'
+import makeVisibleDeveloperKeyReducer from '../reducers/makeVisibleDeveloperKeyReducer'
+import makeInvisibleDeveloperKeyReducer from '../reducers/makeInvisibleDeveloperKeyReducer'
 
-const middleware = [
-  ReduxThunk,
-
-  // this is so redux-logger is not included in the production webpack bundle
-  (process.env.NODE_ENV !== 'production') && require('redux-logger')() // eslint-disable-line global-require
-].filter(Boolean)
-const createStoreWithMiddleware = applyMiddleware(...middleware)(createStore)
+const createStoreWithMiddleware = applyMiddleware(
+  ReduxThunk
+)(createStore);
 
 const developerKeysReducer = combineReducers({
   listDeveloperKeys: listDeveloperKeysReducer,
@@ -42,8 +37,7 @@ const developerKeysReducer = combineReducers({
   deleteDeveloperKey: deleteDeveloperKeyReducer,
   createOrEditDeveloperKey: createOrEditDeveloperKeyReducer,
   makeVisibleDeveloperKey: makeVisibleDeveloperKeyReducer,
-  makeInvisibleDeveloperKey: makeInvisibleDeveloperKeyReducer,
-  listDeveloperKeyScopes: listDeveloperKeyScopesReducer
-})
+  makeInvisibleDeveloperKey: makeInvisibleDeveloperKeyReducer
+});
 
 export default createStoreWithMiddleware(developerKeysReducer)

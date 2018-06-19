@@ -18,15 +18,7 @@
 import React from 'react';
 import { shallow, mount } from 'enzyme';
 import { PlannerHeader } from '../index';
-import moment from "moment-timezone";
-import sinon from 'sinon';
 
-const TZ = 'America/Denver';
-const plannerDays = [
-  moment("2018-03-01T14:00:42Z").tz(TZ),
-  moment("2018-03-02T14:00:42Z").tz(TZ),
-  moment("2018-03-03T14:00:42Z").tz(TZ)
-];
 
 function defaultProps (options) {
   return {
@@ -35,21 +27,17 @@ function defaultProps (options) {
       items: [{id: "1", course_id: "1", due_at: "2017-03-09T20:40:35Z", html_url: "http://www.non_default_url.com", name: "learning object title"}],
       nextUrl: null
     },
-    days: plannerDays.map(d => [d.format('YYYY-MM-DD'), [{dateBucketMoment: d}]]),
     getInitialOpportunities: () => {},
     getNextOpportunities: () => {},
     savePlannerItem: () => {},
     locale: 'en',
-    timeZone: TZ,
+    timeZone: 'America/Denver',
     deletePlannerItem: () => {},
     dismissOpportunity: () => {},
     clearUpdateTodo: () => {},
     startLoadingGradesSaga: () => {},
     ariaHideElement: document.createElement('div'),
-    stickyZIndex: 3,
-    firstNewActivityDate: null,
     loading: {
-      isLoading: false,
       allPastItemsLoaded: false,
       allFutureItemsLoaded: false,
       allOpportunitiesLoaded: false,
@@ -61,10 +49,8 @@ function defaultProps (options) {
       loadingGrades: false,
       gradesLoaded: false,
     },
-    ui: {
-      naiAboveScreen: false
-    },
     todo: {
+      updateTodoItem: null
     },
     ...options,
   };
@@ -151,6 +137,16 @@ it('renders the tray with the name of an existing item when provided', () => {
   expect(findEditTray(wrapper).prop('label')).toBe('Edit abc');
 });
 
+it('calls clearUpdateTodo when closing the tray', () => {
+  const fakeClearFunc = jest.fn();
+  const wrapper = mount(
+    <PlannerHeader {...defaultProps()} clearUpdateTodo={fakeClearFunc} />
+  );
+  wrapper.instance().toggleUpdateItemTray();
+  wrapper.instance().noteBtnOnClose();
+  expect(fakeClearFunc).toHaveBeenCalled();
+});
+
 it('does not call getNextOpportunities when component has 12 opportunities', () => {
   const mockDispatch = jest.fn();
   const props = defaultProps();
@@ -176,7 +172,6 @@ it('does not call getNextOpportunities when component has 12 opportunities', () 
   ];
 
   props.loading = {
-    isLoading: false,
     allPastItemsLoaded: false,
     allFutureItemsLoaded: false,
     allOpportunitiesLoaded: false,
@@ -355,13 +350,12 @@ it('sets the maxHeight on the Opportunities', () => {
   expect(wrapper.find('Animatable(Opportunities)').prop('maxHeight')).toEqual(640);
 });
 
-it('opens the tray when it gets an updateTodoItem prop', () => {
+it('leaves the tray in current open state when receiving new empty todo props', () => {
   const wrapper = shallow(
     <PlannerHeader {...defaultProps()} />
   );
-
-  expect(findEditTray(wrapper).prop('open')).toBe(false);
-  wrapper.setProps({...defaultProps({todo: {updateTodoItem: {}}})});
+  wrapper.instance().toggleUpdateItemTray();
+  wrapper.setProps({...defaultProps({todo: {}})});
   expect(findEditTray(wrapper).prop('open')).toBe(true);
 });
 
@@ -407,96 +401,4 @@ it('does not start the grades saga when grades have been loaded', () => {
   const wrapper = shallow(<PlannerHeader {...props} />);
   wrapper.instance().toggleGradesTray();
   expect(props.startLoadingGradesSaga).not.toHaveBeenCalled();
-});
-
-describe('new activity button', () => {
-  let spy;
-
-  beforeEach(() => {
-    spy = sinon.stub(PlannerHeader.prototype, 'newActivityAboveView');
-  });
-
-  afterEach(() => {
-    spy.reset();
-    spy.restore();
-  });
-
-  it('does not show when there is no new activity', () => {
-    spy.returns(false);
-    const wrapper = shallow(<PlannerHeader {...defaultProps()} />);
-    expect(wrapper).toMatchSnapshot();
-    expect(spy.calledOnce).toEqual(true);
-  });
-
-  it('shows when there is new activity', () => {
-    spy.returns(true);
-    const wrapper = shallow(<PlannerHeader {...defaultProps()} />);
-    expect(wrapper).toMatchSnapshot();
-    expect(spy.calledOnce).toEqual(true);
-  });
-});
-
-describe('decision to show new activity indicator', () => {
-
-  it('is false while data is loading', () => {
-    const props = defaultProps();
-    props.loading.isLoading = true;
-    const wrapper = shallow(<PlannerHeader {...props} />);
-    expect(wrapper.instance().newActivityAboveView()).toEqual(false);
-  });
-
-  it('is false when there are no planner items', () => {
-    const props = defaultProps();
-    props.days = [];
-    props.loading.isLoading = false;
-    const wrapper = shallow(<PlannerHeader {...props} />);
-    expect(wrapper.instance().newActivityAboveView()).toEqual(false);
-  });
-
-  it('is false when first activity date is unknown', () => {
-    const props = defaultProps();
-    props.loading.isLoading = false;
-    props.firstNewActivityDate = undefined;
-    const wrapper = shallow(<PlannerHeader {...props} />);
-    expect(wrapper.instance().newActivityAboveView()).toEqual(false);
-  });
-
-  it('is false when the newest activity is already on or below the viewport', () => {
-    const props = defaultProps();
-    props.loading.isLoading = false;
-    props.firstNewActivityDate = plannerDays[0];
-    props.ui.naiAboveScreen = false;
-    const wrapper = shallow(<PlannerHeader {...props} />);
-    expect(wrapper.instance().newActivityAboveView()).toEqual(false);
-  });
-
-    it('is true when there is new activity still to be loaded from the past', () => {
-    const props = defaultProps();
-    props.loading.isLoading = false;
-    props.firstNewActivityDate = moment(plannerDays[0]);
-    props.firstNewActivityDate.subtract(5, 'days');
-    props.ui.naiAboveScreen = false;
-    const wrapper = shallow(<PlannerHeader {...props} />);
-    expect(wrapper.instance().newActivityAboveView()).toEqual(true);
-  });
-
-  it('is true when a new activity is above the viewport', () => {
-    const props = defaultProps();
-    props.loading.isLoading = false;
-    props.firstNewActivityDate = plannerDays[0];
-    props.ui.naiAboveScreen = true;
-    const wrapper = shallow(<PlannerHeader {...props} />);
-    expect(wrapper.instance().newActivityAboveView()).toEqual(true);
-  });
-
-  it('is true when there is new activity but no current items', () => {
-    const props = defaultProps();
-    props.days = [];
-    props.loading.isLoading = false;
-    props.firstNewActivityDate = plannerDays[0];
-    props.ui.naiAboveScreen = true;
-    const wrapper = shallow(<PlannerHeader {...props} />);
-    expect(wrapper.instance().newActivityAboveView()).toEqual(true);
-  });
-
 });

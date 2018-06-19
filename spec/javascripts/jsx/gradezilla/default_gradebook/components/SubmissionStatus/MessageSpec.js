@@ -19,8 +19,8 @@
 import React from 'react'
 import {shallow} from 'enzyme'
 import Text from '@instructure/ui-core/lib/components/Text'
-import IconWarningLine from '@instructure/ui-icons/lib/Line/IconWarning'
-import IconInfoLine from '@instructure/ui-icons/lib/Line/IconInfo'
+import IconWarningLine from 'instructure-icons/lib/Line/IconWarningLine'
+import IconInfoLine from 'instructure-icons/lib/Line/IconInfoLine'
 import Message from 'jsx/gradezilla/default_gradebook/components/SubmissionStatus/Message'
 
 QUnit.module('Message', () => {

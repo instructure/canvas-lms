@@ -1352,11 +1352,11 @@ describe ExternalToolsController do
     before do
       allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
       allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
-      user_session(@user)
     end
 
     it "generates a sessionless launch" do
       @tool = new_valid_tool(@course)
+      user_session(@user)
 
       get :generate_sessionless_launch, params: {:course_id => @course.id, id: @tool.id}
 
@@ -1377,6 +1377,7 @@ describe ExternalToolsController do
 
     it "strips query param from launch_url before signing, attaches to post body, and removes query params in url for launch" do
       @tool = new_valid_tool(@course, { url: 'http://www.example.com/basic_lti?tripping', post_only: true })
+      user_session(@user)
 
       get :generate_sessionless_launch, params: {:course_id => @course.id, id: @tool.id}
 
@@ -1393,6 +1394,7 @@ describe ExternalToolsController do
 
     it "generates a sessionless launch for an external tool assignment" do
       tool = new_valid_tool(@course)
+      user_session(@user)
       assignment_model(:course => @course,
                        :name => 'tool assignment',
                        :submission_types => 'external_tool',
@@ -1420,6 +1422,7 @@ describe ExternalToolsController do
     end
 
     it "requires context_module_id for module_item launch type" do
+      user_session(@user)
       @tool = new_valid_tool(@course)
       @cm = ContextModule.create(context: @course)
       @tg = ContentTag.create(context: @course,
@@ -1437,6 +1440,7 @@ describe ExternalToolsController do
     end
 
     it "Sets the correct resource_link_id for module items when module_item_id is provided" do
+      user_session(@user)
       @tool = new_valid_tool(@course)
       @cm = ContextModule.create(context: @course)
       @tg = ContentTag.create(context: @course,
@@ -1465,6 +1469,7 @@ describe ExternalToolsController do
     end
 
     it 'makes the module item available for variable expansions' do
+      user_session(@user)
       @tool = new_valid_tool(@course)
       @tool.settings[:custom_fields] = {'standard' => '$Canvas.moduleItem.id'}
       @tool.save!
@@ -1490,24 +1495,6 @@ describe ExternalToolsController do
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
       expect(launch_settings.dig('tool_settings', 'custom_standard')).to eq @tg.id.to_s
     end
-
-    it 'redirects if there is no matching tool for the launch_url, and tool id' do
-      params = {course_id: @course.id, url: 'http://my_non_esisting_tool_domain.com', id: -1}
-      expect(get :generate_sessionless_launch, params: params).to redirect_to course_url(@course)
-    end
-
-    it 'redirects if there is no matching tool for the and tool id' do
-      params = {:course_id => @course.id, id: -1}
-      expect(get :generate_sessionless_launch, params: params).to redirect_to course_url(@course)
-    end
-
-    it 'redirects if there is no launch url associated with the tool' do
-      no_url_tool = new_valid_tool(@course)
-      no_url_tool.update_attributes!(url: nil)
-      params = {:course_id => @course.id, id: no_url_tool.id}
-      expect(get :generate_sessionless_launch, params: params).to redirect_to course_url(@course)
-    end
-
   end
 
   def opaque_id(asset)

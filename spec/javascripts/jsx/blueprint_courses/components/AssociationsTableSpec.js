@@ -20,7 +20,7 @@ import React from 'react'
 import * as enzyme from 'enzyme'
 import AssociationsTable from 'jsx/blueprint_courses/components/AssociationsTable'
 import FocusManager from 'jsx/blueprint_courses/focusManager'
-import getSampleData from '../getSampleData'
+import data from '../sampleData'
 
 QUnit.module('AssociationsTable component')
 
@@ -28,7 +28,7 @@ const focusManager = new FocusManager()
 focusManager.before = document.body
 
 const defaultProps = () => ({
-  existingAssociations: getSampleData().courses,
+  existingAssociations: data.courses,
   addedAssociations: [],
   removedAssociations: [],
   onRemoveAssociations: () => {},

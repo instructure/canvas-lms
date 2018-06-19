@@ -20,32 +20,32 @@ import actions from 'jsx/blueprint_courses/actions'
 import reducer from 'jsx/blueprint_courses/reducer'
 import MigrationStates from 'jsx/blueprint_courses/migrationStates'
 import LoadStates from 'jsx/blueprint_courses/loadStates'
-import getSampleData from './getSampleData'
+import sampleData from './sampleData'
 
 QUnit.module('Blueprint Courses reducer')
 
 const reduce = (action, state = {}) => reducer(state, action)
 
 test('sets courses on LOAD_COURSES_SUCCESS', () => {
-  const newState = reduce(actions.loadCoursesSuccess(getSampleData().courses))
-  deepEqual(newState.courses, getSampleData().courses)
+  const newState = reduce(actions.loadCoursesSuccess(sampleData.courses))
+  deepEqual(newState.courses, sampleData.courses)
 })
 
 test('sets existingAssociations on LOAD_LISTINGS_SUCCESS', () => {
-  const newState = reduce(actions.loadAssociationsSuccess(getSampleData().courses))
-  deepEqual(newState.existingAssociations, getSampleData().courses)
+  const newState = reduce(actions.loadAssociationsSuccess(sampleData.courses))
+  deepEqual(newState.existingAssociations, sampleData.courses)
 })
 
 test('adds associations to existingAssociations on SAVE_ASSOCIATIONS_SUCCESS', () => {
-  const existing = [getSampleData().courses[0]]
-  const added = [getSampleData().courses[1]]
+  const existing = [sampleData.courses[0]]
+  const added = [sampleData.courses[1]]
   const newState = reduce(actions.saveAssociationsSuccess({ added }), { existingAssociations: existing })
-  deepEqual(newState.existingAssociations, getSampleData().courses)
+  deepEqual(newState.existingAssociations, sampleData.courses)
 })
 
 test('removes associations froms existingAssociations on SAVE_ASSOCIATIONS_SUCCESS', () => {
-  const newState = reduce(actions.saveAssociationsSuccess({ removed: [{id: '1'}] }), { existingAssociations: getSampleData().courses })
-  deepEqual(newState.existingAssociations, [getSampleData().courses[1]])
+  const newState = reduce(actions.saveAssociationsSuccess({ removed: [{id: '1'}] }), { existingAssociations: sampleData.courses })
+  deepEqual(newState.existingAssociations, [sampleData.courses[1]])
 })
 
 test('resets addedAssociations on SAVE_ASSOCIATIONS_SUCCESS', () => {
@@ -59,15 +59,15 @@ test('resets addedAssociations on CLEAR_ASSOCIATIONS', () => {
 })
 
 test('adds associations to addedAssociations on ADD_COURSE_ASSOCIATIONS', () => {
-  const existing = [getSampleData().courses[0]]
-  const added = [getSampleData().courses[1]]
+  const existing = [sampleData.courses[0]]
+  const added = [sampleData.courses[1]]
   const newState = reduce(actions.addCourseAssociations(added), { addedAssociations: existing })
-  deepEqual(newState.addedAssociations, getSampleData().courses)
+  deepEqual(newState.addedAssociations, sampleData.courses)
 })
 
 test('removes associations from addedAssociations on UNDO_ADD_COURSE_ASSOCIATIONS', () => {
-  const newState = reduce(actions.undoAddCourseAssociations(['1']), { addedAssociations: getSampleData().courses })
-  deepEqual(newState.addedAssociations, [getSampleData().courses[1]])
+  const newState = reduce(actions.undoAddCourseAssociations(['1']), { addedAssociations: sampleData.courses })
+  deepEqual(newState.addedAssociations, [sampleData.courses[1]])
 })
 
 test('resets removedAssociations on CLEAR_ASSOCIATIONS', () => {
@@ -243,8 +243,8 @@ test('sets hasLoadedUnsyncedChanges to true on LOAD_UNSYNCED_CHANGES_SUCCESS', (
 })
 
 test('sets unsyncedChanges on LOAD_UNSYNCED_CHANGES_SUCCESS', () => {
-  const newState = reduce(actions.loadUnsyncedChangesSuccess(getSampleData().unsyncedChanges))
-  deepEqual(newState.unsyncedChanges, getSampleData().unsyncedChanges)
+  const newState = reduce(actions.loadUnsyncedChangesSuccess(sampleData.unsyncedChanges))
+  deepEqual(newState.unsyncedChanges, sampleData.unsyncedChanges)
 })
 
 test('sets willSendNotification on ENABLE_SEND_NOTIFICATION', () => {

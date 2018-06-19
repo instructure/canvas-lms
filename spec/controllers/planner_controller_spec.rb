@@ -45,17 +45,6 @@ describe PlannerController do
     end
   end
 
-  context "feature disabled" do
-    before :each do
-      user_session(@student)
-    end
-
-    it "should return forbidden" do
-      get :index
-      assert_forbidden
-    end
-  end
-
   context "as student" do
     before :each do
       user_session(@student)
@@ -198,98 +187,33 @@ describe PlannerController do
         end
       end
 
-      context "with context codes" do
+      context "only_favorites" do
         before :once do
-          @course1 = course_with_student(active_all: true).course
-          @course2 = course_with_student(active_all: true, user: @student).course
-          group_category(context: @course1)
-          @group = @group_category.groups.create!(context: @course1)
-          @group.add_user(@student, 'accepted')
-          @assignment1 = assignment_model(course: @course1, due_at: 1.day.from_now)
-          @assignment2 = assignment_model(course: @course2, due_at: 1.day.from_now)
-          @group_assignment = @course1.assignments.create!(group_category: @group_category, due_at: 1.day.from_now)
-          @course_topic = discussion_topic_model(context: @course1, todo_date: 1.day.from_now)
-          @group_topic = discussion_topic_model(context: @group, todo_date: 1.day.from_now)
-          @course_page = wiki_page_model(course: @course1, todo_date: 1.day.from_now)
-          @group_page = wiki_page_model(todo_date: 1.day.from_now, course: @group)
-          @assignment3 = assignment_model(course: @course1, due_at: Time.zone.now, only_visible_to_overrides: true)
-          create_adhoc_override_for_assignment(@assignment3, @student, {due_at: 2.days.ago})
-          @quiz = @course1.quizzes.create!(quiz_type: 'practice_quiz', due_at: 1.day.from_now).publish!
-          create_adhoc_override_for_assignment(@quiz, @student, {due_at: 2.days.ago})
-          @user_note = planner_note_model(user: @student, todo_date: 1.day.ago)
-          @course1_note = planner_note_model(user: @student, todo_date: 1.day.from_now, course: @course1)
-          @course2_note = planner_note_model(user: @student, todo_date: 1.day.from_now, course: @course2)
-          @course1_event = @course1.calendar_events.create!(title: "Course 1 event", start_at: 1.minute.from_now, end_at: 1.hour.from_now)
-          @course2_event = @course2.calendar_events.create!(title: "Course 2 event", start_at: 1.minute.from_now, end_at: 1.hour.from_now)
-          @group_event = @group.calendar_events.create!(title: "Group event", start_at: 1.minute.from_now, end_at: 1.hour.from_now)
-          @user_event = @user.calendar_events.create!(title: "User event", start_at: 1.minute.from_now, end_at: 1.hour.from_now)
+          @u = User.create!
+
+          @c1 = course_with_student(:active_all => true, :user => @u).course
+          @u.favorites.create!(:context_type => "Course", :context_id => @c1)
+          @a1 = course_assignment
+
+          @c2 = course_with_student(:active_all => true, :user => @u).course
+          @u.favorites.where(:context_type => "Course", :context_id => @c2).first.destroy
+          @a2 = course_assignment
         end
 
         before :each do
-          user_session(@student)
+          user_session(@u)
         end
 
-        it "should include all data by default" do
-          get :index, params: {per_page: 50}
+        it "should include all course data by default" do
+          get :index
           response_json = json_parse(response.body)
-          expect(response_json.length).to be 16
+          expect(response_json.map { |i| i["plannable"]["id"] }).to be_include(@a2.id)
         end
 
-        it "should only return data from contexted courses if specified" do
-          get :index, params: {context_codes: [@course1.asset_string]}
+        it "should only return data from favorite courses if specified" do
+          get :index, params: {include: %w{only_favorites}}
           response_json = json_parse(response.body)
-          response_hash = response_json.map{|i| [i['plannable_type'], i['plannable_id']]}
-          expect(response_hash).to include(['assignment', @assignment1.id])
-          expect(response_hash).to include(['assignment', @group_assignment.id])
-          expect(response_hash).to include(['discussion_topic', @course_topic.id])
-          expect(response_hash).to include(['wiki_page', @course_page.id])
-          expect(response_hash).to include(['assignment', @assignment3.id])
-          expect(response_hash).to include(['quiz', @quiz.id])
-          expect(response_hash).to include(['planner_note', @course1_note.id])
-          expect(response_hash).to include(['calendar_event', @course1_event.id])
-          expect(response_hash.length).to be 8
-        end
-
-        it "should only return data from contexted users if specified" do
-          get :index, params: {context_codes: [@user.asset_string]}
-          response_json = json_parse(response.body)
-          response_hash = response_json.map{|i| [i['plannable_type'], i['plannable_id']]}
-          expect(response_hash).to include(['planner_note', @user_note.id])
-          expect(response_hash).to include(['calendar_event', @user_event.id])
-          expect(response_hash.length).to be 2
-        end
-
-        it "should return items from all context_codes specified" do
-          get :index, params: {context_codes: [@user.asset_string, @group.asset_string]}
-          response_json = json_parse(response.body)
-          response_hash = response_json.map{|i| [i['plannable_type'], i['plannable_id']]}
-          expect(response_hash).to include(['planner_note', @user_note.id])
-          expect(response_hash).to include(['calendar_event', @user_event.id])
-          expect(response_hash).to include(['discussion_topic', @group_topic.id])
-          expect(response_hash).to include(['wiki_page', @group_page.id])
-          expect(response_hash).to include(['calendar_event', @group_event.id])
-          expect(response_hash.length).to be 5
-        end
-
-        it "should not return any data if context_codes are specified but none are valid for the user" do
-          course_with_teacher(active_all: true)
-          assignment_model(course: @course, due_at: 1.day.from_now)
-
-          get :index, params: {context_codes: [@course.asset_string]}
-          response_json = json_parse(response.body)
-          expect(response_json).to eq []
-        end
-
-        it "filters ungraded_todo_items" do
-          get :index, params: {filter: 'ungraded_todo_items'}
-          response_json = json_parse(response.body)
-          items = response_json.map{|i| [i['plannable_type'], i['plannable_id']]}
-          expect(items).to match_array(
-            [['discussion_topic', @course_topic.id],
-             ['discussion_topic', @group_topic.id],
-             ['wiki_page', @course_page.id],
-             ['wiki_page', @group_page.id]]
-          )
+          expect(response_json.map { |i| i["plannable"]["id"] }).not_to be_include(@a2.id)
         end
       end
 
@@ -357,7 +281,9 @@ describe PlannerController do
         end
 
         it "should return results in reverse order by date if requested" do
-          wiki_page_model(course: @course, todo_date: 1.day.from_now)
+          wiki_page_model(course: @course)
+          @page.todo_date = 1.day.from_now
+          @page.save!
           @assignment3 = course_assignment
           @assignment3.due_at = 1.week.ago
           @assignment3.save!
@@ -507,17 +433,13 @@ describe PlannerController do
             @another_assignment = @another_course.assignments.create!(:title => "title", :due_at => 1.day.from_now)
             @student = user_with_pseudonym(:active_all => true, :account => @another_account)
             @another_course.enroll_student(@student, :enrollment_state => 'active')
-            group_with_user(active_all: true, user: @student, context: @another_course)
-            @group.announcements.create!(message: 'Hi')
           end
-          group_with_user(active_all: true, user: @student, context: @course)
-          announcement = @group.announcements.create!(message: 'Hi')
           @course.enroll_student(@student, :enrollment_state => 'active')
           user_session(@student)
 
           get :index
           response_json = json_parse(response.body)
-          expect(response_json.map { |i| i["plannable_id"]}).to eq [announcement.id, @assignment.id, @assignment2.id]
+          expect(response_json.map { |i| i["plannable_id"]}).to eq [@assignment.id, @assignment2.id]
         end
       end
 
@@ -582,7 +504,7 @@ describe PlannerController do
           get :index, params: {filter: "new_activity"}
           response_json = json_parse(response.body)
           expect(response_json.length).to eq 1
-          expect(response_json.map { |i| i["plannable"]["id"].to_s }).to include(dt.id.to_s)
+          expect(response_json.map { |i| i["plannable"]["id"].to_s }).to be_include(dt.id.to_s)
         end
 
         it "should return newly graded items" do
@@ -665,7 +587,7 @@ describe PlannerController do
                               end_date: 1.week.from_now.to_date.to_s}
             response_json = json_parse(response.body)
             expect(response_json.length).to eq 1
-            expect(response_json.map { |i| i["plannable_id"] }).to include dt.id
+            expect(response_json.map { |i| i["plannable_id"] }).to be_include dt.id
           end
         end
 

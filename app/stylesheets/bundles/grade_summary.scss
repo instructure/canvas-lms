@@ -18,7 +18,6 @@
 
 @import "base/environment";
 @import 'pages/shared/_outcome_colors';
-@import "components/rubric";
 
 // print button for grades summary page
 .print-grades {
@@ -337,10 +336,6 @@ div.rubric-toggle {
 
 #assignments {
   padding: 1em 0;
-}
-
-.individualStudentView .outcomeGroup {
-  margin-top: 1rem;
 }
 
 $outcome-border: 1px solid #BCC2CA;

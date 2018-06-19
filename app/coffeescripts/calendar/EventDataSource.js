@@ -402,12 +402,9 @@ export default class EventDataSource {
       if (!data) return
 
       const newEvents = []
-      // planner_items and planner_notes are passing thru here too now
+      // planner_notes are passing thru here too now
       // detect and add some missing fields the calendar code needs
-      if (data.length && 'plannable' in data[0]) {
-        data = this.transformPlannerItems(data)
-        key = 'type_planner_item'
-      } else if (data.length && 'todo_date' in data[0]) {
+      if (data.length && 'todo_date' in data[0]) {
         data = this.fillOutPlannerNotes(data, url)
         key = 'type_planner_note'
       } else {
@@ -496,7 +493,6 @@ export default class EventDataSource {
     ]
     if (ENV.STUDENT_PLANNER_ENABLED) {
       eventDataSources.push(['/api/v1/planner_notes', params])
-      eventDataSources.push(['/api/v1/planner/items', _.extend({filter: 'ungraded_todo_items'}, params)])
     }
     return this.startFetch(eventDataSources, dataCB, doneCB, options)
   }
@@ -645,22 +641,5 @@ export default class EventDataSource {
       note.all_context_codes = note.context_code
     })
     return notes
-  }
-
-  // make planner items readable as calendar events
-  transformPlannerItems(items) {
-    items.forEach(item => {
-      /* eslint-disable no-param-reassign */
-      item.type = item.plannable_type
-      item.id = `${item.plannable_type}_${item.plannable_id}`
-      item.context_code = (item.course_id ? `course_${item.course_id}` : `user_${item.user_id}`)
-      item.all_context_codes = item.context_code
-      item.start_at = item.plannable.todo_date
-      item.end_at = item.plannable.todo_date
-      item.title = item.plannable.title
-      item.can_edit = false
-      /* eslint-enable no-param-reassign */
-    })
-    return items
   }
 }

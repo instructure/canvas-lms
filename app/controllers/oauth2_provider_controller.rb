@@ -37,9 +37,6 @@ class Oauth2ProviderController < ApplicationController
 
     raise Canvas::Oauth::RequestError, :invalid_client_id unless provider.has_valid_key?
     raise Canvas::Oauth::RequestError, :invalid_redirect unless provider.has_valid_redirect?
-    if api_token_scoping_enabled? provider
-      raise Canvas::Oauth::RequestError, :invalid_scope unless scopes.present? && scopes.all? { |scope| provider.key.scopes.include?(scope) }
-    end
 
     session[:oauth2] = provider.session_hash
     session[:oauth2][:state] = params[:state] if params.key?(:state)
@@ -139,16 +136,5 @@ class Oauth2ProviderController < ApplicationController
         !params[:grant_type] && params[:code] ? "authorization_code" : "__UNSUPPORTED_PLACEHOLDER__"
       )
     )
-  end
-
-  def api_token_scoping_enabled?(provider)
-    (
-      (
-        @domain_root_account.site_admin? &&
-        Setting.get(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, nil).present?
-      ) ||
-      @domain_root_account.feature_enabled?(:api_token_scoping)
-    ) &&
-    provider.key.require_scopes?
   end
 end

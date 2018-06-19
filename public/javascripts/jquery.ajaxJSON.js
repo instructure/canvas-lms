@@ -145,8 +145,7 @@ $.fn.defaultAjaxError = function(func) {
     const unhandled = ($.inArray(request, $.ajaxJSON.unhandledXHRs) !== -1)
     const ignore = ($.inArray(request, $.ajaxJSON.ignoredXHRs) !== -1)
     if((!inProduction || unhandled || $.ajaxJSON.isUnauthenticated(request)) && !ignore) {
-      // $.grep will throw an error if it somehow gets something without length like undefined
-      $.ajaxJSON.unhandledXHRs = ($.ajaxJSON.unhandledXHRs) ? $.grep($.ajaxJSON.unhandledXHRs, (xhr) => xhr !== request) : $.ajaxJSON.unhandledXHRs
+      $.ajaxJSON.unhandledXHRs = $.grep($.ajaxJSON.unhandledXHRs, (xhr) => xhr !== request)
       const debugOnly = !!unhandled
       func.call(this, event, request, settings, error, debugOnly)
     }

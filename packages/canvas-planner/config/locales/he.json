@@ -83,6 +83,9 @@
   "title_is_required_6ddcab69": {
     "message": "דרושה כותרת"
   },
+  "assignmenttype_title_is_complete_813e54f8": {
+    "message": "{ assignmentType } { title } הושלמה"
+  },
   "date_at_time_dbdb1b99": {
     "message": "בתאריך { date } בשעה { time }"
   },
@@ -103,6 +106,9 @@
   },
   "no_due_dates_assigned_e8f5bac8": {
     "message": "לא הוגדרו תאריכי יעד"
+  },
+  "assignmenttype_title_is_incomplete_a1d5fac0": {
+    "message": "{ assignmentType } { title } הושלמה"
   },
   "save_11a80ec3": {
     "message": "שמירה "

@@ -124,26 +124,21 @@ describe 'Speedgrader' do
       before(:each) do
         user_session(@teacher)
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@quiz.assignment_id}"
+        driver.switch_to.frame f('#speedgrader_iframe')
       end
 
       it 'should display needs review alert on non-autograde questions', priority: "1", test_id: 441360 do
-        in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do
-          expect(ff('#update_history_form .alert')[0]).to include_text('The following questions need review:')
-        end
+        expect(ff('#update_history_form .alert')[0]).to include_text('The following questions need review:')
       end
 
       it 'should only display needs review for file_upload and essay questions', priority: "2", test_id: 452539 do
-        in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do
-          questions_to_grade = ff('#questions_needing_review li a')
-          expect(questions_to_grade[0]).to include_text('Question 2')
-          expect(questions_to_grade[1]).to include_text('Question 3')
-        end
+        questions_to_grade = ff('#questions_needing_review li a')
+        expect(questions_to_grade[0]).to include_text('Question 2')
+        expect(questions_to_grade[1]).to include_text('Question 3')
       end
 
       it 'should not display review warning on text only quiz questions', priority: "1", test_id: 377664 do
-        in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do
-          expect(ff('#update_history_form .alert')[0]).not_to include_text('Question 4')
-        end
+        expect(ff('#update_history_form .alert')[0]).not_to include_text('Question 4')
       end
     end
 
@@ -387,47 +382,44 @@ describe 'Speedgrader' do
     end
 
     it 'displays question navigation bar when setting is enabled', priority: "1", test_id: 164019 do
-      in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do
-        expect(f('header.quiz-header')).to include_text quiz.title
-        expect(f('#quiz-nav-inner-wrapper')).to be_displayed
-        nav = ff('.quiz-nav-li')
-        expect(nav).to have_size 24
-      end
+      driver.switch_to.frame f('#speedgrader_iframe')
+      expect(f('header.quiz-header')).to include_text quiz.title
+      expect(f('#quiz-nav-inner-wrapper')).to be_displayed
+      nav = ff('.quiz-nav-li')
+      expect(nav).to have_size 24
     end
 
     it 'scrolls nav bar and to questions', priority: "1", test_id: 164020 do
       skip_if_chrome('broken')
 
-      in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do
-        wrapper = f('#quiz-nav-inner-wrapper')
+      driver.switch_to.frame f('#speedgrader_iframe')
+      wrapper = f('#quiz-nav-inner-wrapper')
 
-        # check scrolling
-        first_left = wrapper.css_value('left').to_f
+      # check scrolling
+      first_left = wrapper.css_value('left').to_f
 
-        f('#nav-link-next').click
-        second_left = wrapper.css_value('left').to_f
-        expect(first_left).to be > second_left
+      f('#nav-link-next').click
+      second_left = wrapper.css_value('left').to_f
+      expect(first_left).to be > second_left
 
-        # check anchors
-        anchors = ff('#quiz-nav-inner-wrapper li a')
-        data_id = anchors[1].attribute 'data-id'
-        anchors[1].click
-        expect(f("#question_#{data_id}")).to have_class 'selected_single_question'
-      end
+      # check anchors
+      anchors = ff('#quiz-nav-inner-wrapper li a')
+      data_id = anchors[1].attribute 'data-id'
+      anchors[1].click
+      expect(f("#question_#{data_id}")).to have_class 'selected_single_question'
     end
 
     it 'updates scores', priority: "1", test_id: 164021 do
-      in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do
-        list = ff('#questions .user_points input')
-        replace_content list[1], "1", :tab_out => true
-        replace_content f('#fudge_points_entry'), "7", :tab_out => true
+      driver.switch_to.frame f('#speedgrader_iframe')
+      list = ff('#questions .user_points input')
+      replace_content list[1], "1", :tab_out => true
+      replace_content f('#fudge_points_entry'), "7", :tab_out => true
 
-        # after_fudge_points_total is updated, even before update button is clicked
-        expect(f('#after_fudge_points_total')).to include_text '8'
+      # after_fudge_points_total is updated, even before update button is clicked
+      expect(f('#after_fudge_points_total')).to include_text '8'
 
-        expect_new_page_load {f('button.update-scores').click}
-        expect(f('#after_fudge_points_total')).to include_text '8'
-      end
+      expect_new_page_load {f('button.update-scores').click}
+      expect(f('#after_fudge_points_total')).to include_text '8'
     end
   end
 

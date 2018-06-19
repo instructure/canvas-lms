@@ -32,15 +32,14 @@ class StickyButton extends Component {
     disabled: bool,
     hidden: bool,
     direction: oneOf(['none', 'up', 'down']),
-    className: string,
     zIndex: number,
+    offset: string,
     buttonRef: func,
   };
 
   static defaultProps = {
     direction: 'none',
     offset: '0',
-    className: ''
   };
 
   handleClick = (e) => {
@@ -76,6 +75,7 @@ class StickyButton extends Component {
       hidden,
       direction,
       zIndex,
+      offset,
     } = this.props;
 
     const classes = {
@@ -85,13 +85,14 @@ class StickyButton extends Component {
 
     const style = {
       zIndex: (zIndex) ? zIndex : null,
+      top: offset,
     };
 
     return (
       <button
         type="button"
         onClick={this.handleClick}
-        className={classnames(classes, styles.newActivityButton)}
+        className={classnames(classes)}
         style={style}
         aria-disabled={(disabled) ? 'true' : null}
         aria-hidden={(hidden) ? 'true' : null}

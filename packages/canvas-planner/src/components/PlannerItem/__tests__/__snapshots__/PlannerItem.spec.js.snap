@@ -5,26 +5,21 @@ exports[`renders Announcement correctly with everything 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={true}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Announcement I am an Announcement is marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={true}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Announcement I am a Announcement is complete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -48,13 +43,7 @@ exports[`renders Announcement correctly with everything 1`] = `
           A Course about being Diffrient Announcement
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -62,23 +51,7 @@ exports[`renders Announcement correctly with everything 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Announcement I am an Announcement, at Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am an Announcement
-            </Text>
-          </PresentationContent>
+          I am a Announcement
         </Link>
       </div>
     </div>
@@ -116,11 +89,7 @@ exports[`renders Announcement correctly with everything 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            <PresentationContent
-              as="span"
-            >
-              3:30 AM
-            </PresentationContent>
+            3:30 AM
           </Text>
         </div>
       </div>
@@ -134,26 +103,21 @@ exports[`renders Announcement correctly with just date 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={false}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Announcement I am an Announcement is not marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={false}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Announcement I am a Announcement is incomplete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -177,13 +141,7 @@ exports[`renders Announcement correctly with just date 1`] = `
           A Course about being Diffrient Announcement
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -191,23 +149,7 @@ exports[`renders Announcement correctly with just date 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Announcement I am an Announcement, at Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am an Announcement
-            </Text>
-          </PresentationContent>
+          I am a Announcement
         </Link>
       </div>
     </div>
@@ -221,11 +163,7 @@ exports[`renders Announcement correctly with just date 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            <PresentationContent
-              as="span"
-            >
-              3:30 AM
-            </PresentationContent>
+            3:30 AM
           </Text>
         </div>
       </div>
@@ -239,26 +177,21 @@ exports[`renders Announcement correctly with just points 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={false}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Announcement I am an Announcement is not marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={false}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Announcement I am a Announcement is incomplete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -282,13 +215,7 @@ exports[`renders Announcement correctly with just points 1`] = `
           A Course about being Diffrient Announcement
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -296,23 +223,7 @@ exports[`renders Announcement correctly with just points 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Announcement I am an Announcement, at Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am an Announcement
-            </Text>
-          </PresentationContent>
+          I am a Announcement
         </Link>
       </div>
     </div>
@@ -349,13 +260,7 @@ exports[`renders Announcement correctly with just points 1`] = `
             color="secondary"
             letterSpacing="normal"
             size="x-small"
-          >
-            <PresentationContent
-              as="span"
-            >
-              3:30 AM
-            </PresentationContent>
-          </Text>
+          />
         </div>
       </div>
     </div>
@@ -368,26 +273,21 @@ exports[`renders Announcement correctly without right side content 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={false}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Announcement I am an Announcement is not marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={false}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Announcement I am a Announcement is incomplete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -411,13 +311,7 @@ exports[`renders Announcement correctly without right side content 1`] = `
           A Course about being Diffrient Announcement
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -425,23 +319,7 @@ exports[`renders Announcement correctly without right side content 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Announcement I am an Announcement, at Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am an Announcement
-            </Text>
-          </PresentationContent>
+          I am a Announcement
         </Link>
       </div>
     </div>
@@ -454,13 +332,7 @@ exports[`renders Announcement correctly without right side content 1`] = `
             color="secondary"
             letterSpacing="normal"
             size="x-small"
-          >
-            <PresentationContent
-              as="span"
-            >
-              3:30 AM
-            </PresentationContent>
-          </Text>
+          />
         </div>
       </div>
     </div>
@@ -473,26 +345,21 @@ exports[`renders Assignment correctly with everything 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={true}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Assignment I am an Assignment is marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={true}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Assignment I am a Assignment is complete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -516,13 +383,7 @@ exports[`renders Assignment correctly with everything 1`] = `
           A Course about being Diffrient Assignment
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -530,23 +391,7 @@ exports[`renders Assignment correctly with everything 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Assignment I am an Assignment, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am an Assignment
-            </Text>
-          </PresentationContent>
+          I am a Assignment
         </Link>
       </div>
     </div>
@@ -584,11 +429,7 @@ exports[`renders Assignment correctly with everything 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            <PresentationContent
-              as="span"
-            >
-              DUE: 3:30 AM
-            </PresentationContent>
+            DUE: 3:30 AM
           </Text>
         </div>
       </div>
@@ -602,26 +443,21 @@ exports[`renders Assignment correctly with just date 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={false}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Assignment I am an Assignment is not marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={false}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Assignment I am a Assignment is incomplete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -645,13 +481,7 @@ exports[`renders Assignment correctly with just date 1`] = `
           A Course about being Diffrient Assignment
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -659,23 +489,7 @@ exports[`renders Assignment correctly with just date 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Assignment I am an Assignment, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am an Assignment
-            </Text>
-          </PresentationContent>
+          I am a Assignment
         </Link>
       </div>
     </div>
@@ -689,11 +503,7 @@ exports[`renders Assignment correctly with just date 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            <PresentationContent
-              as="span"
-            >
-              DUE: 3:30 AM
-            </PresentationContent>
+            DUE: 3:30 AM
           </Text>
         </div>
       </div>
@@ -707,26 +517,21 @@ exports[`renders Assignment correctly with just points 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={false}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Assignment I am an Assignment is not marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={false}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Assignment I am a Assignment is incomplete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -750,13 +555,7 @@ exports[`renders Assignment correctly with just points 1`] = `
           A Course about being Diffrient Assignment
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -764,23 +563,7 @@ exports[`renders Assignment correctly with just points 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Assignment I am an Assignment, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am an Assignment
-            </Text>
-          </PresentationContent>
+          I am a Assignment
         </Link>
       </div>
     </div>
@@ -817,13 +600,7 @@ exports[`renders Assignment correctly with just points 1`] = `
             color="secondary"
             letterSpacing="normal"
             size="x-small"
-          >
-            <PresentationContent
-              as="span"
-            >
-              DUE: 3:30 AM
-            </PresentationContent>
-          </Text>
+          />
         </div>
       </div>
     </div>
@@ -836,26 +613,21 @@ exports[`renders Assignment correctly without right side content 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={false}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Assignment I am an Assignment is not marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={false}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Assignment I am a Assignment is incomplete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -879,13 +651,7 @@ exports[`renders Assignment correctly without right side content 1`] = `
           A Course about being Diffrient Assignment
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -893,23 +659,7 @@ exports[`renders Assignment correctly without right side content 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Assignment I am an Assignment, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am an Assignment
-            </Text>
-          </PresentationContent>
+          I am a Assignment
         </Link>
       </div>
     </div>
@@ -922,13 +672,7 @@ exports[`renders Assignment correctly without right side content 1`] = `
             color="secondary"
             letterSpacing="normal"
             size="x-small"
-          >
-            <PresentationContent
-              as="span"
-            >
-              DUE: 3:30 AM
-            </PresentationContent>
-          </Text>
+          />
         </div>
       </div>
     </div>
@@ -941,26 +685,21 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={false}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Calendar Event I am a Calendar Event is not marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={false}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Calendar Event I am a Calendar Event is incomplete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -984,13 +723,7 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
           A Course about being Diffrient Calendar Event
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -998,23 +731,7 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Calendar Event I am a Calendar Event, on December 17, 2011.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Calendar Event
-            </Text>
-          </PresentationContent>
+          I am a Calendar Event
         </Link>
       </div>
     </div>
@@ -1028,11 +745,7 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            <PresentationContent
-              as="span"
-            >
-              All Day
-            </PresentationContent>
+            All Day
           </Text>
         </div>
       </div>
@@ -1046,26 +759,21 @@ exports[`renders Calendar Event correctly with everything 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={true}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Calendar Event I am a Calendar Event is marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={true}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Calendar Event I am a Calendar Event is complete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -1089,13 +797,7 @@ exports[`renders Calendar Event correctly with everything 1`] = `
           A Course about being Diffrient Calendar Event
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -1103,23 +805,7 @@ exports[`renders Calendar Event correctly with everything 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Calendar Event I am a Calendar Event, at Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Calendar Event
-            </Text>
-          </PresentationContent>
+          I am a Calendar Event
         </Link>
       </div>
     </div>
@@ -1157,11 +843,7 @@ exports[`renders Calendar Event correctly with everything 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            <PresentationContent
-              as="span"
-            >
-              3:30 AM
-            </PresentationContent>
+            3:30 AM
           </Text>
         </div>
       </div>
@@ -1175,26 +857,21 @@ exports[`renders Calendar Event correctly with just date 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={false}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Calendar Event I am a Calendar Event is not marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={false}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Calendar Event I am a Calendar Event is incomplete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -1218,13 +895,7 @@ exports[`renders Calendar Event correctly with just date 1`] = `
           A Course about being Diffrient Calendar Event
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -1232,23 +903,7 @@ exports[`renders Calendar Event correctly with just date 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Calendar Event I am a Calendar Event, at Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Calendar Event
-            </Text>
-          </PresentationContent>
+          I am a Calendar Event
         </Link>
       </div>
     </div>
@@ -1262,11 +917,7 @@ exports[`renders Calendar Event correctly with just date 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            <PresentationContent
-              as="span"
-            >
-              3:30 AM
-            </PresentationContent>
+            3:30 AM
           </Text>
         </div>
       </div>
@@ -1280,26 +931,21 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={false}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Calendar Event I am a Calendar Event is not marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={false}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Calendar Event I am a Calendar Event is incomplete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -1323,13 +969,7 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
           A Course about being Diffrient Calendar Event
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -1337,23 +977,7 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Calendar Event I am a Calendar Event, at Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Calendar Event
-            </Text>
-          </PresentationContent>
+          I am a Calendar Event
         </Link>
       </div>
     </div>
@@ -1366,13 +990,7 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
             color="secondary"
             letterSpacing="normal"
             size="x-small"
-          >
-            <PresentationContent
-              as="span"
-            >
-              3:30 AM
-            </PresentationContent>
-          </Text>
+          />
         </div>
       </div>
     </div>
@@ -1385,26 +1003,21 @@ exports[`renders Discussion correctly with everything 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={true}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Discussion I am a Discussion is marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={true}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Discussion I am a Discussion is complete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -1428,13 +1041,7 @@ exports[`renders Discussion correctly with everything 1`] = `
           A Course about being Diffrient Discussion
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -1442,23 +1049,7 @@ exports[`renders Discussion correctly with everything 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Discussion I am a Discussion, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Discussion
-            </Text>
-          </PresentationContent>
+          I am a Discussion
         </Link>
       </div>
     </div>
@@ -1496,11 +1087,7 @@ exports[`renders Discussion correctly with everything 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            <PresentationContent
-              as="span"
-            >
-              DUE: 3:30 AM
-            </PresentationContent>
+            DUE: 3:30 AM
           </Text>
         </div>
       </div>
@@ -1514,26 +1101,21 @@ exports[`renders Discussion correctly with just date 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={false}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Discussion I am a Discussion is not marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={false}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Discussion I am a Discussion is incomplete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -1557,13 +1139,7 @@ exports[`renders Discussion correctly with just date 1`] = `
           A Course about being Diffrient Discussion
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -1571,23 +1147,7 @@ exports[`renders Discussion correctly with just date 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Discussion I am a Discussion, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Discussion
-            </Text>
-          </PresentationContent>
+          I am a Discussion
         </Link>
       </div>
     </div>
@@ -1601,11 +1161,7 @@ exports[`renders Discussion correctly with just date 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            <PresentationContent
-              as="span"
-            >
-              DUE: 3:30 AM
-            </PresentationContent>
+            DUE: 3:30 AM
           </Text>
         </div>
       </div>
@@ -1619,26 +1175,21 @@ exports[`renders Discussion correctly with just points 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={false}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Discussion I am a Discussion is not marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={false}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Discussion I am a Discussion is incomplete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -1662,13 +1213,7 @@ exports[`renders Discussion correctly with just points 1`] = `
           A Course about being Diffrient Discussion
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -1676,23 +1221,7 @@ exports[`renders Discussion correctly with just points 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Discussion I am a Discussion, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Discussion
-            </Text>
-          </PresentationContent>
+          I am a Discussion
         </Link>
       </div>
     </div>
@@ -1729,13 +1258,7 @@ exports[`renders Discussion correctly with just points 1`] = `
             color="secondary"
             letterSpacing="normal"
             size="x-small"
-          >
-            <PresentationContent
-              as="span"
-            >
-              DUE: 3:30 AM
-            </PresentationContent>
-          </Text>
+          />
         </div>
       </div>
     </div>
@@ -1748,26 +1271,21 @@ exports[`renders Discussion correctly without right side content 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={false}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Discussion I am a Discussion is not marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={false}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Discussion I am a Discussion is incomplete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -1791,13 +1309,7 @@ exports[`renders Discussion correctly without right side content 1`] = `
           A Course about being Diffrient Discussion
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -1805,23 +1317,7 @@ exports[`renders Discussion correctly without right side content 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Discussion I am a Discussion, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Discussion
-            </Text>
-          </PresentationContent>
+          I am a Discussion
         </Link>
       </div>
     </div>
@@ -1834,13 +1330,7 @@ exports[`renders Discussion correctly without right side content 1`] = `
             color="secondary"
             letterSpacing="normal"
             size="x-small"
-          >
-            <PresentationContent
-              as="span"
-            >
-              DUE: 3:30 AM
-            </PresentationContent>
-          </Text>
+          />
         </div>
       </div>
     </div>
@@ -1853,26 +1343,21 @@ exports[`renders Note correctly with Group 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={false}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Page this is an account-level group page is not marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={false}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Page this is an account-level group page is incomplete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -1896,13 +1381,7 @@ exports[`renders Note correctly with Group 1`] = `
           Account-level group 1 Page
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -1910,23 +1389,7 @@ exports[`renders Note correctly with Group 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Page this is an account-level group page, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              this is an account-level group page
-            </Text>
-          </PresentationContent>
+          this is an account-level group page
         </Link>
       </div>
     </div>
@@ -1940,11 +1403,7 @@ exports[`renders Note correctly with Group 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            <PresentationContent
-              as="span"
-            >
-              DUE: 3:30 AM
-            </PresentationContent>
+            DUE: 3:30 AM
           </Text>
         </div>
       </div>
@@ -1958,26 +1417,21 @@ exports[`renders Note correctly with everything 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={true}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Task I am a Note is marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={true}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Task I am a Note is complete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -2007,13 +1461,7 @@ exports[`renders Note correctly with everything 1`] = `
           Math 101 TO DO
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -2021,23 +1469,7 @@ exports[`renders Note correctly with everything 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Task I am a Note, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Note
-            </Text>
-          </PresentationContent>
+          I am a Note
         </Link>
       </div>
     </div>
@@ -2051,11 +1483,7 @@ exports[`renders Note correctly with everything 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            <PresentationContent
-              as="span"
-            >
-              DUE: 3:30 AM
-            </PresentationContent>
+            DUE: 3:30 AM
           </Text>
         </div>
       </div>
@@ -2069,26 +1497,21 @@ exports[`renders Note correctly without Course 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={false}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Note I am a Note is not marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={false}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Task I am a Note is incomplete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -2115,16 +1538,10 @@ exports[`renders Note correctly without Course 1`] = `
           letterSpacing="normal"
           size="x-small"
         >
-           Note
+           TO DO
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -2132,23 +1549,7 @@ exports[`renders Note correctly without Course 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Note I am a Note, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Note
-            </Text>
-          </PresentationContent>
+          I am a Note
         </Link>
       </div>
     </div>
@@ -2161,13 +1562,7 @@ exports[`renders Note correctly without Course 1`] = `
             color="secondary"
             letterSpacing="normal"
             size="x-small"
-          >
-            <PresentationContent
-              as="span"
-            >
-              DUE: 3:30 AM
-            </PresentationContent>
-          </Text>
+          />
         </div>
       </div>
     </div>
@@ -2180,26 +1575,21 @@ exports[`renders Page correctly with everything 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={true}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Page I am a Page is marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={true}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Page I am a Page is complete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -2223,13 +1613,7 @@ exports[`renders Page correctly with everything 1`] = `
           A Course about being Diffrient Page
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -2237,23 +1621,7 @@ exports[`renders Page correctly with everything 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Page I am a Page, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Page
-            </Text>
-          </PresentationContent>
+          I am a Page
         </Link>
       </div>
     </div>
@@ -2291,11 +1659,7 @@ exports[`renders Page correctly with everything 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            <PresentationContent
-              as="span"
-            >
-              DUE: 3:30 AM
-            </PresentationContent>
+            DUE: 3:30 AM
           </Text>
         </div>
       </div>
@@ -2309,26 +1673,21 @@ exports[`renders Page correctly with just date 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={false}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Page I am a Page is not marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={false}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Page I am a Page is incomplete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -2352,13 +1711,7 @@ exports[`renders Page correctly with just date 1`] = `
            Page
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -2366,23 +1719,7 @@ exports[`renders Page correctly with just date 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Page I am a Page, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Page
-            </Text>
-          </PresentationContent>
+          I am a Page
         </Link>
       </div>
     </div>
@@ -2396,11 +1733,7 @@ exports[`renders Page correctly with just date 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            <PresentationContent
-              as="span"
-            >
-              DUE: 3:30 AM
-            </PresentationContent>
+            DUE: 3:30 AM
           </Text>
         </div>
       </div>
@@ -2414,26 +1747,21 @@ exports[`renders Page correctly with just points 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={false}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Page I am a Page is not marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={false}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Page I am a Page is incomplete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -2457,13 +1785,7 @@ exports[`renders Page correctly with just points 1`] = `
           A Course about being Diffrient Page
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -2471,23 +1793,7 @@ exports[`renders Page correctly with just points 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Page I am a Page, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Page
-            </Text>
-          </PresentationContent>
+          I am a Page
         </Link>
       </div>
     </div>
@@ -2524,13 +1830,7 @@ exports[`renders Page correctly with just points 1`] = `
             color="secondary"
             letterSpacing="normal"
             size="x-small"
-          >
-            <PresentationContent
-              as="span"
-            >
-              DUE: 3:30 AM
-            </PresentationContent>
-          </Text>
+          />
         </div>
       </div>
     </div>
@@ -2543,26 +1843,21 @@ exports[`renders Page correctly without right side content 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={false}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Page I am a Page is not marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={false}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Page I am a Page is incomplete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -2586,13 +1881,7 @@ exports[`renders Page correctly without right side content 1`] = `
           A Course about being Diffrient Page
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -2600,23 +1889,7 @@ exports[`renders Page correctly without right side content 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Page I am a Page, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Page
-            </Text>
-          </PresentationContent>
+          I am a Page
         </Link>
       </div>
     </div>
@@ -2629,13 +1902,7 @@ exports[`renders Page correctly without right side content 1`] = `
             color="secondary"
             letterSpacing="normal"
             size="x-small"
-          >
-            <PresentationContent
-              as="span"
-            >
-              DUE: 3:30 AM
-            </PresentationContent>
-          </Text>
+          />
         </div>
       </div>
     </div>
@@ -2648,26 +1915,21 @@ exports[`renders Quiz correctly with everything 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={true}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Quiz I am a Quiz is marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={true}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Quiz I am a Quiz is complete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -2691,13 +1953,7 @@ exports[`renders Quiz correctly with everything 1`] = `
           A Course about being Diffrient Quiz
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -2705,23 +1961,7 @@ exports[`renders Quiz correctly with everything 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Quiz I am a Quiz, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Quiz
-            </Text>
-          </PresentationContent>
+          I am a Quiz
         </Link>
       </div>
     </div>
@@ -2759,11 +1999,7 @@ exports[`renders Quiz correctly with everything 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            <PresentationContent
-              as="span"
-            >
-              DUE: 3:30 AM
-            </PresentationContent>
+            DUE: 3:30 AM
           </Text>
         </div>
       </div>
@@ -2777,26 +2013,21 @@ exports[`renders Quiz correctly with just date 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={false}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Quiz I am a Quiz is not marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={false}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Quiz I am a Quiz is incomplete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -2820,13 +2051,7 @@ exports[`renders Quiz correctly with just date 1`] = `
           A Course about being Diffrient Quiz
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -2834,23 +2059,7 @@ exports[`renders Quiz correctly with just date 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Quiz I am a Quiz, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Quiz
-            </Text>
-          </PresentationContent>
+          I am a Quiz
         </Link>
       </div>
     </div>
@@ -2864,11 +2073,7 @@ exports[`renders Quiz correctly with just date 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            <PresentationContent
-              as="span"
-            >
-              DUE: 3:30 AM
-            </PresentationContent>
+            DUE: 3:30 AM
           </Text>
         </div>
       </div>
@@ -2882,26 +2087,21 @@ exports[`renders Quiz correctly with just points 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={false}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Quiz I am a Quiz is not marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={false}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Quiz I am a Quiz is incomplete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -2925,13 +2125,7 @@ exports[`renders Quiz correctly with just points 1`] = `
           A Course about being Diffrient Quiz
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -2939,23 +2133,7 @@ exports[`renders Quiz correctly with just points 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Quiz I am a Quiz, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Quiz
-            </Text>
-          </PresentationContent>
+          I am a Quiz
         </Link>
       </div>
     </div>
@@ -2992,13 +2170,7 @@ exports[`renders Quiz correctly with just points 1`] = `
             color="secondary"
             letterSpacing="normal"
             size="x-small"
-          >
-            <PresentationContent
-              as="span"
-            >
-              DUE: 3:30 AM
-            </PresentationContent>
-          </Text>
+          />
         </div>
       </div>
     </div>
@@ -3011,26 +2183,21 @@ exports[`renders Quiz correctly without right side content 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={false}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Quiz I am a Quiz is not marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={false}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Quiz I am a Quiz is incomplete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -3054,13 +2221,7 @@ exports[`renders Quiz correctly without right side content 1`] = `
           A Course about being Diffrient Quiz
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -3068,23 +2229,7 @@ exports[`renders Quiz correctly without right side content 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Quiz I am a Quiz, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Quiz
-            </Text>
-          </PresentationContent>
+          I am a Quiz
         </Link>
       </div>
     </div>
@@ -3097,13 +2242,7 @@ exports[`renders Quiz correctly without right side content 1`] = `
             color="secondary"
             letterSpacing="normal"
             size="x-small"
-          >
-            <PresentationContent
-              as="span"
-            >
-              DUE: 3:30 AM
-            </PresentationContent>
-          </Text>
+          />
         </div>
       </div>
     </div>
@@ -3116,26 +2255,21 @@ exports[`renders correctly 1`] = `
   className="planner-item"
 >
   <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={false}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Assignment This Assignment is about awesome stuff is not marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
+    <Checkbox
+      checked={false}
+      disabled={false}
+      inline={false}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Assignment This Assignment is about awesome stuff is incomplete
+        </ScreenReaderContent>
+      }
+      onChange={[Function]}
+      size="medium"
+      variant="simple"
+    />
   </div>
   <div
     aria-hidden="true"
@@ -3159,13 +2293,7 @@ exports[`renders correctly 1`] = `
           A Course about being Diffrient Assignment
         </Text>
       </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
+      <div>
         <Link
           as="button"
           ellipsis={false}
@@ -3173,23 +2301,7 @@ exports[`renders correctly 1`] = `
           linkRef={[Function]}
           variant="default"
         >
-          <ScreenReaderContent
-            as="span"
-          >
-            Assignment This Assignment is about awesome stuff, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              This Assignment is about awesome stuff
-            </Text>
-          </PresentationContent>
+          This Assignment is about awesome stuff
         </Link>
       </div>
     </div>
@@ -3227,122 +2339,7 @@ exports[`renders correctly 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            <PresentationContent
-              as="span"
-            >
-              DUE: 3:30 AM
-            </PresentationContent>
-          </Text>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-`;
-
-exports[`renders user-created Todo correctly 1`] = `
-<div
-  className="planner-item"
->
-  <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={false}
-        disabled={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Task do that one thing is not marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
-  </div>
-  <div
-    aria-hidden="true"
-    style={
-      Object {
-        "color": null,
-      }
-    }
-  >
-    <Avatar
-      inline={true}
-      name="Jane"
-      size="small"
-      src="/picture/is/here"
-      variant="circle"
-    />
-  </div>
-  <div>
-    <div>
-      <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          To Do TO DO
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Task do that one thing, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              do that one thing
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
-      <div>
-        <div>
-          <Text
-            as="span"
-            color="secondary"
-            letterSpacing="normal"
-            size="x-small"
-          >
-            <PresentationContent
-              as="span"
-            >
-              DUE: 3:30 AM
-            </PresentationContent>
+            DUE: 3:30 AM
           </Text>
         </div>
       </div>

@@ -707,15 +707,6 @@ describe EnrollmentsApiController, type: :request do
                         }
         expect(response.code).to eql '400'
       end
-
-      it "should not allow self-enrollment in a concluded course" do
-        @course.update_attributes(:start_at => 2.days.ago, :conclude_at => 1.day.ago,
-          :restrict_enrollments_to_course_dates => true)
-        json = raw_api_call :post, @path, @path_options,
-          {enrollment: {user_id: 'self', self_enrollment_code: @course.self_enrollment_code}}
-        expect(response.code).to eql '400'
-        expect(response.body).to include("concluded")
-      end
     end
   end
 

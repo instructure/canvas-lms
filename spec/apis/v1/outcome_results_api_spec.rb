@@ -565,16 +565,6 @@ describe "Outcome Results API", type: :request do
       expect(json['linked']['alignments'][0]['id']).to eq outcome_assignment.asset_string
     end
 
-    it "side loads assignments" do
-      outcome_assessment
-      api_call(:get, outcome_results_url(outcome_course, include: ['assignments']),
-               controller: 'outcome_results', action: 'index', format: 'json', course_id: outcome_course.id.to_s, include: ['assignments'])
-      json = JSON.parse(response.body)
-      expect(json['linked']).to be_present
-      expect(json['linked']['assignments']).to be_present
-      expect(json['linked']['assignments'][0]['id']).to eq outcome_assignment.asset_string
-    end
-
     it "returns outcome results" do
       outcome_assessment
       api_call(:get, outcome_results_url(outcome_course),

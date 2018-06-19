@@ -42,6 +42,9 @@ const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
   if (plannable_type === 'discussion_topic' || plannable_type === 'announcement') {
     details.unread_count = plannable.unread_count;
   }
+  if (plannable_type === 'announcement' && !details.date) {
+    details.date = plannable.delayed_post_at || plannable.posted_at;
+  }
 
   if (plannable_type === 'planner_note') {
     details.details = plannable.details;
@@ -50,7 +53,6 @@ const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
   if (plannable_type === 'calendar_event') {
     details.allDay = plannable.all_day
   }
-
   return details;
 };
 
@@ -135,7 +137,7 @@ export function transformPlannerNoteApiToInternalItem (plannerItemApiResponse, c
     course_id: plannerNote.course_id,
     context: context,
     title: plannerNote.title,
-    date: moment.tz(plannerNote.todo_date, timeZone),
+    date: plannerNote.todo_date,
     details: plannerNote.details,
     completed: false
   };

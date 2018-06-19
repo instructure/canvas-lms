@@ -350,18 +350,17 @@ class DiscussionTopicsController < ApplicationController
       scope = scope.active.where('delayed_post_at IS NULL OR delayed_post_at<?', Time.now.utc)
     end
 
-    if !@context.account.feature_enabled?(:section_specific_discussions) || request.format.json?
-      @topics = Api.paginate(scope, self, topic_pagination_url)
-      if params[:exclude_context_module_locked_topics]
-        @topics = DiscussionTopic.reject_context_module_locked_topics(@topics, @current_user)
-      end
+    @topics = Api.paginate(scope, self, topic_pagination_url)
 
-      if states.present?
-        @topics.reject! { |t| t.locked_for?(@current_user) } if states.include?('unlocked')
-        @topics.select! { |t| t.locked_for?(@current_user) } if states.include?('locked')
-      end
-      @topics.each { |topic| topic.current_user = @current_user }
+    if params[:exclude_context_module_locked_topics]
+      @topics = DiscussionTopic.reject_context_module_locked_topics(@topics, @current_user)
     end
+
+    if states.present?
+      @topics.reject! { |t| t.locked_for?(@current_user) } if states.include?('unlocked')
+      @topics.select! { |t| t.locked_for?(@current_user) } if states.include?('locked')
+    end
+    @topics.each { |topic| topic.current_user = @current_user }
 
     respond_to do |format|
       format.html do
@@ -371,17 +370,16 @@ class DiscussionTopicsController < ApplicationController
         add_crumb(t('#crumbs.discussions', 'Discussions'),
                   named_context_url(@context, :context_discussion_topics_url))
 
-        if !@context.account.feature_enabled?(:section_specific_discussions)
-          locked_topics, open_topics = @topics.partition do |topic|
-            locked = topic.locked? || topic.locked_for?(@current_user)
-            locked.is_a?(Hash) ? locked[:can_view] : locked
-          end
-          js_env openTopics: open_topics, lockedTopics: locked_topics, newTopicURL: named_context_url(@context, :new_context_discussion_topic_url)
+        locked_topics, open_topics = @topics.partition do |topic|
+          locked = topic.locked? || topic.locked_for?(@current_user)
+          locked.is_a?(Hash) ? locked[:can_view] : locked
         end
 
         hash = {
           USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),
-          totalDiscussions: scope.count,
+          openTopics: open_topics,
+          lockedTopics: locked_topics,
+          newTopicURL: named_context_url(@context, :new_context_discussion_topic_url),
           permissions: {
             create: @context.discussion_topics.temp_record.grants_right?(@current_user, session, :create),
             moderate: user_can_moderate,
@@ -719,8 +717,8 @@ class DiscussionTopicsController < ApplicationController
                 :COURSE_ID => @sequence_asset.context.id,
               }
             end
-            if @topic.for_assignment? && @presenter.allows_speed_grader? &&
-              @topic.assignment.can_view_speed_grader?(@current_user)
+            if @topic.for_assignment? &&
+               @topic.assignment.grants_right?(@current_user, session, :grade) && @presenter.allows_speed_grader?
               env_hash[:SPEEDGRADER_URL_TEMPLATE] = named_context_url(@topic.assignment.context,
                                                                       :speed_grader_context_gradebook_url,
                                                                       :assignment_id => @topic.assignment.id,

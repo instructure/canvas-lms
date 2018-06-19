@@ -20,14 +20,14 @@ import React from 'react'
 import keycode from 'keycode'
 import I18n from 'i18n!act_as'
 
-import Modal, {ModalHeader, ModalBody} from '@instructure/ui-overlays/lib/components/Modal'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import View from '@instructure/ui-layout/lib/components/View'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Avatar from '@instructure/ui-elements/lib/components/Avatar'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Table from '@instructure/ui-elements/lib/components/Table'
+import Modal, {ModalHeader, ModalBody} from '@instructure/ui-core/lib/components/Modal'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import Container from '@instructure/ui-core/lib/components/Container'
+import Text from '@instructure/ui-core/lib/components/Text'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Avatar from '@instructure/ui-core/lib/components/Avatar'
+import Spinner from '@instructure/ui-core/lib/components/Spinner'
+import Table from '@instructure/ui-core/lib/components/Table'
 
 import ActAsMask from './ActAsMask'
 import ActAsPanda from './ActAsPanda'
@@ -140,7 +140,7 @@ export default class ActAsModal extends React.Component {
           <Text size="small">{category}</Text>
         </td>
         <td>
-          <View
+          <Container
             as="div"
             textAlign="end"
           >
@@ -150,7 +150,7 @@ export default class ActAsModal extends React.Component {
             >
               {info}
             </Text>
-          </View>
+          </Container>
         </td>
       </tr>
     )
@@ -167,6 +167,7 @@ export default class ActAsModal extends React.Component {
           size="fullscreen"
           label={I18n.t('Act as User')}
           closeButtonLabel={I18n.t('Close')}
+          applicationElement={() => document.getElementById('application')}
           closeButtonRef={(el) => this.closeButton = el}
           open
         >
@@ -191,11 +192,11 @@ export default class ActAsModal extends React.Component {
                   </div>
                 </div>
                 <div className="ActAs__text">
-                  <View
+                  <Container
                     as="div"
                     size="small"
                   >
-                    <View
+                    <Container
                       as="div"
                       textAlign="center"
                       padding="0 0 x-small 0"
@@ -206,8 +207,8 @@ export default class ActAsModal extends React.Component {
                       >
                         {I18n.t('Act as %{name}', { name: user.short_name })}
                       </Text>
-                    </View>
-                    <View
+                    </Container>
+                    <Container
                       as="div"
                       textAlign="center"
                     >
@@ -223,8 +224,8 @@ export default class ActAsModal extends React.Component {
                           'actions on behalf of this user.'
                         )}
                       </Text>
-                    </View>
-                    <View
+                    </Container>
+                    <Container
                       as="div"
                       textAlign="center"
                     >
@@ -234,25 +235,25 @@ export default class ActAsModal extends React.Component {
                         size="small"
                         margin="medium 0 x-small 0"
                       />
-                    </View>
-                    <View
+                    </Container>
+                    <Container
                       as="div"
                       textAlign="center"
                     >
                       {this.renderInfoTable(I18n.t('User details'), this.renderUserInfoRows)}
-                    </View>
+                    </Container>
                     {user.pseudonyms.map(pseudonym => (
-                        <View
+                        <Container
                           as="div"
                           textAlign="center"
                           margin="large 0 0 0"
                           key={pseudonym.login_id}
                         >
                           {this.renderInfoTable(I18n.t('Login info'), () => this.renderLoginInfoRows(pseudonym))}
-                        </View>
+                        </Container>
                       )
                     )}
-                    <View
+                    <Container
                       as="div"
                       textAlign="center"
                     >
@@ -266,8 +267,8 @@ export default class ActAsModal extends React.Component {
                       >
                         {I18n.t('Proceed')}
                       </Button>
-                    </View>
-                  </View>
+                    </Container>
+                  </Container>
                 </div>
               </div>
             }

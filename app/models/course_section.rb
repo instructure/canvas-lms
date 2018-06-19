@@ -301,26 +301,6 @@ class CourseSection < ActiveRecord::Base
     save!
   end
 
-  def self.destroy_batch(batch, sis_batch: nil, batch_mode: false)
-    raise ArgumentError, 'Cannot call with more than 1000 sections' if batch.count > 1000
-    cs = CourseSection.where(id: batch).select(:id, :workflow_state).to_a
-    data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: cs, updated_state: 'deleted', batch_mode_delete: batch_mode)
-    CourseSection.where(id: cs.map(&:id)).update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
-    Enrollment.not_fake.where(course_section_id: cs.map(&:id)).active.find_in_batches do |e_batch|
-      Shackles.activate(:master) do
-        new_data = Enrollment::BatchStateUpdater.destroy_batch(e_batch, sis_batch: sis_batch, batch_mode: batch_mode)
-        data.push(*new_data)
-        SisBatchRollBackData.bulk_insert_roll_back_data(data)
-        data = []
-      end
-    end
-    AssignmentOverride.where(set_type: 'CourseSection', set_id: cs.map(&:id)).find_each(&:destroy)
-    DiscussionTopicSectionVisibility.where(course_section_id: cs.map(&:id)).find_in_batches do |d_batch|
-      DiscussionTopicSectionVisibility.where(id: d_batch).update_all(workflow_state: 'deleted')
-    end
-    cs.count
-  end
-
   scope :active, -> { where("course_sections.workflow_state<>'deleted'") }
 
   scope :sis_sections, lambda { |account, *source_ids| where(:root_account_id => account, :sis_source_id => source_ids).order(:sis_source_id) }

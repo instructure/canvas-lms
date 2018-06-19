@@ -44,6 +44,9 @@
   "today_76e10f9c": {
     "message": "Bugün"
   },
+  "assignmenttype_title_is_incomplete_a1d5fac0": {
+    "message": "{ assignmentType } { title } tamamlanmadı"
+  },
   "save_11a80ec3": {
     "message": "Kaydet"
   },

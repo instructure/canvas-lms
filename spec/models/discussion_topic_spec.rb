@@ -1079,22 +1079,6 @@ describe DiscussionTopic do
       expect(@teacher.stream_item_instances.count).to eq 1
     end
 
-    it "should send stream items to participating students" do
-      expect { @course.discussion_topics.create!(:title => "topic", :user => @teacher) }.to change { @student.stream_item_instances.count }.by(1)
-    end
-
-    it "should not send stream items to students if the topic isn't published" do
-      topic = nil
-      expect { topic = @course.discussion_topics.create!(:title => "secret topic", :user => @teacher, :workflow_state => 'unpublished') }.to change { @student.stream_item_instances.count }.by(0)
-      expect { topic.discussion_entries.create! }.to change { @student.stream_item_instances.count }.by(0)
-    end
-
-    it "should not send stream items to students if the topic is not available yet" do
-      topic = nil
-      expect { topic = @course.discussion_topics.create!(:title => "secret topic", :user => @teacher, :delayed_post_at => 1.week.from_now) }.to change { @student.stream_item_instances.count }.by(0)
-      expect { topic.discussion_entries.create! }.to change { @student.stream_item_instances.count }.by(0)
-    end
-
     it "should send stream items to students for graded discussions" do
       @topic = @course.discussion_topics.build(:title => "topic")
       @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)

@@ -110,7 +110,6 @@
 .medium {
   &.root {
     display: block;
-    margin: 0;
   }
   .hero, .overlay {
     border-radius: 0;

@@ -201,22 +201,9 @@ Object.assign(CommonEvent.prototype, {
     return 'assignment'
   },
 
-  plannerObjectType() {
-    switch(this.object.plannable_type) {
-      case 'discussion_topic':
-        return 'discussion'
-      case 'wiki_page':
-        return 'document'
-      default:
-        return null
-    }
-  },
-
   iconType() {
     let type
     if ((type = this.assignmentType())) {
-      return type
-    } else if ((type = this.plannerObjectType())) {
       return type
     } else if (this.eventType === 'planner_note') {
       return 'note-light'

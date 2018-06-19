@@ -81,7 +81,7 @@ class Course < ActiveRecord::Base
   has_many :all_students, :through => :all_student_enrollments, :source => :user
   has_many :all_students_including_deleted, :through => :all_student_enrollments_including_deleted, source: :user
   has_many :all_accepted_student_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')").preload(:user) }, class_name: 'Enrollment'
-  has_many :all_accepted_students, -> { distinct }, :through => :all_accepted_student_enrollments, :source => :user
+  has_many :all_accepted_students, :through => :all_accepted_student_enrollments, :source => :user
   has_many :all_real_enrollments, -> { where("enrollments.workflow_state<>'deleted' AND enrollments.type<>'StudentViewEnrollment'").preload(:user) }, class_name: 'Enrollment'
   has_many :all_real_users, :through => :all_real_enrollments, :source => :user
   has_many :all_real_student_enrollments, -> { where("enrollments.type = 'StudentEnrollment' AND enrollments.workflow_state <> 'deleted'").preload(:user) }, class_name: 'StudentEnrollment'
@@ -965,17 +965,15 @@ class Course < ActiveRecord::Base
     true
   end
 
-  def update_enrolled_users(sis_batch: nil)
+  def update_enrolled_users
     self.shard.activate do
-      if self.workflow_state_changed? || sis_batch && self.saved_change_to_workflow_state?
+      if self.workflow_state_changed?
         if self.completed?
-          enrollment_info = Enrollment.where(:course_id => self, :workflow_state => ['active', 'invited']).select(:id, :workflow_state).to_a
-          if enrollment_info.any?
-            data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: enrollment_info, updated_state: 'completed')
-            Enrollment.where(:id => enrollment_info.map(&:id)).update_all(:workflow_state => 'completed', :completed_at => Time.now.utc)
-            EnrollmentState.where(:enrollment_id => enrollment_info.map(&:id)).
-              update_all(["state = ?, state_is_current = ?, access_is_current = ?, lock_version = lock_version + 1", 'completed', true, false])
-            EnrollmentState.send_later_if_production(:process_states_for_ids, enrollment_info.map(&:id)) # recalculate access
+          enrollment_ids = Enrollment.where(:course_id => self, :workflow_state => ['active', 'invited']).pluck(:id)
+          if enrollment_ids.any?
+            Enrollment.where(:id => enrollment_ids).update_all(:workflow_state => 'completed', :completed_at => Time.now.utc)
+            EnrollmentState.where(:enrollment_id => enrollment_ids).update_all(["state = ?, state_is_current = ?, access_is_current = ?, lock_version = lock_version + 1", 'completed', true, false])
+            EnrollmentState.send_later_if_production(:process_states_for_ids, enrollment_ids) # recalculate access
           end
 
           appointment_participants.active.current.update_all(:workflow_state => 'deleted')
@@ -985,12 +983,10 @@ class Course < ActiveRecord::Base
 
           user_ids = enroll_scope.group(:user_id).pluck(:user_id).uniq
           if user_ids.any?
-            enrollment_info = enroll_scope.select(:id, :workflow_state).to_a
-            if enrollment_info.any?
-              data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: enrollment_info, updated_state: 'deleted')
-              Enrollment.where(:id => enrollment_info.map(&:id)).update_all(:workflow_state => 'deleted')
-              EnrollmentState.where(:enrollment_id => enrollment_info.map(&:id)).
-                update_all(["state = ?, state_is_current = ?, lock_version = lock_version + 1", 'deleted', true])
+            enrollment_ids = enroll_scope.pluck(:id)
+            if enrollment_ids.any?
+              Enrollment.where(:id => enrollment_ids).update_all(:workflow_state => 'deleted')
+              EnrollmentState.where(:enrollment_id => enrollment_ids).update_all(["state = ?, state_is_current = ?, lock_version = lock_version + 1", 'deleted', true])
             end
             User.send_later_if_production(:update_account_associations, user_ids)
           end
@@ -1004,7 +1000,6 @@ class Course < ActiveRecord::Base
 
       Enrollment.where(:course_id => self).touch_all
       User.where(id: Enrollment.where(course_id: self).select(:user_id)).touch_all
-      data
     end
   end
 
@@ -1243,27 +1238,6 @@ class Course < ActiveRecord::Base
   def destroy
     self.workflow_state = 'deleted'
     save!
-  end
-
-  def self.destroy_batch(courses, sis_batch: nil, batch_mode: false)
-    enroll_scope = Enrollment.where(course_id: courses, workflow_state: 'deleted')
-    enroll_scope.find_in_batches do |e_batch|
-      user_ids = e_batch.map(&:user_id).uniq.sort
-      data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch,
-                                                       contexts: e_batch,
-                                                       updated_state: 'deleted',
-                                                       batch_mode_delete: batch_mode)
-      SisBatchRollBackData.bulk_insert_roll_back_data(data) if data
-      Enrollment.where(id: e_batch.map(&:id)).update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
-      EnrollmentState.where(:enrollment_id => e_batch.map(&:id)).
-        update_all(["state = ?, state_is_current = ?, lock_version = lock_version + 1", 'deleted', true])
-      User.where(id: user_ids).touch_all
-      User.send_later_if_production(:update_account_associations, user_ids) if user_ids.any?
-    end
-    c_data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: courses, updated_state: 'deleted', batch_mode_delete: batch_mode)
-    SisBatchRollBackData.bulk_insert_roll_back_data(c_data) if c_data
-    Course.where(id: courses).update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
-    courses.count
   end
 
   def call_event(event)

@@ -421,12 +421,6 @@ define [
     isQuizLTIAssignment: =>
       @get('is_quiz_lti_assignment')
 
-    isImporting: =>
-      @get('workflow_state') == 'importing'
-
-    failedToImport: =>
-      @get('workflow_state') == 'failed_to_import'
-
     submissionTypesFrozen: =>
       _.include(@frozenAttributes(), 'submission_types')
 
@@ -449,7 +443,6 @@ define [
         'moderatedGrading', 'postToSISEnabled', 'isOnlyVisibleToOverrides',
         'omitFromFinalGrade', 'isDuplicating', 'failedToDuplicate',
         'originalAssignmentName', 'is_quiz_assignment', 'isQuizLTIAssignment',
-        'isImporting', 'failedToImport',
         'secureParams', 'inClosedGradingPeriod', 'dueDateRequired',
         'submissionTypesFrozen', 'anonymousInstructorAnnotations',
         'anonymousGrading'
@@ -563,23 +556,11 @@ define [
         {}, callback
 
     pollUntilFinishedDuplicating: (interval = 3000) =>
-      @pollUntilFinished(interval, @isDuplicating)
-
-    pollUntilFinishedImporting: (interval = 3000) =>
-      @pollUntilFinished(interval, @isImporting)
-
-    pollUntilFinishedLoading: (interval = 3000) =>
-      if @isDuplicating()
-        @pollUntilFinishedDuplicating(interval)
-      else if @isImporting()
-        @pollUntilFinishedImporting(interval)
-
-    pollUntilFinished: (interval, isFinished) =>
       # TODO: implement pandapub streaming updates
       poller = new PandaPubPoller interval, interval * 5, (done) =>
         @fetch().always =>
           done()
-          poller.stop() unless isFinished()
+          poller.stop() unless @isDuplicating()
       poller.start()
 
     isOnlyVisibleToOverrides: (override_flag) ->
@@ -593,7 +574,6 @@ define [
       props =
         currentGraderCount: @get('grader_count')
         finalGraderID: @get('final_grader_id')
-        gradedSubmissionsExist: ENV.HAS_GRADED_SUBMISSIONS
         moderatedGradingEnabled: @moderatedGrading()
         availableModerators: ENV.AVAILABLE_MODERATORS
         maxGraderCount: ENV.MODERATED_GRADING_MAX_GRADER_COUNT

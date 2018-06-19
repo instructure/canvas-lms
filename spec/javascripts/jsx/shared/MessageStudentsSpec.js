@@ -21,6 +21,7 @@ import ReactDOM from 'react-dom'
 import TestUtils from 'react-addons-test-utils'
 import axios from 'axios'
 import MessageStudents from 'jsx/shared/MessageStudents'
+import Transition from '@instructure/ui-core/lib/components/Transition'
 
 let $domNode, subject, fixtures
 
@@ -33,6 +34,9 @@ const renderComponent = props => {
 QUnit.module('MessageStudents', hooks => {
   hooks.beforeEach(() => {
     fixtures = document.getElementById('fixtures')
+    const appElement = document.createElement('div')
+    appElement.id = 'application'
+    fixtures.appendChild(appElement)
   })
   hooks.afterEach(() => {
     ReactDOM.unmountComponentAtNode($domNode)
@@ -226,6 +230,10 @@ QUnit.module('MessageStudents', hooks => {
     test('sets state.hideAlert to true', () => {
       notOk(subject.state.hideAlert, 'precondition')
       TestUtils.Simulate.click(closeButton)
+      // can remove these ticks once this ticket is resolved
+      // https://instructure.atlassian.net/browse/INSTUI-607
+      clocks.tick(Transition.duration)
+      clocks.tick(Transition.duration)
       ok(subject.state.hideAlert)
     })
   })

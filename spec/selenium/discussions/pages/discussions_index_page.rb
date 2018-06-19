@@ -107,10 +107,6 @@ class DiscussionsIndex
       f('.subscribe-button', discussion(title))
     end
 
-    def discussion_availability(title)
-      f('.discussion-availability', discussion(title))
-    end
-
     # ---------------------- Discussion Menu ----------------------
     def discussion_menu(title)
       f('.discussions-index-manage-menu button', discussion(title))

@@ -39,7 +39,7 @@ module Quizzes
                 :quiz_submissions_zip_url, :preview_url, :quiz_submission_versions_html_url,
                 :assignment_id, :one_time_results, :only_visible_to_overrides,
                 :assignment_group_id, :show_correct_answers_last_attempt, :version_number,
-                :has_access_code, :post_to_sis, :anonymous_submissions, :migration_id
+                :has_access_code, :post_to_sis, :anonymous_submissions
 
     def_delegators :@controller,
       # :api_v1_course_assignment_group_url,
@@ -216,7 +216,7 @@ module Quizzes
         when :quiz_extensions_url, :moderate_url, :deleted
           accepts_jsonapi? && user_may_manage?
         when :quiz_submission_html_url, :take_quiz_url
-          accepts_jsonapi?
+         accepts_jsonapi?
         when :quiz_submissions_zip_url
           accepts_jsonapi? && user_may_grade? && has_file_uploads?
         when :preview_url
@@ -317,7 +317,7 @@ module Quizzes
     private
 
     def show_speedgrader?
-      quiz.assignment.present? && quiz.published? && quiz.assignment.can_view_speed_grader?(current_user)
+      quiz.assignment.present? && quiz.published? && context.allows_speed_grader?
     end
 
     def quiz_locked_for_user?

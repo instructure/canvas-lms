@@ -19,6 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-addons-test-utils'
+import Button from '@instructure/ui-core/lib/components/Button'
 import CourseImagePicker from 'jsx/course_settings/components/CourseImagePicker'
 
 const wrapper = document.getElementById('fixtures');

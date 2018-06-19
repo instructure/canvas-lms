@@ -138,13 +138,13 @@ test('renders master course lock icon if masterCourseData is provided', (assert)
 
 test('renders reply button icon if is not locked', () => {
   const tree = mount(<AnnouncementRow {...makeProps({ announcement: { locked: false } })} />)
-  const node = tree.find('IconReply')
+  const node = tree.find('IconReplyLine')
   ok(node.exists())
 })
 
 test('does not render reply button icon if is locked', () => {
   const tree = mount(<AnnouncementRow {...makeProps({ announcement: { locked: true } })} />)
-  const node = tree.find('IconReply')
+  const node = tree.find('IconReplyLine')
   notOk(node.exists())
 })
 

@@ -64,17 +64,6 @@ QUnit.module('EventDataSource: getEvents', {
             due_at
           }
         })
-      },
-      addPlannerItem(course_id, plannable_type, plannable_id, title, todo_date) {
-        return this.calendarEvents.push({
-          course_id,
-          plannable_type,
-          plannable_id,
-          plannable: {
-            title,
-            todo_date
-          }
-        })
       }
     }
 
@@ -275,19 +264,4 @@ test('indexParams filters appointment_group_ids from params', function() {
   equal(p.blah, 'blah')
   deepEqual(p.context_codes, ['course_1', 'group_3'])
   equal(p.appointment_group_ids, '2,1337')
-})
-
-test('transforms planner item', function() {
-  const date = fcUtil.unwrap(this.date2).toISOString()
-  this.server.addPlannerItem(1, 'discussion_topic', 3, 'blah', date)
-  this.source.getEvents(this.date1, this.date4, this.contexts, events => {
-    equal(events.length, 1)
-    const event = events[0].calendarEvent
-    equal(event.context_code, 'course_1')
-    equal(event.all_context_codes, 'course_1')
-    equal(event.start_at, date)
-    equal(event.end_at, date)
-    equal(event.type, 'discussion_topic')
-    equal(event.title, 'blah')
-  })
 })

@@ -20,14 +20,14 @@ import I18n from 'i18n!discussion_settings'
 import React, { Component } from 'react'
 import { func, bool } from 'prop-types'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import CheckboxGroup from '@instructure/ui-forms/lib/components/CheckboxGroup'
-import Modal, {ModalHeader, ModalBody, ModalFooter} from '@instructure/ui-overlays/lib/components/Modal'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import IconSettingsLine from '@instructure/ui-icons/lib/Line/IconSettings'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Heading from '@instructure/ui-core/lib/components/Heading'
+import Checkbox from '@instructure/ui-core/lib/components/Checkbox'
+import Spinner from '@instructure/ui-core/lib/components/Spinner'
+import CheckboxGroup from '@instructure/ui-core/lib/components/CheckboxGroup'
+import Modal, {ModalHeader, ModalBody, ModalFooter} from '@instructure/ui-core/lib/components/Modal'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import IconSettingsLine from 'instructure-icons/lib/Line/IconSettingsLine'
 import propTypes from '../propTypes'
 
 const STUDENT_SETTINGS = ["allow_student_forum_attachments",
@@ -44,10 +44,12 @@ export default class DiscussionSettings extends Component {
     saveSettings: func.isRequired,
     toggleModalOpen: func.isRequired,
     userSettings: propTypes.userSettings.isRequired,
+    applicationElement: func,
   }
 
   static defaultProps = {
     courseSettings: {},
+    applicationElement: () => [document.getElementById('application')]
   }
 
   state = {
@@ -151,6 +153,7 @@ export default class DiscussionSettings extends Component {
            onExited={this.exited}
            shouldCloseOnOverlayClick
            closeButtonLabel={I18n.t('Close Discussion Settings')}
+           applicationElement={this.props.applicationElement}
          >
            <ModalHeader>
              <Heading>{I18n.t('Edit Discussion Settings')}</Heading>

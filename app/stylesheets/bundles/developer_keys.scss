@@ -22,20 +22,6 @@
   text-align: center;
 }
 
-.scopes-list {
-  .developer-key-scope {
-    margin-right: -29px;
-  }
-}
-
-.scopes-group {
-  border-bottom: solid 1px $ic-border-color;
-}
-
-.LazyLoad.is-visible {
-  height: auto !important;
-}
-
 #keys, .keys {
   tr:hover {
     td {

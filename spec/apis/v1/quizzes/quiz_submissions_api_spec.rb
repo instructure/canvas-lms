@@ -754,10 +754,11 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
   end
 
   describe "GET /courses/:course_id/quizzes/:quiz_id/submssions/:id/time" do
-    now = Time.now.utc
     around(:once_and_each) do |block|
-      Timecop.freeze(now) { block.call }
+      Timecop.freeze(Time.local(2018, 5, 8, 10, 5, 0)) { block.call }
     end
+
+    let_once(:now) { Time.zone.now }
 
     before :once do
       enroll_student

@@ -19,12 +19,12 @@
 import React from 'react'
 import * as enzyme from 'enzyme'
 import CoursePickerTable from 'jsx/blueprint_courses/components/CoursePickerTable'
-import getSampleData from '../getSampleData'
+import data from '../sampleData'
 
 QUnit.module('CoursePickerTable component')
 
 const defaultProps = () => ({
-  courses: getSampleData().courses,
+  courses: data.courses,
   selectedCourses: [],
   onSelectedChanged: () => {},
 })

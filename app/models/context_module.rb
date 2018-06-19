@@ -20,7 +20,6 @@ class ContextModule < ActiveRecord::Base
   include Workflow
   include SearchTermHelper
   include DuplicatingObjects
-  include LockedFor
 
   include MasterCourses::Restrictor
   restrict_columns :state, [:workflow_state]
@@ -321,11 +320,11 @@ class ContextModule < ActiveRecord::Base
     can :read
   end
 
-  def low_level_locked_for?(user, opts={})
+  def locked_for?(user, opts={})
     return false if self.grants_right?(user, :read_as_admin)
     available = self.available_for?(user, opts)
-    return {object: self, module: self} unless available
-    return {object: self, module: self, unlock_at: unlock_at} if to_be_unlocked
+    return {:asset_string => self.asset_string, :context_module => self.attributes} unless available
+    return {:asset_string => self.asset_string, :context_module => self.attributes, :unlock_at => self.unlock_at} if self.to_be_unlocked
     false
   end
 

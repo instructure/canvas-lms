@@ -158,44 +158,6 @@ test('creates the SELECT_MARK action', () => {
   deepEqual(action, expected, 'creates the action successfully')
 })
 
-test('creates the UNMUTED action with a type of UNMUTED', () => {
-  const action = ModerationActions.unmuted('test message')
-  strictEqual(action.type, ModerationActions.UNMUTED)
-})
-
-test('creates the UNMUTED action with the passed-in message', () => {
-  const action = ModerationActions.unmuted('test message')
-  strictEqual(action.payload.message, 'test message')
-})
-
-test('creates the UNMUTED action with the current time', () => {
-  const now = Date.now()
-  const clock = sinon.useFakeTimers(now)
-
-  const action = ModerationActions.unmuted('test message')
-  strictEqual(action.payload.time, now)
-  clock.restore()
-})
-
-test('creates the UNMUTED_FAILED action with a type of UNMUTED_FAILED', () => {
-  const action = ModerationActions.unmuteFailed('test message')
-  strictEqual(action.type, ModerationActions.UNMUTED_FAILED)
-})
-
-test('creates the UNMUTED_FAILED action with the passed-in message', () => {
-  const action = ModerationActions.unmuteFailed('test message')
-  strictEqual(action.payload.message, 'test message')
-})
-
-test('creates the UNMUTED_FAILED action with the current time', () => {
-  const now = Date.now()
-  const clock = sinon.useFakeTimers(now)
-
-  const action = ModerationActions.unmuteFailed('test message')
-  strictEqual(action.payload.time, now)
-  clock.restore()
-})
-
 QUnit.module('ModerationActions#apiGetStudents', {
   setup() {
     this.client = {
@@ -489,68 +451,4 @@ test('dispatches displayErrorMessage on failure', function(assert) {
     equal(action.error, true, 'has correct payload')
     return start()
   }, getState)
-})
-
-QUnit.module('ModerationActions#unmuteAssignment', function(hooks) {
-  let client
-
-  hooks.beforeEach(() => {
-    client = {
-      put() {
-        return new Promise(resolve => setTimeout(() => resolve('test'), 100))
-      }
-    }
-  })
-
-  test('dispatches UNMUTED action on success', function(assert) {
-    const done = assert.async()
-    const getState = () => ({urls: {unmute_assignment_url: 'some_url'}})
-    const fakeResponse = {status: 200}
-    sinon.stub(client, 'put').returns(Promise.resolve(fakeResponse))
-
-    ModerationActions.unmuteAssignment(client)(action => {
-      strictEqual(action.type, ModerationActions.UNMUTED)
-      client.put.restore()
-      done()
-    }, getState)
-  })
-
-  test('dispatches message indicating unmuting on success', function(assert) {
-    const done = assert.async()
-    const getState = () => ({urls: {unmute_assignment_url: 'some_url'}})
-    const fakeResponse = {status: 200}
-    sinon.stub(client, 'put').returns(Promise.resolve(fakeResponse))
-
-    ModerationActions.unmuteAssignment(client)(action => {
-      strictEqual(action.payload.message, 'Success! Grades for this assignment are now visible to students.')
-      client.put.restore()
-      done()
-    }, getState)
-  })
-
-  test('dispatches UNMUTED_FAILED action on error', function(assert) {
-    const done = assert.async()
-    const getState = () => ({urls: {unmute_assignment_url: 'some_url'}})
-    const fakeResponse = {status: 400}
-    sinon.stub(client, 'put').returns(Promise.reject(fakeResponse))
-
-    ModerationActions.unmuteAssignment(client)(action => {
-      strictEqual(action.type, ModerationActions.UNMUTED_FAILED)
-      client.put.restore()
-      done()
-    }, getState)
-  })
-
-  test('dispatches message indicating unmute failed on error', function(assert) {
-    const done = assert.async()
-    const getState = () => ({urls: {unmute_assignment_url: 'some_url'}})
-    const fakeResponse = {status: 400}
-    sinon.stub(client, 'put').returns(Promise.reject(fakeResponse))
-
-    ModerationActions.unmuteAssignment(client)(action => {
-      strictEqual(action.payload.message, 'An error occurred updating the assignment.')
-      client.put.restore()
-      done()
-    }, getState)
-  })
 })

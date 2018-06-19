@@ -19,17 +19,17 @@
 import I18n from 'i18n!new_nav'
 import React from 'react'
 import {bool, array, func, string} from 'prop-types'
-import View from '@instructure/ui-layout/lib/components/View'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
+import Container from '@instructure/ui-core/lib/components/Container'
+import Heading from '@instructure/ui-core/lib/components/Heading'
 import HelpDialog from '../../help_dialog/HelpDialog'
 
 export default function HelpTray({trayTitle, closeTray, links, hasLoaded}) {
   return (
-    <View as="div" padding="medium" id="help_tray">
+    <Container as="div" padding="medium" id="help_tray">
       <Heading level="h3" as="h2">{trayTitle}</Heading>
       <hr role="presentation"/>
       <HelpDialog links={links} hasLoaded={hasLoaded} onFormSubmit={closeTray}/>
-    </View>
+    </Container>
   )
 }
 

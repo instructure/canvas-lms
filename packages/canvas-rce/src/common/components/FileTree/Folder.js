@@ -16,24 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import PropTypes from "prop-types";
-
 import React, { Component } from "react";
 import File from "./File";
 import Loading from "../Loading";
 import { css } from "aphrodite";
 import styles from "./styles";
-import IconMiniArrowDownLine from "@instructure/ui-icons/lib/Line/IconMiniArrowDown";
-import IconMiniArrowRightLine from "@instructure/ui-icons/lib/Line/IconMiniArrowRight";
-import IconFolderLine from "@instructure/ui-icons/lib/Line/IconFolder";
+import IconMiniArrowDownLine from "instructure-icons/lib/Line/IconMiniArrowDownLine";
+import IconMiniArrowRightLine from "instructure-icons/lib/Line/IconMiniArrowRightLine";
+import IconFolderLine from "instructure-icons/lib/Line/IconFolderLine";
 
 export default class Folder extends Component {
-  handleToggle = () => {
+  constructor(props) {
+    super(props);
+    this.handleToggle = this.handleToggle.bind(this);
+  }
+
+  handleToggle() {
     const { onToggle, folder } = this.props;
     if (onToggle) {
       onToggle(folder.id);
     }
-  };
+  }
 
   files() {
     return this.props.folder.fileIds
@@ -92,19 +95,19 @@ export default class Folder extends Component {
   }
 }
 
-const folderPropType = PropTypes.shape({
-  id: PropTypes.number,
-  name: PropTypes.string,
-  loading: PropTypes.bool,
-  fileIds: PropTypes.arrayOf(PropTypes.number),
-  folderIds: PropTypes.arrayOf(PropTypes.number)
+const folderPropType = React.PropTypes.shape({
+  id: React.PropTypes.number,
+  name: React.PropTypes.string,
+  loading: React.PropTypes.bool,
+  fileIds: React.PropTypes.arrayOf(React.PropTypes.number),
+  folderIds: React.PropTypes.arrayOf(React.PropTypes.number)
 });
 
 Folder.propTypes = {
-  folders: PropTypes.objectOf(folderPropType),
-  files: PropTypes.objectOf(File.propTypes.file),
+  folders: React.PropTypes.objectOf(folderPropType),
+  files: React.PropTypes.objectOf(File.propTypes.file),
   folder: folderPropType.isRequired,
-  onToggle: PropTypes.func,
+  onToggle: React.PropTypes.func,
   onSelect: File.propTypes.onSelect
 };
 

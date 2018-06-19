@@ -226,7 +226,12 @@ describe ApplicationController do
       # safe_domain_file_url wants to use request.protocol
       allow(controller).to receive(:request).and_return(double(:protocol => '', :host_with_port => ''))
 
-      @common_params = { :only_path => true }
+      @common_params = {
+        :user_id => nil,
+        :ts => nil,
+        :sf_verifier => nil,
+        :only_path => true
+      }
     end
 
     it "should include inline=1 in url by default" do
@@ -791,22 +796,6 @@ describe ApplicationController do
         end
         controller.send(:get_all_pertinent_contexts, include_groups: true, only_contexts: "group_#{@other_group.id},group_#{@group.id}")
         expect(controller.instance_variable_get(:@contexts).select{|c| c.is_a?(Group)}).to eq [@group]
-      end
-
-      it "should not include groups in courses the user doesn't have the ability to view yet" do
-        user_factory(active_all: true)
-        controller.instance_variable_set(:@context, @user)
-
-        course_factory
-        student_in_course(:user => @user, :course => @course)
-        expect(@course).to_not be_available
-        expect(@user.cached_current_enrollments).to be_empty
-        @other_group = group_model(:context => @course)
-        group_model(:context => @course)
-        @group.add_user(@user)
-
-        controller.send(:get_all_pertinent_contexts, include_groups: true)
-        expect(controller.instance_variable_get(:@contexts).select{|c| c.is_a?(Group)}).to be_empty
       end
 
       it 'must select all cross-shard courses the user belongs to' do

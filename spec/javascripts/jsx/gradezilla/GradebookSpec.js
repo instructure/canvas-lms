@@ -33,7 +33,6 @@ import ActionMenu from 'jsx/gradezilla/default_gradebook/components/ActionMenu';
 import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator';
 import DataLoader from 'jsx/gradezilla/DataLoader';
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
-import AnonymousSpeedGraderAlert from 'jsx/gradezilla/default_gradebook/components/AnonymousSpeedGraderAlert'
 import GradebookApi from 'jsx/gradezilla/default_gradebook/apis/GradebookApi';
 import LatePolicyApplicator from 'jsx/grading/LatePolicyApplicator';
 import SubmissionStateMap from 'jsx/gradezilla/SubmissionStateMap';
@@ -4532,6 +4531,23 @@ QUnit.module('Gradebook Grid Events', () => {
       strictEqual(gradebook.onBeforeEditCell(null, eventObject), false);
     });
 
+    test('returns false when the student enrollment is concluded', () => {
+      gradebook.students[1101].isConcluded = true;
+      strictEqual(gradebook.onBeforeEditCell(null, eventObject), false);
+    });
+
+    test('returns false when the submission is locked', () => {
+      gradebook.submissionStateMap.getSubmissionState
+        .withArgs({ user_id: '1101', assignment_id: '2301' }).returns({ locked: true });
+      strictEqual(gradebook.onBeforeEditCell(null, eventObject), false);
+    });
+
+    test('returns true when the submission state is undefined', () => {
+      gradebook.submissionStateMap.getSubmissionState
+        .withArgs({ user_id: '1101', assignment_id: '2301' }).returns(undefined);
+      strictEqual(gradebook.onBeforeEditCell(null, eventObject), true);
+    });
+
     test('returns true when the cell is not in an assignment column', () => {
       eventObject.column = { type: 'custom_column' };
       strictEqual(gradebook.onBeforeEditCell(null, eventObject), true);
@@ -6196,18 +6212,6 @@ test('sets the submission state map .isAdmin when the current user roles do not 
   const gradebook = createGradebook();
   gradebook.initSubmissionStateMap();
   strictEqual(gradebook.submissionStateMap.isAdmin, false);
-});
-
-test('sets submission state map .anonymousModeratedMarkingEnabled when anonymous moderated marking flag is set', function () {
-  const gradebook = createGradebook({ anonymous_moderated_marking_enabled: true });
-  gradebook.initSubmissionStateMap();
-  strictEqual(gradebook.submissionStateMap.anonymousModeratedMarkingEnabled, true);
-});
-
-test('sets submission state map .anonymousModeratedMarkingEnabled to false when anonymous moderated marking flag is reset', function () {
-  const gradebook = createGradebook({ anonymous_moderated_marking_enabled: false });
-  gradebook.initSubmissionStateMap();
-  strictEqual(gradebook.submissionStateMap.anonymousModeratedMarkingEnabled, false);
 });
 
 QUnit.module('Gradebook#initPostGradesLtis');
@@ -7982,91 +7986,6 @@ test('affects submissions that are in not-closed grading periods', function () {
 QUnit.module('Gradebook', () => {
   let gradebook
 
-  QUnit.module('#isGradeEditable()', hooks => {
-    hooks.beforeEach(() => {
-      gradebook = createGradebook()
-      gradebook.students = {1101: {id: '1101', isConcluded: false}}
-      sinon.stub(gradebook.submissionStateMap, 'getSubmissionState').returns({hideGrade: false, locked: false})
-    })
-
-    hooks.afterEach(() => {
-      gradebook.submissionStateMap.getSubmissionState.restore()
-    })
-
-    test('returns true when the submission state is not locked', () => {
-      strictEqual(gradebook.isGradeEditable('1101', '2301'), true)
-    })
-
-    test('returns false when the submission state is locked', () => {
-      gradebook.submissionStateMap.getSubmissionState.returns({hideGrade: false, locked: true})
-      strictEqual(gradebook.isGradeEditable('1101', '2301'), false)
-    })
-
-    test('returns false when the submission state is not defined', () => {
-      gradebook.submissionStateMap.getSubmissionState.returns(undefined)
-      strictEqual(gradebook.isGradeEditable('1101', '2301'), false)
-    })
-
-    test('uses the given assignment id when retrieving submission state', () => {
-      gradebook.isGradeEditable('1101', '2301')
-      const submission = gradebook.submissionStateMap.getSubmissionState.lastCall.args[0]
-      strictEqual(submission.assignment_id, '2301')
-    })
-
-    test('uses the given student id when retrieving submission state', () => {
-      gradebook.isGradeEditable('1101', '2301')
-      const submission = gradebook.submissionStateMap.getSubmissionState.lastCall.args[0]
-      strictEqual(submission.user_id, '1101')
-    })
-
-    test('returns false when the student enrollment is concluded', () => {
-      gradebook.students[1101].isConcluded = true
-      strictEqual(gradebook.isGradeEditable('1101', '2301'), false)
-    })
-
-    test('returns false when the student is not loaded', () => {
-      delete gradebook.students[1101]
-      strictEqual(gradebook.isGradeEditable('1101', '2301'), false)
-    })
-  })
-
-  QUnit.module('#isGradeVisible()', hooks => {
-    hooks.beforeEach(() => {
-      gradebook = createGradebook()
-      sinon.stub(gradebook.submissionStateMap, 'getSubmissionState').returns({hideGrade: false, locked: true})
-    })
-
-    hooks.afterEach(() => {
-      gradebook.submissionStateMap.getSubmissionState.restore()
-    })
-
-    test('returns true when the submission state is not hiding the grade', () => {
-      strictEqual(gradebook.isGradeVisible('1101', '2301'), true)
-    })
-
-    test('returns false when the submission state is hiding the grade', () => {
-      gradebook.submissionStateMap.getSubmissionState.returns({hideGrade: true, locked: true})
-      strictEqual(gradebook.isGradeVisible('1101', '2301'), false)
-    })
-
-    test('returns false when the submission state is not defined', () => {
-      gradebook.submissionStateMap.getSubmissionState.returns(undefined)
-      strictEqual(gradebook.isGradeVisible('1101', '2301'), false)
-    })
-
-    test('uses the given assignment id when retrieving submission state', () => {
-      gradebook.isGradeVisible('1101', '2301')
-      const submission = gradebook.submissionStateMap.getSubmissionState.lastCall.args[0]
-      strictEqual(submission.assignment_id, '2301')
-    })
-
-    test('uses the given student id when retrieving submission state', () => {
-      gradebook.isGradeVisible('1101', '2301')
-      const submission = gradebook.submissionStateMap.getSubmissionState.lastCall.args[0]
-      strictEqual(submission.user_id, '1101')
-    })
-  })
-
   QUnit.module('#addPendingGradeInfo()', hooks => {
     let pendingGradeInfo
     let submission
@@ -9108,13 +9027,12 @@ QUnit.module('Gradebook#showAnonymousSpeedGraderAlertForURL', (hooks) => {
 
   test('renders the alert with the supplied speedGraderURL', function () {
     gradebook = createGradebook();
-    sinon.stub(AnonymousSpeedGraderAlert.prototype, 'open');
+
     sinon.spy(gradebook, 'renderAnonymousSpeedGraderAlert');
     gradebook.showAnonymousSpeedGraderAlertForURL('http://test.url:3000');
 
     strictEqual(anonymousSpeedGraderAlertProps().speedGraderUrl, 'http://test.url:3000');
     gradebook.renderAnonymousSpeedGraderAlert.restore();
-    AnonymousSpeedGraderAlert.prototype.open.restore();
   });
 });
 
@@ -9256,20 +9174,5 @@ QUnit.module('Gradebook#setAssignmentGroupsLoaded', (hooks) => {
   test('sets contentLoadStates.assignmentGroupsLoaded to false when passed false', () => {
     gradebook.setAssignmentGroupsLoaded(false)
     strictEqual(gradebook.contentLoadStates.assignmentGroupsLoaded, false)
-  })
-})
-
-QUnit.module('Gradebook#handleAssignmentMutingChange', (hooks) => {
-  let gradebook
-
-  hooks.beforeEach(() => {
-    gradebook = createGradebook()
-  })
-
-  test('resets grading', () => {
-    sinon.stub(gradebook, 'resetGrading')
-    gradebook.handleAssignmentMutingChange({ id: '2301' })
-    strictEqual(gradebook.resetGrading.callCount, 1)
-    gradebook.resetGrading.restore()
   })
 })

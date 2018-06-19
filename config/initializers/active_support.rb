@@ -105,13 +105,3 @@ module RaiseErrorOnDurationCoercion
   end
 end
 ActiveSupport::Duration.prepend(RaiseErrorOnDurationCoercion)
-
-module Enumerable
-  def pluck(*keys)
-    if keys.many?
-      map { |o| keys.map { |key| o.is_a?(ActiveRecord::Base) ? o.send(key) : o[key] } }
-    else
-      map { |o| o.is_a?(ActiveRecord::Base) ? o.send(keys.first) : o[keys.first] }
-    end
-  end
-end

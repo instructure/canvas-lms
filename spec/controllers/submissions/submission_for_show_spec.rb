@@ -16,99 +16,86 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../spec_helper'
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 describe Submissions::SubmissionForShow do
-  subject { Submissions::SubmissionForShow.new(assignment_id: assignment.id, context: course, id: student.id) }
-
-  let(:course) do
-    course_with_student
-    @course
+  before :once do
+    course_with_student(active_all: true)
+    assignment_model(course: @course)
+    @options = {
+      assignment_id: @assignment.id,
+      id: @student.id
+    }
   end
-
-  let(:student) do
-    course
-    @student
-  end
-
-  let(:assignment) { course.assignments.create! }
-  let(:submission) do
-    Timecop.freeze(2.hours.ago) do
-      assignment.submit_homework(student, { body: 'hello' })
-    end
-  end
+  subject { Submissions::SubmissionForShow.new(@course, @options) }
 
   describe '#assignment' do
     it 'returns assignment found with provided assignment_id' do
-      expect(subject.assignment).to eq assignment
+      expect(subject.assignment).to eq @assignment
     end
   end
 
   describe '#user' do
     it 'returns user found with provided id' do
-      expect(subject.user).to eq student
+      expect(subject.user).to eq @user
     end
   end
 
   describe '#submission' do
     it 'instantiates a new submission when one is not present' do
-      submission_for_show =
-        Submissions::SubmissionForShow.new(assignment_id: assignment.id, context: course, id: student.id)
       Submission.delete_all
-      expect(submission_for_show.submission).to be_new_record
+      expect(subject.submission).to be_new_record
     end
 
     context 'when submission exists' do
       before :once do
         submission_model({
-          assignment: assignment,
+          assignment: @assignment,
           body: 'here my assignment',
           submission_type: 'online_text_entry',
-          user: student
+          user: @student
         })
-        submission.submitted_at = 3.hours.ago
-        submission.save!
+        @submission.submitted_at = 3.hours.ago
+        @submission.save
       end
 
       it 'returns existing submission when present' do
-        expect(subject.submission).to eq submission
+        expect(subject.submission).to eq @submission
       end
 
+      # Note that submission_history returns a zero-indexed array,
+      # and even though I couldn't believe it, that is what is passed
+      # to the controller as the version query param.
       context 'when version & preview params are provided' do
-        subject do
-          Submissions::SubmissionForShow.new(
-            assignment_id: assignment.id,
-            context: course,
-            id: student.id,
-            preview: true,
-            version: 0
-          )
+        before :once do
+          @options = @options.merge({ preview: true, version: 0 })
         end
 
         it 'returns version from submission history' do
-          submission.with_versioning(explicit: true) do
-            submission.submitted_at = 1.hour.ago
-            submission.save!
-          end
+          expect {
+            @submission.with_versioning(explicit: true) do
+              @submission.submitted_at = 1.hour.ago
+              @submission.save
+            end
+          }.to change(@submission.versions, :count), 'precondition'
+          expect(@submission.version_number).to eq(2), 'precondition'
+
           expect(subject.submission.version_number).to eq 1
         end
 
         context 'when assignment is a quiz' do
-          it 'ignores version params' do
-            quiz = course.quizzes.create!
-            quiz_submission = quiz.quiz_submissions.create!(user: student)
-            quiz_submission.with_versioning(true) do
-              quiz_submission.update_attribute(:finished_at, 1.hour.ago)
+          before :once do
+            quiz_with_submission
+            @assignment = @quiz.assignment
+            submission = @quiz.assignment.submissions.where(user_id: @student).first
+            submission.quiz_submission.with_versioning(true) do
+              submission.quiz_submission.update_attribute(:finished_at, 1.hour.ago)
             end
-            version = quiz_submission.versions.last.number
-            Submissions::SubmissionForShow.new(
-              assignment_id: assignment.id,
-              context: course,
-              id: student.id,
-              preview: true,
-              version: version
-            )
-            expect(subject.submission.version_number).not_to eq version
+            @options = @options.merge({ preview: true, version: submission.quiz_submission.versions.last.number, assignment_id: @assignment.id })
+          end
+
+          it 'ignores version params' do
+            expect(subject.submission.version_number).not_to eq @options[:version]
           end
         end
       end

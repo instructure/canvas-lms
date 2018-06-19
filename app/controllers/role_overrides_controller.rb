@@ -170,7 +170,6 @@ class RoleOverridesController < ApplicationController
 
       if @context.is_a?(Account) && @context.feature_enabled?(:permissions_v2_ui)
         js_bundle :permissions_index
-        css_bundle :permissions
       else
         js_bundle :roles
       end

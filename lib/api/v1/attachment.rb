@@ -233,10 +233,8 @@ module Api::V1::Attachment
 
       json = InstFS.upload_preflight_json(
         context: context,
-        root_account: context.try(:root_account) || @domain_root_account,
         user: logged_in_user,
         acting_as: @current_user,
-        access_token: @access_token,
         folder: folder,
         filename: infer_upload_filename(params),
         content_type: infer_upload_content_type(params),

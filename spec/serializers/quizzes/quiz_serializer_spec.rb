@@ -61,7 +61,7 @@ describe Quizzes::QuizSerializer do
     :points_possible, :cant_go_back, :access_code, :ip_filter, :due_at,
     :lock_at, :unlock_at, :published, :show_correct_answers_at,
     :hide_correct_answers_at, :show_correct_answers_last_attempt,
-    :has_access_code, :migration_id
+    :has_access_code
   ].each do |attribute|
 
       it "serializes #{attribute}" do
@@ -126,10 +126,10 @@ describe Quizzes::QuizSerializer do
 
     # nil when context doesn't allow speedgrader
     allow(@quiz).to receive(:published?).and_return true
-    expect(assignment).to receive(:can_view_speed_grader?).with(@user).and_return false
+    expect(@context).to receive(:allows_speed_grader?).and_return false
     expect(@serializer.as_json[:quiz][:speed_grader_url]).to be_nil
 
-    expect(assignment).to receive(:can_view_speed_grader?).with(@user).and_return true
+    expect(@context).to receive(:allows_speed_grader?).and_return true
     json = @serializer.as_json[:quiz]
     expect(json[:speed_grader_url]).to eq(
       controller.send(:speed_grader_course_gradebook_url, @quiz.context, assignment_id: @quiz.assignment.id)

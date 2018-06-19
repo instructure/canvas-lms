@@ -19,10 +19,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!appointment_groups'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import IconMiniArrowRight from '@instructure/ui-icons/lib/Solid/IconMiniArrowRight'
-import IconMiniArrowDown from '@instructure/ui-icons/lib/Solid/IconMiniArrowDown'
-import Grid, { GridCol, GridRow } from '@instructure/ui-layout/lib/components/Grid'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Grid, { GridCol, GridRow } from '@instructure/ui-core/lib/components/Grid'
 
   class ContextSelector extends React.Component {
     static propTypes = {
@@ -199,9 +197,7 @@ import Grid, { GridCol, GridRow } from '@instructure/ui-layout/lib/components/Gr
 
     renderSections (context) {
       return (
-        <div id={`${context.asset_string}_sections`}
-             className={this.state.expandedContexts.has(context)
-               ? 'CourseListItem-sections' : 'hiddenSection'}>
+        <div id={`${context.asset_string}_sections`} className={this.state.expandedContexts.has(context) ? '' : 'hiddenSection'}>
           {
             (context.sections || []).map(section => {
               return (
@@ -210,7 +206,6 @@ import Grid, { GridCol, GridRow } from '@instructure/ui-layout/lib/components/Gr
                     id={`${section.asset_string}_checkbox`}
                     key={`${section.asset_string}_checkbox`}
                     type="checkbox"
-                    className="CourseListItem-section-item CourseListItem-item-checkbox"
                     onChange={() => this.toggleSection(context.asset_string, section.asset_string, !this.isSubContextChecked(context.asset_string, section.asset_string))}
                     ref={(checkbox) => { this.sectionsCheckboxes[section.asset_string] = checkbox }}
                     value={section.asset_string}
@@ -218,11 +213,7 @@ import Grid, { GridCol, GridRow } from '@instructure/ui-layout/lib/components/Gr
                     checked={this.isSubContextChecked(context.asset_string, section.asset_string)}
                     disabled={this.isSubContextDisabled(context.asset_string, section.asset_string)}
                   />
-                  {
-                    // eslint-disable-next-line
-                  }<label
-                    className="ContextLabel CourseListItem-section-item"
-                    htmlFor={`${section.asset_string}_checkbox`}>{section.name}</label>
+                  <label className="ContextLabel" htmlFor={`${section.asset_string}_checkbox`}>{section.name}</label>
                 </div>
               )
             })
@@ -239,27 +230,27 @@ import Grid, { GridCol, GridRow } from '@instructure/ui-layout/lib/components/Gr
               const expanded = this.state.expandedContexts.has(context)
               const inputId = `${context.asset_string}_checkbox`
               return (
-                <div key={context.asset_string} className="CourseListItem">
-                  <div className="CourseListItem-horizontal">
-                    <Button onClick={() => this.toggleCourseExpanded(context)} variant="icon">
-                      {expanded ? <IconMiniArrowDown /> : <IconMiniArrowRight /> }
-                    </Button>
+                <div className="CourseListItem" key={context.asset_string}>
+                  <i
+                    role="button"
+                    aria-controls={`${context.asset_string}_sections`}
+                    aria-expanded={expanded}
+                    onClick={() => this.toggleCourseExpanded(context)}
+                    className={`icon-arrow-${expanded ? 'down' : 'right'}`}
+                  >
                     <span className="screenreader-only">{context.name}</span>
-                    <input
-                      className="CourseListItem-item CourseListItem-item-checkbox"
-                      ref={(checkbox) => { this.contextCheckboxes[context.asset_string] = checkbox }}
-                      id={inputId}
-                      type="checkbox"
-                      onChange={() => this.toggleCourse(context.asset_string, !this.isContextChecked(context.asset_string))}
-                      value={context.asset_string}
-                      defaultChecked={this.isContextChecked(context.asset_string)}
-                      checked={this.isContextChecked(context.asset_string)}
-                      disabled={this.isContextDisabled(context.asset_string)}
-                    />
-                    {
-                      // eslint-disable-next-line
-                    }<label className="ContextLabel CourseListItem-item" htmlFor={inputId}>{context.name}</label>
-                  </div>
+                  </i>
+                  <input
+                    ref={(checkbox) => { this.contextCheckboxes[context.asset_string] = checkbox }}
+                    id={inputId}
+                    type="checkbox"
+                    onChange={() => this.toggleCourse(context.asset_string, !this.isContextChecked(context.asset_string))}
+                    value={context.asset_string}
+                    defaultChecked={this.isContextChecked(context.asset_string)}
+                    checked={this.isContextChecked(context.asset_string)}
+                    disabled={this.isContextDisabled(context.asset_string)}
+                  />
+                  <label className="ContextLabel" htmlFor={inputId}>{context.name}</label>
                   {this.renderSections(context)}
                 </div>
               )

@@ -20,17 +20,16 @@ module SIS
   class GroupMembershipImporter < BaseImporter
 
     def process
-      start = Time.zone.now
+      start = Time.now
       importer = Work.new(@batch, @root_account, @logger)
       yield importer
-      SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data) if @batch.using_parallel_importers?
-      @logger.debug("Group Users took #{Time.zone.now - start} seconds")
-      importer.success_count
+      @logger.debug("Group Users took #{Time.now - start} seconds")
+      return importer.success_count
     end
 
-    private
+  private
     class Work
-      attr_accessor :success_count, :roll_back_data
+      attr_accessor :success_count
 
       def initialize(batch, root_account, logger)
         @batch = batch
@@ -38,7 +37,6 @@ module SIS
         @logger = logger
         @success_count = 0
         @groups_cache = {}
-        @roll_back_data = []
       end
 
       def add_group_membership(user_id, group_id, status)
@@ -64,7 +62,7 @@ module SIS
         group_membership = GroupMembership.where(group_id: group, user_id: user).take
         group_membership ||= group.group_memberships.build(:user => user)
 
-        group_membership.sis_batch_id = @batch.id
+        group_membership.sis_batch_id = @batch.id if @batch
 
         case status
         when /accepted/i
@@ -79,8 +77,6 @@ module SIS
 
         if group_membership.valid?
           group_membership.save
-          data = SisBatchRollBackData.build_data(sis_batch: @batch, context: group_membership)
-          @roll_back_data << data if data
         else
           msg = "A group user did not pass validation "
           msg += "(" + "user: #{user_id}, group: #{group_id}, error: "

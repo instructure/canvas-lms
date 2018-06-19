@@ -31,7 +31,6 @@ type Assignment implements Node, Timestamped {
   htmlUrl: URL
   id: ID!
   lockAt: DateTime
-  lockInfo: LockInfo
   muted: Boolean
   name: String
   needsGradingCount: Int
@@ -538,28 +537,6 @@ enum GroupMembershipState {
   requested
 }
 
-type LockInfo {
-  canView: Boolean
-  isLocked: Boolean
-  lockAt: DateTime
-  lockedObject: Lockable
-  module: Module
-  unlockAt: DateTime
-}
-
-# Types that can be locked
-union Lockable = Assignment | Discussion | Module | Page | Quiz
-
-type Module implements Node, Timestamped {
-  # legacy canvas id
-  _id: ID!
-  createdAt: DateTime
-  id: ID!
-  name: String
-  unlockAt: DateTime
-  updatedAt: DateTime
-}
-
 type Mutation {
   createAssignment(assignment: AssignmentInput!): Assignment
 }
@@ -575,8 +552,6 @@ enum NodeType {
   Course
   Enrollment
   GradingPeriod
-  Module
-  Page
   Section
   User
 }
@@ -584,15 +559,6 @@ enum NodeType {
 enum OrderDirection {
   ascending
   descending
-}
-
-type Page implements Node, Timestamped {
-  # legacy canvas id
-  _id: ID!
-  createdAt: DateTime
-  id: ID!
-  title: String
-  updatedAt: DateTime
 }
 
 # Information about pagination in a connection.

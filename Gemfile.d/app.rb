@@ -57,15 +57,13 @@ gem 'bcrypt', '3.1.11'
 gem 'canvas_connect', '0.3.11'
   gem 'adobe_connect', '1.0.6', require: false
 gem 'canvas_webex', '0.17'
-gem 'inst-jobs', '0.14.8'
+gem 'inst-jobs', '0.14.6'
   gem 'rufus-scheduler', '3.4.2', require: false
     gem 'et-orbi', '1.0.8', require: false
-gem 'switchman-inst-jobs', '1.1.7'
-gem 'inst-jobs-autoscaling', '1.0.4'
+gem 'switchman-inst-jobs', '1.1.5'
+gem 'inst-jobs-autoscaling', '1.0.3'
   gem 'aws-sdk-autoscaling', '1.5.0', require: false
-# ffi 1.9.2x seem to have issues on RHEL & CentOS causing segfaults
-# check https://github.com/ffi/ffi/issues/621 for resolution prior to bumping version
-gem 'ffi', '1.9.18', require: false
+gem 'ffi', '1.9.23', require: false
 gem 'hashery', '2.1.2', require: false
 gem 'highline', '1.7.10', require: false
 gem 'httparty', '0.16.1'
@@ -107,7 +105,7 @@ gem 'rotp', '3.3.1', require: false
 gem 'net-ldap', '0.16.1', require: false
 gem 'ruby-duration', '3.2.3', require: false
 gem 'ruby-saml-mod', '0.3.8'
-gem 'saml2', '2.2.7'
+gem 'saml2', '2.2.9'
   gem 'nokogiri-xmlsec-instructure', '0.9.6', require: false
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.2.1', require: 'zip'

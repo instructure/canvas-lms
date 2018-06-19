@@ -17,7 +17,6 @@
 
 class LiveEventsObserver < ActiveRecord::Observer
   observe :content_export,
-          :content_migration,
           :course,
           :discussion_entry,
           :discussion_topic,
@@ -49,10 +48,6 @@ class LiveEventsObserver < ActiveRecord::Observer
         if obj.workflow_state == "exported"
           Canvas::LiveEvents.quiz_export_complete(obj)
         end
-      end
-    when ContentMigration
-      if changes["workflow_state"] && obj.workflow_state == "imported"
-        Canvas::LiveEvents.content_migration_completed(obj)
       end
     when Course
       if changes["syllabus_body"]

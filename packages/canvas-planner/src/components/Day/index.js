@@ -28,6 +28,7 @@ import { userShape, itemShape } from '../plannerPropTypes';
 import styles from './styles.css';
 import theme from './theme.js';
 import { getFriendlyDate, getFullDate, isToday } from '../../utilities/dateUtils';
+import { groupBy } from 'lodash';
 import Grouping from '../Grouping';
 import formatMessage from '../../format-message';
 import { animatable } from '../../dynamic-ui';
@@ -44,9 +45,6 @@ export class Day extends Component {
     deregisterAnimatable: func,
     currentUser: shape(userShape),
   };
-  static defaultProps = {
-    animatableIndex: 0,
-  };
 
   constructor (props) {
     super(props);
@@ -54,6 +52,9 @@ export class Day extends Component {
     const tzMomentizedDate = moment.tz(props.day, props.timeZone);
     this.friendlyName = getFriendlyDate(tzMomentizedDate);
     this.fullDate = getFullDate(tzMomentizedDate);
+    this.state = {
+      groupedItems: this.groupItems(props.itemsForDay)
+    };
   }
 
   componentDidMount () {
@@ -63,6 +64,12 @@ export class Day extends Component {
   componentWillReceiveProps (nextProps) {
     this.props.deregisterAnimatable('day', this, this.itemUniqueIds());
     this.props.registerAnimatable('day', this, nextProps.animatableIndex, this.itemUniqueIds(nextProps));
+
+    this.setState((state) => {
+      return {
+        groupedItems: this.groupItems(nextProps.itemsForDay)
+      };
+    });
   }
 
   componentWillUnmount () {
@@ -71,56 +78,12 @@ export class Day extends Component {
 
   itemUniqueIds (props = this.props) { return props.itemsForDay.map(item => item.uniqueId); }
 
+  groupItems = (items) => groupBy(items, item => {
+    return (item.context && (item.context.type+item.context.id)) || 'Notes';
+  })
+
   hasItems () {
-    return this.props.itemsForDay && this.props.itemsForDay.length > 0;
-  }
-
-  renderGrouping(groupKey, groupItems, index) {
-    const courseInfo = groupItems[0].context || {};
-    const groupColor = (courseInfo.color ? courseInfo.color : this.props.currentUser.color) || null;
-    return (
-      <Grouping
-        title={courseInfo.title}
-        image_url={courseInfo.image_url}
-        color={groupColor}
-        timeZone={this.props.timeZone}
-        updateTodo={this.props.updateTodo}
-        items={groupItems}
-        animatableIndex={this.props.animatableIndex * 100 + index + 1}
-        url={courseInfo.url}
-        key={groupKey}
-        theme={{
-          titleColor: groupColor
-        }}
-        toggleCompletion={this.props.toggleCompletion}
-        currentUser={this.props.currentUser}
-      />
-    );
-  }
-
-  renderGroupings () {
-    const groupings = [];
-    let currGroupItems;
-    let currGroupKey;
-    const nItems = this.props.itemsForDay.length;
-
-    for (let i = 0; i < nItems; ++i) {
-      let item = this.props.itemsForDay[i];
-      let groupKey = (item.context && item.context.id) ? `${item.context.type}${item.context.id}` : 'Notes';
-      if (groupKey !== currGroupKey) {
-        if (currGroupKey) { // emit the grouping we've been working
-          groupings.push(this.renderGrouping(currGroupKey, currGroupItems, groupings.length));
-        }
-        // start new grouping
-        currGroupKey = groupKey;
-        currGroupItems = [item];
-      } else {
-        currGroupItems.push(item);
-      }
-    }
-    // the last groupings// emit the grouping we've been working
-    groupings.push(this.renderGrouping(currGroupKey, currGroupItems, groupings.length));
-    return groupings;
+    return !!Object.keys(this.state.groupedItems).length;
   }
 
   render () {
@@ -150,7 +113,28 @@ export class Day extends Component {
         <div>
           {
             (this.hasItems()) ? (
-              this.renderGroupings()
+              Object.keys(this.state.groupedItems).map((cid, groupIndex) => {
+                const groupItems = this.state.groupedItems[cid];
+                const courseInfo = groupItems[0].context || {};
+                return (
+                  <Grouping
+                    title={courseInfo.title}
+                    image_url={courseInfo.image_url}
+                    color={courseInfo.color}
+                    timeZone={this.props.timeZone}
+                    updateTodo={this.props.updateTodo}
+                    items={groupItems}
+                    animatableIndex={groupIndex}
+                    url={courseInfo.url}
+                    key={cid}
+                    theme={{
+                      titleColor: courseInfo.color || null
+                    }}
+                    toggleCompletion={this.props.toggleCompletion}
+                    currentUser={this.props.currentUser}
+                  />
+                );
+              })
             ) : (
               <View
                 textAlign="center"

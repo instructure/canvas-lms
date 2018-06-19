@@ -225,18 +225,6 @@ import Constants from './../constants'
     return newState;
   };
 
-  flashHandlers[ModerationActions.UNMUTED] = (state, action) => {
-    // Don't mutate the existing state.
-    const {time, message} = action.payload;
-    return {...state, time, message, error: false};
-  };
-
-  flashHandlers[ModerationActions.UNMUTED_FAILED] = (state, action) => {
-    // Don't mutate the existing state.
-    const {time, message, error} = action.payload;
-    return {...state, time, message, error};
-  };
-
   /**
    * Moderation Stage Handlers
    */
@@ -302,10 +290,6 @@ import Constants from './../constants'
     return __landAction(state, 'review');
   };
 
-  inflightActionHandlers[ModerationActions.UNMUTED] = (state, _action) => __landAction(state, 'unmute');
-
-  inflightActionHandlers[ModerationActions.UNMUTED_FAILED] = (state, _action) => __landAction(state, 'unmute');
-
   function inflightAction (state, action) {
     state = state || {};
 
@@ -350,9 +334,6 @@ import Constants from './../constants'
       var newState = _.extend({}, state);
       newState.published = true;
       return newState;
-    } else if (action.type === ModerationActions.UNMUTED) {
-      // Don't mutate the existing state.
-      return {...state, muted: false};
     }
     return state;
   }

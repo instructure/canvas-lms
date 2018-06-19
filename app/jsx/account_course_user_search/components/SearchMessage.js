@@ -17,8 +17,8 @@
  */
 
 import React, { Component } from 'react'
-import Pagination, {PaginationButton} from '@instructure/ui-pagination/lib/components/Pagination'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import Pagination, {PaginationButton} from '@instructure/ui-core/lib/components/Pagination'
+import Spinner from '@instructure/ui-core/lib/components/Spinner'
 import { array, func, string, shape, oneOf } from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
 import Alert from '@instructure/ui-alerts/lib/components/Alert'
@@ -34,7 +34,10 @@ export default class SearchMessage extends Component {
   static propTypes = {
     collection: shape({
       data: array.isRequired,
-      links: shape({ current: linkPropType })
+      links: shape({
+        current: linkPropType,
+        last: linkPropType
+      })
     }).isRequired,
     setPage: func.isRequired,
     noneFoundMessage: string.isRequired,
@@ -64,7 +67,6 @@ export default class SearchMessage extends Component {
 
       if (nextProps.collection.links.last) {
         newState.lastKnownPage = nextProps.collection.links.last;
-        newState.lastUnknown = false
       } else {
         newState.lastKnownPage = nextProps.collection.links.next;
         newState.lastUnknown = true
@@ -140,7 +142,6 @@ export default class SearchMessage extends Component {
         <div>
           {this.renderSearchDoneAlert(collection.loading, resultsFoundMessage)}
           <Pagination
-            as="nav"
             variant="compact"
             labelNext={I18n.t('Next Page')}
             labelPrev={I18n.t('Previous Page')}
@@ -155,7 +156,6 @@ export default class SearchMessage extends Component {
                   key={pageNumber}
                   onClick={() => this.handleSetPage(pageNumber)}
                   current={isCurrent}
-                  aria-label={I18n.t('Page %{pageNum}', { pageNum: pageNumber })}
                 >
                     { isCurrent && this.state.pageBecomingCurrent ? (
                       <Spinner size="x-small" title={I18n.t('Loading...')} />

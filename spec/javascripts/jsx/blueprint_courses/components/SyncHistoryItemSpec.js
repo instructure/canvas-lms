@@ -19,13 +19,13 @@
 import React from 'react'
 import * as enzyme from 'enzyme'
 import SyncHistoryItem from 'jsx/blueprint_courses/components/SyncHistoryItem'
-import getSampleData from '../getSampleData'
+import sampleData from '../sampleData'
 
 QUnit.module('SyncHistoryItem component')
 
 const defaultProps = () => ({
   heading: null,
-  migration: getSampleData().history[0],
+  migration: sampleData.history[0],
 })
 
 test('renders the SyncHistoryItem component', () => {
@@ -54,7 +54,7 @@ test('does not render the heading component when migration has no changes', () =
 test('renders changes using the appropriate prop component', () => {
   const props = defaultProps()
   props.ChangeComponent = () => <div className="test-change" />
-  const tree = enzyme.mount(<SyncHistoryItem {...props} />)
+  const tree = enzyme.shallow(<SyncHistoryItem {...props} />)
   const node = tree.find('.bcs__history-item .test-change')
   equal(node.length, props.migration.changes.length)
 })

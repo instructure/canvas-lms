@@ -22,9 +22,6 @@ export default handleActions({
   UPDATE_TODO: (state, action) => {
     return _.cloneDeep(action.payload);
   },
-  OPEN_EDITING_PLANNER_ITEM: (state, action) => {
-    return state.updateTodoItem ? state : {updateTodoItem: {}};
-  },
   CLEAR_UPDATE_TODO: (state, action) => {
     return {};
   }

@@ -18,73 +18,71 @@
 require_relative '../../common'
 
 class StudentGradesPage
-  class << self
-    include SeleniumDependencies
+  include SeleniumDependencies
 
-    # Period components
-    def period_options_css
-      '#grading_period_select_menu > option'
-    end
+  # Period components
+  def period_options_css
+    '#grading_period_select_menu > option'
+  end
 
-    # Assignment components
-    def assignment_titles_css
-      '.student_assignment > th > a'
-    end
+  # Assignment components
+  def assignment_titles_css
+    '.student_assignment > th > a'
+  end
 
-    def visit_as_teacher(course, student)
-      get "/courses/#{course.id}/grades/#{student.id}"
-    end
+  def visit_as_teacher(course, student)
+    get "/courses/#{course.id}/grades/#{student.id}"
+  end
 
-    def visit_as_student(course)
-      get "/courses/#{course.id}/grades"
-    end
+  def visit_as_student(course)
+    get "/courses/#{course.id}/grades"
+  end
 
-    def final_grade
-      f('#submission_final-grade .grade')
-    end
+  def final_grade
+    f('#submission_final-grade .grade')
+  end
 
-    def final_points_possible
-      f('#submission_final-grade .points_possible')
-    end
+  def final_points_possible
+    f('#submission_final-grade .points_possible')
+  end
 
-    def grading_period_dropdown
-      f('#grading_period_select_menu')
-    end
+  def grading_period_dropdown
+    f('#grading_period_select_menu')
+  end
 
-    def select_period_by_name(name)
-      click_option(grading_period_dropdown, name)
-    end
+  def select_period_by_name(name)
+    click_option(grading_period_dropdown, name)
+  end
 
-    def click_apply_button
-      f('#apply_select_menus').click
-    end
+  def click_apply_button
+    f('#apply_select_menus').click
+  end
 
-    def assignment_titles
-      ff(assignment_titles_css).map(&:text)
-    end
+  def assignment_titles
+    ff(assignment_titles_css).map(&:text)
+  end
 
-    def assignment_row(assignment)
-      f("#submission_#{assignment.id}")
-    end
+  def assignment_row(assignment)
+    f("#submission_#{assignment.id}")
+  end
 
-    def toggle_comment_module
-      fj('.toggle_comments_link .icon-discussion:first').click
-    end
+  def toggle_comment_module
+    fj('.toggle_comments_link .icon-discussion:first').click
+  end
 
-    def status_pill(assignment_id, status)
-      fj("#submission_#{assignment_id} .submission-#{status}-pill:contains('#{status}')")
-    end
+  def status_pill(assignment_id, status)
+    fj("#submission_#{assignment_id} .submission-#{status}-pill:contains('#{status}')")
+  end
 
-    def show_details_button
-      f("#show_all_details_button")
-    end
+  def show_details_button
+    f("#show_all_details_button")
+  end
 
-    def submission_late_penalty_text(assignment_id)
-      fj("#score_details_#{assignment_id} td:contains('Late Penalty:') .error").text
-    end
+  def submission_late_penalty_text(assignment_id)
+    fj("#score_details_#{assignment_id} td:contains('Late Penalty:') .error").text
+  end
 
-    def late_submission_final_score_text(assignment_id)
-      f("#submission_#{assignment_id} .assignment_score .grade").text
-    end
+  def late_submission_final_score_text(assignment_id)
+    f("#submission_#{assignment_id} .assignment_score .grade").text
   end
 end

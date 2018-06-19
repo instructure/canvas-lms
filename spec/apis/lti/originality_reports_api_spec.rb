@@ -59,7 +59,6 @@ module Lti
         create: "/api/lti/assignments/#{@assignment.id}/submissions/#{@submission.id}/originality_report"
       }
 
-      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:anonymous_moderated_marking).and_return(false)
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:plagiarism_detection_platform).and_return(true)
     end
 
@@ -750,38 +749,6 @@ module Lti
              headers: request_headers
         response_body = JSON.parse(response.body)
         expect(response_body['workflow_state']).to eq 'pending'
-      end
-
-      it 'allows creating reports for any attachment in submission history' do
-        shard_two = Shard.create!
-        a = @course.assignments.create!(
-          title: "some assignment",
-          assignment_group: @group,
-          points_possible: 12,
-          tool_settings_tool: @tool
-        )
-        a.tool_settings_tool = message_handler
-        a.save!
-
-        first_attachment = shard_two.activate { attachment_model(context: @student) }
-        Timecop.freeze(10.seconds.ago) do
-          a.submit_homework(@student, attachments: [first_attachment])
-        end
-
-        Timecop.freeze(5.seconds.ago) do
-          a.submit_homework(@student, attachments: [attachment_model(context: @student)])
-        end
-
-        post "/api/lti/assignments/#{a.id}/submissions/#{a.reload.submissions.first.id}/originality_report",
-             params: {
-                originality_report: {
-                  file_id: first_attachment.id,
-                  workflow_state: 'pending'
-                }
-             },
-             headers: request_headers
-
-        expect(response.status).to eq 201
       end
 
       it 'sets the link_id resource_url' do

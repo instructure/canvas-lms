@@ -8,6 +8,7 @@ exports[`adds aria-hidden when specified 1`] = `
   onClick={[Function]}
   style={
     Object {
+      "top": "0",
       "zIndex": null,
     }
   }
@@ -27,6 +28,7 @@ exports[`renders 1`] = `
   onClick={[Function]}
   style={
     Object {
+      "top": "0",
       "zIndex": null,
     }
   }

@@ -20,13 +20,18 @@ import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
-import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
-import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGroup'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import RadioInput from '@instructure/ui-core/lib/components/RadioInput'
+import RadioInputGroup from '@instructure/ui-core/lib/components/RadioInputGroup'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 
 export default class PolicyCell extends React.Component {
   static renderAt (elt, props) {
     ReactDOM.render(<PolicyCell {...props} />, elt)
+  }
+
+  constructor () {
+    super()
+    this.handleValueChanged = this.handleValueChanged.bind(this)
   }
 
   static propTypes = {
@@ -73,7 +78,7 @@ export default class PolicyCell extends React.Component {
       variant="toggle"
       size="small"
       defaultValue={this.props.selection}
-      onChange={(e, val) => this.handleValueChanged(val)}
+      onChange={this.handleValueChanged}
     >
       {this.renderRadioInputs()}
     </RadioInputGroup>

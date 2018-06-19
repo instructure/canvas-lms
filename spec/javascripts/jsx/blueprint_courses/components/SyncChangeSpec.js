@@ -19,12 +19,12 @@
 import React from 'react'
 import * as enzyme from 'enzyme'
 import SyncChange from 'jsx/blueprint_courses/components/SyncChange'
-import getSampleData from '../getSampleData'
+import data from '../sampleData'
 
 QUnit.module('SyncChange component')
 
 const defaultProps = () => ({
-  change: getSampleData().history[0].changes[0],
+  change: data.history[0].changes[0],
 })
 
 test('renders the SyncChange component', () => {

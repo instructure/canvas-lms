@@ -19,9 +19,9 @@
 /*global jsonData*/
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Alert from '@instructure/ui-alerts/lib/components/Alert';
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
-import TextArea from '@instructure/ui-forms/lib/components/TextArea';
+import Alert from '@instructure/ui-core/lib/components/Alert';
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
+import TextArea from '@instructure/ui-core/lib/components/TextArea';
 import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper';
 import quizzesNextSpeedGrading from 'jsx/grading/quizzesNextSpeedGrading';
 import StatusPill from 'jsx/grading/StatusPill';
@@ -173,7 +173,7 @@ function setupHandleFragmentChanged () {
   return false
 }
 
-export function teardownHandleFragmentChanged () {
+function teardownHandleFragmentChanged () {
   if (EG.isHandleFragmentChangedSet) {
     window.removeEventListener('hashchange', EG.handleFragmentChanged);
     EG.isHandleFragmentChangedSet = false
@@ -1213,8 +1213,11 @@ EG = {
     if (!jsonData.rubric_association) { return; }
     if (!rubricFull.filter(":visible").length) { return; }
 
-    const container = rubricFull.find(".rubric")
-    rubricAssessment.populateNewRubric(container, rubricAssessmentToPopulate(), jsonData.rubric_association)
+    rubricAssessment.populateRubric(
+      rubricFull.find(".rubric"),
+      rubricAssessmentToPopulate()
+    );
+
     $("#grading").height(rubricFull.height());
   },
 
@@ -1316,13 +1319,9 @@ EG = {
         this.currentStudent.submission.grade = null; // otherwise it may be tricked into showing the wrong submission_state
       }
 
-      const {course_id: courseId, assignment_id: assignmentId} = ENV;
-      const resourceSegment = isAnonymous ? 'anonymous_provisional_grades' : 'provisional_grades';
-      const resourceUrl = `/api/v1/courses/${courseId}/assignments/${assignmentId}/${resourceSegment}/status`;
-
-      let status_url = `${resourceUrl}?${anonymizableStudentId}=${this.currentStudent[anonymizableId]}`;
+      let status_url = `${ENV.provisional_status_url}?student_id=${this.currentStudent[anonymizableId]}`
       if (ENV.grading_role == 'moderator') {
-        status_url += "&last_updated_at=";
+        status_url += "&last_updated_at="
         if (this.currentStudent.submission) status_url += this.currentStudent.submission.updated_at;
       }
 
@@ -1379,19 +1378,7 @@ EG = {
     this.refreshFullRubric();
   },
 
-  removeModerationBarAndShowSubmission() {
-    $full_width_container.removeClass("with_moderation_tabs")
-    $moderation_bar.hide()
-    this.showSubmission()
-    this.setReadOnly(false)
-  },
-
   handleModerationTabs: function(index_to_load) {
-    if (isAnonymousModeratedMarkingEnabled()) {
-      this.removeModerationBarAndShowSubmission()
-      return
-    }
-
     var prov_grades = this.currentStudent.submission && this.currentStudent.submission.provisional_grades;
     var final_grade = this.currentStudent.submission && this.currentStudent.submission.final_provisional_grade;
 
@@ -1470,7 +1457,10 @@ EG = {
         }
       }
     } else {
-      this.removeModerationBarAndShowSubmission()
+      $full_width_container.removeClass("with_moderation_tabs");
+      $moderation_bar.hide();
+      this.showSubmission();
+      this.setReadOnly(false);
     }
   },
 
@@ -1723,15 +1713,17 @@ EG = {
     clearInterval(sessionTimer);
 
     function currentIndex (context, submissionToViewVal) {
+      var result;
       if (submissionToViewVal) {
-        return Number(submissionToViewVal);
-      } else if (context.currentStudent &&
-        context.currentStudent.submission &&
-        context.currentStudent.submission.currentSelectedIndex ) {
-
-        return context.currentStudent.submission.currentSelectedIndex;
+        result = Number(submissionToViewVal);
+      } else if (context.currentStudent && context.currentStudent.submission &&
+                 context.currentStudent.submission.currentSelectedIndex ) {
+        result = context.currentStudent.submission.currentSelectedIndex;
+      } else {
+        result = 0;
       }
-      return 0;
+
+      return result;
     };
 
     const $submission_to_view = $("#submission_to_view")
@@ -1811,14 +1803,13 @@ EG = {
       if (browserableCssClasses.test(attachment.mime_class)) {
         browserableAttachments.push(attachment);
       }
-      const anonymizableSubmissionIdKey = isAnonymous ? 'anonymousId' : 'submissionId';
       var $submission_file = $submission_file_hidden.clone(true).fillTemplateData({
         data: {
-          [anonymizableSubmissionIdKey]: submission[anonymizableId],
+          submissionId: submission.user_id,
           attachmentId: attachment.id,
           display_name: attachment.display_name
         },
-        hrefValues: [anonymizableSubmissionIdKey, 'attachmentId']
+        hrefValues: ['submissionId', 'attachmentId']
       }).appendTo($submission_files_list)
         .find('a.display_name')
         .data('attachment', attachment)
@@ -2086,13 +2077,12 @@ EG = {
     this.emptyIframeHolder()
     const {context_id: courseId} = jsonData
     const {assignment_id: assignmentId} = this.currentStudent.submission
-    const anonymizableSubmissionId = this.currentStudent.submission[anonymizableUserId]
-    const resourceSegment = isAnonymous ? 'anonymous_submissions' : 'submissions'
+    const submissionId = this.currentStudent.submission[anonymizableUserId]
     const iframePreviewVersion = SpeedgraderHelpers.iframePreviewVersion(this.currentStudent.submission)
     const hideStudentNames = utils.shouldHideStudentNames() ? "&hide_student_name=1" : ""
     const queryParams = `${iframePreviewVersion}${hideStudentNames}`
     const src =
-      `/courses/${courseId}/assignments/${assignmentId}/${resourceSegment}/${anonymizableSubmissionId}?preview=true${queryParams}`
+      `/courses/${courseId}/assignments/${assignmentId}/submissions/${submissionId}?preview=true${queryParams}`
     const iframe = SpeedgraderHelpers.buildIframe(htmlEscape(src), {frameborder: 0, allowfullscreen: true}, domElement)
     $iframe_holder.html($.raw(iframe)).show();
   },
@@ -2197,9 +2187,8 @@ EG = {
     let contents;
     const genericSrc = unescape($submission_file_hidden.find('.display_name').attr('href'));
 
-    const anonymizableSubmissionIdToken = isAnonymous ? 'anonymousId' : 'submissionId';
     const src = genericSrc
-      .replace(`{{${anonymizableSubmissionIdToken}}}`, this.currentStudent.submission[anonymizableUserId])
+      .replace('{{submissionId}}', this.currentStudent.submission[anonymizableUserId])
       .replace('{{attachmentId}}', attachment.id);
 
     if (attachment.mime_class === 'image') {
@@ -2450,7 +2439,7 @@ EG = {
     $comments.scrollTop(9999999);  // the scrollTop part forces it to scroll down to the bottom so it shows the most recent comment.
   },
 
-  revertFromFormSubmit: ({draftComment = null, errorSubmitting = false} = {}) => {
+  revertFromFormSubmit: function(draftComment) {
     // This is to continue existing behavior of creating finalized comments by default
     if (draftComment === undefined) {
       draftComment = false;
@@ -2464,7 +2453,7 @@ EG = {
       // Show a different message when auto-saving a draft comment
       $comment_saved.show();
       $comment_saved_message.attr("tabindex",-1).focus();
-    } else if (!errorSubmitting) {
+    } else {
       $comment_submitted.show();
       $comment_submitted_message.attr("tabindex",-1).focus();
     }
@@ -2513,21 +2502,15 @@ EG = {
       $.each(submissions, function(){
         EG.setOrUpdateSubmission(this.submission);
       });
-      EG.revertFromFormSubmit({draftComment});
+      EG.revertFromFormSubmit(draftComment);
       window.setTimeout(function() {
         $rightside_inner.scrollTo($rightside_inner[0].scrollHeight, 500);
       });
     }
-
-    const formError = (data, _xhr, _textStatus, _errorThrown) => {
-      EG.handleGradingError(data);
-      EG.revertFromFormSubmit({errorSubmitting: true});
-    }
-
     if($add_a_comment.find("input[type='file']:visible").length) {
-      $.ajaxJSONFiles(url + ".text", method, formData, $add_a_comment.find("input[type='file']:visible"), formSuccess, formError);
+      $.ajaxJSONFiles(url + ".text", method, formData, $add_a_comment.find("input[type='file']:visible"), formSuccess);
     } else {
-      $.ajaxJSON(url, method, formData, formSuccess, formError);
+      $.ajaxJSON(url, method, formData, formSuccess);
     }
 
     $("#comment_attachments").empty();
@@ -2624,7 +2607,7 @@ EG = {
       }
     }
 
-    const submissionSuccess = submissions => {
+    $.ajaxJSON(url, method, formData, function(submissions) {
       var pointsPossible = jsonData.points_possible;
       var score = submissions[0].submission.score;
 
@@ -2645,14 +2628,7 @@ EG = {
       EG.refreshSubmissionsToView();
       $multiple_submissions.change();
       EG.showGrade();
-    };
-
-    const submissionError = (data, _xhr, _textStatus, _errorThrown) => {
-      EG.handleGradingError(data);
-      EG.showGrade();
-    };
-
-    $.ajaxJSON(url, method, formData, submissionSuccess, submissionError);
+    });
   },
 
   showGrade: function() {
@@ -2854,17 +2830,6 @@ EG = {
     teardownHandleFragmentChanged()
     teardownBeforeLeavingSpeedgrader()
     return undefined
-  },
-
-  handleGradingError (data={}) {
-    let errorMessage
-    if (data.errors && data.errors.error_code === 'MAX_GRADERS_REACHED') {
-      errorMessage = I18n.t('The maximum number of graders has been reached for this assignment.');
-    } else {
-      errorMessage = I18n.t('An error occurred updating this assignment.');
-    }
-
-    $.flashError(errorMessage);
   }
 }
 

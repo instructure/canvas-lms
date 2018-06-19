@@ -35,35 +35,6 @@ describe Oauth2ProviderController do
       expect(response.body).to match /redirect_uri does not match/
     end
 
-    context 'with invalid scopes' do
-      let(:dev_key) { DeveloperKey.create! redirect_uri: 'https://example.com', require_scopes: true, scopes: [] }
-
-      before do
-        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:api_token_scoping).and_return(true)
-      end
-
-      it 'renders 400' do
-        get :auth, params: {
-          client_id: dev_key.id,
-          redirect_uri: Canvas::Oauth::Provider::OAUTH2_OOB_URI,
-          response_type: 'code',
-          scope: 'not|valid'
-        }
-        assert_status(400)
-        expect(response.body).to match /A requested scope is invalid/
-      end
-
-      it 'renders 400 when scopes empty' do
-        get :auth, params: {
-          client_id: dev_key.id,
-          redirect_uri: Canvas::Oauth::Provider::OAUTH2_OOB_URI,
-          response_type: 'code'
-        }
-        assert_status(400)
-        expect(response.body).to match /A requested scope is invalid/
-      end
-    end
-
     it 'redirects back with an error for invalid response_type' do
       get :auth,
           params: {client_id: key.id,

@@ -333,19 +333,6 @@ test('sets to published on PUBLISHED_GRADES', () => {
   ok(newState.assignment.published, 'successfully sets to publish')
 })
 
-test('sets to unmuted on UNMUTED', () => {
-  const initialState = {assignment: {published: true, muted: true}}
-  const publishedGradesAction = {
-    type: 'UNMUTED',
-    payload: {
-      time: Date.now(),
-      message: 'test'
-    }
-  }
-  const newState = rootReducer(initialState, publishedGradesAction)
-  strictEqual(newState.assignment.muted, false)
-})
-
 QUnit.module('flashMessage reducer')
 
 test('sets success message on PUBLISHED_GRADES', () => {
@@ -441,43 +428,6 @@ test('sets message and error on SELECTING_PROVISIONAL_GRADES_FAILED', () => {
   const expected = {
     time: error.time,
     message,
-    error: true
-  }
-  deepEqual(newState.flashMessage, expected, 'updates state')
-})
-
-test('sets success message on UNMUTED', () => {
-  const initialState = {flashMessage: {}}
-  const unmutedAction = {
-    type: 'UNMUTED',
-    payload: {
-      time: 123,
-      message: 'test success'
-    }
-  }
-  const newState = rootReducer(initialState, unmutedAction)
-  const expected = {
-    time: 123,
-    message: 'test success',
-    error: false
-  }
-  deepEqual(newState.flashMessage, expected, 'updates state')
-})
-
-test('sets failure message on UNMUTED_FAILED', () => {
-  const initialState = {flashMessage: {}}
-  const unmutedAction = {
-    type: 'UNMUTED_FAILED',
-    payload: {
-      time: 123,
-      message: 'failed to publish',
-      error: true
-    }
-  }
-  const newState = rootReducer(initialState, unmutedAction)
-  const expected = {
-    time: 123,
-    message: 'failed to publish',
     error: true
   }
   deepEqual(newState.flashMessage, expected, 'updates state')

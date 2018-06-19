@@ -27,7 +27,7 @@ class Login::SamlController < ApplicationController
 
   def new
     increment_saml_stat("login_attempt")
-    session[:saml2_processing] = false if Canvas::Plugin.value_to_boolean(params[:saml2_processing], ignore_unrecognized: true) == false
+    session[:saml2_processing] = true if params[:saml2_processing]
     redirect_to delegated_auth_redirect_uri(aac.generate_authn_request_redirect(host: request.host_with_port,
                                                                                 parent_registration: session[:parent_registration]))
   end
@@ -36,9 +36,7 @@ class Login::SamlController < ApplicationController
     login_error_message = t("There was a problem logging in at %{institution}",
                             institution: @domain_root_account.display_name)
 
-    saml2_processing = true
-    saml2_processing = false if session[:saml2_processing] == false
-    saml2_processing = false if @domain_root_account.settings[:process_saml_responses_with_saml2] == false
+    saml2_processing = session[:saml2_processing] || @domain_root_account.settings[:process_saml_responses_with_saml2]
 
     legacy_response = Onelogin::Saml::Response.new(params[:SAMLResponse])
     response, relay_state = SAML2::Bindings::HTTP_POST.decode(request.request_parameters)
@@ -66,9 +64,12 @@ class Login::SamlController < ApplicationController
 
     settings = aac.saml_settings(request.host_with_port)
 
+    verify_certificate = true
+    verify_certificate = false if  @domain_root_account.settings[:verify_saml_certificate] == false
     aac.sp_metadata(request.host_with_port).valid_response?(response,
                                                             aac.idp_metadata,
-                                                            allow_expired_certificate: @domain_root_account.settings[:allow_expired_saml_certificate])
+                                                            allow_expired_certificate: @domain_root_account.settings[:allow_expired_saml_certificate],
+                                                            verify_certificate: verify_certificate)
     legacy_response.process(settings) unless saml2_processing
 
     if debugging

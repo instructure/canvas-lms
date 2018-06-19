@@ -111,18 +111,16 @@ module Canvas::Security
   # body (Hash) - The contents of the JWT token
   # expires (Time) - When the token should expire. `nil` for no expiration
   # key (String) - The key to sign with. `nil` will use the currently configured key
-  # alg (Symbol) - The algorithm used to generate the signature. Should be `:HS512` or `:ES512`!
-  #                To keep backwards compatibility, `nil` will default to `:HS256` for now.
   #
   # Returns the token as a string.
-  def self.create_jwt(body, expires = nil, key = nil, alg = nil)
+  def self.create_jwt(body, expires = nil, key = nil)
     jwt_body = body
     if expires
       jwt_body = jwt_body.merge({ exp: expires.to_i })
     end
     raw_jwt = JSON::JWT.new(jwt_body)
     return raw_jwt.to_s if key == :unsigned
-    raw_jwt.sign(key || encryption_key, alg || :HS256).to_s
+    raw_jwt.sign(key || encryption_key, :HS256).to_s
   end
 
   # Creates an encrypted JWT token string
@@ -133,13 +131,11 @@ module Canvas::Security
   # payload (hash) - The data you want in the token
   # signing_secret (big string) - The shared secret for signing
   # encryption_secret (big string) - The shared key for symmetric key encryption.
-  # alg (Symbol) - The algorithm used to generate the signature. Should be `:HS512` or `:ES512`!
-  #                To keep backwards compatibility, `nil` will default to `:HS256` for now.
   #
   # Returns the token as a string.
-  def self.create_encrypted_jwt(payload, signing_secret, encryption_secret, alg = nil)
+  def self.create_encrypted_jwt(payload, signing_secret, encryption_secret)
     jwt = JSON::JWT.new(payload)
-    jws = jwt.sign(signing_secret, alg || :HS256)
+    jws = jwt.sign(signing_secret, :HS256)
     jwe = jws.encrypt(encryption_secret, 'dir', :A256GCM)
     jwe.to_s
   end

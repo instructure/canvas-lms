@@ -261,8 +261,8 @@ class SisImportsApiController < ApplicationController
   #   If set, only shows imports created after the specified date (use ISO8601 format)
   #
   # Example:
-  #   curl https://<canvas>/api/v1/accounts/<account_id>/sis_imports \
-  #     -H 'Authorization: Bearer <token>'
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/sis_imports' \
+  #     -H "Authorization: Bearer <token>"
   #
   # @returns [SisImport]
   def index
@@ -299,7 +299,7 @@ class SisImportsApiController < ApplicationController
   #
   #   Examples:
   #     curl -F attachment=@<filename> -H "Authorization: Bearer <token>" \
-  #         https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv
+  #         'https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv'
   #
   #   If you decide to do a raw post, you can skip the 'attachment' argument,
   #   but you will then be required to provide a suitable Content-Type header.
@@ -308,19 +308,19 @@ class SisImportsApiController < ApplicationController
   #   Examples:
   #     curl -H 'Content-Type: application/octet-stream' --data-binary @<filename>.zip \
   #         -H "Authorization: Bearer <token>" \
-  #         https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv&extension=zip
+  #         'https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv&extension=zip'
   #
   #     curl -H 'Content-Type: application/zip' --data-binary @<filename>.zip \
   #         -H "Authorization: Bearer <token>" \
-  #         https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv
+  #         'https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv'
   #
   #     curl -H 'Content-Type: text/csv' --data-binary @<filename>.csv \
   #         -H "Authorization: Bearer <token>" \
-  #         https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv
+  #         'https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv'
   #
   #     curl -H 'Content-Type: text/csv' --data-binary @<filename>.csv \
   #         -H "Authorization: Bearer <token>" \
-  #         https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv&batch_mode=1&batch_mode_term_id=15
+  #         'https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv&batch_mode=1&batch_mode_term_id=15'
   #
   # @argument extension [String]
   #   Recommended for raw post request style imports. This field will be used to
@@ -505,47 +505,13 @@ class SisImportsApiController < ApplicationController
   # Get the status of an already created SIS import.
   #
   #   Examples:
-  #     curl https://<canvas>/api/v1/accounts/<account_id>/sis_imports/<sis_import_id> \
-  #         -H 'Authorization: Bearer <token>'
+  #     curl 'https://<canvas>/api/v1/accounts/<account_id>/sis_imports/<sis_import_id>' \
+  #         -H "Authorization: Bearer <token>"
   #
   # @returns SisImport
   def show
     if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
       @batch = @account.sis_batches.find(params[:id])
-      render json: sis_import_json(@batch, @current_user, session, includes: ['errors'])
-    end
-  end
-
-  # @API Restore workflow_states of SIS imported items
-  #
-  # This will restore the the workflow_state for all the items that changed
-  # their workflow_state during the import being restored.
-  # This will restore states for items imported with the following importers:
-  # accounts.csv terms.csv courses.csv sections.csv group_categories.csv
-  # groups.csv users.csv admins.csv
-  # This also restores states for other items that changed during the import.
-  # An example would be if an enrollment was deleted from a sis import and the
-  # group_membership was also deleted as a result of the enrollment deletion,
-  # both items would be restored when the sis batch is restored.
-  #
-  # @argument batch_mode [Boolean]
-  #   If set, will only restore items that were deleted from batch_mode.
-  #
-  # @argument undelete_only [Boolean]
-  #   If set, will only restore items that were deleted. This will ignore any
-  #   items that were created or modified.
-  #
-  # @example_request
-  #   curl https://<canvas>/api/v1/accounts/<account_id>/sis_imports/<sis_import_id>/restore_states \
-  #     -H 'Authorization: Bearer <token>'
-  #
-  # @returns SisImport
-  def restore_states
-    if authorized_action(@account, @current_user, :manage_sis)
-      @batch = @account.sis_batches.find(params[:id])
-      batch_mode = value_to_boolean(params[:batch_mode])
-      undelete_only = value_to_boolean(params[:undelete_only])
-      @batch.restore_states_for_batch(batch_mode: batch_mode, undelete_only: undelete_only)
       render json: sis_import_json(@batch, @current_user, session, includes: ['errors'])
     end
   end

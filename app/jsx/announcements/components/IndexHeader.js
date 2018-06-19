@@ -23,18 +23,18 @@ import { connect } from 'react-redux'
 import { debounce } from 'lodash'
 import { bindActionCreators } from 'redux'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
+import Button from '@instructure/ui-core/lib/components/Button'
+import TextInput from '@instructure/ui-core/lib/components/TextInput'
 import Select from '@instructure/ui-core/lib/components/Select'
-import Grid, { GridCol, GridRow } from '@instructure/ui-layout/lib/components/Grid'
-import View from '@instructure/ui-layout/lib/components/View'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
-import IconPlus from '@instructure/ui-icons/lib/Line/IconPlus'
-import IconSearchLine from '@instructure/ui-icons/lib/Line/IconSearch'
-import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
-import IconUnlock from '@instructure/ui-icons/lib/Line/IconUnlock'
-import IconLock from '@instructure/ui-icons/lib/Line/IconLock'
+import Grid, { GridCol, GridRow } from '@instructure/ui-core/lib/components/Grid'
+import Container from '@instructure/ui-core/lib/components/Container'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent'
+import IconPlus from 'instructure-icons/lib/Line/IconPlusLine'
+import IconSearchLine from 'instructure-icons/lib/Line/IconSearchLine'
+import IconTrash from 'instructure-icons/lib/Line/IconTrashLine'
+import IconUnlock from 'instructure-icons/lib/Line/IconUnlockLine'
+import IconLock from 'instructure-icons/lib/Line/IconLockLine'
 
 import select from '../../shared/select'
 import propTypes from '../propTypes'
@@ -61,6 +61,7 @@ export default class IndexHeader extends Component {
     searchAnnouncements: func.isRequired,
     toggleSelectedAnnouncementsLock: func.isRequired,
     deleteSelectedAnnouncements: func.isRequired,
+    applicationElement: func,
     searchInputRef: func,
     announcementsLocked: bool.isRequired,
   }
@@ -69,6 +70,7 @@ export default class IndexHeader extends Component {
     isBusy: false,
     atomFeedUrl: null,
     selectedCount: 0,
+    applicationElement: () => document.getElementById('application'),
     searchInputRef: null,
   }
 
@@ -83,6 +85,7 @@ export default class IndexHeader extends Component {
   onDelete = () => {
     showConfirmDelete({
       modalRef: (modal) => { this.deleteModal = modal },
+      applicationElement: this.props.applicationElement,
       selectedCount: this.props.selectedCount,
       onConfirm: () => this.props.deleteSelectedAnnouncements(),
       onHide: () => {
@@ -103,8 +106,8 @@ export default class IndexHeader extends Component {
 
   render () {
     return (
-      <View>
-        <View margin="0 0 medium" display="block">
+      <Container>
+        <Container margin="0 0 medium" display="block">
           <Grid>
             <GridRow hAlign="space-between">
               <GridCol width={2}>
@@ -178,9 +181,9 @@ export default class IndexHeader extends Component {
               </GridCol>
             </GridRow>
           </Grid>
-        </View>
+        </Container>
         <ExternalFeedsTray atomFeedUrl={this.props.atomFeedUrl} permissions={this.props.permissions} />
-      </View>
+      </Container>
     )
   }
 }

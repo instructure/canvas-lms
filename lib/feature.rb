@@ -133,6 +133,7 @@ END
       description: -> { I18n.t('Allows creating discussions for a specific section') },
       applies_to: 'Account',
       state: 'hidden',
+      development: true,
     },
     'permissions_v2_ui' =>
     {
@@ -311,8 +312,10 @@ END
       display_name: -> { I18n.t('Duplicate Modules') },
       description: -> { I18n.t("Allows the duplicating of modules in Canvas") },
       applies_to: 'Account',
-      state: 'allowed',
-      root_opt_in: true
+      state: 'hidden',
+      root_opt_in: true,
+      development: true,
+      beta: true
     },
     'allow_opt_out_of_inbox' =>
     {
@@ -555,7 +558,8 @@ END
       display_name: -> { I18n.t('Account Course and User Search') },
       description: -> { I18n.t('Updated UI for searching and displaying users and courses within an account.') },
       applies_to: 'Account',
-      state: 'on',
+      state: 'allowed',
+      beta: true,
       root_opt_in: true,
       touch_context: true
     },
@@ -675,6 +679,7 @@ END
       description: -> { I18n.t('Allow importing of QTI and Common Cartridge into Quizzes.Next.') },
       applies_to: 'RootAccount',
       beta: true,
+      development: true,
       state: 'allowed'
     },
     'developer_key_management' =>
@@ -701,12 +706,6 @@ END
     'api_token_scoping' => {
       display_name: -> { I18n.t('API Token Scoping')},
       description: -> { I18n.t('If enabled, scopes will be validated on API requests if the developer key being used requires scopes.') },
-      applies_to: 'RootAccount',
-      state: 'hidden'
-    },
-    'non_scoring_rubrics' => {
-      display_name: -> { I18n.t('Non-scoring Rubrics')},
-      description: -> { I18n.t('If enabled, the option will be presented to have non-scoring rubrics.') },
       applies_to: 'RootAccount',
       state: 'hidden'
     }

@@ -17,18 +17,22 @@
  */
 
 import React, { Component } from "react";
-import { number, string, shape, func } from "prop-types";
 import { css } from "aphrodite";
 import styles from "./styles";
-import IconDocumentLine from "@instructure/ui-icons/lib/Line/IconDocument";
+import IconDocumentLine from "instructure-icons/lib/Line/IconDocumentLine";
 
 export default class File extends Component {
-  handleSelect = () => {
+  constructor(props) {
+    super(props);
+    this.handleSelect = this.handleSelect.bind(this);
+  }
+
+  handleSelect() {
     const { onSelect, file } = this.props;
     if (onSelect) {
       onSelect(file.id);
     }
-  };
+  }
 
   icon() {
     switch (this.props.file.type) {
@@ -51,10 +55,10 @@ export default class File extends Component {
 }
 
 File.propTypes = {
-  file: shape({
-    id: number,
-    name: string,
-    type: string
+  file: React.PropTypes.shape({
+    id: React.PropTypes.number,
+    name: React.PropTypes.string,
+    type: React.PropTypes.string
   }).isRequired,
-  onSelect: func
+  onSelect: React.PropTypes.func
 };

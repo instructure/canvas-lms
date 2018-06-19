@@ -20,19 +20,19 @@ import I18n from 'i18n!announcements_v2'
 import React from 'react'
 import {bool} from 'prop-types'
 
-import View from '@instructure/ui-layout/lib/components/View'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import Container from '@instructure/ui-core/lib/components/Container'
+import Heading from '@instructure/ui-core/lib/components/Heading'
+import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent'
+import Text from '@instructure/ui-core/lib/components/Text'
 
 import SVGWrapper from '../../shared/SVGWrapper'
 
 const AnnouncementEmptyState = props => (
-  <View margin="large auto" textAlign="center" display="block">
+  <Container margin="large auto" textAlign="center" display="block">
     <PresentationContent>
-      <View margin="small auto" size="x-small" display="block">
+      <Container margin="small auto" size="x-small" display="block">
         <SVGWrapper url="/images/announcements/announcements-airhorn.svg"/>
-      </View>
+      </Container>
     </PresentationContent>
     <Heading margin="x-small">{I18n.t('No Announcements')}</Heading>
     {props.canCreate ? (
@@ -40,7 +40,7 @@ const AnnouncementEmptyState = props => (
     ) : (
       <Text margin="x-small auto">{I18n.t('Check back later')}</Text>
     )}
-  </View>
+  </Container>
 )
 
 AnnouncementEmptyState.propTypes = {

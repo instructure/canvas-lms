@@ -29,6 +29,7 @@ class Pseudonym < ActiveRecord::Base
   belongs_to :authentication_provider
   MAX_UNIQUE_ID_LENGTH = 100
 
+  CAS_TICKET_EXPIRED = 'expired'.freeze
   CAS_TICKET_TTL = 1.day
 
   validates_length_of :unique_id, :maximum => MAX_UNIQUE_ID_LENGTH
@@ -534,20 +535,38 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def self.cas_ticket_key(ticket)
-    "cas_session_slo:#{ticket}"
+    "cas_session:#{ticket}"
+  end
+
+  def claim_cas_ticket(ticket)
+    return unless Canvas.redis_enabled?
+
+    redis_key = Pseudonym.cas_ticket_key(ticket)
+
+    # Refresh the keys ttl if it exists.
+    unless Canvas.redis.expire(redis_key, CAS_TICKET_TTL)
+      # If it does not exist we need to create it.
+      Canvas.redis.set(redis_key, global_id, ex: CAS_TICKET_TTL, nx: true)
+    end
   end
 
   def cas_ticket_expired?(ticket)
     return unless Canvas.redis_enabled?
     redis_key = Pseudonym.cas_ticket_key(ticket)
 
-    !!Canvas.redis.get(redis_key)
+    # Refresh the ttl on the cas ticket before we check its state.
+    Canvas.redis.expire(redis_key, CAS_TICKET_TTL)
+    Canvas.redis.get(redis_key) != global_id.to_s
   end
 
   def self.expire_cas_ticket(ticket)
     return unless Canvas.redis_enabled?
     redis_key = cas_ticket_key(ticket)
 
-    Canvas.redis.set(redis_key, true, ex: CAS_TICKET_TTL)
+    if id = Canvas.redis.getset(redis_key, CAS_TICKET_EXPIRED)
+      Canvas.redis.expire(redis_key, CAS_TICKET_TTL)
+
+      Pseudonym.where(id: id).exists? if id != CAS_TICKET_EXPIRED
+    end
   end
 end

@@ -19,8 +19,7 @@
 import axios from 'axios'
 // For now, context is always an account, so just pass the id
 
-// Here is an example API call.
-//
-// export function getPermissions (contextId) {
-//   return axios.get(`/api/v1/accounts/${contextId}/permissions`)
-// }
+// TODO: Delete the disabler when we have more to export
+export function getPermissions (contextId) { // eslint-disable-line
+  return axios.get(`/api/v1/accounts/${contextId}/permissions`)
+}

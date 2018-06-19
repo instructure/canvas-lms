@@ -24,7 +24,6 @@ import groups from './groups-reducer';
 import opportunities from './opportunities-reducer';
 import todo from './todo-reducer';
 import ui from './ui-reducer';
-import savePlannerItem from './save-item-reducer';
 
 const locale = handleAction('INITIAL_OPTIONS', (state, action) => {
   return action.payload.locale;
@@ -42,7 +41,7 @@ const firstNewActivityDate = handleAction('FOUND_FIRST_NEW_ACTIVITY_DATE', (stat
   return action.payload.clone();
 }, null);
 
-const combinedReducers = combineReducers({
+export default combineReducers({
   courses,
   groups,
   locale,
@@ -55,8 +54,3 @@ const combinedReducers = combineReducers({
   todo,
   ui,
 });
-
-export default function finalReducer (state, action) {
-  const nextState = savePlannerItem(state, action);
-  return combinedReducers(nextState, action);
-}

@@ -163,7 +163,7 @@ class RceApiSource {
   }
 
   uploadFRD(fileDomObject, preflightProps) {
-    var data = new window.FormData()
+    var data = new FormData()
     Object.keys(preflightProps.upload_params).forEach(uploadProp => {
       data.append(uploadProp, preflightProps.upload_params[uploadProp])
     })

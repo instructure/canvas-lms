@@ -38,7 +38,7 @@ const props = {
 }
 
 it('indicates if a course is a blueprint course', () => {
-  const tooltip = 'Tooltip[tip="This is a blueprint course"] IconBlueprint'
+  const tooltip = 'Tooltip[tip="This is a blueprint course"] IconBlueprintLine'
 
   expect(
     shallow(<CoursesListRow {...props} />)

@@ -188,6 +188,7 @@ describe DiscussionTopicPresenter do
       it "returns true when assignment published" do
         expect(presenter.allows_speed_grader?).to eq true
       end
+
     end
   end
 

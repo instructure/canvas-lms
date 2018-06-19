@@ -22,12 +22,12 @@ import {func, bool, number} from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import View from '@instructure/ui-layout/lib/components/View'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Pagination, {PaginationButton} from '@instructure/ui-pagination/lib/components/Pagination'
+import Spinner from '@instructure/ui-core/lib/components/Spinner'
+import Container from '@instructure/ui-core/lib/components/Container'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import Heading from '@instructure/ui-core/lib/components/Heading'
+import Text from '@instructure/ui-core/lib/components/Text'
+import Pagination, {PaginationButton} from '@instructure/ui-core/lib/components/Pagination'
 
 import AnnouncementRow from '../../shared/components/AnnouncementRow'
 import {ConnectedIndexHeader} from './IndexHeader'
@@ -55,11 +55,13 @@ export default class AnnouncementsIndex extends Component {
     masterCourseData: masterCourseDataShape,
     deleteAnnouncements: func.isRequired,
     toggleAnnouncementsLock: func.isRequired,
+    applicationElement: func,
     announcementsLocked: bool.isRequired,
   }
 
   static defaultProps = {
     masterCourseData: null,
+    applicationElement: () => document.getElementById('application'),
   }
 
   componentDidMount() {
@@ -74,6 +76,7 @@ export default class AnnouncementsIndex extends Component {
         showConfirmDelete({
           selectedCount: 1,
           modalRef: (modal) => { this.deleteModal = modal },
+          applicationElement: this.props.applicationElement,
           onConfirm: () => {
             this.props.deleteAnnouncements(id)
             if (this.searchInput) this.searchInput.focus()
@@ -124,7 +127,7 @@ export default class AnnouncementsIndex extends Component {
   renderAnnouncements() {
     if (this.props.hasLoadedAnnouncements && this.props.announcements.length) {
       return (
-        <View margin="medium">
+        <Container margin="medium">
           <ScreenReaderContent>
             <Heading level="h2">{I18n.t('Announcements List')}</Heading>
           </ScreenReaderContent>
@@ -140,7 +143,7 @@ export default class AnnouncementsIndex extends Component {
               announcementsLocked={this.props.announcementsLocked}
             />
           ))}
-        </View>
+        </Container>
       )
     } else {
       return null

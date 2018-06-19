@@ -117,7 +117,6 @@ var buildAssignment = function(options) {
   }
   Object.assign(base, options)
   const ac = new AssignmentCollection([base])
-  sinon.stub(ac.at(0), 'pollUntilFinishedDuplicating')
   return ac.at(0)
 }
 const createView = function(model, options) {
@@ -804,15 +803,9 @@ test('re-renders when assignment state changes', function() {
 
 test('polls for updates if assignment is duplicating', function() {
   this.stub(this.model, 'isDuplicating').returns(true)
+  this.stub(this.model, 'pollUntilFinishedDuplicating')
   const view = createView(this.model)
   ok(this.model.pollUntilFinishedDuplicating.calledOnce)
-})
-
-test('polls for updates if assignment is importing', function() {
-  this.stub(this.model, 'isImporting').returns(true)
-  this.stub(this.model, 'pollUntilFinishedImporting')
-  const view = createView(this.model)
-  ok(this.model.pollUntilFinishedImporting.calledOnce)
 })
 
 QUnit.module('AssignmentListItemViewSpec - editing assignments', function(hooks) {

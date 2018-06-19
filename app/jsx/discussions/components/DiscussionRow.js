@@ -29,30 +29,30 @@ import cx from 'classnames'
 import $ from 'jquery'
 import 'jquery.instructure_date_and_time'
 
-import Badge from '@instructure/ui-elements/lib/components/Badge'
-import View from '@instructure/ui-layout/lib/components/View'
+import Badge from '@instructure/ui-core/lib/components/Badge'
+import Container from '@instructure/ui-core/lib/components/Container'
 import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
 import Grid, { GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
+import Heading from '@instructure/ui-core/lib/components/Heading'
 
-import IconAssignmentLine from '@instructure/ui-icons/lib/Line/IconAssignment'
-import IconBookmarkLine from '@instructure/ui-icons/lib/Line/IconBookmark'
-import IconBookmarkSolid from '@instructure/ui-icons/lib/Solid/IconBookmark'
-import IconCopySolid from '@instructure/ui-icons/lib/Solid/IconCopy'
-import IconDragHandleLine from '@instructure/ui-icons/lib/Line/IconDragHandle'
-import IconLock from '@instructure/ui-icons/lib/Line/IconLock'
-import IconLtiLine from '@instructure/ui-icons/lib/Line/IconLti'
-import IconPeerReviewLine from '@instructure/ui-icons/lib/Line/IconPeerReview'
-import IconPinLine from '@instructure/ui-icons/lib/Line/IconPin'
-import IconPinSolid from '@instructure/ui-icons/lib/Solid/IconPin'
-import IconPublishSolid from '@instructure/ui-icons/lib/Solid/IconPublish'
-import IconTrashSolid from '@instructure/ui-icons/lib/Solid/IconTrash'
-import IconUnlock from '@instructure/ui-icons/lib/Line/IconUnlock'
-import IconUnpublishedLine from '@instructure/ui-icons/lib/Line/IconUnpublished'
-import IconUpdownLine from '@instructure/ui-icons/lib/Line/IconUpdown'
-import Pill from '@instructure/ui-elements/lib/components/Pill'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import IconAssignmentLine from 'instructure-icons/lib/Line/IconAssignmentLine'
+import IconBookmarkLine from 'instructure-icons/lib/Line/IconBookmarkLine'
+import IconBookmarkSolid from 'instructure-icons/lib/Solid/IconBookmarkSolid'
+import IconCopySolid from 'instructure-icons/lib/Solid/IconCopySolid'
+import IconDragHandleLine from 'instructure-icons/lib/Line/IconDragHandleLine'
+import IconLock from 'instructure-icons/lib/Line/IconLockLine'
+import IconLtiLine from 'instructure-icons/lib/Line/IconLtiLine'
+import IconPeerReviewLine from 'instructure-icons/lib/Line/IconPeerReviewLine'
+import IconPinLine from 'instructure-icons/lib/Line/IconPinLine'
+import IconPinSolid from 'instructure-icons/lib/Solid/IconPinSolid'
+import IconPublishSolid from 'instructure-icons/lib/Solid/IconPublishSolid'
+import IconTrashSolid from 'instructure-icons/lib/Solid/IconTrashSolid'
+import IconUnlock from 'instructure-icons/lib/Line/IconUnlockLine'
+import IconUnpublishedLine from 'instructure-icons/lib/Line/IconUnpublishedLine'
+import IconUpdownLine from 'instructure-icons/lib/Line/IconUpdownLine'
+import Pill from '@instructure/ui-core/lib/components/Pill'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import Text from '@instructure/ui-core/lib/components/Text'
 import { MenuItem } from '@instructure/ui-core/lib/components/Menu'
 
 import DiscussionModel from 'compiled/models/DiscussionTopic'
@@ -239,7 +239,6 @@ export class DiscussionRow extends Component {
   const readCount = this.props.discussion.discussion_subentry_count > 0
     ? (
       <UnreadBadge
-        key={`Badge_${this.props.discussion.id}`}
         unreadCount={this.props.discussion.unread_count}
         unreadLabel={I18n.t('%{count} unread replies', { count: this.props.discussion.unread_count })}
         totalCount={this.props.discussion.discussion_subentry_count}
@@ -252,7 +251,6 @@ export class DiscussionRow extends Component {
 
   subscribeButton = () => (
     <ToggleIcon
-      key={`Subscribe_${this.props.discussion.id}`}
       toggled={this.props.discussion.subscribed}
       OnIcon={
         <Text color="success">
@@ -274,7 +272,6 @@ export class DiscussionRow extends Component {
   publishButton = () => (
     this.props.canPublish
     ? (<ToggleIcon
-         key={`Publish_${this.props.discussion.id}`}
          toggled={this.props.discussion.published}
          disabled={!this.props.discussion.can_unpublish && this.props.discussion.published}
          OnIcon={
@@ -686,9 +683,9 @@ export class DiscussionRow extends Component {
             <GridCol width="auto">
             {!(this.props.discussion.read_state === "read")
               ? <Badge margin="0 small x-small 0" standalone type="notification" />
-              : <View display="block" margin="0 small x-small 0">
-            <View display="block" margin="0 small x-small 0" />
-            </View>}
+              : <Container display="block" margin="0 small x-small 0">
+            <Container display="block" margin="0 small x-small 0" />
+            </Container>}
             </GridCol>
             <GridCol>
               {this.renderDiscussion()}

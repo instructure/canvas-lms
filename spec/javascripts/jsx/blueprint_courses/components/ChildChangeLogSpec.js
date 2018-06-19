@@ -20,13 +20,13 @@ import React from 'react'
 import * as enzyme from 'enzyme'
 import ChildChangeLog from 'jsx/blueprint_courses/components/ChildChangeLog'
 import loadStates from 'jsx/blueprint_courses/loadStates'
-import getSampleData from '../getSampleData'
+import sampleData from '../sampleData'
 
 QUnit.module('ChildChangeLog component')
 
 const defaultProps = () => ({
   status: loadStates.states.not_loaded,
-  migration: getSampleData().history[0],
+  migration: sampleData.history[0],
 })
 
 test('renders the ChildChangeLog component', () => {

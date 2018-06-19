@@ -19,21 +19,13 @@
 class PlannerNote < ActiveRecord::Base
   include Canvas::SoftDeletable
   include Plannable
-  include PlannerHelper
-
   belongs_to :user
   belongs_to :course
   belongs_to :linked_object, polymorphic:
     [:announcement, :assignment, :discussion_topic, :wiki_page, quiz: 'Quizzes::Quiz']
-  validates :user_id, presence: true
-  validates :title, presence: true
-  validates :todo_date, presence: true
-  validates :workflow_state, presence: true
+  validates_presence_of :user_id, :title, :todo_date, :workflow_state
 
-  scope :for_user, -> (user) { where(user: user) }
-  scope :for_course, -> (course) { where(course: course) }
-  scope :exclude_deleted_courses, -> { left_joins(:course).where("courses IS NULL OR courses.workflow_state <> 'deleted'") }
-
-  scope :before, -> (end_at) { where("todo_date <= ?", end_at) }
-  scope :after, -> (start_at) { where("todo_date >= ?", start_at) }
+  scope :for_user, lambda { |user| where(user: user) }
+  scope :for_course, lambda { |course| where(course: course) }
 end
+

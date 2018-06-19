@@ -27,7 +27,6 @@ QUnit.module('AssignmentCellEditor', (suiteHooks) => {
   let $container;
   let editor;
   let editorOptions;
-  let gradebook
   let gridSupport;
 
   function createEditor () {
@@ -45,7 +44,7 @@ QUnit.module('AssignmentCellEditor', (suiteHooks) => {
     };
 
     const assignment = { grading_type: 'points', id: '2301', points_possible: 10 };
-    gradebook = createGradebook()
+    const gradebook = createGradebook()
 
     gradebook.students['1101'] = { id: '1101' }
     gradebook.setAssignments({2301: assignment})
@@ -57,9 +56,6 @@ QUnit.module('AssignmentCellEditor', (suiteHooks) => {
       id: '2501',
       user_id: '1101'
     })
-
-    sinon.stub(gradebook, 'isGradeEditable').withArgs('1101', '2301').returns(true)
-    sinon.stub(gradebook, 'isGradeVisible').withArgs('1101', '2301').returns(true)
 
     editorOptions = {
       column: {
@@ -111,13 +107,6 @@ QUnit.module('AssignmentCellEditor', (suiteHooks) => {
       equal(element.type.name, 'AssignmentRowCell');
     });
 
-    test('renders a ReadOnlyCell when the grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
-      createEditor()
-      const [element] = ReactDOM.render.lastCall.args
-      equal(element.type.name, 'AssignmentRowCell')
-    })
-
     test('renders into the given container', () => {
       createEditor();
       const [/* element */, container] = ReactDOM.render.lastCall.args;
@@ -160,15 +149,6 @@ QUnit.module('AssignmentCellEditor', (suiteHooks) => {
       const returnValue = gridSupport.events.onKeyDown.trigger(keyboardEvent);
       strictEqual(returnValue, false);
     });
-
-    test('calls .handleKeyDown on the ReadOnlyCell component when grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
-      createEditor()
-      sinon.spy(editor.component, 'handleKeyDown')
-      const keyboardEvent = new KeyboardEvent('example')
-      gridSupport.events.onKeyDown.trigger(keyboardEvent)
-      strictEqual(editor.component.handleKeyDown.callCount, 1)
-    })
   });
 
   QUnit.module('#destroy', () => {
@@ -201,14 +181,6 @@ QUnit.module('AssignmentCellEditor', (suiteHooks) => {
       editor.focus();
       strictEqual(editor.component.focus.callCount, 1);
     });
-
-    test('calls .focus on the ReadOnlyCell component when grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
-      createEditor()
-      sinon.spy(editor.component, 'focus')
-      editor.focus()
-      strictEqual(editor.component.focus.callCount, 1)
-    })
   });
 
   QUnit.module('#isValueChanged', () => {
@@ -217,13 +189,6 @@ QUnit.module('AssignmentCellEditor', (suiteHooks) => {
       sinon.stub(editor.component, 'isValueChanged').returns(true);
       strictEqual(editor.isValueChanged(), true);
     });
-
-    test('calls .isValueChanged on the ReadOnlyCell component when the grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
-      createEditor()
-      sinon.stub(editor.component, 'isValueChanged').returns(true)
-      strictEqual(editor.isValueChanged(), true)
-    })
   });
 
   QUnit.module('#serializeValue', () => {
@@ -243,32 +208,23 @@ QUnit.module('AssignmentCellEditor', (suiteHooks) => {
   });
 
   QUnit.module('#applyValue', (hooks) => {
-    test('calls .gradeSubmission on the AssignmentRowCell component', () => {
+    hooks.beforeEach(() => {
       createEditor();
       sinon.stub(editor.component, 'gradeSubmission')
+    });
+
+    test('calls .gradeSubmission on the AssignmentRowCell component', () => {
       editor.applyValue({ id: '1101' }, '9.7');
       strictEqual(editor.component.gradeSubmission.callCount, 1)
     });
 
-    test('calls .gradeSubmission on the ReadOnlyCell component when the grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
-      createEditor()
-      sinon.stub(editor.component, 'gradeSubmission')
-      editor.applyValue({ id: '1101' }, '9.7')
-      strictEqual(editor.component.gradeSubmission.callCount, 1)
-    })
-
     test('includes the given item when applying the value', () => {
-      createEditor();
-      sinon.stub(editor.component, 'gradeSubmission')
       editor.applyValue({ id: '1101' }, '9.7');
       const [item] = editor.component.gradeSubmission.lastCall.args
       deepEqual(item, { id: '1101' });
     });
 
     test('includes the given value when applying the value', () => {
-      createEditor();
-      sinon.stub(editor.component, 'gradeSubmission')
       editor.applyValue({ id: '1101' }, '9.7');
       const [/* item */, value] = editor.component.gradeSubmission.lastCall.args;
       strictEqual(value, '9.7');

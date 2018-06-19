@@ -1140,9 +1140,8 @@ describe GradeCalculator do
 
       it 'does not update grading period scores if update_all_grading_period_scores is false' do
         calculator = GradeCalculator.new(@student.id, @course, update_all_grading_period_scores: false)
-        expect { calculator.compute_and_save_scores }.not_to change {
-          @student.enrollments.first.scores.where.not(grading_period_id: nil).order(:id).pluck(:updated_at)
-        }
+        expect { calculator.compute_and_save_scores }.
+          not_to (change { @student.enrollments.first.scores.where.not(grading_period_id: nil).map(&:updated_at) })
       end
 
       it 'schedules assignment score statistic updates as a singleton' do
@@ -1172,18 +1171,16 @@ describe GradeCalculator do
 
         it 'does not update scores for other grading periods' do
           calculator = GradeCalculator.new(@student.id, @course, grading_period: @first_period)
-          expect { calculator.compute_and_save_scores }.not_to change {
-            @student.enrollments.first.scores.find_by!(grading_period: @second_period)
-          }
+          expect { calculator.compute_and_save_scores }.
+            not_to (change { @student.enrollments.first.scores.where(grading_period: @second_period) })
         end
 
         it 'does not update the overall course score if update_course_score is false' do
           calculator_options = { grading_period: @first_period, update_course_score: false }
           calculator = GradeCalculator.new(@student.id, @course, calculator_options)
 
-          expect { calculator.compute_and_save_scores }.not_to change {
-            @student.enrollments.first.scores.find_by!(course_score: true)
-          }
+          expect { calculator.compute_and_save_scores }.
+              not_to (change { @student.enrollments.first.scores.find_by(course_score: true) })
         end
 
         it 'does not restore previously deleted score if grading period is deleted too' do

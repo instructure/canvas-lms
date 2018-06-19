@@ -43,49 +43,49 @@ test('renders assignment icon for assignments', () => {
   const wrapper = shallow(
     <ToDoItem {...getDefaultProps({ itemType: 'assignment' })} />
   );
-  ok(wrapper.find('IconAssignment').exists());
+  ok(wrapper.find('IconAssignmentLine').exists());
 });
 
 test('renders quiz icon for quizzes', () => {
   const wrapper = shallow(
     <ToDoItem {...getDefaultProps({ itemType: 'quiz' })} />
   );
-  ok(wrapper.find('IconQuiz').exists());
+  ok(wrapper.find('IconQuizLine').exists());
 });
 
 test('renders discussion icon for discussions', () => {
   const wrapper = shallow(
     <ToDoItem {...getDefaultProps({ itemType: 'discussion_topic' })} />
   );
-  ok(wrapper.find('IconDiscussion').exists());
+  ok(wrapper.find('IconDiscussionLine').exists());
 });
 
 test('renders announcement icon for announcements', () => {
   const wrapper = shallow(
     <ToDoItem {...getDefaultProps({ itemType: 'announcement' })} />
   );
-  ok(wrapper.find('IconAnnouncement').exists());
+  ok(wrapper.find('IconAnnouncementLine').exists());
 });
 
 test('renders calendar icon for calendar events', () => {
   const wrapper = shallow(
     <ToDoItem {...getDefaultProps({ itemType: 'calendar' })} />
   );
-  ok(wrapper.find('IconCalendarMonth').exists());
+  ok(wrapper.find('IconCalendarMonthLine').exists());
 });
 
 test('renders page icon for pages', () => {
   const wrapper = shallow(
     <ToDoItem {...getDefaultProps({ itemType: 'page' })} />
   );
-  ok(wrapper.find('IconMsWord').exists());
+  ok(wrapper.find('IconMsWordLine').exists());
 });
 
 test('renders note icon for planner_notes', () => {
   const wrapper = shallow(
     <ToDoItem {...getDefaultProps({ itemType: 'planner_note' })} />
   );
-  ok(wrapper.find('IconNoteLight').exists());
+  ok(wrapper.find('IconNoteLightLine').exists());
 });
 
 test('renders the courses short name when the item has an associated course', () => {

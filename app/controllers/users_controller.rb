@@ -509,8 +509,7 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
-    # Use the legacy to do list for non-students until it is ready for other roles
-    if planner_enabled? && !@current_user.non_student_enrollment?
+    if planner_enabled?
       js_bundle :react_todo_sidebar
       css_bundle :react_todo_sidebar
     end
@@ -532,7 +531,7 @@ class UsersController < ApplicationController
     js_env({
       :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
       :PREFERENCES => {
-        :dashboard_view => @current_user.dashboard_view(@domain_root_account),
+        :dashboard_view => @current_user.dashboard_view,
         :hide_dashcard_color_overlays => @current_user.preferences[:hide_dashcard_color_overlays],
         :custom_colors => @current_user.custom_colors,
       },
@@ -599,7 +598,7 @@ class UsersController < ApplicationController
   def dashboard_view
     if request.get?
       render json: {
-        dashboard_view: @current_user.dashboard_view(@context)
+        dashboard_view: @current_user.dashboard_view
       }
     elsif request.put?
       valid_options = ['activity', 'cards', 'planner']
@@ -2204,74 +2203,48 @@ class UsersController < ApplicationController
     render :json => {:invited_users => invited_users, :errored_users => errored_users}
   end
 
-  # @API Get a Pandata Events jwt token and its expiration date
+  # @API Get a Pandata jwt token and its expiration date
   #
-  # Returns a jwt auth and props token that can be used to send events to
-  # Pandata.
-  #
-  # NOTE: This is currently only available to the mobile developer keys.
+  # Returns a jwt token that can be used to send events to Pandata
   #
   # @argument app_key [String]
-  #   The pandata events appKey for this mobile app
+  #   The pandata appKey for this mobile app
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/users/self/pandata_events_token \
+  #     curl https://<canvas>/api/v1/users/<user_id>/pandata_token \
   #          -X POST \
   #          -H 'Authorization: Bearer <token>'
   #          -F 'app_key=MOBILE_APPS_KEY' \
   #
   # @example_response
   #   {
-  #     "url": "https://example.com/pandata/events"
-  #     "auth_token": "wek23klsdnsoieioeoi3of9deeo8r8eo8fdn",
-  #     "props_token": "paowinefopwienpfiownepfiownepfownef",
+  #     "token": "wek23klsdnsoieioeoi3of9deeo8r8eo8fdn",
   #     "expires_at": 1521667783000,
   #   }
-  def pandata_events_token
-    settings = Canvas::DynamicSettings.find('events', service: 'pandata')
-    dk_ids = Setting.get("pandata_events_token_allowed_developer_key_ids", "").split(",")
+  def pandata_token
+    user = api_find(User, params[:id])
+    settings = Canvas::DynamicSettings.find(service: 'pandata')
 
-    unless @access_token
-      return render json: { :message => "Access token required" }, status: :bad_request
-    end
-
-    unless dk_ids.include?(@access_token.global_developer_key_id.to_s)
-      return render json: { :message => "Developer key not authorized" }, status: :forbidden
-    end
-
-    if params[:app_key] == settings["ios-key"]
-      key = settings["ios-key"]
-      sekrit = settings["ios-secret"]
-    elsif params[:app_key] == settings["android-key"]
-      key = settings["android-key"]
-      sekrit = settings["android-secret"]
+    if params[:app_key] == settings["ios-pandata-key"]
+      key = settings["ios-pandata-key"]
+      sekrit = settings["ios-pandata-secret"]
+    elsif params[:app_key] == settings["android-pandata-key"]
+      key = settings["android-pandata-key"]
+      sekrit = settings["android-pandata-secret"]
     else
-      return render json: { :message => "Invalid app key" }, status: :bad_request
+      return render(json: { :message => "Invalid app key" }, status: :bad_request)
     end
 
     expires_at = Time.zone.now + 1.day.to_i
-    auth_body = {
+    body = {
       iss: key,
       exp: expires_at.to_i,
       aud: 'PANDATA',
-      sub: @current_user.global_id,
+      sub: user.global_id
     }
 
-    props_body = {
-      user_id: @current_user.global_id,
-      shard: @domain_root_account.shard.id,
-      root_account_id: @domain_root_account.local_id,
-      root_account_uuid: @domain_root_account.uuid
-    }
-
-    auth_token = Canvas::Security.create_jwt(auth_body, expires_at, sekrit)
-    props_token = Canvas::Security.create_jwt(props_body, nil, sekrit)
-    render json: {
-      url: settings["url"],
-      auth_token: auth_token,
-      props_token: props_token,
-      expires_at: expires_at.to_f * 1000
-    }
+    token = Canvas::Security.create_jwt(body, expires_at, sekrit)
+    render json: {token: token, expires_at: expires_at.to_f * 1000}
   end
 
   protected

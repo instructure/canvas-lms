@@ -34,9 +34,15 @@ export default class GraderCountNumberInput extends React.Component {
     currentGraderCount: null
   }
 
-  state = {
-    graderCount: this.props.currentGraderCount || Math.min(this.props.maxGraderCount, DEFAULT_GRADER_COUNT),
-    messages: []
+  constructor(props) {
+    super(props)
+    this.generateMessages = this.generateMessages.bind(this)
+    this.handleNumberInputBlur = this.handleNumberInputBlur.bind(this)
+    this.handleNumberInputChange = this.handleNumberInputChange.bind(this)
+    this.state = {
+      graderCount: props.currentGraderCount || Math.min(props.maxGraderCount, DEFAULT_GRADER_COUNT),
+      messages: []
+    }
   }
 
   generateMessages(newValue, eventType) {
@@ -61,13 +67,13 @@ export default class GraderCountNumberInput extends React.Component {
     return []
   }
 
-  handleNumberInputBlur(value) {
+  handleNumberInputBlur({target: {value}}) {
     if (value === '') {
       this.setState({messages: this.generateMessages(value, 'blur')})
     }
   }
 
-  handleNumberInputChange(value) {
+  handleNumberInputChange({target: {value}}) {
     if (value === '') {
       this.setState({graderCount: '', messages: this.generateMessages(value, 'change')})
     } else {
@@ -94,8 +100,8 @@ export default class GraderCountNumberInput extends React.Component {
           messages={this.state.messages}
           min="1"
           name="grader_count"
-          onChange={e => { if (e.type !== 'blur') this.handleNumberInputChange(e.target.value)}}
-          onBlur={e => this.handleNumberInputBlur(e.target.value)}
+          onChange={this.handleNumberInputChange}
+          onBlur={this.handleNumberInputBlur}
           showArrows={false}
           width="5rem"
         />

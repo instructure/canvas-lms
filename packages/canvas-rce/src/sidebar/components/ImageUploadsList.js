@@ -16,9 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import PropTypes from "prop-types";
-
-import React, { Component } from "react";
+import React, { Component, PropTypes } from "react";
 import LoadMore from "../../common/components/LoadMore";
 import UploadedImage from "./UploadedImage";
 

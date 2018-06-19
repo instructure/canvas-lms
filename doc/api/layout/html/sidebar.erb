@@ -1,7 +1,5 @@
 <nav>
   <h2 class='first'>Basics</h2>
-  <a href="<%= url_for("file.changelog.html") %>" class="<%= 'current' if options[:object] == 'file.changelog.html' %>">API Change Log</a>
-  <a href="<%= url_for("file.breaking.html") %>" class="<%= 'current' if options[:object] == 'file.breaking.html' %>">API Breaking Changes</a>
   <a href="<%= url_for("file.object_ids.html") %>" class="<%= 'current' if options[:object] == 'file.object_ids.html' %>">SIS IDs</a>
   <a href="<%= url_for("file.pagination.html") %>" class="<%= 'current' if options[:object] == 'file.pagination.html' %>">Pagination</a>
   <a href="<%= url_for("file.throttling.html") %>" class="<%= 'current' if options[:object] == 'file.throttling.html' %>">Throttling</a>
@@ -12,8 +10,6 @@
   <h2>OAuth2</h2>
   <a href="<%= url_for("file.oauth.html") %>" class="<%= 'current' if options[:object] == 'file.oauth.html' %>">OAuth2 Overview</a>
   <a href="<%= url_for("file.oauth_endpoints.html") %>" class="<%= 'current' if options[:object] == 'file.oauth_endpoints.html' %>">OAuth2 Endpoints</a>
-  <a href="<%= url_for("file.developer_keys.html") %>" class="<%= 'current' if options[:object] == 'file.developer_keys.html' %>">Developer Keys</a>
-  <a href="<%= url_for("file.api_token_scopes.html") %>" class="<%= 'current' if options[:object] == 'file.api_token_scopes.html' %>">API Token Scopes</a>
   <h2>Resources</h2>
   <a <%= "class='current'" if options[:all_resources] %> href="all_resources.html">All Resources Reference</a>
   <% options[:resources].each_with_index do |(resource, controllers), i| %>

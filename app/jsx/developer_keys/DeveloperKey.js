@@ -23,26 +23,14 @@ import 'jqueryui/dialog'
 import I18n from 'i18n!react_developer_keys'
 import React from 'react'
 import PropTypes from 'prop-types'
+import Image from '@instructure/ui-core/lib/components/Image'
+import Link from '@instructure/ui-core/lib/components/Link'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
-import Popover, { PopoverTrigger, PopoverContent } from '@instructure/ui-overlays/lib/components/Popover'
-import Image from '@instructure/ui-elements/lib/components/Img'
-import Link from '@instructure/ui-elements/lib/components/Link'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import View from '@instructure/ui-layout/lib/components/View'
-
-import DeveloperKeyActionButtons from './ActionButtons'
-import DeveloperKeyStateControl from './InheritanceStateControl'
+import DeveloperKeyActionButtons from './DeveloperKeyActionButtons'
+import DeveloperKeyStateControl from './DeveloperKeyStateControl'
 
 
 class DeveloperKey extends React.Component {
-  state = { showKey: false }
-
-  get isSiteAdmin() {
-    return this.props.ctx.params.contextId === "site_admin"
-  }
-
   activateLinkHandler = (event) => {
     event.preventDefault()
     this.props.store.dispatch(
@@ -82,11 +70,9 @@ class DeveloperKey extends React.Component {
     this.actionButtons.focusDeleteLink();
   }
 
-  focusToggleGroup = () => {
-    this.toggleGroup.focusToggleGroup();
+  focusName() {
+    this.keyName.focus();
   }
-
-  isDisabled = () => ( this.toggleGroup.isDisabled() )
 
   makeImage (developerKey) {
     if (developerKey.icon_url) {
@@ -122,13 +108,8 @@ class DeveloperKey extends React.Component {
     this.props.onDelete(this.props.developerKey.id)
   )
 
-  handleShowKey = () => {
-    this.setState({showKey: !this.state.showKey})
-  }
-
   refActionButtons = (link) => { this.actionButtons = link; }
   refKeyName = (link) => { this.keyName = link; }
-  refToggleGroup = (link) => { this.toggleGroup = link }
 
   render () {
     const { developerKey, inherited } = this.props;
@@ -137,7 +118,7 @@ class DeveloperKey extends React.Component {
       <tr className={classNames('key', { inactive: !this.isActive(developerKey) })}>
         <td className="name">
           {this.makeImage(developerKey)}
-          <span ref={this.refKeyName}>
+          <span ref={this.refKeyName} tabIndex="0">
             {this.developerName(developerKey)}
           </span>
         </td>
@@ -160,43 +141,7 @@ class DeveloperKey extends React.Component {
             </div>
             {!inherited &&
               <div>
-                <Popover
-                  placement="top"
-                  alignArrow
-                  on="click"
-                  show={this.state.showKey}
-                  shouldContainFocus
-                  shouldReturnFocus
-                  shouldCloseOnDocumentClick
-                  onDismiss={this.handleShowKey}
-                  label={I18n.t("Key")}
-                >
-                  <PopoverTrigger>
-                    <Button onClick={this.handleShowKey} size="small">
-                      {
-                        this.state.showKey ?
-                          I18n.t('Hide Key') :
-                          I18n.t('Show Key')
-                      }
-                      <ScreenReaderContent>
-                        {this.developerName()}
-                      </ScreenReaderContent>
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent>
-                    <CloseButton
-                      placement="end"
-                      offset="x-small"
-                      variant="icon"
-                      onClick={this.handleShowKey}
-                    >
-                      {I18n.t('Close')}
-                    </CloseButton>
-                    <View padding="large small small small" display="block">
-                      { developerKey.api_key }
-                    </View>
-                  </PopoverContent>
-                </Popover>
+                {I18n.t("Key:")} <span className='api_key'>{developerKey.api_key}</span>
               </div>
             }
             {!inherited &&
@@ -223,7 +168,6 @@ class DeveloperKey extends React.Component {
 
         <td>
           <DeveloperKeyStateControl
-            ref={this.refToggleGroup}
             developerKey={developerKey}
             store={this.props.store}
             actions={this.props.actions}
@@ -240,7 +184,6 @@ class DeveloperKey extends React.Component {
               visible={this.props.developerKey.visible}
               developerName={this.developerName()}
               onDelete={this.handleDelete}
-              showVisibilityToggle={this.isSiteAdmin}
             />
           </td>
         }

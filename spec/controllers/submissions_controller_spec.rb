@@ -397,11 +397,8 @@ describe SubmissionsController do
     context "google doc" do
       before(:each) do
         course_with_student_logged_in(active_all: true)
-        @assignment = @course.assignments.create!(title: 'some assignment', submission_types: 'online_upload')
-      end
-
-      it "should not save if domain restriction prevents it" do
         allow(@student).to receive(:gmail).and_return('student@does-not-match.com')
+        @assignment = @course.assignments.create!(title: 'some assignment', submission_types: 'online_upload')
         account = Account.default
         flag    = FeatureFlag.new
         account.settings[:google_docs_domain] = 'example.com'
@@ -414,6 +411,9 @@ describe SubmissionsController do
         allow(@user).to receive(:user_services).and_return(mock_user_service)
         expect(mock_user_service).to receive(:where).with(service: "google_drive").
           and_return(double(first: double(token: "token", secret: "secret")))
+      end
+
+      it "should not save if domain restriction prevents it" do
         google_docs = double
         expect(GoogleDrive::Connection).to receive(:new).and_return(google_docs)
 
@@ -422,16 +422,6 @@ describe SubmissionsController do
              submission: { submission_type: 'google_doc' },
              google_doc: { document_id: '12345' }})
         expect(response).to be_redirect
-      end
-
-      it "should use instfs to save google doc if instfs is enabled" do
-        allow(InstFS).to receive(:enabled?).and_return(true)
-        uuid = "1234-abcd"
-        allow(InstFS).to receive(:direct_upload).and_return(uuid)
-
-        attachment = @assignment.submissions.first.attachments.new
-        SubmissionsController.new.store_google_doc_attachment(attachment, File.open("public/images/a.png"))
-        expect(attachment.instfs_uuid).to eq uuid
       end
     end
   end
@@ -528,23 +518,6 @@ describe SubmissionsController do
       expect(assigns[:submission].submission_comments[0].attachments.length).to eql(2)
       expect(assigns[:submission].submission_comments[0].attachments.map{|a| a.display_name}).to be_include("doc.doc")
       expect(assigns[:submission].submission_comments[0].attachments.map{|a| a.display_name}).to be_include("txt.txt")
-    end
-
-    it "should store comment files in instfs if instfs is enabled" do
-      allow(InstFS).to receive(:enabled?).and_return(true)
-      uuid = "1234-abcd"
-      allow(InstFS).to receive(:direct_upload).and_return(uuid)
-      course_with_student_logged_in(:active_all => true)
-      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
-      @submission = @assignment.submit_homework(@user)
-      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
-      put 'update', params: {
-        :course_id => @course.id, 
-        :assignment_id => @assignment.id, 
-        :id => @user.id, 
-        :submission => {:comment => "some comment"}, 
-        :attachments => {"0" => {:uploaded_data => data}}}
-      expect(assigns[:submission].submission_comments[0].attachments[0].instfs_uuid).to eql(uuid)
     end
 
     describe 'allows a teacher to add draft comments to a submission' do
@@ -749,49 +722,6 @@ describe SubmissionsController do
         expect(json[0]['submission']['submission_comments'].first['submission_comment']['comment']).to eq 'provisional!'
       end
     end
-
-    describe 'provisional grade error handling for Anonymous Moderated Marking' do
-      before(:once) do
-        course_with_student(active_all: true)
-        teacher_in_course(active_all: true)
-        @course.root_account.enable_feature!(:anonymous_moderated_marking)
-
-        @assignment = @course.assignments.create!(
-          title: 'yet another assignment',
-          moderated_grading: true,
-          grader_count: 1
-        )
-      end
-
-      let(:submission_params) { {comment: 'hi', provisional: true, final: true } }
-      let(:request_params) do
-        { course_id: @course.id, assignment_id: @assignment.id, id: @student.id, submission: submission_params }
-      end
-
-      let(:response_json) { JSON.parse(response.body) }
-
-      it 'returns an error code of MAX_GRADERS_REACHED if a MaxGradersReachedError is raised' do
-        @assignment.grade_student(@student, provisional: true, grade: 5, grader: @teacher)
-        @previous_teacher = @teacher
-
-        teacher_in_course(active_all: true)
-        user_session(@teacher)
-
-        put 'update', params: request_params, format: :json
-
-        expect(response_json.dig('errors', 'error_code')).to eq 'MAX_GRADERS_REACHED'
-      end
-
-      it 'returns a generic error if a GradeError is raised' do
-        invalid_submission_params = submission_params.merge(excused: true)
-        invalid_request_params = request_params.merge(submission: invalid_submission_params)
-        user_session(@teacher)
-
-        put 'update', params: invalid_request_params, format: :json
-
-        expect(response_json.dig('errors', 'base')).to be_present
-      end
-    end
   end
 
   describe "GET zip" do
@@ -897,49 +827,6 @@ describe SubmissionsController do
       expect(body['grade']).to be nil
       expect(body['published_grade']).to be nil
       expect(body['published_score']).to be nil
-    end
-
-    context "for an assignment that has anonymous grading and muted with anonymous_moderated_marking enabled" do
-      before :each do
-        @assignment.root_account.enable_feature!(:anonymous_moderated_marking)
-      end
-
-      it "renders the page for submitting student" do
-        user_session(@student)
-        @assignment.update!(anonymous_grading: true, muted: true)
-        get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
-        assert_status(200)
-      end
-
-      it "renders unauthorized for non-submitting student" do
-        new_student = User.create!
-        @context.enroll_student(new_student, enrollment_state: 'active')
-        user_session(new_student)
-        @assignment.update!(anonymous_grading: true, muted: true)
-        get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
-        assert_unauthorized
-      end
-
-      it "renders unauthorized for teacher" do
-        user_session(@teacher)
-        @assignment.update!(anonymous_grading: true, muted: true)
-        get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
-        assert_unauthorized
-      end
-
-      it "renders unauthorized for admin" do
-        user_session(account_admin_user)
-        @assignment.update!(anonymous_grading: true, muted: true)
-        get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
-        assert_unauthorized
-      end
-
-      it "renders the page for site admin" do
-        user_session(site_admin_user)
-        @assignment.update!(anonymous_grading: true, muted: true)
-        get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
-        assert_status(200)
-      end
     end
 
     context "with user id not present in course" do

@@ -173,11 +173,11 @@ test('it should toggle color overlays', function () {
       dashboard_view='cards'
     />, container)
 
-  dashboardMenu.handleColorOverlayOptionSelect(false)
+  dashboardMenu.handleColorOverlayOptionSelect(null, [''])
   strictEqual(document.getElementsByClassName('ic-DashboardCard__header_hero')[0].style.opacity, '0')
   strictEqual(document.getElementsByClassName('ic-DashboardCard__header-button-bg')[0].style.opacity, '1')
 
-  dashboardMenu.handleColorOverlayOptionSelect(true)
+  dashboardMenu.handleColorOverlayOptionSelect(null, ['colorOverlays'])
   strictEqual(document.getElementsByClassName('ic-DashboardCard__header_hero')[0].style.opacity, '0.6')
   strictEqual(document.getElementsByClassName('ic-DashboardCard__header-button-bg')[0].style.opacity, '0')
 });

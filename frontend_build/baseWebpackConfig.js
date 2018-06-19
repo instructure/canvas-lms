@@ -109,6 +109,10 @@ module.exports = {
       'node_modules-version-of-backbone': require.resolve('backbone'),
       'node_modules-version-of-react-modal': require.resolve('react-modal'),
 
+      // don't let people import these top-level modules, because then you
+      // get :allthethings: ... you need to import particular components
+      'instructure-icons$': 'invalid',
+
       backbone: 'Backbone',
       timezone$: 'timezone_core',
       jst: path.resolve(__dirname, '../app/views/jst'),

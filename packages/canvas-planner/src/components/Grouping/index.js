@@ -92,7 +92,7 @@ export class Grouping extends Component {
     this.groupingLink = link;
   }
 
-  getFocusable = () => { return this.groupingLink; }
+  getFocusable () { return this.groupingLink; }
   getScrollable () { return this.groupingLink || this.plannerNoteHero; }
 
   handleFacadeClick = (e) => {
@@ -116,7 +116,7 @@ export class Grouping extends Component {
     }
 
     const componentsToRender = this.renderItems(itemsToRender);
-    componentsToRender.push(this.renderFacade(completedItems, this.props.animatableIndex * 100 + itemsToRender.length + 1));
+    componentsToRender.push(this.renderFacade(completedItems, itemsToRender.length));
     return componentsToRender;
   }
 
@@ -136,7 +136,7 @@ export class Grouping extends Component {
           overrideId={item.overrideId}
           id={item.id}
           uniqueId={item.uniqueId}
-          animatableIndex={this.props.animatableIndex * 100 + itemIndex + 1}
+          animatableIndex={itemIndex}
           courseName={this.props.title}
           context={item.context || {}}
           date={moment(item.date).tz(this.props.timeZone)}
@@ -190,9 +190,6 @@ export class Grouping extends Component {
             animatableIndex={animatableIndex}
             animatableItemIds={completedItemIds}
             notificationBadge={notificationBadge}
-            theme={{
-              labelColor: this.props.color
-            }}
           />
         </li>
       );
@@ -223,8 +220,7 @@ export class Grouping extends Component {
           <IndicatorComponent
           title={badgeMessage}
           itemIds={this.itemUniqueIds()}
-          animatableIndex={this.props.animatableIndex}
-          getFocusable={this.getFocusable} />
+          animatableIndex={this.props.animatableIndex} />
         </NotificationBadge>
       );
     } else {

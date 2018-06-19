@@ -43,8 +43,7 @@ const getBasicState = () => ({
     pastNextUrl: null,
     allOpportunitiesLoaded: true,
   },
-  currentUser: {id: '1', displayName: 'Jane',
-    avatarUrl: '/avatar/is/here', color: "#00AC18"},
+  currentUser: {id: '1', displayName: 'Jane', avatarUrl: '/avatar/is/here'},
   opportunities: {
     items: [
       { id: 1, firstName: 'Fred', lastName: 'Flintstone', dismissed: false},
@@ -242,13 +241,12 @@ describe('api actions', () => {
 });
 
   describe('savePlannerItem', () => {
-    it('dispatches saving, clearUpdateTodo, and saved actions', () => {
+    it('dispatches saving and saved actions', () => {
       const mockDispatch = jest.fn();
       const plannerItem = simpleItem();
       const savePromise = Actions.savePlannerItem(plannerItem)(mockDispatch, getBasicState);
       expect(isPromise(savePromise)).toBe(true);
       expect(mockDispatch).toHaveBeenCalledWith({type: 'SAVING_PLANNER_ITEM', payload: {item: plannerItem, isNewItem: true}});
-      expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_UPDATE_TODO'});
       expect(mockDispatch).toHaveBeenCalledWith({type: 'SAVED_PLANNER_ITEM', payload: savePromise});
     });
 
@@ -258,7 +256,6 @@ describe('api actions', () => {
       const savePromise = Actions.savePlannerItem(plannerItem)(mockDispatch, getBasicState);
       expect(isPromise(savePromise)).toBe(true);
       expect(mockDispatch).toHaveBeenCalledWith({type: 'SAVING_PLANNER_ITEM', payload: {item: plannerItem, isNewItem: false}});
-      expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_UPDATE_TODO'});
       expect(mockDispatch).toHaveBeenCalledWith({type: 'SAVED_PLANNER_ITEM', payload: savePromise});
     });
 
@@ -365,13 +362,12 @@ describe('api actions', () => {
   });
 
   describe('deletePlannerItem', () => {
-    it('dispatches deleting, clearUpdateTodo, and deleted actions', () => {
+    it('dispatches deleting and deleted actions', () => {
       const mockDispatch = jest.fn();
       const plannerItem = simpleItem();
       const deletePromise = Actions.deletePlannerItem(plannerItem)(mockDispatch, getBasicState);
       expect(isPromise(deletePromise)).toBe(true);
       expect(mockDispatch).toHaveBeenCalledWith({type: 'DELETING_PLANNER_ITEM', payload: plannerItem});
-      expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_UPDATE_TODO'});
       expect(mockDispatch).toHaveBeenCalledWith({type: 'DELETED_PLANNER_ITEM', payload: deletePromise});
     });
 
@@ -422,7 +418,7 @@ describe('api actions', () => {
       const savingItem = {...plannerItem, show: true, toggleAPIPending: true};
       const savePromise = Actions.togglePlannerItemCompletion(plannerItem)(mockDispatch, getBasicState);
       expect(isPromise(savePromise)).toBe(true);
-      expect(mockDispatch).toHaveBeenCalledWith({type: 'SAVING_PLANNER_ITEM', payload: {item: savingItem, isNewItem: false, wasToggled: true}});
+      expect(mockDispatch).toHaveBeenCalledWith({type: 'SAVED_PLANNER_ITEM', payload: {item: savingItem, isNewItem: false}});
       expect(mockDispatch).toHaveBeenCalledWith({type: 'SAVED_PLANNER_ITEM', payload: savePromise});
     });
 
@@ -466,7 +462,6 @@ describe('api actions', () => {
         togglePromise
       ).then((result) => {
         expect(result).toMatchObject({
-          wasToggled: true,
           item: {
             ...plannerItem,
             completed: false,
@@ -493,19 +488,9 @@ describe('api actions', () => {
       ).then((result) => {
         expect(fakeAlert).toHaveBeenCalled();
         expect(result).toMatchObject({
-          item: { ...plannerItem},
-          wasToggled: true,
+          item: { ...plannerItem}
         });
       });
-    });
-  });
-
-  describe('cancelEditingPlannerItem', () => {
-    it('dispatches clearUpdateTodo and canceledEditingPlannerItem actions', () => {
-      const mockDispatch = jest.fn();
-      Actions.cancelEditingPlannerItem()(mockDispatch, getBasicState);
-      expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_UPDATE_TODO'});
-      expect(mockDispatch).toHaveBeenCalledWith({type: 'CANCELED_EDITING_PLANNER_ITEM'});
     });
   });
 });

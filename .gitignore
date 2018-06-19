@@ -51,6 +51,7 @@ yarn-error.log
 # generated client app stuff
 /public/javascripts/client_apps/
 
+
 # canvas-gems
 /gems/*/coverage
 /gems/*/tmp
@@ -66,13 +67,3 @@ docker-compose.local.*
 /packages/canvas-planner/es
 /packages/canvas-planner/coverage/
 /packages/canvas-planner/.babel-cache
-
-# pact artifacts
-/reports/
-/pacts/
-
-# generated scope names
-/lib/api_scope_mapper.rb
-
-# generated scopes markdown
-/doc/api/api_token_scopes.md

@@ -18,7 +18,7 @@
 
 import ChildCourse from 'jsx/blueprint_courses/apps/ChildCourse'
 import select from 'jsx/shared/select'
-import getSampleData from '../getSampleData'
+import sampleData from '../sampleData'
 
 let child = null
 const container = document.getElementById('fixtures')
@@ -33,7 +33,7 @@ QUnit.module('ChildCourse class', {
   }
 })
 
-const defaultData = () => select(getSampleData(), [
+const defaultData = () => select(sampleData, [
   'terms',
   'masterCourse',
   ['childCourse', 'course'],

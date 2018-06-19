@@ -130,10 +130,27 @@ describe UsersController do
   describe "#index" do
     it "should render" do
       user_with_pseudonym(:active_all => 1)
+      @johnstclair = @user.update_attributes(:name => 'John St. Clair', :sortable_name => 'St. Clair, John')
+      user_with_pseudonym(:active_all => 1, :username => 'jtolds@instructure.com', :name => 'JT Olds')
+      @jtolds = @user
       Account.default.account_users.create!(user: @user)
       user_session(@user, @pseudonym)
       get account_users_url(Account.default)
       expect(response).to be_success
+      expect(response.body).to match /Olds, JT.*St\. Clair, John/m
+    end
+
+    it "should not show any student view students at the account level" do
+      course_with_teacher(:active_all => true)
+      @fake_student = @course.student_view_student
+
+      site_admin_user(:active_all => true)
+      user_session(@admin)
+
+      get account_users_url Account.default.id
+      body = Nokogiri::HTML(response.body)
+      expect(body.css("#user_#{@fake_student.id}")).to be_empty
+      expect(body.at_css('.users').text).not_to match(/Test Student/)
     end
   end
 

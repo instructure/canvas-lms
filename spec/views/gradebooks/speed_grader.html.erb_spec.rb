@@ -16,16 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../spec_helper'
-require_relative '../views_helper'
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 require_relative '../../selenium/helpers/groups_common'
 
 describe "/gradebooks/speed_grader" do
   include GroupsCommon
-
-  let(:locals) do
-    { anonymous_grading: false }
-  end
 
   before do
     course_with_student(active_all: true)
@@ -47,69 +43,47 @@ describe "/gradebooks/speed_grader" do
   end
 
   it "should render" do
-    render template: 'gradebooks/speed_grader', locals: locals
+    render "gradebooks/speed_grader"
     expect(rendered).not_to be_nil
   end
 
   it "includes a link back to the gradebook (gradebook by default)" do
-    render template: 'gradebooks/speed_grader', locals: locals
+    render "gradebooks/speed_grader"
     course_id = @course.id
     expect(rendered).to include "a href=\"http://test.host/courses/#{course_id}/gradebook\""
   end
 
   it 'includes the comment auto-save message' do
-    render template: 'gradebooks/speed_grader', locals: locals
+    render 'gradebooks/speed_grader'
 
     expect(rendered).to include 'Your comment was auto-saved as a draft.'
   end
 
   it 'includes the link to publish' do
-    render template: 'gradebooks/speed_grader', locals: locals
+    render 'gradebooks/speed_grader'
 
     expect(rendered).to match(/button.+?class=.+?submit_comment_button/)
   end
 
   it 'it renders the plagiarism resubmit button if the assignment has a plagiarism tool' do
     allow_any_instance_of(Assignment).to receive(:assignment_configuration_tool_lookup_ids) { [1] }
-    render template: 'gradebooks/speed_grader', locals: locals
+    render 'gradebooks/speed_grader'
     expect(rendered).to include "<div id='plagiarism_platform_info_container'>"
   end
 
   describe 'submission comments form' do
     it 'is rendered when @can_comment_on_submission is true' do
       assign(:can_comment_on_submission, true)
-      render template: 'gradebooks/speed_grader', locals: locals
+      render 'gradebooks/speed_grader'
 
       expect(rendered).to match(/form id="add_a_comment"/)
     end
 
     it 'is not rendered when @can_comment_on_submission is false' do
       assign(:can_comment_on_submission, false)
-      render template: 'gradebooks/speed_grader', locals: locals
+      render 'gradebooks/speed_grader'
 
       expect(rendered).not_to match(/form id="add_a_comment"/)
-    end
-  end
-
-  describe 'mute button' do
-    it 'is rendered' do
-      render template: 'gradebooks/speed_grader', locals: locals
-      html = Nokogiri::HTML.fragment(response.body)
-      expect(html.at_css('#mute_link')).to be_present
-    end
-
-    it 'is enabled if user can mute assignment' do
-      assign(:disable_unmute_assignment, false)
-      render template: 'gradebooks/speed_grader', locals: locals
-      html = Nokogiri::HTML.fragment(response.body)
-      expect(html.at_css('#mute_link.disabled')).not_to be_present
-    end
-
-    it 'is disabled if user cannot mute assignment' do
-      assign(:disable_unmute_assignment, true)
-      render template: 'gradebooks/speed_grader', locals: locals
-      html = Nokogiri::HTML.fragment(response.body)
-      expect(html.at_css('#mute_link.disabled')).to be_present
     end
   end
 
@@ -119,18 +93,18 @@ describe "/gradebooks/speed_grader" do
     end
 
     it 'shows radio buttons if individually graded' do
-      render template: 'gradebooks/speed_grader', locals: locals
+      render 'gradebooks/speed_grader'
       html = Nokogiri::HTML.fragment(response.body)
-      expect(html.css('input[type="radio"][name="submission[group_comment]"]').size).to be 2
-      expect(html.css('#submission_group_comment').size).to be 1
+      expect(html.css('input[type="radio"][name="submission[group_comment]"]').size).to eq 2
+      expect(html.css('#submission_group_comment').size).to eq 1
     end
 
     it 'renders hidden checkbox if group graded' do
       @assignment.grade_group_students_individually = false
       @assignment.save!
-      render template: 'gradebooks/speed_grader', locals: locals
+      render 'gradebooks/speed_grader'
       html = Nokogiri::HTML.fragment(response.body)
-      expect(html.css('input[type="radio"][name="submission[group_comment]"]').size).to be 0
+      expect(html.css('input[type="radio"][name="submission[group_comment]"]').size).to eq 0
       checkbox = html.css('#submission_group_comment')
       expect(checkbox.attr('checked').value).to eq 'checked'
       expect(checkbox.attr('style').value).to include('display:none')

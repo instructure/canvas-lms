@@ -1,9 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`The Ratings component renders the root component as expected 1`] = `
-"<div className=\\"rating-tier-list\\">
-  <Rating onClick={[Function]} classes=\\"rating-tier\\" description=\\"Superb\\" points={10} selected={false} />
-  <Rating onClick={[Function]} classes=\\"rating-tier selected none\\" description=\\"Meh\\" long_description=\\"More Verbosity\\" points={5} selected={false} />
-  <Rating onClick={[Function]} classes=\\"rating-tier\\" description=\\"Subpar\\" points={2} selected={false} />
-</div>"
-`;

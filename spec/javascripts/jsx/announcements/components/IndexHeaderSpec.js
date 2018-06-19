@@ -73,7 +73,26 @@ test('onSearch calls searchAnnouncements with searchInput value after debounce t
   tree.instance().onSearch()
 
   setTimeout(() => {
-    deepEqual(searchSpy.lastCall.args[0], { term: 'foo' })
+    deepEqual(searchSpy.firstCall.args[0], { term: 'foo' })
+    done()
+  }, SEARCH_TIME_DELAY)
+})
+
+test('onSearch calls searchAnnouncements with searchInput value only once within debounce timeout', (assert) => {
+  const done = assert.async()
+  const searchSpy = sinon.spy()
+  const tree = mount(
+    <IndexHeader {...makeProps({ searchAnnouncements: searchSpy })} />
+  )
+
+  tree.find('input[name="announcements_search"]').node.value = 'foo'
+  tree.instance().onSearch()
+  tree.instance().onSearch()
+  tree.instance().onSearch()
+
+  setTimeout(() => {
+    deepEqual(searchSpy.firstCall.args[0], { term: 'foo' })
+    equal(searchSpy.callCount, 1)
     done()
   }, SEARCH_TIME_DELAY)
 })

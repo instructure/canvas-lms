@@ -71,6 +71,9 @@
   "load_prior_dates_f2b0f6f0": {
     "message": "Last tidlegare datoar"
   },
+  "there_s_nothing_today_heading_to_the_next_item_due_e4abf4bc": {
+    "message": "Det er ingenting som skjer i dag. Gå vidare til neste element med ein frist."
+  },
   "all_items_loaded_aa256183": {
     "message": "Alle element er lasta"
   },
@@ -100,6 +103,9 @@
   },
   "title_is_required_6ddcab69": {
     "message": "tittel er obligatorisk"
+  },
+  "assignmenttype_title_is_complete_813e54f8": {
+    "message": "{ assignmentType } { title } er fullført"
   },
   "nothing_planned_yet_8675ffe9": {
     "message": "Ingenting er planlagt"
@@ -133,6 +139,9 @@
   },
   "no_due_dates_assigned_e8f5bac8": {
     "message": "Ingen innleveringsfristar er sett opp"
+  },
+  "assignmenttype_title_is_incomplete_a1d5fac0": {
+    "message": "{ assignmentType } { title } er ikkje fullført"
   },
   "save_11a80ec3": {
     "message": "Lagre"

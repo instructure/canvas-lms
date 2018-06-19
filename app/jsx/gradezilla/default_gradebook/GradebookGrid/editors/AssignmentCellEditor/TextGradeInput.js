@@ -169,7 +169,6 @@ export default class TextGradeInput extends Component {
         messages={this.props.messages}
         onChange={this.handleTextChange}
         size="small"
-        textAlign="center"
         value={this.state.grade}
       />
     )

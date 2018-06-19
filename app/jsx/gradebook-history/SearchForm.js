@@ -22,13 +22,13 @@ import { arrayOf, func, shape, string } from 'prop-types';
 import I18n from 'i18n!gradebook_history';
 import moment from 'moment';
 import Autocomplete from '@instructure/ui-core/lib/components/Autocomplete';
-import Button from '@instructure/ui-buttons/lib/components/Button';
-import View from '@instructure/ui-layout/lib/components/View';
-import DateInput from '@instructure/ui-forms/lib/components/DateInput';
-import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup';
-import { GridCol } from '@instructure/ui-layout/lib/components/Grid';
-import Spinner from '@instructure/ui-elements/lib/components/Spinner';
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
+import Button from '@instructure/ui-core/lib/components/Button';
+import Container from '@instructure/ui-core/lib/components/Container';
+import DateInput from '@instructure/ui-core/lib/components/DateInput';
+import FormFieldGroup from '@instructure/ui-core/lib/components/FormFieldGroup';
+import { GridCol } from '@instructure/ui-core/lib/components/Grid';
+import Spinner from '@instructure/ui-core/lib/components/Spinner';
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
 import SearchFormActions from '../gradebook-history/actions/SearchFormActions';
 import { showFlashAlert } from '../shared/FlashAlert';
 
@@ -242,7 +242,7 @@ class SearchFormComponent extends Component {
 
   render () {
     return (
-      <View as="div" margin="0 0 xx-large">
+      <Container as="div" margin="0 0 xx-large">
         <FormFieldGroup
           description={<ScreenReaderContent>{I18n.t('Search Form')}</ScreenReaderContent>}
           as="div"
@@ -336,7 +336,7 @@ class SearchFormComponent extends Component {
             </div>
           </GridCol>
         </FormFieldGroup>
-      </View>
+      </Container>
     );
   }
 }

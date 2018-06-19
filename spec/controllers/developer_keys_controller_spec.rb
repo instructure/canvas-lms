@@ -19,26 +19,30 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe DeveloperKeysController do
-  let(:test_domain_root_account) { Account.create! }
-  let(:site_admin_key) { DeveloperKey.create!(name: 'Site Admin Key', visible: false) }
-
+  let(:site_admin_key) do
+    DeveloperKey.create!(
+      name: 'Site Admin Key',
+      visible: false
+    )
+  end
   let(:root_account_key) do
-    DeveloperKey.create!(name: 'Root Account Key', account: test_domain_root_account, visible: true)
+    DeveloperKey.create!(
+      name: 'Root Account Key',
+      account: test_domain_root_account,
+      visible: true
+    )
   end
-
-  before do
-    Setting.set(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, 'true')
-  end
+  let(:test_domain_root_account) { Account.create! }
 
   context "Site admin" do
-    before do
+    before :once do
       account_admin_user(:account => Account.site_admin)
     end
 
     describe "GET 'index'" do
       context 'with no session' do
         it 'should require authorization' do
-          get 'index', params: { account_id: Account.site_admin.id }
+          get 'index', params: {account_id: Account.site_admin.id}
           expect(response).to be_redirect
         end
       end
@@ -48,21 +52,9 @@ describe DeveloperKeysController do
           user_session(@admin)
         end
 
-        describe "Setting is set" do
-          render_views
-
-          it 'sets the scopes to empty' do
-            dk = DeveloperKey.create!
-            get 'index', params: { account_id: Account.site_admin.id, format: :json}
-            expect(response).to be_success
-            developer_key = json_parse(response.body).first
-            expect(developer_key['scopes']).to eq( [] )
-          end
-        end
-
         it 'should return the list of developer keys' do
           dk = DeveloperKey.create!
-          get 'index', params: { account_id: Account.site_admin.id }
+          get 'index', params: {account_id: Account.site_admin.id}
           expect(response).to be_success
           expect(assigns[:keys]).to be_include(dk)
         end
@@ -71,8 +63,7 @@ describe DeveloperKeysController do
           render_views
 
           it 'includes developer_keys' do
-            Setting.remove(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES)
-            get 'index', params: { account_id: Account.site_admin.id }
+            get 'index', params: {account_id: Account.site_admin.id}
             expect(response).to render_template(:index)
             expect(response).to be_success
           end
@@ -81,7 +72,7 @@ describe DeveloperKeysController do
         it 'should not include deleted keys' do
           dk = DeveloperKey.create!
           dk.destroy
-          get 'index', params: { account_id: Account.site_admin.id }
+          get 'index', params: {account_id: Account.site_admin.id}
           expect(response).to be_success
           expect(assigns[:keys]).not_to be_include(dk)
         end
@@ -89,27 +80,27 @@ describe DeveloperKeysController do
         it 'should include inactive keys' do
           dk = DeveloperKey.create!
           dk.deactivate!
-          get 'index', params: { account_id: Account.site_admin.id }
+          get 'index', params: {account_id: Account.site_admin.id}
           expect(response).to be_success
           expect(assigns[:keys]).to be_include(dk)
         end
 
         it "should include the key's 'vendor_code'" do
           DeveloperKey.create!(vendor_code: 'test_vendor_code')
-          get 'index', params: { account_id: Account.site_admin.id }
+          get 'index', params: {account_id: Account.site_admin.id}
           expect(assigns[:keys].first.vendor_code).to eq 'test_vendor_code'
         end
 
         it "should include the key's 'visibility'" do
           key = DeveloperKey.create!
-          get 'index', params: { account_id: Account.site_admin.id }, format: :json
+          get 'index', params: {account_id: Account.site_admin.id}, format: :json
           developer_key = json_parse(response.body).first
           expect(developer_key['visible']).to eq(key.visible)
         end
 
         it 'includes non-visible keys created in site admin' do
           site_admin_key = DeveloperKey.create!(name: 'Site Admin Key', visible: false)
-          get 'index', params: { account_id: 'site_admin' }
+          get 'index', params: {account_id: 'site_admin'}
           expect(assigns[:keys]).to eq [site_admin_key]
         end
 
@@ -117,12 +108,13 @@ describe DeveloperKeysController do
           before do
             site_admin_key
             root_account_key
-            test_domain_root_account.enable_feature!(:developer_key_management_ui_rewrite)
+            allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(true)
+            allow_any_instance_of(Account).to receive(:feature_enabled?).with(:api_token_scoping).and_return(false)
           end
 
           context 'on site_admin account' do
             it 'returns empty array' do
-              get 'index', params: { inherited: true, account_id: 'site_admin', format: 'json' }
+              get 'index', params: {inherited: true, account_id: 'site_admin', format: 'json'}
               developer_keys = json_parse(response.body)
               expect(developer_keys.size).to eq 0
             end
@@ -130,10 +122,13 @@ describe DeveloperKeysController do
 
           context 'on root account' do
             context 'with site_admin key visible' do
-              it 'returns only the keys from site_admin' do
+              before do
                 dev_key = DeveloperKey.create!(name: 'Site Admin Key 2')
                 dev_key.update!(visible: true)
-                get 'index', params: { inherited: true, account_id: test_domain_root_account.id, format: 'json' }
+              end
+
+              it 'returns only the keys from site_admin' do
+                get 'index', params: {inherited: true, account_id: test_domain_root_account.id, format: 'json'}
                 developer_keys = json_parse(response.body)
                 expect(developer_keys.size).to eq 1
                 expect(developer_keys.first['name']).to eq 'Site Admin Key 2'
@@ -142,12 +137,14 @@ describe DeveloperKeysController do
 
             context 'with site_admin key not visible' do
               it 'returns empty array' do
-                get 'index', params: { inherited: true, account_id: test_domain_root_account.id, format: 'json' }
+                get 'index', params: {inherited: true, account_id: test_domain_root_account.id, format: 'json'}
                 developer_keys = json_parse(response.body)
                 expect(developer_keys.size).to eq 0
               end
             end
           end
+
+          context 'on sub account'
         end
       end
     end
@@ -155,17 +152,15 @@ describe DeveloperKeysController do
     describe "POST 'create'" do
       it 'should return the list of developer keys' do
         user_session(@admin)
-        create_params = {
-          account_id: Account.site_admin.id,
-          developer_key: {
-            redirect_uri: "http://example.com/sdf"
-          }
-        }
 
-        post "create", params: create_params
+        post "create", params: {account_id: Account.site_admin.id, developer_key: {
+                       redirect_uri: "http://example.com/sdf"
+                     }}
+
+        expect(response).to be_success
 
         json_data = JSON.parse(response.body)
-        expect(response).to be_success
+
         key = DeveloperKey.find(json_data['id'])
         expect(key.account).to be nil
       end
@@ -182,7 +177,6 @@ describe DeveloperKeysController do
           Account.site_admin.allow_feature!(:api_token_scoping)
           allow_any_instance_of(Account).to receive(:feature_enabled?).with(:api_token_scoping).and_return(true)
           allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(true)
-
           user_session(@admin)
         end
 
@@ -207,7 +201,6 @@ describe DeveloperKeysController do
           post 'create', params: { account_id: root_account.id, developer_key: { scopes: valid_scopes } }
           expect(DeveloperKey.find(json_parse['id']).scopes).to be_blank
         end
-
       end
     end
 
@@ -239,17 +232,11 @@ describe DeveloperKeysController do
         let(:invalid_scopes) { ['url:POST|/api/v1/banana', 'not_a_scope'] }
         let(:root_account) { account_model }
         let(:developer_key) { DeveloperKey.create!(account: account_model) }
-        let(:site_admin_key) { DeveloperKey.create! }
 
         before do
           allow_any_instance_of(Account).to receive(:feature_enabled?).with(:api_token_scoping).and_return(true)
           allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(true)
           user_session(@admin)
-        end
-
-        it 'allows setting scopes for site admin keys' do
-          put 'update', params: { id: site_admin_key.id, developer_key: { scopes: valid_scopes } }
-          expect(site_admin_key.reload.scopes).to match_array valid_scopes
         end
 
         it 'allows setting scopes' do
@@ -271,11 +258,6 @@ describe DeveloperKeysController do
           allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(false)
           put 'update', params: { id: developer_key.id, developer_key: { scopes: valid_scopes } }
           expect(developer_key.reload.scopes).to be_blank
-        end
-
-        it 'sets the scopes to empty if the scopes parameter is an empty string' do
-          put 'update', params: { id: developer_key.id, developer_key: { scopes: '' } }
-          expect(developer_key.reload.scopes).to match_array []
         end
       end
     end
@@ -305,14 +287,9 @@ describe DeveloperKeysController do
       before do
         site_admin_key
         root_account_key
+
         allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
         allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(true)
-      end
-
-      it 'responds with not found if the account is a sub account' do
-        allow(controller).to receive(:require_context_with_permission).and_return nil
-        get 'index', params: {account_id: sub_account.id}
-        expect(response).to be_not_found
       end
 
       it 'does not inherit site admin keys if feature flag is off' do
@@ -391,35 +368,30 @@ describe DeveloperKeysController do
 
     it "An account admin shouldn't be able to access site admin dev keys" do
       user_session(test_domain_root_account_admin)
-      get 'index', params: { account_id: Account.site_admin.id }
+      get 'index', params: {account_id: Account.site_admin.id}
       expect(response).to be_redirect
       expect(flash[:error]).to eq "You don't have permission to access that page"
     end
 
     it "An account admin shouldn't be able to access site admin dev keys explicitly" do
       user_session(test_domain_root_account_admin)
-      get 'index', params: { account_id: Account.site_admin.id }
+      get 'index', params: {account_id: Account.site_admin.id}
       expect(response).to be_redirect
       expect(flash[:error]).to eq "You don't have permission to access that page"
     end
 
     describe "Should be able to create developer key" do
-      let(:create_params) do
-        {
-          account_id: test_domain_root_account.id,
-          developer_key: {
-            redirect_uri: "http://example.com/sdf"
-          }
-        }
+      before :each do
+        post "create", params: {account_id: test_domain_root_account.id, developer_key: {
+                       redirect_uri: "http://example.com/sdf"
+                     }}
       end
 
       it 'should be allowed to create a dev key' do
-        post "create", params: create_params
         expect(response).to be_success
       end
 
       it 'should be dev keys plus 1 key' do
-        post "create", params: create_params
         expect(test_domain_root_account.developer_keys.all.count).to be 1
       end
     end

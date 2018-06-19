@@ -20,11 +20,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!dashcards'
 import Menu, { MenuItem } from '@instructure/ui-core/lib/components/Menu'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import IconMoveUpTopSolid from '@instructure/ui-icons/lib/Solid/IconMoveUpTop'
-import IconMoveUpSolid from '@instructure/ui-icons/lib/Solid/IconMoveUp'
-import IconMoveDownSolid from '@instructure/ui-icons/lib/Solid/IconMoveDown'
-import IconMoveDownBottomSolid from '@instructure/ui-icons/lib/Solid/IconMoveDownBottom'
+import Text from '@instructure/ui-core/lib/components/Text'
+import IconMoveUpTopSolid from 'instructure-icons/lib/Solid/IconMoveUpTopSolid'
+import IconMoveUpSolid from 'instructure-icons/lib/Solid/IconMoveUpSolid'
+import IconMoveDownSolid from 'instructure-icons/lib/Solid/IconMoveDownSolid'
+import IconMoveDownBottomSolid from 'instructure-icons/lib/Solid/IconMoveDownBottomSolid'
 
   class DashboardCardMovementMenu extends React.Component {
 

@@ -23,8 +23,7 @@ module Api::V1::ObserverAlertThreshold
   API_ALLOWED_OUTPUT_FIELDS = {
     :only => %w(
       id
-      user_id
-      observer_id
+      user_observation_link_id
       alert_type
       threshold
       workflow_state

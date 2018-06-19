@@ -31,7 +31,6 @@ export class NewActivityIndicator extends Component {
     registerAnimatable: func,
     deregisterAnimatable: func,
     animatableIndex: number,
-    getFocusable: func,
   }
 
   static defaultProps = {
@@ -52,9 +51,7 @@ export class NewActivityIndicator extends Component {
     this.props.deregisterAnimatable('new-activity-indicator', this, this.props.itemIds);
   }
 
-  getFocusable () {
-    return this.props.getFocusable ? this.props.getFocusable() : undefined;
-  }
+  getFocusable () { throw new Error('tried to call getFocusable on NewActivityIndicator'); }
   getScrollable () {
     return this.indicatorElt;
   }

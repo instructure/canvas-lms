@@ -16,8 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# @API API Token Scopes
-# @internal
+# @API Scopes
 # API for retrieving API scopes
 #
 # @model Scope
@@ -28,21 +27,6 @@
 #         "resource": {
 #           "description": "The resource the scope is associated with",
 #           "example": "courses",
-#           "type": "string"
-#         },
-#         "resource_name": {
-#           "description": "The localized resource name",
-#           "example": "Courses",
-#           "type": "string"
-#         },
-#         "controller": {
-#           "description": "The controller the scope is associated to",
-#           "example": "courses",
-#           "type": "string"
-#         },
-#         "action": {
-#           "description": "The controller action the scope is associated to",
-#           "example": "index",
 #           "type": "string"
 #         },
 #         "verb": {
@@ -66,22 +50,19 @@ class ScopesApiController < ApplicationController
   # @API List scopes
   # A list of scopes that can be applied to developer keys and access tokens.
   #
-  # @argument group_by [String, "resource_name"]
+  # @argument group_by [String, "resource"]
   #   The attribute to group the scopes by. By default no grouping is done.
   #
   # @returns [Scope]
   def index
-    named_scopes = TokenScopes.named_scopes
     if authorized_action(@context, @current_user, :manage_role_overrides)
-      scopes = params[:group_by] == "resource_name" ? named_scopes.group_by {|route| route[:resource_name]} : named_scopes
+      scopes = params[:group_by] == "resource" ? TokenScopes::GROUPED_DETAILED_SCOPES : TokenScopes::DETAILED_SCOPES
       render json: scopes
     end
   end
 
   private
-
   def check_feature_flag
-    return if @context.try(:site_admin?) && Setting.get(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, nil).present?
     return if @context.root_account.feature_enabled?(:api_token_scoping)
     render json: [], status: :forbidden
   end

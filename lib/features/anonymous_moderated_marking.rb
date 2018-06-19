@@ -46,7 +46,7 @@ Feature.register(
       if context.is_a?(Account)
         context.feature_enabled?(:anonymous_moderated_marking)
       elsif context.is_a?(Course)
-        context.root_account.feature_enabled?(:anonymous_moderated_marking)
+        context.account.feature_enabled?(:anonymous_moderated_marking)
       else
         false
       end

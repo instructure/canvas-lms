@@ -17,26 +17,37 @@
 #
 
 module Submissions
-  class SubmissionForShow < AbstractSubmissionForShow
-    attr_reader :id
+  class SubmissionForShow
+    def initialize(context, options={})
+      @context = context
+      @options = options
+    end
+    attr_reader :options
 
-    def initialize(assignment_id:, context:, id:, preview: false, version: nil)
-      super(assignment_id: assignment_id, context: context, preview: preview, version: version)
-      @id = id
+    def assignment
+      @_assignment ||= @context.assignments.active.find(options[:assignment_id])
+    end
+
+    def submission
+      @_submission ||= versioned? ? versioned_submission : root_submission
     end
 
     def user
-      @user ||= context.all_students.find(id)
+      @_user ||= @context.all_students.find(options[:id])
     end
 
     private
+    def versioned?
+      options[:preview] && options[:version] && !assignment.quiz
+    end
 
     def root_submission
-      @root_submission ||= assignment.submissions.
-        except(:preload).
-        preload(versioned? ? :versions : nil).
-        where(user_id: user).
-        first_or_initialize
+      @_root_submission ||= assignment.submissions.
+        preload(:versions).where(user_id: user).first_or_initialize
+    end
+
+    def versioned_submission
+      root_submission.submission_history[options[:version].to_i] || root_submission
     end
   end
 end

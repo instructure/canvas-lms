@@ -20,10 +20,6 @@ import Animation from '../animation';
 import {loadPastUntilNewActivity} from '../../actions/loading-actions';
 
 export class ScrollToNewActivity extends Animation {
-  fixedElement () {
-    return this.app().fixedElementForItemScrolling();
-  }
- 
   findNaiAboveScreen () {
     const nais = this.registry().getAllNewActivityIndicatorsSorted();
     return nais.reverse().find(indicator => {
@@ -34,8 +30,6 @@ export class ScrollToNewActivity extends Animation {
   uiDidUpdate () {
     const nai = this.findNaiAboveScreen();
     if (nai) {
-      this.maintainViewportPositionOfFixedElement();
-      this.animator().focusElement(nai.component.getFocusable());
       this.animator().scrollTo(nai.component.getScrollable(), this.manager().totalOffset());
     } else {
       this.animator().scrollToTop();

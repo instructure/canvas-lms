@@ -46,8 +46,6 @@ export function mergeDaysHashes (oldDaysHash, newDaysHash) {
   oldDaysHash = {...oldDaysHash};
   const mergedDaysHash = _.mergeWith(oldDaysHash, newDaysHash, (oldDayItems, newDayItems) => {
     if (oldDayItems == null) oldDayItems = [];
-    // this is only called when necessary to merge new items into old items.
-    // that way we avoid sorting items that have already been sorted.
     return mergeItems(oldDayItems, newDayItems);
   });
   return mergedDaysHash;
@@ -78,104 +76,21 @@ export function daysToItems (days) {
 }
 
 export function mergeItems(oldItems, newItems) {
-  const newItemsMap = new Map(newItems.map(item => [item.uniqueId, item]));
+  const newItemsMap = new Map(newItems.map(item => [item.id, item]));
   const oldItemsMerged = oldItems.map(oldItem => {
-    const newItem = newItemsMap.get(oldItem.uniqueId);
+    const newItem = newItemsMap.get(oldItem.id);
     if (newItem) {
-      newItemsMap.delete(newItem.uniqueId);
+      newItemsMap.delete(newItem.id);
       return newItem;
     } else {
       return oldItem;
     }
   });
-  const resultingItems = oldItemsMerged.concat([...newItemsMap.values()]);
-  // mergeItems is only called as needed to merge new items into old items,
-  // so sorting here is ok and won't wind up sorting every day on every merge.
-  return groupAndSortDayItems(resultingItems);
-}
-
-// returns {dayIndex, itemIndex, item}. Both indexes are -1 and item is undefined if the item isn't found.
-export function findItemInDays (days, uniqueId) {
-  let dayIndex = -1;
-  let itemIndex = -1;
-  if (uniqueId !== undefined) {
-    dayIndex = days.findIndex(day => {
-      const items = day[1];
-      itemIndex = items.findIndex(itemToCheck => itemToCheck.uniqueId === uniqueId);
-      return itemIndex !== -1;
-    });
-  }
-  const item = dayIndex !== -1 ? days[dayIndex][1][itemIndex] : undefined;
-  return {dayIndex, itemIndex, item};
-}
-
-export function deleteItemFromDaysAt (days, dayIndex, itemIndex) {
-  const oldItems = days[dayIndex][1];
-  const newItems = oldItems.filter((_, index) => index !== itemIndex);
-  if (newItems.length === 0) {
-    return days.filter((_, index) => index !== dayIndex);
-  } else {
-    const newDay = days[dayIndex].slice(0); // copy
-    newDay[1] = newItems;
-    const newDays = days.slice(0);
-    newDays[dayIndex] = newDay;
-    return newDays;
-  }
-}
-
-export function deleteItemFromDays (days, doomedItem) {
-  const {dayIndex, itemIndex} = findItemInDays(days, doomedItem.uniqueId);
-  if (dayIndex === -1 || itemIndex === -1) return days;
-  return deleteItemFromDaysAt(days, dayIndex, itemIndex);
+  return oldItemsMerged.concat([...newItemsMap.values()]);
 }
 
 export function purgeDuplicateDays (oldDays, newDays) {
   const purgedDaysHash = daysToDaysHash(oldDays);
   newDays.forEach(day => { delete purgedDaysHash[day[0]]; });
   return daysHashToDays(purgedDaysHash);
-}
-
-// sort the items:
-// First by grouping (alpha by course or group title, followed by the Notes (aka To Dos)
-// Then by due-time for each item w/in the grouping.
-export function groupAndSortDayItems (items) {
-  return items.sort(orderItems);
-}
-
-// ----- grouping and sorting helpers -----
-const cmpopts = {numeric: true};
-const locale =(window.ENV && window.ENV.LOCALE) || 'en';
-
-// order items by their grouping
-function getItemGroupTitle(item) {
-  if (item.context && item.context.id) {  // edited items have an empty context, so look for the id too
-    return item.context.title || `${item.context.type}${item.context.id}`;
-  }
-  return 'Notes';
-}
-
-function orderItemsByGrouping (a, b) {
-  let namea = getItemGroupTitle(a);
-  let nameb = getItemGroupTitle(b);
-  if (namea.localeCompare(nameb, locale, cmpopts) === 0) return 0;
-  if (namea === 'Notes') return 1;
-  if (nameb === 'Notes') return -1;
-  return namea.localeCompare(nameb, locale, cmpopts);
-}
-
-// order items by time, then title
-function orderItemsByTimeAndTitle (a, b) {
-  if (a.date.valueOf() === b.date.valueOf()) {
-    return a.title.localeCompare(b.title, locale, cmpopts);
-  }
-  return a.date < b.date ? -1 : 1;
-}
-
-// order items
-function orderItems (a, b) {
-  let order = orderItemsByGrouping(a, b);
-  if (order === 0) {
-    order = orderItemsByTimeAndTitle(a, b);
-  }
-  return order;
 }
