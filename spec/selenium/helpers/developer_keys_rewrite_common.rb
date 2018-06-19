@@ -64,4 +64,9 @@ module DeveloperKeysRewriteCommon
     f("input[placeholder='Search endpoints']").clear
     f("input[placeholder='Search endpoints']").send_keys scope
   end
+
+  def wait_for_dev_key_modal_to_close
+    app = f("#application") # prevent keep_trying_until from complaining about 'f'
+    keep_trying_until { expect(app.attribute('aria-hidden')).to be_falsey }
+  end
 end

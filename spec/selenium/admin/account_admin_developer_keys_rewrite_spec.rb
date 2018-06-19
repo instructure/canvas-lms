@@ -279,12 +279,7 @@ describe 'Developer Keys' do
     end
 
     context "scopes" do
-      let(:api_token_scopes) do
-         [
-           "url:GET|/api/v1/accounts/:account_id/scopes"
-         ]
-      end
-
+      let(:api_token_scopes) { ["url:GET|/api/v1/accounts/:account_id/scopes"] }
       let(:assignment_groups_scopes) do
         [
           "url:GET|/api/v1/courses/:course_id/assignment_groups",
@@ -294,9 +289,9 @@ describe 'Developer Keys' do
           "url:DELETE|/api/v1/courses/:course_id/assignment_groups/:assignment_group_id"
         ]
       end
-
       let(:developer_key_with_scopes) do
         DeveloperKey.create!(
+          name: 'Developer Key With Scopes',
           account: Account.default,
           scopes: api_token_scopes + assignment_groups_scopes,
           require_scopes: true
@@ -387,6 +382,17 @@ describe 'Developer Keys' do
         expect(developer_key_with_scopes.reload.scopes).to eq api_token_scopes
       end
 
+      it "keeps all endpoints read only checkbox checked after save" do
+        get "/accounts/#{Account.default.id}/developer_keys"
+        find_button("Developer Key").click
+        click_enforce_scopes
+        click_select_all_readonly_checkbox
+        find_button("Save Key").click
+        wait_for_dev_key_modal_to_close
+        click_edit_icon
+        expect(all_endpoints_readonly_checkbox_selected?).to eq true
+      end
+
       it "keeps all endpoints read only checkbox checked if check/unchecking another http method" do
         expand_scope_group_by_filter('Assignment Groups', Account.default.id)
         click_select_all_readonly_checkbox
@@ -412,6 +418,17 @@ describe 'Developer Keys' do
         keep_trying_until do
           expect(flash_holder.text).to eq 'At least one scope must be selected.' if flash_holder.text.present?
         end
+      end
+
+      it "clears current developer key state when browser back button is pressed" do
+        developer_key_with_scopes
+        get "/accounts/#{Account.default.id}/developer_keys"
+        click_edit_icon
+        wait_for_ajaximations
+        driver.navigate.back
+        wait_for_dev_key_modal_to_close
+        find_button("Developer Key").click
+        expect(f("input[name='developer_key[name]']").attribute('value')).not_to be_present
       end
     end
   end
