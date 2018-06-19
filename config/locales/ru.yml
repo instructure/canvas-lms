@@ -5207,6 +5207,11 @@ ru:
     many: "%{count} люди, успешно зарегистрированные на *%{course_name}*."
     one: "%{user_name} успешно зарегистрирован на *%{course_name}*."
     other: "%{count} люди, успешно зарегистрированные на *%{course_name}*."
+  count_permissions_found_1a926f7d: 
+    few: "%{count} найденные разрешения"
+    many: "%{count} найденные разрешения"
+    one: "Найдено одно разрешение"
+    other: "%{count} найденные разрешения"
   count_points_4735a2e8: 
     few: "%{count} баллов"
     many: "%{count} баллов"
