@@ -78,6 +78,27 @@ describe Outcomes::ResultAnalytics do
     end
   end
 
+  describe "#find_outcome_results" do
+    before(:once) do
+      course_with_student
+      outcome_with_rubric context: @course
+      assignment_model
+      alignment = @outcome.align(@assignment, @course)
+      LearningOutcomeResult.create! context: @course, learning_outcome: @outcome, user: @student, alignment: alignment
+      LearningOutcomeResult.create! context: @course, learning_outcome: @outcome, user: @student, alignment: alignment, hidden: true
+    end
+
+    it 'does not return hidden outcome results' do
+      results = ra.find_outcome_results(users: [@student], context: @course, outcomes: [@outcome])
+      expect(results.length).to eq 1
+    end
+
+    it 'returns hidden outcome results when include_hidden is true' do
+      results = ra.find_outcome_results(users: [@student], context: @course, outcomes: [@outcome], include_hidden: true)
+      expect(results.length).to eq 2
+    end
+  end
+
   describe '#rollup_user_results' do
     it 'returns a rollup score for each distinct outcome_id' do
       results = [
