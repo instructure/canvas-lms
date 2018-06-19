@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class EnrollmentState < ActiveRecord::Base
-  belongs_to :enrollment
+  belongs_to :enrollment, inverse_of: :enrollment_state
 
   attr_accessor :skip_touch_user, :user_needs_touch, :is_direct_recalculation
   validates_presence_of :enrollment_id
