@@ -139,8 +139,10 @@ export default class GradeSelect extends Component {
     const graderOptions = optionsForGraders(props.graders, props.grades)
     const options = [...graderOptions]
 
+    let customGradeOption
+
     if (props.finalGrader) {
-      const customGradeOption = customGradeOptionFromProps(props)
+      customGradeOption = customGradeOptionFromProps(props)
       if (customGradeOption) {
         options.push(customGradeOption)
 
@@ -157,6 +159,7 @@ export default class GradeSelect extends Component {
     }
 
     return {
+      customGradeOption,
       graderOptions,
       options,
       selectedOption
@@ -186,15 +189,22 @@ export default class GradeSelect extends Component {
       return
     }
 
-    const optionMatch = this.state.options.find(option => option.value === selectedOption.value)
-    if (!optionMatch.gradeInfo.selected) {
-      this.props.onSelect(optionMatch.gradeInfo)
-    } else {
-      const originalGrade = this.props.grades[optionMatch.value]
-      if (optionMatch.gradeInfo.score !== originalGrade.score) {
-        this.props.onSelect(optionMatch.gradeInfo)
-      }
+    const options = [...this.state.graderOptions]
+    if (this.state.customGradeOption) {
+      options.push(this.state.customGradeOption)
     }
+
+    this.setState({options}, () => {
+      const optionMatch = this.state.options.find(option => option.value === selectedOption.value)
+      if (!optionMatch.gradeInfo.selected) {
+        this.props.onSelect(optionMatch.gradeInfo)
+      } else {
+        const originalGrade = this.props.grades[optionMatch.value]
+        if (optionMatch.gradeInfo.score !== originalGrade.score) {
+          this.props.onSelect(optionMatch.gradeInfo)
+        }
+      }
+    })
   }
 
   handleClose() {
@@ -208,11 +218,7 @@ export default class GradeSelect extends Component {
   }
 
   handleInputChange(event, value) {
-    if (event == null) {
-      return
-    }
-
-    const cleanValue = value.trim()
+    const cleanValue = event == null ? '' : value.trim()
     const options = filterOptions(this.state.graderOptions, cleanValue)
     const score = numberHelper.parse(cleanValue)
 
@@ -233,7 +239,7 @@ export default class GradeSelect extends Component {
       options.push(customGradeOption)
     }
 
-    this.setState({options})
+    this.setState({customGradeOption, options})
   }
 
   render() {

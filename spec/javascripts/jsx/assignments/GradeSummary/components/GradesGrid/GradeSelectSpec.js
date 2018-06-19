@@ -332,6 +332,13 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
       await clickOff()
       equal(getTextInput().value, '–')
     })
+
+    test('restores the full list of options for subsequent selection', async () => {
+      await mountAndClick()
+      setInputText('7.9')
+      await clickOff()
+      deepEqual(getOptionLabels(), ['frizz', 'robin', 'feeny'].map(labelForGrader))
+    })
   })
 
   QUnit.module('when no grade has been selected', () => {
@@ -892,6 +899,11 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
     test('includes the student id when calling onSelect', () => {
       const [gradeInfo] = props.onSelect.lastCall.args
       strictEqual(gradeInfo.studentId, '1111')
+    })
+
+    test('restores the full list of options for subsequent selection', () => {
+      const graderOptionLabels = ['frizz', 'robin', 'feeny'].map(labelForGrader)
+      deepEqual(getOptionLabels(), [...graderOptionLabels, customLabel('5')])
     })
   })
 
