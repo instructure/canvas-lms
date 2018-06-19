@@ -17,6 +17,7 @@
  */
 
 import _ from 'lodash'
+import $ from 'jquery'
 import React from 'react'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
@@ -179,6 +180,11 @@ const Ratings = (props) => {
     }
   }
 
+  const handleClick = (tierPoints) => {
+    onPointChange(tierPoints)
+    $.screenReaderFlashMessage(I18n.t('Rating selected'))
+  }
+
   const selectedIndex = points !== undefined ? currentIndex() : null
   const ratings = tiers.map((tier, index) => {
     const selected = selectedIndex === index
@@ -195,7 +201,7 @@ const Ratings = (props) => {
         classes={classes}
         endOfRangePoints={useRange ? getRangePoints(tier.points, tiers[index + 1]) : null}
         footer={footer}
-        onClick={() => onPointChange(tier.points)}
+        onClick={() => handleClick(tier.points)}
         tierColor={getTierColor(selected)}
         hidePoints={isSummary || hidePoints}
         isSummary={isSummary}

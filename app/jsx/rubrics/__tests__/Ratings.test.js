@@ -16,9 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
+import $ from 'jquery'
 import { shallow } from 'enzyme'
 import sinon from 'sinon'
 import Ratings, { Rating } from '../Ratings'
+
+// This is needed for $.screenReaderFlashMessageExclusive to work.
+import 'compiled/jquery.rails_flash_notifications' // eslint-disable-line
 
 describe('The Ratings component', () => {
   const props = {
@@ -62,12 +66,15 @@ describe('The Ratings component', () => {
     expect(ratings(undefined)).toEqual([false, false, false])
   })
 
-  it('calls onPointChange when a rating is clicked', () => {
+  it('calls onPointChange and flashes VO message when a rating is clicked', () => {
     const onPointChange = sinon.spy()
+    const flashMock = jest.spyOn($, 'screenReaderFlashMessage')
     const el = component({ onPointChange })
 
     el.find('Rating').first().prop('onClick').call()
     expect(onPointChange.args[0]).toEqual([10])
+    expect(flashMock).toHaveBeenCalledTimes(1)
+    flashMock.mockRestore()
   })
 
   it('uses the right default mastery level colors', () => {
