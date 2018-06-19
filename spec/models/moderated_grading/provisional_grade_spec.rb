@@ -55,6 +55,8 @@ describe ModeratedGrading::ProvisionalGrade do
         'graded_at' => nil,
         'scorer_id' => provisional_grade.scorer_id,
         'graded_anonymously' => nil,
+        'entered_grade' => 'A',
+        'entered_score' => 100.0,
         'final' => false,
         'grade_matches_current_submission' => true
       })

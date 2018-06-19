@@ -73,8 +73,8 @@ class Assignment
       current_user_rubric_assessments = @assignment.visible_rubric_assessments_for(@user, :provisional_grader => is_provisional) || []
 
       # include all the rubric assessments if a moderator
-      all_provisional_rubric_assessments = @grading_role == :moderator &&
-        (@assignment.visible_rubric_assessments_for(@user, :provisional_moderator => true) || [])
+      all_provisional_rubric_assessments =
+        @grading_role == :moderator ? @assignment.visible_rubric_assessments_for(@user, :provisional_moderator => true) : []
 
       ActiveRecord::Associations::Preloader.new.preload(@assignment, :moderated_grading_selections) if is_provisional
 
@@ -130,19 +130,23 @@ class Assignment
       Submission.bulk_load_text_entry_originality_reports(submission_histories)
 
       provisional_grades = @assignment.provisional_grades
-      provisional_grades = provisional_grades.preload(:scorer) unless anonymous_graders?
-      preloaded_prov_grades =
-        case @grading_role
-        when :moderator
-          provisional_grades.order(:id).to_a.group_by(&:submission_id)
-        when :provisional_grader
-          provisional_grades.not_final.where(scorer: @user).order(:id).to_a.
-            group_by(&:submission_id)
-        else
-          {}
-        end
+      unless anonymous_graders?
+        provisional_grades = provisional_grades.preload(:scorer)
+      end
 
-      preloaded_prov_selections = @grading_role == :moderator ? @assignment.moderated_grading_selections.index_by(&:student_id) : []
+      if @grading_role == :provisional_grader
+        provisional_grades = if grader_comments_hidden?
+          provisional_grades.not_final.where(scorer: @user)
+        else
+          select_fields = ::ModeratedGrading::GRADE_ATTRIBUTES_ONLY.dup.append(:submission_id)
+          provisional_grades.select(select_fields)
+        end
+      elsif @grading_role == :grader
+        provisional_grades = ::ModeratedGrading::ProvisionalGrade.none
+      end
+      preloaded_prov_grades = provisional_grades.order(:id).to_a.group_by(&:submission_id)
+      preloaded_prov_selections =
+        @grading_role == :moderator ? @assignment.moderated_grading_selections.index_by(&:student_id) : []
 
       res[:too_many_quiz_submissions] = too_many = @assignment.too_many_qs_versions?(@submissions)
       qs_versions = @assignment.quiz_submission_versions(@submissions, too_many)
@@ -169,7 +173,12 @@ class Assignment
           json.merge! provisional_grade_to_json(provisional_grade)
         end
 
-        comments = (provisional_grade || sub).submission_comments
+        comments = if grader_comments_hidden?
+          (provisional_grade || sub).submission_comments
+        else
+          sub.all_submission_comments
+        end
+
         if @assignment.grade_as_group?
           comments = comments.reject { |comment| comment.group_comment_id.nil? }
         end
@@ -252,7 +261,7 @@ class Assignment
           end
         end
 
-        if @grading_role == :moderator
+        if @grading_role == :moderator || @grading_role == :provisional_grader
           pgs = preloaded_prov_grades[sub.id] || []
           selection = preloaded_prov_selections[sub.user.id]
           unless pgs.count == 0 || (pgs.count == 1 && pgs.first.scorer_id == @user.id)
@@ -263,12 +272,9 @@ class Assignment
                 pg_json[:rubric_assessments] = rubric_assessements_to_json(assessments)
 
                 pg_json[:selected] = !!(selection && selection.selected_provisional_grade_id == pg.id)
-
                 # this should really be provisional_doc_view_urls :: https://instructure.atlassian.net/browse/CNVS-38202
                 pg_json[:crocodoc_urls] = sub_attachments.map { |a| pg.attachment_info(@user, a) }
-
                 pg_json[:readonly] = !pg.final && (pg.scorer_id != @user.id)
-
                 pg_json[:submission_comments] = submission_comments_to_json(pg.submission_comments)
               end
 
@@ -338,19 +344,24 @@ class Assignment
         json = submission_comment.as_json(include_root: false,
                                           methods: @submission_comment_methods,
                                           only: @submission_comment_fields)
-        author_id = json[:author_id].to_s
+        author_id = submission_comment.author_id.to_s
 
+        json[:publishable] = submission_comment.publishable_for?(@user)
         if anonymous_students? && student_ids_to_anonymous_ids.key?(author_id)
           json.delete(:author_id)
           json.delete(:author_name)
-          json[:anonymous_id] = student_ids_to_anonymous_ids[author_id]
+          json[:anonymous_id] = student_ids_to_anonymous_ids.fetch(author_id)
           json[:avatar_path] = User.default_avatar_fallback if @avatars
-        elsif anonymous_graders? && grader_ids_to_anonymous_ids.key?(author_id)
+        elsif anonymous_graders? && (grader_ids_to_anonymous_ids.key?(author_id) || final_grader?(author_id))
           json.delete(:author_id)
-          json[:anonymous_id] = grader_ids_to_anonymous_ids[author_id]
+          json[:anonymous_id] = grader_ids_to_anonymous_ids.fetch(author_id, nil)
           unless author_id == @user.id.to_s
             json[:avatar_path] = User.default_avatar_fallback if @avatars
-            json.delete(:author_name)
+            if final_grader?(author_id)
+              json[:author_name] = I18n.t 'Moderator'
+            else
+              json.delete(:author_name)
+            end
           end
         end
 
@@ -359,17 +370,17 @@ class Assignment
     end
 
     def anonymous_students?
-      return @anonymous_students unless @anonymous_students.nil?
+      return @anonymous_students if defined? @anonymous_students
       @anonymous_students = !@assignment.can_view_student_names?(@user)
     end
 
     def anonymous_graders?
-      return @anonymous_graders unless @anonymous_graders.nil?
+      return @anonymous_graders if defined? @anonymous_graders
       @anonymous_graders = !@assignment.can_view_other_grader_identities?(@user)
     end
 
     def grader_comments_hidden?
-      return @grader_comments_hidden unless @grader_comments_hidden.nil?
+      return @grader_comments_hidden if defined? @grader_comments_hidden
       @grader_comments_hidden = !@assignment.can_view_other_grader_comments?(@user)
     end
 
@@ -390,6 +401,10 @@ class Assignment
 
     def grader_ids_to_anonymous_ids
       @assignment.grader_ids_to_anonymous_ids
+    end
+
+    def final_grader?(user_id)
+      @assignment.final_grader_id.to_s == user_id.to_s
     end
 
     def other_grader?(user_id)

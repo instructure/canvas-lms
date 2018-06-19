@@ -60,6 +60,7 @@ QUnit.module('SpeedGrader#showDiscussion', {
         grade: 70,
         submission_comments: [{
           group_comment_id: null,
+          publishable: false,
           anonymous: false,
           assessment_request_id: null,
           attachment_ids: '',
@@ -293,6 +294,7 @@ QUnit.module('SpeedGrader#renderComment', {
         grade: 70,
         submission_comments: [{
           group_comment_id: null,
+          publishable: false,
           anonymous: false,
           assessment_request_id: null,
           attachment_ids: '',
@@ -310,6 +312,7 @@ QUnit.module('SpeedGrader#renderComment', {
           updated_at: '2016-07-12T23:47:34Z'
         }, {
           group_comment_id: null,
+          publishable: false,
           anonymous: false,
           assessment_request_id: null,
           attachment_ids: '',
@@ -1564,8 +1567,10 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
     const enrollment = { user_id: student.id, course_section_id: '1'}
     const submissionComment = {
       created_at: (new Date).toISOString(),
+      publishable: false,
       comment: 'a comment',
-      author_id: 1
+      author_id: 1,
+      author_name: 'an author'
     }
     const submission = {
       id: '3',
@@ -1591,6 +1596,26 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
     }
 
     let jsonData;
+    let commentToRender
+
+    const commentBlankHtml = `
+      <div class="comment">
+        <span class="comment"></span>
+        <button class="submit_comment_button">
+          <span>Submit</span>
+        </button>
+        <a class="delete_comment_link icon-x">
+          <span class="screenreader-only">Delete comment</span>
+        </a>
+        <div class="comment_attachments"></div>
+      </div>
+    `;
+
+    const commentAttachmentBlank = `
+      <div class="comment_attachment">
+        <a href="example.com/{{ submitter_id }}/{{ id }}/{{ comment_id }}"><span class="display_name">&nbsp;</span></a>
+      </div>
+    `;
 
     hooks.beforeEach(() => {
       ({jsonData} = window)
@@ -1600,7 +1625,9 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         course_id: '29',
         grading_role: 'moderator',
         help_url: 'example.com/support',
-        show_help_menu_item: false
+        show_help_menu_item: false,
+        current_user_id: '1',
+        RUBRIC_ASSESSMENT: {}
       })
 
       fixtures.innerHTML = `
@@ -1612,6 +1639,10 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       window.jsonData = windowJsonData
       SpeedGrader.EG.jsonReady()
       setupCurrentStudent()
+      commentToRender = {...submissionComment}
+      commentToRender.draft = true
+
+      commentRenderingOptions = { commentBlank: $(commentBlankHtml), commentAttachmentBlank: $(commentAttachmentBlank) };
     })
 
     hooks.afterEach(() => {
@@ -1635,40 +1666,26 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       )
     })
 
-    const commentBlankHtml = `
-      <div class="comment">
-        <span class="comment"></span>
-        <button class="submit_comment_button">
-          <span>Submit</span>
-        </button>
-        <a class="delete_comment_link icon-x">
-          <span class="screenreader-only">Delete comment</span>
-        </a>
-        <div class="comment_attachments"></div>
-      </div>
-    `;
-
-    const commentAttachmentBlank = `
-      <div class="comment_attachment">
-        <a href="example.com/{{ submitter_id }}/{{ id }}/{{ comment_id }}"><span class="display_name">&nbsp;</span></a>
-      </div>
-    `;
-
-    commentRenderingOptions = { commentBlank: $(commentBlankHtml), commentAttachmentBlank: $(commentAttachmentBlank) };
-
-    test('renderComment adds the comment text to the submit link for draft comments', () => {
-      fakeENV.setup({
-        ...ENV,
-        current_user_id: '1',
-        RUBRIC_ASSESSMENT: {}
-      })
-      const commentToRender = {...submissionComment}
-      commentToRender.draft = true
+    test('renderComment adds the comment text to the submit button for draft comments', () => {
       const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions)
       const submitLinkScreenreaderText = renderedComment.find('.submit_comment_button').attr('aria-label')
 
       equal(submitLinkScreenreaderText, 'Submit comment: a comment')
     })
+
+    test('renderComment displays the submit button for draft comments that are publishable', () => {
+      commentToRender.publishable = true
+      const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions)
+      const button = renderedComment.find('.submit_comment_button')
+      notStrictEqual(button.css('display'), 'none')
+    });
+
+    test('renderComment hides the submit button for draft comments that are not publishable', () => {
+      commentToRender.publishable = false
+      const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions)
+      const button = renderedComment.find('.submit_comment_button')
+      strictEqual(button.css('display'), 'none')
+    });
   })
 
   QUnit.module('Anonymous Assignments', anonymousHooks => {
@@ -1689,6 +1706,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
     const omegaEnrollment = {...omega, course_section_id: '1'}
     const alphaSubmissionComment = {
       created_at: (new Date).toISOString(),
+      publishable: false,
       comment: 'a comment',
       ...alpha
     };
@@ -1788,13 +1806,40 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
 
       commentRenderingOptions = { commentBlank: $(commentBlankHtml), commentAttachmentBlank: $(commentAttachmentBlank) };
 
-      test('renderComment add the comment text to the submit link for draft comments', () => {
+      test('renderComment adds the comment text to the submit button for draft comments', () => {
         const commentToRender = SpeedGrader.EG.currentStudent.submission.submission_comments[0];
+        SpeedGrader.EG.currentStudent.submission.provisional_grades = [{
+          anonymous_grader_id: commentToRender.anonymous_id
+        }]
         commentToRender.draft = true;
         const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions);
         const submitLinkScreenreaderText = renderedComment.find('.submit_comment_button').attr('aria-label');
 
         equal(submitLinkScreenreaderText, 'Submit comment: a comment');
+      });
+
+      test('renderComment displays the submit button for draft comments that are publishable', () => {
+        const commentToRender = SpeedGrader.EG.currentStudent.submission.submission_comments[0];
+        SpeedGrader.EG.currentStudent.submission.provisional_grades = [{
+          anonymous_grader_id: commentToRender.anonymous_id
+        }]
+        commentToRender.draft = true;
+        commentToRender.publishable = true;
+        const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions);
+        const button = renderedComment.find('.submit_comment_button')
+        notStrictEqual(button.css('display'), 'none')
+      });
+
+      test('renderComment hides the submit button for draft comments that are not publishable', () => {
+        const commentToRender = SpeedGrader.EG.currentStudent.submission.submission_comments[0];
+        SpeedGrader.EG.currentStudent.submission.provisional_grades = [{
+          anonymous_grader_id: commentToRender.anonymous_id
+        }]
+        commentToRender.draft = true;
+        commentToRender.publishable = false;
+        const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions);
+        const button = renderedComment.find('.submit_comment_button')
+        strictEqual(button.css('display'), 'none')
       });
     })
 

@@ -669,7 +669,7 @@ describe Assignment::SpeedGrader do
         user: student
       )
 
-      selection = assignment.moderated_grading_selections.find_by(student: student)
+      selection = assignment.moderated_grading_selections.find_by!(student: student)
       selection.provisional_grade = teacher_pg
       selection.save!
 
@@ -707,25 +707,25 @@ describe Assignment::SpeedGrader do
       end
 
       it "includes submission comments from other graders" do
-        ta_comment = submission.submission_comments.find_by(author: ta, provisional_grade_id: nil)
+        ta_comment = submission.submission_comments.find_by!(author: ta, provisional_grade_id: nil)
         comment_ids = submission_json['submission_comments'].map {|comment| comment['id']}
         expect(comment_ids).to include(ta_comment.id.to_s)
       end
 
       it "includes submission comments from students" do
-        student_comment = submission.submission_comments.find_by(author: student)
+        student_comment = submission.submission_comments.find_by!(author: student)
         comment_ids = submission_json['submission_comments'].map {|comment| comment['id']}
         expect(comment_ids).to include(student_comment.id.to_s)
       end
 
       it "includes submission comments from the current user" do
-        moderator_comment = submission.submission_comments.find_by(author: moderator, provisional_grade_id: nil)
+        moderator_comment = submission.submission_comments.find_by!(author: moderator, provisional_grade_id: nil)
         comment_ids = submission_json['submission_comments'].map {|comment| comment['id']}
         expect(comment_ids).to include(moderator_comment.id.to_s)
       end
 
       it "includes provisional grade submission comments from other graders" do
-        ta_comment = submission.submission_comments.find_by(author: ta, provisional_grade_id: nil)
+        ta_comment = submission.submission_comments.find_by!(author: ta, provisional_grade_id: nil)
         provisional_comments = submission_json['provisional_grades'].map {|grade| grade['submission_comments']}.flatten
         comment_ids = provisional_comments.map {|comment| comment['id']}
         expect(comment_ids).to include(ta_comment.id.to_s)
@@ -754,38 +754,38 @@ describe Assignment::SpeedGrader do
       end
 
       it "includes submission comments from other graders" do
-        ta_comment = submission.submission_comments.find_by(author: ta, provisional_grade_id: nil)
+        ta_comment = submission.submission_comments.find_by!(author: ta, provisional_grade_id: nil)
         comment_ids = submission_json['submission_comments'].map {|comment| comment['id']}
         expect(comment_ids).to include(ta_comment.id.to_s)
       end
 
       it "includes submission comments from the final grader" do
-        moderator_comment = submission.submission_comments.find_by(author: moderator, provisional_grade_id: nil)
+        moderator_comment = submission.submission_comments.find_by!(author: moderator, provisional_grade_id: nil)
         comment_ids = submission_json['submission_comments'].map {|comment| comment['id']}
         expect(comment_ids).to include(moderator_comment.id.to_s)
       end
 
       it "includes submission comments from students" do
-        student_comment = submission.submission_comments.find_by(author: student)
+        student_comment = submission.submission_comments.find_by!(author: student)
         comment_ids = submission_json['submission_comments'].map {|comment| comment['id']}
         expect(comment_ids).to include(student_comment.id.to_s)
       end
 
       it "includes submission comments from the current user" do
-        teacher_comment = submission.submission_comments.find_by(author: teacher, provisional_grade_id: nil)
+        teacher_comment = submission.submission_comments.find_by!(author: teacher, provisional_grade_id: nil)
         comment_ids = submission_json['submission_comments'].map {|comment| comment['id']}
         expect(comment_ids).to include(teacher_comment.id.to_s)
       end
 
       it "includes provisional grade submission comments from other graders" do
-        ta_comment = submission.submission_comments.find_by(author: ta, provisional_grade_id: nil)
+        ta_comment = submission.submission_comments.find_by!(author: ta, provisional_grade_id: nil)
         provisional_comments = submission_json['provisional_grades'].map {|grade| grade['submission_comments']}.flatten
         comment_ids = provisional_comments.map {|comment| comment['id']}
         expect(comment_ids).to include(ta_comment.id.to_s)
       end
 
       it "includes provisional grade submission comments from the final grader" do
-        moderator_comment = submission.submission_comments.find_by(author: moderator, provisional_grade_id: nil)
+        moderator_comment = submission.submission_comments.find_by!(author: moderator, provisional_grade_id: nil)
         provisional_comments = submission_json['provisional_grades'].map {|grade| grade['submission_comments']}.flatten
         comment_ids = provisional_comments.map {|comment| comment['id']}
         expect(comment_ids).to include(moderator_comment.id.to_s)
@@ -814,38 +814,38 @@ describe Assignment::SpeedGrader do
       end
 
       it "excludes submission comments from other graders" do
-        ta_comment = submission.submission_comments.find_by(author: ta)
+        ta_comment = submission.submission_comments.find_by!(author: ta)
         comment_ids = submission_json['submission_comments'].map {|comment| comment['id']}
         expect(comment_ids).not_to include(ta_comment.id.to_s)
       end
 
       it "excludes submission comments from the final grader" do
-        moderator_comment = submission.submission_comments.find_by(author: moderator, provisional_grade_id: nil)
+        moderator_comment = submission.submission_comments.find_by!(author: moderator, provisional_grade_id: nil)
         comment_ids = submission_json['submission_comments'].map {|comment| comment['id']}
         expect(comment_ids).not_to include(moderator_comment.id.to_s)
       end
 
       it "includes submission comments from students" do
-        student_comment = submission.submission_comments.find_by(author: student)
+        student_comment = submission.submission_comments.find_by!(author: student)
         comment_ids = submission_json['submission_comments'].map {|comment| comment['id']}
         expect(comment_ids).to include(student_comment.id.to_s)
       end
 
       it "includes submission comments from the current user" do
-        teacher_comment = submission.submission_comments.find_by(author: teacher, provisional_grade_id: nil)
+        teacher_comment = submission.submission_comments.find_by!(author: teacher, provisional_grade_id: nil)
         comment_ids = submission_json['submission_comments'].map {|comment| comment['id']}
         expect(comment_ids).to include(teacher_comment.id.to_s)
       end
 
       it "excludes provisional grade submission comments from other graders" do
-        ta_comment = submission.submission_comments.find_by(author: ta, provisional_grade_id: nil)
+        ta_comment = submission.submission_comments.find_by!(author: ta, provisional_grade_id: nil)
         provisional_comments = submission_json['provisional_grades'].map {|grade| grade['submission_comments']}.flatten
         comment_ids = provisional_comments.map {|comment| comment['id']}
         expect(comment_ids).not_to include(ta_comment.id.to_s)
       end
 
       it "excludes provisional grade submission comments from the final grader" do
-        moderator_comment = submission.submission_comments.find_by(author: moderator, provisional_grade_id: nil)
+        moderator_comment = submission.submission_comments.find_by!(author: moderator, provisional_grade_id: nil)
         provisional_comments = submission_json['provisional_grades'].map {|grade| grade['submission_comments']}.flatten
         comment_ids = provisional_comments.map {|comment| comment['id']}
         expect(comment_ids).not_to include(moderator_comment.id.to_s)
@@ -870,20 +870,23 @@ describe Assignment::SpeedGrader do
   describe "when moderated grading is enabled" do
     before(:once) do
       course_with_ta(:course => @course, :active_all => true)
-      assignment_model(:course => @course, :submission_types => 'online_text_entry')
+      @assignment = assignment_model(
+        course: @course,
+        submission_types: 'online_text_entry',
+        moderated_grading: true,
+        grader_count: 2
+      )
       rubric_model
       @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
 
       @submission = @assignment.submit_homework(@student, :submission_type => 'online_text_entry', :body => 'ahem')
       @assignment.update_submission(@student, :comment => 'real comment', :score => 1, :commenter => @student)
 
-      selection = @assignment.moderated_grading_selections.create!(:student => @student)
-
       @submission.add_comment(:author => @teacher, :comment => 'provisional comment', :provisional => true)
-      teacher_pg = @submission.provisional_grade(@teacher)
-      teacher_pg.update_attribute(:score, 2)
+      @teacher_pg = @submission.provisional_grade(@teacher)
+      @teacher_pg.update_attribute(:score, 2)
       @association.assess(
-        :user => @student, :assessor => @teacher, :artifact => teacher_pg,
+        :user => @student, :assessor => @teacher, :artifact => @teacher_pg,
         :assessment => {
           :assessment_type => 'grading',
           :criterion_crit1 => {
@@ -893,14 +896,14 @@ describe Assignment::SpeedGrader do
         }
       )
 
-      selection.provisional_grade = teacher_pg
-      selection.save!
+      selection = @assignment.moderated_grading_selections.find_by!(student: @student)
+      selection.update!(provisional_grade: @teacher_pg)
 
       @submission.add_comment(:author => @ta, :comment => 'other provisional comment', :provisional => true)
-      ta_pg = @submission.provisional_grade(@ta)
-      ta_pg.update_attribute(:score, 3)
+      @ta_pg = @submission.provisional_grade(@ta)
+      @ta_pg.update_attribute(:score, 3)
       @association.assess(
-        :user => @student, :assessor => @ta, :artifact => ta_pg,
+        :user => @student, :assessor => @ta, :artifact => @ta_pg,
         :assessment => {
           :assessment_type => 'grading',
           :criterion_crit1 => {
@@ -918,10 +921,11 @@ describe Assignment::SpeedGrader do
       json['submissions'].find { |s| s['workflow_state'] != 'unsubmitted' }
     end
 
-    it "returns submission comments with null provisional grade" do
+    it "returns all three comments" do
       course_with_ta :course => @course, :active_all => true
       json = Assignment::SpeedGrader.new(@assignment, @ta, :grading_role => :provisional_grader).json
-      expect(find_real_submission(json)['submission_comments'].map { |comment| comment['comment'] }).to match_array ['real comment']
+      comments = find_real_submission(json)['submission_comments'].map { |comment| comment['comment'] }
+      expect(comments).to match_array ['real comment', 'provisional comment', 'other provisional comment']
     end
 
     describe "for provisional grader" do
@@ -929,15 +933,20 @@ describe Assignment::SpeedGrader do
         @json = Assignment::SpeedGrader.new(@assignment, @ta, :grading_role => :provisional_grader).json
       end
 
-      it "includes only the grader's provisional grades" do
+      it 'has a submission with score' do
         s = find_real_submission(@json)
-        expect(s['score']).to eq 3
-        expect(s['provisional_grades']).to be_nil
+        expect(s['score']).to eq @ta_pg.score
       end
 
-      it "includes only the grader's provisional comments (and the real ones)" do
+      it "includes all provisional grades" do
+        submission = find_real_submission(@json)
+        scorer_ids = submission['provisional_grades'].map {|pg| pg.fetch('scorer_id')}
+        expect(scorer_ids).to contain_exactly(@teacher_pg.scorer_id.to_s, @ta_pg.scorer_id.to_s)
+      end
+
+      it "has all three comments" do
         comments = find_real_submission(@json)['submission_comments'].map { |comment| comment['comment'] }
-        expect(comments).to match_array ['other provisional comment', 'real comment']
+        expect(comments).to match_array ['real comment', 'provisional comment', 'other provisional comment']
       end
 
       it "only includes the grader's provisional rubric assessments" do
@@ -952,10 +961,11 @@ describe Assignment::SpeedGrader do
         @json = Assignment::SpeedGrader.new(@assignment, @teacher, :grading_role => :moderator).json
       end
 
-      it "includes the moderator's provisional grades and comments" do
+      it "has all three comments" do
         s = find_real_submission(@json)
         expect(s['score']).to eq 2
-        expect(s['submission_comments'].map { |comment| comment['comment'] }).to match_array ['provisional comment', 'real comment']
+        comments = s['submission_comments'].map { |comment| comment['comment'] }
+        expect(comments).to match_array ['real comment', 'provisional comment', 'other provisional comment']
       end
 
       it "includes the moderator's provisional rubric assessments" do
@@ -1214,7 +1224,7 @@ describe Assignment::SpeedGrader do
 
     let(:submission_1) { assignment.submit_homework(student_1, submission_type: "online_upload", attachments: [attachment_1]) }
     let(:submission_2) { assignment.submit_homework(student_2, submission_type: "online_upload", attachments: [attachment_2]) }
-    let(:test_submission) { Submission.find_by(user_id: test_student.id, assignment_id: assignment.id) }
+    let(:test_submission) { Submission.find_by!(user_id: test_student.id, assignment_id: assignment.id) }
 
     let(:teacher_pg) { submission_1.provisional_grade(teacher) }
     let(:ta_pg) { submission_1.provisional_grade(ta) }
@@ -1229,7 +1239,7 @@ describe Assignment::SpeedGrader do
       assignment.moderation_graders.create!(user: teacher, anonymous_id: 'teach')
       assignment.moderation_graders.create!(user: ta, anonymous_id: 'atata')
 
-      selection = assignment.moderated_grading_selections.find_by(student_id: student_1.id)
+      selection = assignment.moderated_grading_selections.find_by!(student_id: student_1.id)
 
       submission_1.add_comment(author: teacher, comment: 'comment by teacher', provisional: false)
       submission_1.add_comment(author: teacher, comment: 'provisional comment by teacher', provisional: true)
@@ -1529,7 +1539,7 @@ describe Assignment::SpeedGrader do
       assignment.moderation_graders.create!(user: ta, anonymous_id: 'atata')
       assignment.moderation_graders.create!(user: moderator, anonymous_id: 'moder')
 
-      selection = assignment.moderated_grading_selections.find_by(student_id: student.id)
+      selection = assignment.moderated_grading_selections.find_by!(student_id: student.id)
 
       submission.add_comment(author: moderator, comment: 'comment by moderator', provisional: false)
       submission.add_comment(author: moderator, comment: 'provisional comment by moderator', provisional: true)

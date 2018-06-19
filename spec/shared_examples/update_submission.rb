@@ -314,7 +314,8 @@ RSpec.shared_examples 'a submission update action' do |controller|
         expect(@submission.provisional_grade(@teacher).submission_comments.first.comment).to eq 'provisional!'
 
         json = JSON.parse response.body
-        expect(json.first['submission']['submission_comments'].first['submission_comment']['comment']).to eq 'provisional!'
+        puts json.first['submission']['submission_comments'].first
+        expect(json.first['submission']['submission_comments'].first['comment']).to eq 'provisional!'
       end
 
       it "should create a final provisional comment" do
@@ -335,7 +336,7 @@ RSpec.shared_examples 'a submission update action' do |controller|
         expect(pg.final).to be_truthy
 
         json = JSON.parse response.body
-        expect(json.first['submission']['submission_comments'].first['submission_comment']['comment']).to eq 'provisional!'
+        expect(json.first['submission']['submission_comments'].first['comment']).to eq 'provisional!'
       end
     end
 

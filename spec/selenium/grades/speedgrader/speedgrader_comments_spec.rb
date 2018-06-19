@@ -52,8 +52,6 @@ describe "speed grader" do
 
   context 'manually submitted comments' do
     it "creates a comment on assignment", priority: "1", test_id: 283754 do
-      # pending("failing because it is dependant on an external kaltura system")
-
       student_submission
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
@@ -371,8 +369,8 @@ describe "speed grader" do
 
       it 'replaces the draft comment in the list of comments with a published comment' do
         publish_links = ff('#comments .comment.draft .comment_flex > button.submit_comment_button').select(&:displayed?)
-        comment_count = ff('#comments .comment').size
-        draft_comment_count = ff('#comments .comment.draft').size
+        comment_count = ff('#comments > .comment').size
+        draft_comment_count = ff('#comments > .comment.draft').size
 
         publish_links[0].click
         accept_alert
@@ -382,8 +380,8 @@ describe "speed grader" do
         f('#prev-student-button').click
 
 
-        expect(ff('#comments .comment')).to have_size(comment_count)
-        expect(ff('#comments .comment.draft')).to have_size(draft_comment_count - 1)
+        expect(ff('#comments > .comment')).to have_size(comment_count)
+        expect(ff('#comments > .comment.draft')).to have_size(draft_comment_count - 1)
       end
     end
 

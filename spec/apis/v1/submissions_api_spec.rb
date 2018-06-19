@@ -4402,7 +4402,9 @@ describe 'Submissions API', type: :request do
             "selected_provisional_grade_id"=>pg.id,
             "provisional_grades"=>
               [{"grade"=>"90",
+                "entered_grade"=>"90",
                 "score"=>90,
+                "entered_score"=>90,
                 "graded_at"=>pg.graded_at.iso8601,
                 "scorer_id"=>@ta.id,
                 "provisional_grade_id"=>pg.id,

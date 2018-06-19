@@ -2215,15 +2215,7 @@ EG = {
   addCommentSubmissionHandler: function (commentElement, comment) {
     var that = this;
 
-    // this is really poorly decoupled but over in
-    // speed_grader.html.erb these rubricAssessment. variables are
-    // set.  what this is saying is: if I am able to grade this
-    // assignment (I am administrator in the course) or if I wrote
-    // this comment... and if the student isn't concluded
     const isConcluded = EG.isStudentConcluded(EG.currentStudent[anonymizableId]);
-    var commentIsPublishableByMe = comment.draft &&
-        (comment.author_id && comment.author_id.toString() === ENV.current_user_id) && !isConcluded;
-
     commentElement.find('.submit_comment_button').click(function (_event) {
       var updateUrl = '';
       var updateData = {};
@@ -2260,7 +2252,7 @@ EG = {
 
         $.ajax(updateAjaxOptions).done(commentUpdateSucceeded).fail(commentUpdateFailed);
       }
-    }).showIf(commentIsPublishableByMe);
+    }).showIf(comment.publishable && !isConcluded);
   },
 
   renderComment: function (commentData, incomingOpts) {
@@ -2290,6 +2282,14 @@ EG = {
 
     hideStudentName = opts.hideStudentNames && window.jsonData.studentMap[comment[anonymizableAuthorId]];
     if (hideStudentName) { comment.author_name = I18n.t('Student'); }
+    // anonymous commentors
+    if (comment.author_name == null) {
+      if (provisionalGraderDisplayNames == null) this.setupProvisionalGraderDisplayNames()
+      const {provisional_grade_id} = EG.currentStudent.submission.provisional_grades.find(pg =>
+        pg.anonymous_grader_id === comment.anonymous_id
+      )
+      comment.author_name = provisionalGraderDisplayNames[provisional_grade_id]
+    }
     commentElement = commentElement.fillTemplateData({ data: comment });
 
     if (comment.draft) {
