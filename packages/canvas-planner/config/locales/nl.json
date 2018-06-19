@@ -1,191 +1,272 @@
 {
+  "add_to_do_7def3c37": {
+    "message": "To-do lijst toevoegen"
+  },
+  "all_day_fb42c4fc": {
+    "message": "De hele dag"
+  },
+  "all_items_loaded_aa256183": {
+    "message": "Alle items geladen"
+  },
+  "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
+    "message": "Weet je zeker dat je dit planneritem wilt verwijderen?"
+  },
+  "assignmenttype_title_6612d008": {
+    "message": "{ assignmentType } { title }."
+  },
+  "assignmenttype_title_at_datetime_478f0709": {
+    "message": "{ assignmentType } { title }, om { datetime }."
+  },
+  "assignmenttype_title_due_datetime_a112d8ff": {
+    "message": "{ assignmentType } { title }, in te leveren op { datetime }."
+  },
+  "assignmenttype_title_is_marked_as_done_a8dc46ef": {
+    "message": "{ assignmentType } { title } is gemarkeerd als gereed."
+  },
+  "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
+    "message": "{ assignmentType } { title } is niet gemarkeerd als gereed."
+  },
+  "assignmenttype_title_on_datetime_446013fb": {
+    "message": "{ assignmentType } { title }, op { datetime }."
+  },
+  "beginning_of_your_to_do_history_61ef2dce": {
+    "message": "Begin van je To-do-historie"
+  },
+  "canvas_planner_98ed106": {
+    "message": "Canvas planner"
+  },
+  "close_d634289d": {
+    "message": "Sluiten"
+  },
+  "close_opportunities_popover_f4e50551": {
+    "message": "Sluit de pop-up voor mogelijkheden"
+  },
+  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
+    "message": "{ count, plural,\n     =0 {# mogelijkheden}\n    one {# mogelijkheid}\n  other {# mogelijkheden}\n}"
+  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Toon # voltooid item}\n  other {Toon # voltooide items}\n}"
   },
   "course_8a63b4a3": {
     "message": "Cursus"
   },
-  "pts_699bd9aa": {
-    "message": "ptn"
-  },
-  "failed_to_save_to_do_ddc7503b": {
-    "message": "Kan To Do-lijst niet opslaan"
-  },
   "course_to_do_bcbbab54": {
     "message": "{ course } TO-DO"
   },
-  "canvas_planner_98ed106": {
-    "message": "Canvas planner"
-  },
-  "looks_like_there_isn_t_anything_here_d9bcef49": {
-    "message": "Het lijkt erop dat er hier niets is"
-  },
-  "points_points_63e59cce": {
-    "message": "{ points } punten"
-  },
-  "loading_planner_items_947a813d": {
-    "message": "Planner items laden"
-  },
-  "add_to_do_7def3c37": {
-    "message": "To-do lijst toevoegen"
-  },
-  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
-    "message": "{ count, plural,\n     =0 {# mogelijkheden}\n    one {# mogelijkheid}\n  other {# mogelijkheden}\n}"
-  },
-  "due_5d7267be": {
-    "message": "Inleverdatum:"
-  },
-  "feedback_6dcc1991": {
-    "message": "Feedback"
-  },
-  "loading_25990131": {
-    "message": "Bezig met laden..."
-  },
-  "next_month_749b1778": {
-    "message": "Volgende maand"
-  },
-  "beginning_of_your_to_do_history_61ef2dce": {
-    "message": "Begin van je To-do-historie"
-  },
-  "yesterday_at_date_1aa6d18e": {
-    "message": "Gisteren om { date }"
-  },
-  "load_prior_dates_f2b0f6f0": {
-    "message": "Eerdere datums laden"
-  },
-  "all_items_loaded_aa256183": {
-    "message": "Alle items geladen"
-  },
-  "submitted_318fad53": {
-    "message": "Ingediend"
-  },
-  "task_16b0ef38": {
-    "message": "Taak"
-  },
-  "excused_cf8792eb": {
-    "message": "Vrijgesteld"
-  },
-  "replies_4a8577c8": {
-    "message": "Antwoorden"
-  },
-  "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
-    "message": "Weet je zeker dat je dit planneritem wilt verwijderen?"
-  },
-  "dismiss_opportunityname_5995176f": {
-    "message": "{ opportunityName } afwijzen"
-  },
-  "failed_to_get_new_activity_17e7ec7c": {
-    "message": "Kan geen nieuwe activiteit ophalen"
-  },
-  "title_is_required_6ddcab69": {
-    "message": "titel is verplicht"
-  },
   "date_at_time_dbdb1b99": {
-    "message": "{ date } op { time }"
-  },
-  "loading_past_items_ca499e75": {
-    "message": "Eerdere items laden"
-  },
-  "tomorrow_at_date_b53f2cf1": {
-    "message": "Morgen om { date }"
-  },
-  "today_76e10f9c": {
-    "message": "Vandaag"
-  },
-  "edit_title_72e5a21e": {
-    "message": "{ title } bewerken"
-  },
-  "error_loading_past_items_2881dbb1": {
-    "message": "Fout bij het laden van eerdere items"
-  },
-  "no_due_dates_assigned_e8f5bac8": {
-    "message": "Geen inleverdatums toegewezen"
-  },
-  "save_11a80ec3": {
-    "message": "Opslaan"
-  },
-  "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
-    "message": "Je bent teruggescrold naar je allereerste To-do-item!"
-  },
-  "delete_a6efa79d": {
-    "message": "Verwijderen"
-  },
-  "go_to_dashboard_card_view_10398ef6": {
-    "message": "Ga naar de weergave Dashboardkaarten"
-  },
-  "unable_to_mark_as_complete_8141856d": {
-    "message": "Kan dit niet als voltooid markeren."
-  },
-  "points_bceb5005": {
-    "message": "punten"
-  },
-  "nothing_new_needs_attention_3ac548d4": {
-    "message": "Er is niets nieuws waarnaar gekeken moet worden."
-  },
-  "title_ee03d132": {
-    "message": "Titel"
+    "message": "{ date } om { time }"
   },
   "date_ee500367": {
     "message": "Datum"
   },
-  "due_date_8ce289b6": {
-    "message": "VERVALDATUM: { date }"
-  },
-  "late_2be42b88": {
-    "message": "Te laat"
-  },
-  "yesterday_c6bd6abf": {
-    "message": "Gisteren"
-  },
-  "graded_25cd3fcd": {
-    "message": "Beoordeeld"
-  },
-  "to_do_1d554f36": {
-    "message": "To-do lijst"
-  },
-  "missing_1a256b3b": {
-    "message": "Ontbrekend"
+  "date_is_not_a_valid_date_4ef9f8ba": {
+    "message": "#{ date } is geen geldige datum."
   },
   "date_is_required_8660ec22": {
     "message": "Datum is verplicht"
   },
-  "error_loading_more_items_3f109d9f": {
-    "message": "Fout bij het laden van meer items"
-  },
-  "optional_add_course_ef0d70fc": {
-    "message": "Optioneel: Cursus toevoegen"
-  },
-  "failed_to_load_opportunities_52ab6404": {
-    "message": "Kan mogelijkheden niet laden"
-  },
-  "previous_month_bb1e3c84": {
-    "message": "Vorige maand"
-  },
-  "new_activity_8b84847d": {
-    "message": "Nieuwe activiteit"
-  },
-  "failed_to_delete_to_do_64edff49": {
-    "message": "Kan To Do-lijst niet sluiten"
-  },
-  "close_opportunities_popover_f4e50551": {
-    "message": "Sluit de pop-up voor mogelijkheden"
-  },
-  "tomorrow_9a6c9a00": {
-    "message": "Morgen"
-  },
-  "load_more_a36f9cf9": {
-    "message": "Meer laden"
-  },
-  "today_at_date_8ac30d6": {
-    "message": "Vandaag om { date }"
-  },
-  "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-    "message": "{ count, plural,\n     =0 {# items}\n    one {# item}\n  other {# items}\n} geladen"
+  "delete_a6efa79d": {
+    "message": "Verwijderen"
   },
   "details_98a31b68": {
     "message": "Details"
   },
-  "close_d634289d": {
-    "message": "Sluiten"
+  "dismiss_opportunityname_5995176f": {
+    "message": "{ opportunityName } afwijzen"
+  },
+  "due_5d7267be": {
+    "message": "Inleverdatum:"
+  },
+  "due_date_8ce289b6": {
+    "message": "VERVALDATUM: { date }"
+  },
+  "edit_title_72e5a21e": {
+    "message": "{ title } bewerken"
+  },
+  "error_loading_grades_e0b38f4d": {
+    "message": "Fout bij laden van cijfers"
+  },
+  "error_loading_more_items_3f109d9f": {
+    "message": "Fout bij het laden van meer items"
+  },
+  "error_loading_past_items_2881dbb1": {
+    "message": "Fout bij het laden van eerdere items"
+  },
+  "excused_cf8792eb": {
+    "message": "Vrijgesteld"
+  },
+  "failed_to_delete_to_do_64edff49": {
+    "message": "Kan To Do-lijst niet sluiten"
+  },
+  "failed_to_get_new_activity_17e7ec7c": {
+    "message": "Kan geen nieuwe activiteit ophalen"
+  },
+  "failed_to_load_opportunities_52ab6404": {
+    "message": "Kan mogelijkheden niet laden"
+  },
+  "failed_to_save_to_do_ddc7503b": {
+    "message": "Kan To Do-lijst niet opslaan"
+  },
+  "feedback_6dcc1991": {
+    "message": "Feedback"
+  },
+  "go_to_dashboard_card_view_10398ef6": {
+    "message": "Ga naar de weergave Dashboardkaarten"
+  },
+  "graded_25cd3fcd": {
+    "message": "Beoordeeld"
+  },
+  "grades_are_loading_c899652d": {
+    "message": "Cijfers worden geladen"
+  },
+  "grades_loaded_5056277c": {
+    "message": "Cijfers geladen"
+  },
+  "items_completed_items_plural_1_item_other_items_717d579f": {
+    "message": "{ items } voltooid(e) { items, plural,\n     =1 {item}\n  other {items}\n}"
+  },
+  "late_2be42b88": {
+    "message": "Te laat"
+  },
+  "load_more_a36f9cf9": {
+    "message": "Meer laden"
+  },
+  "load_prior_dates_f2b0f6f0": {
+    "message": "Eerdere datums laden"
+  },
+  "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
+    "message": "{ count, plural,\n     =0 {# items}\n    one {# item}\n  other {# items}\n} geladen"
+  },
+  "loading_25990131": {
+    "message": "Bezig met laden..."
+  },
+  "loading_725811ca": {
+    "message": "laden"
+  },
+  "loading_grades_c842c887": {
+    "message": "Cijfers worden geladen"
+  },
+  "loading_past_items_ca499e75": {
+    "message": "Eerdere items laden"
+  },
+  "loading_planner_items_947a813d": {
+    "message": "Planner items laden"
+  },
+  "looks_like_there_isn_t_anything_here_d9bcef49": {
+    "message": "Het lijkt erop dat er hier niets is"
+  },
+  "missing_1a256b3b": {
+    "message": "Ontbrekend"
+  },
+  "missing_items_for_title_516511f8": {
+    "message": "Ontbrekende items voor { title }"
+  },
+  "my_grades_98834476": {
+    "message": "Mijn cijfers"
+  },
+  "new_activity_8b84847d": {
+    "message": "Nieuwe activiteit"
+  },
+  "new_activity_for_title_14c9c3af": {
+    "message": "Nieuwe activiteit voor { title }"
+  },
+  "next_month_749b1778": {
+    "message": "Volgende maand"
+  },
+  "no_due_dates_assigned_e8f5bac8": {
+    "message": "Geen inleverdatums toegewezen"
+  },
+  "no_grade_3b4d7f3e": {
+    "message": "Geen cijfer"
+  },
+  "nothing_new_needs_attention_3ac548d4": {
+    "message": "Er is niets nieuws waarnaar gekeken moet worden."
+  },
+  "nothing_planned_today_next_item_loaded_5a199868": {
+    "message": "Niks gepland voor vandaag. Volgend item geladen."
+  },
+  "nothing_planned_yet_8675ffe9": {
+    "message": "Nog niets gepland"
+  },
+  "only_most_recent_grading_period_shown_f1ad6458": {
+    "message": "*Alleen meest recente beoordelingsperiode wordt weergegeven."
+  },
+  "optional_add_course_ef0d70fc": {
+    "message": "Optioneel: Cursus toevoegen"
+  },
+  "points_bceb5005": {
+    "message": "punten"
+  },
+  "points_points_63e59cce": {
+    "message": "{ points } punten"
+  },
+  "previous_month_bb1e3c84": {
+    "message": "Vorige maand"
+  },
+  "pts_699bd9aa": {
+    "message": "ptn"
+  },
+  "replies_4a8577c8": {
+    "message": "Antwoorden"
+  },
+  "save_11a80ec3": {
+    "message": "Opslaan"
+  },
+  "show_my_grades_ebd08684": {
+    "message": "Mijn cijfers tonen"
+  },
+  "startdate_to_enddate_d245175b": {
+    "message": "{ startDate } tot { endDate }"
+  },
+  "submitted_318fad53": {
+    "message": "Ingediend"
+  },
+  "success_to_do_created_e34ed395": {
+    "message": "Succes: To Do gemaakt"
+  },
+  "task_16b0ef38": {
+    "message": "Taak"
+  },
+  "the_date_and_time_this_to_do_is_due_74c823d4": {
+    "message": "De datum en tijd om dat te doen is verlopen"
+  },
+  "time_2b5aac58": {
+    "message": "Tijd"
+  },
+  "title_ee03d132": {
+    "message": "Titel"
+  },
+  "title_is_required_6ddcab69": {
+    "message": "titel is verplicht"
+  },
+  "to_do_1d554f36": {
+    "message": "To-do lijst"
+  },
+  "today_76e10f9c": {
+    "message": "Vandaag"
+  },
+  "today_at_date_8ac30d6": {
+    "message": "Vandaag om { date }"
+  },
+  "tomorrow_9a6c9a00": {
+    "message": "Morgen"
+  },
+  "tomorrow_at_date_b53f2cf1": {
+    "message": "Morgen om { date }"
+  },
+  "unable_to_mark_as_complete_8141856d": {
+    "message": "Kan dit niet als voltooid markeren."
+  },
+  "yesterday_at_date_1aa6d18e": {
+    "message": "Gisteren om { date }"
+  },
+  "yesterday_c6bd6abf": {
+    "message": "Gisteren"
+  },
+  "you_must_provide_a_date_and_time_a86839d2": {
+    "message": "Je moet een datum en tijd opgeven."
+  },
+  "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
+    "message": "Je bent teruggescrold naar je allereerste To-do-item!"
   }
 }
