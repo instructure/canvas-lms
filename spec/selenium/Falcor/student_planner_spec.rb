@@ -94,6 +94,14 @@ describe "student planner" do
       validate_link_to_url(@assignment, 'assignments')
     end
 
+    it "navigates to the assignment submissions page when they are submitted" do
+      skip('skip until ADMIN-179')
+      submission = @assignment.submit_homework(@student1, submission_type: "online_text_entry",
+                                  body: "Assignment submitted")
+      go_to_list_view
+      validate_link_to_submissions(@assignment, submission,'assignments')
+    end
+
     it "enables the checkbox when an assignment is completed", priority: "1", test_id: 3306201 do
       @assignment.submit_homework(@student1, submission_type: "online_text_entry",
                                   body: "Assignment submitted")
@@ -162,17 +170,24 @@ describe "student planner" do
 
   context "Graded discussion" do
     before :once do
-      assignment = @course.assignments.create!(name: 'assignment',
+      @assignment_d = @course.assignments.create!(name: 'assignment',
                                                due_at: Time.zone.now.advance(days:2))
       @discussion = @course.discussion_topics.create!(title: 'Discussion 1',
                                                      message: 'Graded discussion',
-                                                     assignment: assignment)
+                                                     assignment: @assignment_d)
     end
 
     it "shows and navigates to graded discussions page from student planner", priority: "1", test_id: 3259301 do
       go_to_list_view
       validate_object_displayed('Discussion')
       validate_link_to_url(@discussion, 'discussion_topics')
+    end
+
+    it "navigates to the submissions page once the graded discussion has a reply" do
+      skip('skip until ADMIN-179')
+      @discussion.reply_from(user: @student1, text: 'user reply')
+      # for discussion, submissions page has the users id. So, sending the student object instead of submission for id
+      validate_link_to_submissions(@assignment_d, @student1, 'assignments')
     end
 
     it "shows new replies tag for discussion with new replies", priority: "1", test_id: 3284231 do
