@@ -23,6 +23,14 @@ function addWithPrecision(a, b) {
   return new Big(a || 0).plus(b || 0)
 }
 
+function divideWithPrecision(a, b) {
+  return new Big(a || 0).div(b || 0)
+}
+
+function multiplyWithPrecision(a, b) {
+  return new Big(a || 0).times(b || 0)
+}
+
 export function sum(collection) {
   const bigValue = _.reduce(collection, addWithPrecision, 0)
   return parseFloat(bigValue, 10)
@@ -31,4 +39,13 @@ export function sum(collection) {
 export function sumBy(collection, attr) {
   const values = _.map(collection, attr)
   return sum(values)
+}
+
+export function scoreToPercentage(score, pointsPossible) {
+  const floatingPointResult = score / pointsPossible * 100
+  if (!Number.isFinite(floatingPointResult)) {
+    return floatingPointResult
+  }
+
+  return Number.parseFloat(multiplyWithPrecision(divideWithPrecision(score, pointsPossible), 100))
 }

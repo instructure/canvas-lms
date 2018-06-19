@@ -39,6 +39,7 @@ import {scoreToGrade} from '../gradebook/GradingSchemeHelper'
 import GradeFormatHelper from '../gradebook/shared/helpers/GradeFormatHelper'
 import StatusPill from '../grading/StatusPill'
 import SelectMenuGroup from '../grade_summary/SelectMenuGroup'
+import {scoreToPercentage} from '../gradebook/shared/helpers/GradeCalculationHelper'
 
 const GradeSummary = {
   getSelectedGradingPeriodId () {
@@ -268,7 +269,8 @@ function canBeConvertedToGrade (score, possible) {
 }
 
 function calculatePercentGrade (score, possible) {
-  return round((score / possible) * 100, round.DEFAULT)
+  const percentGrade = scoreToPercentage(score, possible)
+  return round(percentGrade, round.DEFAULT)
 }
 
 function formatPercentGrade (percentGrade) {

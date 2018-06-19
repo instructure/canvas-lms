@@ -967,3 +967,28 @@ QUnit.module('Gradebook#gotAllAssignmentGroups', suiteHooks => {
     strictEqual(unmoderatedAssignment.hide_grades_when_muted, false)
   })
 })
+
+QUnit.module('Gradebook#calculateAndRoundGroupTotalScore', (hooks) => {
+  let gradebook
+
+  hooks.beforeEach(() => {
+    gradebook = createGradebook()
+  })
+
+  test('returns the score as a percentage of the points possible', () => {
+    const score = gradebook.calculateAndRoundGroupTotalScore(7.5, 10)
+    strictEqual(score, 75)
+  })
+
+  test('rounds to two decimals', () => {
+    const score = gradebook.calculateAndRoundGroupTotalScore(2, 3)
+    strictEqual(score, 66.67)
+  })
+
+  test('avoids floating point calculation issues', () => {
+    const score = gradebook.calculateAndRoundGroupTotalScore(946.65, 1000)
+    const floatingPointResult = 946.65 / 1000 * 100
+    strictEqual(floatingPointResult, 94.66499999999999)
+    strictEqual(score, 94.67)
+  })
+})

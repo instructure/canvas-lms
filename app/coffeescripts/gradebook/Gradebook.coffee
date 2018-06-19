@@ -61,6 +61,7 @@ define [
   'jsx/gradebook/shared/helpers/assignmentHelper'
   '../api/gradingPeriodsApi'
   '../api/gradingPeriodSetsApi'
+  '../../jsx/gradebook/shared/helpers/GradeCalculationHelper'
   'jst/_avatar' #needed by row_student_name
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
@@ -83,7 +84,7 @@ define [
   AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell,
   GradebookHeaderMenu, NumberCompare, natcompare, htmlEscape, PostGradesStore, PostGradesApp, SubmissionStateMap,
   ColumnHeaderTemplate, GroupTotalCellTemplate, RowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView,
-  GradebookKeyboardNav, assignmentHelper, GradingPeriodsApi, GradingPeriodSetsApi
+  GradebookKeyboardNav, assignmentHelper, GradingPeriodsApi, GradingPeriodSetsApi, {scoreToPercentage}
 ) ->
   # This class both creates the slickgrid instance, and acts as the data source for that instance.
   class Gradebook
@@ -774,7 +775,7 @@ define [
       val
 
     calculateAndRoundGroupTotalScore: (score, possible_points) ->
-      grade = (score / possible_points) * 100
+      grade = scoreToPercentage(score, possible_points)
       round(grade, round.DEFAULT)
 
     submissionsForStudent: (student) =>

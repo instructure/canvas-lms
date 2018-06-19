@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {sum, sumBy} from 'jsx/gradebook/shared/helpers/GradeCalculationHelper'
+import {scoreToPercentage, sum, sumBy} from 'jsx/gradebook/shared/helpers/GradeCalculationHelper'
 
 QUnit.module('GradeCalculationHelper.sum', () => {
   test('sums up values', () => {
@@ -47,7 +47,7 @@ QUnit.module('GradeCalculationHelper.sum', () => {
     strictEqual(sum([null, undefined]), 0)
   })
 
-  test('avoids floating point rounding issues', () => {
+  test('avoids floating point calculation issues', () => {
     const values = [7, 6.1, 7, 6.9, 6.27]
     const floatingPointSum = values.reduce((total, value) => total + value)
     strictEqual(floatingPointSum, 33.269999999999996)
@@ -100,11 +100,109 @@ QUnit.module('GradeCalculationHelper.sumBy', (hooks) => {
     strictEqual(sumBy(collection, 'price'), 0)
   })
 
-  test('avoids floating point rounding issues', () => {
+  test('avoids floating point calculation issues', () => {
     const prices = [7, 6.1, 7, 6.9, 6.27]
     collection = [7, 6.1, 7, 6.9, 6.27].map((price) => ({price}))
     const floatingPointSum = prices.reduce((total, value) => total + value)
     strictEqual(floatingPointSum, 33.269999999999996)
     strictEqual(sumBy(collection, 'price'), 33.27)
+  })
+})
+
+QUnit.module('GradeCalculationHelper.scoreToPercentage', () => {
+  test ('returns the score/points possible as a percentage', () => {
+    strictEqual(scoreToPercentage(5, 8), 62.5)
+  })
+
+  test ('avoids floating point calculation issues', () => {
+    const floatingPointResult = 946.65 / 1000 * 100
+    strictEqual(floatingPointResult, 94.66499999999999)
+    strictEqual(scoreToPercentage(946.65, 1000), 94.665)
+  })
+
+  QUnit.module('when points possible is 0', () => {
+    test('returns Infinity when score is > 0', () => {
+      strictEqual(scoreToPercentage(5, 0), Infinity)
+    })
+
+    test('returns -Infinity when score is < 0', () => {
+      strictEqual(scoreToPercentage(-5, 0), -Infinity)
+    })
+
+    test('returns NaN when score is 0', () => {
+      ok(Number.isNaN(scoreToPercentage(0, 0)))
+    })
+
+    test('returns NaN when score is null', () => {
+      ok(Number.isNaN(scoreToPercentage(null, 0)))
+    })
+
+    test('returns NaN when score is undefined', () => {
+      ok(Number.isNaN(scoreToPercentage(undefined, 0)))
+    })
+  })
+
+  QUnit.module('when points possible is null', () => {
+    test('returns Infinity when score is > 0', () => {
+      strictEqual(scoreToPercentage(5, null), Infinity)
+    })
+
+    test('returns -Infinity when score is < 0', () => {
+      strictEqual(scoreToPercentage(-5, null), -Infinity)
+    })
+
+    test('returns NaN when score is 0', () => {
+      ok(Number.isNaN(scoreToPercentage(0, null)))
+    })
+
+    test('returns NaN when score is null', () => {
+      ok(Number.isNaN(scoreToPercentage(null, null)))
+    })
+
+    test('returns NaN when score is undefined', () => {
+      ok(Number.isNaN(scoreToPercentage(undefined, null)))
+    })
+  })
+
+  QUnit.module('when points possible is undefined', () => {
+    test('returns NaN when score is > 0', () => {
+      ok(Number.isNaN(scoreToPercentage(5, undefined)))
+    })
+
+    test('returns NaN when score is < 0', () => {
+      ok(Number.isNaN(scoreToPercentage(-5, undefined)))
+    })
+
+    test('returns NaN when score is 0', () => {
+      ok(Number.isNaN(scoreToPercentage(0, undefined)))
+    })
+
+    test('returns NaN when score is null', () => {
+      ok(Number.isNaN(scoreToPercentage(null, undefined)))
+    })
+
+    test('returns NaN when score is undefined', () => {
+      ok(Number.isNaN(scoreToPercentage(undefined, undefined)))
+    })
+  })
+
+  QUnit.module('when score is null', () => {
+    test('returns 0 when points possible is > 0', () => {
+      strictEqual(scoreToPercentage(null, 10), 0)
+    })
+
+    test('returns NaN when points possible is 0', () => {
+      ok(Number.isNaN(scoreToPercentage(null, 0)))
+    })
+  })
+
+  QUnit.module('when score is undefined', () => {
+    test('returns NaN when points possible is > 0', () => {
+      ok(Number.isNaN(scoreToPercentage(undefined, 10)))
+    })
+
+    test('returns NaN when points possible is 0', () => {
+      ok(Number.isNaN(scoreToPercentage(undefined, 0)))
+    })
   })
 })

@@ -18,9 +18,10 @@
 
 import round from 'compiled/util/round';
 import I18n from 'i18nObj';
+import {scoreToPercentage} from '../../../../gradebook/shared/helpers/GradeCalculationHelper'
 
 function getGradePercentage (score, pointsPossible) {
-  const grade = (score / pointsPossible) * 100;
+  const grade = scoreToPercentage(score, pointsPossible)
   return round(grade, round.DEFAULT);
 }
 

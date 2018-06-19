@@ -413,9 +413,14 @@ define([
   QUnit.module('GradeSummary.calculatePercentGrade');
 
   test('returns properly computed and rounded value', function () {
-    const percentGrade = GradeSummary.calculatePercentGrade(1, 3);
-    ok(percentGrade === 33.33);
-  });
+    const percentGrade = GradeSummary.calculatePercentGrade(1, 3)
+    strictEqual(percentGrade, 33.33)
+  })
+
+  test('avoids floating point calculation issues', function () {
+    const percentGrade = GradeSummary.calculatePercentGrade(946.65, 1000)
+    strictEqual(percentGrade, 94.67)
+  })
 
   QUnit.module('GradeSummary.formatPercentGrade');
 

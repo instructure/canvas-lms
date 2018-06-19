@@ -454,6 +454,14 @@ QUnit.module('GradeFormatHelper', (suiteHooks) => {
         equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '68%');
       });
 
+      test('avoids floating point calculation issues when computing the percent', () => {
+        submission.score = 946.65
+        options.pointsPossible = 1000
+        const floatingPointResult = 946.65 / 1000 * 100
+        strictEqual(floatingPointResult, 94.66499999999999)
+        strictEqual(GradeFormatHelper.formatSubmissionGrade(submission, options), '94.67%');
+      })
+
       test('uses the "final" score when explicitly specified', () => {
         options.version = 'final';
         equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '68%');
@@ -517,6 +525,15 @@ QUnit.module('GradeFormatHelper', (suiteHooks) => {
       test('returns the matching scheme grade for the "final" score', () => {
         equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'D');
       });
+
+      test('avoids floating point calculation issues when computing the percent', () => {
+        options.gradingScheme = [['A', 0.94665], ['F', 0]]
+        submission.score = 946.65
+        options.pointsPossible = 1000
+        const floatingPointResult = 946.65 / 1000 * 100
+        strictEqual(floatingPointResult, 94.66499999999999)
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'A')
+      })
 
       test('uses the "final" score when explicitly specified', () => {
         options.version = 'final';
