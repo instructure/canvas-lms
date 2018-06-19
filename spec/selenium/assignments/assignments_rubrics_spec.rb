@@ -201,8 +201,6 @@ describe "assignment rubrics" do
       wait_for_ajaximations
       # click on the Import button
       f('.ui-dialog .btn-primary').click
-      # confirm the import
-      driver.switch_to.alert.accept
       wait_for_ajaximations
       # pts should not be editable
       expect(f('#rubric_new .learning_outcome_criterion .points_form .editing').displayed?).to be_falsey

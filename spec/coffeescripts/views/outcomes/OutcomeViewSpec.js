@@ -371,6 +371,12 @@ test('edit is enabled and warning text present when viewing an assessed account 
   view.remove()
 })
 
+test('warning text is not present if outcome view is read-only', () => {
+  const view = createView({ model: newOutcome({ assessed: true }, {}), readOnly: true })
+  notOk(view.$('.outcome-assessed-info-banner').length > 0)
+  view.remove()
+})
+
 test('delete button is not shown for outcomes that cannot be unlinked', () => {
   const view = createView({
     model: newOutcome(
