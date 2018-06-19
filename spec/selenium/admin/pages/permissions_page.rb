@@ -63,6 +63,9 @@ class PermissionsIndex
       f(role_link_css(role_name))
     end
 
+    def role_header_by_id(role)
+      f("#role_#{role.id}")
+    end
     # this is the button/link that opens the tray
     def permission_link(permission_name)
       f("#permission_#{permission_name}")
@@ -151,8 +154,12 @@ class PermissionsIndex
       permission_tab(tab_name).click
     end
 
-    def close_tray
-      close_tray_button.click
+    def close_role_tray_button
+      f("#close-role-tray-button")
+    end
+
+    def close_role_tray
+      close_role_tray_button.click
     end
 
     def disable_tray_permission(permission_name, role_id)

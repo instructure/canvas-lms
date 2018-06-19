@@ -114,13 +114,16 @@ it('updaterole calls updaterolenameandbasetype', () => {
 
 it('deleterole calls deleterole prop', () => {
   const props = makeDefaultProps()
-  const mockFunction = jest.fn()
-  props.deleteRole = mockFunction
+  const mockDeleteFunction = jest.fn()
+  props.deleteRole = mockDeleteFunction
   const tree = shallow(<RoleTray {...props} />)
-  const hideTray = tree.instance().hideTray
   const hideDeleteAlert = tree.instance().hideDeleteAlert
+  const finishDeleteRole = tree.instance().finishDeleteRole
   tree.instance().deleteRole()
-  expect(mockFunction).toHaveBeenCalledWith(props.role, hideTray, hideDeleteAlert)
+  // Though deleteRole will temporarily flip this to true, it should clean up
+  // after itself after everything shakes out; verify this
+  expect(tree.state().roleDeleted).toEqual(false)
+  expect(mockDeleteFunction).toHaveBeenCalledWith(props.role, finishDeleteRole, hideDeleteAlert)
 })
 
 it('renders edit icon if editable is true', () => {
@@ -195,7 +198,8 @@ it('calls props.hideTray() and correctly sets state when hideTray is called', ()
     editTrayVisable: false,
     newTargetBaseRole: null,
     editRoleLabelInput: '',
-    editRoleLabelErrorMessages: []
+    editRoleLabelErrorMessages: [],
+    roleDeleted: false
   }
   expect(tree.state()).toEqual(expectedState)
   expect(hideTrayMock).toHaveBeenCalled()

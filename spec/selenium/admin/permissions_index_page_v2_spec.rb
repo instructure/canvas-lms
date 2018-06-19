@@ -49,6 +49,7 @@ describe "permissions index" do
     end
 
     it "updates the permission to the correct selection" do
+      skip("because venk said so, COMMS-1227")
       PermissionsIndex.open_edit_role_tray(@custom_student_role)
       PermissionsIndex.disable_tray_permission("read_announcements", @custom_student_role.id)
       expect{PermissionsIndex.role_tray_permission_state("read_announcements", @custom_student_role.id)}.to become('Disabled')
@@ -66,6 +67,15 @@ describe "permissions index" do
     it "opens the edit tray when you click an edit icon" do
       PermissionsIndex.add_role("best role name ever")
       expect(PermissionsIndex.role_header).to include_text("Student\nbest role name ever\n")
+    end
+
+    it "focuses on newly created role when you close out all the things" do
+      role_name = "no this is the best role name ever"
+      PermissionsIndex.add_role(role_name)
+      PermissionsIndex.close_role_tray
+      role = Role.last
+      expect(role.name).to eq(role_name)
+      check_element_has_focus(PermissionsIndex.role_header_by_id(role))
     end
   end
 
@@ -117,7 +127,7 @@ describe "permissions index" do
     end
 
     it "permissions disables and locks on grid" do
-      PermissionsIndex.visit(@account)
+      skip("because venk said so, COMMS-1227")
       permission_name = "read_announcements"
       PermissionsIndex.change_permission(permission_name, student_role.id, "disable_and_lock")
       r = RoleOverride.last
@@ -159,13 +169,14 @@ describe "permissions index" do
     end
 
     it "updates a permission when changed in the tray" do
+      skip("because venk said so, comms-1227")
       PermissionsIndex.open_permission_tray(@permission_name)
       PermissionsIndex.disable_tray_permission(@permission_name, @role.id)
-
       expect{PermissionsIndex.role_tray_permission_state(@permission_name, @role.id)}.to become('Disabled')
       expect{PermissionsIndex.grid_permission_state(@permission_name, @role.id)}.to become('Disabled')
     end
   end
+
   context "main controls" do
     before(:each) do
       @account = Account.default

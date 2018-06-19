@@ -185,18 +185,8 @@ actions.deleteRole = function(role, successCallback, failCallback) {
       .deleteRole(getState().contextId, role)
       .then(_ => {
         successCallback()
-        // This is terrible; focus on previous role upon deletion.
-        const roles = getState().roles
-        const index = roles.findIndex(r => r.id === role.id)
-        // index should always be >= 1 here, but be responsible
-        const prevRoleId = index >= 1 ? roles[index - 1].id : undefined
         dispatch(actions.deleteRoleSuccess(role))
         showFlashSuccess(I18n.t('Delete role %{label} succeeded', {label: role.label}))()
-        if (prevRoleId) {
-          const query = `#ic-permissions__role-header-for-role-${prevRoleId}`
-          const button = $(query).find('button')
-          button.focus()
-        }
       })
       .catch(_error => {
         failCallback()

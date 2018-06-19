@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import I18n from 'i18n!permissions_role_tray'
+import $ from 'jquery'
+
 import {connect} from 'react-redux'
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
@@ -79,8 +81,8 @@ export default class RoleTray extends Component {
     editBaseRoleAlertVisable: false,
     editTrayVisable: false,
     newTargetBaseRole: null,
-    // There is only ever one  but TextInput expects an array
-    editRoleLabelErrorMessages: []
+    editRoleLabelErrorMessages: [],
+    roleDeleted: false
   }
 
   // We need this so that if there is an alert displayed inside this tray
@@ -108,8 +110,23 @@ export default class RoleTray extends Component {
     })
   }
 
+  finishDeleteRole = () => {
+    this.setState({roleDeleted: true}, this.hideTray)
+  }
+
+  returnFocus = () => {
+    if (this.state.roleDeleted) {
+      $('#permissions-role-filter').focus()
+    } else {
+      const query = `#ic-permissions__role-header-for-role-${this.props.role.id}`
+      const button = $(query).find('button')
+      button.focus()
+    }
+  }
+
   hideTray = () => {
     this.props.hideTray()
+    this.returnFocus()
     this.clearState()
   }
 
@@ -135,7 +152,8 @@ export default class RoleTray extends Component {
         editBaseRoleAlertVisable: false,
         newTargetBaseRole: null,
         editRoleLabelInput: '',
-        editRoleLabelErrorMessages: []
+        editRoleLabelErrorMessages: [],
+        roleDeleted: false
       },
       callback
     )
@@ -193,7 +211,7 @@ export default class RoleTray extends Component {
   }
 
   deleteRole = () => {
-    this.props.deleteRole(this.props.role, this.hideTray, this.hideDeleteAlert)
+    this.props.deleteRole(this.props.role, this.finishDeleteRole, this.hideDeleteAlert)
   }
 
   handleBaseRoleChange = () => {
@@ -220,7 +238,7 @@ export default class RoleTray extends Component {
                 <ScreenReaderContent>{children}</ScreenReaderContent>
                 {I18n.t('Cancel')}
               </Button>
-              <Button onClick={onOk} variant="primary">
+              <Button onClick={onOk} id="confirm-delete-role" variant="primary">
                 {I18n.t('Ok')}
               </Button>
             </Container>
@@ -259,6 +277,7 @@ export default class RoleTray extends Component {
 
   renderCloseButton = () => (
     <Button
+      id="close-role-tray-button"
       variant="icon"
       size="small"
       margin="small 0 0 xx-small"
@@ -327,6 +346,7 @@ export default class RoleTray extends Component {
 
   renderDeleteButton = () => (
     <Button
+      id="delete-role-button"
       variant="icon"
       size="medium"
       onClick={this.showDeleteAlert}
