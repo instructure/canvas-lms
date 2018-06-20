@@ -3,17 +3,13 @@
 exports[`render matches snapshot with errors 1`] = `
 <LiveAnnouncer>
   <Tray
-    applicationElement={[Function]}
     border={false}
-    closeButtonLabel="Close Accessibility Checker"
-    closeButtonRef={[Function]}
-    closeButtonVariant="icon"
     contentRef={[Function]}
     defaultFocusElement={null}
     insertAt="bottom"
-    isDismissable={true}
     label="Accessibility Checker"
-    mountNode={[Function]}
+    liveRegion={null}
+    mountNode={null}
     onClose={[Function]}
     onDismiss={[Function]}
     onEnter={[Function]}
@@ -31,15 +27,21 @@ exports[`render matches snapshot with errors 1`] = `
     shouldReturnFocus={true}
     size="small"
   >
-    <Container
+    <CloseButton
+      buttonRef={[Function]}
+      margin="0"
+      offset="x-small"
+      onClick={[Function]}
+      placement="start"
+      size="small"
+      variant="icon"
+    >
+      Close Accessibility Checker
+    </CloseButton>
+    <View
       as="div"
-      display={null}
-      padding="medium"
-      style={
-        Object {
-          "width": "20rem",
-        }
-      }
+      display="auto"
+      padding="x-large large"
     >
       <Heading
         as="h2"
@@ -51,9 +53,9 @@ exports[`render matches snapshot with errors 1`] = `
       >
          Accessibility Checker
       </Heading>
-      <Container
+      <View
         as="div"
-        display={null}
+        display="auto"
       >
         <LiveMessage
           aria-live="polite"
@@ -63,9 +65,9 @@ exports[`render matches snapshot with errors 1`] = `
                   Error Message
                 "
         />
-        <Container
+        <View
           as="div"
-          display={null}
+          display="auto"
           margin="large 0 medium 0"
         >
           <Grid
@@ -95,15 +97,14 @@ exports[`render matches snapshot with errors 1`] = `
               >
                 <Popover
                   alignArrow={false}
-                  applicationElement={[Function]}
                   closeButtonLabel="Close"
-                  closeButtonRef={[Function]}
                   constrain="window"
                   contentRef={[Function]}
                   defaultFocusElement={null}
                   defaultShow={false}
                   insertAt="bottom"
                   label={null}
+                  liveRegion={null}
                   mountNode={null}
                   offsetX={0}
                   offsetY={0}
@@ -125,6 +126,7 @@ exports[`render matches snapshot with errors 1`] = `
                   shouldContainFocus={true}
                   shouldRenderOffscreen={false}
                   shouldReturnFocus={true}
+                  stacking="topmost"
                   trackPosition={true}
                   variant="default"
                   withArrow={true}
@@ -134,25 +136,24 @@ exports[`render matches snapshot with errors 1`] = `
                       as="button"
                       buttonRef={[Function]}
                       fluidWidth={false}
+                      icon={[Function]}
                       margin="0"
                       size="medium"
                       type="button"
                       variant="icon"
                     >
-                      <IconQuestionLine
-                        title="Why"
-                      />
+                      <ScreenReaderContent
+                        as="span"
+                      >
+                        Why
+                      </ScreenReaderContent>
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent>
-                    <Container
+                    <View
                       display="block"
                       padding="medium"
-                      style={
-                        Object {
-                          "width": "16rem",
-                        }
-                      }
+                      width="16rem"
                     >
                       <Text
                         as="span"
@@ -165,6 +166,7 @@ exports[`render matches snapshot with errors 1`] = `
                             as="button"
                             ellipsis={false}
                             href="http://some-url"
+                            iconPlacement="start"
                             linkRef={[Function]}
                             target="_blank"
                             variant="default"
@@ -173,13 +175,13 @@ exports[`render matches snapshot with errors 1`] = `
                           </Link>
                         </p>
                       </Text>
-                    </Container>
+                    </View>
                   </PopoverContent>
                 </Popover>
               </GridCol>
             </GridRow>
           </Grid>
-        </Container>
+        </View>
         <form
           onSubmit={[Function]}
         >
@@ -190,9 +192,9 @@ exports[`render matches snapshot with errors 1`] = `
           >
             Error Message
           </Text>
-          <Container
+          <View
             as="div"
-            display={null}
+            display="auto"
             key="select"
             margin="medium 0 0"
           >
@@ -222,10 +224,10 @@ exports[`render matches snapshot with errors 1`] = `
                 B
               </option>
             </Select>
-          </Container>
-          <Container
+          </View>
+          <View
             as="div"
-            display={null}
+            display="auto"
             key="checkbox"
             margin="medium 0 0"
           >
@@ -239,10 +241,10 @@ exports[`render matches snapshot with errors 1`] = `
               size="medium"
               variant="simple"
             />
-          </Container>
-          <Container
+          </View>
+          <View
             as="div"
-            display={null}
+            display="auto"
             key="color"
             margin="medium 0 0"
           >
@@ -252,10 +254,10 @@ exports[`render matches snapshot with errors 1`] = `
               onChange={[Function]}
               value="rgba(40, 100, 200, 0.6)"
             />
-          </Container>
-          <Container
+          </View>
+          <View
             as="div"
-            display={null}
+            display="auto"
             key="text"
             margin="medium 0 0"
           >
@@ -268,15 +270,16 @@ exports[`render matches snapshot with errors 1`] = `
               messages={Array []}
               name="text"
               onChange={[Function]}
+              readOnly={false}
               size="medium"
               textAlign="start"
               type="text"
               value="Text"
             />
-          </Container>
-          <Container
+          </View>
+          <View
             as="div"
-            display={null}
+            display="auto"
             key="textarea"
             margin="medium 0 0"
           >
@@ -289,14 +292,15 @@ exports[`render matches snapshot with errors 1`] = `
               messages={Array []}
               name="textarea"
               onChange={[Function]}
+              readOnly={false}
               resize="none"
               size="medium"
               textareaRef={[Function]}
             />
-          </Container>
-          <Container
+          </View>
+          <View
             as="div"
-            display={null}
+            display="auto"
             margin="medium 0"
           >
             <Grid
@@ -355,10 +359,10 @@ exports[`render matches snapshot with errors 1`] = `
                 </GridCol>
               </GridRow>
             </Grid>
-          </Container>
+          </View>
         </form>
-      </Container>
-    </Container>
+      </View>
+    </View>
   </Tray>
 </LiveAnnouncer>
 `;
@@ -366,17 +370,13 @@ exports[`render matches snapshot with errors 1`] = `
 exports[`render matches snapshot without errors 1`] = `
 <LiveAnnouncer>
   <Tray
-    applicationElement={[Function]}
     border={false}
-    closeButtonLabel="Close Accessibility Checker"
-    closeButtonRef={[Function]}
-    closeButtonVariant="icon"
     contentRef={[Function]}
     defaultFocusElement={null}
     insertAt="bottom"
-    isDismissable={true}
     label="Accessibility Checker"
-    mountNode={[Function]}
+    liveRegion={null}
+    mountNode={null}
     onClose={[Function]}
     onDismiss={[Function]}
     onEnter={[Function]}
@@ -394,15 +394,21 @@ exports[`render matches snapshot without errors 1`] = `
     shouldReturnFocus={true}
     size="small"
   >
-    <Container
+    <CloseButton
+      buttonRef={[Function]}
+      margin="0"
+      offset="x-small"
+      onClick={[Function]}
+      placement="start"
+      size="small"
+      variant="icon"
+    >
+      Close Accessibility Checker
+    </CloseButton>
+    <View
       as="div"
-      display={null}
-      padding="medium"
-      style={
-        Object {
-          "width": "20rem",
-        }
-      }
+      display="auto"
+      padding="x-large large"
     >
       <Heading
         as="h2"
@@ -414,8 +420,8 @@ exports[`render matches snapshot without errors 1`] = `
       >
          Accessibility Checker
       </Heading>
-      <Container
-        display={null}
+      <View
+        display="auto"
       >
         <Text
           as="span"
@@ -427,8 +433,8 @@ exports[`render matches snapshot without errors 1`] = `
           </p>
         </Text>
         <PlaceholderSVG />
-      </Container>
-    </Container>
+      </View>
+    </View>
   </Tray>
 </LiveAnnouncer>
 `;
