@@ -87,20 +87,29 @@ type AssignmentEdge {
 }
 
 input AssignmentFilter {
-  #     only return assignments for the given grading period. Defaults to the
-  # current grading period. Pass `null` to not filter by grading period.
+  # only return assignments for the given grading period. Defaults to
+  # the current grading period. Pass `null` to return all assignments
+  # (irrespective of the assignment's grading period)
   gradingPeriodId: ID
 }
 
-type AssignmentGroup implements Node & Timestamped {
+type AssignmentGroup implements AssignmentsConnectionInterface & Node & Timestamped {
   # legacy canvas id
   _id: ID!
+
+  # returns a list of assignments.
+  #
+  # **NOTE**: for courses with grading periods, this will only return grading
+  # periods in the current course; see `AssignmentFilter` for more info.
+  # In courses with grading periods that don't have students, it is necessary
+  # to *not* filter by grading period to list assignments.
   assignmentsConnection(
     # Returns the elements in the list that come after the specified cursor.
     after: String
 
     # Returns the elements in the list that come before the specified cursor.
     before: String
+    filter: AssignmentFilter
 
     # Returns the first _n_ elements from the list.
     first: Int
@@ -110,6 +119,8 @@ type AssignmentGroup implements Node & Timestamped {
   ): AssignmentConnection
   createdAt: DateTime
   groupWeight: Float
+
+  # ID of the object.
   id: ID!
   name: String
   position: Int
@@ -200,7 +211,30 @@ enum AssignmentState {
   unpublished
 }
 
-type Course implements Node & Timestamped {
+interface AssignmentsConnectionInterface {
+  # returns a list of assignments.
+  #
+  # **NOTE**: for courses with grading periods, this will only return grading
+  # periods in the current course; see `AssignmentFilter` for more info.
+  # In courses with grading periods that don't have students, it is necessary
+  # to *not* filter by grading period to list assignments.
+  assignmentsConnection(
+    # Returns the elements in the list that come after the specified cursor.
+    after: String
+
+    # Returns the elements in the list that come before the specified cursor.
+    before: String
+    filter: AssignmentFilter
+
+    # Returns the first _n_ elements from the list.
+    first: Int
+
+    # Returns the last _n_ elements from the list.
+    last: Int
+  ): AssignmentConnection
+}
+
+type Course implements AssignmentsConnectionInterface & Node & Timestamped {
   # legacy canvas id
   _id: ID!
   assignmentGroupsConnection(
@@ -216,6 +250,13 @@ type Course implements Node & Timestamped {
     # Returns the last _n_ elements from the list.
     last: Int
   ): AssignmentGroupConnection
+
+  # returns a list of assignments.
+  #
+  # **NOTE**: for courses with grading periods, this will only return grading
+  # periods in the current course; see `AssignmentFilter` for more info.
+  # In courses with grading periods that don't have students, it is necessary
+  # to *not* filter by grading period to list assignments.
   assignmentsConnection(
     # Returns the elements in the list that come after the specified cursor.
     after: String

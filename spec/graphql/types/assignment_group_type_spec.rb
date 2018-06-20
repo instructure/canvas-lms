@@ -26,7 +26,13 @@ describe Types::AssignmentGroupType do
     before(:once) do
       course_with_student(active_all: true)
       @group = @course.assignment_groups.create!(name: 'a group')
-      @course.assignments.create!(name: 'a assignment')
+      @assignment = @course.assignments.create!(name: 'a assignment')
+
+      @other_group = @course.assignment_groups.create!(name: "other group")
+      @other_assignment = @course.assignments.create!(
+        name: "other",
+        assignment_group: @other_group,
+      )
     end
 
     before do
@@ -37,9 +43,8 @@ describe Types::AssignmentGroupType do
       expect(@group_type.name).to eq("a group")
     end
 
-    it "can access assignments" do
-      expect(@group_type.assignmentsConnection.length).to be 1
-      expect(@group_type.assignmentsConnection[0].name).to eq("a assignment")
+    it "returns assignments from the assignment group" do
+      expect(@group_type.assignmentsConnection).to eq [@assignment]
     end
   end
 end

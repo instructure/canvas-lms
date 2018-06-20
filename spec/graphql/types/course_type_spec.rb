@@ -34,8 +34,8 @@ describe Types::CourseType do
     }
 
     it "only returns visible assignments" do
-      expect(course_type.assignmentsConnection(current_user: @teacher, args: {filter: nil}).size).to eq 1
-      expect(course_type.assignmentsConnection(current_user: @student, args: {filter: nil}).size).to eq 0
+      expect(course_type.assignmentsConnection(current_user: @teacher).size).to eq 1
+      expect(course_type.assignmentsConnection(current_user: @student).size).to eq 0
     end
 
     context "grading periods" do
@@ -57,14 +57,14 @@ describe Types::CourseType do
 
       it "only returns assignments for the current grading period" do
         expect(
-          course_type.assignmentsConnection(current_user: @student, args: {filter: nil})
+          course_type.assignmentsConnection(current_user: @student)
         ).to eq [@term2_assignment1]
       end
 
       it "returns no assignments when outside of a grading period" do
         @term2.destroy
         expect(
-          course_type.assignmentsConnection(current_user: @student, args: {filter: nil})
+          course_type.assignmentsConnection(current_user: @student)
         ).to eq []
       end
 

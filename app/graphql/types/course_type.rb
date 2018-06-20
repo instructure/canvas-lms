@@ -46,14 +46,6 @@ module Types
       value "deleted"
     end
 
-    AssignmentFilterInputType = GraphQL::InputObjectType.define do
-      name "AssignmentFilter"
-      argument :gradingPeriodId, types.ID, <<-DESC
-    only return assignments for the given grading period. Defaults to the
-current grading period. Pass `null` to not filter by grading period.
-      DESC
-    end
-
     CourseFilterableEnrollmentWorkflowState = GraphQL::EnumType.define do
       name "CourseFilterableEnrollmentState"
       description "Users in a course can be returned based on these enrollment states"
@@ -94,39 +86,10 @@ current grading period. Pass `null` to not filter by grading period.
       method: :assignment_groups,
       null: true
 
-    field :assignments_connection, AssignmentType.connection_type, null: true do
-      argument :filter, AssignmentFilterInputType, required: false
+    implements Interfaces::AssignmentsConnectionInterface
+    def assignments_connection(filter: {})
+      super(filter: filter, course: course)
     end
-    def assignments_connection(filter:)
-      filter ||= {}
-
-      if filter.key?(:grading_period_id)
-        assignments(filter[:grading_period_id])
-      else
-        Loaders::CurrentGradingPeriodLoader.load(course)
-          .then do |gp, has_grading_periods|
-          assignments(gp&.id, has_grading_periods)
-        end
-      end
-    end
-
-    def assignments(grading_period_id, has_grading_periods = nil)
-      assignments = Assignments::ScopedToUser.new(course, current_user).scope
-
-      if grading_period_id
-        assignments.
-          joins(:submissions).
-          where(submissions: {grading_period_id: grading_period_id}).
-          distinct
-      elsif has_grading_periods
-        # this is the case where a grading_period_id was not passed *and*
-        # we are outside of any grading period (so we return nothing)
-        []
-      else
-        assignments
-      end
-    end
-
 
     field :sections_connection, SectionType.connection_type, null: true
     def sections_connection
