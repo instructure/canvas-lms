@@ -16,7 +16,7 @@
   <% end %>
 
   <% if @can_grade %>
-    <li><a class="icon-speed-grader" href="/bz/grades_download.csv?assignment_id=<%=@assignment.id%>">Download Grades</a></li>
+    <li><a class="icon-speed-grader" href="/bz/grades_download?assignment_id=<%=@assignment.id%>">Download Grades</a></li>
 
     <% if @assignment.name.starts_with? "Course Participation -" %>
       <%

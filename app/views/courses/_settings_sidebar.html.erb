@@ -42,7 +42,7 @@
   <a class="btn button-sidebar-wide" href="/courses/<%= @context.id %>/dynamic_syllabus/edit">Edit Dynamic Syllabus</a>
   <a class="btn button-sidebar-wide" href="/bz/retained_data_export.csv?type=survey&amp;course=<%= @context.id %>">Export Survey Data</a>
   <a class="btn button-sidebar-wide" href="/bz/retained_data_export.csv?type=magic&amp;course=<%= @context.id %>">Export Magic Fields</a>
-  <a class="btn button-sidebar-wide" href="/bz/grades_download.csv?course_id=<%= @context.id %>">Export Grades Breakdown</a>
+  <a class="btn button-sidebar-wide" href="/bz/grades_download?course_id=<%= @context.id %>">Export Grades Breakdown</a>
 
   <% if can_do(@context, @current_user, :delete) && !@context.deleted? %>
     <%= link_to context_url(@context, :context_confirm_action_url, :event => 'delete'), :class => 'btn button-sidebar-wide delete_course_link' do %>
