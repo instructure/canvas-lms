@@ -386,7 +386,10 @@ export default class RoleTray extends Component {
           <FlexItem>
             <Text className="role-tray-last-changed">
               <span>
-                {I18n.t('Last changed:')} <FriendlyDatetime dateTime={this.props.lastChanged} />
+                <FriendlyDatetime
+                  prefix={I18n.t('Last changed:')}
+                  dateTime={this.props.lastChanged}
+                />
               </span>
             </Text>
           </FlexItem>
