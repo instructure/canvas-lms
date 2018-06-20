@@ -43,20 +43,27 @@ export default class PermissionsTable extends Component {
   }
 
   state = {
-    leftOffset: 0,
-    topOffset: 0,
     expanded: {}
   }
 
-  fixScroll = e => {
+  fixScroll = (leftOffset, leftScroll) => {
     const sidebarWidth = 300
-    const leftOffset = e.target.offsetParent.offsetLeft
-    const leftScroll = this.contentWrapper.scrollLeft
-
     if (leftOffset - sidebarWidth < leftScroll) {
-      const newScroll = Math.max(0, this.contentWrapper.scrollLeft - sidebarWidth)
+      const newScroll = Math.max(0, leftScroll - sidebarWidth)
       this.contentWrapper.scrollLeft = newScroll
     }
+  }
+
+  fixScrollButton = e => {
+    const leftOffset = e.target.offsetParent.offsetLeft
+    const leftScroll = this.contentWrapper.scrollLeft
+    this.fixScroll(leftOffset, leftScroll)
+  }
+
+  fixScrollHeader = e => {
+    const leftOffset = e.target.offsetParent.offsetParent.offsetLeft
+    const leftScroll = this.contentWrapper.scrollLeft
+    this.fixScroll(leftOffset, leftScroll)
   }
 
   toggleExpanded(id) {
@@ -100,7 +107,6 @@ export default class PermissionsTable extends Component {
           >
             <div className="ic-permissions__top-header__col-wrapper">
               <div
-                style={{top: `${this.state.topOffset}px`}}
                 className="ic-permissions__header-content ic-permissions__header-content-col"
                 id={`ic-permissions__role-header-for-role-${role.id}`}
               >
@@ -108,7 +114,7 @@ export default class PermissionsTable extends Component {
                   variant="link"
                   onClick={() => this.openRoleTray(role)}
                   id={`role_${role.id}`}
-                  onFocus={this.fixScroll}
+                  onFocus={this.fixScrollHeader}
                 >
                   <Text size="small">{role.label} </Text>
                 </Button>
@@ -124,10 +130,7 @@ export default class PermissionsTable extends Component {
     return (
       <th scope="row" className="ic-permissions__main-left-header" aria-label={perm.label}>
         <div className="ic-permissions__left-header__col-wrapper">
-          <div
-            style={{left: `${this.state.leftOffset}px`}}
-            className="ic-permissions__header-content"
-          >
+          <div className="ic-permissions__header-content">
             {/*
             This button is for the expanding of permissions.  When we get more granular
             we will uncomment this to allow that functionality to still stand
@@ -163,10 +166,7 @@ export default class PermissionsTable extends Component {
       <tr key={rowType}>
         <th scope="row" className="ic-permissions__left-header__expanded">
           <div className="ic-permissions__left-header__col-wrapper">
-            <div
-              style={{left: `${this.state.leftOffset}px`}}
-              className="ic-permissions__header-content"
-            >
+            <div className="ic-permissions__header-content">
               <Text>{rowTypes[rowType]}</Text>
             </div>
           </div>
@@ -200,7 +200,7 @@ export default class PermissionsTable extends Component {
                       roleId={role.id}
                       roleLabel={role.label}
                       inTray={false}
-                      onFocus={this.fixScroll}
+                      onFocus={this.fixScrollButton}
                     />
                   </div>
                 </td>
