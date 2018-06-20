@@ -1714,7 +1714,7 @@ EG = {
       const anonymizableSubmissionIdKey = isAnonymous ? 'anonymousId' : 'submissionId';
       var $submission_file = $submission_file_hidden.clone(true).fillTemplateData({
         data: {
-          [anonymizableSubmissionIdKey]: submission[anonymizableId],
+          [anonymizableSubmissionIdKey]: submission[anonymizableUserId],
           attachmentId: attachment.id,
           display_name: attachment.display_name
         },
