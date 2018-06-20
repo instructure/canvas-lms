@@ -6,11 +6,12 @@
         "translationsDir": "locales",
         "extractDefaultTranslations": false
       }
+    ],
+    [
+      "@instructure/ui-presets/babel",
+      {
+        "themeable": true
+      }
     ]
-  ],
-  "env": {
-    "test": {
-      "plugins": ["transform-es2015-modules-commonjs"]
-    }
-  }
+  ]
 }

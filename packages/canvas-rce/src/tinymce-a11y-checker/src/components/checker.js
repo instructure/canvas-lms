@@ -1,27 +1,28 @@
 import React from "react"
 
+import preventDefault from "prevent-default"
 import { LiveAnnouncer, LiveMessage } from "react-aria-live"
-import Tray from "@instructure/ui-core/lib/components/Tray"
-import Container from "@instructure/ui-core/lib/components/Container"
-import Heading from "@instructure/ui-core/lib/components/Heading"
-import Button from "@instructure/ui-core/lib/components/Button"
-import Link from "@instructure/ui-core/lib/components/Link"
-import Alert from "@instructure/ui-core/lib/components/Alert"
-import Checkbox from "@instructure/ui-core/lib/components/Checkbox"
-import TextInput from "@instructure/ui-core/lib/components/TextInput"
-import TextArea from "@instructure/ui-core/lib/components/TextArea"
+import ScreenReaderContent from "@instructure/ui-a11y/lib/components/ScreenReaderContent"
+import CloseButton from "@instructure/ui-buttons/lib/components/CloseButton"
+import Tray from "@instructure/ui-overlays/lib/components/Tray"
+import View from "@instructure/ui-layout/lib/components/View"
+import Heading from "@instructure/ui-elements/lib/components/Heading"
+import Button from "@instructure/ui-buttons/lib/components/Button"
+import Link from "@instructure/ui-elements/lib/components/Link"
+import Checkbox from "@instructure/ui-forms/lib/components/Checkbox"
+import TextInput from "@instructure/ui-forms/lib/components/TextInput"
+import TextArea from "@instructure/ui-forms/lib/components/TextArea"
 import Select from "@instructure/ui-core/lib/components/Select"
-import ContextBox from "@instructure/ui-core/lib/components/ContextBox"
-import Grid from "@instructure/ui-core/lib/components/Grid"
-import GridRow from "@instructure/ui-core/lib/components/Grid/GridRow"
-import GridCol from "@instructure/ui-core/lib/components/Grid/GridCol"
-import Spinner from "@instructure/ui-core/lib/components/Spinner"
+import Grid from "@instructure/ui-layout/lib/components/Grid"
+import GridRow from "@instructure/ui-layout/lib/components/Grid/GridRow"
+import GridCol from "@instructure/ui-layout/lib/components/Grid/GridCol"
+import Spinner from "@instructure/ui-elements/lib/components/Spinner"
 import Popover, {
   PopoverTrigger,
   PopoverContent
-} from "@instructure/ui-core/lib/components/Popover"
-import Text from "@instructure/ui-core/lib/components/Text"
-import IconQuestionLine from "instructure-icons/lib/Line/IconQuestionLine"
+} from "@instructure/ui-overlays/lib/components/Popover"
+import Text from "@instructure/ui-elements/lib/components/Text"
+import IconQuestionLine from "@instructure/ui-icons/lib/Line/IconQuestion"
 import ColorField from "./color-field"
 import PlaceholderSVG from "./placeholder-svg"
 
@@ -33,26 +34,14 @@ import formatMessage from "../format-message"
 const noop = () => {}
 
 export default class Checker extends React.Component {
-  constructor() {
-    super()
-
-    this.state = {
-      open: false,
-      checking: false,
-      errors: [],
-      formState: {},
-      formStateValid: false,
-      errorIndex: 0,
-      config: {}
-    }
-
-    this.firstError = this.firstError.bind(this)
-    this.nextError = this.nextError.bind(this)
-    this.prevError = this.prevError.bind(this)
-    this.selectCurrent = this.selectCurrent.bind(this)
-    this.updateFormState = this.updateFormState.bind(this)
-    this.fixIssue = this.fixIssue.bind(this)
-    this.handleClose = this.handleClose.bind(this)
+  state = {
+    open: false,
+    checking: false,
+    errors: [],
+    formState: {},
+    formStateValid: false,
+    errorIndex: 0,
+    config: {}
   }
 
   static defaultProps = {
@@ -130,7 +119,7 @@ export default class Checker extends React.Component {
             }
           })
           if (errors.length === 0) {
-            this._closeTimout = setTimeout(this.handleClose, 3000)
+            this._closeTimout = setTimeout(() => this.handleClose(), 3000)
           }
         }
       )
@@ -159,7 +148,7 @@ export default class Checker extends React.Component {
     if (errorIndex >= this.state.errors.length) {
       errorIndex = 0
     }
-    this.setState({ errorIndex }, this.selectCurrent)
+    this.setState({ errorIndex }, () => this.selectCurrent())
   }
 
   selectCurrent() {
@@ -212,7 +201,7 @@ export default class Checker extends React.Component {
     }
   }
 
-  updateFormState({ target }) {
+  updateFormState = ({ target }) => {
     const formState = Object.assign({}, this.state.formState)
     if (target.type === "checkbox") {
       formState[target.name] = target.checked
@@ -240,8 +229,7 @@ export default class Checker extends React.Component {
     return rule.test(node)
   }
 
-  fixIssue(ev) {
-    ev.preventDefault()
+  fixIssue() {
     const rule = this.errorRule()
     let node = this.errorNode()
     if (rule && node) {
@@ -300,16 +288,6 @@ export default class Checker extends React.Component {
     this.setState({ open: false })
   }
 
-  applicationElements() {
-    const _filter = Array.prototype.filter
-    return _filter.call(
-      document.body.childNodes,
-      node =>
-        node.nodeType == 1 &&
-        node.className !== "tinymce-a11y-checker-container"
-    )
-  }
-
   render() {
     const rule = this.errorRule()
     const issueNumberMessage = formatMessage("Issue { num }/{ total }", {
@@ -321,24 +299,24 @@ export default class Checker extends React.Component {
       <LiveAnnouncer>
         <Tray
           label={formatMessage("Accessibility Checker")}
-          isDismissable
-          shouldContainFocus
           open={this.state.open}
-          onDismiss={this.handleClose}
+          onDismiss={() => this.handleClose()}
           placement="end"
-          mountNode={() =>
-            document.getElementsByClassName(
-              "tinymce-a11y-checker-container"
-            )[0]}
-          closeButtonLabel={formatMessage("Close Accessibility Checker")}
-          applicationElement={this.applicationElements}
+          contentRef={e => (this.trayElement = e)}
         >
-          <Container as="div" style={{ width: "20rem" }} padding="medium">
+          <CloseButton
+            placement="start"
+            offset="x-small"
+            onClick={() => this.handleClose()}
+          >
+            {formatMessage("Close Accessibility Checker")}
+          </CloseButton>
+          <View as="div" padding="x-large large">
             <Heading level="h3" as="h2" margin="medium 0">
               {" " + formatMessage("Accessibility Checker")}
             </Heading>
             {this.state.errors.length > 0 && (
-              <Container as="div">
+              <View as="div">
                 <LiveMessage
                   aria-live="polite"
                   message={`
@@ -347,7 +325,7 @@ export default class Checker extends React.Component {
                   ${this.errorMessage()}
                 `}
                 />
-                <Container as="div" margin="large 0 medium 0">
+                <View as="div" margin="large 0 medium 0">
                   <Grid
                     vAlign="middle"
                     hAlign="space-between"
@@ -362,22 +340,20 @@ export default class Checker extends React.Component {
                           on="click"
                           shouldContainFocus
                           shouldReturnFocus
-                          closeButtonLabel="Close"
-                          applicationElement={() =>
-                            document.getElementsByClassName(
-                              "tinymce-a11y-checker-container"
-                            )[0]}
+                          closeButtonLabel={formatMessage("Close")}
                         >
                           <PopoverTrigger>
-                            <Button variant="icon">
-                              <IconQuestionLine title={formatMessage("Why")} />
+                            <Button variant="icon" icon={IconQuestionLine}>
+                              <ScreenReaderContent>
+                                {formatMessage("Why")}
+                              </ScreenReaderContent>
                             </Button>
                           </PopoverTrigger>
                           <PopoverContent>
-                            <Container
+                            <View
                               padding="medium"
                               display="block"
-                              style={{ width: "16rem" }}
+                              width="16rem"
                             >
                               <Text>
                                 <p>
@@ -390,21 +366,21 @@ export default class Checker extends React.Component {
                                     )}
                                 </p>
                               </Text>
-                            </Container>
+                            </View>
                           </PopoverContent>
                         </Popover>
                       </GridCol>
                     </GridRow>
                   </Grid>
-                </Container>
-                <form onSubmit={this.fixIssue}>
+                </View>
+                <form onSubmit={preventDefault(() => this.fixIssue())}>
                   <Text as="div">{this.errorMessage()}</Text>
                   {rule.form().map(f => (
-                    <Container as="div" key={f.dataKey} margin="medium 0 0">
+                    <View as="div" key={f.dataKey} margin="medium 0 0">
                       {this.renderField(f)}
-                    </Container>
+                    </View>
                   ))}
-                  <Container as="div" margin="medium 0">
+                  <View as="div" margin="medium 0">
                     <Grid
                       vAlign="middle"
                       hAlign="space-between"
@@ -412,10 +388,13 @@ export default class Checker extends React.Component {
                     >
                       <GridRow>
                         <GridCol>
-                          <Button onClick={this.prevError} margin="0 small 0 0">
+                          <Button
+                            onClick={() => this.prevError()}
+                            margin="0 small 0 0"
+                          >
                             {formatMessage("Prev")}
                           </Button>
-                          <Button onClick={this.nextError}>
+                          <Button onClick={() => this.nextError()}>
                             {formatMessage("Next")}
                           </Button>
                         </GridCol>
@@ -430,20 +409,20 @@ export default class Checker extends React.Component {
                         </GridCol>
                       </GridRow>
                     </Grid>
-                  </Container>
+                  </View>
                 </form>
-              </Container>
+              </View>
             )}
             {this.state.errors.length === 0 &&
               !this.state.checking && (
-                <Container>
+                <View>
                   <Text>
                     <p>
                       {formatMessage("No accessibility issues were detected.")}
                     </p>
                   </Text>
                   <PlaceholderSVG />
-                </Container>
+                </View>
               )}
             {this.state.checking && (
               <div>
@@ -457,7 +436,7 @@ export default class Checker extends React.Component {
                 />
               </div>
             )}
-          </Container>
+          </View>
         </Tray>
       </LiveAnnouncer>
     )

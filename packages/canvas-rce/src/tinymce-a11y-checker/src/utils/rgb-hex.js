@@ -32,7 +32,7 @@ module.exports = (red, green, blue, alpha) => {
     if (!isPercent && alpha >= 0 && alpha <= 1) {
       alpha = Math.round(255 * alpha)
     } else if (isPercent && alpha >= 0 && alpha <= 100) {
-      alpha = Math.round(255 * alpha / 100)
+      alpha = Math.round((255 * alpha) / 100)
     } else {
       throw new TypeError(
         `Expected alpha value (${alpha}) as a fraction or percentage`

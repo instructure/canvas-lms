@@ -1,9 +1,8 @@
 import React from "react"
-import InlineSVG from "@instructure/ui-core/lib/components/InlineSVG"
 
 export default function PlaceholderSVG() {
   return (
-    <InlineSVG viewBox="0 0 245 310" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 245 310" xmlns="http://www.w3.org/2000/svg">
       <g fill="none" fillRule="evenodd">
         <path
           d="M166.886 39.098c1.975 25.644-22.325 55.153-31.764 55.89-8.258.645-37.972-24.727-39.947-50.37C93.2 18.972 108.168 3.644 127.97 2.12 147.774.6 164.91 13.455 166.887 39.1"
@@ -84,6 +83,6 @@ export default function PlaceholderSVG() {
           strokeWidth="2"
         />
       </g>
-    </InlineSVG>
+    </svg>
   )
 }

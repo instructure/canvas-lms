@@ -1,8 +1,8 @@
 import React from "react"
 import ReactDOM from "react-dom"
 import contrast from "wcag-element-contrast"
-import TextInput from "@instructure/ui-core/lib/components/TextInput"
-import Container from "@instructure/ui-core/lib/components/Container"
+import TextInput from "@instructure/ui-forms/lib/components/TextInput"
+import View from "@instructure/ui-layout/lib/components/View"
 import ColorPicker from "./color-picker"
 
 export default class ColorField extends React.Component {
@@ -38,13 +38,13 @@ export default class ColorField extends React.Component {
 
   render() {
     return (
-      <Container as="div">
+      <View as="div">
         <TextInput {...this.props} />
         <ColorPicker
           color={contrast.parseRGBA(this.props.value)}
           onChange={this.handlePickerChange}
         />
-      </Container>
+      </View>
     )
   }
 }

@@ -9,7 +9,7 @@ const server = new WebpackDevServer(compiler, webpackConfig.devServer)
 
 server.listen(8080, "127.0.0.1", () => {
   const config = {
-    videoRecording: false
+    video: false
   }
   cypress.run({ config }).then(results => {
     server.close()
