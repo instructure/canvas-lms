@@ -2643,7 +2643,7 @@ mi:
       external_tool_group_warning: "E kore e taea te mau ohipa Group whakamahi Utauta waho. E te tautuhinga rōpū taki ina whakaora ia koutou"
       external_tool_options: "Kōwhiringa Tool waho"
       label: 
-        external_tool_new_tab: "Te uta tēnei Tool I roto i te Ripa New"
+        external_tool_new_tab: "Te uta tēnei Tool I roto i te Ripa Hou"
         external_tool_url: "Tool waho URL"
         turnitin_enabled: "Whakahohe Turnitin Tukunga"
         vericite_enabled: "Whakahohe VeriCite Ngā tāpaetanga"
@@ -3428,7 +3428,7 @@ mi:
       event_title: "takahanga Taitara"
       location_address: "Wāhi noho:"
       location_name: "Wāhi:"
-      new_calendar_event_header: "Takahanga Maramataka New"
+      new_calendar_event_header: "Takahanga Maramataka Hou"
       repeat: Tārua
       start_time: "Start Time"
     edit_event: 
@@ -3549,11 +3549,11 @@ mi:
   calendar_event_89aadc1c: "Takahanga Māramataka"
   calendar_events: 
     crumbs: 
-      new: "Takahanga Maramataka New"
+      new: "Takahanga Maramataka Hou"
     full_calendar_event: 
       no_content: "No Ihirangi"
     new: 
-      page_title: "Takahanga Maramataka New"
+      page_title: "Takahanga Maramataka Hou"
     notices: 
       created: "I momoho te hanga Takahanga."
       deleted: "Kua mukua tēnei kaupapa"
@@ -3965,7 +3965,7 @@ mi:
       messages: 
         delete_google_doc_as_well: "Kei te rongoa tenei mahi tahi, ano he Google Doc. I e hiahia ana koe ki te muku i te reira tika i Kanaweti, tango i te reira i Google Tuhinga rite pai ranei?"
       titles: 
-        new: "Tīmata i te Tahi New"
+        new: "Tīmata i te Tahi Hou"
     google_drive: 
       file_not_found: "Kihai i kitea te kōnae Ngātahitanga"
     index: 
@@ -3989,7 +3989,7 @@ mi:
         drive: 
           upgrade: 
             description: "E kuhu ai koe ki tēnei mahi-ā-rōpū, me tukuna e koe a Canvas kia uru ki tō pae Google Drive."
-      how_to_start_a_new_collaboration: "Ki te kitea i roto i atu e pā ana ki te momo ngā o te mahi tahi, pāwhiri \"Tīmata i te Tahi New\" a ka whiriwhiri i taua momo i roto i te rārangi takaiho."
+      how_to_start_a_new_collaboration: "Ki te kitea i roto i atu e pā ana ki te momo ngā o te mahi tahi, pāwhiri \"Tīmata i te Tahi Hou\" a ka whiriwhiri i taua momo i roto i te rārangi takaiho."
       links: 
         delete: "Mukua tenei Tahi"
         edit: "Whakatikaina tēnei Tahi"
@@ -4454,7 +4454,7 @@ mi:
         default_question_bank_label: "Pae Pātai Aunoa"
         question_bank_placeholder: "Pātai te ingoa o te pēke"
         question_bank_placeholder_aria: "Whakauru pātai hou pēke ingoa"
-        question_bank_title: "Ingoa pātai pēke New"
+        question_bank_title: "Ingoa pātai pēke hou"
         question_banks_disabled: "Kua whakakorehia tēnei kōwhiringa"
         select_question_bank: "Tīpako pēke pātai"
       select_content_checkbox: 
@@ -5676,7 +5676,7 @@ mi:
       edit_sections_view: 
         edit_sections_desc: "Wāhanga Ko te ara atu ki te whakarite i ngā kaiwhakamahi. Ka taea e tukua tenei ki a koutou e whakaako akomanga maha i te akoranga kotahi, kia taea e whai i te ihirangi akoranga koutou katoa i roto i te wahi kotahi. Kei raro koe e taea te neke i te kaiwhakamahi ki te wāhanga rerekē, ranei tāpiri / tango wāhanga whakaurunga. Kia Kaiwhakamahi i roto i te iti rawa kia kotahi te wāhanga i nga wa katoa."
       index: 
-        cannot_add_users: "E kore e taea te tāpiri kaiwhakamahi New no te faaoti tēnei akoranga te"
+        cannot_add_users: "E kore e taea te tāpiri kaiwhakamahi hou no te faaoti tēnei akoranga te"
         filter_field_description: "Rapu iwi. Ka rite ki te patopato koe i roto i tenei mara, ka kia tātarihia aunoa i te rārangi o te iwi ki te anake ngā hunga ōrite koutou wāhi nei ingoa."
         group_set: "Tautuhi rōpū"
         people: People
@@ -5784,7 +5784,7 @@ mi:
         course_lock_all_announcements: "Monokia kōrero i runga i mau faaararaa"
         course_name: Ingoa
         course_offline_export: "Akoranga tuimotu"
-        course_section_name: "Tāpiri i te Wāhanga New"
+        course_section_name: "Tāpiri i te Wāhanga Hou"
         course_status_published: "I whakaputaina akoranga te"
         course_status_unpublished: "Ko kaore akoranga"
         course_visibility: Aritanga
@@ -5914,7 +5914,7 @@ mi:
         course_setup: "Akoranga Arowhai Tatūnga"
         drop_course: "Maturuturu tenei akoranga"
         join_course: "Hono tenei akoranga"
-        new_announcement: "Pānuitanga New"
+        new_announcement: "Pānuitanga Hou"
         student_view: "Tirohanga Ākonga "
         view_course_stream: "Tirohia Stream Akoranga"
       re_sending: "Re-Tuku ana ..."
@@ -6710,7 +6710,7 @@ mi:
       include_replies_in_podcast_feed: "Whakautu Whakaurua ngā ākonga i roto i te whāngai podcast"
       only_graders_can_like: "Ka taea e graders anake rite"
       options: kōwhiringa
-      page_header_title: "Aparauraa New"
+      page_header_title: "Aparauraa Hou"
       points_possible: "Piro pea"
       post_at: "Post I"
       save: Tiakina
@@ -7503,7 +7503,7 @@ mi:
       headings: 
         page_comments: "Comments whārangi"
       labels: 
-        add_comment: "Tāpiri i te Tākupu New"
+        add_comment: "Tāpiri i te Tākupu Hou"
         allow_comments: "Tukua Comments i runga i tenei Whārangi"
         choose_submission: "Tīpakohia i tētehi tukunga taumahi ki te whakaū i roto i tēnei whārangi"
         eportfolio_name: "ingoa ePortfolio"
@@ -7530,7 +7530,7 @@ mi:
         view_original: "Tirohia te Kōnae Taketake"
         wizard: "Getting Started Ruānuku"
       login_required: "Me te * koe kia takiuru * ki te hanga kōrero i runga i tēnei whārangi."
-      new_section: "Wāhanga New"
+      new_section: "Wāhanga Hou"
       no_comments: "No Comments"
       no_files: "Kāore he kōnae i tukuna"
       no_submissions: "Kāore he Tukunga kitea"
@@ -7766,7 +7766,7 @@ mi:
   external_feed_was_deleted_403465fd: "Kua mukua te whāngai waho i"
   external_feeds: 
     index_view: 
-      add_a_new_feed: "Tāpiri i te Whāngai New"
+      add_a_new_feed: "Tāpiri i te Whāngai Hou"
       buttons: 
         add_feed: "Tāpiri Whāngai"
         adding_feed: "Tāpiri kai ..."
@@ -8843,7 +8843,7 @@ mi:
         one: "1 kōrero hanga"
         other: "%{count} kōrero hanga"
       done: "Mea ai! Ka mau tatou i te kōnae tukuake koe, ka piri ratou ki te kōrero poto ki te whārangi tāpaetanga o ia kaiwhakamahi mō tēnei taumahi. Ka whiwhi te ākonga i te whakamōhiotanga i honoa he kōrero hōu i."
-      failures: "Object Hai! Ka mau Tātou i file tukuake pēhea koe, ka piri Ultimo ki te kōrero poto ki te whārangi tāpaetanga e every user mō this function. Ka Received te ākonga i te Notification i Linked ia kōrero new i."
+      failures: "Object Hai! Ka mau Tātou i file tukuake pēhea koe, ka piri Ultimo ki te kōrero poto ki te whārangi tāpaetanga e every user mō this function. Ka Received te ākonga i te Notification i Linked ia kōrero hou i."
       files_ignored: 
         one: "1 Kōnae Waiho"
         other: "%{count} Kōnae Waiho"
@@ -10819,13 +10819,13 @@ mi:
           body: "whakairi %{user} he kōrero hou i runga i te fanongonongo:%{discussion_topic} mō te %{course}:"
           discussion_entry_reply_message: "Hono te whakahaere mā te whakamahi i te hono i raro nei, kōrero rānei i te whakautu ki tēnei karere. Ki te whakaaetia, ki te hiahia koe ki te whakauru i tetahi tāpiri, tēnā koa whakauru ki a Canvas ka whakautu ki te panui."
           link: "Pāwhiri ki konei kia uru atu te tiro i te fanongonongo"
-          subject: "Tākupu New i runga i pāohotia %{discussion_topic}:%{course}"
-        subject: "Tākupu New i runga i pāohotia %{discussion_topic}:%{course}"
+          subject: "Tākupu Hou i runga i pāohotia %{discussion_topic}:%{course}"
+        subject: "Tākupu Hou i runga i pāohotia %{discussion_topic}:%{course}"
       sms: 
         body: "Tākupu New i runga i pāohotia %{discussion_topic}:%{course}"
         details: "Ētahi atu info i %{url}"
       summary: 
-        subject: "Tākupu New i runga i pāohotia:%{discussion_topic}:%{course}"
+        subject: "Tākupu Hou i runga i pāohotia:%{discussion_topic}:%{course}"
       twitter: 
         body: "Matohi Kānawehi - pāohotia Comment:%{discussion_topic}, %{course}."
     appointment_canceled_by_user: 
@@ -10971,13 +10971,13 @@ mi:
         message: "Kua Time i'ai tapiritia ki \"%{appointment_name}\" me e wātea ana mō te tohuake."
         subject: "Wāhui \"%{appointment_name}\" Kua whakahōutia (%{course})"
       sms: 
-        message: "E wātea ana hoki \"%{appointment_name}\" i'ai wā New."
+        message: "E wātea ana hoki \"%{appointment_name}\" i'ai wā hou."
         more_info: "Ētahi atu info i %{url}"
       summary: 
         message: "Kua Time i'ai tapiritia ki \"%{appointment_name}\" me e wātea ana mō te tohuake (%{dates})."
         subject: "Wāhui \"%{appointment_name}\" Kua whakahōutia (%{course})"
       twitter: 
-        message: "Matohi Kānawehi - E wātea ana hoki \"%{appointment_name}\" i'ai wā New."
+        message: "Matohi Kānawehi - E wātea ana hoki \"%{appointment_name}\" i'ai wā hou."
     appointment_reserved_by_user: 
       email: 
         html: 
@@ -11403,12 +11403,12 @@ mi:
     course_already_started: 
       email: 
         body: |-
-            Hi% {kaiwhakamahi},
+            Hi%{user},
             
-            % {akoranga}, tō akoranga i runga i Whatunga Kanaweti, tīmata te ra tokorua i mua, a ite matou kihai i takiuru koe i roto i ano. Tatou hinaaro noa ki te tonoa koe e tetahi whakamahara whakamutunga i roto i te take wareware koe.
+            %{course}, tō akoranga i runga i Whatunga Kanaweti, tīmata te ra tokorua i mua, a ite matou kihai i takiuru koe i roto i ano. Tatou hinaaro noa ki te tonoa koe e tetahi whakamahara whakamutunga i roto i te take wareware koe.
             
-            Hei te takiuru i roto i, haere ki% {pae} me te tāuru i tō ingoa, me te kupuhipa. Ki te mea kua kore whakaturia e koe he kupuhipa ano, ka taea e whakaturia e koe tetahi konei:% {password_url}
-            Noa ki te taea e koe te kore e hanga i tēnei akoranga, ite noa ki te tirotiro i to tatou rārangi akoranga i% {pae} ki te kitea tetahi mea atu e faauru koe. Akoranga New Kei te tapiritia te wa katoa!
+            Hei te takiuru i roto i, haere ki %{site} me te tāuru i tō ingoa, me te kupuhipa. Ki te mea kua kore whakaturia e koe he kupuhipa ano, ka taea e whakaturia e koe tetahi konei: %{password_url}
+            Noa ki te taea e koe te kore e hanga i tēnei akoranga, ite noa ki te tirotiro i to tatou rārangi akoranga i %{site} ki te kitea tetahi mea atu e faauru koe. Akoranga hou kei te tapiritia te wa katoa!
             
             Te ti'aturi nei tatou e kite wawe ia koe,
             
@@ -11876,7 +11876,7 @@ mi:
         subject: "He āpititanga rōpū hou mō %{course_or_account}"
       twitter: 
         body_account: "Whakamataara Canvas - Rōpū hou: %{group} mō te pae %{account}"
-        body_course: "Matohi Kānawehi - Rōpū New: %{group} mo te akoranga %{course}"
+        body_course: "Matohi Kānawehi - Rōpū Hou: %{group} mo te akoranga %{course}"
     new_context_group_membership_invitation: 
       email: 
         body_account: "He tono tēnei kia hono koe ki te rōpū %{group} i raro i te pae %{account}."
@@ -11935,13 +11935,13 @@ mi:
           body: "whakairi %{user} he kōrero hou i runga i te miro %{discussion_topic} mō te %{course}:"
           discussion_entry_reply_message: "Hono te whakahaere mā te whakamahi i te hono i raro nei, kōrero rānei i te whakautu ki tēnei karere. Ki te whakaaetia, ki te hiahia koe ki te whakauru i tetahi tāpiri, tēnā koa whakauru ki a Canvas ka whakautu ki te kōrerorero."
           link: "Pāwhiri ki konei kia uru atu te kōrero"
-          subject: "New Comment for %{discussion_topic}: %{course}"
-        subject: "New Comment for %{discussion_topic}: %{course}"
+          subject: "Tākupu hou hoki %{discussion_topic}: %{course}"
+        subject: "Tākupu hou hoki %{discussion_topic}: %{course}"
       sms: 
         body: "New Comment for %{discussion_topic}: %{course}"
         details: "Ētahi atu info i %{url}"
       summary: 
-        subject: "New Comment for %{discussion_topic}: %{course}"
+        subject: "Tākupu hou hoki %{discussion_topic}: %{course}"
       twitter: 
         body: "Matohi Kānawehi - Comment: %{discussion_topic}, %{course}."
     new_discussion_topic: 
@@ -11961,7 +11961,7 @@ mi:
         body: "Kaupapa Hōu mō te %{course}:"
         details: "Ētahi atu info i %{url}"
       summary: 
-        subject: "Aparauraa New - %{discussion_topic}: %{course}"
+        subject: "Aparauraa Hou - %{discussion_topic}: %{course}"
       twitter: 
         subject: "Matohi Kānawehi - Kaupapa: %{discussion_topic}, %{course}"
     new_event_created: 
@@ -12206,7 +12206,7 @@ mi:
         someone: tetahi
         subject: "Tākupu tukunga: %{user}, %{assignment}, %{context}"
       sms: 
-        body: "Kōrero New i te %{author} mō te %{assignment}, %{user}, %{context}."
+        body: "Kōrero Hou i te %{author} mō te %{assignment}, %{user}, %{context}."
         more_info: "Ētahi atu info i %{url}"
       summary: 
         body: "%{author} hanga noa he kōrero hou i runga i te tukunga mō te %{user} mō te %{assignment}."
@@ -12228,7 +12228,7 @@ mi:
         submission_comment_link_message: "Ka taea e koe te arotake i te kōrero tāpaetanga mā te whakamahi i te hono i raro nei, e whakahoki ki tenei kōrero mā te whakautu ki tēnei karere ranei."
       sms: 
         more_info: "Ētahi atu info i %{url}"
-        sms_body: "Kōrero New i te %{author} mō te %{assignment}, %{user}, %{context}."
+        sms_body: "Kōrero Hou i te %{author} mō te %{assignment}, %{user}, %{context}."
       summary: 
         body: "%{author} hanga noa he kōrero hou i runga i te tukunga mō te %{user} mō te %{assignment}."
         someone: tetahi
@@ -12872,8 +12872,8 @@ mi:
   new_gradebook_history_b4367fc7: "Puka kōeke Hītori Hou"
   new_group_category_66be9cbd: "Kāwai Rōpū Hōu"
   new_group_set_7241a581: "Tautuhi Rōpū Hōu"
-  new_module_4e9287e4: "Kōwae New"
-  new_outcome_7fba8c7d: "Putanga New"
+  new_module_4e9287e4: "Kōwae Hou"
+  new_outcome_7fba8c7d: "Putanga Hou"
   new_outcome_group_af59f145: "Rōpū Huanga hou"
   new_question_9107c469: "Pātai hou"
   new_question_group_d9306280: "Rōpū Pātai Hou"
@@ -13036,7 +13036,7 @@ mi:
         * Faaara i hanga e koutou
         * Whakautu ki faaararaa kua hanga koutou
     announcement_created_by_you_display: "Pānuitanga Waihangatia e koe"
-    announcement_description: "Pānuitanga New i roto i to koutou akoranga"
+    announcement_description: "Pānuitanga Hou i roto i to koutou akoranga"
     announcement_display: pānui
     appointment_availability_description: |-
         *Kaiwhakaako me Whakahaere anake:*
@@ -13045,14 +13045,14 @@ mi:
     appointment_availability_display: "Wāhui te wātea"
     appointment_cancelations_description: "Wāhui whakakorenga "
     appointment_cancelations_display: "whakakorenga Wāhui "
-    appointment_signups_description: "Whakarite New i runga i tou maramataka"
+    appointment_signups_description: "Whakarite hou i runga i tou maramataka"
     appointment_signups_display: "Signups Wāhui"
     blueprint_description: |-
         *Kaitohutohu me te Kaiwhakahaere anake:*
         
         I tukutahitia te ihirangi mai i te mape akoranga ki ngā akoranga e hāngai ana
     blueprint_display: "Mape Tukutahi"
-    calendar_description: "Tūemi New me taui i runga i tou maramataka akoranga"
+    calendar_description: "Tūemi hou me taui i runga i tou maramataka akoranga"
     calendar_display: Maramataka
     categories: 
       all_submissions: "Tukunga katoa "
@@ -13082,7 +13082,7 @@ mi:
       submission_comment: "Tākupu Tukunga"
     conversation_created_description: "Hanga koe i te kōrero"
     conversation_created_display: "Kōrero Waihangatia e ahau"
-    conversation_message_description: "Karere Pouakauru New"
+    conversation_message_description: "Karere Pouakauru Hou"
     conversation_message_display: "Karere Kōrerorero"
     course_content_description: |-
         Hurihia ki te ihirangi akoranga:
@@ -13092,11 +13092,11 @@ mi:
     course_content_display: "Ihirangi akoranga"
     discussion_description: "Kaupapa whakawhitinga kōrero hōu i roto i to koutou akoranga"
     discussion_display: Aparauraa
-    discussion_post_description: "Pou kōrero New i roto i te kaupapa e ohauru koe ki"
+    discussion_post_description: "Pou kōrero hou i roto i te kaupapa e ohauru koe ki"
     discussion_post_display: "Aparauraa Post"
     due_date_description: "Taumahi huringa rā tika"
     due_date_display: "rā Nā"
-    files_description: "Tāpiri kōnae New ki tou akoranga"
+    files_description: "Tāpiri kōnae hou ki tou akoranga"
     files_display: Kōnae
     grading_description: |-
         Kei:
@@ -13174,16 +13174,16 @@ mi:
       migration_import_failed: "I rahua Migration Kawemai"
       migration_import_finished: "Migration Kawemai Kua Mutu te"
       new_account_user: "Apataki pae hou"
-      new_announcement: "Pānuitanga New"
+      new_announcement: "Pānuitanga Hou"
       new_context_group_membership: "Horopaki Hōu Mema Rōpū"
-      new_context_group_membership_invitation: "Horopaki New Mema Rōpū Poroaki"
+      new_context_group_membership_invitation: "Horopaki Hou Mema Rōpū Poroaki"
       new_course: "akoranga Hōu"
-      new_discussion_entry: "Tāurunga Aparauraa New"
-      new_discussion_topic: "New Aparauraa Kaupapa"
+      new_discussion_entry: "Tāurunga Aparauraa Hou"
+      new_discussion_topic: "Aparauraa Kaupapa Hou"
       new_event_created: "Fakatupu Takahanga Hōu"
       new_file_added: "Kua tāpirihia Kōnae Hōu"
-      new_files_added: "Ange Kōnae New"
-      new_student_organized_group: "Ākonga New Akanoonooia Rōpū"
+      new_files_added: "Ange Kōnae Hou"
+      new_student_organized_group: "Ākonga Hou Akanoonooia Rōpū"
       new_user: "Kaiwhakamahi Hōu"
       pseudonym_registration: "pseudonym rēhitatanga"
       pseudonym_registration_done: "Pseudonym Rēhitatanga Fai"
@@ -14389,7 +14389,7 @@ mi:
     done_resending: "Mea ai! Tango i te meneti torutoru kia Karere tuku."
     email_select: 
       default_email_option: "[Tīpako Īmēra]"
-      new_email_option: "Wāhitau Īmēra New"
+      new_email_option: "Wāhitau Īmēra Hou"
     errors: 
       confirmation_failed: "I rahua te haamauraa. Tēnā ngana anō."
       generating_token_failed: "Whakanao maimai I Rahua te"
@@ -14420,7 +14420,7 @@ mi:
         authorize_google_drive: "Whakamana Google Drive Access"
         authorize_twitter: "Whakamana Twitter Uru"
         generate_token: "Hanga Maimai"
-        new_access_token: "Maimai Access New"
+        new_access_token: "Maimai Access Hou"
         regenerate_token: "Whakatupu Maimai"
         register_linkedin_account: "Rēhitatia tō pae LinkedIn"
         save_login: "Tohua te takiurutanga"
@@ -14540,7 +14540,7 @@ mi:
         click_to_change_profile_pic: "Pāwhiritia ki te huri i pic kōtaha"
         delicious_login: "Takiurutanga Delicious"
         diigo_login: "Takiurutanga Diigo"
-        new_access_token: "Maimai Access New"
+        new_access_token: "Maimai Access Hou"
         register_skype: "Rēhita Skype"
         remove_account_from_profile: "Tangohia taku pae i tēnei whārangi motuhake"
         unregister_service: "Ratonga te rēhita"
@@ -14577,7 +14577,7 @@ mi:
       masquerade: "poupou pakoko"
     sms_select: 
       default_sms_option: "[Tīpako Cell]"
-      new_sms_option: "Tau Cell New"
+      new_sms_option: "Tau Cell Hou"
     titles: 
       confirm_email_address: "Whakaū Īmēra Wāhitau"
       confirm_sms_number: "Whakaū Tau SMS"
@@ -15436,7 +15436,7 @@ mi:
           no_group: "[No Group]"
         select_a_question_bank: "Tīpakohia te pēke pātai i te rārangi i raro nei ki te hono i te reira ki te tenei pātaitai ano he rōpū pātai."
         titles: 
-          add_new_question_group: "Tāpiri i te Pātai Group New"
+          add_new_question_group: "Tāpiri i te Pātai Group Hou"
       form_answer: 
         answer_in_range_accessible: "i waenganui i * whānuitanga tīmata * me #range mutunga # "
         answer_with_precision_accessible: "*exact answer* ki te pū #precision#"
@@ -16463,7 +16463,7 @@ mi:
       manage_students: "Tāpiri / tango i ngā ākonga mo te akoranga"
       manage_user_logins: "Panonitia ngā mokamoka takiuru mō ngā apataki"
       manage_user_notes: "Whakahaerehia ngā tāurunga manga tohinoá"
-      manage_user_observers: "Whakahaere mataitai mō ngā kaiwhakamahi"
+      manage_user_observers: "Whakahaere kaitirotiro mō ngā kaiwhakamahi"
       manage_wiki: "Whakahaere wiki (tāpiri / edit / muku whārangi)"
       managed_jobs: "Whakahaere mahi papamuri "
       moderate_form: "He āhua kōrero (muku / whakatika atu a pou, kaupapa maukati) "
@@ -16494,7 +16494,7 @@ mi:
       designer: kaihoahoa
       designers: "kaihoahoa "
       observer: kaimātakitaki
-      observers: "mataitai "
+      observers: Kaitirotiro
       student: Akonga
       students: Akonga
       ta: TA
@@ -16802,7 +16802,7 @@ mi:
       next: Next
       previous: Previous
     course_sections: "Wāhanga akoranga "
-    enrollments_observers: "mataitai "
+    enrollments_observers: Kaitirotiro
     enrollments_students: Akonga
     enrollments_tas: "Haapiiraa Kaiāwhina "
     enrollments_teachers: Kaiako
@@ -17007,7 +17007,7 @@ mi:
   select_students_for_review_6e004a12: "Tīpako ākonga mō te arotake"
   select_sub_account_6704196a: "Tīpako Pūkete -iti"
   select_term_f8083fb0: "Tīpako term"
-  select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Tīpakohia te kōnae e hiahia ana koe ki te pāhono, tāpiri i te kōnae mā te tīpako \"Kōnae New\" ranei. "
+  select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Tīpakohia te kōnae e hiahia ana koe ki te pāhono, tāpiri i te kōnae mā te tīpako \"Kōnae Hou\" ranei. "
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "Tīpako te whārangi e hiahia ana koe ki te whakapā atu, ā tāpiri he whārangi hou mā te tīpako ʻWhārangi Houʻ"
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "Tīpako te whārangi e hiahia ana koe ki te whakapā atu ki tēnei *kōwae*, ā tāpiri he whārangi hou mā te tīpako ʻWhārangi Houʻ"
   select_type_of_prerequisite_8d6fa902: "Tīpako te momo titauhia"
@@ -17468,7 +17468,7 @@ mi:
         name: "Ingoa kaupapa"
       new_course_name_placeholder: "Ingoa kaupapa"
       sample_course_code: Akoranga-101
-      start_a_new_course: "Tīmata i te Akoranga New"
+      start_a_new_course: "Tīmata i te Akoranga Hou"
     new_nav_header: 
       links: 
         dashboard: Papatohu
@@ -17648,8 +17648,8 @@ mi:
     select_content_dialog: 
       add_to_module: "Tāpiri %{item} ki te *kōwae* "
       assignment_item: Taumahi
-      assignment_item_select_label: "Tīpakohia te ohipa e hiahia ana koe ki te pāhono, tāpiri ha ngāue mā te tīpako \"Taumahi New\" ranei. "
-      assignment_notice: "Tīpakohia te ohipa e hiahia ana koe ki te pāhono ki tenei * * kōwae, tāpiri ha ngāue mā te tīpako \"Taumahi New\" ranei. "
+      assignment_item_select_label: "Tīpakohia te ohipa e hiahia ana koe ki te pāhono, tāpiri ha ngāue mā te tīpako \"Taumahi Hou\" ranei. "
+      assignment_notice: "Tīpakohia te ohipa e hiahia ana koe ki te pāhono ki tenei * * kōwae, tāpiri ha ngāue mā te tīpako \"Taumahi Hou\" ranei. "
       content_page_item: "Whārangi ihirangi"
       discussion_item: Aparauraa
       discussion_topic_select_label: "Tīpakohia te kaupapa e hiahia ana koe ki te pāhono, tāpiri i te kaupapa mā te tīpako \"Kaupapa Hōu\" ranei. "
@@ -17659,7 +17659,7 @@ mi:
       external_url_item: "URL waho"
       external_url_notice: "E tomo te ingoa URL, me te whārangi ki te tāpiri i te hononga ki tetahi paetukutuku URL ki tenei * kōwae *. "
       file_item: kōnae
-      file_notice: "Tīpakohia te kōnae e hiahia ana koe ki te pāhono ki tenei * * kōwae, tāpiri i te kōnae mā te tīpako \"Kōnae New\" ranei. "
+      file_notice: "Tīpakohia te kōnae e hiahia ana koe ki te pāhono ki tenei * * kōwae, tāpiri i te kōnae mā te tīpako \"Kōnae Hou\" ranei. "
       indent_level: 
         one: "*Nuku 1 Taumata* "
         other: "*Nuku %{count} taumata* "
@@ -17686,8 +17686,8 @@ mi:
       options: 
         assignments: Taumahi
       quiz_item: patapatai
-      quiz_notice: "Tīpakohia te pātaitai e hiahia ana koe ki te pāhono ki tenei * * kōwae, tāpiri i te kotahi hou mā te tīpako \"Quiz New\" ranei. "
-      quiz_select_label: "Tīpakohia te pātaitai e hiahia ana koe ki te pāhono, tāpiri i te kotahi hou mā te tīpako \"Quiz New\" ranei. "
+      quiz_notice: "Tīpakohia te pātaitai e hiahia ana koe ki te pāhono ki tenei * * kōwae, tāpiri i te kotahi hou mā te tīpako \"New Quiz\" ranei. "
+      quiz_select_label: "Tīpakohia te pātaitai e hiahia ana koe ki te pāhono, tāpiri i te kotahi hou mā te tīpako \"New Quiz\" ranei. "
       select_item_type_label: "Tīpakohia te momo o te ihirangi ki te tāpiri. "
       sub_header_notice: "Patohia te kuputuhi rite koe ki te tāpiri rite ki te kōwae * * iti-pane hiahia "
       text_header_item: "Pane Kupu"
@@ -17737,7 +17737,7 @@ mi:
         notice: Notice
       no_valid_users: "*Sorry,* it does not seem as if there were any valid email addresses or login IDs typed in, please go back and try again.*Hei whakapāhā,* te āhua nei kahore he nohoanga karere hiko tika, he tau takiuru rānei i whakauruhia, e hoki ka mahia anōtia."
       titles: 
-        new_user: "kaiwhakamahi New"
+        new_user: "Kaiwhakamahi hou"
       user_list_explanation: "Tauira raupapa: \"Example Student\" <student@example.com>, \"Lastname, Firstname\" <firstlast@example.com>, justAnEmailAddress@example.com"
     wiki_image: 
       titles: 
@@ -19119,8 +19119,8 @@ mi:
   title: 
     edit_announcement: "Whakatika Pānuitanga"
     edit_topic: "Whakatika Kaupapa Aparauraa"
-    new_announcement: "Pānuitanga New"
-    new_topic: "New Aparauraa Kaupapa"
+    new_announcement: "Pānuitanga Hou"
+    new_topic: "Aparauraa Kaupapa Hou"
   title_52b8638d: "taitara:"
   title_appointment_group_you_can_sign_up_for_this_1c254712: "*%{title} rōpū whakarite* Ka taea e koe **haina ake** mo tenei"
   title_ee03d132: taitara
@@ -19437,7 +19437,7 @@ mi:
   use_default_890939b7: "Whakamahia Taunoa "
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "Mahi MathMan ki te huri LaTeX kī MathML?"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Mahi MathMan ki te huri LaTeX kī SVG?"
-  use_new_folder_tree_in_files_bc0ea09f: "Whakamahia Tree Kōpaki New i roto i te Kōnae"
+  use_new_folder_tree_in_files_bc0ea09f: "Whakamahia Tree Kōpaki Hou i roto i te Kōnae"
   use_new_folder_tree_in_files_eb5a451b: "Whakamahia rakau kōpaki hōu i roto i te Kōnae "
   use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: "Whakamahi whai rawa ihirangi ētita me te paetaha whakarei ngā wāhi katoa"
   use_remote_service_for_notifications_9fe667c6: "Whakamahia mahi mamao mō ngā whakamōhiotanga"
@@ -19686,7 +19686,7 @@ mi:
     dashboard_sidebar: 
       coming_up: "haere mai Up"
       recent_feedback: "Urupare Tata"
-      start_new_course: "Tīmata i te Akoranga New"
+      start_new_course: "Tīmata i te Akoranga Hou"
     delete: 
       are_you_sure: "E tino hiahia ana koe ki te muku i tēnei pūkete kaiwhakamahi?"
       buttons: 
