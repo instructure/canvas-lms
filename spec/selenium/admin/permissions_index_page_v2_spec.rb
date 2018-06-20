@@ -49,7 +49,6 @@ describe "permissions index" do
     end
 
     it "updates the permission to the correct selection" do
-      skip("because venk said so, COMMS-1227")
       PermissionsIndex.open_edit_role_tray(@custom_student_role)
       PermissionsIndex.disable_tray_permission("read_announcements", @custom_student_role.id)
       expect{PermissionsIndex.role_tray_permission_state("read_announcements", @custom_student_role.id)}.to become('Disabled')
@@ -169,9 +168,9 @@ describe "permissions index" do
     end
 
     it "updates a permission when changed in the tray" do
-      skip("because venk said so, comms-1227")
       PermissionsIndex.open_permission_tray(@permission_name)
       PermissionsIndex.disable_tray_permission(@permission_name, @role.id)
+
       expect{PermissionsIndex.role_tray_permission_state(@permission_name, @role.id)}.to become('Disabled')
       expect{PermissionsIndex.grid_permission_state(@permission_name, @role.id)}.to become('Disabled')
     end

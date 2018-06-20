@@ -165,6 +165,7 @@ class PermissionsIndex
     def disable_tray_permission(permission_name, role_id)
       permission_tray_button(permission_name, role_id).click()
       ff('[role="menuitemradio"]')[2].click()
+      permission_tray_button(permission_name, role_id)
     end
 
     def open_edit_role_tray(role)
