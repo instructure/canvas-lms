@@ -70,7 +70,8 @@ export default class SubmissionTray extends React.Component {
       htmlUrl: string.isRequired,
       muted: bool.isRequired,
       published: bool.isRequired,
-      anonymousGrading: bool.isRequired
+      anonymousGrading: bool.isRequired,
+      moderatedGrading: bool.isRequired
     }).isRequired,
     contentRef: func,
     currentUserId: string.isRequired,
@@ -169,6 +170,11 @@ export default class SubmissionTray extends React.Component {
   }
 
   renderSubmissionComments () {
+    const { anonymousGrading, moderatedGrading, muted } = this.props.assignment;
+    if (muted && (anonymousGrading || moderatedGrading)) {
+      return;
+    }
+
     if (this.props.submissionCommentsLoaded) {
       return (
         <div>

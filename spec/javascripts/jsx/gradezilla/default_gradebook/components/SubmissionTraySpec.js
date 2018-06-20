@@ -603,6 +603,30 @@ QUnit.module('SubmissionTray', function (hooks) {
     strictEqual(form.length, 1);
   });
 
+  test('renders new comment form if assignment is not muted', function () {
+    mountComponent({assignment: {muted: false, anonymousGrading: false, moderatedGrading: true}});
+    const form = wrapContent().find(SubmissionCommentCreateForm);
+    strictEqual(form.length, 1);
+  });
+
+  test('renders new comment form if assignment is muted and not anonymous or moderated', function () {
+    mountComponent({assignment: {muted: true, anonymousGrading: false, moderatedGrading: false}});
+    const form = wrapContent().find(SubmissionCommentCreateForm);
+    strictEqual(form.length, 1);
+  });
+
+  test('does not render new comment form if assignment is muted and anonymous', function () {
+    mountComponent({assignment: {muted: true, anonymousGrading: true, moderatedGrading: false}});
+    const form = wrapContent().find(SubmissionCommentCreateForm);
+    strictEqual(form.length, 0);
+  });
+
+  test('does not render new comment form if assignment is muted and moderated', function () {
+    mountComponent({assignment: {muted: true, anonymousGrading: false, moderatedGrading: true}});
+    const form = wrapContent().find(SubmissionCommentCreateForm);
+    strictEqual(form.length, 0);
+  });
+
   test('does not render the new comment form if the editedCommentId is not null', function () {
     mountComponent({ editedCommentId: '5' });
     const form = wrapContent().find(SubmissionCommentCreateForm);

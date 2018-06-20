@@ -927,6 +927,10 @@ define [
       @get('selectedSubmission.hidden') || false
     ).property('selectedStudent', 'selectedAssignment')
 
+    hideComments: (->
+      @get('selectedAssignment.muted') && (@get('selectedAssignment.anonymous_grading') || @get('selectedAssignment.moderated_grading')) || false
+    ).property('selectedAssignment')
+
     selectedSubmissionLate: (->
       ( @get('selectedSubmission.points_deducted') || 0 ) > 0
     ).property('selectedStudent', 'selectedAssignment')
