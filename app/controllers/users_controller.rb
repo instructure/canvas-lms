@@ -1020,7 +1020,7 @@ class UsersController < ApplicationController
           assignments: {context_id: shard_course_ids}).
           merge(Assignment.published)
         subs = subs.merge(Assignment.not_locked) if only_submittable
-        submissions = subs.order(:cached_due_date)
+        submissions = subs.order(:cached_due_date, :id)
       end
     end
     assignments = Api.paginate(submissions, self, api_v1_user_missing_submissions_url).map(&:assignment)

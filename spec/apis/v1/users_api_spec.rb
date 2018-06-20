@@ -2048,6 +2048,12 @@ describe "Users API", type: :request do
       expect(json[0]['id']).to eq assign.id
     end
 
+    it "paginates properly when multiple submissions have the same cached_due_date" do
+      id1 = api_call(:get, @path, @params.merge(per_page: 1, page: 1))[0]['id'].to_i
+      id2 = api_call(:get, @path, @params.merge(per_page: 1, page: 2))[0]['id'].to_i
+      expect([id1, id2]).to eq @course.assignments.pluck(:id).sort
+    end
+
     it "should not return locked assignments if filter is set to 'submittable'" do
       @course.assignments.create!(due_at: 3.days.ago,
                                   workflow_state: 'published',
