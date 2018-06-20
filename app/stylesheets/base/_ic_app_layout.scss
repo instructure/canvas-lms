@@ -249,7 +249,7 @@ body:not(.course-menu-expanded) {
 }
 
 .sm-course-menu.list-view{
-  padding: 0 10px;
+  padding: 0 1%;
   position: relative;
   border-bottom: $sm-course-nav-hover-color;
 
@@ -291,7 +291,7 @@ body:not(.course-menu-expanded) {
   background-repeat: no-repeat;
   background-size: cover;
   position: relative;
-  
+
   &:after {
     content: "";
     display: flex;
@@ -395,7 +395,7 @@ body:not(.course-menu-expanded) {
   position: absolute;
   bottom: 0px;
   padding-top: 13px;
-  width: 100%;
+  width: 98%;
 
   ul > li > a:active {
     background: $sm-body-background-color;
@@ -403,7 +403,7 @@ body:not(.course-menu-expanded) {
     background: -o-linear-gradient(to top, $sm-body-background-color 12px, rgba($sm-body-background-color, .8), transparent);
     background: -moz-linear-gradient(to top, $sm-body-background-color 12px, rgba($sm-body-background-color, .8), transparent);
     background: linear-gradient(to top, $sm-body-background-color 12px, rgba($sm-body-background-color, .8), transparent);
-  
+
   }
 }
 
