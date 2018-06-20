@@ -17,11 +17,14 @@
  */
 
 import {shape, string, bool, oneOf, object} from 'prop-types'
+import I18n from 'i18n!permissions_v2_propTypes'
 
 const propTypes = {}
 
 export const COURSE = 'Course'
 export const ACCOUNT = 'Account'
+export const ALL_ROLES_VALUE = '0'
+export const ALL_ROLES_LABEL = I18n.t('All Roles')
 
 propTypes.permission = shape({
   permission_name: string.isRequired,
@@ -46,6 +49,11 @@ propTypes.role = shape({
   contextType: oneOf([COURSE, ACCOUNT]),
   displayed: bool.isRequired,
   permissions: object.isRequired // eslint-disable-line, shape is indeterminate
+})
+
+propTypes.filteredRole = shape({
+  label: string.isRequired,
+  value: string.isRequired
 })
 
 export default propTypes

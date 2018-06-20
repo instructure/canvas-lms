@@ -17,7 +17,7 @@
  */
 
 import createPermissionsIndex from 'jsx/permissions'
-import {COURSE, ACCOUNT} from '../permissions/propTypes'
+import {COURSE, ACCOUNT, ALL_ROLES_VALUE, ALL_ROLES_LABEL} from '../permissions/propTypes'
 import {getSortedRoles} from '../permissions/helper/utils'
 
 const root = document.querySelector('#content')
@@ -47,8 +47,9 @@ function markAndCombineArrays(courseArray, accountArray) {
 const initialState = {
   contextId: ENV.ACCOUNT_ID, // This is at present always an account, I think?
   permissions: markAndCombineArrays(flattenPermissions(ENV.COURSE_PERMISSIONS),
-    flattenPermissions(ENV.ACCOUNT_PERMISSIONS)),
-  roles: getSortedRoles(markAndCombineArrays(ENV.COURSE_ROLES, ENV.ACCOUNT_ROLES))
+  flattenPermissions(ENV.ACCOUNT_PERMISSIONS)),
+  roles: getSortedRoles(markAndCombineArrays(ENV.COURSE_ROLES, ENV.ACCOUNT_ROLES)),
+  selectedRoles: [{value: ALL_ROLES_VALUE, label: ALL_ROLES_LABEL}]
 }
 
 const app = createPermissionsIndex(root, initialState)
