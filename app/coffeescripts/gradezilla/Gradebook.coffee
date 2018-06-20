@@ -1060,7 +1060,9 @@ define [
       @gradebookGrid.gridSupport.state.blur()
 
     sectionList: () ->
-      _.values(@sections).sort((a, b) => (a.id - b.id))
+      _.values(@sections)
+        .sort((a, b) => (a.id - b.id))
+        .map((section) => Object.assign({}, section, {name: htmlEscape.unescape(section.name)}))
 
     updateSectionFilterVisibility: () ->
       mountPoint = document.getElementById('sections-filter-container')

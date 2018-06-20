@@ -3171,7 +3171,10 @@ QUnit.module('Gradebook#updateSectionFilterVisibility', {
     const sectionsFilterContainerSelector = 'sections-filter-container';
     $fixtures.innerHTML = `<div id="${sectionsFilterContainerSelector}"></div>`;
     this.container = $fixtures.querySelector(`#${sectionsFilterContainerSelector}`);
-    const sections = [{ id: '2001', name: 'Freshmen' }, { id: '2002', name: 'Sophomores' }];
+    const sections = [
+      { id: '2001', name: 'Freshmen / First-Year' },
+      { id: '2002', name: 'Sophomores' }
+    ];
     this.gradebook = createGradebook({ sections });
     this.gradebook.sections_enabled = true;
     this.gradebook.setSelectedViewOptionsFilters(['sections']);
@@ -3211,6 +3214,12 @@ test('renders the section select with a list of sections', function () {
   const sections = this.gradebook.sectionFilterMenu.props.items;
   strictEqual(sections.length, 2, 'includes the "nothing selected" option plus the two sections');
   deepEqual(sections.map(section => section.id), ['2001', '2002']);
+});
+
+test('unescapes section names', function () {
+  this.gradebook.updateSectionFilterVisibility();
+  const sections = this.gradebook.sectionFilterMenu.props.items;
+  deepEqual(sections.map(section => section.name), ['Freshmen / First-Year', 'Sophomores']);
 });
 
 test('sets the section select to show the saved "filter rows by" setting', function () {
