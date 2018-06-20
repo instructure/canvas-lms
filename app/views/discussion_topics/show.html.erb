@@ -196,6 +196,9 @@
           <%= render :partial => 'assignment_details' %>
           <%= render :partial => 'peer_reviews' %>
         <% end %>
+        <% if @topic.todo_date? %>
+          <%= render :partial => 'assignment_todo' %>
+        <% end %>
         <% if @topic.for_group_discussion? %>
           <%= render :partial => 'group_discussion', :locals => {show_da_note: (@topic.for_assignment? && @topic.assignment.only_visible_to_overrides)} %>
         <% end %>

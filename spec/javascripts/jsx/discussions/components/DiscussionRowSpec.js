@@ -207,6 +207,41 @@ test('renders nothing if currently available and no end date', () => {
   tree.unmount()
 })
 
+test('renders due date if graded with a due date', () => {
+  const props = makeProps({
+    discussion: {
+      assignment: {
+        due_at: '2018-07-01T05:59:00Z',
+      }
+    }
+  })
+  const tree = mount(<DiscussionRow {...props} />)
+  let node = tree.find('.due-date')
+  ok(node.exists())
+  node = tree.find('.todo-date')
+  notOk(node.exists())
+})
+
+test('renders to do date if ungraded with a to do date', () => {
+  const props = makeProps({
+    discussion: {
+      todo_date: '2018-07-01T05:59:00Z',
+    }
+  })
+  const tree = mount(<DiscussionRow {...props} />)
+  let node = tree.find('.todo-date')
+  ok(node.exists())
+  node = tree.find('due-date')
+  notOk(node.exists())
+})
+
+test('renders neither a due or to do date if neither are available', () => {
+  const tree = mount(<DiscussionRow {...makeProps()} />)
+  let node = tree.find('.todo-date')
+  notOk(node.exists())
+  node = tree.find('due-date')
+  notOk(node.exists())
+})
 
 test('renders the SectionsTooltip component', () => {
   const discussion = { user_count: 200 }

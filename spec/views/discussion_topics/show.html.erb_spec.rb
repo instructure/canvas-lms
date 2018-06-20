@@ -62,6 +62,24 @@ describe "/discussion_topics/show" do
     expect(response).to have_tag("div#discussion_subentries")
   end
 
+  it "should render the student to-do date" do
+    assignment_model(:submission_types => 'discussion_topic')
+    rubric_association_model(:association_object => @assignment, :purpose => 'grading')
+    group_model
+    view_context(@group, @user)
+    @topic = @assignment.discussion_topic
+    @topic.message = nil # the assigns for @context don't seem to carry over to the controller helper method
+    @topic.user = @user
+    @topic.todo_date = "2018-06-22 05:59:00"
+    @topic.save!
+    assign(:topic, @topic)
+    assign(:assignment, AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @user))
+    assign(:presenter, DiscussionTopicPresenter.new(@topic, @user))
+    assign(:assignment_presenter, AssignmentPresenter.new(@assignment))
+    render "discussion_topics/show"
+    expect(response).to have_tag("div.discussion-tododate")
+  end
+
   context "for TAs" do
     it "renders a speedgrader link if user can manage grades but not view all grades" do
       course_with_teacher

@@ -495,11 +495,17 @@ export class DiscussionRow extends Component {
 
   renderDueDate = () => {
     const assignment = this.props.discussion.assignment // eslint-disable-line
-    const dueDateString = assignment && assignment.due_at
-      ? I18n.t('Due %{date}', { date: $.datetimeString(assignment.due_at) })
-      : null
+    let dueDateString = null;
+    let className = '';
+    if (assignment && assignment.due_at) {
+      className = 'due-date'
+      dueDateString = I18n.t('Due %{date}', { date: $.datetimeString(assignment.due_at) });
+    } else if (this.props.discussion.todo_date) {
+      className = 'todo-date'
+      dueDateString = I18n.t('To do %{date}', { date: $.datetimeString(this.props.discussion.todo_date)});
+    }
     return (
-      <div className="ic-discussion-row__content">
+      <div className={`ic-discussion-row__content ${className}`}>
         { dueDateString }
       </div>
     )
