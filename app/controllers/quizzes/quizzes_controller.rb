@@ -440,7 +440,7 @@ class Quizzes::QuizzesController < ApplicationController
         end
       end
 
-      cached_due_dates_changed = @quiz.update_cached_due_dates?
+      cached_due_dates_changed = @quiz.update_cached_due_dates?(quiz_params[:quiz_type])
 
       # TODO: API for Quiz overrides!
       respond_to do |format|

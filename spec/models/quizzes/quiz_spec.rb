@@ -1420,6 +1420,10 @@ describe Quizzes::Quiz do
       expect { @quiz.only_visible_to_overrides = true }.
         to change { @quiz.update_cached_due_dates? }.from(false).to(true)
     end
+
+    it 'returns true when quiz was previously not an assignment, but about to become one' do
+      expect(@quiz.update_cached_due_dates?('assignment')).to be true
+    end
   end
 
   describe "#published?" do

@@ -323,8 +323,11 @@ class Quizzes::Quiz < ActiveRecord::Base
     end
   end
 
-  def update_cached_due_dates?
-    due_at_changed? || workflow_state_changed? || only_visible_to_overrides_changed?
+  def update_cached_due_dates?(next_quiz_type = nil)
+    due_at_changed? ||
+      workflow_state_changed? ||
+      only_visible_to_overrides_changed? ||
+      (assignment.nil? && next_quiz_type == 'assignment')
   end
 
   def assignment?
