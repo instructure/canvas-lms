@@ -67,7 +67,7 @@ module NewUserSearchPage
   end
 
   def masquerade_button(user_name)
-    fj("[data-automation='users list'] tr:contains('#{user_name}') [role=button]:has([name='IconMasqueradeLine'])")
+    fj("[data-automation='users list'] tr:contains('#{user_name}') [role=button]:has([name='IconMasquerade'])")
   end
 
   def send_message_button(user_name)
