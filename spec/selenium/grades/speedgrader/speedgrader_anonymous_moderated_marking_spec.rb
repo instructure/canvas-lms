@@ -162,14 +162,13 @@ describe "SpeedGrader" do
     end
 
     it 'anonymizes grader comments', priority: '1', test_id: 3505165 do
-      skip 'fixed with GRADE-1126'
+      @moderated_anonymous_assignment.grade_student(@student1, grade: '2', grader: @teacher2, provisional: true)
+      @moderated_anonymous_assignment.grade_student(@student2, grade: '2', grader: @teacher2, provisional: true)
 
-      user_session(@teacher2)
-      Speedgrader.visit(@course.id, @moderated_anonymous_assignment.id)
-
-      Speedgrader.enter_grade(15)
-      Speedgrader.add_comment_and_submit('Some comment text')
-      wait_for_ajaximations
+      @moderated_anonymous_assignment.submissions.each do |submission|
+        pg = @moderated_anonymous_assignment.provisional_grades.find_by(submission_id: submission.id)
+        submission.add_comment(author: @teacher2, comment: 'Some comment text', provisonal: true, provisional_grade_id: pg.id)
+      end
 
       user_session(@teacher3)
       Speedgrader.visit(@course.id, @moderated_anonymous_assignment.id)
