@@ -31,7 +31,7 @@ describe "student planner" do
 
   before :each do
     user_session(@student1)
-  end
+  end  
 
   it "shows no due date assigned when no assignments are created.", priority: "1", test_id: 3265570 do
     go_to_list_view
@@ -615,4 +615,35 @@ describe "student planner" do
     wait_for_planner_load
     expect(f('.PlannerApp')).to contain_jqcss('span:contains("Show 1 completed item")')
   end
+  
+  context "teacher in a course" do
+    before :once do 
+      @teacher1 = User.create!(name: 'teacher')
+      @course.enroll_teacher(@teacher1).accept!
+    end
+
+    before :each do
+      user_session(@teacher1)
+    end
+
+    it "shows correct default time in a wiki pages" do
+      skip("skip until ADMIN-1096")
+      Timecop.freeze(Time.zone.today) do
+        @wiki = @course.wiki_pages.create!(title: 'Default Time Wiki Page', todo_date: Time.zone.today)
+        get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
+        wait_for_ajaximations
+        expect(get_value("#todo_date")).to eq "#{format_date_for_view(Time.zone.today)} at 11:59PM"
+      end
+    end
+
+    it "shows correct default time in a ungraded discussions" do
+      skip("skip until ADMIN-1096")
+      Timecop.freeze(Time.zone.today) do
+        @discussion = @course.discussion_topics.create!(title: "Default Time Discussion", message: nil, user: @teacher, todo_date: Time.zone.today)
+        get("/courses/#{@course.id}/discussion_topics/#{@discussion.id}/edit")
+        wait_for_ajaximations
+        expect(get_value("#todo_date")).to eq "#{format_date_for_view(Time.zone.today)} at 11:59PM"
+      end
+    end
+  end 
 end
