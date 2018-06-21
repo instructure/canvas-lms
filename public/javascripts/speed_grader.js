@@ -310,7 +310,7 @@ import './vendor/ui.selectmenu'
         $menu.show().css({
           'left'   : $selectmenu_list.css('left'),
           'top'    : $selectmenu_list.css('top'),
-          'width'  : $selectmenu_list.width() - ($selectmenu_list.hasScrollbar() && $.getScrollbarWidth()),
+          'width'  : $selectmenu_list.width() - 15),
           'z-index': Number($selectmenu_list.css('z-index')) + 1
         });
 
