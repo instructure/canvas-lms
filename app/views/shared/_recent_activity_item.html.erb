@@ -1,6 +1,10 @@
 <% recent_activity_item ||= nil %>
 <% item = recent_activity_item %>
-<tr>
+<% if item.unread %>
+  <tr class="unread">
+<% else %>
+  <tr>
+<% end %>
   <td>
     <% if item.unread %>
       <div class="unread"><span class="accessibly-hidden"><%= t(:unread, "Unread") %></span></div>
