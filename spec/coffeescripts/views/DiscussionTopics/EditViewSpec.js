@@ -538,3 +538,8 @@ test('switches to details tab if save error does not contain conditional release
     return resolved()
   })
 })
+
+test('Does not change the locked status of an existing discussion topic', function() {
+  const view = this.editView({}, {locked: true})
+  equal(true, view.model.get('locked'))
+})

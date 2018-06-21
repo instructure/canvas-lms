@@ -228,7 +228,8 @@ define [
 
       @$(".datetime_field").datetime_field()
 
-      @updateAllowComments()
+      if !@model.get('locked')
+        @updateAllowComments()
 
       this
 
