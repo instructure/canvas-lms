@@ -176,10 +176,17 @@ module SIS
           @batch.data[:supplied_batches] << importer if @csvs[importer].present?
           @batch.data[:counts][importer.to_s.pluralize.to_sym] = 0
         end
+        @run_immediately = @total_rows <= Setting.get('sis_batch_parallelism_count_threshold', '50').to_i
+        @batch.data[:running_immediately] = @run_immediately
+
         @batch.data[:completed_importers] = []
         @batch.save!
 
-        queue_next_importer_set
+        if @run_immediately
+          run_all_importers
+        else
+          queue_next_importer_set
+        end
       rescue => e
         fail_with_error!(e)
       ensure
@@ -225,8 +232,10 @@ module SIS
         fail_with_error!(e)
       ensure
         file&.close
-        if is_last_parallel_importer_of_type?(parallel_importer)
-          queue_next_importer_set unless %w{aborted failed failed_with_messages}.include?(@batch.workflow_state)
+        unless @run_immediately
+          if is_last_parallel_importer_of_type?(parallel_importer)
+            queue_next_importer_set unless %w{aborted failed failed_with_messages}.include?(@batch.workflow_state)
+          end
         end
       end
 
@@ -248,6 +257,18 @@ module SIS
       end
 
       private
+
+      def run_all_importers
+        IMPORTERS.each do |importer_type|
+          importers = @parallel_importers[importer_type]
+          next unless importers
+          importers.each do |pi|
+            run_parallel_importer(pi)
+            return false if %w{aborted failed failed_with_messages}.include?(@batch.workflow_state)
+          end
+        end
+        finish
+      end
 
       def queue_next_importer_set
         next_importer_type = IMPORTERS.detect{|i| !@batch.data[:completed_importers].include?(i) && @parallel_importers[i].present?}

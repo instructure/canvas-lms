@@ -877,11 +877,49 @@ test("hides non-current student name if shouldHideStudentNames is true", functio
   equal(result, 'Student 2 - graded');
 });
 
-QUnit.module('handleSubmissionSelectionChange', {
-  setup() {
-    fakeENV.setup();
-    this.originalWindowJSONData = window.jsonData;
-    this.originalStudent = SpeedGrader.EG.currentStudent;
+QUnit.module('handleSubmissionSelectionChange', (hooks) => {
+  let closedGradingPeriodNotice
+  let getFromCache
+  let originalWindowJSONData
+  let originalStudent
+  let courses
+  let assignment
+  let submission
+  let params
+
+  hooks.beforeEach(() => {
+    fakeENV.setup({
+      assignment_id: '17',
+      course_id: '29',
+      grading_role: 'grader',
+      help_url: 'helpUrl',
+      show_help_menu_item: false
+    })
+    sinon.stub(SpeedGrader.EG, 'handleFragmentChanged')
+    originalWindowJSONData = window.jsonData
+    originalStudent = SpeedGrader.EG.currentStudent
+    courses = `/courses/${ENV.course_id}`;
+    assignments = `/assignments/${ENV.assignment_id}`;
+    submissions = `/submissions/{{submissionId}}`;
+    params = `?download={{attachmentId}}`;
+    fixtures.innerHTML =`
+      <span id="speedgrader-settings"></span>
+      <div id='grade_container'>
+        <input type='text' id='grading-box-extended' />
+      </div>
+      <div id="submission_file_hidden">
+        <a
+          class="display_name"
+          href="${courses}${assignments}${submissions}${params}"
+        </a>
+      </div>
+      <div id="submission_files_list">
+        <a class="display_name"></a>
+      </div>
+      `
+    sinon.stub($, 'ajaxJSON');
+    SpeedGrader.setup()
+
     SpeedGrader.EG.currentStudent = {
       id: 4,
       name: "Guy B. Studying",
@@ -899,12 +937,14 @@ QUnit.module('handleSubmissionSelectionChange', {
         submission_history: [
           {
             submission: {
+              user_id: 4,
               submission_type: 'basic_lti_launch',
               external_tool_url: 'foo'
             }
           },
           {
             submission: {
+              user_id: 4,
               submission_type: 'basic_lti_launch',
               external_tool_url: 'bar'
             }
@@ -920,9 +960,32 @@ QUnit.module('handleSubmissionSelectionChange', {
       points_possible: 10,
       studentMap : {
         4 : SpeedGrader.EG.currentStudent
-      }
-    };
-  },
+      },
+      studentsWithSubmissions: [],
+      submissions: []
+    }
+
+    SpeedGrader.EG.jsonReady()
+    closedGradingPeriodNotice = { showIf: sinon.stub() }
+    getFromCache = sinon.stub(JQuerySelectorCache.prototype, 'get')
+    getFromCache.withArgs('#closed_gp_notice').returns(closedGradingPeriodNotice)
+  })
+
+  hooks.afterEach(() => {
+    getFromCache.restore()
+    window.jsonData = originalWindowJSONData
+    SpeedGrader.EG.currentStudent = originalStudent
+    $.ajaxJSON.restore()
+    SpeedGrader.EG.handleFragmentChanged.restore()
+    fakeENV.teardown()
+    fixtures.innerHTML = ''
+  })
+
+  test('should use submission history lti launch url', () => {
+    const renderLtiLaunch = sinon.stub(SpeedGrader.EG, 'renderLtiLaunch')
+    SpeedGrader.EG.handleSubmissionSelectionChange()
+    ok(renderLtiLaunch.calledWith(sinon.match.any, sinon.match.any, "bar"))
+  })
 
   teardown() {
     SpeedGrader.EG.currentStudent = this.originalStudent;
@@ -937,23 +1000,35 @@ test('should use submission history lti launch url', () => {
   ok(renderLtiLaunch.calledWith(sinon.match.any, sinon.match.any, "bar"));
 });
 
-test('shows a "closed grading period" notice if the submission is in a closed period', () => {
-  const getFromCache = sinon.stub(JQuerySelectorCache.prototype, 'get')
-  const closedGradingPeriodNotice = { showIf: sinon.stub() }
-  getFromCache.withArgs('#closed_gp_notice').returns(closedGradingPeriodNotice)
-  SpeedGrader.EG.handleSubmissionSelectionChange()
-  ok(closedGradingPeriodNotice.showIf.calledWithExactly(true))
-  getFromCache.restore()
-})
+  QUnit.skip('disables the complete/incomplete select when grading period is closed', () => {
+    // the select box is not powered by isClosedForSubmission, it's powered by isConcluded
+    SpeedGrader.EG.currentStudent.submission.grading_period_id = 8
+    SpeedGrader.EG.handleSubmissionSelectionChange()
+    const select = document.getElementById('grading-box-extended')
+    ok(select.hasAttribute('disabled'))
+  })
 
-test('does not show a "closed grading period" notice if the submission is not in a closed period', () => {
-  SpeedGrader.EG.currentStudent.submission.grading_period_id = null
-  const getFromCache = sinon.stub(JQuerySelectorCache.prototype, 'get')
-  const closedGradingPeriodNotice = { showIf: sinon.stub() }
-  getFromCache.withArgs('#closed_gp_notice').returns(closedGradingPeriodNotice)
-  SpeedGrader.EG.handleSubmissionSelectionChange()
-  notOk(closedGradingPeriodNotice.showIf.calledWithExactly(true))
-  getFromCache.restore()
+  QUnit.skip('does not disable the complete/incomplete select when grading period is open', () => {
+    // the select box is not powered by isClosedForSubmission, it's powered by isConcluded
+    SpeedGrader.EG.currentStudent.submission.grading_period_id = 7
+    SpeedGrader.EG.handleSubmissionSelectionChange()
+    const select = document.getElementById('grading-box-extended')
+    notOk(select.hasAttribute('disabled'))
+  })
+
+  test('submission files list template is populated with anonymous submission data', () => {
+    SpeedGrader.EG.currentStudent.submission.currentSelectedIndex = 0
+    SpeedGrader.EG.currentStudent.submission.submission_history[0].submission.versioned_attachments = [{
+      attachment: {
+        id: 1,
+        display_name: 'submission.txt'
+      }
+    }]
+    SpeedGrader.EG.handleSubmissionSelectionChange();
+    const {pathname} = new URL(document.querySelector('#submission_files_list a').href);
+    const expectedPathname = `${courses}${assignments}/submissions/${SpeedGrader.EG.currentStudent.id}`;
+    equal(pathname, expectedPathname);
+  })
 })
 
 QUnit.module('SpeedGrader#isGradingTypePercent', {
@@ -1426,7 +1501,6 @@ QUnit.module('SpeedGrader', function() {
         attachment: {
           id: 1,
           display_name: 'submission.txt'
-
         }
       }]
     }
@@ -1842,7 +1916,7 @@ QUnit.module('SpeedGrader', function() {
         const {pathname} = new URL(document.querySelector('#submission_files_list a').href);
         const expectedPathname = `${courses}${assignments}/anonymous_submissions/${alphaSubmission.anonymous_id}`;
         equal(pathname, expectedPathname);
-      });
+      })
     })
 
     QUnit.module('#renderAttachment', hooks => {
