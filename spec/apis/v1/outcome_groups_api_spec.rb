@@ -1785,5 +1785,38 @@ describe "Outcome Groups API", type: :request do
         "description" => @source_group.description
       })
     end
+
+    context "with async true" do
+      it "creates and returns progress object" do
+        json = api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@target_group.id}/import",
+          { :controller => 'outcome_groups_api',
+            :action => 'import',
+            :account_id => @account.id.to_s,
+            :id => @target_group.id.to_s,
+            :format => 'json' },
+          { :source_outcome_group_id => @source_group.id.to_s,
+            :async => true })
+        progress = Progress.find(json['id'])
+        expect(progress.tag).to eq 'import_outcome_group'
+        expect(progress.workflow_state).to eq 'queued'
+        expect(progress.context).to eq @account
+        expect(progress.user).to eq @user
+      end
+
+      it "creates the outcome group asynchronously" do
+        api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@target_group.id}/import",
+          { :controller => 'outcome_groups_api',
+            :action => 'import',
+            :account_id => @account.id.to_s,
+            :id => @target_group.id.to_s,
+            :format => 'json' },
+          { :source_outcome_group_id => @source_group.id.to_s,
+            :async => true })
+
+        expect(@target_group.child_outcome_groups).to be_empty
+        run_jobs
+        expect(@target_group.child_outcome_groups.length).to eq(1)
+      end
+    end
   end
 end
