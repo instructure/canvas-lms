@@ -1586,7 +1586,7 @@ class CoursesController < ApplicationController
         @course = @context
         @progressions = @current_user.context_module_progressions
         @editable = @course.grants_right?(@current_user, session, :update)
-        @stream_items = @current_user.try(:cached_recent_stream_items) || []
+        @stream_items = @current_user.try(:cached_recent_stream_items, { :contexts => @contexts }) || []
 
         #redirect_to "/courses/#{@context.id}/dynamic_syllabus"
       else

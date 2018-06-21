@@ -14,7 +14,7 @@
     items = categorize_stream_items(@stream_items)["Announcement"]
     if items.present?
   %>
-    <table id="bz-announcements-list">
+    <table id="bz-announcements-list" class="no-zebra">
       <%= render :partial => 'shared/recent_activity_item', :collection => items %>
     </table>
   <%
