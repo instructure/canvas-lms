@@ -238,7 +238,6 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
   }
 
   async function mountAndClick() {
-    props.onSelect = sinon.spy()
     await mountComponent()
     await clickInputToOpenMenu()
   }
@@ -366,7 +365,6 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
     }
 
     test('calls the onSelect prop', async () => {
-      props.onSelect = sinon.spy()
       await openAndSelect(labelForGrader('frizz'))
       strictEqual(props.onSelect.callCount, 1)
     })
@@ -378,7 +376,6 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
 
     test('does not call the onSelect prop when the option for the selected grade is clicked', async () => {
       props.grades.robin.selected = true
-      props.onSelect = sinon.spy()
       await openAndSelect(labelForGrader('robin'))
       strictEqual(props.onSelect.callCount, 0)
     })
@@ -424,11 +421,7 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
       notOk(getOptionLabels().includes(customLabel('11')))
     })
 
-    QUnit.module('when clicking the custom grade option', hooks => {
-      hooks.beforeEach(() => {
-        props.onSelect = sinon.spy()
-      })
-
+    QUnit.module('when clicking the custom grade option', () => {
       test('does not call the onSelect prop when the custom grade is selected', async () => {
         props.grades.teach.selected = true
         await mountAndClick()
@@ -493,6 +486,12 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
     test('includes the "no selection" option', async () => {
       await mountAndClick()
       ok(getOptionLabels().includes('–'))
+    })
+
+    test('allows selecting other grades', async () => {
+      await mountAndClick()
+      await clickOption(labelForGrader('robin'))
+      deepEqual(selectedGrade, props.grades.robin)
     })
   })
 
@@ -766,7 +765,6 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
 
   QUnit.module('when an option has focus and Escape is pressed', hooks => {
     hooks.beforeEach(async () => {
-      props.onSelect = sinon.spy()
       await mountComponent()
       await clickInputToOpenMenu()
     })
@@ -793,7 +791,6 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
 
   QUnit.module('when the input has focus and Enter is pressed', hooks => {
     hooks.beforeEach(async () => {
-      props.onSelect = sinon.spy()
       await mountComponent()
       await clickInputToOpenMenu()
     })
@@ -837,11 +834,7 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
     })
   })
 
-  QUnit.module('when an option has focus and Enter is pressed', hooks => {
-    hooks.beforeEach(() => {
-      props.onSelect = sinon.spy()
-    })
-
+  QUnit.module('when an option has focus and Enter is pressed', () => {
     async function openAndSelect(optionLabel) {
       await mountComponent()
       await clickInputToOpenMenu()
@@ -880,7 +873,6 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
 
   QUnit.module('when selecting a new custom grade', hooks => {
     hooks.beforeEach(async () => {
-      props.onSelect = sinon.spy()
       await mountComponent()
       await clickInputToOpenMenu()
       setInputText('5')

@@ -167,6 +167,13 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
         const gradesGrid = wrapper.find('GradesGrid')
         strictEqual(gradesGrid.prop('disabledCustomGrade'), true)
       })
+
+      test('prevents editing custom grades when there is no final grader', () => {
+        storeEnv.finalGrader = null
+        mountAndInitialize()
+        const gradesGrid = wrapper.find('GradesGrid')
+        strictEqual(gradesGrid.prop('disabledCustomGrade'), true)
+      })
     })
 
     QUnit.module('when grades have been published', contextHooks => {

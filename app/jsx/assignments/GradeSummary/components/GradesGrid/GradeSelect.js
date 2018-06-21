@@ -73,9 +73,11 @@ function buildCustomGradeOption(gradeInfo) {
 }
 
 function customGradeOptionFromProps({finalGrader, grades}) {
-  const customGrade = grades[finalGrader.graderId]
-  if (customGrade) {
-    return buildCustomGradeOption(customGrade)
+  if (finalGrader) {
+    const customGrade = grades[finalGrader.graderId]
+    if (customGrade) {
+      return buildCustomGradeOption(customGrade)
+    }
   }
   return null
 }
@@ -139,16 +141,13 @@ export default class GradeSelect extends Component {
     const graderOptions = optionsForGraders(props.graders, props.grades)
     const options = [...graderOptions]
 
-    let customGradeOption
+    const customGradeOption = customGradeOptionFromProps(props)
 
-    if (props.finalGrader) {
-      customGradeOption = customGradeOptionFromProps(props)
-      if (customGradeOption) {
-        options.push(customGradeOption)
+    if (customGradeOption) {
+      options.push(customGradeOption)
 
-        if (customGradeOption.gradeInfo.selected) {
-          selectedOption = customGradeOption
-        }
+      if (customGradeOption.gradeInfo.selected) {
+        selectedOption = customGradeOption
       }
     }
 

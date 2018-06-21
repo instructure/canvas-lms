@@ -99,7 +99,7 @@ function mapStateToProps(state) {
   const {gradesPublished} = state.assignment.assignment
 
   return {
-    canEditCustomGrades: !gradesPublished && currentUser.id === finalGrader.id,
+    canEditCustomGrades: !(gradesPublished || !finalGrader || currentUser.id !== finalGrader.id),
     finalGrader,
     graders: state.context.graders,
     gradesPublished,
