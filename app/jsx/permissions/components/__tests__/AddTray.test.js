@@ -30,6 +30,8 @@ const defaultProps = () => ({
   loading: false,
   hideTray: () => {},
   open: true,
+  tab: 'course',
+  allLabels: [],
   allBaseRoles: [
     {
       id: '3',
@@ -253,4 +255,19 @@ it('does not pass in the account admin base role in mapStateToProps', () => {
 
   const realProps = mapStateToProps(state, ownProps)
   expect(realProps.allBaseRoles).toEqual([state.roles[0]])
+})
+
+it('onChangeRoleLabel sets error if role is used', () => {
+  const props = defaultProps()
+  props.allLabels = ['student', 'teacher']
+  const tree = shallow(<AddTray {...props} />)
+  const event = {target: {value: ' teacher   '}} // make sure trimming happens
+  tree.instance().onChangeRoleName(event)
+  const expectedErrorState = [
+    {
+      text: 'Cannot add role name teacher: already in use',
+      type: 'error'
+    }
+  ]
+  expect(tree.state().roleNameErrors).toEqual(expectedErrorState)
 })

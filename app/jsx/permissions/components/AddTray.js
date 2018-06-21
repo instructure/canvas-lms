@@ -42,6 +42,7 @@ import {roleIsCourseBaseRole} from '../helper/utils'
 export default class AddTray extends Component {
   static propTypes = {
     allBaseRoles: PropTypes.arrayOf(PropTypes.object).isRequired,
+    allLabels: PropTypes.arrayOf(PropTypes.string).isRequired,
     hideTray: PropTypes.func.isRequired,
     createNewRole: PropTypes.func.isRequired,
     open: PropTypes.bool.isRequired,
@@ -53,7 +54,8 @@ export default class AddTray extends Component {
     super(props)
     this.state = {
       selectedRoleName: '',
-      selectedBaseType: this.props.allBaseRoles[0] || {label: ''}
+      selectedBaseType: this.props.allBaseRoles[0] || {label: ''},
+      roleNameErrors: []
     }
   }
 
@@ -61,13 +63,24 @@ export default class AddTray extends Component {
     if (!this.props.loading) {
       this.setState({
         selectedRoleName: '',
-        selectedBaseType: newProps.allBaseRoles[0] || {label: ''}
+        selectedBaseType: newProps.allBaseRoles[0] || {label: ''},
+        roleNameErrors: []
       })
     }
   }
 
   onChangeRoleName = event => {
-    this.setState({selectedRoleName: event.target.value})
+    const trimmedValue = event.target.value.trim()
+    let errorMessages = []
+    if (this.props.allLabels.includes(trimmedValue)) {
+      const err = I18n.t('Cannot add role name %{name}: already in use', {name: trimmedValue})
+      errorMessages = [{text: err, type: 'error'}]
+    }
+
+    this.setState({
+      selectedRoleName: event.target.value,
+      roleNameErrors: errorMessages
+    })
   }
 
   onChangeBaseType = event => {
@@ -80,7 +93,8 @@ export default class AddTray extends Component {
   hideTray = () => {
     this.setState({
       selectedRoleName: '',
-      selectedBaseType: this.props.allBaseRoles[0] || {label: ''}
+      selectedBaseType: this.props.allBaseRoles[0] || {label: ''},
+      roleNameErrors: []
     })
     this.props.hideTray()
   }
@@ -123,6 +137,7 @@ export default class AddTray extends Component {
         id="add_role_input"
         value={this.state.selectedRoleName}
         label={<Text weight="light">{`${I18n.t('Role Name')}:`}</Text>}
+        messages={this.state.roleNameErrors}
       />
     </Container>
   )
@@ -157,7 +172,7 @@ export default class AddTray extends Component {
           </Button>
           <Button
             id="permissions-add-tray-submit-button"
-            disabled={!this.isDoneSelecting()}
+            disabled={!this.isDoneSelecting() || this.state.roleNameErrors.length !== 0}
             type="submit"
             variant="primary"
             onClick={this.handleSaveButton}
@@ -224,6 +239,7 @@ export function mapStateToProps(state, ownProps) {
 
   const stateProps = {
     allBaseRoles,
+    allLabels: state.roles.map(r => r.label),
     open: true,
     loading: state.activeAddTray && state.activeAddTray.loading,
     tab: state.roles.find(role => !!role.displayed).contextType
