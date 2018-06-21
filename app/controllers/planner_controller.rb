@@ -121,11 +121,18 @@ class PlannerController < ApplicationController
   # ]
   def index
     # fetch a meta key so we can invalidate just this info and not the whole of the user's cache
-    planner_overrides_meta_key = Rails.cache.fetch(planner_meta_cache_key, expires_in: 30.minutes) do
+    planner_overrides_meta_key = Rails.cache.fetch(planner_meta_cache_key, expires_in: 120.minutes) do
       SecureRandom.uuid
     end
 
-    items_response = Rails.cache.fetch(['planner_items', planner_overrides_meta_key, page, params[:filter], default_opts].cache_key, expires_in: 120.minutes) do
+    composite_cache_key = ['planner_items',
+                           planner_overrides_meta_key,
+                           page,
+                           params[:filter],
+                           default_opts,
+                           contexts_cache_key].cache_key
+
+    items_response = Rails.cache.fetch(composite_cache_key, expires_in: 120.minutes) do
       items = collection_for_filter(params[:filter])
       items = Api.paginate(items, self, api_v1_planner_items_url)
       {
@@ -291,6 +298,12 @@ class PlannerController < ApplicationController
       @group_ids = @current_user.group_ids_for_todo_lists(default_opts)
       @user_ids = [@current_user.id]
     end
+  end
+
+  def contexts_cache_key
+    [Context.last_updated_at(Course, @course_ids),
+     Context.last_updated_at(User, @user_ids),
+     Context.last_updated_at(Group, @group_ids)].compact.max || Time.zone.today
   end
 
   def default_opts
