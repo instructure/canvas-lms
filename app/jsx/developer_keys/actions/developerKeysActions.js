@@ -171,6 +171,13 @@ actions.createOrEditDeveloperKeyFailed = () => ({type: actions.CREATE_OR_EDIT_DE
 actions.SET_EDITING_DEVELOPER_KEY = 'SET_EDITING_DEVELOPER_KEY'
 actions.setEditingDeveloperKey = payload => ({type: actions.SET_EDITING_DEVELOPER_KEY, payload})
 
+actions.editDeveloperKey = payload => dispatch => {
+  if (payload) {
+    dispatch(actions.listDeveloperKeyScopesSet(payload.scopes))
+  }
+  dispatch(actions.setEditingDeveloperKey(payload))
+}
+
 actions.DEVELOPER_KEYS_MODAL_OPEN = 'DEVELOPER_KEYS_MODAL_OPEN'
 actions.developerKeysModalOpen = () => {
   window.location.hash = "key_modal_opened"
@@ -270,7 +277,7 @@ actions.createOrEditDeveloperKey = (formData, url, method) => dispatch => {
       dispatch(actions.createOrEditDeveloperKeyFailed())
     })
     .finally(() => {
-      dispatch(actions.setEditingDeveloperKey())
+      dispatch(actions.editDeveloperKey())
     })
 }
 

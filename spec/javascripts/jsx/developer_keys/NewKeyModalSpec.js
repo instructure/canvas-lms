@@ -30,7 +30,7 @@ const selectedScopes = [
 
 const fakeActions = {
   createOrEditDeveloperKey: () => {},
-  setEditingDeveloperKey: () => {}
+  editDeveloperKey: () => {}
 }
 
 const developerKey = {
@@ -121,7 +121,7 @@ test('it dismisses the modal when the "cancel" button is pressed', () => {
   const fakeActions = {
     createOrEditDeveloperKey: () => {},
     developerKeysModalClose: closeModalSpy,
-    setEditingDeveloperKey: () => {}
+    editDeveloperKey: () => {}
   }
 
   const wrapper = shallow(
@@ -147,7 +147,7 @@ test('clear the active key when the cancel button is closed', () => {
   const fakeActions = {
     createOrEditDeveloperKey: () => {},
     developerKeysModalClose: () => {},
-    setEditingDeveloperKey: setKeySpy
+    editDeveloperKey: setKeySpy
   }
 
   const wrapper = shallow(
@@ -445,4 +445,28 @@ test('flashes an error if no scopes are selected', () => {
   flashStub.restore()
 
   wrapper.unmount()
+})
+
+test('allows saving if the key previously had scopes', () => {
+  const flashStub = sinon.stub($, 'flashError')
+  const dispatchSpy = sinon.spy()
+  const fakeStore = { dispatch: dispatchSpy }
+  const keyWithScopes = Object.assign({}, developerKey, { require_scopes: true, scopes: selectedScopes })
+  const editKeyWithScopesState = Object.assign({}, editDeveloperKeyState, { developerKey: keyWithScopes })
+  const wrapper = mount(
+    <DeveloperKeyModal
+      availableScopes={{}}
+      availableScopesPending={false}
+      createOrEditDeveloperKeyState={editKeyWithScopesState}
+      listDeveloperKeyScopesState={listDeveloperKeyScopesState}
+      actions={fakeActions}
+      store={fakeStore}
+      mountNode={modalMountNode}
+      selectedScopes={selectedScopes}
+    />
+  )
+
+  wrapper.node.submitForm()
+  notOk(flashStub.called)
+  flashStub.restore()
 })

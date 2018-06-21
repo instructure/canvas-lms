@@ -212,7 +212,7 @@ DeveloperKeysApp.propTypes = {
     developerKeysModalOpen: PropTypes.func.isRequired,
     getRemainingDeveloperKeys: PropTypes.func.isRequired,
     getRemainingInheritedDeveloperKeys: PropTypes.func.isRequired,
-    setEditingDeveloperKey: PropTypes.func.isRequired
+    editDeveloperKey: PropTypes.func.isRequired
   }).isRequired,
   applicationState: PropTypes.shape({
     createOrEditDeveloperKey: PropTypes.shape({

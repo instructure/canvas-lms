@@ -78,7 +78,7 @@ const defaultProps = {
     activateDeveloperKey: () => {},
     deactivateDeveloperKey: () => {},
     deleteDeveloperKey: () => {},
-    setEditingDeveloperKey: () => {},
+    editDeveloperKey: () => {},
     developerKeysModalOpen: () => {},
   },
   ctx: { params: { contextId: 'context' } }

@@ -266,7 +266,7 @@ DeveloperKey.propTypes = {
     activateDeveloperKey: PropTypes.func.isRequired,
     deactivateDeveloperKey: PropTypes.func.isRequired,
     deleteDeveloperKey: PropTypes.func.isRequired,
-    setEditingDeveloperKey: PropTypes.func.isRequired,
+    editDeveloperKey: PropTypes.func.isRequired,
     developerKeysModalOpen: PropTypes.func.isRequired
   }).isRequired,
   developerKey: PropTypes.shape({

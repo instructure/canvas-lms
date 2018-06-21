@@ -119,7 +119,7 @@ export default class DeveloperKeyModal extends React.Component {
 
   closeModal = () => {
     this.props.store.dispatch(this.props.actions.developerKeysModalClose())
-    this.props.store.dispatch(this.props.actions.setEditingDeveloperKey())
+    this.props.store.dispatch(this.props.actions.editDeveloperKey())
   }
 
   render() {
@@ -163,7 +163,7 @@ DeveloperKeyModal.propTypes = {
   actions: PropTypes.shape({
     createOrEditDeveloperKey: PropTypes.func.isRequired,
     developerKeysModalClose: PropTypes.func.isRequired,
-    setEditingDeveloperKey: PropTypes.func.isRequired,
+    editDeveloperKey: PropTypes.func.isRequired,
     listDeveloperKeyScopesSet: PropTypes.func.isRequired
   }).isRequired,
   createOrEditDeveloperKeyState: PropTypes.shape({
