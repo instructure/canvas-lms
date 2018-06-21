@@ -46,7 +46,7 @@ class WikiPage < ActiveRecord::Base
         page.workflow_state = 'deleted'
         page.save!
       end
-    elsif self.body_changed?
+    elsif self.body_changed? || self.title_changed?
       WikiPage.where(:clone_of_id => id).each do |page|
         # Look for links to other pages / assignments in the Content Library and update those
         # be links to the associated pages / assignment in the local course.
@@ -58,7 +58,7 @@ class WikiPage < ActiveRecord::Base
           # Syncing titles changes the page URL which has a
           # major risk of breaking links in the courses. I
           # am thus going to leave that manual - adr
-          # page.title = title
+          page.title = title
           page.is_content_library_sync = true
           page.save
         else

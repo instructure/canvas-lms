@@ -28,13 +28,14 @@ CanvasRails::Application.routes.draw do
   get 'bz/retained_data_stats' => 'bz#retained_data_stats'
   get 'bz/retained_data_export' => 'bz#retained_data_export'
   get 'bz/magic_field_dump' => 'bz#magic_field_dump'
+  get 'bz/magic_fields_for_cohort' => 'bz#magic_fields_for_cohort'
   get 'bz/courses_for_email' => 'bz#courses_for_email'
 
   get 'bz/user_linkedin_url' => 'bz#user_linkedin_url'
 
   get 'bz/grade_details' => 'bz#grade_details'
 
-  get 'bz/grades_download' => 'bz#grades_download', defaults: { format: 'csv' }
+  get 'bz/grades_download' => 'bz#grades_download'
 
   get 'bz/linked_in_auth' => 'bz#linked_in_auth'
   get 'bz/linked_in_export' => 'bz#linked_in_export'

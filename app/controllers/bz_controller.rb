@@ -11,9 +11,9 @@ require 'bz_grading'
 
 class BzController < ApplicationController
 
-  # magic field dump uses an access token instead
+  # magic field dump / for cohorts uses an access token instead
   # and courses_for_email is unauthenticated since it isn't really sensitive
-  before_filter :require_user, :except => [:magic_field_dump, :courses_for_email]
+  before_filter :require_user, :except => [:magic_field_dump, :courses_for_email, :magic_fields_for_cohort]
   skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user, :user_retained_data_batch]
 
   # this is meant to be used for requests from external services like LL kits
@@ -39,6 +39,66 @@ class BzController < ApplicationController
     ul.users.each do |u|
       u.enrollments.active.each do |e|
         result["course_ids"] << e.course_id
+      end
+    end
+
+    render :json => result
+  end
+
+  # given an email and a list of magic field names,
+  # it will return the responses for each magic field
+  # requested for the cohort under that email.
+  #
+  # You can optionally pass a course_id too.
+  #
+  # email=whatever&fields[]=something&fields[]=more
+  # etc. returns; { "answers" : { "field": { "student":"answer","student2":"answer2" }, "field2"....etc } }
+  def magic_fields_for_cohort
+
+    access_token = AccessToken.authenticate(params[:access_token])
+    if access_token.nil?
+      render :json => "Access denied"
+      return
+    end
+
+    requesting_user = access_token.user
+    # we should prolly allow designer accounts to access too, but
+    # for now i just want to use the admin access token for myself
+    if requesting_user.id != 1
+      render :json => "Not admin"
+      return
+    end
+
+
+    email = params[:email]
+    enrollment = nil
+    ul = UserList.new(email)
+    ul.users.each do |user|
+      if params[:course_id]
+        user.ta_enrollments.each do |tae|
+          if tae.course_id.to_s == params[:course_id].to_s
+            enrollment = tae
+          end
+        end
+      else
+        enrollment = user.ta_enrollments.first
+      end
+      break unless enrollment.nil?
+    end
+
+    result = {}
+    result["answers"] = {}
+
+    if enrollment
+      enrollment.course_section.students.each do |student|
+        params[:fields].each do |name|
+          if result["answers"][name].nil?
+            result["answers"][name] = {}
+          end
+          rd = RetainedData.get_for_course(enrollment.course_id, student.id, name)
+          value = rd.nil? ? "" : rd.value
+          result["answers"][name][student.name] = value
+        end
       end
     end
 
@@ -169,7 +229,7 @@ class BzController < ApplicationController
   end
 
   def grades_download
-    download = BzController::ExportGrades.new(@current_user.email, params)
+    download = BzController::ExportGrades.new(@current_user.id, params)
     Delayed::Job.enqueue(download, max_attempts: 1)
   end
 
@@ -663,14 +723,14 @@ class BzController < ApplicationController
   # (private)
   
   class ExportGrades
-    def initialize(email, params)
-      @email = email
+    def initialize(user_id, params)
+      @user = User.find(user_id)
       @params = params
     end
     
     def perform
-      csv = Export::GradeDownload.csv(@params)
-      Mailer.bz_message(@email, "Export Success", "Attached is your export data", "grades_download" => csv).deliver
+      csv = Export::GradeDownload.csv(@user, @params)
+      Mailer.bz_message(@user.email, "Export Success: Course #{@params[:course_id]}", "Attached is your export data", "grades_download.csv" => csv).deliver
       
       csv
     end
@@ -679,7 +739,7 @@ class BzController < ApplicationController
       er_id = Canvas::Errors.capture_exception("BzController::ExportGrades", error)[:error_report]
       # email us?
       Mailer.debug_message("Export FAIL", error.to_s).deliver
-      Mailer.bz_message(@email, "Export Failed :(", "Your grades download export didn't work. The tech team was also emailed to look into why.")
+      Mailer.bz_message(@user.email, "Export Failed :(", "Your grades download export didn't work. The tech team was also emailed to look into why.")
     end
   end
   
