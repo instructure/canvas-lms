@@ -83,4 +83,11 @@ QUnit.module('GradeSummary GradeIndicator', suiteHooks => {
     wrapper.setProps({gradeInfo: {...props.gradeInfo, selected: true}})
     notEqual(style.color, colorBefore)
   })
+
+  test('adds screenreader text when the grade is selected', () => {
+    mountComponent()
+    wrapper.setProps({gradeInfo: {...props.gradeInfo, selected: true}})
+    const text = wrapper.children().map(child => child.text())
+    deepEqual(text, ['10', 'Selected Grade'])
+  })
 })

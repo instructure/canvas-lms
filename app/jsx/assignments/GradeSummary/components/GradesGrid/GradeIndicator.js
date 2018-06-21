@@ -18,6 +18,7 @@
 
 import React, {Component} from 'react'
 import {bool, number, shape, string} from 'prop-types'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import View from '@instructure/ui-layout/lib/components/View'
 import I18n from 'i18n!assignment_grade_summary'
@@ -58,6 +59,8 @@ export default class GradeIndicator extends Component {
         <Text color={textColor}>
           {gradeInfo && gradeInfo.score != null ? I18n.n(gradeInfo.score) : '–'}
         </Text>
+
+        {selected && <ScreenReaderContent>{I18n.t('Selected Grade')}</ScreenReaderContent>}
       </View>
     )
   }
