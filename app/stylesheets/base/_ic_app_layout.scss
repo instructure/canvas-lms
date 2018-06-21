@@ -249,7 +249,7 @@ body:not(.course-menu-expanded) {
 }
 
 .sm-course-menu.list-view{
-  padding: 0 10px;
+  padding: 0 1%;
   position: relative;
   border-bottom: $sm-course-nav-hover-color;
 
@@ -390,7 +390,11 @@ body:not(.course-menu-expanded) {
   background: $sm-body-background-color;
   position: absolute;
   bottom: 0px;
+<<<<<<< HEAD
   width: 100%;
+=======
+  width: 98%;
+>>>>>>> master
 
   ul > li > a:active {
     background: $sm-body-background-color;
