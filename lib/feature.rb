@@ -139,8 +139,7 @@ END
       display_name: -> { I18n.t('Updated Permissions Page') },
       description: -> { I18n.t('Use the new interface for managing permissions') },
       applies_to: 'Account',
-      state: 'hidden',
-      development: true,
+      state: 'allowed',
     },
     'google_docs_domain_restriction' =>
     {
