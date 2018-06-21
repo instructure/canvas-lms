@@ -1518,7 +1518,7 @@ es:
   add_course_calendar_events_146154a5: "Agregar eventos al calendario del curso"
   add_criterion_eb9587ef: "Agregar criterio"
   add_custom_link_22059c0: "Agregar un enlace personalizado"
-  add_discussion_653dab4c: "Agregar un debate"
+  add_discussion_653dab4c: "Agregar un foro"
   add_email_address_aef3b61: "Agregar una dirección de correo electrónico"
   add_existing_content_7e36da66: "Agregar contenido existente"
   add_external_feed_6d437a28: "Agregar un canal externo"
@@ -1712,7 +1712,7 @@ es:
   allow_users_to_comment_45b8f753: "Permitir que los usuarios comenten"
   allowed_attempts_4e229caa: "Intentos permitidos"
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Permite crear anuncios para una sección específica"
-  allows_creating_discussions_for_a_specific_section_6bf44036: "Permite crear debates para una sección específica"
+  allows_creating_discussions_for_a_specific_section_6bf44036: "Permite crear foros para una sección específica"
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Permitir que los profesores marquen los datos de calificación para ser exportados en cantidad a las integraciones de SIS."
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "Permite la duplicación de módulos en Canvas"
   allows_the_duplicating_of_objects_in_canvas_c86f3665: "Permite la duplicación de objetos en Canvas"
@@ -2826,7 +2826,7 @@ es:
   at_the_bottom_a6a5f0fe: "En la parte inferior"
   at_the_top_c2ce2371: "En la parte superior"
   at_the_top_fa836591: "En la parte superior"
-  attach_files_to_discussions_bd16c245: "Adjuntar archivos a los debates"
+  attach_files_to_discussions_bd16c245: "Adjuntar archivos a los foros"
   attach_terms_2b8770a5: "Adjuntar términos"
   attached_display_name_afa00c2e: "Adjunto: %{display_name}"
   attached_files_must_be_greater_than_0_bytes_7f57bee7: "Los archivos adjuntos deben ser más grandes que 0 bytes"
@@ -3821,7 +3821,7 @@ es:
   click_here_for_an_account_9536cb36: "Haga clic aquí para una cuenta"
   click_here_it_s_free_eeccb9cb: "Haga clic aquí, ¡es gratis!"
   click_here_on_the_calendar_link_c9965631: "Haga clic aquí en el enlace del *Calendario*"
-  click_here_to_add_a_discussion_f17c4260: "Haga clic aquí para agregar un debate"
+  click_here_to_add_a_discussion_f17c4260: "Haga clic aquí para agregar un foro"
   click_here_to_download_size_of_file_74443988: "Haga clic aquí para descargar %{size_of_file}"
   click_here_to_log_in_again_4a6055de: "Haga clic aquí para volver a iniciar sesión"
   click_here_to_see_the_file_79e2b366: "Haga clic aquí para ver el archivo."
@@ -3880,8 +3880,8 @@ es:
   close_date_9b52fb9b: "Fecha de cierre:"
   close_date_a2f617b3: "Fecha de cierre"
   close_details_sidebar_ff8f663d: "Cerrar la barra lateral de detalles"
-  close_discussion_settings_e6f4b31f: "Cerrar configuraciones de debates"
-  close_discussion_title_for_comments_adde43bc: "Cerrar debate %{title} para comentarios"
+  close_discussion_settings_e6f4b31f: "Cerrar configuraciones de foros"
+  close_discussion_title_for_comments_adde43bc: "Cerrar foro %{title} para comentarios"
   close_for_comments_37783f56: "Cerrar para comentarios"
   close_for_comments_ce0e5d00: "Cerrar para comentarios"
   close_grade_info_58ef5a20: "Cerrar información de las calificaciones"
@@ -4033,7 +4033,7 @@ es:
     from_beginning: "el comienzo"
     to_now: ahora
   comment_by_replying_to_this_message_or_join_the_co_26d42fde: "Comentar al responder a este mensaje, o únase a la conversación usando este enlace: %{link}."
-  comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "Comente respondiendo a este mensaje, o únase a la conversación mediante este enlace: %{link}. Cuando esté permitido, si debe incluir un archivo adjunto, inicie sesión en Canvas y responda al debate."
+  comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "Comente respondiendo a este mensaje, o únase a la conversación mediante este enlace: %{link}. Cuando esté permitido, si debe incluir un archivo adjunto, inicie sesión en Canvas y responda al foro."
   comment_by_replying_to_this_message_or_join_the_co_886bc612: "Comente respondiendo a este mensaje, o únase a la conversación mediante este enlace: %{link}Cuando esté permitido, si debe incluir un archivo adjunto, inicie sesión en Canvas y responda al anuncio."
   comments_e07bcbe3: Comentarios
   commmessages_9fa33faa: CommMessages
@@ -4220,7 +4220,7 @@ es:
   confirm_contact_method_29d6fe4b: "Confirmar el método de contacto"
   confirm_delete_6febeafb: "Confirmar eliminación"
   confirm_delete_announcements_3d83b69a: "Confirmar eliminación de anuncios"
-  confirm_delete_discussions_1fb0d053: "Confirmar eliminación de debates"
+  confirm_delete_discussions_1fb0d053: "Confirmar eliminación de foros"
   confirm_deletion_b2efe7d4: "Confirmar el eliminado"
   confirm_dialog: 
     cancel: Cancelar
@@ -5064,7 +5064,7 @@ es:
   correct_check_icon_617da6c3: "icono de comprobación correcto"
   costa_rica_506_d63d2ea1: "Costa Rica (+506)"
   costa_rica_97d66afe: "Costa Rica"
-  could_not_duplicate_discussion_953ed67f: "No se puede duplicar el debate"
+  could_not_duplicate_discussion_953ed67f: "No se puede duplicar el foro"
   could_not_save_chosencolor_741b74ce: "No se pudo guardar '%{chosenColor}'"
   couldn_t_find_an_authority_to_update_44d9407e: "No se pudo encontrar una autoridad para actualizar"
   couldn_t_find_canvas_csv_import_headers_487f1b6c: "No ha sido posible encontrar los encabezados de importación CSV de Canvas"
@@ -5091,7 +5091,7 @@ es:
   count_criteria_22927713: 
     one: 1 criterio
     other: "%{count} criterios"
-  count_discussions_found_fc326362: "%{count} debates encontrados."
+  count_discussions_found_fc326362: "%{count} foros encontrados."
   count_errors_5cde7fdc: 
     one: "1 error"
     other: "%{count} errores"
@@ -6056,7 +6056,7 @@ es:
   create_content_for_your_course_500a7032: "Crear contenido para el curso"
   create_criterion_6df4d4ad: "Crear criterio"
   create_developer_key_78de8510: "Crear clave del desarrollador"
-  create_discussion_topics_8330d52b: "Crear temas de debate"
+  create_discussion_topics_8330d52b: "Crear temas de foro"
   create_educational_resources_8219326e: "Crear recursos educativos"
   create_failed_15d07ad4: "La creación no se pudo completar"
   create_item_base: 
@@ -6460,7 +6460,7 @@ es:
   delete_current_message_5da0221a: "Eliminar el mensaje actual"
   delete_current_module_item_21fefc54: "Eliminar el módulo/Elemento actual"
   delete_custom_help_link_814f0509: "Eliminar enlace de ayuda personalizado"
-  delete_discussion_title_a28df8b6: "Eliminar debate %{title}"
+  delete_discussion_title_a28df8b6: "Eliminar foro %{title}"
   delete_entry_title_5e59727b: "Borrar contribución %{title}"
   delete_feedname_1ac9a4a4: "Eliminar %{feedName}"
   delete_grading_period_dba36e59: "Eliminar período de calificación"
@@ -6667,7 +6667,7 @@ es:
   disccussions_515a3a99: Debates
   discovery_url_3dce06d9: "URL de descubrimiento"
   discussion_6719c51d: Foro
-  discussion_assignments_cannot_be_section_specific_93d63843: "Las tareas de debate no pueden ser específicas de una sección"
+  discussion_assignments_cannot_be_section_specific_93d63843: "Las tareas de foro no pueden ser específicas de una sección"
   discussion_closed_for_comments_successfully_dfaab1d8: "Debate cerrado para comentarios exitosamente"
   discussion_entries: 
     created_entry_notice: "Contribución creada con éxito."
@@ -6680,11 +6680,11 @@ es:
   discussion_entry: 
     atom_no_author: "Sin autor"
     default_user_name: "Nombre de usuario"
-  discussion_filter_5d68de61: "Filtro de debates"
+  discussion_filter_5d68de61: "Filtro de foros"
   discussion_group_category_locked: "Las categorías grupales no se pueden configurar directamente en las tareas de foro, sino que debe hacerse en el propio foro"
   discussion_opened_for_comments_successfully_b320dc39: "Debate abierto para comentarios exitosamente"
   discussion_pinned_successfully_f9c03d9f: "Debate marcado exitosamente"
-  discussion_settings_2fbf0b95: "Configuraciones de debates"
+  discussion_settings_2fbf0b95: "Configuraciones de foros"
   discussion_submission_781d5d33: "Presentación del foro"
   discussion_topic: 
     atom_no_author: "Sin autor"
@@ -6787,7 +6787,7 @@ es:
     error_draft_state_with_posts: "Este tema no se puede marcar como borrador porque contiene publicaciones."
     error_group_announcement: "No puede utilizar un foro grupal en un anuncio."
     error_group_change: "No puede cargar la configuración de grupos en un foro con respuestas."
-    error_section_permission: "No tiene permiso para editar debates de la(s) sección(es) %{section_ids}"
+    error_section_permission: "No tiene permiso para editar foros de la(s) sección(es) %{section_ids}"
     error_todo_date_assignment: "No se puede agregar la fecha si el tema del foro ha sido calificado"
     error_todo_date_unauthorized: "No tiene permiso para agregar este tema a la lista por hacer del alumno."
     flash: 
@@ -6808,7 +6808,7 @@ es:
       assignments: Tareas
       delete: Eliminar
       discussion_topics: "Temas del foro"
-      edit_settings: "Editar la configuración de los foros"
+      edit_settings: "Editar la configuración de los Foros"
       loading: Cargando...
       lock_for_comments: "Buscar comentarios"
       make_sure_all_search_terms_are_spelled_correctly: "Asegurarse de que todos los términos de búsqueda están escritos correctamente."
@@ -6928,7 +6928,7 @@ es:
       deleted: "Eliminada por *%{editor_name}* el %{edited_at}"
     discussion_participant: "Participante del foro"
     discussions: Foros
-    edit_settings: "Editar la configuración de los foros"
+    edit_settings: "Editar la configuración de los Foros"
     entry_collection_view: 
       add_reply_to_topic: "Agregar respuesta al tema"
     entry_content: 
@@ -6999,7 +6999,7 @@ es:
     unsubscribed_hint: "No está suscripto a este tema. Haga clic aquí para suscribirse."
   discussions_a5f96392: Foros
   discussions_tutorial_tray_4ef79bcc: "Bandeja de tutoriales: foros"
-  discussions_with_groups_cannot_be_section_specific_1146d29: "Los debates con grupos no pueden ser específicos de una sección"
+  discussions_with_groups_cannot_be_section_specific_1146d29: "Los foros con grupos no pueden ser específicos de una sección"
   dismiss_dacdb625: Descartar
   dismiss_itemtitle_c5020a4c: "Descartar %{itemTitle}"
   dismiss_this_5c74dddc: "Descartar esto"
@@ -7108,8 +7108,8 @@ es:
   due_time_9acd6b69: "Fecha límite %{time}"
   duplicate_31cec192: Duplicado
   duplicate_assignment_name_3ca7d753: "Tarea duplicada %{name}"
-  duplicate_discussion_title_43b39959: "Duplicar debate %{title}"
-  duplicate_discussion_title_6537ef4d: "Duplicar debate %{title}"
+  duplicate_discussion_title_43b39959: "Duplicar foro %{title}"
+  duplicate_discussion_title_6537ef4d: "Duplicar foro %{title}"
   duplicate_item_339f54bb: "Elemento duplicado"
   duplicate_module_module_name_be40ad50: "Duplicar módulo %{module_name}"
   duplicate_modules_8ea35557: "Duplicar módulos"
@@ -7157,7 +7157,7 @@ es:
   edit_criterion_description_5828919: "Editar descripción del criterio"
   edit_current_message_da650d4c: "Editar el mensaje actual"
   edit_developer_key_d8fa33c4: "Editar clave del desarrollador"
-  edit_discussion_settings_1bbb03d: "Editar configuraciones de Debate"
+  edit_discussion_settings_1bbb03d: "Editar configuraciones de Foro"
   edit_grading_period_e39af45d: "Editar período de calificación"
   edit_grading_period_set_c548f4df: "Editar conjunto de período de calificación"
   edit_grading_scheme_53091236: "Editar el esquema de calificaciones"
@@ -7681,7 +7681,7 @@ es:
   error_retrieving_assignment_configuration_tools_f7d75303: "Error al recuperar las herramientas de configuración de la tarea"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Error al consultar las herramientas de detección de similitud"
   error_running_quizzes_2_export_cfecedba: "Error al ejecutar la exportación a Evaluaciones 2."
-  error_saving_discussion_settings_3360661d: "Error al guardar las configuraciones del debate"
+  error_saving_discussion_settings_3360661d: "Error al guardar las configuraciones del foro"
   error_uploading_file_e2d31b56: "Error al cargar archivo."
   error_while_importing_csv_please_contact_support_e_57e6b3b: "Error al importar CSV. Póngase en contacto con el servicio de asistencia (Informe de error %{number})"
   errors: 
@@ -7962,7 +7962,7 @@ es:
   failed_to_close_discussion_for_comments_28603bca: "No se pudo cerrar el debate para comentarios"
   failed_to_create_webhook_b766cf5c: "Hubo un error al crear webhook."
   failed_to_create_zip_file_1a943d06: "Hubo una falla al crear el archivo comprimido"
-  failed_to_delete_discussion_title_986df717: "Error al eliminar el debate %{title}"
+  failed_to_delete_discussion_title_986df717: "Error al eliminar el foro %{title}"
   failed_to_delete_external_feed_36f19d70: "No se pudo borrar el canal externo"
   failed_to_export_some_tool_settings_c992fc56: "Falló la exportación de la configuración de algunas herramientas"
   failed_to_import_media_objects_4c1fcb4f: "Se produjo un error al importar los objetos de medios"
@@ -7976,7 +7976,7 @@ es:
   failed_to_save_please_try_again_later_bb7070fb: "No se pudo guardar. Inténtelo más tarde"
   failed_to_submit_draft_comment_1de83451: "No se pudo presentar el comentario del borrador"
   failed_to_unpin_discussion_503eab82: "No se pudo desmarcar el debate"
-  failed_to_update_discussion_23cc229a: "Error al actualizar el debate"
+  failed_to_update_discussion_23cc229a: "Error al actualizar el foro"
   fair_38e62237: Justo
   fair_score_554e2558: "Puntaje justo"
   fair_use_bee47d77: "Uso legítimo"
@@ -10399,7 +10399,7 @@ es:
     other: "Carga de cursos completada: %{count} cursos se encontraron"
   loading_courses_started_6e6d742c: "Carga de cursos iniciada"
   loading_data_ecd89ba: "Cargando datos..."
-  loading_discussions_8ed5fcd7: "Cargando debates"
+  loading_discussions_8ed5fcd7: "Cargando foros"
   loading_graders_f6a76142: "Cargando calificadores"
   loading_last_attended_date_5a42463: "Cargando la fecha de la última asistencia"
   loading_mastery_paths_c558a766: "Cargando los caminos del dominio..."
@@ -10427,8 +10427,8 @@ es:
   lock_date_cannot_be_after_section_end_d37da70c: "La fecha de bloqueo no puede ser posterior al fin de la sección"
   lock_date_cannot_be_after_term_end_cf1a188f: "La fecha de bloqueo no puede ser posterior al fin del período"
   lock_date_cannot_be_before_due_date_ac30f54: "La fecha de bloqueo no puede ser anterior a la fecha límite"
-  lock_discussion_title_failed_9d49f2d: "El bloqueo del debate %{title} falló"
-  lock_discussion_title_succeeded_fb24ebfc: "El bloqueo del debate %{title} fue exitoso"
+  lock_discussion_title_failed_9d49f2d: "El bloqueo del foro %{title} falló"
+  lock_discussion_title_succeeded_fb24ebfc: "El bloqueo del foro %{title} fue exitoso"
   lock_icon_a9916601: "bloquear ícono"
   lock_questions_after_answering_5aecef9d: "Bloquear las preguntas después de responderlas"
   lock_selected_announcements_33740f80: "Bloquear los anuncios seleccionados"
@@ -12012,7 +12012,7 @@ es:
         discussion_entry_reply_message: "Participe en la conversación utilizando el enlace siguiente o haga un comentario respondiendo a este mensaje."
         html: 
           body: "%{user} publicó un nuevo comentario en la conversación %{discussion_topic} para %{course}:"
-          discussion_entry_reply_message: "Únase a la conversación utilizando el enlace que aparece a continuación o agregue un comentario respondiendo a este mensaje. Cuando esté permitido, si debe incluir un archivo adjunto, inicie sesión en Canvas y responda al debate."
+          discussion_entry_reply_message: "Únase a la conversación utilizando el enlace que aparece a continuación o agregue un comentario respondiendo a este mensaje. Cuando esté permitido, si debe incluir un archivo adjunto, inicie sesión en Canvas y responda al foro."
           link: "Haga clic aquí para participar en la conversación"
           subject: "Nuevo comentario para %{discussion_topic}: %{course}"
         subject: "Nuevo comentario para %{discussion_topic}: %{course}"
@@ -12778,8 +12778,8 @@ es:
     where_to_move: "¿Dónde desea mover *%{name}*?"
   move_dialog_select: 
     move_to_end: "-- En la parte inferior --"
-  move_discussion_9ff5b2d1: "Mover debate"
-  move_discussion_title_93ea7be1: "Mover debate %{title}"
+  move_discussion_9ff5b2d1: "Mover foro"
+  move_discussion_title_93ea7be1: "Mover foro %{title}"
   move_group_3dd7f76e: "Mover grupo"
   move_group_77ae285d: "Mover grupo..."
   move_item_e94a8103: "Mover elemento"
@@ -13489,7 +13489,7 @@ es:
   only_after_their_last_attempt_3593d101: "Solo después de su último intento"
   only_announcements_can_be_section_specific_1ff992a: "Solo los anuncios pueden ser específicos a una sección"
   only_available_to_students_with_link_not_visible_i_b21ec391: "Disponible solo para alumnos con enlace. No está visible en los archivos de los alumnos."
-  only_course_announcements_and_discussions_can_be_s_924d4386: "Solo los anuncios del curso y los debates pueden ser específicos de una sección"
+  only_course_announcements_and_discussions_can_be_s_924d4386: "Solo los anuncios del curso y los foros pueden ser específicos de una sección"
   only_course_announcements_can_be_section_specific_eabcd6e0: "Solo los anuncios de los cursos pueden ser específicos de una sección"
   only_once_after_each_attempt_cc842738: "Solo una vez después de cada intento"
   only_show_announcement_on_current_account_domain_fc341eea: "Solo mostrar anuncios en el dominio de la cuenta actual"
@@ -13499,7 +13499,7 @@ es:
   oops_there_was_a_problem_loading_content_locks_4ab29a2a: "Vaya, hubo un problema al cargar los bloqueos de contenido."
   open_color_picker_f117df0a: "Abra el selector de color"
   open_complete_incomplete_menu_cfe2033b: "Abrir menú Completo/Incompleto"
-  open_discussion_title_for_comments_6baa3fa: "Abrir debate %{title} para comentarios"
+  open_discussion_title_for_comments_6baa3fa: "Abrir foro %{title} para comentarios"
   open_event_menu_e9a21e39: "Abrir el menú de eventos"
   open_for_comments_1810648: "Abrir para comentarios"
   open_for_comments_f8f7641e: "Abrir para comentar"
@@ -13853,11 +13853,11 @@ es:
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "Elija un terminal, publicaremos sus informes de errores ahí "
   pick_the_date_and_time_for_the_following_conferenc_e9f91edd: "Elija la fecha y la hora para la siguiente configuración de la conferencia:"
   pin_cdbc9f8f: Anclar
-  pin_discussion_title_67c84658: "Marcar debate %{title}"
-  pin_of_discussion_title_failed_6c2c32a5: "No se pudo marcar el debate %{title}"
-  pin_of_discussion_title_succeeded_c7d59580: "El debate %{title} se marcó con éxito"
+  pin_discussion_title_67c84658: "Marcar foro %{title}"
+  pin_of_discussion_title_failed_6c2c32a5: "No se pudo marcar el foro %{title}"
+  pin_of_discussion_title_succeeded_c7d59580: "El foro %{title} se marcó con éxito"
   pink_68ad45cb: Rosado
-  pinned_discussions_a55c0cea: "Debates anclados"
+  pinned_discussions_a55c0cea: "Foros anclados"
   place_b128fa94: Lugar
   place_item_2acc18b9: "Colocar \"%{item}\""
   place_section_before_5b45714e: "Colocar \"%{section}\" antes:"
@@ -16738,7 +16738,7 @@ es:
   save_this_comment_for_reuse_5eda0b70: "Guardar este comentario para reusarlo"
   save_your_type_to_begin_specifying_conditional_con_9e4f536a: "Guardar su %{type} para comenzar a especificar el contenido condicional"
   saved_comments_2f6ba95: "Comentarios guardados"
-  saved_discussion_settings_successfully_ebd46a57: "Se guardaron las configuraciones de debates exitosamente"
+  saved_discussion_settings_successfully_ebd46a57: "Se guardaron las configuraciones de foros exitosamente"
   saving_2521e616: Guardando
   saving_associations_989bd4da: "Guardado de asociaciones"
   saving_associations_complete_e4b9634d: "Guardado de asociaciones completo"
@@ -16905,7 +16905,7 @@ es:
   search_courses_591bc900: "Buscar cursos..."
   search_courses_7b5c4ab3: "Buscar cursos"
   search_courses_by_teacher_e9760a48: "Buscar cursos por profesor"
-  search_discussion_by_title_30466604: "Buscar debate por título"
+  search_discussion_by_title_30466604: "Buscar foro por título"
   search_endpoints_d5abf37f: "Buscar criterios de valoración"
   search_entries_or_author_63fb0a86: "Buscar respuestas o autor"
   search_flickr_6f28b02e: "Buscar flickr"
@@ -16969,7 +16969,7 @@ es:
   section_specific_announcements_are_disabled_80c53340: "Se han deshabilitado los anuncios específicos de una sección"
   section_specific_announcements_e0d355d9: "Anuncios específicos de la sección"
   section_specific_discussions_are_disabled_9e3fd431: "Las discusiones específicas de la sección están desactivadas"
-  section_specific_discussions_d6a3addf: "Debates específicos de la sección"
+  section_specific_discussions_d6a3addf: "Foros específicos de la sección"
   section_specific_topics_must_have_sections_11868960: "Los temas específicos de la sección deben poseer secciones"
   section_starts_at_65eaed1: "La sección comienza el"
   sections: 
@@ -18500,7 +18500,7 @@ es:
   success_grades_for_this_assignment_are_now_visible_e6dafd1e: "¡Éxito! Las calificaciones para esta tarea ahora están visibles para los alumnos."
   success_grades_were_published_to_the_grade_book_da3b4fba: "¡Logrado! Las calificaciones fueron publicadas en el libro de calificaciones."
   successfully_created_a_set_38374719: "Se ha creado un conjunto exitosamente"
-  successfully_deleted_discussion_title_a685f345: "Se eliminó el debate exitosamente %{title}"
+  successfully_deleted_discussion_title_a685f345: "Se eliminó el foro exitosamente %{title}"
   successfully_deleted_the_comment_a8bbe561: "Se eliminó el comentario con éxito"
   successfully_moved_model_to_newgroup_f7b7aa5a: "%{model} movido correctamente a %{newGroup}"
   successfully_posted_the_comment_12d95d56: "Se publicó el comentario con éxito"
@@ -18812,7 +18812,7 @@ es:
   there_are_no_announcements_for_this_course_5ee649c3: "No hay anuncios para este curso."
   there_are_no_available_signups_for_this_course_26b05c56: "No hay inscripciones disponibles para este curso."
   there_are_no_configured_ltis_that_interact_with_co_8c780ce6: "No hay LTIs configurados que interactúen con las colaboraciones."
-  there_are_no_discussions_to_show_in_this_section_e8f04ebd: "No hay debates que mostrar en esta sección"
+  there_are_no_discussions_to_show_in_this_section_e8f04ebd: "No hay foros que mostrar en esta sección"
   there_are_no_outcomes_in_the_course_1d36d9c6: "No hay resultados en este curso."
   there_are_no_unsaved_changes_9276e87c: "No hay cambios sin guardar"
   there_are_no_unsynced_changes_4e8f0838: "No hay cambios sin sincronizar"
@@ -19239,7 +19239,7 @@ es:
   to_be_removed_d4b48586: "Por eliminarse"
   to_c4c44f4b: hasta
   to_change_sis_account_id_the_user_must_have_manage_4b8a37a8: "Para cambiar sis_account_id, el usuario debe tener permisos manage_sis."
-  to_close_comments_on_a_discussion_drag_a_discussio_85b27448: "Para cerrar los comentarios de un debate, arrastre un debate aquí o seleccione Cerrar para comentarios desde el menú de configuraciones de debates."
+  to_close_comments_on_a_discussion_drag_a_discussio_85b27448: "Para cerrar los comentarios de un foro, arrastre un foro aquí o seleccione Cerrar para comentarios desde el menú de configuraciones de foros."
   to_configure_an_openid_connect_provider_you_need_t_5c937249: |-
       Para configurar un proveedor de OpenID Connect, usted necesita autorizar las URL claves, y
       obtener el ID del cliente y el secreto del cliente.
@@ -19255,7 +19255,7 @@ es:
   to_do_time_a7e17623: "Hora de las tareas por hacer"
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Para conectar a un observador del curso *%{name}* a un alumno, comience a escribir el nombre del alumnos más abajo para encontrarle y luego haga clic en Actualizar."
   to_minscore_43e5452e: "a %{minScore}%"
-  to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "Para anclar un debate en la parte superior de la página, arrastre un foro aquí o seleccione Anclar en el menú de configuración de foros."
+  to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "Para anclar un foro en la parte superior de la página, arrastre un foro aquí o seleccione Anclar en el menú de configuración de foros."
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "Para previsualizar la marca del Editor de tema usted tendrá que *apagar la Interfaz del usuario de Alto contraste*."
   to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: "Para restringir a los usuarios de un distrito específico de Clever, ingrese el ID de Clever del distrito aquí. Esto es necesario para el Inicio de sesión instantáneo de Clever para trabajar en un entorno de multi-inquilino."
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "Para restringir a los usuarios de los dominios específicos de Google Apps, ingrese el dominio aquí."
@@ -19345,7 +19345,7 @@ es:
   unable_to_find_clever_district_district_id_61deb1cb: "No se pudo encontrar el distrito de Clever %{district_id}"
   unable_to_find_matches_for_these_email_addresses_i_c2305106: "No se pueden encontrar coincidencias para estas direcciones de correo electrónico en su institución. Seleccione aquellas que le gustaría crear como nuevos usuarios. Se omitirán las no seleccionadas."
   unable_to_remove_app_4293cb53: "No se ha podido eliminar la aplicación"
-  unable_to_save_new_discussion_topic_99239f3f: "no se pudo guardar el nuevo tema de debate"
+  unable_to_save_new_discussion_topic_99239f3f: "no se pudo guardar el nuevo tema de foro"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: "No se puede establecer la calificación predeterminada porque esta tarea tiene fecha límite en un período de calificación cerrado para al menos un alumno"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "No se pudo transmitir el archivo al servicio de almacenamiento. Es posible que el servicio no esté funcionando o que tenga que volver a iniciar sesión en Canvas."
   unarchive_selected_e0c4bd3d: "Desarchivar lo seleccionado"
@@ -19386,7 +19386,7 @@ es:
   unknown_answers_9688a2bc: "Respuestas desconocidas"
   unknown_compression_method_b6a850b5: "método de compresión desconocido"
   unknown_content_type_ae6d08e8: "Tipo de contenido desconocido"
-  unknown_manage_discussion_action_encountered_92a8dfc0: "Se ha encontrado una acción desconocida en una gestión de debates"
+  unknown_manage_discussion_action_encountered_92a8dfc0: "Se ha encontrado una acción desconocida en una gestión de foros"
   unknown_question_bank: "Banco de preguntas desconocido"
   unknown_quiz: "Evaluación desconocida"
   unknown_status_status_35331e1d: "Estado desconocido, %{status}"
@@ -19400,8 +19400,8 @@ es:
   unlock_date_cannot_be_before_course_start_9c7b8524: "La fecha de bloqueo no puede ser anterior a la fecha de comienzo del curso"
   unlock_date_cannot_be_before_section_start_793ddc66: "La fecha del bloqueo no puede ser anterior a la fecha de comienzo de la sección"
   unlock_date_cannot_be_before_term_start_d3c01813: "La fecha de bloqueo no puede ser anterior al comienzo del período"
-  unlock_discussion_title_failed_42a4252f: "El desbloqueo del debate %{title} falló"
-  unlock_discussion_title_succeeded_cd97847c: "El desbloqueo del debate %{title} fue exitoso"
+  unlock_discussion_title_failed_42a4252f: "El desbloqueo del foro %{title} falló"
+  unlock_discussion_title_succeeded_cd97847c: "El desbloqueo del foro %{title} fue exitoso"
   unlock_f6196bf5: Desbloquear
   unlock_module_on_date_17144fbd: "Desbloquear el módulo en la fecha"
   unlock_selected_announcements_37485f05: "Desbloquear anuncios seleccionados"
@@ -19414,9 +19414,9 @@ es:
   unnamed_tool_961cb95b: "Herramienta sin nombre"
   unnamed_tool_logo_410f37d0: "Logotipo de la herramienta sin nombre"
   unpin_a318452a: Desanclar
-  unpin_discussion_title_8c2a0942: "Desmarcar debate %{title}"
-  unpin_of_discussion_title_failed_852116d4: "No se ha podido desmarcar el debate %{title}"
-  unpin_of_discussion_title_succeeded_ce315adb: "Se ha desmarcado el debate %{title} exitosamente"
+  unpin_discussion_title_8c2a0942: "Desmarcar foro %{title}"
+  unpin_of_discussion_title_failed_852116d4: "No se ha podido desmarcar el foro %{title}"
+  unpin_of_discussion_title_succeeded_ce315adb: "Se ha desmarcado el foro %{title} exitosamente"
   unposted_8d9932ec: "No publicado"
   unposted_current_score_c1dd3879: "puntaje actual no publicado"
   unposted_final_score_c19c35b3: "puntaje final no publicado"
@@ -19482,7 +19482,7 @@ es:
   updated_terms_of_service_82f34148: "Términos de servicio actualizados"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Interfaz del usuario actualizada para la búsqueda y visualización de los usuarios y cursos dentro de una cuenta."
   updating_6edbab78: Actualizando
-  updating_discussion_failed_aadb2d35: "No se ha podido actualizar el debate"
+  updating_discussion_failed_aadb2d35: "No se ha podido actualizar el foro"
   upload_8b403d05: Cargar
   upload_a_css_file_ec22214b: "Cargar un archivo CSS"
   upload_a_js_file_c89d795: "Cargar un archivo JS"
@@ -20324,8 +20324,8 @@ es:
     one: "Está a punto de eliminar 1 anuncio. ¿Está seguro?"
     other: "Está a punto de eliminar %{count} anuncios. ¿Está seguro?"
   you_are_about_to_delete_count_discussions_are_you__7ff455aa: 
-    one: "Está a punto de eliminar 1 debate. ¿Está seguro?"
-    other: "Está a punto de eliminar %{count} debates. ¿Está seguro?"
+    one: "Está a punto de eliminar 1 foro. ¿Está seguro?"
+    other: "Está a punto de eliminar %{count} foros. ¿Está seguro?"
   you_are_about_to_lose_any_changes_that_you_have_no_6759802f: |-
       Está a punto de perder los cambios que aún no se han aplicado a su cuenta.
       ¿Todavía desea proceder?
@@ -20391,8 +20391,8 @@ es:
   you_cannot_set_a_grouped_discussion_as_a_student_a20f363: "No puede establecer un foro grupal como alumno."
   you_cannot_use_a_number_greater_than_the_number_of_af33e220: "No puede utilizar un número mayor que el del número de tareas"
   you_created_an_announcement_in_course_c49e3d70: "Usted creó un anuncio en %{course}"
-  you_currently_have_no_discussions_with_closed_comm_366a9dab: "Actualmente no tiene debates con comentarios cerrados"
-  you_currently_have_no_pinned_discussions_6f0078b8: "Actualmente no tiene debates anclados"
+  you_currently_have_no_discussions_with_closed_comm_366a9dab: "Actualmente no tiene foros con comentarios cerrados"
+  you_currently_have_no_pinned_discussions_6f0078b8: "Actualmente no tiene foros anclados"
   you_do_not_have_access_to_the_requested_announceme_a774d80a: "No tiene acceso al anuncio solicitado."
   you_do_not_have_access_to_the_requested_discussion_90d8ec99: "No tiene acceso al foro solicitado."
   you_do_not_have_access_to_the_requested_quiz_d3659e4b: "No tiene acceso a la evaluación solicitada."
