@@ -81,21 +81,41 @@ describe Outcomes::ResultAnalytics do
   describe "#find_outcome_results" do
     before(:once) do
       course_with_student
-      outcome_with_rubric context: @course
-      assignment_model
-      alignment = @outcome.align(@assignment, @course)
-      LearningOutcomeResult.create! context: @course, learning_outcome: @outcome, user: @student, alignment: alignment
-      LearningOutcomeResult.create! context: @course, learning_outcome: @outcome, user: @student, alignment: alignment, hidden: true
+      course_with_teacher(course: @course)
+      rubric = outcome_with_rubric context: @course
+      @assignment = assignment_model
+      @alignment = @outcome.align(@assignment, @course)
+      @rubric_association = rubric.associate_with(@assignment, @course, purpose: 'grading')
+      lor
+      lor(hidden: true)
+    end
+
+    def lor(opts = {})
+      LearningOutcomeResult.create!(
+        context: @course,
+        learning_outcome: @outcome,
+        user: @student,
+        alignment: @alignment,
+        association_type: 'RubricAssociation',
+        association_id: @rubric_association.id,
+        **opts
+      )
     end
 
     it 'does not return hidden outcome results' do
-      results = ra.find_outcome_results(users: [@student], context: @course, outcomes: [@outcome])
+      results = ra.find_outcome_results(@teacher, users: [@student], context: @course, outcomes: [@outcome])
       expect(results.length).to eq 1
     end
 
     it 'returns hidden outcome results when include_hidden is true' do
-      results = ra.find_outcome_results(users: [@student], context: @course, outcomes: [@outcome], include_hidden: true)
+      results = ra.find_outcome_results(@teacher, users: [@student], context: @course, outcomes: [@outcome], include_hidden: true)
       expect(results.length).to eq 2
+    end
+
+    it 'does not return muted assignment results' do
+      @assignment.mute!
+      results = ra.find_outcome_results(@student, users: [@student], context: @course, outcomes: [@outcome])
+      expect(results.length).to eq 0
     end
   end
 

@@ -24,6 +24,7 @@ module Outcomes
 
     # Public: Queries learning_outcome_results for rollup.
     #
+    # user - User requesting results.
     # opts - The options for the query. In a later version of ruby, these would
     #        be named parameters.
     #        :users    - The users to lookup results for (required)
@@ -31,7 +32,7 @@ module Outcomes
     #        :outcomes - The outcomes to lookup results for (required)
     #
     # Returns a relation of the results, suitably ordered.
-    def find_outcome_results(opts)
+    def find_outcome_results(user, opts)
       required_opts = [:users, :context, :outcomes]
       required_opts.each { |p| raise "#{p} option is required" unless opts[p] }
       users, context, outcomes = opts.values_at(*required_opts)
@@ -40,6 +41,9 @@ module Outcomes
         user_id:             users.map(&:id),
         learning_outcome_id: outcomes.map(&:id),
       )
+      unless context.grants_any_right?(user, :manage_grades, :view_all_grades)
+        results = results.exclude_muted_associations
+      end
       unless opts[:include_hidden]
         results = results.where(hidden: false)
       end

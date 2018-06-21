@@ -228,10 +228,7 @@ class OutcomeResultsController < ApplicationController
   #      outcome_results: [OutcomeResult]
   #    }
   def index
-    @results = find_outcome_results(
-      users: @users,
-      context: @context,
-      outcomes: @outcomes,
+    @results = find_results(
       include_hidden: value_to_boolean(params[:include_hidden])
     )
     @results = Api.paginate(@results, self, api_v1_course_outcome_results_url)
@@ -318,8 +315,12 @@ class OutcomeResultsController < ApplicationController
 
   private
 
-  def user_rollups(opts = {})
-    @results = find_outcome_results(users: @users, context: @context, outcomes: @outcomes).preload(:user)
+  def find_results(opts = {})
+    find_outcome_results(@current_user, users: @users, context: @context, outcomes: @outcomes, **opts)
+  end
+
+  def user_rollups(_opts = {})
+    @results = find_results.preload(:user)
     outcome_results_rollups(@results, @users)
   end
 
@@ -333,7 +334,7 @@ class OutcomeResultsController < ApplicationController
   def aggregate_rollups_json
     # calculating averages for all users in the context and only returning one
     # rollup, so don't paginate users in this method.
-    @results = find_outcome_results(users: @users, context: @context, outcomes: @outcomes)
+    @results = find_results
     aggregate_rollups = [aggregate_outcome_results_rollup(@results, @context, params[:aggregate_stat])]
     json = aggregate_outcome_results_rollups_json(aggregate_rollups)
     # no pagination, so no meta field
