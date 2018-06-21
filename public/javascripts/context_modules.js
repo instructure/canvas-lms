@@ -2029,7 +2029,9 @@ function scrollTo ($thing, time = 500) {
     modules.updateAssignmentData(function() {
       modules.updateProgressions(function() {
         if (window.location.hash && !window.location.hash.startsWith('#!')) {
-          scrollTo($(window.location.hash))
+          try {
+            scrollTo($(window.location.hash))
+          } catch (error) {}
         } else {
           if ($(".context_module:first .content:visible").length == 0) {
             scrollTo($(".context_module .content:visible").filter(":first").parents(".context_module"))
