@@ -291,7 +291,7 @@ body:not(.course-menu-expanded) {
   background-repeat: no-repeat;
   background-size: cover;
   position: relative;
-  
+
   &:after {
     content: "";
     display: flex;
@@ -388,13 +388,8 @@ body:not(.course-menu-expanded) {
 
 .sm-course-header-image .sm-course-menu.list-view {
   background: $sm-body-background-color;
-  background: -webkit-linear-gradient(to top, $sm-body-background-color 12px, rgba($sm-body-background-color, .8), transparent);
-  background: -o-linear-gradient(to top, $sm-body-background-color 12px, rgba($sm-body-background-color, .8), transparent);
-  background: -moz-linear-gradient(to top, $sm-body-background-color 12px, rgba($sm-body-background-color, .8), transparent);
-  background: linear-gradient(to top, $sm-body-background-color 12px, rgba($sm-body-background-color, .8), transparent);
   position: absolute;
   bottom: 0px;
-  padding-top: 13px;
   width: 100%;
 
   ul > li > a:active {
@@ -403,7 +398,7 @@ body:not(.course-menu-expanded) {
     background: -o-linear-gradient(to top, $sm-body-background-color 12px, rgba($sm-body-background-color, .8), transparent);
     background: -moz-linear-gradient(to top, $sm-body-background-color 12px, rgba($sm-body-background-color, .8), transparent);
     background: linear-gradient(to top, $sm-body-background-color 12px, rgba($sm-body-background-color, .8), transparent);
-  
+
   }
 }
 
@@ -411,7 +406,7 @@ body:not(.course-menu-expanded) {
   display: flex;
   align-items: center;
   border-bottom: 1px solid $ic-border-light;
-  padding: 16px $ic-sp*2;
+  padding: $ic-sp/2 $ic-sp*2;
   background-color: #FFFFFF;
 }
 
