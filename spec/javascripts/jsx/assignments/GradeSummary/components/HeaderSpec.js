@@ -62,9 +62,17 @@ QUnit.module('GradeSummary Header', suiteHooks => {
     )
   }
 
-  test('includes the assignment title as a heading', () => {
+  test('includes the "Grade Summary" heading', () => {
     mountComponent()
-    equal(wrapper.find('h2').text(), 'Example Assignment')
+    equal(wrapper.find('h1').text(), 'Grade Summary')
+  })
+
+  test('includes the assignment title', () => {
+    mountComponent()
+    const children = wrapper.find('header').children()
+    const childArray = children.map(child => child)
+    const headingIndex = childArray.findIndex(child => child.text() === 'Grade Summary')
+    equal(childArray[headingIndex + 1].text(), 'Example Assignment')
   })
 
   test('includes a "grades posted" message when grades have been published', () => {

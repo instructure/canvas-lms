@@ -95,11 +95,11 @@ class Header extends Component {
           </Alert>
         )}
 
-        <Heading level="h1">{I18n.t('Grade Summary')}</Heading>
-
-        <Heading level="h2" margin="small 0 0 0">
-          {this.props.assignment.title}
+        <Heading level="h1" margin="0 0 x-small 0">
+          {I18n.t('Grade Summary')}
         </Heading>
+
+        <Text size="x-large">{this.props.assignment.title}</Text>
 
         <View as="div" margin="large 0 0 0" textAlign="end">
           <PostButton
