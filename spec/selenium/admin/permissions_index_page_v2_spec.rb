@@ -168,9 +168,9 @@ describe "permissions index" do
     end
 
     it "updates a permission when changed in the tray" do
+      skip("fragile spec")
       PermissionsIndex.open_permission_tray(@permission_name)
       PermissionsIndex.disable_tray_permission(@permission_name, @role.id)
-
       expect{PermissionsIndex.role_tray_permission_state(@permission_name, @role.id)}.to become('Disabled')
       expect{PermissionsIndex.grid_permission_state(@permission_name, @role.id)}.to become('Disabled')
     end
