@@ -224,6 +224,7 @@ describe "threaded discussions" do
   context "student tray" do
 
     before(:each) do
+      preload_graphql_schema
       @account = Account.default
       @account.enable_feature!(:student_context_cards)
     end
