@@ -33,6 +33,7 @@ module OutcomeCommon
     end
     driver.switch_to.alert.accept
     wait_for_ajaximations
+    run_jobs
   end
 
   def traverse_nested_outcomes(outcome)
