@@ -21,7 +21,7 @@ import natcompare from 'compiled/util/natcompare';
 import fakeENV from 'helpers/fakeENV';
 import JQuerySelectorCache from 'jsx/shared/helpers/JQuerySelectorCache';
 import numberHelper from 'jsx/shared/helpers/numberHelper';
-import SpeedGrader, {teardownHandleFragmentChanged} from 'speed_grader';
+import SpeedGrader from 'speed_grader';
 import SpeedgraderHelpers from 'speed_grader_helpers';
 import userSettings from 'compiled/userSettings';
 import 'jquery.ajaxJSON';
@@ -584,6 +584,8 @@ QUnit.module('SpeedGrader#handleGradeSubmit', {
     SpeedGrader.EG.currentStudent = this.originalStudent;
     fixtures.innerHTML = ''
     window.jsonData = this.originalWindowJSONData;
+    SpeedGrader.teardown()
+    window.location.hash = ''
     fakeENV.teardown();
     SpeedgraderHelpers.reloadPage.restore();
   }
@@ -1016,6 +1018,8 @@ QUnit.module('handleSubmissionSelectionChange', (hooks) => {
     window.jsonData = originalWindowJSONData
     SpeedGrader.EG.currentStudent = originalStudent
     $.ajaxJSON.restore()
+    SpeedGrader.teardown()
+    window.location.hash = ''
     SpeedGrader.EG.handleFragmentChanged.restore()
     fakeENV.teardown()
     fixtures.innerHTML = ''
@@ -1264,6 +1268,8 @@ QUnit.module('SpeedGrader - clicking save rubric button', function(hooks) {
     fixtures.innerHTML = ''
     fakeENV.teardown();
     disableWhileLoadingStub.restore();
+    SpeedGrader.teardown()
+    window.location.hash = ''
     $.ajaxJSON.restore();
   });
 
@@ -1360,6 +1366,8 @@ QUnit.module('SpeedGrader - clicking save rubric button for an anonymous assignm
 
   hooks.afterEach(() => {
     window.rubricAssessment.assessmentData.restore();
+    SpeedGrader.teardown()
+    window.location.hash = ''
     SpeedGrader.EG.handleFragmentChanged.restore();
 
     fixtures.innerHTML = ''
@@ -1518,6 +1526,8 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
     })
 
     hooks.afterEach(function() {
+      SpeedGrader.teardown()
+      window.location.hash = ''
       fixtures.innerHTML = ''
     })
 
@@ -1551,6 +1561,8 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
     })
 
     hooks.afterEach(function() {
+      SpeedGrader.teardown()
+      window.location.hash = ''
       fixtures.innerHTML = ''
     })
 
@@ -1652,7 +1664,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       fixtures.innerHTML = ''
       delete SpeedGrader.EG.currentStudent
       window.jsonData = jsonData
-      teardownHandleFragmentChanged()
+      SpeedGrader.teardown()
       window.location.hash = ''
       document.querySelector('.ui-selectmenu-menu').remove()
     })
@@ -1784,7 +1796,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         fakeENV.teardown()
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
-        teardownHandleFragmentChanged()
+        SpeedGrader.teardown()
         window.location.hash = ''
       })
 
@@ -1971,6 +1983,8 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
 
       hooks.afterEach(function() {
         fixtures.innerHTML = ''
+        SpeedGrader.teardown()
+        window.location.hash = ''
         SpeedGrader.EG.goToStudent.restore()
         SpeedGrader.EG.handleFragmentChanged.restore()
         window.jsonData = originalJsonData
@@ -2004,8 +2018,8 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         })
         fixtures.innerHTML = '<span id="speedgrader-settings"></span>'
         sinon.stub(SpeedGrader.EG, 'goToStudent')
-        sinon.stub(SpeedGrader.EG, 'handleFragmentChanged');
         SpeedGrader.setup()
+        sinon.stub(SpeedGrader.EG, 'handleFragmentChanged');
         window.jsonData = windowJsonData // setup() resets jsonData
         SpeedGrader.EG.jsonReady()
         document.location.hash = `#${encodeURIComponent(JSON.stringify(omegaStudent))}`
@@ -2014,6 +2028,8 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
 
       hooks.afterEach(function() {
         fixtures.innerHTML = ''
+        SpeedGrader.teardown()
+        window.location.hash = ''
         SpeedGrader.EG.goToStudent.restore()
         window.jsonData = originalJsonData
       })
@@ -2054,6 +2070,8 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       })
 
       hooks.afterEach(() => {
+        SpeedGrader.teardown()
+        window.location.hash = ''
         fixtures.innerHTML = ''
         window.jsonData = originalJsonData
         document.querySelector('.ui-selectmenu-menu').remove()
@@ -2117,7 +2135,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         fixtures.innerHTML = ''
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
-        teardownHandleFragmentChanged()
+        SpeedGrader.teardown()
         window.location.hash = ''
       })
 
@@ -2238,6 +2256,8 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       });
 
       hooks.afterEach(() => {
+        SpeedGrader.teardown()
+        window.location.hash = ''
         window.jsonData = originalJsonData;
         SpeedGrader.EG.showSubmission.restore();
         fixtures.innerHTML = '';
@@ -2271,6 +2291,8 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       });
 
       hooks.afterEach(() => {
+        SpeedGrader.teardown()
+        window.location.hash = ''
         window.jsonData = originalJsonData;
         fixtures.innerHTML = '';
       });
@@ -2298,6 +2320,8 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       })
 
       hooks.afterEach(() => {
+        SpeedGrader.teardown()
+        window.location.hash = ''
         fixtures.innerHTML = ''
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
@@ -2346,7 +2370,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         fixtures.innerHTML = ''
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
-        teardownHandleFragmentChanged()
+        SpeedGrader.teardown()
         window.location.hash = ''
       })
 
@@ -2382,7 +2406,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         fixtures.innerHTML = ''
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
-        teardownHandleFragmentChanged()
+        SpeedGrader.teardown()
         window.location.hash = ''
       })
 
@@ -2417,7 +2441,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         fixtures.innerHTML = ''
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
-        teardownHandleFragmentChanged()
+        SpeedGrader.teardown()
         window.location.hash = ''
       })
 
@@ -2461,7 +2485,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         fixtures.innerHTML = ''
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
-        teardownHandleFragmentChanged()
+        SpeedGrader.teardown()
         window.location.hash = ''
       })
 
@@ -2539,7 +2563,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         fixtures.innerHTML = ''
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
-        teardownHandleFragmentChanged()
+        SpeedGrader.teardown()
         window.location.hash = ''
       })
 
@@ -2616,7 +2640,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         fixtures.innerHTML = ''
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
-        teardownHandleFragmentChanged()
+        SpeedGrader.teardown()
         window.location.hash = ''
         document.querySelector('.ui-selectmenu-menu').remove()
       })
@@ -2660,7 +2684,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         fixtures.innerHTML = ''
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
-        teardownHandleFragmentChanged()
+        SpeedGrader.teardown()
         window.location.hash = ''
       })
 
@@ -2709,7 +2733,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         fixtures.innerHTML = ''
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
-        teardownHandleFragmentChanged()
+        SpeedGrader.teardown()
         window.location.hash = ''
       })
 
@@ -2836,6 +2860,8 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       ReactDOM.render.restore()
       EG.setupProvisionalGraderDisplayNames.restore()
 
+      SpeedGrader.teardown()
+      window.location.hash = ''
       fixtures.innerHTML = ''
     })
 
@@ -2930,6 +2956,8 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       EG.setActiveProvisionalGradeFields.restore()
       EG.submitSelectedProvisionalGrade.restore()
 
+      SpeedGrader.teardown()
+      window.location.hash = ''
       fixtures.innerHTML = ''
     })
 
@@ -3001,6 +3029,8 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
     })
 
     hooks.afterEach(() => {
+      SpeedGrader.teardown()
+      window.location.hash = ''
       fixtures.innerHTML = ''
     })
 
@@ -3074,6 +3104,8 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
 
     hooks.afterEach(() => {
       EG.onProvisionalGradesFetched.restore()
+      SpeedGrader.teardown()
+      window.location.hash = ''
       fixtures.innerHTML = ''
     })
 
@@ -3146,6 +3178,8 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       SpeedgraderHelpers.submissionState.restore()
       EG.showStudent.restore()
 
+      SpeedGrader.teardown()
+      window.location.hash = ''
       fixtures.innerHTML = ''
     })
 
@@ -3229,7 +3263,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
     hooks.afterEach(() => {
       EG.renderProvisionalGradeSelector.restore()
       EG.fetchProvisionalGrades.restore()
-      teardownHandleFragmentChanged()
+      SpeedGrader.teardown()
       window.location.hash = ''
 
       fixtures.innerHTML = ''
@@ -3278,7 +3312,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
     hooks.afterEach(() => {
       EG.setActiveProvisionalGradeFields.restore()
       EG.submitSelectedProvisionalGrade.restore()
-      teardownHandleFragmentChanged()
+      SpeedGrader.teardown()
       window.location.hash = ''
 
       fixtures.innerHTML = ''

@@ -170,39 +170,19 @@ let EG
 const customProvisionalGraderLabel = I18n.t('Custom')
 
 function setupHandleFragmentChanged () {
-  if (!EG.isHandleFragmentChangedSet) {
-    window.addEventListener('hashchange', EG.handleFragmentChanged);
-    EG.isHandleFragmentChangedSet = true
-    return true
-  }
-  return false
+  window.addEventListener('hashchange', EG.handleFragmentChanged);
 }
 
-export function teardownHandleFragmentChanged () {
-  if (EG.isHandleFragmentChangedSet) {
-    window.removeEventListener('hashchange', EG.handleFragmentChanged);
-    EG.isHandleFragmentChangedSet = false
-    return true
-  }
-  return false
+function teardownHandleFragmentChanged () {
+  window.removeEventListener('hashchange', EG.handleFragmentChanged);
 }
 
 function setupBeforeLeavingSpeedgrader () {
-  if (!EG.isBeforeLeavingSpeedgraderSet) {
-    window.addEventListener('beforeunload', EG.beforeLeavingSpeedgrader);
-    EG.isBeforeLeavingSpeedgraderSet = true
-    return true
-  }
-  return false
+  window.addEventListener('beforeunload', EG.beforeLeavingSpeedgrader);
 }
 
 function teardownBeforeLeavingSpeedgrader () {
-  if (EG.isBeforeLeavingSpeedgraderSet) {
-    window.removeEventListener('beforeunload', EG.beforeLeavingSpeedgrader);
-    EG.isBeforeLeavingSpeedgraderSet = false
-    return true
-  }
-  return false
+  window.removeEventListener('beforeunload', EG.beforeLeavingSpeedgrader);
 }
 
 function unexcuseSubmission (grade, submission, assignment) {
@@ -3116,6 +3096,11 @@ export default {
     $(document).ready(function() {
       EG.domReady();
     });
+  },
+
+  teardown() {
+    teardownHandleFragmentChanged()
+    teardownBeforeLeavingSpeedgrader()
   },
 
   EG
