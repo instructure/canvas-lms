@@ -161,7 +161,7 @@ namespace :db do
     end
 
     Setting.set("usage_statistics_collection", gather_data)
-    Reporting::CountsReport.process
+    Reporting::CountsReport.process_shard
   end
 
   desc "Configure default settings"
