@@ -8,10 +8,10 @@ type Assignment implements Node & Timestamped {
   _id: ID!
   assignmentGroup: AssignmentGroup
   assignmentOverrides(
-    # Returns the elements in the list that come after the specified global ID.
+    # Returns the elements in the list that come after the specified cursor.
     after: String
 
-    # Returns the elements in the list that come before the specified global ID.
+    # Returns the elements in the list that come before the specified cursor.
     before: String
 
     # Returns the first _n_ elements from the list.
@@ -51,10 +51,10 @@ type Assignment implements Node & Timestamped {
 
   # submissions for this assignment
   submissionsConnection(
-    # Returns the elements in the list that come after the specified global ID.
+    # Returns the elements in the list that come after the specified cursor.
     after: String
 
-    # Returns the elements in the list that come before the specified global ID.
+    # Returns the elements in the list that come before the specified cursor.
     before: String
     filter: SubmissionFilter
 
@@ -96,10 +96,10 @@ type AssignmentGroup implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
   assignmentsConnection(
-    # Returns the elements in the list that come after the specified global ID.
+    # Returns the elements in the list that come after the specified cursor.
     after: String
 
-    # Returns the elements in the list that come before the specified global ID.
+    # Returns the elements in the list that come before the specified cursor.
     before: String
 
     # Returns the first _n_ elements from the list.
@@ -204,10 +204,10 @@ type Course implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
   assignmentGroupsConnection(
-    # Returns the elements in the list that come after the specified global ID.
+    # Returns the elements in the list that come after the specified cursor.
     after: String
 
-    # Returns the elements in the list that come before the specified global ID.
+    # Returns the elements in the list that come before the specified cursor.
     before: String
 
     # Returns the first _n_ elements from the list.
@@ -217,10 +217,10 @@ type Course implements Node & Timestamped {
     last: Int
   ): AssignmentGroupConnection
   assignmentsConnection(
-    # Returns the elements in the list that come after the specified global ID.
+    # Returns the elements in the list that come after the specified cursor.
     after: String
 
-    # Returns the elements in the list that come before the specified global ID.
+    # Returns the elements in the list that come before the specified cursor.
     before: String
     filter: AssignmentFilter
 
@@ -235,10 +235,10 @@ type Course implements Node & Timestamped {
   courseCode: String
   createdAt: DateTime
   gradingPeriodsConnection(
-    # Returns the elements in the list that come after the specified global ID.
+    # Returns the elements in the list that come after the specified cursor.
     after: String
 
-    # Returns the elements in the list that come before the specified global ID.
+    # Returns the elements in the list that come before the specified cursor.
     before: String
 
     # Returns the first _n_ elements from the list.
@@ -248,10 +248,10 @@ type Course implements Node & Timestamped {
     last: Int
   ): GradingPeriodConnection
   groupsConnection(
-    # Returns the elements in the list that come after the specified global ID.
+    # Returns the elements in the list that come after the specified cursor.
     after: String
 
-    # Returns the elements in the list that come before the specified global ID.
+    # Returns the elements in the list that come before the specified cursor.
     before: String
 
     # Returns the first _n_ elements from the list.
@@ -266,10 +266,10 @@ type Course implements Node & Timestamped {
   # returns permission information for the current user in this course
   permissions: CoursePermissions
   sectionsConnection(
-    # Returns the elements in the list that come after the specified global ID.
+    # Returns the elements in the list that come after the specified cursor.
     after: String
 
-    # Returns the elements in the list that come before the specified global ID.
+    # Returns the elements in the list that come before the specified cursor.
     before: String
 
     # Returns the first _n_ elements from the list.
@@ -282,10 +282,10 @@ type Course implements Node & Timestamped {
 
   # all the submissions for assignments in this course
   submissionsConnection(
-    # Returns the elements in the list that come after the specified global ID.
+    # Returns the elements in the list that come after the specified cursor.
     after: String
 
-    # Returns the elements in the list that come before the specified global ID.
+    # Returns the elements in the list that come before the specified cursor.
     before: String
     filter: SubmissionFilter
 
@@ -301,10 +301,10 @@ type Course implements Node & Timestamped {
   ): SubmissionConnection
   updatedAt: DateTime
   usersConnection(
-    # Returns the elements in the list that come after the specified global ID.
+    # Returns the elements in the list that come after the specified cursor.
     after: String
 
-    # Returns the elements in the list that come before the specified global ID.
+    # Returns the elements in the list that come before the specified cursor.
     before: String
     filter: CourseUsersFilter
 
@@ -469,10 +469,10 @@ type Group implements Timestamped {
   _id: ID!
   createdAt: DateTime
   membersConnection(
-    # Returns the elements in the list that come after the specified global ID.
+    # Returns the elements in the list that come after the specified cursor.
     after: String
 
-    # Returns the elements in the list that come before the specified global ID.
+    # Returns the elements in the list that come before the specified cursor.
     before: String
 
     # Returns the first _n_ elements from the list.
