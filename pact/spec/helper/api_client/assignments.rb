@@ -15,16 +15,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'httparty'
 require 'json'
 require_relative '../../../pact_config'
+require_relative '../api_client_base'
 
 module Helper
   module ApiClient
-    class Assignments
-      include HTTParty
+    class Assignments < ApiClientBase
       base_uri PactConfig.mock_provider_service_base_uri
-      headers "Authorization" => "Bearer some_token"
 
       # TODO: modify these to use params
       def list_assignments(course_id, user_id)

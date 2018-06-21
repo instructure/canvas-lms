@@ -15,17 +15,29 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# require_relative '../../pact_config'
-# require_relative '../pact_setup'
+class PactApiConsumerProxy
 
-PactConfig::Consumers::ALL.each do |consumer|
-  Pact.provider_states_for consumer do
-    provider_state 'a student in a course with an assignment' do
-      set_up do
-        course_with_student(active_all: true)
-        Assignment.create!(context: @course, title: "Assignment1")
-        Pseudonym.create!(user: @student, unique_id: 'testuser@instructure.com')
-      end
+  AUTH_HEADER = 'HTTP_AUTH_USER_ID'.freeze
+
+  def call(env)
+    # Users calling the API will know the user ID of the
+    # user that they want to identify as. These are given
+    # in the provider state descriptions.
+    if requesting_user_id(env)
+      user = User.find(requesting_user_id(env))
+      token = user.access_tokens.create!.full_token
+      env['HTTP_AUTHORIZATION'] = "Bearer #{token}"
+      # Unset the 'AUTH_USER_ID' header -- that's only for this proxy,
+      # don't pass it along to Canvas.
+      env.delete(AUTH_HEADER)
     end
+
+    CanvasRails::Application.call(env)
+  end
+
+  private
+
+  def requesting_user_id(env)
+    env[AUTH_HEADER]
   end
 end

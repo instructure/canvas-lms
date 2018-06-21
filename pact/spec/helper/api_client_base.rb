@@ -15,17 +15,20 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# require_relative '../../pact_config'
-# require_relative '../pact_setup'
+require 'httparty'
+require 'byebug'
+class ApiClientBase
+  include HTTParty
 
-PactConfig::Consumers::ALL.each do |consumer|
-  Pact.provider_states_for consumer do
-    provider_state 'a student in a course with an assignment' do
-      set_up do
-        course_with_student(active_all: true)
-        Assignment.create!(context: @course, title: "Assignment1")
-        Pseudonym.create!(user: @student, unique_id: 'testuser@instructure.com')
-      end
-    end
+  AUTH_HEADER = 'Auth-User-Id'.freeze
+
+  def initialize
+    # default to user 1, optionally override later
+    authenticate_as_user(1)
   end
+
+  def authenticate_as_user(user_id)
+    self.class.headers AUTH_HEADER => user_id.to_s
+  end
+
 end
