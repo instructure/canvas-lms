@@ -22,6 +22,7 @@ import tinymce from 'compiled/editor/stocktiny'
 import $ from 'jquery'
 import initializeEquella from 'tinymce_plugins/instructure_equella/initializeEquella'
 import 'jqueryui/dialog'
+import I18n from 'i18n!editor'
 
   tinymce.create('tinymce.plugins.InstructureEquella', {
     init : function(ed, url) {
@@ -30,7 +31,7 @@ import 'jqueryui/dialog'
       })
 
       ed.addButton('instructure_equella', {
-        title: 'Insert Equella Links',
+        title: I18n.t('Insert Equella Links'),
         cmd: 'instructureEquella',
         icon: 'equella icon-equella'
       });
