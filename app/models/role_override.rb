@@ -917,6 +917,11 @@ class RoleOverride < ActiveRecord::Base
         :label => -> { t('View audit trail') },
         :true_for => %w(TeacherEnrollment AccountAdmin),
         :available_to => %w(TeacherEnrollment AccountAdmin AccountMembership)
+      },
+      :generate_observer_pairing_code => {
+        :label => -> { t('Generate observer pairing codes for students') },
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(TeacherEnrollment ObserverEnrollment TaEnrollment AccountAdmin DesignerEnrollment)
       }
     })
 

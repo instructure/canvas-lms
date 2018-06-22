@@ -290,7 +290,7 @@ class RoleOverridesController < ApplicationController
   #     lti_add_edit                     -- [ TAD ] LTI add and edit
   #     read_email_addresses             -- [sTAdo] See other users' primary email address
   #     view_user_logins                 -- [ TA  ] View login ids for users
-  #
+  #     generate_observer_pairing_code   -- [ tAdo] Allow observer pairing code generation
   #
   #   Some of these permissions are applicable only for roles on the site admin
   #   account, on a root account, or for course-level roles with a particular base role type;
