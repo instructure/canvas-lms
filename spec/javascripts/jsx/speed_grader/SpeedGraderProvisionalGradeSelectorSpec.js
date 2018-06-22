@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
+import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
 import SpeedGraderProvisionalGradeSelector from 'jsx/speed_grader/SpeedGraderProvisionalGradeSelector'
 
 QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
@@ -42,12 +43,14 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
       provisionalGrades: [
         {
           grade: '11',
+          score: 11,
           provisional_grade_id: '1',
           readonly: true,
           scorer_id: '1'
         },
         {
           grade: '22',
+          score: 22,
           provisional_grade_id: '2',
           readonly: true,
           scorer_id: '2',
@@ -55,6 +58,7 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
         },
         {
           grade: '33',
+          score: 33,
           provisional_grade_id: '3',
           readonly: false,
           scorer_id: '3'
@@ -159,7 +163,7 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
     strictEqual(getRadioInput({value: '3'}).text().includes('Custom'), true)
   })
 
-  test('includes the grade value for a provisional grade in the button label', () => {
+  test('includes the score for a provisional grade in the button label', () => {
     mountComponent()
     strictEqual(getRadioInput({value: '1'}).text().includes('11'), true)
   })
@@ -231,5 +235,45 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
       wrapper.find('RadioInput').map(input => input.prop('value')),
       ['custom', '3', '2', '1']
     )
+  })
+
+  test('calls formatSubmissionGrade to render a provisional grade', () => {
+    const provisionalGrades = [
+      {
+        grade: '123456.78',
+        score: 123456.78,
+        provisional_grade_id: '1',
+        readonly: true,
+        scorer_id: '300'
+      },
+    ]
+
+    const formatSpy = sinon.spy(GradeFormatHelper, 'formatSubmissionGrade')
+    mountComponent({provisionalGrades})
+
+    const [gradeToFormat] = formatSpy.firstCall.args
+    deepEqual(gradeToFormat, provisionalGrades[0])
+
+    formatSpy.restore()
+  })
+
+  test('calls formatSubmissionGrade with the passed-in grading type', () => {
+    const provisionalGrades = [
+      {
+        grade: '123456.78',
+        score: 123456.78,
+        provisional_grade_id: '1',
+        readonly: true,
+        scorer_id: '300'
+      },
+    ]
+
+    const formatSpy = sinon.spy(GradeFormatHelper, 'formatSubmissionGrade')
+    mountComponent({provisionalGrades})
+
+    const [,options] = formatSpy.firstCall.args
+    strictEqual(options.formatType, 'points')
+
+    formatSpy.restore()
   })
 })
