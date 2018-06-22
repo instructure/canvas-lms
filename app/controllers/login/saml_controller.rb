@@ -119,7 +119,7 @@ class Login::SamlController < ApplicationController
           aac.debug_set(:is_valid_login_response, 'false')
           aac.debug_set(:login_response_validation_error, response.errors.join("\n"))
         end
-        logger.error "Failed to verify SAML signature: #{legacy_response.validation_error}"
+        logger.error "Failed to verify SAML signature: #{response.errors.join("\n")}"
         flash[:delegated_message] = login_error_message
         return redirect_to login_url
       end
