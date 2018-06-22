@@ -131,6 +131,34 @@
       bottom: 0.7em;
     }
   }
+
+  .exceedsMasteryShader {
+    background-color: #127A1B;
+    .triangle {
+      color: #127A1B;
+    }
+  }
+
+  .meetsMasteryShader {
+    background-color: $shamrock;
+    .triangle {
+       color: $shamrock;
+    }
+  }
+
+  .nearMasteryShader {
+    background-color: $fire;
+    .triangle {
+      color: $fire;
+    }
+  }
+
+  .wellBelowMasteryShader {
+    background-color: #EE0612;
+    .triangle {
+      color: #EE0612;
+    }
+  }
 }
 
 .react-rubric .react-assessing .rating-tier:focus,

@@ -15,7 +15,7 @@ exports[`The Ratings component only renders the single selected Rating with a fo
       ow my foot
     </div>
   </div>
-  <div className=\\"shader\\" style={{...}} aria-label={{...}}>
+  <div className=\\"shader nearMasteryShader\\" style={{...}} aria-label={{...}}>
     <div className=\\"triangle\\" style={{...}} />
   </div>
 </div>"
@@ -74,7 +74,7 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
   <Text size=\\"small\\" lineHeight=\\"condensed\\" as=\\"span\\" letterSpacing=\\"normal\\">
     More Verbosity
   </Text>
-  <div className=\\"shader\\" style={{...}} aria-label=\\"This rating is selected\\">
+  <div className=\\"shader nearMasteryShader\\" style={{...}} aria-label=\\"This rating is selected\\">
     <div className=\\"triangle\\" style={{...}} />
   </div>
 </div>"
@@ -101,8 +101,8 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
 
 exports[`The Ratings component renders the root component as expected 1`] = `
 "<div className=\\"rating-tier-list\\">
-  <Rating assessing={false} classes=\\"rating-tier\\" endOfRangePoints={{...}} footer={{...}} onClick={[Function]} tierColor=\\"transparent\\" hidePoints={false} isSummary={false} selected={false} description=\\"Superb\\" points={10} />
-  <Rating assessing={false} classes=\\"rating-tier selected\\" endOfRangePoints={{...}} footer={{...}} onClick={[Function]} tierColor=\\"#e0d773\\" hidePoints={false} isSummary={false} selected={true} description=\\"Meh\\" long_description=\\"More Verbosity\\" points={5} />
-  <Rating assessing={false} classes=\\"rating-tier\\" endOfRangePoints={{...}} footer={{...}} onClick={[Function]} tierColor=\\"transparent\\" hidePoints={false} isSummary={false} selected={false} description=\\"Subpar\\" points={1} />
+  <Rating assessing={false} classes=\\"rating-tier\\" endOfRangePoints={{...}} footer={{...}} onClick={[Function]} shaderClass={{...}} tierColor=\\"transparent\\" hidePoints={false} isSummary={false} selected={false} description=\\"Superb\\" points={10} />
+  <Rating assessing={false} classes=\\"rating-tier selected\\" endOfRangePoints={{...}} footer={{...}} onClick={[Function]} shaderClass=\\"nearMasteryShader\\" tierColor={{...}} hidePoints={false} isSummary={false} selected={true} description=\\"Meh\\" long_description=\\"More Verbosity\\" points={5} />
+  <Rating assessing={false} classes=\\"rating-tier\\" endOfRangePoints={{...}} footer={{...}} onClick={[Function]} shaderClass={{...}} tierColor=\\"transparent\\" hidePoints={false} isSummary={false} selected={false} description=\\"Subpar\\" points={1} />
 </div>"
 `;

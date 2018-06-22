@@ -36,16 +36,16 @@ define [
 
   Dictionary =
     exceedsMastery:
-      color : '#6a843f'
+      color : '#127A1B'
       label : I18n.t('Exceeds Mastery')
     mastery:
-      color : '#8aac53'
+      color : if ENV.use_high_contrast then '#127A1B' else '#00AC18'
       label : I18n.t('Meets Mastery')
     nearMastery:
-      color : '#e0d773'
+      color : if ENV.use_high_contrast then '#C23C0D' else '#FC5E13'
       label : I18n.t('Near Mastery')
     remedial:
-      color : '#df5b59'
+      color : '#EE0612'
       label : I18n.t('Well Below Mastery')
 
   class OutcomeGradebookView extends View

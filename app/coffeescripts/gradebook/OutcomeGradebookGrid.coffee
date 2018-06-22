@@ -398,10 +398,10 @@ define [
         mastery     = outcome.mastery_points
         nearMastery = mastery / 2
         exceedsMastery = mastery + (mastery / 2)
-        return ['rating_0', '#6a843f', I18n.t('Exceeds Mastery')] if score >= exceedsMastery
-        return ['rating_1', '#8aac53', I18n.t('Meets Mastery')] if score >= mastery
-        return ['rating_2', '#e0d773', I18n.t('Near Mastery')] if score >= nearMastery
-        ['rating_3', '#df5b59', I18n.t('Well Below Mastery')]
+        return ['rating_0', '#127A1B', I18n.t('Exceeds Mastery')] if score >= exceedsMastery
+        return ['rating_1', (if ENV.use_high_contrast then '#127A1B' else '#00AC18'), I18n.t('Meets Mastery')] if score >= mastery
+        return ['rating_2', (if ENV.use_high_contrast then '#C23C0D' else '#FC5E13'), I18n.t('Near Mastery')] if score >= nearMastery
+        ['rating_3', '#EE0612', I18n.t('Well Below Mastery')]
 
       getColumnResults: (data, column) ->
         _.chain(data)
