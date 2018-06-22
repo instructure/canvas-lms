@@ -2754,6 +2754,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def permits_moderation?(user)
+    return false unless user
     final_grader_id == user.id || context.account_membership_allows(user, :select_final_grade)
   end
 

@@ -250,6 +250,10 @@ describe Assignment do
       expect(@assignment.permits_moderation?(assistant)).to be false
     end
 
+    it 'returns false if user is nil' do
+      expect(@assignment.permits_moderation?(nil)).to be false
+    end
+
     it 'returns true if the user is the final grader' do
       expect(@assignment.permits_moderation?(@teacher)).to be true
     end
