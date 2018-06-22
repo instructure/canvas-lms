@@ -28,6 +28,9 @@ import DashboardHeader from 'jsx/dashboard/DashboardHeader'
 const container = document.getElementById('fixtures')
 
 const FakeDashboard = function (props) {
+  // let property be null to force the default property on DashboardHeader
+  let showTodoList = props.showTodoList
+  if (showTodoList === null) showTodoList = undefined;
   return (
     <div>
       <DashboardHeader
@@ -35,6 +38,7 @@ const FakeDashboard = function (props) {
         ref={(c) => { props.headerRef(c) }}
         planner_enabled={props.planner_enabled}
         dashboard_view={props.dashboard_view}
+        showTodoList={showTodoList}
       />
       <div
         id="flashalert_message_holder"
@@ -62,12 +66,16 @@ const FakeDashboard = function (props) {
 
 FakeDashboard.propTypes = {
   planner_enabled: PropTypes.bool,
-  dashboard_view: PropTypes.string
+  dashboard_view: PropTypes.string,
+  headerRef: PropTypes.func,
+  showTodoList: PropTypes.func,
 }
 
 FakeDashboard.defaultProps = {
   planner_enabled: false,
-  dashboard_view: 'cards'
+  dashboard_view: 'cards',
+  headerRef: () => {},
+  showTodoList: () => {},
 }
 
 let plannerStub
@@ -94,6 +102,27 @@ test('it renders', () => {
     <DashboardHeader planner_enabled planner_selected />
   )
   ok(dashboardHeader)
+})
+
+test('it waits for the parent element to appear and then renders the the ToDoSidebar', () => {
+  const clock = sinon.useFakeTimers(new Date('2018-01-01'))
+  try {
+    ReactDOM.render(
+      <FakeDashboard
+        planner_enabled={false}
+        dashboard_view='activity'
+        showTodoList={null}
+      />, container)
+      clock.tick(510) // don't bork when the element isn't there
+      notOk(container.textContent.match(/Loading/), 'container should not contain "Loading"')
+      const todoContainer = document.createElement('div')
+      todoContainer.className = 'Sidebar__TodoListContainer'
+      container.appendChild(todoContainer)
+      clock.tick(510)
+      ok(todoContainer.textContent.match(/Loading/), 'container should contain "Loading"')
+    } finally {
+      clock.restore()
+    }
 })
 
 test('it should switch dashboard view appropriately when changeDashboard is called', () => {
@@ -179,7 +208,6 @@ test('it should use the dashboard view endpoint when Student Planner is enabled'
     equal(request.config.data, '{"dashboard_view":"cards"}');
     done()
   })
-
   ok(plannerStub.notCalled)
 })
 

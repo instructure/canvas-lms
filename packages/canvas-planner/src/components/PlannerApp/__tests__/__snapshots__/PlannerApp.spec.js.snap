@@ -573,7 +573,8 @@ exports[`PlannerApp renders empty component with no assignments 1`] = `
     </ShowOnFocusButton>
   </View>
   <PlannerEmptyState
-    changeToDashboardCardView={[Function]}
+    changeDashboardView={[Function]}
+    isCompletelyEmpty={[Function]}
     onAddToDo={[Function]}
   />
 </div>

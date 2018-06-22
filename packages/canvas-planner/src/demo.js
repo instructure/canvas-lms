@@ -53,7 +53,7 @@ const COURSES = [{
   color: "#19C3B4"
 }];
 
-const changeToDashboardCardView = () => {
+const changeDashboardView = () => {
   console.log("Demo: Change to Dashboard Card View Clicked");
 };
 
@@ -125,7 +125,7 @@ class DemoArea extends Component {
         ...this.state,
         theme: THEMES[this.state.theme],
         stickyOffset,
-        changeToDashboardCardView
+        changeDashboardView
       };
       CanvasPlanner.renderHeader(header_mount_point, opts);
       CanvasPlanner.render(mount_point, opts);

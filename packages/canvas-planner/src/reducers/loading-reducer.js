@@ -19,6 +19,7 @@
 import { handleActions } from 'redux-actions';
 import parseLinkHeader from 'parse-link-header';
 import {mergeDays, purgeDuplicateDays} from '../utilities/daysUtils';
+import {findNextLink} from '../utilities/apiUtils';
 
 function loadingState (currentState, loadingState) {
   return {
@@ -32,23 +33,15 @@ function loadingState (currentState, loadingState) {
   };
 }
 
-function findNextLink (state, action) {
+function findNextLinkFromAction (action) {
   const response = action.payload.response;
   if (response == null) return null;
-
-  const linkHeader = response.headers.link;
-  if (linkHeader == null) return null;
-
-  const parsedLinks = parseLinkHeader(linkHeader);
-  if (parsedLinks == null) return null;
-
-  if (parsedLinks.next == null) return null;
-  return parsedLinks.next.url;
+  return findNextLink(response);
 }
 
 function getNextUrls (state, action) {
   const linkState = {};
-  const nextLink = findNextLink(state, action);
+  const nextLink = findNextLinkFromAction(action);
 
   if (state.isLoading || state.loadingFuture) {
     linkState.futureNextUrl = nextLink;

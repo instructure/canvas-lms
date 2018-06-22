@@ -154,7 +154,9 @@ exports[`does not render end time if the same as start time 2`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -200,7 +202,9 @@ exports[`does not render end time if the same as start time 2`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -4107,7 +4111,9 @@ exports[`renders media feedback if available 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -4153,7 +4159,9 @@ exports[`renders media feedback if available 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""

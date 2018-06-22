@@ -28,7 +28,7 @@ const getDefaultValues = (overrides) => {
   return Object.assign({}, {
     days: days.map(d => [d.format('YYYY-MM-DD'), [{dateBucketMoment: d}]]),
     timeZone: TZ,
-    changeToDashboardCardView () {}
+    changeDashboardView () {}
   }, overrides);
 };
 
@@ -98,7 +98,7 @@ describe('PlannerApp', () => {
       <PlannerApp
         days={[]}
         timeZone="UTC"
-        changeToDashboardCardView={() => {}}
+        changeDashboardView={() => {}}
         firstNewActivityDate={moment().add(-1, 'days')}
         loadingPast
       />);

@@ -511,7 +511,6 @@ class UsersController < ApplicationController
   def user_dashboard
     # Use the legacy to do list for non-students until it is ready for other roles
     if planner_enabled? && !@current_user.non_student_enrollment?
-      js_bundle :react_todo_sidebar
       css_bundle :react_todo_sidebar
     end
     session.delete(:parent_registration) if session[:parent_registration]

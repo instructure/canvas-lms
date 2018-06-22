@@ -23,7 +23,6 @@ import { connect } from 'react-redux';
 import View from '@instructure/ui-layout/lib/components/View';
 import Spinner from '@instructure/ui-elements/lib/components/Spinner';
 import { arrayOf, oneOfType, shape, bool, object, string, number, func } from 'prop-types';
-import { momentObj } from 'react-moment-proptypes';
 import { userShape, sizeShape } from '../plannerPropTypes';
 import Day from '../Day';
 import EmptyDays from '../EmptyDays';
@@ -57,7 +56,7 @@ export class PlannerApp extends Component {
     loadPastUntilNewActivity: func,
     loadFutureItems: func,
     stickyOffset: number, // in pixels
-    changeToDashboardCardView: func,
+    changeDashboardView: func,
     togglePlannerItemCompletion: func,
     updateTodo: func,
     triggerDynamicUiUpdates: func,
@@ -77,6 +76,7 @@ export class PlannerApp extends Component {
     responsiveSize: 'large',
     appRef: () => {},
     focusFallback: () => {},
+    isCompletelyEmpty: bool,
   };
 
   constructor (props) {
@@ -208,7 +208,7 @@ export class PlannerApp extends Component {
   renderNoAssignments() {
     return (
       <PlannerEmptyState
-        changeToDashboardCardView={this.props.changeToDashboardCardView}
+        changeDashboardView={this.props.changeDashboardView}
         isCompletelyEmpty={this.props.isCompletelyEmpty}
         onAddToDo={this.onAddToDo}
       />

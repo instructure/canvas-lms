@@ -34,14 +34,14 @@ import theme from './theme.js';
 class PlannerEmptyState extends Component {
 
   static propTypes = {
-    changeToDashboardCardView: func.isRequired,
+    changeDashboardView: func.isRequired,
     onAddToDo: func.isRequired,
     isCompletelyEmpty: bool,
   }
 
   handleDashboardCardLinkClick = () => {
-    if (this.props.changeToDashboardCardView) {
-        this.props.changeToDashboardCardView();
+    if (this.props.changeDashboardView) {
+        this.props.changeDashboardView('cards');
     }
   }
 
@@ -85,7 +85,7 @@ class PlannerEmptyState extends Component {
       </div>
     );
   }
- 
+
   render () {
     return this.props.isCompletelyEmpty ? this.renderNothingAtAll() : this.renderNothingLeft();
   }

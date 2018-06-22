@@ -17,6 +17,7 @@
  */
 import moment from 'moment-timezone';
 import _ from 'lodash';
+import parseLinkHeader from 'parse-link-header';
 import { makeEndOfDayIfMidnight } from './dateUtils';
 
 const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
@@ -78,6 +79,17 @@ const getItemType = (plannableType) => {
 const getApiItemType = (overrideType) => {
   return _.findKey(TYPE_MAPPING, _.partial(_.isEqual, overrideType));
 };
+
+export function findNextLink (response) {
+  const linkHeader = response.headers.link;
+  if (linkHeader == null) return null;
+
+  const parsedLinks = parseLinkHeader(linkHeader);
+  if (parsedLinks == null) return null;
+
+  if (parsedLinks.next == null) return null;
+  return parsedLinks.next.url;
+}
 
 /**
 * Translates the API data to the format the planner expects
