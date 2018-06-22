@@ -145,6 +145,10 @@ export class PlannerItem extends Component {
            this.props.endTime && !this.props.endTime.isSame(this.props.date)
   }
 
+  hasBadges () {
+    return this.props.badges && this.props.badges.length && this.props.badges.length > 0
+  }
+
   assignmentType () {
     return this.props.associated_item ?
       this.props.associated_item : formatMessage('Task');
@@ -233,9 +237,10 @@ export class PlannerItem extends Component {
   }
 
   renderItemMetrics = () => {
+    const secondaryClasses = classnames(styles.secondary, !this.hasBadges() ? styles.secondary_no_badges: '');
     const metricsClasses = classnames(styles.metrics, {[styles.with_end_time]: this.showEndTime()});
     return (
-      <div className={styles.secondary}>
+      <div className={secondaryClasses}>
         <div className={styles.badges}>
           {this.renderBadges()}
         </div>
@@ -273,7 +278,7 @@ export class PlannerItem extends Component {
 
   renderItemDetails = () => {
     return (
-      <div className={styles.details}>
+      <div className={classnames(styles.details, !this.hasBadges() ? styles.details_no_badges: '')}>
         <div className={styles.type}>
           <Text size="x-small" color="secondary">
             {this.renderType()}

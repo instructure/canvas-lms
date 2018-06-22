@@ -39,7 +39,9 @@ exports[`does not render end time if the same as start time 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -85,7 +87,9 @@ exports[`does not render end time if the same as start time 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -261,7 +265,9 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -307,7 +313,9 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -393,7 +401,9 @@ exports[`renders Announcement correctly with everything 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -439,7 +449,9 @@ exports[`renders Announcement correctly with everything 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -528,7 +540,9 @@ exports[`renders Announcement correctly with just date 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -574,7 +588,9 @@ exports[`renders Announcement correctly with just date 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -639,7 +655,9 @@ exports[`renders Announcement correctly with just points 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -685,7 +703,9 @@ exports[`renders Announcement correctly with just points 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -774,7 +794,9 @@ exports[`renders Announcement correctly without right side content 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -820,7 +842,9 @@ exports[`renders Announcement correctly without right side content 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -885,7 +909,9 @@ exports[`renders Assignment correctly with everything 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -931,7 +957,9 @@ exports[`renders Assignment correctly with everything 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -1020,7 +1048,9 @@ exports[`renders Assignment correctly with just date 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -1066,7 +1096,9 @@ exports[`renders Assignment correctly with just date 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -1131,7 +1163,9 @@ exports[`renders Assignment correctly with just points 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -1177,7 +1211,9 @@ exports[`renders Assignment correctly with just points 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -1266,7 +1302,9 @@ exports[`renders Assignment correctly without right side content 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -1312,7 +1350,9 @@ exports[`renders Assignment correctly without right side content 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -1377,7 +1417,9 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -1423,7 +1465,9 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -1488,7 +1532,9 @@ exports[`renders Calendar Event correctly with everything 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -1534,7 +1580,9 @@ exports[`renders Calendar Event correctly with everything 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -1623,7 +1671,9 @@ exports[`renders Calendar Event correctly with just date 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -1669,7 +1719,9 @@ exports[`renders Calendar Event correctly with just date 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -1734,7 +1786,9 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -1780,7 +1834,9 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -1845,7 +1901,9 @@ exports[`renders Discussion correctly with everything 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -1891,7 +1949,9 @@ exports[`renders Discussion correctly with everything 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -1980,7 +2040,9 @@ exports[`renders Discussion correctly with just date 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -2026,7 +2088,9 @@ exports[`renders Discussion correctly with just date 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -2091,7 +2155,9 @@ exports[`renders Discussion correctly with just points 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -2137,7 +2203,9 @@ exports[`renders Discussion correctly with just points 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -2226,7 +2294,9 @@ exports[`renders Discussion correctly without right side content 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -2272,7 +2342,9 @@ exports[`renders Discussion correctly without right side content 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -2337,7 +2409,9 @@ exports[`renders Note correctly with Group 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -2383,7 +2457,9 @@ exports[`renders Note correctly with Group 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -2454,7 +2530,9 @@ exports[`renders Note correctly with everything 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -2500,7 +2578,9 @@ exports[`renders Note correctly with everything 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -2571,7 +2651,9 @@ exports[`renders Note correctly without Course 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -2617,7 +2699,9 @@ exports[`renders Note correctly without Course 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -2682,7 +2766,9 @@ exports[`renders Page correctly with everything 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -2728,7 +2814,9 @@ exports[`renders Page correctly with everything 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -2817,7 +2905,9 @@ exports[`renders Page correctly with just date 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -2863,7 +2953,9 @@ exports[`renders Page correctly with just date 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -2928,7 +3020,9 @@ exports[`renders Page correctly with just points 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -2974,7 +3068,9 @@ exports[`renders Page correctly with just points 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -3063,7 +3159,9 @@ exports[`renders Page correctly without right side content 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -3109,7 +3207,9 @@ exports[`renders Page correctly without right side content 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -3174,7 +3274,9 @@ exports[`renders Quiz correctly with everything 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -3220,7 +3322,9 @@ exports[`renders Quiz correctly with everything 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -3309,7 +3413,9 @@ exports[`renders Quiz correctly with just date 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -3355,7 +3461,9 @@ exports[`renders Quiz correctly with just date 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -3420,7 +3528,9 @@ exports[`renders Quiz correctly with just points 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -3466,7 +3576,9 @@ exports[`renders Quiz correctly with just points 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -3555,7 +3667,9 @@ exports[`renders Quiz correctly without right side content 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -3601,7 +3715,9 @@ exports[`renders Quiz correctly without right side content 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -3666,7 +3782,9 @@ exports[`renders correctly 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -3712,7 +3830,9 @@ exports[`renders correctly 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -3801,7 +3921,9 @@ exports[`renders feedback if available 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -3847,7 +3969,9 @@ exports[`renders feedback if available 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -4065,7 +4189,9 @@ exports[`renders the end time if available 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -4111,7 +4237,9 @@ exports[`renders the end time if available 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className="undefined"
@@ -4176,7 +4304,9 @@ exports[`renders the location if available 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -4222,7 +4352,9 @@ exports[`renders the location if available 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
@@ -4303,7 +4435,9 @@ exports[`renders user-created Todo correctly 1`] = `
   </div>
   <div>
     <div>
-      <div>
+      <div
+        className=""
+      >
         <div>
           <Text
             as="span"
@@ -4349,7 +4483,9 @@ exports[`renders user-created Todo correctly 1`] = `
           </Link>
         </div>
       </div>
-      <div>
+      <div
+        className=""
+      >
         <div />
         <div
           className=""
