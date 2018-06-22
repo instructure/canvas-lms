@@ -43,10 +43,13 @@ learning outcome groups in the parent_guids field below, to indicate that this g
 contains an outcome or group. This value cannot contain spaces.
 <br />
 If outcomes have been exported from an account with no vendor_guid values set,
-canvas will auto-assign vendor_guid values from internal identifiers. We
+canvas will auto-assign vendor_guid values from internal identifiers. These ids will have the
+prefix "canvas_outcome:" and "canvas_outcome_group:" for outcomes and groups respectively.  We
 recommend that you *do not* change these values once they have been assigned.
-If you want to set your own vendor_guid values, you should do that using the
+If you want to set your own vendor_guid values for existing outcomes, you should do that using the
 Canvas API prior to exporting outcomes from an account.
+In addition, these prefixes are reserved; newly created outcomes and groups may not
+have vendor_guid fields with these prefixes.
 </td>
 </tr>
 <tr>
