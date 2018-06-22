@@ -19,7 +19,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-addons-test-utils'
-import axios from 'axios'
 import moxios from 'moxios';
 import MessageStudents from 'jsx/shared/MessageStudents'
 
@@ -142,7 +141,10 @@ QUnit.module('MessageStudents', hooks => {
     QUnit.module('on error', hooks => {
       hooks.beforeEach(() => {
         moxios.stubRequest('/api/v1/conversations', {
-          status: 500
+          status: 500,
+          response: [
+            { attribute: 'fake', message: 'error' }
+          ]
         })
       })
 
