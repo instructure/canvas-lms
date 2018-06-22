@@ -186,7 +186,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     self.idp_entity_id = entity.entity_id
     self.log_in_url = idp.single_sign_on_services.find { |ep| ep.binding == SAML2::Bindings::HTTPRedirect::URN }.try(:location)
     self.log_out_url = idp.single_logout_services.find { |ep| ep.binding == SAML2::Bindings::HTTPRedirect::URN }.try(:location)
-    self.certificate_fingerprint = (idp.signing_keys.first || idp.keys.first).try(:fingerprint)
+    self.certificate_fingerprint = idp.signing_keys.map(&:fingerprint).join(' ').presence || idp.keys.first&.fingerprint
     self.identifier_format = (idp.name_id_formats & Onelogin::Saml::NameIdentifiers::ALL_IDENTIFIERS).first
     self.settings[:signing_certificates] = idp.signing_keys.map(&:x509)
     case idp.want_authn_requests_signed?
