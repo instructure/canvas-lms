@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
+import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
 import Button from '@instructure/ui-buttons/lib/components/Button'
@@ -32,6 +33,7 @@ import uuid from 'uuid/v1'
 import _ from 'underscore'
 import { fromJS, List } from 'immutable'
 import { fetchProficiency, saveProficiency } from './api'
+import RubricManagement from 'jsx/rubrics/RubricManagement'
 import NumberHelper from '../shared/helpers/numberHelper'
 import SVGWrapper from '../shared/SVGWrapper'
 
@@ -46,7 +48,12 @@ function unformatColor (color) {
 
 export default class ProficiencyTable extends React.Component {
   static propTypes = {
-    accountId: PropTypes.string.isRequired
+    accountId: PropTypes.string.isRequired,
+    managementView: PropTypes.instanceOf(RubricManagement)
+  }
+
+  static defaultProps = {
+    managementView: null
   }
 
   constructor (props) {
@@ -167,7 +174,17 @@ export default class ProficiencyTable extends React.Component {
     if (masteryIndex >= index && masteryIndex > 0) {
       this.setState({ masteryIndex: masteryIndex - 1 })
     }
-    this.setState({rows})
+    if (index === 0) {
+      this.setState({rows})
+      if (this.props.managementView) {
+        setTimeout(() => {
+          ReactDOM.findDOMNode(this.props.managementView.tabList._tabs[1]).focus()
+        }, 700)
+      }
+    } else {
+      this.setState({ rows: rows.setIn([index-1, 'focusField'], 'trash') })
+    }
+    $.screenReaderFlashMessage(I18n.t('Proficiency Rating deleted'))
   })
 
   isStateValid = () => !this.state.rows.some(row =>

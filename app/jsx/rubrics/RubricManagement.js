@@ -23,19 +23,21 @@ import TabList, { TabPanel } from '@instructure/ui-tabs/lib/components/TabList'
 import ProficiencyTable from 'jsx/rubrics/ProficiencyTable'
 import RubricPanel from 'jsx/rubrics/RubricPanel'
 
-const RubricManagement = ({accountId}) => (
-    <TabList defaultSelectedIndex={0}>
-      <TabPanel title={I18n.t('Account Rubrics')}>
-        <RubricPanel />
-      </TabPanel>
-      <TabPanel title={I18n.t('Learning Mastery')}>
-        <ProficiencyTable accountId={accountId} />
-      </TabPanel>
-    </TabList>
-  )
+export default class RubricManagement extends React.Component {
+  static propTypes = {
+    accountId: PropTypes.string.isRequired
+  }
 
-RubricManagement.propTypes = {
-  accountId: PropTypes.string.isRequired
+  render() {
+    return (
+      <TabList ref={tabList => { this.tabList = tabList }} defaultSelectedIndex={0}>
+        <TabPanel title={I18n.t('Account Rubrics')}>
+          <RubricPanel />
+        </TabPanel>
+        <TabPanel title={I18n.t('Learning Mastery')}>
+          <ProficiencyTable managementView={this} accountId={this.props.accountId} />
+        </TabPanel>
+      </TabList>
+    )
+  }
 }
-
-export default RubricManagement

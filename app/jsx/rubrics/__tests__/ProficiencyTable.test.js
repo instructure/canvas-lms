@@ -101,12 +101,15 @@ describe('default proficiency', () => {
     }, 1)
   })
 
-  it('handling delete rating removes rating', (done) => {
+  it('handling delete rating removes rating and flashes SR message', (done) => {
     const wrapper = mount(<ProficiencyTable {...defaultProps()}/>)
+    const flashMock = jest.spyOn($, 'screenReaderFlashMessage')
     setTimeout(() => {
       wrapper.instance().removeBillboard()
-      wrapper.instance().handleDelete(0)()
+      wrapper.instance().handleDelete(1)()
       expect(wrapper.find('ProficiencyRating')).toHaveLength(4)
+      expect(flashMock).toHaveBeenCalledTimes(1)
+      flashMock.mockRestore()
       done()
     }, 1)
   })
