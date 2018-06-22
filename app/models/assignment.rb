@@ -103,13 +103,10 @@ class Assignment < ActiveRecord::Base
     self.muted = true if moderated_grading? && anonymous_moderated_marking?
   end
 
-  validates :graders_anonymous_to_graders, absence: true, unless: :anonymous_grading?
-
   with_options unless: :moderated_grading? do
-    validates :grader_comments_visible_to_graders, absence: true
+    validates :graders_anonymous_to_graders, absence: true
     validates :grader_section, absence: true
     validates :final_grader, absence: true
-    validates :grader_names_visible_to_final_grader, absence: true
   end
 
   with_options if: -> { moderated_grading? && anonymous_moderated_marking? } do
