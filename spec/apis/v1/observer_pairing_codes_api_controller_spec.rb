@@ -29,7 +29,7 @@ describe ObserverPairingCodesApiController, type: :request do
         controller: 'observer_pairing_codes_api', action: 'create', format: 'json'}
     end
 
-    it 'creates a pairing code' do
+    it 'students can create pairing codes for themselves' do
       json = api_call_as_user(@student, :post, @path, @params)
       expect(json['user_id']).to eq @student.id
       expect(json['expires_at']).not_to be nil
@@ -37,7 +37,7 @@ describe ObserverPairingCodesApiController, type: :request do
       expect(json['code'].length).to eq 6
     end
 
-    it 'errors if user isnt a student' do
+    it 'errors if user_id passed in isnt a student' do
       user = user_model
       params = @params.merge(user_id: user.to_param)
       path = "/api/v1/users/#{user.id}/observer_pairing_codes"
@@ -45,11 +45,11 @@ describe ObserverPairingCodesApiController, type: :request do
       expect(response.code).to eq "401"
     end
 
-    it 'teacher can generate code' do
+    it 'teacher cannot generate code by default' do
       teacher = teacher_in_course(course: @course, active_all: true).user
       json = api_call_as_user(teacher, :post, @path, @params)
-      expect(response.code).to eq "200"
-      expect(json['code']).not_to be nil
+      expect(response.code).to eq "401"
+      expect(json['code']).to eq nil
     end
 
     it 'admin can generate code' do
