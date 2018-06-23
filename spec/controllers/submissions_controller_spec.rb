@@ -826,6 +826,12 @@ describe SubmissionsController do
 
     let(:body) { JSON.parse(response.body)['submission'] }
 
+    it "redirects to login when logged out" do
+      remove_user_session
+      get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
+      expect(response).to redirect_to(login_url)
+    end
+
     it "renders show template" do
       get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
       expect(response).to render_template(:show)

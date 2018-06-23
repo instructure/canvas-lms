@@ -4070,7 +4070,7 @@ describe Submission do
     end
   end
 
-  describe "#can_view_details" do
+  describe "#can_view_details?" do
     before :each do
       @assignment.root_account.enable_feature!(:anonymous_moderated_marking)
       @assignment.update!(anonymous_grading: true, muted: true)
@@ -4080,6 +4080,10 @@ describe Submission do
     it "returns true if anonymous_moderated_marking is not enabled" do
       @assignment.root_account.disable_feature!(:anonymous_moderated_marking)
       expect(@submission.can_view_details?(@student)).to be true
+    end
+
+    it "returns false if user isn't present" do
+      expect(@submission).not_to be_can_view_details(nil)
     end
 
     it "returns true for submitting student if assignment anonymous grading and muted" do

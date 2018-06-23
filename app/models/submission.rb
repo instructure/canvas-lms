@@ -462,6 +462,7 @@ class Submission < ActiveRecord::Base
   end
 
   def can_view_details?(user)
+    return false unless grants_right?(user, :read)
     return true unless self.assignment.root_account.feature_enabled?(:anonymous_moderated_marking)
     return true unless self.assignment.anonymous_grading && self.assignment.muted
     user == self.user || Account.site_admin.grants_right?(user, :update)
