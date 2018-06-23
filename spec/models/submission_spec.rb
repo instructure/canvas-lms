@@ -4073,10 +4073,14 @@ describe Submission do
     end
   end
 
-  describe "#can_view_details" do
+  describe "#can_view_details?" do
     before :each do
       @assignment.update!(anonymous_grading: true, muted: true)
       @submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry', body: 'a body')
+    end
+
+    it "returns false if user isn't present" do
+      expect(@submission).not_to be_can_view_details(nil)
     end
 
     it "returns true for submitting student if assignment anonymous grading and muted" do
