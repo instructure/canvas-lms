@@ -138,5 +138,16 @@ class Announcement < DiscussionTopic
   def create_alert
     return if !saved_changes.keys.include?('workflow_state') || saved_changes['workflow_state'][1] != 'active'
     return if self.context_type != 'Course'
+
+    observer_enrollments = self.course.enrollments.active.where(type: 'ObserverEnrollment')
+    observer_enrollments.each do |enrollment|
+      observer = enrollment.user
+      threshold = ObserverAlertThreshold.where(observer: observer, alert_type: 'course_announcement').first
+      next unless threshold
+
+      ObserverAlert.create!(observer: observer, student: threshold.student, observer_alert_threshold: threshold,
+                            context: self, alert_type: 'course_announcement', action_date: self.updated_at,
+                            title: I18n.t("Announcement posted: %{title}", title: self.title))
+    end
   end
 end

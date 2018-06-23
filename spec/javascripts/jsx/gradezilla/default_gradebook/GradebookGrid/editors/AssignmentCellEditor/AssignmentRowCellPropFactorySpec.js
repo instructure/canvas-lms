@@ -40,7 +40,7 @@ QUnit.module('AssignmentRowCellPropFactory', () => {
         }
       }
 
-      gradebook.students['1101'] = {id: '1101'}
+      gradebook.students['1101'] = {id: '1101', isConcluded: false}
       gradebook.setAssignments({
         2301: {grading_type: 'points', id: '2301', points_possible: 10}
       })
@@ -49,7 +49,9 @@ QUnit.module('AssignmentRowCellPropFactory', () => {
         entered_grade: '7.8',
         entered_score: 7.8,
         excused: false,
+        grade: '6.8',
         id: '2501',
+        score: 6.8,
         user_id: '1101'
       })
 
@@ -57,7 +59,7 @@ QUnit.module('AssignmentRowCellPropFactory', () => {
         column: {
           assignmentId: '2301'
         },
-        item: {id: '1101', isConcluded: false}
+        item: {id: '1101'}
       }
 
       sinon.stub(gradebook, 'updateRowAndRenderSubmissionTray') // no rendering needed for these tests
@@ -78,6 +80,26 @@ QUnit.module('AssignmentRowCellPropFactory', () => {
     test('.enterGradesAs is the "enter grades as" setting for the assignment', () => {
       gradebook.setEnterGradesAsSetting('2301', 'percent')
       equal(getProps().enterGradesAs, 'percent')
+    })
+
+    test('.gradeIsEditable is true when the grade for the submission is editable', () => {
+      sinon.stub(gradebook, 'isGradeEditable').withArgs('1101', '2301').returns(true)
+      strictEqual(getProps().gradeIsEditable, true)
+    })
+
+    test('.gradeIsEditable is false when the grade for the submission is not editable', () => {
+      sinon.stub(gradebook, 'isGradeEditable').withArgs('1101', '2301').returns(false)
+      strictEqual(getProps().gradeIsEditable, false)
+    })
+
+    test('.gradeIsVisible is true when the grade for the submission is visible', () => {
+      sinon.stub(gradebook, 'isGradeVisible').withArgs('1101', '2301').returns(true)
+      strictEqual(getProps().gradeIsVisible, true)
+    })
+
+    test('.gradeIsVisible is false when the grade for the submission is not visible', () => {
+      sinon.stub(gradebook, 'isGradeVisible').withArgs('1101', '2301').returns(false)
+      strictEqual(getProps().gradeIsVisible, false)
     })
 
     test('.gradingScheme is the grading scheme for the assignment', () => {
@@ -156,6 +178,10 @@ QUnit.module('AssignmentRowCellPropFactory', () => {
       strictEqual(getProps().pendingGradeInfo, null)
     })
 
+    test('.student is the student associated with the row of the cell', () => {
+      deepEqual(getProps().student, gradebook.students['1101'])
+    })
+
     test('.submission.assignmentId is the assignment id', () => {
       strictEqual(getProps().submission.assignmentId, '2301')
     })
@@ -178,8 +204,20 @@ QUnit.module('AssignmentRowCellPropFactory', () => {
       strictEqual(getProps().submission.excused, false)
     })
 
+    test('.submission.grade is the final grade on the submission', () => {
+      strictEqual(getProps().submission.grade, '6.8')
+    })
+
     test('.submission.id is the submission id', () => {
       strictEqual(getProps().submission.id, '2501')
+    })
+
+    test('.submission.rawGrade is the raw grade on the submission', () => {
+      strictEqual(getProps().submission.rawGrade, '6.8')
+    })
+
+    test('.submission.score is the final score on the submission', () => {
+      strictEqual(getProps().submission.score, 6.8)
     })
 
     test('.submission.userId is the student id', () => {

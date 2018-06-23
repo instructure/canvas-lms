@@ -16,9 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import actions from 'jsx/developer_keys/actions/developerKeysActions'
+import store from 'jsx/developer_keys/store/store'
 import axios from 'axios'
 
 QUnit.module('Developer key actions')
+
+function thenStub() {
+  return(
+    {
+      then: () => {
+        return {catch: () => {}}
+      }
+    }
+  )
+}
 
 test('listInheritedDeveloperKeysStart returns proper action', () => {
   const retVal = actions.listInheritedDeveloperKeysStart()
@@ -54,57 +65,37 @@ test('listInheritedDeveloperKeysFailed returns a error', () => {
 })
 
 test('getDeveloperKeys retrieves account key data', () => {
-  const thenStub = {
-    then: () => {
-      return {catch: () => {}}
-    }
-  }
-
-  const getStub = sinon.stub(axios, 'get').returns(thenStub)
-
+  const getStub = sinon.stub(axios, 'get').returns(thenStub())
   actions.getDeveloperKeys('http://www.test.com', {})(() => {}, () => {})
   ok(getStub.calledWith('http://www.test.com'))
   axios.get.restore()
 })
 
 test('getDeveloperKeys retrieves account key data', () => {
-  const thenStub = {
-    then: () => {
-      return {catch: () => {}}
-    }
-  }
-
-  const getStub = sinon.stub(axios, 'get').returns(thenStub)
-
+  const getStub = sinon.stub(axios, 'get').returns(thenStub())
   actions.getDeveloperKeys('http://www.test.com', {})(() => {}, () => {})
   ok(getStub.calledWith('http://www.test.com?inherited=true'))
   axios.get.restore()
 })
 
 test('getRemainingDeveloperKeys requests keys from the specified URL', () => {
-  const thenStub = {
-    then: () => {
-      return {catch: () => {}}
-    }
-  }
-
-  const getStub = sinon.stub(axios, 'get').returns(thenStub)
-
+  const getStub = sinon.stub(axios, 'get').returns(thenStub())
   actions.getRemainingDeveloperKeys('http://www.test.com', [])(() => {}, () => {})
   ok(getStub.calledWith('http://www.test.com'))
   axios.get.restore()
 })
 
 test('getRemainingInheritedDeveloperKeys requests keys from the specified URL with inherited param', () => {
-  const thenStub = {
-    then: () => {
-      return {catch: () => {}}
-    }
-  }
-
-  const getStub = sinon.stub(axios, 'get').returns(thenStub)
-
+  const getStub = sinon.stub(axios, 'get').returns(thenStub())
   actions.getRemainingInheritedDeveloperKeys('http://www.test.com', [])(() => {}, () => {})
   ok(getStub.calledWith('http://www.test.com?inherited=true'))
   axios.get.restore()
 })
+
+test('listDeveloperKeyScopes makes a request to the scopes endpoint', () => {
+  const getStub = sinon.stub(axios, 'get').returns(thenStub())
+  actions.listDeveloperKeyScopes(1)(store.dispatch)
+  ok(getStub.calledWith('/api/v1/accounts/1/scopes?group_by=resource_name'))
+  axios.get.restore()
+})
+

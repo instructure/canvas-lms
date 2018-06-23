@@ -9,10 +9,30 @@
     </div>
   {{else}}
   {{#if failedToDuplicate}}
-    {{#t}}Oops! Something went wrong with making a copy of "{{originalAssignmentName}}"{{/t}}
+    <span aria-live="polite">{{#t}}Oops! Something went wrong with making a copy of "{{originalAssignmentName}}"{{/t}}</span>
     <div class="duplicate-failed-actions">
-      <button class="duplicate-failed-retry btn btn-primary">{{#t}}Retry{{/t}}</button>
-      <button class="duplicate-failed-cancel btn">{{#t}}Cancel{{/t}}</button>
+      <button class="duplicate-failed-retry btn btn-primary">
+        <span class="screenreader-only">{{#t}}Retry duplicating "{{originalAssignmentName}}"{{/t}}</span>
+        <span aria-hidden="true">{{#t}}Retry{{/t}}</span>
+      </button>
+      <button class="duplicate-failed-cancel btn">
+        <span class="screenreader-only">{{#t}}Cancel duplicating "{{originalAssignmentName}}"{{/t}}</span>
+        <span aria-hidden="true">{{#t}}Cancel{{/t}}</span>
+      </button>
+    </div>
+  {{else}}
+  {{#if isImporting}}
+    <div class="ig-row__layout">
+      {{>spinner}} {{#t}}Importing "{{name}}"{{/t}}
+    </div>
+  {{else}}
+  {{#if failedToImport}}
+    <span aria-live="polite">{{#t}}Oops! Something went wrong importing "{{name}}"{{/t}}</span>
+    <div class="import-failed-actions">
+      <button class="import-failed-cancel btn">
+        <span class="screenreader-only">{{#t}}Cancel importing "{{name}}"{{/t}}</span>
+        <span aria-hidden="true">{{#t}}Cancel{{/t}}</span>
+      </button>
     </div>
   {{else}}
   <div class="ig-row__layout">
@@ -27,7 +47,7 @@
       <i aria-hidden="true" class='icon-{{iconType}}'></i>
     </div>
     <div class="ig-info">
-      <a href="{{htmlUrl}}" class="ig-title">
+      <a href="{{htmlUrl}}" class="ig-title" aria-live="polite">
         {{name}}
       </a>
       <div class="ig-details">
@@ -191,6 +211,8 @@
     </div>
 
     <form data-view="edit-assignment" class="form-dialog"></form>
+  {{/if}}
+  {{/if}}
   {{/if}}
   {{/if}}
   {{/if}}

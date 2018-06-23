@@ -18,9 +18,9 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import Button from '@instructure/ui-core/lib/components/Button'
-import Tray from '@instructure/ui-core/lib/components/Tray'
-import IconX from 'instructure-icons/lib/Solid/IconXSolid'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import Tray from '@instructure/ui-overlays/lib/components/Tray'
+import IconX from '@instructure/ui-icons/lib/Solid/IconX'
 import I18n from 'i18n!cyoe_assignment_sidebar'
 import StudentRangeView from './student-ranges-view'
 import StudentDetailsView from './student-details-view'
@@ -91,7 +91,6 @@ export default class BreakdownDetails extends React.Component {
           placement="end"
           shouldContainFocus
           defaultFocusElement={() => this.closeButton}
-          applicationElement={() => document.getElementById('application')}
         >
           <div className="crs-breakdown-details">
             <div className="crs-breakdown-details__content">

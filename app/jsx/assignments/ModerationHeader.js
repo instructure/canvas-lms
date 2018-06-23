@@ -24,13 +24,17 @@ import I18n from 'i18n!moderated_grading'
     displayName: 'Header',
 
     propTypes: {
+      anonymousModeratedMarkingEnabled: PropTypes.bool.isRequired,
+      muted: PropTypes.bool.isRequired,
       onPublishClick: PropTypes.func.isRequired,
       onReviewClick: PropTypes.func.isRequired,
+      onUnmuteClick: PropTypes.func.isRequired,
       published: PropTypes.bool.isRequired,
       selectedStudentCount: PropTypes.number.isRequired,
       inflightAction: PropTypes.shape({
         review: PropTypes.bool.isRequired,
-        publish: PropTypes.bool.isRequired
+        publish: PropTypes.bool.isRequired,
+        unmute: PropTypes.bool.isRequired
       }).isRequired,
       permissions: PropTypes.shape({
         editGrades: PropTypes.bool.isRequired
@@ -70,6 +74,28 @@ import I18n from 'i18n!moderated_grading'
       }
     },
 
+    handleUnmuteClick () {
+      const confirmMessage = I18n.t('Are you sure you want to display grades for this assignment to students?');
+      if (window.confirm(confirmMessage)) {
+        this.props.onUnmuteClick();
+      }
+    },
+
+    renderUnmuteButton () {
+      const {published, muted, inflightAction} = this.props;
+      const allowUnmute = published && muted && !inflightAction.unmute;
+      return (
+        <button
+          type="button"
+          className="ModeratedGrading__Header-UnmuteBtn Button"
+          onClick={this.handleUnmuteClick}
+          disabled={!allowUnmute}
+        >
+          {I18n.t('Display to Students')}
+        </button>
+      );
+    },
+
     renderPostButton () {
       return this.props.permissions.editGrades && (
         <button
@@ -85,6 +111,8 @@ import I18n from 'i18n!moderated_grading'
     },
 
     render () {
+      const showUnmuteButton = this.props.anonymousModeratedMarkingEnabled && this.props.permissions.editGrades
+
       return (
         <div>
           {this.renderPublishedMessage()}
@@ -113,6 +141,7 @@ import I18n from 'i18n!moderated_grading'
                 </span>
               </button>
               {this.renderPostButton()}
+              {showUnmuteButton && this.renderUnmuteButton()}
             </div>
           </div>
       </div>

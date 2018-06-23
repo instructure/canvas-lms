@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import page from 'page'
 import qs from 'qs'
-import DeveloperKeysApp from './DeveloperKeysApp'
+import DeveloperKeysApp from './App'
 import actions from './actions/developerKeysActions'
 import store from './store/store'
 
@@ -28,49 +28,47 @@ import store from './store/store'
  * Route Handlers
  */
 // ctx is context
-function renderShowDeveloperKeys (ctx) {
-  store.dispatch(actions.getDeveloperKeys(`/api/v1/accounts/${ctx.params.contextId}/developer_keys`, true));
+function renderShowDeveloperKeys(ctx) {
+  store.dispatch(
+    actions.getDeveloperKeys(`/api/v1/accounts/${ctx.params.contextId}/developer_keys`, true)
+  )
+
+  store.dispatch(actions.listDeveloperKeyScopes(ctx.params.contextId))
 
   const view = () => {
-    const state = store.getState();
+    const state = store.getState()
     ReactDOM.render(
-      <DeveloperKeysApp
-        applicationState={state}
-        actions={actions}
-        store={store}
-        ctx={ctx}
-      />,
-      document.getElementById('reactContent'));
-  };
+      <DeveloperKeysApp applicationState={state} actions={actions} store={store} ctx={ctx} />,
+      document.getElementById('reactContent')
+    )
+  }
   // returns A function that unsubscribes the change listener.
-  store.subscribe(view);
+  store.subscribe(view)
 
   // renders the page
-  view();
+  view()
 }
-
 
 /**
  * Middlewares
  */
 
-function parseQueryString (ctx, next) {
-  ctx.query = qs.parse(ctx.querystring);
-  next();
+function parseQueryString(ctx, next) {
+  ctx.query = qs.parse(ctx.querystring)
+  next()
 }
 
 /**
  * Route Configuration
  */
-page('*', parseQueryString); // Middleware to parse querystring to object
+page('*', parseQueryString) // Middleware to parse querystring to object
 
-page('/accounts/:contextId/developer_keys', renderShowDeveloperKeys);
+page('/accounts/:contextId/developer_keys', renderShowDeveloperKeys)
 
 // export default for a module
 // when we import router.js, this is what we get by default
 export default {
-  start () {
-    page.start();
+  start() {
+    page.start()
   }
-};
-
+}

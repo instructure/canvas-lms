@@ -23,7 +23,7 @@ describe AccessToken do
   context "Authenticate" do
     shared_examples "#authenticate" do
 
-      it "new access tokens shouldnt have an expiratione" do
+      it "new access tokens shouldnt have an expiration" do
         at = AccessToken.create!(:user => user_model, :developer_key => DeveloperKey.default)
         expect(at.expires_at).to eq nil
       end
@@ -288,6 +288,7 @@ describe AccessToken do
       before do
         allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
         allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite) { true }
+        Setting.set(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, 'true')
       end
 
       shared_examples_for 'an access token that honors developer key bindings' do
@@ -377,6 +378,25 @@ describe AccessToken do
           let(:binding) { root_account_key.developer_key_account_bindings.find_by!(account: root_account) }
           let(:account) { root_account }
         end
+      end
+    end
+
+    describe 'adding scopes' do
+      let(:dev_key) { DeveloperKey.create! require_scopes: true, scopes: TokenScopes.all_scopes.slice(0,10)}
+
+      before do
+        allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
+        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:api_token_scoping) { true }
+      end
+
+      it 'is invalid when scopes requested are not included on dev key' do
+        access_token = AccessToken.new(user: user_model, developer_key: dev_key, scopes: [TokenScopes.all_scopes[12]])
+        expect(access_token).not_to be_valid
+      end
+
+      it 'is valid when scopes requested are included on dev key' do
+        access_token = AccessToken.new(user: user_model, developer_key: dev_key, scopes: [TokenScopes.all_scopes[8], TokenScopes.all_scopes[7]])
+        expect(access_token).to be_valid
       end
     end
   end

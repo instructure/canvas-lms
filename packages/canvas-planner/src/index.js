@@ -99,7 +99,6 @@ export function render (element, options) {
         <PlannerApp
           appRef={app => dynamicUiManager.setApp(app)}
           stickyOffset={opts.stickyOffset}
-          stickyZIndex={opts.stickyZIndex}
           changeToDashboardCardView={opts.changeToDashboardCardView}
           plannerActive={plannerActive}
           currentUser={opts.currentUser}
@@ -118,6 +117,7 @@ export function renderHeader (element, options) {
     <DynamicUiProvider manager={dynamicUiManager} >
       <Provider store={store}>
         <PlannerHeader
+          stickyZIndex={opts.stickyZIndex}
           timeZone={opts.timeZone}
           locale={opts.locale}
           ariaHideElement={opts.ariaHideElement}
@@ -154,7 +154,7 @@ export default function loadPlannerDashboard ({changeToCardView, getActiveApp, f
     })) : [];
 
   const stickyElementRect = stickyElement.getBoundingClientRect();
-  const stickyOffset = stickyElementRect.bottom - stickyElementRect.top;
+  const stickyOffset = stickyElementRect.bottom - stickyElementRect.top + 24;
   plannerActive = () => getActiveApp() === 'planner';
 
   const options = {
@@ -169,12 +169,11 @@ export default function loadPlannerDashboard ({changeToCardView, getActiveApp, f
     currentUser: {
       id: env.current_user.id,
       displayName: env.current_user.display_name,
-      avatarUrl: env.current_user.avatar_image_url
+      avatarUrl: env.current_user.avatar_image_url,
+      color: env.PREFERENCES.custom_colors[`user_${env.current_user.id}`]
     },
     ariaHideElement: document.getElementById('application'),
     theme: '',
-    // the new activity button isn't sticky in IE yet, so make sure it slides
-    // under the header that is sticky in IE
     stickyZIndex: 3,
     stickyOffset: stickyOffset,
     courses: courses,

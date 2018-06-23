@@ -528,8 +528,7 @@ class ContentMigration < ActiveRecord::Base
       end
 
       migration_settings[:migration_ids_to_import] ||= {:copy=>{}}
-
-      Importers.content_importer_for(self.context_type).import_content(self.context, data, migration_settings[:migration_ids_to_import], self)
+      import!(data)
 
       if !self.import_immediately?
         update_import_progress(100)
@@ -552,6 +551,31 @@ class ContentMigration < ActiveRecord::Base
     end
   end
   alias_method :import_content_without_send_later, :import_content
+
+  def import!(data)
+    return import_quizzes_next!(data) if quizzes_next_migration?
+    Importers.content_importer_for(self.context_type).
+      import_content(
+        self.context,
+        data,
+        self.migration_settings[:migration_ids_to_import],
+        self
+      )
+  end
+
+  def quizzes_next_migration?
+    context.instance_of?(Course) && root_account &&
+      root_account.feature_enabled?(:import_to_quizzes_next) &&
+      migration_settings[:import_quizzes_next]
+  end
+
+  def import_quizzes_next!(data)
+    quizzes2_importer =
+      QuizzesNext::Importers::CourseContentImporter.new(data, self)
+    quizzes2_importer.import_content(
+      self.migration_settings[:migration_ids_to_import]
+    )
+  end
 
   def master_migration
     @master_migration ||= self.shard.activate { MasterCourses::MasterMigration.find(self.migration_settings[:master_migration_id]) }

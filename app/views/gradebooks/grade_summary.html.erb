@@ -154,7 +154,7 @@
           <% if assignment_presenter.is_unread? %>
             <div class="unread-grade">&nbsp;</div>
           <% end %>
-          <% if assignment_presenter.is_assignment? %>
+          <% if assignment_presenter.show_submission_details_link? %>
             <a href="<%= context_url(@context, :context_assignment_submission_url, assignment, @presenter.student_id) %>"><%= assignment.title %></a>
           <% else %>
             <%= assignment.title %>
@@ -537,7 +537,18 @@
                 <% end %>
               </div>
               <div class="rubric-toggle"><a href="#" data-aria="rubric_<%= assignment.id %>" class="screenreader-toggle pull-left"><%= t(:close_rubric, 'Close Rubric') %></a></div>
-              <%= render :partial => "shared/rubric", :object => assessment.rubric, :locals => { :assessment => assessment } %>
+              <% if @domain_root_account.feature_enabled?(:non_scoring_rubrics)%>
+                <div
+                  class="react_rubric_container rubric <%= "for_grading" if assessment.rubric_association.try(:use_for_grading) %>"
+                  id="<%= assessment.rubric ? "rubric_#{assessment.rubric&.id}" : "default_rubric" %>"
+                  data-rubric-id="<%= assessment.rubric ? assessment.rubric.id : "default" %>"
+                  data-rubric-assessment-id="<%= assessment ? assessment.id : "none" %>"
+                  tabindex="0"
+                >
+              <% else %>
+                <%= render :partial => "shared/rubric", :object => assessment.rubric, :locals => { :assessment => assessment } %>
+              <% end %>
+              </div>
             <% end %>
           </td>
         <% end %>

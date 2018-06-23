@@ -523,6 +523,8 @@ class ContextExternalTool < ActiveRecord::Base
       [context] + (context.context ? contexts_to_search(context.context) : context.account_chain)
     when Account
       context.account_chain
+    when Assignment
+      contexts_to_search(context.context)
     else
       []
     end

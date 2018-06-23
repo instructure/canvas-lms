@@ -1,0 +1,194 @@
+/*
+ * Copyright (C) 2018 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import "base/environment";
+
+$border-color: #ddd;
+$borderShadow: inset 0 1px 0 0 $border-color;
+
+$faintRowBg: #fafafa;
+$lightRowBg: #fff;
+$darkRowBg: #f9f9f9;
+
+// container that holds the table, we scroll inside here
+.ic-permissions__table-container {
+  // dimensions of the table on screen, the table will scroll inside this container
+  // might want to change to match design
+  width: 90%;
+  height: 530px;
+
+  // needed for scrolling + sticky headers
+  overflow: auto;
+  position: relative;
+
+  border: 1px solid $border-color;
+
+  margin: 20px;
+}
+
+.ic-permissions_role_tray {
+  hr {
+    margin-top: 7px;
+    margin-bottom: 7px;
+  }
+}
+
+.ic-permissions_role_tray_table_role_expandable {
+  margin-#{direction(left)}: -6px;
+}
+
+// the <table> itself
+.ic-permissions__table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  empty-cells: show;
+
+  font-size: 13px;
+
+  // alternate background of row groups
+  tbody {
+    background: $lightRowBg;
+
+    &:nth-of-type(odd) {
+      background: $darkRowBg;
+
+      .ic-permissions__left-header__col-wrapper {
+        background: $darkRowBg;
+      }
+    }
+  }
+
+  td, th {
+    padding: 0;
+  }
+
+  tr {
+    box-shadow: $borderShadow;
+  }
+
+  // content cell, aka a table cell with permission buttons inside it
+  .ic-permissions__cell-content {
+    text-align: center;
+  }
+
+  // STICKY PROPERTIES
+  .ic-permissions__corner-stone {
+    width: 300px;
+    border-right: 1px solid #ddd;
+    box-shadow: 3px 4px 5px 0 #e8e8e8, inset 0 1px 0 0 #ddd;
+    position: sticky;
+    left: 0;
+    top: 0;
+    z-index: 100;
+    background-color: $faintRowBg;
+  }
+  .ic-permission-corner-text{
+    margin-#{direction(left)}: 10px;
+  }
+
+  .ic-permissions__corner-stone:after{
+    content:'';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    border-bottom: 1px solid $border-color;
+  }
+
+  .ic-permissions__main-left-header {
+    position: sticky;
+    left: 0;
+    z-index: 9;
+  }
+
+  // the header cells of the expanded row
+  .ic-permissions__left-header__expanded {
+    position: sticky;
+    left: 0;
+
+    .ic-permissions__left-header__col-wrapper {
+
+      .ic-permissions__header-content {
+        text-align: right;
+      }
+    }
+  }
+  // specifically for the column header content
+  .ic-permissions__header-content-col {
+    justify-content: center;
+  }
+  // header cell for the top and side headers
+  .ic-permissions__header-content {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    width: inherit;
+    height: inherit;
+    background-color: inherit;
+  }
+
+  .ic-permissions__top-header__col-wrapper-th {
+    box-shadow: 3px 4px 5px 0 #e8e8e8, inset 0 1px 0 0 #ddd;
+    position: sticky;
+    top: 0;
+    z-index: 8;
+    background: $faintRowBg;
+  }
+
+  .ic-permissions__top-header__col-wrapper-th:after{
+    content:'';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    border-bottom: 1px solid $border-color;
+  }
+
+  // the top "fixed" header
+  .ic-permissions__top-header__col-wrapper {
+    margin-left: auto;
+    margin-right: auto;
+    height: 50px;
+    width: 140px;
+    background: $faintRowBg;
+  }
+
+  // the left "fixed" header
+  .ic-permissions__left-header__col-wrapper {
+    width: 300px;
+    height: 60px;
+    background: $lightRowBg;
+
+    .ic-permissions__header-content {
+      text-align: left;
+
+      // that border shadow effect on the left side header
+      border-right: 1px solid #ddd;
+      box-shadow: 3px 4px 5px 0 #e8e8e8, $borderShadow;
+    }
+  }
+
+}
+
+.permissions__add-tray-footer {
+    position: sticky;
+    bottom: 0;
+    background: $faintRowBg;
+    padding: 0 0 20px 0;
+}

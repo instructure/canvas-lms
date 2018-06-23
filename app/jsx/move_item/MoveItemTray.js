@@ -20,9 +20,9 @@ import I18n from 'i18n!move_item_tray'
 import axios from 'axios'
 import React from 'react'
 import { string, func, arrayOf } from 'prop-types'
-import Tray from '@instructure/ui-core/lib/components/Tray'
-import Heading from '@instructure/ui-core/lib/components/Heading'
-import Container from '@instructure/ui-core/lib/components/Container'
+import Tray from '@instructure/ui-overlays/lib/components/Tray'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
+import View from '@instructure/ui-layout/lib/components/View'
 
 import { showFlashError } from '../shared/FlashAlert'
 import { itemShape, moveOptionsType } from './propTypes'
@@ -38,7 +38,6 @@ export default class MoveItemTray extends React.Component {
     formatSaveData: func,
     onMoveSuccess: func,
     onExited: func,
-    applicationElement: func,
   }
 
   static defaultProps = {
@@ -48,7 +47,6 @@ export default class MoveItemTray extends React.Component {
     formatSaveData: (order) => ({ order: order.join(',') }),
     onExited: () => {},
     onMoveSuccess: () => {},
-    applicationElement: () => document.getElementById('application'),
   }
 
   state = {
@@ -92,18 +90,17 @@ export default class MoveItemTray extends React.Component {
         onExited={this.onExited}
         closeButtonLabel={I18n.t('close move tray')}
         placement="end"
-        applicationElement={this.props.applicationElement}
         closeButtonVariant="icon"
         shouldContainFocus>
         <Heading margin="small xx-large" level="h4">{this.props.title}</Heading>
-        <Container display="block" padding="medium medium large">
+        <View display="block" padding="medium medium large">
           <MoveSelect
             items={this.props.items}
             moveOptions={this.props.moveOptions}
             onSelect={this.onMoveSelect}
             onClose={this.close}
           />
-        </Container>
+        </View>
       </Tray>
     )
   }

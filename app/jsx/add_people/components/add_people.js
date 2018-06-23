@@ -21,10 +21,10 @@ import React from 'react'
 import {bool, func, shape, arrayOf, oneOfType} from 'prop-types'
 import Modal, {ModalHeader, ModalBody, ModalFooter} from '@instructure/ui-overlays/lib/components/Modal'
 import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
-import Heading from '@instructure/ui-core/lib/components/Heading'
-import Button from '@instructure/ui-core/lib/components/Button'
-import Spinner from '@instructure/ui-core/lib/components/Spinner'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import {
   courseParamsShape,
   apiStateShape,

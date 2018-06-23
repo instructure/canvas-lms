@@ -19,6 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import RubricAddCriterionPopover from 'jsx/rubrics/RubricAddCriterionPopover'
+import RubricManagement from 'jsx/rubrics/RubricManagement'
 import I18n from 'i18n!edit_rubric'
 import changePointsPossibleToMatchRubricDialog from 'jst/changePointsPossibleToMatchRubricDialog'
 import $ from 'jquery'
@@ -38,9 +39,18 @@ import 'vendor/jquery.ba-tinypubsub'
 import './vendor/jquery.scrollTo'
 import 'compiled/jquery/fixDialogButtons'
 
-  var rubricEditing = {
+  const rubricEditing = {
     htmlBody: null,
-
+    hidePoints: (...args) => {
+      args.forEach(($el) => {
+        $el.find('.toggle_for_hide_points').addClass('hidden')
+      })
+    },
+    showPoints: (...args) => {
+      args.forEach(($el) => {
+        $el.find('.toggle_for_hide_points').removeClass('hidden')
+      })
+    },
     localizedPoints: function(points) {
       return I18n.n(points, {precision: 2, strip_insignificant_zeros: true})
     },
@@ -316,6 +326,8 @@ import 'compiled/jquery/fixDialogButtons'
       if(data['rubric_association[use_for_grading]'] == '0') {
         data['rubric_association[hide_score_total]'] = $rubric.find(".totalling_rubric_checkbox").attr('checked') ? "1" : "0";
       }
+      data['rubric_association[hide_points]'] = $rubric.find(".hide_points_checkbox").attr('checked') ? "1" : "0";
+      data['rubric_association[hide_outcome_results]'] = $rubric.find(".hide_outcome_results_checkbox").attr('checked') ? "1" : "0";
       data['rubric[free_form_criterion_comments]'] = $rubric.find(".rubric_custom_rating").attr('checked') ? "1" : "0";
       data['rubric_association[id]'] = vals.rubric_association_id;
       // make sure the association is always updated, see the comment on
@@ -389,7 +401,7 @@ import 'compiled/jquery/fixDialogButtons'
       $rubric = $original_rubric.clone(true).addClass('editing');
       $rubric.find(".edit_rubric").remove();
 
-      data = $rubric.getTemplateData({textValues: ['use_for_grading', 'free_form_criterion_comments', 'hide_score_total']});
+      data = $rubric.getTemplateData({textValues: ['use_for_grading', 'free_form_criterion_comments', 'hide_score_total', 'hide_points', 'hide_outcome_results']});
       $original_rubric.hide().after($rubric.show());
 
       $tr = $("#edit_rubric").clone(true).show().removeAttr('id').addClass('edit_rubric');
@@ -397,9 +409,11 @@ import 'compiled/jquery/fixDialogButtons'
       $rubric.find('.rubric_table').append($tr);
 
       $rubric.find(":text:first").focus().select();
-      $form.find(".grading_rubric_checkbox").attr('checked', data.use_for_grading == "true").triggerHandler('change');
-      $form.find(".rubric_custom_rating").attr('checked', data.free_form_criterion_comments == "true").triggerHandler('change');
-      $form.find(".totalling_rubric_checkbox").attr('checked', data.hide_score_total == "true").triggerHandler('change');
+      $form.find(".grading_rubric_checkbox").attr('checked', data.use_for_grading === "true").triggerHandler('change');
+      $form.find(".rubric_custom_rating").attr('checked', data.free_form_criterion_comments === "true").triggerHandler('change');
+      $form.find(".totalling_rubric_checkbox").attr('checked', data.hide_score_total === "true").triggerHandler('change');
+      $form.find(".hide_points_checkbox").attr('checked', data.hide_points === "true").triggerHandler('change');
+      $form.find(".hide_outcome_results_checkbox").attr('checked', data.hide_outcome_results === "true").triggerHandler('change');
       var createText = I18n.t('buttons.create_rubric', "Create Rubric");
       var updateText = I18n.t('buttons.update_rubric', "Update Rubric");
       $form.find(".save_button").text($rubric.attr('id') == 'rubric_new' ? createText : updateText);
@@ -542,6 +556,7 @@ import 'compiled/jquery/fixDialogButtons'
         }
         $rubric_long_description_dialog
           .fillFormData(data).fillTemplateData({data: data})
+          .hideErrors()
           .find('.editing').show().end()
           .find(".displaying").hide().end();
       } else {
@@ -639,6 +654,7 @@ import 'compiled/jquery/fixDialogButtons'
       $rubric_rating_dialog
         .data('current_criterion', $criterion)
         .data('current_rating', $rating)
+        .hideErrors()
         .dialog({
           title: I18n.t('titles.edit_rubric_rating', "Edit Rating"),
           width: 400,
@@ -726,6 +742,13 @@ import 'compiled/jquery/fixDialogButtons'
       var long_description = $rubric_long_description_dialog.find("textarea.long_description").val(),
           description      = $rubric_long_description_dialog.find("textarea.description").val(),
           $criterion       = $rubric_long_description_dialog.data('current_criterion');
+      const valid = $rubric_long_description_dialog.validateForm({
+        required: ['description'],
+        labels: { description: I18n.t('Description') }
+      })
+      if (!valid) {
+        return
+      }
       if($criterion) {
         $criterion.fillTemplateData({data: {long_description: long_description, description_title: description}});
         $criterion.find("textarea.long_description").val(long_description);
@@ -753,15 +776,23 @@ import 'compiled/jquery/fixDialogButtons'
     });
 
     $rubric_rating_dialog.find(".save_button").click(function(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      const data = $rubric_rating_dialog.find("#edit_rating_form").getFormData();
+      const valid = $rubric_rating_dialog.find("#edit_rating_form").validateForm({
+        data,
+        required: ['description'],
+        labels: { description: I18n.t('Rating Title') }
+      })
+      if (!valid) {
+        return
+      }
       const $rating = $rubric_rating_dialog.data('current_rating');
       const $criterion = $rubric_rating_dialog.data('current_criterion');
       const $target = $rating.find('.edit_rating_link');
       const use_range = $criterion.find('.criterion_use_range').attr('checked')
       const $nextRating = $rating.next('.rating')
       const $previousRating = $rating.prev('.rating')
-      event.preventDefault();
-      event.stopPropagation();
-      const data = $rubric_rating_dialog.find("#edit_rating_form").getFormData();
       data.points = round(numberHelper.parse(data.points), 2);
       if (isNaN(data.points)) {
         data.points = numberHelper.parse($criterion.find(".criterion_points").val());
@@ -1020,6 +1051,8 @@ import 'compiled/jquery/fixDialogButtons'
         $rubric.loadingImage('remove');
         rubric.rubric_association_id = data.rubric_association.id;
         rubric.use_for_grading = data.rubric_association.use_for_grading;
+        rubric.hide_points = data.rubric_association.hide_points
+        rubric.hide_outcome_results = data.rubric_association.hide_outcome_results
         rubric.permissions = rubric.permissions || {};
         if(data.rubric_association.permissions) {
           rubric.permissions.update_association = data.rubric_association.permissions.update;
@@ -1133,6 +1166,22 @@ import 'compiled/jquery/fixDialogButtons'
     $("#edit_rubric_form #totalling_rubric").change(function() {
       $(this).parents(".rubric").find(".total_points_holder").showIf(!$(this).attr('checked'));
     });
+    $("#edit_rubric_form #hide_points").change(function(e) {
+      if (e.target.checked) {
+        rubricEditing.hidePoints($(this).parents('.rubric'), $('#rubric_rating_dialog'))
+      } else {
+        rubricEditing.showPoints($(this).parents('.rubric'), $('#rubric_rating_dialog'))
+      }
+    });
+    $("#edit_rubric_form .hide_points_checkbox").change(function() {
+      const checked = $(this).attr('checked');
+      if (checked) {
+        $(this).parents(".rubric").find(".grading_rubric_checkbox").attr('checked', false);
+        $(this).parents(".rubric").find(".grading_rubric_checkbox").triggerHandler('change');
+      }
+      $(this).parents(".rubric").find(".rubric_grading").css('display', checked ? 'none' : '');
+      $(this).parents(".rubric").find(".totalling_rubric").css('display', checked ? 'none' : '');
+    });
     $("#edit_rubric_form .grading_rubric_checkbox").change(function() {
       $(this).parents(".rubric").find(".totalling_rubric").css('visibility', $(this).attr('checked') ? 'hidden' : 'visible');
       $(this).parents(".rubric").find(".totalling_rubric_checkbox").attr('checked', false);
@@ -1152,5 +1201,13 @@ import 'compiled/jquery/fixDialogButtons'
     setInterval(rubricEditing.sizeRatings, 10000);
     $.publish('edit_rubric/initted')
   };
+
+  if (document.getElementById("rubric_management") && ENV.NON_SCORING_RUBRICS && ENV.PERMISSIONS.manage_outcomes) {
+    $('h1').hide()
+    ReactDOM.render(
+      <RubricManagement />,
+      document.getElementById("rubric_management")
+    );
+  }
 
 export default rubricEditing;

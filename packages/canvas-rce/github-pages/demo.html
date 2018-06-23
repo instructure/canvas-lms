@@ -1,12 +1,12 @@
 <!doctype html>
-<html>
+<html dir="ltr">
   <head>
     <title>canvas-rce demo</title>
     <style>
     body {width: 1100px; margin: 2em auto; background-color: #eee;}
     h1 small { font-size: .5em; font-weight: normal; color: #888; }
     #demo {display: flex;}
-    .main {flex: 3; padding-right: 2em;}
+    .main {flex: 3; padding: 0 2em;}
     .sidebar {flex: 1}
     #options {margin-top: 1em;}
     #options label {margin-top: 1em;}
@@ -37,6 +37,7 @@
         <div id="options"></div>
       </div>
     </div>
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?rum=0"></script>
     <script src="demo.js"></script>
   </body>
 </html>

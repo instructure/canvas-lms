@@ -17,6 +17,7 @@
 #
 
 require 'atom'
+require 'anonymity'
 
 class Submission < ActiveRecord::Base
   include Canvas::GradeValidations
@@ -63,6 +64,12 @@ class Submission < ActiveRecord::Base
                 :grade_posting_in_progress
   attr_writer :versioned_originality_reports,
               :text_entry_originality_reports
+  # This can be set to true to force late policy behaviour that would
+  # be skipped otherwise. See #late_policy_relevant_changes? and
+  # #score_late_or_none. It is reset to false in an after save so late
+  # policy deductions don't happen again if the submission object is
+  # saved again.
+  attr_writer :regraded
 
   belongs_to :attachment # this refers to the screenshot of the submission if it is a url submission
   belongs_to :assignment
@@ -230,29 +237,6 @@ class Submission < ActiveRecord::Base
     anonymized.for_assignment(assignment).pluck(:anonymous_id)
   end
 
-  # Returns a unique short id to be used for anonymous_id. If the
-  # generated short id is already in use, loop until an available
-  # one is generated. `anonymous_ids` are unique per assignment.
-  # This method will throw a unique constraint error from the
-  # database if it has used all unique ids.
-  # An optional argument of existing_anonymous_ids can be supplied
-  # to customize the handling of existing anonymous_ids. E.g. bulk
-  # generation of anonymous ids where you wouldn't want to
-  # continuously query the database
-  def self.generate_unique_anonymous_id(assignment:, existing_anonymous_ids: anonymous_ids_for(assignment))
-    loop do
-      short_id = Submission.generate_short_id
-      break short_id unless existing_anonymous_ids.include?(short_id)
-    end
-  end
-
-  # base58 to avoid literal problems with prefixed 0 (i.e. when 0x123
-  # is interpreted as a hex value `0x123 == 291`), and similar looking
-  # characters: 0/O, I/l
-  def self.generate_short_id
-    SecureRandom.base58(5)
-  end
-
   # see #needs_grading?
   # When changing these conditions, update index_submissions_needs_grading to
   # maintain performance.
@@ -335,6 +319,12 @@ class Submission < ActiveRecord::Base
   after_save :update_participation
   after_save :update_line_item_result
   after_save :delete_ignores
+  after_save :create_alert
+  after_save :reset_regraded
+
+  def reset_regraded
+    @regraded = false
+  end
 
   def autograded?
     # AutoGrader == (quiz_id * -1)
@@ -471,6 +461,13 @@ class Submission < ActiveRecord::Base
     can :view_vericite_report
   end
 
+  def can_view_details?(user)
+    return false unless grants_right?(user, :read)
+    return true unless self.assignment.root_account.feature_enabled?(:anonymous_moderated_marking)
+    return true unless self.assignment.anonymous_grading && self.assignment.muted
+    user == self.user || Account.site_admin.grants_right?(user, :update)
+  end
+
   def can_view_plagiarism_report(type, user, session)
     if(type == "vericite")
       plagData = self.vericite_data_hash
@@ -549,6 +546,28 @@ class Submission < ActiveRecord::Base
       self.assignment&.send_later_if_production(:multiple_module_actions, [self.user_id], :scored, self.score)
     end
     true
+  end
+
+  def create_alert
+    return unless saved_change_to_score? && self.grader_id && !self.autograded?
+
+    thresholds = ObserverAlertThreshold.active.where(student: self.user,
+      alert_type: ['assignment_grade_high', 'assignment_grade_low'])
+
+    thresholds.each do |threshold|
+      threshold_value = threshold.threshold.to_i
+      next if threshold.alert_type == 'assignment_grade_high' && self.score < threshold_value
+      next if threshold.alert_type == 'assignment_grade_low' && self.score > threshold_value
+
+      ObserverAlert.create!(observer: threshold.observer, student: self.user,
+                            observer_alert_threshold: threshold,
+                            context: self.assignment, alert_type: threshold.alert_type, action_date: self.graded_at,
+                            title: I18n.t("Assignment graded: %{score} on %{assignmentName} in %{courseName}", {
+                              score: self.score,
+                              assignmentName: self.assignment.title,
+                              courseName: self.assignment.course.name
+                            }))
+    end
   end
 
   def update_quiz_submission
@@ -2361,7 +2380,7 @@ class Submission < ActiveRecord::Base
       preloaded_users = scope.where(:id => user_ids)
       preloaded_submissions = assignment.submissions.where(user_id: user_ids).group_by(&:user_id)
 
-      Delayed::Batch.serial_batch(:priority => Delayed::LOW_PRIORITY) do
+      Delayed::Batch.serial_batch(priority: Delayed::LOW_PRIORITY, n_strand: ["bulk_update_submissions", context.root_account.global_id]) do
         user_grades.each do |user_id, user_data|
 
           user = preloaded_users.detect{|u| u.global_id == Shard.global_id_for(user_id)}
@@ -2462,6 +2481,6 @@ class Submission < ActiveRecord::Base
   private
 
   def set_anonymous_id
-    self.anonymous_id = Submission.generate_unique_anonymous_id(assignment: anonymous_id)
+    self.anonymous_id = Anonymity.generate_id(existing_ids: Submission.anonymous_ids_for(assignment))
   end
 end

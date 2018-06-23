@@ -30,6 +30,7 @@ module QuizzesNext
           "assignments": assignments.map do |assignment|
             {
               "original_resource_link_id": assignment.lti_resource_link_id,
+              "original_assignment_id": assignment.id,
               "$canvas_assignment_id": assignment.id # transformed to new id
             }
           end
@@ -47,15 +48,23 @@ module QuizzesNext
       def send_imported_content(new_course, imported_content)
         imported_content[:assignments].each do |assignment|
           next if QuizzesNext::Service.assignment_not_in_export?(assignment)
+          old_assignment_id = assignment.fetch(:original_assignment_id)
+          old_assignment = Assignment.find(old_assignment_id)
+
           new_assignment_id = assignment.fetch(:$canvas_assignment_id)
           new_assignment = Assignment.find(new_assignment_id)
-          new_assignment.update!(workflow_state: 'duplicating')
+
+          new_assignment.duplicate_of = old_assignment
+          new_assignment.workflow_state = 'duplicating'
+
+          new_assignment.save!
           Canvas::LiveEvents.quizzes_next_quiz_duplicated(
             {
-              new_assignment_id: new_assignment_id,
+              new_assignment_id: new_assignment.global_id,
               original_course_uuid: imported_content[:original_course_uuid],
-              new_course_uuid: new_course.uuid,
               original_resource_link_id: assignment[:original_resource_link_id],
+              new_course_uuid: new_course.uuid,
+              new_course_id: new_course.lti_context_id,
               new_resource_link_id: new_assignment.lti_resource_link_id
             }
           )

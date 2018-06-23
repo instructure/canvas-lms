@@ -29,7 +29,7 @@ describe Submissions::DownloadsController do
     context 'with user id not present in course' do
       before do
         @attachment = @submission.attachment = attachment_model(context: @context)
-        @submission.save
+        @submission.save!
         course_with_student(active_all: true)
         user_session(@student)
       end
@@ -58,7 +58,7 @@ describe Submissions::DownloadsController do
     context "when attachment belongs to submission" do
       before do
         @attachment = @submission.attachment = attachment_model(context: @context)
-        @submission.save
+        @submission.save!
       end
 
       it "sets attachment the submission belongs to by default" do
@@ -92,13 +92,13 @@ describe Submissions::DownloadsController do
     it "sets attachment from submission history if present" do
       attachment = @submission.attachment = attachment_model(context: @context)
       @submission.submitted_at = 3.hours.ago
-      @submission.save
+      @submission.save!
       expect(@submission.attachment).not_to be_nil, 'precondition'
       expect {
         @submission.with_versioning(explicit: true) do
           @submission.attachment = nil
           @submission.submitted_at = 1.hour.ago
-          @submission.save
+          @submission.save!
         end
       }.to change(@submission.versions, :count), 'precondition'
       expect(@submission.attachment).to be_nil, 'precondition'
@@ -135,7 +135,7 @@ describe Submissions::DownloadsController do
         submission_comment_model
         @attachment = attachment_model(context: @assignment)
         @submission_comment.attachments = [@attachment]
-        @submission_comment.save
+        @submission_comment.save!
       end
 
       it "sets attachment from comment_id & download_id" do

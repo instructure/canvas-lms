@@ -26,15 +26,14 @@ describe "gradebook" do
 
   before(:once) do
     gradebook_data_setup
-    @gradebook_page = Gradebook::MultipleGradingPeriods.new
   end
 
   before(:each) { user_session(@teacher) }
 
   it "page should load within acceptable time ", priority:"1" do
-    page_load_start_time = Time.now
-    @gradebook_page.visit_gradebook(@course)
-    page_load_finish_time = Time.now
+    page_load_start_time = Time.zone.now
+    Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
+    page_load_finish_time = Time.zone.now
     page_load_time = page_load_finish_time - page_load_start_time
     Rails.logger.debug "The gradebook page /courses/#{@course}/gradebook loaded in #{page_load_time} seconds"
     expect(page_load_time).to be > 0.0
@@ -43,11 +42,11 @@ describe "gradebook" do
   it "hides unpublished/shows published assignments", priority: "1", test_id: 210016 do
     assignment = @course.assignments.create! title: 'unpublished'
     assignment.unpublish
-    @gradebook_page.visit_gradebook(@course)
+    Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
     expect(f('#gradebook_grid .container_1 .slick-header')).not_to include_text(assignment.title)
 
     @first_assignment.publish
-    @gradebook_page.visit_gradebook(@course)
+    Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
     expect(f('#gradebook_grid .container_1 .slick-header')).to include_text(@first_assignment.title)
   end
 
@@ -67,7 +66,7 @@ describe "gradebook" do
   end
 
   it 'should filter students', priority: "1", test_id: 210018 do
-    @gradebook_page.visit_gradebook(@course)
+    Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
     expect(visible_students).to have_size @all_students.size
     filter_student 'student 1'
     visible_after_filtering = visible_students
@@ -82,13 +81,13 @@ describe "gradebook" do
   end
 
   it "should show students sorted by their sortable_name", priority: "1", test_id: 210022 do
-    @gradebook_page.visit_gradebook(@course)
+    Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
     dom_names = ff('.student-name').map(&:text)
     expect(dom_names).to eq @all_students.map(&:name)
   end
 
   it "should not show student avatars until they are enabled", priority: "1", test_id: 210023 do
-    @gradebook_page.visit_gradebook(@course)
+    Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
 
     expect(ff('.student-name')).to have_size @all_students.size
     expect(f("body")).not_to contain_css('.avatar img')
@@ -104,8 +103,8 @@ describe "gradebook" do
   end
 
   it "should handle muting/unmuting correctly", priority: "1", test_id: 164227 do
-    @gradebook_page.visit_gradebook(@course)
-    @gradebook_page.toggle_assignment_mute_option(@second_assignment.id)
+    Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
+    Gradebook::MultipleGradingPeriods.toggle_assignment_mute_option(@second_assignment.id)
     expect(fj(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted")).to be_displayed
     expect(f('.total-cell .icon-muted')).to be_displayed
     expect(@second_assignment.reload).to be_muted
@@ -115,7 +114,7 @@ describe "gradebook" do
     expect(fj(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted")).to be_displayed
 
     # make sure you can un-mute
-    @gradebook_page.toggle_assignment_mute_option(@second_assignment.id)
+    Gradebook::MultipleGradingPeriods.toggle_assignment_mute_option(@second_assignment.id)
     expect(f("#content")).not_to contain_jqcss(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted")
     expect(@second_assignment.reload).not_to be_muted
   end
@@ -123,7 +122,7 @@ describe "gradebook" do
   context "unpublished course" do
     before do
       @course.claim!
-      @gradebook_page.visit_gradebook(@course)
+      Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
     end
 
     it "should allow editing grades", priority: "1", test_id: 210026 do
@@ -135,14 +134,14 @@ describe "gradebook" do
   end
 
   it "should validate that gradebook settings is displayed when button is clicked", priority: "1", test_id: 164217 do
-    @gradebook_page.visit_gradebook(@course)
+    Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
 
     f('#gradebook_settings').click
     expect(f('.gradebook_dropdown')).to be_displayed
   end
 
   it "View Gradebook History menu item redirects to grading history page", priority: "2", test_id: 164218 do
-    @gradebook_page.visit_gradebook(@course)
+    Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
 
     f('#gradebook_settings').click
     fj('.ui-menu-item a:contains("View Gradebook History")').click
@@ -152,7 +151,7 @@ describe "gradebook" do
   it "should validate assignment details", priority: "1", test_id: 210048 do
     submissions_count = @second_assignment.submissions.count.to_s + ' submissions'
 
-    @gradebook_page.visit_gradebook(@course)
+    Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
 
     open_assignment_options(1)
     f('[data-action="showAssignmentDetails"]').click
@@ -169,7 +168,7 @@ describe "gradebook" do
     @fake_student1.update_attribute :workflow_state, "registered"
     @fake_submission = @first_assignment.submit_homework(@fake_student1, :body => 'fake student submission')
 
-    @gradebook_page.visit_gradebook(@course)
+    Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
 
     fakes = [@fake_student1.name, @fake_student2.name]
     expect(ff('.student-name').last(2).map(&:text)).to eq fakes
@@ -204,7 +203,7 @@ describe "gradebook" do
     graded_assignment.grade_student @student_1, grade: 10, grader: @teacher # 10 points possible
     group_assignment.grade_student @student_1, grade: 2, grader: @teacher # 0 points possible
 
-    @gradebook_page.visit_gradebook(@course)
+    Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
     group_grade = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .assignment-group-cell .percentage')
     total_grade = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .total-cell .percentage')
     expect(group_grade).to include_text('100%') # otherwise 108%
@@ -220,7 +219,7 @@ describe "gradebook" do
                                            })
 
     assignment.mute!
-    @gradebook_page.visit_gradebook(@course)
+    Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
 
     expect(f("body")).not_to contain_css(".total-cell .icon-muted")
   end
@@ -234,7 +233,7 @@ describe "gradebook" do
       student_toggle.click
     end
 
-    @gradebook_page.visit_gradebook(@course)
+    Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
 
     toggle_hiding_students
     expect(f("#content")).not_to contain_jqcss('.student-name:visible')
@@ -246,16 +245,16 @@ describe "gradebook" do
   end
 
   it "should hide and show notes", priority: "2", test_id: 164224 do
-    @gradebook_page.visit_gradebook(@course)
+    Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
 
     # show notes column
-    @gradebook_page.gb_settings_cog_select
-    @gradebook_page.show_notes_select
+    Gradebook::MultipleGradingPeriods.gb_settings_cog_select
+    Gradebook::MultipleGradingPeriods.show_notes_select
     expect(f("#content")).to contain_jqcss('.custom_column:visible')
 
     # hide notes column
-    @gradebook_page.gb_settings_cog_select
-    @gradebook_page.hide_notes_select
+    Gradebook::MultipleGradingPeriods.gb_settings_cog_select
+    Gradebook::MultipleGradingPeriods.hide_notes_select
     expect(f("#content")).not_to contain_jqcss('.custom_column:visible')
   end
 
@@ -266,7 +265,7 @@ describe "gradebook" do
       @first_assignment.submit_homework(@student_2, :submission_type => 'online_upload', :attachments => [a])
 
       # When I go to the gradebook
-      @gradebook_page.visit_gradebook(@course)
+      Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
 
       # And I click the dropdown menu on the assignment
       f('.gradebook-header-drop').click
@@ -298,12 +297,12 @@ describe "gradebook" do
   end
 
   it "should show late submissions" do
-    @gradebook_page.visit_gradebook(@course)
+    Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
     expect(f("body")).not_to contain_css(".late")
 
     @student_3_submission.write_attribute(:cached_due_date, 1.week.ago)
     @student_3_submission.save!
-    @gradebook_page.visit_gradebook(@course)
+    Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
 
     expect(ff('.late')).to have_size(1)
   end
@@ -311,7 +310,7 @@ describe "gradebook" do
   it "should not display a speedgrader link for large courses", priority: "2", test_id: 210099 do
     allow_any_instance_of(Course).to receive(:large_roster?).and_return(true)
 
-    @gradebook_page.visit_gradebook(@course)
+    Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
 
     f('.gradebook-header-drop').click
     expect(f('.gradebook-header-menu')).not_to include_text("SpeedGrader")
@@ -367,7 +366,7 @@ describe "gradebook" do
       essay_submission.complete!(essay_text)
       user_session(teacher)
 
-      @gradebook_page.visit_gradebook(@course)
+      Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
       expect(f('#gradebook_grid .icon-quiz')).to be_truthy
     end
 
@@ -380,7 +379,7 @@ describe "gradebook" do
       file_submission.complete!
       user_session(teacher)
 
-      @gradebook_page.visit_gradebook(@course)
+      Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
       expect(f('#gradebook_grid .icon-quiz')).to be_truthy
     end
 
@@ -388,7 +387,7 @@ describe "gradebook" do
       essay_submission.complete!(essay_text)
       user_session(teacher)
 
-      @gradebook_page.visit_gradebook(@course)
+      Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
       # in order to get into edit mode with an icon in the way, a total of 3 clicks are needed
       f('#gradebook_grid .icon-quiz').click
       double_click('.online_quiz')

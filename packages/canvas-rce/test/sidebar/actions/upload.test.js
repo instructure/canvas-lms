@@ -24,6 +24,13 @@ import * as imagesActions from "../../../src/sidebar/actions/images";
 import { spiedStore } from "./utils";
 import Bridge from "../../../src/bridge";
 
+const fakeFileReader = {
+  readAsDataURL() {
+    this.onload();
+  },
+  result: "fakeDataURL"
+};
+
 describe("Upload data actions", () => {
   const results = { id: 47 };
   const file = { url: "fileurl", thumbnail_url: "thumbnailurl" };
@@ -169,93 +176,29 @@ describe("Upload data actions", () => {
     });
   });
 
-  describe("getThumbnailUrlIfMissing", () => {
+  describe("generateThumbnailUrl", () => {
     it("returns the results if the file is not an image", () => {
       const results = { "content-type": "application/pdf" };
-      return actions
-        .getThumbnailUrlIfMissing(successSource, results)
-        .then(returnResults => {
-          assert.deepEqual(results, returnResults);
-          sinon.assert.notCalled(successSource.getFile);
-        });
+      return actions.generateThumbnailUrl(results).then(returnResults => {
+        assert.deepEqual(results, returnResults);
+      });
     });
 
-    it("returns if the the results already has a thumbnail_url", () => {
+    it("sets a data url for the thumbnail", () => {
       const results = {
-        "content-type": "image/png",
-        thumbnail_url: "some_url"
+        "content-type": "image/jpeg"
       };
-      return actions
-        .getThumbnailUrlIfMissing(successSource, results)
-        .then(returnResults => {
-          assert.deepEqual(results, returnResults);
-          sinon.assert.notCalled(successSource.getFile);
-        });
-    });
 
-    it("returns if it has already attempted > 3 times", () => {
-      const results = {
-        "content-type": "image/png",
-        thumbnail_url: "some_url"
-      };
-      return actions
-        .getThumbnailUrlIfMissing(successSource, results, 4)
-        .then(returnResults => {
-          assert.deepEqual(results, returnResults);
-          sinon.assert.notCalled(successSource.getFile);
-        });
-    });
+      const fakeFileDOMObject = {};
 
-    it("calls getFile if the thumbnail_url is not present", () => {
-      const results = { "content-type": "image/png" };
-      const source = {
-        getFile: sinon
-          .stub()
-          .returns(
-            Promise.resolve(
-              Object.assign({}, results, file, { thumbnail_url: "new_url" })
-            )
-          )
-      };
       return actions
-        .getThumbnailUrlIfMissing(source, results)
+        .generateThumbnailUrl(results, fakeFileDOMObject, fakeFileReader)
         .then(returnResults => {
           assert.deepEqual(returnResults, {
-            "content-type": "image/png",
-            thumbnail_url: "new_url"
-          });
-          sinon.assert.called(source.getFile);
-        });
-    });
-
-    it("calls getthumbnailUrlIfMissing if calling after getFile it still does not have a thumbnail_url", () => {
-      const results = { "content-type": "image/png" };
-      const source = {
-        getFile: sinon
-          .stub()
-          .returns(Promise.resolve({ "content-type": "image/png" }))
-      };
-
-      source.getFile.onCall(3).returns(
-        Promise.resolve({
-          "content-type": "image/png",
-          thumbnail_url: "new_url"
-        })
-      );
-      const fakeWait = () => {
-        return Promise.resolve();
-      };
-      const promise = actions
-        .getThumbnailUrlIfMissing(source, results, fakeWait)
-        .then(returnResults => {
-          sinon.assert.callCount(source.getFile, 4);
-          assert.deepEqual(returnResults, {
-            "content-type": "image/png",
-            thumbnail_url: "new_url"
+            "content-type": "image/jpeg",
+            thumbnail_url: "fakeDataURL"
           });
         });
-
-      return promise;
     });
   });
 
@@ -358,6 +301,7 @@ describe("Upload data actions", () => {
     });
 
     it("dispatches ADD_IMAGE if content type is image/*", () => {
+      props.fileReader = fakeFileReader;
       successSource.uploadFRD.returns(
         Promise.resolve({
           "content-type": "image/png",
@@ -385,6 +329,7 @@ describe("Upload data actions", () => {
     });
 
     it("inserts the image content through the bridge", () => {
+      props.fileReader = fakeFileReader;
       let bridgeSpy = sinon.spy(Bridge, "insertImage");
       successSource.uploadFRD.returns(
         Promise.resolve({
@@ -400,6 +345,7 @@ describe("Upload data actions", () => {
     });
 
     it("inserts the file content through the bridge", () => {
+      props.fileReader = fakeFileReader;
       let bridgeSpy = sinon.spy(Bridge, "insertLink");
       let state = getBaseState();
       state.ui.selectedTabIndex = 1;
@@ -499,4 +445,36 @@ describe("Upload data actions", () => {
       });
     });
   });
+
+  describe('handleFailures', () => {
+    it('calls quota exceeded when the file size exceeds the quota', () => {
+      const fakeDispatch = sinon.spy();
+      const error = {
+        response: new Response('{ "message": "file size exceeds quota" }', { status: 400})
+      }
+      return actions.handleFailures(error, fakeDispatch).then(() => {
+        sinon.assert.calledWith(fakeDispatch,
+          sinon.match({
+            type: 'QUOTA_EXCEEDED_UPLOAD',
+            error
+          })
+        );
+      })
+
+    });
+    it('calls failUpload for other errors', () => {
+      const fakeDispatch = sinon.spy();
+      const error = {
+        response: new Response('{ "message": "we don\'t like you " }', { status: 400})
+      }
+      return actions.handleFailures(error, fakeDispatch).then(() => {
+        sinon.assert.calledWith(fakeDispatch,
+          sinon.match({
+            type: 'FAIL_FILE_UPLOAD',
+            error
+          })
+        );
+      })
+    })
+  })
 });

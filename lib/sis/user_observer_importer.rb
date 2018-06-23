@@ -33,7 +33,7 @@ module SIS
 
       importer.user_observers_to_update_sis_batch_ids.in_groups_of(1000, false) do |batch|
         UserObservationLink.where(id: batch).update_all(sis_batch_id: @batch.id)
-      end if @batch
+      end
 
       User.update_account_associations(importer.users_to_update_account_associations.to_a)
 

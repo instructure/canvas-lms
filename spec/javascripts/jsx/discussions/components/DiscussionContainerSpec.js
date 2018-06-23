@@ -90,20 +90,14 @@ test('discussionTarget canDrop returns true if not dragging to closed state', ()
 })
 
 test('discussionTarget canDrop returns true if assignment due_at is in the future', () => {
-  moment.now = function () {
-      return +new Date('2015-05-13T00:59:59Z');
-  }
-  const assignment = {due_at: '2018-05-13T00:59:59Z'}
+  const dueAt = moment().add(7, 'days')
+  const assignment = {due_at: dueAt.format()}
   const getItem = function () {
     return {assignment}
   }
   const mockMonitor = {getItem}
   ok(!discussionTarget.canDrop({closedState: true}, mockMonitor))
 })
-
-moment.now = function () {
-    return +new Date();
-}
 
 test('connected mapStateToProps filters out filtered discussions', () => {
   const state = {}
@@ -116,8 +110,6 @@ test('connected mapStateToProps filters out filtered discussions', () => {
   const connectedProps = mapState(state, ownProps)
   deepEqual(connectedProps.discussions, [{id: 2, filtered: false}])
 })
-
-
 
 test('renders background image no discussions are present', () => {
   const props = defaultProps()

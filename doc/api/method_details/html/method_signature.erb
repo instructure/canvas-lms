@@ -1,7 +1,13 @@
+<% require 'lib/token_scopes_helper.rb' %>
+
 <% @routes.each do |route| %>
   <% route_path = route.path.spec.to_s.sub("(.:format)", "")
      next if route_path =~ /\.json$/ %>
   <h3 class='endpoint'>
     <%= route.verb %> <%= route_path %>
   </h3>
+  <div>
+    <strong>Scope: </strong>
+    <code class="scope"><%= TokenScopesHelper.scope_from_route(route) %></code>
+  </div>
 <% end %>

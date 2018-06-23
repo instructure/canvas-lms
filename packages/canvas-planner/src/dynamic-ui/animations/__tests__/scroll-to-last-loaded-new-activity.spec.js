@@ -38,22 +38,21 @@ it('scrolls to the last newly loaded item with new activity', () => {
   const {animation, registry, app, animator} = createReadyAnimation();
   const mockDayEntry = mockRegistryEntry(['item-1', 'item-2', 'item-3', 'item-4']);
   const mockNaiEntry = mockRegistryEntry(['item-3'], 'nai');
-  const mockGroupEntry = mockRegistryEntry(['item-1', 'item-2', 'item-3'], 'group');
   registry.getLastComponent
     .mockReturnValueOnce(mockDayEntry)
     .mockReturnValueOnce(mockNaiEntry)
-    .mockReturnValueOnce(mockGroupEntry)
   ;
   app.fixedElementForItemScrolling.mockReturnValue('fixed-element');
   animator.elementPositionMemo.mockReturnValueOnce('position-memo');
   animation.invokeUiWillUpdate();
   animation.invokeUiDidUpdate();
+
   expect(registry.getLastComponent).toHaveBeenCalledWith('day', expect.objectContaining(['item-2', 'item-3']));
   expect(registry.getLastComponent).toHaveBeenCalledWith('new-activity-indicator', expect.objectContaining(['item-2', 'item-3']));
-  expect(registry.getLastComponent).toHaveBeenCalledWith('group', expect.objectContaining(['item-3']));
+
   expect(animator.maintainViewportPositionFromMemo).toHaveBeenCalledWith('fixed-element', 'position-memo');
   expect(animator.scrollTo).toHaveBeenCalledWith('nai-scrollable', 42);
-  expect(animator.focusElement).toHaveBeenCalledWith('group-focusable');
+  expect(animator.focusElement).toHaveBeenCalledWith('nai-focusable');
 });
 
 it('does nothing if there is no new activity on load', () => {

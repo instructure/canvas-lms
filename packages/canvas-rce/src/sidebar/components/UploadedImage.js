@@ -16,32 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { Component, PropTypes } from "react";
+import PropTypes from "prop-types";
+
+import React, { Component } from "react";
 import { renderImage as renderImageHtml } from "../../rce/contentRendering";
 import dragHtml from "../dragHtml";
 import formatMessage from "../../format-message";
 
 class UploadedImage extends Component {
-  constructor(props) {
-    super(props);
-    this.onDrag = this.onDrag.bind(this);
-    this.handleImageClick = this.handleImageClick.bind(this);
-  }
-
   imgTitle() {
     return formatMessage("Click to embed { imageName }", {
       imageName: this.props.image.display_name
     });
   }
 
-  handleImageClick(e) {
+  handleImageClick = e => {
     e.preventDefault();
     this.props.onImageEmbed(this.props.image);
-  }
+  };
 
-  onDrag(ev) {
+  onDrag = ev => {
     dragHtml(ev, renderImageHtml(this.props.image));
-  }
+  };
 
   renderImg() {
     let image = this.props.image;

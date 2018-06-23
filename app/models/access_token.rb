@@ -230,7 +230,10 @@ class AccessToken < ActiveRecord::Base
 
   def must_only_include_valid_scopes
     return true if scopes.nil?
-    errors.add(:scopes, "must match accepted scopes") unless scopes.all? {|scope| TokenScopes::ALL_SCOPES.include?(scope)}
+    errors.add(:scopes, "must match accepted scopes") unless scopes.all? {|scope| TokenScopes.all_scopes.include?(scope)}
+    if developer_key.owner_account.feature_enabled?(:api_token_scoping) && developer_key.require_scopes?
+      errors.add(:scopes, 'requested scopes must match scopes on developer key') unless scopes.all? { |scope| developer_key.scopes.include?(scope) }
+    end
   end
 
   # It's encrypted, but end users still shouldn't see this.
@@ -244,6 +247,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   private
+
   def cached_developer_key
     return nil unless developer_key_id
     @developer_key ||= DeveloperKey.find_cached(developer_key_id)

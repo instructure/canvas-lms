@@ -193,6 +193,13 @@ describe Api do
     it "should find user by uuid" do
       expect(@api.api_find(User, "uuid:#{@user.uuid}")).to eq @user
     end
+
+    it "should find course by uuid" do
+      lti_course = course_factory
+      lti_course.uuid = Canvas::Security.hmac_sha1(lti_course.asset_string.to_s, 'key')
+      lti_course.save!
+      expect(@api.api_find(Course, "uuid:#{lti_course.uuid}")).to eq lti_course
+    end
   end
 
   context 'api_find_all' do

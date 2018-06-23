@@ -18,7 +18,7 @@
 
 import React from 'react';
 import { bool, func, number, shape, string } from 'prop-types';
-import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid';
+import IconMoreSolid from '@instructure/ui-icons/lib/Solid/IconMore';
 import Button from '@instructure/ui-core/lib/components/Button';
 import Grid, { GridCol, GridRow } from '@instructure/ui-core/lib/components/Grid';
 import { MenuItem, MenuItemFlyout, MenuItemGroup } from '@instructure/ui-core/lib/components/Menu';

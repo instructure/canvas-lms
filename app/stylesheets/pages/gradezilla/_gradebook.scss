@@ -658,20 +658,6 @@ $gradebook_cell_padding_top: 8px;
   .Grid__AssignmentRowCell__PercentInput,
   .Grid__AssignmentRowCell__PointsInput,
   .Grid__AssignmentRowCell__GradingSchemeInput {
-
-    /*
-    the "html[dir] &" part here is to win the specificity war with
-    instUI's <Input> default styling in RTL. Because the postcss-bidirection
-    plugin that InstUI uses prints out css that looks something like:
-      .input {text-align: left}
-       html[dir="rtl"] .input {text-align: right}
-    the css used when in RTL is more specific than LTR so we need something
-    that wins in both cases. Otherwise, we win in LTR but it wins in RTL
-    */
-    html[dir] & label input[type="text"] {
-      text-align: center;
-    }
-
     // clip any input messages
     span > span {
       margin-bottom: 0;

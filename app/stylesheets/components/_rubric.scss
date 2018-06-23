@@ -1,0 +1,160 @@
+/*
+ * Copyright (C) 2011 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+.react-rubric {
+  border-collapse: collapse;
+  page-break-inside: avoid;
+}
+
+.react-rubric table {
+  width: 100%;
+  height: 100%;
+}
+
+.react-rubric .container {
+  width: 100%;
+}
+
+.react-rubric thead {
+  background-color: #F5F5F5;
+}
+
+.react-rubric td, .react-rubric th {
+  border: 1px solid #C7CDD1;
+  padding: 7px 10px;
+  line-height: 1.3;
+}
+
+.react-rubric th {
+  padding-bottom: 14px;
+}
+
+.react-rubric .description-header {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  & .long-description button {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.react-rubric .assessment-comments {
+  margin-top: 10px;
+  margin-bottom: 6px;
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+.react-rubric .rubric-criterion td {
+  vertical-align: top;
+}
+
+.react-rubric .rating-description {
+  padding-bottom: 0.5em;
+}
+
+.react-rubric td.ratings {
+  padding: 0;
+  vertical-align: middle;
+}
+
+.react-rubric .ratings .rating-points {
+  white-space: nowrap;
+}
+
+.react-rubric .rubric-freeform {
+  padding: 0px 5px;
+}
+
+.react-rubric .edit-freeform-comments {
+  min-width: 15rem;
+  padding: 1rem;
+}
+
+.react-rubric .ratings .rating-tier-list {
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  margin-left: -1px;
+  border-collapse: collapse;
+}
+
+.react-rubric .rating-tier {
+  width: 100%;
+  padding: 7px 10px;
+  border-left: 1px solid #C7CDD1;
+  border-top: 0;
+  border-right: 0;
+  border-bottom: 0;
+  position: relative;
+}
+
+.react-rubric .rating-tier.selected {
+  .shader {
+    width: 100%;
+    height: 0.3em;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    .triangle {
+      width: 0;
+      height: 0;
+      border-left: 0.7em solid transparent;
+      border-right: 0.7em solid transparent;
+      position: relative;
+      margin: 0 auto;
+      bottom: 0.7em;
+    }
+  }
+  &.none .shader {
+      background-color: #df5b59;
+      .triangle {
+        border-bottom: 1em solid #df5b59;
+      }
+    }
+  &.partial .shader {
+    background-color: #e0d773;
+    .triangle {
+      border-bottom: 1em solid #e0d773;
+    }
+  }
+  &.full .shader {
+    background-color: #8aac53;
+    .triangle {
+      border-bottom: 1em solid #8aac53;
+    }
+  }
+}
+
+.react-rubric .react-assessing .rating-tier:focus,
+.react-rubric .react-assessing .rating-tier:hover {
+  background-color: #ad9;
+  cursor: pointer;
+}
+
+.react-rubric .graded-points {
+  white-space: nowrap;
+}
+
+.react-rubric .total-points {
+  text-align: end;
+}

@@ -22,7 +22,7 @@ import PropTypes from 'prop-types'
 import shapes from './shapes'
 import DuplicateSection from './duplicate_section'
 import MissingPeopleSection from './missing_people_section'
-import Alert from '@instructure/ui-core/lib/components/Alert'
+import Alert from '@instructure/ui-alerts/lib/components/Alert'
 
   class PeopleValidationIssues extends React.Component {
     static propTypes = {

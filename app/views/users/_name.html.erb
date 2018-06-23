@@ -54,10 +54,12 @@
           </td>
         </tr>
       <% end %>
-      <tr>
-        <th><%= before_label('default_email', 'Default Email') %></th>
-        <td class="email"><%=h @user.email %></td>
-      </tr>
+      <% if @context.grants_right? @current_user, :read_email_addresses %>
+        <tr>
+          <th><%= before_label('default_email', 'Default Email') %></th>
+          <td class="email"><%=h @user.email %></td>
+        </tr>
+      <% end %>
       <tr>
         <th><%= before_label('time_zone', 'Time Zone') %></th>
         <td class="time_zone"><%= @user.time_zone.try(:name) || t('none', "None") %></td>

@@ -19,15 +19,15 @@
 import React from 'react'
 import * as enzyme from 'enzyme'
 import ChildContent from 'jsx/blueprint_courses/components/ChildContent'
-import sampleData from '../sampleData'
+import getSampleData from '../getSampleData'
 
 QUnit.module('ChildContent app')
 
 const defaultProps = () => ({
   isChangeLogOpen: false,
-  terms: sampleData.terms,
-  childCourse: sampleData.childCourse,
-  masterCourse: sampleData.masterCourse,
+  terms: getSampleData().terms,
+  childCourse: getSampleData().childCourse,
+  masterCourse: getSampleData().masterCourse,
   realRef: () => {},
   routeTo: () => {},
   selectChangeLog: () => {},

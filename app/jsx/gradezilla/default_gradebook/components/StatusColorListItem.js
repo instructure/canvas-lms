@@ -22,7 +22,7 @@ import I18n from 'i18n!gradebook';
 import Button from '@instructure/ui-core/lib/components/Button';
 import Popover, { PopoverTrigger, PopoverContent } from '@instructure/ui-core/lib/components/Popover';
 import Text from '@instructure/ui-core/lib/components/Text';
-import IconDiscussionReplySolid from 'instructure-icons/lib/Solid/IconDiscussionReplySolid';
+import IconDiscussionReplySolid from '@instructure/ui-icons/lib/Solid/IconDiscussionReply';
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
 import Grid, { GridRow, GridCol } from '@instructure/ui-core/lib/components/Grid';
 import ColorPicker from '../../../shared/ColorPicker';

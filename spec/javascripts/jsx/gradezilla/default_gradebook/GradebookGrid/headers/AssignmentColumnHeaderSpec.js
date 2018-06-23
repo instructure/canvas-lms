@@ -223,7 +223,7 @@ test('adds a class to the action container when the PopoverMenu is opened', func
 });
 
 test('renders a title for the More icon based on the assignment name', function () {
-  const optionsMenuTrigger = this.wrapper.find('PopoverMenu IconMoreSolid');
+  const optionsMenuTrigger = this.wrapper.find('PopoverMenu IconMore');
 
   equal(optionsMenuTrigger.props().title, 'Assignment #1 Options');
 });
@@ -1024,21 +1024,20 @@ test('#focusAtEnd sets focus on the options menu trigger', function () {
   equal(document.activeElement, this.wrapper.node.optionsMenuTrigger);
 });
 
-test('applies the "focused" class when the assignment title has focus', function() {
-  const link = this.wrapper.find('.assignment-name a')
-  link.get(0).focus()
-  ok(this.wrapper.hasClass('focused'))
+test('applies the "focused" class when the assignment title has focus', function(assert) {
+  const done = assert.async();
+  this.wrapper.setState({ hasFocus: true }, () => {
+    ok(this.wrapper.hasClass('focused'));
+    done();
+  });
 })
 
-test('applies the "focused" class when the options menu has focus', function() {
-  const button = this.wrapper.find('.Gradebook__ColumnHeaderAction button')
-  button.get(0).focus()
-  ok(this.wrapper.hasClass('focused'))
-})
-
-test('removes the "focused" class when the header blurs', function() {
-  const link = this.wrapper.find('.assignment-name a')
-  link.get(0).focus()
-  link.get(0).blur()
-  notOk(this.wrapper.hasClass('focused'))
+test('removes the "focused" class when the header blurs', function(assert) {
+  const done = assert.async()
+  this.wrapper.setState({ hasFocus: true }, () => {
+    this.wrapper.setState({ hasFocus: false }, () => {
+      notOk(this.wrapper.hasClass('focused'));
+      done();
+    });
+  });
 })

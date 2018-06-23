@@ -27,13 +27,13 @@ import Rating from './Rating'
 import SectionInfo from './SectionInfo'
 import SubmissionProgressBars from './SubmissionProgressBars'
 import MessageStudents from '../shared/MessageStudents'
-import Heading from '@instructure/ui-core/lib/components/Heading'
-import Button from '@instructure/ui-core/lib/components/Button'
-import Link from '@instructure/ui-core/lib/components/Link'
-import Text from '@instructure/ui-core/lib/components/Text'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
-import Spinner from '@instructure/ui-core/lib/components/Spinner'
-import Tray from '@instructure/ui-core/lib/components/Tray'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import Link from '@instructure/ui-elements/lib/components/Link'
+import Text from '@instructure/ui-elements/lib/components/Text'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import Tray from '@instructure/ui-overlays/lib/components/Tray'
 
 const courseShape = PropTypes.shape({
   permissions: PropTypes.shape({}).isRequired,
@@ -185,7 +185,6 @@ export default class StudentContextTray extends React.Component {
             label={I18n.t('Student Details')}
             closeButtonLabel={I18n.t('Close')}
             closeButtonRef={this.getCloseButtonRef}
-            applicationElement={() => document.getElementById('application') || document.body}
             open={this.state.isOpen}
             onDismiss={this.handleRequestClose}
             placement='end'

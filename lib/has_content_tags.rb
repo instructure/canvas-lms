@@ -44,7 +44,7 @@ module HasContentTags
   end
 
   def locked_cache_key(user)
-    keys = ['_locked_for3', self, user]
+    keys = ['_locked_for4', self, user]
     unlocked_at = self.respond_to?(:unlock_at) ? self.unlock_at : nil
     locked_at = self.respond_to?(:lock_at) ? self.lock_at : nil
     keys << (unlocked_at ? unlocked_at > Time.zone.now : false)

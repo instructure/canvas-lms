@@ -47,7 +47,8 @@ const getDefaultProps = () => ({
   id: 256,
   url: 'example.com',
   title: 'Board Games',
-  updateTodo: () => {}
+  updateTodo: () => {},
+  animatableIndex: 1,
 });
 
 it('renders the base component with required props', () => {
@@ -80,7 +81,8 @@ it('renders to do items correctly', () => {
     id: null,
     url: null,
     title: null,
-    updateTodo: () => {}
+    updateTodo: () => {},
+    animatableIndex: 1,
   };
   const wrapper = shallow(
     <Grouping {...props} />

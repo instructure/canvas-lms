@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import Spinner from '@instructure/ui-core/lib/components/Spinner'
+import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import I18n from 'i18n!cyoe_assignment_sidebar'
 import { i18nGrade } from '../../shared/conditional_release/score'
 import StudentAssignmentItem from './student-assignment-item'

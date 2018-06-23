@@ -1338,10 +1338,14 @@ class Attachment < ActiveRecord::Base
     att.send_to_purgatory(deleted_by_user)
     att.destroy_content
     att.thumbnail&.destroy
-    file_removed_file = File.open Rails.root.join('public', 'file_removed', 'file_removed.pdf')
+    new_name = 'file_removed.pdf'
+    file_removed_file = File.open Rails.root.join('public', 'file_removed', new_name)
     # TODO set the instfs_uuid of the attachment to a single "file removed" file to avoid
     # upload the same file over and over. This instfs_uuid should be retrieved from the inst-fs services
     Attachments::Storage.store_for_attachment(att, file_removed_file)
+    att.filename = new_name
+    att.display_name = new_name
+    att.content_type = "application/pdf"
     CrocodocDocument.where(attachment_id: att.children_and_self.select(:id)).delete_all
     Canvadoc.where(attachment_id: att.children_and_self.select(:id)).delete_all
     att.save!
@@ -1360,10 +1364,12 @@ class Attachment < ActiveRecord::Base
       p = Purgatory.where(attachment_id: self).take
       p.deleted_by_user = deleted_by_user
       p.old_filename = filename
+      p.old_display_name = display_name
+      p.old_content_type = content_type
       p.workflow_state = 'active'
       p.save!
     else
-      Purgatory.create!(attachment: self, old_filename: filename, deleted_by_user: deleted_by_user)
+      Purgatory.create!(attachment: self, old_filename: filename, old_display_name: display_name, old_content_type: content_type, deleted_by_user: deleted_by_user)
     end
   end
 
@@ -1383,6 +1389,8 @@ class Attachment < ActiveRecord::Base
     p = Purgatory.where(attachment_id: id).take
     raise 'must have been sent to purgatory first' unless p
     write_attribute(:filename, p.old_filename)
+    write_attribute(:display_name, p.old_display_name)
+    write_attribute(:content_type, p.old_content_type)
     write_attribute(:root_attachment_id, nil)
 
     if Attachment.s3_storage?

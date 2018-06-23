@@ -86,7 +86,7 @@ describe "speed grader" do
     it "properly shows and hides student name when name hidden toggled", priority: "2", test_id: 283741 do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
-      in_frame 'speedgrader_iframe' do
+      in_frame 'speedgrader_iframe', '.is-inside-submission-frame' do
         expect(f('.not_external')).to include_text("instructure")
         expect(f('.open_in_a_new_tab')).to include_text("View")
       end
@@ -364,19 +364,19 @@ describe "speed grader" do
     quiz = seed_quiz_with_submission
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{quiz.assignment_id}"
     # In the left panel modify the grade to 0.5
-    driver.switch_to.frame f('#speedgrader_iframe')
-    points_input = ff('#questions .user_points input')
-    driver.execute_script("$('#questions .user_points input').focus()")
-    replace_content(points_input[0], '0')
-    replace_content(points_input[1], '.5')
-    replace_content(points_input[2], '0')
-    f('.update_scores button[type="submit"]').click
-    wait_for_ajaximations
+    in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do
+      points_input = ff('#questions .user_points input')
+      driver.execute_script("$('#questions .user_points input').focus()")
+      replace_content(points_input[0], '0')
+      replace_content(points_input[1], '.5')
+      replace_content(points_input[2], '0')
+      f('.update_scores button[type="submit"]').click
+      wait_for_ajaximations
+    end
     # Switch to the right panel
     # Verify that the grade is .5
-    driver.switch_to.default_content
     wait_for_ajaximations
-    expect(f('#grading-box-extended')['value']).to eq('0.5')
+    expect{f('#grading-box-extended')['value']}.to become('0.5')
     expect(f("#students_selectmenu-button")).to_not have_class("not_graded")
     expect(f("#students_selectmenu-button")).to have_class("graded")
   end

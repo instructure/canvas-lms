@@ -16,11 +16,30 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class FileAuthenticator
-  attr_reader :user, :acting_as, :oauth_host
+  attr_reader :user, :acting_as, :access_token, :root_account, :oauth_host
 
-  def initialize(user, acting_as, oauth_host)
+  # implements the minimum interface necessary for the temporary API client
+  # work around when given just a developer key. we'll need real access tokens
+  # for the long term solution
+  class FakeAccessToken
+    attr_reader :global_developer_key_id
+
+    def initialize(developer_key)
+      @global_developer_key_id = developer_key.global_id
+    end
+  end
+
+  def fake_access_token_for(developer_key)
+    if developer_key.present?
+      FakeAccessToken.new(developer_key)
+    end
+  end
+
+  def initialize(user:, acting_as:, access_token: nil, developer_key: nil, root_account:, oauth_host:)
     @user = user # logged in user
     @acting_as = acting_as # user being acted as
+    @access_token = access_token || fake_access_token_for(developer_key) # "access token" used to authenticate the logged in user, if any
+    @root_account = root_account # domain root account where the request occurred
     @oauth_host = oauth_host # host against which inst-fs should oauth the user
   end
 
@@ -32,17 +51,22 @@ class FileAuthenticator
     Digest::MD5.hexdigest("#{@user&.global_id}|#{@acting_as&.global_id}|#{@oauth_host}")
   end
 
+  def instfs_options(attachment, extras={})
+    {
+      user: @user,
+      acting_as: @acting_as,
+      access_token: @access_token,
+      root_account: @root_account,
+      oauth_host: @oauth_host,
+      expires_in: attachment.url_ttl,
+    }.merge(extras)
+  end
+
   def download_url(attachment)
     return nil unless attachment
     if attachment.instfs_hosted?
-      InstFS.authenticated_url(
-        attachment,
-        user: @user,
-        acting_as: @acting_as,
-        oauth_host: @oauth_host,
-        expires_in: attachment.url_ttl,
-        download: true
-      )
+      options = instfs_options(attachment, download: true)
+      InstFS.authenticated_url(attachment, options)
     else
       # s3 doesn't distinguish authenticated and public urls
       attachment.public_download_url
@@ -52,14 +76,8 @@ class FileAuthenticator
   def inline_url(attachment)
     return nil unless attachment
     if attachment.instfs_hosted?
-      InstFS.authenticated_url(
-        attachment,
-        user: @user,
-        acting_as: @acting_as,
-        oauth_host: @oauth_host,
-        expires_in: attachment.url_ttl,
-        download: false
-      )
+      options = instfs_options(attachment, download: false)
+      InstFS.authenticated_url(attachment, options)
     else
       # s3 doesn't distinguish authenticated and public urls
       attachment.public_inline_url
@@ -69,14 +87,8 @@ class FileAuthenticator
   def thumbnail_url(attachment, options={})
     return nil unless attachment
     if !Attachment.skip_thumbnails && attachment.instfs_hosted? && attachment.thumbnailable?
-      InstFS.authenticated_thumbnail_url(
-        attachment,
-        user: @user,
-        acting_as: @acting_as,
-        oauth_host: @oauth_host,
-        expires_in: attachment.url_ttl,
-        geometry: options[:size]
-      )
+      options = instfs_options(attachment, geometry: options[:size])
+      InstFS.authenticated_thumbnail_url(attachment, options)
     else
       attachment.thumbnail_url(options)
     end

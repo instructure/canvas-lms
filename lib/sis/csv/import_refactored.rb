@@ -73,6 +73,7 @@ module SIS
         end
         @rows_for_parallel = nil
         update_pause_vars
+        @batch.data[:use_parallel_imports] = true
         sleep(@pause_duration)
       end
 
@@ -175,17 +176,19 @@ module SIS
           @batch.data[:supplied_batches] << importer if @csvs[importer].present?
           @batch.data[:counts][importer.to_s.pluralize.to_sym] = 0
         end
+        @run_immediately = @total_rows <= Setting.get('sis_batch_parallelism_count_threshold', '50').to_i
+        @batch.data[:running_immediately] = @run_immediately
+
         @batch.data[:completed_importers] = []
         @batch.save!
 
-        queue_next_importer_set
-      rescue => e
-        if @batch
-          fail_with_error!(e)
+        if @run_immediately
+          run_all_importers
         else
-          SisBatch.add_error(nil, e.message, sis_batch: @batch, failure: true, backtrace: e.backtrace)
-          raise e
+          queue_next_importer_set
         end
+      rescue => e
+        fail_with_error!(e)
       ensure
         @tmp_dirs.each do |tmp_dir|
           FileUtils.rm_rf(tmp_dir, :secure => true) if File.directory?(tmp_dir)
@@ -193,9 +196,7 @@ module SIS
       end
 
       def errors
-        errors = @root_account.sis_batch_errors
-        errors = errors.where(sis_batch: @batch) if @batch
-        errors.order(:id).pluck(:file, :message)
+        @root_account.sis_batch_errors.where(sis_batch: @batch).order(:id).pluck(:file, :message)
       end
 
       def calculate_progress
@@ -203,7 +204,6 @@ module SIS
       end
 
       def update_progress
-        return unless @batch
         completed_count = @batch.parallel_importers.where(workflow_state: "completed").count
         current_progress = (completed_count.to_f * 100 / @parallel_importers.values.map(&:count).sum).round
         SisBatch.where(:id => @batch).where("progress IS NULL or progress < ?", current_progress).update_all(progress: current_progress)
@@ -232,8 +232,10 @@ module SIS
         fail_with_error!(e)
       ensure
         file&.close
-        if is_last_parallel_importer_of_type?(parallel_importer)
-          queue_next_importer_set unless %w{aborted failed failed_with_messages}.include?(@batch.workflow_state)
+        unless @run_immediately
+          if is_last_parallel_importer_of_type?(parallel_importer)
+            queue_next_importer_set unless %w{aborted failed failed_with_messages}.include?(@batch.workflow_state)
+          end
         end
       end
 
@@ -256,6 +258,18 @@ module SIS
 
       private
 
+      def run_all_importers
+        IMPORTERS.each do |importer_type|
+          importers = @parallel_importers[importer_type]
+          next unless importers
+          importers.each do |pi|
+            run_parallel_importer(pi)
+            return false if %w{aborted failed failed_with_messages}.include?(@batch.workflow_state)
+          end
+        end
+        finish
+      end
+
       def queue_next_importer_set
         next_importer_type = IMPORTERS.detect{|i| !@batch.data[:completed_importers].include?(i) && @parallel_importers[i].present?}
         return finish unless next_importer_type
@@ -264,7 +278,7 @@ module SIS
         if next_importer_type == :account
           enqueue_args[:strand] = "sis_account_import:#{@root_account.global_id}" # run one at a time
         else
-          enqueue_args[:n_strand] = ["sis_parallel_import", @root_account.global_id]
+          enqueue_args[:n_strand] = ["sis_parallel_import", @batch.data[:strand_account_id] || @root_account.global_id]
         end
 
         importers_to_queue = @parallel_importers[next_importer_type]
@@ -301,8 +315,6 @@ module SIS
       end
 
       def update_pause_vars
-        return unless @batch
-
         # throttling can be set on individual SisBatch instances, and also
         # site-wide in the Setting table.
         @batch.reload(:select => 'data') # update to catch changes to pause vars

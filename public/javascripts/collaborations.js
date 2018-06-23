@@ -120,9 +120,9 @@ import 'compiled/jquery.rails_flash_notifications'
         $('#lti_new_collaboration_iframe').hide();
         $('.before_external_content_info_alert, .after_external_content_info_alert').hide();
         $('.collaborate_data, #google_docs_description').show();
-        if (INST.collaboration_types) {
-          for (var i in INST.collaboration_types) {
-            var collaboration = INST.collaboration_types[i];
+        if (ENV.collaboration_types) {
+          for (var i in ENV.collaboration_types) {
+            var collaboration = ENV.collaboration_types[i];
 
             if (collaboration.name === name) {
               type = collaboration.type;

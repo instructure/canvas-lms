@@ -50,6 +50,11 @@ module Canvas::Oauth
         error_description: "incorrect client"
       }.freeze,
 
+      invalid_scope: {
+        error: :invalid_scope,
+        error_description: 'A requested scope is invalid, unknown, malformed, or exceeds the scope granted by the resource owner.'
+      }.freeze,
+
       authorization_code_not_supplied: {
         error: :invalid_request,
         error_description: "You must provide the code parameter when using the authorization_code grant type"

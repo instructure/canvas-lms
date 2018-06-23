@@ -691,6 +691,7 @@ describe "new groups" do
 
       context "choosing New Group Set option" do
         it "should clone group set when adding an unassigned student to a group with submission" do
+          skip("Flakey selenium spec. Jira: COMMS-1143")
           group_test_setup(2,1,1)
           add_user_to_group(@students.last,@testgroup.first)
           create_and_submit_assignment_from_group(@students.last)

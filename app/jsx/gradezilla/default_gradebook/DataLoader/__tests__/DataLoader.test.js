@@ -17,8 +17,9 @@
  */
 
 import sinon from 'sinon'
+
+import FakeServer, {paramsFromRequest, pathFromRequest} from '../../../../__tests__/FakeServer'
 import DataLoader from '../../../DataLoader'
-import FakeServer, {paramsFromRequest, pathFromRequest} from './FakeServer'
 
 describe('Gradebook DataLoader', () => {
   const exampleData = {

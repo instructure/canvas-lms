@@ -202,8 +202,12 @@ describe "API Authentication", type: :request do
           allow_any_instance_of(Onelogin::Saml::Response).to receive(:session_index).and_return(nil)
           allow_any_instance_of(Onelogin::Saml::Response).to receive(:issuer).and_return("saml_entity")
           allow_any_instance_of(Onelogin::Saml::Response).to receive(:trusted_roots).and_return([])
+          response = SAML2::Response.new
+          response.assertions << (assertion = SAML2::Assertion.new)
+          assertion.subject = SAML2::Subject.new
+          assertion.subject.name_id = SAML2::NameID.new('test1@example.com')
           allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
-            [double('response2', errors: []), nil]
+            [response, nil]
           )
           allow_any_instance_of(SAML2::Entity).to receive(:valid_response?)
 

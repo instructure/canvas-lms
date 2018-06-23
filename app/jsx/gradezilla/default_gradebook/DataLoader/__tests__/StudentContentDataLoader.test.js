@@ -17,9 +17,10 @@
  */
 
 import sinon from 'sinon'
+
+import FakeServer, {paramsFromRequest} from '../../../../__tests__/FakeServer'
 import * as FlashAlert from '../../../../shared/FlashAlert'
 import StudentContentDataLoader from '../StudentContentDataLoader'
-import FakeServer, {paramsFromRequest} from './FakeServer'
 
 describe('Gradebook StudentContentDataLoader', () => {
   const exampleData = {

@@ -22,15 +22,15 @@ import {bool, func} from 'prop-types'
 import $ from 'jquery'
 import 'jquery.instructure_date_and_time'
 
-import Container from '@instructure/ui-core/lib/components/Container'
-import Text from '@instructure/ui-core/lib/components/Text'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import View from '@instructure/ui-layout/lib/components/View'
+import Text from '@instructure/ui-elements/lib/components/Text'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import {MenuItem} from '@instructure/ui-core/lib/components/Menu'
-import IconTimer from 'instructure-icons/lib/Line/IconTimerLine'
-import IconReply from 'instructure-icons/lib/Line/IconReplyLine'
-import IconLock from 'instructure-icons/lib/Line/IconLockLine'
-import IconUnlock from 'instructure-icons/lib/Line/IconUnlockLine'
-import IconTrash from 'instructure-icons/lib/Line/IconTrashLine'
+import IconTimer from '@instructure/ui-icons/lib/Line/IconTimer'
+import IconReply from '@instructure/ui-icons/lib/Line/IconReply'
+import IconLock from '@instructure/ui-icons/lib/Line/IconLock'
+import IconUnlock from '@instructure/ui-icons/lib/Line/IconUnlock'
+import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
 
 import AnnouncementModel from 'compiled/models/Announcement'
 import SectionsTooltip from '../SectionsTooltip'
@@ -66,11 +66,11 @@ export default function AnnouncementRow({
   ) : null
 
   const replyButton = announcement.locked ? null : (
-    <Container display="block" margin="x-small 0 0">
+    <View display="block" margin="x-small 0 0">
       <Text color="brand">
         <IconReply /> {I18n.t('Reply')}
       </Text>
-    </Container>
+    </View>
   )
 
   const renderMenuList = () => {

@@ -369,6 +369,11 @@ class OutcomeResultsController < ApplicationController
     outcome_results_include_alignments_json(alignments)
   end
 
+  def include_assignments
+    assignments = @results.map(&:assignment)
+    outcome_results_assignments_json(assignments)
+  end
+
   def require_outcome_context
     reject! "invalid context type" unless @context.is_a?(Course)
 

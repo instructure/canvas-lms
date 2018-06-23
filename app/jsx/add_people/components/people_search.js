@@ -18,14 +18,14 @@
 
 import I18n from 'i18n!roster'
 import React from 'react'
-import Text from '@instructure/ui-core/lib/components/Text'
-import RadioInputGroup from '@instructure/ui-core/lib/components/RadioInputGroup'
-import RadioInput from '@instructure/ui-core/lib/components/RadioInput'
+import Text from '@instructure/ui-elements/lib/components/Text'
+import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGroup'
+import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
 import Select from '@instructure/ui-core/lib/components/Select'
-import TextArea from '@instructure/ui-core/lib/components/TextArea'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
-import Checkbox from '@instructure/ui-core/lib/components/Checkbox'
-import IconUserSolid from 'instructure-icons/lib/Solid/IconUserSolid'
+import TextArea from '@instructure/ui-forms/lib/components/TextArea'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
+import IconUserSolid from '@instructure/ui-icons/lib/Solid/IconUser'
 import {courseParamsShape, inputParamsShape} from './shapes'
 import {parseNameList, findEmailInEntry, emailValidator} from '../helpers'
 
@@ -118,7 +118,7 @@ import {parseNameList, findEmailInEntry, emailValidator} from '../helpers'
             name="search_type"
             defaultValue={this.props.searchType}
             description={I18n.t('Add user(s) by')}
-            onChange={this.onChangeSearchType}
+            onChange={(e, val) => this.onChangeSearchType(val)}
             layout="columns"
           >
             <RadioInput

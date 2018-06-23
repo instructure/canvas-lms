@@ -26,9 +26,15 @@ describe Quizzes::QuizStatisticsSerializer do
     end
   end
 
+  let :assignment do
+    context.assignments.create!(title: 'quiz assignment')
+  end
+
   let :quiz do
     context.quizzes.build(title: 'banana split').tap do |quiz|
       quiz.id = 1
+      quiz.assignment = assignment
+      quiz.workflow_state = 'available'
       quiz.save!
     end
   end
@@ -115,6 +121,18 @@ describe Quizzes::QuizStatisticsSerializer do
   it 'serializes quiz url' do
     expect(@json['links']).to be_present
     expect(@json['links']['quiz']).to eq 'http://example.com/api/v1/courses/1/quizzes/1'
+  end
+
+  it 'serializes speed_grader url' do
+    allow(quiz.assignment).to receive(:can_view_speed_grader?).and_return true
+    expect(subject.as_json[:quiz_statistics][:speed_grader_url]).to eq(
+      controller.send(:speed_grader_course_gradebook_url, quiz.context, assignment_id: quiz.assignment.id)
+    )
+  end
+
+  it 'does not serialize speed_grader url if user cannot view speed grader' do
+    allow(quiz.assignment).to receive(:can_view_speed_grader?).and_return false
+    expect(subject.as_json[:quiz_statistics][:speed_grader_url]).to be_nil
   end
 
   it 'stringifies question_statistics ids' do

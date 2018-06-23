@@ -1,6 +1,6 @@
 <li>
-  <input type="checkbox" name="context_codes[]" value="{{asset_string}}" id="option_{{asset_string}}">
-  <label for="option_{{asset_string}}">{{name}}</label>
+  <input type="checkbox" title="{{name}}" name="context_codes[]" value="{{asset_string}}" id="option_{{asset_string}}">
+  <label title="{{name}}" for="option_{{asset_string}}">{{name}}</label>
   <button class="ag_sections_toggle">
     <span class="screenreader-only">{{#t}}Show course sections for course {{name}}{{/t}}</span>
   </button>
@@ -8,8 +8,8 @@
     {{#each course_sections}}
       {{#if can_create_ag}}
         <li>
-          <input type="checkbox" name="sections[]" value="{{asset_string}}" id="option_{{asset_string}}">
-          <label for="option_{{asset_string}}" aria-label="{{#t}}Course Section {{name}}{{/t}}">{{name}}</label>
+          <input title="{{name}}" type="checkbox" name="sections[]" value="{{asset_string}}" id="option_{{asset_string}}">
+          <label title="{{name}}" for="option_{{asset_string}}" aria-label="{{#t}}Course Section {{name}}{{/t}}">{{name}}</label>
         </li>
       {{/if}}
     {{/each}}

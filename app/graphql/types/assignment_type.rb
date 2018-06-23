@@ -42,11 +42,23 @@ module Types
     field :lockAt, DateTimeType, property: :lock_at
     field :unlockAt, DateTimeType, property: :unlock_at
 
+    field :lockInfo, LockInfoType, resolve: ->(assignment, ctx, _) {
+      Loaders::AssociationLoader.for(
+        Assignment,
+        %i[context discussion_topic quiz wiki_page]
+      ).load(assignment).then {
+        assignment.low_level_locked_for?(ctx[:current_user],
+                                         check_policies: true,
+                                         context: assignment.context)
+      }
+    }
+
     field :muted, types.Boolean, property: :muted?
 
     field :state, !AssignmentState, property: :workflow_state
 
     field :assignmentGroup, AssignmentGroupType, resolve: ->(assignment, _, _) {
+      # TODO: conditionally load context_module_tags (see locked_for impl.)
       Loaders::AssociationLoader.for(Assignment, :assignment_group)
         .load(assignment)
         .then { assignment.assignment_group }

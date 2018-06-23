@@ -131,7 +131,9 @@ class SplitUsers
                          type: e.type,
                          role_id: e.role_id).where.not(id: e).shard(e.shard).exists?
       end
-      Enrollment.where(id: enrollments_to_update).update_all(user_id: user.id, updated_at: Time.now.utc)
+      Shard.partition_by_shard(enrollments_to_update) do |shard_enrolls|
+        Enrollment.where(id: shard_enrolls).update_all(user_id: user.id, updated_at: Time.now.utc)
+      end
       courses = enrollments_to_update.map(&:course_id)
       transfer_enrollment_data(source_user, user, Course.where(id: courses))
       handle_submissions(source_user, user, records)
@@ -225,19 +227,25 @@ class SplitUsers
        [:'quizzes/quiz_submissions', 'fk_rails_04850db4b4']].each do |table, foreign_key|
         model = table.to_s.classify.constantize
 
-        ids = records.where(context_type: model.to_s, previous_user_id: user).pluck(:context_id)
-        other_ids = records.where(context_type: model.to_s, previous_user_id: source_user).pluck(:context_id)
+        ids_by_shard = records.where(context_type: model.to_s, previous_user_id: user).pluck(:context_id).group_by{|id| Shard.shard_for(id)}
+        other_ids_by_shard = records.where(context_type: model.to_s, previous_user_id: source_user).pluck(:context_id).group_by{|id| Shard.shard_for(id)}
 
-        model.transaction do
-          # there is a unique index on assignment_id and user_id or quiz_id
-          # and user_id. Unique indexes are checked after every row during
-          # an update statement to get around this and to allow us to swap
-          # we are setting the user_id to the negative user_id and then back
-          # to the user_id after the conflicting rows have been updated.
-          model.connection.execute("SET CONSTRAINTS #{model.connection.quote_table_name(foreign_key)} DEFERRED")
-          model.where(id: ids).update_all(user_id: -user.id)
-          model.where(id: other_ids).update_all(user_id: source_user.id)
-          model.where(id: ids).update_all(user_id: user.id)
+        (ids_by_shard.keys + other_ids_by_shard.keys).uniq.each do |shard|
+          ids = ids_by_shard[shard] || []
+          other_ids = ids_by_shard[shard] || []
+          shard.activate do
+            model.transaction do
+              # there is a unique index on assignment_id and user_id or quiz_id
+              # and user_id. Unique indexes are checked after every row during
+              # an update statement to get around this and to allow us to swap
+              # we are setting the user_id to the negative user_id and then back
+              # to the user_id after the conflicting rows have been updated.
+              model.connection.execute("SET CONSTRAINTS #{model.connection.quote_table_name(foreign_key)} DEFERRED")
+              model.where(id: ids).update_all(user_id: -user.id)
+              model.where(id: other_ids).update_all(user_id: source_user.id)
+              model.where(id: ids).update_all(user_id: user.id)
+            end
+          end
         end
       end
     end

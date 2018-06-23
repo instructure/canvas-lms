@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createStore, applyMiddleware } from 'redux'
+import {createStore, applyMiddleware} from 'redux'
 import ReduxThunk from 'redux-thunk'
 import rootReducer from './reducer'
 
-export default function configStore (initialState) {
+export default function configStore(initialState) {
   // TODO: Make this comprehensible
   const middleware = [
     ReduxThunk,
-    (process.env.NODE_ENV !== 'production') && require('redux-logger')() // eslint-disable-line global-require
+    process.env.NODE_ENV !== 'production' && require('redux-logger')() // eslint-disable-line global-require
   ].filter(Boolean)
   return applyMiddleware(...middleware)(createStore)(rootReducer, initialState)
 }

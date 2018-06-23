@@ -22,12 +22,12 @@ import { func, arrayOf, object, bool, string } from 'prop-types';
 import moment from 'moment-timezone';
 
 import I18n from 'i18n!todo_sidebar';
-import Heading from '@instructure/ui-core/lib/components/Heading';
-import List from '@instructure/ui-core/lib/components/List';
-import ListItem from '@instructure/ui-core/lib/components/List/ListItem';
-import Container from '@instructure/ui-core/lib/components/Container';
-import Spinner from '@instructure/ui-core/lib/components/Spinner';
-import ButtonLink from '@instructure/ui-core/lib/components/Link';
+import Heading from '@instructure/ui-elements/lib/components/Heading';
+import List from '@instructure/ui-elements/lib/components/List';
+import ListItem from '@instructure/ui-elements/lib/components/List/ListItem';
+import View from '@instructure/ui-layout/lib/components/View';
+import Spinner from '@instructure/ui-elements/lib/components/Spinner';
+import ButtonLink from '@instructure/ui-elements/lib/components/Link';
 
 import { loadInitialItems, completeItem } from './actions';
 import ToDoItem from './ToDoItem';
@@ -93,9 +93,9 @@ export class ToDoSidebar extends Component {
   render () {
     if (this.props.loading) {
       return (
-        <Container as="div" textAlign="center">
+        <View as="div" textAlign="center">
           <Spinner title={I18n.t('To Do Items Loading')} size="small" />
-        </Container>
+        </View>
       );
     }
 

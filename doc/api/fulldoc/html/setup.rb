@@ -16,8 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-$:.unshift(File.join(File.dirname(__FILE__), 'swagger'))
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'swagger'))
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'api_scopes'))
 require 'controller_list_view'
+require 'api_scope_mapping_writer'
 
 include Helpers::ModuleHelper
 include Helpers::FilterHelper
@@ -156,6 +158,8 @@ def init
     group_by { |o| o.tags('API').first.text }.
     sort_by  { |o| o.first }
   generate_swagger_json
+  scope_writer = ApiScopeMappingWriter.new(options[:resources])
+  scope_writer.generate_scope_mapper
 
   options[:page_title] = "Canvas LMS REST API Documentation"
 

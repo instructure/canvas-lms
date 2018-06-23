@@ -128,7 +128,7 @@ describe AssignmentsApiController, type: :request do
 
     it 'returns all assignments using paging' do
       group1 = @course.assignment_groups.create!(:name => 'group1')
-      41.times do
+      5.times do
         @course.assignments.create!(:title => 'assignment1',
           :assignment_group => group1).
           update_attribute(:position, 0)
@@ -137,21 +137,21 @@ describe AssignmentsApiController, type: :request do
       page = 1
       loop do
         json = api_call(:get,
-                        "/api/v1/courses/#{@course.id}/assignments.json?per_page=10&page=#{page}",
+                        "/api/v1/courses/#{@course.id}/assignments.json?per_page=2&page=#{page}",
                         {
                             :controller => 'assignments_api',
                             :action => 'index',
                             :format => 'json',
                             :course_id => @course.id.to_s,
-                            :per_page => '10',
+                            :per_page => '2',
                             :page => page.to_s
                         })
         assignment_ids.concat(json.map { |a| a['id'] })
-        break if json.empty?
+        break if json.length == 1
         page +=1
       end
-      expect(assignment_ids.count).to eq(41)
-      expect(assignment_ids.uniq.count).to eq(41)
+      expect(assignment_ids.count).to eq(5)
+      expect(assignment_ids.uniq.count).to eq(5)
     end
 
     it "sorts the returned list of assignments" do
@@ -270,9 +270,9 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "should allow filtering based on assignment_ids[] parameter" do
-      13.times { |i| @course.assignments.create!(title: "a_#{i}") }
+      5.times { |i| @course.assignments.create!(title: "a_#{i}") }
       all_ids = @course.assignments.pluck(:id).map(&:to_s)
-      some_ids = all_ids.slice(1, 4)
+      some_ids = all_ids.slice(1, 3)
       query_string = some_ids.map { |id| "assignment_ids[]=#{id}" }.join('&')
 
       json = api_call(:get,
@@ -285,7 +285,7 @@ describe AssignmentsApiController, type: :request do
                           :assignment_ids => some_ids
                       })
 
-      expect(json.length).to eq 4
+      expect(json.length).to eq 3
       expect(json.map{|h| h['id']}.map(&:to_s).sort).to eq some_ids.sort
     end
 
@@ -4621,6 +4621,32 @@ describe AssignmentsApiController, type: :request do
         let(:duplicated_successfully) { false }
 
         it { is_expected.to have_received(:fail_to_duplicate) }
+      end
+    end
+
+    context "with the cc_imported_successfully parameter" do
+      subject { @assignment }
+
+      let(:params) do
+        ActionController::Parameters.new(cc_imported_successfully: cc_imported_successfully)
+      end
+
+      before do
+        allow(@assignment).to receive(:finish_importing)
+        allow(@assignment).to receive(:fail_to_import)
+        update_from_params(@assignment, params, @teacher)
+      end
+
+      context "when cc_imported_successfully is true" do
+        let(:cc_imported_successfully) { true }
+
+        it { is_expected.to have_received(:finish_importing) }
+      end
+
+      context "when cc_imported_successfully is false" do
+        let(:cc_imported_successfully) { false }
+
+        it { is_expected.to have_received(:fail_to_import) }
       end
     end
   end

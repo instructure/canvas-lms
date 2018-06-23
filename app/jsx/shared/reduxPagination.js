@@ -20,7 +20,6 @@ import flatMap from 'lodash/flatMap'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import parseLinkHeader from './helpers/parseLinkHeader'
-import makePromisePool from '../shared/makePromisePool'
 
 const DEFAULT_PAGE = 1
 
@@ -176,31 +175,35 @@ function wrapGetPageThunk (actions, name, thunk) {
   }
 }
 
-function fetchAllEntries(actions, headThunk, getThunk) {
+function fetchAllEntries(actions, totalCount, getThunk) {
   return () => (dispatch, getState) => {
     dispatch({ type: actions.start, payload: { page: 1 }})
     const state = getState()
-
-    headThunk(state)
-      .then(headResults => {
-        const links = parseLinkHeader(headResults)
-        const lastPage = Number(/[&?]page=([0-9]+)&/.exec(links.last)[1])
-        const pages = Array(lastPage).fill().map((_, i) => i+1)
-        const makePromise = (page) => getThunk(state, { page })
-        return makePromisePool(pages, makePromise)
-      })
-      .then(getResults => {
-        const allDiscussions = flatMap(getResults.successes, (e) => e.res.data)
-        const successPayload = {
-          page: 1,
-          lastPage: 1,
-          data: allDiscussions,
-        }
-        dispatch({ type: actions.success, payload: successPayload})
-      })
-      .catch(err => {
-        dispatch({ type: actions.fail, payload: { page: 1, ...err } })
-      })
+    if(!totalCount || totalCount === 0) {
+      const successPayload = {
+        page: 1,
+        lastPage: 1,
+        data: [],
+      }
+      dispatch({ type: actions.success, payload: successPayload})
+    } else {
+      const promises = Array(Math.ceil(totalCount / 50))
+        .fill()
+        .map((_, i) => getThunk(state, {page: i + 1}))
+      Promise.all(promises)
+        .then(responses => {
+          const allDiscussions = flatMap(responses, resp => resp.data)
+          const successPayload = {
+            page: 1,
+            lastPage: 1,
+            data: allDiscussions,
+          }
+          dispatch({ type: actions.success, payload: successPayload})
+        })
+        .catch(err => {
+          dispatch({ type: actions.fail, payload: { page: 1, ...err } })
+        })
+    }
   }
 }
 
@@ -248,12 +251,12 @@ function fetchAllEntries(actions, headThunk, getThunk) {
  */
 export function createPaginationActions (name, thunk, opts = {}) {
   const fetchAll = opts.fetchAll || false
-  const headThunk = opts.headThunk
+  const totalCount = opts.totalCount
 
   const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1)
   const actionTypes = createActionTypes(name)
   const fetchFunction = fetchAll
-    ? () => fetchAllEntries(actionTypes, headThunk, thunk)
+    ? () => fetchAllEntries(actionTypes, totalCount, thunk)
     : () => wrapGetPageThunk(actionTypes, name, thunk)
 
   return {

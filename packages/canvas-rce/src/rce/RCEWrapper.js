@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import PropTypes from "prop-types";
+
 import React from "react";
 import ReactDOM from "react-dom";
 import TinyMCE from "react-tinymce";
@@ -42,7 +44,6 @@ export default class RCEWrapper extends React.Component {
 
     // test override points
     this.indicator = false;
-    this.handleTextareaChange = this.handleTextareaChange.bind(this);
   }
 
   // getCode and setCode naming comes from tinyMCE
@@ -232,11 +233,11 @@ export default class RCEWrapper extends React.Component {
     return options;
   }
 
-  handleTextareaChange() {
+  handleTextareaChange = () => {
     if (this.isHidden()) {
       this.setCode(this.textareaValue());
     }
-  }
+  };
 
   unhandleTextareaChange() {
     if (this._textareaEl) {
@@ -282,13 +283,13 @@ export default class RCEWrapper extends React.Component {
 }
 
 RCEWrapper.propTypes = {
-  defaultContent: React.PropTypes.string,
-  language: React.PropTypes.string,
-  tinymce: React.PropTypes.object,
-  textareaId: React.PropTypes.string,
-  textareaClassName: React.PropTypes.string,
-  editorOptions: React.PropTypes.object,
-  onFocus: React.PropTypes.func,
-  onRemove: React.PropTypes.func,
-  handleUnmount: React.PropTypes.func
+  defaultContent: PropTypes.string,
+  language: PropTypes.string,
+  tinymce: PropTypes.object,
+  textareaId: PropTypes.string,
+  textareaClassName: PropTypes.string,
+  editorOptions: PropTypes.object,
+  onFocus: PropTypes.func,
+  onRemove: PropTypes.func,
+  handleUnmount: PropTypes.func
 };

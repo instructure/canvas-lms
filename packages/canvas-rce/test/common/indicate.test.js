@@ -81,7 +81,7 @@ describe("indicate function", () => {
     });
 
     it("div gets leave fast class on mouse over", () => {
-      indicator.dispatchEvent(new MouseEvent("mouseover"));
+      indicator.dispatchEvent(new window.MouseEvent("mouseover"));
       ok(/leaveFast/.test(indicator.className));
     });
   });

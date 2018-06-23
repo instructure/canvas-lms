@@ -19,10 +19,10 @@
 import React from 'react'
 import {bool, arrayOf, shape, string, func} from 'prop-types'
 import I18n from 'i18n!help_dialog'
-import Link from '@instructure/ui-core/lib/components/Link'
-import List, {ListItem} from '@instructure/ui-core/lib/components/List'
-import Spinner from '@instructure/ui-core/lib/components/Spinner'
-import Text from '@instructure/ui-core/lib/components/Text'
+import Link from '@instructure/ui-elements/lib/components/Link'
+import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
+import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import Text from '@instructure/ui-elements/lib/components/Text'
 
 export default function HelpLinks({links, hasLoaded, onClick}) {
   return (

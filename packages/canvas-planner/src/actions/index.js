@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { createActions } from 'redux-actions';
+import { createActions, createAction } from 'redux-actions';
 import axios from 'axios';
 import configureAxios from '../utilities/configureAxios';
 import { alert } from '../utilities/alertUtils';
@@ -45,7 +45,6 @@ export const {
   updateTodo,
   clearUpdateTodo,
   openEditingPlannerItem,
-  cancelEditingPlannerItem,
   setNaiAboveScreen,
   scrollToNewActivity,
   scrollToToday,
@@ -63,7 +62,6 @@ export const {
   'UPDATE_TODO',
   'CLEAR_UPDATE_TODO',
   'OPEN_EDITING_PLANNER_ITEM',
-  'CANCEL_EDITING_PLANNER_ITEM',
   'SET_NAI_ABOVE_SCREEN',
   'SCROLL_TO_NEW_ACTIVITY',
   'SCROLL_TO_TODAY',
@@ -168,6 +166,7 @@ export const savePlannerItem = (plannerItem) => {
         };
       })
       .catch(() => alert(formatMessage('Failed to save to do'), true));
+    dispatch(clearUpdateTodo());
     dispatch(savedPlannerItem(promise));
     return promise;
   };
@@ -181,10 +180,20 @@ export const deletePlannerItem = (plannerItem) => {
       url: `api/v1/planner_notes/${plannerItem.id}`,
     }).then(response => transformPlannerNoteApiToInternalItem(response.data, getState().courses, getState().timeZone))
       .catch(() => alert(formatMessage('Failed to delete to do'), true));
+    dispatch(clearUpdateTodo());
     dispatch(deletedPlannerItem(promise));
     return promise;
   };
 };
+
+export const canceledEditingPlannerItem = createAction('CANCELED_EDITING_PLANNER_ITEM');
+
+export const cancelEditingPlannerItem = () => {
+  return (dispatch, getState) => {
+    dispatch(clearUpdateTodo());
+    dispatch(canceledEditingPlannerItem());
+  }
+}
 
 function saveExistingPlannerOverride (apiOverride) {
   return axios({
@@ -205,7 +214,7 @@ function saveNewPlannerOverride (apiOverride) {
 export const togglePlannerItemCompletion = (plannerItem) => {
   return (dispatch, getState) => {
     const savingItem = {...plannerItem, toggleAPIPending: true, show: true};
-    dispatch(savedPlannerItem({item: savingItem, isNewItem: false}));
+    dispatch(savingPlannerItem({item: savingItem, isNewItem: false, wasToggled: true}));
     const apiOverride = transformInternalToApiOverride(plannerItem, getState().currentUser.id);
     apiOverride.marked_complete = !apiOverride.marked_complete;
     let promise = apiOverride.id ?
@@ -214,11 +223,13 @@ export const togglePlannerItemCompletion = (plannerItem) => {
     promise = promise.then(response => ({
       item: updateOverrideDataOnItem(plannerItem, response.data),
       isNewItem: false,
+      wasToggled: true,
     })).catch(response => {
       alert(formatMessage('Unable to mark as complete.'), true);
       return ({
         item: plannerItem,
         isNewItem: false,
+        wasToggled: true,
       });
     });
     dispatch(savedPlannerItem(promise));
