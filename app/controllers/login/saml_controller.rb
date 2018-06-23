@@ -158,10 +158,10 @@ class Login::SamlController < ApplicationController
         increment_saml_stat("normal.login_success")
 
         session[:saml_unique_id] = unique_id
-        session[:name_id] = subject_name_id.id
-        session[:name_identifier_format] = subject_name_id.format
-        session[:name_qualifier] = subject_name_id.name_qualifier
-        session[:sp_name_qualifier] = subject_name_id.sp_name_qualifier
+        session[:name_id] = subject_name_id&.id
+        session[:name_identifier_format] = subject_name_id&.format
+        session[:name_qualifier] = subject_name_id&.name_qualifier
+        session[:sp_name_qualifier] = subject_name_id&.sp_name_qualifier
         session[:session_index] = assertion.authn_statements.first&.session_index
         session[:return_to] = relay_state if relay_state&.match(/\A\/(\z|[^\/])/)
         session[:login_aac] = aac.id
