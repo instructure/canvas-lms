@@ -86,7 +86,7 @@
   <div style="text-align: center;">
   <% if @submission.processed %>
     <%
-      preview_url = if anonymous_grading
+      preview_url = if anonymous_now
         context_url(
           @context,
           :context_assignment_anonymous_submission_url,
@@ -133,7 +133,7 @@
 
         <div class="file-upload-submission-info">
           <%
-            preview_url = if anonymous_grading
+            preview_url = if anonymous_now
               context_url(
                 @context,
                 :context_assignment_anonymous_submission_url,

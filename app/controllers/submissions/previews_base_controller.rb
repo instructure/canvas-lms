@@ -53,7 +53,9 @@ module Submissions
         if redirect?
           redirect_to(named_context_url(@context, redirect_path_name, @assignment.quiz.id, redirect_params))
         else
-          render 'submissions/show_preview', locals: { anonymous_grading: @assignment.anonymous_grading? }
+          render template: 'submissions/show_preview', locals: {
+            anonymous_now: @assignment.anonymous_grading? && @assignment.muted?
+          }
         end
       end
     end
