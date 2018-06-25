@@ -30,8 +30,8 @@ describe RuboCop::Cop::Migration::RemoveColumn do
         end
       })
       expect(cop.offenses.size).to eq(1)
-      expect(cop.messages.first).to match(/remove_column/)
-      expect(cop.offenses.first.severity.name).to eq(:warning)
+      expect(cop.messages.first).to match(/column removal/)
+      expect(cop.offenses.first.severity.name).to eq(:error)
     end
 
     it 'disallows remove_column in `self.up`' do
@@ -45,8 +45,43 @@ describe RuboCop::Cop::Migration::RemoveColumn do
         end
       })
       expect(cop.offenses.size).to eq(1)
-      expect(cop.messages.first).to match(/remove_column/)
-      expect(cop.offenses.first.severity.name).to eq(:warning)
+      expect(cop.messages.first).to match(/column removal/)
+      expect(cop.offenses.first.severity.name).to eq(:error)
+    end
+
+    it 'disallows remove_column in `change`' do
+      inspect_source(%{
+        class MyMigration < ActiveRecord::Migration
+          tag :predeploy
+
+          def change
+            remove_column :x, :y
+          end
+        end
+      })
+      expect(cop.offenses.size).to eq(1)
+      expect(cop.messages.first).to match(/column removal/)
+      expect(cop.offenses.first.severity.name).to eq(:error)
+    end
+
+    it 'disallows a bunch of other column removal methods' do
+      inspect_source(%{
+        class MyMigration < ActiveRecord::Migration
+          tag :predeploy
+
+          def up
+            change_table :x do |t|
+              t.remove :y
+              t.remove_belongs_to :y
+              t.remove_references :y
+              t.remove_timestamps
+            end
+            remove_reference :y
+            remove_columns :y, :z
+          end
+        end
+      })
+      expect(cop.offenses.size).to eq(6)
     end
 
     it 'allows remove_column in `down`' do
