@@ -70,7 +70,7 @@ describe "speed grader" do
 
       # add comment
       f('#add_a_comment textarea').send_keys('grader comment')
-      submit_form('#add_a_comment')
+      submit_comment('#add_a_comment')
       expect(f('#comments > .comment')).to be_displayed
       expect(f('#comments > .comment')).to include_text('grader comment')
       expect(f('#add_a_comment textarea').text).to be_empty
@@ -99,7 +99,7 @@ describe "speed grader" do
 
       # add comment
       f('#add_a_comment textarea').send_keys('grader comment')
-      submit_form('#add_a_comment')
+      submit_comment('#add_a_comment')
       expect(f('#comments > .comment')).to be_displayed
       @submission.reload
       @comment = @submission.submission_comments.first
@@ -131,7 +131,7 @@ describe "speed grader" do
 
       # add comment
       f('#add_a_comment textarea').send_keys('grader comment')
-      submit_form('#add_a_comment')
+      submit_comment('#add_a_comment')
       expect(f('#comments > .comment')).to be_displayed
       expect(f('#comments > .comment')).to include_text('grader comment')
 
@@ -177,7 +177,7 @@ describe "speed grader" do
       # add teacher comment
       f('#add_a_comment textarea').send_keys('grader comment')
       scroll_into_view("#comment_submit_button")
-      submit_form('#add_a_comment')
+      submit_comment('#add_a_comment')
       expect(ff('#comments > .comment')).to have_size(2)
 
       # make sure name and avatar show up for teacher comment
