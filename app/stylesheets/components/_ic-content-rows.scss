@@ -133,6 +133,18 @@
   padding: direction-sides(8px 8px 7px 8px);
 }
 
+.ic-drag-handle-container{
+  padding: 0.375rem;
+  flex-shrink: 1;
+}
+
+.ic-discussion-content-container{
+  flex-grow: 1;
+  flex-shrink: 1;
+  box-sizing: border-box;
+  min-width: 0.0625rem;
+}
+
 .icon-blueprint-lock {
   margin-bottom: 3px;
   padding: direction-sides(8px 8px 7px 8px);
@@ -150,6 +162,13 @@
       margin-right: 2px;
     }
   }
+}
+
+.ic-discussion-row-container{
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .ic-discussion-row {

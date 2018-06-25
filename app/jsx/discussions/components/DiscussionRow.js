@@ -31,7 +31,6 @@ import 'jquery.instructure_date_and_time'
 
 import Badge from '@instructure/ui-elements/lib/components/Badge'
 import View from '@instructure/ui-layout/lib/components/View'
-import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
 import Grid, { GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 
@@ -630,14 +629,14 @@ export class DiscussionRow extends Component {
     return (
       this.props.connectDropTarget(this.props.connectDragSource(
         <div style={{ opacity: (this.props.isDragging) ? 0 : 1 }} className={`${classes} ic-discussion-row`}>
-          <Flex width="100%">
-            <FlexItem shrink padding="xx-small">
+          <div className="ic-discussion-row-container">
+            <span className="ic-drag-handle-container">
               {this.renderDragHandleIfAppropriate()}
-            </FlexItem>
-            <FlexItem shrink padding="xx-small">
+            </span>
+            <span className="ic-drag-handle-container">
               {this.renderIcon()}
-            </FlexItem>
-            <FlexItem padding="xx-small" grow shrink>
+            </span>
+            <span className="ic-discussion-content-container">
               <Grid startAt="medium" vAlign="middle" rowSpacing="none" colSpacing="none">
                 <GridRow vAlign="middle">
                   <GridCol vAlign="middle" textAlign="start">
@@ -666,8 +665,8 @@ export class DiscussionRow extends Component {
                   </GridCol>
                 </GridRow>
               </Grid>
-            </FlexItem>
-          </Flex>
+          </span>
+          </div>
         </div>, {dropEffect: 'copy'}
       ))
     )
