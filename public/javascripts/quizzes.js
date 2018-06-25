@@ -1848,7 +1848,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         data.allowed_attempts = attempts;
         data['quiz[allowed_attempts]'] = attempts;
         var overrides = overrideView.getOverrides();
-        data['quiz[only_visible_to_overrides]'] = overrideView.containsSectionsWithoutOverrides();
+        data['quiz[only_visible_to_overrides]'] = !overrideView.overridesContainDefault()
         if (overrideView.containsSectionsWithoutOverrides() && !hasCheckedOverrides) {
           var sections = overrideView.sectionsWithoutOverrides();
           var missingDateView = new MissingDateDialog({
@@ -4293,4 +4293,3 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       }
     }).triggerHandler('change');
   });
-
