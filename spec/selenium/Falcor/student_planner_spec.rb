@@ -626,23 +626,29 @@ describe "student planner" do
       user_session(@teacher1)
     end
 
-    it "shows correct default time in a wiki pages" do
-      skip("skip until ADMIN-1096")
+    it "shows correct default time in a wiki page" do
       Timecop.freeze(Time.zone.today) do
-        @wiki = @course.wiki_pages.create!(title: 'Default Time Wiki Page', todo_date: Time.zone.today)
+        @wiki = @course.wiki_pages.create!(title: 'Default Time Wiki Page')
         get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
+        f('#student_planner_checkbox').click
         wait_for_ajaximations
-        expect(get_value("#todo_date")).to eq "#{format_date_for_view(Time.zone.today)} at 11:59PM"
+        f('#todo_date').send_keys(format_date_for_view(Time.zone.now).to_s)  
+        fj('button:contains("Save")').click
+        get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
+        expect(get_value("#todo_date")).to eq "#{format_date_for_view(Time.zone.today)} 11:59pm"
       end
     end
 
-    it "shows correct default time in a ungraded discussions" do
-      skip("skip until ADMIN-1096")
+    it "shows correct default time in a ungraded discussion" do
       Timecop.freeze(Time.zone.today) do
-        @discussion = @course.discussion_topics.create!(title: "Default Time Discussion", message: nil, user: @teacher, todo_date: Time.zone.today)
+        @discussion = @course.discussion_topics.create!(title: "Default Time Discussion", message: "here is a message", user: @teacher)
         get("/courses/#{@course.id}/discussion_topics/#{@discussion.id}/edit")
+        f('#todo_options').click
         wait_for_ajaximations
-        expect(get_value("#todo_date")).to eq "#{format_date_for_view(Time.zone.today)} at 11:59PM"
+        f('#todo_date').send_keys(format_date_for_view(Time.zone.now).to_s)  
+        expect_new_page_load { submit_form('.form-actions') }
+        get("/courses/#{@course.id}/discussion_topics/#{@discussion.id}/edit")
+        expect(get_value("#todo_date")).to eq "#{format_date_for_view(Time.zone.today)} 11:59pm"
       end
     end
   end 
