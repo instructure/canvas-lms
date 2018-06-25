@@ -576,6 +576,8 @@ QUnit.module('SpeedGrader#handleGradeSubmit', {
       assessor_id: 1
     };
 
+    sinon.stub(SpeedgraderHelpers, 'reloadPage');
+
   },
 
   teardown () {
@@ -583,6 +585,7 @@ QUnit.module('SpeedGrader#handleGradeSubmit', {
     fixtures.innerHTML = ''
     window.jsonData = this.originalWindowJSONData;
     fakeENV.teardown();
+    SpeedgraderHelpers.reloadPage.restore();
   }
 });
 

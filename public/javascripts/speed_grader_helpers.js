@@ -42,6 +42,7 @@ export function setupAnonymizableAuthorId (isAnonymous) {
   return isAnonymous ? 'anonymous_id' : 'author_id'
 }
 
+
   const speedgraderHelpers = {
     urlContainer: function(submission, defaultEl, originalityReportEl) {
       if (submission.has_originality_report) {
@@ -159,12 +160,16 @@ export function setupAnonymizableAuthorId (isAnonymous) {
       $(event.target).attr('disabled', true).text(I18n.t('turnitin.resubmitting', 'Resubmitting...'));
 
       $.ajaxJSON(resubmitUrl, "POST", {}, () => {
-        window.location.reload();
+        speedgraderHelpers.reloadPage();
       });
     },
 
     plagiarismResubmitUrl (submission, anonymizableUserId) {
       return $.replaceTags($('#assignment_submission_resubmit_to_turnitin_url').attr('href'), { user_id: submission[anonymizableUserId] })
+    },
+
+    reloadPage() {
+      window.location.reload();
     },
 
     setupIsAnonymous,

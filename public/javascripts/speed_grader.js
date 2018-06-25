@@ -320,7 +320,7 @@ function mergeStudentsAndSubmission() {
     } else {
       alert(I18n.t('alerts.no_students_in_section', "Could not find any students in that section, falling back to showing all sections."));
       userSettings.contextRemove('grading_show_only_section');
-      window.location.reload();
+      SpeedgraderHelpers.reloadPage();
     }
   }
 
@@ -373,7 +373,7 @@ function changeToSection (sectionId) {
     userSettings.contextSet('grading_show_only_section', sectionId);
   }
 
-  window.location.reload();
+  SpeedgraderHelpers.reloadPage();
 }
 
 function initDropdown(){
@@ -567,7 +567,7 @@ function setupHeader () {
       $.post(ENV.settings_url, {
         enable_speedgrader_grade_by_question: gradeByQuestion
       }).then(function() {
-        window.location.reload();
+        SpeedgraderHelpers.reloadPage();
       });
     },
 
@@ -1612,7 +1612,7 @@ EG = {
             .text(I18n.t('vericite.resubmitting', 'Resubmitting...'));
 
           $.ajaxJSON(resubmitUrl, "POST", {}, function() {
-            window.location.reload();
+            SpeedgraderHelpers.reloadPage();
           });
         });
       }
@@ -2025,7 +2025,7 @@ EG = {
     sessionTimer = window.setInterval(() => {
       const elapsed = new Date() - start;
       if (elapsed > sessionLimit) {
-        window.location.reload();
+        SpeedgraderHelpers.reloadPage();
       } else if (elapsed > aggressiveWarnings[0]) {
         $.flashWarning(message);
         aggressiveWarnings.shift();
