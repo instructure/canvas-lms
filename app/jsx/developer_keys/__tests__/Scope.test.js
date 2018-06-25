@@ -58,7 +58,7 @@ it('renders the scope scope', () => {
   }
 
   const wrapper = mount(<DeveloperKeyScope {...props} />)
-  expect(wrapper.find('.developer-key-scope').text()).toContain(scope.scope)
+  expect(wrapper.find('Checkbox').text()).toContain(scope.scope)
 })
 
 it('renders the scope verb', () => {
@@ -69,5 +69,5 @@ it('renders the scope verb', () => {
   }
 
   const wrapper = mount(<DeveloperKeyScope {...props} />)
-  expect(wrapper.find('.developer-key-scope').text()).toContain(scope.verb)
+  expect(wrapper.find('Checkbox').text()).toContain(scope.verb)
 })

@@ -34,7 +34,14 @@ let $div
 
 QUnit.module('SpeedGrader#showDiscussion', {
   setup () {
-    fakeENV.setup();
+    fakeENV.setup({
+      assignment_id: '17',
+      course_id: '29',
+      grading_role: 'moderator',
+      help_url: 'example.com/support',
+      show_help_menu_item: false
+    })
+    fixtures.innerHTML = '<span id="speedgrader-settings"></span>'
     this.stub($, 'ajaxJSON');
     this.spy($.fn, 'append');
     this.originalWindowJSONData = window.jsonData;
@@ -53,6 +60,7 @@ QUnit.module('SpeedGrader#showDiscussion', {
         grade: 70,
         submission_comments: [{
           group_comment_id: null,
+          publishable: false,
           anonymous: false,
           assessment_request_id: null,
           attachment_ids: '',
@@ -89,6 +97,7 @@ QUnit.module('SpeedGrader#showDiscussion', {
     $.getJSON.restore()
     SpeedGrader.EG.currentStudent = this.originalStudent;
     window.jsonData = this.originalWindowJSONData;
+    fixtures.innerHTML = ''
     fakeENV.teardown();
   }
 });
@@ -116,7 +125,14 @@ test('showDiscussion should show private comments for non group assignments', ()
 
 QUnit.module('SpeedGrader#refreshSubmissionToView', {
   setup () {
-    fakeENV.setup();
+    fakeENV.setup({
+      assignment_id: '17',
+      course_id: '29',
+      grading_role: 'moderator',
+      help_url: 'example.com/support',
+      show_help_menu_item: false
+    })
+    fixtures.innerHTML = '<span id="speedgrader-settings"></span>'
     this.stub($, 'ajaxJSON');
     this.spy($.fn, 'append');
     this.originalWindowJSONData = window.jsonData;
@@ -155,6 +171,7 @@ QUnit.module('SpeedGrader#refreshSubmissionToView', {
     $.getJSON.restore()
     window.jsonData = this.originalWindowJSONData;
     SpeedGrader.EG.currentStudent = this.originalStudent;
+    fixtures.innerHTML = ''
     fakeENV.teardown();
   }
 })
@@ -169,7 +186,13 @@ QUnit.module('#showSubmissionDetails', function(hooks) {
   let originalStudent
 
   hooks.beforeEach(function() {
-    fakeENV.setup()
+    fakeENV.setup({
+      assignment_id: '17',
+      course_id: '29',
+      grading_role: 'moderator',
+      help_url: 'example.com/support',
+      show_help_menu_item: false
+    })
     sinon.stub(SpeedGrader.EG, 'handleSubmissionSelectionChange')
     originalWindowJSONData = window.jsonData
     window.jsonData = {
@@ -183,7 +206,10 @@ QUnit.module('#showSubmissionDetails', function(hooks) {
       submission_state: 'not_graded',
       submission: { score: 7, grade: 70, submission_history: [] }
     }
-    fixtures.innerHTML = '<div id="submission_details">Submission Details</div>'
+    fixtures.innerHTML = `
+      <span id="speedgrader-settings"></span>
+      <div id="submission_details">Submission Details</div>
+    `
     sinon.stub($, 'getJSON')
     sinon.stub($, 'ajaxJSON')
     sinon.stub(SpeedGrader.EG, 'domReady')
@@ -268,6 +294,7 @@ QUnit.module('SpeedGrader#renderComment', {
         grade: 70,
         submission_comments: [{
           group_comment_id: null,
+          publishable: false,
           anonymous: false,
           assessment_request_id: null,
           attachment_ids: '',
@@ -285,6 +312,7 @@ QUnit.module('SpeedGrader#renderComment', {
           updated_at: '2016-07-12T23:47:34Z'
         }, {
           group_comment_id: null,
+          publishable: false,
           anonymous: false,
           assessment_request_id: null,
           attachment_ids: '',
@@ -400,15 +428,6 @@ test('renderComment should add the comment text to the delete link for screenrea
   equal(deleteLinkScreenreaderText, 'Delete comment: test');
 });
 
-test('renderComment should add the comment text to the submit link for draft comments', () => {
-  const commentToRender = SpeedGrader.EG.currentStudent.submission.submission_comments[0];
-  commentToRender.draft = true;
-  const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions);
-  const submitLinkScreenreaderText = renderedComment.find('.submit_comment_button').attr('aria-label');
-
-  equal(submitLinkScreenreaderText, 'Submit comment: test');
-});
-
 QUnit.module('SpeedGrader#showGrade', {
   setup () {
     fakeENV.setup();
@@ -476,11 +495,18 @@ test('Does not error out if a user has no submission', function () {
 
 QUnit.module('SpeedGrader#handleGradeSubmit', {
   setup () {
-    fakeENV.setup();
+    fakeENV.setup({
+      assignment_id: '17',
+      course_id: '29',
+      grading_role: 'moderator',
+      help_url: 'example.com/support',
+      show_help_menu_item: false
+    })
     this.stub($, 'ajaxJSON');
     this.spy($.fn, 'append');
     this.originalWindowJSONData = window.jsonData;
     fixtures.innerHTML = `
+      <span id="speedgrader-settings"></span>
       <div id="multiple_submissions"></div>
       <a class="update_submission_grade_url" href="my_url.com" title="POST"></a>
     `
@@ -550,6 +576,8 @@ QUnit.module('SpeedGrader#handleGradeSubmit', {
       assessor_id: 1
     };
 
+    sinon.stub(SpeedgraderHelpers, 'reloadPage');
+
   },
 
   teardown () {
@@ -557,6 +585,7 @@ QUnit.module('SpeedGrader#handleGradeSubmit', {
     fixtures.innerHTML = ''
     window.jsonData = this.originalWindowJSONData;
     fakeENV.teardown();
+    SpeedgraderHelpers.reloadPage.restore();
   }
 });
 
@@ -620,24 +649,6 @@ test('unexcuses the submission if the grade is blank and the assignment is compl
   SpeedGrader.EG.handleFragmentChanged.restore()
 });
 
-QUnit.module('loading a submission Preview', {
-  setup() {
-    fakeENV.setup();
-    this.stub($, 'ajaxJSON');
-    fixtures.innerHTML = '<div id="iframe_holder">not empty</div>'
-  },
-
-  teardown() {
-    fakeENV.teardown();
-    fixtures.innerHTML = ''
-  }
-});
-
-test('entry point function, loadSubmissionPreview, is a function', () => {
-  // FIXME: loadSubmissionPreview needs a behavioral test
-  ok(typeof SpeedGrader.EG.loadSubmissionPreview === 'function');
-})
-
 QUnit.module('attachmentIframeContents', {
   setup () {
     fakeENV.setup();
@@ -685,9 +696,18 @@ test('clears the contents of the iframe_holder', () => {
 
 QUnit.module('renderLtiLaunch', {
   setup() {
-    fakeENV.setup();
-    $div = $("<div id='iframe_holder'>not empty</div>")
-    fixtures.innerHTML = $div
+    fakeENV.setup({
+      assignment_id: '17',
+      course_id: '29',
+      grading_role: 'moderator',
+      help_url: 'example.com/support',
+      show_help_menu_item: false
+    })
+    fixtures.innerHTML = `
+      <span id="speedgrader-settings"></span>
+      <div id="iframe_holder">not empty</div>
+    `
+    $div = $(fixtures).find('#iframe_holder')
     sinon.stub($, 'getJSON')
     sinon.stub($, 'ajaxJSON')
     sinon.stub(SpeedGrader.EG, 'domReady')
@@ -878,11 +898,48 @@ test("hides non-current student name if shouldHideStudentNames is true", functio
   equal(result, 'Student 2 - graded');
 });
 
-QUnit.module('handleSubmissionSelectionChange', {
-  setup() {
-    fakeENV.setup();
-    this.originalWindowJSONData = window.jsonData;
-    this.originalStudent = SpeedGrader.EG.currentStudent;
+QUnit.module('handleSubmissionSelectionChange', (hooks) => {
+  let closedGradingPeriodNotice
+  let getFromCache
+  let originalWindowJSONData
+  let originalStudent
+  let courses
+  let assignment
+  let submission
+  let params
+
+  hooks.beforeEach(() => {
+    fakeENV.setup({
+      assignment_id: '17',
+      course_id: '29',
+      grading_role: 'grader',
+      help_url: 'helpUrl',
+      show_help_menu_item: false
+    })
+    sinon.stub(SpeedGrader.EG, 'handleFragmentChanged')
+    originalWindowJSONData = window.jsonData
+    originalStudent = SpeedGrader.EG.currentStudent
+    courses = `/courses/${ENV.course_id}`;
+    assignments = `/assignments/${ENV.assignment_id}`;
+    submissions = `/submissions/{{submissionId}}`;
+    params = `?download={{attachmentId}}`;
+    fixtures.innerHTML =`
+      <span id="speedgrader-settings"></span>
+      <div id='grade_container'>
+        <input type='text' id='grading-box-extended' />
+      </div>
+      <div id="submission_file_hidden">
+        <a
+          class="display_name"
+          href="${courses}${assignments}${submissions}${params}"
+        </a>
+      </div>
+      <div id="submission_files_list">
+        <a class="display_name"></a>
+      </div>
+      `
+    sinon.stub($, 'ajaxJSON');
+    SpeedGrader.setup()
     SpeedGrader.EG.currentStudent = {
       id: 4,
       name: "Guy B. Studying",
@@ -900,61 +957,116 @@ QUnit.module('handleSubmissionSelectionChange', {
         submission_history: [
           {
             submission: {
+              user_id: 4,
               submission_type: 'basic_lti_launch',
               external_tool_url: 'foo'
             }
           },
           {
             submission: {
+              user_id: 4,
               submission_type: 'basic_lti_launch',
               external_tool_url: 'bar'
             }
           }
         ]
       }
-    };
+    }
 
     window.jsonData = {
       id: 27,
-      gradingPeriods: { 8: { id: 8, is_closed: true } },
+      context: {
+        active_course_sections: [],
+        enrollments: [
+          {
+            user_id: "4",
+            course_section_id: 1
+          }
+        ],
+        students: [
+          {
+            index: 0,
+            id: 4,
+            name: 'Guy B. Studying',
+            submission_state: 'not_graded'
+          }
+        ]
+      },
+      gradingPeriods: {
+        7: { id: 7, is_closed: false },
+        8: { id: 8, is_closed: true }
+      },
       GROUP_GRADING_MODE: false,
       points_possible: 10,
       studentMap : {
         4 : SpeedGrader.EG.currentStudent
+      },
+      studentsWithSubmissions: [],
+      submissions: []
+    }
+
+    SpeedGrader.EG.jsonReady()
+    closedGradingPeriodNotice = { showIf: sinon.stub() }
+    getFromCache = sinon.stub(JQuerySelectorCache.prototype, 'get')
+    getFromCache.withArgs('#closed_gp_notice').returns(closedGradingPeriodNotice)
+  })
+
+  hooks.afterEach(() => {
+    getFromCache.restore()
+    window.jsonData = originalWindowJSONData
+    SpeedGrader.EG.currentStudent = originalStudent
+    $.ajaxJSON.restore()
+    SpeedGrader.EG.handleFragmentChanged.restore()
+    fakeENV.teardown()
+    fixtures.innerHTML = ''
+  })
+
+  test('should use submission history lti launch url', () => {
+    const renderLtiLaunch = sinon.stub(SpeedGrader.EG, 'renderLtiLaunch')
+    SpeedGrader.EG.handleSubmissionSelectionChange()
+    ok(renderLtiLaunch.calledWith(sinon.match.any, sinon.match.any, "bar"))
+  })
+
+  test('shows a "closed grading period" notice if the submission is in a closed period', () => {
+    SpeedGrader.EG.handleSubmissionSelectionChange()
+    ok(closedGradingPeriodNotice.showIf.calledWithExactly(true))
+  })
+
+  test('does not show a "closed grading period" notice if the submission is not in a closed period', () => {
+    SpeedGrader.EG.currentStudent.submission.grading_period_id = null
+    SpeedGrader.EG.handleSubmissionSelectionChange()
+    notOk(closedGradingPeriodNotice.showIf.calledWithExactly(true))
+  })
+
+  QUnit.skip('disables the complete/incomplete select when grading period is closed', () => {
+    // the select box is not powered by isClosedForSubmission, it's powered by isConcluded
+    SpeedGrader.EG.currentStudent.submission.grading_period_id = 8
+    SpeedGrader.EG.handleSubmissionSelectionChange()
+    const select = document.getElementById('grading-box-extended')
+    ok(select.hasAttribute('disabled'))
+  })
+
+  QUnit.skip('does not disable the complete/incomplete select when grading period is open', () => {
+    // the select box is not powered by isClosedForSubmission, it's powered by isConcluded
+    SpeedGrader.EG.currentStudent.submission.grading_period_id = 7
+    SpeedGrader.EG.handleSubmissionSelectionChange()
+    const select = document.getElementById('grading-box-extended')
+    notOk(select.hasAttribute('disabled'))
+  })
+
+  test('submission files list template is populated with anonymous submission data', () => {
+    SpeedGrader.EG.currentStudent.submission.currentSelectedIndex = 0
+    SpeedGrader.EG.currentStudent.submission.submission_history[0].submission.versioned_attachments = [{
+      attachment: {
+        id: 1,
+        display_name: 'submission.txt'
       }
-    };
-  },
-
-  teardown() {
-    SpeedGrader.EG.currentStudent = this.originalStudent;
-    fakeENV.teardown();
-    window.jsonData = this.originalWindowJSONData;
-  }
-});
-
-test('should use submission history lti launch url', () => {
-  const renderLtiLaunch = sinon.stub(SpeedGrader.EG, 'renderLtiLaunch');
-  SpeedGrader.EG.handleSubmissionSelectionChange();
-  ok(renderLtiLaunch.calledWith(sinon.match.any, sinon.match.any, "bar"));
-});
-
-test('shows a "closed grading period" notice if the submission is in a closed period', () => {
-  const getFromCache = sinon.stub(JQuerySelectorCache.prototype, 'get')
-  const closedGradingPeriodNotice = { showIf: sinon.stub() }
-  getFromCache.withArgs('#closed_gp_notice').returns(closedGradingPeriodNotice)
-  SpeedGrader.EG.handleSubmissionSelectionChange()
-  ok(closedGradingPeriodNotice.showIf.calledWithExactly(true))
-  getFromCache.restore()
-})
-
-test('does not show a "closed grading period" notice if the submission is not in a closed period', () => {
-  SpeedGrader.EG.currentStudent.submission.grading_period_id = null
-  const getFromCache = sinon.stub(JQuerySelectorCache.prototype, 'get')
-  const closedGradingPeriodNotice = { showIf: sinon.stub() }
-  getFromCache.withArgs('#closed_gp_notice').returns(closedGradingPeriodNotice)
-  SpeedGrader.EG.handleSubmissionSelectionChange()
-  notOk(closedGradingPeriodNotice.showIf.calledWithExactly(true))
-  getFromCache.restore()
+    }]
+    SpeedGrader.EG.handleSubmissionSelectionChange();
+    const {pathname} = new URL(document.querySelector('#submission_files_list a').href);
+    const expectedPathname = `${courses}${assignments}/submissions/${SpeedGrader.EG.currentStudent.id}`;
+    equal(pathname, expectedPathname);
+  })
 })
 
 QUnit.module('SpeedGrader#isGradingTypePercent', {
@@ -1099,14 +1211,23 @@ test('compares student sortable names when given function returns equal values f
 
 QUnit.module('SpeedGrader - gateway timeout', {
   setup () {
-    fakeENV.setup();
+    fakeENV.setup({
+      assignment_id: '17',
+      course_id: '29',
+      grading_role: 'moderator',
+      help_url: 'example.com/support',
+      show_help_menu_item: false
+    })
     this.server = sinon.fakeServer.create({ respondImmediately: true });
     this.server.respondWith(
       'GET',
       `${window.location.pathname}.json${window.location.search}`,
       [504, { 'Content-Type': 'application/json' }, '']
     );
-    fixtures.innerHTML = '<div id="speed_grader_timeout_alert"></div>'
+    fixtures.innerHTML = `
+      <span id="speedgrader-settings"></span>
+      <div id="speed_grader_timeout_alert"></div>
+    `
   },
   teardown () {
     fixtures.innerHTML = ''
@@ -1170,7 +1291,6 @@ QUnit.module('SpeedGrader - clicking save rubric button for an anonymous assignm
     sinon.stub($, 'ajaxJSON');
     disableWhileLoadingStub = sinon.stub($.fn, 'disableWhileLoading');
     fakeENV.setup({
-      anonymous_moderated_marking_enabled: true,
       assignment_id: '27',
       course_id: '3',
       help_url: '',
@@ -1182,6 +1302,7 @@ QUnit.module('SpeedGrader - clicking save rubric button for an anonymous assignm
     sinon.stub(window.rubricAssessment, 'assessmentData').returns({ 'rubric_assessment[user_id]': 'abcde' });
 
     fixtures.innerHTML = `
+      <span id="speedgrader-settings"></span>
       <button class="save_rubric_button"></button>
       <div id="speedgrader_comment_textarea_mount_point"></div>
       <div id="speedgrader-settings"></div>
@@ -1264,14 +1385,23 @@ QUnit.module('SpeedGrader - clicking save rubric button for an anonymous assignm
 
 QUnit.module('SpeedGrader - no gateway timeout', {
   setup () {
-    fakeENV.setup();
+    fakeENV.setup({
+      assignment_id: '17',
+      course_id: '29',
+      grading_role: 'moderator',
+      help_url: 'example.com/support',
+      show_help_menu_item: false
+    })
     this.server = sinon.fakeServer.create({ respondImmediately: true });
     this.server.respondWith(
       'GET',
       `${window.location.pathname}.json${window.location.search}`,
       [200, { 'Content-Type': 'application/json' }, '{ hello: "world"}']
     );
-    fixtures.innerHTML = '<div id="speed_grader_timeout_alert"></div>'
+    fixtures.innerHTML = `
+      <span id="speedgrader-settings"></span>
+      <div id="speed_grader_timeout_alert"></div>
+    `
   },
   teardown () {
     fixtures.innerHTML = ''
@@ -1287,7 +1417,26 @@ test('does not show an error when the gateway times out', function () {
   strictEqual($('#speed_grader_timeout_alert').text(), '');
 });
 
-QUnit.module('SpeedGrader', function() {
+QUnit.module('SpeedGrader', function(suiteHooks) {
+  suiteHooks.beforeEach(() => {
+    fakeENV.setup({
+      assignment_id: '2',
+      course_id: '7',
+      help_url: 'example.com/foo',
+      show_help_menu_item: false
+    })
+    sinon.stub($, 'getJSON')
+    sinon.stub($, 'ajaxJSON')
+    fixtures.innerHTML = '<span id="speedgrader-settings"></span>'
+  })
+
+  suiteHooks.afterEach(() => {
+    $.getJSON.restore()
+    $.ajaxJSON.restore()
+    fixtures.innerHTML = ''
+    fakeENV.teardown()
+  })
+
   QUnit.module('#refreshFullRubric', function(hooks) {
     let speedGraderCurrentStudent;
     let jsonData;
@@ -1300,7 +1449,7 @@ QUnit.module('SpeedGrader', function() {
 
     hooks.beforeEach(function () {
       fixtures.innerHTML = rubricHTML
-      fakeENV.setup({ RUBRIC_ASSESSMENT: { assessment_type: 'peer_review' }});
+      fakeENV.setup({ ...window.ENV, RUBRIC_ASSESSMENT: { assessment_type: 'peer_review' }});
       ({jsonData} = window);
       speedGraderCurrentStudent = SpeedGrader.EG.currentStudent;
       window.jsonData = { rubric_association: {} };
@@ -1318,14 +1467,13 @@ QUnit.module('SpeedGrader', function() {
       JQuerySelectorCache.prototype.get.restore();
       SpeedGrader.EG.currentStudent = speedGraderCurrentStudent;
       window.jsonData = jsonData;
-      fakeENV.teardown();
       fixtures.innerHTML = ''
     });
 
     QUnit.module('when the assessment is a grading assessment and the user is a grader', function(contextHooks) {
       contextHooks.beforeEach(function() {
         SpeedGrader.EG.currentStudent.rubric_assessments[0].assessment_type = 'grading'
-        fakeENV.setup({ current_user_id: '7', RUBRIC_ASSESSMENT: { assessment_type: 'grading' }})
+        fakeENV.setup({ ...window.ENV, current_user_id: '7', RUBRIC_ASSESSMENT: { assessment_type: 'grading' }})
       })
 
       contextHooks.afterEach(function() {
@@ -1363,18 +1511,14 @@ QUnit.module('SpeedGrader', function() {
 
   QUnit.module('#renderCommentTextArea', function(hooks) {
     hooks.beforeEach(function() {
-      fakeENV.setup()
-      fixtures.innerHTML = '<div id="speedgrader_comment_textarea_mount_point"/>'
-
-      sinon.stub($, 'getJSON')
-      sinon.stub($, 'ajaxJSON')
+      fixtures.innerHTML = `
+        <span id="speedgrader-settings"></span>
+        <div id="speedgrader_comment_textarea_mount_point"/>
+      `
     })
 
     hooks.afterEach(function() {
-      $.ajaxJSON.restore()
-      $.getJSON.restore()
       fixtures.innerHTML = ''
-      fakeENV.teardown()
     })
 
     test('mounts the comment text area when there is an element to mount it in', function() {
@@ -1395,6 +1539,7 @@ QUnit.module('SpeedGrader', function() {
   QUnit.module('#setup', function(hooks) {
     hooks.beforeEach(function() {
       fakeENV.setup({
+        ...window.ENV,
         assignment_id: '17',
         course_id: '29',
         grading_role: 'moderator',
@@ -1403,29 +1548,16 @@ QUnit.module('SpeedGrader', function() {
       })
 
       fixtures.innerHTML = '<span id="speedgrader-settings"></span>'
-      sinon.stub($, 'getJSON')
-      sinon.stub($, 'ajaxJSON')
     })
 
     hooks.afterEach(function() {
-      $.ajaxJSON.restore()
-      $.getJSON.restore()
       fixtures.innerHTML = ''
-      fakeENV.teardown()
     })
 
-    test('populates the settings mount point if anonymous_moderated_marking_enabled is true', () => {
-      fakeENV.setup({...window.ENV, anonymous_moderated_marking_enabled: true})
+    test('populates the settings mount point', () => {
       SpeedGrader.setup()
       const mountPoint = document.getElementById('speedgrader-settings')
       strictEqual(mountPoint.textContent, 'SpeedGrader Settings')
-    })
-
-    test('does not populate the settings mount point if anonymous_moderated_marking_enabled is false', () => {
-      fakeENV.setup({...window.ENV, anonymous_moderated_marking_enabled: false})
-      SpeedGrader.setup()
-      const mountPoint = document.getElementById('speedgrader-settings')
-      strictEqual(mountPoint.textContent, '')
     })
   })
 
@@ -1436,6 +1568,13 @@ QUnit.module('SpeedGrader', function() {
       submission_history: [],
     }
     const enrollment = { user_id: student.id, course_section_id: '1'}
+    const submissionComment = {
+      created_at: (new Date).toISOString(),
+      publishable: false,
+      comment: 'a comment',
+      author_id: 1,
+      author_name: 'an author'
+    }
     const submission = {
       id: '3',
       user_id: '1',
@@ -1443,7 +1582,8 @@ QUnit.module('SpeedGrader', function() {
       workflow_state: 'active',
       submitted_at: (new Date).toISOString(),
       grade: 'A',
-      assignment_id: '456'
+      assignment_id: '456',
+      submission_comments: [submissionComment]
     }
     const windowJsonData = {
       ...assignment,
@@ -1459,6 +1599,26 @@ QUnit.module('SpeedGrader', function() {
     }
 
     let jsonData;
+    let commentToRender
+
+    const commentBlankHtml = `
+      <div class="comment">
+        <span class="comment"></span>
+        <button class="submit_comment_button">
+          <span>Submit</span>
+        </button>
+        <a class="delete_comment_link icon-x">
+          <span class="screenreader-only">Delete comment</span>
+        </a>
+        <div class="comment_attachments"></div>
+      </div>
+    `;
+
+    const commentAttachmentBlank = `
+      <div class="comment_attachment">
+        <a href="example.com/{{ submitter_id }}/{{ id }}/{{ comment_id }}"><span class="display_name">&nbsp;</span></a>
+      </div>
+    `;
 
     hooks.beforeEach(() => {
       ({jsonData} = window)
@@ -1468,7 +1628,9 @@ QUnit.module('SpeedGrader', function() {
         course_id: '29',
         grading_role: 'moderator',
         help_url: 'example.com/support',
-        show_help_menu_item: false
+        show_help_menu_item: false,
+        current_user_id: '1',
+        RUBRIC_ASSESSMENT: {}
       })
 
       fixtures.innerHTML = `
@@ -1476,19 +1638,18 @@ QUnit.module('SpeedGrader', function() {
         <div id="combo_box_container"></div>
         <div id="iframe_holder"></div>
         `
-      sinon.stub($, 'getJSON')
-      sinon.stub($, 'ajaxJSON')
       SpeedGrader.setup()
       window.jsonData = windowJsonData
       SpeedGrader.EG.jsonReady()
       setupCurrentStudent()
+      commentToRender = {...submissionComment}
+      commentToRender.draft = true
+
+      commentRenderingOptions = { commentBlank: $(commentBlankHtml), commentAttachmentBlank: $(commentAttachmentBlank) };
     })
 
     hooks.afterEach(() => {
-      $.ajaxJSON.restore()
-      $.getJSON.restore()
       fixtures.innerHTML = ''
-      fakeENV.teardown()
       delete SpeedGrader.EG.currentStudent
       window.jsonData = jsonData
       teardownHandleFragmentChanged()
@@ -1507,6 +1668,27 @@ QUnit.module('SpeedGrader', function() {
         `/courses/${course_id}/assignments/${assignment_id}/submissions/${user_id}?preview=true`
       )
     })
+
+    test('renderComment adds the comment text to the submit button for draft comments', () => {
+      const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions)
+      const submitLinkScreenreaderText = renderedComment.find('.submit_comment_button').attr('aria-label')
+
+      equal(submitLinkScreenreaderText, 'Submit comment: a comment')
+    })
+
+    test('renderComment displays the submit button for draft comments that are publishable', () => {
+      commentToRender.publishable = true
+      const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions)
+      const button = renderedComment.find('.submit_comment_button')
+      notStrictEqual(button.css('display'), 'none')
+    });
+
+    test('renderComment hides the submit button for draft comments that are not publishable', () => {
+      commentToRender.publishable = false
+      const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions)
+      const button = renderedComment.find('.submit_comment_button')
+      strictEqual(button.css('display'), 'none')
+    });
   })
 
   QUnit.module('Anonymous Assignments', anonymousHooks => {
@@ -1525,6 +1707,12 @@ QUnit.module('SpeedGrader', function() {
     const unsortedPair = [omegaStudent, alphaStudent]
     const alphaEnrollment = {...alpha, course_section_id: '1'}
     const omegaEnrollment = {...omega, course_section_id: '1'}
+    const alphaSubmissionComment = {
+      created_at: (new Date).toISOString(),
+      publishable: false,
+      comment: 'a comment',
+      ...alpha
+    };
     const alphaSubmission = {
       ...alpha,
       grade_matches_current_submission: true,
@@ -1537,9 +1725,9 @@ QUnit.module('SpeedGrader', function() {
         attachment: {
           id: 1,
           display_name: 'submission.txt'
-
         }
-      }]
+      }],
+      submission_comments: [alphaSubmissionComment]
     }
     alphaSubmission.submission_history = [{...alphaSubmission}]
     const omegaSubmission = {
@@ -1561,14 +1749,101 @@ QUnit.module('SpeedGrader', function() {
     }
 
     anonymousHooks.beforeEach(() => {
-      fakeENV.setup({anonymous_moderated_marking_enabled: true, force_anonymous_grading: true})
+      fakeENV.setup({...window.ENV, force_anonymous_grading: true})
       window.jsonData = windowJsonData
     })
 
     anonymousHooks.afterEach(() => {
       window.location.hash = ''
       window.jsonData = originalJsonData
-      fakeENV.teardown()
+    })
+
+    QUnit.module('renderComment', hooks => {
+      hooks.beforeEach(() => {
+        fakeENV.setup({
+          ...ENV,
+          assignment_id: '17',
+          course_id: '29',
+          grading_role: 'moderator',
+          help_url: 'example.com/support',
+          show_help_menu_item: false,
+          RUBRIC_ASSESSMENT: {}
+        })
+
+        fixtures.innerHTML = `
+          <span id="speedgrader-settings"></span>
+        `
+        SpeedGrader.setup()
+        window.jsonData = windowJsonData
+        SpeedGrader.EG.jsonReady()
+        setupCurrentStudent()
+      })
+
+      hooks.afterEach(() => {
+        fixtures.innerHTML = ''
+        fakeENV.teardown()
+        window.jsonData = originalJsonData
+        delete SpeedGrader.EG.currentStudent
+        teardownHandleFragmentChanged()
+        window.location.hash = ''
+      })
+
+      const commentBlankHtml = `
+        <div class="comment">
+          <span class="comment"></span>
+          <button class="submit_comment_button">
+            <span>Submit</span>
+          </button>
+          <a class="delete_comment_link icon-x">
+            <span class="screenreader-only">Delete comment</span>
+          </a>
+          <div class="comment_attachments"></div>
+        </div>
+      `;
+
+      const commentAttachmentBlank = `
+        <div class="comment_attachment">
+          <a href="example.com/{{ submitter_id }}/{{ id }}/{{ comment_id }}"><span class="display_name">&nbsp;</span></a>
+        </div>
+      `;
+
+      commentRenderingOptions = { commentBlank: $(commentBlankHtml), commentAttachmentBlank: $(commentAttachmentBlank) };
+
+      test('renderComment adds the comment text to the submit button for draft comments', () => {
+        const commentToRender = SpeedGrader.EG.currentStudent.submission.submission_comments[0];
+        SpeedGrader.EG.currentStudent.submission.provisional_grades = [{
+          anonymous_grader_id: commentToRender.anonymous_id
+        }]
+        commentToRender.draft = true;
+        const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions);
+        const submitLinkScreenreaderText = renderedComment.find('.submit_comment_button').attr('aria-label');
+
+        equal(submitLinkScreenreaderText, 'Submit comment: a comment');
+      });
+
+      test('renderComment displays the submit button for draft comments that are publishable', () => {
+        const commentToRender = SpeedGrader.EG.currentStudent.submission.submission_comments[0];
+        SpeedGrader.EG.currentStudent.submission.provisional_grades = [{
+          anonymous_grader_id: commentToRender.anonymous_id
+        }]
+        commentToRender.draft = true;
+        commentToRender.publishable = true;
+        const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions);
+        const button = renderedComment.find('.submit_comment_button')
+        notStrictEqual(button.css('display'), 'none')
+      });
+
+      test('renderComment hides the submit button for draft comments that are not publishable', () => {
+        const commentToRender = SpeedGrader.EG.currentStudent.submission.submission_comments[0];
+        SpeedGrader.EG.currentStudent.submission.provisional_grades = [{
+          anonymous_grader_id: commentToRender.anonymous_id
+        }]
+        commentToRender.draft = true;
+        commentToRender.publishable = false;
+        const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions);
+        const button = renderedComment.find('.submit_comment_button')
+        strictEqual(button.css('display'), 'none')
+      });
     })
 
     QUnit.module('#jsonReady', contextHooks => {
@@ -1687,8 +1962,6 @@ QUnit.module('SpeedGrader', function() {
           show_help_menu_item: false
         })
         fixtures.innerHTML = '<span id="speedgrader-settings"></span>'
-        sinon.stub($, 'getJSON')
-        sinon.stub($, 'ajaxJSON')
         sinon.stub(SpeedGrader.EG, 'handleFragmentChanged');
         sinon.stub(SpeedGrader.EG, 'goToStudent')
         SpeedGrader.setup()
@@ -1697,10 +1970,7 @@ QUnit.module('SpeedGrader', function() {
       })
 
       hooks.afterEach(function() {
-        $.ajaxJSON.restore()
-        $.getJSON.restore()
         fixtures.innerHTML = ''
-        fakeENV.teardown()
         SpeedGrader.EG.goToStudent.restore()
         SpeedGrader.EG.handleFragmentChanged.restore()
         window.jsonData = originalJsonData
@@ -1733,8 +2003,6 @@ QUnit.module('SpeedGrader', function() {
           show_help_menu_item: false
         })
         fixtures.innerHTML = '<span id="speedgrader-settings"></span>'
-        sinon.stub($, 'getJSON')
-        sinon.stub($, 'ajaxJSON')
         sinon.stub(SpeedGrader.EG, 'goToStudent')
         sinon.stub(SpeedGrader.EG, 'handleFragmentChanged');
         SpeedGrader.setup()
@@ -1746,11 +2014,8 @@ QUnit.module('SpeedGrader', function() {
 
       hooks.afterEach(function() {
         fixtures.innerHTML = ''
-        fakeENV.teardown()
         SpeedGrader.EG.goToStudent.restore()
         window.jsonData = originalJsonData
-        $.getJSON.restore()
-        $.ajaxJSON.restore()
       })
 
       test('goToStudent is called with student anonymous_id', () => {
@@ -1786,15 +2051,10 @@ QUnit.module('SpeedGrader', function() {
           <img id="avatar_image" alt="" />
           <div id="combo_box_container"></div>
         `
-        sinon.stub($, 'getJSON')
-        sinon.stub($, 'ajaxJSON')
       })
 
       hooks.afterEach(() => {
-        $.ajaxJSON.restore()
-        $.getJSON.restore()
         fixtures.innerHTML = ''
-        fakeENV.teardown()
         window.jsonData = originalJsonData
         document.querySelector('.ui-selectmenu-menu').remove()
       })
@@ -1838,7 +2098,6 @@ QUnit.module('SpeedGrader', function() {
     })
 
     QUnit.module('#handleStudentChanged', hooks => {
-      let getJSON
       hooks.beforeEach(() => {
         fakeENV.setup({
           ...ENV,
@@ -1849,18 +2108,13 @@ QUnit.module('SpeedGrader', function() {
           show_help_menu_item: false
         })
         fixtures.innerHTML = '<span id="speedgrader-settings"></span>'
-        getJSON = sinon.stub($, 'getJSON')
-        sinon.stub($, 'ajaxJSON')
         SpeedGrader.setup()
         window.jsonData = windowJsonData
         SpeedGrader.EG.jsonReady()
       })
 
       hooks.afterEach(() => {
-        $.ajaxJSON.restore()
-        getJSON.restore()
         fixtures.innerHTML = ''
-        fakeENV.teardown()
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
         teardownHandleFragmentChanged()
@@ -1878,7 +2132,7 @@ QUnit.module('SpeedGrader', function() {
           submission: alphaSubmission
         };
         setupCurrentStudent();
-        const [url] = getJSON.firstCall.args;
+        const [url] = $.getJSON.firstCall.args;
         const {course_id: courseId, assignment_id: assignmentId} = ENV;
         const params = `anonymous_id=${alphaStudent.anonymous_id}&last_updated_at=${alphaSubmission.updated_at}`;
         strictEqual(url, `/api/v1/courses/${courseId}/assignments/${assignmentId}/anonymous_provisional_grades/status?${params}`);
@@ -1918,18 +2172,13 @@ QUnit.module('SpeedGrader', function() {
           </div>
           <select id="submission_to_view"><option selected="selected" value="${alphaStudent.anonymous_id}"></option></select>
         `;
-        sinon.stub($, 'getJSON')
-        sinon.stub($, 'ajaxJSON')
         SpeedGrader.setup()
         window.jsonData = windowJsonData
         SpeedGrader.EG.jsonReady()
       })
 
       hooks.afterEach(() => {
-        $.ajaxJSON.restore()
-        $.getJSON.restore()
         fixtures.innerHTML = ''
-        fakeENV.teardown()
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
       })
@@ -1956,7 +2205,7 @@ QUnit.module('SpeedGrader', function() {
         const {pathname} = new URL(document.querySelector('#submission_files_list a').href);
         const expectedPathname = `${courses}${assignments}/anonymous_submissions/${alphaSubmission.anonymous_id}`;
         equal(pathname, expectedPathname);
-      });
+      })
     })
 
     QUnit.module('#initRubricStuff', hooks => {
@@ -1980,8 +2229,6 @@ QUnit.module('SpeedGrader', function() {
             <button class='save_rubric_button'></button>
           </div>
         `;
-        sinon.stub($, 'getJSON');
-        sinon.stub($, 'ajaxJSON');
         sinon.stub(SpeedGrader.EG, 'showSubmission');
         sinon.stub($.fn, 'ready');
         SpeedGrader.setup();
@@ -1993,10 +2240,7 @@ QUnit.module('SpeedGrader', function() {
       hooks.afterEach(() => {
         window.jsonData = originalJsonData;
         SpeedGrader.EG.showSubmission.restore();
-        $.ajaxJSON.restore();
-        $.getJSON.restore();
         fixtures.innerHTML = '';
-        fakeENV.teardown();
       });
 
       test('sets graded_anonymously to true for the rubric ajax request', () => {
@@ -2019,8 +2263,6 @@ QUnit.module('SpeedGrader', function() {
           show_help_menu_item: false
         });
         fixtures.innerHTML = '<span id="speedgrader-settings"></span>';
-        sinon.stub($, 'getJSON');
-        sinon.stub($, 'ajaxJSON');
         sinon.stub($.fn, 'ready');
         SpeedGrader.setup();
         window.jsonData = windowJsonData;
@@ -2030,10 +2272,7 @@ QUnit.module('SpeedGrader', function() {
 
       hooks.afterEach(() => {
         window.jsonData = originalJsonData;
-        $.ajaxJSON.restore();
-        $.getJSON.restore();
         fixtures.innerHTML = '';
-        fakeENV.teardown();
       });
 
       test('fetches student via anonymous_id', () => {
@@ -2053,18 +2292,13 @@ QUnit.module('SpeedGrader', function() {
           show_help_menu_item: false
         })
         fixtures.innerHTML = '<span id="speedgrader-settings"></span>'
-        sinon.stub($, 'getJSON')
-        sinon.stub($, 'ajaxJSON')
         SpeedGrader.setup()
         window.jsonData = windowJsonData
         SpeedGrader.EG.jsonReady()
       })
 
       hooks.afterEach(() => {
-        $.ajaxJSON.restore()
-        $.getJSON.restore()
         fixtures.innerHTML = ''
-        fakeENV.teardown()
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
       })
@@ -2101,8 +2335,6 @@ QUnit.module('SpeedGrader', function() {
           RUBRIC_ASSESSMENT: {}
         })
         fixtures.innerHTML = '<span id="speedgrader-settings"></span>'
-        sinon.stub($, 'getJSON')
-        sinon.stub($, 'ajaxJSON')
         SpeedGrader.setup()
         window.jsonData = windowJsonData
         window.jsonData.rubric_association = {}
@@ -2111,10 +2343,7 @@ QUnit.module('SpeedGrader', function() {
       })
 
       hooks.afterEach(() => {
-        $.ajaxJSON.restore()
-        $.getJSON.restore()
         fixtures.innerHTML = ''
-        fakeENV.teardown()
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
         teardownHandleFragmentChanged()
@@ -2142,8 +2371,6 @@ QUnit.module('SpeedGrader', function() {
           <span id="speedgrader-settings"></span>
           <div id="comment_attachment_blank"><a id="submitter_id" href="{{submitter_id}}" /></a></div>
         `
-        sinon.stub($, 'getJSON')
-        sinon.stub($, 'ajaxJSON')
         SpeedGrader.setup()
         window.jsonData = windowJsonData
         window.jsonData.rubric_association = {}
@@ -2152,10 +2379,7 @@ QUnit.module('SpeedGrader', function() {
       })
 
       hooks.afterEach(() => {
-        $.ajaxJSON.restore()
-        $.getJSON.restore()
         fixtures.innerHTML = ''
-        fakeENV.teardown()
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
         teardownHandleFragmentChanged()
@@ -2182,8 +2406,6 @@ QUnit.module('SpeedGrader', function() {
         fixtures.innerHTML = `
           <span id="speedgrader-settings"></span>
         `
-        sinon.stub($, 'getJSON')
-        sinon.stub($, 'ajaxJSON')
         SpeedGrader.setup()
         window.jsonData = windowJsonData
         window.jsonData.rubric_association = {}
@@ -2192,10 +2414,7 @@ QUnit.module('SpeedGrader', function() {
       })
 
       hooks.afterEach(() => {
-        $.ajaxJSON.restore()
-        $.getJSON.restore()
         fixtures.innerHTML = ''
-        fakeENV.teardown()
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
         teardownHandleFragmentChanged()
@@ -2227,8 +2446,6 @@ QUnit.module('SpeedGrader', function() {
           <span id="speedgrader-settings"></span>
           <textarea id="speedgrader_comment_textarea_mount_point">hi hi</textarea>
         `
-        sinon.stub($, 'getJSON')
-        sinon.stub($, 'ajaxJSON')
         SpeedGrader.setup()
         window.jsonData = windowJsonData
         window.jsonData.rubric_association = {}
@@ -2241,36 +2458,33 @@ QUnit.module('SpeedGrader', function() {
       })
 
       hooks.afterEach(() => {
-        $.getJSON.restore()
         fixtures.innerHTML = ''
-        fakeENV.teardown()
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
         teardownHandleFragmentChanged()
         window.location.hash = ''
       })
 
-      test('calls ajaxJSON with submission url with anonymous id', () => {
-        $.ajaxJSON.restore()
-        const ajaxJSON = sinon.stub($, 'ajaxJSON')
+      test('calls ajaxJSON with anonymous submission url with anonymous id', () => {
         SpeedGrader.EG.addSubmissionComment('draft comment')
-        const [url] = ajaxJSON.firstCall.args
-        deepEqual(url, `${assignmentURL}/submissions/${alphaStudent.anonymous_id}`)
-        ajaxJSON.restore()
+        const addSubmissionCommentAjaxJSON = $.ajaxJSON.getCalls().find(call =>
+          call.args[0] === `${assignmentURL}/anonymous_submissions/${alphaStudent.anonymous_id}`
+        )
+        notStrictEqual(addSubmissionCommentAjaxJSON, undefined)
       })
 
       test('calls ajaxJSON with with anonymous id in data', () => {
-        $.ajaxJSON.restore()
-        const ajaxJSON = sinon.stub($, 'ajaxJSON')
         SpeedGrader.EG.addSubmissionComment('draft comment')
-        const [,,formData] = ajaxJSON.firstCall.args
+        const addSubmissionCommentAjaxJSON = $.ajaxJSON.getCalls().find(call =>
+          call.args[0] === `${assignmentURL}/anonymous_submissions/${alphaStudent.anonymous_id}`
+        )
+        const [,,formData] = addSubmissionCommentAjaxJSON.args
         strictEqual(formData['submission[anonymous_id]'], alphaStudent.anonymous_id)
-        ajaxJSON.restore()
       })
 
       test('calls handleGradingError if an error is encountered', () => {
         $.ajaxJSON.restore()
-        const ajaxJSON = sinon.stub($, 'ajaxJSON').callsFake((_url, _method, _form, _success, error) => {
+        sinon.stub($, 'ajaxJSON').callsFake((_url, _method, _form, _success, error) => {
           error()
         })
         const handleGradingError = sinon.stub(SpeedGrader.EG, 'handleGradingError')
@@ -2281,12 +2495,11 @@ QUnit.module('SpeedGrader', function() {
 
         revertFromFormSubmit.restore()
         handleGradingError.restore()
-        ajaxJSON.restore()
       })
 
       test('calls revertFromFormSubmit to clear the comment if an error is encountered', () => {
         $.ajaxJSON.restore()
-        const ajaxJSON = sinon.stub($, 'ajaxJSON').callsFake((_url, _method, _form, _success, error) => {
+        sinon.stub($, 'ajaxJSON').callsFake((_url, _method, _form, _success, error) => {
           error()
         })
         const revertFromFormSubmit = sinon.stub(SpeedGrader.EG, 'revertFromFormSubmit')
@@ -2296,7 +2509,6 @@ QUnit.module('SpeedGrader', function() {
         deepEqual(params, {errorSubmitting: true})
 
         revertFromFormSubmit.restore()
-        ajaxJSON.restore()
       })
     })
 
@@ -2316,20 +2528,15 @@ QUnit.module('SpeedGrader', function() {
             <input />
           </div>
         `
-        sinon.stub($, 'getJSON')
-        const ajaxJSON = sinon.stub($, 'ajaxJSON')
         SpeedGrader.setup()
         window.jsonData = windowJsonData
         window.jsonData.rubric_association = {}
         SpeedGrader.EG.jsonReady()
         setupCurrentStudent()
-        ajaxJSON.restore()
       })
 
       hooks.afterEach(() => {
-        $.getJSON.restore()
         fixtures.innerHTML = ''
-        fakeENV.teardown()
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
         teardownHandleFragmentChanged()
@@ -2337,34 +2544,33 @@ QUnit.module('SpeedGrader', function() {
       })
 
       test('calls isStudentConcluded with student looked up by anonymous id', () => {
-        const ajaxJSON = sinon.stub($, 'ajaxJSON')
         const isStudentConcluded = sinon.spy(SpeedGrader.EG, 'isStudentConcluded')
         SpeedGrader.EG.handleGradeSubmit({}, false)
         deepEqual(isStudentConcluded.firstCall.args, [alphaStudent.anonymous_id])
-        ajaxJSON.restore()
       })
 
-      test('calls ajaxJSON with with anonymous id in data', () => {
-        const ajaxJSON = sinon.stub($, 'ajaxJSON')
+      test('calls ajaxJSON with anonymous id in data', () => {
+        $.ajaxJSON.restore()
+        sinon.stub($, 'ajaxJSON')
         SpeedGrader.EG.handleGradeSubmit({}, false)
-        const [,,formData] = ajaxJSON.firstCall.args
+        const [,,formData] = $.ajaxJSON.firstCall.args
         strictEqual(formData['submission[anonymous_id]'], alphaStudent.anonymous_id)
-        ajaxJSON.restore()
       })
 
       test('calls handleGradingError if an error is encountered', () => {
-        const ajaxJSON = sinon.stub($, 'ajaxJSON').callsFake((_url, _method, _form, _success, error) => { error() })
+        $.ajaxJSON.restore()
+        sinon.stub($, 'ajaxJSON').callsFake((_url, _method, _form, _success, error) => { error() })
         const handleGradingError = sinon.stub(SpeedGrader.EG, 'handleGradingError')
 
         SpeedGrader.EG.handleGradeSubmit({}, false)
         strictEqual(handleGradingError.callCount, 1)
 
         handleGradingError.restore()
-        ajaxJSON.restore()
       })
 
       test('clears the grade input if an error is encountered', () => {
-        const ajaxJSON = sinon.stub($, 'ajaxJSON').callsFake((_url, _method, _form, _success, error) => { error() })
+        $.ajaxJSON.restore()
+        sinon.stub($, 'ajaxJSON').callsFake((_url, _method, _form, _success, error) => { error() })
         const handleGradingError = sinon.stub(SpeedGrader.EG, 'handleGradingError')
         const showGrade = sinon.stub(SpeedGrader.EG, 'showGrade')
 
@@ -2373,15 +2579,14 @@ QUnit.module('SpeedGrader', function() {
 
         showGrade.restore()
         handleGradingError.restore()
-        ajaxJSON.restore()
       })
 
       test('submission is always marked as graded anonymously', () => {
-        const ajaxJSON = sinon.stub($, 'ajaxJSON');
+        $.ajaxJSON.restore()
+        sinon.stub($, 'ajaxJSON')
         SpeedGrader.EG.handleGradeSubmit({}, false);
-        const [,,formData] = ajaxJSON.firstCall.args;
+        const [,,formData] = $.ajaxJSON.firstCall.args;
         strictEqual(formData['submission[graded_anonymously]'], true);
-        ajaxJSON.restore();
       });
     })
 
@@ -2400,8 +2605,6 @@ QUnit.module('SpeedGrader', function() {
           <span id="speedgrader-settings"></span>
           <div id="combo_box_container"></div>
         `
-        sinon.stub($, 'getJSON')
-        sinon.stub($, 'ajaxJSON')
         SpeedGrader.setup()
         window.jsonData = windowJsonData
         window.jsonData.rubric_association = {}
@@ -2410,10 +2613,7 @@ QUnit.module('SpeedGrader', function() {
       })
 
       hooks.afterEach(() => {
-        $.ajaxJSON.restore()
-        $.getJSON.restore()
         fixtures.innerHTML = ''
-        fakeENV.teardown()
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
         teardownHandleFragmentChanged()
@@ -2450,8 +2650,6 @@ QUnit.module('SpeedGrader', function() {
           <span id="speedgrader-settings"></span>
           <div id="iframe_holder">not empty</div>
         `
-        sinon.stub($, 'getJSON')
-        sinon.stub($, 'ajaxJSON')
         SpeedGrader.setup()
         window.jsonData = windowJsonData
         SpeedGrader.EG.jsonReady()
@@ -2459,10 +2657,7 @@ QUnit.module('SpeedGrader', function() {
       })
 
       hooks.afterEach(() => {
-        $.ajaxJSON.restore()
-        $.getJSON.restore()
         fixtures.innerHTML = ''
-        fakeENV.teardown()
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
         teardownHandleFragmentChanged()
@@ -2504,8 +2699,6 @@ QUnit.module('SpeedGrader', function() {
             </a>
           </div>
         `
-        sinon.stub($, 'getJSON')
-        sinon.stub($, 'ajaxJSON')
         SpeedGrader.setup()
         window.jsonData = windowJsonData
         SpeedGrader.EG.jsonReady()
@@ -2513,10 +2706,7 @@ QUnit.module('SpeedGrader', function() {
       })
 
       hooks.afterEach(() => {
-        $.ajaxJSON.restore()
-        $.getJSON.restore()
         fixtures.innerHTML = ''
-        fakeENV.teardown()
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
         teardownHandleFragmentChanged()
@@ -2537,84 +2727,14 @@ QUnit.module('SpeedGrader', function() {
     })
   })
 
-  QUnit.module('#handleModerationTabs', (suiteHooks) => {
-    let originalCurrentStudent
-
-    suiteHooks.beforeEach(() => {
-      fixtures.innerHTML = `
-        <div id="moderation_bar"></div>
-      `
-      originalCurrentStudent = SpeedGrader.EG.currentStudent
-      SpeedGrader.EG.currentStudent = {
-        id: 4,
-        name: 'Guy B. Studying',
-        submission: {
-          provisional_grades: [
-            {score: 3, grade: '3', provisional_grade_id: '22', scorer_id: '93'},
-            {score: 4, grade: '4', provisional_grade_id: '91', scorer_id: '77'}
-          ]
-        }
-      }
-      fakeENV.setup()
-      sinon.stub($, 'getJSON')
-      sinon.stub($, 'ajaxJSON')
-      sinon.stub(SpeedGrader.EG, 'domReady')
-      sinon.stub(SpeedGrader.EG, 'showSubmission')
-      SpeedGrader.setup()
-    })
-
-    suiteHooks.afterEach(() => {
-      SpeedGrader.EG.showSubmission.restore()
-      SpeedGrader.EG.domReady.restore()
-      $.ajaxJSON.restore()
-      $.getJSON.restore()
-      fakeENV.teardown()
-      SpeedGrader.EG.currentStudent = originalCurrentStudent
-      fixtures.innerHTML = ''
-    })
-
-    test('shows the moderation bar if there are provisional grades', () => {
-      SpeedGrader.EG.handleModerationTabs()
-      const moderationBar = document.getElementById('moderation_bar')
-      strictEqual(moderationBar.style.display, '')
-    })
-
-    test('hides the moderation bar if there are not any provisional grades', () => {
-      SpeedGrader.EG.currentStudent.submission.provisional_grades = []
-      SpeedGrader.EG.handleModerationTabs()
-      const moderationBar = document.getElementById('moderation_bar')
-      strictEqual(moderationBar.style.display, 'none')
-    })
-
-    QUnit.module('when Anonymous Moderated Marking is enabled', (hooks) => {
-      hooks.beforeEach(() => {
-        ENV.anonymous_moderated_marking_enabled = true
-      })
-
-      test('hides the moderation bar if there are provisional grades', () => {
-        SpeedGrader.EG.handleModerationTabs()
-        const moderationBar = document.getElementById('moderation_bar')
-        strictEqual(moderationBar.style.display, 'none')
-      })
-
-      test('hides the moderation bar if there are not any provisional grades', () => {
-        SpeedGrader.EG.currentStudent.submission.provisional_grades = []
-        SpeedGrader.EG.handleModerationTabs()
-        const moderationBar = document.getElementById('moderation_bar')
-        strictEqual(moderationBar.style.display, 'none')
-      })
-    })
-  })
-
   QUnit.module('#removeModerationBarAndShowSubmission', function(hooks) {
     hooks.beforeEach(() => {
       fixtures.innerHTML = `
+        <span id="speedgrader-settings"></span>
         <div id="full_width_container" class="with_moderation_tabs"></div>
         <div id="moderation_bar"></div>
         <form id="add_a_comment" style="display:none;"></form>
       `
-      sinon.stub($, 'getJSON')
-      sinon.stub($, 'ajaxJSON');
       sinon.stub(SpeedGrader.EG, 'domReady')
       sinon.stub(SpeedGrader.EG, 'showSubmission')
       SpeedGrader.setup()
@@ -2623,8 +2743,6 @@ QUnit.module('SpeedGrader', function() {
     hooks.afterEach(() => {
       SpeedGrader.EG.showSubmission.restore()
       SpeedGrader.EG.domReady.restore()
-      $.ajaxJSON.restore()
-      $.getJSON.restore()
       fixtures.innerHTML = ''
     })
 
@@ -2687,10 +2805,9 @@ QUnit.module('SpeedGrader', function() {
     let submission
 
     hooks.beforeEach(() => {
-      fakeENV.setup()
       ENV.grading_type = 'gpa_scale'
-
       fixtures.innerHTML = `
+        <span id="speedgrader-settings"></span>
         <div id='grading_details_mount_point'></div>
         <div id='grading_box_selected_grader'></div>
         <input type='text' id='grade' />
@@ -2720,7 +2837,6 @@ QUnit.module('SpeedGrader', function() {
       EG.setupProvisionalGraderDisplayNames.restore()
 
       fixtures.innerHTML = ''
-      fakeENV.teardown()
     })
 
     test('displays the component if at least one provisional grade is present', () => {
@@ -2785,8 +2901,8 @@ QUnit.module('SpeedGrader', function() {
     let submission
 
     hooks.beforeEach(() => {
-      fakeENV.setup()
       fixtures.innerHTML = `
+        <span id="speedgrader-settings"></span>
         <div id='grading_details_mount_point'></div>
         <div id='grading_box_selected_grader'></div>
         <input type='text' id='grade' />
@@ -2815,7 +2931,6 @@ QUnit.module('SpeedGrader', function() {
       EG.submitSelectedProvisionalGrade.restore()
 
       fixtures.innerHTML = ''
-      fakeENV.teardown()
     })
 
     test('calls submitSelectedProvisionalGrade with the grade ID when selectedGrade is passed', () => {
@@ -2861,8 +2976,8 @@ QUnit.module('SpeedGrader', function() {
     const EG = SpeedGrader.EG
 
     hooks.beforeEach(() => {
-      fakeENV.setup()
       fixtures.innerHTML = `
+        <span id="speedgrader-settings"></span>
         <div id='grading_details_mount_point'></div>
         <div id='grading-box-selected-grader'></div>
         <div id='grade_container'>
@@ -2885,7 +3000,6 @@ QUnit.module('SpeedGrader', function() {
 
     hooks.afterEach(() => {
       fixtures.innerHTML = ''
-      fakeENV.teardown()
     })
 
     test('sets the selected grader text to the passed-in label', () => {
@@ -2925,10 +3039,10 @@ QUnit.module('SpeedGrader', function() {
     const EG = SpeedGrader.EG
 
     hooks.beforeEach(() => {
-      fakeENV.setup()
       ENV.grading_role = 'moderator'
 
       fixtures.innerHTML = `
+        <span id="speedgrader-settings"></span>
         <div id='grading_details_mount_point'></div>
         <div id='grading-box-selected-grader'></div>
         <div id='grade_container'>
@@ -2948,21 +3062,17 @@ QUnit.module('SpeedGrader', function() {
         }
       }
       EG.setupProvisionalGraderDisplayNames()
-      ENV.anonymous_moderated_marking_enabled = true
       ENV.provisional_status_url = 'some_url_or_other'
 
       sinon.stub(EG, 'onProvisionalGradesFetched')
-      sinon.stub($, 'getJSON').callsFake((url, params, success) => {
+      $.getJSON.callsFake((url, params, success) => {
         success({needs_provisional_grade: true})
       })
     })
 
     hooks.afterEach(() => {
       EG.onProvisionalGradesFetched.restore()
-      $.getJSON.restore()
-
       fixtures.innerHTML = ''
-      fakeENV.teardown()
     })
 
     test('calls onProvisionalGradesFetched upon fetching data', () => {
@@ -3002,9 +3112,8 @@ QUnit.module('SpeedGrader', function() {
     let submission
 
     hooks.beforeEach(() => {
-      fakeENV.setup()
-
       fixtures.innerHTML = `
+        <span id="speedgrader-settings"></span>
         <div id='grading_details_mount_point'></div>
         <div id='grading-box-selected-grader'></div>
         <div id='grade_container'>
@@ -3024,7 +3133,6 @@ QUnit.module('SpeedGrader', function() {
         }
       }
       EG.setupProvisionalGraderDisplayNames()
-      ENV.anonymous_moderated_marking_enabled = true
 
       submission = EG.currentStudent.submission
 
@@ -3037,7 +3145,6 @@ QUnit.module('SpeedGrader', function() {
       EG.showStudent.restore()
 
       fixtures.innerHTML = ''
-      fakeENV.teardown()
     })
 
     test('sets needs_provisional_grade to the supplied value', () => {
@@ -3086,10 +3193,10 @@ QUnit.module('SpeedGrader', function() {
     const EG = SpeedGrader.EG
 
     hooks.beforeEach(() => {
-      fakeENV.setup()
       ENV.provisional_select_url = "provisional_select_url?{{provisional_grade_id}}"
 
       fixtures.innerHTML = `
+        <span id="speedgrader-settings"></span>
         <div id='grading_details_mount_point'></div>
         <div id='grading-box-selected-grader'></div>
         <div id='grade_container'>
@@ -3109,9 +3216,8 @@ QUnit.module('SpeedGrader', function() {
         }
       }
       EG.setupProvisionalGraderDisplayNames()
-      ENV.anonymous_moderated_marking_enabled = true
 
-      sinon.stub($, 'ajaxJSON').callsFake((url, method, params, success) => {
+      $.ajaxJSON.callsFake((url, method, params, success) => {
         success(params)
       })
       sinon.stub(EG, 'fetchProvisionalGrades')
@@ -3121,18 +3227,18 @@ QUnit.module('SpeedGrader', function() {
     hooks.afterEach(() => {
       EG.renderProvisionalGradeSelector.restore()
       EG.fetchProvisionalGrades.restore()
-      $.ajaxJSON.restore()
       teardownHandleFragmentChanged()
       window.location.hash = ''
 
       fixtures.innerHTML = ''
-      fakeENV.teardown()
     })
 
     test('includes the value of ENV.provisional_select_url and provisionalGradeId in the URL', () => {
       EG.submitSelectedProvisionalGrade(123)
-      const [url] = $.ajaxJSON.firstCall.args
-      strictEqual(url, 'provisional_select_url?123')
+      const addSubmissionCommentAjaxJSON = $.ajaxJSON.getCalls().find(call =>
+        call.args[0] === 'provisional_select_url?123'
+      )
+      notStrictEqual(addSubmissionCommentAjaxJSON, undefined)
     })
 
     QUnit.module('when the request completes successfully', () => {
@@ -3152,9 +3258,8 @@ QUnit.module('SpeedGrader', function() {
     const EG = SpeedGrader.EG
 
     hooks.beforeEach(() => {
-      fakeENV.setup()
-
       fixtures.innerHTML = `
+        <span id="speedgrader-settings"></span>
         <div id='grading_details_mount_point'></div>
         <div id='grading-box-selected-grader'></div>
         <div id='grade_container'>
@@ -3163,7 +3268,6 @@ QUnit.module('SpeedGrader', function() {
       `
 
       SpeedGrader.setup()
-      ENV.anonymous_moderated_marking_enabled = true
 
       sinon.stub(EG, 'submitSelectedProvisionalGrade')
       sinon.spy(EG, 'setActiveProvisionalGradeFields')
@@ -3176,7 +3280,6 @@ QUnit.module('SpeedGrader', function() {
       window.location.hash = ''
 
       fixtures.innerHTML = ''
-      fakeENV.teardown()
     })
 
     test('assigns anonymous grader names based on sorted anonymous grader ID', () => {

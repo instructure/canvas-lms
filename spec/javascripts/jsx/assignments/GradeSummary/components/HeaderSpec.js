@@ -38,6 +38,10 @@ QUnit.module('GradeSummary Header', suiteHooks => {
         muted: true,
         title: 'Example Assignment'
       },
+      currentUser: {
+        graderId: 'teach',
+        id: '1105'
+      },
       graders: [
         {graderId: '1101', graderName: 'Miss Frizzle'},
         {graderId: '1102', graderName: 'Mr. Keating'}
@@ -58,9 +62,17 @@ QUnit.module('GradeSummary Header', suiteHooks => {
     )
   }
 
-  test('includes the assignment title as a heading', () => {
+  test('includes the "Grade Summary" heading', () => {
     mountComponent()
-    equal(wrapper.find('h2').text(), 'Example Assignment')
+    equal(wrapper.find('h1').text(), 'Grade Summary')
+  })
+
+  test('includes the assignment title', () => {
+    mountComponent()
+    const children = wrapper.find('header').children()
+    const childArray = children.map(child => child)
+    const headingIndex = childArray.findIndex(child => child.text() === 'Grade Summary')
+    equal(childArray[headingIndex + 1].text(), 'Example Assignment')
   })
 
   test('includes a "grades posted" message when grades have been published', () => {
@@ -98,60 +110,35 @@ QUnit.module('GradeSummary Header', suiteHooks => {
       window.confirm.restore()
     })
 
-    function postButton() {
-      return wrapper.find('button').filterWhere(button => button.text() === 'Post')
-    }
+    test('receives the assignment gradesPublished property as a prop', () => {
+      mountComponent()
+      strictEqual(wrapper.find('PostButton').prop('gradesPublished'), false)
+    })
+
+    test('receives the unmuteAssignmentStatus as a prop', () => {
+      mountComponent()
+      store.dispatch(AssignmentActions.setPublishGradesStatus(AssignmentActions.STARTED))
+      const button = wrapper.find('PostButton')
+      equal(button.prop('publishGradesStatus'), AssignmentActions.STARTED)
+    })
 
     test('displays a confirmation dialog when clicked', () => {
       mountComponent()
-      postButton().simulate('click')
+      wrapper.find('PostButton').simulate('click')
       strictEqual(window.confirm.callCount, 1)
     })
 
     test('publishes grades when dialog is confirmed', () => {
       mountComponent()
-      postButton().simulate('click')
+      wrapper.find('PostButton').simulate('click')
       equal(store.getState().assignment.publishGradesStatus, AssignmentActions.STARTED)
     })
 
     test('does not publish grades when dialog is dismissed', () => {
       window.confirm.returns(false)
       mountComponent()
-      postButton().simulate('click')
+      wrapper.find('PostButton').simulate('click')
       strictEqual(store.getState().assignment.publishGradesStatus, null)
-    })
-
-    test('is disabled when grades are being published', () => {
-      mountComponent()
-      store.dispatch(AssignmentActions.setPublishGradesStatus(AssignmentActions.STARTED))
-      strictEqual(postButton().prop('disabled'), true)
-    })
-
-    test('performs no action upon click when grades are being published', () => {
-      mountComponent()
-      store.dispatch(AssignmentActions.setPublishGradesStatus(AssignmentActions.STARTED))
-      postButton().simulate('click')
-      strictEqual(window.confirm.callCount, 0)
-    })
-
-    test('is disabled when grades were already published', () => {
-      storeEnv.assignment.gradesPublished = true
-      mountComponent()
-      strictEqual(postButton().prop('disabled'), true)
-    })
-
-    test('performs no action upon click when grades were already published', () => {
-      storeEnv.assignment.gradesPublished = true
-      mountComponent()
-      postButton().simulate('click')
-      strictEqual(window.confirm.callCount, 0)
-    })
-
-    test('is enabled when grade publishing failed', () => {
-      mountComponent()
-      store.dispatch(AssignmentActions.setPublishGradesStatus(AssignmentActions.STARTED))
-      store.dispatch(AssignmentActions.setPublishGradesStatus(AssignmentActions.FAILURE))
-      notEqual(postButton().prop('disabled'), true)
     })
   })
 
@@ -169,73 +156,36 @@ QUnit.module('GradeSummary Header', suiteHooks => {
       window.confirm.restore()
     })
 
-    function unmuteButton() {
-      return wrapper.find('button').filterWhere(button => button.text() === 'Display to Students')
-    }
+    test('receives the assignment as a prop', () => {
+      mountComponent()
+      const button = wrapper.find('DisplayToStudentsButton')
+      deepEqual(button.prop('assignment'), storeEnv.assignment)
+    })
+
+    test('receives the unmuteAssignmentStatus as a prop', () => {
+      mountComponent()
+      store.dispatch(AssignmentActions.setUnmuteAssignmentStatus(AssignmentActions.STARTED))
+      const button = wrapper.find('DisplayToStudentsButton')
+      equal(button.prop('unmuteAssignmentStatus'), AssignmentActions.STARTED)
+    })
 
     test('displays a confirmation dialog when clicked', () => {
       mountComponent()
-      unmuteButton().simulate('click')
+      wrapper.find('DisplayToStudentsButton').simulate('click')
       strictEqual(window.confirm.callCount, 1)
     })
 
     test('unmutes the assignment when dialog is confirmed', () => {
       mountComponent()
-      unmuteButton().simulate('click')
+      wrapper.find('DisplayToStudentsButton').simulate('click')
       equal(store.getState().assignment.unmuteAssignmentStatus, AssignmentActions.STARTED)
     })
 
     test('does not unmute the assignment when dialog is dismissed', () => {
       window.confirm.returns(false)
       mountComponent()
-      unmuteButton().simulate('click')
+      wrapper.find('DisplayToStudentsButton').simulate('click')
       strictEqual(store.getState().assignment.unmuteAssignmentStatus, null)
-    })
-
-    test('is disabled when the assignment is being unmuted', () => {
-      mountComponent()
-      store.dispatch(AssignmentActions.setUnmuteAssignmentStatus(AssignmentActions.STARTED))
-      strictEqual(unmuteButton().prop('disabled'), true)
-    })
-
-    test('performs no action upon click when the assignment is being unmuted', () => {
-      mountComponent()
-      store.dispatch(AssignmentActions.setUnmuteAssignmentStatus(AssignmentActions.STARTED))
-      unmuteButton().simulate('click')
-      strictEqual(window.confirm.callCount, 0)
-    })
-
-    test('is disabled when the assignment is not muted', () => {
-      storeEnv.assignment.muted = false
-      mountComponent()
-      strictEqual(unmuteButton().prop('disabled'), true)
-    })
-
-    test('performs no action upon click when assignment is not muted', () => {
-      storeEnv.assignment.muted = false
-      mountComponent()
-      unmuteButton().simulate('click')
-      strictEqual(window.confirm.callCount, 0)
-    })
-
-    test('is disabled when grades have not been published', () => {
-      storeEnv.assignment.muted = false
-      mountComponent()
-      strictEqual(unmuteButton().prop('disabled'), true)
-    })
-
-    test('performs no action upon click when grades have not been published', () => {
-      storeEnv.assignment.muted = false
-      mountComponent()
-      unmuteButton().simulate('click')
-      strictEqual(window.confirm.callCount, 0)
-    })
-
-    test('is enabled when assignment unmuting failed', () => {
-      mountComponent()
-      store.dispatch(AssignmentActions.setUnmuteAssignmentStatus(AssignmentActions.STARTED))
-      store.dispatch(AssignmentActions.setUnmuteAssignmentStatus(AssignmentActions.FAILURE))
-      notEqual(unmuteButton().prop('disabled'), true)
     })
   })
 })

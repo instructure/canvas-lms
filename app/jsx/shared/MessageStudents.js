@@ -23,8 +23,7 @@ import axios from 'axios'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import TextArea from '@instructure/ui-forms/lib/components/TextArea'
-import Modal, { ModalHeader, ModalBody, ModalFooter } from '@instructure/ui-overlays/lib/components/Modal'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
+import Modal, { ModalBody, ModalFooter } from './components/InstuiModal'
 import FormField from '@instructure/ui-forms/lib/components/FormField'
 import Alert from '@instructure/ui-alerts/lib/components/Alert'
 
@@ -249,13 +248,9 @@ import Alert from '@instructure/ui-alerts/lib/components/Alert'
             transition="fade"
             label={this.props.title}
             onDismiss={this.props.onRequestClose}
-            closeButtonLabel={I18n.t('Close')}
             size='medium'
             onExited={this.props.onExited}
           >
-            <ModalHeader>
-              <Heading>{I18n.t('Send Message')}</Heading>
-            </ModalHeader>
             <ModalBody>
               {this.renderAlert(I18n.t("Your message was sent!"), 'success', () => {
                 return this.state.success

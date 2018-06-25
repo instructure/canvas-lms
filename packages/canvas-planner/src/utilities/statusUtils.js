@@ -48,11 +48,8 @@ export function didWeFindToday (days) {
 export function showPillForOverdueStatus(status, item) {
   if (!['late', 'missing'].includes(status)) {
     throw new Error(`Expected status to be 'late' or 'missing', but it was ${status}`);
-  } else if (!item.status || !item.status[status] || !item.context) {
-    return false;
-  }
-
-  return item.context.inform_students_of_overdue_submissions;
+  } 
+  return (!!item.context && !!item.status && item.status[status]);
 }
 
 /**

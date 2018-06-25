@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import I18n from 'i18n!assignment_grade_summary'
+
 function normalizeGraders() {
   const graders = ENV.GRADERS.map(grader => ({
     graderId: grader.user_id || grader.anonymous_id,
@@ -25,10 +27,40 @@ function normalizeGraders() {
 
   graders.sort((a, b) => (a.graderId < b.graderId ? -1 : 1))
 
+  graders.forEach((grader, index) => {
+    /* eslint-disable no-param-reassign */
+    grader.graderName =
+      grader.graderName || I18n.t('Grader %{graderNumber}', {graderNumber: I18n.n(index + 1)})
+    /* eslint-enable no-param-reassign */
+  })
+
   return graders
 }
 
 export default function getEnv() {
+  let finalGrader = null
+  if (ENV.FINAL_GRADER) {
+    finalGrader = {
+      graderId: ENV.FINAL_GRADER.grader_id || 'FINAL_GRADER',
+      id: ENV.FINAL_GRADER.id
+    }
+  }
+
+  const currentUser = {
+    canViewGraderIdentities: ENV.CURRENT_USER.can_view_grader_identities,
+    canViewStudentIdentities: ENV.CURRENT_USER.can_view_student_identities,
+    graderId: ENV.CURRENT_USER.grader_id || null,
+    id: ENV.CURRENT_USER.id
+  }
+
+  if (currentUser.graderId == null) {
+    if (finalGrader && currentUser.id === finalGrader.id) {
+      currentUser.graderId = finalGrader.graderId
+    } else {
+      currentUser.graderId = 'CURRENT_USER'
+    }
+  }
+
   return {
     assignment: {
       courseId: ENV.ASSIGNMENT.course_id,
@@ -37,6 +69,9 @@ export default function getEnv() {
       gradesPublished: ENV.ASSIGNMENT.grades_published,
       title: ENV.ASSIGNMENT.title
     },
+
+    currentUser,
+    finalGrader,
 
     graders: normalizeGraders()
   }

@@ -50,25 +50,46 @@ define([
   // time this is being written a significant amount of work is needed
   // to be able to require javascript files that live in the spec directory
 
-  QUnit.module('SubmissionStateMap with anonymous moderated marking enabled');
+  QUnit.module('SubmissionStateMap');
 
   test ('submission is unlocked if not anonymous', function() {
     const assignment = { id: '1', muted: true };
-    const map = createAndSetupMap(assignment, { anonymousModeratedMarkingEnabled: true });
+    const map = createAndSetupMap(assignment);
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
     strictEqual(state.locked, false);
   });
 
   test ('submission is unlocked if not muted', function() {
     const assignment = { id: '1', anonymous_grading: true };
-    const map = createAndSetupMap(assignment, { anonymousModeratedMarkingEnabled: true });
+    const map = createAndSetupMap(assignment);
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
     strictEqual(state.locked, false);
   });
 
   test ('submission is locked if anonymous and muted', function() {
     const assignment = { id: '1', anonymous_grading: true, muted: true };
-    const map = createAndSetupMap(assignment, { anonymousModeratedMarkingEnabled: true });
+    const map = createAndSetupMap(assignment);
+    const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
+    strictEqual(state.locked, true);
+  });
+
+  test ('submission is unlocked if not moderated', function() {
+    const assignment = { id: '1', moderated_grading: false, grades_published: false };
+    const map = createAndSetupMap(assignment);
+    const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
+    strictEqual(state.locked, false);
+  });
+
+  test ('submission is unlocked if grades are published', function() {
+    const assignment = { id: '1', moderated_grading: false, grades_published: true };
+    const map = createAndSetupMap(assignment);
+    const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
+    strictEqual(state.locked, false);
+  });
+
+  test ('submission is locked if moderated and not published', function() {
+    const assignment = { id: '1', moderated_grading: true, grades_published: false };
+    const map = createAndSetupMap(assignment);
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
     strictEqual(state.locked, true);
   });

@@ -40,3 +40,9 @@ bin/contracts-verify-api
 ```
 
 All specs should pass.
+
+### Publish the pact file to broker
+
+```sh 
+bin/contracts-publish-api
+```

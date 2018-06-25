@@ -45,6 +45,7 @@ function defaultProps (options) {
     dismissOpportunity: () => {},
     clearUpdateTodo: () => {},
     startLoadingGradesSaga: () => {},
+    cancelEditingPlannerItem: () => {},
     ariaHideElement: document.createElement('div'),
     stickyZIndex: 3,
     firstNewActivityDate: null,
@@ -52,7 +53,7 @@ function defaultProps (options) {
       isLoading: false,
       allPastItemsLoaded: false,
       allFutureItemsLoaded: false,
-      allOpportunitiesLoaded: false,
+      allOpportunitiesLoaded: true,
       setFocusAfterLoad: false,
       firstNewDayKey: null,
       futureNextUrl: null,
@@ -66,6 +67,7 @@ function defaultProps (options) {
     },
     todo: {
     },
+    auxElement: document.createElement("div"),
     ...options,
   };
 }
@@ -88,14 +90,17 @@ it('renders the base component correctly with buttons and trays', () => {
 });
 
 it('toggles the new item tray', () => {
+  const mockCancel = jest.fn();
   const wrapper = mount(
-    <PlannerHeader {...defaultProps()} />
+    <PlannerHeader {...defaultProps()} cancelEditingPlannerItem={mockCancel} />
   );
   const button = wrapper.find('[children="Add To Do"]');
   button.simulate('click');
   expect(findEditTray(wrapper).props().open).toEqual(true);
+  expect(mockCancel).not.toHaveBeenCalled();
   button.simulate('click');
   expect(findEditTray(wrapper).props().open).toEqual(false);
+  expect(mockCancel).toHaveBeenCalled();
 });
 
 it('sends focus back to the add new item button', () => {
@@ -104,7 +109,7 @@ it('sends focus back to the add new item button', () => {
     <PlannerHeader {...defaultProps()} cancelEditingPlannerItem={mockCancel}/>
   );
   wrapper.instance().toggleUpdateItemTray();
-  wrapper.instance().handleCancelPlannerItem();
+  wrapper.instance().handleToggleTray();
   expect(mockCancel).toHaveBeenCalled();
 });
 
@@ -151,7 +156,7 @@ it('renders the tray with the name of an existing item when provided', () => {
   expect(findEditTray(wrapper).prop('label')).toBe('Edit abc');
 });
 
-it('does not call getNextOpportunities when component has 12 opportunities', () => {
+it('does not call getNextOpportunities when component has loaded all opportunities', () => {
   const mockDispatch = jest.fn();
   const props = defaultProps();
   props.courses = [
@@ -179,7 +184,7 @@ it('does not call getNextOpportunities when component has 12 opportunities', () 
     isLoading: false,
     allPastItemsLoaded: false,
     allFutureItemsLoaded: false,
-    allOpportunitiesLoaded: false,
+    allOpportunitiesLoaded: true,
     setFocusAfterLoad: false,
     firstNewDayKey: null,
     futureNextUrl: null,
@@ -281,7 +286,8 @@ it('opens tray if todo update item props is set', () => {
   expect(wrapper.state().trayOpen).toEqual(true);
 });
 
-it('shows only 10 opportunities badge when we over 10 items', () => {
+it('shows all opportunities on badge even when we have over 10 items', () => {
+  const mockDispatch = jest.fn();
   const props = defaultProps();
   props.courses = [
     {id: "1", shortName: "Course Short Name"},
@@ -304,13 +310,19 @@ it('shows only 10 opportunities badge when we over 10 items', () => {
     {id: "12", course_id: "3", due_at: "2017-16-09T20:40:35Z", html_url: "http://www.non_default_url.com", name: "learning object title"},
   ];
 
+  props.loading = {
+    loadingOpportunities: false,
+    allOpportunitiesLoaded: true,
+  };
+
   const fakeElement = document.createElement('div');
   const wrapper = mount(
     <PlannerHeader {...props} ariaHideElement={fakeElement} />
   );
+
   wrapper.setProps(props);
   expect(wrapper.find('Badge').filterWhere((item) => {
-    return item.prop('count') === 10; //src undefined
+    return item.prop('count') === props.opportunities.items.length; //src undefined
   }).length).toEqual(1);
 });
 

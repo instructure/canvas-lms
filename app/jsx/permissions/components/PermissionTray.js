@@ -21,8 +21,8 @@ import PropTypes from 'prop-types'
 import React from 'react'
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import Container from '@instructure/ui-core/lib/components/Container'
-import Heading from '@instructure/ui-core/lib/components/Heading'
+import Container from '@instructure/ui-layout/lib/components/View'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
 import IconX from '@instructure/ui-icons/lib/Solid/IconX'
 import Tray from '@instructure/ui-overlays/lib/components/Tray'
 
@@ -41,7 +41,13 @@ export default function PermissionTray(props) {
       size="small"
       placement="end"
     >
-      <Button variant="icon" size="small" margin="small 0 0 xx-small" onClick={props.hideTray}>
+      <Button
+        id="close"
+        variant="icon"
+        size="small"
+        margin="small 0 0 xx-small"
+        onClick={props.hideTray}
+      >
         <IconX title={I18n.t('Close')} />
       </Button>
 
@@ -59,9 +65,9 @@ export default function PermissionTray(props) {
                 description=""
                 expandable={false}
                 permissionName={props.permissionName}
+                permissionLabel={props.label}
                 permission={role.permissions[props.permissionName]}
                 role={role}
-                trayIcon
               />
             ))}
           </RoleTrayTable>
@@ -76,9 +82,9 @@ export default function PermissionTray(props) {
                 description=""
                 expandable={false}
                 permissionName={props.permissionName}
+                permissionLabel={props.label}
                 permission={role.permissions[props.permissionName]}
                 role={role}
-                trayIcon
               />
             ))}
           </RoleTrayTable>

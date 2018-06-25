@@ -84,13 +84,12 @@ describe "/gradebooks/grade_summary" do
     expect(response.body).to match(/Test Student scores are not included in grade statistics./)
   end
 
-  describe "submission details link when anonymous_moderated_marking enabled" do
+  describe "submission details link" do
     before(:each) do
       course_with_teacher
       student_in_course
       @assignment = @course.assignments.create!(title: 'Moderated Assignment', anonymous_grading: true, muted: true)
       @assignment.submit_homework @student, :submission_type => "online_text_entry", :body => "o hai"
-      @assignment.root_account.enable_feature!(:anonymous_moderated_marking)
       @submission_details_url = context_url(@course, :context_assignment_submission_url, @assignment, @student.id)
     end
 

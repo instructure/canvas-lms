@@ -28,7 +28,7 @@ module CC::Exporter::Epub
       announcements: I18n.t("Announcements"),
       topics: I18n.t("Discussion Topics"),
       quizzes: I18n.t("Quizzes"),
-      pages: I18n.t("Wiki Pages"),
+      pages: I18n.t("Pages"),
       files: I18n.t("Files")
     }.freeze
 

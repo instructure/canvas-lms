@@ -33,23 +33,16 @@ describe Moderation do
       @student = User.create!
     end
 
-    it "does not create selections if anonymous moderated marking is not enabled" do
+    it "does not create selections if moderated grading is false" do
       expect{ test_moderation.create_moderation_selections_for_assignment(@assignment.id, [@student.id], []) }.
         not_to change{ @assignment.moderated_grading_selections.count }
     end
 
-    it "does not create selections if anonymous moderated marking is enabled and moderated grading is false" do
-      @course.root_account.enable_feature!(:anonymous_moderated_marking)
-      expect{ test_moderation.create_moderation_selections_for_assignment(@assignment.id, [@student.id], []) }.
-        not_to change{ @assignment.moderated_grading_selections.count }
-    end
-
-    context "with anonymous moderated marking enabled and moderated grading on" do
+    context "with moderated grading on" do
       before :once do
         @student2 = User.create!
         @student3 = User.create!
 
-        @course.root_account.enable_feature!(:anonymous_moderated_marking)
         @assignment.update!(moderated_grading: true, grader_count: 1)
       end
 

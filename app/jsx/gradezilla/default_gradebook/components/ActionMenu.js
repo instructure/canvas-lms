@@ -21,8 +21,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import IconMiniArrowDownSolid from '@instructure/ui-icons/lib/Solid/IconMiniArrowDown'
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import { MenuItem, MenuItemSeparator } from '@instructure/ui-core/lib/components/Menu'
-import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
+import Menu, { MenuItem, MenuItemSeparator } from '@instructure/ui-menu/lib/components/Menu'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import GradebookExportManager from '../../../gradezilla/shared/GradebookExportManager'
 import { AppLaunch } from '../../../gradezilla/SISGradePassback/PostGradesApp'
@@ -283,7 +282,7 @@ const { arrayOf, bool, func, object, shape, string } = PropTypes;
       const publishGradesToSis = this.renderPublishGradesToSis();
 
       return (
-        <PopoverMenu
+        <Menu
           trigger={
             <Button variant="link">
               <Text {...buttonTypographyProps}>
@@ -306,7 +305,7 @@ const { arrayOf, bool, func, object, shape, string } = PropTypes;
           </MenuItem>
 
           { [...this.renderPreviousExports()] }
-        </PopoverMenu>
+        </Menu>
       );
     }
   }

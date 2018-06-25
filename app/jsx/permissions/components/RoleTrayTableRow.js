@@ -21,10 +21,10 @@ import PropTypes from 'prop-types'
 import React from 'react'
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import Container from '@instructure/ui-core/lib/components/Container'
+import Container from '@instructure/ui-layout/lib/components/View'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import IconArrowOpenStart from '@instructure/ui-icons/lib/Solid/IconArrowOpenStart'
-import Text from '@instructure/ui-core/lib/components/Text'
+import Text from '@instructure/ui-elements/lib/components/Text'
 import {ConnectedPermissionButton} from './PermissionButton'
 import permissionPropTypes from '../propTypes'
 
@@ -37,8 +37,8 @@ export default function RoleTrayTableRow({
   title,
   permission,
   permissionName,
-  role,
-  trayIcon
+  permissionLabel,
+  role
 }) {
   return (
     <Container as="div">
@@ -69,12 +69,16 @@ export default function RoleTrayTableRow({
         </FlexItem>
 
         <FlexItem>
-          <ConnectedPermissionButton
-            permission={permission}
-            permissionName={permissionName}
-            courseRoleId={role.id}
-            trayIcon={trayIcon}
-          />
+          <div className="ic-permissions__cell-content">
+            <ConnectedPermissionButton
+              permission={permission}
+              permissionName={permissionName}
+              permissionLabel={permissionLabel}
+              roleId={role.id}
+              roleLabel={role.label}
+              inTray
+            />
+          </div>
         </FlexItem>
       </Flex>
     </Container>
@@ -86,13 +90,12 @@ RoleTrayTableRow.propTypes = {
   expandable: PropTypes.bool,
   permission: permissionPropTypes.rolePermission.isRequired,
   permissionName: PropTypes.string.isRequired,
+  permissionLabel: PropTypes.string.isRequired,
   role: permissionPropTypes.role.isRequired,
-  trayIcon: PropTypes.bool,
   title: PropTypes.string.isRequired
 }
 
 RoleTrayTableRow.defaultProps = {
   description: '',
-  expandable: false,
-  trayIcon: false
+  expandable: false
 }

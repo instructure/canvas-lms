@@ -273,7 +273,6 @@ describe "Gradezilla editing grades" do
   context "for a moderated assignment" do
     before(:each) do
       # turn on the moderation flag
-      Account.default.enable_feature!(:anonymous_moderated_marking)
       Account.default.enable_feature!(:anonymous_marking)
 
       now = Time.zone.now

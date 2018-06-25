@@ -18,7 +18,29 @@
 
 import { canvas } from '@instructure/ui-themes/lib'
 import './support/sinon/sinon-qunit-1.0.0'
+import en_US from 'timezone/en_US'
 
+if (process.env.SENTRY_DSN) {
+  // This should allow us to capture more errors rather than just
+  // "Script error"
+  const Raven = require('raven-js')
+  Raven.config(process.env.SENTRY_DSN, {
+    release: process.env.GIT_COMMIT
+  }).install();
+
+  // QUnit is assumed global
+  QUnit.testStart(({module, name}) => {
+    Raven.setExtraContext(); // Clear all extra data from the context.
+    Raven.setExtraContext({
+      spec: `${module}: ${name}`
+    });
+  })
+}
+
+// Handle making sure we load in timezone data to prevent errors.
+(window.__PRELOADED_TIMEZONE_DATA__ || (window.__PRELOADED_TIMEZONE_DATA__ = {}))['en_US'] = en_US
+
+document.dir = 'ltr'
 const fixturesDiv = document.createElement('div')
 fixturesDiv.id = 'fixtures'
 document.body.appendChild(fixturesDiv)

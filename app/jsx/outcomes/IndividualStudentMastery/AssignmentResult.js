@@ -18,6 +18,7 @@
 
 import React from 'react'
 import I18n from 'i18n!outcomes'
+import _ from 'lodash'
 import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
 import View from '@instructure/ui-layout/lib/components/View'
 import Link from '@instructure/ui-elements/lib/components/Link'
@@ -27,7 +28,7 @@ import IconQuiz from '@instructure/ui-icons/lib/Line/IconQuiz'
 import * as shapes from './shapes'
 import Ratings from '../../rubrics/Ratings'
 
-const AssignmentResult = ({ outcome, result }) => {
+const AssignmentResult = ({ outcome, result, outcomeProficiency }) => {
   const { ratings } = outcome
   const { html_url: url, name, submission_types: types } = result.assignment
   const isQuiz = types && types.indexOf('online_quiz') >= 0
@@ -48,11 +49,27 @@ const AssignmentResult = ({ outcome, result }) => {
       </FlexItem>
       <FlexItem padding="x-small 0">
         <View padding="x-small 0 0 0">
-          <Text size="small" fontStyle="italic" weight="bold">{ I18n.t('Your score') }</Text>
+          <Text size="small" fontStyle="italic" weight="bold">{
+            result.hide_points ? I18n.t('Your score') : I18n.t('Your score: %{score}', { score: result.score })
+          }</Text>
         </View>
       </FlexItem>
       <FlexItem borderWidth="small">
-        <div className="react-rubric"><div className="ratings"><Ratings tiers={ratings} points={result.score} /></div></div>
+        <div className="react-rubric">
+          <div className="ratings">
+            <Ratings
+              tiers={ratings}
+              points={result.score}
+              hidePoints={result.hide_points}
+              useRange={false}
+              customRatings={_.get(outcomeProficiency, 'ratings')}
+              defaultMasteryThreshold={outcome.mastery_points}
+              pointsPossible={outcome.points_possible}
+              assessing={false}
+              isSummary={false}
+            />
+          </div>
+        </div>
       </FlexItem>
     </Flex>
   )
@@ -60,7 +77,12 @@ const AssignmentResult = ({ outcome, result }) => {
 
 AssignmentResult.propTypes = {
   result: shapes.outcomeResultShape.isRequired,
-  outcome: shapes.outcomeShape.isRequired
+  outcome: shapes.outcomeShape.isRequired,
+  outcomeProficiency: shapes.outcomeProficiencyShape
+}
+
+AssignmentResult.defaultProps = {
+  outcomeProficiency: null
 }
 
 export default AssignmentResult

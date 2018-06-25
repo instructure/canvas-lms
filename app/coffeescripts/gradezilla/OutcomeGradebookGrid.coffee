@@ -226,7 +226,7 @@ define [
             section_name: if _.keys(Grid.sections).length > 1 then section_name else null
             student)
         _.each rollup[0].scores, (score) ->
-          row["outcome_#{score.links.outcome}"] = score.score
+          row["outcome_#{score.links.outcome}"] = _.pick score, 'score', 'hide_points'
         row
 
       # Public: Filter the given row by its section.
@@ -346,42 +346,48 @@ define [
       #
       # row - Current row index.
       # cell - Current cell index.
-      # value - Current value of the cell.
+      # value - Object with current score and hide_points status of the cell
       # columnDef - Object that defines the current column.
       # dataContext - Context for the cell.
       #
       # Returns cell HTML.
       cell: (row, cell, value, columnDef, dataContext) ->
-        Grid.View.cellHtml(value, columnDef, true)
+        score = value?.score
+        hide_points = value?.hide_points
+        Grid.View.cellHtml(score, hide_points, columnDef, true)
 
       # Internal: Determine HTML for a cell.
       #
-      # value - The proposed value for the cell
+      # score - The proposed value for the cell
+      # hide_points - Whether or not to show raw points or tier description
       # columnDef - The object for the current column
       # applyFilter - Whether filtering should be applied
       #
       # Returns cell HTML
-      cellHtml: (value, columnDef, shouldFilter) ->
+      cellHtml: (score, hide_points, columnDef, shouldFilter) ->
         outcome     = Grid.Util.lookupOutcome(columnDef.field)
-        return unless outcome and _.isNumber(value)
-        [className, color] = Grid.View.masteryColor(value, outcome)
+        return unless outcome and _.isNumber(score)
+        [className, color, description] = Grid.View.masteryDetails(score, outcome)
         return '' if shouldFilter and !_.include(Grid.filter, className)
         cssColor = if color then "background-color:#{color};" else ''
-        cellTemplate(color: cssColor, score: Math.round(value * 100.0) / 100.0, className: className, masteryScore: outcome.mastery_points)
+        if hide_points
+          cellTemplate(color: cssColor, className: className, description: description)
+        else
+          cellTemplate(color: cssColor, score: Math.round(score * 100.0) / 100.0, className: className, masteryScore: outcome.mastery_points)
 
       studentCell: (row, cell, value, columnDef, dataContext) ->
         studentCellTemplate(_.extend value, course_id: ENV.GRADEBOOK_OPTIONS.context_id)
 
-      masteryColor: (score, outcome) ->
+      masteryDetails: (score, outcome) ->
         if Grid.ratings.length > 0
           total_points = outcome.points_possible
           total_points = outcome.mastery_points if total_points == 0
           scaled = if total_points == 0 then score else (score / total_points) * Grid.ratings[0].points
           idx = Grid.ratings.findIndex((r) -> scaled >= r.points)
           idx = if idx == -1 then Grid.ratings.length - 1 else idx
-          ["rating_#{idx}", "\##{Grid.ratings[idx].color}"]
+          ["rating_#{idx}", "\##{Grid.ratings[idx].color}", Grid.ratings[idx].description]
         else
-          Grid.View.legacyMasteryColor(score, outcome)
+          Grid.View.legacyMasteryDetails(score, outcome)
 
       # Public: Create a string class name and color for the given score.
       #
@@ -389,19 +395,19 @@ define [
       # outcome - The outcome to compare the score against.
       #
       # Returns an array with a className and CSS color.
-      legacyMasteryColor: (score, outcome) ->
+      legacyMasteryDetails: (score, outcome) ->
         mastery     = outcome.mastery_points
         nearMastery = mastery / 2
         exceedsMastery = mastery + (mastery / 2)
-        return ['rating_0', '#6a843f'] if score >= exceedsMastery
-        return ['rating_1', '#8aac53'] if score >= mastery
-        return ['rating_2', '#e0d773'] if score >= nearMastery
-        ['rating_3', '#df5b59']
+        return ['rating_0', '#6a843f', I18n.t('Exceeds Mastery')] if score >= exceedsMastery
+        return ['rating_1', '#8aac53', I18n.t('Meets Mastery')] if score >= mastery
+        return ['rating_2', '#e0d773', I18n.t('Near Mastery')] if score >= nearMastery
+        ['rating_3', '#df5b59', I18n.t('Well Below Mastery')]
 
       getColumnResults: (data, column) ->
         _.chain(data)
           .pluck(column.field)
-          .filter(_.isNumber)
+          .filter(_.isObject)
           .value()
 
       headerRowCell: ({node, column, grid}, fn = Grid.averageFn) ->
@@ -409,8 +415,10 @@ define [
 
         results = Grid.View.getColumnResults(grid.getData(), column)
         return $(node).empty() unless results.length
-        value = Grid.Math[fn].call(this, (results))
-        $(node).empty().append(Grid.View.cellHtml(value, column, false))
+        scores = _.map results, (result) -> result.score
+        hide_points = _.every results, (result) -> result.hide_points
+        score = Grid.Math[fn].call(this, (scores))
+        $(node).empty().append(Grid.View.cellHtml(score, hide_points, column, false))
 
       redrawHeader: (grid, fn = Grid.averageFn) ->
         Grid.averageFn = fn

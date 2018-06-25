@@ -988,7 +988,7 @@ class UsersController < ApplicationController
 
   # @API List Missing Submissions
   # A paginated list of past-due assignments for which the student does not have a submission.
-  # The user sending the request must either be an admin or a parent observer using the parent app
+  # The user sending the request must either be the student, an admin or a parent observer using the parent app
   #
   # @argument user_id
   #   the student's ID
@@ -1195,10 +1195,14 @@ class UsersController < ApplicationController
       @enrollments.each { |e| e.user = @user }
 
       respond_to do |format|
-        format.html
-        format.json {
+        format.html do
+          js_env(CONTEXT_USER_DISPLAY_NAME: @user.short_name,
+                 USER_ID: @user.id)
+        end
+        format.json do
           render :json => user_json(@user, @current_user, session, %w{locale avatar_url},
-                                    @current_user.pseudonym.account) }
+                                    @current_user.pseudonym.account)
+        end
       end
     end
   end
@@ -2212,7 +2216,7 @@ class UsersController < ApplicationController
     render :json => {:invited_users => invited_users, :errored_users => errored_users}
   end
 
-  # @API Get a Pandata jwt token and its expiration date
+  # @API Get a Pandata Events jwt token and its expiration date
   #
   # Returns a jwt auth and props token that can be used to send events to
   # Pandata.
@@ -2220,24 +2224,24 @@ class UsersController < ApplicationController
   # NOTE: This is currently only available to the mobile developer keys.
   #
   # @argument app_key [String]
-  #   The pandata appKey for this mobile app
+  #   The pandata events appKey for this mobile app
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/users/self/pandata_token \
+  #     curl https://<canvas>/api/v1/users/self/pandata_events_token \
   #          -X POST \
   #          -H 'Authorization: Bearer <token>'
   #          -F 'app_key=MOBILE_APPS_KEY' \
   #
   # @example_response
   #   {
-  #     "url": "https://example.com/pandata"
+  #     "url": "https://example.com/pandata/events"
   #     "auth_token": "wek23klsdnsoieioeoi3of9deeo8r8eo8fdn",
   #     "props_token": "paowinefopwienpfiownepfiownepfownef",
   #     "expires_at": 1521667783000,
   #   }
-  def pandata_token
-    settings = Canvas::DynamicSettings.find(service: 'pandata')
-    dk_ids = Setting.get("pandata_token_allowed_developer_key_ids", "").split(",")
+  def pandata_events_token
+    settings = Canvas::DynamicSettings.find('events', service: 'pandata')
+    dk_ids = Setting.get("pandata_events_token_allowed_developer_key_ids", "").split(",")
 
     unless @access_token
       return render json: { :message => "Access token required" }, status: :bad_request
@@ -2247,12 +2251,12 @@ class UsersController < ApplicationController
       return render json: { :message => "Developer key not authorized" }, status: :forbidden
     end
 
-    if params[:app_key] == settings["ios-pandata-key"]
-      key = settings["ios-pandata-key"]
-      sekrit = settings["ios-pandata-secret"]
-    elsif params[:app_key] == settings["android-pandata-key"]
-      key = settings["android-pandata-key"]
-      sekrit = settings["android-pandata-secret"]
+    if params[:app_key] == settings["ios-key"]
+      key = settings["ios-key"]
+      sekrit = settings["ios-secret"]
+    elsif params[:app_key] == settings["android-key"]
+      key = settings["android-key"]
+      sekrit = settings["android-secret"]
     else
       return render json: { :message => "Invalid app key" }, status: :bad_request
     end
@@ -2275,7 +2279,7 @@ class UsersController < ApplicationController
     auth_token = Canvas::Security.create_jwt(auth_body, expires_at, sekrit)
     props_token = Canvas::Security.create_jwt(props_body, nil, sekrit)
     render json: {
-      url: settings["pandata-url"],
+      url: settings["url"],
       auth_token: auth_token,
       props_token: props_token,
       expires_at: expires_at.to_f * 1000
@@ -2472,15 +2476,16 @@ class UsersController < ApplicationController
       @pseudonym = nil if @pseudonym && !['creation_pending', 'pending_approval'].include?(@pseudonym.user.workflow_state)
     end
 
-    @user ||= @pseudonym && @pseudonym.user
+    @user ||= @pseudonym&.user
     @user ||= @context.shard.activate { User.new }
 
+    use_pairing_code = @domain_root_account.feature_enabled?(:observer_pairing_code)
     force_validations = value_to_boolean(params[:force_validations])
     manage_user_logins = @context.grants_right?(@current_user, session, :manage_user_logins)
     self_enrollment = params[:self_enrollment].present?
     allow_non_email_pseudonyms = !force_validations && manage_user_logins || self_enrollment && params[:pseudonym_type] == 'username'
     require_password = self_enrollment && allow_non_email_pseudonyms
-    allow_password = require_password || manage_user_logins
+    allow_password = require_password || manage_user_logins || use_pairing_code
 
     notify_policy = Users::CreationNotifyPolicy.new(manage_user_logins, params[:pseudonym])
 
@@ -2556,8 +2561,17 @@ class UsersController < ApplicationController
     end
 
     @invalid_observee_creds = nil
+    @invalid_observee_code = nil
     if @user.initial_enrollment_type == 'observer'
-      if (observee_pseudonym = authenticate_observee)
+      if use_pairing_code
+        @pairing_code = ObserverPairingCode.active.where(code: params[:pairing_code][:code]).first
+        if !@pairing_code.nil?
+          @observee = @pairing_code.user
+        else
+          @invalid_observee_code = ObserverPairingCode.new
+          @invalid_observee_code.errors.add('code', 'invalid')
+        end
+      elsif (observee_pseudonym = authenticate_observee)
         @observee = observee_pseudonym.user
       else
         @invalid_observee_creds = Pseudonym.new
@@ -2601,7 +2615,7 @@ class UsersController < ApplicationController
       @cc.workflow_state = skip_confirmation ? 'active' : 'unconfirmed' unless @cc.workflow_state == 'confirmed'
     end
 
-    if @user.valid? && @pseudonym.valid? && @invalid_observee_creds.nil?
+    if @user.valid? && @pseudonym.valid? && @invalid_observee_creds.nil? & @invalid_observee_code.nil?
       # saving the user takes care of the @pseudonym and @cc, so we can't call
       # save_without_session_maintenance directly. we don't want to auto-log-in
       # unless the user is registered/pre_registered (if the latter, he still
@@ -2616,6 +2630,7 @@ class UsersController < ApplicationController
 
       if @observee && !@user.as_observer_observation_links.where(user_id: @observee, root_account: @context).exists?
         UserObservationLink.create_or_restore(student: @observee, observer: @user, root_account: @context)
+        @pairing_code&.destroy
       end
 
       if notify_policy.is_self_registration?
@@ -2652,7 +2667,8 @@ class UsersController < ApplicationController
           :errors => {
               :user => @user.errors.as_json[:errors],
               :pseudonym => @pseudonym ? @pseudonym.errors.as_json[:errors] : {},
-              :observee => @invalid_observee_creds ? @invalid_observee_creds.errors.as_json[:errors] : {}
+              :observee => @invalid_observee_creds ? @invalid_observee_creds.errors.as_json[:errors] : {},
+              :pairing_code => @invalid_observee_code ? @invalid_observee_code.errors.as_json[:errors] : {}
           }
       }
       render :json => errors, :status => :bad_request

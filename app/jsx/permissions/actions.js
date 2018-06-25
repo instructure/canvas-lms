@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import $ from 'jquery'
 import I18n from 'i18n!permissions'
 import {createActions} from 'redux-actions'
+import $ from 'jquery'
 
 import * as apiClient from './apiClient'
 
@@ -73,11 +73,23 @@ actions.createNewRole = function(label, baseRole) {
         dispatch(actions.addTraySavingSuccess())
         dispatch(actions.hideAllTrays())
         dispatch(actions.displayRoleTray({role: createdRole}))
-        showFlashSuccess(I18n.t('Successfully created new role'))()
       })
-      .catch(_error => {
+      .catch(error => {
         dispatch(actions.addTraySavingFail())
-        showFlashError(I18n.t('Failed to create new role'))()
+        showFlashError(I18n.t('Failed to create new role'))(error)
+      })
+  }
+}
+
+actions.updateRoleName = function(id, label, baseType) {
+  return (dispatch, getState) => {
+    apiClient
+      .updateRole(getState(), {id, label, base_role_type: baseType})
+      .then(res => {
+        dispatch(actions.updateRole(res.data))
+      })
+      .catch(error => {
+        showFlashError(I18n.t('Failed to update role name'))(error)
       })
   }
 }
@@ -87,7 +99,6 @@ actions.updateRoleNameAndBaseType = function(id, label, baseType) {
     apiClient
       .updateRole(getState(), {id, label, base_role_type: baseType})
       .then(res => {
-        $.screenReaderFlashMessage(I18n.t('Successfully updated role name'))
         dispatch(actions.updateRole(res.data))
       })
       .catch(_ => {
@@ -129,15 +140,42 @@ actions.tabChanged = function tabChanged(newContextType) {
   }
 }
 
-actions.modifyPermissions = function modifyPermissions(
-  permissionName,
-  courseRoleId,
+function changePermission(role, permissionName, enabled, locked, explicit) {
+  return {
+    ...role,
+    permissions: {
+      ...role.permissions,
+      [permissionName]: {
+        ...role.permissions[permissionName],
+        enabled,
+        locked,
+        explicit
+      }
+    }
+  }
+}
+
+actions.modifyPermissions = function modifyPermissions({
+  name,
+  id,
   enabled,
-  locked
-) {
-  return dispatch => {
-    dispatch(actions.updatePermissions({permissionName, courseRoleId, enabled, locked}))
-    dispatch(actions.fixFocus({permissionName, courseRoleId}))
+  locked,
+  explicit,
+  inTray
+}) {
+  return (dispatch, getState) => {
+    const role = getState().roles.find(r => r.id === id)
+    const updatedRole = changePermission(role, name, enabled, locked, explicit)
+    apiClient
+      .updateRole(getState(), updatedRole)
+      .then(res => {
+        const newRes = {...res.data, contextType: role.contextType, displayed: role.displayed}
+        dispatch(actions.updatePermissions({role: newRes}))
+        dispatch(actions.fixButtonFocus({permissionName: name, roleId: id, inTray}))
+      })
+      .catch(_error => {
+        setTimeout(() => showFlashError(I18n.t('Failed to update permission'))(), 500)
+      })
   }
 }
 
@@ -147,24 +185,38 @@ actions.deleteRole = function(role, successCallback, failCallback) {
       .deleteRole(getState().contextId, role)
       .then(_ => {
         successCallback()
-        // This is terrible; focus on previous role upon deletion.
-        const roles = getState().roles
-        const index = roles.findIndex(r => r.id === role.id)
-        // index should always be >= 1 here, but be responsible
-        const prevRoleId = index >= 1 ? roles[index - 1].id : undefined
         dispatch(actions.deleteRoleSuccess(role))
         showFlashSuccess(I18n.t('Delete role %{label} succeeded', {label: role.label}))()
-        if (prevRoleId) {
-          const query = `#ic-permissions__role-header-for-role-${prevRoleId}`
-          const button = $(query).find('button')
-          button.focus()
-        }
       })
       .catch(_error => {
         failCallback()
-        showFlashError(I18n.t('Failed to delete role %{label}', {label: role.label}))()
+        setTimeout(
+          () => showFlashError(I18n.t('Failed to delete role %{label}', {label: role.label}))(),
+          500
+        )
       })
   }
+}
+
+actions.updateBaseRole = function updateBaseRole(role, baseRole, onSuccess, onFail) {
+  return (dispatch, getState) => {
+    const state = getState()
+    apiClient
+      .updateBaseRole(state, role, baseRole)
+      .then(res => {
+        const newRes = {...res.data, contextType: role.contextType, displayed: role.displayed}
+        dispatch(actions.updatePermissions({role: newRes}))
+        onSuccess()
+      })
+      .catch(() => {
+        onFail()
+      })
+  }
+}
+
+actions.fixButtonFocus = function fixButtonFocus({permissionName, roleId, inTray}) {
+  const targetArea = inTray ? 'tray' : 'table'
+  return actions.fixFocus({permissionName, roleId, targetArea})
 }
 
 const actionTypes = types.reduce((acc, type) => {

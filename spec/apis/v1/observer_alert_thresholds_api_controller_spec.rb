@@ -40,7 +40,8 @@ describe ObserverAlertThresholdsApiController, type: :request do
       end
 
       it 'only returns active thresholds' do
-        to_destroy = observer_alert_threshold_model(observer: @observer, student: @student, alert_type: 'assignment_grade_low')
+        to_destroy = observer_alert_threshold_model(observer: @observer, student: @student,
+          alert_type: 'assignment_grade_low', threshold: 50)
         to_destroy.destroy!
 
         json = api_call_as_user(@observer, :get, @path, @params)
@@ -64,7 +65,8 @@ describe ObserverAlertThresholdsApiController, type: :request do
 
       it 'returns an empty array if users are no longer linked' do
         observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
-        observer_alert_threshold_model(observer: observer, student: @student, alert_type: 'course_grade_high')
+        observer_alert_threshold_model(observer: observer, student: @student,
+          alert_type: 'course_grade_high', threshold: 90)
         observer.enrollments.active.map(&:destroy)
         @observation_link.destroy
         path = "/api/v1/users/#{observer.id}/observer_alert_thresholds?student_id=#{@student.id}"
@@ -78,7 +80,8 @@ describe ObserverAlertThresholdsApiController, type: :request do
 
     context 'without student_id' do
       it 'returns the thresholds' do
-        observer_alert_threshold_model(observer: @observer, student: @student, alert_type: 'assignment_grade_high')
+        observer_alert_threshold_model(observer: @observer, student: @student,
+          alert_type: 'assignment_grade_high', threshold: 90)
 
         path = "/api/v1/users/#{@observer.id}/observer_alert_thresholds"
         params = {user_id: @observer.to_param, controller: 'observer_alert_thresholds_api',
@@ -101,7 +104,8 @@ describe ObserverAlertThresholdsApiController, type: :request do
 
       it 'returns an empty array if users are no longer linked' do
         observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
-        observer_alert_threshold_model(observer: observer, student: @student, alert_type: 'course_grade_high')
+        observer_alert_threshold_model(observer: observer, student: @student,
+          alert_type: 'course_grade_high', threshold: 90)
         observer.enrollments.active.map(&:destroy)
         @observation_link.destroy
         path = "/api/v1/users/#{observer.id}/observer_alert_thresholds"

@@ -21,7 +21,7 @@ import { connect } from 'react-redux';
 import { arrayOf, func, shape, string } from 'prop-types';
 import I18n from 'i18n!gradebook_history';
 import moment from 'moment';
-import Autocomplete from '@instructure/ui-core/lib/components/Autocomplete';
+import Select from '@instructure/ui-forms/lib/components/Select';
 import Button from '@instructure/ui-buttons/lib/components/Button';
 import View from '@instructure/ui-layout/lib/components/View';
 import DateInput from '@instructure/ui-forms/lib/components/DateInput';
@@ -229,7 +229,7 @@ class SearchFormComponent extends Component {
   }
 
   filterNone = options => (
-    // empty function here as the default filter function for Autocomplete
+    // empty function here as the default filter function for Select
     // does a startsWith call, and won't match `nora` -> `Elenora` for example
     options
   )
@@ -258,48 +258,48 @@ class SearchFormComponent extends Component {
             vAlign="top"
             startAt="medium"
           >
-            <Autocomplete
+            <Select
+              editable
               id="students"
               allowEmpty
               emptyOption={this.state.messages.students}
               filter={this.filterNone}
               label={I18n.t('Student')}
-              loading={this.props.students.fetchStatus === 'started'}
-              loadingOption={<Spinner size="small" title={I18n.t('Loading Students')} />}
+              loadingText={this.props.students.fetchStatus === 'started' ? I18n.t('Loading Students') : undefined}
               onBlur={this.promptUserEntry}
               onChange={this.setSelectedStudent}
               onInputChange={this.handleStudentChange}
             >
               {this.renderAsOptions(this.props.students.items)}
-            </Autocomplete>
-            <Autocomplete
+            </Select>
+            <Select
+              editable
               id="graders"
               allowEmpty
               emptyOption={this.state.messages.graders}
               filter={this.filterNone}
               label={I18n.t('Grader')}
-              loading={this.props.graders.fetchStatus === 'started'}
-              loadingOption={<Spinner size="small" title={I18n.t('Loading Graders')} />}
+              loadingText={this.props.graders.fetchStatus === 'started' ? I18n.t('Loading Graders') : undefined}
               onBlur={this.promptUserEntry}
               onChange={this.setSelectedGrader}
               onInputChange={this.handleGraderChange}
             >
               {this.renderAsOptions(this.props.graders.items)}
-            </Autocomplete>
-            <Autocomplete
+            </Select>
+            <Select
+              editable
               id="assignments"
               allowEmpty
               emptyOption={this.state.messages.assignments}
               filter={this.filterNone}
               label={I18n.t('Assignment')}
-              loading={this.props.assignments.fetchStatus === 'started'}
-              loadingOption={<Spinner size="small" title={I18n.t('Loading Assignments')} />}
+              loadingText={this.props.assignments.fetchStatus === 'started' ? I18n.t('Loading Assignments') : undefined}
               onBlur={this.promptUserEntry}
               onChange={this.setSelectedAssignment}
               onInputChange={this.handleAssignmentChange}
             >
               {this.renderAsOptions(this.props.assignments.items)}
-            </Autocomplete>
+            </Select>
           </FormFieldGroup>
 
           <FormFieldGroup

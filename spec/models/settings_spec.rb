@@ -35,6 +35,20 @@ describe Setting do
       Setting.set('my_new_setting', '1')
       expect(Setting.get('my_new_setting', '0')).to eq '1'
     end
+
+    it 'should allow passing a cache expiration' do
+      opts = { expires_in: 1.minute }
+      # cache 0 in process
+      expect(Setting.get('my_new_setting', '0', cache_options: opts)).to eq '0'
+      # some other process sets the value out from under us
+      Setting.create!(name: 'my_new_setting', value: '1')
+      # but we still see the cached value for now
+      expect(Setting.get('my_new_setting', '0', cache_options: opts)).to eq '0'
+      # until the expiration has passed
+      Timecop.travel(2.minutes.from_now) do
+        expect(Setting.get('my_new_setting', '0', cache_options: opts)).to eq '1'
+      end
+    end
   end
 
   context "setting" do

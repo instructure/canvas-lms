@@ -34,6 +34,8 @@ module SIS
         current_csvs = current_import.prepare
 
         output_csvs = generate_csvs(previous_csvs, current_csvs)
+        return unless output_csvs.any?
+
         output_file = Tempfile.new(["sis_csv_diff_generator", ".zip"])
         output_path = output_file.path
         output_file.close!

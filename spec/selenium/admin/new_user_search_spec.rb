@@ -17,6 +17,8 @@
 
 require_relative '../common'
 require_relative './new_user_search_page'
+require_relative './new_user_edit_modal_page.rb'
+require_relative './masquerade_page.rb'
 
 describe "new account user search" do
   include_context "in-process server selenium tests"
@@ -204,16 +206,6 @@ describe "new account user search" do
     expect(driver.current_url).to include("/accounts/#{@account.id}/groups")
   end
 
-  it "should open the act as page when clicking the masquerade button", priority: "1", test_id: 3453424 do
-    mask_user = user_with_pseudonym(:account => @account, :name => "Mask User", :active_user => true)
-
-    get "/accounts/#{@account.id}/users"
-
-    fj("[data-automation='users list'] tr:contains('#{mask_user.name}') [role=button]:has([name='IconMasquerade'])")
-      .click
-    expect(f('.ActAs__text')).to include_text mask_user.name
-  end
-
   it "should open the conversation page when clicking the send message button", priority: "1", test_id: 3453435 do
     conv_user = user_with_pseudonym(:account => @account, :name => "Conversation User")
 
@@ -224,26 +216,30 @@ describe "new account user search" do
     expect(f('.message-header-input .ac-token')).to include_text conv_user.name
   end
 
-  it "should open the edit user modal when clicking the edit user button", priority: "1", test_id: 3453436 do
-    edit_user = user_with_pseudonym(:account => @account, :name => "Edit User")
-
-    get "/accounts/#{@account.id}/users"
-
-    fj("[data-automation='users list'] tr:contains('#{edit_user.name}') [role=button]:has([name='IconEdit'])").click
-
-    expect(fj('label:contains("Full Name") input').attribute('value')).to eq("Edit User")
-  end
-
   # This describe block will be removed once all tests are converted
   describe 'Page Object Converted Tests' do
+    include NewUserSearchPage
+    include NewUserEditModalPage
+    include MasqueradePage
+
     before do
       @user.update_attribute(:name, "Test User")
-      NewUserSearchPage.visit(@account)
+      visit(@account)
     end
 
     it "should bring up user page when clicking name", priority: "1", test_id: 3399648 do
-      NewUserSearchPage.click_user_link(@user.name)
+      click_user_link(@user.name)
       expect(f("#content h2")).to include_text @user.name
+    end
+
+    it "should open the edit user modal when clicking the edit user icon" do
+      click_edit_button(@user.name)
+      expect(full_name_input.attribute('value')).to eq(@user.name)
+    end
+
+    it "should open the act as page when clicking the masquerade button", priority: "1", test_id: 3453424 do
+      click_masquerade_button(@user.name)
+      expect(act_as_label).to include_text @user.name
     end
   end
 end

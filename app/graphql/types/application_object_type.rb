@@ -18,5 +18,22 @@
 
 module Types
   class ApplicationObjectType < GraphQL::Schema::Object
+    def current_user
+      context[:current_user]
+    end
+
+    def session
+      context[:session]
+    end
+
+    def load_association(assoc)
+      Loaders::AssociationLoader.for(object.class, assoc).load(object).then do
+        if block_given?
+          yield object.send(assoc)
+        else
+          object.send(assoc)
+        end
+      end
+    end
   end
 end

@@ -36,10 +36,11 @@ import GradingPeriodsHelper from '../grading/helpers/GradingPeriodsHelper'
     student,
     hasGradingPeriods,
     selectedGradingPeriodID,
-    isAdmin,
-    anonymousModeratedMarkingEnabled
+    isAdmin
   ) {
-    if (assignment.anonymous_grading && assignment.muted && anonymousModeratedMarkingEnabled) {
+    if (assignment.moderated_grading && !assignment.grades_published) {
+      return { locked: true, hideGrade: false };
+    } else if (assignment.anonymous_grading && assignment.muted) {
       return { locked: true, hideGrade: true };
     } else if (!visibleToStudent(assignment, student)) {
       return { locked: true, hideGrade: true, tooltip: TOOLTIP_KEYS.NONE };
@@ -74,11 +75,10 @@ import GradingPeriodsHelper from '../grading/helpers/GradingPeriodsHelper'
   }
 
   class SubmissionState {
-    constructor({ hasGradingPeriods, selectedGradingPeriodID, isAdmin, anonymousModeratedMarkingEnabled }) {
+    constructor({ hasGradingPeriods, selectedGradingPeriodID, isAdmin }) {
       this.hasGradingPeriods = hasGradingPeriods;
       this.selectedGradingPeriodID = selectedGradingPeriodID;
       this.isAdmin = isAdmin;
-      this.anonymousModeratedMarkingEnabled = anonymousModeratedMarkingEnabled;
       this.submissionCellMap = {};
       this.submissionMap = {};
     }
@@ -100,8 +100,7 @@ import GradingPeriodsHelper from '../grading/helpers/GradingPeriodsHelper'
         student,
         this.hasGradingPeriods,
         this.selectedGradingPeriodID,
-        this.isAdmin,
-        this.anonymousModeratedMarkingEnabled
+        this.isAdmin
       ];
 
       this.submissionCellMap[student.id][assignment.id] = cellMapForSubmission(...params);

@@ -18,28 +18,38 @@
 
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
-import {bool, func, shape, string} from 'prop-types'
+import {bool, func, oneOf, shape, string} from 'prop-types'
 import Alert from '@instructure/ui-alerts/lib/components/Alert'
-import Button from '@instructure/ui-buttons/lib/components/Button'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import View from '@instructure/ui-layout/lib/components/View'
 import I18n from 'i18n!assignment_grade_summary'
 
 import * as AssignmentActions from '../assignment/AssignmentActions'
+import DisplayToStudentsButton from './DisplayToStudentsButton'
+import PostButton from './PostButton'
 
 /* eslint-disable no-alert */
+
+function enumeratedStatuses(actions) {
+  return [actions.FAILURE, actions.STARTED, actions.SUCCESS]
+}
 
 class Header extends Component {
   static propTypes = {
     assignment: shape({
       title: string.isRequired
     }).isRequired,
-    canPublish: bool.isRequired,
-    canUnmute: bool.isRequired,
     publishGrades: func.isRequired,
+    publishGradesStatus: oneOf(enumeratedStatuses(AssignmentActions)),
     showNoGradersMessage: bool.isRequired,
-    unmuteAssignment: func.isRequired
+    unmuteAssignment: func.isRequired,
+    unmuteAssignmentStatus: oneOf(enumeratedStatuses(AssignmentActions))
+  }
+
+  static defaultProps = {
+    publishGradesStatus: null,
+    unmuteAssignmentStatus: null
   }
 
   constructor(props) {
@@ -85,25 +95,25 @@ class Header extends Component {
           </Alert>
         )}
 
-        <Heading level="h1">{I18n.t('Grade Summary')}</Heading>
-
-        <Heading level="h2" margin="small 0 0 0">
-          {this.props.assignment.title}
+        <Heading level="h1" margin="0 0 x-small 0">
+          {I18n.t('Grade Summary')}
         </Heading>
 
+        <Text size="x-large">{this.props.assignment.title}</Text>
+
         <View as="div" margin="large 0 0 0" textAlign="end">
-          <Button
-            disabled={!this.props.canPublish}
+          <PostButton
+            gradesPublished={this.props.assignment.gradesPublished}
             margin="0 x-small 0 0"
             onClick={this.handlePublishClick}
-            variant="primary"
-          >
-            {I18n.t('Post')}
-          </Button>
+            publishGradesStatus={this.props.publishGradesStatus}
+          />
 
-          <Button disabled={!this.props.canUnmute} onClick={this.handleUnmuteClick}>
-            {I18n.t('Display to Students')}
-          </Button>
+          <DisplayToStudentsButton
+            assignment={this.props.assignment}
+            onClick={this.handleUnmuteClick}
+            unmuteAssignmentStatus={this.props.unmuteAssignmentStatus}
+          />
         </View>
       </header>
     )
@@ -112,13 +122,12 @@ class Header extends Component {
 
 function mapStateToProps(state) {
   const {assignment, publishGradesStatus, unmuteAssignmentStatus} = state.assignment
-  const {gradesPublished, muted} = assignment
 
   return {
     assignment,
-    canPublish: !gradesPublished && publishGradesStatus !== AssignmentActions.STARTED,
-    canUnmute: gradesPublished && muted && unmuteAssignmentStatus !== AssignmentActions.STARTED,
-    showNoGradersMessage: !gradesPublished && state.context.graders.length === 0
+    publishGradesStatus,
+    showNoGradersMessage: !assignment.gradesPublished && state.context.graders.length === 0,
+    unmuteAssignmentStatus
   }
 }
 
@@ -134,4 +143,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Header)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Header)

@@ -17,6 +17,7 @@
  */
 
 import _ from 'lodash'
+import $ from 'jquery'
 import React from 'react'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
@@ -42,40 +43,56 @@ const pointString = (points, endOfRangePoints) => {
 export const Rating = (props) => {
   const {
     assessing,
+    classes,
     description,
+    endOfRangePoints,
+    footer,
     long_description,
     points,
     onClick,
-    endOfRangePoints,
-    classes,
-    tierColor
+    tierColor,
+    hidePoints,
+    isSummary,
+    selected
   } = props
 
-  const shaderStyle = {backgroundColor: tierColor}
-  const triangleStyle = {borderBottomColor: tierColor}
+  const shaderStyle = { backgroundColor: tierColor }
+  const triangleStyle = { borderBottomColor: tierColor }
+
+  const ratingPoints = () => (
+    <div className="rating-points">
+      <Text size="small" weight="bold">
+        {pointString(points, endOfRangePoints)}
+      </Text>
+    </div>
+  )
 
   return (
     <div
       className={classes}
       onClick={assessing ? onClick : null}
       onKeyPress={(e) => e.key === 'Enter' ? onClick() : null}
-      role="button"
+      role={assessing ? "button" : null}
       tabIndex={assessing ? 0 : null}
     >
-      <div className="rating-points">
-        <Text size="x-small">
-          {pointString(points, endOfRangePoints)}
-        </Text>
-      </div>
+      {hidePoints ? null : ratingPoints()}
       <div className="rating-description">
-        <Text size="x-small" lineHeight="condensed">
+        <Text size="small" lineHeight="condensed" weight="bold">
           {description}
         </Text>
       </div>
-      <Text size="x-small" fontStyle="italic" lineHeight="condensed">
+      <Text size="small" lineHeight="condensed">
         {long_description}
       </Text>
-      <div className='shader' style={shaderStyle}>
+      {
+        footer !== null ? (
+          <div className="rating-footer">
+            {footer}
+          </div>
+        ) : null
+      }
+      <div className='shader' style={shaderStyle}
+        aria-label={isSummary || !selected ? null : I18n.t('This rating is selected')}>
         <div className="triangle" style={triangleStyle}/>
       </div>
     </div>
@@ -92,9 +109,10 @@ const getDefaultColor = (points, defaultMasteryThreshold) => {
   }
 }
 
-const getCustomColor = (points, customRatings) => {
+const getCustomColor = (points, pointsPossible, customRatings) => {
   const sortedRatings = _.sortBy(customRatings, 'points').reverse()
-  const selectedRating = _.find(sortedRatings, (rating) => ( points >= rating.points ))
+  const scaledPoints = pointsPossible > 0 ? points * (sortedRatings[0].points / pointsPossible) : points
+  const selectedRating = _.find(sortedRatings, (rating) => ( scaledPoints >= rating.points ))
   if (selectedRating) {
     return `#${selectedRating.color}`
   } else {
@@ -105,22 +123,31 @@ const getCustomColor = (points, customRatings) => {
 Rating.propTypes = {
   ...tierShape,
   assessing: PropTypes.bool.isRequired,
-  selected: PropTypes.bool
+  footer: PropTypes.node,
+  selected: PropTypes.bool,
+  hidePoints: PropTypes.bool,
+  isSummary: PropTypes.bool.isRequired,
 }
 Rating.defaultProps = {
+  footer: null,
   selected: false,
-  endOfRangePoints: null // eslint-disable-line react/default-props-match-prop-types
+  endOfRangePoints: null, // eslint-disable-line react/default-props-match-prop-types
+  hidePoints: false
 }
 
 const Ratings = (props) => {
   const {
     assessing,
+    customRatings,
+    defaultMasteryThreshold,
+    footer,
     tiers,
     points,
+    pointsPossible,
+    hidePoints,
     onPointChange,
-    defaultMasteryThreshold,
-    useRange,
-    customRatings
+    isSummary,
+    useRange
   } = props
 
   const pairs = tiers.map((tier, index) => {
@@ -147,45 +174,71 @@ const Ratings = (props) => {
   const getTierColor = (selected) => {
     if (!selected) { return 'transparent' }
     if (customRatings && customRatings.length > 0) {
-      return getCustomColor(points, customRatings)
+      return getCustomColor(points, pointsPossible, customRatings)
     } else {
       return getDefaultColor(points, defaultMasteryThreshold)
     }
   }
 
+  const handleClick = (tierPoints) => {
+    onPointChange(tierPoints)
+    $.screenReaderFlashMessage(I18n.t('Rating selected'))
+  }
+
   const selectedIndex = points !== undefined ? currentIndex() : null
+  const ratings = tiers.map((tier, index) => {
+    const selected = selectedIndex === index
+    if (isSummary && !selected) return null
+    const classes = classNames({
+      'rating-tier': true,
+      'selected': selected,
+    })
+
+    return (
+      <Rating
+        key={index} // eslint-disable-line react/no-array-index-key
+        assessing={assessing}
+        classes={classes}
+        endOfRangePoints={useRange ? getRangePoints(tier.points, tiers[index + 1]) : null}
+        footer={footer}
+        onClick={() => handleClick(tier.points)}
+        tierColor={getTierColor(selected)}
+        hidePoints={isSummary || hidePoints}
+        isSummary={isSummary}
+        selected={selected}
+        {...tier}
+      />
+    )
+  }).filter((v) => v !== null)
+
+  const defaultRating = () => (
+    <Rating
+      key={0}
+      classes="rating-tier"
+      description={I18n.t('No details')}
+      footer={footer}
+      points={0}
+      hidePoints={isSummary || hidePoints}
+    />
+  )
 
   return (
     <div className={classNames("rating-tier-list", { 'react-assessing': assessing })}>
-      {
-        tiers.map((tier, index) => {
-          const selected = selectedIndex === index
-          const classes = classNames({
-            'rating-tier': true,
-            'selected': selected,
-          })
-          return (
-            <Rating
-              key={index} // eslint-disable-line react/no-array-index-key
-              assessing={assessing}
-              onClick={() => onPointChange(tier.points)}
-              classes={classes}
-              endOfRangePoints={useRange ? getRangePoints(tier.points, tiers[index + 1]) : null}
-              tierColor={getTierColor(selected)}
-              {...tier}
-            />
-          )
-        })
-      }
+      {ratings.length > 0 || !isSummary ? ratings : defaultRating()}
     </div>
   )
 }
 Ratings.propTypes = {
   ...ratingShape,
   assessing: PropTypes.bool.isRequired,
-  onPointChange: PropTypes.func
+  footer: PropTypes.node,
+  onPointChange: PropTypes.func,
+  isSummary: PropTypes.bool.isRequired,
+  hidePoints: PropTypes.bool
 }
 Ratings.defaultProps = {
+  footer: null,
+  hidePoints: false,
   onPointChange: () => { }
 }
 

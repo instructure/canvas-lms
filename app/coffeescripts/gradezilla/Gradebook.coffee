@@ -1060,7 +1060,9 @@ define [
       @gradebookGrid.gridSupport.state.blur()
 
     sectionList: () ->
-      _.values(@sections).sort((a, b) => (a.id - b.id))
+      _.values(@sections)
+        .sort((a, b) => (a.id - b.id))
+        .map((section) => Object.assign({}, section, {name: htmlEscape.unescape(section.name)}))
 
     updateSectionFilterVisibility: () ->
       mountPoint = document.getElementById('sections-filter-container')
@@ -1186,7 +1188,6 @@ define [
         hasGradingPeriods: @gradingPeriodSet?
         selectedGradingPeriodID: @getGradingPeriodToShow()
         isAdmin: isAdmin()
-        anonymousModeratedMarkingEnabled: @options.anonymous_moderated_marking_enabled
 
     initPostGradesStore: ->
       @postGradesStore = PostGradesStore
@@ -2159,7 +2160,6 @@ define [
       submissionState = @submissionStateMap.getSubmissionState({ user_id: studentId, assignment_id: assignmentId })
       isGroupWeightZero = @assignmentGroups[assignment.assignment_group_id].group_weight == 0
 
-      anonymousModeratedMarkingEnabled: @options.anonymous_moderated_marking_enabled
       assignment: ConvertCase.camelize(assignment)
       colors: @getGridColors()
       comments: comments
@@ -2175,7 +2175,8 @@ define [
       isLastAssignment: isLastAssignment
       isFirstStudent: isFirstStudent
       isLastStudent: isLastStudent
-      isNotCountedForScore: assignment.omit_from_final_grade or isGroupWeightZero
+      isNotCountedForScore: assignment.omit_from_final_grade or
+                            (@options.group_weighting_scheme == 'percent' and isGroupWeightZero)
       isOpen: open
       key: "grade_details_tray"
       latePolicy: @courseContent.latePolicy
@@ -2681,8 +2682,7 @@ define [
       manager = new AssignmentMuterDialogManager(
         assignment,
         "#{@options.context_url}/assignments/#{assignmentId}/mute",
-        @contentLoadStates.submissionsLoaded,
-        @options.anonymous_moderated_marking_enabled
+        @contentLoadStates.submissionsLoaded
       )
 
       {

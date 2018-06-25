@@ -20,71 +20,46 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!new_user_tutorial'
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Modal, { ModalHeader, ModalBody, ModalFooter } from '@instructure/ui-overlays/lib/components/Modal'
+import Modal, {ModalBody, ModalFooter} from '../shared/components/InstuiModal'
 import axios from 'axios'
 
-  class ConfirmEndTutorialDialog extends React.Component {
+const API_URL = '/api/v1/users/self/features/flags/new_user_tutorial_on_off'
 
-    static propTypes = {
-      isOpen: PropTypes.bool,
-      handleRequestClose: PropTypes.func.isRequired
-    }
-
-    static defaultProps = {
-      isOpen: false
-    }
-
-    handleOkayButtonClick = (e, onSuccessFunc) => {
-      const API_URL = '/api/v1/users/self/features/flags/new_user_tutorial_on_off';
-      axios.put(API_URL, {
-        state: 'off'
-      }).then(() => {
-        // Done this way such that onSuccessFunc (reload) gets the proper thisArg
-        // while still allowing us to easily provide a replacement for tests.
-        if (onSuccessFunc) {
-          onSuccessFunc()
-        } else {
-          window.location.reload();
-        }
-      });
-    }
-
-    render () {
-      return (
-        <Modal
-          open={this.props.isOpen}
-          size="small"
-          onDismiss={this.props.handleRequestClose}
-          label={I18n.t('End Course Set-up Tutorial Dialog')}
-          closeButtonLabel={I18n.t('Close')}
-        >
-          <ModalHeader>
-            <Heading>{I18n.t('End Course Set-up Tutorial')}</Heading>
-          </ModalHeader>
-          <ModalBody>
-            {
-            I18n.t('Turning off this tutorial will remove the tutorial tray from your view ' +
-                   'for all of your courses. It can be turned back on under Feature Options in your User Settings.')
+export default function ConfirmEndTutorialDialog({isOpen, handleRequestClose}) {
+  return (
+    <Modal
+      open={isOpen}
+      size="small"
+      onDismiss={handleRequestClose}
+      label={I18n.t('End Course Set-up Tutorial')}
+    >
+      <ModalBody>
+        {I18n.t(
+          'Turning off this tutorial will remove the tutorial tray from your view for all of your courses. It can be turned back on under Feature Options in your User Settings.'
+        )}
+      </ModalBody>
+      <ModalFooter>
+        <Button onClick={handleRequestClose}>{I18n.t('Cancel')}</Button>
+        &nbsp;
+        <Button
+          onClick={() =>
+            axios.put(API_URL, {state: 'off'}).then(() => ConfirmEndTutorialDialog.onSuccess())
           }
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              onClick={this.props.handleRequestClose}
-            >
-              {I18n.t('Cancel')}
-            </Button>
-            &nbsp;
-            <Button
-              onClick={this.handleOkayButtonClick}
-              variant="primary"
-            >
-              {I18n.t('Okay')}
-            </Button>
-          </ModalFooter>
-        </Modal>
-      );
-    }
-  }
+          variant="primary"
+        >
+          {I18n.t('Okay')}
+        </Button>
+      </ModalFooter>
+    </Modal>
+  )
+}
+ConfirmEndTutorialDialog.onSuccess = () => window.location.reload()
 
-export default ConfirmEndTutorialDialog
+ConfirmEndTutorialDialog.propTypes = {
+  isOpen: PropTypes.bool,
+  handleRequestClose: PropTypes.func.isRequired
+}
+
+ConfirmEndTutorialDialog.defaultProps = {
+  isOpen: false
+}

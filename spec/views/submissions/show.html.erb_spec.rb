@@ -123,6 +123,54 @@ describe "/submissions/show" do
     end
   end
 
+  context 'comments sidebar' do
+    before :each do
+      course_with_teacher
+      assignment_model(course: @course)
+      @submission = @assignment.submit_homework(@user)
+      view_context(@course, @teacher)
+      assign(:assignment, @assignment)
+      assign(:submission, @submission)
+    end
+
+    it "renders if assignment is not muted" do
+      @assignment.muted = false
+      @assignment.anonymous_grading = true
+      render 'submissions/show'
+      html = Nokogiri::HTML.fragment(response.body)
+      styles = html.css('.submission-details-comments').attribute('style').value.split("\;").map(&:strip)
+      expect(styles).not_to include('display: none')
+    end
+
+    it "renders if assignment is muted but not anonymous or moderated" do
+      @assignment.muted = true
+      @assignment.anonymous_grading = false
+      @assignment.moderated_grading = false
+      render 'submissions/show'
+      html = Nokogiri::HTML.fragment(response.body)
+      styles = html.css('.submission-details-comments').attribute('style').value.split("\;").map(&:strip)
+      expect(styles).not_to include('display: none')
+    end
+
+    it "does not render if assignment is muted and anonymous" do
+      @assignment.muted = true
+      @assignment.anonymous_grading = true
+      render 'submissions/show'
+      html = Nokogiri::HTML.fragment(response.body)
+      styles = html.css('.submission-details-comments').attribute('style').value.split("\;").map(&:strip)
+      expect(styles).to include('display: none')
+    end
+
+    it "does not render if assignment is muted and moderated" do
+      @assignment.muted = true
+      @assignment.moderated_grading = true
+      render 'submissions/show'
+      html = Nokogiri::HTML.fragment(response.body)
+      styles = html.css('.submission-details-comments').attribute('style').value.split("\;").map(&:strip)
+      expect(styles).to include('display: none')
+    end
+  end
+
   context 'when assignment has a rubric' do
     before :once do
       assignment_model(course: @course)

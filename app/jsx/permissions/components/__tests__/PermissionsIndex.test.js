@@ -17,32 +17,31 @@
  */
 
 import React from 'react'
-import {Provider} from 'react-redux'
-import {mount, shallow} from 'enzyme'
+import {shallow} from 'enzyme'
 
-import {DEFAULT_PROPS, STORE} from '../../__tests__/examples'
+import {DEFAULT_PROPS} from '../../__tests__/examples'
 import PermissionsIndex from '../PermissionsIndex'
 
-it('renders the component', () => {
-  const tree = mount(
-    <Provider store={STORE}>
-      <PermissionsIndex {...DEFAULT_PROPS()} />
-    </Provider>
-  )
-  const node = tree.find('PermissionsIndex')
-  expect(node.exists()).toEqual(true)
-})
-
-it('sets selected rolls correctly when there are no rolls selected', () => {
+it('sets selected roles correctly when there are no rolls selected', () => {
   const tree = shallow(<PermissionsIndex {...DEFAULT_PROPS()} />)
   tree.instance().onAutocompleteBlur({target: {value: ''}})
   expect(tree.instance().state.selectedRoles[0].value).toEqual('0')
 })
 
-it('sets selected rolls correctly when we are changing role filter', () => {
+it('sets selected roles correctly when we are changing role filter', () => {
   const tree = shallow(<PermissionsIndex {...DEFAULT_PROPS()} />)
   tree
     .instance()
     .onRoleFilterChange(null, [{value: '1', label: 'stuff'}, {value: '0', label: 'All Roles'}])
   expect(tree.instance().state.selectedRoles[0].value).toEqual('1')
+})
+
+it('sets selected roles correctly when we are changing tabs', () => {
+  const tree = shallow(<PermissionsIndex {...DEFAULT_PROPS()} />)
+  tree.instance().onTabChanged(0, 1)
+  expect(tree.instance().state.selectedRoles[0].value).toEqual('0')
+  // Select something and change tabs to make sure we clear the selection out
+  tree.instance().onRoleFilterChange(null, [{value: '1', label: 'stuff'}])
+  tree.instance().onTabChanged(1, 0)
+  expect(tree.instance().state.selectedRoles[0].value).toEqual('0')
 })

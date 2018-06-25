@@ -17,10 +17,11 @@
  */
 
 import React, {Component} from 'react'
-import {arrayOf, shape, string} from 'prop-types'
+import {arrayOf, bool, func, shape, string} from 'prop-types'
 import View from '@instructure/ui-layout/lib/components/View'
 import I18n from 'i18n!assignment_grade_summary'
 
+import FocusableView from '../FocusableView'
 import Grid from './Grid'
 import PageNavigation from './PageNavigation'
 
@@ -48,6 +49,10 @@ function studentsToPages(students) {
 
 export default class GradesGrid extends Component {
   static propTypes = {
+    disabledCustomGrade: bool.isRequired,
+    finalGrader: shape({
+      graderId: string.isRequired
+    }),
     graders: arrayOf(
       shape({
         graderName: string,
@@ -55,12 +60,19 @@ export default class GradesGrid extends Component {
       })
     ).isRequired,
     grades: shape({}).isRequired,
+    onGradeSelect: func,
+    selectProvisionalGradeStatuses: shape({}).isRequired,
     students: arrayOf(
       shape({
         displayName: string,
         id: string.isRequired
       }).isRequired
     ).isRequired
+  }
+
+  static defaultProps = {
+    finalGrader: null,
+    onGradeSelect: null
   }
 
   constructor(props) {
@@ -90,8 +102,21 @@ export default class GradesGrid extends Component {
     const rows = this.state.pages[this.state.currentPageIndex]
 
     return (
-      <div className="GradesGridContainer">
-        <Grid graders={this.props.graders} grades={this.props.grades} rows={rows} />
+      <div>
+        <FocusableView>
+          {props => (
+            <Grid
+              disabledCustomGrade={this.props.disabledCustomGrade}
+              finalGrader={this.props.finalGrader}
+              graders={this.props.graders}
+              grades={this.props.grades}
+              horizontalScrollRef={props.horizontalScrollRef}
+              onGradeSelect={this.props.onGradeSelect}
+              rows={rows}
+              selectProvisionalGradeStatuses={this.props.selectProvisionalGradeStatuses}
+            />
+          )}
+        </FocusableView>
 
         {this.state.pages.length > 1 && (
           <View as="div" margin="medium">

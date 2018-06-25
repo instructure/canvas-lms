@@ -128,7 +128,12 @@ describe "dashboard" do
       before do
         @teacher = @user
         @student = student_in_course(:course => @course, :active_all => true).user
-        @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'], :moderated_grading => true)
+        @assignment = @course.assignments.create!(
+          title: "some assignment",
+          submission_types: ['online_text_entry'],
+          moderated_grading: true,
+          grader_count: 2
+        )
         @assignment.submit_homework(@student, :body => "submission")
       end
 

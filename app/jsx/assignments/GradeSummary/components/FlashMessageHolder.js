@@ -17,12 +17,13 @@
  */
 
 import {Component} from 'react'
-import {oneOf} from 'prop-types'
+import {arrayOf, bool, oneOf, shape, string} from 'prop-types'
 import {connect} from 'react-redux'
 import I18n from 'i18n!assignment_grade_summary'
 
 import {showFlashAlert} from '../../../shared/FlashAlert'
 import * as AssignmentActions from '../assignment/AssignmentActions'
+import * as GradeActions from '../grades/GradeActions'
 import * as StudentActions from '../students/StudentActions'
 
 function enumeratedStatuses(actions) {
@@ -82,7 +83,17 @@ class FlashMessageHolder extends Component {
   static propTypes = {
     loadStudentsStatus: oneOf(enumeratedStatuses(StudentActions)),
     publishGradesStatus: oneOf(assignmentStatuses),
-    unmuteAssignmentStatus: oneOf(enumeratedStatuses(AssignmentActions))
+    selectProvisionalGradeStatuses: shape({}).isRequired,
+    unmuteAssignmentStatus: oneOf(enumeratedStatuses(AssignmentActions)),
+    updateGradeStatuses: arrayOf(
+      shape({
+        gradeInfo: shape({
+          studentId: string.isRequired,
+          selected: bool
+        }).isRequired,
+        status: oneOf(enumeratedStatuses(StudentActions))
+      })
+    ).isRequired
   }
 
   static defaultProps = {
@@ -106,6 +117,47 @@ class FlashMessageHolder extends Component {
       }
     }
 
+    if (changes.selectProvisionalGradeStatuses) {
+      Object.keys(nextProps.selectProvisionalGradeStatuses).forEach(studentId => {
+        if (
+          nextProps.selectProvisionalGradeStatuses[studentId] !==
+          this.props.selectProvisionalGradeStatuses[studentId]
+        ) {
+          const status = nextProps.selectProvisionalGradeStatuses[studentId]
+          if (status === GradeActions.SUCCESS) {
+            showFlashAlert({
+              message: I18n.t('Grade saved.'),
+              type: 'success'
+            })
+          } else if (status === GradeActions.FAILURE) {
+            showFlashAlert({
+              message: I18n.t('There was a problem saving the grade.'),
+              type: 'error'
+            })
+          }
+        }
+      })
+    }
+
+    if (changes.updateGradeStatuses) {
+      const newStatuses = nextProps.updateGradeStatuses.filter(
+        statusInfo => this.props.updateGradeStatuses.indexOf(statusInfo) === -1
+      )
+      newStatuses.forEach(statusInfo => {
+        if (statusInfo.status === GradeActions.SUCCESS && statusInfo.gradeInfo.selected) {
+          showFlashAlert({
+            message: I18n.t('Grade saved.'),
+            type: 'success'
+          })
+        } else if (statusInfo.status === GradeActions.FAILURE) {
+          showFlashAlert({
+            message: I18n.t('There was a problem updating the grade.'),
+            type: 'error'
+          })
+        }
+      })
+    }
+
     if (changes.publishGradesStatus) {
       announcePublishGradesStatus(nextProps.publishGradesStatus)
     }
@@ -124,7 +176,9 @@ function mapStateToProps(state) {
   return {
     loadStudentsStatus: state.students.loadStudentsStatus,
     publishGradesStatus: state.assignment.publishGradesStatus,
-    unmuteAssignmentStatus: state.assignment.unmuteAssignmentStatus
+    selectProvisionalGradeStatuses: state.grades.selectProvisionalGradeStatuses,
+    unmuteAssignmentStatus: state.assignment.unmuteAssignmentStatus,
+    updateGradeStatuses: state.grades.updateGradeStatuses
   }
 }
 

@@ -102,6 +102,7 @@ describe ContentMigration do
 
       cm.queue_migration
       run_jobs
+      expect(cm.reload).to be_imported
       expect(context.reload.attachments.count).to eq filecount
     end
 
@@ -607,10 +608,6 @@ describe ContentMigration do
 
   context 'Quizzes.Next CC import' do
     before do
-      allow(@cm.root_account).
-        to receive(:feature_enabled?).
-        with(:import_to_quizzes_next).
-        and_return(true)
       allow(@cm.migration_settings).
         to receive(:[]).
         with(:import_quizzes_next).

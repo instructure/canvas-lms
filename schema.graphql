@@ -29,16 +29,18 @@ type Assignment implements Node & Timestamped {
   dueAt: DateTime
   gradingType: GradingType
   htmlUrl: URL
+
+  # ID of the object.
   id: ID!
   lockAt: DateTime
   lockInfo: LockInfo
-  muted: Boolean
+  muted: Boolean!
   name: String
   needsGradingCount: Int
 
   # specifies that this assignment is only assigned to students for whom an
   #        `AssignmentOverride` applies.
-  onlyVisibleToOverrides: Boolean
+  onlyVisibleToOverrides: Boolean!
 
   # the assignment is out of this many points
   pointsPossible: Float
@@ -364,6 +366,8 @@ type Discussion implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
   createdAt: DateTime
+
+  # ID of the object.
   id: ID!
   updatedAt: DateTime
 }
@@ -697,9 +701,11 @@ type Submission implements Node & Timestamped {
   grade: String
   gradedAt: DateTime
   gradingStatus: String
+
+  # ID of the object.
   id: ID!
   score: Float
-  state: SubmissionState
+  state: SubmissionState!
   submissionStatus: String
   submittedAt: DateTime
   updatedAt: DateTime

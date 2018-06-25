@@ -20,13 +20,11 @@ import React from 'react';
 import { arrayOf, bool, func, shape, string } from 'prop-types'
 import IconMiniArrowDownSolid from '@instructure/ui-icons/lib/Solid/IconMiniArrowDown'
 import Button from '@instructure/ui-buttons/lib/components/Button';
-import {
+import Menu, {
   MenuItem,
   MenuItemGroup,
-  MenuItemFlyout,
   MenuItemSeparator
-} from '@instructure/ui-core/lib/components/Menu';
-import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu';
+} from '@instructure/ui-menu/lib/components/Menu';
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 import Text from '@instructure/ui-elements/lib/components/Text';
 import I18n from 'i18n!gradebook';
@@ -98,11 +96,11 @@ class ViewOptionsMenu extends React.Component {
 
   render () {
     return (
-      <PopoverMenu
+      <Menu
         trigger={renderTriggerButton(this.bindButton)}
         contentRef={this.bindMenuContent}
       >
-        <MenuItemFlyout
+        <Menu
           contentRef={this.bindArrangeByMenuContent}
           label={I18n.t('Arrange By')}
         >
@@ -185,13 +183,13 @@ class ViewOptionsMenu extends React.Component {
               </MenuItem>
             }
           </MenuItemGroup>
-        </MenuItemFlyout>
+        </Menu>
 
         <MenuItemSeparator />
 
         {
           this.props.filterSettings.available.length > 0 &&
-          <MenuItemFlyout
+          <Menu
             contentRef={this.bindFiltersMenuContent}
             label={I18n.t('Filters')}
           >
@@ -209,7 +207,7 @@ class ViewOptionsMenu extends React.Component {
                 ))
               }
             </MenuItemGroup>
-          </MenuItemFlyout>
+          </Menu>
         }
 
         { this.props.filterSettings.available.length > 0 && <MenuItemSeparator /> }
@@ -236,7 +234,7 @@ class ViewOptionsMenu extends React.Component {
             {I18n.t('Unpublished Assignments')}
           </MenuItem>
         </MenuItemGroup>
-      </PopoverMenu>
+      </Menu>
     );
   }
 }

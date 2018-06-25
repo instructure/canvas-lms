@@ -25,31 +25,21 @@ Feature.register(
       DESCRIPTION
     },
     applies_to: 'Account',
-    state: 'allowed',
+    state: 'hidden',
     root_opt_in: true,
     beta: true,
-    development: false
+    development: true
   },
   anonymous_marking:  {
-    display_name: -> { I18n.t 'Anonymous Marking' },
+    display_name: -> { I18n.t 'Anonymous Grading' },
     description: -> {
       I18n.t <<~DESCRIPTION
-        Enable anonymous marking of assignments. Only relevant if the Anonymous Moderated Marking flag is enabled.
+        Enable anonymous grading of assignments.
       DESCRIPTION
     },
     applies_to: 'Course',
     state: 'allowed',
     root_opt_in: true,
-    beta: true,
-    development: false,
-    visible_on: ->(context) do
-      if context.is_a?(Account)
-        context.feature_enabled?(:anonymous_moderated_marking)
-      elsif context.is_a?(Course)
-        context.root_account.feature_enabled?(:anonymous_moderated_marking)
-      else
-        false
-      end
-    end
+    beta: true
   }
 )

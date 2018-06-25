@@ -31,6 +31,7 @@ import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReade
 import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import Select from '@instructure/ui-forms/lib/components/Select'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
 
 import actions from '../actions'
 import propTypes, {COURSE, ACCOUNT} from '../propTypes'
@@ -42,6 +43,7 @@ import {ConnectedAddTray} from './AddTray'
 
 const SEARCH_DELAY = 350
 const COURSE_TAB_INDEX = 0
+const ALL_ROLES_LABEL = I18n.t('All Roles')
 
 export default class PermissionsIndex extends Component {
   static propTypes = {
@@ -54,7 +56,7 @@ export default class PermissionsIndex extends Component {
 
   state = {
     permissionSearchString: '',
-    selectedRoles: [{value: '0', label: 'All Roles'}],
+    selectedRoles: [{value: '0', label: ALL_ROLES_LABEL}],
     contextType: COURSE
   }
 
@@ -71,7 +73,11 @@ export default class PermissionsIndex extends Component {
     if (newIndex === oldIndex) return
     const newContextType = newIndex === COURSE_TAB_INDEX ? COURSE : ACCOUNT
     this.setState(
-      {permissionSearchString: '', selectedRoles: [], contextType: newContextType},
+      {
+        permissionSearchString: '',
+        selectedRoles: [{value: '0', label: ALL_ROLES_LABEL}],
+        contextType: newContextType
+      },
       () => {
         this.props.tabChanged(newContextType)
       }
@@ -81,7 +87,7 @@ export default class PermissionsIndex extends Component {
   onAutocompleteBlur = e => {
     if (e.target.value === '' && this.state.selectedRoles.length === 0) {
       this.setState({
-        selectedRoles: [{value: '0', label: 'All Roles'}]
+        selectedRoles: [{value: '0', label: ALL_ROLES_LABEL}]
       })
     }
   }
@@ -144,6 +150,7 @@ export default class PermissionsIndex extends Component {
               </GridCol>
               <GridCol width={2}>
                 <Button
+                  id="add_role"
                   variant="primary"
                   margin="0 x-small 0 0"
                   onClick={this.props.setAndOpenAddTray}
@@ -161,6 +168,9 @@ export default class PermissionsIndex extends Component {
   render() {
     return (
       <div className="permissions-v2__wrapper">
+        <ScreenReaderContent>
+          <Heading level="h1">{I18n.t('Permissions')}</Heading>
+        </ScreenReaderContent>
         <ConnectedRoleTray />
         <ConnectedAddTray />
         <ConnectedPermissionTray />

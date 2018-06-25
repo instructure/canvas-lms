@@ -20,13 +20,15 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe ScopesApiController, type: :request do
 
+  before { enable_default_developer_key! }
+
   # We want to force the usage of the fallback scope mapper here, not the generated version
   Object.const_set("ApiScopeMapper", ApiScopeMapperLoader.api_scope_mapper_fallback)
 
   describe "index" do
     before do
       allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
-      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:api_token_scoping).and_return(true)
+      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(true)
     end
 
     let(:account) { account_model }

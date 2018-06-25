@@ -141,7 +141,7 @@ module CanvasSanitize #:nodoc:
           'blockquote' => ['cite'].freeze,
           'col' => ['span', 'width'].freeze,
           'colgroup' => ['span', 'width'].freeze,
-          'img' => ['align', 'alt', 'height', 'src', 'width'].freeze,
+          'img' => ['align', 'alt', 'height', 'src', 'width', 'longdesc'].freeze,
           'iframe' => ['src', 'width', 'height', 'name', 'align', 'frameborder', 'scrolling',
                        'allow', # TODO: remove explicit allow with domain whitelist account setting
                        'sandbox', 'allowfullscreen','webkitallowfullscreen','mozallowfullscreen'].freeze,

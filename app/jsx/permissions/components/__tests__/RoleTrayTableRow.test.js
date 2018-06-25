@@ -17,10 +17,9 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
-import {Provider} from 'react-redux'
+import {shallow} from 'enzyme'
 
-import {ROLES, STORE} from '../../__tests__/examples'
+import {ROLES} from '../../__tests__/examples'
 import RoleTrayTableRow from '../RoleTrayTableRow'
 
 function createRowProps(title, roleId) {
@@ -30,36 +29,22 @@ function createRowProps(title, roleId) {
   return {title, role, permission, permissionName}
 }
 
-it('renders the component', () => {
-  const tree = mount(
-    <Provider store={STORE}>
-      <RoleTrayTableRow {...createRowProps('banana', '1')} />
-    </Provider>
-  )
-  const node = tree.find('RoleTrayTableRow')
-  expect(node.exists()).toBeTruthy()
-})
-
 it('renders the title', () => {
-  const tree = mount(
-    <Provider store={STORE}>
-      <RoleTrayTableRow {...createRowProps('banana', '1')} />
-    </Provider>
-  )
+  const tree = shallow(<RoleTrayTableRow {...createRowProps('banana', '1')} />)
   const node = tree.find('Text')
   expect(node.exists()).toBeTruthy()
-  expect(node.at(0).text()).toEqual('banana')
+  expect(
+    node
+      .at(0)
+      .dive()
+      .text()
+  ).toEqual('banana')
 })
 
 it('renders the expandable button if expandable prop is true', () => {
   const props = createRowProps('banana', '1')
   props.expandable = true
-  const tree = mount(
-    <Provider store={STORE}>
-      <RoleTrayTableRow {...props} />
-    </Provider>
-  )
-
+  const tree = shallow(<RoleTrayTableRow {...props} />)
   const node = tree.find('IconArrowOpenStart')
   expect(node.exists()).toBeTruthy()
 })
@@ -67,12 +52,7 @@ it('renders the expandable button if expandable prop is true', () => {
 it('does not render the expandable button if expandable prop is false', () => {
   const props = createRowProps('banana', '1')
   props.expandable = false
-  const tree = mount(
-    <Provider store={STORE}>
-      <RoleTrayTableRow {...props} />
-    </Provider>
-  )
-
+  const tree = shallow(<RoleTrayTableRow {...props} />)
   const node = tree.find('IconArrowOpenStart')
   expect(node.exists()).toBeFalsy()
 })
@@ -80,27 +60,22 @@ it('does not render the expandable button if expandable prop is false', () => {
 it('renders the description if provided', () => {
   const props = createRowProps('banana', '1')
   props.description = "it's a fruit"
-  const tree = mount(
-    <Provider store={STORE}>
-      <RoleTrayTableRow {...props} />
-    </Provider>
-  )
-
+  const tree = shallow(<RoleTrayTableRow {...props} />)
   const node = tree.find('Text')
-  expect(node).toHaveLength(4)
+  expect(node).toHaveLength(2)
   expect(node.at(1).exists()).toBeTruthy()
-  expect(node.at(1).text()).toEqual("it's a fruit")
+  expect(
+    node
+      .at(1)
+      .dive()
+      .text()
+  ).toEqual("it's a fruit")
 })
 
 it('does not render the description if not provided', () => {
   const props = createRowProps('banana', '1')
   props.description = ''
-  const tree = mount(
-    <Provider store={STORE}>
-      <RoleTrayTableRow {...props} />
-    </Provider>
-  )
-
+  const tree = shallow(<RoleTrayTableRow {...props} />)
   const node = tree.find('Text')
-  expect(node).toHaveLength(3)
+  expect(node).toHaveLength(1)
 })

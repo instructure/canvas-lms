@@ -20,8 +20,7 @@ import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 import {instanceOf} from 'prop-types'
 import I18n from 'i18n!outcomes'
-import Modal, { ModalHeader, ModalBody } from '@instructure/ui-overlays/lib/components/Modal'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
+import Modal, { ModalBody } from '../shared/components/InstuiModal'
 import FileDrop from '@instructure/ui-forms/lib/components/FileDrop'
 import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
 import Text from '@instructure/ui-elements/lib/components/Text'
@@ -92,11 +91,7 @@ export default class ImportOutcomesModal extends Component {
         onDismiss={this.onCancel}
         size="fullscreen"
         label={I18n.t('Import Outcomes')}
-        closeButtonLabel={I18n.t('Close')}
       >
-        <ModalHeader>
-          <Heading>{I18n.t('Import Outcomes')}</Heading>
-        </ModalHeader>
         <ModalBody>
           <FileDrop
             accept=".csv, .json"

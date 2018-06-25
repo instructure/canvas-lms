@@ -114,7 +114,7 @@ export default class DeveloperKeyScopesList extends React.Component {
 
   render() {
     return (
-      <div className="scopes-list">
+      <div data-automation="scopes-list">
         <View borderRadius="small" display="block" borderWidth="small">
           <Flex height="564px" width="100%" as="div" direction="column">
             <FlexItem padding="none" textAlign="start">

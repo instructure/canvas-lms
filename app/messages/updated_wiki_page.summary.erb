@@ -3,7 +3,7 @@
 <% end %>
 
 <% define_content :subject do %>
-  <%= t :subject, "Updated Wiki Page: %{title}, %{user}", :title => asset.title.titleize, :user => asset.context.name %>
+  <%= t :subject, "Updated Page: %{title}, %{user}", :title => asset.title.titleize, :user => asset.context.name %>
 <% end %>
 
 <%= CanvasTextHelper.truncate_text(html_to_text(asset.body), :max_length => 200) %>

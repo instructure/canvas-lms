@@ -1,191 +1,272 @@
 {
+  "add_to_do_7def3c37": {
+    "message": "Добавить в задачи"
+  },
+  "all_day_fb42c4fc": {
+    "message": "Весь день"
+  },
+  "all_items_loaded_aa256183": {
+    "message": "Все элементы загружены"
+  },
+  "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
+    "message": "Вы уверены, что хотите удалить этот элемент планировщика?"
+  },
+  "assignmenttype_title_6612d008": {
+    "message": "{ assignmentType } { title }."
+  },
+  "assignmenttype_title_at_datetime_478f0709": {
+    "message": "{ assignmentType } { title }, в { datetime }."
+  },
+  "assignmenttype_title_due_datetime_a112d8ff": {
+    "message": "{ assignmentType } { title }, со сроком сдачи { datetime }."
+  },
+  "assignmenttype_title_is_marked_as_done_a8dc46ef": {
+    "message": "{ assignmentType } { title } отмечен как выполненный."
+  },
+  "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
+    "message": "{ assignmentType } { title } не отмечен как выполненный."
+  },
+  "assignmenttype_title_on_datetime_446013fb": {
+    "message": "{ assignmentType } { title }, в { datetime }."
+  },
+  "beginning_of_your_to_do_history_61ef2dce": {
+    "message": "Начало вашей истории задач"
+  },
+  "canvas_planner_98ed106": {
+    "message": "Планировщик Canvas"
+  },
+  "close_d634289d": {
+    "message": "Закрыть"
+  },
+  "close_opportunities_popover_f4e50551": {
+    "message": "Закрыть всплывающее меню дополнительных возможностей"
+  },
+  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
+    "message": "{ count, plural,\n     =0 {# возможности}\n    one {# возможность}\n  other {# возможности}\n}"
+  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Показать # завершенный элемент}\n  other {Показать # завершенные элементы}\n}"
   },
   "course_8a63b4a3": {
     "message": "Курс"
   },
-  "pts_699bd9aa": {
-    "message": "баллы"
-  },
-  "failed_to_save_to_do_ddc7503b": {
-    "message": "Не удалось выполнить сохранение"
-  },
   "course_to_do_bcbbab54": {
     "message": "{ course } ЗАДАЧИ"
-  },
-  "canvas_planner_98ed106": {
-    "message": "Планировщик Canvas"
-  },
-  "looks_like_there_isn_t_anything_here_d9bcef49": {
-    "message": "Похоже, здесь ничего нет"
-  },
-  "points_points_63e59cce": {
-    "message": "{ points } баллов"
-  },
-  "loading_planner_items_947a813d": {
-    "message": "Загрузка событий планировщика"
-  },
-  "add_to_do_7def3c37": {
-    "message": "Добавить в задачи"
-  },
-  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
-    "message": "{ count, plural,\n     =0 {# возможности}\n    one {# возможность}\n  other {# возможности}\n}"
-  },
-  "due_5d7267be": {
-    "message": "Срок выполнения:"
-  },
-  "feedback_6dcc1991": {
-    "message": "Отзывы"
-  },
-  "loading_25990131": {
-    "message": "Выполняется загрузка..."
-  },
-  "next_month_749b1778": {
-    "message": "Следующий месяц"
-  },
-  "beginning_of_your_to_do_history_61ef2dce": {
-    "message": "Начало вашей истории задач"
-  },
-  "yesterday_at_date_1aa6d18e": {
-    "message": "Вчера в { date }"
-  },
-  "load_prior_dates_f2b0f6f0": {
-    "message": "Загрузить предыдущие даты"
-  },
-  "all_items_loaded_aa256183": {
-    "message": "Все элементы загружены"
-  },
-  "submitted_318fad53": {
-    "message": "Отправлено"
-  },
-  "task_16b0ef38": {
-    "message": "Задача"
-  },
-  "excused_cf8792eb": {
-    "message": "По уважительной причине"
-  },
-  "replies_4a8577c8": {
-    "message": "Ответы"
-  },
-  "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
-    "message": "Вы уверены, что хотите удалить этот элемент планировщика?"
-  },
-  "dismiss_opportunityname_5995176f": {
-    "message": "Исключить { opportunityName }"
-  },
-  "failed_to_get_new_activity_17e7ec7c": {
-    "message": "Не удалось получить новую активность"
-  },
-  "title_is_required_6ddcab69": {
-    "message": "необходим заголовок"
   },
   "date_at_time_dbdb1b99": {
     "message": "{ date } в { time }"
   },
-  "loading_past_items_ca499e75": {
-    "message": "Загрузка прошлых элементов"
-  },
-  "tomorrow_at_date_b53f2cf1": {
-    "message": "Завтра в { date }"
-  },
-  "today_76e10f9c": {
-    "message": "Сегодня"
-  },
-  "edit_title_72e5a21e": {
-    "message": "Редактировать { title }"
-  },
-  "error_loading_past_items_2881dbb1": {
-    "message": "Ошибка загрузки прошлых элементов"
-  },
-  "no_due_dates_assigned_e8f5bac8": {
-    "message": "Даты выполнения не заданы"
-  },
-  "save_11a80ec3": {
-    "message": "Сохранить"
-  },
-  "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
-    "message": "Вы перешли к самой первой своей задаче!"
-  },
-  "delete_a6efa79d": {
-    "message": "Удалить"
-  },
-  "go_to_dashboard_card_view_10398ef6": {
-    "message": "Перейти к виду карты приборной панели"
-  },
-  "unable_to_mark_as_complete_8141856d": {
-    "message": "Невозможно отметить как завершенный."
-  },
-  "points_bceb5005": {
-    "message": "баллы"
-  },
-  "nothing_new_needs_attention_3ac548d4": {
-    "message": "Нет новых пунктов, требующих внимания."
-  },
-  "title_ee03d132": {
-    "message": "Заголовок"
-  },
   "date_ee500367": {
     "message": "Дата"
   },
-  "due_date_8ce289b6": {
-    "message": "СРОК: { date }"
-  },
-  "late_2be42b88": {
-    "message": "Поздно"
-  },
-  "yesterday_c6bd6abf": {
-    "message": "Вчера"
-  },
-  "graded_25cd3fcd": {
-    "message": "С оценкой"
-  },
-  "to_do_1d554f36": {
-    "message": "Задачи"
-  },
-  "missing_1a256b3b": {
-    "message": "Отсутствует"
+  "date_is_not_a_valid_date_4ef9f8ba": {
+    "message": "#{ date } не является действительной датой."
   },
   "date_is_required_8660ec22": {
     "message": "Необходимо указать дату"
   },
-  "error_loading_more_items_3f109d9f": {
-    "message": "Ошибка загрузки дополнительных элементов"
-  },
-  "optional_add_course_ef0d70fc": {
-    "message": "Опционально: Добавить курс"
-  },
-  "failed_to_load_opportunities_52ab6404": {
-    "message": "Не удалось загрузить варианты"
-  },
-  "previous_month_bb1e3c84": {
-    "message": "Предыдущий месяц"
-  },
-  "new_activity_8b84847d": {
-    "message": "Новая активность"
-  },
-  "failed_to_delete_to_do_64edff49": {
-    "message": "Не удалось выполнить удаление"
-  },
-  "close_opportunities_popover_f4e50551": {
-    "message": "Закрыть всплывающее меню дополнительных возможностей"
-  },
-  "tomorrow_9a6c9a00": {
-    "message": "Завтра"
-  },
-  "load_more_a36f9cf9": {
-    "message": "Загрузить еще"
-  },
-  "today_at_date_8ac30d6": {
-    "message": "Сегодня в { date }"
-  },
-  "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-    "message": "Загруженные { count, plural,\n     =0 {# элементы}\n    one {# элемент}\n  other {# элементы}\n}"
+  "delete_a6efa79d": {
+    "message": "Удалить"
   },
   "details_98a31b68": {
     "message": "Подробные сведения"
   },
-  "close_d634289d": {
-    "message": "Закрыть"
+  "dismiss_opportunityname_5995176f": {
+    "message": "Исключить { opportunityName }"
+  },
+  "due_5d7267be": {
+    "message": "Срок выполнения:"
+  },
+  "due_date_8ce289b6": {
+    "message": "СРОК ВЫПОЛНЕНИЯ: { date }"
+  },
+  "edit_title_72e5a21e": {
+    "message": "Редактировать { title }"
+  },
+  "error_loading_grades_e0b38f4d": {
+    "message": "Ошибка загрузки оценок"
+  },
+  "error_loading_more_items_3f109d9f": {
+    "message": "Ошибка загрузки дополнительных элементов"
+  },
+  "error_loading_past_items_2881dbb1": {
+    "message": "Ошибка загрузки прошлых элементов"
+  },
+  "excused_cf8792eb": {
+    "message": "По уважительной причине"
+  },
+  "failed_to_delete_to_do_64edff49": {
+    "message": "Не удалось выполнить удаление"
+  },
+  "failed_to_get_new_activity_17e7ec7c": {
+    "message": "Не удалось получить новую активность"
+  },
+  "failed_to_load_opportunities_52ab6404": {
+    "message": "Не удалось загрузить варианты"
+  },
+  "failed_to_save_to_do_ddc7503b": {
+    "message": "Не удалось выполнить сохранение"
+  },
+  "feedback_6dcc1991": {
+    "message": "Отзывы"
+  },
+  "go_to_dashboard_card_view_10398ef6": {
+    "message": "Перейти к виду карты приборной панели"
+  },
+  "graded_25cd3fcd": {
+    "message": "С оценкой"
+  },
+  "grades_are_loading_c899652d": {
+    "message": "Выполняется загрузка оценок"
+  },
+  "grades_loaded_5056277c": {
+    "message": "Оценки загружены"
+  },
+  "items_completed_items_plural_1_item_other_items_717d579f": {
+    "message": "{ items } завершенный(-е) { items, plural,\n     =1 {элемент}\n  other {элементы}\n}"
+  },
+  "late_2be42b88": {
+    "message": "Поздно"
+  },
+  "load_more_a36f9cf9": {
+    "message": "Загрузить еще"
+  },
+  "load_prior_dates_f2b0f6f0": {
+    "message": "Загрузить предыдущие даты"
+  },
+  "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
+    "message": "Загруженные { count, plural,\n     =0 {# элементы}\n    one {# элемент}\n  other {# элементы}\n}"
+  },
+  "loading_25990131": {
+    "message": "Выполняется загрузка..."
+  },
+  "loading_725811ca": {
+    "message": "загрузка"
+  },
+  "loading_grades_c842c887": {
+    "message": "Загрузка оценок"
+  },
+  "loading_past_items_ca499e75": {
+    "message": "Загрузка прошлых элементов"
+  },
+  "loading_planner_items_947a813d": {
+    "message": "Загрузка событий планировщика"
+  },
+  "looks_like_there_isn_t_anything_here_d9bcef49": {
+    "message": "Похоже, здесь ничего нет"
+  },
+  "missing_1a256b3b": {
+    "message": "Отсутствует"
+  },
+  "missing_items_for_title_516511f8": {
+    "message": "Отсутствуют элементы для { title }"
+  },
+  "my_grades_98834476": {
+    "message": "Мои оценки"
+  },
+  "new_activity_8b84847d": {
+    "message": "Новая активность"
+  },
+  "new_activity_for_title_14c9c3af": {
+    "message": "Новая активность для { title }"
+  },
+  "next_month_749b1778": {
+    "message": "Следующий месяц"
+  },
+  "no_due_dates_assigned_e8f5bac8": {
+    "message": "Даты выполнения не заданы"
+  },
+  "no_grade_3b4d7f3e": {
+    "message": "Нет оценки"
+  },
+  "nothing_new_needs_attention_3ac548d4": {
+    "message": "Нет новых пунктов, требующих внимания."
+  },
+  "nothing_planned_today_next_item_loaded_5a199868": {
+    "message": "На сегодня ничего не запланировано. Загружен следующий элемент."
+  },
+  "nothing_planned_yet_8675ffe9": {
+    "message": "Пока ничего не запланировано"
+  },
+  "only_most_recent_grading_period_shown_f1ad6458": {
+    "message": "*Показан только самый последний академический период."
+  },
+  "optional_add_course_ef0d70fc": {
+    "message": "Опционально: Добавить курс"
+  },
+  "points_bceb5005": {
+    "message": "баллы"
+  },
+  "points_points_63e59cce": {
+    "message": "{ points } баллов"
+  },
+  "previous_month_bb1e3c84": {
+    "message": "Предыдущий месяц"
+  },
+  "pts_699bd9aa": {
+    "message": "баллы"
+  },
+  "replies_4a8577c8": {
+    "message": "Ответы"
+  },
+  "save_11a80ec3": {
+    "message": "Сохранить"
+  },
+  "show_my_grades_ebd08684": {
+    "message": "Показать мои оценки"
+  },
+  "startdate_to_enddate_d245175b": {
+    "message": "с { startDate } до { endDate }"
+  },
+  "submitted_318fad53": {
+    "message": "Отправлено"
+  },
+  "success_to_do_created_e34ed395": {
+    "message": "Успешно: Задание создано"
+  },
+  "task_16b0ef38": {
+    "message": "Задача"
+  },
+  "the_date_and_time_this_to_do_is_due_74c823d4": {
+    "message": "Дата и время выполнения этого установлены на"
+  },
+  "time_2b5aac58": {
+    "message": "Время"
+  },
+  "title_ee03d132": {
+    "message": "Заголовок"
+  },
+  "title_is_required_6ddcab69": {
+    "message": "необходим заголовок"
+  },
+  "to_do_1d554f36": {
+    "message": "Задачи"
+  },
+  "today_76e10f9c": {
+    "message": "Сегодня"
+  },
+  "today_at_date_8ac30d6": {
+    "message": "Сегодня в { date }"
+  },
+  "tomorrow_9a6c9a00": {
+    "message": "Завтра"
+  },
+  "tomorrow_at_date_b53f2cf1": {
+    "message": "Завтра в { date }"
+  },
+  "unable_to_mark_as_complete_8141856d": {
+    "message": "Невозможно отметить как завершенный."
+  },
+  "yesterday_at_date_1aa6d18e": {
+    "message": "Вчера в { date }"
+  },
+  "yesterday_c6bd6abf": {
+    "message": "Вчера"
+  },
+  "you_must_provide_a_date_and_time_a86839d2": {
+    "message": "Необходимо указать дату и время."
+  },
+  "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
+    "message": "Вы перешли к самой первой своей задаче!"
   }
 }

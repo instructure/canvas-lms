@@ -16,20 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
+import $ from 'jquery'
 import { shallow } from 'enzyme'
 import sinon from 'sinon'
 import Ratings, { Rating } from '../Ratings'
 
+// This is needed for $.screenReaderFlashMessageExclusive to work.
+import 'compiled/jquery.rails_flash_notifications' // eslint-disable-line
+
 describe('The Ratings component', () => {
   const props = {
     assessing: false,
+    footer: null,
     tiers: [
       { description: 'Superb', points: 10 },
       { description: 'Meh', long_description: 'More Verbosity', points: 5 },
       { description: 'Subpar', points: 1 }
     ],
-    points: 5,
     defaultMasteryThreshold: 10,
+    points: 5,
+    pointsPossible: 10,
+    isSummary: false,
     useRange: false
   }
 
@@ -59,12 +66,15 @@ describe('The Ratings component', () => {
     expect(ratings(undefined)).toEqual([false, false, false])
   })
 
-  it('calls onPointChange when a rating is clicked', () => {
+  it('calls onPointChange and flashes VO message when a rating is clicked', () => {
     const onPointChange = sinon.spy()
+    const flashMock = jest.spyOn($, 'screenReaderFlashMessage')
     const el = component({ onPointChange })
 
     el.find('Rating').first().prop('onClick').call()
     expect(onPointChange.args[0]).toEqual([10])
+    expect(flashMock).toHaveBeenCalledTimes(1)
+    flashMock.mockRestore()
   })
 
   it('uses the right default mastery level colors', () => {
@@ -89,23 +99,78 @@ describe('The Ratings component', () => {
     expect(ratings(0, true)).toEqual(['transparent', 'transparent', '#F8971C'])
   })
 
-  describe('Rating component', () => {
-    it('is navigable and clickable when assessing', () => {
-      const onClick = sinon.spy()
-      const wrapper = shallow(<Rating {...props.tiers[0]} assessing onClick={onClick} />)
-      const div = wrapper.find('div').at(0)
-      expect(div.prop('tabIndex')).toEqual(0)
-      div.simulate('click')
-      expect(onClick.called).toBe(true)
+  describe('custom ratings', () => {
+    const customRatings = [
+      {points: 100, color: "100100"},
+      {points: 60, color: "606060"},
+      {points: 10, color: "101010"},
+      {points: 1, color: "111111"}
+    ]
+    const ratings = (points, pointsPossible = 10) =>
+      component({ points, pointsPossible, customRatings, useRange: true }).find('Rating').map((el) => el.prop('tierColor'))
+
+    it('scales points to custom ratings', () => {
+      expect(ratings(10)).toEqual(['#100100', 'transparent', 'transparent'])
+      expect(ratings(6)).toEqual(['#606060', 'transparent', 'transparent'])
+      expect(ratings(5)).toEqual(['transparent', '#101010', 'transparent'])
+      expect(ratings(4.4)).toEqual(['transparent', '#101010', 'transparent'])
+      expect(ratings(1)).toEqual(['transparent', 'transparent', '#101010'])
+      expect(ratings(0.1)).toEqual(['transparent', 'transparent', '#111111'])
+      expect(ratings(0)).toEqual(['transparent', 'transparent', '#111111'])
     })
 
-    it('is not navigable or clickable when not assessing', () => {
-      const onClick = sinon.spy()
-      const wrapper = shallow(<Rating {...props.tiers[0]} assessing={false} onClick={onClick} />)
-      const div = wrapper.find('div').at(0)
-      expect(div.prop('tabIndex')).toBeNull()
-      div.simulate('click')
-      expect(onClick.called).toBe(false)
+    it('does not scale points if pointsPossible is 0', () => {
+      expect(ratings(10, 0)).toEqual(['#101010', 'transparent', 'transparent'])
+      expect(ratings(4, 0)).toEqual(['transparent', '#111111', 'transparent'])
     })
+  })
+
+  it('does not scale points if points possible is 0', () => {
+
+  })
+
+  it('is navigable and clickable when assessing', () => {
+    const onClick = sinon.spy()
+    const wrapper = shallow(<Rating {...props.tiers[0]} assessing onClick={onClick} />)
+    const div = wrapper.find('div').at(0)
+    expect(div.prop('tabIndex')).toEqual(0)
+    div.simulate('click')
+    expect(onClick.called).toBe(true)
+  })
+
+  it('is not navigable or clickable when not assessing', () => {
+    const onClick = sinon.spy()
+    const wrapper = shallow(<Rating {...props.tiers[0]} assessing={false} onClick={onClick} />)
+    const div = wrapper.find('div').at(0)
+    expect(div.prop('tabIndex')).toBeNull()
+    expect(div.prop('role')).toBeNull()
+    div.simulate('click')
+    expect(onClick.called).toBe(false)
+  })
+
+  it('only renders the single selected Rating with a footer in summary mode', () => {
+    const el = component({ points: 5, isSummary: true, footer: <div>ow my foot</div> })
+    const ratings = el.find('Rating')
+
+    expect(ratings).toHaveLength(1)
+
+    const rating = ratings.at(0)
+    expect(rating.shallow().debug()).toMatchSnapshot()
+  })
+
+  it('renders a default rating if none of the ratings are selected', () => {
+    const el = component({ points: 6, isSummary: true, footer: <div>ow my foot</div> })
+    const ratings = el.find('Rating')
+
+    expect(ratings).toHaveLength(1)
+
+    const rating = ratings.at(0)
+    expect(rating.shallow().debug()).toMatchSnapshot()
+  })
+
+  it('hides points on the default rating if points are hidden', () => {
+    const el = component({ points: 6, isSummary: true, footer: <div>ow my foot</div> })
+    const rating = el.find('Rating')
+    expect(rating.prop('hidePoints')).toBe(true)
   })
 })

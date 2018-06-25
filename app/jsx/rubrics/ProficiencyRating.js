@@ -40,7 +40,7 @@ export default class ProficiencyRating extends React.Component {
     description: PropTypes.string.isRequired,
     descriptionError: PropTypes.string,
     disableDelete: PropTypes.bool.isRequired,
-    focusField: PropTypes.oneOf(['description', 'points']),
+    focusField: PropTypes.oneOf(['description', 'points', 'mastery']),
     mastery: PropTypes.bool.isRequired,
     onColorChange: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
@@ -69,6 +69,12 @@ export default class ProficiencyRating extends React.Component {
       this.descriptionInput.focus()
     } else if (this.props.focusField === 'points') {
       this.pointsInput.focus()
+    }
+  }
+
+  componentDidMount() {
+    if (this.props.focusField === 'mastery') {
+      this.radioInput.focus()
     }
   }
 
@@ -124,15 +130,16 @@ export default class ProficiencyRating extends React.Component {
     } = this.props
     return (
       <tr>
-        <td style={{textAlign: 'center'}}>
+        <td style={{textAlign: 'center', verticalAlign: 'top', padding: '1.1rem 0 0 0'}}>
           <div style={{display: 'inline-block'}}>
             <RadioInput
+              ref={(input) => { this.radioInput = input }}
               label={<ScreenReaderContent>{I18n.t('Change mastery')}</ScreenReaderContent>}
               checked={mastery}
               onChange={this.handleMasteryChange} />
           </div>
         </td>
-        <td className="description">
+        <td className="description" style={{verticalAlign: 'top'}}>
           <TextInput
             ref={this.setDescriptionRef}
             label={<ScreenReaderContent>{I18n.t('Change description')}</ScreenReaderContent>}
@@ -141,7 +148,7 @@ export default class ProficiencyRating extends React.Component {
             defaultValue={description}
           />
         </td>
-        <td className="points">
+        <td className="points" style={{verticalAlign: 'top'}}>
           <TextInput
             ref={this.setPointsRef}
             label={<ScreenReaderContent>{I18n.t('Change points')}</ScreenReaderContent>}
@@ -151,7 +158,7 @@ export default class ProficiencyRating extends React.Component {
             width="4rem"
           />
         </td>
-        <td className="color">
+        <td className="color" style={{verticalAlign: 'top'}}>
           <Popover
             on="click"
             show={this.state.showColorPopover}

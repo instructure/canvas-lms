@@ -24,13 +24,28 @@ describe "Api::V1::ModerationGrader" do
   end).new
 
   describe "#moderation_graders_json" do
-    let_once(:assignment) { assignment_model }
-    let_once(:user) { user_model }
-    let_once(:session) { Object.new }
-    let_once(:grader_1) { user_model(name: "Adam Jones") }
-    let_once(:grader_2) { user_model(name: "Betty Ford") }
+    let_once(:course) do
+      course_with_teacher(active_all: true)
+      @course
+    end
 
-    let(:json) { api.moderation_graders_json(assignment, user, session) }
+    let_once(:teacher) { @teacher }
+    let_once(:grader_1) do
+      ta = User.create!(name: "Adam Jones")
+      course.enroll_ta(ta, enrollment_state: 'active')
+      ta
+    end
+    let_once(:grader_2) do
+      ta = User.create!(name: "Betty Ford")
+      course.enroll_ta(ta, enrollment_state: 'active')
+      ta
+    end
+
+    let_once(:assignment) { @course.assignments.create!(final_grader: @teacher, grader_count: 2, moderated_grading: true) }
+
+    let_once(:session) { Object.new }
+
+    let(:json) { api.moderation_graders_json(assignment, teacher, session) }
 
     before :once do
       assignment.moderation_graders.create!(anonymous_id: "abcde", user: grader_1)
@@ -38,12 +53,15 @@ describe "Api::V1::ModerationGrader" do
     end
 
     context "when the user can view other grader identities" do
-      before :each do
-        allow(assignment).to receive(:can_view_other_grader_identities?).with(user).and_return(true)
+      let(:json) { api.moderation_graders_json(assignment, teacher, session) }
+
+      it "returns all provisional moderation graders for the assignment" do
+        expect(json.length).to be(2)
       end
 
-      it "returns all moderation graders for the assignment" do
-        expect(json.length).to be(2)
+      it "excludes the final grader" do
+        assignment.moderation_graders.create!(anonymous_id: "teach", user: teacher)
+        expect(json.map {|grader| grader['user_id']}).not_to include(teacher.id)
       end
 
       it "includes user_id on graders" do
@@ -60,12 +78,17 @@ describe "Api::V1::ModerationGrader" do
     end
 
     context "when the user cannot view other grader identities" do
-      before :each do
-        allow(assignment).to receive(:can_view_other_grader_identities?).with(user).and_return(false)
+      before :once do
+        assignment.update(grader_names_visible_to_final_grader: false)
       end
 
-      it "returns all moderation graders for the assignment" do
+      it "returns all provisional moderation graders for the assignment" do
         expect(json.length).to be(2)
+      end
+
+      it "excludes the final grader" do
+        assignment.moderation_graders.create!(anonymous_id: "teach", user: teacher)
+        expect(json.map {|grader| grader['anonymous_id']}).not_to include("teach")
       end
 
       it "includes anonymous_id on graders" do

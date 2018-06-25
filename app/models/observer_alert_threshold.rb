@@ -20,18 +20,27 @@ class ObserverAlertThreshold < ActiveRecord::Base
   belongs_to :observer, :class_name => 'User', inverse_of: :as_observer_observer_alert_thresholds
   has_many :observer_alerts, :inverse_of => :observer_alert_threshold
 
-  ALERT_TYPES = %w(
-    assignment_missing
+  ALERT_TYPES_WITH_THRESHOLD = %w(
     assignment_grade_high
     assignment_grade_low
     course_grade_high
     course_grade_low
+  ).freeze
+
+  ALERT_TYPES_WITHOUT_THRESHOLD = %w(
+    assignment_missing
     course_announcement
     institution_announcement
   ).freeze
+
+  ALERT_TYPES = (ALERT_TYPES_WITH_THRESHOLD | ALERT_TYPES_WITHOUT_THRESHOLD).freeze
+
   validates :alert_type, inclusion: { in: ALERT_TYPES }
   validates :user_id, :observer_id, :alert_type, presence: true
   validates :alert_type, uniqueness: { scope: [:user_id, :observer_id] }
+  validates :threshold, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }, allow_nil: true
+  validate :validate_threshold_type
+  validate :validate_threshold_low_high
   validate :validate_users_link
 
   scope :active, -> { where.not(workflow_state: 'deleted') }
@@ -49,6 +58,44 @@ class ObserverAlertThreshold < ActiveRecord::Base
     false
   end
 
+  # Validates alert types that require a treshold
+  # Also enforces _not_ passing a threshold if one is not required
+  def validate_threshold_type
+    # If a threshold is provided, there are only 4 applicable types of alert
+    if self.threshold
+      unless ALERT_TYPES_WITH_THRESHOLD.include? self.alert_type
+        errors.add(:threshold, "Threshold is only applicable to the following alert types: #{ALERT_TYPES_WITH_THRESHOLD.join(', ')}")
+      end
+    else
+      unless ALERT_TYPES_WITHOUT_THRESHOLD.include? self.alert_type
+        errors.add(:threshold, "Threshold is required for the provided alert_type.")
+      end
+    end
+  end
+
+  # Validates the highs and lows of a single alert type, enforcing that a high threshold cannot be lower than a low threshold, or vica versa
+  # For example:
+  # If the user sets assignment_grade_high to be 40, and then tries to set assignment_grade_low to 50, that would be rejected.
+  # On the flip side, if assignment_grade_low is set to 50, and then assignment_grade_high is set to 20, will be rejected
+  def validate_threshold_low_high
+    if ALERT_TYPES_WITH_THRESHOLD.include? self.alert_type
+      opposite_type = if self.alert_type.include? 'high'
+        self.alert_type.gsub('high', 'low')
+      else
+        self.alert_type.gsub('low', 'high')
+      end
+
+      opposite = observer.as_observer_observer_alert_thresholds.where(alert_type: opposite_type)
+      if opposite.any?
+        if (self.alert_type.include? 'high') && (self.threshold.to_i <= opposite.first.threshold.to_i)
+          errors.add(:threshold, 'You cannot set a high threshold that is lower or equal to a previously set low threshold.')
+        elsif (self.alert_type.include? 'low') && (self.threshold.to_i >= opposite.first.threshold.to_i)
+          errors.add(:threshold, 'You cannot set a low threshold that is higher or equal to a previously set high threshold.')
+        end
+      end
+    end
+  end
+  
   def destroy
     self.workflow_state = 'deleted'
     self.save!

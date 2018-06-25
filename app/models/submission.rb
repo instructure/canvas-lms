@@ -462,7 +462,7 @@ class Submission < ActiveRecord::Base
   end
 
   def can_view_details?(user)
-    return true unless self.assignment.root_account.feature_enabled?(:anonymous_moderated_marking)
+    return false unless grants_right?(user, :read)
     return true unless self.assignment.anonymous_grading && self.assignment.muted
     user == self.user || Account.site_admin.grants_right?(user, :update)
   end
@@ -1509,9 +1509,7 @@ class Submission < ActiveRecord::Base
   def can_grade_symbolic_status(user = nil)
     user ||= grader
 
-    if assignment.root_account&.feature_enabled?(:anonymous_moderated_marking)
-      return :moderation_in_progress unless assignment.grades_published? || grade_posting_in_progress
-    end
+    return :moderation_in_progress unless assignment.grades_published? || grade_posting_in_progress || assignment.permits_moderation?(user)
 
     return :not_applicable if deleted?
     return :unpublished unless assignment.published?
@@ -2343,15 +2341,17 @@ class Submission < ActiveRecord::Base
 
   def visible_rubric_assessments_for(viewing_user)
     return [] if self.assignment.muted? && !grants_right?(viewing_user, :read_grade)
+    return [] unless self.assignment.rubric_association
+
     filtered_assessments = self.rubric_assessments.select do |a|
-      a.grants_right?(viewing_user, :read)
+      a.grants_right?(viewing_user, :read) &&
+        a.rubric_association == self.assignment.rubric_association
     end
     filtered_assessments.sort_by do |a|
-      if a.assessment_type == 'grading'
-        [CanvasSort::First]
-      else
-        [CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)]
-      end
+      [
+        a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last,
+        Canvas::ICU.collation_key(a.assessor_name)
+      ]
     end
   end
 

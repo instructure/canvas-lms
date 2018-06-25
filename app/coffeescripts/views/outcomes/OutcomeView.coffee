@@ -225,7 +225,7 @@ define [
             setQuizMastery: @setQuizMastery,
             useForScoring: @useForScoring,
             isLargeRoster: ENV.IS_LARGE_ROSTER,
-            assessedInContext: @model.outcomeLink.assessed || (@model.isNative() && @model.get('assessed'))
+            assessedInContext: !@readOnly() && (@model.outcomeLink.assessed || (@model.isNative() && @model.get('assessed')))
 
       @$('input:first').focus()
       @screenreaderTitleFocus()

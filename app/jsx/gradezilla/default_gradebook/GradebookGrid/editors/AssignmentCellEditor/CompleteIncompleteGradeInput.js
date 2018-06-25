@@ -19,8 +19,8 @@
 import React, {Component} from 'react'
 import {bool, func, number, shape, string} from 'prop-types'
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import {MenuItem} from '@instructure/ui-core/lib/components/Menu'
-import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
+import Menu, {MenuItem} from '@instructure/ui-menu/lib/components/Menu'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import IconArrowOpenDownLine from '@instructure/ui-icons/lib/Line/IconArrowOpenDown'
 import IconCheckSolid from '@instructure/ui-icons/lib/Solid/IconCheck'
@@ -71,7 +71,7 @@ export default class CompleteIncompleteGradeInput extends Component {
     }).isRequired,
     disabled: bool,
     menuContentRef: func,
-    onMenuClose: func,
+    onMenuDismiss: Menu.propTypes.onDismiss,
     pendingGradeInfo: shape({
       excused: bool.isRequired,
       grade: string,
@@ -87,7 +87,7 @@ export default class CompleteIncompleteGradeInput extends Component {
   static defaultProps = {
     disabled: false,
     menuContentRef: null,
-    onMenuClose: null,
+    onMenuDismiss () {},
     pendingGradeInfo: null
   }
 
@@ -150,9 +150,9 @@ export default class CompleteIncompleteGradeInput extends Component {
         </span>
 
         <div className="Grid__AssignmentRowCell__CompleteIncompleteMenu">
-          <PopoverMenu
-            contentRef={this.props.menuContentRef}
-            onClose={this.props.onMenuClose}
+          <Menu
+            menuRef={this.props.menuContentRef}
+            onDismiss={this.props.onMenuDismiss}
             onSelect={this.handleSelect}
             placement="bottom"
             trigger={
@@ -161,8 +161,9 @@ export default class CompleteIncompleteGradeInput extends Component {
                 disabled={this.props.disabled}
                 size="small"
                 variant="icon"
+                icon={IconArrowOpenDownLine}
               >
-                <IconArrowOpenDownLine title={I18n.t('Open Complete/Incomplete menu')} />
+                <ScreenReaderContent>{I18n.t('Open Complete/Incomplete menu')}</ScreenReaderContent>
               </Button>
             }
           >
@@ -171,7 +172,7 @@ export default class CompleteIncompleteGradeInput extends Component {
                 {componentForGrade(menuItem.status, {forMenu: true})}
               </MenuItem>
             ))}
-          </PopoverMenu>
+          </Menu>
         </div>
       </div>
     )

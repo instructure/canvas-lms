@@ -59,9 +59,7 @@ test('speed_grader_enabled sets speedgrader url', function() {
   equal(dialog.dialog.find('.more-details-link').length, 1)
 })
 
-test('speedGraderUrl excludes student id when Anonymous Moderated Marking is ' +
-'enabled and the assignment is anonymously graded', function() {
-  this.options.anonymous_moderated_marking_enabled = true
+test('speedGraderUrl excludes student id when assignment is anonymously graded', function() {
   this.assignment.anonymous_grading = true
   this.options.context_url = 'http://some-fake-url'
   const dialog = new SubmissionDetailsDialog(this.assignment, this.user, this.options)
@@ -69,28 +67,7 @@ test('speedGraderUrl excludes student id when Anonymous Moderated Marking is ' +
   notOk(dialog.submission.speedGraderUrl.match(/student_id/))
 })
 
-test('speedGraderUrl includes student id when Anonymous Moderated Marking is ' +
-'enabled and the assignment is not anonymously graded', function() {
-  this.options.anonymous_moderated_marking_enabled = true
-  this.options.context_url = 'http://some-fake-url'
-  const dialog = new SubmissionDetailsDialog(this.assignment, this.user, this.options)
-
-  ok(dialog.submission.speedGraderUrl.match(/student_id/))
-})
-
-test('speedGraderUrl includes student id when Anonymous Moderated Marking is ' +
-'disabled and the assignment is anonymously graded', function() {
-  this.options.anonymous_moderated_marking_enabled = false
-  this.assignment.anonymous_grading = true
-  this.options.context_url = 'http://some-fake-url'
-  const dialog = new SubmissionDetailsDialog(this.assignment, this.user, this.options)
-
-  ok(dialog.submission.speedGraderUrl.match(/student_id/))
-})
-
-test('speedGraderUrl includes student id when Anonymous Moderated Marking is ' +
-'disabled and the assignment is not anonymously graded', function() {
-  this.options.anonymous_moderated_marking_enabled = false
+test('speedGraderUrl includes student id when assignment is not anonymously graded', function() {
   this.options.context_url = 'http://some-fake-url'
   const dialog = new SubmissionDetailsDialog(this.assignment, this.user, this.options)
 

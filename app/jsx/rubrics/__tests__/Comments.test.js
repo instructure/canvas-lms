@@ -74,4 +74,10 @@ describe('The Comments component', () => {
 
     expect(setSaveLater.args).toEqual([[true]])
   })
+
+  it('renders a footer after the comment when provided', () => {
+    const el = component({ assessing: false, footer: <div>this is a footer</div> })
+
+    expect(el.shallow().debug()).toMatchSnapshot()
+  })
 })

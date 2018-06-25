@@ -41,7 +41,8 @@ define [
       masteryElement = React.createElement(IndividualStudentMastery, {
         courseId: @course_id,
         studentId: @student_id,
-        onExpansionChange: @updateToggles
+        onExpansionChange: @updateToggles,
+        outcomeProficiency: ENV.outcome_proficiency
       })
       @reactView = ReactDOM.render(masteryElement, $('.individualStudentView').get(0))
 

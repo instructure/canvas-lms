@@ -40,6 +40,7 @@ class CanvadocSessionsController < ApplicationController
 
       opts[:enable_annotations] = blob["enable_annotations"] && !anonymous_grading_enabled?(attachment)
       opts[:anonymous_instructor_annotations] = blob["anonymous_instructor_annotations"]
+      opts[:enrollment_type] = blob["enrollment_type"]
       # TODO: Remove the next line after the DocViewer Data Migration project RD-4702
       opts[:region] = attachment.shard.database_server.config[:region] || "none"
       attachment.submit_to_canvadocs(1, opts) unless attachment.canvadoc_available?
@@ -71,8 +72,6 @@ class CanvadocSessionsController < ApplicationController
   private
 
   def anonymous_grading_enabled?(attachment)
-    return false unless @domain_root_account.feature_enabled?(:anonymous_moderated_marking)
-
     Assignment.joins(submissions: :attachment_associations).
       where(
         submissions: {attachment_associations: {context_type: 'Submission', attachment: attachment}},

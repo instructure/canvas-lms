@@ -62,22 +62,6 @@ describe 'Access Different Gradebooks Environments', type: :request do
         end
       end
 
-      describe 'anonymous_moderated_marking_enabled' do
-        it 'is false when the root account does not have anonymous_moderated_marking enabled' do
-          get speed_grader_course_gradebook_path(course_id: @course.id), params: { assignment_id: @assignment.id }
-          js_env = js_env_from_response(response)
-
-          expect(js_env.fetch('anonymous_moderated_marking_enabled')).to be false
-        end
-
-        it 'is true when the root account has anonymous_moderated_marking enabled' do
-          @course.root_account.enable_feature!(:anonymous_moderated_marking)
-          get speed_grader_course_gradebook_path(course_id: @course.id), params: { assignment_id: @assignment.id }
-          js_env = js_env_from_response(response)
-          expect(js_env.fetch('anonymous_moderated_marking_enabled')).to be true
-        end
-      end
-
       describe 'show_help_menu_item' do
         it 'is false when the root account does not have a support URL configured' do
           get speed_grader_course_gradebook_path(course_id: @course.id), params: { assignment_id: @assignment.id }
@@ -109,7 +93,6 @@ describe 'Access Different Gradebooks Environments', type: :request do
 
         context 'for a moderated assignment with no grades published' do
           before(:once) do
-            @course.root_account.enable_feature!(:anonymous_moderated_marking)
             @assignment.update!(
               final_grader: @teacher,
               grader_count: 2,
@@ -133,6 +116,7 @@ describe 'Access Different Gradebooks Environments', type: :request do
         it 'is set to :grader for a moderated assignment whose grades have been published' do
           @assignment.update!(
             moderated_grading: true,
+            grader_count: 2,
             grades_published_at: Time.zone.now
           )
           expect(js_env.fetch('grading_role')).to eq 'grader'
@@ -183,29 +167,6 @@ describe 'Access Different Gradebooks Environments', type: :request do
 
             expect(course_details.fetch('grading_period_set_id')).to eq(grading_period_group_id.to_s)
           end
-        end
-      end
-    end
-  end
-
-  describe 'GET #show' do
-    describe 'js_env' do
-      describe 'anonymous_moderated_marking_enabled' do
-        before(:each) do
-          user_session(@teacher)
-        end
-
-        it 'is false when the root account does not have anonymous_moderated_marking enabled' do
-          get course_gradebook_path(course_id: @course.id)
-          js_env = js_env_from_response(response)
-          expect(js_env.dig('GRADEBOOK_OPTIONS', 'anonymous_moderated_marking_enabled')).to be false
-        end
-
-        it 'is true when the root account has anonymous_moderated_marking enabled' do
-          @course.root_account.enable_feature!(:anonymous_moderated_marking)
-          get course_gradebook_path(course_id: @course.id)
-          js_env = js_env_from_response(response)
-          expect(js_env.dig('GRADEBOOK_OPTIONS', 'anonymous_moderated_marking_enabled')).to be true
         end
       end
     end

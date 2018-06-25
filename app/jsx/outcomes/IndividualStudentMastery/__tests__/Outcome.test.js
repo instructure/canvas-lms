@@ -24,8 +24,11 @@ const result = (id = 1, date = new Date()) => ({
   id,
   percent: 0.1,
   assignment: {
+    id: 1,
     html_url: 'http://foo',
-    name: 'My alignment'
+    name: 'My alignment',
+    submission_types: '',
+    score: 0
   },
   submitted_or_assessed_at: date.toISOString()
 })
@@ -36,6 +39,8 @@ const defaultProps = (props = {}) => (
       id: 1,
       expansionId: 100,
       mastered: false,
+      mastery_points: 3,
+      points_possible: 5,
       ratings: [
         { description: 'My first rating' },
         { description: 'My second rating' }
@@ -49,7 +54,8 @@ const defaultProps = (props = {}) => (
             id: 1,
             html_url: 'http://foo',
             name: 'My assignment',
-            submission_types: 'online_quiz'
+            submission_types: 'online_quiz',
+            score: 0
           }
         }
       ],
@@ -65,15 +71,22 @@ it('renders the Outcome component', () => {
   expect(wrapper.debug()).toMatchSnapshot()
 })
 
-it('renders correct expanded', () => {
+it('renders correctly expanded', () => {
   const wrapper = shallow(<Outcome {...defaultProps()} expanded />)
+  expect(wrapper.debug()).toMatchSnapshot()
+})
+
+it('renders correctly expanded with no results', () => {
+  const props = defaultProps()
+  props.outcome.results = []
+  const wrapper = shallow(<Outcome {...props} expanded />)
   expect(wrapper.debug()).toMatchSnapshot()
 })
 
 describe('header', () => {
   it('includes the outcome name', () => {
     const wrapper = shallow(<Outcome {...defaultProps()}/>)
-    const header = wrapper.find('ToggleDetails')
+    const header = wrapper.find('ToggleGroup')
     const summary = render(header.prop('summary'))
     expect(summary.text()).toMatch('My outcome')
   })
@@ -82,21 +95,21 @@ describe('header', () => {
     const props = defaultProps()
     props.outcome.mastered = true
     const wrapper = shallow(<Outcome {...props} />)
-    const header = wrapper.find('ToggleDetails')
+    const header = wrapper.find('ToggleGroup')
     const summary = render(header.prop('summary'))
     expect(summary.text()).toMatch('Mastered')
   })
 
   it('includes non-mastery when not mastered', () => {
     const wrapper = shallow(<Outcome {...defaultProps()} />)
-    const header = wrapper.find('ToggleDetails')
+    const header = wrapper.find('ToggleGroup')
     const summary = render(header.prop('summary'))
     expect(summary.text()).toMatch('Not mastered')
   })
 
   it('shows correct number of alignments', () => {
     const wrapper = shallow(<Outcome {...defaultProps()} />)
-    const header = wrapper.find('ToggleDetails')
+    const header = wrapper.find('ToggleGroup')
     const summary = render(header.prop('summary'))
     expect(summary.text()).toMatch('1 alignment')
   })

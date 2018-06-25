@@ -23,8 +23,8 @@ exports[`Free-form Rubric with a custom criterion by default renders the LongDes
 exports[`Free-form Rubric with a custom criterion by default renders the root component as expected 1`] = `
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description container\\">
-      <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+    <div className=\\"description react-rubric-cell\\">
+      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Description of criterion
       </Text>
     </div>
@@ -33,10 +33,10 @@ exports[`Free-form Rubric with a custom criterion by default renders the root co
     </div>
   </th>
   <td className=\\"ratings\\">
-    <Comments assessing={false} assessment={{...}} savedComments={{...}} setSaveLater={[Function]} setComments={[Function]} />
+    <Comments assessing={false} assessment={{...}} footer={{...}} savedComments={{...}} setSaveLater={[Function]} setComments={[Function]} />
   </td>
   <td>
-    <Points assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={8} />
+    <Points allowExtraCredit={true} assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={8} />
   </td>
 </tr>"
 `;
@@ -62,8 +62,8 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the Lon
 exports[`Free-form Rubric with a custom criterion when assessing renders the root component as expected 1`] = `
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description container\\">
-      <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+    <div className=\\"description react-rubric-cell\\">
+      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Description of criterion
       </Text>
     </div>
@@ -72,10 +72,10 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the roo
     </div>
   </th>
   <td className=\\"ratings\\">
-    <Comments assessing={true} assessment={{...}} savedComments={{...}} setSaveLater={[Function]} setComments={[Function]} />
+    <Comments assessing={true} assessment={{...}} footer={{...}} savedComments={{...}} setSaveLater={[Function]} setComments={[Function]} />
   </td>
   <td>
-    <Points assessing={true} assessment={{...}} onPointChange={[Function]} pointsPossible={8} />
+    <Points allowExtraCredit={true} assessing={true} assessment={{...}} onPointChange={[Function]} pointsPossible={8} />
   </td>
 </tr>"
 `;
@@ -101,8 +101,8 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
 exports[`Free-form Rubric with a custom criterion without an assessment renders the root component as expected 1`] = `
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description container\\">
-      <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+    <div className=\\"description react-rubric-cell\\">
+      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Description of criterion
       </Text>
     </div>
@@ -111,10 +111,10 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
     </div>
   </th>
   <td className=\\"ratings\\">
-    <Comments assessing={false} assessment={{...}} savedComments={{...}} setSaveLater={[Function]} setComments={[Function]} />
+    <Comments assessing={false} assessment={{...}} footer={{...}} savedComments={{...}} setSaveLater={[Function]} setComments={[Function]} />
   </td>
   <td>
-    <Points assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={8} />
+    <Points allowExtraCredit={true} assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={8} />
   </td>
 </tr>"
 `;
@@ -156,7 +156,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the Outcom
 `;
 
 exports[`Free-form Rubric with a outcome criterion by default renders the Threshold sub-component(s) as expected 1`] = `
-"<Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+"<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
   threshold: 3.0
 </Text>"
 `;
@@ -164,9 +164,9 @@ exports[`Free-form Rubric with a outcome criterion by default renders the Thresh
 exports[`Free-form Rubric with a outcome criterion by default renders the root component as expected 1`] = `
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description container\\">
+    <div className=\\"description react-rubric-cell\\">
       <OutcomeIcon />
-      <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
     </div>
@@ -177,10 +177,10 @@ exports[`Free-form Rubric with a outcome criterion by default renders the root c
     <Threshold threshold={3} />
   </th>
   <td className=\\"ratings\\">
-    <Comments assessing={false} assessment={{...}} savedComments={{...}} setSaveLater={[Function]} setComments={[Function]} />
+    <Comments assessing={false} assessment={{...}} footer={{...}} savedComments={{...}} setSaveLater={[Function]} setComments={[Function]} />
   </td>
   <td>
-    <Points assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={3} />
+    <Points allowExtraCredit={false} assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={3} />
   </td>
 </tr>"
 `;
@@ -222,7 +222,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Ou
 `;
 
 exports[`Free-form Rubric with a outcome criterion when assessing renders the Threshold sub-component(s) as expected 1`] = `
-"<Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+"<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
   threshold: 3.0
 </Text>"
 `;
@@ -230,9 +230,9 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Th
 exports[`Free-form Rubric with a outcome criterion when assessing renders the root component as expected 1`] = `
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description container\\">
+    <div className=\\"description react-rubric-cell\\">
       <OutcomeIcon />
-      <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
     </div>
@@ -243,10 +243,10 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the ro
     <Threshold threshold={3} />
   </th>
   <td className=\\"ratings\\">
-    <Comments assessing={true} assessment={{...}} savedComments={{...}} setSaveLater={[Function]} setComments={[Function]} />
+    <Comments assessing={true} assessment={{...}} footer={{...}} savedComments={{...}} setSaveLater={[Function]} setComments={[Function]} />
   </td>
   <td>
-    <Points assessing={true} assessment={{...}} onPointChange={[Function]} pointsPossible={3} />
+    <Points allowExtraCredit={false} assessing={true} assessment={{...}} onPointChange={[Function]} pointsPossible={3} />
   </td>
 </tr>"
 `;
@@ -288,7 +288,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
 `;
 
 exports[`Free-form Rubric with a outcome criterion without an assessment renders the Threshold sub-component(s) as expected 1`] = `
-"<Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+"<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
   threshold: 3.0
 </Text>"
 `;
@@ -296,9 +296,9 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
 exports[`Free-form Rubric with a outcome criterion without an assessment renders the root component as expected 1`] = `
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description container\\">
+    <div className=\\"description react-rubric-cell\\">
       <OutcomeIcon />
-      <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
     </div>
@@ -309,10 +309,10 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
     <Threshold threshold={3} />
   </th>
   <td className=\\"ratings\\">
-    <Comments assessing={false} assessment={{...}} savedComments={{...}} setSaveLater={[Function]} setComments={[Function]} />
+    <Comments assessing={false} assessment={{...}} footer={{...}} savedComments={{...}} setSaveLater={[Function]} setComments={[Function]} />
   </td>
   <td>
-    <Points assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={3} />
+    <Points allowExtraCredit={false} assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={3} />
   </td>
 </tr>"
 `;
@@ -338,20 +338,26 @@ exports[`Point Rubric with a custom criterion by default renders the LongDescrip
 exports[`Point Rubric with a custom criterion by default renders the root component as expected 1`] = `
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description container\\">
-      <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+    <div className=\\"description react-rubric-cell\\">
+      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Description of criterion
       </Text>
     </div>
     <div className=\\"long-description\\">
       <LongDescriptionDialog close={[Function]} longDescription=\\"\\" open={false} />
     </div>
+    <div className=\\"assessment-comments\\">
+      <Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+        Instructor Comments
+      </Text>
+      <CommentText assessment={{...}} weight=\\"light\\" placeholder=\\"\\" />
+    </div>
   </th>
   <td className=\\"ratings\\">
-    <Ratings assessing={false} tiers={{...}} onPointChange={[Function]} points={3.2} useRange={false} defaultMasteryThreshold={8} customRatings={{...}} />
+    <Ratings assessing={false} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={3.2} pointsPossible={8} defaultMasteryThreshold={8} isSummary={false} useRange={false} hidePoints={false} />
   </td>
   <td>
-    <Points assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={8} />
+    <Points allowExtraCredit={true} assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={8} />
   </td>
 </tr>"
 `;
@@ -377,8 +383,8 @@ exports[`Point Rubric with a custom criterion when assessing renders the LongDes
 exports[`Point Rubric with a custom criterion when assessing renders the root component as expected 1`] = `
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description container\\">
-      <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+    <div className=\\"description react-rubric-cell\\">
+      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Description of criterion
       </Text>
     </div>
@@ -387,10 +393,10 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
     </div>
   </th>
   <td className=\\"ratings\\">
-    <Ratings assessing={true} tiers={{...}} onPointChange={[Function]} points={3.2} useRange={false} defaultMasteryThreshold={8} customRatings={{...}} />
+    <Ratings assessing={true} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={3.2} pointsPossible={8} defaultMasteryThreshold={8} isSummary={false} useRange={false} hidePoints={false} />
   </td>
   <td>
-    <Points assessing={true} assessment={{...}} onPointChange={[Function]} pointsPossible={8} />
+    <Points allowExtraCredit={true} assessing={true} assessment={{...}} onPointChange={[Function]} pointsPossible={8} />
     <CommentButton comments=\\"i'd like to say some things\\" description=\\"Description of criterion\\" finalize={[Function]} initialize={[Function]} open={false} setComments={[Function]} />
   </td>
 </tr>"
@@ -417,26 +423,20 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
 exports[`Point Rubric with a custom criterion without an assessment renders the root component as expected 1`] = `
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description container\\">
-      <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+    <div className=\\"description react-rubric-cell\\">
+      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Description of criterion
       </Text>
     </div>
     <div className=\\"long-description\\">
       <LongDescriptionDialog close={[Function]} longDescription=\\"\\" open={false} />
     </div>
-    <div className=\\"assessment-comments\\">
-      <Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
-        Instructor Comments
-      </Text>
-      <CommentText assessment={{...}} weight=\\"light\\" placeholder=\\"\\" />
-    </div>
   </th>
   <td className=\\"ratings\\">
-    <Ratings assessing={false} tiers={{...}} onPointChange={[Function]} points={[undefined]} useRange={false} defaultMasteryThreshold={8} customRatings={{...}} />
+    <Ratings assessing={false} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={[undefined]} pointsPossible={8} defaultMasteryThreshold={8} isSummary={false} useRange={false} hidePoints={false} />
   </td>
   <td>
-    <Points assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={8} />
+    <Points allowExtraCredit={true} assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={8} />
   </td>
 </tr>"
 `;
@@ -478,7 +478,7 @@ exports[`Point Rubric with a outcome criterion by default renders the OutcomeIco
 `;
 
 exports[`Point Rubric with a outcome criterion by default renders the Threshold sub-component(s) as expected 1`] = `
-"<Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+"<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
   threshold: 3.0
 </Text>"
 `;
@@ -486,9 +486,9 @@ exports[`Point Rubric with a outcome criterion by default renders the Threshold 
 exports[`Point Rubric with a outcome criterion by default renders the root component as expected 1`] = `
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description container\\">
+    <div className=\\"description react-rubric-cell\\">
       <OutcomeIcon />
-      <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
     </div>
@@ -497,12 +497,18 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
       <LongDescriptionDialog close={[Function]} longDescription=\\"sa Sivert.\\" open={false} />
     </div>
     <Threshold threshold={3} />
+    <div className=\\"assessment-comments\\">
+      <Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+        Instructor Comments
+      </Text>
+      <CommentText assessment={{...}} weight=\\"light\\" placeholder=\\"\\" />
+    </div>
   </th>
   <td className=\\"ratings\\">
-    <Ratings assessing={false} tiers={{...}} onPointChange={[Function]} points={3} useRange={false} defaultMasteryThreshold={3} customRatings={{...}} />
+    <Ratings assessing={false} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={3} pointsPossible={3} defaultMasteryThreshold={3} isSummary={false} useRange={false} hidePoints={false} />
   </td>
   <td>
-    <Points assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={3} />
+    <Points allowExtraCredit={false} assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={3} />
   </td>
 </tr>"
 `;
@@ -544,7 +550,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the Outcom
 `;
 
 exports[`Point Rubric with a outcome criterion when assessing renders the Threshold sub-component(s) as expected 1`] = `
-"<Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+"<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
   threshold: 3.0
 </Text>"
 `;
@@ -552,9 +558,9 @@ exports[`Point Rubric with a outcome criterion when assessing renders the Thresh
 exports[`Point Rubric with a outcome criterion when assessing renders the root component as expected 1`] = `
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description container\\">
+    <div className=\\"description react-rubric-cell\\">
       <OutcomeIcon />
-      <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
     </div>
@@ -565,10 +571,10 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
     <Threshold threshold={3} />
   </th>
   <td className=\\"ratings\\">
-    <Ratings assessing={true} tiers={{...}} onPointChange={[Function]} points={3} useRange={false} defaultMasteryThreshold={3} customRatings={{...}} />
+    <Ratings assessing={true} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={3} pointsPossible={3} defaultMasteryThreshold={3} isSummary={false} useRange={false} hidePoints={false} />
   </td>
   <td>
-    <Points assessing={true} assessment={{...}} onPointChange={[Function]} pointsPossible={3} />
+    <Points allowExtraCredit={false} assessing={true} assessment={{...}} onPointChange={[Function]} pointsPossible={3} />
     <CommentButton comments=\\"here too\\" description=\\"Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.\\" finalize={[Function]} initialize={[Function]} open={false} setComments={[Function]} />
   </td>
 </tr>"
@@ -611,7 +617,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
 `;
 
 exports[`Point Rubric with a outcome criterion without an assessment renders the Threshold sub-component(s) as expected 1`] = `
-"<Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+"<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
   threshold: 3.0
 </Text>"
 `;
@@ -619,9 +625,9 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
 exports[`Point Rubric with a outcome criterion without an assessment renders the root component as expected 1`] = `
 "<tr className=\\"rubric-criterion\\">
   <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description container\\">
+    <div className=\\"description react-rubric-cell\\">
       <OutcomeIcon />
-      <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
     </div>
@@ -630,18 +636,12 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
       <LongDescriptionDialog close={[Function]} longDescription=\\"sa Sivert.\\" open={false} />
     </div>
     <Threshold threshold={3} />
-    <div className=\\"assessment-comments\\">
-      <Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
-        Instructor Comments
-      </Text>
-      <CommentText assessment={{...}} weight=\\"light\\" placeholder=\\"\\" />
-    </div>
   </th>
   <td className=\\"ratings\\">
-    <Ratings assessing={false} tiers={{...}} onPointChange={[Function]} points={[undefined]} useRange={false} defaultMasteryThreshold={3} customRatings={{...}} />
+    <Ratings assessing={false} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function]} points={[undefined]} pointsPossible={3} defaultMasteryThreshold={3} isSummary={false} useRange={false} hidePoints={false} />
   </td>
   <td>
-    <Points assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={3} />
+    <Points allowExtraCredit={false} assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={3} />
   </td>
 </tr>"
 `;

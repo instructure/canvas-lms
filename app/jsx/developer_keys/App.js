@@ -21,6 +21,7 @@ import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReade
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
+import View from '@instructure/ui-layout/lib/components/View'
 
 import IconPlusLine from '@instructure/ui-icons/lib/Line/IconPlus'
 
@@ -118,26 +119,31 @@ class DeveloperKeysApp extends React.Component {
     } = this.props
     return (
       <div>
-        <div className="ic-Action-header">
-          <div className="ic-Action-header__Primary">
-            <Heading level="h1">{I18n.t('Developer Keys')}</Heading>
-          </div>
-        </div>
+        <View
+          as="div"
+          margin="0 0 small 0"
+          padding="none"
+        >
+          <Heading level="h1">{I18n.t('Developer Keys')}</Heading>
+        </View>
         <TabList variant="minimal" focus={this.state.focusTab}>
           <TabPanel title={I18n.t('Account')}>
-            <div className="ic-Action-header">
-              <div className="ic-Action-header__Secondary">
-                <Button
-                  variant="primary"
-                  onClick={this.showCreateDeveloperKey}
-                  buttonRef={this.setAddKeyButtonRef}
-                >
-                  <ScreenReaderContent>{I18n.t('Create a')}</ScreenReaderContent>
-                  <IconPlusLine />
-                  { I18n.t('Developer Key') }
-                </Button>
-              </div>
-            </div>
+            <View
+              as="div"
+              margin="0 0 small 0"
+              padding="none"
+              textAlign="end"
+            >
+              <Button
+                variant="primary"
+                onClick={this.showCreateDeveloperKey}
+                buttonRef={this.setAddKeyButtonRef}
+              >
+                <ScreenReaderContent>{I18n.t('Create a')}</ScreenReaderContent>
+                <IconPlusLine />
+                { I18n.t('Developer Key') }
+              </Button>
+            </View>
             <DeveloperKeyModal
               store={store}
               actions={actions}
@@ -155,10 +161,15 @@ class DeveloperKeysApp extends React.Component {
               ctx={ctx}
               setFocus={this.focusDevKeyButton}
             />
-            <div className="loadingSection">
+            <View
+              as="div"
+              margin="small"
+              padding="large"
+              textAlign="center"
+            >
               {listDeveloperKeysPending ? <Spinner title={I18n.t('Loading')} /> : null}
               {this.showMoreButton()}
-            </div>
+            </View>
           </TabPanel>
           {
             this.isSiteAdmin
@@ -176,10 +187,15 @@ class DeveloperKeysApp extends React.Component {
                   inherited
                   setFocus={this.focusInheritedTab}
                 />
-                <div className="loadingSection">
+                <View
+                  as="div"
+                  margin="small"
+                  padding="large"
+                  textAlign="center"
+                >
                   {listInheritedDeveloperKeysPending ? <Spinner title={I18n.t('Loading')} /> : null}
                   {this.showMoreInheritedButton()}
-                </div>
+                </View>
               </TabPanel>
           }
         </TabList>
@@ -196,7 +212,7 @@ DeveloperKeysApp.propTypes = {
     developerKeysModalOpen: PropTypes.func.isRequired,
     getRemainingDeveloperKeys: PropTypes.func.isRequired,
     getRemainingInheritedDeveloperKeys: PropTypes.func.isRequired,
-    setEditingDeveloperKey: PropTypes.func.isRequired
+    editDeveloperKey: PropTypes.func.isRequired
   }).isRequired,
   applicationState: PropTypes.shape({
     createOrEditDeveloperKey: PropTypes.shape({

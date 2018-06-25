@@ -21,12 +21,8 @@ describe Api::V1::PlannerItem do
   class PlannerItemHarness
     include Api::V1::PlannerItem
 
-    def api_v1_users_todo_ignore_url(*args); end
     def assignment_json(*args); end
-    def speed_grader_course_gradebook_url(*args); end
     def quiz_json(*args); end
-    def course_quiz_url(*args); end
-    def course_assignment_url(*args); end
     def wiki_page_json(*args); end
     def discussion_topic_api_json(*args); end
     def named_context_url(*args); end

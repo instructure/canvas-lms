@@ -71,12 +71,28 @@ describe Types::AssignmentType do
       submission1 = assignment.submit_homework(student, { :body => "sub1", :submission_type => 'online_text_entry' })
       submission2 = assignment.submit_homework(other_student, { :body => "sub1", :submission_type => 'online_text_entry' })
 
-      expect(assignment_type.submissionsConnection(current_user: teacher).sort).to eq [submission1, submission2]
-      expect(assignment_type.submissionsConnection(current_user: student)).to eq [submission1]
+      expect(
+        assignment_type.submissionsConnection(
+          current_user: teacher,
+          args: {filter: nil}
+        ).sort
+      ).to eq [submission1, submission2]
+
+      expect(
+        assignment_type.submissionsConnection(
+          current_user: student,
+          args: {filter: nil}
+        )
+      ).to eq [submission1]
     end
 
     it "can filter submissions according to workflow state" do
-      expect(assignment_type.submissionsConnection(current_user: teacher)).to eq []
+      expect(
+        assignment_type.submissionsConnection(
+          current_user: teacher,
+          args: {filter: nil}
+        )
+      ).to eq []
 
       expect(
         assignment_type.submissionsConnection(

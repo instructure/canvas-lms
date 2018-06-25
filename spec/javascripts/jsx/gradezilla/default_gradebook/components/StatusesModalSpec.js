@@ -230,7 +230,7 @@ QUnit.module('StatusesModal', function (suiteHooks) {
     const modalContent = new ReactWrapper(wrapper.node.modalContentRef, wrapper.node);
     modalContent.find('StatusColorListItem PopoverTrigger Button').at(0).simulate('click');
     const colorPickerContent = new ReactWrapper(wrapper.node.colorPickerContents.late, wrapper.node);
-    const applyButton = colorPickerContent.find('button').findWhere(button => button.prop('children') === 'Apply');
+    const applyButton = colorPickerContent.find('button').filterWhere(button => button.text() === 'Apply');
     applyButton.simulate('click');
     strictEqual(modalContent.find('StatusColorListItem Popover').at(0).prop('show'), false);
   });
@@ -253,7 +253,7 @@ QUnit.module('StatusesModal', function (suiteHooks) {
     const modalContent = new ReactWrapper(wrapper.node.modalContentRef, wrapper.node);
     modalContent.find('StatusColorListItem PopoverTrigger Button').at(0).simulate('click');
     const colorPickerContent = new ReactWrapper(wrapper.node.colorPickerContents.late, wrapper.node);
-    const applyButton = colorPickerContent.find('button').findWhere(button => button.prop('children') === 'Cancel');
+    const applyButton = colorPickerContent.find('button').filterWhere(button => button.text() === 'Cancel');
     applyButton.simulate('click');
     strictEqual(modalContent.find('StatusColorListItem Popover').at(0).prop('show'), false);
   });
@@ -272,7 +272,7 @@ QUnit.module('StatusesModal', function (suiteHooks) {
     const colorPickerContent = new ReactWrapper(wrapper.node.colorPickerContents.late, wrapper.node);
     const whiteSwatch = colorPickerContent.find('button').findWhere(button => button.prop('title') === 'white (#FFFFFF)');
     whiteSwatch.simulate('click');
-    const applyButton = colorPickerContent.find('button').findWhere(button => button.prop('children') === 'Apply');
+    const applyButton = colorPickerContent.find('button').filterWhere(button => button.text() === 'Apply');
     applyButton.simulate('click');
     strictEqual(afterUpdateStatusColors.firstCall.args[0].late, '#FFFFFF');
     wrapper.unmount();

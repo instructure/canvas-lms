@@ -120,8 +120,8 @@ class GradebooksController < ApplicationController
       effective_due_dates: effective_due_dates,
       exclude_total: @exclude_total,
       non_scoring_rubrics_enabled: @context.root_account.feature_enabled?(:non_scoring_rubrics),
-      rubric_assessments: rubric_assessments_json(@presenter.submissions.flat_map(&:rubric_assessments), @current_user, session, style: 'full'),
-      rubrics: rubrics_json(@presenter.submissions.flat_map(&:rubric_assessments).map(&:rubric), @current_user, session, style: 'full'),
+      rubric_assessments: rubric_assessments_json(@presenter.rubric_assessments, @current_user, session, style: 'full'),
+      rubrics: rubrics_json(@presenter.rubrics, @current_user, session, style: 'full'),
       save_assignment_order_url: course_save_assignment_order_url(@context),
       student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
       student_id: @presenter.student_id,
@@ -307,7 +307,6 @@ class GradebooksController < ApplicationController
       GRADEBOOK_OPTIONS: {
         api_max_per_page: per_page,
         chunk_size: Setting.get('gradebook2.submissions_chunk_size', '10').to_i,
-        anonymous_moderated_marking_enabled: anonymous_moderated_marking_enabled?,
         assignment_groups_url: api_v1_course_assignment_groups_url(
           @context,
           include: ag_includes,
@@ -447,7 +446,7 @@ class GradebooksController < ApplicationController
 
       # decorate submissions with user_ids if not present
       submissions_without_user_ids = submissions.select {|s| s[:user_id].blank?}
-      if submissions_without_user_ids.present? && anonymous_moderated_marking_enabled?
+      if submissions_without_user_ids.present?
         submissions = populate_user_ids(submissions_without_user_ids)
       end
 
@@ -563,7 +562,7 @@ class GradebooksController < ApplicationController
   def submissions_json(submissions:, assignments:)
     submissions.map do |sub|
       assignment = assignments[sub[:assignment_id].to_i]
-      omitted_field = assignment.anonymous_grading? && anonymous_moderated_marking_enabled? ? :user_id : :anonymous_id
+      omitted_field = assignment.anonymous_grading? ? :user_id : :anonymous_id
       json_params = {
         include: { submission_history: { methods: %i[late missing], except: omitted_field } },
         except: omitted_field
@@ -627,14 +626,13 @@ class GradebooksController < ApplicationController
     end
 
     @can_comment_on_submission = !@context.completed? && !@context_enrollment.try(:completed?)
-    @disable_unmute_assignment = @assignment.muted && !@assignment.grades_published? && anonymous_moderated_marking_enabled?
+    @disable_unmute_assignment = @assignment.muted && !@assignment.grades_published?
     respond_to do |format|
 
       format.html do
         rubric = @assignment&.rubric_association&.rubric
         @headers = false
         @outer_frame = true
-        @anonymous_moderated_marking_enabled = anonymous_moderated_marking_enabled?
         log_asset_access([ "speed_grader", @context ], "grades", "other")
         env = {
           CONTEXT_ACTION_SOURCE: :speed_grader,
@@ -645,12 +643,12 @@ class GradebooksController < ApplicationController
           lti_retrieve_url: retrieve_course_external_tools_url(
             @context.id, assignment_id: @assignment.id, display: 'borderless'
           ),
-          anonymous_moderated_marking_enabled: @anonymous_moderated_marking_enabled,
           course_id: @context.id,
           assignment_id: @assignment.id,
           assignment_title: @assignment.title,
           rubric: rubric ? rubric_json(rubric, @current_user, session, style: 'full') : nil,
           nonScoringRubrics: @domain_root_account.feature_enabled?(:non_scoring_rubrics),
+          outcome_extra_credit_enabled: @context.feature_enabled?(:outcome_extra_credit),
           can_comment_on_submission: @can_comment_on_submission,
           show_help_menu_item: show_help_link?,
           help_url: help_link_url,
@@ -669,8 +667,7 @@ class GradebooksController < ApplicationController
         append_sis_data(env)
         js_env(env)
 
-        anonymous_grading = @assignment.anonymous_grading? && @anonymous_moderated_marking_enabled
-        render :speed_grader, locals: { anonymous_grading: anonymous_grading }
+        render :speed_grader, locals: { anonymous_grading: @assignment.anonymous_grading? }
       end
 
       format.json do
@@ -760,10 +757,6 @@ class GradebooksController < ApplicationController
     if @context.root_account.feature_enabled?(:non_scoring_rubrics)
       @context.account.resolved_outcome_proficiency&.as_json
     end
-  end
-
-  def anonymous_moderated_marking_enabled?
-    @context.root_account.feature_enabled?(:anonymous_moderated_marking)
   end
 
   def new_gradebook_env

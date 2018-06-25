@@ -50,7 +50,7 @@ QUnit.module('GradeInput using CompleteIncompleteGradeInput', suiteHooks => {
       menuContentRef(ref) {
         $menuContent = ref
       },
-      onMenuClose() {
+      onMenuDismiss() {
         resolveClose()
       },
       submission
@@ -76,7 +76,7 @@ QUnit.module('GradeInput using CompleteIncompleteGradeInput', suiteHooks => {
     return new Promise(resolve => {
       const waitForMenuReady = () => {
         setTimeout(() => {
-          if ($menuContent && $menuContent.contains(document.activeElement)) {
+          if ($menuContent) {
             resolve()
           } else {
             waitForMenuReady()

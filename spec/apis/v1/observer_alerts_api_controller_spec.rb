@@ -28,13 +28,14 @@ describe ObserverAlertsApiController, type: :request do
       @course = course_model
       @assignment = assignment_model(context: @course)
 
-      alerts << observer_alert_model(course: @course, alert_type: 'assignment_grade_high', context: @assignment)
+      alerts << observer_alert_model(course: @course, alert_type: 'assignment_grade_high',
+        threshold: 80, context: @assignment)
       observer_alert_threshold = @observer_alert_threshold
 
       alerts << observer_alert_model(course: @course, observer: @observer, student: @student, link: @observation_link,
-        alert_type: 'assignment_grade_low', context: @assignment)
+        alert_type: 'assignment_grade_low', threshold: 70, context: @assignment)
       alerts << observer_alert_model(course: @course, observer: @observer, student: @student, link: @observation_link,
-        alert_type: 'course_grade_high', context: @course)
+        alert_type: 'course_grade_high', threshold: 80, context: @course)
 
       @observer_alert_threshold = observer_alert_threshold
 
@@ -71,7 +72,8 @@ describe ObserverAlertsApiController, type: :request do
       user = user_model
       link = UserObservationLink.create(observer: @observer, student: user)
       asg = assignment_model(context: @course)
-      observer_alert_model(link: link, observer: @observer, alert_type: 'assignment_grade_high', context: asg)
+      observer_alert_model(link: link, observer: @observer, alert_type: 'assignment_grade_high',
+        threshold: 90, context: asg)
       json = api_call_as_user(@observer, :get, @path, @params)
       expect(json.length).to eq 3
     end
@@ -92,10 +94,13 @@ describe ObserverAlertsApiController, type: :request do
       @course = course_model
       @assignment = assignment_model(context: @course)
 
-      observer_alert_model(course: @course, alert_type: 'assignment_grade_high', context: @assignment, workflow_state: 'unread')
+      observer_alert_model(course: @course, alert_type: 'assignment_grade_high',
+        threshold: 90, context: @assignment, workflow_state: 'unread')
       student = @student
-      observer_alert_model(course: @course, alert_type: 'assignment_grade_high', context: @assignment, workflow_state: 'unread', observer: @observer)
-      observer_alert_model(course: @course, alert_type: 'assignment_grade_low', context: @assignment, workflow_state: 'read', observer: @observer)
+      observer_alert_model(course: @course, alert_type: 'assignment_grade_high',
+        threshold: 90, context: @assignment, workflow_state: 'unread', observer: @observer)
+      observer_alert_model(course: @course, alert_type: 'assignment_grade_low',
+        threshold: 40, context: @assignment, workflow_state: 'read', observer: @observer)
       @student = student
     end
 
@@ -121,7 +126,7 @@ describe ObserverAlertsApiController, type: :request do
       @course = course_model
       @assignment = assignment_model(context: @course)
 
-      observer_alert_model(course: @course, alert_type: 'assignment_grade_high', context: @assignment)
+      observer_alert_model(course: @course, alert_type: 'assignment_grade_high', threshold: 80, context: @assignment)
 
       @path = "/api/v1/users/#{@observer.id}/observer_alerts/#{@observer_alert.id}"
       @params = {user_id: @observer.to_param, observer_alert_id: @observer_alert.to_param,

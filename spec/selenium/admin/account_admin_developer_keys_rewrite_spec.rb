@@ -25,9 +25,9 @@ describe 'Developer Keys' do
     before(:each) do
       admin_logged_in
       Setting.set(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, 'true')
-      Account.default.enable_feature!(:developer_key_management_ui_rewrite)
-      Account.site_admin.allow_feature!(:api_token_scoping)
-      Account.default.enable_feature!(:api_token_scoping)
+      Account.default.enable_feature!(:developer_key_management_and_scoping)
+      Account.site_admin.allow_feature!(:developer_key_management_and_scoping)
+      Account.default.enable_feature!(:developer_key_management_and_scoping)
     end
 
     let(:root_developer_key) do
@@ -133,7 +133,7 @@ describe 'Developer Keys' do
       skip_if_safari(:alert)
       root_developer_key
       get "/accounts/#{Account.default.id}/developer_keys"
-      fj("table[data-automation='devKeyAdminTable'] tbody tr.key button:has(svg[name='IconTrash'])").click
+      fj("table[data-automation='devKeyAdminTable'] tbody tr button:has(svg[name='IconTrash'])").click
       accept_alert
       expect(f("table[data-automation='devKeyAdminTable']")).not_to contain_css("tbody tr")
       expect(Account.default.developer_keys.nondeleted.count).to eq 0
@@ -162,7 +162,7 @@ describe 'Developer Keys' do
       site_admin_developer_key
       site_admin_logged_in
       get "/accounts/site_admin/developer_keys"
-      expect(f("table[data-automation='devKeyAdminTable'] tr.key")).to contain_css("svg[name='IconOff']")
+      expect(f("table[data-automation='devKeyAdminTable'] tbody tr")).to contain_css("svg[name='IconOff']")
       expect(site_admin_developer_key.reload.visible).to eq false
     end
 
@@ -171,7 +171,7 @@ describe 'Developer Keys' do
       site_admin_logged_in
       get "/accounts/site_admin/developer_keys"
       fj("table[data-automation='devKeyAdminTable'] button:has(svg[name='IconOff'])").click
-      expect(f("table[data-automation='devKeyAdminTable'] tr.key")).not_to contain_css("svg[name='IconOff']")
+      expect(f("table[data-automation='devKeyAdminTable'] tr")).not_to contain_css("svg[name='IconOff']")
       expect(site_admin_developer_key.reload.visible).to eq true
     end
 
@@ -279,7 +279,8 @@ describe 'Developer Keys' do
     end
 
     context "scopes" do
-      let(:expected_scopes) do
+      let(:api_token_scopes) { ["url:GET|/api/v1/accounts/:account_id/scopes"] }
+      let(:assignment_groups_scopes) do
         [
           "url:GET|/api/v1/courses/:course_id/assignment_groups",
           "url:GET|/api/v1/courses/:course_id/assignment_groups/:assignment_group_id",
@@ -287,6 +288,14 @@ describe 'Developer Keys' do
           "url:PUT|/api/v1/courses/:course_id/assignment_groups/:assignment_group_id",
           "url:DELETE|/api/v1/courses/:course_id/assignment_groups/:assignment_group_id"
         ]
+      end
+      let(:developer_key_with_scopes) do
+        DeveloperKey.create!(
+          name: 'Developer Key With Scopes',
+          account: Account.default,
+          scopes: api_token_scopes + assignment_groups_scopes,
+          require_scopes: true
+        )
       end
 
       it "does not have enforce scopes toggle activated on initial dev key creation" do
@@ -307,18 +316,18 @@ describe 'Developer Keys' do
 
       it "allows filtering by scope group name" do
         expand_scope_group_by_filter('Assignment Groups', Account.default.id)
-        expect(ff(".toggle-scope-group")).to have_size(1)
+        expect(ff("[data-automation='toggle-scope-group']")).to have_size(1)
       end
 
       it "expands scope group when group name is selected" do
         expand_scope_group_by_filter('Assignment Groups', Account.default.id)
-        expect(f(".toggle-scope-group button").attribute('aria-expanded')).to eq 'true'
-        expect(ff(".toggle-scope-group .developer-key-scope")).to have_size(5)
+        expect(f("[data-automation='toggle-scope-group'] button").attribute('aria-expanded')).to eq 'true'
+        expect(ff("[data-automation='developer-key-scope']")).to have_size(5)
       end
 
       it "includes proper scopes for scope group" do
         expand_scope_group_by_filter('Assignment Groups', Account.default.id)
-        scope_group = f(".toggle-scope-group")
+        scope_group = f("[data-automation='toggle-scope-group']")
         expect(scope_group).to contain_css("span[title='GET']")
         expect(scope_group).to contain_css("span[title='POST']")
         expect(scope_group).to contain_css("span[title='PUT']")
@@ -329,20 +338,20 @@ describe 'Developer Keys' do
         expand_scope_group_by_filter('Assignment Groups', Account.default.id)
         click_scope_group_checkbox
         # checks that all UI pills have been added to scope group if selected
-        expect(ff(".toggle-scope-group span[title='GET']")).to have_size(3)
-        expect(ff(".toggle-scope-group span[title='POST']")).to have_size(2)
-        expect(ff(".toggle-scope-group span[title='PUT']")).to have_size(2)
-        expect(ff(".toggle-scope-group span[title='DELETE']")).to have_size(2)
+        expect(ff("[data-automation='toggle-scope-group'] span[title='GET']")).to have_size(3)
+        expect(ff("[data-automation='toggle-scope-group'] span[title='POST']")).to have_size(2)
+        expect(ff("[data-automation='toggle-scope-group'] span[title='PUT']")).to have_size(2)
+        expect(ff("[data-automation='toggle-scope-group'] span[title='DELETE']")).to have_size(2)
       end
 
       it "scope group individual checkbox adds only associated scope" do
         expand_scope_group_by_filter('Assignment Groups', Account.default.id)
         click_scope_checkbox
         # adds a UI pill to scope group with http verb if scope selected
-        expect(ff(".toggle-scope-group span[title='GET']")).to have_size(3)
-        expect(ff(".toggle-scope-group span[title='POST']")).to have_size(1)
-        expect(ff(".toggle-scope-group span[title='PUT']")).to have_size(1)
-        expect(ff(".toggle-scope-group span[title='DELETE']")).to have_size(1)
+        expect(ff("[data-automation='toggle-scope-group'] span[title='GET']")).to have_size(3)
+        expect(ff("[data-automation='toggle-scope-group'] span[title='POST']")).to have_size(1)
+        expect(ff("[data-automation='toggle-scope-group'] span[title='PUT']")).to have_size(1)
+        expect(ff("[data-automation='toggle-scope-group'] span[title='DELETE']")).to have_size(1)
       end
 
       it "adds scopes to backend developer key via UI" do
@@ -350,7 +359,7 @@ describe 'Developer Keys' do
         click_scope_group_checkbox
         find_button("Save Key").click
         wait_for_ajaximations
-        expect(DeveloperKey.last.scopes).to eq expected_scopes
+        expect(DeveloperKey.last.scopes).to eq assignment_groups_scopes
       end
 
       it "adds scopes to backend developer key via UI in site admin" do
@@ -359,41 +368,67 @@ describe 'Developer Keys' do
         click_scope_group_checkbox
         find_button("Save Key").click
         wait_for_ajaximations
-        expect(DeveloperKey.last.scopes).to eq expected_scopes
+        expect(DeveloperKey.last.scopes).to eq assignment_groups_scopes
       end
 
-      it "removes scopes from backend developer key via UI" do
-        skip 'will be fixed in PLAT-3391'
-        expand_scope_group_by_filter('Assignment Groups', Account.default.id)
-        click_scope_group_checkbox
-        find_button("Save Key").click
+      it "removes scopes from backend developer key through UI" do
+        developer_key_with_scopes
+        get "/accounts/#{Account.default.id}/developer_keys"
         click_edit_icon
-        filter_scopes_by_name 'Assignment Groups'
+        filter_scopes_by_name('Assignment Groups')
         click_scope_group_checkbox
-        dk = DeveloperKey.last
         find_button("Save Key").click
-        wait_for_ajaximations
-        expect(dk.reload.scopes).not_to eq expected_scopes
+        wait_for_ajax_requests
+        expect(developer_key_with_scopes.reload.scopes).to eq api_token_scopes
       end
 
       it "keeps all endpoints read only checkbox checked after save" do
-        skip 'will be fixed in PLAT-3391'
         get "/accounts/#{Account.default.id}/developer_keys"
         find_button("Developer Key").click
         click_enforce_scopes
-        select_all_readonly_checkbox.click
+        click_select_all_readonly_checkbox
         find_button("Save Key").click
+        wait_for_dev_key_modal_to_close
         click_edit_icon
         expect(all_endpoints_readonly_checkbox_selected?).to eq true
       end
 
       it "keeps all endpoints read only checkbox checked if check/unchecking another http method" do
         expand_scope_group_by_filter('Assignment Groups', Account.default.id)
-        select_all_readonly_checkbox.click
+        click_select_all_readonly_checkbox
         click_scope_checkbox
-        expect(f(".toggle-scope-group input[type='checkbox']").selected?).to eq false
+        expect(f("[data-automation='toggle-scope-group'] input[type='checkbox']").selected?).to eq false
         click_scope_checkbox
         expect(all_endpoints_readonly_checkbox_selected?).to eq true
+      end
+
+      it "opens the developer key modal when open modal anchor is present" do
+        get "/accounts/#{Account.default.id}/developer_keys#key_modal_opened"
+        expect(find_button("Save Key")).to be_present
+      end
+
+      it "displays flash alert if scopes aren't selected when enforce scopes toggled" do
+        get "/accounts/#{Account.default.id}/developer_keys"
+        find_button("Developer Key").click
+        wait_for_ajaximations
+        click_enforce_scopes
+        wait_for_ajaximations
+        find_button("Save Key").click
+        flash_holder = f("#flash_message_holder")
+        keep_trying_until do
+          expect(flash_holder.text).to eq 'At least one scope must be selected.' if flash_holder.text.present?
+        end
+      end
+
+      it "clears current developer key state when browser back button is pressed" do
+        developer_key_with_scopes
+        get "/accounts/#{Account.default.id}/developer_keys"
+        click_edit_icon
+        wait_for_ajaximations
+        driver.navigate.back
+        wait_for_dev_key_modal_to_close
+        find_button("Developer Key").click
+        expect(f("input[name='developer_key[name]']").attribute('value')).not_to be_present
       end
     end
   end

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getSortedRoles, roleSortedInsert} from '../utils'
+import {getSortedRoles, roleSortedInsert, roleIsCourseBaseRole, roleIsBaseRole} from '../utils'
 
 it('getSortedRoles sorts roles properly based on base_role_type', () => {
   const UNORDERED_ROLES = [
@@ -284,4 +284,15 @@ it('roleSortedInsert sorts roles properly inserts Role into middle item', () => 
 
   const orderedRoles = roleSortedInsert(ALL_ROLES, ROLE_TO_INSERT)
   expect(orderedRoles).toMatchObject(ORDERED_ROLES)
+})
+
+it('does not return account base roles as course base roles', () => {
+  const accountBaserole = {
+    id: '1',
+    role: 'AccountAdmin',
+    base_role_type: 'AccountMembership'
+  }
+
+  expect(roleIsCourseBaseRole(accountBaserole)).toBeFalsy()
+  expect(roleIsBaseRole(accountBaserole)).toBeTruthy()
 })

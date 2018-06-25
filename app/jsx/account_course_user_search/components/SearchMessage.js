@@ -22,6 +22,7 @@ import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import { array, func, string, shape, oneOf } from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
 import Alert from '@instructure/ui-alerts/lib/components/Alert'
+import View from '@instructure/ui-layout/lib/components/View'
 
 const linkPropType = shape({
   url: string.isRequired,
@@ -127,6 +128,12 @@ export default class SearchMessage extends Component {
             {errorLoadingMessage}
           </div>
         </div>
+      )
+    } else if (collection.loading) {
+      return (
+        <View display="block" textAlign="center" padding="medium">
+          <Spinner size="medium" title={I18n.t('Loading...')} />
+        </View>
       )
     } else if (!collection.data.length) {
       return (

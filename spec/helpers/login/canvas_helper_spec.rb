@@ -40,4 +40,23 @@ describe Login::CanvasHelper do
       end
     end
   end
+
+  describe '#reg_link_data' do
+    before :once do
+      @domain_root_account = account_model
+    end
+
+    it 'returns the proper template when an auth type is present' do
+      expect(helper.reg_link_data('customAuth')[:template]).to eq 'customauthDialog'
+    end
+
+    it 'returns the proper template without an auth type' do
+      expect(helper.reg_link_data(nil)[:template]).to eq 'parentDialog'
+    end
+
+    it 'returns the proper template when the root account has pairing codes turned on' do
+      @domain_root_account.enable_feature!(:observer_pairing_code)
+      expect(helper.reg_link_data(nil)[:template]).to eq 'newParentDialog'
+    end
+  end
 end

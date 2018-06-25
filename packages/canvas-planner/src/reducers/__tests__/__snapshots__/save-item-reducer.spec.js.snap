@@ -33,6 +33,7 @@ Object {
     "allPastItemsLoaded": false,
     "partialFutureDays": Array [],
     "partialPastDays": Array [],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -70,6 +71,7 @@ Object {
     "allPastItemsLoaded": true,
     "partialFutureDays": Array [],
     "partialPastDays": Array [],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -119,6 +121,7 @@ Object {
     "allPastItemsLoaded": false,
     "partialFutureDays": Array [],
     "partialPastDays": Array [],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -158,6 +161,7 @@ Object {
     "allPastItemsLoaded": false,
     "partialFutureDays": Array [],
     "partialPastDays": Array [],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -208,6 +212,7 @@ Object {
       ],
     ],
     "partialPastDays": Array [],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -270,6 +275,7 @@ Object {
       ],
     ],
     "partialPastDays": Array [],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -315,6 +321,7 @@ Object {
       ],
     ],
     "partialPastDays": Array [],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -365,6 +372,7 @@ Object {
         ],
       ],
     ],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -427,6 +435,7 @@ Object {
         ],
       ],
     ],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -472,6 +481,7 @@ Object {
         ],
       ],
     ],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -521,6 +531,7 @@ Object {
     "allPastItemsLoaded": false,
     "partialFutureDays": Array [],
     "partialPastDays": Array [],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -572,6 +583,7 @@ Object {
     "allPastItemsLoaded": false,
     "partialFutureDays": Array [],
     "partialPastDays": Array [],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -584,6 +596,7 @@ Object {
     "allPastItemsLoaded": false,
     "partialFutureDays": Array [],
     "partialPastDays": Array [],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -609,6 +622,7 @@ Object {
     "allPastItemsLoaded": false,
     "partialFutureDays": Array [],
     "partialPastDays": Array [],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -634,6 +648,33 @@ Object {
     "allPastItemsLoaded": false,
     "partialFutureDays": Array [],
     "partialPastDays": Array [],
+    "plannerLoaded": true,
+  },
+}
+`;
+
+exports[`does nothing if the planner is not loaded 1`] = `
+Object {
+  "days": Array [
+    Array [
+      "2018-01-01",
+      Array [
+        Object {
+          "date": "2018-01-01T00:00:00.000Z",
+          "dateBucketMoment": "2018-01-01T00:00:00.000Z",
+          "id": 0,
+          "title": "0",
+          "uniqueId": 0,
+        },
+      ],
+    ],
+  ],
+  "loading": Object {
+    "allFutureItemsLoaded": false,
+    "allPastItemsLoaded": false,
+    "partialFutureDays": Array [],
+    "partialPastDays": Array [],
+    "plannerLoaded": false,
   },
 }
 `;
@@ -659,6 +700,7 @@ Object {
     "allPastItemsLoaded": false,
     "partialFutureDays": Array [],
     "partialPastDays": Array [],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -684,6 +726,7 @@ Object {
     "allPastItemsLoaded": false,
     "partialFutureDays": Array [],
     "partialPastDays": Array [],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -722,6 +765,7 @@ Object {
       ],
     ],
     "partialPastDays": Array [],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -760,6 +804,7 @@ Object {
         ],
       ],
     ],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -785,6 +830,7 @@ Object {
     "allPastItemsLoaded": false,
     "partialFutureDays": Array [],
     "partialPastDays": Array [],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -810,6 +856,7 @@ Object {
     "allPastItemsLoaded": true,
     "partialFutureDays": Array [],
     "partialPastDays": Array [],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -835,6 +882,7 @@ Object {
     "allPastItemsLoaded": false,
     "partialFutureDays": Array [],
     "partialPastDays": Array [],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -879,6 +927,7 @@ Object {
     "allPastItemsLoaded": false,
     "partialFutureDays": Array [],
     "partialPastDays": Array [],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -924,6 +973,7 @@ Object {
       ],
     ],
     "partialPastDays": Array [],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -969,6 +1019,7 @@ Object {
         ],
       ],
     ],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -1007,6 +1058,7 @@ Object {
       ],
     ],
     "partialPastDays": Array [],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -1045,6 +1097,7 @@ Object {
         ],
       ],
     ],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -1084,6 +1137,7 @@ Object {
     "allPastItemsLoaded": false,
     "partialFutureDays": Array [],
     "partialPastDays": Array [],
+    "plannerLoaded": true,
   },
 }
 `;
@@ -1116,6 +1170,7 @@ Object {
     "allPastItemsLoaded": false,
     "partialFutureDays": Array [],
     "partialPastDays": Array [],
+    "plannerLoaded": true,
   },
 }
 `;

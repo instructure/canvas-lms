@@ -187,7 +187,7 @@ describe "assignment groups" do
     replace_content(f("#ag_#{ag.id}_assignment_name"), "Disappear")
     fj('.create_assignment:visible').click
     wait_for_ajaximations
-
+    refresh_page
     expect(fj("#assignment_group_#{ag.id} .assignment:eq(1) .ig-title").text).to match "Disappear"
 
     f("#assignment_group_#{ag.id} .al-trigger").click
@@ -264,6 +264,7 @@ describe "assignment groups" do
       replace_content(f("#ag_#{ag.id}_assignment_points"), assignment_points)
       fj('.create_assignment:visible').click
       wait_for_ajaximations
+      refresh_page
 
       # Checks for correct values in back end.
       a = ag.reload.assignments.last

@@ -78,14 +78,14 @@ test('it does not render the table if no keys are given', () => {
   notOk(componentNode([]))
 })
 
-test('does not render the "User" heading if inherited', () => {
+test('does not render the "Owner Email" heading if inherited', () => {
   const node = componentNode(devKeyList(), true)
   equal(node.querySelectorAll('th')[1].innerText, 'Details')
 })
 
-test('does render the "User" heading if not inherited', () => {
+test('does render the "Owner Email" heading if not inherited', () => {
   const node = componentNode()
-  equal(node.querySelectorAll('th')[1].innerText, 'User')
+  equal(node.querySelectorAll('th')[1].innerText, 'Owner Email')
 })
 
 test('does not render the "Stats" heading if inherited', () => {

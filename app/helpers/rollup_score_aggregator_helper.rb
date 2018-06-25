@@ -17,7 +17,9 @@
 
 module RollupScoreAggregatorHelper
   def aggregate_score
-    (scores.sum.to_f / scores.size).round(2)
+    scores = score_sets.pluck(:score)
+    agg_score = (scores.sum.to_f / scores.size).round(2)
+    {score: agg_score, results: score_sets.pluck(:result)}
   end
 
   private
@@ -42,7 +44,8 @@ module RollupScoreAggregatorHelper
 
   def retrieve_scores(results)
     results.map do |result|
-      quiz_score?(result) ? scaled_score_from_result(result) : result_score(result)
+      score = quiz_score?(result) ? scaled_score_from_result(result) : result_score(result)
+      {score: score, result: result}
     end
   end
 
@@ -90,15 +93,15 @@ module RollupScoreAggregatorHelper
     end
   end
 
-  def scores
-    @scores || begin
+  def score_sets
+    @score_sets || begin
       case @calculation_method
       when 'decaying_average'
-        @scores = retrieve_scores(@aggregate ? @outcome_results : sorted_results)
+        @score_sets = retrieve_scores(@aggregate ? @outcome_results : sorted_results)
       when 'n_mastery', 'highest'
-        @scores = retrieve_scores(@outcome_results)
+        @score_sets = retrieve_scores(@outcome_results)
       when 'latest'
-        @scores = retrieve_scores(@aggregate ? @outcome_results : [sorted_results.last])
+        @score_sets = retrieve_scores(@aggregate ? @outcome_results : [sorted_results.last])
       end
     end
   end

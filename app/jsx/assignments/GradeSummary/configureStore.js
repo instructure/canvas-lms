@@ -28,6 +28,8 @@ const createStoreWithMiddleware = applyMiddleware(ReduxThunk)(createStore)
 export default function configureStore(env) {
   const contextReducer = state =>
     state || {
+      currentUser: env.currentUser,
+      finalGrader: env.finalGrader,
       graders: env.graders
     }
 

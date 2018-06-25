@@ -32,7 +32,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
       total_students: 6,
       teachers: [{
         id: '1',
-        display_name: 'Testing Teacher'
+        name: 'Testing Teacher'
       }],
       term: {
         name: "A Term"
@@ -45,7 +45,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
       total_students: 7,
       teachers: [{
         id: '1',
-        display_name: 'Testing Teacher'
+        name: 'Testing Teacher'
       }],
       term: {
         name: "Ba Term"
@@ -58,7 +58,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
       total_students: 6,
       teachers: [{
         id: '1',
-        display_name: 'Testing Teacher'
+        name: 'Testing Teacher'
       }],
       term: {
         name: "Bb Term"
@@ -71,7 +71,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
       total_students: 6,
       teachers: [{
         id: '1',
-        display_name: 'Testing Teacher'
+        name: 'Testing Teacher'
       }],
       term: {
         name: "C Term"
@@ -84,7 +84,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
       total_students: 11,
       teachers: [{
         id: '1',
-        display_name: 'Testing Teacher'
+        name: 'Testing Teacher'
       }],
       term: {
         name: "De Term"
@@ -97,7 +97,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
       total_students: 10,
       teachers: [{
         id: '1',
-        display_name: 'Testing Teacher'
+        name: 'Testing Teacher'
       }],
       term: {
         name: "Dz Term"

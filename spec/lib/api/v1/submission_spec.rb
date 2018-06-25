@@ -35,11 +35,16 @@ describe Api::V1::Submission do
   let(:user) { User.create! }
   let(:course) { Course.create! }
   let(:assignment) { course.assignments.create! }
+  let(:teacher) {
+    teacher = User.create!
+    course.enroll_teacher(teacher)
+    teacher
+  }
   let(:session) { {} }
   let(:context) { nil }
   let(:params) { { includes: [field]} }
   let(:submission) { assignment.submissions.create!(user: user) }
-  let(:provisional_grade) { submission.provisional_grades.create!(scorer: User.create!) }
+  let(:provisional_grade) { submission.provisional_grades.create!(scorer: teacher) }
 
   describe 'speedgrader_url' do
     it "links to the speed grader for a student's submission" do

@@ -53,31 +53,7 @@
           </span>
         </button>
 
-        <% unless @anonymous_moderated_marking_enabled %>
-          <button id="keyboard-shortcut-info-icon" class="Button Button--icon-action gradebookActions__Button" type="button" title="<%= t('Keyboard Shortcuts') %>">
-            <i class="icon-keyboard-shortcuts" aria-hidden="true"></i>
-            <span class="screenreader-only" aria-hidden="true"><%= t('Keyboard Shortcuts') %></span>
-          </button>
-        <% end %>
-
-        <% if help_link && !@anonymous_moderated_marking_enabled %>
-          <%= link_to help_link_url,
-                class: help_link_classes(["Button Button--icon-action gradebookActions__Button exclude_external_icon"]),
-                title: help_link_name,
-                data: help_link_data do %>
-            <span class="gradebookActions__Svg" role="presentation"><%= svg_icon help_link_icon %></span>
-            <span class="screenreader-only" aria-hidden="true"><%= help_link_name %></span>
-          <% end %>
-        <% end %>
-
-        <% if @anonymous_moderated_marking_enabled %>
-          <span id="speedgrader-settings"></span>
-        <% else %>
-          <button id="settings_link" class="Button Button--icon-action gradebookActions__Button" type="button" title="<%= t('Settings') %>">
-            <i class="icon-settings" aria-hidden="true"></i>
-            <span class="screenreader-only" aria-hidden="true"><%= t('SpeedGrader Settings') %></span>
-          </button>
-        <% end %>
+        <span id="speedgrader-settings"></span>
       </div>
       <div class="assignmentDetails">
         <a id="assignment_url" href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>">
@@ -261,7 +237,12 @@
             </div>
               <h2><%= t("Grading") %></h2>
               <div id="rubric_holder">
-                <%= render :partial => "shared/rubric", :object => @assignment.try_rescue(:rubric_association).try_rescue(:rubric), :locals => {:assessing => true, :rubric_association => @assignment.rubric_association } if @assignment.try_rescue(:rubric_association).try_rescue(:rubric) %>
+                <%= render :partial => "shared/rubric",
+                           :object => @assignment.try_rescue(:rubric_association).try_rescue(:rubric),
+                           :locals => {
+                             :assessing => can_do(@context, @current_user, :manage_grades),
+                             :rubric_association => @assignment.rubric_association
+                           } if @assignment.try_rescue(:rubric_association).try_rescue(:rubric) %>
                 <div class="button-container">
                   <% if can_do(@context, @current_user, :manage_grades) %>
                     <button type="button" class="save_rubric_button Button Button--primary"><%= t("Save") %></button>
@@ -280,10 +261,7 @@
             <% if can_do(@context, @current_user, :manage_grades) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin)) %>
               <div id="grade_container">
                 <%= render partial: "grading_box_extended",
-                  locals: {
-                    assignment: @assignment,
-                    anonymous_moderated_marking_enabled: @anonymous_moderated_marking_enabled
-                  }
+                  locals: {assignment: @assignment}
                 %>
                 <span class="turnitin_score_container"></span>
                 <a href="#" id="submit_same_score"><br><%= t('links.submit_same_score', "Use this same grade for the resubmission") %></a>
@@ -334,7 +312,7 @@
                 </div>
               </div>
               <div class="comment_attachment" id="comment_attachment_blank" style="display: none;">
-                <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{ submitter_id }}", :comment_id => "{{ comment_id }}", :download => "{{ id }}") %>"><span class="display_name">&nbsp;</span></a>
+                <a href="<%= context_url(@context, resource, @assignment.id, "{{ submitter_id }}", :comment_id => "{{ comment_id }}", :download => "{{ id }}") %>"><span class="display_name">&nbsp;</span></a>
               </div>
             </div>
           </div>
@@ -413,7 +391,6 @@
     </div>
   </div>
 </div>
-<a style="display:none;" id="assignment_submission_url" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{submission_id}}") %>"></a>
 <a style="display:none;" id="assignment_submission_turnitin_report_url" href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @assignment.id, "{{ user_id }}", "{{ asset_string }}") %>"></a>
 <a style="display:none;" id="assignment_submission_originality_report_url" href="<%= context_url(@context, :context_assignment_submission_originality_report_url, @assignment.id, "{{ user_id }}", "{{ asset_string }}")%>"></a>
 <a style="display:none;" id="assignment_submission_resubmit_to_turnitin_url" href="<%= context_url(@context, :context_assignment_submission_resubmit_to_turnitin_url, @assignment.id, "{{ user_id }}") %>"></a>

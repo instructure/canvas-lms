@@ -19,6 +19,7 @@
 import React from 'react'
 import {arrayOf, bool, func, number, objectOf, shape, string} from 'prop-types'
 import Button from '@instructure/ui-buttons/lib/components/Button'
+import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
 import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGroup'
@@ -78,11 +79,15 @@ export default class SpeedGraderProvisionalGradeSelector extends React.Component
     const {pointsPossible} = this.props
     const graderName = this.props.provisionalGraderDisplayNames[grade.provisional_grade_id]
 
+    // A provisional grade isn't *really* a submission object, but it has the
+    // two fields ("score" and "grade") relevant to formatting.
+    const formattedScore = GradeFormatHelper.formatSubmissionGrade(grade, {formatType: this.props.gradingType})
+
     return (
       <View>
-        <Text size="small" weight="bold">{grade.grade}</Text>
+        <Text size="small" weight="bold">{formattedScore}</Text>
         {this.props.gradingType === 'points' &&
-          <Text size="small"> {I18n.t('out of %{pointsPossible}', {pointsPossible})}</Text>
+          <Text size="small"> {I18n.t('out of %{pointsPossible}', {pointsPossible: I18n.n(pointsPossible)})}</Text>
         }
 
         <View padding="none small">

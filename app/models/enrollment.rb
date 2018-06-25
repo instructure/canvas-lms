@@ -40,7 +40,7 @@ class Enrollment < ActiveRecord::Base
   belongs_to :role
   include Role::AssociationHelper
 
-  has_one :enrollment_state, :dependent => :destroy
+  has_one :enrollment_state, :dependent => :destroy, inverse_of: :enrollment
 
   has_many :role_overrides, :as => :context, :inverse_of => :context
   has_many :pseudonyms, :primary_key => :user_id, :foreign_key => :user_id
@@ -714,10 +714,13 @@ class Enrollment < ActiveRecord::Base
 
   def enrollment_state
     raise "cannot call enrollment_state on a new record" if new_record?
-    state = self.association(:enrollment_state).target ||=
-      self.shard.activate { EnrollmentState.where(:enrollment_id => self).first }
-    state.association(:enrollment).target ||= self # ensure reverse association
-    state
+    result = super
+    unless result
+      association(:enrollment_state).reload
+      result = super
+    end
+    result.enrollment = self # ensure reverse association
+    result
   end
 
   def create_enrollment_state
@@ -1440,7 +1443,6 @@ class Enrollment < ActiveRecord::Base
 
   def remove_user_as_final_grader?
     instructor? &&
-      root_account.feature_enabled?(:anonymous_moderated_marking) &&
       !other_enrollments_of_type(['TaEnrollment', 'TeacherEnrollment']).exists?
   end
 

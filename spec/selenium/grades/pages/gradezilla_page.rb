@@ -21,8 +21,6 @@ class Gradezilla
   class << self
     include SeleniumDependencies
 
-    private
-
     # Student Headings
     STUDENT_COLUMN_MENU_SELECTOR = '.container_0 .Gradebook__ColumnHeaderAction'.freeze
 
@@ -44,7 +42,7 @@ class Gradezilla
     end
 
     def notes_option
-      f('span [data-menu-item-id="show-notes-column"]')
+      fj('[role="menuitemcheckbox"]:contains("Notes")')
     end
 
     def save_button
@@ -54,7 +52,7 @@ class Gradezilla
     # ---------------------NEW-----------------------
     # assignment header column elements
     def assignment_header_menu_element(id)
-      f(".slick-header-column[id*='assignment_#{id}'] .Gradebook__ColumnHeaderAction [id*='PopoverMenu']")
+      f(".slick-header-column[id*='assignment_#{id}'] .Gradebook__ColumnHeaderAction [id*='Menu']")
     end
 
     def assignment_header_menu_item_element(item_name)
@@ -73,13 +71,17 @@ class Gradezilla
       select_assignment_header_cell_element(title).find('.assignment-name')
     end
 
+    def assignment_menu_selector(menu_text)
+      fj("span[role='menuitem']:contains('#{menu_text}')")
+    end
+
     # student header column elements
     def student_column_menu
       f("span .Gradebook__ColumnHeaderAction")
     end
 
     def student_header_menu_main_element(menu)
-      fj("[role=menu][aria-labelledby*=PopoverMenu] button:contains('#{menu}')")
+      fj("[role=menu][aria-labelledby*=Menu] button:contains('#{menu}')")
     end
 
     def student_header_submenu_item_element(sub_menu_item)
@@ -104,7 +106,7 @@ class Gradezilla
     # ---------------------END NEW-----------------------
 
     def menu_container(container_id)
-      selector = '[aria-expanded=true][role=menu]'
+      selector = '[role=menu]'
       selector += "[aria-labelledby=#{container_id}]" if container_id
 
       f(selector)
@@ -167,7 +169,7 @@ class Gradezilla
     end
 
     def filters_element
-      fj('li:contains(Filters)')
+      fj('li:contains(Filters) button')
     end
 
     def show_grading_period_filter_element
@@ -186,8 +188,6 @@ class Gradezilla
       fj('li li:contains("Unpublished Assignments")')
     end
 
-    public
-
     def body
       f('body')
     end
@@ -201,7 +201,7 @@ class Gradezilla
     end
 
     def expanded_popover_menu_selector
-      '[aria-labelledby*="PopoverMenu"][aria-expanded="true"]'
+      '[role="menu"][aria-labelledby*="Menu"]'
     end
 
     def expanded_popover_menu
@@ -549,10 +549,6 @@ class Gradezilla
 
     # ASSIGNMENT COLUMN HEADER OPTIONS
     # css selectors
-    def assignment_header_menu_selector(id)
-      assignment_header_menu_element(id)
-    end
-
     def assignment_header_cell_element(title)
       f(assignment_header_cell_selector(title))
     end
@@ -578,7 +574,7 @@ class Gradezilla
     end
 
     def select_filters
-      filters_element.click
+      hover(filters_element)
     end
 
     def select_view_filter(filter)
@@ -623,7 +619,9 @@ class Gradezilla
     end
 
     def click_assignment_popover_sort_by(sort_type)
-      hover(assignment_header_popover_menu_element("Sort by"))
+      assignment_header_popover_menu_element("Sort by").click # focus it
+      assignment_header_popover_menu_element("Sort by").click # open it
+
       sort_by_item = ""
 
       if sort_type =~ /(low[\s\-]to[\s\-]high)/i
@@ -638,6 +636,7 @@ class Gradezilla
         sort_by_item = 'Unposted'
       end
       assignment_header_popover_sub_item_element(sort_by_item).click
+      driver.action.send_keys(:escape).perform
     end
 
     def click_assignment_popover_enter_grade_as(assignment_id, grade_type)

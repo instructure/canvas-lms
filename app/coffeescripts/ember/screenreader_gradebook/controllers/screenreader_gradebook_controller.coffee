@@ -819,7 +819,6 @@ define [
         hasGradingPeriods: !!@has_grading_periods
         selectedGradingPeriodID: @get('selectedGradingPeriod.id') || '0'
         isAdmin: ENV.current_user_roles && _.contains(ENV.current_user_roles, "admin")
-        anonymousModeratedMarkingEnabled: ENV.GRADEBOOK_OPTIONS.anonymous_moderated_marking_enabled
       )
       map.setup(@get('students').toArray(), @get('assignmentsFromGroups.content').toArray())
       @set('submissionStateMap', map)
@@ -927,6 +926,10 @@ define [
     selectedSubmissionHidden: (->
       @get('selectedSubmission.hidden') || false
     ).property('selectedStudent', 'selectedAssignment')
+
+    hideComments: (->
+      @get('selectedAssignment.muted') && (@get('selectedAssignment.anonymous_grading') || @get('selectedAssignment.moderated_grading')) || false
+    ).property('selectedAssignment')
 
     selectedSubmissionLate: (->
       ( @get('selectedSubmission.points_deducted') || 0 ) > 0

@@ -62,25 +62,6 @@ test('renders', () => {
   ok(view.$('.header-bar-right').length > 0, 'header bar is rendered')
 })
 
-test('renders the moderated grading form field group if Moderated Grading is enabled', () => {
-  ENV.MODERATED_GRADING_ENABLED = true
-  function beforeRender(editView) {
-    sinon.stub(editView.model, 'renderModeratedGradingFormFieldGroup')
-  }
-  const view = editHeaderView({}, {}, beforeRender)
-  strictEqual(view.model.renderModeratedGradingFormFieldGroup.callCount, 1)
-  view.model.renderModeratedGradingFormFieldGroup.restore()
-})
-
-test('does not render the moderated grading form field group if Moderated Grading is disabled', () => {
-  function beforeRender(editView) {
-    sinon.stub(editView.model, 'renderModeratedGradingFormFieldGroup')
-  }
-  const view = editHeaderView({}, {}, beforeRender)
-  strictEqual(view.model.renderModeratedGradingFormFieldGroup.callCount, 0)
-  view.model.renderModeratedGradingFormFieldGroup.restore()
-})
-
 test('delete works for an un-saved assignment', function() {
   const view = editHeaderView()
   const cb = this.stub(view, 'onDeleteSuccess')

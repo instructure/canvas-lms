@@ -22,12 +22,12 @@ import cs from '../../config/locales/cs.json';
 import da from '../../config/locales/da.json';
 import de from '../../config/locales/de.json';
 import el from '../../config/locales/el.json';
-import enAU from '../../config/locales/en-AU.json';
-import enGB from '../../config/locales/en-GB.json';
+import enAU from '../../config/locales/en_AU.json';
+import enGB from '../../config/locales/en_GB.json';
 import en from '../../config/locales/en.json';
 import es from '../../config/locales/es.json';
-import faIR from '../../config/locales/fa-IR.json';
-import frCA from '../../config/locales/fr-CA.json';
+import faIR from '../../config/locales/fa_IR.json';
+import frCA from '../../config/locales/fr_CA.json';
 import fr from '../../config/locales/fr.json';
 import he from '../../config/locales/he.json';
 import ht from '../../config/locales/ht.json';
@@ -41,23 +41,22 @@ import nl from '../../config/locales/nl.json';
 import nn from '../../config/locales/nn.json';
 import nb from '../../config/locales/no.json';
 import pl from '../../config/locales/pl.json';
-import ptBR from '../../config/locales/pt-BR.json';
+import ptBR from '../../config/locales/pt_BR.json';
 import pt from '../../config/locales/pt.json';
 import ro from '../../config/locales/ro.json';
 import ru from '../../config/locales/ru.json';
 import sq from '../../config/locales/sq.json';
 import sr from '../../config/locales/sr.json';
 import sv from '../../config/locales/sv.json';
-import tkTM from '../../config/locales/tk-TM.json';
 import tr from '../../config/locales/tr.json';
-import ukUA from '../../config/locales/uk-UA.json';
+import ukUA from '../../config/locales/uk_UA.json';
 import vi from '../../config/locales/vi.json';
-import zhHans from '../../config/locales/zh-Hans.json';
-import zhHant from '../../config/locales/zh-Hant.json';
+import zhHans from '../../config/locales/zh.json';
+import zhHant from '../../config/locales/zh_HK.json';
 
 export default {
-  enflip: flipAll(en), ar, bg, cs, da, de, el, enAU, enGB, en,
-  es, faIR, frCA, fr, he, ht, hu, hy, it, ja, ko, mi, nl, nn,
-  nb, pl, ptBR, pt, ro, ru, sq, sr, sv, tkTM, tr, ukUA, vi,
-  zhHans, zhHant
+  enflip: flipAll(en), ar, bg, cs, da, de, el, 'en-AU': enAU, 'en-GB': enGB, en,
+  es, 'fa-IR': faIR, 'fr-CA': frCA, fr, he, ht, hu, hy, it, ja, ko, mi, nl, nn,
+  nb, pl, 'pt-BR': ptBR, pt, ro, ru, sq, sr, sv, tr, 'uk-UA': ukUA, vi,
+  'zh-Hans': zhHans, 'zh-Hant': zhHant,
 };

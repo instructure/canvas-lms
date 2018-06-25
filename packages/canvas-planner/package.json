@@ -74,6 +74,7 @@
     "redux-promise": "^0.5.3",
     "redux-saga": "^0.16.0",
     "redux-thunk": "^2.2.0",
+    "timezone": "1.0.13",
     "velocity-animate": "^1.5.0"
   },
   "devDependencies": {
@@ -106,6 +107,7 @@
     "mockdate": "^2.0.2",
     "moxios": "^0.4.0",
     "npm-run-all": "^4",
+    "redux-devtools-extension": "^2.13.2",
     "webpack": "^3"
   },
   "resolutions": {

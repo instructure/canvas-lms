@@ -58,7 +58,7 @@ function defaultProps ({ props, sortBySetting, gradeDisplay, position } = {}) {
     },
     addGradebookElement () {},
     removeGradebookElement () {},
-    onMenuClose () {},
+    onMenuDismiss () {},
     ...props
   };
 }
@@ -69,7 +69,7 @@ QUnit.module('TotalGradeColumnHeader - base behavior', {
       props: {
         addGradebookElement: this.stub(),
         removeGradebookElement: this.stub(),
-        onMenuClose: this.stub()
+        onMenuDismiss: this.stub()
       }
     });
     this.wrapper = mount(<TotalGradeColumnHeader {...this.props} />);
@@ -86,28 +86,27 @@ test('renders the label Total', function () {
   equal(label.text().trim(), 'Total');
 });
 
-test('renders a PopoverMenu', function () {
-  const optionsMenu = this.wrapper.find('PopoverMenu');
+test('renders a Menu', function () {
+  const optionsMenu = this.wrapper.find('Menu');
 
   equal(optionsMenu.length, 1);
 });
 
-test('renders a PopoverMenu with a trigger', function () {
-  const optionsMenuTrigger = this.wrapper.find('PopoverMenu button');
+test('renders a Menu with a trigger', function () {
+  const optionsMenuTrigger = this.wrapper.find('Menu button');
 
   equal(optionsMenuTrigger.length, 1);
 });
 
-test('adds a class to the action container when the PopoverMenu is opened', function () {
+test('adds a class to the action container when the Menu is opened', function () {
   const actionContainer = this.wrapper.find('.Gradebook__ColumnHeaderAction');
   actionContainer.find('button').simulate('click');
   ok(actionContainer.hasClass('menuShown'));
 });
 
-test('renders a title for the More icon based on the assignment name', function () {
-  const optionsMenuTrigger = this.wrapper.find('PopoverMenu IconMore');
-
-  equal(optionsMenuTrigger.props().title, 'Total Options');
+test('renders a title that says "Total Options"', function () {
+  const optionsMenuTrigger = this.wrapper.find('Button ScreenReaderContent');
+  equal(optionsMenuTrigger.text(), 'Total Options');
 });
 
 test('calls addGradebookElement prop on open', function () {
@@ -127,11 +126,11 @@ test('calls removeGradebookElement prop on close', function () {
   ok(this.props.removeGradebookElement.called);
 });
 
-test('calls onMenuClose prop on close', function () {
+test('calls onMenuDismiss prop on close', function () {
   this.wrapper.find('.Gradebook__ColumnHeaderAction button').simulate('click');
   this.wrapper.find('.Gradebook__ColumnHeaderAction button').simulate('click');
 
-  strictEqual(this.props.onMenuClose.callCount, 1);
+  strictEqual(this.props.onMenuDismiss.callCount, 1);
 });
 
 QUnit.module('TotalGradeColumnHeader - Sort by Settings', {
@@ -424,8 +423,8 @@ QUnit.module('TotalGradeColumnHeader#handleKeyDown', function (hooks) {
 
   test('Enter opens the options menu', function () {
     this.handleKeyDown(13); // Enter
-    const optionsMenu = this.wrapper.find('PopoverMenu');
-    strictEqual(optionsMenu.node.show, true);
+    const optionsMenu = this.wrapper.find('Menu');
+    strictEqual(optionsMenu.node.shown, true);
   });
 
   test('returns false for Enter on options menu', function () {

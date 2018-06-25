@@ -47,19 +47,12 @@ export default class ColumnHeader extends React.Component {
     }
   }
 
-  bindOptionsMenuTrigger = (ref) => { this.optionsMenuTrigger = ref };
-
   bindFlyoutMenu = (ref, savedRef) => {
-    // instructure-ui components return references to react components.
-    // At this time the only way to get dom node refs is via findDOMNode.
     if (ref) {
-      // eslint-disable-next-line react/no-find-dom-node
-      const domNode = ReactDOM.findDOMNode(ref);
-      this.props.addGradebookElement(domNode);
-      domNode.addEventListener('keydown', this.handleMenuKeyDown);
+      this.props.addGradebookElement(ref);
+      ref.addEventListener('keydown', this.handleMenuKeyDown);
     } else if (savedRef) {
-      // eslint-disable-next-line react/no-find-dom-node
-      this.props.removeGradebookElement(ReactDOM.findDOMNode(savedRef));
+      this.props.removeGradebookElement(savedRef);
     }
   }
 
@@ -69,12 +62,8 @@ export default class ColumnHeader extends React.Component {
   };
 
   bindOptionsMenuContent = (ref) => {
-    // instructure-ui components return references to react components.
-    // At this time the only way to get dom node refs is via findDOMNode.
     if (ref) {
       this.optionsMenuContent = ref;
-      // eslint-disable-next-line react/no-find-dom-node
-      this.optionsMenuContentDOMNode = ReactDOM.findDOMNode(ref);
     }
     this.bindFlyoutMenu(ref, this.optionsMenuContent);
   };
@@ -122,7 +111,6 @@ export default class ColumnHeader extends React.Component {
 
       if (!menuShown) {
         this.optionsMenuContent = null;
-        this.optionsMenuContentDOMNode = null;
       }
     });
   };

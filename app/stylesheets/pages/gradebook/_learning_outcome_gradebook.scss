@@ -342,6 +342,15 @@ $page-dark: #ebeff2;
   }
 }
 
+.outcome-description {
+  width: 70%;
+  float: left;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .outcome-cell-wrapper {
   text-align: direction(right);
   padding-#{direction(right)}: 10px;

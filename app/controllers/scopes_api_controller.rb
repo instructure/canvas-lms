@@ -17,7 +17,7 @@
 #
 
 # @API API Token Scopes
-# @internal
+# @beta
 # API for retrieving API scopes
 #
 # @model Scope
@@ -82,7 +82,7 @@ class ScopesApiController < ApplicationController
 
   def check_feature_flag
     return if @context.try(:site_admin?) && Setting.get(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, nil).present?
-    return if @context.root_account.feature_enabled?(:api_token_scoping)
+    return if @context.root_account.feature_enabled?(:developer_key_management_and_scoping)
     render json: [], status: :forbidden
   end
 end

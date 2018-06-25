@@ -56,9 +56,9 @@ class ObserverAlert < ActiveRecord::Base
 
   def self.create_assignment_missing_alerts
     submissions = Submission.active.
-      preload(user: :as_student_observer_alert_thresholds).
+      eager_load(user: :as_student_observer_alert_thresholds).
       joins(:assignment).
-      joins("INNER JOIN #{ObserverAlertThreshold.quoted_table_name} observer_alert_thresholds ON observer_alert_thresholds.user_id = submissions.user_id AND observer_alert_thresholds.workflow_state <> 'deleted'").
+      where("observer_alert_thresholds.user_id = submissions.user_id").
       joins("LEFT OUTER JOIN #{ObserverAlert.quoted_table_name} ON observer_alerts.context_id = submissions.id
              AND observer_alerts.context_type = 'Submission'
              AND observer_alerts.alert_type = 'assignment_missing'").
@@ -69,9 +69,10 @@ class ObserverAlert < ActiveRecord::Base
       where("observer_alerts.id IS NULL").
       where("observer_alert_thresholds.alert_type = 'assignment_missing'")
 
-      alerts = []
-      submissions.find_each do |submission|
-        threshold = submission.user.as_student_observer_alert_thresholds.first
+    alerts = []
+    submissions.find_each do |submission|
+      thresholds = submission.user.as_student_observer_alert_thresholds
+      thresholds.find_each do |threshold|
         next unless threshold.users_are_still_linked?
 
         now = Time.now.utc
@@ -89,9 +90,10 @@ class ObserverAlert < ActiveRecord::Base
                       course_name: submission.assignment.course.name
                     }) }
       end
+    end
 
-      alerts.each_slice(1000) do |slice|
-        ObserverAlert.bulk_insert(slice)
-      end
+    alerts.each_slice(1000) do |slice|
+      ObserverAlert.bulk_insert(slice)
+    end
   end
 end

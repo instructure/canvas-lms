@@ -17,3 +17,4 @@
  */
 
 import 'prerequisites_lookup'
+import 'context_modules'

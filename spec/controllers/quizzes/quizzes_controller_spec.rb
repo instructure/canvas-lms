@@ -1590,6 +1590,22 @@ describe Quizzes::QuizzesController do
         expect(@quiz.reload).to be_edited
       end
 
+      it "runs DueDateCacher when transitioning from ungraded quiz to graded" do
+        @quiz.update!(quiz_type: 'practice_quiz')
+        due_date_cacher = instance_double(DueDateCacher)
+        allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
+
+        expect(due_date_cacher).to receive(:recompute).once
+
+        post 'update', params: {
+          course_id: @course.id,
+          id: @quiz.id,
+          quiz: {
+            quiz_type: 'assignment'
+          }
+        }
+      end
+
       it "does not runs DueDateCacher when nothing is updated" do
         due_date_cacher = instance_double(DueDateCacher)
         allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)

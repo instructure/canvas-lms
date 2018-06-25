@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount, shallow} from 'enzyme'
+import {shallow} from 'enzyme'
 
 import {ROLES} from '../../__tests__/examples'
 import PermissionTray from '../PermissionTray'
@@ -32,13 +32,6 @@ function makeDefaultProps() {
     unassignedRoles: ROLES.filter(r => r.id === '2')
   }
 }
-
-it('renders the component', () => {
-  const props = makeDefaultProps()
-  const tree = mount(<PermissionTray {...props} />)
-  const node = tree.find('PermissionTray')
-  expect(node.exists()).toBeTruthy()
-})
 
 it('renders the label', () => {
   const props = makeDefaultProps()

@@ -19,7 +19,6 @@
 import {combineReducers} from 'redux'
 import {handleActions} from 'redux-actions'
 import {actionTypes} from './actions'
-import {COURSE} from './propTypes'
 
 import activeRoleTrayReducer from './reducers/activeRoleTrayReducer'
 import activeAddTrayReducer from './reducers/activeAddTrayReducer'
@@ -76,16 +75,14 @@ const roles = handleActions(
       })
     },
     [actionTypes.UPDATE_PERMISSIONS]: (state, action) => {
-      const {courseRoleId, permissionName, enabled, locked} = action.payload
-      return state.map(
-        p => (p.id === courseRoleId ? changePermission(p, permissionName, enabled, locked) : p)
-      )
+      const {role} = action.payload
+      return state.map(r => (r.id === role.id ? role : r))
     },
     [actionTypes.ADD_NEW_ROLE]: (state, action) => {
       const displayedRole = state.find(role => !!role.displayed)
       const currentContext = displayedRole.contextType
-      const displayed = currentContext === COURSE
-      const roleToAdd = {...action.payload, displayed, contextType: COURSE}
+      const displayed = true
+      const roleToAdd = {...action.payload, displayed, contextType: currentContext}
       return roleSortedInsert(state, roleToAdd)
     },
     [actionTypes.UPDATE_ROLE]: (state, action) =>
@@ -95,20 +92,6 @@ const roles = handleActions(
   },
   []
 )
-
-function changePermission(permission, permissionName, enabled, locked) {
-  return {
-    ...permission,
-    permissions: {
-      ...permission.permissions,
-      [permissionName]: {
-        ...permission.permissions[permissionName],
-        enabled,
-        locked
-      }
-    }
-  }
-}
 
 export default combineReducers({
   activeRoleTray: activeRoleTrayReducer,

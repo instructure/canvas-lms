@@ -171,11 +171,24 @@ actions.createOrEditDeveloperKeyFailed = () => ({type: actions.CREATE_OR_EDIT_DE
 actions.SET_EDITING_DEVELOPER_KEY = 'SET_EDITING_DEVELOPER_KEY'
 actions.setEditingDeveloperKey = payload => ({type: actions.SET_EDITING_DEVELOPER_KEY, payload})
 
+actions.editDeveloperKey = payload => dispatch => {
+  if (payload) {
+    dispatch(actions.listDeveloperKeyScopesSet(payload.scopes))
+  }
+  dispatch(actions.setEditingDeveloperKey(payload))
+}
+
 actions.DEVELOPER_KEYS_MODAL_OPEN = 'DEVELOPER_KEYS_MODAL_OPEN'
-actions.developerKeysModalOpen = () => ({type: actions.DEVELOPER_KEYS_MODAL_OPEN})
+actions.developerKeysModalOpen = () => {
+  window.location.hash = "key_modal_opened"
+  return {type: actions.DEVELOPER_KEYS_MODAL_OPEN}
+}
 
 actions.DEVELOPER_KEYS_MODAL_CLOSE = 'DEVELOPER_KEYS_MODAL_CLOSE'
-actions.developerKeysModalClose = () => ({type: actions.DEVELOPER_KEYS_MODAL_CLOSE})
+actions.developerKeysModalClose = () => {
+  window.location.hash = ""
+  return {type: actions.DEVELOPER_KEYS_MODAL_CLOSE}
+}
 
 actions.SET_BINDING_WORKFLOW_STATE_START = 'SET_BINDING_WORKFLOW_STATE_START'
 actions.setBindingWorkflowStateStart = () => ({type: actions.SET_BINDING_WORKFLOW_STATE_START})
@@ -264,7 +277,7 @@ actions.createOrEditDeveloperKey = (formData, url, method) => dispatch => {
       dispatch(actions.createOrEditDeveloperKeyFailed())
     })
     .finally(() => {
-      dispatch(actions.setEditingDeveloperKey())
+      dispatch(actions.editDeveloperKey())
     })
 }
 

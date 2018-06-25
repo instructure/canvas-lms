@@ -67,3 +67,18 @@ escape.SafeString = SafeString
 
 // tinymce plugins use this and they need it global :(
 INST.htmlEscape = escape
+
+const UNESCAPE_ENTITIES = Object.keys(ENTITIES).reduce((map, key) => {
+  const value = ENTITIES[key]
+  map[value] = key
+  return map
+}, {})
+
+const unescapeSource = `(?:${Object.keys(UNESCAPE_ENTITIES).join('|')})`
+const UNESCAPE_REGEX = new RegExp(unescapeSource, 'g')
+
+function unescape(str) {
+  return str.replace(UNESCAPE_REGEX, match => UNESCAPE_ENTITIES[match])
+}
+
+escape.unescape = unescape

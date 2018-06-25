@@ -19,15 +19,7 @@
 import _ from 'underscore'
 import round from 'compiled/util/round'
 import AssignmentGroupGradeCalculator from '../gradebook/AssignmentGroupGradeCalculator'
-
-function sum (collection) {
-  return _.reduce(collection, (total, value) => (total + value), 0);
-}
-
-function sumBy (collection, attr) {
-  const values = _.map(collection, attr);
-  return sum(values);
-}
+import {sum, sumBy} from './shared/helpers/GradeCalculationHelper'
 
 function getWeightedPercent ({ score, possible, weight }) {
   return score ? (score / possible) * weight : 0;

@@ -69,7 +69,7 @@ class GradeBookHistory
     end
 
     def select_data_from_dropdown(text)
-      fj("[id*=Autocomplete_Options_]li[role=option]:contains('#{text}')").click
+      fj("[role=listbox] [role=option]:contains('#{text}')").click
       wait_for_ajaximations
     end
 

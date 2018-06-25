@@ -30,9 +30,8 @@ describe "student planner" do
   end
 
   before :each do
-    @course.enable_feature!(:new_gradebook) # missing or late pill is only shown when new gradebook is enabled for the course
     user_session(@student1)
-  end
+  end  
 
   it "shows no due date assigned when no assignments are created.", priority: "1", test_id: 3265570 do
     go_to_list_view
@@ -93,6 +92,14 @@ describe "student planner" do
       go_to_list_view
       validate_object_displayed('Assignment')
       validate_link_to_url(@assignment, 'assignments')
+    end
+
+    it "navigates to the assignment submissions page when they are submitted" do
+      skip('skip until ADMIN-179')
+      submission = @assignment.submit_homework(@student1, submission_type: "online_text_entry",
+                                  body: "Assignment submitted")
+      go_to_list_view
+      validate_link_to_submissions(@assignment, submission,'assignments')
     end
 
     it "enables the checkbox when an assignment is completed", priority: "1", test_id: 3306201 do
@@ -163,17 +170,24 @@ describe "student planner" do
 
   context "Graded discussion" do
     before :once do
-      assignment = @course.assignments.create!(name: 'assignment',
+      @assignment_d = @course.assignments.create!(name: 'assignment',
                                                due_at: Time.zone.now.advance(days:2))
       @discussion = @course.discussion_topics.create!(title: 'Discussion 1',
                                                      message: 'Graded discussion',
-                                                     assignment: assignment)
+                                                     assignment: @assignment_d)
     end
 
     it "shows and navigates to graded discussions page from student planner", priority: "1", test_id: 3259301 do
       go_to_list_view
       validate_object_displayed('Discussion')
       validate_link_to_url(@discussion, 'discussion_topics')
+    end
+
+    it "navigates to the submissions page once the graded discussion has a reply" do
+      skip('skip until ADMIN-179')
+      @discussion.reply_from(user: @student1, text: 'user reply')
+      # for discussion, submissions page has the users id. So, sending the student object instead of submission for id
+      validate_link_to_submissions(@assignment_d, @student1, 'assignments')
     end
 
     it "shows new replies tag for discussion with new replies", priority: "1", test_id: 3284231 do
@@ -601,4 +615,35 @@ describe "student planner" do
     wait_for_planner_load
     expect(f('.PlannerApp')).to contain_jqcss('span:contains("Show 1 completed item")')
   end
+  
+  context "teacher in a course" do
+    before :once do 
+      @teacher1 = User.create!(name: 'teacher')
+      @course.enroll_teacher(@teacher1).accept!
+    end
+
+    before :each do
+      user_session(@teacher1)
+    end
+
+    it "shows correct default time in a wiki pages" do
+      skip("skip until ADMIN-1096")
+      Timecop.freeze(Time.zone.today) do
+        @wiki = @course.wiki_pages.create!(title: 'Default Time Wiki Page', todo_date: Time.zone.today)
+        get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
+        wait_for_ajaximations
+        expect(get_value("#todo_date")).to eq "#{format_date_for_view(Time.zone.today)} at 11:59PM"
+      end
+    end
+
+    it "shows correct default time in a ungraded discussions" do
+      skip("skip until ADMIN-1096")
+      Timecop.freeze(Time.zone.today) do
+        @discussion = @course.discussion_topics.create!(title: "Default Time Discussion", message: nil, user: @teacher, todo_date: Time.zone.today)
+        get("/courses/#{@course.id}/discussion_topics/#{@discussion.id}/edit")
+        wait_for_ajaximations
+        expect(get_value("#todo_date")).to eq "#{format_date_for_view(Time.zone.today)} at 11:59PM"
+      end
+    end
+  end 
 end

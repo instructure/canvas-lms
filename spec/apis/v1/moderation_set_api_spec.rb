@@ -26,13 +26,13 @@ describe 'Moderated Grades API', type: :request do
     sec2 = @course.course_sections.create!(:name => "section 2")
     @assignment = @course.assignments.create! name: "asdf"
     @assignment.update_attribute :moderated_grading, true
+    @assignment.update_attribute :grader_count, 1
     @student1, @student2, @student3 = n_students_in_course(3, course: @course)
     @course.enroll_student(@student1, :section => sec1, :allow_multiple_enrollments => true)
     @course.enroll_student(@student2, :section => sec1, :allow_multiple_enrollments => true)
     @course.enroll_student(@student3, :section => sec1, :allow_multiple_enrollments => true)
     @course.enroll_student(@student3, :section => sec2, :allow_multiple_enrollments => true)
     @user = @teacher
-    @assignment.moderated_grading_selections.create! student: @student1
   end
 
   before :each do
@@ -46,7 +46,7 @@ describe 'Moderated Grades API', type: :request do
       {controller: 'moderation_set', action: 'index',
        format: 'json', course_id: @course.id, assignment_id: @assignment.id}
       expect(response).to be_success
-      expect(json.size).to eq 1
+      expect(json.size).to eq 3
       expect(json.first["id"]).to eq @student1.id
     end
 

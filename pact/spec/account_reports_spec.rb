@@ -38,8 +38,8 @@ describe 'Account Reports', :pact do
             'Version': 'HTTP/1.1'
           },
           'path' => Pact.provider_param(
-            "/api/v1/accounts/:{account_user_id}/reports",
-            {account_user_id: '1' }
+            "/api/v1/accounts/:{account_id}/reports",
+            {account_id: '1' }
           ),
           query: ''
         ).
@@ -59,7 +59,7 @@ describe 'Account Reports', :pact do
 
   context 'Show Report' do
     it 'should return JSON body' do
-      canvas_lms_api.given('a user with many account reports').
+      canvas_lms_api.given('a user with a robust account report').
         upon_receiving('Show Reports').
         with(
           method: :get,
@@ -73,8 +73,8 @@ describe 'Account Reports', :pact do
             'Version': 'HTTP/1.1'
           },
           'path' => Pact.provider_param(
-            "/api/v1/accounts/:{account_user_id}/reports/:{report_type}/:{report_id}",
-            {account_user_id: '1', report_type: 'report_type', report_id: '1'}
+            "/api/v1/accounts/:{account_id}/reports/:{report_type}/:{report_id}",
+            {account_id: '1', report_type: 'report_type', report_id: '1'}
           ),
           query: ''
         ).
@@ -83,10 +83,12 @@ describe 'Account Reports', :pact do
           body: Pact.like(
             'id': 1,
             'report': 'report_type',
+            'file_url': 'https://wwww.wow.com',
+            'status': 'created',
             'created_at': 'blah',
             'started_at': 'start_time',
             'ended_at': 'end_time',
-            'status': 'created'
+            'progress': 100
           )
         )
 

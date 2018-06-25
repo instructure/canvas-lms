@@ -112,7 +112,7 @@ export default React.createClass({
         "quiz_menu":I18n.t("Quiz Menu"),
         "tool_configuration":I18n.t("Tool Configuration"),
         "user_navigation":I18n.t("User Navigation"),
-        "wiki_page_menu":I18n.t("Wiki Page Menu"),
+        "wiki_page_menu":I18n.t("Page Menu"),
       };
 
       var tool = this.state.tool;

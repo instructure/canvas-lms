@@ -25,7 +25,7 @@ import Heading from '@instructure/ui-elements/lib/components/Heading'
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import CheckboxGroup from '@instructure/ui-forms/lib/components/CheckboxGroup'
-import Modal, {ModalHeader, ModalBody, ModalFooter} from '@instructure/ui-overlays/lib/components/Modal'
+import Modal, {ModalBody, ModalFooter} from '../../shared/components/InstuiModal'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import IconSettingsLine from '@instructure/ui-icons/lib/Line/IconSettings'
 import propTypes from '../propTypes'
@@ -147,14 +147,9 @@ export default class DiscussionSettings extends Component {
          <Modal
            open={this.props.isSettingsModalOpen}
            onDismiss={this.props.toggleModalOpen}
-           label={I18n.t('Discussion Settings')}
+           label={I18n.t('Edit Discussion Settings')}
            onExited={this.exited}
-           shouldCloseOnOverlayClick
-           closeButtonLabel={I18n.t('Close Discussion Settings')}
          >
-           <ModalHeader>
-             <Heading>{I18n.t('Edit Discussion Settings')}</Heading>
-           </ModalHeader>
            <ModalBody>
               <div className="discussion-settings-v2-modal-body-container">
                 {this.props.isSavingSettings ? this.renderSpinner() : null}

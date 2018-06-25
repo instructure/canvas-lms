@@ -17,9 +17,9 @@
  */
 
 import React from 'react'
-import {mount, shallow} from 'enzyme'
+import {shallow} from 'enzyme'
 
-import AddTray from 'jsx/permissions/components/AddTray'
+import AddTray, {mapStateToProps} from 'jsx/permissions/components/AddTray'
 
 const defaultProps = () => ({
   permissions: [
@@ -30,6 +30,8 @@ const defaultProps = () => ({
   loading: false,
   hideTray: () => {},
   open: true,
+  tab: 'course',
+  allLabels: [],
   allBaseRoles: [
     {
       id: '3',
@@ -184,12 +186,6 @@ const defaultProps = () => ({
   ]
 })
 
-test('renders the component', () => {
-  const tree = mount(<AddTray {...defaultProps()} />)
-  const node = tree.find('AddTray')
-  expect(node.exists()).toBe(true)
-})
-
 it('renders proper loading state for component', () => {
   const props = defaultProps()
   props.loading = true
@@ -228,4 +224,50 @@ it('save button is properly enabled if role name is set', () => {
   })
   const inst = tree.instance()
   expect(inst.isDoneSelecting()).toBeTruthy()
+})
+
+it('does not pass in the account admin base role in mapStateToProps', () => {
+  const ownProps = {}
+  const state = {
+    activeAddTray: {
+      show: true,
+      loading: false
+    },
+    roles: [
+      {
+        id: '1',
+        base_role_type: 'StudentEnrollment',
+        label: 'Student',
+        role: 'StudentEnrollment',
+        displayed: true,
+        contextType: 'Course'
+      },
+      {
+        id: '2',
+        base_role_type: 'AccountMembership',
+        label: 'Account Admin',
+        role: 'AccountAdmin',
+        displayed: false,
+        contextType: 'Account'
+      }
+    ]
+  }
+
+  const realProps = mapStateToProps(state, ownProps)
+  expect(realProps.allBaseRoles).toEqual([state.roles[0]])
+})
+
+it('onChangeRoleLabel sets error if role is used', () => {
+  const props = defaultProps()
+  props.allLabels = ['student', 'teacher']
+  const tree = shallow(<AddTray {...props} />)
+  const event = {target: {value: ' teacher   '}} // make sure trimming happens
+  tree.instance().onChangeRoleName(event)
+  const expectedErrorState = [
+    {
+      text: 'Cannot add role name teacher: already in use',
+      type: 'error'
+    }
+  ]
+  expect(tree.state().roleNameErrors).toEqual(expectedErrorState)
 })

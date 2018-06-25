@@ -47,10 +47,14 @@ import './jquery.templateData'
     onContextExternalToolSelect : function(e) {
       e.preventDefault();
       var $tool = $(this);
+      var toolName = $tool.find('a').text();
       if($(this).hasClass('selected') && !$(this).hasClass('resource_selection')) {
         $(this).removeClass('selected');
+        $("#external_tool_create_url").val('');
+        $.screenReaderFlashMessage(I18n.t('Unselected external tool %{tool}', {tool: toolName}));
         return;
       }
+      $.screenReaderFlashMessage(I18n.t('Selected external tool %{tool}', {tool: toolName}));
       $tool.parents(".tools").find(".tool.selected").removeClass('selected');
       $tool.addClass('selected');
       if($tool.hasClass('resource_selection')) {

@@ -565,7 +565,6 @@ class ContentMigration < ActiveRecord::Base
 
   def quizzes_next_migration?
     context.instance_of?(Course) && root_account &&
-      root_account.feature_enabled?(:import_to_quizzes_next) &&
       migration_settings[:import_quizzes_next]
   end
 

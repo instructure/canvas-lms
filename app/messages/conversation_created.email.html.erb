@@ -7,12 +7,20 @@
 <% end %>
 
 <% define_content :subject do %>
-  <%= t :subject, "%{user_name}, you just sent a message in Canvas.", :user_name => content(:user_name) %>
+  <% if IncomingMailProcessor::MailboxAccount.reply_to_enabled %>
+    <%= t "%{user_name}, you just sent a message in Canvas.", :user_name => content(:user_name) %>
+  <% else %>
+    <%= t "%{user_name}, you just sent a message in Canvas - Do not reply", :user_name => content(:user_name) %>
+  <% end %>
 <% end %>
 
 <% define_content :footer_link do %>
   <a href="<%= content :link %>">
-    <%= t :view_message, "View this message in Conversations" %>
+    <% if IncomingMailProcessor::MailboxAccount.reply_to_enabled %>
+      <%= t "View this message in Conversations" %>
+    <% else %>
+      <%= t "Reply to this message in Canvas" %>
+    <% end %>
   </a>
 <% end %>
 
@@ -38,7 +46,11 @@
         <table border="0" style="font-size: 14px; color: #444444; background-color: #ffffff; font-family: 'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif';" valign="top" align="left">
           <tr>
             <td valign="bottom" align="left">
-              <b><%= author_short_name%></b>
+              <% if IncomingMailProcessor::MailboxAccount.reply_to_enabled %>
+                <b><%= author_short_name%></b>
+              <% else %>
+                <b><%= author_short_name%> <%= t"Please do not reply to this email, it will not be delivered." %></b>
+              <% end %>
             </td>
           </tr>
           <tr>
@@ -55,7 +67,11 @@
 <% else %>
   <p height="30px"></p>
   <p>
-    <b><%= author_short_name%></b>
+    <% if IncomingMailProcessor::MailboxAccount.reply_to_enabled %>
+      <b><%= author_short_name%></b>
+    <% else %>
+      <b><%= author_short_name%> <%= t"Please do not reply to this email, it will not be delivered." %></b>
+    <% end %>
     <br/>
     <a href="<%= content :link %>">
       <%= author_email_address%>
@@ -67,6 +83,8 @@
 <p><%= t :audio_comment, "This message includes media comments. To listen or reply, click the link below:" %></p>
 <% elsif IncomingMailProcessor::MailboxAccount.reply_to_enabled %>
 <p><%= t :reply_to_conversation_message, "You can reply to this message in Canvas by replying directly to this email.  If you need to include an attachment, please log in to Canvas and reply through the Inbox." %></p>
+<% else %>
+  <p><%=t :pre_you_can, "You can "%><a href="<%= content :link %>"><%= t"reply to this message in Canvas." %></a></p>
 <% end %>
 
 <% unless asset.attachments.empty? %>

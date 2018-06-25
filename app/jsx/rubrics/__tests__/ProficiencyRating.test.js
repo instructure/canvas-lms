@@ -48,6 +48,16 @@ it('mastery checkbox is checked if mastery', () => {
   expect(radio.props().checked).toBe(true)
 })
 
+it('mastery checkbox receives focus', () => {
+  const wrapper = mount(
+    <table>
+      <tbody>
+        <ProficiencyRating {...defaultProps({focusField: 'mastery'})}/>
+      </tbody>
+    </table>)
+  expect(wrapper.find('RadioInput').find('input').node).toBe(document.activeElement)
+})
+
 it('clicking mastery checkbox triggers change', () => {
   const onMasteryChange = jest.fn()
   const wrapper = mount(

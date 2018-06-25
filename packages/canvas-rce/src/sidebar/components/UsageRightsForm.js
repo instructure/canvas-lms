@@ -20,7 +20,7 @@ import React, { Component } from "react";
 import formatMessage from "../../format-message";
 import Select from "@instructure/ui-forms/lib/components/Select";
 import TextInput from "@instructure/ui-forms/lib/components/TextInput";
-import Alert from "@instructure/ui-core/lib/components/Alert";
+import Alert from '@instructure/ui-alerts/lib/components/Alert';
 
 const usageRightsValues = {
   "": formatMessage("Choose usage rights..."),

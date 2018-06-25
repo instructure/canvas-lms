@@ -25,12 +25,35 @@ $faintRowBg: #fafafa;
 $lightRowBg: #fff;
 $darkRowBg: #f9f9f9;
 
+.ic-permissions__permission-button-container {
+  display: flex;
+  justify-content: center;
+}
+
+.ic-permissions__cell-content {
+  .ic-disabled_permission_button {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+  button {
+    @include ic-focus-base;
+    &:focus-within {
+      @include ic-focus-variant;
+    }
+    border: none;
+    background: transparent;
+  }
+}
+.ic-hidden-button {
+  visibility: hidden;
+}
+
 // container that holds the table, we scroll inside here
 .ic-permissions__table-container {
   // dimensions of the table on screen, the table will scroll inside this container
   // might want to change to match design
-  width: 60vw;
-  height: 60vh;
+  width: 72vw;
+  height: 64vh;
 
   // needed for scrolling + sticky headers
   overflow: auto;
@@ -42,7 +65,7 @@ $darkRowBg: #f9f9f9;
 }
 
 .permissions-v2__header_contianer {
-  width: 58vw;
+  width: 70vw;
   margin: 20px 20px 20px 0px;
 }
 
@@ -89,6 +112,7 @@ $darkRowBg: #f9f9f9;
 
   // content cell, aka a table cell with permission buttons inside it
   .ic-permissions__cell-content {
+    margin-#{direction(left)}: 20px;
     text-align: center;
   }
 
@@ -113,7 +137,6 @@ $darkRowBg: #f9f9f9;
     left: 0;
     bottom: 0;
     width: 100%;
-    border-bottom: 1px solid $border-color;
   }
 
   .ic-permissions__main-left-header {

@@ -44,13 +44,20 @@ describe DataFixup::ExportAttachmentsToInstfs do
       to receive(:enabled?).
       and_return(true)
 
-    attachment_with_context(@course)
+    attachment_with_context(@course, md5: "md5")
   end
 
   describe "run" do
     it "finds attachments, posts to them instfs, and updates them" do
       @class.run(Account.find(@attachment.root_account_id))
       expect(Attachment.find(@attachment.id).instfs_uuid).not_to be_nil
+    end
+
+    it "skips attachments without an md5" do
+      @attachment.md5 = nil
+      @attachment.save!
+      expect{ @class.run(Account.find(@attachment.root_account_id)) }.not_to raise_exception
+      expect(Attachment.find(@attachment.id).instfs_uuid).to be_nil
     end
   end
 

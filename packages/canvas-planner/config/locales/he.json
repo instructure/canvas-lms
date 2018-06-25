@@ -2,6 +2,12 @@
   "all_day_fb42c4fc": {
     "message": "כל היום"
   },
+  "announcement_fb4cb645": {
+    "message": "הכרזה"
+  },
+  "assignment_976578a8": {
+    "message": "משימה"
+  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {הצגת פריט # שהושלם}\n  other {הצגת # פריטים שהושלמו}\n}"
   },
@@ -52,6 +58,9 @@
   },
   "yesterday_at_date_1aa6d18e": {
     "message": "אתמול, בתאריך { date }"
+  },
+  "calendar_event_89aadc1c": {
+    "message": "אירוע יומן"
   },
   "load_prior_dates_f2b0f6f0": {
     "message": "טעינת מועדים קודמים"
@@ -119,6 +128,9 @@
   "go_to_dashboard_card_view_10398ef6": {
     "message": "מעבר לתצוגת כרטיס לוח המחוונים"
   },
+  "discussion_6719c51d": {
+    "message": "דיון"
+  },
   "points_bceb5005": {
     "message": "נקודות"
   },
@@ -143,6 +155,9 @@
   "graded_25cd3fcd": {
     "message": "ניתן ציון"
   },
+  "page_50c4823d": {
+    "message": "דף"
+  },
   "to_do_1d554f36": {
     "message": "לביצוע"
   },
@@ -154,6 +169,9 @@
   },
   "optional_add_course_ef0d70fc": {
     "message": "אופציונלי: הוספת קורס"
+  },
+  "quiz_e0dcce8f": {
+    "message": "בוחן"
   },
   "failed_to_load_opportunities_52ab6404": {
     "message": "טעינת הזדמנויות נכשלה"

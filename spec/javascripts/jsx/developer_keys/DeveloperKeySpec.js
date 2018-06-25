@@ -78,7 +78,7 @@ const defaultProps = {
     activateDeveloperKey: () => {},
     deactivateDeveloperKey: () => {},
     deleteDeveloperKey: () => {},
-    setEditingDeveloperKey: () => {},
+    editDeveloperKey: () => {},
     developerKeysModalOpen: () => {},
   },
   ctx: { params: { contextId: 'context' } }
@@ -113,16 +113,16 @@ test('includes Unnamed Tool when developerName empty string case', () => {
   testWrapperOk(updateDefaultProps({ developerKey: { name: '' } }), "Unnamed Tool")
 });
 
-test('includes userName', () => {
-  testWrapperOk(defaultProps, "billy bob")
+test('includes email', () => {
+  testWrapperOk(defaultProps, "bob@myemail.com")
 });
 
-test('includes No User when userName is null and email missing', () => {
-  testWrapperOk(updateDefaultProps({ developerKey: { user_name: null, email: null } }), "No User")
+test('includes No Email when userName is null and email missing', () => {
+  testWrapperOk(updateDefaultProps({ developerKey: { user_name: null, email: null } }), "No Email")
 });
 
-test('includes No User when userName is empty string and email is missing', () => {
-  testWrapperOk(updateDefaultProps({ developerKey: { user_name: '', email: null } }), "No User")
+test('includes No Email when userName is empty string and email is missing', () => {
+  testWrapperOk(updateDefaultProps({ developerKey: { user_name: '', email: null } }), "No Email")
 });
 
 test('includes an image when name is present', () => {
@@ -134,18 +134,6 @@ test('includes an img box when name is null', () => {
   const propsModified = updateDefaultProps({ developerKey: { name: null } })
   const component = renderComponent(propsModified)
   ok(TestUtils.findRenderedComponentWithType(component, Image))
-});
-
-test('includes an empty box to mimic img box when icon_url is null', () => {
-  const propsModified = updateDefaultProps({ developerKey: { icon_url: null } })
-  const component = renderComponent(propsModified)
-  ok(TestUtils.findRenderedDOMComponentWithClass(component, 'emptyIconImage'))
-});
-
-test('includes an empty box to mimic img box when icon_url is empty string', () => {
-  const propsModified = updateDefaultProps({ developerKey: { icon_url: '' } })
-  const component = renderComponent(propsModified)
-  ok(TestUtils.findRenderedDOMComponentWithClass(component, 'emptyIconImage'))
 });
 
 test('does not inactive when workflow_state is active', () => {
@@ -184,8 +172,8 @@ test('it renders the developer key state control', () => {
   testWrapperOk(defaultProps, 'Key state for the current account')
 })
 
-test('renders Name Missing when email present but user_name missing', () => {
-  testWrapperOk(updateDefaultProps({ developerKey: { user_name: null } }), 'Name Missing')
+test('renders No Email when email is missing', () => {
+  testWrapperOk(updateDefaultProps({ developerKey: { email: null } }), 'No Email')
 })
 
 const inheritedProps = updateDefaultProps({ inherited: true })

@@ -296,7 +296,7 @@ RSpec.shared_examples 'a submission update action' do |controller|
       before :once do
         course_with_student(active_all: true)
         @assignment = @course.assignments.create!(title: "some assignment",
-          submission_types: "online_url,online_upload", moderated_grading: true)
+          submission_types: "online_url,online_upload", moderated_grading: true, grader_count: 2)
         @submission = @assignment.submit_homework(@user)
       end
 
@@ -314,7 +314,8 @@ RSpec.shared_examples 'a submission update action' do |controller|
         expect(@submission.provisional_grade(@teacher).submission_comments.first.comment).to eq 'provisional!'
 
         json = JSON.parse response.body
-        expect(json.first['submission']['submission_comments'].first['submission_comment']['comment']).to eq 'provisional!'
+        puts json.first['submission']['submission_comments'].first
+        expect(json.first['submission']['submission_comments'].first['comment']).to eq 'provisional!'
       end
 
       it "should create a final provisional comment" do
@@ -335,7 +336,7 @@ RSpec.shared_examples 'a submission update action' do |controller|
         expect(pg.final).to be_truthy
 
         json = JSON.parse response.body
-        expect(json.first['submission']['submission_comments'].first['submission_comment']['comment']).to eq 'provisional!'
+        expect(json.first['submission']['submission_comments'].first['comment']).to eq 'provisional!'
       end
     end
 
@@ -343,7 +344,6 @@ RSpec.shared_examples 'a submission update action' do |controller|
       before(:once) do
         course_with_student(active_all: true)
         teacher_in_course(active_all: true)
-        @course.root_account.enable_feature!(:anonymous_moderated_marking)
 
         @assignment = @course.assignments.create!(
           title: 'yet another assignment',

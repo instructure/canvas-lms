@@ -23,6 +23,7 @@ import Heading from '@instructure/ui-elements/lib/components/Heading'
 import TextArea from '@instructure/ui-forms/lib/components/TextArea'
 import IconFeedback from '@instructure/ui-icons/lib/Line/IconFeedback'
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '@instructure/ui-overlays/lib/components/Modal'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import I18n from 'i18n!edit_rubric'
 
 const CommentDialog = ({ comments, description, finalize, open, setComments }) => {
@@ -79,8 +80,8 @@ CommentDialog.propTypes = {
 
 const CommentButton = ({ initialize, ...props }) => (
   <div>
-    <Button variant="icon" margin="0 x-small 0 0" onClick={() => initialize()}>
-      <IconFeedback title="Additional Comments" />
+    <Button variant="icon" icon={<IconFeedback />} margin="0 x-small 0 0" onClick={() => initialize()}>
+      <ScreenReaderContent>{I18n.t('Additional Comments')}</ScreenReaderContent>
     </Button>
     <CommentDialog {...props} />
   </div>

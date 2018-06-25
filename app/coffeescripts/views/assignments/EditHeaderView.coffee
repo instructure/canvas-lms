@@ -53,9 +53,6 @@ define [
       if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
         @toggleConditionalReleaseTab(@model.gradingType())
 
-      if ENV.MODERATED_GRADING_ENABLED
-        @model.renderModeratedGradingFormFieldGroup()
-
     canDelete: ->
       (@userIsAdmin or @model.canDelete()) && !(ENV.MASTER_COURSE_DATA?.is_master_course_child_content && ENV.MASTER_COURSE_DATA.restricted_by_master_course)
 

@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import React from 'react'
 import Assignment from 'compiled/models/Assignment'
 import Submission from 'compiled/models/Submission'
 import DateGroup from 'compiled/models/DateGroup'
@@ -1191,97 +1190,76 @@ test('stops polling when the assignment has finished importing', function () {
   ok(this.assignment.fetch.calledOnce)
 })
 
-
-QUnit.module('Assignment#renderModeratedGradingFormFieldGroup', (hooks) => {
-  const fixtures = document.getElementById('fixtures')
-  const availableModerators = [{ name: 'John Doe', id: '21' }, { name: 'Jane Doe', id: '89' }]
-  const mountPointID = 'ModeratedGradingFormFieldGroup'
+QUnit.module('Assignment#gradersAnonymousToGraders', (hooks) => {
+  let assignment
 
   hooks.beforeEach(() => {
-    fakeENV.setup({
-      ANONYMOUS_MODERATED_MARKING_ENABLED: false,
-      AVAILABLE_MODERATORS: availableModerators,
-      HAS_GRADED_SUBMISSIONS: false,
-      LOCALE: 'en',
-      MODERATED_GRADING_MAX_GRADER_COUNT: 7
-    })
-    fixtures.innerHTML = `<span data-component="${mountPointID}"></span>`
+    assignment = new Assignment()
   })
 
-  hooks.afterEach(() => {
-    fixtures.innerHTML = ''
+  test('returns graders_anonymous_to_graders on the record if no arguments are passed', () => {
+    assignment.set('graders_anonymous_to_graders', true)
+    equal(assignment.gradersAnonymousToGraders(), true)
   })
 
-  test('renders the moderated grading form field group', () => {
-    const assignment = new Assignment()
-    assignment.renderModeratedGradingFormFieldGroup()
-    strictEqual(document.getElementsByClassName('ModeratedGrading__Container').length, 1)
+  test('sets the graders_anonymous_to_graders value if an argument is passed', () => {
+    assignment.set('graders_anonymous_to_graders', true)
+    assignment.gradersAnonymousToGraders(false)
+    equal(assignment.gradersAnonymousToGraders(), false)
+  })
+})
+
+QUnit.module('Assignment#graderCommentsVisibleToGraders', (hooks) => {
+  let assignment
+
+  hooks.beforeEach(() => {
+    assignment = new Assignment()
   })
 
-  test('passes the final_grader_id as a prop to the component', () => {
-    const assignment = new Assignment()
-    assignment.set('final_grader_id', '293')
-    sinon.spy(React, 'createElement')
-    assignment.renderModeratedGradingFormFieldGroup()
-    const [,props] = React.createElement.getCall(0).args
-    strictEqual(props.finalGraderID, '293')
-    React.createElement.restore()
+  test('returns grader_comments_visible_to_graders on the record if no arguments are passed', () => {
+    assignment.set('grader_comments_visible_to_graders', true)
+    equal(assignment.graderCommentsVisibleToGraders(), true)
   })
 
-  test('passes moderated_grading as a prop to the component', () => {
-    const assignment = new Assignment()
+  test('sets the grader_comments_visible_to_graders value if an argument is passed', () => {
+    assignment.set('grader_comments_visible_to_graders', true)
+    assignment.graderCommentsVisibleToGraders(false)
+    equal(assignment.graderCommentsVisibleToGraders(), false)
+  })
+})
+
+QUnit.module('Assignment#showGradersAnonymousToGradersCheckbox', (hooks) => {
+  let assignment
+
+  hooks.beforeEach(() => {
+    assignment = new Assignment()
+  })
+
+  test('returns false if grader_comments_visible_to_graders is false', () => {
+    assignment.set('grader_comments_visible_to_graders', false)
+    equal(assignment.showGradersAnonymousToGradersCheckbox(), false)
+  })
+
+  test('returns false if moderated_grading is false', () => {
+    assignment.set('moderated_grading', false)
+    equal(assignment.showGradersAnonymousToGradersCheckbox(), false)
+  })
+
+  test('returns false if grader_comments_visible_to_graders is false and moderated_grading is true', () => {
+    assignment.set('grader_comments_visible_to_graders', false)
     assignment.set('moderated_grading', true)
-    sinon.spy(React, 'createElement')
-    assignment.renderModeratedGradingFormFieldGroup()
-    const [,props] = React.createElement.getCall(0).args
-    strictEqual(props.moderatedGradingEnabled, true)
-    React.createElement.restore()
+    equal(assignment.showGradersAnonymousToGradersCheckbox(), false)
   })
 
-  test('passes available moderators in the ENV as a prop to the component', () => {
-    const assignment = new Assignment()
+  test('returns false if grader_comments_visible_to_graders is true and moderated_grading is false', () => {
+    assignment.set('grader_comments_visible_to_graders', true)
+    assignment.set('moderated_grading', false)
+    equal(assignment.showGradersAnonymousToGradersCheckbox(), false)
+  })
+
+  test('returns true if grader_comments_visible_to_graders is true and moderated_grading is true', () => {
+    assignment.set('grader_comments_visible_to_graders', true)
     assignment.set('moderated_grading', true)
-    sinon.spy(React, 'createElement')
-    assignment.renderModeratedGradingFormFieldGroup()
-    const [,props] = React.createElement.getCall(0).args
-    strictEqual(props.availableModerators, availableModerators)
-    React.createElement.restore()
-  })
-
-  test('passes max grader count in the ENV as a prop to the component', () => {
-    const assignment = new Assignment()
-    sinon.spy(React, 'createElement')
-    assignment.renderModeratedGradingFormFieldGroup()
-    const [,props] = React.createElement.getCall(0).args
-    strictEqual(props.maxGraderCount, ENV.MODERATED_GRADING_MAX_GRADER_COUNT)
-    React.createElement.restore()
-  })
-
-  test('passes locale in the ENV as a prop to the component', () => {
-    const assignment = new Assignment()
-    sinon.spy(React, 'createElement')
-    assignment.renderModeratedGradingFormFieldGroup()
-    const [,props] = React.createElement.getCall(0).args
-    strictEqual(props.locale, ENV.LOCALE)
-    React.createElement.restore()
-  })
-
-  test('passes HAS_GRADED_SUBMISSIONS in the ENV as a prop to the component', () => {
-    const assignment = new Assignment()
-    sinon.spy(React, 'createElement')
-    assignment.renderModeratedGradingFormFieldGroup()
-    const [,props] = React.createElement.getCall(0).args
-    strictEqual(props.gradedSubmissionsExist, ENV.HAS_GRADED_SUBMISSIONS)
-    React.createElement.restore()
-  })
-
-  test('passes current grader count as a prop to the component', () => {
-    const assignment = new Assignment()
-    assignment.set('grader_count', 4)
-    sinon.spy(React, 'createElement')
-    assignment.renderModeratedGradingFormFieldGroup()
-    const [,props] = React.createElement.getCall(0).args
-    strictEqual(props.currentGraderCount, 4)
-    React.createElement.restore()
+    equal(assignment.showGradersAnonymousToGradersCheckbox(), true)
   })
 })

@@ -726,6 +726,13 @@ class SubmissionsApiController < ApplicationController
   #       rubric_assessment[crit1][points]=3&rubric_assessment[crit2][points]=5&rubric_assessment[crit2][comments]=Well%20Done.
   def update
     @assignment = @context.assignments.active.find(params[:assignment_id])
+
+    if params[:submission] && params[:submission][:posted_grade] && !params[:submission][:provisional] &&
+        @assignment.moderated_grading && !@assignment.grades_published?
+      render_unauthorized_action
+      return
+    end
+
     @user = get_user_considering_section(params[:user_id])
 
     @submission = @assignment.all_submissions.find_or_create_by!(user: @user)

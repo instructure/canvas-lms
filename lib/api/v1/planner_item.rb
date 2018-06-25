@@ -25,6 +25,7 @@ module Api::V1::PlannerItem
   include Api::V1::WikiPage
   include Api::V1::PlannerOverride
   include Api::V1::CalendarEvent
+  include Api::V1::PlannerNote
   include PlannerHelper
 
   def planner_item_json(item, user, session, opts = {})
@@ -33,6 +34,7 @@ module Api::V1::PlannerItem
       :planner_override => planner_override_json(item.planner_override_for(user), user, session),
       :new_activity => new_activity(item, user, opts)
     }).merge(submission_statuses_for(user, item, opts)).tap do |hash|
+      assignment_opts = {exclude_response_fields: ['rubric']}
       if item.is_a?(::CalendarEvent)
         hash[:plannable_date] = item.start_at || item.created_at
         hash[:plannable_type] = 'calendar_event'
@@ -40,7 +42,7 @@ module Api::V1::PlannerItem
       elsif item.is_a?(::PlannerNote)
         hash[:plannable_date] = item.todo_date || item.created_at
         hash[:plannable_type] = 'planner_note'
-        hash[:plannable] = api_json(item, user, session)
+        hash[:plannable] = planner_note_json(item, user, session)
         # TODO: We don't currently have an html_url for individual planner items.
         # hash[:html_url] = ???
       elsif item.is_a?(Quizzes::Quiz) || (item.respond_to?(:quiz?) && item.quiz?)
@@ -55,38 +57,39 @@ module Api::V1::PlannerItem
         item = item.wiki_page if item.respond_to?(:wiki_page?) && item.wiki_page?
         hash[:plannable_date] = item.todo_date || item.created_at
         hash[:plannable_type] = 'wiki_page'
-        hash[:plannable] = wiki_page_json(item, user, session)
+        hash[:plannable] = wiki_page_json(item, user, session, false, assignment_opts: assignment_opts)
         hash[:html_url] = named_context_url(item.context, :context_wiki_page_url, item.id)
         hash[:planner_override] ||= planner_override_json(item.planner_override_for(user), user, session)
       elsif item.is_a?(Announcement)
-        hash[:plannable_date] = item.todo_date || item.posted_at || item.created_at
+        hash[:plannable_date] = item.posted_at || item.created_at
         hash[:plannable_type] = 'announcement'
-        hash[:plannable] = discussion_topic_api_json(item.discussion_topic, item.discussion_topic.context, user, session)
-        hash[:html_url] = named_context_url(item.discussion_topic.context, :context_discussion_topic_url, item.discussion_topic.id)
+        hash[:plannable] = discussion_topic_api_json(item, item.context, user, session)
+        hash[:html_url] = named_context_url(item.context, :context_discussion_topic_url, item.id)
       elsif item.is_a?(DiscussionTopic) || (item.respond_to?(:discussion_topic?) && item.discussion_topic?)
         topic = item.is_a?(DiscussionTopic) ? item : item.discussion_topic
         hash[:plannable_id] = topic.id
         hash[:plannable_date] = item[:user_due_date] || topic.todo_date || topic.posted_at || topic.created_at
         hash[:plannable_type] = 'discussion_topic'
-        hash[:plannable] = discussion_topic_api_json(topic, topic.context, user, session)
+        hash[:plannable] = discussion_topic_api_json(topic, topic.context, user, session, assignment_opts: assignment_opts)
         hash[:html_url] = named_context_url(topic.context, :context_discussion_topic_url, topic.id)
         hash[:planner_override] ||= planner_override_json(topic.planner_override_for(user), user, session)
       else
         hash[:plannable_type] = 'assignment'
         hash[:plannable_date] = item[:user_due_date] || item.due_at
-        hash[:plannable] = assignment_json(item, user, session, include_discussion_topic: true)
+        hash[:plannable] = assignment_json(item, user, session, {include_discussion_topic: true}.merge(assignment_opts))
         hash[:html_url] = named_context_url(item.context, :context_assignment_url, item.id)
       end
     end
   end
 
   def planner_items_json(items, user, session, opts = {})
+    ActiveRecord::Associations::Preloader.new.preload(items, :planner_overrides, ::PlannerOverride.where(user: user))
     _events, other_items = items.partition{|i| i.is_a?(::CalendarEvent)}
     notes, context_items = other_items.partition{|i| i.is_a?(::PlannerNote)}
-    ActiveRecord::Associations::Preloader.new.preload(notes, :user => {:pseudonym => :account}) if notes.any?
-    wiki_pages, other_context_items = context_items.partition{|i| i.is_a?(::WikiPage)}
-    ActiveRecord::Associations::Preloader.new.preload(wiki_pages, :wiki => [{:course => :root_account}, {:group => :root_account}]) if wiki_pages.any?
-    ActiveRecord::Associations::Preloader.new.preload(other_context_items, :context => :root_account) if other_context_items.any?
+    ActiveRecord::Associations::Preloader.new.preload(notes, user: {pseudonym: :account}) if notes.any?
+    wiki_pages, other_context_items = context_items.partition{|i| i.is_a?(::WikiPage) || i.try(:wiki_page?)}
+    ActiveRecord::Associations::Preloader.new.preload(wiki_pages, wiki: [{course: :root_account}, {group: :root_account}]) if wiki_pages.any?
+    ActiveRecord::Associations::Preloader.new.preload(other_context_items, {context: :root_account}) if other_context_items.any?
     items.map do |item|
       planner_item_json(item, user, session, opts)
     end
@@ -95,15 +98,15 @@ module Api::V1::PlannerItem
   def submission_statuses_for(user, item, opts = {})
     submission_status = {submissions: false}
     return submission_status unless item.is_a?(Assignment)
-    ss = user.submission_statuses(opts)
+    @ss ||= user.submission_statuses(opts)
     submission_status[:submissions] = {
-      submitted: ss[:submitted].include?(item.id),
-      excused: ss[:excused].include?(item.id),
-      graded: ss[:graded].include?(item.id),
-      late: ss[:late].include?(item.id),
-      missing: ss[:missing].include?(item.id),
-      needs_grading: ss[:needs_grading].include?(item.id),
-      has_feedback: ss[:has_feedback].include?(item.id)
+      submitted: @ss[:submitted].include?(item.id),
+      excused: @ss[:excused].include?(item.id),
+      graded: @ss[:graded].include?(item.id),
+      late: @ss[:late].include?(item.id),
+      missing: @ss[:missing].include?(item.id),
+      needs_grading: @ss[:needs_grading].include?(item.id),
+      has_feedback: @ss[:has_feedback].include?(item.id)
     }
 
     # planner will display the most recent comment not made by the user herself
@@ -130,8 +133,9 @@ module Api::V1::PlannerItem
 
   def new_activity(item, user, opts = {})
     if item.is_a?(Assignment) || item.try(:assignment)
+      @ss ||= user.submission_statuses(opts)
       assign = item.try(:assignment) || item
-      return true if user.submission_statuses(opts).dig(:new_activity).include?(assign.id)
+      return true if @ss.dig(:new_activity).include?(assign.id)
     end
     if item.is_a?(DiscussionTopic) || item.try(:discussion_topic)
       topic = item.try(:discussion_topic) || item

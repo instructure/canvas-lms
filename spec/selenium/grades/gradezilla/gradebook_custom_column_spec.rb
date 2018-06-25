@@ -55,11 +55,13 @@ describe "Gradezilla - custom columns" do
     expect(Gradezilla.content_selector).to contain_css('.custom_column')
 
     # hide the notes column
+    driver.action.send_keys(:escape).perform
     Gradezilla.select_view_dropdown
     Gradezilla.select_notes_option
     expect(Gradezilla.content_selector).not_to contain_css('.custom_column')
 
     # show the notes column
+    driver.action.send_keys(:escape).perform
     Gradezilla.select_view_dropdown
     Gradezilla.select_notes_option
     expect(Gradezilla.content_selector).to contain_css('.custom_column')

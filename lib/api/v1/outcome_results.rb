@@ -204,6 +204,7 @@ module Api::V1::OutcomeResults
       title: score.title,
       submitted_at: score.submitted_at,
       count: score.count,
+      hide_points: score.hide_points,
       links: {outcome: score.outcome.id.to_s},
     }
   end

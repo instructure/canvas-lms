@@ -78,6 +78,7 @@ describe SisBatch do
 
   it 'should make parallel importers' do
     @account.enable_feature!(:refactor_of_sis_imports)
+
     batch = process_csv_data([%{user_id,login_id,status
                                 user_1,user_1,active},
                               %{course_id,short_name,long_name,term_id,status
@@ -160,6 +161,62 @@ test_1,TC 101,Test Course 101,,term1,deleted
       expect(batch.progress).to eq 100
       expect(batch.workflow_state).to eq 'aborted'
       expect(@account.all_courses.where(sis_source_id: 'test_1').take.workflow_state).to eq 'claimed'
+    end
+
+    describe "with parallel importers" do
+      before :each do
+        @account.enable_feature!(:refactor_of_sis_imports)
+        @batch1 = create_csv_data(
+          [%{user_id,login_id,status
+          user_1,user_1,active
+          user_2,user_2,active}])
+        @batch2 = create_csv_data(
+          [%{course_id,short_name,long_name,term_id,status
+          course_1,course_1,course_1,term_1,active
+          course_2,course_2,course_2,term_1,active}])
+      end
+
+      it "should run all batches immediately if they are small enough" do
+        SisBatch.process_all_for_account(@account)
+        expect(@batch1.reload).to be_imported
+        expect(@batch1.data[:running_immediately]).to be_truthy
+        expect(@batch2.reload).to be_imported
+        expect(@batch2.data[:running_immediately]).to be_truthy
+      end
+
+      it "should queue a new job after a successful parallelized import" do
+        Setting.get('sis_batch_parallelism_count_threshold', '1') # force parallelism
+        SisBatch.process_all_for_account(@account)
+        expect(@batch1.reload).to be_importing
+        expect(@batch2.reload).to be_created
+        run_jobs # should queue up process_all_for_account again after @batch1 completes
+        expect(@batch1.reload).to be_imported
+        expect(@batch2.reload).to be_imported
+      end
+    end
+
+    describe "with non-standard batches" do
+      it "should only queue one 'process_all_for_account' job and run together" do
+        begin
+          @account.enable_feature!(:refactor_of_sis_imports)
+          SisBatch.valid_import_types["silly_sis_batch"] = {
+            :callback => lambda {|batch| batch.data[:silliness_complete] = true; batch.finish(true) }
+          }
+          enable_cache do
+            batch1 = @account.sis_batches.create!(:workflow_state => "created", :data => {:import_type => "silly_sis_batch"})
+            batch1.process
+            batch2 = @account.sis_batches.create!(:workflow_state => "created", :data => {:import_type => "silly_sis_batch"})
+            batch2.process
+            expect(Delayed::Job.where(:tag => "SisBatch.process_all_for_account",
+              :strand => SisBatch.strand_for_account(@account)).count).to eq 1
+            SisBatch.process_all_for_account(@account)
+            expect(batch1.reload.data[:silliness_complete]).to eq true
+            expect(batch2.reload.data[:silliness_complete]).to eq true
+          end
+        ensure
+          SisBatch.valid_import_types.delete("silly_sis_batch")
+        end
+      end
     end
   end
 
@@ -620,6 +677,16 @@ s2,test_1,section2,active},
       zip = Zip::File.open(batch1.generated_diff.open.path)
       expect(zip.glob('*.csv').first.get_input_stream.read).to eq(%{user_id,login_id,status\n})
       expect(batch1.workflow_state).to eq 'imported'
+    end
+
+    it 'should not fail for completely empty files' do
+      batch0 = create_csv_data([], add_empty_file: true)
+      batch0.update_attributes(diffing_data_set_identifier: 'default', options: {diffing_drop_status: 'completed'})
+      batch0.process_without_send_later
+      batch1 = create_csv_data([], add_empty_file: true)
+      batch1.update_attributes(diffing_data_set_identifier: 'default', options: {diffing_drop_status: 'completed'})
+      batch1.process_without_send_later
+      expect(batch1.reload).to be_imported
     end
 
     describe 'diffing_drop_status' do

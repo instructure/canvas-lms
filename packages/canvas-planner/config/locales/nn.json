@@ -5,11 +5,17 @@
   "all_day_fb42c4fc": {
     "message": "Heile dagen"
   },
+  "announcement_fb4cb645": {
+    "message": "Kunngjering"
+  },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } til { endDate }"
   },
   "only_most_recent_grading_period_shown_f1ad6458": {
     "message": "*Kun nyaste karaktersetjingsperiode viser."
+  },
+  "assignment_976578a8": {
+    "message": "Oppgåve"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Vis # fullført element}\n  other {Vis # fullførte elementer}\n}"
@@ -67,6 +73,9 @@
   },
   "yesterday_at_date_1aa6d18e": {
     "message": "I går på { date }"
+  },
+  "calendar_event_89aadc1c": {
+    "message": "Kalenderhending"
   },
   "load_prior_dates_f2b0f6f0": {
     "message": "Last tidlegare datoar"
@@ -152,6 +161,9 @@
   "unable_to_mark_as_complete_8141856d": {
     "message": "Kan ikkje merke som fullført. "
   },
+  "discussion_6719c51d": {
+    "message": "Diskusjon"
+  },
   "points_bceb5005": {
     "message": "poeng"
   },
@@ -188,6 +200,9 @@
   "graded_25cd3fcd": {
     "message": "Karaktersett"
   },
+  "page_50c4823d": {
+    "message": "Side"
+  },
   "to_do_1d554f36": {
     "message": "Gjeremål"
   },
@@ -206,6 +221,9 @@
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
   },
+  "quiz_e0dcce8f": {
+    "message": "Quiz"
+  },
   "date_is_not_a_valid_date_4ef9f8ba": {
     "message": "#{ date } er ikkje ein gyldig dato."
   },
@@ -220,6 +238,9 @@
   },
   "failed_to_delete_to_do_64edff49": {
     "message": "Kan ikkje slette gjeremål"
+  },
+  "to_do_items_loading_d1cdfcd5": {
+    "message": "Lastar innhald i Å gjere-oversikta"
   },
   "loading_725811ca": {
     "message": "lastar"

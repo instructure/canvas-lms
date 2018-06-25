@@ -17,10 +17,9 @@
  */
 
 import React, {Component} from 'react'
-import {arrayOf, bool, element, func, instanceOf, number, shape, string} from 'prop-types'
+import {arrayOf, bool, element, instanceOf, number, shape, string} from 'prop-types'
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import {MenuItem} from '@instructure/ui-core/lib/components/Menu'
-import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
+import Menu, {MenuItem} from '@instructure/ui-menu/lib/components/Menu'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import IconArrowOpenDownLine from '@instructure/ui-icons/lib/Line/IconArrowOpenDown'
 import I18n from 'i18n!gradebook'
@@ -59,14 +58,14 @@ export default class GradingSchemeInput extends Component {
     disabled: bool,
     gradingScheme: instanceOf(Array).isRequired,
     label: element.isRequired,
-    menuContentRef: func,
+    menuContentRef: Menu.propTypes.menuRef,
     messages: arrayOf(
       shape({
         text: string.isRequired,
         type: string.isRequired
       })
     ).isRequired,
-    onMenuClose: func,
+    onMenuDismiss: Menu.propTypes.onDismiss,
     pendingGradeInfo: shape({
       excused: bool.isRequired,
       grade: string,
@@ -82,7 +81,7 @@ export default class GradingSchemeInput extends Component {
   static defaultProps = {
     disabled: false,
     menuContentRef: null,
-    onMenuClose: null,
+    onMenuDismiss: null,
     pendingGradeInfo: null
   }
 
@@ -212,9 +211,9 @@ export default class GradingSchemeInput extends Component {
         />
 
         <div className="Grid__AssignmentRowCell__GradingSchemeMenu">
-          <PopoverMenu
+          <Menu
             contentRef={this.props.menuContentRef}
-            onClose={this.props.onMenuClose}
+            onDismiss={this.props.onMenuDismiss}
             onToggle={this.handleToggle}
             onSelect={this.handleSelect}
             placement="bottom"
@@ -233,7 +232,7 @@ export default class GradingSchemeInput extends Component {
             <MenuItem key="EX" value="EX">
               {GradeFormatHelper.excused()}
             </MenuItem>
-          </PopoverMenu>
+          </Menu>
         </div>
       </div>
     )

@@ -1,0 +1,58 @@
+/*
+ * Copyright (C) 2018 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+.pairing-code {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #E1E5E6;
+  cursor: text;
+  margin: 1.5rem 0 0;
+}
+
+// The context_roster_user view can show 2 different
+// views based on whether or not profiles are enabled
+// The following css is for when profiles are not enabled
+// in order to match our button styles with the existing
+// button styles on the page
+.page-action-list #pairing-code {
+  button {
+    display: block;
+    padding: 8px 0;
+    color: var(--ic-brand-font-color-dark);
+    font-weight: bold;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+    border-bottom: 1px solid #C7CDD1;
+    background-color: white;
+
+    &:hover {
+      color: var(--ic-link-color);
+    }
+
+    &:active {
+      color: #999;
+      box-shadow: none;
+    }
+
+    span {
+      padding: .15rem;
+    }
+  }
+}

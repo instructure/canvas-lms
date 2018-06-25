@@ -27,6 +27,12 @@ class RoleOverride < ActiveRecord::Base
 
   validate :must_apply_to_something
 
+  after_save :update_role_changed_at
+
+  def update_role_changed_at
+    self.role.touch
+  end
+
   def self.v2_labels(context, has_v2)
     context.feature_enabled?(:permissions_v2_ui) && has_v2
   end
@@ -736,13 +742,14 @@ class RoleOverride < ActiveRecord::Base
       },
       :import_sis => {
         :label => lambda { t('Import SIS data') },
+        :label_v2 => lambda { t("SIS Data - import") },
         :account_only => :root,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
       },
       :manage_sis => {
         :label => lambda { t('permissions.manage_sis', "Manage SIS data") },
-        :label_v2 => lambda { t("SIS Data - import") },
+        :label_v2 => lambda { t("SIS Data - manage") },
         :account_only => :root,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
@@ -904,14 +911,12 @@ class RoleOverride < ActiveRecord::Base
       :select_final_grade => {
         :label => -> { t('Select final grade for moderation') },
         :true_for => %w(AccountAdmin TeacherEnrollment TaEnrollment),
-        :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment),
-        :account_allows => lambda {|a| a.feature_enabled?(:anonymous_moderated_marking)}
+        :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment)
       },
       :view_audit_trail => {
         :label => -> { t('View audit trail') },
         :true_for => %w(TeacherEnrollment AccountAdmin),
-        :available_to => %w(TeacherEnrollment AccountAdmin AccountMembership),
-        :account_allows => lambda {|a| a.feature_enabled?(:anonymous_moderated_marking)}
+        :available_to => %w(TeacherEnrollment AccountAdmin AccountMembership)
       }
     })
 

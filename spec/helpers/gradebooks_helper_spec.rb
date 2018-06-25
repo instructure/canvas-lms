@@ -21,12 +21,20 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'nokogiri'
 
 describe GradebooksHelper do
-  FakeAssignment = Struct.new(:grading_type, :quiz, :points_possible).freeze
+  FakeAssignment = Struct.new(:grading_type, :quiz, :points_possible, :anonymous_grading) do
+    def anonymous_grading?
+      anonymous_grading
+    end
+  end.freeze
   FakeSubmission = Struct.new(:assignment, :score, :grade, :submission_type,
                               :workflow_state, :excused?).freeze
   FakeQuiz = Struct.new(:survey, :anonymous_submissions) do
     def survey?
       survey
+    end
+
+    def anonymous_survey?
+      survey? && anonymous_submissions
     end
   end.freeze
 
@@ -35,62 +43,24 @@ describe GradebooksHelper do
   let(:quiz) { assignment.quiz = FakeQuiz.new }
   let(:anonymous_survey) { assignment.quiz = FakeQuiz.new(true, true) }
 
-  describe '#anonymous_assignment?' do
+  describe '#anonymous_survey?' do
     it 'requires a quiz' do
-      expect(helper.anonymous_assignment?(assignment)).to eq false
+      expect(helper.anonymous_survey?(assignment)).to eq false
     end
 
     it 'is falsy with just a survey' do
       quiz.survey = true
-      expect(helper.anonymous_assignment?(assignment)).to eq false
+      expect(helper.anonymous_survey?(assignment)).to eq false
     end
 
     it 'is falsy with just anonymous_submissions' do
       quiz.anonymous_submissions = true
-      expect(helper.anonymous_assignment?(assignment)).to eq false
+      expect(helper.anonymous_survey?(assignment)).to eq false
     end
 
     it 'is truthy with an anonymous survey' do
       anonymous_survey
-      expect(helper.anonymous_assignment?(assignment)).to eq true
-    end
-  end
-
-  describe '#anonymous_grading_required?' do
-    it 'returns false by default' do
-      assignment = assignment_model
-      expect(helper.anonymous_grading_required?(assignment)).to eq false
-    end
-
-    it 'returns true if course setting is on' do
-      assignment = assignment_model
-      assignment.context.enable_feature!(:anonymous_grading)
-      expect(helper.anonymous_grading_required?(assignment)).to eq true
-    end
-
-    it 'returns true if sub-account setting is on' do
-      root_account = Account.default
-      sub_account = root_account.sub_accounts.create!
-      sub_account.enable_feature!(:anonymous_grading)
-      sub_account_course = course_model(account: sub_account)
-      assignment = assignment_model(course: sub_account_course)
-      expect(helper.anonymous_grading_required?(assignment)).to eq true
-    end
-
-    it 'returns true if root account setting is on' do
-      root_account = Account.default
-      root_account.enable_feature!(:anonymous_grading)
-      sub_account = root_account.sub_accounts.create!
-      sub_account_course = course_model(account: sub_account)
-      assignment = assignment_model(course: sub_account_course)
-      expect(helper.anonymous_grading_required?(assignment)).to eq true
-    end
-
-    it 'returns true if site admin setting is on' do
-      site_admin_account = Account.site_admin
-      site_admin_account.enable_feature!(:anonymous_grading)
-      assignment = assignment_model
-      expect(helper.anonymous_grading_required?(assignment)).to eq true
+      expect(helper.anonymous_survey?(assignment)).to eq true
     end
   end
 
@@ -104,26 +74,15 @@ describe GradebooksHelper do
       expect(helper.force_anonymous_grading?(assignment)).to eq true
     end
 
-    it 'returns true if anonymous grading flag set' do
-      Account.default.enable_feature!(:anonymous_grading)
-      expect(helper.force_anonymous_grading?(assignment_model)).to eq true
+    it 'returns true for an anonymously-graded assignment' do
+      assignment = assignment_model
+      assignment.anonymous_grading = true
+      expect(helper.force_anonymous_grading?(assignment)).to eq true
     end
 
-    context 'when Anonymous Moderated Marking is enabled' do
-      before(:once) do
-        Account.default.enable_feature!(:anonymous_moderated_marking)
-      end
-
-      it 'returns true for an anonymously-graded assignment' do
-        assignment = assignment_model
-        assignment.anonymous_grading = true
-        expect(helper.force_anonymous_grading?(assignment)).to eq true
-      end
-
-      it 'returns false for a non-anonymously-graded assignment' do
-        assignment = assignment_model
-        expect(helper.force_anonymous_grading?(assignment)).to eq false
-      end
+    it 'returns false for a non-anonymously-graded assignment' do
+      assignment = assignment_model
+      expect(helper.force_anonymous_grading?(assignment)).to eq false
     end
   end
 
@@ -138,8 +97,9 @@ describe GradebooksHelper do
     end
 
     it 'returns anonymous grading' do
-      Account.default.enable_feature!(:anonymous_grading)
-      expect(helper.force_anonymous_grading_reason(assignment_model)).to match(/anonymous grading/)
+      assignment = assignment_model
+      assignment.anonymous_grading = true
+      expect(helper.force_anonymous_grading_reason(assignment)).to match(/anonymous grading/)
     end
   end
 

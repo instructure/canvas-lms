@@ -215,7 +215,7 @@ test('shows todo input with date when given date', function() {
   ENV.STUDENT_PLANNER_ENABLED = true
   const view = this.editView({}, {todo_date: '2017-01-03'})
   equal(view.$el.find('#allow_todo_date').prop('checked'), true)
-  equal(view.$el.find('#todo_date').val(), 'Jan 3, 2017 at 12am')
+  equal(view.$el.find('#todo_date').val(), 'Jan 3, 2017 12am')
 })
 
 test('does not show todo checkbox without permission', function() {
@@ -537,4 +537,9 @@ test('switches to details tab if save error does not contain conditional release
     equal(0, view.$discussionEditView.tabs('option', 'active'))
     return resolved()
   })
+})
+
+test('Does not change the locked status of an existing discussion topic', function() {
+  const view = this.editView({}, {locked: true})
+  equal(true, view.model.get('locked'))
 })

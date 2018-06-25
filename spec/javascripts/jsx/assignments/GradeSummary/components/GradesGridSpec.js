@@ -19,6 +19,7 @@
 import React from 'react'
 import {mount} from 'enzyme'
 
+import Grid from 'jsx/assignments/GradeSummary/components/GradesGrid/Grid'
 import GradesGrid from 'jsx/assignments/GradeSummary/components/GradesGrid'
 
 QUnit.module('GradeSummary GradesGrid', suiteHooks => {
@@ -27,6 +28,11 @@ QUnit.module('GradeSummary GradesGrid', suiteHooks => {
 
   suiteHooks.beforeEach(() => {
     props = {
+      disabledCustomGrade: false,
+      finalGrader: {
+        graderId: 'teach',
+        id: '1105'
+      },
       graders: [
         {graderId: '1101', graderName: 'Miss Frizzle'},
         {graderId: '1102', graderName: 'Mr. Keating'}
@@ -71,6 +77,8 @@ QUnit.module('GradeSummary GradesGrid', suiteHooks => {
           }
         }
       },
+      onGradeSelect() {},
+      selectProvisionalGradeStatuses: {},
       students: [
         {id: '1111', displayName: 'Adam Jones'},
         {id: '1112', displayName: 'Betty Ford'},
@@ -108,16 +116,39 @@ QUnit.module('GradeSummary GradesGrid', suiteHooks => {
     deepEqual(getGraderNames(), ['Miss Frizzle', 'Mr. Keating'])
   })
 
-  test('enumerates graders for names when graders are anonymous', () => {
-    props.graders[0].graderName = null
-    props.graders[1].graderName = null
-    mountComponent()
-    deepEqual(getGraderNames(), ['Grader 1', 'Grader 2'])
-  })
-
   test('includes a row for each student', () => {
     mountComponent()
     strictEqual(wrapper.find('tr.GradesGrid__BodyRow').length, 4)
+  })
+
+  test('sends disabledCustomGrade to the Grid', () => {
+    mountComponent()
+    const grid = wrapper.find(Grid)
+    strictEqual(grid.prop('disabledCustomGrade'), false)
+  })
+
+  test('sends finalGrader to the Grid', () => {
+    mountComponent()
+    const grid = wrapper.find(Grid)
+    strictEqual(grid.prop('finalGrader'), props.finalGrader)
+  })
+
+  test('sends graders to the Grid', () => {
+    mountComponent()
+    const grid = wrapper.find(Grid)
+    strictEqual(grid.prop('graders'), props.graders)
+  })
+
+  test('sends onGradeSelect to the Grid', () => {
+    mountComponent()
+    const grid = wrapper.find(Grid)
+    strictEqual(grid.prop('onGradeSelect'), props.onGradeSelect)
+  })
+
+  test('sends selectProvisionalGradeStatuses to the Grid', () => {
+    mountComponent()
+    const grid = wrapper.find(Grid)
+    strictEqual(grid.prop('selectProvisionalGradeStatuses'), props.selectProvisionalGradeStatuses)
   })
 
   test('adds rows as students are added', () => {

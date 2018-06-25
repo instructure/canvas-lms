@@ -2,8 +2,10 @@
 
 exports[`The CommentButton component renders the root component as expected 1`] = `
 "<div>
-  <Button variant=\\"icon\\" margin=\\"0 x-small 0 0\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" fluidWidth={false} buttonRef={[Function]}>
-    <IconFeedback title=\\"Additional Comments\\" />
+  <Button variant=\\"icon\\" icon={{...}} margin=\\"0 x-small 0 0\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" fluidWidth={false} buttonRef={[Function]}>
+    <ScreenReaderContent as=\\"span\\">
+      Additional Comments
+    </ScreenReaderContent>
   </Button>
   <CommentDialog description=\\"Criterion description\\" open={false} comments=\\"some things\\" finalize={[Function]} setComments={[Function]} />
 </div>"

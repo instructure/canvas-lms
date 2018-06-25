@@ -40,7 +40,7 @@ describe AssignmentOverride do
   it 'should allow deletes to invalid objects' do
     override = assignment_override_model(course: @course)
     # make it invalid
-    AssignmentOverride.where(id: override).update_all(assignment_id: nil, quiz_id: nil)
+    AssignmentOverride.where(id: override).update_all(set_type: 'potato')
     expect(override.reload).to be_invalid
     override.destroy
     expect{ override.destroy }.not_to raise_error

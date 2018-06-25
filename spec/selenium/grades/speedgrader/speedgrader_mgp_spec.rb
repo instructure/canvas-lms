@@ -48,10 +48,7 @@ describe "speedgrader with grading periods" do
     it 'assignment in closed gp should not be gradable', test_id: 2947133, priority: "1" do
       assignment = @course.assignments.create!(due_at: 18.days.ago, title: "assign in closed")
       Speedgrader.visit(@course.id, assignment.id)
-      Speedgrader.enter_grade(8)
-
-      expect(Speedgrader.current_grade).to eq ""
-      expect(Submission.where(assignment_id: assignment.id, user_id: @student.id).first).not_to be_graded
+      expect(Speedgrader.grading_enabled?).to be false
       expect(Speedgrader.top_bar).to contain_css(Speedgrader.closed_gp_notice_selector)
     end
   end

@@ -55,10 +55,11 @@ it('sets loadingFuture to true on GETTING_FUTURE_ITEMS', () => {
   expect(newState).toMatchObject({ loadingFuture: true });
 });
 
-it('sets loading to false on GOT_DAYS_SUCCESS', () => {
+it('sets loading to false and plannerLoaded to true on GOT_DAYS_SUCCESS', () => {
   const state = initialState({isLoading: true});
   const newState = loadingReducer(state, Actions.gotDaysSuccess([]));
   expect(newState).toMatchObject({
+    plannerLoaded: true,
     isLoading: false,
     loadingPast: false,
     loadingFuture: false,
