@@ -367,6 +367,25 @@ describe GradebookImporter do
     expect(@gi.missing_assignments).to eq [@assignment3]
   end
 
+  it "parses assignments correctly with existing custom columns" do
+    course_model
+    @assignment1 = @course.assignments.create! name: 'Assignment 1'
+    @assignment3 = @course.assignments.create! name: 'Assignment 3'
+    @custom_column1 = @course.custom_gradebook_columns.create! title: "Custom Column 1"
+
+    importer_with_rows(
+      'Student,ID,Section,Custom Column 1,Assignment 1,Assignment 2',
+      'Some Student,,,,,'
+    )
+
+    expect(@gi.assignments.length).to eq 2
+    expect(@gi.assignments.first).to eq @assignment1
+    expect(@gi.assignments.last.title).to eq 'Assignment 2'
+    expect(@gi.assignments.last).to be_new_record
+    expect(@gi.assignments.last.id).to be < 0
+    expect(@gi.missing_assignments).to eq [@assignment3]
+  end
+
   it "parses CSVs with the SIS Login ID column" do
     course = course_model
     user = user_model

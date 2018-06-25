@@ -31,7 +31,43 @@ describe GradebookExporter do
       GradebookExporter.new(@course, @teacher, opts)
     end
 
+    describe "custom columns" do
+      before(:once) do
+        first_column = @course.custom_gradebook_columns.create! title: "Custom Column 1"
+        second_column = @course.custom_gradebook_columns.create! title: "Custom Column 2"
+        third_column = @course.custom_gradebook_columns.create!({title: "Custom Column 3", workflow_state: "hidden"})
+
+        student1_enrollment = student_in_course(course: @course, active_all: true).user
+        student2_enrollment = student_in_course(course: @course, active_all: true).user
+
+        first_column.custom_gradebook_column_data.create!({content: 'Row1 Custom Column 1', user_id: student1_enrollment.id})
+        first_column.custom_gradebook_column_data.create!({content: 'Row2 Custom Column 1', user_id: student2_enrollment.id})
+        second_column.custom_gradebook_column_data.create!({content: 'Row1 Custom Column 2', user_id: student1_enrollment.id})
+        second_column.custom_gradebook_column_data.create!({content: 'Row2 Custom Column 2', user_id: student2_enrollment.id})
+        third_column.custom_gradebook_column_data.create!({content: 'Row1 Custom Column 3', user_id: student1_enrollment.id})
+        third_column.custom_gradebook_column_data.create!({content: 'Row2 Custom Column 3', user_id: student2_enrollment.id})
+      end
+
+      it "have the correct custom column data in proper order" do
+        csv = GradebookExporter.new(@course, @teacher).to_csv
+        rows = CSV.parse(csv, headers: true)
+
+        expect(rows[1]['Custom Column 1']).to eq 'Row1 Custom Column 1'
+        expect(rows[2]['Custom Column 1']).to eq 'Row2 Custom Column 1'
+        expect(rows[1]['Custom Column 2']).to eq 'Row1 Custom Column 2'
+        expect(rows[2]['Custom Column 2']).to eq 'Row2 Custom Column 2'
+        expect(rows[1]['Custom Column 3']).to eq nil
+        expect(rows[2]['Custom Column 3']).to eq nil
+      end
+    end
+
     describe "default output with blank course" do
+      before(:once) do
+        @course.custom_gradebook_columns.create! title: "Custom Column 1"
+        @course.custom_gradebook_columns.create! title: "Custom Column 2"
+        @course.custom_gradebook_columns.create!({title: "Custom Column 3", workflow_state: "hidden"})
+      end
+
       subject(:csv) { exporter.to_csv }
 
       it { is_expected.to be_a String }
@@ -47,10 +83,12 @@ describe GradebookExporter do
 
       it "has headers in a default order" do
         expected_headers = [
-          "Student", "ID", "SIS Login ID", "Section", "Current Points", "Final Points",
+          "Student", "ID", "SIS Login ID", "Section", "Custom Column 1", "Custom Column 2",
+          "Current Points", "Final Points",
           "Current Score", "Unposted Current Score", "Final Score", "Unposted Final Score",
           "Current Grade", "Unposted Current Grade", "Final Grade", "Unposted Final Grade"
         ]
+
         actual_headers = CSV.parse(csv, headers: true).headers
 
         expect(actual_headers).to match_array(expected_headers)
