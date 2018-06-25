@@ -1,3 +1,4 @@
+if Gem.loaded_specs.has_key?('pact_broker-client')
 require 'pact_broker/client/tasks'
 
 # see https://github.com/pact-foundation/pact_broker-client/blob/master/README.md
@@ -32,4 +33,5 @@ namespace :broker do
     task.tag = task_tag
     puts "Pact file tagged with: #{task.tag}"
   end
+end
 end
