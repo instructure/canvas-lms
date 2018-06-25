@@ -2862,6 +2862,7 @@ describe DiscussionTopicsController, type: :request do
   describe "duplicate" do
     before :once do
       course_with_teacher(:active_all => true)
+      @student = User.create!(:name => "foo", :short_name => "fo")
       student_in_course(:course => @course, :active_all => true)
       group_discussion_topic_model()
     end
@@ -2974,6 +2975,48 @@ describe DiscussionTopicsController, type: :request do
       expect(json["title"]).to eq "Section Specific Topic Copy"
       expect(json["sections"].length).to eq 1
       expect(json["sections"][0]["id"]).to eq section1.id
+    end
+
+    it "duplicate publishes group context discussions if its a student duplicating" do
+      @user = @student
+      group_category = @course.group_categories.create!(:name => 'group category')
+      @course.enroll_student(@student, :active_all => true)
+      group = group_category.groups.create!(:name => "group", :context => @course)
+      group.add_user(@student)
+      topic = group.discussion_topics.create!(:title => "student topic", :user => @student,
+        :workflow_state => "active", :message => "hello")
+      json = api_call(:post, "/api/v1/groups/#{group.id}/discussion_topics/#{topic.id}/duplicate",
+        { :controller => "discussion_topics_api",
+          :action => "duplicate",
+          :format => "json",
+          :group_id => group.to_param,
+          :topic_id => topic.to_param },
+        {},
+        {},
+        :expected_status => 200)
+      duplicated_topic = DiscussionTopic.last
+      expect(duplicated_topic.published?).to be_truthy
+      expect(json["published"]).to be_truthy
+    end
+
+    it "duplicate does not publish group context discussions if its a teacher duplicating" do
+      @user = @teacher
+      group_category = @course.group_categories.create!(:name => 'group category')
+      group = group_category.groups.create!(:name => "group", :context => @course)
+      topic = group.discussion_topics.create!(:title => "teacher topic", :user => @teacher,
+        :workflow_state => "active", :message => "hello")
+      json = api_call(:post, "/api/v1/groups/#{group.id}/discussion_topics/#{topic.id}/duplicate",
+        { :controller => "discussion_topics_api",
+          :action => "duplicate",
+          :format => "json",
+          :group_id => group.to_param,
+          :topic_id => topic.to_param },
+        {},
+        {},
+        :expected_status => 200)
+      duplicated_topic = DiscussionTopic.last
+      expect(duplicated_topic.published?).to be_falsey
+      expect(json["published"]).to be_falsey
     end
 
     it "duplicate updates positions" do
