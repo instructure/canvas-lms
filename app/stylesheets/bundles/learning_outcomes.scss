@@ -207,6 +207,21 @@ ul.outcome-level {
       opacity: 0.75;
     }
   }
+
+  h3, .h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: var(--ic-link-color);
+    font-weight: normal;
+    min-height: 1em;
+    font-size: 1rem;
+    &.total {
+      font-weight: bold;
+      @if $use_high_contrast {
+        color: $ic-font-color-dark;
+      }
+    }
+  }
 }
 
 #import_dialog {
@@ -235,21 +250,6 @@ table.criterion td {
 
 .rating-wrap {
   position: relative;
-}
-
-h3, .h3 {
-  margin-top: 0;
-  margin-bottom: 10px;
-  color: var(--ic-link-color);
-  font-weight: normal;
-  min-height: 1em;
-  font-size: 1rem;
-  &.total {
-    font-weight: bold;
-    @if $use_high_contrast {
-      color: $ic-font-color-dark;
-    }
-  }
 }
 
 table.criterion .edit {
