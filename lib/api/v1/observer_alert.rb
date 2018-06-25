@@ -31,6 +31,7 @@ module Api::V1::ObserverAlert
       context_type
       context_id
       workflow_state
+      action_date
     ).freeze
   }.freeze
 
@@ -46,6 +47,9 @@ module Api::V1::ObserverAlert
             course_url(alert.context)
           when 'AccountNotification'
             account_notification_url(alert.context.account_id, alert.context)
+          when 'Submission'
+            assignment = alert.context.assignment
+            course_assignment_url(assignment.context_id, assignment)
           end
 
     hash['html_url'] = url
