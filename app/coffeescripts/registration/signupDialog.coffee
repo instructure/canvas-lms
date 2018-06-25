@@ -71,8 +71,8 @@ define [
       errorFormatter: registrationErrors
       success: (data) =>
         # they should now be authenticated (either registered or pre_registered)
-        if data.redirect
-          window.location = data.redirect
+        if data.destination
+          window.location = data.destination
         else if data.course
           window.location = "/courses/#{data.course.course.id}?registration_success=1"
         else
