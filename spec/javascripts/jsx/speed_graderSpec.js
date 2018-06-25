@@ -1308,15 +1308,17 @@ QUnit.module('SpeedGrader - clicking save rubric button for an anonymous assignm
     sinon.stub(window.rubricAssessment, 'assessmentData').returns({ 'rubric_assessment[user_id]': 'abcde' });
 
     fixtures.innerHTML = `
-      <span id="speedgrader-settings"></span>
       <button class="save_rubric_button"></button>
       <div id="speedgrader_comment_textarea_mount_point"></div>
       <div id="speedgrader-settings"></div>
+      <select id="rubric_assessments_select"></select>
+      <div id="rubric_assessments_list"></div>
     `
     SpeedGrader.setup()
     SpeedGrader.EG.currentStudent = {
       id: 4,
       name: 'P. Sextus Rubricius',
+      rubric_assessments: [],
       submission_state: 'not_graded',
       submission: {
         grading_period_id: 8,
@@ -1388,6 +1390,22 @@ QUnit.module('SpeedGrader - clicking save rubric button for an anonymous assignm
 
     const [, , data] = $.ajaxJSON.lastCall.args;
     notOk('rubric_assessment[user_id]' in data)
+  })
+
+  test('calls showRubric with no arguments upon receiving a successful response', () => {
+    const fakeResponse = {
+      artifact: {user_id: 4},
+      related_group_submissions_and_assessments: []
+    }
+    $.ajaxJSON.yields(fakeResponse)
+    sinon.spy(SpeedGrader.EG, 'showRubric')
+
+    $('.save_rubric_button').trigger('click')
+
+    strictEqual(SpeedGrader.EG.showRubric.firstCall.args.length, 0)
+
+    SpeedGrader.EG.showRubric.restore()
+    $.ajaxJSON.reset()
   })
 })
 
@@ -2378,6 +2396,24 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         SpeedGrader.EG.showRubric()
         strictEqual(ENV.RUBRIC_ASSESSMENT.assessment_user_id, alphaStudent.anonymous_id)
       })
+
+      test('calls populateNewRubricSummary with editingData set to a non-null value by default', () => {
+        sinon.spy(window.rubricAssessment, 'populateNewRubricSummary')
+        SpeedGrader.EG.showRubric()
+
+        const [, , , editingData] = window.rubricAssessment.populateNewRubricSummary.firstCall.args
+        notStrictEqual(editingData, null)
+        window.rubricAssessment.populateNewRubricSummary.restore()
+      })
+
+      test('calls populateNewRubricSummary with null editingData when validateEnteredData is false', () => {
+        sinon.spy(window.rubricAssessment, 'populateNewRubricSummary')
+        SpeedGrader.EG.showRubric({validateEnteredData: false})
+
+        const [, , , editingData] = window.rubricAssessment.populateNewRubricSummary.firstCall.args
+        strictEqual(editingData, null)
+        window.rubricAssessment.populateNewRubricSummary.restore()
+      })
     })
 
     QUnit.module('#renderCommentAttachment', hooks => {
@@ -2748,6 +2784,33 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
           `/courses/${course_id}/assignments/${assignment_id}/submissions/${anonymous_id}?download=101112`
         )
       })
+    })
+  })
+
+  QUnit.module('#showSubmission', (hooks) => {
+    hooks.beforeEach(() => {
+      sinon.stub(SpeedGrader.EG, 'showGrade')
+      sinon.stub(SpeedGrader.EG, 'showDiscussion')
+      sinon.stub(SpeedGrader.EG, 'showRubric')
+      sinon.stub(SpeedGrader.EG, 'updateStatsInHeader')
+      sinon.stub(SpeedGrader.EG, 'showSubmissionDetails')
+      sinon.stub(SpeedGrader.EG, 'refreshFullRubric')
+    })
+
+    hooks.afterEach(() => {
+      SpeedGrader.EG.showGrade.restore()
+      SpeedGrader.EG.showDiscussion.restore()
+      SpeedGrader.EG.showRubric.restore()
+      SpeedGrader.EG.updateStatsInHeader.restore()
+      SpeedGrader.EG.showSubmissionDetails.restore()
+      SpeedGrader.EG.refreshFullRubric.restore()
+    })
+
+    test('calls showRubric with validateEnteredData set to false', () => {
+      SpeedGrader.EG.showSubmission()
+
+      const [params] = SpeedGrader.EG.showRubric.firstCall.args
+      strictEqual(params.validateEnteredData, false)
     })
   })
 

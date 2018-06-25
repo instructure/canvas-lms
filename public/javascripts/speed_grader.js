@@ -795,6 +795,23 @@ function getSelectedAssessment(){
   ))[0];
 }
 
+function handleSelectedRubricAssessmentChanged({validateEnteredData = true} = {}) {
+  // This function is triggered both when we assess a student and when we switch
+  // students. In the former case, we want populateNewRubricSummary to check the
+  // data we entered and show an alert if the grader tried to assign more points
+  // to an outcome than it allows (and the course does not allow extra credit).
+  // In the latter case, because this function is called *before* the editing
+  // data is switched over to the new student, we don't want to perform the
+  // comparison since it could result in specious alerts being shown.
+  const editingData = validateEnteredData ? rubricAssessment.assessmentData($("#rubric_full")) : null
+  rubricAssessment.populateNewRubricSummary(
+    $("#rubric_summary_holder .rubric_summary"),
+    getSelectedAssessment(),
+    jsonData.rubric_association,
+    editingData
+  );
+}
+
 function initRubricStuff(){
   $("#rubric_summary_container .button-container").appendTo("#rubric_assessments_list_and_edit_button_holder").find('.edit').text(I18n.t('edit_view_rubric', "View Rubric"));
 
@@ -804,14 +821,7 @@ function initRubricStuff(){
   });
 
   selectors.get('#rubric_assessments_select').change(() => {
-    const editingData = rubricAssessment.assessmentData($("#rubric_full"))
-    var selectedAssessment = getSelectedAssessment();
-    rubricAssessment.populateNewRubricSummary(
-      $("#rubric_summary_holder .rubric_summary"),
-      selectedAssessment,
-      jsonData.rubric_association,
-      editingData
-    );
+    handleSelectedRubricAssessmentChanged();
   });
 
   $rubric_full_resizer_handle.draggable({
@@ -1342,7 +1352,7 @@ EG = {
   showSubmission: function(){
     this.showGrade();
     this.showDiscussion();
-    this.showRubric();
+    this.showRubric({validateEnteredData: false});
     this.updateStatsInHeader();
     this.showSubmissionDetails();
     this.refreshFullRubric();
@@ -2091,7 +2101,7 @@ EG = {
     return $.raw(contents);
   },
 
-  showRubric: function(){
+  showRubric ({validateEnteredData = true} = {}) {
     const selectMenu = selectors.get('#rubric_assessments_select');
     //if this has some rubric_assessments
     if (jsonData.rubric_association) {
@@ -2125,7 +2135,7 @@ EG = {
 
       // hide the select box if there is not >1 option
       $("#rubric_assessments_list").showIf(selectMenu.find("option").length > 1);
-      selectMenu.change();
+      handleSelectedRubricAssessmentChanged({validateEnteredData});
     }
   },
 
