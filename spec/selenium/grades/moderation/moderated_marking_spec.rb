@@ -27,24 +27,16 @@ describe 'Moderated Marking' do
     Account.default.enable_feature!(:moderated_grading)
 
     # create a course with three teachers
-    @moderated_course = create_course(course_name: 'moderated_course', active_all: true)
-    @teacher1 = User.create!(name: 'Teacher1')
-    @teacher1.register!
-    @moderated_course.enroll_teacher(@teacher1, enrollment_state: 'active')
-    @teacher2 = User.create!(name: 'Teacher2')
-    @teacher2.register!
-    @moderated_course.enroll_teacher(@teacher2, enrollment_state: 'active')
-    @teacher3 = User.create!(name: 'Teacher3')
-    @teacher3.register!
-    @moderated_course.enroll_teacher(@teacher3, enrollment_state: 'active')
-    # enroll two students
-    @student1 = User.create!(name: 'Some Student')
-    @student1.register!
-    @moderated_course.enroll_student(@student1, enrollment_state: 'active')
+    @moderated_course = course_factory(course_name: 'moderated_course')
+    @teachers = create_users_in_course(@moderated_course, 3, return_type: :record, name_prefix: "TeacherBoss", enrollment_type: 'TeacherEnrollment')
+    @teacher1 = @teachers[0]
+    @teacher2 = @teachers[1]
+    @teacher3 = @teachers[2]
 
-    @student2 = User.create!(name: 'Some Other Student')
-    @student2.register!
-    @moderated_course.enroll_student(@student2, enrollment_state: 'active')
+    # enroll two students
+    @students = create_users_in_course(@moderated_course, 2, return_type: :record, name_prefix: "Some Student")
+    @student1 = @students[0]
+    @student2 = @students[1]
 
     # create moderated assignment
     @moderated_assignment = @moderated_course.assignments.create!(
@@ -77,9 +69,7 @@ describe 'Moderated Marking' do
   context 'with Select_Final_Grade permission' do
     before(:each) do
       # enroll a ta and remove permission for TA role
-      @ta1 = User.create!(name: 'TA_One')
-      @ta1.register!
-      @moderated_course.enroll_ta(@ta1, enrollment_state: 'active')
+      ta_in_course(course: @moderated_course, name: 'TA_One', enrollment_state: 'active')
       Account.default.role_overrides.create!(role: Role.find_by(name: 'TaEnrollment'), permission: 'select_final_grade', enabled: false)
 
       user_session(@teacher1)
@@ -89,7 +79,7 @@ describe 'Moderated Marking' do
     it 'user without the permission is not displayed in final-grader dropdown', priority: '1', test_id: 3490529 do
       AssignmentPage.select_grader_dropdown.click
 
-      expect(AssignmentPage.select_grader_dropdown).not_to include_text(@ta1.name)
+      expect(AssignmentPage.select_grader_dropdown).not_to include_text(@ta.name)
     end
   end
 
@@ -141,11 +131,13 @@ describe 'Moderated Marking' do
       @moderated_assignment.grade_student(@student2, grade: 12, grader: @teacher3, provisional: true)
     end
 
-    it 'allows viewing provisional grades', priority: '1', test_id: 3503385 do
+    before(:each) do
       # visit the moderation page as teacher 1
       user_session(@teacher1)
       ModeratePage.visit(@moderated_course.id, @moderated_assignment.id)
+    end
 
+    it 'allows viewing provisional grades', priority: '1', test_id: 3503385 do
       # expect to see two students with two provisional grades
       expect(ModeratePage.fetch_student_count).to eq 2
       expect(ModeratePage.fetch_provisional_grade_count_for_student(@student1)).to eq 2
@@ -153,10 +145,6 @@ describe 'Moderated Marking' do
     end
 
     it 'allows viewing provisional grades and posting final grade', priority: '1', test_id: 3503385 do
-      # visit the moderation page as teacher 1
-      user_session(@teacher1)
-      ModeratePage.visit(@moderated_course.id, @moderated_assignment.id)
-
       # # select a provisional grade for each student
       ModeratePage.select_provisional_grade_for_student_by_position(@student1, 1)
       ModeratePage.select_provisional_grade_for_student_by_position(@student2, 2)
@@ -175,22 +163,15 @@ describe 'Moderated Marking' do
     end
 
     it 'shows student names in row headers', priority: '1', test_id: 3503464 do
-      # visit the moderation page as teacher 1
-      user_session(@teacher1)
-      ModeratePage.visit(@moderated_course.id, @moderated_assignment.id)
-
       # expect student names to be shown
       student_names = ModeratePage.student_table_row_headers.map(&:text)
-      expect(student_names).to eql ['Some Student', 'Some Other Student']
+      expect(student_names).to eql [@student1.name, @student2.name]
     end
 
     it 'anonymizes students if anonymous grading is enabled', priority: '1', test_id: 3503464 do
       # enable anonymous grading
       @moderated_assignment.update(anonymous_grading: true)
-
-      # visit the moderation page as teacher 1
-      user_session(@teacher1)
-      ModeratePage.visit(@moderated_course.id, @moderated_assignment.id)
+      refresh_page
 
       # expect student names to be replaced with anonymous stand ins
       student_names = ModeratePage.student_table_row_headers.map(&:text)
@@ -198,22 +179,15 @@ describe 'Moderated Marking' do
     end
 
     it 'shows grader names in table headers', priority: '1', test_id: 3503464 do
-      # visit the moderation page as teacher 1
-      user_session(@teacher1)
-      ModeratePage.visit(@moderated_course.id, @moderated_assignment.id)
-
       # expect teacher names to be shown
       grader_names = ModeratePage.student_table_headers.map(&:text)
-      expect(grader_names).to eql ['Teacher2', 'Teacher3']
+      expect(grader_names).to eql [@teacher2.name, @teacher3.name]
     end
 
     it 'anonymizes graders if grader names visible to final grader is false', priority: '1', test_id: 3503464 do
       # disable grader names visible to final grader
       @moderated_assignment.update(grader_names_visible_to_final_grader: false)
-
-      # visit the moderation page as teacher 1
-      user_session(@teacher1)
-      ModeratePage.visit(@moderated_course.id, @moderated_assignment.id)
+      refresh_page
 
       # expect teacher names to be replaced with anonymous stand ins
       grader_names = ModeratePage.student_table_headers.map(&:text)
@@ -222,8 +196,6 @@ describe 'Moderated Marking' do
 
     context 'when a custom grade is entered' do
       before(:each) do
-        user_session(@teacher1)
-        ModeratePage.visit(@moderated_course.id, @moderated_assignment.id)
         ModeratePage.enter_custom_grade(@student1, 4)
       end
       it 'selects the custom grade', priority: '1', test_id: 3505170 do
