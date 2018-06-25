@@ -227,7 +227,15 @@
                 <a class="display_name no-hover" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{submissionId}}", :download => "{{attachmentId}}", :inline => 1) %>" title="<%= t('titles.preview_file', "Preview this File") %>">???</a>
               </div>
             </div>
-            <div class="turnitin_info_container"></div>
+          </div>
+        <div class="turnitin_info_container"></div>
+          <div id="add_attempt_container">
+            <div class="ic-Action-header__Primary add_attempt" role="group" aria-labelledby="speedgrader_add_attempt_label">
+              <button class="Button Button--small" type="button" id="add_attempt" title="<%= t("Add Attempt") %>">
+                <i class="icon-plus" aria-hidden="true"></i>
+                  <span class="screenreader-only"></span>
+              </button>
+            </div>
           </div>
         </div>
 
