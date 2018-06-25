@@ -113,7 +113,8 @@ class ContentTag < ActiveRecord::Base
 
   def associate_external_tool
     return if content.present? || content_type != 'ContextExternalTool' || context.blank? || url.blank?
-    self.content = ContextExternalTool.find_external_tool(url, context)
+    content = ContextExternalTool.find_external_tool(url, context)
+    self.content = content if content
   end
 
   def default_values
