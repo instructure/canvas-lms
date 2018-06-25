@@ -63,6 +63,7 @@ class Assignment
       @students = @assignment.representatives(@user, includes: gradebook_includes) do |rep, others|
         others.each { |s| res[:context][:rep_for_student][s.id] = rep.id }
       end
+
       # Ensure that any test students are sorted last
       @students = @students.partition { |r| r.preferences[:fake_student] != true }.flatten
 

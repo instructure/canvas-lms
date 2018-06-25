@@ -383,6 +383,36 @@ describe Assignment::SpeedGrader do
     expect(url_json).to eql('http://www.example.com')
   end
 
+  context "course is soft concluded" do
+    before :once do
+      course_with_teacher(active_all: true)
+      @student1 = User.create!
+      @student2 = User.create!
+      @course.enroll_student(@student1, enrollment_state: 'active')
+      @course.enroll_student(@student2, enrollment_state: 'active')
+      assignment_model(course: @course)
+      @teacher.preferences[:gradebook_settings] = {}
+      @teacher.preferences[:gradebook_settings][@course.id] = {
+        'show_concluded_enrollments' => 'false'
+      }
+    end
+
+    it 'does not include concluded students when user preference is to not include' do
+      Enrollment.find_by(user: @student1).conclude
+      @course.update_attributes!(conclude_at: 1.day.ago, start_at: 2.days.ago)
+      json = Assignment::SpeedGrader.new(@assignment, @teacher).json
+      expect(json[:context][:students].count).to be 1
+    end
+
+    it 'includes concluded when user preference is to include' do
+      @teacher.preferences[:gradebook_settings][@course.id]['show_concluded_enrollments'] = 'true'
+      Enrollment.find_by(user: @student1).conclude
+      @course.update_attributes!(conclude_at: 1.day.ago, start_at: 2.days.ago)
+      json = Assignment::SpeedGrader.new(@assignment, @teacher).json
+      expect(json[:context][:students].count).to be 2
+    end
+  end
+
   context "group assignments" do
     before :once do
       course_with_teacher(active_all: true)
