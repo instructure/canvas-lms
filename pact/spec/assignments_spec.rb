@@ -29,6 +29,7 @@ describe 'Assignments', :pact do
         with(
           method: :get,
           headers: {
+            'Authorization': 'some_token',
             'Auth-User-Id': '2',
             'Connection': 'close',
             'Host': PactConfig.mock_provider_service_base_uri,
@@ -56,6 +57,7 @@ describe 'Assignments', :pact do
         with(
           method: :post,
           headers: {
+            'Authorization': 'some_token',
             'Auth-User-Id': '2',
             'Connection': 'close',
             'Host': PactConfig.mock_provider_service_base_uri,
