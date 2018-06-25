@@ -355,7 +355,19 @@ import './vendor/ui.selectmenu'
       this.elements.settings.link.click(this.showSettingsModal.bind(this));
       this.elements.keyinfo.icon.click(this.keyboardShortcutInfoModal.bind(this));
       $('#add_attempt').on('click', function() {
-              alert('ive been clicked');
+          var studentID = JSON.parse(decodeURIComponent(document.location.hash.substr(1)))['student_id']
+          var assignmentID = utils.getParam('assignment_id')
+
+            var studentID = 1
+            var assignmentID = 2
+              $.ajax({
+                   type: "POST",
+                   url: '/users/' + studentID + '/assignments/' + assignmentID + '/settings/max_attempts/',
+                   contentType: "application/json",
+                   headers: {"X-HTTP-Method-Override": "PUT"},
+                   data: JSON.stringify({"value": "increment"}),
+                   dataType: "json"
+              });
          })
     },
     createModals: function(){
