@@ -2639,29 +2639,33 @@ class UsersController < ApplicationController
       end
       message_sent = notify_policy.dispatch!(@user, @pseudonym, @cc) if @cc
 
-      data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :message_sent => message_sent, :course => @user.self_enrollment_course }
-      if api_request?
-        result = user_json(@user, @current_user, session, includes)
-        # if they passed a destination, and it matches the current canvas installation,
-        # add a session_token to it for the newly created user and return it
-        if params[:destination] && password_provided &&
-          (_routes.recognize_path(params[:destination]) rescue false) &&
-          (uri = URI.parse(params[:destination]) rescue nil) &&
-          uri.host == request.host &&
-          uri.port == request.port
-
-          # add session_token to the query
-          qs = URI.decode_www_form(uri.query || '')
-          qs.delete_if { |(k, _v)| k == 'session_token' }
-          qs << ['session_token', SessionToken.new(@pseudonym.id, current_user_id: @user.id)]
-          uri.query = URI.encode_www_form(qs)
-
-          result['destination'] = uri.to_s
-        end
-        render(:json => result)
+      data = if api_request?
+        user_json(@user, @current_user, session, includes)
       else
-        render(:json => data)
+        { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :message_sent => message_sent, :course => @user.self_enrollment_course }
       end
+
+      # if they passed a destination, and it matches the current canvas installation,
+      # add a session_token to it for the newly created user and return it
+      if params[:destination] && password_provided &&
+        (_routes.recognize_path(params[:destination]) rescue false) &&
+        (uri = URI.parse(params[:destination]) rescue nil) &&
+        uri.host == request.host &&
+        uri.port == request.port
+
+        # add session_token to the query
+        qs = URI.decode_www_form(uri.query || '')
+        qs.delete_if { |(k, _v)| k == 'session_token' }
+        qs << ['session_token', SessionToken.new(@pseudonym.id, current_user_id: @user.id)]
+        uri.query = URI.encode_www_form(qs)
+
+        data['destination'] = uri.to_s
+      elsif (oauth = session[:oauth2])
+        provider = Canvas::Oauth::Provider.new(oauth[:client_id], oauth[:redirect_uri], oauth[:scopes], oauth[:purpose])
+        data['destination'] = Canvas::Oauth::Provider.confirmation_redirect(self, provider, @user).to_s
+      end
+
+      render(:json => data)
     else
       errors = {
           :errors => {
