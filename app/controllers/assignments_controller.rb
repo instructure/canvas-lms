@@ -62,7 +62,7 @@ class AssignmentsController < ApplicationController
         MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT: max_name_length_required_for_account,
         MAX_NAME_LENGTH: max_name_length,
         HAS_ASSIGNMENTS: @context.active_assignments.count > 0,
-        QUIZ_LTI_ENABLED: @context.feature_enabled?(:quizzes_next) && @context.quiz_lti_tool.present?,
+        QUIZ_LTI_ENABLED: quiz_lti_tool_enabled?,
         DUE_DATE_REQUIRED_FOR_ACCOUNT: due_date_required_for_account,
       }
       js_env(hash)
@@ -639,5 +639,18 @@ class AssignmentsController < ApplicationController
     (@assignment.turnitin_enabled? && @context.turnitin_pledge) ||
     (@assignment.vericite_enabled? && @context.vericite_pledge) ||
     @assignment.course.account.closest_turnitin_pledge
+  end
+
+  def quiz_lti_tool_enabled?
+    quiz_lti_tool = @context.quiz_lti_tool
+
+    # The void url here is the default voided url as set by the beta refresh.
+    # Rather than using the rails env (beta/test) to determine whether or not
+    # the tool should be enabled, this URL was chosen because we sometimes
+    # want the tool enabled in beta or test. NOTE: This is a stop-gap until
+    # Quizzes.Next has a beta env.
+    @context.feature_enabled?(:quizzes_next) &&
+      quiz_lti_tool.present? &&
+      quiz_lti_tool.url != 'http://void.url.inseng.net'
   end
 end
