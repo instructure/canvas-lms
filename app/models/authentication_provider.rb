@@ -242,6 +242,9 @@ class AuthenticationProvider < ActiveRecord::Base
     end
 
     canvas_attributes.each do |(attribute, value)|
+      # ignore attributes with no value sent; we don't process "deletions" yet
+      next unless value
+
       case attribute
       when 'admin_roles'
         role_names = value.is_a?(String) ? value.split(',').map(&:strip) : value
