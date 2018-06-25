@@ -1179,17 +1179,17 @@ describe CoursesController do
   context 'validate_scopes' do
     let(:account_with_feature_enabled) do
       account = double()
-      allow(account).to receive(:feature_enabled?).with(:api_token_scoping).and_return(true)
+      allow(account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(true)
       account
     end
 
     let(:account_with_feature_disabled) do
       account = double()
-      allow(account).to receive(:feature_enabled?).with(:api_token_scoping).and_return(false)
+      allow(account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(false)
       account
     end
 
-    context 'api_token_scoping feature enabled' do
+    context 'developer_key_management_and_scoping feature enabled' do
       before do
         controller.instance_variable_set(:@domain_root_account, account_with_feature_enabled)
       end
@@ -1268,7 +1268,7 @@ describe CoursesController do
       end
     end
 
-    context 'api_token_scoping feature disabled' do
+    context 'developer_key_management_and_scoping feature disabled' do
       before do
         controller.instance_variable_set(:@domain_root_account, account_with_feature_disabled)
       end

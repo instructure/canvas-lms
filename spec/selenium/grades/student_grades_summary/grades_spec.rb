@@ -93,7 +93,7 @@ describe "grades" do
     @second_submission = @second_assignment.submit_homework(@student_1, :body => 'student second submission')
     @second_assignment.grade_student(@student_1, grade: 2, grader: @teacher)
     @second_submission.save!
-    @second_assessment = @association.assess({
+    @second_assessment = @second_association.assess({
       :user => @student_1,
       :assessor => @teacher,
       :artifact => @second_submission,

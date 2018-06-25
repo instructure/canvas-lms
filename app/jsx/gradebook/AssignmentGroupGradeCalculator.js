@@ -17,15 +17,7 @@
  */
 
 import _ from 'underscore'
-
-function sum (collection) {
-  return _.reduce(collection, (total, value) => total + value, 0);
-}
-
-function sumBy (collection, attr) {
-  const values = _.map(collection, attr);
-  return sum(values);
-}
+import {sum, sumBy} from './shared/helpers/GradeCalculationHelper'
 
 function partition (collection, partitionFn) {
   const grouped = _.groupBy(collection, partitionFn);

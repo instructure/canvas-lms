@@ -20,6 +20,7 @@ module Submissions
   class PreviewsBaseController < ApplicationController
     include KalturaHelper
     include Submissions::ShowHelper
+    include CoursesHelper
 
     before_action :require_context
 
@@ -29,6 +30,7 @@ module Submissions
       @assignment = @submission_for_show.assignment
       @user = @submission_for_show.user
       @submission = @submission_for_show.submission
+      @enrollment_type = user_type(@context, @current_user)
 
       prepare_js_env
 
@@ -39,6 +41,9 @@ module Submissions
         @moderated_grading_whitelist = @submission.moderated_grading_whitelist
       end
 
+      @anonymous_instructor_annotations = @context.grants_right?(@current_user, :manage_grades) &&
+                                          @assignment.anonymous_instructor_annotations
+
       unless @assignment.visible_to_user?(@current_user)
         flash[:notice] = t('This assignment will no longer count towards your grade.')
       end
@@ -48,10 +53,9 @@ module Submissions
         if redirect?
           redirect_to(named_context_url(@context, redirect_path_name, @assignment.quiz.id, redirect_params))
         else
-          anonymous_grading = @assignment.anonymous_grading? &&
-            @context.root_account.feature_enabled?(:anonymous_moderated_marking)
-
-          render 'submissions/show_preview', locals: { anonymous_grading: anonymous_grading }
+          render template: 'submissions/show_preview', locals: {
+            anonymous_now: @assignment.anonymous_grading? && @assignment.muted?
+          }
         end
       end
     end

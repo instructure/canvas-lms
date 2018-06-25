@@ -117,7 +117,7 @@ describe DeveloperKeysController do
           before do
             site_admin_key
             root_account_key
-            test_domain_root_account.enable_feature!(:developer_key_management_ui_rewrite)
+            test_domain_root_account.enable_feature!(:developer_key_management_and_scoping)
           end
 
           context 'on site_admin account' do
@@ -179,10 +179,8 @@ describe DeveloperKeysController do
         let(:root_account) { account_model }
 
         before do
-          Account.site_admin.allow_feature!(:api_token_scoping)
-          allow_any_instance_of(Account).to receive(:feature_enabled?).with(:api_token_scoping).and_return(true)
-          allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(true)
-
+          Account.site_admin.allow_feature!(:developer_key_management_and_scoping)
+          allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(true)
           user_session(@admin)
         end
 
@@ -202,8 +200,8 @@ describe DeveloperKeysController do
           end.not_to change(DeveloperKey, :count)
         end
 
-        it 'does not set scopes if the "developer_key_management_ui_rewrite" flag is disabled' do
-          allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(false)
+        it 'does not set scopes if the "developer_key_management_and_scoping" flag is disabled' do
+          allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(false)
           post 'create', params: { account_id: root_account.id, developer_key: { scopes: valid_scopes } }
           expect(DeveloperKey.find(json_parse['id']).scopes).to be_blank
         end
@@ -242,8 +240,7 @@ describe DeveloperKeysController do
         let(:site_admin_key) { DeveloperKey.create! }
 
         before do
-          allow_any_instance_of(Account).to receive(:feature_enabled?).with(:api_token_scoping).and_return(true)
-          allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(true)
+          allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(true)
           user_session(@admin)
         end
 
@@ -267,8 +264,8 @@ describe DeveloperKeysController do
           expect(developer_key.reload.scopes).to be_blank
         end
 
-        it 'does not set scopes if the "developer_key_management_ui_rewrite" flag is disabled' do
-          allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(false)
+        it 'does not set scopes if the "developer_key_management_and_scoping" flag is disabled' do
+          allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(false)
           put 'update', params: { id: developer_key.id, developer_key: { scopes: valid_scopes } }
           expect(developer_key.reload.scopes).to be_blank
         end
@@ -306,7 +303,7 @@ describe DeveloperKeysController do
         site_admin_key
         root_account_key
         allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
-        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(true)
+        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(true)
       end
 
       it 'responds with not found if the account is a sub account' do

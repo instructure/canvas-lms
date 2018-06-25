@@ -108,6 +108,11 @@ module CoursesHelper
     cr[:count] == 0 && cr[:workflow_state] == 'inactive'
   end
 
+  def user_type(course, user)
+    enrollment = course.enrollments.find_by(user: user)
+    enrollment.type.downcase.remove(/enrollment/) unless enrollment.nil?
+  end
+
   def why_cant_i_enable_master_course(course)
     return nil if MasterCourses::MasterTemplate.is_master_course?(course)
 

@@ -30,9 +30,8 @@ describe "student planner" do
   end
 
   before :each do
-    @course.enable_feature!(:new_gradebook) # missing or late pill is only shown when new gradebook is enabled for the course
     user_session(@student1)
-  end
+  end  
 
   it "shows no due date assigned when no assignments are created.", priority: "1", test_id: 3265570 do
     go_to_list_view
@@ -93,6 +92,14 @@ describe "student planner" do
       go_to_list_view
       validate_object_displayed('Assignment')
       validate_link_to_url(@assignment, 'assignments')
+    end
+
+    it "navigates to the assignment submissions page when they are submitted" do
+      skip('skip until ADMIN-179')
+      submission = @assignment.submit_homework(@student1, submission_type: "online_text_entry",
+                                  body: "Assignment submitted")
+      go_to_list_view
+      validate_link_to_submissions(@assignment, submission,'assignments')
     end
 
     it "enables the checkbox when an assignment is completed", priority: "1", test_id: 3306201 do
@@ -163,17 +170,24 @@ describe "student planner" do
 
   context "Graded discussion" do
     before :once do
-      assignment = @course.assignments.create!(name: 'assignment',
+      @assignment_d = @course.assignments.create!(name: 'assignment',
                                                due_at: Time.zone.now.advance(days:2))
       @discussion = @course.discussion_topics.create!(title: 'Discussion 1',
                                                      message: 'Graded discussion',
-                                                     assignment: assignment)
+                                                     assignment: @assignment_d)
     end
 
     it "shows and navigates to graded discussions page from student planner", priority: "1", test_id: 3259301 do
       go_to_list_view
       validate_object_displayed('Discussion')
       validate_link_to_url(@discussion, 'discussion_topics')
+    end
+
+    it "navigates to the submissions page once the graded discussion has a reply" do
+      skip('skip until ADMIN-179')
+      @discussion.reply_from(user: @student1, text: 'user reply')
+      # for discussion, submissions page has the users id. So, sending the student object instead of submission for id
+      validate_link_to_submissions(@assignment_d, @student1, 'assignments')
     end
 
     it "shows new replies tag for discussion with new replies", priority: "1", test_id: 3284231 do
@@ -438,17 +452,21 @@ describe "student planner" do
                                                        title: "Student to do 2")
       view_todo_item
       modal = todo_sidebar_modal(@student_to_do.title)
-      expect(f('input', modal)[:value]).to eq(@student_to_do.title)
-      expect((f('select', modal)[:value]).to_i).to eq(@course.id)
+      title_input = f('input', modal)
+      course_name_dropdown = fj('span:contains("Course")>span>span>input', modal)
+
+      expect(title_input[:value]).to eq(@student_to_do.title)
+      expect(course_name_dropdown[:value]).to eq("#{@course.name} - #{@course.short_name}")
+
       flnpt(student_to_do2.title).click
-      expect(f('input', modal)[:value]).to eq(student_to_do2.title)
-      expect(f('select', modal)[:value]).to eq("none")
+      expect(title_input[:value]).to eq(student_to_do2.title)
+      expect(course_name_dropdown[:value]).to eq("Optional: Add Course")
     end
 
     it "allows editing the course of a to-do item", priority: "1", test_id: 3418827 do
       view_todo_item
-      element = fj("select:contains('Unnamed Course')")
-      fj("option:contains('Optional: Add Course')", element).click
+      fj(":contains('Unnamed Course')>span>input[role=combobox]").click
+      fj("[role='option'] :contains('Optional: Add Course')").click
       todo_save_button.click
       @student_to_do.reload
       expect(@student_to_do.course_id).to be nil
@@ -457,8 +475,8 @@ describe "student planner" do
     it "has courses in the course combo box.", priority: "1", test_id: 3263160 do
       go_to_list_view
       todo_modal_button.click
-      element = fj("select:contains('Optional: Add Course')")
-      expect(fj("option:contains('Unnamed Course')", element)).to be
+      fj(":contains('Optional: Add Course')>span>input[role=combobox]").click
+      expect(fj("[role='option'] :contains('Unnamed Course')")).to be
     end
 
     it "ensures time zones with offsets higher than UTC update the planner items" do
@@ -597,4 +615,35 @@ describe "student planner" do
     wait_for_planner_load
     expect(f('.PlannerApp')).to contain_jqcss('span:contains("Show 1 completed item")')
   end
+  
+  context "teacher in a course" do
+    before :once do 
+      @teacher1 = User.create!(name: 'teacher')
+      @course.enroll_teacher(@teacher1).accept!
+    end
+
+    before :each do
+      user_session(@teacher1)
+    end
+
+    it "shows correct default time in a wiki pages" do
+      skip("skip until ADMIN-1096")
+      Timecop.freeze(Time.zone.today) do
+        @wiki = @course.wiki_pages.create!(title: 'Default Time Wiki Page', todo_date: Time.zone.today)
+        get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
+        wait_for_ajaximations
+        expect(get_value("#todo_date")).to eq "#{format_date_for_view(Time.zone.today)} at 11:59PM"
+      end
+    end
+
+    it "shows correct default time in a ungraded discussions" do
+      skip("skip until ADMIN-1096")
+      Timecop.freeze(Time.zone.today) do
+        @discussion = @course.discussion_topics.create!(title: "Default Time Discussion", message: nil, user: @teacher, todo_date: Time.zone.today)
+        get("/courses/#{@course.id}/discussion_topics/#{@discussion.id}/edit")
+        wait_for_ajaximations
+        expect(get_value("#todo_date")).to eq "#{format_date_for_view(Time.zone.today)} at 11:59PM"
+      end
+    end
+  end 
 end

@@ -167,7 +167,6 @@ describe GradeSummaryAssignmentPresenter do
 
   describe "#show_submission_details_link?" do
     before :each do
-      @assignment.root_account.enable_feature!(:anonymous_moderated_marking)
       @submission_stub = double()
       allow(@submission_stub).to receive(:originality_reports_for_display)
     end

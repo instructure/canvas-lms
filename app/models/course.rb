@@ -3181,8 +3181,6 @@ class Course < ActiveRecord::Base
   end
 
   def moderators
-    return [] unless root_account.feature_enabled?(:anonymous_moderated_marking)
-
     active_instructors = users.merge(Enrollment.active_or_pending.of_instructor_type)
     active_instructors.select { |user| grants_right?(user, :select_final_grade) }
   end

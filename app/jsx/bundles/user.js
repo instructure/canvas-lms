@@ -17,3 +17,12 @@
  */
 
 import 'user'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import GeneratePairingCode from 'jsx/profiles/GeneratePairingCode'
+
+const container = document.querySelector('#pairing-code')
+if (container) {
+  ReactDOM.render(<GeneratePairingCode userId={ENV.USER_ID} name={ENV.CONTEXT_USER_DISPLAY_NAME} />,
+                  container)
+}

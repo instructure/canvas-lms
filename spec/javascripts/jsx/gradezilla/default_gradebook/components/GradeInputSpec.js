@@ -108,6 +108,14 @@ QUnit.module('GradeInput', suiteHooks => {
       strictEqual(input.prop('value'), '–')
     })
 
+    test('is blank when the assignment is anonymously graded and muted', () => {
+      props.assignment.anonymousGrading = true
+      props.assignment.muted = true
+      mountComponent()
+      const input = wrapper.find('input')
+      strictEqual(input.prop('value'), '–')
+    })
+
     test('displays "Excused" as the input value when the submission is excused', () => {
       submission.excused = true
       mountComponent()
@@ -424,6 +432,14 @@ QUnit.module('GradeInput', suiteHooks => {
       strictEqual(input.prop('value'), 'Excused')
     })
 
+    test('is blank when the assignment is anonymously graded and muted', () => {
+      props.assignment.anonymousGrading = true
+      props.assignment.muted = true
+      mountComponent()
+      const input = wrapper.find('input')
+      strictEqual(input.prop('value'), '–')
+    })
+
     test('disables the input when the submission is excused', () => {
       submission.excused = true
       mountComponent()
@@ -685,6 +701,14 @@ QUnit.module('GradeInput', suiteHooks => {
       strictEqual(input.prop('value'), 'Excused')
     })
 
+    test('is blank when the assignment is anonymously graded and muted', () => {
+      props.assignment.anonymousGrading = true
+      props.assignment.muted = true
+      mountComponent()
+      const input = wrapper.find('input')
+      strictEqual(input.prop('value'), '–')
+    })
+
     test('disables the input when the submission is excused', () => {
       submission.excused = true
       mountComponent()
@@ -942,6 +966,14 @@ QUnit.module('GradeInput', suiteHooks => {
       mountComponent()
       const input = wrapper.find('select')
       strictEqual(input.prop('disabled'), true)
+    })
+
+    test('shows empty string if anonymously graded and muted', () => {
+      props.assignment.anonymousGrading = true
+      props.assignment.muted = true
+      mountComponent()
+      const input = wrapper.find('select')
+      strictEqual(input.prop('value'), '');
     })
 
     test('sets the select value to "Ungraded" when the submission is not graded', () => {

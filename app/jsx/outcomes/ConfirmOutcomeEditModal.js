@@ -95,7 +95,6 @@ export default class ConfirmOutcomeEditModal extends Component {
         open={this.state.show}
         onDismiss={this.onCancel}
         size="small"
-        shouldCloseOnOverlayClick
       >
         <ModalBody>
           <div>

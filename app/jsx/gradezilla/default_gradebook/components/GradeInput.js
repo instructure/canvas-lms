@@ -19,8 +19,8 @@
 import React from 'react';
 import { arrayOf, bool, func, number, oneOf, shape, string } from 'prop-types';
 import Select from '@instructure/ui-core/lib/components/Select';
-import TextInput from '@instructure/ui-core/lib/components/TextInput';
-import Text from '@instructure/ui-core/lib/components/Text';
+import TextInput from '@instructure/ui-forms/lib/components/TextInput';
+import Text from '@instructure/ui-elements/lib/components/Text';
 import I18n from 'i18n!gradebook';
 import GradeFormatHelper from '../../../gradebook/shared/helpers/GradeFormatHelper';
 import {parseTextValue} from '../../../grading/helpers/GradeInputHelper'
@@ -100,6 +100,30 @@ function CompleteIncompleteSelect (props) {
   );
 }
 
+function stateFromProps (props) {
+  const { anonymousGrading, muted } = props.assignment;
+  const hideGrade = anonymousGrading && muted;
+  let normalizedGrade;
+
+  if (props.enterGradesAs === 'passFail') {
+    normalizedGrade = hideGrade ? null : props.submission.enteredGrade;
+  } else {
+    const propsCopy = { ...props };
+
+    if (hideGrade) {
+      const submission = { ...props.submission, enteredScore: null };
+      propsCopy.submission = submission;
+    }
+
+    normalizedGrade = normalizeSubmissionGrade(propsCopy);
+  }
+
+  return {
+    formattedGrade: normalizedGrade,
+    grade: normalizedGrade
+  };
+}
+
 export default class GradeInput extends React.Component {
   static propTypes = {
     assignment: shape({
@@ -134,21 +158,12 @@ export default class GradeInput extends React.Component {
   constructor (props) {
     super(props);
 
-    let normalizedGrade = normalizeSubmissionGrade(props);
-
-    if (props.enterGradesAs === 'passFail') {
-      normalizedGrade = props.submission.enteredGrade
-    }
-
-    this.state = {
-      formattedGrade: normalizedGrade,
-      grade: normalizedGrade
-    };
-
     this.handleSelectChange = this.handleSelectChange.bind(this);
     this.handleTextChange = this.handleTextChange.bind(this);
     this.handleTextBlur = this.handleTextBlur.bind(this);
     this.handleGradeChange = this.handleGradeChange.bind(this);
+
+    this.state = stateFromProps(props);
   }
 
   componentWillReceiveProps (nextProps) {
@@ -156,16 +171,7 @@ export default class GradeInput extends React.Component {
     const submissionUpdated = this.props.submissionUpdating && !nextProps.submissionUpdating;
 
     if (submissionChanged || submissionUpdated) {
-      let normalizedGrade = normalizeSubmissionGrade(nextProps);
-
-      if (nextProps.enterGradesAs === 'passFail') {
-        normalizedGrade = nextProps.submission.enteredGrade;
-      }
-
-      this.setState({
-        formattedGrade: normalizedGrade,
-        grade: normalizedGrade
-      });
+      this.setState(stateFromProps(nextProps));
     }
   }
 

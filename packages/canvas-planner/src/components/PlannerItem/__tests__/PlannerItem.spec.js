@@ -582,3 +582,13 @@ it('renders a NewActivityIndicator when asked to', () => {
   );
   expect(wrapper.find('Animatable(NewActivityIndicator)')).toHaveLength(1);
 });
+
+it('renders feedback if available', () => {
+  const props = defaultProps({feedback: {
+    author_avatar_url: '/avatar/is/here/',
+    author_name: 'Boyd Crowder',
+    comment: 'Death will not be the end of your suffering.'
+  }});
+  const wrapper = shallow(<PlannerItem {...props} />);
+  expect(wrapper).toMatchSnapshot(); 
+})

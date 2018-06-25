@@ -309,7 +309,7 @@ describe "ratio of submissions graded" do
     let(:moderate_button) { Nokogiri::HTML(response.body).at_css('#moderated_grading_button') }
 
     it 'shows the moderation link for moderated assignments' do
-      @assignment.update!(moderated_grading: true)
+      @assignment.update!(moderated_grading: true, grader_count: 1, final_grader: @teacher)
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       expect(moderate_button).not_to be_nil

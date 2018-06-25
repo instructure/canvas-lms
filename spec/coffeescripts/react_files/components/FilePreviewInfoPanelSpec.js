@@ -78,8 +78,9 @@ test('displays date modified', function() {
   equal(
     $(this.rendered.getDOMNode())
       .find('#dateModified')
+      .find(".visible-desktop")
       .text(),
-    'Jan 17, 19701/17/1970',
+    'Jan 17, 1970',
     'rendered date modified'
   )
 })
@@ -88,8 +89,9 @@ test('displays date created', function() {
   equal(
     $(this.rendered.getDOMNode())
       .find('#dateCreated')
+      .find(".visible-desktop")
       .text(),
-    'Jan 17, 19701/17/1970',
+    'Jan 17, 1970',
     'rendered date created'
   )
 })

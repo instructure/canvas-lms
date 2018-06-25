@@ -19,9 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!custom_help_link'
-import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
-import MenuItem from '@instructure/ui-core/lib/components/Menu/MenuItem'
-import MenuItemGroup from '@instructure/ui-core/lib/components/Menu/MenuItemGroup'
+import Menu, {MenuItem, MenuItemGroup} from '@instructure/ui-menu/lib/components/Menu'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import AccessibleContent from '@instructure/ui-a11y/lib/components/AccessibleContent'
 import IconPlusLine from '@instructure/ui-icons/lib/Line/IconPlus'
@@ -67,7 +65,7 @@ export default class CustomHelpLinkMenu extends React.Component {
   render() {
     return (
       <div className="HelpMenuOptions__Container">
-        <PopoverMenu
+        <Menu
           trigger={
             <Button
               ref={c => {
@@ -94,7 +92,7 @@ export default class CustomHelpLinkMenu extends React.Component {
               </MenuItem>
             ))}
           </MenuItemGroup>
-        </PopoverMenu>
+        </Menu>
       </div>
     )
   }

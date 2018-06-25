@@ -30,13 +30,18 @@ module Canvas::LiveEvents
   def self.amended_context(canvas_context)
     ctx = LiveEvents.get_context || {}
     return ctx unless canvas_context
-    ctx.merge({
+    ctx = ctx.merge({
       context_type: canvas_context.class.to_s,
-      context_id: canvas_context.global_id,
-      root_account_id: canvas_context.root_account.try(:global_id),
-      root_account_uuid: canvas_context.root_account.try(:uuid),
-      root_account_lti_guid: canvas_context.root_account.try(:lti_guid),
+      context_id: canvas_context.global_id
     })
+    if canvas_context.respond_to?(:root_account)
+      ctx.merge!({
+        root_account_id: canvas_context.root_account.try(:global_id),
+        root_account_uuid: canvas_context.root_account.try(:uuid),
+        root_account_lti_guid: canvas_context.root_account.try(:lti_guid),
+      })
+    end
+    ctx
   end
 
   def self.get_course_data(course)

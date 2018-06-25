@@ -3171,7 +3171,10 @@ QUnit.module('Gradebook#updateSectionFilterVisibility', {
     const sectionsFilterContainerSelector = 'sections-filter-container';
     $fixtures.innerHTML = `<div id="${sectionsFilterContainerSelector}"></div>`;
     this.container = $fixtures.querySelector(`#${sectionsFilterContainerSelector}`);
-    const sections = [{ id: '2001', name: 'Freshmen' }, { id: '2002', name: 'Sophomores' }];
+    const sections = [
+      { id: '2001', name: 'Freshmen / First-Year' },
+      { id: '2002', name: 'Sophomores' }
+    ];
     this.gradebook = createGradebook({ sections });
     this.gradebook.sections_enabled = true;
     this.gradebook.setSelectedViewOptionsFilters(['sections']);
@@ -3211,6 +3214,12 @@ test('renders the section select with a list of sections', function () {
   const sections = this.gradebook.sectionFilterMenu.props.items;
   strictEqual(sections.length, 2, 'includes the "nothing selected" option plus the two sections');
   deepEqual(sections.map(section => section.id), ['2001', '2002']);
+});
+
+test('unescapes section names', function () {
+  this.gradebook.updateSectionFilterVisibility();
+  const sections = this.gradebook.sectionFilterMenu.props.items;
+  deepEqual(sections.map(section => section.name), ['Freshmen / First-Year', 'Sophomores']);
 });
 
 test('sets the section select to show the saved "filter rows by" setting', function () {
@@ -6198,18 +6207,6 @@ test('sets the submission state map .isAdmin when the current user roles do not 
   strictEqual(gradebook.submissionStateMap.isAdmin, false);
 });
 
-test('sets submission state map .anonymousModeratedMarkingEnabled when anonymous moderated marking flag is set', function () {
-  const gradebook = createGradebook({ anonymous_moderated_marking_enabled: true });
-  gradebook.initSubmissionStateMap();
-  strictEqual(gradebook.submissionStateMap.anonymousModeratedMarkingEnabled, true);
-});
-
-test('sets submission state map .anonymousModeratedMarkingEnabled to false when anonymous moderated marking flag is reset', function () {
-  const gradebook = createGradebook({ anonymous_moderated_marking_enabled: false });
-  gradebook.initSubmissionStateMap();
-  strictEqual(gradebook.submissionStateMap.anonymousModeratedMarkingEnabled, false);
-});
-
 QUnit.module('Gradebook#initPostGradesLtis');
 
 test('sets postGradesLtis as an array', function () {
@@ -6973,19 +6970,6 @@ QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
     moxios.uninstall();
   });
 
-  test('anonymousModeratedMarkingEnabled is true when options.anonymous_moderated_marking_enabled is true', function () {
-    gradebook.options.anonymous_moderated_marking_enabled = true
-    gradebook.setSubmissionTrayState(true, '1101', '2301');
-    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
-    strictEqual(props.anonymousModeratedMarkingEnabled, true);
-  });
-
-  test('anonymousModeratedMarkingEnabled is false when options.anonymous_moderated_marking_enabled is false', function () {
-    gradebook.setSubmissionTrayState(true, '1101', '2301');
-    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
-    strictEqual(props.anonymousModeratedMarkingEnabled, false);
-  });
-
   test('gradingDisabled is true when the submission state is locked', function () {
     sinon.stub(gradebook.submissionStateMap, 'getSubmissionState').returns({ locked: true });
     gradebook.setSubmissionTrayState(true, '1101', '2301');
@@ -7166,14 +7150,14 @@ QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
     strictEqual(props.enterGradesAs, 'points');
   });
 
-  test('sets isNotCountedForScore to false when the assignment is not counted toward final grade', () => {
+  test('sets isNotCountedForScore to false when the assignment is counted toward final grade', () => {
     gradebook.assignments[2301].omit_from_final_grade = false
     gradebook.setSubmissionTrayState(true, '1101', '2301')
     const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
     strictEqual(props.isNotCountedForScore, false)
   })
 
-  test('sets isNotCountedForScore to false when the assignment is counted toward final grade', () => {
+  test('sets isNotCountedForScore to true when the assignment is not counted toward final grade', () => {
     gradebook.assignments[2301].omit_from_final_grade = true
     gradebook.setSubmissionTrayState(true, '1101', '2301')
     const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
@@ -7182,18 +7166,33 @@ QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
 
   test('sets isNotCountedForScore to false when the assignment group weight is not zero', () => {
     gradebook.assignmentGroups[9000].group_weight = 100
-
     gradebook.setSubmissionTrayState(true, '1101', '2301')
     const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
     strictEqual(props.isNotCountedForScore, false)
   })
 
-  test('sets isNotCountedForScore to true when the assignmentgroup weight is zero', () => {
+  test('sets isNotCountedForScore to true when the assignment group weight is zero and weighting scheme is percent', () => {
     gradebook.assignmentGroups[9000].group_weight = 0
-
+    gradebook.options.group_weighting_scheme = 'percent'
     gradebook.setSubmissionTrayState(true, '1101', '2301')
     const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
     strictEqual(props.isNotCountedForScore, true)
+  })
+
+  test('sets isNotCountedForScore to false when the assignment group weight is not zero and weighting scheme is percent', () => {
+    gradebook.assignmentGroups[9000].group_weight = 100
+    gradebook.options.group_weighting_scheme = 'percent'
+    gradebook.setSubmissionTrayState(true, '1101', '2301')
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+    strictEqual(props.isNotCountedForScore, false)
+  })
+
+  test('sets isNotCountedForScore to false when assignment group weight is zero and weighting scheme is not percent', () => {
+    gradebook.assignmentGroups[9000].group_weight = 0
+    gradebook.options.group_weighting_scheme = 'equals'
+    gradebook.setSubmissionTrayState(true, '1101', '2301')
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+    strictEqual(props.isNotCountedForScore, false)
   })
 
   test('sets pendingGradeInfo when a pending grade exists for the current student/assignment', () => {

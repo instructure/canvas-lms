@@ -17,47 +17,33 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!outcomes'
 import View from '@instructure/ui-layout/lib/components/View'
 import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
-import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleDetails'
+import ToggleGroup from '@instructure/ui-toggle-details/lib/components/ToggleGroup'
 import List, { ListItem } from '@instructure/ui-elements/lib/components/List'
 import Pill from '@instructure/ui-elements/lib/components/Pill'
 import Text from '@instructure/ui-elements/lib/components/Text'
-import IconArrowOpenDown from '@instructure/ui-icons/lib/Solid/IconArrowOpenDown'
-import IconArrowOpenRight from '@instructure/ui-icons/lib/Solid/IconArrowOpenRight'
 import IconOutcomes from '@instructure/ui-icons/lib/Line/IconOutcomes'
+import natcompare from 'compiled/util/natcompare'
 import AssignmentResult from './AssignmentResult'
 import * as shapes from './shapes'
 
-const spacyIcon = (expanded) => () => {
-  const Icon = expanded ? IconArrowOpenDown : IconArrowOpenRight
-  return (
-    <View padding="0 0 0 small"><Icon /></View>
-  )
-}
-
 export default class Outcome extends React.Component {
   static propTypes = {
-    outcome: shapes.outcomeShape.isRequired
+    outcome: shapes.outcomeShape.isRequired,
+    expanded: PropTypes.bool.isRequired,
+    onExpansionChange: PropTypes.func.isRequired,
+    outcomeProficiency: shapes.outcomeProficiencyShape
   }
 
-  constructor () {
-    super()
-    this.handleToggle = this.handleToggle.bind(this)
-    this.state = { expanded: false }
+  static defaultProps = {
+    outcomeProficiency: null
   }
 
-  contract () {
-    this.setState({ expanded: false })
-  }
-
-  expand () {
-    this.setState({ expanded: true })
-  }
-
-  handleToggle (_event, expanded) {
-    this.setState({ expanded })
+  handleToggle = (_event, expanded) => {
+    this.props.onExpansionChange('outcome', this.props.outcome.expansionId, expanded)
   }
 
   renderHeader () {
@@ -66,7 +52,7 @@ export default class Outcome extends React.Component {
     const numAlignments = results.length
 
     return (
-      <Flex direction="row" justifyItems='space-between' padding="small x-small">
+      <Flex direction="row" justifyItems="space-between">
         <FlexItem>
           <Flex direction="column">
             <FlexItem>
@@ -93,28 +79,44 @@ export default class Outcome extends React.Component {
     )
   }
 
-  render () {
-    const { outcome } = this.props
+  renderDetails () {
+    const { outcome, outcomeProficiency } = this.props
+    const { results } = outcome
     return (
-      <ToggleDetails
-        divider="dashed"
-        icon={spacyIcon(false)}
-        iconExpanded={spacyIcon(true)}
+      <List variant="unstyled" delimiter="dashed">
+      {
+          results.sort(natcompare.byKey('submitted_or_assessed_at')).reverse().map((result) => (
+            <ListItem key={result.id}>
+              <AssignmentResult result={result} outcome={outcome} outcomeProficiency={outcomeProficiency} />
+            </ListItem>
+        ))
+      }
+      </List>
+    )
+  }
+
+  renderEmpty () {
+    return (
+      <View as="div" padding="small">
+        <Text>{ I18n.t('No alignments are available for this outcome.') }</Text>
+      </View>
+    )
+  }
+
+  render () {
+    const { outcome, expanded } = this.props
+    const { results, title } = outcome
+    const hasResults = results.length > 0
+    return (
+      <ToggleGroup
         summary={this.renderHeader()}
-        expanded={this.state.expanded}
+        toggleLabel={I18n.t('Toggle alignment details for %{title}', { title })}
+        expanded={expanded}
         onToggle={this.handleToggle}
-        fluidWidth
+        border={false}
       >
-        <View as="div" borderWidth="small 0 0 0">
-          <List variant="unstyled" delimiter="dashed">
-          {
-            outcome.results.map((result) => (
-              <ListItem key={result.id}><AssignmentResult result={result} outcome={outcome} /></ListItem>
-            ))
-          }
-          </List>
-        </View>
-      </ToggleDetails>
+        { hasResults ? this.renderDetails() : this.renderEmpty() }
+      </ToggleGroup>
     )
   }
 }

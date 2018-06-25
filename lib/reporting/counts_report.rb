@@ -24,8 +24,14 @@ class CountsReport
   MONTHS_TO_KEEP = 24
   WEEKS_TO_KEEP = 52
 
-  def self.process
-    self.new.process
+  def self.process_shard
+    reporter = new
+
+    Account.root_accounts.active.each do |account|
+      next if account.external_status == 'test'
+
+      reporter.process_account(account)
+    end
   end
 
   def initialize
@@ -33,103 +39,58 @@ class CountsReport
     @yesterday = Time.parse("#{date} 23:59:00 UTC")
     @week = date.cweek
     @timestamp = @yesterday
-    @overview = {:generated_at=>@timestamp, :totals => new_counts_hash}.with_indifferent_access
-    ExternalStatuses.possible_external_statuses.each do |status|
-      @overview[status.to_sym] = new_counts_hash
-    end
   end
 
-  def process
-    start_time = Time.zone.now
-
+  def process_account(account)
     Shackles.activate(:slave) do
-      callback = -> { Shard.default.activate { Canvas::Errors.capture_exception(:periodic_job, $ERROR_INFO) } }
-      Shard.with_each_shard(exception: callback) do
-        Account.root_accounts.active.each do |account|
-          next if account.external_status == 'test'
+      data = {}.with_indifferent_access
+      data[:generated_at] = @timestamp
+      data[:id] = account.id
+      data[:name] = account.name
+      data[:external_status] = account.external_status
 
-          data = {}.with_indifferent_access
-          data[:generated_at] = @timestamp
-          data[:id] = account.id
-          data[:name] = account.name
-          data[:external_status] = account.external_status
+      course_ids = get_course_ids(account)
+      data[:courses] = course_ids.length
 
-          course_ids = get_course_ids(account)
-          data[:courses] = course_ids.length
+      if data[:courses] == 0
+        data[:teachers] = 0
+        data[:students] = 0
+        data[:users] = 0
+        data[:files] = 0
+        data[:files_size] = 0
+        data[:media_files] = 0
+        data[:media_files_size] = 0
+      else
+        timespan = Setting.get('recently_logged_in_timespan', 30.days.to_s).to_i.seconds
+        enrollment_scope = Enrollment.active.not_fake.
+          joins("INNER JOIN #{Pseudonym.quoted_table_name} ON enrollments.user_id=pseudonyms.user_id").
+          where(pseudonyms: { workflow_state: 'active'}).
+          where("course_id IN (?) AND pseudonyms.last_request_at>?", course_ids, timespan.seconds.ago)
 
-          if data[:courses] == 0
-            data[:teachers] = 0
-            data[:students] = 0
-            data[:users] = 0
-            data[:files] = 0
-            data[:files_size] = 0
-            data[:media_files] = 0
-            data[:media_files_size] = 0
-          else
-            timespan = Setting.get('recently_logged_in_timespan', 30.days.to_s).to_i.seconds
-            enrollment_scope = Enrollment.active.not_fake.
-              joins("INNER JOIN #{Pseudonym.quoted_table_name} ON enrollments.user_id=pseudonyms.user_id").
-              where(pseudonyms: { workflow_state: 'active'}).
-              where("course_id IN (?) AND pseudonyms.last_request_at>?", course_ids, timespan.seconds.ago)
+        data[:teachers] = enrollment_scope.where(:type => 'TeacherEnrollment').distinct.count(:user_id)
+        data[:students] = enrollment_scope.where(:type => 'StudentEnrollment').distinct.count(:user_id)
+        data[:users] = enrollment_scope.distinct.count(:user_id)
 
-            data[:teachers] = enrollment_scope.where(:type => 'TeacherEnrollment').distinct.count(:user_id)
-            data[:students] = enrollment_scope.where(:type => 'StudentEnrollment').distinct.count(:user_id)
-            data[:users] = enrollment_scope.distinct.count(:user_id)
+        # ActiveRecord::Base.calculate doesn't support multiple calculations in account single pass
+        data[:files], data[:files_size] = Attachment.connection.select_rows("SELECT COUNT(id), SUM(size) FROM #{Attachment.quoted_table_name} WHERE namespace IN ('account_%s','account_%s') AND root_attachment_id IS NULL AND file_state != 'deleted'" % [account.local_id, account.global_id]).first.map(&:to_i)
+        data[:media_files], data[:media_files_size] = MediaObject.connection.select_rows("SELECT COUNT(id), SUM(total_size) FROM #{MediaObject.quoted_table_name} WHERE root_account_id='%s' AND attachment_id IS NULL AND workflow_state != 'deleted'" % [account.id]).first.map(&:to_i)
+        data[:media_files_size] *= 1000
+      end
 
-            # ActiveRecord::Base.calculate doesn't support multiple calculations in account single pass
-            data[:files], data[:files_size] = Attachment.connection.select_rows("SELECT COUNT(id), SUM(size) FROM #{Attachment.quoted_table_name} WHERE namespace IN ('account_%s','account_%s') AND root_attachment_id IS NULL AND file_state != 'deleted'" % [account.local_id, account.global_id]).first.map(&:to_i)
-            data[:media_files], data[:media_files_size] = MediaObject.connection.select_rows("SELECT COUNT(id), SUM(total_size) FROM #{MediaObject.quoted_table_name} WHERE root_account_id='%s' AND attachment_id IS NULL AND workflow_state != 'deleted'" % [account.id]).first.map(&:to_i)
-            data[:media_files_size] *= 1000
-          end
+      Shackles.activate(:master) do
+        detailed = account.report_snapshots.detailed.build
+        detailed.created_at = @yesterday
+        detailed.data = data
+        detailed.save!
 
-          Shackles.activate(:master) do
-            detailed = account.report_snapshots.detailed.build
-            detailed.created_at = @yesterday
-            detailed.data = data
-            detailed.save!
-
-            save_detailed_progressive(account, data)
-            add_account_stats(data)
-          end
-        end
-        nil
+        save_detailed_progressive(account, data)
       end
     end
-    @overview[:seconds_to_process] = Time.now - start_time
 
-    save_counts
-    save_progressive
-    ""
+    nil
   end
 
   private
-
-  def save_counts
-    overview = ReportSnapshot.overview.build
-    overview.created_at = @yesterday
-    overview.data = @overview
-    overview.save!
-  end
-
-  def save_progressive
-    if snapshot = ReportSnapshot.progressive_overview.last
-      progressive = snapshot.data.with_indifferent_access
-    else
-      progressive = start_progressive_hash.with_indifferent_access
-    end
-
-    progressive[:generated_at] = @timestamp
-    create_progressive_hashes(progressive[:totals], @overview[:totals])
-    ExternalStatuses.possible_external_statuses.each do |status|
-      progressive[status.to_sym] ||= new_progressive_hash
-      create_progressive_hashes(progressive[status.to_sym], @overview[status.to_sym])
-    end
-
-    snapshot = ReportSnapshot.progressive_overview.build
-    snapshot.created_at = @yesterday
-    snapshot.data = progressive
-    snapshot.save!
-  end
 
   def save_detailed_progressive(account, data)
     if snapshot = account.report_snapshots.progressive.last
@@ -183,32 +144,6 @@ class CountsReport
     to[:files_size] = from[:files_size]
     to[:media_files] = from[:media_files]
     to[:media_files_size] = from[:media_files_size]
-  end
-
-  def add_account_stats(account)
-    unless @overview[account[:external_status]]
-      @overview[account[:external_status]] = new_counts_hash
-    end
-
-    @overview[account[:external_status]][:institutions] += 1
-    @overview[account[:external_status]][:courses] += account[:courses]
-    @overview[account[:external_status]][:teachers] += account[:teachers]
-    @overview[account[:external_status]][:students] += account[:students]
-    @overview[account[:external_status]][:files] += account[:files]
-    @overview[account[:external_status]][:files_size] += account[:files_size]
-    @overview[account[:external_status]][:media_files] += account[:media_files]
-    @overview[account[:external_status]][:media_files_size] += account[:media_files_size]
-    @overview[account[:external_status]][:users] += account[:users]
-
-    @overview[:totals][:institutions] += 1
-    @overview[:totals][:courses] += account[:courses]
-    @overview[:totals][:teachers] += account[:teachers]
-    @overview[:totals][:students] += account[:students]
-    @overview[:totals][:files] += account[:files]
-    @overview[:totals][:files_size] += account[:files_size]
-    @overview[:totals][:media_files] += account[:media_files]
-    @overview[:totals][:media_files_size] += account[:media_files_size]
-    @overview[:totals][:users] += account[:users]
   end
 
   def get_course_ids(account)

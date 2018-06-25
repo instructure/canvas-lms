@@ -56,6 +56,53 @@ describe ObserverAlert do
     end
   end
 
+  describe 'course_grade alerts' do
+    before :once do
+      course_with_teacher()
+      @threshold1 = observer_alert_threshold_model(course: @course, alert_type: 'course_grade_high', threshold: 80)
+      @student1 = @student
+      @enrollment1 = @student1.enrollments.where(course: @course).first
+
+      @threshold2 = observer_alert_threshold_model(course: @course, alert_type: 'course_grade_low', threshold: 30)
+      @student2 = @student
+      @enrollment2 = @student2.enrollments.where(course: @course).first
+
+      @assignment = assignment_model(context: @course, points_possible: 100)
+    end
+
+    it 'doesnt create an alert if the threshold isnt met' do
+      @assignment.grade_student(@student1, score: 70, grader: @teacher)
+      @assignment.grade_student(@student2, score: 40, grader: @teacher)
+      alerts = ObserverAlert.where(context: @course)
+      expect(alerts.count).to eq 0
+    end
+
+    it 'creates an alert if the threshold is met' do
+      @assignment.grade_student(@student1, score: 90, grader: @teacher)
+      @assignment.grade_student(@student2, score: 20, grader: @teacher)
+
+      alert1 = ObserverAlert.where(observer_alert_threshold: @threshold1).first
+      alert2 = ObserverAlert.where(observer_alert_threshold: @threshold2).first
+
+      expect(alert1).not_to be_nil
+      expect(alert2).not_to be_nil
+
+      expect(alert1.title).to include('Course grade: ')
+      expect(alert2.title).to include('Course grade: ')
+    end
+
+    it 'doesnt create an alert if the old score was already above the threshold' do
+      @assignment.grade_student(@student1, score: 100, grader: @teacher)
+      @assignment.grade_student(@student2, score: 0, grader: @teacher)
+
+      alert1 = ObserverAlert.where(observer_alert_threshold: @threshold1)
+      alert2 = ObserverAlert.where(observer_alert_threshold: @threshold2)
+
+      expect(alert1.count).to eq 1
+      expect(alert2.count).to eq 1
+    end
+  end
+
   describe 'course_announcement' do
     before :once do
       @course = course_factory
@@ -70,7 +117,9 @@ describe ObserverAlert do
 
     it 'creates an alert when a user has a threshold for course announcements' do
       a = announcement_model(:context => @course)
-      alert = ObserverAlert.where(student: @student, observer: @observer).first
+      alert1 = ObserverAlert.where(student: @student, observer: @observer)
+      expect(alert1.count).to eq 1
+      alert = alert1.first
       expect(alert).not_to be_nil
       expect(alert.context).to eq a
       expect(alert.title).to include('Announcement posted: ')
@@ -105,6 +154,70 @@ describe ObserverAlert do
       ObserverAlert.clean_up_old_alerts
       expect(ObserverAlert.where(id: a1.id).first).to be_nil
       expect(ObserverAlert.find(a2.id)).not_to be_nil
+    end
+  end
+
+  describe 'create_assignment_missing_alerts' do
+    before :once do
+      @course = course_factory()
+      @student1 = student_in_course(active_all: true, course: @course).user
+      @observer1 = course_with_observer(course: @course, associated_user_id: @student1.id, active_all: true).user
+      observer_alert_threshold_model(student: @student1, observer: @observer1, alert_type: 'assignment_missing')
+      observer_alert_threshold_model(student: @student1, observer: @observer1, alert_type: 'course_announcement')
+
+      @student2 = student_in_course(active_all: true, course: @course).user
+      @observer2 = course_with_observer(course: @course, associated_user_id: @student2.id, active_all: true).user
+      @link2 = UserObservationLink.create!(student: @student2, observer: @observer2, root_account: @account)
+
+      assignment_model(context: @course, due_at: 5.minutes.ago, submission_types: 'online_text_entry')
+      @student3 = student_in_course(active_all: true, course: @course).user
+      @observer3 = course_with_observer(course: @course, associated_user_id: @student3.id, active_all: true).user
+      observer_alert_threshold_model(student: @student3, observer: @observer3, alert_type: 'assignment_missing')
+      @assignment.submit_homework(@student3, :submission_type => 'online_text_entry', :body => 'done')
+
+      # student with multiple observers
+      @student4 = student_in_course(active_all: true, course: @course).user
+      @observer4 = course_with_observer(course: @course, associated_user_id: @student4.id, active_all: true).user
+      @observer5 = course_with_observer(course: @course, associated_user_id: @student4.id, active_all: true).user
+      observer_alert_threshold_model(student: @student4, observer: @observer4, alert_type: 'assignment_missing')
+      observer_alert_threshold_model(student: @student4, observer: @observer5, alert_type: 'assignment_missing')
+
+      ObserverAlert.create_assignment_missing_alerts
+    end
+
+    it 'creates an assignment_missing_alert' do
+      alert = ObserverAlert.active.where(student: @student1, alert_type: 'assignment_missing').first
+      expect(alert.alert_type).to eq 'assignment_missing'
+      expect(alert.context.user).to eq @student1
+    end
+
+    it 'doesnt create another alert if one already exists' do
+      alert = ObserverAlert.active.where(student: @student2, alert_type: 'assignment_missing').first
+      expect(alert).to be_nil
+    end
+
+    it 'doesnt create an alert if the submission is not missing' do
+      alert = ObserverAlert.where(student: @student3, alert_type: 'assignment_missing').first
+      expect(alert).to be_nil
+    end
+
+    it 'doesnt create an alert for if there is no threshold' do
+      ObserverAlert.create_assignment_missing_alerts
+      alert = ObserverAlert.where(student: @student2).first
+
+      expect(alert).to be_nil
+    end
+
+    it 'creates an alert for each observer' do
+      alert1 = ObserverAlert.active.where(student: @student4, alert_type: 'assignment_missing', observer: @observer4)
+      alert2 = ObserverAlert.active.where(student: @student4, alert_type: 'assignment_missing', observer: @observer5)
+      expect(alert1.count).to eq 1
+      expect(alert2.count).to eq 1
+    end
+
+    it 'only sends alerts for assignment_missing' do
+      alerts = ObserverAlert.active.where(student: @student1, alert_type: 'course_announcement', observer: @observer1)
+      expect(alerts).to be_empty
     end
   end
 

@@ -63,10 +63,6 @@ class WikiPage < ActiveRecord::Base
   after_save  :update_assignment,
     if: proc { self.context.try(:feature_enabled?, :conditional_release) }
 
-  scope :without_assignment_in_course, lambda { |course_ids|
-    where(assignment_id: nil).joins(:course).where(courses: {id: course_ids})
-  }
-
   scope :starting_with_title, lambda { |title|
     where('title ILIKE ?', "#{title}%")
   }

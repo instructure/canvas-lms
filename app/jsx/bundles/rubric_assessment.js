@@ -36,13 +36,15 @@ const findRubricAssessment = (id) => {
   return null
 }
 
-document.querySelectorAll(".react_rubric_container").forEach((rubricElement) => {
+const rubricElements = document.querySelectorAll(".react_rubric_container")
+Array.prototype.forEach.call(rubricElements, (rubricElement) => {
   const assessment = findRubricAssessment(rubricElement.dataset.rubricAssessmentId)
   ReactDOM.render((
     <Rubric
       rubric={findRubric(rubricElement.dataset.rubricId)}
       rubricAssessment={assessment}
       rubricAssociation={assessment.rubric_association}
+      customRatings={ENV.outcome_proficiency ? ENV.outcome_proficiency.ratings : []}
     />
   ), rubricElement)
 })

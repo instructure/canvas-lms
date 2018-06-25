@@ -20,7 +20,6 @@ import Gradebook from 'compiled/gradezilla/Gradebook';
 
 export function createGradebook (options = {}) {
   const gradebook = new Gradebook({
-    anonymous_moderated_marking_enabled: false,
     colors: {},
     context_allows_gradebook_uploads: true,
     context_id: '1',

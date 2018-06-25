@@ -33,8 +33,8 @@ define [
     equal assignment.muted, fixture.muted, 'muted status'
     equal assignment.id, fixture.id, 'assignment id'
 
-  QUnit.module 'screenreader_gradebook assignment_muter_component',
-    setup: ->
+  QUnit.module 'screenreader_gradebook assignment_muter_component', (hooks) ->
+    hooks.beforeEach((assert) ->
       fixtures.create()
       mutedAssignment = fixtures.assignment_groups[0].assignments[1]
       unmutedAssignment = fixtures.assignment_groups[0].assignments[0]
@@ -42,18 +42,51 @@ define [
       run =>
         @assignment = Ember.copy(mutedAssignment, true)
         @component = App.AssignmentMuterComponent.create(assignment: @assignment)
-        
-    teardown: ->
+    )
+
+    hooks.afterEach((assert) ->
       run =>
         @component.destroy()
         @component = null
+    )
 
-  test 'it works', ->
-    compareIdentity(@component.get('assignment'), mutedAssignment)
+    QUnit.test 'it works', ->
+      compareIdentity(@component.get('assignment'), mutedAssignment)
 
-    Ember.run =>
-      @assignment = Ember.copy(unmutedAssignment, true)
-      @component.setProperties
-        assignment: @assignment
+      Ember.run =>
+        @assignment = Ember.copy(unmutedAssignment, true)
+        @component.setProperties
+          assignment: @assignment
 
-    compareIdentity(@component.get('assignment'), unmutedAssignment)
+      compareIdentity(@component.get('assignment'), unmutedAssignment)
+
+    QUnit.module 'moderated grading', (hooks) ->
+      QUnit.test 'it is not disabled if assignment is not muted', ->
+        unmutedAssignment = fixtures.assignment_groups[4].assignments[1]
+        Ember.run =>
+          @assignment = Ember.copy(unmutedAssignment, true)
+          @component = App.AssignmentMuterComponent.create(assignment: @assignment)
+        strictEqual @component.get('disabled'), false
+
+      QUnit.test 'it is not disabled if assignment is not moderated', ->
+        nonmoderatedAssignment = fixtures.assignment_groups[4].assignments[2]
+        Ember.run =>
+          @assignment = Ember.copy(nonmoderatedAssignment, true)
+          @component = App.AssignmentMuterComponent.create(assignment: @assignment)
+        strictEqual @component.get('disabled'), false
+
+      QUnit.test 'it is not disabled if assignment has grades published', ->
+        gradesPublishedAssignment = fixtures.assignment_groups[4].assignments[3]
+        Ember.run =>
+          @assignment = Ember.copy(gradesPublishedAssignment, true)
+          @component = App.AssignmentMuterComponent.create(assignment: @assignment)
+        strictEqual @component.get('disabled'), false
+
+      QUnit.test 'it is disabled if muted, moderated, and grades not published', ->
+        mutedModeratedGradesNotPublishedAssignment = fixtures.assignment_groups[4].assignments[0]
+        Ember.run =>
+          @assignment = Ember.copy(mutedModeratedGradesNotPublishedAssignment, true)
+          @component = App.AssignmentMuterComponent.create(assignment: @assignment)
+        strictEqual @component.get('disabled'), true
+
+

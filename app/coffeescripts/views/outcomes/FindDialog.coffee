@@ -92,11 +92,11 @@ define [
       model.quizMasteryLevel = (parseFloat(@$el.find('#outcome_mastery_at').val()) or 0) if @content.setQuizMastery
       model.useForScoring = @$el.find('#outcome_use_for_scoring').prop('checked') if @content.useForScoring
       return alert I18n.t('dont_import', 'This group cannot be imported.') if model.get 'dontImport'
+      unless @shouldImport
+        @trigger('import', model)
+        @close()
+        return
       if confirm(@confirmText(model))
-        unless @shouldImport
-          @trigger('import', model)
-          @close()
-          return
         if model instanceof OutcomeGroup
           url = @selectedGroup.get('import_url')
           dfd = $.ajaxJSON url, 'POST',

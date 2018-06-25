@@ -126,7 +126,7 @@ function defaultProps ({ props, sortBySetting, assignment, curveGradesAction } =
     submissionsLoaded: true,
     addGradebookElement () {},
     removeGradebookElement () {},
-    onMenuClose () {},
+    onMenuDismiss () {},
     ...props
   };
 }
@@ -147,7 +147,7 @@ QUnit.module('AssignmentColumnHeader', {
       props: {
         addGradebookElement: this.stub(),
         removeGradebookElement: this.stub(),
-        onMenuClose: this.stub()
+        onMenuDismiss: this.stub()
       }
     });
     this.wrapper = mountComponent(this.props);
@@ -173,20 +173,20 @@ test('renders the points possible', function () {
   equal(pointsPossible.text().trim(), 'Out of 13');
 });
 
-test('renders a PopoverMenu', function () {
-  const optionsMenu = this.wrapper.find('PopoverMenu');
+test('renders a Menu', function () {
+  const optionsMenu = this.wrapper.find('Menu');
 
   equal(optionsMenu.length, 1);
 });
 
-test('does not render a PopoverMenu if assignment is not published', function () {
+test('does not render a Menu if assignment is not published', function () {
   const props = defaultProps({ assignment: { published: false } });
   const wrapper = mountComponent(props);
-  const optionsMenu = wrapper.find('PopoverMenu');
+  const optionsMenu = wrapper.find('Menu');
   equal(optionsMenu.length, 0);
 });
 
-test('renders a PopoverMenu with a trigger', function () {
+test('renders a Menu with a trigger', function () {
   const optionsMenuTrigger = this.wrapper.find('.Gradebook__ColumnHeaderAction button');
 
   equal(optionsMenuTrigger.length, 1);
@@ -209,23 +209,22 @@ test('calls removeGradebookElement prop on close', function () {
   ok(this.props.removeGradebookElement.called);
 });
 
-test('calls onMenuClose prop on close', function () {
+test('calls onMenuDismiss prop on close', function () {
   this.wrapper.find('.Gradebook__ColumnHeaderAction button').simulate('click');
   this.wrapper.find('.Gradebook__ColumnHeaderAction button').simulate('click');
 
-  strictEqual(this.props.onMenuClose.callCount, 1);
+  strictEqual(this.props.onMenuDismiss.callCount, 1);
 });
 
-test('adds a class to the action container when the PopoverMenu is opened', function () {
+test('adds a class to the action container when the Menu is opened', function () {
   const actionContainer = this.wrapper.find('.Gradebook__ColumnHeaderAction');
   actionContainer.find('button').simulate('click');
   ok(actionContainer.hasClass('menuShown'));
 });
 
 test('renders a title for the More icon based on the assignment name', function () {
-  const optionsMenuTrigger = this.wrapper.find('PopoverMenu IconMore');
-
-  equal(optionsMenuTrigger.props().title, 'Assignment #1 Options');
+  const optionsMenuTrigger = this.wrapper.find('Button ScreenReaderContent');
+  equal(optionsMenuTrigger.text(), 'Assignment #1 Options');
 });
 
 QUnit.module('AssignmentColumnHeader: "Enter Grades as" Settings', function (hooks) {
@@ -239,7 +238,7 @@ QUnit.module('AssignmentColumnHeader: "Enter Grades as" Settings', function (hoo
 
   function getMenuItemFlyout (text) {
     const content = new ReactWrapper(wrapper.node.optionsMenuContent, wrapper.node);
-    return content.findWhere(component => component.name() === 'MenuItemFlyout' && component.text().trim() === text);
+    return content.findWhere(component => component.name() === 'Menu' && component.text().trim() === text);
   }
 
   function mountAndOpenMenu () {
@@ -976,8 +975,8 @@ QUnit.module('AssignmentColumnHeader#handleKeyDown', function (hooks) {
 
   test('Enter opens the options menu', function () {
     this.handleKeyDown(13); // Enter
-    const optionsMenu = this.wrapper.find('PopoverMenu');
-    strictEqual(optionsMenu.node.show, true);
+    const optionsMenu = this.wrapper.find('Menu');
+    strictEqual(optionsMenu.node.shown, true);
   });
 
   test('returns false for Enter on options menu', function () {

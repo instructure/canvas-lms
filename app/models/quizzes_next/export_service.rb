@@ -48,6 +48,8 @@ module QuizzesNext
       def send_imported_content(new_course, imported_content)
         imported_content[:assignments].each do |assignment|
           next if QuizzesNext::Service.assignment_not_in_export?(assignment)
+          next unless QuizzesNext::Service.assignment_duplicated?(assignment)
+
           old_assignment_id = assignment.fetch(:original_assignment_id)
           old_assignment = Assignment.find(old_assignment_id)
 
@@ -56,8 +58,9 @@ module QuizzesNext
 
           new_assignment.duplicate_of = old_assignment
           new_assignment.workflow_state = 'duplicating'
-
+          new_assignment.duplication_started_at = Time.zone.now
           new_assignment.save!
+
           Canvas::LiveEvents.quizzes_next_quiz_duplicated(
             {
               new_assignment_id: new_assignment.global_id,

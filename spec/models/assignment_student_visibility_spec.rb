@@ -332,22 +332,32 @@ describe "differentiated_assignments" do
           it "should show the assignment to the user" do
             ensure_user_sees_assignment
           end
+
           it "should not show unpublished assignments" do
             @assignment.workflow_state = "unpublished"
             @assignment.save!
             ensure_user_does_not_see_assignment
           end
-          it "should update when enrollments change" do
+
+          it "should update when enrollments are destroyed" do
             ensure_user_sees_assignment
             enrollments = StudentEnrollment.where(:user_id => @user.id, :course_id => @course.id, :course_section_id => @section_foo.id)
             enrollments.each(&:destroy_permanently!)
             ensure_user_does_not_see_assignment
           end
+
+          it "should update when enrollments are inactive" do
+            ensure_user_sees_assignment
+            @user.enrollments.where(:course_id => @course.id, :course_section_id => @section_foo.id).first.deactivate
+            ensure_user_does_not_see_assignment
+          end
+
           it "should update when the override is deleted" do
             ensure_user_sees_assignment
             @assignment.assignment_overrides.each(&:destroy!)
             ensure_user_does_not_see_assignment
           end
+
           it "should not return duplicate visibilities with multiple visible sections" do
             enroller_user_in_section(@section_bar, {user: @user})
             give_section_due_date(@assignment, @section_bar)

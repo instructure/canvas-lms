@@ -51,6 +51,13 @@ afterEach(() => {
   document.body.removeChild(flashElements);
 });
 
+it("shows spinner when loading", () => {
+  const props = getProps();
+  props.collection.loading = true;
+  const wrapper = mount(<SearchMessage {...props} />);
+  expect(wrapper.find('Spinner').exists()).toBe(true);
+})
+
 describe("Pagination Handling", () => {
   it("shows the loading spinner on the page that is becoming current", () => {
     const props = getProps();

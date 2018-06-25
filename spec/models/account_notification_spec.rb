@@ -194,6 +194,27 @@ describe AccountNotification do
       expect(nother_notes).to include other_announcement
       expect(nother_notes).to include nother_announcement
     end
+
+    it "restricts to roles within the respective sub-accounts (even if within same root account)" do
+      course_with_teacher(user: @user, account: @sub_account, active_all: true)
+
+      other_sub_account = Account.default.sub_accounts.create!
+      course_with_student(user: @user, account: other_sub_account, active_all: true)
+      other_sub_announcement = sub_account_notification(subject: 'blah', account: other_sub_account,
+        role_ids: [Role.get_built_in_role("TeacherEnrollment").id])
+      # should not show to user because they're not a teacher in this subaccount
+
+      expect(AccountNotification.for_user_and_account(@user, Account.default)).to_not include(other_sub_announcement)
+    end
+
+    it "still shows to roles nested within the sub-accounts" do
+      sub_sub_account = @sub_account.sub_accounts.create!
+      course_with_teacher(user: @user, account: sub_sub_account, active_all: true)
+      sub_announcement = sub_account_notification(subject: 'blah', account: @sub_account,
+        role_ids: [Role.get_built_in_role("TeacherEnrollment").id])
+
+      expect(AccountNotification.for_user_and_account(@user, Account.default)).to include(sub_announcement)
+    end
   end
 
   describe "survey notifications" do

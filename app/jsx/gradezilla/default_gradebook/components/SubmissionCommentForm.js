@@ -21,9 +21,9 @@ import 'compiled/jquery.rails_flash_notifications';
 import React from 'react';
 import { bool, func, string } from 'prop-types';
 import I18n from 'i18n!gradebook';
-import TextArea from '@instructure/ui-core/lib/components/TextArea';
-import Button from '@instructure/ui-core/lib/components/Button';
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
+import TextArea from '@instructure/ui-forms/lib/components/TextArea';
+import Button from '@instructure/ui-buttons/lib/components/Button';
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 
 export default class SubmissionCommentForm extends React.Component {
   static propTypes = {

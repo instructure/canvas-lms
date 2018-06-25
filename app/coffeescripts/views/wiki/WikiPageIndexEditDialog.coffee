@@ -26,7 +26,7 @@ define [
 
   dialogDefaults =
     fixDialogButtons: false
-    title: I18n.t 'edit_dialog_title', 'Edit Wiki Page'
+    title: I18n.t 'edit_dialog_title', 'Edit Page'
     width: 450
     height: 230
     minWidth: 450

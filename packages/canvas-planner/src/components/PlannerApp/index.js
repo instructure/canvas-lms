@@ -21,7 +21,7 @@ import classnames from 'classnames';
 import moment from 'moment-timezone';
 import { connect } from 'react-redux';
 import View from '@instructure/ui-layout/lib/components/View';
-import Spinner from '@instructure/ui-core/lib/components/Spinner';
+import Spinner from '@instructure/ui-elements/lib/components/Spinner';
 import { arrayOf, oneOfType, shape, bool, object, string, number, func } from 'prop-types';
 import { momentObj } from 'react-moment-proptypes';
 import { userShape, sizeShape } from '../plannerPropTypes';

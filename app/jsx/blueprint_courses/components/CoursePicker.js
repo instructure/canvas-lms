@@ -53,7 +53,6 @@ export default class CoursePicker extends React.Component {
     super(props)
     this.state = {
       isExpanded: props.isExpanded,
-      isManuallyExpanded: props.isExpanded,
       announceChanges: false,
     }
     this._homeRef = null;
@@ -84,7 +83,6 @@ export default class CoursePicker extends React.Component {
   onFilterActivate = () => {
     this.setState({
       isExpanded: true,
-      isManuallyExpanded: this.coursesToggle.state.isExpanded,
     })
   }
 

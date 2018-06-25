@@ -209,6 +209,7 @@ describe "conversations new" do
       end
 
       it "should check and lock the bulk_message checkbox when over the max size", priority: "2", test_id: 206022 do
+        skip('COMMS-1164')
         conversations
         compose course: @course, subject: 'lockme', body: 'hallo!', send: false
 

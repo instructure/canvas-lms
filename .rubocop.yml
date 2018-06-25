@@ -143,7 +143,6 @@ RSpec/VerifiedDoubles:
   Enabled: false
 RSpec/NamedSubject:
   Enabled: false
-
 # RSpec cops we care extra about
 RSpec/EmptyExampleGroup:
   Severity: error
@@ -183,7 +182,7 @@ Lint/AmbiguousRegexpLiteral:
   Severity: convention
 Lint/AmbiguousBlockAssociation:
   Exclude:
-    - "spec/**/*"
+    - spec/**/*
 Lint/UselessAssignment:
   Severity: convention
 Lint/Debugger:
@@ -234,9 +233,9 @@ Metrics/ModuleLength:
 Metrics/BlockLength:
   Max: 50
   Exclude:
-  - 'gems/*/spec/**/*.rb'
-  - 'gems/plugins/*/spec_canvas/**/*.rb'
-  - 'spec/**/*.rb'
+  - gems/*/spec/**/*.rb
+  - gems/plugins/*/spec_canvas/**/*.rb
+  - spec/**/*.rb
 Metrics/CyclomaticComplexity:
   Max: 28
 Metrics/PerceivedComplexity:
@@ -263,3 +262,8 @@ RSpec/ScatteredSetup:
   Enabled: false
 Style/RescueStandardError:
   Enabled: false
+
+Specs/EnsureSpecExtension:
+  Enabled: true
+  Exclude:
+    - spec/shared_examples/**/*

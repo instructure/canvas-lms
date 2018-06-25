@@ -18,8 +18,8 @@
 import React from 'react';
 import StickyButton from '../index';
 import {shallow} from 'enzyme';
-import IconArrowUpSolid from 'instructure-icons/lib/Solid/IconArrowUpSolid';
-import IconArrowDownLine from 'instructure-icons/lib/Line/IconArrowDownLine';
+import IconArrowUpSolid from '@instructure/ui-icons/lib/Solid/IconArrowUp';
+import IconArrowDownLine from '@instructure/ui-icons/lib/Line/IconArrowDown';
 
 
 it('renders', () => {

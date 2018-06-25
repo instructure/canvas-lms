@@ -17,17 +17,19 @@
  */
 
 import React, {Component} from 'react'
-import {arrayOf, shape, string} from 'prop-types'
+import {arrayOf, bool, func, oneOf, shape, string} from 'prop-types'
 import Text from '@instructure/ui-elements/lib/components/Text'
-import I18n from 'i18n!assignment_grade_summary'
 
-function getGrade(graderId, grades) {
-  const gradeInfo = grades[graderId]
-  return gradeInfo && gradeInfo.score != null ? I18n.n(gradeInfo.score) : '–'
-}
+import {FAILURE, STARTED, SUCCESS} from '../../grades/GradeActions'
+import GradeIndicator from './GradeIndicator'
+import GradeSelect from './GradeSelect'
 
 export default class GridRow extends Component {
   static propTypes = {
+    disabledCustomGrade: bool.isRequired,
+    finalGrader: shape({
+      graderId: string.isRequired
+    }),
     graders: arrayOf(
       shape({
         graderName: string,
@@ -35,14 +37,19 @@ export default class GridRow extends Component {
       })
     ).isRequired,
     grades: shape({}),
+    onGradeSelect: func,
     row: shape({
       studentId: string.isRequired,
       studentName: string.isRequired
-    }).isRequired
+    }).isRequired,
+    selectProvisionalGradeStatus: oneOf([FAILURE, STARTED, SUCCESS])
   }
 
   static defaultProps = {
-    grades: {}
+    finalGrader: null,
+    grades: {},
+    onGradeSelect: null,
+    selectProvisionalGradeStatus: null
   }
 
   shouldComponentUpdate(nextProps) {
@@ -51,8 +58,8 @@ export default class GridRow extends Component {
 
   render() {
     return (
-      <tr className={`GradesGrid__BodyRow student_${this.props.row.studentId}`}>
-        <th className="GradesGrid__BodyRowHeader" scope="row">
+      <tr className={`GradesGrid__BodyRow student_${this.props.row.studentId}`} role="row">
+        <th className="GradesGrid__BodyRowHeader" role="rowheader" scope="row">
           <Text>{this.props.row.studentName}</Text>
         </th>
 
@@ -60,11 +67,24 @@ export default class GridRow extends Component {
           const classNames = ['GradesGrid__ProvisionalGradeCell', `grader_${grader.graderId}`]
 
           return (
-            <td className={classNames.join(' ')} key={grader.graderId}>
-              <Text>{getGrade(grader.graderId, this.props.grades)}</Text>
+            <td className={classNames.join(' ')} key={grader.graderId} role="cell">
+              <GradeIndicator gradeInfo={this.props.grades[grader.graderId]} />
             </td>
           )
         })}
+
+        <td className="GradesGrid__FinalGradeCell" role="cell">
+          <GradeSelect
+            disabledCustomGrade={this.props.disabledCustomGrade}
+            finalGrader={this.props.finalGrader}
+            graders={this.props.graders}
+            grades={this.props.grades}
+            onSelect={this.props.onGradeSelect}
+            selectProvisionalGradeStatus={this.props.selectProvisionalGradeStatus}
+            studentId={this.props.row.studentId}
+            studentName={this.props.row.studentName}
+          />
+        </td>
       </tr>
     )
   }

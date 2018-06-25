@@ -15,7 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../common')
+require_relative '../common'
+require_relative './new_user_search_page'
+require_relative './new_user_edit_modal_page.rb'
+require_relative './masquerade_page.rb'
 
 describe "new account user search" do
   include_context "in-process server selenium tests"
@@ -134,16 +137,6 @@ describe "new account user search" do
     expect(new_pseudonym.user.name).to eq name
   end
 
-  it "should bring up user page when clicking name", priority: "1", test_id: 3399648 do
-    page_user = user_with_pseudonym(:account => @account, :name => "User Page")
-    get "/accounts/#{@account.id}/users"
-
-    fj("[data-automation='users list'] tr a:contains('#{page_user.name}')").click
-
-    wait_for_ajax_requests
-    expect(f("#content h2")).to include_text page_user.name
-  end
-
   it "should paginate" do
     ('A'..'Z').each do |letter|
       user_with_pseudonym(:account => @account, :name => "Test User #{letter}")
@@ -213,16 +206,6 @@ describe "new account user search" do
     expect(driver.current_url).to include("/accounts/#{@account.id}/groups")
   end
 
-  it "should open the act as page when clicking the masquerade button", priority: "1", test_id: 3453424 do
-    mask_user = user_with_pseudonym(:account => @account, :name => "Mask User", :active_user => true)
-
-    get "/accounts/#{@account.id}/users"
-
-    fj("[data-automation='users list'] tr:contains('#{mask_user.name}') [role=button]:has([name='IconMasquerade'])")
-      .click
-    expect(f('.ActAs__text')).to include_text mask_user.name
-  end
-
   it "should open the conversation page when clicking the send message button", priority: "1", test_id: 3453435 do
     conv_user = user_with_pseudonym(:account => @account, :name => "Conversation User")
 
@@ -233,14 +216,30 @@ describe "new account user search" do
     expect(f('.message-header-input .ac-token')).to include_text conv_user.name
   end
 
-  it "should open the edit user modal when clicking the edit user button", priority: "1", test_id: 3453436 do
-    edit_user = user_with_pseudonym(:account => @account, :name => "Edit User")
+  # This describe block will be removed once all tests are converted
+  describe 'Page Object Converted Tests' do
+    include NewUserSearchPage
+    include NewUserEditModalPage
+    include MasqueradePage
 
-    get "/accounts/#{@account.id}/users"
+    before do
+      @user.update_attribute(:name, "Test User")
+      visit(@account)
+    end
 
-    fj("[data-automation='users list'] tr:contains('#{edit_user.name}') [role=button]:has([name='IconEdit'])").click
+    it "should bring up user page when clicking name", priority: "1", test_id: 3399648 do
+      click_user_link(@user.name)
+      expect(f("#content h2")).to include_text @user.name
+    end
 
-    expect(fj('label:contains("Full Name") input').attribute('value')).to eq("Edit User")
+    it "should open the edit user modal when clicking the edit user icon" do
+      click_edit_button(@user.name)
+      expect(full_name_input.attribute('value')).to eq(@user.name)
+    end
+
+    it "should open the act as page when clicking the masquerade button", priority: "1", test_id: 3453424 do
+      click_masquerade_button(@user.name)
+      expect(act_as_label).to include_text @user.name
+    end
   end
-
 end

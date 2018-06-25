@@ -201,7 +201,6 @@ describe Enrollment do
 
     context 'when the user is a final grader' do
       before(:once) do
-        @course.root_account.enable_feature!(:anonymous_moderated_marking)
         @teacher = User.create!
         @another_teacher = User.create!
         @course.enroll_teacher(@teacher, enrollment_state: 'active', allow_multiple_enrollments: true)
@@ -210,7 +209,7 @@ describe Enrollment do
         @course.assignments.create!(moderated_grading: true, final_grader: @another_teacher, grader_count: 2)
       end
 
-      it 'removes the user as final grader from all course assignments if Anonymous Moderated Marking is enabled' do
+      it 'removes the user as final grader from all course assignments' do
         expect { @course.enrollments.find_by!(user: @teacher).destroy }.to change {
           @course.assignments.order(:created_at).pluck(:final_grader_id)
         }.from([nil, @teacher.id, @teacher.id, @another_teacher.id]).to([nil, nil, nil, @another_teacher.id])

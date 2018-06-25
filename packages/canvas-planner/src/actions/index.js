@@ -68,6 +68,7 @@ export const {
 );
 
 export * from './loading-actions';
+export * from './sidebar-actions';
 
 function saveExistingPlannerItem (apiItem) {
   return axios({
@@ -111,7 +112,7 @@ export const getInitialOpportunities = () => {
 
     axios({
       method: 'get',
-      url: getState().opportunities.nextUrl || '/api/v1/users/self/missing_submissions?include[]=planner_overrides',
+      url: getState().opportunities.nextUrl || '/api/v1/users/self/missing_submissions?include[]=planner_overrides&filter[]=submittable',
     }).then(response => {
       if(parseLinkHeader(response.headers.link).next) {
         dispatch(addOpportunities({items: response.data, nextUrl: parseLinkHeader(response.headers.link).next.url }));
@@ -140,6 +141,9 @@ export const dismissOpportunity = (id, plannerOverride) => {
         return opp.planner_override && !opp.planner_override.dismissed;
       }).length < 10)
         dispatch(getNextOpportunities());
+    })
+    .catch((error) => {
+      alert(formatMessage('An error occurred attempting to dismiss the opportunity.'), true);
     });
     return promise;
   };
@@ -192,8 +196,8 @@ export const cancelEditingPlannerItem = () => {
   return (dispatch, getState) => {
     dispatch(clearUpdateTodo());
     dispatch(canceledEditingPlannerItem());
-  }
-}
+  };
+};
 
 function saveExistingPlannerOverride (apiOverride) {
   return axios({

@@ -32,7 +32,7 @@ import Badge from '@instructure/ui-elements/lib/components/Badge'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
+import Menu from '@instructure/ui-menu/lib/components/Menu'
 import IconMore from '@instructure/ui-icons/lib/Line/IconMore'
 
 import IconDragHandleLine from '@instructure/ui-icons/lib/Line/IconDragHandle'
@@ -249,10 +249,10 @@ export default class CourseItemRow extends Component {
             }
             {this.props.actionsContent}
             <span ref={this.initializeMasterCourseIcon} className="ic-item-row__master-course-lock" />
-            {this.props.showManageMenu &&
-              (<span className="ic-item-row__manage-menu">
-                <PopoverMenu
-                  ref={(c) => { this._manageMenu = c }}
+            {this.props.showManageMenu && (
+              <span className="ic-item-row__manage-menu">
+                <Menu
+                  ref={c => this._manageMenu = c}
                   onSelect={this.props.onManageMenuSelect}
                   onToggle={this.toggleManageMenuShown}
                   trigger={
@@ -260,8 +260,12 @@ export default class CourseItemRow extends Component {
                       <IconMore />
                       <ScreenReaderContent>{I18n.t('Manage options for %{name}', { name: this.props.title })}</ScreenReaderContent>
                     </Button>
-                  }>{this.state.manageMenuShown ? this.props.manageMenuOptions() : null}</PopoverMenu>
-              </span>)}
+                  }
+                >
+                  {this.state.manageMenuShown ? this.props.manageMenuOptions() : null}
+                </Menu>
+              </span>
+            )}
           </div>
           <div className="ic-item-row__meta-content">
             {this.props.metaContent}

@@ -242,6 +242,38 @@ describe UsersController do
           expect(oe.associated_user).to eq @user
         end
 
+        it "should allow observers to self register with a pairing code" do
+          course_with_student
+          @domain_root_account = @course.account
+          pairing_code = @student.generate_observer_pairing_code
+          @course.account.enable_feature!(:observer_pairing_code)
+
+          post 'create', params: {
+            pseudonym: {
+              unique_id: 'jon@example.com',
+              password: 'password',
+              password_confirmation: 'password'
+            },
+            user: {
+              name: 'Jon',
+              terms_of_use: '1',
+              initial_enrollment_type: 'observer',
+              skip_registration: '1'
+            },
+            pairing_code: {
+              code: pairing_code.code
+            }
+          }, format: 'json'
+
+          expect(response).to be_success
+          new_pseudo = Pseudonym.where(unique_id: 'jon@example.com').first
+          new_user = new_pseudo.user
+          expect(new_user.linked_students).to eq [@student]
+          oe = new_user.observer_enrollments.first
+          expect(oe.course).to eq @course
+          expect(oe.associated_user).to eq @student
+        end
+
         it "should redirect 'new' action to root_url" do
           get 'new'
           expect(response).to redirect_to root_url

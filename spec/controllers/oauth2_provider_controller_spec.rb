@@ -39,7 +39,7 @@ describe Oauth2ProviderController do
       let(:dev_key) { DeveloperKey.create! redirect_uri: 'https://example.com', require_scopes: true, scopes: [] }
 
       before do
-        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:api_token_scoping).and_return(true)
+        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(true)
       end
 
       it 'renders 400' do
@@ -176,7 +176,7 @@ describe Oauth2ProviderController do
         before do
           allow(Account.site_admin).to receive(:feature_allowed?).and_return(false)
           allow(Account.default).to receive(:feature_enabled?).and_return(false)
-          allow(Account.default).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite).and_return(true)
+          allow(Account.default).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(true)
         end
 
         shared_examples_for 'the authorization endpoint' do

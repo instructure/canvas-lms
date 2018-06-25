@@ -48,7 +48,7 @@ describe('CourseImageSelector', () => {
     const wrapper = shallow(<CourseImageSelector store={store} />)
 
     wrapper.setState({gettingImage: false})
-    expect(wrapper.find('PopoverMenu').exists()).toBeTruthy()
+    expect(wrapper.find('Menu').exists()).toBeTruthy()
   })
 
 })

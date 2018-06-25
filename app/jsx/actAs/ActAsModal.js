@@ -20,7 +20,7 @@ import React from 'react'
 import keycode from 'keycode'
 import I18n from 'i18n!act_as'
 
-import Modal, {ModalHeader, ModalBody} from '@instructure/ui-overlays/lib/components/Modal'
+import Modal, {ModalBody} from '../shared/components/InstuiModal'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import View from '@instructure/ui-layout/lib/components/View'
 import Text from '@instructure/ui-elements/lib/components/Text'
@@ -166,15 +166,8 @@ export default class ActAsModal extends React.Component {
           transition="fade"
           size="fullscreen"
           label={I18n.t('Act as User')}
-          closeButtonLabel={I18n.t('Close')}
-          closeButtonRef={(el) => this.closeButton = el}
           open
         >
-          <ModalHeader>
-            <Text size="large">
-              {I18n.t('Act as User')}
-            </Text>
-          </ModalHeader>
           <ModalBody>
             {this.state.isLoading ?
               <div className="ActAs__loading">

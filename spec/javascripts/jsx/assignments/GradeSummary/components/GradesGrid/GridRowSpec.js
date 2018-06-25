@@ -20,6 +20,7 @@ import React from 'react'
 import {mount} from 'enzyme'
 
 import GridRow from 'jsx/assignments/GradeSummary/components/GradesGrid/GridRow'
+import {STARTED} from 'jsx/assignments/GradeSummary/grades/GradeActions'
 
 QUnit.module('GradeSummary GridRow', suiteHooks => {
   let props
@@ -27,6 +28,11 @@ QUnit.module('GradeSummary GridRow', suiteHooks => {
 
   suiteHooks.beforeEach(() => {
     props = {
+      disabledCustomGrade: false,
+      finalGrader: {
+        graderId: 'teach',
+        id: '1105'
+      },
       graders: [
         {graderId: '1101', graderName: 'Miss Frizzle'},
         {graderId: '1102', graderName: 'Mr. Keating'}
@@ -49,10 +55,12 @@ QUnit.module('GradeSummary GridRow', suiteHooks => {
           studentId: '1111'
         }
       },
+      onGradeSelect() {},
       row: {
         studentId: '1111',
         studentName: 'Adam Jones'
-      }
+      },
+      selectProvisionalGradeStatus: STARTED
     }
   })
 
@@ -114,5 +122,58 @@ QUnit.module('GradeSummary GridRow', suiteHooks => {
     mountComponent()
     const cell = wrapper.find('td.grader_1101')
     equal(cell.text(), '–')
+  })
+
+  QUnit.module('GradeSelect', () => {
+    test('receives the disabledCustomGrade prop', () => {
+      mountComponent()
+      const gradeSelect = wrapper.find('GradeSelect')
+      strictEqual(gradeSelect.prop('disabledCustomGrade'), false)
+    })
+
+    test('receives the finalGrader prop', () => {
+      mountComponent()
+      const gradeSelect = wrapper.find('GradeSelect')
+      strictEqual(gradeSelect.prop('finalGrader'), props.finalGrader)
+    })
+
+    test('receives the graders prop', () => {
+      mountComponent()
+      const gradeSelect = wrapper.find('GradeSelect')
+      strictEqual(gradeSelect.prop('graders'), props.graders)
+    })
+
+    test('receives the grades prop', () => {
+      mountComponent()
+      const gradeSelect = wrapper.find('GradeSelect')
+      strictEqual(gradeSelect.prop('grades'), props.grades)
+    })
+
+    test('receives the onGradeSelect prop as onSelect', () => {
+      mountComponent()
+      const gradeSelect = wrapper.find('GradeSelect')
+      strictEqual(gradeSelect.prop('onSelect'), props.onGradeSelect)
+    })
+
+    test('receives the selectProvisionalGradeStatus prop', () => {
+      mountComponent()
+      const gradeSelect = wrapper.find('GradeSelect')
+      strictEqual(
+        gradeSelect.prop('selectProvisionalGradeStatus'),
+        props.selectProvisionalGradeStatus
+      )
+    })
+
+    test('receives the studentId prop from the row', () => {
+      mountComponent()
+      const gradeSelect = wrapper.find('GradeSelect')
+      strictEqual(gradeSelect.prop('studentId'), '1111')
+    })
+
+    test('receives the studentName prop from the row', () => {
+      mountComponent()
+      const gradeSelect = wrapper.find('GradeSelect')
+      strictEqual(gradeSelect.prop('studentName'), 'Adam Jones')
+    })
   })
 })

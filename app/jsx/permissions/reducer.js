@@ -22,6 +22,10 @@ import {actionTypes} from './actions'
 
 import activeRoleTrayReducer from './reducers/activeRoleTrayReducer'
 import activeAddTrayReducer from './reducers/activeAddTrayReducer'
+import activePermissionTrayReducer from './reducers/activePermissionTrayReducer'
+import setFocusReducer from './reducers/setFocusReducer'
+
+import {roleSortedInsert} from './helper/utils'
 
 const permissions = handleActions(
   {
@@ -52,7 +56,7 @@ const roles = handleActions(
     [actionTypes.UPDATE_ROLE_FILTERS]: (state, action) => {
       const {selectedRoles, contextType} = action.payload
       const selectedRolesObject = selectedRoles.reduce((obj, role) => {
-        obj[role.id] = true  // eslint-disable-line
+        obj[role.id] = true // eslint-disable-line
         return obj
       }, {})
       return state.map(role => {
@@ -71,34 +75,30 @@ const roles = handleActions(
       })
     },
     [actionTypes.UPDATE_PERMISSIONS]: (state, action) => {
-      const {courseRoleId, permissionName, enabled, locked} = action.payload
-      const newState = state.map(
-        p => (p.id === courseRoleId ? changePermission(p, permissionName, enabled, locked) : p)
-      )
-      return newState
-    }
+      const {role} = action.payload
+      return state.map(r => (r.id === role.id ? role : r))
+    },
+    [actionTypes.ADD_NEW_ROLE]: (state, action) => {
+      const displayedRole = state.find(role => !!role.displayed)
+      const currentContext = displayedRole.contextType
+      const displayed = true
+      const roleToAdd = {...action.payload, displayed, contextType: currentContext}
+      return roleSortedInsert(state, roleToAdd)
+    },
+    [actionTypes.UPDATE_ROLE]: (state, action) =>
+      state.map(r => (r.id === action.payload.id ? {...r, ...action.payload} : r)),
+    [actionTypes.DELETE_ROLE_SUCCESS]: (state, action) =>
+      state.filter(role => action.payload.id !== role.id)
   },
   []
 )
 
-function changePermission(permission, permissionName, enabled, locked) {
-  return {
-    ...permission,
-    permissions: {
-      ...permission.permissions,
-      [permissionName]: {
-        ...permission.permissions[permissionName],
-        enabled,
-        locked
-      }
-    }
-  }
-}
-
 export default combineReducers({
   activeRoleTray: activeRoleTrayReducer,
   activeAddTray: activeAddTrayReducer,
+  activePermissionTray: activePermissionTrayReducer,
   contextId: (state, _action) => state || '',
+  nextFocus: setFocusReducer,
   permissions,
   roles
 })

@@ -58,7 +58,7 @@ function defaultProps ({ props, sortBySetting } = {}) {
     },
     addGradebookElement () {},
     removeGradebookElement () {},
-    onMenuClose () {},
+    onMenuDismiss () {},
     ...props
   };
 }
@@ -69,7 +69,7 @@ QUnit.module('StudentColumnHeader', {
       props: {
         addGradebookElement: this.stub(),
         removeGradebookElement: this.stub(),
-        onMenuClose: this.stub()
+        onMenuDismiss: this.stub()
       }
     });
     this.wrapper = mountComponent(this.props);
@@ -86,28 +86,27 @@ test('renders a title for .Gradebook__ColumnHeaderDetail', function () {
   ok(selectedElements.text().includes('Student Name'));
 });
 
-test('renders a PopoverMenu', function () {
-  const selectedElements = this.wrapper.find('PopoverMenu');
+test('renders a Menu', function () {
+  const selectedElements = this.wrapper.find('Menu');
 
   strictEqual(selectedElements.length, 1);
 });
 
-test('renders a PopoverMenu with a trigger', function () {
+test('renders a Menu with a trigger', function () {
   const optionsMenuTrigger = this.wrapper.find('.Gradebook__ColumnHeaderAction button');
 
   strictEqual(optionsMenuTrigger.length, 1);
 });
 
-test('adds a class to the action container when the PopoverMenu is opened', function () {
+test('adds a class to the action container when the Menu is opened', function () {
   const actionContainer = this.wrapper.find('.Gradebook__ColumnHeaderAction');
   actionContainer.find('button').simulate('click');
   ok(actionContainer.hasClass('menuShown'));
 });
 
 test('renders a title for the More icon', function () {
-  const selectedElements = this.wrapper.find('PopoverMenu IconMore');
-
-  strictEqual(selectedElements.props().title, 'Student Name Options');
+  const selectedElements = this.wrapper.find('Button ScreenReaderContent');
+  equal(selectedElements.text(), 'Student Name Options');
 });
 
 test('calls addGradebookElement prop on open', function () {
@@ -127,11 +126,11 @@ test('calls removeGradebookElement prop on close', function () {
   ok(this.props.removeGradebookElement.called);
 });
 
-test('calls onMenuClose prop on close', function () {
+test('calls onMenuDismiss prop on close', function () {
   this.wrapper.find('.Gradebook__ColumnHeaderAction button').simulate('click');
   this.wrapper.find('.Gradebook__ColumnHeaderAction button').simulate('click');
 
-  strictEqual(this.props.onMenuClose.callCount, 1);
+  strictEqual(this.props.onMenuDismiss.callCount, 1);
 });
 
 QUnit.module('StudentColumnHeader disabled prop', {
@@ -142,7 +141,7 @@ QUnit.module('StudentColumnHeader disabled prop', {
 
 test('renders flyout menus disabled when prop is true', function () {
   this.wrapper = findMenuContent.call(this, defaultProps({props: {disabled: true}}));
-  const flyoutMenus = this.wrapper.find('MenuItemFlyout');
+  const flyoutMenus = this.wrapper.find('Menu');
 
   flyoutMenus.forEach((flyoutMenu) => {
     ok(flyoutMenu.prop('disabled'));
@@ -163,7 +162,7 @@ test('renders menu items disabled when prop is true', function () {
 
 test('renders flyout menus enabled when prop is false', function () {
   this.wrapper = findMenuContent.call(this, defaultProps({props: {disabled: false}}));
-  const flyoutMenus = this.wrapper.find('MenuItemFlyout');
+  const flyoutMenus = this.wrapper.find('Menu');
 
   flyoutMenus.forEach((flyoutMenu) => {
     notOk(flyoutMenu.prop('disabled'));
@@ -620,8 +619,8 @@ QUnit.module('StudentColumnHeader#handleKeyDown', function (hooks) {
 
   test('Enter opens the options menu', function () {
     this.handleKeyDown(13); // Enter
-    const optionsMenu = this.wrapper.find('PopoverMenu');
-    strictEqual(optionsMenu.node.show, true);
+    const optionsMenu = this.wrapper.find('Menu');
+    strictEqual(optionsMenu.node.shown, true);
   });
 
   test('returns false for Enter on options menu', function () {

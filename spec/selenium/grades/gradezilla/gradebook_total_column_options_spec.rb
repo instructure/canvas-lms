@@ -154,7 +154,7 @@ describe "Gradezilla - total column menu options" do
     it 'Moves total column to the front', priority: "1", test_id: 3253355 do
       Gradezilla.click_total_header_menu_option('Move to Front')
 
-      expect(Gradezilla.gradebook_slick_header_columns[1]).to eq("Total")
+      expect(Gradezilla.gradebook_slick_header_columns[1]).to match("Total")
     end
   end
 end

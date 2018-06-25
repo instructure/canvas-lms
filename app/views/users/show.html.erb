@@ -29,6 +29,9 @@
         <%= t('buttons.faculty_journal_for', 'Faculty Journal for %{user}', :user => context_user_name(@context, @user)) %>
       </a>
     <% end %>
+    <% if @user.has_student_enrollment? %>
+      <div id='pairing-code'></div>
+    <% end %>
   </div>
 <% end %>
 <div>
@@ -56,7 +59,7 @@
 </style>
 <% end %>
 
-<% css_bundle :roster_user, :context_list %>
+<% css_bundle :roster_user, :context_list, :pairing_code %>
 
 <div id="user-info-fieldsets">
   <%= render :partial => 'users/name' %>

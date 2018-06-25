@@ -21,6 +21,9 @@ import 'compiled/util/BackoffPoller'
 import 'profile'
 import 'user_sortable_name'
 import 'communication_channels'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import GeneratePairingCode from '../profiles/GeneratePairingCode'
 
 const hiddenFlags = [];
 if (!ENV.NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT) {
@@ -29,3 +32,8 @@ if (!ENV.NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT) {
 
 const view = new FeatureFlagAdminView({el: '.feature-flag-wrapper', hiddenFlags})
 view.collection.fetchAll()
+
+const container = document.querySelector('#pairing-code')
+if (container) {
+  ReactDOM.render(<GeneratePairingCode userId={ENV.current_user.id} />, container)
+}

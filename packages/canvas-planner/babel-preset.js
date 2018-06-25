@@ -6,7 +6,7 @@ if (env === 'test') {
       ['env', {
         modules: 'commonjs',
         // use the same polyfills we use in the code we send to browsers
-        targets: { browsers: require('@instructure/ui-presets/browserslist') }
+        targets: { browsers: require('@instructure/canvas-supported-browsers') }
       }],
       'stage-1',
       'react'

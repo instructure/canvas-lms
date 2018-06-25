@@ -20,8 +20,8 @@ import { head, tail } from 'underscore'
 import React from 'react'
 import PropTypes from 'prop-types'
 import Select from '@instructure/ui-core/lib/components/Select'
-import Text from '@instructure/ui-core/lib/components/Text'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import Text from '@instructure/ui-elements/lib/components/Text'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import I18n from 'i18n!gradebook'
 
   const INDIVIDUAL_GRADEBOOK = 'IndividualGradebook';

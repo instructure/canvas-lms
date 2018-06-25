@@ -17,7 +17,7 @@
 
 import React from 'react';
 import { mount } from 'enzyme';
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 import SubmissionCommentUpdateForm from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentUpdateForm';
 
 QUnit.module('SubmissionCommentUpdateForm', function (hooks) {

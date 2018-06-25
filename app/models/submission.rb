@@ -462,7 +462,7 @@ class Submission < ActiveRecord::Base
   end
 
   def can_view_details?(user)
-    return true unless self.assignment.root_account.feature_enabled?(:anonymous_moderated_marking)
+    return false unless grants_right?(user, :read)
     return true unless self.assignment.anonymous_grading && self.assignment.muted
     user == self.user || Account.site_admin.grants_right?(user, :update)
   end
@@ -554,9 +554,7 @@ class Submission < ActiveRecord::Base
       alert_type: ['assignment_grade_high', 'assignment_grade_low'])
 
     thresholds.each do |threshold|
-      threshold_value = threshold.threshold.to_i
-      next if threshold.alert_type == 'assignment_grade_high' && self.score < threshold_value
-      next if threshold.alert_type == 'assignment_grade_low' && self.score > threshold_value
+      next unless threshold.did_pass_threshold(saved_changes['score'][0], self.score)
 
       ObserverAlert.create!(observer: threshold.observer, student: self.user,
                             observer_alert_threshold: threshold,
@@ -1247,7 +1245,9 @@ class Submission < ActiveRecord::Base
         if submit_to_canvadocs
           opts = {
             preferred_plugins: [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC],
-            wants_annotation: true
+            wants_annotation: true,
+            # TODO: Remove the next line after the DocViewer Data Migration project RD-4702
+            region: a.shard.database_server.config[:region] || "none"
           }
 
           if context.root_account.settings[:canvadocs_prefer_office_online]
@@ -1509,9 +1509,7 @@ class Submission < ActiveRecord::Base
   def can_grade_symbolic_status(user = nil)
     user ||= grader
 
-    if assignment.root_account&.feature_enabled?(:anonymous_moderated_marking)
-      return :moderation_in_progress unless assignment.grades_published? || grade_posting_in_progress
-    end
+    return :moderation_in_progress unless assignment.grades_published? || grade_posting_in_progress || assignment.permits_moderation?(user)
 
     return :not_applicable if deleted?
     return :unpublished unless assignment.published?
@@ -2343,15 +2341,17 @@ class Submission < ActiveRecord::Base
 
   def visible_rubric_assessments_for(viewing_user)
     return [] if self.assignment.muted? && !grants_right?(viewing_user, :read_grade)
+    return [] unless self.assignment.rubric_association
+
     filtered_assessments = self.rubric_assessments.select do |a|
-      a.grants_right?(viewing_user, :read)
+      a.grants_right?(viewing_user, :read) &&
+        a.rubric_association == self.assignment.rubric_association
     end
     filtered_assessments.sort_by do |a|
-      if a.assessment_type == 'grading'
-        [CanvasSort::First]
-      else
-        [CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)]
-      end
+      [
+        a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last,
+        Canvas::ICU.collation_key(a.assessor_name)
+      ]
     end
   end
 

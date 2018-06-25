@@ -36,11 +36,6 @@ describe('getBadgesForItem', () => {
     }]);
   });
 
-  it('does not return a "Missing" badge if the course is set to not inform students of overdue submissions', () => {
-    const item = { status: { missing: true }, context: { inform_students_of_overdue_submissions: false } };
-    expect(getBadgesForItem(item)).toEqual([]);
-  });
-
   it('returns late status with a danger variant and "Late" text', () => {
     const item = { status: { late: true }, context: { inform_students_of_overdue_submissions: true } };
     expect(getBadgesForItem(item)).toEqual([{
@@ -48,11 +43,6 @@ describe('getBadgesForItem', () => {
       text: 'Late',
       variant: 'danger'
     }]);
-  });
-
-  it('does not return a "Late" badge if the course is set to not inform students of overdue submissions', () => {
-    const item = { status: { late: true }, context: { inform_students_of_overdue_submissions: false } };
-    expect(getBadgesForItem(item)).toEqual([]);
   });
 
   it('returns new_replies status when there is an unread_count', () => {
@@ -106,14 +96,6 @@ describe('getBadgesForItems', () => {
     });
   });
 
-  it('does not return a "Missing" badge when the course is set to not inform students of overdue submissions', () => {
-    const items = [
-      { status: { fake: true }, context: { inform_students_of_overdue_submissions: true } },
-      { newActivity: true, status: { missing: true }, context: { inform_students_of_overdue_submissions: false } }
-    ];
-    expect(getBadgesForItems(items)).toEqual([]);
-  });
-
   it('returns Late object when at least one new activity item has a missing status', () => {
     const items = [
       { status: { fake: true }, context: { inform_students_of_overdue_submissions: true } },
@@ -124,14 +106,6 @@ describe('getBadgesForItems', () => {
       text: 'Late',
       variant: 'danger'
     });
-  });
-
-  it('does not return a "Late" badge when the course is set to not inform students of overdue submissions', () => {
-    const items = [
-      { status: { fake: true }, context: { inform_students_of_overdue_submissions: true } },
-      { newActivity: true, status: { late: true }, context: { inform_students_of_overdue_submissions: false } }
-    ];
-    expect(getBadgesForItems(items)).toEqual([]);
   });
 
   // 'late' and 'missing' are mutually exclusive, so this case should not possible, but
@@ -206,10 +180,12 @@ describe('showPillForOverdueStatus', () => {
     expect(showPillForOverdueStatus('missing', item)).toEqual(true);
   });
 
-  it(`returns false if the value is true for the requested status but the
+  // inform_students_of_overdue_submissions is true if new_gradebook is enbled
+  // and we decided to show missing and late pills in planner regardless
+  it(`returns true if the value is true for the requested status even if the
     course is set to not inform students of overdue submissions`, () => {
     item.context.inform_students_of_overdue_submissions = false;
-    expect(showPillForOverdueStatus('missing', item)).toEqual(false);
+    expect(showPillForOverdueStatus('missing', item)).toEqual(true);
   });
 
   it('returns false if the "status" on the item is null', () => {

@@ -52,6 +52,7 @@
             </p>
           {{/unless}}
           </div>
+          {{#unless hideComments}}
           <button
             id="submission_details"
             class="btn"
@@ -59,6 +60,7 @@
           >
             {{#t 'submission_details'}}Submission Details{{/t}}
           </button>
+          {{/unless}}
         {{/if}}
       {{else}}
         <p class="submission_selection">

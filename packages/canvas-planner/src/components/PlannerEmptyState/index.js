@@ -20,8 +20,8 @@ import classnames from 'classnames';
 import themeable from '@instructure/ui-themeable/lib';
 import { func } from 'prop-types';
 
-import Heading from '@instructure/ui-core/lib/components/Heading';
-import Link from '@instructure/ui-core/lib/components/Link';
+import Heading from '@instructure/ui-elements/lib/components/Heading';
+import Link from '@instructure/ui-elements/lib/components/Link';
 
 import formatMessage from '../../format-message';
 import DesertSvg from './empty-desert.svg'; // Currently uses react-svg-loader

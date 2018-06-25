@@ -16,31 +16,33 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<label class="bold" for="grading-box-extended"><%= t('labels.grade', "Grade") %>
+<%
+  out_of_text = t("out of %{points_possible}", points_possible: I18n.n(round_if_whole(assignment.points_possible)))
+%>
 
-<% case assignment.grading_type %>
-<% when "points", "percent", "letter_grade", "gpa_scale" %>
-  <input type="text" id="grading-box-extended" maxlength="254"/>
-<% when "pass_fail" %>
-  <select id="grading-box-extended" class="pass_fail_grading_type">
-    <option value="">---</option>
-    <option value="complete"><%= t('#gradebooks.grades.complete', "Complete") %></option>
-    <option value="incomplete"><%= t('#gradebooks.grades.incomplete', "Incomplete") %></option>
-    <option value="EX"><%= t('Excused') %></option>
-  </select>
-<% end %>
+<label class="bold" for="grading-box-extended">
+  <div id="grading-box-points-possible">
+    <%= t('labels.grade', "Grade") %>
+    <% if assignment.grading_type == 'points' %>
+      <%= out_of_text %>
+    <% elsif assignment.grading_type != 'gpa_scale' %>
+      (<span class="score"></span> / <%= I18n.n(round_if_whole(assignment.points_possible)) %>)
+    <% end %>
+  </div>
 
-<% if assignment.grading_type == "points" %>
-  <%=
-    t(
-      "out of %{points_possible}",
-      points_possible: I18n.n(round_if_whole(assignment.points_possible))
-    )
-  %>
-<% elsif  assignment.grading_type != "gpa_scale" %>
-  (<span class="score">&nbsp;</span> / <%= I18n.n(round_if_whole(assignment.points_possible)) %>)
-<% end %>
+  <% case assignment.grading_type %>
+  <% when "points", "percent", "letter_grade", "gpa_scale" %>
+    <input type="text" id="grading-box-extended" maxlength="254"/>
+  <% when "pass_fail" %>
+    <select id="grading-box-extended" class="pass_fail_grading_type">
+      <option value="">---</option>
+      <option value="complete"><%= t('#gradebooks.grades.complete', "Complete") %></option>
+      <option value="incomplete"><%= t('#gradebooks.grades.incomplete', "Incomplete") %></option>
+      <option value="EX"><%= t('Excused') %></option>
+    </select>
+  <% end %>
 
+  <span id="grading-box-selected-grader"></span>
 </label>
 
 <div id="deduction-box" class="hidden">

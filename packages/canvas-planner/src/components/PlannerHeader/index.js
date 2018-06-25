@@ -18,17 +18,19 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import themeable from '@instructure/ui-themeable/lib';
-import Button from '@instructure/ui-core/lib/components/Button';
+import Button from '@instructure/ui-buttons/lib/components/Button';
 import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton';
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import View from '@instructure/ui-layout/lib/components/View';
-import IconPlusLine from 'instructure-icons/lib/Line/IconPlusLine';
-import IconAlertsLine from 'instructure-icons/lib/Line/IconAlertsLine';
-import IconGradebookLine from 'instructure-icons/lib/Line/IconGradebookLine';
-import Popover, {PopoverTrigger, PopoverContent} from '@instructure/ui-core/lib/components/Popover';
+import Portal from '@instructure/ui-portal/lib/components/Portal'
+import IconPlusLine from '@instructure/ui-icons/lib/Line/IconPlus';
+import IconAlertsLine from '@instructure/ui-icons/lib/Line/IconAlerts';
+import IconGradebookLine from '@instructure/ui-icons/lib/Line/IconGradebook';
+import Popover, {PopoverTrigger, PopoverContent} from '@instructure/ui-overlays/lib/components/Popover';
 import PropTypes from 'prop-types';
 import UpdateItemTray from '../UpdateItemTray';
-import Tray from '@instructure/ui-core/lib/components/Tray';
-import Badge from '@instructure/ui-core/lib/components/Badge';
+import Tray from '@instructure/ui-overlays/lib/components/Tray';
+import Badge from '@instructure/ui-elements/lib/components/Badge';
 import Opportunities from '../Opportunities';
 import GradesDisplay from '../GradesDisplay';
 import StickyButton from '../StickyButton';
@@ -98,7 +100,8 @@ export class PlannerHeader extends Component {
       gradesLoaded: PropTypes.bool,
       gradesLoadingError: PropTypes.string,
     }).isRequired,
-    ariaHideElement: PropTypes.instanceOf(Element).isRequired
+    ariaHideElement: PropTypes.instanceOf(Element).isRequired,
+    auxElement: PropTypes.instanceOf(Element).isRequired
   };
 
   static defaultProps = {
@@ -126,11 +129,11 @@ export class PlannerHeader extends Component {
   componentWillReceiveProps(nextProps) {
     let opportunities = nextProps.opportunities.items.filter((opportunity) => this.isOpportunityVisible(opportunity));
 
-    if (!nextProps.loading.allOpportunitiesLoaded && !nextProps.loading.loadingOpportunities && opportunities.length < 10) {
+    if (!nextProps.loading.allOpportunitiesLoaded &&
+        !nextProps.loading.loadingOpportunities) {
       nextProps.getNextOpportunities();
     }
 
-    opportunities = opportunities.slice(0, 10);
     this.setUpdateItemTray(!!nextProps.todo.updateTodoItem);
     this.setState({opportunities});
   }
@@ -164,9 +167,9 @@ export class PlannerHeader extends Component {
     this.props.deletePlannerItem(plannerItem);
   }
 
-  handleCancelPlannerItem = () => {
+  handleToggleTray = () => {
+    if (this.state.trayOpen) this.props.cancelEditingPlannerItem();
     this.toggleUpdateItemTray();
-    this.props.cancelEditingPlannerItem();
   }
 
   toggleAriaHiddenStuff = (hide) => {
@@ -269,8 +272,8 @@ export class PlannerHeader extends Component {
   }
 
   renderNewActivity () {
-    if (this.newActivityAboveView()) {
-      return (
+    return (
+      <Portal mountNode={this.props.auxElement} open={this.newActivityAboveView()}>
         <StickyButton
           direction="up"
           hidden={true}
@@ -281,8 +284,8 @@ export class PlannerHeader extends Component {
         >
           {formatMessage("New Activity")}
         </StickyButton>
-      );
-    }
+      </Portal>
+    );
   }
 
   render () {
@@ -301,17 +304,19 @@ export class PlannerHeader extends Component {
         <Button
           variant="icon"
           margin="0 medium 0 0"
-          onClick={this.toggleUpdateItemTray}
+          onClick={this.handleToggleTray}
           ref={(b) => { this.addNoteBtn = b; }}
         >
-          <IconPlusLine title={formatMessage("Add To Do")} />
+          <IconPlusLine/>
+          <ScreenReaderContent>{formatMessage("Add To Do")}</ScreenReaderContent>
         </Button>
         <Button
           variant="icon"
           margin="0 medium 0 0"
           onClick={this.toggleGradesTray}
         >
-          <IconGradebookLine title={formatMessage("Show My Grades")} />
+          <IconGradebookLine/>
+          <ScreenReaderContent>{formatMessage("Show My Grades")}</ScreenReaderContent>
         </Button>
         <Popover
           onDismiss={this.closeOpportunitiesDropdown}
@@ -328,8 +333,9 @@ export class PlannerHeader extends Component {
               ref={(b) => { this.opportunitiesButton = b; }}
               buttonRef={(b) => { this.opportunitiesHtmlButton = b; }}
             >
-              <Badge {...this.state.opportunities.length ? {count :this.state.opportunities.length} : {}}>
-                <IconAlertsLine title={this.opportunityTitle()} />
+              <Badge {...this.props.loading.allOpportunitiesLoaded && this.state.opportunities.length ? {count :this.state.opportunities.length} : {}}>
+                <IconAlertsLine/>
+                <ScreenReaderContent>{this.opportunityTitle()}</ScreenReaderContent>
               </Badge>
             </Button>
           </PopoverTrigger>
@@ -352,7 +358,7 @@ export class PlannerHeader extends Component {
           shouldContainFocus={true}
           shouldReturnFocus={false}
           applicationElement={() => document.getElementById('application') }
-          onDismiss={this.handleCancelPlannerItem}
+          onDismiss={this.handleToggleTray}
         >
           <UpdateItemTray
             locale={this.props.locale}
@@ -369,7 +375,6 @@ export class PlannerHeader extends Component {
           placement="end"
           shouldContainFocus
           shouldReturnFocus
-          applicationElement={() => document.getElementById('application') }
           onDismiss={this.toggleGradesTray}
         >
           <View as="div" padding="large large medium">

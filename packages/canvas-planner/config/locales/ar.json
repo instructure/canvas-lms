@@ -2,17 +2,32 @@
   "add_to_do_7def3c37": {
     "message": "إضافة قائمة مهام"
   },
+  "all_day_fb42c4fc": {
+    "message": "طوال اليوم"
+  },
   "all_items_loaded_aa256183": {
     "message": "تم تحميل كافة العناصر"
   },
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "هل أنت متأكد أنك تريد حذف عنصر المخطط هذا؟"
   },
-  "assignmenttype_title_is_complete_813e54f8": {
-    "message": "{ assignmentType } { title } مكتمل"
+  "assignmenttype_title_6612d008": {
+    "message": "{ assignmentType } { title }."
   },
-  "assignmenttype_title_is_incomplete_a1d5fac0": {
-    "message": "{ assignmentType } { title } غير مكتمل"
+  "assignmenttype_title_at_datetime_478f0709": {
+    "message": "{ assignmentType } { title }، الساعة { datetime }."
+  },
+  "assignmenttype_title_due_datetime_a112d8ff": {
+    "message": "{ assignmentType } { title }، يستحق في { datetime }."
+  },
+  "assignmenttype_title_is_marked_as_done_a8dc46ef": {
+    "message": "تم وضع علامة تم على { assignmentType } { title }."
+  },
+  "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
+    "message": "لم يتم وضع علامة تم على { assignmentType } { title }."
+  },
+  "assignmenttype_title_on_datetime_446013fb": {
+    "message": "{ assignmentType } { title }، في { datetime }."
   },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "بداية سجل قائمة المهام الخاصة بك"
@@ -27,22 +42,25 @@
     "message": "إغلاق الصفحات المنبثقة العلوية للفرص"
   },
   "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
-    "message": "{ count, plural,\n     =0 {# فرص}\n    one {# فرصة}\n  other {# فرص}\n}"
+    "message": "{ count, plural,\n     =0 {# من الفرص}\n    one {# فرصة}\n  other {# من الفرص}\n}"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-    "message": "{ count, plural,\n    one {إظهار # عنصر مكتمل}\n  other {إظهار # عناصر مكتملة}\n}"
+    "message": "{ count, plural,\n    one {إظهار # عنصر مكتمل}\n  other {إظهار # من العناصر المكتملة}\n}"
   },
   "course_8a63b4a3": {
     "message": "المساق"
   },
   "course_to_do_bcbbab54": {
-    "message": "{ course } قائمة مهام"
+    "message": "قائمة مهام { course }"
   },
   "date_at_time_dbdb1b99": {
     "message": "{ date } في { time }"
   },
   "date_ee500367": {
     "message": "التاريخ"
+  },
+  "date_is_not_a_valid_date_4ef9f8ba": {
+    "message": "#{ date } ليس تاريخًا صالحًا."
   },
   "date_is_required_8660ec22": {
     "message": "التاريخ مطلوب"
@@ -64,6 +82,9 @@
   },
   "edit_title_72e5a21e": {
     "message": "تحرير { title }"
+  },
+  "error_loading_grades_e0b38f4d": {
+    "message": "خطأ أثناء تحميل الدرجات"
   },
   "error_loading_more_items_3f109d9f": {
     "message": "حدث خطأ في تحميل المزيد من العناصر"
@@ -93,7 +114,16 @@
     "message": "اذهب إلى طريقة عرض بطاقة لوحة المعلومات"
   },
   "graded_25cd3fcd": {
-    "message": "تم منح الدرجات"
+    "message": "تم تقييم الدرجة"
+  },
+  "grades_are_loading_c899652d": {
+    "message": "جارٍ تحميل الدرجات"
+  },
+  "grades_loaded_5056277c": {
+    "message": "تم تحميل الدرجات"
+  },
+  "items_completed_items_plural_1_item_other_items_717d579f": {
+    "message": "{ items } أكمل { items, plural,\n     =1 {عنصر}\n  other {من العناصر}\n}"
   },
   "late_2be42b88": {
     "message": "متأخر"
@@ -105,10 +135,16 @@
     "message": "تحميل تواريخ سابقة"
   },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-    "message": "{ count, plural,\n     =0{# عناصر}\n    one {# عنصر}\n  other {# عناصر تم تحميلها}\n}"
+    "message": "تم تحميل { count, plural,\n     =0 {# من العناصر}\n    one {# عنصر}\n  other {# من العناصر}\n}"
   },
   "loading_25990131": {
-    "message": "يتم الآن التحميل..."
+    "message": "جارٍ التحميل..."
+  },
+  "loading_725811ca": {
+    "message": "يتم الآن التحميل"
+  },
+  "loading_grades_c842c887": {
+    "message": "جارٍ تحميل الدرجات"
   },
   "loading_past_items_ca499e75": {
     "message": "جارٍ تحميل العناصر السابقة"
@@ -122,14 +158,17 @@
   "missing_1a256b3b": {
     "message": "مفقود"
   },
-  "missing_items_for_5ef30cea": {
-    "message": "عناصر مفقودة لـ "
+  "missing_items_for_title_516511f8": {
+    "message": "عناصر مفقودة لـ { title }"
+  },
+  "my_grades_98834476": {
+    "message": "درجاتي"
   },
   "new_activity_8b84847d": {
     "message": "نشاط جديد"
   },
-  "new_activity_for_ac84f6e6": {
-    "message": "نشاط جديد لـ "
+  "new_activity_for_title_14c9c3af": {
+    "message": "نشاط جديد لـ { title }"
   },
   "next_month_749b1778": {
     "message": "الشهر القادم"
@@ -137,11 +176,20 @@
   "no_due_dates_assigned_e8f5bac8": {
     "message": "لم يتم تعيين تواريخ الاستحقاق"
   },
-  "no_to_do_s_for_this_day_yet_90c5873d": {
-    "message": "لا توجد \"قوائم مهام\" في هذا اليوم حتى الآن."
+  "no_grade_3b4d7f3e": {
+    "message": "لا توجد أي درجة"
   },
   "nothing_new_needs_attention_3ac548d4": {
     "message": "لا يوجد شيء جديد يستدعي الاهتمام."
+  },
+  "nothing_planned_today_next_item_loaded_5a199868": {
+    "message": "لم يتم اليوم تخطيط أي شيء. تم تحميل العنصر التالي."
+  },
+  "nothing_planned_yet_8675ffe9": {
+    "message": "لم يتم تخطيط أي شيء بعد"
+  },
+  "only_most_recent_grading_period_shown_f1ad6458": {
+    "message": "*إظهار أحدث فترة تقييم فقط."
   },
   "optional_add_course_ef0d70fc": {
     "message": "اختياري: إضافة مساق"
@@ -164,11 +212,26 @@
   "save_11a80ec3": {
     "message": "حفظ"
   },
+  "show_my_grades_ebd08684": {
+    "message": "إظهار درجاتي"
+  },
+  "startdate_to_enddate_d245175b": {
+    "message": "{ startDate } إلى { endDate }"
+  },
   "submitted_318fad53": {
     "message": "تم الإرسال"
   },
+  "success_to_do_created_e34ed395": {
+    "message": "نجاح: تم إنشاء قائمة مهام"
+  },
   "task_16b0ef38": {
     "message": "مهمة"
+  },
+  "the_date_and_time_this_to_do_is_due_74c823d4": {
+    "message": "تاريخ ووقت استحقاق قائمة المهام تلك"
+  },
+  "time_2b5aac58": {
+    "message": "الوقت"
   },
   "title_ee03d132": {
     "message": "العنوان"
@@ -199,6 +262,9 @@
   },
   "yesterday_c6bd6abf": {
     "message": "أمس"
+  },
+  "you_must_provide_a_date_and_time_a86839d2": {
+    "message": "يجب عليك إدخال تاريخ ووقت."
   },
   "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
     "message": "لقد قمت بالتمرير للخلف إلى أول قائمة مهام خاصة بك!"

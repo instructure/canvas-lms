@@ -174,6 +174,25 @@ QUnit.module('GradeSummary StudentsApi', suiteHooks => {
       deepEqual(ids.sort(), ['1111', '1112', '1113', '1114'])
     })
 
+    test('uses anonymous ids for ids when students are anonymous', async () => {
+      for (let i = 0; i < studentsData.length; i++) {
+        delete studentsData[i].id
+        studentsData[i].anonymous_id = `abcd${i + 1}`
+      }
+      await loadStudents()
+      const ids = flatten(loadedStudents).map(student => student.id)
+      deepEqual(ids.sort(), ['abcd1', 'abcd2', 'abcd3', 'abcd4'])
+    })
+
+    test('sets student names to null when anonymous', async () => {
+      for (let i = 0; i < studentsData.length; i++) {
+        delete studentsData[i].display_name
+      }
+      await loadStudents()
+      const names = flatten(loadedStudents).map(student => student.displayName)
+      deepEqual(names, [null, null, null, null])
+    })
+
     test('includes provisional grades when calling onPageLoaded', async () => {
       await loadStudents()
       const gradeCountPerPage = loadedProvisionalGrades.map(pageGrades => pageGrades.length)
@@ -224,6 +243,16 @@ QUnit.module('GradeSummary StudentsApi', suiteHooks => {
       await loadStudents()
       const grades = sortBy(flatten(loadedProvisionalGrades), 'id')
       deepEqual(grades.map(grade => grade.studentId), ['1111', '1112', '1112', '1114'])
+    })
+
+    test('uses anonymous id for associated students when anonymous', async () => {
+      for (let i = 0; i < studentsData.length; i++) {
+        delete studentsData[i].id
+        studentsData[i].anonymous_id = `abcd${i + 1}`
+      }
+      await loadStudents()
+      const grades = sortBy(flatten(loadedProvisionalGrades), 'id')
+      deepEqual(grades.map(grade => grade.studentId), ['abcd1', 'abcd2', 'abcd2', 'abcd4'])
     })
 
     test('calls onFailure when a request fails', async () => {

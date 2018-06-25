@@ -19,6 +19,7 @@
 import {applyMiddleware, combineReducers, createStore} from 'redux'
 import ReduxThunk from 'redux-thunk'
 
+import buildAssignmentReducer from './assignment/buildAssignmentReducer'
 import gradesReducer from './grades/gradesReducer'
 import studentsReducer from './students/studentsReducer'
 
@@ -27,11 +28,13 @@ const createStoreWithMiddleware = applyMiddleware(ReduxThunk)(createStore)
 export default function configureStore(env) {
   const contextReducer = state =>
     state || {
-      assignment: env.assignment,
+      currentUser: env.currentUser,
+      finalGrader: env.finalGrader,
       graders: env.graders
     }
 
   const reducer = combineReducers({
+    assignment: buildAssignmentReducer(env),
     context: contextReducer,
     grades: gradesReducer,
     students: studentsReducer

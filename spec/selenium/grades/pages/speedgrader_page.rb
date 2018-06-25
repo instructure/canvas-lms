@@ -36,6 +36,10 @@ class Speedgrader
       f('#grading-box-extended')
     end
 
+    def grading_enabled?
+      grade_input.enabled?
+    end
+
     def top_bar
       f("#content")
     end
@@ -45,7 +49,19 @@ class Speedgrader
     end
 
     def settings_link
-      f('#settings_link')
+      f('#speedgrader-settings button')
+    end
+
+    def options_link
+      fxpath('//span[text() = "Options"]')
+    end
+
+    def keyboard_shortcuts_link
+      fxpath('//ul[@role = "menu"]//span[text() = "Keyboard Shortcuts"]')
+    end
+
+    def mute_button
+      f('button#mute_link')
     end
 
     def hide_students_chkbox
@@ -90,6 +106,10 @@ class Speedgrader
 
     def delete_comment
       f('.delete_comment_link')
+    end
+
+    def comments
+      ff('div.comment')
     end
 
     def submission_file_name
@@ -156,11 +176,32 @@ class Speedgrader
       f("a[data-section-id=\"all\"]")
     end
 
+    def grading_details_container
+      f("div#grading_details_container")
+    end
+
+    def show_details_button
+      f("button", grading_details_container)
+    end
+
+    def provisional_grade_radio_buttons
+      ff("label", grading_details_container)
+    end
+
+    def provisional_grade_radio_button_by_label(label)
+      fj(":contains('#{label}')", provisional_grade_radio_buttons)
+    end
+
     # action
     def visit(course_id, assignment_id)
       get "/courses/#{course_id}/gradebook/speed_grader?assignment_id=#{assignment_id}"
       visibility_check = grade_input
       keep_trying_until { visibility_check.displayed? }
+    end
+
+    def select_provisional_grade_by_label(label)
+      provisional_grade_radio_button_by_label(label).click
+      driver.action.send_keys(:space).perform
     end
 
     def visit_section(section)
@@ -171,7 +212,7 @@ class Speedgrader
     end
 
     def enter_grade(grade)
-      grade_input.send_keys(grade, :tab)
+      grade_input.send_keys(grade, :enter)
     end
 
     def current_grade
@@ -194,8 +235,16 @@ class Speedgrader
       settings_link.click
     end
 
+    def click_options_link
+      options_link.click
+    end
+
+    def click_keyboard_shortcuts_link
+      keyboard_shortcuts_link.click
+    end
+
     def select_hide_student_names
-      hide_students_chkbox
+      hide_students_chkbox.click
     end
 
     def click_next_student_btn

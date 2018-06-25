@@ -18,20 +18,30 @@
 ENV["RAILS_ENV"] = ENV["RACK_ENV"]= "test"
 
 require 'pact/provider/rspec'
-require_relative '../../pact_config'
+require_relative '../pact_config'
 require_relative '../../../spec_helper'
-require_relative 'provider_states_for_consumer'
+require_relative 'pact_setup'
+require_relative 'proxy_app'
+Dir[File.dirname(__FILE__) + "/provider_states_for_consumer/*.rb"].each {|f| require f }
 
 Pact.service_provider PactConfig::Providers::CANVAS_LMS_API do
-  # Optional app configuration. Pact loads the app from config.ru by default
-  # (it is recommended to let Pact use the config.ru if possible, so testing
-  # conditions are closest to runtime conditions)
-  app { CanvasRails::Application }
+  app { PactApiConsumerProxy.new }
+
+  pact_path = format(
+    'pacts/provider/%<provider>s/consumer/%<consumer>s',
+    provider: ERB::Util.url_encode(PactConfig::Providers::CANVAS_LMS_API),
+    consumer: ERB::Util.url_encode(PactConfig::Consumers::GENERIC_CONSUMER)
+  )
 
   honours_pact_with PactConfig::Consumers::GENERIC_CONSUMER do
-    # This example points to a local file, however, on a real project with a continuous
-    # integration box, you would publish your pacts as artifacts,
-    # and point the pact_uri to the pact published by the last successful build.
-    pact_uri 'pacts/generic_consumer-canvas_lms_api.json'
+
+    if PactConfig.jenkins_build? then
+      pact_uri PactConfig.pact_uri(pact_path: pact_path)
+    else
+      pact_uri 'pacts/generic_consumer-canvas_lms_api.json'
+    end
+
+    app_version PactConfig::Providers::CANVAS_API_VERSION
+    publish_verification_results true
   end
 end

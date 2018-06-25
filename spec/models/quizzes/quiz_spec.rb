@@ -1420,6 +1420,10 @@ describe Quizzes::Quiz do
       expect { @quiz.only_visible_to_overrides = true }.
         to change { @quiz.update_cached_due_dates? }.from(false).to(true)
     end
+
+    it 'returns true when quiz was previously not an assignment, but about to become one' do
+      expect(@quiz.update_cached_due_dates?('assignment')).to be true
+    end
   end
 
   describe "#published?" do
@@ -2484,6 +2488,13 @@ describe Quizzes::Quiz do
 
     it 'respects limit' do
       expect(@course.quizzes.need_submitting_info(@student, 1).length).to eql 1
+    end
+  end
+
+  describe '#anonymous_grading?' do
+    it 'returns the value of anonymous_submissions' do
+      quiz = @course.quizzes.create!(title: "hello", anonymous_submissions: true)
+      expect(quiz.anonymous_grading?).to be true
     end
   end
 end

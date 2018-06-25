@@ -19,8 +19,8 @@
 import React from 'react';
 import { bool, shape } from 'prop-types';
 import I18n from 'i18n!gradebook';
-import Container from '@instructure/ui-core/lib/components/Container';
-import Pill from '@instructure/ui-core/lib/components/Pill';
+import View from '@instructure/ui-layout/lib/components/View';
+import Pill from '@instructure/ui-elements/lib/components/Pill';
 import Message from './SubmissionStatus/Message'
 
 export default class SubmissionStatus extends React.Component {
@@ -139,13 +139,13 @@ export default class SubmissionStatus extends React.Component {
     };
 
     return (
-      <Container as="div" padding="0 0 small 0">
+      <View as="div" padding="0 0 small 0">
         <div key="status-icons" style={statusContainerStyle}>
           {statusPillComponents}
         </div>
 
         {statusNotificationComponents}
-      </Container>
+      </View>
     );
   }
 };

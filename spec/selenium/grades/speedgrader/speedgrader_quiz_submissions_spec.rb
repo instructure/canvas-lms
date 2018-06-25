@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../../common"
+require_relative "../pages/speedgrader_page"
 
 describe "speed grader - quiz submissions" do
   include_context "in-process server selenium tests"
@@ -65,8 +66,9 @@ describe "speed grader - quiz submissions" do
   it "hides student's name from quiz if hide student names is enabled", priority: "1", test_id: 283744 do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
-    f("#settings_link").click
-    f('#hide_student_names').click
+    Speedgrader.click_settings_link
+    Speedgrader.click_options_link
+    Speedgrader.select_hide_student_names
     expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
     wait_for_ajaximations
     in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do

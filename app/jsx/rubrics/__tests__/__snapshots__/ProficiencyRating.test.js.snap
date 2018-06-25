@@ -7,13 +7,13 @@ exports[`renders the ProficiencyRating component 1`] = `
       <RadioInput label={{...}} checked={false} onChange={[Function]} onClick={[Function]} variant=\\"simple\\" size=\\"medium\\" disabled={false} inline={false} context=\\"success\\" readOnly={false} />
     </div>
   </td>
-  <td className=\\"description\\">
+  <td className=\\"description\\" style={{...}}>
     <TextInput label={{...}} messages={{...}} onChange={[Function]} defaultValue=\\"Stellar\\" inline={false} type=\\"text\\" size=\\"medium\\" textAlign=\\"start\\" disabled={false} readOnly={false} inputRef={[Function]} layout=\\"stacked\\" />
   </td>
-  <td className=\\"points\\">
+  <td className=\\"points\\" style={{...}}>
     <TextInput label={{...}} messages={{...}} onChange={[Function]} defaultValue=\\"10\\" width=\\"4rem\\" inline={false} type=\\"text\\" size=\\"medium\\" textAlign=\\"start\\" disabled={false} readOnly={false} inputRef={[Function]} layout=\\"stacked\\" />
   </td>
-  <td className=\\"color\\">
+  <td className=\\"color\\" style={{...}}>
     <Popover on=\\"click\\" show={false} onToggle={[Function]} onClick={[Function]} onFocus={[Function]} onBlur={[Function]} onMouseOver={[Function]} onMouseOut={[Function]} onShow={[Function]} onDismiss={[Function]} placement=\\"bottom center\\" stacking=\\"topmost\\" offsetX={0} offsetY={0} variant=\\"default\\" contentRef={[Function]} defaultShow={false} withArrow={true} trackPosition={true} constrain=\\"window\\" onPositioned={[Function]} onPositionChanged={[Function]} shouldRenderOffscreen={false} shouldContainFocus={false} shouldReturnFocus={true} shouldCloseOnDocumentClick={true} shouldCloseOnEscape={true} defaultFocusElement={{...}} label={{...}} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} positionTarget={{...}} alignArrow={false}>
       <PopoverTrigger>
         <Button variant=\\"link\\" as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" fluidWidth={false} buttonRef={[Function]}>
@@ -28,8 +28,8 @@ exports[`renders the ProficiencyRating component 1`] = `
       </PopoverContent>
     </Popover>
     <div className=\\"delete\\">
-      <Button variant=\\"icon\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" fluidWidth={false} buttonRef={[Function]}>
-        <IconTrashLine title=\\"Delete proficiency rating\\" />
+      <Button variant=\\"icon\\" onClick={[Function]} disabled={false} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" fluidWidth={false} buttonRef={[Function]}>
+        <IconTrash title=\\"Delete proficiency rating\\" />
       </Button>
     </div>
   </td>

@@ -34,7 +34,7 @@ define [
 
     tagName: 'input'
     type: 'checkbox'
-    attributeBindings: ['type', 'checked', 'ariaLabel:aria-label']
+    attributeBindings: ['type', 'checked', 'ariaLabel:aria-label', 'disabled']
 
     checked: (->
       this.get('assignment.muted')
@@ -46,6 +46,11 @@ define [
       else
         I18n.t "assignment_unmuted", "Click to mute."
     ).property('assignment.muted')
+
+    disabled: (->
+      this.get('assignment.muted') && this.get('assignment.moderated_grading') && \
+        !this.get('assignment.grades_published')
+    ).property('assignment.muted', 'assignment.moderated_grading', 'assignment.grades_published')
 
     setup: (->
       if assignment = this.get('assignment')

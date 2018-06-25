@@ -75,7 +75,7 @@ module.exports = {
   // In development, generate `eval` sourcemaps.
   devtool: process.env.NODE_ENV === 'production' ?
     (process.env.JS_BUILD_NO_UGLIFY ? undefined : 'source-map')
-    : 'eval',
+    : ((process.env.COVERAGE || process.env.SENTRY_DSN) ? 'source-map' : 'eval'),
 
   entry: Object.assign({
     vendor: require('./modulesToIncludeInVendorBundle'),

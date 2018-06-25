@@ -243,14 +243,6 @@ describe ContentMigration do
       expect(new_assignment.group_category.name).to eq "Project Groups"
     end
 
-    it "should copy moderated_grading setting" do
-      assignment_model(:course => @copy_from, :points_possible => 40,
-                       :submission_types => 'file_upload', :grading_type => 'points', :moderated_grading => true)
-      run_course_copy
-      new_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
-      expect(new_assignment).to be_moderated_grading
-    end
-
     it "should not copy peer_reviews_assigned" do
       assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'file_upload', :grading_type => 'points')
       @assignment.peer_reviews_assigned = true

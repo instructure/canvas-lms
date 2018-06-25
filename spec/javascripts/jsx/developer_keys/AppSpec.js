@@ -185,7 +185,11 @@ test('renders the correct keys in the inherited tab', () => {
   const component = renderComponent();
   const componentNode = ReactDOM.findDOMNode(component)
   clickInheritedTab(componentNode)
-  equal(developerKeyRows(componentNode, 1)[1].querySelector('.details div').innerHTML, 2)
+  ok(Array.from(
+    developerKeyRows(componentNode, 1)[1]
+    .querySelectorAll('td div'))
+    .some(n => n.innerText === '2')
+  )
 })
 
 test('only renders inherited keys in the inherited tab', () => {
@@ -198,7 +202,11 @@ test('only renders inherited keys in the inherited tab', () => {
 test('renders the correct keys in the account tab', () => {
   const component = renderComponent();
   const componentNode = ReactDOM.findDOMNode(component)
-  equal(developerKeyRows(componentNode, 0)[1].querySelector('.details div').innerHTML, 1)
+  ok(Array.from(
+    developerKeyRows(componentNode, 0)[1]
+    .querySelectorAll('td div'))
+    .some(n => n.innerText === '1')
+  )
 })
 
 test('only renders account keys in the account tab', () => {
@@ -339,7 +347,7 @@ test('opens the modal when the create button is clicked', () => {
             created_at: "2012-06-07T20:36:50Z"
           }
         ]
-      },
+      }
     },
     actions: {
       developerKeysModalOpen: openSpy
@@ -348,7 +356,7 @@ test('opens the modal when the create button is clicked', () => {
 
   const component = renderComponent(overrides)
   const componentNode = ReactDOM.findDOMNode(component)
-  const button = componentNode.querySelector('.ic-Action-header__Secondary button')
+  const button = componentNode.querySelector('button')
   TestUtils.Simulate.click(button)
 
   ok(openSpy.called)

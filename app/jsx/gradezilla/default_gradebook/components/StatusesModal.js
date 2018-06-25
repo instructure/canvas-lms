@@ -21,10 +21,10 @@ import ReactDOM from 'react-dom';
 import { func, shape, string } from 'prop-types';
 import update from 'immutability-helper';
 import I18n from 'i18n!gradebook';
-import Button from '@instructure/ui-core/lib/components/Button';
-import Modal, { ModalBody, ModalFooter, ModalHeader } from '@instructure/ui-core/lib/components/Modal';
-import Heading from '@instructure/ui-core/lib/components/Heading';
-import Text from '@instructure/ui-core/lib/components/Text';
+import Button from '@instructure/ui-buttons/lib/components/Button';
+import Modal, { ModalBody, ModalFooter, ModalHeader } from '@instructure/ui-overlays/lib/components/Modal';
+import Heading from '@instructure/ui-elements/lib/components/Heading';
+import Text from '@instructure/ui-elements/lib/components/Text';
 import { statuses } from '../../../gradezilla/default_gradebook/constants/statuses';
 import StatusColorListItem from '../../../gradezilla/default_gradebook/components/StatusColorListItem';
 
@@ -139,11 +139,10 @@ class StatusesModal extends React.Component {
         label={I18n.t('Statuses')}
         closeButtonLabel={I18n.t('Close')}
         closeButtonRef={bindCloseButton}
-        applicationElement={() => document.getElementById('application')}
         onDismiss={close}
         onExited={onClose}
         contentRef={bindContentRef}
-        shouldCloseOnOverlayClick={false}
+        shouldCloseOnDocumentClick={false}
       >
         <ModalHeader>
           <Heading level="h3">{I18n.t('Statuses')}</Heading>

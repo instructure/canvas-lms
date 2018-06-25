@@ -23,6 +23,7 @@ import tz from 'timezone'
 import _ from 'underscore'
 import $ from 'jquery'
 import 'jquery.instructure_date_and_time'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
 class FriendlyDatetime extends Component {
   static propTypes = {
@@ -31,10 +32,12 @@ class FriendlyDatetime extends Component {
       PropTypes.instanceOf(Date)
     ]).isRequired,
     format: PropTypes.string,
+    prefix: PropTypes.string
   }
 
   static defaultProps = {
     format: null,
+    prefix: ""
   }
 
   // The original render function is really slow because of all
@@ -57,17 +60,28 @@ class FriendlyDatetime extends Component {
       dateTime: datetime.toISOString(),
     })
 
+    let fixedPrefix = this.props.prefix
+    if (fixedPrefix && !fixedPrefix.endsWith(' ')) {
+      fixedPrefix += ' '
+    }
+
     return (
-      <time {...timeProps} ref={(c) => { this.time = c }}>
-        <span className="visible-desktop">
-          {/* something like: Mar 6, 2014 */}
-          {friendly}
-        </span>
-        <span className="hidden-desktop">
-          {/* something like: 3/3/2014 */}
-          {fudged.toLocaleDateString()}
-        </span>
-      </time>
+      <span>
+        <ScreenReaderContent>
+          {fixedPrefix + friendly}
+        </ScreenReaderContent>
+
+        <time {...timeProps} ref={(c) => { this.time = c }} aria-hidden="true">
+          <span className="visible-desktop">
+            {/* something like: Mar 6, 2014 */}
+            {fixedPrefix + friendly}
+          </span>
+          <span className="hidden-desktop">
+            {/* something like: 3/3/2014 */}
+            {fudged.toLocaleDateString()}
+          </span>
+        </time>
+      </span>
     )
   }, () => this.props.dateTime)
 }

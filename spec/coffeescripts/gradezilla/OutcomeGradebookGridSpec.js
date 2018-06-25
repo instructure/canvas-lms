@@ -51,26 +51,116 @@ test('Grid.Math.mode', () => {
   ok(Grid.Math.mode(multiple) === 2, 'averages multiple modes to return a single result')
 })
 
-test('Grid.View.masteryClassName', () => {
+test('Grid.Util._toRow', () => {
+  Grid.students = {1: {}}
+  Grid.sections = {1: {}}
+  const rollup = {
+    links: { section: "1", user: "1" },
+    scores: [{ score: "3", hide_points: true, links: { outcome:"2" } }]
+  }
+  ok(
+    isEqual(Grid.Util._toRow([rollup], null).outcome_2, { score: "3", hide_points: true }),
+    'correctly returns an object with a score and hide_points for a cell'
+  )
+})
+
+test('Grid.View.masteryDetails', () => {
+  const outcome = {mastery_points: 5, points_possible: 10}
+  const spy = sinon.spy(Grid.View, 'legacyMasteryDetails')
+  Grid.View.masteryDetails(10, outcome)
+  ok(
+    spy.calledOnce,
+    'calls legacyMasteryDetails when no custom ratings defined'
+  )
+  Grid.ratings = [
+    {points: 10, color: '00ff00', description: 'great'},
+    {points:  5, color: '0000ff', description: 'OK'},
+    {points:  0, color: 'ff0000', description: 'turrable'}
+  ]
+  ok(
+    isEqual(Grid.View.masteryDetails(10, outcome), ['rating_0', '#00ff00', 'great']),
+    'returns color of first rating'
+  )
+  ok(
+    isEqual(Grid.View.masteryDetails(9, outcome), ['rating_1', '#0000ff', 'OK']),
+    'returns color of second rating'
+  )
+  ok(
+    isEqual(Grid.View.masteryDetails(5, outcome), ['rating_1', '#0000ff', 'OK']),
+    'returns color of second rating'
+  )
+  ok(
+    isEqual(Grid.View.masteryDetails(4, outcome), ['rating_2', '#ff0000', 'turrable']),
+    'returns color of third rating'
+  )
+  ok(
+    isEqual(Grid.View.masteryDetails(0, outcome), ['rating_2', '#ff0000', 'turrable']),
+    'returns color of third rating'
+  )
+})
+
+test('Grid.View.masteryDetails with scaling', () => {
+  const outcome = {points_possible: 5}
+  Grid.ratings = [
+    {points: 10, color: '00ff00', description: 'great'},
+    {points:  5, color: '0000ff', description: 'OK'},
+    {points:  0, color: 'ff0000', description: 'turrable'}
+  ]
+  ok(
+    isEqual(Grid.View.masteryDetails(5, outcome), ['rating_0', '#00ff00', 'great']),
+    'returns color of first rating'
+  )
+  ok(
+    isEqual(Grid.View.masteryDetails(2.5, outcome), ['rating_1', '#0000ff', 'OK']),
+    'returns color of second rating'
+  )
+  ok(
+    isEqual(Grid.View.masteryDetails(0, outcome), ['rating_2', '#ff0000', 'turrable']),
+    'returns color of third rating'
+  )
+})
+
+test('Grid.View.masteryDetails with scaling (points_possible 0)', () => {
+  const outcome = {mastery_points: 5, points_possible: 0}
+  Grid.ratings = [
+    {points: 10, color: '00ff00', description: 'great'},
+    {points:  5, color: '0000ff', description: 'OK'},
+    {points:  0, color: 'ff0000', description: 'turrable'}
+  ]
+  ok(
+    isEqual(Grid.View.masteryDetails(5, outcome), ['rating_0', '#00ff00', 'great']),
+    'returns color of first rating'
+  )
+  ok(
+    isEqual(Grid.View.masteryDetails(2.5, outcome), ['rating_1', '#0000ff', 'OK']),
+    'returns color of second rating'
+  )
+  ok(
+    isEqual(Grid.View.masteryDetails(0, outcome), ['rating_2', '#ff0000', 'turrable']),
+    'returns color of third rating'
+  )
+})
+
+test('Grid.View.legacyMasteryDetails', () => {
   const outcome = {mastery_points: 5}
   ok(
-    Grid.View.masteryClassName(8, outcome) === 'exceeds',
+    isEqual(Grid.View.legacyMasteryDetails(8, outcome), ['rating_0', '#6a843f', 'Exceeds Mastery']),
     'returns "exceeds" if 150% or more of mastery score'
   )
   ok(
-    Grid.View.masteryClassName(5, outcome) === 'mastery',
+    isEqual(Grid.View.legacyMasteryDetails(5, outcome), ['rating_1', '#8aac53', 'Meets Mastery']),
     'returns "mastery" if equal to mastery score'
   )
   ok(
-    Grid.View.masteryClassName(7, outcome) === 'mastery',
+    isEqual(Grid.View.legacyMasteryDetails(7, outcome), ['rating_1', '#8aac53', 'Meets Mastery']),
     'returns "mastery" if above mastery score'
   )
   ok(
-    Grid.View.masteryClassName(3, outcome) === 'near-mastery',
+    isEqual(Grid.View.legacyMasteryDetails(3, outcome), ['rating_2', '#e0d773', 'Near Mastery']),
     'returns "near-mastery" if half of mastery score or greater'
   )
   ok(
-    Grid.View.masteryClassName(1, outcome) === 'remedial',
+    isEqual(Grid.View.legacyMasteryDetails(1, outcome), ['rating_3', '#df5b59', 'Well Below Mastery']),
     'returns "remedial" if less than half of mastery score'
   )
 })

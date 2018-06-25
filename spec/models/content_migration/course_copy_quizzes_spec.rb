@@ -805,6 +805,26 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       expect(answer["precision"]).to eq 3
     end
 
+    it "should copy large precision answers for numeric questions" do
+      q = @copy_from.quizzes.create!(:title => "blah")
+      data = {:question_type => "numerical_question",
+        :question_text => "how many problems does QTI cause?",
+        :answers => [{
+          :text => "answer_text", :weight => 100,
+          :numerical_answer_type => "precision_answer",
+          :answer_approximate => 99000000, :answer_precision => 2
+        }]}.with_indifferent_access
+      q.quiz_questions.create!(:question_data => data)
+
+      run_course_copy
+
+      q2 = @copy_to.quizzes.where(migration_id: mig_id(q)).first
+      answer = q2.quiz_questions[0].question_data["answers"][0]
+      expect(answer["numerical_answer_type"]).to eq "precision_answer"
+      expect(answer["approximate"]).to eq 99000000
+      expect(answer["precision"]).to eq 2
+    end
+
     it "should copy range answers for numeric questions" do
       q = @copy_from.quizzes.create!(:title => "blah")
       data = {:question_type => "numerical_question",

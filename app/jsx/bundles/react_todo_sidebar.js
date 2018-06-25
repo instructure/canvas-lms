@@ -16,13 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import ToDoSidebar from '../dashboard/ToDoSidebar';
-import configureStore from '../dashboard/ToDoSidebar/store';
-
-const store = configureStore({});
+import { renderToDoSidebar } from 'canvas-planner';
 
 /**
 * This handles rendering this properly.  Because the sidebar itself is loaded
@@ -34,11 +28,7 @@ const store = configureStore({});
 const interval = window.setInterval(() => {
   const container = document.querySelector('.Sidebar__TodoListContainer')
   if (container) {
-    ReactDOM.render(
-      <Provider store={store}>
-        <ToDoSidebar courses={window.ENV.STUDENT_PLANNER_COURSES} timeZone={window.ENV.TIMEZONE} />
-      </Provider>
-      , document.querySelector('.Sidebar__TodoListContainer'));
+    renderToDoSidebar(document.querySelector('.Sidebar__TodoListContainer'));
     window.clearInterval(interval);
   }
 }, 500);

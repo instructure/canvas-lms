@@ -49,7 +49,7 @@ describe Types::UserType do
     it "returns enrollments for a given course" do
       expect(
         user_type.enrollments(
-          args: {courseId: @course1.id.to_s},
+          args: {course_id: @course1.id.to_s},
           current_user: @teacher
         )
       ).to eq [@student.enrollments.first]
@@ -59,19 +59,19 @@ describe Types::UserType do
       @course1.enroll_student(@student, enrollment_state: "active")
 
       expect(
-        user_type.enrollments(current_user: @teacher)
+        user_type.enrollments(current_user: @teacher, args: {course_id: nil})
       ).to eq [@student.enrollments.first]
 
       site_admin_user
       expect(
-        user_type.enrollments(current_user: @admin)
+        user_type.enrollments(current_user: @admin, args: {course_id: nil})
       ).to eq @student.enrollments
     end
 
     it "doesn't return enrollments for courses the user doesn't have permission for" do
       expect(
         user_type.enrollments(
-          args: {courseId: @course2.id.to_s},
+          args: {course_id: @course2.id.to_s},
           current_user: @teacher
         )
       ).to eq []

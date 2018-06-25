@@ -3,7 +3,7 @@ type AdhocStudents {
   students: [User]
 }
 
-type Assignment implements Node, Timestamped {
+type Assignment implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
   assignmentGroup: AssignmentGroup
@@ -29,16 +29,18 @@ type Assignment implements Node, Timestamped {
   dueAt: DateTime
   gradingType: GradingType
   htmlUrl: URL
+
+  # ID of the object.
   id: ID!
   lockAt: DateTime
   lockInfo: LockInfo
-  muted: Boolean
+  muted: Boolean!
   name: String
   needsGradingCount: Int
 
   # specifies that this assignment is only assigned to students for whom an
   #        `AssignmentOverride` applies.
-  onlyVisibleToOverrides: Boolean
+  onlyVisibleToOverrides: Boolean!
 
   # the assignment is out of this many points
   pointsPossible: Float
@@ -92,7 +94,7 @@ input AssignmentFilter {
   gradingPeriodId: ID
 }
 
-type AssignmentGroup implements Node, Timestamped {
+type AssignmentGroup implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
   assignmentsConnection(
@@ -200,7 +202,7 @@ enum AssignmentState {
   unpublished
 }
 
-type Course implements Node, Timestamped {
+type Course implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
   assignmentGroupsConnection(
@@ -360,15 +362,17 @@ enum CourseWorkflowState {
 # an ISO8601 formatted time string
 scalar DateTime
 
-type Discussion implements Node, Timestamped {
+type Discussion implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
   createdAt: DateTime
+
+  # ID of the object.
   id: ID!
   updatedAt: DateTime
 }
 
-type Enrollment implements Node, Timestamped {
+type Enrollment implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
   course: Course
@@ -419,7 +423,7 @@ type Grades {
   finalScore: Float
 }
 
-type GradingPeriod implements Node, Timestamped {
+type GradingPeriod implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
 
@@ -550,7 +554,7 @@ type LockInfo {
 # Types that can be locked
 union Lockable = Assignment | Discussion | Module | Page | Quiz
 
-type Module implements Node, Timestamped {
+type Module implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
   createdAt: DateTime
@@ -586,7 +590,7 @@ enum OrderDirection {
   descending
 }
 
-type Page implements Node, Timestamped {
+type Page implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
   createdAt: DateTime
@@ -635,15 +639,17 @@ type Query {
   ): Node
 }
 
-type Quiz implements Node, Timestamped {
+type Quiz implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
   createdAt: DateTime
+
+  # ID of the object.
   id: ID!
   updatedAt: DateTime
 }
 
-type Section implements Node, Timestamped {
+type Section implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
   createdAt: DateTime
@@ -677,7 +683,7 @@ type StudentSummaryAnalytics {
   tardinessBreakdown: TardinessBreakdown
 }
 
-type Submission implements Node, Timestamped {
+type Submission implements Node & Timestamped {
   assignment: Assignment
   createdAt: DateTime
 
@@ -695,9 +701,11 @@ type Submission implements Node, Timestamped {
   grade: String
   gradedAt: DateTime
   gradingStatus: String
+
+  # ID of the object.
   id: ID!
   score: Float
-  state: SubmissionState
+  state: SubmissionState!
   submissionStatus: String
   submittedAt: DateTime
   updatedAt: DateTime
@@ -776,7 +784,7 @@ interface Timestamped {
 
 scalar URL
 
-type User implements Node, Timestamped {
+type User implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
   avatarUrl: URL
@@ -785,7 +793,9 @@ type User implements Node, Timestamped {
   enrollments(
     # only return enrollments for this course
     courseId: ID
-  ): [Enrollment]!
+  ): [Enrollment!]!
+
+  # ID of the object.
   id: ID!
   name: String
 

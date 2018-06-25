@@ -28,12 +28,15 @@ import {setNaiAboveScreen} from '../actions';
 
 export class DynamicUiManager {
   static defaultOptions =  {
+    plannerActive: () => false,
     animator: new Animator(),
     document: document,
     actionsToAnimations: AnimationCollection.actionsToAnimations
   }
 
-  constructor (opts = DynamicUiManager.defaultOptions) {
+  constructor (optsParam = {}) {
+    const opts = {...DynamicUiManager.defaultOptions, ...optsParam};
+    this.plannerActive = opts.plannerActive;
     this.animator = opts.animator;
     this.document = opts.document;
     this.animatableRegistry = new AnimatableRegistry();
@@ -95,18 +98,20 @@ export class DynamicUiManager {
   uiStateUnchanged (action) {
     // pretend there was a ui update so the animations can respond to actions that don't change
     // the redux state.
-    this.animationCollection.uiWillUpdate();
-    this.animationCollection.uiDidUpdate();
+    if (this.plannerActive()) {
+      this.animationCollection.uiWillUpdate();
+      this.animationCollection.uiDidUpdate();
+    }
   }
 
   preTriggerUpdates = () => {
-    this.animationCollection.uiWillUpdate();
+    if (this.plannerActive()) this.animationCollection.uiWillUpdate();
   }
 
   triggerUpdates = (additionalOffset) => {
     if (additionalOffset != null) this.additionalOffset = additionalOffset;
 
-    this.animationCollection.uiDidUpdate();
+    if (this.plannerActive()) this.animationCollection.uiDidUpdate();
 
     const animationPlan = this.animationPlan;
     if (!animationPlan.ready) return;
@@ -149,7 +154,7 @@ export class DynamicUiManager {
   }
 
   handleAction = (action) => {
-    this.animationCollection.acceptAction(action);
+    if (this.plannerActive()) this.animationCollection.acceptAction(action);
 
     const handlerSuffix = changeCase.pascal(action.type);
     const handlerName = `handle${handlerSuffix}`;

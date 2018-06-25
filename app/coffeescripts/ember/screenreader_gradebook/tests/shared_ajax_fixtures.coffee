@@ -475,6 +475,70 @@ define [
             }
           ]
         }
+        {
+          id: '6'
+          name: 'moderated grading'
+          position: 4
+          group_weight: 0
+          assignments: [
+            {
+              id: '25'
+              name: 'muted, moderated, grades not published'
+              points_possible: 10
+              grading_type: "percent"
+              submission_types: ["not_graded"]
+              due_at: "2013-09-01T10:00:00Z"
+              position: 1
+              assignment_group_id:'4'
+              muted: true
+              moderated_grading: true
+              grades_published: false
+              published: true
+            }
+            {
+              id: '26'
+              name: 'not muted, moderated, grades not published'
+              points_possible: 10
+              grading_type: "percent"
+              submission_types: ["not_graded"]
+              due_at: "2013-09-01T10:00:00Z"
+              position: 1
+              assignment_group_id:'4'
+              muted: false
+              moderated_grading: true
+              grades_published: false
+              published: true
+            }
+            {
+              id: '27'
+              name: 'muted, not moderated, grades not published'
+              points_possible: 10
+              grading_type: "percent"
+              submission_types: ["not_graded"]
+              due_at: "2013-09-01T10:00:00Z"
+              position: 1
+              assignment_group_id:'4'
+              muted: true
+              moderated_grading: false
+              grades_published: false
+              published: true
+            }
+            {
+              id: '28'
+              name: 'muted, moderated, grades published'
+              points_possible: 10
+              grading_type: "percent"
+              submission_types: ["not_graded"]
+              due_at: "2013-09-01T10:00:00Z"
+              position: 1
+              assignment_group_id:'4'
+              muted: true
+              moderated_grading: true
+              grades_published: true
+              published: true
+            }
+          ]
+        }
       ]
 
   submissions = [

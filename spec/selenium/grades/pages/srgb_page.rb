@@ -60,6 +60,14 @@ class SRGB
       f('#student_information .total-grade')
     end
 
+    def assignment_muted_checkbox
+      f('#assignment_muted_check')
+    end
+
+    def assignment_mute_dialog_button
+      fj("button:contains('Unmute Assignment')")
+    end
+
     def assign_subtotal_grade
       f('.assignment-subtotal-grade .grade')
     end
@@ -105,6 +113,10 @@ class SRGB
       f('#show_notes')
     end
 
+    def all_content
+      f('#content')
+    end
+
     # content selection buttons
     def previous_student
       f('.student_navigation button.previous_object')
@@ -128,7 +140,7 @@ class SRGB
     end
 
     def speedgrader_link
-      f('#assignment-speedgrader-link a')
+      f('#assignment-speedgrader-link')
     end
 
     def assignment_scores

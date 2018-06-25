@@ -154,16 +154,10 @@ describe Course do
   describe '#moderators' do
     before(:once) do
       @course = Course.create!
-      @course.root_account.enable_feature!(:anonymous_moderated_marking)
       @teacher = User.create!
       @course.enroll_teacher(@teacher)
       @ta = User.create!
       @course.enroll_ta(@ta)
-    end
-
-    it 'returns an empty list if the root account has Anonymous Moderated Marking disabled' do
-      @course.root_account.disable_feature!(:anonymous_moderated_marking)
-      expect(@course.moderators).to be_empty
     end
 
     it 'includes active teachers' do

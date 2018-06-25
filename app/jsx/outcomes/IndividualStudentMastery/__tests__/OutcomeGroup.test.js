@@ -18,7 +18,32 @@
 
 import React from 'react'
 import { render, shallow } from 'enzyme'
+import { Set } from 'immutable'
 import OutcomeGroup from '../OutcomeGroup'
+
+const outcome = (id, title) => ({
+  id,
+  title,
+  mastered: false,
+  mastery_points: 3,
+  points_possible: 5,
+  ratings: [
+    { description: 'My first rating' },
+    { description: 'My second rating' }
+  ],
+  results: [
+    {
+      id: 1,
+      percent: 0.1,
+      assignment: {
+        id: 2,
+        name: 'My alignment',
+        html_url: 'http://foo',
+        submission_types: ''
+      }
+    }
+  ]
+})
 
 const defaultProps = (props = {}) => (
   Object.assign({
@@ -29,7 +54,10 @@ const defaultProps = (props = {}) => (
     outcomes: [
       {
         id: 1,
+        expansionId: 100,
         mastered: false,
+        mastery_points: 3,
+        points_possible: 5,
         ratings: [
           { description: 'My first rating' },
           { description: 'My second rating' }
@@ -49,7 +77,10 @@ const defaultProps = (props = {}) => (
         ],
         title: 'My outcome'
       }
-    ]
+    ],
+    expanded: false,
+    expandedOutcomes: Set(),
+    onExpansionChange: () => {}
   }, props)
 )
 
@@ -61,7 +92,7 @@ it('renders the OutcomeGroup component', () => {
 describe('header', () => {
   it('includes the outcome group name', () => {
     const wrapper = shallow(<OutcomeGroup {...defaultProps()}/>)
-    const header = wrapper.find('ToggleDetails')
+    const header = wrapper.find('ToggleGroup')
     const summary = render(header.prop('summary'))
     expect(summary.text()).toMatch('My group')
   })
@@ -72,37 +103,35 @@ it('includes the individual outcomes', () => {
   expect(wrapper.find('Outcome')).toHaveLength(1)
 })
 
-it('defaults to unexpanded', () => {
-  const wrapper = shallow(<OutcomeGroup {...defaultProps()} />)
-  expect(wrapper.state('expanded')).toBe(false)
+it('renders correctly expanded', () => {
+  const wrapper = shallow(<OutcomeGroup {...defaultProps()} expanded />)
+  expect(wrapper.debug()).toMatchSnapshot()
 })
 
-describe('expand()', () => {
-  it('expands when called', () => {
-    const wrapper = shallow(<OutcomeGroup {...defaultProps()} />)
-    wrapper.instance().expand()
-    expect(wrapper.state('expanded')).toBe(true)
+it('renders outcomes in alphabetical order by title', () => {
+  const props = defaultProps({
+    outcomes: [
+      outcome(1, 'ZZ Top'),
+      outcome(2, 'Aardvark'),
+      outcome(3, 'abba'),
+      outcome(4, 'Aerosmith')
+    ]
   })
-})
-
-describe('contract()', () => {
-  it('contracts when called', () => {
-    const wrapper = shallow(<OutcomeGroup {...defaultProps()} />).setState({ expanded: true })
-    wrapper.instance().contract()
-    expect(wrapper.state('expanded')).toBe(false)
-  })
+  const wrapper = shallow(<OutcomeGroup {...props} />)
+  const outcomes = wrapper.find('Outcome')
+  expect(outcomes).toHaveLength(4)
+  expect(outcomes.get(0).props.outcome.title).toEqual('Aardvark')
+  expect(outcomes.get(1).props.outcome.title).toEqual('abba')
+  expect(outcomes.get(2).props.outcome.title).toEqual('Aerosmith')
+  expect(outcomes.get(3).props.outcome.title).toEqual('ZZ Top')
 })
 
 describe('handleToggle()', () => {
-  it('expands when called with true', () => {
-    const wrapper = shallow(<OutcomeGroup {...defaultProps()} />)
+  it('calls the correct onExpansionChange callback', () => {
+    const props = defaultProps()
+    props.onExpansionChange = jest.fn()
+    const wrapper = shallow(<OutcomeGroup {...props} />)
     wrapper.instance().handleToggle(null, true)
-    expect(wrapper.state('expanded')).toBe(true)
-  })
-
-  it('contracts when called with false', () => {
-    const wrapper = shallow(<OutcomeGroup {...defaultProps()} />).setState({ expanded: true })
-    wrapper.instance().handleToggle(null, false)
-    expect(wrapper.state('expanded')).toBe(false)
+    expect(props.onExpansionChange).toBeCalledWith('group', 10, true)
   })
 })

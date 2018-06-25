@@ -222,6 +222,24 @@ describe('api actions', () => {
     });
   });
 
+  it('calls the alert function when dismissing an opportunity fails', (done) => {
+    const mockDispatch = jest.fn();
+    const fakeAlert = jest.fn();
+    alertInitialize({
+      visualErrorCallback: fakeAlert
+    });
+    Actions.dismissOpportunity("6", {id: "6"})(() => {});
+    moxios.wait(() => {
+      let request = moxios.requests.mostRecent();
+      request.respondWith({
+        status: 400,
+      }).then(() => {
+        expect(fakeAlert).toHaveBeenCalled();
+        done();
+      });
+    })
+  });
+
   it('calls the alert function when a failure occurs', (done) => {
     const mockDispatch = jest.fn();
     const fakeAlert = jest.fn();

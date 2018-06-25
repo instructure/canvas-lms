@@ -37,6 +37,9 @@ module Api::V1::Assignment
       due_at
       final_grader_id
       grader_count
+      graders_anonymous_to_graders
+      grader_comments_visible_to_graders
+      grader_names_visible_to_final_grader
       lock_at
       unlock_at
       assignment_group_id
@@ -57,6 +60,9 @@ module Api::V1::Assignment
 
   API_ASSIGNMENT_NEW_RECORD_FIELDS = {
     :only => %w(
+      graders_anonymous_to_graders
+      grader_comments_visible_to_graders
+      grader_names_visible_to_final_grader
       points_possible
       due_at
       assignment_group_id
@@ -77,6 +83,9 @@ module Api::V1::Assignment
     only_visible_to_overrides
     post_to_sis
     time_zone_edited
+    graders_anonymous_to_graders
+    grader_comments_visible_to_graders
+    grader_names_visible_to_final_grader
   ].freeze
 
   def assignments_json(assignments, user, session, opts = {})
@@ -383,6 +392,9 @@ module Api::V1::Assignment
     description
     position
     points_possible
+    graders_anonymous_to_graders
+    grader_comments_visible_to_graders
+    grader_names_visible_to_final_grader
     grader_count
     grading_type
     allowed_extensions
@@ -427,7 +439,7 @@ module Api::V1::Assignment
     store_in_index
   ).freeze
 
-  def create_api_assignment(assignment, assignment_params, user, context = assignment.context)
+  def create_api_assignment(assignment, assignment_params, user, context = assignment.context, calculate_grades: nil)
     return :forbidden unless grading_periods_allow_submittable_create?(assignment, assignment_params)
 
     prepared_create = prepare_assignment_create_or_update(assignment, assignment_params, user, context)
@@ -446,7 +458,8 @@ module Api::V1::Assignment
       end
     end
 
-    DueDateCacher.recompute(prepared_create[:assignment], update_grades: true)
+    calc_grades = calculate_grades ? value_to_boolean(calculate_grades) : true
+    DueDateCacher.recompute(prepared_create[:assignment], update_grades: calc_grades)
     response
   rescue ActiveRecord::RecordInvalid
     false
@@ -682,7 +695,7 @@ module Api::V1::Assignment
       assignment.moderated_grading = value_to_boolean(assignment_params['moderated_grading'])
     end
 
-    grader_changes = final_grader_changes(assignment, context, assignment_params)
+    grader_changes = final_grader_changes(assignment, assignment_params)
     assignment.final_grader_id = grader_changes.grader_id if grader_changes.grader_changed?
 
     if assignment_params.key?('anonymous_grading') && assignment.course.feature_enabled?(:anonymous_marking)
@@ -773,10 +786,9 @@ module Api::V1::Assignment
 
   private
 
-  def final_grader_changes(assignment, course, assignment_params)
+  def final_grader_changes(assignment, assignment_params)
     no_changes = OpenStruct.new(grader_changed?: false)
     return no_changes unless assignment.moderated_grading && assignment_params.key?('final_grader_id')
-    return no_changes unless course.root_account.feature_enabled?(:anonymous_moderated_marking)
 
     final_grader_id = assignment_params.fetch("final_grader_id")
     return OpenStruct.new(grader_changed?: true, grader_id: nil) if final_grader_id.blank?

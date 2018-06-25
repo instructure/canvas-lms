@@ -92,13 +92,13 @@ class GradebooksController < ApplicationController
     submissions_json = @presenter.submissions.
       select { |s| s.user_can_read_grade?(@current_user) }.
       map do |s|
-      {
-        assignment_id: s.assignment_id,
-        score: s.score,
-        excused: s.excused?,
-        workflow_state: s.workflow_state,
-      }
-    end
+        {
+          assignment_id: s.assignment_id,
+          score: s.score,
+          excused: s.excused?,
+          workflow_state: s.workflow_state,
+        }
+      end
 
     grading_period = @grading_periods && @grading_periods.find { |period| period[:id] == gp_id }
 
@@ -120,12 +120,13 @@ class GradebooksController < ApplicationController
       effective_due_dates: effective_due_dates,
       exclude_total: @exclude_total,
       non_scoring_rubrics_enabled: @context.root_account.feature_enabled?(:non_scoring_rubrics),
-      rubric_assessments: rubric_assessments_json(@presenter.submissions.flat_map(&:rubric_assessments), @current_user, session, style: 'full'),
-      rubrics: rubrics_json(@presenter.submissions.flat_map(&:rubric_assessments).map(&:rubric), @current_user, session, style: 'full'),
+      rubric_assessments: rubric_assessments_json(@presenter.rubric_assessments, @current_user, session, style: 'full'),
+      rubrics: rubrics_json(@presenter.rubrics, @current_user, session, style: 'full'),
       save_assignment_order_url: course_save_assignment_order_url(@context),
       student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
       student_id: @presenter.student_id,
-      students: @presenter.students.as_json(include_root: false)
+      students: @presenter.students.as_json(include_root: false),
+      outcome_proficiency: outcome_proficiency
     )
   end
 
@@ -306,7 +307,6 @@ class GradebooksController < ApplicationController
       GRADEBOOK_OPTIONS: {
         api_max_per_page: per_page,
         chunk_size: Setting.get('gradebook2.submissions_chunk_size', '10').to_i,
-        anonymous_moderated_marking_enabled: anonymous_moderated_marking_enabled?,
         assignment_groups_url: api_v1_course_assignment_groups_url(
           @context,
           include: ag_includes,
@@ -393,7 +393,8 @@ class GradebooksController < ApplicationController
         settings: gradebook_settings.fetch(@context.id, {}),
         login_handle_name: @context.root_account.settings[:login_handle_name],
         sis_name: @context.root_account.settings[:sis_name],
-        version: params.fetch(:version, nil)
+        version: params.fetch(:version, nil),
+        outcome_proficiency: outcome_proficiency
       }
     }
   end
@@ -430,7 +431,6 @@ class GradebooksController < ApplicationController
     end
   end
 
-  # TODO: stop using this for speedgrader
   def update_submission
     if authorized_action(@context, @current_user, :manage_grades)
       if params[:submissions].blank? && params[:submission].blank?
@@ -439,22 +439,29 @@ class GradebooksController < ApplicationController
       end
 
       submissions = if params[:submissions]
-                      params[:submissions].values.map { |s| ActionController::Parameters.new(s) }
-                    else
-                      [params[:submission]]
-                    end
+        params[:submissions].values.map { |s| ActionController::Parameters.new(s) }
+      else
+        [params[:submission]]
+      end
+
+      # decorate submissions with user_ids if not present
+      submissions_without_user_ids = submissions.select {|s| s[:user_id].blank?}
+      if submissions_without_user_ids.present?
+        submissions = populate_user_ids(submissions_without_user_ids)
+      end
+
       valid_user_ids = Set.new(@context.students_visible_to(@current_user, include: :inactive).pluck(:id))
-      submissions.select! { |s| valid_user_ids.include? s[:user_id].to_i }
-      users = @context.admin_visible_students.distinct.find(submissions.map { |s| s[:user_id] })
-        .index_by(&:id)
-      assignments = @context.assignments.active.find(submissions.map { |s|
-        s[:assignment_id]
-      }).index_by(&:id)
+      submissions.select! { |submission| valid_user_ids.include? submission[:user_id].to_i }
+
+      user_ids = submissions.map { |submission| submission[:user_id] }
+      assignment_ids = submissions.map { |submission| submission[:assignment_id] }
+      users = @context.admin_visible_students.distinct.find(user_ids).index_by(&:id)
+      assignments = @context.assignments.active.find(assignment_ids).index_by(&:id)
 
       request_error_status = nil
       error = nil
       @submissions = []
-      submissions.compact.each do |submission|
+      submissions.each do |submission|
         @assignment = assignments[submission[:assignment_id].to_i]
         @user = users[submission[:user_id].to_i]
 
@@ -517,13 +524,21 @@ class GradebooksController < ApplicationController
         if @submissions && error.nil?
           flash[:notice] = t('notices.updated', 'Assignment submission was successfully updated.')
           format.html { redirect_to course_gradebook_url(@assignment.context) }
-          format.json {
-            render :json => submissions_json, :status => :created, :location => course_gradebook_url(@assignment.context)
-          }
-          format.text {
-            render :json => submissions_json, :status => :created, :location => course_gradebook_url(@assignment.context),
-                   :as_text => true
-          }
+          format.json do
+            render(
+              json: submissions_json(submissions: @submissions, assignments: assignments),
+              status: :created,
+              location: course_gradebook_url(@assignment.context)
+            )
+          end
+          format.text do
+            render(
+              json: submissions_json(submissions: @submissions, assignments: assignments),
+              status: :created,
+              location: course_gradebook_url(@assignment.context),
+              as_text: true
+            )
+          end
         else
           error_message = error&.to_s
           flash[:error] = t(
@@ -544,10 +559,15 @@ class GradebooksController < ApplicationController
     end
   end
 
-  def submissions_json
-    @submissions.map do |sub|
-      submission_history_methods = { include: { submission_history: { methods: %i[late missing] } } }
-      json = sub.as_json(Submission.json_serialization_full_parameters.merge(submission_history_methods))
+  def submissions_json(submissions:, assignments:)
+    submissions.map do |sub|
+      assignment = assignments[sub[:assignment_id].to_i]
+      omitted_field = assignment.anonymous_grading? ? :user_id : :anonymous_id
+      json_params = {
+        include: { submission_history: { methods: %i[late missing], except: omitted_field } },
+        except: omitted_field
+      }
+      json = sub.as_json(Submission.json_serialization_full_parameters.merge(json_params))
       json['submission']['assignment_visible'] = sub.assignment_visible_to_user?(sub.user)
       json['submission']['provisional_grade_id'] = sub.provisional_grade_id if sub.provisional_grade_id
       json
@@ -596,7 +616,7 @@ class GradebooksController < ApplicationController
     end
 
     grading_role = if moderated_grading_enabled_and_no_grades_published
-      if @context.grants_right?(@current_user, :moderate_grades)
+      if @assignment.permits_moderation?(@current_user)
         :moderator
       else
         :provisional_grader
@@ -606,14 +626,13 @@ class GradebooksController < ApplicationController
     end
 
     @can_comment_on_submission = !@context.completed? && !@context_enrollment.try(:completed?)
-    @disable_unmute_assignment = @assignment.muted && !@assignment.grades_published? && anonymous_moderated_marking_enabled?
+    @disable_unmute_assignment = @assignment.muted && !@assignment.grades_published?
     respond_to do |format|
 
       format.html do
         rubric = @assignment&.rubric_association&.rubric
         @headers = false
         @outer_frame = true
-        @anonymous_moderated_marking_enabled = anonymous_moderated_marking_enabled?
         log_asset_access([ "speed_grader", @context ], "grades", "other")
         env = {
           CONTEXT_ACTION_SOURCE: :speed_grader,
@@ -624,15 +643,16 @@ class GradebooksController < ApplicationController
           lti_retrieve_url: retrieve_course_external_tools_url(
             @context.id, assignment_id: @assignment.id, display: 'borderless'
           ),
-          anonymous_moderated_marking_enabled: @anonymous_moderated_marking_enabled,
           course_id: @context.id,
           assignment_id: @assignment.id,
           assignment_title: @assignment.title,
           rubric: rubric ? rubric_json(rubric, @current_user, session, style: 'full') : nil,
           nonScoringRubrics: @domain_root_account.feature_enabled?(:non_scoring_rubrics),
+          outcome_extra_credit_enabled: @context.feature_enabled?(:outcome_extra_credit),
           can_comment_on_submission: @can_comment_on_submission,
           show_help_menu_item: show_help_link?,
-          help_url: help_link_url
+          help_url: help_link_url,
+          outcome_proficiency: outcome_proficiency
         }
         if grading_role == :moderator
           env[:provisional_copy_url] = api_v1_copy_to_final_mark_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
@@ -647,8 +667,7 @@ class GradebooksController < ApplicationController
         append_sis_data(env)
         js_env(env)
 
-        anonymous_grading = @assignment.anonymous_grading? && @anonymous_moderated_marking_enabled
-        render :speed_grader, locals: { anonymous_grading: anonymous_grading }
+        render :speed_grader, locals: { anonymous_grading: @assignment.anonymous_grading? }
       end
 
       format.json do
@@ -734,8 +753,10 @@ class GradebooksController < ApplicationController
 
   private
 
-  def anonymous_moderated_marking_enabled?
-    @context.root_account.feature_enabled?(:anonymous_moderated_marking)
+  def outcome_proficiency
+    if @context.root_account.feature_enabled?(:non_scoring_rubrics)
+      @context.account.resolved_outcome_proficiency&.as_json
+    end
   end
 
   def new_gradebook_env
@@ -972,5 +993,18 @@ class GradebooksController < ApplicationController
         grading_period_set_id: grading_period_set_id.try(:to_s)
       }
     end.as_json
+  end
+
+  def populate_user_ids(submissions)
+    anonymous_ids = submissions.map {|submission| submission.fetch(:anonymous_id)}
+    submission_ids_map = Submission.select(:user_id, :anonymous_id).
+      where(assignment: @context.assignments, anonymous_id: anonymous_ids).
+      index_by(&:anonymous_id)
+
+    # merge back into submissions
+    submissions.map do |submission|
+      submission[:user_id] = submission_ids_map[submission.fetch(:anonymous_id)].user_id
+      submission
+    end
   end
 end

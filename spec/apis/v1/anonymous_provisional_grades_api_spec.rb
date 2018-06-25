@@ -26,7 +26,7 @@ describe 'Anonymous Provisional Grades API', type: :request do
       course_with_teacher(active_all: true)
       ta_in_course(active_all: true)
       @student = student_in_course(active_all: true).user
-      @assignment = @course.assignments.create!(moderated_grading: true)
+      @assignment = @course.assignments.create!(moderated_grading: true, grader_count: 1)
       @submission = @assignment.submit_homework(@student, body: 'EHLO')
       @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/anonymous_provisional_grades/status"
       @params = {

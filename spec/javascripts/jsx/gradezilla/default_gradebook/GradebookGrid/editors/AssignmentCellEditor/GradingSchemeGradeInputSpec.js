@@ -68,7 +68,7 @@ QUnit.module('GradeInput using GradingSchemeGradeInput', suiteHooks => {
       menuContentRef(ref) {
         $menuContent = ref
       },
-      onMenuClose() {
+      onMenuDismiss() {
         resolveClose()
       },
       onMenuShow() {

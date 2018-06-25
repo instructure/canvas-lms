@@ -135,7 +135,8 @@ describe "courses/_to_do_list.html.erb" do
                          submission_types: "online_text_entry",
                          points_possible: 15,
                          title: "ModerateMe",
-                         moderated_grading: true)
+                         moderated_grading: true,
+                         grader_count: 2)
         allow_any_instance_of(Assignments::NeedsGradingCountQuery).to receive(:manual_count).and_return(1)
         @submission = submission_model(assignment: @assignment, body: "my submission")
         @submission.find_or_create_provisional_grade!(@teacher, grade: 5)

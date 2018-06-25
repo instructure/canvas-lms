@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!dashcards'
-import Menu, { MenuItem } from '@instructure/ui-core/lib/components/Menu'
+import Menu, { MenuItem } from '@instructure/ui-menu/lib/components/Menu'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import IconMoveUpTopSolid from '@instructure/ui-icons/lib/Solid/IconMoveUpTop'
 import IconMoveUpSolid from '@instructure/ui-icons/lib/Solid/IconMoveUp'

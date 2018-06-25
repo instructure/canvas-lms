@@ -47,9 +47,16 @@
 
 .layout {
   display: flex;
-  flex: 1;
+  flex-direction: column;
+  flex: 1 0;
+  min-width: 1px;
+}
+.innerLayout {
+  display: flex;
+  flex: 1 0;
   align-items: center;
   min-width: 1px;
+  min-height: 2.5rem; /* or ie11 smashes it down */
 }
 
 .details {
@@ -110,6 +117,22 @@
   flex: 1;
   text-align: end;
   min-width: 1px;
+}
+
+.feedback {
+  display: flex;
+  align-items: center;
+  min-height: 40px;   /* height of the avater, so ie11 doesn't squish it */
+  
+  .feedbackAvatar {
+    flex-shrink: 0;
+    margin-inline-end: var(--gutterWidth);
+  }
+  .feedbackComment {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
 }
 
 .medium {

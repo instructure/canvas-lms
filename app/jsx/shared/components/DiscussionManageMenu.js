@@ -21,7 +21,7 @@ import { func, string } from 'prop-types'
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import IconMore from '@instructure/ui-icons/lib/Line/IconMore'
-import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
+import Menu from '@instructure/ui-menu/lib/components/Menu'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
 export default class DiscussionManageMenu extends Component {
@@ -53,7 +53,7 @@ export default class DiscussionManageMenu extends Component {
   render () {
     return (
       <span className="discussions-index-manage-menu">
-        <PopoverMenu
+        <Menu
           ref={this.props.menuRefFn}
           onSelect={this.props.onSelect}
           onToggle={this.toggleManageMenuOpen}
@@ -64,7 +64,7 @@ export default class DiscussionManageMenu extends Component {
             </Button>
           }>
           {this.state.manageMenuOpen ? this.props.menuOptions() : null}
-        </PopoverMenu>
+        </Menu>
       </span>
     )
   }

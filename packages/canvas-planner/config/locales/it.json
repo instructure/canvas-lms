@@ -2,20 +2,35 @@
   "add_to_do_7def3c37": {
     "message": "Aggiungi elenco attività"
   },
+  "all_day_fb42c4fc": {
+    "message": "Tutto il giorno"
+  },
   "all_items_loaded_aa256183": {
     "message": "Tutti gli elementi caricati"
   },
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
-    "message": "Vuoi eliminare questo elemento dell'agenda?"
+    "message": "Vuoi eliminare questo elemento dell''agenda?"
   },
-  "assignmenttype_title_is_complete_813e54f8": {
-    "message": "{ assignmentType } { title } completata"
+  "assignmenttype_title_6612d008": {
+    "message": "{ assignmentType } { title }."
   },
-  "assignmenttype_title_is_incomplete_a1d5fac0": {
-    "message": "{ assignmentType } { title } non completata"
+  "assignmenttype_title_at_datetime_478f0709": {
+    "message": "{ assignmentType } { title }, alle { datetime }."
+  },
+  "assignmenttype_title_due_datetime_a112d8ff": {
+    "message": "{ assignmentType } { title }, scade { datetime }."
+  },
+  "assignmenttype_title_is_marked_as_done_a8dc46ef": {
+    "message": "{ assignmentType } { title } è contrassegnato come fatto."
+  },
+  "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
+    "message": "{ assignmentType } { title } non è contrassegnato come fatto."
+  },
+  "assignmenttype_title_on_datetime_446013fb": {
+    "message": "{ assignmentType } { title }, il { datetime }."
   },
   "beginning_of_your_to_do_history_61ef2dce": {
-    "message": "Inizio della cronologia dell'elenco attività"
+    "message": "Inizio della cronologia delle cose da fare"
   },
   "canvas_planner_98ed106": {
     "message": "Canvas Planner"
@@ -36,13 +51,16 @@
     "message": "Corso"
   },
   "course_to_do_bcbbab54": {
-    "message": "{ course } ELENCO ATTIVITÀ"
+    "message": "{ course } COSE DA FARE"
   },
   "date_at_time_dbdb1b99": {
-    "message": "{ date } alle { time }"
+    "message": "{ date } dalle { time }"
   },
   "date_ee500367": {
     "message": "Data"
+  },
+  "date_is_not_a_valid_date_4ef9f8ba": {
+    "message": "#{ date } non è una data valida."
   },
   "date_is_required_8660ec22": {
     "message": "Data obbligatoria"
@@ -64,6 +82,9 @@
   },
   "edit_title_72e5a21e": {
     "message": "Modifica { title }"
+  },
+  "error_loading_grades_e0b38f4d": {
+    "message": "Errore durante il caricamento dei voti"
   },
   "error_loading_more_items_3f109d9f": {
     "message": "Errore durante il caricamento di più elementi"
@@ -95,8 +116,17 @@
   "graded_25cd3fcd": {
     "message": "Valutato"
   },
+  "grades_are_loading_c899652d": {
+    "message": "Voti in fase di caricamento"
+  },
+  "grades_loaded_5056277c": {
+    "message": "Voti caricati"
+  },
+  "items_completed_items_plural_1_item_other_items_717d579f": {
+    "message": "{ items } elemento { items, plural,\n     =1 {completato}\n  other {elementi completati}\n}"
+  },
   "late_2be42b88": {
-    "message": "Tardi"
+    "message": "In ritardo"
   },
   "load_more_a36f9cf9": {
     "message": "Carica altro"
@@ -105,10 +135,16 @@
     "message": "Carica date precedenti"
   },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-    "message": "Caricati { count, plural,\n     =0{# elementi}\n    one {# elemento}\n  other {# elementi}\n}"
+    "message": "Caricamento di { count, plural,\n     =0 {# elementi}\n    one {# elemento}\n  other {# elementi}\n} eseguito"
   },
   "loading_25990131": {
     "message": "Caricamento in corso..."
+  },
+  "loading_725811ca": {
+    "message": "caricamento"
+  },
+  "loading_grades_c842c887": {
+    "message": "Caricamento voti"
   },
   "loading_past_items_ca499e75": {
     "message": "Caricamento elementi precedenti"
@@ -122,14 +158,17 @@
   "missing_1a256b3b": {
     "message": "Mancante"
   },
-  "missing_items_for_5ef30cea": {
-    "message": "Elementi mancanti per "
+  "missing_items_for_title_516511f8": {
+    "message": "Elementi mancanti per { title }"
+  },
+  "my_grades_98834476": {
+    "message": "I miei voti"
   },
   "new_activity_8b84847d": {
     "message": "Nuova attività"
   },
-  "new_activity_for_ac84f6e6": {
-    "message": "Nuova attività per "
+  "new_activity_for_title_14c9c3af": {
+    "message": "Nuova attività per { title }"
   },
   "next_month_749b1778": {
     "message": "Mese successivo"
@@ -137,11 +176,20 @@
   "no_due_dates_assigned_e8f5bac8": {
     "message": "Nessuna data di scadenza assegnata"
   },
-  "no_to_do_s_for_this_day_yet_90c5873d": {
-    "message": "Ancora nessun elenco attività per oggi."
+  "no_grade_3b4d7f3e": {
+    "message": "Nessun voto"
   },
   "nothing_new_needs_attention_3ac548d4": {
     "message": "Nulla di nuovo richiede attenzione."
+  },
+  "nothing_planned_today_next_item_loaded_5a199868": {
+    "message": "Nulla in programma oggi. Elemento successivo caricato."
+  },
+  "nothing_planned_yet_8675ffe9": {
+    "message": "Ancora nulla programmato"
+  },
+  "only_most_recent_grading_period_shown_f1ad6458": {
+    "message": "*Viene mostrato solo il periodo di valutazione più recente."
   },
   "optional_add_course_ef0d70fc": {
     "message": "Facoltativo: Aggiungi corso"
@@ -164,11 +212,26 @@
   "save_11a80ec3": {
     "message": "Salva"
   },
+  "show_my_grades_ebd08684": {
+    "message": "Mostra I miei voti"
+  },
+  "startdate_to_enddate_d245175b": {
+    "message": "{ startDate } alle { endDate }"
+  },
   "submitted_318fad53": {
     "message": "Inviato"
   },
+  "success_to_do_created_e34ed395": {
+    "message": "Operazione riuscita: Cose da fare create"
+  },
   "task_16b0ef38": {
     "message": "Attività"
+  },
+  "the_date_and_time_this_to_do_is_due_74c823d4": {
+    "message": "Data e ora elemento elenco attività scaduta"
+  },
+  "time_2b5aac58": {
+    "message": "Ora"
   },
   "title_ee03d132": {
     "message": "Titolo"
@@ -200,7 +263,10 @@
   "yesterday_c6bd6abf": {
     "message": "Ieri"
   },
+  "you_must_provide_a_date_and_time_a86839d2": {
+    "message": "È necessario fornire data e ora."
+  },
   "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
-    "message": "Hai raggiunto l'inizio dell'elenco attività."
+    "message": "Sei tornato indietro alle tue prime cose da fare."
   }
 }

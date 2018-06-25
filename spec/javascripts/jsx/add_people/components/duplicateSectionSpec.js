@@ -87,13 +87,13 @@ define([
 
     const createUserBtn = createNewRow.querySelector('button');
     ok(createUserBtn)
-    equal(createUserBtn.innerHTML, 'Create a new user for "addr1"')
+    equal(createUserBtn.innerText, 'Create a new user for "addr1"')
 
     const skipUserRow = duplicateSection.querySelector('tr.skip-addr')
     ok(skipUserRow, 'skip user row exists')
 
     const skipUserBtn = skipUserRow.querySelector('button')
-    equal(skipUserBtn.innerHTML, 'Don’t add this user for now.', 'skip user button');
+    equal(skipUserBtn.innerText, 'Don’t add this user for now.', 'skip user button');
   });
   test('select a user', () => {
     const dupes = _.cloneDeep(duplicates);

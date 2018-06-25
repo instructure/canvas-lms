@@ -19,12 +19,12 @@
 import React from 'react';
 import { bool, func } from 'prop-types';
 import I18n from 'i18n!gradebook';
-import Avatar from '@instructure/ui-core/lib/components/Avatar';
-import Button from '@instructure/ui-core/lib/components/Button';
-import Link from '@instructure/ui-core/lib/components/Link';
+import Avatar from '@instructure/ui-elements/lib/components/Avatar';
+import Button from '@instructure/ui-buttons/lib/components/Button';
+import Link from '@instructure/ui-elements/lib/components/Link';
 import IconEditLine from '@instructure/ui-icons/lib/Line/IconEdit';
 import IconTrashLine from '@instructure/ui-icons/lib/Line/IconTrash';
-import Text from '@instructure/ui-core/lib/components/Text';
+import Text from '@instructure/ui-elements/lib/components/Text';
 import DateHelper from '../../../shared/helpers/dateHelper';
 import TextHelper from 'compiled/str/TextHelper';
 import CommentPropTypes from '../../../gradezilla/default_gradebook/propTypes/CommentPropTypes';

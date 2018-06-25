@@ -18,7 +18,7 @@
 import React, { Children, Component } from 'react';
 import themeable from '@instructure/ui-themeable/lib';
 import CustomPropTypes from '@instructure/ui-utils/lib/react/CustomPropTypes';
-import Pill from '@instructure/ui-core/lib/components/Pill';
+import Pill from '@instructure/ui-elements/lib/components/Pill';
 
 import styles from './styles.css';
 import theme from './theme.js';

@@ -23,6 +23,7 @@ import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import Modal, {ModalHeader, ModalBody, ModalFooter} from '@instructure/ui-overlays/lib/components/Modal'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import View from '@instructure/ui-layout/lib/components/View'
 import React from 'react'
 import PropTypes from 'prop-types'
 import DeveloperKeyFormFields from './NewKeyForm'
@@ -58,9 +59,7 @@ export default class DeveloperKeyModal extends React.Component {
     if (!this.requireScopes) {
       formData.delete('developer_key[scopes][]')
       formData.append('developer_key[require_scopes]', false)
-    } else if (this.props.selectedScopes.length === 0 &&
-      this.props.createOrEditDeveloperKeyState.developerKey.scopes.length === 0
-    ) {
+    } else if (this.props.selectedScopes.length === 0) {
       $.flashError(I18n.t('At least one scope must be selected.'))
       return
     } else {
@@ -85,9 +84,12 @@ export default class DeveloperKeyModal extends React.Component {
 
   spinner() {
     return (
-      <div className="center-content">
+      <View
+        as="div"
+        textAlign="center"
+      >
         <Spinner title={I18n.t('Creating Key')} margin="0 0 0 medium" />
-      </div>
+      </View>
     )
   }
 
@@ -117,7 +119,7 @@ export default class DeveloperKeyModal extends React.Component {
 
   closeModal = () => {
     this.props.store.dispatch(this.props.actions.developerKeysModalClose())
-    this.props.store.dispatch(this.props.actions.setEditingDeveloperKey())
+    this.props.store.dispatch(this.props.actions.editDeveloperKey())
   }
 
   render() {
@@ -161,7 +163,7 @@ DeveloperKeyModal.propTypes = {
   actions: PropTypes.shape({
     createOrEditDeveloperKey: PropTypes.func.isRequired,
     developerKeysModalClose: PropTypes.func.isRequired,
-    setEditingDeveloperKey: PropTypes.func.isRequired,
+    editDeveloperKey: PropTypes.func.isRequired,
     listDeveloperKeyScopesSet: PropTypes.func.isRequired
   }).isRequired,
   createOrEditDeveloperKeyState: PropTypes.shape({
@@ -179,4 +181,3 @@ DeveloperKeyModal.propTypes = {
   }).isRequired,
   selectedScopes: PropTypes.arrayOf(PropTypes.string).isRequired
 }
-

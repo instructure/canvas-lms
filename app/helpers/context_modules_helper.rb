@@ -30,7 +30,7 @@ module ContextModulesHelper
     'ExternalUrl': I18n.t('External Url'),
     'Quiz': I18n.t('Quiz'),
     'Quizzes::Quiz': I18n.t('Quiz'),
-    'WikiPage': I18n.t('Wiki Page')
+    'WikiPage': I18n.t('Page')
   }.freeze
 
   def cache_if_module(context_module, editable, is_student, can_view_unpublished, user, context, &block)

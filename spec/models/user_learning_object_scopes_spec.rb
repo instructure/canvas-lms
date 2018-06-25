@@ -752,6 +752,7 @@ describe UserLearningObjectScopes do
         end
       end
       @course2.assignments.first.update_attribute(:moderated_grading, true)
+      @course2.assignments.first.update_attribute(:grader_count, 2)
     end
 
     it "should not count assignments with no provisional grades" do

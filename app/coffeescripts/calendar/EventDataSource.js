@@ -653,7 +653,13 @@ export default class EventDataSource {
       /* eslint-disable no-param-reassign */
       item.type = item.plannable_type
       item.id = `${item.plannable_type}_${item.plannable_id}`
-      item.context_code = (item.course_id ? `course_${item.course_id}` : `user_${item.user_id}`)
+      if (item.course_id) {
+        item.context_code = `course_${item.course_id}`
+      } else if (item.group_id) {
+        item.context_code = `group_${item.group_id}`
+      } else {
+        item.context_code = `user_${item.user_id}`
+      }
       item.all_context_codes = item.context_code
       item.start_at = item.plannable.todo_date
       item.end_at = item.plannable.todo_date

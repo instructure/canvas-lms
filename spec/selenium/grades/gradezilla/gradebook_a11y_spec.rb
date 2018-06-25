@@ -73,10 +73,9 @@ describe "Gradezilla" do
     before { Gradezilla.visit(@course) }
 
     it "after arrange columns is clicked", priority: "2", test_id: 720462 do
-      Gradezilla.open_view_menu_and_arrange_by_menu
+      view_menu = Gradezilla.open_view_menu_and_arrange_by_menu
       Gradezilla.select_gradebook_menu_option('Due Date - Oldest to Newest')
-
-      expect(check_element_has_focus(Gradezilla.view_options_menu_selector)).to be true
+      expect(check_element_has_focus(fj("button:contains('Arrange By')", view_menu))).to be true
     end
   end
 
@@ -87,8 +86,7 @@ describe "Gradezilla" do
     it 'returns focus to the view options menu after clicking the "Notes" option' do
       Gradezilla.select_view_dropdown
       Gradezilla.select_notes_option
-
-      expect(check_element_has_focus(Gradezilla.view_options_menu_selector)).to be true
+      expect(check_element_has_focus(fj('[role=menu] [role=menuitemcheckbox]:contains("Notes")'))).to be true
     end
   end
 
@@ -348,6 +346,8 @@ describe "Gradezilla" do
     it 'is placed on assignment header trigger upon sort' do
       Gradezilla.click_assignment_header_menu(assignment.id)
       Gradezilla.click_assignment_popover_sort_by('low-to-high')
+
+      driver.action.send_keys(:escape).perform
 
       check_element_has_focus Gradezilla.assignment_header_menu_trigger_element(assignment.title)
     end

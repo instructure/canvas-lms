@@ -2,6 +2,12 @@
   "all_day_fb42c4fc": {
     "message": "Весь день"
   },
+  "announcement_fb4cb645": {
+    "message": "Оголошення"
+  },
+  "assignment_976578a8": {
+    "message": "Завдання"
+  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Show # completed item}\n  other {Show # completed items}\n}"
   },
@@ -52,6 +58,9 @@
   },
   "yesterday_at_date_1aa6d18e": {
     "message": "Вчора в { date }"
+  },
+  "calendar_event_89aadc1c": {
+    "message": "Календарна подія"
   },
   "load_prior_dates_f2b0f6f0": {
     "message": "Завантажте попередні дати"
@@ -122,6 +131,9 @@
   "unable_to_mark_as_complete_8141856d": {
     "message": "Неможливо позначити як завершений."
   },
+  "discussion_6719c51d": {
+    "message": "Обговорення"
+  },
   "points_bceb5005": {
     "message": "бали"
   },
@@ -146,6 +158,9 @@
   "graded_25cd3fcd": {
     "message": "Оцінено"
   },
+  "page_50c4823d": {
+    "message": "Сторінка"
+  },
   "to_do_1d554f36": {
     "message": "Зробити"
   },
@@ -161,6 +176,9 @@
   "optional_add_course_ef0d70fc": {
     "message": "Опціонально: Додати курс"
   },
+  "quiz_e0dcce8f": {
+    "message": "Контрольна робота"
+  },
   "failed_to_load_opportunities_52ab6404": {
     "message": "Не вдалося завантажити можливості"
   },
@@ -172,6 +190,9 @@
   },
   "failed_to_delete_to_do_64edff49": {
     "message": "Не вдалося видалити завдання"
+  },
+  "to_do_items_loading_d1cdfcd5": {
+    "message": "Завантажувати елементи"
   },
   "loading_725811ca": {
     "message": "завантаження"

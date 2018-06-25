@@ -22,12 +22,8 @@ import I18n from 'i18n!gradebook'
 import './jquery.instructure_date_and_time'
 import './jquery.instructure_misc_helpers'
 
-export function isAnonymousModeratedMarkingEnabled () {
-  return !!ENV.anonymous_moderated_marking_enabled
-}
-
 export function setupIsAnonymous ({anonymous_grading}) {
-  return isAnonymousModeratedMarkingEnabled() && anonymous_grading
+  return anonymous_grading
 }
 
 export function setupAnonymizableId (isAnonymous) {
@@ -40,6 +36,10 @@ export function setupAnonymizableStudentId (isAnonymous) {
 
 export function setupAnonymizableUserId (isAnonymous) {
   return isAnonymous ? 'anonymous_id' : 'user_id'
+}
+
+export function setupAnonymizableAuthorId (isAnonymous) {
+  return isAnonymous ? 'anonymous_id' : 'author_id'
 }
 
   const speedgraderHelpers = {
@@ -102,10 +102,12 @@ export function setupAnonymizableUserId (isAnonymous) {
           $(element).addClass('ui-state-disabled');
           $(element).attr('aria-disabled', true);
           $(element).attr('readonly', true);
+          $(element).prop('disabled', true);
         } else {
           $(element).removeClass('ui-state-disabled');
           $(element).removeAttr('aria-disabled');
           $(element).removeAttr('readonly');
+          $(element).removeProp('disabled');
         }
       });
     },
@@ -169,7 +171,7 @@ export function setupAnonymizableUserId (isAnonymous) {
     setupAnonymizableId,
     setupAnonymizableUserId,
     setupAnonymizableStudentId,
-    isAnonymousModeratedMarkingEnabled
+    setupAnonymizableAuthorId
   }
 
 export default speedgraderHelpers

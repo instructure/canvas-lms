@@ -252,7 +252,7 @@ module Api::V1::Submission
     attachment = attachments.pop
     attachments.each(&:destroy_permanently_plus)
 
-    anonymous = assignment.context.feature_enabled?(:anonymous_grading)
+    anonymous = assignment.anonymous_grading?
 
     # Remove the earlier attachment and re-create it if it's "stale"
     if attachment

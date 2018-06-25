@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {shape, string, bool, oneOf, number, object} from 'prop-types'
+import {shape, string, bool, oneOf, object} from 'prop-types'
 
 const propTypes = {}
 
@@ -40,7 +40,7 @@ propTypes.rolePermission = shape({
 })
 
 propTypes.role = shape({
-  id: number.isRequired,
+  id: string.isRequired,
   label: string.isRequired,
   base_role_type: string.isRequired,
   contextType: oneOf([COURSE, ACCOUNT]),

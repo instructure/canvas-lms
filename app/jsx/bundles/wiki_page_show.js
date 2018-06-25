@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'context_modules'
 import WikiPage from 'compiled/models/WikiPage'
 import WikiPageView from 'compiled/views/wiki/WikiPageView'
 import MarkAsDone from 'compiled/util/markAsDone'

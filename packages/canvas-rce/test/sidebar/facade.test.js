@@ -20,14 +20,21 @@ import assert from "assert";
 import configureStore from "../../src/sidebar/store/configureStore";
 import * as actions from "../../src/sidebar/actions/ui";
 import SidebarFacade from "../../src/sidebar/facade";
+import fetchMock from 'fetch-mock';
 
 describe("Sidebar facade", () => {
   let store, facade;
 
   beforeEach(() => {
+    fetchMock.mock("*", url => {
+      if (url.includes("api/folders")) return { folders: {} };
+      return [{}];
+    });
     store = configureStore();
     facade = new SidebarFacade(store);
   });
+
+  afterEach(() => fetchMock.restore());
 
   it("shows the sidebar on show()", () => {
     store.dispatch(actions.hideSidebar());

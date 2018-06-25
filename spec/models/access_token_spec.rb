@@ -287,7 +287,7 @@ describe AccessToken do
 
       before do
         allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
-        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite) { true }
+        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping) { true }
         Setting.set(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, 'true')
       end
 
@@ -386,7 +386,7 @@ describe AccessToken do
 
       before do
         allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
-        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:api_token_scoping) { true }
+        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping) { true }
       end
 
       it 'is invalid when scopes requested are not included on dev key' do

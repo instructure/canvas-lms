@@ -23,7 +23,7 @@ module DataFixup
     def self.run(root_account, batch_size: 1000, sleep_interval_per_batch: nil)
       root_account.shard.activate do
         raise ArgumentError unless InstFS.enabled?
-        importable_attachments = Attachment.where(instfs_uuid: nil)
+        importable_attachments = Attachment.where(instfs_uuid: nil).where("md5 IS NOT NULL")
         importable_attachments.find_ids_in_ranges(batch_size: batch_size) do |start_id, end_id|
           batch = importable_attachments.where(id: start_id..end_id)
           references = self.post_to_instfs({

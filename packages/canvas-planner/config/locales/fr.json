@@ -2,17 +2,32 @@
   "add_to_do_7def3c37": {
     "message": "Ajouter à faire"
   },
+  "all_day_fb42c4fc": {
+    "message": "Toute la journée"
+  },
   "all_items_loaded_aa256183": {
     "message": "Tous les éléments ont été chargés"
   },
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "Êtes-vous sûr de vouloir supprimer cet élément de planificateur ?"
   },
-  "assignmenttype_title_is_complete_813e54f8": {
-    "message": "{ assignmentType } { title } terminé"
+  "assignmenttype_title_6612d008": {
+    "message": "{ assignmentType } { title }."
   },
-  "assignmenttype_title_is_incomplete_a1d5fac0": {
-    "message": "{ assignmentType } { title } terminé"
+  "assignmenttype_title_at_datetime_478f0709": {
+    "message": "{ assignmentType } { title }, à { datetime }."
+  },
+  "assignmenttype_title_due_datetime_a112d8ff": {
+    "message": "{ assignmentType } { title }, à rendre le { datetime }."
+  },
+  "assignmenttype_title_is_marked_as_done_a8dc46ef": {
+    "message": "{ assignmentType } { title } est marqué comme étant fait."
+  },
+  "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
+    "message": "{ assignmentType } { title } n''est pas marqué comme étant fait."
+  },
+  "assignmenttype_title_on_datetime_446013fb": {
+    "message": "{ assignmentType } { title }, sur { datetime }."
   },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Début de votre historique des choses à faire"
@@ -27,10 +42,10 @@
     "message": "Fermer l''infobulle des opportunités"
   },
   "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
-    "message": "{ count, plural,\n     =0 {# occasions}\n    one {# occasion}\n  other {# occasions}\n}"
+    "message": "{ count, plural,\n     =0 {# opportunités}\n    one {# opportunité}\n  other {# opportunités}\n}"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-    "message": "{ count, plural,\n    one {Afficher # l’élément terminé}\n  other { Afficher # les éléments terminés}\n}"
+    "message": "{ count, plural,\n    one {Afficher # l''élément terminé}\n  other {Afficher # les éléments terminés}\n}"
   },
   "course_8a63b4a3": {
     "message": "Cours"
@@ -39,10 +54,13 @@
     "message": "{ course } À FAIRE"
   },
   "date_at_time_dbdb1b99": {
-    "message": "{ date } à { time }"
+    "message": "le { date } à { time }"
   },
   "date_ee500367": {
     "message": "Date"
+  },
+  "date_is_not_a_valid_date_4ef9f8ba": {
+    "message": "#{ date } n''est pas une date valide."
   },
   "date_is_required_8660ec22": {
     "message": "Une date est requise"
@@ -64,6 +82,9 @@
   },
   "edit_title_72e5a21e": {
     "message": "Modifier { title }"
+  },
+  "error_loading_grades_e0b38f4d": {
+    "message": "Erreur de chargement des notes"
   },
   "error_loading_more_items_3f109d9f": {
     "message": "Erreur lors du chargement des éléments supplémentaires"
@@ -95,6 +116,15 @@
   "graded_25cd3fcd": {
     "message": "Noté"
   },
+  "grades_are_loading_c899652d": {
+    "message": "Les notes sont en train de charger"
+  },
+  "grades_loaded_5056277c": {
+    "message": "Notes chargées"
+  },
+  "items_completed_items_plural_1_item_other_items_717d579f": {
+    "message": "{ items } terminé(s) { items, plural,\n     =1 {élément}\n  other {éléments}\n}"
+  },
   "late_2be42b88": {
     "message": "En retard"
   },
@@ -105,16 +135,22 @@
     "message": "Charger les dates précédentes"
   },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-    "message": "Chargé { count, plural,\n     =0{# éléments}\n    one {# élément}\n  other {# éléments}\n}"
+    "message": "Chargé(s) { count, plural,\n     =0 {# éléments}\n    one {# élément}\n  other {# éléments}\n}"
   },
   "loading_25990131": {
     "message": "Chargement..."
+  },
+  "loading_725811ca": {
+    "message": "chargement"
+  },
+  "loading_grades_c842c887": {
+    "message": "Chargement des notes"
   },
   "loading_past_items_ca499e75": {
     "message": "Charger les éléments passés"
   },
   "loading_planner_items_947a813d": {
-    "message": "Téléchargement des éléments de l'agenda"
+    "message": "Téléchargement des éléments de l''agenda"
   },
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Apparemment, il n''y a rien ici."
@@ -122,14 +158,17 @@
   "missing_1a256b3b": {
     "message": "Manquant"
   },
-  "missing_items_for_5ef30cea": {
-    "message": "Éléments manquants pour "
+  "missing_items_for_title_516511f8": {
+    "message": "Éléments manquants pour { title }"
+  },
+  "my_grades_98834476": {
+    "message": "Mes notes"
   },
   "new_activity_8b84847d": {
     "message": "Nouvelle activité"
   },
-  "new_activity_for_ac84f6e6": {
-    "message": "Nouvelle activité pour "
+  "new_activity_for_title_14c9c3af": {
+    "message": "Nouvelle activité pour { title }"
   },
   "next_month_749b1778": {
     "message": "Mois suivant"
@@ -137,11 +176,20 @@
   "no_due_dates_assigned_e8f5bac8": {
     "message": "Pas de dates limites de rendu"
   },
-  "no_to_do_s_for_this_day_yet_90c5873d": {
-    "message": "Pas de choses à faire pour aujourd''hui."
+  "no_grade_3b4d7f3e": {
+    "message": "Aucune note"
   },
   "nothing_new_needs_attention_3ac548d4": {
     "message": "Aucune nouvelle info nécessitant votre attention"
+  },
+  "nothing_planned_today_next_item_loaded_5a199868": {
+    "message": "Rien de prévu aujourd''hui. Élément suivant chargé."
+  },
+  "nothing_planned_yet_8675ffe9": {
+    "message": "Rien de prévu pour l''instant"
+  },
+  "only_most_recent_grading_period_shown_f1ad6458": {
+    "message": "*Seule la période de notation la plus récente est indiquée."
   },
   "optional_add_course_ef0d70fc": {
     "message": "Facultatif : Ajouter un cours"
@@ -164,11 +212,26 @@
   "save_11a80ec3": {
     "message": "Enregistrer"
   },
+  "show_my_grades_ebd08684": {
+    "message": "Afficher mes notes"
+  },
+  "startdate_to_enddate_d245175b": {
+    "message": "de { startDate } à { endDate }"
+  },
   "submitted_318fad53": {
     "message": "Soumis"
   },
+  "success_to_do_created_e34ed395": {
+    "message": "Opération réussie : À faire créé"
+  },
   "task_16b0ef38": {
     "message": "Tâche"
+  },
+  "the_date_and_time_this_to_do_is_due_74c823d4": {
+    "message": "La date et l''heure à laquelle cela doit être fait est passé."
+  },
+  "time_2b5aac58": {
+    "message": "Temps"
   },
   "title_ee03d132": {
     "message": "Titre"
@@ -199,6 +262,9 @@
   },
   "yesterday_c6bd6abf": {
     "message": "Hier"
+  },
+  "you_must_provide_a_date_and_time_a86839d2": {
+    "message": "Vous devez introduire une date et une heure."
   },
   "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
     "message": "Vous êtes revenu à votre toute première chose à faire."

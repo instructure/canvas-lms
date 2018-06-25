@@ -278,19 +278,19 @@ export default class ThemeEditor extends React.Component {
       const defaultVal = this.getSchemaDefault(k)
       if (properties[k] !== defaultVal && properties[k] && properties[k][0] !== '$') {
         processedData.append(`brand_config[variables][${k}]`, properties[k])
-      } else {
-        processedData.append(`brand_config[variables][${k}]`, defaultVal)
       }
     })
     files.forEach(f => {
       const keyName = f.customFileUpload
         ? f.variable_name
         : `brand_config[variables][${f.variable_name}]`
-      processedData.append(keyName, f.value)
+      if (!f.customFileUpload || (f.customFileUpload && f.value != null)) {
+        processedData.append(keyName, f.value)
+      }
     });
     // We need to make sure that these are present with the upload
     OVERRIDE_FILE_KEYS.forEach(name => {
-      if (!processedData.has(name) || processedData.get(name) === 'undefined') {
+      if (!processedData.has(name) || processedData.get(name) === 'undefined' || processedData.get(name) === 'null') {
         processedData.append(name, this.props.brandConfig[name] || '');
       }
     })

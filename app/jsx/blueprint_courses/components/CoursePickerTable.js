@@ -220,7 +220,7 @@ export default class CoursePickerTable extends React.Component {
             <tbody />
           </Table>
         </PresentationContent>
-        <p className="bca-table__select-all">
+        <div className="bca-table__select-all">
           <Checkbox
             onChange={this.onSelectAllToggle}
             value="all"
@@ -233,7 +233,7 @@ export default class CoursePickerTable extends React.Component {
               </Text>
             }
           />
-        </p>
+        </div>
       </div>
     )
   }

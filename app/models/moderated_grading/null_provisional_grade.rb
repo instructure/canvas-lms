@@ -38,4 +38,9 @@ class ModeratedGrading::NullProvisionalGrade
   def submission_comments
     @submission.submission_comments
   end
+
+  def scorer
+    return nil if @scorer_id.nil?
+    @scorer ||= User.find(@scorer_id)
+  end
 end

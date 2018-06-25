@@ -21,27 +21,21 @@ class Setting < ActiveRecord::Base
 
   self.shard_category = :unsharded if self.respond_to?(:shard_category=)
 
-  @@cache = {}
-  @@yaml_cache = {}
-
-  def self.get(name, default)
-    if @@cache.has_key?(name)
-      @@cache[name]
-    else
-      begin
-        from_db = Setting.where(name: name).first.try(:value)
-        @@cache[name] = from_db || default.try(:to_s)
-      rescue ActiveRecord::StatementInvalid, ActiveRecord::ConnectionNotEstablished => e
-        # the db may not exist yet
-        Rails.logger.warn("Unable to read setting: #{e}") if Rails.logger
-        default.try(:to_s)
+  def self.get(name, default, cache_options: nil)
+    begin
+      cache.fetch(name, cache_options) do
+        Setting.where(name: name).first&.value || default&.to_s
       end
+    rescue ActiveRecord::StatementInvalid, ActiveRecord::ConnectionNotEstablished => e
+      # the db may not exist yet
+      Rails.logger.warn("Unable to read setting: #{e}") if Rails.logger
+      default&.to_s
     end
   end
 
   # Note that after calling this, you should send SIGHUP to all running Canvas processes
   def self.set(name, value)
-    @@cache.delete(name)
+    cache.delete(name)
     s = Setting.where(name: name).first_or_initialize
     s.value = value.try(:to_s)
     s.save!
@@ -53,18 +47,16 @@ class Setting < ActiveRecord::Base
 
   # this cache doesn't get invalidated by other rails processes, obviously, so
   # use this only for relatively unchanging data
-
-  def self.clear_cache(name)
-    @@cache.delete(name)
+  def self.cache
+    @cache ||= ActiveSupport::Cache.lookup_store(:memory_store)
   end
 
   def self.reset_cache!
-    @@cache = {}
-    @@yaml_cache = {}
+    cache.clear
   end
 
   def self.remove(name)
-    @@cache.delete(name)
+    cache.delete(name)
     Setting.where(name: name).delete_all
   end
 end

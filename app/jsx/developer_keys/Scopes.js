@@ -22,10 +22,9 @@ import React from 'react'
 
 import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
-import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
 import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import IconWarning from 'instructure-icons/lib/Line/IconWarningLine'
-import IconSearchLine from 'instructure-icons/lib/Line/IconSearchLine'
+import IconWarning from '@instructure/ui-icons/lib/Line/IconWarning'
+import IconSearchLine from '@instructure/ui-icons/lib/Line/IconSearch'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import Text from '@instructure/ui-elements/lib/components/Text'
@@ -97,27 +96,26 @@ export default class DeveloperKeyScopes extends React.Component {
     return (
       <Grid>
         <GridRow rowSpacing="small">
-          <GridCol>
-            <Text size="medium" weight="bold">
-              {I18n.t('Add Scope')}
-            </Text>
+          <GridCol
+            data-automation="enforce_scopes"
+          >
+            <Checkbox
+              variant="toggle"
+              label={
+                <span>
+                  <Text>{I18n.t('Enforce Scopes')}</Text>
+                  <ScreenReaderContent>{this.enforceScopesSrText()}</ScreenReaderContent>
+                </span>
+              }
+              checked={this.props.requireScopes}
+              onChange={this.props.onRequireScopesChange}
+            />
           </GridCol>
-          <GridCol width="auto">
-            <Flex>
-              <FlexItem padding="0 large 0 0" data-automation="enforce_scopes">
-                <Checkbox
-                  variant="toggle"
-                  label={
-                    <span>
-                      <Text>{I18n.t('Enforce Scopes')}</Text>
-                      <ScreenReaderContent>{this.enforceScopesSrText()}</ScreenReaderContent>
-                    </span>
-                  }
-                  checked={this.props.requireScopes}
-                  onChange={this.props.onRequireScopesChange}
-                />
-              </FlexItem>
-              <FlexItem>
+          {
+            this.props.requireScopes
+            ? (
+              <GridCol width="auto">
+                <ScreenReaderContent>{I18n.t('Add Scope')}</ScreenReaderContent>
                 <TextInput
                   label={<ScreenReaderContent>{searchEndpoints}</ScreenReaderContent>}
                   placeholder={searchEndpoints}
@@ -125,9 +123,10 @@ export default class DeveloperKeyScopes extends React.Component {
                   icon={() => <IconSearchLine />}
                   onChange={this.handleFilterChange}
                 />
-              </FlexItem>
-            </Flex>
-          </GridCol>
+              </GridCol>
+            )
+            : null
+          }
         </GridRow>
         {this.body()}
       </Grid>

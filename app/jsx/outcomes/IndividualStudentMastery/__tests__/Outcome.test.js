@@ -20,11 +20,27 @@ import React from 'react'
 import { render, shallow } from 'enzyme'
 import Outcome from '../Outcome'
 
+const result = (id = 1, date = new Date()) => ({
+  id,
+  percent: 0.1,
+  assignment: {
+    id: 1,
+    html_url: 'http://foo',
+    name: 'My alignment',
+    submission_types: '',
+    score: 0
+  },
+  submitted_or_assessed_at: date.toISOString()
+})
+
 const defaultProps = (props = {}) => (
   Object.assign({
     outcome: {
       id: 1,
+      expansionId: 100,
       mastered: false,
+      mastery_points: 3,
+      points_possible: 5,
       ratings: [
         { description: 'My first rating' },
         { description: 'My second rating' }
@@ -38,12 +54,15 @@ const defaultProps = (props = {}) => (
             id: 1,
             html_url: 'http://foo',
             name: 'My assignment',
-            submission_types: 'online_quiz'
+            submission_types: 'online_quiz',
+            score: 0
           }
         }
       ],
       title: 'My outcome'
-    }
+    },
+    expanded: false,
+    onExpansionChange: () => {}
   }, props)
 )
 
@@ -52,10 +71,22 @@ it('renders the Outcome component', () => {
   expect(wrapper.debug()).toMatchSnapshot()
 })
 
+it('renders correctly expanded', () => {
+  const wrapper = shallow(<Outcome {...defaultProps()} expanded />)
+  expect(wrapper.debug()).toMatchSnapshot()
+})
+
+it('renders correctly expanded with no results', () => {
+  const props = defaultProps()
+  props.outcome.results = []
+  const wrapper = shallow(<Outcome {...props} expanded />)
+  expect(wrapper.debug()).toMatchSnapshot()
+})
+
 describe('header', () => {
   it('includes the outcome name', () => {
     const wrapper = shallow(<Outcome {...defaultProps()}/>)
-    const header = wrapper.find('ToggleDetails')
+    const header = wrapper.find('ToggleGroup')
     const summary = render(header.prop('summary'))
     expect(summary.text()).toMatch('My outcome')
   })
@@ -64,21 +95,21 @@ describe('header', () => {
     const props = defaultProps()
     props.outcome.mastered = true
     const wrapper = shallow(<Outcome {...props} />)
-    const header = wrapper.find('ToggleDetails')
+    const header = wrapper.find('ToggleGroup')
     const summary = render(header.prop('summary'))
     expect(summary.text()).toMatch('Mastered')
   })
 
   it('includes non-mastery when not mastered', () => {
     const wrapper = shallow(<Outcome {...defaultProps()} />)
-    const header = wrapper.find('ToggleDetails')
+    const header = wrapper.find('ToggleGroup')
     const summary = render(header.prop('summary'))
     expect(summary.text()).toMatch('Not mastered')
   })
 
   it('shows correct number of alignments', () => {
     const wrapper = shallow(<Outcome {...defaultProps()} />)
-    const header = wrapper.find('ToggleDetails')
+    const header = wrapper.find('ToggleGroup')
     const summary = render(header.prop('summary'))
     expect(summary.text()).toMatch('1 alignment')
   })
@@ -89,37 +120,35 @@ it('includes the individual results', () => {
   expect(wrapper.find('AssignmentResult')).toHaveLength(1)
 })
 
-it('defaults to unexpanded', () => {
-  const wrapper = shallow(<Outcome {...defaultProps()} />)
-  expect(wrapper.state('expanded')).toBe(false)
-})
+it('renders the results by most recent', () => {
+  const props = defaultProps()
+  const now = new Date()
+  const minuteAgo = new Date(now - 60000)
+  const hourAgo = new Date(now - 3600000)
+  const yearishAgo = new Date(now - 3600000 * 24 * 360)
+  props.outcome.results = [
+    result(1, hourAgo),
+    result(2, now),
+    result(3, minuteAgo),
+    result(4, yearishAgo)
+  ]
 
-describe('expand()', () => {
-  it('expands when called', () => {
-    const wrapper = shallow(<Outcome {...defaultProps()} />)
-    wrapper.instance().expand()
-    expect(wrapper.state('expanded')).toBe(true)
-  })
-})
-
-describe('contract()', () => {
-  it('contracts when called', () => {
-    const wrapper = shallow(<Outcome {...defaultProps()} />).setState({ expanded: true })
-    wrapper.instance().contract()
-    expect(wrapper.state('expanded')).toBe(false)
-  })
+  const wrapper = shallow(<Outcome {...props} />)
+  const results = wrapper.find('AssignmentResult')
+  expect(results).toHaveLength(4)
+  expect(results.get(0).props.result.id).toEqual(2) // now
+  expect(results.get(1).props.result.id).toEqual(3) // minuteAgo
+  expect(results.get(2).props.result.id).toEqual(1) // hourAgo
+  expect(results.get(3).props.result.id).toEqual(4) // yearishAgo
 })
 
 describe('handleToggle()', () => {
-  it('expands when called with true', () => {
-    const wrapper = shallow(<Outcome {...defaultProps()} />)
-    wrapper.instance().handleToggle(null, true)
-    expect(wrapper.state('expanded')).toBe(true)
-  })
+  it('calls onExpansionChange with the correct data', () => {
+    const props = defaultProps()
+    props.onExpansionChange = jest.fn()
 
-  it('contracts when called with false', () => {
-    const wrapper = shallow(<Outcome {...defaultProps()} />).setState({ expanded: true })
-    wrapper.instance().handleToggle(null, false)
-    expect(wrapper.state('expanded')).toBe(false)
+    const wrapper = shallow(<Outcome {...props} />)
+    wrapper.instance().handleToggle(null, true)
+    expect(props.onExpansionChange).toBeCalledWith('outcome', 100, true)
   })
 })

@@ -19,7 +19,7 @@
 import PropTypes from 'prop-types'
 
 export const assignmentShape = PropTypes.shape({
-  id: PropTypes.number.isRequired,
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   name: PropTypes.string.isRequired,
   html_url: PropTypes.string.isRequired,
   submission_types: PropTypes.string.isRequired
@@ -27,9 +27,11 @@ export const assignmentShape = PropTypes.shape({
 
 export const outcomeResultShape = PropTypes.shape({
   assignment: assignmentShape.isRequired,
-  id: PropTypes.number.isRequired,
-  score: PropTypes.number.isRequired,
-  percent: PropTypes.number
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  score: PropTypes.number,
+  percent: PropTypes.number,
+  hidden: PropTypes.bool,
+  hide_points: PropTypes.bool
 })
 
 export const ratingShape = PropTypes.shape({
@@ -41,7 +43,9 @@ export const outcomeShape = PropTypes.shape({
   mastered: PropTypes.bool.isRequired,
   ratings: PropTypes.arrayOf(ratingShape).isRequired,
   results: PropTypes.arrayOf(outcomeResultShape).isRequired,
-  title: PropTypes.string.isRequired
+  title: PropTypes.string.isRequired,
+  mastery_points: PropTypes.number.isRequired,
+  points_possible: PropTypes.number.isRequired
 })
 
 export const outcomeLinkShape = PropTypes.shape({
@@ -51,4 +55,15 @@ export const outcomeLinkShape = PropTypes.shape({
 export const outcomeGroupShape = PropTypes.shape({
   id: PropTypes.number.isRequired,
   title: PropTypes.string.isRequired
+})
+
+export const outcomeProficiencyRatingShape = PropTypes.shape({
+  description: PropTypes.string.isRequired,
+  points: PropTypes.number.isRequired,
+  mastery: PropTypes.bool.isRequired,
+  color: PropTypes.string.isRequired
+})
+
+export const outcomeProficiencyShape = PropTypes.shape({
+  ratings: PropTypes.arrayOf(outcomeProficiencyRatingShape)
 })

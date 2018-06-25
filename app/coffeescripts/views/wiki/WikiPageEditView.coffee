@@ -18,6 +18,8 @@
 define [
   'jquery'
   'Backbone'
+  'react'
+  'react-dom'
   'jsx/shared/rce/RichContentEditor'
   'jst/wiki/WikiPageEdit'
   '../ValidatedFormView'
@@ -25,8 +27,9 @@ define [
   './WikiPageReloadView'
   'i18n!pages'
   '../editor/KeyboardShortcuts'
+  'jsx/due_dates/DueDateCalendarPicker'
   'jquery.instructure_date_and_time'
-], ($, Backbone, RichContentEditor, template, ValidatedFormView, WikiPageDeleteDialog, WikiPageReloadView, I18n, KeyboardShortcuts) ->
+], ($, Backbone, React, ReactDOM, RichContentEditor, template, ValidatedFormView, WikiPageDeleteDialog, WikiPageReloadView, I18n, KeyboardShortcuts, DueDateCalendarPicker) ->
 
   RichContentEditor.preloadRemoteModule()
 
@@ -37,8 +40,8 @@ define [
         '.header-bar-outer-container': '$headerBarOuterContainer'
         '.page-changed-alert': '$pageChangedAlert'
         '.help_dialog': '$helpDialog'
-        '#todo_date': '$studentTodoAt'
         '#todo_date_container': '$studentTodoAtContainer'
+        '#student_planner_checkbox': '$studentPlannerCheckbox'
 
       events:
         'click a.switch_views': 'switchViews'
@@ -61,6 +64,11 @@ define [
       @PAGE_RIGHTS ||= {}
       @on 'success', (args) => window.location.href = @model.get('html_url')
       @lockedItems = options.lockedItems || {}
+      todoDate = @model.get('todo_date')
+      @studentTodoAtDateValue = if (todoDate)
+        new Date(todoDate)
+      else
+        ''
 
     toJSON: ->
       json = super
@@ -116,13 +124,34 @@ define [
     toggleStudentTodo: (e) =>
       @$studentTodoAtContainer.toggle()
 
+    handleStudentTodoUpdate: (newDate) =>
+      @studentTodoAtDateValue = newDate
+      @renderStudentTodoAtDate()
+
+    renderStudentTodoAtDate: () =>
+      elt = @$studentTodoAtContainer[0]
+      if elt
+        ReactDOM.render(React.createElement(DueDateCalendarPicker,
+          dateType: 'todo_date'
+          name: 'student_todo_at'
+          handleUpdate: @handleStudentTodoUpdate
+          rowKey: 'student_todo_at_date'
+          labelledBy: 'student_todo_at_date_label'
+          inputClasses: ''
+          disabled: false
+          isFancyMidnight: true
+          dateValue: @studentTodoAtDateValue
+          labelText: 'Student Planner Date'
+          labelClasses: 'screenreader-only'
+        ), elt)
 
     # After the page loads, ensure the that wiki sidebar gets initialized
     # correctly.
     # @api custom backbone override
     afterRender: ->
       super
-      @$studentTodoAt.datetime_field()
+      @renderStudentTodoAtDate()
+
       if !@toJSON().todo_date?
         @$studentTodoAtContainer.hide()
 
@@ -176,7 +205,8 @@ define [
           }
         ]
 
-      if data.student_planner_checkbox == '1' && !data.student_todo_at?
+      studentTodoAtValid = data.student_todo_at? && data.student_todo_at != ''
+      if data.student_planner_checkbox && !studentTodoAtValid
         errors['student_todo_at'] = [
           {
             type: 'required'
@@ -227,11 +257,11 @@ define [
       else
         page_data.assignment = @model.createAssignment(set_assignment: '0')
       page_data.set_assignment = page_data.assignment.get('set_assignment')
-      page_data.student_planner_checkbox = planner_checkbox_is_checked = $("#student_planner_checkbox").is(":checked")
+      page_data.student_planner_checkbox = @$studentPlannerCheckbox.is(":checked")
       if page_data.student_planner_checkbox
-        page_data.todo_date = $("#todo_date").val()
+        page_data.student_todo_at = @studentTodoAtDateValue
       else
-        page_data.todo_date = null
+        page_data.student_todo_at = null
 
       page_data.published = true if @shouldPublish
       page_data

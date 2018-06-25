@@ -19,35 +19,15 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe Reporting::CountsReport do
-  shared_examples_for "counts_report" do
-    before do
-      @shard1 ||= Shard.default
-      @account1 = Account.create!
-      @account2 = @shard1.activate { Account.create! }
-      allow(Reporting::CountsReport).to receive(:last_activity).and_return(true)
-    end
-
-    it "should create a detailed report for each account" do
-      Reporting::CountsReport.process
-      expect(@account1.report_snapshots.detailed.first).not_to be_nil
-      snapshot = @account2.report_snapshots.detailed.first
-      expect(snapshot).not_to be_nil
-      expect(snapshot.shard).to eq @shard1
-    end
+  before do
+    @account1 = Account.create!
   end
-
-  context "sharding" do
-    specs_require_sharding
-    include_examples "counts_report"
-  end
-
-  include_examples "counts_report"
 
   describe "detailed report" do
     describe "courses" do
       it "should count available courses" do
         course_factory(:account => @account1, :active_all => 1)
-        Reporting::CountsReport.process
+        Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
         expect(@snapshot.data['courses']).to eq 1
       end
@@ -60,7 +40,7 @@ describe Reporting::CountsReport do
         expect(@course1.workflow_state).to eq 'claimed'
         expect(@course2.workflow_state).to eq 'deleted'
 
-        Reporting::CountsReport.process
+        Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
         expect(@snapshot.data['courses']).to eq 0
       end
@@ -68,7 +48,7 @@ describe Reporting::CountsReport do
 
     shared_examples_for "user_counts" do
       it "should count users that recently logged in" do
-        Reporting::CountsReport.process
+        Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
         expect(@snapshot.data[datum]).to eq 1
       end
@@ -76,7 +56,7 @@ describe Reporting::CountsReport do
       it "should not count users whose enrollment is deleted" do
         @enrollment.destroy
 
-        Reporting::CountsReport.process
+        Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
         expect(@snapshot.data[datum]).to eq 0
       end
@@ -84,7 +64,7 @@ describe Reporting::CountsReport do
       it "should not count users whose pseudonym is deleted" do
         @pseudonym.destroy
 
-        Reporting::CountsReport.process
+        Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
         expect(@snapshot.data[datum]).to eq 0
       end
@@ -94,7 +74,7 @@ describe Reporting::CountsReport do
         @pseudonym.last_request_at = 2.days.ago
         @pseudonym.save!
 
-        Reporting::CountsReport.process
+        Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
         expect(@snapshot.data[datum]).to eq 0
       end
@@ -133,7 +113,7 @@ describe Reporting::CountsReport do
       include_examples "user_counts"
 
       it "should include tas" do
-        Reporting::CountsReport.process
+        Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
         expect(@snapshot.data[datum]).to eq 1
       end
@@ -143,7 +123,7 @@ describe Reporting::CountsReport do
         @pseudonym.last_request_at = 1.day.ago
         @pseudonym.save!
 
-        Reporting::CountsReport.process
+        Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
         expect(@snapshot.data[datum]).to eq 2
       end
@@ -153,7 +133,7 @@ describe Reporting::CountsReport do
         @pseudonym.last_request_at = 1.day.ago
         @pseudonym.save!
 
-        Reporting::CountsReport.process
+        Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
         expect(@snapshot.data[datum]).to eq 2
       end
@@ -163,7 +143,7 @@ describe Reporting::CountsReport do
         @pseudonym.last_request_at = 1.day.ago
         @pseudonym.save!
 
-        Reporting::CountsReport.process
+        Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
         expect(@snapshot.data[datum]).to eq 2
       end
@@ -173,7 +153,7 @@ describe Reporting::CountsReport do
         @pseudonym.last_request_at = 1.day.ago
         @pseudonym.save!
 
-        Reporting::CountsReport.process
+        Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
         expect(@snapshot.data[datum]).to eq 2
       end
@@ -183,7 +163,7 @@ describe Reporting::CountsReport do
         @pseudonym.last_request_at = 1.day.ago
         @pseudonym.save!
 
-        Reporting::CountsReport.process
+        Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
         expect(@snapshot.data[datum]).to eq 1
       end
@@ -197,7 +177,7 @@ describe Reporting::CountsReport do
 
       it "should count files with the account's local id in the namespace" do
         attachment_model(namespace: "account_#{@account1.local_id}", size: 5 * 1024)
-        Reporting::CountsReport.process
+        Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
         expect(@snapshot.data['files']).to eq 1
         expect(@snapshot.data['files_size']).to eq 5 * 1024
@@ -205,7 +185,7 @@ describe Reporting::CountsReport do
 
       it "should count files with the account's global id in the namespace" do
         attachment_model(namespace: "account_#{@account1.global_id}", size: 3 * 1024)
-        Reporting::CountsReport.process
+        Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
         expect(@snapshot.data['files']).to eq 1
         expect(@snapshot.data['files_size']).to eq 3 * 1024
@@ -214,7 +194,7 @@ describe Reporting::CountsReport do
       it "should count with a heterogenous mixture of file namespaces" do
         attachment_model(namespace: "account_#{@account1.local_id}", size: 5 * 1024)
         attachment_model(namespace: "account_#{@account1.global_id}", size: 3 * 1024)
-        Reporting::CountsReport.process
+        Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
         expect(@snapshot.data['files']).to eq 2
         expect(@snapshot.data['files_size']).to eq 8 * 1024

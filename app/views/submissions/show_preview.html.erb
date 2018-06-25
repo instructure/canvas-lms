@@ -86,7 +86,7 @@
   <div style="text-align: center;">
   <% if @submission.processed %>
     <%
-      preview_url = if anonymous_grading
+      preview_url = if anonymous_now
         context_url(
           @context,
           :context_assignment_anonymous_submission_url,
@@ -133,7 +133,7 @@
 
         <div class="file-upload-submission-info">
           <%
-            preview_url = if anonymous_grading
+            preview_url = if anonymous_now
               context_url(
                 @context,
                 :context_assignment_anonymous_submission_url,
@@ -204,7 +204,26 @@
             %>
           <% end %>
           <% if attachment.crocodoc_available? || attachment.canvadocable? %>
-            <a href=<%= preview_url %> data-tooltip title="<%= preview_document %>" class="modal_preview_link Button--link" role="button" data-attachment_id="<%= attachment.id %>" data-submission_id="<%= @submission.id %>" data-dialog-title="<%= attachment.display_name %>" <%= doc_preview_attributes(attachment, enable_annotations: true, moderated_grading_whitelist: @moderated_grading_whitelist) %>><%= button_text %></a>
+            <a
+              href=<%= preview_url %>
+              data-tooltip title="<%= preview_document %>"
+              class="modal_preview_link Button--link"
+              role="button"
+              data-attachment_id="<%= attachment.id %>"
+              data-submission_id="<%= @submission.id %>"
+              data-dialog-title="<%= attachment.display_name %>"
+              <%=
+                doc_preview_attributes(
+                  attachment,
+                  anonymous_instructor_annotations: @anonymous_instructor_annotations,
+                  enable_annotations: true,
+                  enrollment_type: @enrollment_type,
+                  moderated_grading_whitelist: @moderated_grading_whitelist
+                )
+              %>
+            >
+              <%= button_text %>
+            </a>
           <% end %>
         </div>
 

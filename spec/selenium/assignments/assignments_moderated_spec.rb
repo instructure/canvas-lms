@@ -22,10 +22,12 @@ describe "moderated grading assignments" do
   include_context "in-process server selenium tests"
 
   before do
+    Account.default.enable_feature!(:moderated_grading)
     @course = course_model
     @course.offer!
     @assignment = @course.assignments.create!(submission_types: 'online_text_entry', title: 'Test Assignment')
     @assignment.update_attribute :moderated_grading, true
+    @assignment.update_attribute :grader_count, 2
     @assignment.update_attribute :workflow_state, 'published'
     @student = User.create!
     @course.enroll_student(@student)
@@ -33,35 +35,9 @@ describe "moderated grading assignments" do
     @course.enroll_ta(@user)
   end
 
-  it "publishes grades from the moderate screen" do
-    sub = @assignment.submit_homework(@student, :submission_type => 'online_text_entry', :body => 'hallo')
-    sub.find_or_create_provisional_grade!(@user, score: 80)
-
-    course_with_teacher_logged_in course: @course
-    get "/courses/#{@course.id}/assignments/#{@assignment.id}/moderate"
-    f('.ModeratedGrading__Header-PublishBtn').click
-    driver.switch_to.alert.accept
-    assert_flash_notice_message("Success! Grades were published to the grade book")
-  end
-
-  context "student tray" do
-    before(:each) do
-      @account = Account.default
-      @account.enable_feature!(:student_context_cards)
-    end
-
-    it "moderated assignment should display student name in tray", priority: "1", test_id: 3022071 do
-      course_with_teacher_logged_in course: @course
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}/moderate"
-      f("a[data-student_id='#{@student.id}']").click
-      expect(f(".StudentContextTray-Header__Name h2 a")).to include_text("User")
-    end
-  end
-
   context "with assignment moderation setting" do
     before(:each) do
       # turn on the moderation flag
-      Account.default.enable_feature!(:anonymous_moderated_marking)
       Account.default.enable_feature!(:anonymous_marking)
       Account.default.enable_feature!(:moderated_grading)
       @moderated_assignment = @course.assignments.create!(
@@ -105,7 +81,6 @@ describe "moderated grading assignments" do
   context "with moderator selected" do
     before(:each) do
       # turn on the moderation flag
-      Account.default.enable_feature!(:anonymous_moderated_marking)
       Account.default.enable_feature!(:anonymous_marking)
 
       # create 2 teachers

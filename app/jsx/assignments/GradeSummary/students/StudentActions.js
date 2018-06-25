@@ -35,7 +35,7 @@ export function setLoadStudentsStatus(status) {
 
 export function loadStudents() {
   return (dispatch, getState) => {
-    const {assignment} = getState().context
+    const {assignment} = getState().assignment
 
     dispatch(setLoadStudentsStatus(STARTED))
 

@@ -340,7 +340,7 @@ class Notification < ActiveRecord::Base
     t 'names.submission_grade_changed', 'Submission Grade Changed'
     t 'names.submission_graded', 'Submission Graded'
     t 'names.summaries', 'Summaries'
-    t 'names.updated_wiki_page', 'Updated Wiki Page'
+    t 'names.updated_wiki_page', 'Updated Page'
     t 'names.web_conference_invitation', 'Web Conference Invitation'
     t 'names.alert', 'Alert'
     t 'names.appointment_canceled_by_user', 'Appointment Canceled By User'
@@ -459,7 +459,7 @@ EOS
         mt(:course_content_description, <<-EOS)
 Change to course content:
 
-* WikiPage
+* Page content
 * Quiz content
 * Assignment content
 EOS

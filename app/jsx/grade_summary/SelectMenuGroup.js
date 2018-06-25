@@ -19,11 +19,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import Button from '@instructure/ui-core/lib/components/Button';
-import Container from '@instructure/ui-core/lib/components/Container';
-import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent';
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
-import Text from '@instructure/ui-core/lib/components/Text';
+import Button from '@instructure/ui-buttons/lib/components/Button';
+import View from '@instructure/ui-layout/lib/components/View';
+import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent';
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
+import Text from '@instructure/ui-elements/lib/components/Text';
 
 import {showFlashError} from '../shared/FlashAlert';
 import I18n from 'i18n!grade_summary';
@@ -139,7 +139,7 @@ export default class SelectMenuGroup extends React.Component {
 
   render () {
     return (
-      <Container>
+      <View>
         {this.props.students.length > 1 &&
           <SelectMenu
             defaultValue={this.props.selectedStudentID}
@@ -153,7 +153,7 @@ export default class SelectMenuGroup extends React.Component {
           />
         }
 
-        <Container
+        <View
           as="span"
           style={{ display: "flex", flexWrap: "wrap", alignContent: "flex-end", alignItems: "flex-end"}}
         >
@@ -194,7 +194,7 @@ export default class SelectMenuGroup extends React.Component {
             valueAttribute={1}
           />
 
-          <Container as="div" margin="small small small 0">
+          <View as="div" margin="small small small 0">
             <Button
               disabled={this.state.processing || this.noSelectMenuChanged()}
               id="apply_select_menus"
@@ -208,9 +208,9 @@ export default class SelectMenuGroup extends React.Component {
                 {I18n.t('Apply filters. Note: clicking this button will cause the page to reload.')}
               </ScreenReaderContent>
             </Button>
-          </Container>
-        </Container>
-      </Container>
+          </View>
+        </View>
+      </View>
     );
   }
 }

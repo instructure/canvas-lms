@@ -16,8 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* eslint-disable react/no-array-index-key */
+
 import React, {Component} from 'react'
-import {arrayOf, shape, string} from 'prop-types'
+import {arrayOf, bool, func, shape, string} from 'prop-types'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import I18n from 'i18n!assignment_grade_summary'
 
@@ -25,6 +28,10 @@ import GridRow from './GridRow'
 
 export default class Grid extends Component {
   static propTypes = {
+    disabledCustomGrade: bool.isRequired,
+    finalGrader: shape({
+      graderId: string.isRequired
+    }),
     graders: arrayOf(
       shape({
         graderName: string,
@@ -32,12 +39,20 @@ export default class Grid extends Component {
       })
     ).isRequired,
     grades: shape({}).isRequired,
+    horizontalScrollRef: func.isRequired,
+    onGradeSelect: func,
     rows: arrayOf(
       shape({
         studentId: string.isRequired,
         studentName: string.isRequired
       }).isRequired
-    ).isRequired
+    ).isRequired,
+    selectProvisionalGradeStatuses: shape({}).isRequired
+  }
+
+  static defaultProps = {
+    finalGrader: null,
+    onGradeSelect: null
   }
 
   shouldComponentUpdate(nextProps) {
@@ -46,32 +61,48 @@ export default class Grid extends Component {
 
   render() {
     return (
-      <div className="GradesGrid">
-        <table>
-          <thead className="GradesGrid__Header">
-            <tr className="GradesGrid__HeaderRow">
-              <th className="GradesGrid__StudentColumnHeader" scope="col">
+      <div className="GradesGrid" ref={this.props.horizontalScrollRef}>
+        <table role="table">
+          <caption>
+            {<ScreenReaderContent>{I18n.t('Grade Selection Table')}</ScreenReaderContent>}
+          </caption>
+
+          <thead>
+            <tr className="GradesGrid__HeaderRow" role="row">
+              <th className="GradesGrid__StudentColumnHeader" role="columnheader" scope="col">
                 <Text>{I18n.t('Student')}</Text>
               </th>
 
-              {this.props.graders.map((grader, index) => (
-                <th className="GradesGrid__GraderHeader" key={grader.graderId} scope="col">
-                  <Text>
-                    {grader.graderName ||
-                      I18n.t('Grader %{graderNumber}', {graderNumber: I18n.n(index + 1)})}
-                  </Text>
+              {this.props.graders.map(grader => (
+                <th
+                  className="GradesGrid__GraderHeader"
+                  key={grader.graderId}
+                  role="columnheader"
+                  scope="col"
+                >
+                  <Text>{grader.graderName}</Text>
                 </th>
               ))}
+
+              <th className="GradesGrid__FinalGradeHeader" role="columnheader" scope="col">
+                <Text>{I18n.t('Final Grade')}</Text>
+              </th>
             </tr>
           </thead>
 
-          <tbody className="GradesGrid__Body">
+          <tbody>
             {this.props.rows.map((row, index) => (
               <GridRow
+                disabledCustomGrade={this.props.disabledCustomGrade}
+                finalGrader={this.props.finalGrader}
                 graders={this.props.graders}
                 grades={this.props.grades[row.studentId]}
-                key={index}
+                key={index /* index used for performance reasons */}
+                onGradeSelect={this.props.onGradeSelect}
                 row={row}
+                selectProvisionalGradeStatus={
+                  this.props.selectProvisionalGradeStatuses[row.studentId]
+                }
               />
             ))}
           </tbody>

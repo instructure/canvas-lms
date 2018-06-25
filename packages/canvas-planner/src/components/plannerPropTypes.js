@@ -62,6 +62,12 @@ export const statusShape = PropTypes.oneOfType([
   })
 ]);
 
+export const feedbackShape = {
+  author_avatar_url: PropTypes.string,
+  author_name: PropTypes.string,
+  comment: PropTypes.string,
+};
+
 export default {
   badgeShape,
   userShape,
@@ -70,4 +76,5 @@ export default {
   opportunityShape,
   sizeShape,
   statusShape,
+  feedbackShape,
 };

@@ -66,7 +66,7 @@ class NumericInteraction < AssessmentItemConverter
         is_precision = false
         if (lower_node = or_node.at_css('and customOperator[class=vargt] baseValue')) &&
             (upper_node = or_node.at_css('and customOperator[class=varlte] baseValue')) &&
-            lower_node.text.end_with?("5") && upper_node.text.end_with?("5")
+            lower_node.text.gsub(/[0\.]/, "").end_with?("5") && upper_node.text.gsub(/[0\.]/, "").end_with?("5")
           # tl;dr - super hacky way to try to detect the precision answers
           upper = upper_node.text.to_d
           lower = lower_node.text.to_d

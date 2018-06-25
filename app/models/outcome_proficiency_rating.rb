@@ -20,7 +20,7 @@ class OutcomeProficiencyRating < ApplicationRecord
   belongs_to :outcome_proficiency, inverse_of: :outcome_proficiency_ratings
 
   validates :description, presence: true
-  validates :points, presence: true
+  validates :points, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :color, presence: true, format: /\A([A-Fa-f0-9]{6})\z/i
 
   def as_json(_options={})

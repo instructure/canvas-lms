@@ -20,7 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import I18n from 'i18n!rubrics'
-import IconTrash from 'instructure-icons/lib/Line/IconTrashLine'
+import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
 import Popover, {PopoverTrigger, PopoverContent} from '@instructure/ui-overlays/lib/components/Popover'
 import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
@@ -39,7 +39,8 @@ export default class ProficiencyRating extends React.Component {
     color: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
     descriptionError: PropTypes.string,
-    focusField: PropTypes.oneOf(['description', 'points']),
+    disableDelete: PropTypes.bool.isRequired,
+    focusField: PropTypes.oneOf(['description', 'points', 'mastery']),
     mastery: PropTypes.bool.isRequired,
     onColorChange: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
@@ -68,6 +69,12 @@ export default class ProficiencyRating extends React.Component {
       this.descriptionInput.focus()
     } else if (this.props.focusField === 'points') {
       this.pointsInput.focus()
+    }
+  }
+
+  componentDidMount() {
+    if (this.props.focusField === 'mastery') {
+      this.radioInput.focus()
     }
   }
 
@@ -116,21 +123,23 @@ export default class ProficiencyRating extends React.Component {
       color,
       description,
       descriptionError,
+      disableDelete,
       mastery,
       points,
       pointsError
     } = this.props
     return (
       <tr>
-        <td style={{textAlign: 'center'}}>
+        <td style={{textAlign: 'center', verticalAlign: 'top', padding: '1.1rem 0 0 0'}}>
           <div style={{display: 'inline-block'}}>
             <RadioInput
+              ref={(input) => { this.radioInput = input }}
               label={<ScreenReaderContent>{I18n.t('Change mastery')}</ScreenReaderContent>}
               checked={mastery}
               onChange={this.handleMasteryChange} />
           </div>
         </td>
-        <td className="description">
+        <td className="description" style={{verticalAlign: 'top'}}>
           <TextInput
             ref={this.setDescriptionRef}
             label={<ScreenReaderContent>{I18n.t('Change description')}</ScreenReaderContent>}
@@ -139,7 +148,7 @@ export default class ProficiencyRating extends React.Component {
             defaultValue={description}
           />
         </td>
-        <td className="points">
+        <td className="points" style={{verticalAlign: 'top'}}>
           <TextInput
             ref={this.setPointsRef}
             label={<ScreenReaderContent>{I18n.t('Change points')}</ScreenReaderContent>}
@@ -149,7 +158,7 @@ export default class ProficiencyRating extends React.Component {
             width="4rem"
           />
         </td>
-        <td className="color">
+        <td className="color" style={{verticalAlign: 'top'}}>
           <Popover
             on="click"
             show={this.state.showColorPopover}
@@ -157,7 +166,7 @@ export default class ProficiencyRating extends React.Component {
             <PopoverTrigger>
               <Button variant="link">
                 <div>
-                  <span className="colorPickerIcon" style={{background: color}} />
+                  <span className="colorPickerIcon" style={{background: formatColor(color)}} />
                   {I18n.t('Change')}
                 </div>
               </Button>
@@ -166,7 +175,7 @@ export default class ProficiencyRating extends React.Component {
               <ColorPicker
                 parentComponent="ProficiencyRating"
                 colors={PREDEFINED_COLORS}
-                currentColor={color}
+                currentColor={formatColor(color)}
                 isOpen
                 hidePrompt
                 nonModal
@@ -182,7 +191,7 @@ export default class ProficiencyRating extends React.Component {
             </PopoverContent>
           </Popover>
           <div className="delete">
-            <Button variant="icon" onClick={this.handleDelete}>
+            <Button variant="icon" onClick={this.handleDelete} disabled={disableDelete}>
               <IconTrash title={I18n.t('Delete proficiency rating')} />
             </Button>
           </div>

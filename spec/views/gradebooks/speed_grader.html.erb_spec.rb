@@ -44,6 +44,9 @@ describe "/gradebooks/speed_grader" do
     assign(:submissions, [])
     assign(:assessments, [])
     assign(:body_classes, [])
+
+    teacher_in_course(active_all: true)
+    assign(:current_user, @teacher)
   end
 
   it "should render" do
@@ -134,6 +137,36 @@ describe "/gradebooks/speed_grader" do
       checkbox = html.css('#submission_group_comment')
       expect(checkbox.attr('checked').value).to eq 'checked'
       expect(checkbox.attr('style').value).to include('display:none')
+    end
+  end
+
+  context 'grading box' do
+    before(:once) do
+    end
+
+    let(:html) do
+      render template: 'gradebooks/speed_grader', locals: locals
+      Nokogiri::HTML.fragment(response.body)
+    end
+
+    it 'renders the possible points for a points-based assignment' do
+      @assignment.update!(grading_type: 'points', points_possible: 999)
+      expect(html.at_css('#grading-box-points-possible').text).to include('out of 999')
+    end
+
+    it 'renders rounded possible points for a non-GPA-scale-based assignment' do
+      @assignment.update!(grading_type: 'percent', points_possible: 999)
+      expect(html.at_css('#grading-box-points-possible').text).to include('/ 999')
+    end
+
+    it 'renders a placeholder for the submission score for a non-points and non-GPA-scale-based assignment' do
+      @assignment.update!(grading_type: 'percent', points_possible: 999)
+      expect(html.at_css('#grading-box-points-possible .score')).to be_present
+    end
+
+    it 'does not render a placeholder for the submission score for a GPA-scale-based assignment' do
+      @assignment.update!(grading_type: 'gpa_scale', points_possible: 999)
+      expect(html.at_css('#grading-box-points-possible .score')).not_to be_present
     end
   end
 end

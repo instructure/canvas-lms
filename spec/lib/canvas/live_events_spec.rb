@@ -92,6 +92,13 @@ describe Canvas::LiveEvents do
         }
       )
     end
+
+    it 'omits root_account fields in user context' do
+      LiveEvents.set_context(nil)
+      user = user_model
+      amended_context = Canvas::LiveEvents.amended_context(user)
+      expect(amended_context).to eq({context_id: user.global_id, context_type: 'User'})
+    end
   end
 
   describe ".enrollment_updated" do

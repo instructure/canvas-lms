@@ -18,8 +18,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import View from '@instructure/ui-layout/lib/components/View';
-import Spinner from '@instructure/ui-core/lib/components/Spinner';
-import Text from '@instructure/ui-core/lib/components/Text';
+import Spinner from '@instructure/ui-elements/lib/components/Spinner';
+import Text from '@instructure/ui-elements/lib/components/Text';
 import ErrorAlert from '../ErrorAlert';
 import formatMessage from '../../format-message';
 import TV from './tv.svg';

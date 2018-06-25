@@ -23,7 +23,7 @@ import { rubrics, assessments } from './fixtures'
 
 const criteriaTypes = ['custom', 'outcome']
 
-const subComponents = ['Threshold', 'Comments', 'OutcomeIcon', 'LongDescription', 'LongDescriptionDialog']
+const subComponents = ['Threshold', 'OutcomeIcon', 'LongDescription', 'LongDescriptionDialog']
 
 _.toPairs(rubrics).forEach(([key, rubric]) => {
   const assessment = assessments[key]
@@ -52,35 +52,33 @@ _.toPairs(rubrics).forEach(([key, rubric]) => {
       }
 
       describe(`with a ${criteriaType} criterion`, () => {
-        testRenderedSnapshots(basicProps)
-      })
+        describe('by default', () => {
+          testRenderedSnapshots(basicProps)
+        })
 
-      describe(`when assessing with a ${criteriaType} criterion`, () => {
-        testRenderedSnapshots({ ...basicProps, onAssessmentChange: () => {}})
+        describe('when assessing', () => {
+          testRenderedSnapshots({ ...basicProps, onAssessmentChange: () => {}})
+        })
+
+        describe('without an assessment', () => {
+          testRenderedSnapshots({ ...basicProps, assessment: undefined})
+        })
       })
     })
   })
 })
 
 describe('Criterion', () => {
-  it('directly renders comments_html', () => {
-    const component = shallow(
-      <Criterion
-        assessment={assessments.freeForm.data[1]}
-        criterion={rubrics.freeForm.criteria[1]}
-        freeForm
-      />
-    )
-
-    const el = component.find('Comments').shallow().findWhere((e) => e.children().length === 0)
-    expect(el.html()).toMatchSnapshot()
-  })
-
   it('can open and close the long description dialog', () => {
+    const criterion = {
+      ...rubrics.freeForm.criteria[1],
+      long_description: '<p> a wild paragraph appears </p>'
+    }
+
     const component = (
       <Criterion
         assessment={assessments.freeForm.data[1]}
-        criterion={rubrics.freeForm.criteria[1]}
+        criterion={criterion}
         freeForm
       />
     )
@@ -92,7 +90,100 @@ describe('Criterion', () => {
     expectState(false)
     render.find('LongDescription').prop('showLongDescription')()
     expectState(true)
-    render.find('LongDescriptionDialog').prop('close')()
+    const dialog = render.find('LongDescriptionDialog')
+    expect(dialog.shallow().find('div').html()).toMatchSnapshot()
+    dialog.prop('close')()
     expectState(false)
+  })
+
+  it('only shows instructor comments in sidebar when relevant', () => {
+    // in particular, we only show the comment sidebar when:
+    // - there are comments
+    // - the rubric is not free-form
+    // - we are not assessing the rubric
+    // - the rubric is not in summary mode
+    const comments = (changes) => shallow(
+      <Criterion
+        assessment={assessments.points.data[1]}
+        criterion={rubrics.points.criteria[1]}
+        freeForm={false}
+        {...changes}
+      />
+    ).find('CommentText')
+
+    expect(comments()).toHaveLength(1)
+    const noComments = { ...assessments.points.data[1], comments: undefined }
+    expect(comments({ assessment: noComments })).toHaveLength(0)
+    expect(comments({ freeForm: true })).toHaveLength(0)
+    expect(comments({ onAssessmentChange: () => {} })).toHaveLength(0)
+    expect(comments({ isSummary: true })).toHaveLength(0)
+  })
+
+  it('does not have a points column when hasPointsColumn is false', () => {
+    const el = shallow(
+      <Criterion
+        assessment={assessments.points.data[1]}
+        criterion={rubrics.points.criteria[1]}
+        freeForm={false}
+        hasPointsColumn={false}
+      />
+    )
+
+    expect(el.find('td')).toHaveLength(1)
+  })
+
+  it('allows extra credit for outcomes when enabled', () => {
+    const el = shallow(
+      <Criterion
+        allowExtraCredit
+        assessment={assessments.points.data[1]}
+        criterion={rubrics.points.criteria[1]}
+        freeForm={false}
+        onAssessmentChange={() => {}}
+      />
+    )
+
+    expect(el.find('Points').prop('allowExtraCredit')).toEqual(true)
+  })
+
+  describe('the Points for a criterion', () => {
+    const points = (props) => shallow(
+      <Criterion
+        assessment={assessments.points.data[1]}
+        freeForm={false}
+        {...props}
+      />
+    ).find('Points')
+
+    const criterion = rubrics.points.criteria[1]
+    it('are visible by default', () => {
+      expect(points({ criterion })).toHaveLength(1)
+    })
+
+    it('are hidden when hidePoints is true', () => {
+      expect(points({ criterion, hidePoints: true })).toHaveLength(0)
+    })
+
+    describe('when ignore_for_scoring is set', () => {
+      const ignoredPoints = (props) => points({
+        criterion: {
+          ...rubrics.points.criteria[1],
+          ignore_for_scoring: true
+        },
+        ...props
+      })
+
+      it('are not shown by default', () =>
+        expect(ignoredPoints()).toHaveLength(0)
+      )
+
+      it('are not shown in summary mode', () =>
+        expect(ignoredPoints({ isSummary: true })).toHaveLength(0)
+      )
+
+      it('are not shown when assessing', () => {
+        expect(ignoredPoints({ onAssessmentChange: () => {} })).toHaveLength(0)
+      })
+    })
   })
 })

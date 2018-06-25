@@ -84,8 +84,9 @@ describe "speed grader - discussion submissions" do
     it "hides the name of student on discussion iframe", priority: "2", test_id: 283746 do
       Speedgrader.visit(@course.id, @assignment.id)
 
-      f("#settings_link").click
-      f('#hide_student_names').click
+      Speedgrader.click_settings_link
+      Speedgrader.click_options_link
+      Speedgrader.select_hide_student_names
       expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
 
       # check for correct submissions in speed grader iframe
@@ -106,8 +107,9 @@ describe "speed grader - discussion submissions" do
 
       Speedgrader.visit(@course.id, @assignment.id)
 
-      f("#settings_link").click
-      f('#hide_student_names').click
+      Speedgrader.click_settings_link
+      Speedgrader.click_options_link
+      Speedgrader.select_hide_student_names
       expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
 
       # check for correct submissions in speed grader iframe
@@ -126,8 +128,9 @@ describe "speed grader - discussion submissions" do
     it "hides avatars on entries on both discussion links", priority: "2", test_id: 283748 do
       Speedgrader.visit(@course.id, @assignment.id)
 
-      f("#settings_link").click
-      f('#hide_student_names').click
+      Speedgrader.click_settings_link
+      Speedgrader.click_options_link
+      Speedgrader.select_hide_student_names
       expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
 
       # check for correct submissions in speed grader iframe

@@ -19,6 +19,7 @@ import React from 'react'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import Table from '@instructure/ui-elements/lib/components/Table'
+import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
 import I18n from 'i18n!edit_rubric'
 
 import Criterion from './Criterion'
@@ -36,40 +37,74 @@ const totalAssessingString = (score, possible) =>
     possible: I18n.toNumber(possible, { precision: 1 })
   })
 
-const Rubric = ({ onAssessmentChange, rubric, rubricAssessment, rubricAssociation }) => {
+const Rubric = (props) => {
+  const {
+    allowExtraCredit,
+    customRatings,
+    onAssessmentChange,
+    rubric,
+    rubricAssessment,
+    rubricAssociation,
+    isSummary
+  } = props
   const assessing = onAssessmentChange !== null
   const priorData = _.get(rubricAssessment, 'data', [])
   const byCriteria = _.keyBy(priorData, (ra) => ra.criterion_id)
+  const criteriaById = _.keyBy(rubric.criteria, (c) => c.id)
   const allComments = _.get(rubricAssociation, 'summary_data.saved_comments', {})
+  const hidePoints = _.get(rubricAssociation, 'hide_points', false)
+  const freeForm = rubric.free_form_criterion_comments
+
   const onCriteriaChange = (id) => (update) => {
     const data = priorData.map((prior) => (
       prior.criterion_id === id ? { ...prior, ...update } : prior
     ))
+
+    const ignore = (c) => _.isUndefined(c) ? true : c.ignore_for_scoring
+    const points = data
+      .filter((result) => !ignore(criteriaById[result.criterion_id]))
+      .map((result) => result.points !== null ? result.points : 0)
+
     onAssessmentChange({
       ...rubricAssessment,
       data,
-      score: _.sum(data.map((result) => result.points !== null ? result.points : 0))
+      score: _.sum(points)
     })
   }
+
+  // we show the last column for points or comments button
+  const showPointsColumn = () => {
+    if (isSummary) { return false }
+    if (!hidePoints) { return true }
+    if (assessing && !freeForm) { return true } // comments button
+    return false
+  }
+
   const criteria = rubric.criteria.map((criterion) => {
     const assessment = byCriteria[criterion.id]
     return (
       <Criterion
+        allowExtraCredit={allowExtraCredit}
         key={criterion.id}
         assessment={assessment}
         criterion={criterion}
-        freeForm={rubric.free_form_criterion_comments}
+        customRatings={customRatings}
+        freeForm={freeForm}
+        isSummary={isSummary}
         onAssessmentChange={assessing ? onCriteriaChange(criterion.id) : undefined}
         savedComments={allComments[criterion.id]}
+        hidePoints={hidePoints}
+        hasPointsColumn={showPointsColumn()}
       />
     )
   })
 
   const possible = rubric.points_possible
-  const points = rubricAssessment.score
+  const points = _.get(rubricAssessment, 'score', possible)
   const total = assessing ? totalAssessingString(points, possible) : totalString(points)
-  const hideScore = _.get(rubricAssociation, 'hide_score_total') === true
+  const hideScoreTotal = _.get(rubricAssociation, 'hide_score_total') === true
   const noScore = _.get(rubricAssociation, 'score') === null
+  const showTotalPoints = !hidePoints && !hideScoreTotal
 
   return (
     <div className="react-rubric">
@@ -78,31 +113,51 @@ const Rubric = ({ onAssessmentChange, rubric, rubricAssessment, rubricAssociatio
           <tr>
             <th scope="col">{I18n.t('Criteria')}</th>
             <th scope="col">{I18n.t('Ratings')}</th>
-            <th scope="col">{I18n.t('Pts')}</th>
+            {
+              showPointsColumn() && (
+                <th scope="col">{I18n.t('Pts')}</th>
+              )
+            }
           </tr>
         </thead>
         <tbody className="criterions">
           {criteria}
-          <tr>
-            <td colSpan="3" className="total-points">
-              {hideScore || noScore ? null : total}
-            </td>
-          </tr>
+          { showTotalPoints && (
+            <tr>
+              <td colSpan="3">
+                <Flex justifyItems="end">
+                  <FlexItem>
+                    {hideScoreTotal || noScore ? null : total}
+                  </FlexItem>
+                </Flex>
+              </td>
+            </tr>
+          )}
         </tbody>
       </Table>
     </div>
   )
 }
 Rubric.propTypes = {
+  allowExtraCredit: PropTypes.bool,
+  customRatings: PropTypes.arrayOf(PropTypes.object),
   onAssessmentChange: PropTypes.func,
   rubric: PropTypes.shape(rubricShape).isRequired,
-  rubricAssessment: PropTypes.shape(rubricAssessmentShape),
-  rubricAssociation: PropTypes.shape(rubricAssociationShape)
+  rubricAssessment: (props) => {
+    const shape = PropTypes.shape(rubricAssessmentShape)
+    const rubricAssessment = props.onAssessmentChange ? shape.isRequired : shape
+    return PropTypes.checkPropTypes({ rubricAssessment }, props, 'prop', 'Rubric')
+  },
+  rubricAssociation: PropTypes.shape(rubricAssociationShape),
+  isSummary: PropTypes.bool
 }
 Rubric.defaultProps = {
+  allowExtraCredit: false,
+  customRatings: [],
   onAssessmentChange: null,
   rubricAssessment: null,
-  rubricAssociation: {}
+  rubricAssociation: {},
+  isSummary: false
 }
 
 export default Rubric

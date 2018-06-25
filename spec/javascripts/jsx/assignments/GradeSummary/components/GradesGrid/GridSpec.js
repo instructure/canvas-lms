@@ -20,6 +20,8 @@ import React from 'react'
 import {mount} from 'enzyme'
 
 import Grid from 'jsx/assignments/GradeSummary/components/GradesGrid/Grid'
+import GridRow from 'jsx/assignments/GradeSummary/components/GradesGrid/GridRow'
+import {STARTED, SUCCESS} from 'jsx/assignments/GradeSummary/grades/GradeActions'
 
 QUnit.module('GradeSummary Grid', suiteHooks => {
   let props
@@ -27,10 +29,16 @@ QUnit.module('GradeSummary Grid', suiteHooks => {
 
   suiteHooks.beforeEach(() => {
     props = {
+      disabledCustomGrade: false,
+      finalGrader: {
+        graderId: 'teach',
+        id: '1105'
+      },
       graders: [
         {graderId: '1101', graderName: 'Miss Frizzle'},
         {graderId: '1102', graderName: 'Mr. Keating'}
       ],
+
       grades: {
         1111: {
           1101: {
@@ -71,12 +79,19 @@ QUnit.module('GradeSummary Grid', suiteHooks => {
           }
         }
       },
+
+      horizontalScrollRef: sinon.spy(),
+      onGradeSelect() {},
       rows: [
         {studentId: '1111', studentName: 'Adam Jones'},
         {studentId: '1112', studentName: 'Betty Ford'},
         {studentId: '1113', studentName: 'Charlie Xi'},
         {studentId: '1114', studentName: 'Dana Smith'}
-      ]
+      ],
+      selectProvisionalGradeStatuses: {
+        1111: SUCCESS,
+        1112: STARTED
+      }
     }
   })
 
@@ -88,9 +103,19 @@ QUnit.module('GradeSummary Grid', suiteHooks => {
     wrapper = mount(<Grid {...props} />)
   }
 
+  test('includes a column header for the student name column', () => {
+    mountComponent()
+    strictEqual(wrapper.find('th.GradesGrid__StudentColumnHeader').length, 1)
+  })
+
   test('includes a column header for each grader', () => {
     mountComponent()
     strictEqual(wrapper.find('th.GradesGrid__GraderHeader').length, 2)
+  })
+
+  test('includes a column header for the final grade column', () => {
+    mountComponent()
+    strictEqual(wrapper.find('th.GradesGrid__FinalGradeHeader').length, 1)
   })
 
   test('displays the grader names in the column headers', () => {
@@ -99,35 +124,60 @@ QUnit.module('GradeSummary Grid', suiteHooks => {
     deepEqual(headers.map(header => header.text()), ['Miss Frizzle', 'Mr. Keating'])
   })
 
-  test('enumerates graders for names when graders are anonymous', () => {
-    props.graders[0].graderName = null
-    props.graders[1].graderName = null
-    mountComponent()
-    const headers = wrapper.find('th.GradesGrid__GraderHeader')
-    deepEqual(headers.map(header => header.text()), ['Grader 1', 'Grader 2'])
-  })
-
   test('includes a GridRow for each student', () => {
     mountComponent()
-    strictEqual(wrapper.find('GridRow').length, 4)
+    strictEqual(wrapper.find(GridRow).length, 4)
+  })
+
+  test('sends disabledCustomGrade to each GridRow', () => {
+    mountComponent()
+    wrapper.find(GridRow).forEach(gridRow => {
+      strictEqual(gridRow.prop('disabledCustomGrade'), false)
+    })
+  })
+
+  test('sends finalGrader to each GridRow', () => {
+    mountComponent()
+    wrapper.find(GridRow).forEach(gridRow => {
+      strictEqual(gridRow.prop('finalGrader'), props.finalGrader)
+    })
   })
 
   test('sends graders to each GridRow', () => {
     mountComponent()
-    wrapper.find('GridRow').forEach(gridRow => {
+    wrapper.find(GridRow).forEach(gridRow => {
       strictEqual(gridRow.prop('graders'), props.graders)
+    })
+  })
+
+  test('sends onGradeSelect to each GridRow', () => {
+    mountComponent()
+    wrapper.find(GridRow).forEach(gridRow => {
+      strictEqual(gridRow.prop('onGradeSelect'), props.onGradeSelect)
     })
   })
 
   test('sends student-specific grades to each GridRow', () => {
     mountComponent()
-    const gridRow = wrapper.find('GridRow').at(1)
+    const gridRow = wrapper.find(GridRow).at(1)
     strictEqual(gridRow.prop('grades'), props.grades[1112])
+  })
+
+  test('sends student-specific select provisional grade statuses to each GridRow', () => {
+    mountComponent()
+    const gridRow = wrapper.find(GridRow).at(1)
+    strictEqual(gridRow.prop('selectProvisionalGradeStatus'), STARTED)
   })
 
   test('sends the related row to each GridRow', () => {
     mountComponent()
-    const gridRow = wrapper.find('GridRow').at(1)
+    const gridRow = wrapper.find(GridRow).at(1)
     strictEqual(gridRow.prop('row'), props.rows[1])
+  })
+
+  test('binds the GradesGrid container using the horizontalScrollRef prop', () => {
+    mountComponent()
+    const [ref] = props.horizontalScrollRef.lastCall.args
+    strictEqual(ref, wrapper.find('.GradesGrid').get(0))
   })
 })

@@ -23,6 +23,7 @@ import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleDetails'
+import View from '@instructure/ui-layout/lib/components/View'
 import DeveloperKeyScopesMethod from './ScopesMethod'
 import DeveloperKeyScope from './Scope'
 
@@ -127,7 +128,11 @@ export default class DeveloperKeyScopesGroup extends React.Component {
 
   render() {
     return (
-      <div className="scopes-group">
+      <View
+        as="div"
+        borderWidth="none none small none"
+        data-automation="scopes-group"
+      >
         <Flex alignItems="start" padding="small none small small">
         <FlexItem padding="none small none none">
             <Checkbox
@@ -142,7 +147,7 @@ export default class DeveloperKeyScopesGroup extends React.Component {
             />
           </FlexItem>
           <FlexItem grow padding="none small none none">
-            <div className="toggle-scope-group">
+            <div data-automation="toggle-scope-group">
               <ToggleDetails summary={this.groupSummary()} fluidWidth>
                 {this.props.scopes.map(scope => (
                   <DeveloperKeyScope
@@ -156,7 +161,7 @@ export default class DeveloperKeyScopesGroup extends React.Component {
             </div>
           </FlexItem>
         </Flex>
-      </div>
+      </View>
     )
   }
 }

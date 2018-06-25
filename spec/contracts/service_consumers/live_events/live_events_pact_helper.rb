@@ -17,7 +17,7 @@
 #
 
 require 'pact/messages'
-require_relative '../../pact_config'
+require_relative '../pact_config'
 require_relative '../../../spec_helper'
 
 Pact::Messages.pact_broker_url = PactConfig.broker_uri

@@ -20,9 +20,12 @@ module AttachmentHelper
   # returns a string of html attributes suitable for use with $.loadDocPreview
   def doc_preview_attributes(attachment, attrs={})
     url_opts = {
-      moderated_grading_whitelist: attrs[:moderated_grading_whitelist],
-      enable_annotations: attrs.delete(:enable_annotations)
+      anonymous_instructor_annotations: attrs.delete(:anonymous_instructor_annotations),
+      enable_annotations: attrs.delete(:enable_annotations),
+      moderated_grading_whitelist: attrs[:moderated_grading_whitelist]
     }
+    url_opts[:enrollment_type] = attrs.delete(:enrollment_type) if url_opts[:enable_annotations]
+
     if attachment.crocodoc_available?
       begin
         attrs[:crocodoc_session_url] = attachment.crocodoc_url(@current_user, url_opts)

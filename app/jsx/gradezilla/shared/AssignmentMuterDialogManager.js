@@ -19,11 +19,10 @@
 import AssignmentMuter from 'compiled/AssignmentMuter'
 
 export default class AssignmentMuterDialogManager {
-  constructor(assignment, url, submissionsLoaded, anonymousModeratedMarkingEnabled) {
+  constructor(assignment, url, submissionsLoaded) {
     this.assignment = assignment
     this.url = url
     this.submissionsLoaded = submissionsLoaded
-    this.anonymousModeratedMarkingEnabled = anonymousModeratedMarkingEnabled
 
     this.showDialog = this.showDialog.bind(this)
     this.isDialogEnabled = this.isDialogEnabled.bind(this)
@@ -41,11 +40,7 @@ export default class AssignmentMuterDialogManager {
       return false
     }
 
-    if (
-      this.assignment.muted &&
-      this.anonymousModeratedMarkingEnabled &&
-      this.assignment.moderated_grading
-    ) {
+    if (this.assignment.muted && this.assignment.moderated_grading) {
       return this.assignment.grades_published
     }
 

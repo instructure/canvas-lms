@@ -183,7 +183,7 @@ describe Assignment do
         assignment = @course.assignments.new(assignment_valid_attributes)
         expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
 
-        assignment.update!(moderated_grading: !assignment.moderated_grading)
+        assignment.update!(moderated_grading: !assignment.moderated_grading, grader_count: 2)
       end
 
       it 'invokes DueDateCacher if called in a before_save context' do
@@ -244,40 +244,23 @@ describe Assignment do
       )
     end
 
-    context 'when Anonymous Moderated Marking is enabled' do
-      before(:once) do
-        @course.root_account.enable_feature!(:anonymous_moderated_marking)
-      end
-
-      it 'returns false if the user is not the final grader and not an admin' do
-        assistant = User.create!
-        @course.enroll_ta(assistant, enrollment_state: 'active')
-        expect(@assignment.permits_moderation?(assistant)).to be false
-      end
-
-      it 'returns true if the user is the final grader' do
-        expect(@assignment.permits_moderation?(@teacher)).to be true
-      end
-
-      it 'returns true if the user is an admin with "select final grader for moderation" privileges' do
-        expect(@assignment.permits_moderation?(account_admin_user)).to be true
-      end
-
-      it 'returns false if the user is an admin without "select final grader for moderation" privileges' do
-        @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :select_final_grade)
-        expect(@assignment.permits_moderation?(account_admin_user)).to be false
-      end
+    it 'returns false if the user is not the final grader and not an admin' do
+      assistant = User.create!
+      @course.enroll_ta(assistant, enrollment_state: 'active')
+      expect(@assignment.permits_moderation?(assistant)).to be false
     end
 
-    context 'when Anonymous Moderated Marking is disabled' do
-      it 'returns true if the user has moderate grades privileges' do
-        expect(@assignment.permits_moderation?(@teacher)).to be true
-      end
+    it 'returns true if the user is the final grader' do
+      expect(@assignment.permits_moderation?(@teacher)).to be true
+    end
 
-      it 'returns false if the user does not have moderate grades privileges' do
-        @course.root_account.role_overrides.create!(permission: 'moderate_grades', enabled: false, role: teacher_role)
-        expect(@assignment.permits_moderation?(@teacher)).to be false
-      end
+    it 'returns true if the user is an admin with "select final grader for moderation" privileges' do
+      expect(@assignment.permits_moderation?(account_admin_user)).to be true
+    end
+
+    it 'returns false if the user is an admin without "select final grader for moderation" privileges' do
+      @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :select_final_grade)
+      expect(@assignment.permits_moderation?(account_admin_user)).to be false
     end
   end
 
@@ -314,9 +297,8 @@ describe Assignment do
       end
     end
 
-    context 'when Anonymous Moderated Marking is enabled' do
+    context 'when the assignment is anonymously graded' do
       before(:once) do
-        @course.root_account.enable_feature!(:anonymous_moderated_marking)
         assignment.update!(anonymous_grading: true)
       end
 
@@ -521,10 +503,6 @@ describe Assignment do
         end
       end
     end
-
-    context 'when Anonymous Moderated Marking is disabled' do
-      it_behaves_like "grader anonymity does not apply"
-    end
   end
 
   describe '#can_view_other_grader_comments?' do
@@ -560,75 +538,57 @@ describe Assignment do
       end
     end
 
-    context 'when Anonymous Moderated Marking is enabled' do
-      before(:once) do
-        @course.root_account.enable_feature!(:anonymous_moderated_marking)
+    context 'when the assignment is not moderated' do
+      before :once do
+        assignment.update!(moderated_grading: false)
       end
 
-      context 'when the assignment is not moderated' do
-        before :once do
-          assignment.update!(moderated_grading: false)
-        end
+      it_behaves_like "grader comment hiding does not apply"
+    end
 
-        it_behaves_like "grader comment hiding does not apply"
+    context 'when grader comments are visible to other graders' do
+      before :once do
+        assignment.update!(
+          grader_comments_visible_to_graders: true,
+          grader_names_visible_to_final_grader: true
+        )
       end
 
-      context 'when the assignment is not anonymously graded' do
-        before :once do
-          assignment.update!(anonymous_grading: false)
-        end
+      it_behaves_like "grader comment hiding does not apply"
 
-        it_behaves_like "grader comment hiding does not apply"
+      it 'returns true when the user is not the final grader and not an admin' do
+        expect(assignment.can_view_other_grader_comments?(ta)).to be true
       end
 
-      context 'when grader comments are visible to other graders' do
-        before :once do
-          assignment.update!(
-            grader_comments_visible_to_graders: true,
-            grader_names_visible_to_final_grader: true
-          )
-        end
-
-        it_behaves_like "grader comment hiding does not apply"
-
-        it 'returns true when the user is not the final grader and not an admin' do
-          expect(assignment.can_view_other_grader_comments?(ta)).to be true
-        end
-
-        it 'returns true when the user is the final grader' do
-          expect(assignment.can_view_other_grader_comments?(@teacher)).to be true
-        end
-
-        it 'returns true when the user is an admin' do
-          expect(assignment.can_view_other_grader_comments?(admin)).to be true
-        end
+      it 'returns true when the user is the final grader' do
+        expect(assignment.can_view_other_grader_comments?(@teacher)).to be true
       end
 
-      context 'when grader comments are hidden to other graders' do
-        before :once do
-          assignment.update!(
-            grader_comments_visible_to_graders: false,
-            grader_names_visible_to_final_grader: true
-          )
-        end
-
-        it 'returns false when the user is not the final grader and not an admin' do
-          expect(assignment.can_view_other_grader_comments?(ta)).to be false
-        end
-
-        it 'returns true when the user is the final grader' do
-          # The final grader must always be able to see grader comments.
-          expect(assignment.can_view_other_grader_comments?(@teacher)).to be true
-        end
-
-        it 'returns true when the user is an admin' do
-          expect(assignment.can_view_other_grader_comments?(admin)).to be true
-        end
+      it 'returns true when the user is an admin' do
+        expect(assignment.can_view_other_grader_comments?(admin)).to be true
       end
     end
 
-    context 'when Anonymous Moderated Marking is disabled' do
-      it_behaves_like "grader comment hiding does not apply"
+    context 'when grader comments are hidden to other graders' do
+      before :once do
+        assignment.update!(
+          grader_comments_visible_to_graders: false,
+          grader_names_visible_to_final_grader: true
+        )
+      end
+
+      it 'returns false when the user is not the final grader and not an admin' do
+        expect(assignment.can_view_other_grader_comments?(ta)).to be false
+      end
+
+      it 'returns true when the user is the final grader' do
+        # The final grader must always be able to see grader comments.
+        expect(assignment.can_view_other_grader_comments?(@teacher)).to be true
+      end
+
+      it 'returns true when the user is an admin' do
+        expect(assignment.can_view_other_grader_comments?(admin)).to be true
+      end
     end
   end
 
@@ -665,32 +625,22 @@ describe Assignment do
       end
     end
 
-    context 'when Anonymous Moderated Marking is enabled' do
-      before(:once) do
-        @course.root_account.enable_feature!(:anonymous_moderated_marking)
+    context 'when the assignment is not anonymously graded' do
+      before :once do
+        assignment.update!(anonymous_grading: false)
       end
 
-      context 'when the assignment is not anonymously graded' do
-        before :once do
-          assignment.update!(anonymous_grading: false)
-        end
-
-        it_behaves_like "student anonymity does not apply"
-      end
-
-      context 'when the assignment is anonymously graded' do
-        it 'returns false when the user is not an admin' do
-          expect(assignment.can_view_student_names?(@teacher)).to be false
-        end
-
-        it 'returns false when the user is an admin' do
-          expect(assignment.can_view_student_names?(admin)).to be false
-        end
-      end
+      it_behaves_like "student anonymity does not apply"
     end
 
-    context 'when Anonymous Moderated Marking is disabled' do
-      it_behaves_like "student anonymity does not apply"
+    context 'when the assignment is anonymously graded' do
+      it 'returns false when the user is not an admin' do
+        expect(assignment.can_view_student_names?(@teacher)).to be false
+      end
+
+      it 'returns false when the user is an admin' do
+        expect(assignment.can_view_student_names?(admin)).to be false
+      end
     end
   end
 
@@ -1388,9 +1338,8 @@ describe Assignment do
       end
     end
 
-    context 'for a moderated assignment with Anonymous Moderated Marking enabled' do
+    context 'for a moderated assignment' do
       before(:once) do
-        @course.root_account.enable_feature!(:anonymous_moderated_marking)
         student_in_course
         teacher_in_course
         @first_teacher = @teacher
@@ -1623,10 +1572,8 @@ describe Assignment do
       expect(comment).not_to be_hidden
     end
 
-    context 'for moderated assignments with Anonymous Moderated Marking enabled' do
+    context 'for moderated assignments' do
       before(:once) do
-        @assignment.root_account.enable_feature!(:anonymous_moderated_marking)
-
         teacher_in_course
         @first_teacher = @teacher
 
@@ -2288,56 +2235,48 @@ describe Assignment do
       expect(@assignment.muted?).to eql false
     end
 
-    context 'when Anonymous Moderated Marking is enabled' do
-      before(:once) do
-        @course.root_account.enable_feature!(:anonymous_moderated_marking)
-      end
+    it 'does not mute non-anonymous, non-moderated assignments when created' do
+      assignment = @course.assignments.create!
+      expect(assignment).not_to be_muted
+    end
 
-      it 'does not mute non-anonymous, non-moderated assignments when created' do
-        assignment = @course.assignments.create!
-        expect(assignment).not_to be_muted
-      end
+    it 'mutes anonymous assignments when created' do
+      assignment = @course.assignments.create!(anonymous_grading: true)
+      expect(assignment).to be_muted
+    end
 
-      it 'mutes anonymous assignments when created' do
-        assignment = @course.assignments.create!(anonymous_grading: true)
-        expect(assignment).to be_muted
-      end
+    it 'mutes moderated assignments when created' do
+      assignment = @course.assignments.create!(moderated_grading: true, grader_count: 1)
+      expect(assignment).to be_muted
+    end
 
-      it 'mutes moderated assignments when created' do
-        assignment = @course.assignments.create!(moderated_grading: true, grader_count: 1)
-        expect(assignment).to be_muted
-      end
+    it 'mutes assignments when they are update from non-anonymous to anonymous' do
+      assignment = @course.assignments.create!
+      expect { assignment.update!(anonymous_grading: true) }.to change {
+        assignment.muted?
+      }.from(false).to(true)
+    end
 
-      it 'mutes assignments when they are update from non-anonymous to anonymous' do
-        assignment = @course.assignments.create!
-        expect { assignment.update!(anonymous_grading: true) }.to change {
-          assignment.muted?
-        }.from(false).to(true)
-      end
-
-      it 'does not mute assignments when they are updated from anonymous to non-anonymous' do
-        assignment = @course.assignments.create!(anonymous_grading: true)
-        assignment.update!(muted: false)
-        expect { assignment.update!(anonymous_grading: false) }.not_to change {
-          assignment.muted?
-        }.from(false)
-      end
+    it 'does not mute assignments when they are updated from anonymous to non-anonymous' do
+      assignment = @course.assignments.create!(anonymous_grading: true)
+      assignment.update!(muted: false)
+      expect { assignment.update!(anonymous_grading: false) }.not_to change {
+        assignment.muted?
+      }.from(false)
     end
   end
 
   describe "#unmute!" do
     before :once do
       @assignment = assignment_model(course: @course)
-      @course.enable_feature! :anonymous_grading
     end
 
     it "returns falsey when assignment is not muted" do
       expect(@assignment.unmute!).to be_falsey
     end
 
-    context "when Anonymous Moderated Marking is enabled and assignment is anonymously graded" do
+    context "when assignment is anonymously graded" do
       before :once do
-        @course.root_account.enable_feature! :anonymous_moderated_marking
         @assignment.update_attributes(moderated_grading: true, anonymous_grading: true, grader_count: 1)
         @assignment.mute!
       end
@@ -2374,9 +2313,8 @@ describe Assignment do
       end
     end
 
-    context "when Anonymous Moderated Marking is enabled and assignment is anonymously graded and not moderated" do
+    context "when assignment is anonymously graded and not moderated" do
       before :once do
-        @course.account.enable_feature! :anonymous_moderated_marking
         @assignment.update_attributes(moderated_grading: false, anonymous_grading: true)
         @assignment.mute!
       end
@@ -2391,27 +2329,9 @@ describe Assignment do
       end
     end
 
-    context "when Anonymous Moderated Marking is enabled and assignment is not anonymously graded" do
+    context "when assignment is not anonymously graded" do
       before :once do
-        @course.account.enable_feature! :anonymous_moderated_marking
         @assignment.update_attributes(moderated_grading: true, anonymous_grading: false, grader_count: 1)
-        @assignment.mute!
-      end
-
-      it "unmutes the assignment" do
-        @assignment.unmute!
-        expect(@assignment).not_to be_muted
-      end
-
-      it "returns true" do
-        expect(@assignment.unmute!).to eq(true)
-      end
-    end
-
-    context "when Anonymous Moderated Marking is disabled and assignment is anonymously graded" do
-      before :once do
-        @course.account.disable_feature! :anonymous_moderated_marking
-        @assignment.update_attributes(moderated_grading: true, anonymous_grading: true, grader_count: 1)
         @assignment.mute!
       end
 
@@ -3169,37 +3089,34 @@ describe Assignment do
     end
 
     describe "to update" do
-      context "when Anonymous Moderated Marking is enabled" do
-        before(:each) do
-          @course.root_account.enable_feature!(:anonymous_moderated_marking)
-          @course.enable_feature!(:moderated_grading)
+      before(:each) do
+        @course.enable_feature!(:moderated_grading)
 
-          @moderator = teacher_in_course(course: @course, active_all: true).user
-          @non_moderator = teacher_in_course(course: @course, active_all: true).user
+        @moderator = teacher_in_course(course: @course, active_all: true).user
+        @non_moderator = teacher_in_course(course: @course, active_all: true).user
 
-          @moderated_assignment = @course.assignments.create!(
-            moderated_grading: true,
-            grader_count: 3,
-            final_grader: @moderator
-          )
-        end
+        @moderated_assignment = @course.assignments.create!(
+          moderated_grading: true,
+          grader_count: 3,
+          final_grader: @moderator
+        )
+      end
 
-        it "allows the designated moderator to update a moderated assignment" do
-          expect(@moderated_assignment.grants_right?(@moderator, :update)).to eq(true)
-        end
+      it "allows the designated moderator to update a moderated assignment" do
+        expect(@moderated_assignment.grants_right?(@moderator, :update)).to eq(true)
+      end
 
-        it "does not allow non-moderators to update a moderated assignment" do
-          expect(@moderated_assignment.grants_right?(@non_moderator, :update)).to eq(false)
-        end
+      it "does not allow non-moderators to update a moderated assignment" do
+        expect(@moderated_assignment.grants_right?(@non_moderator, :update)).to eq(false)
+      end
 
-        it "allows an admin to update a moderated assignment" do
-          expect(@moderated_assignment.grants_right?(@admin, :update)).to eq(true)
-        end
+      it "allows an admin to update a moderated assignment" do
+        expect(@moderated_assignment.grants_right?(@admin, :update)).to eq(true)
+      end
 
-        it "allows a teacher to update a moderated assignment with no moderator selected" do
-          @moderated_assignment.update!(final_grader: nil)
-          expect(@moderated_assignment.grants_right?(@non_moderator, :update)).to eq(true)
-        end
+      it "allows a teacher to update a moderated assignment with no moderator selected" do
+        @moderated_assignment.update!(final_grader: nil)
+        expect(@moderated_assignment.grants_right?(@non_moderator, :update)).to eq(true)
       end
     end
   end
@@ -5209,7 +5126,7 @@ describe Assignment do
     end
 
     it "excludes student names from filenames when anonymous grading is enabled" do
-      @course.enable_feature! :anonymous_grading
+      @assignment.update!(anonymous_grading: true)
 
       s1 = @students.first
       sub = submit_homework(s1)
@@ -5461,6 +5378,30 @@ describe Assignment do
         before { create_adhoc_override_for_assignment(assignment, user, due_at: 3.months.ago) }
 
         it { is_expected.to be_in_closed_grading_period }
+      end
+
+      context 'when there is a soft deleted closed grading period pointed at by concluded submissions' do
+        before do
+          # We need to set up a situation where a submission owned by
+          # a concluded enrollment points at a soft deleted grading
+          # period that would be considered closed.
+          student_enrollment = student_in_course(course: assignment.context, active_all: true, user_name: 'another student')
+          current_dup = @current.dup
+          assignment.update(due_at: 45.days.ago(Time.zone.now))
+          @current.update!(end_date: 1.month.ago(Time.zone.now))
+          student_enrollment.conclude
+          @current.destroy!
+          current_dup.save!
+        end
+
+        context "without preloaded submissions" do
+          it { is_expected.not_to be_in_closed_grading_period }
+        end
+
+        context "with preloaded submissions" do
+          before { assignment.submissions.load }
+          it { is_expected.not_to be_in_closed_grading_period }
+        end
       end
     end
   end
@@ -5812,6 +5753,7 @@ describe Assignment do
       assignment_model(course: @course)
       @assignment.grade_student @student, score: 0, grader: @teacher
       @assignment.moderated_grading = true
+      @assignment.grader_count = 1
       expect(@assignment.save).to eq false
       expect(@assignment.errors[:moderated_grading]).to be_present
     end
@@ -5820,6 +5762,7 @@ describe Assignment do
       assignment_model(course: @course)
       @assignment.peer_reviews = true
       @assignment.moderated_grading = true
+      @assignment.grader_count = 1
       expect(@assignment.save).to eq false
       expect(@assignment.errors[:moderated_grading]).to be_present
     end
@@ -5828,12 +5771,13 @@ describe Assignment do
       assignment_model(course: @course)
       @assignment.group_category = @course.group_categories.create!(name: "groups")
       @assignment.moderated_grading = true
+      @assignment.grader_count = 1
       expect(@assignment.save).to eq false
       expect(@assignment.errors[:moderated_grading]).to be_present
     end
 
     it "does not allow turning off if graded submissions exist" do
-      assignment_model(course: @course, moderated_grading: true)
+      assignment_model(course: @course, moderated_grading: true, grader_count: 2, final_grader: @teacher)
       expect(@assignment).to be_moderated_grading
       @assignment.grade_student @student, score: 0, grader: @teacher
       @assignment.moderated_grading = false
@@ -5842,7 +5786,7 @@ describe Assignment do
     end
 
     it "does not allow turning off if provisional grades exist" do
-      assignment_model(course: @course, moderated_grading: true)
+      assignment_model(course: @course, moderated_grading: true, grader_count: 2)
       expect(@assignment).to be_moderated_grading
       submission = @assignment.submit_homework @student, body: "blah"
       submission.find_or_create_provisional_grade!(@teacher, score: 0)
@@ -5854,6 +5798,7 @@ describe Assignment do
     it "does not allow turning on for an ungraded assignment" do
       assignment_model(course: @course, submission_types: 'not_graded')
       @assignment.moderated_grading = true
+      @assignment.grader_count = 1
       expect(@assignment.save).to eq false
       expect(@assignment.errors[:moderated_grading]).to be_present
     end
@@ -5861,6 +5806,7 @@ describe Assignment do
     it "does not allow creating a new ungraded assignment with moderated grading" do
       a = @course.assignments.build
       a.moderated_grading = true
+      a.grader_count = 1
       a.submission_types = 'not_graded'
       expect(a).not_to be_valid
     end
@@ -5953,17 +5899,18 @@ describe Assignment do
 
   describe '.remove_user_as_final_grader_immediately' do
     it 'removes the user as final grader in all assignments in the given course' do
-      2.times { @course.assignments.create!(moderated_grading: true, final_grader: @teacher) }
-      another_teacher = User.create!
+      2.times { @course.assignments.create!(moderated_grading: true, grader_count: 2, final_grader: @teacher) }
+      og_teacher = @teacher
+      another_teacher = teacher_in_course(course: @course, active_all: true).user
       @course.enroll_teacher(another_teacher, active_all: true)
-      @course.assignments.create!(moderated_grading: true, final_grader: another_teacher)
-      expect { Assignment.remove_user_as_final_grader_immediately(@teacher.id, @course.id) }.to change {
+      @course.assignments.create!(moderated_grading: true, grader_count: 2, final_grader: another_teacher)
+      expect { Assignment.remove_user_as_final_grader_immediately(og_teacher.id, @course.id) }.to change {
         @course.assignments.order(:created_at).pluck(:final_grader_id)
-      }.from([@teacher.id, @teacher.id, another_teacher.id]).to([nil, nil, another_teacher.id])
+      }.from([og_teacher.id, og_teacher.id, another_teacher.id]).to([nil, nil, another_teacher.id])
     end
 
     it 'includes soft-deleted assignments when removing the user as final grader' do
-      assignment = @course.assignments.create!(moderated_grading: true, final_grader: @teacher)
+      assignment = @course.assignments.create!(moderated_grading: true, grader_count: 2, final_grader: @teacher)
       assignment.destroy
       expect { Assignment.remove_user_as_final_grader_immediately(@teacher.id, @course.id) }.to change {
         assignment.reload.final_grader_id
@@ -6044,7 +5991,6 @@ describe Assignment do
   describe '#available_moderators' do
     before(:once) do
       @course = Course.create!
-      @course.root_account.enable_feature!(:anonymous_moderated_marking)
       @first_teacher = User.create!
       @second_teacher = User.create!
       [@first_teacher, @second_teacher].each { |user| @course.enroll_teacher(user, enrollment_state: 'active') }
@@ -6135,44 +6081,38 @@ describe Assignment do
   describe '#moderated_grader_limit_reached?' do
     before(:once) do
       @course = Course.create!
-      teacher = User.create!
+      @teacher = User.create!
       second_teacher = User.create!
       @ta = User.create!
-      @course.enroll_teacher(teacher, enrollment_state: 'active')
+      @course.enroll_teacher(@teacher, enrollment_state: 'active')
       @course.enroll_teacher(second_teacher, enrollment_state: 'active')
       @course.enroll_ta(@ta, enrollment_state: 'active')
       @assignment = @course.assignments.create!(
-        final_grader: teacher,
+        final_grader: @teacher,
         grader_count: 2,
         moderated_grading: true
       )
       @assignment.moderation_graders.create!(user: second_teacher, anonymous_id: '12345')
     end
 
-    it 'returns false if anonymous moderated marking is off' do
-      @assignment.moderation_graders.create!(user: @ta, anonymous_id: '54321')
+    it 'returns false if all provisional grader slots are not filled' do
       expect(@assignment.moderated_grader_limit_reached?).to eq false
     end
 
-    context 'when anonymous moderated marking is enabled' do
-      before :once do
-        @course.root_account.enable_feature!(:anonymous_moderated_marking)
-      end
+    it 'returns true if all provisional grader slots are filled' do
+      @assignment.moderation_graders.create!(user: @ta, anonymous_id: '54321')
+      expect(@assignment.moderated_grader_limit_reached?).to eq true
+    end
 
-      it 'returns false if all grader slots are not filled' do
-        expect(@assignment.moderated_grader_limit_reached?).to eq false
-      end
+    it 'ignores grades issued by the final grader when determining if slots are filled' do
+      @assignment.moderation_graders.create!(user: @teacher, anonymous_id: '00000')
+      expect(@assignment.moderated_grader_limit_reached?).to eq false
+    end
 
-      it 'returns true if all grader slots are filled' do
-        @assignment.moderation_graders.create!(user: @ta, anonymous_id: '54321')
-        expect(@assignment.moderated_grader_limit_reached?).to eq true
-      end
-
-      it 'returns false if moderated grading is off' do
-        @assignment.moderation_graders.create!(user: @ta, anonymous_id: '54321')
-        @assignment.moderated_grading = false
-        expect(@assignment.moderated_grader_limit_reached?).to eq false
-      end
+    it 'returns false if moderated grading is off' do
+      @assignment.moderation_graders.create!(user: @ta, anonymous_id: '54321')
+      @assignment.moderated_grading = false
+      expect(@assignment.moderated_grader_limit_reached?).to eq false
     end
   end
 
@@ -6191,7 +6131,6 @@ describe Assignment do
         moderated_grading: true
       )
       @assignment.moderation_graders.create!(user: @second_teacher, anonymous_id: '12345')
-      @course.root_account.enable_feature!(:anonymous_moderated_marking)
     end
 
     shared_examples 'grader permissions are checked' do
@@ -6281,7 +6220,6 @@ describe Assignment do
 
   describe 'Anonymous Moderated Marking setting validation' do
     before(:once) do
-      @course.account.enable_feature!(:anonymous_moderated_marking)
       assignment_model(course: @course)
     end
 
@@ -6406,6 +6344,18 @@ describe Assignment do
             @assignment.valid?
 
             expect(errors[:final_grader]).to eq ['Final grader must be an instructor in this course']
+          end
+        end
+
+        describe 'graders_anonymous_to_graders' do
+          it 'cannot be set to true when grader_comments_visible_to_graders is false' do
+            @assignment.update!(grader_comments_visible_to_graders: false, graders_anonymous_to_graders: true)
+            expect(@assignment).not_to be_graders_anonymous_to_graders
+          end
+
+          it 'can be set to true when grader_comments_visible_to_graders is true' do
+            @assignment.update!(grader_comments_visible_to_graders: true, graders_anonymous_to_graders: true)
+            expect(@assignment).to be_graders_anonymous_to_graders
           end
         end
       end

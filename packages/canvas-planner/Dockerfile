@@ -17,7 +17,6 @@ USER root
 RUN mkdir -p $APP_HOME
 
 COPY package.json $APP_HOME/
-COPY yarn.lock $APP_HOME/
 
 WORKDIR $APP_HOME
 

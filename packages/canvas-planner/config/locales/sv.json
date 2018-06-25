@@ -1,36 +1,51 @@
 {
   "add_to_do_7def3c37": {
-    "message": "Lägg till att göra"
+    "message": "Lägg till Att göra"
+  },
+  "all_day_fb42c4fc": {
+    "message": "Hela dagen"
   },
   "all_items_loaded_aa256183": {
-    "message": "Alla föremål laddade"
+    "message": "Alla objekt inlästa"
   },
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
-    "message": "Är du säker på att du vill radera det här planeringsföremålet?"
+    "message": "Är du säker på att du vill ta bort det här Planner-objektet?"
   },
-  "assignmenttype_title_is_complete_813e54f8": {
-    "message": "{ assignmentType } { title } är färdig"
+  "assignmenttype_title_6612d008": {
+    "message": "{ assignmentType } { title }."
   },
-  "assignmenttype_title_is_incomplete_a1d5fac0": {
-    "message": "{ assignmentType } { title } är ofullständig"
+  "assignmenttype_title_at_datetime_478f0709": {
+    "message": "{ assignmentType } { title }, vid { datetime }."
+  },
+  "assignmenttype_title_due_datetime_a112d8ff": {
+    "message": "{ assignmentType } { title }, inlämnas { datetime }."
+  },
+  "assignmenttype_title_is_marked_as_done_a8dc46ef": {
+    "message": "{ assignmentType } { title } har markerats som slutförd."
+  },
+  "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
+    "message": "{ assignmentType } { title } har inte markerats som slutförd."
+  },
+  "assignmenttype_title_on_datetime_446013fb": {
+    "message": "{ assignmentType } { title }, den { datetime }."
   },
   "beginning_of_your_to_do_history_61ef2dce": {
-    "message": "Början av din To-Do historik"
+    "message": "Början av din Att göra-historik"
   },
   "canvas_planner_98ed106": {
-    "message": "Canvas planering"
+    "message": "Canvas Planner"
   },
   "close_d634289d": {
     "message": "Stäng"
   },
   "close_opportunities_popover_f4e50551": {
-    "message": "Stäng möjligheter"
+    "message": "Stäng navigeringsmenyn för möjligheter"
   },
   "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
-    "message": "{ count, plural,\n     =0 {# Möjligheter}\n    one {# möjlighet}\n  other {# möjligheter}\n}"
+    "message": "{ count, plural,\n     =0 {# möjligheter}\n    one {# möjlighet}\n  other {# möjligheter}\n}"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-    "message": "{ count, plural,\n    one {Visa # färdiga föremål}\n  other {Visa # färdiga föremål}\n}"
+    "message": "{ count, plural,\n    one {Visa # slutfört objekt}\n  other {Visa # slutförda objekt}\n}"
   },
   "course_8a63b4a3": {
     "message": "Kurs"
@@ -44,6 +59,9 @@
   "date_ee500367": {
     "message": "Datum"
   },
+  "date_is_not_a_valid_date_4ef9f8ba": {
+    "message": "#{ date } är inte ett giltigt datum."
+  },
   "date_is_required_8660ec22": {
     "message": "Datum krävs"
   },
@@ -54,94 +72,124 @@
     "message": "Detaljer"
   },
   "dismiss_opportunityname_5995176f": {
-    "message": "Avfärda { opportunityName }"
+    "message": "Avvisa { opportunityName }"
   },
   "due_5d7267be": {
-    "message": "Färdig:"
+    "message": "Förfallodatum:"
   },
   "due_date_8ce289b6": {
-    "message": "FÄRDIG: { date }"
+    "message": "FÖRFALLODATUM: { date }"
   },
   "edit_title_72e5a21e": {
     "message": "Redigera { title }"
   },
+  "error_loading_grades_e0b38f4d": {
+    "message": "Fel vid inläsning av omdömen"
+  },
   "error_loading_more_items_3f109d9f": {
-    "message": "Det gick inte att läsa in fler föremål"
+    "message": "Det gick inte att läsa in fler objekt"
   },
   "error_loading_past_items_2881dbb1": {
-    "message": "Det gick inte att läsa in tidigare föremål"
+    "message": "Det gick inte att läsa in tidigare objekt"
   },
   "excused_cf8792eb": {
     "message": "Ursäktad"
   },
   "failed_to_delete_to_do_64edff49": {
-    "message": "Misslyckades att ta bort: att göra"
+    "message": "Misslyckades att ta bort Att göra"
   },
   "failed_to_get_new_activity_17e7ec7c": {
-    "message": "Misslyckades att få ny aktivitet"
+    "message": "Misslyckades att hämta ny aktivitet"
   },
   "failed_to_load_opportunities_52ab6404": {
-    "message": "Kunde inte ladda upp möjligheter"
+    "message": "Misslyckades att läsa in möjligheter"
   },
   "failed_to_save_to_do_ddc7503b": {
-    "message": "Misslyckades att spara: att göra"
+    "message": "Misslyckades att spara Att göra"
   },
   "feedback_6dcc1991": {
     "message": "Återkoppling"
   },
   "go_to_dashboard_card_view_10398ef6": {
-    "message": "Gå till kortvyn för panelen"
+    "message": "Gå till översikten Kortvy"
   },
   "graded_25cd3fcd": {
-    "message": "Betygsatt"
+    "message": "Omdöme har getts"
+  },
+  "grades_are_loading_c899652d": {
+    "message": "Omdömen läses in nu"
+  },
+  "grades_loaded_5056277c": {
+    "message": "Omdömen har lästs in"
+  },
+  "items_completed_items_plural_1_item_other_items_717d579f": {
+    "message": "{ items } färdigt { items, plural,\n     =1 {objekt}\n  other {objekt}\n}"
   },
   "late_2be42b88": {
     "message": "Sen"
   },
   "load_more_a36f9cf9": {
-    "message": "Ladda mer"
+    "message": "Läs in mer"
   },
   "load_prior_dates_f2b0f6f0": {
-    "message": "Laddar tidigare datum"
+    "message": "Läs in tidigare datum"
   },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-    "message": "Laddade { count, plural,\n     =0{# föremål}\n    one {# föremål}\n  other {# föremål}\n}"
+    "message": "Läste in { count, plural,\n     =0 {# objekt}\n    one {# objekt}\n  other {# objekt}\n}"
   },
   "loading_25990131": {
-    "message": "Laddar..."
+    "message": "Läser in ..."
+  },
+  "loading_725811ca": {
+    "message": "läser in"
+  },
+  "loading_grades_c842c887": {
+    "message": "Läsa in omdömen"
   },
   "loading_past_items_ca499e75": {
-    "message": "Laddar tidigare föremål"
+    "message": "Läser in tidigare objekt"
   },
   "loading_planner_items_947a813d": {
-    "message": "Laddar planerade föremål"
+    "message": "Läser in Planner-objekt"
   },
   "looks_like_there_isn_t_anything_here_d9bcef49": {
-    "message": "Det verkar som att det inte finns något här"
+    "message": "Det verkar inte finnas något här"
   },
   "missing_1a256b3b": {
     "message": "Saknas"
   },
-  "missing_items_for_5ef30cea": {
-    "message": "Saknade föremål för "
+  "missing_items_for_title_516511f8": {
+    "message": "Saknar objekt för { title }"
+  },
+  "my_grades_98834476": {
+    "message": "Mina omdömen"
   },
   "new_activity_8b84847d": {
     "message": "Ny aktivitet"
   },
-  "new_activity_for_ac84f6e6": {
-    "message": "Ny aktivitet för "
+  "new_activity_for_title_14c9c3af": {
+    "message": "Ny aktivitet för { title }"
   },
   "next_month_749b1778": {
     "message": "Nästa månad"
   },
   "no_due_dates_assigned_e8f5bac8": {
-    "message": "Inga slutdatum tilldelade"
+    "message": "Inga förfallodatum tilldelade"
   },
-  "no_to_do_s_for_this_day_yet_90c5873d": {
-    "message": "Inga \"To-Do''s\" för den här dagen ännu."
+  "no_grade_3b4d7f3e": {
+    "message": "Inget omdöme"
   },
   "nothing_new_needs_attention_3ac548d4": {
-    "message": "Ingenting är i behov av uppmärksamhet"
+    "message": "Inget nytt som kräver uppmärksamhet."
+  },
+  "nothing_planned_today_next_item_loaded_5a199868": {
+    "message": "Inget planerat i dag. Nästa objekt har lästs in."
+  },
+  "nothing_planned_yet_8675ffe9": {
+    "message": "Inget planerat än"
+  },
+  "only_most_recent_grading_period_shown_f1ad6458": {
+    "message": "*Endast den senaste omdömesperioden visas."
   },
   "optional_add_course_ef0d70fc": {
     "message": "Valfritt: Lägg till kurs"
@@ -164,17 +212,32 @@
   "save_11a80ec3": {
     "message": "Spara"
   },
+  "show_my_grades_ebd08684": {
+    "message": "Visa mina omdömen"
+  },
+  "startdate_to_enddate_d245175b": {
+    "message": "{ startDate } till { endDate }"
+  },
   "submitted_318fad53": {
-    "message": "Inlämnad"
+    "message": "Skickad"
+  },
+  "success_to_do_created_e34ed395": {
+    "message": "Framgång: Skapade Att göra-objekt"
   },
   "task_16b0ef38": {
     "message": "Uppgift"
+  },
+  "the_date_and_time_this_to_do_is_due_74c823d4": {
+    "message": "Datum och tid dessa Att göra-uppgifter ska vara klara"
+  },
+  "time_2b5aac58": {
+    "message": "Tid"
   },
   "title_ee03d132": {
     "message": "Titel"
   },
   "title_is_required_6ddcab69": {
-    "message": "rubrik krävs"
+    "message": "titel krävs"
   },
   "to_do_1d554f36": {
     "message": "Att göra"
@@ -183,24 +246,27 @@
     "message": "Idag"
   },
   "today_at_date_8ac30d6": {
-    "message": "Idag vid { date }"
+    "message": "I dag vid { date }"
   },
   "tomorrow_9a6c9a00": {
-    "message": "Imorgon"
+    "message": "I morgon"
   },
   "tomorrow_at_date_b53f2cf1": {
-    "message": "Imorgon vid { date }"
+    "message": "I morgon kl. { date }"
   },
   "unable_to_mark_as_complete_8141856d": {
-    "message": "Kunde inte markera som fullständigt."
+    "message": "Det går inte att markera som färdig."
   },
   "yesterday_at_date_1aa6d18e": {
-    "message": "Igår vid { date }"
+    "message": "I går vid { date }"
   },
   "yesterday_c6bd6abf": {
-    "message": "Igår"
+    "message": "I går"
+  },
+  "you_must_provide_a_date_and_time_a86839d2": {
+    "message": "Du måste ange ett datum och en tid."
   },
   "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
-    "message": "Du har skrollat tillbaka till din allra första To-Do!"
+    "message": "Du har rullat tillbaka till din allra första Att göra-uppgift!"
   }
 }

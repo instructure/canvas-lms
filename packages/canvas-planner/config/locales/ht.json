@@ -2,17 +2,32 @@
   "add_to_do_7def3c37": {
     "message": "Ajoute Lis Tach"
   },
+  "all_day_fb42c4fc": {
+    "message": "Tout Jounen"
+  },
   "all_items_loaded_aa256183": {
     "message": "Tout eleman yo chaje"
   },
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "Èske vrèman ou vle elemine eleman planifikatè sa a?"
   },
-  "assignmenttype_title_is_complete_813e54f8": {
-    "message": "{ assignmentType } { title } konplete"
+  "assignmenttype_title_6612d008": {
+    "message": "{ assignmentType } { title }."
   },
-  "assignmenttype_title_is_incomplete_a1d5fac0": {
-    "message": "{ assignmentType } { title } enkonplè"
+  "assignmenttype_title_at_datetime_478f0709": {
+    "message": "{ assignmentType } { title }, a { datetime }."
+  },
+  "assignmenttype_title_due_datetime_a112d8ff": {
+    "message": "{ assignmentType } { title }, delè { datetime }."
+  },
+  "assignmenttype_title_is_marked_as_done_a8dc46ef": {
+    "message": "{ assignmentType } { title } make ke li fini."
+  },
+  "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
+    "message": "{ assignmentType } { title } pa make ke li fini."
+  },
+  "assignmenttype_title_on_datetime_446013fb": {
+    "message": "{ assignmentType } { title }, nan { datetime }."
   },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Kòmansman Istwa Tach ou yo"
@@ -36,13 +51,16 @@
     "message": "Kou"
   },
   "course_to_do_bcbbab54": {
-    "message": "{ course } POU FÈ"
+    "message": "{ course } Pou Fè"
   },
   "date_at_time_dbdb1b99": {
-    "message": "{ date } nan { time }"
+    "message": "{ date } a { time }"
   },
   "date_ee500367": {
     "message": "Dat"
+  },
+  "date_is_not_a_valid_date_4ef9f8ba": {
+    "message": "#{ date } pa yon dat valid."
   },
   "date_is_required_8660ec22": {
     "message": "Dat obligatwa"
@@ -64,6 +82,9 @@
   },
   "edit_title_72e5a21e": {
     "message": "Modifye { title }"
+  },
+  "error_loading_grades_e0b38f4d": {
+    "message": "Erè nan chajman nòt yo"
   },
   "error_loading_more_items_3f109d9f": {
     "message": "Erè chajman plis eleman"
@@ -90,10 +111,19 @@
     "message": "Kòmantè"
   },
   "go_to_dashboard_card_view_10398ef6": {
-    "message": "Ale nan Afichaj Tablo"
+    "message": "Ale nan Tablo Afichaj Kat"
   },
   "graded_25cd3fcd": {
     "message": "Klase"
+  },
+  "grades_are_loading_c899652d": {
+    "message": "Nòt yo ap chaje"
+  },
+  "grades_loaded_5056277c": {
+    "message": "Nòt yo chaje"
+  },
+  "items_completed_items_plural_1_item_other_items_717d579f": {
+    "message": "{ items } eleman { items, plural,\n     =1 {eleman}\n  other {konplete}\n}"
   },
   "late_2be42b88": {
     "message": "An reta"
@@ -105,10 +135,16 @@
     "message": "Chaje dat avan"
   },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-    "message": "Chaje { count, plural,\n     =0{# eleman}\n    one {# eleman}\n  other {# eleman}\n}"
+    "message": "Eleman { count, plural,\n     =0 {# eleman}\n    one {# eleman}\n  other {# chaje}\n}"
   },
   "loading_25990131": {
     "message": "Chajman..."
+  },
+  "loading_725811ca": {
+    "message": "chajman"
+  },
+  "loading_grades_c842c887": {
+    "message": "Chajman Nòt"
   },
   "loading_past_items_ca499e75": {
     "message": "Chaje eleman pase"
@@ -122,26 +158,38 @@
   "missing_1a256b3b": {
     "message": "Manke"
   },
-  "missing_items_for_5ef30cea": {
-    "message": "Eleman manke pou "
+  "missing_items_for_title_516511f8": {
+    "message": "Eleman ki manke pou { title }"
+  },
+  "my_grades_98834476": {
+    "message": "Nòt Mwen"
   },
   "new_activity_8b84847d": {
     "message": "Nouvo Aktivite"
   },
-  "new_activity_for_ac84f6e6": {
-    "message": "Nouvo aktivite pou "
+  "new_activity_for_title_14c9c3af": {
+    "message": "Nouvo aktivite pou { title }"
   },
   "next_month_749b1778": {
     "message": "Mwa Pwochen"
   },
   "no_due_dates_assigned_e8f5bac8": {
-    "message": "Yo Pa Bay Delè"
+    "message": "Pa gen Delè"
   },
-  "no_to_do_s_for_this_day_yet_90c5873d": {
-    "message": "Poko gen \"Okenn Tach\" pou jou sa a "
+  "no_grade_3b4d7f3e": {
+    "message": "Pa gen Klas"
   },
   "nothing_new_needs_attention_3ac548d4": {
-    "message": "Pa gen anyen nouvo ki mande atansyon."
+    "message": "Pa gen anyen nouvo ki bezwen atansyon."
+  },
+  "nothing_planned_today_next_item_loaded_5a199868": {
+    "message": "Pa gen anyen ki planifye pou jodi a. Pwochen eleman chaje"
+  },
+  "nothing_planned_yet_8675ffe9": {
+    "message": "Poko Gen Anyen Planifye"
+  },
+  "only_most_recent_grading_period_shown_f1ad6458": {
+    "message": "*Peryòd notasyon ki pi resan an ki afiche sèlman."
   },
   "optional_add_course_ef0d70fc": {
     "message": "Opsyonèl: Ajoute Kou"
@@ -156,7 +204,7 @@
     "message": "Mwa Pase"
   },
   "pts_699bd9aa": {
-    "message": "pts"
+    "message": "pwen"
   },
   "replies_4a8577c8": {
     "message": "Repons"
@@ -164,11 +212,26 @@
   "save_11a80ec3": {
     "message": "Anrejistre"
   },
+  "show_my_grades_ebd08684": {
+    "message": "Afiche Nòt Mwen"
+  },
+  "startdate_to_enddate_d245175b": {
+    "message": "{ startDate } a { endDate }"
+  },
   "submitted_318fad53": {
     "message": "Soumèt"
   },
+  "success_to_do_created_e34ed395": {
+    "message": "Reyisi: Lis Tach Kreye"
+  },
   "task_16b0ef38": {
     "message": "Tach"
+  },
+  "the_date_and_time_this_to_do_is_due_74c823d4": {
+    "message": "Dat ak lè pou sa fèt la se"
+  },
+  "time_2b5aac58": {
+    "message": "Tan"
   },
   "title_ee03d132": {
     "message": "Tit"
@@ -183,7 +246,7 @@
     "message": "Jodi a"
   },
   "today_at_date_8ac30d6": {
-    "message": "Jodi a a { date }"
+    "message": "Jodi a nan { date }"
   },
   "tomorrow_9a6c9a00": {
     "message": "Demen"
@@ -199,6 +262,9 @@
   },
   "yesterday_c6bd6abf": {
     "message": "Yè"
+  },
+  "you_must_provide_a_date_and_time_a86839d2": {
+    "message": "Ou dwe bay yon lè e yon dat."
   },
   "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
     "message": "Ou retounan nan premye Tach ou yo!"

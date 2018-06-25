@@ -23,27 +23,28 @@ import UserActions from 'jsx/account_course_user_search/actions/UserActions';
 
 QUnit.module('Account Course User Search UsersPane View');
 
-const fakeStore = {
-  dispatch () {},
-  getState () {
-    return {
-      userList: {
-        users: [],
-        isLoading: true,
-        errors: {search_term: ''},
-        next: undefined,
-        searchFilter: {search_term: ''},
-        permissions: {},
-        accountId: 1
-      },
+const fakeStore = () => ({
+  state: {
+    userList: {
+      users: [{}],
+      isLoading: false,
+      errors: {search_term: ''},
+      next: undefined,
+      searchFilter: {search_term: ''},
+      permissions: {},
+      accountId: 1
     }
   },
+  dispatch () {},
+  getState () {
+    return this.state
+  },
   subscribe () {}
-};
+});
 
-const wrapper = shallow(
+const wrapper = store => shallow(
   <UsersPane
-    store={fakeStore}
+    store={store}
     roles={['a']}
     queryParams={{}}
     onUpdateQueryParams={function(){}}
@@ -53,7 +54,8 @@ const wrapper = shallow(
 test('handleUpdateSearchFilter dispatches applySearchFilter action', (assert) => {
   const done = assert.async();
   const spy = sinon.spy(UserActions, 'applySearchFilter');
-  const instance = wrapper.instance();
+  const store = fakeStore()
+  const instance = wrapper(store).instance();
   instance.handleUpdateSearchFilter();
   setTimeout(() => {
     ok(spy.called);
@@ -62,5 +64,12 @@ test('handleUpdateSearchFilter dispatches applySearchFilter action', (assert) =>
 });
 
 test('have an h1 on the page', () => {
-  equal(wrapper.find('h1').length, 1, 'There is one H1 on the page')
+  const store = fakeStore()
+  equal(wrapper(store).find('h1').length, 1, 'There is one H1 on the page')
+})
+
+test('does not render UserList if loading', () => {
+  const store = fakeStore()
+  store.state.userList.isLoading = true
+  notOk(wrapper(store).find('UsersList').exists())
 })

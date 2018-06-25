@@ -107,7 +107,7 @@ gem 'rotp', '3.3.1', require: false
 gem 'net-ldap', '0.16.1', require: false
 gem 'ruby-duration', '3.2.3', require: false
 gem 'ruby-saml-mod', '0.3.8'
-gem 'saml2', '2.2.9'
+gem 'saml2', '2.2.11'
   gem 'nokogiri-xmlsec-instructure', '0.9.6', require: false
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.2.1', require: 'zip'
@@ -126,7 +126,7 @@ gem 'gepub', '0.7.0beta4'
 gem 'imperium', '0.3.0', require: false
 gem 'academic_benchmarks', '0.0.10', require: false
 
-gem 'graphql', '1.7.12'
+gem 'graphql', '1.8.0'
 gem 'graphql-batch', '0.3.9'
 
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'
