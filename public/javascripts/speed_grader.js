@@ -354,6 +354,9 @@ import './vendor/ui.selectmenu'
       this.elements.settings.form.submit(this.submitSettingsForm.bind(this));
       this.elements.settings.link.click(this.showSettingsModal.bind(this));
       this.elements.keyinfo.icon.click(this.keyboardShortcutInfoModal.bind(this));
+      $('#add_attempt').on('click', function() {
+              alert('ive been clicked');
+         })
     },
     createModals: function(){
       this.elements.settings.form.dialog({
