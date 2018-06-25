@@ -1383,6 +1383,31 @@ describe FilesController do
             expect(progress.reload.workflow_state).to eq 'failed'
           end
         end
+
+        context 'with Progress but submit_assignment not set' do
+          let(:progress) do
+            ::Progress.
+              new(context: assignment, user: user, tag: :upload_via_url).
+              tap(&:start).
+              tap(&:save!)
+          end
+          let(:progress_params) do
+            assignment_params.merge(
+              progress_id: progress.id
+            )
+          end
+          let(:request) { post "api_capture", params: progress_params }
+
+          it 'should submit the attachment' do
+            expect(Services::SubmitHomeworkService).not_to receive(:submit).with(kind_of(Attachment), progress.created_at)
+            request
+          end
+
+          it "returns a 201 http status" do
+            request
+            assert_status(201)
+          end
+        end
       end
     end
   end

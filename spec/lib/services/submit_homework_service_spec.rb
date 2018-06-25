@@ -51,6 +51,77 @@ module Services
       )
     end
     let(:eula_agreement_timestamp) { "1522419910" }
+    let(:url) { 'url' }
+    let(:dup_handling) { false }
+    let(:check_quota) { false }
+    let(:opts) { { fancy: 'very' } }
+    let(:executor) do
+      described_class.create_clone_url_executor(url, dup_handling, check_quota, opts)
+    end
+
+    describe '.create_clone_url_executor' do
+      it 'should set the url' do
+        expect(executor.url).to eq url
+      end
+
+      it 'should set the duplicate_handling' do
+        expect(executor.duplicate_handling).to eq dup_handling
+      end
+
+      it 'should set the check_quota' do
+        expect(executor.check_quota).to eq check_quota
+      end
+
+      it 'should set the opts' do
+        expect(executor.opts).to eq opts
+      end
+    end
+
+    describe '.submit_job' do
+      let(:progress) { Progress.create(context: assignment, tag: 'test') }
+      let!(:worker) { described_class.submit_job(progress, attachment, eula_agreement_timestamp, executor) }
+
+      it 'should clone and submit the url' do
+        allow(worker).to receive(:attachment).and_return(attachment)
+        expect(attachment).to receive(:clone_url).with(url, dup_handling, check_quota, opts)
+        expect(described_class).to receive(:submit).with(attachment, assignment, progress.created_at, eula_agreement_timestamp)
+        worker.perform
+      end
+
+      context 'on an error' do
+        before { worker.on_permanent_failure("error") }
+
+        it 'marks progress as failed' do
+          latest_progress = progress.reload
+          expect(latest_progress.workflow_state).to eq 'failed'
+          expect(latest_progress.message).to match(/Unexpected error/)
+        end
+
+        it 'sends a failure email' do
+          email_job = Delayed::Job.order(:id).last
+          expect(email_job.handler).to match(/#{described_class::EmailWorker.name}/)
+          expect(Mailer).to receive(:deliver).with(Mailer.create_message(failure_email))
+          email_job.invoke_job
+        end
+      end
+
+      context 'queues up a delayed job' do
+        let(:worker_job) { Delayed::Job.order(:id).last }
+
+        it 'enqueues the worker job' do
+          expect(worker_job.handler).to include described_class::SubmitWorker.name
+        end
+
+        it 'sends a successful email' do
+          worker_job.invoke_job
+
+          email_job = Delayed::Job.order(:id).last
+          expect(email_job.handler).to match(/#{described_class::EmailWorker.name}/)
+          expect(Mailer).to receive(:deliver).with(Mailer.create_message(successful_email))
+          email_job.invoke_job
+        end
+      end
+    end
 
     describe '#submit' do
       let(:submission) { described_class.submit(attachment, assignment, submitted_at, eula_agreement_timestamp) }
@@ -74,7 +145,7 @@ module Services
       describe '#successful_email' do
         it 'enqueues a successful email' do
           described_class.successful_email(attachment, assignment)
-          expect(email_job.handler).to match(/#{described_class::EmailJob.name}/)
+          expect(email_job.handler).to match(/#{described_class::EmailWorker.name}/)
           expect(Mailer).to receive(:deliver).with(Mailer.create_message(successful_email))
           email_job.invoke_job
         end
@@ -83,7 +154,7 @@ module Services
       describe '#failure_email' do
         it 'enqueues a failure email' do
           described_class.failure_email(attachment, assignment)
-          expect(email_job.handler).to match(/#{described_class::EmailJob.name}/)
+          expect(email_job.handler).to match(/#{described_class::EmailWorker.name}/)
           expect(Mailer).to receive(:deliver).with(Mailer.create_message(failure_email))
           email_job.invoke_job
         end

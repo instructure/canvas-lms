@@ -18,14 +18,69 @@
 
 module Services
   class SubmitHomeworkService
-
-    EmailJob = Struct.new(:message) do
+    EmailWorker = Struct.new(:message) do
       def perform
         Mailer.deliver(Mailer.create_message(message))
+      end
+
+      def on_permanent_failure(error)
+        Canvas::Errors.capture_exception(self.class.name, error)
+      end
+    end
+
+    CloneUrlExecutor = Struct.new(:url, :duplicate_handling, :check_quota, :opts) do
+      def execute(attachment)
+        attachment.clone_url(url, duplicate_handling, check_quota, opts)
+      end
+    end
+
+    SubmitWorker = Struct.new(:progress_id, :attachment_id, :eula_agreement_timestamp, :clone_url_executor) do
+      def progress
+        @progress ||= Progress.find(progress_id)
+      end
+
+      def attachment
+        @attachment ||= Attachment.find(attachment_id)
+      end
+
+      def perform
+        progress.start
+        assignment = progress.context
+        clone_url_executor.execute(attachment)
+        SubmitHomeworkService.submit(attachment, assignment, progress.created_at, eula_agreement_timestamp)
+        progress.complete
+        SubmitHomeworkService.successful_email(attachment, assignment)
+      rescue => error
+        mark_as_failure(error)
+      end
+
+      def on_permanent_failure(error)
+        mark_as_failure(error)
+      end
+
+      private
+
+      def mark_as_failure(error)
+        error_id = Canvas::Errors.capture_exception(self.class.name, error)[:error_report]
+        progress.message = "Unexpected error, ID: #{error_id || 'unknown'}"
+        progress.save
+        progress.fail
+        SubmitHomeworkService.failure_email(attachment, attachment.context)
       end
     end
 
     class << self
+      def create_clone_url_executor(url, duplicate_handling, check_quota, opts)
+        CloneUrlExecutor.new(url, duplicate_handling, check_quota, opts)
+      end
+
+      def submit_job(progress, attachment, eula_agreement_timestamp, clone_url_executor)
+        SubmitWorker.new(progress.id, attachment.id, eula_agreement_timestamp, clone_url_executor).
+          tap do |worker|
+            Delayed::Job.enqueue(worker, n_strand: 'file_download')
+          end
+      end
+
       def submit(attachment, assignment, submitted_at, eula_agreement_timestamp)
         opts = {
           submission_type: 'online_upload',
@@ -68,7 +123,7 @@ module Services
       end
 
       def deliver_email(message)
-        Delayed::Job.enqueue(EmailJob.new(message))
+        Delayed::Job.enqueue(EmailWorker.new(message))
       end
     end
   end

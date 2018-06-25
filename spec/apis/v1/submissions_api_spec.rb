@@ -3931,6 +3931,31 @@ describe 'Submissions API', type: :request do
           expect(json_response['progress']).to include progress_json
         end
       end
+
+      context 'for url upload using DelayedJob' do
+        let(:json_response) do
+          preflight(url: 'http://example.com/test', filename: 'test.txt', submit_assignment: true)
+          JSON.parse(response.body)
+        end
+
+        before { allow(InstFS).to receive(:enabled?).and_return(false) }
+
+        it 'returns progress json' do
+          progress_json = {
+            "context_id" => @assignment.id,
+            "context_type" =>"Assignment",
+            "user_id" => @student1.id,
+            "tag" => "upload_via_url"
+          }
+          expect(json_response['progress']).to include progress_json
+        end
+
+        it 'should enqueue the submit job' do
+          json_response
+          job = Delayed::Job.order(:id).last
+          expect(job.handler).to include Services::SubmitHomeworkService::SubmitWorker.name
+        end
+      end
     end
 
     it "rejects invalid urls" do

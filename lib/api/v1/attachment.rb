@@ -272,21 +272,35 @@ module Api::V1::Attachment
 
       on_duplicate = infer_on_duplicate(params)
       if params[:url]
+
         progress = ::Progress.new(context: progress_context, user: @current_user, tag: :upload_via_url)
         progress.reset!
-        progress.process_job(
-          @attachment,
-          :clone_url,
-          {
-            n_strand: 'file_download',
-            preserve_method_args: true,
-            priority: Delayed::HIGH_PRIORITY
-          },
-          params[:url],
-          on_duplicate,
-          opts[:check_quota],
-          { progress: progress }
-        )
+
+        # TODO: The `submit_assignment` param is used to help in backwards compat for prevent double submissions,
+        # can be removed in the next release.
+        if params[:submit_assignment].to_s == 'true' # coerced to handle json body vs url param
+          executor = Services::SubmitHomeworkService.create_clone_url_executor(
+            params[:url], on_duplicate, opts[:check_quota], progress: progress
+          )
+          Services::SubmitHomeworkService.submit_job(progress, @attachment, params[:eula_agreement_timestamp], executor)
+
+        # Old way that does not submit the assignment (browser js will try to do it)
+        else
+          progress.process_job(
+            @attachment,
+            :clone_url,
+            {
+              n_strand: 'file_download',
+              preserve_method_args: true,
+              priority: Delayed::HIGH_PRIORITY
+            },
+            params[:url],
+            on_duplicate,
+            opts[:check_quota],
+            { progress: progress }
+          )
+        end
+
         json = { progress: progress_json(progress, @current_user, session) }
       else
         on_duplicate = nil if on_duplicate == 'overwrite'
