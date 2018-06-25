@@ -276,6 +276,11 @@ describe AuthenticationProvider do
       expect(@user.time_zone.tzinfo.name).to eq 'America/New_York'
     end
 
+    it "doesn't asplode with nil values" do
+      aac.apply_federated_attributes(@pseudonym, 'email' => nil, 'surname' => nil, 'given_name' => nil)
+      expect(@user.name).not_to be_blank
+    end
+
     context 'admin_roles' do
       it 'ignores non-existent roles' do
         aac.apply_federated_attributes(@pseudonym, 'admin_roles' => 'garbage')
