@@ -94,6 +94,8 @@ class AssessmentItemConverter
         @question[:migration_id] = get_node_att(@doc, 'assessmentItem', 'label')
       end
 
+      @question[:migration_id] = @question[:migration_id].presence
+
       if @type == 'text_entry_interaction'
         @doc.css('textEntryInteraction').each do |node|
           node.inner_html = "[#{node['responseIdentifier']}]"
