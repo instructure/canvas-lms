@@ -61,7 +61,7 @@ wrong person in, as <a href="http://homakov.blogspot.com/2012/07/saferweb-most-c
       <td class="mono">scope<span class="label optional"></span></td>
       <td>
         This can be used to specify what information the access token will provide access to.
-        A complete list of available scopes can be found <a href="/doc/api/file.api_token_scopes.html">here</a>. Scopes may also be found beneath their corresponding endpoints in the "resources" documentation pages.
+        Scopes may be found beneath their corresponding endpoints in the "resources" documentation pages.
         If the developer key does not require scopes and no scope parameter is specified, the access token will have access to all scopes. If the developer key does require scopes and no scope parameter is specified, Canvas will respond with "invalid_scope."
       </td>
     </tr>
