@@ -53,6 +53,7 @@ export default class ShowEventDetailsDialog {
   }
 
   deleteEvent = (event, opts = {}) => {
+    $('.event-details').attr('aria-hidden', true)
     if (event == null) event = this.event
 
     if (this.event.isNewEvent()) return
