@@ -37,7 +37,7 @@
     "@instructure/ui-themes": "^5",
     "@instructure/ui-toggle-details": "^5",
     "apollo-boost": "^0.1.4",
-    "axios": "^0.16.0",
+    "axios": "^0.18.0",
     "backbone": "1.1.1",
     "big.js": "^5.0.3",
     "brandable_css": "0.1.0",

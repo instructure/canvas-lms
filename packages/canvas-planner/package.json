@@ -51,7 +51,7 @@
     "@instructure/ui-themeable": "^5",
     "@instructure/ui-toggle-details": "^5",
     "@instructure/ui-utils": "^5",
-    "axios": "^0.16.0",
+    "axios": "^0.18.0",
     "babel-plugin-inline-react-svg": "^0.4.0",
     "change-case": "^3.0.1",
     "classnames": "^2.2.5",
