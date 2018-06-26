@@ -55,7 +55,12 @@ module LtiOutbound
 
       if active_record_assignment.migration_id
         assignment_settings = SettingsService.get_settings(id: active_record_assignment.migration_id.to_s, object: 'assignment')
-        student_assignment_settings = SettingsService.get_settings(id: "#{active_record_assignment.migration_id.to_s}:#{user.id}", object: 'student_assignment')
+        student_assignment_settings = SettingsService.get_settings(
+            id: {
+              assignment_id: active_record_assignment.id,
+              student_id: user.id
+            },
+            object: 'student_assignment')
       end
 
       ### Temporary Ugly Hack ##
@@ -68,7 +73,7 @@ module LtiOutbound
       end
 
       if student_assignment_settings and student_assignment_settings['max_attempts']
-        hash['custom_strongmind_max_assessment_attempts'] = assignment_settings['max_attempts'].to_i
+        hash['custom_strongmind_max_assessment_attempts'] = student_assignment_settings['max_attempts'].to_i
       end
 
       add_assignment_substitutions!(assignment)
