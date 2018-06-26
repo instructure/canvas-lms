@@ -364,7 +364,10 @@ import './vendor/ui.selectmenu'
                    contentType: "application/json",
                    headers: {"X-HTTP-Method-Override": "PUT"},
                    data: JSON.stringify({"value": "increment"}),
-                   dataType: "json"
+                   dataType: "json",
+                   success: function(data) {
+                     $('#add-attempt-feedback').html('Attempt Added');
+                  },
               });
          })
     },
