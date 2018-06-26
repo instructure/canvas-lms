@@ -2976,6 +2976,8 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
     const EG = SpeedGrader.EG
 
     hooks.beforeEach(() => {
+      // A lot of these are polluting the space prior to execution, make sure things are clean
+      $('.score').remove();
       fixtures.innerHTML = `
         <span id="speedgrader-settings"></span>
         <div id='grading_details_mount_point'></div>
