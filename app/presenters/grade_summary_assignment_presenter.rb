@@ -111,7 +111,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def show_submission_details_link?
-    is_assignment? && submission.can_view_details?(@current_user)
+    is_assignment? && !!submission&.can_view_details?(@current_user)
   end
 
   def classes

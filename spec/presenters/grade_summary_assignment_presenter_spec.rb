@@ -189,6 +189,11 @@ describe GradeSummaryAssignmentPresenter do
       presenter = GradeSummaryAssignmentPresenter.new(summary, @student, @assignment, @submission_stub)
       expect(presenter.show_submission_details_link?).to be true
     end
+
+    it "returns false when submission is nil" do
+      presenter = GradeSummaryAssignmentPresenter.new(summary, @student, @assignment, nil)
+      expect(presenter.show_submission_details_link?).to be false
+    end
   end
 
   describe "#missing?" do
