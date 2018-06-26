@@ -4,7 +4,7 @@ class StudentAssignmentSettingsController < ApplicationController
 
     SettingsService.update_settings(
       id: {
-        user_id: params[:user_id],
+        student_id: params[:user_id],
         assignment_id: params[:assignment_id]
       },
       setting: params[:id],

@@ -358,8 +358,6 @@ import './vendor/ui.selectmenu'
           var studentID = JSON.parse(decodeURIComponent(document.location.hash.substr(1)))['student_id']
           var assignmentID = utils.getParam('assignment_id')
 
-            var studentID = 1
-            var assignmentID = 2
               $.ajax({
                    type: "POST",
                    url: '/users/' + studentID + '/assignments/' + assignmentID + '/settings/max_attempts/',
