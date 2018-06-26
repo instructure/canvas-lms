@@ -102,6 +102,12 @@
   flex: 0 0 7rem;
   min-width: 1px;
   padding-inline-start: var(--metricsPadding);
+  &.with_end_time {
+    flex-basis: 14rem;
+    .due {
+      text-transform: none;
+    }
+  }
 }
 
 .due,

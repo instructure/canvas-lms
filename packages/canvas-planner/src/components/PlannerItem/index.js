@@ -73,6 +73,8 @@ export class PlannerItem extends Component {
     responsiveSize: sizeShape,
     allDay: bool,
     feedback: shape(feedbackShape),
+    location: string,
+    endTime: momentObj,
   };
 
   static defaultProps = {
@@ -137,6 +139,12 @@ export class PlannerItem extends Component {
       );
   }
 
+  showEndTime () {
+    return this.props.date &&
+          !this.props.allDay &&
+           this.props.endTime && !this.props.endTime.isSame(this.props.date)
+  }
+
   assignmentType () {
     return this.props.associated_item ?
       this.props.associated_item : formatMessage('Task');
@@ -145,9 +153,18 @@ export class PlannerItem extends Component {
   renderDateField = () => {
     if (this.props.date) {
       if (this.hasDueTime()) {
-        return formatMessage(`DUE: {date}`, {date: this.props.date.format("LT")});
+        return formatMessage("DUE: {date}", {date: this.props.date.format("LT")});
       }
-      return this.props.allDay === true ? formatMessage('All Day') : this.props.date.format("LT");
+      if (this.props.allDay) {
+        return formatMessage('All Day');
+      }
+      if (this.showEndTime()) {
+        return formatMessage("{startTime} to {endTime}", {
+          startTime: this.props.date.format("LT"),
+          endTime: this.props.endTime.format("LT")
+        });
+      }
+      return this.props.date.format("LT");
     }
     return null;
   }
@@ -165,8 +182,12 @@ export class PlannerItem extends Component {
       if (this.hasDueTime()) {
         return formatMessage('{assignmentType} {title}, due {datetime}.', params);
       }
-      if (this.props.allDay === true) {
+      if (this.props.allDay) {
         return formatMessage('{assignmentType} {title}, on {datetime}.', params);
+      }
+      if (this.showEndTime()) {
+        params.endTime = this.props.endTime.format('LT');
+        return formatMessage('{assignmentType} {title}, at {datetime} until {endTime}', params);
       }
       return formatMessage('{assignmentType} {title}, at {datetime}.', params);
     }
@@ -212,12 +233,13 @@ export class PlannerItem extends Component {
   }
 
   renderItemMetrics = () => {
+    const metricsClasses = classnames(styles.metrics, {[styles.with_end_time]: this.showEndTime()});
     return (
       <div className={styles.secondary}>
         <div className={styles.badges}>
           {this.renderBadges()}
         </div>
-        <div className={styles.metrics}>
+        <div className={metricsClasses}>
           {(this.props.points) ?
             <div className={styles.score}>
               <Text color="secondary">
@@ -308,7 +330,7 @@ export class PlannerItem extends Component {
     };
   }
 
-  renderFeedback () {
+  renderExtraInfo () {
     const feedback = this.props.feedback;
     if (feedback) {
       return (
@@ -319,6 +341,14 @@ export class PlannerItem extends Component {
           <span className={styles.feedbackComment}><Text fontStyle="italic">{feedback.comment}</Text></span>
         </div>
       );
+    }
+    const location = this.props.location;
+    if (location) {
+      return (
+        <div className={styles.location}>
+          <Text color="secondary">{location}</Text>
+        </div>
+      )
     }
     return null;
   }
@@ -359,7 +389,7 @@ export class PlannerItem extends Component {
             {this.renderItemDetails()}
             {this.renderItemMetrics()}
           </div>
-          {this.renderFeedback()}
+          {this.renderExtraInfo()}
         </div>
       </div>
     );

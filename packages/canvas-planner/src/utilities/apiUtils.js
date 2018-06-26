@@ -38,6 +38,7 @@ const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
     overrideAssignId: plannable.assignment_id,
     id: plannableId,
     uniqueId: `${plannable_type}-${plannableId}`,
+    location: plannable.location_name || null
   };
 
   details.feedback = apiResponse.submissions ? apiResponse.submissions.feedback : undefined;
@@ -51,7 +52,10 @@ const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
   }
 
   if (plannable_type === 'calendar_event') {
-    details.allDay = plannable.all_day
+    details.allDay = plannable.all_day;
+    if (!details.allDay && plannable.end_at && plannable.end_at !== apiResponse.plannable_date ) {
+      details.endTime = moment(plannable.end_at);
+    }
   }
 
   return details;

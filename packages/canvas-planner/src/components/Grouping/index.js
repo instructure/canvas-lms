@@ -155,6 +155,8 @@ export class Grouping extends Component {
           showNotificationBadge={showNotificationBadgeOnItem}
           currentUser={this.props.currentUser}
           feedback={item.feedback}
+          location={item.location}
+          endTime={item.endTime}
         />
       </li>
     ));

@@ -590,5 +590,45 @@ it('renders feedback if available', () => {
     comment: 'Death will not be the end of your suffering.'
   }});
   const wrapper = shallow(<PlannerItem {...props} />);
-  expect(wrapper).toMatchSnapshot(); 
+  expect(wrapper).toMatchSnapshot();
 })
+
+it('renders the location if available', () => {
+  const props = defaultProps({
+    location: 'Columbus, OH'
+  });
+  const wrapper = shallow(<PlannerItem {...props} />);
+  expect(wrapper).toMatchSnapshot();
+})
+
+it('prefers to render feedback if it and the location are available', () => {
+  // I don't believe this is possible, but it's how the code handles it.
+  const props = defaultProps({
+    feedback: {
+      author_avatar_url: '/avatar/is/here/',
+      author_name: 'Dr. David Bowman',
+      comment: 'Open the pod bay doors, HAL.'
+    },
+    location: "NYC"
+  });
+  const wrapper = shallow(<PlannerItem {...props} />);
+  expect(wrapper).toMatchSnapshot();
+})
+
+it('renders the end time if available', () => {
+  const props = defaultProps({
+    associated_item: 'Calendar Event',
+    endTime: DEFAULT_DATE.clone().add(2, 'hours')
+  });
+  const wrapper = shallow(<PlannerItem {...props} />);
+  expect(wrapper).toMatchSnapshot();
+});
+
+it('does not render end time if the same as start time', () => {
+  const props = defaultProps({
+    associated_item: 'Calendar Event',
+    endTime: DEFAULT_DATE.clone()
+  });
+  const wrapper = shallow(<PlannerItem {...props} />);
+  expect(wrapper).toMatchSnapshot();
+});
