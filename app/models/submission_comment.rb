@@ -160,7 +160,7 @@ class SubmissionComment < ActiveRecord::Base
     raise IncomingMail::Errors::UnknownAddress if self.context.root_account.deleted?
     user = opts[:user]
     message = opts[:text].strip
-    user = nil unless user && self.context.users.include?(user)
+    user = nil unless user && self.submission.grants_right?(user, :comment)
     if !user
       raise "Only comment participants may reply to messages"
     elsif !message || message.empty?
