@@ -134,8 +134,12 @@ export class PlannerHeader extends Component {
       nextProps.getNextOpportunities();
     }
 
-    this.setUpdateItemTray(!!nextProps.todo.updateTodoItem);
-    this.setState({opportunities});
+    if (this.props.todo.updateTodoItem !== nextProps.todo.updateTodoItem) {
+      this.setUpdateItemTray(!!nextProps.todo.updateTodoItem);
+    }
+    if (this.props.opportunities !== opportunities) {
+      this.setState({opportunities});
+    }
   }
 
   componentWillUpdate () {
@@ -150,26 +154,43 @@ export class PlannerHeader extends Component {
   }
 
   handleSavePlannerItem = (plannerItem) => {
-    this.toggleUpdateItemTray();
+    this.handleCloseTray();
     this.props.savePlannerItem(plannerItem);
   }
 
-  isOpportunityVisible = (opportunity) => {
-    if(this.state.dismissedTabSelected) {
-      return opportunity.planner_override ? opportunity.planner_override.dismissed : false;
-    } else {
-      return opportunity.planner_override ? !opportunity.planner_override.dismissed : true;
-    }
-  }
-
   handleDeletePlannerItem = (plannerItem) => {
-    this.toggleUpdateItemTray();
+    this.handleCloseTray();
     this.props.deletePlannerItem(plannerItem);
   }
 
+  handleCloseTray = () => {
+    this.setUpdateItemTray(false);
+  }
+
   handleToggleTray = () => {
-    if (this.state.trayOpen) this.props.cancelEditingPlannerItem();
-    this.toggleUpdateItemTray();
+    if(this.state.trayOpen) {
+      this.handleCloseTray();
+    } else {
+      this.setUpdateItemTray(true)
+    }
+  }
+
+  // sets the tray open state and tells dynamic-ui what just happened
+  // via open/cancelEditingPlannerItem
+  setUpdateItemTray (trayOpen) {
+    if (trayOpen) {
+      if (this.props.openEditingPlannerItem) {
+        this.props.openEditingPlannerItem();  // tell dynamic-ui we've started editing
+      }
+    } else {
+      if (this.props.cancelEditingPlannerItem) {
+        this.props.cancelEditingPlannerItem();
+      }
+    }
+
+    this.setState({ trayOpen }, () => {
+      this.toggleAriaHiddenStuff(this.state.trayOpen);
+    });
   }
 
   toggleAriaHiddenStuff = (hide) => {
@@ -180,8 +201,12 @@ export class PlannerHeader extends Component {
     }
   }
 
-  toggleUpdateItemTray = () => {
-    this.setUpdateItemTray(!this.state.trayOpen);
+  isOpportunityVisible = (opportunity) => {
+    if(this.state.dismissedTabSelected) {
+      return opportunity.planner_override ? opportunity.planner_override.dismissed : false;
+    } else {
+      return opportunity.planner_override ? !opportunity.planner_override.dismissed : true;
+    }
   }
 
   toggleGradesTray = () => {
@@ -191,15 +216,6 @@ export class PlannerHeader extends Component {
       this.props.startLoadingGradesSaga();
     }
     this.setState({gradesTrayOpen: !this.state.gradesTrayOpen});
-  }
-
-  setUpdateItemTray (trayOpen) {
-    if (trayOpen && this.props.openEditingPlannerItem) {
-      this.props.openEditingPlannerItem();
-    }
-    this.setState({ trayOpen }, () => {
-      this.toggleAriaHiddenStuff(this.state.trayOpen);
-    });
   }
 
   handleTodayClick = () => {
@@ -359,7 +375,7 @@ export class PlannerHeader extends Component {
           shouldContainFocus={true}
           shouldReturnFocus={false}
           applicationElement={() => document.getElementById('application') }
-          onDismiss={this.handleToggleTray}
+          onDismiss={this.handleCloseTray}
         >
           <UpdateItemTray
             locale={this.props.locale}

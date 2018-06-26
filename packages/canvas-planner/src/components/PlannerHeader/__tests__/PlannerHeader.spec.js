@@ -108,8 +108,8 @@ it('sends focus back to the add new item button', () => {
   const wrapper = mount(
     <PlannerHeader {...defaultProps()} cancelEditingPlannerItem={mockCancel}/>
   );
-  wrapper.instance().toggleUpdateItemTray();
-  wrapper.instance().handleToggleTray();
+  wrapper.instance().handleToggleTray();  // simulate clicking the + button
+  wrapper.instance().handleCloseTray();   // simulate cancelling
   expect(mockCancel).toHaveBeenCalled();
 });
 
@@ -269,19 +269,17 @@ it('opens tray if todo update item props is set', () => {
     {id: "10", course_id: "2", due_at: "2017-17-09T20:40:35Z", html_url: "http://www.non_default_url.com", name: "learning object title"}
   ];
 
+  props.getNextOpportunities = mockDispatch;
+  const wrapper = shallow(
+    <PlannerHeader {...props} />
+  );
+  
   props.todo = {
     updateTodoItem: {
       id: 10
     }
   };
-
-  props.updateTodoItem = true;
-
-  props.getNextOpportunities = mockDispatch;
-  const wrapper = shallow(
-    <PlannerHeader {...props} />
-  );
-
+  
   wrapper.setProps(props);
   expect(wrapper.state().trayOpen).toEqual(true);
 });
