@@ -23,9 +23,11 @@ describe "SpeedGrader" do
   include_context "in-process server selenium tests"
   include SpeedGraderCommon
 
-  before(:each) do
+  before(:once) do
     # a course with 1 teacher
-    course_with_teacher_logged_in
+    @teacher1 = course_with_teacher(name: 'Teacher1', active_all: true).user
+    @teacher2 = course_with_teacher(course: @course, name: 'Teacher2', active_all: true).user
+    @teacher3 = course_with_teacher(course: @course, name: 'Teacher3', active_all: true).user
 
     # enroll two students
     @student1 = User.create!(name: 'Student1')
@@ -72,10 +74,6 @@ describe "SpeedGrader" do
 
   context 'with a moderated assignment' do
     before(:each) do
-      @teacher1 = @teacher
-      @teacher2 = course_with_teacher(course: @course, name: 'Teacher2', active_all: true).user
-      @teacher3 = course_with_teacher(course: @course, name: 'Teacher3', active_all: true).user
-
       @moderated_assignment = @course.assignments.create!(
         title: 'Moderated Assignment1',
         grader_count: 2,
@@ -144,10 +142,7 @@ describe "SpeedGrader" do
   end
 
   context 'with a moderated anonymous assignment' do
-    before(:each) do
-      @teacher1 = @teacher
-      @teacher2 = course_with_teacher(course: @course, name: 'Teacher2', active_all: true).user
-      @teacher3 = course_with_teacher(course: @course, name: 'Teacher3', active_all: true).user
+    before(:once) do
 
       @moderated_anonymous_assignment = @course.assignments.create!(
         title: 'Moderated Anonymous Assignment1',
