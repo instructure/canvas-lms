@@ -34,9 +34,6 @@ class ObserverAlertApiHarness
     "/courses/#{course.id}"
   end
 
-  def account_notification_url(context_id, notification)
-    "/accounts/#{context_id}/account_notifications/#{notification.id}"
-  end
 end
 
 describe "Api::V1::ObserverAlert" do
@@ -81,14 +78,6 @@ describe "Api::V1::ObserverAlert" do
         alert = observer_alert_model(course: @course, active_all: true, alert_type: 'course_grade_high', context: @course)
         json = api.observer_alert_json(alert, user, session)
         expect(json['html_url']).to eq api.course_url(@course)
-      end
-
-      it "for account_notification" do
-        noti = AccountNotification.create!(account: Account.default, message: "Danger! Danger! Will Robinson",
-          start_at: Time.zone.now, end_at: 3.days.from_now, subject: "Danger")
-        alert = observer_alert_model(course: @course, active_all: true, alert_type: 'institution_announcement', context: noti)
-        json = api.observer_alert_json(alert, user, session)
-        expect(json['html_url']).to eq api.account_notification_url(noti.account_id, noti)
       end
 
       it "for assignment_missing" do

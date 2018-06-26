@@ -59,6 +59,7 @@ describe ObserverAlert do
   describe 'course_grade alerts' do
     before :once do
       course_with_teacher()
+      observer_alert_threshold_model(course: @course, alert_type: 'course_grade_low', threshold: 50)
       @threshold1 = observer_alert_threshold_model(course: @course, alert_type: 'course_grade_high', threshold: 80)
       @student1 = @student
       @enrollment1 = @student1.enrollments.where(course: @course).first
@@ -122,7 +123,7 @@ describe ObserverAlert do
       alert = alert1.first
       expect(alert).not_to be_nil
       expect(alert.context).to eq a
-      expect(alert.title).to include('Announcement posted: ')
+      expect(alert.title).to include('Course announcement: ')
 
       alert2 = ObserverAlert.where(student: @student, observer: @observer2).first
       expect(alert2).to be_nil
@@ -189,6 +190,7 @@ describe ObserverAlert do
       alert = ObserverAlert.active.where(student: @student1, alert_type: 'assignment_missing').first
       expect(alert.alert_type).to eq 'assignment_missing'
       expect(alert.context.user).to eq @student1
+      expect(alert.title).to include('Assignment missing:')
     end
 
     it 'doesnt create another alert if one already exists' do
@@ -262,6 +264,7 @@ describe ObserverAlert do
       expect(alert.count).to eq 1
 
       expect(alert.first.context).to eq notification
+      expect(alert.first.title).to include('Institution announcement:')
     end
 
     it 'creates an alert if student role is selected but not observer' do

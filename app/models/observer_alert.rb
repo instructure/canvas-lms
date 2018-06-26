@@ -85,9 +85,9 @@ class ObserverAlert < ActiveRecord::Base
                     created_at: now,
                     updated_at: now,
                     action_date: now,
-                    title: I18n.t('Assignment missing: %{assignment_name} in %{course_name}', {
+                    title: I18n.t('Assignment missing: %{assignment_name} in %{course_code}', {
                       assignment_name: submission.assignment.title,
-                      course_name: submission.assignment.course.name
+                      course_code: submission.assignment.course.course_code
                     }) }
       end
     end

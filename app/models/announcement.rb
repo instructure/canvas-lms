@@ -147,7 +147,10 @@ class Announcement < DiscussionTopic
 
       ObserverAlert.create!(observer: observer, student: threshold.student, observer_alert_threshold: threshold,
                             context: self, alert_type: 'course_announcement', action_date: self.updated_at,
-                            title: I18n.t("Announcement posted: %{title}", title: self.title))
+                            title: I18n.t("Course announcement: \"%{title}\" in %{course_code}", {
+                              title: self.title,
+                              course_code: self.course.course_code
+                            }))
     end
   end
 end

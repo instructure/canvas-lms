@@ -57,7 +57,9 @@ class AccountNotification < ActiveRecord::Base
       ObserverAlert.create(student: threshold.student, observer: threshold.observer,
                            observer_alert_threshold: threshold, context: self,
                            alert_type: 'institution_announcement', action_date: self.start_at,
-                           title: I18n.t('Announcement posted: %{account_name}', { account_name: self.account.name}))
+                           title: I18n.t('Institution announcement: "%{announcement_title}"', { 
+                             announcement_title: self.subject
+                           }))
     end
   end
 
