@@ -226,7 +226,7 @@
     "jspec": "./spec/jspec.sh",
     "jspec-watch": "./spec/jspec.sh --watch",
     "a11y-report": "./spec/jspec.sh --a11y",
-    "upgrade-and-dedupe": "rm -rf yarn.lock node_modules && yes 1 | yarn install --flat --production && git checkout package.json && yarn install && git add yarn.lock"
+    "upgrade-and-dedupe": "rm -rf yarn.lock node_modules && yes 1 | yarn install --flat --production --ignore-scripts && git checkout package.json && yarn install && git add yarn.lock"
   },
   "resolutions": {
     "jquery": "https://github.com/ryankshaw/jquery.git#a755a3e9c99d5a70d8ea570836f94ae1ba56046d",
