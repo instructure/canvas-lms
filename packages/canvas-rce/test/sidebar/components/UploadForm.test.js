@@ -401,17 +401,15 @@ describe("UploadForm", () => {
   });
 
   describe("handleFolderChange", () => {
-    let ev, form, value;
+    let ev, form, selected, value;
 
     beforeEach(() => {
       value = 123;
-      ev = {
-        preventDefault: sinon.spy(),
-        target: { value }
-      };
+      ev = { preventDefault: sinon.spy() };
+      selected = { value };
       form = new UploadForm({});
       sinon.stub(form, "setState");
-      form.handleFolderChange(ev);
+      form.handleFolderChange(ev, selected);
     });
 
     it("prevents default on event", () => {

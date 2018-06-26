@@ -91,11 +91,11 @@ class UploadForm extends Component {
     this.props.startUpload(fileMetaProps);
   }
 
-  handleFolderChange(e) {
+  handleFolderChange(e, selected) {
     e.preventDefault();
     this.setState({
       file: {
-        parentFolderId: e.target.value,
+        parentFolderId: selected.value,
         name: this.state.file.name,
         size: this.state.file.size,
         contentType: this.state.file.contentType,
