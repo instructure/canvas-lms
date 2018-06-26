@@ -53,9 +53,9 @@ module LtiOutbound
       hash['ext_outcome_result_total_score_accepted'] = true
       hash['ext_outcomes_tool_placement_url'] = lti_turnitin_outcomes_placement_url
 
-
       if active_record_assignment.migration_id
         assignment_settings = SettingsService.get_settings(id: active_record_assignment.migration_id.to_s, object: 'assignment')
+        student_assignment_settings = SettingsService.get_settings(id: "#{active_record_assignment.migration_id.to_s}:#{user.id}", object: 'student_assignment')
       end
 
       ### Temporary Ugly Hack ##
@@ -64,6 +64,10 @@ module LtiOutbound
       end
 
       if assignment_settings and assignment_settings['max_attempts']
+        hash['custom_strongmind_max_assessment_attempts'] = assignment_settings['max_attempts'].to_i
+      end
+
+      if student_assignment_settings and student_assignment_settings['max_attempts']
         hash['custom_strongmind_max_assessment_attempts'] = assignment_settings['max_attempts'].to_i
       end
 
