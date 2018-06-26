@@ -45,8 +45,6 @@ module Api::V1::ObserverAlert
             course_assignment_url(alert.context.context_id, alert.context)
           when 'Course'
             course_url(alert.context)
-          when 'AccountNotification'
-            account_notification_url(alert.context.account_id, alert.context)
           when 'Submission'
             assignment = alert.context.assignment
             course_assignment_url(assignment.context_id, assignment)

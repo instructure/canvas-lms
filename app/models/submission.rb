@@ -563,10 +563,10 @@ class Submission < ActiveRecord::Base
       ObserverAlert.create!(observer: threshold.observer, student: self.user,
                             observer_alert_threshold: threshold,
                             context: self.assignment, alert_type: threshold.alert_type, action_date: self.graded_at,
-                            title: I18n.t("Assignment graded: %{score} on %{assignmentName} in %{courseName}", {
-                              score: self.score,
-                              assignmentName: self.assignment.title,
-                              courseName: self.assignment.course.name
+                            title: I18n.t("Assignment graded: %{grade} on %{assignment_name} in %{course_code}", {
+                              grade: self.grade,
+                              assignment_name: self.assignment.title,
+                              course_code: self.assignment.course.course_code
                             }))
     end
   end
