@@ -135,6 +135,16 @@ module PlannerPageObject
                                            message: "new reply from teacher")
   end
 
+  def discussion_index_page_detail
+    # might need to change when implementing
+    f('.ig-details__item')
+  end
+
+  def discussion_show_page_detail
+    # might need to change when implementing
+    f('.discussion-pubdate')
+  end
+
   def open_opportunities_dropdown
     fj("button:contains('opportunit')").click
   end

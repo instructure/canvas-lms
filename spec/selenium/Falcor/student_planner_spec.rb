@@ -31,7 +31,7 @@ describe "student planner" do
 
   before :each do
     user_session(@student1)
-  end  
+  end
 
   it "shows no due date assigned when no assignments are created.", priority: "1", test_id: 3265570 do
     go_to_list_view
@@ -209,13 +209,30 @@ describe "student planner" do
     end
   end
 
-  it "shows and navigates to ungraded discussions with todo dates from student planner", priority:"1", test_id: 3259305 do
-    discussion = @course.discussion_topics.create!(user: @teacher, title: 'somebody topic title',
-                                                   message: 'somebody topic message',
-                                                   todo_date: Time.zone.now + 2.days)
-    go_to_list_view
-    validate_object_displayed('Discussion')
-    validate_link_to_url(discussion, 'discussion_topics')
+  context "ungraded discussion" do
+    before :once do
+      @ungraded_discussion = @course.discussion_topics.create!(user: @teacher, title: 'somebody topic title',
+                                                               message: 'somebody topic message',
+                                                               todo_date: Time.zone.now + 2.days)
+    end
+
+    it "shows and navigates to ungraded discussions with todo dates from student planner", priority:"1", test_id: 3259305 do
+      go_to_list_view
+      validate_object_displayed('Discussion')
+      validate_link_to_url(@ungraded_discussion, 'discussion_topics')
+    end
+
+    it 'shows the date in the index page' do
+      skip('unskip with ADMIN-1160')
+      get "/courses/#{@course.id}/discussion_topics/"
+      expect(discussion_index_page_detail.text).to eq(format_time_for_view(@ungraded_discussion.todo_date))
+    end
+
+    it 'shows the date in the show page' do
+      skip('unskip with ADMIN-1160')
+      get "/courses/#{@course.id}/discussion_topics/#{@ungraded_discussion.id}/"
+      expect(discussion_show_page_detail.text).to eq(format_time_for_view(@ungraded_discussion.todo_date))
+    end
   end
 
   context "Quizzes" do
@@ -615,9 +632,9 @@ describe "student planner" do
     wait_for_planner_load
     expect(f('.PlannerApp')).to contain_jqcss('span:contains("Show 1 completed item")')
   end
-  
+
   context "teacher in a course" do
-    before :once do 
+    before :once do
       @teacher1 = User.create!(name: 'teacher')
       @course.enroll_teacher(@teacher1).accept!
     end
@@ -632,7 +649,7 @@ describe "student planner" do
         get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
         f('#student_planner_checkbox').click
         wait_for_ajaximations
-        f('#todo_date').send_keys(format_date_for_view(Time.zone.now).to_s)  
+        f('#todo_date').send_keys(format_date_for_view(Time.zone.now).to_s)
         fj('button:contains("Save")').click
         get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
         expect(get_value("#todo_date")).to eq "#{format_date_for_view(Time.zone.today)} 11:59pm"
@@ -645,11 +662,11 @@ describe "student planner" do
         get("/courses/#{@course.id}/discussion_topics/#{@discussion.id}/edit")
         f('#todo_options').click
         wait_for_ajaximations
-        f('#todo_date').send_keys(format_date_for_view(Time.zone.now).to_s)  
+        f('#todo_date').send_keys(format_date_for_view(Time.zone.now).to_s)
         expect_new_page_load { submit_form('.form-actions') }
         get("/courses/#{@course.id}/discussion_topics/#{@discussion.id}/edit")
         expect(get_value("#todo_date")).to eq "#{format_date_for_view(Time.zone.today)} 11:59pm"
       end
     end
-  end 
+  end
 end
