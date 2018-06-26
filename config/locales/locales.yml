@@ -12,7 +12,7 @@ da:
   dow_offset: 1
 da-x-k12:
   locales:
-    da-x-k12: Dansk K12
+    da-x-k12: Dansk GR/GY
   bigeasy_locale: da_DK
   fullcalendar_locale: da
   moment_locale: da
@@ -117,7 +117,7 @@ nb:
   dow_offset: 1
 nb-x-k12:
   locales:
-    nb-x-k12: Norsk K12 (Bokmål)
+    nb-x-k12: Norsk (Bokmål) GS/VGS
   bigeasy_locale: nb_NO
   fullcalendar_locale: nb
   moment_locale: nb
@@ -154,7 +154,7 @@ sv:
   dow_offset: 1
 sv-x-k12:
   locales:
-    sv-x-k12: Svenska K12
+    sv-x-k12: Svenska GR/GY
   bigeasy_locale: sv_SE
   fullcalendar_locale: sv
   moment_locale: sv

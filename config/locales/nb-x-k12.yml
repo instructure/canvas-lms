@@ -8268,7 +8268,7 @@ nb-x-k12:
   loading_sync_history_9f342cbf: "Laster synkroniseringsloggen"
   loading_unsynced_changes_b5d7b202: "Laster usynkroniserte endringer"
   locales: 
-    nb-x-k12: "Norsk K12 (Bokmål)"
+    nb-x-k12: "Norsk (Bokmål) GS/VGS"
   location_e17bd402: Lokasjon
   lock_at_time_3c8a044e: "Lås kl.: %{time}"
   lock_c341af13: Lås
