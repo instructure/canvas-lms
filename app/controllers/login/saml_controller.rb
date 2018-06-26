@@ -119,7 +119,7 @@ class Login::SamlController < ApplicationController
           aac.debug_set(:is_valid_login_response, 'false')
           aac.debug_set(:login_response_validation_error, response.errors.join("\n"))
         end
-        logger.error "Failed to verify SAML signature: #{legacy_response.validation_error}"
+        logger.error "Failed to verify SAML signature: #{response.errors.join("\n")}"
         flash[:delegated_message] = login_error_message
         return redirect_to login_url
       end
@@ -158,10 +158,10 @@ class Login::SamlController < ApplicationController
         increment_saml_stat("normal.login_success")
 
         session[:saml_unique_id] = unique_id
-        session[:name_id] = subject_name_id.id
-        session[:name_identifier_format] = subject_name_id.format
-        session[:name_qualifier] = subject_name_id.name_qualifier
-        session[:sp_name_qualifier] = subject_name_id.sp_name_qualifier
+        session[:name_id] = subject_name_id&.id
+        session[:name_identifier_format] = subject_name_id&.format
+        session[:name_qualifier] = subject_name_id&.name_qualifier
+        session[:sp_name_qualifier] = subject_name_id&.sp_name_qualifier
         session[:session_index] = assertion.authn_statements.first&.session_index
         session[:return_to] = relay_state if relay_state&.match(/\A\/(\z|[^\/])/)
         session[:login_aac] = aac.id

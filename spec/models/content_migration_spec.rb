@@ -102,6 +102,7 @@ describe ContentMigration do
 
       cm.queue_migration
       run_jobs
+      expect(cm.reload).to be_imported
       expect(context.reload.attachments.count).to eq filecount
     end
 
