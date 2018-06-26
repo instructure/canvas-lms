@@ -8225,7 +8225,7 @@ da-x-k12:
   loading_sync_history_9f342cbf: "Indlæser synkroniseringshistorik"
   loading_unsynced_changes_b5d7b202: "Indlæser usynkroniserede ændringer"
   locales: 
-    da-x-k12: "Dansk K12"
+    da-x-k12: "Dansk GR/GY"
   location_e17bd402: Placering
   lock_at_time_3c8a044e: "Lås kl.: %{time}"
   lock_c341af13: Lås
