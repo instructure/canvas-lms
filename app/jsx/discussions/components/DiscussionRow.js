@@ -506,21 +506,27 @@ export class DiscussionRow extends Component {
   }
 
   getAvailabilityString = () => {
-    const availabilityBegin = this.props.discussion.delayed_post_at
-    const availabilityEnd = this.props.discussion.lock_at
-    if (availabilityBegin && !isPassedDelayedPostAt({ checkDate: null, delayedDate: availabilityBegin })) {
+    const assignment = this.props.discussion.assignment
+
+    const availabilityBegin =
+      this.props.discussion.delayed_post_at || (assignment && assignment.unlock_at)
+    const availabilityEnd = this.props.discussion.lock_at || (assignment && assignment.lock_at)
+
+    if (
+      availabilityBegin &&
+      !isPassedDelayedPostAt({checkDate: null, delayedDate: availabilityBegin})
+    ) {
       return I18n.t('Not available until %{date}', {date: $.datetimeString(availabilityBegin)})
     }
     if (availabilityEnd) {
-      if (isPassedDelayedPostAt({ checkDate: null, delayedDate: availabilityEnd })) {
+      if (isPassedDelayedPostAt({checkDate: null, delayedDate: availabilityEnd})) {
         return I18n.t('Was locked at %{date}', {date: $.datetimeString(availabilityEnd)})
       } else {
-        return I18n.t('Available until %{date}',{date: $.datetimeString(availabilityEnd)})
+        return I18n.t('Available until %{date}', {date: $.datetimeString(availabilityEnd)})
       }
     }
-    return ""
+    return ''
   }
-
   renderAvailabilityDate = () => {
     // Check if we are too early for the topic to be available
     const availabilityString = this.getAvailabilityString();

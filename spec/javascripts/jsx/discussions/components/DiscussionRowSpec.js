@@ -316,6 +316,47 @@ test('manage menu items do appear upon click', () => {
   tree.unmount()
 })
 
+test('renders available date and delayed date on graded discussions', () => {
+  const tree = mount(
+    <DiscussionRow
+      {...makeProps({
+        discussion: {
+          assignment: {
+            lock_at: '2018-07-01T05:59:00Z',
+            unlock_at: '2018-06-21T06:00:00Z'
+          },
+          id: '1',
+          position: 1,
+          published: true,
+          title: 'Hello World',
+          message: 'Foo bar bar baz boop beep bop Foo',
+          posted_at: 'January 10, 2019 at 10:00 AM',
+          can_unpublish: true,
+          author: {
+            id: '5',
+            display_name: 'John Smith',
+            html_url: '',
+            avatar_image_url: null
+          },
+          read_state: 'unread',
+          unread_count: 0,
+          discussion_subentry_count: 5,
+          locked: false,
+          html_url: '',
+          user_count: 10,
+          delayed_post_at: '2018-06-21T06:00:00Z',
+          last_reply_at: new Date(2018, 1, 14, 0, 0, 0, 0)
+        }
+      })}
+    />
+  )
+  let node = tree.find('.discussion-availability')
+  ok(node.exists())
+  node = tree.find('.ic-discussion-row__content')
+  ok(node.exists())
+  tree.unmount()
+})
+
 test('renders move-to in manage menu if permitted', () => {
   const tree = mount(<DiscussionRow {...makeProps({
     displayManageMenu: true,
