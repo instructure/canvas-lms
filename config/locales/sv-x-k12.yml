@@ -8176,7 +8176,7 @@ sv-x-k12:
   loading_sync_history_9f342cbf: "Laddar synkroniseringshistorik"
   loading_unsynced_changes_b5d7b202: "Laddar osynkroniserade ändringar"
   locales: 
-    sv-x-k12: Svenska
+    sv-x-k12: "Svenska GR/GY"
   location_e17bd402: Plats
   lock_at_time_3c8a044e: "Lås klockan: %{time}"
   lock_c341af13: Lås
