@@ -234,7 +234,7 @@ define [
       this
 
     afterRender: =>
-      @renderStudentTodoAtDate() if ENV.STUDENT_PLANNER_ENABLED
+      @renderStudentTodoAtDate() if ENV.STUDENT_PLANNER_ENABLED && @$todoDateInput.length
 
 
     attachKeyboardShortcuts: =>
