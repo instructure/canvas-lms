@@ -103,13 +103,16 @@ import './jquery.loadingImg'
         });
       }
       else if (opts.canvadoc_session_url) {
-        const canvadocWrapper = $('<div style="overflow: auto; border: 1px solid transparent; height: 100%;"/>')
+        const canvadocWrapper = $('<div style="overflow: auto; resize: vertical;\
+        border: 1px solid transparent; height: 100%;"/>')
         canvadocWrapper.appendTo($this)
+
+        const minHeight = opts.iframe_min_height !== undefined ? opts.iframe_min_height : '800px'
         var iframe = $('<iframe/>', {
           src: opts.canvadoc_session_url,
           width: opts.width,
           allowfullscreen: '1',
-          css: {border: 0, overflow: 'auto', height: '99%'},
+          css: {border: 0, overflow: 'auto', height: '99%', 'min-height': minHeight},
           id: opts.id
         });
         iframe.appendTo(canvadocWrapper)

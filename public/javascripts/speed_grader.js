@@ -2065,7 +2065,8 @@ EG = {
       this.displayExpirationWarnings(aggressiveWarnings, 10, canvadocMessage);
 
       $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
-        canvadoc_session_url: (attachment.provisional_canvadoc_url || attachment.canvadoc_url)
+        canvadoc_session_url: (attachment.provisional_canvadoc_url || attachment.canvadoc_url),
+        iframe_min_height: 0
       }));
     } else if ($.isPreviewable(attachment.content_type, 'google')) {
       if (!INST.disableCrocodocPreviews) $no_annotation_warning.show();

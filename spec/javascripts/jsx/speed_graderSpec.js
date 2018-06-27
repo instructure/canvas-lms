@@ -2363,6 +2363,18 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         SpeedGrader.EG.renderAttachment(attachment)
         strictEqual(SpeedGrader.EG.currentStudent.anonymous_id, alphaStudent.anonymous_id)
       })
+
+      test('calls loadDocPreview for canvadoc documents with iframe_min_height set to 0', () => {
+        const loadDocPreview = sinon.stub($.fn, 'loadDocPreview')
+        SpeedGrader.EG.currentStudent = alphaStudent
+        const attachment = {content_type: 'application/pdf', canvadoc_url: 'fake_url'}
+
+        SpeedGrader.EG.renderAttachment(attachment)
+
+        const [documentParams] = loadDocPreview.firstCall.args
+        strictEqual(documentParams.iframe_min_height, 0)
+        loadDocPreview.restore()
+      })
     })
 
     QUnit.module('#showRubric', hooks => {
