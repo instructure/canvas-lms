@@ -526,6 +526,11 @@ describe LearningOutcome do
       }.from(1).to(0)
     end
 
+    it "returns points possible value set through rubric_criterion assessor" do
+      @outcome.rubric_criterion[:points_possible] = 10
+      expect(@outcome.rubric_criterion[:points_possible]).to eq 10
+    end
+
     it "returns #data[:rubric_criterion] when #rubric_criterion is called" do
       @outcome.rubric_criterion = {
         description: "Thoughtful description",
@@ -806,6 +811,16 @@ describe LearningOutcome do
     end
 
     context "default values" do
+      it 'should default mastery points to 3' do
+        @outcome = LearningOutcome.create!(:title => 'outcome')
+        expect(@outcome.mastery_points).to be 3
+      end
+
+      it 'should default points possible to 5' do
+        @outcome = LearningOutcome.create!(:title => 'outcome')
+        expect(@outcome.points_possible).to be 5
+      end
+
       it "should default calculation_method to highest" do
         @outcome = LearningOutcome.create!(:title => 'outcome')
         expect(@outcome.calculation_method).to eql('highest')

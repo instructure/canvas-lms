@@ -157,7 +157,8 @@ describe Outcomes::CsvImporter do
     it 'works when no ratings are present' do
       expect_ok_import(csv_file('no-ratings'))
 
-      expect(by_guid['c'].rubric_criterion).to eq(nil)
+      expect(by_guid['c'].data).not_to be_nil
+      expect(by_guid['c'].rubric_criterion).not_to be_nil
     end
 
     it 'properly sets scoring types' do

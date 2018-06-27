@@ -241,7 +241,7 @@ class OutcomesApiController < ApplicationController
   end
 
   def update_outcome_criterion(outcome)
-    criterion = outcome.data && outcome.data[:rubric_criterion]
+    criterion = outcome.rubric_criterion
     criterion ||= {}
     if params[:mastery_points]
       criterion[:mastery_points] = params[:mastery_points]

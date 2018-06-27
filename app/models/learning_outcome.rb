@@ -228,8 +228,31 @@ class LearningOutcome < ActiveRecord::Base
     end
   end
 
+  def self.default_rubric_criterion
+    {
+      description: t('No Description'),
+      ratings: [
+        {
+          description: I18n.t('Exceeds Expectations'),
+          points: 5
+        },
+        {
+          description: I18n.t('Meets Expectations'),
+          points: 3
+        },
+        {
+          description: I18n.t('Does Not Meet Expectations'),
+          points: 0
+        }
+      ],
+      mastery_points: 3,
+      points_possible: 5
+    }
+  end
+
   def rubric_criterion
-    data && data[:rubric_criterion]
+    self.data ||= {}
+    data[:rubric_criterion] ||= self.class.default_rubric_criterion
   end
 
   def rubric_criterion=(hash)
@@ -250,7 +273,7 @@ class LearningOutcome < ActiveRecord::Base
       criterion[:mastery_points] = (hash[:mastery_points] || criterion[:ratings][0][:points]).to_f
       criterion[:points_possible] = criterion[:ratings][0][:points] rescue 0
     else
-      criterion = nil
+      criterion = self.class.default_rubric_criterion
     end
 
     self.data[:rubric_criterion] = criterion
@@ -292,13 +315,11 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   def mastery_points
-    return unless self.rubric_criterion
-    self.data[:rubric_criterion][:mastery_points]
+    self.rubric_criterion[:mastery_points]
   end
 
   def points_possible
-    return unless self.rubric_criterion
-    self.data[:rubric_criterion][:points_possible]
+    self.rubric_criterion[:points_possible]
   end
 
   def mastery_percent
