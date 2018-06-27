@@ -125,7 +125,7 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
   padding: 0;
   margin: 0;
   line-height: 1.3;
-  font-size: $baseFontSize;
+  font-size: calculateRem($baseFontSize);
   font-weight: bold;
 }
 
