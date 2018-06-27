@@ -20,15 +20,10 @@ require 'byebug'
 class ApiClientBase
   include HTTParty
 
-  AUTH_HEADER = 'Auth-User-Id'.freeze
+  AUTH_HEADER = 'Auth-User'.freeze
 
-  def initialize
-    # default to user 1, optionally override later
-    authenticate_as_user(1)
-  end
-
-  def authenticate_as_user(user_id)
-    self.class.headers AUTH_HEADER => user_id.to_s
+  def authenticate_as_user(name)
+    self.class.headers AUTH_HEADER => name
   end
 
 end

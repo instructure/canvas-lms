@@ -18,31 +18,43 @@
 class PactApiConsumerProxy
 
   AUTH_HEADER = 'HTTP_AUTHORIZATION'.freeze
-  USER_ID_HEADER = 'HTTP_AUTH_USER_ID'.freeze
+  USER_HEADER = 'HTTP_AUTH_USER'.freeze
 
   def call(env)
     # Users calling the API will know the user ID of the
     # user that they want to identify as. These are given
     # in the provider state descriptions.
-    if expects_auth_header(env)
-      user = User.find(requesting_user_id(env))
+    if expects_auth_header?(env)
+      user = find_requesting_user(env)
+      # You can create an access token without having a pseudonym;
+      # however, when Canvas receives a request and looks up the user
+      # for that access token, it expects that user to have a pseudonym.
+      Pseudonym.create!(user: user, unique_id: "#{user.name}@instructure.com")
       token = user.access_tokens.create!.full_token
       env[AUTH_HEADER] = "Bearer #{token}"
-      # Unset the 'AUTH_USER_ID' header -- that's only for this proxy,
-      # don't pass it along to Canvas.
-      env.delete(USER_ID_HEADER)
     end
+    # Unset the 'AUTH_USER' header -- that's only for this proxy,
+    # don't pass it along to Canvas.
+    env.delete(USER_HEADER)
 
     CanvasRails::Application.call(env)
   end
 
   private
 
-  def expects_auth_header(env)
+  def expects_auth_header?(env)
     env[AUTH_HEADER]
   end
 
-  def requesting_user_id(env)
-    env[USER_ID_HEADER] || '1'
+  def find_requesting_user(env)
+    user_name = env[USER_HEADER]
+    if user_name
+      user = User.where(name: user_name).first
+      raise "There is no user with name #{user_name}." unless user
+    else
+      user = User.first
+    end
+
+    user
   end
 end

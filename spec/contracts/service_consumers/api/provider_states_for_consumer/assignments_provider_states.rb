@@ -22,9 +22,8 @@ PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
     provider_state 'a student in a course with an assignment' do
       set_up do
-        course_with_student(active_all: true)
+        course_with_student(active_all: true, name: 'Student')
         Assignment.create!(context: @course, title: "Assignment1")
-        Pseudonym.create!(user: @student, unique_id: 'testuser@instructure.com')
       end
     end
   end

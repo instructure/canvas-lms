@@ -30,7 +30,7 @@ describe 'Assignments', :pact do
           method: :get,
           headers: {
             'Authorization': 'some_token',
-            'Auth-User-Id': '2',
+            'Auth-User': 'Student',
             'Connection': 'close',
             'Host': PactConfig.mock_provider_service_base_uri,
             'Version': 'HTTP/1.1'
@@ -43,7 +43,7 @@ describe 'Assignments', :pact do
           body: Pact.each_like('id': 1, 'name': 'Assignment1')
         )
 
-      assignments_api.authenticate_as_user(2)
+      assignments_api.authenticate_as_user('Student')
       response = assignments_api.list_assignments(1, 2)
       expect(response[0]['id']).to eq 1
       expect(response[0]['name']).to eq 'Assignment1'
@@ -58,7 +58,7 @@ describe 'Assignments', :pact do
           method: :post,
           headers: {
             'Authorization': 'some_token',
-            'Auth-User-Id': '2',
+            'Auth-User': 'Teacher',
             'Connection': 'close',
             'Host': PactConfig.mock_provider_service_base_uri,
             'Version': 'HTTP/1.1',
@@ -80,7 +80,7 @@ describe 'Assignments', :pact do
           body: Pact.like('id': 1, 'name': 'New Assignment')
         )
 
-      assignments_api.authenticate_as_user(2)
+      assignments_api.authenticate_as_user('Teacher')
       response = assignments_api.post_assignments(1, 'New Assignment')
       expect(response['id']).to eq 1
       expect(response['name']).to eq 'New Assignment'

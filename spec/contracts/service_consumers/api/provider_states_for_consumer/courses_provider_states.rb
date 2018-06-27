@@ -54,7 +54,7 @@ PactConfig::Consumers::ALL.each do |consumer|
 
     provider_state 'a teacher in a course' do
       set_up do
-        course_with_teacher(active_all: true)
+        course_with_teacher(active_all: true, name: 'Teacher')
         Pseudonym.create!(user: @teacher, unique_id: 'testuser@instructure.com')
         token = @teacher.access_tokens.create!().full_token
 
