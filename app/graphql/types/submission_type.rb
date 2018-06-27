@@ -26,6 +26,7 @@ module Types
     alias :submission :object
 
     # not doing a legacy canvas id since they aren't used in the rest api
+    global_id_field :id
 
     field :assignment, AssignmentType, null: true
     def assignment

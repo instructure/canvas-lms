@@ -65,6 +65,7 @@ module Types
       Assignment::ALLOWED_GRADING_TYPES.each { |type| value(type) }
     end
 
+    global_id_field :id
     field :_id, ID, "legacy canvas id", null: false, method: :id
 
     field :name, String, null: true

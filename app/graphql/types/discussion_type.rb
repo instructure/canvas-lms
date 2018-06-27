@@ -23,9 +23,7 @@ module Types
     implements GraphQL::Relay::Node.interface
     implements Interfaces::TimestampInterface
 
-    ## TODO: something like this
-    #implements Interfaces::LegacyNode
-
+    global_id_field :id
     field :_id, ID, "legacy canvas id", null: false, method: :id
   end
 end
