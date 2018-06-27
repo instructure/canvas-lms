@@ -607,7 +607,7 @@ class GradebooksController < ApplicationController
       return redirect_to polymorphic_url([@context, @assignment])
     end
 
-    grading_role = if moderated_grading_enabled_and_no_grades_published
+    grading_role = if moderated_grading_enabled_and_no_grades_published?
       if @assignment.permits_moderation?(@current_user)
         :moderator
       else
@@ -903,7 +903,7 @@ class GradebooksController < ApplicationController
                      asset_string: "final_grade_column")
   end
 
-  def moderated_grading_enabled_and_no_grades_published
+  def moderated_grading_enabled_and_no_grades_published?
     @assignment.moderated_grading? && !@assignment.grades_published?
   end
 
