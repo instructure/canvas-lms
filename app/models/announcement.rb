@@ -142,10 +142,11 @@ class Announcement < DiscussionTopic
     observer_enrollments = self.course.enrollments.active.where(type: 'ObserverEnrollment')
     observer_enrollments.each do |enrollment|
       observer = enrollment.user
-      threshold = ObserverAlertThreshold.where(observer: observer, alert_type: 'course_announcement').first
+      student = enrollment.associated_user
+      threshold = ObserverAlertThreshold.where(observer: observer, alert_type: 'course_announcement', student: student).first
       next unless threshold
 
-      ObserverAlert.create!(observer: observer, student: threshold.student, observer_alert_threshold: threshold,
+      ObserverAlert.create!(observer: observer, student: student, observer_alert_threshold: threshold,
                             context: self, alert_type: 'course_announcement', action_date: self.updated_at,
                             title: I18n.t("Course announcement: \"%{title}\" in %{course_code}", {
                               title: self.title,
