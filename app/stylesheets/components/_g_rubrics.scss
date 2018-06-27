@@ -56,15 +56,18 @@
     label[for=rubric-title] {
       font-weight: bold;
     }
-    tr.criterion .container .add_rating_link {
-      position: absolute;
-      float: direction(right);
-      top: 50%;
-      #{direction(right)}: -.5%;
-      transform: translateY(-50%);
+    tr.criterion .add_rating_link {
       line-height: 0;
-      width: 0;
-      display: block;
+      margin-#{direction(right)}: -1.2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    tr.criterion td.rating > div.container {
+      display: flex;
+    }
+    tr.criterion .rating-main {
+      flex: 1;
     }
     .add_rating_link_after {
       border-radius: 1rem;
@@ -188,9 +191,6 @@
         height: 100%;
       }
       &.edge_rating .delete_rating_link {
-        display: none;
-      }
-      &:last-child .add_rating_link_after {
         display: none;
       }
       &.infinitesimal .range_rating {

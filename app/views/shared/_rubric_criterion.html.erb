@@ -100,7 +100,8 @@
         <% ratings ||= [OpenObject.new(:id => "blank", :description => t(:full_marks, "Full Marks"), :points => 5), OpenObject.new(:id => "blank_2", :description => t(:no_marks, "No Marks"), :points => 0)] %>
         <% ratings.each_index do |idx| %>
           <% rating = ratings[idx];
-             rating.edge = (idx == 0 || idx == ratings.length - 1);
+             last_rating = idx == ratings.length - 1
+             rating.edge = (idx == 0 || last_rating);
              next_rating = ratings[idx+1];
              rating_min = (next_rating&.points || 0);
              rating_match = assessment_rating && assessment_rating[:points] == rating.points
@@ -111,27 +112,30 @@
               class="rating <%= "edge_rating" if rating.edge %>
                 <%= "infinitesimal" if rating_min.try(:to_f) == rating.points.try(:to_f) %>
                 <%= "selected" if selected %>"
-          <div class="container">
-            <% if !learning_outcome_criterion %>
-              <div class="editing links">
-                <a href="#" class="edit_rating_link"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t 'Edit rating' %></span></a>
-                <a href="#" class="delete_rating_link"><i class="icon-trash standalone-icon" ></i><span class="screenreader-only"><%= t 'Delete rating' %></span></a>
+          >
+            <div class="container">
+              <div class="rating-main">
+                <% if !learning_outcome_criterion %>
+                  <div class="editing links">
+                    <a href="#" class="edit_rating_link"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t 'Edit rating' %></span></a>
+                    <a href="#" class="delete_rating_link"><i class="icon-trash standalone-icon" ></i><span class="screenreader-only"><%= t 'Delete rating' %></span></a>
+                  </div>
+                  <div class="clear"></div>
+                <% end %>
+                <span class="nobr toggle_for_hide_points <%= rubric_association&.hide_points ? 'hidden' : '' %>">
+                  <span class="points"><%= n(rating.points) %></span>
+                  <span class="range_rating" style="<%= hidden if !use_range %>"><%= t('to') %> ><span class="min_points"><%= n(rating_min) %></span></span> <%= t('pts') %>
+                </span>
+                <div class="description rating_description_value"><%= rating.description %></div>
+                <div class="rating_long_description small_description"><%= rating.long_description %></div>
+                <span class="rating_id" style="display: none;"><%= rating && rating.id %></span>
               </div>
-              <div class="clear"></div>
-            <% end %>
-            <span class="nobr toggle_for_hide_points <%= rubric_association&.hide_points ? 'hidden' : '' %>">
-              <span class="points"><%= n(rating.points) %></span>
-              <span class="range_rating" style="<%= hidden if !use_range %>"><%= t('to') %> ><span class="min_points"><%= n(rating_min) %></span></span> <%= t('pts') %>
-            </span>
-            <div class="description rating_description_value"><%= rating.description %></div>
-            <div class="rating_long_description small_description"><%= rating.long_description %></div>
-            <span class="rating_id" style="display: none;"><%= rating && rating.id %></span>
-            <% if !learning_outcome_criterion %>
-              <div class="editing links add_rating_link">
-                <a href="#" class="add_rating_link_after" aria-label="<%= t 'Add rating' %>"><i class="icon-add icon-Solid"></i></a>
-              </div>
-            <% end %>
-          </div>
+              <% if !learning_outcome_criterion && !last_rating %>
+                <div class="editing links add_rating_link">
+                  <a href="#" class="add_rating_link_after" aria-label="<%= t 'Add rating' %>"><i class="icon-add icon-Solid"></i></a>
+                </div>
+              <% end %>
+            </div>
           </td>
         <% end %>
       </tr></table>
