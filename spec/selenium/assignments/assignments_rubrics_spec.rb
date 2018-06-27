@@ -565,7 +565,7 @@ describe "assignment rubrics" do
         end
 
         # Add rating
-        ff('.add_rating_link_after')[5].click
+        ff('.add_rating_link_after')[4].click
         expect(fj('span:contains("Edit Rating")')).to be_present
         rating_score_fields = ff('#rating_form_score_label')
         rating_score_fields.each do |rating_score_field|
@@ -577,15 +577,15 @@ describe "assignment rubrics" do
         fj('span:contains("Update Rating")').click
         wait_for_ajaximations
 
-        expect(ff('[class="description rating_description_value"]')[10].text).to eq "Test rating 1"
-        expect(ff('[class="rating_long_description small_description"]')[10].text).to eq "Test description 1"
+        expect(ff('[class="description rating_description_value"]')[11].text).to eq "Test rating 1"
+        expect(ff('[class="rating_long_description small_description"]')[11].text).to eq "Test description 1"
 
         # Save rubric
         find_button("Update Rubric").click
         wait_for_ajaximations
 
-        expect(ff('[class="description rating_description_value"]')[5].text).to eq "Test rating 1"
-        expect(ff('[class="rating_long_description small_description"]')[5].text).to eq "Test description 1"
+        expect(ff('[class="description rating_description_value"]')[6].text).to eq "Test rating 1"
+        expect(ff('[class="rating_long_description small_description"]')[6].text).to eq "Test description 1"
         rating_points_elements = ff('.points')
         rating_points_elements.each do |points|
           expect(points).not_to be_displayed
