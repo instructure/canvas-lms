@@ -32,7 +32,7 @@ define [
   class WikiPageDeleteDialog extends DialogFormView
     setViewProperties: false
     wrapperTemplate: -> '<div class="outlet"></div>'
-    template: -> I18n.t 'delete_confirmation', 'Are you sure you wish to delete this page?'
+    template: -> I18n.t 'delete_confirmation', 'Are you sure you want to delete this page?'
 
     @optionProperty 'wiki_pages_path'
     @optionProperty 'focusOnCancel'
