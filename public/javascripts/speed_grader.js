@@ -366,7 +366,12 @@ import './vendor/ui.selectmenu'
                    data: JSON.stringify({"value": "increment"}),
                    dataType: "json",
                    success: function(data) {
-                     $('#add-attempt-feedback').html('Attempt Added');
+                     $('#add-attempt-feedback')
+                      .hide()
+                      .html('Attempt Added')
+                      .addClass('alert alert-success')
+                      .fadeIn(1200)
+                      .fadeOut(1200)
                   },
               });
          })
