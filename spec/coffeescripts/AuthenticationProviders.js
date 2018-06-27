@@ -18,47 +18,46 @@
 
 import authenticationProviders from 'authentication_providers'
 
-let fixtureNode = null
-const appendFixtureHtml = function(html) {
-  const element = document.createElement('div')
-  element.innerHTML = html
-  fixtureNode.appendChild(element)
-}
+QUnit.module('AuthenticationProviders', () => {
+  QUnit.module('.changedAuthType()', hooks => {
+    let $container
 
-QUnit.module('AuthenticationProviders.changedAuthType', {
-  setup() {
-    fixtureNode = document.getElementById('fixtures')
-  },
-  teardown() {
-    fixtureNode.innerHTML = ''
-  }
-})
+    hooks.beforeEach(() => {
+      $container = document.createElement('div')
+      document.body.appendChild($container)
+    })
 
-test('it hides new auth forms', () => {
-  appendFixtureHtml(`
-    <form id='42_form' class='auth-form-container--new'>
-      <span>Here is a different new form</span>
-    </form>
-  `)
-  authenticationProviders.changedAuthType('saml')
-  const newForm = document.getElementById('42_form')
-  equal(newForm.style.display, 'none')
-})
+    hooks.afterEach(() => {
+      $container.remove()
+    })
 
-test('it reveals a matching form if present', () => {
-  appendFixtureHtml(`
-    <form id='saml_form' style='display:none;'>
-      <span>Here is the new form</span>
-    </form>
-  `)
-  authenticationProviders.changedAuthType('saml')
-  const newForm = document.getElementById('saml_form')
-  equal(newForm.style.display, '')
-})
+    test('it hides new auth forms', () => {
+      $container.innerHTML = `
+        <form id='42_form' class='auth-form-container--new'>
+          <span>Here is a different new form</span>
+        </form>
+      `
+      authenticationProviders.changedAuthType('saml')
+      const newForm = document.getElementById('42_form')
+      equal(newForm.style.display, 'none')
+    })
 
-test("it hides the 'nothing picked' message if present", () => {
-  appendFixtureHtml("<div id='no_auth'>No auth thingy picked</div>")
-  authenticationProviders.changedAuthType('ldap')
-  const noAuthDiv = document.getElementById('no_auth')
-  equal(noAuthDiv.style.display, 'none')
+    test('it reveals a matching form when present', () => {
+      $container.innerHTML = `
+        <form id='saml_form' style='display:none;'>
+          <span>Here is the new form</span>
+        </form>
+      `
+      authenticationProviders.changedAuthType('saml')
+      const newForm = document.getElementById('saml_form')
+      strictEqual(newForm.style.display, '')
+    })
+
+    test('it hides the "nothing picked" message when present', () => {
+      $container.innerHTML = '<div id="no_auth">No auth thingy picked</div>'
+      authenticationProviders.changedAuthType('ldap')
+      const noAuthDiv = document.getElementById('no_auth')
+      equal(noAuthDiv.style.display, 'none')
+    })
+  })
 })
