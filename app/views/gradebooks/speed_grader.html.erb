@@ -229,7 +229,7 @@
             </div>
           </div>
         <div class="turnitin_info_container"></div>
-        <% if SettingsService.get_settings(object: 'assignment', id: @assignment.migration_id)['max_attempts'] %>
+        <% if @assignment.migration_id && SettingsService.get_settings(object: 'assignment', id: @assignment.migration_id)['max_attempts'] %>
           <div id="add_attempt_container">
             <div class="ic-Action-header__Primary add_attempt" role="group" aria-labelledby="speedgrader_add_attempt_label">
               <button class="Button Button--small" type="button" id="add_attempt" title="<%= t("Add Attempt") %>">
