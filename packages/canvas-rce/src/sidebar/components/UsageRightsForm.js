@@ -64,12 +64,12 @@ export default class UsageRightsForm extends Component {
     return this.state.usageRight === Object.keys(usageRightsValues)[0];
   }
 
-  handleUsageRight = ev => {
-    this.setState({ usageRight: ev.target.value });
+  handleUsageRight = (ev, selected) => {
+    this.setState({ usageRight: selected.value });
   };
 
-  handleCCLicense = ev => {
-    this.setState({ ccLicense: ev.target.value });
+  handleCCLicense = (ev, selected) => {
+    this.setState({ ccLicense: selected.value });
   };
 
   handleCopyrightHolder = ev => {
