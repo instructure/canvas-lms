@@ -142,4 +142,25 @@ describe StreamItem do
       end
     end
   end
+
+  it "should return a title for a Conversation" do
+    user_factory
+    convo = Conversation.create!(:subject => "meow")
+    convo.generate_stream_items([@user])
+    si = @user.stream_item_instances.first.stream_item
+    data = si.data(@user.id)
+    expect(data).to be_a Conversation
+    expect(data.title).to eql("meow")
+  end
+
+    it "should return a description for a Collaboration" do
+      user_factory
+      context = Course.create!
+      collab = Collaboration.create!(:context => context, :description => "meow", :title => "kitty")
+      collab.generate_stream_items([@user])
+      si = @user.stream_item_instances.first.stream_item
+      data = si.data(@user.id)
+      expect(data).to be_a Collaboration
+      expect(data.description).to eql("meow")
+    end
 end
