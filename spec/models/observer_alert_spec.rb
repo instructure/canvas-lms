@@ -140,6 +140,23 @@ describe ObserverAlert do
       alert = ObserverAlert.where(student: @student, observer: @observer, context: a).first
       expect(alert).not_to be_nil
     end
+
+    it 'creates an alert for each student' do
+      student1 = student_in_course(active_all: true, course: @course).user
+      student2 = student_in_course(active_all: true, course: @course).user
+      observer = course_with_observer(course: @course, associated_user_id: student1.id, active_all: true).user
+      course_with_observer(user: observer, course: @course, associated_user_id: student2.id, active_all: true).user
+      ObserverAlertThreshold.create!(student: student1, observer: observer, alert_type: 'course_announcement')
+      ObserverAlertThreshold.create!(student: student2, observer: observer, alert_type: 'course_announcement')
+
+      a = announcement_model(context: @course)
+
+      alert1 = ObserverAlert.where(student: student1, observer: observer, context: a)
+      alert2 = ObserverAlert.where(student: student2, observer: observer, context: a)
+
+      expect(alert1.count).to eq 1
+      expect(alert2.count).to eq 1
+    end
   end
 
   describe 'clean_up_old_alerts' do
