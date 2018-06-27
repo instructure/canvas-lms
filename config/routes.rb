@@ -32,6 +32,10 @@ CanvasRails::Application.routes.draw do
   end
 
   resources(:users) do
+    resources(:assignments) do
+      resources(:settings, controller: :student_assignment_settings)
+    end
+
     resources(:settings, controller: :user_settings)
   end
 

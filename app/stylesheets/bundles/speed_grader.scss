@@ -25,6 +25,17 @@
   padding: 0;
 }
 
+i[class*=icon-], i[class^=icon-] {
+  display: inline-block;
+  font-style: normal !important;
+  line-height: 1.3;
+}
+
+.attempt-button {
+  font-size: 1.1em;
+  padding-left: 5px;
+}
+
 // em units are required for the height, positioning and padding
 // on the header bar so it will play nice when a user changes
 // their browser font size to either small or very large
@@ -938,6 +949,11 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 #multiple_submissions {
   padding-top: 10px;
 }
+
+#add_attempt_container {
+  padding-top: 10px;
+}
+
 .accommodations {
 	border-radius: 4px;
 	-moz-border-radius: 4px;
@@ -949,4 +965,8 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 
 	margin-right: 10px;
 	margin-left: 0px;
+}
+
+#add-attempt-feedback {
+  padding: 5px 10px 4px;
 }
