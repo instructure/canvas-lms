@@ -675,7 +675,7 @@ END
       description: -> { I18n.t('Allow importing of QTI and Common Cartridge into Quizzes.Next.') },
       applies_to: 'RootAccount',
       beta: true,
-      state: 'allowed'
+      state: 'hidden'
     },
     'developer_key_management' =>
     {
