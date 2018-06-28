@@ -25,11 +25,11 @@ describe "gradebook - originality reports" do
   before(:each) { user_session(@teacher) }
 
   it "should show originality data" do
-    s1 = @first_assignment.submit_homework(@student_1, :submission_type => 'online_text_entry', :body => 'asdf')
+    s1 = @first_assignment.submit_homework(@student_1, submission_type: 'online_text_entry', body: 'asdf')
     s1.originality_reports.create!(originality_score: 0.0)
 
-    a = attachment_model(:context => @student_2, :content_type => 'text/plain')
-    s2 = @first_assignment.submit_homework(@student_2, :submission_type => 'online_upload', :attachments => [a])
+    a = attachment_model(context: @student_2, content_type: 'text/plain')
+    s2 = @first_assignment.submit_homework(@student_2, submission_type: 'online_upload', attachments: [a])
     s2.originality_reports.create!(originality_score: 1.0, attachment: a)
 
     get "/courses/#{@course.id}/gradebook"
@@ -71,10 +71,10 @@ describe "gradebook - originality reports" do
       group
     end
     let(:submission_one) do
-      @first_assignment.submit_homework(@student_1, :submission_type => 'online_text_entry', :body => 'asdf')
+      @first_assignment.submit_homework(@student_1, submission_type: 'online_text_entry', body: 'asdf')
     end
     let(:submission_two) do
-      @first_assignment.submit_homework(@student_2, :submission_type => 'online_text_entry', :body => 'asdf')
+      @first_assignment.submit_homework(@student_2, submission_type: 'online_text_entry', body: 'asdf')
     end
     let(:originality_report) { submission_one.originality_reports.create!(originality_score: 1.0) }
 

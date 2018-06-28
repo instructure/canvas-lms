@@ -42,24 +42,24 @@ describe "Gradezilla - group weights" do
   before(:each) do
     course_with_teacher_logged_in
     student_in_course
-    @course.update_attributes(:group_weighting_scheme => 'percent')
-    @group1 = @course.assignment_groups.create!(:name => 'first assignment group', :group_weight => 50)
-    @group2 = @course.assignment_groups.create!(:name => 'second assignment group', :group_weight => 50)
+    @course.update_attributes(group_weighting_scheme: 'percent')
+    @group1 = @course.assignment_groups.create!(name: 'first assignment group', group_weight: 50)
+    @group2 = @course.assignment_groups.create!(name: 'second assignment group', group_weight: 50)
     @assignment1 = assignment_model({
-                                      :course => @course,
-                                      :name => 'first assignment',
-                                      :due_at => Date.today,
-                                      :points_possible => 50,
-                                      :submission_types => 'online_text_entry',
-                                      :assignment_group => @group1
+                                      course: @course,
+                                      name: 'first assignment',
+                                      due_at: Date.today,
+                                      points_possible: 50,
+                                      submission_types: 'online_text_entry',
+                                      assignment_group: @group1
                                     })
     @assignment2 = assignment_model({
-                                      :course => @course,
-                                      :name => 'second assignment',
-                                      :due_at => Date.today,
-                                      :points_possible => 10,
-                                      :submission_types => 'online_text_entry',
-                                      :assignment_group => @group2
+                                      course: @course,
+                                      name: 'second assignment',
+                                      due_at: Date.today,
+                                      points_possible: 10,
+                                      submission_types: 'online_text_entry',
+                                      assignment_group: @group2
                                     })
     @course.reload
   end
@@ -69,7 +69,7 @@ describe "Gradezilla - group weights" do
     @assignment2.grade_student @student, grade: 5, grader: @teacher
 
     @course.show_total_grade_as_points = true
-    @course.update_attributes(:group_weighting_scheme => 'points')
+    @course.update_attributes(group_weighting_scheme: 'points')
 
     # Displays total column as points
     Gradezilla.visit(@course)
@@ -81,7 +81,7 @@ describe "Gradezilla - group weights" do
     @assignment2.grade_student @student, grade: 5, grader: @teacher
 
     @course.show_total_grade_as_points = false
-    @course.update_attributes(:group_weighting_scheme => 'percent')
+    @course.update_attributes(group_weighting_scheme: 'percent')
 
     # Displays total column as points
     Gradezilla.visit(@course)
@@ -92,24 +92,24 @@ describe "Gradezilla - group weights" do
     before(:each) do
       course_with_teacher_logged_in
       student_in_course
-      @course.update_attributes(:group_weighting_scheme => 'percent')
-      @group1 = @course.assignment_groups.create!(:name => 'first assignment group', :group_weight => 50)
-      @group2 = @course.assignment_groups.create!(:name => 'second assignment group', :group_weight => 50)
+      @course.update_attributes(group_weighting_scheme: 'percent')
+      @group1 = @course.assignment_groups.create!(name: 'first assignment group', group_weight: 50)
+      @group2 = @course.assignment_groups.create!(name: 'second assignment group', group_weight: 50)
       @assignment1 = assignment_model({
-                                        :course => @course,
-                                        :name => 'first assignment',
-                                        :due_at => Date.today,
-                                        :points_possible => 50,
-                                        :submission_types => 'online_text_entry',
-                                        :assignment_group => @group1
+                                        course: @course,
+                                        name: 'first assignment',
+                                        due_at: Date.today,
+                                        points_possible: 50,
+                                        submission_types: 'online_text_entry',
+                                        assignment_group: @group1
                                       })
       @assignment2 = assignment_model({
-                                        :course => @course,
-                                        :name => 'second assignment',
-                                        :due_at => Date.today,
-                                        :points_possible => 0,
-                                        :submission_types => 'online_text_entry',
-                                        :assignment_group => @group2
+                                        course: @course,
+                                        name: 'second assignment',
+                                        due_at: Date.today,
+                                        points_possible: 0,
+                                        submission_types: 'online_text_entry',
+                                        assignment_group: @group2
                                       })
       @course.reload
     end

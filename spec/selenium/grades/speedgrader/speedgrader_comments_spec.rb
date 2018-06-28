@@ -33,7 +33,7 @@ describe "speed grader" do
     course_with_teacher(course: @course)
     @teacher2 = @teacher
 
-    @assignment = @course.assignments.create(:name => 'assignment with rubric', :points_possible => 10)
+    @assignment = @course.assignments.create(name: 'assignment with rubric', points_possible: 10)
   end
 
   context "alerts" do
@@ -157,7 +157,7 @@ describe "speed grader" do
       expect(@account.service_enabled?(:avatars)).to be_truthy
 
       sub = student_submission
-      sub.add_comment(:comment => "ohai teacher")
+      sub.add_comment(comment: "ohai teacher")
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       expect(f("#avatar_image")).to be_displayed
@@ -189,7 +189,7 @@ describe "speed grader" do
       @teacher1.preferences = { gradebook_settings: { @course.id => { 'show_inactive_enrollments' => 'true' } } }
       @teacher1.save
 
-      student_submission(:username => 'inactivestudent@example.com')
+      student_submission(username: 'inactivestudent@example.com')
       en = @student.student_enrollments.first
       en.deactivate
 

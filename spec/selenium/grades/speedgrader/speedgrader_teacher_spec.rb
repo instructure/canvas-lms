@@ -32,26 +32,26 @@ describe "speed grader" do
   before(:each) do
     stub_kaltura
     course_with_teacher_logged_in
-    @assignment = @course.assignments.create(:name => 'assignment with rubric', :points_possible => 10)
+    @assignment = @course.assignments.create(name: 'assignment with rubric', points_possible: 10)
   end
 
   context "as a course limited ta" do
     before(:each) do
-      @taenrollment = course_with_ta(:course => @course, :active_all => true)
+      @taenrollment = course_with_ta(course: @course, active_all: true)
       @taenrollment.limit_privileges_to_course_section = true
       @taenrollment.save!
-      user_logged_in(:user => @ta, :username => "imata@example.com")
+      user_logged_in(user: @ta, username: "imata@example.com")
 
       @section = @course.course_sections.create!
-      student_in_course(:active_all => true); @student1 = @student
-      student_in_course(:active_all => true); @student2 = @student
+      student_in_course(active_all: true); @student1 = @student
+      student_in_course(active_all: true); @student2 = @student
       @enrollment.course_section = @section; @enrollment.save
 
       @assignment.submission_types = "online_upload"
       @assignment.save!
 
-      @submission1 = @assignment.submit_homework(@student1, :submission_type => "online_text_entry", :body => "hi")
-      @submission2 = @assignment.submit_homework(@student2, :submission_type => "online_text_entry", :body => "there")
+      @submission1 = @assignment.submit_homework(@student1, submission_type: "online_text_entry", body: "hi")
+      @submission2 = @assignment.submit_homework(@student2, submission_type: "online_text_entry", body: "there")
     end
 
     it "lists the correct number of students", priority: "2", test_id: 283737 do
@@ -81,7 +81,7 @@ describe "speed grader" do
       @assignment.update_attributes! submission_types: 'online_url',
                                      title: "url submission"
       student_in_course
-      @assignment.submit_homework(@student, :submission_type => "online_url", :workflow_state => "submitted", :url => "http://www.instructure.com")
+      @assignment.submit_homework(@student, submission_type: "online_url", workflow_state: "submitted", url: "http://www.instructure.com")
     end
 
     it "properly shows and hides student name when name hidden toggled", priority: "2", test_id: 283741 do
@@ -97,7 +97,7 @@ describe "speed grader" do
   it "does not show students in other sections if visibility is limited", priority: "1", test_id: 283758 do
     @enrollment.update_attribute(:limit_privileges_to_course_section, true)
     student_submission
-    student_submission(:username => 'otherstudent@example.com', :section => @course.course_sections.create(:name => "another section"))
+    student_submission(username: 'otherstudent@example.com', section: @course.course_sections.create(name: "another section"))
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
     expect(ff('#students_selectmenu option')).to have_size 1 # just the one student
@@ -109,7 +109,7 @@ describe "speed grader" do
     @teacher.preferences = { gradebook_settings: { @course.id => { 'show_inactive_enrollments' => 'true' } } }
     @teacher.save
 
-    student_submission(:username => 'inactivestudent@example.com')
+    student_submission(username: 'inactivestudent@example.com')
     en = @student.student_enrollments.first
     en.deactivate
 
@@ -126,7 +126,7 @@ describe "speed grader" do
     @teacher.preferences = { gradebook_settings: { @course.id => { 'show_inactive_enrollments' => 'true' } } }
     @teacher.save
 
-    student_submission(:username => 'inactivestudent@example.com')
+    student_submission(username:'inactivestudent@example.com')
     en = @student.student_enrollments.first
     en.deactivate
 
@@ -146,7 +146,7 @@ describe "speed grader" do
     @teacher.preferences = { gradebook_settings: { @course.id => { 'show_concluded_enrollments' => 'true' } } }
     @teacher.save
 
-    student_submission(:username => 'inactivestudent@example.com')
+    student_submission(username: 'inactivestudent@example.com')
     en = @student.student_enrollments.first
     en.conclude
 
@@ -225,11 +225,11 @@ describe "speed grader" do
   context "multiple enrollments" do
     before(:each) do
       student_in_course
-      @course_section = @course.course_sections.create!(:name => "<h1>Other Section</h1>")
+      @course_section = @course.course_sections.create!(name: "<h1>Other Section</h1>")
       @enrollment = @course.enroll_student(@student,
-                                           :enrollment_state => "active",
-                                           :section => @course_section,
-                                           :allow_multiple_enrollments => true)
+                                           enrollment_state: "active",
+                                           section: @course_section,
+                                           allow_multiple_enrollments: true)
     end
 
     it "does not duplicate students", priority: "1", test_id: 283985 do
@@ -399,7 +399,7 @@ describe "speed grader" do
     # create an assignment with online_upload type submission
     let!(:assignment) { test_course.assignments.create!(title: 'Assignment A', submission_types: 'online_text_entry,online_upload') }
     # submit to the assignment as a student twice, one with file and other with text
-    let!(:file_attachment) { attachment_model(:content_type => 'application/pdf', :context => student) }
+    let!(:file_attachment) { attachment_model(content_type: 'application/pdf', context: student) }
     let!(:submit_with_attachment) do
       assignment.submit_homework(
         student,

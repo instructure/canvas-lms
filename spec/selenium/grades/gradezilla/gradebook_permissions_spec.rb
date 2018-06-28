@@ -37,10 +37,10 @@ describe "Gradezilla - permissions" do
   context "as a ta" do
 
     def disable_view_all_grades
-      RoleOverride.create!(:role => ta_role,
-                            :permission => 'view_all_grades',
-                            :context => Account.default,
-                            :enabled => false)
+      RoleOverride.create!(role: ta_role,
+                            permission: 'view_all_grades',
+                            context: Account.default,
+                            enabled: false)
     end
 
     it "should not show gradebook after course conclude if view_all_grades disabled", priority: "1", test_id: 417601 do

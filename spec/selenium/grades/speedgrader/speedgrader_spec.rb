@@ -419,8 +419,8 @@ describe 'Speedgrader' do
     it 'updates scores', priority: "1", test_id: 164021 do
       in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do
         list = ff('#questions .user_points input')
-        replace_content list[1], "1", :tab_out => true
-        replace_content f('#fudge_points_entry'), "7", :tab_out => true
+        replace_content list[1], "1", tab_out: true
+        replace_content f('#fudge_points_entry'), "7", tab_out: true
 
         # after_fudge_points_total is updated, even before update button is clicked
         expect(f('#after_fudge_points_total')).to include_text '8'
@@ -535,7 +535,7 @@ describe 'Speedgrader' do
     end
 
     def submit_with_attachment
-      @file_attachment = attachment_model(:content_type => 'application/pdf', :context => @student_in_course)
+      @file_attachment = attachment_model(content_type: 'application/pdf', context: @student_in_course)
       @submission_for_student = @assignment_for_course.submit_homework(
         @student_in_course,
         submission_type: 'online_upload',

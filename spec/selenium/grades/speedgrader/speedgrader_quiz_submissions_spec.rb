@@ -80,16 +80,16 @@ describe "speed grader - quiz submissions" do
     # create our quiz and our multiple answers question
     @context = @course
     @q = quiz_model
-    answers = [ {'id' => 1, 'text' => 'one', 'weight' => 100},
-                {'id' => 2, 'text' => 'two', 'weight' => 100},
-                {'id' => 3, 'text' => 'three', 'weight' => 100},
-                {'id' => 4, 'text' => 'four', 'weight' => 0} ]
+    answers = [ {'id': 1, 'text': 'one', 'weight': 100},
+                {'id': 2, 'text':'two', 'weight': 100},
+                {'id': 3, 'text': 'three', 'weight': 100},
+                {'id': 4, 'text': 'four', 'weight': 0} ]
     @quest1 = @q.quiz_questions.create!(
-      :question_data => {
-        :name => "first question",
-        'question_type' => 'multiple_answers_question',
-        'answers' => answers,
-        :points_possible => 4
+      question_data: {
+        name: "first question",
+        'question_type': 'multiple_answers_question',
+        'answers': answers,
+        points_possible: 4
       }
     )
     @q.generate_quiz_data
@@ -123,28 +123,28 @@ describe "speed grader - quiz submissions" do
   it "updates quiz grade automatically when the update button is clicked", priority: "1", test_id: 283739 do
     expected_points = "6"
     @quiz.quiz_questions.create!(
-      :quiz => @quiz,
-      :question_data => {
-        :position => 1,
-        :question_type => "true_false_question",
-        :points_possible => 3,
-        :question_name => "true false question"
+      quiz: @quiz,
+      question_data: {
+        position: 1,
+        question_type: "true_false_question",
+        points_possible: 3,
+        question_name: "true false question"
       }
     )
     @quiz.quiz_questions.create!(
-      :quiz => @quiz,
-      :question_data => {
-        :position => 2,
-        :question_type => "essay_question",
-        :points_possible => 7,
-        :question_name => "essay question"
+      quiz: @quiz,
+      question_data: {
+        position: 2,
+        question_type: "essay_question",
+        points_possible: 7,
+        question_name: "essay question"
       }
     )
     @quiz.generate_quiz_data
     @quiz.workflow_state = 'available'
     @quiz.save!
     qs = @quiz.generate_submission(@student)
-    qs.submission_data = {"foo" => "bar1"}
+    qs.submission_data = {"foo": "bar1"}
     Quizzes::SubmissionGrader.new(qs).grade_submission
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
@@ -164,18 +164,19 @@ describe "speed grader - quiz submissions" do
     "has a student enrollment", priority: "2", test_id: 283740 do
     @course.enroll_student(@teacher).accept!
 
-    @quiz.quiz_questions.create!(:quiz => @quiz, :question_data => {
-        :position => 1,
-        :question_type => "true_false_question",
-        :points_possible => 3,
-        :question_name => "true false question"})
+    @quiz.quiz_questions.create!(quiz: @quiz, question_data: {
+        position: 1,
+        question_type: "true_false_question",
+        points_possible: 3,
+        question_name: "true false question"
+    })
     @quiz.generate_quiz_data
     @quiz.workflow_state = 'available'
     @quiz.save!
 
     [@student, @teacher].each do
       @quiz.generate_submission(@student).tap do |qs|
-        qs.submission_data = {'foo' => 'bar1'}
+        qs.submission_data = {'foo': 'bar1'}
         Quizzes::SubmissionGrader.new(qs).grade_submission
       end
     end
@@ -195,7 +196,7 @@ describe "speed grader - quiz submissions" do
     # but that causes `TypeError: submissionHistory is null` in an ajax
     # callback, which usually causes this spec to hang and ultimately fail
     # in wait_for_ajaximations
-    @assignment = @course.assignments.create(:name => 'assignment', :points_possible => 10)
+    @assignment = @course.assignments.create(name: 'assignment', points_possible: 10)
 
     fake_student = @course.student_view_student
     submission = @assignment.find_or_create_submission(fake_student)
