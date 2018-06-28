@@ -2272,7 +2272,10 @@ EG = {
     comment.posted_at = $.datetimeString(comment.created_at);
 
     hideStudentName = opts.hideStudentNames && window.jsonData.studentMap[comment[anonymizableAuthorId]];
-    if (hideStudentName) { comment.author_name = I18n.t('Student'); }
+    if (hideStudentName) {
+      const { index } = window.jsonData.studentMap[comment[anonymizableAuthorId]];
+      comment.author_name = I18n.t('Student %{position}', { position: index + 1 });
+    }
     // anonymous commentors
     if (comment.author_name == null) {
       if (provisionalGraderDisplayNames == null) this.setupProvisionalGraderDisplayNames()

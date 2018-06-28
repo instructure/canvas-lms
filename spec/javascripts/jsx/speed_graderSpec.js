@@ -1743,6 +1743,12 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       comment: 'a comment',
       ...alpha
     };
+    const omegaSubmissionComment = {
+      created_at: (new Date). toISOString(),
+      publishable: false,
+      comment: 'another comment',
+      ...omega
+    };
     const alphaSubmission = {
       ...alpha,
       grade_matches_current_submission: true,
@@ -1757,7 +1763,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
           display_name: 'submission.txt'
         }
       }],
-      submission_comments: [alphaSubmissionComment]
+      submission_comments: [alphaSubmissionComment, omegaSubmissionComment]
     }
     alphaSubmission.submission_history = [{...alphaSubmission}]
     const omegaSubmission = {
@@ -1789,6 +1795,30 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
     })
 
     QUnit.module('renderComment', hooks => {
+      const commentBlankHtml = `
+        <div class="comment">
+          <div class="comment_flex">
+            <div class="comment_citation">
+              <span class="author_name"></span>
+            </div>
+          </div>
+          <span class="comment"></span>
+          <button class="submit_comment_button">
+            <span>Submit</span>
+          </button>
+          <a class="delete_comment_link icon-x">
+            <span class="screenreader-only">Delete comment</span>
+          </a>
+          <div class="comment_attachments"></div>
+        </div>
+      `;
+
+      const commentAttachmentBlank = `
+        <div class="comment_attachment">
+          <a href="example.com/{{ submitter_id }}/{{ id }}/{{ comment_id }}"><span class="display_name">&nbsp;</span></a>
+        </div>
+      `;
+
       hooks.beforeEach(() => {
         fakeENV.setup({
           ...ENV,
@@ -1799,6 +1829,12 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
           show_help_menu_item: false,
           RUBRIC_ASSESSMENT: {}
         })
+
+        commentRenderingOptions = {
+          commentBlank: $(commentBlankHtml),
+          commentAttachmentBlank: $(commentAttachmentBlank),
+          hideStudentNames: true
+        };
 
         fixtures.innerHTML = `
           <span id="speedgrader-settings"></span>
@@ -1817,27 +1853,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         SpeedGrader.teardown()
         window.location.hash = ''
       })
-
-      const commentBlankHtml = `
-        <div class="comment">
-          <span class="comment"></span>
-          <button class="submit_comment_button">
-            <span>Submit</span>
-          </button>
-          <a class="delete_comment_link icon-x">
-            <span class="screenreader-only">Delete comment</span>
-          </a>
-          <div class="comment_attachments"></div>
-        </div>
-      `;
-
-      const commentAttachmentBlank = `
-        <div class="comment_attachment">
-          <a href="example.com/{{ submitter_id }}/{{ id }}/{{ comment_id }}"><span class="display_name">&nbsp;</span></a>
-        </div>
-      `;
-
-      commentRenderingOptions = { commentBlank: $(commentBlankHtml), commentAttachmentBlank: $(commentAttachmentBlank) };
 
       test('renderComment adds the comment text to the submit button for draft comments', () => {
         const commentToRender = SpeedGrader.EG.currentStudent.submission.submission_comments[0];
@@ -1873,6 +1888,18 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions);
         const button = renderedComment.find('.submit_comment_button')
         strictEqual(button.css('display'), 'none')
+      });
+
+      test('renderComment uses a generic student name', () => {
+        const firstStudentComment = SpeedGrader.EG.currentStudent.submission.submission_comments[0];
+        const renderedFirst = SpeedGrader.EG.renderComment(firstStudentComment, commentRenderingOptions);
+        strictEqual(renderedFirst.find('.author_name').text(), 'Student 1');
+      });
+
+      test('renderComment uses a second generic student name', () => {
+        const secondStudentComment = SpeedGrader.EG.currentStudent.submission.submission_comments[1];
+        const renderedSecond = SpeedGrader.EG.renderComment(secondStudentComment, commentRenderingOptions);
+        strictEqual(renderedSecond.find('.author_name').text(), 'Student 2');
       });
     })
 
