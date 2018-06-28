@@ -80,8 +80,8 @@ module Pact::Canvas
 
       # overriding these because the random uuid and lti_context_id won't work
       # with contract tests until we are able to use Pact provider_params
-      course.lti_context_id = '1'
-      course.uuid = '1'
+      course.lti_context_id = '9b4ef1eea0eb4c3498983e09a6ef88f1'
+      course.uuid = 'eylMsUDGR6aQDPCO5kOE6AGyH6ePPZLfV7CN1dV2'
       course.save!
       course
     end
