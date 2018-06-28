@@ -134,6 +134,7 @@
         <% if @assignment.rubric_association && (
              @submission.user_can_read_grade?(@current_user, session) ||
              @assignment.rubric_association.user_can_assess_for?(assessor: @current_user, assessee: @submission.user) ||
+             @assignment.rubric_association.user_did_assess_for?(assessor: @current_user, assessee: @submission.user) ||
              can_do(@assignment.rubric, @current_user, :read)
            )
         %>
