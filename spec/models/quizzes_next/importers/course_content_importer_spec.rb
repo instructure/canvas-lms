@@ -31,6 +31,7 @@ describe QuizzesNext::Importers::CourseContentImporter do
     let(:assignment3) { instance_double('Assignment') }
     let(:quiz1) { instance_double('Quizzes::Quiz') }
     let(:quiz2) { instance_double('Quizzes::Quiz') }
+    let(:quiz3) { instance_double('Quizzes::Quiz') }
     let(:data) { double }
     let(:time_now) { Time.zone.parse('03 May 2018 00:00:00 +0000') }
 
@@ -42,11 +43,17 @@ describe QuizzesNext::Importers::CourseContentImporter do
       allow(migration).
         to receive(:imported_migration_items_by_class).
         with(Quizzes::Quiz).
-        and_return([quiz1, quiz2])
+        and_return([quiz1, quiz2, quiz3])
       allow(Time.zone).to receive(:now).and_return(time_now)
       allow(assignment1).to receive(:quiz?).and_return(true)
       allow(assignment2).to receive(:quiz?).and_return(true)
       allow(assignment3).to receive(:quiz?).and_return(false)
+      allow(assignment1).to receive(:quiz).and_return(quiz1)
+      allow(assignment2).to receive(:quiz).and_return(quiz2)
+      allow(assignment1).to receive(:global_id).and_return(112_233)
+      allow(assignment2).to receive(:global_id).and_return(888_777)
+      allow(quiz1).to receive(:global_id).and_return(123_456)
+      allow(quiz2).to receive(:global_id).and_return(22_345)
     end
 
     it 'makes lti assignments' do
@@ -62,7 +69,11 @@ describe QuizzesNext::Importers::CourseContentImporter do
       expect(assignment2).to receive(:save!)
       expect(quiz1).to receive(:destroy)
       expect(quiz2).to receive(:destroy)
+      expect(quiz2).not_to receive(:destroy)
       importer.import_content(double)
+
+      expect(migration.migration_settings[:imported_assets][:lti_assignment_quiz_set]).
+        to eq([[112_233, 123_456], [888_777, 22_345]])
     end
   end
 

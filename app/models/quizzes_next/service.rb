@@ -26,6 +26,10 @@ module QuizzesNext
       end.compact
     end
 
+    def self.assignment_duplicated?(assignment_hash)
+      assignment_hash.key?(:original_assignment_id)
+    end
+
     def self.assignment_not_in_export?(assignment_hash)
       assignment_hash[:$canvas_assignment_id] == Canvas::Migration::ExternalContent::Translator::NOT_FOUND
     end

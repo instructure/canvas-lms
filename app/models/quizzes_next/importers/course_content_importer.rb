@@ -28,17 +28,34 @@ module QuizzesNext::Importers
       ::Importers::CourseContentImporter.
         import_content(context, @data, params, @migration)
 
+      migration_lti!
+    end
+
+    private
+
+    def migration_lti!
+      lti_assignment_quiz_set = []
       @migration.imported_migration_items_by_class(Assignment).each do |assignment|
         next unless assignment.quiz?
+        quiz = assignment.quiz
+        lti_assignment_quiz_set << [assignment.global_id, quiz.global_id]
         assignment.workflow_state = 'importing'
         assignment.importing_started_at = Time.zone.now
         assignment.quiz_lti! && assignment.save!
-      end
 
-      # Quizzes will be created in Quizzes.Next app
-      # assignment.quiz_lti! breaks relation to quiz. Destroying Quizzes:Quiz wouldn't
-      # mark assginment to be deleted.
-      @migration.imported_migration_items_by_class(Quizzes::Quiz).each(&:destroy)
+        # Quizzes will be created in Quizzes.Next app
+        # assignment.quiz_lti! breaks relation to quiz. Destroying Quizzes:Quiz wouldn't
+        # mark assginment to be deleted.
+        quiz.destroy
+      end
+      setup_assets_imported(lti_assignment_quiz_set)
+    end
+
+    def setup_assets_imported(lti_assignment_quiz_set)
+      imported_asset_hash = @migration.migration_settings[:imported_assets] || {}
+      imported_asset_hash[:lti_assignment_quiz_set] = lti_assignment_quiz_set
+      @migration.migration_settings[:imported_assets] = imported_asset_hash
+      @migration.save!
     end
   end
 end
