@@ -662,6 +662,14 @@ END
         is_provisioned
       end
     },
+    'import_to_quizzes_next' =>
+    {
+      display_name: -> { I18n.t('Quizzes.Next Importing') },
+      description: -> { I18n.t('Allow importing of QTI and Common Cartridge into Quizzes.Next.') },
+      applies_to: 'RootAccount',
+      beta: true,
+      state: 'allowed'
+    },
     'common_cartridge_page_conversion' => {
       display_name: -> { I18n.t('Common Cartridge HTML File to Page Conversion') },
       description: -> { I18n.t('If enabled, Common Cartridge importers will convert HTML files into Pages') },
