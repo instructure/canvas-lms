@@ -145,6 +145,10 @@ module PlannerPageObject
     f('.discussion-pubdate')
   end
 
+  def pages_detail
+    # Complete this while fixing ADMIN-1161
+  end
+
   def open_opportunities_dropdown
     fj("button:contains('opportunit')").click
   end
