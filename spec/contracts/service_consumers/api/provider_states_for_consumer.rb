@@ -76,7 +76,14 @@ module Pact::Canvas
     end
 
     def seed_course
-      course_factory(account: @account, active_course: true, course_name: 'Contract Tests Course')
+      course = course_factory(account: @account, active_course: true, course_name: 'Contract Tests Course')
+
+      # overriding these because the random uuid and lti_context_id won't work
+      # with contract tests until we are able to use Pact provider_params
+      course.lti_context_id = '1'
+      course.uuid = '1'
+      course.save!
+      course
     end
 
     def seed_users(opts)

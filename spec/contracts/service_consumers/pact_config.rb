@@ -19,7 +19,6 @@
 module PactConfig
   # These constants ensure we use the correct strings and thus help avoid our
   # accidentally breaking the contract tests
-
   module Providers
     CANVAS_LMS_API = 'Canvas LMS API'.freeze
     CANVAS_API_VERSION = '0.15'.freeze
