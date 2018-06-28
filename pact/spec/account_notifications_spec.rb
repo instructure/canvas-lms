@@ -28,18 +28,13 @@ describe 'Account Notifications', :pact do
         with(
           method: :get,
           headers: {
-            'Authorization' => Pact.provider_param(
-              'Bearer :{token}',
-              { token: 'some_token' }
-            ),
+            'Authorization': 'Bearer some_token',
+            'Auth-User': 'Account_User',
             'Connection': 'close',
             'Host': PactConfig.mock_provider_service_base_uri,
             'Version': 'HTTP/1.1'
           },
-          'path' => Pact.provider_param(
-            "/api/v1/accounts/:{account_id}/account_notifications",
-            { account_id: '1'}
-          ),
+          'path' => "/api/v1/accounts/1/account_notifications",
           query: ''
         ).
         will_respond_with(
@@ -55,7 +50,7 @@ describe 'Account Notifications', :pact do
             }
           )
         )
-
+      notifications_api.authenticate_as_user('Account_User')
       response = notifications_api.list_account_notifications(1)
       expect(response[0]['subject']).to eq 'something'
       expect(response[0]['message']).to eq 'another'
@@ -69,18 +64,13 @@ describe 'Account Notifications', :pact do
         with(
           method: :get,
           headers: {
-            'Authorization' => Pact.provider_param(
-              'Bearer :{token}',
-              { token: 'some_token' }
-            ),
+            'Authorization': 'Bearer some_token',
+            'Auth-User': 'Account_User',
             'Connection': 'close',
             'Host': PactConfig.mock_provider_service_base_uri,
             'Version': 'HTTP/1.1'
           },
-          'path' => Pact.provider_param(
-            "/api/v1/accounts/:{account_id}/account_notifications/:{notification1_id}",
-            { account_id: '1', notification1_id: '1'}
-          ),
+          'path' => "/api/v1/accounts/1/account_notifications/1",
           query: ''
         ).
         will_respond_with(
@@ -96,7 +86,7 @@ describe 'Account Notifications', :pact do
             }
           )
         )
-
+      notifications_api.authenticate_as_user('Account_User')
       response = notifications_api.show_account_notification(1, 1)
       expect(response['subject']).to eq 'something'
       expect(response['message']).to eq 'another'
@@ -110,18 +100,13 @@ describe 'Account Notifications', :pact do
         with(
           method: :delete,
           headers: {
-            'Authorization' => Pact.provider_param(
-              'Bearer :{token}',
-              { token: 'some_token' }
-            ),
+            'Authorization': 'Bearer some_token',
+            'Auth-User': 'Account_User',
             'Connection': 'close',
             'Host': PactConfig.mock_provider_service_base_uri,
             'Version': 'HTTP/1.1'
           },
-          'path' => Pact.provider_param(
-            "/api/v1/accounts/:{account_id}/account_notifications/:{notification3_id}",
-            { account_id: '1', notification3_id: '3'}
-          ),
+          'path' =>  "/api/v1/accounts/1/account_notifications/3",
           query: ''
         ).
         will_respond_with(
@@ -137,7 +122,7 @@ describe 'Account Notifications', :pact do
             }
           )
         )
-
+      notifications_api.authenticate_as_user('Account_User')
       response = notifications_api.remove_account_notification(1, 3)
       expect(response['subject']).to eq 'something'
       expect(response['message']).to eq 'another'
@@ -151,19 +136,14 @@ describe 'Account Notifications', :pact do
         with(
           method: :post,
           headers: {
-            'Authorization' => Pact.provider_param(
-              'Bearer :{token}',
-              { token: 'some_token' }
-            ),
+            'Authorization': 'Bearer some_token',
+            'Auth-User': 'Account_User',
             'Connection': 'close',
             'Host': PactConfig.mock_provider_service_base_uri,
             'Version': 'HTTP/1.1',
             'Content-Type': 'application/json'
           },
-          'path' => Pact.provider_param(
-            "/api/v1/accounts/:{account_id}/account_notifications",
-            { account_id: '1'}
-          ),
+          'path' => "/api/v1/accounts/1/account_notifications",
           'body' =>
           {
             'account_notification':
@@ -189,7 +169,7 @@ describe 'Account Notifications', :pact do
             }
           )
         )
-
+      notifications_api.authenticate_as_user('Account_User')
       response = notifications_api.create_account_notification(1)
       expect(response['subject']).to eq 'something'
       expect(response['message']).to eq 'another'
@@ -203,19 +183,14 @@ describe 'Account Notifications', :pact do
         with(
           method: :put,
           headers: {
-            'Authorization' => Pact.provider_param(
-              'Bearer :{token}',
-              { token: 'some_token' }
-            ),
+            'Authorization': 'Bearer some_token',
+            'Auth-User': 'Account_User',
             'Connection': 'close',
             'Host': PactConfig.mock_provider_service_base_uri,
             'Version': 'HTTP/1.1',
             'Content-Type': 'application/json'
           },
-          'path' => Pact.provider_param(
-            "/api/v1/accounts/:{account_id}/account_notifications/:{notification1_id}",
-            { account_id: '1', notification1_id: '1'}
-          ),
+          'path' => "/api/v1/accounts/1/account_notifications/1",
           'body' =>
           {
             # make sure the contents of account_notification matches the one in your API Client
@@ -242,6 +217,7 @@ describe 'Account Notifications', :pact do
             }
           )
         )
+      notifications_api.authenticate_as_user('Account_User')
       response = notifications_api.update_account_notification(1,1)
       expect(response['subject']).to eq 'something'
       expect(response['message']).to eq 'another'

@@ -14,11 +14,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'rspec'
 require_relative 'helper'
+require_relative '../pact_helper'
 
 describe 'Announcements', :pact => true do
-
   subject(:announcementsApi) {Helper::ApiClient::Announcements.new}
 
   context 'List Announcements' do
@@ -27,16 +26,14 @@ describe 'Announcements', :pact => true do
         upon_receiving('List Announcements').
         with(method: :get,
              headers: {
-               'Authorization' => Pact.provider_param(
-                 'Bearer :{token}',
-                 {token: 'some_token'}
-               ),
-               "Connection": "close",
-               "Host": PactConfig.mock_provider_service_base_uri,
-               "Version": "HTTP/1.1"
+              'Authorization': 'Bearer some_token',
+              'Auth-User': 'User_Student',
+              'Connection': 'close',
+              'Host': PactConfig.mock_provider_service_base_uri,
+              'Version': 'HTTP/1.1'
              },
              path: '/api/v1/announcements',
-             'query' => Pact.provider_param('context_codes[]=course_:{course_id}', {course_id: '1'})
+             'query' => 'context_codes[]=course_1'
         ).
         will_respond_with(
           status: 200,
@@ -69,8 +66,8 @@ describe 'Announcements', :pact => true do
             "message": "Announcement 1 detail", "subscription_hold": "topic_is_announcement"
           )
         )
-
-      response = announcementsApi.list_announcements(1)
+        announcementsApi.authenticate_as_user('User_Student')
+        response = announcementsApi.list_announcements(1)
         expect(response[0]['id']).to eq 1
         expect(response[0]['title']).to eq 'Announcement1'
     end

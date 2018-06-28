@@ -17,15 +17,15 @@
 require 'httparty'
 require 'json'
 require_relative '../../../pact_config'
+require_relative '../api_client_base'
 
 module Helper
   module ApiClient
-    class Announcements
+    class Announcements < ApiClientBase
       include HTTParty
       base_uri PactConfig.mock_provider_service_base_uri
-      headers "Authorization" => "Bearer some_token"
+      headers 'Authorization' => 'Bearer some_token'
 
-      # TODO: modify these to use params
       def list_announcements(course_id)
         JSON.parse(self.class.get("/api/v1/announcements?context_codes[]=course_#{course_id}").body)
       rescue

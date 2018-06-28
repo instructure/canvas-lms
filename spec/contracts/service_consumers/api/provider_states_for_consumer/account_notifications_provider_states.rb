@@ -17,15 +17,15 @@
 
 PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
+
+    # Creates a user with many different test notifications
+    # Possible API endpoints: get, delete, post and put
+    # Used by every spec in account_notifications
     provider_state 'a user with many notifications' do
       set_up do
-        @user = user_factory(:active_all => true)
-        @account = account_model
-        @account_user = AccountUser.create(:account => @account, :user => @user)
-
-        Pseudonym.create!(user:@user, unique_id: 'testaccountuser@instructure.com')
-        token = @user.access_tokens.create!().full_token
-
+        @user = user_factory(active_all: true, name: 'Account_User')
+        @account = @user.account
+        @account_user = AccountUser.create(account: @account, user: @user)
         @notification1 = AccountNotification.create!(
           account: @account, subject: 'test subj1', message: 'test msg', start_at: Time.zone.now, end_at: 3.days.from_now
         )
@@ -35,12 +35,6 @@ PactConfig::Consumers::ALL.each do |consumer|
         @notification3 = AccountNotification.create!(
           account: @account, subject: 'test subj3', message: 'test msg', start_at: Time.zone.now, end_at: 3.days.from_now
         )
-
-        provider_param :token, token
-        provider_param :account_id, @account.id.to_s
-        provider_param :notification1_id, @notification1.id.to_s
-        provider_param :notification2_id, @notification2.id.to_s
-        provider_param :notification3_id, @notification3.id.to_s
       end
     end
   end

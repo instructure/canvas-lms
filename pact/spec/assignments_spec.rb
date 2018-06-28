@@ -19,7 +19,6 @@ require_relative 'helper'
 require_relative '../pact_helper'
 
 describe 'Assignments', :pact do
-
   subject(:assignments_api) { Helper::ApiClient::Assignments.new }
 
   context 'List Assignments' do
@@ -29,8 +28,8 @@ describe 'Assignments', :pact do
         with(
           method: :get,
           headers: {
-            'Authorization': 'some_token',
-            'Auth-User': 'Student',
+            'Authorization': 'Bearer some_token',
+            'Auth-User': 'User_Student',
             'Connection': 'close',
             'Host': PactConfig.mock_provider_service_base_uri,
             'Version': 'HTTP/1.1'
@@ -42,8 +41,7 @@ describe 'Assignments', :pact do
           status: 200,
           body: Pact.each_like('id': 1, 'name': 'Assignment1')
         )
-
-      assignments_api.authenticate_as_user('Student')
+      assignments_api.authenticate_as_user('User_Student')
       response = assignments_api.list_assignments(1, 2)
       expect(response[0]['id']).to eq 1
       expect(response[0]['name']).to eq 'Assignment1'
@@ -57,8 +55,8 @@ describe 'Assignments', :pact do
         with(
           method: :post,
           headers: {
-            'Authorization': 'some_token',
-            'Auth-User': 'Teacher',
+            'Authorization': 'Bearer some_token',
+            'Auth-User': 'User_Teacher',
             'Connection': 'close',
             'Host': PactConfig.mock_provider_service_base_uri,
             'Version': 'HTTP/1.1',
@@ -72,15 +70,13 @@ describe 'Assignments', :pact do
                   'name': 'New Assignment'
                 }
             },
-
           query: ''
         ).
         will_respond_with(
           status: 201,
           body: Pact.like('id': 1, 'name': 'New Assignment')
         )
-
-      assignments_api.authenticate_as_user('Teacher')
+      assignments_api.authenticate_as_user('User_Teacher')
       response = assignments_api.post_assignments(1, 'New Assignment')
       expect(response['id']).to eq 1
       expect(response['name']).to eq 'New Assignment'

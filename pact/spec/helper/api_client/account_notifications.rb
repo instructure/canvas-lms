@@ -18,15 +18,15 @@
 require 'httparty'
 require 'json'
 require_relative '../../../pact_config'
+require_relative '../api_client_base'
 
 module Helper
   module ApiClient
-    class AccountNotifications
+    class AccountNotifications < ApiClientBase
       include HTTParty
       base_uri PactConfig.mock_provider_service_base_uri
-      headers "Authorization" => "Bearer some_token"
+      headers 'Authorization' => 'Bearer some_token'
 
-      # TODO: modify these to use params
       def list_account_notifications(account_id)
         JSON.parse(self.class.get("/api/v1/accounts/#{account_id}/account_notifications").body)
       rescue
@@ -80,7 +80,6 @@ module Helper
       rescue
         nil
       end
-
     end
   end
 end

@@ -28,9 +28,8 @@ describe 'Courses', :pact do
         with(
           method: :get,
           headers: {
-            'Authorization' => Pact.provider_param(
-              'Bearer :{token}', { token: 'some_token' }
-            ),
+            'Authorization': 'Bearer some_token',
+            'Auth-User': 'User_Student',
             'Connection': 'close',
             'Host': PactConfig.mock_provider_service_base_uri,
             'Version': 'HTTP/1.1'
@@ -68,6 +67,7 @@ describe 'Courses', :pact do
             'restrict_enrollments_to_course_dates': false
           )
         )
+      courses_api.authenticate_as_user('User_Student')
       response = courses_api.list_your_courses()
       expect(response[0]['id']).to eq 9
       expect(response[0]['name']).to eq 'Course1A'
@@ -81,18 +81,13 @@ describe 'Courses', :pact do
         with(
           method: :get,
           headers: {
-            'Authorization' => Pact.provider_param(
-              'Bearer :{token}',
-              { token: 'some_token' }
-            ),
+            'Authorization': 'Bearer some_token',
+            'Auth-User': 'User_Teacher',
             'Connection': 'close',
             'Host': PactConfig.mock_provider_service_base_uri,
             'Version': 'HTTP/1.1'
           },
-          'path' => Pact.provider_param(
-            '/api/v1/courses/:{course_id}/users',
-            { course_id: '2' }
-          ),
+          'path' => '/api/v1/courses/1/users',
           query: 'enrollment_type[]=student'
         ).
         will_respond_with(
@@ -104,7 +99,8 @@ describe 'Courses', :pact do
             'short_name': 'student1'
           )
         )
-      response = courses_api.list_students(2)
+      courses_api.authenticate_as_user('User_Teacher')
+      response = courses_api.list_students(1)
       expect(response[0]['id']).to eq 3
       expect(response[0]['name']).to eq 'student1'
     end
@@ -117,18 +113,13 @@ describe 'Courses', :pact do
         with(
           method: :get,
           headers: {
-            'Authorization' => Pact.provider_param(
-              'Bearer :{token}',
-              { token: 'some_token' }
-            ),
+            'Authorization': 'Bearer some_token',
+            'Auth-User': 'User_Teacher',
             'Connection': 'close',
             'Host': PactConfig.mock_provider_service_base_uri,
             'Version': 'HTTP/1.1'
           },
-          'path' => Pact.provider_param(
-            '/api/v1/courses/:{course_id}/users',
-            { course_id: '2' }
-          ),
+          'path' => '/api/v1/courses/1/users',
           query: 'enrollment_type[]=teacher'
         ).
         will_respond_with(
@@ -140,7 +131,8 @@ describe 'Courses', :pact do
             'short_name': 'teacher1'
           )
         )
-      response = courses_api.list_teachers(2)
+      courses_api.authenticate_as_user('User_Teacher')
+      response = courses_api.list_teachers(1)
       expect(response[0]['id']).to eq 2
       expect(response[0]['name']).to eq 'teacher1'
     end
@@ -153,18 +145,13 @@ describe 'Courses', :pact do
         with(
           method: :get,
           headers: {
-            'Authorization' => Pact.provider_param(
-              'Bearer :{token}',
-              { token: 'some_token' }
-            ),
+            'Authorization': 'Bearer some_token',
+            'Auth-User': 'User_TA',
             'Connection': 'close',
             'Host': PactConfig.mock_provider_service_base_uri,
             'Version': 'HTTP/1.1'
           },
-          'path' => Pact.provider_param(
-            '/api/v1/courses/:{course_id}/users',
-            { course_id: '2' }
-          ),
+          'path' => '/api/v1/courses/1/users',
           query: 'enrollment_type[]=ta'
         ).
         will_respond_with(
@@ -176,7 +163,8 @@ describe 'Courses', :pact do
             'short_name': 'ta1'
           )
         )
-      response = courses_api.list_tas(2)
+      courses_api.authenticate_as_user('User_TA')
+      response = courses_api.list_tas(1)
       expect(response[0]['id']).to eq 2
       expect(response[0]['name']).to eq 'ta1'
     end
@@ -189,18 +177,13 @@ describe 'Courses', :pact do
         with(
           method: :get,
           headers: {
-            'Authorization' => Pact.provider_param(
-              'Bearer :{token}',
-              { token: 'some_token' }
-            ),
+            'Authorization': 'Bearer some_token',
+            'Auth-User': 'User_Teacher',
             'Connection': 'close',
             'Host': PactConfig.mock_provider_service_base_uri,
             'Version': 'HTTP/1.1'
           },
-          'path' => Pact.provider_param(
-            '/api/v1/courses/:{course_id}/users',
-            { course_id: '2' }
-          ),
+          'path' => '/api/v1/courses/1/users',
           query: 'enrollment_type[]=observer'
         ).
         will_respond_with(
@@ -212,7 +195,8 @@ describe 'Courses', :pact do
             'short_name': 'observer1'
           )
         )
-      response = courses_api.list(2, 'observer')
+      courses_api.authenticate_as_user('User_Teacher')
+      response = courses_api.list(1, 'observer')
       expect(response[0]['id']).to eq 2
       expect(response[0]['name']).to eq 'observer1'
     end
@@ -225,18 +209,13 @@ describe 'Courses', :pact do
         with(
           method: :get,
           headers: {
-            'Authorization' => Pact.provider_param(
-              'Bearer :{token}',
-              { token: 'some_token' }
-            ),
+            'Authorization': 'Bearer some_token',
+            'Auth-User': 'User_Teacher',
             'Connection': 'close',
             'Host': PactConfig.mock_provider_service_base_uri,
             'Version': 'HTTP/1.1'
           },
-          'path' => Pact.provider_param(
-            '/api/v1/courses/:{course_id}/discussion_topics',
-            { course_id: '1' }
-          ),
+          'path' => '/api/v1/courses/1/discussion_topics',
           query: ''
         ).
         will_respond_with(
@@ -294,6 +273,7 @@ describe 'Courses', :pact do
             "message": nil,
           )
         )
+      courses_api.authenticate_as_user('User_Teacher')
       response = courses_api.list_discussions(1)
       expect(response[0]['id']).to eq 1
       expect(response[0]['title']).to eq 'No Title'
@@ -303,23 +283,18 @@ describe 'Courses', :pact do
 
   context 'List Quizzes' do
     it 'should return JSON body' do
-      canvas_lms_api.given('a student in a course with a quiz').
+      canvas_lms_api.given('a quiz in a course').
         upon_receiving('List Quizzes').
         with(
           method: :get,
           headers: {
-            'Authorization' => Pact.provider_param(
-              'Bearer :{token}',
-              { token: 'some_token' }
-            ),
+            'Authorization': 'Bearer some_token',
+            'Auth-User': 'User_Teacher',
             'Connection': 'close',
             'Host': PactConfig.mock_provider_service_base_uri,
             'Version': 'HTTP/1.1'
           },
-          'path' => Pact.provider_param(
-            '/api/v1/courses/:{course_id}/quizzes',
-            { course_id: '1' }
-          ),
+          'path' => '/api/v1/courses/1/quizzes',
           query: ''
         ).
         will_respond_with(
@@ -399,6 +374,7 @@ describe 'Courses', :pact do
             "post_to_sis": nil
           )
         )
+      courses_api.authenticate_as_user('User_Teacher')
       response = courses_api.list_quizzes(1)
       expect(response[0]['id']).to eq 1
       expect(response[0]['title']).to eq 'Test Quiz'
@@ -412,18 +388,13 @@ describe 'Courses', :pact do
         with(
           method: :delete,
           headers: {
-            'Authorization' => Pact.provider_param(
-              'Bearer :{token}',
-              { token: 'some_token' }
-            ),
+            'Authorization': 'Bearer some_token',
+            'Auth-User': 'User_Teacher',
             'Connection': 'close',
             'Host': PactConfig.mock_provider_service_base_uri,
             'Version': 'HTTP/1.1'
           },
-          'path' => Pact.provider_param(
-            '/api/v1/courses/:{course_id}',
-            { course_id: '1' }
-          ),
+          'path' => '/api/v1/courses/1',
           query: 'event=delete'
         ).
         will_respond_with(
@@ -432,6 +403,7 @@ describe 'Courses', :pact do
             'delete':true
           )
         )
+      courses_api.authenticate_as_user('User_Teacher')
       response = courses_api.delete_course(1)
       expect(response['delete']).to eq true
     end
@@ -444,18 +416,13 @@ describe 'Courses', :pact do
         with(
           method: :get,
           headers: {
-            'Authorization' => Pact.provider_param(
-              'Bearer :{token}',
-              { token: 'some_token' }
-            ),
+            'Authorization': 'Bearer some_token',
+            'Auth-User': 'User_Teacher',
             'Connection': 'close',
             'Host': PactConfig.mock_provider_service_base_uri,
             'Version': 'HTTP/1.1'
           },
-          'path' => Pact.provider_param(
-            '/api/v1/courses/:{course_id}/pages/',
-            { course_id: '1' }
-          ),
+          'path' => '/api/v1/courses/1/pages/',
           query: ''
         ).
         will_respond_with(
@@ -474,6 +441,7 @@ describe 'Courses', :pact do
             "locked_for_user": false
           )
         )
+      courses_api.authenticate_as_user('User_Teacher')
       response = courses_api.list_wiki_pages(1)
       expect(response[0]['title']).to eq "WIKI Page"
     end
@@ -486,19 +454,14 @@ describe 'Courses', :pact do
         with(
           method: :post,
           headers: {
-            'Authorization' => Pact.provider_param(
-              'Bearer :{token}',
-              { token: 'some_token' }
-            ),
+            'Authorization': 'Bearer some_token',
+            'Auth-User': 'User_Admin',
             'Connection': 'close',
             'Host': PactConfig.mock_provider_service_base_uri,
             'Version': 'HTTP/1.1',
             'Content-Type': 'application/json'
           },
-          'path' => Pact.provider_param(
-            '/api/v1/accounts/:{account_id}/courses',
-            { account_id: '1' }
-          ),
+          'path' => '/api/v1/accounts/1/courses',
           'body' =>
           {
             'course':
@@ -548,6 +511,7 @@ describe 'Courses', :pact do
             "workflow_state": "unpublished"
           )
         )
+      courses_api.authenticate_as_user('User_Admin')
       response = courses_api.create_new_course(1)
       expect(response["name"]).to eq "new course"
     end
@@ -560,19 +524,14 @@ describe 'Courses', :pact do
         with(
           method: :put,
           headers: {
-            'Authorization' => Pact.provider_param(
-              'Bearer :{token}',
-              { token: 'some_token' }
-            ),
+            'Authorization': 'Bearer some_token',
+            'Auth-User': 'User_Admin',
             'Connection': 'close',
             'Host': PactConfig.mock_provider_service_base_uri,
             'Version': 'HTTP/1.1',
             'Content-Type': 'application/json'
           },
-          'path' => Pact.provider_param(
-            '/api/v1/courses/:{course_id}',
-            { course_id: '1' }
-          ),
+          'path' => '/api/v1/courses/1',
           'body' =>
           {
             'course':
@@ -613,6 +572,7 @@ describe 'Courses', :pact do
             "workflow_state": "unpublished"
           )
         )
+      courses_api.authenticate_as_user('User_Admin')
       response = courses_api.update_course(1)
       expect(response["name"]).to eq "updated course"
     end

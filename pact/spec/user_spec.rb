@@ -19,7 +19,6 @@ require_relative 'helper'
 require_relative '../pact_helper'
 
 describe 'Users', :pact do
-
   subject(:users_api) { Helper::ApiClient::Users.new }
 
   context 'List To Do Count for User' do
@@ -29,10 +28,8 @@ describe 'Users', :pact do
         with(
           method: :get,
           headers: {
-            'Authorization' => Pact.provider_param(
-              'Bearer :{token}',
-              { token: 'some_token' }
-            ),
+            'Authorization': 'Bearer some_token',
+            'Auth-User': 'User_Student',
             'Connection': 'close',
             'Host': PactConfig.mock_provider_service_base_uri,
             'Version': 'HTTP/1.1'
@@ -47,7 +44,7 @@ describe 'Users', :pact do
             assignments_needing_submitting: 0
           )
         )
-
+      users_api.authenticate_as_user('User_Student')
       response = users_api.list_to_do_count()
       expect(response['needs_grading_count']).to eq 0
       expect(response['assignments_needing_submitting']).to eq 0

@@ -19,7 +19,6 @@ require_relative 'helper'
 require_relative '../pact_helper'
 
 describe 'Calendar Events', :pact => true do
-
   subject(:calendar_events_api) {Helper::ApiClient::CalendarEvents.new}
 
   context 'Show Calendar Event' do
@@ -28,18 +27,13 @@ describe 'Calendar Events', :pact => true do
         upon_receiving('Show Calendar Event').
         with(method: :get,
           headers: {
-            'Authorization' => Pact.provider_param(
-              'Bearer :{token}',
-              {token: 'some_token'}
-            ),
+            'Authorization': 'Bearer some_token',
+            'Auth-User': 'User_Teacher',
             'Connection': 'close',
             'Host': PactConfig.mock_provider_service_base_uri,
             'Version': 'HTTP/1.1'
           },
-          'path' => Pact.provider_param(
-            "/api/v1/calendar_events/:{event_id}",
-            {event_id: '1'}
-          ),
+          'path' => "/api/v1/calendar_events/1",
           query: '').will_respond_with(
             status: 200,
             body:
@@ -101,12 +95,12 @@ describe 'Calendar Events', :pact => true do
                 'appointment_group_id': Pact.like(1), # int
                 'appointment_group_url': Pact.like('https://example.com'), # string
                 'reserve_url': Pact.like('https://example.com'), # string
-                'reserved': Pact.like(false), # bool
                 'participant_type': Pact.like('User'), # string
                 'participants_per_appointment': Pact.like(1), # int or null
                 'available_slots': Pact.like(1) # int or null
               }
           )
+      calendar_events_api.authenticate_as_user('User_Teacher')
       response = calendar_events_api.show_calendar_event(1)
       expect(response['id']).to eq 1
       expect(response['title']).to eq 'something'

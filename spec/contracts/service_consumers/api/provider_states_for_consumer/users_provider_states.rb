@@ -17,33 +17,14 @@
 
 PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
-    provider_state 'a student' do
-      set_up do
-        student = User.create!(name: 'student')
-        Pseudonym.create!(user: student, unique_id: 'testuser@instructure.com')
-        token = student.access_tokens.create!().full_token
-        provider_param :token, token
-      end
-    end
 
-    provider_state 'a teacher' do
-      set_up do
-        teacher = User.create!(name: 'teacher')
-        Pseudonym.create!(user: teacher, unique_id: 'testuser@instructure.com')
-        token = teacher.access_tokens.create!().full_token
-        provider_param :token, token
-
-      end
-    end
-
+    # Creates a student with a to do item.
+    # Possible API endpoints: get, put, post.
+    # Used by the spec: 'List Todo Items'
     provider_state 'a student with a to do item' do
       set_up do
-        student = User.create!(name: 'student')
-        Pseudonym.create!(user: student, unique_id: 'testuser@instructure.com')
-        token = student.access_tokens.create!().full_token
-
+        student = User.create!(name: 'User_Student')
         planner_note_model(user: student)
-        provider_param :token, token
       end
     end
   end

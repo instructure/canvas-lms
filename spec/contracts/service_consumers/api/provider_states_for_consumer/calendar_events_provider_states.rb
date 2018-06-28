@@ -17,21 +17,23 @@
 
 PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
+
+    # Creates a user with an event in his calender.
+    # Possible API endpoints: get, put and delete
+    # Used by the spec:
     provider_state 'a user with a calendar event' do
       set_up do
         user_factory(name: 'Bob', active_user: true)
-        Pseudonym.create!(user: @user, unique_id: 'testuser@instructure.com')
-        token = @user.access_tokens.create!().full_token
         @event = @user.calendar_events.create!
-
-        provider_param :token, token
-        provider_param :event_id, @event.id.to_s
       end
     end
 
+    # Creates a user with a robust event in his calender.
+    # Possible API endpoints: get, put and delete
+    # Used by the spec: 'Show Calender Event'
     provider_state 'a user with a robust calendar event' do
       set_up do
-        course_with_teacher(:active_all => true)
+        course_with_teacher(:active_all => true, name: 'User_Teacher')
         @ag = AppointmentGroup.create!(
           title: "Rohan's Special Day",
           location_name: "bollywood",
@@ -56,31 +58,19 @@ PactConfig::Consumers::ALL.each do |consumer|
         course_with_student(course: @course, active_all: true)
         @student2 = @student
         @event.reserve_for(@student2, @student2)
-
-        Pseudonym.create!(user: @student, unique_id: 'testuser@instructure.com')
-        token = @student.access_tokens.create!().full_token
-
-        provider_param :token, token
-        provider_param :event_id, @event.id.to_s
       end
     end
 
+    # Creates a user with multiple events in his calender.
+    # Possible API endpoints: get, put and delete
+    # Used by the spec:
     provider_state 'a user with many calendar events' do
       set_up do
         user_factory(name: 'Bob', active_user: true)
-        Pseudonym.create!(user: @user, unique_id: 'testuser@instructure.com')
-        token = @user.access_tokens.create!().full_token
-
         @event0 = @user.calendar_events.create!
         @event1 = @user.calendar_events.create!
         @event2 = @user.calendar_events.create!
         @event3 = @user.calendar_events.create!
-
-        provider_param :token, token
-        provider_param :event_id0, @event0.id.to_s
-        provider_param :event_id1, @event1.id.to_s
-        provider_param :event_id2, @event2.id.to_s
-        provider_param :event_id3, @event3.id.to_s
       end
     end
   end

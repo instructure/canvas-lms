@@ -17,13 +17,13 @@
 
 PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
+
+    # Creates a user in an account with a report
+    # Possible API endpoints: get, put and delete
+    # Used but the spec: 'List Reports' 'Show Report'
     provider_state 'a user with many account reports' do
       set_up do
-        @admin = account_admin_user
-
-        Pseudonym.create!(user:@admin, unique_id: 'testadminaccount@instructure.com')
-        token = @admin.access_tokens.create!().full_token
-
+        @admin = account_admin_user(name: 'User_Admin')
         @report = AccountReport.new
         @report.account = @admin.account
         @report.user = @admin
@@ -37,23 +37,14 @@ PactConfig::Consumers::ALL.each do |consumer|
           :folder => folder, :context => @admin.account, :filename => "test.txt", :uploaded_data => StringIO.new("test file")
         )
         @report.save!
-
-        provider_param :token, token
-        provider_param :account_id, @admin.account.id.to_s
-        provider_param :report_type, @report.report_type.to_s
-        provider_param :report_id, @report.id.to_s
       end
     end
 
     provider_state 'a user with a robust account report' do
       set_up do
-        @user = user_factory(:active_all => true)
-        @account = account_model
-        @account_user = AccountUser.create(:account => @account, :user => @user)
-
-        Pseudonym.create!(user:@user, unique_id: 'testaccountuser@instructure.com')
-        token = @user.access_tokens.create!().full_token
-
+        @user = user_factory(active_all: true, name: 'User_Admin')
+        @account = @user.account
+        @account_user = AccountUser.create(account: @account, user: @user)
         @report = AccountReport.new
         @report.account = @account
         @report.user = @user
@@ -62,16 +53,9 @@ PactConfig::Consumers::ALL.each do |consumer|
         @report.end_at=(Time.zone.now + rand(60*60*4)).to_datetime
         @report.report_type = "student_assignment_outcome_map_csv"
         @report.parameters = HashWithIndifferentAccess['purple' => 'test', 'lovely'=>'ears']
-
         folder = Folder.assert_path("test", @account)
         @report.attachment = Attachment.create!(:folder => folder, :context => @account, :filename => "test.txt", :uploaded_data => StringIO.new("test file"))
-
         @report.save!
-
-        provider_param :token, token
-        provider_param :account_id, @account.id.to_s
-        provider_param :report_type, @report.report_type.to_s
-        provider_param :report_id, @report.id.to_s
       end
     end
   end
