@@ -78,7 +78,7 @@
         <%= link[:text] %>
       </a>
     <% end %>
-    <% if @context.account.grants_right?(@current_user, :read_roster) && @user.has_student_enrollment? %>
+    <% if @context.grants_right?(@current_user, :generate_observer_pairing_code) && @user.has_student_enrollment? %>
       <div id="pairing-code"></div>
     <% end %>
   </div>

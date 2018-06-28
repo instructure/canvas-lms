@@ -548,21 +548,25 @@ class Submission < ActiveRecord::Base
   end
 
   def create_alert
-    return unless saved_change_to_score? && self.grader_id && !self.autograded?
+    return unless saved_change_to_score? && self.grader_id && !self.autograded? &&
+      self.assignment.points_possible && self.assignment.points_possible > 0
 
     thresholds = ObserverAlertThreshold.active.where(student: self.user,
       alert_type: ['assignment_grade_high', 'assignment_grade_low'])
 
     thresholds.each do |threshold|
-      next unless threshold.did_pass_threshold(saved_changes['score'][0], self.score)
+      prev_score = saved_changes['score'][0]
+      prev_percentage = prev_score.present? ? prev_score.to_f / self.assignment.points_possible * 100 : nil
+      percentage = self.score.present? ? self.score.to_f / self.assignment.points_possible * 100 : nil
+      next unless threshold.did_pass_threshold(prev_percentage, percentage)
 
       ObserverAlert.create!(observer: threshold.observer, student: self.user,
                             observer_alert_threshold: threshold,
                             context: self.assignment, alert_type: threshold.alert_type, action_date: self.graded_at,
-                            title: I18n.t("Assignment graded: %{score} on %{assignmentName} in %{courseName}", {
-                              score: self.score,
-                              assignmentName: self.assignment.title,
-                              courseName: self.assignment.course.name
+                            title: I18n.t("Assignment graded: %{grade} on %{assignment_name} in %{course_code}", {
+                              grade: self.grade,
+                              assignment_name: self.assignment.title,
+                              course_code: self.assignment.course.course_code
                             }))
     end
   end

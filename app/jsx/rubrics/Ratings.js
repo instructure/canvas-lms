@@ -50,6 +50,7 @@ export const Rating = (props) => {
     long_description,
     points,
     onClick,
+    shaderClass,
     tierColor,
     hidePoints,
     isSummary,
@@ -58,6 +59,7 @@ export const Rating = (props) => {
 
   const shaderStyle = { backgroundColor: tierColor }
   const triangleStyle = { borderBottomColor: tierColor }
+  const shaderClasses = classNames('shader', shaderClass)
 
   const ratingPoints = () => (
     <div className="rating-points">
@@ -91,22 +93,12 @@ export const Rating = (props) => {
           </div>
         ) : null
       }
-      <div className='shader' style={shaderStyle}
+      <div className={shaderClasses} style={shaderStyle}
         aria-label={isSummary || !selected ? null : I18n.t('This rating is selected')}>
         <div className="triangle" style={triangleStyle}/>
       </div>
     </div>
   )
-}
-
-const getDefaultColor = (points, defaultMasteryThreshold) => {
-  if (points >= defaultMasteryThreshold) {
-    return '#8aac53'
-  } else if (points >= defaultMasteryThreshold/2) {
-    return '#e0d773'
-  } else {
-    return '#df5b59'
-  }
 }
 
 const getCustomColor = (points, pointsPossible, customRatings) => {
@@ -127,12 +119,14 @@ Rating.propTypes = {
   selected: PropTypes.bool,
   hidePoints: PropTypes.bool,
   isSummary: PropTypes.bool.isRequired,
+  shaderClass: PropTypes.string
 }
 Rating.defaultProps = {
   footer: null,
   selected: false,
   endOfRangePoints: null, // eslint-disable-line react/default-props-match-prop-types
-  hidePoints: false
+  hidePoints: false,
+  shaderClass: null
 }
 
 const Ratings = (props) => {
@@ -176,7 +170,22 @@ const Ratings = (props) => {
     if (customRatings && customRatings.length > 0) {
       return getCustomColor(points, pointsPossible, customRatings)
     } else {
-      return getDefaultColor(points, defaultMasteryThreshold)
+      return null
+    }
+  }
+
+  const getShaderClass = (selected) => {
+    if (!selected) { return null }
+    if (customRatings && customRatings.length > 0) { return null }
+    if (points >= defaultMasteryThreshold * 1.5) {
+      return 'exceedsMasteryShader'
+    }
+    else if (points >= defaultMasteryThreshold) {
+      return 'meetsMasteryShader'
+    } else if (points >= defaultMasteryThreshold/2) {
+      return 'nearMasteryShader'
+    } else {
+      return 'wellBelowMasteryShader'
     }
   }
 
@@ -202,6 +211,7 @@ const Ratings = (props) => {
         endOfRangePoints={useRange ? getRangePoints(tier.points, tiers[index + 1]) : null}
         footer={footer}
         onClick={() => handleClick(tier.points)}
+        shaderClass={getShaderClass(selected)}
         tierColor={getTierColor(selected)}
         hidePoints={isSummary || hidePoints}
         isSummary={isSummary}

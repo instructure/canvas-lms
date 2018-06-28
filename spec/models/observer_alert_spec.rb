@@ -59,6 +59,7 @@ describe ObserverAlert do
   describe 'course_grade alerts' do
     before :once do
       course_with_teacher()
+      observer_alert_threshold_model(course: @course, alert_type: 'course_grade_low', threshold: 50)
       @threshold1 = observer_alert_threshold_model(course: @course, alert_type: 'course_grade_high', threshold: 80)
       @student1 = @student
       @enrollment1 = @student1.enrollments.where(course: @course).first
@@ -122,7 +123,7 @@ describe ObserverAlert do
       alert = alert1.first
       expect(alert).not_to be_nil
       expect(alert.context).to eq a
-      expect(alert.title).to include('Announcement posted: ')
+      expect(alert.title).to include('Course announcement: ')
 
       alert2 = ObserverAlert.where(student: @student, observer: @observer2).first
       expect(alert2).to be_nil
@@ -138,6 +139,23 @@ describe ObserverAlert do
 
       alert = ObserverAlert.where(student: @student, observer: @observer, context: a).first
       expect(alert).not_to be_nil
+    end
+
+    it 'creates an alert for each student' do
+      student1 = student_in_course(active_all: true, course: @course).user
+      student2 = student_in_course(active_all: true, course: @course).user
+      observer = course_with_observer(course: @course, associated_user_id: student1.id, active_all: true).user
+      course_with_observer(user: observer, course: @course, associated_user_id: student2.id, active_all: true).user
+      ObserverAlertThreshold.create!(student: student1, observer: observer, alert_type: 'course_announcement')
+      ObserverAlertThreshold.create!(student: student2, observer: observer, alert_type: 'course_announcement')
+
+      a = announcement_model(context: @course)
+
+      alert1 = ObserverAlert.where(student: student1, observer: observer, context: a)
+      alert2 = ObserverAlert.where(student: student2, observer: observer, context: a)
+
+      expect(alert1.count).to eq 1
+      expect(alert2.count).to eq 1
     end
   end
 
@@ -189,6 +207,7 @@ describe ObserverAlert do
       alert = ObserverAlert.active.where(student: @student1, alert_type: 'assignment_missing').first
       expect(alert.alert_type).to eq 'assignment_missing'
       expect(alert.context.user).to eq @student1
+      expect(alert.title).to include('Assignment missing:')
     end
 
     it 'doesnt create another alert if one already exists' do
@@ -262,6 +281,7 @@ describe ObserverAlert do
       expect(alert.count).to eq 1
 
       expect(alert.first.context).to eq notification
+      expect(alert.first.title).to include('Institution announcement:')
     end
 
     it 'creates an alert if student role is selected but not observer' do
@@ -284,14 +304,22 @@ describe ObserverAlert do
       course_with_teacher
       @threshold1 = observer_alert_threshold_model(alert_type: 'assignment_grade_high', threshold: '80', course: @course)
       @threshold2 = observer_alert_threshold_model(alert_type: 'assignment_grade_low', threshold: '40', course: @course)
-      assignment_model(context: @course)
+      @assignment1 = assignment_model(context: @course, points_possible: 100)
+      @assignment2 = assignment_model(context: @course, points_possible: 10)
+      @assignment3 = assignment_model(context: @course, points_possible: 0)
     end
 
     it 'doesnt create an alert if there are no observers on that student' do
       student = student_in_course(course: @course).user
-      @assignment.grade_student(student, score: 50, grader: @teacher)
+      @assignment1.grade_student(student, score: 50, grader: @teacher)
 
-      alerts = ObserverAlert.where(context: @assignment)
+      alerts = ObserverAlert.where(context: @assignment1)
+      expect(alerts.count).to eq 0
+    end
+
+    it 'doesnt create an alert if there are no points possible' do
+      @assignment3.grade_student(@threshold1.student, score: 100, grader: @teacher)
+      alerts = ObserverAlert.where(context: @assignment3)
       expect(alerts.count).to eq 0
     end
 
@@ -299,17 +327,17 @@ describe ObserverAlert do
       student = student_in_course(course: @course).user
       course_with_observer(course: @course, associated_user_id: student.id)
 
-      @assignment.grade_student(student, score: 80, grader: @teacher)
+      @assignment1.grade_student(student, score: 80, grader: @teacher)
 
-      alerts = ObserverAlert.where(context: @assignment)
+      alerts = ObserverAlert.where(context: @assignment1)
       expect(alerts.count).to eq 0
     end
 
     it 'doesnt create an alert if the threshold is not met' do
-      @assignment.grade_student(@threshold1.student, score: 70, grader: @teacher)
-      @assignment.grade_student(@threshold2.student, score: 50, grader: @teacher)
+      @assignment1.grade_student(@threshold1.student, score: 70, grader: @teacher)
+      @assignment1.grade_student(@threshold2.student, score: 50, grader: @teacher)
 
-      alerts = ObserverAlert.where(context: @assignment)
+      alerts = ObserverAlert.where(context: @assignment1)
       expect(alerts.count).to eq 0
     end
 
@@ -317,18 +345,40 @@ describe ObserverAlert do
       @course.enroll_user(@threshold1.student, 'StudentEnrollment')
       @course.enroll_user(@threshold2.student, 'StudentEnrollment')
 
-      @assignment.grade_student(@threshold1.student, score: 100, grader: @teacher)
-      @assignment.grade_student(@threshold2.student, score: 10, grader: @teacher)
+      @assignment1.grade_student(@threshold1.student, score: 100, grader: @teacher)
+      @assignment1.grade_student(@threshold2.student, score: 10, grader: @teacher)
 
-      alert1 = ObserverAlert.where(context: @assignment, alert_type: 'assignment_grade_high').first
+      alert1 = ObserverAlert.where(context: @assignment1, alert_type: 'assignment_grade_high').first
       expect(alert1).not_to be_nil
       expect(alert1.observer_alert_threshold).to eq @threshold1
       expect(alert1.title).to include('Assignment graded: ')
 
-      alert2 = ObserverAlert.where(context: @assignment, alert_type: 'assignment_grade_low').first
+      alert2 = ObserverAlert.where(context: @assignment1, alert_type: 'assignment_grade_low').first
       expect(alert2).not_to be_nil
       expect(alert2.observer_alert_threshold).to eq @threshold2
       expect(alert2.title).to include('Assignment graded: ')
+    end
+
+    it 'creates an alert if the threshold percentage is met' do
+      @assignment2.grade_student(@threshold1.student, score: 10, grader: @teacher)
+      @assignment2.grade_student(@threshold2.student, score: 1, grader: @teacher)
+
+      alert1 = ObserverAlert.where(context: @assignment2, alert_type: 'assignment_grade_high').first
+      expect(alert1).not_to be_nil
+      expect(alert1.observer_alert_threshold).to eq @threshold1
+
+      alert2 = ObserverAlert.where(context: @assignment2, alert_type: 'assignment_grade_low').first
+      expect(alert2).not_to be_nil
+      expect(alert2.observer_alert_threshold).to eq @threshold2
+    end
+
+    it 'doesnt create an alert if the threshold percentage isnt met' do
+      @assignment2.grade_student(@threshold1.student, score: 7, grader: @teacher)
+      @assignment2.grade_student(@threshold2.student, score: 5, grader: @teacher)
+
+      alerts = ObserverAlert.where(context: @course)
+
+      expect(alerts.count).to eq 0
     end
   end
 end

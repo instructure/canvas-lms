@@ -71,6 +71,9 @@ class UserObserveesController < ApplicationController
   # @argument access_token [Optional, String]
   #   The access token for the user to observe.  Required if <tt>observee[unique_id]</tt> or <tt>observee[password]</tt> are omitted.
   #
+  # @argument pairing_code [Optional, String]
+  #   A generated pairing code for the user to observe. Required if the Observer pairing code feature flag is enabled
+  #
   # @argument root_account_id [Optional, Integer]
   #   The ID for the root account to associate with the observation link.
   #   Defaults to the current domain account.
@@ -95,6 +98,15 @@ class UserObserveesController < ApplicationController
       end
       @student = verified_token.user
       common_root_accounts = common_root_accounts_for(observer, student)
+    elsif @domain_root_account.feature_enabled?(:observer_pairing_code) && params[:pairing_code]
+      code = ObserverPairingCode.active.where(code: params[:pairing_code]).first
+      if code.nil?
+        render json: {errors: [{'message' => 'Invalid pairing code.'}]}, status: 422
+        return
+      end
+      @student = code.user
+      common_root_accounts = common_root_accounts_for(observer, student)
+      code.destroy
     else
       observee_pseudonym = @domain_root_account.pseudonyms.active.by_unique_id(params[:observee][:unique_id]).first
 

@@ -136,17 +136,17 @@ class GradeCalculator
     @course.shard.activate do
       scores.each do |score|
         thresholds = ObserverAlertThreshold.active.where(student: score.enrollment.user, alert_type: ['course_grade_high', 'course_grade_low'])
+        previous_score = score.current_score
+        score.reload
         thresholds.each do |threshold|
-          previous_score = score.current_score
-          score.reload
           next unless threshold.did_pass_threshold(previous_score, score.current_score)
 
           ObserverAlert.create(observer: threshold.observer, student: threshold.student,
             observer_alert_threshold: threshold,
             context: @course, action_date: score.updated_at, alert_type: threshold.alert_type,
-            title: I18n.t("Course grade: %{grade} in %{courseName}", {
+            title: I18n.t("Course grade: %{grade}% in %{course_code}", {
               grade: score.current_score,
-              courseName: @course.name
+              course_code: @course.course_code
             }))
         end
       end

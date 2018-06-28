@@ -80,9 +80,14 @@ describe('The Ratings component', () => {
   it('uses the right default mastery level colors', () => {
     const mastery = (points) =>
       component({ points }).find('Rating').map((el) => el.prop('tierColor'))
-    expect(mastery(10)).toEqual(["#8aac53", 'transparent', 'transparent'])
-    expect(mastery(5)).toEqual(['transparent', "#e0d773", 'transparent'])
-    expect(mastery(1)).toEqual(['transparent', 'transparent', "#df5b59"])
+    expect(mastery(10)).toEqual([null, 'transparent', 'transparent'])
+    expect(mastery(5)).toEqual(['transparent', null, 'transparent'])
+    expect(mastery(1)).toEqual(['transparent', 'transparent', null])
+    const shaderClasses = (points) =>
+      component({ points }).find('Rating').map((el) => el.prop('shaderClass'))
+    expect(shaderClasses(10)).toEqual(['meetsMasteryShader', null, null])
+    expect(shaderClasses(5)).toEqual([null, 'nearMasteryShader', null])
+    expect(shaderClasses(1)).toEqual([null, null, 'wellBelowMasteryShader'])
   })
 
   it('uses the right custom rating colors', () => {
