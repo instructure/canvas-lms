@@ -329,27 +329,29 @@ module Canvas::Security
   class << self
     private
     def verify_jwt(body, ignore_expiration: false)
+      verification_time = Time.now.utc
+      if body[:iat].present?
+        iat = timestamp_as_integer(body[:iat])
+        if iat > verification_time.to_i && iat < verification_time.to_i + 300
+          verification_time = iat
+        end
+      end
+
       if body[:exp].present? && !ignore_expiration
-        if timestamp_is_expired?(body[:exp])
+        if timestamp_as_integer(body[:exp]) < verification_time.to_i
           raise Canvas::Security::TokenExpired
         end
       end
 
       if body[:nbf].present?
-        if timestamp_is_future?(body[:nbf])
+        if timestamp_as_integer(body[:nbf]) > verification_time.to_i
           raise Canvas::Security::InvalidToken
         end
       end
     end
 
-    def timestamp_is_expired?(exp_val)
-      now = Time.zone.now
-      (exp_val.is_a?(Time) && exp_val <= now) || exp_val <= now.to_i
-    end
-
-    def timestamp_is_future?(nbf_val)
-      now = Time.zone.now
-      (nbf_val.is_a?(Time) && nbf_val > now) || nbf_val > now.to_i
+    def timestamp_as_integer(timestamp)
+      timestamp.is_a?(Time) ? timestamp.to_i : timestamp
     end
 
     def services_encryption_secret
