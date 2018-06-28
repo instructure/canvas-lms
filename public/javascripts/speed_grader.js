@@ -876,7 +876,7 @@ function initRubricStuff(){
         rubricAssessment.updateRubricAssociation($rubric, response.rubric_association);
         delete response.rubric_association;
       }
-      for (var i in EG.currentStudent.rubric_assessments) {
+      for (let i = 0; i < EG.currentStudent.rubric_assessments.length; i++) {
         if (response.id === EG.currentStudent.rubric_assessments[i].id) {
           $.extend(true, EG.currentStudent.rubric_assessments[i], response);
           found = true;
