@@ -66,12 +66,9 @@ class Login::SamlController < ApplicationController
 
     settings = aac.saml_settings(request.host_with_port)
 
-    verify_certificate = true
-    verify_certificate = false if  @domain_root_account.settings[:verify_saml_certificate] == false
     aac.sp_metadata(request.host_with_port).valid_response?(response,
                                                             aac.idp_metadata,
-                                                            allow_expired_certificate: @domain_root_account.settings[:allow_expired_saml_certificate],
-                                                            verify_certificate: verify_certificate)
+                                                            ignore_audience_condition: aac.settings['ignore_audience_condition'])
     legacy_response.process(settings) unless saml2_processing
 
     if debugging
@@ -89,8 +86,8 @@ class Login::SamlController < ApplicationController
 
     if !saml2_processing && legacy_response.is_valid? && !response.errors.empty?
       logger.warn("Response valid via legacy SAML processing from #{legacy_response.issuer}, but invalid according to SAML2 processing: #{response.errors.join("\n")}")
-      unless aac.settings[:first_saml_error]
-        aac.settings[:first_saml_error] = response.errors.join("\n")
+      unless aac.settings['first_saml_error']
+        aac.settings['first_saml_error'] = response.errors.join("\n")
         aac.save!
       end
     end
