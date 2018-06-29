@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2017 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,16 +14,13 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-module Types
-  class DiscussionType < ApplicationObjectType
-    graphql_name "Discussion"
+class PopulateAnonymousModeratedGradingPermissions < ActiveRecord::Migration[5.1]
+  tag :postdeploy
 
-    implements GraphQL::Relay::Node.interface
-    implements Interfaces::TimestampInterface
+  def up
+    DataFixup::AddRoleOverridesForNewPermission.send_later_if_production(:run, :manage_grades, :select_final_grade)
 
-    global_id_field :id
-    field :_id, ID, "legacy canvas id", null: false, method: :id
+    DataFixup::AddRoleOverridesForNewPermission.send_later_if_production(:run, :manage_account_settings, :view_audit_trail)
   end
 end

@@ -7,6 +7,40 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 <li>This page documents API changes for the last four releases. For prior releases, view the <a href="file.changelog_archive.html">API Change Log archive page</a>.</li>
 </ul>
 
+<h2>2018-07-14</h2>
+  <h3>Changes</h3>
+<table class="changelog">
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td>Plagiarism Detection Platform APIs</td>
+<td></td>
+<td>In the API page sidebar, moved all API documentation for the plagiarism platform to the External Tools section</td>
+</tr>
+</table>
+
+<h3>Additions</h3>
+<table class="changelog">
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="api_token_scopes.html">API Token Scopes</a></td>
+<td></td>
+<td>Added endpoint</td>
+</tr>
+<tr>
+<td><a href="proficiency_ratings.html">Proficiency Ratings API</a></td>
+<td></td>
+<td>Added endpoint</td>
+</tr>
+</table>
+
 <h2>2018-06-23</h2>
   <h3>Changes</h3>
 <table class="changelog">
@@ -150,98 +184,5 @@ Get a Single Course endpoint</td>
   Add an Observee endpoint<br><br>
   Remove an Observee endpoint</td>
 <td>Added root_account_id parameter</td>
-</tr>
-</table>
-
-
-<h2>2018-04-21</h2>
-<h3>Changes</h3>
-<table class="changelog">
-<tr>
-<th>API Calls</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="courses.html">Courses API</a></td>
-<td>Permissions endpoint</td>
-<td>Includes link to Accounts API Permissions endpoint<br><br>
-Clarifies that permission names are documented in the Create a Role endpoint</td>
-</tr>
-<tr>
-<td><a href="sections.html">Sections API</a></td>
-<td>Create Course Section endpoint</td>
-<td>Course_section[sis_section_id] parameter: Notes the user must have the manage_sis permissions to set</td>
-</tr>
-</table>
-
-<h3>Additions</h3>
-<table class="changelog">
-<tr>
-<th>API Calls</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="accounts.html">Accounts API</a></td>
-<td>Permissions endpoint</td>
-<td>New endpoint: GET /api/v1/accounts/:account_id/permissions</td>
-</tr>
-<tr>
-<td><a href="discussion_topics.html">Discussion Topics API</a></td>
-<td>Get a Single Topic endpoint<br><br>
-List Discussion Topics endpoint<br><br></td>
-<td>Added include parameter<br><br>
-Added overrides as an allowed value in the include parameter</td>
-</tr>
-<tr>
-<td><a href="sections.html">Sections API</a></td>
-<td>Create Course Section endpoint</td>
-<td>course_section[integration_id] parameter: sets the integration_id of the section</td>
-</tr>
-<tr>
-<td><a href="file.sis_csv.html">SIS CSV Format</a></td>
-<td>changes_sis_id.csv</td>
-<td>Added group_category as a type<br><br>
-old_integration_id field: description clarifies that this field does not support group categories<br><br>
-new_integration_id field: description clarifies that this field does not support group categories</td>
-</tr>
-<tr>
-<td><a href="sis_imports.html">SIS Imports API</a></td>
-<td>Import SIS Data endpoint</td>
-<td>skip_deletes parameter: can be used on any type of SIS import; when set, the import will skip any deletes</td>
-</tr>
-<tr>
-<td><a href="users.html">Users API</a></td>
-<td>Get a Pandata JWT Token and its Expiration Date endpoint</td>
-<td>Returns a jwt token, which can be used to send events to Canvas Data</td>
-</tr>
-</table>
-<p></p>
-<table class="changelog">
-<tr>
-<th>API Responses</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="modules.html">Modules API</a></td>
-<td>Module object<br><br>
-ModuleItem SequenceNode object<br><br>
-ModuleItemSequence object</td>
-<td>Returns the published parameter<br><br>
-Returns the mastery_path parameter and includes examples for the current and next items in the course<br><br>
-Returns full examples for items and modules arrays</td>
-</tr>
-<tr>
-<td><a href="sis_import_errors.html">SIS Import Errors API</a></td>
-<td>Get SIS Import Error List endpoint</td>
-<td>Returns a list of SIS import errors for an account or SIS import </td>
-</tr>
-<tr>
-<td><a href="sis_imports.html">SIS Imports API</a></td>
-<td>SISImport object</td>
-<td>workflow_state parameter: returns whether the SIS import was aborted<br><br>
-skip_deletes parameter: returns whether the import skipped any deleted objects</td>
 </tr>
 </table>
