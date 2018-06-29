@@ -3,7 +3,7 @@ ar:
   bigeasy_locale: ar_SA
   date:
     abbr_month_names:
-    - 
+    -
     - يناير
     - فبراير
     - مارس
@@ -41,11 +41,51 @@ ar:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+cy:
+  locales:
+    cy: Cymraeg
+  dow_offset: 1
+  bigeasy_locale: cy_GB
+  date:
+    formats:
+      date_at_time: "%b %-d %l:%M%P"
+      default: "%Y-%m-%d"
+      full: "%b %-d, %Y %-l:%M%P"
+      full_with_weekday: "%a %b %-d, %Y %-l:%M%P"
+      long: "%B %-d, %Y"
+      long_with_weekday: "%A, %B %-d"
+      medium: "%b %-d, %Y"
+      medium_month: "%b %Y"
+      medium_with_weekday: "%a %b %-d, %Y"
+      short: "%b %-d"
+      short_month: "%b"
+      short_weekday: "%a"
+      short_with_weekday: "%a, %b %-d"
+      weekday: "%A"
+    abbr_month_names:
+    -
+    - Ion
+    - Chw
+    - Maw
+    - Ebr
+    - Mai
+    - Meh
+    - Gor
+    - Aws
+    - Med
+    - Hyd
+    - Tach
+    - Rhag
+  time:
+    event: "%{date} am %{time}"
+    formats:
+      tiny: "%l:%M%P"
+      tiny_on_the_hour: "%l%P"
 da:
   bigeasy_locale: da_DK
   date:
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -85,7 +125,7 @@ da-x-k12:
   bigeasy_locale: da_DK
   date:
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -127,7 +167,7 @@ de:
   bigeasy_locale: de_DE
   date:
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - März
@@ -170,7 +210,7 @@ en:
 en-AU:
   date:
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -209,7 +249,7 @@ en-AU:
 en-CA:
   date:
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -247,7 +287,7 @@ en-CA:
 en-GB:
   date:
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -287,7 +327,7 @@ es:
   bigeasy_locale: es_ES
   date:
     abbr_month_names:
-    - 
+    -
     - ene
     - feb
     - mar
@@ -328,7 +368,7 @@ fa:
   crowdsourced: true
   date:
     abbr_month_names:
-    - 
+    -
     - ژانویه
     - فوریه
     - مارس
@@ -369,7 +409,7 @@ fr:
   bigeasy_locale: fr_FR
   date:
     abbr_month_names:
-    - 
+    -
     - Janv
     - Févr
     - Mars
@@ -409,7 +449,7 @@ fr-CA:
   bigeasy_locale: fr_CA
   date:
     abbr_month_names:
-    - 
+    -
     - Jan
     - Fév
     - Mar
@@ -450,7 +490,7 @@ he:
   crowdsourced: true
   date:
     abbr_month_names:
-    - 
+    -
     - ינו׳
     - פבר׳
     - מרץ
@@ -490,7 +530,7 @@ ht:
   bigeasy_locale: ht_HT
   date:
     abbr_month_names:
-    - 
+    -
     - jan
     - fev
     - mas
@@ -532,7 +572,7 @@ hy:
   crowdsourced: true
   date:
     abbr_month_names:
-    - 
+    -
     - Հնվ
     - Փտր
     - Մրտ
@@ -574,7 +614,7 @@ is:
   bigeasy_locale: is_IS
   date:
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -614,7 +654,7 @@ it:
   bigeasy_locale: it_IT
   date:
     abbr_month_names:
-    - 
+    -
     - gen
     - feb
     - mar
@@ -654,7 +694,7 @@ ja:
   bigeasy_locale: ja_JP
   date:
     abbr_month_names:
-    - 
+    -
     - 1月
     - 2月
     - 3月
@@ -694,7 +734,7 @@ ko:
   crowdsourced: true
   date:
     abbr_month_names:
-    - 
+    -
     - 1월
     - 2월
     - 3월
@@ -728,7 +768,7 @@ mi:
   bigeasy_locale: mi_NZ
   date:
     abbr_month_names:
-    - 
+    -
     - Hān
     - Pēp
     - Māe
@@ -769,7 +809,7 @@ nb:
   bigeasy_locale: nb_NO
   date:
     abbr_month_names:
-    - 
+    -
     - jan
     - feb
     - mar
@@ -809,7 +849,7 @@ nb-x-k12:
   bigeasy_locale: nb_NO
   date:
     abbr_month_names:
-    - 
+    -
     - jan
     - feb
     - mar
@@ -852,7 +892,7 @@ nl:
   crowdsourced: false
   date:
     abbr_month_names:
-    - 
+    -
     - jan
     - feb
     - mrt
@@ -893,7 +933,7 @@ nn:
   crowdsourced: true
   date:
     abbr_month_names:
-    - 
+    -
     - jan
     - feb
     - mars
@@ -934,7 +974,7 @@ pl:
   bigeasy_locale: pl_PL
   date:
     abbr_month_names:
-    - 
+    -
     - Sty
     - Lut
     - Mar
@@ -974,7 +1014,7 @@ pt:
   bigeasy_locale: pt_PT
   date:
     abbr_month_names:
-    - 
+    -
     - jan
     - fev
     - mar
@@ -1013,7 +1053,7 @@ pt:
 pt-BR:
   date:
     abbr_month_names:
-    - 
+    -
     - jan
     - fev
     - mar
@@ -1052,7 +1092,7 @@ ru:
   bigeasy_locale: ru_RU
   date:
     abbr_month_names:
-    - 
+    -
     - Янв
     - Фев
     - Мар
@@ -1092,7 +1132,7 @@ sv:
   bigeasy_locale: sv_SE
   date:
     abbr_month_names:
-    - 
+    -
     - jan
     - feb
     - mar
@@ -1132,7 +1172,7 @@ sv-x-k12:
   bigeasy_locale: sv_SE
   date:
     abbr_month_names:
-    - 
+    -
     - jan
     - feb
     - mar
@@ -1175,7 +1215,7 @@ tr:
   crowdsourced: true
   date:
     abbr_month_names:
-    - 
+    -
     - Oca
     - Şub
     - Mar
@@ -1216,7 +1256,7 @@ zh-Hans:
   bigeasy_locale: zh_CN
   date:
     abbr_month_names:
-    - 
+    -
     - 1月
     - 2月
     - 3月
@@ -1259,7 +1299,7 @@ zh-Hant:
   bigeasy_locale: zh_HK
   date:
     abbr_month_names:
-    - 
+    -
     - 1月
     - 2月
     - 3月
