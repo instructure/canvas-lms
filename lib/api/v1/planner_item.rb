@@ -137,7 +137,8 @@ module Api::V1::PlannerItem
         submission_status[:submissions][:feedback] = {
           comment: feedback_data.comment,
           author_name: feedback_data.author_name,
-          author_avatar_url: feedback_data.author.avatar_url
+          author_avatar_url: feedback_data.author.avatar_url,
+          is_media: feedback_data.media_comment_id?
         }
       end
     end

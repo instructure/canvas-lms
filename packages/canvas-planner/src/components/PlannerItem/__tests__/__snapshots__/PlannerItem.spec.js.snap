@@ -111,6 +111,117 @@ exports[`does not render end time if the same as start time 1`] = `
 </div>
 `;
 
+exports[`does not render end time if the same as start time 2`] = `
+<div
+  className="planner-item"
+>
+  <div>
+    <ApplyTheme
+      immutable={false}
+      theme={Object {}}
+    >
+      <Checkbox
+        checked={false}
+        disabled={false}
+        indeterminate={false}
+        inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Calendar Event This Assignment is about awesome stuff is not marked as done.
+          </ScreenReaderContent>
+        }
+        onChange={[Function]}
+        size="medium"
+        variant="simple"
+      />
+    </ApplyTheme>
+  </div>
+  <div
+    aria-hidden="true"
+    style={
+      Object {
+        "color": "#d71f85",
+      }
+    }
+  >
+    <IconCalendarMonth />
+  </div>
+  <div>
+    <div>
+      <div>
+        <div>
+          <Text
+            as="span"
+            color="secondary"
+            letterSpacing="normal"
+            size="x-small"
+          >
+            A Course about being Diffrient Calendar Event
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Calendar Event This Assignment is about awesome stuff, at Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
+            <PresentationContent
+              as="span"
+            >
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                This Assignment is about awesome stuff
+              </Text>
+            </PresentationContent>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div
+          className=""
+        >
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
 exports[`prefers to render feedback if it and the location are available 1`] = `
 <div
   className="planner-item"
@@ -3776,6 +3887,138 @@ exports[`renders feedback if available 1`] = `
           size="medium"
         >
           Death will not be the end of your suffering.
+        </Text>
+      </span>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`renders media feedback if available 1`] = `
+<div
+  className="planner-item"
+>
+  <div>
+    <ApplyTheme
+      immutable={false}
+      theme={Object {}}
+    >
+      <Checkbox
+        checked={false}
+        disabled={false}
+        indeterminate={false}
+        inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Assignment This Assignment is about awesome stuff is not marked as done.
+          </ScreenReaderContent>
+        }
+        onChange={[Function]}
+        size="medium"
+        variant="simple"
+      />
+    </ApplyTheme>
+  </div>
+  <div
+    aria-hidden="true"
+    style={
+      Object {
+        "color": "#d71f85",
+      }
+    }
+  >
+    <IconAssignment />
+  </div>
+  <div>
+    <div>
+      <div>
+        <div>
+          <Text
+            as="span"
+            color="secondary"
+            letterSpacing="normal"
+            size="x-small"
+          >
+            A Course about being Diffrient Assignment
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Assignment This Assignment is about awesome stuff, due Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
+            <PresentationContent
+              as="span"
+            >
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                This Assignment is about awesome stuff
+              </Text>
+            </PresentationContent>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div
+          className=""
+        >
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                DUE: 3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <span>
+        <Avatar
+          inline={true}
+          name="Howard Stern"
+          size="small"
+          src="/avatar/is/here/"
+          variant="circle"
+        />
+      </span>
+      <span>
+        <Text
+          as="span"
+          fontStyle="italic"
+          letterSpacing="normal"
+          size="medium"
+        >
+          You have media feedback.
         </Text>
       </span>
     </div>

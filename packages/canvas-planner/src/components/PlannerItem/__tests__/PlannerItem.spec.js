@@ -587,7 +587,8 @@ it('renders feedback if available', () => {
   const props = defaultProps({feedback: {
     author_avatar_url: '/avatar/is/here/',
     author_name: 'Boyd Crowder',
-    comment: 'Death will not be the end of your suffering.'
+    comment: 'Death will not be the end of your suffering.',
+    is_media: false,
   }});
   const wrapper = shallow(<PlannerItem {...props} />);
   expect(wrapper).toMatchSnapshot();
@@ -631,4 +632,16 @@ it('does not render end time if the same as start time', () => {
   });
   const wrapper = shallow(<PlannerItem {...props} />);
   expect(wrapper).toMatchSnapshot();
+  expect(wrapper).toMatchSnapshot(); 
+});
+
+it('renders media feedback if available', () => {
+  const props = defaultProps({feedback: {
+    author_avatar_url: '/avatar/is/here/',
+    author_name: 'Howard Stern',
+    comment: 'This is a media comment.',
+    is_media: true,
+  }});
+  const wrapper = shallow(<PlannerItem {...props} />);
+  expect(wrapper).toMatchSnapshot(); 
 });

@@ -333,12 +333,13 @@ export class PlannerItem extends Component {
   renderExtraInfo () {
     const feedback = this.props.feedback;
     if (feedback) {
+      const comment = feedback.is_media ? formatMessage("You have media feedback.") : feedback.comment;
       return (
         <div className={styles.feedback}>
           <span className={styles.feedbackAvatar}>
             <Avatar name={feedback.author_name || '?'} src={feedback.author_avatar_url} size="small"/>
           </span>
-          <span className={styles.feedbackComment}><Text fontStyle="italic">{feedback.comment}</Text></span>
+          <span className={styles.feedbackComment}><Text fontStyle="italic">{comment}</Text></span>
         </div>
       );
     }

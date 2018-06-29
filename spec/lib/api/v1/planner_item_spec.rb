@@ -182,7 +182,8 @@ describe Api::V1::PlannerItem do
         expect(json[:submissions][:feedback]).to eq({
                                                       comment: "nice work, fam",
                                                       author_name: @teacher.name,
-                                                      author_avatar_url: @teacher.avatar_url
+                                                      author_avatar_url: @teacher.avatar_url,
+                                                      is_media: false
                                                     })
       end
 
@@ -198,7 +199,8 @@ describe Api::V1::PlannerItem do
         expect(json[:submissions][:feedback]).to eq({
                                                       comment: "nice work, fam",
                                                       author_name: @teacher.name,
-                                                      author_avatar_url: @teacher.avatar_url
+                                                      author_avatar_url: @teacher.avatar_url,
+                                                      is_media: false
                                                     })
       end
 
@@ -215,7 +217,24 @@ describe Api::V1::PlannerItem do
         expect(json[:submissions][:feedback]).to eq({
                                                       comment: "don't let it go to your head.",
                                                       author_name: @teacher.name,
-                                                      author_avatar_url: @teacher.avatar_url
+                                                      author_avatar_url: @teacher.avatar_url,
+                                                      is_media: false
+                                                    })
+      end
+
+      it 'should include indicate is_media if comment has a media_comment_id' do
+        submission = @assignment.submit_homework(@student, body: "the stuff")
+        submission.add_comment(user: @teacher, comment: "nice work, fam", media_comment_id: 2)
+        submission.update(score: 10)
+        submission.grade_it!
+
+        json = api.planner_item_json(@assignment, @student, session, { start_at: 1.week.ago })
+        expect(json[:submissions][:has_feedback]).to be true
+        expect(json[:submissions][:feedback]).to eq({
+                                                      comment: "nice work, fam",
+                                                      author_name: @teacher.name,
+                                                      author_avatar_url: @teacher.avatar_url,
+                                                      is_media: true
                                                     })
       end
     end
