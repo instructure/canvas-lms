@@ -86,6 +86,18 @@ module NewUserSearchPage
     fj("[role=button]:has([title='Next Page'])")
   end
 
+  def results_alert
+    f('#content .alert')
+  end
+
+  def results_body
+    f('#content')
+  end
+
+  def results_row
+    ('[data-automation="users list"] tr')
+  end
+
   # ---------------------- Actions ----------------------
   def select_role(role_name)
     role_dropdown.click
