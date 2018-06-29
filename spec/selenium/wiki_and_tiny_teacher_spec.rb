@@ -133,7 +133,6 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       expect(f('.show-content').text).to include body
 
       f('.revision .restore-link').click
-      wait_for_ajaximations
 
       p.reload
       expect(p.body).to eq body
