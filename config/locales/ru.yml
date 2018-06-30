@@ -2279,7 +2279,7 @@ ru:
     assignment_list_item_score: 
       assignment_grading_type_is_not_graded: "Этому заданию не будет присвоена оценка."
       assignment_not_yet_graded_screenreader: "Задание еще не оценено. %{pointsPossible} возможных баллов."
-      empty_points_possible: "-/%{pointsPossible} баллов"
+      empty_points_possible: "-/%{pointsPossible} бал"
       no_submission: "Нет отправки"
       no_submission_for_assignment_screenreader: "По данному заданию ничего не отправлено. %{pointsPossible} возможных баллов."
       not_yet_graded: "*Еще не оценено*"
@@ -2321,16 +2321,16 @@ ru:
       assignment_points: "Баллы:"
       assignment_type: "Тип:"
       buttons: 
-        save_and_publish: "Сохранить и Опубликовать"
-      cancel: Отменить
+        save_and_publish: "Сохр и опубл"
+      cancel: Отмена
       differentiated_due_dates: "Дифференцировано по дате выполнения"
       discussion_type: Обсуждение
       external_tool_type: "Внешний инструмент"
-      more: "Дополнительные опции"
+      more: Дополн
       multiple_due_dates: "Несколько сроков выполнения"
       not_graded_type: "Нет оценки"
       quiz_type: "Контрольная работа"
-      save: Сохранить
+      save: Сохр
       saving: Сохранение...
     create_group: 
       cancel: Отменить
