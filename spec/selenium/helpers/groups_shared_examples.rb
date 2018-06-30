@@ -109,7 +109,7 @@ shared_examples 'announcements_page' do |context|
   it "should only access group files in announcements right content pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273624, teacher: 324931) do
     add_test_files
     get announcements_page
-    expect_new_page_load { f('.btn-primary').click }
+    expect_new_page_load { f('#add_announcement').click }
     expand_files_on_content_pane
     expect(ffj('.file .text:visible').size).to eq 1
   end
@@ -254,7 +254,7 @@ shared_examples 'discussions_page' do |context|
                                         title: 'Course Discussion', message: 'Course')
 
     get discussions_page
-    expect_new_page_load { f('.btn-primary').click }
+    expect_new_page_load { f('#add_discussion').click }
     expect(f('#editor_tabs')).to be_displayed
     fj(".ui-accordion-header a:contains('Discussions')").click
     expect(fln("#{group_dt.title}")).to be_displayed
@@ -264,23 +264,9 @@ shared_examples 'discussions_page' do |context|
   it "should only access group files in discussions right content pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 303701, teacher: 324933) do
     add_test_files
     get discussions_page
-    expect_new_page_load { f('.btn-primary').click }
+    expect_new_page_load { f('#add_discussion').click }
     expand_files_on_content_pane
     expect(ffj('.file .text:visible').size).to eq 1
-  end
-
-  it "should allow group users to reply to group discussions", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 312868, teacher: 312870) do
-    DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
-                            title: 'Group Discussion', message: 'Group')
-    get discussions_page
-    fln('Group Discussion').click
-    wait_for_ajaximations
-    f('.discussion-reply-action').click
-    type_in_tiny('textarea', 'Good discussion')
-    fj('.btn-primary:contains("Post Reply")').click
-    wait_for_ajaximations
-    expect(f('.entry')).to be_present
-    expect(ff('.message.user_content')[1]).to include_text 'Good discussion'
   end
 end
 

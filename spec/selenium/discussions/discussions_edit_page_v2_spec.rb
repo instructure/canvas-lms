@@ -32,7 +32,6 @@ describe "discussions index" do
         account: @account, active_course: true)
       @course.enroll_student(@student, { active_all: true })
       @course.enroll_teacher(@teacher, { active_all: true })
-      DiscussionNewEdit.set_section_specific_discussion_flag(@course,'on')
 
       # Discussion attributes: title, message, delayed_post_at, user
       @discussion1 = @course.discussion_topics.create!(

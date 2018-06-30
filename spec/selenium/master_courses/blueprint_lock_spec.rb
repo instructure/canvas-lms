@@ -136,18 +136,6 @@ describe "master courses - locked items" do
         verify_index_unlocked
       end
 
-      it "discussions show a lock icon on the index page", priority: "2", test_id: 3137708 do
-        @tag = @template.create_content_tag_for!(@discussion)
-        lock_index_tag
-
-        get "/courses/#{@minion.id}/discussion_topics"
-        verify_index_locked
-        unlock_index_tag
-
-        refresh_page
-        verify_index_unlocked
-      end
-
       it "pages show a lock icon on the index page", priority: "2", test_id: 3137709 do
         @tag = @template.create_content_tag_for!(@page)
         lock_index_tag
@@ -201,27 +189,6 @@ describe "master courses - locked items" do
         refresh_page
 
         element = blueprint_index_assignment_icon
-        expect(element).not_to contain_css(@locked_button_css) # verify that the state has changed.
-      end
-
-      it "discussions show a working lock button on the index page", priority: "2", test_id: 3137708 do
-        get "/courses/#{@master.id}/discussion_topics"
-        element = blueprint_index_discussions_icon
-        escape = blueprint_index_quizzes_search_bar
-
-        element.find_element(:css, @unlocked_button_css).click
-        escape.click # click away from the button due to firefox functionality
-        refresh_page # refresh the page to retrieve info from backend
-
-        element = blueprint_index_discussions_icon
-        escape = blueprint_index_quizzes_search_bar
-
-        verify_unlocked(element)
-        element.find_element(:css, @locked_button_css).click
-        escape.click # click away from the button due to firefox functionality
-        refresh_page
-
-        element = blueprint_index_discussions_icon
         expect(element).not_to contain_css(@locked_button_css) # verify that the state has changed.
       end
 

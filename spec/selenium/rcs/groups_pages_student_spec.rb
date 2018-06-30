@@ -86,25 +86,6 @@ describe "groups" do
     end
 
     #-------------------------------------------------------------------------------------------------------------------
-    describe "discussions page" do
-      it "should allow discussions to be created within a group", priority: "1", test_id: 273615 do
-        get discussions_page
-        expect_new_page_load { f('#new-discussion-btn').click }
-        # This creates the discussion and also tests its creation
-        edit_topic('from a student', 'tell me a story')
-      end
-
-      it "should have two options when creating a discussion", priority: "1", test_id: 273617 do
-        get discussions_page
-        expect_new_page_load { f('#new-discussion-btn').click }
-        expect(f('#threaded')).to be_displayed
-        expect(f('#allow_rating')).to be_displayed
-        # Shouldn't be Enable Podcast Feed option
-        expect(f("#content")).not_to contain_css('#podcast_enabled')
-      end
-    end
-
-    #-------------------------------------------------------------------------------------------------------------------
     describe "pages page" do
       it "should only allow group members to access pages", priority: "1", test_id: 315331 do
         get pages_page

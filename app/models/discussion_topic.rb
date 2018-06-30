@@ -80,7 +80,6 @@ class DiscussionTopic < ActiveRecord::Base
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validate :validate_draft_state_change, :if => :workflow_state_changed?
   validate :section_specific_topics_must_have_sections
-  validate :feature_must_be_enabled_for_section_specific
   validate :only_course_topics_can_be_section_specific
   validate :assignments_cannot_be_section_specific
   validate :course_group_discussion_cannot_be_section_specific
@@ -107,15 +106,6 @@ class DiscussionTopic < ActiveRecord::Base
     else
       true
     end
-  end
-
-  def feature_must_be_enabled_for_section_specific
-    return true unless self.is_section_specific && !self.is_announcement
-
-    if !self.context.root_account.feature_enabled?(:section_specific_discussions)
-      return self.errors.add(:is_section_specific, t("Section-specific discussions are disabled"))
-    end
-    return true
   end
 
   def only_course_topics_can_be_section_specific

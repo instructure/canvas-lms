@@ -789,7 +789,6 @@ describe DiscussionTopicsController, type: :request do
       end
 
       it "should include sections if the discussion is section specific and they are asked for" do
-        @course.root_account.enable_feature!(:section_specific_discussions)
         section = @course.course_sections.create!
         @topic.is_section_specific = true
         @topic.discussion_topic_section_visibilities << DiscussionTopicSectionVisibility.new(
@@ -808,7 +807,6 @@ describe DiscussionTopicsController, type: :request do
       end
 
       it "should include section user accounts if they are asked for" do
-        @course.root_account.enable_feature!(:section_specific_discussions)
         section = @course.course_sections.create!
         @topic.is_section_specific = true
         @topic.discussion_topic_section_visibilities << DiscussionTopicSectionVisibility.new(
@@ -862,7 +860,6 @@ describe DiscussionTopicsController, type: :request do
       it "should return section count if section specific" do
         post_at = 1.month.from_now
         lock_at = 2.months.from_now
-        @course.root_account.enable_feature!(:section_specific_discussions)
         discussion_topic_model(:context => @course, :title => "Section Specific Topic", :user => @teacher)
         section1 = @course.course_sections.create!
         @course.course_sections.create! # just to make sure we only copy the right one
@@ -2952,7 +2949,6 @@ describe DiscussionTopicsController, type: :request do
 
     it "duplicate carries sections over" do
       @user = @teacher
-      @course.root_account.enable_feature!(:section_specific_discussions)
       discussion_topic_model(:context => @course, :title => "Section Specific Topic", :user => @teacher)
       section1 = @course.course_sections.create!
       @course.course_sections.create! # just to make sure we only copy the right one

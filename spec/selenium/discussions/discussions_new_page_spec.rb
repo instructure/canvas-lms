@@ -179,7 +179,7 @@ describe "discussions" do
         expect_new_page_load {submit_form('.form-actions')}
         expect(f('.entry-content').text).to include("This topic is locked until #{unlock_text}")
         expect_new_page_load{f('#section-tabs .discussions').click}
-        expect(f(' .discussion').text).to include("Not available until #{unlock_text_index_page}")
+        expect(f('.discussion-availability').text).to include("Not available until #{unlock_text_index_page}")
       end
 
       it "should allow a student to create a discussion", priority: "1", test_id: 150471 do

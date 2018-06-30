@@ -184,40 +184,6 @@ describe DiscussionTopicsController do
       expect(parsed_topic["delayed_post_at"].to_json).to eq delayed_post_time.to_json
       expect(parsed_topic["lock_at"].to_json).to eq lock_at_time.to_json
     end
-
-    it "does not filter module locked discussion by default" do
-      course_topic(user: @teacher)
-      @locked_topic = @topic
-      course_topic(user: @teacher)
-      @module = @course.context_modules.create!(name: 'some module')
-      @module.add_item(type: 'discussion_topic', id: @topic.id)
-      @locked_module = @course.context_modules.create!(name: 'some locked module')
-      @locked_module.add_item(type: 'discussion_topic', id: @locked_topic.id)
-      @locked_module.unlock_at = 2.months.from_now
-      @locked_module.save!
-      user_session(@student)
-
-      get 'index', params: {course_id: @course.id}
-      expect(response).to be_successful
-      expect(assigns["topics"]).to include(@locked_topic)
-    end
-
-    it "filters module locked discussions when asked to" do
-      course_topic(user: @teacher)
-      @locked_topic = @topic
-      course_topic(user: @teacher)
-      @module = @course.context_modules.create!(name: 'some module')
-      @module.add_item(type: 'discussion_topic', id: @topic.id)
-      @locked_module = @course.context_modules.create!(name: 'some locked module')
-      @locked_module.add_item(type: 'discussion_topic', id: @locked_topic.id)
-      @locked_module.unlock_at = 2.months.from_now
-      @locked_module.save!
-      user_session(@student)
-
-      get 'index', params: {course_id: @course.id, exclude_context_module_locked_topics: true}
-      expect(response).to be_successful
-      expect(assigns["topics"]).not_to include(@locked_topic)
-    end
   end
 
   describe "GET 'show'" do
@@ -329,7 +295,6 @@ describe DiscussionTopicsController do
 
     context 'section specific discussions' do
       before(:once) do
-        @course.root_account.enable_feature!(:section_specific_discussions)
         course_with_teacher(active_course: true)
         @section = @course.course_sections.create!(name: 'test section')
 
@@ -1124,7 +1089,6 @@ describe DiscussionTopicsController do
     # TODO: fix this terribleness
     describe 'section specific discussions' do
       before(:each) do
-        @course.root_account.enable_feature!(:section_specific_discussions)
         user_session(@teacher)
         @section1 = @course.course_sections.create!(name: "Section 1")
         @section2 = @course.course_sections.create!(name: "Section 2")
@@ -1191,15 +1155,6 @@ describe DiscussionTopicsController do
         expect(response).to have_http_status :success
         expect(DiscussionTopic.last.course_sections.first).to eq @section1
         expect(DiscussionTopicSectionVisibility.count).to eq 1
-      end
-
-      it 'does not create a discussion with sections if the feature is disabled' do
-        @course.root_account.disable_feature!(:section_specific_discussions)
-        post 'create',
-          params: topic_params(@course, {specific_sections: @section1.id.to_s}), :format => :json
-        expect(response).to have_http_status 400
-        expect(DiscussionTopic.count).to eq 0
-        expect(DiscussionTopicSectionVisibility.count).to eq 0
       end
 
       it 'does not allow creation of group discussions that are section specific' do
@@ -1417,7 +1372,6 @@ describe DiscussionTopicsController do
     end
 
     it 'does not allow setting specific sections for group discussions' do
-      @course.root_account.enable_feature!(:section_specific_discussions)
       user_session(@teacher)
       section1 = @course.course_sections.create!(name: "Section 1")
       section2 = @course.course_sections.create!(name: "Section 2")
@@ -1460,7 +1414,6 @@ describe DiscussionTopicsController do
 
     it "Allows an admin to update a section-specific discussion" do
       account = @course.root_account
-      account.enable_feature!(:section_specific_discussions)
       section = @course.course_sections.create!(name: "Section")
       admin = account_admin_user(account: account, role: admin_role, active_user: true)
       user_session(admin)
@@ -1476,7 +1429,6 @@ describe DiscussionTopicsController do
 
     it "can turn graded topic into ungraded section-specific topic in one edit" do
       user_session(@teacher)
-      @course.root_account.enable_feature!(:section_specific_discussions)
       assign = @course.assignments.create!(title: 'Graded Topic 1', submission_types: 'discussion_topic')
       section1 = @course.course_sections.create!(name: "Section 1")
       section2 = @course.course_sections.create!(name: "Section 2")

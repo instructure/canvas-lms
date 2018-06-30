@@ -70,7 +70,9 @@ describe "discussions" do
           course.allow_student_discussion_topics = false
           course.save!
           get url
-          new_student_entry_text = "'ello there"
+          wait_for_animations
+          new_student_entry_text = "Hello there"
+          wait_for_animations
           expect(f('#content')).not_to include_text(new_student_entry_text)
           add_reply new_student_entry_text
           expect(f('#content')).to include_text(new_student_entry_text)
@@ -134,7 +136,7 @@ describe "discussions" do
       it "should create a group discussion", priority: "1", test_id: 150473 do
         group
         get "/courses/#{course.id}/discussion_topics"
-        expect_new_page_load{f('#new-discussion-btn').click}
+        expect_new_page_load{f('#add_discussion').click}
         f('#discussion-title').send_keys('New Discussion')
         type_in_tiny 'textarea[name=message]', 'Discussion topic message'
         f('#has_group_category').click
@@ -150,7 +152,7 @@ describe "discussions" do
       it "should create a graded discussion", priority: "1", test_id: 150477 do
         assignment_group
         get "/courses/#{course.id}/discussion_topics"
-        expect_new_page_load{f('#new-discussion-btn').click}
+        expect_new_page_load{f('#add_discussion').click}
         f('#discussion-title').send_keys('New Discussion')
         type_in_tiny 'textarea[name=message]', 'Discussion topic message'
         expect(f('#availability_options')).to be_displayed
@@ -166,7 +168,7 @@ describe "discussions" do
 
       it "should show attachment", priority: "1", test_id: 150478 do
         get "/courses/#{course.id}/discussion_topics"
-        expect_new_page_load{f('#new-discussion-btn').click}
+        expect_new_page_load{f('#add_discussion').click}
         filename, fullpath, _data = get_file("graded.png")
         f('#discussion-title').send_keys('New Discussion')
         f('input[name=attachment]').send_keys(fullpath)

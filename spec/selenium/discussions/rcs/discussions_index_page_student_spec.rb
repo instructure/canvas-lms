@@ -61,7 +61,7 @@ describe "discussions" do
 
       it "should allow a student to create a discussion", priority: "1", test_id: 270941 do
         get url
-        expect_new_page_load { f('#new-discussion-btn').click }
+        expect_new_page_load { f('#add_discussion').click }
         edit_topic("from a student", "tell me a story")
       end
     end
