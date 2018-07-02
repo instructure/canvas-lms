@@ -1314,7 +1314,7 @@ describe Assignment do
 
     context 'with an excused assignment' do
       before :once do
-        @result = @assignment.grade_student(@user, :excuse => true)
+        @result = @assignment.grade_student(@user, grader: @teacher, excuse: true)
         @assignment.reload
       end
 
@@ -1412,6 +1412,43 @@ describe Assignment do
           @assignment.grade_student(@student, grader: @second_teacher, provisional: true, score: 2)
 
           expect(@assignment.moderation_graders).to have(3).items
+        end
+
+        describe 'excusing a moderated assignment' do
+          it 'does not accept an excusal from a provisional grader' do
+            @assignment.grade_student(@student, grader: @first_teacher, provisional: true, excused: true)
+            expect(@assignment).not_to be_excused_for(@student)
+          end
+
+          it 'does not allow a provisional grader to un-excuse an assignment' do
+            @assignment.grade_student(@student, grader: @final_grader, provisional: true, excused: true)
+            @assignment.grade_student(@student, grader: @first_teacher, provisional: true, excused: false)
+            expect(@assignment).to be_excused_for(@student)
+          end
+
+          it 'accepts an excusal from the final grader' do
+            @assignment.grade_student(@student, grader: @final_grader, provisional: true, excused: true)
+            expect(@assignment).to be_excused_for(@student)
+          end
+
+          it 'allows the final grader to un-excuse an assignment' do
+            @assignment.grade_student(@student, grader: @final_grader, provisional: true, excused: true)
+            @assignment.grade_student(@student, grader: @final_grader, provisional: true, excused: false)
+            expect(@assignment).not_to be_excused_for(@student)
+          end
+
+          it 'accepts an excusal from an admin' do
+            admin = account_admin_user
+            @assignment.grade_student(@student, grader: admin, provisional: true, excused: true)
+            expect(@assignment).to be_excused_for(@student)
+          end
+
+          it 'allows an admin to un-excuse an assignment' do
+            admin = account_admin_user
+            @assignment.grade_student(@student, grader: @final_grader, provisional: true, excused: true)
+            @assignment.grade_student(@student, grader: admin, provisional: true, excused: false)
+            expect(@assignment).not_to be_excused_for(@student)
+          end
         end
       end
     end
@@ -2015,15 +2052,12 @@ describe Assignment do
 
       context "when excusing an assignment" do
         it "marks the assignment as excused" do
-          submission, _ = @assignment.grade_student(@student, excuse: true)
+          submission, = @assignment.grade_student(@student, grader: @teacher, excuse: true)
           expect(submission).to be_excused
         end
 
         it "doesn't mark everyone in the group excused" do
-          sub1, sub2 = @assignment.grade_student(
-            @student1,
-            excuse: true,
-          )
+          sub1, sub2 = @assignment.grade_student(@student1, grader: @teacher, excuse: true)
 
           expect(sub1.user).to eq @student1
           expect(sub1).to be_excused
@@ -2059,7 +2093,7 @@ describe Assignment do
         end
 
         it "doesn't overwrite the grades of group members who have been excused" do
-          sub1 = @assignment.grade_student(@student1, excuse: true).first
+          sub1 = @assignment.grade_student(@student1, grader: @teacher, excuse: true).first
           expect(sub1).to be_excused
 
           sub2, sub3 = @assignment.grade_student(@student2, grade: 10, grader: @teacher)

@@ -494,7 +494,7 @@ describe UsersController, type: :request do
       'grade' => nil,
       'entered_grade' => nil,
       'grading_period_id' => @sub.grading_period_id,
-      'excused' => nil,
+      'excused' => false,
       'grader_id' => @teacher.id,
       'graded_at' => nil,
       'score' => nil,
