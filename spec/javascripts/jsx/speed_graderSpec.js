@@ -2669,16 +2669,36 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         handleGradingError.restore()
       })
 
-      test('clears the grade input if an error is encountered', () => {
+      test('clears the grade input on an error if the user is not a moderator', () => {
         $.ajaxJSON.restore()
         sinon.stub($, 'ajaxJSON').callsFake((_url, _method, _form, _success, error) => { error() })
         const handleGradingError = sinon.stub(SpeedGrader.EG, 'handleGradingError')
         const showGrade = sinon.stub(SpeedGrader.EG, 'showGrade')
+        ENV.grading_role = 'provisional_grader'
 
         SpeedGrader.EG.handleGradeSubmit({}, false)
-        strictEqual(showGrade.firstCall.args.length, 0)
+        strictEqual(showGrade.callCount, 1)
 
         showGrade.restore()
+        handleGradingError.restore()
+      })
+
+      test('reverts the provisional grade fields on an error if the user is a moderator', () => {
+        const fakeGrade = { grade: 1, selected: true }
+        SpeedGrader.EG.currentStudent.submission.provisional_grades = [fakeGrade]
+        SpeedGrader.EG.setupProvisionalGraderDisplayNames()
+
+        $.ajaxJSON.callsFake((_url, _method, _form, _success, error) => { error() })
+        const handleGradingError = sinon.stub(SpeedGrader.EG, 'handleGradingError')
+        const setActiveProvisionalGradeFields = sinon.stub(SpeedGrader.EG, 'setActiveProvisionalGradeFields')
+
+        ENV.grading_role = 'moderator'
+        SpeedGrader.EG.handleGradeSubmit({}, false)
+
+        const [params] = setActiveProvisionalGradeFields.firstCall.args
+        strictEqual(params.grade, fakeGrade)
+
+        setActiveProvisionalGradeFields.restore()
         handleGradingError.restore()
       })
 
@@ -2918,6 +2938,13 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
 
       const [errorMessage] = $.flashError.firstCall.args
       strictEqual(errorMessage, 'The maximum number of graders has been reached for this assignment.')
+    })
+
+    test('forbears from showing an error message if given a PROVISIONAL_GRADE_INVALID_SCORE error code', () => {
+      const maxGradersError = {base: 'bad grade', error_code: 'PROVISIONAL_GRADE_INVALID_SCORE'}
+      SpeedGrader.EG.handleGradingError({errors: maxGradersError})
+
+      strictEqual($.flashError.callCount, 0)
     })
 
     test('shows a generic error message if not given a MAX_GRADERS_REACHED error code', () => {
@@ -3168,6 +3195,25 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       $('.score').text('234')
       EG.setActiveProvisionalGradeFields()
       strictEqual($('.score').text(), '234')
+    })
+
+    QUnit.module('when the current submission is excused', excusedHooks => {
+      let fakeGrade
+
+      excusedHooks.beforeEach(() => {
+        EG.currentStudent.submission.excused = true
+        fakeGrade = {grade: {score: 100, readonly: false}}
+      })
+
+      test('sets the grade field to EX if passed an editable grade', () => {
+        EG.setActiveProvisionalGradeFields(fakeGrade)
+        strictEqual($('#grading-box-extended').val(), 'EX')
+      })
+
+      test('sets the score field to empty if passed an editable grade', () => {
+        EG.setActiveProvisionalGradeFields(fakeGrade)
+        strictEqual($('.score').text(), '')
+      })
     })
   })
 

@@ -4649,6 +4649,36 @@ describe Submission do
     end
   end
 
+  describe '#provisional_grade' do
+    before(:once) do
+      @assignment.grade_student(@student, score: 10, grader: @teacher, provisional: true)
+      @assignment.grade_student(@student, score: 50, grader: @teacher, provisional: true, final: true)
+    end
+    let(:submission) { @assignment.submissions.first }
+
+    it 'returns the provisional grade matching the passed-in scorer if provided' do
+      expect(submission.provisional_grade(@teacher).score).to eq 10
+    end
+
+    it 'returns the final provisional grade if final is true' do
+      expect(submission.provisional_grade(@teacher, final: true).score).to eq 50
+    end
+
+    context 'when no matching grade is found' do
+      let(:non_scorer) { User.new }
+
+      it 'returns a null provisional grade by default' do
+        provisional_grade = submission.provisional_grade(non_scorer)
+        expect(provisional_grade).to be_a(ModeratedGrading::NullProvisionalGrade)
+      end
+
+      it 'returns nil if default_to_null_grade is false' do
+        provisional_grade = submission.provisional_grade(non_scorer, default_to_null_grade: false)
+        expect(provisional_grade).to be nil
+      end
+    end
+  end
+
   describe '#update_line_item_result' do
     it 'does nothing if lti_result does not exist' do
       submission = submission_model assignment: @assignment

@@ -2563,7 +2563,20 @@ EG = {
 
     const submissionError = (data, _xhr, _textStatus, _errorThrown) => {
       EG.handleGradingError(data);
-      EG.showGrade();
+
+      if (ENV.grading_role === 'moderator') {
+        // Revert to the previously-selected provisional grade, which will not
+        // necessarily be the value in EG.currentStudent.submission
+        const selectedGrade = currentStudentProvisionalGrades().find(provisionalGrade => provisionalGrade.selected)
+        if (selectedGrade) {
+          EG.setActiveProvisionalGradeFields({
+            grade: selectedGrade,
+            label: provisionalGraderDisplayNames[selectedGrade.provisional_grade_id]
+          })
+        }
+      } else {
+        EG.showGrade();
+      }
     };
 
     $.ajaxJSON(url, method, formData, submissionSuccess, submissionError);
@@ -2771,8 +2784,16 @@ EG = {
   },
 
   handleGradingError (data={}) {
+    const errorCode = data.errors && data.errors.error_code
+
+    // If the grader entered an invalid provisional grade, revert it without
+    // showing an explicit error
+    if (errorCode === 'PROVISIONAL_GRADE_INVALID_SCORE') {
+      return;
+    }
+
     let errorMessage
-    if (data.errors && data.errors.error_code === 'MAX_GRADERS_REACHED') {
+    if (errorCode === 'MAX_GRADERS_REACHED') {
       errorMessage = I18n.t('The maximum number of graders has been reached for this assignment.');
     } else {
       errorMessage = I18n.t('An error occurred updating this assignment.');
@@ -2873,9 +2894,19 @@ EG = {
   setActiveProvisionalGradeFields({label='', grade=null} = {}) {
     $grading_box_selected_grader.text(label);
 
+    const submission = EG.currentStudent.submission || {};
     if (grade !== null) {
-      $grade.val(grade.grade);
-      $score.text(grade.score);
+      // If the moderator has selected their own custom grade
+      // (i.e., the selected grade isn't read-only) and has
+      // excused this submission, show that instead of the
+      // provisional grade's score
+      if (!grade.readonly && submission.excused) {
+        $grade.val('EX')
+        $score.text('')
+      } else {
+        $grade.val(grade.grade);
+        $score.text(grade.score);
+      }
     }
   },
 

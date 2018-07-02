@@ -493,11 +493,7 @@ class GradebooksController < ApplicationController
             submission[:dont_overwrite_grade] = value_to_boolean(params[:dont_overwrite_grades])
             submission.delete(:final) if submission[:final] && !@context.grants_right?(@current_user, :moderate_grades)
             subs = @assignment.grade_student(@user, submission)
-            if submission[:provisional]
-              subs.each do |sub|
-                sub.apply_provisional_grade_filter!(sub.provisional_grade(@current_user, final: submission[:final]))
-              end
-            end
+            apply_provisional_grade_filters!(submissions: subs, final: submission[:final]) if submission[:provisional]
             @submissions += subs
           end
           if [:comment, :media_comment_id, :comment_attachments].any? { |k| submission.key? k }
@@ -505,11 +501,7 @@ class GradebooksController < ApplicationController
             submission[:hidden] = @assignment.muted?
 
             subs = @assignment.update_submission(@user, submission)
-            if submission[:provisional]
-              subs.each do |sub|
-                sub.apply_provisional_grade_filter!(sub.provisional_grade(@current_user, final: submission[:final]))
-              end
-            end
+            apply_provisional_grade_filters!(submissions: subs, final: submission[:final]) if submission[:provisional]
             @submissions += subs
           end
         rescue Assignment::GradeError => e
@@ -1005,6 +997,21 @@ class GradebooksController < ApplicationController
     submissions.map do |submission|
       submission[:user_id] = submission_ids_map[submission.fetch(:anonymous_id)].user_id
       submission
+    end
+  end
+
+  def apply_provisional_grade_filters!(submissions:, final:)
+    preloaded_grades = ModeratedGrading::ProvisionalGrade.where(submission: submissions)
+    grades_by_submission_id = preloaded_grades.group_by(&:submission_id)
+
+    submissions.each do |submission|
+      provisional_grade = submission.provisional_grade(
+        @current_user,
+        preloaded_grades: grades_by_submission_id,
+        final: final,
+        default_to_null_grade: false
+      )
+      submission.apply_provisional_grade_filter!(provisional_grade) if provisional_grade
     end
   end
 end

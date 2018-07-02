@@ -1469,6 +1469,62 @@ describe GradebooksController do
         expect(json[0]['submission']['submission_comments'].first['submission_comment']['comment']).to eq 'provisional!'
       end
 
+      context 'when submitting a final provisional grade' do
+        let(:provisional_grade_params) do
+          {
+            course_id: @course.id,
+            submission: {
+              score: 66,
+              comment: "not the end",
+              assignment_id: @assignment.id,
+              user_id: @student.id,
+              provisional: true
+            }
+          }
+        end
+
+        let(:final_provisional_grade_params) do
+          {
+            course_id: @course.id,
+            submission: {
+              score: 77,
+              comment: "THE END",
+              assignment_id: @assignment.id,
+              user_id: @student.id,
+              final: true,
+              provisional: true
+            }
+          }
+        end
+
+        let(:submission_json) do
+          response_json = JSON.parse(response.body)
+          response_json[0]['submission']
+        end
+
+        it 'returns the submitted score in the submission JSON' do
+          post 'update_submission', params: provisional_grade_params, format: :json
+          post 'update_submission', params: final_provisional_grade_params, format: :json
+
+          expect(submission_json['score']).to eq 77
+        end
+
+        it 'returns the submitted comments in the submission JSON' do
+          post 'update_submission', params: provisional_grade_params, format: :json
+          post 'update_submission', params: final_provisional_grade_params, format: :json
+
+          all_comments = submission_json['submission_comments']
+          expect(all_comments.first['submission_comment']['comment']).to eq 'THE END'
+        end
+
+        it 'returns the value for grade_matches_current_submission of the submitted grade in the JSON' do
+          post 'update_submission', params: provisional_grade_params, format: :json
+          post 'update_submission', params: final_provisional_grade_params, format: :json
+
+          expect(submission_json['grade_matches_current_submission']).to be true
+        end
+      end
+
       it "includes the graded anonymously flag in the provisional grade object" do
         submission = @assignment.submit_homework(@student, body: "hello")
         post 'update_submission',
@@ -1600,6 +1656,15 @@ describe GradebooksController do
 
         post 'update_submission', params: invalid_request_params, format: :json
         expect(response_json.dig('errors', 'base')).to be_present
+      end
+
+      it 'returns a PROVISIONAL_GRADE_INVALID_SCORE error code if an invalid grade is given' do
+        invalid_submission_params = submission_params.merge(grade: 'NaN')
+        invalid_request_params = request_params.merge(submission: invalid_submission_params)
+        user_session(@teacher)
+
+        post 'update_submission', params: invalid_request_params, format: :json
+        expect(response_json.dig('errors', 'error_code')).to eq 'PROVISIONAL_GRADE_INVALID_SCORE'
       end
     end
   end

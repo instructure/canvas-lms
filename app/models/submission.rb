@@ -1869,7 +1869,7 @@ class Submission < ActiveRecord::Base
     false
   end
 
-  def provisional_grade(scorer, final: false, preloaded_grades: nil)
+  def provisional_grade(scorer, final: false, preloaded_grades: nil, default_to_null_grade: true)
     pg = if preloaded_grades
       pgs = preloaded_grades[self.id] || []
       if final
@@ -1884,7 +1884,12 @@ class Submission < ActiveRecord::Base
         self.provisional_grades.not_final.where(scorer_id: scorer).first
       end
     end
-    pg ||= ModeratedGrading::NullProvisionalGrade.new(self, scorer.id, final)
+
+    if default_to_null_grade && pg.nil?
+      ModeratedGrading::NullProvisionalGrade.new(self, scorer.id, final)
+    else
+      pg
+    end
   end
 
   def find_or_create_provisional_grade!(scorer, attrs = {})

@@ -1450,6 +1450,13 @@ describe Assignment do
         expect(@assignment.moderation_graders).to have(1).item
       end
 
+      it 'raises an error if an invalid score is passed for a provisional grade' do
+        expect { @assignment.grade_student(@student, grader: @first_teacher, provisional: true, grade: 'bad') }.
+          to raise_error(Assignment::GradeError) do |error|
+            expect(error.error_code).to eq 'PROVISIONAL_GRADE_INVALID_SCORE'
+          end
+      end
+
       context 'with a final grader' do
         before(:once) do
           teacher_in_course(active_all: true)
@@ -1476,8 +1483,8 @@ describe Assignment do
 
         describe 'excusing a moderated assignment' do
           it 'does not accept an excusal from a provisional grader' do
-            @assignment.grade_student(@student, grader: @first_teacher, provisional: true, excused: true)
-            expect(@assignment).not_to be_excused_for(@student)
+            expect { @assignment.grade_student(@student, grader: @first_teacher, provisional: true, excused: true) }.
+              to raise_error(Assignment::GradeError)
           end
 
           it 'does not allow a provisional grader to un-excuse an assignment' do
@@ -1491,9 +1498,9 @@ describe Assignment do
             expect(@assignment).to be_excused_for(@student)
           end
 
-          it 'allows the final grader to un-excuse an assignment' do
+          it 'allows the final grader to un-excuse an assignment if a score is provided' do
             @assignment.grade_student(@student, grader: @final_grader, provisional: true, excused: true)
-            @assignment.grade_student(@student, grader: @final_grader, provisional: true, excused: false)
+            @assignment.grade_student(@student, grader: @final_grader, provisional: true, excused: false, score: 100)
             expect(@assignment).not_to be_excused_for(@student)
           end
 
@@ -1503,10 +1510,10 @@ describe Assignment do
             expect(@assignment).to be_excused_for(@student)
           end
 
-          it 'allows an admin to un-excuse an assignment' do
+          it 'allows an admin to un-excuse an assignment if a score is provided' do
             admin = account_admin_user
             @assignment.grade_student(@student, grader: @final_grader, provisional: true, excused: true)
-            @assignment.grade_student(@student, grader: admin, provisional: true, excused: false)
+            @assignment.grade_student(@student, grader: admin, provisional: true, excused: false, score: 100)
             expect(@assignment).not_to be_excused_for(@student)
           end
         end
