@@ -31,32 +31,32 @@ describe "speed grader - discussion submissions" do
       description: 'a little bit of content'
     )
     student = user_with_pseudonym(
-      :name => 'first student',
-      :active_user => true,
-      :username => 'student@example.com',
-      :password => 'qwertyuiop'
+      name: 'first student',
+      active_user: true,
+      username: 'student@example.com',
+      password: 'qwertyuiop'
     )
-    @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
+    @course.enroll_user(student, "StudentEnrollment", enrollment_state: 'active')
     # create and enroll second student
     student_2 = user_with_pseudonym(
-      :name => 'second student',
-      :active_user => true,
-      :username => 'student2@example.com',
-      :password => 'qwertyuiop'
+      name: 'second student',
+      active_user: true,
+      username: 'student2@example.com',
+      password: 'qwertyuiop'
     )
-    @course.enroll_user(student_2, "StudentEnrollment", :enrollment_state => 'active')
+    @course.enroll_user(student_2, "StudentEnrollment", enrollment_state: 'active')
 
     # create discussion entries
     @first_message = 'first student message'
     @second_message = 'second student message'
     @discussion_topic = DiscussionTopic.find_by_assignment_id(@assignment.id)
     entry = @discussion_topic.discussion_entries.
-        create!(:user => student, :message => @first_message)
+        create!(user: student, message: @first_message)
     entry.update_topic
     entry.context_module_action
-    @attachment_thing = attachment_model(:context => student_2, :filename => 'horse.doc', :content_type => 'application/msword')
+    @attachment_thing = attachment_model(context: student_2, filename: 'horse.doc', content_type: 'application/msword')
     entry_2 = @discussion_topic.discussion_entries.
-        create!(:user => student_2, :message => @second_message, :attachment => @attachment_thing)
+        create!(user: student_2, message: @second_message, attachment: @attachment_thing)
     entry_2.update_topic
     entry_2.context_module_action
   end
@@ -101,7 +101,7 @@ describe "speed grader - discussion submissions" do
       teacher_message = "why did the taco cross the road?"
 
       teacher_entry = @discussion_topic.discussion_entries.
-        create!(:user => teacher, :message => teacher_message)
+        create!(user: teacher, message: teacher_message)
       teacher_entry.update_topic
       teacher_entry.context_module_action
 

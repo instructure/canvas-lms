@@ -21,59 +21,59 @@ describe "grades" do
   include_context "in-process server selenium tests"
 
   before (:each) do
-    course_with_teacher(:active_all => true)
-    student_in_course(:name => "Student 1", :active_all => true)
+    course_with_teacher(active_all: true)
+    student_in_course(name: "Student 1", active_all: true)
     @student_1 = @student
-    student_in_course(:name => "Student 2", :active_all => true)
+    student_in_course(name: "Student 2", active_all: true)
     @student_2 = @student
 
     #first assignment data
     due_date = Time.now.utc + 2.days
-    @group = @course.assignment_groups.create!(:name => 'first assignment group', :group_weight => 33.3)
-    @group2 = @course.assignment_groups.create!(:name => 'second assignment group', :group_weight => 33.3)
-    @group3 = @course.assignment_groups.create!(:name => 'third assignment group', :group_weight => 33.3)
+    @group = @course.assignment_groups.create!(name: 'first assignment group', group_weight: 33.3)
+    @group2 = @course.assignment_groups.create!(name: 'second assignment group', group_weight: 33.3)
+    @group3 = @course.assignment_groups.create!(name: 'third assignment group', group_weight: 33.3)
     @first_assignment = assignment_model({
-      :course => @course,
-      :title => 'first assignment',
-      :due_at => due_date,
-      :points_possible => 10,
-      :submission_types => 'online_text_entry',
-      :assignment_group => @group,
-      :peer_reviews => true,
-      :anonymous_peer_reviews => true
+      course: @course,
+      title: 'first assignment',
+      due_at: due_date,
+      points_possible: 10,
+      submission_types: 'online_text_entry',
+      assignment_group: @group,
+      peer_reviews: true,
+      anonymous_peer_reviews: true
     })
     rubric_model
     @rubric.criteria[0][:criterion_use_range] = true
     @rubric.save!
-    @association = @rubric.associate_with(@first_assignment, @course, :purpose => 'grading')
+    @association = @rubric.associate_with(@first_assignment, @course, purpose: 'grading')
     @assignment.assign_peer_review(@student_2, @student_1)
     @assignment.reload
 
-    @submission = @first_assignment.submit_homework(@student_1, :body => 'student first submission')
+    @submission = @first_assignment.submit_homework(@student_1, body: 'student first submission')
     @first_assignment.grade_student(@user, grade: 10, grader: @teacher)
     @assessment = @association.assess({
-      :user => @student_1,
-      :assessor => @teacher,
-      :artifact => @submission,
-      :assessment => {
-        :assessment_type => 'grading',
-        :criterion_crit1 => {
-          :points => 10,
-          :comments => "cool, yo"
+      user: @student_1,
+      assessor: @teacher,
+      artifact: @submission,
+      assessment: {
+        assessment_type: 'grading',
+        criterion_crit1: {
+          points: 10,
+          comments: "cool, yo"
         }
       }
     })
     @submission.reload
     @submission.score = 3
-    @submission.add_comment(:author => @teacher, :comment => 'submission comment')
+    @submission.add_comment(author: @teacher, comment: 'submission comment')
     @submission.add_comment({
-      :author => @student_2,
-      :comment => "Anonymous Peer Review"
+      author: @student_2,
+      comment: "Anonymous Peer Review"
     })
     @submission.save!
 
     #second student submission
-    @student_2_submission = @first_assignment.submit_homework(@student_2, :body => 'second student second submission')
+    @student_2_submission = @first_assignment.submit_homework(@student_2, body: 'second student second submission')
     @first_assignment.grade_student(@student_2, grade: 4, grader: @teacher)
     @student_2_submission.score = 3
     @submission.save!
@@ -81,33 +81,33 @@ describe "grades" do
     #second assigmnent data
     due_date = due_date + 1.days
     @second_assignment = assignment_model({
-      :course => @course,
-      :title => 'second assignment',
-      :due_at => due_date,
-      :points_possible => 5,
-      :submission_types => 'online_text_entry',
-      :assignment_group => @group
+      course: @course,
+      title: 'second assignment',
+      due_at: due_date,
+      points_possible: 5,
+      submission_types:'online_text_entry',
+      assignment_group: @group
     })
 
-    @second_association = @rubric.associate_with(@second_assignment, @course, :purpose => 'grading')
-    @second_submission = @second_assignment.submit_homework(@student_1, :body => 'student second submission')
+    @second_association = @rubric.associate_with(@second_assignment, @course, purpose: 'grading')
+    @second_submission = @second_assignment.submit_homework(@student_1, body: 'student second submission')
     @second_assignment.grade_student(@student_1, grade: 2, grader: @teacher)
     @second_submission.save!
     @second_assessment = @second_association.assess({
-      :user => @student_1,
-      :assessor => @teacher,
-      :artifact => @second_submission,
-      :assessment => {
-        :assessment_type => 'grading',
-        :criterion_crit1 => {
-          :points => 2
+      user: @student_1,
+      assessor: @teacher,
+      artifact: @second_submission,
+      assessment: {
+        assessment_type: 'grading',
+        criterion_crit1: {
+          points: 2
         }
       }
     })
 
     #third assignment data
     due_date = due_date + 1.days
-    @third_assignment = assignment_model({:title => 'third assignment', :due_at => due_date, :course => @course})
+    @third_assignment = assignment_model({title: 'third assignment', due_at: due_date, course: @course})
   end
 
   context "as a teacher" do
@@ -120,7 +120,7 @@ describe "grades" do
         @course_names = []
         @course_names << @course
         3.times do |i|
-          course = Course.create!(:name => "course #{i}", :account => Account.default)
+          course = Course.create!(name: "course #{i}", account: Account.default)
           course.enroll_user(@teacher, 'TeacherEnrollment').accept!
           course.offer!
           @course_names << course
@@ -136,7 +136,7 @@ describe "grades" do
 
     it "should show the student outcomes report if enabled", priority: "1", test_id: 229447 do
       @outcome_group ||= @course.root_outcome_group
-      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
+      @outcome = @course.created_learning_outcomes.create!(title: 'outcome')
       @outcome_group.add_outcome(@outcome)
       Account.default.set_feature_flag!('student_outcome_gradebook', 'on')
       get "/courses/#{@course.id}/grades/#{@student_1.id}"
@@ -149,7 +149,7 @@ describe "grades" do
     context 'student view' do
       it "should be available to student view student", priority: "1", test_id: 229448 do
         @fake_student = @course.student_view_student
-        @fake_submission = @first_assignment.submit_homework(@fake_student, :body => 'fake student submission')
+        @fake_submission = @first_assignment.submit_homework(@fake_student, body: 'fake student submission')
         @first_assignment.grade_student(@fake_student, grade: 8, grader: @teacher)
 
         enter_student_view
@@ -221,18 +221,18 @@ describe "grades" do
     end
 
     it "should display rubric on assignment and properly highlight levels", priority: "1", test_id: 229661 do
-      zero_assignment = assignment_model({:title => 'zero assignment', :course => @course})
-      zero_association = @rubric.associate_with(zero_assignment, @course, :purpose => 'grading')
+      zero_assignment = assignment_model({title: 'zero assignment', course: @course})
+      zero_association = @rubric.associate_with(zero_assignment, @course, purpose: 'grading')
       zero_submission = zero_assignment.submissions.find_by!(user: @student_1) # unsubmitted submission :/
 
       zero_association.assess({
-        :user => @student_1,
-        :assessor => @teacher,
-        :artifact => zero_submission,
-        :assessment => {
-          :assessment_type => 'grading',
-          :criterion_crit1 => {
-            :points => 0
+        user: @student_1,
+        assessor: @teacher,
+        artifact: zero_submission,
+        assessment: {
+          assessment_type: 'grading',
+          criterion_crit1: {
+            points: 0
           }
         }
       })
@@ -310,15 +310,15 @@ describe "grades" do
       get "/courses/#{@course.id}/grades"
 
       @another_assignment = assignment_model({
-        :course => @course,
-        :title => 'another assignment',
-        :points_possible => 100,
-        :submission_types => 'online_text_entry',
-        :assignment_group => @group,
-        :grading_type => 'letter_grade',
-        :muted => 'true'
+        course: @course,
+        title: 'another assignment',
+        points_possible: 100,
+        submission_types: 'online_text_entry',
+        assignment_group: @group,
+        grading_type: 'letter_grade',
+        muted: 'true'
       })
-      @another_submission = @another_assignment.submit_homework(@student_1, :body => 'student second submission')
+      @another_submission = @another_assignment.submit_homework(@student_1, body: 'student second submission')
       @another_assignment.grade_student(@student_1, grade: 81, grader: @teacher)
       @another_submission.save!
       get "/courses/#{@course.id}/grades"
@@ -327,7 +327,7 @@ describe "grades" do
 
     it "should display assignment statistics", priority: "1", test_id: 229664 do
       all_students = Array.new(5) do
-        s = student_in_course(:active_all => true).user
+        s = student_in_course(active_all: true).user
         @first_assignment.grade_student(s, grade: 4, grader: @teacher)
 
         s
@@ -372,30 +372,30 @@ describe "grades" do
         priority: "1", test_id: 229668 do
       # get up to a point where statistics can be shown
       5.times do
-        s = student_in_course(:active_all => true).user
+        s = student_in_course(active_all: true).user
         @first_assignment.grade_student(s, grade: 4, grader: @teacher)
       end
 
       # but then prevent them at the course level
-      @course.update_attributes(:hide_distribution_graphs => true)
+      @course.update_attributes(hide_distribution_graphs: true)
 
       get "/courses/#{@course.id}/grades"
       expect(f("#content")).not_to contain_css("#grade_info_#{@first_assignment.id} .tooltip")
     end
 
     it "should show rubric even if there are no comments", priority: "1", test_id: 229669 do
-      @third_association = @rubric.associate_with(@third_assignment, @course, :purpose => 'grading')
+      @third_association = @rubric.associate_with(@third_assignment, @course, purpose: 'grading')
       @third_submission = @third_assignment.submissions.find_by!(user: @student_1) # unsubmitted submission :/
 
       @third_association.assess({
-        :user => @student_1,
-        :assessor => @teacher,
-        :artifact => @third_submission,
-        :assessment => {
-          :assessment_type => 'grading',
-          :criterion_crit1 => {
-            :points => 2,
-            :comments => "not bad, not bad"
+        user: @student_1,
+        assessor: @teacher,
+        artifact: @third_submission,
+        assessment: {
+          assessment_type: 'grading',
+          criterion_crit1: {
+            points: 2,
+            comments: "not bad, not bad"
           }
         }
       })
@@ -418,7 +418,7 @@ describe "grades" do
 
       before :each do
         @outcome_group ||= @course.root_outcome_group
-        @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
+        @outcome = @course.created_learning_outcomes.create!(title: 'outcome')
         @outcome_group.add_outcome(@outcome)
       end
 
@@ -432,8 +432,8 @@ describe "grades" do
       end
 
       it "should show the outcome gradebook if the student is in multiple sections", priority: "1", test_id: 229671 do
-        @other_section = @course.course_sections.create(:name => "the other section")
-        @course.enroll_student(@student_1, :section => @other_section, :allow_multiple_enrollments => true)
+        @other_section = @course.course_sections.create(name: "the other section")
+        @course.enroll_student(@student_1, section: @other_section, allow_multiple_enrollments: true)
 
         get "/courses/#{@course.id}/grades/"
         expect(f('#navpills')).not_to be_nil
@@ -447,11 +447,11 @@ describe "grades" do
 
   context "as an observer" do
     it "should allow observers to see grades of all enrollment associations", priority: "1", test_id: 229883 do
-      @obs = user_model(:name => "Observer")
-      e1 = @course.observer_enrollments.create(:user => @obs, :workflow_state => "active")
+      @obs = user_model(name: "Observer")
+      e1 = @course.observer_enrollments.create(user: @obs, workflow_state: "active")
       e1.associated_user = @student_1
       e1.save!
-      e2 = @course.observer_enrollments.create(:user => @obs, :workflow_state => "active")
+      e2 = @course.observer_enrollments.create(user: @obs, workflow_state: "active")
       e2.associated_user = @student_2
       e2.save!
 
