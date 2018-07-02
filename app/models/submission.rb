@@ -463,7 +463,7 @@ class Submission < ActiveRecord::Base
 
   def can_view_details?(user)
     return false unless grants_right?(user, :read)
-    return true unless self.assignment.anonymous_grading && self.assignment.muted
+    return true unless self.assignment.anonymize_students?
     user == self.user || Account.site_admin.grants_right?(user, :update)
   end
 

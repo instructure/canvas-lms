@@ -42,7 +42,11 @@ const baseAssignment = fromJS({
   effectiveDueDates: {1: {due_at: new Date(), grading_period_id: '2', in_closed_grading_period: true}}
 })
 const unpublishedAssignment = baseAssignment.merge({published: false})
-const anonymousMutedAssignment = baseAssignment.merge({anonymous_grading: true, muted: true})
+const anonymousMutedAssignment = baseAssignment.merge({
+  anonymize_students: true,
+  anonymous_grading: true,
+  muted: true
+})
 const moderatedAndGradesUnpublishedAssignment =
   baseAssignment.merge({moderated_grading: true, grades_published: false})
 const hiddenFromStudent =
@@ -224,15 +228,15 @@ QUnit.module('#setSubmissionCellState', function() {
       assignment = { id: '1', published: true, anonymous_grading: true }
     })
 
-    test('the submission state is locked when the assignment is muted', function() {
-      assignment.muted = true
+    test('the submission state is locked when anonymize_students is true', function() {
+      assignment.anonymize_students = true
       const map = createAndSetupMap(assignment, studentWithSubmission)
       const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id })
       strictEqual(submission.locked, true)
     })
 
-    test('the submission state is hidden when the assignment is muted', function() {
-      assignment.muted = true
+    test('the submission state is hidden when anonymize_students is true', function() {
+      assignment.anonymize_students = true
       const map = createAndSetupMap(assignment, studentWithSubmission)
       const submission = map.getSubmissionState({ user_id: studentWithSubmission.id, assignment_id: assignment.id })
       strictEqual(submission.hideGrade, true)

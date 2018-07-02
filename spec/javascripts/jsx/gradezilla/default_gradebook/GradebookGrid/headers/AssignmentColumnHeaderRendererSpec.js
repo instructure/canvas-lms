@@ -45,7 +45,7 @@ QUnit.module('AssignmentColumnHeaderRenderer', function (suiteHooks) {
 
     assignment = {
       id: '2301',
-      anonymous_grading: false,
+      anonymize_students: false,
       assignment_visibility: null,
       course_id: '1201',
       grading_type: 'points',
@@ -173,15 +173,15 @@ QUnit.module('AssignmentColumnHeaderRenderer', function (suiteHooks) {
       equal(component.props.downloadSubmissionsAction, gradebook.getDownloadSubmissionsAction.returnValues[0]);
     });
 
-    test('the anonymousGrading prop is `true` when the assignment is anonymous', function () {
-      assignment.anonymous_grading = true
+    test('the anonymizeStudents prop is `true` when the assignment is anonymous', function () {
+      assignment.anonymize_students = true
       render()
-      strictEqual(component.props.assignment.anonymousGrading, true)
+      strictEqual(component.props.assignment.anonymizeStudents, true)
     })
 
-    test('the anonymousGrading prop is `false` when the assignment is not anonymous', function () {
+    test('the anonymizeStudents prop is `false` when the assignment is not anonymous', function () {
       render()
-      strictEqual(component.props.assignment.anonymousGrading, false)
+      strictEqual(component.props.assignment.anonymizeStudents, false)
     })
 
     test('shows the "enter grades as" setting for a "points" assignment', function () {

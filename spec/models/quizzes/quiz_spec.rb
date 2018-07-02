@@ -159,6 +159,41 @@ describe Quizzes::Quiz do
     end
   end
 
+  describe '#anonymize_students?' do
+    before(:once) do
+      @quiz = @course.quizzes.build
+      @assignment = @course.assignments.build
+    end
+
+    it 'returns false if there is no assignment' do
+      expect(@quiz).not_to be_anonymize_students
+    end
+
+    it 'returns true if the assignment is anonymous and muted' do
+      @quiz.assignment = @assignment
+      @assignment.anonymous_grading = true
+      @assignment.muted = true
+      expect(@quiz).to be_anonymize_students
+    end
+
+    it 'returns false if the assignment is anonymous and unmuted' do
+      @quiz.assignment = @assignment
+      @assignment.anonymous_grading = true
+      expect(@quiz).not_to be_anonymize_students
+    end
+
+    it 'returns false if the assignment is not anonymous' do
+      @quiz.assignment = @assignment
+      expect(@quiz).not_to be_anonymize_students
+    end
+
+    it 'calls Assignment#anonymize_students if an assignment is present' do
+      @quiz.assignment = @assignment
+      expect(@assignment).to receive(:anonymize_students?).once
+      @quiz.anonymize_students?
+    end
+  end
+
   describe "#unpublish!" do
     it "sets the workflow state to unpublished and save!s the quiz" do
       quiz = @course.quizzes.build :title => "hello"

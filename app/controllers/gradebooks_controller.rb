@@ -562,7 +562,7 @@ class GradebooksController < ApplicationController
   def submissions_json(submissions:, assignments:)
     submissions.map do |sub|
       assignment = assignments[sub[:assignment_id].to_i]
-      omitted_field = assignment.anonymous_grading? ? :user_id : :anonymous_id
+      omitted_field = assignment.anonymize_students? ? :user_id : :anonymous_id
       json_params = {
         include: { submission_history: { methods: %i[late missing], except: omitted_field } },
         except: omitted_field
@@ -667,7 +667,7 @@ class GradebooksController < ApplicationController
         append_sis_data(env)
         js_env(env)
 
-        render :speed_grader, locals: { anonymous_grading: @assignment.anonymous_grading? }
+        render :speed_grader, locals: { anonymize_students: @assignment.anonymize_students? }
       end
 
       format.json do

@@ -207,8 +207,8 @@
             <div id="submission_files_list">
               <div id="submission_file_hidden"  class="submission-file" style='display:none;'>
                 <%
-                  resource = anonymous_grading ?  :context_assignment_anonymous_submission_url : :context_assignment_submission_url
-                  submission_id_or_anonymous_id = anonymous_grading ? "{{anonymousId}}" : "{{submissionId}}"
+                  resource = anonymize_students ? :context_assignment_anonymous_submission_url : :context_assignment_submission_url
+                  submission_id_or_anonymous_id = anonymize_students ? "{{anonymousId}}" : "{{submissionId}}"
                   download_url = context_url(@context, resource, @assignment.id, submission_id_or_anonymous_id, download: "{{attachmentId}}")
                   preview_url = context_url(@context, resource, @assignment.id, submission_id_or_anonymous_id, download: "{{attachmentId}}", inline: 1)
                 %>

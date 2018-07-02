@@ -22,8 +22,8 @@ import I18n from 'i18n!gradebook'
 import './jquery.instructure_date_and_time'
 import './jquery.instructure_misc_helpers'
 
-export function setupIsAnonymous ({anonymous_grading}) {
-  return anonymous_grading
+export function setupIsAnonymous ({anonymize_students}) {
+  return anonymize_students
 }
 
 export function setupAnonymizableId (isAnonymous) {

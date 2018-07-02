@@ -135,7 +135,7 @@ class EportfolioEntriesController < ApplicationController
       # @entry.check_for_matching_attachment_id
       @headers = false
       render template: 'submissions/show_preview', locals: {
-        anonymous_now: @assignment.anonymous_grading? && @assignment.muted?
+        anonymize_students: @assignment.anonymize_students?
       }
     end
   end

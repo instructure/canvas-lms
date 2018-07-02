@@ -403,7 +403,7 @@ class ContentZipper
     @submission = submission
     @logger.debug(" checking submission for #{(submission.user.id)}")
 
-    users_name = get_user_name(students, submission) unless @assignment.anonymous_grading?
+    users_name = get_user_name(students, submission) unless @assignment.anonymize_students?
     filename = get_filename(users_name, submission)
 
     case submission.submission_type

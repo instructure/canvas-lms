@@ -51,6 +51,7 @@ class Assignment
         },
         :include_root => false
       )
+      res['anonymize_students'] = @assignment.anonymize_students?
 
       # include :provisional here someday if we need to distinguish
       # between provisional and real comments (also in

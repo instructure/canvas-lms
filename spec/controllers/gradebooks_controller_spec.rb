@@ -1272,34 +1272,41 @@ describe GradebooksController do
       end
 
       describe 'anonymous assignment' do
-        it 'works with the absense of user_id and the presence of anonymous_id' do
-          user_session(@teacher)
+        before(:once) do
           @assignment.update!(anonymous_grading: true)
-          post 'update_submission', params: {
+        end
+
+        let(:post_params) do
+          {
             course_id: @course.id,
             submission: {
               assignment_id: @assignment.id,
               anonymous_id: @submission.anonymous_id,
               grade: 10
             }
-          }, format: :json
+          }
+        end
+
+        it 'works with the absence of user_id and the presence of anonymous_id' do
+          user_session(@teacher)
+          post(:update_submission, params: post_params, format: :json)
           submissions = json.map {|submission| submission.fetch('submission').fetch('anonymous_id')}
           expect(submissions).to contain_exactly(@submission.anonymous_id)
         end
 
-        it 'does not include user_ids' do
+        it 'does not include user_ids for muted anonymous assignments' do
           user_session(@teacher)
-          @assignment.update!(anonymous_grading: true)
-          post 'update_submission', params: {
-            course_id: @course.id,
-            submission: {
-              assignment_id: @assignment.id,
-              anonymous_id: @submission.anonymous_id,
-              grade: 10
-            }
-          }, format: :json
+          post(:update_submission, params: post_params, format: :json)
           submissions = json.map {|submission| submission['submission'].key?('user_id')}
           expect(submissions).to contain_exactly(false)
+        end
+
+        it 'includes user_ids for unmuted anonymous assignments' do
+          user_session(@teacher)
+          @assignment.unmute!
+          post(:update_submission, params: post_params, format: :json)
+          submission = json.first.fetch('submission')
+          expect(submission).to have_key('user_id')
         end
       end
     end

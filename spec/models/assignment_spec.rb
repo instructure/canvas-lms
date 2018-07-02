@@ -596,6 +596,42 @@ describe Assignment do
     end
   end
 
+  describe '#anonymize_students?' do
+    before(:once) do
+      @assignment = @course.assignments.build
+    end
+
+    it 'returns false when the assignment is not graded anonymously' do
+      expect(@assignment).not_to be_anonymize_students
+    end
+
+    context 'when the assignment is anonymously graded' do
+      before(:once) do
+        @assignment.anonymous_grading = true
+      end
+
+      it 'returns true when the assignment is muted' do
+        @assignment.muted = true
+        expect(@assignment).to be_anonymize_students
+      end
+
+      it 'returns false when the assignment is unmuted' do
+        expect(@assignment).not_to be_anonymize_students
+      end
+
+      it 'returns true when the assignment is moderated and grades are unpublished' do
+        @assignment.moderated_grading = true
+        expect(@assignment).to be_anonymize_students
+      end
+
+      it 'returns false when the assignment is moderated and grades are published' do
+        @assignment.moderated_grading = true
+        @assignment.grades_published_at = Time.zone.now
+        expect(@assignment).not_to be_anonymize_students
+      end
+    end
+  end
+
   describe '#can_view_student_names?' do
     let_once(:admin) do
       admin = account_admin_user
@@ -642,8 +678,32 @@ describe Assignment do
         expect(assignment.can_view_student_names?(@teacher)).to be false
       end
 
-      it 'returns false when the user is an admin' do
+      it 'returns false when the user is an admin and the assignment is muted' do
         expect(assignment.can_view_student_names?(admin)).to be false
+      end
+
+      it 'returns true when the user is an admin and the assignment is unmuted' do
+        assignment.muted = false
+        expect(assignment.can_view_student_names?(admin)).to be true
+      end
+
+      context 'when the assignment is moderated' do
+        before(:once) do
+          assignment.moderated_grading = true
+        end
+
+        it 'returns false when the user is not an admin' do
+          expect(assignment.can_view_student_names?(@teacher)).to be false
+        end
+
+        it 'returns true when the user is an admin and grades are published' do
+          assignment.grades_published_at = Time.zone.now
+          expect(assignment.can_view_student_names?(admin)).to be true
+        end
+
+        it 'returns false when the user is an admin and grades are unpublished' do
+          expect(assignment.can_view_student_names?(admin)).to be false
+        end
       end
     end
   end

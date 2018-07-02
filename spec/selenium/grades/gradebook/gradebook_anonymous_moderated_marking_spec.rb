@@ -49,23 +49,6 @@ describe 'Original Gradebook' do
       user_session(@teacher1)
     end
 
-    context 'in submission detail' do
-      before(:each) do
-        @anonymous_assignment.unmute!
-        Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
-        Gradebook::MultipleGradingPeriods.open_comment_dialog(0,1)
-      end
-
-      it 'cannot navigate to speedgrader for specific student', priority: '1', test_id: 3493483 do
-        # try to navigate to @student_2
-        Gradebook::MultipleGradingPeriods.submission_detail_speedgrader_link.click
-        driver.switch_to.window(driver.window_handles.last)
-        wait_for_ajaximations
-
-        expect(driver.current_url).not_to include "student_id"
-      end
-    end
-
     context 'grade cells', priority: '1', test_id: 3496299 do
       before(:each) do
         Gradebook::MultipleGradingPeriods.visit_gradebook(@course)

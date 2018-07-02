@@ -2834,8 +2834,19 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  def anonymize_students?
+    return false unless anonymous_grading?
+
+    # Only anonymize students for moderated assignments if grades have not been published.
+    # Only anonymize students for non-moderated assignments if the assignment is muted.
+    moderated_grading? ? !grades_published? : muted?
+  end
+  alias anonymize_students anonymize_students?
+
   def can_view_student_names?(user)
-    !anonymous_grading && context.grants_any_right?(user, :manage_grades, :view_all_grades)
+    return false if anonymize_students?
+
+    context.grants_any_right?(user, :manage_grades, :view_all_grades)
   end
 
   private

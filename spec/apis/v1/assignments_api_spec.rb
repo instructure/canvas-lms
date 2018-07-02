@@ -4503,14 +4503,32 @@ describe AssignmentsApiController, type: :request do
       end
     end
 
-    it "contains true for anonymous_grading when the assignment has anonymous grading enabled" do
-      @assignment.anonymous_grading = true
-      expect(result['anonymous_grading']).to be true
-    end
-
     it "contains false for anonymous_grading when the assignment has anonymous grading disabled" do
       @assignment.anonymous_grading = false
       expect(result['anonymous_grading']).to be false
+    end
+
+    it 'is false for anonymize_students when the assignment is not anonymous' do
+      expect(result['anonymize_students']).to be false
+    end
+
+    context 'when the assignment is anonymous' do
+      before(:once) do
+        @assignment.anonymous_grading = true
+      end
+
+      it 'contains true for anonymous_grading' do
+        expect(result['anonymous_grading']).to be true
+      end
+
+      it 'is true for anonymize_students when the assignment is muted' do
+        @assignment.muted = true
+        expect(result['anonymize_students']).to be true
+      end
+
+      it 'is false for anonymize_students when the assignment is unmuted' do
+        expect(result['anonymize_students']).to be false
+      end
     end
   end
 

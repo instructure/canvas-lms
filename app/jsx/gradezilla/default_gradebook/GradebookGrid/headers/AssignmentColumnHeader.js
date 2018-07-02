@@ -35,7 +35,7 @@ import MessageStudentsWhoHelper from '../../../shared/helpers/messageStudentsWho
 import ColumnHeader from './ColumnHeader'
 
 function SecondaryDetailLine (props) {
-  const anonymous = props.assignment.anonymousGrading;
+  const anonymous = props.assignment.anonymizeStudents;
   const unpublished = !props.assignment.published;
 
   if (anonymous || unpublished) {
@@ -74,7 +74,7 @@ function SecondaryDetailLine (props) {
 
 SecondaryDetailLine.propTypes = {
   assignment: shape({
-    anonymousGrading: bool.isRequired,
+    anonymizeStudents: bool.isRequired,
     muted: bool.isRequired,
     pointsPossible: number,
     published: bool.isRequired
@@ -85,7 +85,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
   static propTypes = {
     ...ColumnHeader.propTypes,
     assignment: shape({
-      anonymousGrading: bool.isRequired,
+      anonymizeStudents: bool.isRequired,
       courseId: string.isRequired,
       htmlUrl: string.isRequired,
       id: string.isRequired,

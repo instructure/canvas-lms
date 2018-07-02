@@ -4075,34 +4075,68 @@ describe Submission do
 
   describe "#can_view_details?" do
     before :each do
-      @assignment.update!(anonymous_grading: true, muted: true)
+      @assignment.update!(anonymous_grading: true)
       @submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry', body: 'a body')
     end
 
-    it "returns false if user isn't present" do
-      expect(@submission).not_to be_can_view_details(nil)
+    context 'when the assignment is muted' do
+      it "returns false if user isn't present" do
+        expect(@submission).not_to be_can_view_details(nil)
+      end
+
+      it "returns true for submitting student if assignment anonymous grading" do
+        expect(@submission.can_view_details?(@student)).to be true
+      end
+
+      it "returns false for non-submitting student if assignment anonymous grading" do
+        new_student = User.create!
+        @context.enroll_student(new_student, enrollment_state: 'active')
+        expect(@submission.can_view_details?(@new_student)).to be false
+      end
+
+      it "returns false for teacher if assignment anonymous grading" do
+        expect(@submission.can_view_details?(@teacher)).to be false
+      end
+
+      it "returns false for admin if assignment anonymous grading" do
+        expect(@submission.can_view_details?(account_admin_user)).to be false
+      end
+
+      it "returns true for site admin if assignment anonymous grading" do
+        expect(@submission.can_view_details?(site_admin_user)).to be true
+      end
     end
 
-    it "returns true for submitting student if assignment anonymous grading and muted" do
-      expect(@submission.can_view_details?(@student)).to be true
-    end
+    context 'when the assignment is unmuted' do
+      before(:each) do
+        @assignment.unmute!
+      end
 
-    it "returns false for non-submitting student if assignment anonymous grading and muted" do
-      new_student = User.create!
-      @context.enroll_student(new_student, enrollment_state: 'active')
-      expect(@submission.can_view_details?(@new_student)).to be false
-    end
+      it "returns false if user isn't present" do
+        expect(@submission).not_to be_can_view_details(nil)
+      end
 
-    it "returns false for teacher if assignment anonymous grading and muted" do
-      expect(@submission.can_view_details?(@teacher)).to be false
-    end
+      it "returns true for submitting student if assignment anonymous grading" do
+        expect(@submission.can_view_details?(@student)).to be true
+      end
 
-    it "returns false for admin if assignment anonymous grading and muted" do
-      expect(@submission.can_view_details?(account_admin_user)).to be false
-    end
+      it "returns false for non-submitting student if assignment anonymous grading" do
+        new_student = User.create!
+        @context.enroll_student(new_student, enrollment_state: 'active')
+        expect(@submission.can_view_details?(@new_student)).to be false
+      end
 
-    it "returns true for site admin if assignment anonymous grading and muted" do
-      expect(@submission.can_view_details?(site_admin_user)).to be true
+      it "returns true for teacher if assignment anonymous grading" do
+        expect(@submission.can_view_details?(@teacher)).to be true
+      end
+
+      it "returns true for admin if assignment anonymous grading" do
+        expect(@submission.can_view_details?(account_admin_user)).to be true
+      end
+
+      it "returns true for site admin if assignment anonymous grading" do
+        expect(@submission.can_view_details?(site_admin_user)).to be true
+      end
     end
   end
 

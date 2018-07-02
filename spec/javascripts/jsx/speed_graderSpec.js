@@ -1334,6 +1334,7 @@ QUnit.module('SpeedGrader - clicking save rubric button for an anonymous assignm
       GROUP_GRADING_MODE: false,
       points_possible: 10,
       anonymous_grading: true,
+      anonymize_students: true,
       submissions: [],
       context: {
         students: [
@@ -1722,7 +1723,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
   })
 
   QUnit.module('Anonymous Assignments', anonymousHooks => {
-    const assignment = {anonymous_grading: true}
+    const assignment = {anonymous_grading: true, anonymize_students: true}
     const originalJsonData = window.jsonData
     const alpha = {anonymous_id: '00000'}
     const omega = {anonymous_id: 'zzzzz'}

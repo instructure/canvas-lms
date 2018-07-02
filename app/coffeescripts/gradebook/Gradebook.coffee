@@ -319,7 +319,6 @@ define [
           assignment.assignment_group = group
           assignment.due_at = tz.parse(assignment.due_at)
           assignment.moderation_in_progress = assignment.moderated_grading and !assignment.grades_published
-          assignment.hide_grades_when_muted = assignment.anonymous_grading
           @updateAssignmentEffectiveDueDates(assignment)
           @assignments[assignment.id] = assignment
 
@@ -561,12 +560,17 @@ define [
       matchingSection and matchingFilter
 
     handleAssignmentMutingChange: (assignment) =>
+      gradebookAssignment = @assignments[assignment.id]
+      gradebookAssignment.anonymize_students = assignment.anonymize_students
+      gradebookAssignment.muted = assignment.muted
       idx = @grid.getColumnIndex("assignment_#{assignment.id}")
       colDef = @grid.getColumns()[idx]
       colDef.name = @assignmentHeaderHtml(assignment)
       @grid.setColumns(@grid.getColumns())
       @fixColumnReordering()
       @buildRows()
+      allStudents = Object.values(@students).concat(Object.values(@studentViewStudents))
+      @setupGrading(allStudents)
 
     handleAssignmentGroupWeightChange: (assignment_group_options) =>
       columns = @grid.getColumns()
@@ -723,7 +727,7 @@ define [
 
           if !assignment?
             @staticCellFormatter(row, col, '')
-          else if assignment.hide_grades_when_muted and assignment.muted
+          else if assignment.anonymize_students
             @lockedAndHiddenGradeCellFormatter(row, col, 'anonymous')
           else if submission.workflow_state == 'pending_review'
            (SubmissionCell[assignment.grading_type] || SubmissionCell).formatter(row, col, submission, assignment, student, formatterOpts)

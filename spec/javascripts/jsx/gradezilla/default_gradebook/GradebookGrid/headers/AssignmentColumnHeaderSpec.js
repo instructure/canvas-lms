@@ -26,6 +26,7 @@ import {findFlyoutMenuContent, findMenuItem} from './columnHeaderHelpers'
 
 function createAssignmentProp ({ assignment } = {}) {
   return {
+    anonymizeStudents: false,
     courseId: '42',
     htmlUrl: 'http://assignment_htmlUrl',
     id: '1',
@@ -738,14 +739,14 @@ QUnit.module('AssignmentColumnHeader: non-standard assignment', function (hooks)
 
   test('renders an unpublished status when the assignment is unpublished and anonymously graded', function () {
     props.assignment.published = false;
-    props.assignment.anonymousGrading = true;
+    props.assignment.anonymizeStudents = true;
     wrapper = mountComponent(props);
     const secondaryDetail = wrapper.find('.Gradebook__ColumnHeaderDetail--secondary');
     strictEqual(secondaryDetail.text(), 'Unpublished');
   });
 
   test('renders an anonymous status when the assignment is anonymously graded', function() {
-    props.assignment.anonymousGrading = true;
+    props.assignment.anonymizeStudents = true;
     wrapper = mountComponent(props);
     const secondaryDetail = wrapper.find('.Gradebook__ColumnHeaderDetail--secondary');
     strictEqual(secondaryDetail.text(), 'Anonymous');

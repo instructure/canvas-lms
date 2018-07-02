@@ -885,7 +885,8 @@ QUnit.module('Gradebook#gotAllAssignmentGroups', suiteHooks => {
       name: 'test',
       published: true,
       anonymous_grading: false,
-      moderated_grading: false
+      moderated_grading: false,
+      anonymize_students: false
     }
     moderatedUnpublishedAssignment = {
       id: 2,
@@ -893,7 +894,8 @@ QUnit.module('Gradebook#gotAllAssignmentGroups', suiteHooks => {
       published: true,
       anonymous_grading: false,
       moderated_grading: true,
-      grades_published: false
+      grades_published: false,
+      anonymize_students: false
     }
     moderatedPublishedAssignment = {
       id: 3,
@@ -901,7 +903,8 @@ QUnit.module('Gradebook#gotAllAssignmentGroups', suiteHooks => {
       published: true,
       anonymous_grading: false,
       moderated_grading: true,
-      grades_published: true
+      grades_published: true,
+      anonymize_students: false
     }
     anonymousUnmoderatedAssignment = {
       id: 4,
@@ -909,7 +912,8 @@ QUnit.module('Gradebook#gotAllAssignmentGroups', suiteHooks => {
       published: true,
       anonymous_grading: true,
       moderated_grading: false,
-      grades_published: true
+      grades_published: true,
+      anonymize_students: true
     }
     anonymousModeratedAssignment = {
       id: 5,
@@ -917,7 +921,8 @@ QUnit.module('Gradebook#gotAllAssignmentGroups', suiteHooks => {
       published: true,
       anonymous_grading: true,
       moderated_grading: true,
-      grades_published: true
+      grades_published: true,
+      anonymize_students: true
     }
 
     assignmentGroups = [{
@@ -956,16 +961,6 @@ QUnit.module('Gradebook#gotAllAssignmentGroups', suiteHooks => {
     gradebook.gotAllAssignmentGroups(assignmentGroups)
     strictEqual(unmoderatedAssignment.moderation_in_progress, false)
   })
-
-  test('sets hide_grades_when_muted to true for an anonymous assignment', () => {
-    gradebook.gotAllAssignmentGroups(assignmentGroups)
-    strictEqual(anonymousUnmoderatedAssignment.hide_grades_when_muted, true)
-  })
-
-  test('sets hide_grades_when_muted to false for a non-anonymous assignment', () => {
-    gradebook.gotAllAssignmentGroups(assignmentGroups)
-    strictEqual(unmoderatedAssignment.hide_grades_when_muted, false)
-  })
 })
 
 QUnit.module('Gradebook#calculateAndRoundGroupTotalScore', (hooks) => {
@@ -990,5 +985,56 @@ QUnit.module('Gradebook#calculateAndRoundGroupTotalScore', (hooks) => {
     const floatingPointResult = 946.65 / 1000 * 100
     strictEqual(floatingPointResult, 94.66499999999999)
     strictEqual(score, 94.67)
+  })
+})
+
+QUnit.module('Gradebook#handleAssignmentMutingChange', (hooks) => {
+  let gradebook
+  let updatedAssignment
+
+  hooks.beforeEach(() => {
+    gradebook = createGradebook()
+    gradebook.assignments = {14: {id: '14', muted: false, anonymize_students: false}}
+    gradebook.grid = {
+      getColumnIndex: sinon.stub().returns(0),
+      getColumns: sinon.stub().returns([{}]),
+      invalidateRow() {},
+      render() {},
+      setColumns() {},
+    }
+    gradebook.students = {4: {id: '4', name: 'fred'}}
+    gradebook.studentViewStudents = {6: {id: '6', name: 'fake fred'}}
+    sinon.stub(gradebook, 'buildRows')
+    updatedAssignment = {id: '14', muted: true, anonymize_students: true}
+  })
+
+  test('updates the anonymize_students attribute on the assignment', () => {
+    gradebook.handleAssignmentMutingChange(updatedAssignment)
+    strictEqual(gradebook.assignments[updatedAssignment.id].anonymize_students, updatedAssignment.anonymize_students)
+  })
+
+  test('updates the muted attribute on the assignment', () => {
+    gradebook.handleAssignmentMutingChange(updatedAssignment)
+    strictEqual(gradebook.assignments[updatedAssignment.id].muted, updatedAssignment.muted)
+  })
+
+  test('updates grade cells', () => {
+    sinon.stub(gradebook, 'setupGrading')
+    gradebook.handleAssignmentMutingChange(updatedAssignment)
+    strictEqual(gradebook.setupGrading.callCount, 1)
+  })
+
+  test('updates grade cells for students', () => {
+    sinon.stub(gradebook, 'setupGrading')
+    gradebook.handleAssignmentMutingChange(updatedAssignment)
+    const studentIDs = gradebook.setupGrading.getCall(0).args[0].map(student => student.id)
+    ok(studentIDs.includes('4'))
+  })
+
+  test('updates grade cells for fake students', () => {
+    sinon.stub(gradebook, 'setupGrading')
+    gradebook.handleAssignmentMutingChange(updatedAssignment)
+    const studentIDs = gradebook.setupGrading.getCall(0).args[0].map(student => student.id)
+    ok(studentIDs.includes('6'))
   })
 })

@@ -150,4 +150,52 @@ describe EportfolioEntriesController do
       end
     end
   end
+
+  describe "GET 'submission'" do
+    before(:once) do
+      eportfolio_entry(@category)
+      course = Course.create!
+      course.enroll_student(@user, enrollment_state: @active)
+      @assignment = course.assignments.create!
+      @submission = @assignment.submissions.find_by(user: @user)
+    end
+
+    it 'requires authorization' do
+      get 'submission', params: { eportfolio_id: @portfolio.id, entry_id: @entry.id, submission_id: @submission.id }
+      assert_unauthorized
+    end
+
+    it 'passes anonymize_students: false to the template if the assignment is not anonymous' do
+      user_session(@user)
+      expect(controller).to receive(:render).with({
+        template: 'submissions/show_preview',
+        locals: { anonymize_students: false }
+      }).and_call_original
+
+      get 'submission', params: { eportfolio_id: @portfolio.id, entry_id: @entry.id, submission_id: @submission.id }
+    end
+
+    it 'passes anonymize_students: false to the template if the assignment is anonymous and unmuted' do
+      user_session(@user)
+      @assignment.update!(anonymous_grading: true)
+      @assignment.unmute!
+      expect(controller).to receive(:render).with({
+        template: 'submissions/show_preview',
+        locals: { anonymize_students: false }
+      }).and_call_original
+
+      get 'submission', params: { eportfolio_id: @portfolio.id, entry_id: @entry.id, submission_id: @submission.id }
+    end
+
+    it 'passes anonymize_students: true to the template if the assignment is anonymous and muted' do
+      user_session(@user)
+      @assignment.update!(anonymous_grading: true, muted: true)
+      expect(controller).to receive(:render).with({
+        template: 'submissions/show_preview',
+        locals: { anonymize_students: true }
+      }).and_call_original
+
+      get 'submission', params: { eportfolio_id: @portfolio.id, entry_id: @entry.id, submission_id: @submission.id }
+    end
+  end
 end

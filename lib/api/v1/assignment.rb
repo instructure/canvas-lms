@@ -355,7 +355,7 @@ module Api::V1::Assignment
     end
 
     hash['anonymous_grading'] = value_to_boolean(assignment.anonymous_grading)
-
+    hash['anonymize_students'] = assignment.anonymize_students?
     hash
   end
 
