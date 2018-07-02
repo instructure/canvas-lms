@@ -51,7 +51,7 @@ export default class AccountCourseUserSearch extends React.Component {
   render() {
     const tabList = this.props.store.getState().tabList
     const tabs = permissionFilter(tabList.tabs, this.props.permissions)
-    const ActivePane = tabs[tabList.selected].pane
+    const ActivePane = (tabs.length === 1) ? tabs[0].pane : tabs[tabList.selected].pane
 
     return (
       <ActivePane
