@@ -107,6 +107,7 @@ module Canvas
           proxy
         end
       end
+      alias kv_proxy find
 
       def kv_client
         @kv_client

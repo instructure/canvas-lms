@@ -19,9 +19,17 @@ require 'openssl'
 
 module Lti
   class RSAKeyPair < JWKKeyPair
-    def initialize(key_size: 256)
-      @private_key = OpenSSL::PKey::RSA.new key_size
-      @public_key = private_key.public_key
+    ALG = 'RS256'.freeze
+    SIZE = 256
+    def initialize(use: 'sig')
+      @alg = ALG
+      @use = use
+      @private_key = OpenSSL::PKey::RSA.new SIZE
     end
+
+    def public_key
+      private_key.public_key
+    end
+
   end
 end
