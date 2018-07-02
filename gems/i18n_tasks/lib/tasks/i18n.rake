@@ -458,4 +458,66 @@ HEADER
       autoimport(source_translations, new_translations)
     end
   end
+
+  desc "Lock a key so translators cannot change it"
+  task :lock do
+    require "optparse"
+    require "yaml"
+
+    options = { locales: [] }
+    opts = OptionParser.new
+    opts.banner = "Usage: rake i18n:lock -- [options] [keys]"
+    opts.separator ""
+    opts.separator "Options:"
+    opts.on("-lCODE", "--locale=CODE", "Specific locale only") do |v|
+      options[:locales] << v
+    end
+    opts.on("-h", "--help", "Show this message") do
+      puts opts
+      exit
+    end
+    args = opts.order!(ARGV) {}
+    opts.parse!(args)
+    options[:keys] = ARGV
+
+    if options[:keys].empty?
+      puts opts
+      exit
+    end
+
+    Dir.chdir(Rails.root.join("config", "locales"))
+    locales_data = YAML.safe_load(open("locales.yml"))
+
+    Dir.each_child(".") do |filename|
+      next if ["locales.yml", "en.yml"].include?(filename)
+      next if File.directory?(filename)
+
+      locale = File.basename(filename, ".yml")
+      next if options[:locales].present? && !options[:locales].include?(locale)
+
+      data = YAML.safe_load(open(filename))
+
+      options[:keys].each do |path|
+        search = data[locale]
+        slice_next = {}
+        slice = slice_next
+        last_key = nil
+        path.to_s.split(".").each do |key|
+          slice_next = slice_next[last_key] if last_key
+          last_key = key
+          search = search[key]
+          if search.nil?
+            puts "Invalid key #{path} for #{locale}"
+            exit(1)
+          end
+          slice_next[key] = {}
+        end
+        slice_next[last_key] = search
+        locales_data[locale].deep_merge!(slice)
+      end
+    end
+
+    File.open("locales.yml", "w") { |f| YAML.dump(locales_data, f) }
+    exit
+  end
 end
