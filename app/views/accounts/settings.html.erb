@@ -188,7 +188,7 @@ TEXT
                   </tr>
                 <% end %>
                 <tr>
-                  <td>Zero Out Past Due Assignments:</td><td> <input type="text" name="zero_out_pastdue" value="<%= @js_env[:ZERO_OUT_PASTDUE_ASSIGNMENTS] %>" readonly></td>
+                  <td>Zero Out Past Due Assignments:</td><td> <input type="text" name="zero_out_pastdue" value="<%= @js_env[:ZERO_OUT_PASTDUE_ASSIGNMENTS].capitalize %>" readonly></td>
                 </tr>
                 <% unless @account.site_admin? %>
                   <tr>
