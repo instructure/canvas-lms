@@ -200,5 +200,25 @@ describe OutcomeResultsController do
         expect(json['outcome_results'].length).to eq 0
       end
     end
+
+    it 'exclude missing user rollups' do
+      user_session(@teacher)
+      # save a reference to the 1st student
+      student1 = @student
+      # create a 2nd student that is saved as @student
+      student_in_course(active_all: true, course: outcome_course)
+      get 'rollups', params: {:context_id => @course.id,
+                      :course_id => @course.id,
+                      :context_type => "Course",
+                      :user_ids => [student1.id, @student.id],
+                      :outcome_ids => [@outcome.id],
+                      exclude: ['missing_user_rollups']},
+                      format: "json"
+      json = JSON.parse(response.body.gsub("while(1);", ""))
+      # the rollups requests for both students, but excludes the 2nd student
+      # since they do not have any results, unlike the 1st student,
+      # which has a single result in `outcome_result`
+      expect(json['rollups'].length).to be 1
+    end
   end
 end

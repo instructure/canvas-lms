@@ -265,6 +265,10 @@ class OutcomeResultsController < ApplicationController
   # @argument include[] [String, "courses"|"outcomes"|"outcomes.alignments"|"outcome_groups"|"outcome_links"|"outcome_paths"|"users"]
   #   Specify additional collections to be side loaded with the result.
   #
+  # @argument exclude[] [String, "missing_user_rollups"]
+  #   Specify additional values to exclude. "missing_user_rollups" excludes
+  #   rollups for users without results.
+  #
   # @example_response
   #    {
   #      "rollups": [OutcomeRollup],
@@ -320,8 +324,9 @@ class OutcomeResultsController < ApplicationController
   end
 
   def user_rollups(_opts = {})
+    excludes = Api.value_to_array(params[:exclude]).uniq
     @results = find_results.preload(:user)
-    outcome_results_rollups(@results, @users)
+    outcome_results_rollups(@results, @users, excludes)
   end
 
   def user_rollups_json

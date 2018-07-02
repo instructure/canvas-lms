@@ -248,6 +248,15 @@ describe Outcomes::ResultAnalytics do
       end
     end
 
+    it 'excludes missing user rollups' do
+      results = [
+        outcome_from_score(5.0, {user: MockUser[20, 'b']})
+      ]
+      users = [MockUser[10, 'a'], MockUser[30, 'c']]
+      rollups = ra.outcome_results_rollups(results, users, ['missing_user_rollups'])
+      expect(rollups.length).to eq 1
+    end
+
     it 'returns hide_points value of true if all results have hide_points set to true' do
       results = [
         outcome_from_score(4.0,{hide_points: true}),
