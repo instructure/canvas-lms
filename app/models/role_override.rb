@@ -921,7 +921,7 @@ class RoleOverride < ActiveRecord::Base
       :generate_observer_pairing_code => {
         :label => -> { t('Generate observer pairing codes for students') },
         :true_for => %w(AccountAdmin),
-        :available_to => %w(TeacherEnrollment ObserverEnrollment TaEnrollment AccountAdmin DesignerEnrollment)
+        :available_to => %w(TeacherEnrollment ObserverEnrollment TaEnrollment AccountAdmin AccountMembership DesignerEnrollment)
       }
     })
 

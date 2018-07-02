@@ -103,11 +103,6 @@ describe 'BigBlueButton conferences' do
           to_return(:body => big_blue_button_mock_response('get_recordings', 'one'))
         @conference = create_big_blue_button_conference(bbb_fixtures[:get_recordings]['meetingID'])
       end
-
-      it 'teacher should see link for statistics', priority: '2' do
-        show_recordings_in_first_conference_in_list
-        verify_conference_includes_recordings_with_statistics
-      end
     end
 
     context 'and the conference has one recording with statistics' do
