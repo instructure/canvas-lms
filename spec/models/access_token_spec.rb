@@ -197,6 +197,15 @@ describe AccessToken do
       token = AccessToken.create!(developer_key: dk, scopes: ['/auth/userinfo'])
       expect(token.expires_at).to eq nil
     end
+
+    it "does not validate scopes if the workflow state is deleted" do
+      dk_scopes = ["url:POST|/api/v1/accounts/:account_id/admins", "url:DELETE|/api/v1/accounts/:account_id/admins/:user_id",  "url:GET|/api/v1/accounts/:account_id/admins"]
+      dk = DeveloperKey.create!(scopes: dk_scopes, require_scopes: true)
+      token = AccessToken.new(developer_key: dk, scopes: dk_scopes)
+      dk.update!(scopes: [])
+      allow(dk.owner_account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(true)
+      expect { token.destroy! }.not_to raise_error
+    end
   end
 
   context "url scopes" do
