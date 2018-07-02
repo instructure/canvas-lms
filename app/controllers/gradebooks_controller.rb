@@ -491,7 +491,7 @@ class GradebooksController < ApplicationController
             end
 
             submission[:dont_overwrite_grade] = value_to_boolean(params[:dont_overwrite_grades])
-            submission.delete(:final) if submission[:final] && !@context.grants_right?(@current_user, :moderate_grades)
+            submission.delete(:final) if submission[:final] && !@assignment.permits_moderation?(@current_user)
             subs = @assignment.grade_student(@user, submission)
             apply_provisional_grade_filters!(submissions: subs, final: submission[:final]) if submission[:provisional]
             @submissions += subs

@@ -746,7 +746,13 @@ describe UserLearningObjectScopes do
 
       # make some assignments and submissions
       [@course1, @course2].each do |course|
-        assignment = course.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
+        assignment = course.assignments.create!(
+          final_grader: @teacher,
+          grader_count: 2,
+          moderated_grading: true,
+          submission_types: ['online_text_entry'],
+          title: 'some assignment'
+        )
         [@student_a, @student_b].each do |student|
           assignment.submit_homework student, body: "submission for #{student.name}"
         end

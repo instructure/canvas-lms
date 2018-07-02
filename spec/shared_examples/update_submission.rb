@@ -300,13 +300,10 @@ RSpec.shared_examples 'a submission update action' do |controller|
         @submission = @assignment.submit_homework(@user)
       end
 
-      before :each do
-        user_session @teacher
-      end
-
       it "should create a provisional comment" do
         @resource_pair = controller == :anonymous_submissions ? { anonymous_id: @submission.anonymous_id } : { id: @user.id }
         @params = {course_id: @course.id, assignment_id: @assignment.id, submission: {comment: "provisional!", provisional: true}}.merge(@resource_pair)
+        user_session(@teacher)
         put :update, params: @params, format: :json
 
         @submission.reload
@@ -317,25 +314,60 @@ RSpec.shared_examples 'a submission update action' do |controller|
         expect(json.first['submission']['submission_comments'].first['comment']).to eq 'provisional!'
       end
 
-      it "should create a final provisional comment" do
-        @submission.find_or_create_provisional_grade!(@teacher)
-        @resource_pair = controller == :anonymous_submissions ? { anonymous_id: @submission.anonymous_id } : { id: @user.id }
-        @params = {
-          course_id: @course.id,
-          assignment_id: @assignment.id,
-          submission: {comment: "provisional!", provisional: true, final: true}
-        }.merge(@resource_pair)
+      context 'setting a provisional grade to be final' do
+        before(:once) do
+          @assignment.update!(final_grader: @teacher)
+          @submission.find_or_create_provisional_grade!(@teacher)
+          resource_pair = controller == :anonymous_submissions ? { anonymous_id: @submission.anonymous_id } : { id: @user.id }
+          @params = {
+            course_id: @course.id,
+            assignment_id: @assignment.id,
+            submission: {comment: "provisional!", provisional: true, final: true}
+          }.merge(resource_pair)
+        end
 
-        put :update, params: @params, format: :json
-        expect(response).to be_success
-        @submission.reload
-        expect(@submission.submission_comments.first).to be_nil
-        pg = @submission.provisional_grade(@teacher, final: true)
-        expect(pg.submission_comments.first.comment).to eq 'provisional!'
-        expect(pg.final).to be_truthy
+        let(:provisional_grade) do
+          provisional_grade_id = json_parse(response.body).first.dig('submission', 'provisional_grade_id')
+          ModeratedGrading::ProvisionalGrade.find_by(id: provisional_grade_id)
+        end
 
-        json = JSON.parse response.body
-        expect(json.first['submission']['submission_comments'].first['comment']).to eq 'provisional!'
+        it 'returns success for an authorized user' do
+          user_session(@teacher)
+          put :update, params: @params, format: :json
+          expect(response).to be_success
+        end
+
+        it 'creates a final provisional comment' do
+          user_session(@teacher)
+          expect { put :update, params: @params, format: :json }.to change {
+            @submission.reload.provisional_grades.final.find_by(scorer: @teacher).present?
+          }.from(false).to(true)
+        end
+
+        it 'allows setting the grade as final when the user is the final grader' do
+          user_session(@teacher)
+          put :update, params: @params, format: :json
+          expect(provisional_grade).to be_final
+        end
+
+        it 'allows setting the grade as final when the user is an admin that can select final grade' do
+          admin = account_admin_user(account: @course.root_account)
+          user_session(admin)
+          put :update, params: @params, format: :json
+          expect(provisional_grade).to be_final
+        end
+
+        it 'is a bad request when the user is an admin that cannot select final grade' do
+          admin = account_admin_user(account: @course.root_account)
+          @course.root_account.role_overrides.create!(
+            role: admin_role,
+            permission: 'select_final_grade',
+            enabled: false
+          )
+          user_session(admin)
+          put :update, params: @params, format: :json
+          expect(response.status).to eq 400
+        end
       end
     end
 

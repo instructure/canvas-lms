@@ -130,13 +130,16 @@ describe "courses/_to_do_list.html.erb" do
       it "shows assignment data" do
         course_with_student(active_all: true)
         due_date = 2.days.from_now
-        assignment_model(course: @course,
-                         due_at: due_date,
-                         submission_types: "online_text_entry",
-                         points_possible: 15,
-                         title: "ModerateMe",
-                         moderated_grading: true,
-                         grader_count: 2)
+        assignment_model(
+          course: @course,
+          due_at: due_date,
+          submission_types: "online_text_entry",
+          points_possible: 15,
+          title: "ModerateMe",
+          moderated_grading: true,
+          grader_count: 2,
+          final_grader: @teacher
+        )
         allow_any_instance_of(Assignments::NeedsGradingCountQuery).to receive(:manual_count).and_return(1)
         @submission = submission_model(assignment: @assignment, body: "my submission")
         @submission.find_or_create_provisional_grade!(@teacher, grade: 5)

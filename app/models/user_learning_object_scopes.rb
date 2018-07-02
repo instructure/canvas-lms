@@ -268,7 +268,7 @@ module UserLearningObjectScopes
       if options[:scope_only]
         scope # Also need to check the rights like below
       else
-        scope.lazy.select{|a| a.context.grants_right?(self, :moderate_grades)}.take(options[:limit]).to_a
+        scope.lazy.select{|a| a.permits_moderation?(self)}.take(options[:limit]).to_a
       end
     end
   end

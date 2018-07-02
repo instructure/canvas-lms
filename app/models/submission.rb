@@ -1895,7 +1895,7 @@ class Submission < ActiveRecord::Base
 
   def find_or_create_provisional_grade!(scorer, attrs = {})
     ModeratedGrading::ProvisionalGrade.unique_constraint_retry do
-      if attrs[:final] && !self.assignment.context.grants_right?(scorer, :moderate_grades)
+      if attrs[:final] && !self.assignment.permits_moderation?(scorer)
         raise Assignment::GradeError.new("User not authorized to give final provisional grades")
       end
 

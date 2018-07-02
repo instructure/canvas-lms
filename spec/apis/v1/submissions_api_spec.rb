@@ -4504,10 +4504,6 @@ describe 'Submissions API', type: :request do
                     :include => [ 'provisional_grades' ] }
       end
 
-      it "requires :moderate_grades permission" do
-        api_call_as_user(@ta, :get, @path, @params, {}, {}, { :expected_status => 401 })
-      end
-
       it "is unauthorized when the user is not the assigned final grader" do
         api_call_as_user(@teacher, :get, @path, @params, {}, {}, expected_status: 401)
       end

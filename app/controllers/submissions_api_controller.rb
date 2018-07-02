@@ -756,7 +756,7 @@ class SubmissionsApiController < ApplicationController
           submission[:seconds_late_override] = params[:submission].delete(:seconds_late_override)
         end
         submission[:provisional] = value_to_boolean(params[:submission][:provisional])
-        submission[:final] = value_to_boolean(params[:submission][:final]) && @context.grants_right?(@current_user, :moderate_grades)
+        submission[:final] = value_to_boolean(params[:submission][:final]) && @assignment.permits_moderation?(@current_user)
         if params[:submission][:submission_type] == 'basic_lti_launch' && (!@submission.has_submission? || @submission.submission_type == 'basic_lti_launch')
           submission[:submission_type] = params[:submission][:submission_type]
           submission[:url] = params[:submission][:url]
