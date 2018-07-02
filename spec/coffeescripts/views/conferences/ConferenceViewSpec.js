@@ -36,7 +36,6 @@ const conferenceView = function(conferenceOpts = {}) {
     context_code: 'course_1',
     context_id: 1,
     context_type: 'Course',
-    playback_url: 'www.blah.com',
     join_url: 'www.blah.com',
     recordings: conferenceOpts.recordings,
     user_settings: conferenceOpts.user_settings,
@@ -168,8 +167,8 @@ test('renders adobe connect link', function() {
       {
         recording_id: "954cc3",
         title: "Conference",
+        playback_url: 'www.blah.com',
         duration_minutes: 0,
-        playback_url: null,
         playback_formats: [
           {
             type: "statistics",
