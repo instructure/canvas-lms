@@ -150,10 +150,8 @@ class DeveloperKey extends React.Component {
         </td>
 
         {!inherited &&
-          <td>
-            <div>
+          <td style={{wordBreak: "break-all"}} width="200px">
               {this.makeUserLink(developerKey)}
-            </div>
           </td>
         }
 
@@ -207,7 +205,7 @@ class DeveloperKey extends React.Component {
               </div>
             }
             {!inherited &&
-              <div>
+              <div style={{wordBreak: "break-all"}}>
                 {this.redirectURI(developerKey)}
               </div>
             }
