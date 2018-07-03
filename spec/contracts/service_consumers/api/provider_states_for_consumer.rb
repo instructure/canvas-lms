@@ -20,9 +20,9 @@ require 'spec/factories/course_factory'
 require 'spec/factories/user_factory'
 
 PactConfig::Consumers::ALL.each do |consumer|
-  if consumer == 'Generic Consumer'
-    next
-  end
+  # if consumer == 'Generic Consumer'
+  #   next
+  # end
 
   Pact.provider_states_for consumer do
     set_up do

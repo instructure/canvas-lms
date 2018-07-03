@@ -21,13 +21,13 @@
 PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
 
-    # Creates a course with a student enrolled and creates an assignment in the course.
-    # Possible API endpoints: get, put and delete
-    # Used by the spec: 'List Assignments'
+    # Student ID: 5 || Student Name: Student1
+    # Course ID: 1
+    # Assignment ID: 1
     provider_state 'a student in a course with an assignment' do
       set_up do
-        course_with_student(active_all: true, name: 'User_Student')
-        Assignment.create!(context: @course, title: "Assignment1")
+        course = Pact::Canvas:base_state.course
+        Assignment.create!(context: course, title: "Assignment1")
       end
     end
   end
