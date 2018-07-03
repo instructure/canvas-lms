@@ -59,7 +59,7 @@ module BroadcastPolicies
     end
 
     def should_dispatch_submission_graded?
-      return false if submission.grader == Account.account_admin
+      return false if submission.strongmind_grader?
       broadcasting_grades? &&
       user_has_visibility? &&
       (submission.changed_state_to(:graded) || (grade_updated? && graded_recently?))
