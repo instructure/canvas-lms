@@ -21,34 +21,32 @@ require_relative '../pact_helper'
 describe 'Users', :pact do
   subject(:users_api) { Helper::ApiClient::Users.new }
 
-  context 'List To Do Count for User' do
-    it 'should return JSON body' do
-      canvas_lms_api.given('a student in a course').
-        upon_receiving('List To Do Count for User').
-        with(
-          method: :get,
-          headers: {
-            'Authorization': 'Bearer some_token',
-            'Auth-User': 'User_Student',
-            'Connection': 'close',
-            'Host': PactConfig.mock_provider_service_base_uri,
-            'Version': 'HTTP/1.1'
-          },
-          path: '/api/v1/users/self/todo_item_count',
-          query: ''
-        ).
-        will_respond_with(
-          status: 200,
-          body: Pact.like(
-            needs_grading_count: 0,
-            assignments_needing_submitting: 0
-          )
+  it 'List To Do Count for User' do
+    canvas_lms_api.given('a student enrolled in a course').
+      upon_receiving('List To Do Count for User').
+      with(
+        method: :get,
+        headers: {
+          'Authorization': 'Bearer some_token',
+          'Auth-User': 'Student1',
+          'Connection': 'close',
+          'Host': PactConfig.mock_provider_service_base_uri,
+          'Version': 'HTTP/1.1'
+        },
+        path: '/api/v1/users/self/todo_item_count',
+        query: ''
+      ).
+      will_respond_with(
+        status: 200,
+        body: Pact.like(
+          needs_grading_count: 0,
+          assignments_needing_submitting: 0
         )
-      users_api.authenticate_as_user('User_Student')
-      response = users_api.list_to_do_count()
-      expect(response['needs_grading_count']).to eq 0
-      expect(response['assignments_needing_submitting']).to eq 0
-    end
+      )
+    users_api.authenticate_as_user('Student1')
+    response = users_api.list_to_do_count()
+    expect(response['needs_grading_count']).to eq 0
+    expect(response['assignments_needing_submitting']).to eq 0
   end
 end
 

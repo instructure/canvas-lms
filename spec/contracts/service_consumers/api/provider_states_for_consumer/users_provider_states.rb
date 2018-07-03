@@ -18,12 +18,10 @@
 PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
 
-    # Creates a student with a to do item.
-    # Possible API endpoints: get, put, post.
-    # Used by the spec: 'List Todo Items'
+    # Student ID: 5 || Name: Student1
     provider_state 'a student with a to do item' do
       set_up do
-        student = User.create!(name: 'User_Student')
+        student = Pact::Canvas.base_state.students.first
         planner_note_model(user: student)
       end
     end
