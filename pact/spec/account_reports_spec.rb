@@ -21,33 +21,31 @@ require_relative '../pact_helper'
 describe 'Account Reports', :pact do
   subject(:account_reports_api) { Helper::ApiClient::AccountReports.new }
 
-  context 'List Reports' do
-    it 'should return JSON body' do
-      canvas_lms_api.given('a user with many account reports').
-        upon_receiving('List Reports').
-        with(
-          method: :get,
-          headers: {
-            'Authorization': 'Bearer some_token',
-            'Auth-User': 'User_Admin',
-            'Connection': 'close',
-            'Host': PactConfig.mock_provider_service_base_uri,
-            'Version': 'HTTP/1.1'
-          },
-          'path' => "/api/v1/accounts/1/reports",
-          query: ''
-        ).
-        will_respond_with(
-          status: 200,
-          body: Pact.each_like(
-            'title': 'a title',
-            'report': 'report_type'
-          )
+  it 'List Reports' do
+    canvas_lms_api.given('a user with many account reports').
+      upon_receiving('List Reports').
+      with(
+        method: :get,
+        headers: {
+          'Authorization': 'Bearer some_token',
+          'Auth-User': 'Admin1',
+          'Connection': 'close',
+          'Host': PactConfig.mock_provider_service_base_uri,
+          'Version': 'HTTP/1.1'
+        },
+        'path' => "/api/v1/accounts/2/reports",
+        query: ''
+      ).
+      will_respond_with(
+        status: 200,
+        body: Pact.each_like(
+          'title': 'a title',
+          'report': 'report_type'
         )
-      account_reports_api.authenticate_as_user('User_Admin')
-      response = account_reports_api.list_reports(1)
-      expect(response[0]['title']).to eq 'a title'
-      expect(response[0]['report']).to eq 'report_type'
-    end
+      )
+    account_reports_api.authenticate_as_user('Admin1')
+    response = account_reports_api.list_reports(2)
+    expect(response[0]['title']).to eq 'a title'
+    expect(response[0]['report']).to eq 'report_type'
   end
 end
