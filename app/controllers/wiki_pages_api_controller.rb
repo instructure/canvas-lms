@@ -263,6 +263,8 @@ class WikiPagesApiController < ApplicationController
           'wiki_pages.created_at'
         when 'updated_at'
           'wiki_pages.updated_at'
+        when 'todo_date'
+          'wiki_pages.todo_date'
       end
       if order_clause
         order_clause += ' DESC' if params[:order] == 'desc'

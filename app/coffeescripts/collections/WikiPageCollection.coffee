@@ -30,6 +30,7 @@ define [
         title: 'asc'
         created_at: 'desc'
         updated_at: 'desc'
+      @sortOrders.todo_date = 'desc' if ENV.STUDENT_PLANNER_ENABLED
       @setSortField 'title'
 
       # remove the front_page indicator on all other models when one is set

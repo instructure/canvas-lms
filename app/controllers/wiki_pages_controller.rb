@@ -62,7 +62,7 @@ class WikiPagesController < ApplicationController
     return unless authorized_action(@context.wiki, @current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
 
     if @page && !@page.new_record?
-      wiki_page_jsenv(@context)
+      wiki_pages_js_env(@context)
       @padless = true
       render template: 'wiki_pages/show'
     else
@@ -73,11 +73,8 @@ class WikiPagesController < ApplicationController
   def index
     if authorized_action(@context.wiki, @current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
       log_asset_access([ "pages", @context ], "pages", "other")
-      js_env ConditionalRelease::Service.env_for @context
-      if @context.root_account.feature_enabled?(:student_planner)
-        js_env :student_planner_enabled => @context.grants_any_right?(@current_user, session, :manage)
-      end
-      js_env :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu)
+      js_env((ConditionalRelease::Service.env_for(@context)))
+      wiki_pages_js_env(@context)
       set_tutorial_js_env
       @padless = true
     end
@@ -105,7 +102,7 @@ class WikiPagesController < ApplicationController
       if !@context.feature_enabled?(:conditional_release) || enforce_assignment_visible(@page)
         add_crumb(@page.title)
         log_asset_access(@page, 'wiki', @wiki)
-        wiki_page_jsenv(@context)
+        wiki_pages_js_env(@context)
         set_master_course_js_env_data(@page, @context)
         @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @page)
         @padless = true
@@ -116,11 +113,8 @@ class WikiPagesController < ApplicationController
   def edit
     if @page.grants_any_right?(@current_user, session, :update, :update_content) && !@page.editing_restricted?(:content)
       set_master_course_js_env_data(@page, @context)
-
-      js_env ConditionalRelease::Service.env_for @context
-      if @context.root_account.feature_enabled?(:student_planner)
-        js_env :student_planner_enabled => @page.context.grants_any_right?(@current_user, session, :manage)
-      end
+      js_env(ConditionalRelease::Service.env_for(@context))
+      wiki_pages_js_env(@context)
       if !ConditionalRelease::Service.enabled_in_context?(@context) ||
         enforce_assignment_visible(@page)
         add_crumb(@page.title)
@@ -164,8 +158,16 @@ class WikiPagesController < ApplicationController
     rce_js_env(:sidebar)
   end
 
-  def wiki_page_jsenv(context)
-    js_env :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu)
-    js_env :DISPLAY_SHOW_ALL_LINK => tab_enabled?(context.class::TAB_PAGES, {no_render: true})
+  def wiki_pages_js_env(context)
+    return @wiki_pages_env if defined? @wiki_pages_env
+    @wiki_pages_env = Rails.cache.fetch(['wiki_pages_env', context].cache_key, expires_in: 120.minutes) do
+      {
+        :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu),
+        :DISPLAY_SHOW_ALL_LINK => tab_enabled?(context.class::TAB_PAGES, {no_render: true}),
+        :STUDENT_PLANNER_ENABLED => context.root_account.feature_enabled?(:student_planner)
+      }
+    end
+    js_env(@wiki_pages_env)
+    @wiki_pages_env
   end
 end

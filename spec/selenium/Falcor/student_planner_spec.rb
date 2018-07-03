@@ -241,9 +241,15 @@ describe "student planner" do
     end
 
     it 'shows the date in the index page' do
-      skip('unskip with ADMIN-1161')
-      get "/course/#{@course.id}/pages"
-      expect(pages_detail.text).to eq(format_time_for_view(@wiki_page.todo_date))
+      get "/courses/#{@course.id}/pages/"
+      wait_for_ajaximations
+      expect(f('a[data-sort-field="todo_date"]')).to be_displayed
+      expect(f('tbody.collectionViewItems')).to include_text(format_time_for_view(@wiki_page.todo_date))
+    end
+
+    it 'shows the date in the show page' do
+      get "/courses/#{@course.id}/pages/#{@wiki_page.id}/"
+      expect(f('.show-content')).to include_text(format_time_for_view(@wiki_page.todo_date))
     end
   end
 

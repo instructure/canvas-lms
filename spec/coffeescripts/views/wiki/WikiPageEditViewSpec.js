@@ -62,7 +62,7 @@ test('conditional content is hidden when disabled', () => {
 
 QUnit.module('WikiPageEditView:StudentPlanner', {
   setup() {
-    fakeENV.setup({student_planner_enabled: true})
+    fakeENV.setup({STUDENT_PLANNER_ENABLED: true})
   },
 
   teardown() {

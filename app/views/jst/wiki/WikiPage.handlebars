@@ -68,6 +68,11 @@
 
 <div class="show-content user_content clearfix">
   <h1 class="page-title">{{title}}</h1>
+  {{#if ENV.STUDENT_PLANNER_ENABLED}}
+    {{#if todo_date}}
+      <b>{{#t "wiki.todo_date"}}To-Do Date:{{/t}} {{tDateToString todo_date "date_at_time"}}</b>
+    {{/if}}
+  {{/if}}
   {{#if locked_for_user}}
     <div class="spinner"></div>
     <div class="lock_explanation"></div>

@@ -74,6 +74,57 @@ describe WikiPagesController do
       end
     end
 
+    describe "student planner" do
+      before :once do
+        course_with_teacher(active_all: true)
+        @page = @course.wiki_pages.create!(title: "plan for planning the planner's planned plan... plan", body: "")
+      end
+
+      before do
+        user_session @teacher
+      end
+
+      context "feature enabled" do
+        before :once do
+          @course.root_account.enable_feature! :student_planner
+        end
+
+        describe "GET 'index" do
+          it "should render" do
+            get 'index', params: {course_id: @course.id}
+            expect(response).to be_successful
+            expect(controller.js_env[:STUDENT_PLANNER_ENABLED]).to be_truthy
+          end
+        end
+
+        describe "GET 'show" do
+          it "should render" do
+            get 'show', params: {course_id: @course.id, id: @page.url}
+            expect(response).to be_successful
+            expect(controller.js_env[:STUDENT_PLANNER_ENABLED]).to be_truthy
+          end
+        end
+      end
+
+      context "feature disabled" do
+        describe "GET 'index" do
+          it "should render" do
+            get 'index', params: {course_id: @course.id}
+            expect(response).to be_successful
+            expect(controller.js_env[:STUDENT_PLANNER_ENABLED]).to be_falsey
+          end
+        end
+
+        describe "GET 'show" do
+          it "should render" do
+            get 'show', params: {course_id: @course.id, id: @page.url}
+            expect(response).to be_successful
+            expect(controller.js_env[:STUDENT_PLANNER_ENABLED]).to be_falsey
+          end
+        end
+      end
+    end
+
     context "differentiated assignments" do
       before do
         assignment = @course.assignments.create!(
