@@ -18,22 +18,22 @@
 PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
 
-    # Creates a user with an event in his calender.
-    # Possible API endpoints: get, put and delete
-    # Used by the spec:
+    # User ID: 2 || Name: Admin1
+    # Event ID: 1
     provider_state 'a user with a calendar event' do
       set_up do
-        user_factory(name: 'Bob', active_user: true)
+        @user = Pact::Canvas.base_state.account_admins.first
         @event = @user.calendar_events.create!
       end
     end
 
-    # Creates a user with a robust event in his calender.
-    # Possible API endpoints: get, put and delete
-    # Used by the spec: 'Show Calender Event'
+    # Student ID: 2 || Name: Student1
+    # Teacher ID: 4 || Name: Teacher1
+    # Event ID: 1
     provider_state 'a user with a robust calendar event' do
       set_up do
-        course_with_teacher(:active_all => true, name: 'User_Teacher')
+        @course = Pact::Canvas.base_state.course
+        @student = Pact::Canvas.base_state.students.first
         @ag = AppointmentGroup.create!(
           title: "Rohan's Special Day",
           location_name: "bollywood",
@@ -46,7 +46,6 @@ PactConfig::Consumers::ALL.each do |consumer|
             ["2012-01-01 13:59:59", "2012-01-01 14:59:59"]
           ]
         )
-        course_with_student(course: @course, active_all: true)
         @ag.publish!
         @event = @ag.appointments.first
         @event.update!(all_day: true, all_day_date: '2015-09-22', description: "", location_name: "", location_address: "")
@@ -61,12 +60,11 @@ PactConfig::Consumers::ALL.each do |consumer|
       end
     end
 
-    # Creates a user with multiple events in his calender.
-    # Possible API endpoints: get, put and delete
-    # Used by the spec:
+    # User ID: 2 || Name: Admin1
+    # Event ID: 1, 2, 3, 4.
     provider_state 'a user with many calendar events' do
       set_up do
-        user_factory(name: 'Bob', active_user: true)
+        @user = Pact::Canvas.base_state.account_admins.first
         @event0 = @user.calendar_events.create!
         @event1 = @user.calendar_events.create!
         @event2 = @user.calendar_events.create!
