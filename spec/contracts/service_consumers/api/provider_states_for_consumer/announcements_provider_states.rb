@@ -18,13 +18,13 @@
 PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
 
-    # Creates a course with a student enrolled and creates an announcement in the course.
-    # Possible API endpoints: get, put and delete
-    # Used by the spec: 'List Announcement'
+    # Student ID: 5 || Student Name: Student1
+    # Course ID: 1
+    # Announcement ID: 1
     provider_state 'a student in a course with an announcement' do
       set_up do
-        course_with_student(active_all: true, name: 'User_Student')
-        Announcement.create!(context: @course, title: "Announcement1", message: "Announcement 1 detail")
+        course = Pact::Canvas::base_state.course
+        Announcement.create!(context: course, title: "Announcement1", message: "Announcement 1 detail")
       end
     end
   end
