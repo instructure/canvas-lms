@@ -18,22 +18,21 @@
 PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
 
-    # Creates a user with many different test notifications
-    # Possible API endpoints: get, delete, post and put
-    # Used by every spec in account_notifications
+    # Account_Admin ID: 2 || Name: Admin1
+    # Account ID: 2
+    # Notification IDs: 1, 2, 3.
     provider_state 'a user with many notifications' do
       set_up do
-        @user = user_factory(active_all: true, name: 'Account_User')
-        @account = @user.account
-        @account_user = AccountUser.create(account: @account, user: @user)
+        account_admin = Pact::Canvas.base_state.account_admins.first
+        account = account_admin.account
         @notification1 = AccountNotification.create!(
-          account: @account, subject: 'test subj1', message: 'test msg', start_at: Time.zone.now, end_at: 3.days.from_now
+          account: account, subject: 'test subj1', message: 'test msg', start_at: Time.zone.now, end_at: 3.days.from_now
         )
         @notification2 = AccountNotification.create!(
-          account: @account, subject: 'test subj2', message: 'test msg', start_at: Time.zone.now, end_at: 3.days.from_now
+          account: account, subject: 'test subj2', message: 'test msg', start_at: Time.zone.now, end_at: 3.days.from_now
         )
         @notification3 = AccountNotification.create!(
-          account: @account, subject: 'test subj3', message: 'test msg', start_at: Time.zone.now, end_at: 3.days.from_now
+          account: account, subject: 'test subj3', message: 'test msg', start_at: Time.zone.now, end_at: 3.days.from_now
         )
       end
     end
