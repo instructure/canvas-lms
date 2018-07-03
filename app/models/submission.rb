@@ -247,7 +247,7 @@ class Submission < ActiveRecord::Base
   end
 
   def strongmind_grader?
-    grader == Account.account_admin
+    grader_id == GradesService::Account.strongmind_grader.id
   end
 
   scope :needs_grading, -> {
