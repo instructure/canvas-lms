@@ -26,6 +26,9 @@
   "assignmenttype_title_at_datetime_478f0709": {
     "message": "{ assignmentType } { title }, at { datetime }."
   },
+  "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
+    "message": "{ assignmentType } { title }, at { datetime } until { endTime }"
+  },
   "assignmenttype_title_due_datetime_a112d8ff": {
     "message": "{ assignmentType } { title }, due { datetime }."
   },
@@ -200,8 +203,11 @@
   "nothing_new_needs_attention_3ac548d4": {
     "message": "Nothing new needs attention."
   },
-  "nothing_planned_today_next_item_loaded_5a199868": {
-    "message": "Nothing planned today. Next item loaded."
+  "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
+    "message": "Nothing planned today. Selecting most recent item."
+  },
+  "nothing_planned_today_selecting_next_item_f6718aa": {
+    "message": "Nothing planned today. Selecting next item."
   },
   "nothing_planned_yet_8675ffe9": {
     "message": "Nothing Planned Yet"
@@ -250,6 +256,9 @@
   },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } to { endDate }"
+  },
+  "starttime_to_endtime_d7cc249d": {
+    "message": "{ startTime } to { endTime }"
   },
   "submitted_318fad53": {
     "message": "Submitted"
