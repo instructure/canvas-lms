@@ -24,6 +24,8 @@ describe "outcome gradebook" do
   context "as a teacher" do
     before(:once) do
       gradebook_data_setup
+      outcome_model(context: @course)
+      outcome_model(context: @course)
     end
 
     before(:each) do
@@ -50,6 +52,78 @@ describe "outcome gradebook" do
 
         f('a[data-id=outcome]').click
         expect(f('.outcome-gradebook-container')).not_to be_nil
+      end
+
+      def three_students
+        expect(ff('.outcome-student-cell-content')).to have_size 3
+      end
+
+      def no_students
+        expect(f('#application')).not_to contain_css('.outcome-student-cell-content')
+      end
+
+      def two_outcomes
+        expect(ff('.outcome-gradebook-container .headers_1 .slick-header-column')).to have_size 2
+      end
+
+      def no_outcomes
+        expect(f('.outcome-gradebook-container .headers_1')).not_to contain_css('.slick-header-column')
+      end
+
+      it "filter out students without results" do
+        get "/courses/#{@course.id}/gradebook"
+        f('a[data-id=outcome]').click
+        three_students
+
+        f('#no_results_students').click
+        wait_for_ajax_requests
+        no_students
+
+        f('#no_results_students').click
+        wait_for_ajax_requests
+        three_students
+      end
+
+      it "filter out outcomes without results" do
+        get "/courses/#{@course.id}/gradebook"
+        f('a[data-id=outcome]').click
+        two_outcomes
+
+        f('#no_results_outcomes').click
+        no_outcomes
+
+        f('#no_results_outcomes').click
+        two_outcomes
+      end
+
+      it "filter out outcomes and students without results" do
+        get "/courses/#{@course.id}/gradebook"
+        f('a[data-id=outcome]').click
+        two_outcomes
+        three_students
+
+        f('#no_results_outcomes').click
+        no_outcomes
+        three_students
+
+        f('#no_results_students').click
+        wait_for_ajax_requests
+        no_outcomes
+        no_students
+
+        f('#no_results_students').click
+        wait_for_ajax_requests
+        no_outcomes
+        three_students
+
+        f('#no_results_outcomes').click
+        two_outcomes
+        three_students
+
+        f('#no_results_students').click
+        wait_for_ajax_requests
+        two_outcomes
+        no_students
       end
 
       it "should allow showing only a certain section" do

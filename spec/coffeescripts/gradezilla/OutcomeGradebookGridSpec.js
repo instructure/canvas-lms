@@ -202,6 +202,25 @@ test('Grid.Util.toColumns for xss', () => {
     id: 1,
     title: '<script>'
   }
-  const columns = Grid.Util.toColumns([outcome])
+  const columns = Grid.Util.toColumns([outcome], [])
   ok(isEqual(columns[1].name, '&lt;script&gt;'))
+})
+
+test('Grid.Util.toColumns hasResults', () => {
+  const outcomes = [
+    {
+      id: "1"
+
+    },
+    {
+      id: "2"
+    }
+  ]
+  const rollup = {
+    links: { section: "1", user: "1" },
+    scores: [{ score: "3", hide_points: true, links: { outcome:"2" } }]
+  }
+  const columns = Grid.Util.toColumns(outcomes, [rollup])
+  ok(isEqual(columns[1].hasResults, false))
+  ok(isEqual(columns[2].hasResults, true))
 })

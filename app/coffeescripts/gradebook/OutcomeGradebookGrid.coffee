@@ -156,21 +156,23 @@ define [
       # Returns an array with [columns, rows].
       toGrid: (response, options = { column: {}, row: {} }) ->
         Grid.dataSource = response
-        [Grid.Util.toColumns(response.linked.outcomes, options.column),
+        [Grid.Util.toColumns(response.linked.outcomes, response.rollups, options.column),
          Grid.Util.toRows(response.rollups, options.row)]
 
       # Public: Translate an array of outcomes to columns that can be used by SlickGrid.
       #
       # outcomes - An array of outcomes from the outcome rollups API.
+      # rollups  - An array of rollups from the outcome rollups API.
       #
       # Returns an array of columns.
-      toColumns: (outcomes, options = {}) ->
+      toColumns: (outcomes, rollups, options = {}) ->
         options = _.extend({}, Grid.Util.COLUMN_OPTIONS, options)
         columns = _.map outcomes, (outcome) ->
           _.extend(id: "outcome_#{outcome.id}",
                    name: _.escape(outcome.title),
                    field: "outcome_#{outcome.id}",
                    cssClass: 'outcome-result-cell',
+                   hasResults: _.some(rollups, (r) => _.find(r.scores, (s) => s.links.outcome == outcome.id)),
                    outcome: outcome, options)
         [Grid.Util._studentColumn()].concat(columns)
 

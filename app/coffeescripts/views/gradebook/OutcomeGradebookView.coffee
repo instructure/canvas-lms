@@ -112,8 +112,10 @@ define [
           $(this).find('.checkbox')
             .attr('data-tooltip', 'left')
             .attr('title', $(this).find('.checkbox-label').text())
+        @$('.filters').hide()
       else
         @$('.checkbox').removeAttr('data-tooltip').removeAttr('title')
+        @$('.filters').show()
 
     # Internal: Validate options passed to constructor.
     #
@@ -131,6 +133,23 @@ define [
       $.subscribe('currentSection/change', Grid.Events.sectionChangeFunction(@grid))
       $.subscribe('currentSection/change', @updateExportLink)
       @updateExportLink(@gradebook.sectionToShow)
+      _this = @
+      @$('#no_results_outcomes').change(() -> _this._toggleOutcomesWithNoResults(this.checked))
+      @$('#no_results_students').change(() -> _this._toggleStudentsWithNoResults(this.checked))
+
+    _toggleOutcomesWithNoResults: (enabled) ->
+      if enabled
+        columns = [@columns[0]].concat(_.filter(@columns, (c) => c.hasResults))
+        @grid.setColumns(columns)
+      else
+        @grid.setColumns(@columns)
+
+    _toggleStudentsWithNoResults: (enabled) ->
+      @grid.setData([])
+      @grid.invalidate()
+      @hasOutcomes = $.Deferred()
+      $.when(@hasOutcomes).then(@renderGrid)
+      @_loadOutcomes(if enabled then 'missing_user_rollups' else '')
 
     # Internal: Listen for events on grid.
     #
@@ -169,15 +188,22 @@ define [
       Grid.Util.saveOutcomePaths(response.linked.outcome_paths)
       Grid.Util.saveSections(@gradebook.sections) # might want to put these into the api results at some point
       [columns, rows] = Grid.Util.toGrid(response, column: { formatter: Grid.View.cell }, row: { section: @menu.currentSection })
-      @grid = new Slick.Grid(
-        '.outcome-gradebook-wrapper',
-        rows,
-        columns,
-        Grid.options)
-      @_attachGridEvents()
-      @grid.init()
-      Grid.Events.init(@grid)
-      @_attachEvents()
+      @columns = columns
+      if @$('#no_results_outcomes:checkbox:checked').length == 1
+        columns = [columns[0]].concat(_.filter(columns, (c) => c.hasResults))
+      if @grid
+        @grid.setData(rows)
+        @grid.setColumns(columns)
+      else
+        @grid = new Slick.Grid(
+          '.outcome-gradebook-wrapper',
+          rows,
+          columns,
+          Grid.options)
+        @_attachGridEvents()
+        @grid.init()
+        Grid.Events.init(@grid)
+        @_attachEvents()
 
     isLoaded: false
     onShow: ->
@@ -194,10 +220,14 @@ define [
     loadOutcomes: () ->
       $.when(@gradebook.hasSections).then(@_loadOutcomes)
 
-    _loadOutcomes: =>
+    _rollupsUrl: (course, exclude) ->
+      excluding = if exclude == '' then '' else "&exclude[]=#{exclude}"
+      "/api/v1/courses/#{course}/outcome_rollups?per_page=100&include[]=outcomes&include[]=users&include[]=outcome_paths#{excluding}"
+
+    _loadOutcomes: (exclude = '') =>
       course = ENV.context_asset_string.split('_')[1]
       @$('.outcome-gradebook-wrapper').disableWhileLoading(@hasOutcomes)
-      @_loadPage("/api/v1/courses/#{course}/outcome_rollups?per_page=100&include[]=outcomes&include[]=users&include[]=outcome_paths")
+      @_loadPage(@_rollupsUrl(course, exclude))
 
     # Internal: Load a page of outcome results from the given URL.
     #
