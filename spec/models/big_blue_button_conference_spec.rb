@@ -16,25 +16,29 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require_relative('web_conference_spec_helper')
 
 describe BigBlueButtonConference do
   include_examples 'WebConference'
 
+  config = {
+    :domain => "bbb.instructure.com",
+    :secret_dec => Digest::SHA1.hexdigest("secret"),
+  }
+
   context "big_blue_button" do
     before do
       allow(WebConference).to receive(:plugins).and_return([
-        web_conference_plugin_mock("big_blue_button", {
-          :domain => "bbb.instructure.com",
-          :secret_dec => "secret",
-        })
+        web_conference_plugin_mock("big_blue_button", config)
       ])
+      @course = course_factory
       user_with_communication_channel
+      @course.enroll_teacher(@user).accept
       @conference = BigBlueButtonConference.create!(
         :title => "my conference",
         :user => @user,
-        :context => course_factory
+        :context => @course
       )
     end
 
@@ -56,9 +60,9 @@ describe BigBlueButtonConference do
       admin_params = params.merge(:password => 'admin').to_query
       user_params = params.merge(:password => 'user').to_query
       expect(@conference.admin_join_url(@user)).to eql("https://bbb.instructure.com/bigbluebutton/api/join?#{admin_params}&checksum=" +
-        Digest::SHA1.hexdigest("join#{admin_params}secret"))
+        Digest::SHA1.hexdigest("join#{admin_params}#{config[:secret_dec]}"))
       expect(@conference.participant_join_url(@user)).to eql("https://bbb.instructure.com/bigbluebutton/api/join?#{user_params}&checksum=" +
-        Digest::SHA1.hexdigest("join#{user_params}secret"))
+        Digest::SHA1.hexdigest("join#{user_params}#{config[:secret_dec]}"))
     end
 
     it "should confirm valid config" do
@@ -82,6 +86,13 @@ describe BigBlueButtonConference do
       expect(@conference.craft_url(@user)).to match(/\Ahttps:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
     end
 
+    it "should produce a user string as for recording ready that contains the encrypted conference owner email" do
+      key = ActiveSupport::KeyGenerator.new(config[:secret_dec]).generate_key(config[:secret_dec], 32)
+      crypt = ActiveSupport::MessageEncryptor.new(key)
+      padded_user_email = crypt.decrypt_and_verify(@conference.recording_ready_user)
+      expect(padded_user_email.strip).to eq @user.email
+    end
+
     it "return nil if a request times out" do
       allow(CanvasHttp).to receive(:get).and_raise(Timeout::Error)
       expect(@conference.initiate_conference).to be_nil
@@ -92,12 +103,9 @@ describe BigBlueButtonConference do
     let(:get_recordings_fixture){File.read(Rails.root.join('spec', 'fixtures', 'files', 'conferences', 'big_blue_button_get_recordings_two.json'))}
 
     before do
+      config[:recording_enabled] = true
       allow(WebConference).to receive(:plugins).and_return([
-        web_conference_plugin_mock("big_blue_button", {
-          :domain => "bbb.instructure.com",
-          :secret_dec => "secret",
-          :recording_enabled => true,
-        })
+        web_conference_plugin_mock("big_blue_button", config)
       ])
     end
 
@@ -211,12 +219,9 @@ describe BigBlueButtonConference do
 
   describe 'plugin setting recording disabled' do
     before do
+      config[:recording_enabled] = false
       allow(WebConference).to receive(:plugins).and_return([
-        web_conference_plugin_mock("big_blue_button", {
-          :domain => "bbb.instructure.com",
-          :secret_dec => "secret",
-          :recording_enabled => false,
-        })
+        web_conference_plugin_mock("big_blue_button", config)
       ])
     end
 
