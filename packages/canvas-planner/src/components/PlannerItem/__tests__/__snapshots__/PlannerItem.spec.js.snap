@@ -12,6 +12,7 @@ exports[`does not render end time if the same as start time 1`] = `
       <Checkbox
         checked={false}
         disabled={false}
+        indeterminate={false}
         inline={false}
         label={
           <ScreenReaderContent
@@ -122,6 +123,7 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
       <Checkbox
         checked={false}
         disabled={false}
+        indeterminate={false}
         inline={false}
         label={
           <ScreenReaderContent
@@ -3793,6 +3795,7 @@ exports[`renders the end time if available 1`] = `
       <Checkbox
         checked={false}
         disabled={false}
+        indeterminate={false}
         inline={false}
         label={
           <ScreenReaderContent
@@ -3903,6 +3906,7 @@ exports[`renders the location if available 1`] = `
       <Checkbox
         checked={false}
         disabled={false}
+        indeterminate={false}
         inline={false}
         label={
           <ScreenReaderContent
