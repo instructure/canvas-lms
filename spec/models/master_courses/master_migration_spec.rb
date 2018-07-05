@@ -611,6 +611,44 @@ describe MasterCourses::MasterMigration do
       end
     end
 
+    it "copies links to account outcomes on rubrics" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+
+      run_master_migration
+
+      account = @copy_from.account
+      a_group = account.root_outcome_group
+      lo = account.created_learning_outcomes.create!({:title => 'new outcome'})
+
+      root = @copy_from.root_outcome_group
+      log = @copy_from.learning_outcome_groups.create!(:title => "some group")
+      root.adopt_outcome_group(log)
+      tag = log.add_outcome(lo)
+
+      # don't automatically link in selective content but should still get copied because the rubric is copied
+      ContentTag.where(:id => tag).update_all(:updated_at => 5.minutes.ago)
+
+      rub = Rubric.new(:context => @copy_from)
+      rub.data = [
+        {
+          :points => 3,
+          :description => "Outcome row",
+          :id => 1,
+          :ratings => [{:points => 3,:description => "Rockin'",:criterion_id => 1,:id => 2}],
+          :learning_outcome_id => lo.id
+        }
+      ]
+      rub.save!
+      rub.associate_with(@copy_from, @copy_from)
+      Rubric.where(:id => rub.id).update_all(:updated_at => 5.minute.from_now)
+
+      run_master_migration
+
+      rub_to = @copy_to.rubrics.first
+      expect(rub_to.data.first["learning_outcome_id"]).to eq lo.id
+    end
+
     it "doesn't restore deleted associated files unless relocked" do
       @copy_to = course_factory
       @template.add_child_course!(@copy_to)
