@@ -17,6 +17,9 @@
   "only_most_recent_grading_period_shown_f1ad6458": {
     "message": "*Kun nyaste karaktersetjingsperiode viser."
   },
+  "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
+    "message": "Ingen planar i dag. Sjå førre element. "
+  },
   "assignment_976578a8": {
     "message": "Oppgåve"
   },
@@ -49,6 +52,9 @@
   },
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Ser ikkje ut som om det finns noko her"
+  },
+  "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
+    "message": "{ assignmentType } { title }, fra { datetime } til { endTime }"
   },
   "points_points_63e59cce": {
     "message": "{ points } poeng"
@@ -97,6 +103,9 @@
   },
   "load_prior_dates_f2b0f6f0": {
     "message": "Last tidlegare datoar"
+  },
+  "starttime_to_endtime_d7cc249d": {
+    "message": "{ startTime } til { endTime }"
   },
   "all_items_loaded_aa256183": {
     "message": "Alle element er lasta"
@@ -277,6 +286,9 @@
   },
   "to_do_items_loading_d1cdfcd5": {
     "message": "Lastar innhald i Å gjere-oversikta"
+  },
+  "nothing_planned_today_selecting_next_item_f6718aa": {
+    "message": "Ingen planar i dag. Sjå neste element. "
   },
   "loading_725811ca": {
     "message": "lastar"
