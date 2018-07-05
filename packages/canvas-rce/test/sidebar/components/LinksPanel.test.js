@@ -103,7 +103,7 @@ describe("LinksPanel", () => {
         "CollectionPanel",
         "LinkToNewPage"
       ]);
-      assert.ok(linkToNewPage.findNode("#rcs-LinkToNewPage-btn-link"));
+      assert.ok(linkToNewPage.subTree("#rcs-LinkToNewPage-btn-link"));
     });
 
     it("does not have 'link to new page' in Quizzes links", () => {
@@ -164,7 +164,7 @@ describe("LinksPanel", () => {
         "CollectionPanel",
         "LinkToNewPage"
       ]);
-      assert.ok(linkToNewPage.findNode("#rcs-LinkToNewPage-btn-link"));
+      assert.ok(linkToNewPage.subTree("#rcs-LinkToNewPage-btn-link"));
     });
   });
 

@@ -7,7 +7,7 @@
   "scripts": {
     "extract": "format-message extract \"src*/**/*.js\" > locales/en.json",
     "integration-test": "nightwatch --env integration",
-    "lint": "eslint \"src/**/*.js\" \"app/**/*.js\" \"test/**/*.js\" \"shared/**/*.js\"",
+    "lint": "eslint \"src/**/*.js\" \"test/**/*.js\"",
     "lint:fix": "eslint --fix \"src/**/*.js\" \"app/**/*.js\" \"test/**/*.js\" \"shared/**/*.js\"",
     "test": "BABEL_ENV=test-node mocha 'test/**/*.test.js' --require @instructure/ui-themes/lib/canvas --compilers js:babel-core/register --timeout 5000",
     "test:watch": "BABEL_ENV=test-node mocha 'test/**/*.test.js' --require @instructure/ui-themes/lib/canvas --compilers js:babel-core/register --watch",
@@ -113,7 +113,12 @@
         }
       ]
     },
-    "root": true
+    "root": true,
+    "settings": {
+      "react": {
+        "version": "15.6.2"
+      }
+    }
   },
   "dependencies": {
     "@instructure/ui-a11y": "5.16.0-rc.4",
@@ -149,33 +154,34 @@
     "babel-cli": "^6.22.2",
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.2",
-    "babel-loader": "7.1.4",
+    "babel-loader": "^7.1.4",
     "babel-plugin-inline-json-import": "^0.2.0",
     "babel-plugin-minify-constant-folding": "^0.4.1",
     "babel-plugin-minify-dead-code-elimination": "^0.4.1",
     "babel-plugin-minify-guarded-expressions": "^0.4.1",
     "babel-plugin-transform-inline-environment-variables": "^0.4.1",
     "cross-env": "^5.0.0",
-    "eslint": "^4.19.1",
+    "eslint": "^5",
     "eslint-config-prettier": "^2.9.0",
-    "eslint-plugin-mocha": "4.11.0",
+    "eslint-plugin-mocha": "^5",
     "eslint-plugin-notice": "^0.7.7",
-    "eslint-plugin-react": "4.3.0",
+    "eslint-plugin-react": "^7",
     "fetch-mock": "^6",
     "format-message-cli": "^6",
     "format-message-parse": "^6",
     "jsdomify": "^3",
     "mocha": "^5",
     "mocha-jsdom": "^2",
-    "nyc": "^11",
+    "nyc": "^12",
     "prettier": "^1.12.1",
     "proxyquire": "1.7.4",
     "quiz-presets": "^5.0.4",
     "react-addons-test-utils": "^15.0.0",
-    "sinon": "1.17.3",
-    "skin-deep": "0.13.2",
-    "webpack": "^2.2.1",
-    "webpack-dev-server": "^2.4.1"
+    "sinon": "^6",
+    "skin-deep": "^1",
+    "webpack": "^4",
+    "webpack-cli": "^3.0.8",
+    "webpack-dev-server": "^3"
   },
   "resolutions": {
     "babel-helper-evaluate-path": "0.4.1"

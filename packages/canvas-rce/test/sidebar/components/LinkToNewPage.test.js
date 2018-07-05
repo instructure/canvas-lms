@@ -43,13 +43,6 @@ describe("LinkToNewPage", () => {
     };
   });
 
-  afterEach(() => {
-    // skin deep sets up a global
-    // when you "fillField" for document,
-    // which then breaks jsdom tests
-    global.document = undefined;
-  });
-
   describe("form rendering", () => {
     it("renders form if expanded", () => {
       let props = { ...defaultProps, newPageLinkExpanded: true };
@@ -99,7 +92,9 @@ describe("LinkToNewPage", () => {
       let newLinkComp = sd.shallowRender(<LinkToNewPage {...props} />);
       let instance = newLinkComp.getMountedInstance();
       let pageNameForm = sd.shallowRender(instance.renderForm());
-      pageNameForm.fillField("#new-page-name-input", "page-name");
+      pageNameForm
+        .subTree("#new-page-name-input")
+        .props.onChange({ target: { value: "page-name" } });
       assert.ok(pageNameForm.subTree("#rcs-LinkToNewPage-submit"));
       instance.handleSubmit(fakeEvent);
       assert.deepEqual(link, {
@@ -121,7 +116,9 @@ describe("LinkToNewPage", () => {
       let newLinkComp = sd.shallowRender(<LinkToNewPage {...props} />);
       let instance = newLinkComp.getMountedInstance();
       let pageNameForm = sd.shallowRender(instance.renderForm());
-      pageNameForm.fillField("#new-page-name-input", "page-name");
+      pageNameForm
+        .subTree("#new-page-name-input")
+        .props.onChange({ target: { value: "page-name" } });
       assert.ok(pageNameForm.subTree("#rcs-LinkToNewPage-submit"));
       instance.handleSubmit(fakeEvent);
       assert.deepEqual(link, {

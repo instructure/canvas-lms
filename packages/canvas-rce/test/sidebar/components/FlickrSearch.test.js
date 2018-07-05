@@ -73,12 +73,12 @@ describe("FlickrSearch", () => {
     it("uses aria-expanded to communicate collapsed state", () => {
       flickr.formExpanded = true;
       let flickrComp = sd.shallowRender(<FlickrSearch {...defaultProps} />);
-      let button = flickrComp.subTreeLike("Button", { "aria-expanded": true });
+      let button = flickrComp.subTree("Button", { "aria-expanded": true });
       assert.ok(button);
 
       flickr.formExpanded = false;
       flickrComp = sd.shallowRender(<FlickrSearch {...defaultProps} />);
-      button = flickrComp.subTreeLike("Button", { "aria-expanded": false });
+      button = flickrComp.subTree("Button", { "aria-expanded": false });
       assert.ok(button);
     });
 
@@ -174,8 +174,8 @@ describe("FlickrSearch", () => {
         );
         let instance = flickrComp.getMountedInstance();
         let searchForm = sd.shallowRender(instance.renderForm());
-        assert.ok(searchForm.subTreeLike("img", { alt: "asdf" }));
-        assert.ok(searchForm.subTreeLike("img", { alt: "fdas" }));
+        assert.ok(searchForm.subTree("img", { alt: "asdf" }));
+        assert.ok(searchForm.subTree("img", { alt: "fdas" }));
       });
 
       it("adds a flickr thumbnail signal to href", () => {
@@ -189,7 +189,7 @@ describe("FlickrSearch", () => {
         );
         let instance = flickrComp.getMountedInstance();
         let searchForm = sd.shallowRender(instance.renderForm());
-        let flickrResult1 = searchForm.subTreeLike("img", {
+        let flickrResult1 = searchForm.subTree("img", {
           src: "asdf_s.jpg"
         });
         assert.ok(flickrResult1);
