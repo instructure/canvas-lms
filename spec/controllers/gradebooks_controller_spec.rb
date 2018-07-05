@@ -1339,6 +1339,34 @@ describe GradebooksController do
       expect(assigns[:submissions][0].submission_comments[0].attachments[0].display_name).to eql("doc.doc")
     end
 
+    context 'media comments' do
+      before :each do
+        user_session(@teacher)
+        @assignment = @course.assignments.create!(title: 'some assignment')
+        @student = @course.enroll_user(User.create!(name: 'some user'))
+        post 'update_submission',
+          params: {
+            course_id: @course.id,
+            submission: {
+              assignment_id: @assignment.id,
+              user_id: @student.user_id,
+              media_comment_id: 'asdfqwerty',
+              media_comment_type: 'audio'
+            }
+        }
+        @media_comment = assigns[:submissions][0].submission_comments[0]
+      end
+
+      it 'allows media comments for submissions' do
+        expect(@media_comment).not_to be nil
+        expect(@media_comment.media_comment_id).to eql 'asdfqwerty'
+      end
+
+      it 'includes the type in the media comment' do
+        expect(@media_comment.media_comment_type).to eql 'audio'
+      end
+    end
+
     it "stores attached files in instfs if instfs is enabled" do
       allow(InstFS).to receive(:enabled?).and_return(true)
       uuid = "1234-abcd"

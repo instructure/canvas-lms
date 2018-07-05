@@ -273,7 +273,7 @@
               <% if can_do(comment, @current_user, :read) %>
               <div class="comment <%= 'draft' if comment.draft? %>" id="submission_comment_<%= comment.id %>" style="margin-bottom: 10px;">
                 <div class="comment" style="color: #444;">
-                  <% if comment.media_comment_id && comment.media_comment_type %>
+                  <% if comment.media_comment_id %>
                     <div class="comment_media">
                       <%= t('media_comment_link', "This is a media comment, *click here to view*.", :wrapper => '<br/><a href="#" class="play_comment_link media-comment">\1</a>.') %>
                       <span class="media_comment_id" style="display: none;"><%= comment.media_comment_id %></span>
