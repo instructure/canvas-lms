@@ -84,7 +84,7 @@ class Enrollment
           when nil
             # combine the other branches dynamically based on joined course's
             # workflow_state
-            "enrollments.workflow_state='active' AND (courses.workflow_state='available' OR courses.workflow_state='claimed' AND enrollments.type IN ('TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentViewEnrollment'))"
+            "enrollments.workflow_state='active' AND (courses.workflow_state='available' OR courses.workflow_state IN ('created', 'claimed') AND enrollments.type IN ('TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentViewEnrollment'))"
           else
             # never include enrollments from unclaimed/completed/deleted
             # courses
