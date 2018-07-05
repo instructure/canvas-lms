@@ -118,6 +118,12 @@ module Qti
         end
       end
       return string unless unmatched || lcount > 0
+
+      if string.include?("data-equation-content")
+        # try to fix a weird issue with unescaped brackets inside html attribute values
+        string = Nokogiri::HTML::DocumentFragment.parse(string).to_xml rescue string
+      end
+
       string.split(/(\<[^\<\>]*\>)/m).map do |sub|
         if sub.strip.start_with?("<") && sub.strip.end_with?(">")
           sub
