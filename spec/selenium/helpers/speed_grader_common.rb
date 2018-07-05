@@ -114,7 +114,6 @@ module SpeedGraderCommon
 
   def submit_comment(text)
     f('#speedgrader_comment_textarea').send_keys(text)
-    scroll_into_view('#add_a_comment button[type="submit"]')
     f('#add_a_comment button[type="submit"]').click
     wait_for_ajaximations
   end
