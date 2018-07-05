@@ -14,7 +14,12 @@ exports[`prioritizes loading complete over currently loading 1`] = `
     >
       <TV
         aria-hidden="true"
+        height="157"
         role="img"
+        viewBox="0 0 174 157"
+        width="174"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlnsXlink="http://www.w3.org/1999/xlink"
       />
     </View>
     <Text
@@ -49,7 +54,12 @@ exports[`renders TV when all past items loaded 1`] = `
     >
       <TV
         aria-hidden="true"
+        height="157"
         role="img"
+        viewBox="0 0 174 157"
+        width="174"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlnsXlink="http://www.w3.org/1999/xlink"
       />
     </View>
     <Text
