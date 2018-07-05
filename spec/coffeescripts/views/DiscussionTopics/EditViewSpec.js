@@ -218,6 +218,12 @@ test('shows todo input with date when given date', function() {
   equal(view.$el.find('#todo_date').val(), 'Jan 3, 2017 12am')
 })
 
+test('renders announcement page when planner enabled', function() {
+  ENV.STUDENT_PLANNER_ENABLED = true
+  const view = this.editView({isAnnouncement: true})
+  equal(view.$el.find('#discussion-edit-view').length, 1)
+})
+
 test('does not show todo checkbox without permission', function() {
   ENV.STUDENT_PLANNER_ENABLED = false
   const view = this.editView()
