@@ -36,13 +36,6 @@ a {
   position: relative;
 }
 
-#terms_of_service_link {
-  button {
-    margin-top: -3px !important;
-    color: #999 !important;
-  }
-}
-
 #registration_header {
   background: #fff;
   height: 122px;
@@ -136,7 +129,18 @@ a {
   float: direction(right);
 }
 
+#terms_link {
+  @include ic-focus-base;
+  &:focus {
+    @include ic-focus-variant;
+  }
+}
+
 #signup_teacher, #signup_student {
+  @include ic-focus-base;
+  &:focus {
+    @include ic-focus-variant;
+  }
   position: absolute;
   background-image: url(/images/registration/landing_buttons.png);
   background-repeat: no-repeat;

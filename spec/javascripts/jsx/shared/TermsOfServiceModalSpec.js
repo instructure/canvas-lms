@@ -33,20 +33,20 @@ QUnit.module('Terms of Service Modal Link', {
 test('renders correct link when preview is not provided', () => {
   ENV.TERMS_OF_SERVICE_CUSTOM_CONTENT = "Hello World"
   const wrapper = mount(<TermsOfServiceModal preview/>)
-  const renderedLink = wrapper.find('Link')
+  const renderedLink = wrapper.find('a')
   equal(renderedLink.text(), 'Preview')
 })
 
 test('renders correct link when preview is provided', () => {
   ENV.TERMS_OF_SERVICE_CUSTOM_CONTENT = "Hello World"
   const wrapper = mount(<TermsOfServiceModal/>)
-  const renderedLink = wrapper.find('Link')
+  const renderedLink = wrapper.find('a')
   equal(renderedLink.text(), 'Acceptable Use Policy')
 })
 
 test('Opens the modal when link is preview', () => {
   const wrapper = shallow(<TermsOfServiceModal preview/>)
-  const renderedLink = wrapper.find('Link')
+  const renderedLink = wrapper.find('a')
   renderedLink.simulate('click')
 
   ok(wrapper.state().open)
@@ -54,7 +54,7 @@ test('Opens the modal when link is preview', () => {
 
 test('Opens the modal when link is Terms of Service', () => {
   const wrapper = shallow(<TermsOfServiceModal />)
-  const renderedLink = wrapper.find('Link')
+  const renderedLink = wrapper.find('a')
   renderedLink.simulate('click')
 
   ok(wrapper.state().open)
