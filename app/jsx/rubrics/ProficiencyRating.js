@@ -74,9 +74,9 @@ export default class ProficiencyRating extends React.Component {
 
   componentDidUpdate() {
     if (this.props.focusField === 'trash') {
-      setTimeout(() => {
+      setTimeout(() => (
         this.props.disableDelete ? this.colorButton.focus() : this.trashButton.focus()
-      }, 700)
+      ), 700)
     } else if (this.props.focusField === 'description') {
       this.descriptionInput.focus()
     } else if (this.props.focusField === 'points') {
@@ -205,8 +205,16 @@ export default class ProficiencyRating extends React.Component {
             </PopoverContent>
           </Popover>
           <div className="delete">
-            <Button ref={this.setTrashRef} variant="icon" onClick={this.handleDelete} disabled={disableDelete}>
-              <IconTrash title={I18n.t('Delete proficiency rating')} />
+            <Button
+              disabled={disableDelete}
+              buttonRef={this.setTrashRef}
+              onClick={this.handleDelete}
+              variant="icon"
+              icon={<IconTrash />}
+            >
+              <ScreenReaderContent>
+                {I18n.t('Delete proficiency rating')}
+              </ScreenReaderContent>
             </Button>
           </div>
         </td>

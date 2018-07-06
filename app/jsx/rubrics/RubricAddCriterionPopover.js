@@ -42,6 +42,7 @@ class RubricAddCriterionPopover extends React.Component {
         <Menu
           placement="bottom"
           trigger={
+            // eslint-disable-next-line jsx-a11y/anchor-is-valid
             <a className="icon-plus" href="#" >{I18n.t("Criterion")}</a>
           }
         >
@@ -58,7 +59,9 @@ class RubricAddCriterionPopover extends React.Component {
             )}
           </MenuItemGroup>
         </Menu>
+        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a href="#" id="add_learning_outcome_link" className="icon-search find_outcome_link outcome">{I18n.t("Find Outcome")}</a>
+        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a href="#" id="add_criterion_link" className="hidden icon-plus add_criterion_link">{I18n.t("New Criterion")}</a>
       </span>
     );

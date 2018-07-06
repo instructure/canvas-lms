@@ -15,8 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 import React from 'react'
+import ReactDOM from 'react-dom'
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!rubrics'
 import TabList, { TabPanel } from '@instructure/ui-tabs/lib/components/TabList'
@@ -28,6 +29,11 @@ export default class RubricManagement extends React.Component {
     accountId: PropTypes.string.isRequired
   }
 
+  focusTab = _.memoize((ix) => () => {
+    // eslint-disable-next-line react/no-find-dom-node
+    ReactDOM.findDOMNode(this.tabList._tabs[ix]).focus()
+  })
+
   render() {
     return (
       <TabList ref={tabList => { this.tabList = tabList }} defaultSelectedIndex={0}>
@@ -35,7 +41,10 @@ export default class RubricManagement extends React.Component {
           <RubricPanel />
         </TabPanel>
         <TabPanel title={I18n.t('Learning Mastery')}>
-          <ProficiencyTable managementView={this} accountId={this.props.accountId} />
+          <ProficiencyTable
+            focusTab={this.focusTab(1)}
+            accountId={this.props.accountId}
+          />
         </TabPanel>
       </TabList>
     )

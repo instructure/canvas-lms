@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
+import _ from 'lodash'
 import $ from 'jquery'
 import React from 'react'
 import axios from 'axios'
@@ -32,7 +32,8 @@ let getSpy
 
 describe('default proficiency', () => {
   beforeEach(() => {
-    getSpy = jest.spyOn(axios,'get').mockImplementation(() => Promise.reject({response: {status: 404}}))
+    const err = _.assign(new Error(), { response: { status: 404 } })
+    getSpy = jest.spyOn(axios,'get').mockImplementation(() => Promise.reject(err))
   })
 
   afterEach(() => {

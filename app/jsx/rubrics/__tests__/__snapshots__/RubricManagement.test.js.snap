@@ -6,7 +6,7 @@ exports[`renders the RubricManagement component 1`] = `
     <RubricPanel />
   </TabPanel>
   <TabPanel title=\\"Learning Mastery\\" id={{...}} variant=\\"simple\\" labelledBy={{...}} selected={false} padding=\\"small\\" tabRef={[Function]}>
-    <ProficiencyTable managementView={{...}} accountId=\\"1\\" />
+    <ProficiencyTable focusTab={[Function]} accountId=\\"1\\" />
   </TabPanel>
 </TabList>"
 `;

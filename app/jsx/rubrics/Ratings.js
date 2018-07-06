@@ -71,12 +71,16 @@ export const Rating = (props) => {
   )
 
   return (
+    // eslint is unhappy here because it's not smart enough to understand that
+    // when this is interact-able (via tabIndex), it will always have a role
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div
       className={classes}
       onClick={assessing ? onClick : null}
       onKeyPress={(e) => e.key === 'Enter' ? onClick() : null}
       role={assessing ? "button" : null}
       style={{ width }}
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
       tabIndex={assessing ? 0 : null}
     >
       {hidePoints ? null : ratingPoints()}
@@ -228,9 +232,11 @@ const Ratings = (props) => {
   const defaultRating = () => (
     <Rating
       key={0}
+      assessing={assessing}
       classes="rating-tier"
       description={I18n.t('No details')}
       footer={footer}
+      isSummary={isSummary}
       points={0}
       hidePoints={isSummary || hidePoints}
     />
