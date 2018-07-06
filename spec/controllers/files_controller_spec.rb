@@ -302,7 +302,7 @@ describe FilesController do
       get 'show', params: {:course_id => @course.id, :id => @file.id, :download => 1, :verifier => @file.uuid, :download_frd => 1}
     end
 
-    it "should remember most recent sf_verifier in session" do
+    it "should remember most recent valid sf_verifier in session" do
       user1 = user_factory(active_all: true)
       file1 = user_file
       verifier1 = Users::AccessVerifier.generate(user: user1)
@@ -339,13 +339,23 @@ describe FilesController do
       expect(session[:permissions_key]).not_to eq permissions_key
     end
 
-    it "should reject invalid sf_verifiers" do
+    it "should ignore invalid sf_verifiers" do
       user = user_factory(active_all: true)
       file = user_file
       verifier = Users::AccessVerifier.generate(user: user)
-      get 'show', params: verifier.merge(id: file.id, sf_verifier: 'invalid')
-      expect(response).to be_redirect
-      expect(response.location).to match('login')
+
+      # first use to establish session
+      get 'show', params: verifier.merge(id: file.id)
+      expect(response).to be_success
+      permissions_key = session[:permissions_key]
+
+      # second use after verifier expiration but before session expiration.
+      # expired verifier should be ignored but session should still be extended
+      Timecop.freeze((Users::AccessVerifier::TTL_MINUTES + 1).minutes.from_now) do
+        get 'show', params: verifier.merge(id: file.id)
+      end
+      expect(response).to be_success
+      expect(session[:permissions_key]).not_to eq permissions_key
     end
 
     it "should set cache headers for non text files" do
