@@ -20,15 +20,15 @@ import sinon from 'sinon'
 import { shallow } from 'enzyme'
 import _ from 'lodash'
 import Rubric from '../Rubric'
-import { rubric, pointsAssessment } from './fixtures'
+import { rubric, assessments } from './fixtures'
 
 describe('the Rubric component', () => {
   it('renders as expected', () => {
     const modal = shallow(
       <Rubric
         rubric={rubric}
-        rubricAssessment={pointsAssessment}
-        rubricAssociation={pointsAssessment.rubric_association}
+        rubricAssessment={assessments.points}
+        rubricAssociation={assessments.points.rubric_association}
       />
     )
     expect(modal.debug()).toMatchSnapshot()
@@ -39,7 +39,7 @@ describe('the Rubric component', () => {
     const modal = shallow(
       <Rubric
         rubric={rubric}
-        rubricAssociation={pointsAssessment.rubric_association}
+        rubricAssociation={assessments.points.rubric_association}
       />
     )
     expect(modal.debug()).toMatchSnapshot()
@@ -47,7 +47,7 @@ describe('the Rubric component', () => {
 
   const setCloned = (object, path, value) => _.setWith(_.clone(object), path, value, _.clone)
   it('hides the score total when needed', () => {
-    const hidden = setCloned(pointsAssessment, 'rubric_association.hide_score_total', true)
+    const hidden = setCloned(assessments.points, 'rubric_association.hide_score_total', true)
     const modal = shallow(
       <Rubric
         rubric={rubric}
@@ -69,15 +69,15 @@ describe('the Rubric component', () => {
         />
       )
 
-    const el = renderAssessing(pointsAssessment)
-    const updated = { ...pointsAssessment.data[0], points: 2 }
+    const el = renderAssessing(assessments.points)
+    const updated = { ...assessments.points.data[0], points: { valid: true, value: 2 } }
     el.find('Criterion').first().prop('onAssessmentChange')(updated)
 
     expect(onAssessmentChange.args).toEqual([
       [{
-        ...pointsAssessment,
-        data: [updated, pointsAssessment.data[1]],
-        score: 2 + pointsAssessment.data[1].points
+        ...assessments.points,
+        data: [updated, assessments.points.data[1]],
+        score: 2 + assessments.points.data[1].points.value
       }]
     ])
 
@@ -89,8 +89,8 @@ describe('the Rubric component', () => {
       const el = shallow(
         <Rubric
           rubric={{...rubric, ...rubricProps}}
-          rubricAssessment={{...pointsAssessment, ...assessmentProps}}
-          rubricAssociation={{...pointsAssessment.association, ...associationProps}}
+          rubricAssessment={{...assessments.points, ...assessmentProps}}
+          rubricAssociation={{...assessments.points.association, ...associationProps}}
           onAssessmentChange={() => {}}
           {...otherProps}
         />
@@ -123,8 +123,12 @@ describe('the Rubric component', () => {
   it('ignores criteria scores when flagged as such', () => {
     const ignoreOutcomeScore = setCloned(rubric, 'criteria.1.ignore_for_scoring', true)
     const onAssessmentChange = sinon.spy()
-    const ignored = { ...pointsAssessment.data[1], points: 2, criterion_id: '_invalid' }
-    const assessment = setCloned(pointsAssessment, 'data.2', ignored)
+    const ignored = {
+      ...assessments.points.data[1],
+      points: { value: 2, valid: true },
+      criterion_id: '_invalid'
+    }
+    const assessment = setCloned(assessments.points, 'data.2', ignored)
     const el = shallow(
       <Rubric
         onAssessmentChange={onAssessmentChange}
@@ -141,7 +145,7 @@ describe('the Rubric component', () => {
       [{
         ...assessment,
         data: [assessment.data[0], updated, ignored],
-        score: assessment.data[0].points
+        score: assessment.data[0].points.value
       }]
     ])
   })

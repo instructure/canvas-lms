@@ -17,6 +17,12 @@
  */
 import PropTypes from 'prop-types'
 
+export const pointShape = {
+  text: PropTypes.string,
+  value: PropTypes.number,
+  valid: PropTypes.boolean
+}
+
 export const tierShape = {
   points: PropTypes.number,
   description: PropTypes.string,
@@ -34,8 +40,7 @@ export const ratingShape = {
 export const assessmentShape = {
   criterion_id: PropTypes.string.isRequired,
   comments: PropTypes.string,
-  points: PropTypes.number,
-  pointText: PropTypes.string,
+  points: PropTypes.shape(pointShape).isRequired,
   focusPoints: PropTypes.number,
   saveCommentsForLater: PropTypes.bool
 }

@@ -63,7 +63,7 @@ const Rubric = (props) => {
     const ignore = (c) => _.isUndefined(c) ? true : c.ignore_for_scoring
     const points = data
       .filter((result) => !ignore(criteriaById[result.criterion_id]))
-      .map((result) => result.points !== null ? result.points : 0)
+      .map((result) => _.get(result, 'points.value', 0))
 
     onAssessmentChange({
       ...rubricAssessment,

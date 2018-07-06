@@ -17,6 +17,7 @@
  */
 import _ from 'lodash'
 import React from 'react'
+import sinon from 'sinon'
 import { shallow } from 'enzyme'
 import Criterion from '../Criterion'
 import { rubrics, assessments } from './fixtures'
@@ -158,6 +159,21 @@ describe('Criterion', () => {
     const criterion = rubrics.points.criteria[1]
     it('are visible by default', () => {
       expect(points({ criterion })).toHaveLength(1)
+    })
+
+    it('can be changed', () => {
+      const onAssessmentChange = sinon.spy()
+      const el = points({ criterion, onAssessmentChange })
+      const onPointChange = el.find('Points').prop('onPointChange')
+
+      onPointChange('10')
+      onPointChange('10.245')
+      onPointChange('blergh')
+      expect(onAssessmentChange.args).toEqual([
+        [{ points: { text: '10', valid: true, value: 10 } }],
+        [{ points: { text: '10.245', valid: true, value: 10.245 } } ],
+        [{ points: { text: 'blergh', valid: false, value: undefined } }],
+      ])
     })
 
     it('are hidden when hidePoints is true', () => {

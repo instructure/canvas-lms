@@ -131,11 +131,10 @@ export default class Criterion extends React.Component {
     const ignoreForScoring = criterion.ignore_for_scoring
     const assessing = onAssessmentChange !== null && assessment !== null
     const updatePoints = (text) => {
-      let points = numberHelper.parse(text)
-      if(Number.isNaN(points)) { points = null }
+      const value = numberHelper.parse(text)
+      const valid = !Number.isNaN(value)
       onAssessmentChange({
-        points,
-        pointsText: text.toString()
+        points: { text, valid, value: valid ? value : undefined }
       })
     }
     const onPointChange = assessing ? updatePoints : undefined
@@ -181,7 +180,7 @@ export default class Criterion extends React.Component {
         footer={isSummary ? pointsFooter() : null}
         tiers={criterion.ratings}
         onPointChange={onPointChange}
-        points={_.get(assessment, 'points')}
+        points={_.get(assessment, 'points.value')}
         pointsPossible={pointsPossible}
         defaultMasteryThreshold={isOutcome ? criterion.mastery_points : criterion.points}
         isSummary={isSummary}

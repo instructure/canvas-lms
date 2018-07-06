@@ -19,8 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Rubric from '../rubrics/Rubric'
-
-import 'rubric_assessment'
+import { fillAssessment } from '../rubrics/helpers'
 
 const findRubric = (id) => {
   if (ENV.rubrics) {
@@ -38,11 +37,12 @@ const findRubricAssessment = (id) => {
 
 const rubricElements = document.querySelectorAll(".react_rubric_container")
 Array.prototype.forEach.call(rubricElements, (rubricElement) => {
+  const rubric = findRubric(rubricElement.dataset.rubricId)
   const assessment = findRubricAssessment(rubricElement.dataset.rubricAssessmentId)
   ReactDOM.render((
     <Rubric
-      rubric={findRubric(rubricElement.dataset.rubricId)}
-      rubricAssessment={assessment}
+      rubric={rubric}
+      rubricAssessment={fillAssessment(rubric, assessment || {})}
       rubricAssociation={assessment.rubric_association}
       customRatings={ENV.outcome_proficiency ? ENV.outcome_proficiency.ratings : []}
     />

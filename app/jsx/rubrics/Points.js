@@ -28,7 +28,8 @@ import { assessmentShape } from './types'
 export const roundIfWhole = (n) => (
   I18n.toNumber(n, { precision: Math.floor(n) === n ? 0 : 1 })
 )
-const pointString = (n) => n !== undefined ? roundIfWhole(n) : '--'
+const pointString = (points) =>
+  _.isNull(points.text) ? roundIfWhole(points.value) : points.text
 
 export const possibleString = (possible) =>
   I18n.t('%{possible} pts', {
@@ -42,14 +43,13 @@ export const scoreString = (points, possible) =>
   })
 
 const invalid = () => [{ text: I18n.t('Invalid score'), type: 'error' }]
-const pointError = (points, pointsText) =>
-  (_.isNil(points) && pointsText) ? invalid() : []
+const pointError = (points) => points.valid ? [] : invalid()
 
 const noExtraCredit = () => [
   { text: I18n.t('Cannot give outcomes extra credit'), type: 'error' }
 ]
 const extraCreditError = (points, possible, allowExtraCredit) =>
-  !allowExtraCredit && (points > possible) ? noExtraCredit() : []
+  !allowExtraCredit && (points.value > possible) ? noExtraCredit() : []
 
 const Points = (props) => {
   const {
@@ -68,7 +68,6 @@ const Points = (props) => {
     )
   } else {
     const points = _.get(assessment, 'points')
-    const pointsText = _.get(assessment, 'pointsText')
     if (!assessing) {
       return (
         <div className="react-rubric-cell graded-points">
@@ -76,7 +75,6 @@ const Points = (props) => {
         </div>
       )
     } else {
-      const usePointsText = pointsText !== null && pointsText !== undefined
       return (
         <div className="react-rubric-cell graded-points">
           <Flex alignItems="end" wrapItems>
@@ -85,11 +83,11 @@ const Points = (props) => {
                 inline
                 label={<ScreenReaderContent>{I18n.t('Points')}</ScreenReaderContent>}
                 messages={[
-                  ...pointError(points, pointsText),
+                  ...pointError(points),
                   ...extraCreditError(points, pointsPossible, allowExtraCredit)
                 ]}
                 onChange={(e) => onPointChange(e.target.value)}
-                value={usePointsText ? pointsText : pointString(points)}
+                value={pointString(points)}
                 width="4rem"
               />
             </FlexItem>

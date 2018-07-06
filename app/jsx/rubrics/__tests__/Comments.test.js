@@ -20,12 +20,12 @@ import React from 'react'
 import { shallow } from 'enzyme'
 import Comments from '../Comments'
 
-import { freeFormAssessment } from './fixtures'
+import { assessments } from './fixtures'
 
 describe('The Comments component', () => {
   const props = {
     assessing: true,
-    assessment: freeFormAssessment.data[1],
+    assessment: assessments.freeForm.data[1],
     savedComments: [
       'I award you no points',
       'May god have mercy on your soul'
