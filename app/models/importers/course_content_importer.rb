@@ -340,6 +340,12 @@ module Importers
         end
       end
 
+      if migration.for_master_course_import?
+        course.restrict_enrollments_to_course_dates = settings['restrict_enrollments_to_course_dates']
+        course.start_at    = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(settings['start_at'])
+        course.conclude_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(settings['conclude_at'])
+      end
+
       settings.slice(*atts.map(&:to_s)).each do |key, val|
         course.send("#{key}=", val)
       end

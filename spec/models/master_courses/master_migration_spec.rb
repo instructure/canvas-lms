@@ -1070,14 +1070,23 @@ describe MasterCourses::MasterMigration do
       @sub = @template.add_child_course!(@copy_to)
 
       @copy_from.tab_configuration = [{"id"=>0}, {"id"=>14}, {"id"=>8}, {"id"=>5}, {"id"=>6}, {"id"=>2}, {"id"=>3, "hidden"=>true}]
+      @copy_from.start_at = 1.month.ago.beginning_of_day
+      @copy_from.conclude_at = 1.month.from_now.beginning_of_day
+      @copy_from.restrict_enrollments_to_course_dates = true
       @copy_from.save!
       run_master_migration(:copy_settings => false) # initial sync with explicit false
       expect(@copy_to.reload.tab_configuration).to_not eq @copy_from.tab_configuration
+      expect(@copy_to.start_at).to be_nil
+      expect(@copy_to.conclude_at).to be_nil
+      expect(@copy_to.restrict_enrollments_to_course_dates).to be_falsy
 
       @copy_to2 = course_factory
       @sub = @template.add_child_course!(@copy_to2)
       run_master_migration # initial sync by default
       expect(@copy_to2.reload.tab_configuration).to eq @copy_from.tab_configuration
+      expect(@copy_to2.start_at).to eq @copy_from.start_at
+      expect(@copy_to2.conclude_at).to eq @copy_from.conclude_at
+      expect(@copy_to2.restrict_enrollments_to_course_dates).to be_truthy
 
       @copy_from.update_attribute(:is_public, true)
       run_master_migration # selective without settings
@@ -1085,6 +1094,9 @@ describe MasterCourses::MasterMigration do
 
       run_master_migration(:copy_settings => true) # selective with settings
       expect(@copy_to.reload.is_public).to be_truthy
+      expect(@copy_to.start_at).to eq @copy_from.start_at
+      expect(@copy_to.conclude_at).to eq @copy_from.conclude_at
+      expect(@copy_to.restrict_enrollments_to_course_dates).to be_truthy
     end
 
     it "should copy front wiki pages" do

@@ -404,6 +404,7 @@ describe ContentMigration do
       #set all the possible values to non-default values
       @copy_from.start_at = 5.minutes.ago
       @copy_from.conclude_at = 1.month.from_now
+      @copy_from.restrict_enrollments_to_course_dates = true
       @copy_from.is_public = false
       @copy_from.name = "haha copy from test &amp;"
       @copy_from.course_code = 'something funny'
@@ -444,6 +445,7 @@ describe ContentMigration do
       #compare settings
       expect(@copy_to.conclude_at).to eq nil
       expect(@copy_to.start_at).to eq nil
+      expect(@copy_to.restrict_enrollments_to_course_dates).to eq nil
       expect(@copy_to.storage_quota).to eq 444
       expect(@copy_to.hide_final_grades).to eq true
       expect(@copy_to.grading_standard_enabled).to eq true
