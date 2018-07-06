@@ -66,12 +66,12 @@ class ObserverAlert < ActiveRecord::Base
       missing.
       merge(Assignment.submittable).
       where('cached_due_date > ?', 1.day.ago).
-      where("observer_alerts.id IS NULL").
-      where("observer_alert_thresholds.alert_type = 'assignment_missing'")
+      where("observer_alerts.id IS NULL")
 
     alerts = []
     submissions.find_each do |submission|
-      thresholds = submission.user.as_student_observer_alert_thresholds
+      thresholds = submission.user.as_student_observer_alert_thresholds.
+        where(alert_type: 'assignment_missing')
       thresholds.find_each do |threshold|
         next unless threshold.users_are_still_linked?
 

@@ -204,7 +204,9 @@ describe ObserverAlert do
     end
 
     it 'creates an assignment_missing_alert' do
-      alert = ObserverAlert.active.where(student: @student1, alert_type: 'assignment_missing').first
+      alerts = ObserverAlert.active.where(student: @student1, alert_type: 'assignment_missing')
+      expect(alerts.count).to eq 1
+      alert = alerts.first
       expect(alert.alert_type).to eq 'assignment_missing'
       expect(alert.context.user).to eq @student1
       expect(alert.title).to include('Assignment missing:')
