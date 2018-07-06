@@ -2094,9 +2094,10 @@ describe AssignmentsApiController, type: :request do
             :course_id => @course.id.to_s,
             :id => assignment.to_param
           },
-          { :assignment => {
-            'published' => true,
-            'assignment_overrides' => {
+          {
+            :assignment => {
+              'published' => true,
+              'assignment_overrides' => {
               '0' => {
                 'course_section_id' => section2.id,
                 'due_at' => 1.day.from_now.iso8601
@@ -2106,6 +2107,35 @@ describe AssignmentsApiController, type: :request do
           })
         expect(@student.messages).to be_empty
         expect(student2.messages.detect{|m| m.notification_id == @notification.id}).to be_present
+      end
+
+      it "should update only_visible_to_overrides to false if updating overall date" do
+        assignment = @course.assignments.create!(:name => "blah", :workflow_state => 'unpublished',
+                                                 :only_visible_to_overrides => true)
+        section2 = @course.course_sections.create!
+
+        @user = @teacher
+        json = api_call(:put,
+          "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+          {
+            :controller => 'assignments_api',
+            :action => 'update', :format => 'json',
+            :course_id => @course.id.to_s,
+            :id => assignment.to_param
+          },
+          {
+            :assignment => {
+              'published' => true,
+              'due_at' => 1.day.from_now.iso8601,
+              'assignment_overrides' => {
+                '0' => {
+                  'course_section_id' => section2.id,
+                  'due_at' => 1.day.from_now.iso8601
+                }
+              }
+            }
+            })
+        expect(json["only_visible_to_overrides"]).to be false
       end
     end
 

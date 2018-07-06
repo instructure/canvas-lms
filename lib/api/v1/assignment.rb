@@ -471,6 +471,12 @@ module Api::V1::Assignment
   def update_api_assignment(assignment, assignment_params, user, context = assignment.context)
     return :forbidden unless grading_periods_allow_submittable_update?(assignment, assignment_params)
 
+    # Trying to change the "everyone" due date when the assignment is restricted to a specific section
+    # creates an "everyone else" section
+    if !(assignment_params["due_at"]).nil? && assignment["only_visible_to_overrides"]
+      assignment["only_visible_to_overrides"] = false
+    end
+
     prepared_update = prepare_assignment_create_or_update(assignment, assignment_params, user, context)
     return false unless prepared_update[:valid]
 
