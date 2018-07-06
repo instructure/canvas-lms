@@ -49,7 +49,6 @@ describe "Individual View Gradebook" do
       )
 
       # give a grade as non-final grader
-      @student1_submission = @moderated_assignment.submit_homework(@student1, body: 'student 1 submission moderated assignment')
       @student1_submission = @moderated_assignment.grade_student(@student1, grade: 13, grader: @teacher2, provisional: true).first
     end
 

@@ -45,10 +45,7 @@ describe 'Original Gradebook' do
         anonymous_grading: true
       )
 
-      # submit homework and give a grade
-      @student1_submission = @anonymous_assignment.submit_homework(@student1, body: 'student 1 submission moderated assignment')
       @student1_submission = @anonymous_assignment.grade_student(@student1, grade: 13, grader: @teacher1)
-
       user_session(@teacher1)
     end
 
