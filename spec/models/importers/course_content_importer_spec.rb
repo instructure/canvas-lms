@@ -202,33 +202,44 @@ describe Course do
       expect(file.folder.full_name).to eq("course files/Course Content/Orientation/WebCT specific and old stuff")
     end
 
-    def setup_import(import_course, filename, params, copy_options={})
-      json = File.open(File.join(IMPORT_JSON_DIR, filename)).read
-      data = JSON.parse(json).with_indifferent_access
-
+    def build_migration(import_course, params, copy_options={})
       migration = ContentMigration.create!(:context => import_course)
       migration.migration_settings[:migration_ids_to_import] = params
       migration.migration_settings[:copy_options] = copy_options
       migration.save!
+      migration
+    end
 
-      Importers::CourseContentImporter.import_content(import_course, data, params, migration)
+    def setup_import(import_course, filename, migration)
+      json = File.open(File.join(IMPORT_JSON_DIR, filename)).read
+      data = JSON.parse(json).with_indifferent_access
+      Importers::CourseContentImporter.import_content(
+        import_course,
+        data,
+        migration.migration_settings[:migration_ids_to_import],
+        migration
+      )
     end
 
     it "should not duplicate assessment questions in question banks" do
       params = {:copy => {"everything" => true}}
-      setup_import(@course, 'assessments.json', params)
+      migration = build_migration(@course, params)
+      setup_import(@course, 'assessments.json', migration)
 
       aqb1 = @course.assessment_question_banks.where(migration_id: "i05dab0b3d55dae214bd0c4787bd6d20f").first
       expect(aqb1.assessment_questions.count).to eq 3
       aqb2 = @course.assessment_question_banks.where(migration_id: "iaac763df0de1199ef143b2ab8f237e76").first
       expect(aqb2.assessment_questions.count).to eq 2
+      expect(migration.workflow_state).to eq('imported')
     end
 
     it "should not create assessment question banks if they are not selected" do
       params = {"copy" => {"assessment_question_banks" => {"i05dab0b3d55dae214bd0c4787bd6d20f" => true},
                            "quizzes" => {"i7ed12d5eade40d9ee8ecb5300b8e02b2" => true,
                                          "ife86eb19e30869506ee219b17a6a1d4e" => true}}}
-      setup_import(@course, 'assessments.json', params)
+
+      migration = build_migration(@course, params)
+      setup_import(@course, 'assessments.json', migration)
 
       expect(@course.assessment_question_banks.count).to eq 1
       aqb1 = @course.assessment_question_banks.where(migration_id: "i05dab0b3d55dae214bd0c4787bd6d20f").first
@@ -241,24 +252,29 @@ describe Course do
 
       quiz2 = @course.quizzes.where(migration_id: "ife86eb19e30869506ee219b17a6a1d4e").first
       quiz2.quiz_questions.each{|qq| expect(qq.assessment_question).to be_nil } # since the bank wasn't brought in
+      expect(migration.workflow_state).to eq('imported')
     end
 
     it "should lock announcements if 'lock_all_annoucements' setting is true" do
       @course.update_attribute(:lock_all_announcements, true)
       params = {"copy" => {"announcements" => {"4488523052421" => true}}}
-      setup_import(@course, 'announcements.json', params, all_course_settings: true)
+      migration = build_migration(@course, params, all_course_settings: true)
+      setup_import(@course, 'announcements.json', migration)
 
       ann = @course.announcements.first
       expect(ann).to be_locked
+      expect(migration.workflow_state).to eq('imported')
     end
 
     it "should not lock announcements if 'lock_all_annoucements' setting is false" do
       @course.update_attribute(:lock_all_announcements, false)
       params = {"copy" => {"announcements" => {"4488523052421" => true}}}
-      setup_import(@course, 'announcements.json', params, all_course_settings: true)
+      migration = build_migration(@course, params, all_course_settings: true)
+      setup_import(@course, 'announcements.json', migration)
 
       ann = @course.announcements.first
       expect(ann).to_not be_locked
+      expect(migration.workflow_state).to eq('imported')
     end
 
     it "runs DueDateCacher only twice" do
@@ -269,7 +285,25 @@ describe Course do
       expect(due_date_cacher).to receive(:recompute).twice
 
       params = {:copy => {"everything" => true}}
-      setup_import(@course, 'assessments.json', params)
+      migration = build_migration(@course, params)
+      setup_import(@course, 'assessments.json', migration)
+      expect(migration.workflow_state).to eq('imported')
+    end
+
+    context "when it is a Quizzes.Next migration" do
+      let(:migration) do
+        params = {:copy => {"everything" => true}}
+        build_migration(@course, params)
+      end
+
+      before do
+        allow(migration).to receive(:quizzes_next_migration?).and_return(true)
+      end
+
+      it "shouldn't set workflow_state to imported" do
+        setup_import(@course, 'assessments.json', migration)
+        expect(migration.workflow_state).not_to eq('imported')
+      end
     end
   end
 
