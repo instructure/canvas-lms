@@ -277,7 +277,7 @@ module Importers
       imported_asset_hash = {}
       migration.imported_migration_items_hash.each{|k, assets| imported_asset_hash[k] = assets.values.map(&:id).join(',') if assets.present?}
       migration.migration_settings[:imported_assets] = imported_asset_hash
-      migration.workflow_state = :imported
+      migration.workflow_state = :imported unless post_processing?(migration)
       migration.save
       ActiveRecord::Base.skip_touch_context(false)
       if course.changed?
@@ -290,6 +290,10 @@ module Importers
 
       Auditors::Course.record_copied(migration.source_course, course, migration.user, source: migration.initiated_source)
       migration.imported_migration_items
+    end
+
+    def self.post_processing?(migration)
+      migration.quizzes_next_migration?
     end
 
     def self.import_syllabus_from_migration(course, syllabus_body, migration)
