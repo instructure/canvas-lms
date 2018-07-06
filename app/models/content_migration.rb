@@ -363,6 +363,7 @@ class ContentMigration < ActiveRecord::Base
   alias_method :export_content, :queue_migration
 
   def blocked_by_current_migration?(plugin, retry_count, expires_at)
+    return false if self.migration_type == "zip_file_importer"
     running_cutoff = Setting.get('content_migration_job_block_hours', '4').to_i.hours.ago # at some point just let the jobs keep going
 
     if self.context && self.context.content_migrations.
