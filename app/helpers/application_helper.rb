@@ -271,6 +271,17 @@ module ApplicationHelper
     BrandableCSS.brand_variable_value(variable_name, active_brand_config)
   end
 
+  # returns the proper alt text for the logo
+  def alt_text_for_login_logo
+    possibly_customized_login_logo = brand_variable('ic-brand-Login-logo')
+    default_login_logo = BrandableCSS.brand_variable_value('ic-brand-Login-logo')
+    if possibly_customized_login_logo == default_login_logo
+      I18n.t("Canvas by Instructure")
+    else
+      @domain_root_account.short_name
+    end
+  end
+
   def favicon
     possibly_customized_favicon = brand_variable('ic-brand-favicon')
     default_favicon = BrandableCSS.brand_variable_value('ic-brand-favicon')

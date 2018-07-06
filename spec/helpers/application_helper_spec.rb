@@ -1083,4 +1083,20 @@ describe ApplicationHelper do
       end
     end
   end
+
+  describe "#alt_text_for_login_logo" do
+    before :each do
+      @domain_root_account = Account.default
+    end
+
+    it "returns the default value when there is no custom login logo" do
+      allow(helper).to receive(:k12?).and_return(false)
+      expect(helper.send(:alt_text_for_login_logo)).to eql "Canvas by Instructure"
+    end
+
+    it "returns the account short name when the logo is custom" do
+      Account.default.create_brand_config!(variables: {"ic-brand-Login-logo" => "test.jpg"})
+      expect(alt_text_for_login_logo).to eql "Default Account"
+    end
+  end
 end
