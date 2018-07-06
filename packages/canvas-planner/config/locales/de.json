@@ -8,14 +8,23 @@
   "all_items_loaded_aa256183": {
     "message": "Alle Elemente geladen"
   },
+  "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
+    "message": "Beim Versuch, die Gelegenheit auszulassen, ist ein Fehler aufgetreten"
+  },
+  "announcement_fb4cb645": {
+    "message": "Ankündigung"
+  },
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "Möchten Sie diesen Plan wirklich löschen?"
+  },
+  "assignment_976578a8": {
+    "message": "Aufgabe"
   },
   "assignmenttype_title_6612d008": {
     "message": "{ assignmentType } { title }."
   },
   "assignmenttype_title_at_datetime_478f0709": {
-    "message": "{ assignmentType } { title }, am { datetime }."
+    "message": "{ assignmentType } { title }, um { datetime }."
   },
   "assignmenttype_title_due_datetime_a112d8ff": {
     "message": "{ assignmentType } { title } fällig am { datetime }"
@@ -31,6 +40,9 @@
   },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Beginn Ihrer Aufgabenhistorie"
+  },
+  "calendar_event_89aadc1c": {
+    "message": "Kalenderereignis"
   },
   "canvas_planner_98ed106": {
     "message": "Canvas-Plan"
@@ -70,6 +82,12 @@
   },
   "details_98a31b68": {
     "message": "Details"
+  },
+  "discussion_6719c51d": {
+    "message": "Diskussion"
+  },
+  "dismiss_itemtitle_a9fae1b3": {
+    "message": "{ itemTitle } verwerfen"
   },
   "dismiss_opportunityname_5995176f": {
     "message": "{ opportunityName } verwerfen"
@@ -185,11 +203,20 @@
   "nothing_planned_yet_8675ffe9": {
     "message": "Noch nichts geplant"
   },
+  "number_more_59a297e8": {
+    "message": "{ number } mehr ..."
+  },
+  "numpoints_points_8621a43b": {
+    "message": "{ numPoints } Punkte"
+  },
   "only_most_recent_grading_period_shown_f1ad6458": {
     "message": "* Nur der letzte Benotungszeitraum wird angezeigt."
   },
   "optional_add_course_ef0d70fc": {
     "message": "Optional: Kurs hinzufügen"
+  },
+  "page_50c4823d": {
+    "message": "Seite"
   },
   "points_bceb5005": {
     "message": "Punkte"
@@ -202,6 +229,9 @@
   },
   "pts_699bd9aa": {
     "message": "Pkte."
+  },
+  "quiz_e0dcce8f": {
+    "message": "Quiz"
   },
   "replies_4a8577c8": {
     "message": "Antworten"
@@ -238,6 +268,9 @@
   },
   "to_do_1d554f36": {
     "message": "Zu erledigen"
+  },
+  "to_do_items_loading_d1cdfcd5": {
+    "message": "Zu erledigende Aufgaben werden geladen"
   },
   "today_76e10f9c": {
     "message": "Heute"

@@ -8,8 +8,17 @@
   "all_items_loaded_aa256183": {
     "message": "Tutti gli elementi caricati"
   },
+  "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
+    "message": "Si è verificato un errore durante il tentativo di eliminare l''opportunità."
+  },
+  "announcement_fb4cb645": {
+    "message": "Annuncio"
+  },
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "Vuoi eliminare questo elemento dell''agenda?"
+  },
+  "assignment_976578a8": {
+    "message": "Compito"
   },
   "assignmenttype_title_6612d008": {
     "message": "{ assignmentType } { title }."
@@ -31,6 +40,9 @@
   },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Inizio della cronologia delle cose da fare"
+  },
+  "calendar_event_89aadc1c": {
+    "message": "Evento del calendario"
   },
   "canvas_planner_98ed106": {
     "message": "Canvas Planner"
@@ -70,6 +82,12 @@
   },
   "details_98a31b68": {
     "message": "Dettagli"
+  },
+  "discussion_6719c51d": {
+    "message": "Discussione"
+  },
+  "dismiss_itemtitle_a9fae1b3": {
+    "message": "Ignora { itemTitle }"
   },
   "dismiss_opportunityname_5995176f": {
     "message": "Ignora { opportunityName }"
@@ -185,11 +203,20 @@
   "nothing_planned_yet_8675ffe9": {
     "message": "Ancora nulla programmato"
   },
+  "number_more_59a297e8": {
+    "message": "Altri { number }..."
+  },
+  "numpoints_points_8621a43b": {
+    "message": "{ numPoints } punti"
+  },
   "only_most_recent_grading_period_shown_f1ad6458": {
     "message": "*Viene mostrato solo il periodo di valutazione più recente."
   },
   "optional_add_course_ef0d70fc": {
     "message": "Facoltativo: Aggiungi corso"
+  },
+  "page_50c4823d": {
+    "message": "Pagina"
   },
   "points_bceb5005": {
     "message": "punti"
@@ -202,6 +229,9 @@
   },
   "pts_699bd9aa": {
     "message": "pt"
+  },
+  "quiz_e0dcce8f": {
+    "message": "Quiz"
   },
   "replies_4a8577c8": {
     "message": "Risposte"
@@ -238,6 +268,9 @@
   },
   "to_do_1d554f36": {
     "message": "Elenco attività"
+  },
+  "to_do_items_loading_d1cdfcd5": {
+    "message": "Caricamento elementi elenco attività"
   },
   "today_76e10f9c": {
     "message": "Oggi"

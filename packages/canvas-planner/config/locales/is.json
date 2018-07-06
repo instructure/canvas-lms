@@ -8,8 +8,17 @@
   "all_items_loaded_aa256183": {
     "message": "Öllum atriðum hefur verið hlaðið"
   },
+  "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
+    "message": "Villa kom upp við að reyna að hafna tækifærinu."
+  },
+  "announcement_fb4cb645": {
+    "message": "Tilkynning"
+  },
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "Ertu viss um að þú viljir eyða þessu skipulagi?"
+  },
+  "assignment_976578a8": {
+    "message": "Verkefni"
   },
   "assignmenttype_title_6612d008": {
     "message": "{ assignmentType } { title }."
@@ -31,6 +40,9 @@
   },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Upphaf verkefnasögu þinnar"
+  },
+  "calendar_event_89aadc1c": {
+    "message": "Dagatalsviðburður"
   },
   "canvas_planner_98ed106": {
     "message": "Canvas-skipuleggjari"
@@ -70,6 +82,12 @@
   },
   "details_98a31b68": {
     "message": "Upplýsingar"
+  },
+  "discussion_6719c51d": {
+    "message": "Umræða"
+  },
+  "dismiss_itemtitle_a9fae1b3": {
+    "message": "Hafna { itemTitle }"
   },
   "dismiss_opportunityname_5995176f": {
     "message": "Hafna { opportunityName }"
@@ -185,11 +203,20 @@
   "nothing_planned_yet_8675ffe9": {
     "message": "Ekkert tímasett enn"
   },
+  "number_more_59a297e8": {
+    "message": "{ number } Meira..."
+  },
+  "numpoints_points_8621a43b": {
+    "message": "{ numPoints } punktar"
+  },
   "only_most_recent_grading_period_shown_f1ad6458": {
     "message": "*Aðeins nýjasta einkunnatímabil sýnt."
   },
   "optional_add_course_ef0d70fc": {
     "message": "Valkvætt: Bæta við námskeiði"
+  },
+  "page_50c4823d": {
+    "message": "Síða"
   },
   "points_bceb5005": {
     "message": "punktar"
@@ -202,6 +229,9 @@
   },
   "pts_699bd9aa": {
     "message": "Punktar"
+  },
+  "quiz_e0dcce8f": {
+    "message": "Próf"
   },
   "replies_4a8577c8": {
     "message": "Svör"
@@ -238,6 +268,9 @@
   },
   "to_do_1d554f36": {
     "message": "Verkefni"
+  },
+  "to_do_items_loading_d1cdfcd5": {
+    "message": "Hleð inn verkefnalista"
   },
   "today_76e10f9c": {
     "message": "Í dag"

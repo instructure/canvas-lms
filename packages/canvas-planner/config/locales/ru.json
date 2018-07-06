@@ -8,8 +8,17 @@
   "all_items_loaded_aa256183": {
     "message": "Все элементы загружены"
   },
+  "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
+    "message": "Произошла ошибка при попытке отклонить эту возможность."
+  },
+  "announcement_fb4cb645": {
+    "message": "Объявление"
+  },
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "Вы уверены, что хотите удалить этот элемент планировщика?"
+  },
+  "assignment_976578a8": {
+    "message": "Задание"
   },
   "assignmenttype_title_6612d008": {
     "message": "{ assignmentType } { title }."
@@ -31,6 +40,9 @@
   },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Начало вашей истории задач"
+  },
+  "calendar_event_89aadc1c": {
+    "message": "Событие календаря"
   },
   "canvas_planner_98ed106": {
     "message": "Планировщик Canvas"
@@ -70,6 +82,12 @@
   },
   "details_98a31b68": {
     "message": "Подробные сведения"
+  },
+  "discussion_6719c51d": {
+    "message": "Обсуждение"
+  },
+  "dismiss_itemtitle_a9fae1b3": {
+    "message": "Исключить { itemTitle }"
   },
   "dismiss_opportunityname_5995176f": {
     "message": "Исключить { opportunityName }"
@@ -185,11 +203,20 @@
   "nothing_planned_yet_8675ffe9": {
     "message": "Пока ничего не запланировано"
   },
+  "number_more_59a297e8": {
+    "message": "{ number } Больше..."
+  },
+  "numpoints_points_8621a43b": {
+    "message": "{ numPoints } баллов"
+  },
   "only_most_recent_grading_period_shown_f1ad6458": {
     "message": "*Показан только самый последний академический период."
   },
   "optional_add_course_ef0d70fc": {
     "message": "Опционально: Добавить курс"
+  },
+  "page_50c4823d": {
+    "message": "Страница"
   },
   "points_bceb5005": {
     "message": "баллы"
@@ -202,6 +229,9 @@
   },
   "pts_699bd9aa": {
     "message": "баллы"
+  },
+  "quiz_e0dcce8f": {
+    "message": "Тест"
   },
   "replies_4a8577c8": {
     "message": "Ответы"
@@ -238,6 +268,9 @@
   },
   "to_do_1d554f36": {
     "message": "Задачи"
+  },
+  "to_do_items_loading_d1cdfcd5": {
+    "message": "Для выполнения загрузки позиций"
   },
   "today_76e10f9c": {
     "message": "Сегодня"

@@ -8,8 +8,17 @@
   "all_items_loaded_aa256183": {
     "message": "すべてのアイテムがロードされました"
   },
+  "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
+    "message": "案件を却下しようとした際にエラーが発生しました。"
+  },
+  "announcement_fb4cb645": {
+    "message": "発表"
+  },
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "この計画項目をほんとうに削除しますか？"
+  },
+  "assignment_976578a8": {
+    "message": "課題"
   },
   "assignmenttype_title_6612d008": {
     "message": "{ assignmentType } { title }。"
@@ -31,6 +40,9 @@
   },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "あなたのタスク履歴の始まり"
+  },
+  "calendar_event_89aadc1c": {
+    "message": "予定表のイベント"
   },
   "canvas_planner_98ed106": {
     "message": "Canvas プランナー"
@@ -70,6 +82,12 @@
   },
   "details_98a31b68": {
     "message": "詳細"
+  },
+  "discussion_6719c51d": {
+    "message": "ディスカッション"
+  },
+  "dismiss_itemtitle_a9fae1b3": {
+    "message": "{ itemTitle }を却下する"
   },
   "dismiss_opportunityname_5995176f": {
     "message": "{ opportunityName }を却下する"
@@ -185,11 +203,20 @@
   "nothing_planned_yet_8675ffe9": {
     "message": "まだ計画はありません"
   },
+  "number_more_59a297e8": {
+    "message": "{ number } さらに..."
+  },
+  "numpoints_points_8621a43b": {
+    "message": "{ numPoints } 点"
+  },
   "only_most_recent_grading_period_shown_f1ad6458": {
     "message": "*最新の採点期間のみが表示されます。"
   },
   "optional_add_course_ef0d70fc": {
     "message": "オプション：コースの追加"
+  },
+  "page_50c4823d": {
+    "message": "ページ"
   },
   "points_bceb5005": {
     "message": "ポイント"
@@ -202,6 +229,9 @@
   },
   "pts_699bd9aa": {
     "message": "ポイント"
+  },
+  "quiz_e0dcce8f": {
+    "message": "クイズ"
   },
   "replies_4a8577c8": {
     "message": "返信"
@@ -238,6 +268,9 @@
   },
   "to_do_1d554f36": {
     "message": "タスク"
+  },
+  "to_do_items_loading_d1cdfcd5": {
+    "message": "タスクの読み込み"
   },
   "today_76e10f9c": {
     "message": "今日"
