@@ -1,13 +1,13 @@
 <div class="group-user-name ellipsis">
   <i class="icon-drag-handle" aria-hidden="true"></i>
   {{name}}
-  {{#if is_inactive}}
-    <span style="margin-left:0.5em" class="label"
-          title="{{#t}}This user is currently not able to access the course{{/t}}">
-      {{#t}}inactive{{/t}}
-    </span>
-  {{/if}}
 </div>
+{{#if is_inactive}}
+  <span style="margin-left:0.5em" class="label"
+        title="{{#t}}This user is currently not able to access the course{{/t}}">
+    {{#t}}inactive{{/t}}
+  </span>
+{{/if}}
 {{#if isLeader}}<i class="icon-user group-leader"
   aria-label="{{#t 'group_leader'}}Group Leader{{/t}}"
   title="{{#t 'group_leader'}}Group Leader{{/t}}"></i>{{/if}}
