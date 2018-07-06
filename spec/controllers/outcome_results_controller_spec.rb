@@ -140,5 +140,16 @@ describe OutcomeResultsController do
                       format: "json"
       expect(response).to be_successful
     end
+
+    it 'should validate aggregate_stat parameter' do
+      user_session(@teacher)
+      get 'rollups', params: {:context_id => @course.id,
+                      :course_id => @course.id,
+                      :context_type => "Course",
+                      aggregate: 'course',
+                      aggregate_stat: 'powerlaw'},
+                      format: "json"
+      expect(response).not_to be_success
+    end
   end
 end

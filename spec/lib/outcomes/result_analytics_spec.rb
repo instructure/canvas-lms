@@ -251,23 +251,40 @@ describe Outcomes::ResultAnalytics do
     before do
       allow_any_instance_of(ActiveRecord::Associations::Preloader).to receive(:preload)
     end
-    it 'returns one rollup with the rollup averages' do
-      fake_context = MockUser.new(42, 'fake')
-      results = [
-        outcome_from_score(0.0, {}),
-        outcome_from_score(1.0, {}),
-        outcome_from_score(5.0, {id: 81}),
-        outcome_from_score(2.0, {user: MockUser[20, 'b']}),
-        outcome_from_score(6.0, {id: 81, user: MockUser[20, 'b']}),
-        outcome_from_score(3.0, {user: MockUser[30, 'c']}),
-        outcome_from_score(4.0, {user: MockUser[40, 'd']}),
-        outcome_from_score(7.0, {id: 81, user: MockUser[40, 'd']})
-      ]
-      aggregate_result = ra.aggregate_outcome_results_rollup(results, fake_context)
-      expect(aggregate_result.size).to eq 2
-      expect(aggregate_result.scores.map(&:score)).to eq [2.5, 6.0]
-      expect(aggregate_result.scores[0].outcome_results.size).to eq 4
-      expect(aggregate_result.scores[1].outcome_results.size).to eq 3
+
+    context 'with results' do
+      let(:results) do
+        [
+          # the next two scores for the same user and outcome get combined into an
+          # overall score of 1.0 using the "highest" calculation method
+          outcome_from_score(0.0, {}),
+          outcome_from_score(1.0, {}),
+          outcome_from_score(5.0, {id: 81}),
+          outcome_from_score(2.0, {user: MockUser[20, 'b']}),
+          outcome_from_score(6.0, {id: 81, user: MockUser[20, 'b']}),
+          outcome_from_score(3.0, {user: MockUser[30, 'c']}),
+          outcome_from_score(40.0, {user: MockUser[40, 'd']}),
+          outcome_from_score(70.0, {id: 81, user: MockUser[40, 'd']})
+        ]
+      end
+
+      it 'returns one rollup with the rollup averages' do
+        fake_context = MockUser.new(42, 'fake')
+        aggregate_result = ra.aggregate_outcome_results_rollup(results, fake_context)
+        expect(aggregate_result.size).to eq 2
+        expect(aggregate_result.scores.map(&:score)).to eq [11.5, 27.0]
+        expect(aggregate_result.scores[0].outcome_results.size).to eq 4
+        expect(aggregate_result.scores[1].outcome_results.size).to eq 3
+      end
+
+      it 'returns one rollup with the rollup medians' do
+        fake_context = MockUser.new(42, 'fake')
+        aggregate_result = ra.aggregate_outcome_results_rollup(results, fake_context, 'median')
+        expect(aggregate_result.size).to eq 2
+        expect(aggregate_result.scores.map(&:score)).to eq [2.5, 6]
+        expect(aggregate_result.scores[0].outcome_results.size).to eq 4
+        expect(aggregate_result.scores[1].outcome_results.size).to eq 3
+      end
     end
 
     it "properly calculates a mix of assignment and quiz results" do

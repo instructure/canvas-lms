@@ -73,14 +73,13 @@ module Outcomes
       add_missing_user_rollups(rollups, users)
     end
 
-
     # Public: Calculates an average rollup for the specified results
     #
     # results - An Enumeration of properly sorted LearningOutcomeResult objects.
     # context - The context to use for the resulting rollup.
     #
     # Returns a Rollup.
-    def aggregate_outcome_results_rollup(results, context)
+    def aggregate_outcome_results_rollup(results, context, stat = 'mean')
       rollups = outcome_results_rollups(results)
       rollup_scores = rollups.map(&:scores).flatten
       outcome_results = rollup_scores.group_by(&:outcome).values
@@ -88,7 +87,7 @@ module Outcomes
         scores.map{|score| Result.new(score.outcome, score.score, score.count, score.hide_points)}
       end
       aggregate_rollups = aggregate_results.map do |result|
-        RollupScore.new(result,{aggregate_score: true})
+        RollupScore.new(result, {aggregate_score: true, aggregate_stat: stat})
       end
       Rollup.new(context, aggregate_rollups)
     end

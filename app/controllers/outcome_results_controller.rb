@@ -192,6 +192,7 @@ class OutcomeResultsController < ApplicationController
   before_action :require_context
   before_action :require_outcome_context
   before_action :verify_aggregate_parameter, only: :rollups
+  before_action :verify_aggregate_stat_parameter, only: :rollups
   before_action :verify_include_parameter
   before_action :require_outcomes
   before_action :require_users
@@ -247,7 +248,12 @@ class OutcomeResultsController < ApplicationController
   # @argument aggregate [String, "course"]
   #   If specified, instead of returning one rollup for each user, all the user
   #   rollups will be combined into one rollup for the course that will contain
-  #   the average rollup score for each outcome.
+  #   the average (or median, see below) rollup score for each outcome.
+  #
+  # @argument aggregate_stat [String, "mean"|"median"]
+  #   If aggregate rollups requested, then this value determines what
+  #   statistic is used for the aggregate. Defaults to "mean" if this value
+  #   is not specified.
   #
   # @argument user_ids[] [Integer]
   #   If specified, only the users whose ids are given will be included in the
@@ -326,9 +332,9 @@ class OutcomeResultsController < ApplicationController
 
   def aggregate_rollups_json
     # calculating averages for all users in the context and only returning one
-    # rollup, so don't paginate users in ths method.
+    # rollup, so don't paginate users in this method.
     @results = find_outcome_results(users: @users, context: @context, outcomes: @outcomes)
-    aggregate_rollups = [aggregate_outcome_results_rollup(@results, @context)]
+    aggregate_rollups = [aggregate_outcome_results_rollup(@results, @context, params[:aggregate_stat])]
     json = aggregate_outcome_results_rollups_json(aggregate_rollups)
     # no pagination, so no meta field
     json
@@ -401,6 +407,12 @@ class OutcomeResultsController < ApplicationController
   def verify_aggregate_parameter
     aggregate = params[:aggregate]
     reject! "invalid aggregate parameter value" if aggregate && !%w(course).include?(aggregate)
+    true
+  end
+
+  def verify_aggregate_stat_parameter
+    aggregate_stat = params[:aggregate_stat]
+    reject! "invalid aggregate_stat parameter value" if aggregate_stat && !%w(mean median).include?(aggregate_stat)
     true
   end
 
