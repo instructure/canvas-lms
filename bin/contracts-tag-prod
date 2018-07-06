@@ -1,0 +1,31 @@
+#!/bin/bash 
+
+scriptname=$0
+
+if [ -z "$1" ]; then
+  echo Usage: $scriptname version
+  exit
+else
+  version=$1
+fi
+
+echo "This will tag your specified version of the Generic Consumer pact file on"
+echo "inst-pact-broker.inseng.net as the 'prod' version. This tag will signal"
+echo "the canvas__contract-tests CI build to use your pact file version to"
+echo "test every new Canvas patchset."
+echo
+echo "Are you sure? (yes/no)"
+read confirm
+
+if [ $confirm != "yes" ]; then
+  echo Aborting.
+  exit
+fi
+
+set -e
+
+bundle exec pact-broker create-version-tag \
+  -a "Generic Consumer" \
+  -b https://inst-pact-broker.inseng.net \
+  -e $version \
+  -t prod
