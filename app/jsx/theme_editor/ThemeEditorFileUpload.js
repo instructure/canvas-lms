@@ -137,7 +137,7 @@ export default class ThemeEditorFileUpload extends Component {
             value={this.props.userInput.val === '' ? '' : this.props.currentValue}
           />
           <label className="ThemeEditorFileUpload__file-chooser">
-            <div className="screenreader-only">{this.props.label}</div>
+            <span className="screenreader-only">{this.props.label}</span>
             <input
               type="file"
               name={this.props.userInput.val && this.props.name}
@@ -147,7 +147,6 @@ export default class ThemeEditorFileUpload extends Component {
             />
             <div
               className="ThemeEditorFileUpload__fake-input uneditable-input ic-Input"
-              aria-hidden="true"
             >
               {this.displayValue()}
             </div>
