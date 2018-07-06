@@ -26,7 +26,7 @@ PactConfig::Consumers::ALL.each do |consumer|
     # Assignment ID: 1
     provider_state 'a student in a course with an assignment' do
       set_up do
-        course = Pact::Canvas:base_state.course
+        course = Pact::Canvas.base_state.course
         Assignment.create!(context: course, title: "Assignment1")
       end
     end

@@ -21,7 +21,7 @@ require_relative '../pact_helper'
 describe 'Courses', :pact do
   subject(:courses_api) { Helper::ApiClient::Courses.new }
 
-  it 'List Courses' do
+  it 'should List Courses' do
     canvas_lms_api.given('a student enrolled in a course').
       upon_receiving('List Courses').
       with(
@@ -72,7 +72,7 @@ describe 'Courses', :pact do
     expect(response[0]['name']).to eq 'Course1A'
   end
 
-  it 'List Students' do
+  it 'should List Students' do
     canvas_lms_api.given('a student enrolled in a course').
       upon_receiving('List Students').
       with(
@@ -102,7 +102,7 @@ describe 'Courses', :pact do
     expect(response[0]['name']).to eq 'student1'
   end
 
-  it 'List Teachers' do
+  it 'should List Teachers' do
     canvas_lms_api.given('a teacher enrolled in a course').
       upon_receiving('List Teachers').
       with(
@@ -133,39 +133,37 @@ describe 'Courses', :pact do
   end
 
 
-  context 'List TAs' do
-    it 'should return JSON body' do
-      canvas_lms_api.given('a teacher assistant enrolled in a course').
-        upon_receiving('List TAs').
-        with(
-          method: :get,
-          headers: {
-            'Authorization': 'Bearer some_token',
-            'Auth-User': 'TeacherAssistant1',
-            'Connection': 'close',
-            'Host': PactConfig.mock_provider_service_base_uri,
-            'Version': 'HTTP/1.1'
-          },
-          'path' => '/api/v1/courses/1/users',
-          query: 'enrollment_type[]=ta'
-        ).
-        will_respond_with(
-          status: 200,
-          body: Pact.each_like(
-            'id': 2,
-            'name': 'ta1',
-            'sortable_name': 'ta1',
-            'short_name': 'ta1'
-          )
+  it 'should List TAs' do
+    canvas_lms_api.given('a teacher assistant enrolled in a course').
+      upon_receiving('List TAs').
+      with(
+        method: :get,
+        headers: {
+          'Authorization': 'Bearer some_token',
+          'Auth-User': 'TeacherAssistant1',
+          'Connection': 'close',
+          'Host': PactConfig.mock_provider_service_base_uri,
+          'Version': 'HTTP/1.1'
+        },
+        'path' => '/api/v1/courses/1/users',
+        query: 'enrollment_type[]=ta'
+      ).
+      will_respond_with(
+        status: 200,
+        body: Pact.each_like(
+          'id': 2,
+          'name': 'ta1',
+          'sortable_name': 'ta1',
+          'short_name': 'ta1'
         )
-      courses_api.authenticate_as_user('TeacherAssistant1')
-      response = courses_api.list_tas(1)
-      expect(response[0]['id']).to eq 2
-      expect(response[0]['name']).to eq 'ta1'
-    end
+      )
+    courses_api.authenticate_as_user('TeacherAssistant1')
+    response = courses_api.list_tas(1)
+    expect(response[0]['id']).to eq 2
+    expect(response[0]['name']).to eq 'ta1'
   end
 
-  it 'List Observers' do
+  it 'should List Observers' do
     canvas_lms_api.given('an observer enrolled in a course').
       upon_receiving('List Observers').
       with(
@@ -195,7 +193,7 @@ describe 'Courses', :pact do
     expect(response[0]['name']).to eq 'observer1'
   end
 
-  it 'List Discussions' do
+  it 'should List Discussions' do
     canvas_lms_api.given('a student in a course with a discussion').
       upon_receiving('List Discussions').
       with(
@@ -271,7 +269,7 @@ describe 'Courses', :pact do
     expect(response[0]['title']).to eq 'No Title'
   end
 
-  it 'List Quizzes' do
+  it 'should List Quizzes' do
     canvas_lms_api.given('a quiz in a course').
       upon_receiving('List Quizzes').
       with(
@@ -369,7 +367,7 @@ describe 'Courses', :pact do
     expect(response[0]['title']).to eq 'Test Quiz'
   end
 
-  it 'Delete a Course' do
+  it 'should Delete a Course' do
     canvas_lms_api.given('a teacher enrolled in a course').
       upon_receiving('Delete a Course').
       with(
@@ -395,7 +393,7 @@ describe 'Courses', :pact do
     expect(response['delete']).to eq true
   end
 
-  it 'List Wiki Pages' do
+  it 'Should List Wiki Pages' do
     canvas_lms_api.given('a wiki page in a course').
       upon_receiving('List Wiki Pages').
       with(
@@ -431,7 +429,7 @@ describe 'Courses', :pact do
     expect(response[0]['title']).to eq "WIKI Page"
   end
 
-  it 'Create a Course' do
+  it 'should Create a Course' do
     canvas_lms_api.given('a site admin').
       upon_receiving('Create a Course').
       with(
@@ -499,7 +497,7 @@ describe 'Courses', :pact do
     expect(response["name"]).to eq "new course"
   end
 
-  it 'Update a Course' do
+  it 'should Update a Course' do
     canvas_lms_api.given('a teacher enrolled in a course').
       upon_receiving('Update a Course').
       with(

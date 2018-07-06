@@ -21,7 +21,7 @@ require_relative '../pact_helper'
 describe 'Assignments', :pact do
   subject(:assignments_api) { Helper::ApiClient::Assignments.new }
 
-  it 'List Assignments' do
+  it 'should List Assignments' do
     canvas_lms_api.given('a student in a course with an assignment').
       upon_receiving('List Assignments').
         with(
@@ -47,8 +47,8 @@ describe 'Assignments', :pact do
   end
 
 
-  it 'Post Assignments' do
-    canvas_lms_api.given('a teacher in a course').
+  it 'should Post Assignments' do
+    canvas_lms_api.given('a teacher enrolled in a course').
       upon_receiving('Post Assignments').
         with(
           method: :post,
