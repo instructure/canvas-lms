@@ -443,4 +443,37 @@ describe 'Courses', :pact do
     response = courses_api.update_course(1)
     expect(response["name"]).to eq "updated course"
   end
+
+  context 'Teacher not in a course' do
+    it 'should Give a 401 response' do
+      canvas_lms_api.given('a teacher not in a course').
+        upon_receiving('Give a 401 response').
+        with(
+          method: :get,
+          headers: {
+            'Authorization': 'Bearer some_token',
+            'Auth-User': 'Teacher2',
+            'Connection': 'close',
+            'Host': PactConfig.mock_provider_service_base_uri,
+            'Version': 'HTTP/1.1'
+          },
+          'path' => '/api/v1/courses/1/users',
+          query: 'enrollment_type[]=student'
+        ).
+        will_respond_with(
+          status: 401,
+          body: Pact.like(
+            "status": "unauthorized",
+            "errors": [
+              {
+                "message": "user not authorized to perform that action"
+              },
+            ]
+          )
+        )
+      courses_api.authenticate_as_user('Teacher2')
+      response = courses_api.list_students(1)
+      expect(response["status"]).to eq "unauthorized"
+    end
+  end
 end

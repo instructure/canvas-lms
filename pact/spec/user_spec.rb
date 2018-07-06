@@ -21,7 +21,7 @@ require_relative '../pact_helper'
 describe 'Users', :pact do
   subject(:users_api) { Helper::ApiClient::Users.new }
 
-  it 'List To Do Count for User' do
+  it 'should List To Do Count for User' do
     canvas_lms_api.given('a student enrolled in a course').
       upon_receiving('List To Do Count for User').
       with(

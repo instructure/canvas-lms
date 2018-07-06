@@ -25,5 +25,12 @@ PactConfig::Consumers::ALL.each do |consumer|
         planner_note_model(user: student)
       end
     end
+
+    provider_state 'a teacher not in a course' do
+      set_up do
+        @teacher = user_factory(active_all: true, name: "Teacher2")
+        @teacher.pseudonyms.create!(unique_id: "Teacher2@instructure.com", password: 'password', password_confirmation: 'password')
+      end
+    end
   end
 end
