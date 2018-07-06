@@ -28,14 +28,22 @@ PactConfig::Consumers::ALL.each do |consumer|
 
     # The following states are provided by the set_up block above, thus the no_op
     # because no additional setup is required.
-    # ID: 1 Name: SiteAdmin1
-    # ID: 2 Name: Admin1
-    # ID: 3 Name: Teacher1
-    # ID: 4 Name: TeacherAssistant1
-    # ID: 5 Name: Student1
-    # ID: 6 Name: Observer1
-    # Course_ID: 1 Name: 'Contract Tests Course'
-    # Account_ID: 2
+
+    # Account_ID: 1 | Name: Siteadmin Account
+      # ID: 1 | Name: SiteAdmin1
+
+    # Account_ID: 2 | Name: Default Account
+      # ID: 2 | Name: Admin1
+      # ID: 3 | Name: Teacher1
+      # ID: 4 | Name: TeacherAssistant1
+      # ID: 5 | Name: Student1
+      # ID: 6 | Name: Observer1
+      # Course_ID: 1 | Name: 'Contract Tests Course'
+        # Enrolled:
+          # Student1
+          # Teacher1
+          # TeacherAssistant1
+          # Observer1
     provider_state('an account') { no_op }
     provider_state('a course') { no_op }
     provider_state('a student enrolled in a course') { no_op }
