@@ -88,6 +88,17 @@ describe BigBlueButtonConference do
       expect(@conference.recording_ready_user).to eq "#{@user['name']} <#{@user.email}>"
     end
 
+    it "should have a well formed user string as for recording_user_ready in a group context" do
+      group1 = @course.groups.create!(:name => "group 1")
+      group_conference = BigBlueButtonConference.create!(
+        :title => "my group conference",
+        :user => @user,
+        :context => group1
+      )
+      expect(group_conference.recording_ready_user).to eq "#{@user['name']} <#{@user.email}>"
+    end
+
+
     it "return nil if a request times out" do
       allow(CanvasHttp).to receive(:get).and_raise(Timeout::Error)
       expect(@conference.initiate_conference).to be_nil
