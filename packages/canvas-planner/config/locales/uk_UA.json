@@ -5,6 +5,9 @@
   "announcement_fb4cb645": {
     "message": "Оголошення"
   },
+  "startdate_to_enddate_d245175b": {
+    "message": "{ startDate } до { endDate }"
+  },
   "assignment_976578a8": {
     "message": "Завдання"
   },
@@ -19,6 +22,9 @@
   },
   "failed_to_save_to_do_ddc7503b": {
     "message": "Не вдалося зберегти завдання"
+  },
+  "loading_grades_c842c887": {
+    "message": "Завантаження оцінок"
   },
   "course_to_do_bcbbab54": {
     "message": "Зробити { course }"
@@ -59,11 +65,17 @@
   "yesterday_at_date_1aa6d18e": {
     "message": "Вчора в { date }"
   },
+  "numpoints_points_8621a43b": {
+    "message": "{ numPoints } балів"
+  },
   "calendar_event_89aadc1c": {
     "message": "Календарна подія"
   },
   "load_prior_dates_f2b0f6f0": {
     "message": "Завантажте попередні дати"
+  },
+  "starttime_to_endtime_d7cc249d": {
+    "message": "{ startTime } до { endTime }"
   },
   "all_items_loaded_aa256183": {
     "message": "Всі елементи завантажені"
@@ -73,6 +85,9 @@
   },
   "task_16b0ef38": {
     "message": "Завдання"
+  },
+  "grades_loaded_5056277c": {
+    "message": "Оцінки завантажені"
   },
   "excused_cf8792eb": {
     "message": "Поважно"
@@ -91,6 +106,15 @@
   },
   "title_is_required_6ddcab69": {
     "message": "титул обов''язковий"
+  },
+  "nothing_planned_yet_8675ffe9": {
+    "message": "Досі нічого не заплановано"
+  },
+  "grades_are_loading_c899652d": {
+    "message": "Оцінки завантажені"
+  },
+  "error_loading_grades_e0b38f4d": {
+    "message": "Помилка завантаження оцінок"
   },
   "date_at_time_dbdb1b99": {
     "message": "{ date } в { time }"
@@ -131,6 +155,9 @@
   "unable_to_mark_as_complete_8141856d": {
     "message": "Неможливо позначити як завершений."
   },
+  "assignmenttype_title_is_marked_as_done_a8dc46ef": {
+    "message": "{ assignmentType } { title } помічено як завершене."
+  },
   "discussion_6719c51d": {
     "message": "Обговорення"
   },
@@ -140,6 +167,9 @@
   "nothing_new_needs_attention_3ac548d4": {
     "message": "Ніщо нове не потребує уваги."
   },
+  "my_grades_98834476": {
+    "message": "Мої оцінки"
+  },
   "title_ee03d132": {
     "message": "Заголовок"
   },
@@ -148,6 +178,9 @@
   },
   "due_date_8ce289b6": {
     "message": "DUE: { date }"
+  },
+  "show_my_grades_ebd08684": {
+    "message": "Показати мої оцінки"
   },
   "late_2be42b88": {
     "message": "Пізніше"
@@ -161,8 +194,14 @@
   "page_50c4823d": {
     "message": "Сторінка"
   },
+  "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
+    "message": "{ assignmentType } { title } не помічено як завершене."
+  },
   "to_do_1d554f36": {
     "message": "Зробити"
+  },
+  "number_more_59a297e8": {
+    "message": "{ number } Більше..."
   },
   "missing_1a256b3b": {
     "message": "Втрачено"
@@ -175,6 +214,9 @@
   },
   "optional_add_course_ef0d70fc": {
     "message": "Опціонально: Додати курс"
+  },
+  "items_completed_items_plural_1_item_other_items_717d579f": {
+    "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
   },
   "quiz_e0dcce8f": {
     "message": "Контрольна робота"
