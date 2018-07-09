@@ -57,7 +57,7 @@ class Group < ActiveRecord::Base
   belongs_to :wiki
   has_many :wiki_pages, as: :context, inverse_of: :context
   has_many :web_conferences, :as => :context, :inverse_of => :context, :dependent => :destroy
-  has_many :collaborations, -> { order("#{Collaboration.quoted_table_name}.title, #{Collaboration.quoted_table_name}.created_at") }, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :collaborations, -> { order(Arel.sql("collaborations.title, collaborations.created_at")) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :media_objects, :as => :context, :inverse_of => :context
   has_many :content_migrations, :as => :context, :inverse_of => :context
   has_many :content_exports, :as => :context, :inverse_of => :context

@@ -976,7 +976,7 @@ class Attachment < ActiveRecord::Base
           group(:context_id, :context_type).
           having("MAX(updated_at)<?", quiet_period).
           limit(500).
-          pluck("COUNT(attachments.id), MIN(attachments.id), MAX(updated_at), context_id, context_type")
+          pluck(Arel.sql("COUNT(attachments.id), MIN(attachments.id), MAX(updated_at), context_id, context_type"))
       break if file_batches.empty?
       file_batches.each do |count, attachment_id, last_updated_at, context_id, context_type|
         # clear the need_notify flag for this batch
