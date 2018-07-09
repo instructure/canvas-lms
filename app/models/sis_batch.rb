@@ -515,8 +515,9 @@ class SisBatch < ActiveRecord::Base
       if self.using_parallel_importers?
         data = Enrollment::BatchStateUpdater.destroy_batch(batch, sis_batch: self, batch_mode: true)
         SisBatchRollBackData.bulk_insert_roll_back_data(data)
-        enrollment_count += data.count
-        current_row += data.count
+        batch_count = data.count{|d| d.context_type == "Enrollment"} # data can include group membership deletions
+        enrollment_count += batch_count
+        current_row += batch_count
       else
         batch.each do |enrollment|
           enrollment.destroy
