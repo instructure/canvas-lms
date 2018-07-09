@@ -877,9 +877,15 @@ RSpec.configure do |config|
       klass.connection.bulk_insert klass.table_name, records
       return if return_type == :nil
       scope = klass.order("id DESC").limit(records.size)
-      return_type == :record ?
-        scope.to_a.reverse :
+      if return_type == :record
+        records = scope.to_a.reverse
+        if Bullet.enable?
+          records.each { |record| Bullet::Detector::NPlusOneQuery.add_impossible_object(record) }
+        end
+        records
+      else
         scope.pluck(:id).reverse
+      end
     end
   end
 end

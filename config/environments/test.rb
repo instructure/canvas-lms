@@ -57,6 +57,7 @@ environment_configuration(defined?(config) && config) do |config|
 
     Bullet.enable = true
     Bullet.unused_eager_loading_enable = false
+    Bullet.counter_cache_enable = false
 
     Bullet.rails_logger = true
   end
