@@ -20,9 +20,9 @@ import { connect } from 'react-redux';
 import themeable from '@instructure/ui-themeable/lib';
 import Button from '@instructure/ui-buttons/lib/components/Button';
 import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton';
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 import View from '@instructure/ui-layout/lib/components/View';
-import Portal from '@instructure/ui-portal/lib/components/Portal'
+import Portal from '@instructure/ui-portal/lib/components/Portal';
 import IconPlusLine from '@instructure/ui-icons/lib/Line/IconPlus';
 import IconAlertsLine from '@instructure/ui-icons/lib/Line/IconAlerts';
 import IconGradebookLine from '@instructure/ui-icons/lib/Line/IconGradebook';
@@ -172,7 +172,7 @@ export class PlannerHeader extends Component {
     if(this.state.trayOpen) {
       this.handleCloseTray();
     } else {
-      this.setUpdateItemTray(true)
+      this.setUpdateItemTray(true);
     }
   }
 
@@ -381,7 +381,6 @@ export class PlannerHeader extends Component {
           </PopoverContent>
         </Popover>
         <Tray
-          closeButtonLabel={formatMessage("Close")}
           open={this.state.trayOpen}
           label={this.getTrayLabel()}
           placement="end"
@@ -389,6 +388,9 @@ export class PlannerHeader extends Component {
           shouldReturnFocus={false}
           onDismiss={this.handleCloseTray}
         >
+          <CloseButton placement="start" variant="icon" onClick={this.handleCloseTray}>
+            {formatMessage("Close")}
+          </CloseButton>
           <UpdateItemTray
             locale={this.props.locale}
             timeZone={this.props.timeZone}

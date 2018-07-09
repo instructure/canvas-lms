@@ -146,7 +146,6 @@ exports[`new activity button does not show when there is no new activity 1`] = `
   </Popover>
   <Tray
     border={false}
-    closeButtonLabel="Close"
     contentRef={[Function]}
     defaultFocusElement={null}
     insertAt="bottom"
@@ -170,6 +169,17 @@ exports[`new activity button does not show when there is no new activity 1`] = `
     shouldReturnFocus={false}
     size="small"
   >
+    <CloseButton
+      buttonRef={[Function]}
+      margin="0"
+      offset="x-small"
+      onClick={[Function]}
+      placement="start"
+      size="small"
+      variant="icon"
+    >
+      Close
+    </CloseButton>
     <UpdateItemTray
       courses={
         Array [
@@ -410,7 +420,6 @@ exports[`new activity button shows when there is new activity 1`] = `
   </Popover>
   <Tray
     border={false}
-    closeButtonLabel="Close"
     contentRef={[Function]}
     defaultFocusElement={null}
     insertAt="bottom"
@@ -434,6 +443,17 @@ exports[`new activity button shows when there is new activity 1`] = `
     shouldReturnFocus={false}
     size="small"
   >
+    <CloseButton
+      buttonRef={[Function]}
+      margin="0"
+      offset="x-small"
+      onClick={[Function]}
+      placement="start"
+      size="small"
+      variant="icon"
+    >
+      Close
+    </CloseButton>
     <UpdateItemTray
       courses={
         Array [
@@ -674,7 +694,6 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
   </Popover>
   <Tray
     border={false}
-    closeButtonLabel="Close"
     contentRef={[Function]}
     defaultFocusElement={null}
     insertAt="bottom"
@@ -698,6 +717,17 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
     shouldReturnFocus={false}
     size="small"
   >
+    <CloseButton
+      buttonRef={[Function]}
+      margin="0"
+      offset="x-small"
+      onClick={[Function]}
+      placement="start"
+      size="small"
+      variant="icon"
+    >
+      Close
+    </CloseButton>
     <UpdateItemTray
       courses={
         Array [
