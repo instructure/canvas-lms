@@ -26,3 +26,4 @@ formatMessage.setup({
   translations,
 });
 
+document.documentElement.setAttribute('dir', 'ltr');
