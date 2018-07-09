@@ -17,7 +17,7 @@
  */
 
 import moment from 'moment-timezone';
-import formatMessage from 'format-message';
+import formatMessage from '../../format-message';
 import Animation from '../animation';
 import {loadPastUntilToday} from '../../actions/loading-actions';
 import { alert } from '../../utilities/alertUtils';
