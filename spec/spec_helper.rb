@@ -477,13 +477,33 @@ RSpec.configure do |config|
   end
 
   if Bullet.enable?
-    config.before(:each) do
+    config.before(:each) do |example|
       Bullet.start_request
+      possible_objects, impossible_objects =
+        example.example_group.onceler.instance_variable_get(:@bullet_state)
+      possible_objects&.each { |object| Bullet::Detector::NPlusOneQuery.possible_objects.add(object) }
+      impossible_objects&.each { |object| Bullet::Detector::NPlusOneQuery.impossible_objects.add(object) }
     end
 
     config.after(:each) do
       Bullet.perform_out_of_channel_notifications if Bullet.notification?
       Bullet.end_request
+    end
+
+    Onceler.configure do |config|
+      config.before(:record) do
+        Bullet.start_request
+      end
+
+      config.after(:record) do |tape|
+        tape.onceler.instance_variable_set(:@bullet_state, [
+          Bullet::Detector::NPlusOneQuery.possible_objects.registry.values.map(&:to_a).flatten,
+          Bullet::Detector::NPlusOneQuery.impossible_objects.registry.values.map(&:to_a).flatten,
+        ])
+
+        Bullet.perform_out_of_channel_notifications if Bullet.notification?
+        Bullet.end_request
+      end
     end
   end
 
