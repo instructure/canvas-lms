@@ -374,7 +374,6 @@ export class PlannerHeader extends Component {
           placement="end"
           shouldContainFocus={true}
           shouldReturnFocus={false}
-          applicationElement={() => document.getElementById('application') }
           onDismiss={this.handleCloseTray}
         >
           <UpdateItemTray
