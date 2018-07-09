@@ -339,7 +339,10 @@ class SisBatch < ActiveRecord::Base
     previous_zip = previous_batch.try(:download_zip)
     return unless previous_zip
 
-    return if change_threshold && (1-previous_zip.size.to_f/@data_file.size.to_f).abs > (0.01 * change_threshold)
+    if change_threshold && (1-previous_zip.size.to_f/@data_file.size.to_f).abs > (0.01 * change_threshold)
+      SisBatch.add_error(nil, "Diffing not performed because file size difference exceeded threshold", sis_batch: self)
+      return
+    end
 
     diffed_data_file = SIS::CSV::DiffGenerator.new(self.account, self).generate(previous_zip.path, @data_file.path)
     return :empty_diff_file unless diffed_data_file # just end if there's nothing to import

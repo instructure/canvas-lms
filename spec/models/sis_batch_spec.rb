@@ -807,6 +807,8 @@ test_4,TC 104,Test Course 104,,term1,active
       b3 = process_csv_data([
         %{course_id,short_name,long_name,account_id,term_id,status
       }], diffing_data_set_identifier: 'default', change_threshold: 1)
+      expect(b3).to be_imported_with_messages
+      expect(b3.processing_warnings.first.last).to include("Diffing not performed")
 
       # no change threshold, _should_ delete everything maybe?
       b4 = process_csv_data([
