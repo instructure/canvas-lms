@@ -20,7 +20,7 @@
 module PlannerHelper
   PLANNABLE_TYPES = {
     'discussion_topic' => 'DiscussionTopic',
-    'announcement' => 'DiscussionTopic',
+    'announcement' => 'Announcement',
     'quiz' => 'Quizzes::Quiz',
     'assignment' => 'Assignment',
     'wiki_page' => 'WikiPage',

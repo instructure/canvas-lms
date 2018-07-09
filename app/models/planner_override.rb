@@ -17,18 +17,23 @@
 #
 
 class PlannerOverride < ActiveRecord::Base
-  CONTENT_TYPES = %w(Announcement Assignment DiscussionTopic Quizzes::Quiz WikiPage PlannerNote).freeze
-
   include Workflow
+  include PlannerHelper
+
+  CONTENT_TYPES = PLANNABLE_TYPES.values
+
+  before_validation :link_to_parent_topic, :link_to_submittable
+
   belongs_to :plannable, polymorphic:
     [:announcement, :assignment, :discussion_topic, :planner_note, :wiki_page, :calendar_event, quiz: 'Quizzes::Quiz']
   belongs_to :user
-  validates_presence_of :plannable_id, :workflow_state, :user_id
-  validates_uniqueness_of :plannable_id, scope: [:user_id, :plannable_type]
+  validates :plannable_id, :plannable_type, :workflow_state, :user_id, presence: true
+  validates :plannable_id, uniqueness: {scope: [:user_id, :plannable_type]}
 
   scope :active, -> { where workflow_state: 'active' }
   scope :deleted, -> { where workflow_state: 'deleted' }
   scope :not_deleted, -> { where.not deleted }
+  scope :for_user, -> (user) { where user: user }
 
   workflow do
     state :active do
@@ -40,15 +45,32 @@ class PlannerOverride < ActiveRecord::Base
     state :deleted
   end
 
-  alias_method :published?, :active?
+  alias published? active?
+
+  def link_to_parent_topic
+    return unless self.plannable_type == 'DiscussionTopic'
+    plannable = DiscussionTopic.find(self.plannable_id)
+    self.plannable_id = plannable.root_topic_id if plannable.root_topic_id
+  end
+
+  def link_to_submittable
+    return unless self.plannable_type == 'Assignment'
+    plannable = Assignment.find_by(id: self.plannable_id)
+    if plannable&.quiz?
+      self.plannable_type = PLANNABLE_TYPES['quiz']
+      self.plannable_id = plannable.quiz.id
+    elsif plannable&.discussion_topic?
+      self.plannable_type = PLANNABLE_TYPES['discussion_topic']
+      self.plannable_id = plannable.discussion_topic.id
+    elsif plannable&.wiki_page?
+      self.plannable_type = PLANNABLE_TYPES['wiki_page']
+      self.plannable_id = plannable.wiki_page.id
+    end
+  end
 
   def self.update_for(obj)
     overrides = PlannerOverride.where(plannable_id: obj.id, plannable_type: obj.class.to_s)
     overrides.update_all(workflow_state: plannable_workflow_state(obj)) if overrides.exists?
-  end
-
-  def self.for_user(user)
-    overrides = PlannerOverride.where(user_id: user)
   end
 
   def self.plannable_workflow_state(plannable)

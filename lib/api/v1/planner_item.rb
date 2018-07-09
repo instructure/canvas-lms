@@ -31,17 +31,16 @@ module Api::V1::PlannerItem
   def planner_item_json(item, user, session, opts = {})
     context_data(item, use_effective_code: true).merge({
       :plannable_id => item.id,
-      :planner_override => planner_override_json(item.planner_override_for(user), user, session),
+      :planner_override => planner_override_json(item.planner_override_for(user), user, session, item.class_name),
+      :plannable_type => PLANNABLE_TYPES.key(item.class_name),
       :new_activity => new_activity(item, user, opts)
     }).merge(submission_statuses_for(user, item, opts)).tap do |hash|
       assignment_opts = {exclude_response_fields: ['rubric']}
       if item.is_a?(::CalendarEvent)
         hash[:plannable_date] = item.start_at || item.created_at
-        hash[:plannable_type] = 'calendar_event'
         hash[:plannable] = event_json(item, user, session)
       elsif item.is_a?(::PlannerNote)
         hash[:plannable_date] = item.todo_date || item.created_at
-        hash[:plannable_type] = 'planner_note'
         hash[:plannable] = planner_note_json(item, user, session)
         # TODO: We don't currently have an html_url for individual planner items.
         # hash[:html_url] = ???
@@ -49,32 +48,30 @@ module Api::V1::PlannerItem
         hash[:plannable_date] = item[:user_due_date] || item.due_at
         quiz = item.is_a?(Quizzes::Quiz) ? item : item.quiz
         hash[:plannable_id] = quiz.id
-        hash[:plannable_type] = 'quiz'
+        hash[:plannable_type] = PLANNABLE_TYPES.key(quiz.class_name)
         hash[:plannable] = quiz_json(quiz, quiz.context, user, session)
         hash[:html_url] = named_context_url(quiz.context, :context_quiz_url, quiz.id)
         hash[:planner_override] ||= planner_override_json(quiz.planner_override_for(user), user, session)
       elsif item.is_a?(WikiPage) || (item.respond_to?(:wiki_page?) && item.wiki_page?)
         item = item.wiki_page if item.respond_to?(:wiki_page?) && item.wiki_page?
         hash[:plannable_date] = item.todo_date || item.created_at
-        hash[:plannable_type] = 'wiki_page'
+        hash[:plannable_type] = PLANNABLE_TYPES.key(item.class_name)
         hash[:plannable] = wiki_page_json(item, user, session, false, assignment_opts: assignment_opts)
         hash[:html_url] = named_context_url(item.context, :context_wiki_page_url, item.url)
         hash[:planner_override] ||= planner_override_json(item.planner_override_for(user), user, session)
       elsif item.is_a?(Announcement)
         hash[:plannable_date] = item.posted_at || item.created_at
-        hash[:plannable_type] = 'announcement'
         hash[:plannable] = discussion_topic_api_json(item, item.context, user, session, use_preload: true)
         hash[:html_url] = named_context_url(item.context, :context_discussion_topic_url, item.id)
       elsif item.is_a?(DiscussionTopic) || (item.respond_to?(:discussion_topic?) && item.discussion_topic?)
         topic = item.is_a?(DiscussionTopic) ? item : item.discussion_topic
         hash[:plannable_id] = topic.id
         hash[:plannable_date] = item[:user_due_date] || topic.todo_date || topic.posted_at || topic.created_at
-        hash[:plannable_type] = 'discussion_topic'
+        hash[:plannable_type] = PLANNABLE_TYPES.key(topic.class_name)
         hash[:plannable] = discussion_topic_api_json(topic, topic.context, user, session, assignment_opts: assignment_opts, use_preload: true)
         hash[:html_url] = discussion_topic_html_url(topic, user, hash[:submissions])
-        hash[:planner_override] ||= planner_override_json(topic.planner_override_for(user), user, session)
+        hash[:planner_override] ||= planner_override_json(topic.planner_override_for(user), user, session, topic.class_name)
       else
-        hash[:plannable_type] = 'assignment'
         hash[:plannable_date] = item[:user_due_date] || item.due_at
         hash[:plannable] = assignment_json(item, user, session, {include_discussion_topic: true}.merge(assignment_opts))
         hash[:html_url] = assignment_html_url(item, user, hash[:submissions])
