@@ -246,6 +246,10 @@ class Submission < ActiveRecord::Base
     needs_grading? != needs_grading?(:was)
   end
 
+  def strongmind_grader?
+    grader == GradesService::Account.account_admin
+  end
+
   scope :needs_grading, -> {
     s_name = quoted_table_name
     e_name = Enrollment.quoted_table_name
