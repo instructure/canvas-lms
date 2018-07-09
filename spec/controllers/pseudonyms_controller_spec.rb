@@ -30,7 +30,7 @@ describe PseudonymsController do
         pword = @pseudonym.crypted_password
         code = @cc.confirmation_code
         post 'change_password', params: {:pseudonym_id => @pseudonym.id, :nonce => @cc.confirmation_code, :pseudonym => {:password => '12341234', :password_confirmation => '12341234'}}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:pseudonym]).to eql(@pseudonym)
         @pseudonym.reload
         expect(@pseudonym.crypted_password).not_to eql(pword)
@@ -50,7 +50,7 @@ describe PseudonymsController do
         pword = @pseudonym.crypted_password
         code = @cc.confirmation_code
         post 'change_password', params: {:pseudonym_id => @pseudonym.id, :nonce => @cc.confirmation_code, :pseudonym => {:password => '12341234', :password_confirmation => '12341234'}}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:pseudonym]).to eql(@pseudonym)
         @pseudonym.reload
         expect(@pseudonym.crypted_password).not_to eql(pword)
@@ -79,7 +79,7 @@ describe PseudonymsController do
       @cc.forgot_password!
       expect(@cc.confirmation_code_expires_at).to be_between(58.minutes.from_now, 62.minutes.from_now)
       post 'change_password', :params => { :pseudonym_id => @pseudonym.id, :nonce => @cc.confirmation_code, :pseudonym => {:password => '12341234', :password_confirmation => '12341234'} }
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "rejects an expired password-change token" do
@@ -134,7 +134,7 @@ describe PseudonymsController do
     it "should render confirm change password view for registered user's email" do
       @user.register
       get 'confirm_change_password', params: {:pseudonym_id => @pseudonym.id, :nonce => @cc.confirmation_code}
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should not render confirm change password view for non-email channels" do
@@ -146,7 +146,7 @@ describe PseudonymsController do
 
     it "should render confirm change password view for unregistered user" do
       get 'confirm_change_password', params: {:pseudonym_id => @pseudonym.id, :nonce => @cc.confirmation_code}
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should not render confirm change password view if token is expired" do
@@ -231,7 +231,7 @@ describe PseudonymsController do
 
       it "should use the account id from params" do
         post 'create', params: {:user_id => @user.id, :pseudonym => { :account_id => Account.site_admin.id, :unique_id => 'unique1' }}, format: 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
 
@@ -300,7 +300,7 @@ describe PseudonymsController do
 
       it "should use the domain_root_account" do
         post 'create', params: {:user_id => @user.id, :pseudonym => { :unique_id => 'unique1' }}, format: 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(@user.pseudonyms.size).to eq 2
         expect((@user.pseudonyms - [@pseudonym]).last.account).to eq @account
       end
@@ -308,7 +308,7 @@ describe PseudonymsController do
       it "should allow explicit account id in params as long as they have permission" do
         @account2 = Account.create!
         post 'create', params: {:user_id => @user.id, :pseudonym => { :account_id => @account.id, :unique_id => 'unique1' }}, format: 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(@user.pseudonyms.size).to eq 2
         expect((@user.pseudonyms - [@pseudonym]).last.account).to eq @account
       end
@@ -373,7 +373,7 @@ describe PseudonymsController do
       # not logged in!
 
       post 'update', params: {:id => @pseudonym1.id, :user_id => @user1.id, :pseudonym => { :password => 'bobbobbob', :password_confirmation => 'bobbobbob' }}, format: 'json'
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
       @pseudonym1.reload
       expect(@pseudonym1.valid_password?('qwertyuiop')).to be_truthy
       expect(@pseudonym1.valid_password?('bobbobbob')).to be_falsey
@@ -393,11 +393,11 @@ describe PseudonymsController do
       user_session(@user, @pseudonym)
 
       post 'update', params: {:id => @pseudonym1.id, :user_id => @user1.id, :pseudonym => { :sis_user_id => 'sis1' }}, format: 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(@pseudonym1.reload.sis_user_id).to eq 'sis1'
 
       post 'update', params: {:id => @pseudonym1.id, :user_id => @user1.id, :pseudonym => { :integration_id => 'sis2' }}, format: 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(@pseudonym1.reload.integration_id).to eq 'sis2'
     end
 
@@ -420,7 +420,7 @@ describe PseudonymsController do
         params: {id: bob.pseudonym.id,
         user_id: bob.id,
         pseudonym: { unique_id: 'new_username' }}
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
       expect(bob.pseudonym.reload.unique_id).to eq 'old_username'
     end
 
@@ -435,7 +435,7 @@ describe PseudonymsController do
               password_confirmation: 'new_password',
               unique_id: 'new_username'
           }}
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
       bob.pseudonym.reload
       expect(bob.pseudonym.unique_id).to eq 'old_username'
       expect(bob.pseudonym).to be_valid_password('old_password')
@@ -504,7 +504,7 @@ describe PseudonymsController do
         @p2 = Account.default.pseudonyms.create!(:user => @user, :unique_id => @p1.unique_id)
 
         get 'index', params: {:user_id => @user.id}, format: 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns['pseudonyms']).to match_array [@p1, @p2]
       end
     end
@@ -512,7 +512,7 @@ describe PseudonymsController do
     describe 'create' do
       it "should create a new pseudonym for a user in a different shard (cross-shard)" do
         post 'create', params: {:user_id => @user.id, :pseudonym => { :password => 'bobobobo', :password_confirmation => 'bobobobo', :account_id => Account.default.id, :unique_id => 'bobob' }}, format: 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
 
         @user.reload
         expect(@user.all_pseudonyms.length).to eq 2
@@ -521,7 +521,7 @@ describe PseudonymsController do
 
       it "should create a new pseudonym for a user in a different shard (same-shard)" do
         post 'create', params: {:user_id => @user.id, :pseudonym => { :password => 'bobobobo', :password_confirmation => 'bobobobo', :account_id => @account.id, :unique_id => 'bobob' }}, format: 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
 
         expect(@user.all_pseudonyms.length).to eq 2
         expect(@user.all_pseudonyms.map(&:shard)).to eq [@shard1, @shard1]
@@ -531,7 +531,7 @@ describe PseudonymsController do
     describe 'update' do
       it "should update a pseudonym on another shard" do
         post 'update', params: {:user_id => @user.id, :id => @pseudonym.id, :pseudonym => { :unique_id => 'yoyoyo' }}, format: 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
 
         expect(@pseudonym.reload.unique_id).to eq 'yoyoyo'
       end
@@ -539,7 +539,7 @@ describe PseudonymsController do
       it "should update a pseudonym on the requesting shard for a user from another shard" do
         @pseudonym = Account.default.pseudonyms.create!(:user => @user, :unique_id => 'bobob')
         post 'update', params: {:user_id => @user.id, :id => @pseudonym.id, :pseudonym => { :unique_id => 'yoyoyo' }}, format: 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
 
         expect(@pseudonym.reload.unique_id).to eq 'yoyoyo'
       end
@@ -549,7 +549,7 @@ describe PseudonymsController do
       it "should destroy a pseudonym on another shard" do
         @pseudonym = @account.pseudonyms.create!(:user => @user, :unique_id => 'bobob')
         post 'destroy', params: {:user_id => @user.id, :id => @pseudonym.id}, format: 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
 
         expect(@pseudonym.reload).to be_deleted
       end
@@ -557,7 +557,7 @@ describe PseudonymsController do
       it "should destroy a pseudonym on the requesting shard for a user from another shard" do
         @pseudonym = Account.default.pseudonyms.create!(:user => @user, :unique_id => 'bobob')
         post 'destroy', params: {:user_id => @user.id, :id => @pseudonym.id}, format: 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
 
         expect(@pseudonym.reload).to be_deleted
       end

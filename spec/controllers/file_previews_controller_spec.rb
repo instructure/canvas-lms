@@ -142,6 +142,6 @@ describe FilePreviewsController do
     attachment_model content_type: 'image/png'
     @attachment.update_attribute(:file_state, 'hidden')
     get :show, params: {course_id: @course.id, file_id: @attachment.id}
-    expect(response).to be_success
+    expect(response).to be_successful
   end
 end

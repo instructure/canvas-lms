@@ -138,7 +138,7 @@ describe OutcomeResultsController do
                       :user_ids => [@student.id],
                       :outcome_ids => [@outcome.id]},
                       format: "json"
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 end

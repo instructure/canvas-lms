@@ -54,7 +54,7 @@ describe Login::Oauth2Controller do
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: 'different')
       get :create, params: {state: jwt}
       # it could be a 422, or 0 if error handling isn't enabled properly in specs
-      expect(response).to_not be_success
+      expect(response).to_not be_successful
       expect(response).to_not be_redirect
     end
 
@@ -76,7 +76,7 @@ describe Login::Oauth2Controller do
       session[:sentinel] = true
 
       get :create, params: {state: ''}
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
       expect(session[:sentinel]).to eq true
     end
 

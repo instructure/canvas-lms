@@ -25,7 +25,7 @@ describe SubmissionCommentsController do
       course_with_teacher_logged_in(:active_all => true)
       submission_comment_model(:author => @user)
       delete 'destroy', params: {:id => @submission_comment.id}, format: "json"
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
   end

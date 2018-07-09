@@ -60,7 +60,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
     it 'succeeds if the user has "manage_developer_keys"' do
       user_session(authorized_admin)
       post :create_or_update, params: params
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it 'renders unauthorized if the flag is not enabled in the root account' do
@@ -212,7 +212,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
 
         user_session(account_admin_user(account: Account.site_admin))
         post :create_or_update, params: site_admin_params
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'fails when there is no setting and the account is site admin and developer key has no bindings' do

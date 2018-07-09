@@ -55,7 +55,7 @@ describe PageViewsController do
     it "should succeed" do
       page_view(@user, '/somewhere/in/app', :created_at => 2.days.ago)
       get 'index', params: {:user_id => @user.id}, format: 'csv'
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should order rows by created_at in DESC order" do
@@ -63,7 +63,7 @@ describe PageViewsController do
       pv1 = page_view(@user, '/somewhere/in/app/1', :created_at => 1.day.ago)  # 1st day
       pv3 = page_view(@user, '/somewhere/in/app/2', :created_at => 3.days.ago)  # 3rd day
       get 'index', params: {:user_id => @user.id}, format: 'csv'
-      expect(response).to be_success
+      expect(response).to be_successful
       dates = CSV.parse(response.body, :headers => true).map { |row| row['created_at'] }
       expect(dates).to eq [pv1, pv2, pv3].map(&:created_at).map(&:to_s)
     end
@@ -113,7 +113,7 @@ describe PageViewsController do
           and_return([])
         get 'index', params: {user_id: @user.id, start_time: "2016-03-14T12:25:55Z",
             end_time: "2016-03-15T00:00:00Z", per_page: 25}, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
   end

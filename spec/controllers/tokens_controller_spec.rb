@@ -49,7 +49,7 @@ describe TokensController do
 
       it "should allow creating an access token" do
         post 'create', params: {:access_token => {:purpose => "test", :expires_at => "jun 1 2011"}}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:token]).not_to be_nil
         expect(assigns[:token].developer_key).to eq DeveloperKey.default
         expect(assigns[:token].purpose).to eq "test"
@@ -66,7 +66,7 @@ describe TokensController do
 
       it "should not allow explicitly setting the token value" do
         post 'create', params: {:access_token => {:purpose => "test", :expires_at => "jun 1 2011", :token => "mytoken"}}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).not_to match(/mytoken/)
         expect(assigns[:token]).not_to be_nil
         expect(assigns[:token].full_token).not_to match(/mytoken/)
@@ -80,7 +80,7 @@ describe TokensController do
         token = @user.access_tokens.create!
         expect(token.user_id).to eq @user.id
         delete 'destroy', params: {:id => token.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:token]).to be_deleted
       end
 
@@ -109,7 +109,7 @@ describe TokensController do
         expect(token.user_id).to eq @user.id
         expect(token.protected_token?).to eq false
         get 'show', params: {:id => token.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:token]).to eq token
         expect(response.body).to match(/#{assigns[:token].token_hint}/)
       end
@@ -120,7 +120,7 @@ describe TokensController do
         expect(token.user_id).to eq @user.id
         expect(token.protected_token?).to eq true
         get 'show', params: {:id => token.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:token]).to eq token
         expect(response.body).not_to match(/#{assigns[:token].token_hint}/)
       end
@@ -140,7 +140,7 @@ describe TokensController do
         expect(token.user_id).to eq @user.id
         expect(token.protected_token?).to eq false
         put 'update', params: {:id => token.id, :access_token => {:purpose => 'new purpose'}}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:token]).to eq token
         expect(assigns[:token].purpose).to eq "new purpose"
         expect(response.body).to match(/#{assigns[:token].token_hint}/)
@@ -153,7 +153,7 @@ describe TokensController do
         expect(token.user_id).to eq @user.id
         expect(token.protected_token?).to eq false
         put 'update', params: {:id => token.id, :access_token => {:regenerate => '1'}}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:token]).to eq token
         expect(assigns[:token].crypted_token).not_to eq token.crypted_token
         expect(response.body).to match(/#{assigns[:token].full_token}/)
@@ -177,7 +177,7 @@ describe TokensController do
         expect(token.user_id).to eq @user.id
         expect(token.protected_token?).to eq true
         put 'update', params: {:id => token.id, :access_token => {:regenerate => '1'}}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:token]).to eq token
         expect(assigns[:token].crypted_token).to eq token.crypted_token
         expect(response.body).not_to match(/#{assigns[:token].token_hint}/)

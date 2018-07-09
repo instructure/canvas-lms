@@ -79,7 +79,7 @@ describe DiscussionTopicsController do
       user_session(@student)
 
       get 'index', params: {:group_id => @group.id}
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     context "graded group discussion" do
@@ -106,7 +106,7 @@ describe DiscussionTopicsController do
         user_session(@student)
 
         get 'index', params: {:group_id => @group.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns["topics"]).to include(@child_topic)
       end
 
@@ -114,7 +114,7 @@ describe DiscussionTopicsController do
         user_session(@student)
 
         get 'index', params: {:group_id => @group.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns["topics"]).not_to include(@child_topic)
       end
 
@@ -162,7 +162,7 @@ describe DiscussionTopicsController do
       user_session(@student)
 
       get 'index', params: {:group_id => @group.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns["topics"]).to include(@topic)
     end
 
@@ -176,7 +176,7 @@ describe DiscussionTopicsController do
       group_topic.save!
       group_id = group_topic.child_topics.first.group.id
       get 'index', params: { group_id: group_id }, :format => :json
-      expect(response).to be_success
+      expect(response).to be_successful
       parsed_json = json_parse(response.body)
       expect(parsed_json.length).to eq 1
       parsed_topic = parsed_json.first
@@ -198,7 +198,7 @@ describe DiscussionTopicsController do
       user_session(@student)
 
       get 'index', params: {course_id: @course.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns["topics"]).to include(@locked_topic)
     end
 
@@ -215,7 +215,7 @@ describe DiscussionTopicsController do
       user_session(@student)
 
       get 'index', params: {course_id: @course.id, exclude_context_module_locked_topics: true}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns["topics"]).not_to include(@locked_topic)
     end
   end
@@ -288,7 +288,7 @@ describe DiscussionTopicsController do
         :message => "some message"
       )
       get 'show', params: {:course_id => @course.id, :id => @announcement.id}
-      expect(response).to_not be_success
+      expect(response).to_not be_successful
     end
 
     it "should not display announcements in private courses to users who aren't logged in" do
@@ -316,7 +316,7 @@ describe DiscussionTopicsController do
       it "should be visible to students in specific section" do
         user_session(@student1)
         get 'show', params: {:course_id => @course.id, :id => @announcement.id}
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it "should not be visible to students not in specific section announcements" do
@@ -347,7 +347,7 @@ describe DiscussionTopicsController do
       it "should be visible to students in specific section" do
         user_session(@student1)
         get 'show', params: {:course_id => @course.id, :id => @discussion.id}
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it "should not be visible to students not in specific section discussions" do
@@ -380,7 +380,7 @@ describe DiscussionTopicsController do
       it "doesn't show overrides to students" do
         user_session(@student)
         get 'show', params: {:course_id => @course.id, :id => @topic.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).not_to match 'discussion-topic-due-dates'
         due_date = OverrideListPresenter.new.due_at(@topic.assignment)
         expect(response.body).to match "due #{due_date}"
@@ -389,7 +389,7 @@ describe DiscussionTopicsController do
       it "doesn't show overrides for observers" do
         user_session(@observer)
         get 'show', params: {:course_id => @course.id, :id => @topic.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).not_to match 'discussion-topic-due-dates'
         due_date = OverrideListPresenter.new.due_at(@topic.assignment.overridden_for(@observer))
         expect(response.body).to match "due #{due_date}"
@@ -398,7 +398,7 @@ describe DiscussionTopicsController do
       it "does show overrides to teachers" do
         user_session(@teacher)
         get 'show', params: {:course_id => @course.id, :id => @topic.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).to match 'discussion-topic-due-dates'
       end
 
@@ -411,7 +411,7 @@ describe DiscussionTopicsController do
       @topic.reload
       expect(@topic.discussion_entries).not_to be_empty
       get 'show', params: {:course_id => @course.id, :id => @topic.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:topic]).not_to be_nil
       expect(assigns[:topic]).to eql(@topic)
     end
@@ -516,9 +516,9 @@ describe DiscussionTopicsController do
       course_topic
       @enrollment.conclude
       get 'show', params: {:course_id => @course.id, :id => @topic.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       get 'index', params: {:course_id => @course.id}
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should allow concluded students to see discussions" do
@@ -526,9 +526,9 @@ describe DiscussionTopicsController do
       course_topic
       @enrollment.conclude
       get 'show', params: {:course_id => @course.id, :id => @topic.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       get 'index', params: {:course_id => @course.id}
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     context 'group discussions' do
@@ -565,7 +565,7 @@ describe DiscussionTopicsController do
         asmt.save!
 
         get 'show', params: {:course_id => @course.id, :id => @topic.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:groups]).to eq([@group2])
       end
 
@@ -795,7 +795,7 @@ describe DiscussionTopicsController do
       group = group_model(:context => @course)
       group_topic = group.discussion_topics.create!(:title => "title")
       get(:edit, params: {group_id: group, id: group_topic})
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:js_env]).to have_key(:active_grading_periods)
     end
 
@@ -1171,7 +1171,7 @@ describe DiscussionTopicsController do
         topic.course_sections << @section1
         topic.save!
         get 'index', params: { :course_id => @course.id }, :format => :json
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:topics].length).to eq(1)
       end
 
@@ -1593,7 +1593,7 @@ describe DiscussionTopicsController do
       data = fixture_file_upload("docs/txt.txt", "text/plain", true)
       attachment_model :context => @course, :uploaded_data => data, :folder => Folder.unfiled_folder(@course)
       put 'update', params: {course_id: @course.id, topic_id: @topic.id, attachment: data}, format: 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
       json = JSON.parse(response.body)
       new_file = Attachment.find(json['attachments'][0]['id'])
       expect(new_file.display_name).to match /txt-[0-9]+\.txt/
@@ -1607,7 +1607,7 @@ describe DiscussionTopicsController do
       @topic.save!
       @topic.unlock!
       put('update', params: {course_id: @course.id, topic_id: @topic.id, remove_attachment: '1'}, format: 'json')
-      expect(response).to be_success
+      expect(response).to be_successful
 
       expect(@topic.reload.attachment).to be_nil
       expect(attachment.reload).to be_deleted
@@ -1638,7 +1638,7 @@ describe DiscussionTopicsController do
       @announcement.save!
       put('update', params: {course_id: @course.id, topic_id: @announcement.id, message: 'Foobar',
         is_announcement: true, specific_sections: "all"})
-      expect(response).to be_success
+      expect(response).to be_successful
       visibilities = DiscussionTopicSectionVisibility.active.
         where(:discussion_topic_id => @announcement.id)
       expect(visibilities.empty?).to eq true
@@ -1656,7 +1656,7 @@ describe DiscussionTopicsController do
 
       put('update', params: {course_id: @course.id, topic_id: @announcement.id, message: 'Foobar',
         is_announcement: true})
-      expect(response).to be_success
+      expect(response).to be_successful
       visibilities = DiscussionTopicSectionVisibility.active.
         where(:discussion_topic_id => @announcement.id)
       expect(visibilities.count).to eq 2
@@ -1675,7 +1675,7 @@ describe DiscussionTopicsController do
       expect(topics.map(&:position)).to eq [1, 2, 3]
       t1, t2, _ = topics
       post 'reorder', params: {:course_id => @course.id, :order => "#{t2.id},#{t1.id}"}, :format => 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
       topics.each &:reload
       expect(topics.map(&:position)).to eq [2, 1, 3]
     end

@@ -47,7 +47,7 @@ describe GradebookUploadsController do
   def check_create_response(include_sis_id=false)
     file = generate_file(include_sis_id)
     upload_gradebook_import(@course, file)
-    expect(response).to be_success
+    expect(response).to be_successful
   end
 
   def setup_DA
@@ -126,7 +126,7 @@ describe GradebookUploadsController do
       @gb_upload.save
 
       get 'data', params: {course_id: @course.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(response.body).to eq("while(1);{\"foo\":\"bar\"}")
     end
 
@@ -137,7 +137,7 @@ describe GradebookUploadsController do
       @gb_upload.save
       get 'data', params: {course_id: @course.id}
       expect { GradebookUpload.find(@gb_upload.id) }.to raise_error(ActiveRecord::RecordNotFound)
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 end

@@ -41,7 +41,7 @@ describe ContextModulesController do
     it "should assign variables" do
       user_session(@student)
       get 'index', params: {:course_id => @course.id}
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should touch modules if necessary" do
@@ -53,7 +53,7 @@ describe ContextModulesController do
       end
       user_session(@student)
       get 'index', params: {:course_id => @course.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(@mod1.reload.updated_at.to_i).to_not eq time.to_i # should be touched in case view for old unlock time was cached
       expect(@mod2.reload.updated_at.to_i).to eq time.to_i # should not be touched since the unlock_at was already in the past the last time it was updated
     end
@@ -369,7 +369,7 @@ describe ContextModulesController do
       ContextModule.where(:id => [m1, m2]).update_all(:updated_at => time)
 
       post 'reorder', params: {:course_id => @course.id, :order => "#{m2.id},#{m1.id}"}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(m1.reload.position).to eq 2
       expect(m1.updated_at > time).to be_truthy
       expect(m2.reload.position).to eq 1
@@ -386,7 +386,7 @@ describe ContextModulesController do
 
       expect(Canvas::LiveEvents).to receive(:module_updated).twice
       post 'reorder', params: {:course_id => @course.id, :order => "#{m2.id},#{m1.id},#{m3.id}"}
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 

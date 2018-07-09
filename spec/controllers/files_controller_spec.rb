@@ -105,14 +105,14 @@ describe FilesController do
       user_session(@teacher)
       get 'quota', params: {:course_id => @course.id}
       expect(assigns[:quota]).not_to be_nil
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should assign variables for user quota" do
       user_session(@student)
       get 'quota', params: {:user_id => @student.id}
       expect(assigns[:quota]).not_to be_nil
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should assign variables for group quota" do
@@ -120,7 +120,7 @@ describe FilesController do
       group_model(:context => @course)
       get 'quota', params: {:group_id => @group.id}
       expect(assigns[:quota]).not_to be_nil
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should allow changing group quota" do
@@ -128,7 +128,7 @@ describe FilesController do
       group_model(:context => @course, :storage_quota => 500.megabytes)
       get 'quota', params: {:group_id => @group.id}
       expect(assigns[:quota]).to eq 500.megabytes
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 
@@ -149,7 +149,7 @@ describe FilesController do
     it "should assign variables" do
       user_session(@teacher)
       get 'index', params: {:course_id => @course.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:contexts]).not_to be_nil
       expect(assigns[:contexts][0]).to eql(@course)
     end
@@ -160,7 +160,7 @@ describe FilesController do
       f1 = course_folder
       a1 = folder_file
       get 'index', params: {:course_id => @course.id}, :format => 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
       data = json_parse
       expect(data).not_to be_nil
       # order expected
@@ -170,13 +170,13 @@ describe FilesController do
     it "should work for a user context, too" do
       user_session(@student)
       get 'index', params: {:user_id => @student.id}
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should work for a group context, too" do
       group_with_user_logged_in(:group_context => Account.default)
       get 'index', params: {:group_id => @group.id}
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should not show external tools in a group context" do
@@ -234,12 +234,12 @@ describe FilesController do
 
       it "authorizes users on a remote shard" do
         get 'index', params: {:user_id => @user.global_id}
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it "authorizes users on a remote shard for JSON data" do
         get 'index', params: {:user_id => @user.global_id}, :format => :json
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
   end
@@ -258,7 +258,7 @@ describe FilesController do
       it "should allow public access with legacy verifier" do
         allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return "stubby"
         get 'show', params: {:course_id => @course.id, :id => @file.id, :verifier => @file.uuid}, :format => 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(json_parse['attachment']).to_not be_nil
         expect(json_parse['attachment']['canvadoc_session_url']).to eq "stubby"
         expect(json_parse['attachment']['md5']).to be_nil
@@ -267,7 +267,7 @@ describe FilesController do
       it "should allow public access with new verifier" do
         verifier = Attachments::Verification.new(@file).verifier_for_user(nil)
         get 'show', params: {:course_id => @course.id, :id => @file.id, :verifier => verifier}, :format => 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(json_parse['attachment']).to_not be_nil
         expect(json_parse['attachment']['md5']).to be_nil
       end
@@ -277,14 +277,14 @@ describe FilesController do
         session[:require_terms] = true
         verifier = Attachments::Verification.new(@file).verifier_for_user(@teacher)
         get 'show', params: {:course_id => @course.id, :id => @file.id, :verifier => verifier}, :format => 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
 
     it "should assign variables" do
       user_session(@teacher)
       get 'show', params: {:course_id => @course.id, :id => @file.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:attachment]).not_to be_nil
       expect(assigns[:attachment]).to eql(@file)
     end
@@ -314,7 +314,7 @@ describe FilesController do
       # first verifier
       user_session(user1)
       get 'show', params: verifier1.merge(id: file1.id)
-      expect(response).to be_success
+      expect(response).to be_successful
 
       expect(session[:file_access_user_id]).to eq user1.global_id
       expect(session[:file_access_expiration]).not_to be_nil
@@ -323,7 +323,7 @@ describe FilesController do
 
       # second verifier, should update session
       get 'show', params: verifier2.merge(id: file2.id)
-      expect(response).to be_success
+      expect(response).to be_successful
 
       expect(session[:file_access_user_id]).to eq user2.global_id
       expect(session[:file_access_expiration]).not_to be_nil
@@ -334,7 +334,7 @@ describe FilesController do
       # we can't assert that, because milliseconds) and thus change
       # permissions_key
       get 'show', params: {id: file2.id}
-      expect(response).to be_success
+      expect(response).to be_successful
 
       expect(session[:permissions_key]).not_to eq permissions_key
     end
@@ -374,7 +374,7 @@ describe FilesController do
       user_session(@teacher)
       @enrollment.conclude
       get 'show', params: {:course_id => @course.id, :id => @file.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       get 'show', params: {:course_id => @course.id, :id => @file.id, :download => 1}
       expect(response).to be_redirect
     end
@@ -399,7 +399,7 @@ describe FilesController do
       it "should allow concluded students to read and download files" do
         @enrollment.conclude
         get 'show', params: {:course_id => @course.id, :id => @file.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         get 'show', params: {:course_id => @course.id, :id => @file.id, :download => 1}
         expect(response).to be_redirect
       end
@@ -453,7 +453,7 @@ describe FilesController do
         new_file.save
 
         get 'show', params: {:course_id => @course.id, :id => new_file.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:attachment)).to eq new_file
       end
 
@@ -487,7 +487,7 @@ describe FilesController do
         # create an orphaned attachment_association
         @assignment.all_submissions.delete_all
         get 'show', params: {user_id: @student.id, id: @attachment.id, download_frd: 1}
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
 
@@ -509,7 +509,7 @@ describe FilesController do
         attachment_model :context => @student
         @assignment.submit_homework @student, :attachments => [@attachment]
         get 'show', params: {:user_id => @student.id, :id => @attachment.id, :inline => 1}
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
 
@@ -606,7 +606,7 @@ describe FilesController do
         allow(s3object).to receive(:read).and_return('hello')
         allow_any_instantiation_of(@file).to receive(:s3object).and_return(s3object)
         get "show_relative", params: {file_id: @file.id, course_id: @course.id, file_path: @file.full_display_path, inline: 1, download: 1}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).to eq 'hello'
         expect(response.content_type).to eq 'text/html'
       end
@@ -685,7 +685,7 @@ describe FilesController do
         file_verifier = Attachments::Verification.new(@file).verifier_for_user(nil)
         user_verifier = Users::AccessVerifier.generate(user: @teacher)
         get 'show_relative', params: user_verifier.merge(:download => 1, :inline => 1, :verifier => file_verifier, :account_id => @account.id, :file_id => @file.id, :file_path => @file.full_path)
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it "should enforce verification for contexts other than account" do
@@ -723,7 +723,7 @@ describe FilesController do
       course_folder
 
       put 'update', params: {:course_id => @course.id, :id => @file.id, :attachment => { :folder_id => @folder.id }}, :format => 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
 
       @file.reload
       expect(@file.folder).to eql(@folder)
@@ -850,7 +850,7 @@ describe FilesController do
         :context_code => @course.asset_string,
         :filename => "bob.txt"
       }}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:attachment]).not_to be_nil
       expect(assigns[:attachment].id).not_to be_nil
       expect(assigns[:attachment][:user_id]).not_to be_nil
@@ -868,7 +868,7 @@ describe FilesController do
         :context_code => @course.asset_string,
         :filename => "bob.txt"
       }}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:attachment]).not_to be_nil
       expect(assigns[:attachment].id).not_to be_nil
       expect(assigns[:attachment][:user_id]).not_to be_nil
@@ -888,7 +888,7 @@ describe FilesController do
         :filename => "something.rb",
         :content_type => "text/magical-incantation"
       }}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:attachment].content_type).to eq "text/magical-incantation"
     end
 
@@ -916,7 +916,7 @@ describe FilesController do
         :intent => 'submit',
         :filename => "bob.txt"
       }, :format => :json}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:attachment]).not_to be_nil
       expect(assigns[:attachment].id).not_to be_nil
       json = json_parse
@@ -944,7 +944,7 @@ describe FilesController do
         :intent => 'submit',
         :filename => "bob.txt"
       }}
-      expect(response).to be_success
+      expect(response).to be_successful
 
       expect(assigns[:attachment]).not_to be_nil
       expect(assigns[:attachment].context).to eq group
@@ -957,7 +957,7 @@ describe FilesController do
           :context_code => @course.asset_string,
           :filename => "bob.txt"
       }}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:attachment].locked).to be_falsy
     end
 
@@ -968,7 +968,7 @@ describe FilesController do
           :context_code => @course.asset_string,
           :filename => "bob.txt"
       }}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:attachment].locked).to be_truthy
     end
 
@@ -1008,7 +1008,7 @@ describe FilesController do
         :intent => 'submit',
         :filename => "bob.txt"
       }}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:attachment]).not_to be_nil
       expect(assigns[:attachment].context).to eq group
       expect(assigns[:attachment].folder).to be_for_submissions
@@ -1028,7 +1028,7 @@ describe FilesController do
         :intent => 'submit',
         :filename => "bob.txt"
       }}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:attachment]).not_to be_nil
       expect(assigns[:attachment]).not_to be_locked
     end
@@ -1046,7 +1046,7 @@ describe FilesController do
                                  :context_code => @course.asset_string,
                                  :filename => "bob.txt"
                              }}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:attachment]).not_to be_nil
         expect(assigns[:attachment].id).not_to be_nil
         expect(assigns[:attachment].shard).to eq @shard1
@@ -1074,7 +1074,7 @@ describe FilesController do
                                  :intent => 'submit',
                                  :filename => "bob.txt"
                              }}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:attachment]).not_to be_nil
         expect(assigns[:attachment].id).not_to be_nil
         expect(assigns[:attachment].shard).to eq @shard1
@@ -1338,7 +1338,7 @@ describe FilesController do
 
       it "should give a download url" do
         get "public_url", params: {:id => @attachment.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         data = json_parse
         expect(data).to eq({ "public_url" => @attachment.public_url(secure: false) })
       end
@@ -1356,7 +1356,7 @@ describe FilesController do
 
       it "should allow a teacher to download a student's submission" do
         get "public_url", params: {:id => @attachment.id, :submission_id => @submission.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         data = json_parse
         expect(data).to eq({ "public_url" => @attachment.public_url(secure: false) })
       end
@@ -1372,7 +1372,7 @@ describe FilesController do
         new_file = attachment_model(:context => @student)
         @assignment.submit_homework @student, :attachments => [new_file]
         get "public_url", params: {:id => old_file.id, :submission_id => @submission.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         data = json_parse
         expect(data).to eq({ "public_url" => old_file.public_url(secure: false) })
       end

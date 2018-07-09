@@ -27,7 +27,7 @@ describe ContentMigrationsController do
     it 'index exports quizzes_next environment' do
       user_session(@teacher)
       get :index, params: {course_id: @course.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:js_env][:QUIZZES_NEXT_CONFIGURED_ROOT]).not_to be(nil)
       expect(assigns[:js_env][:QUIZZES_NEXT_ENABLED]).not_to be(nil)
     end

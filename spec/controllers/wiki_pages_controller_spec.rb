@@ -35,7 +35,7 @@ describe WikiPagesController do
       front_page = @course.wiki_pages.create!(title: "ponies4ever")
       @wiki.set_front_page_url!(front_page.url)
       get 'front_page', params: {course_id: @course.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:js_env][:DISPLAY_SHOW_ALL_LINK]).to be(true)
     end
   end

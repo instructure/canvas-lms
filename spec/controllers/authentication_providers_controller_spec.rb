@@ -57,7 +57,7 @@ describe AuthenticationProvidersController do
     context "with no aacs" do
       it "renders ok" do
         get 'index', params: {account_id: account.id}
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
 
@@ -65,7 +65,7 @@ describe AuthenticationProvidersController do
       it "renders ok" do
         account.authentication_providers.create!(saml_hash)
         get 'index', params: {account_id: account.id}
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
 
@@ -73,7 +73,7 @@ describe AuthenticationProvidersController do
       it "renders ok" do
         account.authentication_providers.create!(microsoft_hash)
         get 'index', params: {account_id: account.id}
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
 
@@ -82,7 +82,7 @@ describe AuthenticationProvidersController do
   describe "saml_testing" do
     it "requires saml configuration to test" do
       get "saml_testing", params: {account_id: account.id}, format: :json
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(response.body).to match("A SAML configuration is required to test SAML")
     end
   end
