@@ -317,42 +317,6 @@ describe 'Courses', :pact do
     expect(response['delete']).to eq true
   end
 
-  it 'Should List Wiki Pages' do
-    canvas_lms_api.given('a wiki page in a course').
-      upon_receiving('List Wiki Pages').
-      with(
-        method: :get,
-        headers: {
-          'Authorization': 'Bearer some_token',
-          'Auth-User': 'Teacher1',
-          'Connection': 'close',
-          'Host': PactConfig.mock_provider_service_base_uri,
-          'Version': 'HTTP/1.1'
-        },
-        'path' => '/api/v1/courses/1/pages/',
-        query: ''
-      ).
-      will_respond_with(
-        status: 200,
-        body: Pact.each_like(
-          "title": "WIKI Page",
-          "created_at": "2018-05-30T22:50:18Z",
-          "url": "wiki-page",
-          "editing_roles": "teachers",
-          "page_id": 1,
-          "published": true,
-          "hide_from_students": false,
-          "front_page": false,
-          "html_url": "http://localhost:3000/courses/3/pages/wiki-page",
-          "updated_at": "2018-05-30T22:50:18Z",
-          "locked_for_user": false
-        )
-      )
-    courses_api.authenticate_as_user('Teacher1')
-    response = courses_api.list_wiki_pages(1)
-    expect(response[0]['title']).to eq "WIKI Page"
-  end
-
   it 'should Create a Course' do
     canvas_lms_api.given('a site admin').
       upon_receiving('Create a Course').

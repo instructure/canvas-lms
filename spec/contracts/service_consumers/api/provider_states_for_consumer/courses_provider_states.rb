@@ -38,15 +38,6 @@ PactConfig::Consumers::ALL.each do |consumer|
       end
     end
 
-    # Course ID: 1
-    # Wiki Page ID: 1
-    provider_state 'a wiki page in a course' do
-      set_up do
-        @course = Pact::Canvas.base_state.course
-        @course.wiki_pages.create!(title: "wiki_page")
-      end
-    end
-
     # Student ID: 5 || Name: Student1
     # Course ID: 1
     # Quizzes ID: 1
