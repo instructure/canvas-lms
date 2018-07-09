@@ -1913,6 +1913,7 @@ CanvasRails::Application.routes.draw do
       prefix = "courses/:course_id/custom_gradebook_columns/:id/data"
       get prefix, action: :index, as: "course_custom_gradebook_column_data"
       put "#{prefix}/:user_id", action: :update, as: "course_custom_gradebook_column_datum"
+      put "courses/:course_id/custom_gradebook_column_data", action: :bulk_update, as: "course_custom_gradebook_column_bulk_data"
     end
 
     scope(controller: :content_exports_api) do

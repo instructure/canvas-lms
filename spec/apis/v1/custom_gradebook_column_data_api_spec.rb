@@ -39,6 +39,7 @@ describe CustomGradebookColumnDataApiController, type: :request do
     @user = @teacher
 
     @col = @course.custom_gradebook_columns.create! title: "Notes", position: 1
+    @second_col = @course.custom_gradebook_columns.create! title: "Notes2", position: 2
   end
 
   describe 'index' do
@@ -202,6 +203,123 @@ describe CustomGradebookColumnDataApiController, type: :request do
       # update
       json = update(@student1, "shmarg")
       check.("shmarg")
+    end
+  end
+
+  describe 'bulk update' do
+    def bulk_update(args)
+      api_call(:put,
+        "/api/v1/courses/#{@course.id}/custom_gradebook_column_data",
+        {
+          course_id: @course.to_param,
+          action: "bulk_update",
+          controller: "custom_gradebook_column_data_api", format: "json"
+        },
+        {
+          "column_data" => [
+            {
+              "column_id" => args.first[:column_id],
+              "user_id" => args.first[:student_id],
+              "content" => args.first[:content]
+            }
+          ]
+        })
+    end
+
+    it 'passes the contents to the api call successfully' do
+      @user = @teacher
+      contents = [
+        {
+          column_id: @col.to_param,
+          student_id: @student1.to_param,
+          content: 'Column 1, Student 1'
+        }
+      ]
+
+      json = bulk_update(contents)
+      expect(json.fetch('workflow_state')).to eq "queued"
+    end
+
+    it 'passes muliple contents to the api call successfully' do
+      @user = @teacher
+      contents = [
+        {
+          column_id: @col.to_param,
+          student_id: @student1.to_param,
+          content: 'Column 1, Student 1'
+        },
+        {
+          column_id: @second_col.to_param,
+          student_id: @student2.to_param,
+          content: 'Column 2, Student 2'
+        }
+      ]
+
+      json = api_call :put,
+      "/api/v1/courses/#{@course.id}/custom_gradebook_column_data",
+      {
+        course_id: @course.to_param,
+        action: "bulk_update",
+        controller: "custom_gradebook_column_data_api", format: "json"
+      },
+      {
+        "column_data" => [
+          {
+            "column_id" => contents.first[:column_id],
+            "user_id" => contents.first[:student_id],
+            "content" => contents.first[:content]
+          },
+          {
+            "column_id" => contents.second[:column_id],
+            "user_id" => contents.second[:student_id],
+            "content" => contents.second[:content]
+          }
+        ]
+      }
+
+      expect(json.fetch('workflow_state')).to eq "queued"
+    end
+
+    it 'throws 401 status when updating non existing student' do
+      @user = @teacher
+      contents = [
+        {
+          column_id: @col.to_param,
+          student_id: -1.to_param,
+          content: 'Non existing student 1'
+        }
+      ]
+
+      bulk_update(contents)
+      assert_status(401)
+    end
+
+    it 'throws 400 status when passing empty input' do
+      @user = @teacher
+      api_call :put,
+      "/api/v1/courses/#{@course.id}/custom_gradebook_column_data",
+      {
+        course_id: @course.to_param,
+        action: "bulk_update",
+        controller: "custom_gradebook_column_data_api", format: "json"
+      }, {}
+
+      assert_status(400)
+    end
+
+    it 'throws 400 status when passing empty array in column_data' do
+      @user = @teacher
+
+      api_call :put,
+      "/api/v1/courses/#{@course.id}/custom_gradebook_column_data",
+      {
+        course_id: @course.to_param,
+        action: "bulk_update",
+        controller: "custom_gradebook_column_data_api", format: "json"
+      },
+      { "column_data" => [] }
+
+      assert_status(400)
     end
   end
 end
