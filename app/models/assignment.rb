@@ -54,7 +54,7 @@ class Assignment < ActiveRecord::Base
   restrict_assignment_columns
   restrict_columns :state, [:workflow_state]
 
-  has_many :submissions, -> { active.preload(:grading_period) }
+  has_many :submissions, -> { active.preload(:grading_period) }, inverse_of: :assignment
   has_many :all_submissions, class_name: 'Submission', dependent: :destroy
   has_many :provisional_grades, :through => :submissions
   has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy

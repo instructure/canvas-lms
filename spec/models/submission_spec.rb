@@ -4699,7 +4699,7 @@ describe Submission do
       it 'updates the lti_result score_given if the score has changed' do
         expect(lti_result.result_score).to eq submission.score
         submission.update!(score: 1)
-        expect(lti_result.result_score).to eq submission.score
+        expect(lti_result.reload.result_score).to eq submission.score
       end
     end
   end
