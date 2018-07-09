@@ -236,6 +236,7 @@ Metrics/BlockLength:
   - gems/*/spec/**/*.rb
   - gems/plugins/*/spec_canvas/**/*.rb
   - spec/**/*.rb
+  - pact/spec/**/*_spec.rb
 Metrics/CyclomaticComplexity:
   Max: 28
 Metrics/PerceivedComplexity:
