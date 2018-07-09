@@ -30,11 +30,11 @@ describe "SpeedGrader" do
     @teacher3 = course_with_teacher(course: @course, name: 'Teacher3', active_all: true).user
 
     # enroll two students
-    @student1 = User.create!(name: 'Student1')
+    @student1 = User.create!(name: 'First Student')
     @student1.register!
     @course.enroll_student(@student1, enrollment_state: 'active')
 
-    @student2 = User.create!(name: 'Student2')
+    @student2 = User.create!(name: 'Second Student')
     @student2.register!
     @course.enroll_student(@student2, enrollment_state: 'active')
   end
@@ -45,10 +45,22 @@ describe "SpeedGrader" do
       @assignment = @course.assignments.create!(
         name: 'anonymous assignment',
         points_possible: 10,
-        submission_types: 'text',
+        submission_types: 'online_text_entry,online_upload',
         anonymous_grading: true
       )
 
+      # Student1 & Student2 submit homework and a comment
+      file_attachment = attachment_model(content_type: 'application/pdf', context: @student1)
+      @submission1 = @assignment.submit_homework(@student1,
+                                  submission_type: 'online_upload',
+                                  attachments: [file_attachment],
+                                  comment: "This is Student One's comment")
+
+      file_attachment = attachment_model(content_type: 'application/pdf', context: @student2)
+      @submission1 = @assignment.submit_homework(@student2,
+                                                 submission_type: 'online_upload',
+                                                 attachments: [file_attachment],
+                                                 comment: "This is Student Two's comment")
       user_session(@teacher)
       Speedgrader.visit(@course.id, @assignment.id)
     end
@@ -56,7 +68,7 @@ describe "SpeedGrader" do
     it "student names are anonymous", priority: "1", test_id: 3481048 do
       Speedgrader.students_dropdown_button.click
       student_names = Speedgrader.students_select_menu_list.map(&:text)
-      expect(student_names).to eql ['Student 1', 'Student 2']
+      expect(student_names).to eql ["Student 1", "Student 2"]
     end
 
     context "given a specific student" do
@@ -68,6 +80,13 @@ describe "SpeedGrader" do
 
       it "when their submission is selected and page reloaded", priority: "1", test_id: 3481049 do
         expect { refresh_page }.not_to change { Speedgrader.selected_student.text }.from('Student 2')
+      end
+    end
+
+    context "given student comment and file submission" do
+      it 'author of comment is anonymous', priority: 2, test_id: 3496274 do
+        expect(Speedgrader.comment_citation.text).not_to match(/(First|Second) Student/)
+        expect(Speedgrader.comment_citation.text).to match(/Student (1|2)/)
       end
     end
   end
