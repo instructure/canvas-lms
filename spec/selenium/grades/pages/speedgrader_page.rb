@@ -20,6 +20,10 @@ class Speedgrader
     include SeleniumDependencies
 
     # components/elements
+    def right_inner_panel
+      f('#rightside_inner')
+    end
+
     def grade_value
       f('#grade_container input[type=text]').attribute('value')
     end
@@ -97,7 +101,7 @@ class Speedgrader
     end
 
     def comment_citation
-      f('.author_name')
+      ff('.author_name')
     end
 
     def new_comment_text_area
