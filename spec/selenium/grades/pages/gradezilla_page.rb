@@ -440,6 +440,26 @@ class Gradezilla
       total_cell_warning_icon
     end
 
+    def open_display_dialog
+      select_total_column_option('grade-display-switcher')
+    end
+
+    def close_display_dialog
+      f(".ui-icon-closethick").click
+    end
+
+    def toggle_grade_display
+      open_display_dialog
+      dialog = fj('.ui-dialog:visible')
+      submit_dialog(dialog, '.ui-button')
+    end
+
+    def close_dialog_and_dont_show_again
+      dialog = fj('.ui-dialog:visible')
+      fj("#hide_warning").click
+      submit_dialog(dialog, '.ui-button')
+    end
+
     def content_selector
       f("#content")
     end

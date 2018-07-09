@@ -20,6 +20,8 @@ require_relative '../../helpers/gradezilla_common'
 module NSubmisssionsSetup
 
   # use this to create X students and Y assignments = XY Submissions
+  # Note: This can be used for 200 submissions, beyond that might not be supported on current Jenkins
+
   def submissions_setup(number_of_students, number_of_assignments, opts={})
     course_with_teacher({ active_all: true }.merge(opts))
     @course.grading_standard_enabled = true
