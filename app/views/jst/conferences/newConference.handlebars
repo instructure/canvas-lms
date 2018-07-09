@@ -99,23 +99,30 @@
             <div class="ig-row__layout">
               <div class="ig-info">
                 <div class="ig-details">
-                  <span>{{title}}</span>
-                  &nbsp;&nbsp;&nbsp;
-                  {{#each playback_formats}}
-                    {{#if length}}
-                      <a href="{{url}}" target="_blank" class="ig-title"
-                        style="line-height: inherit;" data-id="{{../recording_id}}" data-format="presentation">
-                        {{#t "type"}}{{type}}{{/t}}
-                      </a>
-                    {{else}}
-                      {{#if ../../../permissions.manage_recordings}}
+                  {{#if ../../isAdobeConnect}}
+                    <a id="adobe-connect-playback-link" href="{{../playback_url}}" target="_blank" class="ig-title"
+                      style="line-height: inherit;" data-id="{{../recording_id}}" data-format="presentation">
+                      {{title}}
+                    </a>
+                  {{else}}
+                    <span>{{title}}</span>
+                    &nbsp;&nbsp;&nbsp;
+                    {{#each playback_formats}}
+                      {{#if length}}
                         <a href="{{url}}" target="_blank" class="ig-title"
-                          style="line-height: inherit;" data-id="{{../recording_id}}" data-format="presentation">
+                          style="line-height: inherit;" data-id="{{../../recording_id}}" data-format="presentation">
                           {{#t "type"}}{{type}}{{/t}}
                         </a>
+                      {{else}}
+                        {{#if ../../../../permissions.manage_recordings}}
+                          <a href="{{url}}" target="_blank" class="ig-title"
+                            style="line-height: inherit;" data-id="{{../../recording_id}}" data-format="presentation">
+                            {{#t "type"}}{{type}}{{/t}}
+                          </a>
+                        {{/if}}
                       {{/if}}
-                    {{/if}}
-                  {{/each}}
+                    {{/each}}
+                  {{/if}}
                   {{dateString created_at}}
                   &nbsp;&#124;&nbsp;
                   {{durationToString duration_minutes}}

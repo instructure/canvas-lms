@@ -32,6 +32,11 @@ const conferenceView = function(conferenceOpts = {}) {
   if (!('user_settings' in conferenceOpts)) conferenceOpts.user_settings = {}
   const conference = new Conference({
     id: conferenceOpts.id,
+    conference_type: 'AdobeConnect',
+    context_code: 'course_1',
+    context_id: 1,
+    context_type: 'Course',
+    join_url: 'www.blah.com',
     recordings: conferenceOpts.recordings,
     user_settings: conferenceOpts.user_settings,
     permissions: {
@@ -139,4 +144,50 @@ test('deleteRecordings calls screenreader', function() {
   equal($.screenReaderFlashMessage.callCount, 1)
   server.restore()
   ok(view)
+})
+
+test('renders adobe connect link', function() {
+  ENV.context_asset_string = 'course_1'
+  ENV.conference_type_details = [
+    {
+      name:"Adobe Connect",
+      type:"AdobeConnect",
+      settings:[]
+    }
+  ]
+  const adobe_connect_conference = {
+    id: 1,
+    conference_type: 'AdobeConnect',
+    context_code: 'course_1',
+    context_id: 1,
+    context_type: 'Course',
+    playback_url: 'www.blah.com',
+    join_url: 'www.blah.com',
+    recordings: [
+      {
+        recording_id: "954cc3",
+        title: "Conference",
+        playback_url: 'www.blah.com',
+        duration_minutes: 0,
+        playback_formats: [
+          {
+            type: "statistics",
+            url: "www.blah.com",
+            length: null
+          },
+          {
+            type: "presentation",
+            url: "www.blah.com",
+            length: 0
+          }
+        ],
+        created_at: 1518554650000,
+      }
+    ],
+    user_settings: {
+      record: true
+    }
+  }
+  conferenceView(adobe_connect_conference)
+  equal($('#adobe-connect-playback-link').attr('href'), 'www.blah.com')
 })

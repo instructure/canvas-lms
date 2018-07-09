@@ -17,7 +17,7 @@
  */
 
 import React, { Component } from 'react'
-import Pagination, {PaginationButton} from '@instructure/ui-pagination/lib/components/Pagination'
+import Pagination, {PaginationButton} from './CopyOfInstUIPaginationThatFixesPerfBug'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import { array, func, string, shape, oneOf } from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
@@ -103,6 +103,27 @@ export default class SearchMessage extends Component {
     );
   };
 
+  renderPaginationButton(pageIndex) {
+    const pageNumber = pageIndex + 1
+    const isCurrent = this.state.pageBecomingCurrent
+      ? pageNumber === this.state.pageBecomingCurrent
+      : pageNumber === this.state.currentPage
+    return (
+      <PaginationButton
+        key={pageNumber}
+        onClick={() => this.handleSetPage(pageNumber)}
+        current={isCurrent}
+        aria-label={I18n.t('Page %{pageNum}', {pageNum: pageNumber})}
+      >
+        {isCurrent && this.state.pageBecomingCurrent ? (
+          <Spinner size="x-small" title={I18n.t('Loading...')} />
+        ) : (
+          I18n.n(pageNumber)
+        )}
+      </PaginationButton>
+    )
+  }
+
 
   render () {
     const { collection, noneFoundMessage } = this.props
@@ -136,6 +157,16 @@ export default class SearchMessage extends Component {
         </div>
       )
     } else if (collection.links) {
+      const lastIndex = this.state.pageNumbers.length - 1
+      const paginationButtons = []
+      paginationButtons[0] = this.renderPaginationButton(0)
+      paginationButtons[lastIndex] = this.renderPaginationButton(lastIndex)
+      const visiblePageRangeStart = Math.max(this.state.currentPage - 2, 0)
+      const visiblePageRangeEnd = Math.min(this.state.currentPage + 5, lastIndex)
+      for (let i = visiblePageRangeStart; i < visiblePageRangeEnd; i++) {
+        paginationButtons[i] = this.renderPaginationButton(i)
+      }
+
       return (
         <div>
           {this.renderSearchDoneAlert(collection.loading, resultsFoundMessage)}
@@ -145,26 +176,7 @@ export default class SearchMessage extends Component {
             labelNext={I18n.t('Next Page')}
             labelPrev={I18n.t('Previous Page')}
           >
-            {this.state.pageNumbers.map((v, i) => {
-              const pageNumber = i + 1
-              const isCurrent = (this.state.pageBecomingCurrent) ?
-                              pageNumber === this.state.pageBecomingCurrent :
-                              pageNumber === this.state.currentPage;
-              return (
-                <PaginationButton
-                  key={pageNumber}
-                  onClick={() => this.handleSetPage(pageNumber)}
-                  current={isCurrent}
-                  aria-label={I18n.t('Page %{pageNum}', { pageNum: pageNumber })}
-                >
-                    { isCurrent && this.state.pageBecomingCurrent ? (
-                      <Spinner size="x-small" title={I18n.t('Loading...')} />
-                    ) : (
-                      I18n.n(pageNumber)
-                    )}
-                </PaginationButton>
-              )
-            }).concat(this.state.lastUnknown
+            {paginationButtons.concat(this.state.lastUnknown
               ? <span key="page-count-is-unknown-indicator" aria-hidden>...</span>
               : []
             )}

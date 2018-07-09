@@ -46,4 +46,5 @@ define [
       json = super
       for attr in ['special_urls', 'recordings_data', 'schedule_data', 'permissions_data']
         _.extend(json, @[attr]())
+      json.isAdobeConnect = json.conference_type == "AdobeConnect"
       json
