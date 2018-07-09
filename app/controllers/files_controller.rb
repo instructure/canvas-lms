@@ -195,8 +195,7 @@ class FilesController < ApplicationController
     begin
       access_verifier = validate_access_verifier
     rescue Users::AccessVerifier::InvalidVerifier
-      render_unauthorized_action
-      return false
+      access_verifier = {}
     end
 
     if access_verifier[:user]

@@ -19,6 +19,8 @@ require 'openssl'
 
 module Users
   module AccessVerifier
+    TTL_MINUTES = 5
+
     class InvalidVerifier < RuntimeError
     end
 
@@ -37,7 +39,7 @@ module Users
       jwt_claims[:root_account_id] = root_account.global_id.to_s if root_account
       jwt_claims[:oauth_host] = oauth_host if oauth_host
 
-      expires = 5.minutes.from_now
+      expires = TTL_MINUTES.minutes.from_now
       key = nil # use default key
       { sf_verifier: Canvas::Security.create_jwt(jwt_claims, expires, key, :HS512) }
     end
