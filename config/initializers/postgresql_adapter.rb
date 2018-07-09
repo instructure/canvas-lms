@@ -253,6 +253,12 @@ module PostgreSQLAdapterExtensions
     execute("SELECT COUNT(*) FROM #{quote_table_name(table)} WHERE #{column} IS NULL")
     super
   end
+
+  def initialize_type_map(m = type_map)
+    m.register_type "pg_lsn", ActiveRecord::ConnectionAdapters::PostgreSQL::OID::SpecializedString.new(:pg_lsn)
+
+    super
+  end
 end
 
 ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(PostgreSQLAdapterExtensions)
