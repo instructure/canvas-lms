@@ -64,7 +64,7 @@ class BigBlueButtonConference < WebConference
   end
 
   def recording_ready_user
-    if self.course.instructor_enrollments.active_or_pending.where(user_id: self.user).exists?
+    if self.grants_right?(self.user, :create)
       "#{self.user['name']} <#{self.user.email}>"
     end
   end

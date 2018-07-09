@@ -186,7 +186,7 @@ class RoleOverride < ActiveRecord::Base
       },
       :send_messages => {
         :label => lambda { t('permissions.send_messages', "Send messages to individual course members") },
-        :label_v2 => lambda { t("Messages - send to individual course members") },
+        :label_v2 => lambda { t('Conversations - send messages to individual course members') },
         :available_to => [
           'StudentEnrollment',
           'TaEnrollment',
@@ -207,7 +207,7 @@ class RoleOverride < ActiveRecord::Base
       },
       :send_messages_all => {
         :label => lambda { t('permissions.send_messages_all', "Send messages to the entire class") },
-        :label_v2 => lambda { t("Messages - send to entire class") },
+        :label_v2 => lambda { t("Conversations - send messages to entire class") },
         :available_to => [
           'StudentEnrollment',
           'TaEnrollment',
@@ -418,7 +418,7 @@ class RoleOverride < ActiveRecord::Base
       },
       :manage_students => {
         :label => lambda { t('permissions.manage_students', "Add/remove students for the course") },
-        :label_v2 => lambda { t("Course - add / remove students") },
+        :label_v2 => lambda { t("Users - add / remove students from courses") },
         :available_to => [
           'TaEnrollment',
           'DesignerEnrollment',
@@ -436,7 +436,7 @@ class RoleOverride < ActiveRecord::Base
       },
       :manage_admin_users => {
         :label => lambda { t('permissions.manage_admin_users', "Add/remove other teachers, course designers or TAs to the course") },
-        :label_v2 => lambda { t("Course - add / remove teachers, course designers or TA's") },
+        :label_v2 => lambda { t("Users - add / remove teachers, course designers or TAs from courses") },
         :available_to => [
           'TaEnrollment',
           'DesignerEnrollment',
@@ -580,7 +580,7 @@ class RoleOverride < ActiveRecord::Base
       },
       :view_course_changes => {
         :label => lambda { t('permissions.view_course_changes', "View Course Change Logs") },
-        :label_v2 => lambda { t("Course - view change logs") },
+        :label_v2 => lambda { t("Grades - view change logs") },
         :admin_tool => true,
         :account_only => true,
         :available_to => [
@@ -591,6 +591,7 @@ class RoleOverride < ActiveRecord::Base
       },
       :view_notifications => {
         :label => lambda { t('permissions.view_notifications', "View notifications") },
+        :label_v2 => lambda { t('Notifications - view') },
         :admin_tool => true,
         :account_only => true,
         :available_to => [
@@ -602,7 +603,7 @@ class RoleOverride < ActiveRecord::Base
       },
       :read_question_banks => {
         :label => lambda { t('permissions.read_question_banks', "View and link to question banks") },
-        :label_v2 => lambda { t("Question banks - view and link to") },
+        :label_v2 => lambda { t("Question banks - view and link") },
         :available_to => [
           'TaEnrollment',
           'DesignerEnrollment',
@@ -684,7 +685,7 @@ class RoleOverride < ActiveRecord::Base
       },
       :manage_user_logins => {
         :label => lambda { t('permissions.manage_user_logins', "Modify login details for users") },
-        :label_v2 => lambda { t("Users - manage log in details") },
+        :label_v2 => lambda { t("Users - manage login details") },
         :available_to => [
           'AccountAdmin',
           'AccountMembership'
@@ -762,6 +763,7 @@ class RoleOverride < ActiveRecord::Base
       },
       :read_course_list => {
         :label => lambda { t('permissions.read_course_list', "View the list of courses") },
+        :label_v2 => lambda { t('Courses - view list') },
         :account_only => true,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership)
@@ -870,13 +872,13 @@ class RoleOverride < ActiveRecord::Base
       },
       :manage_feature_flags => {
         :label => lambda { t('permissions.manage_feature_flags', "Enable or disable features at an account level") },
-        :label_v2 => lambda { t("Feature Flags - enable / disable") },
+        :label_v2 => lambda { t("Feature Options - enable / disable") },
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership)
       },
       :view_quiz_answer_audits => {
         :label => lambda { t('permissions.view_quiz_answer_audits', 'View the answer matrix in Quiz Submission Logs')},
-        :label_v2 => lambda { t('Assignments and Quizzes - view answer matrix')},
+        :label_v2 => lambda { t('Quizzes - view submission log')},
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
         :account_allows => lambda {|a| a.feature_allowed?(:quiz_log_auditing)}
@@ -909,17 +911,17 @@ class RoleOverride < ActiveRecord::Base
         :available_to => %w(TeacherEnrollment TaEnrollment DesignerEnrollment AccountAdmin AccountMembership)
       },
       :select_final_grade => {
-        :label => -> { t('Select final grade for moderation') },
+        :label => -> { t('Grades - Select final grade for moderation') },
         :true_for => %w(AccountAdmin TeacherEnrollment TaEnrollment),
         :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment)
       },
       :view_audit_trail => {
-        :label => -> { t('View audit trail') },
+        :label => -> { t('Grades - View audit trail') },
         :true_for => %w(TeacherEnrollment AccountAdmin),
         :available_to => %w(TeacherEnrollment AccountAdmin AccountMembership)
       },
       :generate_observer_pairing_code => {
-        :label => -> { t('Generate observer pairing codes for students') },
+        :label => -> { t('Users - Generate observer paring code for students') },
         :true_for => %w(AccountAdmin),
         :available_to => %w(TeacherEnrollment ObserverEnrollment TaEnrollment AccountAdmin AccountMembership DesignerEnrollment)
       }
