@@ -116,12 +116,13 @@ export class Opportunity extends Component {
             <Button
               onClick={() => this.props.dismiss(this.props.id, this.props.plannerOverride)}
               variant="icon"
+              icon={IconXLine}
               size="small"
+              title={formatMessage("Dismiss {opportunityName}", {opportunityName: this.props.opportunityTitle})}
             >
-              <IconXLine
-                className={styles.closeButtonIcon}
-                title={formatMessage("Dismiss {opportunityName}", {opportunityName: this.props.opportunityTitle})}
-              />
+              <ScreenReaderContent>
+                {formatMessage("Dismiss {opportunityName}", {opportunityName: this.props.opportunityTitle})}
+              </ScreenReaderContent>
             </Button>
           </div>
       </div>

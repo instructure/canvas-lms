@@ -85,9 +85,8 @@ export default class DashboardOptionsMenu extends React.Component {
     return (
       <Menu
         trigger={
-          <Button variant="icon" buttonRef={this.props.menuButtonRef}>
+          <Button variant="icon" icon={IconMoreLine} buttonRef={this.props.menuButtonRef}>
             <ScreenReaderContent>{I18n.t('Dashboard Options')}</ScreenReaderContent>
-            <IconMoreLine />
           </Button>
         }
         contentRef={el => (this.menuContentRef = el)}

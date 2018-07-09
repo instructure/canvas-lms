@@ -54,15 +54,19 @@ exports[`renders the base component correctly 1`] = `
       as="button"
       buttonRef={[Function]}
       fluidWidth={false}
+      icon={[Function]}
       margin="0"
       onClick={[Function]}
       size="small"
+      title="Dismiss this is a description about the opportunity"
       type="button"
       variant="icon"
     >
-      <IconX
-        title="Dismiss this is a description about the opportunity"
-      />
+      <ScreenReaderContent
+        as="span"
+      >
+        Dismiss this is a description about the opportunity
+      </ScreenReaderContent>
     </Button>
   </div>
 </div>
@@ -120,15 +124,19 @@ exports[`renders the base component correctly without points 1`] = `
       as="button"
       buttonRef={[Function]}
       fluidWidth={false}
+      icon={[Function]}
       margin="0"
       onClick={[Function]}
       size="small"
+      title="Dismiss this is a description about the opportunity"
       type="button"
       variant="icon"
     >
-      <IconX
-        title="Dismiss this is a description about the opportunity"
-      />
+      <ScreenReaderContent
+        as="span"
+      >
+        Dismiss this is a description about the opportunity
+      </ScreenReaderContent>
     </Button>
   </div>
 </div>
