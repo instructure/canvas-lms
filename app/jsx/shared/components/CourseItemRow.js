@@ -248,7 +248,7 @@ export default class CourseItemRow extends Component {
               ) : null
             }
             {this.props.actionsContent}
-            <span ref={this.initializeMasterCourseIcon} className="ic-item-row__master-course-lock" />
+            <span ref={this.initializeMasterCourseIcon} className="ic-item-row__master-course-lock lock-icon" />
             {this.props.showManageMenu && (
               <span className="ic-item-row__manage-menu">
                 <Menu
