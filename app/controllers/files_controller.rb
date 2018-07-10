@@ -840,7 +840,7 @@ class FilesController < ApplicationController
 
     model = Object.const_get(params[:context_type])
     @context = model.where(id: params[:context_id]).first
-    @attachment = Attachment.where(context: @context).build
+    @attachment = @context.shard.activate{ Attachment.where(context: @context).build }
 
     # service metadata
     @attachment.filename = params[:name]
