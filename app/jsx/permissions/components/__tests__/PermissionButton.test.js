@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {shallow, mount} from 'enzyme'
 
 import PermissionButton from '../PermissionButton'
 
@@ -31,8 +31,7 @@ const defaultProps = () => ({
   roleId: '1',
   roleLabel: 'myRole',
   fixButtonFocus: () => {},
-  handleClick: () => {},
-  useCaching: false
+  handleClick: () => {}
 })
 
 const disabledProps = () => ({
@@ -45,8 +44,7 @@ const disabledProps = () => ({
   roleId: '1',
   roleLabel: 'myRole',
   fixButtonFocus: () => {},
-  handleClick: () => {},
-  useCaching: false
+  handleClick: () => {}
 })
 
 const enabledAndLockedProps = () => ({
@@ -59,8 +57,7 @@ const enabledAndLockedProps = () => ({
   roleId: '1',
   roleLabel: 'myRole',
   fixButtonFocus: () => {},
-  handleClick: () => {},
-  useCaching: false
+  handleClick: () => {}
 })
 
 const disabledAndLockedProps = () => ({
@@ -73,8 +70,7 @@ const disabledAndLockedProps = () => ({
   roleId: '1',
   roleLabel: 'myRole',
   fixButtonFocus: () => {},
-  handleClick: () => {},
-  useCaching: false
+  handleClick: () => {}
 })
 
 const readOnly = () => ({
@@ -87,31 +83,30 @@ const readOnly = () => ({
   roleId: '1',
   roleLabel: 'myRole',
   fixButtonFocus: () => {},
-  handleClick: () => {},
-  useCaching: false
+  handleClick: () => {}
 })
 
 it('displays enabled correctly', () => {
-  const tree = shallow(<PermissionButton {...defaultProps()} />)
+  const tree = mount(<PermissionButton {...defaultProps()} />)
 
-  const check = tree.find('IconPublish')
-  const x = tree.find('IconTrouble')
+  const check = tree.getDOMNode().querySelector('svg[name="IconPublish"]')
+  const x = tree.getDOMNode().querySelector('svg[name="IconTrouble"]')
   const hideLock = tree.find('.ic-hidden-button')
 
-  expect(check.exists()).toEqual(true)
-  expect(x.exists()).toEqual(false)
+  expect(check).toBeTruthy()
+  expect(x).toBeNull()
   expect(hideLock.exists()).toEqual(true)
 })
 
 it('displays disabled correctly', () => {
-  const tree = shallow(<PermissionButton {...disabledProps()} />)
+  const tree = mount(<PermissionButton {...disabledProps()} />)
 
-  const check = tree.find('IconPublish')
-  const x = tree.find('IconTrouble')
+  const check = tree.getDOMNode().querySelector('svg[name="IconPublish"]')
+  const x = tree.getDOMNode().querySelector('svg[name="IconTrouble"]')
   const hideLock = tree.find('.ic-hidden-button')
 
-  expect(check.exists()).toEqual(false)
-  expect(x.exists()).toEqual(true)
+  expect(check).toBeNull()
+  expect(x).not.toBeNull()
   expect(hideLock.exists()).toEqual(true)
 })
 
@@ -163,26 +158,26 @@ it('displays screenreader enabled correctly', () => {
 })
 
 it('displays enabled and locked correctly', () => {
-  const tree = shallow(<PermissionButton {...enabledAndLockedProps()} />)
+  const tree = mount(<PermissionButton {...enabledAndLockedProps()} />)
 
-  const check = tree.find('IconPublish')
-  const x = tree.find('IconTrouble')
+  const check = tree.getDOMNode().querySelector('svg[name="IconPublish"]')
+  const x = tree.getDOMNode().querySelector('svg[name="IconTrouble"]')
   const hideLock = tree.find('.ic-hidden-button')
 
-  expect(check.exists()).toEqual(true)
-  expect(x.exists()).toEqual(false)
+  expect(check).toBeTruthy()
+  expect(x).toBeNull()
   expect(hideLock.exists()).toEqual(false)
 })
 
 it('displays disabled and locked correctly', () => {
-  const tree = shallow(<PermissionButton {...disabledAndLockedProps()} />)
+  const tree = mount(<PermissionButton {...disabledAndLockedProps()} />)
 
-  const check = tree.find('IconPublish')
-  const x = tree.find('IconTrouble')
+  const check = tree.getDOMNode().querySelector('svg[name="IconPublish"]')
+  const x = tree.getDOMNode().querySelector('svg[name="IconTrouble"]')
   const hideLock = tree.find('.ic-hidden-button')
 
-  expect(check.exists()).toEqual(false)
-  expect(x.exists()).toEqual(true)
+  expect(check).toBeNull()
+  expect(x).toBeTruthy()
   expect(hideLock.exists()).toEqual(false)
 })
 

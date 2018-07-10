@@ -52,7 +52,6 @@
     "graphiql": "^0.11.2",
     "graphql": "^0.13.2",
     "graphql-tag": "^2.8.0",
-    "html-react-parser": "^0.4.6",
     "i18n-js": "^3",
     "ic-ajax": "~2.0.1",
     "ic-tabs": "0.1.3",
