@@ -110,6 +110,17 @@ describe DiscussionTopicsController do
         expect(assigns["topics"]).to include(@child_topic)
       end
 
+      it "should not assign the create permission if the term is concluded" do
+        term = @course.account.enrollment_terms.create!(:name => 'mew', :end_at => Time.now.utc - 1.minute)
+        @course.enrollment_term = term
+        @course.save!
+        user_session(@teacher)
+
+        get 'index', params: {:course_id => @course.id}
+
+        expect(assigns[:js_env][:permissions][:create]).to be_falsey
+      end
+
       it "should not return graded group discussions if a student has no visibility" do
         user_session(@student)
 
