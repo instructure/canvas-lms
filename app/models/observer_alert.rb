@@ -74,6 +74,7 @@ class ObserverAlert < ActiveRecord::Base
         where(alert_type: 'assignment_missing')
       thresholds.find_each do |threshold|
         next unless threshold.users_are_still_linked?
+        next unless threshold.observer.enrollments.where(course_id: submission.assignment.context_id).first.present?
 
         now = Time.now.utc
         alerts << { observer_id: threshold.observer.id,

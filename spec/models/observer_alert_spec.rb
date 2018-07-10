@@ -102,6 +102,21 @@ describe ObserverAlert do
       expect(alert1.count).to eq 1
       expect(alert2.count).to eq 1
     end
+
+    it 'doesnt create an alert for courses the user is not enrolled in' do
+      course_with_teacher()
+      course_with_student(course: @course)
+      assignment = assignment_model(context: @course, points_possible: 100)
+
+      course_with_student(user: @student)
+      observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
+
+      ObserverAlertThreshold.create(observer: observer, student: @student, alert_type: 'course_grade_high', threshold: 80)
+
+      assignment.grade_student(@student, score: 100, grader: @teacher)
+
+      expect(ObserverAlert.where(student: @student).count).to eq 0
+    end
   end
 
   describe 'course_announcement' do
@@ -240,6 +255,23 @@ describe ObserverAlert do
       alerts = ObserverAlert.active.where(student: @student1, alert_type: 'course_announcement', observer: @observer1)
       expect(alerts).to be_empty
     end
+
+    it 'doesnt create an assignment_missing alert for courses the observer is not in' do
+      # course with just the student
+      course_with_teacher
+      course_with_student(course: @course)
+      assignment = assignment_model(context: @course, due_at: 5.minutes.ago, submission_types: 'online_text_entry', points_possible: 100)
+
+      # course with the student and observer
+      course_with_student(user: @student)
+      observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
+
+      ObserverAlertThreshold.create(observer: observer, student: @student, alert_type: 'assignment_missing')
+
+      ObserverAlert.create_assignment_missing_alerts
+
+      expect(ObserverAlert.where(student: @student).count).to eq 0
+    end
   end
 
   describe 'institution_announcement' do
@@ -344,9 +376,6 @@ describe ObserverAlert do
     end
 
     it 'creates an alert if the threshold is met' do
-      @course.enroll_user(@threshold1.student, 'StudentEnrollment')
-      @course.enroll_user(@threshold2.student, 'StudentEnrollment')
-
       @assignment1.grade_student(@threshold1.student, score: 100, grader: @teacher)
       @assignment1.grade_student(@threshold2.student, score: 10, grader: @teacher)
 
@@ -381,6 +410,23 @@ describe ObserverAlert do
       alerts = ObserverAlert.where(context: @course)
 
       expect(alerts.count).to eq 0
+    end
+
+    it 'doesnt create alerts for courses the observer is not in' do
+      # course with just the student
+      course_with_teacher
+      course_with_student(course: @course)
+      assignment = assignment_model(context: @course, points_possible: 100)
+
+      # course with the student and observer
+      course_with_student(user: @student)
+      observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
+
+      ObserverAlertThreshold.create(observer: observer, student: @student, alert_type: 'assignment_grade_high', threshold: 80)
+
+      assignment.grade_student(@student, score: 90, grader: @teacher)
+
+      expect(ObserverAlert.where(student: @student).count).to eq 0
     end
   end
 end
