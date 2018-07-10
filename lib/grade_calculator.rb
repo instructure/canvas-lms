@@ -140,6 +140,7 @@ class GradeCalculator
         score.reload
         thresholds.each do |threshold|
           next unless threshold.did_pass_threshold(previous_score, score.current_score)
+          next unless threshold.observer.enrollments.where(course_id: @course.id).first.present?
 
           ObserverAlert.create(observer: threshold.observer, student: threshold.student,
             observer_alert_threshold: threshold,
