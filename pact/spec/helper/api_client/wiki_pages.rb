@@ -32,6 +32,24 @@ module Helper
       rescue
         nil
       end
+
+      def post_wiki_pages(course_id)
+        JSON.parse(
+          self.class.post(
+            "/api/v1/courses/#{course_id}/pages",
+            :body =>
+            {
+              :wiki_page =>
+                {
+                  :title => "WikiPage",
+                }
+            }.to_json,
+            :headers => {'Content-Type' => 'application/json'}
+          ).body
+        )
+      rescue
+        nil
+      end
     end
   end
 end

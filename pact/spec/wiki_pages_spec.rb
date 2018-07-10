@@ -56,4 +56,37 @@ describe 'Wiki Pages', :pact do
     response = wiki_page_api.list_wiki_pages(1)
     expect(response[0]['title']).to eq "WIKI Page"
   end
+
+  it 'should Post Wiki Pages' do
+    canvas_lms_api.given('a teacher enrolled in a course').
+      upon_receiving('Post Wiki Pages').
+        with(
+          method: :post,
+          headers: {
+            'Authorization': 'Bearer some_token',
+            'Auth-User': 'Teacher1',
+            'Connection': 'close',
+            'Host': PactConfig.mock_provider_service_base_uri,
+            'Version': 'HTTP/1.1',
+            'Content-Type': 'application/json'
+          },
+          'path' => '/api/v1/courses/1/pages',
+          'body' =>
+          {
+            'wiki_page':
+            {
+              'title': 'WikiPage',
+            }
+          },
+        query: ''
+      ).
+      will_respond_with(
+        status: 200,
+        body: Pact.like('page_id': 1, 'title': 'WikiPage')
+      )
+    wiki_page_api.authenticate_as_user('Teacher1')
+    response = wiki_page_api.post_wiki_pages(1)
+    expect(response['page_id']).to eq 1
+    expect(response['title']).to eq 'WikiPage'
+  end
 end
