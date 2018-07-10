@@ -632,7 +632,10 @@ describe "student planner" do
         @wiki = @course.wiki_pages.create!(title: 'Default Time Wiki Page', todo_date: Time.zone.today)
         get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
         wait_for_ajaximations
-        expect(get_value("#todo_date")).to eq "#{format_date_for_view(Time.zone.today)} at 11:59PM"
+        f('input[name="student_todo_at"]').send_keys(format_date_for_view(Time.zone.now).to_s)
+        fj('button:contains("Save")').click
+        get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
+        expect(get_value('input[name="student_todo_at"]')).to eq "#{format_date_for_view(Time.zone.today)} 11:59pm"
       end
     end
 
@@ -642,8 +645,11 @@ describe "student planner" do
         @discussion = @course.discussion_topics.create!(title: "Default Time Discussion", message: nil, user: @teacher, todo_date: Time.zone.today)
         get("/courses/#{@course.id}/discussion_topics/#{@discussion.id}/edit")
         wait_for_ajaximations
-        expect(get_value("#todo_date")).to eq "#{format_date_for_view(Time.zone.today)} at 11:59PM"
+        f('input[name="todo_date"]').send_keys(format_date_for_view(Time.zone.now).to_s)
+        expect_new_page_load { submit_form('.form-actions') }
+        get("/courses/#{@course.id}/discussion_topics/#{@discussion.id}/edit")
+        expect(get_value('input[name="todo_date"]')).to eq "#{format_date_for_view(Time.zone.today)} 11:59pm"
       end
     end
-  end 
+  end
 end

@@ -20,6 +20,7 @@ import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
 import accessibleDateFormat from '../shared/helpers/accessibleDateFormat'
+import shortId from '../shared/shortid'
 import tz from 'timezone'
 import 'jquery.instructure_forms'
 import cx from 'classnames'
@@ -48,6 +49,11 @@ const { string, func, bool, instanceOf, oneOfType } = PropTypes;
         readonly: false,
         labelClasses: '',
       };
+    },
+
+    getInitialState () {
+      this.uniqueId = shortId()
+      return {}
     },
 
     // ---------------
@@ -131,14 +137,14 @@ const { string, func, bool, instanceOf, oneOfType } = PropTypes;
           <label
             id={this.props.labelledBy}
             className={`${this.props.labelClasses} Date__label`}
-            htmlFor={this.props.dateType}
+            htmlFor={this.uniqueId}
           >{this.props.labelText}</label>
           <div
             ref="datePickerWrapper"
             className={this.wrapperClassName()}
           >
             <input
-              id              = {this.props.dateType}
+              id              = {this.uniqueId}
               name            = {this.props.name}
               type            = "text"
               ref             = "dateInput"
