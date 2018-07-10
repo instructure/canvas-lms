@@ -107,10 +107,12 @@ class PlannerNotesController < ApplicationController
   #   If end_date and start_date are both specified and equivalent,
   #   then only notes with todo dates on that day are returned.
   # @argument context_codes[] [String]
-  #   List of context codes of courses/users whose notes you want to see.
+  #   List of context codes of courses whose notes you want to see.
   #   If not specified, defaults to all contexts that the user belongs to.
   #   The format of this field is the context type, followed by an
-  #   underscore, followed by the context id. For example: course_42, user_37
+  #   underscore, followed by the context id. For example: course_42
+  #   Including a code matching the user's own context code (e.g. user_1)
+  #   will include notes that are not associated with any particular course.
   #
   # @example_response
   #   [
@@ -143,17 +145,17 @@ class PlannerNotesController < ApplicationController
     # Format & filter our notes by course code if passed
 
     if (context_codes = params.delete(:context_codes))
+      context_codes = Array(context_codes)
+
       # Append to our notes scope to include the context codes for courses
-      course_codes = Array(context_codes).select{|c| c =~ /course_\d+/}
+      course_codes = context_codes.select{|c| c =~ /course_\d+/}
       contexts = Context.from_context_codes(course_codes)
-      accessible_courses = contexts&.select { |c| c.grants_right?(@current_user, :read) }
-      notes = notes.for_course(accessible_courses) if accessible_courses
-      # Append to our notes scope to include the context codes for users that the requesting
-      # user has permission to access
-      user_codes = Array(context_codes).select{|c| c =~ /user_\d+/}
-      user_contexts = Context.from_context_codes(user_codes)
-      accessible_users = user_contexts&.select { |c| c.grants_right?(@current_user, :read) }
-      notes = notes.union(PlannerNote.for_user(accessible_users).where(course_id: nil)) if accessible_users
+      accessible_courses = contexts.select { |c| c.grants_right?(@current_user, :read) }
+
+      # include course-less events if the current user is passed in as a context
+      accessible_courses << nil if context_codes.include?(@current_user.asset_string)
+
+      notes = accessible_courses.any? ? notes.for_course(accessible_courses) : PlannerNote.none
     end
 
     start_at = formatted_planner_date('start_date', params.delete(:start_date))
