@@ -117,7 +117,7 @@ test('student planner option does stuff', () => {
   view.render()
 
   const studentPlannerToggle = view.$el.find('#student_planner_checkbox')
-  const studentPlannerDateInput = view.$el.find('#todo_date')
+  const studentPlannerDateInput = view.$el.find('input[name="student_todo_at"]')
   equal(studentPlannerToggle.prop('checked'), true, 'Toggle is checked')
   equal(studentPlannerDateInput.val(), 'Jan 3, 2012 12am')
 })
@@ -135,8 +135,8 @@ test('add to student to-do requires date', () => {
   let errors = view.validateFormData(data)
   deepEqual(errors, {"student_todo_at": [{"message": "You must enter a date", "type": "required"}]})
 
-  view.$el.find('#todo_date').val('2018-01-01')
-  view.$el.find('#todo_date').trigger('change')
+  view.$el.find('input[name="student_todo_at"]').val('2018-01-01')
+  view.$el.find('input[name="student_todo_at"]').trigger('change')
   data = view.getFormData()
   errors = view.validateFormData(data)
   deepEqual(errors, {})
