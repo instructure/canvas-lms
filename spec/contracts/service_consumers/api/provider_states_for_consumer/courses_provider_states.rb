@@ -18,17 +18,6 @@
 PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
 
-    # Teacher ID: 3 || Name: Teacher1
-    # Course ID: 1
-    # Discussion ID: 1
-    provider_state 'a student in a course with a discussion' do
-      set_up do
-        @course = Pact::Canvas.base_state.course
-        @teacher = Pact::Canvas.base_state.teachers.first
-        @course.discussion_topics.create!(title: "title", message: nil, user: @teacher, discussion_type: 'threaded')
-      end
-    end
-
     # Course ID: 1
     # Quizzes ID: 1
     provider_state 'a quiz in a course' do

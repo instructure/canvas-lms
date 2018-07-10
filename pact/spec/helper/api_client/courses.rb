@@ -33,12 +33,6 @@ module Helper
         nil
       end
 
-      def list_discussions(course_id)
-        JSON.parse(self.class.get("/api/v1/courses/#{course_id}/discussion_topics").body)
-      rescue
-        nil
-      end
-
       def list_wiki_pages(course_id)
         JSON.parse(self.class.get("/api/v1/courses/#{course_id}/pages/").body)
       rescue
