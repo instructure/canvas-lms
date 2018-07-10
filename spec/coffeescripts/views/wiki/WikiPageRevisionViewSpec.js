@@ -26,7 +26,7 @@ QUnit.module('WikiPageRevisionView')
 test('binds to model change triggers', function() {
   const revision = new WikiPageRevision()
   const view = new WikiPageRevisionView({model: revision})
-  this.mock(view)
+  sandbox.mock(view)
     .expects('render')
     .atLeast(1)
   revision.set('body', 'A New Body')
@@ -41,7 +41,7 @@ test('restore delegates to model.restore', function() {
       return true
     }
   })
-  this.mock(revision)
+  sandbox.mock(revision)
     .expects('restore')
     .atLeast(1)
     .returns($.Deferred().resolve())

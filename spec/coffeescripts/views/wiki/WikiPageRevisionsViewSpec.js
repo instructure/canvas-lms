@@ -48,7 +48,7 @@ test('selecting a model/view sets the selected attribute on the model', () => {
 
 test('prevPage fetches previous page from collection', function() {
   const collection = new WikiPageRevisionsCollection()
-  this.mock(collection)
+  sandbox.mock(collection)
     .expects('fetch')
     .atLeast(1)
     .withArgs({
@@ -62,7 +62,7 @@ test('prevPage fetches previous page from collection', function() {
 
 test('nextPage fetches next page from collection', function() {
   const collection = new WikiPageRevisionsCollection()
-  this.mock(collection)
+  sandbox.mock(collection)
     .expects('fetch')
     .atLeast(1)
     .withArgs({

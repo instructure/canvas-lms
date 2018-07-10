@@ -118,7 +118,7 @@ define([
 
   test('deteteSharedBrandConfig', function () {
     const id = 'abc123'
-    this.mock(jQuery).expects('ajaxJSON').withArgs(`/api/v1/shared_brand_configs/${id}`, 'DELETE')
+    sandbox.mock(jQuery).expects('ajaxJSON').withArgs(`/api/v1/shared_brand_configs/${id}`, 'DELETE')
     const c = new CollectionView(props)
     c.deleteSharedBrandConfig(id)
   })

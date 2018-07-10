@@ -107,7 +107,7 @@ test('restore POSTs to the revision', function() {
       pageUrl: 'page-url'
     }
   )
-  const mock = this.mock($)
+  const mock = sandbox.mock($)
   mock
     .expects('ajaxJSON')
     .atLeast(1)

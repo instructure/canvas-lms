@@ -60,7 +60,7 @@ test('shipping a new link to the editor instance', function() {
     selectedContent: 'Some Content',
     url: 'Link HREF'
   }
-  const edMock = this.mock(jqueryEditor)
+  const edMock = sandbox.mock(jqueryEditor)
   edMock.expects('editorBox').withArgs('create_link', expectedOpts)
   editor.createLink(text, classes)
 })
