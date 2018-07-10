@@ -48,9 +48,19 @@ export default function SpeedGraderSettingsMenu(props) {
     SpeedGraderSettingsMenu.setURL(props.helpURL)
   }
 
+  function handleToggle(isOpen) {
+    if (isOpen) {
+      props.onMenuShow()
+    }
+  }
 
   return (
-    <Menu contentRef={props.menuContentRef} placement="bottom end" trigger={menuTrigger}>
+    <Menu
+      contentRef={props.menuContentRef}
+      onToggle={handleToggle}
+      placement="bottom end"
+      trigger={menuTrigger}
+    >
       <MenuItem name="options" onSelect={props.openOptionsModal} value="options">
         <Text>{I18n.t('Options')}</Text>
       </MenuItem>
@@ -79,6 +89,7 @@ SpeedGraderSettingsMenu.propTypes = {
   courseID: string.isRequired,
   helpURL: string.isRequired,
   menuContentRef: func,
+  onMenuShow: func,
   openOptionsModal: func.isRequired,
   openKeyboardShortcutsModal: func.isRequired,
   showHelpMenuItem: bool.isRequired,
@@ -86,7 +97,8 @@ SpeedGraderSettingsMenu.propTypes = {
 }
 
 SpeedGraderSettingsMenu.defaultProps = {
-  menuContentRef: null
+  menuContentRef: null,
+  onMenuShow() {}
 }
 
 SpeedGraderSettingsMenu.setURL = function (url) {

@@ -2241,6 +2241,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       })
 
       hooks.afterEach(() => {
+        SpeedGrader.teardown()
         fixtures.innerHTML = ''
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent

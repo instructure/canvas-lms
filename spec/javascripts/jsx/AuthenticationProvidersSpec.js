@@ -47,7 +47,7 @@ QUnit.module('AuthenticationProviders', () => {
     })
 
     function showAllForms() {
-      document.querySelectorAll('form').forEach($form => {
+      $container.querySelectorAll('form').forEach($form => {
         $form.style.display = '' // eslint-disable-line no-param-reassign
       })
     }
@@ -55,34 +55,34 @@ QUnit.module('AuthenticationProviders', () => {
     test('hides the "no authentication providers" message when present', () => {
       $container.innerHTML = '<div id="no_auth">No Authentication Providers</div>'
       AuthenticationProviders.changedAuthType('ldap')
-      const noAuthDiv = document.getElementById('no_auth')
-      equal(noAuthDiv.style.display, 'none')
+      const $div = $container.querySelector('#no_auth')
+      equal($div.style.display, 'none')
     })
 
     test('hides all new auth forms', () => {
       showAllForms()
       AuthenticationProviders.changedAuthType('unrelated')
-      document.querySelectorAll('form').forEach($form => {
+      $container.querySelectorAll('form').forEach($form => {
         equal($form.style.display, 'none')
       })
     })
 
     test('shows the form for the matching auth type', () => {
       AuthenticationProviders.changedAuthType('facebook')
-      const $form = document.getElementById('facebook_form')
+      const $form = $container.querySelector('#facebook_form')
       strictEqual($form.style.display, '')
     })
 
     test('does not show unrelated forms', () => {
       AuthenticationProviders.changedAuthType('facebook')
-      const $form = document.getElementById('google_form')
+      const $form = $container.querySelector('#google_form')
       equal($form.style.display, 'none')
     })
 
     test('sets focus on the first focusable element of the visible form', () => {
       AuthenticationProviders.changedAuthType('google')
       clock.tick(100)
-      const $input = document.getElementById('google-auth-input')
+      const $input = $container.querySelector('#google-auth-input')
       strictEqual(document.activeElement, $input)
     })
   })

@@ -95,17 +95,8 @@ QUnit.module('GradeInput using GradingSchemeGradeInput', suiteHooks => {
 
   function clickToOpen() {
     return new Promise(resolve => {
-      const waitForMenuReady = () => {
-        setTimeout(() => {
-          if ($menuContent && $menuContent.contains(document.activeElement)) {
-            resolve()
-          } else {
-            waitForMenuReady()
-          }
-        })
-      }
+      resolveOpen = resolve
       wrapper.find('button').simulate('click')
-      waitForMenuReady()
     })
   }
 
