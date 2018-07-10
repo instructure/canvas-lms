@@ -364,8 +364,10 @@ export class PlannerHeader extends Component {
               buttonRef={(b) => { this.opportunitiesHtmlButton = b; }}
             >
               <Badge {...this.props.loading.allOpportunitiesLoaded && this.state.opportunities.length ? {count :this.state.opportunities.length} : {}}>
-                <IconAlertsLine/>
-                <ScreenReaderContent>{this.opportunityTitle()}</ScreenReaderContent>
+                <View>
+                  <IconAlertsLine/>
+                  <ScreenReaderContent>{this.opportunityTitle()}</ScreenReaderContent>
+                </View>
               </Badge>
             </Button>
           </PopoverTrigger>

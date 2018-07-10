@@ -30,7 +30,7 @@ const plannerDays = [
 
 function defaultProps (options) {
   return {
-    courses: [{id: "1", shortName: "Course Short Name", informStudentsOfOverdueSubmissions: true}],
+    courses: [{id: "1", longName: "Course Long Name", shortName: "Course Short Name", informStudentsOfOverdueSubmissions: true}],
     opportunities: {
       items: [{id: "1", course_id: "1", due_at: "2017-03-09T20:40:35Z", html_url: "http://www.non_default_url.com", name: "learning object title"}],
       nextUrl: null
@@ -160,9 +160,9 @@ it('does not call getNextOpportunities when component has loaded all opportuniti
   const mockDispatch = jest.fn();
   const props = defaultProps();
   props.courses = [
-    {id: "1", shortName: "Course Short Name"},
-    {id: "2", shortName: "Course Other Name"},
-    {id: "3", shortName: "Course Big Name"}
+    {id: "1", longName: "Course Long Name", shortName: "Course Short Name"},
+    {id: "2", longName: "Course Other Long Name", shortName: "Course Other Name"},
+    {id: "3", longName: "Course Big Long Name", shortName: "Course Big Name"}
   ];
 
   props.opportunities.items = [
@@ -207,9 +207,9 @@ it('does call getNextOpportunities when component has 9 opportunities', () => {
   const mockDispatch = jest.fn();
   const props = defaultProps();
   props.courses = [
-    {id: "1", shortName: "Course Short Name"},
-    {id: "2", shortName: "Course Other Name"},
-    {id: "3", shortName: "Course Big Name"}
+    {id: "1", longName: "Course Long Name", shortName: "Course Short Name"},
+    {id: "2", longName: "Course Other Long Name", shortName: "Course Other Name"},
+    {id: "3", longName: "Course Big Long Name", shortName: "Course Big Name"}
   ];
 
   props.opportunities.items = [
@@ -249,9 +249,9 @@ it('opens tray if todo update item props is set', () => {
   const mockDispatch = jest.fn();
   const props = defaultProps();
   props.courses = [
-    {id: "1", shortName: "Course Short Name"},
-    {id: "2", shortName: "Course Other Name"},
-    {id: "3", shortName: "Course Big Name"}
+    {id: "1", longName: "Course Long Name", shortName: "Course Short Name"},
+    {id: "2", longName: "Course Other Long Name", shortName: "Course Other Name"},
+    {id: "3", longName: "Course Big Long Name", shortName: "Course Big Name"}
   ];
 
   props.opportunities.items = [
@@ -273,13 +273,13 @@ it('opens tray if todo update item props is set', () => {
   const wrapper = shallow(
     <PlannerHeader {...props} />
   );
-  
+
   props.todo = {
     updateTodoItem: {
       id: 10
     }
   };
-  
+
   wrapper.setProps(props);
   expect(wrapper.state().trayOpen).toEqual(true);
 });
@@ -288,9 +288,9 @@ it('shows all opportunities on badge even when we have over 10 items', () => {
   const mockDispatch = jest.fn();
   const props = defaultProps();
   props.courses = [
-    {id: "1", shortName: "Course Short Name"},
-    {id: "2", shortName: "Course Other Name"},
-    {id: "3", shortName: "Course Big Name"}
+    {id: "1", longName: "Course Long Name", shortName: "Course Short Name"},
+    {id: "2", longName: "Course Other Long Name", shortName: "Course Other Name"},
+    {id: "3", longName: "Course Big Long Name", shortName: "Course Big Name"}
   ];
 
   props.opportunities.items = [
