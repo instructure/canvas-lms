@@ -430,6 +430,16 @@ describe 'Developer Keys' do
         find_button("Developer Key").click
         expect(f("input[name='developer_key[name]']").attribute('value')).not_to be_present
       end
+
+      it "allows saving developer key when scopes are present" do
+        developer_key_with_scopes
+        get "/accounts/#{Account.default.id}/developer_keys"
+        click_edit_icon
+        f("input[name='developer_key[email]']").send_keys('admin@example.com')
+        find_button("Save Key").click
+        wait_for_ajax_requests
+        expect(developer_key_with_scopes.reload.email).to eq 'admin@example.com'
+      end
     end
   end
 
