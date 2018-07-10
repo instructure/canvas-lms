@@ -949,7 +949,7 @@ describe Assignment do
   end
 
   describe ".clean_up_duplicating_assignments" do
-    before { allow(described_class).to receive(:duplicating_for_too_long) }
+    before { allow(described_class).to receive(:duplicating_for_too_long).and_return(double()) }
 
     it "marks all assignments that have been duplicating for too long as failed_to_duplicate" do
       now = double('now')
@@ -988,7 +988,7 @@ describe Assignment do
   end
 
   describe ".cleanup_importing_assignments" do
-    before { allow(described_class).to receive(:importing_for_too_long) }
+    before { allow(described_class).to receive(:importing_for_too_long).and_return(double()) }
 
     it "marks all assignments that have been importing for too long as failed_to_import" do
       now = double('now')

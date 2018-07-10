@@ -216,6 +216,8 @@ if defined?(Spec::DSL::Main)
   end
 end
 
+RSpec::Mocks.configuration.allow_message_expectations_on_nil = false
+
 RSpec::Matchers.define_negated_matcher :not_eq, :eq
 RSpec::Matchers.define_negated_matcher :not_have_key, :have_key
 
