@@ -113,11 +113,11 @@ class Speedgrader
     end
 
     def delete_comment
-      f('.delete_comment_link')
+      ff('.delete_comment_link')
     end
 
     def comments
-      ff('div.comment')
+      ff('#comments>.comment')
     end
 
     def submission_file_name
@@ -204,6 +204,71 @@ class Speedgrader
       fj(":contains('#{label}')", provisional_grade_radio_buttons)
     end
 
+    # returns a list of comment strings from right pane
+    def comment_list
+      ff('span.comment').map(&:text)
+    end
+
+    def media_comment_button
+      f('#media_comment_button')
+    end
+
+    def media_audio_record_option
+      f('#audio_record_option')
+    end
+
+    def media_video_record_option
+      f('#video_record_option')
+    end
+
+    def attachment_input_close_button
+      f('#comment_attachments a')
+    end
+
+    def comment_posted_at
+      ff('#comments > .comment .posted_at')
+    end
+
+    def avatar
+      f("#avatar_image")
+    end
+
+    def avatar_comment
+      f("#comments > .comment .avatar")
+    end
+
+    def assignment_link
+      f('#assignment_url')
+    end
+
+    def comment_saved_alert
+      f('#comment_saved')
+    end
+
+    def comment_saved_alert_close_button
+      f('#comment_saved .dismiss_alert')
+    end
+
+    def draft_comments
+      ff('#comments .comment.draft')
+    end
+
+    def draft_comment_markers
+      ff('#comments .comment.draft .comment_flex > .draft-marker')
+    end
+
+    def publish_draft_link
+      f('#comments .comment.draft .comment_flex > button.submit_comment_button')
+    end
+
+    def draft_comment_delete_button
+      ff('#comments .comment.draft .comment_flex > a.delete_comment_link')
+    end
+
+    def comment_delete_buttons
+      ff('#comments .comment .comment_flex > a.delete_comment_link')
+    end
+
     # action
     def visit(course_id, assignment_id)
       get "/courses/#{course_id}/gradebook/speed_grader?assignment_id=#{assignment_id}"
@@ -282,11 +347,47 @@ class Speedgrader
     end
 
     def submit_settings_form
-      fj('.ui-dialog-buttonset .ui-button:visible:last').click
+      wait_for_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
     end
 
     def grade_rubric_criteria(criteria_id, grade)
       rubric_grade_input(criteria_id).send_keys(grade)
+    end
+
+    def clear_new_comment
+      new_comment_text_area.clear
+    end
+
+    def check_hide_student_name
+      click_settings_link
+      click_options_link
+      unless hide_students_chkbox.selected?
+        select_hide_student_names
+      end
+      submit_settings_form
+    end
+
+    def uncheck_hide_student_name
+      click_settings_link
+      click_options_link
+      if hide_students_chkbox.selected?
+        select_hide_student_names
+      end
+      submit_settings_form
+    end
+
+    def select_student(student)
+      click_students_dropdown
+      students_select_menu_list.find { |e| e.text == student.name}.click
+      wait_for_ajaximations
+    end
+
+    def fetch_comment_posted_at_by_index(index)
+      comment_posted_at[index]
+    end
+
+    def close_saved_comment_alert
+      comment_saved_alert_close_button.click
     end
   end
 end

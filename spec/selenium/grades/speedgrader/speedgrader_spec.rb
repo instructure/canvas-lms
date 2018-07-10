@@ -708,6 +708,17 @@ describe 'Speedgrader' do
       f('.ui-resizable .ui-dialog-titlebar-close').click
       expect(keyboard_modal).not_to be_displayed
     end
+
+    it 'navigates to gradebook via link' do
+      user_session(teacher)
+      get "/courses/#{test_course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
+
+      # make sure gradebook link works
+      expect_new_page_load do
+        f('#speed_grader_gradebook_link').click
+      end
+      expect(f('body.grades')).to be_displayed
+    end
   end
 
   context "closed grading periods" do
