@@ -101,7 +101,7 @@ QUnit.module('StatusesModal', function (suiteHooks) {
   });
 
   test('on close prop is passed to Modal onExit', function () {
-    const onClose = this.stub();
+    const onClose = sinon.stub();
     const wrapper = shallow(<StatusesModal {...defaultProps({ onClose })} />);
     equal(wrapper.find('Modal').prop('onExited'), onClose);
   });
@@ -130,7 +130,7 @@ QUnit.module('StatusesModal', function (suiteHooks) {
   QUnit.module('StatusesModal#updateStatusColors');
 
   test('it calls afterUpdateStatusColors', function () {
-    const afterUpdateStatusColors = this.stub();
+    const afterUpdateStatusColors = sinon.stub();
     const wrapper = shallow(<StatusesModal {...defaultProps({ afterUpdateStatusColors })} />);
     const instance = wrapper.instance();
     instance.updateStatusColors('late')('#000000');
@@ -139,7 +139,7 @@ QUnit.module('StatusesModal', function (suiteHooks) {
   });
 
   test('it calls afterUpdateStatusColors with updated colors', function () {
-    const afterUpdateStatusColors = this.stub();
+    const afterUpdateStatusColors = sinon.stub();
     const color = '#000000';
     const expectedColors = {
       late: color,
@@ -157,7 +157,7 @@ QUnit.module('StatusesModal', function (suiteHooks) {
   });
 
   test('it calls afterUpdateStatusColors with updated successFn', function () {
-    const successFn = this.stub();
+    const successFn = sinon.stub();
     function afterUpdateStatusColors (_color, fn) { fn(); }
     const wrapper = shallow(<StatusesModal {...defaultProps({ afterUpdateStatusColors })} />);
     const instance = wrapper.instance();
@@ -168,7 +168,7 @@ QUnit.module('StatusesModal', function (suiteHooks) {
   });
 
   test('it calls afterUpdateStatusColors and sets openPopover to null', function () {
-    const successFn = this.stub();
+    const successFn = sinon.stub();
     function afterUpdateStatusColors (_color, fn) { fn(); }
     const wrapper = shallow(<StatusesModal {...defaultProps({ afterUpdateStatusColors })} />);
     const instance = wrapper.instance();
@@ -179,7 +179,7 @@ QUnit.module('StatusesModal', function (suiteHooks) {
   });
 
   test('it calls afterUpdateStatusColors with updated failureFn', function () {
-    const failureFn = this.stub();
+    const failureFn = sinon.stub();
     function afterUpdateStatusColors (_color, _fn, fn) { fn(); }
     const wrapper = shallow(<StatusesModal {...defaultProps({ afterUpdateStatusColors })} />);
     const instance = wrapper.instance();
@@ -262,7 +262,7 @@ QUnit.module('StatusesModal', function (suiteHooks) {
 
   test('selecting a color and clicking Apply in the color picker passes the ' +
     'color to afterUpdateStatusColors', function () {
-    const afterUpdateStatusColors = this.stub();
+    const afterUpdateStatusColors = sinon.stub();
     const wrapper = mount(<StatusesModal {...defaultProps({ afterUpdateStatusColors })} />);
     const instance = wrapper.instance();
     instance.open();

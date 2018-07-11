@@ -91,8 +91,8 @@ define([
   QUnit.module('DownloadSubmissionsDialogManager#showDialog');
 
   test('calls submissions downloading callback and opens downloadSubmissions dialog', function () {
-    this.stub(INST, 'downloadSubmissions');
-    const submissionsDownloading = this.stub();
+    sandbox.stub(INST, 'downloadSubmissions');
+    const submissionsDownloading = sinon.stub();
     const manager = new DownloadSubmissionsDialogManager(
       {
         id: 'the_id',

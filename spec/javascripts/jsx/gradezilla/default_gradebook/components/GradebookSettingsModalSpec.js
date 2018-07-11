@@ -64,7 +64,7 @@ QUnit.module('GradebookSettingsModal', {
 
     const fetchSuccess = Promise.resolve({ data });
     const promise = fetchSuccess.then(component.onFetchLatePolicySuccess)
-    this.stub(component, 'fetchLatePolicy').returns(promise);
+    sandbox.stub(component, 'fetchLatePolicy').returns(promise);
     return promise;
   },
 
@@ -154,7 +154,7 @@ test('the "Update" button is disabled if a setting is changed, but there are val
 });
 
 test('clicking "Update" sends a request to update the late policy', function () {
-  this.stub(GradebookSettingsModalApi, 'updateLatePolicy').returns(Promise.resolve());
+  sandbox.stub(GradebookSettingsModalApi, 'updateLatePolicy').returns(Promise.resolve());
   const component = this.mountComponent();
   const fetchLatePolicy = this.stubLatePolicyFetchSuccess(component);
   component.open();
@@ -171,7 +171,7 @@ test('clicking "Update" sends a request to update the late policy', function () 
 });
 
 test('clicking "Update" sends a post request to create a late policy if one does not yet exist', function () {
-  this.stub(GradebookSettingsModalApi, 'createLatePolicy').returns(Promise.resolve());
+  sandbox.stub(GradebookSettingsModalApi, 'createLatePolicy').returns(Promise.resolve());
   // When a late policy does not exist, the API call returns 'Not Found'
   const component = this.mountComponent();
   const fetchLatePolicy = this.stubLatePolicyFetchSuccess(component, { newRecord: true });
@@ -189,7 +189,7 @@ test('clicking "Update" sends a post request to create a late policy if one does
 });
 
 test('onUpdateLatePolicySuccess calls the onLatePolicyUpdate prop', function () {
-  const onLatePolicyUpdate = this.stub();
+  const onLatePolicyUpdate = sinon.stub();
   const component = this.mountComponent({ onLatePolicyUpdate });
   component.onUpdateLatePolicySuccess();
   strictEqual(onLatePolicyUpdate.callCount, 1);

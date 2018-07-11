@@ -54,7 +54,7 @@ test('#gradeIsExcused returns false if grade is not EX', function() {
 })
 
 test('when given callback for #show, invokes callback upon dialog close', function() {
-  const callback = this.stub()
+  const callback = sinon.stub()
   const dialog = new SetDefaultGradeDialog({assignment: this.assignment})
   dialog.show(callback)
   $('button.ui-dialog-titlebar-close').click()

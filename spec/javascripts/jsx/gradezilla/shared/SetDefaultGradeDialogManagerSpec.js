@@ -98,8 +98,8 @@ define([
     },
 
     setup () {
-      this.flashErrorStub = this.stub($, 'flashError');
-      this.showDialogStub = this.stub(SetDefaultGradeDialog.prototype, 'show');
+      this.flashErrorStub = sandbox.stub($, 'flashError');
+      this.showDialogStub = sandbox.stub(SetDefaultGradeDialog.prototype, 'show');
     }
   });
 

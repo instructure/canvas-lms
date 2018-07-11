@@ -55,9 +55,9 @@ define([
     const manager = new ReuploadSubmissionsDialogManager({
       id: 'the_id'
     }, 'the_{{ assignment_id }}_url');
-    const dialog = this.stub();
-    const attr = this.stub().returns({ dialog });
-    this.stub(manager, 'getReuploadForm').returns({ attr });
+    const dialog = sinon.stub();
+    const attr = sinon.stub().returns({ dialog });
+    sandbox.stub(manager, 'getReuploadForm').returns({ attr });
     manager.showDialog();
 
     ok(attr.calledWith('action', 'the_the_id_url'));
@@ -67,9 +67,9 @@ define([
     const manager = new ReuploadSubmissionsDialogManager({
       id: 'the_id'
     }, 'the_{{ assignment_id }}_url');
-    const dialog = this.stub();
-    const attr = this.stub().returns({ dialog });
-    this.stub(manager, 'getReuploadForm').returns({ attr });
+    const dialog = sinon.stub();
+    const attr = sinon.stub().returns({ dialog });
+    sandbox.stub(manager, 'getReuploadForm').returns({ attr });
     manager.showDialog();
 
     strictEqual(dialog.callCount, 1);

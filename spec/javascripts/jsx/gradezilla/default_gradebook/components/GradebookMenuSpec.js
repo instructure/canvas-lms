@@ -43,7 +43,7 @@ test('Gradebook trigger button is present', function () {
 });
 
 test('#handleIndividualGradebookSelect calls setLocation', function () {
-  const setLocationStub = this.stub(GradebookMenu.prototype, 'setLocation');
+  const setLocationStub = sandbox.stub(GradebookMenu.prototype, 'setLocation');
   this.wrapper.find('button').simulate('click');
   document.querySelector('[data-menu-item-id="individual-gradebook"]').click();
   const url = `${this.wrapper.props().courseUrl}/gradebook/change_gradebook_version?version=individual`;
@@ -51,7 +51,7 @@ test('#handleIndividualGradebookSelect calls setLocation', function () {
 });
 
 test('#handleGradebookHistorySelect calls setLocation', function () {
-  const setLocationStub = this.stub(GradebookMenu.prototype, 'setLocation');
+  const setLocationStub = sandbox.stub(GradebookMenu.prototype, 'setLocation');
   this.wrapper.find('button').simulate('click');
   document.querySelector('[data-menu-item-id="gradebook-history"]').click();
   const url = `${this.wrapper.props().courseUrl}/gradebook/history`;
@@ -60,7 +60,7 @@ test('#handleGradebookHistorySelect calls setLocation', function () {
 
 QUnit.module('Variant DefaultGradebook with Learning Mastery Enabled', {
   setup () {
-    this.navigateStub = this.stub();
+    this.navigateStub = sinon.stub();
     this.wrapper = mount(
       <GradebookMenu
         variant="DefaultGradebook"
@@ -130,7 +130,7 @@ test('Gradebook History Menu Item is second in the Menu', function () {
 
 QUnit.module('Variant DefaultGradebookLearningMastery with Learning Mastery Enabled', {
   setup () {
-    this.navigateStub = this.stub();
+    this.navigateStub = sinon.stub();
     this.wrapper = mount(
       <GradebookMenu
         variant="DefaultGradebookLearningMastery"
