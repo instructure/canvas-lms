@@ -264,15 +264,15 @@ test('serializeDataForSubmission serializes periods by snake casing keys', funct
 })
 
 test('batchUpdatePeriods makes an AJAX call if validations pass', function() {
-  this.sandbox.stub(this.gradingPeriodCollection, 'areGradingPeriodsValid').returns(true)
-  const ajax = this.sandbox.spy($, 'ajax')
+  sandbox.stub(this.gradingPeriodCollection, 'areGradingPeriodsValid').returns(true)
+  const ajax = sandbox.spy($, 'ajax')
   this.gradingPeriodCollection.batchUpdatePeriods()
   ok(ajax.calledOnce)
 })
 
 test('batchUpdatePeriods does not make an AJAX call if validations fail', function() {
-  this.sandbox.stub(this.gradingPeriodCollection, 'areGradingPeriodsValid').returns(false)
-  const ajax = this.sandbox.spy($, 'ajax')
+  sandbox.stub(this.gradingPeriodCollection, 'areGradingPeriodsValid').returns(false)
+  const ajax = sandbox.spy($, 'ajax')
   this.gradingPeriodCollection.batchUpdatePeriods()
   ok(ajax.notCalled)
 })
