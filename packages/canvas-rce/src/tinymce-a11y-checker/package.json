@@ -9,8 +9,9 @@
     "test:all": "npm run test && npm run cypress:run",
     "test:coverage": "jest src --coverage",
     "test-watch": "jest --watch src",
+    "cypress:ci": "start-server-and-test start http://localhost:8080 cypress:run",
     "cypress:open": "cypress open",
-    "cypress:run": "node cypress/run.js",
+    "cypress:run": "cypress run",
     "start": "webpack-dev-server --open",
     "extract": "format-message extract --generate-id underscored_crc32 \"src/**/*.js\" > locales/en.json",
     "fmt": "prettier --no-semi --write \"src/**/*.js\"",
@@ -46,6 +47,7 @@
     "react": "^15.6.2",
     "react-dom": "^15.6.2",
     "react-test-renderer": "^15.6.2",
+    "start-server-and-test": "^1.5.0",
     "webpack": "^4",
     "webpack-cli": "^3.0.8",
     "webpack-dev-server": "^3"
