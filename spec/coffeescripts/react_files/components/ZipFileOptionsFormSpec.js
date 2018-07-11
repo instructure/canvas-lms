@@ -39,7 +39,7 @@ test('creates a display message based on fileOptions ', () => {
 })
 
 test('handleExpandClick expands zip', function() {
-  const zipOptionsResolvedStub = this.stub()
+  const zipOptionsResolvedStub = sinon.stub()
   const props = {
     fileOptions: {file: 'the_file_obj'},
     onZipOptionsResolved: zipOptionsResolvedStub
@@ -60,7 +60,7 @@ test('handleExpandClick expands zip', function() {
 // note: does not fail when only this spec is run
 if (window.hasOwnProperty('define')) {
   test('handleUploadClick uploads zip', function() {
-    const zipOptionsResolvedStub = this.stub()
+    const zipOptionsResolvedStub = sinon.stub()
     const props = {
       fileOptions: {file: 'the_file_obj'},
       onZipOptionsResolved(options) {

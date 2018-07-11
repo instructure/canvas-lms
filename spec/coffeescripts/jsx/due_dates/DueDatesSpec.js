@@ -77,7 +77,7 @@ QUnit.module('DueDates', {
       isOnlyVisibleToOverrides: false,
       dueAt: null
     }
-    this.syncWithBackboneStub = this.stub(props, 'syncWithBackbone')
+    this.syncWithBackboneStub = sandbox.stub(props, 'syncWithBackbone')
     const DueDatesElement = <DueDates {...props} />
     this.dueDates = ReactDOM.render(DueDatesElement, $('<div>').appendTo('body')[0])
   },
@@ -181,7 +181,7 @@ test('can replace the dates of a row properly', function() {
 })
 
 test('focuses on the new row begin added', function() {
-  this.spy(this.dueDates, 'focusRow')
+  sandbox.spy(this.dueDates, 'focusRow')
   this.dueDates.addRow()
   equal(this.dueDates.focusRow.callCount, 1)
 })
@@ -347,9 +347,9 @@ QUnit.module('DueDates with grading periods', {
         group_ids: []
       }
     }
-    this.stub(OverrideStudentStore, 'getStudents').returns(students)
-    this.stub(OverrideStudentStore, 'currentlySearching').returns(false)
-    this.stub(OverrideStudentStore, 'allStudentsFetched').returns(true)
+    sandbox.stub(OverrideStudentStore, 'getStudents').returns(students)
+    sandbox.stub(OverrideStudentStore, 'currentlySearching').returns(false)
+    sandbox.stub(OverrideStudentStore, 'allStudentsFetched').returns(true)
     const props = {
       overrides,
       overrideModel: AssignmentOverride,
@@ -371,7 +371,7 @@ QUnit.module('DueDates with grading periods', {
       isOnlyVisibleToOverrides: true,
       dueAt: null
     }
-    this.syncWithBackboneStub = this.stub(props, 'syncWithBackbone')
+    this.syncWithBackboneStub = sandbox.stub(props, 'syncWithBackbone')
     const DueDatesElement = <DueDates {...props} />
     this.dueDates = ReactDOM.render(DueDatesElement, $('<div>').appendTo('body')[0])
     this.dueDates.handleStudentStoreChange()
@@ -460,8 +460,8 @@ QUnit.module('DueDates render callbacks', {
 })
 
 test('fetchAdhocStudents does not fire until state is set', function() {
-  const getInitialStateStub = this.stub(DueDates.prototype, 'getInitialState')
-  const fetchAdhocStudentsStub = this.stub(OverrideStudentStore, 'fetchStudentsByID')
+  const getInitialStateStub = sandbox.stub(DueDates.prototype, 'getInitialState')
+  const fetchAdhocStudentsStub = sandbox.stub(OverrideStudentStore, 'fetchStudentsByID')
   const DueDatesElement = <DueDates {...this.props} />
 
   // provide an initial state that should not get pssed into the fetchStudentsByID call

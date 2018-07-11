@@ -33,15 +33,15 @@ QUnit.module('CurrentUploads', {
   },
   mockUploader(name, progress) {
     const uploader = new FileUploader({file: {}})
-    this.stub(uploader, 'getFileName').returns(name)
-    this.stub(uploader, 'roundProgress').returns(progress)
+    sandbox.stub(uploader, 'getFileName').returns(name)
+    sandbox.stub(uploader, 'roundProgress').returns(progress)
     return uploader
   }
 })
 
 test('pulls FileUploaders from UploadQueue', function() {
   const allUploads = [this.mockUploader('name', 0), this.mockUploader('other', 0)]
-  this.stub(UploadQueue, 'getAllUploaders').returns(allUploads)
+  sandbox.stub(UploadQueue, 'getAllUploaders').returns(allUploads)
   UploadQueue.onChange()
   equal(this.uploads.state.currentUploads, allUploads)
 })

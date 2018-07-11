@@ -52,7 +52,7 @@ test('caches the response of get_module when called', assert => {
 
 test('loads event listeners on first load', function(assert) {
   const done = assert.async()
-  this.stub(RCELoader, 'loadEventListeners')
+  sandbox.stub(RCELoader, 'loadEventListeners')
   RCELoader.RCE = null
   return RCELoader.loadRCE(() => {
     ok(RCELoader.loadEventListeners.called)
@@ -62,7 +62,7 @@ test('loads event listeners on first load', function(assert) {
 
 test('does not load event listeners once loaded', function(assert) {
   const done = assert.async()
-  this.stub(RCELoader, 'loadEventListeners')
+  sandbox.stub(RCELoader, 'loadEventListeners')
   RCELoader.RCE = {}
   return RCELoader.loadRCE(() => {
     ok(!RCELoader.loadEventListeners.called)
@@ -193,7 +193,7 @@ QUnit.module('loadSidebarOnTarget', {
     this.rce = {renderSidebarIntoDiv: sinon.stub().callsArgWith(2, this.sidebar)}
     sinon.stub(RCELoader, 'loadRCE').callsArgWith(0, this.rce)
     this.refreshToken = sinon.spy()
-    this.stub(jwt, 'refreshFn').returns(this.refreshToken)
+    sandbox.stub(jwt, 'refreshFn').returns(this.refreshToken)
   },
   teardown() {
     fakeENV.teardown()

@@ -66,7 +66,7 @@ test('shipping a new link to the editor instance', function() {
 })
 
 test('createLink passes data attributes to create_link command', function() {
-  this.stub(RceCommandShim, 'send')
+  sandbox.stub(RceCommandShim, 'send')
   const dataAttrs = {}
   const le = new LinkableEditor({selection: {getContent: () => ({})}})
   le.createLink('text', 'classes', dataAttrs)

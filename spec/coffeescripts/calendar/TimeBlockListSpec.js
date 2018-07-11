@@ -108,7 +108,7 @@ test('should still validate if a row is fully blank', function() {
 test('should alert when invalid', function() {
   const row = this.me.addRow()
   row.$date.val('asdfasdf').change()
-  const spy = this.spy(window, 'alert')
+  const spy = sandbox.spy(window, 'alert')
   this.me.validate()
   ok(spy.called, 'should `alert` a message')
 })

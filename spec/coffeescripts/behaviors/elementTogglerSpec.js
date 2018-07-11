@@ -129,7 +129,7 @@ aria-controls="thing">Show Thing Dialog</button>`).appendTo('#fixtures')
     </form>
   `).appendTo('#fixtures')
   let msg = 'target pops up as a dialog'
-  const spy = this.spy($.fn, 'fixDialogButtons')
+  const spy = sandbox.spy($.fn, 'fixDialogButtons')
   this.$trigger.click()
   ok(this.$target.is(':ui-dialog:visible'), msg)
   ok(spy.thisValues[0].is(this.$target), 'calls fixDialogButton on @$trigger')

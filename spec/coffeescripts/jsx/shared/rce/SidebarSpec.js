@@ -46,7 +46,7 @@ test('uses wikiSidebar when feature flag off', () => {
 test('loads remote sidebar when feature flag on', function() {
   ENV.RICH_CONTENT_SERVICE_ENABLED = true
   const remoteSidebar = {is_a: 'remote_sidebar'}
-  this.stub(RCELoader, 'loadSidebarOnTarget').callsArgWith(1, remoteSidebar)
+  sandbox.stub(RCELoader, 'loadSidebarOnTarget').callsArgWith(1, remoteSidebar)
   Sidebar.pendingShow = false
   Sidebar.init()
   equal(Sidebar.instance, remoteSidebar)

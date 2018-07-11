@@ -116,7 +116,7 @@ test('should accept a presenter function', function() {
 })
 
 test('should allow user to defer getJSON', function() {
-  this.spy($, 'getJSON')
+  sandbox.spy($, 'getJSON')
   new PaginatedList(this.el.wrapper, {
     start: false,
     template: this.template,

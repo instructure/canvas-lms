@@ -20,7 +20,7 @@ import SelectContentDialog from 'select_content_dialog'
 
 QUnit.module('SelectContentDialog: Dialog options', {
   setup() {
-    this.spy($.fn, 'dialog')
+    sandbox.spy($.fn, 'dialog')
     $('#fixtures').html("<div id='select_context_content_dialog'></div>")
   },
   teardown() {

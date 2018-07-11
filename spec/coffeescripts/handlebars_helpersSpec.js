@@ -368,7 +368,7 @@ test('it passes format info through to date format', function() {
 QUnit.module('i18n number helper', {
   setup() {
     this.ret = '47.00%'
-    this.stub(I18n, 'n').returns(this.ret)
+    sandbox.stub(I18n, 'n').returns(this.ret)
   }
 })
 
@@ -383,7 +383,7 @@ test('proxies to I18n.localizeNumber', function() {
 QUnit.module('i18n number format helper', {
   setup() {
     this.ret = '2,34'
-    this.stub(numberFormat, 'outcomeScore').returns(this.ret)
+    sandbox.stub(numberFormat, 'outcomeScore').returns(this.ret)
   }
 })
 
