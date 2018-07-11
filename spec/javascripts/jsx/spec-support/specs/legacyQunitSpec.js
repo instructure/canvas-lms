@@ -20,7 +20,7 @@ import {stubbable, waitForNextExample} from './shared'
 
 QUnit.module('Legacy Module', {
   setup() {
-    this.stub(stubbable, 'getValue').returns('fake')
+    sandbox.stub(stubbable, 'getValue').returns('fake')
     // setting up legacy module
   },
   teardown() {
@@ -32,13 +32,27 @@ test('accepts examples only after calls to `QUnit.module`', () => {
   ok(true)
 })
 
-test('uses "this.stub()" within `setup` to stub methods', () => {
+test('uses "sandbox.stub()" within `setup` to stub methods', () => {
   strictEqual(stubbable.getValue(), 'fake')
 })
 
-test('uses "this.stub()" within tests to stub methods', function() {
-  this.stub(stubbable, 'getOtherValue').returns('really fake')
+test('uses "sandbox.stub()" within tests to stub methods', () => {
+  sandbox.stub(stubbable, 'getOtherValue').returns('really fake')
   strictEqual(stubbable.getOtherValue(), 'really fake')
+})
+
+test('restores sandbox stubs between tests', () => {
+  sandbox.stub(stubbable, 'getOtherValue').returns('super fake')
+  strictEqual(stubbable.getOtherValue(), 'super fake')
+})
+
+test('auto-verifies mock expectations', () => {
+  sandbox
+    .mock(stubbable)
+    .expects('getOtherValue')
+    .once()
+  // When the method call below is removed, this and only this spec will fail.
+  stubbable.getOtherValue()
 })
 
 QUnit.skip('allows skipping examples', () => {

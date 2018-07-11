@@ -19,12 +19,19 @@
 import AsyncTracker from './AsyncTracker'
 import ContextTracker from './ContextTracker'
 import EventTracker from './EventTracker'
+import SandboxFactory from './SandboxFactory'
 
 const DEFAULT_SPEC_TIMEOUT = 5000
 
 const UNPROTECTED_SPECS = Object.keys(process.env).includes('UNPROTECTED_SPECS')
 
 export const contextTracker = new ContextTracker(QUnit)
+
+export const sandboxFactory = new SandboxFactory({
+  contextTracker,
+  global: window,
+  qunit: QUnit
+})
 
 export const asyncTracker = new AsyncTracker({
   contextTracker,

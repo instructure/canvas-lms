@@ -37,17 +37,22 @@ export default class ContextTracker {
     this._qunit = qunit
     this._stack = []
     this._contextCallbacks = {
-      contextEnd: [],
-      contextStart: []
+      beforeContextEnd: [],
+      onContextEnd: [],
+      onContextStart: []
     }
   }
 
+  beforeContextEnd(callback) {
+    this._contextCallbacks.beforeContextEnd.push(callback)
+  }
+
   onContextStart(callback) {
-    this._contextCallbacks.contextStart.push(callback)
+    this._contextCallbacks.onContextStart.push(callback)
   }
 
   onContextEnd(callback) {
-    this._contextCallbacks.contextEnd.push(callback)
+    this._contextCallbacks.onContextEnd.push(callback)
   }
 
   getCurrentContextStack() {
@@ -77,7 +82,7 @@ export default class ContextTracker {
         maybeAddFailure(message, tracker.sourceStack, () => {
           logTrackers([tracker], () => ({
             logType: 'error',
-            message: `Unmanaged error in '${tracker.eventName}' event listener`
+            message
           }))
         })
       },
@@ -88,7 +93,7 @@ export default class ContextTracker {
 
   setup() {
     this._qunit.begin(() => {
-      const {contextStart, contextEnd} = this._contextCallbacks
+      const {beforeContextEnd, onContextStart, onContextEnd} = this._contextCallbacks
 
       this._qunit.config.modules.forEach(module => {
         if (!module.parentModule) {
@@ -99,8 +104,8 @@ export default class ContextTracker {
           const afterEach = testEnvironment.afterEach
 
           testEnvironment.beforeEach = async function() {
-            for (let i = 0; i < contextStart.length; i++) {
-              await contextStart[i]() // eslint-disable-line no-await-in-loop
+            for (let i = 0; i < onContextStart.length; i++) {
+              await onContextStart[i]() // eslint-disable-line no-await-in-loop
             }
             if (beforeEach) {
               await beforeEach.call(this)
@@ -110,13 +115,16 @@ export default class ContextTracker {
           testEnvironment.afterEach = async function() {
             await ensure(
               async () => {
+                for (let i = 0; i < beforeContextEnd.length; i++) {
+                  await beforeContextEnd[i]() // eslint-disable-line no-await-in-loop
+                }
                 if (afterEach) {
                   await afterEach.call(this)
                 }
               },
               async () => {
-                for (let i = 0; i < contextEnd.length; i++) {
-                  await contextEnd[i]() // eslint-disable-line no-await-in-loop
+                for (let i = 0; i < onContextEnd.length; i++) {
+                  await onContextEnd[i]() // eslint-disable-line no-await-in-loop
                 }
               }
             )

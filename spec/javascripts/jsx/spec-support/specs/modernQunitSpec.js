@@ -18,28 +18,36 @@
 
 import {stubbable, waitForNextExample} from './shared'
 
-QUnit.module('Functional Module', function(suiteHooks) {
+QUnit.module('Functional Module', suiteHooks => {
   suiteHooks.beforeEach(() => {
-    sinon.stub(stubbable, 'getValue').returns('fake')
-  })
-
-  suiteHooks.afterEach(() => {
-    stubbable.getValue.restore()
+    sandbox.stub(stubbable, 'getValue').returns('fake')
   })
 
   test('accepts examples within the root "module" callback', () => {
     ok(true)
   })
 
-  test('uses "sinon.stub()" to stub methods', () => {
+  test('uses "sandbox.stub()" within `setup` to stub methods', () => {
     strictEqual(stubbable.getValue(), 'fake')
   })
 
-  test('does not support "this.stub()" to stub methods', function() {
-    // `this.stub` depends on maintaining function context using the magic of
-    // `sinon-qunit`, which is only done by using `function` syntax to define
-    // the test callback.
-    notOk(this.stub)
+  test('uses "sandbox.stub()" within tests to stub methods', () => {
+    sandbox.stub(stubbable, 'getOtherValue').returns('really fake')
+    strictEqual(stubbable.getOtherValue(), 'really fake')
+  })
+
+  test('restores sandbox stubs between tests', () => {
+    sandbox.stub(stubbable, 'getOtherValue').returns('super fake')
+    strictEqual(stubbable.getOtherValue(), 'super fake')
+  })
+
+  test('auto-verifies mock expectations', () => {
+    sandbox
+      .mock(stubbable)
+      .expects('getOtherValue')
+      .once()
+    // When the method call below is removed, this and only this spec will fail.
+    stubbable.getOtherValue()
   })
 
   QUnit.skip('allows skipping examples', () => {
