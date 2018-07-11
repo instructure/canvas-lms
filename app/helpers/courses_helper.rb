@@ -110,7 +110,15 @@ module CoursesHelper
 
   def user_type(course, user)
     enrollment = course.enrollments.find_by(user: user)
-    enrollment.type.downcase.remove(/enrollment/) unless enrollment.nil?
+
+    if enrollment.nil?
+      return course.account_membership_allows(user) ? "admin" : nil
+    end
+
+    type = enrollment.type.remove(/Enrollment/).downcase
+    type = "student" if %w/studentview observer/.include?(type)
+
+    type
   end
 
   def why_cant_i_enable_master_course(course)
