@@ -73,6 +73,26 @@ it('sets loadingPast to false on GOT_DAYS_SUCCESS', () => {
   expect(newState).toMatchObject({ loadingPast: false });
 });
 
+it('handles PEEKED_INTO_PAST finding some items', () => {
+  const state = initialState({isLoading: true});
+  const newState = loadingReducer(state, Actions.peekedIntoPast({hasSomeItems: true}));
+  expect(newState).toMatchObject( {
+    isLoading: true,
+    hasSomeItems: true,
+    allPastItemsLoaded: false,
+  });
+});
+
+it('handles PEEKED_INTO_PAST finding no items', () => {
+  const state = initialState({isLoading: true});
+  const newState = loadingReducer(state, Actions.peekedIntoPast({hasSomeItems: false}));
+  expect(newState).toMatchObject( {
+    isLoading: true,
+    hasSomeItems: false,
+    allPastItemsLoaded: true,
+  });
+});
+
 it('sets only opportunities fields on ALL_OPPORTUNITIES_LOADED', () => {
   const state = initialState({
     isLoading: true,

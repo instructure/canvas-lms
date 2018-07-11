@@ -63,9 +63,6 @@ export class PlannerApp extends Component {
     triggerDynamicUiUpdates: func,
     preTriggerDynamicUiUpdates: func,
     plannerActive: func,
-    ui: shape({
-      naiAboveScreen: bool,
-    }),
     currentUser: shape(userShape),
     responsiveSize: sizeShape,
     appRef: func,
@@ -134,6 +131,11 @@ export class PlannerApp extends Component {
       this.resizeTimer = window.setTimeout(() => {this.resizeTimer = 0;}, 1000);
       this.beforeLayoutChange();
     }
+  }
+
+  onAddToDo = (event) => {
+    event.preventDefault();
+    this.props.updateTodo({updateTodoItem: {}});
   }
 
   // before we tell the responsive elements the size has changed, find the first
@@ -205,7 +207,11 @@ export class PlannerApp extends Component {
 
   renderNoAssignments() {
     return (
-      <PlannerEmptyState changeToDashboardCardView={this.props.changeToDashboardCardView}/>
+      <PlannerEmptyState
+        changeToDashboardCardView={this.props.changeToDashboardCardView}
+        isCompletelyEmpty={this.props.isCompletelyEmpty}
+        onAddToDo={this.onAddToDo}
+      />
     );
   }
 
@@ -340,14 +346,14 @@ export class PlannerApp extends Component {
     const children = [];
     const today = moment.tz(this.props.timeZone).startOf('day');
     let workingDay = moment.tz(this.props.days[0][0], this.props.timeZone);
-    if (workingDay.isAfter(today)) workingDay = today;
+    if (workingDay.isAfter(today)) workingDay = today.clone();
     let lastDay = moment.tz(this.props.days[this.props.days.length-1][0], this.props.timeZone);
     let tomorrow = today.clone().add(1, 'day');
     const dayBeforeYesterday = today.clone().add(-2, 'day');
-    if (lastDay.isBefore(today)) lastDay = today;
+    if (lastDay.isBefore(today)) lastDay = today.clone();
     // We don't want to render an empty tomorrow if we don't know it's actually empty.
     // It might just not be loaded yet. If so, sneak it back to today so it isn't displayed.
-    if (tomorrow.isAfter(lastDay)) tomorrow = today;
+    if (tomorrow.isAfter(lastDay)) tomorrow = today.clone();
     const dayHash = daysToDaysHash(this.props.days);
     let dayIndex = 1;
 
@@ -404,7 +410,10 @@ const mapStateToProps = (state) => {
     allFutureItemsLoaded: state.loading.allFutureItemsLoaded,
     loadingError: state.loading.loadingError,
     timeZone: state.timeZone,
-    ui: state.ui,
+    isCompletelyEmpty: !state.loading.hasSomeItems &&
+                        state.days.length == 0 &&
+                        state.loading.partialPastDays.length === 0 &&
+                        state.loading.partialFutureDays.length === 0,
   };
 };
 

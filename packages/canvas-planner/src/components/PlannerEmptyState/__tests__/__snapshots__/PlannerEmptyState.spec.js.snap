@@ -1,11 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`renders empty page 1`] = `
+exports[`renders desert when completely empty 1`] = `
 <div
   className="planner-empty-state"
 >
   <DesertSvg
     aria-hidden="true"
+    className="desert"
     height="220"
     viewBox="0 0 465 220"
     width="465"
@@ -29,12 +30,27 @@ exports[`renders empty page 1`] = `
       as="button"
       ellipsis={false}
       iconPlacement="start"
+      id="PlannerEmptyState_CardView"
       linkRef={[Function]}
       onClick={[Function]}
       variant="default"
     >
-      Go to Dashboard Card View
+      Go to Card View Dashboard
     </Link>
+     |
+    <Button
+      as="button"
+      buttonRef={[Function]}
+      fluidWidth={false}
+      id="PlannerEmptyState_AddToDo"
+      margin="0"
+      onClick={[Function]}
+      size="medium"
+      type="button"
+      variant="link"
+    >
+      Add To-Do
+    </Button>
   </div>
 </div>
 `;

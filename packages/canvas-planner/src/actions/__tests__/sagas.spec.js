@@ -20,9 +20,9 @@ import axios from 'axios';
 import moment from 'moment-timezone';
 import { select, call, put } from 'redux-saga/effects';
 import { gotItemsError, sendFetchRequest, gotGradesSuccess, gotGradesError } from '../../actions/loading-actions';
-import { loadPastUntilNewActivitySaga, loadPastSaga, loadFutureSaga, loadGradesSaga } from '../sagas';
+import { loadPastUntilNewActivitySaga, loadPastSaga, loadFutureSaga, loadGradesSaga, peekIntoPastSaga } from '../sagas';
 import {
-  mergeFutureItems, mergePastItems, mergePastItemsForNewActivity
+  mergeFutureItems, mergePastItems, mergePastItemsForNewActivity, consumePeekIntoPast
 } from '../saga-actions';
 import { transformApiToInternalGrade } from '../../utilities/apiUtils';
 
@@ -74,7 +74,6 @@ describe('loadPastUntilNewActivitySaga', () => {
     const generator = setupLoadingPastUntilNewActivitySaga();
     const expectedError = new Error('some error');
     expect(generator.throw(expectedError).value).toEqual(put(gotItemsError(expectedError)));
-    expect(() => generator.next()).toThrow();
   });
 });
 
@@ -92,6 +91,21 @@ describe('loadPastSaga', () => {
   });
 
   // not doing a full sequence of tests becuase the code is shared with the above saga
+});
+
+describe('peekIntoPastSaga', () => {
+  it('peeks into past', () => {
+    const generator = peekIntoPastSaga();
+    generator.next();
+    expect(generator.next(initialState()).value).toEqual(call(sendFetchRequest, {
+      getState: expect.any(Function),
+      fromMoment: moment.tz('Asia/Tokyo').startOf('day'),
+      intoThePast: true,
+      perPage: 1,
+    }));
+    expect(generator.next({transformedItems: ['some items'], response: 'response'}).value)
+      .toEqual(call(consumePeekIntoPast, ['some items'], 'response'));
+  });
 });
 
 describe('loadFutureSaga', () => {

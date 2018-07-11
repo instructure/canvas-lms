@@ -110,11 +110,24 @@ export default handleActions({
       seekingNewActivity: action.payload.seekingNewActivity
     });
   },
+  PEEKED_INTO_PAST: (state, action) => {
+    return loadingState(state, {
+      hasSomeItems: action.payload.hasSomeItems,
+      allPastItemsLoaded: !action.payload.hasSomeItems,
+      isLoading: state.isLoading,
+    });
+  },
   GETTING_FUTURE_ITEMS: (state, action) => {
     return loadingState(state, {
       loadingError: state.loadingError, // don't reset error until we're successful
       loadingFuture: true
     });
+  },
+  DELETED_PLANNER_ITEM: (state, action) => {
+    return loadingState(state, {hasSomeItems: false});  // because we can no longer be sure
+  },
+  SAVED_PLANNER_ITEM: (state, action) => {
+    return loadingState(state, {hasSomeItems: true}); // even if days[] is empty, we know we have an item
   },
   ALL_FUTURE_ITEMS_LOADED: (state, action) => {
     return loadingState(state, {allFutureItemsLoaded: true});
@@ -135,8 +148,11 @@ export default handleActions({
   GOT_GRADES_ERROR: (state, action) => ({
      ...state, loadingGrades: false, gradesLoaded: false,
      gradesLoadingError: action.payload.message}),
-
+  
 }, loadingState({}, {
+  isLoading: false,
+  loadingPast: false,
+  loadingFuture: false,
   plannerLoaded: false,
   allPastItemsLoaded: false,
   allFutureItemsLoaded: false,
@@ -147,6 +163,9 @@ export default handleActions({
   seekingNewActivity: false,
   partialPastDays: [],
   partialFutureDays: [],
+  hasSomeItems: false,    // set to true if the first peek into the past returns an item
+                          // reset to false if an item is deleted, because we can't know
+                          // if it was the last one
   loadingGrades: false,
   gradesLoaded: false,
   gradesLoadingError: null,

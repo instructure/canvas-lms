@@ -38,6 +38,8 @@ export const {
   gotGradesSuccess,
   gotGradesError,
   startLoadingPastUntilTodaySaga,
+  peekIntoPastSaga,
+  peekedIntoPast,
 } = createActions(
   'START_LOADING_ITEMS',
   'CONTINUE_LOADING_INITIAL_ITEMS',
@@ -53,6 +55,8 @@ export const {
   'GOT_GRADES_SUCCESS',
   'GOT_GRADES_ERROR',
   'START_LOADING_PAST_UNTIL_TODAY_SAGA',
+  'PEEK_INTO_PAST_SAGA',
+  'PEEKED_INTO_PAST',
 );
 
 export const gettingPastItems = createAction('GETTING_PAST_ITEMS', (opts = {seekingNewActivity: false}) => {
@@ -93,11 +97,14 @@ export function getFirstNewActivityDate (fromMoment) {
   };
 }
 
+// this is the initial load
 export function getPlannerItems (fromMoment) {
   return (dispatch, getState) => {
+
     dispatch(startLoadingItems());
     dispatch(continueLoadingInitialItems()); // a start counts as a continue for the ContinueInitialLoad animation
     dispatch(getFirstNewActivityDate(fromMoment));
+    dispatch(peekIntoPastSaga());
     dispatch(startLoadingFutureSaga());
   };
 }
@@ -147,6 +154,7 @@ export const loadPastUntilToday = () => (dispatch, getState) => {
   return 'loadPastUntilToday'; // for testing
 };
 
+
 export function sendFetchRequest (loadingOptions) {
   return axios.get(...fetchParams(loadingOptions))
     .then(response => handleFetchResponse(loadingOptions, response))
@@ -170,6 +178,9 @@ function fetchParams (loadingOptions) {
     };
     if (loadingOptions.intoThePast) {
       params.order = 'desc';
+    }
+    if (loadingOptions.perPage) {
+      params.per_page = loadingOptions.perPage;
     }
     return [
       '/api/v1/planner/items',

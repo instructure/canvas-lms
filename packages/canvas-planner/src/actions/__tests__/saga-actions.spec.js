@@ -17,9 +17,10 @@
  */
 
 import MockDate from 'mockdate';
-import {mergeFutureItems, mergePastItems, mergePastItemsForNewActivity, mergePastItemsForToday}
+import {mergeFutureItems, mergePastItems, mergePastItemsForNewActivity,
+  mergePastItemsForToday, consumePeekIntoPast}
   from '../saga-actions';
-import {gotPartialFutureDays, gotPartialPastDays, gotDaysSuccess} from '../loading-actions';
+import {gotPartialFutureDays, gotPartialPastDays, gotDaysSuccess, peekedIntoPast} from '../loading-actions';
 import {itemsToDays} from '../../utilities/daysUtils';
 
 function getStateFn (opts = {loading: {}}) {
@@ -224,5 +225,20 @@ describe('mergePastItemsForToday', () => {
     expect(result).toBe(true);
     expect(mockDispatch).toHaveBeenCalledWith(gotPartialPastDays(itemsToDays(mockItems), 'mock response'));
     expect(mockDispatch).toHaveBeenCalledWith(gotDaysSuccess(itemsToDays([mockItems[1]]), 'mock response'));
+  });
+});
+
+describe('consumePeekIntoPast', () => {
+  it('found a past item', () => {
+    const mockDispatch = jest.fn();
+    const result = consumePeekIntoPast(['item'], 'mock response')(mockDispatch, ()=>{});
+    expect(result).toBe(true);
+    expect(mockDispatch).toHaveBeenCalledWith(peekedIntoPast({hasSomeItems: true}));
+  });
+  it('found no past items', () => {
+    const mockDispatch = jest.fn();
+    const result = consumePeekIntoPast([], 'mock response')(mockDispatch, ()=>{});
+    expect(result).toBe(true);
+    expect(mockDispatch).toHaveBeenCalledWith(peekedIntoPast({hasSomeItems: false}));
   });
 });
