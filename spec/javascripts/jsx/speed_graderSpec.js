@@ -48,8 +48,8 @@ QUnit.module('SpeedGrader#showDiscussion', {
       show_help_menu_item: false
     })
     fixtures.innerHTML = '<span id="speedgrader-settings"></span>'
-    this.stub($, 'ajaxJSON');
-    this.spy($.fn, 'append');
+    sandbox.stub($, 'ajaxJSON');
+    sandbox.spy($.fn, 'append');
     this.originalWindowJSONData = window.jsonData;
     window.jsonData = {
       id: 27,
@@ -139,8 +139,8 @@ QUnit.module('SpeedGrader#refreshSubmissionToView', {
       show_help_menu_item: false
     })
     fixtures.innerHTML = '<span id="speedgrader-settings"></span>'
-    this.stub($, 'ajaxJSON');
-    this.spy($.fn, 'append');
+    sandbox.stub($, 'ajaxJSON');
+    sandbox.spy($.fn, 'append');
     this.originalWindowJSONData = window.jsonData;
     window.jsonData = {
       id: 27,
@@ -248,7 +248,7 @@ QUnit.module('#showSubmissionDetails', function(hooks) {
 QUnit.module('SpeedGrader#refreshGrades', {
   setup () {
     fakeENV.setup();
-    this.spy($.fn, 'append');
+    sandbox.spy($.fn, 'append');
     this.originalWindowJSONData = window.jsonData;
     window.jsonData = {
       id: 27,
@@ -437,8 +437,8 @@ test('renderComment should add the comment text to the delete link for screenrea
 QUnit.module('SpeedGrader#showGrade', {
   setup () {
     fakeENV.setup();
-    this.stub($, 'ajaxJSON');
-    this.spy($.fn, 'append');
+    sandbox.stub($, 'ajaxJSON');
+    sandbox.spy($.fn, 'append');
     this.originalWindowJSONData = window.jsonData;
     window.jsonData = {
       id: 27,
@@ -475,22 +475,22 @@ QUnit.module('SpeedGrader#showGrade', {
 });
 
 test('uses submission#grade for pass_fail assignments', function () {
-  this.stub(SpeedGrader.EG, 'updateStatsInHeader');
-  const $grade = this.stub($.fn, 'val');
+  sandbox.stub(SpeedGrader.EG, 'updateStatsInHeader');
+  const $grade = sandbox.stub($.fn, 'val');
   SpeedGrader.EG.showGrade();
   ok($grade.calledWith('complete'));
 });
 
 test('uses submission#entered_grade for other types of assignments', function () {
-  this.stub(SpeedGrader.EG, 'updateStatsInHeader');
-  const $grade = this.stub($.fn, 'val');
+  sandbox.stub(SpeedGrader.EG, 'updateStatsInHeader');
+  const $grade = sandbox.stub($.fn, 'val');
   SpeedGrader.EG.currentStudent.submission.grade = 'B';
   SpeedGrader.EG.showGrade();
   ok($grade.calledWith('A'));
 });
 
 test('Does not error out if a user has no submission', function () {
-  this.stub(SpeedGrader.EG, 'updateStatsInHeader');
+  sandbox.stub(SpeedGrader.EG, 'updateStatsInHeader');
 
   SpeedGrader.EG.currentStudent.submission_state = 'unsubmitted';
   delete SpeedGrader.EG.currentStudent.submission;
@@ -508,8 +508,8 @@ QUnit.module('SpeedGrader#handleGradeSubmit', {
       help_url: 'example.com/support',
       show_help_menu_item: false
     })
-    this.stub($, 'ajaxJSON');
-    this.spy($.fn, 'append');
+    sandbox.stub($, 'ajaxJSON');
+    sandbox.spy($.fn, 'append');
     this.originalWindowJSONData = window.jsonData;
     fixtures.innerHTML = `
       <span id="speedgrader-settings"></span>
@@ -600,12 +600,12 @@ QUnit.module('SpeedGrader#handleGradeSubmit', {
 test('hasWarning and flashWarning are called', function () {
   sinon.stub(SpeedGrader.EG, 'handleFragmentChanged')
   SpeedGrader.EG.jsonReady()
-  const flashWarningStub = this.stub($, 'flashWarning');
-  this.stub(SpeedGraderHelpers, 'determineGradeToSubmit').returns('15');
-  this.stub(SpeedGrader.EG, 'setOrUpdateSubmission');
-  this.stub(SpeedGrader.EG, 'refreshSubmissionsToView');
-  this.stub(SpeedGrader.EG, 'updateSelectMenuStatus');
-  this.stub(SpeedGrader.EG, 'showGrade');
+  const flashWarningStub = sandbox.stub($, 'flashWarning');
+  sandbox.stub(SpeedGraderHelpers, 'determineGradeToSubmit').returns('15');
+  sandbox.stub(SpeedGrader.EG, 'setOrUpdateSubmission');
+  sandbox.stub(SpeedGrader.EG, 'refreshSubmissionsToView');
+  sandbox.stub(SpeedGrader.EG, 'updateSelectMenuStatus');
+  sandbox.stub(SpeedGrader.EG, 'showGrade');
   SpeedGrader.EG.handleGradeSubmit(10, false);
   const [,,, callback] = $.ajaxJSON.getCall(2).args;
   const submissions = [{
@@ -632,7 +632,7 @@ test('handleGradeSubmit should submit score if using existing score', () => {
 test('handleGradeSubmit should submit grade if not using existing score', function() {
   sinon.stub(SpeedGrader.EG, 'handleFragmentChanged')
   SpeedGrader.EG.jsonReady()
-  this.stub(SpeedGraderHelpers, 'determineGradeToSubmit').returns('56');
+  sandbox.stub(SpeedGraderHelpers, 'determineGradeToSubmit').returns('56');
   SpeedGrader.EG.handleGradeSubmit(null, false);
   equal($.ajaxJSON.getCall(2).args[0], 'my_url.com');
   equal($.ajaxJSON.getCall(2).args[1], 'POST');
@@ -647,7 +647,7 @@ test('handleGradeSubmit should submit grade if not using existing score', functi
 test('unexcuses the submission if the grade is blank and the assignment is complete/incomplete', function () {
   sinon.stub(SpeedGrader.EG, 'handleFragmentChanged')
   SpeedGrader.EG.jsonReady()
-  this.stub(SpeedGraderHelpers, 'determineGradeToSubmit').returns('');
+  sandbox.stub(SpeedGraderHelpers, 'determineGradeToSubmit').returns('');
   window.jsonData.grading_type = 'pass_fail';
   SpeedGrader.EG.currentStudent.submission.excused = true;
   SpeedGrader.EG.handleGradeSubmit(null, false);
@@ -700,7 +700,7 @@ test('returns an iframe tag if the attachment is not of type "image"', () => {
 QUnit.module('emptyIframeHolder', {
   setup() {
     fakeENV.setup();
-    this.stub($, 'ajaxJSON');
+    sandbox.stub($, 'ajaxJSON');
     $div = $("<div id='iframe_holder'>not empty</div>")
     fixtures.innerHTML = $div
 
@@ -907,7 +907,7 @@ test('returns name and status', () => {
 });
 
 test('hides name if shouldHideStudentNames is true', function() {
-  this.stub(userSettings, 'get').returns(true);
+  sandbox.stub(userSettings, 'get').returns(true);
   const result = SpeedGrader.EG.getStudentNameAndGrade();
   equal(result, 'Student 1 - not graded');
 });
@@ -919,7 +919,7 @@ test("returns name and status for non-current student", () => {
 });
 
 test("hides non-current student name if shouldHideStudentNames is true", function () {
-  this.stub(userSettings, 'get').returns(true);
+  sandbox.stub(userSettings, 'get').returns(true);
   const student = window.jsonData.studentsWithSubmissions[1];
   const result = SpeedGrader.EG.getStudentNameAndGrade(student);
   equal(result, 'Student 2 - graded');
@@ -1150,7 +1150,7 @@ test('should return false when grading type is neither percent nor points', () =
 QUnit.module('SpeedGrader#formatGradeForSubmission', {
   setup () {
     fakeENV.setup();
-    this.stub(numberHelper, 'parse').returns(42);
+    sandbox.stub(numberHelper, 'parse').returns(42);
   },
 
   teardown () {
@@ -1181,7 +1181,7 @@ test('should not call numberHelper#parse if grading type is neither points nor p
 
 QUnit.module('Function returned by SpeedGrader#compareStudentsBy', {
   setup () {
-    this.spy(natcompare, 'strings');
+    sandbox.spy(natcompare, 'strings');
   }
 });
 
@@ -1267,7 +1267,7 @@ QUnit.module('SpeedGrader - gateway timeout', {
 });
 
 test('shows an error when the gateway times out', function () {
-  this.stub(SpeedGrader.EG, 'domReady');
+  sandbox.stub(SpeedGrader.EG, 'domReady');
   ENV.assignment_title = 'Assignment Title';
   SpeedGrader.setup();
   const message = 'Something went wrong. Please try refreshing the page. If the problem persists, there may be too many records on "Assignment Title" to load SpeedGrader.';
@@ -1511,7 +1511,7 @@ QUnit.module('SpeedGrader - no gateway timeout', {
 });
 
 test('does not show an error when the gateway times out', function () {
-  this.stub(SpeedGrader.EG, 'domReady');
+  sandbox.stub(SpeedGrader.EG, 'domReady');
   ENV.assignment_title = 'Assignment Title';
   SpeedGrader.setup();
   strictEqual($('#speed_grader_timeout_alert').text(), '');
