@@ -35,7 +35,7 @@ test('binds to model change triggers', function() {
 test('restore delegates to model.restore', function() {
   const revision = new WikiPageRevision()
   const view = new WikiPageRevisionView({model: revision})
-  this.stub(view, 'windowLocation').returns({
+  sandbox.stub(view, 'windowLocation').returns({
     href: '',
     reload() {
       return true

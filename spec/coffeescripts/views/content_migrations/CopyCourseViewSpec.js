@@ -45,7 +45,7 @@ test('it should be accessible', function(assert) {
 
 test('after init, calls updateNewDates when @courseFindSelect.triggers "course_changed" event', function() {
   $('#fixtures').html(this.copyCourseView.render().el)
-  const sinonSpy = this.spy(this.copyCourseView.dateShift, 'updateNewDates')
+  const sinonSpy = sandbox.spy(this.copyCourseView.dateShift, 'updateNewDates')
   const course = {
     start_at: 'foo',
     end_at: 'bar'

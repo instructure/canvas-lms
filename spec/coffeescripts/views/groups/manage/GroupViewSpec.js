@@ -117,7 +117,7 @@ test('removes the group after successful deletion', function() {
   const url = `/api/v1/groups/${view.model.get('id')}`
   const server = sinon.fakeServer.create()
   server.respondWith(url, [200, {'Content-Type': 'application/json'}, JSON.stringify({})])
-  this.stub(window, 'confirm').returns(true)
+  sandbox.stub(window, 'confirm').returns(true)
   view.$('.delete-group').click()
   server.respond()
   ok(!view.$el.hasClass('hidden'), 'group hidden')

@@ -33,15 +33,15 @@ QUnit.module('WikiPageIndexView:sort', {
 })
 
 test('sort delegates to the collection sortByField', function() {
-  const sortByFieldStub = this.stub(this.collection, 'sortByField')
+  const sortByFieldStub = sandbox.stub(this.collection, 'sortByField')
   this.view.sort(this.ev)
   ok(sortByFieldStub.calledOnce, 'collection sortByField called once')
 })
 
 test('view disabled while sorting', function() {
   const dfd = $.Deferred()
-  this.stub(this.collection, 'fetch').returns(dfd)
-  const disableWhileLoadingStub = this.stub(this.view.$el, 'disableWhileLoading')
+  sandbox.stub(this.collection, 'fetch').returns(dfd)
+  const disableWhileLoadingStub = sandbox.stub(this.view.$el, 'disableWhileLoading')
   this.view.sort(this.ev)
   ok(disableWhileLoadingStub.calledOnce, 'disableWhileLoading called once')
   ok(
@@ -52,8 +52,8 @@ test('view disabled while sorting', function() {
 
 test('view disabled while sorting again', function() {
   const dfd = $.Deferred()
-  this.stub(this.collection, 'fetch').returns(dfd)
-  const disableWhileLoadingStub = this.stub(this.view.$el, 'disableWhileLoading')
+  sandbox.stub(this.collection, 'fetch').returns(dfd)
+  const disableWhileLoadingStub = sandbox.stub(this.view.$el, 'disableWhileLoading')
   this.view.sort(this.ev)
   ok(disableWhileLoadingStub.calledOnce, 'disableWhileLoading called once')
   ok(
@@ -63,7 +63,7 @@ test('view disabled while sorting again', function() {
 })
 
 test('renderSortHeaders called when sorting changes', function() {
-  const renderSortHeadersStub = this.stub(this.view, 'renderSortHeaders')
+  const renderSortHeadersStub = sandbox.stub(this.view, 'renderSortHeaders')
   this.collection.trigger('sortChanged', 'created_at')
   ok(renderSortHeadersStub.calledOnce, 'renderSortHeaders called once')
   equal(this.view.currentSortField, 'created_at', 'currentSortField set correctly')

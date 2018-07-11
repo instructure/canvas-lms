@@ -50,7 +50,7 @@ test('delegate useAsFrontPage to the model', function() {
     published: true
   })
   const view = new WikiPageIndexItemView({model, collectionHasTodoDate: () => {}})
-  const stub = this.stub(model, 'setFrontPage')
+  const stub = sandbox.stub(model, 'setFrontPage')
   view.useAsFrontPage()
   ok(stub.calledOnce)
 })

@@ -39,7 +39,7 @@ test('it should be accessible', function(assert) {
 
 test('calls flashError with base error message when errors are present', function() {
   const errorMessage = 'User storage quota exceeded'
-  this.stub(this.avatarDialogView, 'enableSelectButton')
+  sandbox.stub(this.avatarDialogView, 'enableSelectButton')
   const mock = sandbox.mock($)
     .expects('flashError')
     .withArgs(errorMessage)

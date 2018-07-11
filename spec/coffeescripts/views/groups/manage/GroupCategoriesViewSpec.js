@@ -43,7 +43,7 @@ QUnit.module('GroupCategoriesView', {
         name: 'group set 2'
       }
     ])
-    this.stub(categories, 'fetch').returns([])
+    sandbox.stub(categories, 'fetch').returns([])
     view = new GroupCategoriesView({collection: categories})
     view.render()
     wrapper = document.getElementById('fixtures')

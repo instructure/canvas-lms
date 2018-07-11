@@ -52,8 +52,8 @@ test('it should inject styleSheets', 1, function() {
 })
 
 test('it should trigger the @open and @close events', function() {
-  const onOpen = this.spy()
-  const onClose = this.spy()
+  const onOpen = sinon.spy()
+  const onClose = sinon.spy()
 
   popup.on('open', onOpen)
   popup.on('close', onClose)
@@ -66,7 +66,7 @@ test('it should trigger the @open and @close events', function() {
 })
 
 test('it should close after a successful login', 1, function() {
-  const onClose = this.spy()
+  const onClose = sinon.spy()
 
   server = sinon.fakeServer.create()
   server.respondWith('POST', /login/, [200, {}, 'OK'])
@@ -84,7 +84,7 @@ test('it should close after a successful login', 1, function() {
 })
 
 test('it should trigger the @login_success event', 1, function() {
-  const onSuccess = this.spy()
+  const onSuccess = sinon.spy()
 
   server = sinon.fakeServer.create()
   server.respondWith('POST', /login/, [200, {}, 'OK'])
@@ -102,7 +102,7 @@ test('it should trigger the @login_success event', 1, function() {
 })
 
 test('it should trigger the @login_failure event', 1, function() {
-  const onFailure = this.spy()
+  const onFailure = sinon.spy()
 
   server = sinon.fakeServer.create()
   server.respondWith('POST', /login/, [401, {}, 'Bad Request'])
@@ -123,13 +123,13 @@ test('it should pop back in if student closes it', function(assert) {
   assert.expect(5)
   const done = assert.async()
   let latestWindow
-  const onFailure = this.spy()
-  const onOpen = this.spy()
-  const onClose = this.spy()
+  const onFailure = sinon.spy()
+  const onOpen = sinon.spy()
+  const onClose = sinon.spy()
   const originalOpen = window.open
 
   // needed for proper cleanup of windows
-  const openStub = this.stub(window, 'open').callsFake(function() {
+  const openStub = sandbox.stub(window, 'open').callsFake(function() {
     return (latestWindow = originalOpen.apply(this, arguments))
   })
 
