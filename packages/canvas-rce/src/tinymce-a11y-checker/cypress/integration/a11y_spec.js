@@ -14,7 +14,7 @@ describe("a11y Checker", () => {
       cy.get("input[type=text]").type("Kitten")
 
       cy.contains("Apply").click()
-      let issueTitle = cy.contains("Issue 1/8")
+      let issueTitle = cy.contains(/Issue 1\/\d+/)
       expect(issueTitle).to.exist
     })
   })

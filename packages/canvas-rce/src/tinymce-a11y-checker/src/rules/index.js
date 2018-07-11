@@ -9,6 +9,7 @@ import adjacentSameLinks from "./adjacent-links"
 import headingsSequence from "./headings-sequence"
 import imageAltLength from "./img-alt-length"
 import paragraphsForHeadings from "./paragraphs-for-headings"
+import listStructure from "./list-structure"
 
 export default [
   imgAlt,
@@ -21,5 +22,6 @@ export default [
   adjacentSameLinks,
   headingsSequence,
   imageAltLength,
-  paragraphsForHeadings
+  paragraphsForHeadings,
+  listStructure
 ]
