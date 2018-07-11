@@ -22,7 +22,7 @@ describe 'Discussions', :pact do
   subject(:discussions_api) { Helper::ApiClient::Discussions.new }
 
   it 'should List Discussions' do
-    canvas_lms_api.given('a student in a course with a discussion').
+    canvas_lms_api.given('a teacher in a course with a discussion').
       upon_receiving('List Discussions').
       with(
         method: :get,
@@ -95,6 +95,35 @@ describe 'Discussions', :pact do
     response = discussions_api.list_discussions(1)
     expect(response[0]['id']).to eq 1
     expect(response[0]['title']).to eq 'No Title'
+  end
+
+  it 'should Delete a Discussion' do
+    canvas_lms_api.given('a teacher in a course with a discussion').
+      upon_receiving('Delete a Discussion').
+      with(
+        method: :delete,
+        headers: {
+          'Authorization': 'Bearer some_token',
+          'Auth-User': 'Teacher1',
+          'Connection': 'close',
+          'Host': PactConfig.mock_provider_service_base_uri,
+          'Version': 'HTTP/1.1'
+        },
+        'path' => '/api/v1/courses/1/discussion_topics/1',
+        query: 'event=delete'
+      ).
+      will_respond_with(
+        status: 200,
+        body: Pact.like(
+          "discussion_topic":
+          {
+            'workflow_state': 'deleted'
+          }
+        )
+      )
+    discussions_api.authenticate_as_user('Teacher1')
+    response = discussions_api.delete_discussion(1, 1)
+    expect(response['discussion_topic']['workflow_state']).to eq 'deleted'
   end
 
   it 'should Post Discussion' do

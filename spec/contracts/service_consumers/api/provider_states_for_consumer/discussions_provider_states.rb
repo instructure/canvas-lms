@@ -21,7 +21,7 @@ PactConfig::Consumers::ALL.each do |consumer|
     # Teacher ID: 3 || Name: Teacher1
     # Course ID: 1
     # Discussion ID: 1
-    provider_state 'a student in a course with a discussion' do
+    provider_state 'a teacher in a course with a discussion' do
       set_up do
         @course = Pact::Canvas.base_state.course
         @teacher = Pact::Canvas.base_state.teachers.first

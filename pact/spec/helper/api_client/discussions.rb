@@ -13,6 +13,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+# DELETE /api/v1/courses/:course_id/discussion_topics/:topic_id
 
 require 'httparty'
 require 'json'
@@ -28,6 +29,12 @@ module Helper
 
       def list_discussions(course_id)
         JSON.parse(self.class.get("/api/v1/courses/#{course_id}/discussion_topics").body)
+      rescue
+        nil
+      end
+
+      def delete_discussion(course_id, topic_id)
+        JSON.parse(self.class.delete("/api/v1/courses/#{course_id}/discussion_topics/#{topic_id}", query: "event=delete").body)
       rescue
         nil
       end
