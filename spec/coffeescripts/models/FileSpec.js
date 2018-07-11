@@ -37,9 +37,9 @@ test('uploads the file, and sets attributes from response', function(assert) {
     id: 123,
     filename: 'example'
   }
-  const uploadStub = this.stub(uploader, 'uploadFile')
+  const uploadStub = sandbox.stub(uploader, 'uploadFile')
   uploadStub.returns(Promise.resolve(data))
-  const setStub = this.stub(Model.prototype, 'set')
+  const setStub = sandbox.stub(Model.prototype, 'set')
   const dfrd = model.save()
   ok(uploadStub.called, 'uploaded the file')
   dfrd.done(() => {

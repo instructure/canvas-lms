@@ -750,7 +750,7 @@ test('gets the due date for section instead of null', function() {
       }
     ]
   })
-  this.stub(assignment, 'multipleDueDates').returns(false)
+  sandbox.stub(assignment, 'multipleDueDates').returns(false)
   equal(assignment.singleSectionDueDate(), dueAt.toISOString())
 })
 
@@ -961,7 +961,7 @@ test('includes singleSectionDueDate', function() {
       }
     ]
   })
-  this.stub(assignment, 'multipleDueDates').returns(false)
+  sandbox.stub(assignment, 'multipleDueDates').returns(false)
   const json = assignment.toView()
   equal(json.singleSectionDueDate, dueAt.toISOString())
 })
@@ -1117,7 +1117,7 @@ test('returns false if record uses quizzes 2', function() {
     name: 'foo',
     frozen_attributes: []
   })
-  this.stub(assignment, 'isQuizLTIAssignment').returns(true)
+  sandbox.stub(assignment, 'isQuizLTIAssignment').returns(true)
   equal(assignment.canFreeze(), false)
 })
 
@@ -1138,7 +1138,7 @@ QUnit.module('Assignment#pollUntilFinishedDuplicating', {
   setup() {
     this.clock = sinon.useFakeTimers()
     this.assignment = new Assignment({ workflow_state: 'duplicating' })
-    this.stub(this.assignment, 'fetch').returns($.Deferred().resolve())
+    sandbox.stub(this.assignment, 'fetch').returns($.Deferred().resolve())
   },
   teardown() {
     this.clock.restore()
@@ -1166,7 +1166,7 @@ QUnit.module('Assignment#pollUntilFinishedImporting', {
   setup() {
     this.clock = sinon.useFakeTimers()
     this.assignment = new Assignment({ workflow_state: 'importing' })
-    this.stub(this.assignment, 'fetch').returns($.Deferred().resolve())
+    sandbox.stub(this.assignment, 'fetch').returns($.Deferred().resolve())
   },
   teardown() {
     this.clock.restore()

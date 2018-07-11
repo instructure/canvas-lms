@@ -54,8 +54,8 @@ test('should persist replies locally, and call provided onComplete callback', fu
     })
   ]
   this.entry.set('replies', replies)
-  this.setSpy = this.spy(this.entry, 'set')
-  const onCompleteCallback = this.spy()
+  this.setSpy = sandbox.spy(this.entry, 'set')
+  const onCompleteCallback = sinon.spy()
   this.entry.sync('update', this.entry, {complete: onCompleteCallback})
   this.server.respond()
   ok(this.setSpy.calledWith('replies', []))

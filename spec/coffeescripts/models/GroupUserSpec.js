@@ -25,8 +25,8 @@ import $ from 'jquery'
 QUnit.module('GroupUser', {
   setup() {
     this.groupUser = new GroupUser({category: new GroupCategory()})
-    this.leaveGroupStub = this.stub(this.groupUser, 'leaveGroup')
-    this.joinGroupStub = this.stub(this.groupUser, 'joinGroup')
+    this.leaveGroupStub = sandbox.stub(this.groupUser, 'leaveGroup')
+    this.joinGroupStub = sandbox.stub(this.groupUser, 'joinGroup')
   }
 })
 
