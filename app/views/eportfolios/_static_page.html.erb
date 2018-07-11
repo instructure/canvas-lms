@@ -51,14 +51,6 @@
         <%= render :partial => "eportfolios/page_section_static", :object => c, :locals => {:idx => idx, :read_only => true} %>
       <% end %>
     </div>
-    <% if !@page.page_comments.empty? %>
-      <div id="page_comments_holder" style="margin-top: 50px;">
-        <h2><%= t('headers.page_comments', "Page Comments") %></h2>
-        <div id="page_comments" style="padding: 5px 20px;">
-          <%= render :partial => "eportfolios/page_comment", :collection => @page.page_comments, :locals => {:read_only => true} %>
-        </div>
-      </div>
-    <% end %>
   </div>
   <div id="sidebar">
     <div class="section_header">
