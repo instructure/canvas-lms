@@ -92,6 +92,7 @@ export default class ContextTracker {
 
       this._qunit.config.modules.forEach(module => {
         if (!module.parentModule) {
+          module.testEnvironment = module.testEnvironment || {} // eslint-disable-line no-param-reassign
           const {testEnvironment} = module
 
           const beforeEach = testEnvironment.beforeEach
