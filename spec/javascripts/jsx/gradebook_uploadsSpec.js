@@ -120,7 +120,7 @@ test('number formatter returns empty string when value missing', function () {
 });
 
 test('number formatter delegates to GradeFormatHelper#formatGrade', function () {
-  const formatGradeSpy = this.spy(GradeFormatHelper, 'formatGrade');
+  const formatGradeSpy = sandbox.spy(GradeFormatHelper, 'formatGrade');
   const formatter = gradebook_uploads.createNumberFormatter('foo');
   formatter(null, null, {});
   ok(formatGradeSpy.calledOnce);

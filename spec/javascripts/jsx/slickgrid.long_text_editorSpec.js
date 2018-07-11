@@ -78,10 +78,10 @@ test('focuses the textarea on initial render', function () {
 QUnit.module('keyboard navigation', {
   stubbedArgs () {
     const args = editorArgs();
-    args.grid.navigatePrev = this.stub();
-    args.grid.navigateNext = this.stub();
-    args.commitChanges = this.stub();
-    args.cancelChanges = this.stub();
+    args.grid.navigatePrev = sinon.stub();
+    args.grid.navigateNext = sinon.stub();
+    args.commitChanges = sinon.stub();
+    args.cancelChanges = sinon.stub();
 
     return args;
   },

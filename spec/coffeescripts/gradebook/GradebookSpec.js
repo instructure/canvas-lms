@@ -97,7 +97,7 @@ QUnit.module('Gradebook#calculateStudentGrade', {
 
 test('calculates grades using properties from the gradebook', function() {
   const self = this.setupThis()
-  this.stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades())
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades())
   this.calculate.call(self, {id: '101', loaded: true, initialized: true})
   const {args} = CourseGradeCalculator.calculate.getCall(0)
   equal(args[0], self.submissionsForStudent())
@@ -108,7 +108,7 @@ test('calculates grades using properties from the gradebook', function() {
 
 test('scopes effective due dates to the user', function() {
   const self = this.setupThis()
-  this.stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades())
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades())
   this.calculate.call(self, {id: '101', loaded: true, initialized: true})
   const dueDates = CourseGradeCalculator.calculate.getCall(0).args[4]
   return deepEqual(dueDates, {201: {grading_period_id: '701'}})
@@ -116,7 +116,7 @@ test('scopes effective due dates to the user', function() {
 
 test('calculates grades without grading period data when grading period set is null', function() {
   const self = this.setupThis({gradingPeriodSet: null})
-  this.stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades())
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades())
   this.calculate.call(self, {id: '101', loaded: true, initialized: true})
   const {args} = CourseGradeCalculator.calculate.getCall(0)
   equal(args[0], self.submissionsForStudent())
@@ -128,7 +128,7 @@ test('calculates grades without grading period data when grading period set is n
 
 test('calculates grades without grading period data when effective due dates are not defined', function() {
   const self = this.setupThis({effectiveDueDates: null})
-  this.stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades())
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades())
   this.calculate.call(self, {id: '101', loaded: true, initialized: true})
   const {args} = CourseGradeCalculator.calculate.getCall(0)
   equal(args[0], self.submissionsForStudent())
@@ -141,7 +141,7 @@ test('calculates grades without grading period data when effective due dates are
 test('stores the current grade on the student when not including ungraded assignments', function() {
   const exampleGrades = createExampleGrades()
   const self = this.setupThis({include_ungraded_assignments: false})
-  this.stub(CourseGradeCalculator, 'calculate').returns(exampleGrades)
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(exampleGrades)
   const student = {id: '101', loaded: true, initialized: true}
   this.calculate.call(self, student)
   equal(student.total_grade, exampleGrades.current)
@@ -150,7 +150,7 @@ test('stores the current grade on the student when not including ungraded assign
 test('stores the final grade on the student when including ungraded assignments', function() {
   const exampleGrades = createExampleGrades()
   const self = this.setupThis({include_ungraded_assignments: true})
-  this.stub(CourseGradeCalculator, 'calculate').returns(exampleGrades)
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(exampleGrades)
   const student = {id: '101', loaded: true, initialized: true}
   this.calculate.call(self, student)
   equal(student.total_grade, exampleGrades.final)
@@ -159,7 +159,7 @@ test('stores the final grade on the student when including ungraded assignments'
 test('stores the current grade from the selected grading period when not including ungraded assignments', function() {
   const exampleGrades = createExampleGrades()
   const self = this.setupThis({gradingPeriodToShow: 701, include_ungraded_assignments: false})
-  this.stub(CourseGradeCalculator, 'calculate').returns(exampleGrades)
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(exampleGrades)
   const student = {id: '101', loaded: true, initialized: true}
   this.calculate.call(self, student)
   equal(student.total_grade, exampleGrades.gradingPeriods[701].current)
@@ -168,7 +168,7 @@ test('stores the current grade from the selected grading period when not includi
 test('stores the final grade from the selected grading period when including ungraded assignments', function() {
   const exampleGrades = createExampleGrades()
   const self = this.setupThis({gradingPeriodToShow: 701, include_ungraded_assignments: true})
-  this.stub(CourseGradeCalculator, 'calculate').returns(exampleGrades)
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(exampleGrades)
   const student = {id: '101', loaded: true, initialized: true}
   this.calculate.call(self, student)
   equal(student.total_grade, exampleGrades.gradingPeriods[701].final)
@@ -176,14 +176,14 @@ test('stores the final grade from the selected grading period when including ung
 
 test('does not calculate when the student is not loaded', function() {
   const self = this.setupThis()
-  this.stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades())
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades())
   this.calculate.call(self, {id: '101', loaded: false, initialized: true})
   notOk(CourseGradeCalculator.calculate.called)
 })
 
 test('does not calculate when the student is not initialized', function() {
   const self = this.setupThis()
-  this.stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades())
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades())
   this.calculate.call(self, {id: '101', loaded: true, initialized: false})
   notOk(CourseGradeCalculator.calculate.called)
 })
@@ -191,13 +191,13 @@ test('does not calculate when the student is not initialized', function() {
 QUnit.module('Gradebook#localeSort')
 
 test('delegates to natcompare.strings', function() {
-  const natCompareSpy = this.spy(natcompare, 'strings')
+  const natCompareSpy = sandbox.spy(natcompare, 'strings')
   Gradebook.prototype.localeSort('a', 'b')
   ok(natCompareSpy.calledWith('a', 'b'))
 })
 
 test('substitutes falsy args with empty string', function() {
-  const natCompareSpy = this.spy(natcompare, 'strings')
+  const natCompareSpy = sandbox.spy(natcompare, 'strings')
   Gradebook.prototype.localeSort(0, false)
   ok(natCompareSpy.calledWith('', ''))
 })
@@ -373,7 +373,7 @@ QUnit.module('Gradebook#getVisibleGradeGridColumns', {
     this.aggregateColumns = []
     this.parentColumns = []
     this.customColumnDefinitions = () => []
-    this.spy(this, 'makeColumnSortFn')
+    sandbox.spy(this, 'makeColumnSortFn')
   },
   teardown() {}
 })
@@ -577,7 +577,7 @@ test('returns false when group_weighting_scheme is not "percent" and gradingPeri
 
 QUnit.module('Gradebook#showNotesColumn', {
   setup() {
-    this.loadNotes = this.stub(DataLoader, 'getDataForColumn')
+    this.loadNotes = sandbox.stub(DataLoader, 'getDataForColumn')
   },
 
   setupShowNotesColumn(opts) {
@@ -608,7 +608,7 @@ QUnit.module('Gradebook#cellCommentClickHandler', {
     this.assignments = {
       '61890000000013319': {name: 'Assignment #1'}
     }
-    this.student = this.stub().returns({
+    this.student = sinon.stub().returns({
       name: 'Some Student'
     })
     this.options = {}
@@ -623,14 +623,14 @@ QUnit.module('Gradebook#cellCommentClickHandler', {
 
     this.submissionDialogArgs = undefined
 
-    this.stub(SubmissionDetailsDialog, 'open').callsFake(
+    sandbox.stub(SubmissionDetailsDialog, 'open').callsFake(
       function() {
         return (this.submissionDialogArgs = arguments)
       }.bind(this)
     )
 
     this.event = {
-      preventDefault: this.stub(),
+      preventDefault: sinon.stub(),
       currentTarget: this.fixture
     }
     this.$grid = {
@@ -639,7 +639,7 @@ QUnit.module('Gradebook#cellCommentClickHandler', {
       })
     }
     this.grid = {
-      getActiveCellNode: this.stub().returns(this.fixture)
+      getActiveCellNode: sinon.stub().returns(this.fixture)
     }
   },
 
@@ -717,13 +717,13 @@ QUnit.module('Gradebook#updateSubmission', {
 })
 
 test('formats the grade for the submission', function() {
-  this.spy(GradeFormatHelper, 'formatGrade')
+  sandbox.spy(GradeFormatHelper, 'formatGrade')
   this.gradebook.updateSubmission(this.submission)
   equal(GradeFormatHelper.formatGrade.callCount, 1)
 })
 
 test('includes submission attributes when formatting the grade', function() {
-  this.spy(GradeFormatHelper, 'formatGrade')
+  sandbox.spy(GradeFormatHelper, 'formatGrade')
   this.gradebook.updateSubmission(this.submission)
   const [grade, options] = Array.from(GradeFormatHelper.formatGrade.getCall(0).args)
   equal(grade, '123.45', 'parameter 1 is the submission grade')
@@ -732,13 +732,13 @@ test('includes submission attributes when formatting the grade', function() {
 })
 
 test('sets the formatted grade on submission', function() {
-  this.stub(GradeFormatHelper, 'formatGrade').returns('123.45%')
+  sandbox.stub(GradeFormatHelper, 'formatGrade').returns('123.45%')
   this.gradebook.updateSubmission(this.submission)
   equal(this.submission.grade, '123.45%')
 })
 
 test('sets the raw grade on submission', function() {
-  this.stub(GradeFormatHelper, 'formatGrade').returns('123.45%')
+  sandbox.stub(GradeFormatHelper, 'formatGrade').returns('123.45%')
   this.gradebook.updateSubmission(this.submission)
   equal(this.submission.rawGrade, '123.45')
 })

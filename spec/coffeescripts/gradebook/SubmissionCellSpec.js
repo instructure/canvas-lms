@@ -45,29 +45,29 @@ QUnit.module('SubmissionCell', {
 test('#applyValue escapes html in passed state', function() {
   const item = {whatever: {grade: '1'}}
   const state = dangerousHTML
-  this.stub(this.cell, 'postValue')
+  sandbox.stub(this.cell, 'postValue')
   this.cell.applyValue(item, state)
   equal(item.whatever.grade, escapedDangerousHTML)
 })
 
 test('#applyValue calls flashWarning', function() {
-  this.stub(this.cell, 'postValue')
-  const flashWarningStub = this.stub($, 'flashWarning')
+  sandbox.stub(this.cell, 'postValue')
+  const flashWarningStub = sandbox.stub($, 'flashWarning')
   this.cell.applyValue(this.opts.item, '150')
   ok(flashWarningStub.calledOnce)
 })
 
 test('#applyValue calls numberHelper with points possible', function() {
-  const numberHelperStub = this.stub(numberHelper, 'parse').withArgs(this.pointsPossible)
-  this.stub(this.cell, 'postValue')
+  const numberHelperStub = sandbox.stub(numberHelper, 'parse').withArgs(this.pointsPossible)
+  sandbox.stub(this.cell, 'postValue')
   this.cell.applyValue(this.opts.item, '10')
   strictEqual(numberHelperStub.callCount, 1)
 })
 
 test('#applyValue calls numberHelper with state', function() {
   const state = '10'
-  const numberHelperStub = this.stub(numberHelper, 'parse').withArgs(state)
-  this.stub(this.cell, 'postValue')
+  const numberHelperStub = sandbox.stub(numberHelper, 'parse').withArgs(state)
+  sandbox.stub(this.cell, 'postValue')
   this.cell.applyValue(this.opts.item, state)
   strictEqual(numberHelperStub.callCount, 1)
 })
@@ -80,7 +80,7 @@ test('#loadValue escapes html', function() {
 })
 
 test('#class.formatter rounds numbers if they are numbers', function() {
-  this.stub(SubmissionCell.prototype, 'cellWrapper')
+  sandbox.stub(SubmissionCell.prototype, 'cellWrapper')
     .withArgs('0.67')
     .returns('ok')
   const formattedResponse = SubmissionCell.formatter(0, 0, {grade: 0.666}, {}, {})
@@ -88,7 +88,7 @@ test('#class.formatter rounds numbers if they are numbers', function() {
 })
 
 test('#class.formatter gives the value to the formatter if submission.grade isnt a parseable number', function() {
-  this.stub(SubmissionCell.prototype, 'cellWrapper')
+  sandbox.stub(SubmissionCell.prototype, 'cellWrapper')
     .withArgs('happy')
     .returns('ok')
   const formattedResponse = SubmissionCell.formatter(0, 0, {grade: 'happy'}, {}, {})
@@ -96,7 +96,7 @@ test('#class.formatter gives the value to the formatter if submission.grade isnt
 })
 
 test('#class.formatter adds a percent symbol for assignments with a percent grading_type', function() {
-  this.stub(SubmissionCell.prototype, 'cellWrapper')
+  sandbox.stub(SubmissionCell.prototype, 'cellWrapper')
     .withArgs('73%')
     .returns('ok')
   const formattedResponse = SubmissionCell.formatter(
@@ -218,7 +218,7 @@ test("#class.formatter, isConcluded doesn't have grayed-out", () => {
 })
 
 test('#letter_grade.formatter, shows EX when submission is excused', function() {
-  this.stub(SubmissionCell.prototype, 'cellWrapper')
+  sandbox.stub(SubmissionCell.prototype, 'cellWrapper')
     .withArgs('EX')
     .returns('ok')
   const formattedResponse = SubmissionCell.letter_grade.formatter(0, 0, {excused: true}, {}, {})
@@ -226,7 +226,7 @@ test('#letter_grade.formatter, shows EX when submission is excused', function() 
 })
 
 test('#letter_grade.formatter, shows the score and letter grade', function() {
-  this.stub(SubmissionCell.prototype, 'cellWrapper')
+  sandbox.stub(SubmissionCell.prototype, 'cellWrapper')
     .withArgs("F<span class='letter-grade-points'>0</span>")
     .returns('ok')
   const formattedResponse = SubmissionCell.letter_grade.formatter(
@@ -243,7 +243,7 @@ test('#letter_grade.formatter, shows the score and letter grade', function() {
 })
 
 test('#letter_grade.formatter, shows the letter grade', function() {
-  this.stub(SubmissionCell.prototype, 'cellWrapper')
+  sandbox.stub(SubmissionCell.prototype, 'cellWrapper')
     .withArgs('B')
     .returns('ok')
   const formattedResponse = SubmissionCell.letter_grade.formatter(0, 0, {grade: 'B'}, {}, {})
