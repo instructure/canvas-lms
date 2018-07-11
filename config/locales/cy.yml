@@ -6314,6 +6314,7 @@ cy:
   either_the_url_or_domain_should_be_set_c29cf8c1: "Dylid gosod naill ai’r url neu’r parth."
   either_you_re_a_new_user_or_the_terms_of_use_have__2bbebdef: "Naill ai rydych chi’n ddefnyddiwr newydd, neu mae’r *telerau defnyddio* wedi newid ers i chi gytuno â nhw ddiwethaf. Mae angen i chi gytuno â’r *telerau defnyddio* cyn bwrw ymlaen."
   el_salvador_503_b0907d30: "El Salvador (+503)"
+  element_option_missing_error_an_element_to_attach__be433478: "Gwall opsiwn `element` ar goll: Mae’n rhaid nodi elfen i atodi TreeBrowserView wrth osod y nodwedd rendro ar yr opsiwn 'gwir’ ar gyfer BBTreeBrowserView"
   email: 
     default_from_name: "Instructure Canvas"
   email_22a7d52d: E-bost
@@ -6955,6 +6956,7 @@ cy:
         folder_locked: "Mae’r ffolder \"%{folder},\" sy’n cynnwys y ffeil hon, wedi’i chloi."
     no_preview: 
       file_previews: 
+        download_file: "Llwytho i lawr enw *ffeil*"
         no_preview_available: "Does dim rhagolwg ar gael ar gyfer y ffeil hon."
   file_s_will_be_included_on_all_pages_in_the_canvas_80569935: "Bydd ffeil(iau) yn cael eu hychwanegu ar bob tudalen yn rhaglen bwrdd gwaith Canvas."
   file_s_will_be_included_when_user_content_is_displ_5e1fa73d: "Bydd ffeil(iau) yn cael eu hychwanegu pan fydd cynnwys defnyddiwr yn ymddangos yn apiau iOS neu Android Canvas, ac mewn apiau trydydd parti sydd wedi’u creu ar ein API."
@@ -15018,6 +15020,7 @@ cy:
       links: 
         assign_rubric: "Neilltuo cyfarwyddyd sgorio"
     select_content_dialog: 
+      add_to_module: "Ychwanegu %{item} at *fodiwl*"
       assignment_item: Aseiniad
       assignment_item_select_label: "Dewiswch yr aseiniad rydych chi am ei gysylltu, neu ychwanegwch aseiniad drwy ddewis \"Aseiniad Newydd\"."
       assignment_notice: "Dewiswch yr aseiniad rydych chi am ei gysylltu â’r *modiwl* hwn, neu ychwanegwch aseiniad newydd drwy ddewis \"Aseiniad Newydd\"."
