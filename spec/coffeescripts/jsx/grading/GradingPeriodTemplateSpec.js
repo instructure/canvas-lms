@@ -218,7 +218,7 @@ QUnit.module('custom prop validation for editable periods', {
     return ReactDOM.render(GradingPeriodElement, wrapper)
   },
   setup() {
-    this.consoleError = this.stub(console, 'error')
+    this.consoleError = sandbox.stub(console, 'error')
   },
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)

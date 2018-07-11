@@ -123,19 +123,19 @@ function renderComponent (props = {}) {
 QUnit.module('GradingPeriodSetCollection - API Data Load', {
   stubTermsSuccess () {
     const termsSuccess = Promise.resolve(exampleTerms);
-    this.stub(enrollmentTermsApi, 'list').returns(termsSuccess);
+    sandbox.stub(enrollmentTermsApi, 'list').returns(termsSuccess);
     return termsSuccess;
   },
 
   stubSetsSuccess () {
     const setsSuccess = Promise.resolve(exampleSets);
-    this.stub(gradingPeriodSetsApi, 'list').returns(setsSuccess);
+    sandbox.stub(gradingPeriodSetsApi, 'list').returns(setsSuccess);
     return setsSuccess;
   },
 
   stubSetsFailure () {
     const setsFailure = Promise.reject('FAIL');
-    this.stub(gradingPeriodSetsApi, 'list').returns(setsFailure);
+    sandbox.stub(gradingPeriodSetsApi, 'list').returns(setsFailure);
     return setsFailure;
   },
 
@@ -178,8 +178,8 @@ QUnit.module('GradingPeriodSetCollection', {
   setup () {
     const setsSuccess = new Promise(resolve => resolve(exampleSets));
     const termsSuccess = new Promise(resolve => resolve(exampleTerms));
-    this.sets = this.stub(gradingPeriodSetsApi, 'list').returns(setsSuccess);
-    this.terms = this.stub(enrollmentTermsApi, 'list').returns(termsSuccess);
+    this.sets = sandbox.stub(gradingPeriodSetsApi, 'list').returns(setsSuccess);
+    this.terms = sandbox.stub(enrollmentTermsApi, 'list').returns(termsSuccess);
   },
 
   teardown () {
@@ -290,8 +290,8 @@ QUnit.module('GradingPeriodSetCollection - Search', {
   setup () {
     const setsSuccess = new Promise(resolve => resolve(exampleSets));
     const termsSuccess = new Promise(resolve => resolve(exampleTerms));
-    this.sets = this.stub(gradingPeriodSetsApi, 'list').returns(setsSuccess);
-    this.terms = this.stub(enrollmentTermsApi, 'list').returns(termsSuccess);
+    this.sets = sandbox.stub(gradingPeriodSetsApi, 'list').returns(setsSuccess);
+    this.terms = sandbox.stub(enrollmentTermsApi, 'list').returns(termsSuccess);
   },
 
   teardown () {
@@ -329,7 +329,7 @@ test('setAndGradingPeriodTitles filters out empty, null, and undefined titles', 
 test('changeSearchText calls setState if the new search text differs from the old search text', function () {
   const collection = renderComponent();
   return Promise.all([this.terms, this.sets]).then(() => {
-    const setStateSpy = this.spy(collection, 'setState');
+    const setStateSpy = sandbox.spy(collection, 'setState');
     collection.changeSearchText('hello world');
     collection.changeSearchText('goodbye world');
     ok(setStateSpy.calledTwice)
@@ -339,7 +339,7 @@ test('changeSearchText calls setState if the new search text differs from the ol
 test('changeSearchText does not call setState if the new search text equals the old search text', function () {
   const collection = renderComponent();
   return Promise.all([this.terms, this.sets]).then(() => {
-    const setStateSpy = this.spy(collection, 'setState');
+    const setStateSpy = sandbox.spy(collection, 'setState');
     collection.changeSearchText('hello world');
     collection.changeSearchText('hello world');
     ok(setStateSpy.calledOnce)
@@ -408,7 +408,7 @@ test('announces number of search results for screen readers', function () {
   const collection = renderComponent();
 
   return Promise.all([this.terms, this.sets]).then(() => {
-    const flashStub = this.spy($, 'screenReaderFlashMessageExclusive');
+    const flashStub = sandbox.spy($, 'screenReaderFlashMessageExclusive');
     collection.changeSearchText('201');
     const message = '2 sets of grading periods found.';
     deepEqual(flashStub.firstCall.args, [message, true]);
@@ -486,8 +486,8 @@ QUnit.module('GradingPeriodSetCollection - Add Set', {
   setup () {
     const setsSuccess = new Promise(resolve => resolve([]));
     const termsSuccess = new Promise(resolve => resolve(exampleTerms));
-    this.sets = this.stub(gradingPeriodSetsApi, 'list').returns(setsSuccess);
-    this.terms = this.stub(enrollmentTermsApi, 'list').returns(termsSuccess);
+    this.sets = sandbox.stub(gradingPeriodSetsApi, 'list').returns(setsSuccess);
+    this.terms = sandbox.stub(enrollmentTermsApi, 'list').returns(termsSuccess);
   },
 
   teardown () {
@@ -519,8 +519,8 @@ QUnit.module('GradingPeriodSetCollection - Delete Set', {
   setup () {
     const setsSuccess = new Promise(resolve => resolve(exampleSets));
     const termsSuccess = new Promise(resolve => resolve(exampleTerms));
-    this.sets = this.stub(gradingPeriodSetsApi, 'list').returns(setsSuccess);
-    this.terms = this.stub(enrollmentTermsApi, 'list').returns(termsSuccess);
+    this.sets = sandbox.stub(gradingPeriodSetsApi, 'list').returns(setsSuccess);
+    this.terms = sandbox.stub(enrollmentTermsApi, 'list').returns(termsSuccess);
   },
 
   teardown () {
@@ -565,8 +565,8 @@ QUnit.module('GradingPeriodSetCollection - Update Set Periods', {
   setup () {
     const setsSuccess = new Promise(resolve => resolve(exampleSets));
     const termsSuccess = new Promise(resolve => resolve(exampleTerms));
-    this.sets = this.stub(gradingPeriodSetsApi, 'list').returns(setsSuccess);
-    this.terms = this.stub(enrollmentTermsApi, 'list').returns(termsSuccess);
+    this.sets = sandbox.stub(gradingPeriodSetsApi, 'list').returns(setsSuccess);
+    this.terms = sandbox.stub(enrollmentTermsApi, 'list').returns(termsSuccess);
   },
 
   teardown () {
@@ -588,8 +588,8 @@ QUnit.module('GradingPeriodSetCollection "Edit Grading Period Set"', {
   setup () {
     const setsSuccess = new Promise(resolve => resolve(exampleSets));
     const termsSuccess = new Promise(resolve => resolve(exampleTerms));
-    this.sets = this.stub(gradingPeriodSetsApi, 'list').returns(setsSuccess);
-    this.terms = this.stub(enrollmentTermsApi, 'list').returns(termsSuccess);
+    this.sets = sandbox.stub(gradingPeriodSetsApi, 'list').returns(setsSuccess);
+    this.terms = sandbox.stub(enrollmentTermsApi, 'list').returns(termsSuccess);
   },
 
   teardown () {
@@ -655,8 +655,8 @@ test('"onCancel" re-enables all grading period set actions', function () {
 
 QUnit.module('GradingPeriodSetCollection "Edit Grading Period Set - onSave"', {
   setup () {
-    this.stub(gradingPeriodSetsApi, 'list').returns(new Promise(() => {}));
-    this.stub(enrollmentTermsApi, 'list').returns(new Promise(() => {}));
+    sandbox.stub(gradingPeriodSetsApi, 'list').returns(new Promise(() => {}));
+    sandbox.stub(enrollmentTermsApi, 'list').returns(new Promise(() => {}));
   },
 
   renderComponent () {
@@ -683,7 +683,7 @@ QUnit.module('GradingPeriodSetCollection "Edit Grading Period Set - onSave"', {
 test('removes the "edit grading period set" form', function () {
   const updatedSet = _.extend({}, exampleSet, {title: 'Updated Title'});
   const success = Promise.resolve(updatedSet);
-  this.stub(gradingPeriodSetsApi, 'update').returns(success);
+  sandbox.stub(gradingPeriodSetsApi, 'update').returns(success);
   const collection = this.renderComponent();
   this.callOnSave(collection);
   return success.then(() => {
@@ -695,7 +695,7 @@ test('removes the "edit grading period set" form', function () {
 test('updates the given grading period set', function () {
   const updatedSet = _.extend({}, exampleSet, {title: 'Updated Title'});
   const success = Promise.resolve(updatedSet);
-  this.stub(gradingPeriodSetsApi, 'update').returns(success);
+  sandbox.stub(gradingPeriodSetsApi, 'update').returns(success);
   const collection = this.renderComponent();
   this.callOnSave(collection);
   return success.then(() => {
@@ -707,7 +707,7 @@ test('updates the given grading period set', function () {
 test('re-enables all grading period set actions', function () {
   const updatedSet = _.extend({}, exampleSet, {title: 'Updated Title'});
   const success = Promise.resolve(updatedSet);
-  this.stub(gradingPeriodSetsApi, 'update').returns(success);
+  sandbox.stub(gradingPeriodSetsApi, 'update').returns(success);
   const collection = this.renderComponent();
   this.callOnSave(collection);
   return success.then(() => {
@@ -721,7 +721,7 @@ test('re-enables all grading period set actions', function () {
 
 test('preserves the "edit grading period set" form upon failure', function () {
   const failure = Promise.reject('FAIL');
-  this.stub(gradingPeriodSetsApi, 'update').returns(failure);
+  sandbox.stub(gradingPeriodSetsApi, 'update').returns(failure);
   const collection = this.renderComponent();
   this.callOnSave(collection);
   return failure.catch(() => {

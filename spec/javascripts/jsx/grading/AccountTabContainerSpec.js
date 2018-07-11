@@ -47,8 +47,8 @@ define([
     setup () {
       const response = {};
       const successPromise = new Promise(resolve => resolve(response));
-      this.stub(axios, 'get').returns(successPromise);
-      this.stub($, 'ajax').returns({ done () {} });
+      sandbox.stub(axios, 'get').returns(successPromise);
+      sandbox.stub($, 'ajax').returns({ done () {} });
     },
 
     teardown () {
@@ -65,7 +65,7 @@ define([
   });
 
   test('jquery-ui tabs() is called', function () {
-    const tabsSpy = this.spy($.fn, 'tabs');
+    const tabsSpy = sandbox.spy($.fn, 'tabs');
     this.renderComponent();
     ok(tabsSpy.calledOnce);
   });

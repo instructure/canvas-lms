@@ -110,7 +110,7 @@ define([
   });
 
   test('the "Display totals for All Grading Periods option" checkbox state is included when the set is saved', function () {
-    const saveStub = this.stub();
+    const saveStub = sinon.stub();
     const form = this.renderComponent({ onSave: saveStub });
     const saveButton = ReactDOM.findDOMNode(form.refs.saveButton);
     Simulate.click(saveButton);

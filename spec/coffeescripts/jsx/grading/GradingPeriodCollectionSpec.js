@@ -27,9 +27,9 @@ import 'compiled/jquery.rails_flash_notifications'
 
 QUnit.module('GradingPeriodCollection', {
   setup() {
-    this.stub($, 'flashMessage')
-    this.stub($, 'flashError')
-    this.stub(window, 'confirm').returns(true)
+    sandbox.stub($, 'flashMessage')
+    sandbox.stub($, 'flashError')
+    sandbox.stub(window, 'confirm').returns(true)
     this.server = sinon.fakeServer.create()
     fakeENV.setup()
     ENV.current_user_roles = ['admin']
@@ -138,7 +138,7 @@ test('gets the grading periods from the grading periods controller', function() 
 })
 
 test('getPeriods requests the index data from the server', function() {
-  this.spy($, 'ajax')
+  sandbox.spy($, 'ajax')
   this.gradingPeriodCollection.getPeriods()
   ok($.ajax.calledOnce)
 })
@@ -165,7 +165,7 @@ test("renders grading periods with their individual 'closeDate'", function() {
 })
 
 test('deleteGradingPeriod calls confirmDelete if the period being deleted is not new (it is saved server side)', function() {
-  const confirmDelete = this.stub($.fn, 'confirmDelete')
+  const confirmDelete = sandbox.stub($.fn, 'confirmDelete')
   this.gradingPeriodCollection.deleteGradingPeriod('1')
   ok(confirmDelete.calledOnce)
 })
