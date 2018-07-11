@@ -900,15 +900,17 @@ class FilesController < ApplicationController
       end
     end
 
-    url_params = { include: [] }
-    includes = Array(params[:include])
-    if includes.include?('preview_url')
-      url_params[:include] << 'preview_url'
+    includes = []
+    if Array(params[:include]).include?('preview_url')
+      includes << 'preview_url'
     # only use implicit enhanced_preview_url if there is no explicit preview_url
     elsif @context.is_a?(User) || @context.is_a?(Course)
-      url_params[:include] << 'enhanced_preview_url'
+      includes << 'enhanced_preview_url'
     end
-    render json: {}, status: :created, location: api_v1_attachment_url(@attachment, url_params)
+
+    render status: :created,
+      json: attachment_json(@attachment, @attachment.user, {}, include: includes),
+      location: api_v1_attachment_url(@attachment, include: includes)
   end
 
   def api_create_success

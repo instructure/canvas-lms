@@ -1237,6 +1237,16 @@ describe FilesController do
         expect(folder.attachments.first).not_to be_nil
       end
 
+      it "should include the attachment json in the response" do
+        post "api_capture", params: params
+        assert_status(201)
+        attachment = folder.attachments.first
+        data = json_parse
+        expect(data["id"]).to eql attachment.id
+        expect(data["filename"]).to eql "test.txt"
+        expect(data["url"]).not_to be_nil
+      end
+
       it "works with a ContentMigration as the context" do
         migration = course.content_migrations.create!
         request_params = params.merge(
