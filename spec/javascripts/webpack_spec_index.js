@@ -18,7 +18,6 @@
 
 import { canvas } from '@instructure/ui-themes/lib'
 import en_US from 'timezone/en_US'
-import './support/sinon/sinon-qunit-1.0.0'
 import './jsx/spec-support/specProtection'
 
 if (process.env.SENTRY_DSN) {

@@ -40,7 +40,7 @@ test('youtube preview gets alt text from link data-preview-alt', function() {
       </a>
     </div>
   `
-  this.stub($, 'youTubeID').returns(47)
+  sandbox.stub($, 'youTubeID').returns(47)
   enhanceUserContent()
   equal(elem.querySelector('.media_comment_thumbnail').alt, alt)
 })
@@ -53,13 +53,13 @@ test('youtube preview ignores missing alt', function() {
       </a>
     </div>
   `
-  this.stub($, 'youTubeID').returns(47)
+  sandbox.stub($, 'youTubeID').returns(47)
   enhanceUserContent()
   ok(elem.querySelector('.media_comment_thumbnail').outerHTML.match('alt=""'))
 })
 
 test("enhance '.instructure_inline_media_comment' in questions", function() {
-  const mediaCommentThumbnailSpy = this.spy($.fn, 'mediaCommentThumbnail')
+  const mediaCommentThumbnailSpy = sandbox.spy($.fn, 'mediaCommentThumbnail')
   elem.innerHTML = `
     <div class="user_content"></div>
     <div class="answers">

@@ -47,17 +47,17 @@ define([
         isHidden: () => false,
         getContainer: () => node,
         dom: {},
-        execCommand: this.spy()
+        execCommand: sinon.spy()
       }
-      this.stub(tinyMCE, 'get').returns(editor)
-      this.stub(EditorBoxList.prototype, '_getEditor').returns(editor)
-      this.stub($.fn, 'offset').returns({left: 0, right: 0})
+      sandbox.stub(tinyMCE, 'get').returns(editor)
+      sandbox.stub(EditorBoxList.prototype, '_getEditor').returns(editor)
+      sandbox.stub($.fn, 'offset').returns({left: 0, right: 0})
     }
   });
 
   test('sets preview-alt data attribute when editor is hidden', function () {
     editor.isHidden = () => true
-    this.stub($.fn, 'replaceSelection')
+    sandbox.stub($.fn, 'replaceSelection')
     $(node).editorBox('create_link', createLinkOpts)
     const html = $.fn.replaceSelection.firstCall.args[0]
     const elem = document.createElement('div')
@@ -68,7 +68,7 @@ define([
   test('sets preview-alt data attribute when cursor is in a link', function () {
     node = document.createElement('a')
     editor.selection.getContent = () => null
-    this.spy($.fn, 'attr')
+    sandbox.spy($.fn, 'attr')
     $(node).editorBox('create_link', createLinkOpts)
     ok($.fn.attr.calledWithMatch({'data-preview-alt': alt}))
   })
@@ -84,7 +84,7 @@ define([
   })
 
   test('sets preview-alt data attribute with selection', function () {
-    this.stub(EditorCommands, 'insertLink')
+    sandbox.stub(EditorCommands, 'insertLink')
     $(node).editorBox('create_link', createLinkOpts)
     equal(EditorCommands.insertLink.firstCall.args[2]['data-preview-alt'], alt)
   })

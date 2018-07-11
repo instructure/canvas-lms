@@ -27,7 +27,7 @@ QUnit.module('SyllabusBehaviors.bindToEditSyllabus', {
   setup () {
     editorUtils.resetRCE();
     fixtures.setup();
-    this.stub(Sidebar, 'init');
+    sandbox.stub(Sidebar, 'init');
   },
   teardown () {
     // on successful bindToEditSyllabus, it will have added keyboard
@@ -67,8 +67,8 @@ test('skips initializing sidebar when edit link absent', function () {
 
 test('sets syllabus_body data value on fresh node when showing edit form', function () {
   const fresh = { val: sinon.spy() };
-  this.stub(RichContentEditor, 'freshNode').returns(fresh);
-  this.stub(RichContentEditor, 'loadNewEditor');
+  sandbox.stub(RichContentEditor, 'freshNode').returns(fresh);
+  sandbox.stub(RichContentEditor, 'loadNewEditor');
   fixtures.create('<div id="course_syllabus"></div>');
   fixtures.create('<a href="#" class="edit_syllabus_link">Edit Link</a>');
   fixtures.create('<form id="edit_course_syllabus_form"></form>');
@@ -84,7 +84,7 @@ test('sets syllabus_body data value on fresh node when showing edit form', funct
 });
 
 test('sets course_syllabus_body after mce destruction', function () {
-  this.stub(RichContentEditor, 'destroyRCE').callsFake( ()=> {
+  sandbox.stub(RichContentEditor, 'destroyRCE').callsFake( ()=> {
      let elem = document.getElementById('course_syllabus_body');
      elem.parentNode.removeChild(elem);
   });
