@@ -24,12 +24,45 @@ describe ContentMigrationsController do
       course_factory active_all: true
     end
 
+    let(:migration) do
+      migration = @course.content_migrations.build(migration_settings: {})
+      migration.save!
+      migration
+    end
+
     it 'index exports quizzes_next environment' do
       user_session(@teacher)
       get :index, params: {course_id: @course.id}
       expect(response).to be_successful
       expect(assigns[:js_env][:QUIZZES_NEXT_CONFIGURED_ROOT]).not_to be(nil)
       expect(assigns[:js_env][:QUIZZES_NEXT_ENABLED]).not_to be(nil)
+    end
+
+    describe '#show' do
+      context 'params[:include] present' do
+        it 'shows content migration with audit_info' do
+          user_session(@teacher)
+          get :show, params: {
+            course_id: @course.id,
+            id: migration.id,
+            include: ['audit_info']
+          }
+          expect(response).to be_successful
+          expect(response.body).to include('audit_info')
+        end
+      end
+
+      context 'params[:include] not present' do
+        it 'shows content migration without audit_info' do
+          user_session(@teacher)
+          get :show, params: {
+            course_id: @course.id,
+            id: migration.id
+          }
+          expect(response).to be_successful
+          expect(response.body).not_to include('audit_info')
+        end
+      end
     end
   end
 end
