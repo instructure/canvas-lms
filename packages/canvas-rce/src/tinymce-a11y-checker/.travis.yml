@@ -4,7 +4,7 @@ node_js:
   - lts/*
 script:
   - npm run test:coverage
-  - npm run cypress:run
+  - npm run cypress:ci
   - npm run fmt-check
   - npm run build:demo
 deploy:
