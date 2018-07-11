@@ -299,9 +299,9 @@ test('upatePublishState toggles ig-published', function() {
 
 test('asks for confirmation before deleting an assignment', function() {
   const view = createView(this.model)
-  this.stub(view, 'visibleAssignments').returns([])
-  this.stub(window, 'confirm').returns(true)
-  this.spy(view, 'delete')
+  sandbox.stub(view, 'visibleAssignments').returns([])
+  sandbox.stub(window, 'confirm').returns(true)
+  sandbox.spy(view, 'delete')
   view.$(`#assignment_${this.model.id} .delete_assignment`).click()
   ok(window.confirm.called)
   ok(view.delete.called)
@@ -310,8 +310,8 @@ test('asks for confirmation before deleting an assignment', function() {
 test('does not attempt to delete an assignment due in a closed grading period', function() {
   this.model.set('in_closed_grading_period', true)
   const view = createView(this.model)
-  this.stub(window, 'confirm').returns(true)
-  this.spy(view, 'delete')
+  sandbox.stub(window, 'confirm').returns(true)
+  sandbox.spy(view, 'delete')
   view.$(`#assignment_${this.model.id} .delete_assignment`).click()
   ok(window.confirm.notCalled)
   ok(view.delete.notCalled)
@@ -321,7 +321,7 @@ test('delete destroys model', function() {
   const old_asset_string = ENV.context_asset_string
   ENV.context_asset_string = 'course_1'
   const view = createView(this.model)
-  this.spy(view.model, 'destroy')
+  sandbox.spy(view.model, 'destroy')
   view.delete()
   ok(view.model.destroy.called)
   ENV.context_asset_string = old_asset_string
@@ -349,7 +349,7 @@ test('delete calls screenreader message', function() {
   ])
   const view = createView(this.model)
   view.delete()
-  this.spy($, 'screenReaderFlashMessage')
+  sandbox.spy($, 'screenReaderFlashMessage')
   server.respond()
   equal($.screenReaderFlashMessage.callCount, 1)
   ENV.context_asset_string = old_asset_string
@@ -518,7 +518,7 @@ test("correctly display's multiple modules", function() {
 })
 
 test('render score template with permission', function() {
-  const spy = this.spy(AssignmentListItemView.prototype, 'updateScore')
+  const spy = sandbox.spy(AssignmentListItemView.prototype, 'updateScore')
   createView(this.model, {
     canManage: false,
     canReadGrades: true
@@ -527,7 +527,7 @@ test('render score template with permission', function() {
 })
 
 test('does not render score template without permission', function() {
-  const spy = this.spy(AssignmentListItemView.prototype, 'updateScore')
+  const spy = sandbox.spy(AssignmentListItemView.prototype, 'updateScore')
   createView(this.model, {
     canManage: false,
     canReadGrades: false
@@ -762,7 +762,7 @@ test('can move when userIsAdmin is true', function() {
 })
 
 test('can move when canManage is true and the assignment group id is not locked', function() {
-  this.stub(this.model, 'canMove').returns(true)
+  sandbox.stub(this.model, 'canMove').returns(true)
   const view = createView(this.model, {
     userIsAdmin: false,
     canManage: true
@@ -773,7 +773,7 @@ test('can move when canManage is true and the assignment group id is not locked'
 })
 
 test('cannot move when canManage is true but the assignment group id is locked', function() {
-  this.stub(this.model, 'canMove').returns(false)
+  sandbox.stub(this.model, 'canMove').returns(false)
   const view = createView(this.model, {
     userIsAdmin: false,
     canManage: true
@@ -784,7 +784,7 @@ test('cannot move when canManage is true but the assignment group id is locked',
 })
 
 test('cannot move when canManage is false but the assignment group id is not locked', function() {
-  this.stub(this.model, 'canMove').returns(true)
+  sandbox.stub(this.model, 'canMove').returns(true)
   const view = createView(this.model, {
     userIsAdmin: false,
     canManage: false
@@ -795,7 +795,7 @@ test('cannot move when canManage is false but the assignment group id is not loc
 })
 
 test('re-renders when assignment state changes', function() {
-  this.stub(AssignmentListItemView.prototype, 'render')
+  sandbox.stub(AssignmentListItemView.prototype, 'render')
   const view = createView(this.model)
   ok(AssignmentListItemView.prototype.render.calledOnce)
   this.model.trigger('change:workflow_state')
@@ -803,14 +803,14 @@ test('re-renders when assignment state changes', function() {
 })
 
 test('polls for updates if assignment is duplicating', function() {
-  this.stub(this.model, 'isDuplicating').returns(true)
+  sandbox.stub(this.model, 'isDuplicating').returns(true)
   const view = createView(this.model)
   ok(this.model.pollUntilFinishedDuplicating.calledOnce)
 })
 
 test('polls for updates if assignment is importing', function() {
-  this.stub(this.model, 'isImporting').returns(true)
-  this.stub(this.model, 'pollUntilFinishedImporting')
+  sandbox.stub(this.model, 'isImporting').returns(true)
+  sandbox.stub(this.model, 'pollUntilFinishedImporting')
   const view = createView(this.model)
   ok(this.model.pollUntilFinishedImporting.calledOnce)
 })

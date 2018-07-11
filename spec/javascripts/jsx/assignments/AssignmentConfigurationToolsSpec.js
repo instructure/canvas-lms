@@ -100,7 +100,7 @@ define([
           }
         }
       ]
-      this.stub($, 'ajax').returns({status: 200, data: toolDefinitions});
+      sandbox.stub($, 'ajax').returns({status: 200, data: toolDefinitions});
       ENV.LTI_LAUNCH_FRAME_ALLOWANCES = ['midi', 'media']
     },
     teardown () {
