@@ -193,7 +193,7 @@ class ContentMigrationsController < ApplicationController
   def show
     @content_migration = @context.content_migrations.find(params[:id])
     @content_migration.check_for_pre_processing_timeout
-    render :json => content_migration_json(@content_migration, @current_user, session)
+    render :json => content_migration_json(@content_migration, @current_user, session, nil, params[:include])
   end
 
   def migration_plugin_supported?(plugin)
