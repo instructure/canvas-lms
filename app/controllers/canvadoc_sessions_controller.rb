@@ -21,6 +21,7 @@
 # It will simply redirect you to the 3rd party document preview..
 #
 class CanvadocSessionsController < ApplicationController
+  include CoursesHelper
   include HmacHelper
 
   def show
@@ -34,13 +35,26 @@ class CanvadocSessionsController < ApplicationController
         preferred_plugins: [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
       }
 
+      opts[:enable_annotations] = blob["enable_annotations"] && !anonymous_grading_enabled?(attachment)
+      if opts[:enable_annotations]
+        # Docviewer only cares about the enrollment type when we're doing annotations
+        opts[:enrollment_type] = blob["enrollment_type"]
+
+        # The enrollment type should come in the blob, but in case it
+        # doesn't, let's see if we can figure out the enrollment type
+        # through an expesive lookup. This should only be a short term
+        # fix until we understand better why mobile speedgrader is
+        # launching without enrollment type being sent.
+        opts[:enrollment_type] = course_user_role(attachment) if opts[:enrollment_type].blank?
+        # If we STILL don't have a role, something went way wrong so let's be unauthorized.
+        return render(plain: 'unauthorized', status: :unauthorized) if opts[:enrollment_type].blank?
+      end
+
       if @domain_root_account.settings[:canvadocs_prefer_office_online]
         opts[:preferred_plugins].unshift Canvadocs::RENDER_O365
       end
 
-      opts[:enable_annotations] = blob["enable_annotations"] && !anonymous_grading_enabled?(attachment)
       opts[:anonymous_instructor_annotations] = blob["anonymous_instructor_annotations"]
-      opts[:enrollment_type] = blob["enrollment_type"]
       # TODO: Remove the next line after the DocViewer Data Migration project RD-4702
       opts[:region] = attachment.shard.database_server.config[:region] || "none"
       attachment.submit_to_canvadocs(1, opts) unless attachment.canvadoc_available?
@@ -71,11 +85,21 @@ class CanvadocSessionsController < ApplicationController
 
   private
 
-  def anonymous_grading_enabled?(attachment)
+  def assignment_scope(attachment)
     Assignment.joins(submissions: :attachment_associations).
-      where(
-        submissions: {attachment_associations: {context_type: 'Submission', attachment: attachment}},
-        anonymous_grading: true
-      ).exists?
+      where(submissions: {attachment_associations: {context_type: 'Submission', attachment: attachment}})
+  end
+
+  def anonymous_grading_enabled?(attachment)
+    assignment_scope(attachment).where(anonymous_grading: true).exists?
+  end
+
+  def course_user_role(attachment)
+    # This has a problem where we could get the wrong course if an
+    # attachment was submitted for multiple homeworks. This will work
+    # to get us over the immediate issue, but when we fix the mobile
+    # enrollment problem.
+    course = assignment_scope(attachment).first.context
+    user_type(course, @current_user)
   end
 end

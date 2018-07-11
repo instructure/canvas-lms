@@ -190,7 +190,7 @@ describe CanvadocSessionsController do
 
     describe "annotations" do
       before(:each) do
-        @assignment = assignment_model
+        @assignment = assignment_model(course: @course)
         @submission = submission_model(assignment: @assignment, user: @student)
         @attachment = attachment_model(content_type: 'application/pdf', user: @student)
         @attachment.associate_with(@submission)
@@ -219,6 +219,13 @@ describe CanvadocSessionsController do
         # working with here, so unfortunately we can't mock them specifically.
         expect_any_instance_of(Canvadoc).to receive(:session_url).
           with(hash_including(enable_annotations: true))
+
+        get :show, params: {blob: blob.to_json, hmac: hmac}
+      end
+
+      it "gets the user role if not passed as a parameter" do
+        expect_any_instance_of(Canvadoc).to receive(:session_url).
+          with(hash_including(enrollment_type: 'student'))
 
         get :show, params: {blob: blob.to_json, hmac: hmac}
       end
