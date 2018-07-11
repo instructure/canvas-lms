@@ -13538,10 +13538,10 @@ pl:
     conversation_message_description: "Nowe wiadomości w skrzynce odbiorczej"
     conversation_message_display: "Wiadomość w rozmowie"
     course_content_description: |-
-        Zmień na zawartość kursu:⏎
-        ⏎
-        * Strona typu wiki⏎
-        * Zawartośc testu⏎
+        Zmień na zawartość kursu:
+        
+        * Zawartość strony
+        * Zawartość testu
         * Zawartość zadania
     course_content_display: "Zawartość kursu"
     discussion_description: "Nowy temat dyskusji na kursie"

@@ -13286,11 +13286,11 @@ pt:
     conversation_message_description: "Novas mensagens na Caixa de entrada"
     conversation_message_display: "Mensagem da conversa"
     course_content_description: |-
-        Alteração do conteúdo da disciplina:
+        Mude para o conteúdo da disciplina:
         
-        * Página Wiki
-        * Conteúdo de teste
-        * Conteúdo de tarefa
+        * Conteúdo da página
+        * Conteúdo do teste
+        * Conteúdo de atribuição
     course_content_display: "Conteúdo da disciplina"
     discussion_description: "Novo tópico de discussão na sua disciplina"
     discussion_display: Discussão

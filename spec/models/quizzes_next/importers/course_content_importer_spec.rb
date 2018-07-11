@@ -70,8 +70,15 @@ describe QuizzesNext::Importers::CourseContentImporter do
       expect(quiz1).to receive(:destroy)
       expect(quiz2).to receive(:destroy)
       expect(quiz2).not_to receive(:destroy)
+
+      original_setup_assets_imported = importer.method(:setup_assets_imported)
+      expect(importer).to receive(:setup_assets_imported) do |lti_assignment_quiz_set|
+        expect(migration.workflow_state).not_to eq('imported')
+        original_setup_assets_imported.call(lti_assignment_quiz_set)
+      end
       importer.import_content(double)
 
+      expect(migration.workflow_state).to eq('imported')
       expect(migration.migration_settings[:imported_assets][:lti_assignment_quiz_set]).
         to eq([[112_233, 123_456], [888_777, 22_345]])
     end

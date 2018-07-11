@@ -15623,7 +15623,7 @@ nb:
           answer_comments: "Kommentarer om studenten velger dette svaret"
           answer_in_range: "Svar i området"
           answer_with_precision: "Svar med presisjon"
-          exact_answer: "Nøyaktig svar"
+          exact_answer: "Eksakt svar"
         matching_left: "Matcher venstre side"
         matching_right: "Matcher høyre side"
         numerical_answer: "Numeriske svar"
