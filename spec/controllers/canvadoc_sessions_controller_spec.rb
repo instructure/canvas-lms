@@ -230,6 +230,31 @@ describe CanvadocSessionsController do
         get :show, params: {blob: blob.to_json, hmac: hmac}
       end
 
+      it "sends anonymous_instructor_annotations when true in the blob" do
+        blob[:anonymous_instructor_annotations] = true
+
+        expect_any_instance_of(Canvadoc).to receive(:session_url).
+          with(hash_including(anonymous_instructor_annotations: true))
+
+        get :show, params: {blob: blob.to_json, hmac: hmac}
+      end
+
+      it "doesn't send anonymous_instructor_annotations when false in the blob" do
+        blob[:anonymous_instructor_annotations] = false
+
+        expect_any_instance_of(Canvadoc).to receive(:session_url).
+          with(hash_excluding(:anonymous_instructor_annotations))
+
+        get :show, params: {blob: blob.to_json, hmac: hmac}
+      end
+
+      it "doesn't send anonymous_instructor_annotations when missing" do
+        expect_any_instance_of(Canvadoc).to receive(:session_url).
+          with(hash_excluding(:anonymous_instructor_annotations))
+
+        get :show, params: {blob: blob.to_json, hmac: hmac}
+      end
+
       context "when the attachment belongs to a non-anonymously-graded assignment" do
         it "enables submission annotations if enable_annotations is true" do
           expect_any_instance_of(Canvadoc).to receive(:session_url).
