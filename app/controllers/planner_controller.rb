@@ -153,6 +153,8 @@ class PlannerController < ApplicationController
       unread_items
     when 'ungraded_todo_items'
       ungraded_todo_items
+    when 'all_ungraded_todo_items'
+      all_ungraded_todo_items
     else
       planner_items
     end
@@ -178,6 +180,24 @@ class PlannerController < ApplicationController
   def ungraded_todo_items
     collections = [page_collection,
                    ungraded_discussion_collection]
+    BookmarkedCollection.merge(*collections)
+  end
+
+  # returns all pages and ungraded discussions in supplied contexts with todo dates (no needing-viewing filter)
+  def all_ungraded_todo_items
+    collections = []
+    collections << item_collection('course_pages',
+        WikiPage.where(context_type: 'Course', context_id: @course_ids, todo_date: @start_date..@end_date),
+        WikiPage, [:todo_date, :created_at], :id)
+    collections << item_collection('group_pages',
+        WikiPage.where(context_type: 'Group', context_id: @group_ids, todo_date: @start_date..@end_date),
+        WikiPage, [:todo_date, :created_at], :id)
+    collections << item_collection('ungraded_course_discussions',
+        DiscussionTopic.where(context_type: 'Course', context_id: @course_ids, todo_date: @start_date..@end_date),
+        DiscussionTopic, [:todo_date, :posted_at, :created_at], :id)
+    collections << item_collection('ungraded_group_discussions',
+        DiscussionTopic.where(context_type: 'Group', context_id: @group_ids, todo_date: @start_date..@end_date),
+        DiscussionTopic, [:todo_date, :posted_at, :created_at], :id)
     BookmarkedCollection.merge(*collections)
   end
 
