@@ -48,13 +48,14 @@ class CanvadocSessionsController < ApplicationController
         opts[:enrollment_type] = course_user_role(attachment) if opts[:enrollment_type].blank?
         # If we STILL don't have a role, something went way wrong so let's be unauthorized.
         return render(plain: 'unauthorized', status: :unauthorized) if opts[:enrollment_type].blank?
+
+        opts[:anonymous_instructor_annotations] = !!blob["anonymous_instructor_annotations"] if blob["anonymous_instructor_annotations"]
       end
 
       if @domain_root_account.settings[:canvadocs_prefer_office_online]
         opts[:preferred_plugins].unshift Canvadocs::RENDER_O365
       end
 
-      opts[:anonymous_instructor_annotations] = blob["anonymous_instructor_annotations"]
       # TODO: Remove the next line after the DocViewer Data Migration project RD-4702
       opts[:region] = attachment.shard.database_server.config[:region] || "none"
       attachment.submit_to_canvadocs(1, opts) unless attachment.canvadoc_available?
