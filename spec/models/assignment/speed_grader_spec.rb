@@ -1029,6 +1029,39 @@ describe Assignment::SpeedGrader do
     end
   end
 
+  context "when an assignment is anonymous" do
+    before(:once) do
+      course_with_teacher
+
+      @active_student = @course.enroll_student(User.create!, enrollment_state: 'active').user
+      @course.enroll_student(User.create!, enrollment_state: 'inactive')
+      @course.enroll_student(User.create!, enrollment_state: 'completed')
+      @course.enroll_student(User.create!, enrollment_state: 'completed')
+    end
+
+    let(:assignment) { @course.assignments.create!(title: 'anonymous', anonymous_grading: true) }
+    let(:speed_grader_json) { Assignment::SpeedGrader.new(assignment, @teacher).json }
+    let(:students) { speed_grader_json[:context][:students] }
+
+    it "returns only active students if assignment is muted" do
+      active_student_submission = assignment.submission_for_student(@active_student)
+
+      returned_ids = students.map { |student| student['anonymous_id'] }
+      expect(returned_ids).to match_array [active_student_submission.anonymous_id]
+    end
+
+    it "returns students in accord with user gradebook preferences if assignment is not muted" do
+      @teacher.preferences[:gradebook_settings] = {}
+      @teacher.preferences[:gradebook_settings][@course.id] = {
+        'show_concluded_enrollments' => 'true',
+        'show_inactive_enrollments' => 'true'
+      }
+      assignment.unmute!
+
+      expect(students.length).to eq 4
+    end
+  end
+
   context "OriginalityReport" do
     include_context 'lti2_spec_helper'
 
