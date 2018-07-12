@@ -126,6 +126,52 @@ describe "outcome gradebook" do
         no_students
       end
 
+      it 'outcomes without results filter preserved after page refresh' do
+        get "/courses/#{@course.id}/gradebook"
+        f('a[data-id=outcome]').click
+        wait_for_ajax_requests
+
+        expect(f('#no_results_outcomes').selected?).to be false
+        expect(f('#no_results_students').selected?).to be false
+
+        f('#no_results_outcomes').click
+        refresh_page
+
+        expect(f('#no_results_outcomes').selected?).to be true
+        expect(f('#no_results_students').selected?).to be false
+      end
+
+      it 'students without results filter preserved after page refresh' do
+        get "/courses/#{@course.id}/gradebook"
+        f('a[data-id=outcome]').click
+        wait_for_ajax_requests
+
+        expect(f('#no_results_outcomes').selected?).to be false
+        expect(f('#no_results_students').selected?).to be false
+
+        f('#no_results_students').click
+        refresh_page
+
+        expect(f('#no_results_outcomes').selected?).to be false
+        expect(f('#no_results_students').selected?).to be true
+      end
+
+      it 'outcomes and students without results filter preserved after page refresh' do
+        get "/courses/#{@course.id}/gradebook"
+        f('a[data-id=outcome]').click
+        wait_for_ajax_requests
+
+        expect(f('#no_results_outcomes').selected?).to be false
+        expect(f('#no_results_students').selected?).to be false
+
+        f('#no_results_outcomes').click
+        f('#no_results_students').click
+        refresh_page
+
+        expect(f('#no_results_outcomes').selected?).to be true
+        expect(f('#no_results_students').selected?).to be true
+      end
+
       it "should allow showing only a certain section" do
         get "/courses/#{@course.id}/gradebook"
         f('a[data-id=outcome]').click

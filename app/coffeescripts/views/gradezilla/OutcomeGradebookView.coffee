@@ -25,6 +25,7 @@ define [
   'Backbone'
   'vendor/slickgrid'
   '../../gradezilla/OutcomeGradebookGrid'
+  '../../userSettings'
   '../gradezilla/CheckboxView'
   '../gradebook/SectionMenuView'
   'jsx/gradezilla/default_gradebook/components/SectionFilter'
@@ -32,7 +33,7 @@ define [
   'vendor/jquery.ba-tinypubsub'
   '../../jquery.rails_flash_notifications'
   'jquery.instructure_misc_plugins'
-], (I18n, $, _, React, ReactDOM, {View}, Slick, Grid, CheckboxView, SectionMenuView, SectionFilter, template, cellTemplate) ->
+], (I18n, $, _, React, ReactDOM, {View}, Slick, Grid, userSettings, CheckboxView, SectionMenuView, SectionFilter, template, cellTemplate) ->
 
   Dictionary =
     exceedsMastery:
@@ -141,7 +142,18 @@ define [
       @$('#no_results_outcomes').change(() -> _this._toggleOutcomesWithNoResults(this.checked))
       @$('#no_results_students').change(() -> _this._toggleStudentsWithNoResults(this.checked))
 
+    _setFilterSetting: (name, value) ->
+      filters = userSettings.contextGet('lmgb_filters')
+      filters = {} unless filters
+      filters[name] = value
+      userSettings.contextSet('lmgb_filters', filters)
+
+    _getFilterSetting: (name) ->
+      filters = userSettings.contextGet('lmgb_filters')
+      filters && filters[name]
+
     _toggleOutcomesWithNoResults: (enabled) ->
+      @_setFilterSetting('outcomes_no_results', enabled)
       if enabled
         columns = [@columns[0]].concat(_.filter(@columns, (c) => c.hasResults))
         @grid.setColumns(columns)
@@ -149,11 +161,12 @@ define [
         @grid.setColumns(@columns)
 
     _toggleStudentsWithNoResults: (enabled) ->
+      @_setFilterSetting('students_no_results', enabled)
       @grid.setData([])
       @grid.invalidate()
       @hasOutcomes = $.Deferred()
       $.when(@hasOutcomes).then(@renderGrid)
-      @_loadOutcomes(if enabled then 'missing_user_rollups' else '')
+      @_loadOutcomes()
 
     # Internal: Listen for events on grid.
     #
@@ -168,6 +181,10 @@ define [
     # Returns an object.
     toJSON: ->
       _.extend({}, checkboxes: @checkboxes)
+
+    _loadFilterSettings: ->
+      @$('#no_results_outcomes').prop('checked', @._getFilterSetting('outcomes_no_results'))
+      @$('#no_results_students').prop('checked', @._getFilterSetting('students_no_results'))
 
     # Public: Render the view once all needed data is loaded.
     #
@@ -211,6 +228,7 @@ define [
 
     isLoaded: false
     onShow: ->
+      @_loadFilterSettings() if !@isLoaded
       @loadOutcomes() if !@isLoaded
       @isLoaded = true
       @$el.fillWindowWithMe({
@@ -250,7 +268,8 @@ define [
       excluding = if exclude == '' then '' else "&exclude[]=#{exclude}"
       "/api/v1/courses/#{course}/outcome_rollups?per_page=100&include[]=outcomes&include[]=users&include[]=outcome_paths#{excluding}"
 
-    _loadOutcomes: (exclude = '') =>
+    _loadOutcomes: =>
+      exclude = if @$('#no_results_students').prop('checked') then 'missing_user_rollups' else ''
       course = ENV.context_asset_string.split('_')[1]
       @$('.outcome-gradebook-wrapper').disableWhileLoading(@hasOutcomes)
       @_loadPage(@_rollupsUrl(course, exclude))
