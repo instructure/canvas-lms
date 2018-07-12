@@ -21,7 +21,6 @@
 # It will simply redirect you to the 3rd party document preview..
 #
 class CanvadocSessionsController < ApplicationController
-  include CoursesHelper
   include HmacHelper
 
   def show
@@ -39,16 +38,8 @@ class CanvadocSessionsController < ApplicationController
       if opts[:enable_annotations]
         # Docviewer only cares about the enrollment type when we're doing annotations
         opts[:enrollment_type] = blob["enrollment_type"]
-
-        # The enrollment type should come in the blob, but in case it
-        # doesn't, let's see if we can figure out the enrollment type
-        # through an expesive lookup. This should only be a short term
-        # fix until we understand better why mobile speedgrader is
-        # launching without enrollment type being sent.
-        opts[:enrollment_type] = course_user_role(attachment) if opts[:enrollment_type].blank?
         # If we STILL don't have a role, something went way wrong so let's be unauthorized.
         return render(plain: 'unauthorized', status: :unauthorized) if opts[:enrollment_type].blank?
-
         opts[:anonymous_instructor_annotations] = !!blob["anonymous_instructor_annotations"] if blob["anonymous_instructor_annotations"]
       end
 
@@ -86,21 +77,11 @@ class CanvadocSessionsController < ApplicationController
 
   private
 
-  def assignment_scope(attachment)
-    Assignment.joins(submissions: :attachment_associations).
-      where(submissions: {attachment_associations: {context_type: 'Submission', attachment: attachment}})
-  end
-
   def anonymous_grading_enabled?(attachment)
-    assignment_scope(attachment).where(anonymous_grading: true).exists?
-  end
-
-  def course_user_role(attachment)
-    # This has a problem where we could get the wrong course if an
-    # attachment was submitted for multiple homeworks. This will work
-    # to get us over the immediate issue, but when we fix the mobile
-    # enrollment problem.
-    course = assignment_scope(attachment).first.context
-    user_type(course, @current_user)
+    Assignment.joins(submissions: :attachment_associations).
+      where(
+        submissions: {attachment_associations: {context_type: 'Submission', attachment: attachment}},
+        anonymous_grading: true
+      ).exists?
   end
 end
