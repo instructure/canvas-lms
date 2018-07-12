@@ -640,7 +640,6 @@ END
       description: -> { I18n.t('Create assessments with Quizzes.Next and migrate existing Canvas Quizzes.') },
       applies_to: 'Course',
       state: 'allowed',
-      beta: true,
       visible_on: ->(context) do
         root_account = context.root_account
         is_provisioned = Rails.env.development? || root_account.settings&.dig(:provision, 'lti').present?
