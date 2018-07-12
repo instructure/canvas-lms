@@ -4055,6 +4055,30 @@ describe 'Submissions API', type: :request do
     )
   end
 
+  it "includes anonymous instructor annotation parameters in the preview urls for attachments" do
+    allow(Canvadocs).to receive(:config).and_return({a: 1})
+
+    course_with_teacher_logged_in active_all: true
+    student_in_course active_all: true
+    @user = @teacher
+    a = @course.assignments.create!
+    a.submit_homework(@student, submission_type: 'online_upload',
+                      attachments: [crocodocable_attachment_model(context: @student)])
+    json = api_call(:get,
+                    "/api/v1/courses/#{@course.id}/assignments/#{a.id}/submissions?include[]=submission_history",
+                    { course_id: @course.id.to_s, assignment_id: a.id.to_s,
+                      action: 'index', controller: 'submissions_api', format: 'json',
+                      include: %w[submission_history] })
+
+    url = URI.parse(URI.decode(json[0]["submission_history"][0]["attachments"][0]["preview_url"]))
+    blob = JSON.parse(URI.decode_www_form(url.query).find { |a| a.first == "blob" }.second)
+    expect(blob).to include({
+                              "enable_annotations" => true,
+                              "anonymous_instructor_annotations" => false,
+                              "enrollment_type" => 'teacher'
+                            })
+  end
+
   it "includes canvadoc_document_id when specified" do
     allow(Canvadocs).to receive(:config).and_return({a: 1})
 
