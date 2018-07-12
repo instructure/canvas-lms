@@ -462,6 +462,7 @@ it('renders Note correctly with everything', () => {
     <PlannerItem {
       ...noteProps(
         {
+          associated_item: 'To Do',
           completed: true,
           title: "I am a Note",
           date: DEFAULT_DATE,
@@ -477,7 +478,7 @@ it('renders Note correctly without Course', () => {
     <PlannerItem {
       ...noteProps(
         {
-          associated_item: 'Note',
+          associated_item: 'To Do',
           completed: false,
           title: "I am a Note",
         })

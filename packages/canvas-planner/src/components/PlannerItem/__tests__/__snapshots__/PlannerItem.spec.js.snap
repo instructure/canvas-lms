@@ -2503,7 +2503,7 @@ exports[`renders Note correctly with everything 1`] = `
           <ScreenReaderContent
             as="span"
           >
-            Task I am a Note is marked as done.
+            To Do I am a Note is marked as done.
           </ScreenReaderContent>
         }
         onChange={[Function]}
@@ -2540,7 +2540,7 @@ exports[`renders Note correctly with everything 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-            Math 101 TO DO
+            Math 101 To Do
           </Text>
         </div>
         <div
@@ -2556,12 +2556,13 @@ exports[`renders Note correctly with everything 1`] = `
             href="#"
             iconPlacement="start"
             linkRef={[Function]}
+            onClick={[Function]}
             variant="default"
           >
             <ScreenReaderContent
               as="span"
             >
-              Task I am a Note, due Saturday, December 17, 2011 3:30 AM.
+              To Do I am a Note, due Saturday, December 17, 2011 3:30 AM.
             </ScreenReaderContent>
             <PresentationContent
               as="span"
@@ -2585,6 +2586,30 @@ exports[`renders Note correctly with everything 1`] = `
         <div
           className=""
         >
+          <div>
+            <ApplyTheme
+              immutable={false}
+              theme={Object {}}
+            >
+              <Button
+                as="button"
+                buttonRef={[Function]}
+                fluidWidth={false}
+                icon={[Function]}
+                margin="0"
+                onClick={[Function]}
+                size="medium"
+                type="button"
+                variant="icon"
+              >
+                <ScreenReaderContent
+                  as="span"
+                >
+                  Edit
+                </ScreenReaderContent>
+              </Button>
+            </ApplyTheme>
+          </div>
           <div>
             <Text
               as="span"
@@ -2624,7 +2649,7 @@ exports[`renders Note correctly without Course 1`] = `
           <ScreenReaderContent
             as="span"
           >
-            Note I am a Note is not marked as done.
+            To Do I am a Note is not marked as done.
           </ScreenReaderContent>
         }
         onChange={[Function]}
@@ -2661,7 +2686,7 @@ exports[`renders Note correctly without Course 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
-             Note
+             To Do
           </Text>
         </div>
         <div
@@ -2677,12 +2702,13 @@ exports[`renders Note correctly without Course 1`] = `
             href="#"
             iconPlacement="start"
             linkRef={[Function]}
+            onClick={[Function]}
             variant="default"
           >
             <ScreenReaderContent
               as="span"
             >
-              Note I am a Note, due Saturday, December 17, 2011 3:30 AM.
+              To Do I am a Note, due Saturday, December 17, 2011 3:30 AM.
             </ScreenReaderContent>
             <PresentationContent
               as="span"
@@ -2706,6 +2732,30 @@ exports[`renders Note correctly without Course 1`] = `
         <div
           className=""
         >
+          <div>
+            <ApplyTheme
+              immutable={false}
+              theme={Object {}}
+            >
+              <Button
+                as="button"
+                buttonRef={[Function]}
+                fluidWidth={false}
+                icon={[Function]}
+                margin="0"
+                onClick={[Function]}
+                size="medium"
+                type="button"
+                variant="icon"
+              >
+                <ScreenReaderContent
+                  as="span"
+                >
+                  Edit
+                </ScreenReaderContent>
+              </Button>
+            </ApplyTheme>
+          </div>
           <div>
             <Text
               as="span"

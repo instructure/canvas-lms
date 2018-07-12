@@ -25,12 +25,14 @@ import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReade
 import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent';
 import Pill from '@instructure/ui-elements/lib/components/Pill';
 import Avatar from '@instructure/ui-elements/lib/components/Avatar';
+import Button from '@instructure/ui-buttons/lib/components/Button';
 import Assignment from '@instructure/ui-icons/lib/Line/IconAssignment';
 import Quiz from '@instructure/ui-icons/lib/Line/IconQuiz';
 import Announcement from '@instructure/ui-icons/lib/Line/IconAnnouncement';
 import Discussion from '@instructure/ui-icons/lib/Line/IconDiscussion';
 import Calendar from '@instructure/ui-icons/lib/Line/IconCalendarMonth';
 import Page from '@instructure/ui-icons/lib/Line/IconMsWord';
+import Edit from '@instructure/ui-icons/lib/Line/IconEdit';
 import NotificationBadge, { MissingIndicator, NewActivityIndicator } from '../NotificationBadge';
 import BadgeList from '../BadgeList';
 import responsiviser from '../responsiviser';
@@ -236,6 +238,35 @@ export class PlannerItem extends Component {
     return null;
   }
 
+  renderItemSubMetric = () => {
+   if (this.props.points) {
+     return (
+      <div className={styles.score}>
+        <Text color="secondary">
+          <Text size="large">{this.props.points}</Text>
+          <Text size="x-small">&nbsp;
+            { formatMessage('pts') }
+          </Text>
+        </Text>
+      </div>
+     );
+    }
+    if (this.props.associated_item === 'To Do') {
+      return (
+        <div>
+          <ApplyTheme theme={{
+            [Button.theme]: {iconColor: this.props.color}
+          }}>
+            <Button variant='icon' icon={Edit} onClick={this.toDoLinkClick}>
+              <ScreenReaderContent>{formatMessage('Edit')}</ScreenReaderContent>
+            </Button>
+          </ApplyTheme>
+        </div>
+      );
+    }
+    return null;
+  }
+
   renderItemMetrics = () => {
     const secondaryClasses = classnames(styles.secondary, !this.hasBadges() ? styles.secondary_no_badges: '');
     const metricsClasses = classnames(styles.metrics, {[styles.with_end_time]: this.showEndTime()});
@@ -245,19 +276,7 @@ export class PlannerItem extends Component {
           {this.renderBadges()}
         </div>
         <div className={metricsClasses}>
-          {(this.props.points) ?
-            <div className={styles.score}>
-              <Text color="secondary">
-                <Text size="large">{this.props.points}</Text>
-                <Text size="x-small">&nbsp;
-                  { this.props.points
-                      ? formatMessage('pts')
-                      : null
-                  }
-                </Text>
-              </Text>
-            </div> : null
-          }
+          {this.renderItemSubMetric()}
           <div className={styles.due}>
             <Text color="secondary" size="x-small">
               <PresentationContent>{this.renderDateField()}</PresentationContent>
