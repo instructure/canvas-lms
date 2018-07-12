@@ -19,6 +19,7 @@
 class SubmissionsBaseController < ApplicationController
   include GradebookSettingsHelpers
   include Api::V1::Rubric
+  include Api::V1::SubmissionComment
 
   def show
     @visible_rubric_assessments = @submission.visible_rubric_assessments_for(@current_user)
@@ -123,7 +124,6 @@ class SubmissionsBaseController < ApplicationController
 
           format.html { redirect_to course_assignment_url(@context, @assignment) }
 
-          # TODO: the serialization here needs to be abstracted and shared with speed_grader.rb
           comments_include = if @assignment.can_view_other_grader_comments?(@current_user)
             :all_submission_comments
           elsif admin_in_context
@@ -140,7 +140,14 @@ class SubmissionsBaseController < ApplicationController
 
           submissions_json = @submissions.map do |submission|
             submission_json = submission.as_json(json_args)
-            submission_json[:submission][:submission_comments] = submission_comments_to_json(submission_json[:submission].delete(comments_include))
+            submission_json[:submission][:submission_comments] = anonymous_moderated_submission_comments(
+              assignment: @assignment,
+              avatars: service_enabled?(:avatars),
+              submissions: @submissions,
+              submission_comments: submission_json[:submission].delete(comments_include),
+              current_user: @current_user,
+              course: @context
+            )
             submission_json
           end
 
@@ -176,87 +183,5 @@ class SubmissionsBaseController < ApplicationController
     if @context.root_account.feature_enabled?(:non_scoring_rubrics)
       @context.account.resolved_outcome_proficiency&.as_json
     end
-  end
-
-  def submission_comments_to_json(submission_comments)
-    @submission_comment_methods ||= avatars ? [:avatar_path] : []
-    @submission_comment_fields ||= %i(attachments author_id author_name cached_attachments comment
-                                      created_at draft group_comment_id id media_comment_id
-                                      media_comment_type)
-
-    visible_submission_comments(submission_comments).map do |submission_comment|
-      json = submission_comment.as_json(include_root: false,
-                                        methods: @submission_comment_methods,
-                                        only: @submission_comment_fields)
-      author_id = submission_comment.author_id.to_s
-
-      json[:publishable] = submission_comment.publishable_for?(@current_user)
-      if anonymous_students? && student_ids_to_anonymous_ids.key?(author_id)
-        json.delete(:author_id)
-        json.delete(:author_name)
-        json[:anonymous_id] = student_ids_to_anonymous_ids[author_id]
-        json[:avatar_path] = User.default_avatar_fallback if avatars
-      elsif anonymous_graders? && grader_ids_to_anonymous_ids.key?(author_id)
-        json.delete(:author_id)
-        json[:anonymous_id] = grader_ids_to_anonymous_ids[author_id]
-        unless author_id == @current_user.id.to_s
-          json[:avatar_path] = User.default_avatar_fallback if avatars
-          json.delete(:author_name)
-        end
-      end
-
-      json
-    end
-  end
-
-  def anonymous_students?
-    return @anonymous_students if defined? @anonymous_students
-    @anonymous_students = !@assignment.can_view_student_names?(@current_user)
-  end
-
-  def anonymous_graders?
-    return @anonymous_graders if defined? @anonymous_graders
-    @anonymous_graders = !@assignment.can_view_other_grader_identities?(@current_user)
-  end
-
-  def grader_comments_hidden?
-    return @grader_comments_hidden if defined? @grader_comments_hidden
-    @grader_comments_hidden = !@assignment.can_view_other_grader_comments?(@current_user)
-  end
-
-  def visible_submission_comments(submission_comments)
-    return submission_comments unless grader_comments_hidden?
-    submission_comments.reject {|submission_comment| other_grader?(submission_comment.author_id)}
-  end
-
-  def student_ids_to_anonymous_ids
-    return @student_ids_to_anonymous_ids if defined? @student_ids_to_anonymous_ids
-    # ensure each student has membership, even without a submission
-    @student_ids_to_anonymous_ids = students.each_with_object({}) {|student, map| map[student.id.to_s] = nil}
-    @submissions.each do |submission|
-      @student_ids_to_anonymous_ids[submission.user_id.to_s] = submission.anonymous_id
-    end
-    @student_ids_to_anonymous_ids
-  end
-
-  def students
-    @students ||= begin
-      includes = gradebook_includes(user: @current_user, course: @context)
-      @assignment.representatives(@current_user, includes: includes) do |rep, others|
-        others.each { |s| res[:context][:rep_for_student][s.id] = rep.id }
-      end
-    end
-  end
-
-  def grader_ids_to_anonymous_ids
-    @assignment.grader_ids_to_anonymous_ids
-  end
-
-  def other_grader?(user_id)
-    !student_ids_to_anonymous_ids.key?(user_id.to_s) && user_id != @current_user.id
-  end
-
-  def avatars
-    @avatars ||= service_enabled?(:avatars) && !@assignment.grade_as_group?
   end
 end

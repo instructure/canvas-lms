@@ -314,7 +314,6 @@ RSpec.shared_examples 'a submission update action' do |controller|
         expect(@submission.provisional_grade(@teacher).submission_comments.first.comment).to eq 'provisional!'
 
         json = JSON.parse response.body
-        puts json.first['submission']['submission_comments'].first
         expect(json.first['submission']['submission_comments'].first['comment']).to eq 'provisional!'
       end
 
