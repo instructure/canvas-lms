@@ -393,18 +393,18 @@ describe InstFS do
 
     context "direct upload" do
       it "makes a network request to the inst-fs endpoint" do
-        uuid = "1234-abcd"
+        instfs_uuid = "1234-abcd"
         allow(CanvasHttp).to receive(:post).and_return(double(
           class: Net::HTTPCreated,
           code: 200,
-          body: {uuid: uuid}.to_json
+          body: {instfs_uuid: instfs_uuid}.to_json
         ))
 
         res = InstFS.direct_upload(
           file_name: "a.png",
           file_object: File.open("public/images/a.png")
         )
-        expect(res).to eq(uuid)
+        expect(res).to eq(instfs_uuid)
       end
     end
   end

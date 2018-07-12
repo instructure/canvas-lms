@@ -127,9 +127,9 @@ module InstFS
       response = CanvasHttp.post(url, form_data: data, multipart:true)
       if response.class == Net::HTTPCreated
         json_response = JSON.parse(response.body)
-        return json_response["uuid"] if json_response.key?("uuid")
+        return json_response["instfs_uuid"] if json_response.key?("instfs_uuid")
 
-        raise InstFS::DirectUploadError, "upload succeeded, but response did not containe a \"uuid\" key"
+        raise InstFS::DirectUploadError, "upload succeeded, but response did not containe an \"instfs_uuid\" key"
       end
       raise InstFS::DirectUploadError, "received code \"#{response.code}\" from service"
     end
