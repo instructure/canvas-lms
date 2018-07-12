@@ -604,6 +604,7 @@ class ContextModuleItemsApiController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       get_module_item
       @item.context_module_action(@current_user, :done)
+      sync_planner_completion(@item.content, @current_user, true) if planner_enabled?
       render :json => { :message => t('OK') }
     end
   end
@@ -614,6 +615,7 @@ class ContextModuleItemsApiController < ApplicationController
       if (progression = @item.progression_for_user(@current_user))
         progression.uncomplete_requirement(params[:id].to_i)
         progression.evaluate
+        sync_planner_completion(@item.content, @current_user, false) if planner_enabled?
       end
       render :json => { :message => t('OK') }
     end
