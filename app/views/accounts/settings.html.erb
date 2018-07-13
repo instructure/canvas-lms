@@ -188,10 +188,10 @@ TEXT
                   </tr>
                 <% end %>
                 <tr>
-                  <td>Zero Out Past Due Assignments:</td><td> <input type="text" name="zero_out_pastdue" value="<%= @js_env[:ZERO_OUT_PASTDUE_ASSIGNMENTS].capitalize %>" readonly></td>
+                  <td>Zero Out Past Due Assignments:</td><td> <input type="text" name="zero_out_pastdue" value="<%= @js_env[:ZERO_OUT_PASTDUE_ASSIGNMENTS] == 'true' ? 'Enabled' : 'Disabled'%>" readonly></td>
                 </tr>
                 <tr>
-                  <td>Distrubute Due Dates On Import:</td><td> <input type="text" name="distrubute_due_dates" value="<%= @js_env[:AUTOMATIC_DUE_DATES].capitalize %>" readonly></td>
+                  <td>Distrubute Due Dates On Import:</td><td> <input type="text" name="distrubute_due_dates" value="<%= @js_env[:AUTOMATIC_DUE_DATES] == 'true' ? 'Enabled': 'Disabled' %>" readonly></td>
                 </tr>
                 <% unless @account.site_admin? %>
                   <tr>
