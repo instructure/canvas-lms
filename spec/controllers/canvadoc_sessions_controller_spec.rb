@@ -199,7 +199,13 @@ describe CanvadocSessionsController do
       end
 
       let(:blob) do
-        {attachment_id: @attachment.global_id, user_id: @student.global_id, type: "canvadoc", enable_annotations: true}
+        {
+          attachment_id: @attachment.global_id,
+          user_id: @student.global_id,
+          type: "canvadoc",
+          enable_annotations: true,
+          enrollment_type: 'student'
+        }
       end
       let(:hmac) { Canvas::Security.hmac_sha1(blob.to_json) }
 
@@ -219,13 +225,6 @@ describe CanvadocSessionsController do
         # working with here, so unfortunately we can't mock them specifically.
         expect_any_instance_of(Canvadoc).to receive(:session_url).
           with(hash_including(enable_annotations: true))
-
-        get :show, params: {blob: blob.to_json, hmac: hmac}
-      end
-
-      it "gets the user role if not passed as a parameter" do
-        expect_any_instance_of(Canvadoc).to receive(:session_url).
-          with(hash_including(enrollment_type: 'student'))
 
         get :show, params: {blob: blob.to_json, hmac: hmac}
       end

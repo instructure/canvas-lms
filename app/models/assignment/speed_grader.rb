@@ -60,14 +60,17 @@ class Assignment
 
       res[:context][:rep_for_student] = {}
 
-      @students = @assignment.representatives(@user, includes: gradebook_includes) do |rep, others|
+      # If we're working with anonymous IDs, skip students who don't have a
+      # valid submission object, which means no inactive or concluded students
+      # even if the user has elected to show them in gradebook
+      @students = @assignment.representatives(@user, includes: student_includes) do |rep, others|
         others.each { |s| res[:context][:rep_for_student][s.id] = rep.id }
       end
       # Ensure that any test students are sorted last
       @students = @students.partition { |r| r.preferences[:fake_student] != true }.flatten
 
       enrollments = @course.apply_enrollment_visibility(gradebook_enrollment_scope, @user, nil,
-                                                        include: gradebook_includes)
+                                                        include: student_includes)
 
       is_provisional = @grading_role == :provisional_grader || @grading_role == :moderator
       current_user_rubric_assessments = @assignment.visible_rubric_assessments_for(@user, :provisional_grader => is_provisional) || []
@@ -297,6 +300,16 @@ class Assignment
     end
 
     private
+
+    def student_includes
+      return gradebook_includes unless @assignment.anonymous_grading?
+
+      if @assignment.moderated_grading?
+        @assignment.grades_published? ? gradebook_includes : []
+      else
+        @assignment.muted? ? [] : gradebook_includes
+      end
+    end
 
     def rubric_assessements_to_json(rubric_assessments)
       rubric_assessments.map do |assessment|

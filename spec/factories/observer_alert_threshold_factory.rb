@@ -18,11 +18,12 @@
 
 module Factories
   def observer_alert_threshold_model(opts = {})
-
-    opts[:observer] ||= user_model
-    @observer = opts[:observer]
+    opts[:active_all] ||= true
     opts[:student] ||= course_with_student(opts).user
     @student = opts[:student]
+    opts[:associated_user_id] ||= @student.id
+    opts[:observer] ||= course_with_observer(opts).user
+    @observer = opts[:observer]
 
     @observation_link = opts[:link] || UserObservationLink.create!(student: @student, observer: @observer)
 

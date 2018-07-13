@@ -559,6 +559,7 @@ class Submission < ActiveRecord::Base
       prev_percentage = prev_score.present? ? prev_score.to_f / self.assignment.points_possible * 100 : nil
       percentage = self.score.present? ? self.score.to_f / self.assignment.points_possible * 100 : nil
       next unless threshold.did_pass_threshold(prev_percentage, percentage)
+      next unless threshold.observer.enrollments.where(course_id: self.assignment.context_id).first.present?
 
       ObserverAlert.create!(observer: threshold.observer, student: self.user,
                             observer_alert_threshold: threshold,
