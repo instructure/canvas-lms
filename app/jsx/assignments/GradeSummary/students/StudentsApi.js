@@ -68,7 +68,7 @@ function getAllStudentsPages(url, callbacks) {
 
 /* eslint-disable import/prefer-default-export */
 export function loadStudents(courseId, assignmentId, callbacks) {
-  const queryParams = `include[]=provisional_grades&per_page=${STUDENTS_PER_PAGE}`
+  const queryParams = `include[]=provisional_grades&allow_new_anonymous_id=true&per_page=${STUDENTS_PER_PAGE}`
   const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/gradeable_students?${queryParams}`
 
   getAllStudentsPages(url, callbacks)

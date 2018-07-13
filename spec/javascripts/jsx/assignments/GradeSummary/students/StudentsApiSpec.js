@@ -140,6 +140,12 @@ QUnit.module('GradeSummary StudentsApi', suiteHooks => {
       deepEqual(paramsFromRequest(request).include, ['provisional_grades'])
     })
 
+    test('includes allow_new_anonymous_id', async () => {
+      await loadStudents()
+      const request = server.receivedRequests[0]
+      equal(paramsFromRequest(request).allow_new_anonymous_id, 'true')
+    })
+
     test('requests 50 students per page', async () => {
       await loadStudents()
       const request = server.receivedRequests[0]
