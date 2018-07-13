@@ -63,7 +63,6 @@ class Assignment
       # If we're working with anonymous IDs, skip students who don't have a
       # valid submission object, which means no inactive or concluded students
       # even if the user has elected to show them in gradebook
-      student_includes = @assignment.anonymize_students? ? [] : gradebook_includes
       @students = @assignment.representatives(@user, includes: student_includes) do |rep, others|
         others.each { |s| res[:context][:rep_for_student][s.id] = rep.id }
       end
@@ -301,6 +300,16 @@ class Assignment
     end
 
     private
+
+    def student_includes
+      return gradebook_includes unless @assignment.anonymous_grading?
+
+      if @assignment.moderated_grading?
+        @assignment.grades_published? ? gradebook_includes : []
+      else
+        @assignment.muted? ? [] : gradebook_includes
+      end
+    end
 
     def rubric_assessements_to_json(rubric_assessments)
       rubric_assessments.map do |assessment|
