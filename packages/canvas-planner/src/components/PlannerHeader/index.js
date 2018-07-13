@@ -34,6 +34,7 @@ import Badge from '@instructure/ui-elements/lib/components/Badge';
 import Opportunities from '../Opportunities';
 import GradesDisplay from '../GradesDisplay';
 import StickyButton from '../StickyButton';
+import { isFutureEmpty } from '../../utilities/statusUtils';
 
 import {
   addDay, savePlannerItem, deletePlannerItem, cancelEditingPlannerItem, openEditingPlannerItem, getNextOpportunities,
@@ -305,11 +306,12 @@ export class PlannerHeader extends Component {
     );
   }
 
-  render () {
-    const verticalRoom = this.getPopupVerticalRoom();
-
-    return (
-      <div className={styles.root}>
+  renderToday () {
+    // if we're not displaying any items, don't show the today button
+    // this is true if the planner is completely empty, or showing the balloons
+    // because everything is in the past when first loaded
+    if (this.props.days.length > 0) {
+      return (
         <Button
           id="planner-today-btn"
           variant="light"
@@ -318,6 +320,17 @@ export class PlannerHeader extends Component {
         >
           {formatMessage("Today")}
         </Button>
+      );
+    }
+    return null;
+  }
+
+  render () {
+    const verticalRoom = this.getPopupVerticalRoom();
+
+    return (
+      <div className={styles.root}>
+        {this.renderToday()}
         <Button
           variant="icon"
           margin="0 medium 0 0"

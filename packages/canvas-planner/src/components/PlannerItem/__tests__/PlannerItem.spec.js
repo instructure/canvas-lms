@@ -633,7 +633,6 @@ it('does not render end time if the same as start time', () => {
   });
   const wrapper = shallow(<PlannerItem {...props} />);
   expect(wrapper).toMatchSnapshot();
-  expect(wrapper).toMatchSnapshot(); 
 });
 
 it('renders media feedback if available', () => {

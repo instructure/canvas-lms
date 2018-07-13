@@ -510,3 +510,20 @@ describe('decision to show new activity indicator', () => {
   });
 
 });
+
+describe('today button', () => {
+  it('is displayed when the planner has items', () => {
+    const props = defaultProps();
+    const wrapper = shallow(<PlannerHeader {...props} />);
+    const todaybtn = wrapper.find('#planner-today-btn');
+    expect(todaybtn.length).toEqual(1)
+  });
+
+  it('is not displayed when the planner has no items to display', () => {
+    const props = defaultProps();
+    props.days = [];
+    const wrapper = shallow(<PlannerHeader {...props} />);
+    const todaybtn = wrapper.find('#planner-today-btn');
+    expect(todaybtn.length).toEqual(0)
+  });
+});
