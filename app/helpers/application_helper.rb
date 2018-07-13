@@ -899,10 +899,9 @@ module ApplicationHelper
   end
 
   def link_to_parent_signup(auth_type)
-    template = auth_type.present? ? "#{auth_type.downcase}Dialog" : "parentDialog"
-    path = auth_type.present? ? external_auth_validation_path : users_path
+    data = reg_link_data(auth_type)
     link_to(t("Parents sign up here"), '#', id: "signup_parent", class: "signup_link",
-            data: {template: template, path: path}, title: t("Parent Signup"))
+            data: data, title: t("Parent Signup"))
   end
 
   def tutorials_enabled?
