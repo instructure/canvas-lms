@@ -165,7 +165,7 @@ module Api::V1::User
   #
   # if parent_context is :profile, the html_url will always be the user's
   # public profile url, regardless of @current_user permissions
-  def user_display_json(user, parent_context = nil)
+  def user_display_json(user, parent_context = nil, includes = [])
     return {} unless user
     participant_url = case parent_context
       when :profile
@@ -181,6 +181,7 @@ module Api::V1::User
       avatar_image_url: avatar_url_for_user(user, blank_fallback),
       html_url: participant_url
     }
+    hash[:avatar_is_fallback] = user.avatar_image_url.nil? if includes.include?(:avatar_is_fallback) && avatars_enabled_for_user?(user)
     hash[:fake_student] = true if user.fake_student?
     hash
   end
