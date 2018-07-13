@@ -1,6 +1,12 @@
 {
+  "you_must_provide_a_date_and_time_a86839d2": {
+    "message": "Ви маєте задати дату та час."
+  },
   "all_day_fb42c4fc": {
     "message": "Весь день"
+  },
+  "assignmenttype_title_due_datetime_a112d8ff": {
+    "message": "{ assignmentType } { title }, до { datetime }."
   },
   "announcement_fb4cb645": {
     "message": "Оголошення"
@@ -8,8 +14,17 @@
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } до { endDate }"
   },
+  "only_most_recent_grading_period_shown_f1ad6458": {
+    "message": "*Покано тільки останній період оцінювання."
+  },
+  "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
+    "message": "На сьогодні нічого не заплановано. Виберіть елемент, який використовували останнім."
+  },
   "assignment_976578a8": {
     "message": "Завдання"
+  },
+  "success_to_do_created_e34ed395": {
+    "message": "Успіх: План робіт створений"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Show # completed item}\n  other {Show # completed items}\n}"
@@ -19,6 +34,9 @@
   },
   "pts_699bd9aa": {
     "message": "бали"
+  },
+  "assignmenttype_title_at_datetime_478f0709": {
+    "message": "{ assignmentType } { title }, в { datetime }."
   },
   "failed_to_save_to_do_ddc7503b": {
     "message": "Не вдалося зберегти завдання"
@@ -35,20 +53,29 @@
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Виглядає наче тут нічого немає"
   },
+  "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
+    "message": "{ assignmentType } { title }, в { datetime } до { endTime }"
+  },
   "points_points_63e59cce": {
     "message": "{ points } балів"
+  },
+  "dismiss_itemtitle_a9fae1b3": {
+    "message": "Відхилити { itemTitle }"
   },
   "loading_planner_items_947a813d": {
     "message": "Завантаження елементів планувальника"
   },
   "add_to_do_7def3c37": {
-    "message": "Додайте до зробленого"
+    "message": "Додайте до плану роботи"
   },
   "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
     "message": "{ count, plural,\n     =0 {# opportunities}\n    one {# opportunity}\n  other {# opportunities}\n}"
   },
   "due_5d7267be": {
     "message": "Очікується:"
+  },
+  "the_date_and_time_this_to_do_is_due_74c823d4": {
+    "message": "Дата та час, до якого це потрібно виконати"
   },
   "feedback_6dcc1991": {
     "message": "Зворотній зв''язок"
@@ -59,8 +86,11 @@
   "next_month_749b1778": {
     "message": "Наступний місяць"
   },
+  "assignmenttype_title_6612d008": {
+    "message": "{ assignmentType } { title }."
+  },
   "beginning_of_your_to_do_history_61ef2dce": {
-    "message": "Початок вашої історії завдання"
+    "message": "Початок вашої історії завдань"
   },
   "yesterday_at_date_1aa6d18e": {
     "message": "Вчора в { date }"
@@ -90,7 +120,7 @@
     "message": "Оцінки завантажені"
   },
   "excused_cf8792eb": {
-    "message": "Поважно"
+    "message": "Вивільнено"
   },
   "replies_4a8577c8": {
     "message": "Відповіді"
@@ -105,10 +135,13 @@
     "message": "Не вдалося отримати нову активність"
   },
   "title_is_required_6ddcab69": {
-    "message": "титул обов''язковий"
+    "message": "заголовок обов''язковий"
   },
   "nothing_planned_yet_8675ffe9": {
     "message": "Досі нічого не заплановано"
+  },
+  "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
+    "message": "Прокрутіть до попереднього елементу з новою діяльністю."
   },
   "grades_are_loading_c899652d": {
     "message": "Оцінки завантажені"
@@ -121,6 +154,9 @@
   },
   "loading_past_items_ca499e75": {
     "message": "Завантаження попередніх елементів"
+  },
+  "missing_items_for_title_516511f8": {
+    "message": "Відсутні елементи для { title }"
   },
   "tomorrow_at_date_b53f2cf1": {
     "message": "Завтра в { date }"
@@ -135,7 +171,7 @@
     "message": "Помилка завантаження попередніх елементів"
   },
   "no_due_dates_assigned_e8f5bac8": {
-    "message": "Дату визначення не призначено "
+    "message": "Термін виконання не призначено"
   },
   "save_11a80ec3": {
     "message": "Зберегти"
@@ -164,6 +200,9 @@
   "points_bceb5005": {
     "message": "бали"
   },
+  "new_activity_for_title_14c9c3af": {
+    "message": "Нова діяльність для { title }"
+  },
   "nothing_new_needs_attention_3ac548d4": {
     "message": "Ніщо нове не потребує уваги."
   },
@@ -173,11 +212,20 @@
   "title_ee03d132": {
     "message": "Заголовок"
   },
+  "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
+    "message": "Виникла помилка при спробі відхилити цю можливість."
+  },
+  "no_grade_3b4d7f3e": {
+    "message": "Оцінка відсутня"
+  },
   "date_ee500367": {
     "message": "Дата"
   },
   "due_date_8ce289b6": {
-    "message": "DUE: { date }"
+    "message": "ДО: { date }"
+  },
+  "assignmenttype_title_on_datetime_446013fb": {
+    "message": "{ assignmentType } { title }, в { datetime }."
   },
   "show_my_grades_ebd08684": {
     "message": "Показати мої оцінки"
@@ -204,10 +252,10 @@
     "message": "{ number } Більше..."
   },
   "missing_1a256b3b": {
-    "message": "Втрачено"
+    "message": "Відсутній"
   },
   "date_is_required_8660ec22": {
-    "message": "Потрібна дата"
+    "message": "Потрібно вказати дату"
   },
   "error_loading_more_items_3f109d9f": {
     "message": "Помилка завантаження інших елементів"
@@ -221,6 +269,9 @@
   "quiz_e0dcce8f": {
     "message": "Контрольна робота"
   },
+  "date_is_not_a_valid_date_4ef9f8ba": {
+    "message": "#{ date } не є допустимою датою."
+  },
   "failed_to_load_opportunities_52ab6404": {
     "message": "Не вдалося завантажити можливості"
   },
@@ -228,13 +279,16 @@
     "message": "Попередній місяць"
   },
   "new_activity_8b84847d": {
-    "message": "Нова активність"
+    "message": "Нова діяльність"
   },
   "failed_to_delete_to_do_64edff49": {
     "message": "Не вдалося видалити завдання"
   },
   "to_do_items_loading_d1cdfcd5": {
-    "message": "Завантажувати елементи"
+    "message": "Завантажувати елементи плану робіт"
+  },
+  "nothing_planned_today_selecting_next_item_f6718aa": {
+    "message": "На сьогодні нічого не заплановано. Виберіть наступний елемент."
   },
   "loading_725811ca": {
     "message": "завантаження"
@@ -252,7 +306,7 @@
     "message": "Сьогодні в { date }"
   },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-    "message": "Loaded { count, plural,\n     =0 {# items}\n    one {# item}\n  other {# items}\n}"
+    "message": "Завантажено { count, plural,\n     =0 {# items}\n    one {# item}\n  other {# items}\n}"
   },
   "details_98a31b68": {
     "message": "Подробиці"
