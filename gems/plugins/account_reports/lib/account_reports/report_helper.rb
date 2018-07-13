@@ -360,7 +360,7 @@ module AccountReports::ReportHelper
   end
 
   def last_account_report_runner?(account_report)
-    return false if account_report.account_report_runners.in_progress.exists?
+    return false if account_report.account_report_runners.incomplete.exists?
     AccountReport.transaction do
       @account_report.reload(lock: true)
       if @account_report.workflow_state == 'running'
