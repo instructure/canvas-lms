@@ -868,7 +868,11 @@ class SubmissionsApiController < ApplicationController
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])
       includes = Array(params[:include])
-      can_view_student_names = @assignment.can_view_student_names?(@current_user)
+
+      # When mobile supports new anonymous we can remove the allow_new flag
+      allow_new_anonymous_id = value_to_boolean(params[:allow_new_anonymous_id])
+      can_view_student_names = allow_new_anonymous_id ? @assignment.can_view_student_names?(@current_user) : true
+
       student_scope = context.students_visible_to(@current_user, include: :inactive)
       submission_scope = @assignment.submissions.except(:preload).where(user_id: student_scope).
         order(can_view_student_names ? :user_id : :anonymous_id)

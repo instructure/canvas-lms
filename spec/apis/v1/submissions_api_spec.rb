@@ -4465,7 +4465,8 @@ describe 'Submissions API', type: :request do
 
     it "anonymizes student ids if anonymously grading" do
       allow_any_instance_of(Assignment).to receive(:can_view_student_names?).and_return false
-      json = api_call_as_user(@ta, :get, @path, @params)
+      params = @params.merge(allow_new_anonymous_id: true)
+      json = api_call_as_user(@ta, :get, @path, params)
       expect(json.map { |el| el['anonymous_id'] }).to match_array([
         @assignment.submission_for_student(@student1).anonymous_id, @assignment.submission_for_student(@student2).anonymous_id
       ])
@@ -4473,13 +4474,16 @@ describe 'Submissions API', type: :request do
 
     it "returns default avatars if anonymously grading" do
       allow_any_instance_of(Assignment).to receive(:can_view_student_names?).and_return false
-      json = api_call_as_user(@ta, :get, @path, @params)
+      params = @params.merge(allow_new_anonymous_id: true)
+      json = api_call_as_user(@ta, :get, @path, params)
       expect(json.map { |el| el['avatar_image_url'] }).to match_array([User.default_avatar_fallback, User.default_avatar_fallback])
     end
 
     it "does not return identifiable attributes if anonymously grading" do
       allow_any_instance_of(Assignment).to receive(:can_view_student_names?).and_return false
-      json = api_call_as_user(@ta, :get, @path, @params)
+      # This is a workaround until mobile supports new anonymous grading
+      params = @params.merge(allow_new_anonymous_id: true)
+      json = api_call_as_user(@ta, :get, @path, params)
       expect(json.map { |el| el['id'] }).to match_array([nil, nil])
       expect(json.map { |el| el['display_name'] }).to match_array([nil, nil])
       expect(json.map { |el| el['html_url'] }).to match_array([nil, nil])
