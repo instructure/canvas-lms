@@ -28,7 +28,9 @@ QUnit.module('InstructureLinks Tinymce Plugin', {
     return (selection = {
       getContent() {
         return 'Selection Content'
-      }
+      },
+      getNode() {},
+      getRng() {}
     })
   },
   teardown() {
@@ -192,7 +194,8 @@ QUnit.module("InstructureLinks Tinymce Plugin: renderDialog", {
       nodeChanged: () => null,
       selection: {
         getContent: () => null,
-        getNode: () => ({nodeName: 'SPAN'})
+        getNode: () => ({nodeName: 'SPAN'}),
+        getRng: () => {}
       }
     };
   },

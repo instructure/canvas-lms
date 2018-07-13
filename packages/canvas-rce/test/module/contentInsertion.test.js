@@ -62,6 +62,7 @@ describe("contentInsertion", () => {
           };
         }
       },
+      focus: () => {},
       insertContent: content => {
         editor.content = editor.content + content;
       },
@@ -81,7 +82,11 @@ describe("contentInsertion", () => {
         href: "/some/path",
         url: "/other/path",
         title: "Here Be Links",
-        contents: "Click On Me"
+        contents: "Click On Me",
+        selectionDetails: {
+          node: undefined,
+          range: undefined
+        }
       };
     });
 
@@ -214,10 +219,20 @@ describe("contentInsertion", () => {
       editor.selection.getContent = () => {
         return "content";
       };
-      assert.equal(true, contentInsertion.existingContentToLink(editor));
+      const link = {
+        selectionDetails: {
+          node: undefined
+        }
+      };
+      assert.equal(true, contentInsertion.existingContentToLink(editor, link));
     });
     it("returns false if content not selected", () => {
-      assert.equal(false, contentInsertion.existingContentToLink(editor));
+      const link = {
+        selectionDetails: {
+          node: false
+        }
+      };
+      assert.equal(false, contentInsertion.existingContentToLink(editor, link));
     });
   });
 
