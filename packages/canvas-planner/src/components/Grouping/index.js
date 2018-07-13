@@ -157,6 +157,7 @@ export class Grouping extends Component {
           feedback={item.feedback}
           location={item.location}
           endTime={item.endTime}
+          dateStyle={item.dateStyle}
         />
       </li>
     ));

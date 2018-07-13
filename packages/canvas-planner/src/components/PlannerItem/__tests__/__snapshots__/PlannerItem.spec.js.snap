@@ -219,7 +219,7 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
               <PresentationContent
                 as="span"
               >
-                DUE: 3:30 AM
+                Due: 3:30 AM
               </PresentationContent>
             </Text>
           </div>
@@ -321,7 +321,7 @@ exports[`renders Announcement correctly with everything 1`] = `
             <ScreenReaderContent
               as="span"
             >
-              Announcement I am an Announcement, at Saturday, December 17, 2011 3:30 AM.
+              Announcement I am an Announcement posted Saturday, December 17, 2011 3:30 AM.
             </ScreenReaderContent>
             <PresentationContent
               as="span"
@@ -460,7 +460,7 @@ exports[`renders Announcement correctly with just date 1`] = `
             <ScreenReaderContent
               as="span"
             >
-              Announcement I am an Announcement, at Saturday, December 17, 2011 3:30 AM.
+              Announcement I am an Announcement posted Saturday, December 17, 2011 3:30 AM.
             </ScreenReaderContent>
             <PresentationContent
               as="span"
@@ -575,7 +575,7 @@ exports[`renders Announcement correctly with just points 1`] = `
             <ScreenReaderContent
               as="span"
             >
-              Announcement I am an Announcement, at Saturday, December 17, 2011 3:30 AM.
+              Announcement I am an Announcement posted Saturday, December 17, 2011 3:30 AM.
             </ScreenReaderContent>
             <PresentationContent
               as="span"
@@ -714,7 +714,7 @@ exports[`renders Announcement correctly without right side content 1`] = `
             <ScreenReaderContent
               as="span"
             >
-              Announcement I am an Announcement, at Saturday, December 17, 2011 3:30 AM.
+              Announcement I am an Announcement posted Saturday, December 17, 2011 3:30 AM.
             </ScreenReaderContent>
             <PresentationContent
               as="span"
@@ -887,7 +887,7 @@ exports[`renders Assignment correctly with everything 1`] = `
               <PresentationContent
                 as="span"
               >
-                DUE: 3:30 AM
+                Due: 3:30 AM
               </PresentationContent>
             </Text>
           </div>
@@ -1002,7 +1002,7 @@ exports[`renders Assignment correctly with just date 1`] = `
               <PresentationContent
                 as="span"
               >
-                DUE: 3:30 AM
+                Due: 3:30 AM
               </PresentationContent>
             </Text>
           </div>
@@ -1141,7 +1141,7 @@ exports[`renders Assignment correctly with just points 1`] = `
               <PresentationContent
                 as="span"
               >
-                DUE: 3:30 AM
+                Due: 3:30 AM
               </PresentationContent>
             </Text>
           </div>
@@ -1256,7 +1256,7 @@ exports[`renders Assignment correctly without right side content 1`] = `
               <PresentationContent
                 as="span"
               >
-                DUE: 3:30 AM
+                Due: 3:30 AM
               </PresentationContent>
             </Text>
           </div>
@@ -1337,7 +1337,7 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
             <ScreenReaderContent
               as="span"
             >
-              Calendar Event I am a Calendar Event, on December 17, 2011.
+              Calendar Event I am a Calendar Event, all day on December 17, 2011.
             </ScreenReaderContent>
             <PresentationContent
               as="span"
@@ -1636,6 +1636,121 @@ exports[`renders Calendar Event correctly with just date 1`] = `
 </div>
 `;
 
+exports[`renders Calendar Event correctly with start and end time 1`] = `
+<div
+  className="planner-item"
+>
+  <div>
+    <ApplyTheme
+      immutable={false}
+      theme={Object {}}
+    >
+      <Checkbox
+        checked={false}
+        disabled={false}
+        indeterminate={false}
+        inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Calendar Event I am a Calendar Event is not marked as done.
+          </ScreenReaderContent>
+        }
+        onChange={[Function]}
+        size="medium"
+        variant="simple"
+      />
+    </ApplyTheme>
+  </div>
+  <div
+    aria-hidden="true"
+    style={
+      Object {
+        "color": "#d71f85",
+      }
+    }
+  >
+    <IconCalendarMonth />
+  </div>
+  <div>
+    <div>
+      <div
+        className=""
+      >
+        <div>
+          <Text
+            as="span"
+            color="secondary"
+            letterSpacing="normal"
+            size="x-small"
+          >
+            A Course about being Diffrient Calendar Event
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Calendar Event I am a Calendar Event, at Saturday, December 17, 2011 3:30 AM until 5:30 AM
+            </ScreenReaderContent>
+            <PresentationContent
+              as="span"
+            >
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am a Calendar Event
+              </Text>
+            </PresentationContent>
+          </Link>
+        </div>
+      </div>
+      <div
+        className=""
+      >
+        <div />
+        <div
+          className="undefined"
+        >
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                3:30 AM to 5:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
 exports[`renders Calendar Event correctly without right side content 1`] = `
 <div
   className="planner-item"
@@ -1879,7 +1994,7 @@ exports[`renders Discussion correctly with everything 1`] = `
               <PresentationContent
                 as="span"
               >
-                DUE: 3:30 AM
+                Due: 3:30 AM
               </PresentationContent>
             </Text>
           </div>
@@ -1994,7 +2109,7 @@ exports[`renders Discussion correctly with just date 1`] = `
               <PresentationContent
                 as="span"
               >
-                DUE: 3:30 AM
+                Due: 3:30 AM
               </PresentationContent>
             </Text>
           </div>
@@ -2133,7 +2248,7 @@ exports[`renders Discussion correctly with just points 1`] = `
               <PresentationContent
                 as="span"
               >
-                DUE: 3:30 AM
+                Due: 3:30 AM
               </PresentationContent>
             </Text>
           </div>
@@ -2248,7 +2363,7 @@ exports[`renders Discussion correctly without right side content 1`] = `
               <PresentationContent
                 as="span"
               >
-                DUE: 3:30 AM
+                Due: 3:30 AM
               </PresentationContent>
             </Text>
           </div>
@@ -2363,7 +2478,7 @@ exports[`renders Note correctly with Group 1`] = `
               <PresentationContent
                 as="span"
               >
-                DUE: 3:30 AM
+                Due: 3:30 AM
               </PresentationContent>
             </Text>
           </div>
@@ -2451,7 +2566,7 @@ exports[`renders Note correctly with everything 1`] = `
             <ScreenReaderContent
               as="span"
             >
-              To Do I am a Note, due Saturday, December 17, 2011 3:30 AM.
+              To Do I am a Note has a to do time at Saturday, December 17, 2011 3:30 AM.
             </ScreenReaderContent>
             <PresentationContent
               as="span"
@@ -2509,7 +2624,7 @@ exports[`renders Note correctly with everything 1`] = `
               <PresentationContent
                 as="span"
               >
-                DUE: 3:30 AM
+                To Do: 3:30 AM
               </PresentationContent>
             </Text>
           </div>
@@ -2597,7 +2712,7 @@ exports[`renders Note correctly without Course 1`] = `
             <ScreenReaderContent
               as="span"
             >
-              To Do I am a Note, due Saturday, December 17, 2011 3:30 AM.
+              To Do I am a Note has a to do time at Saturday, December 17, 2011 3:30 AM.
             </ScreenReaderContent>
             <PresentationContent
               as="span"
@@ -2655,7 +2770,7 @@ exports[`renders Note correctly without Course 1`] = `
               <PresentationContent
                 as="span"
               >
-                DUE: 3:30 AM
+                To Do: 3:30 AM
               </PresentationContent>
             </Text>
           </div>
@@ -2794,7 +2909,7 @@ exports[`renders Page correctly with everything 1`] = `
               <PresentationContent
                 as="span"
               >
-                DUE: 3:30 AM
+                Due: 3:30 AM
               </PresentationContent>
             </Text>
           </div>
@@ -2909,7 +3024,7 @@ exports[`renders Page correctly with just date 1`] = `
               <PresentationContent
                 as="span"
               >
-                DUE: 3:30 AM
+                Due: 3:30 AM
               </PresentationContent>
             </Text>
           </div>
@@ -3048,7 +3163,7 @@ exports[`renders Page correctly with just points 1`] = `
               <PresentationContent
                 as="span"
               >
-                DUE: 3:30 AM
+                Due: 3:30 AM
               </PresentationContent>
             </Text>
           </div>
@@ -3163,7 +3278,7 @@ exports[`renders Page correctly without right side content 1`] = `
               <PresentationContent
                 as="span"
               >
-                DUE: 3:30 AM
+                Due: 3:30 AM
               </PresentationContent>
             </Text>
           </div>
@@ -3302,7 +3417,7 @@ exports[`renders Quiz correctly with everything 1`] = `
               <PresentationContent
                 as="span"
               >
-                DUE: 3:30 AM
+                Due: 3:30 AM
               </PresentationContent>
             </Text>
           </div>
@@ -3417,7 +3532,7 @@ exports[`renders Quiz correctly with just date 1`] = `
               <PresentationContent
                 as="span"
               >
-                DUE: 3:30 AM
+                Due: 3:30 AM
               </PresentationContent>
             </Text>
           </div>
@@ -3556,7 +3671,7 @@ exports[`renders Quiz correctly with just points 1`] = `
               <PresentationContent
                 as="span"
               >
-                DUE: 3:30 AM
+                Due: 3:30 AM
               </PresentationContent>
             </Text>
           </div>
@@ -3671,7 +3786,7 @@ exports[`renders Quiz correctly without right side content 1`] = `
               <PresentationContent
                 as="span"
               >
-                DUE: 3:30 AM
+                Due: 3:30 AM
               </PresentationContent>
             </Text>
           </div>
@@ -3810,7 +3925,7 @@ exports[`renders correctly 1`] = `
               <PresentationContent
                 as="span"
               >
-                DUE: 3:30 AM
+                Due: 3:30 AM
               </PresentationContent>
             </Text>
           </div>
@@ -3925,7 +4040,7 @@ exports[`renders feedback if available 1`] = `
               <PresentationContent
                 as="span"
               >
-                DUE: 3:30 AM
+                Due: 3:30 AM
               </PresentationContent>
             </Text>
           </div>
@@ -4061,7 +4176,7 @@ exports[`renders media feedback if available 1`] = `
               <PresentationContent
                 as="span"
               >
-                DUE: 3:30 AM
+                Due: 3:30 AM
               </PresentationContent>
             </Text>
           </div>
@@ -4312,7 +4427,7 @@ exports[`renders the location if available 1`] = `
               <PresentationContent
                 as="span"
               >
-                DUE: 3:30 AM
+                Due: 3:30 AM
               </PresentationContent>
             </Text>
           </div>
@@ -4443,7 +4558,7 @@ exports[`renders user-created Todo correctly 1`] = `
               <PresentationContent
                 as="span"
               >
-                DUE: 3:30 AM
+                Due: 3:30 AM
               </PresentationContent>
             </Text>
           </div>

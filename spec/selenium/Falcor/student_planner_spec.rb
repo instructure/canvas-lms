@@ -134,7 +134,7 @@ describe "student planner" do
     it "ensures time zone changes update the planner items", priority: "1", test_id: 3306207 do
       go_to_list_view
       time = calendar_time_string(@assignment.due_at).chop
-      expect(fxpath("//div[contains(@class, 'PlannerApp')]//span[contains(text(),'DUE: #{time}')]")).
+      expect(fxpath("//div[contains(@class, 'PlannerApp')]//span[contains(text(),'Due: #{time}')]")).
         to be_displayed
       @student1.time_zone = 'Asia/Tokyo'
       @student1.save!
@@ -142,7 +142,7 @@ describe "student planner" do
 
       # the users time zone is not converted to UTC and to balance it we subtract 6 hours from the due time
       time = calendar_time_string(@assignment.due_at+9.hours).chop
-      expect(fxpath("//div[contains(@class, 'PlannerApp')]//span[contains(text(),'DUE: #{time}')]")).
+      expect(fxpath("//div[contains(@class, 'PlannerApp')]//span[contains(text(),'Due: #{time}')]")).
         to be_displayed
     end
 

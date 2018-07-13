@@ -39,7 +39,8 @@ const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
     overrideAssignId: plannable.assignment_id,
     id: plannableId,
     uniqueId: `${plannable_type}-${plannableId}`,
-    location: plannable.location_name || null
+    location: plannable.location_name || null,
+    dateStyle: plannable.todo_date ? 'todo' : 'due'
   };
 
   details.feedback = apiResponse.submissions ? apiResponse.submissions.feedback : undefined;
