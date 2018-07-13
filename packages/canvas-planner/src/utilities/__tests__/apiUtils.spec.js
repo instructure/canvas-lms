@@ -277,6 +277,7 @@ function makeCalendarEvent(overrides = {}) {
     effective_context_code: 'course_1',
     url: '/api/v1/calendar_event/1',
     html_url: '/calendar?event_id=1&include_contexts=course_1',
+    todo_date: undefined,
     ...overrides,
   }
 }
@@ -304,6 +305,7 @@ describe('transformApiToInternalItem', () => {
       plannable: makeAssignment({
         name: 'How to make friends',
         submission_types: [ 'online_quiz' ],
+        todo_date: undefined,
       })
     });
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
@@ -316,6 +318,7 @@ describe('transformApiToInternalItem', () => {
       plannable: makeGradedDiscussionTopic({
         name: 'How to make friends part 2',
         submission_types: [ 'discussion_topic' ],
+        todo_date: undefined,
       })
     });
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
@@ -343,7 +346,8 @@ describe('transformApiToInternalItem', () => {
         title: "How to make enemies",
         points_possible: 40,
         todo_date: "2017-05-19T05:59:59Z",
-        unread_count: 10
+        unread_count: 10,
+        todo_date: undefined,
       })
     });
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
@@ -370,6 +374,7 @@ describe('transformApiToInternalItem', () => {
       plannable: makeAssignment({
         points_possible: 50,
         name: "How to be neutral",
+        todo_date: undefined,
       }),
     });
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
@@ -501,7 +506,8 @@ describe('transformApiToInternalItem', () => {
       plannable: makeCalendarEvent({
         end_at: "2018-01-12T07:00:00Z",
         location_name: "A galaxy far far away",
-      })
+      }),
+      dateStyle: "none",
     });
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
     expect(result).toMatchSnapshot();

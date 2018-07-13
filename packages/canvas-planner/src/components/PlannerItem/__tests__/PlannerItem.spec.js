@@ -55,6 +55,7 @@ function noteProps (option) {
       toggleCompletion: () => {},
       updateTodo: () => {},
       currentUser: user,
+      dateStyle: "todo",
       ...option
   };
 }
@@ -343,6 +344,7 @@ it('renders Calendar Event correctly with everything', () => {
           title: "I am a Calendar Event",
           points: 4,
           date: DEFAULT_DATE,
+          dateStyle: "due"
         })
     } />
   );
@@ -357,6 +359,7 @@ it('renders Calendar Event correctly without right side content', () => {
           associated_item: 'Calendar Event',
           completed: false,
           title: "I am a Calendar Event",
+          dateStyle: "due",
         })
     } />
   );
@@ -372,6 +375,24 @@ it('renders Calendar Event correctly with just date', () => {
           completed: false,
           title: "I am a Calendar Event",
           date: DEFAULT_DATE,
+          dateStyle: "due",
+        })
+    } />
+  );
+  expect(wrapper).toMatchSnapshot();
+});
+
+it('renders Calendar Event correctly with start and end time', () => {
+  const wrapper = shallow(
+    <PlannerItem {
+      ...defaultProps(
+        {
+          associated_item: 'Calendar Event',
+          completed: false,
+          title: "I am a Calendar Event",
+          date: DEFAULT_DATE,
+          endTime: DEFAULT_DATE.clone().add(2, "hours"),
+          dateStyle: "due",
         })
     } />
   );

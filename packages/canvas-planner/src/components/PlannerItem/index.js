@@ -152,24 +152,52 @@ export class PlannerItem extends Component {
   }
 
   assignmentType () {
-    return this.props.associated_item ?
-      this.props.associated_item : formatMessage('Task');
+    switch(this.props.associated_item) {
+      case 'Quiz':
+        return formatMessage('Quiz');
+      case 'Discussion':
+        return formatMessage('Discussion');
+      case 'Assignment':
+        return formatMessage('Assignment');
+      case 'Page':
+        return formatMessage('Page');
+      case 'Announcement':
+        return formatMessage('Announcement');
+      case 'To Do':
+        return formatMessage('To Do');
+      case 'Calendar Event':
+        return formatMessage('Calendar Event');
+      default:
+        return formatMessage('Task');
+    }
   }
 
   renderDateField = () => {
     if (this.props.date) {
-      if (this.hasDueTime()) {
-        return formatMessage("DUE: {date}", {date: this.props.date.format("LT")});
-      }
       if (this.props.allDay) {
         return formatMessage('All Day');
       }
-      if (this.showEndTime()) {
-        return formatMessage("{startTime} to {endTime}", {
-          startTime: this.props.date.format("LT"),
-          endTime: this.props.endTime.format("LT")
-        });
+
+      if (this.props.associated_item === "Calendar Event") {
+        if (this.showEndTime()) {
+          return formatMessage("{startTime} to {endTime}", {
+            startTime: this.props.date.format("LT"),
+            endTime: this.props.endTime.format("LT")
+          });
+        } else {
+          return formatMessage(this.props.date.format("LT"));
+        }
       }
+
+      if (this.hasDueTime()) {
+        if (this.props.dateStyle === 'todo') {
+          return formatMessage("To Do: {date}", {date: this.props.date.format("LT")});
+        } else {
+          return formatMessage("Due: {date}", {date: this.props.date.format("LT")});  
+        }
+      }
+      
+      
       return this.props.date.format("LT");
     }
     return null;
@@ -185,17 +213,30 @@ export class PlannerItem extends Component {
     };
 
     if (this.props.date) {
-      if (this.hasDueTime()) {
-        return formatMessage('{assignmentType} {title}, due {datetime}.', params);
-      }
       if (this.props.allDay) {
-        return formatMessage('{assignmentType} {title}, on {datetime}.', params);
+        return formatMessage('{assignmentType} {title}, all day on {datetime}.', params);
       }
-      if (this.showEndTime()) {
-        params.endTime = this.props.endTime.format('LT');
-        return formatMessage('{assignmentType} {title}, at {datetime} until {endTime}', params);
+
+      if (this.props.associated_item === "Calendar Event") {
+        if (this.showEndTime()) {
+          params.endTime = this.props.endTime.format('LT');
+          return formatMessage('{assignmentType} {title}, at {datetime} until {endTime}', params);
+        } else {
+          return formatMessage('{assignmentType} {title}, at {datetime}.', params);
+        }
       }
-      return formatMessage('{assignmentType} {title}, at {datetime}.', params);
+
+      if (this.hasDueTime()) {
+        if (this.props.dateStyle === 'todo') {
+          return formatMessage('{assignmentType} {title} has a to do time at {datetime}.', params);
+        } else {
+          return formatMessage('{assignmentType} {title}, due {datetime}.', params);
+        }
+      }
+
+      if (this.props.associated_item === "Announcement") {
+        return formatMessage('{assignmentType} {title} posted {datetime}.', params);    
+      }
     }
     return formatMessage('{assignmentType} {title}.', params);
   }
