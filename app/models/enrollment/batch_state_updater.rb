@@ -45,6 +45,7 @@ class Enrollment::BatchStateUpdater
       # cache some data before the destroy that is needed after the destroy
       invited_user_ids = Enrollment.where(id: batch, workflow_state: 'invited').distinct.pluck(:user_id)
       students = Enrollment.of_student_type.where(id: batch).preload(user: :linked_observers).to_a
+      students.each{|e| e.workflow_state = 'deleted'; e.readonly!}
       user_course_tuples = Enrollment.where(id: batch).active.select(%i(user_id course_id)).distinct.to_a
       user_ids = Enrollment.where(id: batch).distinct.pluck(:user_id)
       courses = Course.where(id: Enrollment.where(id: batch).select(:course_id).distinct).to_a

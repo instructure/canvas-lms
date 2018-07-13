@@ -814,6 +814,12 @@ describe SIS::CSV::EnrollmentImporter do
     e = observer.observer_enrollments.first
     expect(e.course_id).to eq course.id
     expect(e.associated_user_id).to eq student.id
+
+    process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status,associated_user_id",
+      "test_1,user_1,student,,deleted,"
+    )
+    expect(e.reload).to be_deleted
   end
 
   it "should delete observer enrollments when the student enrollment is already deleted" do
