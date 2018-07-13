@@ -185,18 +185,6 @@ describe "new account user search" do
     expect(driver.current_url).to include("/accounts/#{@account.id}/avatars")
   end
 
-  it "should link to the user group page" do
-    match_user = user_with_pseudonym(:account => @account, :name => "user with a search term")
-    user_with_pseudonym(:account => @account, :name => "diffrient user")
-
-    get "/accounts/#{@account.id}/users"
-
-    fj('button:contains("More People Options")').click
-    fj('[role="menuitem"]:contains("View user groups")').click
-
-    expect(driver.current_url).to include("/accounts/#{@account.id}/groups")
-  end
-
   # This describe block will be removed once all tests are converted
   describe 'Page Object Converted Tests' do
     include NewUserSearchPage
@@ -233,6 +221,12 @@ describe "new account user search" do
       enter_search('jtsdumbthing')
       expect(results_alert).to include_text('No users found')
       expect(results_body).not_to contain_css(results_row)
+    end
+
+    it "should link to the user group page" do
+      click_people_more_options
+      click_view_user_groups_option
+      expect(driver.current_url).to include("/accounts/#{@account.id}/groups")
     end
   end
 end

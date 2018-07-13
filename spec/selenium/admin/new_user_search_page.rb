@@ -50,8 +50,8 @@ module NewUserSearchPage
     fj('button:contains("More People Options")')
   end
 
-  def more_options_item(option_name)
-    fj("button:has([role='menuitem']):contains(\"#{option_name}\")")
+  def more_options_user_group
+    fj('[role="menuitem"]:contains("View user groups")')
   end
 
   def column_sort_button(column_name)
@@ -145,5 +145,13 @@ module NewUserSearchPage
 
   def click_next_button
     page_next_button.click
+  end
+
+  def click_people_more_options
+    more_options_button.click
+  end
+
+  def click_view_user_groups_option
+    more_options_user_group.click
   end
 end
