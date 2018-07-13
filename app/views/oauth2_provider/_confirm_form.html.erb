@@ -37,7 +37,7 @@
     <%= link_to(t(:cancel, "Cancel"), oauth2_auth_deny_path, :class => "Button Button--block") %>
     <%=  submit_tag(t("Authorize"),  class: "Button Button--primary Button--block", data: {disable_with: t('Please wait...')}) %>
   </div>
-  <% unless @provider.scopes.blank? %>
+  <% if @provider.scopes == ["/auth/userinfo"] %>
     <div class="control-group">
       <%= check_box_tag(:remember_access, "1", false, :class => "checkbox") %>
       <%= label_tag :remember_access, t('labels.remember_access', "Remember my authorization for this service"), class: "checkbox" %>
