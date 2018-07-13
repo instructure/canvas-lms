@@ -366,6 +366,56 @@ describe Assignment::SpeedGrader do
         end
       end
     end
+
+    describe 'attachment JSON' do
+      let(:viewed_at_time) { Time.zone.now }
+
+      let(:course) { Course.create! }
+      let(:assignment) { course.assignments.create!(title: 'test', points_possible: 10) }
+      let(:student) { User.create! }
+      let(:teacher) { User.create! }
+      let(:attachment) do
+        student.attachments.create!(uploaded_data: stub_png_data, filename: 'file.png', viewed_at: viewed_at_time)
+      end
+
+      before(:each) do
+        course.enroll_student(student).accept(true)
+        course.enroll_teacher(teacher).accept(true)
+
+        assignment.submit_homework(student, attachments: [attachment])
+      end
+
+      it 'includes the viewed_at field if the assignment is not anonymized' do
+        json = Assignment::SpeedGrader.new(assignment, teacher).json
+        submission_json = json.dig(:submissions, 0, :submission_history, 0, :submission)
+        attachment_json = submission_json.dig(:versioned_attachments, 0, :attachment)
+        expect(attachment_json[:viewed_at]).to eq viewed_at_time
+      end
+
+      context 'for an anonymized assignment' do
+        before(:each) do
+          assignment.update!(anonymous_grading: true, muted: true)
+        end
+
+        it 'includes the viewed_at field if the user is an admin' do
+          admin = User.create!
+          Account.default.account_users.create!(user: admin)
+
+          json = Assignment::SpeedGrader.new(assignment, admin).json
+
+          submission_json = json.dig(:submissions, 0, :submission_history, 0, :submission)
+          attachment_json = submission_json.dig(:versioned_attachments, 0, :attachment)
+          expect(attachment_json[:viewed_at]).to eq viewed_at_time
+        end
+
+        it 'omits the viewed_at field if the user is not an admin' do
+          json = Assignment::SpeedGrader.new(assignment, teacher).json
+          submission_json = json.dig(:submissions, 0, :submission_history, 0, :submission)
+          attachment_json = submission_json.dig(:versioned_attachments, 0, :attachment)
+          expect(attachment_json).not_to include(:viewed_at)
+        end
+      end
+    end
   end
 
   it "includes inline view pingback url for files" do

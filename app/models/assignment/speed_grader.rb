@@ -40,7 +40,11 @@ class Assignment
       submission_json_fields << (anonymous_students? ? :anonymous_id : :user_id)
 
       attachment_json_fields = %i(id comment_id content_type context_id context_type display_name
-                                  filename mime_class size submitter_id workflow_state viewed_at)
+                                  filename mime_class size submitter_id workflow_state)
+
+      if !@assignment.anonymize_students? || @course.account_membership_allows(@user)
+        attachment_json_fields << :viewed_at
+      end
 
       enrollment_json_fields = %i(course_section_id workflow_state user_id)
 

@@ -1,6 +1,8 @@
 {{#if singleSubmission}}
   {{#each submissions}}
-    {{#t "submitted"}}<label>Submitted:</label> {{submittedAt}}{{/t}}
+    {{#if ../showSubmissionStatus}}
+      {{#t "submitted"}}<label>Submitted:</label> {{submittedAt}}{{/t}}
+    {{/if}}
     {{#if late}}
       <span class="submission-late-pill"></span>
     {{else}}
@@ -14,23 +16,27 @@
     {{#t "submission_to_view"}}Submission to view:{{/t}}
   </label>
   <select id="submission_to_view" class="ic-Input">
-  {{#each submissions}}
-    <option value="{{value}}"
-            {{#if late}}class=late{{/if}}
-            {{#if selected}}selected{{/if}}>
-      {{submittedAt}}
-      {{#if late}}
-        {{#t}}LATE{{/t}}
-      {{else}}
-        {{#if missing}}
-          {{#t}}MISSING{{/t}}
+    {{#eachWithIndex submissions startingValue="1"}}
+      <option value="{{value}}"
+              {{#if late}}class=late{{/if}}
+              {{#if selected}}selected{{/if}}>
+        {{#if ../showSubmissionStatus}}
+          {{submittedAt}}
+        {{else}}
+          {{#t}}Submission {{_index}}{{/t}}
         {{/if}}
-      {{/if}}
-      {{#if grade}}
-        {{#t "grade"}}(grade: {{grade}}){{/t}}
-      {{/if}}
-    </option>
-  {{/each}}
+        {{#if late}}
+          {{#t}}LATE{{/t}}
+        {{else}}
+          {{#if missing}}
+            {{#t}}MISSING{{/t}}
+          {{/if}}
+        {{/if}}
+        {{#if grade}}
+          {{#t "grade"}}(grade: {{grade}}){{/t}}
+        {{/if}}
+      </option>
+    {{/eachWithIndex}}
   </select>
 {{/if}}
 

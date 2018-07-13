@@ -1694,10 +1694,15 @@ EG = {
           $.isPreviewable(attachment.content_type, 'google')) {
         inlineableAttachments.push(attachment);
       }
-      var viewedAtHTML = studentViewedAtTemplate({
-        viewed_at: $.datetimeString(attachment.viewed_at)
-      });
+
+      let viewedAtHTML = ''
+      if (!jsonData.anonymize_students || isAdmin) {
+        viewedAtHTML = studentViewedAtTemplate({
+          viewed_at: $.datetimeString(attachment.viewed_at)
+        })
+      }
       $submission_attachment_viewed_at.html($.raw(viewedAtHTML));
+
       if (browserableCssClasses.test(attachment.mime_class)) {
         browserableAttachments.push(attachment);
       }
@@ -1855,6 +1860,7 @@ EG = {
       });
 
       innerHTML = submissionsDropdownTemplate({
+        showSubmissionStatus: !jsonData.anonymize_students || isAdmin,
         singleSubmission: submissionHistory.length == 1,
         submissions: templateSubmissions,
         linkToQuizHistory: jsonData.too_many_quiz_submissions,

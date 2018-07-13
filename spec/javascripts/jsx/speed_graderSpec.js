@@ -129,7 +129,7 @@ test('showDiscussion should show private comments for non group assignments', ()
   sinon.assert.calledTwice($.fn.append);
 });
 
-QUnit.module('SpeedGrader#refreshSubmissionToView', {
+QUnit.module('SpeedGrader#refreshSubmissionsToView', {
   setup () {
     fakeENV.setup({
       assignment_id: '17',
@@ -138,14 +138,18 @@ QUnit.module('SpeedGrader#refreshSubmissionToView', {
       help_url: 'example.com/support',
       show_help_menu_item: false
     })
-    fixtures.innerHTML = '<span id="speedgrader-settings"></span>'
+    fixtures.innerHTML = `
+      <span id="speedgrader-settings"></span>
+      <span id="multiple_submissions"></span>
+    `
     sandbox.stub($, 'ajaxJSON');
     sandbox.spy($.fn, 'append');
     this.originalWindowJSONData = window.jsonData;
     window.jsonData = {
       id: 27,
       GROUP_GRADING_MODE: false,
-      points_possible: 10
+      points_possible: 10,
+      anonymize_students: false
     };
     this.originalStudent = SpeedGrader.EG.currentStudent;
     SpeedGrader.EG.currentStudent = {
@@ -158,18 +162,20 @@ QUnit.module('SpeedGrader#refreshSubmissionToView', {
         submission_history: [
           {
             submission_type: 'basic_lti_launch',
-            external_tool_url: 'foo'
+            external_tool_url: 'foo',
+            submitted_at: new Date('Jan 1, 2010').toISOString()
           },
           {
             submission_type: 'basic_lti_launch',
-            external_tool_url: 'bar'
+            external_tool_url: 'bar',
+            submitted_at: new Date('Feb 1, 2010').toISOString()
           }
         ]
       }
     };
     sinon.stub($, 'getJSON')
     sinon.stub(SpeedGrader.EG, 'domReady')
-    SpeedGrader.setup()
+    // call setup() in the individual tests so we can test using different values for isAdmin
   },
 
   teardown () {
@@ -183,8 +189,39 @@ QUnit.module('SpeedGrader#refreshSubmissionToView', {
 })
 
 test('can handle non-nested submission history', () => {
+  SpeedGrader.setup()
   SpeedGrader.EG.refreshSubmissionsToView();
   ok(true, 'should not throw an exception');
+})
+
+test('includes submission time for submissions when not anonymizing', () => {
+  SpeedGrader.setup()
+  SpeedGrader.EG.refreshSubmissionsToView()
+
+  const submissionDropdown = document.getElementById('multiple_submissions')
+  ok(submissionDropdown.innerHTML.includes('Jan 1, 2010'))
+})
+
+test('includes submission time for submissions when the user is an admin', () => {
+  ENV.current_user_roles = ['admin']
+  window.jsonData.anonymize_students = true
+  SpeedGrader.setup()
+
+  SpeedGrader.EG.refreshSubmissionsToView()
+
+  const submissionDropdown = document.getElementById('multiple_submissions')
+  ok(submissionDropdown.innerHTML.includes('Jan 1, 2010'))
+})
+
+test('omits submission time for submissions when anonymizing and not an admin', () => {
+  ENV.current_user_roles = ['teacher']
+  SpeedGrader.setup()
+
+  window.jsonData.anonymize_students = true
+  SpeedGrader.EG.refreshSubmissionsToView()
+
+  const submissionDropdown = document.getElementById('multiple_submissions')
+  notOk(submissionDropdown.innerHTML.includes('Jan 1, 2010'))
 })
 
 QUnit.module('#showSubmissionDetails', function(hooks) {
@@ -934,11 +971,13 @@ QUnit.module('handleSubmissionSelectionChange', (hooks) => {
   let assignments
   let submissions
   let params
+  let finishSetup
 
   hooks.beforeEach(() => {
     fakeENV.setup({
       assignment_id: '17',
       course_id: '29',
+      current_user_roles: ['teacher'],
       grading_role: 'grader',
       help_url: 'helpUrl',
       show_help_menu_item: false
@@ -964,78 +1003,91 @@ QUnit.module('handleSubmissionSelectionChange', (hooks) => {
       <div id="submission_files_list">
         <a class="display_name"></a>
       </div>
+      <div id='submission_attachment_viewed_at_container'>
+      </div>
       `
     sinon.stub($, 'ajaxJSON');
-    SpeedGrader.setup()
-    SpeedGrader.EG.currentStudent = {
-      id: 4,
-      name: "Guy B. Studying",
-      enrollments: [{
-        workflow_state: 'active'
-      }],
-      submission_state: 'not_graded',
-      submission: {
-        currentSelectedIndex: 1,
-        score: 7,
-        grade: 70,
-        grading_period_id: 8,
-        submission_type: 'basic_lti_launch',
-        workflow_state: 'submitted',
-        submission_history: [
-          {
-            submission: {
-              user_id: 4,
-              submission_type: 'basic_lti_launch',
-              external_tool_url: 'foo'
+
+    // Defer the rest of the setup until the tests themselves so we can edit
+    // environment variables if needed
+    finishSetup = () => {
+      SpeedGrader.setup()
+      SpeedGrader.EG.currentStudent = {
+        id: 4,
+        name: "Guy B. Studying",
+        enrollments: [{
+          workflow_state: 'active'
+        }],
+        submission_state: 'not_graded',
+        submission: {
+          currentSelectedIndex: 1,
+          score: 7,
+          grade: 70,
+          grading_period_id: 8,
+          submission_type: 'basic_lti_launch',
+          workflow_state: 'submitted',
+          submission_history: [
+            {
+              submission: {
+                user_id: 4,
+                submission_type: 'basic_lti_launch',
+                external_tool_url: 'foo'
+              }
+            },
+            {
+              submission: {
+                user_id: 4,
+                submission_type: 'basic_lti_launch',
+                external_tool_url: 'bar',
+                versioned_attachments: [
+                  {
+                    attachment: { viewed_at: new Date('Jan 1, 2011').toISOString() }
+                  }
+                ]
+              }
             }
-          },
-          {
-            submission: {
-              user_id: 4,
-              submission_type: 'basic_lti_launch',
-              external_tool_url: 'bar'
-            }
-          }
-        ]
+          ]
+        }
       }
-    }
 
-    window.jsonData = {
-      id: 27,
-      context: {
-        active_course_sections: [],
-        enrollments: [
-          {
-            user_id: "4",
-            course_section_id: 1
-          }
-        ],
-        students: [
-          {
-            index: 0,
-            id: 4,
-            name: 'Guy B. Studying',
-            submission_state: 'not_graded'
-          }
-        ]
-      },
-      gradingPeriods: {
-        7: { id: 7, is_closed: false },
-        8: { id: 8, is_closed: true }
-      },
-      GROUP_GRADING_MODE: false,
-      points_possible: 10,
-      studentMap : {
-        4 : SpeedGrader.EG.currentStudent
-      },
-      studentsWithSubmissions: [],
-      submissions: []
-    }
+      window.jsonData = {
+        id: 27,
+        context: {
+          active_course_sections: [],
+          enrollments: [
+            {
+              user_id: "4",
+              course_section_id: 1
+            }
+          ],
+          students: [
+            {
+              index: 0,
+              id: 4,
+              name: 'Guy B. Studying',
+              submission_state: 'not_graded'
+            }
+          ]
+        },
+        gradingPeriods: {
+          7: { id: 7, is_closed: false },
+          8: { id: 8, is_closed: true }
+        },
+        GROUP_GRADING_MODE: false,
+        points_possible: 10,
+        studentMap : {
+          4 : SpeedGrader.EG.currentStudent
+        },
+        studentsWithSubmissions: [],
+        submissions: []
+      }
 
-    SpeedGrader.EG.jsonReady()
-    closedGradingPeriodNotice = { showIf: sinon.stub() }
-    getFromCache = sinon.stub(JQuerySelectorCache.prototype, 'get')
-    getFromCache.withArgs('#closed_gp_notice').returns(closedGradingPeriodNotice)
+      SpeedGrader.EG.jsonReady()
+
+      closedGradingPeriodNotice = { showIf: sinon.stub() }
+      getFromCache = sinon.stub(JQuerySelectorCache.prototype, 'get')
+      getFromCache.withArgs('#closed_gp_notice').returns(closedGradingPeriodNotice)
+    }
   })
 
   hooks.afterEach(() => {
@@ -1051,6 +1103,7 @@ QUnit.module('handleSubmissionSelectionChange', (hooks) => {
   })
 
   test('should use submission history lti launch url', () => {
+    finishSetup()
     const renderLtiLaunch = sinon.stub(SpeedGrader.EG, 'renderLtiLaunch')
     SpeedGrader.EG.handleSubmissionSelectionChange()
     ok(renderLtiLaunch.calledWith(sinon.match.any, sinon.match.any, "bar"))
@@ -1058,17 +1111,50 @@ QUnit.module('handleSubmissionSelectionChange', (hooks) => {
   })
 
   test('shows a "closed grading period" notice if the submission is in a closed period', () => {
+    finishSetup()
     SpeedGrader.EG.handleSubmissionSelectionChange()
     ok(closedGradingPeriodNotice.showIf.calledWithExactly(true))
   })
 
   test('does not show a "closed grading period" notice if the submission is not in a closed period', () => {
+    finishSetup()
     SpeedGrader.EG.currentStudent.submission.grading_period_id = null
     SpeedGrader.EG.handleSubmissionSelectionChange()
     notOk(closedGradingPeriodNotice.showIf.calledWithExactly(true))
   })
 
+  test('includes last-viewed date for attachments if not anonymizing students', () => {
+    finishSetup()
+    SpeedGrader.EG.handleSubmissionSelectionChange()
+
+    const viewedAtHTML = document.getElementById('submission_attachment_viewed_at_container').innerHTML
+
+    ok(viewedAtHTML.includes('Jan 1, 2011'))
+  })
+
+  test('includes last-viewed date for attachments if viewing as an admin', () => {
+    ENV.current_user_roles = ['admin']
+    finishSetup()
+    window.jsonData.anonymize_students = true
+    SpeedGrader.EG.handleSubmissionSelectionChange()
+
+    const viewedAtHTML = document.getElementById('submission_attachment_viewed_at_container').innerHTML
+
+    ok(viewedAtHTML.includes('Jan 1, 2011'))
+  })
+
+  test('omits last-viewed date and relevant text if anonymizing students and not viewing as an admin', () => {
+    finishSetup()
+    window.jsonData.anonymize_students = true
+    SpeedGrader.EG.handleSubmissionSelectionChange()
+
+    const viewedAtHTML = document.getElementById('submission_attachment_viewed_at_container').innerHTML
+
+    notOk(viewedAtHTML.includes('Jan 1, 2011'))
+  })
+
   QUnit.skip('disables the complete/incomplete select when grading period is closed', () => {
+    finishSetup()
     // the select box is not powered by isClosedForSubmission, it's powered by isConcluded
     SpeedGrader.EG.currentStudent.submission.grading_period_id = 8
     SpeedGrader.EG.handleSubmissionSelectionChange()
@@ -1077,6 +1163,7 @@ QUnit.module('handleSubmissionSelectionChange', (hooks) => {
   })
 
   QUnit.skip('does not disable the complete/incomplete select when grading period is open', () => {
+    finishSetup()
     // the select box is not powered by isClosedForSubmission, it's powered by isConcluded
     SpeedGrader.EG.currentStudent.submission.grading_period_id = 7
     SpeedGrader.EG.handleSubmissionSelectionChange()
@@ -1085,6 +1172,7 @@ QUnit.module('handleSubmissionSelectionChange', (hooks) => {
   })
 
   test('submission files list template is populated with anonymous submission data', () => {
+    finishSetup()
     SpeedGrader.EG.currentStudent.submission.currentSelectedIndex = 0
     SpeedGrader.EG.currentStudent.submission.submission_history[0].submission.versioned_attachments = [{
       attachment: {
