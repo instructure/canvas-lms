@@ -26,7 +26,7 @@
   height: 100%;
 }
 
-.react-rubric .container {
+.react-rubric .react-rubric-cell {
   width: 100%;
 }
 
@@ -46,8 +46,7 @@
 
 .react-rubric .description-header {
   height: 100%;
-  display: flex;
-  flex-direction: column;
+  vertical-align: text-top;
 
   & .long-description button {
     margin: 0;
@@ -64,6 +63,7 @@
 
 .react-rubric .rubric-criterion td {
   vertical-align: top;
+  height: 100%;
 }
 
 .react-rubric .rating-description {
@@ -106,6 +106,11 @@
   border-right: 0;
   border-bottom: 0;
   position: relative;
+  overflow-y: hidden;
+}
+
+.react-rubric .rating-tier .rating-footer {
+  padding-bottom: 1rem;
 }
 
 .react-rubric .rating-tier.selected {
@@ -120,27 +125,38 @@
       height: 0;
       border-left: 0.7em solid transparent;
       border-right: 0.7em solid transparent;
+      border-bottom: 1em solid;
       position: relative;
       margin: 0 auto;
       bottom: 0.7em;
     }
   }
-  &.none .shader {
-      background-color: #df5b59;
-      .triangle {
-        border-bottom: 1em solid #df5b59;
-      }
-    }
-  &.partial .shader {
-    background-color: #e0d773;
+
+  .exceedsMasteryShader {
+    background-color: #127A1B;
     .triangle {
-      border-bottom: 1em solid #e0d773;
+      color: #127A1B;
     }
   }
-  &.full .shader {
-    background-color: #8aac53;
+
+  .meetsMasteryShader {
+    background-color: $shamrock;
     .triangle {
-      border-bottom: 1em solid #8aac53;
+       color: $shamrock;
+    }
+  }
+
+  .nearMasteryShader {
+    background-color: $fire;
+    .triangle {
+      color: $fire;
+    }
+  }
+
+  .wellBelowMasteryShader {
+    background-color: #EE0612;
+    .triangle {
+      color: #EE0612;
     }
   }
 }
@@ -153,8 +169,5 @@
 
 .react-rubric .graded-points {
   white-space: nowrap;
-}
-
-.react-rubric .total-points {
   text-align: end;
 }

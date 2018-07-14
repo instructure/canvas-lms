@@ -242,5 +242,16 @@ describe MissingPolicyApplicator do
 
       expect { applicator.apply_missing_deductions }.to change(enrollment, :computed_final_score)
     end
+
+    it 'sets grade_matches_current_submission to true for affected submissions' do
+      create_recent_assignment
+      late_policy_missing_enabled
+
+      submission = @course.submissions.first
+      submission.update_columns(score: nil, grade: nil)
+      applicator.apply_missing_deductions
+
+      expect(submission.reload.grade_matches_current_submission).to be true
+    end
   end
 end

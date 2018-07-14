@@ -18,7 +18,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import Container from '@instructure/ui-core/lib/components/Container';
+import View from '@instructure/ui-layout/lib/components/View';
 import Select from '@instructure/ui-core/lib/components/Select';
 
 export default function SelectMenu (props) {
@@ -33,7 +33,7 @@ export default function SelectMenu (props) {
   });
 
   return (
-    <Container as="div" margin="small small small 0">
+    <View as="div" margin="small small small 0">
       <Select
         defaultValue={props.defaultValue}
         disabled={props.disabled}
@@ -45,7 +45,7 @@ export default function SelectMenu (props) {
       >
         {options}
       </Select>
-    </Container>
+    </View>
   );
 }
 

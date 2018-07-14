@@ -93,7 +93,10 @@ import splitAssetString from 'compiled/str/splitAssetString'
     },
 
     insertGradingStandardRow: function(index) {
-      var newEditingStandard = update(this.state.editingStandard, {data: {$splice:  [[index + 1, 0, ["", ""]]]}});
+      const [rowBefore, rowAfter] = this.state.editingStandard.data.slice(index, index + 2)
+      const score = rowAfter ? (rowBefore[1] - rowAfter[1]) / 2 + rowAfter[1] : 0
+
+      const newEditingStandard = update(this.state.editingStandard, {data: {$splice:  [[index + 1, 0, ["", score]]]}});
       this.setState({editingStandard: newEditingStandard});
     },
 

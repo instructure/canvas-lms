@@ -24,15 +24,6 @@ module Users
     class InvalidVerifier < RuntimeError
     end
 
-    def self.validate_legacy(fields)
-      return {} if fields[:sf_verifier].blank?
-      ts = fields[:ts]&.to_i
-      raise InvalidVerifier unless ts > 5.minutes.ago.to_i && ts < 1.minute.from_now.to_i
-      user = User.where(id: fields[:user_id]).first
-      raise InvalidVerifier unless user && fields[:sf_verifier] == OpenSSL::HMAC.hexdigest(OpenSSL::Digest::MD5.new, user.uuid, ts.to_s)
-      return { user: user }
-    end
-
     def self.generate(claims)
       return {} unless claims[:user]
 
@@ -54,11 +45,6 @@ module Users
     end
 
     def self.validate(fields)
-      if fields[:user_id].present? && fields[:ts].present?
-        # validate legacy verifiers
-        return validate_legacy(fields)
-      end
-
       return {} if fields[:sf_verifier].blank?
       claims = Canvas::Security.decode_jwt(fields[:sf_verifier])
 

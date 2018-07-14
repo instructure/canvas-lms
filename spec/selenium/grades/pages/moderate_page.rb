@@ -21,15 +21,101 @@ class ModeratePage
   class << self
     include SeleniumDependencies
 
-    # elements
+    # Actions
 
-    # methods
     def visit(course, assignment)
       get "/courses/#{course}/assignments/#{assignment}/moderate"
     end
 
+    def select_provisional_grade_for_student_by_position(student, position)
+      grade_input(student).click
+      grade_input_dropdown_list(student)[position].click
+    end
+
+    def click_post_grades_button
+      post_grades_button.click
+    end
+
+    def click_page_number(page_number)
+      page_buttons.find {|e| e.text == page_number.to_s}.click
+    end
+
+    def enter_custom_grade(student, grade)
+      grade_input(student).click
+      grade_input(student).send_keys(:backspace, grade)
+      grade_input_dropdown_list(student).find {|k| k.text == "#{grade} (Custom)"}.click
+    end
+
+    # Methods
+
+    def fetch_student_count
+      student_table_row_headers.size
+    end
+
+    def fetch_provisional_grade_count_for_student(student)
+      grades(student).size
+    end
+
+    def fetch_grader_count
+      student_table_headers.size
+    end
+
+    def grader_names
+      student_table_headers.map(&:text)
+    end
+
+    def fetch_grades(student)
+      grades(student).map(&:text)
+    end
+
+    def fetch_dropdown_grades(student)
+      grade_input_dropdown_list(student).map(&:text)
+    end
+
+    # Components
+
     def main_content_area
       f("#main")
+    end
+
+    def student_table_headers
+      ff('.GradesGrid__GraderHeader')
+    end
+
+    def student_table_row_headers
+      ff('.GradesGrid__BodyRowHeader')
+    end
+
+    def student_table_row_by_displayed_name(name)
+      fj(".GradesGrid__BodyRow:contains('#{name}')")
+    end
+
+    def post_grades_button
+      fj("button:contains('Post')")
+    end
+
+    def grades_posted_button
+      fj("button:contains('Grades Posted')")
+    end
+
+    def page_buttons
+      ffxpath('//div[@role="navigation"]//button')
+    end
+
+    def grades(student)
+      ff('.GradesGrid__ProvisionalGradeCell', student_table_row_by_displayed_name(student.name))
+    end
+
+    def grade_input(student)
+      f('input', student_table_row_by_displayed_name(student.name))
+    end
+
+    def grade_input_dropdown_list(student)
+      ff('li', student_table_row_by_displayed_name(student.name))
+    end
+
+    def grade_input_dropdown(student)
+      f('ul', student_table_row_by_displayed_name(student.name))
     end
   end
 end

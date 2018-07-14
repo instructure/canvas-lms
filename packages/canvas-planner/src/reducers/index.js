@@ -25,6 +25,7 @@ import opportunities from './opportunities-reducer';
 import todo from './todo-reducer';
 import ui from './ui-reducer';
 import savePlannerItem from './save-item-reducer';
+import sidebar from './sidebar-reducer';
 
 const locale = handleAction('INITIAL_OPTIONS', (state, action) => {
   return action.payload.locale;
@@ -54,6 +55,7 @@ const combinedReducers = combineReducers({
   opportunities,
   todo,
   ui,
+  sidebar,
 });
 
 export default function finalReducer (state, action) {

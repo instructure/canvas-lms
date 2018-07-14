@@ -477,16 +477,16 @@ describe 'Speedgrader' do
     end
 
     it 'list all students', priority: "1", test_id: 164206 do
-      validate_speedgrader_student_list
+      validate_speedgrader_student_list(false)
     end
 
     it 'list alias when hide student name is selected', priority: "2", test_id: 164208 do
       Speedgrader.click_settings_link
+      Speedgrader.click_options_link
       Speedgrader.select_hide_student_names
 
       expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
-
-      validate_speedgrader_student_list
+      validate_speedgrader_student_list(true)
     end
 
     # speedgrader student dropdown shows assignment submission status symbols next to student names
@@ -602,12 +602,12 @@ describe 'Speedgrader' do
     it 'opens and closes keyboard shortcut modal via blue info icon', priority: "2", test_id: 759319 do
       user_session(teacher)
       get "/courses/#{test_course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
-      keyboard_shortcut_icon = f('#keyboard-shortcut-info-icon')
-      keyboard_modal = f('#keyboard_navigation')
-      expect(keyboard_shortcut_icon).to be_displayed
+      Speedgrader.click_settings_link
+      expect(Speedgrader.keyboard_shortcuts_link).to be_displayed
 
       # Open shortcut modal
-      keyboard_shortcut_icon.click
+      Speedgrader.click_keyboard_shortcuts_link
+      keyboard_modal = f('#keyboard_navigation')
       expect(keyboard_modal).to be_displayed
 
       # Close shortcut modal
@@ -704,8 +704,12 @@ describe 'Speedgrader' do
     @assignment.grade_student @students[1], grade: grade2, grader: @teacher
   end
 
-  def validate_speedgrader_student_list
+  def validate_speedgrader_student_list(hide)
     Speedgrader.click_students_dropdown
-    (0..2).each{|num| expect(Speedgrader.student_dropdown_menu).to include_text(@students[num].name)}
+    if hide
+      (1..3).each{|num| expect(Speedgrader.student_dropdown_menu).to include_text("Student #{num}")}
+    else
+      (0..2).each{|num| expect(Speedgrader.student_dropdown_menu).to include_text(@students[num].name)}
+    end
   end
 end

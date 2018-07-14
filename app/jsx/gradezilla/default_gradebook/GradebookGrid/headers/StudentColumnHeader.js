@@ -19,19 +19,17 @@
 import React from 'react';
 import { arrayOf, bool, func, oneOf, shape, string } from 'prop-types';
 import IconMoreSolid from '@instructure/ui-icons/lib/Solid/IconMore';
-import Button from '@instructure/ui-core/lib/components/Button';
-import Container from '@instructure/ui-core/lib/components/Container';
-import Grid, { GridCol, GridRow } from '@instructure/ui-core/lib/components/Grid';
-import {
+import Button from '@instructure/ui-buttons/lib/components/Button';
+import View from '@instructure/ui-layout/lib/components/View';
+import Grid, { GridCol, GridRow } from '@instructure/ui-layout/lib/components/Grid';
+import Menu, {
   MenuItem,
-  MenuItemFlyout,
   MenuItemGroup,
   MenuItemSeparator
-} from '@instructure/ui-core/lib/components/Menu';
-import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu';
-import Text from '@instructure/ui-core/lib/components/Text';
+} from '@instructure/ui-menu/lib/components/Menu';
+import Text from '@instructure/ui-elements/lib/components/Text';
 import I18n from 'i18n!gradebook';
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 import studentRowHeaderConstants from '../../constants/studentRowHeaderConstants'
 import ColumnHeader from './ColumnHeader'
 
@@ -54,8 +52,8 @@ export default class StudentColumnHeader extends ColumnHeader {
     }).isRequired,
     selectedEnrollmentFilters: arrayOf(oneOf(studentRowHeaderConstants.enrollmentFilterKeys)).isRequired,
     onToggleEnrollmentFilter: func.isRequired,
-    disabled: bool.isRequired,
-    onMenuClose: func.isRequired,
+    disabled: Menu.propTypes.disabled.isRequired,
+    onMenuDismiss: Menu.propTypes.onDismiss.isRequired,
     ...ColumnHeader.propTypes
   };
 
@@ -123,25 +121,31 @@ export default class StudentColumnHeader extends ColumnHeader {
           <Grid colSpacing="none" hAlign="space-between" vAlign="middle">
             <GridRow>
               <GridCol textAlign="start">
-                <Container className="Gradebook__ColumnHeaderDetail" padding="0 0 0 small">
+                <View className="Gradebook__ColumnHeaderDetail" padding="0 0 0 small">
                   <Text fontStyle="normal" size="x-small" weight="bold">{ I18n.t('Student Name') }</Text>
-                </Container>
+                </View>
               </GridCol>
 
               <GridCol textAlign="center" width="auto">
                 <div className={classes}>
-                  <PopoverMenu
+                  <Menu
                     contentRef={this.bindOptionsMenuContent}
                     shouldFocusTriggerOnClose={false}
                     trigger={
-                      <Button buttonRef={this.bindOptionsMenuTrigger} margin="0" size="small" variant="icon">
-                        <IconMoreSolid title={I18n.t('Student Name Options')} />
+                      <Button
+                        buttonRef={e => this.optionsMenuTrigger = e}
+                        margin="0"
+                        size="small"
+                        variant="icon"
+                        icon={IconMoreSolid}
+                      >
+                        <ScreenReaderContent>{I18n.t('Student Name Options')}</ScreenReaderContent>
                       </Button>
                     }
                     onToggle={this.onToggle}
-                    onClose={this.props.onMenuClose}
+                    onDismiss={this.props.onMenuDismiss}
                   >
-                    <MenuItemFlyout label={I18n.t('Sort by')} contentRef={this.bindSortByMenuContent} disabled={this.props.disabled}>
+                    <Menu label={I18n.t('Sort by')} contentRef={this.bindSortByMenuContent} disabled={this.props.disabled}>
                       <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
                         <MenuItem
                           selected={selectedSortSetting === 'sortable_name' && direction === 'ascending'}
@@ -159,9 +163,9 @@ export default class StudentColumnHeader extends ColumnHeader {
                           <span>{I18n.t('Z–A')}</span>
                         </MenuItem>
                       </MenuItemGroup>
-                    </MenuItemFlyout>
+                    </Menu>
 
-                    <MenuItemFlyout label={I18n.t('Display as')} contentRef={this.bindDisplayAsMenuContent} disabled={this.props.disabled}>
+                    <Menu label={I18n.t('Display as')} contentRef={this.bindDisplayAsMenuContent} disabled={this.props.disabled}>
                       <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Display as')}</ScreenReaderContent>}>
                         <MenuItem
                           key="first_last"
@@ -178,9 +182,9 @@ export default class StudentColumnHeader extends ColumnHeader {
                           {studentRowHeaderConstants.primaryInfoLabels.last_first}
                         </MenuItem>
                       </MenuItemGroup>
-                    </MenuItemFlyout>
+                    </Menu>
 
-                    <MenuItemFlyout
+                    <Menu
                       contentRef={this.bindSecondaryInfoMenuContent}
                       disabled={this.props.disabled}
                       label={I18n.t('Secondary info')}
@@ -220,7 +224,7 @@ export default class StudentColumnHeader extends ColumnHeader {
                           {studentRowHeaderConstants.secondaryInfoLabels.none}
                         </MenuItem>
                       </MenuItemGroup>
-                    </MenuItemFlyout>
+                    </Menu>
 
                     <MenuItemSeparator />
 
@@ -243,7 +247,7 @@ export default class StudentColumnHeader extends ColumnHeader {
                         {studentRowHeaderConstants.enrollmentFilterLabels.concluded}
                       </MenuItem>
                     </MenuItemGroup>
-                  </PopoverMenu>
+                  </Menu>
                 </div>
               </GridCol>
             </GridRow>

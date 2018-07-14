@@ -195,12 +195,12 @@ export default class CoursesListRow extends React.Component {
           )}
           <Tooltip tip={statsTip}>
             <Button variant="icon" size="small" href={`${url}/statistics`}>
-              <IconStatsLine height="1.5em" title={statsTip} />
+              <IconStatsLine title={statsTip} />
             </Button>
           </Tooltip>
           <Tooltip tip={settingsTip}>
             <Button variant="icon" size="small" href={`${url}/settings`}>
-              <IconSettingsLine  height="1.5em" title={settingsTip} />
+              <IconSettingsLine title={settingsTip} />
             </Button>
           </Tooltip>
         </td>

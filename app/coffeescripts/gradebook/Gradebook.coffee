@@ -317,9 +317,8 @@ define [
         for assignment in group.assignments
           assignment.assignment_group = group
           assignment.due_at = tz.parse(assignment.due_at)
-          if @options.anonymous_moderated_marking_enabled
-            assignment.moderation_in_progress = assignment.moderated_grading and !assignment.grades_published
-            assignment.hide_grades_when_muted = assignment.anonymous_grading
+          assignment.moderation_in_progress = assignment.moderated_grading and !assignment.grades_published
+          assignment.hide_grades_when_muted = assignment.anonymous_grading
           @updateAssignmentEffectiveDueDates(assignment)
           @assignments[assignment.id] = assignment
 

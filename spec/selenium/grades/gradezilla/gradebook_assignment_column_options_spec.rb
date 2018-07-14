@@ -133,8 +133,7 @@ describe "Gradezilla - Assignment Column" do
 
   context "with anonymous assignment" do
     before(:each) do
-      # enable anonymous flags at account level
-      Account.default.enable_feature!(:anonymous_moderated_marking)
+      # enable anonymous flag at account level
       Account.default.enable_feature!(:anonymous_marking)
 
       # re-use the course and student setup from the describe block up-above

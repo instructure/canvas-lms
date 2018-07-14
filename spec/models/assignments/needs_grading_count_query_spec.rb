@@ -127,8 +127,13 @@ module Assignments
 
       context "moderated grading count" do
         before do
-          @assignment = @course.assignments.create(:title => "some assignment",
-            :submission_types => ['online_text_entry'], :moderated_grading => true, :points_possible => 3)
+          @assignment = @course.assignments.create(
+            title: "some assignment",
+            submission_types: ['online_text_entry'],
+            moderated_grading: true,
+            grader_count: 2,
+            points_possible: 3
+          )
           @students = []
           3.times do
             student = student_in_course(:course => @course, :active_all => true).user
@@ -136,8 +141,8 @@ module Assignments
             @students << student
           end
 
-          @ta1 = ta_in_course(:course => course_factory, :active_all => true).user
-          @ta2 = ta_in_course(:course => course_factory, :active_all => true).user
+          @ta1 = ta_in_course(:course => @course, :active_all => true).user
+          @ta2 = ta_in_course(:course => @course, :active_all => true).user
         end
 
         it "should only include students with no marks when unmoderated" do
@@ -151,12 +156,10 @@ module Assignments
           expect(querier.count).to eq 2
 
           @students[1].submissions.first.find_or_create_provisional_grade!(@ta1)
-          expect(querier.count).to eq 1
+          expect(querier.count).to eq 2
         end
 
         it "should only include students without two marks when moderated" do
-          @students.each{|s| @assignment.moderated_grading_selections.create!(:student => s)}
-
           querier = NeedsGradingCountQuery.new(@assignment, @teacher)
           expect(querier.count).to eq 3
 

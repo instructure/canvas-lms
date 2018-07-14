@@ -112,6 +112,7 @@ class DashboardHeader extends React.Component {
     }
     const dashboardPlanner = document.getElementById('dashboard-planner') || fakeObj
     const dashboardPlannerHeader = document.getElementById('dashboard-planner-header') || fakeObj
+    const dashboardPlannerHeaderAux = document.getElementById('dashboard-planner-header-aux') || fakeObj
     const dashboardActivity = document.getElementById('dashboard-activity')
     const dashboardCards = document.getElementById('DashboardCard_Container')
     const rightSideContent = document.getElementById('right-side-wrapper') || fakeObj
@@ -121,18 +122,21 @@ class DashboardHeader extends React.Component {
     if (newView === 'planner') {
       dashboardPlanner.style.display = 'block'
       dashboardPlannerHeader.style.display = 'block'
+      dashboardPlannerHeaderAux.style.display = 'block'
       dashboardActivity.style.display = 'none'
       dashboardCards.style.display = 'none'
       rightSideContent.style.display = 'none'
     } else if (newView === 'activity') {
       dashboardPlanner.style.display = 'none'
       dashboardPlannerHeader.style.display = 'none'
+      dashboardPlannerHeaderAux.style.display = 'none'
       dashboardActivity.style.display = 'block'
       dashboardCards.style.display = 'none'
       rightSideContent.style.display = 'block'
     } else {
       dashboardPlanner.style.display = 'none'
       dashboardPlannerHeader.style.display = 'none'
+      dashboardPlannerHeaderAux.style.display = 'none'
       dashboardActivity.style.display = 'none'
       dashboardCards.style.display = 'block'
       rightSideContent.style.display = 'block'
@@ -159,6 +163,9 @@ class DashboardHeader extends React.Component {
               menuButtonRef={(ref) => {this.menuButtonFocusable = ref}}
             />
           </div>
+          {this.props.planner_enabled && (
+            <div id="dashboard-planner-header-aux" />
+          )}
         </div>
       </div>
     );

@@ -201,8 +201,6 @@ describe "assignment rubrics" do
       wait_for_ajaximations
       # click on the Import button
       f('.ui-dialog .btn-primary').click
-      # confirm the import
-      driver.switch_to.alert.accept
       wait_for_ajaximations
       # pts should not be editable
       expect(f('#rubric_new .learning_outcome_criterion .points_form .editing').displayed?).to be_falsey
@@ -537,6 +535,61 @@ describe "assignment rubrics" do
 
         # The min points of the cell being edited should now be 0.
         expect(ff('.criterion:nth-of-type(3) .min_points')[1]).to include_text "0"
+      end
+    end
+
+    context "non-scoring rubrics" do
+      before(:each) do
+        @course.account.root_account.enable_feature!(:non_scoring_rubrics)
+        @assignment = @course.assignments.create(name: 'NSR assignment')
+        outcome_with_rubric
+        @rubric.associate_with(@assignment, @course, purpose: 'grading')
+      end
+
+      it "should create and edit a non-scoring rubric" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+        f(' .rubric_title .icon-edit').click
+        wait_for_ajaximations
+
+        # Hide points on rubric
+        f('#hide_points').click
+        wait_for_ajaximations
+        rating_points_elements = ff('.points')
+        rating_points_elements.each do |points|
+          expect(points).not_to be_displayed
+        end
+        total_points_elements = ff('[class="total_points_holder toggle_for_hide_points "]')
+        total_points_elements.each do |total_points|
+          expect(total_points).not_to be_displayed
+        end
+
+        # Add rating
+        ff('.add_rating_link_after')[4].click
+        expect(fj('span:contains("Edit Rating")')).to be_present
+        rating_score_fields = ff('#rating_form_score_label')
+        rating_score_fields.each do |rating_score_field|
+          expect(rating_score_field).not_to be_displayed
+        end
+        wait_for_ajaximations
+        set_value(ff('#rating_form_title')[0], 'Test rating 1')
+        set_value(ff('#rating_form_description')[0], 'Test description 1')
+        fj('span:contains("Update Rating")').click
+        wait_for_ajaximations
+
+        expect(ff('[class="description rating_description_value"]')[11].text).to eq "Test rating 1"
+        expect(ff('[class="rating_long_description small_description"]')[11].text).to eq "Test description 1"
+
+        # Save rubric
+        find_button("Update Rubric").click
+        wait_for_ajaximations
+
+        expect(ff('[class="description rating_description_value"]')[6].text).to eq "Test rating 1"
+        expect(ff('[class="rating_long_description small_description"]')[6].text).to eq "Test description 1"
+        rating_points_elements = ff('.points')
+        rating_points_elements.each do |points|
+          expect(points).not_to be_displayed
+        end
       end
     end
 

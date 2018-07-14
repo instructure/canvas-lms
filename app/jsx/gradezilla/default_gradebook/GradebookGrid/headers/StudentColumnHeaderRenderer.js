@@ -32,7 +32,7 @@ function getProps (gradebook, options) {
     onHeaderKeyDown: (event) => {
       gradebook.handleHeaderKeyDown(event, columnId);
     },
-    onMenuClose: gradebook.handleColumnHeaderMenuClose,
+    onMenuDismiss: gradebook.handleColumnHeaderMenuClose,
     onSelectPrimaryInfo: gradebook.setSelectedPrimaryInfo,
     onSelectSecondaryInfo: gradebook.setSelectedSecondaryInfo,
     onToggleEnrollmentFilter: gradebook.toggleEnrollmentFilter,

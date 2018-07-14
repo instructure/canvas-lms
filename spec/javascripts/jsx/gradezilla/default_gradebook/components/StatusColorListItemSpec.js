@@ -18,7 +18,7 @@
 
 import React from 'react';
 import { shallow } from 'enzyme';
-import Text from '@instructure/ui-core/lib/components/Text';
+import Text from '@instructure/ui-elements/lib/components/Text';
 import IconDiscussionReplySolid from '@instructure/ui-icons/lib/Solid/IconDiscussionReply';
 import StatusColorListItem from 'jsx/gradezilla/default_gradebook/components/StatusColorListItem';
 

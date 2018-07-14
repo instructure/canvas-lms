@@ -86,7 +86,7 @@ module AuthenticationMethods
   end
 
   def validate_scopes
-    if @access_token && @domain_root_account.feature_enabled?(:api_token_scoping)
+    if @access_token && @domain_root_account.feature_enabled?(:developer_key_management_and_scoping)
       developer_key = @access_token.developer_key
       request_method = request.method.casecmp('HEAD') == 0 ? 'GET' : request.method.upcase
 
@@ -123,7 +123,6 @@ module AuthenticationMethods
       unless @current_user && @current_pseudonym
         raise AccessTokenError
       end
-
       validate_scopes
       @access_token.used!
 

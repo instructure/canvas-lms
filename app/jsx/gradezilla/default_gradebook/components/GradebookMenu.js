@@ -17,15 +17,13 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
+import { oneOf, bool, string, func } from 'prop-types'
 import IconMiniArrowDownSolid from '@instructure/ui-icons/lib/Solid/IconMiniArrowDown'
-import Button from '@instructure/ui-core/lib/components/Button'
-import { MenuItem, MenuItemSeparator } from '@instructure/ui-core/lib/components/Menu'
-import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
-import Text from '@instructure/ui-core/lib/components/Text'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import Menu, { MenuItem, MenuItemSeparator } from '@instructure/ui-menu/lib/components/Menu'
+import Text from '@instructure/ui-elements/lib/components/Text'
 import I18n from 'i18n!gradebook'
 
-  const { oneOf, bool, string, func } = PropTypes;
 
   class GradebookMenu extends React.Component {
     static propTypes = {
@@ -39,15 +37,6 @@ import I18n from 'i18n!gradebook'
       DefaultGradebook: ['LearningMastery', 'IndividualGradebook', 'Separator', 'GradebookHistory'],
       DefaultGradebookLearningMastery: ['DefaultGradebook', 'IndividualGradebook', 'Separator', 'GradebookHistory'],
     };
-
-    constructor (props) {
-      super(props);
-
-      this.handleDefaultGradebookSelect = this.handleDefaultGradebookSelect.bind(this);
-      this.handleIndividualGradebookSelect = this.handleIndividualGradebookSelect.bind(this);
-      this.handleGradebookHistorySelect = this.handleGradebookHistorySelect.bind(this);
-      this.handleLearningMasterySelect = this.handleLearningMasterySelect.bind(this);
-    }
 
     setLocation (url) {
       window.location = url;
@@ -72,7 +61,7 @@ import I18n from 'i18n!gradebook'
     renderDefaultGradebookMenuItem () {
       const key = 'default-gradebook';
       return (
-        <MenuItem onSelect={this.handleDefaultGradebookSelect} key={key}>
+        <MenuItem onSelect={() => this.handleDefaultGradebookSelect()} key={key}>
           <span data-menu-item-id={key}>
             {I18n.t('Gradebook…')}
           </span>
@@ -83,7 +72,7 @@ import I18n from 'i18n!gradebook'
     renderIndividualGradebookMenuItem () {
       const key = 'individual-gradebook';
       return (
-        <MenuItem onSelect={this.handleIndividualGradebookSelect} key={key}>
+        <MenuItem onSelect={() => this.handleIndividualGradebookSelect()} key={key}>
           <span data-menu-item-id={key}>
             {I18n.t('Individual View…')}
           </span>
@@ -94,7 +83,7 @@ import I18n from 'i18n!gradebook'
     renderGradebookHistoryMenuItem () {
       const key = 'gradebook-history';
       return (
-        <MenuItem onSelect={this.handleGradebookHistorySelect} key={key}>
+        <MenuItem onSelect={() => this.handleGradebookHistorySelect()} key={key}>
           <span data-menu-item-id={key}>
             {I18n.t('Gradebook History…')}
           </span>
@@ -106,7 +95,7 @@ import I18n from 'i18n!gradebook'
       if (!this.props.learningMasteryEnabled) return null;
       const key = 'learning-mastery';
       return (
-        <MenuItem onSelect={this.handleLearningMasterySelect} key={key}>
+        <MenuItem onSelect={() => this.handleLearningMasterySelect()} key={key}>
           <span data-menu-item-id={key}>
             {I18n.t('Learning Mastery…')}
           </span>
@@ -137,9 +126,9 @@ import I18n from 'i18n!gradebook'
 
     render () {
       return (
-        <PopoverMenu trigger={this.renderButton()}>
+        <Menu trigger={this.renderButton()}>
           {this.renderMenuItems()}
-        </PopoverMenu>
+        </Menu>
       );
     }
   }

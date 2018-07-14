@@ -524,6 +524,7 @@ exports[`PlannerApp shows only the loading component when the isLoading prop is 
     textAlign="center"
   >
     <Spinner
+      as="div"
       size="medium"
       title="Loading planner items"
       variant="default"

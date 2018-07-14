@@ -63,7 +63,7 @@ function getNextUrls (state, action) {
 }
 
 function gotDaysSuccess (state, action) {
-  const newState = {seekingNewActivity: false};
+  const newState = {seekingNewActivity: false, plannerLoaded: true};
   newState.partialPastDays = purgeDuplicateDays(state.partialPastDays, action.payload.internalDays);
   newState.partialFutureDays = purgeDuplicateDays(state.partialFutureDays, action.payload.internalDays);
   return loadingState(state, newState);
@@ -137,6 +137,7 @@ export default handleActions({
      gradesLoadingError: action.payload.message}),
 
 }, loadingState({}, {
+  plannerLoaded: false,
   allPastItemsLoaded: false,
   allFutureItemsLoaded: false,
   allOpportunitiesLoaded: false,

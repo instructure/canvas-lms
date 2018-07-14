@@ -29,10 +29,10 @@ import moment from 'moment-timezone';
 import CanvasPlanner, { store as PlannerStore } from './index';
 import { addDay, getPlannerItems } from '../src/actions';
 
-import Button from '@instructure/ui-core/lib/components/Button';
+import Button from '@instructure/ui-buttons/lib/components/Button';
 import Select from '@instructure/ui-core/lib/components/Select';
-import Grid, { GridCol, GridRow } from '@instructure/ui-core/lib/components/Grid';
-import Text from '@instructure/ui-core/lib/components/Text';
+import Grid, { GridCol, GridRow } from '@instructure/ui-layout/lib/components/Grid';
+import Text from '@instructure/ui-elements/lib/components/Text';
 import THEMES from '@instructure/ui-themes/lib';
 
 const COURSES = [{

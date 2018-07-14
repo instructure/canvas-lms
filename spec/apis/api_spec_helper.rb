@@ -260,3 +260,13 @@ end
 def redirect_params
   Rack::Utils.parse_nested_query(URI(response.headers['Location']).query)
 end
+
+def enable_developer_key_account_binding!(developer_key)
+  developer_key.developer_key_account_bindings.first.update!(
+    workflow_state: 'on'
+  )
+end
+
+def enable_default_developer_key!
+  enable_developer_key_account_binding!(DeveloperKey.default)
+end

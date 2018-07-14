@@ -54,7 +54,6 @@ function mockRegister () {
 it('registers proper events', () => {
   const {wind} = mockRegister();
   expect(wind.addEventListener).toHaveBeenCalledWith('wheel', expect.anything());
-  expect(wind.addEventListener).toHaveBeenCalledWith('keydown', expect.anything());
   expect(wind.addEventListener).toHaveBeenCalledWith('touchstart', expect.anything());
   expect(wind.addEventListener).toHaveBeenCalledWith('touchmove', expect.anything());
   expect(wind.addEventListener).toHaveBeenCalledWith('touchend', expect.anything());
@@ -178,78 +177,6 @@ describe('touch events', () => {
       const {touchstart, touchmove} = wind.callbacks;
       touchstart({changedTouches: [{screenY: 10, identifier: 'touchid'}]});
       touchmove({changedTouches: {touchid: {screenY: 7}}});
-      expect(futureCb).not.toHaveBeenCalled();
-    });
-  });
-});
-
-describe('key events', () => {
-  describe('scrolling into the past', () => {
-    it('invokes the callback and preventDefault when a key event happens at the top of the page', () => {
-      const {wind, pastCb} = mockRegister();
-      const mockPreventDefault = jest.fn();
-      const keyHandler = wind.callbacks.keydown;
-      keyHandler({key: 'ArrowUp', preventDefault: mockPreventDefault});
-      expect(mockPreventDefault).toHaveBeenCalled();
-      expect(pastCb).toHaveBeenCalled();
-    });
-
-    it('does not invoke the past callback or preventDefault on other keys', () => {
-      const {wind, pastCb} = mockRegister();
-      const mockPreventDefault = jest.fn();
-      const keyHandler = wind.callbacks.keydown;
-      keyHandler({key: 'Home', preventDefault: mockPreventDefault});
-      expect(mockPreventDefault).not.toHaveBeenCalled();
-      expect(pastCb).not.toHaveBeenCalled();
-    });
-
-    it('does not invoke the past callback if window is not at the top', () => {
-      const {wind, pastCb} = mockRegister();
-      wind.pageYOffset = 42;
-      const mockPreventDefault = jest.fn();
-      const keyHandler = wind.callbacks.keydown;
-      keyHandler({key: 'ArrowUp', preventDefault: mockPreventDefault});
-      expect(mockPreventDefault).not.toHaveBeenCalled();
-      expect(pastCb).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('scrolling into the future', () => {
-    it('invokes the future callback and preventDefault when a key event happens at the bottom of the page', () => {
-      const {wind, futureCb} = mockRegister();
-      const mockPreventDefault = jest.fn();
-      const keyHandler = wind.callbacks.keydown;
-      keyHandler({key: 'ArrowDown', preventDefault: mockPreventDefault});
-      expect(mockPreventDefault).toHaveBeenCalled();
-      expect(futureCb).toHaveBeenCalled();
-    });
-
-    it('invokes the future callback and preventDefault when a key event happens when the document is shorter than the window', () => {
-      const {wind, futureCb} = mockRegister();
-      wind.document.documentElement.getBoundingClientRect = () => ({bottom: 24});
-      const mockPreventDefault = jest.fn();
-      const keyHandler = wind.callbacks.keydown;
-      keyHandler({key: 'ArrowDown', preventDefault: mockPreventDefault});
-      expect(mockPreventDefault).toHaveBeenCalled();
-      expect(futureCb).toHaveBeenCalled();
-    });
-
-    it('does not invoke the future callback or preventDefault on other keys', () => {
-      const {wind, futureCb} = mockRegister();
-      const mockPreventDefault = jest.fn();
-      const keyHandler = wind.callbacks.keydown;
-      keyHandler({key: 'End', preventDefault: mockPreventDefault});
-      expect(mockPreventDefault).not.toHaveBeenCalled();
-      expect(futureCb).not.toHaveBeenCalled();
-    });
-
-    it('does not invoke the callback if window is not at the bottom', () => {
-      const {wind, futureCb} = mockRegister();
-      wind.document.documentElement.getBoundingClientRect = () => ({bottom: 100});
-      const mockPreventDefault = jest.fn();
-      const keyHandler = wind.callbacks.keydown;
-      keyHandler({key: 'ArrowDown', preventDefault: mockPreventDefault});
-      expect(mockPreventDefault).not.toHaveBeenCalled();
       expect(futureCb).not.toHaveBeenCalled();
     });
   });

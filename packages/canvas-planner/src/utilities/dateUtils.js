@@ -18,6 +18,14 @@
 import moment from 'moment-timezone';
 import formatMessage from '../format-message';
 
+// NOTE: Canvas monkey-patches the timezone package to support the Canvas localized formats, and
+// we're counting on that behavior in this file. The version of the timezone package that planner
+// has in its package.json must stay in sync with package.json in Canvas so we don't lose the
+// monkey-patch. The reason we're doing this is because moment.js doesn't support the format that we
+// want to use in the todo sidebar, and Intl.DateTimeFormat doesn't support timezones in IE11. Using
+// the formatter from Canvas seemed like the best remaining option.
+import tz from 'timezone';
+
 function getTodaysDetails () {
   const today = moment();
   const yesterday = today.clone().subtract(1, 'days');
@@ -50,6 +58,13 @@ export function isTodayOrBefore (date, today = moment()) {
   // moment.isSameOrBefore isn't available until moment 2.11, but until we get off
   // all of ui-core, it ends up pulling in an earlier version.
   //return momentizedDate.isSameOrBefore(today, 'day');
+}
+
+// determines if the checkMoment falls on or inbetween the firstMoment and the lastMoment
+export function isInMomentRange (checkMoment, firstMoment, lastMoment) {
+  const isOnOrAfterFirst = checkMoment.isAfter(firstMoment) || checkMoment.isSame(firstMoment);
+  const isOnOrBeforeLast = checkMoment.isBefore(lastMoment) || checkMoment.isSame(lastMoment);
+  return isOnOrAfterFirst && isOnOrBeforeLast;
 }
 
 /**
@@ -97,6 +112,20 @@ export function getFullDateAndTime (date) {
     return formatMessage('Tomorrow at {date}', {date: momentizedDate.format('LT')});
   } else {
     return formatMessage('{date} at {time}', {date: momentizedDate.format('LL'), time: momentizedDate.format('LT')});
+  }
+}
+
+    // NOTE: this is where we're using a canvas specific format from the monkey-patched timezone
+    // package. See comment above on the timezone package import.
+export function formatDateAtTimeWithoutYear (date, timeZone) {
+  // fancy conversion so we can support both Date and moment objects
+  date = new Date(date.toISOString());
+
+  // If  we're not in canvas, then there's no monkey-patch. Use a fallback in the test environment.
+  if (process.env.NODE_ENV === 'test' && !tz.format) {
+    return moment(date).format('lll') // includes the year, unfortunately
+  } else {
+    return tz.format(date, 'date.formats.date_at_time', timeZone);
   }
 }
 

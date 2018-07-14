@@ -17,186 +17,183 @@
 #
 
 module Types
-  AssignmentType = GraphQL::ObjectType.define do
-    name "Assignment"
+  class AssignmentType < ApplicationObjectType
+    graphql_name "Assignment"
 
     implements GraphQL::Relay::Node.interface
-    interfaces [Interfaces::TimestampInterface]
+    implements Interfaces::TimestampInterface
+
+    alias :assignment :object
+
+    class AssignmentStateType < Types::BaseEnum
+      graphql_name "AssignmentState"
+      description "States that an Assignment can be in"
+      value "unpublished"
+      value "published"
+      value "deleted"
+    end
+
+    GRADING_TYPES = Hash[
+      Assignment::ALLOWED_GRADING_TYPES.zip(Assignment::ALLOWED_GRADING_TYPES)
+    ]
+
+    SUBMISSION_TYPES = %w[
+      attendance
+      discussion_topic
+      external_tool
+      media_recording
+      none
+      not_graded
+      on_paper
+      online_quiz
+      online_text_entry
+      online_upload
+      online_url
+      wiki_page
+    ].to_set
+
+    class AssignmentSubmissionType < Types::BaseEnum
+      graphql_name "SubmissionType"
+      description "Types of submissions an assignment accepts"
+      SUBMISSION_TYPES.each { |submission_type|
+        value(submission_type)
+      }
+    end
+
+    class AssignmentGradingType < Types::BaseEnum
+      graphql_name "GradingType"
+      Assignment::ALLOWED_GRADING_TYPES.each { |type| value(type) }
+    end
 
     global_id_field :id
-    field :_id, !types.ID, "legacy canvas id", property: :id
+    field :_id, ID, "legacy canvas id", null: false, method: :id
 
-    field :name, types.String
+    field :name, String, null: true
 
-    field :position, types.Int,
-      "determines the order this assignment is displayed in in its assignment group"
-    field :description, types.String
+    field :position, Int,
+      "determines the order this assignment is displayed in in its assignment group",
+      null: true
+    field :description, String, null: true
 
-    field :pointsPossible, types.Float,
-      "the assignment is out of this many points",
-      property: :points_possible
+    field :points_possible, Float, "the assignment is out of this many points",
+      null: true
 
-    field :dueAt, DateTimeType,
+    field :due_at, DateTimeType,
       "when this assignment is due",
-      property: :due_at
-    field :lockAt, DateTimeType, property: :lock_at
-    field :unlockAt, DateTimeType, property: :unlock_at
+      null: true
+    field :lock_at, DateTimeType, null: true
+    field :unlock_at, DateTimeType, null: true
 
-    field :lockInfo, LockInfoType, resolve: ->(assignment, ctx, _) {
+    field :lock_info, LockInfoType, null: true
+
+    def lock_info
       Loaders::AssociationLoader.for(
         Assignment,
         %i[context discussion_topic quiz wiki_page]
       ).load(assignment).then {
-        assignment.low_level_locked_for?(ctx[:current_user],
+        assignment.low_level_locked_for?(current_user,
                                          check_policies: true,
                                          context: assignment.context)
       }
-    }
+    end
 
-    field :muted, types.Boolean, property: :muted?
+    field :muted, Boolean, method: :muted?, null: false
 
-    field :state, !AssignmentState, property: :workflow_state
+    field :state, AssignmentStateType, method: :workflow_state, null: false
 
-    field :assignmentGroup, AssignmentGroupType, resolve: ->(assignment, _, _) {
+    field :assignment_group, AssignmentGroupType, null: true
+    def assignment_group
       # TODO: conditionally load context_module_tags (see locked_for impl.)
-      Loaders::AssociationLoader.for(Assignment, :assignment_group)
-        .load(assignment)
-        .then { assignment.assignment_group }
-    }
+      load_association(:assignment_group)
+    end
 
-    field :quiz, Types::QuizType, resolve: -> (assignment, _, _) {
-      Loaders::AssociationLoader.for(Assignment, :quiz)
-        .load(assignment)
-        .then { assignment.quiz }
-    }
+    field :quiz, Types::QuizType, null: true
+    def quiz
+      load_association(:quiz)
+    end
 
-    field :discussion, Types::DiscussionType, resolve: -> (assignment, _, _) {
-      Loaders::AssociationLoader.for(Assignment, :discussion_topic)
-        .load(assignment)
-        .then { assignment.discussion_topic }
-    }
+    field :discussion, Types::DiscussionType, null: true
+    def discussion
+      load_association(:discussion_topic)
+    end
 
-    field :htmlUrl, UrlType, resolve: ->(assignment, _, ctx) {
+    field :html_url, UrlType, null: true
+    def html_url
       Rails.application.routes.url_helpers.course_assignment_url(
         course_id: assignment.context_id,
         id: assignment.id,
-        host: ctx[:request].host_with_port
+        host: context[:request].host_with_port
       )
-    }
-
-    field :needsGradingCount, types.Int do
-      # NOTE: this query (as it exists right now) is not batch-able.
-      # make this really expensive cost-wise?
-      resolve ->(assignment, _, ctx) do
-        Assignments::NeedsGradingCountQuery.new(
-          assignment,
-          ctx[:current_user]
-          # TODO course proxy stuff
-          # (actually for some reason not passing along a course proxy doesn't
-          # seem to matter)
-        ).count
-      end
     end
 
-    field :gradingType, AssignmentGradingType, resolve: ->(assignment, _, _) {
+    field :needs_grading_count, Int, null: true
+    def needs_grading_count
+      # NOTE: this query (as it exists right now) is not batch-able.
+      # make this really expensive cost-wise?
+      Assignments::NeedsGradingCountQuery.new(
+        assignment,
+        current_user
+        # TODO course proxy stuff
+        # (actually for some reason not passing along a course proxy doesn't
+        # seem to matter)
+      ).count
+    end
+
+    field :grading_type, AssignmentGradingType, null: true
+    def grading_type
       GRADING_TYPES[assignment.grading_type]
-    }
+    end
 
-    field :submissionTypes, types[!AssignmentSubmissionType],
-      resolve: ->(assignment, _, _) {
-        # there's some weird data in the db so we'll just ignore anything that
-        # doesn't match a value that is expected
-        (SUBMISSION_TYPES & assignment.submission_types_array).to_a
-      }
+    field :submission_types, [AssignmentSubmissionType],
+      null: true
+    def submission_types
+      # there's some weird data in the db so we'll just ignore anything that
+      # doesn't match a value that is expected
+      (SUBMISSION_TYPES & assignment.submission_types_array).to_a
+    end
 
-    field :course, Types::CourseType, resolve: -> (assignment, _, _) {
-      # course is polymorphicly associated with assignment through :context
-      # it could also be queried by assignment.assignment_group.course
-      Loaders::AssociationLoader.for(Assignment, :context)
-        .load(assignment)
-        .then { assignment.context }
-    }
+    field :course, Types::CourseType, null: true
+    def course
+      load_association(:context)
+    end
 
-    field :assignmentGroup, AssignmentGroupType, resolve: ->(assignment, _, _) {
-      Loaders::AssociationLoader.for(Assignment, :assignment_group)
-        .load(assignment)
-        .then { assignment.assignment_group }
-    }
+    field :assignment_group, AssignmentGroupType, null: true
+    def assignment_group
+      load_association(:assignment_group)
+    end
 
-    field :onlyVisibleToOverrides, types.Boolean,
+    field :only_visible_to_overrides, Boolean,
       "specifies that this assignment is only assigned to students for whom an
        `AssignmentOverride` applies.",
-      property: :only_visible_to_overrides
+      null: false
 
-    connection :assignmentOverrides, AssignmentOverrideType.connection_type, resolve:
-      ->(assignment, _, ctx) {
+    field :assignment_overrides, AssignmentOverrideType.connection_type,
+      null: true
+    def assignment_overrides
         # this is the assignment overrides index method of loading
         # overrides... there's also the totally different method found in
         # assignment_overrides_json. they may not return the same results?
         # ¯\_(ツ)_/¯
-        AssignmentOverrideApplicator.overrides_for_assignment_and_user(assignment, ctx[:current_user])
-      }
-
-    connection :submissionsConnection, SubmissionType.connection_type do
-      description "submissions for this assignment"
-      argument :filter, SubmissionFilterInputType
-
-      resolve ->(assignment, args, ctx) {
-        current_user = ctx[:current_user]
-        session = ctx[:session]
-        course = assignment.course
-
-        submissions = assignment.submissions.where(
-          workflow_state: (args[:filter] || {})[:states] || DEFAULT_SUBMISSION_STATES
-        )
-
-        if course.grants_any_right?(current_user, session, :manage_grades, :view_all_grades)
-          submissions
-        elsif course.grants_right?(current_user, session, :read_grades)
-          # a user can see their own submission
-          submissions.where(user_id: current_user.id)
-        end
-      }
+        AssignmentOverrideApplicator.overrides_for_assignment_and_user(assignment, current_user)
     end
-  end
 
-  AssignmentState = GraphQL::EnumType.define do
-    name "AssignmentState"
-    description "States that an Assignment can be in"
-    value "unpublished"
-    value "published"
-    value "deleted"
-  end
+    field :submissions_connection, SubmissionType.connection_type, null: true do
+      description "submissions for this assignment"
+      argument :filter, SubmissionFilterInputType, required: false
+    end
+    def submissions_connection(filter:)
+      course = assignment.context
 
-  SUBMISSION_TYPES = %w[
-    attendance
-    discussion_topic
-    external_tool
-    media_recording
-    none
-    not_graded
-    on_paper
-    online_quiz
-    online_text_entry
-    online_upload
-    online_url
-    wiki_page
-  ].to_set
+      submissions = assignment.submissions.where(
+        workflow_state: (filter || {})[:states] || DEFAULT_SUBMISSION_STATES
+      )
 
-  GRADING_TYPES = Hash[
-    Assignment::ALLOWED_GRADING_TYPES.zip(Assignment::ALLOWED_GRADING_TYPES)
-  ]
-
-  AssignmentSubmissionType = GraphQL::EnumType.define do
-    name "SubmissionType"
-    description "Types of submissions an assignment accepts"
-    SUBMISSION_TYPES.each { |submission_type|
-      value(submission_type)
-    }
-  end
-
-  AssignmentGradingType = GraphQL::EnumType.define do
-    name "GradingType"
-    Assignment::ALLOWED_GRADING_TYPES.each { |type| value(type) }
+      if course.grants_any_right?(current_user, session, :manage_grades, :view_all_grades)
+        submissions
+      elsif course.grants_right?(current_user, session, :read_grades)
+        # a user can see their own submission
+        submissions.where(user_id: current_user.id)
+      end
+    end
   end
 end

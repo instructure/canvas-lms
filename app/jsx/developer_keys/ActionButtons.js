@@ -53,10 +53,10 @@ class DeveloperKeyActionButtons extends React.Component {
   }
 
   editLinkHandler = (event) => {
-    const { dispatch, setEditingDeveloperKey, developerKeysModalOpen, developerKey } = this.props
+    const { dispatch, editDeveloperKey, developerKeysModalOpen, developerKey } = this.props
 
     event.preventDefault()
-    dispatch(setEditingDeveloperKey(developerKey))
+    dispatch(editDeveloperKey(developerKey))
     dispatch(developerKeysModalOpen())
   }
 
@@ -141,7 +141,7 @@ DeveloperKeyActionButtons.propTypes = {
   makeVisibleDeveloperKey: PropTypes.func.isRequired,
   makeInvisibleDeveloperKey: PropTypes.func.isRequired,
   deleteDeveloperKey: PropTypes.func.isRequired,
-  setEditingDeveloperKey: PropTypes.func.isRequired,
+  editDeveloperKey: PropTypes.func.isRequired,
   developerKeysModalOpen: PropTypes.func.isRequired,
   developerKey: PropTypes.shape({
     id: PropTypes.string.isRequired,

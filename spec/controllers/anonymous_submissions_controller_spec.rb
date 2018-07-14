@@ -19,11 +19,12 @@
 require_relative '../spec_helper'
 
 RSpec.describe AnonymousSubmissionsController do
+  it_behaves_like 'a submission update action', :anonymous_submissions
+
   describe "GET show" do
     before do
       course_with_student_and_submitted_homework
       @context = @course
-      @course.root_account.enable_feature!(:anonymous_moderated_marking)
       @assignment.update!(anonymous_grading: true)
       @submission.update!(score: 10)
       @assignment.unmute!

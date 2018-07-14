@@ -1204,8 +1204,9 @@ import 'compiled/jquery/fixDialogButtons'
 
   if (document.getElementById("rubric_management") && ENV.NON_SCORING_RUBRICS && ENV.PERMISSIONS.manage_outcomes) {
     $('h1').hide()
+    const contextId = ENV.context_asset_string.split('_')[1]
     ReactDOM.render(
-      <RubricManagement />,
+      <RubricManagement accountId={contextId} />,
       document.getElementById("rubric_management")
     );
   }

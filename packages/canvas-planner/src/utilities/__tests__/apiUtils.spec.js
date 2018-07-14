@@ -484,6 +484,17 @@ describe('transformApiToInternalItem', () => {
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
     expect(result).toMatchSnapshot();
   });
+
+  it('handles feedback', () => {
+    const apiResponse = makeApiResponse({
+      submissions: {
+        feedback: 'hello world'
+      }
+    });
+
+    const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
+    expect(result.feedback).toEqual('hello world');
+  });
 });
 
 describe('transformInternalToApiItem', () => {

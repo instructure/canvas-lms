@@ -57,6 +57,9 @@ $page-dark: #ebeff2;
     border-color: $border-light;
   }
 }
+.checkbox-view {
+  max-width: 210px;
+}
 .checkbox-view .checkbox,
 .operation-view .operation {
   border-radius: 3px;
@@ -68,6 +71,12 @@ $page-dark: #ebeff2;
   min-height: 18px; /* overwrites .checkbox in g_vendor */
   padding: 0;
   width: 18px;
+}
+.checkbox-label {
+  display: block;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  word-wrap: break-word; /* for IE support */
 }
 
 .checkbox[aria-checked=false] {
@@ -331,6 +340,15 @@ $page-dark: #ebeff2;
       z-index: 1;
     }
   }
+}
+
+.outcome-description {
+  width: 70%;
+  float: left;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .outcome-cell-wrapper {

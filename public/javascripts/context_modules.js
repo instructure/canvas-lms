@@ -1417,7 +1417,11 @@ function scrollTo ($thing, time = 500) {
               initNewItemPublishButton($item, data.content_tag);
               modules.updateAssignmentData();
 
-              $item.find('.lock-icon').data({moduleType: data.content_tag.type, contentId: data.content_tag.id});
+              $item.find('.lock-icon').data({
+                moduleType: data.content_tag.type,
+                contentId: data.content_tag.content_id,
+                moduleItemId: data.content_tag.id
+              });
               modules.loadMasterCourseData(data.content_tag.id);
             }), { onComplete: function() {
               $module.find('.add_module_item_link').focus();
@@ -1440,7 +1444,11 @@ function scrollTo ($thing, time = 500) {
           initNewItemPublishButton($item, data.content_tag)
           modules.updateAssignmentData()
 
-          $item.find('.lock-icon').data({moduleType: data.content_tag.type, contentId: data.content_tag.id})
+          $item.find('.lock-icon').data({
+            moduleType: data.content_tag.type,
+            contentId: data.content_tag.content_id,
+            moduleItemId: data.content_tag.id
+          });
           modules.loadMasterCourseData(data.content_tag.id)
 
           $module.find('.context_module_items.ui-sortable').sortable('disable')
@@ -2021,7 +2029,9 @@ function scrollTo ($thing, time = 500) {
     modules.updateAssignmentData(function() {
       modules.updateProgressions(function() {
         if (window.location.hash && !window.location.hash.startsWith('#!')) {
-          scrollTo($(window.location.hash))
+          try {
+            scrollTo($(window.location.hash))
+          } catch (error) {}
         } else {
           if ($(".context_module:first .content:visible").length == 0) {
             scrollTo($(".context_module .content:visible").filter(":first").parents(".context_module"))

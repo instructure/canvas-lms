@@ -26,6 +26,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
 
+  <%= stylesheet_link_tag(active_brand_config_url('css'), media: "all") %>
+  <%= include_common_stylesheets %>
+
   <script>
     ENV = <%= raw js_env.to_json %>;
   </script>
@@ -35,6 +38,7 @@
   <%= include_account_css %>
 
   <meta name="theme-color" content="<%= brand_variable('ic-brand-primary') %>">
+  <%= include_head_js %>
 </head>
 
 <body>

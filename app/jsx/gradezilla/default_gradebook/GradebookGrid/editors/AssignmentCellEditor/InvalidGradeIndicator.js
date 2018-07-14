@@ -18,9 +18,9 @@
 
 import React from 'react'
 import {func} from 'prop-types'
-import Button from '@instructure/ui-core/lib/components/Button'
-import Text from '@instructure/ui-core/lib/components/Text'
-import Tooltip from '@instructure/ui-core/lib/components/Tooltip'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import Text from '@instructure/ui-elements/lib/components/Text'
+import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
 import IconWarningLine from '@instructure/ui-icons/lib/Line/IconWarning'
 import I18n from 'i18n!gradebook'
 

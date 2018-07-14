@@ -26,7 +26,7 @@ module Api::V1::ContentMigration
     end
   end
 
-  def content_migration_json(migration, current_user, session, attachment_preflight=nil)
+  def content_migration_json(migration, current_user, session, attachment_preflight=nil, includes=[])
     json = api_json(migration, current_user, session, :only => %w(id user_id workflow_state started_at finished_at migration_type))
     json[:created_at] = migration.created_at
     if json[:workflow_state] == 'created'
@@ -69,7 +69,7 @@ module Api::V1::ContentMigration
     end
 
     # For easier auditing for support requests
-    if Account.site_admin.grants_right?(current_user, :read)
+    if Account.site_admin.grants_right?(current_user, :read) || (includes || []).include?('audit_info')
       json[:audit_info] = migration.respond_to?(:slice) &&
                           migration.slice(:id,
                                           :user_id,

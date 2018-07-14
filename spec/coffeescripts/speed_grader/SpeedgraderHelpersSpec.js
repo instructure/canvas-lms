@@ -18,9 +18,11 @@
 
 import fakeENV from 'helpers/fakeENV'
 import SpeedgraderHelpers, {
-  isAnonymousModeratedMarkingEnabled,
   setupIsAnonymous,
-  setupAnonymizableId
+  setupAnonymizableId,
+  setupAnonymizableUserId,
+  setupAnonymizableStudentId,
+  setupAnonymizableAuthorId
 } from 'speed_grader_helpers'
 
 QUnit.module('SpeedGrader', {
@@ -36,16 +38,24 @@ QUnit.module('SpeedGrader', {
   }
 })
 
-test('isAnonymousModeratedMarkingEnabled is available on main object', () => {
-  strictEqual(SpeedgraderHelpers.isAnonymousModeratedMarkingEnabled, isAnonymousModeratedMarkingEnabled)
-})
-
 test('setupIsAnonymous is available on main object', () => {
   strictEqual(SpeedgraderHelpers.setupIsAnonymous, setupIsAnonymous)
 })
 
 test('setupAnonymizableId is available on main object', () => {
   strictEqual(SpeedgraderHelpers.setupAnonymizableId, setupAnonymizableId)
+})
+
+test('setupAnonymizableUserId is available on main object', () => {
+  strictEqual(SpeedgraderHelpers.setupAnonymizableUserId, setupAnonymizableUserId)
+})
+
+test('setupAnonymizableStudentId is available on main object', () => {
+  strictEqual(SpeedgraderHelpers.setupAnonymizableStudentId, setupAnonymizableStudentId)
+})
+
+test('setupAnonymizableAuthorId is available on main object', () => {
+  strictEqual(SpeedgraderHelpers.setupAnonymizableAuthorId, setupAnonymizableAuthorId)
 })
 
 test('populateTurnitin sets correct URL for OriginalityReports', () => {
@@ -227,7 +237,7 @@ test('it properly disables the elements we care about in the right bar', functio
   SpeedgraderHelpers.setRightBarDisabled(true)
   equal(
     this.testArea.innerHTML,
-    '<input type="text" id="grading-box-extended" class="ui-state-disabled" aria-disabled="true" readonly="readonly"><textarea id="speedgrader_comment_textarea" class="ui-state-disabled" aria-disabled="true" readonly="readonly"></textarea><button id="add_attachment" class="ui-state-disabled" aria-disabled="true" readonly="readonly"></button><button id="media_comment_button" class="ui-state-disabled" aria-disabled="true" readonly="readonly"></button><button id="comment_submit_button" class="ui-state-disabled" aria-disabled="true" readonly="readonly"></button>'
+    '<input type="text" id="grading-box-extended" class="ui-state-disabled" aria-disabled="true" readonly="readonly" disabled=""><textarea id="speedgrader_comment_textarea" class="ui-state-disabled" aria-disabled="true" readonly="readonly" disabled=""></textarea><button id="add_attachment" class="ui-state-disabled" aria-disabled="true" readonly="readonly" disabled=""></button><button id="media_comment_button" class="ui-state-disabled" aria-disabled="true" readonly="readonly" disabled=""></button><button id="comment_submit_button" class="ui-state-disabled" aria-disabled="true" readonly="readonly" disabled=""></button>'
   )
 })
 
@@ -441,68 +451,57 @@ test('Posts to the resubmit URL', () => {
   $.ajaxJSON = previousAjaxJson
 })
 
-QUnit.module('SpeedgraderHelpers.isAnonymousModeratedMarking', suiteHooks => {
-  suiteHooks.afterEach(() => {
-    fakeENV.teardown()
-  })
-
-  test('returns false when not set', () => {
-    delete ENV.anonymous_moderated_marking_enabled
-    strictEqual(isAnonymousModeratedMarkingEnabled(), false)
-  })
-
-  test('returns false when disabled', () => {
-    fakeENV.setup({anonymous_moderated_marking_enabled: false})
-    strictEqual(isAnonymousModeratedMarkingEnabled(), false)
-  })
-
-  test('returns true when enabled', () => {
-    fakeENV.setup({anonymous_moderated_marking_enabled: true})
-    strictEqual(isAnonymousModeratedMarkingEnabled(), true)
-  })
-})
-
 QUnit.module('SpeedgraderHelpers.setupIsAnonymous', suiteHooks => {
   suiteHooks.afterEach(() => {
     fakeENV.teardown()
   })
 
-  test('returns true when assignment is anonymously graded and Anonymous Moderated Marking is enabled', () => {
-    fakeENV.setup({anonymous_moderated_marking_enabled: true})
+  test('returns true when assignment is anonymously graded', () => {
     strictEqual(setupIsAnonymous({anonymous_grading: true}), true)
-  })
-
-  test('returns false when assignment is not anonymously graded and Anonymous Moderated Marking is enabled', () => {
-    fakeENV.setup({anonymous_moderated_marking_enabled: true})
-    strictEqual(setupIsAnonymous({anonymous_grading: false}), false)
-  })
-
-  test('returns false when assignment is anonymously graded and Anonymous Moderated Marking is disabled', () => {
-    fakeENV.setup({anonymous_moderated_marking_enabled: false})
-    strictEqual(setupIsAnonymous({anonymous_grading: true}), false)
-  })
-
-  test('returns false when assignment is not anonymously graded and Anonymous Moderated Marking is unset', () => {
-    delete ENV.anonymous_moderated_marking_enabled
-    strictEqual(setupIsAnonymous({anonymous_grading: false}), false)
-  })
-
-  test('returns false when assignment is anonymously graded and Anonymous Moderated Marking is unset', () => {
-    delete ENV.anonymous_moderated_marking_enabled
-    strictEqual(setupIsAnonymous({anonymous_grading: true}), false)
-  })
-})
-
-QUnit.module('SpeedgraderHelpers.setupAnonymizableId', suiteHooks => {
-  suiteHooks.afterEach(() => {
     fakeENV.teardown()
   })
 
+  test('returns false when assignment is not anonymously graded', () => {
+    strictEqual(setupIsAnonymous({anonymous_grading: false}), false)
+  })
+})
+
+QUnit.module('SpeedgraderHelpers.setupAnonymizableId', () => {
   test('returns anonymizable_id when anonymous', () => {
     strictEqual(setupAnonymizableId(true), 'anonymous_id')
   })
 
   test('returns id when anonymous', () => {
     strictEqual(setupAnonymizableId(false), 'id')
+  })
+})
+
+QUnit.module('SpeedgraderHelpers.setupAnonymizableUserId', () => {
+  test('returns anonymizable_id when anonymous', () => {
+    strictEqual(setupAnonymizableUserId(true), 'anonymous_id')
+  })
+
+  test('returns user_id when not anonymous', () => {
+    strictEqual(setupAnonymizableUserId(false), 'user_id')
+  })
+})
+
+QUnit.module('SpeedgraderHelpers.setupAnonymizableStudentId', () => {
+  test('returns anonymizable_id when anonymous', () => {
+    strictEqual(setupAnonymizableStudentId(true), 'anonymous_id')
+  })
+
+  test('returns student_id when not anonymous', () => {
+    strictEqual(setupAnonymizableStudentId(false), 'student_id')
+  })
+})
+
+QUnit.module('SpeedgraderHelpers.setupAnonymizableAuthorId', () => {
+  test('returns anonymizable_id when anonymous', () => {
+    strictEqual(setupAnonymizableAuthorId(true), 'anonymous_id')
+  })
+
+  test('returns author_id when not anonymous', () => {
+    strictEqual(setupAnonymizableAuthorId(false), 'author_id')
   })
 })

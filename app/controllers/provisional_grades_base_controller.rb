@@ -33,9 +33,7 @@ class ProvisionalGradesBaseController < ApplicationController
       return render json: { message: "Assignment grades have already been published" }, status: :bad_request
     end
 
-    # in theory we could apply visibility here, but for now we would rather be performant
-    # e.g. @assignment.students_with_visibility(@context.students_visible_to(@current_user)).find(params[:student_id])
-    json = {needs_provisional_grade: @assignment.student_needs_provisional_grade?(@student)}
+    json = {needs_provisional_grade: @assignment.can_be_moderated_grader?(@current_user)}
 
     return render json: json unless submission_updated?
 
@@ -48,11 +46,16 @@ class ProvisionalGradesBaseController < ApplicationController
 
     selection = @assignment.moderated_grading_selections.where(student_id: @student).first
 
+    include_scorer_names = @assignment.can_view_other_grader_identities?(@current_user)
+    provisional_grades = submission.provisional_grades
+    provisional_grades = provisional_grades.preload(:scorer) if include_scorer_names
+
     json[:provisional_grades] = []
-    submission.provisional_grades.order(:id).each do |pg|
+    provisional_grades.order(:id).each do |pg|
       pg_json = provisional_grade_json(pg, submission, @assignment, @current_user, %w(submission_comments rubric_assessment))
       pg_json[:selected] = !!(selection && selection.selected_provisional_grade_id == pg.id)
       pg_json[:readonly] = !pg.final && (pg.scorer_id != @current_user.id)
+      pg_json[:scorer_name] = pg.scorer.name if include_scorer_names
 
       if pg.final
         json[:final_provisional_grade] = pg_json

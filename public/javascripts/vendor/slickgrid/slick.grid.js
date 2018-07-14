@@ -711,7 +711,7 @@ if (typeof Slick === "undefined") {
       return $headerRow_1[0];
     }
 
-    function getHeaderRowColumn(columnId) {
+    function getColumnHeaderNode(columnId) {
       var idx = getColumnIndex(columnId);
       // FreezeColumn - Combine frozen and nonFrozen side header row objects
       var $headersObject;
@@ -721,6 +721,19 @@ if (typeof Slick === "undefined") {
         $headersObject = $($.merge( $.merge([], $headers_0), $headers_1));
       }
       var $header = $headersObject.children().eq(idx);
+      return $header && $header[0];
+    }
+
+    function getHeaderRowColumn(columnId) {
+      var idx = getColumnIndex(columnId);
+      // FreezeColumn - Combine frozen and nonFrozen side header row objects
+      var $headerRowObject;
+      if (!options.numberOfColumnsToFreeze) {
+        $headerRowObject = $headerRow_1;
+      } else { // Combine frozen and nonFrozen
+        $headerRowObject = $($.merge( $.merge([], $headerRow_0), $headerRow_1));
+      }
+      var $header = $headerRowObject.children().eq(idx);
       return $header && $header[0];
     }
 
@@ -3885,6 +3898,7 @@ if (typeof Slick === "undefined") {
       "setHeaderRowVisibility": setHeaderRowVisibility,
       "getHeaderRow": getHeaderRow,
       "getHeaderRowColumn": getHeaderRowColumn,
+      "getColumnHeaderNode": getColumnHeaderNode,
       "getGridPosition": getGridPosition,
       "flashCell": flashCell,
       "addCellCssStyles": addCellCssStyles,

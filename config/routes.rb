@@ -272,6 +272,7 @@ CanvasRails::Application.routes.draw do
           request.query_parameters.key?(:download)
         end
 
+      put 'anonymous_submissions/:anonymous_id', to: 'anonymous_submissions#update'
       resources :submissions do
         get 'originality_report/:asset_string' => 'submissions#originality_report', as: :originality_report
         post 'turnitin/resubmit' => 'submissions#resubmit_to_turnitin', as: :resubmit_to_turnitin
@@ -1343,6 +1344,10 @@ CanvasRails::Application.routes.draw do
         put 'users/:user_id/observer_alert_thresholds/:observer_alert_threshold_id', action: :update
         delete 'users/:user_id/observer_alert_thresholds/:observer_alert_threshold_id', action: :destroy
       end
+
+      scope(controller: :observer_pairing_codes_api) do
+        post 'users/:user_id/observer_pairing_codes', action: :create
+      end
     end
 
     scope(controller: :custom_data) do
@@ -2189,6 +2194,11 @@ CanvasRails::Application.routes.draw do
     scope(controller: 'lti/ims/results') do
       get "courses/:course_id/line_items/:line_item_id/results/:id", action: :show, as: :lti_result_show
       get "courses/:course_id/line_items/:line_item_id/results", action: :index
+    end
+
+    # Security
+    scope(controller: 'lti/ims/security') do
+      get "security/jwks", action: :jwks, as: :jwks_show
     end
   end
 

@@ -19,7 +19,7 @@ class ObserverAlert < ActiveRecord::Base
   belongs_to :student, :class_name => 'User', inverse_of: :as_student_observer_alerts, :foreign_key => :user_id
   belongs_to :observer, :class_name => 'User', inverse_of: :as_observer_observer_alerts
   belongs_to :observer_alert_threshold, :inverse_of => :observer_alerts
-  belongs_to :context, polymorphic: [:discussion_topic, :assignment, :course, :account_notification]
+  belongs_to :context, polymorphic: [:discussion_topic, :assignment, :course, :account_notification, :submission]
 
   ALERT_TYPES = %w(
     assignment_missing
@@ -52,5 +52,49 @@ class ObserverAlert < ActiveRecord::Base
 
   def self.clean_up_old_alerts
     ObserverAlert.where('created_at < ?', 6.months.ago).delete_all
+  end
+
+  def self.create_assignment_missing_alerts
+    submissions = Submission.active.
+      eager_load(user: :as_student_observer_alert_thresholds).
+      joins(:assignment).
+      where("observer_alert_thresholds.user_id = submissions.user_id").
+      joins("LEFT OUTER JOIN #{ObserverAlert.quoted_table_name} ON observer_alerts.context_id = submissions.id
+             AND observer_alerts.context_type = 'Submission'
+             AND observer_alerts.alert_type = 'assignment_missing'").
+      for_enrollments(Enrollment.all_active_or_pending).
+      missing.
+      merge(Assignment.submittable).
+      where('cached_due_date > ?', 1.day.ago).
+      where("observer_alerts.id IS NULL").
+      where("observer_alert_thresholds.alert_type = 'assignment_missing'")
+
+    alerts = []
+    submissions.find_each do |submission|
+      thresholds = submission.user.as_student_observer_alert_thresholds
+      thresholds.find_each do |threshold|
+        next unless threshold.users_are_still_linked?
+        next unless threshold.observer.enrollments.where(course_id: submission.assignment.context_id).first.present?
+
+        now = Time.now.utc
+        alerts << { observer_id: threshold.observer.id,
+                    user_id: threshold.student.id,
+                    observer_alert_threshold_id: threshold.id,
+                    alert_type: "assignment_missing",
+                    context_type: 'Submission',
+                    context_id: submission.id,
+                    created_at: now,
+                    updated_at: now,
+                    action_date: now,
+                    title: I18n.t('Assignment missing: %{assignment_name} in %{course_code}', {
+                      assignment_name: submission.assignment.title,
+                      course_code: submission.assignment.course.course_code
+                    }) }
+      end
+    end
+
+    alerts.each_slice(1000) do |slice|
+      ObserverAlert.bulk_insert(slice)
+    end
   end
 end

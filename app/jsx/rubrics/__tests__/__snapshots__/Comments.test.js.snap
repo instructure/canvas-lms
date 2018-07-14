@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`The Comments component directly renders comments_html 1`] = `"<div>I award you <b>no</b> points, and may God have mercy on your soul.</div>"`;
+
+exports[`The Comments component renders a footer after the comment when provided 1`] = `
+"<div className=\\"rubric-freeform\\">
+  <CommentText assessment={{...}} placeholder=\\"This area will be used by the assessor to leave comments related to this criterion.\\" weight=\\"normal\\" />
+  <div>
+    this is a footer
+  </div>
+</div>"
+`;
+
+exports[`The Comments component renders a placeholder when no assessment provided 1`] = `
+"<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+  This area will be used by the assessor to leave comments related to this criterion.
+</Text>"
+`;
+
+exports[`The Comments component renders the root component as expected when assessing 1`] = `"<FreeFormComments comments=\\"I award you no points, and may God have mercy on your soul.\\" saveLater={false} savedComments={{...}} setComments={[Function]} setSaveLater={[Function]} />"`;

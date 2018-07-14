@@ -34,11 +34,21 @@ class CanvadocSessionsController < ApplicationController
         preferred_plugins: [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
       }
 
+      opts[:enable_annotations] = blob["enable_annotations"] && !anonymous_grading_enabled?(attachment)
+      if opts[:enable_annotations]
+        # Docviewer only cares about the enrollment type when we're doing annotations
+        opts[:enrollment_type] = blob["enrollment_type"]
+        # If we STILL don't have a role, something went way wrong so let's be unauthorized.
+        return render(plain: 'unauthorized', status: :unauthorized) if opts[:enrollment_type].blank?
+        opts[:anonymous_instructor_annotations] = !!blob["anonymous_instructor_annotations"] if blob["anonymous_instructor_annotations"]
+      end
+
       if @domain_root_account.settings[:canvadocs_prefer_office_online]
         opts[:preferred_plugins].unshift Canvadocs::RENDER_O365
       end
 
-      opts[:enable_annotations] = blob["enable_annotations"] && !anonymous_grading_enabled?(attachment)
+      # TODO: Remove the next line after the DocViewer Data Migration project RD-4702
+      opts[:region] = attachment.shard.database_server.config[:region] || "none"
       attachment.submit_to_canvadocs(1, opts) unless attachment.canvadoc_available?
       url = attachment.canvadoc.session_url(opts.merge({
         user: @current_user,
@@ -68,8 +78,6 @@ class CanvadocSessionsController < ApplicationController
   private
 
   def anonymous_grading_enabled?(attachment)
-    return false unless @domain_root_account.feature_enabled?(:anonymous_moderated_marking)
-
     Assignment.joins(submissions: :attachment_associations).
       where(
         submissions: {attachment_associations: {context_type: 'Submission', attachment: attachment}},

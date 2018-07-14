@@ -20,7 +20,7 @@
 <% css_bundle :select_content_dialog %>
 <% only ||= nil # only is an optimization, so that tabs that aren't going to be used won't have their data loaded %>
 <% lti_app_placements ||= [] %>
-<% cache([@context, 'select_context_content_dialog', only].cache_key) do %>
+<% cache([@context, 'select_context_content_dialog_1', only].cache_key) do %>
   <div id="select_context_content_dialog" style="display: none;">
     <div style="margin-bottom: 5px; <%= hidden if only && only.size == 1 %>">
       <a href="<%= context_url(@context, :context_external_tool_resource_selection_url, "{{ id }}") %>" id="select_content_resource_selection_url" style="display: none;">&nbsp;</a>
@@ -36,7 +36,7 @@
         <option value="attachment"><%= t :file_item, "File" %></option>
         <% end %>
         <% if !only || only.include?(:wiki_pages) %>
-        <option value="wiki_page"><%= t :content_page_item, "Content Page" %></option>
+        <option value="wiki_page"><%= t :content_page_item, "Page" %></option>
         <% end %>
         <% if !only || only.include?(:discussion_topics) %>
         <option value="discussion_topic"><%= t :discussion_item, "Discussion" %></option>
@@ -146,8 +146,8 @@
         <select class="module_item_select" aria-label="<%= t 'Select the page you want to associate, or add a new page by selecting "New Page".' %>" multiple>
           <%# cache on the context.wiki instead of just the context because even though it will require a db query, we will get a much better cache hit rate %>
           <option value="new"><%= t :new_page_option, "[ New Page ]" %></option>
-          <% cache([@context.wiki, 'non_deleted_wiki_pages']) do  %>
-            <% @context.wiki_pages.not_deleted.select([:id, :title]).each do |page| %>
+          <% cache([@context.wiki, 'non_deleted_wiki_pages_1']) do  %>
+            <% @context.wiki_pages.not_deleted.reorder(WikiPage.best_unicode_collation_key('title')).select(:id, :title).each do |page| %>
               <% if page && !page.new_record? %>
                 <option value="<%= page.id %>"><%= page.title %></option>
               <% end %>
@@ -205,8 +205,8 @@
           <% if @context.grants_right?(@current_user, session, :manage_assignments) %>
             <option value="new"><%= t :new_quiz_option, "[ New Quiz ]" %></option>
           <% end %>
-          <% @context.quizzes.active.limit(400).each do |quiz| %>
-            <option value="<%= quiz.id %>"><%= quiz.title %></option>
+          <% @context.quizzes.active.reorder(Quizzes::Quiz.best_unicode_collation_key('title')).limit(400).pluck(:id, :title).each do |id, title| %>
+            <option value="<%= id %>"><%= title %></option>
           <% end %>
         </select>
         </div>
@@ -221,9 +221,9 @@
               <td>
                 <select name="quiz[assignment_group_id]" aria-label="<%= before_label :quiz_group, "Group" %>">
                   <% cnt = 0 %>
-                  <% @context.assignment_groups.active.each do |group| %>
+                  <% @context.assignment_groups.active.reorder(AssignmentGroup.best_unicode_collation_key('name')).pluck(:id, :name).each do |id, name| %>
                     <% cnt += 1 %>
-                    <option value="<%= group.id %>"><%= group.name %></option>
+                    <option value="<%= id %>"><%= name %></option>
                   <% end %>
                   <% if cnt == 0 %>
                     <option value=""><%= t 'options.assignments', "Assignments" %></option>
@@ -247,10 +247,10 @@
           <% if @context.grants_right?(@current_user, session, :manage_assignments) %>
             <option value="new"><%= t :new_assignment_option, "[ New Assignment ]" %></option>
           <% end %>
-          <% @context.assignment_groups.active.include_active_assignments.each do |group| %>
+          <% @context.assignment_groups.active.include_active_assignments.reorder(AssignmentGroup.best_unicode_collation_key('name')).each do |group| %>
             <optgroup label="<%= group.name %>">
-            <% group.active_assignments.no_submittables.limit(200).each do |assignment| %>
-              <option value="<%= assignment.id %>"><%= assignment.title %></option>
+            <% group.active_assignments.no_submittables.reorder(Assignment.best_unicode_collation_key('title')).limit(200).pluck(:id, :title).each do |id, title| %>
+              <option value="<%= id %>"><%= title %></option>
             <% end %>
             </optgroup>
           <% end %>
@@ -272,8 +272,8 @@
         <div style="margin-top: 5px;">
         <select class="module_item_select" aria-label="<%= t 'discussion_topic_select_label', 'Select the topic you want to associate, or add a topic by selecting "New Topic".' %>" multiple>
           <option value="new"><%= t :new_topic_option, "[ New Topic ]" %></option>
-          <% @context.discussion_topics.active.only_discussion_topics.limit(200).each do |topic| %>
-            <option value="<%= topic.id %>"><%= topic.title %></option>
+          <% @context.discussion_topics.active.only_discussion_topics.reorder(DiscussionTopic.best_unicode_collation_key('title')).limit(200).pluck(:id, :title).each do |id, title| %>
+            <option value="<%= id %>"><%= title %></option>
           <% end %>
         </select>
         </div>

@@ -368,6 +368,17 @@ describe "Common Cartridge exporting" do
       expect(@zip_file.find_entry(path)).not_to be_nil
     end
 
+    it "does not get confused by attachments with absolute paths" do
+      @att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
+      @q1 = @course.quizzes.create(:title => 'quiz1', :description => %Q{<img src="https://example.com/files/#{@att.id}/download?download_frd=1"})
+      @ce.export_type = ContentExport::COMMON_CARTRIDGE
+      run_export
+      doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/assessment_meta.xml"))
+      description = doc.at_css('description').to_s
+      expect(description).not_to include 'https://example.com%24IMS-CC-FILEBASE%24'
+      expect(description).to include 'img src="%24IMS-CC-FILEBASE%24/unfiled/first.png'
+    end
+
     it "should not fail when answers are missing for FIMB" do
       @q1 = @course.quizzes.create(:title => 'quiz1')
 

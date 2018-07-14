@@ -29,7 +29,7 @@ const props = ({ showVisibilityToggle = true } = {}) => {
     makeVisibleDeveloperKey: jest.fn(),
     makeInvisibleDeveloperKey: jest.fn(),
     deleteDeveloperKey: jest.fn(),
-    setEditingDeveloperKey: jest.fn(),
+    editDeveloperKey: jest.fn(),
     developerKeysModalOpen: jest.fn(),
     developerKey:{
       id: '1',

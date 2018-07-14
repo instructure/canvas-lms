@@ -88,6 +88,14 @@ module CustomWaitMethods
     wait_for_animations
   end
 
+  def wait_for_children(selector)
+    has_children = false
+    while has_children == false
+      has_children = element_has_children?(selector)
+      wait_for_dom_ready
+    end
+  end
+
   def wait_for_stale_element(selector, jquery_selector: false)
     stale_element = true
     while stale_element == true

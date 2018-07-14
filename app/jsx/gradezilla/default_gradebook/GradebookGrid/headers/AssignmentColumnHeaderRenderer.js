@@ -62,7 +62,7 @@ function getProps (column, gradebook, options) {
     addGradebookElement: gradebook.keyboardNav.addGradebookElement,
 
     assignment: {
-      anonymousGrading: assignment.anonymous_grading && gradebook.options.anonymous_moderated_marking_enabled,
+      anonymousGrading: assignment.anonymous_grading,
       courseId: assignment.course_id,
       htmlUrl: assignment.html_url,
       id: assignment.id,
@@ -89,7 +89,7 @@ function getProps (column, gradebook, options) {
     onHeaderKeyDown: (event) => {
       gradebook.handleHeaderKeyDown(event, columnId);
     },
-    onMenuClose: gradebook.handleColumnHeaderMenuClose,
+    onMenuDismiss: gradebook.handleColumnHeaderMenuClose,
     removeGradebookElement: gradebook.keyboardNav.removeGradebookElement,
     reuploadSubmissionsAction: gradebook.getReuploadSubmissionsAction(assignmentId),
     setDefaultGradeAction: gradebook.getSetDefaultGradeAction(assignmentId),

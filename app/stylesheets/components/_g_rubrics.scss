@@ -42,8 +42,8 @@
     text-align: direction(right);
   }
   .small_description {
-    font-style: italic;
-    margin-top: .5rem;
+    font-weight: normal;
+    margin: 0.25rem 0;
   }
 
   &.editing {
@@ -56,15 +56,18 @@
     label[for=rubric-title] {
       font-weight: bold;
     }
-    tr.criterion .container .add_rating_link {
-      position: absolute;
-      float: direction(right);
-      top: 50%;
-      #{direction(right)}: -.5%;
-      transform: translateY(-50%);
+    tr.criterion .add_rating_link {
       line-height: 0;
-      width: 0;
-      display: block;
+      margin-#{direction(right)}: -1.2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    tr.criterion td.rating > div.container {
+      display: flex;
+    }
+    tr.criterion .rating-main {
+      flex: 1;
     }
     .add_rating_link_after {
       border-radius: 1rem;
@@ -121,7 +124,7 @@
     .container {
       @include revert_bootstrap_container;
       position: relative;
-      font-size: 0.9em;
+      font-size: 0.85rem;
       display: table;
       width: 100%;
     }
@@ -177,9 +180,10 @@
       border-bottom-width: 0;
       border-#{direction(right)}-width: 0;
       border-top-width: 0;
-      font-size: 0.8em;
+      font-size: 0.85em;
+      font-weight: bold;
       vertical-align: top;
-      padding: 2px 10px;
+      padding: 7px 10px;
       .container {
         @include revert_bootstrap_container;
         padding: 5px 0;
@@ -187,9 +191,6 @@
         height: 100%;
       }
       &.edge_rating .delete_rating_link {
-        display: none;
-      }
-      &:last-child .add_rating_link_after {
         display: none;
       }
       &.infinitesimal .range_rating {
@@ -336,6 +337,8 @@
     }
   }
   .points_form {
+    font-size: 0.85rem;
+
     .rating_custom {
       height: 15px;
     }

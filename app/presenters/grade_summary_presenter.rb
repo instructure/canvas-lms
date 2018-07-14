@@ -216,6 +216,14 @@ class GradeSummaryPresenter
     end
   end
 
+  def rubric_assessments
+    assignment_presenters.flat_map(&:rubric_assessments)
+  end
+
+  def rubrics
+    rubric_assessments.map(&:rubric).uniq
+  end
+
   # Called by external classes that want to make sure we clear out
   # cached data. Most likely this is only the GradeCalculator
   def self.invalidate_cache(context)

@@ -20,13 +20,14 @@ import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
 import accessibleDateFormat from '../shared/helpers/accessibleDateFormat'
+import shortId from '../shared/shortid'
 import tz from 'timezone'
 import 'jquery.instructure_forms'
 import cx from 'classnames'
 
 const { string, func, bool, instanceOf, oneOfType } = PropTypes;
 
-  var DueDateCalendarPicker = React.createClass({
+  const DueDateCalendarPicker = React.createClass({
 
     propTypes: {
       dateType: string.isRequired,
@@ -38,13 +39,21 @@ const { string, func, bool, instanceOf, oneOfType } = PropTypes;
       isFancyMidnight: bool.isRequired,
       dateValue: oneOfType([instanceOf(Date), string]).isRequired,
       labelText: string.isRequired,
+      labelClasses: string,
+      name: string,
       readonly: bool
     },
 
     getDefaultProps () {
       return {
-        readonly: false
+        readonly: false,
+        labelClasses: '',
       };
+    },
+
+    getInitialState () {
+      this.uniqueId = shortId()
+      return {}
     },
 
     // ---------------
@@ -52,12 +61,12 @@ const { string, func, bool, instanceOf, oneOfType } = PropTypes;
     // ---------------
 
     componentDidMount() {
-      var dateInput = this.refs.dateInput
+      const dateInput = this.refs.dateInput
 
       $(dateInput).datetime_field().change( (e) => {
-        var trimmedInput = $.trim(e.target.value)
+        const trimmedInput = $.trim(e.target.value)
 
-        var newDate = $(dateInput).data('unfudged-date')
+        let newDate = $(dateInput).data('unfudged-date')
         newDate     = (trimmedInput === "") ? null : newDate
         newDate     = this.changeToFancyMidnightIfNeeded(newDate)
 
@@ -67,7 +76,7 @@ const { string, func, bool, instanceOf, oneOfType } = PropTypes;
 
     // ensure jquery UI updates (as react doesn't know about it)
     componentDidUpdate() {
-      var dateInput = this.refs.dateInput
+      const dateInput = this.refs.dateInput
       $(dateInput).val(this.formattedDate())
     },
 
@@ -100,10 +109,11 @@ const { string, func, bool, instanceOf, oneOfType } = PropTypes;
         const className = cx('ic-Form-control', {readonly: this.props.readonly});
         return (
           <div className={className}>
-            <label className="ic-Label" htmlFor={this.props.dateType}>{this.props.labelText}</label>
+            <label className={`${this.props.labelClasses} ic-Label`} htmlFor={this.props.dateType}>{this.props.labelText}</label>
             <div className="ic-Input-group">
               <input
                 id={this.props.dateType}
+                name={this.props.name}
                 readOnly
                 type="text"
                 className={`ic-Input ${this.props.inputClasses}`}
@@ -126,13 +136,16 @@ const { string, func, bool, instanceOf, oneOfType } = PropTypes;
         <div>
           <label
             id={this.props.labelledBy}
-            className="Date__label"
+            className={`${this.props.labelClasses} Date__label`}
+            htmlFor={this.uniqueId}
           >{this.props.labelText}</label>
           <div
             ref="datePickerWrapper"
             className={this.wrapperClassName()}
           >
             <input
+              id              = {this.uniqueId}
+              name            = {this.props.name}
               type            = "text"
               ref             = "dateInput"
               title           = {accessibleDateFormat()}

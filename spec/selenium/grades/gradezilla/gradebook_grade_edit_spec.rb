@@ -270,6 +270,43 @@ describe "Gradezilla editing grades" do
     end
   end
 
+  context "for a moderated assignment" do
+    before(:each) do
+      # turn on the moderation flag
+      Account.default.enable_feature!(:anonymous_marking)
+
+      now = Time.zone.now
+      # create a moderated assignment
+      @moderated_assignment = @course.assignments.create!(
+        title: 'Moderated Assignment',
+        submission_types: 'online_text_entry',
+        grader_count: 1,
+        final_grader: @teacher,
+        due_at: 1.week.from_now(now),
+        moderated_grading: true,
+        points_possible: 10
+      )
+
+      user_session(@teacher)
+      Gradezilla.visit(@course)
+    end
+
+    it "is not allowed until grades are posted", priority: "1", test_id: 3503489 do
+      Gradezilla::Cells.grading_cell(@student_1, @moderated_assignment).click
+      grid_cell = Gradezilla::Cells.grid_assignment_row_cell(@student_1, @moderated_assignment)
+      class_attribute_fetched = grid_cell.attribute("class")
+      expect(class_attribute_fetched).to include "Grid__ReadOnlyCell"
+    end
+
+    it "is allowed if grades are posted ", priority: "1" do # test_id: 3503489
+      @moderated_assignment.update!(grades_published_at: Time.zone.now)
+      @moderated_assignment.unmute!
+      refresh_page
+      Gradezilla::Cells.edit_grade(@student_1, @moderated_assignment, "20,000")
+      expect(Gradezilla::Cells.get_grade(@student_1, @moderated_assignment)).to eq '20000'
+    end
+  end
+
   context 'with grading periods' do
     before(:once) do
       root_account = @course.root_account = Account.default

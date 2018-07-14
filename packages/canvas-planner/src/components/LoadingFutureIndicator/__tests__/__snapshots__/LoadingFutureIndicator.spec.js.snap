@@ -56,6 +56,7 @@ exports[`renders loading when indicated 1`] = `
       display="auto"
     >
       <Spinner
+        as="div"
         margin="0 x-small 0 0"
         size="small"
         title="Loading..."

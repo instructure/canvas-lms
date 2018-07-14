@@ -56,7 +56,7 @@ describe ContentZipper do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
       att0 = json_parse['attachment']['id']
 
-      @course.enable_feature! :anonymous_grading
+      @assignment.update!(anonymous_grading: true)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
       att1 = json_parse['attachment']['id']
 

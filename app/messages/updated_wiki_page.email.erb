@@ -3,10 +3,10 @@
 <% end %>
 
 <% define_content :subject do %>
-  <%= t :subject, "Updated Wiki Page: %{title}, %{user}", :title => asset.title.titleize, :user => asset.context.name %>
+  <%= t :subject, "Updated Page: %{title}, %{user}", :title => asset.title.titleize, :user => asset.context.name %>
 <% end %>
 
-<%= t :body, "A page has been updated on the wiki for %{title} that may make your life easier.", :title => asset.context.name %>
+<%= t :body, "The page %{title} has been updated.", :title => asset.context.name %>
 
 <%= asset.title.titleize %>
 

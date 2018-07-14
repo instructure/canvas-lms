@@ -101,6 +101,20 @@ describe RoleOverride do
     }.to_not raise_error
   end
 
+  it "should update the roles updated_at timestamp on save" do
+    account = account_model(:parent_account => Account.default)
+    role = teacher_role
+    role_override = RoleOverride.create!(:context => account, :permission => 'moderate_forum',
+                                         :role => role, :enabled => false)
+    role.update!(updated_at: 1.day.ago)
+    old_updated_at = role.updated_at
+
+    role_override.update!(enabled: true)
+    new_updated_at = role.updated_at
+
+    expect(old_updated_at).not_to eq(new_updated_at)
+  end
+
   describe "student view permissions" do
     it "should mirror student permissions" do
       permission = 'comment_on_others_submissions'
@@ -523,16 +537,6 @@ describe RoleOverride do
       it 'is available to account admins, account memberships, teachers, and TAs' do
         expect(permission[:available_to]).to match_array %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment)
       end
-
-      it 'is allowed when Anonymous Moderated Marking is enabled for the account' do
-        @account.root_account.enable_feature!(:anonymous_moderated_marking)
-        expect(permission[:account_allows].call(@account)).to be true
-      end
-
-      it 'is not allowed when Anonymous Moderated Marking is disabled for the account' do
-        @account.root_account.disable_feature!(:anonymous_moderated_marking)
-        expect(permission[:account_allows].call(@account)).to be false
-      end
     end
 
     describe 'view_audit_trail' do
@@ -545,16 +549,28 @@ describe RoleOverride do
       it 'is available to teachers, TAs, admins and account memberships' do
         expect(permission[:available_to]).to match_array %w(TeacherEnrollment AccountAdmin AccountMembership)
       end
+    end
+  end
 
-      it 'is allowed when Anonymous Moderated Marking is enabled for the account' do
-        @account.root_account.enable_feature!(:anonymous_moderated_marking)
-        expect(permission[:account_allows].call(@account)).to be true
-      end
+  describe 'v2 permissions labels' do
+    before :each do
+      @account = account_model(:parent_account => Account.default)
+    end
 
-      it 'is not allowed when Anonymous Moderated Marking is disabled for the account' do
-        @account.root_account.disable_feature!(:anonymous_moderated_marking)
-        expect(permission[:account_allows].call(@account)).to be false
-      end
+    it 'uses original labels when permissions v2 feature flag is off' do
+      @account.root_account.disable_feature!(:permissions_v2_ui)
+      expect(RoleOverride.v2_labels(@account, true)).to be false
+      expect(RoleOverride.v2_labels(@account, false)).to be false
+    end
+
+    it 'uses original labels when feature flag is on and there is no v2 label' do
+      @account.root_account.enable_feature!(:permissions_v2_ui)
+       expect(RoleOverride.v2_labels(@account, false)).to be false
+    end
+
+    it 'uses v2 labels when the feature flag is on and there is a v2 label' do
+      @account.root_account.enable_feature!(:permissions_v2_ui)
+       expect(RoleOverride.v2_labels(@account, true)).to be true
     end
   end
 end

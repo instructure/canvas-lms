@@ -17,7 +17,7 @@
  */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import Alert from '@instructure/ui-core/lib/components/Alert';
+import Alert from '@instructure/ui-alerts/lib/components/Alert';
 
 export default class ErrorAlert extends Component {
   static propTypes = {

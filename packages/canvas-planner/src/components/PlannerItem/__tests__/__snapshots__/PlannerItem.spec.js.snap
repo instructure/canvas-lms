@@ -34,81 +34,11 @@ exports[`renders Announcement correctly with everything 1`] = `
       }
     }
   >
-    <IconAnnouncementLine />
+    <IconAnnouncement />
   </div>
   <div>
     <div>
       <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          A Course about being Diffrient Announcement
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Announcement I am an Announcement, at Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am an Announcement
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
-      <div>
-        <div>
-          <Text
-            as="span"
-            color="secondary"
-            letterSpacing="normal"
-            size="medium"
-          >
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="large"
-            >
-              4
-            </Text>
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="x-small"
-            >
-               
-              pts
-            </Text>
-          </Text>
-        </div>
         <div>
           <Text
             as="span"
@@ -116,12 +46,85 @@ exports[`renders Announcement correctly with everything 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            A Course about being Diffrient Announcement
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Announcement I am an Announcement, at Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am an Announcement
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="medium"
+            >
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="large"
+              >
+                4
+              </Text>
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="x-small"
+              >
+                 
+                pts
+              </Text>
+            </Text>
+          </div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -163,56 +166,10 @@ exports[`renders Announcement correctly with just date 1`] = `
       }
     }
   >
-    <IconAnnouncementLine />
+    <IconAnnouncement />
   </div>
   <div>
     <div>
-      <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          A Course about being Diffrient Announcement
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Announcement I am an Announcement, at Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am an Announcement
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
       <div>
         <div>
           <Text
@@ -221,12 +178,61 @@ exports[`renders Announcement correctly with just date 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            A Course about being Diffrient Announcement
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Announcement I am an Announcement, at Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am an Announcement
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -268,81 +274,11 @@ exports[`renders Announcement correctly with just points 1`] = `
       }
     }
   >
-    <IconAnnouncementLine />
+    <IconAnnouncement />
   </div>
   <div>
     <div>
       <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          A Course about being Diffrient Announcement
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Announcement I am an Announcement, at Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am an Announcement
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
-      <div>
-        <div>
-          <Text
-            as="span"
-            color="secondary"
-            letterSpacing="normal"
-            size="medium"
-          >
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="large"
-            >
-              2
-            </Text>
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="x-small"
-            >
-               
-              pts
-            </Text>
-          </Text>
-        </div>
         <div>
           <Text
             as="span"
@@ -350,12 +286,85 @@ exports[`renders Announcement correctly with just points 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            A Course about being Diffrient Announcement
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Announcement I am an Announcement, at Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am an Announcement
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="medium"
+            >
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="large"
+              >
+                2
+              </Text>
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="x-small"
+              >
+                 
+                pts
+              </Text>
+            </Text>
+          </div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -397,56 +406,10 @@ exports[`renders Announcement correctly without right side content 1`] = `
       }
     }
   >
-    <IconAnnouncementLine />
+    <IconAnnouncement />
   </div>
   <div>
     <div>
-      <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          A Course about being Diffrient Announcement
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Announcement I am an Announcement, at Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am an Announcement
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
       <div>
         <div>
           <Text
@@ -455,12 +418,61 @@ exports[`renders Announcement correctly without right side content 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            A Course about being Diffrient Announcement
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Announcement I am an Announcement, at Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am an Announcement
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -502,81 +514,11 @@ exports[`renders Assignment correctly with everything 1`] = `
       }
     }
   >
-    <IconAssignmentLine />
+    <IconAssignment />
   </div>
   <div>
     <div>
       <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          A Course about being Diffrient Assignment
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="http://www.non_default_url.com"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Assignment I am an Assignment, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am an Assignment
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
-      <div>
-        <div>
-          <Text
-            as="span"
-            color="secondary"
-            letterSpacing="normal"
-            size="medium"
-          >
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="large"
-            >
-              4
-            </Text>
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="x-small"
-            >
-               
-              pts
-            </Text>
-          </Text>
-        </div>
         <div>
           <Text
             as="span"
@@ -584,12 +526,85 @@ exports[`renders Assignment correctly with everything 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            A Course about being Diffrient Assignment
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="http://www.non_default_url.com"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Assignment I am an Assignment, due Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              DUE: 3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am an Assignment
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="medium"
+            >
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="large"
+              >
+                4
+              </Text>
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="x-small"
+              >
+                 
+                pts
+              </Text>
+            </Text>
+          </div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                DUE: 3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -631,56 +646,10 @@ exports[`renders Assignment correctly with just date 1`] = `
       }
     }
   >
-    <IconAssignmentLine />
+    <IconAssignment />
   </div>
   <div>
     <div>
-      <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          A Course about being Diffrient Assignment
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Assignment I am an Assignment, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am an Assignment
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
       <div>
         <div>
           <Text
@@ -689,12 +658,61 @@ exports[`renders Assignment correctly with just date 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            A Course about being Diffrient Assignment
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Assignment I am an Assignment, due Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              DUE: 3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am an Assignment
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                DUE: 3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -736,81 +754,11 @@ exports[`renders Assignment correctly with just points 1`] = `
       }
     }
   >
-    <IconAssignmentLine />
+    <IconAssignment />
   </div>
   <div>
     <div>
       <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          A Course about being Diffrient Assignment
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Assignment I am an Assignment, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am an Assignment
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
-      <div>
-        <div>
-          <Text
-            as="span"
-            color="secondary"
-            letterSpacing="normal"
-            size="medium"
-          >
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="large"
-            >
-              2
-            </Text>
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="x-small"
-            >
-               
-              pts
-            </Text>
-          </Text>
-        </div>
         <div>
           <Text
             as="span"
@@ -818,12 +766,85 @@ exports[`renders Assignment correctly with just points 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            A Course about being Diffrient Assignment
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Assignment I am an Assignment, due Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              DUE: 3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am an Assignment
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="medium"
+            >
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="large"
+              >
+                2
+              </Text>
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="x-small"
+              >
+                 
+                pts
+              </Text>
+            </Text>
+          </div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                DUE: 3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -865,56 +886,10 @@ exports[`renders Assignment correctly without right side content 1`] = `
       }
     }
   >
-    <IconAssignmentLine />
+    <IconAssignment />
   </div>
   <div>
     <div>
-      <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          A Course about being Diffrient Assignment
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Assignment I am an Assignment, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am an Assignment
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
       <div>
         <div>
           <Text
@@ -923,12 +898,61 @@ exports[`renders Assignment correctly without right side content 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            A Course about being Diffrient Assignment
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Assignment I am an Assignment, due Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              DUE: 3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am an Assignment
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                DUE: 3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -970,56 +994,10 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
       }
     }
   >
-    <IconCalendarMonthLine />
+    <IconCalendarMonth />
   </div>
   <div>
     <div>
-      <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          A Course about being Diffrient Calendar Event
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Calendar Event I am a Calendar Event, on December 17, 2011.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Calendar Event
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
       <div>
         <div>
           <Text
@@ -1028,12 +1006,61 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            A Course about being Diffrient Calendar Event
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Calendar Event I am a Calendar Event, on December 17, 2011.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              All Day
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am a Calendar Event
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                All Day
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -1075,81 +1102,11 @@ exports[`renders Calendar Event correctly with everything 1`] = `
       }
     }
   >
-    <IconCalendarMonthLine />
+    <IconCalendarMonth />
   </div>
   <div>
     <div>
       <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          A Course about being Diffrient Calendar Event
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Calendar Event I am a Calendar Event, at Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Calendar Event
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
-      <div>
-        <div>
-          <Text
-            as="span"
-            color="secondary"
-            letterSpacing="normal"
-            size="medium"
-          >
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="large"
-            >
-              4
-            </Text>
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="x-small"
-            >
-               
-              pts
-            </Text>
-          </Text>
-        </div>
         <div>
           <Text
             as="span"
@@ -1157,12 +1114,85 @@ exports[`renders Calendar Event correctly with everything 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            A Course about being Diffrient Calendar Event
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Calendar Event I am a Calendar Event, at Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am a Calendar Event
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="medium"
+            >
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="large"
+              >
+                4
+              </Text>
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="x-small"
+              >
+                 
+                pts
+              </Text>
+            </Text>
+          </div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -1204,56 +1234,10 @@ exports[`renders Calendar Event correctly with just date 1`] = `
       }
     }
   >
-    <IconCalendarMonthLine />
+    <IconCalendarMonth />
   </div>
   <div>
     <div>
-      <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          A Course about being Diffrient Calendar Event
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Calendar Event I am a Calendar Event, at Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Calendar Event
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
       <div>
         <div>
           <Text
@@ -1262,12 +1246,61 @@ exports[`renders Calendar Event correctly with just date 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            A Course about being Diffrient Calendar Event
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Calendar Event I am a Calendar Event, at Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am a Calendar Event
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -1309,56 +1342,10 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
       }
     }
   >
-    <IconCalendarMonthLine />
+    <IconCalendarMonth />
   </div>
   <div>
     <div>
-      <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          A Course about being Diffrient Calendar Event
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Calendar Event I am a Calendar Event, at Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Calendar Event
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
       <div>
         <div>
           <Text
@@ -1367,12 +1354,61 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            A Course about being Diffrient Calendar Event
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Calendar Event I am a Calendar Event, at Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am a Calendar Event
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -1414,81 +1450,11 @@ exports[`renders Discussion correctly with everything 1`] = `
       }
     }
   >
-    <IconDiscussionLine />
+    <IconDiscussion />
   </div>
   <div>
     <div>
       <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          A Course about being Diffrient Discussion
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Discussion I am a Discussion, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Discussion
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
-      <div>
-        <div>
-          <Text
-            as="span"
-            color="secondary"
-            letterSpacing="normal"
-            size="medium"
-          >
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="large"
-            >
-              4
-            </Text>
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="x-small"
-            >
-               
-              pts
-            </Text>
-          </Text>
-        </div>
         <div>
           <Text
             as="span"
@@ -1496,12 +1462,85 @@ exports[`renders Discussion correctly with everything 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            A Course about being Diffrient Discussion
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Discussion I am a Discussion, due Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              DUE: 3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am a Discussion
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="medium"
+            >
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="large"
+              >
+                4
+              </Text>
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="x-small"
+              >
+                 
+                pts
+              </Text>
+            </Text>
+          </div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                DUE: 3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -1543,56 +1582,10 @@ exports[`renders Discussion correctly with just date 1`] = `
       }
     }
   >
-    <IconDiscussionLine />
+    <IconDiscussion />
   </div>
   <div>
     <div>
-      <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          A Course about being Diffrient Discussion
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Discussion I am a Discussion, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Discussion
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
       <div>
         <div>
           <Text
@@ -1601,12 +1594,61 @@ exports[`renders Discussion correctly with just date 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            A Course about being Diffrient Discussion
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Discussion I am a Discussion, due Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              DUE: 3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am a Discussion
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                DUE: 3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -1648,81 +1690,11 @@ exports[`renders Discussion correctly with just points 1`] = `
       }
     }
   >
-    <IconDiscussionLine />
+    <IconDiscussion />
   </div>
   <div>
     <div>
       <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          A Course about being Diffrient Discussion
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Discussion I am a Discussion, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Discussion
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
-      <div>
-        <div>
-          <Text
-            as="span"
-            color="secondary"
-            letterSpacing="normal"
-            size="medium"
-          >
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="large"
-            >
-              2
-            </Text>
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="x-small"
-            >
-               
-              pts
-            </Text>
-          </Text>
-        </div>
         <div>
           <Text
             as="span"
@@ -1730,12 +1702,85 @@ exports[`renders Discussion correctly with just points 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            A Course about being Diffrient Discussion
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Discussion I am a Discussion, due Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              DUE: 3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am a Discussion
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="medium"
+            >
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="large"
+              >
+                2
+              </Text>
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="x-small"
+              >
+                 
+                pts
+              </Text>
+            </Text>
+          </div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                DUE: 3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -1777,56 +1822,10 @@ exports[`renders Discussion correctly without right side content 1`] = `
       }
     }
   >
-    <IconDiscussionLine />
+    <IconDiscussion />
   </div>
   <div>
     <div>
-      <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          A Course about being Diffrient Discussion
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Discussion I am a Discussion, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Discussion
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
       <div>
         <div>
           <Text
@@ -1835,12 +1834,61 @@ exports[`renders Discussion correctly without right side content 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            A Course about being Diffrient Discussion
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Discussion I am a Discussion, due Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              DUE: 3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am a Discussion
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                DUE: 3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -1882,56 +1930,10 @@ exports[`renders Note correctly with Group 1`] = `
       }
     }
   >
-    <IconMsWordLine />
+    <IconMsWord />
   </div>
   <div>
     <div>
-      <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          Account-level group 1 Page
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="/groups/9/pages/this-is-an-account-level-group-page"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Page this is an account-level group page, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              this is an account-level group page
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
       <div>
         <div>
           <Text
@@ -1940,12 +1942,61 @@ exports[`renders Note correctly with Group 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            Account-level group 1 Page
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="/groups/9/pages/this-is-an-account-level-group-page"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Page this is an account-level group page, due Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              DUE: 3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                this is an account-level group page
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                DUE: 3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -1998,52 +2049,6 @@ exports[`renders Note correctly with everything 1`] = `
   <div>
     <div>
       <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          Math 101 TO DO
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Task I am a Note, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Note
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
-      <div>
         <div>
           <Text
             as="span"
@@ -2051,12 +2056,61 @@ exports[`renders Note correctly with everything 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            Math 101 TO DO
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Task I am a Note, due Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              DUE: 3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am a Note
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                DUE: 3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -2109,52 +2163,6 @@ exports[`renders Note correctly without Course 1`] = `
   <div>
     <div>
       <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-           Note
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Note I am a Note, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Note
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
-      <div>
         <div>
           <Text
             as="span"
@@ -2162,12 +2170,61 @@ exports[`renders Note correctly without Course 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+             Note
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Note I am a Note, due Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              DUE: 3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am a Note
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                DUE: 3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -2209,81 +2266,11 @@ exports[`renders Page correctly with everything 1`] = `
       }
     }
   >
-    <IconMsWordLine />
+    <IconMsWord />
   </div>
   <div>
     <div>
       <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          A Course about being Diffrient Page
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Page I am a Page, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Page
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
-      <div>
-        <div>
-          <Text
-            as="span"
-            color="secondary"
-            letterSpacing="normal"
-            size="medium"
-          >
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="large"
-            >
-              4
-            </Text>
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="x-small"
-            >
-               
-              pts
-            </Text>
-          </Text>
-        </div>
         <div>
           <Text
             as="span"
@@ -2291,12 +2278,85 @@ exports[`renders Page correctly with everything 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            A Course about being Diffrient Page
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Page I am a Page, due Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              DUE: 3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am a Page
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="medium"
+            >
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="large"
+              >
+                4
+              </Text>
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="x-small"
+              >
+                 
+                pts
+              </Text>
+            </Text>
+          </div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                DUE: 3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -2338,56 +2398,10 @@ exports[`renders Page correctly with just date 1`] = `
       }
     }
   >
-    <IconMsWordLine />
+    <IconMsWord />
   </div>
   <div>
     <div>
-      <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-           Page
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Page I am a Page, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Page
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
       <div>
         <div>
           <Text
@@ -2396,12 +2410,61 @@ exports[`renders Page correctly with just date 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+             Page
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Page I am a Page, due Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              DUE: 3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am a Page
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                DUE: 3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -2443,81 +2506,11 @@ exports[`renders Page correctly with just points 1`] = `
       }
     }
   >
-    <IconMsWordLine />
+    <IconMsWord />
   </div>
   <div>
     <div>
       <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          A Course about being Diffrient Page
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Page I am a Page, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Page
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
-      <div>
-        <div>
-          <Text
-            as="span"
-            color="secondary"
-            letterSpacing="normal"
-            size="medium"
-          >
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="large"
-            >
-              2
-            </Text>
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="x-small"
-            >
-               
-              pts
-            </Text>
-          </Text>
-        </div>
         <div>
           <Text
             as="span"
@@ -2525,12 +2518,85 @@ exports[`renders Page correctly with just points 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            A Course about being Diffrient Page
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Page I am a Page, due Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              DUE: 3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am a Page
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="medium"
+            >
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="large"
+              >
+                2
+              </Text>
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="x-small"
+              >
+                 
+                pts
+              </Text>
+            </Text>
+          </div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                DUE: 3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -2572,56 +2638,10 @@ exports[`renders Page correctly without right side content 1`] = `
       }
     }
   >
-    <IconMsWordLine />
+    <IconMsWord />
   </div>
   <div>
     <div>
-      <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          A Course about being Diffrient Page
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Page I am a Page, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Page
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
       <div>
         <div>
           <Text
@@ -2630,12 +2650,61 @@ exports[`renders Page correctly without right side content 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            A Course about being Diffrient Page
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Page I am a Page, due Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              DUE: 3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am a Page
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                DUE: 3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -2677,81 +2746,11 @@ exports[`renders Quiz correctly with everything 1`] = `
       }
     }
   >
-    <IconQuizLine />
+    <IconQuiz />
   </div>
   <div>
     <div>
       <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          A Course about being Diffrient Quiz
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Quiz I am a Quiz, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Quiz
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
-      <div>
-        <div>
-          <Text
-            as="span"
-            color="secondary"
-            letterSpacing="normal"
-            size="medium"
-          >
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="large"
-            >
-              4
-            </Text>
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="x-small"
-            >
-               
-              pts
-            </Text>
-          </Text>
-        </div>
         <div>
           <Text
             as="span"
@@ -2759,12 +2758,85 @@ exports[`renders Quiz correctly with everything 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            A Course about being Diffrient Quiz
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Quiz I am a Quiz, due Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              DUE: 3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am a Quiz
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="medium"
+            >
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="large"
+              >
+                4
+              </Text>
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="x-small"
+              >
+                 
+                pts
+              </Text>
+            </Text>
+          </div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                DUE: 3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -2806,56 +2878,10 @@ exports[`renders Quiz correctly with just date 1`] = `
       }
     }
   >
-    <IconQuizLine />
+    <IconQuiz />
   </div>
   <div>
     <div>
-      <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          A Course about being Diffrient Quiz
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Quiz I am a Quiz, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Quiz
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
       <div>
         <div>
           <Text
@@ -2864,12 +2890,61 @@ exports[`renders Quiz correctly with just date 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            A Course about being Diffrient Quiz
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Quiz I am a Quiz, due Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              DUE: 3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am a Quiz
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                DUE: 3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -2911,81 +2986,11 @@ exports[`renders Quiz correctly with just points 1`] = `
       }
     }
   >
-    <IconQuizLine />
+    <IconQuiz />
   </div>
   <div>
     <div>
       <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          A Course about being Diffrient Quiz
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Quiz I am a Quiz, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Quiz
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
-      <div>
-        <div>
-          <Text
-            as="span"
-            color="secondary"
-            letterSpacing="normal"
-            size="medium"
-          >
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="large"
-            >
-              2
-            </Text>
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="x-small"
-            >
-               
-              pts
-            </Text>
-          </Text>
-        </div>
         <div>
           <Text
             as="span"
@@ -2993,12 +2998,85 @@ exports[`renders Quiz correctly with just points 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            A Course about being Diffrient Quiz
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Quiz I am a Quiz, due Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              DUE: 3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am a Quiz
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="medium"
+            >
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="large"
+              >
+                2
+              </Text>
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="x-small"
+              >
+                 
+                pts
+              </Text>
+            </Text>
+          </div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                DUE: 3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -3040,56 +3118,10 @@ exports[`renders Quiz correctly without right side content 1`] = `
       }
     }
   >
-    <IconQuizLine />
+    <IconQuiz />
   </div>
   <div>
     <div>
-      <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          A Course about being Diffrient Quiz
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Quiz I am a Quiz, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              I am a Quiz
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
       <div>
         <div>
           <Text
@@ -3098,12 +3130,61 @@ exports[`renders Quiz correctly without right side content 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            A Course about being Diffrient Quiz
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Quiz I am a Quiz, due Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              DUE: 3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                I am a Quiz
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                DUE: 3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
@@ -3145,81 +3226,11 @@ exports[`renders correctly 1`] = `
       }
     }
   >
-    <IconAssignmentLine />
+    <IconAssignment />
   </div>
   <div>
     <div>
       <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          A Course about being Diffrient Assignment
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Assignment This Assignment is about awesome stuff, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              This Assignment is about awesome stuff
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
-      <div>
-        <div>
-          <Text
-            as="span"
-            color="secondary"
-            letterSpacing="normal"
-            size="medium"
-          >
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="large"
-            >
-              35
-            </Text>
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="x-small"
-            >
-               
-              pts
-            </Text>
-          </Text>
-        </div>
         <div>
           <Text
             as="span"
@@ -3227,14 +3238,216 @@ exports[`renders correctly 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            A Course about being Diffrient Assignment
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Assignment This Assignment is about awesome stuff, due Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              DUE: 3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                This Assignment is about awesome stuff
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
         </div>
       </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="medium"
+            >
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="large"
+              >
+                35
+              </Text>
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="x-small"
+              >
+                 
+                pts
+              </Text>
+            </Text>
+          </div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                DUE: 3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`renders feedback if available 1`] = `
+<div
+  className="planner-item"
+>
+  <div>
+    <ApplyTheme
+      immutable={false}
+      theme={Object {}}
+    >
+      <Checkbox
+        checked={false}
+        disabled={false}
+        inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Assignment This Assignment is about awesome stuff is not marked as done.
+          </ScreenReaderContent>
+        }
+        onChange={[Function]}
+        size="medium"
+        variant="simple"
+      />
+    </ApplyTheme>
+  </div>
+  <div
+    aria-hidden="true"
+    style={
+      Object {
+        "color": "#d71f85",
+      }
+    }
+  >
+    <IconAssignment />
+  </div>
+  <div>
+    <div>
+      <div>
+        <div>
+          <Text
+            as="span"
+            color="secondary"
+            letterSpacing="normal"
+            size="x-small"
+          >
+            A Course about being Diffrient Assignment
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Assignment This Assignment is about awesome stuff, due Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
+            <PresentationContent
+              as="span"
+            >
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                This Assignment is about awesome stuff
+              </Text>
+            </PresentationContent>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                DUE: 3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <span>
+        <Avatar
+          inline={true}
+          name="Boyd Crowder"
+          size="small"
+          src="/avatar/is/here/"
+          variant="circle"
+        />
+      </span>
+      <span>
+        <Text
+          as="span"
+          fontStyle="italic"
+          letterSpacing="normal"
+          size="medium"
+        >
+          Death will not be the end of your suffering.
+        </Text>
+      </span>
     </div>
   </div>
 </div>
@@ -3285,52 +3498,6 @@ exports[`renders user-created Todo correctly 1`] = `
   <div>
     <div>
       <div>
-        <Text
-          as="span"
-          color="secondary"
-          letterSpacing="normal"
-          size="x-small"
-        >
-          To Do TO DO
-        </Text>
-      </div>
-      <div
-        style={
-          Object {
-            "position": "relative",
-          }
-        }
-      >
-        <Link
-          as="button"
-          ellipsis={false}
-          href="#"
-          linkRef={[Function]}
-          variant="default"
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            Task do that one thing, due Saturday, December 17, 2011 3:30 AM.
-          </ScreenReaderContent>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              color="primary"
-              letterSpacing="normal"
-              size="medium"
-            >
-              do that one thing
-            </Text>
-          </PresentationContent>
-        </Link>
-      </div>
-    </div>
-    <div>
-      <div />
-      <div>
         <div>
           <Text
             as="span"
@@ -3338,12 +3505,61 @@ exports[`renders user-created Todo correctly 1`] = `
             letterSpacing="normal"
             size="x-small"
           >
+            To Do TO DO
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={false}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Task do that one thing, due Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
             <PresentationContent
               as="span"
             >
-              DUE: 3:30 AM
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                do that one thing
+              </Text>
             </PresentationContent>
-          </Text>
+          </Link>
+        </div>
+      </div>
+      <div>
+        <div />
+        <div>
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                DUE: 3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
         </div>
       </div>
     </div>

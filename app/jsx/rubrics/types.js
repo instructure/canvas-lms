@@ -20,13 +20,15 @@ import PropTypes from 'prop-types'
 export const tierShape = {
   points: PropTypes.number,
   description: PropTypes.string,
-  long_description: PropTypes.string
+  long_description: PropTypes.string,
+  endOfRangePoints: PropTypes.number
 }
 
 export const ratingShape = {
   tiers: PropTypes.arrayOf(PropTypes.shape(tierShape)).isRequired,
   points: PropTypes.number,
-  masteryThreshold: PropTypes.number
+  defaultMasteryThreshold: PropTypes.number,
+  useRange: PropTypes.bool.isRequired
 }
 
 export const assessmentShape = {

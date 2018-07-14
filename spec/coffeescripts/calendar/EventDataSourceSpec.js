@@ -32,7 +32,7 @@ QUnit.module('EventDataSource: getEvents', {
 
     // create the data source with a couple of recognized contexts. we'll use
     // those same context codes in querying
-    this.source = new EventDataSource([{asset_string: 'course_1'}, {asset_string: 'course_2'}])
+    this.source = new EventDataSource([{asset_string: 'course_1'}, {asset_string: 'course_2'}, {asset_string: 'group_1'}])
     this.contexts = ['course_1', 'course_2']
 
     // a container for stubbing queries, along with helpers to populate
@@ -65,16 +65,17 @@ QUnit.module('EventDataSource: getEvents', {
           }
         })
       },
-      addPlannerItem(course_id, plannable_type, plannable_id, title, todo_date) {
-        return this.calendarEvents.push({
-          course_id,
+      addPlannerItem(context_type, context_id, plannable_type, plannable_id, title, todo_date) {
+        const item = {
           plannable_type,
           plannable_id,
           plannable: {
             title,
             todo_date
           }
-        })
+        }
+        item[`${context_type}_id`] = context_id
+        return this.calendarEvents.push(item)
       }
     }
 
@@ -277,9 +278,9 @@ test('indexParams filters appointment_group_ids from params', function() {
   equal(p.appointment_group_ids, '2,1337')
 })
 
-test('transforms planner item', function() {
+test('transforms course planner item', function() {
   const date = fcUtil.unwrap(this.date2).toISOString()
-  this.server.addPlannerItem(1, 'discussion_topic', 3, 'blah', date)
+  this.server.addPlannerItem('course', 1, 'discussion_topic', 3, 'blah', date)
   this.source.getEvents(this.date1, this.date4, this.contexts, events => {
     equal(events.length, 1)
     const event = events[0].calendarEvent
@@ -288,6 +289,23 @@ test('transforms planner item', function() {
     equal(event.start_at, date)
     equal(event.end_at, date)
     equal(event.type, 'discussion_topic')
+    equal(event.id, 'discussion_topic_3')
     equal(event.title, 'blah')
+  })
+})
+
+test('transforms group planner item', function() {
+  const date = fcUtil.unwrap(this.date2).toISOString()
+  this.server.addPlannerItem('group', 1, 'assignment', 4, 'bleh', date)
+  this.source.getEvents(this.date1, this.date4, ["group_1"], events => {
+    equal(events.length, 1)
+    const event = events[0].calendarEvent
+    equal(event.context_code, 'group_1')
+    equal(event.all_context_codes, 'group_1')
+    equal(event.start_at, date)
+    equal(event.end_at, date)
+    equal(event.type, 'assignment')
+    equal(event.id, 'assignment_4')
+    equal(event.title, 'bleh')
   })
 })

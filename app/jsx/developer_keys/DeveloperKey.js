@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import classNames from 'classnames'
 import $ from 'jquery'
 import 'jquery.instructure_date_and_time'
 import 'jqueryui/dialog'
@@ -26,6 +25,7 @@ import PropTypes from 'prop-types'
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
+import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
 import Popover, { PopoverTrigger, PopoverContent } from '@instructure/ui-overlays/lib/components/Popover'
 import Image from '@instructure/ui-elements/lib/components/Img'
 import Link from '@instructure/ui-elements/lib/components/Link'
@@ -61,17 +61,15 @@ class DeveloperKey extends React.Component {
     )
   }
 
-  developerName () {
+  getToolName () {
     return this.props.developerKey.name || I18n.t('Unnamed Tool')
   }
 
-  userName (developerKey) {
-    if (developerKey.user_name) {
-      return developerKey.user_name
-    } else if(developerKey.email) {
-      return I18n.t('Name Missing')
+  ownerEmail (developerKey) {
+    if(developerKey.email) {
+      return developerKey.email
     }
-    return I18n.t('No User')
+    return I18n.t('No Email')
   }
 
   isActive (developerKey) {
@@ -90,20 +88,28 @@ class DeveloperKey extends React.Component {
 
   makeImage (developerKey) {
     if (developerKey.icon_url) {
-      return <span className="icon">
+      return <FlexItem padding="0 xx-small 0 0">
         <Image
           src={developerKey.icon_url}
-          alt={I18n.t("%{developerName} Logo", {developerName: this.developerName()})}
+          cover
+          width="4rem"
+          height="4rem"
+          margin="xxx-small xx-small xxx-small"
+          alt={I18n.t("%{toolName} Logo", {toolName: this.getToolName()})}
         />
-      </span>
+      </FlexItem>
     }
-    return <span className="emptyIconImage" />
+    return <View
+      as="div"
+      height="4rem"
+      width="4rem"
+    />
   }
 
   makeUserLink (developerKey) {
-    const name = this.userName(developerKey)
-    if (!developerKey.user_id) { return name }
-    return (<Link href={`/users/${developerKey.user_id}`}>{name}</Link> );
+    const email = this.ownerEmail(developerKey)
+    if (!developerKey.user_id) { return email }
+    return (<Link href={`/users/${developerKey.user_id}`}>{email}</Link> );
   }
 
   redirectURI (developerKey) {
@@ -127,19 +133,20 @@ class DeveloperKey extends React.Component {
   }
 
   refActionButtons = (link) => { this.actionButtons = link; }
-  refKeyName = (link) => { this.keyName = link; }
   refToggleGroup = (link) => { this.toggleGroup = link }
 
   render () {
     const { developerKey, inherited } = this.props;
 
     return (
-      <tr className={classNames('key', { inactive: !this.isActive(developerKey) })}>
-        <td className="name">
-          {this.makeImage(developerKey)}
-          <span ref={this.refKeyName}>
-            {this.developerName(developerKey)}
-          </span>
+      <tr>
+        <td>
+          <Flex>
+            {this.makeImage(developerKey)}
+            <FlexItem shrink="true">
+            {this.getToolName(developerKey)}
+            </FlexItem>
+          </Flex>
         </td>
 
         {!inherited &&
@@ -147,14 +154,14 @@ class DeveloperKey extends React.Component {
             <div>
               {this.makeUserLink(developerKey)}
             </div>
-            <div>
-              {developerKey.email}
-            </div>
           </td>
         }
 
         <td>
-          <div className="details">
+          <View
+            maxWidth="200px"
+            as="div"
+          >
             <div>
               {developerKey.id}
             </div>
@@ -179,7 +186,7 @@ class DeveloperKey extends React.Component {
                           I18n.t('Show Key')
                       }
                       <ScreenReaderContent>
-                        {this.developerName()}
+                        {this.getToolName()}
                       </ScreenReaderContent>
                     </Button>
                   </PopoverTrigger>
@@ -204,7 +211,7 @@ class DeveloperKey extends React.Component {
                 {this.redirectURI(developerKey)}
               </div>
             }
-          </div>
+          </View>
         </td>
 
         {!inherited &&
@@ -231,14 +238,14 @@ class DeveloperKey extends React.Component {
           />
         </td>
         {!inherited &&
-          <td className="icon_react">
+          <td>
             <DeveloperKeyActionButtons
               ref={this.refActionButtons}
               dispatch={this.props.store.dispatch}
               {...this.props.actions}
               developerKey={this.props.developerKey}
               visible={this.props.developerKey.visible}
-              developerName={this.developerName()}
+              toolName={this.getToolName()}
               onDelete={this.handleDelete}
               showVisibilityToggle={this.isSiteAdmin}
             />
@@ -259,7 +266,7 @@ DeveloperKey.propTypes = {
     activateDeveloperKey: PropTypes.func.isRequired,
     deactivateDeveloperKey: PropTypes.func.isRequired,
     deleteDeveloperKey: PropTypes.func.isRequired,
-    setEditingDeveloperKey: PropTypes.func.isRequired,
+    editDeveloperKey: PropTypes.func.isRequired,
     developerKeysModalOpen: PropTypes.func.isRequired
   }).isRequired,
   developerKey: PropTypes.shape({

@@ -154,7 +154,6 @@ module RubricsCommon
     f('.outcome-link').click
     wait_for_ajaximations
     f('.ui-dialog .btn-primary').click
-    accept_alert
     wait_for_ajaximations
   end
 end

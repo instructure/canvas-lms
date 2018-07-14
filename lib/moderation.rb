@@ -18,7 +18,7 @@
 module Moderation
   def create_moderation_selections_for_assignment(assignment_id, student_ids, student_context)
     assignment = Assignment.find(assignment_id)
-    return unless assignment.root_account.feature_enabled?(:anonymous_moderated_marking) && assignment.moderated_grading
+    return unless assignment.moderated_grading
 
     # Add selections for students in Student IDs
     already_moderated_ids = assignment.moderated_grading_selections.pluck(:student_id)

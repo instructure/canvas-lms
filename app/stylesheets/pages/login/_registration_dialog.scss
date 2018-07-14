@@ -26,6 +26,11 @@
   .registration-dialog .spinner {
     width: 100px;
   }
+
+  .ic-Label {
+    font-weight: normal;
+    font-size: 14px;
+  }
 }
 
 .terms-of-service__register {
@@ -39,4 +44,13 @@
 
 .terms-of-service__link {
   padding-#{direction(left)}: 4px;
+}
+
+.pairing-code-text {
+  display: flex;
+  justify-content: space-between;
+
+  a {
+    font-size: 14px;
+  }
 }

@@ -16,16 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import { handleActions } from 'redux-actions';
-import _ from 'lodash';
+import { cloneDeep } from 'lodash';
 
 function setOpportunityState(state, action) {
-  return {items: [...state.items, ...action.payload.items], nextUrl: action.payload.nextUrl};
+  // merge payload into state, ignoring duplicates
+  // this approach favors the existing item over the new
+  const opportunities = [...state.items].concat(action.payload.items.filter(
+    payitem => state.items.findIndex(stateitem => stateitem.id === payitem.id) < 0)
+  );
+  return {
+    items: opportunities,
+    nextUrl: action.payload.nextUrl
+  };
 }
 
 export default handleActions({
   ADD_OPPORTUNITIES: setOpportunityState,
   DISMISSED_OPPORTUNITY: (state, action) => {
-    let stateCopy = _.cloneDeep(state);
+    let stateCopy = cloneDeep(state);
     let dismissedOpportunity = stateCopy.items.find((opportunity) => opportunity.id === action.payload.plannable_id + "");
     if (dismissedOpportunity.planner_override) {
       dismissedOpportunity.planner_override.dismissed = action.payload.dismissed;

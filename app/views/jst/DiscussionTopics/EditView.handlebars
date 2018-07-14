@@ -228,24 +228,7 @@
                   aria-controls="todo_date_input"}}
                 {{#t}}Add to student to-do{{/t}}
               </label>
-              <div id="todo_date_input" style="{{hiddenUnless allow_todo_date}}; margin-left: 20px;">
-                <label for="todo_date">
-                  {{#t}}Date{{/t}}
-                </label>
-                <label class="screenreader-only" id="discussion_topic_todo_date_accessible_label">
-                  {{#t}}Discussion Topic will show on student to-do list for date{{/t}}
-                  {{datepickerScreenreaderPrompt}}
-                </label>
-                <input type="text"
-                       class="datetime_field input-medium"
-                       name="todo_date"
-                       id="todo_date"
-                       aria-labelledby="discussion_topic_todo_date_accessible_label"
-                       value="{{datetimeFormatted todo_date}}"
-                       data-tooltip='{"position":"top","force_position":"true"}'
-                       title="{{accessibleDateFormat}}"
-                />
-              </div>
+              <div id="todo_date_input" style="{{hiddenUnless allow_todo_date}}; margin-left: 20px;" />
             </div>
           {{/if}}
         {{/if}}

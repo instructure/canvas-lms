@@ -19,9 +19,17 @@
 import {number, string} from 'prop-types'
 import React from 'react'
 import I18n from 'i18n!assignments'
-import NumberInput from '@instructure/ui-core/lib/components/NumberInput'
+import NumberInput from '@instructure/ui-forms/lib/components/NumberInput'
 
 const DEFAULT_GRADER_COUNT = 2
+
+function availableGradersText(maxGraderCount) {
+  if (maxGraderCount === 1) {
+    return I18n.t('There is currently 1 available grader')
+  }
+
+  return I18n.t('There are currently %{maxGraderCount} available graders', {maxGraderCount})
+}
 
 export default class GraderCountNumberInput extends React.Component {
   static propTypes = {
@@ -48,14 +56,7 @@ export default class GraderCountNumberInput extends React.Component {
 
     const current = parseInt(newValue, 10)
     if (current > this.props.maxGraderCount) {
-      return [
-        {
-          text: I18n.t('There are currently %{max} available graders', {
-            max: this.props.maxGraderCount
-          }),
-          type: 'hint'
-        }
-      ]
+      return [{text: availableGradersText(this.props.maxGraderCount), type: 'hint'}]
     }
 
     return []

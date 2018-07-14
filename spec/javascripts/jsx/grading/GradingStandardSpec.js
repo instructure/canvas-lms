@@ -233,12 +233,29 @@ QUnit.module('GradingStandard', suiteHooks => {
       deepEqual(rowNames, ['A', 'B', '', 'C', 'D', 'F'])
     })
 
-    test('assigns no minimum score value to the inserted row', () => {
+    test('assigns a minimum score value to the inserted row between adjacent row scores', () => {
       mountComponent()
       addRowAfter(1)
       const rows = wrapper.find('.grading_standard_row')
       const rowScores = rows.map(row => row.find('input.standard_value').prop('value'))
-      deepEqual(rowScores, ['0.9', '0.8', '0', '0.7', '0.6', '0'])
+      deepEqual(rowScores, ['0.9', '0.8', '0.75', '0.7', '0.6', '0'])
+    })
+
+    test('assigns a minimum score of 0 to a row added after the last row', () => {
+      mountComponent()
+      addRowAfter(4)
+      const rows = wrapper.find('.grading_standard_row')
+      const rowScores = rows.map(row => row.find('input.standard_value').prop('value'))
+      deepEqual(rowScores, ['0.9', '0.8', '0.7', '0.6', '0', '0'])
+    })
+
+    test('uses a score of 0 when a new last row is added and the previous last row was not zero', () => {
+      mountComponent()
+      setRowMinScore(4, 0.5)
+      addRowAfter(4)
+      const rows = wrapper.find('.grading_standard_row')
+      const rowScores = rows.map(row => row.find('input.standard_value').prop('value'))
+      deepEqual(rowScores, ['0.9', '0.8', '0.7', '0.6', '0.5', '0'])
     })
   })
 
@@ -449,14 +466,16 @@ QUnit.module('GradingStandard', suiteHooks => {
 
       test('does not call onSaveGradingStandard when the row score is blank', () => {
         setRowName(1, 'B+')
-        setRowMinScore(1, '')
+        setRowMinScore(1, '5') // trigger a change
+        setRowMinScore(1, '') // clear it again
         save()
         strictEqual(props.onSaveGradingStandard.callCount, 0)
       })
 
       test('displays a validation message about empty ranges', () => {
         setRowName(1, 'B+')
-        setRowMinScore(1, '')
+        setRowMinScore(1, '5') // trigger a change
+        setRowMinScore(1, '') // clear it again
         save()
         const message = wrapper.find('#invalid_standard_message_5001').text()
         ok(message.includes('Cannot have overlapping or empty ranges.'))

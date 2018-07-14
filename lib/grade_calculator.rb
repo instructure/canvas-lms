@@ -114,9 +114,11 @@ class GradeCalculator
   def compute_and_save_scores
     calculate_grading_period_scores if @update_all_grading_period_scores
     compute_scores
+    scores_prior_to_compute = Score.where(enrollment: @enrollments.map(&:id), assignment_group_id: nil, course_score: true).to_a
     save_scores
     update_score_statistics
     invalidate_caches
+    create_course_grade_alerts(scores_prior_to_compute)
     # The next line looks weird, but it is intended behaviour.  Its
     # saying "if we're on the branch not calculating muted scores, run
     # the branch that does."
@@ -128,6 +130,28 @@ class GradeCalculator
 
   def effective_due_dates
     @effective_due_dates ||= EffectiveDueDates.for_course(@course, @assignments).filter_students_to(@user_ids)
+  end
+
+  def create_course_grade_alerts(scores)
+    @course.shard.activate do
+      scores.each do |score|
+        thresholds = ObserverAlertThreshold.active.where(student: score.enrollment.user, alert_type: ['course_grade_high', 'course_grade_low'])
+        previous_score = score.current_score
+        score.reload
+        thresholds.each do |threshold|
+          next unless threshold.did_pass_threshold(previous_score, score.current_score)
+          next unless threshold.observer.enrollments.where(course_id: @course.id).first.present?
+
+          ObserverAlert.create(observer: threshold.observer, student: threshold.student,
+            observer_alert_threshold: threshold,
+            context: @course, action_date: score.updated_at, alert_type: threshold.alert_type,
+            title: I18n.t("Course grade: %{grade}% in %{course_code}", {
+              grade: score.current_score,
+              course_code: @course.course_code
+            }))
+        end
+      end
+    end
   end
 
   def compute_scores_and_group_sums_for_batch(user_ids)

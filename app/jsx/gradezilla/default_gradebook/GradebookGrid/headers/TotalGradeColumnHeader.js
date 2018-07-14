@@ -19,26 +19,27 @@
 import React from 'react';
 import { bool, func, shape, string } from 'prop-types';
 import IconMoreSolid from '@instructure/ui-icons/lib/Solid/IconMore';
-import Button from '@instructure/ui-core/lib/components/Button';
-import Container from '@instructure/ui-core/lib/components/Container';
-import Grid, { GridCol, GridRow } from '@instructure/ui-core/lib/components/Grid';
-import {
+import Button from '@instructure/ui-buttons/lib/components/Button';
+import View from '@instructure/ui-layout/lib/components/View';
+import Grid, { GridCol, GridRow } from '@instructure/ui-layout/lib/components/Grid';
+import Menu, {
   MenuItem,
-  MenuItemFlyout,
   MenuItemGroup,
   MenuItemSeparator
-} from '@instructure/ui-core/lib/components/Menu';
-import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu';
-import Text from '@instructure/ui-core/lib/components/Text';
+} from '@instructure/ui-menu/lib/components/Menu';
+import Text from '@instructure/ui-elements/lib/components/Text';
 import I18n from 'i18n!gradebook';
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 import ColumnHeader from './ColumnHeader'
 
 function renderTrigger (ref) {
   return (
-    <Button buttonRef={ref} margin="0" size="small" variant="icon">
-      <IconMoreSolid title={I18n.t('Total Options')} />
+    <Button buttonRef={ref} margin="0" size="small" variant="icon" icon={IconMoreSolid}>
+      <ScreenReaderContent>
+        {I18n.t('Total Options')}
+      </ScreenReaderContent>
     </Button>
+
   );
 }
 
@@ -64,7 +65,7 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
       onMoveToFront: func.isRequired,
       onMoveToBack: func.isRequired
     }).isRequired,
-    onMenuClose: func.isRequired,
+    onMenuDismiss: Menu.propTypes.onDismiss.isRequired,
     grabFocus: bool,
     ...ColumnHeader.propTypes
   };
@@ -112,22 +113,22 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
               </GridCol>
 
               <GridCol textAlign="center">
-                <Container className="Gradebook__ColumnHeaderDetail">
+                <View className="Gradebook__ColumnHeaderDetail">
                   <Text fontStyle="normal" size="x-small" weight="bold">{ I18n.t('Total') }</Text>
-                </Container>
+                </View>
               </GridCol>
 
               <GridCol textAlign="center" width="auto">
                 <div className={classes}>
-                  <PopoverMenu
+                  <Menu
                     contentRef={this.bindOptionsMenuContent}
-                    onClose={this.props.onMenuClose}
+                    onDismiss={this.props.onMenuDismiss}
                     onToggle={this.onToggle}
                     ref={this.bindOptionsMenu}
                     shouldFocusTriggerOnClose={false}
-                    trigger={renderTrigger(this.bindOptionsMenuTrigger)}
+                    trigger={renderTrigger(ref => this.optionsMenuTrigger = ref)}
                   >
-                    <MenuItemFlyout contentRef={this.bindSortByMenuContent} label={I18n.t('Sort by')}>
+                    <Menu contentRef={this.bindSortByMenuContent} label={I18n.t('Sort by')}>
                       <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
                         <MenuItem
                           selected={selectedSortSetting === 'grade' && sortBySetting.direction === 'ascending'}
@@ -145,7 +146,7 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
                           <span>{I18n.t('Grade - High to Low')}</span>
                         </MenuItem>
                       </MenuItemGroup>
-                    </MenuItemFlyout>
+                    </Menu>
 
                     {
                       showSeparator &&
@@ -180,7 +181,7 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
                         </span>
                       </MenuItem>
                     }
-                  </PopoverMenu>
+                  </Menu>
                 </div>
               </GridCol>
             </GridRow>

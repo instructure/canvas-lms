@@ -24,7 +24,12 @@ class ObserverAlertsApiController < ApplicationController
   before_action :require_user
 
   def alerts_by_student
-    all_alerts = @current_user.as_observer_observer_alerts.active.where(student: params[:student_id]).select(&:users_are_still_linked?)
+    all_alerts = @current_user.
+      as_observer_observer_alerts.
+      active.
+      where(student: params[:student_id]).
+      order(id: :desc).
+      select(&:users_are_still_linked?)
 
     alerts = Api.paginate(all_alerts, self, api_v1_observer_alerts_by_student_url)
 

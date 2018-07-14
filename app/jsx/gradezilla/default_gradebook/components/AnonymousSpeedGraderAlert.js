@@ -19,12 +19,12 @@
 import React from 'react'
 import {func, string} from 'prop-types'
 import I18n from 'i18n!gradebook'
-import Alert from '@instructure/ui-core/lib/components/Alert'
-import Button from '@instructure/ui-core/lib/components/Button'
-import Grid, {GridCol, GridRow} from '@instructure/ui-core/lib/components/Grid'
-import Mask from '@instructure/ui-core/lib/components/Mask'
-import Overlay from '@instructure/ui-core/lib/components/Overlay'
-import Text from '@instructure/ui-core/lib/components/Text'
+import Alert from '@instructure/ui-alerts/lib/components/Alert'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
+import Mask from '@instructure/ui-overlays/lib/components/Mask'
+import Overlay from '@instructure/ui-overlays/lib/components/Overlay'
+import Text from '@instructure/ui-elements/lib/components/Text'
 
 class AnonymousSpeedGraderAlert extends React.Component {
   static propTypes = {
@@ -108,7 +108,6 @@ class AnonymousSpeedGraderAlert extends React.Component {
         label={I18n.t('Anonymous Mode On')}
         shouldReturnFocus
         onDismiss={this.close}
-        applicationElement={() => document.getElementById('application')}
       >
         <Mask fullscreen onClick={this.close}>
           {this.renderAlert()}

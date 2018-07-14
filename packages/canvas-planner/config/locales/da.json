@@ -2,17 +2,32 @@
   "add_to_do_7def3c37": {
     "message": "Tilføj til opgaveliste"
   },
+  "all_day_fb42c4fc": {
+    "message": "Hele dagen"
+  },
   "all_items_loaded_aa256183": {
     "message": "Alle elementer er indlæst"
   },
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "Er du sikker på, du vil slette dette planlægningselement?"
   },
-  "assignmenttype_title_is_complete_813e54f8": {
-    "message": "{ assignmentType } { title } er komplet"
+  "assignmenttype_title_6612d008": {
+    "message": "{ assignmentType } { title }."
   },
-  "assignmenttype_title_is_incomplete_a1d5fac0": {
-    "message": "{ assignmentType } { title } er ufuldstændig"
+  "assignmenttype_title_at_datetime_478f0709": {
+    "message": "{ assignmentType } { title }, kl. { datetime }."
+  },
+  "assignmenttype_title_due_datetime_a112d8ff": {
+    "message": "{ assignmentType } { title }, forfalder { datetime }."
+  },
+  "assignmenttype_title_is_marked_as_done_a8dc46ef": {
+    "message": "{ assignmentType } { title } er markeret som færdig."
+  },
+  "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
+    "message": "{ assignmentType } { title } er ikke markeret som færdig."
+  },
+  "assignmenttype_title_on_datetime_446013fb": {
+    "message": "{ assignmentType } { title }, d. { datetime }."
   },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Begyndelsen af ​​din Opgaveliste-historik"
@@ -30,7 +45,7 @@
     "message": "{ count, plural,\n     =0 {# muligheder}\n    one {# mulighed}\n  other {# muligheder}\n}"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-    "message": "{ count, plural,\n    one {Vis # afsluttet emne}\n  other {Vis # afsluttede emner}\n}"
+    "message": "{ count, plural,\n    one {Vis # afsluttet element}\n  other {Vis # afsluttede elementer}\n}"
   },
   "course_8a63b4a3": {
     "message": "Fag"
@@ -39,10 +54,13 @@
     "message": "{ course } OPGAVELISTE"
   },
   "date_at_time_dbdb1b99": {
-    "message": "{ date } ved { time }"
+    "message": "{ date } kl. { time }"
   },
   "date_ee500367": {
     "message": "Dato"
+  },
+  "date_is_not_a_valid_date_4ef9f8ba": {
+    "message": "#{ date } er ikke en gyldig dato."
   },
   "date_is_required_8660ec22": {
     "message": "Dato er påkrævet"
@@ -64,6 +82,9 @@
   },
   "edit_title_72e5a21e": {
     "message": "Rediger { title }"
+  },
+  "error_loading_grades_e0b38f4d": {
+    "message": "Fejl ved indlæsning af karakterer"
   },
   "error_loading_more_items_3f109d9f": {
     "message": "Fejl ved indlæsning af flere elementer"
@@ -95,6 +116,15 @@
   "graded_25cd3fcd": {
     "message": "Bedømt"
   },
+  "grades_are_loading_c899652d": {
+    "message": "Karaktererne indlæses"
+  },
+  "grades_loaded_5056277c": {
+    "message": "Karakterer indlæst"
+  },
+  "items_completed_items_plural_1_item_other_items_717d579f": {
+    "message": "{ items } afsluttet { items, plural,\n     =1 {element}\n  other {elementer}\n}"
+  },
   "late_2be42b88": {
     "message": "Sen"
   },
@@ -105,10 +135,16 @@
     "message": "Indlæs tidligere datoer"
   },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-    "message": "indlæst { count, plural,\n     =0{# elementer}\n    one {# element}\n  other {# elementer}\n}"
+    "message": "Indlæst { count, plural,\n     =0 {# elementer}\n    one {# element}\n  other {# elementer}\n}"
   },
   "loading_25990131": {
     "message": "Indlæser ..."
+  },
+  "loading_725811ca": {
+    "message": "indlæser"
+  },
+  "loading_grades_c842c887": {
+    "message": "Indlæser karakterer"
   },
   "loading_past_items_ca499e75": {
     "message": "Indlæser forrige elementer"
@@ -122,14 +158,17 @@
   "missing_1a256b3b": {
     "message": "Mangler"
   },
-  "missing_items_for_5ef30cea": {
-    "message": "Manglende elementer for "
+  "missing_items_for_title_516511f8": {
+    "message": "Manglende emner til { title }"
+  },
+  "my_grades_98834476": {
+    "message": "Mine karakterer"
   },
   "new_activity_8b84847d": {
     "message": "Ny aktivitet"
   },
-  "new_activity_for_ac84f6e6": {
-    "message": "Ny aktivitet for "
+  "new_activity_for_title_14c9c3af": {
+    "message": "Ny aktivitet for { title }"
   },
   "next_month_749b1778": {
     "message": "Næste måned"
@@ -137,11 +176,20 @@
   "no_due_dates_assigned_e8f5bac8": {
     "message": "Ingen afleveringsdatoer tildelt"
   },
-  "no_to_do_s_for_this_day_yet_90c5873d": {
-    "message": "Ingenting på opgavelisten for denne dag endnu."
+  "no_grade_3b4d7f3e": {
+    "message": "Ingen karakter"
   },
   "nothing_new_needs_attention_3ac548d4": {
     "message": "Intet nyt har brug for opmærksomhed."
+  },
+  "nothing_planned_today_next_item_loaded_5a199868": {
+    "message": "Intet planlagt i dag. Næste element indlæst."
+  },
+  "nothing_planned_yet_8675ffe9": {
+    "message": "Intet planlagt endnu"
+  },
+  "only_most_recent_grading_period_shown_f1ad6458": {
+    "message": "*Kun seneste karakterperiode vist."
   },
   "optional_add_course_ef0d70fc": {
     "message": "Valgfrit: Tilføj fag"
@@ -164,11 +212,26 @@
   "save_11a80ec3": {
     "message": "Gem"
   },
+  "show_my_grades_ebd08684": {
+    "message": "Vis mine karakterer"
+  },
+  "startdate_to_enddate_d245175b": {
+    "message": "{ startDate } til { endDate }"
+  },
   "submitted_318fad53": {
-    "message": "Indsendt"
+    "message": "Afleveret"
+  },
+  "success_to_do_created_e34ed395": {
+    "message": "Succes: Opgaveliste oprettet"
   },
   "task_16b0ef38": {
     "message": "Opgave"
+  },
+  "the_date_and_time_this_to_do_is_due_74c823d4": {
+    "message": "Dato og klokkeslæt, hvor denne opgave forfalder"
+  },
+  "time_2b5aac58": {
+    "message": "Tidspunkt"
   },
   "title_ee03d132": {
     "message": "Titel"
@@ -199,6 +262,9 @@
   },
   "yesterday_c6bd6abf": {
     "message": "I går"
+  },
+  "you_must_provide_a_date_and_time_a86839d2": {
+    "message": "Du skal angive en dato og klokkeslæt."
   },
   "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
     "message": "Du har rullet tilbage til din allerførste opgave på Opgavelisten!"

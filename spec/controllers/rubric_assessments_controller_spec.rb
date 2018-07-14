@@ -177,23 +177,77 @@ describe RubricAssessmentsController do
       expect(response).to be_success
     end
   end
-end
 
-def setup_course_assessment
-  course_with_teacher_logged_in(:active_all => true)
-  @student1 = factory_with_protected_attributes(User, :name => "student 1", :workflow_state => "registered")
-  @student2 = factory_with_protected_attributes(User, :name => "student 2", :workflow_state => "registered")
-  @student3 = factory_with_protected_attributes(User, :name => "student 3", :workflow_state => "registered")
-  @teacher2 = factory_with_protected_attributes(User, :name => "teacher 2", :workflow_state => "registered")
-  @course.enroll_student(@student1).accept!
-  @course.enroll_student(@student2).accept!
-  @course.enroll_student(@student3).accept!
-  @course.enroll_teacher(@teacher2).accept!
-  @assignment = @course.assignments.create!(:title => "Some Assignment")
-  rubric_assessment_model(:user => @user, :context => @course, :association_object => @assignment, :purpose => 'grading')
-  student1_asset = @assignment.find_or_create_submission(@student1)
-  student2_asset = @assignment.find_or_create_submission(@student2)
-  student3_asset = @assignment.find_or_create_submission(@student3)
-  @rubric_association.assessment_requests.create!(user: @student1, asset: student1_asset, assessor: @student2, assessor_asset: student2_asset)
-  @rubric_association.assessment_requests.create!(user: @student1, asset: student1_asset, assessor: @student3, assessor_asset: student3_asset)
+  describe 'user ID handling' do
+    before(:each) do
+      setup_course_assessment
+      @assignment.find_or_create_submission(@student1).update!(anonymous_id: 'abcde')
+    end
+
+    let(:base_request_params) { { course_id: @course.id, rubric_association_id: @rubric_association.id } }
+
+    context 'when updating an existing assessment' do
+      it 'looks up the assessment by the passed-in ID' do
+        request_params = base_request_params.merge(
+          id: @rubric_assessment.id,
+          rubric_assessment: {assessment_type: 'no_reason'}
+        )
+        put 'update', params: request_params
+        expect(response).to be_success
+      end
+    end
+
+    context 'when creating a new assessment' do
+      it 'accepts user IDs in the user_id field' do
+        assessment_params = {user_id: @student1.id, assessment_type: 'no_reason'}
+        post 'create', params: base_request_params.merge(rubric_assessment: assessment_params)
+        expect(response).to be_success
+      end
+
+      it 'does not accept non-numerical IDs in the user_id field' do
+        invalid_assessment_params = {user_id: 'abcde', assessment_type: 'no_reason'}
+        post 'create', params: base_request_params.merge(rubric_assessment: invalid_assessment_params)
+        expect(response).to be_not_found
+      end
+    end
+
+    context 'for anonymous IDs' do
+      it 'accepts anonymous IDs matching a submission for the assignment' do
+        assessment_params = {anonymous_id: 'abcde', assessment_type: 'no reason'}
+        post 'create', params: base_request_params.merge(rubric_assessment: assessment_params)
+        expect(response).to be_success
+      end
+
+      it 'does not recognize anonymous IDs that do not match a submission for the assignment' do
+        unknown_assessment_params = {anonymous_id: @student1.id, assessment_type: 'no reason'}
+        post 'create', params: base_request_params.merge(rubric_assessment: unknown_assessment_params)
+        expect(response).to be_not_found
+      end
+
+      it 'does not recognize user IDs in the anonymous_id field' do
+        invalid_assessment_params = {anonymous_id: @student1.id, assessment_type: 'no reason'}
+        post 'create', params: base_request_params.merge(rubric_assessment: invalid_assessment_params)
+        expect(response).to be_not_found
+      end
+    end
+  end
+
+  def setup_course_assessment
+    course_with_teacher_logged_in(:active_all => true)
+    @student1 = factory_with_protected_attributes(User, :name => "student 1", :workflow_state => "registered")
+    @student2 = factory_with_protected_attributes(User, :name => "student 2", :workflow_state => "registered")
+    @student3 = factory_with_protected_attributes(User, :name => "student 3", :workflow_state => "registered")
+    @teacher2 = factory_with_protected_attributes(User, :name => "teacher 2", :workflow_state => "registered")
+    @course.enroll_student(@student1).accept!
+    @course.enroll_student(@student2).accept!
+    @course.enroll_student(@student3).accept!
+    @course.enroll_teacher(@teacher2).accept!
+    @assignment = @course.assignments.create!(:title => "Some Assignment")
+    rubric_assessment_model(:user => @user, :context => @course, :association_object => @assignment, :purpose => 'grading')
+    student1_asset = @assignment.find_or_create_submission(@student1)
+    student2_asset = @assignment.find_or_create_submission(@student2)
+    student3_asset = @assignment.find_or_create_submission(@student3)
+    @rubric_association.assessment_requests.create!(user: @student1, asset: student1_asset, assessor: @student2, assessor_asset: student2_asset)
+    @rubric_association.assessment_requests.create!(user: @student1, asset: student1_asset, assessor: @student3, assessor_asset: student3_asset)
+  end
 end

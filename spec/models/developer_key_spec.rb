@@ -84,7 +84,7 @@ describe DeveloperKey do
           url:GET|/api/v1/audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id)
       end
 
-      before { Account.site_admin.enable_feature!(:api_token_scoping) }
+      before { Account.site_admin.enable_feature!(:developer_key_management_and_scoping) }
 
       describe 'after_update' do
         let(:user) { user_model }
@@ -120,7 +120,7 @@ describe DeveloperKey do
         end
 
         it 'does not delete the associated access tokens if feature flags are off' do
-          Account.site_admin.disable_feature!(:api_token_scoping)
+          Account.site_admin.disable_feature!(:developer_key_management_and_scoping)
           developer_key_with_scopes.update!(scopes: [valid_scopes.first])
           expect(developer_key_with_scopes.access_tokens).to match_array [access_token]
         end

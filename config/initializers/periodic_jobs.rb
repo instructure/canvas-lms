@@ -80,7 +80,7 @@ Rails.configuration.after_initialize do
   end
 
   Delayed::Periodic.cron 'Reporting::CountsReport.process', '0 11 * * 0' do
-    Reporting::CountsReport.process
+    with_each_shard_by_database(Reporting::CountsReport, :process_shard)
   end
 
   Delayed::Periodic.cron 'Account.update_all_update_account_associations', '0 10 * * 0' do
@@ -188,7 +188,7 @@ Rails.configuration.after_initialize do
     end
   end
 
-  Delayed::Periodic.cron 'SisBatchErrors.cleanup_old_errors', '*/15 * * * *', priority: Delayed::LOW_PRIORITY do
+  Delayed::Periodic.cron 'SisBatchError.cleanup_old_errors', '*/15 * * * *', priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(SisBatchError, :cleanup_old_errors)
   end
 
@@ -218,6 +218,10 @@ Rails.configuration.after_initialize do
 
   Delayed::Periodic.cron 'ObserverAlert.clean_up_old_alerts', '0 * * * *', priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(ObserverAlert, :clean_up_old_alerts)
+  end
+
+  Delayed::Periodic.cron 'ObserverAlert.create_assignment_missing_alerts', '*/5 * * * *', priority: Delayed::LOW_PRIORITY do
+    with_each_shard_by_database(ObserverAlert, :create_assignment_missing_alerts)
   end
 
   Delayed::Periodic.cron 'abandoned job cleanup', '*/10 * * * *' do

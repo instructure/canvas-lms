@@ -13,11 +13,11 @@
   <a href="<%= url_for("file.oauth.html") %>" class="<%= 'current' if options[:object] == 'file.oauth.html' %>">OAuth2 Overview</a>
   <a href="<%= url_for("file.oauth_endpoints.html") %>" class="<%= 'current' if options[:object] == 'file.oauth_endpoints.html' %>">OAuth2 Endpoints</a>
   <a href="<%= url_for("file.developer_keys.html") %>" class="<%= 'current' if options[:object] == 'file.developer_keys.html' %>">Developer Keys</a>
-  <a href="<%= url_for("file.api_token_scopes.html") %>" class="<%= 'current' if options[:object] == 'file.api_token_scopes.html' %>">API Token Scopes</a>
   <h2>Resources</h2>
   <a <%= "class='current'" if options[:all_resources] %> href="all_resources.html">All Resources Reference</a>
   <% options[:resources].each_with_index do |(resource, controllers), i| %>
-    <% link = url_for("#{topicize resource}.html")
+    <% next if resource.include?('Plagiarism Detection')
+       link = url_for("#{topicize resource}.html")
        klass = []
        klass << "current" if resource == options[:object] %>
     <a class="<%= klass.join(' ') %>" href="<%= link %>"><%= resource %></a>
@@ -38,6 +38,12 @@
   <a href="<%= url_for("file.editor_button_tools.html") %>" class="<%= 'current' if options[:object] == 'file.editor_button_tools.html' %>">Rich Editor</a>
   <a href="<%= url_for("file.link_selection_tools.html") %>" class="<%= 'current' if options[:object] == 'file.link_selection_tools.html' %>">Link Selection</a>
   <a href="<%= url_for("file.plagiarism_platform.html") %>" class="<%= 'current' if options[:object] == 'file.plagiarism_platform.html' %>">Plagiarism Detection Platform</a>
+  <% options[:resources].each do |(resource, controllers)| %>
+    <% next if resource.exclude?('Plagiarism Detection')
+       link = url_for("#{topicize resource}.html")
+       klass = "current" if resource == options[:object] %>
+    <a class="<%= klass %>" href="<%= link %>"><%= resource %></a>
+  <% end %>
   <a href="<%= url_for("file.jwt_access_tokens.html") %>" class="<%= 'current' if options[:object] == 'file.jwt_access_tokens.html' %>">JWT Access Tokens</a>
   <!-- still experimental, so we're not advertising it.
   <h2>Other</h2>

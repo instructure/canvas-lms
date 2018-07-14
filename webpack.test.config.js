@@ -9,8 +9,29 @@ testWebpackConfig.entry = undefined
 testWebpackConfig.plugins.push(new webpack.EnvironmentPlugin({
   JSPEC_PATH: null,
   JSPEC_GROUP: null,
-  A11Y_REPORT: false
+  A11Y_REPORT: false,
+  SENTRY_DSN: null,
+  GIT_COMMIT: null
 }))
+
+if (process.env.SENTRY_DSN) {
+  const SentryCliPlugin = require('@sentry/webpack-plugin');
+  testWebpackConfig.plugins.push(new SentryCliPlugin({
+    release: process.env.GIT_COMMIT,
+    include: [
+      path.resolve(__dirname, 'public/javascripts'),
+      path.resolve(__dirname, 'app/jsx'),
+      path.resolve(__dirname, 'app/coffeescripts'),
+      path.resolve(__dirname, 'spec/javascripts/jsx'),
+      path.resolve(__dirname, 'spec/coffeescripts')
+    ],
+    ignore: [
+      path.resolve(__dirname, 'public/javascripts/translations'),
+      /bower\//
+    ]
+  }));
+}
+
 
 // These externals are necessary for Enzyme
 // See http://airbnb.io/enzyme/docs/guides/webpack.html

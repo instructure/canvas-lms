@@ -21,12 +21,12 @@ import {animatable} from '../../dynamic-ui';
 import formatMessage from '../../format-message';
 import moment from 'moment-timezone';
 import { getFullDateAndTime } from '../../utilities/dateUtils';
-import Button from '@instructure/ui-core/lib/components/Button';
-import Link from '@instructure/ui-core/lib/components/Link';
-import Pill from '@instructure/ui-core/lib/components/Pill';
-import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent';
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
-import IconXLine from 'instructure-icons/lib/Line/IconXLine';
+import Button from '@instructure/ui-buttons/lib/components/Button';
+import Link from '@instructure/ui-elements/lib/components/Link';
+import Pill from '@instructure/ui-elements/lib/components/Pill';
+import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent';
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
+import IconXLine from '@instructure/ui-icons/lib/Line/IconX';
 import { bool, string, number, func, object } from 'prop-types';
 import styles from './styles.css';
 import theme from './theme.js';
@@ -36,7 +36,6 @@ export class Opportunity extends Component {
     id: string.isRequired,
     dueAt: string.isRequired,
     points: number,
-    showPill: bool.isRequired,
     courseName: string.isRequired,
     opportunityTitle: string.isRequired,
     timeZone: string.isRequired,
@@ -85,31 +84,17 @@ export class Opportunity extends Component {
   render () {
     return (
       <div className={styles.root}>
-        <div className={styles.header}>
-          <div className={styles.oppNameAndTitle}>
-            <div className={styles.oppName}>
-              {this.props.courseName}
-            </div>
-            <div className={styles.title}>
-              <Link href={this.props.url} ref={this.linkRef}>{this.props.opportunityTitle}</Link>
-            </div>
+        <div className={styles.oppNameAndTitle}>
+          <div className={styles.oppName}>
+            {this.props.courseName}
           </div>
-          <div className={styles.close}>
-            <Button
-              onClick={() => this.props.dismiss(this.props.id, this.props.plannerOverride)}
-              variant="icon"
-              size="small"
-            >
-              <IconXLine
-                className={styles.closeButtonIcon}
-                title={formatMessage("Dismiss {opportunityName}", {opportunityName: this.props.opportunityTitle})}
-              />
-            </Button>
+          <div className={styles.title}>
+            <Link href={this.props.url} ref={this.linkRef}>{this.props.opportunityTitle}</Link>
           </div>
         </div>
         <div className={styles.footer}>
           <div className={styles.status}>
-            {this.props.showPill && <Pill text={formatMessage('Missing')} variant="danger"/>}
+            <Pill text={formatMessage('Missing')} variant="danger"/>
             <div className={styles.due}>
               <span className={styles.dueText}>
                 {formatMessage('Due:')}</span> {this.fullDate}
@@ -127,6 +112,18 @@ export class Opportunity extends Component {
             </PresentationContent>
           </div>
         </div>
+        <div className={styles.close}>
+            <Button
+              onClick={() => this.props.dismiss(this.props.id, this.props.plannerOverride)}
+              variant="icon"
+              size="small"
+            >
+              <IconXLine
+                className={styles.closeButtonIcon}
+                title={formatMessage("Dismiss {opportunityName}", {opportunityName: this.props.opportunityTitle})}
+              />
+            </Button>
+          </div>
       </div>
     );
   }

@@ -7,10 +7,9 @@
 
   <div class="outcome-gradebook-sidebar-content">
     <ul class="checkboxes unstyled">
-      <li>{{view exceeds}}</li>
-      <li>{{view mastery}}</li>
-      <li>{{view near-mastery}}</li>
-      <li>{{view remedial}}</li>
+      {{#each checkboxes}}
+      <li>{{view this}}</li>
+      {{/each}}
     </ul>
     <ul class="operations unstyled" >
       <li class="operation-view">

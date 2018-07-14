@@ -172,7 +172,7 @@ define([
     equal(this.menuItems[1].textContent, 'Gradebook…');
   });
 
-  test('Gradebook History Menu Item is third in the PopoverMenu', function () {
+  test('Gradebook History Menu Item is third in the Menu', function () {
     equal(this.menuItems[2].textContent, 'Gradebook History…');
   });
 });

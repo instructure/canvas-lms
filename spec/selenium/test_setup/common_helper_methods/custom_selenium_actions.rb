@@ -250,6 +250,13 @@ module CustomSeleniumActions
     false
   end
 
+  def element_has_children?(selector)
+    disable_implicit_wait { f(selector).find_elements(:xpath, ".//*") }
+    true
+  rescue Selenium::WebDriver::Error::NoSuchElementError
+    false
+  end
+
   def first_selected_option(select_element)
     select = Selenium::WebDriver::Support::Select.new(select_element)
     option = select.first_selected_option

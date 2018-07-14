@@ -19,10 +19,10 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import _ from 'underscore';
-import Alert from '@instructure/ui-core/lib/components/Alert';
-import FormFieldGroup from '@instructure/ui-core/lib/components/FormFieldGroup';
+import Alert from '@instructure/ui-alerts/lib/components/Alert';
+import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup';
 import LatePoliciesTabPanel from 'jsx/gradezilla/default_gradebook/components/LatePoliciesTabPanel';
-import Spinner from '@instructure/ui-core/lib/components/Spinner';
+import Spinner from '@instructure/ui-elements/lib/components/Spinner';
 
 const latePolicyData = {
   missingSubmissionDeductionEnabled: true,
@@ -263,10 +263,12 @@ test('calls the changeLatePolicy function with a validationError if the missing 
 });
 
 test('does not allow entering negative numbers for missing submission deduction', function () {
-  this.wrapper = mountComponent();
+  const changeLatePolicy = this.stub();
+  this.wrapper = mountComponent({}, { changeLatePolicy });
   const input = missingDeductionInput(this.wrapper);
   input.simulate('change', { target: { value: '-0.1' } });
-  strictEqual(input.node.value, '0.1');
+  deepEqual(changeLatePolicy.getCall(0).args[0].changes, {});
+  strictEqual(input.node.value, '100');
 });
 
 test('calls the changeLatePolicy function with a validationError if the missing submission ' +
@@ -412,7 +414,7 @@ test('does not allow entering negative numbers for late submission deduction', f
   this.wrapper = mountComponent();
   const input = lateDeductionInput(this.wrapper);
   input.simulate('change', { target: { value: '-0.1' } });
-  strictEqual(input.node.value, '0.1')
+  strictEqual(input.node.value, '0')
 });
 
 test('calls the changeLatePolicy function with a validationError if the late submission ' +
@@ -577,7 +579,7 @@ test('does not allow entering negative numbers for late submission minimum perce
   this.wrapper = mountComponent();
   const input = lateSubmissionMinimumPercentInput(this.wrapper);
   input.simulate('change', { target: { value: '-0.1' } });
-  strictEqual(input.node.value, '0.1');
+  strictEqual(input.node.value, '0');
 });
 
 test('calls the changeLatePolicy function with a validationError if the late submission ' +

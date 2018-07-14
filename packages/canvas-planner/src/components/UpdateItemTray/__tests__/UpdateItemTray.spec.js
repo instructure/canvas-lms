@@ -26,9 +26,10 @@ const defaultProps = {
   timeZone: 'Asia/Tokyo',
   onDeletePlannerItem: () => {},
   courses: [],
+  noteItem: {},
 };
 
-const simpleItem = (opts = {}) => Object.assign({title: '', date: moment('2017-04-28T11:00:00Z')}, opts);
+const simpleItem = (opts = {}) => Object.assign({uniqueId: "1", title: '', date: moment('2017-04-28T11:00:00Z')}, opts);
 
 afterEach(()=> {
   jest.restoreAllMocks();
@@ -36,6 +37,7 @@ afterEach(()=> {
 
 it('renders the item to update if provided', () => {
   const noteItem = {
+    uniqueId: "1",
     title: 'Planner Item',
     date: moment('2017-04-25 01:49:00-0700'),
     context: {id: '1'},
@@ -104,6 +106,7 @@ it('correctly updates id to null when courseid is none', () => {
   wrapper.instance().handleCourseIdChange({target: {value: 'none'}});
   wrapper.instance().handleSave();
   expect(mockCallback).toHaveBeenCalledWith({
+    uniqueId: "1",
     title: item.title,
     date: item.date.toISOString(),
     context: {
@@ -134,7 +137,7 @@ it('does not set an initial error message on title', () => {
 });
 
 it('sets error message on title field when title is set to blank', () => {
-  const wrapper = shallow(<UpdateItemTray {...defaultProps} noteItem={{title: 'an item'}} />);
+  const wrapper = shallow(<UpdateItemTray {...defaultProps} noteItem={{uniqueId: "1", title: 'an item'}} />);
   wrapper.instance().handleTitleChange({target: {value: ''}});
   const titleInput = wrapper.find('TextInput').first();
   const messages = titleInput.props().messages;
@@ -143,7 +146,7 @@ it('sets error message on title field when title is set to blank', () => {
 });
 
 it('clears the error message when a title is typed in', () => {
-  const wrapper = shallow(<UpdateItemTray {...defaultProps} noteItem={{title: 'an item'}} />);
+  const wrapper = shallow(<UpdateItemTray {...defaultProps} noteItem={{uniqueId: "1", title: 'an item'}} />);
   wrapper.instance().handleTitleChange({target: {value: ''}});
   wrapper.instance().handleTitleChange({target: {value: 't'}});
   const titleInput = wrapper.find('TextInput').first();
@@ -189,6 +192,7 @@ it('changes state when new date is typed in', () => {
   wrapper.instance().handleDateChange({}, newDate.toISOString());
   wrapper.instance().handleSave();
   expect(mockCallback).toHaveBeenCalledWith({
+    uniqueId: "1",
     title: noteItem.title,
     date: newDate.toISOString(),
     context: {id: null}
@@ -208,12 +212,28 @@ it('updates state when new note is passed in', () => {
   expect(wrapper).toMatchSnapshot();
 
   const noteItem2 = simpleItem({
+    uniqueId: "2",
     title: 'Planner Item 2',
     context: {id: '2'},
     details: "This is another reminder"
   });
   wrapper.setProps({noteItem: noteItem2});
   expect(wrapper).toMatchSnapshot();
+});
+
+it('does not update state when the new note property is equal to the previous note property', () => {
+  const note = simpleItem({title: 'original title'});
+  const wrapper = shallow(<UpdateItemTray {...defaultProps} noteItem={note} courses={[]} />);
+  let titleInput = wrapper.find('TextInput').first();
+  expect(titleInput.props().value).toBe('original title');
+
+  titleInput.props().onChange({target: {value: 'new title'}});
+  titleInput = wrapper.find('TextInput').first();
+  expect(titleInput.props().value).toBe('new title');
+
+  wrapper.setProps({noteItem: {...note}}); // new object, same content as original
+  titleInput = wrapper.find('TextInput').first();
+  expect(titleInput.props().value).toBe('new title');
 });
 
 //------------------------------------------------------------------------
@@ -225,7 +245,7 @@ it('does not render the delete button if an item is not specified', () => {
 });
 
 it('does render the delete button if an item is specified', () => {
-  const wrapper = shallow(<UpdateItemTray {...defaultProps} noteItem={{title: 'some note'}} />);
+  const wrapper = shallow(<UpdateItemTray {...defaultProps} noteItem={{uniqueId: "1", title: 'some note'}} />);
   const deleteButton = wrapper.find('Button[variant="light"]');
   expect(deleteButton).toHaveLength(1);
 });
@@ -247,18 +267,22 @@ it('invokes save callback with updated data', () => {
   const saveMock = jest.fn();
   const wrapper = shallow(<UpdateItemTray {...defaultProps}
     noteItem={{
-      title: 'title', date: moment('2017-04-27T13:00:00Z'), courseId: '42', details: 'details',
+      uniqueId: "1", title: 'title', date: moment('2017-04-27T13:00:00Z'), courseId: '42', details: 'details',
     }}
     courses={[{id: '42', longName: 'first'}, {id: '43', longName: 'second'}]}
     onSavePlannerItem={saveMock}
   />);
   wrapper.instance().handleTitleChange({target: {value: 'new title'}});
   wrapper.instance().handleDateChange({}, '2017-05-01T14:00:00Z');
-  wrapper.instance().handleCourseIdChange({target: {value: '43'}});
+  wrapper.instance().handleCourseIdChange(null, {value: '43'});
   wrapper.instance().handleChange('details', 'new details');
   wrapper.instance().handleSave();
   expect(saveMock).toHaveBeenCalledWith({
-    title: 'new title', date: moment('2017-05-01T14:00:00Z').toISOString(), context: {id: '43'}, details: 'new details',
+    uniqueId: "1",
+    title: 'new title',
+    date: moment('2017-05-01T14:00:00Z').toISOString(),
+    context: {id: '43'},
+    details: 'new details',
   });
 });
 

@@ -64,7 +64,7 @@ function mountAndOpenOptions (props) {
 function openArrangeBy (props) {
   const wrapper = mountAndOpenOptions(props);
   const menuContent = new ReactWrapper(wrapper.node.menuContent, wrapper.node);
-  const flyouts = menuContent.find('MenuItemFlyout').map(flyout => flyout);
+  const flyouts = menuContent.find('Menu').map(flyout => flyout);
   const flyout = flyouts.find(menuItem => menuItem.text().trim() === 'Arrange By')
   flyout.find('button').simulate('mouseOver');
   return wrapper;
@@ -73,7 +73,7 @@ function openArrangeBy (props) {
 function openFilters (props) {
   const wrapper = mountAndOpenOptions(props);
   const menuContent = new ReactWrapper(wrapper.node.menuContent, wrapper.node);
-  const flyouts = menuContent.find('MenuItemFlyout').map(flyout => flyout);
+  const flyouts = menuContent.find('Menu').map(flyout => flyout);
   const flyout = flyouts.find(menuItem => menuItem.text().trim() === 'Filters')
   flyout.find('button').simulate('mouseOver');
   return wrapper;
@@ -190,7 +190,7 @@ test('does not display filters group when no filters are available', function ()
   const props = defaultProps({ filterSettings: { available: [] } });
   this.wrapper = mountAndOpenOptions(props);
   const menuContent = new ReactWrapper(this.wrapper.node.menuContent, this.wrapper.node);
-  const flyouts = menuContent.find('MenuItemFlyout').map(flyout => flyout);
+  const flyouts = menuContent.find('Menu').map(flyout => flyout);
   const flyout = flyouts.find(menuItem => menuItem.text().trim() === 'Filters')
   strictEqual(flyout, undefined);
 });

@@ -16,57 +16,102 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
+import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
 import I18n from 'i18n!edit_rubric'
+
+import { assessmentShape } from './types'
 
 export const roundIfWhole = (n) => (
   I18n.toNumber(n, { precision: Math.floor(n) === n ? 0 : 1 })
 )
-const pointString = (n) => n !== null ? roundIfWhole(n) : ''
+const pointString = (n) => n !== undefined ? roundIfWhole(n) : '--'
 
 export const possibleString = (possible) =>
-  I18n.t('/ %{possible} pts', {
+  I18n.t('%{possible} pts', {
     possible: I18n.toNumber(possible, { precision : 1 })
   })
 
-const invalid = () => [{ text: I18n.t('Invalid value'), type: 'error' }]
-const messages = (points) => points === null ? invalid() : undefined
+export const scoreString = (points, possible) =>
+  I18n.t('%{points} / %{possible}', {
+    points: pointString(points),
+    possible: possibleString(possible)
+  })
 
-const Points = ({ assessing, onPointChange, points, pointsText, pointsPossible }) => {
-  if (!assessing) {
+const invalid = () => [{ text: I18n.t('Invalid score'), type: 'error' }]
+const pointError = (points, pointsText) =>
+  (_.isNil(points) && pointsText) ? invalid() : []
+
+const noExtraCredit = () => [
+  { text: I18n.t('Cannot give outcomes extra credit'), type: 'error' }
+]
+const extraCreditError = (points, possible, allowExtraCredit) =>
+  !allowExtraCredit && (points > possible) ? noExtraCredit() : []
+
+const Points = (props) => {
+  const {
+    allowExtraCredit,
+    assessing,
+    assessment,
+    onPointChange,
+    pointsPossible
+  } = props
+
+  if (assessment === null) {
     return (
-      <div className="container graded-points">
-        {roundIfWhole(points)} {possibleString(pointsPossible)}
+      <div className="react-rubric-cell graded-points">
+        {possibleString(pointsPossible)}
       </div>
     )
   } else {
-    return (
-      <div className="container graded-points">
-        <TextInput
-          inline
-          label={<ScreenReaderContent>{I18n.t('Points')}</ScreenReaderContent>}
-          messages={messages(points)}
-          onChange={(e) => onPointChange(e.target.value)}
-          value={pointsText || pointString(points)}
-          width="4rem"
-        /> {possibleString(pointsPossible)}
-      </div>
-    )
+    const points = _.get(assessment, 'points')
+    const pointsText = _.get(assessment, 'pointsText')
+    if (!assessing) {
+      return (
+        <div className="react-rubric-cell graded-points">
+          {scoreString(points, pointsPossible)}
+        </div>
+      )
+    } else {
+      const usePointsText = pointsText !== null && pointsText !== undefined
+      return (
+        <div className="react-rubric-cell graded-points">
+          <Flex alignItems="start">
+            <FlexItem size="4rem">
+              <TextInput
+                inline
+                label={<ScreenReaderContent>{I18n.t('Points')}</ScreenReaderContent>}
+                messages={[
+                  ...pointError(points, pointsText),
+                  ...extraCreditError(points, pointsPossible, allowExtraCredit)
+                ]}
+                onChange={(e) => onPointChange(e.target.value)}
+                value={usePointsText ? pointsText : pointString(points)}
+                width="4rem"
+              />
+            </FlexItem>
+            <FlexItem margin="small">
+              {`/ ${possibleString(pointsPossible)}`}
+            </FlexItem>
+          </Flex>
+        </div>
+      )
+    }
   }
 }
 Points.propTypes = {
+  allowExtraCredit: PropTypes.bool,
   assessing: PropTypes.bool,
+  assessment: PropTypes.shape(assessmentShape),
   onPointChange: PropTypes.func,
-  points: PropTypes.number,
   pointsPossible: PropTypes.number.isRequired,
-  pointsText: PropTypes.string,
 }
 Points.defaultProps = {
+  allowExtraCredit: true,
   assessing: false,
-  points: null,
-  pointsText: null,
   onPointChange: null
 }
 

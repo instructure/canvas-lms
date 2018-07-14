@@ -161,22 +161,7 @@
     {{/if}}
 
     {{#unless isQuizLTIAssignment}}
-      {{#if anonymousModeratedMarkingEnabled}}
-        <span data-component="ModeratedGradingFormFieldGroup"></span>
-      {{else}}
-        <fieldset>
-          <div class="form-column-left">{{#t}}Moderated Grading{{/t}}</div>
-          <div class="form-column-right" style="margin-top: 14px;">
-            <label class="checkbox">
-              {{checkbox "moderatedGrading"
-                id="assignment_moderated_grading"
-                name="moderated_grading"
-              }}
-              {{#t}}Allow a moderator to review multiple independent grades for selected submissions{{/t}}
-            </label>
-          </div>
-        </fieldset>
-      {{/if}}
+      <span data-component="ModeratedGradingFormFieldGroup"></span>
     {{/unless}}
 
     {{#if anonymousGradingEnabled}}
@@ -190,26 +175,30 @@
                 id="assignment_anonymous_grading"
                 name="anonymous_grading"
               }}
-              <strong class="GradeAnonymously__CheckboxLabelText">{{#t}}Grade Anonymously{{/t}}</strong>
+              {{#t}}Graders cannot view student names{{/t}}
+            </label>
 
-              <p>{{#t}}Graders cannot see student names{{/t}}</p>
+            <label class="checkbox" for="assignment_graders_anonymous_to_graders" style="{{hiddenUnless showGradersAnonymousToGradersCheckbox}}">
+              {{checkbox "gradersAnonymousToGraders"
+                id="assignment_graders_anonymous_to_graders"
+                name="graders_anonymous_to_graders"
+              }}
+              {{#t}}Graders cannot view each other's names{{/t}}
             </label>
           </div>
         </div>
       </fieldset>
     {{/if}}
 
-    {{#if anonymousInstructorAnnotationsEnabled}}
-      <fieldset>
-        <div class="form-column-left">{{#t}}Anonymous Instructor Annotations{{/t}}</div>
-        <div class="form-column-right" style="margin-top: 14px;">
-          <label class="checkbox">
-            {{checkbox "anonymousInstructorAnnotations" id="assignment_anonymous_instructor_annotations" name="anonymous_instructor_annotations"}}
-            {{#t}}Anonymize all annotations made by instructors on submissions for this assignment in SpeedGrader{{/t}}
-          </label>
-        </div>
-      </fieldset>
-    {{/if}}
+    <fieldset>
+      <div class="form-column-left">{{#t}}Anonymous Instructor Annotations{{/t}}</div>
+      <div class="form-column-right" style="margin-top: 14px;">
+        <label class="checkbox">
+          {{checkbox "anonymousInstructorAnnotations" id="assignment_anonymous_instructor_annotations" name="anonymous_instructor_annotations"}}
+          {{#t}}Anonymize all annotations made by instructors on submissions for this assignment in SpeedGrader{{/t}}
+        </label>
+      </div>
+    </fieldset>
 
   </div>
 

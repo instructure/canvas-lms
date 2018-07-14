@@ -157,7 +157,8 @@ module UserContent
       @user = user
       @contextless_types = contextless_types
       @context_prefix = "/#{context.class.name.tableize}/#{context.id}"
-      @toplevel_regex = %r{(#{@context_prefix})?/(\w+)(?:/([^\s"<'\?\/]*)([^\s"<']*))?}
+      @absolute_part = '(https?://[\w-]+(?:\.[\w-]+)*(?:\:\d{1,5})?)?'
+      @toplevel_regex = %r{#{@absolute_part}(#{@context_prefix})?/(\w+)(?:/([^\s"<'\?\/]*)([^\s"<']*))?}
       @handlers = {}
       @default_handler = nil
       @unknown_handler = nil
@@ -194,9 +195,9 @@ module UserContent
 
       asset_types = AssetTypes.reject { |k,v| !@allowed_types.include?(k) }
 
-      html.gsub(@toplevel_regex) do |relative_url|
-        prefix, type, obj_id, rest = [$1, $2, $3, $4]
-        next relative_url if !@contextless_types.include?(type) && prefix != @context_prefix
+      html.gsub(@toplevel_regex) do |url|
+        _absolute_part, prefix, type, obj_id, rest = [$1, $2, $3, $4, $5]
+        next url if !@contextless_types.include?(type) && prefix != @context_prefix
 
         if type != "wiki" && type != "pages"
           if obj_id.to_i > 0
@@ -215,12 +216,12 @@ module UserContent
         if asset_types.key?(type)
           klass = asset_types[type]
           klass = klass.to_s.constantize if klass
-          match = UriMatch.new(relative_url, type, klass, obj_id, rest, prefix)
+          match = UriMatch.new(url, type, klass, obj_id, rest, prefix)
           handler = @handlers[type] || @default_handler
-          (handler && handler.call(match)) || relative_url
+          (handler && handler.call(match)) || url
         else
-          match = UriMatch.new(relative_url, type)
-          (@unknown_handler && @unknown_handler.call(match)) || relative_url
+          match = UriMatch.new(url, type)
+          (@unknown_handler && @unknown_handler.call(match)) || url
         end
       end
     end

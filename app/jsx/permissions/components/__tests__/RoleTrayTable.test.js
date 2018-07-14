@@ -17,57 +17,67 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {shallow} from 'enzyme'
 
+import {ROLES} from '../../__tests__/examples'
 import RoleTrayTable from '../RoleTrayTable'
 import RoleTrayTableRow from '../RoleTrayTableRow'
 
+function createRowProps(title, roleId) {
+  const role = ROLES.find(r => r.id === roleId)
+  const permissionName = Object.keys(role.permissions)[0]
+  const permission = role.permissions[permissionName]
+
+  return {title, role, permission, permissionName}
+}
+
 it('renders the component with only one child', () => {
-  const tree = mount(
+  const tree = shallow(
     <RoleTrayTable title="fruit">
-      <RoleTrayTableRow title="banana" />
+      <RoleTrayTableRow {...createRowProps('banana', '1')} />
     </RoleTrayTable>
   )
-  const rootNode = tree.find('RoleTrayTable')
   const childrenNodes = tree.find('RoleTrayTableRow')
-  expect(rootNode.exists()).toBeTruthy()
   expect(childrenNodes).toHaveLength(1)
 })
 
 it('renders the component with multiple children', () => {
-  const tree = mount(
+  const tree = shallow(
     <RoleTrayTable title="fruit">
-      <RoleTrayTableRow title="banana" />
-      <RoleTrayTableRow title="apple" />
-      <RoleTrayTableRow title="mango" />
+      <RoleTrayTableRow {...createRowProps('banana', '1')} />
+      <RoleTrayTableRow {...createRowProps('apple', '2')} />
+      <RoleTrayTableRow {...createRowProps('mango', '3')} />
     </RoleTrayTable>
   )
-  const node = tree.find('RoleTrayTable')
   const childrenNodes = tree.find('RoleTrayTableRow')
-  expect(node.exists()).toBeTruthy()
   expect(childrenNodes).toHaveLength(3)
 })
 
 it('renders the title', () => {
-  const tree = mount(
+  const tree = shallow(
     <RoleTrayTable title="fruit">
-      <RoleTrayTableRow title="banana" />
+      <RoleTrayTableRow {...createRowProps('banana', '1')} />
     </RoleTrayTable>
   )
   const node = tree.find('Text')
-  expect(node.at(0).text()).toEqual('fruit')
+  expect(
+    node
+      .at(0)
+      .dive()
+      .text()
+  ).toEqual('fruit')
 })
 
 it('sorts the children by title', () => {
-  const tree = mount(
+  const tree = shallow(
     <RoleTrayTable title="fruit">
-      <RoleTrayTableRow title="banana" />
-      <RoleTrayTableRow title="apple" />
-      <RoleTrayTableRow title="mango" />
+      <RoleTrayTableRow {...createRowProps('banana', '1')} />
+      <RoleTrayTableRow {...createRowProps('apple', '2')} />
+      <RoleTrayTableRow {...createRowProps('mango', '3')} />
     </RoleTrayTable>
   )
-  const nodes = tree.find('Text')
-  expect(nodes.at(1).text()).toEqual('apple')
-  expect(nodes.at(2).text()).toEqual('banana')
-  expect(nodes.at(3).text()).toEqual('mango')
+  const nodes = tree.find('RoleTrayTableRow')
+  expect(nodes.at(0).props().title).toEqual('apple')
+  expect(nodes.at(1).props().title).toEqual('banana')
+  expect(nodes.at(2).props().title).toEqual('mango')
 })

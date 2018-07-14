@@ -78,6 +78,9 @@
         <%= link[:text] %>
       </a>
     <% end %>
+    <% if @context.grants_right?(@current_user, :generate_observer_pairing_code) && @user.has_student_enrollment? %>
+      <div id="pairing-code"></div>
+    <% end %>
   </div>
   <a href="<%= user_profile_path(@current_user) %>" class="profile_url" style="display: none;">&nbsp;</a>
   <h2><%= t 'headings.user_services', "Registered Web Services" %></h2>
@@ -119,7 +122,7 @@
 <% end %>
 
 <% js_bundle :user_name %>
-<% css_bundle :roster_user %>
+<% css_bundle :roster_user, :pairing_code %>
 
 <h1><%= @user.name %></h1>
 <% can_manage_students = can_do(@context, @current_user, :manage_students) %>

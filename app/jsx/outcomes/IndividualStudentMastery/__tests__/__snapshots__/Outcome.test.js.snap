@@ -1,13 +1,31 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`renders the Outcome component 1`] = `
-"<ToggleDetails divider=\\"dashed\\" icon={[Function]} iconExpanded={[Function]} summary={{...}} expanded={false} onToggle={[Function]} fluidWidth={true} variant=\\"default\\" size=\\"medium\\" iconPosition=\\"start\\" defaultExpanded={false}>
-  <View as=\\"div\\" borderWidth=\\"small 0 0 0\\" display=\\"auto\\">
-    <List variant=\\"unstyled\\" delimiter=\\"dashed\\" as=\\"ul\\" margin=\\"none\\" size=\\"medium\\">
-      <ListItem>
-        <AssignmentResult result={{...}} outcome={{...}} />
-      </ListItem>
-    </List>
+exports[`renders correctly expanded 1`] = `
+"<ToggleGroup summary={{...}} toggleLabel=\\"Toggle alignment details for My outcome\\" expanded={true} onToggle={[Function]} border={false} size=\\"medium\\" icon={[Function]} iconExpanded={[Function]} defaultExpanded={false} transition={true} as=\\"span\\" elementRef={[Function]}>
+  <List variant=\\"unstyled\\" delimiter=\\"dashed\\" as=\\"ul\\" margin=\\"none\\" size=\\"medium\\">
+    <ListItem>
+      <AssignmentResult result={{...}} outcome={{...}} outcomeProficiency={{...}} />
+    </ListItem>
+  </List>
+</ToggleGroup>"
+`;
+
+exports[`renders correctly expanded with no results 1`] = `
+"<ToggleGroup summary={{...}} toggleLabel=\\"Toggle alignment details for My outcome\\" expanded={true} onToggle={[Function]} border={false} size=\\"medium\\" icon={[Function]} iconExpanded={[Function]} defaultExpanded={false} transition={true} as=\\"span\\" elementRef={[Function]}>
+  <View as=\\"div\\" padding=\\"small\\" display=\\"auto\\">
+    <Text as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
+      No alignments are available for this outcome.
+    </Text>
   </View>
-</ToggleDetails>"
+</ToggleGroup>"
+`;
+
+exports[`renders the Outcome component 1`] = `
+"<ToggleGroup summary={{...}} toggleLabel=\\"Toggle alignment details for My outcome\\" expanded={false} onToggle={[Function]} border={false} size=\\"medium\\" icon={[Function]} iconExpanded={[Function]} defaultExpanded={false} transition={true} as=\\"span\\" elementRef={[Function]}>
+  <List variant=\\"unstyled\\" delimiter=\\"dashed\\" as=\\"ul\\" margin=\\"none\\" size=\\"medium\\">
+    <ListItem>
+      <AssignmentResult result={{...}} outcome={{...}} outcomeProficiency={{...}} />
+    </ListItem>
+  </List>
+</ToggleGroup>"
 `;

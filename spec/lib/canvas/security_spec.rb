@@ -136,6 +136,12 @@ describe Canvas::Security do
         )
       end
 
+      it "allows 5 minutes of future clock skew" do
+        back_to_the_future_jwt = test_jwt(exp: 1.hour.from_now, nbf: 1.minutes.from_now, iat: 1.minutes.from_now)
+        body = Canvas::Security.decode_jwt(back_to_the_future_jwt, [ key ])
+        expect(body[:a]).to eq 1
+      end
+
       it "produces an InvalidToken error if string isn't a jwt (even if it looks like one)" do
         # this is an example token which base64_decodes to a thing that looks like a jwt because of the periods
         not_a_jwt = Canvas::Security.base64_decode("1050~LvwezC5Dd3ZK9CR1lusJTRv24dN0263txia3KF3mU6pDjOv5PaoX8Jv4ikdcvoiy")

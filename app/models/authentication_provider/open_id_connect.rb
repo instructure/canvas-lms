@@ -92,7 +92,7 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::Oauth2
       id_token = begin
         ::Canvas::Security.decode_jwt(jwt_string, [:skip_verification])
       rescue ::Canvas::Security::InvalidToken
-        Rails.logger.warning("Failed to decode OpenID Connect id_token: #{jwt_string.inspect}")
+        Rails.logger.warn("Failed to decode OpenID Connect id_token: #{jwt_string.inspect}")
         raise
       end
       # we have a userinfo endpoint, and we don't have everything we want,

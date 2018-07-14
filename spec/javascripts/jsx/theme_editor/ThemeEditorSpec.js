@@ -282,7 +282,6 @@ test('processThemeStoreForSubmit puts the themeStore into a FormData and returns
   const formObj = fromPairs(Array.from(formData.entries()))
   deepEqual(formObj, {
     'brand_config[variables][ic-brand-font-color-dark]': 'black',
-    'brand_config[variables][ic-brand-global-nav-bgd]': '#394B58',
     'brand_config[variables][ic-brand-global-nav-ic-icon-svg-fill]': '#efefef',
     'brand_config[variables][ic-brand-primary]': 'green',
     'brand_config[variables][ic-brand-favicon]': fileValue,
@@ -301,11 +300,8 @@ test('processThemeStoreForSubmit sets the correct keys for custom uploads', () =
   const formData = wrapper.instance().processThemeStoreForSubmit()
   const formObj = fromPairs(Array.from(formData.entries()))
   deepEqual(formObj, {
-    'brand_config[variables][ic-brand-font-color-dark]': '#2D3B45',
-    'brand_config[variables][ic-brand-global-nav-bgd]': '#394B58',
     'brand_config[variables][ic-brand-global-nav-ic-icon-svg-fill]': '#efefef',
     'brand_config[variables][ic-brand-primary]': 'green',
-    'brand_config[variables][ic-brand-favicon]': '/images/favicon.ico',
     'js_overrides': '',
     'mobile_css_overrides': '',
     'mobile_js_overrides': '',
@@ -322,11 +318,8 @@ test('processThemeStoreForSubmit sets the correct keys for custom uploads that a
   const formData = wrapper.instance().processThemeStoreForSubmit()
   const formObj = fromPairs(Array.from(formData.entries()))
   deepEqual(formObj, {
-    'brand_config[variables][ic-brand-font-color-dark]': '#2D3B45',
-    'brand_config[variables][ic-brand-global-nav-bgd]': '#394B58',
     'brand_config[variables][ic-brand-global-nav-ic-icon-svg-fill]': '#efefef',
     'brand_config[variables][ic-brand-primary]': 'green',
-    'brand_config[variables][ic-brand-favicon]': '/images/favicon.ico',
     'js_overrides': '/some/path/to/a/file',
     'mobile_css_overrides': '',
     'mobile_js_overrides': '',

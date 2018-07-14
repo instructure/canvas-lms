@@ -165,6 +165,8 @@ describe "account admin outcomes" do
       expect(driver.switch_to.alert).not_to be nil
       driver.switch_to.alert.accept
       wait_for_ajaximations
+      run_jobs
+      wait_for_no_such_element { f(".ui-dialog") }
     end
 
     def expand_child_folders(counter, back_button)

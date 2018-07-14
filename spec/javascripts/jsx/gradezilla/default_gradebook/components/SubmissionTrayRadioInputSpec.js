@@ -19,7 +19,7 @@
 import React from 'react'
 import { mount } from 'enzyme'
 import SubmissionTrayRadioInput from 'jsx/gradezilla/default_gradebook/components/SubmissionTrayRadioInput'
-import NumberInput from '@instructure/ui-core/lib/components/NumberInput'
+import NumberInput from '@instructure/ui-forms/lib/components/NumberInput'
 
 let wrapper
 let updateSubmission
@@ -203,48 +203,42 @@ QUnit.module('SubmissionTrayRadioInput', function (hooks) {
       test('does not call updateSubmission if the input value is an empty string', function () {
         wrapper = mountComponent({ value: 'late', checked: true, updateSubmission })
         const input = numberInput()
-        input.simulate('change', { target: { value: '' } })
-        input.simulate('blur')
+        input.simulate('blur', { target: { value: '' } })
         strictEqual(updateSubmission.callCount, 0)
       })
 
       test('does not call updateSubmission if the input value cannot be parsed as a number', function () {
         wrapper = mountComponent({ value: 'late', checked: true, updateSubmission })
         const input = numberInput()
-        input.simulate('change', { target: { value: 'foo' } })
-        input.simulate('blur')
+        input.simulate('blur', { target: { value: 'foo' } })
         strictEqual(updateSubmission.callCount, 0)
       })
 
       test('does not call updateSubmission if the input value matches the current value', function () {
         wrapper = mountComponent({ value: 'late', checked: true, updateSubmission })
         const input = numberInput()
-        input.simulate('change', { target: { value: '0' } })
-        input.simulate('blur')
+        input.simulate('blur', { target: { value: '0' } })
         strictEqual(updateSubmission.callCount, 0)
       })
 
       test('does not call updateSubmission if the parsed value (2 decimals) matches the current value', function () {
         wrapper = mountComponent({ value: 'late', checked: true, updateSubmission })
         const input = numberInput()
-        input.simulate('change', { target: { value: '0.004' } })
-        input.simulate('blur')
+        input.simulate('blur', { target: { value: '0.004' } })
         strictEqual(updateSubmission.callCount, 0)
       })
 
       test('calls updateSubmission if the parsed value (2 decimals) differs from the current value', function () {
         wrapper = mountComponent({ value: 'late', checked: true, updateSubmission })
         const input = numberInput()
-        input.simulate('change', { target: { value: '2' } })
-        input.simulate('blur')
+        input.simulate('blur', { target: { value: '2' } })
         strictEqual(updateSubmission.callCount, 1)
       })
 
       test('calls updateSubmission with latePolicyStatus set to "late"', function () {
         wrapper = mountComponent({ value: 'late', checked: true, updateSubmission })
         const input = numberInput()
-        input.simulate('change', { target: { value: '2' } })
-        input.simulate('blur')
+        input.simulate('blur', { target: { value: '2' } })
         strictEqual(updateSubmission.getCall(0).args[0].latePolicyStatus, 'late')
       })
 
@@ -256,8 +250,7 @@ QUnit.module('SubmissionTrayRadioInput', function (hooks) {
         })
 
         const input = numberInput()
-        input.simulate('change', { target: { value: '2' } })
-        input.simulate('blur')
+        input.simulate('blur', { target: { value: '2' } })
         const expectedSeconds = 2 * 3600
         strictEqual(updateSubmission.getCall(0).args[0].secondsLateOverride, expectedSeconds)
       })
@@ -265,8 +258,7 @@ QUnit.module('SubmissionTrayRadioInput', function (hooks) {
       test('interval is day: calls updateSubmission with the input converted to seconds', function () {
         wrapper = mountComponent({ value: 'late', checked: true, updateSubmission })
         const input = numberInput()
-        input.simulate('change', { target: { value: '2' } })
-        input.simulate('blur')
+        input.simulate('blur', { target: { value: '2' } })
         const expectedSeconds = 2 * 86400
         strictEqual(updateSubmission.getCall(0).args[0].secondsLateOverride, expectedSeconds)
       })
@@ -274,8 +266,7 @@ QUnit.module('SubmissionTrayRadioInput', function (hooks) {
       test('truncates the remainder if one exists', function () {
         wrapper = mountComponent({ value: 'late', checked: true, updateSubmission })
         const input = numberInput()
-        input.simulate('change', { target: { value: '2.3737' } })
-        input.simulate('blur')
+        input.simulate('blur', { target: { value: '2.3737' } })
         const expectedSeconds = Math.trunc(2.3737 * 86400)
         strictEqual(updateSubmission.getCall(0).args[0].secondsLateOverride, expectedSeconds)
       })

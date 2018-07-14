@@ -243,7 +243,6 @@ describe "account admin question bank" do
       wait_for_ajaximations
       replace_content(f('#outcome_mastery_at'), mastery_percent)
       fj('.btn-primary:visible').click
-      driver.switch_to.alert.accept
       wait_for_ajax_requests
       expect(fj("[data-id=#{outcome.id}]:visible")).to include_text outcome.short_description
     end

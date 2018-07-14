@@ -44,15 +44,15 @@ describe "gradebook" do
 
   it "should let you post a group comment to a group assignment", priority: "1", test_id: 210047 do
     group_assignment = @course.assignments.create!({
-      :title => 'group assignment',
-      :due_at => (Time.zone.now + 1.week),
-      :points_possible => @assignment_3_points,
-      :submission_types => 'online_text_entry',
-      :assignment_group => @group,
-      :group_category => GroupCategory.create!(:name => "groups", :context => @course),
-      :grade_group_students_individually => true
+      title: 'group assignment',
+      due_at: (Time.zone.now + 1.week),
+      points_possible: @assignment_3_points,
+      submission_types: 'online_text_entry',
+      assignment_group: @group,
+      group_category: GroupCategory.create!(name: "groups", context: @course),
+      grade_group_students_individually: true
     })
-    project_group = group_assignment.group_category.groups.create!(:name => 'g1', :context => @course)
+    project_group = group_assignment.group_category.groups.create!(name: 'g1', context: @course)
     project_group.users << @student_1
     project_group.users << @student_2
 

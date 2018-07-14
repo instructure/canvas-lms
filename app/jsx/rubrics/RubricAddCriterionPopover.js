@@ -18,8 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
-import { MenuItem, MenuItemSeparator, MenuItemGroup } from '@instructure/ui-core/lib/components/Menu'
+import Menu, { MenuItem, MenuItemSeparator, MenuItemGroup } from '@instructure/ui-menu/lib/components/Menu'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import I18n from 'i18n!edit_rubric'
 import $ from 'jquery'
@@ -40,7 +39,7 @@ class RubricAddCriterionPopover extends React.Component {
 
     return (
       <span>
-        <PopoverMenu
+        <Menu
           placement="bottom"
           trigger={
             <a className="icon-plus" href="#" >{I18n.t("Criterion")}</a>
@@ -58,7 +57,7 @@ class RubricAddCriterionPopover extends React.Component {
                       </MenuItem>
             )}
           </MenuItemGroup>
-        </PopoverMenu>
+        </Menu>
         <a href="#" id="add_learning_outcome_link" className="icon-search find_outcome_link outcome">{I18n.t("Find Outcome")}</a>
         <a href="#" id="add_criterion_link" className="hidden icon-plus add_criterion_link">{I18n.t("New Criterion")}</a>
       </span>

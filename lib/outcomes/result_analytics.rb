@@ -20,7 +20,7 @@ module Outcomes
   module ResultAnalytics
 
     Rollup = Struct.new(:context, :scores)
-    Result = Struct.new(:learning_outcome, :score, :count)
+    Result = Struct.new(:learning_outcome, :score, :count, :hide_points)
 
     # Public: Queries learning_outcome_results for rollup.
     #
@@ -35,11 +35,15 @@ module Outcomes
       required_opts = [:users, :context, :outcomes]
       required_opts.each { |p| raise "#{p} option is required" unless opts[p] }
       users, context, outcomes = opts.values_at(*required_opts)
-      order_results_for_rollup LearningOutcomeResult.active.where(
+      results = LearningOutcomeResult.active.where(
         context_code:        context.asset_string,
         user_id:             users.map(&:id),
-        learning_outcome_id: outcomes.map(&:id)
+        learning_outcome_id: outcomes.map(&:id),
       )
+      unless opts[:include_hidden]
+        results = results.where(hidden: false)
+      end
+      order_results_for_rollup results
     end
 
     # Internal: Add an order clause to a relation so results are returned in an
@@ -81,7 +85,7 @@ module Outcomes
       rollup_scores = rollups.map(&:scores).flatten
       outcome_results = rollup_scores.group_by(&:outcome).values
       aggregate_results = outcome_results.map do |scores|
-        scores.map{|score| Result.new(score.outcome, score.score, score.count)}
+        scores.map{|score| Result.new(score.outcome, score.score, score.count, score.hide_points)}
       end
       aggregate_rollups = aggregate_results.map do |result|
         RollupScore.new(result,{aggregate_score: true})

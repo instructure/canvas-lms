@@ -2,17 +2,32 @@
   "add_to_do_7def3c37": {
     "message": "Dodaj do listy zadań"
   },
+  "all_day_fb42c4fc": {
+    "message": "Cały dzień"
+  },
   "all_items_loaded_aa256183": {
     "message": "Wszystkie elementy wczytane"
   },
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "Czy na pewno chcesz usunąć ten element planera?"
   },
-  "assignmenttype_title_is_complete_813e54f8": {
-    "message": "{ assignmentType } { title } jest ukończony"
+  "assignmenttype_title_6612d008": {
+    "message": "{ assignmentType } { title }."
   },
-  "assignmenttype_title_is_incomplete_a1d5fac0": {
-    "message": "{ assignmentType } { title } jest nieukończony"
+  "assignmenttype_title_at_datetime_478f0709": {
+    "message": "{ assignmentType } { title }, o { datetime }."
+  },
+  "assignmenttype_title_due_datetime_a112d8ff": {
+    "message": "{ assignmentType } { title }, termin { datetime }."
+  },
+  "assignmenttype_title_is_marked_as_done_a8dc46ef": {
+    "message": "{ assignmentType } { title } oznaczono jako gotowe."
+  },
+  "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
+    "message": "{ assignmentType } { title } nie oznaczono jako gotowe."
+  },
+  "assignmenttype_title_on_datetime_446013fb": {
+    "message": "{ assignmentType } { title }, w dniu { datetime }."
   },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Początek historii listy zadań"
@@ -30,7 +45,7 @@
     "message": "{ count, plural,\n     =0 {# okazje}\n    one {# okazja}\n  other {# okazji}\n}"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-    "message": "{ count, plural,\n    one {Pokaż # ukończony element}\n  other {Pokaż ukończone elementy: #}\n}"
+    "message": "{ count, plural,\n    one {Pokaż # ukończony element}\n  other {Pokaż # ukończone elementy }\n}"
   },
   "course_8a63b4a3": {
     "message": "Kurs"
@@ -43,6 +58,9 @@
   },
   "date_ee500367": {
     "message": "Data"
+  },
+  "date_is_not_a_valid_date_4ef9f8ba": {
+    "message": "#{ date } nie jest prawidłową datą."
   },
   "date_is_required_8660ec22": {
     "message": "Wymagana jest data."
@@ -64,6 +82,9 @@
   },
   "edit_title_72e5a21e": {
     "message": "Edytuj { title }"
+  },
+  "error_loading_grades_e0b38f4d": {
+    "message": "Błąd podczas wczytywania ocen"
   },
   "error_loading_more_items_3f109d9f": {
     "message": "Błąd podczas wczytywania dodatkowych elementów"
@@ -95,6 +116,15 @@
   "graded_25cd3fcd": {
     "message": "Oceniono"
   },
+  "grades_are_loading_c899652d": {
+    "message": "Trwa wczytywanie ocen"
+  },
+  "grades_loaded_5056277c": {
+    "message": "Wczytano oceny"
+  },
+  "items_completed_items_plural_1_item_other_items_717d579f": {
+    "message": "{ items } ukończył(a) { items, plural,\n     =1 {element}\n  other {elementy}\n}"
+  },
   "late_2be42b88": {
     "message": "Późno"
   },
@@ -105,10 +135,16 @@
     "message": "Wczytaj wcześniejsze daty"
   },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-    "message": "Wczytano { count, plural,\n     =0{# elementów}\n    one {# element}\n  other {# elementy}\n}"
+    "message": "Wczytano { count, plural,\n     =0 {# elementy}\n    one {# element}\n  other {# elementów}\n}"
   },
   "loading_25990131": {
     "message": "Wczytywanie..."
+  },
+  "loading_725811ca": {
+    "message": "wczytywanie"
+  },
+  "loading_grades_c842c887": {
+    "message": "Wczytywanie ocen"
   },
   "loading_past_items_ca499e75": {
     "message": "Wczytywanie wcześniejszych elementów"
@@ -122,14 +158,17 @@
   "missing_1a256b3b": {
     "message": "Brak"
   },
-  "missing_items_for_5ef30cea": {
-    "message": "Brak elementów dla "
+  "missing_items_for_title_516511f8": {
+    "message": "Brak elementów dla { title }"
+  },
+  "my_grades_98834476": {
+    "message": "Moje oceny"
   },
   "new_activity_8b84847d": {
     "message": "Nowa aktywność"
   },
-  "new_activity_for_ac84f6e6": {
-    "message": "Nowa aktywność dla "
+  "new_activity_for_title_14c9c3af": {
+    "message": "Nowa aktywność dla { title }"
   },
   "next_month_749b1778": {
     "message": "Następny miesiąc"
@@ -137,11 +176,20 @@
   "no_due_dates_assigned_e8f5bac8": {
     "message": "Brak ustawionych terminów"
   },
-  "no_to_do_s_for_this_day_yet_90c5873d": {
-    "message": "Brak listy zadań ten dzień."
+  "no_grade_3b4d7f3e": {
+    "message": "Brak oceny"
   },
   "nothing_new_needs_attention_3ac548d4": {
     "message": "Nic nie wymaga uwagi."
+  },
+  "nothing_planned_today_next_item_loaded_5a199868": {
+    "message": "Nic na dziś nie zaplanowano. Następny wczytany element."
+  },
+  "nothing_planned_yet_8675ffe9": {
+    "message": "Nic jeszcze nie zaplanowano"
+  },
+  "only_most_recent_grading_period_shown_f1ad6458": {
+    "message": "*Pokazano tylko najnowszy okres oceniania."
   },
   "optional_add_course_ef0d70fc": {
     "message": "Opcjonalnie: Dodaj kurs"
@@ -164,11 +212,26 @@
   "save_11a80ec3": {
     "message": "Zapisz"
   },
+  "show_my_grades_ebd08684": {
+    "message": "Pokaż moje oceny"
+  },
+  "startdate_to_enddate_d245175b": {
+    "message": "{ startDate } do { endDate }"
+  },
   "submitted_318fad53": {
     "message": "Przesłano"
   },
+  "success_to_do_created_e34ed395": {
+    "message": "Zakończono powodzeniem: Utworzono zadanie"
+  },
   "task_16b0ef38": {
     "message": "Zadanie"
+  },
+  "the_date_and_time_this_to_do_is_due_74c823d4": {
+    "message": "Minęły już termin i godzina na wykonanie tego zadania"
+  },
+  "time_2b5aac58": {
+    "message": "Godzina"
   },
   "title_ee03d132": {
     "message": "Tytuł"
@@ -189,7 +252,7 @@
     "message": "Jutro"
   },
   "tomorrow_at_date_b53f2cf1": {
-    "message": "Dziś o godz. { date }"
+    "message": "Jutro o godz. { date }"
   },
   "unable_to_mark_as_complete_8141856d": {
     "message": "Nie można oznaczyć jako ukończone."
@@ -199,6 +262,9 @@
   },
   "yesterday_c6bd6abf": {
     "message": "Wczoraj"
+  },
+  "you_must_provide_a_date_and_time_a86839d2": {
+    "message": "Wymagane są data i godzina."
   },
   "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
     "message": "Przewinięto do pierwszej listy zadań!"

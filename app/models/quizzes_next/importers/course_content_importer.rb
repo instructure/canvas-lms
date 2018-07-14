@@ -29,6 +29,7 @@ module QuizzesNext::Importers
         import_content(context, @data, params, @migration)
 
       migration_lti!
+      mark_completion!
     end
 
     private
@@ -55,6 +56,10 @@ module QuizzesNext::Importers
       imported_asset_hash = @migration.migration_settings[:imported_assets] || {}
       imported_asset_hash[:lti_assignment_quiz_set] = lti_assignment_quiz_set
       @migration.migration_settings[:imported_assets] = imported_asset_hash
+    end
+
+    def mark_completion!
+      @migration.workflow_state = :imported
       @migration.save!
     end
   end

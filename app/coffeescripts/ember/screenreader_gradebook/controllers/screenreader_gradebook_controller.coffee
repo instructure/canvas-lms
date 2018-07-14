@@ -43,7 +43,7 @@ define [
   'jsx/gradezilla/individual-gradebook/components/GradebookSelector'
   'jquery.instructure_date_and_time'
 ], (
-  $, React, ReactDOM, 
+  $, React, ReactDOM,
   ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz, AssignmentDetailsDialog,
   AssignmentMuter, CourseGradeCalculator, EffectiveDueDates, outcomeGrid, ic_submission_download_dialog,
   htmlEscape, CalculationMethodContent, SubmissionStateMap, GradingPeriodsApi, GradingPeriodSetsApi,
@@ -926,6 +926,10 @@ define [
     selectedSubmissionHidden: (->
       @get('selectedSubmission.hidden') || false
     ).property('selectedStudent', 'selectedAssignment')
+
+    hideComments: (->
+      @get('selectedAssignment.muted') && (@get('selectedAssignment.anonymous_grading') || @get('selectedAssignment.moderated_grading')) || false
+    ).property('selectedAssignment')
 
     selectedSubmissionLate: (->
       ( @get('selectedSubmission.points_deducted') || 0 ) > 0

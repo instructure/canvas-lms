@@ -2204,17 +2204,14 @@ class ApplicationController < ActionController::Base
     js_env hash
   end
 
-  def set_js_assignment_data(include_assignment_permissions: false)
+  def set_js_assignment_data
     rights = [:manage_assignments, :manage_grades, :read_grades, :manage]
     permissions = @context.rights_status(@current_user, *rights)
     permissions[:manage_course] = permissions[:manage]
     permissions[:manage] = permissions[:manage_assignments]
-
-    if include_assignment_permissions
-      permissions[:by_assignment_id] = @context.assignments.map do |assignment|
-        [assignment.id, {update: assignment.user_can_update?(@current_user, session)}]
-      end.to_h
-    end
+    permissions[:by_assignment_id] = @context.assignments.map do |assignment|
+      [assignment.id, {update: assignment.user_can_update?(@current_user, session)}]
+    end.to_h
 
     js_env({
       :URLS => {
@@ -2293,15 +2290,13 @@ class ApplicationController < ActionController::Base
     nil
   end
 
-  def show_request_delete_account
-    false
-  end
-  helper_method :show_request_delete_account
-
-  def request_delete_account_link
+  def self.test_cluster_name
     nil
   end
-  helper_method :request_delete_account_link
+
+  def self.test_cluster?
+    false
+  end
 
   def setup_live_events_context
     ctx = {}

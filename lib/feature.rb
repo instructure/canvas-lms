@@ -60,7 +60,7 @@ class Feature
   end
 
   def self.production_environment?
-    Rails.env.production? && !(ApplicationController.respond_to?(:test_cluster?) && ApplicationController.test_cluster?)
+    Rails.env.production? && !ApplicationController.test_cluster?
   end
 
   # Register one or more features.  Must be done during application initialization.
@@ -69,7 +69,7 @@ class Feature
   #     display_name: -> { I18n.t('features.automatic_essay_grading', 'Automatic Essay Grading') },
   #     description: -> { I18n.t('features.automatic_essay_grading_description, 'Popup text describing the feature goes here') },
   #     applies_to: 'Course', # or 'RootAccount' or 'Account' or 'User'
-  #     state: 'allowed',     # or 'off', 'on', 'hidden', or 'hidden_in_prod'
+  #     state: 'allowed',     # or 'on', 'hidden', or 'hidden_in_prod'
   #                           # - 'hidden' means the feature must be set by a site admin before it will be visible
   #                           #   (in that context and below) to other users
   #                           # - 'hidden_in_prod' registers 'hidden' in production environments or 'allowed' elsewhere
@@ -139,8 +139,7 @@ END
       display_name: -> { I18n.t('Updated Permissions Page') },
       description: -> { I18n.t('Use the new interface for managing permissions') },
       applies_to: 'Account',
-      state: 'hidden',
-      development: true,
+      state: 'allowed',
     },
     'google_docs_domain_restriction' =>
     {
@@ -538,12 +537,6 @@ END
         end
       end
     },
-    'anonymous_grading' => {
-      display_name: -> { I18n.t('Anonymous Grading') },
-      description: -> { I18n.t("Anonymous grading forces student names to be hidden in SpeedGrader™") },
-      applies_to: 'Course',
-      state: 'allowed'
-    },
     'international_sms' => {
       display_name: -> { I18n.t('International SMS') },
       description: -> { I18n.t('Allows users with international phone numbers to receive text messages from Canvas.') },
@@ -677,20 +670,6 @@ END
       beta: true,
       state: 'hidden'
     },
-    'developer_key_management' =>
-    {
-      display_name: -> { I18n.t('Developer Key management')},
-      description: -> { I18n.t('New Features for Developer Key management') },
-      applies_to: 'RootAccount',
-      state: 'hidden'
-    },
-    'developer_key_management_ui_rewrite' =>
-    {
-      display_name: -> { I18n.t('Developer Key management UI Rewrite')},
-      description: -> { I18n.t('React UI rewrite Developer Key management') },
-      applies_to: 'RootAccount',
-      state: 'hidden'
-    },
     'common_cartridge_page_conversion' => {
       display_name: -> { I18n.t('Common Cartridge HTML File to Page Conversion') },
       description: -> { I18n.t('If enabled, Common Cartridge importers will convert HTML files into Pages') },
@@ -698,15 +677,21 @@ END
       state: 'hidden',
       beta: true
     },
-    'api_token_scoping' => {
-      display_name: -> { I18n.t('API Token Scoping')},
-      description: -> { I18n.t('If enabled, scopes will be validated on API requests if the developer key being used requires scopes.') },
+    'developer_key_management_and_scoping' => {
+      display_name: -> { I18n.t('Developer key management and scoping')},
+      description: -> { I18n.t('If enabled, developer key management options and token scoping will be used.') },
       applies_to: 'RootAccount',
-      state: 'hidden'
+      state: 'allowed'
     },
     'non_scoring_rubrics' => {
       display_name: -> { I18n.t('Non-scoring Rubrics')},
       description: -> { I18n.t('If enabled, the option will be presented to have non-scoring rubrics.') },
+      applies_to: 'RootAccount',
+      state: 'allowed'
+    },
+    'observer_pairing_code' => {
+      display_name: -> { I18n.t('Use pairing code for parent sign up') },
+      description: -> { I18n.t('If enabled, the parent sign up form will require a student pairing code instead of the child username and password') },
       applies_to: 'RootAccount',
       state: 'hidden'
     }

@@ -19,13 +19,12 @@
 import React from 'react';
 import { bool, func, number, shape, string } from 'prop-types';
 import IconMoreSolid from '@instructure/ui-icons/lib/Solid/IconMore';
-import Button from '@instructure/ui-core/lib/components/Button';
-import Grid, { GridCol, GridRow } from '@instructure/ui-core/lib/components/Grid';
-import { MenuItem, MenuItemFlyout, MenuItemGroup } from '@instructure/ui-core/lib/components/Menu';
-import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu';
-import Text from '@instructure/ui-core/lib/components/Text';
+import Button from '@instructure/ui-buttons/lib/components/Button';
+import Grid, { GridCol, GridRow } from '@instructure/ui-layout/lib/components/Grid';
+import Menu, { MenuItem, MenuItemGroup } from '@instructure/ui-menu/lib/components/Menu';
+import Text from '@instructure/ui-elements/lib/components/Text';
 import I18n from 'i18n!gradebook';
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 import ColumnHeader from './ColumnHeader'
 
 function AssignmentGroupDetail ({ assignmentGroup, weightedGroups }) {
@@ -84,7 +83,7 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader {
       settingKey: string.isRequired
     }).isRequired,
     weightedGroups: bool.isRequired,
-    onMenuClose: func.isRequired,
+    onMenuDismiss: Menu.propTypes.onDismiss.isRequired,
     ...ColumnHeader.propTypes
   };
 
@@ -116,14 +115,14 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader {
 
               <GridCol textAlign="center" width="auto">
                 <div className={classes}>
-                  <PopoverMenu
+                  <Menu
                     contentRef={this.bindOptionsMenuContent}
                     shouldFocusTriggerOnClose={false}
-                    trigger={renderTrigger(this.props.assignmentGroup, this.bindOptionsMenuTrigger)}
+                    trigger={renderTrigger(this.props.assignmentGroup, ref => this.optionsMenuTrigger = ref)}
                     onToggle={this.onToggle}
-                    onClose={this.props.onMenuClose}
+                    onDismiss={this.props.onMenuDismiss}
                   >
-                    <MenuItemFlyout label={I18n.t('Sort by')} contentRef={this.bindSortByMenuContent}>
+                    <Menu label={I18n.t('Sort by')} contentRef={this.bindSortByMenuContent}>
                       <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
                         <MenuItem
                           selected={selectedSortSetting === 'grade' && sortBySetting.direction === 'ascending'}
@@ -141,8 +140,8 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader {
                           <span>{I18n.t('Grade - High to Low')}</span>
                         </MenuItem>
                       </MenuItemGroup>
-                    </MenuItemFlyout>
-                  </PopoverMenu>
+                    </Menu>
+                  </Menu>
                 </div>
               </GridCol>
             </GridRow>

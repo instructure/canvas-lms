@@ -137,4 +137,28 @@ QUnit.module('DueDateCalendarPicker', suiteHooks => {
     const $button = wrapper.getDOMNode().querySelector('button')
     equal($button.getAttribute('aria-disabled'), 'true')
   })
+
+  test('forwards properties to label', () => {
+    props.labelClasses = 'special-label'
+    mountComponent()
+    ok(wrapper.find('label').prop('className').match(/special-label/));
+  })
+
+  test('forwards properties to input', () => {
+    props.name = 'special-name'
+    mountComponent()
+    ok(wrapper.find('input').prop('name').match(/special-name/));
+  })
+
+  test('label and input reference each other', () => {
+    mountComponent()
+
+    const htmlFor = wrapper.find('label').prop('htmlFor')
+    const inputId = wrapper.find('input').prop('id')
+    equal(htmlFor, inputId)
+
+    const labelId = wrapper.find('label').prop('id')
+    const labelledby = wrapper.find('input').prop('aria-labelledby')
+    equal(labelId, labelledby)
+  })
 })

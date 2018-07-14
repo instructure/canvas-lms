@@ -96,7 +96,7 @@ module Canvadocs
     private :canvadocs_apply_whitelist
 
     def canvadocs_annotation_context
-      if ApplicationController.respond_to?(:test_cluster?) && ApplicationController.test_cluster?
+      if ApplicationController.test_cluster?
         return "default-#{ApplicationController.test_cluster_name}"
       end
       "default"

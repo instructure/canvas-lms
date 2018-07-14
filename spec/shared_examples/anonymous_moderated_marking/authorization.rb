@@ -16,10 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-RSpec.shared_examples 'authorization when Anonymous Moderated Marking is enabled' do |http_verb|
-  before(:once) { @course.root_account.enable_feature!(:anonymous_moderated_marking) }
-
+RSpec.shared_examples 'authorization for provisional final grade selection' do |http_verb|
   it 'is unauthorized if the user is not the assigned final grader' do
+    @assignment.update_attribute(:final_grader_id, nil)
     api_call_as_user(@teacher, http_verb, @path, @params, {}, {}, expected_status: 401)
   end
 

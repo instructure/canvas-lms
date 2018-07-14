@@ -21,6 +21,7 @@ define [
   'jquery'
   'underscore'
   '../../models/OutcomeGroup'
+  '../../models/Progress'
   '../DialogBaseView'
   './SidebarView'
   './ContentView'
@@ -28,7 +29,7 @@ define [
   'jst/outcomes/findInstructions'
   '../../jquery.rails_flash_notifications'
   'jquery.disableWhileLoading'
-], (I18n, $, _, OutcomeGroup, DialogBaseView, SidebarView, ContentView, browserTemplate, instructionsTemplate) ->
+], (I18n, $, _, OutcomeGroup, Progress, DialogBaseView, SidebarView, ContentView, browserTemplate, instructionsTemplate) ->
 
   # Creates a popup dialog similar to the main outcomes browser minus the toolbar.
   class FindDialog extends DialogBaseView
@@ -92,15 +93,24 @@ define [
       model.quizMasteryLevel = (parseFloat(@$el.find('#outcome_mastery_at').val()) or 0) if @content.setQuizMastery
       model.useForScoring = @$el.find('#outcome_use_for_scoring').prop('checked') if @content.useForScoring
       return alert I18n.t('dont_import', 'This group cannot be imported.') if model.get 'dontImport'
+      unless @shouldImport
+        @trigger('import', model)
+        @close()
+        return
       if confirm(@confirmText(model))
-        unless @shouldImport
-          @trigger('import', model)
-          @close()
-          return
         if model instanceof OutcomeGroup
           url = @selectedGroup.get('import_url')
-          dfd = $.ajaxJSON url, 'POST',
-            source_outcome_group_id: model.get 'id'
+          progress = new Progress
+          dfd = $.ajaxJSON(url, 'POST', {
+            source_outcome_group_id: model.get('id'),
+            async: true,
+          }).pipe((resp) ->
+            progress.set('url', resp.url)
+            progress.poll()
+            return progress.pollDfd
+          ).pipe(->
+            return $.ajaxJSON(progress.get('results').outcome_group_url, 'GET')
+          )
         else
           url = @selectedGroup.get('outcomes_url')
           dfd = $.ajaxJSON url, 'POST',

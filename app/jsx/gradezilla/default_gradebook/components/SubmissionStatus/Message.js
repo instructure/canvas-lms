@@ -18,8 +18,8 @@
 
 import React from 'react'
 import {oneOf, string} from 'prop-types'
-import Grid, { GridCol, GridRow } from '@instructure/ui-core/lib/components/Grid'
-import Text from '@instructure/ui-core/lib/components/Text'
+import Grid, { GridCol, GridRow } from '@instructure/ui-layout/lib/components/Grid'
+import Text from '@instructure/ui-elements/lib/components/Text'
 import IconInfoLine from '@instructure/ui-icons/lib/Line/IconInfo'
 import IconWarningLine from '@instructure/ui-icons/lib/Line/IconWarning'
 

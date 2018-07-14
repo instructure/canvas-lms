@@ -104,8 +104,3 @@ test('populates the key notes', () => {
   const [, input] = formFieldTextAreas(developerKey)
   equal(input.value, developerKey.notes)
 })
-
-test('renders the scopes component', () => {
-  const [, , , , , , input] = formFieldInputs(developerKey)
-  equal(input.placeholder, "Search endpoints")
-})

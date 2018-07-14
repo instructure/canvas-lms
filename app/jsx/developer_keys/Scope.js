@@ -20,11 +20,15 @@ import React from 'react'
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import View from '@instructure/ui-layout/lib/components/View'
 import DeveloperKeyScopesMethod from './ScopesMethod'
 
 const DeveloperKeyScope = props => {
   return (
-    <div className="developer-key-scope">
+    <View
+      as="div"
+      data-automation="developer-key-scope"
+    >
       <Flex alignItems="start" padding="small medium small none">
         <FlexItem padding="none">
           <Checkbox
@@ -42,7 +46,7 @@ const DeveloperKeyScope = props => {
           <DeveloperKeyScopesMethod method={props.scope.verb} />
         </FlexItem>
       </Flex>
-    </div>
+    </View>
   )
 }
 

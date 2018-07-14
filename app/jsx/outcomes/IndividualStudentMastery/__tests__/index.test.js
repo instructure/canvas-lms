@@ -18,6 +18,7 @@
 
 import React from 'react'
 import { mount, shallow } from 'enzyme'
+import { Set } from 'immutable'
 import IndividualStudentMastery from '../index'
 import fetchOutcomes from '../fetchOutcomes'
 
@@ -29,7 +30,8 @@ beforeEach(() => {
 
 const props = {
   studentId: 12,
-  courseId: 110
+  courseId: 110,
+  onExpansionChange: jest.fn()
 }
 
 it('renders the component', () => {
@@ -67,10 +69,107 @@ it('renders empty if no groups are returned', (done) => {
 })
 
 it('renders outcome groups if they are returned', (done) => {
-  fetchOutcomes.mockImplementation(() => Promise.resolve({ outcomeGroups: [{ id: 1, title: 'Group' }], outcomes: [] }))
+  fetchOutcomes.mockImplementation(() => Promise.resolve({
+    outcomeGroups: [{ id: 1, title: 'Group' }],
+    outcomes: []
+  }))
   const wrapper = mount(<IndividualStudentMastery {...props} />)
   setTimeout(() => {
     expect(wrapper.update().find('OutcomeGroup')).toHaveLength(1)
     done()
   }, 1)
+})
+
+describe('expand and contract', () => {
+  beforeEach(() => {
+    fetchOutcomes.mockImplementation(() => Promise.resolve({
+      outcomeGroups: [{ id: 1, title: 'Group' }],
+      outcomes: [{id: 2, expansionId: 100, groupId: 1, title: 'Outcome', mastered: false, mastery_points: 0, points_possible: 0, results: [], ratings: []}]
+    }))
+  })
+
+  it('toggles elements to expanded when event fired', (done) => {
+    const wrapper = mount(<IndividualStudentMastery {...props} />)
+    setTimeout(() => {
+      wrapper.instance().onElementExpansionChange('outcome', 100, true)
+      expect(wrapper.state('expandedOutcomes').equals(Set.of(100))).toBe(true)
+      wrapper.instance().onElementExpansionChange('outcome', 100, false)
+      expect(wrapper.state('expandedOutcomes').equals(Set())).toBe(true)
+      done()
+    })
+  })
+
+  it('contracts child outcomes when a group is contracted', (done) => {
+    const wrapper = mount(<IndividualStudentMastery {...props} />)
+    setTimeout(() => {
+      wrapper.setState({ expandedGroups: Set.of(1), expandedOutcomes: Set.of(100) }, () => {
+        wrapper.instance().onElementExpansionChange('group', 1, false)
+        setTimeout(() => {
+          expect(wrapper.state('expandedOutcomes').equals(Set())).toBe(true)
+          done()
+        })
+      })
+    })
+  })
+
+  it('expands all when expand() is called', (done) => {
+    const wrapper = mount(<IndividualStudentMastery {...props} />)
+    setTimeout(() => {
+      wrapper.instance().expand()
+      setTimeout(() => {
+        expect(wrapper.state('expandedGroups').equals(Set.of(1))).toBe(true)
+        expect(wrapper.state('expandedOutcomes').equals(Set.of(100))).toBe(true)
+        done()
+      })
+    })
+  })
+
+  it('contracts all when contract() is called', (done) => {
+    const wrapper = mount(<IndividualStudentMastery {...props} />)
+    setTimeout(() => {
+      wrapper.setState({ expandedOutcomes: Set.of(100), expandedGroups: Set.of(1) }, () => {
+        wrapper.instance().contract()
+        setTimeout(() => {
+          expect(wrapper.state('expandedGroups').equals(Set())).toBe(true)
+          expect(wrapper.state('expandedOutcomes').equals(Set())).toBe(true)
+          done()
+        })
+      })
+    })
+  })
+
+  it('notifies when expansion is changed', (done) => {
+    const wrapper = mount(<IndividualStudentMastery {...props} />)
+    setTimeout(() => {
+      wrapper.instance().onElementExpansionChange('outcome', 100, true)
+      expect(props.onExpansionChange).lastCalledWith(true, true)
+      wrapper.instance().onElementExpansionChange('group', 1, true)
+      expect(props.onExpansionChange).lastCalledWith(true, false)
+      wrapper.instance().contract()
+      expect(props.onExpansionChange).lastCalledWith(false, true)
+      done()
+    })
+  })
+})
+
+it('renders outcome groups in alphabetical order by title', (done) => {
+  fetchOutcomes.mockImplementation(() => Promise.resolve({
+    outcomeGroups: [
+      { id: 1, title: 'ZZ Top Albums' },
+      { id: 2, title: 'Aerosmith Albums' },
+      { id: 3, title: 'Aardvark Albums' },
+      { id: 4, title: 'abba Albums' }
+    ],
+    outcomes: []
+  }))
+  const wrapper = mount(<IndividualStudentMastery {...props} />)
+  setTimeout(() => {
+    const groups = wrapper.find('OutcomeGroup')
+    expect(groups).toHaveLength(4)
+    expect(groups.get(0).props.outcomeGroup.title).toEqual('Aardvark Albums')
+    expect(groups.get(1).props.outcomeGroup.title).toEqual('abba Albums')
+    expect(groups.get(2).props.outcomeGroup.title).toEqual('Aerosmith Albums')
+    expect(groups.get(3).props.outcomeGroup.title).toEqual('ZZ Top Albums')
+    done()
+  })
 })

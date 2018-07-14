@@ -463,7 +463,6 @@ class Submission < ActiveRecord::Base
 
   def can_view_details?(user)
     return false unless grants_right?(user, :read)
-    return true unless self.assignment.root_account.feature_enabled?(:anonymous_moderated_marking)
     return true unless self.assignment.anonymous_grading && self.assignment.muted
     user == self.user || Account.site_admin.grants_right?(user, :update)
   end
@@ -549,23 +548,26 @@ class Submission < ActiveRecord::Base
   end
 
   def create_alert
-    return unless saved_change_to_score? && self.grader_id && !self.autograded?
+    return unless saved_change_to_score? && self.grader_id && !self.autograded? &&
+      self.assignment.points_possible && self.assignment.points_possible > 0
 
     thresholds = ObserverAlertThreshold.active.where(student: self.user,
       alert_type: ['assignment_grade_high', 'assignment_grade_low'])
 
     thresholds.each do |threshold|
-      threshold_value = threshold.threshold.to_i
-      next if threshold.alert_type == 'assignment_grade_high' && self.score < threshold_value
-      next if threshold.alert_type == 'assignment_grade_low' && self.score > threshold_value
+      prev_score = saved_changes['score'][0]
+      prev_percentage = prev_score.present? ? prev_score.to_f / self.assignment.points_possible * 100 : nil
+      percentage = self.score.present? ? self.score.to_f / self.assignment.points_possible * 100 : nil
+      next unless threshold.did_pass_threshold(prev_percentage, percentage)
+      next unless threshold.observer.enrollments.where(course_id: self.assignment.context_id).first.present?
 
       ObserverAlert.create!(observer: threshold.observer, student: self.user,
                             observer_alert_threshold: threshold,
                             context: self.assignment, alert_type: threshold.alert_type, action_date: self.graded_at,
-                            title: I18n.t("Assignment graded: %{score} on %{assignmentName} in %{courseName}", {
-                              score: self.score,
-                              assignmentName: self.assignment.title,
-                              courseName: self.assignment.course.name
+                            title: I18n.t("Assignment graded: %{grade} on %{assignment_name} in %{course_code}", {
+                              grade: self.grade,
+                              assignment_name: self.assignment.title,
+                              course_code: self.assignment.course.course_code
                             }))
     end
   end
@@ -1248,7 +1250,9 @@ class Submission < ActiveRecord::Base
         if submit_to_canvadocs
           opts = {
             preferred_plugins: [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC],
-            wants_annotation: true
+            wants_annotation: true,
+            # TODO: Remove the next line after the DocViewer Data Migration project RD-4702
+            region: a.shard.database_server.config[:region] || "none"
           }
 
           if context.root_account.settings[:canvadocs_prefer_office_online]
@@ -1510,9 +1514,7 @@ class Submission < ActiveRecord::Base
   def can_grade_symbolic_status(user = nil)
     user ||= grader
 
-    if assignment.root_account&.feature_enabled?(:anonymous_moderated_marking)
-      return :moderation_in_progress unless assignment.grades_published? || grade_posting_in_progress
-    end
+    return :moderation_in_progress unless assignment.grades_published? || grade_posting_in_progress || assignment.permits_moderation?(user)
 
     return :not_applicable if deleted?
     return :unpublished unless assignment.published?
@@ -2344,15 +2346,17 @@ class Submission < ActiveRecord::Base
 
   def visible_rubric_assessments_for(viewing_user)
     return [] if self.assignment.muted? && !grants_right?(viewing_user, :read_grade)
+    return [] unless self.assignment.rubric_association
+
     filtered_assessments = self.rubric_assessments.select do |a|
-      a.grants_right?(viewing_user, :read)
+      a.grants_right?(viewing_user, :read) &&
+        a.rubric_association == self.assignment.rubric_association
     end
     filtered_assessments.sort_by do |a|
-      if a.assessment_type == 'grading'
-        [CanvasSort::First]
-      else
-        [CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)]
-      end
+      [
+        a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last,
+        Canvas::ICU.collation_key(a.assessor_name)
+      ]
     end
   end
 

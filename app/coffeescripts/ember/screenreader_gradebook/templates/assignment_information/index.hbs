@@ -22,7 +22,7 @@
           {{/if}}
         {{/if}}
         <div>
-          <a {{bind-attr href="speedGraderUrl"}}>{{#t 'assignment_in_speedgrader'}}See this assignment in speedgrader{{/t}}</a>
+          <a id="assignment-speedgrader-link" {{bind-attr href="speedGraderUrl"}}>{{#t 'assignment_in_speedgrader'}}See this assignment in speedgrader{{/t}}</a>
         </div>
         {{#if showDownloadSubmissionsButton}}
           <div class="pad-box no-sides">

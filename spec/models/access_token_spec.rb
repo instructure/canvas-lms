@@ -197,6 +197,15 @@ describe AccessToken do
       token = AccessToken.create!(developer_key: dk, scopes: ['/auth/userinfo'])
       expect(token.expires_at).to eq nil
     end
+
+    it "does not validate scopes if the workflow state is deleted" do
+      dk_scopes = ["url:POST|/api/v1/accounts/:account_id/admins", "url:DELETE|/api/v1/accounts/:account_id/admins/:user_id",  "url:GET|/api/v1/accounts/:account_id/admins"]
+      dk = DeveloperKey.create!(scopes: dk_scopes, require_scopes: true)
+      token = AccessToken.new(developer_key: dk, scopes: dk_scopes)
+      dk.update!(scopes: [])
+      allow(dk.owner_account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(true)
+      expect { token.destroy! }.not_to raise_error
+    end
   end
 
   context "url scopes" do
@@ -287,7 +296,7 @@ describe AccessToken do
 
       before do
         allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
-        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_ui_rewrite) { true }
+        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping) { true }
         Setting.set(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, 'true')
       end
 
@@ -386,7 +395,7 @@ describe AccessToken do
 
       before do
         allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
-        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:api_token_scoping) { true }
+        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping) { true }
       end
 
       it 'is invalid when scopes requested are not included on dev key' do

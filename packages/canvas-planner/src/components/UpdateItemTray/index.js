@@ -19,14 +19,14 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import themeable from '@instructure/ui-themeable/lib';
 import View from '@instructure/ui-layout/lib/components/View';
-import FormFieldGroup from '@instructure/ui-core/lib/components/FormFieldGroup';
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
-import Button from '@instructure/ui-core/lib/components/Button';
+import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup';
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
+import Button from '@instructure/ui-buttons/lib/components/Button';
 import formatMessage from '../../format-message';
 import PropTypes from 'prop-types';
-import TextInput from '@instructure/ui-core/lib/components/TextInput';
-import Select from '@instructure/ui-core/lib/components/Select';
-import TextArea from '@instructure/ui-core/lib/components/TextArea';
+import TextInput from '@instructure/ui-forms/lib/components/TextInput';
+import Select from '@instructure/ui-forms/lib/components/Select';
+import TextArea from '@instructure/ui-forms/lib/components/TextArea';
 import DateTimeInput from '@instructure/ui-forms/lib/components/DateTimeInput';
 import moment from 'moment-timezone';
 
@@ -55,10 +55,14 @@ export class UpdateItemTray extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    if (nextProps.noteItem) {
+    if (!_.isEqual(this.props.noteItem, nextProps.noteItem)) {
       const updates = this.getNoteUpdates(nextProps);
       this.setState({updates}, this.updateMessages);
     }
+  }
+
+  editingExistingNote () {
+    return this.props.noteItem && this.props.noteItem.uniqueId
   }
 
   getNoteUpdates (props) {
@@ -102,8 +106,9 @@ export class UpdateItemTray extends Component {
     }, this.updateMessages);
   }
 
-  handleCourseIdChange = (e) => {
-    let value = e.target.value;
+  handleCourseIdChange = (e, option) => {
+    if (!option) return
+    let value = option.value;
     if (value === 'none') value = undefined;
     this.handleChange('courseId', value);
   }
@@ -158,7 +163,7 @@ export class UpdateItemTray extends Component {
   }
 
   renderDeleteButton () {
-    if (this.props.noteItem == null) return;
+    if (!this.editingExistingNote()) return;
     return <Button
       variant="light"
       margin="0 x-small 0 0"
@@ -212,24 +217,32 @@ export class UpdateItemTray extends Component {
     );
   }
 
-  renderCourseSelectOptions () {
-    if (!this.props.courses) return [];
-    return this.props.courses.map(course => {
-      return <option key={course.id} value={course.id}>{course.longName}</option>;
-    });
-  }
+
 
   renderCourseSelect () {
-    let courseId = this.findCurrentValue('courseId');
-    if (courseId == null) courseId = 'none';
+    const noneOption = {
+      value: "none",
+      label: formatMessage("Optional: Add Course")
+    }
+    const courseOptions = (this.props.courses || []).map(course => ({
+      value: course.id,
+      label: course.longName
+    }))
+
+    const courseId = this.findCurrentValue('courseId');
+    const selectedOption = courseId
+      ? courseOptions.find(o => o.value === courseId)
+      : noneOption
+
     return (
       <Select
         label={formatMessage("Course")}
-        value={courseId}
+        selectedOption={selectedOption}
         onChange={this.handleCourseIdChange}
       >
-        <option value="none">{formatMessage("Optional: Add Course")}</option>
-        {this.renderCourseSelectOptions()}
+        {[noneOption, ...courseOptions].map(props => (
+          <option key={props.value} value={props.value}>{props.label}</option>
+        ))}
       </Select>
     );
   }
@@ -248,7 +261,7 @@ export class UpdateItemTray extends Component {
   }
 
   renderTrayHeader () {
-    if (this.props.noteItem) {
+    if (this.editingExistingNote()) {
       return (
         <h2>{formatMessage('Edit {title}', { title: this.props.noteItem.title })}</h2>
       );

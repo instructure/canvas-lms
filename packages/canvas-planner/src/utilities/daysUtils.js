@@ -164,7 +164,7 @@ function orderItemsByGrouping (a, b) {
 }
 
 // order items by time, then title
-function orderItemsByTimeAndTitle (a, b) {
+export function orderItemsByTimeAndTitle (a, b) {
   if (a.date.valueOf() === b.date.valueOf()) {
     return a.title.localeCompare(b.title, locale, cmpopts);
   }

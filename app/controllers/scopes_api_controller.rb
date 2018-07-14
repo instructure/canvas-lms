@@ -17,7 +17,7 @@
 #
 
 # @API API Token Scopes
-# @internal
+# @beta
 # API for retrieving API scopes
 #
 # @model Scope
@@ -72,7 +72,7 @@ class ScopesApiController < ApplicationController
   # @returns [Scope]
   def index
     named_scopes = TokenScopes.named_scopes
-    if authorized_action(@context, @current_user, :manage_role_overrides)
+    if authorized_action(@context, @current_user, :manage_developer_keys)
       scopes = params[:group_by] == "resource_name" ? named_scopes.group_by {|route| route[:resource_name]} : named_scopes
       render json: scopes
     end
@@ -82,7 +82,7 @@ class ScopesApiController < ApplicationController
 
   def check_feature_flag
     return if @context.try(:site_admin?) && Setting.get(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, nil).present?
-    return if @context.root_account.feature_enabled?(:api_token_scoping)
+    return if @context.root_account.feature_enabled?(:developer_key_management_and_scoping)
     render json: [], status: :forbidden
   end
 end

@@ -17,44 +17,76 @@
 #
 
 module Types
-  SubmissionType = GraphQL::ObjectType.define do
-    name "Submission"
+  class SubmissionType < ApplicationObjectType
+    graphql_name "Submission"
 
     implements GraphQL::Relay::Node.interface
-    interfaces [Interfaces::TimestampInterface]
+    implements Interfaces::TimestampInterface
 
-    global_id_field :id
+    alias :submission :object
+
     # not doing a legacy canvas id since they aren't used in the rest api
+    global_id_field :id
 
-    field :assignment, AssignmentType,
-      resolve: ->(s, _, _) { Loaders::IDLoader.for(Assignment).load(s.assignment_id) }
+    field :assignment, AssignmentType, null: true
+    def assignment
+      load_association(:assignment)
+    end
 
-    field :user, UserType, resolve: ->(s, _, _) { Loaders::IDLoader.for(User).load(s.user_id) }
+    field :user, UserType, null: true
+    def user
+      load_association(:user)
+    end
 
-    field :score, types.Float, resolve: SubmissionHelper.protect_submission_grades(:score)
-    field :grade, types.String, resolve: SubmissionHelper.protect_submission_grades(:grade)
+    def protect_submission_grades(attr)
+      submission.user_can_read_grade?(current_user, session) ?
+        submission.send(attr) :
+        nil
+    end
+    private :protect_submission_grades
 
-    field :enteredScore, types.Float,
+    field :score, Float, null: true
+    def score
+      protect_submission_grades(:score)
+    end
+
+    field :grade, String, null: true
+    def grade
+      protect_submission_grades(:grade)
+    end
+
+    field :entered_score, Float,
       "the submission score *before* late policy deductions were applied",
-      resolve: SubmissionHelper.protect_submission_grades(:entered_score)
-    field :enteredGrade, types.String,
+      null: true
+    def entered_score
+      protect_submission_grades(:entered_score)
+    end
+
+    field :entered_grade, String,
       "the submission grade *before* late policy deductions were applied",
-      resolve: SubmissionHelper.protect_submission_grades(:entered_grade)
+      null: true
+    def entered_grade
+      protect_submission_grades(:entered_grade)
+    end
 
-    field :deductedPoints, types.Float,
+    field :deducted_points, Float,
       "how many points are being deducted due to late policy",
-      resolve: SubmissionHelper.protect_submission_grades(:points_deducted)
+      null: true
+    def deducted_points
+      protect_submission_grades(:points_deducted)
+    end
 
-    field :excused, types.Boolean,
+    field :excused, Boolean,
       "excused assignments are ignored when calculating grades",
-      property: :excused?
+      method: :excused?, null: true
 
-    field :submittedAt, DateTimeType, property: :submitted_at
-    field :gradedAt, DateTimeType, property: :graded_at
+    field :submitted_at, DateTimeType, null: true
+    field :graded_at, DateTimeType, null: true
 
-    field :state, SubmissionStateType, property: :workflow_state
+    field :state, SubmissionStateType, method: :workflow_state, null: false
 
-    field :submissionStatus, types.String, resolve: ->(submission, _, _) {
+    field :submission_status, String, null: true
+    def submission_status
       if submission.submission_type == "online_quiz"
         Loaders::AssociationLoader.for(Submission, :quiz_submission).
           load(submission).
@@ -62,18 +94,8 @@ module Types
       else
         submission.submission_status
       end
-    }
-
-    field :gradingStatus, types.String, property: :grading_status
-  end
-
-  class SubmissionHelper
-    def self.protect_submission_grades(attr)
-      ->(submission, _, ctx) {
-        submission.user_can_read_grade?(ctx[:current_user], ctx[:session]) ?
-          submission.send(attr) :
-          nil
-      }
     end
+
+    field :grading_status, String, null: true
   end
 end

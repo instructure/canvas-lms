@@ -26,7 +26,7 @@ exports[`renders nothing if no opportunities 1`] = `
         <span>
           Close
         </span>
-        <IconXLine />
+        <IconX />
       </div>
     </Button>
   </div>
@@ -62,7 +62,7 @@ exports[`renders the base component correctly with one opportunity 1`] = `
         <span>
           Close
         </span>
-        <IconXLine />
+        <IconX />
       </div>
     </Button>
   </div>
@@ -75,7 +75,6 @@ exports[`renders the base component correctly with one opportunity 1`] = `
         dueAt="2017-03-09T20:40:35Z"
         id="1"
         opportunityTitle="learning object title"
-        showPill={true}
         timeZone="America/Denver"
         url="http://www.non_default_url.com"
       />
@@ -110,7 +109,7 @@ exports[`renders the right course with the right opportunity 1`] = `
         <span>
           Close
         </span>
-        <IconXLine />
+        <IconX />
       </div>
     </Button>
   </div>
@@ -123,7 +122,6 @@ exports[`renders the right course with the right opportunity 1`] = `
         dueAt="2017-03-09T20:40:35Z"
         id="1"
         opportunityTitle="learning object title"
-        showPill={true}
         timeZone="America/Denver"
         url="http://www.non_default_url.com"
       />
@@ -136,7 +134,6 @@ exports[`renders the right course with the right opportunity 1`] = `
         dueAt="2017-03-09T20:40:35Z"
         id="2"
         opportunityTitle="other learning object"
-        showPill={true}
         timeZone="America/Denver"
         url="http://www.non_default_url.com"
       />

@@ -39,6 +39,10 @@ class Gradezilla
         f("#{grading_cell_selector(student, assignment)} input[type='text']")
       end
 
+      def grid_assignment_row_cell(student,assignment)
+        grading_cell(student, assignment).find(".Grid__AssignmentRowCell")
+      end
+
       def grading_cell_menu_button(student, assignment, menu_selector:)
         f("#{grading_cell_selector(student, assignment)} .Grid__AssignmentRowCell__#{menu_selector}Menu button")
       end

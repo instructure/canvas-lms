@@ -272,7 +272,7 @@ test('changes the "Export" menu item to indicate the export is in progress', fun
 
   // Click the menu item.  This closes it.
   this.menuItem.click();
-  // Click the PopoverMenu trigger again to re-open the menu
+  // Click the Menu trigger again to re-open the menu
   this.trigger.simulate('click');
 
   // Re-fetch the menu element

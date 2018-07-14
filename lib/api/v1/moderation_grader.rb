@@ -21,7 +21,7 @@ module Api::V1::ModerationGrader
 
   def moderation_graders_json(assignment, user, session)
     if assignment.can_view_other_grader_identities?(user)
-      graders = assignment.moderation_graders.preload(:user)
+      graders = assignment.provisional_moderation_graders.preload(:user)
       graders_by_id = graders.each_with_object({}) {|grader, map| map[grader.id] = grader}
 
       api_json(graders, user, session, only: %w(id user_id)).tap do |hash|
@@ -30,7 +30,7 @@ module Api::V1::ModerationGrader
         end
       end
     else
-      api_json(assignment.moderation_graders, user, session, only: %w(id anonymous_id))
+      api_json(assignment.provisional_moderation_graders, user, session, only: %w(id anonymous_id))
     end
   end
 end

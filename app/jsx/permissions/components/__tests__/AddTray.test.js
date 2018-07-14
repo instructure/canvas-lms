@@ -17,17 +17,21 @@
  */
 
 import React from 'react'
-import {mount, shallow} from 'enzyme'
+import {shallow} from 'enzyme'
 
-import AddTray from 'jsx/permissions/components/AddTray'
+import AddTray, {mapStateToProps} from 'jsx/permissions/components/AddTray'
 
 const defaultProps = () => ({
   permissions: [
     {permission_name: 'account_permission', label: 'account_permission', displayed: true},
     {permission_name: 'course_permission', label: 'course_permission', displayed: true}
   ],
+  createNewRole: () => {},
+  loading: false,
   hideTray: () => {},
   open: true,
+  tab: 'course',
+  allLabels: [],
   allBaseRoles: [
     {
       id: '3',
@@ -182,58 +186,12 @@ const defaultProps = () => ({
   ]
 })
 
-test('renders the component', () => {
-  const tree = mount(<AddTray {...defaultProps()} />)
-  const node = tree.find('AddTray')
-  expect(node.exists()).toBe(true)
-})
-
-it('renders unassigned permissions if any are present', () => {
+it('renders proper loading state for component', () => {
   const props = defaultProps()
-  props.permissions = [
-    {
-      permission_name: 'course_permission',
-      label: 'course_permission',
-      displayed: true
-    }
-  ]
-
+  props.loading = true
   const tree = shallow(<AddTray {...props} />)
-  const node = tree.find('RoleTrayTable')
+  const node = tree.find('Spinner')
   expect(node.exists()).toBeTruthy()
-  expect(node.props().title).toEqual('Unassigned Permissions')
-})
-
-it('renders assigned permissions if any are present', () => {
-  const props = defaultProps()
-  props.permissions = [
-    {permission_name: 'account_permission', label: 'account_permission', displayed: true}
-  ]
-
-  const tree = shallow(<AddTray {...props} />)
-  const node = tree.find('RoleTrayTable')
-  expect(node.exists()).toBeTruthy()
-  expect(node.props().title).toEqual('Assigned Permissions')
-})
-
-it('does not render assigned or unassigned permissions if none are present', () => {
-  const props = defaultProps()
-  props.permissions = []
-  const tree = shallow(<AddTray {...props} />)
-  const node = tree.find('RoleTrayTable')
-  expect(node.exists()).toBeFalsy()
-})
-
-it('role changes properly set permissions state', () => {
-  const props = defaultProps()
-  const tree = shallow(<AddTray {...props} />)
-  const inst = tree.instance()
-  inst.onChangeBaseType({
-    target: {
-      value: 'Teacher'
-    }
-  })
-  expect(tree.state().selectedBaseType.label).toEqual('Teacher')
 })
 
 it('onChangeRoleName changes role name properly', () => {
@@ -266,4 +224,50 @@ it('save button is properly enabled if role name is set', () => {
   })
   const inst = tree.instance()
   expect(inst.isDoneSelecting()).toBeTruthy()
+})
+
+it('does not pass in the account admin base role in mapStateToProps', () => {
+  const ownProps = {}
+  const state = {
+    activeAddTray: {
+      show: true,
+      loading: false
+    },
+    roles: [
+      {
+        id: '1',
+        base_role_type: 'StudentEnrollment',
+        label: 'Student',
+        role: 'StudentEnrollment',
+        displayed: true,
+        contextType: 'Course'
+      },
+      {
+        id: '2',
+        base_role_type: 'AccountMembership',
+        label: 'Account Admin',
+        role: 'AccountAdmin',
+        displayed: false,
+        contextType: 'Account'
+      }
+    ]
+  }
+
+  const realProps = mapStateToProps(state, ownProps)
+  expect(realProps.allBaseRoles).toEqual([state.roles[0]])
+})
+
+it('onChangeRoleLabel sets error if role is used', () => {
+  const props = defaultProps()
+  props.allLabels = ['student', 'teacher']
+  const tree = shallow(<AddTray {...props} />)
+  const event = {target: {value: ' teacher   '}} // make sure trimming happens
+  tree.instance().onChangeRoleName(event)
+  const expectedErrorState = [
+    {
+      text: 'Cannot add role name teacher: already in use',
+      type: 'error'
+    }
+  ]
+  expect(tree.state().roleNameErrors).toEqual(expectedErrorState)
 })

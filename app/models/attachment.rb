@@ -1418,7 +1418,7 @@ class Attachment < ActiveRecord::Base
       # TODO: once inst-fs has a delete method, call here
       # for now these objects will be orphaned
     elsif Attachment.s3_storage?
-      self.s3object.delete unless ApplicationController.try(:test_cluster?)
+      self.s3object.delete unless ApplicationController.test_cluster?
     else
       FileUtils.rm full_filename
     end
@@ -1543,7 +1543,9 @@ class Attachment < ActiveRecord::Base
       doc = canvadoc || create_canvadoc
       doc.upload({
         annotatable: opts[:wants_annotation],
-        preferred_plugins: opts[:preferred_plugins]
+        preferred_plugins: opts[:preferred_plugins],
+        # TODO: Remove the next line after the DocViewer Data Migration project RD-4702
+        region: doc.shard.database_server.config[:region] || "none"
       })
       update_attribute(:workflow_state, 'processing')
     end

@@ -25,7 +25,7 @@ module Api::V1::WikiPage
   WIKI_PAGE_JSON_ATTRS = %w(url title created_at editing_roles).freeze
 
   def wiki_page_json(wiki_page, current_user, session, include_body = true, opts={})
-    opts = opts.reverse_merge(include_assignment: true)
+    opts = opts.reverse_merge(include_assignment: true, assignment_opts: {})
     opts.delete(:include_assignment) unless wiki_page.context.try(:feature_enabled?, :conditional_release)
 
     hash = api_json(wiki_page, current_user, session, :only => WIKI_PAGE_JSON_ATTRS)
@@ -42,7 +42,7 @@ module Api::V1::WikiPage
 
     hash['updated_at'] = wiki_page.revised_at
     if opts[:include_assignment] && wiki_page.for_assignment?
-      hash['assignment'] = assignment_json(wiki_page.assignment, current_user, session)
+      hash['assignment'] = assignment_json(wiki_page.assignment, current_user, session, opts[:assignment_opts])
       hash['assignment']['assignment_overrides'] =
         assignment_overrides_json(
           wiki_page.assignment.overrides_for(current_user, ensure_set_not_empty: true)

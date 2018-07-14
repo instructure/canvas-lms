@@ -4588,6 +4588,7 @@ nn:
   count_replies_a685c742: "%{count} svar"
   count_results_9926447c: 
     one: "Eit resultat"
+    other: "*%{count}* resultat"
   count_results_displayed_ed39a0f0: 
     one: "Eit resultat viser"
     other: "%{count} resultat viser"

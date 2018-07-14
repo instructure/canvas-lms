@@ -19,12 +19,12 @@
 import React from 'react';
 import { func, number, shape, string, bool } from 'prop-types';
 import I18n from 'i18n!gradebook';
-import Container from '@instructure/ui-core/lib/components/Container';
-import NumberInput from '@instructure/ui-core/lib/components/NumberInput';
-import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent';
-import Text from '@instructure/ui-core/lib/components/Text';
-import RadioInput from '@instructure/ui-core/lib/components/RadioInput';
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
+import View from '@instructure/ui-layout/lib/components/View';
+import NumberInput from '@instructure/ui-forms/lib/components/NumberInput';
+import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent';
+import Text from '@instructure/ui-elements/lib/components/Text';
+import RadioInput from '@instructure/ui-forms/lib/components/RadioInput';
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 import classnames from 'classnames';
 import round from 'coffeescripts/util/round';
 import NumberHelper from '../../../shared/helpers/numberHelper'
@@ -104,9 +104,9 @@ export default function SubmissionTrayRadioInput (props) {
             />
 
             <PresentationContent>
-              <Container as="div" margin="0 small">
+              <View as="div" margin="0 small">
                 <Text>{numberInputText}</Text>
-              </Container>
+              </View>
             </PresentationContent>
           </span>
       }

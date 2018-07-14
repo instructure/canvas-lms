@@ -135,9 +135,8 @@ class EportfolioEntriesController < ApplicationController
       # @entry.check_for_matching_attachment_id
       @headers = false
       render template: 'submissions/show_preview', locals: {
-               anonymous_now: @assignment.anonymous_grading? && @assignment.muted? &&
-                 @context.root_account.feature_enabled?(:anonymous_moderated_marking)
-             }
+        anonymous_now: @assignment.anonymous_grading? && @assignment.muted?
+      }
     end
   end
 

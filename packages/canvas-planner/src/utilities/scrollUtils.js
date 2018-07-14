@@ -34,14 +34,6 @@ function isScrollPositionAtBottom (wind) {
   return docBottom <= clientHeight + 2;
 }
 
-function isScrollUpKey (key) {
-  return key === 'PageUp' || key === 'ArrowUp' || key === 'Up';
-}
-
-function isScrollDownKey(key) {
-  return key === 'PageDown' || key === 'ArrowDown' || key === 'Down';
-}
-
 function isWheelUpEvent (e) {
   return e.deltaY < 0;
 }
@@ -59,14 +51,6 @@ function handleWindowWheel (pastCb, futureCb, wind, e) {
   if (isScrollPositionAtTop(wind) && isWheelUpEvent(e)) {
     handleScrollAttempt(pastCb, e);
   } else if (isScrollPositionAtBottom(wind) && isWheelDownEvent(e)) {
-    handleScrollAttempt(futureCb, e);
-  }
-}
-
-function handleWindowScrollKey (pastCb, futureCb, wind, e) {
-  if (isScrollPositionAtTop(wind) && isScrollUpKey(e.key)) {
-    handleScrollAttempt(pastCb, e);
-  } else if (isScrollPositionAtBottom(wind) && isScrollDownKey(e.key)) {
     handleScrollAttempt(futureCb, e);
   }
 }
@@ -130,9 +114,6 @@ export function registerScrollEvents ({
   wind = wind ||  window;
   const boundWindowWheel = handleWindowWheel.bind(undefined, scrollIntoPastCb, scrollIntoFutureCb, wind);
   wind.addEventListener('wheel', boundWindowWheel);
-
-  const boundScrollKey = handleWindowScrollKey.bind(undefined, scrollIntoPastCb, scrollIntoFutureCb, wind);
-  wind.addEventListener('keydown', boundScrollKey);
 
   wind.addEventListener('touchstart', handleTouchStart);
   wind.addEventListener('touchend', handleTouchEnd);

@@ -21,7 +21,7 @@ require 'csv'
 class GradebookImporter
   ASSIGNMENT_PRELOADED_FIELDS = %i/
     id title points_possible grading_type updated_at context_id context_type group_category_id
-    created_at due_at only_visible_to_overrides
+    created_at due_at only_visible_to_overrides moderated_grading
   /.freeze
 
   class NegativeId

@@ -1,0 +1,43 @@
+<div class="registration-dialog">
+  <form class="form-horizontal bootstrap-form" method="post" action="{{path}}">
+    <div class="ic-Form-control">
+      <label class="ic-Label" for="parent_name">{{#t "labels.name"}}Your Name{{/t}}</label>
+      <input class="ic-Input" type="text" id="parent_name" name="user[name]">
+    </div>
+    <div class="ic-Form-control">
+      <label class="ic-Label" for="parent_email">{{#t "labels.email"}}Your Email{{/t}}</label>
+      <input class="ic-Input" type="email" id="parent_email" name="pseudonym[unique_id]">
+    </div>
+    <div class="ic-Form-control">
+      <label class="ic-Label" for="password">{{#t "labels.password"}}Password{{/t}}</label>
+      <input class="ic-Input" type="password" id="password" name="pseudonym[password]">
+    </div>
+    <div class="ic-Form-control">
+      <label class="ic-Label" for="confirm_password">{{#t "labels.confirm_password"}}Re-enter Password{{/t}}</label>
+      <input class="ic-Input" type="password" id="confirm_password" name="pseudonym[password_confirmation]">
+    </div>
+    <div class="ic-Form-control">
+      <div class='pairing-code-text'>
+        <label class="ic-Label" for="pairing_code">{{#t "labels.code"}}Student Pairing Code{{/t}}</label>
+        <a href='https://community.canvaslms.com/docs/DOC-14789' target='_blank'>{{#t "anchor.pairing_code"}}What is a pairing code?{{/t}}</a>
+      </div>
+      <input class="ic-Input" type="text" id="pairing_code" name="pairing_code[code]" autocapitalize="off" autocorrect="off">
+    </div>
+    {{#if terms_required}}
+    <div class="ic-Form-control">
+      <label class="checkbox">
+        <input type="checkbox" name="user[terms_of_use]" value="1">
+        {{{terms_html}}}
+      </label>
+    </div>
+    {{/if}}
+    <div class="ic-Form-control">
+      <input type="hidden" name="user[initial_enrollment_type]" value="observer" />
+      <input type="hidden" name="user[skip_registration]" value="1" />
+      <div class='button-container'>
+        <button class="btn btn-secondary dialog_closer">{{#t "buttons.cancel"}}Cancel{{/t}}</button>
+        <button class="btn btn-primary" type="submit">{{#t "buttons.start_participating"}}Start Participating{{/t}}</button>
+      </div>
+    </div>
+  </form>
+</div>

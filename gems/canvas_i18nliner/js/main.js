@@ -91,6 +91,11 @@ module.exports = {
   I18nliner: I18nliner,
   runCommand: function(argv) {
     argv = require('minimist')(argv);
+    // the unlink/symlink uglieness is a temporary hack to get around our circular
+    // symlinks. we should just remove the symlinks
+    fs.unlinkSync('./public/javascripts/symlink_to_node_modules')
     Commands.run(argv._[0], argv) || process.exit(1);
+    fs.symlinkSync('../../node_modules', './public/javascripts/symlink_to_node_modules')
+
   }
 };

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class EnrollmentState < ActiveRecord::Base
-  belongs_to :enrollment
+  belongs_to :enrollment, inverse_of: :enrollment_state
 
   attr_accessor :skip_touch_user, :user_needs_touch, :is_direct_recalculation
   validates_presence_of :enrollment_id
@@ -256,7 +256,10 @@ class EnrollmentState < ActiveRecord::Base
     scope = scope.where(:type => enrollment_type) if enrollment_type
     scope.find_ids_in_ranges(:batch_size => ENROLLMENT_BATCH_SIZE) do |min_id, max_id|
       if invalidate_states(scope.where(:id => min_id..max_id)) > 0
-        EnrollmentState.send_later_if_production_enqueue_args(:process_term_states_in_ranges, {:priority => Delayed::LOW_PRIORITY}, min_id, max_id, term, enrollment_type)
+        EnrollmentState.send_later_if_production_enqueue_args(:process_term_states_in_ranges, {
+          :priority => Delayed::LOW_PRIORITY,
+          :n_strand => ['invalidate_states_for_term', term.global_root_account_id]
+        }, min_id, max_id, term, enrollment_type)
       end
     end
   end

@@ -1070,7 +1070,7 @@ class Account < ActiveRecord::Base
     can :read_outcomes
 
     # any user with an admin enrollment in one of the courses can read
-    given { |user| user && self.courses.where(:id => user.enrollments.admin.pluck(:course_id)).exists? }
+    given { |user| user && self.courses.where(:id => user.enrollments.active.admin.pluck(:course_id)).exists? }
     can :read
 
     given { |user| self.grants_right?(user, :lti_add_edit)}

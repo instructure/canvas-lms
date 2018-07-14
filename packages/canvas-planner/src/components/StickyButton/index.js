@@ -19,8 +19,8 @@ import React, { Component } from 'react';
 import classnames from 'classnames';
 import themeable from '@instructure/ui-themeable/lib';
 import { bool, func, node, number, string, oneOf } from 'prop-types';
-import IconArrowUpSolid from 'instructure-icons/lib/Solid/IconArrowUpSolid';
-import IconArrowDownLine from 'instructure-icons/lib/Line/IconArrowDownLine';
+import IconArrowUpSolid from '@instructure/ui-icons/lib/Solid/IconArrowUp';
+import IconArrowDownLine from '@instructure/ui-icons/lib/Line/IconArrowDown';
 
 import styles from './styles.css';
 import theme from './theme.js';

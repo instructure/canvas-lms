@@ -116,9 +116,9 @@ it('UPDATE_ROLE_FILTER filters properly', () => {
 
 it('DISPLAY_ROLE_TRAY sets the activeRoleTray in the store', () => {
   const originalState = {activeRoleTray: null}
-  const payload = {role: 'newRoleSim'}
+  const payload = {role: {name: 'newRoleSim', id: '3'}}
   const newState = reduce(actions.displayRoleTray(payload), originalState)
-  expect(newState.activeRoleTray).toEqual(payload)
+  expect(newState.activeRoleTray).toEqual({roleId: '3'})
 })
 
 it('HIDE_ALL_TRAYS sets the activeRoleTray in the store', () => {
@@ -128,45 +128,325 @@ it('HIDE_ALL_TRAYS sets the activeRoleTray in the store', () => {
 })
 
 it('DISPLAY_ADD_TRAY sets the activeAddTray in the store', () => {
-  const originalState = {activeAddTray: false}
+  const originalState = {
+    activeAddTray: {
+      show: false,
+      loading: false
+    }
+  }
   const newState = reduce(actions.displayAddTray(), originalState)
-  expect(newState.activeAddTray).toEqual(true)
+  expect(newState.activeAddTray).toEqual({
+    show: true,
+    loading: false
+  })
 })
 
 it('HIDE_ALL_TRAYS sets the activeAddTray to false in the store', () => {
-  const originalState = {activeAddTray: true}
+  const originalState = {
+    activeAddTray: {
+      show: true,
+      loading: false
+    }
+  }
   const newState = reduce(actions.hideAllTrays(), originalState)
-  expect(newState.activeAddTray).toBeFalsy()
+  expect(newState.activeAddTray).toEqual({
+    show: false,
+    loading: false
+  })
+})
+
+it('ADD_TRAY_SAVING_START sets the activeAddTray in the store', () => {
+  const originalState = {
+    activeAddTray: {
+      show: false,
+      loading: true
+    }
+  }
+  const newState = reduce(actions.addTraySavingStart(), originalState)
+  expect(newState.activeAddTray).toEqual({
+    show: false,
+    loading: true
+  })
+})
+
+it('ADD_TRAY_SAVING_SUCCESS sets the activeAddTray to false in the store', () => {
+  const originalState = {
+    activeAddTray: {
+      show: true,
+      loading: true
+    }
+  }
+  const newState = reduce(actions.addTraySavingSuccess(), originalState)
+  expect(newState.activeAddTray).toEqual({
+    show: true,
+    loading: false
+  })
+})
+
+it('ADD_TRAY_SAVING_FAIL sets the activeAddTray to false in the store', () => {
+  const originalState = {
+    activeAddTray: {
+      show: true,
+      loading: true
+    }
+  }
+  const newState = reduce(actions.addTraySavingFail(), originalState)
+  expect(newState.activeAddTray).toEqual({
+    show: true,
+    loading: false
+  })
 })
 
 it('UPDATE_PERMISSIONS sets enabled in the store', () => {
   const originalState = {
-    roles: [{id: '1', permissions: {become_user: {enabled: true, locked: true}}}]
+    roles: [{id: '1', permissions: {become_user: {enabled: true, locked: true, explicit: true}}}]
   }
-  const payload = {courseRoleId: '1', permissionName: 'become_user', enabled: false, locked: true}
+  const payload = {
+    role: {
+      id: '1',
+      permissions: {
+        become_user: {
+          enabled: false,
+          locked: true,
+          explicit: true
+        }
+      }
+    }
+  }
   const newState = reduce(actions.updatePermissions(payload), originalState)
-  const expectedState = {
-    activeAddTray: null,
-    activeRoleTray: null,
-    contextId: '',
-    permissions: [],
-    roles: [{id: '1', permissions: {become_user: {enabled: false, locked: true}}}]
-  }
-  expect(newState).toEqual(expectedState)
+  const expectedState = [
+    {id: '1', permissions: {become_user: {enabled: false, locked: true, explicit: true}}}
+  ]
+  expect(newState.roles).toEqual(expectedState)
 })
 
 it('UPDATE_PERMISSIONS sets locked in the store', () => {
   const originalState = {
-    roles: [{id: '1', permissions: {become_user: {enabled: true, locked: true}}}]
+    roles: [{id: '1', permissions: {become_user: {enabled: true, locked: true, explicit: true}}}]
   }
-  const payload = {courseRoleId: '1', permissionName: 'become_user', enabled: true, locked: false}
+  const payload = {
+    role: {
+      id: '1',
+      permissions: {
+        become_user: {
+          enabled: true,
+          locked: false,
+          explicit: true
+        }
+      }
+    }
+  }
   const newState = reduce(actions.updatePermissions(payload), originalState)
-  const expectedState = {
-    activeAddTray: null,
-    activeRoleTray: null,
-    contextId: '',
-    permissions: [],
-    roles: [{id: '1', permissions: {become_user: {enabled: true, locked: false}}}]
+  const expectedState = [
+    {id: '1', permissions: {become_user: {enabled: true, locked: false, explicit: true}}}
+  ]
+  expect(newState.roles).toEqual(expectedState)
+})
+
+it('UPDATE_PERMISSIONS sets explicit in the store', () => {
+  const originalState = {
+    roles: [{id: '1', permissions: {become_user: {enabled: true, locked: true, explicit: true}}}]
   }
-  expect(newState).toEqual(expectedState)
+  const payload = {
+    role: {
+      id: '1',
+      permissions: {
+        become_user: {
+          enabled: true,
+          locked: true,
+          explicit: false
+        }
+      }
+    }
+  }
+  const newState = reduce(actions.updatePermissions(payload), originalState)
+  const expectedState = [
+    {id: '1', permissions: {become_user: {enabled: true, locked: true, explicit: false}}}
+  ]
+  expect(newState.roles).toEqual(expectedState)
+})
+
+it('UPDATE_ROLE updates the label correct', () => {
+  const originalState = {
+    roles: [
+      {
+        base_role_type: 'StudentEnrollment',
+        id: '9',
+        label: 'steven',
+        role: 'steven',
+        workflow_state: 'active'
+      }
+    ]
+  }
+  const payload = {
+    base_role_type: 'StudentEnrollment',
+    id: '9',
+    label: 'steven awesome',
+    role: 'steven awesome',
+    workflow_state: 'active'
+  }
+  const newState = reduce(actions.updateRole(payload), originalState)
+  const expectedState = [
+    {
+      base_role_type: 'StudentEnrollment',
+      id: '9',
+      label: 'steven awesome',
+      role: 'steven awesome',
+      workflow_state: 'active'
+    }
+  ]
+  expect(newState.roles).toEqual(expectedState)
+})
+
+it('ADD_NEW_ROLE updates the label correct', () => {
+  const originalState = {
+    roles: [
+      {
+        base_role_type: 'StudentEnrollment',
+        id: '9',
+        label: 'steven',
+        role: 'StudentEnrollment',
+        workflow_state: 'active',
+        displayed: true,
+        contextType: COURSE
+      },
+      {
+        base_role_type: 'AccountMembership',
+        id: '10',
+        label: 'aaron',
+        role: 'AccountMembership',
+        workflow_state: 'active',
+        displayed: false,
+        contextType: ACCOUNT
+      }
+    ]
+  }
+  const payload = {
+    base_role_type: 'StudentEnrollment',
+    id: '11',
+    label: 'venk grumpy',
+    role: 'venk grumpy',
+    workflow_state: 'active',
+    displayed: false,
+    contextType: COURSE
+  }
+  const newState = reduce(actions.addNewRole(payload), originalState)
+  const expectedState = [
+    {
+      base_role_type: 'StudentEnrollment',
+      id: '9',
+      label: 'steven',
+      role: 'StudentEnrollment',
+      workflow_state: 'active',
+      displayed: true,
+      contextType: COURSE
+    },
+    {
+      base_role_type: 'StudentEnrollment',
+      id: '11',
+      label: 'venk grumpy',
+      role: 'venk grumpy',
+      workflow_state: 'active',
+      displayed: true,
+      contextType: COURSE
+    },
+    {
+      base_role_type: 'AccountMembership',
+      id: '10',
+      label: 'aaron',
+      role: 'AccountMembership',
+      workflow_state: 'active',
+      displayed: false,
+      contextType: ACCOUNT
+    }
+  ]
+  expect(newState.roles).toEqual(expectedState)
+})
+
+it('ADD_NEW_ROLE correctly adds account level role', () => {
+  const originalState = {
+    roles: [
+      {
+        base_role_type: 'StudentEnrollment',
+        id: '9',
+        label: 'steven',
+        role: 'StudentEnrollment',
+        workflow_state: 'active',
+        displayed: false,
+        contextType: COURSE
+      },
+      {
+        base_role_type: 'AccountMembership',
+        id: '10',
+        label: 'aaron',
+        role: 'AccountMembership',
+        workflow_state: 'active',
+        displayed: true,
+        contextType: ACCOUNT
+      }
+    ]
+  }
+  const payload = {
+    base_role_type: 'AccountMembership',
+    id: '11',
+    label: 'venk grumpy',
+    role: 'venk grumpy',
+    workflow_state: 'active',
+    displayed: false,
+    contextType: ACCOUNT
+  }
+  const newState = reduce(actions.addNewRole(payload), originalState)
+  const expectedState = [
+    {
+      base_role_type: 'StudentEnrollment',
+      id: '9',
+      label: 'steven',
+      role: 'StudentEnrollment',
+      workflow_state: 'active',
+      displayed: false,
+      contextType: COURSE
+    },
+    {
+      base_role_type: 'AccountMembership',
+      id: '10',
+      label: 'aaron',
+      role: 'AccountMembership',
+      workflow_state: 'active',
+      displayed: true,
+      contextType: ACCOUNT
+    },
+    {
+      base_role_type: 'AccountMembership',
+      id: '11',
+      label: 'venk grumpy',
+      role: 'venk grumpy',
+      workflow_state: 'active',
+      displayed: true,
+      contextType: ACCOUNT
+    }
+  ]
+  expect(newState.roles).toEqual(expectedState)
+})
+
+it('DISPLAY_PERMISSION_TRAY sets the activePermissionTray in the store', () => {
+  const originalState = {activePermissionTray: null}
+  const payload = {permission: {label: 'newRoleSim', permission_name: 'role2'}}
+  const newState = reduce(actions.displayPermissionTray(payload), originalState)
+  expect(newState.activePermissionTray).toEqual({permissionName: 'role2'})
+})
+
+it('HIDE_ALL_TRAYS sets the activePermissionTray in the store', () => {
+  const originalState = {activePermissionTray: {permission: 'banana'}}
+  const newState = reduce(actions.hideAllTrays(), originalState)
+  expect(newState.activeRoleTray).toBeNull()
+})
+
+it('DELETE_ROLE_SUCCESS deletes the proper role', () => {
+  const originalState = {roles: ROLES}
+  const roleToDelete = ROLES[1]
+  const newRoles = reduce(actions.deleteRoleSuccess(roleToDelete), originalState).roles
+  expect(newRoles).toHaveLength(3)
+  expect(newRoles[0].id).toEqual(ROLES[0].id)
+  expect(newRoles[1].id).toEqual(ROLES[2].id)
+  expect(newRoles[2].id).toEqual(ROLES[3].id)
 })

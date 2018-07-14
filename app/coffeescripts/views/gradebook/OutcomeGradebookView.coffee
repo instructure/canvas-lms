@@ -32,16 +32,16 @@ define [
 
   Dictionary =
     exceedsMastery:
-      color : '#6a843f'
+      color : '#127A1B'
       label : I18n.t('Exceeds Mastery')
     mastery:
-      color : '#8aac53'
+      color : if ENV.use_high_contrast then '#127A1B' else '#00AC18'
       label : I18n.t('Meets Mastery')
     nearMastery:
-      color : '#e0d773'
+      color : if ENV.use_high_contrast then '#C23C0D' else '#FC5E13'
       label : I18n.t('Near Mastery')
     remedial:
-      color : '#df5b59'
+      color : '#EE0612'
       label : I18n.t('Well Below Mastery')
 
   class OutcomeGradebookView extends View
@@ -57,11 +57,14 @@ define [
     hasOutcomes: $.Deferred()
 
     # child views rendered using the {{view}} helper in the template
-    checkboxes:
-      'exceeds':         new CheckboxView(Dictionary.exceedsMastery)
-      mastery:           new CheckboxView(Dictionary.mastery)
-      'near-mastery':    new CheckboxView(Dictionary.nearMastery)
-      remedial:          new CheckboxView(Dictionary.remedial)
+    checkboxes: [
+      new CheckboxView(Dictionary.exceedsMastery),
+      new CheckboxView(Dictionary.mastery),
+      new CheckboxView(Dictionary.nearMastery),
+      new CheckboxView(Dictionary.remedial)
+    ]
+
+    ratings: []
 
     events:
       'click .sidebar-toggle': 'onSidebarToggle'
@@ -69,6 +72,9 @@ define [
     constructor: (options) ->
       super
       @_validateOptions(options)
+      if ENV.GRADEBOOK_OPTIONS.outcome_proficiency?.ratings
+        @ratings = ENV.GRADEBOOK_OPTIONS.outcome_proficiency.ratings
+        @checkboxes = @ratings.map (rating) -> new CheckboxView({color: "\##{rating.color}", label: rating.description})
 
     # Public: Show/hide the sidebar.
     #
@@ -121,7 +127,7 @@ define [
     #
     # Returns nothing.
     _attachEvents: ->
-      view.on('togglestate', @_createFilter(name)) for name, view of @checkboxes
+      view.on('togglestate', @_createFilter("rating_#{i}")) for view, i in @checkboxes
       $.subscribe('currentSection/change', Grid.Events.sectionChangeFunction(@grid))
       $.subscribe('currentSection/change', @updateExportLink)
       @updateExportLink(@gradebook.sectionToShow)
@@ -138,7 +144,7 @@ define [
     #
     # Returns an object.
     toJSON: ->
-      _.extend({}, @checkboxes)
+      _.extend({}, checkboxes: @checkboxes)
 
     # Public: Render the view once all needed data is loaded.
     #
@@ -156,6 +162,8 @@ define [
     #
     # Returns nothing.
     renderGrid: (response) =>
+      Grid.filter = _.range(@checkboxes.length).map (i) -> "rating_#{i}"
+      Grid.ratings = @ratings
       Grid.Util.saveOutcomes(response.linked.outcomes)
       Grid.Util.saveStudents(response.linked.users)
       Grid.Util.saveOutcomePaths(response.linked.outcome_paths)

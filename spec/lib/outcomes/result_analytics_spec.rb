@@ -29,7 +29,7 @@ describe Outcomes::ResultAnalytics do
   # the surrounding database logic
   MockUser = Struct.new(:id, :name)
   MockOutcome = Struct.new(:id, :calculation_method, :calculation_int, :rubric_criterion)
-  class MockOutcomeResult < Struct.new(:user, :learning_outcome, :score, :title, :submitted_at, :assessed_at, :artifact_type, :percent, :possible, :association_id, :association_type)
+  class MockOutcomeResult < Struct.new(:user, :learning_outcome, :score, :title, :submitted_at, :assessed_at, :hide_points, :artifact_type, :percent, :possible, :association_id, :association_type)
     def initialize *args
       return super unless (args.first.is_a?(Hash) && args.length == 1)
       args.first.each_pair do |k, v|
@@ -50,7 +50,7 @@ describe Outcomes::ResultAnalytics do
     title = args[:title] || "name, o1"
     outcome = args[:outcome] || create_outcome(args)
     user = args[:user] || MockUser[10, 'a']
-    MockOutcomeResult[user, outcome, score, title, args[:submitted_time], args[:assessed_time]]
+    MockOutcomeResult[user, outcome, score, title, args[:submitted_time], args[:assessed_time], args[:hide_points]]
   end
 
   def create_outcome(args)
@@ -75,6 +75,27 @@ describe Outcomes::ResultAnalytics do
     results.map do |result|
       result_params = defaults.merge(result)
       MockOutcomeResult.new(result_params)
+    end
+  end
+
+  describe "#find_outcome_results" do
+    before(:once) do
+      course_with_student
+      outcome_with_rubric context: @course
+      assignment_model
+      alignment = @outcome.align(@assignment, @course)
+      LearningOutcomeResult.create! context: @course, learning_outcome: @outcome, user: @student, alignment: alignment
+      LearningOutcomeResult.create! context: @course, learning_outcome: @outcome, user: @student, alignment: alignment, hidden: true
+    end
+
+    it 'does not return hidden outcome results' do
+      results = ra.find_outcome_results(users: [@student], context: @course, outcomes: [@outcome])
+      expect(results.length).to eq 1
+    end
+
+    it 'returns hidden outcome results when include_hidden is true' do
+      results = ra.find_outcome_results(users: [@student], context: @course, outcomes: [@outcome], include_hidden: true)
+      expect(results.length).to eq 2
     end
   end
 
@@ -205,6 +226,24 @@ describe Outcomes::ResultAnalytics do
       rollups.each.with_index do |rollup, i|
         expect(rollup.scores.map(&:outcome_results).flatten).to eq rollup_scores.find_all{|score| score.user.id == rollup.context.id}
       end
+    end
+
+    it 'returns hide_points value of true if all results have hide_points set to true' do
+      results = [
+        outcome_from_score(4.0,{hide_points: true}),
+        outcome_from_score(5.0, {hide_points: true}),
+      ]
+      rollups = ra.rollup_user_results(results)
+      expect(rollups[0].hide_points).to be true
+    end
+
+    it 'returns hide_points value of false if any results have hide_points set to false' do
+      results = [
+        outcome_from_score(4.0,{hide_points: true}),
+        outcome_from_score(5.0,{hide_points: false}),
+      ]
+      rollups = ra.rollup_user_results(results)
+      expect(rollups[0].hide_points).to be false
     end
   end
 

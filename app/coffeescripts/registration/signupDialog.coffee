@@ -24,16 +24,17 @@ define [
   'jst/registration/teacherDialog'
   'jst/registration/studentDialog'
   'jst/registration/parentDialog'
+  'jst/registration/newParentDialog'
   'jst/registration/samlDialog'
   '../util/addPrivacyLinkToDialog'
   'str/htmlEscape'
   '../jquery/validate'
   'jquery.instructure_forms'
   'jquery.instructure_date_and_time'
-], ($, _, I18n, preventDefault, registrationErrors, teacherDialog, studentDialog, parentDialog, samlDialog, addPrivacyLinkToDialog, htmlEscape) ->
+], ($, _, I18n, preventDefault, registrationErrors, teacherDialog, studentDialog, parentDialog, newParentDialog, samlDialog, addPrivacyLinkToDialog, htmlEscape) ->
 
   $nodes = {}
-  templates = {teacherDialog, studentDialog, parentDialog, samlDialog}
+  templates = {teacherDialog, studentDialog, parentDialog, newParentDialog, samlDialog}
 
   # we do this in coffee because of this hbs 1.3 bug:
   # https://github.com/wycats/handlebars.js/issues/748
@@ -70,8 +71,8 @@ define [
       errorFormatter: registrationErrors
       success: (data) =>
         # they should now be authenticated (either registered or pre_registered)
-        if data.redirect
-          window.location = data.redirect
+        if data.destination
+          window.location = data.destination
         else if data.course
           window.location = "/courses/#{data.course.course.id}?registration_success=1"
         else
@@ -87,7 +88,8 @@ define [
     $node.dialog
       resizable: false
       title: title
-      width: 550
+      width: Math.min(screen.width, 550)
+      height: if screen.height > 750 then 'auto' else screen.height
       open: ->
         $(this).find('a').eq(0).blur()
         $(this).find(':input').eq(0).focus()

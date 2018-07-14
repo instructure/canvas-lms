@@ -16,10 +16,101 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Proficiency Ratings
+#
+# API for customizing proficiency ratings
+#
+# @model ProficiencyRating
+#     {
+#       "id": "ProficiencyRating",
+#       "description": "",
+#       "properties": {
+#         "description": {
+#           "description": "The description of the rating",
+#           "example": "Exceeds Mastery",
+#           "type": "string"
+#         },
+#         "points": {
+#           "description": "A non-negative number of points for the rating",
+#           "example": 4,
+#           "type": "number"
+#         },
+#         "mastery": {
+#           "description": "Indicates the rating where mastery is first achieved",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "color": {
+#           "description": "The hex color code of the rating",
+#           "example": "127A1B",
+#           "type": "string"
+#         }
+#       }
+#     }
+#
+# @model Proficiency
+#     {
+#       "id": "Proficiency",
+#       "description": "",
+#       "properties": {
+#         "ratings": {
+#           "description": "An array of proficiency ratings. See the ProficiencyRating specification above.",
+#           "example": [],
+#           "type": "array"
+#         }
+#       }
+#     }
+#
 class OutcomeProficiencyApiController < ApplicationController
   include Api::V1::OutcomeProficiency
   before_action :get_context
 
+  # @API Create/update proficiency ratings
+  #
+  # Create or update account-level proficiency ratings. These ratings will apply to all
+  # sub-accounts, unless they have their own account-level proficiency ratings defined.
+  #
+  #
+  # @argument ratings[][description] [String]
+  #   The description of the rating level.
+  #
+  # @argument ratings[][points] [Integer]
+  #   The non-negative number of points of the rating level. Points across ratings should be strictly decreasing in value.
+  #
+  # @argument ratings[][mastery] [Integer]
+  #   Indicates the rating level where mastery is first achieved. Only one rating in a proficiency should be marked for mastery.
+  #
+  # @argument ratings[][color] [Integer]
+  #   The color associated with the rating level. Should be a hex color code like '00FFFF'.
+  #
+  # @returns Proficiency
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/outcome_proficiency' \
+  #        -X POST \
+  #        -F 'ratings[][description]=Exceeds Mastery' \
+  #        -F 'ratings[][points]=4' \
+  #        -F 'ratings[][color]=127A1B' \
+  #        -F 'ratings[][mastery]=false' \
+  #        -F 'ratings[][description]=Mastery' \
+  #        -F 'ratings[][points]=3' \
+  #        -F 'ratings[][color]=00AC18' \
+  #        -F 'ratings[][mastery]=true' \
+  #        -F 'ratings[][description]=Near Mastery' \
+  #        -F 'ratings[][points]=2' \
+  #        -F 'ratings[][color]=FAB901' \
+  #        -F 'ratings[][mastery]=false' \
+  #        -F 'ratings[][description]=Below Mastery' \
+  #        -F 'ratings[][points]=1' \
+  #        -F 'ratings[][color]=FD5D10' \
+  #        -F 'ratings[][mastery]=false' \
+  #        -F 'ratings[][description]=Well Below Mastery' \
+  #        -F 'ratings[][points]=0' \
+  #        -F 'ratings[][color]=EE0612' \
+  #        -F 'ratings[][mastery]=false' \
+  #        -H "Authorization: Bearer <token>"
+  #
   def create
     if authorized_action(@context, @current_user, :manage_outcomes)
       if @account.outcome_proficiency
@@ -31,6 +122,17 @@ class OutcomeProficiencyApiController < ApplicationController
     end
   end
 
+  # @API Get proficiency ratings
+  #
+  # Get account-level proficiency ratings. If not defined for this account,
+  # it will return proficiency ratings for the nearest super-account with ratings defined.
+  # Will return 404 if none found.
+  #
+  #   Examples:
+  #     curl https://<canvas>/api/v1/accounts/<account_id>/outcome_proficiency \
+  #         -H 'Authorization: Bearer <token>'
+  #
+  # @returns Proficiency
   def show
     proficiency = @account.resolved_outcome_proficiency or raise ActiveRecord::RecordNotFound
     render json: outcome_proficiency_json(proficiency, @current_user, session)

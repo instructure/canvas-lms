@@ -19,8 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios'
-import Modal, {ModalHeader, ModalBody, ModalFooter} from '@instructure/ui-overlays/lib/components/Modal'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
+import Modal, {ModalBody, ModalFooter} from '../shared/components/InstuiModal'
 import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGroup'
 import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
 import Button from '@instructure/ui-buttons/lib/components/Button'
@@ -131,13 +130,9 @@ class CourseHomeDialog extends React.Component {
         open={this.props.open}
         transition="fade"
         label={I18n.t('Choose Course Home Page')}
-        closeButtonLabel={I18n.t('Close')}
         onDismiss={this.props.onRequestClose}
         onClose={this.onClose}
       >
-        <ModalHeader>
-          <Heading tag="h2" level="h3">{I18n.t('Choose Home Page')}</Heading>
-        </ModalHeader>
         <ModalBody>
           <div className="content-box-mini" style={{marginTop: '0'}}>
             <AccessibleContent>

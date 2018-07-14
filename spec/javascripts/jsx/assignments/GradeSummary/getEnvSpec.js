@@ -30,6 +30,16 @@ QUnit.module('GradeSummary getEnv()', suiteHooks => {
         grades_published: false,
         title: 'Example Assignment'
       },
+      CURRENT_USER: {
+        can_view_grader_identities: true,
+        can_view_student_identities: false,
+        grader_id: 'admin',
+        id: '1100'
+      },
+      FINAL_GRADER: {
+        grader_id: 'teach',
+        id: '1105'
+      },
       GRADERS: [
         {grader_name: 'Charlie Xi', id: '4502', user_id: '1103'},
         {grader_name: 'Adam Jones', id: '4503', user_id: '1101'},
@@ -61,6 +71,59 @@ QUnit.module('GradeSummary getEnv()', suiteHooks => {
 
     test('includes .title', () => {
       strictEqual(getEnv().assignment.title, 'Example Assignment')
+    })
+  })
+
+  QUnit.module('.currentUser', () => {
+    test('camel-cases .canViewGraderIdentities', () => {
+      strictEqual(getEnv().currentUser.canViewGraderIdentities, true)
+    })
+
+    test('camel-cases .canViewStudentIdentities', () => {
+      strictEqual(getEnv().currentUser.canViewStudentIdentities, false)
+    })
+
+    test('camel-cases .graderId', () => {
+      equal(getEnv().currentUser.graderId, 'admin')
+    })
+
+    test('defaults .graderId to "FINAL_GRADER" when the user is the final grader', () => {
+      ENV.CURRENT_USER.id = '1105'
+      delete ENV.FINAL_GRADER.grader_id
+      delete ENV.CURRENT_USER.grader_id
+      strictEqual(getEnv().currentUser.graderId, 'FINAL_GRADER')
+    })
+
+    test('defaults .graderId to "CURRENT_USER" when the user is not the final grader', () => {
+      // The user is likely an Admin in this scenario.
+      delete ENV.FINAL_GRADER.grader_id
+      delete ENV.CURRENT_USER.grader_id
+      ENV.CURRENT_USER.id = '1100'
+      strictEqual(getEnv().currentUser.graderId, 'CURRENT_USER')
+    })
+
+    test('includes .id', () => {
+      strictEqual(getEnv().currentUser.id, '1100')
+    })
+  })
+
+  QUnit.module('.finalGrader', () => {
+    test('camel-cases .graderId', () => {
+      equal(getEnv().finalGrader.graderId, 'teach')
+    })
+
+    test('defaults .graderId to "FINAL_GRADER"', () => {
+      delete ENV.FINAL_GRADER.grader_id
+      strictEqual(getEnv().finalGrader.graderId, 'FINAL_GRADER')
+    })
+
+    test('includes .id', () => {
+      strictEqual(getEnv().finalGrader.id, '1105')
+    })
+
+    test('is null when there is no final grader', () => {
+      delete ENV.FINAL_GRADER
+      strictEqual(getEnv().finalGrader, null)
     })
   })
 
@@ -127,9 +190,9 @@ QUnit.module('GradeSummary getEnv()', suiteHooks => {
         deepEqual(graderIds, ['abcde', 'b01ng', 'h2asd'])
       })
 
-      test('sets .graderName to null', () => {
+      test('assigns enumerated names', () => {
         const graderNames = getEnv().graders.map(grader => grader.graderName)
-        deepEqual(graderNames, [null, null, null])
+        deepEqual(graderNames, ['Grader 1', 'Grader 2', 'Grader 3'])
       })
     })
   })

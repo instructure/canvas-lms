@@ -188,41 +188,23 @@ describe Submission do
             submission_spec_model(assignment: @assignment)
           end
 
-          context 'with Anonymous Moderated Marking enabled' do
-            before(:once) do
-              @assignment.root_account.enable_feature!(:anonymous_moderated_marking)
-              @submission.assignment.reload
-            end
-
-            it 'may not be graded if grades are not published' do
-              expect(@submission.grants_right?(@teacher, :grade)).to eq false
-            end
-
-            it 'sets an error message indicating moderation is in progress if grades are not published' do
-              @submission.grants_right?(@teacher, :grade)
-              expect(@submission.grading_error_message).to eq 'This assignment is currently being moderated'
-            end
-
-            it 'may be graded if grades are not published but grade_posting_in_progress is true' do
-              @submission.grade_posting_in_progress = true
-              expect(@submission.grants_right?(@teacher, :grade)).to eq true
-            end
-
-            it 'may be graded when grades for the assignment are published' do
-              @submission.assignment.update!(grades_published_at: Time.zone.now)
-              expect(@submission.grants_right?(@teacher, :grade)).to eq true
-            end
+          it 'may not be graded if grades are not published' do
+            expect(@submission.grants_right?(@teacher, :grade)).to eq false
           end
 
-          context 'with Anonymous Moderated Marking disabled' do
-            it 'may be graded when grades for the assignment are not published' do
-              expect(@submission.grants_right?(@teacher, :grade)).to eq true
-            end
+          it 'sets an error message indicating moderation is in progress if grades are not published' do
+            @submission.grants_right?(@teacher, :grade)
+            expect(@submission.grading_error_message).to eq 'This assignment is currently being moderated'
+          end
 
-            it 'may be graded when grades for the assignment are published' do
-              @submission.assignment.update!(grades_published_at: Time.zone.now)
-              expect(@submission.grants_right?(@teacher, :grade)).to eq true
-            end
+          it 'may be graded if grades are not published but grade_posting_in_progress is true' do
+            @submission.grade_posting_in_progress = true
+            expect(@submission.grants_right?(@teacher, :grade)).to eq true
+          end
+
+          it 'may be graded when grades for the assignment are published' do
+            @submission.assignment.update!(grades_published_at: Time.zone.now)
+            expect(@submission.grants_right?(@teacher, :grade)).to eq true
           end
         end
       end
@@ -3630,9 +3612,10 @@ describe Submission do
 
   describe 'find_or_create_provisional_grade!' do
     before(:once) do
-      submission_spec_model
+      @assignment.grader_count = 1
       @assignment.moderated_grading = true
       @assignment.save!
+      submission_spec_model
 
       @teacher2 = User.create(name: "some teacher 2")
       @context.enroll_teacher(@teacher2)
@@ -3701,7 +3684,7 @@ describe Submission do
     end
 
     it "raises an exception if grade is not final and student does not need a provisional grade" do
-      @submission.find_or_create_provisional_grade!(@teacher)
+      @assignment.grade_student(@student, grade: 2, grader: @teacher, provisional: true)
 
       expect{ @submission.find_or_create_provisional_grade!(@teacher2, final: false) }
         .to raise_error(Assignment::GradeError, "Student already has the maximum number of provisional grades")
@@ -3727,6 +3710,7 @@ describe Submission do
 
     context "moderated" do
       before(:once) do
+        @assignment.grader_count = 1
         @assignment.moderated_grading = true
         @assignment.save!
         @submission.reload
@@ -3742,7 +3726,6 @@ describe Submission do
 
         context "student in moderation set" do
           it "returns the student alone" do
-            @assignment.moderated_grading_selections.create!(student: @student)
             expect(@submission.moderated_grading_whitelist).to eq([@student.moderated_grading_ids])
           end
         end
@@ -3763,7 +3746,7 @@ describe Submission do
 
         context "student in moderation set" do
           before(:once) do
-            @sel = @assignment.moderated_grading_selections.create!(student: @student)
+            @sel = @assignment.moderated_grading_selections.find_by(student: @student)
           end
 
           it "returns nil if no provisional grade was published" do
@@ -3836,6 +3819,26 @@ describe Submission do
 
       it 'returns rubric_assessments for teacher' do
         expect(subject).to include(@teacher_assessment)
+      end
+
+      it 'does not return rubric assessments if assignment has no rubric' do
+        @assignment.rubric_association.destroy!
+
+        expect(subject).not_to include(@teacher_assessment)
+      end
+
+      it 'only returns rubric assessments from associated rubrics' do
+        other = @rubric_association.dup
+        other.save!
+        other_assessment = other.rubric_assessments.create!({
+          artifact: @submission,
+          assessment_type: 'grading',
+          assessor: @teacher,
+          rubric: @rubric,
+          user: @assessed_user
+        })
+
+        expect(subject).to eq([other_assessment])
       end
 
       it 'returns only student rubric assessment' do
@@ -4072,14 +4075,8 @@ describe Submission do
 
   describe "#can_view_details?" do
     before :each do
-      @assignment.root_account.enable_feature!(:anonymous_moderated_marking)
       @assignment.update!(anonymous_grading: true, muted: true)
       @submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry', body: 'a body')
-    end
-
-    it "returns true if anonymous_moderated_marking is not enabled" do
-      @assignment.root_account.disable_feature!(:anonymous_moderated_marking)
-      expect(@submission.can_view_details?(@student)).to be true
     end
 
     it "returns false if user isn't present" do
@@ -4704,6 +4701,9 @@ describe Submission do
                   else
                     assignment.submissions.find_by!(user: user)
                   end
+    unless assignment.grades_published? || @submission.grade_posting_in_progress || assignment.permits_moderation?(user)
+      opts.delete(:grade)
+    end
     @submission.update!(opts)
     @submission
   end

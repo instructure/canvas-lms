@@ -2,17 +2,32 @@
   "add_to_do_7def3c37": {
     "message": "タスクに追加"
   },
+  "all_day_fb42c4fc": {
+    "message": "全日"
+  },
   "all_items_loaded_aa256183": {
     "message": "すべてのアイテムがロードされました"
   },
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "この計画項目をほんとうに削除しますか？"
   },
-  "assignmenttype_title_is_complete_813e54f8": {
-    "message": "{ assignmentType } { title } 完了しています"
+  "assignmenttype_title_6612d008": {
+    "message": "{ assignmentType } { title }。"
   },
-  "assignmenttype_title_is_incomplete_a1d5fac0": {
-    "message": "{ assignmentType } { title } 完了しています"
+  "assignmenttype_title_at_datetime_478f0709": {
+    "message": "{ assignmentType } { title }（{ datetime }にて）。"
+  },
+  "assignmenttype_title_due_datetime_a112d8ff": {
+    "message": "{ assignmentType } { title }、期限 { datetime }。"
+  },
+  "assignmenttype_title_is_marked_as_done_a8dc46ef": {
+    "message": "{ assignmentType } { title } は、完了とマークされています。"
+  },
+  "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
+    "message": "{ assignmentType } { title } は、完了とマークされていません。"
+  },
+  "assignmenttype_title_on_datetime_446013fb": {
+    "message": "{ assignmentType } { title }（{ datetime }に）。"
   },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "あなたのタスク履歴の始まり"
@@ -39,10 +54,13 @@
     "message": "{ course } タスク"
   },
   "date_at_time_dbdb1b99": {
-    "message": "{ date } おいて{ time }"
+    "message": "{ date }を{ time }で"
   },
   "date_ee500367": {
     "message": "日付"
+  },
+  "date_is_not_a_valid_date_4ef9f8ba": {
+    "message": "#{ date } は無効な日付です。"
   },
   "date_is_required_8660ec22": {
     "message": "日付は必須です"
@@ -54,7 +72,7 @@
     "message": "詳細"
   },
   "dismiss_opportunityname_5995176f": {
-    "message": "却下する{ opportunityName }"
+    "message": "{ opportunityName }を却下する"
   },
   "due_5d7267be": {
     "message": "期限："
@@ -63,7 +81,10 @@
     "message": "期限：{ date }"
   },
   "edit_title_72e5a21e": {
-    "message": "編集{ title }"
+    "message": "{ title }を編集する"
+  },
+  "error_loading_grades_e0b38f4d": {
+    "message": "成績の読み込み中にエラー"
   },
   "error_loading_more_items_3f109d9f": {
     "message": "さらなるアイテムの読み込み中にエラーが発生しました"
@@ -95,6 +116,15 @@
   "graded_25cd3fcd": {
     "message": "採点済み"
   },
+  "grades_are_loading_c899652d": {
+    "message": "成績読み込み中です"
+  },
+  "grades_loaded_5056277c": {
+    "message": "成績が読み込まれました"
+  },
+  "items_completed_items_plural_1_item_other_items_717d579f": {
+    "message": "{ items } 完了した{ items, plural,\n     =1 {項目}\n  other {項目}\n}"
+  },
   "late_2be42b88": {
     "message": "遅れている"
   },
@@ -105,10 +135,16 @@
     "message": "以前のデータを読み込む"
   },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-    "message": "{ count, plural,\n     =0{# アイテム}\n    one {# アイテム}\n  other {# アイテムを読み込みました}\n}"
+    "message": "読み込んだ{ count, plural,\n     =0 {#項目}\n    one {#項目}\n  other {#項目}\n}"
   },
   "loading_25990131": {
     "message": "読み込み中・・・"
+  },
+  "loading_725811ca": {
+    "message": "読み込み中"
+  },
+  "loading_grades_c842c887": {
+    "message": "成績読み込み中"
   },
   "loading_past_items_ca499e75": {
     "message": "過去のアイテムを読み込む"
@@ -122,14 +158,17 @@
   "missing_1a256b3b": {
     "message": "欠如"
   },
-  "missing_items_for_5ef30cea": {
-    "message": "～に不足しているアイテム"
+  "missing_items_for_title_516511f8": {
+    "message": "{ title }に不足しているアイテム"
+  },
+  "my_grades_98834476": {
+    "message": "私の成績"
   },
   "new_activity_8b84847d": {
     "message": "新規アクティビティ"
   },
-  "new_activity_for_ac84f6e6": {
-    "message": "～の新規アクティビティ"
+  "new_activity_for_title_14c9c3af": {
+    "message": "{ title }の新規アクティビティ"
   },
   "next_month_749b1778": {
     "message": "翌月"
@@ -137,11 +176,20 @@
   "no_due_dates_assigned_e8f5bac8": {
     "message": "期日指定なし"
   },
-  "no_to_do_s_for_this_day_yet_90c5873d": {
-    "message": "この日はまだタスクがありません。"
+  "no_grade_3b4d7f3e": {
+    "message": "成績なし"
   },
   "nothing_new_needs_attention_3ac548d4": {
     "message": "注意を必要する新しいものは何もない。"
+  },
+  "nothing_planned_today_next_item_loaded_5a199868": {
+    "message": "今日は何も計画されていません。次のアイテムがロードされました。"
+  },
+  "nothing_planned_yet_8675ffe9": {
+    "message": "まだ計画はありません"
+  },
+  "only_most_recent_grading_period_shown_f1ad6458": {
+    "message": "*最新の採点期間のみが表示されます。"
   },
   "optional_add_course_ef0d70fc": {
     "message": "オプション：コースの追加"
@@ -150,7 +198,7 @@
     "message": "ポイント"
   },
   "points_points_63e59cce": {
-    "message": "{ points } ポイント"
+    "message": "{ points } 点"
   },
   "previous_month_bb1e3c84": {
     "message": "前月"
@@ -164,11 +212,26 @@
   "save_11a80ec3": {
     "message": "保存"
   },
+  "show_my_grades_ebd08684": {
+    "message": "私の成績を表示"
+  },
+  "startdate_to_enddate_d245175b": {
+    "message": "{ startDate } - { endDate }"
+  },
   "submitted_318fad53": {
     "message": "タスクの成績を送信"
   },
+  "success_to_do_created_e34ed395": {
+    "message": "成功：タスクが作成"
+  },
   "task_16b0ef38": {
     "message": "タスク"
+  },
+  "the_date_and_time_this_to_do_is_due_74c823d4": {
+    "message": "これを行う日時が期限を過ぎています"
+  },
+  "time_2b5aac58": {
+    "message": "時間"
   },
   "title_ee03d132": {
     "message": "タイトル"
@@ -183,22 +246,25 @@
     "message": "今日"
   },
   "today_at_date_8ac30d6": {
-    "message": "今日　にて{ date }"
+    "message": "今日{ date }にて"
   },
   "tomorrow_9a6c9a00": {
     "message": "明日"
   },
   "tomorrow_at_date_b53f2cf1": {
-    "message": "明日　　にて{ date }"
+    "message": "明日 { date }にて"
   },
   "unable_to_mark_as_complete_8141856d": {
     "message": "終了とマークできません。"
   },
   "yesterday_at_date_1aa6d18e": {
-    "message": "昨日　　にて{ date }"
+    "message": "昨日{ date }にて"
   },
   "yesterday_c6bd6abf": {
     "message": "昨日"
+  },
+  "you_must_provide_a_date_and_time_a86839d2": {
+    "message": "日時を指定する必要があります。"
   },
   "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
     "message": "あなたの最初のタスクにスクロールしました！"

@@ -19,7 +19,6 @@
 import React from 'react';
 import { mount, shallow } from 'enzyme';
 import { SearchFormComponent } from 'jsx/gradebook-history/SearchForm';
-import Autocomplete from '@instructure/ui-core/lib/components/Autocomplete';
 import Button from '@instructure/ui-buttons/lib/components/Button';
 import DateInput from '@instructure/ui-forms/lib/components/DateInput';
 import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup';
@@ -72,19 +71,19 @@ test('has a form field group', function () {
 test('has an Autocomplete with id #graders', function () {
   const input = this.wrapper.find('#graders');
   equal(input.length, 1);
-  ok(input.is(Autocomplete));
+  ok(input.is('Select'));
 });
 
 test('has an Autocomplete with id #students', function () {
   const input = this.wrapper.find('#students');
   equal(input.length, 1);
-  ok(input.is(Autocomplete));
+  ok(input.is('Select'));
 });
 
 test('has an Autocomplete with id #assignments', function () {
   const input = this.wrapper.find('#assignments');
   equal(input.length, 1);
-  ok(input.is(Autocomplete));
+  ok(input.is('Select'));
 });
 
 test('has DateInputs for from date and to date', function () {

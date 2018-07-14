@@ -27,9 +27,11 @@ function submissionGradingPeriodInformation (assignment, student) {
   };
 }
 
-function visibleToStudent (assignment, student) {
-  if (!assignment.only_visible_to_overrides) return true;
-  return _.contains(assignment.assignment_visibility, student.id);
+function hiddenFromStudent (assignment, student) {
+  if (assignment.only_visible_to_overrides) {
+    return !_.contains(assignment.assignment_visibility, student.id);
+  }
+  return false
 }
 
 function gradingPeriodInfoForCell (assignment, student, selectedGradingPeriodID) {
@@ -52,9 +54,7 @@ function cellMappingsForMultipleGradingPeriods (assignment, student, selectedGra
   const gradingPeriodInfo = gradingPeriodInfoForCell(assignment, student, selectedGradingPeriodID);
   let cellMapping;
 
-  if (specificPeriodSelected && !gradingPeriodID) {
-    cellMapping = { locked: true, hideGrade: true };
-  } else if (specificPeriodSelected && selectedGradingPeriodID !== gradingPeriodID) {
+  if (specificPeriodSelected && (!gradingPeriodID || selectedGradingPeriodID !== gradingPeriodID)) {
     cellMapping = { locked: true, hideGrade: true };
   } else if (!isAdmin && inClosedGradingPeriod) {
     cellMapping = { locked: true, hideGrade: false };
@@ -65,14 +65,12 @@ function cellMappingsForMultipleGradingPeriods (assignment, student, selectedGra
   return { ...cellMapping, ...gradingPeriodInfo };
 }
 
-function cellMapForSubmission (assignment, student, hasGradingPeriods, selectedGradingPeriodID, isAdmin, anonymousModeratedMarkingEnabled) {
-  if (!assignment.published) {
+function cellMapForSubmission (assignment, student, hasGradingPeriods, selectedGradingPeriodID, isAdmin) {
+  if (!assignment.published || (assignment.anonymous_grading && assignment.muted)) {
     return { locked: true, hideGrade: true };
-  } else if (assignment.moderated_grading && !assignment.grades_published && anonymousModeratedMarkingEnabled) {
+  } else if (assignment.moderated_grading && !assignment.grades_published) {
     return { locked: true, hideGrade: false };
-  } else if (assignment.anonymous_grading && assignment.muted && anonymousModeratedMarkingEnabled) {
-    return { locked: true, hideGrade: true };
-  } else if (!visibleToStudent(assignment, student)) {
+  } else if (hiddenFromStudent(assignment, student)) {
     return { locked: true, hideGrade: true };
   } else if (hasGradingPeriods) {
     return cellMappingsForMultipleGradingPeriods(assignment, student, selectedGradingPeriodID, isAdmin);
@@ -98,11 +96,10 @@ function missingSubmission (student, assignment) {
 }
 
 class SubmissionStateMap {
-  constructor ({ hasGradingPeriods, selectedGradingPeriodID, isAdmin, anonymousModeratedMarkingEnabled }) {
+  constructor ({ hasGradingPeriods, selectedGradingPeriodID, isAdmin }) {
     this.hasGradingPeriods = hasGradingPeriods;
     this.selectedGradingPeriodID = selectedGradingPeriodID;
     this.isAdmin = isAdmin;
-    this.anonymousModeratedMarkingEnabled = anonymousModeratedMarkingEnabled;
     this.submissionCellMap = {};
     this.submissionMap = {};
   }
@@ -124,8 +121,7 @@ class SubmissionStateMap {
       student,
       this.hasGradingPeriods,
       this.selectedGradingPeriodID,
-      this.isAdmin,
-      this.anonymousModeratedMarkingEnabled
+      this.isAdmin
     ];
 
     this.submissionCellMap[student.id][assignment.id] = cellMapForSubmission(...params);

@@ -21,22 +21,12 @@ Feature.register(
     display_name: -> { I18n.t 'Moderated Grading' },
     description: -> {
       I18n.t <<~DESCRIPTION
-        Enable moderated grading. Only relevant if the Anonymous Moderated Marking flag is enabled.
+        Enable moderated grading.
       DESCRIPTION
     },
     applies_to: 'Course',
-    state: 'hidden',
+    state: 'allowed',
     root_opt_in: true,
-    beta: true,
-    development: true,
-    visible_on: ->(context) do
-      if context.is_a?(Account)
-        context.feature_enabled?(:anonymous_moderated_marking)
-      elsif context.is_a?(Course)
-        context.root_account.feature_enabled?(:anonymous_moderated_marking)
-      else
-        false
-      end
-    end
+    beta: true
   }
 )

@@ -28,7 +28,7 @@ import { css } from "aphrodite";
 describe("LoadMore", () => {
   const noop = () => {};
 
-  describe("focus handling", () => {
+  describe.skip("focus handling", () => {
     let elem, props;
     jsdom();
 

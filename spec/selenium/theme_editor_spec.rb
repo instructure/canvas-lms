@@ -200,4 +200,39 @@ describe 'Theme Editor' do
     expect(color_labels[0].attribute('style')).to include('background-color: rgb(153, 153, 153)')
     expect(color_labels[1].attribute('style')).to include('background-color: rgb(0, 0, 0)')
   end
+
+  it 'should only store modified values to the database' do
+    open_theme_editor(Account.default.id)
+    ff('.Theme__editor-color-block_input-text')[1].send_keys('#000') # main text color
+    expect_new_page_load do
+      preview_your_changes
+      run_jobs
+    end
+    brand_config_md5 = driver.execute_script "return ENV.brandConfig.md5"
+    expect(BrandConfig.find(brand_config_md5).variables).to eq({"ic-brand-font-color-dark"=>"#000"})
+  end
+
+  it 'should apply the theme to the account' do
+    open_theme_editor(Account.default.id)
+    ff('.Theme__editor-color-block_input-text')[0].send_keys('#639') # primary brand color
+    expect_new_page_load do
+      preview_your_changes
+      run_jobs
+    end
+    fj('button:contains("Save theme")').click
+
+    name_input = f('#new_theme_theme_name')
+    keep_trying_until(1) do
+      name_input.send_keys('Test Theme')
+      true
+    end
+    fj('span[aria-label="Save Theme"] button:contains("Save theme")').click
+    apply_btn = fj('button:contains("Apply theme")')
+    keep_trying_until(1) do
+      apply_btn.click
+      true
+    end
+    driver.switch_to.alert.accept
+    expect(fj('button:contains("Theme")').css_value('background-color')).to eq('rgba(102, 51, 153, 1)')
+  end
 end

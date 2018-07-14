@@ -1,0 +1,272 @@
+{
+  "add_to_do_7def3c37": {
+    "message": "Ychwanegu Tasg i’w Gwneud"
+  },
+  "all_day_fb42c4fc": {
+    "message": "Drwy’r Dydd"
+  },
+  "all_items_loaded_aa256183": {
+    "message": "Pob eitem wedi’i llwytho"
+  },
+  "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
+    "message": "Ydych chi’n siŵr eich bod am ddileu’r eitem hon ar gyfer y trefnydd?"
+  },
+  "assignmenttype_title_6612d008": {
+    "message": "{ assignmentType } { title }."
+  },
+  "assignmenttype_title_at_datetime_478f0709": {
+    "message": "{ assignmentType } { title }, yn { datetime }."
+  },
+  "assignmenttype_title_due_datetime_a112d8ff": {
+    "message": "{ assignmentType } { title }, erbyn { datetime }."
+  },
+  "assignmenttype_title_is_marked_as_done_a8dc46ef": {
+    "message": "{ assignmentType } { title } wedi’i farcio fel wedi gorffen. "
+  },
+  "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
+    "message": "{ assignmentType } { title } heb ei farcio fel wedi gorffen."
+  },
+  "assignmenttype_title_on_datetime_446013fb": {
+    "message": "{ assignmentType } { title }, ar { datetime }."
+  },
+  "beginning_of_your_to_do_history_61ef2dce": {
+    "message": "Dechrau’r Hanes Tasgau i’w Gwneud"
+  },
+  "canvas_planner_98ed106": {
+    "message": "Canvas Planner"
+  },
+  "close_d634289d": {
+    "message": "Cau"
+  },
+  "close_opportunities_popover_f4e50551": {
+    "message": "Cau neidlen cyfleoedd"
+  },
+  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
+    "message": "{ count, plural,\n     =0 {# cyfle}\n    one {# cyfle}\n  other {# cyfle}\n}"
+  },
+  "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
+    "message": "{ count, plural,\n    one {Dangos # eitem wedi’i chwblhau }\n  other {Dangos # eitem wedi’i chwblhau}\n}"
+  },
+  "course_8a63b4a3": {
+    "message": "Cwrs"
+  },
+  "course_to_do_bcbbab54": {
+    "message": "{ course } – TASGAU I’W GWNEUD"
+  },
+  "date_at_time_dbdb1b99": {
+    "message": "{ date } am { time }"
+  },
+  "date_ee500367": {
+    "message": "Dyddiad"
+  },
+  "date_is_not_a_valid_date_4ef9f8ba": {
+    "message": "Dydy #{ date } ddim yn ddyddiad dilys."
+  },
+  "date_is_required_8660ec22": {
+    "message": "Mae’n rhaid rhoi dyddiad"
+  },
+  "delete_a6efa79d": {
+    "message": "Dileu"
+  },
+  "details_98a31b68": {
+    "message": "Manylion"
+  },
+  "dismiss_opportunityname_5995176f": {
+    "message": "Gwrthod { opportunityName }"
+  },
+  "due_5d7267be": {
+    "message": "Erbyn:"
+  },
+  "due_date_8ce289b6": {
+    "message": "ERBYN: { date }"
+  },
+  "edit_title_72e5a21e": {
+    "message": "Golygu { title }"
+  },
+  "error_loading_grades_e0b38f4d": {
+    "message": "Gwall wrth lwytho graddau"
+  },
+  "error_loading_more_items_3f109d9f": {
+    "message": "Gwall wrth lwytho mwy o eitemau"
+  },
+  "error_loading_past_items_2881dbb1": {
+    "message": "Gwall wrth lwytho eitemau blaenorol"
+  },
+  "excused_cf8792eb": {
+    "message": "Esgusodwyd"
+  },
+  "failed_to_delete_to_do_64edff49": {
+    "message": "Wedi methu dileu tasg i’w gwneud"
+  },
+  "failed_to_get_new_activity_17e7ec7c": {
+    "message": "Wedi methu nôl gweithgarwch newydd"
+  },
+  "failed_to_load_opportunities_52ab6404": {
+    "message": "Wedi methu llwytho’r cyfleoedd"
+  },
+  "failed_to_save_to_do_ddc7503b": {
+    "message": "Wedi methu cadw tasg i’w gwneud"
+  },
+  "feedback_6dcc1991": {
+    "message": "Adborth"
+  },
+  "go_to_dashboard_card_view_10398ef6": {
+    "message": "Mynd i Wedd Cerdyn y Dangosfwrdd"
+  },
+  "graded_25cd3fcd": {
+    "message": "Wedi graddio"
+  },
+  "grades_are_loading_c899652d": {
+    "message": "Graddau yn llwytho"
+  },
+  "grades_loaded_5056277c": {
+    "message": "Graddau wedi’u llwytho"
+  },
+  "items_completed_items_plural_1_item_other_items_717d579f": {
+    "message": "{ items } eitem { items, plural,\n     =1 {wedi’i chwblhau}\n  other {eitem}\n} wedi’i chwblhau"
+  },
+  "late_2be42b88": {
+    "message": "Yn Hwyr"
+  },
+  "load_more_a36f9cf9": {
+    "message": "Llwytho mwy"
+  },
+  "load_prior_dates_f2b0f6f0": {
+    "message": "Llwytho dyddiadau blaenorol"
+  },
+  "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
+    "message": "Wedi llwytho { count, plural,\n     =0 {# eitem}\n    one {# eitem}\n  other {# eitem}\n}"
+  },
+  "loading_25990131": {
+    "message": "Wrthi’n llwytho..."
+  },
+  "loading_725811ca": {
+    "message": "wrthi’n llwytho"
+  },
+  "loading_grades_c842c887": {
+    "message": "Llwytho Graddau"
+  },
+  "loading_past_items_ca499e75": {
+    "message": "Llwytho eitemau blaenorol"
+  },
+  "loading_planner_items_947a813d": {
+    "message": "Llwytho eitemau’r trefnydd"
+  },
+  "looks_like_there_isn_t_anything_here_d9bcef49": {
+    "message": "Does dim byd yma yn ôl pob golwg"
+  },
+  "missing_1a256b3b": {
+    "message": "Ar goll"
+  },
+  "missing_items_for_title_516511f8": {
+    "message": "Eitemau ar goll ar gyfer { title }"
+  },
+  "my_grades_98834476": {
+    "message": "Fy Ngraddau"
+  },
+  "new_activity_8b84847d": {
+    "message": "Gweithgarwch Newydd"
+  },
+  "new_activity_for_title_14c9c3af": {
+    "message": "Gweithgaredd newydd ar gyfer { title }"
+  },
+  "next_month_749b1778": {
+    "message": "Mis Nesaf"
+  },
+  "no_due_dates_assigned_e8f5bac8": {
+    "message": "Does dim Dyddiadau Erbyn wedi’u neilltuo"
+  },
+  "no_grade_3b4d7f3e": {
+    "message": "Dim Gradd"
+  },
+  "nothing_new_needs_attention_3ac548d4": {
+    "message": "Does dim byd newydd angen sylw."
+  },
+  "nothing_planned_today_next_item_loaded_5a199868": {
+    "message": "Does dim byd wedi’i drefnu heddiw. Yr eitem nesaf wedi''i llwytho."
+  },
+  "nothing_planned_yet_8675ffe9": {
+    "message": "Does dim byd wedi’i drefnu hyd yma"
+  },
+  "only_most_recent_grading_period_shown_f1ad6458": {
+    "message": "*Dim ond y cyfnod graddio diweddaraf sy’n ymddangos."
+  },
+  "optional_add_course_ef0d70fc": {
+    "message": "Dewisol: Ychwanegu Cwrs"
+  },
+  "points_bceb5005": {
+    "message": "pwynt"
+  },
+  "points_points_63e59cce": {
+    "message": "{ points } pwynt"
+  },
+  "previous_month_bb1e3c84": {
+    "message": "Mis Blaenorol"
+  },
+  "pts_699bd9aa": {
+    "message": "pwynt"
+  },
+  "replies_4a8577c8": {
+    "message": "Ateb"
+  },
+  "save_11a80ec3": {
+    "message": "Cadw"
+  },
+  "show_my_grades_ebd08684": {
+    "message": "Dangos Fy Ngraddau"
+  },
+  "startdate_to_enddate_d245175b": {
+    "message": "{ startDate } i { endDate }"
+  },
+  "submitted_318fad53": {
+    "message": "Wedi Cyflwyno"
+  },
+  "success_to_do_created_e34ed395": {
+    "message": "Wedi llwyddo: Wedi creu rhestr o dasgau i’w gwneud"
+  },
+  "task_16b0ef38": {
+    "message": "Tasg"
+  },
+  "the_date_and_time_this_to_do_is_due_74c823d4": {
+    "message": "Wedi cyrraedd dyddiad ac amser cyflwyno’r dasg hon"
+  },
+  "time_2b5aac58": {
+    "message": "Amser"
+  },
+  "title_ee03d132": {
+    "message": "Teitl"
+  },
+  "title_is_required_6ddcab69": {
+    "message": "mae’n rhaid rhoi teitl"
+  },
+  "to_do_1d554f36": {
+    "message": "Tasgau i’w Gwneud"
+  },
+  "today_76e10f9c": {
+    "message": "Heddiw"
+  },
+  "today_at_date_8ac30d6": {
+    "message": "Heddiw am { date }"
+  },
+  "tomorrow_9a6c9a00": {
+    "message": "Yfory"
+  },
+  "tomorrow_at_date_b53f2cf1": {
+    "message": "Yfory am { date }"
+  },
+  "unable_to_mark_as_complete_8141856d": {
+    "message": "Heb allu marcio fod hyn wedi’i gwblhau."
+  },
+  "yesterday_at_date_1aa6d18e": {
+    "message": "Ddoe am { date }"
+  },
+  "yesterday_c6bd6abf": {
+    "message": "Ddoe"
+  },
+  "you_must_provide_a_date_and_time_a86839d2": {
+    "message": "Mae’n rhaid i chi roi dyddiad ac amser."
+  },
+  "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
+    "message": "Rydych chi wedi sgrolio’n ôl i’r dasg gyntaf un a oedd gennych chi i’w gwneud!"
+  }
+}

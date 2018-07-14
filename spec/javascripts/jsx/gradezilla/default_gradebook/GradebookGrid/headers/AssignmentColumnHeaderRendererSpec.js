@@ -173,11 +173,10 @@ QUnit.module('AssignmentColumnHeaderRenderer', function (suiteHooks) {
       equal(component.props.downloadSubmissionsAction, gradebook.getDownloadSubmissionsAction.returnValues[0]);
     });
 
-    test('the anonymousGrading prop is `false` when the assignment is anonymous', function () {
+    test('the anonymousGrading prop is `true` when the assignment is anonymous', function () {
       assignment.anonymous_grading = true
       render()
-      // anonymousGrading can only be true if Anonymous Moderated Marking is enabled
-      strictEqual(component.props.assignment.anonymousGrading, false)
+      strictEqual(component.props.assignment.anonymousGrading, true)
     })
 
     test('the anonymousGrading prop is `false` when the assignment is not anonymous', function () {
@@ -376,7 +375,7 @@ QUnit.module('AssignmentColumnHeaderRenderer', function (suiteHooks) {
     test('includes a callback for closing the column header menu', function () {
       sinon.stub(gradebook, 'handleColumnHeaderMenuClose');
       render();
-      component.props.onMenuClose();
+      component.props.onMenuDismiss();
       strictEqual(gradebook.handleColumnHeaderMenuClose.callCount, 1);
     });
 
@@ -505,23 +504,6 @@ QUnit.module('AssignmentColumnHeaderRenderer', function (suiteHooks) {
       render();
       equal(component.props.sortBySetting.settingKey, 'grade');
     });
-
-    QUnit.module('when Anonymous Moderated Marking is enabled', function (hooks) {
-      hooks.beforeEach(() => {
-        gradebook.options.anonymous_moderated_marking_enabled = true
-      })
-
-      test('the anonymousGrading prop is `true` when the assignment is anonymous', function () {
-        assignment.anonymous_grading = true
-        render()
-        strictEqual(component.props.assignment.anonymousGrading, true)
-      })
-
-      test('the anonymousGrading prop is `false` when the assignment is not anonymous', function () {
-        render()
-        strictEqual(component.props.assignment.anonymousGrading, false)
-      })
-    })
   });
 
   QUnit.module('#destroy', function () {

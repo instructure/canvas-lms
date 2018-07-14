@@ -33,7 +33,7 @@ function findMenuContent (props) {
 
 function findFlyout (props, flyoutLabel) {
   const menuContent = findMenuContent.call(this, props)
-  const flyouts = menuContent.find('MenuItemFlyout').map(flyout => flyout);
+  const flyouts = menuContent.find('Menu').map(flyout => flyout);
   return flyouts.find(menuItem => menuItem.text().trim() === flyoutLabel);
 }
 

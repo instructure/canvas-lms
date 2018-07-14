@@ -18,7 +18,7 @@
 
 import React from 'react';
 import { arrayOf, number, oneOf, shape, string } from 'prop-types';
-import Text from '@instructure/ui-core/lib/components/Text';
+import Text from '@instructure/ui-elements/lib/components/Text';
 import I18n from 'i18n!gradebook';
 import GradeFormatHelper from '../../../gradebook/shared/helpers/GradeFormatHelper';
 

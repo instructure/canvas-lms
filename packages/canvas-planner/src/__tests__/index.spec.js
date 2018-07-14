@@ -63,7 +63,7 @@ describe('with mock api', () => {
     });
 
     it('calls render with PlannerHeader', () => {
-      renderHeader(document.getElementById('header_container'), options);
+      renderHeader(document.getElementById('header_container'), document.createElement('div'), options);
       // This assertion is a bit odd, we need to get class names working with
       // CSS modules under test then we can be more clear here.
       expect(document.querySelector('#header_container div')).toBeTruthy();
