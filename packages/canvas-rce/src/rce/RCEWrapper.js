@@ -99,9 +99,9 @@ export default class RCEWrapper extends React.Component {
   insertImage(image) {
     const editor = this.mceInstance();
     const element = contentInsertion.insertImage(editor, image);
-    if (element.complete) {
+    if (element && element.complete) {
       this.contentInserted(element);
-    } else {
+    } else if (element) {
       element.onload = () => this.contentInserted(element);
       element.onerror = () => this.checkImageLoadError(element);
     }
