@@ -128,9 +128,6 @@
   "feedback_6dcc1991": {
     "message": "反馈"
   },
-  "go_to_dashboard_card_view_10398ef6": {
-    "message": "转到仪表板卡视图"
-  },
   "graded_25cd3fcd": {
     "message": "已评分"
   },
@@ -202,9 +199,6 @@
   },
   "nothing_planned_yet_8675ffe9": {
     "message": "尚未进行任何计划"
-  },
-  "number_more_59a297e8": {
-    "message": "{ number } 更多……"
   },
   "numpoints_points_8621a43b": {
     "message": "{ numPoints } 分"

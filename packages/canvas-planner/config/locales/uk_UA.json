@@ -80,6 +80,9 @@
   "feedback_6dcc1991": {
     "message": "Зворотній зв''язок"
   },
+  "you_have_media_feedback_f5f9aba8": {
+    "message": "Ви маєте відгук у вигляді медіа файлу."
+  },
   "loading_25990131": {
     "message": "Завантаження..."
   },
@@ -185,9 +188,6 @@
   "delete_a6efa79d": {
     "message": "Видалити"
   },
-  "go_to_dashboard_card_view_10398ef6": {
-    "message": "Перейти на панель інструментів Card View"
-  },
   "unable_to_mark_as_complete_8141856d": {
     "message": "Неможливо позначити як завершений."
   },
@@ -247,9 +247,6 @@
   },
   "to_do_1d554f36": {
     "message": "Зробити"
-  },
-  "number_more_59a297e8": {
-    "message": "{ number } Більше..."
   },
   "missing_1a256b3b": {
     "message": "Відсутній"

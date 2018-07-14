@@ -128,9 +128,6 @@
   "feedback_6dcc1991": {
     "message": "フィードバック"
   },
-  "go_to_dashboard_card_view_10398ef6": {
-    "message": "ダッシュボードカードビューに移動"
-  },
   "graded_25cd3fcd": {
     "message": "採点済み"
   },
@@ -202,9 +199,6 @@
   },
   "nothing_planned_yet_8675ffe9": {
     "message": "まだ計画はありません"
-  },
-  "number_more_59a297e8": {
-    "message": "{ number } さらに..."
   },
   "numpoints_points_8621a43b": {
     "message": "{ numPoints } 点"

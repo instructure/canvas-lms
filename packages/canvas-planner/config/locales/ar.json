@@ -128,9 +128,6 @@
   "feedback_6dcc1991": {
     "message": "التعليقات"
   },
-  "go_to_dashboard_card_view_10398ef6": {
-    "message": "اذهب إلى طريقة عرض بطاقة لوحة المعلومات"
-  },
   "graded_25cd3fcd": {
     "message": "تم تقييم الدرجة"
   },
@@ -202,9 +199,6 @@
   },
   "nothing_planned_yet_8675ffe9": {
     "message": "لم يتم تخطيط أي شيء بعد"
-  },
-  "number_more_59a297e8": {
-    "message": "{ number } المزيد..."
   },
   "numpoints_points_8621a43b": {
     "message": "نقاط { numPoints }"

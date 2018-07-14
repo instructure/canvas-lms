@@ -185,9 +185,6 @@
   "delete_a6efa79d": {
     "message": "Slett"
   },
-  "go_to_dashboard_card_view_10398ef6": {
-    "message": "Gå til dashbordkort-vising"
-  },
   "unable_to_mark_as_complete_8141856d": {
     "message": "Kan ikkje merke som fullført. "
   },
@@ -247,9 +244,6 @@
   },
   "to_do_1d554f36": {
     "message": "Gjeremål"
-  },
-  "number_more_59a297e8": {
-    "message": "{ number } Meir..."
   },
   "missing_1a256b3b": {
     "message": "Manglar"

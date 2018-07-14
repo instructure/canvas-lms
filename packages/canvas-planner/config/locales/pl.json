@@ -128,9 +128,6 @@
   "feedback_6dcc1991": {
     "message": "Informacje zwrotne"
   },
-  "go_to_dashboard_card_view_10398ef6": {
-    "message": "Przejdź do widoku kart panelu"
-  },
   "graded_25cd3fcd": {
     "message": "Oceniono"
   },
@@ -202,9 +199,6 @@
   },
   "nothing_planned_yet_8675ffe9": {
     "message": "Nic jeszcze nie zaplanowano"
-  },
-  "number_more_59a297e8": {
-    "message": "{ number } więcej..."
   },
   "numpoints_points_8621a43b": {
     "message": "{ numPoints } punkty"

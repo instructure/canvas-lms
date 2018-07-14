@@ -128,9 +128,6 @@
   "feedback_6dcc1991": {
     "message": "Tilbakemelding"
   },
-  "go_to_dashboard_card_view_10398ef6": {
-    "message": "Gå til kortvisningen av instrumentpanelet"
-  },
   "graded_25cd3fcd": {
     "message": "Karaktersatt"
   },
@@ -202,9 +199,6 @@
   },
   "nothing_planned_yet_8675ffe9": {
     "message": "Ingenting planlagt enda"
-  },
-  "number_more_59a297e8": {
-    "message": "{ number } mer..."
   },
   "numpoints_points_8621a43b": {
     "message": "{ numPoints } poeng"
