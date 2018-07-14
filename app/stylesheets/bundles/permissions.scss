@@ -82,6 +82,7 @@ $darkRowBg: #f9f9f9;
 
 // the <table> itself
 .ic-permissions__table {
+  min-width: -webkit-fit-content;
   width: 100%;
   border-collapse: collapse;
   border-spacing: 0;
