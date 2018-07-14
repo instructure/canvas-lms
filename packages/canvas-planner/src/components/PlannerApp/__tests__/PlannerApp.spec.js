@@ -28,7 +28,8 @@ const getDefaultValues = (overrides) => {
   return Object.assign({}, {
     days: days.map(d => [d.format('YYYY-MM-DD'), [{dateBucketMoment: d}]]),
     timeZone: TZ,
-    changeDashboardView () {}
+    changeDashboardView () {},
+    isCompletelyEmpty: false,
   }, overrides);
 };
 
