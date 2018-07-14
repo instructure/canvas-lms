@@ -294,6 +294,19 @@ describe('groupAndSortDayItems', () => {
       {uniqueId: '3'}, {uniqueId: '1.5'}, {uniqueId: '4'}, {uniqueId: '2'}, {uniqueId: '1'}
     ]);
   });
+
+  it('sorts completed items last', () => {
+    const items = [
+      mockItem('2017-12-05T11:00:00Z', {uniqueId: '1', context: {type: 'Course', id: '1', title: 'Math'}, completed: true}),
+      mockItem('2017-12-05T12:00:00Z', {uniqueId: '2', context: {type: 'Course', id: '1', title: 'Math'}}),
+      mockItem('2017-12-05T12:30:00Z', {uniqueId: '3', context: {type: 'Course', id: '1', title: 'Math'}, allDay: true}),
+      mockItem('2017-12-05T11:00:00Z', {uniqueId: '4', context: {type: 'Course', id: '1', title: 'Math'}}),
+    ];
+    const result = groupAndSortDayItems(items);
+    expect(result).toMatchObject([
+      {uniqueId: '3'}, {uniqueId: '4'}, {uniqueId: '2'}, {uniqueId: '1'}
+    ]);
+  });
 });
 
 describe('deleteItemFromDays', () => {
