@@ -116,6 +116,9 @@
   "submitted_318fad53": {
     "message": "Підтверджено"
   },
+  "go_to_card_view_dashboard_9d03970e": {
+    "message": "Перейти на Панель інструментів Card View"
+  },
   "task_16b0ef38": {
     "message": "Завдання"
   },
@@ -140,6 +143,9 @@
   "title_is_required_6ddcab69": {
     "message": "заголовок обов''язковий"
   },
+  "scroll_up_to_see_your_history_19b14cad": {
+    "message": "Прокрутіть вверх, щоб побачити свою історію!"
+  },
   "nothing_planned_yet_8675ffe9": {
     "message": "Досі нічого не заплановано"
   },
@@ -158,6 +164,9 @@
   "loading_past_items_ca499e75": {
     "message": "Завантаження попередніх елементів"
   },
+  "show_all_ae37d610": {
+    "message": "Показати все"
+  },
   "missing_items_for_title_516511f8": {
     "message": "Відсутні елементи для { title }"
   },
@@ -175,6 +184,9 @@
   },
   "no_due_dates_assigned_e8f5bac8": {
     "message": "Термін виконання не призначено"
+  },
+  "edit_c5fbea07": {
+    "message": "Редагувати"
   },
   "save_11a80ec3": {
     "message": "Зберегти"
@@ -235,6 +247,12 @@
   },
   "yesterday_c6bd6abf": {
     "message": "Вчора"
+  },
+  "add_to_do_7537af64": {
+    "message": "Додайте до плану роботи"
+  },
+  "nothing_more_to_do_b665da42": {
+    "message": "План роботи порожній"
   },
   "graded_25cd3fcd": {
     "message": "Оцінено"
