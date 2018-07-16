@@ -30,16 +30,6 @@ describe "discussion assignments" do
     course_with_teacher_logged_in
   end
 
-  context "created on the index page" do
-    it "should create a discussion topic when created", priority: "1", test_id: 209964 do
-      ag = @course.assignment_groups.create!(:name => "Stuff")
-      get "/courses/#{@course.id}/assignments"
-      build_assignment_with_type("Discussion", :assignment_group_id => ag.id, :name => "This discussion was created on the assignments page", :submit => true)
-      expect_new_page_load { f("#section-tabs .discussions").click }
-      expect(f('#open-discussions')).to include_text("This discussion was created on the assignments page")
-    end
-  end
-
   context "created with 'more options'" do
     it "should redirect to the discussion new page and maintain parameters", priority: "1", test_id: 209966 do
       ag = @course.assignment_groups.create!(:name => "Stuff")

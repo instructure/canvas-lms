@@ -17,11 +17,11 @@
 
 define [
   'jquery'
+  'axios'
   'i18n!assignments'
   'jst/assignments/ExternalContentHomeworkFileSubmissionView'
   './ExternalContentHomeworkSubmissionView'
-  'jsx/shared/upload_file'
-], ($, I18n, template, ExternalContentHomeworkSubmissionView, uploader) ->
+], ($, axios, I18n, template, ExternalContentHomeworkSubmissionView) ->
 
   class ExternalContentFileSubmissionView extends ExternalContentHomeworkSubmissionView
     template: template
@@ -30,25 +30,29 @@ define [
     submitHomework: =>
       @uploadFileFromUrl(@externalTool, @model)
 
-    submitAssignment: (attachment) =>
-      data =
-        submission:
-          submission_type: "online_upload"
-          file_ids: [ attachment.id ]
-          eula_agreement_timestamp: $('#eula_agreement_timestamp').val()
-        comment:
-          text_comment: @assignmentSubmission.get('comment')
-
-      submissionUrl = "/api/v1/courses/" + ENV.COURSE_ID + "/assignments/" + ENV.SUBMIT_ASSIGNMENT.ID + "/submissions"
-      $.ajaxJSON submissionUrl, "POST", data, @redirectSuccessfulAssignment, @disableLoader
-
-      return
-
-    redirectSuccessfulAssignment: (responseData) =>
+    reloadSuccessfulAssignment: (responseData) =>
       $(window).off('beforeunload') # remove alert message from being triggered
+      alert(
+        I18n.t(
+          "processing_submission",
+          "Canvas is currently processing your submission. You can safely navigate away from this page and we will email you when the submission has processed."
+        )
+      )
       window.location.reload()
       @loaderPromise.resolve()
       return
+
+    sendCallbackUrl: (responseData) =>
+      uploadUrl = responseData.data.upload_url
+      if uploadUrl
+        formData = new FormData
+        uploadParams = responseData.data.upload_params
+
+        if uploadParams
+          for key of uploadParams
+            formData.append(key, uploadParams[key])
+
+        axios.post(uploadUrl, formData)
 
     disableLoader: =>
       @loaderPromise.resolve()
@@ -63,18 +67,23 @@ define [
 
       @assignmentSubmission = modelData
       # build the params for submitting the assignment
+      # TODO: The `submit_assignment` param is used to help in backwards compat for fixing auto submissions,
+      # can be removed in the next release.
       preflightData =
         url: @assignmentSubmission.get('url')
         name: @assignmentSubmission.get('text')
         content_type: ''
+        submit_assignment: true
+        eula_agreement_timestamp: @assignmentSubmission.get('eula_agreement_timestamp')
 
       if ENV.SUBMIT_ASSIGNMENT.GROUP_ID_FOR_USER?
         preflightUrl = "/api/v1/groups/" + ENV.SUBMIT_ASSIGNMENT.GROUP_ID_FOR_USER + "/files"
       else
         preflightUrl = "/api/v1/courses/" + ENV.COURSE_ID + "/assignments/" + ENV.SUBMIT_ASSIGNMENT.ID + "/submissions/" + ENV.current_user_id + "/files"
 
-      uploader.uploadFile(preflightUrl, preflightData, null)
-        .then(@submitAssignment)
+      axios.post(preflightUrl, preflightData)
+        .then(@sendCallbackUrl)
+        .then(@reloadSuccessfulAssignment)
         .catch(@submissionFailure)
 
       @$el.disableWhileLoading @loaderPromise,

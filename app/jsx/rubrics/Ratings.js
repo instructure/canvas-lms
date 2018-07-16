@@ -54,7 +54,8 @@ export const Rating = (props) => {
     tierColor,
     hidePoints,
     isSummary,
-    selected
+    selected,
+    width
   } = props
 
   const shaderStyle = { backgroundColor: tierColor }
@@ -70,11 +71,16 @@ export const Rating = (props) => {
   )
 
   return (
+    // eslint is unhappy here because it's not smart enough to understand that
+    // when this is interact-able (via tabIndex), it will always have a role
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div
       className={classes}
       onClick={assessing ? onClick : null}
       onKeyPress={(e) => e.key === 'Enter' ? onClick() : null}
       role={assessing ? "button" : null}
+      style={{ width }}
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
       tabIndex={assessing ? 0 : null}
     >
       {hidePoints ? null : ratingPoints()}
@@ -86,13 +92,9 @@ export const Rating = (props) => {
       <Text size="small" lineHeight="condensed">
         {long_description}
       </Text>
-      {
-        footer !== null ? (
-          <div className="rating-footer">
-            {footer}
-          </div>
-        ) : null
-      }
+      <div className="rating-footer">
+        {footer}
+      </div>
       <div className={shaderClasses} style={shaderStyle}
         aria-label={isSummary || !selected ? null : I18n.t('This rating is selected')}>
         <div className="triangle" style={triangleStyle}/>
@@ -195,9 +197,14 @@ const Ratings = (props) => {
   }
 
   const selectedIndex = points !== undefined ? currentIndex() : null
-  const ratings = tiers.map((tier, index) => {
+  const visible = tiers.map((tier, index) => ({
+    tier,
+    index,
+    selected: selectedIndex === index,
+  })).filter(({ selected }) => isSummary ? selected : true)
+
+  const ratings = visible.map(({ tier, index }) => {
     const selected = selectedIndex === index
-    if (isSummary && !selected) return null
     const classes = classNames({
       'rating-tier': true,
       'selected': selected,
@@ -216,6 +223,7 @@ const Ratings = (props) => {
         hidePoints={isSummary || hidePoints}
         isSummary={isSummary}
         selected={selected}
+        width={`${100 / visible.length}%`}
         {...tier}
       />
     )
@@ -224,9 +232,11 @@ const Ratings = (props) => {
   const defaultRating = () => (
     <Rating
       key={0}
+      assessing={assessing}
       classes="rating-tier"
       description={I18n.t('No details')}
       footer={footer}
+      isSummary={isSummary}
       points={0}
       hidePoints={isSummary || hidePoints}
     />

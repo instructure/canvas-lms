@@ -41,7 +41,7 @@ function AccordionSection({
         expanded={selectedIndex === collection}
         onToggle={(e, expanded) => onChange(expanded ? collection : "")}
       >
-        <View maxHeight="20em">{children}</View>
+        <div style={{maxHeight: '20em', overflow: 'auto'}}>{children}</div>
       </ToggleDetails>
     </View>
   );

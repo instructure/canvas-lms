@@ -450,7 +450,7 @@ class ActiveRecord::Base
         max_date.advance(:days => 1)
       ).
       group(expression).
-      order(expression).
+      order(Arel.sql(expression)).
       count
 
     return result if result.keys.first.is_a?(Date)
@@ -892,11 +892,11 @@ ActiveRecord::Relation.class_eval do
         quoted_plucks = pluck && pluck.map do |column_name|
           # Rails 4.2 is going to try to quote them anyway but unfortunately not to the temp table, so just make it explicit
           column_names.include?(column_name) ?
-            "#{connection.quote_local_table_name(table)}.#{connection.quote_column_name(column_name)}" : column_name
+            Arel.sql("#{connection.quote_local_table_name(table)}.#{connection.quote_column_name(column_name)}") : column_name
         end
 
         if pluck
-          batch = klass.from(table).order(index).limit(batch_size).pluck(*quoted_plucks)
+          batch = klass.from(table).order(Arel.sql(index)).limit(batch_size).pluck(*quoted_plucks)
         else
           sql = "SELECT * FROM #{table} ORDER BY #{index} LIMIT #{batch_size}"
           batch = klass.find_by_sql(sql)
@@ -908,7 +908,7 @@ ActiveRecord::Relation.class_eval do
 
           if pluck
             last_value = pluck.length == 1 ? batch.last : batch.last[pluck.index(index)]
-            batch = klass.from(table).order(index).where("#{index} > ?", last_value).limit(batch_size).pluck(*quoted_plucks)
+            batch = klass.from(table).order(Arel.sql(index)).where("#{index} > ?", last_value).limit(batch_size).pluck(*quoted_plucks)
           else
             last_value = batch.last[index]
             sql = "SELECT *

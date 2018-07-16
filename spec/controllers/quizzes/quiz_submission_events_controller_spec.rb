@@ -51,7 +51,7 @@ describe Quizzes::QuizSubmissionEventsController do
 
       subject()
 
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should not let the student in" do

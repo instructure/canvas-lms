@@ -23,7 +23,7 @@ describe InfoController do
   describe "GET 'health_check'" do
     it "should work" do
       get 'health_check'
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(response.body).to eq 'canvas ok'
     end
 
@@ -32,7 +32,7 @@ describe InfoController do
       allow(Canvas).to receive(:revision).and_return("Test Proc")
       allow(Canvas::Cdn::RevManifest).to receive(:gulp_manifest).and_return({test_key: "mock_revved_url"})
       get "health_check"
-      expect(response).to be_success
+      expect(response).to be_successful
       json = JSON.parse(response.body)
       expect(json).to have_key('installation_uuid')
       json.delete('installation_uuid')
@@ -51,7 +51,7 @@ describe InfoController do
   describe "GET 'help_links'" do
     it "should work" do
       get 'help_links'
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should set the locale for translated help link text from the current user" do

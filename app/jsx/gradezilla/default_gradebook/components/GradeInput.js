@@ -101,16 +101,14 @@ function CompleteIncompleteSelect (props) {
 }
 
 function stateFromProps (props) {
-  const { anonymousGrading, muted } = props.assignment;
-  const hideGrade = anonymousGrading && muted;
   let normalizedGrade;
 
   if (props.enterGradesAs === 'passFail') {
-    normalizedGrade = hideGrade ? null : props.submission.enteredGrade;
+    normalizedGrade = props.assignment.anonymizeStudents ? null : props.submission.enteredGrade;
   } else {
     const propsCopy = { ...props };
 
-    if (hideGrade) {
+    if (props.assignment.anonymizeStudents) {
       const submission = { ...props.submission, enteredScore: null };
       propsCopy.submission = submission;
     }
@@ -127,6 +125,7 @@ function stateFromProps (props) {
 export default class GradeInput extends React.Component {
   static propTypes = {
     assignment: shape({
+      anonymizeStudents: bool.isRequired,
       gradingType: oneOf(['gpa_scale', 'letter_grade', 'not_graded', 'pass_fail', 'points', 'percent']).isRequired,
       pointsPossible: number
     }).isRequired,

@@ -18,8 +18,6 @@
 
 import Animation from '../animation';
 
-it('requires at least one action');
-
 function mockManager () {
   return {};
 }

@@ -20,10 +20,11 @@ import $ from 'jquery';
 import round from 'compiled/util/round';
 import I18n from 'i18n!gradebook';
 import {scoreToGrade} from '../../../../gradebook/GradingSchemeHelper'
+import {scoreToPercentage} from '../../../../gradebook/shared/helpers/GradeCalculationHelper'
 import 'jquery.instructure_misc_helpers'; // $.toSentence
 
 function getGradePercentage (score, pointsPossible) {
-  const grade = (score / pointsPossible) * 100;
+  const grade = scoreToPercentage(score, pointsPossible)
   return round(grade, round.DEFAULT);
 }
 

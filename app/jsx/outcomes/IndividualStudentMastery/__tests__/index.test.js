@@ -84,7 +84,19 @@ describe('expand and contract', () => {
   beforeEach(() => {
     fetchOutcomes.mockImplementation(() => Promise.resolve({
       outcomeGroups: [{ id: 1, title: 'Group' }],
-      outcomes: [{id: 2, expansionId: 100, groupId: 1, title: 'Outcome', mastered: false, mastery_points: 0, points_possible: 0, results: [], ratings: []}]
+      outcomes: [
+        {
+          id: 2,
+          expansionId: 100,
+          groupId: 1,
+          title: 'Outcome',
+          mastered: false,
+          mastery_points: 0,
+          points_possible: 0,
+          results: [],
+          ratings: []
+        }
+      ]
     }))
   })
 

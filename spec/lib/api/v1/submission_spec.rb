@@ -377,4 +377,23 @@ describe Api::V1::Submission do
       end
     end
   end
+
+  describe '#submission_zip' do
+    let(:attachment) { fake_controller.submission_zip(assignment) }
+
+    it 'locks the attachment if the assignment is anonymous and muted' do
+      assignment.muted = true
+      assignment.anonymous_grading = true
+      expect(attachment).to be_locked
+    end
+
+    it 'does not lock the attachment if the assignment is anonymous and unmuted' do
+      assignment.anonymous_grading = true
+      expect(attachment).not_to be_locked
+    end
+
+    it 'does not lock the attachment if the assignment is not anonymous' do
+      expect(attachment).not_to be_locked
+    end
+  end
 end

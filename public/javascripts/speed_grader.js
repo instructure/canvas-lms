@@ -170,39 +170,19 @@ let EG
 const customProvisionalGraderLabel = I18n.t('Custom')
 
 function setupHandleFragmentChanged () {
-  if (!EG.isHandleFragmentChangedSet) {
-    window.addEventListener('hashchange', EG.handleFragmentChanged);
-    EG.isHandleFragmentChangedSet = true
-    return true
-  }
-  return false
+  window.addEventListener('hashchange', EG.handleFragmentChanged);
 }
 
-export function teardownHandleFragmentChanged () {
-  if (EG.isHandleFragmentChangedSet) {
-    window.removeEventListener('hashchange', EG.handleFragmentChanged);
-    EG.isHandleFragmentChangedSet = false
-    return true
-  }
-  return false
+function teardownHandleFragmentChanged () {
+  window.removeEventListener('hashchange', EG.handleFragmentChanged);
 }
 
 function setupBeforeLeavingSpeedgrader () {
-  if (!EG.isBeforeLeavingSpeedgraderSet) {
-    window.addEventListener('beforeunload', EG.beforeLeavingSpeedgrader);
-    EG.isBeforeLeavingSpeedgraderSet = true
-    return true
-  }
-  return false
+  window.addEventListener('beforeunload', EG.beforeLeavingSpeedgrader);
 }
 
 function teardownBeforeLeavingSpeedgrader () {
-  if (EG.isBeforeLeavingSpeedgraderSet) {
-    window.removeEventListener('beforeunload', EG.beforeLeavingSpeedgrader);
-    EG.isBeforeLeavingSpeedgraderSet = false
-    return true
-  }
-  return false
+  window.removeEventListener('beforeunload', EG.beforeLeavingSpeedgrader);
 }
 
 function unexcuseSubmission (grade, submission, assignment) {
@@ -320,7 +300,7 @@ function mergeStudentsAndSubmission() {
     } else {
       alert(I18n.t('alerts.no_students_in_section', "Could not find any students in that section, falling back to showing all sections."));
       userSettings.contextRemove('grading_show_only_section');
-      window.location.reload();
+      SpeedgraderHelpers.reloadPage();
     }
   }
 
@@ -373,7 +353,7 @@ function changeToSection (sectionId) {
     userSettings.contextSet('grading_show_only_section', sectionId);
   }
 
-  window.location.reload();
+  SpeedgraderHelpers.reloadPage();
 }
 
 function initDropdown(){
@@ -567,7 +547,7 @@ function setupHeader () {
       $.post(ENV.settings_url, {
         enable_speedgrader_grade_by_question: gradeByQuestion
       }).then(function() {
-        window.location.reload();
+        SpeedgraderHelpers.reloadPage();
       });
     },
 
@@ -815,6 +795,23 @@ function getSelectedAssessment(){
   ))[0];
 }
 
+function handleSelectedRubricAssessmentChanged({validateEnteredData = true} = {}) {
+  // This function is triggered both when we assess a student and when we switch
+  // students. In the former case, we want populateNewRubricSummary to check the
+  // data we entered and show an alert if the grader tried to assign more points
+  // to an outcome than it allows (and the course does not allow extra credit).
+  // In the latter case, because this function is called *before* the editing
+  // data is switched over to the new student, we don't want to perform the
+  // comparison since it could result in specious alerts being shown.
+  const editingData = validateEnteredData ? rubricAssessment.assessmentData($("#rubric_full")) : null
+  rubricAssessment.populateNewRubricSummary(
+    $("#rubric_summary_holder .rubric_summary"),
+    getSelectedAssessment(),
+    jsonData.rubric_association,
+    editingData
+  );
+}
+
 function initRubricStuff(){
   $("#rubric_summary_container .button-container").appendTo("#rubric_assessments_list_and_edit_button_holder").find('.edit').text(I18n.t('edit_view_rubric', "View Rubric"));
 
@@ -824,14 +821,7 @@ function initRubricStuff(){
   });
 
   selectors.get('#rubric_assessments_select').change(() => {
-    const editingData = rubricAssessment.assessmentData($("#rubric_full"))
-    var selectedAssessment = getSelectedAssessment();
-    rubricAssessment.populateNewRubricSummary(
-      $("#rubric_summary_holder .rubric_summary"),
-      selectedAssessment,
-      jsonData.rubric_association,
-      editingData
-    );
+    handleSelectedRubricAssessmentChanged();
   });
 
   $rubric_full_resizer_handle.draggable({
@@ -886,7 +876,7 @@ function initRubricStuff(){
         rubricAssessment.updateRubricAssociation($rubric, response.rubric_association);
         delete response.rubric_association;
       }
-      for (var i in EG.currentStudent.rubric_assessments) {
+      for (let i = 0; i < EG.currentStudent.rubric_assessments.length; i++) {
         if (response.id === EG.currentStudent.rubric_assessments[i].id) {
           $.extend(true, EG.currentStudent.rubric_assessments[i], response);
           found = true;
@@ -1362,7 +1352,7 @@ EG = {
   showSubmission: function(){
     this.showGrade();
     this.showDiscussion();
-    this.showRubric();
+    this.showRubric({validateEnteredData: false});
     this.updateStatsInHeader();
     this.showSubmissionDetails();
     this.refreshFullRubric();
@@ -1612,7 +1602,7 @@ EG = {
             .text(I18n.t('vericite.resubmitting', 'Resubmitting...'));
 
           $.ajaxJSON(resubmitUrl, "POST", {}, function() {
-            window.location.reload();
+            SpeedgraderHelpers.reloadPage();
           });
         });
       }
@@ -2025,7 +2015,7 @@ EG = {
     sessionTimer = window.setInterval(() => {
       const elapsed = new Date() - start;
       if (elapsed > sessionLimit) {
-        window.location.reload();
+        SpeedgraderHelpers.reloadPage();
       } else if (elapsed > aggressiveWarnings[0]) {
         $.flashWarning(message);
         aggressiveWarnings.shift();
@@ -2075,7 +2065,8 @@ EG = {
       this.displayExpirationWarnings(aggressiveWarnings, 10, canvadocMessage);
 
       $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
-        canvadoc_session_url: (attachment.provisional_canvadoc_url || attachment.canvadoc_url)
+        canvadoc_session_url: (attachment.provisional_canvadoc_url || attachment.canvadoc_url),
+        iframe_min_height: 0
       }));
     } else if ($.isPreviewable(attachment.content_type, 'google')) {
       if (!INST.disableCrocodocPreviews) $no_annotation_warning.show();
@@ -2111,7 +2102,7 @@ EG = {
     return $.raw(contents);
   },
 
-  showRubric: function(){
+  showRubric ({validateEnteredData = true} = {}) {
     const selectMenu = selectors.get('#rubric_assessments_select');
     //if this has some rubric_assessments
     if (jsonData.rubric_association) {
@@ -2145,7 +2136,7 @@ EG = {
 
       // hide the select box if there is not >1 option
       $("#rubric_assessments_list").showIf(selectMenu.find("option").length > 1);
-      selectMenu.change();
+      handleSelectedRubricAssessmentChanged({validateEnteredData});
     }
   },
 
@@ -2281,7 +2272,10 @@ EG = {
     comment.posted_at = $.datetimeString(comment.created_at);
 
     hideStudentName = opts.hideStudentNames && window.jsonData.studentMap[comment[anonymizableAuthorId]];
-    if (hideStudentName) { comment.author_name = I18n.t('Student'); }
+    if (hideStudentName) {
+      const { index } = window.jsonData.studentMap[comment[anonymizableAuthorId]];
+      comment.author_name = I18n.t('Student %{position}', { position: index + 1 });
+    }
     // anonymous commentors
     if (comment.author_name == null) {
       if (provisionalGraderDisplayNames == null) this.setupProvisionalGraderDisplayNames()
@@ -2569,7 +2563,20 @@ EG = {
 
     const submissionError = (data, _xhr, _textStatus, _errorThrown) => {
       EG.handleGradingError(data);
-      EG.showGrade();
+
+      if (ENV.grading_role === 'moderator') {
+        // Revert to the previously-selected provisional grade, which will not
+        // necessarily be the value in EG.currentStudent.submission
+        const selectedGrade = currentStudentProvisionalGrades().find(provisionalGrade => provisionalGrade.selected)
+        if (selectedGrade) {
+          EG.setActiveProvisionalGradeFields({
+            grade: selectedGrade,
+            label: provisionalGraderDisplayNames[selectedGrade.provisional_grade_id]
+          })
+        }
+      } else {
+        EG.showGrade();
+      }
     };
 
     $.ajaxJSON(url, method, formData, submissionSuccess, submissionError);
@@ -2777,8 +2784,16 @@ EG = {
   },
 
   handleGradingError (data={}) {
+    const errorCode = data.errors && data.errors.error_code
+
+    // If the grader entered an invalid provisional grade, revert it without
+    // showing an explicit error
+    if (errorCode === 'PROVISIONAL_GRADE_INVALID_SCORE') {
+      return;
+    }
+
     let errorMessage
-    if (data.errors && data.errors.error_code === 'MAX_GRADERS_REACHED') {
+    if (errorCode === 'MAX_GRADERS_REACHED') {
       errorMessage = I18n.t('The maximum number of graders has been reached for this assignment.');
     } else {
       errorMessage = I18n.t('An error occurred updating this assignment.');
@@ -2879,9 +2894,19 @@ EG = {
   setActiveProvisionalGradeFields({label='', grade=null} = {}) {
     $grading_box_selected_grader.text(label);
 
+    const submission = EG.currentStudent.submission || {};
     if (grade !== null) {
-      $grade.val(grade.grade);
-      $score.text(grade.score);
+      // If the moderator has selected their own custom grade
+      // (i.e., the selected grade isn't read-only) and has
+      // excused this submission, show that instead of the
+      // provisional grade's score
+      if (!grade.readonly && submission.excused) {
+        $grade.val('EX')
+        $score.text('')
+      } else {
+        $grade.val(grade.grade);
+        $score.text(grade.score);
+      }
     }
   },
 
@@ -3116,6 +3141,11 @@ export default {
     $(document).ready(function() {
       EG.domReady();
     });
+  },
+
+  teardown() {
+    teardownHandleFragmentChanged()
+    teardownBeforeLeavingSpeedgrader()
   },
 
   EG

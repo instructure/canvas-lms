@@ -1078,6 +1078,26 @@ describe ConversationsController, type: :request do
                   :group_conversation => "true", :bulk_message => "true" })
         expect(json.size).to eql 1
       end
+
+      context "cross-shard creation" do
+        specs_require_sharding
+
+        it "should create the conversation on the context's shard" do
+          @shard1.activate do
+            @other_account = Account.create
+            course_with_teacher(:active_all => true, :account => @other_account, :user => @me)
+            @other_course = @course
+            @other_student = user_with_pseudonym(:active_all => true, :account => @other_account)
+            @other_course.enroll_student(@other_student, :enrollment_state => "active")
+          end
+
+          @user = @me
+          json = api_call(:post, "/api/v1/conversations",
+            { :controller => 'conversations', :action => 'create', :format => 'json' },
+            { :recipients => [@other_student.id], :body => "test", :context_code => "course_#{@other_course.id}" })
+          expect(@other_student.conversations.last.conversation.shard).to eq @shard1
+        end
+      end
     end
   end
 

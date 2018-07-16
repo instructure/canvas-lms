@@ -175,7 +175,7 @@ QUnit.module('CourseGradeCalculator.calculate with some assignments and submissi
   }
 });
 
-test('avoids floating point rounding errors', function () {
+test('avoids floating point errors in current and final score when assignment groups are weighted', function () {
   submissions = [
     { assignment_id: 201, score: 194.5 },
     { assignment_id: 202, score: 100.0 },
@@ -197,10 +197,101 @@ test('avoids floating point rounding errors', function () {
     { id: 304, rules: {}, group_weight: 30, assignments: assignments.slice(3, 4) }
   ]
 
-  const floatingPointSum = 9.725 + 10 + 47.25 + 26.85
+  // 9.725 + 10 + 47.25 + 26.85 === 93.82499999999999
   const grades = calculateWithoutGradingPeriods('percent')
-  strictEqual(floatingPointSum, 93.82499999999999)
   strictEqual(grades.current.score, 93.83)
+  strictEqual(grades.final.score, 93.83)
+})
+
+test('avoids floating point errors in current and final score when assignment groups are not weighted', function () {
+  submissions = [
+    { assignment_id: 201, score: 110.1 },
+    { assignment_id: 202, score: 170.7 }
+  ]
+
+  assignments = [
+    { id: 201, points_possible: 120 },
+    { id: 202, points_possible: 180 }
+  ]
+
+  assignmentGroups = [
+    { id: 301, rules: {}, group_weight: 10, assignments: assignments.slice(0, 1) },
+    { id: 302, rules: {}, group_weight: 10, assignments: assignments.slice(1, 2) }
+  ]
+
+  // 110.1 + 170.7 === 280.79999999999995
+  const grades = calculateWithoutGradingPeriods('points')
+  strictEqual(grades.current.score, 280.8)
+  strictEqual(grades.final.score, 280.8)
+})
+
+test('avoids floating point errors in points possible when assignment groups are not weighted', function () {
+  submissions = [
+    { assignment_id: 201, score: 100 },
+    { assignment_id: 202, score: 150 }
+  ]
+
+  assignments = [
+    { id: 201, points_possible: 110.1 },
+    { id: 202, points_possible: 170.7 }
+  ]
+
+  assignmentGroups = [
+    { id: 301, rules: {}, group_weight: 10, assignments: assignments.slice(0, 1) },
+    { id: 302, rules: {}, group_weight: 10, assignments: assignments.slice(1, 2) }
+  ]
+
+  // 110.1 + 170.7 === 280.79999999999995
+  const grades = calculateWithoutGradingPeriods('points')
+  strictEqual(grades.current.possible, 280.8)
+  strictEqual(grades.final.possible, 280.8)
+})
+
+test('avoids floating point errors in assignment group weights', function () {
+  submissions = [
+    { assignment_id: 201, score: 124.46 },
+    { assignment_id: 202, score: 144.53 }
+  ]
+  assignments = [
+    { id: 201, points_possible: 148 },
+    { id: 202, points_possible: 148 }
+  ]
+  assignmentGroups = [
+    { id: 301, group_weight: 50, rules: {}, assignments: assignments.slice(0, 1) },
+    { id: 302, group_weight: 50, rules: {}, assignments: assignments.slice(1, 2) }
+  ];
+
+  //   124.46 / 148 * 0.5 (weight)
+  // + 144.53 / 148 * 0.5 (weight)
+  // = 90.87499999999999 (expected 90.875)
+  const grades = calculateWithGradingPeriods('percent');
+  strictEqual(grades.current.score, 90.88);
+  strictEqual(grades.final.score, 90.88);
+})
+
+test('avoids floating point errors when up-scaling assignment group weights', function () {
+  submissions = [
+    { assignment_id: 201, score: 81.01 },
+    { assignment_id: 202, score: 96.08 }
+  ]
+  assignments = [
+    { id: 201, points_possible: 100 },
+    { id: 202, points_possible: 100 }
+  ]
+  assignmentGroups = [
+    { id: 301, group_weight: 40, rules: {}, assignments: assignments.slice(0, 1) },
+    { id: 302, group_weight: 40, rules: {}, assignments: assignments.slice(1, 2) }
+  ]
+
+  //   81.01 / 100 * 0.4 (weight)
+  // + 96.08 / 100 * 0.4 (weight)
+  // = 0.7083600000000001 (weighted sum, expected 70.836)
+  //
+  // weighted sum * 100 / 80 (total possible)
+  // = 88.54499999999999 (expected 88.545)
+  const grades = calculateWithGradingPeriods('percent')
+  strictEqual(grades.current.score, 88.55)
+  strictEqual(grades.final.score, 88.55)
 })
 
 test('includes assignment group grades', function () {
@@ -883,6 +974,40 @@ test('uses a score unit of "percentage" for grading period grades when weighting
   equal(grades.gradingPeriods[702].scoreUnit, 'percentage');
 });
 
+test('avoids floating point errors in current and final score', function () {
+  submissions = [
+    { assignment_id: 201, score: 45.9 },
+    { assignment_id: 202, score: 38.25 }
+  ];
+  assignments = [
+    { id: 201, points_possible: 60 },
+    { id: 202, points_possible: 40 }
+  ];
+  assignmentGroups = [
+    { id: 301, group_weight: 50, rules: {}, assignments: assignments.slice(0, 1) },
+    { id: 302, group_weight: 50, rules: {}, assignments: assignments.slice(1, 2) }
+  ];
+  effectiveDueDates = {
+    201: { grading_period_id: '701' },
+    202: { grading_period_id: '702' }
+  };
+  gradingPeriods = [
+    { id: '701', weight: 40 },
+    { id: '702', weight: 50 }
+  ];
+  gradingPeriodSet = { gradingPeriods, weighted: true };
+
+  //   45.9  / 60 * 0.4 (weight)
+  // + 38.25 / 40 * 0.5 (weight)
+  // = 0.7841250000000001 (weighted sum, expected 0.784125)
+  //
+  // weighted sum * 100 / 90 (scaling up for grading period weights)
+  // = 87.12499999999999 (expected 87.125, rounded)
+  const grades = calculateWithGradingPeriods('points');
+  strictEqual(grades.current.score, 87.13);
+  strictEqual(grades.final.score, 87.13);
+})
+
 // This is a use case that is STRONGLY discouraged to users, but is still not
 // prevented. Assignment group rules must never be applied to multiple grading
 // periods in combination. Doing so would impact grades in closed grading
@@ -988,3 +1113,51 @@ test('excludes assignments not assigned to the given student', function () {
   equal(grades.final.score, 65, 'assignment 202 is not assigned to the student');
   equal(grades.final.possible, 100, 'final possible is 100 percent');
 });
+
+test('avoids floating point errors in assignment group scores', function () {
+  submissions = [
+    { assignment_id: 201, score: 110.1 },
+    { assignment_id: 202, score: 170.7 },
+    { assignment_id: 203, score: 103.3 }
+  ];
+  assignments = [
+    { id: 201, points_possible: 120 },
+    { id: 202, points_possible: 190 },
+    { id: 203, points_possible: 120 }
+  ];
+  assignmentGroups = [
+    { id: 301, group_weight: 50, rules: {}, assignments: assignments.slice(0, 2) },
+    { id: 302, group_weight: 50, rules: {}, assignments: assignments.slice(2, 3) }
+  ];
+
+  // 110.1 + 170.7 === 280.79999999999995
+  const grades = calculateWithGradingPeriods('percent');
+  strictEqual(grades.assignmentGroups[301].current.score, 280.8);
+  strictEqual(grades.assignmentGroups[302].current.score, 103.3);
+  strictEqual(grades.assignmentGroups[301].final.score, 280.8);
+  strictEqual(grades.assignmentGroups[302].final.score, 103.3);
+})
+
+test('avoids floating point errors in assignment group points possible', function () {
+  submissions = [
+    { assignment_id: 201, score: 100 },
+    { assignment_id: 202, score: 100 },
+    { assignment_id: 203, score: 90 }
+  ];
+  assignments = [
+    { id: 201, points_possible: 110.1 },
+    { id: 202, points_possible: 170.7 },
+    { id: 203, points_possible: 103.3 }
+  ];
+  assignmentGroups = [
+    { id: 301, group_weight: 50, rules: {}, assignments: assignments.slice(0, 2) },
+    { id: 302, group_weight: 50, rules: {}, assignments: assignments.slice(2, 3) }
+  ];
+
+  // 110.1 + 170.7 === 280.79999999999995
+  const grades = calculateWithGradingPeriods('percent');
+  strictEqual(grades.assignmentGroups[301].current.possible, 280.8);
+  strictEqual(grades.assignmentGroups[302].current.possible, 103.3);
+  strictEqual(grades.assignmentGroups[301].final.possible, 280.8);
+  strictEqual(grades.assignmentGroups[302].final.possible, 103.3);
+})

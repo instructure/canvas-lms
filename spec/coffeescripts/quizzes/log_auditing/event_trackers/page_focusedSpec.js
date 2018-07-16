@@ -30,14 +30,14 @@ test('#constructor: it sets up the proper context', () => {
 
 test('capturing: it works', function() {
   const tracker = new Subject()
-  const capture = this.stub()
+  const capture = sinon.stub()
   tracker.install(capture)
   $(window).focus()
   ok(capture.called, 'it captures page focus')
 })
 
 test('capturing: it throttles captures', function() {
-  const capture = this.spy()
+  const capture = sinon.spy()
   const tracker = new Subject()
   tracker.install(capture)
   $(window).focus()

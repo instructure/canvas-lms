@@ -115,10 +115,19 @@ it('setAndOpenPermissionTray dispatches hideAllTrays and dispalyPermissionTray',
 })
 
 it('filterRoles dispatches updateRoleFilters', () => {
-  const state = {contextId: 1, permissions: PERMISSIONS, roles: ROLES}
+  const state = {
+    contextId: 1,
+    permissions: PERMISSIONS,
+    roles: ROLES,
+    selectedRoles: [{id: '104', label: 'kitty', children: 'kitty', value: '104'}]
+  }
   const dispatchMock = jest.fn()
   actions.filterRoles({selectedRoles: [ROLES[0]], contextType: COURSE})(dispatchMock, () => state)
-  const expectedDispatch = {
+  const expectedFirstDispatch = {
+    type: 'UPDATE_SELECTED_ROLES',
+    payload: [ROLES[0]]
+  }
+  const expectedSecondDispatch = {
     type: 'UPDATE_ROLE_FILTERS',
     payload: {
       selectedRoles: [ROLES[0]],
@@ -126,8 +135,33 @@ it('filterRoles dispatches updateRoleFilters', () => {
     }
   }
 
+  expect(dispatchMock).toHaveBeenCalledTimes(2)
+  expect(dispatchMock).toHaveBeenCalledWith(expectedFirstDispatch)
+  expect(dispatchMock).toHaveBeenCalledWith(expectedSecondDispatch)
+})
+
+it('filterRemovedRole dispatches updateRoleFilters and filterDeletedRole', () => {
+  const state = {
+    selectedRoles: [
+      {id: '104', label: 'kitty', children: 'kitty', value: '104'},
+      {id: '108', label: 'meow', children: 'meow', value: '108'}
+    ]
+  }
+  const dispatchMock = jest.fn()
+  actions.filterRemovedRole('Course')(dispatchMock, () => state)
+  const expectedUpdateRoleDispatch = {
+    type: 'UPDATE_ROLE_FILTERS',
+    payload: {
+      selectedRoles: [
+        {id: '104', label: 'kitty', children: 'kitty', value: '104'},
+        {id: '108', label: 'meow', children: 'meow', value: '108'}
+      ],
+      contextType: 'Course'
+    }
+  }
+
   expect(dispatchMock).toHaveBeenCalledTimes(1)
-  expect(dispatchMock).toHaveBeenCalledWith(expectedDispatch)
+  expect(dispatchMock).toHaveBeenCalledWith(expectedUpdateRoleDispatch)
 })
 
 it('tabChanged dispatches permissionsTabChanged', () => {
@@ -240,7 +274,7 @@ describe('api actions', () => {
             type: 'HIDE_ALL_TRAYS'
           }
 
-          expect(mockDispatch).toHaveBeenCalledTimes(5)
+          expect(mockDispatch).toHaveBeenCalledTimes(6)
           expect(mockDispatch).toHaveBeenCalledWith(expectedStartDispatch)
           expect(mockDispatch).toHaveBeenCalledWith(expectedDisplayAddSuccessDispatch)
           expect(mockDispatch).toHaveBeenCalledWith(expectedHideDispatch)
@@ -388,7 +422,7 @@ describe('api actions', () => {
           type: 'DELETE_ROLE_SUCCESS',
           payload: ROLES[1]
         }
-        expect(mockDispatch).toHaveBeenCalledTimes(1)
+        expect(mockDispatch).toHaveBeenCalledTimes(2)
         expect(mockDispatch).toHaveBeenCalledWith(expectedDeleteRoleDispatch)
         done()
       })

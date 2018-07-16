@@ -34,7 +34,7 @@ test('publish updates the state of the model', () => {
 
 test('publish saves to the server', function() {
   const cModule = buildModule(true)
-  const saveStub = this.stub(cModule, 'save')
+  const saveStub = sandbox.stub(cModule, 'save')
   cModule.publish()
   ok(saveStub.calledOnce)
 })
@@ -48,7 +48,7 @@ test('unpublish updates the state of the model', () => {
 
 test('unpublish saves to the server', function() {
   const cModule = buildModule(true)
-  const saveStub = this.stub(cModule, 'save')
+  const saveStub = sandbox.stub(cModule, 'save')
   cModule.unpublish()
   ok(saveStub.calledOnce)
 })

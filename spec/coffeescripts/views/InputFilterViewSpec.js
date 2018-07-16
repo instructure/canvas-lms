@@ -46,7 +46,7 @@ const simulateKeyup = function(opts = {}) {
 }
 
 test('fires input event, sends value', function() {
-  const spy = this.spy()
+  const spy = sinon.spy()
   view.on('input', spy)
   setValue('foo')
   simulateKeyup()
@@ -55,7 +55,7 @@ test('fires input event, sends value', function() {
 })
 
 test('does not fire input event if value has not changed', function() {
-  const spy = this.spy()
+  const spy = sinon.spy()
   view.on('input', spy)
   setValue('foo')
   simulateKeyup()

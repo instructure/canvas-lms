@@ -110,6 +110,7 @@ module AccountReports
                INNER JOIN #{CourseSection.quoted_table_name} cs ON cs.id = e.course_section_id
                INNER JOIN #{Pseudonym.quoted_table_name} p ON e.user_id = p.user_id
                  AND courses.root_account_id = p.account_id
+                 AND p.workflow_state <> 'deleted'
                INNER JOIN #{User.quoted_table_name} u ON u.id = p.user_id").
         where("NOT EXISTS (SELECT s.user_id
                            FROM #{Submission.quoted_table_name} s

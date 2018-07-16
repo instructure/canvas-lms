@@ -46,12 +46,13 @@ const nextUrl = handleActions({
 
 const loading = handleActions({
   SIDEBAR_ITEMS_LOADING: () => true,
-  SIDEBAR_ALL_ITEMS_LOADED: () => false,
+  SIDEBAR_ITEMS_LOADED: () => false,
+  SIDEBAR_ENOUGH_ITEMS_LOADED: () => false,
   SIDEBAR_ITEMS_LOADING_FAILED: () => false
 }, false);
 
 const loaded = handleActions({
-  SIDEBAR_ALL_ITEMS_LOADED: () => true
+  SIDEBAR_ENOUGH_ITEMS_LOADED: () => true
 }, false);
 
 const range = handleActions({

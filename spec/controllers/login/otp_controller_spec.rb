@@ -39,7 +39,7 @@ describe Login::OtpController do
         Account.default.save!
 
         get :new
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(session[:pending_otp_secret_key]).not_to be_nil
       end
 
@@ -51,7 +51,7 @@ describe Login::OtpController do
         @user.save!
 
         get :new
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(session[:pending_otp_secret_key]).to be_nil
       end
 
@@ -65,7 +65,7 @@ describe Login::OtpController do
         @user.save!
 
         get :new
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(session[:pending_otp_secret_key]).to be_nil
       end
     end
@@ -245,7 +245,7 @@ describe Login::OtpController do
 
     it "should delete self" do
       delete :destroy, params: {:user_id => 'self'}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(@user.reload.otp_secret_key).to be_nil
       expect(@user.otp_communication_channel).to be_nil
       expect(@user.one_time_passwords).not_to be_exists
@@ -253,7 +253,7 @@ describe Login::OtpController do
 
     it "should delete self as id" do
       delete :destroy, params: {:user_id => @user.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(@user.reload.otp_secret_key).to be_nil
       expect(@user.otp_communication_channel).to be_nil
     end
@@ -262,7 +262,7 @@ describe Login::OtpController do
       Account.default.settings[:mfa_settings] = :required
       Account.default.save!
       delete :destroy, params: {:user_id => 'self'}
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
       expect(@user.reload.otp_secret_key).not_to be_nil
       expect(@user.otp_communication_channel).not_to be_nil
     end
@@ -271,7 +271,7 @@ describe Login::OtpController do
       Account.default.settings[:mfa_settings] = :required
       Account.default.save!
       delete :destroy, params: {:user_id => @user.id}
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
       expect(@user.reload.otp_secret_key).not_to be_nil
       expect(@user.otp_communication_channel).not_to be_nil
     end
@@ -281,7 +281,7 @@ describe Login::OtpController do
       @admin = user_with_pseudonym(:active_all => 1, :unique_id => 'user2')
       user_session(@admin)
       delete :destroy, params: {:user_id => @other_user.id}
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
       expect(@other_user.reload.otp_secret_key).not_to be_nil
       expect(@other_user.otp_communication_channel).not_to be_nil
     end
@@ -296,7 +296,7 @@ describe Login::OtpController do
 
       user_session(@admin)
       delete :destroy, params: {user_id: @other_user.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(@other_user.reload.otp_secret_key).to be_nil
       expect(@other_user.otp_communication_channel).to be_nil
     end
@@ -311,7 +311,7 @@ describe Login::OtpController do
 
       user_session(@admin)
       delete :destroy, params: {user_id: @other_user.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(@other_user.reload.otp_secret_key).to be_nil
       expect(@other_user.otp_communication_channel).to be_nil
     end
@@ -327,7 +327,7 @@ describe Login::OtpController do
       user_session(@admin)
 
       delete :destroy, params: {user_id: @other_user.id}
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
       expect(@other_user.reload.otp_secret_key).not_to be_nil
       expect(@other_user.otp_communication_channel).not_to be_nil
     end
@@ -342,7 +342,7 @@ describe Login::OtpController do
       Account.default.account_users.create!(user: @admin)
       user_session(@admin)
       delete :destroy, params: {:user_id => @other_user.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(@other_user.reload.otp_secret_key).to be_nil
       expect(@other_user.otp_communication_channel).to be_nil
     end

@@ -75,15 +75,20 @@ describe("FileTree/index", () => {
   describe("keyboard navigation", () => {
     jsdom();
 
-    let div, component, buttons;
-
-    const stopPropagation = sinon.spy();
-    const DOWN_EVENT = { keyCode: 40, stopPropagation };
-    const UP_EVENT = { keyCode: 38, stopPropagation };
-    const OTHER_EVENT = { keyCode: 0, stopPropagation };
+    let div,
+      component,
+      buttons,
+      stopPropagation,
+      DOWN_EVENT,
+      UP_EVENT,
+      OTHER_EVENT;
 
     beforeEach(() => {
-      stopPropagation.reset();
+      stopPropagation = sinon.spy();
+      DOWN_EVENT = { keyCode: 40, stopPropagation };
+      UP_EVENT = { keyCode: 38, stopPropagation };
+      OTHER_EVENT = { keyCode: 0, stopPropagation };
+
       div = document.createElement("div");
       document.body.appendChild(div);
       component = ReactDOM.render(<FileTree {...props} />, div);
@@ -92,7 +97,7 @@ describe("FileTree/index", () => {
 
     afterEach(() => {
       document.body.removeChild(div);
-    })
+    });
 
     it("focus the next button when down is pushed", () => {
       buttons[0].focus();

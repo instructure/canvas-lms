@@ -46,7 +46,12 @@ function unformatColor (color) {
 
 export default class ProficiencyTable extends React.Component {
   static propTypes = {
-    accountId: PropTypes.string.isRequired
+    accountId: PropTypes.string.isRequired,
+    focusTab: PropTypes.func
+  }
+
+  static defaultProps = {
+    focusTab: null
   }
 
   constructor (props) {
@@ -70,6 +75,7 @@ export default class ProficiencyTable extends React.Component {
 
   componentDidUpdate() {
     if (this.fieldWithFocus()) {
+      // eslint-disable-next-line react/no-did-update-set-state
       this.setState({rows: this.state.rows.map(row => row.delete('focusField'))})
     }
   }
@@ -167,7 +173,15 @@ export default class ProficiencyTable extends React.Component {
     if (masteryIndex >= index && masteryIndex > 0) {
       this.setState({ masteryIndex: masteryIndex - 1 })
     }
-    this.setState({rows})
+    if (index === 0) {
+      this.setState({rows})
+      if (this.props.focusTab) {
+        setTimeout(this.props.focusTab, 700)
+      }
+    } else {
+      this.setState({ rows: rows.setIn([index-1, 'focusField'], 'trash') })
+    }
+    $.screenReaderFlashMessage(I18n.t('Proficiency Rating deleted'))
   })
 
   isStateValid = () => !this.state.rows.some(row =>
@@ -273,7 +287,10 @@ export default class ProficiencyTable extends React.Component {
           ref={(d) => { this.triggerRoot = d }} // eslint-disable-line immutable/no-mutation
           hero={<div style={styles}><PresentationContent><SVGWrapper url="/images/trophy.svg"/></PresentationContent></div>}
           heading={I18n.t('Customize Learning Mastery Ratings')}
-          message={I18n.t('Set up how your Proficiency Ratings appear inside of Learning Mastery Gradebook. Adjust number of ratings, mastery level, points, and colors.')}
+          message={I18n.t(`
+            Set up how your Proficiency Ratings appear inside of Learning Mastery Gradebook.
+            Adjust number of ratings, mastery level, points, and colors.
+          `).trim()}
         />
         <Button variant="primary" onClick={this.removeBillboard}>{I18n.t('Get Started')}</Button>
       </div>
@@ -314,8 +331,14 @@ export default class ProficiencyTable extends React.Component {
             }
             <tr>
               <td colSpan="4" style={{textAlign: 'center'}}>
-                <Button variant="circle-primary" onClick={this.addRow}>
-                  <IconPlus title={I18n.t('Add proficiency rating')}/>
+                <Button
+                  onClick={this.addRow}
+                  icon={<IconPlus />}
+                  variant="circle-primary"
+                >
+                  <ScreenReaderContent>
+                    {I18n.t('Add proficiency rating')}
+                  </ScreenReaderContent>
                 </Button>
               </td>
             </tr>

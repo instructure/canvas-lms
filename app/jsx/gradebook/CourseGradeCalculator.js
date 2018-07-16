@@ -19,11 +19,7 @@
 import _ from 'underscore'
 import round from 'compiled/util/round'
 import AssignmentGroupGradeCalculator from '../gradebook/AssignmentGroupGradeCalculator'
-import {sum, sumBy} from './shared/helpers/GradeCalculationHelper'
-
-function getWeightedPercent ({ score, possible, weight }) {
-  return score ? (score / possible) * weight : 0;
-}
+import {bigSum, sum, sumBy, toNumber, weightedPercent} from './shared/helpers/GradeCalculationHelper'
 
 function combineAssignmentGroupGrades (assignmentGroupGrades, includeUngraded, options) {
   const scopedAssignmentGroupGrades = _.map(assignmentGroupGrades, (assignmentGroupGrade) => {
@@ -32,14 +28,14 @@ function combineAssignmentGroupGrades (assignmentGroupGrades, includeUngraded, o
   });
 
   if (options.weightAssignmentGroups) {
-    const relevantGroupGrades = _.filter(scopedAssignmentGroupGrades, 'possible');
+    const relevantGroupGrades = scopedAssignmentGroupGrades.filter(grade => grade.possible);
     const fullWeight = sumBy(relevantGroupGrades, 'weight');
 
-    let finalGrade = sum(_.map(relevantGroupGrades, getWeightedPercent));
+    let finalGrade = bigSum(_.map(relevantGroupGrades, weightedPercent));
     if (fullWeight === 0) {
       finalGrade = null;
     } else if (fullWeight < 100) {
-      finalGrade = (finalGrade * 100) / fullWeight;
+      finalGrade = toNumber(weightedPercent({score: finalGrade, possible: fullWeight, weight: 100}));
     }
 
     const submissionCount = sumBy(relevantGroupGrades, 'submission_count');
@@ -66,9 +62,9 @@ function combineGradingPeriodGrades (gradingPeriodGradesByPeriodId, includeUngra
     scopedGradingPeriodGrades = _.filter(scopedGradingPeriodGrades, 'possible');
   }
 
-  const weightedScores = _.map(scopedGradingPeriodGrades, getWeightedPercent);
+  const scoreSum = bigSum(_.map(scopedGradingPeriodGrades, weightedPercent));
   const totalWeight = sumBy(scopedGradingPeriodGrades, 'weight');
-  const totalScore = totalWeight === 0 ? 0 : (sum(weightedScores) * 100) / Math.min(totalWeight, 100);
+  const totalScore = totalWeight === 0 ? 0 : toNumber(scoreSum.times(100).div(Math.min(totalWeight, 100)));
 
   return {
     score: round(totalScore, 2),
@@ -109,28 +105,32 @@ function extractPeriodBasedAssignmentGroups (assignmentGroups, effectiveDueDates
 
 function recombinePeriodBasedAssignmentGroupGrades (grades) {
   const map = {};
-  _.forEach(grades, (grade) => {
+
+  for (let g = 0; g < grades.length; g++) {
+    const grade = grades[g]
     const previousGrade = map[grade.assignmentGroupId];
+
     if (previousGrade) {
       map[grade.assignmentGroupId] = {
         ...previousGrade,
         current: {
           submission_count: previousGrade.current.submission_count + grade.current.submission_count,
           submissions: [...previousGrade.current.submissions, ...grade.current.submissions],
-          score: previousGrade.current.score + grade.current.score,
-          possible: previousGrade.current.possible + grade.current.possible
+          score: sum([previousGrade.current.score, grade.current.score]),
+          possible: sum([previousGrade.current.possible, grade.current.possible])
         },
         final: {
           submission_count: previousGrade.final.submission_count + grade.final.submission_count,
           submissions: [...previousGrade.final.submissions, ...grade.final.submissions],
-          score: previousGrade.final.score + grade.final.score,
-          possible: previousGrade.final.possible + grade.final.possible
+          score: sum([previousGrade.final.score, grade.final.score]),
+          possible: sum([previousGrade.final.possible, grade.final.possible])
         }
       };
     } else {
       map[grade.assignmentGroupId] = grade;
     }
-  });
+  }
+
   return map;
 }
 
@@ -146,13 +146,17 @@ function calculateWithGradingPeriods (submissions, assignmentGroups, gradingPeri
   const gradingPeriodGradesByPeriodId = {};
   const periodBasedAssignmentGroupGrades = [];
 
-  _.forEach(gradingPeriods, (gradingPeriod) => {
+  for (let gp = 0; gp < gradingPeriods.length; gp++) {
     const groupGrades = {};
+    const gradingPeriod = gradingPeriods[gp]
 
-    (assignmentGroupsByGradingPeriodId[gradingPeriod.id] || []).forEach((assignmentGroup) => {
+    const assignmentGroupsInPeriod = assignmentGroupsByGradingPeriodId[gradingPeriod.id] || []
+    for (let ag = 0; ag < assignmentGroupsInPeriod.length; ag++) {
+      const assignmentGroup = assignmentGroupsInPeriod[ag]
+
       groupGrades[assignmentGroup.id] = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup);
       periodBasedAssignmentGroupGrades.push(groupGrades[assignmentGroup.id]);
-    });
+    }
 
     const groupGradesList = _.values(groupGrades);
 
@@ -164,7 +168,7 @@ function calculateWithGradingPeriods (submissions, assignmentGroups, gradingPeri
       final: combineAssignmentGroupGrades(groupGradesList, true, options),
       scoreUnit: options.weightAssignmentGroups ? 'percentage' : 'points'
     };
-  });
+  }
 
   if (options.weightGradingPeriods) {
     return {

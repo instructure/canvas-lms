@@ -19,6 +19,7 @@
 import {combineReducers} from 'redux'
 import {handleActions} from 'redux-actions'
 import {actionTypes} from './actions'
+import {ALL_ROLES_VALUE} from './propTypes'
 
 import activeRoleTrayReducer from './reducers/activeRoleTrayReducer'
 import activeAddTrayReducer from './reducers/activeAddTrayReducer'
@@ -26,6 +27,10 @@ import activePermissionTrayReducer from './reducers/activePermissionTrayReducer'
 import setFocusReducer from './reducers/setFocusReducer'
 
 import {roleSortedInsert} from './helper/utils'
+
+const allRolesSelected = function allRolesSelected(selectedRoles) {
+  return selectedRoles.length !== 0 && selectedRoles[0].value === ALL_ROLES_VALUE
+}
 
 const permissions = handleActions(
   {
@@ -55,6 +60,9 @@ const roles = handleActions(
   {
     [actionTypes.UPDATE_ROLE_FILTERS]: (state, action) => {
       const {selectedRoles, contextType} = action.payload
+      if (allRolesSelected(selectedRoles)) {
+        return state
+      }
       const selectedRolesObject = selectedRoles.reduce((obj, role) => {
         obj[role.id] = true // eslint-disable-line
         return obj
@@ -66,6 +74,18 @@ const roles = handleActions(
           (selectedRoles.length === 0 || !!selectedRolesObject[role.id])
         return {...role, displayed}
       })
+    },
+    [actionTypes.FILTER_DELETED_ROLE]: (state, action) => {
+      const {role, selectedRoles} = action.payload
+      // The deleted role is automatically not displayed; but if it's the last role
+      // currently displayed we need to explicitly display all roles
+      if (selectedRoles.length === 1 && selectedRoles[0].id === role.id) {
+        return state.map(r => {
+          const displayed = r.contextType === role.contextType
+          return {...r, displayed}
+        })
+      }
+      return state
     },
     [actionTypes.PERMISSIONS_TAB_CHANGED]: (state, action) => {
       const newContextType = action.payload
@@ -93,7 +113,26 @@ const roles = handleActions(
   []
 )
 
+const selectedRolesReducer = handleActions(
+  {
+    [actionTypes.UPDATE_SELECTED_ROLES]: (state, action) => action.payload,
+    [actionTypes.FILTER_NEW_ROLE]: (state, action) => {
+      if (allRolesSelected(state)) return state
+      const newState = state.slice()
+      newState.push(action.payload)
+      return newState
+    },
+    [actionTypes.FILTER_DELETED_ROLE]: (state, action) => {
+      const result = state.filter(role => role.id !== action.payload.role.id)
+
+      return result
+    }
+  },
+  []
+)
+
 export default combineReducers({
+  selectedRoles: selectedRolesReducer,
   activeRoleTray: activeRoleTrayReducer,
   activeAddTray: activeAddTrayReducer,
   activePermissionTray: activePermissionTrayReducer,

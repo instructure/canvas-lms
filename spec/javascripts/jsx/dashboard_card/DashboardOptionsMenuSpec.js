@@ -165,7 +165,7 @@ test('it should not display toggle color overlay option if recent activity view 
 })
 
 test('it should toggle color overlays', function () {
-  this.stub(DashboardOptionsMenu.prototype, 'postToggleColorOverlays')
+  sandbox.stub(DashboardOptionsMenu.prototype, 'postToggleColorOverlays')
   let dashboardMenu = null
   ReactDOM.render(
     <FakeDashboard

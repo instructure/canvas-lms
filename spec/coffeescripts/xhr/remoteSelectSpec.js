@@ -70,7 +70,7 @@ test('should load an object as <optgroup>', function() {
 test('should cache responses', function() {
   const server = sinon.fakeServer.create()
   server.respondWith(/.+/, this.response)
-  this.spy($, 'getJSON')
+  sandbox.spy($, 'getJSON')
 
   const rs = new RemoteSelect(this.el, {url: '/test/cached.json'})
   server.respond()
@@ -115,7 +115,7 @@ test('should accept a formatter', function() {
 
 test('should take params', function() {
   const server = sinon.fakeServer.create()
-  this.spy($, 'getJSON')
+  sandbox.spy($, 'getJSON')
 
   const rs = new RemoteSelect(this.el, {
     url: '/test/url.json',

@@ -51,7 +51,7 @@ describe AnnouncementsController do
       group.add_user(@user)
       group.save!
       get 'index', params: { :group_id => group.id }
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:js_bundles].length).to eq 1
       expect(assigns[:js_bundles].first).to include :announcements_index_v2
       expect(assigns[:js_bundles].first).not_to include :announcements_index
@@ -60,7 +60,7 @@ describe AnnouncementsController do
     it "returns new bundle for course announcements if section specific enabled" do
       user_session(@user)
       get 'index', params: { :course_id => @course.id }
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:js_bundles].length).to eq 1
       expect(assigns[:js_bundles].first).to include :announcements_index_v2
       expect(assigns[:js_bundles].first).not_to include :announcements_index

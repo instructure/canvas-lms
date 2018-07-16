@@ -270,7 +270,7 @@ describe Login::CanvasController do
                           password: 'qwertyuiop',
                           account: account2)
       post 'create', params: {:pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwertyuiop'}}
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
       expect(response).to render_template(:new)
     end
 

@@ -58,6 +58,40 @@ describe ContentZipper do
       expect(expected_file_patterns).to be_empty
     end
 
+    context 'anonymous assignments' do
+      before(:once) do
+        course = Course.create!
+        student = User.create!(name: 'fred')
+        @teacher = User.create!
+        course.enroll_student(student, enrollment_state: :active)
+        course.enroll_teacher(@teacher, enrollment_state: :active)
+        @assignment = course.assignments.create!(anonymous_grading: true, muted: true)
+        @assignment.submit_homework(student, body: 'homework')
+        @attachment = @assignment.attachments.create!(
+          display_name: 'my_download.zip',
+          user: @teacher,
+          workflow_state: 'to_be_zipped'
+        )
+      end
+
+      it 'omits user names if the assignment is anonymous and muted' do
+        ContentZipper.process_attachment(@attachment, @teacher)
+        Zip::File.open(@attachment.reload.full_filename) do |zip_file|
+          filename = zip_file.first.name
+          expect(filename).not_to match(/fred/)
+        end
+      end
+
+      it 'includes user names if the assignment is anonymous and unmuted' do
+        @assignment.unmute!
+        ContentZipper.process_attachment(@attachment, @teacher)
+        Zip::File.open(@attachment.reload.full_filename) do |zip_file|
+          filename = zip_file.first.name
+          expect(filename).to match(/fred/)
+        end
+      end
+    end
+
     it "should ignore undownloadable submissions" do
       course_with_student(active_all: true)
       @user.update_attributes!(sortable_name: 'some_999_, _1234_guy')

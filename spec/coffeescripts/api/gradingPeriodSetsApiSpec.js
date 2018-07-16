@@ -141,7 +141,7 @@ QUnit.module('gradingPeriodSetsApi.list', {
 })
 
 test('calls the resolved endpoint', function() {
-  this.stub($, 'ajaxJSON').returns(new Promise(() => {}))
+  sandbox.stub($, 'ajaxJSON').returns(new Promise(() => {}))
   api.list()
   ok($.ajaxJSON.calledWith('api/grading_period_sets'))
 })
@@ -247,19 +247,19 @@ QUnit.module('gradingPeriodSetsApi.create', {
 })
 
 test('calls the resolved endpoint with the serialized grading period set', function() {
-  const apiSpy = this.stub(axios, 'post').returns(new Promise(() => {}))
+  const apiSpy = sandbox.stub(axios, 'post').returns(new Promise(() => {}))
   api.create(deserializedSetCreating)
   ok(axios.post.calledWith('api/grading_period_sets', serializedSetCreating))
 })
 
 test('deserializes returned grading period sets', function() {
   const successPromise = new Promise(resolve => resolve({data: serializedSetCreated}))
-  this.stub(axios, 'post').returns(successPromise)
+  sandbox.stub(axios, 'post').returns(successPromise)
   return api.create(deserializedSetCreating).then(set => deepEqual(set, deserializedSetCreated))
 })
 
 test('rejects the promise upon errors', function() {
-  this.stub(axios, 'post').returns(Promise.reject('FAIL'))
+  sandbox.stub(axios, 'post').returns(Promise.reject('FAIL'))
   return api.create(deserializedSetCreating).catch(error => equal(error, 'FAIL'))
 })
 const deserializedSetUpdating = {
@@ -328,17 +328,17 @@ QUnit.module('gradingPeriodSetsApi.update', {
 })
 
 test('calls the resolved endpoint with the serialized grading period set', function() {
-  const apiSpy = this.stub(axios, 'patch').returns(new Promise(() => {}))
+  const apiSpy = sandbox.stub(axios, 'patch').returns(new Promise(() => {}))
   api.update(deserializedSetUpdating)
   ok(axios.patch.calledWith('api/grading_period_sets/1', serializedSetUpdating))
 })
 
 test('returns the given grading period set', function() {
-  this.stub(axios, 'patch').returns(Promise.resolve({data: serializedSetUpdated}))
+  sandbox.stub(axios, 'patch').returns(Promise.resolve({data: serializedSetUpdated}))
   return api.update(deserializedSetUpdating).then(set => deepEqual(set, deserializedSetUpdating))
 })
 
 test('rejects the promise upon errors', function() {
-  this.stub(axios, 'patch').returns(Promise.reject('FAIL'))
+  sandbox.stub(axios, 'patch').returns(Promise.reject('FAIL'))
   return api.update(deserializedSetUpdating).catch(error => equal(error, 'FAIL'))
 })

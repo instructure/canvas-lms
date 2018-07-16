@@ -21,10 +21,14 @@ import moxios from 'moxios';
 import moment from 'moment-timezone';
 import MockDate from 'mockdate';
 
-import {transformApiToInternalItem} from '../../utilities/apiUtils';
+import {moxiosRespond} from '../../test-utils';
+import {findNextLink, transformApiToInternalItem} from '../../utilities/apiUtils';
 
 jest.mock('../../utilities/apiUtils');
 transformApiToInternalItem.mockImplementation(item => `transformed-${item.uniqueId}`);
+
+// unmock findNextLink
+findNextLink.mockImplementation(require.requireActual('../../utilities/apiUtils').findNextLink);
 
 beforeEach(() => {
   moxios.install();
@@ -34,6 +38,8 @@ beforeEach(() => {
 afterEach(() => {
   moxios.uninstall();
   MockDate.reset();
+  Actions.sidebarLoadNextItems.reset();
+  Actions.maybeUpdateTodoSidebar.reset();
 });
 
 function mockGetState (overrides) {
@@ -50,6 +56,17 @@ function mockGetState (overrides) {
     groups: [],
   };
   return () => state;
+}
+
+function generateItem (opts = {}) {
+  return {
+    completed: false,
+    ...opts
+  };
+}
+
+function generateItems (num, opts = {}) {
+  return Array(num).fill().map(() => generateItem(opts));
 }
 
 describe('load items', () => {
@@ -115,17 +132,16 @@ describe('load items', () => {
     });
   });
 
-  it('dispatches SIDEBAR_ALL_ITEMS_LOADED when initial load gets them all', (done) => {
+  it('dispatches SIDEBAR_ENOUGH_ITEMS_LOADED when initial load gets them all', (done) => {
     expect.hasAssertions();
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'));
     const fakeDispatch = jest.fn();
-    thunk(fakeDispatch, mockGetState());
+    thunk(fakeDispatch, mockGetState({nextUrl: null}));
     moxios.wait(() => {
       const request = moxios.requests.mostRecent();
       request.respondWith({
         status: 200,
-        headers: {
-        },
+        headers: {}, // no link header means we got them all
         response: [{ uniqueId: 1 }, { uniqueId: 2 }]
       }).then(() => {
         const expected = {
@@ -133,9 +149,99 @@ describe('load items', () => {
           payload: { items: ['transformed-1', 'transformed-2'], nextUrl: null }
         };
         expect(fakeDispatch).toHaveBeenCalledWith(expected);
-        expect(fakeDispatch).toHaveBeenCalledWith({type: 'SIDEBAR_ALL_ITEMS_LOADED'});
+        expect(fakeDispatch).toHaveBeenCalledWith({type: 'SIDEBAR_ENOUGH_ITEMS_LOADED'});
         done();
       });
+    });
+  });
+
+  it('continues to load if there are less than 10 incomplete items loaded', (done) => {
+    expect.hasAssertions();
+    const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'));
+    const fakeDispatch = jest.fn();
+    const fetchPromise = thunk(fakeDispatch, mockGetState({
+      items: [
+        {completed: true},
+        {completed: false},
+        {completed: false},
+        {completed: false},
+        {completed: false},
+        {completed: false},
+      ],
+    }));
+    return moxiosRespond([], fetchPromise, {headers: {link: '</>; rel="next"'}}).then((response) => {
+      expect(fakeDispatch).toHaveBeenCalledWith({type: 'SIDEBAR_ENOUGH_ITEMS_LOADED'});
+      expect(fakeDispatch).toHaveBeenCalledTimes(4);
+      const secondCallThunk = fakeDispatch.mock.calls[3][0];
+      expect(secondCallThunk).toBe(Actions.sidebarLoadNextItems);
+      fakeDispatch.mockReset();
+      const secondFetchPromise = secondCallThunk(fakeDispatch, mockGetState({
+        nextUrl: '/',
+        items: [
+          {completed: true},
+          {completed: false},
+          {completed: false},
+          {completed: false},
+          {completed: false},
+          {completed: false},
+          {completed: true},
+          {completed: true},
+          {completed: true},
+          {completed: false},
+          {completed: false},
+          {completed: true},
+          {completed: true},
+        ],
+      }));
+      return moxiosRespond([], secondFetchPromise).then((response) => {
+        // make sure we got here because another load happened.
+        // test times out if we don't get here.
+        done();
+      });
+    });
+  });
+
+  it('stops loading when it gets 10 incomplete items', () => {
+    expect.hasAssertions();
+    const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'));
+    const fakeDispatch = jest.fn();
+    const fetchPromise = thunk(fakeDispatch, mockGetState({
+      items: [
+        {completed: false},
+        {completed: false},
+        {completed: false},
+        {completed: false},
+        {completed: false},
+        {completed: false},
+        {completed: false},
+        {completed: false},
+        {completed: false},
+        {completed: false},
+      ],
+    }));
+    return moxiosRespond([], fetchPromise, {headers: {link: '</>; rel="next"'}}).then((response) => {
+      expect(fakeDispatch).not.toHaveBeenCalledWith(Actions.sidebarLoadNextItems);
+    });
+  });
+
+  it('finishes loading even when there are less then 5 incomplete items', () => {
+    expect.hasAssertions();
+    const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'));
+    const fakeDispatch = jest.fn();
+    const fetchPromise = thunk(fakeDispatch, mockGetState({
+      items: [
+        {completed: false},
+        {completed: false},
+        {completed: false},
+        {completed: false},
+        {completed: true},
+        {completed: true},
+      ],
+    }));
+    return moxiosRespond([], fetchPromise).then((response) => {
+      expect(fakeDispatch).toHaveBeenCalledWith(expect.objectContaining({
+        type: 'SIDEBAR_ENOUGH_ITEMS_LOADED',
+      }));
     });
   });
 
@@ -155,6 +261,38 @@ describe('load items', () => {
           {type: 'SIDEBAR_ITEMS_LOADING_FAILED', error: true}));
         done();
       });
+    });
+  });
+});
+
+describe('fetch more items', () => {
+  it('resumes loading when there are less than the desired number of incomplete items', () => {
+    expect.hasAssertions();
+    const mockDispatch = jest.fn();
+    const mockGs = mockGetState({nextUrl: '/', items: generateItems(9)});
+    const savedItemPromise = new Promise(res => res({item: {completed: true}}));
+    return Actions.maybeUpdateTodoSidebar(savedItemPromise)(mockDispatch, mockGs).then(() => {
+      expect(mockDispatch).toHaveBeenCalledWith(Actions.sidebarLoadNextItems);
+    });
+  });
+
+  it('will not resume loading if desired number of items is loaded', () => {
+    expect.hasAssertions();
+    const mockDispatch = jest.fn();
+    const gs = mockGetState({nextUrl: '/', items: generateItems(10)});
+    const savedItemPromise = new Promise(res => res({item: {completed: true}}));
+    return Actions.maybeUpdateTodoSidebar(savedItemPromise)(mockDispatch, gs).then(() => {
+      expect(mockDispatch).not.toHaveBeenCalledWith(Actions.sidebarLoadNextItems);
+    });
+  });
+
+  it('will not resume loading if all items are loaded', () => {
+    expect.hasAssertions();
+    const mockDispatch = jest.fn();
+    const gs = mockGetState({nextUrl: null});
+    const savedItemPromise = new Promise(res => res({item: {completed: true}}));
+    return Actions.maybeUpdateTodoSidebar(savedItemPromise)(mockDispatch, gs).then(() => {
+      expect(mockDispatch).not.toHaveBeenCalledWith(Actions.sidebarLoadNextItems);
     });
   });
 });

@@ -57,7 +57,7 @@ describe OutcomesController do
     it "should assign variables" do
       user_session(@student)
       get 'index', params: {:course_id => @course.id}
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should work in accounts" do
@@ -93,14 +93,14 @@ describe OutcomesController do
       user_session(@teacher)
       course_outcome
       get 'show', params: {:course_id => @course.id, :id => @outcome.id}
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should work in accounts" do
       user_session(@admin)
       account_outcome
       get 'show', params: {:account_id => @account.id, :id => @outcome.id}
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should include tags from courses when viewed in the account" do
@@ -137,7 +137,7 @@ describe OutcomesController do
       user_session(@student)
       course_outcome
       get 'details', params: {:course_id => @course.id, :outcome_id => @outcome.id}
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should work in accounts" do
@@ -158,7 +158,7 @@ describe OutcomesController do
       account_outcome
       user_session(@admin)
       get 'user_outcome_results', params: {:account_id => @account.id, :user_id => @student.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(response).to render_template('user_outcome_results')
     end
   end
@@ -169,7 +169,7 @@ describe OutcomesController do
 
       user_session(@admin)
       get 'list', params: {:account_id => @account.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       data = json_parse
       expect(data).not_to be_empty
     end
@@ -180,7 +180,7 @@ describe OutcomesController do
 
       user_session(@admin)
       get 'list', params: {:account_id => sub_account_1.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       data = json_parse
       expect(data).not_to be_empty
     end
@@ -190,7 +190,7 @@ describe OutcomesController do
 
       user_session(@teacher)
       get 'list', params: {:course_id => @course.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       data = json_parse
       expect(data).not_to be_empty
     end

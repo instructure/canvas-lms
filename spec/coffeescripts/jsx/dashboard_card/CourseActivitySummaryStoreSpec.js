@@ -47,7 +47,7 @@ test('getStateForCourse', function() {
     has(CourseActivitySummaryStore.getStateForCourse(), 'streams'),
     'should return root state object when no courseId is provided'
   )
-  const spy = this.stub(CourseActivitySummaryStore, '_fetchForCourse').returns(true)
+  const spy = sandbox.stub(CourseActivitySummaryStore, '_fetchForCourse').returns(true)
   ok(
     isEmpty(CourseActivitySummaryStore.getStateForCourse(1)),
     'should return empty object for course id not already in state'

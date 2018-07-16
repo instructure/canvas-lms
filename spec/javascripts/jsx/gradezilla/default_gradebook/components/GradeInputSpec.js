@@ -32,6 +32,7 @@ QUnit.module('GradeInput', suiteHooks => {
 
   suiteHooks.beforeEach(() => {
     assignment = {
+      anonymizeStudents: false,
       gradingType: 'points'
     }
     submission = {
@@ -108,9 +109,8 @@ QUnit.module('GradeInput', suiteHooks => {
       strictEqual(input.prop('value'), '–')
     })
 
-    test('is blank when the assignment is anonymously graded and muted', () => {
-      props.assignment.anonymousGrading = true
-      props.assignment.muted = true
+    test('is blank when the assignment has anonymized students', () => {
+      props.assignment.anonymizeStudents = true
       mountComponent()
       const input = wrapper.find('input')
       strictEqual(input.prop('value'), '–')
@@ -432,9 +432,8 @@ QUnit.module('GradeInput', suiteHooks => {
       strictEqual(input.prop('value'), 'Excused')
     })
 
-    test('is blank when the assignment is anonymously graded and muted', () => {
-      props.assignment.anonymousGrading = true
-      props.assignment.muted = true
+    test('is blank when the assignment has anonymized students', () => {
+      props.assignment.anonymizeStudents = true
       mountComponent()
       const input = wrapper.find('input')
       strictEqual(input.prop('value'), '–')
@@ -701,9 +700,8 @@ QUnit.module('GradeInput', suiteHooks => {
       strictEqual(input.prop('value'), 'Excused')
     })
 
-    test('is blank when the assignment is anonymously graded and muted', () => {
-      props.assignment.anonymousGrading = true
-      props.assignment.muted = true
+    test('is blank when the assignment has anonymized students', () => {
+      props.assignment.anonymizeStudents = true
       mountComponent()
       const input = wrapper.find('input')
       strictEqual(input.prop('value'), '–')
@@ -968,9 +966,8 @@ QUnit.module('GradeInput', suiteHooks => {
       strictEqual(input.prop('disabled'), true)
     })
 
-    test('shows empty string if anonymously graded and muted', () => {
-      props.assignment.anonymousGrading = true
-      props.assignment.muted = true
+    test('shows empty string if the assignment has anonymized students', () => {
+      props.assignment.anonymizeStudents = true
       mountComponent()
       const input = wrapper.find('select')
       strictEqual(input.prop('value'), '');
@@ -1137,7 +1134,7 @@ QUnit.module('GradeInput', suiteHooks => {
     mountComponent()
 
     submission = {enteredScore: 50, excused: false}
-    assignment = {pointsPossible: 10, gradingType: 'points'}
+    assignment = {anonymizeStudents: false, pointsPossible: 10, gradingType: 'points'}
     wrapper.setProps({submission, assignment})
 
     ok(wrapper.text().includes('This grade is unusually high'))

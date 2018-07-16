@@ -351,6 +351,7 @@ class GroupsController < ApplicationController
           add_crumb @group.short_name, named_context_url(@group, :context_url)
         end
         @context = @group
+        assign_localizer
         if @group.deleted? && @group.context
           flash[:notice] = t('notices.already_deleted', "That group has been deleted")
           redirect_to named_context_url(@group.context, :context_url)

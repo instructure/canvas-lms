@@ -76,7 +76,7 @@ module Lti
 
           it 'processes the request' do
             get :index, params: valid_params
-            expect(response).to be_success
+            expect(response).to be_successful
           end
         end
 

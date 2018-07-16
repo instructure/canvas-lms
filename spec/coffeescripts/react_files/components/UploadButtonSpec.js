@@ -45,7 +45,7 @@ test('hides actual file input form', function() {
 })
 
 test('only enques uploads when state.newUploads is true', function() {
-  this.spy(this.button, 'queueUploads')
+  sandbox.spy(this.button, 'queueUploads')
   this.button.state.nameCollisions.length = 0
   this.button.state.resolvedNames.length = 1
   FileOptionsCollection.state.newOptions = false

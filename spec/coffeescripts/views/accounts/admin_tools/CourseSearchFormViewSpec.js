@@ -40,7 +40,7 @@ test('should be accessible', function(assert) {
 })
 
 test('#search, when form is submited, search is called', function() {
-  this.mock(this.courseRestore)
+  sandbox.mock(this.courseRestore)
     .expects('search')
     .once()
     .returns($.Deferred().resolve())
@@ -49,7 +49,7 @@ test('#search, when form is submited, search is called', function() {
 })
 
 test('#search shows an error when given a blank query', function() {
-  this.mock(this.courseSearchFormView.$courseSearchField)
+  sandbox.mock(this.courseSearchFormView.$courseSearchField)
     .expects('errorBox')
     .once()
   return this.courseSearchFormView.$el.submit()

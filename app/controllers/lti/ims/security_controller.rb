@@ -48,16 +48,8 @@ module Lti::Ims
     #
     # @returns JWKs
     def jwks
-      keys = %w(past present future).map {|key| retrieve_public_key_jwk(key) }
+      keys = Lti::KeyStorage.public_keyset
       render json: { keys: keys }
-    end
-
-    private
-
-    def retrieve_public_key_jwk(key_type)
-      key = JSON.parse(Canvas::DynamicSettings.find('lti')[key_type])
-      jwk = JSON::JWK.new(key)
-      jwk.to_key.public_key.to_jwk
     end
   end
 end

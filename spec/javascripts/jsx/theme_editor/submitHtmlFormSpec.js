@@ -25,13 +25,13 @@ define([
 
   QUnit.module('submitHtmlForm', {
     setup () {
-      this.spy(jQuery.fn, 'appendTo')
-      this.stub(jQuery.fn, 'submit')
+      sandbox.spy(jQuery.fn, 'appendTo')
+      sandbox.stub(jQuery.fn, 'submit')
       action = '/foo'
       method = 'PUT'
       md5 = '0123456789abcdef0123456789abcdef'
       csrfToken = 'csrftoken'
-      this.stub(jQuery, 'cookie').returns(csrfToken)
+      sandbox.stub(jQuery, 'cookie').returns(csrfToken)
     }
   })
 

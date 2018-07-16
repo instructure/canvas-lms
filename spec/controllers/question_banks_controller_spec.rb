@@ -36,7 +36,7 @@ describe QuestionBanksController do
       @bank3 = @course.account.assessment_question_banks.create!
       @bank3.destroy
       res = get 'index', params: {controller: :question_banks, inherited: '1', course_id: @course.id}, format: 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
       json = json_parse(response.body)
       expect(json.size).to eq 2
       expect(json.detect { |bank|
@@ -52,7 +52,7 @@ describe QuestionBanksController do
 
     it "should copy questions" do
       post 'move_questions', params: {:course_id => @course.id, :question_bank_id => @bank1.id, :assessment_question_bank_id => @bank2.id, :questions => { @question1.id => 1, @question2.id => 1 }}
-      expect(response).to be_success
+      expect(response).to be_successful
 
       @bank1.reload
       expect(@bank1.assessment_questions.count).to eq 2
@@ -61,7 +61,7 @@ describe QuestionBanksController do
 
     it "should move questions" do
       post 'move_questions', params: {:course_id => @course.id, :question_bank_id => @bank1.id, :assessment_question_bank_id => @bank2.id, :move => '1', :questions => { @question1.id => 1, @question2.id => 1 }}
-      expect(response).to be_success
+      expect(response).to be_successful
 
       @bank1.reload
       expect(@bank1.assessment_questions.count).to eq 0
@@ -82,7 +82,7 @@ describe QuestionBanksController do
     it "bookmarks" do
       post 'bookmark', params: {:course_id => @course.id,
                        :question_bank_id => @bank.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(@teacher.reload.assessment_question_banks).to include @bank
     end
 
@@ -96,7 +96,7 @@ describe QuestionBanksController do
       post 'bookmark', params: {:course_id => @course.id,
                        :question_bank_id => @bank.id,
                        :unbookmark => 1}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(@teacher.reload.assessment_question_banks).not_to include @bank
     end
   end

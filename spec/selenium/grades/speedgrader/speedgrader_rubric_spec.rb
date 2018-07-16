@@ -26,8 +26,8 @@ describe "speed grader - rubrics" do
   before(:each) do
     course_with_teacher_logged_in
     outcome_with_rubric
-    @assignment = @course.assignments.create(:name => 'assignment with rubric', :points_possible => 10)
-    @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
+    @assignment = @course.assignments.create(name: 'assignment with rubric', points_possible: 10)
+    @association = @rubric.associate_with(@assignment, @course, purpose: 'grading')
   end
 
   it "grades assignment using rubric", priority: "2", test_id: 283749 do
@@ -139,27 +139,27 @@ describe "speed grader - rubrics" do
     student_submission
     @association.use_for_grading = true
     @association.save!
-    @ignored = @course.created_learning_outcomes.create!(:title => 'outcome', :description => 'just for reference')
+    @ignored = @course.created_learning_outcomes.create!(title: 'outcome', description: 'just for reference')
     @rubric.data = @rubric.data + [{
-      :points => 3,
-      :description => "just for reference",
-      :id => 3,
-      :ratings => [
+      points: 3,
+      description: "just for reference",
+      id: 3,
+      ratings: [
         {
-          :points => 3,
-          :description => "You Learned",
-          :criterion_id => 3,
-          :id => 6,
+          points: 3,
+          description: "You Learned",
+          criterion_id: 3,
+          id: 6,
         },
         {
-          :points => 0,
-          :description => "No-learn-y",
-          :criterion_id => 3,
-          :id => 7,
+          points: 0,
+          description: "No-learn-y",
+          criterion_id: 3,
+          id: 7,
         },
       ],
-      :learning_outcome_id => @ignored.id,
-      :ignore_for_scoring => '1',
+      learning_outcome_id: @ignored.id,
+      ignore_for_scoring:'1',
     }]
     @rubric.save!
 

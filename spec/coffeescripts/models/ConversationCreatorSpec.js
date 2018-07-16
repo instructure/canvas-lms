@@ -40,7 +40,7 @@ test('#validate passes through to Conversation', function() {
 })
 
 test('#save calls save in batches', function() {
-  const spy = this.spy()
+  const spy = sinon.spy()
   this.server.respondWith('POST', '/api/v1/conversations', xhr => {
     spy()
     return xhr.respond([200, {'Content-Type': 'application/json'}, JSON.stringify({})])

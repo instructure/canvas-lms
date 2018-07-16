@@ -39,8 +39,8 @@ test('it should be accessible', function(assert) {
 
 test('calls flashError with base error message when errors are present', function() {
   const errorMessage = 'User storage quota exceeded'
-  this.stub(this.avatarDialogView, 'enableSelectButton')
-  const mock = this.mock($)
+  sandbox.stub(this.avatarDialogView, 'enableSelectButton')
+  const mock = sandbox.mock($)
     .expects('flashError')
     .withArgs(errorMessage)
   this.avatarDialogView.preflightRequest()
@@ -54,8 +54,8 @@ test('calls flashError with base error message when errors are present', functio
 
 test("errors if waitAndSaveUserAvatar is called more than 50 times without successful save", function(assert) {
   const done = assert.async()
-  this.mock($).expects('getJSON').returns(Promise.resolve([{ token: "avatar-token" }]))
-  const mock = this.mock(this.avatarDialogView).expects('handleErrorUpdating')
+  sandbox.mock($).expects('getJSON').returns(Promise.resolve([{ token: "avatar-token" }]))
+  const mock = sandbox.mock(this.avatarDialogView).expects('handleErrorUpdating')
   const maxCalls = 50
   this.avatarDialogView.waitAndSaveUserAvatar("fake-token", "fake-url", maxCalls).then(() => {
     ok(mock.verify()) 

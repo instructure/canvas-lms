@@ -17,6 +17,7 @@
  */
 import moment from 'moment-timezone';
 import _ from 'lodash';
+import parseLinkHeader from 'parse-link-header';
 import { makeEndOfDayIfMidnight } from './dateUtils';
 
 const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
@@ -33,11 +34,12 @@ const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
       || apiResponse.submissions.graded)
     ),
     points: plannable.points_possible,
-    html_url: plannable.html_url,
+    html_url: apiResponse.html_url || plannable.html_url,
     overrideId: planner_override && planner_override.id,
     overrideAssignId: plannable.assignment_id,
     id: plannableId,
     uniqueId: `${plannable_type}-${plannableId}`,
+    location: plannable.location_name || null
   };
 
   details.feedback = apiResponse.submissions ? apiResponse.submissions.feedback : undefined;
@@ -51,7 +53,10 @@ const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
   }
 
   if (plannable_type === 'calendar_event') {
-    details.allDay = plannable.all_day
+    details.allDay = plannable.all_day;
+    if (!details.allDay && plannable.end_at && plannable.end_at !== apiResponse.plannable_date ) {
+      details.endTime = moment(plannable.end_at);
+    }
   }
 
   return details;
@@ -74,6 +79,17 @@ const getItemType = (plannableType) => {
 const getApiItemType = (overrideType) => {
   return _.findKey(TYPE_MAPPING, _.partial(_.isEqual, overrideType));
 };
+
+export function findNextLink (response) {
+  const linkHeader = response.headers.link;
+  if (linkHeader == null) return null;
+
+  const parsedLinks = parseLinkHeader(linkHeader);
+  if (parsedLinks == null) return null;
+
+  if (parsedLinks.next == null) return null;
+  return parsedLinks.next.url;
+}
 
 /**
 * Translates the API data to the format the planner expects

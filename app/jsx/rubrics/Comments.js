@@ -89,9 +89,11 @@ const commentElement = (assessment) => (
 )
 
 export const CommentText = ({ assessment, placeholder, weight }) => (
-  <Text size="x-small" weight={weight}>
-    {assessment !== null ? commentElement(assessment) : placeholder}
-  </Text>
+  <span className="react-rubric-break-words">
+    <Text size="x-small" weight={weight}>
+      {assessment !== null ? commentElement(assessment) : placeholder}
+    </Text>
+  </span>
 )
 CommentText.propTypes = {
   assessment: PropTypes.shape(assessmentShape),

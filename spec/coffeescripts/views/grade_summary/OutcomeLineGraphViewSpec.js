@@ -73,7 +73,7 @@ test('#initialize', function() {
 })
 
 test('render', function() {
-  const renderSpy = this.spy(this.outcomeLineGraphView, 'render')
+  const renderSpy = sandbox.spy(this.outcomeLineGraphView, 'render')
   ok(!this.outcomeLineGraphView.deferred.isResolved(), 'precondition')
   ok(this.outcomeLineGraphView.render())
   ok(isUndefined(this.outcomeLineGraphView.svg), 'should not render svg if promise is unresolved')

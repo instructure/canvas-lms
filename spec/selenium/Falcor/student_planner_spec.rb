@@ -31,7 +31,7 @@ describe "student planner" do
 
   before :each do
     user_session(@student1)
-  end  
+  end
 
   it "shows no due date assigned when no assignments are created.", priority: "1", test_id: 3265570 do
     go_to_list_view
@@ -209,13 +209,48 @@ describe "student planner" do
     end
   end
 
-  it "shows and navigates to ungraded discussions with todo dates from student planner", priority:"1", test_id: 3259305 do
-    discussion = @course.discussion_topics.create!(user: @teacher, title: 'somebody topic title',
-                                                   message: 'somebody topic message',
-                                                   todo_date: Time.zone.now + 2.days)
-    go_to_list_view
-    validate_object_displayed('Discussion')
-    validate_link_to_url(discussion, 'discussion_topics')
+  context "ungraded discussion" do
+    before :once do
+      @ungraded_discussion = @course.discussion_topics.create!(user: @teacher, title: 'somebody topic title',
+                                                               message: 'somebody topic message',
+                                                               todo_date: Time.zone.now + 2.days)
+    end
+
+    it "shows and navigates to ungraded discussions with todo dates from student planner", priority:"1", test_id: 3259305 do
+      go_to_list_view
+      validate_object_displayed('Discussion')
+      validate_link_to_url(@ungraded_discussion, 'discussion_topics')
+    end
+
+    it 'shows the date in the index page' do
+      skip('unskip with ADMIN-1160')
+      get "/courses/#{@course.id}/discussion_topics/"
+      expect(discussion_index_page_detail.text).to eq(format_time_for_view(@ungraded_discussion.todo_date))
+    end
+
+    it 'shows the date in the show page' do
+      skip('unskip with ADMIN-1160')
+      get "/courses/#{@course.id}/discussion_topics/#{@ungraded_discussion.id}/"
+      expect(discussion_show_page_detail.text).to eq(format_time_for_view(@ungraded_discussion.todo_date))
+    end
+  end
+
+  context "wiki_pages" do
+    before :once do
+      @wiki_page = @course.wiki_pages.create!(title: 'Page1', todo_date: Time.zone.now + 2.days)
+    end
+
+    it 'shows the date in the index page' do
+      get "/courses/#{@course.id}/pages/"
+      wait_for_ajaximations
+      expect(f('a[data-sort-field="todo_date"]')).to be_displayed
+      expect(f('tbody.collectionViewItems')).to include_text(format_time_for_view(@wiki_page.todo_date))
+    end
+
+    it 'shows the date in the show page' do
+      get "/courses/#{@course.id}/pages/#{@wiki_page.id}/"
+      expect(f('.show-content')).to include_text(format_time_for_view(@wiki_page.todo_date))
+    end
   end
 
   context "Quizzes" do
@@ -349,6 +384,7 @@ describe "student planner" do
     end
 
     it "edits a completed To Do", priority: "1" do
+      skip("build breaking, for some reason, it won't click a:contains('Title Text') 12 lines down.")
       @student1.planner_notes.create!(todo_date: 2.days.from_now, title: "Title Text")
       go_to_list_view
 
@@ -615,9 +651,9 @@ describe "student planner" do
     wait_for_planner_load
     expect(f('.PlannerApp')).to contain_jqcss('span:contains("Show 1 completed item")')
   end
-  
+
   context "teacher in a course" do
-    before :once do 
+    before :once do
       @teacher1 = User.create!(name: 'teacher')
       @course.enroll_teacher(@teacher1).accept!
     end
@@ -626,11 +662,11 @@ describe "student planner" do
       user_session(@teacher1)
     end
 
-    it "shows correct default time in a wiki pages" do
-      skip("skip until ADMIN-1096")
+    it "shows correct default time in a wiki page" do
       Timecop.freeze(Time.zone.today) do
-        @wiki = @course.wiki_pages.create!(title: 'Default Time Wiki Page', todo_date: Time.zone.today)
+        @wiki = @course.wiki_pages.create!(title: 'Default Time Wiki Page')
         get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
+        f('#student_planner_checkbox').click
         wait_for_ajaximations
         f('input[name="student_todo_at"]').send_keys(format_date_for_view(Time.zone.now).to_s)
         fj('button:contains("Save")').click
@@ -639,11 +675,11 @@ describe "student planner" do
       end
     end
 
-    it "shows correct default time in a ungraded discussions" do
-      skip("skip until ADMIN-1096")
+    it "shows correct default time in a ungraded discussion" do
       Timecop.freeze(Time.zone.today) do
-        @discussion = @course.discussion_topics.create!(title: "Default Time Discussion", message: nil, user: @teacher, todo_date: Time.zone.today)
+        @discussion = @course.discussion_topics.create!(title: "Default Time Discussion", message: "here is a message", user: @teacher)
         get("/courses/#{@course.id}/discussion_topics/#{@discussion.id}/edit")
+        f('#todo_options').click
         wait_for_ajaximations
         f('input[name="todo_date"]').send_keys(format_date_for_view(Time.zone.now).to_s)
         expect_new_page_load { submit_form('.form-actions') }

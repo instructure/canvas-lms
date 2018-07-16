@@ -65,7 +65,7 @@ const createView = function(quiz, options = {}) {
 
 QUnit.module('QuizItemView', {
   setup() {
-    this.ajaxStub = this.stub($, 'ajaxJSON')
+    this.ajaxStub = sandbox.stub($, 'ajaxJSON')
     fakeENV.setup({
       CONDITIONAL_RELEASE_ENV: {
         active_rules: [
@@ -203,8 +203,8 @@ test('cannot delete quiz without delete permissions', function() {
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: true, permissions: {delete: false}})
   const view = createView(quiz)
 
-  this.spy(quiz, 'destroy')
-  this.spy(window, 'confirm')
+  sandbox.spy(quiz, 'destroy')
+  sandbox.spy(window, 'confirm')
 
   view.$('.delete-item').simulate('click')
   notOk(window.confirm.called)
@@ -216,7 +216,7 @@ test('prompts confirm for delete', function() {
   const view = createView(quiz)
   quiz.destroy = () => true
 
-  this.stub(window, 'confirm').returns(true)
+  sandbox.stub(window, 'confirm').returns(true)
 
   view.$('.delete-item').simulate('click')
   ok(window.confirm.called)
@@ -228,7 +228,7 @@ test('confirm delete destroys model', function() {
 
   let destroyed = false
   quiz.destroy = () => (destroyed = true)
-  this.stub(window, 'confirm').returns(true)
+  sandbox.stub(window, 'confirm').returns(true)
 
   view.$('.delete-item').simulate('click')
   ok(destroyed)

@@ -10,6 +10,7 @@ module.exports = {
     'public/javascripts',
     'public/javascripts/vendor'
   ],
+  reporters: [ "default", "jest-junit" ],
   setupFiles: [
     'jest-localstorage-mock',
     '<rootDir>/jest/jest-setup.js'
@@ -17,7 +18,6 @@ module.exports = {
   testMatch: [
     '**/__tests__/**/?(*.)(spec|test).js'
   ],
-  testResultsProcessor: 'jest-junit',
   transform: {
     '^i18n': '<rootDir>/jest/i18nTransformer.js',
     '^.+\\.jsx?$': 'babel-jest'

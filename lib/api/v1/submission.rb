@@ -256,7 +256,7 @@ module Api::V1::Submission
     attachment = attachments.pop
     attachments.each(&:destroy_permanently_plus)
 
-    anonymous = assignment.anonymous_grading?
+    anonymous = assignment.anonymize_students?
 
     # Remove the earlier attachment and re-create it if it's "stale"
     if attachment

@@ -42,7 +42,7 @@ test('it should be accessible', function(assert) {
 })
 
 test('calls render on return view when launch button clicked', function() {
-  this.stub(this.mockReturnView, 'render').returns(this)
+  sandbox.stub(this.mockReturnView, 'render').returns(this)
   this.launchView.$el.find('#externalToolLaunch').click()
   ok(this.mockReturnView.render.calledOnce, 'render not called on return view')
 })

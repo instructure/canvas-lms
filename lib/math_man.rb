@@ -26,6 +26,10 @@ module MathMan
     uri.to_s
   end
 
+  def self.cache_key_for(latex, target)
+    ["mathman", dynamic_settings.fetch('version'), Digest::MD5.hexdigest(latex), target].compact.cache_key
+  end
+
   def self.use_for_mml?
     Canvas::Plugin.value_to_boolean(plugin_settings[:use_for_mml])
   end

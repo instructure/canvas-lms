@@ -22,7 +22,7 @@ import AssignmentApi from 'jsx/gradebook-history/api/AssignmentApi';
 QUnit.module('AssignmentApi', {
   setup () {
     this.courseId = 23;
-    this.getStub = this.stub(axios, 'get')
+    this.getStub = sandbox.stub(axios, 'get')
       .returns(Promise.resolve({
         response: {}
       }));

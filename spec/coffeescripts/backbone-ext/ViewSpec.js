@@ -253,14 +253,14 @@ test('View.mixin', 3, function() {
 
 test('View.mixin initialize, attach and afterRender magic tricks', function() {
   const mixin1 = {
-    initialize: this.spy(),
-    attach: this.spy(),
-    afterRender: this.spy()
+    initialize: sinon.spy(),
+    attach: sinon.spy(),
+    afterRender: sinon.spy()
   }
   const mixin2 = {
-    initialize: this.spy(),
-    attach: this.spy(),
-    afterRender: this.spy()
+    initialize: sinon.spy(),
+    attach: sinon.spy(),
+    afterRender: sinon.spy()
   }
   class SomeView extends Backbone.View {
     static initClass() {
@@ -291,13 +291,13 @@ test('View.mixin does not merge into parent class', function() {
 })
 
 test('View.mixin with compound mixins', function() {
-  const afterRender1 = this.spy()
+  const afterRender1 = sinon.spy()
   const mixin1 = {afterRender: afterRender1}
-  const afterRender2 = this.spy()
+  const afterRender2 = sinon.spy()
   const mixin2 = mixing({}, mixin1, {afterRender: afterRender2})
-  const afterRender3 = this.spy()
+  const afterRender3 = sinon.spy()
   const mixin3 = {afterRender: afterRender3}
-  const afterRenderFoo = this.spy()
+  const afterRenderFoo = sinon.spy()
   class Foo extends Backbone.View {
     static initClass() {
       this.mixin(mixin2, mixin3)
@@ -316,13 +316,13 @@ test('View.mixin with compound mixins', function() {
   ok(afterRenderFoo.calledOnce, 'called foo afterRender')
 
   // order of mixing in shouldn't matter
-  const afterRender4 = this.spy()
-  const afterRender5 = this.spy()
-  const afterRender6 = this.spy()
+  const afterRender4 = sinon.spy()
+  const afterRender5 = sinon.spy()
+  const afterRender6 = sinon.spy()
   const mixin4 = {afterRender: afterRender4}
   const mixin5 = mixing({}, mixin4, {afterRender: afterRender5})
   const mixin6 = {afterRender: afterRender6}
-  const afterRenderBar = this.spy()
+  const afterRenderBar = sinon.spy()
   class Bar extends Backbone.View {
     static initClass() {
       this.mixin(mixin6, mixin5)

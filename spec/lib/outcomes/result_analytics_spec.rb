@@ -81,21 +81,41 @@ describe Outcomes::ResultAnalytics do
   describe "#find_outcome_results" do
     before(:once) do
       course_with_student
-      outcome_with_rubric context: @course
-      assignment_model
-      alignment = @outcome.align(@assignment, @course)
-      LearningOutcomeResult.create! context: @course, learning_outcome: @outcome, user: @student, alignment: alignment
-      LearningOutcomeResult.create! context: @course, learning_outcome: @outcome, user: @student, alignment: alignment, hidden: true
+      course_with_teacher(course: @course)
+      rubric = outcome_with_rubric context: @course
+      @assignment = assignment_model
+      @alignment = @outcome.align(@assignment, @course)
+      @rubric_association = rubric.associate_with(@assignment, @course, purpose: 'grading')
+      lor
+      lor(hidden: true)
+    end
+
+    def lor(opts = {})
+      LearningOutcomeResult.create!(
+        context: @course,
+        learning_outcome: @outcome,
+        user: @student,
+        alignment: @alignment,
+        association_type: 'RubricAssociation',
+        association_id: @rubric_association.id,
+        **opts
+      )
     end
 
     it 'does not return hidden outcome results' do
-      results = ra.find_outcome_results(users: [@student], context: @course, outcomes: [@outcome])
+      results = ra.find_outcome_results(@teacher, users: [@student], context: @course, outcomes: [@outcome])
       expect(results.length).to eq 1
     end
 
     it 'returns hidden outcome results when include_hidden is true' do
-      results = ra.find_outcome_results(users: [@student], context: @course, outcomes: [@outcome], include_hidden: true)
+      results = ra.find_outcome_results(@teacher, users: [@student], context: @course, outcomes: [@outcome], include_hidden: true)
       expect(results.length).to eq 2
+    end
+
+    it 'does not return muted assignment results' do
+      @assignment.mute!
+      results = ra.find_outcome_results(@student, users: [@student], context: @course, outcomes: [@outcome])
+      expect(results.length).to eq 0
     end
   end
 
@@ -228,6 +248,15 @@ describe Outcomes::ResultAnalytics do
       end
     end
 
+    it 'excludes missing user rollups' do
+      results = [
+        outcome_from_score(5.0, {user: MockUser[20, 'b']})
+      ]
+      users = [MockUser[10, 'a'], MockUser[30, 'c']]
+      rollups = ra.outcome_results_rollups(results, users, ['missing_user_rollups'])
+      expect(rollups.length).to eq 1
+    end
+
     it 'returns hide_points value of true if all results have hide_points set to true' do
       results = [
         outcome_from_score(4.0,{hide_points: true}),
@@ -251,23 +280,40 @@ describe Outcomes::ResultAnalytics do
     before do
       allow_any_instance_of(ActiveRecord::Associations::Preloader).to receive(:preload)
     end
-    it 'returns one rollup with the rollup averages' do
-      fake_context = MockUser.new(42, 'fake')
-      results = [
-        outcome_from_score(0.0, {}),
-        outcome_from_score(1.0, {}),
-        outcome_from_score(5.0, {id: 81}),
-        outcome_from_score(2.0, {user: MockUser[20, 'b']}),
-        outcome_from_score(6.0, {id: 81, user: MockUser[20, 'b']}),
-        outcome_from_score(3.0, {user: MockUser[30, 'c']}),
-        outcome_from_score(4.0, {user: MockUser[40, 'd']}),
-        outcome_from_score(7.0, {id: 81, user: MockUser[40, 'd']})
-      ]
-      aggregate_result = ra.aggregate_outcome_results_rollup(results, fake_context)
-      expect(aggregate_result.size).to eq 2
-      expect(aggregate_result.scores.map(&:score)).to eq [2.5, 6.0]
-      expect(aggregate_result.scores[0].outcome_results.size).to eq 4
-      expect(aggregate_result.scores[1].outcome_results.size).to eq 3
+
+    context 'with results' do
+      let(:results) do
+        [
+          # the next two scores for the same user and outcome get combined into an
+          # overall score of 1.0 using the "highest" calculation method
+          outcome_from_score(0.0, {}),
+          outcome_from_score(1.0, {}),
+          outcome_from_score(5.0, {id: 81}),
+          outcome_from_score(2.0, {user: MockUser[20, 'b']}),
+          outcome_from_score(6.0, {id: 81, user: MockUser[20, 'b']}),
+          outcome_from_score(3.0, {user: MockUser[30, 'c']}),
+          outcome_from_score(40.0, {user: MockUser[40, 'd']}),
+          outcome_from_score(70.0, {id: 81, user: MockUser[40, 'd']})
+        ]
+      end
+
+      it 'returns one rollup with the rollup averages' do
+        fake_context = MockUser.new(42, 'fake')
+        aggregate_result = ra.aggregate_outcome_results_rollup(results, fake_context)
+        expect(aggregate_result.size).to eq 2
+        expect(aggregate_result.scores.map(&:score)).to eq [11.5, 27.0]
+        expect(aggregate_result.scores[0].outcome_results.size).to eq 4
+        expect(aggregate_result.scores[1].outcome_results.size).to eq 3
+      end
+
+      it 'returns one rollup with the rollup medians' do
+        fake_context = MockUser.new(42, 'fake')
+        aggregate_result = ra.aggregate_outcome_results_rollup(results, fake_context, 'median')
+        expect(aggregate_result.size).to eq 2
+        expect(aggregate_result.scores.map(&:score)).to eq [2.5, 6]
+        expect(aggregate_result.scores[0].outcome_results.size).to eq 4
+        expect(aggregate_result.scores[1].outcome_results.size).to eq 3
+      end
     end
 
     it "properly calculates a mix of assignment and quiz results" do

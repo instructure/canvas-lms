@@ -246,7 +246,14 @@ module Lti
         it "requires an active developer_key" do
           allow(dev_key).to receive(:active?).and_return false
           expect { auth_validator.tool_proxy }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
-                                                              "the Developer Key is not active"
+                                                              "the Developer Key is not active or available in this environment"
+        end
+
+        it "requires a developer key that is usable for the cluster" do
+          allow(DeveloperKey).to receive(:test_cluster_checks_enabled?).and_return true
+          allow(dev_key).to receive(:test_cluster_only?).and_return true
+          expect { auth_validator.tool_proxy }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
+                                                              "the Developer Key is not active or available in this environment"
         end
 
       end

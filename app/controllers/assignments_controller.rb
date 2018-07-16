@@ -79,6 +79,7 @@ class AssignmentsController < ApplicationController
   def show
     rce_js_env(:highrisk)
     @assignment ||= @context.assignments.find(params[:id])
+    @assignment_presenter = AssignmentPresenter.new(@assignment)
     if @assignment.deleted?
       respond_to do |format|
         flash[:notice] = t 'notices.assignment_delete', "This assignment has been deleted"
@@ -361,7 +362,7 @@ class AssignmentsController < ApplicationController
 
     respond_to do |format|
       if @assignment && @assignment.send(method)
-        format.json { render :json => @assignment }
+        format.json { render json: @assignment.as_json(methods: :anonymize_students) }
       else
         format.json { render :json => @assignment, :status => :bad_request }
       end

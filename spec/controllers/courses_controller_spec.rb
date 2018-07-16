@@ -29,7 +29,7 @@ describe CoursesController do
     it "should assign variables" do
       course_with_student_logged_in(:active_all => true)
       get 'index'
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:current_enrollments]).not_to be_nil
       expect(assigns[:current_enrollments]).not_to be_empty
       expect(assigns[:current_enrollments][0]).to eql(@enrollment)
@@ -46,7 +46,7 @@ describe CoursesController do
       @course.offer!
       @course.enroll_student(@user)
       get 'index'
-      expect(response).to be_success
+      expect(response).to be_successful
       assigns[:future_enrollments].each do |e|
         expect(assigns[:current_enrollments]).not_to include e
       end
@@ -69,7 +69,7 @@ describe CoursesController do
 
         user_session(@user)
         get 'index'
-        expect(response).to be_success
+        expect(response).to be_successful
         current_ens = assigns[:current_enrollments]
         expect(current_ens.count).to eql(2)
 
@@ -91,7 +91,7 @@ describe CoursesController do
 
         user_session(@student)
         get 'index'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:past_enrollments]).to eql([enrollment1])
         expect(assigns[:current_enrollments]).to eql([])
         expect(assigns[:future_enrollments]).to eql([])
@@ -107,7 +107,7 @@ describe CoursesController do
 
         user_session(@student)
         get 'index'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:past_enrollments]).to eq [completed_enrollment, rejected_enrollment]
         expect(assigns[:current_enrollments]).to eq [active_enrollment]
         expect(assigns[:future_enrollments]).to be_empty
@@ -126,7 +126,7 @@ describe CoursesController do
         user_session(@student)
 
         get 'index'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:past_enrollments]).to eq [old_enroll]
       end
 
@@ -187,7 +187,7 @@ describe CoursesController do
 
         user_session(@student)
         get 'index'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:past_enrollments]).to match_array([enrollment7, enrollment5, enrollment3, enrollment2, enrollment1])
         expect(assigns[:current_enrollments]).to eq [enrollment4]
         expect(assigns[:future_enrollments]).to be_empty
@@ -210,7 +210,7 @@ describe CoursesController do
 
         user_session(@student)
         get 'index'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:past_enrollments]).to eq [enrollment1]
         expect(assigns[:current_enrollments]).to eq [enrollment2]
         expect(assigns[:future_enrollments]).to be_empty
@@ -224,7 +224,7 @@ describe CoursesController do
 
         user_session(@student)
         get 'index'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:future_enrollments]).to be_empty
       end
 
@@ -243,7 +243,7 @@ describe CoursesController do
 
         user_session(@student)
         get 'index'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:future_enrollments]).to be_empty
       end
@@ -267,7 +267,7 @@ describe CoursesController do
 
         user_session(@student)
         get 'index'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to be_empty
         expect(assigns[:future_enrollments]).to be_empty
@@ -276,14 +276,14 @@ describe CoursesController do
         o = @student.as_student_observation_links.build; o.observer = observer; o.save!
         user_session(observer)
         get 'index'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to be_empty
         expect(assigns[:future_enrollments]).to be_empty
 
         user_session(teacher)
         get 'index'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:past_enrollments]).to eq [teacher_enrollment]
         expect(assigns[:current_enrollments]).to be_empty
         expect(assigns[:future_enrollments]).to be_empty
@@ -304,7 +304,7 @@ describe CoursesController do
 
         user_session(@student)
         get 'index'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:past_enrollments]).to eq [enrollment]
         expect(assigns[:current_enrollments]).to be_empty
         expect(assigns[:future_enrollments]).to be_empty
@@ -331,7 +331,7 @@ describe CoursesController do
 
         user_session(@student)
         get 'index'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to eq [enrollment1, enrollment2, enrollment3]
         expect(assigns[:future_enrollments]).to be_empty
@@ -351,7 +351,7 @@ describe CoursesController do
 
         user_session(@student)
         get 'index'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to eq [enrollment1, enrollment2]
         expect(assigns[:future_enrollments]).to be_empty
@@ -367,7 +367,7 @@ describe CoursesController do
 
         user_session(@student)
         get 'index'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to eq [enrollment1, enrollment2]
         expect(assigns[:future_enrollments]).to be_empty
@@ -380,7 +380,7 @@ describe CoursesController do
 
         user_session(@student)
         get 'index'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to eq [enrollment]
         expect(assigns[:future_enrollments]).to be_empty
@@ -401,7 +401,7 @@ describe CoursesController do
 
         user_session(@student)
         get 'index'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to be_empty
         expect(assigns[:future_enrollments].map(&:course_id)).to eq [course1.id, course2.id]
@@ -410,7 +410,7 @@ describe CoursesController do
         o = @student.as_student_observation_links.build; o.observer = observer; o.save!
         user_session(observer)
         get 'index'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to be_empty
         expect(assigns[:future_enrollments].map(&:course_id)).to eq [course1.id, course2.id]
@@ -435,7 +435,7 @@ describe CoursesController do
 
         user_session(@student)
         get 'index'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to be_empty
         expect(assigns[:future_enrollments]).to eq [enrollment1]
@@ -444,7 +444,7 @@ describe CoursesController do
         o = @student.as_student_observation_links.build; o.observer = observer; o.save!
         user_session(observer)
         get 'index'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to be_empty
         expect(assigns[:future_enrollments]).to eq [observer.enrollments.first]
@@ -453,7 +453,7 @@ describe CoursesController do
         teacher_enrollment = course_with_teacher course: course1, :user => teacher
         user_session(teacher)
         get 'index'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to be_empty
         expect(assigns[:future_enrollments]).to eq [teacher_enrollment]
@@ -469,7 +469,7 @@ describe CoursesController do
 
         user_session(@student)
         get 'index'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:future_enrollments]).to eq []
       end
     end
@@ -515,7 +515,7 @@ describe CoursesController do
     it 'does not break using new student_ids method from course' do
       course_with_teacher_logged_in(:active_all => true)
       get 'statistics', params: {:course_id => @course.id}, :format => 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 
@@ -551,7 +551,7 @@ describe CoursesController do
     it "should render properly" do
       user_session(@teacher)
       get 'settings', params: {:course_id => @course.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(response).to render_template("settings")
     end
 
@@ -733,7 +733,7 @@ describe CoursesController do
     it "should assign variables" do
       user_session(@student)
       get 'show', params: {:id => @course.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:context]).to eql(@course)
       expect(assigns[:modules].to_a).to eql([])
     end
@@ -767,7 +767,7 @@ describe CoursesController do
       session[:become_user_id] = @fake_student.id
 
       get 'show', params: {:id => @course.id}
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should not allow student view students to view other courses" do
@@ -790,7 +790,7 @@ describe CoursesController do
 
       get 'show', params: {:id => @course.id}
       if should_show
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:context]).to eql(@course)
       else
         assert_status(401)
@@ -967,7 +967,7 @@ describe CoursesController do
         @course1.save!
         remove_user_session
         get 'show', params: {:id => @course1.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(controller.js_env[:COURSE_HOME]).to be_truthy
         expect(controller.js_env[:SHOW_ANNOUNCEMENTS]).to be_falsey
       end
@@ -1009,7 +1009,7 @@ describe CoursesController do
       it "should allow an invited user to see the course" do
         expect(@enrollment).to be_invited
         get 'show', params: {:id => @course.id, :invitation => @enrollment.uuid}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:pending_enrollment]).to eq @enrollment
       end
 
@@ -1040,14 +1040,14 @@ describe CoursesController do
         @course.save!
 
         get 'show', params: {:id => @course.id, :invitation => @teacher_enrollment.uuid}
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it "should re-invite an enrollment that has previously been rejected" do
         expect(@enrollment).to be_invited
         @enrollment.reject!
         get 'show', params: {:id => @course.id, :invitation => @enrollment.uuid}
-        expect(response).to be_success
+        expect(response).to be_successful
         @enrollment.reload
         expect(@enrollment).to be_invited
       end
@@ -1057,7 +1057,7 @@ describe CoursesController do
         @account = Account.create!
         course_with_student_logged_in(:active_course => 1, :account => @account)
         get 'show', params: {:id => @course.id, :invitation => @enrollment.uuid}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response).to render_template('show')
         expect(assigns[:context_enrollment]).to eq @enrollment
         @enrollment.reload
@@ -1076,7 +1076,7 @@ describe CoursesController do
 
         get 'show', params: {:id => @course.id}
 
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response).to render_template('show')
         expect(assigns[:context_enrollment]).to eq enrollment
         enrollment.reload
@@ -1093,7 +1093,7 @@ describe CoursesController do
         @enrollment.accept!
         user_session(@student)
         get 'show', params: {:id => @course.id, :invitation => @enrollment.uuid}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:pending_enrollment]).to be_nil
       end
 
@@ -1106,7 +1106,7 @@ describe CoursesController do
         expect(@enrollment).to be_invited
 
         get 'show', params: {:id => @course.id, :invitation => @enrollment.uuid}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:pending_enrollment]).to eq @enrollment
         expect(assigns[:current_user]).to eq @student1
         expect(session[:enrollment_uuid]).to eq @enrollment.uuid
@@ -1117,7 +1117,7 @@ describe CoursesController do
 
         controller.instance_variable_set(:@js_env, nil)
         get 'show', params: {:id => @course.id} # invitation should be in the session now
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:pending_enrollment]).to eq @enrollment
         expect(assigns[:current_user]).to eq @student1
         expect(session[:enrollment_uuid]).to eq @enrollment.uuid
@@ -1150,7 +1150,7 @@ describe CoursesController do
         user_session(@user)
 
         get 'show', params: {:id => @course1.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:pending_enrollment]).to eq @enrollment1
         expect(session[:enrollment_uuid]).to eq @enrollment1.uuid
         expect(session[:permissions_key]).not_to be_nil
@@ -1159,7 +1159,7 @@ describe CoursesController do
         controller.instance_variable_set(:@pending_enrollment, nil)
         controller.instance_variable_set(:@js_env, nil)
         get 'show', params: {:id => @course2.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:pending_enrollment]).to eq @enrollment2
         expect(session[:enrollment_uuid]).to eq @enrollment2.uuid
         expect(session[:permissions_key]).not_to eq permissions_key
@@ -1174,7 +1174,7 @@ describe CoursesController do
         user_session(@user)
 
         get 'show', params: {:id => @course.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:pending_enrollment]).to eq @enrollment
       end
     end
@@ -1201,7 +1201,7 @@ describe CoursesController do
       user_session(@user)
 
       get 'show', params: {:id => @course.id}, xhr: true
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should redirect to the xlisted course" do
@@ -1240,7 +1240,7 @@ describe CoursesController do
       it "should log an AUA with membership_type" do
         user_session(@student)
         get 'show', params: {:id => @course.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         aua = AssetUserAccess.where(user_id: @student, context_type: 'Course', context_id: @course).first
         expect(aua.asset_category).to eq 'home'
         expect(aua.membership_type).to eq 'StudentEnrollment'
@@ -1250,7 +1250,7 @@ describe CoursesController do
         allow(@controller).to receive(:api_request?).and_return(true)
         user_session(@student)
         get 'show', params: {:id => @course.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         aua = AssetUserAccess.where(user_id: @student, context_type: 'Course', context_id: @course).first
         expect(aua.asset_category).to eq 'home'
         expect(aua.membership_type).to eq 'StudentEnrollment'
@@ -1302,7 +1302,7 @@ describe CoursesController do
       user_session(@teacher)
       post 'unenroll_user', params: {:course_id => @course.id, :id => @enrollment.id}
       @course.reload
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(@course.enrollments.map{|e| e.user}).not_to be_include(@student)
     end
 
@@ -1317,7 +1317,7 @@ describe CoursesController do
       @course.account.account_users.create!(user: @teacher)
       post 'unenroll_user', params: {:course_id => @course.id, :id => @teacher_enrollment.id}
       @course.reload
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(@course.enrollments.map{|e| e.user}).not_to be_include(@teacher)
     end
   end
@@ -1345,7 +1345,7 @@ describe CoursesController do
     it "should enroll people" do
       user_session(@teacher)
       post 'enroll_users', params: {:course_id => @course.id, :user_list => "\"Sam\" <sam@yahoo.com>, \"Fred\" <fred@yahoo.com>"}
-      expect(response).to be_success
+      expect(response).to be_successful
       @course.reload
       expect(@course.students.map{|s| s.name}).to be_include("Sam")
       expect(@course.students.map{|s| s.name}).to be_include("Fred")
@@ -1355,7 +1355,7 @@ describe CoursesController do
       user_session(@teacher)
       @course.complete
       post 'enroll_users', params: {:course_id => @course.id, :user_list => "\"Sam\" <sam@yahoo.com>, \"Fred\" <fred@yahoo.com>"}
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
       @course.reload
       expect(@course.students.map{|s| s.name}).not_to be_include("Sam")
       expect(@course.students.map{|s| s.name}).not_to be_include("Fred")
@@ -1368,7 +1368,7 @@ describe CoursesController do
       @course.restrict_enrollments_to_course_dates = true
       @course.save!
       post 'enroll_users', params: {:course_id => @course.id, :user_list => "\"Sam\" <sam@yahoo.com>, \"Fred\" <fred@yahoo.com>"}
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
       @course.reload
       expect(@course.students.map{|s| s.name}).not_to be_include("Sam")
       expect(@course.students.map{|s| s.name}).not_to be_include("Fred")
@@ -1377,7 +1377,7 @@ describe CoursesController do
     it "should record initial_enrollment_type on new users" do
       user_session(@teacher)
       post 'enroll_users', params: {:course_id => @course.id, :user_list => "\"Sam\" <sam@yahoo.com>", :enrollment_type => 'ObserverEnrollment'}
-      expect(response).to be_success
+      expect(response).to be_successful
       @course.reload
       expect(@course.observers.count).to eq 1
       expect(@course.observers.first.initial_enrollment_type).to eq 'observer'
@@ -1387,7 +1387,7 @@ describe CoursesController do
       user_session(@teacher)
       role = custom_student_role('customrole', :account => @course.account)
       post 'enroll_users', params: {:course_id => @course.id, :user_list => "\"Sam\" <sam@yahoo.com>", :role_id => role.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       @course.reload
       expect(@course.students.map(&:name)).to include("Sam")
       expect(@course.student_enrollments.find_by_role_id(role.id)).to_not be_nil
@@ -1399,7 +1399,7 @@ describe CoursesController do
       @course.enroll_ta(user_factory).accept!
       user_session(@user)
       post 'enroll_users', params: {:course_id => @course.id, :user_list => "\"Sam\" <sam@yahoo.com>, \"Fred\" <fred@yahoo.com>", :enrollment_type => 'ObserverEnrollment'}
-      expect(response).to be_success
+      expect(response).to be_successful
       @course.reload
       expect(@course.students).to be_empty
       expect(@course.observers.map{|s| s.name}).to be_include("Sam")
@@ -1413,7 +1413,7 @@ describe CoursesController do
         :user_list => "\"Sam\" <sam@yahoo.com>",
         :enrollment_type => 'TeacherEnrollment',
         :limit_privileges_to_course_section => true}
-      expect(response).to be_success
+      expect(response).to be_successful
       run_jobs
       enrollment = @course.reload.teachers.find { |t| t.name == 'Sam' }.enrollments.first
       expect(enrollment.limit_privileges_to_course_section).to eq true
@@ -1424,7 +1424,7 @@ describe CoursesController do
       u2 = user_factory
       user_session(@teacher)
       post 'enroll_users', params: {:course_id => @course.id, :user_tokens => [u1.token, u2.token]}
-      expect(response).to be_success
+      expect(response).to be_successful
       @course.reload
       expect(@course.students).to include(u1)
       expect(@course.students).to include(u2)
@@ -1780,7 +1780,7 @@ describe CoursesController do
 
       it 'should set a course as a master course' do
         put 'update', params: {:id => @course.id, :course => { :blueprint => '1' }}, :format => 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(MasterCourses::MasterTemplate).to be_is_master_course @course
       end
 
@@ -1804,7 +1804,7 @@ describe CoursesController do
       it "should allow setting of default template restrictions" do
         put 'update', params: {:id => @course.id, :course => { :blueprint => '1',
           :blueprint_restrictions => {'content' => '0', 'due_dates' => '1'}}}, :format => 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
         template = MasterCourses::MasterTemplate.full_template_for(@course)
         expect(template.default_restrictions).to eq({:content => false, :due_dates => true})
       end
@@ -1812,14 +1812,14 @@ describe CoursesController do
       it "should validate template restrictions" do
         put 'update', params: {:id => @course.id, :course => { :blueprint => '1',
           :blueprint_restrictions => {'content' => '1', 'doo_dates' => '1'}}}, :format => 'json'
-        expect(response).to_not be_success
+        expect(response).to_not be_successful
         expect(response.body).to include 'Invalid restrictions'
       end
 
       it "should allow setting whether to use template restrictions by object type" do
         put 'update', params: {:id => @course.id, :course => { :blueprint => '1',
           :use_blueprint_restrictions_by_object_type => '1'}}, :format => 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
         template = MasterCourses::MasterTemplate.full_template_for(@course)
         expect(template.use_default_restrictions_by_type).to be_truthy
       end
@@ -1828,7 +1828,7 @@ describe CoursesController do
         put 'update', params: {:id => @course.id, :course => { :blueprint => '1',
           :blueprint_restrictions_by_object_type =>
             {'assignment' => {'content' => '1', 'due_dates' => '1'}, 'quiz' => {'content' => '1'}}}}, :format => 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
         template = MasterCourses::MasterTemplate.full_template_for(@course)
         expect(template.default_restrictions_by_type).to eq ({
           "Assignment" => {:content => true, :due_dates => true},
@@ -1840,7 +1840,7 @@ describe CoursesController do
         put 'update', params: {:id => @course.id, :course => { :blueprint => '1',
           :blueprint_restrictions_by_object_type =>
             {'notarealtype' => {'content' => '1', 'due_dates' => '1'}}}}, :format => 'json'
-        expect(response).to_not be_success
+        expect(response).to_not be_successful
         expect(response.body).to include 'Invalid restrictions'
       end
     end
@@ -1909,7 +1909,7 @@ describe CoursesController do
       @enrollment.update_attribute(:self_enrolled, true)
 
       post 'self_unenrollment', params: {:course_id => @course.id, :self_unenrollment => @enrollment.uuid}
-      expect(response).to be_success
+      expect(response).to be_successful
       @enrollment.reload
       expect(@enrollment).to be_completed
     end
@@ -1944,7 +1944,7 @@ describe CoursesController do
       expect_any_instance_of(Course).to receive(:publish_final_grades).never
       user_session(@teacher)
       get 'sis_publish_status', params: {:course_id => @course.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(json_parse(response.body)).to eq({"sis_publish_overall_status" => "unpublished", "sis_publish_statuses" => {}})
     end
 
@@ -1966,7 +1966,7 @@ describe CoursesController do
         enrollment.save!
       end
       get 'sis_publish_status', params: {:course_id => @course.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       response_body = json_parse(response.body)
       response_body["sis_publish_statuses"]["Synced"].sort_by!{|x| x["id"]}
       expect(response_body).to eq({
@@ -2041,7 +2041,7 @@ describe CoursesController do
       expect(SSLCommon).to receive(:post_data).once
       post "publish_to_sis", params: {:course_id => @course.id}
 
-      expect(response).to be_success
+      expect(response).to be_successful
       response_body = json_parse(response.body)
       response_body["sis_publish_statuses"]["Synced"].sort_by!{|x| x["id"]}
       expect(response_body).to eq({

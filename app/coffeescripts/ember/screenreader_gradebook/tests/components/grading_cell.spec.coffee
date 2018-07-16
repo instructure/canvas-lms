@@ -127,28 +127,28 @@ define [
 
   test "does not translate pass_fail grades", ->
     setType 'pass_fail'
-    @stub(GradeFormatHelper, 'formatGrade').returns 'completo'
+    sandbox.stub(GradeFormatHelper, 'formatGrade').returns 'completo'
     run => @submission.set('entered_grade', 'complete')
     @component.submissionDidChange()
     equal(@component.get('value'), 'complete')
 
   test "formats percent grades", ->
     setType 'percent'
-    @stub(GradeFormatHelper, 'formatGrade').returns '32,4%'
+    sandbox.stub(GradeFormatHelper, 'formatGrade').returns '32,4%'
     run => @submission.set('entered_grade', '32.4')
     @component.submissionDidChange()
     equal(@component.get('value'), '32,4%')
 
   test "focusOut", (assert) ->
     done = assert.async()
-    stub = @stub @component, 'boundUpdateSuccess'
+    stub = sandbox.stub @component, 'boundUpdateSuccess'
     submissions = []
 
     requestStub = null
     run =>
       requestStub = Ember.RSVP.resolve all_submissions: submissions
 
-    @stub(@component, 'ajax').returns requestStub
+    sandbox.stub(@component, 'ajax').returns requestStub
 
     run =>
       @component.set('value', 'ohai')
@@ -160,6 +160,6 @@ define [
 
   test "onUpdateSuccess", ->
     run => @assignment.set('points_possible', 100)
-    flashWarningStub = @stub $, 'flashWarning'
+    flashWarningStub = sandbox.stub $, 'flashWarning'
     @component.onUpdateSuccess({all_submissions: [], score: 150})
     ok flashWarningStub.called

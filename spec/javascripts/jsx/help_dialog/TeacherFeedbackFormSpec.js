@@ -37,7 +37,7 @@ define([
         [200, { "Content-Type": "application/json" }, JSON.stringify([])]
       );
 
-      this.stub(jQuery, 'ajaxJSON')
+      sandbox.stub(jQuery, 'ajaxJSON')
     },
     render (overrides={}) {
       const props = {

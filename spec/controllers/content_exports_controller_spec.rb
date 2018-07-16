@@ -23,7 +23,7 @@ describe ContentExportsController do
     it "should explicitly export everything" do
       course_with_teacher_logged_in(:active_all => true)
       post 'create', params: {:course_id => @course.id}
-      expect(response).to be_success
+      expect(response).to be_successful
 
       expect(ContentExport.last.selected_content[:everything]).to be_present
     end
@@ -49,7 +49,7 @@ describe ContentExportsController do
       before { get 'xml_schema', params: {:version => 'notafile'} }
 
       it 'returns a 404' do
-        expect(response).not_to be_success
+        expect(response).not_to be_successful
       end
 
       it 'renders the 404 template' do
@@ -74,7 +74,7 @@ describe ContentExportsController do
         it "returns all course exports + the teacher's file exports" do
           user_session(@teacher)
           get :index, params: {course_id: @course.id}
-          expect(response).to be_success
+          expect(response).to be_successful
           expect(assigns(:exports).map(&:id)).to match_array [@acx.id, @tcx.id, @tzx.id]
         end
       end
@@ -83,13 +83,13 @@ describe ContentExportsController do
         it "should find course exports" do
           user_session(@teacher)
           get :show, params: {course_id: @course.id, id: @acx.id}
-          expect(response).to be_success
+          expect(response).to be_successful
         end
 
         it "should find teacher's file exports" do
           user_session(@teacher)
           get :show, params: {course_id: @course.id, id: @tzx.id}
-          expect(response).to be_success
+          expect(response).to be_successful
         end
 
         it "should not find other's file exports" do
@@ -113,7 +113,7 @@ describe ContentExportsController do
         it "should show one's own exports" do
           user_session(@student)
           get :index
-          expect(response).to be_success
+          expect(response).to be_successful
           expect(assigns(:exports).map(&:id)).to match_array [@sdx.id, @szx.id]
         end
       end
@@ -122,7 +122,7 @@ describe ContentExportsController do
         it "should find one's own export" do
           user_session(@student)
           get :show, params: {id: @sdx.id}
-          expect(response).to be_success
+          expect(response).to be_successful
         end
 
         it "should not find another's export" do

@@ -126,7 +126,7 @@ test('save', function() {
   expect(4)
   const {_generateParams} = store
   store._generateParams = () => ({foo: 'bar'})
-  const spy = this.spy(store, 'save')
+  const spy = sandbox.spy(store, 'save')
   const data = {some: 'data'}
   const success = function(data, statusText, xhr) {
     equal(statusText, 'success')

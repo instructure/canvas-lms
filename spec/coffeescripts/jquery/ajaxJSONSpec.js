@@ -36,7 +36,7 @@ QUnit.module('$.fn.defaultAjaxError', {
 test('should call the function if not production', function() {
   notEqual(INST.environment, 'production')
   deepEqual($.ajaxJSON.unhandledXHRs, [])
-  const spy = this.spy()
+  const spy = sinon.spy()
   $('#fixtures').defaultAjaxError(spy)
   const xhr = {
     status: 200,
@@ -53,7 +53,7 @@ test('should call the function if unhandled', function() {
     responseText: '{"status": "ok"}'
   }
   $.ajaxJSON.unhandledXHRs.push(xhr)
-  const spy = this.spy()
+  const spy = sinon.spy()
   $('#fixtures').defaultAjaxError(spy)
   $.fn.defaultAjaxError.func({}, xhr)
   ok(spy.called)
@@ -62,7 +62,7 @@ test('should call the function if unhandled', function() {
 test('should call the function if unauthenticated', function() {
   INST.environment = 'production'
   deepEqual($.ajaxJSON.unhandledXHRs, [])
-  const spy = this.spy()
+  const spy = sinon.spy()
   $('#fixtures').defaultAjaxError(spy)
   const xhr = {
     status: 401,
@@ -107,7 +107,7 @@ QUnit.module('$.ajaxJSON.abortRequest', {
   setup () {
     abortXhr = {
       readyState: 0,
-      abort: this.spy()
+      abort: sinon.spy()
     }
   }
 })

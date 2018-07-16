@@ -27,6 +27,9 @@ exports[`renders the component 1`] = `
     <GroupedDates
       aria-hidden="true"
       role="img"
+      viewBox="0 0 907 155"
+      xmlns="http://www.w3.org/2000/svg"
+      xmlnsXlink="http://www.w3.org/1999/xlink"
     />
     <div>
       <div>
@@ -70,6 +73,9 @@ exports[`renders the today className when surrounds Today 1`] = `
     <GroupedDates
       aria-hidden="true"
       role="img"
+      viewBox="0 0 907 155"
+      xmlns="http://www.w3.org/2000/svg"
+      xmlnsXlink="http://www.w3.org/1999/xlink"
     />
     <div>
       <div>

@@ -46,8 +46,8 @@ QUnit.module('UploadProgress', {
   },
   mockUploader(name, progress) {
     const uploader = new FileUploader({file: {}})
-    this.stub(uploader, 'getFileName').returns(name)
-    this.stub(uploader, 'roundProgress').returns(progress)
+    sandbox.stub(uploader, 'getFileName').returns(name)
+    sandbox.stub(uploader, 'roundProgress').returns(progress)
     return uploader
   }
 })
@@ -57,7 +57,7 @@ test('getLabel displays file name', function() {
 })
 
 test('announces upload progress to screen reader when queue changes', function() {
-  this.stub($, 'screenReaderFlashMessage')
+  sandbox.stub($, 'screenReaderFlashMessage')
   equal(this.prog.props.uploader.roundProgress(), 35)
 
   // File upload 75% complete
@@ -72,7 +72,7 @@ test('announces upload progress to screen reader when queue changes', function()
 })
 
 test('does not announce upload progress to screen reader if progress has not changed', function() {
-  this.stub($, 'screenReaderFlashMessage')
+  sandbox.stub($, 'screenReaderFlashMessage')
   equal(this.prog.props.uploader.roundProgress(), 35)
 
   // Simulates a "componentWillReceiveProps"

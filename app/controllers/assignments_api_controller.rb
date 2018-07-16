@@ -745,7 +745,7 @@ class AssignmentsApiController < ApplicationController
   # @argument include[] [String, "submission"|"assignment_visibility"|"overrides"|"observed_users"]
   #   Associations to include with the assignment. The "assignment_visibility" option
   #   requires that the Differentiated Assignments course feature be turned on. If
-  #  "observed_users" is passed, submissions for observed users will also be included.
+  #   "observed_users" is passed, submissions for observed users will also be included.
   # @argument override_assignment_dates [Boolean]
   #   Apply assignment overrides to the assignment, defaults to true.
   # @argument needs_grading_count_by_section [Boolean]

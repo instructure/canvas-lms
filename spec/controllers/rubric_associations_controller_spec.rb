@@ -37,7 +37,7 @@ describe RubricAssociationsController do
                                                       :association_id => @rubric_association.association_object.id}}
       expect(assigns[:association]).not_to be_nil
       expect(assigns[:association].title).to eql("some association")
-      expect(response).to be_success
+      expect(response).to be_successful
     end
     it "should create without manager_rubrics permission" do
       course_with_teacher_logged_in(:active_all => true)
@@ -49,7 +49,7 @@ describe RubricAssociationsController do
                                                       :association_type =>
                                                         @rubric_association.association_object.class.name,
                                                       :association_id => @rubric_association.association_object.id}}
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 
@@ -66,7 +66,7 @@ describe RubricAssociationsController do
       put 'update', params: {:course_id => @course.id, :id => @rubric_association.id, :rubric_association => {:title => "some association"}}
       expect(assigns[:association]).not_to be_nil
       expect(assigns[:association].title).to eql("some association")
-      expect(response).to be_success
+      expect(response).to be_successful
     end
     it "should update the rubric if updateable" do
       course_with_teacher_logged_in(:active_all => true)
@@ -76,7 +76,7 @@ describe RubricAssociationsController do
       expect(assigns[:rubric].title).to eql("new title")
       expect(assigns[:association]).not_to be_nil
       expect(assigns[:association].title).to eql("some association")
-      expect(response).to be_success
+      expect(response).to be_successful
     end
     it "should not update the rubric if not updateable (should make a new one instead)" do
       course_with_teacher_logged_in(:active_all => true)
@@ -87,7 +87,7 @@ describe RubricAssociationsController do
       expect(assigns[:rubric].title).not_to eql("new title")
       expect(assigns[:association]).not_to be_nil
       expect(assigns[:association].title).to eql("some association")
-      expect(response).to be_success
+      expect(response).to be_successful
     end
     it "should update the association" do
       course_with_teacher_logged_in(:active_all => true)
@@ -95,7 +95,7 @@ describe RubricAssociationsController do
       put 'update', params: {:course_id => @course.id, :id => @rubric_association.id, :rubric_association => {:title => "some association"}}
       expect(assigns[:association]).not_to be_nil
       expect(assigns[:association].title).to eql("some association")
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 
@@ -110,7 +110,7 @@ describe RubricAssociationsController do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
       delete 'destroy', params: {:course_id => @course.id, :id => @rubric_association.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:association]).not_to be_nil
       expect(assigns[:association]).to be_frozen
       expect(assigns[:rubric]).not_to be_nil
@@ -121,7 +121,7 @@ describe RubricAssociationsController do
       rubric_association_model(:user => @user, :context => @course)
       @rubric.associate_with(@course, @course, :purpose => 'bookmark')
       delete 'destroy', params: {:course_id => @course.id, :id => @rubric_association.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:rubric]).not_to be_nil
       expect(assigns[:rubric]).not_to be_deleted
       expect(assigns[:rubric]).not_to be_frozen
@@ -135,7 +135,7 @@ describe RubricAssociationsController do
       @rubric.associate_with(@course, @course, :purpose => 'grading')
       @rubric.associate_with(@course, @course, :purpose => 'bookmark')
       delete 'destroy', params: {:course_id => @course.id, :id => @rubric_association.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:rubric]).not_to be_nil
       expect(assigns[:rubric]).not_to be_deleted
       expect(assigns[:rubric]).not_to be_frozen

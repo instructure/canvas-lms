@@ -48,6 +48,7 @@ define [
     @optionProperty 'collection'
     @optionProperty 'WIKI_RIGHTS'
     @optionProperty 'contextName'
+    @optionProperty 'collectionHasTodoDate'
 
     initialize: ->
       super
@@ -70,6 +71,7 @@ define [
       json.wiki_page_menu_tools = ENV.wiki_page_menu_tools || []
       json.wiki_page_menu_tools.forEach (tool) =>
         tool.url = tool.base_url + "&pages[]=#{@model.get("page_id")}"
+      json.collectionHasTodoDate = @collectionHasTodoDate()
       json
 
     render: ->

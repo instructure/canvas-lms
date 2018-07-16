@@ -255,12 +255,14 @@ body.ic-Login-Body #footer.ic-Login-footer {
 }
 // end
 
-.ic-Login-footer {
-  .terms-of-service__link {
-    button {
-      color: var(--ic-brand-Login-footer-link-color) !important;
-    }
+#terms_link {
+  @include ic-focus-base;
+  &:focus {
+    @include ic-focus-variant;
   }
+}
+
+.ic-Login-footer {
   .ic-Login-footer__logo-link {
     display: block;
     text-align: center;
@@ -280,6 +282,10 @@ body.ic-Login-Body #footer.ic-Login-footer {
     padding: $ic-sp;
     text-align: center;
     a, .menu-item__text, .external {
+      @include ic-focus-base;
+      &:focus {
+        @include ic-focus-variant;
+      }
       color: var(--ic-brand-Login-footer-link-color);
       @include fontSize(11px);
       padding: 0 $ic-sp/2;

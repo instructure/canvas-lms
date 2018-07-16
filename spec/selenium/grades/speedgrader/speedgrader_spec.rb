@@ -244,6 +244,100 @@ describe 'Speedgrader' do
       end
     end
 
+    context 'rubric with points removed' do
+      before :once do
+        course_with_teacher(active_all: true)
+        student_in_course(active_all: true)
+        @course.root_account.enable_feature!(:non_scoring_rubrics)
+        init_course_with_students
+        @teacher = @user
+        @assignment = @course.assignments.create!(
+          title: 'Rubric with points removed'
+        )
+        rubric = @course.rubrics.build(
+          title: 'Everything is Awesome',
+          points_possible: 20
+        )
+        rubric.data = rubric_data
+        rubric.save!
+        rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: false)
+        rubric.rubric_associations.first.update!(hide_points: true)
+        rubric.reload
+      end
+
+      before :each do
+        user_session(@teacher)
+      end
+      describe 'assessing the rubric' do
+        it 'can be assessed on speedgrader' do
+          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
+          wait_for_ajaximations
+          f('button.toggle_full_rubric').click
+          wait_for_ajaximations
+          expect(f('#rubric_holder')).to be_displayed
+          ratings = ff('.rating-tier')
+
+          # check that points are removed
+          ratings.each do |rating|
+            expect(rating).not_to include_text('pts')
+          end
+          fj('span:contains("Much Awesome")').click
+          fj('span:contains("So Wow")').click
+
+          # check that only selected ratings have spikes
+          spikes = ff('.triangle')
+          spikes.each_with_index do |spike, index|
+            if index == 0 || index == 4
+              expect(spike).to be_displayed
+            else
+              expect(spike).not_to be_displayed
+            end
+          end
+          find_button('Save').click
+          wait_for_ajaximations
+
+          # check that saved ratings are displayed correctly
+          ratings = ff('.rating-description')
+          spikes = ff('.triangle')
+          expect(ratings[6]).to be_displayed
+          expect(ratings[6]).to include_text('Much Awesome')
+          expect(ratings[6]).not_to include_text('pts')
+          expect(spikes[6]).to be_displayed
+
+          expect(ratings[7]).to be_displayed
+          expect(ratings[7]).to include_text('So Wow')
+          expect(ratings[7]).not_to include_text('pts')
+          expect(spikes[7]).to be_displayed
+
+          # check rubric on student grades page
+          get "/courses/#{@course.id}/grades/#{@students[0].id}"
+          wait_for_ajaximations
+          f('.icon-rubric').click
+          wait_for_ajaximations
+          expect(f('.criterions')).to be_displayed
+
+          ratings = ff('.rating-description')
+          spikes = ff('.triangle')
+
+          ratings.each do |rating|
+            expect(rating).not_to include_text('pts')
+          end
+
+          expect(ratings.first).to include_text('Much Awesome')
+          expect(ratings.fifth).to include_text('So Wow')
+
+          # check that spikes appear only for selected ratings
+          spikes.each_with_index do |spike, index|
+            if index == 0 || index == 4
+              expect(spike).to be_displayed
+            else
+              expect(spike).not_to be_displayed
+            end
+          end
+        end
+      end
+    end
+
     context 'rubric with outcomes' do
       before :once do
         init_course_with_students
@@ -419,8 +513,8 @@ describe 'Speedgrader' do
     it 'updates scores', priority: "1", test_id: 164021 do
       in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do
         list = ff('#questions .user_points input')
-        replace_content list[1], "1", :tab_out => true
-        replace_content f('#fudge_points_entry'), "7", :tab_out => true
+        replace_content list[1], "1", tab_out: true
+        replace_content f('#fudge_points_entry'), "7", tab_out: true
 
         # after_fudge_points_total is updated, even before update button is clicked
         expect(f('#after_fudge_points_total')).to include_text '8'
@@ -535,7 +629,7 @@ describe 'Speedgrader' do
     end
 
     def submit_with_attachment
-      @file_attachment = attachment_model(:content_type => 'application/pdf', :context => @student_in_course)
+      @file_attachment = attachment_model(content_type: 'application/pdf', context: @student_in_course)
       @submission_for_student = @assignment_for_course.submit_homework(
         @student_in_course,
         submission_type: 'online_upload',

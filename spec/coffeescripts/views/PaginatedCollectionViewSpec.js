@@ -126,8 +126,8 @@ test('fetches the next page on scroll', () => {
 })
 
 test("doesn't fetch if already fetching", function() {
-  this.spy(collection, 'fetch')
-  this.spy(view, 'hideLoadingIndicator')
+  sandbox.spy(collection, 'fetch')
+  sandbox.spy(view, 'hideLoadingIndicator')
   collection.fetch()
   view.checkScroll()
   ok(collection.fetch.calledOnce, 'fetch called once')

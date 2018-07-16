@@ -1420,6 +1420,10 @@ class Quizzes::Quiz < ActiveRecord::Base
     filters
   end
 
+  def anonymize_students?
+    assignment.present? && assignment.anonymize_students?
+  end
+
   def self.class_names
     %w(Quiz Quizzes::Quiz)
   end

@@ -121,8 +121,7 @@ describe("RCEWrapper", () => {
 
   afterEach(() => {
     jsdomify.destroy();
-    execCommandSpy.reset();
-    editorCommandSpy.reset();
+    execCommandSpy.restore();
   });
 
   // ====================

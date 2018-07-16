@@ -527,7 +527,7 @@ describe AssignmentsController do
       user_session(@student)
       @assignment.submit_homework(@student, :submission_type => 'online_url', :url => 'http://www.google.com')
       get 'show', params: {:course_id => @course.id, :id => @assignment.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:current_user_submission]).not_to be_nil
       expect(assigns[:assigned_assessments]).to eq []
     end
@@ -589,7 +589,7 @@ describe AssignmentsController do
 
       get 'show', params: {:course_id => @course.id, :id => @assignment.id}
       expect(response).not_to be_redirect
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should not show locked external tool assignments" do
@@ -640,7 +640,7 @@ describe AssignmentsController do
       allow(controller).to receive(:google_drive_connection).and_return(google_drive_mock)
       get 'show', params: {:course_id => @course.id, :id => a.id}
 
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns(:user_has_google_drive)).to be true
     end
 
@@ -670,7 +670,7 @@ describe AssignmentsController do
         @assignment.save!
 
         get 'show', params: {:course_id => @course.id, :id => @assignment.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         aua = AssetUserAccess.where(user_id: @student, context_type: 'Course', context_id: @course).first
         expect(aua.asset_category).to eq 'assignments'
         expect(aua.asset_code).to eq @assignment.asset_string
@@ -743,6 +743,35 @@ describe AssignmentsController do
         put 'toggle_mute', params: { course_id: @course.id, assignment_id: @assignment.id, status: false }, format: 'json'
         @assignment.reload
         expect(@assignment).not_to be_muted
+      end
+
+      describe 'anonymize_students' do
+        it "is included in the response" do
+          put 'toggle_mute', params: { course_id: @course.id, assignment_id: @assignment.id, status: true }, format: 'json'
+          assignment_json = json_parse(response.body)['assignment']
+          expect(assignment_json).to have_key('anonymize_students')
+        end
+
+        it "is true if the assignment is anonymous and muted" do
+          @assignment.update!(anonymous_grading: true)
+          @assignment.unmute!
+          put 'toggle_mute', params: { course_id: @course.id, assignment_id: @assignment.id, status: true }, format: 'json'
+          assignment_json = json_parse(response.body)['assignment']
+          expect(assignment_json.fetch('anonymize_students')).to be true
+        end
+
+        it "is false if the assignment is anonymous and unmuted" do
+          @assignment.update!(anonymous_grading: true)
+          put 'toggle_mute', params: { course_id: @course.id, assignment_id: @assignment.id, status: false }, format: 'json'
+          assignment_json = json_parse(response.body)['assignment']
+          expect(assignment_json.fetch('anonymize_students')).to be false
+        end
+
+        it "is false if the assignment is not anonymous" do
+          put 'toggle_mute', params: { course_id: @course.id, assignment_id: @assignment.id, status: true }, format: 'json'
+          assignment_json = json_parse(response.body)['assignment']
+          expect(assignment_json.fetch('anonymize_students')).to be false
+        end
       end
     end
   end

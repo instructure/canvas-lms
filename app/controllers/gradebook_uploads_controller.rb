@@ -30,7 +30,7 @@ class GradebookUploadsController < ApplicationController
       if previous_upload
         if previous_upload.stale?
           previous_upload.destroy
-        elsif previous_upload
+        else
           # let them continue on with their old upload
           redirect_to course_gradebook_upload_path(@context)
           return

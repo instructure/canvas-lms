@@ -237,7 +237,7 @@ describe AssignmentGroupsController do
           # ensures that check is not an N+1 from the gradebook
           expect_any_instance_of(Assignment).to receive(:students_with_visibility).never
           get 'index', params: {:course_id => @course.id, :include => ['assignments','assignment_visibility']}, :format => :json
-          expect(response).to be_success
+          expect(response).to be_successful
         end
       end
     end
@@ -312,7 +312,7 @@ describe AssignmentGroupsController do
       expect(groups.map(&:position)).to eq [1, 2, 3]
       g1, g2, _ = groups
       post 'reorder', params: {:course_id => @course.id, :order => "#{g2.id},#{g1.id}"}
-      expect(response).to be_success
+      expect(response).to be_successful
       groups.each(&:reload)
       expect(groups.map(&:position)).to eq [2, 1, 3]
     end
@@ -345,7 +345,7 @@ describe AssignmentGroupsController do
     it 'moves the assignment from its current assignment group to another assignment group' do
       user_session(@teacher)
       post :reorder_assignments, params: {course_id: @course.id, assignment_group_id: @group1.id, order: @order}
-      expect(response).to be_success
+      expect(response).to be_successful
       @assignment3.reload
       expect(@assignment3.assignment_group_id).to eq(@group1.id)
       expect(@group2.assignments.count).to eq(0)
@@ -396,7 +396,7 @@ describe AssignmentGroupsController do
         @order = "#{@assignment3.id},#{@assignment2.id}"
 
         post :reorder_assignments, params: {course_id: @course.id, assignment_group_id: @group2.id, order: @order}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(@assignment1.reload.assignment_group_id).to eq(@group1.id)
         expect(@assignment2.reload.assignment_group_id).to eq(@group2.id)
         expect(@assignment3.reload.assignment_group_id).to eq(@group2.id)
@@ -408,7 +408,7 @@ describe AssignmentGroupsController do
         user_session(@teacher)
         order = "#{@assignment3.id},#{@assignment2.id}"
         post :reorder_assignments, params: {course_id: @course.id, assignment_group_id: @group2.id, order: order}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(@assignment1.reload.assignment_group_id).to eq(@group1.id)
         expect(@assignment2.reload.assignment_group_id).to eq(@group2.id)
         expect(@assignment3.reload.assignment_group_id).to eq(@group2.id)
@@ -420,7 +420,7 @@ describe AssignmentGroupsController do
         user_session(@teacher)
         order = "#{@assignment3.id},#{@assignment1.id},#{@assignment2.id}"
         post :reorder_assignments, params: {course_id: @course.id, assignment_group_id: @group1.id, order: order}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(@assignment1.reload.assignment_group_id).to eq(@group1.id)
         expect(@assignment2.reload.assignment_group_id).to eq(@group1.id)
         expect(@assignment3.reload.assignment_group_id).to eq(@group1.id)
@@ -433,7 +433,7 @@ describe AssignmentGroupsController do
         admin = account_admin_user(account: @course.root_account)
         user_session(admin)
         post :reorder_assignments, params: {course_id: @course.id, assignment_group_id: @group2.id, order: @order}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(@assignment1.reload.assignment_group_id).to eq(@group2.id)
         expect(@assignment2.reload.assignment_group_id).to eq(@group2.id)
         expect(@assignment3.reload.assignment_group_id).to eq(@group2.id)
@@ -443,7 +443,7 @@ describe AssignmentGroupsController do
         @assignment1.destroy
         user_session(@teacher)
         post :reorder_assignments, params: {course_id: @course.id, assignment_group_id: @group2.id, order: @order}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(@assignment1.reload.assignment_group_id).to eq(@group1.id)
         expect(@assignment2.reload.assignment_group_id).to eq(@group2.id)
         expect(@assignment3.reload.assignment_group_id).to eq(@group2.id)
@@ -715,13 +715,13 @@ describe AssignmentGroupsController do
       assignment.copied = true
       assignment.save!
       delete 'destroy', format: :json, params: {course_id: @course.id, id: group.id}
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
     end
 
     it 'returns JSON if requested' do
       user_session(@teacher)
       delete 'destroy', :format => 'json', params: {:course_id => @course.id, :id => @group.id}
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 end

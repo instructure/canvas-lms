@@ -98,6 +98,13 @@ describe PlannerNotesController do
           expect(course_notes.first["id"]).to eq @course_2_note.id
         end
 
+        it "includes own notes if specified" do
+          get :index, params: {context_codes: ["course_#{@course_1.id}", "user_#{@user.id}"]}
+          course_notes = json_parse(response.body)
+          expect(course_notes.length).to eq 2
+          expect(course_notes.map{|n| n["id"]}).to match_array [@course_1_note.id, @student_note.id]
+        end
+
         it "filters by start and end dates when specified" do
           get :index, params: {start_date: 2.weeks.ago.to_date.to_s}
           all_notes = json_parse(response.body)

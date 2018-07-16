@@ -17,15 +17,14 @@
 
 PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
+
+    # Student ID: 5 || Student Name: Student1
+    # Course ID: 1
+    # Announcement ID: 1
     provider_state 'a student in a course with an announcement' do
       set_up do
-        course_with_student(active_all: true)
-        Announcement.create!(context: @course, title: "Announcement1", message: "Announcement 1 detail")
-        Pseudonym.create!(user: @student, unique_id: 'testuser@instructure.com')
-        token = @student.access_tokens.create!().full_token
-
-        provider_param :token, token
-        provider_param :course_id, @course.id.to_s
+        course = Pact::Canvas::base_state.course
+        Announcement.create!(context: course, title: "Announcement1", message: "Announcement 1 detail")
       end
     end
   end

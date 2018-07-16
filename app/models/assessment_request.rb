@@ -61,6 +61,7 @@ class AssessmentRequest < ActiveRecord::Base
   end
 
   scope :incomplete, -> { where(:workflow_state => 'assigned') }
+  scope :complete, -> { where(:workflow_state => 'completed') }
   scope :for_assessee, lambda { |user_id| where(:user_id => user_id) }
   scope :for_assessor, lambda { |assessor_id| where(:assessor_id => assessor_id) }
   scope :for_asset, lambda { |asset_id| where(:asset_id => asset_id)}

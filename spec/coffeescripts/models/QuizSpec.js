@@ -29,7 +29,7 @@ QUnit.module('Quiz', {
       id: 1,
       html_url: 'http://localhost:3000/courses/1/quizzes/24'
     })
-    this.ajaxStub = this.stub($, 'ajaxJSON')
+    this.ajaxStub = sandbox.stub($, 'ajaxJSON')
   },
   teardown() {}
 })
@@ -213,7 +213,7 @@ test('gets the due date for section instead of null', function() {
       }
     ]
   })
-  this.stub(quiz, 'multipleDueDates').returns(false)
+  sandbox.stub(quiz, 'multipleDueDates').returns(false)
   deepEqual(quiz.singleSectionDueDate(), dueAt.toISOString())
 })
 
@@ -286,7 +286,7 @@ test('includes singleSectionDueDate', function() {
       }
     ]
   })
-  this.stub(quiz, 'multipleDueDates').returns(false)
+  sandbox.stub(quiz, 'multipleDueDates').returns(false)
   const json = quiz.toView()
   equal(json.singleSectionDueDate, dueAt.toISOString())
 })

@@ -74,7 +74,7 @@ test('initializes equation editor plugin', function(assert) {
 
 test('initializes links plugin and renders dialog', function(assert) {
   const done = assert.async()
-  this.stub(Links)
+  sandbox.stub(Links)
   loadEventListeners({
     linksCB: () => {
       ok(Links.renderDialog.calledWithExactly(fakeEditor))

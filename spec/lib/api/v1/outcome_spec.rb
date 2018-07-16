@@ -78,6 +78,7 @@ RSpec.describe "Api::V1::Outcome" do
           expect(outcome['has_updateable_rubrics']).to eq(
             LearningOutcome.find(outcome['id']).updateable_rubrics?
           )
+          expect(outcome['ratings'].length).to eq 3
         end
       end
 

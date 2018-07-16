@@ -611,6 +611,44 @@ describe MasterCourses::MasterMigration do
       end
     end
 
+    it "copies links to account outcomes on rubrics" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+
+      run_master_migration
+
+      account = @copy_from.account
+      a_group = account.root_outcome_group
+      lo = account.created_learning_outcomes.create!({:title => 'new outcome'})
+
+      root = @copy_from.root_outcome_group
+      log = @copy_from.learning_outcome_groups.create!(:title => "some group")
+      root.adopt_outcome_group(log)
+      tag = log.add_outcome(lo)
+
+      # don't automatically link in selective content but should still get copied because the rubric is copied
+      ContentTag.where(:id => tag).update_all(:updated_at => 5.minutes.ago)
+
+      rub = Rubric.new(:context => @copy_from)
+      rub.data = [
+        {
+          :points => 3,
+          :description => "Outcome row",
+          :id => 1,
+          :ratings => [{:points => 3,:description => "Rockin'",:criterion_id => 1,:id => 2}],
+          :learning_outcome_id => lo.id
+        }
+      ]
+      rub.save!
+      rub.associate_with(@copy_from, @copy_from)
+      Rubric.where(:id => rub.id).update_all(:updated_at => 5.minute.from_now)
+
+      run_master_migration
+
+      rub_to = @copy_to.rubrics.first
+      expect(rub_to.data.first["learning_outcome_id"]).to eq lo.id
+    end
+
     it "doesn't restore deleted associated files unless relocked" do
       @copy_to = course_factory
       @template.add_child_course!(@copy_to)
@@ -1032,14 +1070,23 @@ describe MasterCourses::MasterMigration do
       @sub = @template.add_child_course!(@copy_to)
 
       @copy_from.tab_configuration = [{"id"=>0}, {"id"=>14}, {"id"=>8}, {"id"=>5}, {"id"=>6}, {"id"=>2}, {"id"=>3, "hidden"=>true}]
+      @copy_from.start_at = 1.month.ago.beginning_of_day
+      @copy_from.conclude_at = 1.month.from_now.beginning_of_day
+      @copy_from.restrict_enrollments_to_course_dates = true
       @copy_from.save!
       run_master_migration(:copy_settings => false) # initial sync with explicit false
       expect(@copy_to.reload.tab_configuration).to_not eq @copy_from.tab_configuration
+      expect(@copy_to.start_at).to be_nil
+      expect(@copy_to.conclude_at).to be_nil
+      expect(@copy_to.restrict_enrollments_to_course_dates).to be_falsy
 
       @copy_to2 = course_factory
       @sub = @template.add_child_course!(@copy_to2)
       run_master_migration # initial sync by default
       expect(@copy_to2.reload.tab_configuration).to eq @copy_from.tab_configuration
+      expect(@copy_to2.start_at).to eq @copy_from.start_at
+      expect(@copy_to2.conclude_at).to eq @copy_from.conclude_at
+      expect(@copy_to2.restrict_enrollments_to_course_dates).to be_truthy
 
       @copy_from.update_attribute(:is_public, true)
       run_master_migration # selective without settings
@@ -1047,6 +1094,9 @@ describe MasterCourses::MasterMigration do
 
       run_master_migration(:copy_settings => true) # selective with settings
       expect(@copy_to.reload.is_public).to be_truthy
+      expect(@copy_to.start_at).to eq @copy_from.start_at
+      expect(@copy_to.conclude_at).to eq @copy_from.conclude_at
+      expect(@copy_to.restrict_enrollments_to_course_dates).to be_truthy
     end
 
     it "should copy front wiki pages" do

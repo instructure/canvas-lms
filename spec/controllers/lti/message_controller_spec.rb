@@ -45,7 +45,7 @@ module Lti
           course_with_teacher_logged_in(:active_all => true)
           course = @course
           post 'registration', params: {course_id: course.id, tool_consumer_url: 'http://tool.consumer.url'}
-          expect(response).to be_success
+          expect(response).to be_successful
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.resource_url).to eq 'http://tool.consumer.url'
           launch_params = lti_launch.params

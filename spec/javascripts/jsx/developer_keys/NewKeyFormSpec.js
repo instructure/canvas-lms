@@ -19,6 +19,7 @@
 import React from 'react'
 import TestUtils from 'react-addons-test-utils'
 import DeveloperKeyFormFields from 'jsx/developer_keys/NewKeyForm'
+import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('NewKeyForm')
 
@@ -38,69 +39,72 @@ const developerKey = {
   user_id: '53532',
   user_name: 'billy bob',
   vendor_code: 'b3w9w9bf',
-  workflow_state: 'active'
+  workflow_state: 'active',
+  test_cluster_only: true
 }
 
-function formFieldInputs(devKey) {
+function formFieldOfTypeAndName(devKey, fieldType, name) {
   const component = TestUtils.renderIntoDocument(
     <DeveloperKeyFormFields
       availableScopes={{}}
       availableScopesPending={false}
       developerKey={devKey}
-      store={ {dispatch: () => {}} }
+      dispatch={ () => {} }
+      listDeveloperKeyScopesSet={ () => {} }
     />
   )
-  return TestUtils.scryRenderedDOMComponentsWithTag(component, 'input')
-}
-
-function formFieldTextAreas(devKey) {
-  const component = TestUtils.renderIntoDocument(
-    <DeveloperKeyFormFields
-      availableScopes={{}}
-      availableScopesPending={false}
-      developerKey={devKey}
-      store={ {dispatch: () => {}} }
-    />
-  )
-  return TestUtils.scryRenderedDOMComponentsWithTag(component, 'textarea')
+  return TestUtils.scryRenderedDOMComponentsWithTag(component, fieldType).
+    find((elem) => elem.name == `developer_key[${name}]`);
 }
 
 test('populates the key name', () => {
-  const [input] = formFieldInputs(developerKey)
+  const input = formFieldOfTypeAndName(developerKey, 'input', 'name')
   equal(input.value, developerKey.name)
 })
 
 test('defaults name to "Unnamed Tool"', () => {
-  const [input] = formFieldInputs({id: 123})
+  const input = formFieldOfTypeAndName({id: 123}, 'input', 'name')
   equal(input.value, 'Unnamed Tool')
 })
 
 test('populates the key owner email', () => {
-  const [, input] = formFieldInputs(developerKey)
+  const input = formFieldOfTypeAndName(developerKey, 'input', 'email')
   equal(input.value, developerKey.email)
 })
 
 test('populates the key legacy redirect uri', () => {
-  const [, , input] = formFieldInputs(developerKey)
+  const input = formFieldOfTypeAndName(developerKey, 'input', 'redirect_uri')
   equal(input.value, developerKey.redirect_uri)
 })
 
 test('populates the key redirect uris', () => {
-  const [input] = formFieldTextAreas(developerKey)
-  equal(input.value, developerKey.redirect_uris)
+  const textarea = formFieldOfTypeAndName(developerKey, 'textarea', 'redirect_uris')
+  equal(textarea.value, developerKey.redirect_uris)
 })
 
 test('populates the key vendor code', () => {
-  const [, , , input] = formFieldInputs(developerKey)
+  const input = formFieldOfTypeAndName(developerKey, 'input', 'vendor_code')
   equal(input.value, developerKey.vendor_code)
 })
 
 test('populates the key icon URL', () => {
-  const [, , , , input] = formFieldInputs(developerKey)
+  const input = formFieldOfTypeAndName(developerKey, 'input', 'icon_url')
   equal(input.value, developerKey.icon_url)
 })
 
 test('populates the key notes', () => {
-  const [, input] = formFieldTextAreas(developerKey)
-  equal(input.value, developerKey.notes)
+  const textarea = formFieldOfTypeAndName(developerKey, 'textarea', 'notes')
+  equal(textarea.value, developerKey.notes)
+})
+
+test('does not populates the key test_cluster_only without ENV set', () => {
+  const input = formFieldOfTypeAndName(developerKey, 'input', 'test_cluster_only')
+  equal(input, undefined)
+})
+
+test('populates the key test_cluster_only', () => {
+  fakeENV.setup({ enableTestClusterChecks: true })
+  const input = formFieldOfTypeAndName(developerKey, 'input', 'test_cluster_only')
+  equal(input.defaultChecked, developerKey.test_cluster_only)
+  fakeENV.teardown()
 })

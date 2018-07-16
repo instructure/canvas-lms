@@ -22,8 +22,8 @@ import I18n from 'i18n!gradebook'
 import './jquery.instructure_date_and_time'
 import './jquery.instructure_misc_helpers'
 
-export function setupIsAnonymous ({anonymous_grading}) {
-  return anonymous_grading
+export function setupIsAnonymous ({anonymize_students}) {
+  return anonymize_students
 }
 
 export function setupAnonymizableId (isAnonymous) {
@@ -41,6 +41,7 @@ export function setupAnonymizableUserId (isAnonymous) {
 export function setupAnonymizableAuthorId (isAnonymous) {
   return isAnonymous ? 'anonymous_id' : 'author_id'
 }
+
 
   const speedgraderHelpers = {
     urlContainer: function(submission, defaultEl, originalityReportEl) {
@@ -159,12 +160,16 @@ export function setupAnonymizableAuthorId (isAnonymous) {
       $(event.target).attr('disabled', true).text(I18n.t('turnitin.resubmitting', 'Resubmitting...'));
 
       $.ajaxJSON(resubmitUrl, "POST", {}, () => {
-        window.location.reload();
+        speedgraderHelpers.reloadPage();
       });
     },
 
     plagiarismResubmitUrl (submission, anonymizableUserId) {
       return $.replaceTags($('#assignment_submission_resubmit_to_turnitin_url').attr('href'), { user_id: submission[anonymizableUserId] })
+    },
+
+    reloadPage() {
+      window.location.reload();
     },
 
     setupIsAnonymous,

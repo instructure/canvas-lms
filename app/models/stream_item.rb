@@ -115,6 +115,7 @@ class StreamItem < ActiveRecord::Base
 
   def prepare_conversation(conversation)
     res = conversation.attributes.slice('id', 'has_attachments', 'updated_at')
+    res['title'] = conversation.subject
     res['private'] = conversation.private?
     res['participant_count'] = conversation.conversation_participants.size
     # arbitrary limit. would be nice to say "John, Jane, Michael, and 6

@@ -26,6 +26,7 @@ import {findFlyoutMenuContent, findMenuItem} from './columnHeaderHelpers'
 
 function createAssignmentProp ({ assignment } = {}) {
   return {
+    anonymizeStudents: false,
     courseId: '42',
     htmlUrl: 'http://assignment_htmlUrl',
     id: '1',
@@ -145,9 +146,9 @@ QUnit.module('AssignmentColumnHeader', {
   setup () {
     this.props = defaultProps({
       props: {
-        addGradebookElement: this.stub(),
-        removeGradebookElement: this.stub(),
-        onMenuDismiss: this.stub()
+        addGradebookElement: sinon.stub(),
+        removeGradebookElement: sinon.stub(),
+        onMenuDismiss: sinon.stub()
       }
     });
     this.wrapper = mountComponent(this.props);
@@ -361,17 +362,17 @@ test('does not select "Grade - Low to High" when isSortColumn is false', functio
 });
 
 test('clicking "Grade - Low to High" calls onSortByGradeAscending', function () {
-  const onSortByGradeAscending = this.stub();
+  const onSortByGradeAscending = sinon.stub();
   const props = defaultProps({ sortBySetting: { onSortByGradeAscending } });
   findMenuItem.call(this, props, 'Sort by', 'Grade - Low to High').simulate('click');
   strictEqual(onSortByGradeAscending.callCount, 1);
 });
 
 test('clicking "Grade - Low to High" focuses menu trigger', function () {
-  const onSortByGradeAscending = this.stub();
+  const onSortByGradeAscending = sinon.stub();
   const props = defaultProps({ sortBySetting: { onSortByGradeAscending } });
   const menuItem = findMenuItem.call(this, props, 'Sort by', 'Grade - Low to High');
-  const focusStub = this.stub(this.wrapper.instance(), 'focusAtEnd')
+  const focusStub = sandbox.stub(this.wrapper.instance(), 'focusAtEnd')
 
   menuItem.simulate('click');
 
@@ -397,17 +398,17 @@ test('does not select "Grade - High to Low" when isSortColumn is false', functio
 });
 
 test('clicking "Grade - High to Low" calls onSortByGradeDescending', function () {
-  const onSortByGradeDescending = this.stub();
+  const onSortByGradeDescending = sinon.stub();
   const props = defaultProps({ sortBySetting: { onSortByGradeDescending } });
   findMenuItem.call(this, props, 'Sort by', 'Grade - High to Low').simulate('click');
   strictEqual(onSortByGradeDescending.callCount, 1);
 });
 
 test('clicking "Grade - High to Low" focuses menu trigger', function () {
-  const onSortByGradeDescending = this.stub();
+  const onSortByGradeDescending = sinon.stub();
   const props = defaultProps({ sortBySetting: { onSortByGradeDescending } });
   const menuItem = findMenuItem.call(this, props, 'Sort by', 'Grade - High to Low');
-  const focusStub = this.stub(this.wrapper.instance(), 'focusAtEnd')
+  const focusStub = sandbox.stub(this.wrapper.instance(), 'focusAtEnd')
 
   menuItem.simulate('click');
 
@@ -433,17 +434,17 @@ test('does not select "Missing" when isSortColumn is false', function () {
 });
 
 test('clicking "Missing" calls onSortByMissing', function () {
-  const onSortByMissing = this.stub();
+  const onSortByMissing = sinon.stub();
   const props = defaultProps({ sortBySetting: { onSortByMissing } });
   findMenuItem.call(this, props, 'Sort by', 'Missing').simulate('click');
   strictEqual(onSortByMissing.callCount, 1);
 });
 
 test('clicking "Missing" focuses menu trigger', function () {
-  const onSortByMissing = this.stub();
+  const onSortByMissing = sinon.stub();
   const props = defaultProps({ sortBySetting: { onSortByMissing } });
   const menuItem = findMenuItem.call(this, props, 'Sort by', 'Missing');
-  const focusStub = this.stub(this.wrapper.instance(), 'focusAtEnd')
+  const focusStub = sandbox.stub(this.wrapper.instance(), 'focusAtEnd')
 
   menuItem.simulate('click');
 
@@ -469,17 +470,17 @@ test('does not select "Late" when isSortColumn is false', function () {
 });
 
 test('clicking "Late" calls onSortByLate', function () {
-  const onSortByLate = this.stub();
+  const onSortByLate = sinon.stub();
   const props = defaultProps({ sortBySetting: { onSortByLate } });
   findMenuItem.call(this, props, 'Sort by', 'Late').simulate('click');
   strictEqual(onSortByLate.callCount, 1);
 });
 
 test('clicking "Late" focuses menu trigger', function () {
-  const onSortByLate = this.stub();
+  const onSortByLate = sinon.stub();
   const props = defaultProps({ sortBySetting: { onSortByLate } });
   const menuItem = findMenuItem.call(this, props, 'Sort by', 'Late');
-  const focusStub = this.stub(this.wrapper.instance(), 'focusAtEnd')
+  const focusStub = sandbox.stub(this.wrapper.instance(), 'focusAtEnd')
 
   menuItem.simulate('click');
 
@@ -505,17 +506,17 @@ test('does not select "Unposted" when isSortColumn is false', function () {
 });
 
 test('clicking "Unposted" calls onSortByUnposted', function () {
-  const onSortByUnposted = this.stub();
+  const onSortByUnposted = sinon.stub();
   const props = defaultProps({ sortBySetting: { onSortByUnposted } });
   findMenuItem.call(this, props, 'Sort by', 'Unposted').simulate('click');
   strictEqual(onSortByUnposted.callCount, 1);
 });
 
 test('clicking "Unposted" focuses menu trigger', function () {
-  const onSortByUnposted = this.stub();
+  const onSortByUnposted = sinon.stub();
   const props = defaultProps({ sortBySetting: { onSortByUnposted } });
   const menuItem = findMenuItem.call(this, props, 'Sort by', 'Unposted');
-  const focusStub = this.stub(this.wrapper.instance(), 'focusAtEnd')
+  const focusStub = sandbox.stub(this.wrapper.instance(), 'focusAtEnd')
 
   menuItem.simulate('click');
 
@@ -561,7 +562,7 @@ test('Curve Grades menu item is enabled when isDisabled is false', function () {
 });
 
 test('clicking the menu item invokes onSelect with correct callback', function () {
-  const onSelect = this.stub();
+  const onSelect = sinon.stub();
   const props = defaultProps({ curveGradesAction: { onSelect } });
   this.wrapper = mountAndOpenOptions(props);
   const menuItem = document.querySelector('[data-menu-item-id="curve-grades"]');
@@ -627,7 +628,7 @@ test('disables the menu item when submissions are not loaded', function () {
 
 test('clicking the menu item invokes the Message Students Who dialog with correct callback', function () {
   this.wrapper = mountAndOpenOptions(this.props);
-  const messageStudents = this.stub(window, 'messageStudents');
+  const messageStudents = sandbox.stub(window, 'messageStudents');
   const menuItem = document.querySelector('[data-menu-item-id="message-students-who"]');
 
   menuItem.click();
@@ -675,7 +676,7 @@ test('disables the option when prop muteAssignmentAction.disabled is truthy', fu
 });
 
 test('clicking the menu item invokes onSelect with correct callback', function () {
-  this.props.muteAssignmentAction.onSelect = this.stub();
+  this.props.muteAssignmentAction.onSelect = sinon.stub();
   this.wrapper = mountAndOpenOptions(this.props);
 
   const specificMenuItem = document.querySelector('[data-menu-item-id="assignment-muter"]');
@@ -738,14 +739,14 @@ QUnit.module('AssignmentColumnHeader: non-standard assignment', function (hooks)
 
   test('renders an unpublished status when the assignment is unpublished and anonymously graded', function () {
     props.assignment.published = false;
-    props.assignment.anonymousGrading = true;
+    props.assignment.anonymizeStudents = true;
     wrapper = mountComponent(props);
     const secondaryDetail = wrapper.find('.Gradebook__ColumnHeaderDetail--secondary');
     strictEqual(secondaryDetail.text(), 'Unpublished');
   });
 
   test('renders an anonymous status when the assignment is anonymously graded', function() {
-    props.assignment.anonymousGrading = true;
+    props.assignment.anonymizeStudents = true;
     wrapper = mountComponent(props);
     const secondaryDetail = wrapper.find('.Gradebook__ColumnHeaderDetail--secondary');
     strictEqual(secondaryDetail.text(), 'Anonymous');
@@ -797,7 +798,7 @@ test('disables the menu item when the disabled prop is true', function () {
 });
 
 test('clicking the menu item invokes onSelect with correct callback', function () {
-  this.props.setDefaultGradeAction.onSelect = this.stub();
+  this.props.setDefaultGradeAction.onSelect = sinon.stub();
   this.wrapper = mountAndOpenOptions(this.props);
 
   const specificMenuItem = document.querySelector('[data-menu-item-id="set-default-grade"]');
@@ -854,7 +855,7 @@ test('does not render the menu item when the hidden prop is true', function () {
 });
 
 test('clicking the menu item invokes onSelect with correct callback', function () {
-  this.props.downloadSubmissionsAction.onSelect = this.stub();
+  this.props.downloadSubmissionsAction.onSelect = sinon.stub();
   this.wrapper = mountAndOpenOptions(this.props);
 
   const specificMenuItem = document.querySelector('[data-menu-item-id="download-submissions"]');
@@ -893,7 +894,7 @@ test('does not render the menu item when the hidden prop is true', function () {
 });
 
 test('clicking the menu item invokes the onSelect property with correct callback', function () {
-  this.props.reuploadSubmissionsAction.onSelect = this.stub();
+  this.props.reuploadSubmissionsAction.onSelect = sinon.stub();
   this.wrapper = mountAndOpenOptions(this.props);
 
   const specificMenuItem = document.querySelector('[data-menu-item-id="reupload-submissions"]');

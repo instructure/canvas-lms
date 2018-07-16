@@ -61,6 +61,7 @@ define [
   'jsx/gradebook/shared/helpers/assignmentHelper'
   '../api/gradingPeriodsApi'
   '../api/gradingPeriodSetsApi'
+  '../../jsx/gradebook/shared/helpers/GradeCalculationHelper'
   'jst/_avatar' #needed by row_student_name
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
@@ -83,7 +84,7 @@ define [
   AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell,
   GradebookHeaderMenu, NumberCompare, natcompare, htmlEscape, PostGradesStore, PostGradesApp, SubmissionStateMap,
   ColumnHeaderTemplate, GroupTotalCellTemplate, RowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView,
-  GradebookKeyboardNav, assignmentHelper, GradingPeriodsApi, GradingPeriodSetsApi
+  GradebookKeyboardNav, assignmentHelper, GradingPeriodsApi, GradingPeriodSetsApi, {scoreToPercentage}
 ) ->
   # This class both creates the slickgrid instance, and acts as the data source for that instance.
   class Gradebook
@@ -318,7 +319,6 @@ define [
           assignment.assignment_group = group
           assignment.due_at = tz.parse(assignment.due_at)
           assignment.moderation_in_progress = assignment.moderated_grading and !assignment.grades_published
-          assignment.hide_grades_when_muted = assignment.anonymous_grading
           @updateAssignmentEffectiveDueDates(assignment)
           @assignments[assignment.id] = assignment
 
@@ -560,12 +560,17 @@ define [
       matchingSection and matchingFilter
 
     handleAssignmentMutingChange: (assignment) =>
+      gradebookAssignment = @assignments[assignment.id]
+      gradebookAssignment.anonymize_students = assignment.anonymize_students
+      gradebookAssignment.muted = assignment.muted
       idx = @grid.getColumnIndex("assignment_#{assignment.id}")
       colDef = @grid.getColumns()[idx]
       colDef.name = @assignmentHeaderHtml(assignment)
       @grid.setColumns(@grid.getColumns())
       @fixColumnReordering()
       @buildRows()
+      allStudents = Object.values(@students).concat(Object.values(@studentViewStudents))
+      @setupGrading(allStudents)
 
     handleAssignmentGroupWeightChange: (assignment_group_options) =>
       columns = @grid.getColumns()
@@ -722,7 +727,7 @@ define [
 
           if !assignment?
             @staticCellFormatter(row, col, '')
-          else if assignment.hide_grades_when_muted and assignment.muted
+          else if assignment.anonymize_students
             @lockedAndHiddenGradeCellFormatter(row, col, 'anonymous')
           else if submission.workflow_state == 'pending_review'
            (SubmissionCell[assignment.grading_type] || SubmissionCell).formatter(row, col, submission, assignment, student, formatterOpts)
@@ -774,7 +779,7 @@ define [
       val
 
     calculateAndRoundGroupTotalScore: (score, possible_points) ->
-      grade = (score / possible_points) * 100
+      grade = scoreToPercentage(score, possible_points)
       round(grade, round.DEFAULT)
 
     submissionsForStudent: (student) =>

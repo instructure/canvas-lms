@@ -28,8 +28,8 @@ define [
   originalGradingStandard = null
   groupScores =
     assignment_group_1:
-      possible: 1000.111
-      score: 85.115
+      possible: 1000
+      score: 946.65
       submission_count: 10
       submissions: []
       weight: 90
@@ -76,19 +76,20 @@ define [
     deepEqual @component.get('values'), groupScores.assignment_group_1
 
   test 'points', ->
-    expected = "85.12 / 1,000.11"
+    expected = "946.65 / 1,000"
     equal @component.get('points'), expected
 
   test 'percent', ->
-    expected = "8.51%"
-    equal @component.get('percent'), expected
+    expected = "94.67%"
+    strictEqual(946.65/1000 * 100, 94.66499999999999)
+    strictEqual @component.get('percent'), expected
 
   test 'letterGrade', ->
-    expected = "C"
+    expected = "A"
     equal @component.get('letterGrade'), expected
 
   test 'scoreDetail', ->
-    expected = "(85.12 / 1,000.11)"
+    expected = "(946.65 / 1,000)"
     equal @component.get('scoreDetail'), expected
 
   QUnit.module 'assignment_subtotal_grades_component by period',

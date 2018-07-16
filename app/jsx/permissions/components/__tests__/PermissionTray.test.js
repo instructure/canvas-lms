@@ -72,3 +72,11 @@ it('renders unassigned roles if any are present', () => {
   expect(node.exists()).toBeTruthy()
   expect(node.props().title).toEqual('Unassigned Roles')
 })
+
+it('renders details toggles for permissions if any are present', () => {
+  const props = makeDefaultProps()
+  props.permissionName = 'manage_account_settings'
+  const tree = shallow(<PermissionTray {...props} />)
+  const node = tree.find('DetailsToggle')
+  expect(node.exists()).toBeTruthy()
+})

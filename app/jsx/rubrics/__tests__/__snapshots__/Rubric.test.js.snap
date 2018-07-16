@@ -1,14 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`the Rubric component hides the score total when needed 1`] = `
-"<div className=\\"react-rubric\\">
+"<div className=\\"react-rubric\\" style={{...}}>
   <Table caption=\\"Point Rubric\\" hover={false} size=\\"medium\\">
     <thead>
       <tr>
-        <th scope=\\"col\\">
+        <th scope=\\"col\\" className={[undefined]}>
           Criteria
         </th>
-        <th scope=\\"col\\">
+        <th scope=\\"col\\" className=\\"ratings\\">
           Ratings
         </th>
         <th scope=\\"col\\">
@@ -25,14 +25,14 @@ exports[`the Rubric component hides the score total when needed 1`] = `
 `;
 
 exports[`the Rubric component renders as expected 1`] = `
-"<div className=\\"react-rubric\\">
+"<div className=\\"react-rubric\\" style={{...}}>
   <Table caption=\\"Point Rubric\\" hover={false} size=\\"medium\\">
     <thead>
       <tr>
-        <th scope=\\"col\\">
+        <th scope=\\"col\\" className={[undefined]}>
           Criteria
         </th>
-        <th scope=\\"col\\">
+        <th scope=\\"col\\" className=\\"ratings\\">
           Ratings
         </th>
         <th scope=\\"col\\">
@@ -58,14 +58,14 @@ exports[`the Rubric component renders as expected 1`] = `
 `;
 
 exports[`the Rubric component renders properly with no assessment 1`] = `
-"<div className=\\"react-rubric\\">
+"<div className=\\"react-rubric\\" style={{...}}>
   <Table caption=\\"Point Rubric\\" hover={false} size=\\"medium\\">
     <thead>
       <tr>
-        <th scope=\\"col\\">
+        <th scope=\\"col\\" className={[undefined]}>
           Criteria
         </th>
-        <th scope=\\"col\\">
+        <th scope=\\"col\\" className=\\"ratings\\">
           Ratings
         </th>
         <th scope=\\"col\\">
@@ -91,14 +91,14 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
 `;
 
 exports[`the Rubric component updates the total score when an individual criterion point assessment changes 1`] = `
-"<div className=\\"react-rubric\\">
+"<div className=\\"react-rubric\\" style={{...}}>
   <Table caption=\\"Point Rubric\\" hover={false} size=\\"medium\\">
     <thead>
       <tr>
-        <th scope=\\"col\\">
+        <th scope=\\"col\\" className={[undefined]}>
           Criteria
         </th>
-        <th scope=\\"col\\">
+        <th scope=\\"col\\" className=\\"ratings\\">
           Ratings
         </th>
         <th scope=\\"col\\">

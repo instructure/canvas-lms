@@ -49,7 +49,8 @@ const developerKey = {
   user_id: '53532',
   user_name: 'billy bob',
   vendor_code: 'b3w9w9bf',
-  workflow_state: 'active'
+  workflow_state: 'active',
+  test_cluster_only: false
 }
 
 const createDeveloperKeyState = {
@@ -347,6 +348,7 @@ test('it sends the contents of the form saving', () => {
   equal(sentFormData.get('developer_key[icon_url]'), developerKey.icon_url)
   equal(sentFormData.get('developer_key[notes]'), developerKey.notes)
   equal(sentFormData.get('developer_key[require_scopes]'), 'true')
+  equal(sentFormData.get('developer_key[test_cluster_only]'), 'false')
 
   wrapper.unmount()
 })

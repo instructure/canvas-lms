@@ -20,7 +20,7 @@ module RuboCop
     module Migration
       class RemoveColumn < Cop
         include RuboCop::Canvas::MigrationTags
-        MSG = "`remove_column` needs to be in a postdeploy migration"
+        MSG = "column removal needs to be in a postdeploy migration"
 
         def on_def(node)
           method_name, *_args = *node
@@ -35,16 +35,27 @@ module RuboCop
         def on_send(node)
           super
           _receiver, method_name, *_args = *node
+
           if remove_column_in_predeploy?(method_name)
-            add_offense(node, message: MSG, severity: :warning)
+            add_offense(node, message: MSG, severity: :error)
           end
         end
+
+        DISALLOWED_METHOD_NAMES = [
+          :remove,
+          :remove_column,
+          :remove_columns,
+          :remove_belongs_to,
+          :remove_reference,
+          :remove_references,
+          :remove_timestamps
+        ].freeze
 
         private
         def remove_column_in_predeploy?(method_name)
           tags.include?(:predeploy) &&
-            method_name == :remove_column &&
-            @current_def == :up
+            DISALLOWED_METHOD_NAMES.include?(method_name) &&
+            [:up, :change].include?(@current_def)
         end
       end
     end

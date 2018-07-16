@@ -21,6 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe SubmissionComment do
   before(:once) do
     course_with_teacher(:active_all => true)
+    course_with_observer(:active_all => true)
     student_in_course(:active_all => true)
     @assignment = @course.assignments.new(:title => "some assignment")
     @assignment.workflow_state = "published"
@@ -262,6 +263,13 @@ This text has a http://www.google.com link in it...
       comment = @submission.add_comment(:user => @teacher, :comment => "blah")
       reply = comment.reply_from(:user => @teacher, :text => "oops I meant blah")
       expect(reply.provisional_grade).to be_nil
+    end
+
+    it "should not create reply for observers" do
+      comment = @submission.add_comment(:user => @teacher, :comment => "blah")
+      expect {
+        comment.reply_from(:user => @observer, :text => "some reply")
+      }.to raise_error("Only comment participants may reply to messages")
     end
 
     it "should create reply in the same provisional grade" do

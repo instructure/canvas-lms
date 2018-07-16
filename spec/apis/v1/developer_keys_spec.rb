@@ -75,7 +75,31 @@ describe DeveloperKeysController, type: :request do
         format: 'json',
         account_id: sa_id.to_s
       })
+    end
 
+    it 'does not include `test_cluster_only` by default' do
+      admin_session
+      key = DeveloperKey.create!
+      json = api_call(:get, "/api/v1/accounts/#{sa_id}/developer_keys.json", {
+        controller: 'developer_keys',
+        action: 'index',
+        format: 'json',
+        account_id: sa_id.to_s
+      })
+      expect(json.first.keys).not_to be_include('test_cluster_only')
+    end
+
+    it 'does include `test_cluster_only` when enabled' do
+      Setting.set("dev_key_test_cluster_checks_enabled", true)
+      admin_session
+      key = DeveloperKey.create!
+      json = api_call(:get, "/api/v1/accounts/#{sa_id}/developer_keys.json", {
+        controller: 'developer_keys',
+        action: 'index',
+        format: 'json',
+        account_id: sa_id.to_s
+      })
+      expect(json.first.keys).to be_include('test_cluster_only')
     end
 
     describe 'developer key account bindings' do
@@ -240,7 +264,6 @@ describe DeveloperKeysController, type: :request do
     end
 
     expect(json.include?(key_to_hash(key))).to be true
-
   end
 
   def key_to_hash(key)

@@ -114,15 +114,15 @@ QUnit.module('SearchFormActions', function () {
 QUnit.module('SearchFormActions getGradebookHistory', {
   setup () {
     this.response = Fixtures.historyResponse();
-    this.getGradebookHistoryStub = this.stub(HistoryApi, 'getGradebookHistory')
+    this.getGradebookHistoryStub = sandbox.stub(HistoryApi, 'getGradebookHistory')
       .returns(Promise.resolve(this.response));
 
-    this.dispatchSpy = this.spy(GradebookHistoryStore, 'dispatch');
+    this.dispatchSpy = sandbox.spy(GradebookHistoryStore, 'dispatch');
   }
 });
 
 test('dispatches fetchHistoryStart', function () {
-  const fetchSpy = this.spy(HistoryActions, 'fetchHistoryStart');
+  const fetchSpy = sandbox.spy(HistoryActions, 'fetchHistoryStart');
   const promise = this.dispatchSpy(SearchFormActions.getGradebookHistory({}));
   return promise.then(() => {
     strictEqual(fetchSpy.callCount, 1);
@@ -130,7 +130,7 @@ test('dispatches fetchHistoryStart', function () {
 });
 
 test('dispatches fetchHistorySuccess on success', function () {
-  const fetchSpy = this.spy(HistoryActions, 'fetchHistorySuccess');
+  const fetchSpy = sandbox.spy(HistoryActions, 'fetchHistorySuccess');
   const promise = this.dispatchSpy(SearchFormActions.getGradebookHistory({}));
   return promise.then(() => {
     strictEqual(fetchSpy.callCount, 1);
@@ -141,7 +141,7 @@ test('dispatches fetchHistorySuccess on success', function () {
 
 test('dispatches fetchHistoryFailure on failure', function () {
   this.getGradebookHistoryStub.returns(Promise.reject(new Error('FAIL')));
-  const fetchSpy = this.spy(HistoryActions, 'fetchHistoryFailure');
+  const fetchSpy = sandbox.spy(HistoryActions, 'fetchHistoryFailure');
   const promise = this.dispatchSpy(SearchFormActions.getGradebookHistory({}));
   return promise.then(() => {
     strictEqual(fetchSpy.callCount, 1);
@@ -155,16 +155,16 @@ QUnit.module('SearchFormActions getSearchOptions', {
       headers: { link: 'http://example.com/link-to-next-page' }
     };
 
-    this.getUsersByNameStub = this.stub(UserApi, 'getUsersByName')
+    this.getUsersByNameStub = sandbox.stub(UserApi, 'getUsersByName')
       .returns(Promise.resolve(this.userResponse));
-    this.courseIsConcludedStub = this.stub(environment, 'courseIsConcluded');
+    this.courseIsConcludedStub = sandbox.stub(environment, 'courseIsConcluded');
 
-    this.dispatchSpy = this.spy(GradebookHistoryStore, 'dispatch');
+    this.dispatchSpy = sandbox.spy(GradebookHistoryStore, 'dispatch');
   }
 });
 
 test('dispatches fetchRecordsStart', function () {
-  const fetchSpy = this.spy(SearchFormActions, 'fetchRecordsStart');
+  const fetchSpy = sandbox.spy(SearchFormActions, 'fetchRecordsStart');
   const promise = this.dispatchSpy(SearchFormActions.getSearchOptions('assignments', '50 Page Essay'));
   return promise.then(() => {
     strictEqual(fetchSpy.callCount, 1);
@@ -172,7 +172,7 @@ test('dispatches fetchRecordsStart', function () {
 });
 
 test('dispatches fetchRecordsSuccess on success', function () {
-  const fetchSpy = this.spy(SearchFormActions, 'fetchRecordsSuccess');
+  const fetchSpy = sandbox.spy(SearchFormActions, 'fetchRecordsSuccess');
   const promise = this.dispatchSpy(SearchFormActions.getSearchOptions('graders', 'Norval'));
   return promise.then(() => {
     strictEqual(fetchSpy.callCount, 1);
@@ -183,7 +183,7 @@ test('dispatches fetchRecordsSuccess on success', function () {
 
 test('dispatches fetchRecordsFailure on failure', function () {
   this.getUsersByNameStub.returns(Promise.reject(new Error('FAIL')));
-  const fetchSpy = this.spy(SearchFormActions, 'fetchRecordsFailure');
+  const fetchSpy = sandbox.spy(SearchFormActions, 'fetchRecordsFailure');
   const promise = this.dispatchSpy(SearchFormActions.getSearchOptions('students', 'Norval'));
   return promise.then(() => {
     strictEqual(fetchSpy.callCount, 1);
@@ -194,7 +194,7 @@ test('calls getUsersByName with empty array for enrollmentStates if course is no
   this.courseIsConcludedStub.returns(false);
 
   UserApi.getUsersByName.restore();
-  const getUsersSpy = this.spy(UserApi, 'getUsersByName');
+  const getUsersSpy = sandbox.spy(UserApi, 'getUsersByName');
 
   const promise = this.dispatchSpy(SearchFormActions.getSearchOptions('students', 'Norval'));
   return promise.then(() => {
@@ -207,7 +207,7 @@ test('calls getUsersByName with enrollmentStates of ["completed"] if course is c
   this.courseIsConcludedStub.returns(true);
 
   UserApi.getUsersByName.restore();
-  const getUsersSpy = this.spy(UserApi, 'getUsersByName');
+  const getUsersSpy = sandbox.spy(UserApi, 'getUsersByName');
 
   const promise = this.dispatchSpy(SearchFormActions.getSearchOptions('students', 'Norval'));
   return promise.then(() => {

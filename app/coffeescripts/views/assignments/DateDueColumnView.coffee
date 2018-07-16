@@ -34,9 +34,13 @@ define [
         tooltipClass: 'center bottom vertical',
         content: -> $($(@).data('tooltipSelector')).html()
 
+    # has to handle both the discusson's model,
+    # and a graded discussion's child assignment model
     toJSON: ->
       data = @model.toView()
-      data.selector  = @model.get("id") + "_due"
-      data.linkHref  = @model.htmlUrl()
-      data.allDates  = @model.allDates()
+      m = @model.get('assignment') || @model
+
+      data.selector  = m.get("id") + "_due"
+      data.linkHref  = m.htmlUrl()
+      data.allDates  = m.allDates()
       data

@@ -24,7 +24,7 @@ import CourseActivitySummaryStore from 'jsx/dashboard_card/CourseActivitySummary
 
 QUnit.module('DashboardCardBox', {
   setup() {
-    this.stub(CourseActivitySummaryStore, 'getStateForCourse').returns({})
+    sandbox.stub(CourseActivitySummaryStore, 'getStateForCourse').returns({})
     this.courseCards = [
       {
         id: 1,

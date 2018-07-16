@@ -62,7 +62,7 @@ test('restored is set to false when initialized', function() {
 })
 
 test('render is called whenever the model has a change event triggered', function() {
-  this.mock(this.courseSearchResultsView)
+  sandbox.mock(this.courseSearchResultsView)
     .expects('render')
     .once()
   this.courseSearchResultsView.applyBindings()
@@ -71,7 +71,7 @@ test('render is called whenever the model has a change event triggered', functio
 
 test('pressing the restore button calls restore on the model and view', function() {
   this.courseRestore.set(courseJSON)
-  this.mock(this.courseRestore)
+  sandbox.mock(this.courseRestore)
     .expects('restore')
     .once()
     .returns($.Deferred().resolve())

@@ -5,7 +5,6 @@
   "dependencies": "These are all things that there is not an npm version of, so they have to stay here, even when using webpack",
   "dependencies": {
     "ember": "1.4.0",
-    "ember-qunit": "~0.1.7",
     "k5uploader": "0.0.3"
   }
 }

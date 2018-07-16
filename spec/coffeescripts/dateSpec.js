@@ -87,7 +87,7 @@ test('date.getUTCOffset', function() {
     for (const offset in examples) {
       const expectedResult = examples[offset]
       const date = new Date()
-      this.stub(date, 'getTimezoneOffset').returns(Number(offset))
+      sandbox.stub(date, 'getTimezoneOffset').returns(Number(offset))
       result.push(equal(date.getUTCOffset(), expectedResult))
     }
     return result

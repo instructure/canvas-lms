@@ -46,7 +46,7 @@ QUnit.module('Rce Abstraction - integration', {
         return renderCallback(fakeEditor)
       }
     }
-    return this.stub(RCELoader, 'loadRCE').callsFake(callback => callback(this.fakeRceModule))
+    return sandbox.stub(RCELoader, 'loadRCE').callsFake(callback => callback(this.fakeRceModule))
   },
   teardown() {
     fakeENV.teardown()

@@ -33,7 +33,7 @@ describe MediaTracksController do
       expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
       content = "one track mind"
       post 'create', params: {:media_object_id => @mo.media_id, :kind => 'subtitles', :locale => 'en', :content => content}
-      expect(response).to be_success
+      expect(response).to be_successful
       track = @mo.media_tracks.last
       expect(track.content).to eq content
     end
@@ -43,7 +43,7 @@ describe MediaTracksController do
     it "should show a track" do
       track = @mo.media_tracks.create!(kind: 'subtitles', locale: 'en', content: "subs")
       get 'show', params: {:media_object_id => @mo.media_id, :id => track.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(response.body).to eq track.content
     end
   end

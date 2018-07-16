@@ -48,7 +48,6 @@ function makeApiResponse (overrides = {}, assignmentOverrides = {}) {
     ignore: `/api/v1/users/self/todo/assignment_10/submitting?permanent=0`,
     ignore_permanently: `/api/v1/users/self/todo/assignment_10/submitting?permanent=1`,
     planner_override: null,
-    html_url: `/courses/1/assignments/10#submit`,
     plannable_type: 'assignment',
     plannable: makeAssignment(assignmentOverrides),
     submissions: false,
@@ -417,7 +416,6 @@ describe('transformApiToInternalItem', () => {
       plannable_type: 'calendar_event',
       plannable: makeCalendarEvent()
     });
-
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
     expect(result).toMatchSnapshot();
   });
@@ -495,6 +493,35 @@ describe('transformApiToInternalItem', () => {
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
     expect(result.feedback).toEqual('hello world');
   });
+
+  it('includes location and endTime if given', () => {
+    const apiResponse = makeApiResponse({
+      plannable_type: 'calendar_event',
+      plannable_date: "2018-01-12T05:00:00Z",
+      plannable: makeCalendarEvent({
+        end_at: "2018-01-12T07:00:00Z",
+        location_name: "A galaxy far far away",
+      })
+    });
+    const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
+    expect(result).toMatchSnapshot();
+  });
+
+  it('sets allDay properly', () => {
+    const apiResponse = makeApiResponse({
+      plannable_type: 'calendar_event',
+      plannable_date: "2018-01-12T05:00:00Z",
+      plannable: makeCalendarEvent({
+        all_day: true,
+      })
+    });
+    let result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
+    expect(result.allDay).toBeTruthy();
+
+    apiResponse.plannable.all_day = false;
+    result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
+    expect(result.allDay).toBeFalsy();
+  })
 });
 
 describe('transformInternalToApiItem', () => {

@@ -103,7 +103,8 @@ export default class AddTray extends Component {
     const newRole = this.state.selectedBaseType
     newRole.base_role_type =
       this.props.tab === COURSE ? newRole.base_role_type : 'AccountMembership'
-    this.props.createNewRole(this.state.selectedRoleName, newRole)
+    const context = this.props.tab === COURSE ? 'Course' : 'Account'
+    this.props.createNewRole(this.state.selectedRoleName, newRole, context)
   }
 
   isDoneSelecting = () => !!this.state.selectedRoleName

@@ -183,6 +183,9 @@ describe InstFS do
       let(:on_duplicate) { 'rename' }
       let(:include_param) { ['avatar'] }
       let(:capture_url) { 'http://canvas.host/api/v1/files/capture' }
+      let(:additional_capture_params) do
+        { additional_note: 'notefull' }
+      end
 
       let(:default_args) do
         {
@@ -197,7 +200,8 @@ describe InstFS do
           quota_exempt: quota_exempt,
           on_duplicate: on_duplicate,
           capture_url: capture_url,
-          include_param: include_param
+          include_param: include_param,
+          additional_capture_params: additional_capture_params,
         }
       end
 
@@ -271,8 +275,12 @@ describe InstFS do
             expect(capture_params['on_duplicate']).to eq on_duplicate
           end
 
-          it "include the inlcude options" do
+          it "include the include options" do
             expect(capture_params['include']).to eq include_param
+          end
+
+          it "include additional_capture_params" do
+            expect(capture_params).to include additional_capture_params
           end
         end
       end
@@ -385,18 +393,18 @@ describe InstFS do
 
     context "direct upload" do
       it "makes a network request to the inst-fs endpoint" do
-        uuid = "1234-abcd"
+        instfs_uuid = "1234-abcd"
         allow(CanvasHttp).to receive(:post).and_return(double(
           class: Net::HTTPCreated,
           code: 200,
-          body: {uuid: uuid}.to_json
+          body: {instfs_uuid: instfs_uuid}.to_json
         ))
 
         res = InstFS.direct_upload(
           file_name: "a.png",
           file_object: File.open("public/images/a.png")
         )
-        expect(res).to eq(uuid)
+        expect(res).to eq(instfs_uuid)
       end
     end
   end

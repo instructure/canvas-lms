@@ -22,23 +22,17 @@ import GradebookConstants from 'jsx/gradezilla/shared/constants'
 
 QUnit.module('GradebookHelpers#noErrorsOnPage', {
   setup() {
-    this.mockFind = this.mock($, 'find')
+    sandbox.stub($, 'find')
   }
 })
 
 test('noErrorsOnPage returns true when the dom has no errors', function() {
-  this.mockFind
-    .expects('find')
-    .once()
-    .returns([])
+  $.find.returns([])
   ok(GradebookHelpers.noErrorsOnPage())
 })
 
 test('noErrorsOnPage returns false when the dom contains errors', function() {
-  this.mockFind
-    .expects('find')
-    .once()
-    .returns(['dom element with error message'])
+  $.find.returns(['dom element with error message'])
   notOk(GradebookHelpers.noErrorsOnPage())
 })
 
@@ -52,7 +46,7 @@ test('textareaIsGreaterThanMaxLength is true at greater than the max allowed len
 
 QUnit.module('GradebookHelpers#maxLengthErrorShouldBeShown', {
   setup() {
-    this.mockFind = this.mock($, 'find')
+    sandbox.stub($, 'find')
   }
 })
 
@@ -60,10 +54,7 @@ test('maxLengthErrorShouldBeShown is false when text length is exactly the max a
   notOk(GradebookHelpers.maxLengthErrorShouldBeShown(GradebookConstants.MAX_NOTE_LENGTH)))
 
 test('maxLengthErrorShouldBeShown is false when there are DOM errors', function() {
-  this.mockFind
-    .expects('find')
-    .once()
-    .returns(['dom element with error message'])
+  $.find.returns(['dom element with error message'])
   notOk(GradebookHelpers.maxLengthErrorShouldBeShown(GradebookConstants.MAX_NOTE_LENGTH + 1))
 })
 
@@ -71,10 +62,7 @@ test(
   'maxLengthErrorShouldBeShown is true when text length is greater than' +
     'the max allowed length AND there are no DOM errors',
   function() {
-    this.mockFind
-      .expects('find')
-      .once()
-      .returns([])
+    $.find.returns([])
     ok(GradebookHelpers.maxLengthErrorShouldBeShown(GradebookConstants.MAX_NOTE_LENGTH + 1))
   }
 )

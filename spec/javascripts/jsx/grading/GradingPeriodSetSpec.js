@@ -107,8 +107,8 @@ define([
   QUnit.module('GradingPeriodSet', {
     renderComponent (opts = {}) {
       const attrs = _.extend({}, props, opts);
-      attrs.onDelete = this.stub();
-      attrs.onEdit = this.stub();
+      attrs.onDelete = sinon.stub();
+      attrs.onEdit = sinon.stub();
       let component;
       attrs.ref = (ref) => { component = ref };
       ReactDOM.render(React.createElement(GradingPeriodSet, attrs), wrapper);
@@ -117,7 +117,7 @@ define([
 
     stubDeleteSuccess () {
       const successPromise = Promise.resolve();
-      this.stub(axios, 'delete').returns(successPromise);
+      sandbox.stub(axios, 'delete').returns(successPromise);
       return successPromise;
     },
 
@@ -175,8 +175,8 @@ define([
   });
 
   test('does not delete the set if the user cancels the delete confirmation', function () {
-    this.stub(axios, 'delete');
-    this.stub(window, 'confirm').returns(false);
+    sandbox.stub(axios, 'delete');
+    sandbox.stub(window, 'confirm').returns(false);
     const set = this.renderComponent();
     set.refs.deleteButton.handleClick(new MouseEvent('click'));
     ok(set.props.onDelete.notCalled);
@@ -184,7 +184,7 @@ define([
 
   test('deletes the set if the user confirms deletion', function () {
     const deletePromise = this.stubDeleteSuccess();
-    this.stub(window, 'confirm').returns(true);
+    sandbox.stub(window, 'confirm').returns(true);
     const set = this.renderComponent();
     set.refs.deleteButton.handleClick(new MouseEvent('click'));
     return deletePromise.then(() => {
@@ -284,7 +284,7 @@ define([
 
   test('updates the given grading period in the set', function () {
     const success = Promise.resolve(examplePeriods);
-    this.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
+    sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
     const set = this.renderComponent();
     this.callOnSave(set);
     return success.then(() => {
@@ -294,7 +294,7 @@ define([
 
   test('ensures sorted grading periods', function () {
     const success = Promise.resolve(examplePeriods);
-    this.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
+    sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
     const set = this.renderComponent();
     this.callOnSave(set);
     return success.then(() => {
@@ -306,7 +306,7 @@ define([
 
   test('disables the "edit period form"', function () {
     const success = new Promise(() => {});
-    this.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
+    sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
     const set = this.renderComponent();
     this.callOnSave(set);
     assertDisabled(set.refs.addPeriodButton);
@@ -314,7 +314,7 @@ define([
 
   test('calls the onPeriodsChange prop upon completion', function () {
     const success = Promise.resolve(examplePeriods);
-    this.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
+    sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
     const spy = sinon.spy();
     const set = this.renderComponent({onPeriodsChange: spy});
     this.callOnSave(set);
@@ -327,7 +327,7 @@ define([
 
   test('removes the "edit period form" upon completion', function () {
     const success = Promise.resolve(examplePeriods);
-    this.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
+    sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
     const set = this.renderComponent();
     this.callOnSave(set);
     return success.then(() => {
@@ -337,7 +337,7 @@ define([
 
   test('focuses on the grading period "edit button" upon completion', function () {
     const success = Promise.resolve(examplePeriods);
-    this.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
+    sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
     const set = this.renderComponent();
     this.callOnSave(set);
     return success.then(() => {
@@ -347,7 +347,7 @@ define([
 
   test('re-enables all grading period actions upon completion', function () {
     const success = Promise.resolve(examplePeriods);
-    this.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
+    sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
     const set = this.renderComponent();
     this.callOnSave(set);
     return success.then(() => {
@@ -360,7 +360,7 @@ define([
 
   test('re-enables set toggling upon completion', function () {
     const success = Promise.resolve(examplePeriods);
-    this.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
+    sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
     const spy = sinon.spy();
     const set = this.renderComponent({ onToggleBody: spy });
     this.callOnSave(set);
@@ -373,7 +373,7 @@ define([
   QUnit.module('GradingPeriodSet "Edit Grading Period - validations"', {
     stubUpdate () {
       const failure = Promise.reject(new Error('FAIL'));
-      this.stub(gradingPeriodsApi, 'batchUpdate').returns(failure);
+      sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(failure);
     },
 
     renderComponent () {
@@ -649,7 +649,7 @@ define([
   test('adds the given grading period to the set', function () {
     const allPeriods = examplePeriods.concat([examplePeriod]);
     const success = Promise.resolve(allPeriods);
-    this.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
+    sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
     const set = this.renderComponent();
     this.callOnSave(set);
     return success.then(() => {
@@ -660,7 +660,7 @@ define([
   test('ensures sorted grading periods', function () {
     const allPeriods = examplePeriods.concat([examplePeriod]);
     const success = Promise.resolve(allPeriods);
-    this.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
+    sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
     const set = this.renderComponent();
     this.callOnSave(set);
     return success.then(() => {
@@ -672,7 +672,7 @@ define([
 
   test('disables the "new period form"', function () {
     const success = new Promise(() => {});
-    this.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
+    sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
     const set = this.renderComponent();
     this.callOnSave(set);
     ok(set.refs.newPeriodForm.props.disabled);
@@ -680,7 +680,7 @@ define([
 
   test('calls the onPeriodsChange prop upon completion', function () {
     const success = Promise.resolve(examplePeriods);
-    this.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
+    sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
     const spy = sinon.spy();
     const set = this.renderComponent({onPeriodsChange: spy});
     this.callOnSave(set);
@@ -693,7 +693,7 @@ define([
 
   test('removes the "new period form" upon completion', function () {
     const success = Promise.resolve(examplePeriods);
-    this.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
+    sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
     const set = this.renderComponent();
     this.callOnSave(set);
     return success.then(() => {
@@ -703,7 +703,7 @@ define([
 
   test('re-enables all grading period actions upon completion', function () {
     const success = Promise.resolve(examplePeriods);
-    this.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
+    sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success);
     const set = this.renderComponent();
     this.callOnSave(set);
     return success.then(() => {
@@ -717,7 +717,7 @@ define([
   QUnit.module('GradingPeriodSet "New Grading Period - validations"', {
     stubUpdate () {
       const failure = Promise.reject(new Error('FAIL'));
-      this.stub(gradingPeriodsApi, 'batchUpdate').returns(failure);
+      sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(failure);
     },
 
     renderComponent () {

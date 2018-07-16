@@ -24,19 +24,24 @@ class RollupScore
   def initialize(outcome_results, opts={})
     @outcome_results = outcome_results
     @aggregate = opts[:aggregate_score]
+    @median = opts[:aggregate_stat] == 'median'
     @outcome = @outcome_results.first.learning_outcome
     @count = @outcome_results.size
     @points_possible = @outcome.rubric_criterion[:points_possible]
     @mastery_points = @outcome.rubric_criterion[:mastery_points]
     @calculation_method = @outcome.calculation_method || "highest"
     @calculation_int = @outcome.calculation_int
-    score_set = @aggregate ? aggregate_score : calculate_results
+    score_set = if @aggregate
+                  @median ? median_aggregate_score : aggregate_score
+                else
+                  calculate_results
+    end
     @score = score_set[:score] if score_set
     @hide_points = score_set[:results].all?(&:hide_points) if score_set
     latest_result unless @aggregate
   end
 
-  # TODO - do send(@calculation_method) instead of the case to streamline this more
+  # TODO: do send(@calculation_method) instead of the case to streamline this more
   def calculate_results
     # decaying average is default for new outcomes
     case @calculation_method

@@ -318,7 +318,7 @@ class ContentExport < ActiveRecord::Base
     return false unless obj
     return true unless selective_export?
 
-    return master_migration.export_object?(obj) if for_master_migration?
+    return true if for_master_migration? && master_migration.export_object?(obj) # fallback to selected_content otherwise
 
     # because Announcement.table_name == 'discussion_topics'
     if obj.is_a?(Announcement)
@@ -349,7 +349,7 @@ class ContentExport < ActiveRecord::Base
 
   def add_item_to_export(obj, type=nil)
     return unless obj && (type || obj.class.respond_to?(:table_name))
-    return unless selective_export? && !for_master_migration?
+    return unless selective_export?
 
     asset_type = type || obj.class.table_name
     selected_content[asset_type] ||= {}

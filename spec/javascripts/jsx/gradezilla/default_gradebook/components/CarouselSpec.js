@@ -72,14 +72,14 @@ test('renders right arrow when displayRightArrow is true', function () {
 });
 
 test('calls onLeftArrowClick when left arrow is clicked', function () {
-  const onLeftArrowClick = this.stub();
+  const onLeftArrowClick = sinon.stub();
   this.wrapper = mountComponent({ displayLeftArrow: true, onLeftArrowClick });
   this.wrapper.find('.left-arrow-button-container button').simulate('click');
   strictEqual(onLeftArrowClick.callCount, 1);
 });
 
 test('calls onRightArrowClick when right arrow is clicked', function () {
-  const onRightArrowClick = this.stub();
+  const onRightArrowClick = sinon.stub();
   this.wrapper = mountComponent({ displayRightArrow: true, onRightArrowClick });
   this.wrapper.find('.right-arrow-button-container button').simulate('click');
   strictEqual(onRightArrowClick.callCount, 1);

@@ -35,7 +35,7 @@ describe WikiPagesController do
       front_page = @course.wiki_pages.create!(title: "ponies4ever")
       @wiki.set_front_page_url!(front_page.url)
       get 'front_page', params: {course_id: @course.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:js_env][:DISPLAY_SHOW_ALL_LINK]).to be(true)
     end
   end
@@ -71,6 +71,57 @@ describe WikiPagesController do
       it "should render" do
         get 'revisions', params: {course_id: @course.id, wiki_page_id: @page.url}
         expect(response).to be_successful
+      end
+    end
+
+    describe "student planner" do
+      before :once do
+        course_with_teacher(active_all: true)
+        @page = @course.wiki_pages.create!(title: "plan for planning the planner's planned plan... plan", body: "")
+      end
+
+      before do
+        user_session @teacher
+      end
+
+      context "feature enabled" do
+        before :once do
+          @course.root_account.enable_feature! :student_planner
+        end
+
+        describe "GET 'index" do
+          it "should render" do
+            get 'index', params: {course_id: @course.id}
+            expect(response).to be_successful
+            expect(controller.js_env[:STUDENT_PLANNER_ENABLED]).to be_truthy
+          end
+        end
+
+        describe "GET 'show" do
+          it "should render" do
+            get 'show', params: {course_id: @course.id, id: @page.url}
+            expect(response).to be_successful
+            expect(controller.js_env[:STUDENT_PLANNER_ENABLED]).to be_truthy
+          end
+        end
+      end
+
+      context "feature disabled" do
+        describe "GET 'index" do
+          it "should render" do
+            get 'index', params: {course_id: @course.id}
+            expect(response).to be_successful
+            expect(controller.js_env[:STUDENT_PLANNER_ENABLED]).to be_falsey
+          end
+        end
+
+        describe "GET 'show" do
+          it "should render" do
+            get 'show', params: {course_id: @course.id, id: @page.url}
+            expect(response).to be_successful
+            expect(controller.js_env[:STUDENT_PLANNER_ENABLED]).to be_falsey
+          end
+        end
       end
     end
 

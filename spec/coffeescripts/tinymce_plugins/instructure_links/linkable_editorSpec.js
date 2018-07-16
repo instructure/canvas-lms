@@ -60,13 +60,13 @@ test('shipping a new link to the editor instance', function() {
     selectedContent: 'Some Content',
     url: 'Link HREF'
   }
-  const edMock = this.mock(jqueryEditor)
+  const edMock = sandbox.mock(jqueryEditor)
   edMock.expects('editorBox').withArgs('create_link', expectedOpts)
   editor.createLink(text, classes)
 })
 
 test('createLink passes data attributes to create_link command', function() {
-  this.stub(RceCommandShim, 'send')
+  sandbox.stub(RceCommandShim, 'send')
   const dataAttrs = {}
   const le = new LinkableEditor({selection: {getContent: () => ({})}})
   le.createLink('text', 'classes', dataAttrs)

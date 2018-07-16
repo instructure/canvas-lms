@@ -88,7 +88,7 @@ define [
 
   test "focusOut", (assert) ->
     assert.expect(1)
-    stub = @stub @component, 'boundSaveSuccess'
+    stub = sandbox.stub @component, 'boundSaveSuccess'
 
     requestStub = null
     run =>
@@ -98,7 +98,7 @@ define [
         content: 'less content now'
       )
 
-    @stub(@component, 'ajax').returns requestStub
+    sandbox.stub(@component, 'ajax').returns requestStub
 
     run =>
       @component.set('value', 'such success')
@@ -109,14 +109,14 @@ define [
   test "textAreaInput does not flash an error if note length is exactly the max allowed length", ->
     note = 'a'.repeat(GradebookConstants.MAX_NOTE_LENGTH)
     noteInputEvent = {target: {value: note}}
-    maxLengthError = @spy(GradebookHelpers, 'flashMaxLengthError')
+    maxLengthError = sandbox.spy(GradebookHelpers, 'flashMaxLengthError')
     @component.textAreaInput(noteInputEvent)
     ok maxLengthError.notCalled
 
   test "textAreaInput flashes an error if note length is greater than the max allowed length", ->
     note = 'a'.repeat(GradebookConstants.MAX_NOTE_LENGTH + 1)
     noteInputEvent = {target: {value: note}}
-    maxLengthError = @spy(GradebookHelpers, 'flashMaxLengthError')
+    maxLengthError = sandbox.spy(GradebookHelpers, 'flashMaxLengthError')
     @component.textAreaInput(noteInputEvent)
     ok maxLengthError.calledOnce
 
@@ -124,8 +124,8 @@ define [
   even if note length is greater than the max allowed length", ->
     note = 'a'.repeat(GradebookConstants.MAX_NOTE_LENGTH + 1)
     noteInputEvent = {target: {value: note}}
-    maxLengthError = @spy(GradebookHelpers, 'flashMaxLengthError')
-    findStub = @stub($, 'find')
+    maxLengthError = sandbox.spy(GradebookHelpers, 'flashMaxLengthError')
+    findStub = sandbox.stub($, 'find')
     findStub.withArgs('.ic-flash-error').returns(['a non-empty error array'])
     @component.textAreaInput(noteInputEvent)
     ok maxLengthError.notCalled

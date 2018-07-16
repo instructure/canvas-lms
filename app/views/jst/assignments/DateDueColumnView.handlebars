@@ -37,5 +37,13 @@
       {{datetimeFormatted singleSectionDueDate}}
     </span>
     <span class="screenreader-only">{{contextSensitiveDatetimeTitle singleSectionDueDate justText=true}}</span>
+  {{else}}
+      {{#if todo_date}}
+      <strong>{{#t "todo_date"}}To do{{/t}}</strong>
+      <span {{contextSensitiveDatetimeTitle todo_date}} aria-hidden="true">
+        {{datetimeFormatted todo_date}}
+      </span>
+      <span class="screenreader-only">{{contextSensitiveDatetimeTitle todo_date justText=true}}</span>
+    {{/if}}
   {{/if}}
 {{/if}}

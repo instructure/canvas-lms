@@ -115,11 +115,11 @@ describe "Outcome Reports" do
     user, assignment, outcome, outcome_result, course, section, submission, quiz, question, quiz_submission, pseudonym =
       values.values_at(:user, :assignment, :outcome, :outcome_result, :course, :section, :submission, :quiz, :question,
       :quiz_submission, :pseudonym)
-    rating = if outcome.present? && outcome_result&.score&.present?
+    rating = if quiz.nil? && outcome.present? && outcome_result&.score&.present?
                outcome.rubric_criterion&.[](:ratings)&.select do |r|
                  r[:points].present? && r[:points] <= outcome_result.score
                end&.first
-             end
+    end
     rating ||= {}
 
     hide_points = outcome_result&.hide_points

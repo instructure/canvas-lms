@@ -144,6 +144,11 @@ class RubricAssociation < ActiveRecord::Base
     self.context.grants_right?(assessor, :manage_grades) || self.assessment_requests.incomplete.for_assessee(assessee).pluck(:assessor_id).include?(assessor.id)
   end
 
+  def user_did_assess_for?(assessor: nil, assessee: nil)
+    raise "assessor and assessee required" unless assessor && assessee
+    self.assessment_requests.complete.for_assessee(assessee).for_assessor(assessor).any?
+  end
+
   set_policy do
     given {|user, session| self.context.grants_right?(user, session, :manage_rubrics) }
     can :update and can :delete and can :manage

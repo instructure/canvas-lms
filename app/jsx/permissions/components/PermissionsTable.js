@@ -24,7 +24,6 @@ import $ from 'jquery'
 // For screenreaderFlashMessageExclusive  Maybe there's a better way
 import 'compiled/jquery.rails_flash_notifications' // eslint-disable-line
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
 import Link from '@instructure/ui-elements/lib/components/Link'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
@@ -110,14 +109,14 @@ export default class PermissionsTable extends Component {
                 className="ic-permissions__header-content ic-permissions__header-content-col"
                 id={`ic-permissions__role-header-for-role-${role.id}`}
               >
-                <Button
-                  variant="link"
+                <Link
+                  as="button"
                   onClick={() => this.openRoleTray(role)}
                   id={`role_${role.id}`}
                   onFocus={this.fixScrollHeader}
                 >
                   <Text size="small">{role.label} </Text>
-                </Button>
+                </Link>
               </div>
             </div>
           </th>

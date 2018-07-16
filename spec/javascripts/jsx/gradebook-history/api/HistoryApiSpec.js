@@ -24,7 +24,7 @@ QUnit.module('HistoryApi', {
   setup () {
     this.courseId = 123;
 
-    this.getStub = this.stub(axios, 'get')
+    this.getStub = sandbox.stub(axios, 'get')
       .returns(Promise.resolve({
         status: 200,
         response: Fixtures.historyResponse()

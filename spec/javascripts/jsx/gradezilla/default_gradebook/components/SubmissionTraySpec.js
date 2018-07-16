@@ -56,6 +56,7 @@ QUnit.module('SubmissionTray', function (hooks) {
     gradingDisabled: false,
     gradingScheme: [['A', 0.90], ['B+', 0.85], ['B', 0.80], ['B-', 0.75]],
     locale: 'en',
+    onAnonymousSpeedGraderClick () {},
     onGradeSubmission () {},
     onRequestClose () {},
     onClose () {},
@@ -83,6 +84,7 @@ QUnit.module('SubmissionTray', function (hooks) {
     updateSubmission () {},
     updateSubmissionComment () {},
     assignment: {
+      anonymizeStudents: false,
       name: 'Book Report',
       gradingType: 'points',
       htmlUrl: 'http://htmlUrl/',
@@ -204,11 +206,10 @@ QUnit.module('SubmissionTray', function (hooks) {
   test('invokes "onAnonymousSpeedGraderClick" when the SpeedGrader link is clicked if the assignment is anonymous', function () {
     const props = {
       assignment: {
+        anonymizeStudents: true,
         name: 'Book Report',
         gradingType: 'points',
         htmlUrl: 'http://htmlUrl/',
-        anonymousGrading: true,
-        muted: false,
         published: true
       },
       onAnonymousSpeedGraderClick: sinon.stub()
@@ -218,8 +219,8 @@ QUnit.module('SubmissionTray', function (hooks) {
     strictEqual(props.onAnonymousSpeedGraderClick.callCount, 1)
   })
 
-  test('omits student_id from SpeedGrader link if enabled and assignment is anonymously graded', function() {
-    mountComponent({assignment: {anonymousGrading: true}});
+  test('omits student_id from SpeedGrader link if enabled and assignment has anonymized students', function() {
+    mountComponent({assignment: {anonymizeStudents: true}});
     const speedGraderLink = document.querySelector('.SubmissionTray__Container a[href*="speed_grader"]').getAttribute('href');
     notOk(speedGraderLink.match(/student_id/))
   });
@@ -522,8 +523,10 @@ QUnit.module('SubmissionTray', function (hooks) {
   QUnit.module('Grade Input', function () {
     test('receives the "assignment" given to the Tray', function () {
       const assignment = {
+        anonymizeStudents: false,
         gradingType: 'points',
         htmlUrl: 'http://htmlUrl/',
+        moderatedGrading: false,
         muted: false,
         name: 'Book Report',
         published: true
@@ -604,25 +607,61 @@ QUnit.module('SubmissionTray', function (hooks) {
   });
 
   test('renders new comment form if assignment is not muted', function () {
-    mountComponent({assignment: {muted: false, anonymousGrading: false, moderatedGrading: true}});
+    const assignment = {
+      anonymizeStudents: false,
+      gradingType: 'points',
+      htmlUrl: 'foo',
+      moderatedGrading: true,
+      muted: false,
+      name: 'foo',
+      published: false
+    };
+    mountComponent({assignment});
     const form = wrapContent().find(SubmissionCommentCreateForm);
     strictEqual(form.length, 1);
   });
 
   test('renders new comment form if assignment is muted and not anonymous or moderated', function () {
-    mountComponent({assignment: {muted: true, anonymousGrading: false, moderatedGrading: false}});
+    const assignment = {
+      anonymizeStudents: false,
+      gradingType: 'points',
+      htmlUrl: 'foo',
+      moderatedGrading: false,
+      muted: true,
+      name: 'foo',
+      published: false
+    };
+    mountComponent({assignment});
     const form = wrapContent().find(SubmissionCommentCreateForm);
     strictEqual(form.length, 1);
   });
 
-  test('does not render new comment form if assignment is muted and anonymous', function () {
-    mountComponent({assignment: {muted: true, anonymousGrading: true, moderatedGrading: false}});
+  test('does not render new comment form if assignment has anonymized students', function () {
+    const assignment = {
+      anonymizeStudents: true,
+      gradingType: 'points',
+      htmlUrl: 'foo',
+      moderatedGrading: false,
+      muted: true,
+      name: 'foo',
+      published: false
+    };
+    mountComponent({assignment});
     const form = wrapContent().find(SubmissionCommentCreateForm);
     strictEqual(form.length, 0);
   });
 
   test('does not render new comment form if assignment is muted and moderated', function () {
-    mountComponent({assignment: {muted: true, anonymousGrading: false, moderatedGrading: true}});
+    const assignment = {
+      anonymizeStudents: false,
+      gradingType: 'points',
+      htmlUrl: 'foo',
+      moderatedGrading: true,
+      muted: true,
+      name: 'foo',
+      published: false
+    };
+    mountComponent({assignment});
     const form = wrapContent().find(SubmissionCommentCreateForm);
     strictEqual(form.length, 0);
   });

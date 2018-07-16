@@ -346,7 +346,7 @@ describe Oauth2ProviderController do
       expect(redis).to receive(:del).with(valid_code_redis_key).at_least(:once)
       allow(Canvas).to receive_messages(:redis => redis)
       post :token, params: {client_id: key.id, client_secret: key.api_key, grant_type: 'authorization_code', code: valid_code}
-      expect(response).to be_success
+      expect(response).to be_successful
       json = JSON.parse(response.body)
       expect(json.keys.sort).to match_array(['access_token',  'refresh_token', 'user', 'expires_in', 'token_type'])
       expect(json['token_type']).to eq 'Bearer'
@@ -364,7 +364,7 @@ describe Oauth2ProviderController do
       expect(redis).to receive(:del).with(valid_code_redis_key).at_least(:once)
       allow(Canvas).to receive_messages(:redis => redis)
       post :token, params: {:client_id => key.id, :client_secret => key.api_key, :code => valid_code}
-      expect(response).to be_success
+      expect(response).to be_successful
       json = JSON.parse(response.body)
       expect(json.keys.sort).to match_array ['access_token', 'refresh_token', 'user', 'expires_in', 'token_type']
     end
@@ -373,7 +373,7 @@ describe Oauth2ProviderController do
       old_token = user.access_tokens.create! :developer_key => key
       allow(Canvas).to receive_messages(:redis => redis)
       post :token, params: {:client_id => key.id, :client_secret => key.api_key, :code => valid_code, :replace_tokens => '1'}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(AccessToken.not_deleted.exists?(old_token.id)).to be(false)
     end
 
@@ -381,7 +381,7 @@ describe Oauth2ProviderController do
       old_token = user.access_tokens.create! :developer_key => key
       allow(Canvas).to receive_messages(:redis => redis)
       post :token, params: {:client_id => key.id, :client_secret => key.api_key, :code => valid_code}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(AccessToken.not_deleted.exists?(old_token.id)).to be(true)
     end
 
@@ -430,13 +430,13 @@ describe Oauth2ProviderController do
         access_token = old_token.full_token
 
         post :token, params: {client_id: key.id, client_secret: key.api_key, grant_type: "refresh_token", refresh_token: refresh_token}
-        expect(response).to be_success
+        expect(response).to be_successful
         json = JSON.parse(response.body)
         expect(json['access_token']).to_not eq access_token
 
         access_token = json['access_token']
         post :token, params: {client_id: key.id, client_secret: key.api_key, grant_type: "refresh_token", refresh_token: refresh_token}
-        expect(response).to be_success
+        expect(response).to be_successful
         json = JSON.parse(response.body)
         expect(json['access_token']).to_not eq access_token
       end

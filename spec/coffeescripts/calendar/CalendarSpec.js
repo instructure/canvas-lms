@@ -29,11 +29,17 @@ QUnit.module('Calendar', {
   setup() {
     this.snapshot = tz.snapshot()
     tz.changeZone(denver, 'America/Denver')
-    return fixtures.setup()
+    fixtures.setup()
+    sinon.stub($, 'getJSON')
   },
   teardown() {
     tz.restore(this.snapshot)
+    const calendar = $('#fixtures .calendar').data('fullCalendar')
+    if (calendar) {
+      calendar.destroy()
+    }
     fixtures.teardown()
+    $.getJSON.restore()
   }
 })
 const makeMockDataSource = () => ({

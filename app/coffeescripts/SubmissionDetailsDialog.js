@@ -101,7 +101,7 @@ export default class SubmissionDetailsDialog {
 
   buildSpeedGraderUrl = () => {
     const assignmentParam = `assignment_id=${this.assignment.id}`
-    const speedGraderUrlParams = this.assignment.anonymous_grading
+    const speedGraderUrlParams = this.assignment.anonymize_students
       ? assignmentParam
       : `${assignmentParam}#{"student_id":"${this.student.id}"}`
     return encodeURI(`${this.options.context_url}/gradebook/speed_grader?${speedGraderUrlParams}`)

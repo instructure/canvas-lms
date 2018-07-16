@@ -136,7 +136,7 @@ describe Quizzes::QuizSubmissionsController do
       Quizzes::QuizSubmission.where(:id => @qs).update_all(:updated_at => 1.hour.ago)
 
       put 'backup', params: {:quiz_id => @quiz.id, :course_id => @course.id, :a => 'test', :validation_token => @qs.validation_token}
-      expect(response).to be_success
+      expect(response).to be_successful
 
       expect(@qs.reload.submission_data[:a]).to eq 'test'
     end
@@ -215,7 +215,7 @@ describe Quizzes::QuizSubmissionsController do
         user_session(@teacher)
         request.accept = "application/json"
         post 'extensions', params: {quiz_id: quiz.id, course_id: @course, user_id: @teacher.id, extra_attempts: 1}
-        expect(response).to be_success
+        expect(response).to be_successful
         json = JSON.parse(response.body)
         expect(json).to have_key('extra_attempts')
         expect(json['extra_attempts']).to eq 1
@@ -225,7 +225,7 @@ describe Quizzes::QuizSubmissionsController do
         user_session(@teacher)
         request.accept = "application/json"
         post 'extensions', params: {quiz_id: quiz.id, course_id: @course, user_id: @teacher.id, reset_has_seen_results: 1}
-        expect(response).to be_success
+        expect(response).to be_successful
         json = JSON.parse(response.body)
         expect(json).to have_key('has_seen_results')
         expect(json['has_seen_results']).to eq false

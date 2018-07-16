@@ -41,7 +41,7 @@ if [[ $OS == 'Darwin' ]]; then
   dependencies='docker docker-machine docker-compose dinghy'
 elif [[ $OS == 'Linux' ]]; then
   install='sudo apt-get update && sudo apt-get install -y'
-  dependencies='docker docker-compose'
+  dependencies='docker.io docker-compose'
 else
   echo 'This script only supports MacOS and Linux :('
   exit 1
@@ -207,7 +207,7 @@ errors.'
   fi
 
   # Fixes 'error while trying to write to `/usr/src/app/Gemfile.lock`'
-  if ! docker-compose run --rm web touch Gemfile.lock; then
+  if ! docker-compose run --no-deps --rm web touch Gemfile.lock; then
     message \
 "The 'docker' user is not allowed to write to Gemfile.lock. We need write
 permissions so we can install gems."
@@ -215,7 +215,7 @@ permissions so we can install gems."
     confirm_command 'chmod a+rw Gemfile.lock' || true
   fi
 
-  docker-compose run --rm web bundle install
+  docker-compose run --no-deps --rm web bundle install --jobs 8
 }
 
 function database_exists {
@@ -226,7 +226,7 @@ function database_exists {
 function prepare_database {
   message 'Setting up the development database...'
 
-  if ! docker-compose run --rm web touch db/structure.sql; then
+  if ! docker-compose run --no-deps --rm web touch db/structure.sql; then
     message \
 "The 'docker' user is not allowed to write to db/structure.sql. We need write
 permissions so we can run migrations."
@@ -258,8 +258,8 @@ function setup_canvas {
   copy_docker_config
   build_images
   install_gems
-  prepare_database
   compile_assets
+  prepare_database
 }
 
 function display_next_steps {

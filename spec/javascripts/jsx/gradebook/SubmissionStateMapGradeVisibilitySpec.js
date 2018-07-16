@@ -66,8 +66,8 @@ define([
     strictEqual(state.hideGrade, false);
   });
 
-  test ('submission has grade hidden if anonymous and muted', function() {
-    const assignment = { id: '1', anonymous_grading: true, muted: true };
+  test ('submission has grade hidden if anonymize_students is true', function() {
+    const assignment = { id: '1', anonymize_students: true };
     const map = createAndSetupMap(assignment);
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
     strictEqual(state.hideGrade, true);

@@ -127,13 +127,6 @@ END
         applies_to: 'RootAccount',
         state: 'allowed'
       },
-    'section_specific_discussions' =>
-    {
-      display_name: -> { I18n.t('Section Specific Discussions') },
-      description: -> { I18n.t('Allows creating discussions for a specific section') },
-      applies_to: 'Account',
-      state: 'hidden',
-    },
     'permissions_v2_ui' =>
     {
       display_name: -> { I18n.t('Updated Permissions Page') },

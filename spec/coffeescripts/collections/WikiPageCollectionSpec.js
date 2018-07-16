@@ -79,7 +79,7 @@ test('sort order can be forced', function() {
 })
 
 test('setting sort triggers a sortChanged event', function() {
-  const sortChangedSpy = this.spy()
+  const sortChangedSpy = sinon.spy()
   this.collection.on('sortChanged', sortChangedSpy)
   this.collection.setSortField('created_at')
   ok(sortChangedSpy.calledOnce, 'sortChanged event triggered once')
@@ -98,8 +98,8 @@ test('setting sort sets fetch parameters', function() {
 })
 
 test('sortByField delegates to setSortField', function() {
-  const setSortFieldStub = this.stub(this.collection, 'setSortField')
-  const fetchStub = this.stub(this.collection, 'fetch')
+  const setSortFieldStub = sandbox.stub(this.collection, 'setSortField')
+  const fetchStub = sandbox.stub(this.collection, 'fetch')
   this.collection.sortByField('created_at', 'desc')
   ok(setSortFieldStub.calledOnce, 'setSortField called once')
   ok(
@@ -109,7 +109,7 @@ test('sortByField delegates to setSortField', function() {
 })
 
 test('sortByField triggers a fetch', function() {
-  const fetchStub = this.stub(this.collection, 'fetch')
+  const fetchStub = sandbox.stub(this.collection, 'fetch')
   this.collection.sortByField('created_at', 'desc')
   ok(fetchStub.calledOnce, 'fetch called once')
 })

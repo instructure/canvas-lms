@@ -36,21 +36,21 @@ export class ToDoSidebar extends Component {
     sidebarLoadInitialItems: func.isRequired,
     sidebarCompleteItem: func.isRequired,
     items: arrayOf(object).isRequired,
-    loading: bool,
+    loaded: bool,
     courses: arrayOf(object).isRequired,
     timeZone: string,
     locale: string,
+    changeDashboardView: func.isRequired,
   };
 
   static defaultProps = {
-    loading: false,
+    loaded: false,
     timeZone: moment.tz.guess(),
     locale: 'en',
   }
 
   constructor () {
     super();
-    this.state = { showTodos: false };
     this.dismissedItemIndex = null;
     this.titleFocus = null;
   }
@@ -71,28 +71,24 @@ export class ToDoSidebar extends Component {
     }
   }
 
-  showMoreTodos = () => {
-    this.setState({showTodos: true});
-  }
-
   handleDismissClick (itemIndex, item) {
     this.dismissedItemIndex = itemIndex;
     this.props.sidebarCompleteItem(item)
       .catch(() => {this.dismissedItemIndex = null;});
   }
 
-  renderShowMoreTodos (items) {
-    if (items.length > 5 && !this.state.showTodos) {
-      const number = items.length - 5;
-      return (
-        <Button variant="link" onClick={this.showMoreTodos}>{formatMessage("{number} More...", {number})}</Button>
-      );
-    }
-    return null;
+  renderShowAll () {
+    return (
+      <View as="div" textAlign="center">
+        <Button variant="link" onClick={() => this.props.changeDashboardView('planner')}>
+          {formatMessage('Show All')}
+        </Button>
+      </View>
+    );
   }
 
   render () {
-    if (this.props.loading) {
+    if (!this.props.loaded) {
       return (
         <View as="div" textAlign="center">
           <Spinner title={formatMessage('To Do Items Loading')} size="small" />
@@ -100,13 +96,12 @@ export class ToDoSidebar extends Component {
       );
     }
 
-    const completedFilter = (item) => {
+    const incompletedFilter = (item) => {
       if (!item) return false;
       return !item.completed;
     };
 
-    const filteredTodos = this.props.items.filter(completedFilter);
-    const visibleTodos = this.state.showTodos ? filteredTodos : filteredTodos.slice(0, 5);
+    const visibleTodos = this.props.items.filter(incompletedFilter).slice(0, 5);
 
     this.todoItemComponents = [];
     return (
@@ -130,7 +125,7 @@ export class ToDoSidebar extends Component {
             ))
           }
         </List>
-        { this.renderShowMoreTodos(filteredTodos) }
+        { this.renderShowAll() }
       </div>
     );
   }
@@ -138,7 +133,7 @@ export class ToDoSidebar extends Component {
 
 const mapStateToProps = state => ({
   items: state.sidebar.items,
-  loading: state.sidebar.loading
+  loaded: state.sidebar.loaded,
 });
 const mapDispatchToProps = { sidebarLoadInitialItems, sidebarCompleteItem };
 

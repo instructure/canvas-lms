@@ -18,13 +18,14 @@
 require 'httparty'
 require 'json'
 require_relative '../../../pact_config'
+require_relative '../api_client_base'
 
 module Helper
   module ApiClient
-    class AccountReports
+    class AccountReports < ApiClientBase
       include HTTParty
       base_uri PactConfig.mock_provider_service_base_uri
-      headers "Authorization" => "Bearer some_token"
+      headers 'Authorization' => 'Bearer some_token'
 
       def list_reports(account_id)
         JSON.parse(self.class.get("/api/v1/accounts/#{account_id}/reports").body)
@@ -32,8 +33,8 @@ module Helper
         nil
       end
 
-      def show_report(account_id, report_type, report_id)
-        JSON.parse(self.class.get("/api/v1/accounts/#{account_id}/reports/#{report_type}/#{report_id}"))
+      def show_report(account_id, report_id)
+        JSON.parse(self.class.get("/api/v1/accounts/#{account_id}/reports/#{report_id}"))
       rescue
         nil
       end

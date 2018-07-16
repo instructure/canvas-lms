@@ -77,7 +77,7 @@ test('renders', () => {
 })
 
 test('delete calls screenreader', function() {
-  this.stub(window, 'confirm').returns(true)
+  sandbox.stub(window, 'confirm').returns(true)
   ENV.context_asset_string = 'course_1'
   const server = sinon.fakeServer.create()
   server.respondWith('DELETE', '/api/v1/courses/1/conferences/1', [
@@ -91,7 +91,7 @@ test('delete calls screenreader', function() {
       join_url: 'www.blah.com'
     })
   ])
-  this.spy($, 'screenReaderFlashMessage')
+  sandbox.spy($, 'screenReaderFlashMessage')
   const view = conferenceView()
   view.delete($.Event('click'))
   server.respond()
@@ -100,7 +100,7 @@ test('delete calls screenreader', function() {
 })
 
 test('deleteRecordings calls screenreader', function() {
-  this.stub(window, 'confirm').returns(true)
+  sandbox.stub(window, 'confirm').returns(true)
   ENV.context_asset_string = 'course_1'
   const server = sinon.fakeServer.create()
   server.respondWith('POST', '/recording', [
@@ -137,7 +137,7 @@ test('deleteRecordings calls screenreader', function() {
       record: true
     }
   }
-  this.spy($, 'screenReaderFlashMessage')
+  sandbox.spy($, 'screenReaderFlashMessage')
   const view = conferenceView(big_blue_button_conference)
   $('div.ig-button[data-id="954cc3"]').children('a').trigger($.Event( "click" ))
   server.respond()

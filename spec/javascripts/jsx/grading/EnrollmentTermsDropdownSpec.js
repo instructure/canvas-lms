@@ -29,7 +29,7 @@ define([
     renderComponent() {
       const props = {
         terms: this.terms(),
-        changeSelectedEnrollmentTerm: this.spy()
+        changeSelectedEnrollmentTerm: sinon.spy()
       };
       const element = React.createElement(Dropdown, props);
       return ReactDOM.render(element, wrapper);

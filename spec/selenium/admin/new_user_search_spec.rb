@@ -19,6 +19,7 @@ require_relative '../common'
 require_relative './new_user_search_page'
 require_relative './new_user_edit_modal_page.rb'
 require_relative './masquerade_page.rb'
+require_relative '../conversations/conversations_new_message_modal_page.rb'
 
 describe "new account user search" do
   include_context "in-process server selenium tests"
@@ -172,16 +173,6 @@ describe "new account user search" do
     expect(rows.first).to include_text(match_user.name)
   end
 
-  it "should search but not find bogus user", priority: "1", test_id: 3399649 do
-    bogus = 'jtsdumbthing'
-    get "/accounts/#{@account.id}/users"
-
-    f('input[placeholder="Search people..."]').send_keys(bogus)
-
-    expect(f('#content .alert')).to include_text('No users found')
-    expect(f('#content')).not_to contain_css('[data-automation="users list"] tr')
-  end
-
   it "should link to the user avatar page" do
     match_user = user_with_pseudonym(:account => @account, :name => "user with a search term")
     user_with_pseudonym(:account => @account, :name => "diffrient user")
@@ -206,21 +197,12 @@ describe "new account user search" do
     expect(driver.current_url).to include("/accounts/#{@account.id}/groups")
   end
 
-  it "should open the conversation page when clicking the send message button", priority: "1", test_id: 3453435 do
-    conv_user = user_with_pseudonym(:account => @account, :name => "Conversation User")
-
-    get "/accounts/#{@account.id}/users"
-
-    fj("[data-automation='users list'] tr:contains('#{conv_user.name}') [role=button]:has([name='IconMessage'])")
-      .click
-    expect(f('.message-header-input .ac-token')).to include_text conv_user.name
-  end
-
   # This describe block will be removed once all tests are converted
   describe 'Page Object Converted Tests' do
     include NewUserSearchPage
     include NewUserEditModalPage
     include MasqueradePage
+    include ConversationsNewMessageModalPage
 
     before do
       @user.update_attribute(:name, "Test User")
@@ -240,6 +222,17 @@ describe "new account user search" do
     it "should open the act as page when clicking the masquerade button", priority: "1", test_id: 3453424 do
       click_masquerade_button(@user.name)
       expect(act_as_label).to include_text @user.name
+    end
+
+    it "should open the conversation page when clicking the send message button", priority: "1", test_id: 3453435 do
+      click_message_button(@user.name)
+      expect(message_recipient_input).to include_text @user.name
+    end
+
+    it "should search but not find bogus user", priority: "1", test_id: 3399649 do
+      enter_search('jtsdumbthing')
+      expect(results_alert).to include_text('No users found')
+      expect(results_body).not_to contain_css(results_row)
     end
   end
 end

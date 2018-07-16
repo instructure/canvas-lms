@@ -59,6 +59,25 @@ describe OutcomeResultsController do
     create_outcome_rubric_association
   end
 
+  let_once(:outcome_result) do
+    rubric_association = outcome_rubric.associate_with(outcome_assignment, outcome_course, purpose: 'grading')
+
+    LearningOutcomeResult.new(
+      user_id: @student.id,
+      alignment: ContentTag.create!({
+        title: 'content',
+        context: outcome_course,
+        learning_outcome: @outcome,
+        content_type: 'Assignment',
+        content_id: outcome_assignment.id
+      })
+    ).tap do |lor|
+      lor.association_object = rubric_association
+      lor.context = outcome_course
+      lor.save!
+    end
+  end
+
   let(:outcome_criterion) do
     find_outcome_criterion
   end
@@ -138,7 +157,68 @@ describe OutcomeResultsController do
                       :user_ids => [@student.id],
                       :outcome_ids => [@outcome.id]},
                       format: "json"
-      expect(response).to be_success
+      expect(response).to be_successful
+    end
+
+    it 'should validate aggregate_stat parameter' do
+      user_session(@teacher)
+      get 'rollups', params: {:context_id => @course.id,
+                      :course_id => @course.id,
+                      :context_type => "Course",
+                      aggregate: 'course',
+                      aggregate_stat: 'powerlaw'},
+                      format: "json"
+      expect(response).not_to be_success
+    end
+
+    context 'with muted assignment' do
+      before do
+        outcome_assignment.mute!
+      end
+
+      it 'teacher should see result' do
+        user_session(@teacher)
+        get 'index', params: {:context_id => @course.id,
+                        :course_id => @course.id,
+                        :context_type => "Course",
+                        :user_ids => [@student.id],
+                        :outcome_ids => [@outcome.id]},
+                        format: "json"
+        json = JSON.parse(response.body.gsub("while(1);", ""))
+        expect(json['outcome_results'].length).to eq 1
+      end
+
+      it 'student should not see result' do
+        user_session(@student)
+        get 'index', params: {:context_id => @course.id,
+                        :course_id => @course.id,
+                        :context_type => "Course",
+                        :user_ids => [@student.id],
+                        :outcome_ids => [@outcome.id]},
+                        format: "json"
+        json = JSON.parse(response.body.gsub("while(1);", ""))
+        expect(json['outcome_results'].length).to eq 0
+      end
+    end
+
+    it 'exclude missing user rollups' do
+      user_session(@teacher)
+      # save a reference to the 1st student
+      student1 = @student
+      # create a 2nd student that is saved as @student
+      student_in_course(active_all: true, course: outcome_course)
+      get 'rollups', params: {:context_id => @course.id,
+                      :course_id => @course.id,
+                      :context_type => "Course",
+                      :user_ids => [student1.id, @student.id],
+                      :outcome_ids => [@outcome.id],
+                      exclude: ['missing_user_rollups']},
+                      format: "json"
+      json = JSON.parse(response.body.gsub("while(1);", ""))
+      # the rollups requests for both students, but excludes the 2nd student
+      # since they do not have any results, unlike the 1st student,
+      # which has a single result in `outcome_result`
+      expect(json['rollups'].length).to be 1
     end
   end
 end

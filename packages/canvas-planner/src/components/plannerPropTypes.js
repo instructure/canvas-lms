@@ -66,6 +66,7 @@ export const feedbackShape = {
   author_avatar_url: PropTypes.string,
   author_name: PropTypes.string,
   comment: PropTypes.string,
+  is_media: PropTypes.bool,
 };
 
 export default {

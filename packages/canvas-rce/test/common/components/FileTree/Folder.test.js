@@ -57,7 +57,10 @@ describe("FileTree/Folder", () => {
 
   it("renders a button with the folder name", () => {
     const tree = sd.shallowRender(<Folder {...props} />);
-    const text = tree.textIn("button").trim();
+    const text = tree
+      .subTree("button")
+      .text()
+      .trim();
     assert(new RegExp(folder.name).test(text));
   });
 

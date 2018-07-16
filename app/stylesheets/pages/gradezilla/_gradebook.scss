@@ -290,10 +290,18 @@ $gradebook_cell_padding_top: 8px;
 
 .odd .slick-cell {
   background-color: #f5f6f7;
+
+  &.minimized {
+    background-color: darken(#f5f6f7, 4%);
+  }
 }
 
 .even .slick-cell {
   background-color: #fcfcfc;
+
+  &.minimized {
+    background-color: darken(#fcfcfc, 4%);
+  }
 }
 
 .odd .meta-cell {
@@ -753,6 +761,15 @@ $gradebook_checkbox_size: 16px;
 
 #hide_warning {
   vertical-align: top;
+}
+
+.minimized {
+  background-color: darken($ic-bg-light-neutral, 4%);
+
+  .gradebook-cell,
+  .Gradebook__ColumnHeaderContent {
+    display: none;
+  }
 }
 
 // STUFF FOR HEADER

@@ -30,8 +30,8 @@ const wrapper = document.getElementById('fixtures')
 
 QUnit.module('GradingPeriod', {
   setup() {
-    this.stub($, 'flashMessage')
-    this.stub($, 'flashError')
+    sandbox.stub($, 'flashMessage')
+    sandbox.stub($, 'flashError')
     this.server = sinon.fakeServer.create()
     fakeENV.setup()
     ENV.GRADING_PERIODS_URL = 'api/v1/courses/1/grading_periods'
@@ -99,7 +99,7 @@ test('sets initial state properly', function() {
 
 test('onDateChange calls replaceInputWithDate', function() {
   const gradingPeriod = this.renderComponent()
-  const replaceInputWithDate = this.stub(gradingPeriod, 'replaceInputWithDate')
+  const replaceInputWithDate = sandbox.stub(gradingPeriod, 'replaceInputWithDate')
   gradingPeriod.onDateChange('startDate', 'period_start_date_1')
   ok(replaceInputWithDate.calledOnce)
 })
@@ -136,7 +136,7 @@ test('onTitleChange calls updateGradingPeriodCollection', function() {
 
 test('replaceInputWithDate calls formatDatetimeForDisplay', function() {
   const gradingPeriod = this.renderComponent()
-  const formatDatetime = this.stub(DateHelper, 'formatDatetimeForDisplay')
+  const formatDatetime = sandbox.stub(DateHelper, 'formatDatetimeForDisplay')
   const fakeDateElement = {
     val() {}
   }

@@ -42,7 +42,7 @@ test('should be accessible', function(assert) {
 
 test('clicking a day in picker navigates to that date', function() {
   // instrument the callback
-  const handler = this.spy()
+  const handler = sinon.spy()
   this.navigator.on('navigateDate', handler)
 
   // find and click a date other than today (typically tomorrow, but maybe
@@ -71,7 +71,7 @@ test('clicking a day in picker navigates to that date', function() {
 
 test('hitting enter in date field navigates to date', function() {
   // instrument the callback
-  const handler = this.spy()
+  const handler = sinon.spy()
   this.navigator.on('navigateDate', handler)
 
   // type and "enter" a date

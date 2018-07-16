@@ -339,7 +339,7 @@ describe "Screenreader Gradebook" do
     it "shows sections in drop-down", priority: '1', test_id: 615680 do
       sections=[]
       2.times do |i|
-        sections << @course.course_sections.create!(:name => "other section #{i}")
+        sections << @course.course_sections.create!(name: "other section #{i}")
       end
 
       SRGB.visit(@course.id)

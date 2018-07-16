@@ -62,7 +62,7 @@ function getProps (column, gradebook, options) {
     addGradebookElement: gradebook.keyboardNav.addGradebookElement,
 
     assignment: {
-      anonymousGrading: assignment.anonymous_grading,
+      anonymizeStudents: assignment.anonymize_students,
       courseId: assignment.course_id,
       htmlUrl: assignment.html_url,
       id: assignment.id,

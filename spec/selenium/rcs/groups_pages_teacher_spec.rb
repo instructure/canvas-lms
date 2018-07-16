@@ -51,24 +51,5 @@ describe "groups" do
       user_session(@teacher)
       stub_rcs_config
     end
-
-    #-------------------------------------------------------------------------------------------------------------------
-    describe "discussions page" do
-
-      it "should allow teachers to create discussions within a group", priority: "1", test_id: 285586 do
-        get discussions_page
-        expect_new_page_load { f('#new-discussion-btn').click }
-        # This creates the discussion and also tests its creation
-        edit_topic('from a teacher', 'tell me a story')
-      end
-
-      it "should have three options when creating a discussion", priority: "1", test_id: 285584 do
-        get discussions_page
-        expect_new_page_load { f('#new-discussion-btn').click }
-        expect(f('#threaded')).to be_displayed
-        expect(f('#allow_rating')).to be_displayed
-        expect(f('#podcast_enabled')).to be_displayed
-      end
-    end
   end
 end

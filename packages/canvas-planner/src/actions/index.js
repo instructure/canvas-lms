@@ -22,6 +22,7 @@ import { alert } from '../utilities/alertUtils';
 import formatMessage from '../format-message';
 import parseLinkHeader from 'parse-link-header';
 import { makeEndOfDayIfMidnight } from '../utilities/dateUtils';
+import { maybeUpdateTodoSidebar } from './sidebar-actions';
 
 import {
   transformInternalToApiItem,
@@ -186,6 +187,7 @@ export const deletePlannerItem = (plannerItem) => {
       .catch(() => alert(formatMessage('Failed to delete to do'), true));
     dispatch(clearUpdateTodo());
     dispatch(deletedPlannerItem(promise));
+    dispatch(maybeUpdateTodoSidebar(promise));
     return promise;
   };
 };
@@ -237,6 +239,7 @@ export const togglePlannerItemCompletion = (plannerItem) => {
       });
     });
     dispatch(savedPlannerItem(promise));
+    dispatch(maybeUpdateTodoSidebar(promise));
     return promise;
   };
 };

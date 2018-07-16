@@ -18,13 +18,14 @@
 
 import tinymce from 'compiled/editor/stocktiny'
 import Links from 'tinymce_plugins/instructure_links/links'
+import I18n from 'i18n!editor'
 
   tinymce.create('tinymce.plugins.InstructureLinks', {
     init : function(ed, url) {
       ed.addCommand('instructureLinks', Links.renderDialog.bind(null, ed));
 
       ed.addButton('instructure_links', {
-        title: 'Link to URL',
+        title: I18n.t('Link to URL'),
         cmd: 'instructureLinks',
         icon: 'link',
         onPostRender: function(){

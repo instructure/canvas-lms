@@ -66,13 +66,13 @@ test('CanManage returns true for an account outcome on the course level', functi
 })
 
 test('default calculation method settings not set if calculation_method exists', function() {
-  const spy = this.spy(Outcome.prototype, 'setDefaultCalcSettings')
+  const spy = sandbox.spy(Outcome.prototype, 'setDefaultCalcSettings')
   const outcome = new Outcome(this.importedOutcome, {parse: true})
   ok(!spy.called)
 })
 
 test('default calculation method settings set if calculation_method is null', function() {
-  const spy = this.spy(Outcome.prototype, 'setDefaultCalcSettings')
+  const spy = sandbox.spy(Outcome.prototype, 'setDefaultCalcSettings')
   const outcome = new Outcome(this.courseOutcome, {parse: true})
   ok(spy.calledOnce)
 })

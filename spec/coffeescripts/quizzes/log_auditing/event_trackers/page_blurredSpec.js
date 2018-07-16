@@ -30,7 +30,7 @@ test('#constructor: it sets up the proper context', () => {
 
 test('capturing: it works', function() {
   const tracker = new Subject()
-  const capture = this.stub()
+  const capture = sinon.stub()
   tracker.install(capture)
   $(window).blur()
   ok(capture.called, 'it captures page blur')
@@ -38,7 +38,7 @@ test('capturing: it works', function() {
 
 test('capturing: it doesnt send events if in iframe (for RCE focusing)', function() {
   const tracker = new Subject()
-  const capture = this.stub()
+  const capture = sinon.stub()
   tracker.install(capture)
   const iframe = $('<iframe>')
     .appendTo('body')
@@ -49,7 +49,7 @@ test('capturing: it doesnt send events if in iframe (for RCE focusing)', functio
 })
 
 test('capturing: it throttles captures', function() {
-  const capture = this.spy()
+  const capture = sinon.spy()
   const tracker = new Subject()
   tracker.install(capture)
   $(window).blur()

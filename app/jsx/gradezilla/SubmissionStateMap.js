@@ -66,7 +66,7 @@ function cellMappingsForMultipleGradingPeriods (assignment, student, selectedGra
 }
 
 function cellMapForSubmission (assignment, student, hasGradingPeriods, selectedGradingPeriodID, isAdmin) {
-  if (!assignment.published || (assignment.anonymous_grading && assignment.muted)) {
+  if (!assignment.published || assignment.anonymize_students) {
     return { locked: true, hideGrade: true };
   } else if (assignment.moderated_grading && !assignment.grades_published) {
     return { locked: true, hideGrade: false };

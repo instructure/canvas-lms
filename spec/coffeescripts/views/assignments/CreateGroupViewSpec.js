@@ -86,7 +86,7 @@ test('it should not add errors when never_drop rules are added', () => {
 })
 
 test('it should create a new assignment group', function() {
-  this.stub(CreateGroupView.prototype, 'close')
+  sandbox.stub(CreateGroupView.prototype, 'close')
   const view = createView({newGroup: true})
   view.render()
   view.onSaveSuccess()
@@ -95,7 +95,7 @@ test('it should create a new assignment group', function() {
 
 test('it should edit an existing assignment group', function() {
   const view = createView()
-  const save_spy = this.stub(view.model, 'save').returns($.Deferred().resolve())
+  const save_spy = sandbox.stub(view.model, 'save').returns($.Deferred().resolve())
   view.render()
   view.open()
   view.$('#ag_new_name').val('IchangedIt')
@@ -111,7 +111,7 @@ test('it should edit an existing assignment group', function() {
 
 test('it should not save drop rules when none are given', function() {
   const view = createView()
-  const save_spy = this.stub(view.model, 'save').returns($.Deferred().resolve())
+  const save_spy = sandbox.stub(view.model, 'save').returns($.Deferred().resolve())
   view.render()
   view.open()
   view.$('#ag_new_drop_lowest').val('')
@@ -175,7 +175,7 @@ test('it should not allow NaN values for group weight', () => {
 })
 
 test('it should trigger a render event on save success when editing', function() {
-  const triggerSpy = this.spy(AssignmentGroupCollection.prototype, 'trigger')
+  const triggerSpy = sandbox.spy(AssignmentGroupCollection.prototype, 'trigger')
   const view = createView()
   view.onSaveSuccess()
   ok(triggerSpy.calledWith('render'))
@@ -183,14 +183,14 @@ test('it should trigger a render event on save success when editing', function()
 
 test('it should call render on save success if adding an assignmentGroup', function() {
   const view = createView({newGroup: true})
-  this.stub(view, 'render')
+  sandbox.stub(view, 'render')
   view.onSaveSuccess()
   equal(view.render.callCount, 1)
 })
 
 test('it shows a success message', function() {
-  this.stub(CreateGroupView.prototype, 'close')
-  this.spy($, 'flashMessage')
+  sandbox.stub(CreateGroupView.prototype, 'close')
+  sandbox.spy($, 'flashMessage')
   const clock = sinon.useFakeTimers()
   const view = createView({newGroup: true})
   view.render()

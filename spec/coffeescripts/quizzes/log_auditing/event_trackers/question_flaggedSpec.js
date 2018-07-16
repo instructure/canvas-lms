@@ -45,7 +45,7 @@ test('#constructor: it sets up the proper context', () => {
 })
 
 test('capturing: it works', function() {
-  const capture = this.stub()
+  const capture = sinon.stub()
   const tracker = new Subject({
     questionSelector: '.question',
     questionMarkedClass: 'marked',

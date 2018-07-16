@@ -8,8 +8,17 @@
   "all_items_loaded_aa256183": {
     "message": "Alle elementer lastet opp"
   },
+  "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
+    "message": "Det skjedde en feil da muligheten skulle avvises."
+  },
+  "announcement_fb4cb645": {
+    "message": "Kunngjøring"
+  },
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "Er du sikker på at du vil slette dette elementet fra planleggeren?"
+  },
+  "assignment_976578a8": {
+    "message": "Oppgave"
   },
   "assignmenttype_title_6612d008": {
     "message": "{ assignmentType } { title }."
@@ -31,6 +40,9 @@
   },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Begynnelsen av din gjøremålhistorie"
+  },
+  "calendar_event_89aadc1c": {
+    "message": "Kalenderhendelse"
   },
   "canvas_planner_98ed106": {
     "message": "Canvas planlegger"
@@ -71,6 +83,12 @@
   "details_98a31b68": {
     "message": "Detaljer"
   },
+  "discussion_6719c51d": {
+    "message": "Diskusjon"
+  },
+  "dismiss_itemtitle_a9fae1b3": {
+    "message": "Avvise { itemTitle }"
+  },
   "dismiss_opportunityname_5995176f": {
     "message": "Avvise { opportunityName }"
   },
@@ -109,9 +127,6 @@
   },
   "feedback_6dcc1991": {
     "message": "Tilbakemelding"
-  },
-  "go_to_dashboard_card_view_10398ef6": {
-    "message": "Gå til kortvisningen av instrumentpanelet"
   },
   "graded_25cd3fcd": {
     "message": "Karaktersatt"
@@ -182,17 +197,20 @@
   "nothing_new_needs_attention_3ac548d4": {
     "message": "Ingenting nytt trenger oppmerksomhet."
   },
-  "nothing_planned_today_next_item_loaded_5a199868": {
-    "message": "Ingenting på programmet i dag. Lastet opp neste element."
-  },
   "nothing_planned_yet_8675ffe9": {
     "message": "Ingenting planlagt enda"
+  },
+  "numpoints_points_8621a43b": {
+    "message": "{ numPoints } poeng"
   },
   "only_most_recent_grading_period_shown_f1ad6458": {
     "message": "*Bare den nyeste karakterperioden vises."
   },
   "optional_add_course_ef0d70fc": {
     "message": "Valgfri: Legg til emne"
+  },
+  "page_50c4823d": {
+    "message": "Side"
   },
   "points_bceb5005": {
     "message": "poeng"
@@ -205,6 +223,9 @@
   },
   "pts_699bd9aa": {
     "message": "Poeng"
+  },
+  "quiz_e0dcce8f": {
+    "message": "Test"
   },
   "replies_4a8577c8": {
     "message": "Svar"
@@ -241,6 +262,9 @@
   },
   "to_do_1d554f36": {
     "message": "Å gjøre"
+  },
+  "to_do_items_loading_d1cdfcd5": {
+    "message": "Å gjøre-elementer laster"
   },
   "today_76e10f9c": {
     "message": "I dag"

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 rm -rf lib
-TRANSPILE=true babel --out-dir lib --quiet src
+TRANSPILE=true yarn run babel --out-dir lib --quiet src
 rm -rf canvas
 mkdir canvas
 cp -r lib locales README.md package.json canvas

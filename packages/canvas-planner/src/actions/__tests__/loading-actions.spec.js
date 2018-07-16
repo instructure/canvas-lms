@@ -124,6 +124,7 @@ describe('api actions', () => {
       Actions.getPlannerItems(moment('2017-12-18'))(mockDispatch, getBasicState);
       expect(mockDispatch).toHaveBeenCalledWith(Actions.startLoadingItems());
       expect(mockDispatch).toHaveBeenCalledWith(Actions.continueLoadingInitialItems());
+      expect(mockDispatch).toHaveBeenCalledWith(Actions.peekIntoPastSaga());
       expect(mockDispatch).toHaveBeenCalledWith(Actions.startLoadingFutureSaga());
       const getFirstNewActivityDateThunk = mockDispatch.mock.calls[2][0];
       expect(typeof getFirstNewActivityDateThunk).toBe('function');

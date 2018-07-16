@@ -234,7 +234,8 @@ define [
   class Gradebook
     columnWidths =
       assignment:
-        min: 214
+        min: 10
+        default_max: 200
         max: 400
       assignmentGroup:
         min: 35
@@ -1514,13 +1515,16 @@ define [
     # Assignment Column
 
     buildAssignmentColumn: (assignment) ->
+      shrinkForOutOfText = assignment && assignment.grading_type == 'points' && assignment.points_possible?
+      minWidth = if shrinkForOutOfText then 140 else 90
+
       columnId = @getAssignmentColumnId(assignment.id)
       fieldName = "assignment_#{assignment.id}"
 
       if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings[fieldName]
         assignmentWidth = parseInt(@gradebookColumnSizeSettings[fieldName])
       else
-        assignmentWidth = columnWidths.assignment.min
+        assignmentWidth = testWidth(assignment.name, minWidth, columnWidths.assignment.default_max)
 
       columnDef =
         id: columnId
@@ -1536,6 +1540,10 @@ define [
         toolTip: assignment.name
         type: 'assignment'
         assignmentId: assignment.id
+
+      unless columnDef.width > columnDef.minWidth
+        columnDef.cssClass += ' minimized'
+        columnDef.headerCssClass += ' minimized'
 
       columnDef
 

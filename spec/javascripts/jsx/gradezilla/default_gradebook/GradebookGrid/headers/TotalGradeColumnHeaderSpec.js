@@ -67,9 +67,9 @@ QUnit.module('TotalGradeColumnHeader - base behavior', {
   setup () {
     this.props = defaultProps({
       props: {
-        addGradebookElement: this.stub(),
-        removeGradebookElement: this.stub(),
-        onMenuDismiss: this.stub()
+        addGradebookElement: sinon.stub(),
+        removeGradebookElement: sinon.stub(),
+        onMenuDismiss: sinon.stub()
       }
     });
     this.wrapper = mount(<TotalGradeColumnHeader {...this.props} />);
@@ -165,7 +165,7 @@ test('does not select "Grade - Low to High" when isSortColumn is false', functio
 });
 
 test('clicking "Grade - Low to High" calls onSortByGradeAscending', function () {
-  const onSortByGradeAscending = this.stub();
+  const onSortByGradeAscending = sinon.stub();
   const props = defaultProps({ sortBySetting: { onSortByGradeAscending } });
   findMenuItem.call(this, props, 'Sort by', 'Grade - Low to High').simulate('click');
   strictEqual(onSortByGradeAscending.callCount, 1);
@@ -195,7 +195,7 @@ test('does not select "Grade - High to Low" when isSortColumn is false', functio
 });
 
 test('clicking "Grade - High to Low" calls onSortByGradeDescending', function () {
-  const onSortByGradeDescending = this.stub();
+  const onSortByGradeDescending = sinon.stub();
   const props = defaultProps({ sortBySetting: { onSortByGradeDescending } });
   findMenuItem.call(this, props, 'Sort by', 'Grade - High to Low').simulate('click');
   strictEqual(onSortByGradeDescending.callCount, 1);
@@ -216,7 +216,7 @@ QUnit.module('TotalGradeColumnHeader - Display as Points', {
   setup () {
     this.props = defaultProps();
     this.props.gradeDisplay.currentDisplay = 'percentage';
-    this.props.gradeDisplay.onSelect = this.stub();
+    this.props.gradeDisplay.onSelect = sinon.stub();
   },
 
   teardown () {
@@ -261,7 +261,7 @@ QUnit.module('TotalGradeColumnHeader - Display as Percentage', {
   setup () {
     this.props = defaultProps();
     this.props.gradeDisplay.currentDisplay = 'points';
-    this.props.gradeDisplay.onSelect = this.stub();
+    this.props.gradeDisplay.onSelect = sinon.stub();
   },
 
   teardown () {
@@ -301,7 +301,7 @@ QUnit.module('TotalGradeColumnHeader - Move to Front', {
   setup () {
     this.props = defaultProps();
     this.props.position.isInFront = false;
-    this.props.position.onMoveToFront = this.stub();
+    this.props.position.onMoveToFront = sinon.stub();
   },
 
   getMenuItem () {
@@ -347,7 +347,7 @@ QUnit.module('TotalGradeColumnHeader - Move to Back', {
   setup () {
     this.props = defaultProps();
     this.props.position.isInBack = false;
-    this.props.position.onMoveToBack = this.stub();
+    this.props.position.onMoveToBack = sinon.stub();
   },
 
   getMenuItem () {

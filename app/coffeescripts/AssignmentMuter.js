@@ -67,15 +67,25 @@ export default class AssignmentMuter {
   }
 
   afterUpdate (serverResponse) {
+    const assignment = serverResponse.assignment
     if (this.setter) {
-      this.setter(this.assignment, 'muted', serverResponse.assignment.muted)
+      this.setter(
+        this.assignment,
+        'anonymize_students',
+        assignment.anonymize_students
+      )
+      this.setter(this.assignment, 'muted', assignment.muted)
     } else {
-      this.assignment.muted = serverResponse.assignment.muted
+      this.assignment.anonymize_students = assignment.anonymize_students
+      this.assignment.muted = assignment.muted
     }
     if (!(this.options && this.options.openDialogInstantly)) this.updateLink()
 
     this.$dialog.dialog('close')
-    $.publish('assignment_muting_toggled', [this.assignment])
+    $.publish(
+      'assignment_muting_toggled',
+      [{...this.assignment, anonymize_students: assignment.anonymize_students, muted: assignment.muted}]
+    )
   }
 
   confirmUnmute () {

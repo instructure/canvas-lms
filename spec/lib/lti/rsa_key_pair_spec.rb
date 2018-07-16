@@ -29,15 +29,5 @@ describe Lti::RSAKeyPair do
       keys = Lti::RSAKeyPair.new
       expect(/\d+/.match(keys.private_key.to_text())[0]).to eq "256"
     end
-
-    it 'generates a public key with specified size' do
-      keys = Lti::RSAKeyPair.new key_size: 2048
-      expect(/\d+/.match(keys.public_key.to_text())[0]).to eq "2048"
-    end
-
-    it 'generates a private key with specified size' do
-      keys = Lti::RSAKeyPair.new key_size: 2048
-      expect(/\d+/.match(keys.private_key.to_text())[0]).to eq "2048"
-    end
   end
 end

@@ -20,9 +20,19 @@ class Assignment
   class GradeError < StandardError
     attr_accessor :status_code, :error_code
 
-    def initialize(message = nil, status_code = nil)
+    # The following parameters are all optional, and allow for different behavior
+    # depending on the type of error.
+    #
+    # message: A human-readable message. May not be passed to the client.
+    # status_code: A symbol corresponding to one of the Rails HTTP status codes.
+    # error_code: A custom string (such as MAX_GRADERS_REACHED) for when status_code
+    #   is not specific enough. Supply a value here if you want the client to
+    #   behave specially or show a specific message for different error types.
+    #   (Currently SpeedGrader pays attention to this parameter.)
+    def initialize(message = nil, status_code = nil, error_code: nil)
       super(message)
       self.status_code = status_code
+      self.error_code = error_code
     end
   end
 end

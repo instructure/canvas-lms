@@ -22,23 +22,14 @@ require_relative '../pages/gradezilla_grade_detail_tray_page'
 describe 'New Gradebook' do
   include_context 'in-process server selenium tests'
 
-  before(:each) do
+  before(:once) do
     # create a course with a teacher
-    course_with_teacher(course_name: 'Course1', active_all: true)
+    @teacher1 = course_with_teacher(course_name: 'Course1', active_all: true).user
+    @student1 = student_in_course.user
   end
 
   context 'with an anonymous assignment' do
-    before(:each) do
-      @student1 = student_in_course.user
-
-      # create a new anonymous assignment
-      @anonymous_assignment = @course.assignments.create!(
-        title: 'Anonymous Assignment',
-        submission_types: 'online_text_entry',
-        anonymous_grading: true,
-        points_possible: 10
-      )
-
+    before(:once) do
       # create a regular non-anonymous assignment
       @non_anonymous_assignment = @course.assignments.create!(
         title: 'Non Anonymous Assignment',
@@ -47,9 +38,20 @@ describe 'New Gradebook' do
       )
     end
 
-    it 'score cell disabled in grade detail tray', priority: '1', test_id: 3500571 do
-      user_session(@teacher)
+    before(:each) do
+      # create a new anonymous assignment
+      @anonymous_assignment = @course.assignments.create!(
+        title: 'Anonymous Assignment',
+        submission_types: 'online_text_entry',
+        anonymous_grading: true,
+        points_possible: 10
+      )
+
+      user_session(@teacher1)
       Gradezilla.visit(@course)
+    end
+
+    it 'score cell disabled in grade detail tray', priority: '1', test_id: 3500571 do
       Gradezilla::Cells.open_tray(@student1, @anonymous_assignment)
 
       expect(Gradezilla::GradeDetailTray.grade_input).to have_attribute('aria-disabled', 'true')
@@ -63,65 +65,52 @@ describe 'New Gradebook' do
       expect(@non_anonymous_assignment.muted?).to be true
     end
 
-    context 'causes score cells to be' do
-      before(:each) do
-        user_session(@teacher)
-        Gradezilla.visit(@course)
-      end
+    it 'causes score cells to be greyed out with grades invisible when assignment is muted', priority: '1', test_id: 3504000 do
+      grid_cell = Gradezilla::Cells.grid_assignment_row_cell(@student1, @anonymous_assignment)
+      class_attribute_fetched = grid_cell.attribute('class')
+      expect(class_attribute_fetched).to include 'grayed-out'
+      expect(Gradezilla::Cells.get_grade(@student1, @anonymous_assignment)).to eq ''
+    end
 
-      it 'greyed out with grades invisible when assignment is muted', priority: '1', test_id: 3504000 do
-        grid_cell = Gradezilla::Cells.grid_assignment_row_cell(@student1, @anonymous_assignment)
-        class_attribute_fetched = grid_cell.attribute('class')
-        expect(class_attribute_fetched).to include 'grayed-out'
-        expect(Gradezilla::Cells.get_grade(@student1, @anonymous_assignment)).to eq ''
-      end
-
-      it 'not greyed out with grades visible when assignment is unmuted', priority: '1', test_id: 3504000 do
-        Gradezilla.toggle_assignment_muting(@anonymous_assignment.id)
-        Gradezilla::Cells.edit_grade(@student1, @anonymous_assignment, '12')
-        expect(Gradezilla::Cells.get_grade(@student1, @anonymous_assignment)).to eq '12'
-      end
+    it 'causes score cells to be not greyed out with grades visible when assignment is unmuted', priority: '1', test_id: 3504000 do
+      Gradezilla.toggle_assignment_muting(@anonymous_assignment.id)
+      Gradezilla::Cells.edit_grade(@student1, @anonymous_assignment, '12')
+      expect(Gradezilla::Cells.get_grade(@student1, @anonymous_assignment)).to eq '12'
     end
   end
 
   context 'with a moderated assignment' do
-    before(:each) do
+    before(:once) do
       # enroll a second teacher
-      @teacher2 = User.create!(name: 'Teacher2')
-      @teacher2.register!
-      @course.enroll_teacher(@teacher2, enrollment_state: 'active')
+      @teacher2 = course_with_teacher(course: @course, name: 'Teacher2', active_all: true).user
+    end
 
+    before(:each) do
       # create moderated assignment
       @moderated_assignment = @course.assignments.create!(
         title: 'Moderated Assignment1',
         grader_count: 2,
-        final_grader_id: @teacher.id,
+        final_grader_id: @teacher1.id,
         grading_type: 'points',
         points_possible: 15,
         submission_types: 'online_text_entry',
         moderated_grading: true
       )
 
-      # enroll a student
-      @student1 = User.create!(name: 'Student1')
-      @student1.register!
-      @course.enroll_student(@student1, enrollment_state: 'active')
-
       # give a grade as non-final grader
-      @student1_submission = @moderated_assignment.submit_homework(@student1, body: 'student 1 submission moderated assignment')
       @student1_submission = @moderated_assignment.grade_student(@student1, grade: 13, grader: @teacher2, provisional: true).first
 
-      # switch session to non-final-grader
-      user_session(@teacher2)
     end
 
     it 'displays "MUTED" in the assignment', priority: '1', test_id: 3496196 do
+      user_session(@teacher2)
       Gradezilla.visit(@course)
 
       expect(Gradezilla.select_assignment_header_secondary_label(@moderated_assignment.name).text).to include 'MUTED'
     end
 
     it 'prevents unmuting the assignment before grades are posted', prirotiy: '1', test_id: 3496196 do
+      user_session(@teacher2)
       Gradezilla.visit(@course)
       Gradezilla.click_assignment_header_menu(@moderated_assignment.id)
       wait_for_ajaximations
@@ -130,6 +119,7 @@ describe 'New Gradebook' do
     end
 
     it 'allows unmuting the assignment after grades are posted', priority: '1', test_id: 3496196 do
+      user_session(@teacher2)
       @moderated_assignment.update!(grades_published_at: Time.zone.now)
 
       Gradezilla.visit(@course)
@@ -141,7 +131,7 @@ describe 'New Gradebook' do
 
     context "causes editing grades to be" do
       before(:each) do
-        user_session(@teacher)
+        user_session(@teacher1)
         Gradezilla.visit(@course)
       end
 

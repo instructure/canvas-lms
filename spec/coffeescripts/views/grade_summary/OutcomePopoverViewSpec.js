@@ -54,7 +54,7 @@ test('closePopover', function() {
 })
 
 test('mouseenter', function() {
-  const spy = this.spy(this.popoverView, 'openPopover')
+  const spy = sandbox.spy(this.popoverView, 'openPopover')
   ok(!this.popoverView.inside, 'precondition')
   this.popoverView.el.find('i').trigger(this.e('mouseenter'))
   ok(spy.called)
@@ -62,7 +62,7 @@ test('mouseenter', function() {
 })
 
 test('mouseleave when no popover is present', function() {
-  const spy = this.spy(this.popoverView, 'closePopover')
+  const spy = sandbox.spy(this.popoverView, 'closePopover')
   ok(isUndefined(this.popoverView.popover), 'precondition')
   this.popoverView.el.find('i').trigger(this.e('mouseleave'))
   this.clock.tick(this.popoverView.TIMEOUT_LENGTH)
@@ -73,7 +73,7 @@ test('mouseleave when popover is present', function() {
   this.popoverView.el.find('i').trigger('mouseenter')
   ok(!isUndefined(this.popoverView.popover), 'precondition')
   ok(this.popoverView.inside, 'precondition')
-  const spy = this.spy(this.popoverView, 'closePopover')
+  const spy = sandbox.spy(this.popoverView, 'closePopover')
   this.popoverView.el.find('i').trigger(this.e('mouseleave'))
   this.clock.tick(this.popoverView.TIMEOUT_LENGTH)
   ok(spy.called)
@@ -81,8 +81,8 @@ test('mouseleave when popover is present', function() {
 
 test('openPopover', function() {
   ok(isUndefined(this.popoverView.popover), 'precondition')
-  const elementSpy = this.stub(this.popoverView.outcomeLineGraphView, 'setElement')
-  const renderSpy = this.stub(this.popoverView.outcomeLineGraphView, 'render')
+  const elementSpy = sandbox.stub(this.popoverView.outcomeLineGraphView, 'setElement')
+  const renderSpy = sandbox.stub(this.popoverView.outcomeLineGraphView, 'render')
   this.popoverView.openPopover(this.e('mouseenter'))
   ok(this.popoverView.popover instanceof Popover)
   ok(elementSpy.called)

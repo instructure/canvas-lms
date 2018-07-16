@@ -52,8 +52,16 @@ TimeZoneSelect.propTypes = {
   priority_zones: arrayOf(timezoneShape)
 }
 
+let defaultsJSON
+try {
+  defaultsJSON = require(`./localized-timezone-lists/${ENV.LOCALE || 'en'}.json`)
+} catch (e) {
+  // fall back to english if a user has a locale set that we don't have a list for
+  defaultsJSON = require(`./localized-timezone-lists/en.json`)
+}
+
 TimeZoneSelect.defaultProps = {
   // TODO: change ENV.LOCALE to process.env.BUILD_LOCALE once we do locale-specific builds so we only pull in that one json file
-  ...require(`./localized-timezone-lists/${ENV.LOCALE || 'en'}.json`),
+  ...defaultsJSON,
   label: I18n.t('Time Zone')
 }

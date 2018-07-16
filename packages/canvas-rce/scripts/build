@@ -17,6 +17,6 @@ echo "building pretranslated output in lib/translated $CPUS at a time ..."
 ls locales/*.json | \
   xargs basename -s .json | \
   xargs -t -n 1 -P $CPUS -I % env \
-    BUILD_LOCALE=% babel --out-dir lib/translated/%/modules --ignore locales* --quiet src
+    BUILD_LOCALE=% yarn run babel --out-dir lib/translated/%/modules --ignore locales* --quiet src
 
 wait # wait for the default untranslated builds that we backgrounded above with an "&"

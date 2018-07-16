@@ -40,7 +40,7 @@ import GradingPeriodsHelper from '../grading/helpers/GradingPeriodsHelper'
   ) {
     if (assignment.moderated_grading && !assignment.grades_published) {
       return { locked: true, hideGrade: false };
-    } else if (assignment.anonymous_grading && assignment.muted) {
+    } else if (assignment.anonymize_students) {
       return { locked: true, hideGrade: true };
     } else if (!visibleToStudent(assignment, student)) {
       return { locked: true, hideGrade: true, tooltip: TOOLTIP_KEYS.NONE };

@@ -57,6 +57,14 @@ module Canvas
           expect(new_proxy.data).to eq({qux: 42}.with_indifferent_access)
         end
       end
+
+      describe '#set_keys' do
+        it 'merges in a hash' do
+          kvs = {foo1: 'bar1', foo2: 'bar2'}
+          proxy.set_keys(kvs)
+          expect(proxy.data).to include kvs
+        end
+      end
     end
   end
 end

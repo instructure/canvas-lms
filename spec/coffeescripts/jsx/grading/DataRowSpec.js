@@ -86,7 +86,7 @@ test('renders in "edit" mode (as opposed to "view" mode)', function() {
 })
 
 test('on change, accepts arbitrary input and saves to state', function() {
-  const changeMinScore = this.spy(this.props, 'onRowMinScoreChange')
+  const changeMinScore = sandbox.spy(this.props, 'onRowMinScoreChange')
   const DataRowElement = <DataRow {...this.props} />
   this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
   Simulate.change(this.dataRow.minScoreInput, {target: {value: 'A'}})
@@ -100,7 +100,7 @@ test('on change, accepts arbitrary input and saves to state', function() {
 })
 
 test('on blur, does not call onRowMinScoreChange if the input parsed value is less than 0', function() {
-  const changeMinScore = this.spy(this.props, 'onRowMinScoreChange')
+  const changeMinScore = sandbox.spy(this.props, 'onRowMinScoreChange')
   const DataRowElement = <DataRow {...this.props} />
   this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
   Simulate.change(this.dataRow.minScoreInput, {target: {value: '-1'}})
@@ -110,7 +110,7 @@ test('on blur, does not call onRowMinScoreChange if the input parsed value is le
 })
 
 test('on blur, does not call onRowMinScoreChange if the input parsed value is greater than 100', function() {
-  const changeMinScore = this.spy(this.props, 'onRowMinScoreChange')
+  const changeMinScore = sandbox.spy(this.props, 'onRowMinScoreChange')
   const DataRowElement = <DataRow {...this.props} />
   this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
   Simulate.change(this.dataRow.minScoreInput, {target: {value: '101'}})
@@ -120,7 +120,7 @@ test('on blur, does not call onRowMinScoreChange if the input parsed value is gr
 })
 
 test('on blur, calls onRowMinScoreChange when input parsed value is between 0 and 100', function() {
-  const changeMinScore = this.spy(this.props, 'onRowMinScoreChange')
+  const changeMinScore = sandbox.spy(this.props, 'onRowMinScoreChange')
   const DataRowElement = <DataRow {...this.props} />
   this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
   Simulate.change(this.dataRow.minScoreInput, {target: {value: '88.'}})
@@ -140,7 +140,7 @@ test('on blur, calls onRowMinScoreChange when input parsed value is between 0 an
 })
 
 test('on blur, does not call onRowMinScoreChange when input has not changed', function() {
-  const changeMinScore = this.spy(this.props, 'onRowMinScoreChange')
+  const changeMinScore = sandbox.spy(this.props, 'onRowMinScoreChange')
   const DataRowElement = <DataRow {...this.props} />
   this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
   Simulate.blur(this.dataRow.minScoreInput)
@@ -149,7 +149,7 @@ test('on blur, does not call onRowMinScoreChange when input has not changed', fu
 })
 
 test('calls onRowNameChange when input changes', function() {
-  const changeMinScore = this.spy(this.props, 'onRowNameChange')
+  const changeMinScore = sandbox.spy(this.props, 'onRowNameChange')
   const DataRowElement = <DataRow {...this.props} />
   this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
   Simulate.change(this.dataRow.refs.nameInput, {target: {value: 'F'}})
@@ -158,7 +158,7 @@ test('calls onRowNameChange when input changes', function() {
 })
 
 test('calls onDeleteRow when the delete button is clicked', function() {
-  const deleteRow = this.spy(this.props, 'onDeleteRow')
+  const deleteRow = sandbox.spy(this.props, 'onDeleteRow')
   const DataRowElement = <DataRow {...this.props} />
   this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
   Simulate.click(this.dataRow.refs.deleteButton.getDOMNode())

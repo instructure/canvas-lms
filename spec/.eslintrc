@@ -7,6 +7,7 @@
     "test": true,
     "equal": true,
     "ok": true,
+    "sandbox": true,
     "sinon": true,
     "deepEqual": true
   },

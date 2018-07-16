@@ -176,43 +176,43 @@ test('disables inputs while loading', 2, function() {
 })
 
 test('submit delegates to saveFormData', 1, function() {
-  this.spy(this.form, 'saveFormData')
+  sandbox.spy(this.form, 'saveFormData')
 
   this.form.submit()
   ok(this.form.saveFormData.called, 'saveFormData called')
 })
 
 test('submit calls validateBeforeSave', 1, function() {
-  this.spy(this.form, 'validateBeforeSave')
+  sandbox.spy(this.form, 'validateBeforeSave')
 
   this.form.submit()
   ok(this.form.validateBeforeSave.called, 'validateBeforeSave called')
 })
 
 test('submit always calls hideErrors', 1, function() {
-  this.spy(this.form, 'hideErrors')
+  sandbox.spy(this.form, 'hideErrors')
 
   this.form.submit()
   ok(this.form.hideErrors.called, 'hideErrors called')
 })
 
 test('validateBeforeSave delegates to validateFormData, by default', 1, function() {
-  this.spy(this.form, 'validateFormData')
+  sandbox.spy(this.form, 'validateFormData')
 
   this.form.validateBeforeSave({})
   ok(this.form.validateFormData.called, 'validateFormData called')
 })
 
 test('validate delegates to validateFormData', 1, function() {
-  this.spy(this.form, 'validateFormData')
+  sandbox.spy(this.form, 'validateFormData')
 
   this.form.validate()
   ok(this.form.validateFormData.called, 'validateFormData called')
 })
 
 test('validate always calls hideErrors', 2, function() {
-  this.stub(this.form, 'validateFormData')
-  this.spy(this.form, 'hideErrors')
+  sandbox.stub(this.form, 'validateFormData')
+  sandbox.spy(this.form, 'hideErrors')
 
   this.form.validateFormData.returns({})
   this.form.validate()
@@ -232,8 +232,8 @@ test('validate always calls hideErrors', 2, function() {
 })
 
 test('validate always calls showErrors', 2, function() {
-  this.stub(this.form, 'validateFormData')
-  this.spy(this.form, 'showErrors')
+  sandbox.stub(this.form, 'validateFormData')
+  sandbox.spy(this.form, 'showErrors')
 
   this.form.validateFormData.returns({})
   this.form.validate()

@@ -6944,11 +6944,11 @@ sv-x-k12:
     gradebook_list_students_by_sortable_name: "Bedömningsöversikt - Ordna elever efter sorterbara namn"
     high_contrast: "Högupplöst UI"
     k12: "K-12 särskilda funktioner"
-    learning_mastery_gradebook: "Bedömningsöversikt för måluppfyllelse av lärandemål"
+    learning_mastery_gradebook: "Bedömningsöversikt för måluppfyllelse"
     lor: "LOR externa verktyg"
     post_grades: "Posta bedömningar till SIS"
     quiz_log_auditing: "Granskning av quizlogg"
-    student_outcome_gradebook: "Bedömningsöversikt för elevs måluppfyllelse av lärandemål"
+    student_outcome_gradebook: "Bedömningsöversikt för elevs måluppfyllelse"
   features_2581da: Funktioner
   federated_attributes_5cbe6441: Förbundsattribut
   federated_attributes_are_information_sent_from_you_2116fb61: "Förbundsattribut är information som skickats från  ditt externa verifieringssystem som kan användas för att automatiskt uppdatera överensstämmande information för användare i Canvas varje gång de loggar in. "
@@ -8491,7 +8491,7 @@ sv-x-k12:
   learning_mastery_5fc34276: Måluppfyllelse
   learning_mastery_6ed4fd63: Måluppfyllelse...
   learning_mastery_gradebook_description: |-
-      Bedömningsöversikten för måluppfyllelse av lärandemål ger läraren en överblick över elev- och kursutvecklingen baserat på kursens lärandemål. Resultaten presenteras i ett bedömningsöversiktsliknade format och elevutveckling visas både i siffror och
+      Bedömningsöversikten för måluppfyllelse ger läraren en överblick över elev- och kursutvecklingen baserat på kursens lärandemål. Resultaten presenteras i ett bedömningsöversiktsliknade format och elevutveckling visas både i siffror och
       definierade kategorier.
   learning_object_1f9e5dd8: Inlärningsföremål
   learning_outcome: 

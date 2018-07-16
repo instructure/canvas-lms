@@ -20,6 +20,10 @@ class Speedgrader
     include SeleniumDependencies
 
     # components/elements
+    def right_inner_panel
+      f('#rightside_inner')
+    end
+
     def grade_value
       f('#grade_container input[type=text]').attribute('value')
     end
@@ -96,7 +100,11 @@ class Speedgrader
       f('#students_selectmenu-button')
     end
 
-    def comment_text_area
+    def comment_citation
+      ff('.author_name')
+    end
+
+    def new_comment_text_area
       f('#speedgrader_comment_textarea')
     end
 
@@ -118,6 +126,10 @@ class Speedgrader
 
     def submission_to_view_dropdown
       f('#submission_to_view')
+    end
+
+    def submission_file_download
+      f('.submission-file-download')
     end
 
     def attachment_button
@@ -169,7 +181,7 @@ class Speedgrader
     end
 
     def students_select_menu_list
-      ff("#students_selectmenu-menu li")
+      ff("#students_selectmenu-menu li .ui-selectmenu-item-header")
     end
 
     def section_all
@@ -252,7 +264,7 @@ class Speedgrader
     end
 
     def add_comment_and_submit(comment)
-      replace_content(comment_text_area, comment)
+      replace_content(new_comment_text_area, comment)
       comment_submit_button.click
     end
 

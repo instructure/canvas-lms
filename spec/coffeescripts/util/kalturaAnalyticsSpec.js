@@ -39,7 +39,7 @@ QUnit.module('kaltura analytics helper', {
 })
 
 test('adds event listeners', function() {
-  this.mock(this.player)
+  sandbox.mock(this.player)
     .expects('addEventListener')
     .atLeast(6)
   return kalturaAnalytics('1', this.player, this.pluginSettings)

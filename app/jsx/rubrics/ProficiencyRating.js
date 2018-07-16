@@ -40,7 +40,7 @@ export default class ProficiencyRating extends React.Component {
     description: PropTypes.string.isRequired,
     descriptionError: PropTypes.string,
     disableDelete: PropTypes.bool.isRequired,
-    focusField: PropTypes.oneOf(['description', 'points', 'mastery']),
+    focusField: PropTypes.oneOf(['description', 'points', 'mastery', 'trash']),
     mastery: PropTypes.bool.isRequired,
     onColorChange: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
@@ -62,19 +62,25 @@ export default class ProficiencyRating extends React.Component {
     this.state = { showColorPopover: false }
     this.descriptionInput = null
     this.pointsInput = null
-  }
-
-  componentDidUpdate() {
-    if (this.props.focusField === 'description') {
-      this.descriptionInput.focus()
-    } else if (this.props.focusField === 'points') {
-      this.pointsInput.focus()
-    }
+    this.trashButton = null
+    this.colorButton = null
   }
 
   componentDidMount() {
     if (this.props.focusField === 'mastery') {
       this.radioInput.focus()
+    }
+  }
+
+  componentDidUpdate() {
+    if (this.props.focusField === 'trash') {
+      setTimeout(() => (
+        this.props.disableDelete ? this.colorButton.focus() : this.trashButton.focus()
+      ), 700)
+    } else if (this.props.focusField === 'description') {
+      this.descriptionInput.focus()
+    } else if (this.props.focusField === 'points') {
+      this.pointsInput.focus()
     }
   }
 
@@ -84,6 +90,14 @@ export default class ProficiencyRating extends React.Component {
 
   setPointsRef = element => {
     this.pointsInput = element
+  }
+
+  setTrashRef = element => {
+    this.trashButton = element
+  }
+
+  setColorRef = element => {
+    this.colorButton = element
   }
 
   setColor = (unformattedColor, _successFn, _errorFn) => {
@@ -164,7 +178,7 @@ export default class ProficiencyRating extends React.Component {
             show={this.state.showColorPopover}
             onToggle={this.handleMenuToggle}>
             <PopoverTrigger>
-              <Button variant="link">
+              <Button ref={this.setColorRef} variant="link">
                 <div>
                   <span className="colorPickerIcon" style={{background: formatColor(color)}} />
                   {I18n.t('Change')}
@@ -191,8 +205,16 @@ export default class ProficiencyRating extends React.Component {
             </PopoverContent>
           </Popover>
           <div className="delete">
-            <Button variant="icon" onClick={this.handleDelete} disabled={disableDelete}>
-              <IconTrash title={I18n.t('Delete proficiency rating')} />
+            <Button
+              disabled={disableDelete}
+              buttonRef={this.setTrashRef}
+              onClick={this.handleDelete}
+              variant="icon"
+              icon={<IconTrash />}
+            >
+              <ScreenReaderContent>
+                {I18n.t('Delete proficiency rating')}
+              </ScreenReaderContent>
             </Button>
           </div>
         </td>

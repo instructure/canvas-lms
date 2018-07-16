@@ -29,13 +29,13 @@ QUnit.module('messageStudentsWhoHelper#options', {
 })
 
 test("Includes the 'Haven't been graded' option if there are submissions", function() {
-  this.stub(MessageStudentsWhoHelper, 'hasSubmission').returns(true)
+  sandbox.stub(MessageStudentsWhoHelper, 'hasSubmission').returns(true)
   const options = MessageStudentsWhoHelper.options(this.assignment)
   deepEqual(options[1].text, "Haven't been graded")
 })
 
 test("Does not include the 'Haven't been graded' option if there are no submissions", function() {
-  this.stub(MessageStudentsWhoHelper, 'hasSubmission').returns(false)
+  sandbox.stub(MessageStudentsWhoHelper, 'hasSubmission').returns(false)
   const options = MessageStudentsWhoHelper.options(this.assignment)
   deepEqual(options[1].text, 'Scored less than')
 })
@@ -135,7 +135,7 @@ test('returns the student ids filtered by the correct criteria', function() {
       return student.score > cutoff
     }
   }
-  this.stub(MessageStudentsWhoHelper, 'findOptionByText').returns(option)
+  sandbox.stub(MessageStudentsWhoHelper, 'findOptionByText').returns(option)
   const students = [
     {
       user_data: {
@@ -165,7 +165,7 @@ test('generates a function that returns the subject string', function() {
       return `name: ${assignment.name}, cutoff: ${cutoff}`
     }
   }
-  this.stub(MessageStudentsWhoHelper, 'findOptionByText').returns(option)
+  sandbox.stub(MessageStudentsWhoHelper, 'findOptionByText').returns(option)
   const assignment = {
     id: '1',
     name: 'Shootbags'

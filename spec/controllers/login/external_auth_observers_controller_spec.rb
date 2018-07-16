@@ -33,7 +33,7 @@ describe Login::ExternalAuthObserversController do
       allow(controller).to receive(:valid_user_unique_id?).and_return(true)
       allow(controller).to receive(:valid_observee_unique_id?).and_return(true)
       subject = post :redirect_login, params: params
-      expect(subject).to be_success
+      expect(subject).to be_successful
     end
 
     it "returns an error if unique_id is not valid" do

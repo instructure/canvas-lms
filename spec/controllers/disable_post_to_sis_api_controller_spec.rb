@@ -35,7 +35,7 @@ describe DisablePostToSisApiController do
 
       put 'disable_post_to_sis', params: {course_id: course.id}
 
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assignment.reload.post_to_sis).to eq false
     end
 

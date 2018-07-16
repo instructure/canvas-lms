@@ -200,7 +200,7 @@ test('populates the editor contents input', function() {
     selection: {getContent: () => 'itor conte'}
   }
   const form = $('#external_tool_button_form')
-  this.stub(form, 'submit').returns({
+  sandbox.stub(form, 'submit').returns({
     status: 200,
     data: {}
   })
@@ -217,7 +217,7 @@ test('populates the editor selection input', function() {
     selection: {getContent: () => 'itor conte'}
   }
   const form = $('#external_tool_button_form')
-  this.stub(form, 'submit').returns({
+  sandbox.stub(form, 'submit').returns({
     status: 200,
     data: {}
   })

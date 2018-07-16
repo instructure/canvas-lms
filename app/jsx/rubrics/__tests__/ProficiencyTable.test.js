@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
+import _ from 'lodash'
 import $ from 'jquery'
 import React from 'react'
 import axios from 'axios'
@@ -32,7 +32,8 @@ let getSpy
 
 describe('default proficiency', () => {
   beforeEach(() => {
-    getSpy = jest.spyOn(axios,'get').mockImplementation(() => Promise.reject({response: {status: 404}}))
+    const err = _.assign(new Error(), { response: { status: 404 } })
+    getSpy = jest.spyOn(axios,'get').mockImplementation(() => Promise.reject(err))
   })
 
   afterEach(() => {
@@ -101,12 +102,15 @@ describe('default proficiency', () => {
     }, 1)
   })
 
-  it('handling delete rating removes rating', (done) => {
+  it('handling delete rating removes rating and flashes SR message', (done) => {
     const wrapper = mount(<ProficiencyTable {...defaultProps()}/>)
+    const flashMock = jest.spyOn($, 'screenReaderFlashMessage')
     setTimeout(() => {
       wrapper.instance().removeBillboard()
-      wrapper.instance().handleDelete(0)()
+      wrapper.instance().handleDelete(1)()
       expect(wrapper.find('ProficiencyRating')).toHaveLength(4)
+      expect(flashMock).toHaveBeenCalledTimes(1)
+      flashMock.mockRestore()
       done()
     }, 1)
   })

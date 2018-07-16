@@ -79,6 +79,7 @@
             <%= render partial: "sso_buttons", locals: { aacs: @aacs_with_buttons } %>
           <% end %>
           <%= form_for :pseudonym_session, :url => forgot_password_path, :html => {:id => "forgot_password_form", :style => "display: none;"} do |f| %>
+            <h1 class="ui-helper-hidden-accessible"><%= t('Forgot Password?') %></h1>
             <p id="forgot_password_instructions" class="ic-Login__forgot-text">
               <%= t('login_handle', "Enter your %{login_handle_name} and we'll send you a link to change your password.", :login_handle_name => login_handle_name) %>
             </p>

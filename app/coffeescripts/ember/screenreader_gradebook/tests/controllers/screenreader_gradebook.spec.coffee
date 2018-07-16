@@ -918,41 +918,17 @@ QUnit.module 'ScreenReader Gradebook', (suiteHooks) ->
       initializeApp()
       asyncHelper.waitForRequests()
 
-    test 'false when assignment is not muted', ->
+    test 'false when anonymize_students is false', ->
       assignment = srgb.get('assignments.firstObject')
-      assignment.muted = false
-      assignment.anonymous_grading = true
-      assignment.moderated_grading = true
+      assignment.anonymize_students = false
 
       Ember.run ->
         srgb.set('selectedAssignment', assignment)
         equal srgb.get('hideComments'), false
 
-    test 'false when assignment is muted but not anonymous or moderated', ->
+    test 'true when anonymize_students is true', ->
       assignment = srgb.get('assignments.firstObject')
-      assignment.muted = true
-      assignment.anonymous_grading = false
-      assignment.moderated_grading = false
-
-      Ember.run ->
-        srgb.set('selectedAssignment', assignment)
-        equal srgb.get('hideComments'), false
-
-    test 'true when assignment is muted and anonymous', ->
-      assignment = srgb.get('assignments.firstObject')
-      assignment.muted = true
-      assignment.anonymous_grading = true
-      assignment.moderated_grading = false
-
-      Ember.run ->
-        srgb.set('selectedAssignment', assignment)
-        equal srgb.get('hideComments'), true
-
-    test 'true when assignment is muted and moderated', ->
-      assignment = srgb.get('assignments.firstObject')
-      assignment.muted = true
-      assignment.anonymous_grading = false
-      assignment.moderated_grading = true
+      assignment.anonymize_students = true
 
       Ember.run ->
         srgb.set('selectedAssignment', assignment)

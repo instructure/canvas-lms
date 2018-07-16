@@ -205,7 +205,7 @@ describe 'Student Gradebook' do
         submission_types: 'online_upload'
       )
     end
-    let_once(:file_attachment) { attachment_model(:content_type => 'application/pdf', :context => student) }
+    let_once(:file_attachment) { attachment_model(content_type: 'application/pdf', context: student) }
     let_once(:student_submission) do
       assignment.submit_homework(
         student,

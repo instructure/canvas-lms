@@ -35,7 +35,7 @@ define([
     },
 
     setup () {
-      this.stub($, 'getJSON').returns({success: () => ({ error: () => {} }), done: () => {}});
+      sandbox.stub($, 'getJSON').returns({success: () => ({ error: () => {} }), done: () => {}});
     },
 
     teardown () {
@@ -57,13 +57,13 @@ define([
   });
 
   test('jquery-ui tabs() is called when there are grading periods', function () {
-    const tabsSpy = this.spy($.fn, 'tabs');
+    const tabsSpy = sandbox.spy($.fn, 'tabs');
     this.renderComponent({ hasGradingPeriods: true });
     ok(tabsSpy.calledOnce);
   });
 
   test('jquery-ui tabs() is not called when there are no grading periods', function () {
-    const tabsSpy = this.spy($.fn, 'tabs');
+    const tabsSpy = sandbox.spy($.fn, 'tabs');
     this.renderComponent({ hasGradingPeriods: false});
     notOk(tabsSpy.called);
   });

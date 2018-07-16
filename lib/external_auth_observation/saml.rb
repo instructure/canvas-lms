@@ -43,7 +43,7 @@ module ExternalAuthObservation
         )
 
         # sign the request
-        private_key = AccountAuthorizationConfig::SAML.private_key
+        private_key = AuthenticationProvider::SAML.private_key
         private_key = nil if aac.sig_alg.nil?
         SAML2::Bindings::HTTPRedirect.encode(logout_request,
                                              private_key: private_key,

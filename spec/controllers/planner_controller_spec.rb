@@ -291,6 +291,24 @@ describe PlannerController do
              ['wiki_page', @group_page.id]]
           )
         end
+
+        it "filters all_ungraded_todo_items for teachers" do
+          user_session @course1.teachers.first
+          get :index, params: {
+            filter: 'all_ungraded_todo_items',
+            context_codes: [@course1.asset_string, @group.asset_string],
+            start_date: 2.weeks.ago.iso8601,
+            end_date: 2.weeks.from_now.iso8601
+          }
+          response_json = json_parse(response.body)
+          items = response_json.map{|i| [i['plannable_type'], i['plannable_id']]}
+          expect(items).to match_array(
+            [['discussion_topic', @course_topic.id],
+             ['discussion_topic', @group_topic.id],
+             ['wiki_page', @course_page.id],
+             ['wiki_page', @group_page.id]]
+          )
+        end
       end
 
       context "date sorting" do

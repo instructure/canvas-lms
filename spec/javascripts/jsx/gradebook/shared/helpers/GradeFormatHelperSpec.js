@@ -23,19 +23,19 @@ import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
 QUnit.module('GradeFormatHelper#formatGrade', {
   setup () {
     this.translateString = I18n.t;
-    this.stub(numberHelper, 'validate').callsFake(val => !isNaN(parseFloat(val)));
-    this.stub(I18n, 't').callsFake(this.translateString);
+    sandbox.stub(numberHelper, 'validate').callsFake(val => !isNaN(parseFloat(val)));
+    sandbox.stub(I18n, 't').callsFake(this.translateString);
   }
 });
 
 test('uses I18n#n to format numerical integer grades', function () {
-  this.stub(I18n, 'n').withArgs(1000).returns('* 1,000');
+  sandbox.stub(I18n, 'n').withArgs(1000).returns('* 1,000');
   equal(GradeFormatHelper.formatGrade(1000), '* 1,000');
   equal(I18n.n.callCount, 1);
 });
 
 test('uses I18n#n to format numerical decimal grades', function () {
-  this.stub(I18n, 'n').withArgs(123.45).returns('* 123.45');
+  sandbox.stub(I18n, 'n').withArgs(123.45).returns('* 123.45');
   equal(GradeFormatHelper.formatGrade(123.45), '* 123.45');
   equal(I18n.n.callCount, 1);
 });
@@ -66,7 +66,7 @@ test('returns "Excused" when the grade is "EX"', function () {
 });
 
 test('parses a stringified integer percentage grade when it is a valid number', function () {
-  this.spy(numberHelper, 'parse');
+  sandbox.spy(numberHelper, 'parse');
   GradeFormatHelper.formatGrade('32%');
   equal(numberHelper.parse.callCount, 1);
   strictEqual(numberHelper.parse.getCall(0).args[0], '32');
@@ -89,7 +89,7 @@ test('returns the given grade when it is numbers followed by letters', function 
 });
 
 test('does not format letter grades', function () {
-  this.spy(I18n, 'n');
+  sandbox.spy(I18n, 'n');
   GradeFormatHelper.formatGrade('A');
   equal(I18n.n.callCount, 0, 'I18n.n was not called');
 });
@@ -119,7 +119,7 @@ test('returns the grade when given an empty string and no defaultValue option', 
 });
 
 test('formats numerical integer grades as percent when given a gradingType of "percent"', function () {
-  this.spy(I18n, 'n');
+  sandbox.spy(I18n, 'n');
   GradeFormatHelper.formatGrade(10, { gradingType: 'percent' });
   const [value, options] = I18n.n.getCall(0).args;
   strictEqual(value, 10);
@@ -127,7 +127,7 @@ test('formats numerical integer grades as percent when given a gradingType of "p
 });
 
 test('formats numerical decimal grades as percent when given a gradingType of "percent"', function () {
-  this.spy(I18n, 'n');
+  sandbox.spy(I18n, 'n');
   GradeFormatHelper.formatGrade(10.1, { gradingType: 'percent' });
   const [value, options] = I18n.n.getCall(0).args;
   strictEqual(value, 10.1);
@@ -135,7 +135,7 @@ test('formats numerical decimal grades as percent when given a gradingType of "p
 });
 
 test('formats string percentage grades as points when given a gradingType of "points"', function () {
-  this.spy(I18n, 'n');
+  sandbox.spy(I18n, 'n');
   GradeFormatHelper.formatGrade('10%', { gradingType: 'points' });
   const [value, options] = I18n.n.getCall(0).args;
   strictEqual(value, 10);
@@ -152,7 +152,7 @@ test('optionally rounds to a given precision', function () {
 });
 
 test('optionally parses grades as non-localized', function () {
-  this.stub(numberHelper, 'parse').withArgs('32.459').returns(32459);
+  sandbox.stub(numberHelper, 'parse').withArgs('32.459').returns(32459);
   const formatted = GradeFormatHelper.formatGrade('32.459', { delocalize: false });
 
   strictEqual(numberHelper.parse.callCount, 0);
@@ -210,25 +210,25 @@ test('parses stringified decimal percentages', function () {
 });
 
 test('uses numberHelper.parse to parse a stringified integer grade', function () {
-  this.spy(numberHelper, 'parse');
+  sandbox.spy(numberHelper, 'parse');
   GradeFormatHelper.parseGrade('123');
   equal(numberHelper.parse.callCount, 1);
 });
 
 test('uses numberHelper.parse to parse a stringified decimal grade', function () {
-  this.spy(numberHelper, 'parse');
+  sandbox.spy(numberHelper, 'parse');
   GradeFormatHelper.parseGrade('123.456');
   equal(numberHelper.parse.callCount, 1);
 });
 
 test('uses numberHelper.parse to parse a stringified integer percentage', function () {
-  this.spy(numberHelper, 'parse');
+  sandbox.spy(numberHelper, 'parse');
   GradeFormatHelper.parseGrade('123%');
   equal(numberHelper.parse.callCount, 1);
 });
 
 test('uses numberHelper.parse to parse a stringified decimal percentage', function () {
-  this.spy(numberHelper, 'parse');
+  sandbox.spy(numberHelper, 'parse');
   GradeFormatHelper.parseGrade('123.456%');
   equal(numberHelper.parse.callCount, 1);
 });
@@ -258,7 +258,7 @@ test('returns an empty string when given an empty string', function () {
 });
 
 test('optionally parses grades without delocalizing', function () {
-  this.spy(numberHelper, 'parse');
+  sandbox.spy(numberHelper, 'parse');
   GradeFormatHelper.parseGrade('123', { delocalize: false });
   equal(numberHelper.parse.callCount, 0);
 });
@@ -454,6 +454,14 @@ QUnit.module('GradeFormatHelper', (suiteHooks) => {
         equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '68%');
       });
 
+      test('avoids floating point calculation issues when computing the percent', () => {
+        submission.score = 946.65
+        options.pointsPossible = 1000
+        const floatingPointResult = 946.65 / 1000 * 100
+        strictEqual(floatingPointResult, 94.66499999999999)
+        strictEqual(GradeFormatHelper.formatSubmissionGrade(submission, options), '94.67%');
+      })
+
       test('uses the "final" score when explicitly specified', () => {
         options.version = 'final';
         equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '68%');
@@ -517,6 +525,15 @@ QUnit.module('GradeFormatHelper', (suiteHooks) => {
       test('returns the matching scheme grade for the "final" score', () => {
         equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'D');
       });
+
+      test('avoids floating point calculation issues when computing the percent', () => {
+        options.gradingScheme = [['A', 0.94665], ['F', 0]]
+        submission.score = 946.65
+        options.pointsPossible = 1000
+        const floatingPointResult = 946.65 / 1000 * 100
+        strictEqual(floatingPointResult, 94.66499999999999)
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'A')
+      })
 
       test('uses the "final" score when explicitly specified', () => {
         options.version = 'final';

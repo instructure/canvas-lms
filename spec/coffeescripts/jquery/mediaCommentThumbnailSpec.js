@@ -25,7 +25,7 @@ QUnit.module('mediaCommentThumbnail', {
     // flop out the _.defer function to just call directly down to the passed
     // function reference. this helps the tests run in a synchronous order
     // internally so asserts can work like we expect.
-    this.stub(_, 'defer').callsFake((func, ...args) => func(...Array.from(args || [])))
+    sandbox.stub(_, 'defer').callsFake((func, ...args) => func(...Array.from(args || [])))
     this.$fixtures = $('#fixtures')
   },
   teardown() {

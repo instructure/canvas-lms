@@ -22,26 +22,27 @@ require_relative '../pact_config'
 require_relative '../../../spec_helper'
 require_relative 'pact_setup'
 require_relative 'proxy_app'
-Dir[File.dirname(__FILE__) + "/provider_states_for_consumer/*.rb"].each {|f| require f }
+require_relative 'provider_states_for_consumer'
 
 Pact.service_provider PactConfig::Providers::CANVAS_LMS_API do
   app { PactApiConsumerProxy.new }
 
-  pact_path = format(
-    'pacts/provider/%<provider>s/consumer/%<consumer>s',
-    provider: ERB::Util.url_encode(PactConfig::Providers::CANVAS_LMS_API),
-    consumer: ERB::Util.url_encode(PactConfig::Consumers::GENERIC_CONSUMER)
-  )
+  PactConfig::Consumers::ALL.each do |consumer|
+    pact_path = format(
+      'pacts/provider/%<provider>s/consumer/%<consumer>s',
+      provider: ERB::Util.url_encode(PactConfig::Providers::CANVAS_LMS_API),
+      consumer: ERB::Util.url_encode(consumer)
+    )
 
-  honours_pact_with PactConfig::Consumers::GENERIC_CONSUMER do
-
-    if PactConfig.jenkins_build? then
+    honours_pact_with consumer do
       pact_uri PactConfig.pact_uri(pact_path: pact_path)
-    else
-      pact_uri 'pacts/generic_consumer-canvas_lms_api.json'
-    end
 
-    app_version PactConfig::Providers::CANVAS_API_VERSION
-    publish_verification_results true
+      if !PactConfig.jenkins_build? && consumer == 'Generic Consumer'
+        pact_uri 'pacts/generic_consumer-canvas_lms_api.json'
+      end
+
+      app_version PactConfig::Providers::CANVAS_API_VERSION
+      publish_verification_results true
+    end
   end
 end

@@ -79,7 +79,7 @@ QUnit.module('CourseRestore', {
 
 // Describes searching for a course by ID
 test("triggers 'searching' when search is called", function() {
-  const callback = this.spy()
+  const callback = sinon.spy()
   this.courseRestore.on('searching', callback)
   this.courseRestore.search(this.account_id)
   ok(callback.called, 'Searching event is called when searching')

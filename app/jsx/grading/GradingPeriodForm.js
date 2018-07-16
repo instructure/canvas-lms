@@ -49,7 +49,7 @@ import round from 'compiled/util/round'
   let GradingPeriodForm = React.createClass({
     propTypes: {
       period:   Types.shape({
-        id:        Types.string.isRequired,
+        id:        Types.string,
         title:     Types.string.isRequired,
         weight:    Types.number,
         startDate: Types.instanceOf(Date).isRequired,

@@ -24,12 +24,14 @@ import moment from 'moment-timezone';
 const defaultProps = {
   sidebarLoadInitialItems: () => {},
   sidebarCompleteItem: () => {},
+  loaded: true,
   items: [],
-  courses: []
+  courses: [],
+  changeDashboardView: () => {},
 };
 
-it('displays a spinner when the loading prop is true', () => {
-  const wrapper = shallow(<ToDoSidebar {...defaultProps} loading />);
+it('displays a spinner when the loaded prop is false', () => {
+  const wrapper = shallow(<ToDoSidebar {...defaultProps} loaded={false} />);
   expect(wrapper.find('Spinner').exists()).toBe(true);
 });
 
@@ -107,52 +109,13 @@ it('initially renders out 5 ToDoItems', () => {
   expect(wrapper.find('ToDoItem')).toHaveLength(5);
 });
 
-it('initially renders out all ToDoItems when link is clicked', () => {
-  const items = [{
-    uniqueId: '1',
-    type: 'Assignment',
-    date: moment('2017-07-15T20:00:00Z'),
-    title: 'Glory to Rome',
-  }, {
-    uniqueId: '2',
-    type: 'Quiz',
-    date: moment('2017-07-15T20:00:00Z'),
-    title: 'Glory to Orange County',
-  }, {
-    uniqueId: '3',
-    type: 'Assignment',
-    date: moment('2017-07-15T20:00:00Z'),
-    title: 'Glory to China',
-  }, {
-    uniqueId: '4',
-    plannable_type: 'quiz',
-    date: moment('2017-07-15T20:00:00Z'),
-    title: 'Glory to Egypt',
-  }, {
-    uniqueId: '5',
-    type: 'Assignment',
-    date: moment('2017-07-15T20:00:00Z'),
-    title: 'Glory to Sacramento',
-  }, {
-    uniqueId: '6',
-    plannable_type: 'quiz',
-    date: moment('2017-07-15T20:00:00Z'),
-    title: 'Glory to Atlantis',
-  }, {
-    uniqueId: '7',
-    plannable_type: 'quiz',
-    date: moment('2017-07-15T20:00:00Z'),
-    title: 'Glory to Hoboville',
-  }];
-
+it('invokes change dashboard view when link is clicked', () => {
+  const changeDashboardView = jest.fn();
   const wrapper = shallow(
-    <ToDoSidebar
-      {...defaultProps}
-      items={items}
-    />
+    <ToDoSidebar {...defaultProps} changeDashboardView={changeDashboardView} />
   );
   wrapper.find('Button').simulate('click');
-  expect(wrapper.find('ToDoItem')).toHaveLength(7);
+  expect(changeDashboardView).toHaveBeenCalledWith('planner');
 });
 
 it('does not render out items that are completed', () => {

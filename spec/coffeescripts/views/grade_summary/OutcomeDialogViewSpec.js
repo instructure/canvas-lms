@@ -35,8 +35,8 @@ test('assign instance of OutcomeLineGraphView on init', function() {
 })
 
 test('afterRender', function() {
-  const setElementSpy = this.stub(this.outcomeDialogView.outcomeLineGraphView, 'setElement')
-  const renderSpy = this.stub(this.outcomeDialogView.outcomeLineGraphView, 'render')
+  const setElementSpy = sandbox.stub(this.outcomeDialogView.outcomeLineGraphView, 'setElement')
+  const renderSpy = sandbox.stub(this.outcomeDialogView.outcomeLineGraphView, 'render')
 
   this.outcomeDialogView.render()
 
@@ -45,8 +45,8 @@ test('afterRender', function() {
 })
 
 test('#show', function() {
-  const renderSpy = this.stub(this.outcomeDialogView, 'render')
-  const dialogSpy = this.stub(this.outcomeDialogView.$el, 'dialog')
+  const renderSpy = sandbox.stub(this.outcomeDialogView, 'render')
+  const dialogSpy = sandbox.stub(this.outcomeDialogView.$el, 'dialog')
 
   this.outcomeDialogView.show(this.e('mouseenter'))
   ok(!renderSpy.called, 'should not render on any event')

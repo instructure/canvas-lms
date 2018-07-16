@@ -30,7 +30,10 @@
     :MAX_GROUP_CONVERSATION_SIZE => Conversation.max_group_conversation_size,
     :VISIBLE_CONTEXTS_LIMIT => @domain_root_account.settings[:calendar_contexts_limit] || 10,
   }
-  js_env :STUDENT_PLANNER_ENABLED => @domain_root_account&.feature_enabled?(:student_planner) && @current_user.has_student_enrollment?
+  js_env({
+    :STUDENT_PLANNER_ENABLED => @domain_root_account&.feature_enabled?(:student_planner) && @current_user.has_student_enrollment?,
+    :PLANNER_ENABLED => @domain_root_account&.feature_enabled?(:student_planner)
+  })
 
   js_bundle :calendar2
   css_bundle :calendar2, :agenda_view

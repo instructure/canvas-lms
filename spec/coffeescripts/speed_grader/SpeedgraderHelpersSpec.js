@@ -456,13 +456,13 @@ QUnit.module('SpeedgraderHelpers.setupIsAnonymous', suiteHooks => {
     fakeENV.teardown()
   })
 
-  test('returns true when assignment is anonymously graded', () => {
-    strictEqual(setupIsAnonymous({anonymous_grading: true}), true)
+  test('returns true when assignment has anonymize_students set to true', () => {
+    strictEqual(setupIsAnonymous({anonymize_students: true}), true)
     fakeENV.teardown()
   })
 
-  test('returns false when assignment is not anonymously graded', () => {
-    strictEqual(setupIsAnonymous({anonymous_grading: false}), false)
+  test('returns false when assignment has anonymize_students set to false', () => {
+    strictEqual(setupIsAnonymous({anonymize_students: false}), false)
   })
 })
 

@@ -55,11 +55,9 @@ module Api::V1::Outcome
           hash['calculation_int'] = outcome.calculation_int
         end
 
-        if criterion = outcome.data && outcome.data[:rubric_criterion]
-          hash['points_possible'] = criterion[:points_possible]
-          hash['mastery_points'] = criterion[:mastery_points]
-          hash['ratings'] = criterion[:ratings]
-        end
+        hash['points_possible'] = outcome.rubric_criterion[:points_possible]
+        hash['mastery_points'] = outcome.rubric_criterion[:mastery_points]
+        hash['ratings'] = outcome.rubric_criterion[:ratings]
         if opts[:assessed_outcomes] && outcome.context_type != "Account"
           hash['assessed'] = opts[:assessed_outcomes].include?(outcome.id)
         else
