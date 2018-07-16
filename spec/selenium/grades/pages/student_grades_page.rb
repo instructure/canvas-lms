@@ -86,5 +86,9 @@ class StudentGradesPage
     def late_submission_final_score_text(assignment_id)
       f("#submission_#{assignment_id} .assignment_score .grade").text
     end
+
+    def fetch_assignment_score(assignment)
+      assignment_row(assignment).find_element(css: '.assignment_score .grade').text.split("\n")[1]
+    end
   end
 end
