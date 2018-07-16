@@ -26,6 +26,7 @@ module Api::V1::PlannerItem
   include Api::V1::PlannerOverride
   include Api::V1::CalendarEvent
   include Api::V1::PlannerNote
+  include Api::V1::AssessmentRequest
   include PlannerHelper
 
   def planner_item_json(item, user, session, opts = {})
@@ -71,6 +72,11 @@ module Api::V1::PlannerItem
         hash[:plannable] = discussion_topic_api_json(topic, topic.context, user, session, assignment_opts: assignment_opts, use_preload: true, user_can_moderate: false, skip_permissions: true)
         hash[:html_url] = discussion_topic_html_url(topic, user, hash[:submissions])
         hash[:planner_override] ||= planner_override_json(topic.planner_override_for(user), user, session, topic.class_name)
+      elsif item.is_a?(AssessmentRequest)
+        hash[:plannable_type] = 'assessment_request'
+        hash[:plannable_date] = item.asset.assignment.peer_reviews_due_at
+        hash[:plannable] = assessment_request_json(item, user, session, %w{user assignment})
+        hash[:html_url] = course_assignment_submission_url(item.asset.context.id, item.asset.id, item.user.id)
       else
         hash[:plannable_date] = item[:user_due_date] || item.due_at
         hash[:plannable] = assignment_json(item, user, session, {include_discussion_topic: true}.merge(assignment_opts))
@@ -91,10 +97,13 @@ module Api::V1::PlannerItem
         i
       end
     end
+
     ActiveRecord::Associations::Preloader.new.preload(preload_items, :planner_overrides, ::PlannerOverride.where(user: user))
     events, other_items = preload_items.partition{|i| i.is_a?(::CalendarEvent)}
     ActiveRecord::Associations::Preloader.new.preload(events, :context) if events.any?
-    notes, context_items = other_items.partition{|i| i.is_a?(::PlannerNote)}
+    assessment_requests, plannable_items = other_items.partition{|i| i.is_a?(::AssessmentRequest)}
+    ActiveRecord::Associations::Preloader.new.preload(assessment_requests, {submission: :assignment}) if assessment_requests.any?
+    notes, context_items = plannable_items.partition{|i| i.is_a?(::PlannerNote)}
     ActiveRecord::Associations::Preloader.new.preload(notes, user: {pseudonym: :account}) if notes.any?
     wiki_pages, other_context_items = context_items.partition{|i| i.is_a?(::WikiPage)}
     ActiveRecord::Associations::Preloader.new.preload(wiki_pages, {context: :root_account}) if wiki_pages.any?
@@ -102,6 +111,7 @@ module Api::V1::PlannerItem
     ss = user.submission_statuses(opts)
     discussions, _assign_quiz_items = other_context_items.partition{|i| i.is_a?(::DiscussionTopic)}
     ActiveRecord::Associations::Preloader.new.preload(discussions, :discussion_topic_participants, DiscussionTopicParticipant.where(user: user))
+
     items.map do |item|
       planner_item_json(item, user, session, opts.merge(submission_statuses: ss))
     end
