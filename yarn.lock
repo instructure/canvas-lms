@@ -15036,9 +15036,9 @@ tinymce-light-skin@1.3.1, tinymce-light-skin@~1.3.0:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/tinymce-light-skin/-/tinymce-light-skin-1.3.1.tgz#fcce7a8b5761716a381f756e1ac7f47c7a41ea88"
 
-tinymce@^4.5.7, tinymce@^4.7.9:
-  version "4.7.13"
-  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-4.7.13.tgz#3b139fd95c0b78e3959b2064f043ccb7459bebcb"
+tinymce@^4.5.7, tinymce@^4.8.0:
+  version "4.8.0"
+  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-4.8.0.tgz#3c4c88701d0526374efb45bafbb820c7715e2356"
 
 title-case@^2.1.0:
   version "2.1.1"
