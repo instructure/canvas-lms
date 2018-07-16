@@ -255,6 +255,8 @@ define [
       @model.collection.forEach((a) =>
         a.set('position', response.new_positions[a.get('id')])
       )
+      if @hasIndividualPermissions()
+        ENV.PERMISSIONS.by_assignment_id[assignment.id] = ENV.PERMISSIONS.by_assignment_id[assignment.originalAssignmentID()]
       @model.collection.add(assignment)
       @focusOnAssignment(response)
 
