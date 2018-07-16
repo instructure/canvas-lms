@@ -323,7 +323,8 @@ describe "users" do
         terms.update(passive: false)
       end
 
-      user_with_pseudonym(:active_all => true, :password => 'lolwut12')
+      user = user_with_pseudonym(:active_all => true, :password => 'lolwut12')
+      pairing_code = user.generate_observer_pairing_code
 
       get '/register'
       f('#signup_parent').click
@@ -331,15 +332,14 @@ describe "users" do
       form = fj('.ui-dialog:visible form')
       f('#parent_name').send_keys('parent!')
       f('#parent_email').send_keys('parent@example.com')
-      f('#parent_child_username').send_keys(@pseudonym.unique_id)
-      f('#parent_child_password').send_keys('lolwut12')
+      f('#password').send_keys('password')
+      f('#confirm_password').send_keys('password')
+      f('#pairing_code').send_keys(pairing_code.code)
       f('input[name="user[terms_of_use]"]', form).click
 
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
 
-      # close the "check your email to confirm your account" dialog
-      f('.ui-dialog-titlebar-close').click
       expect_logout_link_present
 
       expect(User.last.initial_enrollment_type).to eq 'observer'
