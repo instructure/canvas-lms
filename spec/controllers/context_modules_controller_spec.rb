@@ -796,6 +796,21 @@ describe ContextModulesController do
       json = json_parse(response.body)
       expect(json[@tag.id.to_s]["past_due"]).to be_blank
     end
+
+    it "should return a todo date for an ungraded page with a todo_date" do
+      course_with_teacher_logged_in(:active_all => true)
+      @mod = @course.context_modules.create!
+      wiki_date = 1.day.from_now
+      @wiki_page = @course.wiki_pages.build(:title => "title", :todo_date => wiki_date)
+      @wiki_page.body = "hello world"
+      @wiki_page.workflow_state = 'active'
+      @wiki_page.save!
+      @tag = @mod.add_item(type: 'WikiPage', id: @wiki_page.id)
+
+      get 'content_tag_assignment_data', params: {course_id: @course.id}, format: 'json' # precache
+      json = json_parse(response.body)
+      expect(Time.zone.parse(json[@tag.id.to_s]["todo_date"]).to_i).to eq wiki_date.to_i
+    end
   end
 
   describe "GET show" do

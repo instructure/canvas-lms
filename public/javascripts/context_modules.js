@@ -226,11 +226,13 @@ function scrollTo ($thing, time = 500) {
             if (info["points_possible"] != null) {
               data["points_possible_display"] = I18n.t('points_possible_short', '%{points} pts', {'points': I18n.n(info["points_possible"])});
             }
-            if (info["due_date"] != null) {
+            if (info["todo_date"] != null) {
+              data["due_date_display"] = $.dateString(info["todo_date"]);
+            } else if (info["due_date"] != null) {
               if (info["past_due"] != null) {
                 $context_module_item.data('past_due', true);
               }
-              data["due_date_display"] = $.dateString(info["due_date"])
+              data["due_date_display"] = $.dateString(info["due_date"]);
             } else if (info['has_many_overrides'] != null) {
               data["due_date_display"] = I18n.t("Multiple Due Dates");
             } else if (info["vdd_tooltip"] != null) {

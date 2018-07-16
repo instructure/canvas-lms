@@ -309,6 +309,7 @@ class ContextModulesController < ApplicationController
         else
           {:points_possible => nil, :due_date => nil}
         end
+        info[tag.id][:todo_date] = tag.content[:todo_date] || nil
       end
       render :json => info
     end
