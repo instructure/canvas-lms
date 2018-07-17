@@ -138,19 +138,21 @@ describe LearningOutcomeGroup do
   end
 
   describe '#add_outcome_group' do
+    before :each do
+      @group1 = @course.learning_outcome_groups.create!(:title => 'group1')
+      @group2 = @course.learning_outcome_groups.create!(:title => 'group2')
+      @outcome1 = @course.created_learning_outcomes.create!(:title => 'o1')
+      @group2.add_outcome(@outcome1)
+    end
+
     it 'adds a child outcome group and copies all contents' do
-      group1 = @course.learning_outcome_groups.create!(:title => 'group1')
-      group2 = @course.learning_outcome_groups.create!(:title => 'group2')
-      outcome1 = @course.created_learning_outcomes.create!(:title => 'o1')
-      group2.add_outcome(outcome1)
+      expect(@group1.child_outcome_groups).to be_empty
 
-      expect(group1.child_outcome_groups).to be_empty
+      child_outcome_group = @group1.add_outcome_group(@group2)
 
-      child_outcome_group = group1.add_outcome_group(group2)
-
-      expect(child_outcome_group.title).to eq(group2.title)
+      expect(child_outcome_group.title).to eq(@group2.title)
       expect(child_outcome_group.child_outcome_links.map(&:content_id)).to eq(
-        group2.child_outcome_links.map(&:content_id)
+        @group2.child_outcome_links.map(&:content_id)
       )
     end
   end
