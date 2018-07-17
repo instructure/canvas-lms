@@ -1603,6 +1603,25 @@ describe Attachment do
       expect(Message.where(user_id: @teacher, notification_name: 'New File Added').first).not_to be_nil
     end
 
+    it "should not send notifications to students if the file is unpublished because of usage rights" do
+      @teacher.register!
+      cc = @teacher.communication_channels.create!(:path => "default@example.com")
+      cc.confirm!
+      NotificationPolicy.create!(:notification => Notification.where(name: 'New File Added').first, :communication_channel => cc, :frequency => "immediately")
+
+      @course.enable_feature! :usage_rights_required
+      attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
+      @attachment.set_publish_state_for_usage_rights
+      @attachment.save!
+
+      Timecop.freeze(10.minutes.from_now) { Attachment.do_notifications }
+
+      @attachment.reload
+      expect(@attachment.need_notify).not_to be_truthy
+      expect(Message.where(user_id: @student, notification_name: 'New File Added').first).to be_nil
+      expect(Message.where(user_id: @teacher, notification_name: 'New File Added').first).not_to be_nil
+    end
+
     it "should not send notifications to students if the files navigation is hidden from student view" do
       @teacher.register!
       cc = @teacher.communication_channels.create!(:path => "default@example.com")
