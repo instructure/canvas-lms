@@ -25,7 +25,7 @@ exports[`The CommentButton component renders the root component as expected 2`] 
     </Heading>
   </ModalHeader>
   <ModalBody padding=\\"medium\\" as=\\"div\\">
-    <TextArea label=\\"Comments\\" maxHeight=\\"50rem\\" onChange={[Function: onChange]} value=\\"some things\\" size=\\"medium\\" autoGrow={true} resize=\\"none\\" inline={false} messages={{...}} disabled={false} readOnly={false} textareaRef={[Function: textareaRef]} layout=\\"stacked\\" />
+    <TextArea data-selenium=\\"criterion_comments_text\\" label=\\"Comments\\" maxHeight=\\"50rem\\" onChange={[Function: onChange]} value=\\"some things\\" size=\\"medium\\" autoGrow={true} resize=\\"none\\" inline={false} messages={{...}} disabled={false} readOnly={false} textareaRef={[Function: textareaRef]} layout=\\"stacked\\" />
   </ModalBody>
   <ModalFooter>
     <Button variant=\\"light\\" margin=\\"0 x-small 0 0\\" onClick={[Function: close]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" fluidWidth={false} buttonRef={[Function: buttonRef]} cursor=\\"pointer\\">

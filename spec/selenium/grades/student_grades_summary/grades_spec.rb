@@ -142,7 +142,10 @@ describe "grades" do
       expect(f('#navpills')).not_to be_nil
       f('a[href="#outcomes"]').click
       wait_for_ajaximations
-      expect(ff('#outcomes li.outcome').count).to eq @course.learning_outcome_links.count
+      expect(fj("span:contains('Toggle outcomes for Unnamed Course')")).to be_present
+      f(".icon-expand").click
+      wait_for_ajaximations
+      expect(ff("span[data-selenium='outcome']").count).to eq @course.learning_outcome_links.count
     end
 
     context 'student view' do
@@ -240,8 +243,8 @@ describe "grades" do
       # click first rubric
       f("#submission_#{@first_assignment.id} .toggle_rubric_assessments_link").click
       wait_for_ajaximations
-      expect(fj('.rubric_assessments:visible .rubric_title')).to include_text(@rubric.title)
-      expect(fj('.rubric_assessments:visible .rubric_total')).to include_text('10')
+      expect(fj('.react-rubric caption:visible')).to include_text(@rubric.title)
+      expect(fj("span[data-selenium='rubric_total']:visible")).to include_text('10')
 
       # check if only proper rating is highlighted for a score of 10 on scale of 10|5|0
       expect(ffj('.rubric_assessments:visible .selected').length).to eq 1
@@ -251,18 +254,30 @@ describe "grades" do
       expect(fj('.assessment-comments:visible div').text).to eq 'cool, yo'
 
       # close first rubric
-      f("#submission_#{@first_assignment.id} .toggle_rubric_assessments_link").click
+      scroll_into_view("a:contains('Close Rubric'):visible")
+      fj("a:contains('Close Rubric'):visible").click
 
       # click second rubric
+      scroll_into_view("#submission_#{zero_assignment.id} .toggle_rubric_assessments_link")
       f("#submission_#{zero_assignment.id} .toggle_rubric_assessments_link").click
-      expect(fj('.rubric_assessments:visible .rubric_total')).to include_text('0')
+      expect(fj("span[data-selenium='rubric_total']:visible")).to include_text('0')
 
       # check if only proper rating is highlighted for a score of 0 on scale of 10|5|0
       expect(ffj('.rubric_assessments:visible .selected').length).to eq 1
       expect(fj('.rubric_assessments:visible .selected')).to include_text('0')
     end
 
-    context "rubric criterion ranges" do
+    context "rubric criterion ranges disabled" do
+      before(:each) do
+        @rubric.criteria[0][:criterion_use_range] = false
+        @rubric.save!
+      end
+
+      after(:each) do
+        @rubric.criteria[0][:criterion_use_range] = true
+        @rubric.save!
+      end
+
       it "should not highlight scores between ranges when range rating is disabled" do
         StudentGradesPage.visit_as_student(@course)
 
@@ -272,7 +287,9 @@ describe "grades" do
         # check if no highlights exist on a non-range criterion for a score of 2 on scale of 10|5|0
         expect(find_with_jquery('.rubric_assessments:visible .selected')).to be nil
       end
+    end
 
+    context "rubric criterion ranges enabled" do
       it "should highlight scores between ranges when range rating is enabled" do
         @course.account.root_account.enable_feature!(:rubric_criterion_range)
         StudentGradesPage.visit_as_student(@course)
@@ -399,8 +416,8 @@ describe "grades" do
 
       # click rubric
       f("#submission_#{@third_assignment.id} .toggle_rubric_assessments_link").click
-      expect(fj('.rubric_assessments:visible .rubric_title')).to include_text(@rubric.title)
-      expect(fj('.rubric_assessments:visible .rubric_total')).to include_text('2')
+      expect(fj('.react-rubric caption:visible')).to include_text(@rubric.title)
+      expect(fj("span[data-selenium='rubric_total']:visible")).to include_text('2')
 
       # check rubric comment
       expect(fj('.assessment-comments:visible div').text).to eq 'not bad, not bad'
@@ -420,8 +437,10 @@ describe "grades" do
         expect(f('#navpills')).not_to be_nil
         f('a[href="#outcomes"]').click
         wait_for_ajaximations
-
-        expect(ff('#outcomes li.outcome').count).to eq @course.learning_outcome_links.count
+        expect(fj("span:contains('Toggle outcomes for Unnamed Course')")).to be_present
+        f(".icon-expand").click
+        wait_for_ajaximations
+        expect(ff("span[data-selenium='outcome']").count).to eq @course.learning_outcome_links.count
       end
 
       it "should show the outcome gradebook if the student is in multiple sections", priority: "1", test_id: 229671 do
@@ -432,8 +451,10 @@ describe "grades" do
         expect(f('#navpills')).not_to be_nil
         f('a[href="#outcomes"]').click
         wait_for_ajaximations
-
-        expect(ff('#outcomes li.outcome').count).to eq @course.learning_outcome_links.count
+        expect(fj("span:contains('Toggle outcomes for Unnamed Course')")).to be_present
+        f(".icon-expand").click
+        wait_for_ajaximations
+        expect(ff("span[data-selenium='outcome']").count).to eq @course.learning_outcome_links.count
       end
     end
   end

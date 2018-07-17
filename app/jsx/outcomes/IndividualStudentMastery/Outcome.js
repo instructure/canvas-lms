@@ -55,7 +55,7 @@ export default class Outcome extends React.Component {
     const numAlignments = assignments.length
 
     return (
-      <Flex direction="row" justifyItems="space-between">
+      <Flex direction="row" justifyItems="space-between" data-selenium="outcome">
         <FlexItem shrink>
           <Flex direction="column">
             <FlexItem>

@@ -78,7 +78,6 @@ module RubricsCommon
 
   def edit_rubric_after_updating
     fj(".rubric .edit_rubric_link:visible").click
-    driver.find_element(:tag_name, "body").click
   end
 
   # should be in editing mode before calling
@@ -129,8 +128,13 @@ module RubricsCommon
     create_rubric_with_criterion_points "5.5"
     edit_rubric_after_updating
 
-    split_ratings(1)
-
+    wait_for_ajaximations
+    fj('.add_rating_link_after:visible').click
+    expect(f('#edit_rating_form input')).to have_value('3')
+    set_value(f('#rating_form_title'), 'three')
+    fj("span:contains('Update Rating')").click
+    wait_for_ajaximations
+    expect(ffj(".rubric .criterion:visible .rating .points").count).to eq 3
     expect(ffj(".rubric .criterion:visible .rating .points")[1].text).to eq '3'
   end
 
@@ -140,6 +144,7 @@ module RubricsCommon
 
     split_ratings(1)
     wait_for_ajaximations
+    wait_for_dom_ready
     expect(ffj(".rubric .criterion:visible .rating .points").count).to eq 3
     expect(ffj(".rubric .criterion:visible .rating .points")[1].text).to eq '0'
   end

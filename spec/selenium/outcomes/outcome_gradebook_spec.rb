@@ -256,7 +256,6 @@ describe "outcome gradebook" do
 
       context 'with non-scoring results' do
         before(:once) do
-          @course.root_account.enable_feature!(:non_scoring_rubrics)
           align1 = @outcome1.align(@assignment, @course)
           align2 = @outcome2.align(@assignment, @course)
           result(@student_1, align1, 5, hide_points: true)
