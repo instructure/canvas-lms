@@ -151,6 +151,24 @@ describe "courses/_to_do_list.html.erb" do
         expect(response).to include "Moderate ModerateMe"
         expect(response).to include "Ignore ModerateMe until new mark"
       end
+
+      it "does not show moderate link if user is not final grader" do
+        course_with_student(active_all: true)
+        second_teacher = @course.enroll_teacher(User.create!, enrollment_state: "active").user
+        assignment_model(
+          course: @course,
+          submission_types: "online_text_entry",
+          title: "ModerateMe",
+          moderated_grading: true,
+          final_grader: second_teacher,
+          grader_count: 2
+        )
+        submission = submission_model(assignment: @assignment, body: "my submission")
+        submission.find_or_create_provisional_grade!(@teacher, grade: 5)
+        view_context
+        render partial: "courses/to_do_list", locals: {contexts: nil}
+        expect(response).not_to include "Moderate ModerateMe"
+      end
     end
   end
 end

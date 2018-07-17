@@ -259,9 +259,9 @@ module UserLearningObjectScopes
     objects_needing('Assignment', 'moderation', :instructor, 120.minutes, opts) do |assignment_scope, options|
       scope = assignment_scope.active.
         expecting_submission.
-        where(:moderated_grading => true).
+        where(final_grader: self, moderated_grading: true).
         where("assignments.grades_published_at IS NULL").
-        where(:id => ModeratedGrading::ProvisionalGrade.joins(:submission).
+        where(id: ModeratedGrading::ProvisionalGrade.joins(:submission).
           where("submissions.assignment_id=assignments.id").
           where(Submission.needs_grading_conditions).distinct.select(:assignment_id)).
         preload(:context)
