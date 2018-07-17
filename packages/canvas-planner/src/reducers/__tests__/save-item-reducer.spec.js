@@ -112,6 +112,12 @@ it('adds a new item to an existing day when the new date is within the loaded ra
   expect(nextState).toMatchSnapshotAndNotBe(initialState);
 });
 
+it('adds an item to today even when the only loaded items are in the future', () => {
+  const initialState = makeState({days: itemsToDays([itemIdAt(1, 1)])});
+  const nextState = reducer(initialState, savedPlannerItem({item: itemIdAt(0, 0)}));
+  expect(nextState.days).toHaveLength(2);
+});
+
 it('adds a new item to a new day when the loaded range is open ended in the past', () => {
   const initialState = makeState({
     loading: { allPastItemsLoaded: true },
