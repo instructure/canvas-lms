@@ -33,6 +33,30 @@ module Helper
         nil
       end
 
+      def update_wiki_page(course_id, url)
+        JSON.parse(
+          self.class.put(
+            "/api/v1/courses/#{course_id}/pages/#{url}",
+            :body =>
+            {
+              :wiki_page =>
+                {
+                  :title => "New Title",
+                }
+            }.to_json,
+            :headers => {'Content-Type' => 'application/json'}
+          ).body
+        )
+      rescue
+        nil
+      end
+
+      def delete_wiki(course_id)
+        JSON.parse(self.class.delete("/api/v1/courses/#{course_id}/pages/wiki-page", query: "event=delete").body)
+      rescue
+        nil
+      end
+
       def post_wiki_pages(course_id)
         JSON.parse(
           self.class.post(

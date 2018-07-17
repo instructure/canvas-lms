@@ -57,7 +57,7 @@ end
 
 module Pact::Canvas
   def self.base_state=(base_state)
-    @base_state ||= base_state
+    @base_state = base_state
   end
 
   def self.base_state

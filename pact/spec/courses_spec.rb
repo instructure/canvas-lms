@@ -448,7 +448,7 @@ describe 'Courses', :pact do
   context 'Teacher not in a course' do
     it 'should Give a 401 response' do
       canvas_lms_api.given('a teacher not in a course').
-        upon_receiving('Give a 401 response').
+        upon_receiving('List Students').
         with(
           method: :get,
           headers: {
