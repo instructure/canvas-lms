@@ -43,6 +43,13 @@ export default {
       2 on <date1>
       1 on <date4>
 
+    - Ungraded Discussions -
+      2 on <date1>
+      1 on <date4>
+
+    - Pages -
+      2 on <date1>
+      1 on <date4>
 
   [[ REASONING ]]
 
@@ -311,6 +318,61 @@ export default {
       type: 'event'
     }
   ],
+
+  planner_items: [{
+    plannable_type: 'discussion_topic',
+    plannable_id: '1',
+    html_url: 'http://localhost/courses/1/discussion_topics/1',
+    plannable: {
+      title: 'discussion 1',
+      todo_date: '2012-01-01T13:30:00-07:00',
+    }
+  },
+  {
+    plannable_type: 'discussion_topic',
+    plannable_id: '2',
+    html_url: 'http://localhost/courses/1/discussion_topics/2',
+    plannable: {
+      title: 'discussion 2',
+      todo_date: '2012-01-01T13:30:00-07:00',
+    },
+  },
+  {
+    plannable_type: 'discussion_topic',
+    plannable_id: '3',
+    html_url: 'http://localhost/courses/1/discussion_topics/3',
+    plannable: {
+      title: 'discussion 3',
+      todo_date: '2012-01-30T13:30:00-07:00',
+    },
+  },
+  {
+    plannable_type: 'wiki_page',
+    plannable_id: '1',
+    html_url: 'http://localhost/courses/1/pages/1',
+    plannable: {
+      title: 'page 1',
+      todo_date: '2012-01-01T13:30:00-07:00',
+    },
+  },
+  {
+    plannable_type: 'wiki_page',
+    plannable_id: '2',
+    html_url: 'http://localhost/courses/1/pages/2',
+    plannable: {
+      title: 'page 2',
+      todo_date: '2012-01-01T13:30:00-07:00',
+    },
+  },
+  {
+    plannable_type: 'wiki_page',
+    plannable_id: '3',
+    html_url: 'http://localhost/courses/1/pages/3',
+    plannable: {
+      title: 'page 3',
+      todo_date: '2012-01-30T13:30:00-07:00',
+    },
+  }],
 
   /* HTML */
   jumpToToday: '<a href="#" class="jump_to_today_link">Jump to Today</a>',

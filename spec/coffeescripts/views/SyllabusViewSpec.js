@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import _ from 'lodash'
 import tz from 'timezone'
 import denver from 'timezone/America/Denver'
 import newYork from 'timezone/America/New_York'
@@ -24,6 +25,7 @@ import SyllabusBehaviors from 'compiled/behaviors/SyllabusBehaviors'
 import SyllabusCollection from 'compiled/collections/SyllabusCollection'
 import SyllabusCalendarEventsCollection from 'compiled/collections/SyllabusCalendarEventsCollection'
 import SyllabusAppointmentGroupsCollection from 'compiled/collections/SyllabusAppointmentGroupsCollection'
+import SyllabusPlannerCollection from '../../../app/coffeescripts/collections/SyllabusPlannerCollection'
 import SyllabusView from 'compiled/views/courses/SyllabusView'
 import SyllabusViewPrerendered from './SyllabusViewPrerendered'
 import fakeENV from 'helpers/fakeENV'
@@ -84,8 +86,30 @@ function setupServerResponses() {
     )
   }
 
+  let {planner_items} = SyllabusViewPrerendered
+  function planner_items_endpoint(request) {
+    const response = planner_items.slice(0, 2)
+    planner_items = planner_items.slice(2)
+    const more = planner_items.length > 0
+
+    let links = `<${request.url}>; rel=\"first\"`
+    if (more) {
+      links += `,<${request.url}>; rel=\"next\"`
+    }
+
+    return request.respond(
+      200,
+      {
+        'Content-Type': 'application/json',
+        Link: links
+      },
+      JSON.stringify(response)
+    )
+  }
+
   server.respondWith(/\/api\/v1\/calendar_events($|\?)/, calendar_events_endpoint)
   server.respondWith(/\/api\/v1\/appointment_groups($|\?)/, appointment_groups_endpoint)
+  server.respondWith(/\/api\/v1\/planner\/items($|\?)/, planner_items_endpoint)
   return server
 }
 
@@ -118,13 +142,16 @@ QUnit.module('Syllabus', {
       new SyllabusCalendarEventsCollection([ENV.context_asset_string], 'event'),
       new SyllabusCalendarEventsCollection([ENV.context_asset_string], 'assignment'),
       new SyllabusAppointmentGroupsCollection([ENV.context_asset_string], 'reservable'),
-      new SyllabusAppointmentGroupsCollection([ENV.context_asset_string], 'manageable')
+      new SyllabusAppointmentGroupsCollection([ENV.context_asset_string], 'manageable'),
+      new SyllabusPlannerCollection([ENV.context_asset_string])
     ]
 
     const acollection = new SyllabusCollection(collections)
 
     _.map(collections, collection => {
-      const error = () => ok(false, 'ajax call failed')
+      const error = () => {
+        ok(false, 'ajax call failed')
+      }
 
       var success = () => {
         if (collection.canFetch('next')) {
@@ -176,7 +203,7 @@ QUnit.module('Syllabus', {
   },
 
   renderAssertions() {
-    expect(19)
+    expect(23)
 
     // rendering
     const syllabus = $('#syllabus')
@@ -200,6 +227,22 @@ QUnit.module('Syllabus', {
       equal($('td.name a', events).length, 6, 'events - link rendered for each event')
     } else {
       equal($('td.name a', events).length, 0, 'events - link not rendered for each event')
+    }
+
+    const discussions = $('tr.syllabus_discussion_topic', dates)
+    equal(discussions.length, 3, 'discussions - all discussions rendered')
+    if (this.view.can_read && this.view.is_valid_user) {
+      equal($('td.name a', discussions).length, 3, 'discussions - link rendered for each event')
+    } else {
+      equal($('td.name a', discussions).length, 0, 'discussions - link not rendered for each event')
+    }
+
+    const pages = $('tr.syllabus_wiki_page', dates)
+    equal(pages.length, 3, 'pages - all pages rendered')
+    if (this.view.can_read && this.view.is_valid_user) {
+      equal($('td.name a', pages).length, 3, 'pages - link rendered for each event')
+    } else {
+      equal($('td.name a', pages).length, 0, 'pages - link not rendered for each event')
     }
 
     // mini calendar dates - has event
