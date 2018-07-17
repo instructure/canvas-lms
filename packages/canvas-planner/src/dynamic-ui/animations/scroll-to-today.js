@@ -68,40 +68,33 @@ export function scrollAndFocusTodayItem (manager, todayElem) {
 function findTodayOrNearest (registry) {
   const today = moment().startOf('day');
   const allItems = registry.getAllItemsSorted();
-  let before = {
-    diff: Number.MIN_SAFE_INTEGER,
-    component: null
-  };
-  let after = {
-    diff: Number.MAX_SAFE_INTEGER,
-    component: null
-  };
+  let lastInPast = null;
+  let firstInFuture = null;
 
   // find the before and after today items due closest to today
   for (let i = 0; i < allItems.length; ++i) {
     const item = allItems[i];
     if (item.component && item.component.props.date) {
-      const diff = item.component.props.date.diff(today, 'seconds');
-      if (diff < 0 && diff > before.diff) {
-        before.diff = diff;
-        before.component = item.component;
-      } else if (diff >= 0 && diff < after.diff) {
-        after.diff = diff;
-        after.component = item.component;
+      const date = item.component.props.date;
+      if (date.isBefore(today, 'day')) {
+        lastInPast = item.component;
+      } else if (date.isSame(today, 'day') || date.isAfter(today, 'day')) {
+        firstInFuture = item.component;
+        break;
       }
     }
   }
   // if there's an item in the future, prefer it
-  const component = after.component ? after.component : before.component;
+  const component = firstInFuture || lastInPast;
 
   let when = 'never';
-  if (after.component) {
+  if (component === firstInFuture) {
     if (component.props.date.isSame(today, 'day')) {
       when = 'today';
     } else {
       when = 'after';
     }
-  } else if (before.component) {
+  } else if (component === lastInPast) {
     when = 'before';
   }
   return {component, when};
