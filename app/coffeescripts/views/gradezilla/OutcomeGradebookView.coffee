@@ -225,6 +225,7 @@ define [
         @grid.init()
         Grid.Events.init(@grid)
         @_attachEvents()
+        Grid.View.redrawHeader(@grid,  Grid.averageFn, @gradebook.getFilterRowsBySetting('sectionId'))
 
     isLoaded: false
     onShow: ->

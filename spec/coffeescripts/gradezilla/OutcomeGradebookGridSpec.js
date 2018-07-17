@@ -37,20 +37,6 @@ test('Grid.Math.mean', () => {
   ok(Grid.Math.mean([5, 12, 2]) === 6.33, 'rounds to two places')
 })
 
-test('Grid.Math.median', () => {
-  const odd = [1, 3, 2, 5, 4]
-  const even = [1, 3, 2, 6, 5, 4]
-  ok(Grid.Math.median(odd) === 3, 'properly finds median on odd datasets')
-  ok(Grid.Math.median(even) === 3.5, 'properly finds median on even datasets')
-})
-
-test('Grid.Math.mode', () => {
-  const single = [1, 1, 1, 3, 5]
-  const multiple = [1, 1, 2, 2, 3, 5]
-  ok(Grid.Math.mode(single) === 1, 'returns mode when it is a single node')
-  ok(Grid.Math.mode(multiple) === 2, 'averages multiple modes to return a single result')
-})
-
 test('Grid.Util._toRow', () => {
   Grid.students = {1: {}}
   Grid.sections = {1: {}}

@@ -221,6 +221,7 @@ define [
         @grid.init()
         Grid.Events.init(@grid)
         @_attachEvents()
+        Grid.View.redrawHeader(@grid,  Grid.averageFn, @menu.currentSection)
 
     isLoaded: false
     onShow: ->
