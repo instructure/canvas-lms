@@ -255,7 +255,7 @@ export default class Criterion extends React.Component {
         </td>
         {
           hasPointsColumn && (
-            <td>
+            <td className="criterion_points">
               {pointsElement()}
               {assessing && !freeForm ? commentInput : null}
             </td>

@@ -195,31 +195,29 @@ describe "speed grader submissions" do
       wait_for_ajaximations
       rubric = f('#rubric_full')
       expect(rubric).to be_displayed
-      first_criterion = rubric.find_element(:id, "criterion_#{@rubric.criteria[0][:id]}")
-      first_criterion.find_element(:css, '.ratings .edge_rating').click
-      second_criterion = rubric.find_element(:id, "criterion_#{@rubric.criteria[1][:id]}")
-      second_criterion.find_element(:css, '.ratings .edge_rating').click
-      expect(rubric.find_element(:css, '.rubric_total')).to include_text('8')
+      fj("span:contains('Rockin\''):visible").click
+      fj("span:contains('Amazing'):visible").click
+      expect(f("span[data-selenium='rubric_total']")).to include_text('8')
       f('#rubric_full .save_rubric_button').click
       wait_for_ajaximations
       f('.toggle_full_rubric').click
       wait_for_ajaximations
 
-      expect(f("#criterion_#{@rubric.criteria[0][:id]} input.criterion_points")).to have_attribute("value", "3")
-      expect(f("#criterion_#{@rubric.criteria[1][:id]} input.criterion_points")).to have_attribute("value", "5")
+      expect(ff('td.criterion_points input').first).to have_value('3')
+      expect(ff('td.criterion_points input').second).to have_value('5')
       f('#gradebook_header .next').click
       wait_for_ajaximations
 
       expect(f('#rubric_full')).to be_displayed
-      expect(f("#criterion_#{@rubric.criteria[0][:id]} input.criterion_points")).to have_attribute("value", "")
-      expect(f("#criterion_#{@rubric.criteria[1][:id]} input.criterion_points")).to have_attribute("value", "")
+      expect(ffj('td.criterion_points input:visible').first).to have_attribute("value", "")
+      expect(ffj('td.criterion_points input:visible').second).to have_attribute("value", "")
 
       f('#gradebook_header .prev').click
       wait_for_ajaximations
 
       expect(f('#rubric_full')).to be_displayed
-      expect(f("#criterion_#{@rubric.criteria[0][:id]} input.criterion_points")).to have_attribute("value", "3")
-      expect(f("#criterion_#{@rubric.criteria[1][:id]} input.criterion_points")).to have_attribute("value", "5")
+      expect(ffj('td.criterion_points input:visible').first).to have_attribute("value", "3")
+      expect(ffj('td.criterion_points input:visible').second).to have_attribute("value", "5")
     end
 
     it "should highlight submitted assignments and not non-submitted assignments for students", priority: "1",

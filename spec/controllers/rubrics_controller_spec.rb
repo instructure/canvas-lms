@@ -45,7 +45,6 @@ describe RubricsController do
       end
 
       it "should return non_scoring_rubrics if enabled" do
-        @course.root_account.enable_feature! :non_scoring_rubrics
         get 'index', params: {:course_id => @course.id}
         expect(assigns[:js_env][:NON_SCORING_RUBRICS]).to eq true
       end
