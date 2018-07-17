@@ -295,9 +295,9 @@ describe('groupAndSortDayItems', () => {
     ]);
   });
 
-  it('sorts completed items last', () => {
+  it('sorts originallyCompleted items last', () => {
     const items = [
-      mockItem('2017-12-05T11:00:00Z', {uniqueId: '1', context: {type: 'Course', id: '1', title: 'Math'}, completed: true}),
+      mockItem('2017-12-05T11:00:00Z', {uniqueId: '1', context: {type: 'Course', id: '1', title: 'Math'}, originallyCompleted: true}),
       mockItem('2017-12-05T12:00:00Z', {uniqueId: '2', context: {type: 'Course', id: '1', title: 'Math'}}),
       mockItem('2017-12-05T12:30:00Z', {uniqueId: '3', context: {type: 'Course', id: '1', title: 'Math'}, allDay: true}),
       mockItem('2017-12-05T11:00:00Z', {uniqueId: '4', context: {type: 'Course', id: '1', title: 'Math'}}),

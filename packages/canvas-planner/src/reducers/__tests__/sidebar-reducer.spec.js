@@ -128,8 +128,8 @@ it('updates the item on SAVED_PLANNER_ITEM', () => {
     item: {...initialState.items[1], completed: true}}));
   expect(nextState.items).toMatchObject([
     {uniqueId: '41', completed: false},
-    {uniqueId: '43', completed: false},
     {uniqueId: '42', completed: true},
+    {uniqueId: '43', completed: false},
   ]);
   expect(nextState).not.toBe(initialState);
 });
