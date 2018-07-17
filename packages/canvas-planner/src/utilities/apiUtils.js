@@ -42,7 +42,7 @@ const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
     location: plannable.location_name || null,
     dateStyle: plannable.todo_date ? 'todo' : 'due'
   };
-
+  details.originallyCompleted = details.completed;
   details.feedback = apiResponse.submissions ? apiResponse.submissions.feedback : undefined;
 
   if (plannable_type === 'discussion_topic' || plannable_type === 'announcement') {

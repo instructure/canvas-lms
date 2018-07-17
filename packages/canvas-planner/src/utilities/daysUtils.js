@@ -166,8 +166,8 @@ function orderItemsByGrouping (a, b) {
 // order items by time, then title
 export function orderItemsByTimeAndTitle (a, b) {
   // completed items are grouped at the bottom
-  if (a.completed && !b.completed) return 1;
-  if (!a.completed && b.completed) return -1;
+  if (a.originallyCompleted && !b.originallyCompleted) return 1;
+  if (!a.originallyCompleted && b.originallyCompleted) return -1;
   // all day items are grouped at the top
   if (a.allDay && !b.allDay) return -1;
   if (!a.allDay && b.allDay) return 1;
