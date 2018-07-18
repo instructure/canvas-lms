@@ -169,20 +169,26 @@ test('Grid.Events.sort', () => {
   const rows = [
     {
       student: {sortable_name: 'Draper, Don'},
-      outcome_1: 3
+      outcome_1: {
+        score: 3
+      }
     },
     {
       student: {sortable_name: 'Olson, Peggy'},
-      outcome_1: 4
+      outcome_1: {
+        score: 4
+      }
     },
     {
       student: {sortable_name: 'Campbell, Pete'},
-      outcome_1: 3
+      outcome_1: {
+        score: 3
+      }
     }
   ]
   const outcomeSort = rows.sort((a, b) => Grid.Events._sortResults(a, b, true, 'outcome_1'))
   const userSort = rows.sort((a, b) => Grid.Events._sortStudents(a, b, true))
-  ok(isEqual([3, 3, 4], pluck(outcomeSort, 'outcome_1')), 'sorts by result value')
+  ok(isEqual([3, 3, 4], pluck(pluck(outcomeSort, 'outcome_1'), 'score')), 'sorts by result value')
   ok(
     outcomeSort.map(r => r.student.sortable_name)[0] === 'Campbell, Pete',
     'result sort falls back to sortable name'

@@ -137,7 +137,7 @@ define [
       _sortResults: (a, b, sortAsc, field) ->
         scoreA = a[field]
         scoreB = b[field]
-        val = numberCompare(scoreA, scoreB, descending: !sortAsc)
+        val = numberCompare(scoreA.score, scoreB.score, descending: !sortAsc)
         if val == 0
           Grid.Events._sortStudents(a, b, sortAsc)
         else
