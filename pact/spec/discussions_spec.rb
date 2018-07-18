@@ -206,5 +206,35 @@ describe 'Discussions', :pact do
     expect(response['id']).to eq 1
     expect(response['message']).to eq 'Great Discussion!'
   end
+
+  it 'should Update a Discussion' do
+    canvas_lms_api.given('a teacher in a course with a discussion').
+      upon_receiving('Update a Discussion').
+      with(
+        method: :put,
+          headers: {
+            'Authorization': 'Bearer some_token',
+            'Auth-User': 'Teacher1',
+            'Connection': 'close',
+            'Host': PactConfig.mock_provider_service_base_uri,
+            'Version': 'HTTP/1.1',
+            'Content-Type': 'application/json'
+          },
+          'path' => '/api/v1/courses/1/discussion_topics/1',
+          'body' =>
+          {
+            'title': 'Updated Discussion'
+          },
+        query: ''
+      ).
+      will_respond_with(
+        status: 200,
+        body: Pact.like('id': 1, 'title': 'Updated Discussion')
+      )
+    discussions_api.authenticate_as_user('Teacher1')
+    response = discussions_api.update_discussion(1, 1, 'Updated Discussion')
+    expect(response['id']).to eq 1
+    expect(response['title']).to eq 'Updated Discussion'
+  end
 end
 

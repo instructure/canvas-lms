@@ -71,6 +71,21 @@ module Helper
       rescue
         nil
       end
+
+      def update_discussion(course_id, topic_id, update)
+        JSON.parse(
+          self.class.put(
+            "/api/v1/courses/#{course_id}/discussion_topics/#{topic_id}",
+            :body =>
+              {
+                :title => update
+              }.to_json,
+            :headers => {'Content-Type' => 'application/json'}
+          ).body
+        )
+      rescue
+        nil
+      end
     end
   end
 end
