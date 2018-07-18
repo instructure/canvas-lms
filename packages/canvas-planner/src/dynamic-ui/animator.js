@@ -66,6 +66,14 @@ export class Animator {
     }, 'push');
   }
 
+  // scroll the top of elt offset pixels from the top of the screen
+  forceScrollTo (elt, offset, onComplete) {
+    this.queueAnimation(() => {
+       this.velocity(elt, 'scroll', {offset: -offset, duration: 1000, easing: 'ease-in-out', complete: onComplete});
+    });
+  }
+
+  // scroll the top of elt offset pixels from the top of the screen, but only if it's not currently in view
   scrollTo (elt, offset, onComplete) {
     this.queueAnimation(() => {
       if (this.isOffScreen(elt, offset)) {
