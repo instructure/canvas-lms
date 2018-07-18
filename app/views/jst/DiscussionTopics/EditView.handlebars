@@ -2,7 +2,11 @@
   <h1 class="screenreader-only" style="display: inline">{{title}}</h1>
 {{else}}
   <h1 class="screenreader-only" style="display: inline">
-    {{#t "page_header_title"}}New Discussion{{/t}}
+  {{#if isAnnouncement}}
+    {{#t}}New Announcement{{/t}}
+  {{else}}
+    {{#t}}New Discussion{{/t}}
+  {{/if}}
   </h1>
 {{/if}}
 
