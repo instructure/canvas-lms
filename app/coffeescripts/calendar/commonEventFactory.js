@@ -35,11 +35,11 @@ export default function commonEventFactory(data, contexts) {
   let actualContextCode = data.context_code
   let contextCode = data.effective_context_code || actualContextCode
 
-  const type = data.assignment_overrides
-    ? 'assignment_override'
-    : data.assignment || data.assignment_group_id
-      ? 'assignment'
-      : data.type === 'planner_note' ? 'planner_note' : 'calendar_event'
+  const type = data.assignment_overrides ? 'assignment_override' :
+    data.assignment || data.assignment_group_id ? 'assignment' :
+    data.type === 'planner_note' ? 'planner_note' :
+    data.plannable ? 'todo_item' :
+    'calendar_event'
 
   data = data.assignment_overrides
     ? {assignment: data.assignment, assignment_override: data.assignment_overrides[0]}
@@ -134,6 +134,12 @@ export default function commonEventFactory(data, contexts) {
     obj.can_change_context = true // TODO: will change to false when note is linked to an asset
     obj.can_edit = true
     obj.can_delete = true
+  }
+
+  // TODO make todo items editable, but for now prevent brokenness when the user tries
+  if (type === 'todo_item') {
+    obj.can_edit = false
+    obj.can_delete = false
   }
 
   // disable fullcalendar.js dragging unless the user has permissions
