@@ -268,6 +268,9 @@ module SIS
             return false if %w{aborted failed failed_with_messages}.include?(@batch.workflow_state)
           end
         end
+        @batch.parallel_importers.group(:importer_type).sum(:rows_processed).each do |type, count|
+          @batch.data[:counts][type.pluralize.to_sym] = count
+        end
         finish
       end
 
