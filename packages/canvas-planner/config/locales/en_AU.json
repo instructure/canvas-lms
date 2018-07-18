@@ -35,9 +35,6 @@
   "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
     "message": "{ assignmentType } { title } is not marked as done."
   },
-  "assignmenttype_title_on_datetime_446013fb": {
-    "message": "{ assignmentType } { title }, on { datetime }."
-  },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Beginning of Your To-Do History"
   },
@@ -94,9 +91,6 @@
   },
   "due_5d7267be": {
     "message": "Due:"
-  },
-  "due_date_8ce289b6": {
-    "message": "DUE: { date }"
   },
   "edit_title_72e5a21e": {
     "message": "Edit { title }"

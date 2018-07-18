@@ -233,12 +233,6 @@
   "date_ee500367": {
     "message": "Дата"
   },
-  "due_date_8ce289b6": {
-    "message": "ДО: { date }"
-  },
-  "assignmenttype_title_on_datetime_446013fb": {
-    "message": "{ assignmentType } { title }, в { datetime }."
-  },
   "show_my_grades_ebd08684": {
     "message": "Показати мої оцінки"
   },

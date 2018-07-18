@@ -35,9 +35,6 @@
   "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
     "message": "{ assignmentType } { title } kaore i tohua kua oti."
   },
-  "assignmenttype_title_on_datetime_446013fb": {
-    "message": "{ assignmentType } { title }, i runga i{ datetime }."
-  },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Te timatatanga o tō hītori Hei-Mahi"
   },
@@ -94,9 +91,6 @@
   },
   "due_5d7267be": {
     "message": "E tika ana:"
-  },
-  "due_date_8ce289b6": {
-    "message": "E TIKA ANA: { date }"
   },
   "edit_title_72e5a21e": {
     "message": "Whakatika { title }"

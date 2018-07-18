@@ -221,12 +221,6 @@
   "date_ee500367": {
     "message": "Dato"
   },
-  "due_date_8ce289b6": {
-    "message": "FRIST: { date }"
-  },
-  "assignmenttype_title_on_datetime_446013fb": {
-    "message": "{ assignmentType } { title }, på { datetime }."
-  },
   "show_my_grades_ebd08684": {
     "message": "Vis karakterane mine"
   },

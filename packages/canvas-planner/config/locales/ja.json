@@ -35,9 +35,6 @@
   "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
     "message": "{ assignmentType } { title } は、完了とマークされていません。"
   },
-  "assignmenttype_title_on_datetime_446013fb": {
-    "message": "{ assignmentType } { title }（{ datetime }に）。"
-  },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "あなたのタスク履歴の始まり"
   },
@@ -94,9 +91,6 @@
   },
   "due_5d7267be": {
     "message": "期限："
-  },
-  "due_date_8ce289b6": {
-    "message": "期限：{ date }"
   },
   "edit_title_72e5a21e": {
     "message": "{ title }を編集する"
