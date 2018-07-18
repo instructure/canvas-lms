@@ -21,7 +21,8 @@ module PactConfig
   # accidentally breaking the contract tests
   module Providers
     CANVAS_LMS_API = 'Canvas LMS API'.freeze
-    CANVAS_API_VERSION = '1.0'.freeze
+    sha = `git rev-parse --short HEAD`.strip
+    CANVAS_API_VERSION = '1.0' + "+#{sha}".freeze
     CANVAS_LMS_LIVE_EVENTS = 'Canvas LMS Live Events'.freeze
     ALL = Providers.constants.map { |c| Providers.const_get(c) }.freeze
   end
