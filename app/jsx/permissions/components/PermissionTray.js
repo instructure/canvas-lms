@@ -29,7 +29,27 @@ import Tray from '@instructure/ui-overlays/lib/components/Tray'
 import actions from '../actions'
 import RoleTrayTable from './RoleTrayTable'
 import RoleTrayTableRow from './RoleTrayTableRow'
-import permissionPropTypes from '../propTypes'
+import permissionPropTypes, {COURSE} from '../propTypes'
+
+import DetailsToggle from './DetailsToggle'
+import {
+  PERMISSION_DETAILS_COURSE_TEMPLATES,
+  PERMISSION_DETAILS_ACCOUNT_TEMPLATES,
+  PERMISSION_DETAIL_SECTIONS
+} from '../templates'
+
+function renderPermissionDetailToggles(tab, permissionName) {
+  return PERMISSION_DETAIL_SECTIONS.map(PDS => (
+    <DetailsToggle
+      title={PDS.title}
+      detailItems={
+        tab === COURSE
+          ? PERMISSION_DETAILS_COURSE_TEMPLATES[PDS.key][permissionName] || []
+          : PERMISSION_DETAILS_ACCOUNT_TEMPLATES[PDS.key][permissionName] || []
+      }
+    />
+  ))
+}
 
 // TODO don't pass in label if we are passing in permission
 export default function PermissionTray(props) {
@@ -55,7 +75,7 @@ export default function PermissionTray(props) {
         <Heading level="h3" as="h2" margin="0 0 medium 0">
           {props.label}
         </Heading>
-
+        {renderPermissionDetailToggles(props.tab, props.permissionName)}
         {props.assignedRoles.length !== 0 && (
           <RoleTrayTable title={I18n.t('Assigned Roles')}>
             {props.assignedRoles.map(role => (
@@ -72,7 +92,6 @@ export default function PermissionTray(props) {
             ))}
           </RoleTrayTable>
         )}
-
         {props.unassignedRoles.length !== 0 && (
           <RoleTrayTable title={I18n.t('Unassigned Roles')}>
             {props.unassignedRoles.map(role => (
@@ -100,7 +119,8 @@ PermissionTray.propTypes = {
   label: PropTypes.string.isRequired,
   open: PropTypes.bool.isRequired,
   unassignedRoles: PropTypes.arrayOf(permissionPropTypes.role).isRequired,
-  permissionName: PropTypes.string.isRequired
+  permissionName: PropTypes.string.isRequired,
+  tab: PropTypes.string.isRequired
 }
 
 function mapStateToProps(state, ownProps) {
@@ -109,7 +129,8 @@ function mapStateToProps(state, ownProps) {
       assignedRoles: [],
       label: '',
       open: false,
-      unassignedRoles: []
+      unassignedRoles: [],
+      tab: ownProps.tab || COURSE
     }
     return {...stateProps, ...ownProps}
   }
@@ -125,7 +146,8 @@ function mapStateToProps(state, ownProps) {
     permissionName,
     label: permission.label,
     open: true,
-    unassignedRoles: displayedRoles.filter(r => !r.permissions[permissionName].enabled)
+    unassignedRoles: displayedRoles.filter(r => !r.permissions[permissionName].enabled),
+    tab: ownProps.tab || COURSE
   }
   return {...ownProps, ...stateProps}
 }

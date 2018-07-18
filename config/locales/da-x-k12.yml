@@ -1162,8 +1162,8 @@ da-x-k12:
       pending_batches_title: "Afventende batcher"
       process_data_button: "Behandling af data"
       select_file_instructions: |-
-          Vælg zip-filen, som du ønsker at importere.
-          For en beskrivelse over, hvordan man genererer disse zip-filer, [skal du læse denne dokumentation](%{url}).
+          Vælg den zip-fil, du vil importere.
+          For en beskrivelse af, hvordan du genererer disse zip-filer, [se venligst denne dokumentation](%{url}).
       sis_import_crumb: SIS-import
       started_at_message: "Startet: %{started_at}"
       title: SIS-import
@@ -2266,7 +2266,7 @@ da-x-k12:
     redirect_page: 
       redirect_message: |-
           Denne aflevering var en url. Vi tager dig til url-linket nu.
-          [Klik her for at gå til afleveringen](%{url})
+          [Klik her for at gennemse afleveringen](%{url})
     remove_never_drop_rule: "Fjern reglen 'fjern aldrig'"
     remove_unsaved_never_drop_rule: "Fjern den ikke gemte regel 'fjern aldrig'"
     rules_text: 
@@ -2588,6 +2588,11 @@ da-x-k12:
       test_ldap_search_help_fixes_3: "Kontrollér, at brugerobjektet i LDAP har søgeprivilegier til den pågældende søgebasis."
       test_ldap_search_help_header: "Canvas kan ikke søge efter din LDAP-instans"
       test_ldap_search_label: "Tester LDAP-søgning ..."
+    linkedin_fields: 
+      description: |-
+          Du skal [registrere en ansøgning på LinkedIn](%{linkedin_url}).
+          Du skal tilføje %{callback_url} som en OAuth 2.0 autoriseret omdirigerings-URL og indstille programstatus til Live
+          Efter du opretter dit program, skal du notere dig kunde-id og kundehemmelighed og indtaste dem her.
     login_required: "skal formidles"
     no_changing_auth_types: "Kan ikke ændre autorisationskonfig. Slet og opret ny konfig."
     password_required: "skal formidles"
@@ -3512,9 +3517,9 @@ da-x-k12:
       collaboration_name: "%{course_or_group_name} Samarbejde"
       descriptions: 
         etherpad: |-
-            EtherPad er et projekt med åben kildekode, med hvilket du hurtigt kan konfigurere delte dokumenter. Det er så hurtigt, at du kan se, hvad andre indtaster, mens de indtaster det. På den anden side er "pads" ikke beskyttet med adgangskode, så enhver deltager med et tilhørende link kan redigere dem. EtherPadegner sig bedre end Google Docs, hvis du ønsker forbedret anonymitet og/eller at give deltagere uden Google-konti muligheden for at deltage.
+            EtherPad er et open source-projekt, der gør det muligt for dig hurtigt at oprette fælles dokumenter.  Det går så hurtigt, at man kan se, at andre skriver, mens de skriver det. På den anden side er "pads" ikke beskyttet af et kodeord, så alle med et link til dem kan redigere dem. EtherPad er bedre end Google Docs, hvis du vil støtte anonymitet og/eller lade personer uden Google-konti deltage.
             
-            **Advarsel**: Du skal sørge for at være bekendt med [EtherPad's sletningspolitik](%{etherpad_deletion_policy_url}) for at sikre, at dit arbejde bevares.
+            **Advarsel **: Sørg for, at du er bekendt med [EtherPads sletningspolitik](%{etherpad_deletion_policy_url}) for at sikre, at dit arbejde bevares.
         google_docs: |-
             Google Docs er et godt sted at samarbejde om et gruppeprojekt.  Det er ligesom Microsoft Word, men lader dig arbejde sammen med andre på samme fil på samme tid uden at skulle e-maile det til alle.
             
