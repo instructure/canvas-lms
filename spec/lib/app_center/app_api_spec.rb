@@ -20,9 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 # Manually stubbing the actual API request
 describe AppCenter::AppApi do
-  let(:api) { AppCenter::AppApi.new }
+  let(:api) { AppCenter::AppApi.new(@account) }
 
   before(:each) do
+    account_model
     default_settings = api.app_center.default_settings
     default_settings['base_url'] = 'http://www.example.com'
     default_settings['apps_index_endpoint'] = '/apps'
@@ -119,7 +120,7 @@ describe AppCenter::AppApi do
           plugin_setting.settings['token'] = 'new_token'
           plugin_setting.save!
 
-          api2 = AppCenter::AppApi.new
+          api2 = AppCenter::AppApi.new(@account)
 
           api2.fetch_app_center_response('/endpoint/url', 13.minutes, 7, 4)
         end
@@ -199,6 +200,15 @@ describe AppCenter::AppApi do
       config_settings = {custom_param: 'custom_value'}
       url = api.get_app_config_url(app_center_id, config_settings)
       expect(url).to eq "#{app_center_response['config_xml_url']}&custom_param=custom_value"
+    end
+
+    it 'uses the correct app center token by context if set' do
+      @account.settings[:app_center_access_token] = 'account_token'
+      app_center_id = 'pr_youtube'
+      config_settings = {custom_param: 'custom_value'}
+      endpoint = "/api/v1/lti_apps/pr_youtube?access_token=account_token"
+      expect(api).to receive(:fetch_app_center_response).with(endpoint, 5.minutes, 1, 1).and_return(app_center_response)
+      api.get_app_config_url(app_center_id, config_settings)
     end
   end
 

@@ -23,12 +23,13 @@ module AppCenter
   class AppApi
     attr_reader :app_center
 
-    def initialize
+    def initialize(context)
       @app_center = Canvas::Plugin.find(:app_center)
+      @context ||= context
     end
 
     def valid_app_center?
-      @app_center && @app_center.enabled? && !@app_center.settings['base_url'].empty?
+      @app_center&.enabled? && !@app_center.settings['base_url'].empty?
     end
 
     def fetch_app_center_response(endpoint, expires, page, per_page)
@@ -56,15 +57,15 @@ module AppCenter
         Rails.cache.delete cache_key
       end
 
-      return json
+      json
     end
 
-    def get_apps(page = 1, per_page = 72, app_center_access_token=nil)
+    def get_apps(page = 1, per_page = 72)
       return {} unless valid_app_center?
 
       uri = URI.parse(@app_center.settings['apps_index_endpoint'])
       params = URI.decode_www_form(uri.query || '')
-      access_token = app_center_access_token ? app_center_access_token : @app_center.settings['token']
+      access_token = app_center_token_by_context
       params << ['access_token', access_token]
       uri.query = URI.encode_www_form(params)
       json = fetch_app_center_response(uri.to_s, 5.minutes, page, per_page)
@@ -108,7 +109,7 @@ module AppCenter
     end
 
     def get_app_config_url(app_center_id, config_settings)
-      access_token = @app_center.settings['token']
+      access_token = app_center_token_by_context
       endpoint = "/api/v1/lti_apps/#{app_center_id}?access_token=#{access_token}"
 
       app_details = fetch_app_center_response(endpoint, 5.minutes, 1, 1)
@@ -128,6 +129,18 @@ module AppCenter
       end
 
       config_url
+    end
+
+    private
+
+    def app_center_token_by_context
+      context = @context.is_a?(Account) ? @context : @context.account
+
+      if context.settings[:app_center_access_token].present?
+        context.calculate_inherited_setting(:app_center_access_token)[:value]
+      else
+        @app_center.settings['token']
+      end
     end
   end
 end
