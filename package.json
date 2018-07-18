@@ -262,6 +262,8 @@
     "canvas-rce/**/babel-helper-evaluate-path": "0.4.1",
     "canvas-quizzes/grunt-contrib-jasmine/jasmine-core": "2.6.4",
     "graphael": "this is just here so yarn.lock looks the same whether the analytics plugin is checked out or not",
-    "graphael": "https://github.com/ryankshaw/graphael.git"
+    "graphael": "https://github.com/ryankshaw/graphael.git",
+    "node-sass": "if we let node-sass upgrade to recent versions, it causes: SIS-3125",
+    "node-sass": "4.7.2"
   }
 }
