@@ -3114,7 +3114,25 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         handleGradingError.restore()
       })
 
-      test('reverts the provisional grade fields on an error if the user is a moderator', () => {
+      test('clears the grade input on an error if moderating but no provisional grade was chosen', () => {
+        const unselectedGrade = { grade: 1, selected: false }
+        SpeedGrader.EG.currentStudent.submission.provisional_grades = [unselectedGrade]
+        SpeedGrader.EG.setupProvisionalGraderDisplayNames()
+
+        $.ajaxJSON.callsFake((_url, _method, _form, _success, error) => { error() })
+        const handleGradingError = sinon.stub(SpeedGrader.EG, 'handleGradingError')
+        const showGrade = sinon.stub(SpeedGrader.EG, 'showGrade')
+
+        ENV.grading_role = 'moderator'
+        SpeedGrader.EG.handleGradeSubmit({}, false)
+        strictEqual(showGrade.callCount, 1)
+
+        showGrade.restore()
+        handleGradingError.restore()
+      })
+
+
+      test('reverts the provisional grade fields on an error if moderating and a provisional grade was chosen', () => {
         const fakeGrade = { grade: 1, selected: true }
         SpeedGrader.EG.currentStudent.submission.provisional_grades = [fakeGrade]
         SpeedGrader.EG.setupProvisionalGraderDisplayNames()

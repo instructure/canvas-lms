@@ -2568,20 +2568,22 @@ EG = {
     };
 
     const submissionError = (data, _xhr, _textStatus, _errorThrown) => {
-      EG.handleGradingError(data);
+      EG.handleGradingError(data)
 
+      let selectedGrade
       if (ENV.grading_role === 'moderator') {
-        // Revert to the previously-selected provisional grade, which will not
-        // necessarily be the value in EG.currentStudent.submission
-        const selectedGrade = currentStudentProvisionalGrades().find(provisionalGrade => provisionalGrade.selected)
-        if (selectedGrade) {
-          EG.setActiveProvisionalGradeFields({
-            grade: selectedGrade,
-            label: provisionalGraderDisplayNames[selectedGrade.provisional_grade_id]
-          })
-        }
+        selectedGrade = currentStudentProvisionalGrades().find(provisionalGrade => provisionalGrade.selected)
+      }
+
+      // Revert to the previously selected provisional grade (if we're moderating) or
+      // the last valid value (if not moderating or no provisional grade was chosen)
+      if (selectedGrade) {
+        EG.setActiveProvisionalGradeFields({
+          grade: selectedGrade,
+          label: provisionalGraderDisplayNames[selectedGrade.provisional_grade_id]
+        })
       } else {
-        EG.showGrade();
+        EG.showGrade()
       }
     };
 
