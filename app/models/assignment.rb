@@ -47,13 +47,13 @@ class Assignment < ActiveRecord::Base
 
   after_update :duplicate_across_courses
   def duplicate_across_courses
-    if self.description_changed? || self.name_changed?
+    if self.description_changed?
       Assignment.where(:clone_of_id => id).each do |assignment|
         # Look for links to other pages / assignments in the Content Library and update those
         # be links to the associated pages / assignment in the local course.
         local_course_id = assignment.context_id
         assignment.description = replace_content_library_links_with_local_links(description, local_course_id)
-        assignment.name = name
+        # assignment.name = name
         assignment.submission_types = submission_types
 
         if rubric != assignment.rubric
