@@ -37,11 +37,20 @@ QUnit.module('DashboardCardAction', {
   }
 })
 
-test('should render link & i', function() {
+test('should render link & icon', function() {
   this.component = TestUtils.renderIntoDocument(<DashboardCardAction {...this.props} />)
   const $html = $(this.component.getDOMNode())
   equal($html.prop('tagName'), 'A', 'parent tag should be link')
-  equal($html.find('i').attr('class'), this.props.iconClass, 'i tag should have provided iconClass')
+  equal($html.find('svg').attr('name'), 'IconAssignment', 'should have provided corresponding icon')
+  equal($html.find('span.screenreader-only').length, 0, 'should not have screenreader span')
+})
+
+test('should render fallback icon for unrecognized iconClass', function() {
+  this.props.iconClass = 'icon-something-else'
+  this.component = TestUtils.renderIntoDocument(<DashboardCardAction {...this.props} />)
+  const $html = $(this.component.getDOMNode())
+  equal($html.prop('tagName'), 'A', 'parent tag should be link')
+  equal($html.find('i').attr('class'), this.props.iconClass, 'i tag should have given prop as class')
   equal($html.find('span.screenreader-only').length, 0, 'should not have screenreader span')
 })
 
