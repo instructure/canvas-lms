@@ -149,7 +149,7 @@ class Assignment
         provisional_grades = if grader_comments_hidden?(current_user: @current_user, assignment: @assignment)
           provisional_grades.not_final.where(scorer: @current_user)
         else
-          select_fields = ::ModeratedGrading::GRADE_ATTRIBUTES_ONLY.dup.append(:submission_id)
+          select_fields = ::ModeratedGrading::GRADE_ATTRIBUTES_ONLY.dup.push(:id, :submission_id)
           provisional_grades.select(select_fields)
         end
       elsif @grading_role == :grader
@@ -171,6 +171,10 @@ class Assignment
         else
           @assignment.quiz.context.preload_user_roles!
         end
+      end
+
+      if anonymous_graders?(current_user: @current_user, assignment: @assignment)
+        res[:anonymous_grader_ids] = @assignment.ordered_moderation_graders.pluck(:anonymous_id)
       end
 
       res[:submissions] = @submissions.map do |sub|

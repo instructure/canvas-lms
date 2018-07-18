@@ -2285,10 +2285,12 @@ EG = {
     }
     // anonymous commentors
     if (comment.author_name == null) {
-      if (provisionalGraderDisplayNames == null) this.setupProvisionalGraderDisplayNames()
       const {provisional_grade_id} = EG.currentStudent.submission.provisional_grades.find(pg =>
         pg.anonymous_grader_id === comment.anonymous_id
       )
+      if (provisionalGraderDisplayNames == null || provisionalGraderDisplayNames[provisional_grade_id] == null) {
+        this.setupProvisionalGraderDisplayNames()
+      }
       comment.author_name = provisionalGraderDisplayNames[provisional_grade_id]
     }
     commentElement = commentElement.fillTemplateData({ data: comment });
@@ -2845,26 +2847,26 @@ EG = {
 
   setupProvisionalGraderDisplayNames() {
     provisionalGraderDisplayNames = {};
-
     let provisionalGrades = currentStudentProvisionalGrades();
-    // For anonymous assignments, we sort by anonymous grader ID and
-    // number our graders based on that order
-    if (provisionalGrades.length > 0 && provisionalGrades[0].anonymous_grader_id) {
-      provisionalGrades = _.sortBy(provisionalGrades, (grade) => grade.anonymous_grader_id);
+    const anonymous_grader_ids = window.jsonData.anonymous_grader_ids || [];
+    const anonymousIdToProvisionalName = {};
+
+    // By doing this, we guarantee that the provisional graders will
+    // maintain the same order within the same speedgrader session.
+    for (let i = 0; i < anonymous_grader_ids.length; i += 1) {
+      anonymousIdToProvisionalName[anonymous_grader_ids[i]] = I18n.t('Grader %{index}',{index: i+1});
     }
 
-    let provisionalGradesCounted = 0;
     provisionalGrades.forEach((grade) => {
       if (grade.readonly) {
-        provisionalGradesCounted += 1;
         const displayName = grade.anonymous_grader_id
-          ? I18n.t('Grader %{graderIndex}', {graderIndex: provisionalGradesCounted})
+          ? anonymousIdToProvisionalName[grade.anonymous_grader_id]
           : grade.scorer_name;
         provisionalGraderDisplayNames[grade.provisional_grade_id] = displayName;
       } else {
         provisionalGraderDisplayNames[grade.provisional_grade_id] = customProvisionalGraderLabel;
       }
-    })
+    });
   },
 
   fetchProvisionalGrades() {

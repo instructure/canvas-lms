@@ -162,6 +162,23 @@ describe Assignment::SpeedGrader do
     expect(json[:submissions].first[:submission_comments]).to be_empty
   end
 
+  it "returns provisional grade ids to provisional grader" do
+    final_grader = @course.enroll_teacher(User.create!, enrollment_state: 'active').user
+    assignment = Assignment.create!(
+      context: @course,
+      moderated_grading: true,
+      grader_count: 2,
+      final_grader: final_grader
+    )
+    assignment.submit_homework(@user, {submission_type: 'online_text_entry', body: 'blah'})
+    submission = assignment.submissions.first
+    comment = submission.add_comment(comment: 'comment', author: final_grader, provisional: true)
+    json = Assignment::SpeedGrader.new(assignment, @teacher, grading_role: :provisional_grader).json
+    expect(
+      json[:submissions].first[:provisional_grades].first[:provisional_grade_id]
+    ).to eq comment.provisional_grade_id.to_s
+  end
+
   context "students and active course sections" do
     before(:once) do
       @course = course_factory(active_course: true)
@@ -372,16 +389,13 @@ describe Assignment::SpeedGrader do
 
       let(:course) { Course.create! }
       let(:assignment) { course.assignments.create!(title: 'test', points_possible: 10) }
-      let(:student) { User.create! }
-      let(:teacher) { User.create! }
+      let(:student) { course_with_student(course: course).user }
+      let(:teacher) { course_with_teacher(course: course).user }
       let(:attachment) do
         student.attachments.create!(uploaded_data: stub_png_data, filename: 'file.png', viewed_at: viewed_at_time)
       end
 
       before(:each) do
-        course.enroll_student(student).accept(true)
-        course.enroll_teacher(teacher).accept(true)
-
         assignment.submit_homework(student, attachments: [attachment])
       end
 
@@ -389,7 +403,7 @@ describe Assignment::SpeedGrader do
         json = Assignment::SpeedGrader.new(assignment, teacher).json
         submission_json = json.dig(:submissions, 0, :submission_history, 0, :submission)
         attachment_json = submission_json.dig(:versioned_attachments, 0, :attachment)
-        expect(attachment_json[:viewed_at]).to eq viewed_at_time
+        expect(attachment_json.fetch(:viewed_at)).to eq viewed_at_time
       end
 
       context 'for an anonymized assignment' do
@@ -2215,6 +2229,17 @@ describe Assignment::SpeedGrader do
         ta_pg.update!(final: true)
         ta_assessments = submission_json['final_provisional_grade']['rubric_assessments']
         expect(ta_assessments).to all(include("anonymous_assessor_id" => "atata"))
+      end
+    end
+
+    context 'when the grader cannot see names of other graders' do
+      let(:json) do
+        assignment.update!(anonymous_grading: true, graders_anonymous_to_graders: true)
+        Assignment::SpeedGrader.new(assignment, teacher, avatars: true, grading_role: :provisional_grader).json
+      end
+
+      it "includes the anonymous grader ids of moderation graders ordered alphanumerically" do
+        expect(json[:anonymous_grader_ids]).to eq ["atata", "moder", "teach"]
       end
     end
 

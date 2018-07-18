@@ -171,14 +171,32 @@ describe "SpeedGrader" do
         submission_types: 'online_text_entry',
         moderated_grading: true
       )
-      @moderated_assignment.submissions.each do |submission|
-        submission.add_comment(author: @teacher2,
-                               comment: 'Some comment text by non-final grader',
-                               provisonal: true)
-        submission.add_comment(author: @teacher3,
-                               comment: 'Some comment text by another non-final grader',
-                               provisonal: true)
-      end
+      @moderated_assignment.update_submission(
+        @student1,
+        author: @teacher2,
+        comment: 'Some comment text by non-final grader',
+        provisional: true
+      )
+      @moderated_assignment.update_submission(
+        @student1,
+        author: @teacher3,
+        comment: 'Some comment text by another non-final grader',
+        provisional: true
+      )
+      @moderated_assignment.update_submission(
+        @student2,
+        author: @teacher2,
+        comment: 'Some comment text by non-final grader',
+        provisional: true
+      )
+      @moderated_assignment.update_submission(
+        @student2,
+        author: @teacher3,
+        comment: 'Some comment text by another non-final grader',
+        provisional: true
+      )
+      ModerationGrader.find_by(user: @teacher2, assignment: @moderated_assignment).update!(anonymous_id: 'AAAAA')
+      ModerationGrader.find_by(user: @teacher3, assignment: @moderated_assignment).update!(anonymous_id: 'BBBBB')
     end
 
     it "graders cannot view other grader's comments when `grader_comments_visible_to_graders = false`",
@@ -208,7 +226,6 @@ describe "SpeedGrader" do
     end
 
     it "final-grader can view other grader's comments by default", priority: 1, test_id: 3512445 do
-
       user_session(@teacher1)
       Speedgrader.visit(@course.id, @moderated_assignment.id)
 
@@ -217,11 +234,11 @@ describe "SpeedGrader" do
     end
 
     it "final-grader cannot view other grader's name with `grader_names_visible_to_final_grader = false`" do
-
-      skip('Unskip in GRADE-1360')
-      @moderated_assignment.update!(anonymous_grading: true,
-                                    graders_anonymous_to_graders: true,
-                                    grader_names_visible_to_final_grader: false)
+      @moderated_assignment.update!(
+        anonymous_grading: true,
+        graders_anonymous_to_graders: true,
+        grader_names_visible_to_final_grader: false
+      )
       user_session(@teacher1)
       Speedgrader.visit(@course.id, @moderated_assignment.id)
 
@@ -231,21 +248,19 @@ describe "SpeedGrader" do
 
     it "anonymizes grader comments for other non-final graders when `graders_anonymous_to_graders = true`",
        priority: 1, test_id: 3505165 do
-
-      skip('Unskip in GRADE-1360')
-      @moderated_assignment.update!(grader_comments_visible_to_graders: true,
-                                    anonymous_grading: true,
-                                    graders_anonymous_to_graders: true,
-                                    grader_names_visible_to_final_grader: false)
+      @moderated_assignment.update!(
+        grader_comments_visible_to_graders: true,
+        anonymous_grading: true,
+        graders_anonymous_to_graders: true,
+        grader_names_visible_to_final_grader: false
+      )
       user_session(@teacher3)
       Speedgrader.visit(@course.id, @moderated_assignment.id)
       Speedgrader.click_next_student_btn
 
       expect(Speedgrader.comments.length).to eq 2
-      comment_text = Speedgrader.comments.first.text
-      expect(comment_text).to include 'Some comment text by non-final grader'
-      expect(comment_text).not_to include 'Teacher2'
-      expect(comment_text).to include 'Grader 1'
+      expect(Speedgrader.comments.first.text).to include 'Some comment text by non-final grader'
+      expect(Speedgrader.comment_citation.first.text).to eq 'Grader 1'
     end
   end
 

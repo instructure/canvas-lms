@@ -175,7 +175,6 @@ QUnit.module('SpeedGrader#refreshSubmissionsToView', {
     };
     sinon.stub($, 'getJSON')
     sinon.stub(SpeedGrader.EG, 'domReady')
-    // call setup() in the individual tests so we can test using different values for isAdmin
   },
 
   teardown () {
@@ -325,7 +324,8 @@ QUnit.module('SpeedGrader#renderComment', {
     this.originalWindowJSONData = window.jsonData;
     window.jsonData = {
       id: 27,
-      GROUP_GRADING_MODE: false
+      GROUP_GRADING_MODE: false,
+      anonymous_grader_ids: ['asdfg', 'mry2b']
     };
     this.originalStudent = SpeedGrader.EG.currentStudent;
     SpeedGrader.EG.currentStudent = {
@@ -424,6 +424,9 @@ QUnit.module('SpeedGrader#renderComment', {
         <button class="submit_comment_button">
           <span>Submit</span>
         </button>
+        <div class="comment_citation">
+          <span class="author_name"></span>
+        </div>
         <a class="delete_comment_link icon-x">
           <span class="screenreader-only">Delete comment</span>
         </a>
@@ -469,6 +472,94 @@ test('renderComment should add the comment text to the delete link for screenrea
   const deleteLinkScreenreaderText = renderedComment.find('.delete_comment_link .screenreader-only').text();
 
   equal(deleteLinkScreenreaderText, 'Delete comment: test');
+});
+
+test('renders a generic grader name when graders cannot view other grader names', () => {
+  SpeedGrader.EG.currentStudent = {
+    id: '4',
+    index: 1,
+    name: 'Michael B. Jordan',
+    submission: {
+      provisional_grades: [
+        {
+          anonymous_grader_id: 'mry2b',
+          final: false,
+          provisional_grade_id: '53',
+          readonly: true
+        }
+      ],
+      submission_comments: [
+        {
+          anonymous_id: 'mry2b',
+          comment: 'a comment',
+          created_at: '2018-07-30T15:42:14Z',
+          id: '44'
+        }
+      ]
+    }
+  };
+  const commentToRender = SpeedGrader.EG.currentStudent.submission.submission_comments[0];
+  const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions);
+  const authorName = renderedComment.find('.author_name').text();
+  strictEqual(authorName, 'Grader 2');
+});
+
+test('refreshes provisional grader display names when names are stale after switching students', () => {
+  const firstStudent = {
+    id: '4',
+    index: 1,
+    name: 'Michael B. Jordan',
+    submission: {
+      provisional_grades: [
+        {
+          anonymous_grader_id: 'mry2b',
+          final: false,
+          provisional_grade_id: '53',
+          readonly: true
+        }
+      ],
+      submission_comments: [
+        {
+          anonymous_id: 'mry2b',
+          comment: 'a comment',
+          created_at: '2018-07-30T15:42:14Z',
+          id: '44'
+        }
+      ]
+    }
+  };
+  const secondStudent = {
+    id: '5',
+    index: 2,
+    name: 'Chadwick Boseman',
+    submission: {
+      provisional_grades: [
+        {
+          anonymous_grader_id: 'asdfg',
+          final: false,
+          provisional_grade_id: '54',
+          readonly: true
+        }
+      ],
+      submission_comments: [
+        {
+          anonymous_id: 'asdfg',
+          comment: 'canvas forever',
+          created_at: '2018-07-30T15:43:14Z',
+          id: '45'
+        }
+      ]
+    }
+  };
+
+  SpeedGrader.EG.currentStudent = firstStudent;
+  SpeedGrader.EG.renderComment(SpeedGrader.EG.currentStudent.submission.submission_comments[0], commentRenderingOptions);
+
+  SpeedGrader.EG.currentStudent = secondStudent;
+  const commentToRender = SpeedGrader.EG.currentStudent.submission.submission_comments[0]
+  const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions);
+  const authorName = renderedComment.find('.author_name').text();
+  strictEqual(authorName, 'Grader 1');
 });
 
 QUnit.module('SpeedGrader#showGrade', {
@@ -3891,6 +3982,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
 
   QUnit.module('provisional grader display names', (hooks) => {
     const EG = SpeedGrader.EG
+    let originalWindowJson
 
     hooks.beforeEach(() => {
       fixtures.innerHTML = `
@@ -3901,8 +3993,9 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
           <input type='text' id='grading-box-extended' />
         </div>
       `
-
       SpeedGrader.setup()
+      originalWindowJson = window.jsonData
+      window.jsonData = { anonymous_grader_ids: ['aaaaa', 'bbbbb'] }
 
       sinon.stub(EG, 'submitSelectedProvisionalGrade')
       sinon.spy(EG, 'setActiveProvisionalGradeFields')
@@ -3911,6 +4004,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
     hooks.afterEach(() => {
       EG.setActiveProvisionalGradeFields.restore()
       EG.submitSelectedProvisionalGrade.restore()
+      window.jsonData = originalWindowJson
       SpeedGrader.teardown()
       window.location.hash = ''
 

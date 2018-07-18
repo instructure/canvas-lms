@@ -2789,6 +2789,10 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  def ordered_moderation_graders
+    moderation_graders.order(:anonymous_id)
+  end
+
   def moderated_grading_max_grader_count
     max_course_count = course.moderated_grading_max_grader_count
     return max_course_count if grader_count.blank?

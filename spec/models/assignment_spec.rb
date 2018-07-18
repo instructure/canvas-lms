@@ -235,6 +235,25 @@ describe Assignment do
     end
   end
 
+  describe '#ordered_moderation_graders' do
+    let(:teacher1) { @course.enroll_teacher(User.create!, enrollment_state: :active).user }
+    let(:teacher2) { @course.enroll_teacher(User.create!, enrollment_state: :active).user }
+    let(:assignment) do
+      @course.assignments.create!(
+        moderated_grading: true,
+        grader_count: 3,
+        final_grader: @teacher
+      )
+    end
+
+    it 'returns moderation graders ordered by anonymous id' do
+      mod_teacher1 = assignment.moderation_graders.create!(user: teacher1, anonymous_id: 'VFH2Y')
+      mod_teacher2 = assignment.moderation_graders.create!(user: teacher2, anonymous_id: 'A23FH')
+      mod_teacher = assignment.moderation_graders.create!(user: @teacher, anonymous_id: 'R2D22')
+      expect(assignment.ordered_moderation_graders).to eq [mod_teacher2, mod_teacher, mod_teacher1]
+    end
+  end
+
   describe '#permits_moderation?' do
     before(:once) do
       @assignment = @course.assignments.create!(
