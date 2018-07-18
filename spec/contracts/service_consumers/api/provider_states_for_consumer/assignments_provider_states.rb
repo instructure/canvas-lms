@@ -27,7 +27,11 @@ PactConfig::Consumers::ALL.each do |consumer|
     provider_state 'a student in a course with an assignment' do
       set_up do
         course = Pact::Canvas.base_state.course
-        Assignment.create!(context: course, title: "Assignment1")
+        course.assignments.create({
+                                   name: 'Assignment 1',
+                                   due_at: Time.zone.now + 1.day,
+                                   submission_types: 'online_text_entry'
+                                 })
       end
     end
 
