@@ -36,6 +36,18 @@ describe TermsController do
       }}}
   end
 
+  it "should not be able to change the name for a default term" do
+    account_model
+    account_admin_user(:account => @account)
+    user_session(@user)
+
+    put 'update', params: {:account_id => @account.id, :id => @account.default_enrollment_term.id, :enrollment_term => {:name => "new name lol"}}
+
+    expect(response).to_not be_successful
+    error = json_parse(response.body)["errors"]["name"].first["message"]
+    expect(error).to eq "Cannot change the default term name"
+  end
+
   it "should not be able to delete a default term" do
     account_model
     account_admin_user(:account => @account)

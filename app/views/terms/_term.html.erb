@@ -17,6 +17,7 @@
 %>
 
 <% term ||= nil %>
+<% default_term = @context.default_enrollment_term %>
 <tr class="term" id="term_<%= term ? term.id : "blank" %>" style="<%= hidden unless term %>">
   <td class="header">
     <div class="show_term">
@@ -43,7 +44,7 @@
         <div class="control-group edit_term">
           <label class="control-label" for="enrollment_term_name"><%= t :name, 'Term Name:' %></label>
           <div class="controls">
-            <%= f.text_field :name, :class => "input-xlarge" %>
+            <%= f.text_field :name, :class => "input-xlarge", :disabled => (term && term == default_term) %>
           </div>
         </div>
       <% if can_do(@root_account, @current_user, :manage_sis) %>
@@ -120,7 +121,7 @@
     <a href="#" class="edit_term_link no-hover" title="<%= t 'Edit Term %{name}', name: term.try(:name) %>"><i class="icon-edit standalone-icon" aria-hidden="true"></i></a>
     <% if term && @course_counts_by_term[term.id].to_i > 0 %>
       <a href="#" class="cant_delete_term_link no-hover" title="<%= t 'Delete Term %{name}', name: term.try(:name) %>"><i class="icon-end standalone-icon" aria-hidden="true"></i></a>
-    <% elsif term != @context.default_enrollment_term %>
+    <% elsif term != default_term %>
       <a href="#" class="delete_term_link no-hover" title="<%= t 'Delete Term %{name}', name: term.try(:name) %>"><i class="icon-trash standalone-icon" aria-hidden="true"></i></a>
     <% end %>
   </td>
