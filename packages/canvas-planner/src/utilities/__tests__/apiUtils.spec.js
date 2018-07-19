@@ -528,6 +528,40 @@ describe('transformApiToInternalItem', () => {
     result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
     expect(result.allDay).toBeFalsy();
   })
+
+  it('sets completed correctly', () => {
+    const apiResponse = makeApiResponse({
+      submissions: {
+        graded: true,
+        has_feedback: true
+      }
+    });
+    // graded => not complete
+    let result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
+    expect(result.completed).toBeFalsy();
+
+    // excused => not complete
+    apiResponse.submissions.excused = true;
+    result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
+    expect(result.completed).toBeFalsy();
+
+    // submitted => complete
+    apiResponse.submissions.submitted = true;
+    result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
+    expect(result.completed).toBeTruthy();
+
+    // !submitted but user marked complete => complete
+    apiResponse.submissions.submitted = false;
+    apiResponse.planner_override = {marked_complete: true}
+    result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
+    expect(result.completed).toBeTruthy();
+
+    // submitted but user marked not complete => not complete
+    apiResponse.submissions.submitted = true;
+    apiResponse.planner_override = {marked_complete: false}
+    result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
+    expect(result.completed).toBeFalsy();
+  })
 });
 
 describe('transformInternalToApiItem', () => {
