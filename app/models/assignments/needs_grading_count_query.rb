@@ -139,10 +139,6 @@ module Assignments
           AND e.workflow_state = 'active'
           AND #{Submission.needs_grading_conditions}
         SQL
-
-      string += <<-SQL
-        AND EXISTS (SELECT * FROM #{AssignmentStudentVisibility.quoted_table_name} asv WHERE asv.user_id = submissions.user_id AND asv.assignment_id = submissions.assignment_id)
-      SQL
       joined_submissions.where(string, assignment, course)
     end
 
