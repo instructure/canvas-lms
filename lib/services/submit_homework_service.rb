@@ -43,13 +43,23 @@ module Services
         @attachment ||= Attachment.find(attachment_id)
       end
 
+      def assignment
+        @assignment ||= progress.context
+      end
+
+      def homework_service
+        @homework_service ||= SubmitHomeworkService.new(attachment, assignment)
+      end
+
       def perform
         progress.start
-        assignment = progress.context
         clone_url_executor.execute(attachment)
-        SubmitHomeworkService.submit(attachment, assignment, progress.created_at, eula_agreement_timestamp)
-        progress.complete
-        SubmitHomeworkService.successful_email(attachment, assignment)
+        progress.reload
+
+        homework_service.submit(progress.created_at, eula_agreement_timestamp)
+        homework_service.deliver_email
+
+        progress.complete unless progress.failed?
       rescue => error
         mark_as_failure(error)
       end
@@ -61,11 +71,22 @@ module Services
       private
 
       def mark_as_failure(error)
-        error_id = Canvas::Errors.capture_exception(self.class.name, error)[:error_report]
-        progress.message = "Unexpected error, ID: #{error_id || 'unknown'}"
-        progress.save
-        progress.fail
-        SubmitHomeworkService.failure_email(attachment, attachment.context)
+        progress.reload
+        unless progress.failed?
+          error_id = Canvas::Errors.capture_exception(self.class.name, error)[:error_report]
+          message = "Unexpected error, ID: #{error_id || 'unknown'}"
+
+          attachment.file_state = 'errored'
+          attachment.workflow_state = 'errored'
+          attachment.upload_error_message = message
+          attachment.save
+
+          progress.message = message
+          progress.save
+          progress.fail
+        end
+
+        homework_service.failure_email
       end
     end
 
@@ -80,51 +101,66 @@ module Services
             Delayed::Job.enqueue(worker, n_strand: 'file_download')
           end
       end
+    end
 
-      def submit(attachment, assignment, submitted_at, eula_agreement_timestamp)
-        opts = {
-          submission_type: 'online_upload',
-          submitted_at: submitted_at,
-          attachments: [attachment],
-          eula_agreement_timestamp: eula_agreement_timestamp
-        }
+    def initialize(attachment, assignment)
+      @attachment = attachment
+      @assignment = assignment
+    end
 
-        assignment.submit_homework(attachment.user, opts)
+    def submit(submitted_at, eula_agreement_timestamp)
+      opts = {
+        submission_type: 'online_upload',
+        submitted_at: submitted_at,
+        attachments: [@attachment],
+        eula_agreement_timestamp: eula_agreement_timestamp
+      }
+
+      @assignment.submit_homework(@attachment.user, opts)
+    end
+
+    def deliver_email
+      if @attachment.errored?
+        failure_email
+      else
+        successful_email
       end
+    end
 
-      def successful_email(attachment, assignment)
-        body = "Your file, #{attachment.display_name}, has been successfully "\
-               "uploaded to your Canvas assignment, #{assignment.name}"
-        user_email = User.find(attachment.user_id).email
+    def successful_email
+      body = "Your file, #{@attachment.display_name}, has been successfully "\
+             "uploaded to your Canvas assignment, #{@assignment.name}"
+      user_email = User.find(@attachment.user_id).email
 
-        message = OpenStruct.new(
-          from_name: 'notifications@instructure.com',
-          subject: "Submission upload successful: #{assignment.name}",
-          to: user_email,
-          body: body
-        )
-        deliver_email(message)
-      end
+      message = OpenStruct.new(
+        from_name: 'notifications@instructure.com',
+        subject: "Submission upload successful: #{@assignment.name}",
+        to: user_email,
+        body: body
+      )
+      queue_email(message)
+    end
 
-      def failure_email(attachment, assignment)
-        body = "Your file, #{attachment.display_name}, failed to upload to your "\
-               "Canvas assignment, #{assignment.name}. Please re-submit to "\
-               "the assignment or contact your instructor if you are no "\
-               "longer able to do so."
-        user_email = User.where(id: attachment.user_id).first.email
+    def failure_email
+      body = "Your file, #{@attachment.display_name}, failed to upload to your "\
+             "Canvas assignment, #{@assignment.name}. Please re-submit to "\
+             "the assignment or contact your instructor if you are no "\
+             "longer able to do so."
+      user_email = User.where(id: @attachment.user_id).first.email
 
-        message = OpenStruct.new(
-          from_name: 'notifications@instructure.com',
-          subject: "Submission upload failed: #{assignment.name}",
-          to: user_email,
-          body: body
-        )
-        deliver_email(message)
-      end
+      message = OpenStruct.new(
+        from_name: 'notifications@instructure.com',
+        subject: "Submission upload failed: #{@assignment.name}",
+        to: user_email,
+        body: body
+      )
+      queue_email(message)
+    end
 
-      def deliver_email(message)
-        Delayed::Job.enqueue(EmailWorker.new(message))
-      end
+    private
+
+    def queue_email(message)
+      Delayed::Job.enqueue(EmailWorker.new(message))
     end
   end
 end
