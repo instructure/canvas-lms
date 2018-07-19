@@ -28,10 +28,10 @@ const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
   const details = {
     course_id: plannable.course_id,
     title: plannable.name || plannable.title,
-    completed: (markedComplete != null) ? markedComplete.marked_complete : (apiResponse.submissions
-      && (apiResponse.submissions.submitted
-      || apiResponse.submissions.excused
-      || apiResponse.submissions.graded)
+    // items are completed if the user marks it as complete or made a submission
+    completed: (markedComplete != null)
+      ? markedComplete.marked_complete
+      : (apiResponse.submissions && apiResponse.submissions.submitted
     ),
     points: plannable.points_possible,
     html_url: apiResponse.html_url || plannable.html_url,
