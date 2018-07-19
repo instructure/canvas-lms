@@ -130,6 +130,7 @@ import Toolbar from '../files/Toolbar'
             openModal: this.openModal,
             closeModal: this.closeModal
           }}
+          showingSearchResults={this.state.showingSearchResults}
         />
         <div className='ef-main'>
           {filesEnv.newFolderTree && (

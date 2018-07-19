@@ -43,6 +43,9 @@ import Folder from 'compiled/models/Folder'
   };
 
   Toolbar.renderUploadAddFolderButtons = function (canManage) {
+    if (this.props.showingSearchResults) {
+      return null;
+    }
     var phoneHiddenSet = classnames({
       'hidden-phone' : this.showingButtons
     });
