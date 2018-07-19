@@ -195,6 +195,8 @@ class ContextModule < ActiveRecord::Base
       :content_type => original_content_tag.content_type,
       :context_id => original_content_tag.context_id,
       :context_type => original_content_tag.context_type,
+      :url => original_content_tag.url,
+      :new_tab => original_content_tag.new_tab,
       :title => original_content_tag.title,
       :tag_type => original_content_tag.tag_type,
       :position => original_content_tag.position,

@@ -108,17 +108,29 @@ describe ContextModule do
     @module.content_tags[2].workflow_state = 'deleted'
     @module.add_item({:id => assignment2.id, :type => 'assignment'})
 
+    @module.add_item(
+      :type => 'external_url',
+      :url => "http://www.instructure.com",
+      :new_tab => true,
+      :title => "Instructure",
+      :indent => 0
+    )
+
     @module.workflow_state = 'published'
     @module.save!
     new_module = @module.duplicate
     expect(new_module.name).to eq "some module Copy"
-    expect(new_module.content_tags.length).to eq 3
+    expect(new_module.content_tags.length).to eq 4
     # Stuff with actual content should get unique names, but not stuff like headers.
     expect(new_module.content_tags[0].title).to eq('unpublished header')
     expect(new_module.content_tags[1].content.title).to eq('assignment Copy 2')
     # Respect original choice of "copy" if the thing I copied already made a decision.
     expect(new_module.content_tags[2].content.title).to eq('assignment copy 3')
     expect(new_module.workflow_state).to eq('unpublished')
+
+    expect(new_module.content_tags[3].title).to eq('Instructure')
+    expect(new_module.content_tags[3].url).to eq('http://www.instructure.com')
+    expect(new_module.content_tags[3].new_tab).to eq(true)
   end
 
   describe "available_for?" do
