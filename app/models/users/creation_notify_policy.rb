@@ -44,11 +44,7 @@ module Users
     attr_reader :is_manager
 
     def send_self_registration_email(user, pseudonym)
-      if user.pre_registered?
-        pseudonym.send_confirmation!
-      elsif !user.registered?
-        pseudonym.send_registration_notification!
-      end
+      pseudonym.send_confirmation!
     end
 
     def send_confirmation_email(user, pseudonym)
