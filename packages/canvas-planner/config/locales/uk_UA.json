@@ -83,6 +83,9 @@
   "you_have_media_feedback_f5f9aba8": {
     "message": "Ви маєте відгук у вигляді медіа файлу."
   },
+  "assignmenttype_title_posted_datetime_cab69444": {
+    "message": "{ assignmentType } { title } розміщено { datetime }."
+  },
   "loading_25990131": {
     "message": "Завантаження..."
   },
@@ -161,6 +164,9 @@
   "date_at_time_dbdb1b99": {
     "message": "{ date } в { time }"
   },
+  "to_do_date_4b211ad0": {
+    "message": "Зробити: { date }"
+  },
   "loading_past_items_ca499e75": {
     "message": "Завантаження попередніх елементів"
   },
@@ -172,6 +178,9 @@
   },
   "tomorrow_at_date_b53f2cf1": {
     "message": "Завтра в { date }"
+  },
+  "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
+    "message": "{ assignmentType } { title } має бути виконано { datetime }."
   },
   "today_76e10f9c": {
     "message": "Сьогодні"
@@ -194,8 +203,14 @@
   "time_2b5aac58": {
     "message": "Час"
   },
+  "assignmenttype_title_all_day_on_datetime_9768903c": {
+    "message": "{ assignmentType } { title }, всі дні о { datetime }."
+  },
   "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
     "message": "Ви прокрутили назад до самого першого завдання!"
+  },
+  "due_date_124fdd99": {
+    "message": "До: { date }"
   },
   "delete_a6efa79d": {
     "message": "Видалити"
