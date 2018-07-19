@@ -16,6 +16,23 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
+<style media="screen">
+  #unauthorized_message div {
+    font-size: 1.1em;
+    padding: 1em;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  #unauthorized_message p {
+    padding: 1em;
+  }
+
+  #unauthorized_message p.error {
+    background-color: lightgray
+  }
+</style>
+
 <% content_for :page_title do %>
   <%= t 'Failed to Log In' %>
 <% end %>
@@ -26,9 +43,15 @@
     <h2 class="ui-state-error">
       <%= t 'Failed to Log In' %>
     </h2>
-    <p>
-      <%= flash[:delegated_message] %>
+
+    <p class="error">
+      Authentication with OpenID connect was successful, but no Unique ID was la de dah
     </p>
+
+    <div>
+      <%= raw(SettingsService.get_settings(object: :school, id: 1)['error_help_text']) %>
+    </div>
+
     <p>
       <%= t "You can try to *log in again*.", wrapper: link_to('\1', login_url) %>
     </p>

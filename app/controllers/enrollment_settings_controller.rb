@@ -3,17 +3,19 @@ class EnrollmentSettingsController < ApplicationController
     if params[:id] == 'sequence_control'
       params[:value] = ActiveRecord::Type::Boolean.new.deserialize(params[:value])
     end
-    SettingsService.update_enrollment_setting(
+    SettingsService.update_settings(
       id: params[:enrollment_id],
       setting: params[:id],
-      value: params[:value]
+      value: params[:value],
+      object: :enrollment
     )
     render json: {'status': 'ok'}
   end
 
   def index
-    render json: SettingsService.get_enrollment_settings(
-      id: params[:enrollment_id]
+    render json: SettingsService.get_settings(
+      id: params[:enrollment_id],
+      noun: :enrollment
     )
   end
 end

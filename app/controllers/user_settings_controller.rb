@@ -1,15 +1,17 @@
 class UserSettingsController < ApplicationController
   def update
-    SettingsService.update_user_setting(
+    SettingsService.update_setting(
       id: params[:user_id],
       setting: params[:id],
-      value: params[:value]
+      value: params[:value],
+      noun: user
     )
   end
 
   def index
-    render json: SettingsService.get_user_settings(
-      id: params[:user_id]
+    render json: SettingsService.get_settings(
+      id: params[:user_id],
+      object: :user
     )
   end
 end

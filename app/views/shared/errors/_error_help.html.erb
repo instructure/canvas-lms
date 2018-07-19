@@ -1,5 +1,1 @@
-<%=
-  raw(
-    SettingsService.get_settings(object: :school, id: 1)['error_help_text']
-  )
-%>
+<%= raw(SettingsService.get_settings(object: :school, id: 1)['error_help_text']) %>

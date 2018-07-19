@@ -21,67 +21,67 @@ require 'securerandom'
 class LoginController < ApplicationController
   include Login::Shared
 
-  before_action :forbid_on_files_domain, except: :clear_file_session
-  before_action :run_login_hooks, only: :new
-  before_action :fix_ms_office_redirects, only: :new
-  skip_before_action :require_reacceptance_of_terms
-  before_action :require_user, only: :session_token
+  # before_action :forbid_on_files_domain, except: :clear_file_session
+  # before_action :run_login_hooks, only: :new
+  # before_action :fix_ms_office_redirects, only: :new
+  # skip_before_action :require_reacceptance_of_terms
+  # before_action :require_user, only: :session_token
 
   def new
-    if @current_user &&
-        !params[:force_login] &&
-        !params[:confirm] &&
-        !params[:expected_user_id] &&
-        !session[:used_remember_me_token]
-      redirect_to dashboard_url
-      return
-    end
-
-    if params[:needs_cookies] == '1'
-      @needs_cookies = true
-      return render 'shared/unauthorized', :layout => 'application', :status => :unauthorized
-    end
-
-    session[:expected_user_id] = params[:expected_user_id].to_i if params[:expected_user_id]
-    session[:confirm] = params[:confirm] if params[:confirm]
-    session[:enrollment] = params[:enrollment] if params[:enrollment]
-
-    if @current_pseudonym
-      params[:pseudonym_session] ||= {}
-      params[:pseudonym_session][:unique_id] ||= @current_pseudonym.unique_id
-    end
-
-    # deprecated redirect; link directly to /login/canvas
-    params[:authentication_provider] = 'canvas' if params['canvas_login']
-    # deprecated redirect; they should already know the correct type
-    params[:authentication_provider] ||= params[:id]
-
-    if @domain_root_account.auth_discovery_url && !params[:authentication_provider]
-      auth_discovery_url = @domain_root_account.auth_discovery_url
-      if flash[:delegated_message]
-        auth_discovery_url << (URI.parse(auth_discovery_url).query ? '&' : '?')
-        auth_discovery_url << "message=#{URI.escape(flash[:delegated_message])}"
-      end
-      return redirect_to auth_discovery_url
-    end
-
-    if params[:authentication_provider]
-      auth_type = @domain_root_account.
-        authentication_providers.
-        active.
-        find(params[:authentication_provider]).
-        auth_type
-      params[:id] = params[:authentication_provider] if params[:authentication_provider] != auth_type
-    else
-      auth_type = @domain_root_account.authentication_providers.active.first.try(:auth_type)
-      auth_type ||= 'canvas'
-    end
-
-    unless flash[:delegated_message]
-      return redirect_to url_for({ controller: "login/#{auth_type}", action: :new }
-                                     .merge(params.permit(:id).to_unsafe_h)
-                                     .merge(params.permit(pseudonym_session: :unique_id).to_unsafe_h))
-    end
+    # if @current_user &&
+    #     !params[:force_login] &&
+    #     !params[:confirm] &&
+    #     !params[:expected_user_id] &&
+    #     !session[:used_remember_me_token]
+    #   redirect_to dashboard_url
+    #   return
+    # end
+    #
+    # if params[:needs_cookies] == '1'
+    #   @needs_cookies = true
+    #   return render 'shared/unauthorized', :layout => 'application', :status => :unauthorized
+    # end
+    #
+    # session[:expected_user_id] = params[:expected_user_id].to_i if params[:expected_user_id]
+    # session[:confirm] = params[:confirm] if params[:confirm]
+    # session[:enrollment] = params[:enrollment] if params[:enrollment]
+    #
+    # if @current_pseudonym
+    #   params[:pseudonym_session] ||= {}
+    #   params[:pseudonym_session][:unique_id] ||= @current_pseudonym.unique_id
+    # end
+    #
+    # # deprecated redirect; link directly to /login/canvas
+    # params[:authentication_provider] = 'canvas' if params['canvas_login']
+    # # deprecated redirect; they should already know the correct type
+    # params[:authentication_provider] ||= params[:id]
+    #
+    # if @domain_root_account.auth_discovery_url && !params[:authentication_provider]
+    #   auth_discovery_url = @domain_root_account.auth_discovery_url
+    #   if flash[:delegated_message]
+    #     auth_discovery_url << (URI.parse(auth_discovery_url).query ? '&' : '?')
+    #     auth_discovery_url << "message=#{URI.escape(flash[:delegated_message])}"
+    #   end
+    #   return redirect_to auth_discovery_url
+    # end
+    #
+    # if params[:authentication_provider]
+    #   auth_type = @domain_root_account.
+    #     authentication_providers.
+    #     active.
+    #     find(params[:authentication_provider]).
+    #     auth_type
+    #   params[:id] = params[:authentication_provider] if params[:authentication_provider] != auth_type
+    # else
+    #   auth_type = @domain_root_account.authentication_providers.active.first.try(:auth_type)
+    #   auth_type ||= 'canvas'
+    # end
+    #
+    # unless flash[:delegated_message]
+    #   return redirect_to url_for({ controller: "login/#{auth_type}", action: :new }
+    #                                  .merge(params.permit(:id).to_unsafe_h)
+    #                                  .merge(params.permit(pseudonym_session: :unique_id).to_unsafe_h))
+    # end
 
     # we had an error from an SSO - we need to show it
     @headers = false

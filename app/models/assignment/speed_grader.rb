@@ -85,7 +85,7 @@ class Assignment
         json = u.as_json(:include_root => false,
                   :methods => submission_comment_methods,
                   :only => [:name, :id, :sortable_name])
-        json['settings'] = SettingsService.get_user_settings(id: u.id)
+        json['settings'] = SettingsService.get_settings(id: u.id, object: :user)
 
         if preloaded_pg_counts
           json[:needs_provisional_grade] = @assignment.student_needs_provisional_grade?(u, preloaded_pg_counts)
