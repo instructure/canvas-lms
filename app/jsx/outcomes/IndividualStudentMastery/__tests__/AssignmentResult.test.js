@@ -25,6 +25,7 @@ const defaultProps = (props = {}) => (
     outcome: {
       id: 1,
       mastered: false,
+      calculation_method: 'highest',
       ratings: [
         { description: 'My first rating' },
         { description: 'My second rating' }
