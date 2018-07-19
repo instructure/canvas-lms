@@ -20,12 +20,6 @@
 // frontend code that doesn't use React.
 // See http://instructure.github.io/instructure-ui/#Spinner
 
-@keyframes rotate {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 @keyframes morph {
   0% {
     stroke-dashoffset: 190%;
@@ -43,10 +37,6 @@
 }
 
 .spinner {
-  animation-name: rotate;
-  animation-duration: 2.25s;
-  animation-iteration-count: infinite;
-  animation-timing-function: linear;
   stroke-width: 0.375em;
   width: 3em;
   height: 3em;
