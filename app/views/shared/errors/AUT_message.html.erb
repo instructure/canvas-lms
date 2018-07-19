@@ -29,6 +29,7 @@
 <div style="width: 400px; margin-left: auto; margin-right: auto; margin-top: 50px;">
   <h2><%= t('headings.page', %{Page Error}) %></h2>
   <p><%= t('description', %{There was a problem with your last request.  You may have tried to perform an action after a long period of inactivity.  If that's the case, try going back, reloading the page you were working on, and resubmitting.  If not, please let us know what you were doing when the error happened.}) %></p>
+  <%= render '/shared/errors/error_help' if ENV['SHOW_ERROR_HELP'] == 'true' %>
   <a href="#" style="font-size: 1.2em;" class="submit_error_link discussion-topic"><%= t('#links.errors.feedback', %{Click here to tell us what happened}) %></a>
   <%= render :partial => "shared/errors/error_form", :locals => {:status => status, :error_category => 'AUT'} %>
 </div>

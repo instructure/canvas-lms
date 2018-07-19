@@ -24,10 +24,10 @@
 <div id="unauthorized_holder">
   <% css_bundle("unauthorized_message") %>
   <div id="unauthorized_message">
-    <h2 class="ui-state-error"> 
+    <h2 class="ui-state-error">
       <%= t('headings.unauthorized_action', %{Oops you’ve found a broken link!}) %>
     </h2>
+    <%= render '/shared/errors/error_help' if ENV['SHOW_ERROR_HELP'] == 'true' %>
     <div id="sendMessageForm"></div>
   </div>
 </div>
-
