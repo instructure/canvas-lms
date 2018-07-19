@@ -653,8 +653,7 @@ export default class EventDataSource {
   transformPlannerItems(items) {
     items.forEach(item => {
       /* eslint-disable no-param-reassign */
-      item.type = item.plannable_type
-      item.id = `${item.plannable_type}_${item.plannable_id}`
+      item.type = 'todo_item'
       if (item.course_id) {
         item.context_code = `course_${item.course_id}`
       } else if (item.group_id) {
@@ -663,9 +662,6 @@ export default class EventDataSource {
         item.context_code = `user_${item.user_id}`
       }
       item.all_context_codes = item.context_code
-      item.start_at = item.plannable.todo_date
-      item.end_at = item.plannable.todo_date
-      item.title = item.plannable.title
       /* eslint-enable no-param-reassign */
     })
     return items

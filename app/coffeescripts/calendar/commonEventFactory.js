@@ -21,6 +21,7 @@ import Assignment from '../calendar/CommonEvent.Assignment'
 import AssignmentOverride from '../calendar/CommonEvent.AssignmentOverride'
 import CalendarEvent from '../calendar/CommonEvent.CalendarEvent'
 import PlannerNote from '../calendar/CommonEvent.PlannerNote'
+import ToDoItem from '../calendar/CommonEvent.ToDoItem'
 import splitAssetString from '../str/splitAssetString'
 
 export default function commonEventFactory(data, contexts) {
@@ -78,6 +79,8 @@ export default function commonEventFactory(data, contexts) {
     obj = new AssignmentOverride(data, contextInfo)
   } else if (type === 'planner_note') {
     obj = new PlannerNote(data, contextInfo, actualContextInfo)
+  } else if (type === 'todo_item') {
+    obj = new ToDoItem(data, contextInfo, actualContextInfo)
   } else {
     obj = new CalendarEvent(data, contextInfo, actualContextInfo)
   }
@@ -136,10 +139,11 @@ export default function commonEventFactory(data, contexts) {
     obj.can_delete = true
   }
 
-  // TODO make todo items editable, but for now prevent brokenness when the user tries
   if (type === 'todo_item') {
-    obj.can_edit = false
-    obj.can_delete = false
+    const can_update_object = contextInfo[`can_update_${obj.object.plannable_type}`]
+    const can_manage_todo = contextInfo.can_update_todo_date
+    obj.can_edit = can_update_object && can_manage_todo
+    obj.can_delete = can_update_object
   }
 
   // disable fullcalendar.js dragging unless the user has permissions

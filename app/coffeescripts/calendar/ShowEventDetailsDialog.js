@@ -59,8 +59,10 @@ export default class ShowEventDetailsDialog {
     if (this.event.isNewEvent()) return
 
     let {url} = event.object
-    // We can't delete assignments via the synthetic calendar_event
-    if (event.assignment) {
+    // We can't delete todo items or assignments via the synthetic calendar_event
+    if (event.deleteObjectURL) {
+      url = event.deleteObjectURL
+    } else if (event.assignment) {
       url = $.replaceTags(this.event.deleteURL, 'id', this.event.object.id)
     }
 
