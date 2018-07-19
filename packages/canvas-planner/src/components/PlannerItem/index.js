@@ -347,6 +347,7 @@ export class PlannerItem extends Component {
         <div className={styles.title} style={{position: 'relative'}}>
           <Link
             linkRef={(link) => {this.itemLink = link;}}
+            ellipsis={true}
             {...this.props.associated_item === "To Do" ? {onClick: this.toDoLinkClick} : {}}
             href={this.props.html_url || "#" }>
             <ScreenReaderContent>{this.linkLabel()}</ScreenReaderContent>
