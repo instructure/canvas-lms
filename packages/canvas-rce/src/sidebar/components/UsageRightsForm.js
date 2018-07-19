@@ -18,7 +18,7 @@
 
 import React, { Component } from "react";
 import formatMessage from "../../format-message";
-import Select from "@instructure/ui-forms/lib/components/Select";
+import Select from "@instructure/ui-core/lib/components/Select";
 import TextInput from "@instructure/ui-forms/lib/components/TextInput";
 import Alert from '@instructure/ui-alerts/lib/components/Alert';
 
@@ -64,12 +64,12 @@ export default class UsageRightsForm extends Component {
     return this.state.usageRight === Object.keys(usageRightsValues)[0];
   }
 
-  handleUsageRight = (ev, selected) => {
-    this.setState({ usageRight: selected.value });
+  handleUsageRight = ev => {
+    this.setState({ usageRight: ev.target.value });
   };
 
-  handleCCLicense = (ev, selected) => {
-    this.setState({ ccLicense: selected.value });
+  handleCCLicense = ev => {
+    this.setState({ ccLicense: ev.target.value });
   };
 
   handleCopyrightHolder = ev => {

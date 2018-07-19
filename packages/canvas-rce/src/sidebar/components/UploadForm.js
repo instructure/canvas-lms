@@ -22,7 +22,7 @@ import React, { Component } from "react";
 import ReactCSSTransitionGroup from "react-transition-group/CSSTransitionGroup";
 import formatMessage from "../../format-message";
 import ScreenReaderContent from "@instructure/ui-a11y/lib/components/ScreenReaderContent";
-import Select from "@instructure/ui-forms/lib/components/Select";
+import Select from "@instructure/ui-core/lib/components/Select";
 import Button from "@instructure/ui-buttons/lib/components/Button";
 import Alert from "@instructure/ui-alerts/lib/components/Alert";
 import IconAddSolid from "@instructure/ui-icons/lib/Solid/IconAdd";
@@ -91,11 +91,11 @@ class UploadForm extends Component {
     this.props.startUpload(fileMetaProps);
   }
 
-  handleFolderChange(e, selected) {
+  handleFolderChange(e) {
     e.preventDefault();
     this.setState({
       file: {
-        parentFolderId: selected.value,
+        parentFolderId: e.target.value,
         name: this.state.file.name,
         size: this.state.file.size,
         contentType: this.state.file.contentType,
