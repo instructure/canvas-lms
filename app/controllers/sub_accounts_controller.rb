@@ -136,7 +136,7 @@ class SubAccountsController < ApplicationController
     if @sub_account.save
       render :json => account_json(@sub_account, @current_user, session, [])
     else
-      render :json => @sub_account.errors
+      render :json => @sub_account.errors, status: 400
     end
   end
 
@@ -146,7 +146,7 @@ class SubAccountsController < ApplicationController
     if @sub_account.update_attributes(account_params)
       render :json => account_json(@sub_account, @current_user, session, [])
     else
-      render :json => @sub_account.errors
+      render :json => @sub_account.errors, status: 400
     end
   end
 
