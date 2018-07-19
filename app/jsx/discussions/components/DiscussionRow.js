@@ -684,6 +684,25 @@ export class DiscussionRow extends Component {
     )
   }
 
+  renderBlueUnreadBadge() {
+    if(this.props.discussion.read_state !== "read") {
+      return (
+        <Badge
+          margin="0 small x-small 0"
+          standalone
+          type="notification"
+          formatOutput={() => <ScreenReaderContent>{I18n.t('Unread')}</ScreenReaderContent>}
+        />
+      )
+    } else {
+      return (
+        <View display="block" margin="0 small x-small 0">
+          <View display="block" margin="0 small x-small 0" />
+        </View>
+      )
+    }
+  }
+
   render () {
     // necessary because discussions return html from RCE
     const contentWrapper = document.createElement('span')
@@ -695,11 +714,7 @@ export class DiscussionRow extends Component {
           <GridRow>
           {/* discussion topics is different for badges so we use our own read indicator instead of passing to isRead */}
             <GridCol width="auto">
-            {!(this.props.discussion.read_state === "read")
-              ? <Badge margin="0 small x-small 0" standalone type="notification" />
-              : <View display="block" margin="0 small x-small 0">
-            <View display="block" margin="0 small x-small 0" />
-            </View>}
+            {this.renderBlueUnreadBadge()}
             </GridCol>
             <GridCol>
               {this.renderDiscussion()}
