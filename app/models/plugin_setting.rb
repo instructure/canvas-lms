@@ -46,7 +46,7 @@ class PluginSetting < ActiveRecord::Base
   def validate_posted_settings
     if @posted_settings
       plugin = Canvas::Plugin.find(name.to_s)
-      @posted_settings.transform_values(&:strip!)
+      @posted_settings.transform_values{|v| v.strip! if v.is_a?(String)}
       result = plugin.validate_settings(self, @posted_settings)
       throw :abort if result == false
     end
