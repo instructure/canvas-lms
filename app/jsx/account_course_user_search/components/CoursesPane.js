@@ -27,6 +27,7 @@ import AccountsTreeStore from '../store/AccountsTreeStore'
 import CoursesList from './CoursesList'
 import CoursesToolbar from './CoursesToolbar'
 import SearchMessage from './SearchMessage'
+import SRSearchMessage from './SRSearchMessage'
 import { SEARCH_DEBOUNCE_TIME } from './UsersPane'
 
 const MIN_SEARCH_LENGTH = 3
@@ -59,7 +60,8 @@ class CoursesPane extends React.Component {
       previousCourses: {
         data: [],
         loading: true
-      }
+      },
+      srMessageDisplayed: false
     }
 
     // Doing this here because the class property version didn't work :(
@@ -162,6 +164,11 @@ class CoursesPane extends React.Component {
           isLoading={isLoading}
           errors={errors}
           draftFilters={draftFilters}
+          toggleSRMessage={
+            (show = false) => {
+              this.setState({ srMessageDisplayed: show})
+            }
+          }
         />
 
         <CoursesList
@@ -179,6 +186,12 @@ class CoursesPane extends React.Component {
           noneFoundMessage={I18n.t('No courses found')}
           dataType="Course"
         />
+        {this.state.srMessageDisplayed && (
+          <SRSearchMessage
+            collection={courses}
+            dataType="Course"
+          />
+        )}
       </div>
     )
   }
