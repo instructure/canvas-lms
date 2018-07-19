@@ -11,7 +11,7 @@
     "packages": [
       "gems/canvas_i18nliner",
       "gems/selinimum",
-      "gems/plugins/analytics",
+      "gems/plugins/*",
       "packages/*",
       "client_apps/*"
     ],
