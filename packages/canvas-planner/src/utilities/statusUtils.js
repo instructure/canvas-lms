@@ -48,7 +48,7 @@ export function didWeFindToday (days) {
 export function showPillForOverdueStatus(status, item) {
   if (!['late', 'missing'].includes(status)) {
     throw new Error(`Expected status to be 'late' or 'missing', but it was ${status}`);
-  } 
+  }
   return (!!item.context && !!item.status && item.status[status]);
 }
 
@@ -60,6 +60,7 @@ export function getBadgesForItem (item) {
   let badges = [];
   if (item.status) {
     badges = Object.keys(item.status)
+      .filter((key, index, all) => item.status.excused && key === 'graded' ? false : true) // if excused, ignore graded
       .filter((key, index, all) => item.status.graded && key === 'submitted' ? false : true) // if graded, ignore submitted
       .filter((key) => {
         const validKeyPresent = item.status[key] && PILL_MAPPING.hasOwnProperty(key);
@@ -90,7 +91,7 @@ export function getBadgesForItem (item) {
 */
 export function getBadgesForItems (items) {
   const badges = [];
-  if (items.some(i => i.status && i.newActivity && i.status.graded)) {
+  if (items.some(i => i.status && i.newActivity && i.status.graded && !i.status.excused)) {
     badges.push(PILL_MAPPING.new_grades());
   }
   if (items.some(showPillForOverdueStatus.bind(this, 'missing'))) {
