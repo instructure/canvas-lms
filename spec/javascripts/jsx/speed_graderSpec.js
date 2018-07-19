@@ -3937,4 +3937,47 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       strictEqual(label, 'Grader 2')
     })
   })
+
+  QUnit.module('#loadSubmissionPreview', (hooks) => {
+    const EG = SpeedGrader.EG
+
+    hooks.beforeEach(() => {
+      fixtures.innerHTML = `
+        <div id='this_student_does_not_have_a_submission'></div>
+        <div id='iframe_holder'>
+          I am an iframe holder!
+        </div>
+        <span id="speedgrader-settings"></span>
+      `
+
+      SpeedGrader.setup()
+
+      EG.currentStudent = {
+        submission: { submission_type: 'quiz', workflow_state: 'unsubmitted' }
+      }
+    })
+
+    hooks.afterEach(() => {
+      fixtures.innerHTML = ''
+
+      SpeedGrader.teardown()
+      window.location.hash = ''
+    })
+
+    QUnit.module('when a submission is unsubmitted', () => {
+      test('shows the "this student does not have a submission" div', () => {
+        const $noSubmission = $('#this_student_does_not_have_a_submission')
+        $noSubmission.hide()
+
+        EG.loadSubmissionPreview()
+        ok($noSubmission.is(':visible'))
+      })
+
+      test('clears the contents of the iframe holder', () => {
+        EG.loadSubmissionPreview()
+
+        strictEqual($('#iframe_holder').html(), '')
+      })
+    })
+  })
 })

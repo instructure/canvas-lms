@@ -1957,6 +1957,7 @@ EG = {
     $(".speedgrader_alert").hide();
     if (!this.currentStudent.submission || !this.currentStudent.submission.submission_type || this.currentStudent.submission.workflow_state == 'unsubmitted') {
       $this_student_does_not_have_a_submission.show();
+      this.emptyIframeHolder()
     } else if (this.currentStudent.submission && this.currentStudent.submission.submitted_at && jsonData.context.quiz && jsonData.context.quiz.anonymous_submissions) {
       $this_student_has_a_submission.show();
     } else if (attachment) {
