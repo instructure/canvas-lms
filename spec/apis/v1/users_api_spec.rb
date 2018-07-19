@@ -1014,7 +1014,7 @@ describe "Users API", type: :request do
     end
 
     it "should send a confirmation if send_confirmation is set to 1" do
-      expect_any_instance_of(Pseudonym).to receive(:send_registration_notification!)
+      expect_any_instance_of(Pseudonym).to receive(:send_registration_done_notification!)
       api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
         { :controller => 'users', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
         {

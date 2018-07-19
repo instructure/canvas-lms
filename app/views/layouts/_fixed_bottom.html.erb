@@ -26,7 +26,7 @@
       </div>
     <% end %>
   <% end %>
-<% if @real_current_user && @real_current_user != @current_user %>
+<% if @current_user && @real_current_user && @real_current_user != @current_user %>
   <% if @current_user.fake_student? %>
     <div id="masquerade_bar" class="ic-alert-masquerade-student-view">
       <% student_view_course = @current_user.all_courses.first %>
