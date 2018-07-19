@@ -94,13 +94,6 @@
   line-height: var(--titleLineHeight);
 }
 
-.type,
-.title {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .metrics {
   box-sizing: border-box;
   text-align: end;
