@@ -343,7 +343,6 @@ class ContentExport < ActiveRecord::Base
   #
   # Returns: bool
   def export_symbol?(symbol)
-    return false if symbol == :all_course_settings && should_skip_course_settings?
     selected_content.empty? || is_set?(selected_content[symbol]) || is_set?(selected_content[:everything])
   end
 
@@ -365,18 +364,6 @@ class ContentExport < ActiveRecord::Base
       end
     end
     @selective_export
-  end
-
-  def should_skip_course_settings?
-    if for_master_migration?
-      if master_migration.migration_settings.has_key?(:copy_settings)
-        !master_migration.migration_settings[:copy_settings]
-      else
-        selective_export?
-      end
-    else
-      false
-    end
   end
 
   def exported_assets
