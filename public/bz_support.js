@@ -183,7 +183,11 @@ function bzRetainedInfoSetup(readonly) {
 						//var last = new XMLHttpRequest();
 						//last.open("GET", next.getResponseHeader("Location"));
 						//last.onload = function() {
-							var n = JSON.parse(next.responseText.substring(9)); // last
+							var n;
+							if(next.responseText.charAt(0) == 'w')
+								n = JSON.parse(next.responseText.substring(9)); // last
+							else
+								n = JSON.parse(next.responseText); // last
 							value = n.url;
 							actualSaveInternal();
 						//};
