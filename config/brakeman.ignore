@@ -115,8 +115,28 @@
         "user_input": "params[:context_type]",
         "confidence": "High",
         "note": "Value is whitelisted"
+      },
+      {
+        "warning_type": "SQL Injection",
+        "warning_code": 0,
+        "fingerprint": "6c187af95302423b293a6ee5fcc3233c199e0f82d858931c478515c5f2d22cad",
+        "check_name": "SQL",
+        "message": "Possible SQL injection",
+        "file": "app/controllers/outcome_results_controller.rb",
+        "line": 572,
+        "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+        "code": "Arel.sql((User.sortable_name_order_by_clause(User.quoted_table_name) or \"#{User.sortable_name_order_by_clause(User.quoted_table_name)} DESC\"))",
+        "render_path": null,
+        "location": {
+          "type": "method",
+          "class": "OutcomeResultsController",
+          "method": "apply_sort_order"
+        },
+        "user_input": "User.sortable_name_order_by_clause(User.quoted_table_name)",
+        "confidence": "High",
+        "note": "No user input is passed in"
       }
     ],
-    "updated": "2018-03-09 20:57:06 +0000",
-    "brakeman_version": "4.2.0"
+    "updated": "2018-08-09 00:31:51 +0000",
+    "brakeman_version": "4.3.1"
 }
