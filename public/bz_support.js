@@ -54,6 +54,16 @@ function bzRetainedInfoSetup(readonly) {
   function bzChangeRetainedItem(element, value) {
     if(element.tagName == "INPUT" && element.getAttribute("type") == "checkbox"){
       element.checked = (value == "yes") ? true : false;
+    } else if(element.tagName == "INPUT" && element.getAttribute("type") == "file"){
+    	//
+	var n = element.nextSibling;
+	if(!n || !n.classList || !n.classList.contains("bz-uploaded-file-display")) {
+		n = document.createElement("a");
+		n.textContent = "Download File";
+		n.className = "bz-uploaded-file-display";
+		element.parentNode.insertBefore(n, element.nextSibling);
+	}
+	n.href = value;
     } else if(element.tagName == "INPUT" && element.getAttribute("type") == "radio"){
       element.checked = (value == element.value) ? true : false;
     } else if(element.tagName == "INPUT" && element.getAttribute("type") == "button"){
@@ -130,7 +140,7 @@ function bzRetainedInfoSetup(readonly) {
         if (el.classList.contains("bz-optional-magic-field"))
           optional = true;
 
-        var actualSave = function() {
+        var actualSaveInternal = function() {
           BZ_SaveMagicField(name, value, optional, el.getAttribute("type"), el.getAttribute("data-bz-answer"), el.getAttribute("data-bz-weight"), el.getAttribute("data-bz-partial-credit"));
 
           // we also need to update other views on the same page
@@ -141,6 +151,68 @@ function bzRetainedInfoSetup(readonly) {
                 bzChangeRetainedItem(item, value);
           }
         };
+
+	var actualSave = function() {
+		if(el.type == "file") {
+			// upload first, then set the magic field to the URL
+			var http = new XMLHttpRequest();
+			http.open("POST", "/api/v1/users/self/files");
+
+			var file = el.files[0];
+
+			var data = new FormData();
+			data.append("authenticity_token", BZ_AuthToken);
+			data.append("utf8", "\u2713");
+			data.append("name", file.name);
+			data.append("size", file.size);
+			data.append("content_type", file.type);
+
+			http.onload = function() {
+				var obj = JSON.parse(http.responseText);
+
+				var next = new XMLHttpRequest();
+				var data = new FormData();
+				next.open("POST", obj.upload_url);
+				for(objkey in obj.upload_params) {
+					data.append(objkey, obj.upload_params[objkey]);
+				}
+				data.append("file", file);
+
+				next.onload = function() {
+					if(next.status >= 200 && next.status < 300) {
+						//var last = new XMLHttpRequest();
+						//last.open("GET", next.getResponseHeader("Location"));
+						//last.onload = function() {
+							var n;
+							if(next.responseText.charAt(0) == 'w')
+								n = JSON.parse(next.responseText.substring(9)); // last
+							else
+								n = JSON.parse(next.responseText); // last
+							value = n.url;
+							actualSaveInternal();
+						//};
+						//last.send();
+					} else if(next.status >= 300 && next.status < 400) {
+						var url = next.getResponseHeader("Location");
+						var last = new XMLHttpRequest();
+						last.open("POST", url);
+						last.onload = function() {
+							var n = JSON.parse(last.responseText);
+							value = n.url;
+							actualSaveInternal();
+						};
+						last.send("");
+					}
+				};
+
+				next.send(data);
+			};
+
+			http.send(data);
+		} else {
+			actualSaveInternal();
+		}
+	};
 
         if(!window.bzQueuedListeners)
           window.bzQueuedListeners = {};
