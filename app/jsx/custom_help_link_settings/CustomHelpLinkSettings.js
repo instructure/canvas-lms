@@ -56,7 +56,8 @@ export default class CustomHelpLinkSettings extends React.Component {
 
     this.state = {
       links,
-      editing: null // id of link that is being edited
+      editing: null, // id of link that is being edited
+      isNameValid: true,  // so the first blur will trigger the alert even if name is empty now.
     }
   }
 
@@ -265,6 +266,15 @@ export default class CustomHelpLinkSettings extends React.Component {
     }
   }
 
+  validateName = event => {
+    const isValid = !!event.target.value  // covers undefined and empty string
+    if (this.state.isNameValid && !isValid) {
+      // we just transitioned from valid to invalid
+      $.screenReaderFlashMessage(I18n.t('You left the required name field empty.'));
+    }
+    this.setState({isNameValid: isValid});
+  }
+
   renderForm = link => (
     <CustomHelpLinkForm
       ref={c => {
@@ -314,8 +324,11 @@ export default class CustomHelpLinkSettings extends React.Component {
               className="ic-Input"
               required
               aria-required="true"
+              aria-invalid={!this.state.isNameValid}
               name="account[settings][help_link_name]"
               defaultValue={name}
+              onBlur={this.validateName}
+              onInput={this.validateName}
             />
           </label>
           <CustomHelpLinkIcons defaultValue={icon} />
