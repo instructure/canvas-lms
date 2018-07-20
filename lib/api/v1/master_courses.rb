@@ -68,4 +68,17 @@ module Api::V1::MasterCourses
     json[:exceptions] = exceptions[migration_id] || [] unless migration_id.nil?
     json
   end
+
+  def changed_syllabus_json(course, exceptions=nil)
+    {
+      asset_id: course.id,
+      asset_type: 'syllabus',
+      asset_name: I18n.t('Syllabus'),
+      change_type: :updated,
+      html_url: syllabus_course_assignments_url(course),
+      locked: false
+    }.tap do |json|
+      json[:exceptions] = exceptions['syllabus'] if exceptions
+    end
+  end
 end

@@ -66,7 +66,7 @@ propTypes.migrationExceptionList = arrayOf(propTypes.migrationException)
 
 propTypes.migrationChange = shape({
   asset_id: string.isRequired,
-  asset_type: oneOf(['assignment', 'quiz', 'discussion_topic', 'wiki_page', 'attachment', 'context_module', 'learning_outcome', 'learning_outcome_group', 'announcement']).isRequired,
+  asset_type: oneOf(['assignment', 'quiz', 'discussion_topic', 'wiki_page', 'attachment', 'context_module', 'learning_outcome', 'learning_outcome_group', 'announcement', 'rubric', 'syllabus']).isRequired,
   asset_name: string.isRequired,
   change_type: oneOf(['created', 'updated', 'deleted']).isRequired,
   htnl_url: string,

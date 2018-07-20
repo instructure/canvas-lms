@@ -615,9 +615,10 @@ class ContentMigration < ActiveRecord::Base
     self.migration_type == 'master_course_import'
   end
 
-  def add_skipped_item(child_tag)
+  def add_skipped_item(item)
     @skipped_master_course_items ||= Set.new
-    @skipped_master_course_items << child_tag.migration_id
+    item = item.migration_id if item.is_a?(MasterCourses::ChildContentTag)
+    @skipped_master_course_items << item
   end
 
   def process_master_deletions(deletions)

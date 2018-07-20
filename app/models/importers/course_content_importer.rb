@@ -298,7 +298,7 @@ module Importers
 
     def self.import_syllabus_from_migration(course, syllabus_body, migration)
       if migration.for_master_course_import?
-        course.updating_master_template_id = migration.master_course_subscription.master_template_id
+        course.master_migration = migration
       end
       course.syllabus_body = migration.convert_html(syllabus_body, :syllabus, nil, :syllabus)
     end
