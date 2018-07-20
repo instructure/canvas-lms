@@ -39,6 +39,9 @@ describe SubmissionComment do
 
   describe 'notifications' do
     before(:once) do
+      @student_ended = user_model
+      @section_ended = @course.course_sections.create!(end_at: Time.zone.now - 1.day)
+
       Notification.create(:name => 'Submission Comment', category: 'TestImmediately')
       Notification.create(:name => 'Submission Comment For Teacher')
     end
@@ -55,6 +58,12 @@ describe SubmissionComment do
       course_with_observer(active_all: true, active_cc: true, course: @course, associated_user_id: @student.id)
       @submission.add_comment(:author => @teacher, :comment => "some comment")
       expect(@observer.email_channel.messages.length).to eq 1
+    end
+
+    it "should not send notifications to users in concluded sections" do
+      @submission_ended = @assignment.submit_homework(@student_ended)
+      @comment = @submission_ended.add_comment(:author => @teacher, :comment => "some comment")
+      expect(@comment.messages_sent.keys).not_to be_include('Submission Comment')
     end
 
     it "should not dispatch notification on create if course is unpublished" do

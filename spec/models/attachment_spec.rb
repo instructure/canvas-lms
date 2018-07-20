@@ -1503,8 +1503,21 @@ describe Attachment do
       e = @course.enroll_student(@student).accept
       @cc = @student.communication_channels.create(:path => "default@example.com")
       @cc.confirm!
+
+      @student_ended = user_model
+      @student_ended.register!
+      @section_ended = @course.course_sections.create!(end_at: Time.zone.now - 1.day)
+      @course.enroll_student(@student_ended, :section => @section_ended).accept
+      @cc_ended = @student_ended.communication_channels.create(:path => "default2@example.com")
+      @cc_ended.confirm!
+
       NotificationPolicy.create(:notification => Notification.create!(:name => 'New File Added'), :communication_channel => @cc, :frequency => "immediately")
       NotificationPolicy.create(:notification => Notification.create!(:name => 'New Files Added'), :communication_channel => @cc, :frequency => "immediately")
+
+      NotificationPolicy.create(:notification => Notification.create!(:name => 'New File Added - ended'),
+                                :communication_channel => @cc_ended, :frequency => "immediately")
+      NotificationPolicy.create(:notification => Notification.create!(:name => 'New Files Added - ended'),
+                                :communication_channel => @cc_ended, :frequency => "immediately")
     end
 
     it "should send a single-file notification" do
@@ -1656,6 +1669,12 @@ describe Attachment do
       @course.save!
       Timecop.freeze(10.minutes.from_now) { Attachment.do_notifications }
       expect(Message.where(user_id: @student, notification_name: 'New File Added').first).to be_nil
+    end
+
+    it "doesn't send notifications for a concluded section in an active course" do
+      attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
+      Timecop.freeze(10.minutes.from_now) { Attachment.do_notifications }
+      expect(Message.where(user_id: @student_ended, notification_name: 'New File Added').first).to be_nil
     end
   end
 

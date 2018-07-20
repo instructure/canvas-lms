@@ -993,7 +993,7 @@ class Attachment < ActiveRecord::Base
           # only notify course students if they are able to access it
           to_list = record.context.participating_admins - [record.user]
         elsif record.context.respond_to?(:participants)
-          to_list = record.context.participants - [record.user]
+          to_list = record.context.participants(by_date: true) - [record.user]
         end
         recipient_keys = (to_list || []).compact.map(&:asset_string)
         next if recipient_keys.empty?

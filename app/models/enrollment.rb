@@ -45,7 +45,7 @@ class Enrollment < ActiveRecord::Base
   has_many :role_overrides, :as => :context, :inverse_of => :context
   has_many :pseudonyms, :primary_key => :user_id, :foreign_key => :user_id
   has_many :course_account_associations, :foreign_key => 'course_id', :primary_key => 'course_id'
-  has_many :scores, -> { active }, inverse_of: :enrollment
+  has_many :scores, -> { active }
 
   validates_presence_of :user_id, :course_id, :type, :root_account_id, :course_section_id, :workflow_state, :role_id
   validates_inclusion_of :limit_privileges_to_course_section, :in => [true, false]
@@ -90,10 +90,24 @@ class Enrollment < ActiveRecord::Base
   scope :current_and_concluded, -> { joins(:course).where(QueryBuilder.new(:current_and_concluded).conditions).readonly(false) }
 
   def self.not_yet_started(course)
-    collection = where(course_id: course).to_a
+    collection = self.where(course_id: course).to_a
     Canvas::Builders::EnrollmentDateBuilder.preload(collection)
     collection.select do |enrollment|
       enrollment.effective_start_at > Time.zone.now
+    end
+  end
+
+  def self.section_ended(course_id)
+    collection = self.where(course_id: course_id).to_a
+    Canvas::Builders::EnrollmentDateBuilder.preload(collection)
+    courses = Course.where(id: course_id)
+    unless courses[0].nil?
+      collection.select do |enrollment|
+        (!enrollment.course_section.end_at.nil? &&
+         enrollment.course_section.end_at < courses[0].time_zone.now) ||
+          (!enrollment.course_section.start_at.nil? &&
+           enrollment.course_section.start_at >  courses[0].time_zone.now)
+      end
     end
   end
 
@@ -106,13 +120,13 @@ class Enrollment < ActiveRecord::Base
   end
 
   def valid_course?
-    if !deleted? && course.deleted?
+    if self.course.deleted? && !self.deleted?
       self.errors.add(:course_id, "is not a valid course")
     end
   end
 
   def valid_section?
-    unless deleted? || course_section.active?
+    unless self.course_section.active? || self.deleted?
       self.errors.add(:course_section_id, "is not a valid section")
     end
   end
@@ -628,8 +642,8 @@ class Enrollment < ActiveRecord::Base
   STATE_BY_DATE_RANK = ['active', ['invited', 'creation_pending', 'pending_active', 'pending_invited'], 'completed', 'inactive', 'rejected', 'deleted']
   STATE_BY_DATE_RANK_HASH = rank_hash(STATE_BY_DATE_RANK)
   def self.state_by_date_rank_sql
-    @state_by_date_rank_sql ||= Arel.sql(rank_sql(STATE_BY_DATE_RANK, 'enrollment_states.state').
-      sub(/^CASE/, "CASE WHEN enrollment_states.restricted_access THEN #{STATE_BY_DATE_RANK.index('inactive')}")) # pretend restricted access is the same as inactive
+    @state_by_date_rank_sql ||= rank_sql(STATE_BY_DATE_RANK, 'enrollment_states.state').
+      sub(/^CASE/, "CASE WHEN enrollment_states.restricted_access THEN #{STATE_BY_DATE_RANK.index('inactive')}") # pretend restricted access is the same as inactive
   end
 
   def state_with_date_sortable
@@ -1082,21 +1096,11 @@ class Enrollment < ActiveRecord::Base
     id_opts ||= Score.params_for_course
     valid_keys = %i(course_score grading_period grading_period_id assignment_group assignment_group_id)
     return nil if id_opts.except(*valid_keys).any?
-    result = if scores.loaded?
+    if scores.loaded?
       scores.detect { |score| score.attributes >= id_opts.with_indifferent_access }
     else
       scores.where(id_opts).first
     end
-    if result
-      result.enrollment = self
-      # have to go through gymnastics to force-preload a has_one :through without causing a db transaction
-      if association(:course).loaded?
-        assn = result.association(:course)
-        assn.target = course
-        Bullet::Detector::Association.add_object_associations(result, :course) if defined?(Bullet) && Bullet.start?
-      end
-    end
-    result
   end
 
   def graded_at
@@ -1265,7 +1269,7 @@ class Enrollment < ActiveRecord::Base
     raise "top_enrollment_by_user must be scoped" unless all.where_clause.present?
 
     key = key.to_s
-    order(Arel.sql("#{key}, #{type_rank_sql(rank_order)}")).distinct_on(key)
+    order("#{key}, #{type_rank_sql(rank_order)}").distinct_on(key)
   end
 
   def assign_uuid

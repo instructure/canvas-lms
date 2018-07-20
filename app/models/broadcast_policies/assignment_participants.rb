@@ -25,7 +25,7 @@ module BroadcastPolicies
     delegate :context, :participants, to: :assignment
 
     def to
-      all_participants - excluded_enrollment_users
+      all_participants - excluded_enrollment_users - inactive_section_users
     end
 
     private
@@ -36,7 +36,8 @@ module BroadcastPolicies
     def all_participants
       @_all_participants ||= participants({
         include_observers: true,
-        excluded_user_ids: excluded_ids
+        excluded_user_ids: excluded_ids,
+        by_date: true
       })
     end
 
@@ -48,6 +49,17 @@ module BroadcastPolicies
       Enrollment.where({
         user_id: all_participant_ids
       }).not_yet_started(context)
+    end
+
+
+    def inactive_section_users
+      inactive_sections.map(&:user)
+    end
+
+    def inactive_sections
+      Enrollment.where({
+        user_id: all_participant_ids
+      }).section_ended(context.id)
     end
   end
 end

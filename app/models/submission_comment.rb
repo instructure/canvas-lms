@@ -127,7 +127,16 @@ class SubmissionComment < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :submission_comment
-    p.to { ([submission.user] + User.observing_students_in_course(submission.user, submission.assignment.context)) - [author] }
+    p.to do
+      course_id = /\d+/.match(submission.context_code).to_s.to_i
+      section_ended =
+        Enrollment.where({
+                           user_id: submission.user.id
+                         }).section_ended(course_id).length > 0
+      unless section_ended
+        ([submission.user] + User.observing_students_in_course(submission.user, submission.assignment.context)) - [author]
+      end
+    end
     p.whenever {|record|
       # allows broadcasting when this record is initially saved (assuming draft == false) and also when it gets updated
       # from draft to final
