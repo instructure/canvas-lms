@@ -116,27 +116,27 @@
       <div class="control-label">{{#t "options"}}Options{{/t}}</div>
       <div class="controls">
         {{#if isTopic}}
-          <label class="checkbox" for="threaded">
+          <div><label class="checkbox short-label" for="threaded">
             {{checkbox "threaded"}}
             {{#t "allow_threaded_replies"}}Allow threaded replies{{/t}}
-          </label>
+          </label></div>
         {{/if}}
         {{#if contextIsCourse}}
           {{#if isAnnouncement}}
-            <label class="checkbox" for="delay_posting">
+            <div><label class="checkbox short-label" for="delay_posting">
               {{checkbox "delay_posting"
                 checked=delayed_post_at
                 class="element_toggler"
                 aria-controls="discussion_topic_delay_post_container"}}
               {{#t "delay_posting"}}Delay posting{{/t}}
-            </label>
+            </label></div>
             <label class="screenreader-only" id="discussion_topic_delay_post_accessible_label">
               {{#t}}Delay posting this topic until{{/t}}
               {{datepickerScreenreaderPrompt}}
             </label>
-            <label id="discussion_topic_delay_post_container"
+            <div><label id="discussion_topic_delay_post_container"
                    style="{{hiddenUnless delayed_post_at}}"
-                   class="checkbox">
+                   class="checkbox short-label">
               {{#t "post_at"}}Post At{{/t}}
               <input type="text"
                      class="datetime_field input-medium"
@@ -146,92 +146,92 @@
                      aria-labelledby="discussion_topic_delay_post_accessible_label"
                      data-tooltip='{"position":"top","force_position":"true"}'
                      title="{{accessibleDateFormat}}" />
-            </label>
+            </label></div>
             {{#unless announcementsLocked}}
-            <label class="checkbox" for="allow_user_comments">
+            <div><label class="checkbox short-label" for="allow_user_comments">
               {{#if title}}
               {{checkbox "allow_user_comments" checked=unlocked}}
               {{else}}
               {{checkbox "allow_user_comments" checked=ENV.CREATE_ANNOUNCEMENTS_UNLOCKED}}
               {{/if}}
               {{#t}}Allow users to comment{{/t}}
-            </label>
-            <label class="checkbox" for="require_initial_post" style="margin-left: 2em;">
+            </label></div>
+            <div><label class="checkbox short-label" for="require_initial_post" style="margin-left: 2em;">
               {{checkbox "require_initial_post"}}
               {{#t "users_must_post_before_seeing_replies"}}Users must post before seeing replies{{/t}}
-            </label>
+            </label></div>
             {{/unless}}
           {{else}}
-          <label class="checkbox" for="require_initial_post">
+          <div><label class="checkbox short-label" for="require_initial_post">
             {{checkbox "require_initial_post"}}
             {{#t "users_must_post_before_seeing_replies"}}Users must post before seeing replies{{/t}}
-          </label>
+          </label></div>
           {{/if}}
         {{/if}}
         {{#if canModerate}}
-          <label class="checkbox" for="podcast_enabled">
+          <div><label class="checkbox short-label" for="podcast_enabled">
             {{checkbox "podcast_enabled"
               checked=podcast_url
               class="element_toggler"
               aria-controls="podcast_has_student_posts_container"}}
             {{#t "enable_podcast_feed"}}Enable podcast feed{{/t}}
-          </label>
+          </label></div>
 
           {{#if contextIsCourse}}
-            <label id="podcast_has_student_posts_container"
+            <div><label id="podcast_has_student_posts_container"
                    style="{{hiddenUnless podcast_url}}"
-                   class="checkbox" for="podcast_has_student_posts">
+                   class="checkbox short-label" for="podcast_has_student_posts">
               {{checkbox "podcast_has_student_posts"}}
               {{#t "include_replies_in_podcast_feed"}}Include student replies in podcast feed{{/t}}
-            </label>
+            </label></div>
           {{/if}}
         {{/if}}
         {{#if showAssignment}}
-          <label class="checkbox" for="use_for_grading">
+          <div><label class="checkbox short-label" for="use_for_grading">
             {{checkbox "assignment.set_assignment"
               id="use_for_grading"
               class="element_toggler"
               aria-controls="assignment_options"
               checked=set_assignment}}
             {{#t "use_for_grading"}}Graded{{/t}}
-          </label>
+          </label></div>
         {{/if}}
 
-        <label class="checkbox" for="allow_rating">
+        <div><label class="checkbox short-label" for="allow_rating">
           {{checkbox "allow_rating"
             id="allow_rating"
             class="element_toggler"
             checked=allow_rating
             aria-controls="rating_settings_container"}}
           {{#t "allow_liking"}}Allow liking{{/t}}
-        </label>
+        </label></div>
         <div id="rating_settings_container" style="{{hiddenUnless allow_rating}}; margin-left: 20px;">
-          <label class="checkbox" for="only_graders_can_rate">
+          <div><label class="checkbox short-label" for="only_graders_can_rate">
             {{checkbox "only_graders_can_rate"
               id="only_graders_can_rate"
               class="element_toggler"
               checked=only_graders_can_rate}}
             {{#t "only_graders_can_like"}}Only graders can like{{/t}}
-          </label>
-          <label class="checkbox" for="sort_by_rating">
+          </label></div>
+          <div><label class="checkbox short-label" for="sort_by_rating">
             {{checkbox "sort_by_rating"
               id="sort_by_rating"
               class="element_toggler"
               checked=sort_by_rating}}
             {{#t "sort_by_likes"}}Sort by likes{{/t}}
-          </label>
+          </label></div>
         </div>
 
         {{#if ENV.STUDENT_PLANNER_ENABLED}}
           {{#if isTopic}}
             <div id="todo_options" style="{{hiddenIf set_assignment}}">
-              <label class="checkbox" for="allow_todo_date">
+              <div><label class="checkbox short-label" for="allow_todo_date">
                 {{checkbox "allow_todo_date"
                   id="allow_todo_date"
                   class="element_toggler"
                   aria-controls="todo_date_input"}}
                 {{#t}}Add to student to-do{{/t}}
-              </label>
+              </label></div>
               <div id="todo_date_input" style="{{hiddenUnless allow_todo_date}}; margin-left: 20px;" />
             </div>
           {{/if}}
