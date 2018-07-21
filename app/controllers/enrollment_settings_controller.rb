@@ -15,7 +15,7 @@ class EnrollmentSettingsController < ApplicationController
   def index
     render json: SettingsService.get_settings(
       id: params[:enrollment_id],
-      noun: :enrollment
+      object: :enrollment
     )
   end
 end

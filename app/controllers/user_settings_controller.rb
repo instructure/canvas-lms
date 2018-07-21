@@ -4,7 +4,7 @@ class UserSettingsController < ApplicationController
       id: params[:user_id],
       setting: params[:id],
       value: params[:value],
-      noun: user
+      object: user
     )
   end
 
