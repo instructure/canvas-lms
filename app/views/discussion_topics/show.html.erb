@@ -105,7 +105,7 @@
             </a>
           <% end %>
 
-          <% if @current_user.present? %>
+          <% if @current_user.present? && !@initial_post_required %>
             <div class="admin-links">
               <a class="al-trigger btn announcement_cog" href="#" role="button">
                 <i class="icon-more" aria-hidden="true"></i>

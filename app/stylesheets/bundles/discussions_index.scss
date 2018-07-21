@@ -43,6 +43,8 @@
 }
 
 .disabled-toggle-button {
+  background: transparent;
+  border: none;
   cursor: not-allowed;
   opacity: 0.5;
 }
