@@ -21,14 +21,13 @@ require 'securerandom'
 class EportfolioCategoriesController < ApplicationController
   include EportfolioPage
   before_action :rich_content_service_config
+  before_action :get_eportfolio
 
   def index
-    @portfolio = Eportfolio.find(params[:eportfolio_id])
     redirect_to eportfolio_url(@portfolio)
   end
 
   def create
-    @portfolio = Eportfolio.find(params[:eportfolio_id])
     if authorized_action(@portfolio, @current_user, :update)
       category_names = @portfolio.eportfolio_categories.map{|c| c.name}
       @category = @portfolio.eportfolio_categories.build(eportfolio_category_params)
@@ -45,7 +44,6 @@ class EportfolioCategoriesController < ApplicationController
   end
 
   def update
-    @portfolio = Eportfolio.find(params[:eportfolio_id])
     if authorized_action(@portfolio, @current_user, :update)
       @category = @portfolio.eportfolio_categories.find(params[:id])
       respond_to do |format|
@@ -60,7 +58,6 @@ class EportfolioCategoriesController < ApplicationController
   end
 
   def show
-    @portfolio = Eportfolio.find(params[:eportfolio_id])
     begin
       if params[:verifier] == @portfolio.uuid
         session[:eportfolio_ids] ||= []
@@ -86,7 +83,6 @@ class EportfolioCategoriesController < ApplicationController
   end
 
   def destroy
-    @portfolio = Eportfolio.find(params[:eportfolio_id])
     if authorized_action(@portfolio, @current_user, :update)
       @category = @portfolio.eportfolio_categories.find(params[:id])
       respond_to do |format|
@@ -106,5 +102,9 @@ class EportfolioCategoriesController < ApplicationController
 
   def eportfolio_category_params
     params.require(:eportfolio_category).permit(:name)
+  end
+
+  def get_eportfolio
+    @portfolio = Eportfolio.active.find(params[:eportfolio_id])
   end
 end

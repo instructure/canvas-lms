@@ -51,13 +51,13 @@ class Eportfolio < ActiveRecord::Base
     given {|user| user && user.eportfolios_enabled? }
     can :create
 
-    given {|user| self.user == user && user.eportfolios_enabled? }
+    given {|user| self.active? && self.user == user && user.eportfolios_enabled? }
     can :read and can :manage and can :update and can :delete
 
-    given {|_| self.public }
+    given {|_| self.active? && self.public }
     can :read
 
-    given {|_, session| session && session[:eportfolio_ids] && session[:eportfolio_ids].include?(self.id) }
+    given {|_, session| self.active? && session && session[:eportfolio_ids] && session[:eportfolio_ids].include?(self.id) }
     can :read
   end
 

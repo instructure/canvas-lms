@@ -21,9 +21,9 @@ require 'securerandom'
 class EportfolioEntriesController < ApplicationController
   include EportfolioPage
   before_action :rich_content_service_config
+  before_action :get_eportfolio
 
   def create
-    @portfolio = Eportfolio.find(params[:eportfolio_id])
     if authorized_action(@portfolio, @current_user, :update)
       @category = @portfolio.eportfolio_categories.find(params[:eportfolio_entry].delete(:eportfolio_category_id))
 
@@ -43,7 +43,6 @@ class EportfolioEntriesController < ApplicationController
   end
 
   def show
-    @portfolio = Eportfolio.find(params[:eportfolio_id])
     if params[:verifier] == @portfolio.uuid
       session[:eportfolio_ids] ||= []
       session[:eportfolio_ids] << @portfolio.id
@@ -70,7 +69,6 @@ class EportfolioEntriesController < ApplicationController
   end
 
   def update
-    @portfolio = Eportfolio.find(params[:eportfolio_id])
     if authorized_action(@portfolio, @current_user, :update)
       @entry = @portfolio.eportfolio_entries.find(params[:id])
       @entry.parse_content(params) if params[:section_count]
@@ -94,7 +92,6 @@ class EportfolioEntriesController < ApplicationController
 
 
   def destroy
-    @portfolio = Eportfolio.find(params[:eportfolio_id])
     if authorized_action(@portfolio, @current_user, :update)
       @entry = @portfolio.eportfolio_entries.find(params[:id])
       @category = @entry.eportfolio_category
@@ -109,7 +106,6 @@ class EportfolioEntriesController < ApplicationController
   end
 
   def attachment
-    @portfolio = Eportfolio.find(params[:eportfolio_id])
     if authorized_action(@portfolio, @current_user, :read)
       @entry = @portfolio.eportfolio_entries.find(params[:entry_id])
       @category = @entry.eportfolio_category
@@ -124,7 +120,6 @@ class EportfolioEntriesController < ApplicationController
   end
 
   def submission
-    @portfolio = Eportfolio.find(params[:eportfolio_id])
     if authorized_action(@portfolio, @current_user, :read)
       @entry = @portfolio.eportfolio_entries.find(params[:entry_id])
       @category = @entry.eportfolio_category
@@ -147,5 +142,9 @@ class EportfolioEntriesController < ApplicationController
 
   def eportfolio_entry_params
     params.require(:eportfolio_entry).permit(:name, :allow_comments, :show_comments)
+  end
+
+  def get_eportfolio
+    @portfolio = Eportfolio.active.find(params[:eportfolio_id])
   end
 end
