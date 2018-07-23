@@ -249,7 +249,7 @@ class ContextModule < ActiveRecord::Base
 
   def available_for?(user, opts={})
     enrollment = Enrollment.where(user_id: user.id, course_id: context.id).first
-    settings = SettingsService.get_settings(id: enrollment.id, object: :enrollment)
+    settings = SettingsService.get_enrollment_settings(id: enrollment.id)
     sequence_control = settings.fetch('sequence_control', true)
     return true unless sequence_control
 
