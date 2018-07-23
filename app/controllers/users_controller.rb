@@ -2299,10 +2299,10 @@ class UsersController < ApplicationController
       student[:last_interaction] = [student[:last_interaction], date].compact.max
     end
     scope = ConversationMessage.
-        joins("INNER JOIN #{ConversationParticipant.quoted_table_name} ON conversation_participants.conversation_id=conversation_messages.conversation_id").
-        where('conversation_messages.author_id = ? AND conversation_participants.user_id IN (?) AND NOT conversation_messages.generated', teacher, ids)
+        joins(:conversation_message_participants).
+        where('conversation_messages.author_id = ? AND conversation_message_participants.user_id IN (?) AND NOT conversation_messages.generated', teacher, ids)
     # fake_arel can't pass an array in the group by through the scope
-    last_message_dates = scope.group(['conversation_participants.user_id', 'conversation_messages.author_id']).maximum(:created_at)
+    last_message_dates = scope.group(['conversation_message_participants.user_id', 'conversation_messages.author_id']).maximum(:created_at)
     last_message_dates.each do |key, date|
       next unless (student = data[key.first.to_i])
       student[:last_interaction] = [student[:last_interaction], date].compact.max
@@ -2465,6 +2465,7 @@ class UsersController < ApplicationController
         @pseudonym.save!
         @user = @pseudonym.user
         @user.workflow_state = 'registered'
+
         @user.update_account_associations
       end
     end
