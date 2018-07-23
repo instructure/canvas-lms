@@ -30,11 +30,11 @@ describe GraphQLController do
       expect(response.location).to match /\/login$/
     end
 
-    it "doesn't work in production for normal users" do
+    it "works in production for normal users" do
       allow(Rails.env).to receive(:production?).and_return(true)
       user_session(@student)
       get :graphiql
-      expect(response.status).to eq 401
+      expect(response.status).to eq 200
     end
 
     it "works in production for site admins" do
