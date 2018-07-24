@@ -80,6 +80,12 @@
   "feedback_6dcc1991": {
     "message": "Tilbakemelding"
   },
+  "you_have_media_feedback_f5f9aba8": {
+    "message": "Du har tilbakemelding. "
+  },
+  "assignmenttype_title_posted_datetime_cab69444": {
+    "message": "{ assignmentType } { title } levert den { datetime }."
+  },
   "loading_25990131": {
     "message": "Lastar..."
   },
@@ -113,6 +119,9 @@
   "submitted_318fad53": {
     "message": "Innlevert"
   },
+  "go_to_card_view_dashboard_9d03970e": {
+    "message": "Gå til rutevising av dashbord"
+  },
   "task_16b0ef38": {
     "message": "Oppgåve"
   },
@@ -137,6 +146,9 @@
   "title_is_required_6ddcab69": {
     "message": "tittel er obligatorisk"
   },
+  "scroll_up_to_see_your_history_19b14cad": {
+    "message": "Rull opp for å sjå historikken din! "
+  },
   "nothing_planned_yet_8675ffe9": {
     "message": "Ingenting er planlagt"
   },
@@ -152,14 +164,23 @@
   "date_at_time_dbdb1b99": {
     "message": "{ date } klokka { time }"
   },
+  "to_do_date_4b211ad0": {
+    "message": "Gjeremål: { date }"
+  },
   "loading_past_items_ca499e75": {
     "message": "Lastar tidlegare element"
+  },
+  "show_all_ae37d610": {
+    "message": "Vis alt"
   },
   "missing_items_for_title_516511f8": {
     "message": "Manglar element i { title }"
   },
   "tomorrow_at_date_b53f2cf1": {
     "message": "I morgon på { date }"
+  },
+  "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
+    "message": "{ assignmentType } { title } har eit gjeremål knytta til seg den { datetime }."
   },
   "today_76e10f9c": {
     "message": "I dag"
@@ -182,8 +203,14 @@
   "time_2b5aac58": {
     "message": "Tidspunkt"
   },
+  "assignmenttype_title_all_day_on_datetime_9768903c": {
+    "message": "{ assignmentType } { title }, heile dagen den { datetime }."
+  },
   "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
     "message": "Du har rulla heilt tilbake til ditt aller første gjeremål!"
+  },
+  "due_date_124fdd99": {
+    "message": "Frist: { date }"
   },
   "delete_a6efa79d": {
     "message": "Slett"
@@ -229,6 +256,12 @@
   },
   "yesterday_c6bd6abf": {
     "message": "I går"
+  },
+  "add_to_do_7537af64": {
+    "message": "Legg til gjeremål"
+  },
+  "nothing_more_to_do_b665da42": {
+    "message": "Ingenting meir å gjere"
   },
   "graded_25cd3fcd": {
     "message": "Karaktersett"
