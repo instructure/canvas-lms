@@ -54,6 +54,10 @@ module NewUserSearchPage
     fj('[role="menuitem"]:contains("View user groups")')
   end
 
+  def more_options_profile_pictures
+    fj('[role="menuitem"]:contains("Manage profile pictures")')
+  end
+
   def column_sort_button(column_name)
     fj("button:contains(\"#{column_name}\")")
   end
@@ -153,5 +157,9 @@ module NewUserSearchPage
 
   def click_view_user_groups_option
     more_options_user_group.click
+  end
+
+  def click_manage_profile_pictures_option
+    more_options_profile_pictures.click
   end
 end

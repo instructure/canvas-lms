@@ -173,18 +173,6 @@ describe "new account user search" do
     expect(rows.first).to include_text(match_user.name)
   end
 
-  it "should link to the user avatar page" do
-    match_user = user_with_pseudonym(:account => @account, :name => "user with a search term")
-    user_with_pseudonym(:account => @account, :name => "diffrient user")
-
-    get "/accounts/#{@account.id}/users"
-
-    fj('button:contains("More People Options")').click
-    fj('[role="menuitem"]:contains("Manage profile pictures")').click
-
-    expect(driver.current_url).to include("/accounts/#{@account.id}/avatars")
-  end
-
   # This describe block will be removed once all tests are converted
   describe 'Page Object Converted Tests' do
     include NewUserSearchPage
@@ -227,6 +215,12 @@ describe "new account user search" do
       click_people_more_options
       click_view_user_groups_option
       expect(driver.current_url).to include("/accounts/#{@account.id}/groups")
+    end
+
+    it "should link to the user avatar page" do
+      click_people_more_options
+      click_manage_profile_pictures_option
+      expect(driver.current_url).to include("/accounts/#{@account.id}/avatars")
     end
   end
 end
