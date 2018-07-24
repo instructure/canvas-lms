@@ -239,6 +239,12 @@ class Assignment
               version_json['submission']['has_originality_score'] = version.originality_reports_for_display.any? { |o| o.originality_score.present? }
               version_json['submission']['turnitin_data'].merge!(version.originality_data)
 
+              # Fill in the parent's anonymous ID if this version was serialized
+              # without it
+              if @assignment.anonymize_students? && version_json['submission']['anonymous_id'].blank?
+                version_json['submission']['anonymous_id'] = sub.anonymous_id
+              end
+
               if version_json['submission'][:submission_type] == 'discussion_topic'
                 url_opts[:enable_annotations] = false
               end

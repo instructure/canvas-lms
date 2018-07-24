@@ -1550,6 +1550,31 @@ describe Assignment::SpeedGrader do
       it "includes the current user's author name on submission comments" do
         expect(submission_1_json['submission_comments'].map { |s| s['author_name'] }).to include(teacher.name)
       end
+
+      context "when a submission has multiple versions" do
+        it "uses the current submission's anonymous ID for older versions that lack one" do
+          student = User.create!
+          course.enroll_student(student).accept!
+          assignment = course.assignments.create!(title: 'new assignment', anonymous_grading: true)
+
+          # Clear this first submission's anonymous ID so it gets serialized without one
+          old_submission = assignment.submit_homework(student)
+          old_submission.update!(anonymous_id: nil)
+
+          submission = assignment.submit_homework(student)
+          submission.update!(anonymous_id: 'zxcvb')
+
+          json = Assignment::SpeedGrader.new(assignment, teacher, avatars: true, grading_role: :moderator).json
+
+          submission_json = json['submissions'].detect { |s| s['anonymous_id'] == submission.anonymous_id }
+
+          returned_anonymous_ids = submission_json['submission_history'].map do |historical_submission|
+            historical_submission.dig(:submission, :anonymous_id)
+          end
+
+          expect(returned_anonymous_ids.uniq).to eq [submission.anonymous_id]
+        end
+      end
     end
   end
 
