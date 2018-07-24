@@ -242,7 +242,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   def deletions_since_last_export
     return {} unless last_export_started_at
     deletions_by_type = {}
-    MasterCourses::ALLOWED_CONTENT_TYPES.each do |klass|
+    MasterCourses::CONTENT_TYPES_FOR_DELETIONS.each do |klass|
       item_scope = case klass
       when 'Attachment'
         course.attachments.where(:file_state => 'deleted')

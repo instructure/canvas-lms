@@ -255,6 +255,7 @@ class WikiPage < ActiveRecord::Base
     end
 
     self.wiki.set_front_page_url!(self.url)
+    self.touch if self.persisted?
   end
 
   def context_module_tag_for(context)

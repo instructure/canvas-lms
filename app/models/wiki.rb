@@ -22,6 +22,8 @@ class Wiki < ActiveRecord::Base
   has_many :wiki_pages, :dependent => :destroy
 
   before_save :set_has_no_front_page_default
+  after_update :set_downstream_change_for_master_courses
+
   after_save :update_contexts
 
   has_one :course
@@ -35,6 +37,26 @@ class Wiki < ActiveRecord::Base
     end
   end
   private :set_has_no_front_page_default
+
+  # some hacked up stuff similar to what's in MasterCourses::Restrictor
+  def load_tag_for_master_course_import!(child_subscription_id)
+    @child_tag_for_import = MasterCourses::ChildContentTag.all.polymorphic_where(:content => self).first ||
+      MasterCourses::ChildContentTag.create(:content => self, :child_subscription_id => child_subscription_id)
+  end
+
+  def can_update_front_page_for_master_courses?
+    !@child_tag_for_import.downstream_changes.include?("front_page_url")
+  end
+
+  def set_downstream_change_for_master_courses
+    if self.saved_change_to_front_page_url? && !@child_tag_for_import
+      child_tag = MasterCourses::ChildContentTag.all.polymorphic_where(:content => self).first
+      if child_tag
+        child_tag.downstream_changes = ["front_page_url"]
+        child_tag.save! if child_tag.changed?
+      end
+    end
+  end
 
   def update_contexts
     self.context.try(:touch)
@@ -90,6 +112,8 @@ class Wiki < ActiveRecord::Base
       self.context.default_view = nil
       self.context.save
     end
+
+    self.front_page.touch if self.front_page&.persisted?
 
     self.front_page_url = nil
     self.has_no_front_page = true

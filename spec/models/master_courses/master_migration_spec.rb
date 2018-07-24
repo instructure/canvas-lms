@@ -1027,7 +1027,6 @@ describe MasterCourses::MasterMigration do
       expect(copied_quiz_assmt.reload.title).to eq new_title # should carry the new title over to the assignments
       expect(copied_topic_assmt.reload.title).to eq new_title
 
-      expect(sub.child_content_tags.count).to eq 2
       quiz_child_tag = sub.child_content_tags.polymorphic_where(:content => copied_quiz).first
       topic_child_tag = sub.child_content_tags.polymorphic_where(:content => copied_topic).first
       [quiz_child_tag, topic_child_tag].each do |tag|
@@ -1120,12 +1119,48 @@ describe MasterCourses::MasterMigration do
 
       run_master_migration
 
-      expect(@copy_to.wiki.reload.front_page).to eq @page_copy # don't change yet
-
-      run_master_migration(:copy_settings => true)
-
       @page2_copy = @copy_to.wiki_pages.where(:migration_id => mig_id(@page2)).first
-      expect(@copy_to.wiki.reload.front_page).to eq @page2_copy # now should change
+      expect(@copy_to.wiki.reload.front_page).to eq @page2_copy
+
+      Timecop.freeze(2.minutes.from_now) do
+        @copy_from.wiki.reload.unset_front_page! # should unset on associated course
+      end
+
+      run_master_migration
+
+      expect(@copy_to.wiki.reload.front_page).to be_nil
+    end
+
+    it "should change front wiki pages unless it gets changed downstream" do
+      @copy_to = course_factory
+      @sub = @template.add_child_course!(@copy_to)
+
+      @page = @copy_from.wiki_pages.create!(:title => "first page")
+      @page.set_as_front_page!
+
+      run_master_migration
+
+      Timecop.freeze(10.seconds.from_now) do
+        @page.update_attributes(:title => "new title", :url => "new_url")
+        @page.set_as_front_page! # change the url but keep as front page
+      end
+
+      run_master_migration
+
+      @page_copy = @copy_to.wiki_pages.where(:migration_id => mig_id(@page)).first
+      expect(@page_copy.title).to eq "new title"
+      expect(@copy_to.wiki.reload.front_page).to eq @page_copy
+
+      @copy_to.wiki.unset_front_page! # set downstream change
+
+      Timecop.freeze(20.seconds.from_now) do
+        @page.update_attributes(:title => "another new title", :url => "another_new_url")
+        @page.set_as_front_page!
+      end
+
+      run_master_migration
+
+      expect(@copy_to.wiki.reload.front_page_url).to be nil # should leave alone
     end
 
     it "shouldn't overwrite syllabus body if already present or changed" do
