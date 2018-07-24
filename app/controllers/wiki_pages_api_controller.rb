@@ -665,7 +665,6 @@ class WikiPagesApiController < ApplicationController
         !value_to_boolean(params[:wiki_page][:student_planner_checkbox])
         @page.todo_date = nil
       end
-      @page.save!
     end
   end
 
