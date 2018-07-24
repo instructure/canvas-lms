@@ -6610,11 +6610,11 @@ cy:
     title: "%{portfolio_name} Crynodeb"
     user_index: 
       buttons: 
-        add_eportfolio: "Gwneud e-Bortffolio"
+        add_eportfolio: "Creu e-Bortffolio"
       defaults: 
         eportfolio_name: "Fy Mhortffolio i"
       headers: 
-        add_eportfolio: "Gwneud e-Bortffolio"
+        add_eportfolio: "Creu e-Bortffolio"
         eportfolios: e-Bortffolios
         my_eportfolios: "Fy e-Bortffolios i"
         what: "Beth ydy e-Bortffolio?"
@@ -15693,7 +15693,7 @@ cy:
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "rhaid creu ffolderi cyflwyniadau mewn cyd-destun Defnyddiwr neu Grŵp"
   submissions_view_and_make_comments_cafaf361: "Cyflwyniadau - gweld a rhoi sylwadau"
   submit_a3cc6859: Cyflwyno
-  submit_a_feature_idea_2d4baa3d: "Cyflwyno Syniad am Nodwedd"
+  submit_a_feature_idea_2d4baa3d: "Cyflwyno Syniad Newydd"
   submit_assignment_5799b4e3: "Cyflwyno Aseiniad"
   submit_comment_commenttext_8e5638d7: "Cyflwyno sylw: %{commentText}"
   submit_comment_e5cc2718: "Cyflwyno sylw"
