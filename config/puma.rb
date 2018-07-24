@@ -47,4 +47,4 @@ workers ENV.fetch("WEB_CONCURRENCY") { 2 }
 # Allow puma to be restarted by `rails restart` command.
 plugin :tmp_restart
 # write out a pid file
-pidfile: /var/run/puma.pid
+pidfile '/var/run/puma.pid'
