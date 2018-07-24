@@ -254,7 +254,6 @@ END
             transitions['off']['locked'] = true if transitions&.dig('off')
           else
             should_lock = context.gradebook_backwards_incompatible_features_enabled?
-            transitions['on']['locked'] = should_lock if transitions&.dig('on')
             transitions['off']['locked'] = should_lock if transitions&.dig('off')
           end
         elsif context.is_a?(Account)
