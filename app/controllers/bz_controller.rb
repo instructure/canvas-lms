@@ -253,6 +253,28 @@ class BzController < ApplicationController
       # from bz_support.js. Just doing it server side for 1) speed and 2) viewing another
       # user's data, with proper permission checking
       doc = Nokogiri::HTML(@assignment_html)
+
+      cohort = current_cohort(User.find(student_id), @context)
+
+      doc.css(".duplicate-for-each-cohort-member").each do |o|
+
+        html = o.inner_html
+
+        newHtml = ''
+
+        cohort.each do |id, name|
+          replacedHtml = html.gsub("{ID}", id.to_s);
+          replacedHtml = replacedHtml.gsub("{COURSE_ID}", @context.id.to_s);
+          replacedHtml = replacedHtml.gsub("{NAME}", name);
+
+          newHtml += replacedHtml;
+        end
+
+        o.inner_html = newHtml
+
+        o['class'] = 'duplicate-for-each-cohort-member already-duplicated'
+      end
+
       doc.css('[data-bz-retained]').each do |o|
         result = RetainedData.where(:user_id => student_id, :name => o["data-bz-retained"])
         value = ''
