@@ -43,6 +43,27 @@ module IncomingMailProcessor
       @error_reporter = error_reporter
     end
 
+    def self.queue_processors
+      if self.run_periodically?
+        imp = self.new(IncomingMail::MessageHandler.new, ErrorReport::Reporter.new)
+        self.workers.times do |worker_id|
+          if self.dedicated_workers_per_mailbox
+            # Launch one per mailbox
+            self.mailbox_accounts.each do |account|
+              imp.send_later_enqueue_args(:process,
+                {singleton: "IncomingMailProcessor::IncomingMessageProcessor#process:#{worker_id}:#{account.address}", max_attempts: 1},
+                {worker_id: worker_id, mailbox_account_address: account.address})
+            end
+          else
+            # Just launch the one
+            imp.send_later_enqueue_args(:process,
+              {singleton: "IncomingMailProcessor::IncomingMessageProcessor#process:#{worker_id}", max_attempts: 1},
+              {worker_id: worker_id})
+          end
+        end
+      end
+    end
+
     # See config/incoming_mail.yml.example for documentation on how to configure incoming mail
     def self.configure(config)
       configure_settings(config.except(*mailbox_keys))

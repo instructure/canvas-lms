@@ -91,25 +91,13 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(StreamItem, :destroy_stream_items_using_setting)
   end
 
-  if IncomingMailProcessor::IncomingMessageProcessor.run_periodically?
-    Delayed::Periodic.cron 'IncomingMailProcessor::IncomingMessageProcessor#process', '*/1 * * * *' do
-      imp = IncomingMailProcessor::IncomingMessageProcessor.new(IncomingMail::MessageHandler.new, ErrorReport::Reporter.new)
-      IncomingMailProcessor::IncomingMessageProcessor.workers.times do |worker_id|
-        if IncomingMailProcessor::IncomingMessageProcessor.dedicated_workers_per_mailbox
-          # Launch one per mailbox
-          IncomingMailProcessor::IncomingMessageProcessor.mailbox_accounts.each do |account|
-            imp.send_later_enqueue_args(:process,
-                                        {singleton: "IncomingMailProcessor::IncomingMessageProcessor#process:#{worker_id}:#{account.address}", max_attempts: 1},
-                                        {worker_id: worker_id, mailbox_account_address: account.address})
-          end
-        else
-          # Just launch the one
-          imp.send_later_enqueue_args(:process,
-                                      {singleton: "IncomingMailProcessor::IncomingMessageProcessor#process:#{worker_id}", max_attempts: 1},
-                                      {worker_id: worker_id})
-        end
-      end
-    end
+  Delayed::Periodic.cron 'IncomingMailProcessor::IncomingMessageProcessor#process', '*/1 * * * *' do
+    DatabaseServer.send_in_each_region(
+      IncomingMailProcessor::IncomingMessageProcessor,
+      :queue_processors,
+      { run_current_region_asynchronously: true,
+        singleton: 'IncomingMailProcessor::IncomingMessageProcessor.queue_processors' }
+    )
   end
 
   Delayed::Periodic.cron 'IncomingMailProcessor::Instrumentation#process', '*/5 * * * *' do
