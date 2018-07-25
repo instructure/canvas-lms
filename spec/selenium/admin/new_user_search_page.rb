@@ -99,7 +99,11 @@ module NewUserSearchPage
   end
 
   def results_row
-    ('[data-automation="users list"] tr')
+    '[data-automation="users list"] tr'
+  end
+
+  def results_rows
+    ff(results_row)
   end
 
   # ---------------------- Actions ----------------------

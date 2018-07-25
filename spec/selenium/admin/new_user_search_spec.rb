@@ -159,20 +159,6 @@ describe "new account user search" do
     expect(f("[data-automation='users list']")).not_to include_text("Test User A")
   end
 
-  it "should search by name" do
-    match_user = user_with_pseudonym(:account => @account, :name => "user with a search term")
-    user_with_pseudonym(:account => @account, :name => "diffrient user")
-
-    get "/accounts/#{@account.id}/users"
-
-    f('input[placeholder="Search people..."]').send_keys('search')
-    wait_for_loading_to_disappear
-
-    rows = get_rows
-    expect(rows.count).to eq 1
-    expect(rows.first).to include_text(match_user.name)
-  end
-
   # This describe block will be removed once all tests are converted
   describe 'Page Object Converted Tests' do
     include NewUserSearchPage
@@ -221,6 +207,14 @@ describe "new account user search" do
       click_people_more_options
       click_manage_profile_pictures_option
       expect(driver.current_url).to include("/accounts/#{@account.id}/avatars")
+    end
+
+    it "should search by name" do
+      user_with_pseudonym(:account => @account, :name => "diffrient user")
+      enter_search("Test")
+      wait_for_loading_to_disappear
+      expect(results_rows.count).to eq 1
+      expect(results_rows.first).to include_text("Test")
     end
   end
 end
