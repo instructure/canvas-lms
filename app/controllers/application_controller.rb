@@ -167,6 +167,24 @@ class ApplicationController < ActionController::Base
   end
   helper_method :rce_js_env
 
+
+  def current_cohort(current_user = @current_user, context = @context)
+    res = {}
+    if current_user && context && context.is_a?(Course)
+      # LCs, even in the playbook, should see their Accelerator cohort, not the other LCs
+      if context.name.match(/.*LC Playbook.*/)
+        context = Course.active.where(:name => context.name.sub("LC Playbook", "Braven Accelerator")).first
+      end
+      current_user.enrollments.active.where(:course_id => context.id).each do |enrollment|
+        enrollment.course_section.students.active.each do |student|
+          res[student.id] = student.name
+        end
+      end
+    end
+    return res
+  end
+  helper_method :current_cohort
+
   def conditional_release_js_env(assignment = nil)
     return unless ConditionalRelease::Service.enabled_in_context?(@context)
     cr_env = ConditionalRelease::Service.env_for(

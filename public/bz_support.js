@@ -34,6 +34,46 @@ function addOnMagicFieldsLoaded(func) {
   }
 }
 
+/*
+	In the HTML, you can use placeholders {NAME} {ID} and {COURSE_ID}
+	inside any .duplicate-for-each-cohort-member element. the innerHTML
+	is duplicated for each member.
+
+	Add class `include-all-ta-cohorts-across-courses` to list every one
+	the given user is a TA for. (e.g. for LC evals.)
+*/
+function expandCohortMagicFields(ele) {
+	if(!ele)
+		ele = document.querySelector("body");
+
+	var cohort = JSON.parse(document.getElementById("my-current-cohort-json").innerHTML);
+
+	var dupes = ele.querySelectorAll(".duplicate-for-each-cohort-member");
+	for(var i = 0; i < dupes.length; i++) {
+		var d = dupes[i];
+		if(d.classList.contains("already-duplicated"))
+			continue;
+
+		var html = d.innerHTML;
+		var newHtml = "";
+
+		var replacedHtml;
+
+		for(var id in cohort) {
+			var name = cohort[id];
+			replacedHtml = html.replace(new RegExp("\\{ID\\}", "g"), id);
+			replacedHtml = replacedHtml.replace(new RegExp("\\{COURSE_ID\\}", "g"), ENV["COURSE_ID"]);
+			replacedHtml = replacedHtml.replace(new RegExp("\\{NAME\\}", "g"), name);
+
+			newHtml += replacedHtml;
+		}
+
+		d.innerHTML = newHtml;
+
+		d.classList.add("already-duplicated");
+	}
+}
+
 function bzRetainedInfoSetup(readonly) {
   function lockRelatedCheckboxes(el) {
     // or if we are a graded checkbox, disable other graded checkboxes inside the same bz-box since they are all related
@@ -83,6 +123,8 @@ function bzRetainedInfoSetup(readonly) {
       lockRelatedCheckboxes(element);
     }
   }
+
+  expandCohortMagicFields();
 
   if(window.ENV && ENV.current_user) {
     var names = document.querySelectorAll(".bz-user-name");
@@ -297,6 +339,9 @@ if(window != window.top) {
 
 
 function getInnerHtmlWithMagicFieldsReplaced(ele) {
+
+  expandCohortMagicFields(ele);
+
   // we need to copy the textarea values into the html
   // text because otherwise cloneNode will discard it, and
   // the info won't be copied to the submission
