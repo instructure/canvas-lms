@@ -2,7 +2,7 @@
 
 exports[`The CommentButton component renders the root component as expected 1`] = `
 "<div>
-  <Button variant=\\"icon\\" icon={{...}} margin=\\"0 x-small 0 0\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" fluidWidth={false} buttonRef={[Function]}>
+  <Button variant=\\"icon\\" icon={{...}} margin=\\"0 x-small 0 0\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" fluidWidth={false} buttonRef={[Function]} cursor=\\"pointer\\">
     <ScreenReaderContent as=\\"span\\">
       Additional Comments
     </ScreenReaderContent>
@@ -28,11 +28,11 @@ exports[`The CommentButton component renders the root component as expected 2`] 
     <TextArea label=\\"Comments\\" maxHeight=\\"50rem\\" onChange={[Function]} value=\\"some things\\" size=\\"medium\\" autoGrow={true} resize=\\"none\\" inline={false} messages={{...}} disabled={false} readOnly={false} textareaRef={[Function]} layout=\\"stacked\\" />
   </ModalBody>
   <ModalFooter>
-    <Button variant=\\"light\\" margin=\\"0 x-small 0 0\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" fluidWidth={false} buttonRef={[Function]}>
+    <Button variant=\\"light\\" margin=\\"0 x-small 0 0\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" fluidWidth={false} buttonRef={[Function]} cursor=\\"pointer\\">
       Cancel
     </Button>
      
-    <Button variant=\\"primary\\" margin=\\"0 x-small 0 0\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" fluidWidth={false} buttonRef={[Function]}>
+    <Button variant=\\"primary\\" margin=\\"0 x-small 0 0\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" fluidWidth={false} buttonRef={[Function]} cursor=\\"pointer\\">
       Update Comment
     </Button>
   </ModalFooter>

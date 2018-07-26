@@ -25,11 +25,11 @@ module PlannerPageObject
   end
 
   def select_list_view
-    fxpath("//span[contains(text(),'List View')]").click
+    fj('span[role="menuitemradio"]:contains("List View")').click
   end
 
   def select_dashboard_view
-    fxpath("//span[contains(text(),'Card View')]").click
+    fj('span[role="menuitemradio"]:contains("Card View")').click
   end
 
   def navigate_to_course_object(object)

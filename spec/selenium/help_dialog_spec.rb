@@ -87,6 +87,7 @@ describe "help dialog" do
       expect(f("#help_tray")).to be_displayed
       teacher_feedback_link = f("#help_tray a[href='#teacher_feedback']")
       expect(teacher_feedback_link).to be_displayed
+      sleep 0.3 # have to wait for instUI tray animations
       teacher_feedback_link.click
       feedback_form = f("form[action='/api/v1/conversations']")
       wait_for_ajaximations

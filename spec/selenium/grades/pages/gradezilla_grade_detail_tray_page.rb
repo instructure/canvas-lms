@@ -102,11 +102,11 @@ class Gradezilla
       end
 
       def next_student_button
-        fj(navigate_to_next_student_selector)
+        f(navigate_to_next_student_selector)
       end
 
       def previous_student_button
-        fj(navigate_to_previous_student_selector)
+        f(navigate_to_previous_student_selector)
       end
 
       def all_comments

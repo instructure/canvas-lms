@@ -120,7 +120,7 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
 `;
 
 exports[`Free-form Rubric with a outcome criterion by default renders the LongDescription sub-component(s) as expected 1`] = `
-"<Button fluidWidth={true} variant=\\"link\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" buttonRef={[Function]}>
+"<Button fluidWidth={true} variant=\\"link\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" buttonRef={[Function]} cursor=\\"pointer\\">
   <Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
     view longer description
   </Text>
@@ -186,7 +186,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the root c
 `;
 
 exports[`Free-form Rubric with a outcome criterion when assessing renders the LongDescription sub-component(s) as expected 1`] = `
-"<Button fluidWidth={true} variant=\\"link\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" buttonRef={[Function]}>
+"<Button fluidWidth={true} variant=\\"link\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" buttonRef={[Function]} cursor=\\"pointer\\">
   <Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
     view longer description
   </Text>
@@ -252,7 +252,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the ro
 `;
 
 exports[`Free-form Rubric with a outcome criterion without an assessment renders the LongDescription sub-component(s) as expected 1`] = `
-"<Button fluidWidth={true} variant=\\"link\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" buttonRef={[Function]}>
+"<Button fluidWidth={true} variant=\\"link\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" buttonRef={[Function]} cursor=\\"pointer\\">
   <Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
     view longer description
   </Text>
@@ -442,7 +442,7 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
 `;
 
 exports[`Point Rubric with a outcome criterion by default renders the LongDescription sub-component(s) as expected 1`] = `
-"<Button fluidWidth={true} variant=\\"link\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" buttonRef={[Function]}>
+"<Button fluidWidth={true} variant=\\"link\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" buttonRef={[Function]} cursor=\\"pointer\\">
   <Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
     view longer description
   </Text>
@@ -514,7 +514,7 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
 `;
 
 exports[`Point Rubric with a outcome criterion when assessing renders the LongDescription sub-component(s) as expected 1`] = `
-"<Button fluidWidth={true} variant=\\"link\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" buttonRef={[Function]}>
+"<Button fluidWidth={true} variant=\\"link\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" buttonRef={[Function]} cursor=\\"pointer\\">
   <Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
     view longer description
   </Text>
@@ -581,7 +581,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
 `;
 
 exports[`Point Rubric with a outcome criterion without an assessment renders the LongDescription sub-component(s) as expected 1`] = `
-"<Button fluidWidth={true} variant=\\"link\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" buttonRef={[Function]}>
+"<Button fluidWidth={true} variant=\\"link\\" onClick={[Function]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" buttonRef={[Function]} cursor=\\"pointer\\">
   <Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
     view longer description
   </Text>

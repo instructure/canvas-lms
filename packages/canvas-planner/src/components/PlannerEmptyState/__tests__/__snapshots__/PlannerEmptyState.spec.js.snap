@@ -41,6 +41,7 @@ exports[`renders desert when completely empty 1`] = `
     <Button
       as="button"
       buttonRef={[Function]}
+      cursor="pointer"
       fluidWidth={false}
       id="PlannerEmptyState_AddToDo"
       margin="0"

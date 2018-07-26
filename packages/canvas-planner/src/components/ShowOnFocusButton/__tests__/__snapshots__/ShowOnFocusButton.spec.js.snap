@@ -7,6 +7,7 @@ exports[`renders a ScreenReaderContent by default 1`] = `
   <Button
     as="button"
     buttonRef={[Function]}
+    cursor="pointer"
     fluidWidth={false}
     margin="0"
     onBlur={[Function]}

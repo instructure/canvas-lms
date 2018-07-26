@@ -132,7 +132,7 @@ describe "conversations new" do
 
       get "/accounts/#{Account.default.id}/users"
       wait_for_ajaximations
-      f('[data-automation="users list"] tr a [name="IconMessage"]').click
+      fj('[data-automation="users list"] tr a:has([name="IconMessage"])').click
       wait_for_ajaximations
       expect(f('.ac-token')).not_to be_nil
     end

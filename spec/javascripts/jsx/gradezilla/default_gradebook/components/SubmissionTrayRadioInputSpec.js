@@ -50,7 +50,7 @@ function numberInput () {
 }
 
 function numberInputDescription () {
-  return numberInputContainer().find('span[role="presentation"]').node.textContent
+  return numberInputContainer().find('span.NumberInput__Container.NumberInput__Container-LeftIndent').node.textContent
 }
 
 function numberInputLabel () {
@@ -146,12 +146,12 @@ QUnit.module('SubmissionTrayRadioInput', function (hooks) {
 
     test('the text next to the input reads "Day(s)" if the late policy interval is "day"', function () {
       wrapper = mountComponent({ value: 'late', checked: true })
-      strictEqual(numberInputDescription(), 'Day(s)')
+      strictEqual(numberInputDescription(), 'Days lateDay(s)')
     })
 
     test('the text next to the input reads "Hour(s)" if the late policy interval is "day"', function () {
       wrapper = mountComponent({ value: 'late', checked: true, latePolicy: { lateSubmissionInterval: 'hour' } })
-      strictEqual(numberInputDescription(), 'Hour(s)')
+      strictEqual(numberInputDescription(), 'Hours lateHour(s)')
     })
 
     test('the label for the input reads "Days late" if the late policy interval is "day"', function () {

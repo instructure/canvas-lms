@@ -149,7 +149,7 @@ class Speedgrader
     end
 
     def submission_status_pill(status)
-      fj("[title='#{status}']:contains('#{status}')")
+      fj(".submission-#{status}-pill:contains('#{status}')")
     end
 
     def late_points_deducted_text

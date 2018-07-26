@@ -95,7 +95,8 @@ describe "new groups" do
       f('.edit-group-assignment').click
       wait_for_ajaximations
       click_option('.move-select .move-select__group select', "#{@testgroup[1].name}")
-      f('.move-select button[type="submit"]').click
+      button = f('.move-select button[type="submit"]')
+      keep_trying_until { button.click; true }
       wait_for_ajaximations
 
       # Verifies the student count updates
@@ -225,6 +226,7 @@ describe "new groups" do
       wait_for_ajaximations
       f(".ui-menu-item .edit-group-assignment").click
       wait_for_ajaximations
+      sleep 0.1 # uses sleep because it has an animation that can't be waited on by wait_for_ajaximations
       ff(".move-select .move-select__group option").last.click
       f('.move-select button[type="submit"]').click
       wait_for_ajaximations
@@ -268,7 +270,8 @@ describe "new groups" do
       ff('.move-select .move-select__group option').last.click
       wait_for_ajaximations
 
-      f('.move-select button[type="submit"]').click
+      button = f('.move-select button[type="submit"]')
+      keep_trying_until { button.click; true } # have to wait for instUI animations
       wait_for_ajaximations
 
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full")).not_to be_displayed
@@ -321,9 +324,11 @@ describe "new groups" do
 
       f(".ui-menu-item .edit-group-assignment").click
 
-      ff(".move-select .move-select__group option").last.click
+      option = ff(".move-select .move-select__group option").last
+      keep_trying_until { option.click; true } # have to wait for instUI animations
 
-      f('.move-select button[type="submit"]').click
+      button = f('.move-select button[type="submit"]')
+      keep_trying_until { button.click; true } # have to wait for instUI animations
       wait_for_ajaximations
 
       f(".group[data-id=\"#{@testgroup[1].id}\"] .toggle-group").click
@@ -946,7 +951,10 @@ describe "new groups" do
           ff('.edit-group-assignment').last.click
           wait_for_ajaximations
           click_option('.move-select .move-select__group select', "#{@testgroup.first.name}")
+          
+          sleep 0.3 # have to wait for instUI animations
           ff('.move-select button[type="submit"]').last.click
+
           wait_for_ajaximations
 
           select_change_groups_option

@@ -163,6 +163,7 @@ class PermissionsIndex
     end
 
     def disable_tray_permission(permission_name, role_id)
+      sleep 0.2 #have to wait for instUI animations
       permission_tray_button(permission_name, role_id).click()
       ff('[role="menuitemradio"]')[2].click()
       permission_tray_button(permission_name, role_id)
@@ -175,6 +176,7 @@ class PermissionsIndex
 
     def add_role(name)
       add_role_button.click()
+      sleep 0.5 # have to wait for instUI animations to happen
       set_value(add_role_input, name)
       add_role_submit_button.click()
       wait_for_ajaximations
@@ -182,8 +184,10 @@ class PermissionsIndex
 
     def edit_role(role, new_name)
       open_edit_role_tray(role)
+      sleep 0.2 # have to wait for instUI animations to happen
       set_value(f('input[name="edit_name_box"]'), new_name)
       driver.action.send_keys(:tab).perform
+      wait_for_ajaximations
     end
 
     def enter_search(search_term)

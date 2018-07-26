@@ -492,7 +492,7 @@ describe "student planner" do
       view_todo_item
       modal = todo_sidebar_modal(@student_to_do.title)
       title_input = f('input', modal)
-      course_name_dropdown = fj('span:contains("Course")>span>span>input', modal)
+      course_name_dropdown = fj('span:contains("Course")>span>span>span>input', modal)
 
       expect(title_input[:value]).to eq(@student_to_do.title)
       expect(course_name_dropdown[:value]).to eq("#{@course.name} - #{@course.short_name}")
@@ -504,7 +504,9 @@ describe "student planner" do
 
     it "allows editing the course of a to-do item", priority: "1", test_id: 3418827 do
       view_todo_item
-      fj(":contains('Unnamed Course')>span>input[role=combobox]").click
+      
+      input = driver.execute_script("return $('[aria-label=\"Edit Student to do\"] input[role=combobox]').filter((i,el) => el.value.includes('Unnamed Course'))[0]")
+      input.click
       fj("[role='option'] :contains('Optional: Add Course')").click
       todo_save_button.click
       @student_to_do.reload
@@ -514,7 +516,11 @@ describe "student planner" do
     it "has courses in the course combo box.", priority: "1", test_id: 3263160 do
       go_to_list_view
       todo_modal_button.click
-      fj(":contains('Optional: Add Course')>span>input[role=combobox]").click
+      input = nil
+      keep_trying_until do 
+        input = driver.execute_script("return $('[aria-label=\"Add To Do\"] input[role=combobox]').filter((i,el) => el.value.includes('Optional: Add Course'))[0]")
+      end
+      input.click
       expect(fj("[role='option'] :contains('Unnamed Course')")).to be
     end
 

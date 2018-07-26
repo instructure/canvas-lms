@@ -5,6 +5,7 @@ exports[`new activity button does not show when there is no new activity 1`] = `
   <Button
     as="button"
     buttonRef={[Function]}
+    cursor="pointer"
     fluidWidth={false}
     id="planner-today-btn"
     margin="0 medium 0 0"
@@ -18,6 +19,7 @@ exports[`new activity button does not show when there is no new activity 1`] = `
   <Button
     as="button"
     buttonRef={[Function]}
+    cursor="pointer"
     fluidWidth={false}
     icon={[Function]}
     margin="0 medium 0 0"
@@ -35,6 +37,7 @@ exports[`new activity button does not show when there is no new activity 1`] = `
   <Button
     as="button"
     buttonRef={[Function]}
+    cursor="pointer"
     fluidWidth={false}
     icon={[Function]}
     margin="0 medium 0 0"
@@ -89,6 +92,7 @@ exports[`new activity button does not show when there is no new activity 1`] = `
       <Button
         as="button"
         buttonRef={[Function]}
+        cursor="pointer"
         fluidWidth={false}
         margin="0 medium 0 0"
         onClick={[Function]}
@@ -286,6 +290,7 @@ exports[`new activity button shows when there is new activity 1`] = `
   <Button
     as="button"
     buttonRef={[Function]}
+    cursor="pointer"
     fluidWidth={false}
     id="planner-today-btn"
     margin="0 medium 0 0"
@@ -299,6 +304,7 @@ exports[`new activity button shows when there is new activity 1`] = `
   <Button
     as="button"
     buttonRef={[Function]}
+    cursor="pointer"
     fluidWidth={false}
     icon={[Function]}
     margin="0 medium 0 0"
@@ -316,6 +322,7 @@ exports[`new activity button shows when there is new activity 1`] = `
   <Button
     as="button"
     buttonRef={[Function]}
+    cursor="pointer"
     fluidWidth={false}
     icon={[Function]}
     margin="0 medium 0 0"
@@ -370,6 +377,7 @@ exports[`new activity button shows when there is new activity 1`] = `
       <Button
         as="button"
         buttonRef={[Function]}
+        cursor="pointer"
         fluidWidth={false}
         margin="0 medium 0 0"
         onClick={[Function]}
@@ -567,6 +575,7 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
   <Button
     as="button"
     buttonRef={[Function]}
+    cursor="pointer"
     fluidWidth={false}
     id="planner-today-btn"
     margin="0 medium 0 0"
@@ -580,6 +589,7 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
   <Button
     as="button"
     buttonRef={[Function]}
+    cursor="pointer"
     fluidWidth={false}
     icon={[Function]}
     margin="0 medium 0 0"
@@ -597,6 +607,7 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
   <Button
     as="button"
     buttonRef={[Function]}
+    cursor="pointer"
     fluidWidth={false}
     icon={[Function]}
     margin="0 medium 0 0"
@@ -651,6 +662,7 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
       <Button
         as="button"
         buttonRef={[Function]}
+        cursor="pointer"
         fluidWidth={false}
         margin="0 medium 0 0"
         onClick={[Function]}

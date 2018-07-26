@@ -34,7 +34,8 @@ class ExternalFeedPage
     end
 
     def display_length_option(type)
-      fj("label[data-reactid*='#{type}']")
+      input_id = f("input[type='radio'][name='verbosity-selection'][value='#{type}']").attribute('id')
+      f("label[for='#{input_id}']")
     end
 
     def phrase_textbox
@@ -69,6 +70,7 @@ class ExternalFeedPage
     end
 
     def add_external_feed(url, article_length)
+      sleep 0.5 #have to wait for instUI animations
       add_external_feed_expander.click
       type_in_box(feed_url_textbox, url)
       display_length_option(article_length).click
