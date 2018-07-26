@@ -724,7 +724,7 @@ class Submission < ActiveRecord::Base
   end
 
   def originality_reports_for_display
-    (versioned_originality_reports + text_entry_originality_reports).uniq
+    (versioned_originality_reports + text_entry_originality_reports).uniq.sort_by(&:created_at)
   end
 
   def turnitin_assets
