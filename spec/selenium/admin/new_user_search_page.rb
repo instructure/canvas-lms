@@ -42,8 +42,12 @@ module NewUserSearchPage
     f('input[placeholder="Search people..."]')
   end
 
+  def add_user_button_jqcss
+    'button:has([name="IconPlusLine"]):contains("People")'
+  end
+
   def add_user_button
-    fj('button:has([name="IconPlusLine"]):contains("People")')
+    fj(add_user_button_jqcss)
   end
 
   def more_options_button
