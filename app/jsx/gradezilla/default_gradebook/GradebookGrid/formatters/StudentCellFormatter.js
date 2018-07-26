@@ -25,7 +25,7 @@ function getSecondaryDisplayInfo (student, secondaryInfo, options) {
     const sectionNames = student.sections.map(sectionId => options.getSection(sectionId).name);
     return $.toSentence(sectionNames.sort());
   }
-  return { login_id: student.login_id, sis_id: student.sis_user_id }[secondaryInfo];
+  return {login_id: student.login_id, sis_id: student.sis_user_id, integration_id: student.integration_id}[secondaryInfo];
 }
 
 function getEnrollmentLabel (student) {

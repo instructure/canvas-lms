@@ -268,6 +268,40 @@ test('calls onSelectSecondaryInfo with "sis id"', function () {
   ok(onSelectSecondaryInfo.calledWithExactly('sis_id'));
 });
 
+QUnit.module('StudentColumnHeader: Secondary info > Integration ID', {
+  setup () {
+    this.mountAndOpenOptions = mountAndOpenOptions;
+    const props = defaultProps();
+    this.integrationIDMenuItem = findMenuItem.call(this, props, 'Secondary info', 'Integration ID');
+  },
+
+  teardown () {
+    this.wrapper.unmount();
+  }
+});
+
+test('includes an Integration ID MenuItem', function () {
+  strictEqual(this.integrationIDMenuItem.length, 1);
+});
+
+test('calls onSelectSecondaryInfo once', function () {
+  const onSelectSecondaryInfo = sinon.stub();
+  const props = defaultProps({ props: { onSelectSecondaryInfo } });
+  const integrationID = findMenuItem.call(this, props, 'Secondary info', 'Integration ID');
+  integrationID.simulate('click');
+
+  strictEqual(onSelectSecondaryInfo.callCount, 1);
+});
+
+test('calls onSelectSecondaryInfo with "integration id"', function () {
+  const onSelectSecondaryInfo = sinon.stub();
+  const props = defaultProps({ props: { onSelectSecondaryInfo } });
+  const integrationID = findMenuItem.call(this, props, 'Secondary info', 'Integration ID');
+  integrationID.simulate('click');
+
+  ok(onSelectSecondaryInfo.calledWithExactly('integration_id'));
+});
+
 QUnit.module('StudentColumnHeader: Secondary info > Login ID', {
   setup () {
     this.mountAndOpenOptions = mountAndOpenOptions;
