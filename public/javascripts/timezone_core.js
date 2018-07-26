@@ -123,15 +123,8 @@ const tz = {
 
     // _tz parsing failed or skipped. try moment parsing
     const formats = MomentFormats.getFormats()
-    const cleanValue = this.removeUnwantedChars(value)
-    const m = tz.moment(cleanValue, formats)
+    const m = tz.moment(value, formats)
     return m.isValid() ? m.toDate() : null
-  },
-
-  removeUnwantedChars (value) {
-    return _.isString(value) ?
-      value.replace('.', '') :
-      value
   },
 
   // format a date value (parsing it if necessary). returns null for parse
