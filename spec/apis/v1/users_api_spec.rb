@@ -320,21 +320,23 @@ describe Api::V1::User do
 
     def test_context(mock_context, context_to_pass)
       expect(mock_context).to receive(:account).and_return(mock_context)
-      expect(mock_context).to receive(:global_id).and_return(42)
+      expect(mock_context).to receive(:global_id).and_return(42).twice
       expect(mock_context).to receive(:grants_any_right?).with(@admin, :manage_students, :read_sis).and_return(true)
       expect(mock_context).to receive(:grants_right?).with(@admin, {}, :view_user_logins).and_return(true)
-      expect(if context_to_pass
+      json = if context_to_pass
         @test_api.user_json(@student, @admin, {}, [], context_to_pass)
       else
         @test_api.user_json(@student, @admin, {}, [])
-      end).to eq({ "name"=>"Student",
-                      "sortable_name"=>"Student",
-                      "id"=>@student.id,
-                      "short_name"=>"Student",
-                      "sis_user_id"=>"sis-user-id",
-                      "integration_id" => nil,
-                      "sis_import_id"=>@student.pseudonym.sis_batch_id,
-                      "login_id" => "pvuser@example.com"
+      end
+      expect(json).to eq({
+        "name"=>"Student",
+        "sortable_name"=>"Student",
+        "id"=>@student.id,
+        "short_name"=>"Student",
+        "sis_user_id"=>"sis-user-id",
+        "integration_id" => nil,
+        "sis_import_id"=>@student.pseudonym.sis_batch_id,
+        "login_id" => "pvuser@example.com"
       })
     end
 

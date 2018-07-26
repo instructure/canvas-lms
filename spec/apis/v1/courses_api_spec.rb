@@ -16,9 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
+require_relative '../api_spec_helper'
+require_relative '../../sharding_spec_helper'
+require_relative '../file_uploads_spec_helper'
 
 class TestCourseApi
   include Api::V1::Course
@@ -2443,8 +2443,8 @@ describe CoursesController, type: :request do
       @ta_enroll1 = @course1.enroll_user(@ta, 'TaEnrollment', :section => @section1)
       @ta_enroll2 = @course1.enroll_user(@ta, 'TaEnrollment', :section => @section2, :allow_multiple_enrollments => true)
 
-      @student1 = user_factory(:name => 'SSS1')
-      @student2 = user_factory(:name => 'SSS2')
+      @student1 = user_with_pseudonym(name: 'SSS1')
+      @student2 = user_with_pseudonym(name: 'SSS2')
       @student1_enroll = @course1.enroll_user(@student1, 'StudentEnrollment', :section => @section1)
       @student2_enroll = @course1.enroll_user(@student2, 'StudentEnrollment', :section => @section2)
 
@@ -2645,8 +2645,27 @@ describe CoursesController, type: :request do
       it "returns a list of users" do
         json = api_call(:get, api_url, api_route)
         expected_users = @course1.users.to_a.uniq - [@test_student]
-        expect(json.sort_by {|x| x["id"]}).to eq api_json_response(expected_users,
-                                                                   only: user_api_fields).sort_by {|x| x["id"]}
+        expect(json.sort_by {|x| x["id"]}).to eq api_json_response(
+          expected_users,
+          only: user_api_fields
+        ).sort_by {|x| x["id"]}
+      end
+
+      it 'does not include the sis_user_id when not an admin' do
+        @student1.pseudonym.update!(sis_user_id: 'student1')
+        @student2.pseudonym.update!(sis_user_id: 'student2')
+        json = api_call_as_user(@student1, :get, api_url, api_route)
+        json.each do |user_json|
+          expect(user_json).not_to have_key 'sis_user_id'
+        end
+      end
+
+      it 'includes the sis_user_id as admin' do
+        @admin = account_admin_user
+        @student1.pseudonym.update!(sis_user_id: 'student1')
+        @student2.pseudonym.update!(sis_user_id: 'student2')
+        json = api_call_as_user(@admin, :get, api_url, api_route)
+        expect(json.map {|record| record['sis_user_id']}).to include 'student1', 'student2'
       end
 
       it "returns a list of users filtered by id if user_ids is given" do

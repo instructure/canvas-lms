@@ -925,7 +925,7 @@ class CoursesController < ApplicationController
         end
 
         users = Api.paginate(users, self, api_v1_course_users_url)
-        includes = Array(params[:include])
+        includes = Array(params[:include]).concat(['sis_user_id'])
 
         # user_json_preloads loads both active/accepted and deleted
         # group_memberships when passed "group_memberships: true." In a
