@@ -13,7 +13,7 @@ class BzController < ApplicationController
 
   # magic field dump / for cohorts uses an access token instead
   # and courses_for_email is unauthenticated since it isn't really sensitive
-  before_filter :require_user, :except => [:magic_field_dump, :courses_for_email, :magic_fields_for_cohort]
+  before_filter :require_user, :except => [:magic_field_dump, :courses_for_email, :magic_fields_for_cohort, :cohort_lc_emails]
   skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user, :user_retained_data_batch]
 
   # this is meant to be used for requests from external services like LL kits
@@ -40,6 +40,37 @@ class BzController < ApplicationController
       u.enrollments.active.each do |e|
         result["course_ids"] << e.course_id
       end
+    end
+
+    render :json => result
+  end
+
+  # give it a course_id
+  def tas_for_course
+    access_token = AccessToken.authenticate(params[:access_token])
+    if access_token.nil?
+      render :json => "Access denied"
+      return
+    end
+
+    requesting_user = access_token.user
+    # we should prolly allow designer accounts to access too, but
+    # for now i just want to use the admin access token for myself
+    if requesting_user.id != 1
+      render :json => "Not admin"
+      return
+    end
+
+    course = Course.find(params[:course_id])
+
+    result = {}
+    result["tas"] = []
+    course.ta_enrollments.each do |enrollment|
+      obj = {}
+      obj["id"] = enrollment.user.id
+      obj["name"] = enrollment.user.name
+      obj["email"] = enrollment.user.email
+      result["tas"] << obj
     end
 
     render :json => result

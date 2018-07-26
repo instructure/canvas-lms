@@ -29,6 +29,7 @@ CanvasRails::Application.routes.draw do
   get 'bz/retained_data_export' => 'bz#retained_data_export'
   get 'bz/magic_field_dump' => 'bz#magic_field_dump'
   get 'bz/magic_fields_for_cohort' => 'bz#magic_fields_for_cohort'
+  get 'bz/tas_for_course' => 'bz#tas_for_course'
   get 'bz/courses_for_email' => 'bz#courses_for_email'
 
   get 'bz/user_linkedin_url' => 'bz#user_linkedin_url'
