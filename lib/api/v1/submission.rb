@@ -95,6 +95,10 @@ module Api::V1::Submission
       hash['grading_status'] = submission.grading_status
     end
 
+    if context.account_membership_allows(current_user)
+      hash['anonymous_id'] = submission.anonymous_id
+    end
+
     hash
   end
 
