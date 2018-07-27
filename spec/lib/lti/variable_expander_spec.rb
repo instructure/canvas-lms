@@ -772,6 +772,16 @@ module Lti
           expect(exp_hash[:test]).to eq 'teacher,student'
         end
 
+        it 'has substitution for $com.Instructure.membership.roles' do
+          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+          allow(substitution_helper).to receive(:current_canvas_roles_lis_v2).and_return(
+            'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student'
+          )
+          exp_hash = {test: '$com.Instructure.membership.roles'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student'
+        end
+
         it 'has substitution for $Canvas.membership.concludedRoles' do
           allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
           allow(substitution_helper).to receive(:concluded_lis_roles).and_return('learner')

@@ -95,6 +95,28 @@ describe ExternalToolsController do
   end
 
   describe "GET 'show'" do
+    context 'resource link request' do
+      let(:tool) do
+        tool = @course.context_external_tools.new(
+          name: "bob",
+          consumer_key: "bob",
+          shared_secret: "bob"
+        )
+        tool.url = "http://www.example.com/basic_lti"
+        tool.course_navigation = { enabled: true }
+        tool.settings['use_1_3'] = true
+        tool.save!
+        tool
+      end
+
+      it 'creates a resource link request when tool is configured to use LTI 1.3' do
+        user_session(@teacher)
+        get :show, params: {:course_id => @course.id, id: tool.id}
+        jwt = JSON::JWT.decode(assigns[:lti_launch].params[:id_token], :skip_verification)
+        expect(jwt["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
+      end
+    end
+
     context 'basic-lti-launch-request' do
       it "launches account tools for non-admins" do
         user_session(@teacher)

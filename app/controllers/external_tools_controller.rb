@@ -486,11 +486,24 @@ class ExternalToolsController < ApplicationController
     opts = default_opts.merge(opts)
 
     assignment = @context.assignments.active.find(params[:assignment_id]) if params[:assignment_id]
-    adapter = Lti::LtiOutboundAdapter.new(tool, @current_user, @context).prepare_tool_launch(
-      @return_url,
-      variable_expander(assignment: assignment, tool: tool, launch: lti_launch, post_message_token: opts[:launch_token]),
-      opts
-    )
+    expander = variable_expander(assignment: assignment, tool: tool, launch: lti_launch, post_message_token: opts[:launch_token])
+
+    adapter = if tool.settings.fetch('use_1_3', false)
+      Lti::LtiAdvantageAdapter.new(
+        tool: tool,
+        user: @current_user,
+        context: @context,
+        return_url: @return_url,
+        expander: expander,
+        opts: opts
+      )
+    else
+       Lti::LtiOutboundAdapter.new(tool, @current_user, @context).prepare_tool_launch(
+         @return_url,
+         expander,
+         opts
+       )
+    end
 
     lti_launch.params = if selection_type == 'homework_submission' && assignment
                           adapter.generate_post_payload_for_homework_submission(assignment)

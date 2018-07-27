@@ -525,6 +525,55 @@ describe ApplicationController do
         end
       end
 
+      context 'lti version' do
+        let(:user) { User.new }
+
+        before do
+          allow(controller).to receive(:named_context_url).and_return('wrong_url')
+          allow(controller).to receive(:lti_grade_passback_api_url).and_return('wrong_url')
+          allow(controller).to receive(:blti_legacy_grade_passback_api_url).and_return('wrong_url')
+          allow(controller).to receive(:lti_turnitin_outcomes_placement_url).and_return('wrong_url')
+
+          allow(controller).to receive(:render)
+          allow(controller).to receive_messages(js_env:[])
+          controller.instance_variable_set(:"@context", course)
+          allow(content_tag).to receive(:id).and_return(42)
+          allow(controller).to receive(:require_user) { user_model }
+          controller.instance_variable_set(:@current_user, user)
+          controller.instance_variable_set(:@domain_root_account, course.account)
+          content_tag.update_attributes!(context: assignment_model)
+        end
+
+        describe 'LTI 1.3' do
+          before do
+            tool.settings['use_1_3'] = true
+            tool.save!
+          end
+
+          context 'assignments' do
+            it 'creates a resource link request when tool is configured to use LTI 1.3' do
+              controller.send(:content_tag_redirect, course, content_tag, nil)
+              jwt = JSON::JWT.decode(assigns[:lti_launch].params[:id_token], :skip_verification)
+              expect(jwt["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
+            end
+          end
+
+          context 'module items' do
+            it 'creates a resource link request when tool is configured to use LTI 1.3' do
+              content_tag.update!(context: course.account)
+              controller.send(:content_tag_redirect, course, content_tag, nil)
+              jwt = JSON::JWT.decode(assigns[:lti_launch].params[:id_token], :skip_verification)
+              expect(jwt["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
+            end
+          end
+        end
+
+        it 'creates a basic lti launch request when tool is not configured to use LTI 1.3' do
+          controller.send(:content_tag_redirect, course, content_tag, nil)
+          expect(assigns[:lti_launch].params["lti_message_type"]).to eq "basic-lti-launch-request"
+        end
+      end
+
       it 'returns the full path for the redirect url' do
         expect(controller).to receive(:named_context_url).with(course, :context_url, {:include_host => true})
         expect(controller).to receive(:named_context_url).with(course, :context_external_content_success_url, 'external_tool_redirect', {:include_host => true}).and_return('wrong_url')

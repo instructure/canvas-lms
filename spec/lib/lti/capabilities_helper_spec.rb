@@ -105,7 +105,8 @@ module Lti
          com.instructure.Group.id
          com.instructure.Group.name
          Canvas.membership.roles
-         com.instructure.Course.groupIds)
+         com.instructure.Course.groupIds
+         com.Instructure.membership.roles)
     }
 
     describe '#supported_capabilities' do

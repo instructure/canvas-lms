@@ -1596,7 +1596,19 @@ class ApplicationController < ActionController::Base
                                                         assignment: @assignment,
                                                         launch: @lti_launch,
                                                         tool: @tool})
-        adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(@return_url, variable_expander, opts)
+
+        adapter = if @tool.settings.fetch('use_1_3', false)
+          Lti::LtiAdvantageAdapter.new(
+            tool: @tool,
+            user: @current_user,
+            context: @context,
+            return_url: @return_url,
+            expander: variable_expander,
+            opts: opts
+          )
+        else
+          Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(@return_url, variable_expander, opts)
+        end
 
         if tag.try(:context_module)
           # if you change this, see also url_show.html.erb
