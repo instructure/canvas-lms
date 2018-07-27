@@ -86,11 +86,11 @@ class Course < ActiveRecord::Base
   has_many :all_real_users, :through => :all_real_enrollments, :source => :user
   has_many :all_real_student_enrollments, -> { where("enrollments.type = 'StudentEnrollment' AND enrollments.workflow_state <> 'deleted'").preload(:user) }, class_name: 'StudentEnrollment'
   has_many :all_real_students, :through => :all_real_student_enrollments, :source => :user
-  has_many :teacher_enrollments, -> { where("enrollments.workflow_state <> 'deleted' AND enrollments.type = 'TeacherEnrollment'").preload(:user) }, class_name: 'TeacherEnrollment'
+  has_many :teacher_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted') AND enrollments.type = 'TeacherEnrollment'").preload(:user) }, class_name: 'TeacherEnrollment'
   has_many :teachers, -> { order("sortable_name") }, :through => :teacher_enrollments, :source => :user
-  has_many :ta_enrollments, -> { where("enrollments.workflow_state<>'deleted'").preload(:user) }, class_name: 'TaEnrollment'
+  has_many :ta_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted')").preload(:user) }, class_name: 'TaEnrollment'
   has_many :tas, :through => :ta_enrollments, :source => :user
-  has_many :observer_enrollments, -> { where("enrollments.workflow_state<>'deleted'").preload(:user) }, class_name: 'ObserverEnrollment'
+  has_many :observer_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted')").preload(:user) }, class_name: 'ObserverEnrollment'
   has_many :observers, :through => :observer_enrollments, :source => :user
   has_many :participating_observers, -> { where(enrollments: { workflow_state: 'active' }) }, through: :observer_enrollments, source: :user
   has_many :participating_observers_by_date, -> { where(enrollments: { type: 'ObserverEnrollment', workflow_state: 'active' }).
