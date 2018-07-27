@@ -194,7 +194,7 @@ export default class MoveSelect extends React.Component {
           : this.renderSelectPosition(siblings)}
         {(
           <View textAlign="end" display="block">
-            <hr />
+            <hr aria-hidden="true"/>
             <Button id="move-item-tray-cancel-button" onClick={this.props.onClose} margin="0 x-small 0 0">{I18n.t('Cancel')}</Button>
             <Button
               id="move-item-tray-submit-button"
