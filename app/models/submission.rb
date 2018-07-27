@@ -74,11 +74,11 @@ class Submission < ActiveRecord::Base
   belongs_to :attachment # this refers to the screenshot of the submission if it is a url submission
   belongs_to :assignment, inverse_of: :submissions
   belongs_to :user
+  alias student user
   belongs_to :grader, :class_name => 'User'
   belongs_to :grading_period
   belongs_to :group
   belongs_to :media_object
-  belongs_to :student, :class_name => 'User', :foreign_key => :user_id
 
   belongs_to :quiz_submission, :class_name => 'Quizzes::QuizSubmission'
   has_many :all_submission_comments, -> { order(:created_at) }, class_name: 'SubmissionComment', dependent: :destroy

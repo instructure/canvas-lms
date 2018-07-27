@@ -289,7 +289,7 @@ describe OriginalityReport do
       specs_require_sharding
 
       let(:new_shard) { Shard.create! }
-      let(:new_shard_attachment) { new_shard.activate { attachment_model } }
+      let(:new_shard_attachment) { new_shard.activate { attachment_model(context: user_model) } }
       let(:submission) { submission_model }
 
       it 'allows cross-shard attachment associations' do

@@ -52,7 +52,7 @@ class Score < ActiveRecord::Base
   alias original_destroy_permanently! destroy_permanently!
   private :original_destroy_permanently!
   def destroy_permanently!
-    score_metadata.destroy_permanently! if score_metadata.present?
+    ScoreMetadata.where(score: self).delete_all
     original_destroy_permanently!
   end
 

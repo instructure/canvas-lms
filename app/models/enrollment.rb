@@ -106,13 +106,13 @@ class Enrollment < ActiveRecord::Base
   end
 
   def valid_course?
-    if self.course.deleted? && !self.deleted?
+    if !deleted? && course.deleted?
       self.errors.add(:course_id, "is not a valid course")
     end
   end
 
   def valid_section?
-    unless self.course_section.active? || self.deleted?
+    unless deleted? || course_section.active?
       self.errors.add(:course_section_id, "is not a valid section")
     end
   end

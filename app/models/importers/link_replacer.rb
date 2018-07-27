@@ -53,7 +53,7 @@ module Importers
     def load_questions!(link_map)
       aq_item_keys = link_map.keys.select{|item_key| item_key[:type] == :assessment_question}
       aq_item_keys.each_slice(100) do |item_keys|
-        context.assessment_questions.where(:migration_id => item_keys.map{|ikey| ikey[:migration_id]}).each do |aq|
+        context.assessment_questions.where(:migration_id => item_keys.map{|ikey| ikey[:migration_id]}).preload(:assessment_question_bank).each do |aq|
           item_keys.detect{|ikey| ikey[:migration_id] == aq.migration_id}[:item] = aq
         end
       end

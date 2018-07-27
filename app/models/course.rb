@@ -57,7 +57,7 @@ class Course < ActiveRecord::Base
   has_many :active_course_sections, -> { where(workflow_state: 'active') }, class_name: 'CourseSection'
   has_many :enrollments, -> { where("enrollments.workflow_state<>'deleted'") }, inverse_of: :course
 
-  has_many :all_enrollments, :class_name => 'Enrollment'
+  has_many :all_enrollments, class_name: 'Enrollment', inverse_of: :course
   has_many :current_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')").preload(:user) }, class_name: 'Enrollment'
   has_many :all_current_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')").preload(:user) }, class_name: 'Enrollment'
   has_many :prior_enrollments, -> { preload(:user, :course).where(workflow_state: 'completed') }, class_name: 'Enrollment'
@@ -928,7 +928,7 @@ class Course < ActiveRecord::Base
       end
       self.account_id ||= self.root_account_id
     end
-    self.root_account_id ||= Account.default.id
+    self.root_account = Account.default if root_account_id.nil?
     self.account_id ||= self.root_account_id
     self.enrollment_term = nil if self.enrollment_term.try(:root_account_id) != self.root_account_id
     self.enrollment_term ||= self.root_account.default_enrollment_term
