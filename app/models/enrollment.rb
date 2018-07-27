@@ -1031,7 +1031,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def self.recompute_final_scores(user_id)
-    StudentEnrollment.where(user_id: user_id).pluck('distinct course_id').each do |course_id|
+    StudentEnrollment.where(user_id: user_id).distinct.pluck(:course_id).each do |course_id|
       recompute_final_score_in_singleton(user_id, course_id)
     end
   end

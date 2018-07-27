@@ -216,7 +216,7 @@ class WikiPage < ActiveRecord::Base
     self.versions.map(&:model)
   end
 
-  scope :deleted_last, -> { order("workflow_state='deleted'") }
+  scope :deleted_last, -> { order(Arel.sql("workflow_state='deleted'")) }
 
   scope :not_deleted, -> { where("wiki_pages.workflow_state<>'deleted'") }
 
