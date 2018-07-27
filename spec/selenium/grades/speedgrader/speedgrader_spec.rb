@@ -20,8 +20,9 @@ require_relative "../../helpers/gradebook_common"
 require_relative "../../helpers/groups_common"
 require_relative "../../helpers/assignments_common"
 require_relative "../../helpers/quizzes_common"
-require_relative "../../helpers/speed_grader_common"
 require_relative "../pages/speedgrader_page"
+require_relative "../pages/student_grades_page"
+require_relative "../pages/gradebook_page"
 require_relative "../../assignments/page_objects/assignment_page"
 require_relative "../../assignments/page_objects/submission_detail_page"
 require 'benchmark'
@@ -32,7 +33,6 @@ describe 'Speedgrader' do
   include GradebookCommon
   include GroupsCommon
   include AssignmentsCommon
-  include SpeedGraderCommon
 
   let(:rubric_data) do
     [
@@ -60,27 +60,15 @@ describe 'Speedgrader' do
     ]
   end
 
-  def wait_for_grade_input
-    wait = Selenium::WebDriver::Wait.new(timeout: 5)
-    wait.until { Speedgrader.grade_input.attribute('value') != "" }
+  before :once do
+    course_factory(active_all: true)
+    @students = create_users_in_course(@course, 5, return_type: :record, name_prefix: "Student_")
   end
 
   context 'grading' do
     describe 'displays grades correctly' do
-      before(:each) do
-        init_course_with_students 2
+      before :each do
         user_session(@teacher)
-      end
-
-      it 'complete/incomplete', priority: "1", test_id: 164014 do
-        @assignment = @course.assignments.create!(
-          title: 'Complete?',
-          grading_type: 'pass_fail'
-        )
-        @assignment.grade_student @students.first, grade: 'complete', grader: @teacher
-        @assignment.grade_student @students.second, grade: 'incomplete', grader: @teacher
-
-        grader_speedgrader_assignment('complete', 'incomplete', false)
       end
 
       it 'letter grades', priority: "1", test_id: 164015 do
@@ -104,83 +92,83 @@ describe 'Speedgrader' do
       end
     end
 
-
     context 'quizzes' do
       before(:once) do
-        init_course_with_students
         @quiz = seed_quiz_with_submission
+      end
+
+      before(:each) do
+        user_session(@teacher)
+        Speedgrader.visit(@course.id, @quiz.assignment_id)
       end
 
       it "page should load in acceptable time ", priority:"1" do
         page_load_time = Benchmark.measure do
           Speedgrader.visit(@course.id,@quiz.assignment_id)
-          wait_for_grade_input
+          Speedgrader.wait_for_grade_input
         end
         Rails.logger.debug "SpeedGrader for course #{@course.id} and assignment"\
                              " #{@quiz.assignment_id} loaded in #{page_load_time.real} seconds"
         expect(page_load_time.real).to be > 0.0
       end
 
-      before(:each) do
-        user_session(@teacher)
-        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@quiz.assignment_id}"
-      end
-
       it 'should display needs review alert on non-autograde questions', priority: "1", test_id: 441360 do
         in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do
-          expect(ff('#update_history_form .alert')[0]).to include_text('The following questions need review:')
+          expect(Speedgrader.quiz_alerts[0]).to include_text('The following questions need review:')
         end
       end
 
       it 'should only display needs review for file_upload and essay questions', priority: "2", test_id: 452539 do
         in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do
-          questions_to_grade = ff('#questions_needing_review li a')
-          expect(questions_to_grade[0]).to include_text('Question 2')
-          expect(questions_to_grade[1]).to include_text('Question 3')
+          expect(Speedgrader.quiz_questions_need_review[0]).to include_text('Question 2')
+          expect(Speedgrader.quiz_questions_need_review[1]).to include_text('Question 3')
         end
       end
 
       it 'should not display review warning on text only quiz questions', priority: "1", test_id: 377664 do
         in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do
-          expect(ff('#update_history_form .alert')[0]).not_to include_text('Question 4')
+          expect(Speedgrader.quiz_alerts[0]).not_to include_text('Question 4')
         end
       end
     end
 
     context 'pass/fail assignment grading' do
       before :once do
-        init_course_with_students 1
         @assignment = @course.assignments.create!(
           grading_type: 'pass_fail',
           points_possible: 0
         )
-        @assignment.grade_student(@students[0], grade: 'pass', grader: @teacher)
+        @assignment.grade_student(@students.first, grade: 'pass', grader: @teacher)
+        @assignment.grade_student(@students.second, grade: 'fail', grader: @teacher)
       end
 
       before :each do
         user_session(@teacher)
+        Speedgrader.visit(@course.id, @assignment.id)
+        Speedgrader.wait_for_grade_input
+      end
+
+      it 'complete/incomplete', priority: "1", test_id: 164014 do
+        expect(Speedgrader.grade_input).to have_value 'complete'
+        Speedgrader.click_next_student_btn
+        expect(Speedgrader.grade_input).to have_value 'incomplete'
       end
 
       it 'should allow pass grade on assignments worth 0 points', priority: "1", test_id: 400127 do
-        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
-        wait_for_grade_input
-        expect(Speedgrader.grade_input['value']).to eq('complete')
-        expect(f('#grade_container label')).to include_text('(0 / 0)')
+        expect(Speedgrader.grade_input).to have_value('complete')
+        expect(Speedgrader.points_possible_label).to include_text('(0 / 0)')
       end
 
       it 'should display pass/fail correctly when total points possible is changed', priority: "1", test_id: 419289 do
         @assignment.update_attributes(points_possible: 1)
-        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
-        wait_for_grade_input
-        expect(Speedgrader.grade_input['value']).to eq('complete')
-        expect(f('#grade_container label')).to include_text('(1 / 1)')
+        refresh_page
+        expect(Speedgrader.grade_input).to have_value('complete')
+        expect(Speedgrader.points_possible_label).to include_text('(1 / 1)')
       end
     end
 
     context 'Using a rubric' do
       before :once do
-        init_course_with_students
-        @teacher = @user
         @assignment = @course.assignments.create!(
           title: 'Rubric',
           points_possible: 20
@@ -196,30 +184,34 @@ describe 'Speedgrader' do
         rubric.reload
       end
 
-      it "properly shows the view longer description link" do
+      before :each do
         user_session(@teacher)
-        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
-        f('button.toggle_full_rubric').click
-        expect(fj('#criterion_crit1 .long_description_link:visible')).to be_present
       end
 
-      describe 'saves grades in' do
+      it "properly shows the view longer description link" do
+        Speedgrader.visit(@course.id, @assignment.id)
+
+        Speedgrader.view_rubric_button.click
+        expect(Speedgrader.view_longer_description_link).to be_displayed
+      end
+
+      context 'saves grades in' do
         before :each do
-          user_session(@teacher)
-          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
-          f('button.toggle_full_rubric').click
-          [f('#rating_rat1'), f('#rating_rat5')].each(&:click)
-          f('button.save_rubric_button').click
+          Speedgrader.visit(@course.id, @assignment.id)
+          Speedgrader.view_rubric_button.click
+          [Speedgrader.rating(1), Speedgrader.rating(5)].each(&:click)
+          Speedgrader.save_rubric_button.click
           wait_for_ajax_requests
         end
 
         it 'speedgrader', priority: "1", test_id: 164016 do
           expect(Speedgrader.grade_input).to have_value '15'
-          expect(f('#grading span.rubric_total')).to include_text '15'
+          expect(Speedgrader.rubric_total_points).to include_text '15'
         end
 
         it 'assignment page ', priority: "1", test_id: 217611 do
-          get "/courses/#{@course.id}/grades/#{@students[0].id}"
+          StudentGradesPage.visit_as_teacher(@course, @students.first)
+
           f("#submission_#{@assignment.id}  i.icon-rubric").click
 
           expect(f('#criterion_crit1 span.criterion_rating_points')).to include_text '10'
@@ -246,11 +238,7 @@ describe 'Speedgrader' do
 
     context 'rubric with points removed' do
       before :once do
-        course_with_teacher(active_all: true)
-        student_in_course(active_all: true)
         @course.root_account.enable_feature!(:non_scoring_rubrics)
-        init_course_with_students
-        @teacher = @user
         @assignment = @course.assignments.create!(
           title: 'Rubric with points removed'
         )
@@ -267,58 +255,46 @@ describe 'Speedgrader' do
 
       before :each do
         user_session(@teacher)
+        Speedgrader.visit(@course.id, @assignment.id)
+        wait_for_ajaximations
+        Speedgrader.view_rubric_button.click
+        wait_for_ajaximations
       end
-      describe 'assessing the rubric' do
-        it 'can be assessed on speedgrader' do
-          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
+
+      it 'can be viewed on speedgrader' do
+        expect(f('#rubric_holder')).to be_displayed
+      end
+
+      it 'does not show points in rating tiers' do
+        Speedgrader.rating_tiers.each do |rating|
+          expect(rating).not_to include_text('pts')
+        end
+      end
+      context 'saving rubric ratings' do
+        before :each do
+          Speedgrader.rating_by_text("Much Awesome").click
+          Speedgrader.rating_by_text("So Wow").click
+          Speedgrader.save_rubric_button.click
           wait_for_ajaximations
-          f('button.toggle_full_rubric').click
-          wait_for_ajaximations
-          expect(f('#rubric_holder')).to be_displayed
-          ratings = ff('.rating-tier')
+        end
 
-          # check that points are removed
-          ratings.each do |rating|
-            expect(rating).not_to include_text('pts')
-          end
-          fj('span:contains("Much Awesome")').click
-          fj('span:contains("So Wow")').click
+        it 'saves the correct ratings on speedgrader' do
+          expect(Speedgrader.saved_rubric_ratings.first).to be_displayed
+          expect(Speedgrader.saved_rubric_ratings.second).to be_displayed
+          expect(Speedgrader.saved_rubric_ratings.first).to include_text 'Much Awesome'
+          expect(Speedgrader.saved_rubric_ratings.first).not_to include_text 'pts'
+          expect(Speedgrader.saved_rubric_ratings.second).to include_text 'So Wow'
+          expect(Speedgrader.saved_rubric_ratings.second).not_to include_text 'pts'
+        end
 
-          # check that only selected ratings have spikes
-          spikes = ff('.triangle')
-          spikes.each_with_index do |spike, index|
-            if index == 0 || index == 4
-              expect(spike).to be_displayed
-            else
-              expect(spike).not_to be_displayed
-            end
-          end
-          find_button('Save').click
-          wait_for_ajaximations
-
-          # check that saved ratings are displayed correctly
-          ratings = ff('.rating-description')
-          spikes = ff('.triangle')
-          expect(ratings[6]).to be_displayed
-          expect(ratings[6]).to include_text('Much Awesome')
-          expect(ratings[6]).not_to include_text('pts')
-          expect(spikes[6]).to be_displayed
-
-          expect(ratings[7]).to be_displayed
-          expect(ratings[7]).to include_text('So Wow')
-          expect(ratings[7]).not_to include_text('pts')
-          expect(spikes[7]).to be_displayed
-
-          # check rubric on student grades page
-          get "/courses/#{@course.id}/grades/#{@students[0].id}"
-          wait_for_ajaximations
+        it 'saves the correct ratings on student grades page' do
+          StudentGradesPage.visit_as_teacher(@course, @students.first)
           f('.icon-rubric').click
           wait_for_ajaximations
           expect(f('.criterions')).to be_displayed
 
           ratings = ff('.rating-description')
           spikes = ff('.triangle')
-
           ratings.each do |rating|
             expect(rating).not_to include_text('pts')
           end
@@ -340,8 +316,6 @@ describe 'Speedgrader' do
 
     context 'rubric with outcomes' do
       before :once do
-        init_course_with_students
-        @teacher = @user
         @assignment = @course.assignments.create!(
           title: 'Outcome Rubric',
           points_possible: 8
@@ -359,10 +333,10 @@ describe 'Speedgrader' do
         end
 
         it 'speedgrader' do
-          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
-          f('button.toggle_full_rubric').click
-          replace_content f('.learning_outcome_criterion input.criterion_points'), '5'
-          f('button.save_rubric_button').click
+          Speedgrader.visit(@course.id, @assignment.id)
+          Speedgrader.view_rubric_button.click
+          Speedgrader.enter_rubric_points('5')
+          Speedgrader.save_rubric_button.click
           wait_for_ajax_requests
           expect_flash_message :warning
         end
@@ -381,8 +355,11 @@ describe 'Speedgrader' do
     end
 
     context 'Using a rubric to grade' do
+      before :each do
+        user_session(@teacher)
+      end
+
       it 'should display correct grades for student with proper selected ratings', priority: "1", test_id: 164205 do
-        course_with_student_logged_in(active_all: true)
         rubric = outcome_with_rubric
         @assignment = @course.assignments.create!(name: 'assignment with rubric', points_possible: 10)
         @association = rubric.associate_with(
@@ -391,7 +368,7 @@ describe 'Speedgrader' do
           purpose: 'grading',
           use_for_grading: true
         )
-        @submission = @assignment.submissions.find_by!(user: @student)
+        @submission = @assignment.submissions.find_by!(user: @students.first)
         @submission.update!(
           submission_type: "online_text_entry",
           has_rubric_assessment: true
@@ -399,7 +376,7 @@ describe 'Speedgrader' do
         criterion1 = rubric.criteria.first
         criterion2 = rubric.criteria.last
         @assessment = @association.assess(
-          user: @student,
+          user: @students.first,
           assessor: @teacher,
           artifact: @submission,
           assessment: {
@@ -408,7 +385,7 @@ describe 'Speedgrader' do
             "criterion_#{criterion2[:id]}": { points: 0 }
           }
         )
-        get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@students.first.id}"
         f('a.assess_submission_link').click
         expect(ff("#criterion_#{criterion1[:id]} .selected").length).to eq 1
         expect(f("#criterion_#{criterion1[:id]} .selected")).to include_text('3')
@@ -468,7 +445,6 @@ describe 'Speedgrader' do
 
   context 'grade by question' do
     before(:once) do
-      init_course_with_students
       @teacher.preferences[:enable_speedgrader_grade_by_question] = true
       @teacher.save!
     end
@@ -477,15 +453,14 @@ describe 'Speedgrader' do
 
     before(:each) do
       user_session(@teacher)
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{quiz.assignment_id}"
+      Speedgrader.visit(@course.id, quiz.assignment_id)
     end
 
     it 'displays question navigation bar when setting is enabled', priority: "1", test_id: 164019 do
       in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do
-        expect(f('header.quiz-header')).to include_text quiz.title
-        expect(f('#quiz-nav-inner-wrapper')).to be_displayed
-        nav = ff('.quiz-nav-li')
-        expect(nav).to have_size 24
+        expect(Speedgrader.quiz_header).to include_text quiz.title
+        expect(Speedgrader.quiz_nav).to be_displayed
+        expect(Speedgrader.quiz_nav_questions).to have_size 24
       end
     end
 
@@ -512,37 +487,32 @@ describe 'Speedgrader' do
 
     it 'updates scores', priority: "1", test_id: 164021 do
       in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do
-        list = ff('#questions .user_points input')
-        replace_content list[1], "1", tab_out: true
-        replace_content f('#fudge_points_entry'), "7", tab_out: true
+        replace_content Speedgrader.quiz_point_inputs[1], "1", tab_out: true
+        replace_content Speedgrader.quiz_fudge_points, "7", tab_out: true
 
         # after_fudge_points_total is updated, even before update button is clicked
-        expect(f('#after_fudge_points_total')).to include_text '8'
+        expect(Speedgrader.quiz_after_fudge_total).to include_text '8'
 
-        expect_new_page_load {f('button.update-scores').click}
-        expect(f('#after_fudge_points_total')).to include_text '8'
+        expect_new_page_load {Speedgrader.quiz_update_scores_button.click}
+        expect(Speedgrader.quiz_after_fudge_total).to include_text '8'
       end
     end
   end
 
   context 'Student drop-down' do
     before :once do
-      init_course_with_students 3
-      @assignment = create_assignment_with_type('letter_grade')
+      @assignment = @course.assignments.create!(title: 'My Title', grading_type: 'letter_grade', points_possible: 20)
     end
 
     before :each do
       user_session(@teacher)
       # see first student
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      Speedgrader.visit(@course.id, @assignment.id)
     end
 
     after :each do
       clear_local_storage
     end
-
-    let(:next_) {'.next'}
-    let(:previous) {'.prev'}
 
     it 'selects the first student' do
       expect(Speedgrader.selected_student).to include_text(@students[0].name)
@@ -550,28 +520,39 @@ describe 'Speedgrader' do
 
     it 'has working next and previous arrows ', priority: "1", test_id: 164018 do
       # click next to second student
-      expect(cycle_students_correctly(next_)).to be
+      Speedgrader.click_next_student_btn
+      expect(Speedgrader.selected_student).to include_text(@students[1].name)
+      expect(Speedgrader.student_x_of_x_label).to include_text "2/5"
 
       # click next to third student
-      expect(cycle_students_correctly(next_)).to be
+      Speedgrader.click_next_student_btn
+      expect(Speedgrader.selected_student).to include_text(@students[2].name)
+      expect(Speedgrader.student_x_of_x_label).to include_text "3/5"
 
-      # go back to the first student
-      expect(cycle_students_correctly(previous)).to be
+      # go back to the second student
+      Speedgrader.click_next_or_prev_student :previous
+      expect(Speedgrader.selected_student).to include_text(@students[1].name)
+      expect(Speedgrader.student_x_of_x_label).to include_text "2/5"
     end
 
     it 'arrows wrap around to start when you reach the last student', priority: "1", test_id: 272512 do
-      # click next to second student
-      expect(cycle_students_correctly(next_)).to be
-
       # click next to third student
-      expect(cycle_students_correctly(next_)).to be
+      Speedgrader.click_next_student_btn
+      Speedgrader.click_next_student_btn
+      expect(Speedgrader.selected_student).to include_text(@students[2].name)
+      expect(Speedgrader.student_x_of_x_label).to include_text "3/5"
 
       # wrap around to the first student
-      expect(cycle_students_correctly(next_)).to be
+      Speedgrader.click_next_student_btn
+      Speedgrader.click_next_student_btn
+      Speedgrader.click_next_student_btn
+      expect(Speedgrader.selected_student).to include_text(@students[0].name)
+      expect(Speedgrader.student_x_of_x_label).to include_text "1/5"
     end
 
     it 'list all students', priority: "1", test_id: 164206 do
-      validate_speedgrader_student_list(false)
+      Speedgrader.click_students_dropdown
+      (0..2).each{|num| expect(Speedgrader.student_dropdown_menu).to include_text(@students[num].name)}
     end
 
     it 'list alias when hide student name is selected', priority: "2", test_id: 164208 do
@@ -580,7 +561,8 @@ describe 'Speedgrader' do
       Speedgrader.select_hide_student_names
 
       expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
-      validate_speedgrader_student_list(true)
+      Speedgrader.click_students_dropdown
+      (1..3).each{|num| expect(Speedgrader.student_dropdown_menu).to include_text("Student #{num}")}
     end
 
     # speedgrader student dropdown shows assignment submission status symbols next to student names
@@ -590,7 +572,6 @@ describe 'Speedgrader' do
       @assignment.grade_student(@students[1], grade: 10, grader: @teacher)
 
       # resubmit only as student_2
-
       Timecop.travel(1.hour.from_now) do
         @assignment.submit_homework(
           @students[1],
@@ -599,12 +580,10 @@ describe 'Speedgrader' do
         )
 
         refresh_page
-        wait_for_ajaximations
-
         Speedgrader.click_students_dropdown
         student_options = Speedgrader.student_dropdown_menu.find_elements(tag_name:'li')
 
-        graded = ["graded","resubmitted","not_submitted"]
+        graded = ["resubmitted","graded","not_submitted"]
         (0..2).each{|num| expect(student_options[num]).to have_class(graded[num])}
       end
     end
@@ -613,15 +592,12 @@ describe 'Speedgrader' do
   context 'submissions' do
     let(:resubmit_with_text) do
       @assignment_for_course.submit_homework(
-        @student_in_course, submission_type: 'online_text_entry', body: 'hello!'
+        @students.first, submission_type: 'online_text_entry', body: 'hello!'
       )
     end
 
     # set up course, users and an assignment
     before(:once) do
-      course_with_teacher(active_all:true)
-      @student_in_course = User.create!
-      @course.enroll_student(@student_in_course, enrollment_state: 'active')
       @assignment_for_course = @course.assignments.create!(
         title: 'Assignment A',
         submission_types: 'online_text_entry,online_upload'
@@ -629,9 +605,9 @@ describe 'Speedgrader' do
     end
 
     def submit_with_attachment
-      @file_attachment = attachment_model(content_type: 'application/pdf', context: @student_in_course)
+      @file_attachment = attachment_model(content_type: 'application/pdf', context: @students.first)
       @submission_for_student = @assignment_for_course.submit_homework(
-        @student_in_course,
+        @students.first,
         submission_type: 'online_upload',
         attachments: [@file_attachment]
       )
@@ -646,14 +622,14 @@ describe 'Speedgrader' do
       submission_detail = SubmissionDetails.new
 
       # student can see the new comment
-      user_session(@student_in_course)
-      submission_detail.visit_as_student(@course.id, @assignment_for_course.id, @student_in_course.id)
+      user_session(@students.first)
+      submission_detail.visit_as_student(@course.id, @assignment_for_course.id, @students.first.id)
       expect(submission_detail.comment_text_by_id(@comment.id)).to eq @comment_text
 
       @comment.destroy
 
       # student cannot see the deleted comment
-      submission_detail.visit_as_student(@course.id, @assignment_for_course.id, @student_in_course.id)
+      submission_detail.visit_as_student(@course.id, @assignment_for_course.id, @students.first.id)
       expect(submission_detail.comment_list_div).not_to contain_css("#submission_comment_#{@comment.id}")
     end
 
@@ -678,54 +654,39 @@ describe 'Speedgrader' do
   end
 
   context 'speedgrader nav bar' do
-    # set up course, users and assignment
-    let(:test_course) { course_factory() }
-    let(:teacher)     { user_factory(active_all: true) }
-    let(:student)     { user_factory(active_all: true) }
-    let!(:enroll_teacher_and_students) do
-      test_course.enroll_user(teacher, 'TeacherEnrollment', enrollment_state: 'active')
-      test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active')
-    end
-    let!(:assignment) do
-      test_course.assignments.create!(
+    before :once do
+      @assignment = @course.assignments.create!(
         title: 'Assignment A',
         submission_types: 'online_text_entry,online_upload'
       )
     end
+    before :each do
+      user_session(@teacher)
+      Speedgrader.visit(@course.id, @assignment.id)
+    end
 
     it 'opens and closes keyboard shortcut modal via blue info icon', priority: "2", test_id: 759319 do
-      user_session(teacher)
-      get "/courses/#{test_course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
       Speedgrader.click_settings_link
       expect(Speedgrader.keyboard_shortcuts_link).to be_displayed
 
       # Open shortcut modal
       Speedgrader.click_keyboard_shortcuts_link
-      keyboard_modal = f('#keyboard_navigation')
-      expect(keyboard_modal).to be_displayed
+      expect(Speedgrader.keyboard_navigation_modal).to be_displayed
 
       # Close shortcut modal
-      f('.ui-resizable .ui-dialog-titlebar-close').click
-      expect(keyboard_modal).not_to be_displayed
+      Speedgrader.keyboard_modal_close_button.click
+      expect(Speedgrader.keyboard_navigation_modal).not_to be_displayed
     end
 
     it 'navigates to gradebook via link' do
-      user_session(teacher)
-      get "/courses/#{test_course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
-
       # make sure gradebook link works
-      expect_new_page_load do
-        f('#speed_grader_gradebook_link').click
-      end
-      expect(f('body.grades')).to be_displayed
+      expect_new_page_load {Speedgrader.gradebook_link.click}
+      expect(Gradebook::MultipleGradingPeriods.grade_grid).to be_displayed
     end
   end
 
   context "closed grading periods" do
     before(:once) do
-      course_with_teacher(active_all: true)
-      student_in_course(active_all: true)
-
       account = @course.root_account
       gpg = GradingPeriodGroup.new
       gpg.account_id = account
@@ -745,7 +706,7 @@ describe 'Speedgrader' do
     end
 
     it "disables grading" do
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      Speedgrader.visit(@course.id, @assignment.id)
       expect(f("#grade_container input")["readonly"]).to eq "true"
       expect(f("#closed_gp_notice")).to be_displayed
     end
@@ -753,8 +714,6 @@ describe 'Speedgrader' do
 
   context "mute/unmute dialogs" do
     before(:once) do
-      init_course_with_students
-
       @assignment = @course.assignments.create!(
         grading_type: 'points',
         points_possible: 10
@@ -768,7 +727,7 @@ describe 'Speedgrader' do
     it "shows dialog when attempting to mute and mutes" do
       @assignment.update_attributes(muted: false)
 
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
+      Speedgrader.visit(@course.id, @assignment.id)
       f('#mute_link').click
       expect(f('#mute_dialog').attribute('style')).not_to include('display: none')
       f('button.btn-mute').click
@@ -792,29 +751,18 @@ describe 'Speedgrader' do
 
   private
 
-  def grader_speedgrader_assignment(grade1, grade2, clear_grade=true)
-    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
+  def grader_speedgrader_assignment(grade1, grade2)
+    Speedgrader.visit(@course.id, @assignment.id)
+    Speedgrader.wait_for_grade_input
 
-    wait_for_grade_input
     expect(Speedgrader.grade_input).to have_value grade1
     Speedgrader.click_next_student_btn
     expect(Speedgrader.grade_input).to have_value grade2
-
-    clear_grade_and_validate if clear_grade
   end
 
   def create_assignment_type_and_grade(assignment_type, grade1, grade2)
     @assignment = create_assignment_with_type(assignment_type)
     @assignment.grade_student @students[0], grade: grade1, grader: @teacher
     @assignment.grade_student @students[1], grade: grade2, grader: @teacher
-  end
-
-  def validate_speedgrader_student_list(hide)
-    Speedgrader.click_students_dropdown
-    if hide
-      (1..3).each{|num| expect(Speedgrader.student_dropdown_menu).to include_text("Student #{num}")}
-    else
-      (0..2).each{|num| expect(Speedgrader.student_dropdown_menu).to include_text(@students[num].name)}
-    end
   end
 end

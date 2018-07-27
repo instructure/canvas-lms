@@ -28,6 +28,10 @@ class Speedgrader
       f('#grade_container input[type=text]').attribute('value')
     end
 
+    def points_possible_label
+      f('#grading-box-points-possible')
+    end
+
     def fraction_graded
       f("#x_of_x_graded")
     end
@@ -156,18 +160,6 @@ class Speedgrader
       f("#final-grade").text
     end
 
-    def view_rubric_button
-      fj("button:contains('View Rubric')")
-    end
-
-    def rubric_grade_input(criteria_id)
-      f("#criterion_#{criteria_id} input.criterion_points")
-    end
-
-    def save_rubric_button
-      f("button.save_rubric_button")
-    end
-
     def student_grading_status_icon(student_name)
       fj("#students_selectmenu-button:contains('#{student_name}')")
     end
@@ -267,6 +259,18 @@ class Speedgrader
 
     def comment_delete_buttons
       ff('#comments .comment .comment_flex > a.delete_comment_link')
+    end
+
+    def gradebook_link
+      f('#speed_grader_gradebook_link')
+    end
+
+    def keyboard_navigation_modal
+      f('#keyboard_navigation')
+    end
+
+    def keyboard_modal_close_button
+      f('.ui-resizable .ui-dialog-titlebar-close')
     end
 
     # action
@@ -388,6 +392,93 @@ class Speedgrader
 
     def close_saved_comment_alert
       comment_saved_alert_close_button.click
+    end
+
+    def wait_for_grade_input
+      wait = Selenium::WebDriver::Wait.new(timeout: 5)
+      wait.until { grade_input.attribute('value') != "" }
+    end
+
+    # quizzes
+    def quiz_alerts
+      ff('#update_history_form .alert')
+    end
+
+    def quiz_questions_need_review
+      ff('#questions_needing_review li a')
+    end
+
+    def quiz_header
+      f('header.quiz-header')
+    end
+
+    def quiz_nav
+      f('#quiz-nav-inner-wrapper')
+    end
+
+    def quiz_nav_questions
+      ff('.quiz-nav-li')
+    end
+
+    def quiz_point_inputs
+      ff('#questions .user_points input')
+    end
+
+    def quiz_fudge_points
+      f('#fudge_points_entry')
+    end
+
+    def quiz_after_fudge_total
+      f('#after_fudge_points_total')
+    end
+
+    def quiz_update_scores_button
+      f('button.update-scores')
+    end
+
+    # rubric
+    def view_rubric_button
+      f('button.toggle_full_rubric')
+    end
+
+    def view_longer_description_link
+      f('#criterion_crit1 .long_description_link')
+    end
+
+    def rating(rat_num)
+      f("#rating_rat#{rat_num}")
+    end
+
+    def save_rubric_button
+      f('button.save_rubric_button')
+    end
+
+    def rubric_total_points
+      f('#grading span.rubric_total')
+    end
+
+    def rating_tiers
+      ff('.rating-tier')
+    end
+
+    def rating_by_text(rating_text)
+      fj("span:contains(\"#{rating_text}\")")
+    end
+
+    def saved_rubric_ratings
+      ff('#rubric_summary_container .rating-description')
+    end
+
+    def learning_outcome_points
+      f('.learning_outcome_criterion input.criterion_points')
+    end
+
+    def enter_rubric_points(points)
+      replace_content(learning_outcome_points, points)
+    end
+
+    def rubric_grade_input(criteria_id)
+      f("#criterion_#{criteria_id} input.criterion_points")
     end
   end
 end
