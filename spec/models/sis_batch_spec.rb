@@ -85,6 +85,33 @@ describe SisBatch do
     expect(batch.parallel_importers.pluck(:importer_type)).to match_array %w(course user)
   end
 
+  it 'should create filtered versions of csvs with passwords' do
+    batch = process_csv_data([%{user_id,password,login_id,status,ssha_password
+                                user_1,supersecurepwdude,user_1,active,hunter2}])
+    expect(batch).to be_imported
+    atts = batch.downloadable_attachments
+    expect(atts.count).to eq 1
+
+    atts.first.open do |file|
+      @row = ::CSV.new(file, :headers => true).first.to_h
+    end
+    expect(@row).to eq({"user_id" => "user_1", "login_id" => "user_1", "status" => "active"})
+  end
+
+  it 'should be able to preload downloadable attachments' do
+    batch1 = process_csv_data([%{user_id,password,login_id,status,ssha_password
+                                user_1,supersecurepwdude,user_1,active,hunter2},
+                              %{course_id,short_name,long_name,term_id,status
+                                course_1,course_1,course_1,term_1,active}])
+    batch2 = @account.sis_batches.create!
+    SisBatch.load_downloadable_attachments([batch1, batch2])
+
+    expect(batch2.instance_variable_get(:@downloadable_attachments)).to eq []
+    atts = batch1.instance_variable_get(:@downloadable_attachments)
+    expect(atts.count).to eq 2
+    expect(atts.map(&:id)).to match_array(batch1.data[:downloadable_attachment_ids])
+  end
+
   it "should keep the batch in initializing state during create_with_attachment" do
     batch = SisBatch.create_with_attachment(@account, 'instructure_csv', stub_file_data('test.csv', 'abc', 'text'), user_factory) do |b|
       expect(b.attachment).not_to be_new_record

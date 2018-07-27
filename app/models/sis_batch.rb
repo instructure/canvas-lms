@@ -749,4 +749,26 @@ class SisBatch < ActiveRecord::Base
         RETURNING t.id
     SQL
   end
+
+  attr_writer :downloadable_attachments
+  def self.load_downloadable_attachments(batches)
+    batches = Array(batches)
+    all_ids = batches.map{|sb| sb.data&.dig(:downloadable_attachment_ids) || []}.flatten
+    all_attachments = all_ids.any? ? Attachment.where(:context_type => self.name, :context_id => batches, :id => all_ids).to_a.group_by(&:context_id) : {}
+    batches.each do |b|
+      b.downloadable_attachments = all_attachments[b.id] || []
+    end
+  end
+
+  def downloadable_attachments
+    @downloadable_attachments ||=
+      begin
+        ids = data[:downloadable_attachment_ids]
+        if ids.present?
+          self.shard.activate { Attachment.where(:id => ids).polymorphic_where(:context => self).to_a }
+        else
+          []
+        end
+      end
+  end
 end
