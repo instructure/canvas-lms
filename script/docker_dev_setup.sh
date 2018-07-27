@@ -41,7 +41,7 @@ if [[ $OS == 'Darwin' ]]; then
   dependencies='docker docker-machine docker-compose dinghy'
 elif [[ $OS == 'Linux' ]]; then
   install='sudo apt-get update && sudo apt-get install -y'
-  dependencies='docker.io docker-compose'
+  dependencies='docker-compose'
 else
   echo 'This script only supports MacOS and Linux :('
   exit 1
