@@ -132,6 +132,8 @@ gem 'academic_benchmarks', '0.0.10', require: false
 gem 'graphql', '1.8.3'
 gem 'graphql-batch', '0.3.9'
 
+gem 'prawn-rails', '1.2.0'
+
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'
 gem 'acts_as_list', path: 'gems/acts_as_list'
 gem 'adheres_to_policy', path: 'gems/adheres_to_policy'

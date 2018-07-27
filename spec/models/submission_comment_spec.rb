@@ -16,25 +16,39 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require_relative '../spec_helper'
 
-describe SubmissionComment do
+RSpec.describe SubmissionComment do
   before(:once) do
-    course_with_teacher(:active_all => true)
-    course_with_observer(:active_all => true)
-    student_in_course(:active_all => true)
-    @assignment = @course.assignments.new(:title => "some assignment")
-    @assignment.workflow_state = "published"
+    course_with_teacher(active_all: true)
+    course_with_observer(active_all: true)
+    student_in_course(active_all: true)
+    @assignment = @course.assignments.build
+    @assignment.workflow_state = :published
     @assignment.save!
     @submission = @assignment.submit_homework(@user)
-    @valid_attributes = {
-      :submission => @submission,
-      :comment => "some comment"
-    }
   end
 
-  it "should create a new instance given valid attributes" do
-    expect { SubmissionComment.create!(@valid_attributes) }.not_to raise_error
+  let(:valid_attributes) {{ comment: "some comment" }}
+
+  it "creates a new instance given valid attributes" do
+    expect(@submission.submission_comments.create!(valid_attributes)).to be_persisted
+  end
+
+  describe '#body' do
+    it 'aliases comment' do
+      submission_comment = SubmissionComment.new(comment: 'a body')
+      expect(submission_comment.body).to eq submission_comment.comment
+    end
+  end
+
+  describe '#body=' do
+    it 'aliases comment=' do
+      text = 'a body'
+      submission_comment = SubmissionComment.new
+      submission_comment.body = text
+      expect(submission_comment.comment).to eq text
+    end
   end
 
   describe 'notifications' do
@@ -42,8 +56,8 @@ describe SubmissionComment do
       @student_ended = user_model
       @section_ended = @course.course_sections.create!(end_at: Time.zone.now - 1.day)
 
-      Notification.create(:name => 'Submission Comment', category: 'TestImmediately')
-      Notification.create(:name => 'Submission Comment For Teacher')
+      Notification.create!(:name => 'Submission Comment', category: 'TestImmediately')
+      Notification.create!(:name => 'Submission Comment For Teacher')
     end
 
     it "dispatches notifications on create for published assignment" do
@@ -113,7 +127,7 @@ describe SubmissionComment do
 
   it "should allow valid attachments" do
     a = Attachment.create!(:context => @assignment, :uploaded_data => default_uploaded_data)
-    @comment = SubmissionComment.create!(@valid_attributes)
+    @comment = @submission.submission_comments.create!(valid_attributes)
     expect(a.recently_created).to eql(true)
     @comment.reload
     @comment.update_attributes(:attachments => [a])
@@ -123,13 +137,13 @@ describe SubmissionComment do
   it "should reject invalid attachments" do
     a = Attachment.create!(:context => @assignment, :uploaded_data => default_uploaded_data)
     a.recently_created = false
-    @comment = SubmissionComment.create!(@valid_attributes)
+    @comment = @submission.submission_comments.create!(valid_attributes)
     @comment.update_attributes(:attachments => [a])
     expect(@comment.attachment_ids).to eql("")
   end
 
   it "should render formatted_body correctly" do
-    @comment = SubmissionComment.create!(@valid_attributes)
+    @comment = @submission.submission_comments.create!(valid_attributes)
     @comment.comment = %{
 This text has a http://www.google.com link in it...
 
@@ -292,7 +306,7 @@ This text has a http://www.google.com link in it...
   describe "read/unread state" do
     it "should be unread after submission is commented on by teacher" do
       expect {
-        @comment = SubmissionComment.create!(@valid_attributes.merge({:author => @teacher}))
+        @comment = @submission.submission_comments.create!(valid_attributes.merge({author: @teacher}))
       }.to change(ContentParticipation, :count).by(1)
       expect(ContentParticipation.where(user_id: @student).first).to be_unread
       expect(@submission.unread?(@student)).to be_truthy
@@ -300,7 +314,7 @@ This text has a http://www.google.com link in it...
 
     it "should be read after submission is commented on by self" do
       expect {
-        @comment = SubmissionComment.create!(@valid_attributes.merge({:author => @student}))
+        @comment = @submission.submission_comments.create!(valid_attributes.merge({author: @student}))
       }.to change(ContentParticipation, :count).by(0)
       expect(@submission.read?(@student)).to be_truthy
     end
@@ -410,9 +424,9 @@ This text has a http://www.google.com link in it...
 
   describe 'scope: draft' do
     before(:once) do
-      @standard_comment = SubmissionComment.create!(@valid_attributes)
-      @published_comment = SubmissionComment.create!(@valid_attributes.merge({ draft: false }))
-      @draft_comment = SubmissionComment.create!(@valid_attributes.merge({ draft: true }))
+      @standard_comment = @submission.submission_comments.create!(valid_attributes)
+      @published_comment = @submission.submission_comments.create!(valid_attributes.merge({ draft: false }))
+      @draft_comment = @submission.submission_comments.create!(valid_attributes.merge({ draft: true }))
     end
 
     it 'returns the draft comment' do
@@ -430,8 +444,8 @@ This text has a http://www.google.com link in it...
 
   describe 'scope: published' do
     before(:once) do
-      @published_comment = SubmissionComment.create!(@valid_attributes.merge({ draft: false }))
-      @draft_comment = SubmissionComment.create!(@valid_attributes.merge({ draft: true }))
+      @published_comment = @submission.submission_comments.create!(valid_attributes.merge({draft: false}))
+      @draft_comment = @submission.submission_comments.create!(valid_attributes.merge({draft: true}))
     end
 
     it 'does not return the draft comment' do
@@ -449,7 +463,10 @@ This text has a http://www.google.com link in it...
         course_with_user('TeacherEnrollment', course: @course)
         @second_teacher = @user
 
-        @submission_comment = SubmissionComment.create!(@valid_attributes.merge({ draft: true, author: @teacher }))
+        @submission_comment = @submission.submission_comments.create!(valid_attributes.merge({
+          draft: true,
+          author: @teacher
+        }))
       end
 
       it 'can be updated by the teacher who created it' do
@@ -471,8 +488,11 @@ This text has a http://www.google.com link in it...
   describe '#update_submission' do
     context 'draft comment' do
       before(:once) do
-        SubmissionComment.create!(@valid_attributes)
-        @submission_comment = SubmissionComment.create!(@valid_attributes.merge({ draft: true, author: @teacher }))
+        @submission.submission_comments.create!(valid_attributes)
+        @submission_comment = @submission.submission_comments.create!(valid_attributes.merge({
+          draft: true,
+          author: @teacher
+        }))
       end
 
       it "is not reflected in the submission's submission_comments_count" do
@@ -492,7 +512,7 @@ This text has a http://www.google.com link in it...
 
   describe "#edited_at" do
     before(:once) do
-      @comment = SubmissionComment.create!(@valid_attributes)
+      @comment = @submission.submission_comments.create!(valid_attributes)
     end
 
     it "is nil for newly-created submission comments" do

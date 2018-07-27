@@ -132,7 +132,7 @@ describe "help dialog" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       wait_for_ajaximations
 
-      settings_menu = f('#speedgrader-settings')
+      settings_menu = f('#speed_grader_settings_mount_point')
       settings_menu.click
 
       trigger = f('ul[role=menu] span[name=help][role=menuitem]')

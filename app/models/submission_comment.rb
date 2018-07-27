@@ -20,7 +20,9 @@ class SubmissionComment < ActiveRecord::Base
   include SendToStream
   include HtmlTextHelper
 
-  belongs_to :submission #, :touch => true
+  alias_attribute :body, :comment
+
+  belongs_to :submission
   belongs_to :author, :class_name => 'User'
   belongs_to :assessment_request
   belongs_to :context, polymorphic: [:course]

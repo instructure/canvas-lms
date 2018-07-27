@@ -410,7 +410,7 @@ class Submission < ActiveRecord::Base
       self.assignment.published? &&
         self.assignment.context.grants_right?(user, session, :manage_grades)
     end
-    can :read and can :comment and can :make_group_comment and can :read_grade
+    can :read and can :comment and can :make_group_comment and can :read_grade and can :read_comments
 
     given do |user, _session|
       can_grade?(user)

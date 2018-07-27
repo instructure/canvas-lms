@@ -627,7 +627,7 @@ class ApplicationController < ActionController::Base
       path_params[:format] = nil
       @headers = !!@current_user if @headers != false
       @files_domain = @account_domain && @account_domain.host_type == 'files'
-      format.html {
+      format.any(:html, :pdf) do
         return unless fix_ms_office_redirects
         store_location
         return redirect_to login_url(params.permit(:authentication_provider)) if !@files_domain && !@current_user
@@ -645,8 +645,8 @@ class ApplicationController < ActionController::Base
           end
         end
 
-        render "shared/unauthorized", status: :unauthorized
-      }
+        render "shared/unauthorized", status: :unauthorized, content_type: Mime::Type.lookup('text/html'), formats: :html
+      end
       format.zip { redirect_to(url_for(path_params)) }
       format.json { render_json_unauthorized }
       format.all { render plain: 'Unauthorized', status: :unauthorized }
@@ -1311,7 +1311,7 @@ class ApplicationController < ActionController::Base
   def render_optional_error_file(status)
     path = "#{Rails.public_path}/#{status.to_s[0,3]}"
     if File.exist?(path)
-      render :file => path, :status => status, :content_type => Mime::HTML, :layout => false, :formats => [:html]
+      render :file => path, :status => status, :content_type => Mime::Type.lookup('text/html'), :layout => false, :formats => [:html]
     else
       head status
     end
@@ -1837,9 +1837,7 @@ class ApplicationController < ActionController::Base
             redirect_to_login
           end
         end
-        format.json do
-          render_json_unauthorized
-        end
+        format.json { render_json_unauthorized }
       end
       return false
     end

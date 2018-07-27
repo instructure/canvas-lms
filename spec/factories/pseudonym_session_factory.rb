@@ -45,6 +45,7 @@ module Factories
       next original.call unless @session_stubbed
       session
     end
+    session
   end
 
   def remove_user_session

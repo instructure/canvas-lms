@@ -57,7 +57,7 @@ class Speedgrader
     end
 
     def settings_link
-      f('#speedgrader-settings button')
+      f('#speed_grader_settings_mount_point button')
     end
 
     def options_link
@@ -109,7 +109,7 @@ class Speedgrader
     end
 
     def new_comment_text_area
-      f('#speedgrader_comment_textarea')
+      f('#speed_grader_comment_textarea')
     end
 
     def comment_submit_button

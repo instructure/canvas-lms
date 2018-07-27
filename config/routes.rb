@@ -26,6 +26,9 @@ CanvasRails::Application.routes.draw do
   post "/api/graphql", to: "graphql#execute"
   get 'graphiql', to: 'graphql#graphiql'
 
+  resources :submissions, only: [] do
+    resources :submission_comments, path: :comments, only: :index, defaults: { format: :pdf }
+  end
   resources :submission_comments, only: [:update, :destroy]
 
   resources :epub_exports, only: [:index]

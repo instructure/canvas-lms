@@ -66,7 +66,7 @@ describe "speed grader" do
     it "should alert the teacher before leaving the page if comments are not saved", priority: "1", test_id: 283736 do
       student_in_course(active_user: true).user
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      comment_textarea = f("#speedgrader_comment_textarea")
+      comment_textarea = f("#speed_grader_comment_textarea")
       replace_content(comment_textarea, "oh no i forgot to save this comment!")
       # navigate away
       driver.navigate.refresh
@@ -135,7 +135,7 @@ describe "speed grader" do
     replace_content f('#grading-box-extended'), "5", tab_out: true
     expect { @submission.reload.score }.to become 5
 
-    f('#speedgrader_comment_textarea').send_keys('srsly')
+    f('#speed_grader_comment_textarea').send_keys('srsly')
     f('#add_a_comment button[type="submit"]').click
     expect { @submission.submission_comments.where(comment: 'srsly').any? }.to become(true)
     # doesn't get inserted into the menu

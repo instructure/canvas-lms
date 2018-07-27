@@ -15,16 +15,50 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path('../spec_helper', File.dirname(__FILE__))
+require_relative '../spec_helper'
 
-
+# FIXME: these tests should all exist in a controller test,
+# since that's the context required to run any of them
 describe AuthenticationMethods do
+  class MockController
+    include Canvas::RequestForgeryProtection
+    include AuthenticationMethods
+
+    attr_reader :redirects, :params, :session, :request
+
+    def initialize(root_account, req, params_hash = {})
+      @domain_root_account = root_account
+      @request = req
+      @redirects = []
+      @params = params_hash
+      reset_session
+    end
+
+    def reset_session
+      @session = {}
+    end
+
+    def redirect_to(url)
+      @redirects << url
+    end
+
+    def cas_login_url; ''; end
+
+    def zendesk_delegated_auth_pass_through_url(options)
+      options[:target]
+    end
+
+    def cookies
+      @cookies ||= {}
+    end
+  end
+
   describe "#load_user" do
     before do
       @request = double(:env => {'encrypted_cookie_store.session_refreshed_at' => 5.minutes.ago},
                       :format =>double(:json? => false),
                       :host_with_port => "")
-      @controller = RSpec::MockController.new(nil, @request)
+      @controller = MockController.new(nil, @request)
       allow(@controller).to receive(:load_pseudonym_from_access_token)
       allow(@controller).to receive(:api_request?).and_return(false)
       allow(@controller).to receive(:logger).and_return(double(info: nil))
@@ -72,7 +106,7 @@ describe AuthenticationMethods do
   describe "#masked_authenticity_token" do
     before do
       @request = double(host_with_port: "")
-      @controller = RSpec::MockController.new(nil, @request)
+      @controller = MockController.new(nil, @request)
       @session_options = {}
       expect(CanvasRails::Application.config).to receive(:session_options).at_least(:once).and_return(@session_options)
     end
@@ -112,12 +146,11 @@ describe AuthenticationMethods do
   end
 
   describe "#access_token_account" do
-
     let(:account) {Account.create!}
     let(:dev_key) {DeveloperKey.create!(account: account)}
     let(:access_token) {AccessToken.create!(developer_key: dev_key)}
     let(:request) {double(format: double(:json? => false), host_with_port:"")}
-    let(:controller) {RSpec::MockController.new(account, request)}
+    let(:controller) {MockController.new(account, request)}
 
     it "doesn't call '#get_context' if the Dev key is owned by the domain root account" do
       expect(controller).not_to receive(:get_context)
@@ -157,41 +190,5 @@ describe AuthenticationMethods do
       allow(controller).to receive(:get_context)
       expect(controller.access_token_account(account, access_token)).to be(account)
     end
-
-  end
-
-end
-
-class RSpec::MockController
-  include Canvas::RequestForgeryProtection
-  include AuthenticationMethods
-
-  attr_reader :redirects, :params, :session, :request
-
-  def initialize(root_account, req, params_hash = {})
-    @domain_root_account = root_account
-    @request = req
-    @redirects = []
-    @params = params_hash
-    reset_session
-  end
-
-  def reset_session
-    @session = {}
-  end
-
-  def redirect_to(url)
-    @redirects << url
-  end
-
-  def cas_login_url; ''; end
-
-  def zendesk_delegated_auth_pass_through_url(options)
-    options[:target]
-  end
-
-  def cookies
-    @cookies ||= {}
   end
 end
-

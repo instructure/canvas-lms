@@ -76,7 +76,9 @@ import './jquery.disableWhileLoading';
 import 'compiled/jquery/fixDialogButtons';
 
 const selectors = new JQuerySelectorCache();
-const SPEEDGRADER_COMMENT_TEXTAREA_MOUNT_POINT = 'speedgrader_comment_textarea_mount_point';
+const SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT = 'speed_grader_comment_textarea_mount_point';
+const SPEED_GRADER_SUBMISSION_COMMENTS_DOWNLOAD_MOUNT_POINT = 'speed_grader_submission_comments_download_mount_point';
+const SPEED_GRADER_SETTINGS_MOUNT_POINT = 'speed_grader_settings_mount_point';
 
 let isAnonymous
 let anonymizableId
@@ -605,7 +607,7 @@ function setupHeader () {
 }
 
 function unmountCommentTextArea () {
-  const node = document.getElementById(SPEEDGRADER_COMMENT_TEXTAREA_MOUNT_POINT);
+  const node = document.getElementById(SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT);
   ReactDOM.unmountComponentAtNode(node);
 }
 
@@ -619,7 +621,7 @@ function renderCommentTextArea () {
 
   const textAreaProps = {
     height: '4rem',
-    id: 'speedgrader_comment_textarea',
+    id: 'speed_grader_comment_textarea',
     label: React.createElement(ScreenReaderContent, null, I18n.t('Add a Comment')),
     placeholder: I18n.t('Add a Comment'),
     resize: 'vertical',
@@ -628,7 +630,7 @@ function renderCommentTextArea () {
 
   ReactDOM.render(
     React.createElement(TextArea, textAreaProps),
-    document.getElementById(SPEEDGRADER_COMMENT_TEXTAREA_MOUNT_POINT)
+    document.getElementById(SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT)
   );
 }
 
@@ -994,6 +996,17 @@ function rubricAssessmentToPopulate () {
   }
 
   return assessment;
+}
+
+function renderSubmissionCommentsDownloadLink(submission) {
+  const mountPoint = document.getElementById(SPEED_GRADER_SUBMISSION_COMMENTS_DOWNLOAD_MOUNT_POINT);
+  if (isAnonymous) {
+    mountPoint.innerHTML = '';
+  } else {
+    mountPoint.innerHTML =
+      `<a href="/submissions/${htmlEscape(submission.id)}/comments.pdf" target="_blank">${htmlEscape(I18n.t('Download Submission Comments'))}</a>`;
+  }
+  return mountPoint;
 }
 
 // Public Variables and Methods
@@ -1760,6 +1773,7 @@ EG = {
 
     // load up a preview of one of the attachments if we can.
     this.loadSubmissionPreview(preview_attachment, submission);
+    renderSubmissionCommentsDownloadLink(submission);
 
     // if there is any submissions after this one, show a notice that they are not looking at the newest
     $submission_not_newest_notice.showIf($submission_to_view.filter(":visible").find(":selected").nextAll().length);
@@ -1982,6 +1996,7 @@ EG = {
 
   //load in the iframe preview.  if we are viewing a past version of the file pass the version to preview in the url
   renderSubmissionPreview (domElement = 'iframe') {
+    // TODO: this is duplicate code from line 1972 and should be removed
     if (!this.currentStudent.submission) {
       $this_student_does_not_have_a_submission.show();
       return
@@ -3047,7 +3062,7 @@ function setupSelectors() {
   // so that the jquery selector does not have to be run every time.
   $add_a_comment = $('#add_a_comment')
   $add_a_comment_submit_button = $add_a_comment.find('button:submit')
-  $add_a_comment_textarea = $(`#${SPEEDGRADER_COMMENT_TEXTAREA_MOUNT_POINT}`)
+  $add_a_comment_textarea = $(`#${SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT}`)
   $add_attachment = $('#add_attachment')
   $assignment_submission_originality_report_url = $('#assignment_submission_originality_report_url')
   $assignment_submission_resubmit_to_vericite_url = $('#assignment_submission_resubmit_to_vericite_url')
@@ -3146,7 +3161,7 @@ function renderSettingsMenu () {
   }
 
   const settingsMenu = <SpeedGraderSettingsMenu {...props} />
-  ReactDOM.render(settingsMenu, document.getElementById('speedgrader-settings'))
+  ReactDOM.render(settingsMenu, document.getElementById(SPEED_GRADER_SETTINGS_MOUNT_POINT))
 }
 
 // Helper function that guard against provisional_grades being null, allowing

@@ -43,7 +43,7 @@ export function setupAnonymizableAuthorId (isAnonymous) {
 }
 
 
-  const speedgraderHelpers = {
+  const speedGraderHelpers = {
     urlContainer: function(submission, defaultEl, originalityReportEl) {
       if (submission.has_originality_report) {
         return originalityReportEl
@@ -94,7 +94,7 @@ export function setupAnonymizableAuthorId (isAnonymous) {
     },
 
     setRightBarDisabled: function(isDisabled){
-      var elements = ['#grading-box-extended', '#speedgrader_comment_textarea', '#add_attachment',
+      var elements = ['#grading-box-extended', '#speed_grader_comment_textarea', '#add_attachment',
                       '#media_comment_button', '#comment_submit_button',
                       '#speech_recognition_button'];
 
@@ -161,7 +161,7 @@ export function setupAnonymizableAuthorId (isAnonymous) {
 
       $(event.target).attr('disabled', true).text(I18n.t('turnitin.resubmitting', 'Resubmitting...'));
       $.ajaxJSON(resubmitUrl, "POST", params, () => {
-        speedgraderHelpers.reloadPage();
+        speedGraderHelpers.reloadPage();
       });
     },
 
@@ -180,4 +180,4 @@ export function setupAnonymizableAuthorId (isAnonymous) {
     setupAnonymizableAuthorId
   }
 
-export default speedgraderHelpers
+export default speedGraderHelpers

@@ -122,6 +122,21 @@ describe LoginController do
                             controller.url_for(controller: 'login/canvas', action: :new)+'?pseudonym_session%5Bunique_id%5D=test')
     end
 
+    context 'given an html request' do
+      before { get :new, format: :html }
+
+      it 'response with an html content type' do
+        expect(response.headers.fetch('Content-Type')).to match(/\Atext\/html/)
+      end
+    end
+
+    context 'given a pdf request' do
+      before { get :new, format: :pdf }
+
+      it 'response with an html content type' do
+        expect(response.headers.fetch('Content-Type')).to match(/\Atext\/html/)
+      end
+    end
   end
 
   describe "#logout" do
