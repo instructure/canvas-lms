@@ -171,10 +171,11 @@ module AuthenticationMethods
       end
       @current_user = @current_pseudonym && @current_pseudonym.user
 
-      if @current_user
+      sis_id = @current_user && @current_user.pseudonym && @current_user.pseudonym.sis_user_id
+      if sis_id
         begin
           lock_out = HTTParty.get(
-            "https://flms.flipswitch.com/AttendanceTwo/IsLockedOut?schoolId=17&studentId=#{@current_user.id}",
+            "https://flms.flipswitch.com/AttendanceTwo/IsLockedOut?schoolId=17&studentId=#{sis_id}",
             headers: {"CanvasAuth" => "98454055-2148-4F9B-A170-FD61562998CE"}
           ).body == 'true'
 
