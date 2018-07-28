@@ -12077,7 +12077,7 @@ da-x-k12:
       name: SIS-import
     sis_import_settings: 
       labels: 
-        minimum_rows_for_parallel: "Min. rækker i en SIS-rapport inden brug af parallel behandling"
+        minimum_rows_for_parallel: "Min. rækker i en SIS-import inden brug af parallel behandling"
         parallelism: "Antal jobprocessorer som bruges til at behandle SIS-importer i parallel"
         queue_for_parallel_jobs: "Jobkø som bruges til parallelle jobs (tom for standard)"
     ticketing_system_settings: 
