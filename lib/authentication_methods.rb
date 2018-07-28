@@ -114,6 +114,7 @@ module AuthenticationMethods
   end
 
   def load_user
+
     @current_user = @current_pseudonym = nil
 
     masked_authenticity_token # ensure that the cookie is set
@@ -169,6 +170,20 @@ module AuthenticationMethods
         return redirect_to(login_url(:needs_cookies => '1'))
       end
       @current_user = @current_pseudonym && @current_pseudonym.user
+
+      if @current_user
+        begin
+          lock_out = HTTParty.get(
+            "https://flms.flipswitch.com/AttendanceTwo/IsLockedOut?schoolId=17&studentId=#{@current_user.id}",
+            headers: {"CanvasAuth" => "98454055-2148-4F9B-A170-FD61562998CE"}
+          ).body == 'true'
+
+          redirect_to('https://flms.flipswitch.com') if lock_out
+        rescue
+        end
+      end
+
+      @current_user
     end
 
     if @current_user && @current_user.unavailable?
