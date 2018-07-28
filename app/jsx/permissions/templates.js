@@ -2557,7 +2557,7 @@ Allows user to view Login IDs in a course People page.`)
   [
     {
       title: I18n.t('People (Account/Course)'),
-      description: I18n.t(`To access the People page, Users - view list must be enabled. If this permission is enabled, and if Users - view primary email address is disabled, users will see email addresses used as login IDs.`)
+      description: I18n.t(`To access the People page, Users - view list must be enabled. If this permission is enabled, and if Users - view primary email address is disabled, users will see email addresses used as login IDs. To view login IDs, Users - add / remove students in courses and Users - add / remove teachers, course designers, or TAs in courses must also be enabled.`)
     }
   ],
   [
@@ -2569,7 +2569,7 @@ Allows user to view Login IDs in a course People page.`)
   [
     {
       title: I18n.t('People'),
-      description: I18n.t(`To access the People page, Users - view list must be enabled. If this permission is enabled, and if Users - view primary email address is disabled, users will see email addresses used as login IDs.`)
+      description: I18n.t(`To access the People page, Users - view list must be enabled. If this permission is enabled, and if Users - view primary email address is disabled, users will see email addresses used as login IDs. To view login IDs, Users - add / remove students in courses and Users - add / remove teachers, course designers, or TAs in courses must also be enabled.`)
     }
   ]
 )
