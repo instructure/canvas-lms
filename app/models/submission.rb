@@ -24,6 +24,7 @@ class Submission < ActiveRecord::Base
   include CustomValidations
   include SendToStream
   include Workflow
+  include PlannerHelper
 
   GRADE_STATUS_MESSAGES_MAP = {
     success: {
@@ -346,9 +347,22 @@ class Submission < ActiveRecord::Base
 
   after_create :needs_grading_count_updated, if: :needs_grading?
   after_update :needs_grading_count_updated, if: :needs_grading_changed?
+  after_update :update_planner_override
   def needs_grading_count_updated
     self.class.connection.after_transaction_commit do
       touch_assignments
+    end
+  end
+
+  def update_planner_override
+    return unless self.saved_change_to_workflow_state?
+    if self.submission_type == "online_quiz" && self.workflow_state == "graded"
+      # unless it's an auto-graded quiz
+      return unless self.workflow_state_before_last_save == "unsubmitted"
+      complete_planner_override_for_submission(self)
+    else
+      return unless self.workflow_state == "submitted"
+      complete_planner_override_for_submission(self)
     end
   end
 
