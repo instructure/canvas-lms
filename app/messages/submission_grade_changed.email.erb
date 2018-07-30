@@ -8,7 +8,11 @@
   <%= t :subject, "Grade Changed: %{assignment}, %{context}", :assignment => asset.assignment.title, :context => asset.assignment.context.name %>
 <% end %>
 
-<%= t :body, "The grade on your assignment, %{assignment_title} has been changed.", :assignment_title => asset.assignment.title %>
+<% if send_student_names(asset, user) %>
+<%= t "The grade on assignment %{assignment_title} has been changed for %{name}.", :assignment_title => asset.assignment.title, name: asset.user.name %>
+<% else %>
+<%= t :body, "The grade on your assignment %{assignment_title} has been changed.", :assignment_title => asset.assignment.title %>
+<% end %>
 
 <%= t :regraded_date, "re-graded: %{date}", :date => (datetime_string(force_zone(asset.graded_at)) rescue t(:no_date_set, "No Date Set")) %>
 <% if user.try(:send_scores_in_emails?, asset.assignment.context.root_account) %>

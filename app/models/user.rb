@@ -1460,6 +1460,10 @@ class User < ActiveRecord::Base
     preferences[:send_scores_in_emails] == true && root_account.settings[:allow_sending_scores_in_emails] != false
   end
 
+  def send_observed_names_in_notifications?
+    preferences[:send_observed_names_in_notifications] == true
+  end
+
   def close_announcement(announcement)
     preferences[:closed_notifications] ||= []
     # serialize ids relative to the user

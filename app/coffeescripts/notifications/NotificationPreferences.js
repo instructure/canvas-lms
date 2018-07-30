@@ -69,6 +69,7 @@ export default class NotificationPreferences {
     this.channels = this.options.channels || []
     this.categories = this.options.categories || []
     this.policies = this.options.policies || []
+    this.showObservedNames = this.options.show_observed_names
 
     // Give each channel a 'name'
     this.channels.forEach((c) => {
@@ -172,6 +173,12 @@ export default class NotificationPreferences {
       channels: this.channels,
       eventGroups,
       buttonData: this.buttonData,
+      showObservedNames: {
+        available: this.showObservedNames != null,
+        name: 'send_observed_names_in_notifications',
+        on: this.showObservedNames,
+        label: I18n.t('Show name of observed students in notifications.'),
+      }
     }))
 
     // Display Bootstrap-like popover tooltip on category names. Allow entire cell to trigger popup.
@@ -226,7 +233,7 @@ export default class NotificationPreferences {
     $notificationPrefs.find('.user-pref-check').on('change', (e) => {
       const check = $(e.currentTarget)
       const checkStatus = check.attr('checked') === 'checked'
-      // Send user prefernce value to server
+      // Send user preference value to server
       const data = {user: {}}
       data.user[check.attr('name')] = checkStatus
       this.$notificationSaveStatus.disableWhileLoading($.ajaxJSON(this.updateUrl, 'PUT', data, null, () =>
