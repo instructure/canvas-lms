@@ -127,6 +127,7 @@ export class DiscussionRow extends Component {
     draggable: bool,
     duplicateDiscussion: func.isRequired,
     isDragging: bool,
+    isMasterCourse: bool.isRequired,
     masterCourseData: masterCourseDataShape,
     moveCard: func, // eslint-disable-line
     onMoveDiscussion: func,
@@ -448,8 +449,9 @@ export class DiscussionRow extends Component {
   }
 
   renderSectionsTooltip = () => {
+
     if (this.props.contextType === "group" || this.props.discussion.assignment ||
-      this.props.discussion.group_category_id) {
+      this.props.discussion.group_category_id || this.props.isMasterCourse) {
       return null
     }
 
@@ -739,6 +741,10 @@ const mapDispatch = (dispatch) => {
 const mapState = (state, ownProps) => {
   const { discussion } = ownProps
   const cyoe = CyoeHelper.getItemData(discussion.assignment_id)
+  let masterCourse = true
+  if(!state.masterCourseData || !state.masterCourseData.isMasterCourse) {
+    masterCourse = false
+  }
   const shouldShowMasteryPathsPill = cyoe.isReleased && cyoe.releasedLabel &&
     (cyoe.releasedLabel !== "") && discussion.permissions.update
   const propsFromState = {
@@ -755,6 +761,7 @@ const mapState = (state, ownProps) => {
     displayManageMenu: discussion.permissions.delete,
     displayPinMenuItem: state.permissions.moderate,
     masterCourseData: state.masterCourseData,
+    isMasterCourse: masterCourse
   }
   return Object.assign({}, ownProps, propsFromState)
 }

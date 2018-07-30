@@ -275,13 +275,20 @@ test('does not render the SectionsTooltip component on a group discussion', () =
   notOk(node.exists())
 })
 
-test('does not renders the SectionsTooltip component within a group context', () => {
+test('does not render the SectionsTooltip component within a group context', () => {
   const discussion = { user_count: 200 }
   const tree = mount(<DiscussionRow {...makeProps({ discussion, contextType: "group" })} />)
   const node = tree.find('SectionsTooltip')
   notOk(node.exists())
   tree.unmount()
+})
 
+test('does not render the SectionsTooltip component in a blueprint course', () => {
+  const discussion = { user_count: 200 }
+  const tree = mount(<DiscussionRow {...makeProps({ discussion, isMasterCourse: true})} />)
+  const node = tree.find('SectionsTooltip')
+  notOk(node.exists())
+  tree.unmount()
 })
 
 test('does not render master course lock icon if masterCourseData is not provided', (assert) => {
