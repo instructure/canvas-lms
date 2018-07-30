@@ -262,6 +262,7 @@ class GradebookExporter
     includes = {:user => {:pseudonyms => :account}, :course_section => [], :scores => []}
 
     enrollments = scope.preload(includes).eager_load(:user).order_by_sortable_name.to_a
+    enrollments.each { |e| e.course = @course }
     enrollments.partition { |e| e.type != "StudentViewEnrollment" }.flatten
   end
 

@@ -19,7 +19,7 @@
 class Score < ActiveRecord::Base
   include Canvas::SoftDeletable
 
-  belongs_to :enrollment
+  belongs_to :enrollment, inverse_of: :scores
   belongs_to :grading_period, optional: true
   belongs_to :assignment_group, optional: true
   has_one :course, through: :enrollment
