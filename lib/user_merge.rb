@@ -331,11 +331,11 @@ class UserMerge
 
       ContextModuleProgression.
         where(context_module_id: cmp.context_module_id, user_id: [from_user, target_user]).
-        order("CASE WHEN workflow_state = 'completed' THEN 0
-                    WHEN workflow_state = 'started' THEN 1
-                    WHEN workflow_state = 'unlocked' THEN 2
-                    WHEN workflow_state = 'locked' THEN 3
-                END DESC").first.destroy
+        order(Arel.sql("CASE WHEN workflow_state = 'completed' THEN 0
+                       WHEN workflow_state = 'started' THEN 1
+                       WHEN workflow_state = 'unlocked' THEN 2
+                       WHEN workflow_state = 'locked' THEN 3
+                       END DESC")).first.destroy
     end
   end
 
