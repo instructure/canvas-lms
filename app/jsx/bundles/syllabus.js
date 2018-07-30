@@ -22,6 +22,7 @@ import SyllabusBehaviors from 'compiled/behaviors/SyllabusBehaviors'
 import SyllabusCollection from 'compiled/collections/SyllabusCollection'
 import SyllabusCalendarEventsCollection from 'compiled/collections/SyllabusCalendarEventsCollection'
 import SyllabusAppointmentGroupsCollection from 'compiled/collections/SyllabusAppointmentGroupsCollection'
+import SyllabusPlannerCollection from '../../coffeescripts/collections/SyllabusPlannerCollection'
 import SyllabusView from 'compiled/views/courses/SyllabusView'
 
 // Setup the collections
@@ -34,6 +35,12 @@ const collections = [
 if (ENV.current_user_id) {
   collections.push(new SyllabusAppointmentGroupsCollection([ENV.context_asset_string], 'reservable'))
   collections.push(new SyllabusAppointmentGroupsCollection([ENV.context_asset_string], 'manageable'))
+}
+
+// also only show planner items to logged in users because non-logged in users don't have access
+// to these yet.
+if (ENV.STUDENT_PLANNER_ENABLED && ENV.current_user_id) {
+  collections.push(new SyllabusPlannerCollection([ENV.context_asset_string]))
 }
 
 // Perform a fetch on each collection

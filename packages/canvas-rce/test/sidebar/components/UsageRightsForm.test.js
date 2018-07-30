@@ -58,24 +58,23 @@ describe("UsageRightsForm", () => {
   });
 
   describe("events handlers", () => {
-    let event, selected;
+    let event;
 
     beforeEach(() => {
       event = {
         preventDefault() {},
         target: { value: "foo" }
       };
-      selected= { value: "bar" };
     });
 
     it("handleUsageRight", () => {
-      instance.handleUsageRight(event, selected);
-      equal(instance.state.usageRight, selected.value);
+      instance.handleUsageRight(event);
+      equal(instance.state.usageRight, event.target.value);
     });
 
     it("handleCCLicense", () => {
-      instance.handleCCLicense(event, selected);
-      equal(instance.state.ccLicense, selected.value);
+      instance.handleCCLicense(event);
+      equal(instance.state.ccLicense, event.target.value);
     });
 
     it("handleCopyrightHolder", () => {

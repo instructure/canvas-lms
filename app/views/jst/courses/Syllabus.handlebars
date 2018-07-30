@@ -30,12 +30,18 @@
         <table class="detail_list">
           {{#each events}}
           <tr class="syllabus_{{type}} related-{{related_id}}{{#if override}} special_date{{/if}}">
-            <td class="name{{#unless last}} not_last{{/unless}}">
+            <td class="icon" aria-hidden="true">
               {{#ifEqual type 'assignment'}}
                 {{addIcon 'assignment'}}
+              {{else}}{{#ifEqual type 'wiki_page' }}
+                {{addIcon 'document'}}
+              {{else}}{{#ifEqual type 'discussion_topic' }}
+                {{addIcon 'discussion'}}
               {{else}}
                 {{addIcon 'calendar-month'}}
-              {{/ifEqual}}
+              {{/ifEqual}}{{/ifEqual}}{{/ifEqual}}
+            </td>
+            <td class="name{{#unless last}} not_last{{/unless}}">
               {{#if html_url}}
                 <a href="{{html_url}}">{{title}}</a>
               {{else}}
@@ -49,6 +55,8 @@
               {{#if start_at}}
                 {{#if due_at}}
                   {{t "due by"}} <span {{contextSensitiveDatetimeTitle (unfudge due_at)}} >{{tTimeHours due_at}}</span>
+                {{else}}{{#if todo_at}}
+                  {{t "to do:"}} <span {{contextSensitiveDatetimeTitle (unfudge todo_at)}} >{{tTimeHours todo_at}}</span>
                 {{else}}
                   <span {{contextSensitiveDatetimeTitle (unfudge start_at)}} >{{tTimeHours start_at}}</span>
                   {{#unless same_time}}
@@ -61,7 +69,7 @@
                       {{/if}}
                    </span>
                   {{/unless}}
-                {{/if}}
+                {{/if}}{{/if}}
               {{else}}
                 &nbsp;
               {{/if}}

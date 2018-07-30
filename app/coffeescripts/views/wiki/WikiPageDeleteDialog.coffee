@@ -25,7 +25,7 @@ define [
 
   dialogDefaults =
     fixDialogButtons: false
-    title: I18n.t 'delete_dialog_title', 'Delete Wiki Page'
+    title: I18n.t 'delete_dialog_title', 'Delete Page'
     width: 400
     height: 'auto'
 

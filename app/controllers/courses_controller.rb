@@ -1727,12 +1727,16 @@ class CoursesController < ApplicationController
       @course_home_view = "feed" if params[:view] == "feed"
       @course_home_view ||= default_view
 
-      js_env COURSE: {
-        id: @context.id.to_s,
-        pages_url: polymorphic_url([@context, :wiki_pages]),
-        front_page_title: @context&.wiki&.front_page&.title,
-        default_view: default_view
-      }
+      js_env({
+        # don't check for student enrollments because we want to show course items on the teacher's  syllabus
+        STUDENT_PLANNER_ENABLED: @domain_root_account&.feature_enabled?(:student_planner),
+        COURSE: {
+          id: @context.id.to_s,
+          pages_url: polymorphic_url([@context, :wiki_pages]),
+          front_page_title: @context&.wiki&.front_page&.title,
+          default_view: default_view
+        }
+      })
 
       # make sure the wiki front page exists
       if @course_home_view == 'wiki'&& @context.wiki.front_page.nil?

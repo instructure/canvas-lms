@@ -42,6 +42,10 @@
         border: none;
         background-color: transparent;
       }
+      td.icon {
+        padding-#{direction(right)}: 0;
+        width: 1rem;  // size of the contained icon.
+      }
     }
     table.detail_list {
       width: 100%;

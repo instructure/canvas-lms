@@ -6610,11 +6610,11 @@ cy:
     title: "%{portfolio_name} Crynodeb"
     user_index: 
       buttons: 
-        add_eportfolio: "Gwneud e-Bortffolio"
+        add_eportfolio: "Creu e-Bortffolio"
       defaults: 
         eportfolio_name: "Fy Mhortffolio i"
       headers: 
-        add_eportfolio: "Gwneud e-Bortffolio"
+        add_eportfolio: "Creu e-Bortffolio"
         eportfolios: e-Bortffolios
         my_eportfolios: "Fy e-Bortffolios i"
         what: "Beth ydy e-Bortffolio?"
@@ -8723,7 +8723,7 @@ cy:
           request_password: "Gofyn am gyfrinair"
         labels: 
           password: Cyfrinair
-          remember_me: "Dal wedi mewngofnodi"
+          remember_me: "Peidio allgofnodi"
         log_in: Mewngofnodi
         login_handle: "Rhowch eich %{login_handle_name} ac fe wnawn ni anfon dolen atoch chi i newid eich cyfrinair."
         open_source_learning_management_system: "LMS Ffynhonnell Agored"
@@ -12199,7 +12199,7 @@ cy:
       headers: 
         notification_preferences: "Dewisiadau Hysbysiadau"
       page_title: "Dewisiadau Hysbysiadau"
-      weekly_notification_range: "Caiff eich hysbysiadau wythnosol eu hanfon %{weekday} rhwng %{start_time} a %{end_time}."
+      weekly_notification_range: "Caiff eich hysbysiadau eu hanfon ar ddydd %{weekday} rhwng %{start_time} a %{end_time}."
     confirming_contact: "Wrthi’n cadarnhau..."
     confirms: 
       delete_access_key: "Ydych chi’n siŵr eich bod am ddileu’r allwedd mynediad hwn?"
@@ -12598,7 +12598,7 @@ cy:
       question_count: 
         many: "%{count} Cwestiynau"
         one: "1 Cwestiwn"
-        other: "%{count} Cwestiynau"
+        other: "%{count} Cwestiwn"
         two: "%{count} Cwestiynau"
     question_teaser: 
       full_details: "Cliciwch i weld manylion llawn y cwestiwn"
@@ -12972,7 +12972,7 @@ cy:
     question_count: 
       many: "%{count} Cwestiynau"
       one: "1 Cwestiwn"
-      other: "%{count} Cwestiynau"
+      other: "%{count} Cwestiwn"
       two: "%{count} Cwestiynau"
     question_limit_reached: |-
         Rydych chi wedi cyrraedd y nifer fwyaf o gwestiynau a ganiateir ar gyfer cwis (%{count}/%{limit}).
@@ -13102,7 +13102,7 @@ cy:
           add_questions: "Ychwanegu cwestiynau"
           create_group: "Creu Grŵp"
           select_bank: "Dewiswch fanc"
-        group_pick_count: "%{pick_count} cwestiynau"
+        group_pick_count: "%{pick_count} cwestiwn"
         group_points: "%{points} fesul cwestiwn"
         headers: 
           bank_name: "Enw banc"
@@ -15222,7 +15222,7 @@ cy:
   show_course_sections_for_course_name_5f715702: "Dangos adrannau cwrs ar gyfer y cwrs %{name}"
   show_courses_from_8a087f63: "Dangos cyrsiau o"
   show_courses_navigation_menu_7ad1a8d4: "Dangos Dewislen Crwydro Cyrsiau"
-  show_deleted_replies_a2e0a36f: "Dangos atebion wedi’u dileu"
+  show_deleted_replies_a2e0a36f: "Dangos ymatebion sydd wedi'u dileu"
   show_details_194cf390: "Dangos Manylion"
   show_exceptions_270ea1c5: "Dangos eithriadau"
   show_groups_navigation_menu_1521d38d: "Dangos Dewislen Crwydro Grwpiau"
@@ -15693,7 +15693,7 @@ cy:
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "rhaid creu ffolderi cyflwyniadau mewn cyd-destun Defnyddiwr neu Grŵp"
   submissions_view_and_make_comments_cafaf361: "Cyflwyniadau - gweld a rhoi sylwadau"
   submit_a3cc6859: Cyflwyno
-  submit_a_feature_idea_2d4baa3d: "Cyflwyno Syniad am Nodwedd"
+  submit_a_feature_idea_2d4baa3d: "Cyflwyno Syniad Newydd"
   submit_assignment_5799b4e3: "Cyflwyno Aseiniad"
   submit_comment_commenttext_8e5638d7: "Cyflwyno sylw: %{commentText}"
   submit_comment_e5cc2718: "Cyflwyno sylw"

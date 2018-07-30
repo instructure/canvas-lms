@@ -558,6 +558,28 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       expect(qq_to.question_data[:question_text]).to match_ignoring_whitespace(qq.question_data[:question_text])
     end
 
+    it "should do more terrible equation stuff" do
+      qtext = <<-HTML.strip
+            hmm: <p><img class="equation_image" 
+      data-equation-content="h\\left( x \\right) = \\left\\{ {\\begin{array}{*{20}{c}}
+      {{x^2} + 4x - 1}&amp;{{\\rm{for}}}&amp;{ - 7 \\le x \\le - 1}\\\\
+      { - 3x + p}&amp;{{\\rm{for}}}&amp;{ - 1 &lt; x \\le 6}
+      \\end{array}} \\right." />
+      HTML
+
+      data = {'question_name' => 'test question 1', 'question_type' => 'essay_question', 'question_text' => qtext}
+
+      q1 = @copy_from.quizzes.create!(:title => 'quiz1')
+      qq = q1.quiz_questions.create!(:question_data => data)
+
+      run_course_copy
+
+      q_to = @copy_to.quizzes.where(:migration_id => mig_id(q1)).first
+      qq_to = q_to.active_quiz_questions.first
+
+      expect(qq_to.question_data['question_text']).to match_ignoring_whitespace(qq.question_data['question_text'])
+    end
+
     it "should copy all html fields in assessment questions" do
       @bank = @copy_from.assessment_question_banks.create!(:title => 'Test Bank')
       data = {:correct_comments_html => "<strong>correct</strong>",

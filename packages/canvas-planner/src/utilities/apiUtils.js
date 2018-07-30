@@ -28,10 +28,10 @@ const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
   const details = {
     course_id: plannable.course_id,
     title: plannable.name || plannable.title,
-    completed: (markedComplete != null) ? markedComplete.marked_complete : (apiResponse.submissions
-      && (apiResponse.submissions.submitted
-      || apiResponse.submissions.excused
-      || apiResponse.submissions.graded)
+    // items are completed if the user marks it as complete or made a submission
+    completed: (markedComplete != null)
+      ? markedComplete.marked_complete
+      : (apiResponse.submissions && apiResponse.submissions.submitted
     ),
     points: plannable.points_possible,
     html_url: apiResponse.html_url || plannable.html_url,
@@ -39,9 +39,10 @@ const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
     overrideAssignId: plannable.assignment_id,
     id: plannableId,
     uniqueId: `${plannable_type}-${plannableId}`,
-    location: plannable.location_name || null
+    location: plannable.location_name || null,
+    dateStyle: plannable.todo_date ? 'todo' : 'due'
   };
-
+  details.originallyCompleted = details.completed;
   details.feedback = apiResponse.submissions ? apiResponse.submissions.feedback : undefined;
 
   if (plannable_type === 'discussion_topic' || plannable_type === 'announcement') {

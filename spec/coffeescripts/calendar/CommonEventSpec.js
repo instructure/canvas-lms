@@ -152,11 +152,15 @@ test('Returns "discussion" for ungraded discussion objects with todo dates', () 
     {
       title: 'some title',
       start_at: '2016-12-01T12:30:00Z',
-      plannable_type: 'discussion_topic'
+      plannable_type: 'discussion_topic',
+      plannable: { id: '123' }
     },
     ['course_1']
   )
   equal(event.iconType(), 'discussion')
+  equal(event.can_edit, false)
+  equal(event.can_delete, false)
+  equal(event.can_change_context, false)
 })
 
 test('Returns "document" for wiki pages with todo dates', () => {
@@ -164,9 +168,13 @@ test('Returns "document" for wiki pages with todo dates', () => {
     {
       title: 'some title',
       start_at: '2016-12-01T12:30:00Z',
-      plannable_type: 'wiki_page'
+      plannable_type: 'wiki_page',
+      plannable: { url: 'some_title' }
     },
     ['course_1']
   )
   equal(event.iconType(), 'document')
+  equal(event.can_edit, false)
+  equal(event.can_delete, false)
+  equal(event.can_change_context, false)
 })

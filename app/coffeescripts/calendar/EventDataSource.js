@@ -666,7 +666,6 @@ export default class EventDataSource {
       item.start_at = item.plannable.todo_date
       item.end_at = item.plannable.todo_date
       item.title = item.plannable.title
-      item.can_edit = false
       /* eslint-enable no-param-reassign */
     })
     return items
