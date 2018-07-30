@@ -276,14 +276,12 @@ describe BasicLTI::BasicOutcomes do
       expect(request.body).to eq '<replaceResultResponse />'
     end
 
-    it "sets submitted_at to now if resultData is not present" do
+    it "Does not change the attempt number" do
       xml.css('resultData').remove
       now = Time.now.utc
-      Timecop.freeze(now) do
-        BasicLTI::BasicOutcomes.process_request(tool, xml)
-        submission = assignment.submissions.where(user_id: @user.id).first
-        expect(submission.submitted_at).to eq now
-      end
+      BasicLTI::BasicOutcomes.process_request(tool, xml)
+      submission = assignment.submissions.where(user_id: @user.id).first
+      expect(submission.attempt).to eq 1
     end
 
     context 'with submitted_at details' do
