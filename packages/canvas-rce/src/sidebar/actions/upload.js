@@ -29,6 +29,16 @@ export const COMPLETE_FILE_UPLOAD = "COMPLETE_FILE_UPLOAD";
 export const TOGGLE_UPLOAD_FORM = "TOGGLE_UPLOAD_FORM";
 export const PROCESSED_FOLDER_BATCH = "PROCESSED_FOLDER_BATCH";
 export const QUOTA_EXCEEDED_UPLOAD = "QUOTA_EXCEEDED_UPLOAD";
+export const START_LOADING = "START_LOADING";
+export const STOP_LOADING = "STOP_LOADING";
+
+export function startLoading() {
+  return { type: START_LOADING };
+}
+
+export function stopLoading() {
+  return { type: STOP_LOADING };
+}
 
 export function receiveFolder({ id, name, parentId }) {
   return { type: RECEIVE_FOLDER, id, name, parentId };
@@ -106,6 +116,7 @@ export function embedUploadResult(results, selectedTabType) {
 // fetches the list of folders to select from when uploading a file
 export function fetchFolders(bookmark) {
   return (dispatch, getState) => {
+    dispatch(startLoading());
     const { source, jwt, upload, host, contextId, contextType } = getState();
     if (
       bookmark ||
@@ -119,6 +130,8 @@ export function fetchFolders(bookmark) {
           dispatch(processedFolderBatch(upload));
           if (bookmark) {
             dispatch(fetchFolders(bookmark));
+          } else {
+            dispatch(stopLoading());
           }
         })
         .catch(error => {
@@ -181,15 +194,15 @@ export function setAltText(altText, results) {
 
 export function handleFailures(error, dispatch) {
   return error.response
-  .json()
-  .then(resp => {
-    if (resp.message === "file size exceeds quota") {
-      dispatch(quotaExceeded(error));
-    } else {
-      dispatch(failUpload(error));
-    }
-  })
-  .catch(error => dispatch(failUpload(error)))
+    .json()
+    .then(resp => {
+      if (resp.message === "file size exceeds quota") {
+        dispatch(quotaExceeded(error));
+      } else {
+        dispatch(failUpload(error));
+      }
+    })
+    .catch(error => dispatch(failUpload(error)));
 }
 
 export function uploadPreflight(tabContext, fileMetaProps) {

@@ -24,7 +24,9 @@ import {
   RECEIVE_FOLDER,
   FAIL_FOLDERS_LOAD,
   PROCESSED_FOLDER_BATCH,
-  QUOTA_EXCEEDED_UPLOAD
+  QUOTA_EXCEEDED_UPLOAD,
+  START_LOADING,
+  STOP_LOADING
 } from "../actions/upload";
 import { combineReducers } from "redux";
 
@@ -127,11 +129,26 @@ function folderTree(state = {}, action) {
   }
 }
 
+function loadingFolders(state = false, action) {
+  switch (action.type) {
+    case START_LOADING:
+      return true;
+    case STOP_LOADING:
+      return false;
+    case FAIL_FOLDERS_LOAD: {
+      return false;
+    }
+    default:
+      return state;
+  }
+}
+
 export default combineReducers({
   uploading,
   formExpanded,
   folders,
   rootFolderId,
   folderTree,
-  error
+  error,
+  loadingFolders
 });
