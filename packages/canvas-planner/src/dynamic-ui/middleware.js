@@ -21,8 +21,9 @@ export function createDynamicUiMiddleware (uiManager) {
     uiManager.setStore(store);
     return next => action => {
       const beforeState = store.getState();
-      uiManager.handleAction(action);
       const result = next(action);
+      // update the uiManager after the action has succeeded so we know it didn't throw
+      uiManager.handleAction(action);
       const afterState = store.getState();
       if (beforeState === afterState) uiManager.uiStateUnchanged(action);
       return result;

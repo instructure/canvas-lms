@@ -75,6 +75,14 @@ describe('loadPastUntilNewActivitySaga', () => {
     const expectedError = new Error('some error');
     expect(generator.throw(expectedError).value).toEqual(put(gotItemsError(expectedError)));
   });
+
+  it('aborts if the reducers throw on a put effect', () => {
+    const generator = setupLoadingPastUntilNewActivitySaga();
+    generator.next('fetch result');
+    generator.next('a thunk');
+    generator.next(undefined); // simulate what happens when reducers throw
+    expect(generator.next().done).toBe(true);
+  });
 });
 
 describe('loadPastSaga', () => {
@@ -90,7 +98,7 @@ describe('loadPastSaga', () => {
       .toEqual(call(mergePastItems, 'some items', 'response'));
   });
 
-  // not doing a full sequence of tests becuase the code is shared with the above saga
+  // not doing a full sequence of tests because the code is shared with the above saga
 });
 
 describe('peekIntoPastSaga', () => {
@@ -121,7 +129,7 @@ describe('loadFutureSaga', () => {
       .toEqual(call(mergeFutureItems, 'some items', 'response'));
   });
 
-  // not doing a full sequence of tests becuase the code is shared with the above saga
+  // not doing a full sequence of tests because the code is shared with the above saga
 });
 
 function mockCourse (opts = {grade: '42.34'}) {
