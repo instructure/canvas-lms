@@ -28,13 +28,13 @@ import { rubricShape, rubricAssessmentShape, rubricAssociationShape } from './ty
 import { roundIfWhole } from './Points'
 
 const totalString = (score) => I18n.t('Total Points: %{total}', {
-  total: I18n.toNumber(score, { precision: 1 })
+  total: I18n.toNumber(score, { precision: 2, strip_insignificant_zeros: true })
 })
 
 const totalAssessingString = (score, possible) =>
   I18n.t('Total Points: %{total} out of %{possible}', {
     total: roundIfWhole(score),
-    possible: I18n.toNumber(possible, { precision: 1 })
+    possible: I18n.toNumber(possible, { precision: 2, strip_insignificant_zeros: true })
   })
 
 const Rubric = (props) => {

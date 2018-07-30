@@ -47,7 +47,7 @@ exports[`the Rubric component renders as expected 1`] = `
         <td colSpan=\\"3\\">
           <Flex justifyItems=\\"end\\" as=\\"span\\" direction=\\"row\\" alignItems=\\"center\\" inline={false} visualDebug={false} wrapItems={false}>
             <FlexItem as=\\"span\\" grow={false} shrink={false}>
-              Total Points: 6.0
+              Total Points: 6
             </FlexItem>
           </Flex>
         </td>
@@ -80,7 +80,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
         <td colSpan=\\"3\\">
           <Flex justifyItems=\\"end\\" as=\\"span\\" direction=\\"row\\" alignItems=\\"center\\" inline={false} visualDebug={false} wrapItems={false}>
             <FlexItem as=\\"span\\" grow={false} shrink={false}>
-              Total Points: 11.0
+              Total Points: 11
             </FlexItem>
           </Flex>
         </td>
@@ -113,7 +113,7 @@ exports[`the Rubric component updates the total score when an individual criteri
         <td colSpan=\\"3\\">
           <Flex justifyItems=\\"end\\" as=\\"span\\" direction=\\"row\\" alignItems=\\"center\\" inline={false} visualDebug={false} wrapItems={false}>
             <FlexItem as=\\"span\\" grow={false} shrink={false}>
-              Total Points: 5 out of 11.0
+              Total Points: 5 out of 11
             </FlexItem>
           </Flex>
         </td>

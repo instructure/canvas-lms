@@ -157,7 +157,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the Outcom
 
 exports[`Free-form Rubric with a outcome criterion by default renders the Threshold sub-component(s) as expected 1`] = `
 "<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
-  threshold: 3.0
+  threshold: 3
 </Text>"
 `;
 
@@ -223,7 +223,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Ou
 
 exports[`Free-form Rubric with a outcome criterion when assessing renders the Threshold sub-component(s) as expected 1`] = `
 "<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
-  threshold: 3.0
+  threshold: 3
 </Text>"
 `;
 
@@ -289,7 +289,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
 
 exports[`Free-form Rubric with a outcome criterion without an assessment renders the Threshold sub-component(s) as expected 1`] = `
 "<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
-  threshold: 3.0
+  threshold: 3
 </Text>"
 `;
 
@@ -479,7 +479,7 @@ exports[`Point Rubric with a outcome criterion by default renders the OutcomeIco
 
 exports[`Point Rubric with a outcome criterion by default renders the Threshold sub-component(s) as expected 1`] = `
 "<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
-  threshold: 3.0
+  threshold: 3
 </Text>"
 `;
 
@@ -551,7 +551,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the Outcom
 
 exports[`Point Rubric with a outcome criterion when assessing renders the Threshold sub-component(s) as expected 1`] = `
 "<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
-  threshold: 3.0
+  threshold: 3
 </Text>"
 `;
 
@@ -618,7 +618,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
 
 exports[`Point Rubric with a outcome criterion without an assessment renders the Threshold sub-component(s) as expected 1`] = `
 "<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
-  threshold: 3.0
+  threshold: 3
 </Text>"
 `;
 
