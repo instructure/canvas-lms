@@ -179,6 +179,22 @@ describe ContentMigration do
       expect(page_to.body).to eq body % [@copy_to.id, tag_to.id]
     end
 
+    it "should translate links to assignments with module item id" do
+      mod1 = @copy_from.context_modules.create!(:name => "some module")
+      asmnt1 = @copy_from.assignments.create!(:title => "some assignment")
+      tag = mod1.add_item({:id => asmnt1.id, :type => 'assignment', :indent => 1})
+      body = %{<p>Link to module item: <a href="/courses/%s/assignments/%s?module_item_id=%s">some assignment</a></p>}
+      page = @copy_from.wiki_pages.create!(:title => "some page", :body => body % [@copy_from.id, asmnt1.id, tag.id])
+
+      run_course_copy
+
+      mod1_to = @copy_to.context_modules.where(migration_id: mig_id(mod1)).first
+      asmnt_to = @copy_to.assignments.where(migration_id: mig_id(asmnt1)).first
+      tag_to = mod1_to.content_tags.first
+      page_to = @copy_to.wiki_pages.where(migration_id: mig_id(page)).first
+      expect(page_to.body).to eq body % [@copy_to.id, asmnt_to.id, tag_to.id]
+    end
+
     it "should translate links to modules in quiz content" do
       skip unless Qti.qti_enabled?
 
