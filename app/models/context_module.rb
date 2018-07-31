@@ -171,10 +171,8 @@ class ContextModule < ActiveRecord::Base
       :context_type => self.context_type,
       :name => copy_title,
       :position => ContextModule.not_deleted.where(context_id: self.context_id).maximum(:position) + 1,
-      :prerequisites => self.prerequisites,
       :completion_requirements => self.completion_requirements,
       :workflow_state => 'unpublished',
-      :unlock_at => self.unlock_at,
       :require_sequential_progress => self.require_sequential_progress,
       :completion_events => self.completion_events,
       :requirement_count => self.requirement_count
