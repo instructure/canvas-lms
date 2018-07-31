@@ -37,7 +37,7 @@
       assignments_shown = {}
       @course.context_modules.active.each do |mod|
         mod.content_tags.active.each do |tag|
-          text = ''
+          text = nil
           icon = ''
           obj = nil
           if tag.content_type =='Assignment'
@@ -47,6 +47,10 @@
             assignments_shown[tag.content_id] = true
             obj = Assignment.find(tag.content_id)
             next if obj.nil?
+
+            if obj.name.starts_with?('Begin') || obj.name.starts_with?('Complete')
+              text = ''
+            end
 
             submission = obj.find_or_create_submission(@current_user)
             # user already submitted, it isn't a todo anymore
@@ -71,7 +75,7 @@
 
           overridden = obj.overridden_for(@current_user)
 
-          unless text.empty? || overridden.due_at.nil?
+          unless text.nil? || overridden.due_at.nil?
             # skip anything that is significantly past due
             # because it ought to be already done
             next if overridden.due_at < (DateTime.now - 2.days)
@@ -91,7 +95,7 @@
       # let's also fetch assignments not in modules,
       # with special treatment for course participation
       @course.assignments.active.each do |obj|
-        text = ''
+        text = nil
         if obj.title.starts_with? "Course Participation - "
 
           submission = obj.find_or_create_submission(@current_user)
@@ -124,6 +128,10 @@
           disp_name = obj.title
           link = "/courses/#{@course.id}/assignments/#{obj.id}"
 
+          if obj.name.starts_with?('Begin') || obj.name.starts_with?('Complete')
+            text = ''
+          end
+
           submission = obj.find_or_create_submission(@current_user)
           # user already submitted, it isn't a todo anymore
           if submission
@@ -136,7 +144,7 @@
 
         overridden = obj.overridden_for(@current_user)
 
-        unless text.empty? || overridden.due_at.nil?
+        unless text.nil? || overridden.due_at.nil?
           # skip anything that is significantly past due
           # because it ought to be already done
           next if overridden.due_at < (DateTime.now - 2.days)
