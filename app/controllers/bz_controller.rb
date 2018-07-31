@@ -13,7 +13,7 @@ class BzController < ApplicationController
 
   # magic field dump / for cohorts uses an access token instead
   # and courses_for_email is unauthenticated since it isn't really sensitive
-  before_filter :require_user, :except => [:magic_field_dump, :courses_for_email, :magic_fields_for_cohort]
+  before_filter :require_user, :except => [:magic_field_dump, :courses_for_email, :magic_fields_for_cohort, :course_cohort_information]
   skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user, :user_retained_data_batch]
 
   # this is meant to be used for requests from external services like LL kits
@@ -40,6 +40,68 @@ class BzController < ApplicationController
       u.enrollments.active.each do |e|
         result["course_ids"] << e.course_id
       end
+    end
+
+    render :json => result
+  end
+
+  # give it a set of course_id[]
+  def course_cohort_information
+    access_token = AccessToken.authenticate(params[:access_token])
+    if access_token.nil?
+      render :json => "Access denied"
+      return
+    end
+
+    requesting_user = access_token.user
+    # we should prolly allow designer accounts to access too, but
+    # for now i just want to use the admin access token for myself
+    if requesting_user.id != 1
+      render :json => "Not admin"
+      return
+    end
+
+    result = {}
+    result["courses"] = []
+    params[:course_ids].each do |course_id|
+      course = Course.find(course_id)
+      ci = {}
+      ci["name"] = course.name
+      ci["id"] = course.id
+      ci["sections"] = []
+
+      course.course_sections.each do |section|
+        si = {}
+        si["name"] = section.name
+        si["id"] = section.id
+
+        additional_info = CohortInfo.where(:course_id => course_id, :section_name => section.name).first
+        if additional_info
+          si["lc_name"] = additional_info.lc_name
+          si["lc_email"] = additional_info.lc_email
+          si["lc_phone"] = additional_info.lc_phone
+          si["ta_name"] = additional_info.ta_name
+          si["ta_email"] = additional_info.ta_email
+          si["ta_phone"] = additional_info.ta_phone
+          si["ta_office"] = additional_info.ta_office
+          si["ll_times"] = additional_info.ll_times
+          si["ll_location"] = additional_info.ll_location
+        end
+
+        si["enrollments"] = []
+        section.enrollments.each do |enrollment|
+          next if enrollment.user.name == "Test Student" # we dont need to filter this everywhere else!
+          obj = {}
+          obj["enrollment_id"] = enrollment.id
+          obj["id"] = enrollment.user.id
+          obj["name"] = enrollment.user.name
+          obj["email"] = enrollment.user.email
+          obj["type"] = enrollment.type
+          si["enrollments"] << obj
+        end
+        ci["sections"] << si
+      end
+      result["courses"] << ci
     end
 
     render :json => result
@@ -253,6 +315,28 @@ class BzController < ApplicationController
       # from bz_support.js. Just doing it server side for 1) speed and 2) viewing another
       # user's data, with proper permission checking
       doc = Nokogiri::HTML(@assignment_html)
+
+      cohort = current_cohort(User.find(student_id), @context)
+
+      doc.css(".duplicate-for-each-cohort-member").each do |o|
+
+        html = o.inner_html
+
+        newHtml = ''
+
+        cohort.each do |id, name|
+          replacedHtml = html.gsub("{ID}", id.to_s);
+          replacedHtml = replacedHtml.gsub("{COURSE_ID}", @context.id.to_s);
+          replacedHtml = replacedHtml.gsub("{NAME}", name);
+
+          newHtml += replacedHtml;
+        end
+
+        o.inner_html = newHtml
+
+        o['class'] = 'duplicate-for-each-cohort-member already-duplicated'
+      end
+
       doc.css('[data-bz-retained]').each do |o|
         result = RetainedData.where(:user_id => student_id, :name => o["data-bz-retained"])
         value = ''
