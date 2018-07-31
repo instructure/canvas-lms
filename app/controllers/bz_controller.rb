@@ -90,6 +90,7 @@ class BzController < ApplicationController
 
         si["enrollments"] = []
         section.enrollments.each do |enrollment|
+          next if enrollment.user.name == "Test Student" # we dont need to filter this everywhere else!
           obj = {}
           obj["enrollment_id"] = enrollment.id
           obj["id"] = enrollment.user.id
