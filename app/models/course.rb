@@ -619,7 +619,11 @@ class Course < ActiveRecord::Base
   end
 
   def associated_accounts
-    accounts = self.non_unique_associated_accounts.to_a.uniq
+    if association(:course_account_associations).loaded? && !association(:non_unique_associated_accounts).loaded?
+      accounts = course_account_associations.map(&:account).uniq
+    else
+      accounts = self.non_unique_associated_accounts.to_a.uniq
+    end
     accounts << self.account if account_id && !accounts.find { |a| a.id == account_id }
     accounts << self.root_account if root_account_id && !accounts.find { |a| a.id == root_account_id }
     accounts
