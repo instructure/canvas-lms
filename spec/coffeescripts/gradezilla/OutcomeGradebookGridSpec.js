@@ -184,11 +184,16 @@ test('Grid.Events.sort', () => {
       outcome_1: {
         score: 3
       }
+    },
+    {
+      student: {sortable_name: 'Darko, Donnie'}
     }
   ]
-  const outcomeSort = rows.sort((a, b) => Grid.Events._sortResults(a, b, true, 'outcome_1'))
-  const userSort = rows.sort((a, b) => Grid.Events._sortStudents(a, b, true))
-  ok(isEqual([3, 3, 4], pluck(pluck(outcomeSort, 'outcome_1'), 'score')), 'sorts by result value')
+  const outcomeSort = rows.sort((a, b) => Grid.Events._sortResults(a, b, true, 'outcome_1')).slice()
+  const reverseOutcomeSort = rows.sort((a, b) => Grid.Events._sortResults(a, b, false, 'outcome_1')).slice()
+  const userSort = rows.sort((a, b) => Grid.Events._sortStudents(a, b, true)).slice()
+  ok(isEqual([3, 3, 4, null], pluck(outcomeSort, 'outcome_1').map((s) => s ? s.score : null)), 'sorts by result value')
+  ok(isEqual([4, 3, 3, null], pluck(reverseOutcomeSort, 'outcome_1').map((s) => s ? s.score : null)), 'sorts by reverse result value')
   ok(
     outcomeSort.map(r => r.student.sortable_name)[0] === 'Campbell, Pete',
     'result sort falls back to sortable name'
@@ -196,6 +201,7 @@ test('Grid.Events.sort', () => {
   ok(
     isEqual(userSort.map(r => r.student.sortable_name), [
       'Campbell, Pete',
+      'Darko, Donnie',
       'Draper, Don',
       'Olson, Peggy'
     ]),
