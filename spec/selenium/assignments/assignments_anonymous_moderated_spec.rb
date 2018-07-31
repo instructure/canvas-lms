@@ -85,12 +85,10 @@ describe 'Anonymous Moderated Marking' do
     end
 
     it 'student can see add comment text box', priority: '1', test_id: 3513996 do
-      skip('Unskip in GRADE-1304')
       expect(SubmissionDetails.add_comment_text_area).to be_displayed
     end
 
     it 'student can leave comments on submission details page', priority: '1', test_id: 3513996 do
-      skip('Unskip in GRADE-1304')
       SubmissionDetails.submit_comment("Student submission details comment")
       refresh_page
       expect(SubmissionDetails.comments).to include_text 'Student submission details comment'
@@ -120,12 +118,10 @@ describe 'Anonymous Moderated Marking' do
     end
 
     it 'student can see add comment text box', priority: '1', test_id: 3513996 do
-      skip('Unskip in GRADE-1304')
       expect(SubmissionDetails.add_comment_text_area).to be_displayed
     end
 
     it 'student can leave comment on submission details page', priority: '1', test_id: 3513996 do
-      skip('Unskip in GRADE-1304')
       SubmissionDetails.submit_comment("Student submission details comment")
       refresh_page
       expect(SubmissionDetails.comments).to include_text 'Student submission details comment'
