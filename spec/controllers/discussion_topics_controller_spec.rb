@@ -891,7 +891,7 @@ describe DiscussionTopicsController do
         allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
         allow(ConditionalRelease::Service).to receive(:env_for).and_return({ dummy: 'value' })
         get :edit, params: {course_id: @course.id, id: @topic.id}
-        expect(response).to have_http_status :success
+        expect(response).to be_successful
         expect(controller.js_env[:dummy]).to eq 'value'
       end
 
@@ -899,7 +899,7 @@ describe DiscussionTopicsController do
         allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(false)
         allow(ConditionalRelease::Service).to receive(:env_for).and_return({ dummy: 'value' })
         get :edit, params: {course_id: @course.id, id: @topic.id}
-        expect(response).to have_http_status :success
+        expect(response).to be_successful
         expect(controller.js_env).not_to have_key :dummy
       end
     end
@@ -1127,7 +1127,7 @@ describe DiscussionTopicsController do
         post 'create',
           params: topic_params(@course, {is_announcement: true, specific_sections: @section1.id.to_s}),
           :format => :json
-        expect(response).to have_http_status :success
+        expect(response).to be_successful
         expect(DiscussionTopic.last.course_sections.first).to eq @section1
         expect(DiscussionTopicSectionVisibility.count).to eq 1
       end
@@ -1137,7 +1137,7 @@ describe DiscussionTopicsController do
         post 'create',
           params: topic_params(@course, {is_announcement: true}),
           :format => :json
-        expect(response).to have_http_status :success
+        expect(response).to be_successful
         expect(DiscussionTopic.count).to eq old_count + 1
         expect(DiscussionTopic.last.is_section_specific).to be_falsey
       end
@@ -1169,14 +1169,14 @@ describe DiscussionTopicsController do
         post 'create',
           params: topic_params(@course, {is_announcement: true, specific_sections: @section1.id.to_s}),
           :format => :json
-        expect(response).to have_http_status :success
+        expect(response).to be_successful
         expect(DiscussionTopic.last.course_sections.first).to eq @section1
       end
 
       it 'creates a discussion with sections' do
         post 'create',
           params: topic_params(@course, {specific_sections: @section1.id.to_s}), :format => :json
-        expect(response).to have_http_status :success
+        expect(response).to be_successful
         expect(DiscussionTopic.last.course_sections.first).to eq @section1
         expect(DiscussionTopicSectionVisibility.count).to eq 1
       end
@@ -1252,7 +1252,7 @@ describe DiscussionTopicsController do
       params = topic_params(@course, {is_announcement: true})
       params.delete(:locked)
       post('create', params: params, format: :json)
-      expect(response).to have_http_status :success
+      expect(response).to be_successful
       expect(DiscussionTopic.last.locked).to be_truthy
     end
 
@@ -1261,7 +1261,7 @@ describe DiscussionTopicsController do
       params = topic_params(@course, {is_announcement: false})
       params.delete(:locked)
       post('create', params: params, format: :json)
-      expect(response).to have_http_status :success
+      expect(response).to be_successful
       expect(DiscussionTopic.last.locked).to be_falsy
     end
 

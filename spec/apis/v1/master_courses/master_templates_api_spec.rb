@@ -487,7 +487,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       api_call_as_user(@admin, :get, "/api/v1/courses/#{@master.id}/blueprint_templates/default/migrations/#{@migration.id}/details",
                  :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
                  :id => @migration.to_param, :course_id => @master.to_param, :action => 'migration_details')
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "requires manage rights on the course" do

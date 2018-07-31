@@ -587,7 +587,7 @@ describe Quizzes::QuizzesApiController, type: :request do
                          { :controller=>"quizzes/quizzes_api", :action=>"update", :format=>"json", :course_id=>"#{@course.id}", :id => "#{@quiz.id}"},
                          { quizzes: [{ 'id' => @quiz.id, 'title' => 'blah blah' }] },
                         'Accept' => 'application/vnd.api+json')
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
 

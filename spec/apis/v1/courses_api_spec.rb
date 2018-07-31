@@ -536,7 +536,7 @@ describe CoursesController, type: :request do
 
         it "returns 200 success" do
           api_call(:put, @path, @params, { :event => 'undelete', :course_ids => [@course.id] })
-          expect(response).to be_success
+          expect(response).to be_successful
         end
       end
 

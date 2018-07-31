@@ -28,7 +28,7 @@ context "accessing public content" do
     enable_cache do
       Timecop.freeze(10.seconds.ago) do
         yield
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       Timecop.freeze(8.seconds.ago) do
@@ -44,7 +44,7 @@ context "accessing public content" do
 
       Timecop.freeze(5.seconds.ago) do
         yield
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       @course.update_attribute(:is_public_to_auth_users, false)

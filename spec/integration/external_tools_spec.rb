@@ -37,7 +37,7 @@ describe "External Tools" do
       student_in_course(:course => @course, :active_all => true)
       user_session(@user)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      expect(response).to be_success
+      expect(response).to be_successful
       doc = Nokogiri::HTML.parse(response.body)
       form = doc.at_css('form#tool_form')
 
@@ -59,7 +59,7 @@ describe "External Tools" do
       user_session(@user)
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      expect(response).to be_success
+      expect(response).to be_successful
       doc = Nokogiri::HTML.parse(response.body)
 
       expect(doc.at_css('form#tool_form input#lis_result_sourcedid')['value']).to eq BasicLTI::Sourcedid.new(@tool, @course, @assignment, @user).to_s
@@ -71,7 +71,7 @@ describe "External Tools" do
       @course.enroll_teacher(user_factory(:active_all => true))
       user_session(@user)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      expect(response).to be_success
+      expect(response).to be_successful
       doc = Nokogiri::HTML.parse(response.body)
       expect(doc.at_css('form#tool_form input#lis_result_sourcedid')).to be_nil
       expect(doc.at_css('form#tool_form input#lis_outcome_service_url')).not_to be_nil
@@ -90,7 +90,7 @@ describe "External Tools" do
       account.save!
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      expect(response).to be_success
+      expect(response).to be_successful
       doc = Nokogiri::HTML.parse(response.body)
       expect(doc.at_css('form#tool_form input#custom_time_zone')['value']).to eq "America/Juneau"
 
@@ -98,7 +98,7 @@ describe "External Tools" do
       @user.save!
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      expect(response).to be_success
+      expect(response).to be_successful
       doc = Nokogiri::HTML.parse(response.body)
       expect(doc.at_css('form#tool_form input#custom_time_zone')['value']).to eq "Pacific/Honolulu"
     end
@@ -117,7 +117,7 @@ describe "External Tools" do
       student_in_course(:active_all => true)
       user_session(@user)
       get "/courses/#{@course.id}/external_tools/retrieve?url=#{CGI.escape(@tag.url)}"
-      expect(response).to be_success
+      expect(response).to be_successful
       doc = Nokogiri::HTML.parse(response.body)
       expect(doc.at_css('#tool_form')).not_to be_nil
       expect(doc.at_css("input[name='launch_presentation_return_url']")['value']).to match(/^http/)
@@ -131,7 +131,7 @@ describe "External Tools" do
       student_in_course(:active_all => true)
       user_session(@user)
       get "/users/#{@user.id}/external_tools/#{tool.id}"
-      expect(response).to be_success
+      expect(response).to be_successful
       doc = Nokogiri::HTML.parse(response.body)
       expect(doc.at_css('#tool_form')).not_to be_nil
       expect(doc.at_css("input[name='launch_presentation_return_url']")['value']).to match(/^http/)
@@ -147,7 +147,7 @@ describe "External Tools" do
     @tool.save!
 
     get "/courses/#{@course.id}/external_tools/#{@tool.id}"
-    expect(response).to be_success
+    expect(response).to be_successful
     doc = Nokogiri::HTML.parse(response.body)
     tab = doc.at_css("a.#{@tool.asset_string}")
     expect(tab).not_to be_nil
@@ -168,7 +168,7 @@ describe "External Tools" do
     it "should show the admin level global navigation menu items to teachers" do
       course_with_teacher_logged_in(:account => @account, :active_all => true)
       get "/courses"
-      expect(response).to be_success
+      expect(response).to be_successful
       doc = Nokogiri::HTML.parse(response.body)
 
       menu_link1 = doc.at_css("##{@admin_tool.asset_string}_menu_item a")
@@ -185,7 +185,7 @@ describe "External Tools" do
     it "should only show the member level global navigation menu items to students" do
       course_with_student_logged_in(:account => @account, :active_all => true)
       get "/courses"
-      expect(response).to be_success
+      expect(response).to be_successful
       doc = Nokogiri::HTML.parse(response.body)
 
       menu_link1 = doc.at_css("##{@admin_tool.asset_string}_menu_item a")

@@ -126,7 +126,7 @@ describe "security" do
       "pseudonym_session[password]" => "asdfasdf",
       "pseudonym_session[remember_me]" => "1" },
       headers: { 'HTTP_ACCEPT' => 'application/json' }
-    expect(response).to be_success
+    expect(response).to be_successful
     expect(response['Content-Type']).to match(%r"^application/json")
     expect(response.body).not_to match(%r{^while\(1\);})
     json = JSON.parse response.body
@@ -136,7 +136,7 @@ describe "security" do
   it "should prepend GET JSON responses with protection" do
     course_with_teacher_logged_in
     get "/courses.json"
-    expect(response).to be_success
+    expect(response).to be_successful
     expect(response['Content-Type']).to match(%r"^application/json")
     expect(response.body).to match(%r{^while\(1\);})
   end
@@ -144,7 +144,7 @@ describe "security" do
   it "should not prepend GET JSON responses to Accept application/json requests with protection" do
     course_with_teacher_logged_in
     get "/courses.json", headers: { 'HTTP_ACCEPT' => 'application/json' }
-    expect(response).to be_success
+    expect(response).to be_successful
     expect(response['Content-Type']).to match(%r"^application/json")
     expect(response.body).not_to match(%r{^while\(1\);})
   end
@@ -152,7 +152,7 @@ describe "security" do
   it "should not prepend non-GET JSON responses with protection" do
     course_with_teacher_logged_in
     delete "/dashboard/ignore_stream_item/1"
-    expect(response).to be_success
+    expect(response).to be_successful
     expect(response['Content-Type']).to match(%r"^application/json")
     expect(response.body).not_to match(%r{^while\(1\);})
   end
@@ -183,7 +183,7 @@ describe "security" do
     it "should login via persistence token when no session exists" do
       token = SessionPersistenceToken.generate(@p)
       get "/", headers: {"HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}"}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(cookies['_normandy_session']).to be_present
       expect(session[:used_remember_me_token]).to be_truthy
 
@@ -197,13 +197,13 @@ describe "security" do
       expect(session[:used_remember_me_token]).not_to be_truthy
 
       follow_redirect!
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should not allow login via the same valid token twice" do
       token = SessionPersistenceToken.generate(@p)
       get "/", headers: {"HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}"}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(SessionPersistenceToken.find_by_id(token.id)).to be_nil
       reset!
       https!
@@ -214,7 +214,7 @@ describe "security" do
     it "should generate a new valid token when a token is used" do
       token = SessionPersistenceToken.generate(@p)
       get "/", headers: {"HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}"}
-      expect(response).to be_success
+      expect(response).to be_successful
       s1 = cookies['_normandy_session']
       expect(s1).to be_present
       cookie = cookies['pseudonym_credentials']
@@ -227,7 +227,7 @@ describe "security" do
       https!
       # check that the new token is valid too
       get "/", headers: {"HTTP_COOKIE" => "pseudonym_credentials=#{cookie}"}
-      expect(response).to be_success
+      expect(response).to be_successful
       s2 = cookies['_normandy_session']
       expect(s2).to be_present
       expect(s2).not_to eq s1
@@ -284,13 +284,13 @@ describe "security" do
       s3 = open_session
       s3.https!
       s3.get "/", headers: {"HTTP_COOKIE" => "pseudonym_credentials=#{c1}"}
-      expect(s3.response).to be_success
+      expect(s3.response).to be_successful
       s3.delete "/logout"
       # make sure c2 can still work
       s4 = open_session
       s4.https!
       s4.get "/", headers: {"HTTP_COOKIE" => "pseudonym_credentials=#{c2}"}
-      expect(s4.response).to be_success
+      expect(s4.response).to be_successful
     end
 
     it "should not login if the pseudonym is deleted" do
@@ -322,7 +322,7 @@ describe "security" do
         end
         token = SessionPersistenceToken.generate(@pseudonym)
         get "/", headers: {"HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}"}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(cookies['_normandy_session']).to be_present
         expect(session[:used_remember_me_token]).to be_truthy
       end
@@ -550,7 +550,7 @@ describe "security" do
     it "should remember the destination with an intervening auth" do
       token = SessionPersistenceToken.generate(@admin.pseudonyms.first)
       get "/", headers: {"HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}"}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(cookies['_normandy_session']).to be_present
       expect(session[:used_remember_me_token]).to be_truthy
 
@@ -570,7 +570,7 @@ describe "security" do
       expect(response).to redirect_to conversations_url
 
       follow_redirect!
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(session[:become_user_id]).to eq @student.id.to_s
     end
   end
@@ -610,7 +610,7 @@ describe "security" do
     describe "site admin" do
       it "role_overrides" do
         get "/accounts/#{Account.site_admin.id}/settings"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).not_to match /Permissions/
 
         get "/accounts/#{Account.site_admin.id}/role_overrides"
@@ -619,10 +619,10 @@ describe "security" do
         add_permission :manage_role_overrides
 
         get "/accounts/#{Account.site_admin.id}/role_overrides"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         get "/accounts/#{Account.site_admin.id}/settings"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).to match /Permissions/
       end
     end
@@ -635,22 +635,22 @@ describe "security" do
         assert_status(401)
 
         get "/accounts/#{Account.default.id}/settings"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         get "/accounts/#{Account.default.id}/statistics"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).not_to match /Recently Logged-In Users/
 
         add_permission :read_roster
 
         get "/accounts/#{Account.default.id}/users"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         get "/accounts/#{Account.default.id}/settings"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         get "/accounts/#{Account.default.id}/statistics"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).to match /Recently Logged-In Users/
       end
 
@@ -660,21 +660,21 @@ describe "security" do
         course_factory
 
         get "/accounts/#{Account.default.id}/settings"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         get "/accounts/#{Account.default.id}/statistics"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).not_to match /Recently Started Courses/
         expect(response.body).not_to match /Recently Ended Courses/
 
         add_permission :read_course_list
 
         get "/accounts/#{Account.default.id}"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).to match /Courses/
 
         get "/accounts/#{Account.default.id}/statistics"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).to match /Recently Started Courses/
         expect(response.body).to match /Recently Ended Courses/
       end
@@ -684,16 +684,16 @@ describe "security" do
         assert_status(401)
 
         get "/accounts/#{Account.default.id}/settings"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).not_to match /Statistics/
 
         add_permission :view_statistics
 
         get "/accounts/#{Account.default.id}/statistics"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         get "/accounts/#{Account.default.id}/settings"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).to match /Statistics/
       end
 
@@ -708,7 +708,7 @@ describe "security" do
         assert_status(401)
 
         get "/accounts/#{Account.default.id}/settings"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).not_to match /Faculty Journal/
 
         get "/users/#{@student.id}/user_notes"
@@ -726,23 +726,23 @@ describe "security" do
         add_permission :manage_user_notes
 
         get "/accounts/#{Account.default.id}/user_notes"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         get "/accounts/#{Account.default.id}/settings"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).to match /Faculty Journal/
 
         get "/users/#{@student.id}/user_notes"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         post "/users/#{@student.id}/user_notes.json"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         get "/users/#{@student.id}/user_notes/#{@user_note.id}.json"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         delete "/users/#{@student.id}/user_notes/#{@user_note.id}.json"
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it "view_jobs" do
@@ -752,7 +752,7 @@ describe "security" do
         add_permission :view_jobs
 
         get "/jobs"
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
 
@@ -767,7 +767,7 @@ describe "security" do
         expect(response).to be_redirect
 
         get "/courses/#{@course.id}/details"
-        expect(response).to be_success
+        expect(response).to be_successful
         html = Nokogiri::HTML(response.body)
         expect(html.css('.edit_course_link')).to be_empty
         expect(html.css('#tab-users')).to be_empty
@@ -777,10 +777,10 @@ describe "security" do
         @admin.reload
 
         get "/courses/#{@course.id}"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         get "/courses/#{@course.id}/details"
-        expect(response).to be_success
+        expect(response).to be_successful
         html = Nokogiri::HTML(response.body)
         expect(html.css('#course_form')).not_to be_empty
         expect(html.css('#tab-navigation')).not_to be_empty
@@ -797,7 +797,7 @@ describe "security" do
         assert_status(401)
 
         get "/courses/#{@course.id}/details"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).not_to match /People/
         html = Nokogiri::HTML(response.body)
         expect(html.css('#tab-users')).to be_empty
@@ -805,19 +805,19 @@ describe "security" do
         add_permission :read_roster
 
         get "/courses/#{@course.id}/users"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).to match /View User Groups/
         expect(response.body).to match /View Prior Enrollments/
         expect(response.body).not_to match /Manage Users/
 
         get "/courses/#{@course.id}/users/prior"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         get "/courses/#{@course.id}/groups"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         get "/courses/#{@course.id}/details"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).to match /People/
       end
 
@@ -832,7 +832,7 @@ describe "security" do
         assert_status(401)
 
         get "/courses/#{@course.id}/details"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).not_to match /People/
 
         add_permission :manage_students
@@ -846,18 +846,18 @@ describe "security" do
         add_permission :read_roster
 
         get "/courses/#{@course.id}/users"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).to match /View User Groups/
         expect(response.body).to match /View Prior Enrollments/
 
         get "/courses/#{@course.id}/users/prior"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         get "/courses/#{@course.id}/groups"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         get "/courses/#{@course.id}/details"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).to match /People/
 
         @course.tab_configuration = [ { :id => Course::TAB_PEOPLE, :hidden => true } ]
@@ -866,7 +866,7 @@ describe "security" do
         # Should still be able to see People tab even if disabled, because we can
         # manage stuff in it
         get "/courses/#{@course.id}/details"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).to match /People/
       end
 
@@ -883,7 +883,7 @@ describe "security" do
         expect(response).to be_redirect
 
         get "/courses/#{@course.id}/gradebook"
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'read_course_content' do
@@ -921,7 +921,7 @@ describe "security" do
         assert_status(401)
 
         get "/courses/#{@course.id}/details"
-        expect(response).to be_success
+        expect(response).to be_successful
         html = Nokogiri::HTML(response.body)
         expect(html.css('.section .assignments')).to be_empty
         expect(html.css('.section .syllabus')).to be_empty
@@ -938,39 +938,39 @@ describe "security" do
         add_permission :read_forum
 
         get "/courses/#{@course.id}"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).to match /People/
 
         @course.tab_configuration = [ { :id => Course::TAB_PEOPLE, :hidden => true } ]
         @course.save!
 
         get "/courses/#{@course.id}/assignments"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).to match /People/ # still has read_as_admin rights
 
         get "/courses/#{@course.id}/assignments/syllabus"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         get "/courses/#{@course.id}/wiki"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         get "/courses/#{@course.id}/quizzes"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         get "/courses/#{@course.id}/discussion_topics"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         get "/courses/#{@course.id}/files"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         get "/courses/#{@course.id}/copy"
         assert_status(401)
 
         get "/courses/#{@course.id}/content_exports"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         get "/courses/#{@course.id}/details"
-        expect(response).to be_success
+        expect(response).to be_successful
         html = Nokogiri::HTML(response.body)
         expect(html.css('.section .assignments')).not_to be_empty
         expect(html.css('.section .syllabus')).not_to be_empty
@@ -995,7 +995,7 @@ describe "security" do
         add_permission :manage_courses
 
         get "/courses/#{@course.id}/details"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).to match /Copy this Course/
         expect(response.body).not_to match /Import Course Content/
         expect(response.body).to match /Export Course Content/
@@ -1004,7 +1004,7 @@ describe "security" do
         add_permission :change_course_state
 
         get "/courses/#{@course.id}/details"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).to match /Delete this Course/
 
         html = Nokogiri::HTML(response.body)
@@ -1012,7 +1012,7 @@ describe "security" do
         expect(html.css('#course_enrollment_term_id')).not_to be_empty
 
         get "/courses/#{@course.id}/copy"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         delete "/courses/#{@course.id}", params: {:event => 'delete'}
         expect(response).to be_redirect
@@ -1022,7 +1022,7 @@ describe "security" do
 
       it 'manage_content' do
         get "/courses/#{@course.id}/details"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).not_to match /Import Course Content/
 
         get "/courses/#{@course.id}/content_migrations"
@@ -1031,11 +1031,11 @@ describe "security" do
         add_permission :manage_content
 
         get "/courses/#{@course.id}/details"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).to match /Import Course Content/
 
         get "/courses/#{@course.id}/content_migrations"
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'read_reports' do
@@ -1043,7 +1043,7 @@ describe "security" do
         add_permission :read_roster
 
         get "/courses/#{@course.id}/users/#{@student.id}"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).not_to match "Access Report"
 
         get "/courses/#{@course.id}/users/#{@student.id}/usage"
@@ -1052,11 +1052,11 @@ describe "security" do
         add_permission :read_reports
 
         get "/courses/#{@course.id}/users/#{@student.id}"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).to match "Access Report"
 
         get "/courses/#{@course.id}/users/#{@student.id}/usage"
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'manage_sections' do
@@ -1064,14 +1064,14 @@ describe "security" do
         remove_permission(:manage_sections, teacher_role)
 
         get "/courses/#{@course.id}/settings"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).not_to match 'Add Section'
 
         post "/courses/#{@course.id}/sections"
         assert_status(401)
 
         get "/courses/#{@course.id}/sections/#{@course.default_section.id}"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         put "/courses/#{@course.id}/sections/#{@course.default_section.id}"
         assert_status(401)
@@ -1082,7 +1082,7 @@ describe "security" do
         remove_permission(:change_course_state, teacher_role)
 
         get "/courses/#{@course.id}/settings"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).not_to match 'End this Course'
 
         delete "/courses/#{@course.id}", params: {:event => 'conclude'}
@@ -1099,7 +1099,7 @@ describe "security" do
         end
 
         get "/courses/#{@course.id}/users/#{@student.id}"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         get "/users/#{@student.id}"
         assert_status(401)
@@ -1108,7 +1108,7 @@ describe "security" do
         user_session(admin)
 
         get "/users/#{@student.id}"
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
   end

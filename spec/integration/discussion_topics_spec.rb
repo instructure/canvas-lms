@@ -32,13 +32,13 @@ describe "discussion_topics" do
     @group.users << @user
 
     get "/groups/#{@group.id}/discussion_topics/#{@topic.id}"
-    expect(response).to be_success
+    expect(response).to be_successful
 
     post "/groups/#{@group.id}/discussion_entries", params: {:discussion_entry => { :discussion_topic_id => @topic.id, :message => "frist!!1" }}
     expect(response).to be_redirect
 
     get "/groups/#{@group.id}/discussion_topics/#{@topic.id}"
-    expect(response).to be_success
+    expect(response).to be_successful
   end
 
   it "should not allow concluded students to update topic" do
@@ -67,7 +67,7 @@ describe "discussion_topics" do
     discussion_assignment
 
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-    expect(response).to be_success
+    expect(response).to be_successful
     doc = Nokogiri::XML(response.body)
     expect(doc.at_css('.admin-links .icon-speed-grader')).not_to be_nil
   end
@@ -79,7 +79,7 @@ describe "discussion_topics" do
     @assignment.save
 
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-    expect(response).to be_success
+    expect(response).to be_successful
     doc = Nokogiri::XML(response.body)
     expect(doc.at_css('.admin-links .icon-peer-review')).not_to be_nil
   end

@@ -74,14 +74,14 @@ describe PlannerOverridesController do
     describe "GET #index" do
       it "returns http success" do
         get :index
-        expect(response).to have_http_status(:success)
+        expect(response).to be_successful
       end
     end
 
     describe "GET #show" do
       it "returns http success" do
         get :show, params: {id: @planner_override.id}
-        expect(response).to have_http_status(:success)
+        expect(response).to be_successful
       end
     end
 
@@ -89,7 +89,7 @@ describe PlannerOverridesController do
       it "returns http success" do
         expect(@planner_override.marked_complete).to be_falsey
         put :update, params: {id: @planner_override.id, marked_complete: true, dismissed: true}
-        expect(response).to have_http_status(:success)
+        expect(response).to be_successful
         expect(@planner_override.reload.marked_complete).to be_truthy
         expect(@planner_override.dismissed).to be_truthy
       end
@@ -125,7 +125,7 @@ describe PlannerOverridesController do
     describe "DELETE #destroy" do
       it "returns http success" do
         delete :destroy, params: {id: @planner_override.id}
-        expect(response).to have_http_status(:success)
+        expect(response).to be_successful
         expect(@planner_override.reload).to be_deleted
       end
 

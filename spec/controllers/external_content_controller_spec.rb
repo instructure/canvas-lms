@@ -22,7 +22,7 @@ describe ExternalContentController do
   describe "GET success" do
     it "doesn't require a context" do
       get :success, params: {service: 'equella'}
-      expect(response).to have_http_status(:success)
+      expect(response).to be_successful
     end
 
     it "gets a context for external_tool_dialog" do

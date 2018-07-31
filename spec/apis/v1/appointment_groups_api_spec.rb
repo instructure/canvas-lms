@@ -402,7 +402,7 @@ describe AppointmentGroupsController, type: :request do
     ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
     json = api_call(:delete, "/api/v1/appointment_groups/#{ag.id}",
                       {:controller => 'appointment_groups', :action => 'destroy', :format => 'json', :id => ag.id.to_s})
-    expect(response).to be_success
+    expect(response).to be_successful
     expect(json.keys.sort).to eql expected_fields
     expect(json['workflow_state']).to eql 'deleted'
     expect(ag.reload).to be_deleted
@@ -422,7 +422,7 @@ describe AppointmentGroupsController, type: :request do
     json = api_call(:delete, "/api/v1/appointment_groups/#{ag.id}",
                       {:controller => 'appointment_groups', :action => 'destroy', :format => 'json', :id => ag.id.to_s})
 
-    expect(response).to be_success
+    expect(response).to be_successful
     expect(json.keys.sort).to eql expected_fields
     expect(json['workflow_state']).to eql 'deleted'
     expect(ag.reload).to be_deleted

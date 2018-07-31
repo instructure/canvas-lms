@@ -657,7 +657,7 @@ describe ConversationsController, type: :request do
             { :controller => 'conversations', :action => 'create', :format => 'json' },
             { :recipients => [@user.id], :body => "hello, me", :context_code => @course.asset_string }
           )
-          expect(response).to be_success
+          expect(response).to be_successful
           expect(json[0]['messages'][0]['participating_user_ids']).to eq([@user.id])
         end
 

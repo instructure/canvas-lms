@@ -57,7 +57,7 @@ describe LtiApiController, type: :request do
     p = pseudonym(@student)
     user_session(@student, p)
     get "/courses/#{@course.id}/external_tools/#{@tool.id}"
-    expect(response).to be_success
+    expect(response).to be_successful
     doc = Nokogiri::HTML(response.body)
     logout_service_url = doc.css('#custom_sub_logout_service_url').attr('value').value
     match = %r{\Ahttp://www.example.com/api/lti/v1/logout_service/([a-z0-9-]+)\z}.match(logout_service_url)
@@ -108,7 +108,7 @@ describe LtiApiController, type: :request do
     enable_cache do
       token = Lti::LogoutService.create_token(@tool, @pseudonym)
       make_call('path' => api_path(token, 'http://logout.notify.example.com/123'))
-      expect(response).to be_success
+      expect(response).to be_successful
       make_call('path' => api_path(token, 'http://logout.notify.example.com/456'))
       expect(response.status).to eql 401
       expect(response.body).to match /Logout service token has already been used/

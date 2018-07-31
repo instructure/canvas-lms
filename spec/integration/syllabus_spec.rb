@@ -28,7 +28,7 @@ describe "syllabus" do
 
     get "/courses/#{@course.id}/assignments/syllabus"
 
-    expect(response).to be_success
+    expect(response).to be_successful
     page = Nokogiri::HTML(response.body)
     expect(page.css('#identity a[href="/login"]')).not_to be_nil
     expect(page.at_css('#syllabusContainer')).not_to be_nil
@@ -52,7 +52,7 @@ describe "syllabus" do
 
       get "/courses/#{@course.id}/assignments/syllabus"
 
-      expect(response).to be_success
+      expect(response).to be_successful
       page = Nokogiri::HTML(response.body)
       expect(page.css('#identity a[href="/login"]')).not_to be_nil
       link = page.at_css('#course_syllabus a')
@@ -71,7 +71,7 @@ describe "syllabus" do
 
       get "/courses/#{@course.id}/assignments/syllabus"
 
-      expect(response).to be_success
+      expect(response).to be_successful
       page = Nokogiri::HTML(response.body)
       expect(page.css('#identity a[href="/login"]')).not_to be_nil
       link = page.at_css('#course_syllabus a')
@@ -90,7 +90,7 @@ describe "syllabus" do
 
       get "/courses/#{@course.id}/assignments/syllabus"
 
-      expect(response).to be_success
+      expect(response).to be_successful
       page = Nokogiri::HTML(response.body)
       expect(page.css('#identity a[href="/login"]')).not_to be_nil
       link = page.at_css('#course_syllabus a')
@@ -110,7 +110,7 @@ describe "syllabus" do
 
       get "/courses/#{@course.id}/assignments/syllabus"
 
-      expect(response).to be_success
+      expect(response).to be_successful
       page = Nokogiri::HTML(response.body)
       expect(page.css('#identity a[href="/login"]')).not_to be_nil
       link = page.at_css('#course_syllabus a')
@@ -158,7 +158,7 @@ describe "syllabus" do
 
     get "/courses/#{@course.id}"
 
-    expect(response).to be_success
+    expect(response).to be_successful
     page = Nokogiri::HTML(response.body)
     expect(page.at_css('#course_syllabus').text).to include(syllabus_body)
   end

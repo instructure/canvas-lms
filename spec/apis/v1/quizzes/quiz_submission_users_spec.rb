@@ -87,7 +87,7 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
         options,
         { 'Accept' => 'application/json'}
       )
-      JSON.parse(response.body) if response.success?
+      JSON.parse(response.body) if response.successful?
     end
 
     it "does not allow students to view information at the endpoint" do
@@ -98,13 +98,13 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
 
     it "allows teachers to see submitted students with ?submitted=true" do
       json = get_submitted_users(submitted: true)
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(json['users'].first['id']).to eq @student1.id.to_s
     end
 
     it "allows teachers to see unsubmitted students with ?submitted=false" do
       json = get_submitted_users(submitted: false)
-      expect(response).to be_success
+      expect(response).to be_successful
       user_ids = json['users'].map { |h| h['id'] }
       expect(user_ids).not_to include @student1.id.to_s
       expect(user_ids).to include @student2.id.to_s
@@ -112,7 +112,7 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
 
     it "allows teachers to see all students for quiz when submitted parameter not passed" do
       json = get_submitted_users
-      expect(response).to be_success
+      expect(response).to be_successful
       user_ids = json['users'].map { |h| h['id'] }
       expect(user_ids).to include @student1.id.to_s
       expect(user_ids).to include @student2.id.to_s
@@ -120,7 +120,7 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
 
     it "will sideload quiz_submissions" do
       json = get_submitted_users(include: ['quiz_submissions'])
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(json['quiz_submissions'].first.with_indifferent_access[:id]).to eq @quiz_submission.id.to_s
       expect(json['quiz_submissions'].length).to eq 1
     end
@@ -131,14 +131,14 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
         @quiz.save!
 
         json = get_submitted_users(submitted: false)
-        expect(response).to be_success
+        expect(response).to be_successful
         user_ids = json['users'].map { |h| h['id'] }
         expect(user_ids).not_to include @student2.id.to_s
 
         create_section_override_for_quiz(@quiz, {course_section: @student2.enrollments.current.first.course_section})
 
         json = get_submitted_users(submitted: false)
-        expect(response).to be_success
+        expect(response).to be_successful
         user_ids = json['users'].map { |h| h['id'] }
         expect(user_ids).to include @student2.id.to_s
       end

@@ -89,7 +89,7 @@ describe FilesController do
       remove_user_session
 
       get location
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(response.content_type).to eq 'image/png'
       # ensure that the user wasn't logged in by the normal means
       expect(controller.instance_variable_get(:@current_user)).to be_nil
@@ -98,7 +98,7 @@ describe FilesController do
     it "without safefiles" do
       allow(HostUrl).to receive(:file_host).and_return('test.host')
       get "http://test.host/users/#{@me.id}/files/#{@att.id}/download"
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(response.content_type).to eq 'image/png'
       expect(response['Pragma']).to be_nil
       expect(response['Cache-Control']).not_to match(/no-cache/)
@@ -121,7 +121,7 @@ describe FilesController do
 
         get location
         # the response will be on the main domain, with an iframe pointing to the files domain and the actual uploaded html file
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.content_type).to eq 'text/html'
         doc = Nokogiri::HTML::DocumentFragment.parse(response.body)
         expect(doc.at_css('iframe#file_content')['src']).to match %r{^http://files-test.host/users/#{@me.id}/files/#{@att.id}/my%20files/unfiled/ohai.html}
@@ -209,7 +209,7 @@ describe FilesController do
     remove_user_session
 
     get location
-    expect(response).to be_success
+    expect(response).to be_successful
     expect(response.content_type).to eq 'image/png'
     # ensure that the user wasn't logged in by the normal means
     expect(controller.instance_variable_get(:@current_user)).to be_nil
@@ -231,7 +231,7 @@ describe FilesController do
     remove_user_session
 
     get location
-    expect(response).to be_success
+    expect(response).to be_successful
     expect(response.content_type).to eq 'image/png'
     # ensure that the user wasn't logged in by the normal means
     expect(controller.instance_variable_get(:@current_user)).to be_nil
@@ -253,7 +253,7 @@ describe FilesController do
 
     # the response will be on the main domain, with an iframe pointing to the files domain and the actual uploaded html file
     get "http://test.host/courses/#{@course.id}/files/#{@att.id}"
-    expect(response).to be_success
+    expect(response).to be_successful
     expect(response.content_type).to eq 'text/html'
     doc = Nokogiri::HTML::DocumentFragment.parse(response.body)
     location = doc.at_css('iframe#file_content')['src']
@@ -291,7 +291,7 @@ describe FilesController do
       remove_user_session
 
       get location
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(response.content_type).to eq 'image/png'
       # ensure that the user wasn't logged in by the normal means
       expect(controller.instance_variable_get(:@current_user)).to be_nil
@@ -310,7 +310,7 @@ describe FilesController do
     def do_without_safefiles_test(url)
       allow(HostUrl).to receive(:file_host).and_return('test.host')
       get url
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(response.content_type).to eq 'image/png'
       expect(response['Pragma']).to be_nil
       expect(response['Cache-Control']).not_to match(/no-cache/)
@@ -344,7 +344,7 @@ describe FilesController do
     remove_user_session
 
     get location
-    expect(response).to be_success
+    expect(response).to be_successful
     expect(response.content_type).to eq 'image/png'
     expect(controller.instance_variable_get(:@current_user)).to be_nil
     expect(controller.instance_variable_get(:@context)).to be_nil
@@ -371,7 +371,7 @@ describe FilesController do
     att2 = attachment_model(:uploaded_data => stub_png_data("file2.png"), :context => @course)
 
     post "/courses/#{@course.id}/files/reorder", params: {:order => "#{att2.id}, #{att1.id}", :folder_id => @folder.id}
-    expect(response).to be_success
+    expect(response).to be_successful
 
     expect(@folder.file_attachments.by_position_then_display_name).to eq [att2, att1]
   end
@@ -406,6 +406,6 @@ describe FilesController do
     expect(response['Location']).to include("files/#{attachment.id}")
 
     get response['Location']
-    expect(response).to be_success
+    expect(response).to be_successful
   end
 end

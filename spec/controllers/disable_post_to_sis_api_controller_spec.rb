@@ -49,7 +49,7 @@ describe DisablePostToSisApiController do
         put 'disable_post_to_sis', params: {course_id: course.id}
 
         expect(response.code).to eq "204"
-        expect(response.success?).to be_truthy
+        expect(response).to be_successful
       end
 
       it 'disables assignments with post_to_sis enabled' do
@@ -61,7 +61,7 @@ describe DisablePostToSisApiController do
         assignment = Assignment.find(assignment.id)
 
         expect(response.code).to eq "204"
-        expect(response.success?).to be_truthy
+        expect(response).to be_successful
         expect(assignment.post_to_sis).to be_falsey
       end
 
@@ -101,7 +101,7 @@ describe DisablePostToSisApiController do
           assignment = Assignment.find(assignment.id)
 
           expect(response.code).to eq "204"
-          expect(response.success?).to be_truthy
+          expect(response).to be_successful
           expect(assignment.post_to_sis).to be_falsey
         end
       end

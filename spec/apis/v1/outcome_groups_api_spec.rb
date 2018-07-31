@@ -777,7 +777,7 @@ describe "Outcome Groups API", type: :request do
                    :account_id => @account.id.to_s,
                    :id => @group.id.to_s,
                    :format => 'json')
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should return the outcomes linked into the group" do
@@ -1508,7 +1508,7 @@ describe "Outcome Groups API", type: :request do
                    :account_id => @account.id.to_s,
                    :id => @group.id.to_s,
                    :format => 'json')
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     def create_subgroup(opts={})

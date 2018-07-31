@@ -84,7 +84,7 @@ describe SisApiController, type: :request do
         it 'returns paginated assignment list' do
           # first page
           get "/api/sis/accounts/#{context.id}/assignments", params: {account_id: context.id, per_page: 2}
-          expect(response).to be_success
+          expect(response).to be_successful
           result_json = json_parse
           expect(result_json.length).to eq(2)
           expect(result_json[0]).to include('id' => assignment8.id)
@@ -92,7 +92,7 @@ describe SisApiController, type: :request do
 
           # second page
           get "/api/sis/accounts/#{context.id}/assignments", params: {account_id: context.id, per_page: 2, page: 2}
-          expect(response).to be_success
+          expect(response).to be_successful
           result_json = json_parse
           expect(result_json.length).to eq(2)
           expect(result_json[0]).to include('id' => assignment10.id)
@@ -121,7 +121,7 @@ describe SisApiController, type: :request do
           end
 
           get "/api/sis/accounts/#{context.id}/assignments?starts_before=#{start_at.iso8601}", params: {:account_id => context.id}
-          expect(response).to be_success
+          expect(response).to be_successful
 
           result = json_parse
           expect(result.map{|h| h['course_id']}).to match_array [course1.id, course2.id, course4.id]
@@ -145,7 +145,7 @@ describe SisApiController, type: :request do
           end
 
           get "/api/sis/accounts/#{context.id}/assignments?ends_after=#{end_at.iso8601}", params: {:account_id => context.id}
-          expect(response).to be_success
+          expect(response).to be_successful
 
           result = json_parse
           expect(result.map{|h| h['course_id']}).to match_array [course1.id, course2.id, course4.id]
@@ -156,7 +156,7 @@ describe SisApiController, type: :request do
           @account.save!
 
           get "/api/sis/accounts/sis_account_id:#{@account.sis_source_id}/assignments"
-          expect(response).to be_success
+          expect(response).to be_successful
 
           result = json_parse
           assignment_ids = result.map { |a| a['id'] }
@@ -287,7 +287,7 @@ describe SisApiController, type: :request do
         it 'returns paginated assignment list' do
           # first page
           get "/api/sis/courses/#{@course.id}/assignments", params: {course_id: @course.id, per_page: 2}
-          expect(response).to be_success
+          expect(response).to be_successful
           result_json = json_parse
           expect(result_json.length).to eq(2)
           expect(result_json[0]).to include('id' => assignment4.id)
@@ -295,7 +295,7 @@ describe SisApiController, type: :request do
 
           # second page
           get "/api/sis/courses/#{@course.id}/assignments", params: {course_id: @course.id, per_page: 2, page: 2}
-          expect(response).to be_success
+          expect(response).to be_successful
           result_json = json_parse
           expect(result_json.length).to eq(2)
           expect(result_json[0]).to include('id' => assignment6.id)
@@ -303,7 +303,7 @@ describe SisApiController, type: :request do
 
           # third page
           get "/api/sis/courses/#{@course.id}/assignments", params: {course_id: @course.id, per_page: 2, page: 3}
-          expect(response).to be_success
+          expect(response).to be_successful
           result_json = json_parse
           expect(result_json.length).to eq(1)
           expect(result_json[0]).to include('id' => assignment8.id)
@@ -335,7 +335,7 @@ describe SisApiController, type: :request do
           context.save!
 
           get "/api/sis/courses/sis_course_id:#{context.sis_source_id}/assignments"
-          expect(response).to be_success
+          expect(response).to be_successful
 
           result = json_parse
           assignment_ids = result.map { |a| a['id'] }

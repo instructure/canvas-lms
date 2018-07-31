@@ -43,14 +43,14 @@ describe "one time passwords" do
       follow_redirect!
       expect(response).to redirect_to canvas_login_url
       follow_redirect!
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should not destroy your session when someone does an XHR accidentally" do
       get '/api/v1/conversations/unread_count', :xhr => true
       expect(response.status).to eq 403
       get otp_login_url
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 end

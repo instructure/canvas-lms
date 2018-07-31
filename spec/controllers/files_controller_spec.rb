@@ -346,7 +346,7 @@ describe FilesController do
 
       # first use to establish session
       get 'show', params: verifier.merge(id: file.id)
-      expect(response).to be_success
+      expect(response).to be_successful
       permissions_key = session[:permissions_key]
 
       # second use after verifier expiration but before session expiration.
@@ -354,7 +354,7 @@ describe FilesController do
       Timecop.freeze((Users::AccessVerifier::TTL_MINUTES + 1).minutes.from_now) do
         get 'show', params: verifier.merge(id: file.id)
       end
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(session[:permissions_key]).not_to eq permissions_key
     end
 

@@ -54,11 +54,11 @@ describe "user asset accesses" do
 
     user_session(@student)
     get "/courses/#{@course.id}/assignments/#{assignment.id}"
-    expect(response).to be_success
+    expect(response).to be_successful
 
     user_session(@teacher)
     get "/courses/#{@course.id}/users/#{@student.id}/usage"
-    expect(response).to be_success
+    expect(response).to be_successful
     html = Nokogiri::HTML(response.body)
     expect(html.css('#usage_report .access.assignment').length).to eq 1
     expect(html.css('#usage_report .access.assignment .readable_name').text.strip).to eq 'Assignment 1'
@@ -74,11 +74,11 @@ describe "user asset accesses" do
 
     user_session(@student)
     get "/courses/#{@course.id}/assignments/#{assignment.id}"
-    expect(response).to be_success
+    expect(response).to be_successful
 
     user_session(@teacher)
     get "/courses/#{@course.id}/users/#{@student.id}/usage"
-    expect(response).to be_success
+    expect(response).to be_successful
     html = Nokogiri::HTML(response.body)
     expect(html.css('#usage_report .access.assignment').length).to eq 1
     expect(html.css('#usage_report .access.assignment .readable_name').text.strip).to eq 'Assignment 1'

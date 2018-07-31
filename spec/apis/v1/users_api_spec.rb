@@ -1064,7 +1064,7 @@ describe "Users API", type: :request do
           }
         }
       )
-      expect(response).to be_success
+      expect(response).to be_successful
       users = User.where(name: "Test User").to_a
       expect(users.size).to eq 1
       expect(users.first.pseudonyms.first.unique_id).to eq "test"
@@ -1165,7 +1165,7 @@ describe "Users API", type: :request do
                      }
                  }
                 )
-        expect(response).to be_success
+        expect(response).to be_successful
         users = User.where(name: "Test User").to_a
         expect(users.size).to eq 1
         expect(users.first.pseudonyms.first.unique_id).to eq "test@test.com"
