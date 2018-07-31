@@ -16,21 +16,46 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class SubmissionDetails
-  include SeleniumDependencies
+  class << self
+    include SeleniumDependencies
 
-  def visit_as_student(courseid,assignmentid,studentid)
-    get "/courses/#{courseid}/assignments/#{assignmentid}/submissions/#{studentid}"
-  end
+    # element locators
 
-  def comment_text_by_id(comment_id)
-    f("#submission_comment_#{comment_id} span").text
-  end
+    def comment_text_by_id(comment_id)
+      f("#submission_comment_#{comment_id} span").text
+    end
 
-  def comment_list_div
-    f('.comment_list')
-  end
+    def comment_list_div
+      f('.comment_list')
+    end
 
-  def view_feedback_link
-    f("div .file-upload-submission-attachment a").attribute('text')
+    def comments
+      f('.comment_list .comment .comment')
+    end
+
+    def view_feedback_link
+      f("div .file-upload-submission-attachment a").attribute('text')
+    end
+
+    def add_comment_text_area
+      f('.ic-Input.grading_comment')
+    end
+
+    def comment_save_button
+      fj('button:contains("Save")')
+    end
+
+
+    # page actions
+
+    def submit_comment(text)
+      replace_content(add_comment_text_area, text)
+      comment_save_button.click
+      wait_for_ajaximations
+    end
+
+    def visit_as_student(course_id, assignment_id, student_id)
+      get "/courses/#{course_id}/assignments/#{assignment_id}/submissions/#{student_id}"
+    end
   end
 end

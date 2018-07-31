@@ -619,18 +619,17 @@ describe 'Speedgrader' do
       @comment = @submission_for_student.add_comment(author: @teacher, comment: @comment_text)
 
       # page object
-      submission_detail = SubmissionDetails.new
 
       # student can see the new comment
       user_session(@students.first)
-      submission_detail.visit_as_student(@course.id, @assignment_for_course.id, @students.first.id)
-      expect(submission_detail.comment_text_by_id(@comment.id)).to eq @comment_text
+      SubmissionDetails.visit_as_student(@course.id, @assignment_for_course.id, @students.first.id)
+      expect(SubmissionDetails.comment_text_by_id(@comment.id)).to eq @comment_text
 
       @comment.destroy
 
       # student cannot see the deleted comment
-      submission_detail.visit_as_student(@course.id, @assignment_for_course.id, @students.first.id)
-      expect(submission_detail.comment_list_div).not_to contain_css("#submission_comment_#{@comment.id}")
+      SubmissionDetails.visit_as_student(@course.id, @assignment_for_course.id, @students.first.id)
+      expect(SubmissionDetails.comment_list_div).not_to contain_css("#submission_comment_#{@comment.id}")
     end
 
     it 'should display the correct file submission in the right sidebar', priority: "1", test_id: 525188 do
