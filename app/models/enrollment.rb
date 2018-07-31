@@ -628,8 +628,8 @@ class Enrollment < ActiveRecord::Base
   STATE_BY_DATE_RANK = ['active', ['invited', 'creation_pending', 'pending_active', 'pending_invited'], 'completed', 'inactive', 'rejected', 'deleted']
   STATE_BY_DATE_RANK_HASH = rank_hash(STATE_BY_DATE_RANK)
   def self.state_by_date_rank_sql
-    @state_by_date_rank_sql ||= rank_sql(STATE_BY_DATE_RANK, 'enrollment_states.state').
-      sub(/^CASE/, "CASE WHEN enrollment_states.restricted_access THEN #{STATE_BY_DATE_RANK.index('inactive')}") # pretend restricted access is the same as inactive
+    @state_by_date_rank_sql ||= Arel.sql(rank_sql(STATE_BY_DATE_RANK, 'enrollment_states.state').
+      sub(/^CASE/, "CASE WHEN enrollment_states.restricted_access THEN #{STATE_BY_DATE_RANK.index('inactive')}")) # pretend restricted access is the same as inactive
   end
 
   def state_with_date_sortable
@@ -1253,7 +1253,7 @@ class Enrollment < ActiveRecord::Base
     raise "top_enrollment_by_user must be scoped" unless all.where_clause.present?
 
     key = key.to_s
-    order("#{key}, #{type_rank_sql(rank_order)}").distinct_on(key)
+    order(Arel.sql("#{key}, #{type_rank_sql(rank_order)}")).distinct_on(key)
   end
 
   def assign_uuid

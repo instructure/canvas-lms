@@ -229,7 +229,7 @@ class FilesController < ApplicationController
         if authorized_action(root_folder, @current_user, :read)
           file_structure = {
             :folders => @context.active_folders.
-              reorder("COALESCE(parent_folder_id, 0), COALESCE(position, 0), COALESCE(name, ''), created_at").
+              reorder(Arel.sql("COALESCE(parent_folder_id, 0), COALESCE(position, 0), COALESCE(name, ''), created_at")).
               select(:id, :parent_folder_id, :name)
           }
 
