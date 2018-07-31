@@ -87,6 +87,7 @@ class Assignment < ActiveRecord::Base
   has_one :score_statistic, dependent: :destroy
 
   has_many :moderation_graders, inverse_of: :assignment
+  has_many :moderation_grader_users, through: :moderation_graders, source: :user
 
   validates_associated :external_tool_tag, :if => :external_tool?
   validate :group_category_changes_ok?

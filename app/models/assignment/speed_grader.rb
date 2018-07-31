@@ -194,21 +194,15 @@ class Assignment
         json['attachments'] = attachments_for_submission[sub].map do |att|
           att.as_json(:only => [:mime_class, :comment_id, :id, :submitter_id ])
         end
-        has_crocodoc = attachments_for_submission[sub].any?(&:crocodoc_available?)
 
         sub_attachments = []
-        moderated_grading_whitelist = if provisional_grader_or_moderator?
-                                        [ sub.user, @user ].map do |u|
-                                          u.moderated_grading_ids(has_crocodoc)
-                                        end
-                                      else
-                                        sub.moderated_grading_whitelist
-                                      end
-
         url_opts = {
           anonymous_instructor_annotations: @assignment.anonymous_instructor_annotations,
           enable_annotations: true,
-          moderated_grading_whitelist: moderated_grading_whitelist
+          moderated_grading_whitelist: sub.moderated_grading_whitelist(
+            @user,
+            loaded_attachments: attachments_for_submission[sub]
+          )
         }
 
         if url_opts[:enable_annotations]
