@@ -1638,6 +1638,7 @@ ht:
   allows_the_duplicating_of_objects_in_canvas_c86f3665: "Pèmèt diplikasyon objè nan Canvas"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "Pèmèt diplikasyon Aktivite ki nan Kalandriye yo"
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Pèmèt pwogramasyon evènman ki gen yon ajenda peryodik"
+  allows_user_to_send_a_message_to_all_in_course_nam_992e425: "Pèmèt itilizatè a voye yon mesaj bay \"Tout moun nan [course name],” oswa “Tout moun nan [course group].”"
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Pèmèt itilizatè ki gen nimewo telefòn entènasyonal yo pou yo resevwa mesaj de Canvas."
   alumno_88c80e37: Alumno
   always_3a59e701: Toujou
