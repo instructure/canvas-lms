@@ -26,6 +26,7 @@ describe Assignment do
   describe 'relationships' do
     it { is_expected.to have_one(:score_statistic).dependent(:destroy) }
     it { is_expected.to have_many(:moderation_graders) }
+    it { is_expected.to have_many(:moderation_grader_users) }
   end
 
   before :once do

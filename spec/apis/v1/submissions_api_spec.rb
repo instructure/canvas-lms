@@ -4112,6 +4112,7 @@ describe 'Submissions API', type: :request do
     assignment.moderated_grading_selections.
       where(student_id: @student.id).first.
       update_attribute(:provisional_grade, provisional_grade)
+    provisional_grade.publish!
     assignment.update(grades_published_at: 1.hour.ago)
     submission.reload
     submission.attachments.first.create_crocodoc_document(uuid: '1234',
