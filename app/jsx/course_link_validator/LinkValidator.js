@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'compiled/jquery.rails_flash_notifications'
 import React from 'react'
 import I18n from 'i18n!link_validator'
 import ValidatorResults from './ValidatorResults'
@@ -79,12 +80,15 @@ import ValidatorResults from './ValidatorResults'
       this.setState({
         buttonMessage: I18n.t("Loading..."),
         buttonDisabled: true,
+        displayResults: false,
+        results: []
       });
     },
     startValidation () {
       $('#all-results').hide();
 
       this.setLoadingState();
+      $.screenReaderFlashMessage(I18n.t("Link validation is running"))
 
       // You need to send a POST request to the API to initialize validation
       $.ajax({
@@ -106,10 +110,11 @@ import ValidatorResults from './ValidatorResults'
     },
 
     render () {
-      var loadingImage;
+      let loadingImage;
       if (this.state.buttonDisabled) {
-        loadingImage = <img src="/images/ajax-loader.gif"/>;
+        loadingImage = <img src="/images/ajax-loader.gif" alt={I18n.t('Link validation is running')}/>
       }
+
       return (
         <div>
           <button onClick={this.startValidation} className="Button Button--primary"

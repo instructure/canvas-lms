@@ -17,6 +17,8 @@
  */
 
 import React from 'react'
+import $ from 'jquery'
+import 'compiled/jquery.rails_flash_notifications'
 import I18n from 'i18n!link_validator'
 import _ from 'underscore'
 import ValidatorResultsRow from './ValidatorResultsRow'
@@ -46,6 +48,7 @@ import ValidatorResultsRow from './ValidatorResultsRow'
 
       if (this.props.error) {
         alertMessage = <div className='alert alert-error'>{errorMessage}</div>;
+        $.flashError(errorMessage)
       } else if (!this.props.displayResults) {
         return null;
       } else {
@@ -72,6 +75,7 @@ import ValidatorResultsRow from './ValidatorResultsRow'
 
         if (results.length === 0) {
           alertMessage = <div className='alert alert-success'>{noBrokenLinksMessage}</div>;
+          $.screenReaderFlashMessage(noBrokenLinksMessage)
         } else {
           results.forEach((result) => {
             allResults.push(<ValidatorResultsRow result={result} />);
@@ -79,6 +83,7 @@ import ValidatorResultsRow from './ValidatorResultsRow'
           });
 
           alertMessage = <div className='alert alert-info'>{this.getDisplayMessage(numberofBrokenLinks)}</div>;
+          $.screenReaderFlashMessage(this.getDisplayMessage(numberofBrokenLinks));
         }
       }
 
