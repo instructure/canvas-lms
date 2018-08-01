@@ -1358,65 +1358,269 @@ test('should not call numberHelper#parse if grading type is neither points nor p
   equal(result, 'A');
 });
 
-QUnit.module('Function returned by SpeedGrader#compareStudentsBy', {
-  setup () {
-    sandbox.spy(natcompare, 'strings');
-  }
-});
+QUnit.module('SpeedGrader', suiteHooks => {
+  let $container
 
-test('returns 1 when the given function returns false for the first student and non-false for the second', () => {
-  const studentA = { sortable_name: 'b' };
-  const studentB = { sortable_name: 'a' };
-  const stub = sinon.stub().returns(false, 'foo');
-  const compare = SpeedGrader.EG.compareStudentsBy(stub);
-  strictEqual(compare(studentA, studentB), 1);
-});
+  suiteHooks.beforeEach(() => {
+    $container = document.createElement('div')
+    document.body.appendChild($container)
+    $container.innerHTML = `
+      <span id="speedgrader-settings"></span>
+      <div id="combo_box_container"></div>
+      <div id="iframe_holder"></div>
+    `
 
-test('returns 1 when the given function returns a greater value for the first student than the second', () => {
-  const studentA = { sortable_name: 'b' };
-  const studentB = { sortable_name: 'a' };
-  const stub = sinon.stub();
-  stub.onFirstCall().returns(2);
-  stub.onSecondCall().returns(1);
-  const compare = SpeedGrader.EG.compareStudentsBy(stub);
-  strictEqual(compare(studentA, studentB), 1);
-});
+    sandbox.stub($, 'ajaxJSON')
+    fakeENV.setup({
+      RUBRIC_ASSESSMENT: {},
+      assignment_id: '2301',
+      course_id: '1201',
+      help_url: '',
+      show_help_menu_item: false
+    })
 
-test('returns -1 when the given function returns a lesser value for the first student than the second', () => {
-  const studentA = { sortable_name: 'b' };
-  const studentB = { sortable_name: 'a' };
-  const stub = sinon.stub();
-  stub.onFirstCall().returns(1);
-  stub.onSecondCall().returns(2);
-  const compare = SpeedGrader.EG.compareStudentsBy(stub);
-  strictEqual(compare(studentA, studentB), -1);
-});
+    sandbox.stub(userSettings, 'get')
+    sandbox.stub(SpeedGrader.EG, 'handleFragmentChanged')
+  })
 
-test('compares student sortable names when given function returns falsey for both students', () => {
-  const studentA = { sortable_name: 'b' };
-  const studentB = { sortable_name: 'a' };
-  const compare = SpeedGrader.EG.compareStudentsBy(() => false);
-  const order = compare(studentA, studentB);
-  equal(natcompare.strings.callCount, 1);
-  ok(natcompare.strings.calledWith(studentA.sortable_name, studentB.sortable_name));
-  equal(order, 1);
-});
+  suiteHooks.afterEach(() => {
+    window.location.hash = ''
+    fakeENV.teardown()
+    $container.remove()
+  })
 
-test('compares student sortable names when given function returns equal values for both students', () => {
-  const studentA = { sortable_name: 'b' };
-  const studentB = { sortable_name: 'a' };
-  let compare = SpeedGrader.EG.compareStudentsBy(() => 42);
-  let order = compare(studentA, studentB);
-  equal(natcompare.strings.callCount, 1);
-  ok(natcompare.strings.calledWith(studentA.sortable_name, studentB.sortable_name));
-  equal(order, 1);
+  QUnit.module('Student Order', hooks => {
+    hooks.beforeEach(() => {
+      SpeedGrader.setup()
 
-  compare = SpeedGrader.EG.compareStudentsBy(() => 'foo');
-  order = compare(studentA, studentB);
-  equal(natcompare.strings.callCount, 2);
-  ok(natcompare.strings.calledWith(studentA.sortable_name, studentB.sortable_name));
-  equal(order, 1);
-});
+      window.jsonData = {
+        GROUP_GRADING_MODE: false,
+        anonymize_students: false,
+        gradingPeriods: {},
+        id: 27,
+        points_possible: 10,
+        submissions: []
+      }
+
+      userSettings.get.withArgs('eg_sort_by').returns('alphabetically')
+    })
+
+    hooks.afterEach(() => {
+      SpeedGrader.teardown()
+    })
+
+    QUnit.module('when students are not anonymous', contextHooks => {
+      contextHooks.beforeEach(() => {
+        window.jsonData.context = {
+          active_course_sections: ['2001'],
+          enrollments: [
+            {course_section_id: '2001', user_id: '1101', workflow_state: 'active'},
+            {course_section_id: '2001', user_id: '1102', workflow_state: 'active'},
+            {course_section_id: '2001', user_id: '1103', workflow_state: 'active'},
+            {course_section_id: '2001', user_id: '1104', workflow_state: 'active'}
+          ],
+          students: [
+            {id: '1101', sortable_name: 'Jones, Adam'},
+            {id: '1102', sortable_name: 'Ford, Betty'},
+            {id: '1103', sortable_name: 'Xi, Charlie'},
+            {id: '1104', sortable_name: 'Smith, Dana'}
+          ]
+        }
+
+        window.jsonData.submissions = [
+          {
+            grade: null,
+            grade_matches_current_submission: false,
+            id: '2501',
+            score: null,
+            submitted_at: '2015-05-05T12:00:00Z',
+            user_id: '1101',
+            workflow_state: 'submitted'
+          },
+
+          {
+            grade: null,
+            grade_matches_current_submission: false,
+            id: '2502',
+            score: null,
+            submitted_at: null,
+            user_id: '1102',
+            workflow_state: 'unsubmitted'
+          },
+
+          {
+            grade: 'F',
+            grade_matches_current_submission: false,
+            id: '2503',
+            score: 0,
+            submitted_at: '2015-05-06T12:00:00Z',
+            user_id: '1103',
+            workflow_state: 'resubmitted'
+          },
+
+          {
+            grade: 'A',
+            grade_matches_current_submission: true,
+            id: '2504',
+            score: 10,
+            submitted_at: '2015-05-04T12:00:00Z',
+            user_id: '1104',
+            workflow_state: 'graded'
+          }
+        ]
+      })
+
+      test('preserves student order (from server) when sorting alphabetically', () => {
+        SpeedGrader.EG.jsonReady()
+        const ids = window.jsonData.studentsWithSubmissions.map(student => student.id)
+        deepEqual(ids, ['1101', '1102', '1103', '1104'])
+      })
+
+      test('preserves student order (from server) when no sorting preference is set', () => {
+        userSettings.get.withArgs('eg_sort_by').returns(undefined)
+        SpeedGrader.EG.jsonReady()
+        const ids = window.jsonData.studentsWithSubmissions.map(student => student.id)
+        deepEqual(ids, ['1101', '1102', '1103', '1104'])
+      })
+
+      test('sorts students by submission "submitted_at" when sorting by submission date', () => {
+        userSettings.get.withArgs('eg_sort_by').returns('submitted_at')
+        SpeedGrader.EG.jsonReady()
+        const ids = window.jsonData.studentsWithSubmissions.map(student => student.id)
+        deepEqual(ids, ['1104', '1101', '1103', '1102'])
+      })
+
+      test('sorts students by sortable_name when submission "submitted_at" dates match', () => {
+        window.jsonData.submissions[0].submitted_at = window.jsonData.submissions[1].submitted_at
+        userSettings.get.withArgs('eg_sort_by').returns('submitted_at')
+        SpeedGrader.EG.jsonReady()
+        const ids = window.jsonData.studentsWithSubmissions.map(student => student.id)
+        deepEqual(ids, ['1104', '1103', '1102', '1101'])
+      })
+
+      test('sorts students by submission status', () => {
+        userSettings.get.withArgs('eg_sort_by').returns('submission_status')
+        SpeedGrader.EG.jsonReady()
+        const ids = window.jsonData.studentsWithSubmissions.map(student => student.id)
+        deepEqual(ids, ['1101', '1103', '1102', '1104'])
+      })
+
+      test('sorts students by sortable_name when submission statuses match', () => {
+        Object.assign(window.jsonData.submissions[1], {grade: null, score: null, workflow_state: 'submitted'})
+        userSettings.get.withArgs('eg_sort_by').returns('submission_status')
+        SpeedGrader.EG.jsonReady()
+        const ids = window.jsonData.studentsWithSubmissions.map(student => student.id)
+        deepEqual(ids, ['1102', '1101', '1103', '1104'])
+      })
+    })
+
+    QUnit.module('when students are anonymous', contextHooks => {
+      contextHooks.beforeEach(() => {
+        window.jsonData.anonymize_students = true
+        window.jsonData.context = {
+          active_course_sections: ['2001'],
+          enrollments: [
+            {course_section_id: '2001', anonymous_id: '12345', workflow_state: 'active'},
+            {course_section_id: '2001', anonymous_id: '23456', workflow_state: 'active'},
+            {course_section_id: '2001', anonymous_id: '34567', workflow_state: 'active'},
+            {course_section_id: '2001', anonymous_id: '45678', workflow_state: 'active'}
+          ],
+          students: [
+            {anonymous_id: '23456'},
+            {anonymous_id: '12345'},
+            {anonymous_id: '45678'},
+            {anonymous_id: '34567'}
+          ]
+        }
+
+        window.jsonData.submissions = [
+          {
+            anonymous_id: '23456',
+            grade: null,
+            grade_matches_current_submission: false,
+            id: '2501',
+            score: null,
+            submitted_at: '2015-05-05T12:00:00Z',
+            workflow_state: 'submitted'
+          },
+
+          {
+            anonymous_id: '12345',
+            grade: null,
+            grade_matches_current_submission: false,
+            id: '2502',
+            score: null,
+            submitted_at: null,
+            workflow_state: 'unsubmitted'
+          },
+
+          {
+            anonymous_id: '45678',
+            grade: 'F',
+            grade_matches_current_submission: false,
+            id: '2503',
+            score: 0,
+            submitted_at: '2015-05-06T12:00:00Z',
+            workflow_state: 'resubmitted'
+          },
+
+          {
+            anonymous_id: '34567',
+            grade: 'A',
+            grade_matches_current_submission: true,
+            id: '2504',
+            score: 10,
+            submitted_at: '2015-05-04T12:00:00Z',
+            workflow_state: 'graded'
+          }
+        ]
+      })
+
+      test('sorts students by anonymous_id when sorting alphabetically', () => {
+        SpeedGrader.EG.jsonReady()
+        const ids = window.jsonData.studentsWithSubmissions.map(student => student.anonymous_id)
+        deepEqual(ids, ['12345', '23456', '34567', '45678'])
+      })
+
+      test('sorts students by anonymous_id when no sorting preference is set', () => {
+        userSettings.get.withArgs('eg_sort_by').returns(undefined)
+        SpeedGrader.EG.jsonReady()
+        const ids = window.jsonData.studentsWithSubmissions.map(student => student.anonymous_id)
+        deepEqual(ids, ['12345', '23456', '34567', '45678'])
+      })
+
+      test('sorts students by submission "submitted_at" when sorting by submission date', () => {
+        userSettings.get.withArgs('eg_sort_by').returns('submitted_at')
+        SpeedGrader.EG.jsonReady()
+        const ids = window.jsonData.studentsWithSubmissions.map(student => student.anonymous_id)
+        deepEqual(ids, ['34567', '23456', '45678', '12345'])
+      })
+
+      test('sorts students by anonymous_id when submission "submitted_at" dates match', () => {
+        window.jsonData.submissions[0].submitted_at = window.jsonData.submissions[1].submitted_at
+        userSettings.get.withArgs('eg_sort_by').returns('submitted_at')
+        SpeedGrader.EG.jsonReady()
+        const ids = window.jsonData.studentsWithSubmissions.map(student => student.anonymous_id)
+        deepEqual(ids, ['34567', '45678', '12345', '23456'])
+      })
+
+      test('sorts students by submission status', () => {
+        userSettings.get.withArgs('eg_sort_by').returns('submission_status')
+        SpeedGrader.EG.jsonReady()
+        const ids = window.jsonData.studentsWithSubmissions.map(student => student.anonymous_id)
+        deepEqual(ids, ['23456', '45678', '12345', '34567'])
+      })
+
+      test('sorts students by anonymous_id when submission statuses match', () => {
+        Object.assign(window.jsonData.submissions[1], {grade: null, score: null, workflow_state: 'submitted'})
+        userSettings.get.withArgs('eg_sort_by').returns('submission_status')
+        SpeedGrader.EG.jsonReady()
+        const ids = window.jsonData.studentsWithSubmissions.map(student => student.anonymous_id)
+        deepEqual(ids, ['12345', '23456', '45678', '34567'])
+      })
+    })
+  })
+})
 
 QUnit.module('SpeedGrader - gateway timeout', {
   setup () {

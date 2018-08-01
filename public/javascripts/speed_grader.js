@@ -304,44 +304,58 @@ function mergeStudentsAndSubmission() {
     }
   }
 
-  // by default the list is sorted alphabetically by student last name so we
-  // don't have to do any more work here, if the cookie to sort it by
-  // submitted_at is set we need to sort by submitted_at.
   if (isAnonymous) {
-    jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(student => student.anonymous_id))
-
-    // update index again to be in line with the anonymous_id sorting
-    jsonData.studentsWithSubmissions.forEach((student, index) => {
-      student.index = index /* eslint-disable-line no-param-reassign */
+    // When student anonymity is enabled, the students must be indexed
+    // consistently. For a given anonymous id, the student name (e.g. Student 1)
+    // must be consistent regardless of how the students are sorted.
+    const orderedIds = Object.keys(window.jsonData.studentMap).sort()
+    orderedIds.forEach((id, index) => {
+      window.jsonData.studentMap[id].index = index
     })
-  } else if (utils.shouldHideStudentNames() && userSettings.get('eg_sort_by') === 'alphabetically') {
-    window.jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(function (student) {
-      return student && student.submission && student.submission.id;
-    }));
-  } else if (userSettings.get("eg_sort_by") == "submitted_at") {
-    window.jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(function (student) {
-      var submittedAt = student &&
-        student.submission &&
-        student.submission.submitted_at;
-      if (submittedAt) {
-        return +tz.parse(submittedAt);
-      } else {
-        // puts the unsubmitted assignments at the bottom
-        return Number.NaN;
+  }
+
+  switch(userSettings.get("eg_sort_by")) {
+    case 'submitted_at': {
+      window.jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(student => {
+        const submittedAt = student && student.submission && student.submission.submitted_at;
+        if (submittedAt) {
+          return +tz.parse(submittedAt);
+        } else {
+          // puts the unsubmitted assignments at the bottom
+          return Number.NaN;
+        }
+      }));
+      break;
+    }
+
+    case 'submission_status': {
+      const states = {
+        "not_graded": 1,
+        "resubmitted": 2,
+        "not_submitted": 3,
+        "graded": 4,
+        "not_gradeable": 5
+      };
+      window.jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(student => (
+        student && states[SpeedgraderHelpers.submissionState(student, ENV.grading_role)]
+      )));
+      break;
+    }
+
+    default: {
+      // The list of students is sorted alphabetically on the server by student
+      // last name.
+
+      if (isAnonymous) {
+        // When student anonymity is enabled, sort by the student's related
+        // anonymous id.
+        window.jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(student => student.anonymous_id))
+      } else if (utils.shouldHideStudentNames()) {
+        window.jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(student => (
+          student && student.submission && student.submission.id
+        )));
       }
-    }));
-  } else if (userSettings.get("eg_sort_by") == "submission_status") {
-    var states = {
-      "not_graded": 1,
-      "resubmitted": 2,
-      "not_submitted": 3,
-      "graded": 4,
-      "not_gradeable": 5
-    };
-    window.jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(function (student) {
-      return student &&
-        states[SpeedgraderHelpers.submissionState(student, ENV.grading_role)];
-    }));
+    }
   }
 }
 
@@ -365,7 +379,7 @@ function initDropdown(){
     let {name} = student
     const className = SpeedgraderHelpers.classNameBasedOnStudent({submission_state, submission})
     if (hideStudentNames || isAnonymous) {
-      name = I18n.t("Student %{number}", {number: index + 1})
+      name = I18n.t("Student %{number}", {number: student.index + 1})
     }
 
     return {[anonymizableId]: student[anonymizableId], anonymizableId, name, className};
@@ -2730,6 +2744,8 @@ EG = {
   },
 
   compareStudentsBy: function (f) {
+    const secondaryAttr = isAnonymous ? 'anonymous_id' : 'sortable_name'
+
     return function (studentA, studentB) {
       var a = f(studentA);
       var b = f(studentB);
@@ -2737,7 +2753,7 @@ EG = {
       if ((!a && !b) || a === b) {
         // chrome / safari sort isn't stable, so we need to sort by name in
         // case of tie
-        return natcompare.strings(studentA.sortable_name, studentB.sortable_name);
+        return natcompare.strings(studentA[secondaryAttr], studentB[secondaryAttr]);
       } else if (!a || a > b) {
         return 1;
       }
