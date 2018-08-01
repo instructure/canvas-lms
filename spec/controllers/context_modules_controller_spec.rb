@@ -811,6 +811,14 @@ describe ContextModulesController do
       json = json_parse(response.body)
       expect(Time.zone.parse(json[@tag.id.to_s]["todo_date"]).to_i).to eq wiki_date.to_i
     end
+
+    it "should return external urls properly" do
+      course_with_teacher_logged_in(:active_all => true)
+      @module = @course.context_modules.create!
+      @module.add_item :type => 'external_url', :url => 'http://lolcats', :title => 'lol'
+      get 'content_tag_assignment_data', params: {course_id: @course.id}, format: 'json'
+      expect(response).to be_successful
+    end
   end
 
   describe "GET show" do
