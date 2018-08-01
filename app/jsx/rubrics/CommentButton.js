@@ -26,57 +26,63 @@ import Modal, { ModalBody, ModalFooter, ModalHeader } from '@instructure/ui-over
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import I18n from 'i18n!edit_rubric'
 
-const CommentDialog = ({ comments, description, finalize, open, setComments }) => {
-  const modalHeader = I18n.t('Additional Comments')
-  const close = () => finalize(false)
+const CommentDialog = React.createClass({
+  propTypes: {
+    comments: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    finalize: PropTypes.func.isRequired,
+    open: PropTypes.bool.isRequired,
+    setComments: PropTypes.func.isRequired
+  },
 
-  return (
-    <Modal
-       open={open}
-       onDismiss={close}
-       size="medium"
-       label={modalHeader}
-       shouldCloseOnDocumentClick
-    >
-      <ModalHeader>
-        <CloseButton
-          placement="end"
-          offset="medium"
-          variant="icon"
-          onClick={close}
-        >
-          {I18n.t('Close')}
-        </CloseButton>
-        <Heading>{modalHeader}</Heading>
-        <Heading level="h3">{description}</Heading>
-      </ModalHeader>
-      <ModalBody>
-        <TextArea
-          label={I18n.t('Comments')}
-          maxHeight='50rem'
-          onChange={(e) => setComments(e.target.value)}
-          value={comments}
-        />
-      </ModalBody>
-      <ModalFooter>
-        <Button variant="light" margin="0 x-small 0 0" onClick={close}>
-          {I18n.t('Cancel')}
-        </Button>
-        &nbsp;
-        <Button variant="primary" margin="0 x-small 0 0" onClick={() => finalize(true)}>
-          {I18n.t('Update Comment')}
-        </Button>
-      </ModalFooter>
-    </Modal>
-  )
-}
-CommentDialog.propTypes = {
-  comments: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
-  finalize: PropTypes.func.isRequired,
-  open: PropTypes.bool.isRequired,
-  setComments: PropTypes.func.isRequired
-}
+  render() {
+    const { comments, description, finalize, open, setComments } = this.props
+    const modalHeader = I18n.t('Additional Comments')
+    const close = () => finalize(false)
+
+    return (
+      <Modal
+         open={open}
+         onDismiss={close}
+         size="medium"
+         label={modalHeader}
+         defaultFocusElement={() => this.textArea}
+         shouldCloseOnDocumentClick
+      >
+        <ModalHeader>
+          <CloseButton
+            placement="end"
+            offset="medium"
+            variant="icon"
+            onClick={close}
+          >
+            {I18n.t('Close')}
+          </CloseButton>
+          <Heading>{modalHeader}</Heading>
+          <Heading level="h3">{description}</Heading>
+        </ModalHeader>
+        <ModalBody>
+          <TextArea
+            label={I18n.t('Comments')}
+            maxHeight='50rem'
+            onChange={(e) => setComments(e.target.value)}
+            value={comments}
+            ref={(node) => { this.textArea = node }}
+          />
+        </ModalBody>
+        <ModalFooter>
+          <Button variant="light" margin="0 x-small 0 0" onClick={close}>
+            {I18n.t('Cancel')}
+          </Button>
+          &nbsp;
+          <Button variant="primary" margin="0 x-small 0 0" onClick={() => finalize(true)}>
+            {I18n.t('Update Comment')}
+          </Button>
+        </ModalFooter>
+      </Modal>
+    )
+  }
+})
 
 const CommentButton = ({ initialize, ...props }) => (
   <div>
