@@ -32,12 +32,13 @@ module PactConfig
   module Consumers
     my_broker_host = ENV.fetch('PACT_BROKER_HOST', 'pact-broker.docker')
     if my_broker_host.include?(EXTERNAL_BROKER_HOST)
-      # extrnal consumers
+      # external consumers
       GENERIC_CONSUMER = 'Generic Consumer'.freeze
     else
       # internal consumers
       GENERIC_CONSUMER = 'Generic Consumer'.freeze
       QUIZ_LTI = 'Quiz LTI'.freeze
+      SISTEMIC = 'Sistemic'.freeze
     end
     ALL = Consumers.constants.map { |c| Consumers.const_get(c) }.freeze
   end

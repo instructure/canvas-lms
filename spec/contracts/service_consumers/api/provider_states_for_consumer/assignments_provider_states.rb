@@ -44,5 +44,20 @@ PactConfig::Consumers::ALL.each do |consumer|
         assignment.save!
       end
     end
+
+    provider_state 'an assignment with overrides' do
+      set_up do
+        course = Pact::Canvas.base_state.course
+        student = Pact::Canvas.base_state.students.first
+        assignment = course.assignments.create({
+                                   name: 'Assignment Override',
+                                   due_at: Time.zone.now + 1.day,
+                                   submission_types: 'online_text_entry'
+                                 })
+
+        override = assignment.assignment_overrides.create!
+        override.assignment_override_students.create!(:user => student)
+      end
+    end
   end
 end
