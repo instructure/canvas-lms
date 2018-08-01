@@ -286,12 +286,17 @@ function mergeStudentsAndSubmission() {
   });
 
   // handle showing students only in a certain section.
-  // the sectionToShow will be remembered for a given user in a given browser across all assignments in this course
+
   if (!jsonData.GROUP_GRADING_MODE) {
-    sectionToShow = userSettings.contextGet('grading_show_only_section');
-    sectionToShow = sectionToShow && String(sectionToShow);
+    if (ENV.new_gradebook_enabled) {
+      sectionToShow = ENV.selected_section_id
+    } else {
+      sectionToShow = userSettings.contextGet('grading_show_only_section')
+    }
   }
+
   if (sectionToShow) {
+    sectionToShow = sectionToShow.toString()
     var tempArray  = $.grep(jsonData.studentsWithSubmissions, function(student, i){
       return $.inArray(sectionToShow, student.section_ids) != -1;
     });
@@ -299,8 +304,7 @@ function mergeStudentsAndSubmission() {
       jsonData.studentsWithSubmissions = tempArray;
     } else {
       alert(I18n.t('alerts.no_students_in_section', "Could not find any students in that section, falling back to showing all sections."));
-      userSettings.contextRemove('grading_show_only_section');
-      SpeedgraderHelpers.reloadPage();
+      EG.changeToSection('all')
     }
   }
 
@@ -359,17 +363,6 @@ function mergeStudentsAndSubmission() {
   }
 }
 
-function changeToSection (sectionId) {
-  if (sectionId === 'all') {
-    // We're removing all filters and resetting to default
-    userSettings.contextRemove('grading_show_only_section');
-  } else {
-    userSettings.contextSet('grading_show_only_section', sectionId);
-  }
-
-  SpeedgraderHelpers.reloadPage();
-}
-
 function initDropdown(){
   var hideStudentNames = utils.shouldHideStudentNames();
   $("#hide_student_names").attr('checked', hideStudentNames);
@@ -397,7 +390,7 @@ function initDropdown(){
 
     if (newStudentOrSection && newStudentOrSection.match(/^section_(\d+|all)$/)) {
       const sectionId = newStudentOrSection.replace(/^section_/, '');
-      changeToSection(sectionId);
+      EG.changeToSection(sectionId)
     } else {
       EG.handleStudentChanged();
     }
@@ -406,7 +399,6 @@ function initDropdown(){
   if (jsonData.context.active_course_sections.length && jsonData.context.active_course_sections.length > 1 && !jsonData.GROUP_GRADING_MODE) {
     const $selectmenu_list = $selectmenu.data('selectmenu').list;
     const $menu = $("#section-menu");
-
 
     $menu.find('ul').append($.raw($.map(jsonData.context.active_course_sections, function(section, i){
       return '<li><a class="section_' + section.id + '" data-section-id="'+ section.id +'" href="#">'+ htmlEscape(section.name) +'</a></li>';
@@ -421,7 +413,7 @@ function initDropdown(){
       .hide()
       .menu()
       .delegate('a', 'click mousedown', function(){
-        changeToSection($(this).data('section-id'));
+        EG.changeToSection($(this).data('section-id'))
       });
 
     if (sectionToShow) {
@@ -2991,6 +2983,23 @@ EG = {
 
     const gradeSelector = <SpeedGraderProvisionalGradeSelector {...props} />
     ReactDOM.render(gradeSelector, mountPoint)
+  },
+
+  changeToSection (sectionId) {
+    // Update the selected section in old gradebook
+    if (sectionId === 'all') {
+      // We're removing all filters and resetting to default
+      userSettings.contextRemove('grading_show_only_section');
+    } else {
+      userSettings.contextSet('grading_show_only_section', sectionId);
+    }
+
+    // ...and in new gradebook
+    if (ENV.settings_url) {
+      $.post(ENV.settings_url, { selected_section_id: sectionId }, () => { SpeedgraderHelpers.reloadPage() })
+    } else {
+      SpeedgraderHelpers.reloadPage();
+    }
   }
 }
 

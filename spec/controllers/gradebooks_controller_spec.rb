@@ -1781,6 +1781,18 @@ describe GradebooksController do
       get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
       expect(assigns[:disable_unmute_assignment]).to eq true
     end
+
+    it 'sets new_gradebook_enabled in ENV to true if new gradebook is enabled' do
+      @course.enable_feature!(:new_gradebook)
+      get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
+      expect(assigns[:js_env][:new_gradebook_enabled]).to eq true
+    end
+
+    it 'sets new_gradebook_enabled in ENV to false if new gradebook is not enabled' do
+      @course.disable_feature!(:new_gradebook)
+      get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
+      expect(assigns[:js_env][:new_gradebook_enabled]).to eq false
+    end
   end
 
   describe "POST 'speed_grader_settings'" do
@@ -1795,6 +1807,53 @@ describe GradebooksController do
       post 'speed_grader_settings', params: {course_id: @course.id,
         enable_speedgrader_grade_by_question: "0"}
       expect(@teacher.reload.preferences[:enable_speedgrader_grade_by_question]).not_to be_truthy
+    end
+
+    describe 'selected_section_id preference' do
+      let(:course_settings) { @teacher.reload.preferences.dig(:gradebook_settings, @course.id) }
+
+      before(:each) do
+        @teacher.preferences[:gradebook_settings] = { @course.id => {} }
+
+        user_session(@teacher)
+      end
+
+      context 'when new gradebook is enabled' do
+        it 'sets the selected section for the course to the passed-in value' do
+          section_id = @course.course_sections.first.id
+          post 'speed_grader_settings', params: {course_id: @course.id, selected_section_id: section_id}
+
+          expect(course_settings.dig('filter_rows_by', 'section_id')).to eq section_id.to_s
+        end
+
+        it 'clears the selected section for the course if passed the value "all"' do
+          post 'speed_grader_settings', params: {course_id: @course.id, selected_section_id: 'all'}
+
+          expect(course_settings.dig('filter_rows_by', 'section_id')).to be nil
+        end
+
+        it 'clears the selected section if passed an invalid value' do
+          post 'speed_grader_settings', params: {course_id: @course.id, selected_section_id: 'hahahaha'}
+
+          expect(course_settings.dig('filter_rows_by', 'section_id')).to be nil
+        end
+
+        it 'clears the selected section if passed a non-active section in the course' do
+          deleted_section = @course.course_sections.create!
+          deleted_section.destroy!
+
+          post 'speed_grader_settings', params: {course_id: @course.id, selected_section_id: deleted_section.id}
+
+          expect(course_settings.dig('filter_rows_by', 'section_id')).to be nil
+        end
+
+        it 'clears the selected section if passed a section ID not in the course' do
+          section_in_other_course = Course.create!.course_sections.create!
+          post 'speed_grader_settings', params: {course_id: @course.id, selected_section_id: section_in_other_course.id}
+
+          expect(course_settings.dig('filter_rows_by', 'section_id')).to be nil
+        end
+      end
     end
   end
 

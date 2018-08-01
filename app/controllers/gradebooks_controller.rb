@@ -629,6 +629,7 @@ class GradebooksController < ApplicationController
         env = {
           CONTEXT_ACTION_SOURCE: :speed_grader,
           settings_url: speed_grader_settings_course_gradebook_path,
+          new_gradebook_enabled: new_gradebook_enabled?,
           force_anonymous_grading: force_anonymous_grading?(@assignment),
           grading_role: grading_role,
           grading_type: @assignment.grading_type,
@@ -649,6 +650,10 @@ class GradebooksController < ApplicationController
         if grading_role == :moderator
           env[:provisional_copy_url] = api_v1_copy_to_final_mark_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
           env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
+        end
+
+        if new_gradebook_enabled?
+          env[:selected_section_id] = gradebook_settings.dig(@context.id, 'filter_rows_by', 'section_id')
         end
 
         if @assignment.quiz
@@ -674,9 +679,29 @@ class GradebooksController < ApplicationController
   end
 
   def speed_grader_settings
-    grade_by_question = value_to_boolean(params[:enable_speedgrader_grade_by_question])
-    @current_user.preferences[:enable_speedgrader_grade_by_question] = grade_by_question
-    @current_user.save!
+    if params[:enable_speedgrader_grade_by_question]
+      grade_by_question = value_to_boolean(params[:enable_speedgrader_grade_by_question])
+      @current_user.preferences[:enable_speedgrader_grade_by_question] = grade_by_question
+      @current_user.save!
+    end
+
+    if params[:selected_section_id]
+      section_to_show = if params[:selected_section_id] == 'all'
+        nil
+      elsif @context.active_course_sections.exists?(id: params[:selected_section_id])
+        params[:selected_section_id]
+      end
+
+      gradebook_settings.deep_merge!({
+        @context.id => {
+          'filter_rows_by' => {
+            'section_id' => section_to_show
+          }
+        }
+      })
+      @current_user.save!
+    end
+
     head :ok
   end
 

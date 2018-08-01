@@ -1906,6 +1906,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       assignment_id: '2',
       course_id: '7',
       help_url: 'example.com/foo',
+      settings_url: 'example.com/settings',
       show_help_menu_item: false
     })
     sinon.stub($, 'getJSON')
@@ -4275,6 +4276,223 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         EG.loadSubmissionPreview()
 
         strictEqual($('#iframe_holder').html(), '')
+      })
+    })
+  })
+
+  QUnit.module('when a course has multiple sections', (hooks) => {
+    const sectionSelectPath = '#section-menu li a[data-section-id="2"]'
+    const allSectionsSelectPath = '#section-menu li a[data-section-id="all"]'
+    let originalWindowJSONData
+
+    hooks.beforeEach(() => {
+      fixtures.innerHTML = `
+        <span id="speedgrader-settings"></span>
+        <div id="combo_box_container">
+        </div>
+        <ul
+          id="section-menu"
+          class="ui-selectmenu-menu ui-widget ui-widget-content ui-selectmenu-menu-dropdown ui-selectmenu-open"
+          style="display:none;" role="listbox" aria-activedescendant="section-menu-link"
+        >
+          <li role="presentation" class="ui-selectmenu-item">
+            <a href="#" tabindex="-1" role="option" aria-selected="true" id="section-menu-link">
+              <span>Showing: <span id="section_currently_showing">All Sections</span></span>
+            </a>
+            <ul>
+              <li><a class="selected" data-section-id="all" href="#">Show All Sections</a></li>
+            </ul>
+          </li>
+        </ul>
+      `
+
+      originalWindowJSONData = window.jsonData
+      window.jsonData = {
+        context: {
+          students: [
+            {
+              id: 4,
+              name: 'Guy B. Studying'
+            }
+          ],
+          enrollments: [
+            {
+              user_id: 4,
+              workflow_state: 'active',
+              course_section_id: 1
+            },
+            {
+              user_id: 4,
+              workflow_state: 'active',
+              course_section_id: 2
+            },
+            {
+              user_id: 4,
+              workflow_state: 'active',
+              course_section_id: 3
+            }
+          ],
+          active_course_sections: [
+            {
+              id: 1,
+              name: 'The First Section'
+            },
+            {
+              id: 2,
+              name: 'The Second Section'
+            },
+            {
+              id: 3,
+              name: 'The Third Section'
+            },
+            {
+              id: 4,
+              name: 'The Lost Section'
+            }
+          ]
+        },
+        submissions: []
+      }
+
+      // This function gets set by a jQuery extension in a way that doesn't
+      // appear to happen as part of the testing setup. So far as I can tell
+      // it does nothing except return the current jQuery element.
+      $.fn.menu = function() { return $(this) }
+
+      sandbox.stub($, 'post').yields()
+      sandbox.stub(SpeedGraderHelpers, 'reloadPage')
+      sandbox.stub(SpeedGrader.EG, 'handleFragmentChanged')
+      sandbox.stub(userSettings, 'contextSet')
+      sandbox.stub(userSettings, 'contextRemove')
+      sandbox.stub(userSettings, 'contextGet').returns('3')
+    })
+
+    hooks.afterEach(() => {
+      userSettings.contextGet.restore()
+      userSettings.contextRemove.restore()
+      userSettings.contextSet.restore()
+      SpeedGrader.EG.handleFragmentChanged.restore()
+      SpeedGraderHelpers.reloadPage.restore()
+      $.post.restore()
+      delete $.fn.menu
+
+      document.querySelectorAll('.ui-selectmenu-menu').forEach(element => { element.remove() })
+
+      window.location.hash = ''
+      fixtures.innerHTML = ''
+      SpeedGrader.teardown()
+      window.jsonData = originalWindowJSONData
+    })
+
+    test('initially selects the section in userSettings if ENV.new_gradebook_enabled is not true', () => {
+      SpeedGrader.EG.jsonReady()
+      SpeedGrader.setup()
+
+      const currentlyShowing = document.querySelector('#section_currently_showing')
+      strictEqual(currentlyShowing.innerText, 'The Third Section')
+    })
+
+    test('initially selects the section in ENV.selected_section_id if ENV.new_gradebook_enabled is true', () => {
+      window.ENV.new_gradebook_enabled = true
+      window.ENV.selected_section_id = 2
+
+      SpeedGrader.EG.jsonReady()
+      SpeedGrader.setup()
+
+      const currentlyShowing = document.querySelector('#section_currently_showing')
+      strictEqual(currentlyShowing.innerText, 'The Second Section')
+
+      delete window.ENV.selected_section_id
+      delete window.ENV.new_gradebook_enabled
+    })
+
+    test('reloads SpeedGrader when the user selects a new section and ENV.settings_url is set', () => {
+      SpeedGrader.EG.jsonReady()
+      SpeedGrader.setup()
+
+      $(sectionSelectPath).click()
+      strictEqual(SpeedGraderHelpers.reloadPage.callCount, 1)
+    })
+
+    test('reloads SpeedGrader when the user selects a new section and ENV.settings_url is not set', () => {
+      const settingsURL = window.ENV.settings_url
+      delete window.ENV.settings_url
+
+      SpeedGrader.EG.jsonReady()
+      SpeedGrader.setup()
+
+      $(sectionSelectPath).click()
+      strictEqual(SpeedGraderHelpers.reloadPage.callCount, 1)
+
+      window.ENV.settings_url = settingsURL
+    })
+
+    test('saves the selected section in userSettings when one is selected', () => {
+      SpeedGrader.EG.jsonReady()
+      SpeedGrader.setup()
+
+      $(sectionSelectPath).click()
+
+      const params = userSettings.contextSet.firstCall.args
+      deepEqual(params, ['grading_show_only_section', 2])
+    })
+
+    test('annuls the selected section in userSettings when "all sections" is selected', () => {
+      SpeedGrader.EG.jsonReady()
+      SpeedGrader.setup()
+
+      $(allSectionsSelectPath).click()
+
+      const [key] = userSettings.contextRemove.firstCall.args
+      strictEqual(key, 'grading_show_only_section')
+    })
+
+    test('posts the selected section to the settings URL when a specific section is selected', () => {
+      SpeedGrader.EG.jsonReady()
+      SpeedGrader.setup()
+
+      $(sectionSelectPath).click()
+
+      const [, params] = $.post.firstCall.args
+      deepEqual(params, {selected_section_id: 2})
+    })
+
+    test('posts the value "all" to the settings URL when "all sections" is selected', () => {
+      SpeedGrader.EG.jsonReady()
+      SpeedGrader.setup()
+
+      $(allSectionsSelectPath).click()
+
+      const [, params] = $.post.firstCall.args
+      deepEqual(params, {selected_section_id: 'all'})
+    })
+
+    QUnit.module('when a course loads with an empty section selected', emptySectionHooks => {
+      emptySectionHooks.beforeEach(() => {
+        userSettings.contextGet.returns('4')
+        sandbox.stub(SpeedGrader.EG, 'changeToSection')
+        sandbox.stub(window, 'alert')
+      })
+
+      emptySectionHooks.afterEach(() => {
+        window.alert.restore()
+        SpeedGrader.EG.changeToSection.restore()
+      })
+
+      test('displays an alert indicating the section has no students', () => {
+        SpeedGrader.EG.jsonReady()
+        SpeedGrader.setup()
+
+        const [message] = window.alert.firstCall.args
+        strictEqual(message, "Could not find any students in that section, falling back to showing all sections.")
+      })
+
+      test('calls changeToSection with the value "all"', () => {
+        SpeedGrader.EG.jsonReady()
+        SpeedGrader.setup()
+
+        const [sectionId] = SpeedGrader.EG.changeToSection.firstCall.args
+        strictEqual(sectionId, 'all')
       })
     })
   })
