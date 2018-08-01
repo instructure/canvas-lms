@@ -229,10 +229,12 @@ module AccountReports
     end
 
     def courses
+      include_blueprints = root_account.feature_enabled?(:master_courses)
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
         headers = ['course_id', 'integration_id', 'short_name', 'long_name',
                    'account_id', 'term_id', 'status', 'start_date', 'end_date', 'course_format']
+        headers << 'blueprint_course_id' if include_blueprints
       else
         headers = []
         headers << I18n.t('#account_reports.report_header_canvas_course_id', 'canvas_course_id')
@@ -248,6 +250,7 @@ module AccountReports
         headers << I18n.t('#account_reports.report_header_start__date', 'start_date')
         headers << I18n.t('#account_reports.report_header_end__date', 'end_date')
         headers << I18n.t('#account_reports.report_header_course_format', 'course_format')
+        headers << I18n.t('blueprint_course_id') if include_blueprints
         headers << I18n.t('created_by_sis')
       end
 
@@ -271,37 +274,56 @@ module AccountReports
                           'available' => 'active'}
 
       generate_and_run_report headers do |csv|
-        courses.find_each do |c|
-          row = []
-          row << c.id unless @sis_format
-          row << c.sis_source_id
-          row << c.integration_id
-          row << c.course_code
-          row << c.name
-          row << c.account_id unless @sis_format
-          row << c.account.try(:sis_source_id)
-          row << c.enrollment_term_id unless @sis_format
-          row << c.enrollment_term.try(:sis_source_id)
-          # for sis import format 'claimed', 'created', and 'available' are all considered active
-          if @sis_format
-            if c.workflow_state == 'deleted' || c.workflow_state == 'completed'
-              row << c.workflow_state
-            else
-              row << 'active'
+        courses.find_in_batches do |batch|
+
+          blueprint_map = {}
+          if include_blueprints
+            root_account.shard.activate do
+              sub_data = Hash[MasterCourses::ChildSubscription.active.where(:child_course_id => batch).pluck(:child_course_id, :master_template_id)]
+              template_data = Hash[MasterCourses::MasterTemplate.active.for_full_course.where(:id => sub_data.values).pluck(:id, :course_id)] if sub_data.present?
+              course_sis_data = Hash[Course.where(:id => template_data.values).where.not(:sis_source_id => nil).pluck(:id, :sis_source_id)] if template_data.present?
+              if course_sis_data.present?
+                sub_data.each do |child_course_id, template_id|
+                  sis_id = course_sis_data[template_data[template_id]]
+                  blueprint_map[child_course_id] = sis_id if sis_id
+                end
+              end
             end
-          else
-            row << course_state_sub[c.workflow_state]
           end
-          if c.restrict_enrollments_to_course_dates
-            row << default_timezone_format(c.start_at)
-            row << default_timezone_format(c.conclude_at)
-          else
-            row << nil
-            row << nil
+
+          batch.each do |c|
+            row = []
+            row << c.id unless @sis_format
+            row << c.sis_source_id
+            row << c.integration_id
+            row << c.course_code
+            row << c.name
+            row << c.account_id unless @sis_format
+            row << c.account.try(:sis_source_id)
+            row << c.enrollment_term_id unless @sis_format
+            row << c.enrollment_term.try(:sis_source_id)
+            # for sis import format 'claimed', 'created', and 'available' are all considered active
+            if @sis_format
+              if c.workflow_state == 'deleted' || c.workflow_state == 'completed'
+                row << c.workflow_state
+              else
+                row << 'active'
+              end
+            else
+              row << course_state_sub[c.workflow_state]
+            end
+            if c.restrict_enrollments_to_course_dates
+              row << default_timezone_format(c.start_at)
+              row << default_timezone_format(c.conclude_at)
+            else
+              row << nil
+              row << nil
+            end
+            row << c.course_format
+            row << blueprint_map[c.id] if include_blueprints
+            row << c.sis_batch_id? unless @sis_format
+            csv << row
           end
-          row << c.course_format
-          row << c.sis_batch_id? unless @sis_format
-          csv << row
         end
       end
     end
