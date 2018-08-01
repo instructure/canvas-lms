@@ -88,7 +88,11 @@ class StudentGradesPage
     end
 
     def fetch_assignment_score(assignment)
-      assignment_row(assignment).find_element(css: '.assignment_score .grade').text.split("\n")[1]
+      if assignment.grading_type == "letter_grade"
+        assignment_row(assignment).find_element(css: '.assignment_score .score_value').text
+      else
+        assignment_row(assignment).find_element(css: '.assignment_score .grade').text.split("\n")[1]
+      end
     end
   end
 end
