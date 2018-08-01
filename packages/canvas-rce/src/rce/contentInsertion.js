@@ -117,7 +117,8 @@ function hasSelection(editor) {
 }
 
 export function existingContentToLink(editor, link) {
-  return !editor.isHidden() && (currentLink(editor, link) || hasSelection(editor) || !!link.selectedContent);
+  return !editor.isHidden() &&
+         ((link && (currentLink(editor, link) || !!link.selectedContent)) || hasSelection(editor));
 }
 
 function selectionIsImg(editor) {

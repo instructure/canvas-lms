@@ -234,6 +234,13 @@ describe("contentInsertion", () => {
       };
       assert.equal(false, contentInsertion.existingContentToLink(editor, link));
     });
+
+    it('returns true when only an editor is passed with a selection', () => {
+      editor.selection.getContent = () => {
+        return "content";
+      };
+      assert.equal(true, contentInsertion.existingContentToLink(editor))
+    })
   });
 
   describe("existingContentToLinkIsImg", () => {
