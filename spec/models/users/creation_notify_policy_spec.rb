@@ -44,15 +44,7 @@ module Users
         before{ allow(channel).to receive_messages(has_merge_candidates?: false) }
 
         it "sends confirmation notification" do
-          allow(user).to receive_messages(pre_registered?: true)
           expect(pseudonym).to receive(:send_confirmation!)
-          result = policy.dispatch!(user, pseudonym, channel)
-          expect(result).to be(true)
-        end
-
-        it "sends the registration notification if the user is pending or registered" do
-          allow(user).to receive_messages(pre_registered?: false, registered?: false)
-          expect(pseudonym).to receive(:send_registration_notification!)
           result = policy.dispatch!(user, pseudonym, channel)
           expect(result).to be(true)
         end

@@ -33,7 +33,8 @@ const itemTypeLabels = {
   learning_outcome_group: I18n.t('Outcome Group'),
   rubric: I18n.t('Rubric'),
   context_external_tool: I18n.t('External Tool'),
-  folder: I18n.t('Folder')
+  folder: I18n.t('Folder'),
+  syllabus: I18n.t('Syllabus')
 }
 
 const itemTypeLabelPlurals = {

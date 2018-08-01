@@ -55,6 +55,7 @@ describe MasterCourses::ChildSubscription do
       @template = MasterCourses::MasterTemplate.set_as_master_course(master_course)
       child_course = course_factory
       sub = @template.add_child_course!(@course)
+      expect(child_course.reload.syllabus_master_template_id).to eq @template.id.to_s
 
       original_page = master_course.wiki_pages.create!(:title => "blah")
       mc_tag = @template.create_content_tag_for!(original_page)
@@ -65,10 +66,12 @@ describe MasterCourses::ChildSubscription do
       sub.destroy!
       expect(page_copy.reload.migration_id).to eq (sub.deactivation_prefix + mc_tag.migration_id)
       expect(child_tag.reload.migration_id).to eq (sub.deactivation_prefix + mc_tag.migration_id)
+      expect(child_course.reload.syllabus_master_template_id).to be_empty
 
       sub.undestroy
       expect(page_copy.reload.migration_id).to eq mc_tag.migration_id
       expect(child_tag.reload.migration_id).to eq mc_tag.migration_id
+      expect(child_course.reload.syllabus_master_template_id).to eq @template.id.to_s
     end
   end
 end

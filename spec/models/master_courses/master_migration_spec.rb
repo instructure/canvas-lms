@@ -1134,8 +1134,8 @@ describe MasterCourses::MasterMigration do
 
       @copy_to2 = course_factory
       child_syllabus1 = "<p>some child syllabus</p>"
-      @copy_to2.update_attribute(:syllabus_body, child_syllabus1)
       @template.add_child_course!(@copy_to2)
+      @copy_to2.update_attribute(:syllabus_body, child_syllabus1)
 
       master_syllabus1 = "<p>some original syllabus</p>"
       @copy_from.update_attribute(:syllabus_body, master_syllabus1)
