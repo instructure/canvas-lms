@@ -56,6 +56,9 @@
   "fix_heading_hierarchy_f60884c4": {
     "message": "見出しヒエアルキーを修正する"
   },
+  "format_as_a_list_142210c3": {
+    "message": "リスト形式"
+  },
   "header_column_f27433cb": {
     "message": "ヘッダー列"
   },
@@ -97,6 +100,9 @@
   },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "{ start } で始まるテキストとのリンク"
+  },
+  "lists_should_be_formatted_as_lists_f862de8d": {
+    "message": "リストはリスト形式にしなければなりません。"
   },
   "merge_links_2478df96": {
     "message": "リンクをマージする"
@@ -181,6 +187,9 @@
   },
   "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
     "message": "18pt（または太字14pt）より小きいテキストは、4.5：1の最小コントラスト比で表示しなければなりません。"
+  },
+  "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
+    "message": "アイテムをリスト形式に視覚的にフォーマットするマークアップが使用されますが、リストの関係を示唆するものではなく、ユーザが情報をナビゲートするのは難しいかもしれません。"
   },
   "why_523b3d8c": {
     "message": "理由"

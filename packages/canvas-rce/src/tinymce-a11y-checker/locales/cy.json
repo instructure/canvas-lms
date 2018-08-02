@@ -56,6 +56,9 @@
   "fix_heading_hierarchy_f60884c4": {
     "message": "Pennu hierarchaeth penawdau"
   },
+  "format_as_a_list_142210c3": {
+    "message": "Fformatio ar ffurf rhestr"
+  },
   "header_column_f27433cb": {
     "message": "Colofn y pennawd"
   },
@@ -97,6 +100,9 @@
   },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Dolen â thestun yn dechrau gyda { start }"
+  },
+  "lists_should_be_formatted_as_lists_f862de8d": {
+    "message": "Dylai rhestrau gael eu fformatio ar ffurf rhestrau."
   },
   "merge_links_2478df96": {
     "message": "Cyfuno dolenni"
@@ -181,6 +187,9 @@
   },
   "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
     "message": "Dylai testun llai na 18pt (neu 14pt trwm) fod â chyferbyniad 4.5:1 o leiaf."
+  },
+  "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
+    "message": "Pan fydd marcio’n cael ei ddefnyddio, sy’n fformatio eitemau’n weledol ar ffurf rhestr ond sydd ddim yn nodi perthynas y rhestr, mae’n bosib y bydd defnyddwyr yn cael trafferth i ddod o hyd i’r wybodaeth."
   },
   "why_523b3d8c": {
     "message": "Pam"

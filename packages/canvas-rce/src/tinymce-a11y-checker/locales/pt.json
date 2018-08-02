@@ -56,6 +56,9 @@
   "fix_heading_hierarchy_f60884c4": {
     "message": "Fixar hierarquia"
   },
+  "format_as_a_list_142210c3": {
+    "message": "Formatar como uma lista"
+  },
   "header_column_f27433cb": {
     "message": "Coluna de cabeçalho"
   },
@@ -97,6 +100,9 @@
   },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Ligação com texto a começar com { start }"
+  },
+  "lists_should_be_formatted_as_lists_f862de8d": {
+    "message": "As listas devem ser formatadas como listas."
   },
   "merge_links_2478df96": {
     "message": "Criar ligações"
@@ -181,6 +187,9 @@
   },
   "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
     "message": "O texto menor que 18pt (ou em negrito 14pt) deve exibir uma relação de contraste mínima de 4.5:1."
+  },
+  "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
+    "message": "Quando a marcação é usada para formatar itens visualmente como uma lista, mas não indica o relacionamento da lista, os utilizadores podem ter dificuldade em navegar pelas informações."
   },
   "why_523b3d8c": {
     "message": "Por quê"

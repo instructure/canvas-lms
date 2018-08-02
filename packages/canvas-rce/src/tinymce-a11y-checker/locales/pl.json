@@ -56,6 +56,9 @@
   "fix_heading_hierarchy_f60884c4": {
     "message": "Przypnij hierarchię nagłówków"
   },
+  "format_as_a_list_142210c3": {
+    "message": "Formatuj jako listę"
+  },
   "header_column_f27433cb": {
     "message": "Kolumna nagłówka"
   },
@@ -97,6 +100,9 @@
   },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Powiąż z tekstem, który się zaczyna od słów { start }"
+  },
+  "lists_should_be_formatted_as_lists_f862de8d": {
+    "message": "Listy należy sformatować jako listy."
   },
   "merge_links_2478df96": {
     "message": "Scal łącza"
@@ -181,6 +187,9 @@
   },
   "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
     "message": "Tekst o czcionce poniżej 18 pt (lub pogrubionej 14 pt) powinien korzystać ze współczynnika kontrastu co najmniej 4,5:1."
+  },
+  "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
+    "message": "Gdy używane jest oznaczenie, które wizualnie formatuje elementy jako listę, ale nie wskazuje na relacje w liście, użytkownicy mogą mieć problem z nawigowaniem po informacjach."
   },
   "why_523b3d8c": {
     "message": "Dlaczego"

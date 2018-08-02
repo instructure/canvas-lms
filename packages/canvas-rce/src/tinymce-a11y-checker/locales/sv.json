@@ -56,6 +56,9 @@
   "fix_heading_hierarchy_f60884c4": {
     "message": "Fast rubrik hierarki"
   },
+  "format_as_a_list_142210c3": {
+    "message": "Formatera som lista"
+  },
   "header_column_f27433cb": {
     "message": "Rubrikkolumn"
   },
@@ -97,6 +100,9 @@
   },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Länk med text som börjar med { start }"
+  },
+  "lists_should_be_formatted_as_lists_f862de8d": {
+    "message": "Listor ska formateras som listor."
   },
   "merge_links_2478df96": {
     "message": "Sammanfoga länkar"
@@ -181,6 +187,9 @@
   },
   "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
     "message": "Text som är mindre än 18pt (eller fet 14pt) ska visa ett lägsta kontrastförhållande på 4,5:1."
+  },
+  "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
+    "message": "Om kodningen visuellt formaterar objekt som listor men inte visar listans relation kan användare få svårt att navigera i informationen."
   },
   "why_523b3d8c": {
     "message": "Varför"

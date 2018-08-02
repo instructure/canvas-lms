@@ -56,6 +56,9 @@
   "fix_heading_hierarchy_f60884c4": {
     "message": "Reparer tittelhierarki"
   },
+  "format_as_a_list_142210c3": {
+    "message": "Formater som liste"
+  },
   "header_column_f27433cb": {
     "message": "Tittelkolonne"
   },
@@ -97,6 +100,9 @@
   },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Lenke med tekst som starter med { start }"
+  },
+  "lists_should_be_formatted_as_lists_f862de8d": {
+    "message": "Lister må formateres som lister."
   },
   "merge_links_2478df96": {
     "message": "Slå sammen lenker"
@@ -181,6 +187,9 @@
   },
   "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
     "message": "Tekst mindre enn 18pkt (eller tykk 14pkt) bør vises med en minimums kontrastrate på 4,5:1."
+  },
+  "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
+    "message": "Når det brukes markering som visuellt formaterer elementer som en liste men ikke indikerer et listeforhold kan brukere finne det vanskelig å navigere informasjonen."
   },
   "why_523b3d8c": {
     "message": "Hvorfor"

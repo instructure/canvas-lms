@@ -56,6 +56,9 @@
   "fix_heading_hierarchy_f60884c4": {
     "message": "Lagfæra stigveldi hauss"
   },
+  "format_as_a_list_142210c3": {
+    "message": "Sníða sem lista"
+  },
   "header_column_f27433cb": {
     "message": "Dálkur fyrir haus"
   },
@@ -97,6 +100,9 @@
   },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Tengill með texta byrjar á { start }"
+  },
+  "lists_should_be_formatted_as_lists_f862de8d": {
+    "message": "Lista ætti að sníða sem lista."
   },
   "merge_links_2478df96": {
     "message": "Fella tengla saman"
@@ -181,6 +187,9 @@
   },
   "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
     "message": "Hlutfall hámarks- og lágmarksbirtu fyrir letur sem er minna en 18 punkta (14 punkta ef feitletrað) ætti að vera að lágmarki 5:1."
+  },
+  "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
+    "message": "Þegar merkingar eru notaðar sem sníða atriði sjónrænt sem lista en sýna ekki lista-sambandið, gætu notendur átt í erfiðleikum við að átta sig á upplýsingunum."
   },
   "why_523b3d8c": {
     "message": "Hvers vegna"
