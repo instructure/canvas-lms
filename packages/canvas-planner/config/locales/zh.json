@@ -1,4 +1,7 @@
 {
+  "add_to_do_7537af64": {
+    "message": "添加待办事项"
+  },
   "add_to_do_7def3c37": {
     "message": "添加到待办事项"
   },
@@ -23,17 +26,29 @@
   "assignmenttype_title_6612d008": {
     "message": "{ assignmentType } { title }。"
   },
+  "assignmenttype_title_all_day_on_datetime_9768903c": {
+    "message": "{ assignmentType } { title }，{ datetime }全天。"
+  },
   "assignmenttype_title_at_datetime_478f0709": {
     "message": "{ assignmentType } { title }，时间 { datetime }。"
   },
+  "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
+    "message": "{ assignmentType } { title }，{ datetime }截至{ endTime }"
+  },
   "assignmenttype_title_due_datetime_a112d8ff": {
     "message": "{ assignmentType } { title }，截止时间 { datetime }。"
+  },
+  "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
+    "message": "{ assignmentType } { title }在{ datetime }有待办事项。"
   },
   "assignmenttype_title_is_marked_as_done_a8dc46ef": {
     "message": "{ assignmentType } { title } 已标记为已完成。"
   },
   "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
     "message": "{ assignmentType } { title } 未标记为已完成。"
+  },
+  "assignmenttype_title_posted_datetime_cab69444": {
+    "message": "{ assignmentType } { title }发布了{ datetime }。"
   },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "您的待办事项历史记录的开始"
@@ -92,6 +107,12 @@
   "due_5d7267be": {
     "message": "到期："
   },
+  "due_date_124fdd99": {
+    "message": "到期：{ date }"
+  },
+  "edit_c5fbea07": {
+    "message": "编辑"
+  },
   "edit_title_72e5a21e": {
     "message": "编辑 { title }"
   },
@@ -121,6 +142,9 @@
   },
   "feedback_6dcc1991": {
     "message": "反馈"
+  },
+  "go_to_card_view_dashboard_9d03970e": {
+    "message": "前往卡片视图仪表板"
   },
   "graded_25cd3fcd": {
     "message": "已评分"
@@ -188,8 +212,17 @@
   "no_grade_3b4d7f3e": {
     "message": "没有评分"
   },
+  "nothing_more_to_do_b665da42": {
+    "message": "没有更多待办事项"
+  },
   "nothing_new_needs_attention_3ac548d4": {
     "message": "没有任何新内容需要注意。"
+  },
+  "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
+    "message": "今天没有计划。选择最近的项目。"
+  },
+  "nothing_planned_today_selecting_next_item_f6718aa": {
+    "message": "今天没有计划。选择下一个项目。"
   },
   "nothing_planned_yet_8675ffe9": {
     "message": "尚未进行任何计划"
@@ -227,11 +260,23 @@
   "save_11a80ec3": {
     "message": "保存"
   },
+  "scroll_up_to_see_your_history_19b14cad": {
+    "message": "向上滚动以查看您的历史记录！"
+  },
+  "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
+    "message": "向上滚动到上一个具有新活动的项目。"
+  },
+  "show_all_ae37d610": {
+    "message": "显示全部"
+  },
   "show_my_grades_ebd08684": {
     "message": "显示我的评分"
   },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } 至 { endDate }"
+  },
+  "starttime_to_endtime_d7cc249d": {
+    "message": "{ startTime } 至 { endTime }"
   },
   "submitted_318fad53": {
     "message": "已提交"
@@ -257,6 +302,9 @@
   "to_do_1d554f36": {
     "message": "待办事项"
   },
+  "to_do_date_4b211ad0": {
+    "message": "待办事项：{ date }"
+  },
   "to_do_items_loading_d1cdfcd5": {
     "message": "正在加载待办事项"
   },
@@ -280,6 +328,9 @@
   },
   "yesterday_c6bd6abf": {
     "message": "昨天"
+  },
+  "you_have_media_feedback_f5f9aba8": {
+    "message": "您有媒体反馈。"
   },
   "you_must_provide_a_date_and_time_a86839d2": {
     "message": "须提供日期和时间。"

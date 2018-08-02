@@ -1,4 +1,7 @@
 {
+  "add_to_do_7537af64": {
+    "message": "タスクを追加"
+  },
   "add_to_do_7def3c37": {
     "message": "タスクに追加"
   },
@@ -23,17 +26,29 @@
   "assignmenttype_title_6612d008": {
     "message": "{ assignmentType } { title }。"
   },
+  "assignmenttype_title_all_day_on_datetime_9768903c": {
+    "message": "{ assignmentType } { title }終日{ datetime }に。"
+  },
   "assignmenttype_title_at_datetime_478f0709": {
     "message": "{ assignmentType } { title }（{ datetime }にて）。"
   },
+  "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
+    "message": "{ assignmentType } { title }、{ datetime }で{ endTime }まで"
+  },
   "assignmenttype_title_due_datetime_a112d8ff": {
     "message": "{ assignmentType } { title }、期限 { datetime }。"
+  },
+  "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
+    "message": "{ assignmentType } { title }は{ datetime }で時間を費やさなければなりません"
   },
   "assignmenttype_title_is_marked_as_done_a8dc46ef": {
     "message": "{ assignmentType } { title } は、完了とマークされています。"
   },
   "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
     "message": "{ assignmentType } { title } は、完了とマークされていません。"
+  },
+  "assignmenttype_title_posted_datetime_cab69444": {
+    "message": "{ assignmentType } { title }は{ datetime }を掲示しました。"
   },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "あなたのタスク履歴の始まり"
@@ -92,6 +107,12 @@
   "due_5d7267be": {
     "message": "期限："
   },
+  "due_date_124fdd99": {
+    "message": "期限：{ date }"
+  },
+  "edit_c5fbea07": {
+    "message": "編集"
+  },
   "edit_title_72e5a21e": {
     "message": "{ title }を編集する"
   },
@@ -121,6 +142,9 @@
   },
   "feedback_6dcc1991": {
     "message": "フィードバック"
+  },
+  "go_to_card_view_dashboard_9d03970e": {
+    "message": "カードビューダッシュボードに進みます。"
   },
   "graded_25cd3fcd": {
     "message": "採点済み"
@@ -188,8 +212,17 @@
   "no_grade_3b4d7f3e": {
     "message": "成績なし"
   },
+  "nothing_more_to_do_b665da42": {
+    "message": "他にタスクはありません"
+  },
   "nothing_new_needs_attention_3ac548d4": {
     "message": "注意を必要する新しいものは何もない。"
+  },
+  "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
+    "message": "今日は何も計画されていません。最新のアイテムを選択中。"
+  },
+  "nothing_planned_today_selecting_next_item_f6718aa": {
+    "message": "今日は何も計画されていません。次のアイテムを選択中。"
   },
   "nothing_planned_yet_8675ffe9": {
     "message": "まだ計画はありません"
@@ -227,11 +260,23 @@
   "save_11a80ec3": {
     "message": "保存"
   },
+  "scroll_up_to_see_your_history_19b14cad": {
+    "message": "スクロールアップして履歴を見る！"
+  },
+  "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
+    "message": "新しいアクティビティで前の項目までスクロールします。"
+  },
+  "show_all_ae37d610": {
+    "message": "すべて表示する"
+  },
   "show_my_grades_ebd08684": {
     "message": "私の成績を表示"
   },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } - { endDate }"
+  },
+  "starttime_to_endtime_d7cc249d": {
+    "message": "{ startTime } - { endTime }"
   },
   "submitted_318fad53": {
     "message": "タスクの成績を送信"
@@ -257,6 +302,9 @@
   "to_do_1d554f36": {
     "message": "タスク"
   },
+  "to_do_date_4b211ad0": {
+    "message": "タスク：{ date }"
+  },
   "to_do_items_loading_d1cdfcd5": {
     "message": "タスクの読み込み"
   },
@@ -280,6 +328,9 @@
   },
   "yesterday_c6bd6abf": {
     "message": "昨日"
+  },
+  "you_have_media_feedback_f5f9aba8": {
+    "message": "メディアフィードバックがあります。"
   },
   "you_must_provide_a_date_and_time_a86839d2": {
     "message": "日時を指定する必要があります。"

@@ -1,4 +1,7 @@
 {
+  "add_to_do_7537af64": {
+    "message": "Ajouter À faire"
+  },
   "add_to_do_7def3c37": {
     "message": "Ajouter une tâche"
   },
@@ -23,17 +26,29 @@
   "assignmenttype_title_6612d008": {
     "message": "{ assignmentType } { title }."
   },
+  "assignmenttype_title_all_day_on_datetime_9768903c": {
+    "message": "{ assignmentType } { title }, toute la journée à { datetime }."
+  },
   "assignmenttype_title_at_datetime_478f0709": {
     "message": "{ assignmentType } { title }, à { datetime }."
   },
+  "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
+    "message": "{ assignmentType } { title }, à { datetime } jusqu’à { endTime }"
+  },
   "assignmenttype_title_due_datetime_a112d8ff": {
     "message": "{ assignmentType } { title }, dû { datetime }."
+  },
+  "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
+    "message": "{ assignmentType } { title } dispose d’une période À faire à { datetime }."
   },
   "assignmenttype_title_is_marked_as_done_a8dc46ef": {
     "message": "{ assignmentType } { title } est marqué comme terminé."
   },
   "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
     "message": "{ assignmentType } { title } n’est pas marqué comme terminé."
+  },
+  "assignmenttype_title_posted_datetime_cab69444": {
+    "message": "{ assignmentType } { title } publié { datetime }."
   },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Début de votre historique des tâches À faire"
@@ -92,6 +107,12 @@
   "due_5d7267be": {
     "message": "Échéance :"
   },
+  "due_date_124fdd99": {
+    "message": "Échéance : { date }"
+  },
+  "edit_c5fbea07": {
+    "message": "Modifier"
+  },
   "edit_title_72e5a21e": {
     "message": "Modifier { title }"
   },
@@ -121,6 +142,9 @@
   },
   "feedback_6dcc1991": {
     "message": "Rétroaction"
+  },
+  "go_to_card_view_dashboard_9d03970e": {
+    "message": "Aller au tableau de bord Vue de carte"
   },
   "graded_25cd3fcd": {
     "message": "Noté"
@@ -188,8 +212,17 @@
   "no_grade_3b4d7f3e": {
     "message": "Non noté"
   },
+  "nothing_more_to_do_b665da42": {
+    "message": "Rien de plus à faire"
+  },
   "nothing_new_needs_attention_3ac548d4": {
     "message": "Rien de nouveau à prendre en charge."
+  },
+  "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
+    "message": "Rien de planifié aujourd''hui. Sélection du plus récent élément."
+  },
+  "nothing_planned_today_selecting_next_item_f6718aa": {
+    "message": "Rien de planifié aujourd''hui. Sélection du prochain élément."
   },
   "nothing_planned_yet_8675ffe9": {
     "message": "Rien de planifié en ce moment"
@@ -227,11 +260,23 @@
   "save_11a80ec3": {
     "message": "Enregistrer"
   },
+  "scroll_up_to_see_your_history_19b14cad": {
+    "message": "Défiler vers le haut pour visualiser l’historique!"
+  },
+  "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
+    "message": "Défile vers le haut vers l’élément précédent avec une nouvelle activité."
+  },
+  "show_all_ae37d610": {
+    "message": "Tout afficher"
+  },
   "show_my_grades_ebd08684": {
     "message": "Afficher Mes Notes"
   },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } à { endDate }"
+  },
+  "starttime_to_endtime_d7cc249d": {
+    "message": "{ startTime } à { endTime }"
   },
   "submitted_318fad53": {
     "message": "Envoyé"
@@ -257,6 +302,9 @@
   "to_do_1d554f36": {
     "message": "À faire"
   },
+  "to_do_date_4b211ad0": {
+    "message": "À faire : { date }"
+  },
   "to_do_items_loading_d1cdfcd5": {
     "message": "Chargement des tâches à faire"
   },
@@ -280,6 +328,9 @@
   },
   "yesterday_c6bd6abf": {
     "message": "Hier"
+  },
+  "you_have_media_feedback_f5f9aba8": {
+    "message": "Vous avez une rétroaction de média."
   },
   "you_must_provide_a_date_and_time_a86839d2": {
     "message": "Vous devez fournir une date et une heure."

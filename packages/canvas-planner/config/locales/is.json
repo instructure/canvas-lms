@@ -1,4 +1,7 @@
 {
+  "add_to_do_7537af64": {
+    "message": "Bæta við Verkefni"
+  },
   "add_to_do_7def3c37": {
     "message": "Bæta við Verkefni"
   },
@@ -23,17 +26,29 @@
   "assignmenttype_title_6612d008": {
     "message": "{ assignmentType } { title }."
   },
+  "assignmenttype_title_all_day_on_datetime_9768903c": {
+    "message": "{ assignmentType } { title }, allan daginn þann { datetime }."
+  },
   "assignmenttype_title_at_datetime_478f0709": {
     "message": "{ assignmentType } { title }, klukkan { datetime }."
   },
+  "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
+    "message": "{ assignmentType } { title }, klukkan { datetime } þangað til { endTime }"
+  },
   "assignmenttype_title_due_datetime_a112d8ff": {
     "message": "{ assignmentType } { title }, skilafrestur { datetime }."
+  },
+  "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
+    "message": "{ assignmentType } { title } er með skiladag á verkefni klukkan { datetime }."
   },
   "assignmenttype_title_is_marked_as_done_a8dc46ef": {
     "message": "{ assignmentType } { title } er merkt sem lokið."
   },
   "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
     "message": "{ assignmentType } { title } er ekki merkt sem lokið."
+  },
+  "assignmenttype_title_posted_datetime_cab69444": {
+    "message": "{ assignmentType } { title } birti { datetime }."
   },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Upphaf verkefnasögu þinnar"
@@ -92,6 +107,12 @@
   "due_5d7267be": {
     "message": "Skil:"
   },
+  "due_date_124fdd99": {
+    "message": "Skil: { date }"
+  },
+  "edit_c5fbea07": {
+    "message": "Breyta"
+  },
   "edit_title_72e5a21e": {
     "message": "Breyta { title }"
   },
@@ -121,6 +142,9 @@
   },
   "feedback_6dcc1991": {
     "message": "Endurgjöf"
+  },
+  "go_to_card_view_dashboard_9d03970e": {
+    "message": "Fara í kortaskoðunarstjórnborð"
   },
   "graded_25cd3fcd": {
     "message": "Metið"
@@ -188,8 +212,17 @@
   "no_grade_3b4d7f3e": {
     "message": "Engin einkunn"
   },
+  "nothing_more_to_do_b665da42": {
+    "message": "Ekkert annað á dagskrá"
+  },
   "nothing_new_needs_attention_3ac548d4": {
     "message": "Ekkert nýtt sem krefst athygli."
+  },
+  "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
+    "message": "Ekkert skipulagt í dag. Vel nýlegasta atriðið."
+  },
+  "nothing_planned_today_selecting_next_item_f6718aa": {
+    "message": "Ekkert skipulagt í dag. Vel næsta atriði."
   },
   "nothing_planned_yet_8675ffe9": {
     "message": "Ekkert tímasett enn"
@@ -227,11 +260,23 @@
   "save_11a80ec3": {
     "message": "Vista"
   },
+  "scroll_up_to_see_your_history_19b14cad": {
+    "message": "Skruna upp til að sjá sögu þína!"
+  },
+  "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
+    "message": "Skruna upp að fyrra atriði með nýrri virkni."
+  },
+  "show_all_ae37d610": {
+    "message": "Sýna allt"
+  },
   "show_my_grades_ebd08684": {
     "message": "Sýna einkunnir mínar"
   },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } til { endDate }"
+  },
+  "starttime_to_endtime_d7cc249d": {
+    "message": "{ startTime } til { endTime }"
   },
   "submitted_318fad53": {
     "message": "Skilað"
@@ -257,6 +302,9 @@
   "to_do_1d554f36": {
     "message": "Verkefni"
   },
+  "to_do_date_4b211ad0": {
+    "message": "Verkefni: { date }"
+  },
   "to_do_items_loading_d1cdfcd5": {
     "message": "Hleð inn verkefnalista"
   },
@@ -280,6 +328,9 @@
   },
   "yesterday_c6bd6abf": {
     "message": "Í gær"
+  },
+  "you_have_media_feedback_f5f9aba8": {
+    "message": "Þú er með margmiðlunarsvörun."
   },
   "you_must_provide_a_date_and_time_a86839d2": {
     "message": "Þú þarft að gefa upp dagsetningu og tíma."
