@@ -78,7 +78,7 @@
 -%>
 <%= render :partial => "layouts/head" %>
 <body class="<%= (@body_classes).uniq.join(" ") %> lato-font-not-loaded-yet">
-<%if @real_current_user && @real_current_user != @current_user %>
+<%if @current_user && @real_current_user && @real_current_user != @current_user %>
   <div role="alert" class="screenreader-only">
     <% if @current_user.fake_student? %>
         <%= t("You are currently logged into Student View") %>

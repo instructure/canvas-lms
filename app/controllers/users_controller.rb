@@ -2596,6 +2596,9 @@ class UsersController < ApplicationController
       pseudonym_params.delete(:password_confirmation)
     end
     password_provided = @pseudonym.new_record? && pseudonym_params.key?(:password)
+    if password_provided && @user.workflow_state == 'pre_registered'
+      @user.workflow_state = 'registered'
+    end
     if params[:pseudonym][:authentication_provider_id]
       @pseudonym.authentication_provider = @context.
           authentication_providers.active.
@@ -2656,7 +2659,7 @@ class UsersController < ApplicationController
         # add session_token to the query
         qs = URI.decode_www_form(uri.query || '')
         qs.delete_if { |(k, _v)| k == 'session_token' }
-        qs << ['session_token', SessionToken.new(@pseudonym.id, current_user_id: @user.id)]
+        qs << ['session_token', SessionToken.new(@pseudonym.id)]
         uri.query = URI.encode_www_form(qs)
 
         data['destination'] = uri.to_s
