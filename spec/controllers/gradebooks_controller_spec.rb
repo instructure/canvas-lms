@@ -260,6 +260,16 @@ describe GradebooksController do
       expect(submission).to include :workflow_state
     end
 
+    it 'returns submissions of even inactive students' do
+      user_session(@teacher)
+      assignment = @course.assignments.create!(points_possible: 10)
+      assignment.grade_student(@student, grade: 6.6, grader: @teacher)
+      enrollment = @course.enrollments.find_by(user: @student)
+      enrollment.deactivate
+      get :grade_summary, params: { course_id: @course.id, id: @student.id }
+      expect(assigns.fetch(:js_env).fetch(:submissions).first.fetch(:score)).to be 6.6
+    end
+
     context "assignment sorting" do
       let!(:teacher_session) { user_session(@teacher) }
       let!(:assignment1) { @course.assignments.create(title: "Banana", position: 2) }
