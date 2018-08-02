@@ -124,7 +124,7 @@ class Assignment
             assignment: @assignment,
             course: @course,
             submissions: @submissions
-          ).fetch(enrollment.user_id.to_s)
+          ).fetch(enrollment.user_id.to_s, nil)
           enrollment_json.delete(:user_id)
         end
         enrollment_json

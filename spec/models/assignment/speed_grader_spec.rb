@@ -1565,6 +1565,16 @@ describe Assignment::SpeedGrader do
         expect(submission_1_json['submission_comments'].map { |s| s['author_name'] }).to include(teacher.name)
       end
 
+      it "excludes students who are not assigned" do
+        create_adhoc_override_for_assignment(assignment, [student_1, student_2])
+        assignment.update!(only_visible_to_overrides: true)
+
+        student_3 = user_with_pseudonym(active_all: true, username: "student3@example.com")
+        course.enroll_student(student_3, section: section_2).accept!
+
+        expect(json['context']['students'].count).to be(2)
+      end
+
       context "when a submission has multiple versions" do
         it "uses the current submission's anonymous ID for older versions that lack one" do
           student = User.create!
