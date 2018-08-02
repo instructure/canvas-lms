@@ -187,6 +187,18 @@ describe Assignment do
         assignment.update!(moderated_grading: !assignment.moderated_grading, grader_count: 2)
       end
 
+      it 'invokes DueDateCacher after save when moderated_grading becomes enabled' do
+        assignment = @course.assignments.create!(assignment_valid_attributes)
+        assignment.reload
+
+        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+
+        assignment.moderated_grading = true
+        assignment.grader_count = 2
+
+        assignment.update_cached_due_dates
+      end
+
       it 'invokes DueDateCacher if called in a before_save context' do
         assignment = @course.assignments.new(assignment_valid_attributes)
         allow(assignment).to receive(:update_cached_due_dates?).and_return(true)

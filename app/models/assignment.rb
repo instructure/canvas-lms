@@ -2560,7 +2560,7 @@ class Assignment < ActiveRecord::Base
       will_save_change_to_workflow_state? || saved_change_to_workflow_state? ||
       will_save_change_to_only_visible_to_overrides? ||
       saved_change_to_only_visible_to_overrides? ||
-      saved_change_to_moderated_grading?
+      will_save_change_to_moderated_grading? || saved_change_to_moderated_grading?
   end
 
   def apply_late_policy
