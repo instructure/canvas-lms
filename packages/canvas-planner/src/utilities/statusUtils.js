@@ -94,6 +94,9 @@ export function getBadgesForItems (items) {
   if (items.some(i => i.status && i.newActivity && i.status.graded && !i.status.excused)) {
     badges.push(PILL_MAPPING.new_grades());
   }
+  if (items.some(i => i.status && i.status.submitted && !i.status.graded && !i.status.excused)) {
+    badges.push(PILL_MAPPING.submitted());
+  }
   if (items.some(showPillForOverdueStatus.bind(this, 'missing'))) {
     badges.push(PILL_MAPPING.missing());
   } else if (items.some(showPillForOverdueStatus.bind(this, 'late'))) {

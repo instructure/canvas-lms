@@ -113,6 +113,24 @@ describe('getBadgesForItems', () => {
     expect(getBadgesForItems(items)).toEqual([]);
   });
 
+  it('returns Submitted object when at least one item is submitted but not graded or excused', () => {
+    const items = [{ newActivity: false, status: { submitted: true, graded: false, excused: false } }];
+    expect(getBadgesForItems(items)).toContainEqual({
+      id: 'submitted',
+      text: 'Submitted'
+    });
+  });
+
+  it('does not return Submitted object when an item is submitted but also graded', () => {
+    const items = [{ newActivity: false, status: { submitted: true, graded: true, excused: false } }];
+    expect(getBadgesForItems(items)).toEqual([]);
+  });
+
+  it('does not return Submitted object when an item is submitted but also excused', () => {
+    const items = [{ newActivity: false, status: { submitted: true, graded: false, excused: true } }];
+    expect(getBadgesForItems(items)).toEqual([]);
+  });
+
   it('returns New Feedback object when at least one new activity item has a has_feedback status', () => {
     const items = [{ status: { fake: true } }, { newActivity: true, status: { has_feedback: true } }];
     expect(getBadgesForItems(items)).toContainEqual({
