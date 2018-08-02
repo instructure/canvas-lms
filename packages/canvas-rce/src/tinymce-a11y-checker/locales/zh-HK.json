@@ -56,6 +56,9 @@
   "fix_heading_hierarchy_f60884c4": {
     "message": "固定標題階層"
   },
+  "format_as_a_list_142210c3": {
+    "message": "使用清單格式"
+  },
   "header_column_f27433cb": {
     "message": "標題欄"
   },
@@ -97,6 +100,9 @@
   },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "文字以 { start } 開始的連結"
+  },
+  "lists_should_be_formatted_as_lists_f862de8d": {
+    "message": "列表應使用清單格式。"
   },
   "merge_links_2478df96": {
     "message": "合併連結"
@@ -181,6 +187,9 @@
   },
   "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
     "message": "大小為 18pt（或粗體 14pt）以下的文字的色彩比最少應達到 4.5:1。"
+  },
+  "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
+    "message": "如果使用標記使項目看起來像清單，但並未標示其清單關係，使用者瀏覽資訊時或會有困難。"
   },
   "why_523b3d8c": {
     "message": "為什麼"

@@ -56,6 +56,9 @@
   "fix_heading_hierarchy_f60884c4": {
     "message": "إصلاح هيكل العنوان"
   },
+  "format_as_a_list_142210c3": {
+    "message": "التنسيق في صورة قائمة"
+  },
   "header_column_f27433cb": {
     "message": "عمود الرأس"
   },
@@ -97,6 +100,9 @@
   },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "رابط بنص يبدأ بـ { start }"
+  },
+  "lists_should_be_formatted_as_lists_f862de8d": {
+    "message": "يجب تنسيق القوائم في صورة قوائم"
   },
   "merge_links_2478df96": {
     "message": "دمج الروابط"
@@ -181,6 +187,9 @@
   },
   "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
     "message": "يجب أن يعرض النص الأصغر من 18 نقطة (أو 14 نقطة بخط عريض) معدل تباين لا يقل عن 4.5:1."
+  },
+  "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
+    "message": "عند استخدام العلامة التي تنسق العناصر في صورة قوائم  ولكنها لا تشير إلى علاقة القوائم، فقد يواجه المستخدمون صعوبة في التنقل بين المعلومات."
   },
   "why_523b3d8c": {
     "message": "السبب"

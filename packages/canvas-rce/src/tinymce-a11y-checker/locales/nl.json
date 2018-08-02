@@ -56,6 +56,9 @@
   "fix_heading_hierarchy_f60884c4": {
     "message": "Hiërarchie van kopteksten corrigeren"
   },
+  "format_as_a_list_142210c3": {
+    "message": "Opmaken als lijst"
+  },
   "header_column_f27433cb": {
     "message": "Koptekstkolom"
   },
@@ -97,6 +100,9 @@
   },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Koppeling maken naar tekst die begint met { start }"
+  },
+  "lists_should_be_formatted_as_lists_f862de8d": {
+    "message": "Lijsten moeten als lijst worden opgemaakt."
   },
   "merge_links_2478df96": {
     "message": "Koppelingen samenvoegen"
@@ -181,6 +187,9 @@
   },
   "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
     "message": "Voor tekst kleiner dan 18pt (of vet 14pt) geldt een miinimum contrastverhouding van 4,5:1."
+  },
+  "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
+    "message": "Wanneer een markering is gebruikt die items visueel opmaakt als een lijst maar de lijstrelatie niet aangeeft, kan het voor gebruikers moeilijk zijn om door de informatie te navigeren."
   },
   "why_523b3d8c": {
     "message": "Waarom"

@@ -56,6 +56,9 @@
   "fix_heading_hierarchy_f60884c4": {
     "message": "Correggi gerarchia intestazioni"
   },
+  "format_as_a_list_142210c3": {
+    "message": "Formatta come elenco"
+  },
   "header_column_f27433cb": {
     "message": "Colonna intestazione"
   },
@@ -97,6 +100,9 @@
   },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Link al testo che inizia con { start }"
+  },
+  "lists_should_be_formatted_as_lists_f862de8d": {
+    "message": "Gli elenchi devono essere formattati come elenchi."
   },
   "merge_links_2478df96": {
     "message": "Unisci link"
@@ -181,6 +187,9 @@
   },
   "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
     "message": "Il testo con dimensioni minori di 18 pt (o in grassetto 14 pt) deve visualizzare un rapporto di contrasto minimo pari a 4,5:1."
+  },
+  "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
+    "message": "Quando viene utilizzato il markup che formatta visivamente gli elementi come elenco ma non indica la relazione tra gli elenchi, gli utenti potrebbero avere difficoltà a spostarsi tra le informazioni."
   },
   "why_523b3d8c": {
     "message": "Perché"

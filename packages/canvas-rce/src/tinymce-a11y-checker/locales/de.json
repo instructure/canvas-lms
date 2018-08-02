@@ -56,6 +56,9 @@
   "fix_heading_hierarchy_f60884c4": {
     "message": "Feste Überschriftshierarchie"
   },
+  "format_as_a_list_142210c3": {
+    "message": "Format als Liste"
+  },
   "header_column_f27433cb": {
     "message": "Überschrift Spalte"
   },
@@ -97,6 +100,9 @@
   },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Link mit Text, beginnend mit { start }"
+  },
+  "lists_should_be_formatted_as_lists_f862de8d": {
+    "message": "Listen sollten als Listen formatiert werden."
   },
   "merge_links_2478df96": {
     "message": "Links zusammenführen"
@@ -181,6 +187,9 @@
   },
   "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
     "message": "Text, der kleiner als 18 Punkte ist (bei Fettdruck 14 Punkte), sollte einen Mindestkontrastverhältnis von 4,5:1 haben."
+  },
+  "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
+    "message": "Wenn Markup verwendet wird, das die Elemente optisch als Liste formatiert, die Listenbeziehung jedoch nicht zeigt, haben Benutzer möglicherweise Schwierigkeiten, in diesen Informationen zu navigieren."
   },
   "why_523b3d8c": {
     "message": "Warum?"

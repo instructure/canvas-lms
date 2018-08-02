@@ -56,6 +56,9 @@
   "fix_heading_hierarchy_f60884c4": {
     "message": "Corriger la hiérarchie des en-têtes"
   },
+  "format_as_a_list_142210c3": {
+    "message": "Présenter sous forme de liste"
+  },
   "header_column_f27433cb": {
     "message": "Colonne d’en-tête"
   },
@@ -97,6 +100,9 @@
   },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Lien contenant du texte commençant par { start }"
+  },
+  "lists_should_be_formatted_as_lists_f862de8d": {
+    "message": "Les listes doivent être présentées sous forme de listes."
   },
   "merge_links_2478df96": {
     "message": "Fusionner les liens"
@@ -181,6 +187,9 @@
   },
   "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
     "message": "Les textes de moins de 18pt (ou 14pt en gras) devraient respecter un ratio de contraste d’au moins 4,5:1."
+  },
+  "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
+    "message": "Lorsqu''on utilise des balises qui formatent visuellement les éléments sous forme de liste, mais qui n''indiquent pas la relation entre les listes, les utilisateurs peuvent avoir de la difficulté à naviguer dans l''information."
   },
   "why_523b3d8c": {
     "message": "Pourquoi"

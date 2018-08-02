@@ -56,6 +56,9 @@
   "fix_heading_hierarchy_f60884c4": {
     "message": "Fijar jerarquía de títulos"
   },
+  "format_as_a_list_142210c3": {
+    "message": "Formatear como lista"
+  },
   "header_column_f27433cb": {
     "message": "Columna de encabezado"
   },
@@ -97,6 +100,9 @@
   },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Vincular con texto que comienza con { start }"
+  },
+  "lists_should_be_formatted_as_lists_f862de8d": {
+    "message": "Las listas deben tener el formato de listas."
   },
   "merge_links_2478df96": {
     "message": "Fusionar enlaces"
@@ -181,6 +187,9 @@
   },
   "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
     "message": "El texto de tamaño menor de 18pt (o 14pt en negrita) debe mostrar una relación de contraste mínima de 4,5:1."
+  },
+  "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
+    "message": "Cuando se usa el marcado que formatea visualmente los elementos como una lista pero no indica la relación de la lista, los usuarios pueden tener dificultades para navegar por la información."
   },
   "why_523b3d8c": {
     "message": "Por qué"

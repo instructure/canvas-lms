@@ -56,6 +56,9 @@
   "fix_heading_hierarchy_f60884c4": {
     "message": "Corriger la hiérarchie d’entête"
   },
+  "format_as_a_list_142210c3": {
+    "message": "Formater comme une liste"
+  },
   "header_column_f27433cb": {
     "message": "Entête de colonne"
   },
@@ -97,6 +100,9 @@
   },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Lien avec texte commençant par { start }"
+  },
+  "lists_should_be_formatted_as_lists_f862de8d": {
+    "message": "Les listes doivent être formatées comme une liste."
   },
   "merge_links_2478df96": {
     "message": "Fusionner les liens"
@@ -181,6 +187,9 @@
   },
   "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
     "message": "Un texte avec une police plus petite que 18pt (ou 14pt gras) doit afficher un rapport de contraste minimum de 4.5:1."
+  },
+  "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
+    "message": "Lorsque le langage de balisage est utilisé pour formater visuellement les éléments sous forme de liste, mais n''indique pas la relation de la liste, les utilisateurs peuvent avoir de la difficulté à naviguer dans l''information."
   },
   "why_523b3d8c": {
     "message": "Pourquoi"
