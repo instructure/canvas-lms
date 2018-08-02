@@ -471,12 +471,12 @@ class FilesController < ApplicationController
     # @current_user.attachments.find , since it might not actually be a user
     # attachment.
     # this implicit context magic happens in ApplicationController#get_context
-    if @context && !@context.is_a?(User)
-      # note that Attachment#find has special logic to find overwriting files; see FindInContextAssociation
-      @attachment = @context.attachments.find(params[:id])
-    else
+    if @context.nil? || @current_user.nil? || @context == @current_user
       @attachment = Attachment.find(params[:id])
       @skip_crumb = true unless @context
+    else
+      # note that Attachment#find has special logic to find overwriting files; see FindInContextAssociation
+      @attachment = @context.attachments.find(params[:id])
     end
 
     params[:download] ||= params[:preview]

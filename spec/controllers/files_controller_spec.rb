@@ -255,6 +255,13 @@ describe FilesController do
       assert_unauthorized
     end
 
+    it "should respect user context" do
+      user_session(@teacher)
+      assert_page_not_found do
+        get 'show', params: {:user_id => @user.id, :id => @file.id}, :format => 'html'
+      end
+    end
+
     describe "with verifiers" do
       it "should allow public access with legacy verifier" do
         allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return "stubby"
