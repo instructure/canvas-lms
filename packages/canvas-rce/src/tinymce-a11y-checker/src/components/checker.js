@@ -52,10 +52,6 @@ export default class Checker extends React.Component {
     return "Checker"
   }
 
-  componentWillUnmount() {
-    clearTimeout(this._closeTimout)
-  }
-
   setConfig(config) {
     this.setState({ config })
   }
@@ -118,9 +114,6 @@ export default class Checker extends React.Component {
               done()
             }
           })
-          if (errors.length === 0) {
-            this._closeTimout = setTimeout(() => this.handleClose(), 3000)
-          }
         }
       )
     }
