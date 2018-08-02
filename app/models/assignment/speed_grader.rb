@@ -175,7 +175,7 @@ class Assignment
       end
 
       if anonymous_graders?(current_user: @current_user, assignment: @assignment)
-        res[:anonymous_grader_ids] = @assignment.ordered_moderation_graders.pluck(:anonymous_id)
+        res[:anonymous_grader_ids] = @assignment.ordered_moderation_graders_with_slot_taken.pluck(:anonymous_id)
       end
 
       res[:submissions] = @submissions.map do |sub|

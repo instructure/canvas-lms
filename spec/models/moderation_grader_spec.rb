@@ -47,4 +47,23 @@ describe ModerationGrader do
       it { is_expected.not_to allow_value('AaZz99').for(:anonymous_id) }
     end
   end
+
+  describe '#with_slot_taken' do
+    before(:once) do
+      course = Course.create!
+      @teacher = User.create!
+      course.enroll_teacher(@teacher, enrollment_state: :active)
+      @assignment = course.assignments.create!(moderated_grading: true, grader_count: 2)
+    end
+
+    it 'includes moderation graders that have taken a slot' do
+      @assignment.create_moderation_grader(@teacher, occupy_slot: true)
+      expect(@assignment.moderation_graders.with_slot_taken.pluck(:user_id)).to include @teacher.id
+    end
+
+    it 'excludes moderation graders that have not taken a slot' do
+      @assignment.create_moderation_grader(@teacher, occupy_slot: false)
+      expect(@assignment.moderation_graders.with_slot_taken.pluck(:id)).not_to include @teacher.id
+    end
+  end
 end

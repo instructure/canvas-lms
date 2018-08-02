@@ -16,17 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ModerationGrader < ActiveRecord::Base
-  belongs_to :user
-  belongs_to :assignment, inverse_of: :moderation_graders
+class AddSlotTakenToModerationGraders < ActiveRecord::Migration[5.1]
+  tag :predeploy
 
-  validates :anonymous_id, presence: true,
-    format: { with: /\A[A-Za-z0-9]{5}\z/ },
-    length: { is: 5 },
-    uniqueness: { scope: :assignment_id }
-
-  validates :user, uniqueness: { scope: :assignment_id }
-  validates :slot_taken, inclusion: { in: [true, false] }
-
-  scope :with_slot_taken, -> { where(slot_taken: true) }
+  def change
+    add_column :moderation_graders, :slot_taken, :boolean, default: true, null: false
+  end
 end

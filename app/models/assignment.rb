@@ -1529,7 +1529,8 @@ class Assignment < ActiveRecord::Base
     submissions = []
     grade_group_students = !(grade_group_students_individually || opts[:excused])
 
-    ensure_grader_can_adjudicate(grader: opts[:grader], provisional: opts[:provisional]) do
+    # grading a student results in a teacher occupying a grader slot for that assignment if it is moderated.
+    ensure_grader_can_adjudicate(grader: opts[:grader], provisional: opts[:provisional], occupy_slot: true) do
       if grade_group_students
         find_or_create_submissions(students, Submission.preload(:grading_period, :stream_item)) do |submission|
           submissions << save_grade_to_submission(submission, original_student, group, opts)
@@ -1750,7 +1751,9 @@ class Assignment < ActiveRecord::Base
       opts[:assessment_request].complete unless opts[:assessment_request].rubric_association
     end
 
-    ensure_grader_can_adjudicate(grader: opts[:author], provisional: opts[:provisional]) do
+    # commenting on a student submission results in a teacher occupying a
+    # grader slot for that assignment if it is moderated.
+    ensure_grader_can_adjudicate(grader: opts[:author], provisional: opts[:provisional], occupy_slot: true) do
       if opts[:comment] && Canvas::Plugin.value_to_boolean(opts[:group_comment])
         uuid = CanvasSlug.generate_securish_uuid
         res = find_or_create_submissions(students) do |submission|
@@ -2792,14 +2795,14 @@ class Assignment < ActiveRecord::Base
 
   def provisional_moderation_graders
     if final_grader_id.present?
-      moderation_graders.where.not(user_id: final_grader_id)
+      moderation_graders.with_slot_taken.where.not(user_id: final_grader_id)
     else
-      moderation_graders
+      moderation_graders.with_slot_taken
     end
   end
 
-  def ordered_moderation_graders
-    moderation_graders.order(:anonymous_id)
+  def ordered_moderation_graders_with_slot_taken
+    moderation_graders.with_slot_taken.order(:anonymous_id)
   end
 
   def moderated_grading_max_grader_count
@@ -2817,7 +2820,7 @@ class Assignment < ActiveRecord::Base
     return false unless context.grants_any_right?(user, :manage_grades, :view_all_grades)
     return true unless moderated_grader_limit_reached?
     # Final grader can always be a moderated grader, and existing moderated graders can re-grade
-    final_grader_id == user.id || moderation_graders.where(user_id: user.id).exists?
+    final_grader_id == user.id || provisional_moderation_graders.where(user: user).exists?
   end
 
   def can_view_speed_grader?(user)
@@ -2865,7 +2868,25 @@ class Assignment < ActiveRecord::Base
     context.grants_any_right?(user, :manage_grades, :view_all_grades)
   end
 
+  def create_moderation_grader(user, occupy_slot:)
+    ensure_moderation_grader_slot_available(user) if occupy_slot
+
+    existing_anonymous_ids = moderation_graders.pluck(:anonymous_id)
+    new_anonymous_id = Anonymity.generate_id(existing_ids: existing_anonymous_ids)
+    moderation_graders.create!(user: user, anonymous_id: new_anonymous_id, slot_taken: occupy_slot)
+  end
+
+  def user_is_moderation_grader?(user)
+    moderation_grader_users.exists?(user)
+  end
+
   private
+
+  def ensure_moderation_grader_slot_available(user)
+    if moderated_grader_limit_reached? && user.id != final_grader_id
+      raise MaxGradersReachedError
+    end
+  end
 
   def mute_if_changed_to_anonymous
     return unless anonymous_grading_changed?
@@ -2954,26 +2975,12 @@ class Assignment < ActiveRecord::Base
     assignment.graders_anonymous_to_graders = false
   end
 
-  def create_moderation_grader_if_needed(grader:)
-    return false if moderation_graders.where(user: grader).exists?
-
-    if moderated_grader_limit_reached?
-      raise MaxGradersReachedError unless grader.id == final_grader_id
-    end
-
-    existing_anonymous_ids = moderation_graders.pluck(:anonymous_id)
-    new_anonymous_id = Anonymity.generate_id(existing_ids: existing_anonymous_ids)
-    moderation_graders.create!(user: grader, anonymous_id: new_anonymous_id)
-
-    true
-  end
-
   # This is a helper method intended to ensure the number of provisional graders
   # for a moderated assignment doesn't exceed the prescribed maximum. Currently,
   # it is used for submitting grades and comments via SpeedGrader. If the assignment
   # is not moderated or the grade/comment being issued is not provisional, this
   # method will simply execute the provided block without any additional checks.
-  def ensure_grader_can_adjudicate(grader:, provisional: false)
+  def ensure_grader_can_adjudicate(grader:, provisional: false, occupy_slot:)
     unless provisional && moderated_grading?
       yield and return
     end
@@ -2981,7 +2988,17 @@ class Assignment < ActiveRecord::Base
     Assignment.transaction do
       # If we can't add a new grader, this will raise an error and abort
       # the transaction.
-      added_moderation_grader = create_moderation_grader_if_needed(grader: grader)
+      moderation_grader = moderation_graders.find_by(user: grader)
+      if moderation_grader.nil?
+        create_moderation_grader(grader, occupy_slot: occupy_slot)
+        filled_available_slot = occupy_slot
+      elsif moderation_grader.slot_taken != occupy_slot
+        if occupy_slot
+          ensure_moderation_grader_slot_available(grader)
+          filled_available_slot = true
+        end
+        moderation_grader.update!(slot_taken: occupy_slot)
+      end
 
       yield
 
@@ -2989,7 +3006,7 @@ class Assignment < ActiveRecord::Base
       # multiple new graders could have tried to add themselves simultaneously
       # when there weren't enough slots open for all of them. If we ended up
       # with too many provisional graders, throw an error to roll things back.
-      if added_moderation_grader && provisional_moderation_graders.count > grader_count
+      if filled_available_slot && provisional_moderation_graders.count > grader_count
         raise MaxGradersReachedError
       end
     end

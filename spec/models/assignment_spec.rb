@@ -248,7 +248,7 @@ describe Assignment do
     end
   end
 
-  describe '#ordered_moderation_graders' do
+  describe '#ordered_moderation_graders_with_slot_taken' do
     let(:teacher1) { @course.enroll_teacher(User.create!, enrollment_state: :active).user }
     let(:teacher2) { @course.enroll_teacher(User.create!, enrollment_state: :active).user }
     let(:assignment) do
@@ -260,10 +260,11 @@ describe Assignment do
     end
 
     it 'returns moderation graders ordered by anonymous id' do
-      mod_teacher1 = assignment.moderation_graders.create!(user: teacher1, anonymous_id: 'VFH2Y')
-      mod_teacher2 = assignment.moderation_graders.create!(user: teacher2, anonymous_id: 'A23FH')
-      mod_teacher = assignment.moderation_graders.create!(user: @teacher, anonymous_id: 'R2D22')
-      expect(assignment.ordered_moderation_graders).to eq [mod_teacher2, mod_teacher, mod_teacher1]
+      assignment.grade_student(@student, grader: teacher1, provisional: true, score: 0)
+      assignment.grade_student(@student, grader: teacher2, provisional: true, score: 5)
+      assignment.grade_student(@student, grader: @teacher, provisional: true, score: 10)
+      ordered_moderation_graders_with_slot_taken = assignment.moderation_graders.with_slot_taken.order(:anonymous_id)
+      expect(assignment.ordered_moderation_graders_with_slot_taken).to eq ordered_moderation_graders_with_slot_taken
     end
   end
 
@@ -6221,15 +6222,16 @@ describe Assignment do
       @teacher = User.create!
       second_teacher = User.create!
       @ta = User.create!
-      @course.enroll_teacher(@teacher, enrollment_state: 'active')
-      @course.enroll_teacher(second_teacher, enrollment_state: 'active')
-      @course.enroll_ta(@ta, enrollment_state: 'active')
+      @course.enroll_teacher(@teacher, enrollment_state: :active)
+      @course.enroll_teacher(second_teacher, enrollment_state: :active)
+      @course.enroll_ta(@ta, enrollment_state: :active)
+      @course.enroll_student(@student, enrollment_state: :active)
       @assignment = @course.assignments.create!(
         final_grader: @teacher,
         grader_count: 2,
         moderated_grading: true
       )
-      @assignment.moderation_graders.create!(user: second_teacher, anonymous_id: '12345')
+      @assignment.grade_student(@student, grader: second_teacher, provisional: true, score: 5)
     end
 
     it 'returns false if all provisional grader slots are not filled' do
@@ -6237,17 +6239,17 @@ describe Assignment do
     end
 
     it 'returns true if all provisional grader slots are filled' do
-      @assignment.moderation_graders.create!(user: @ta, anonymous_id: '54321')
+      @assignment.grade_student(@student, grader: @ta, provisional: true, score: 10)
       expect(@assignment.moderated_grader_limit_reached?).to eq true
     end
 
     it 'ignores grades issued by the final grader when determining if slots are filled' do
-      @assignment.moderation_graders.create!(user: @teacher, anonymous_id: '00000')
+      @assignment.grade_student(@student, grader: @teacher, provisional: true, score: 10)
       expect(@assignment.moderated_grader_limit_reached?).to eq false
     end
 
     it 'returns false if moderated grading is off' do
-      @assignment.moderation_graders.create!(user: @ta, anonymous_id: '54321')
+      @assignment.grade_student(@student, grader: @ta, provisional: true, score: 10)
       @assignment.moderated_grading = false
       expect(@assignment.moderated_grader_limit_reached?).to eq false
     end
@@ -6259,15 +6261,18 @@ describe Assignment do
       @teacher = User.create!
       @second_teacher = User.create!
       @final_teacher = User.create!
-      @course.enroll_teacher(@teacher, enrollment_state: 'active')
-      @course.enroll_teacher(@second_teacher, enrollment_state: 'active')
-      @course.enroll_teacher(@final_teacher, enrollment_state: 'active')
+      student = User.create!
+      @course.enroll_teacher(@teacher, enrollment_state: :active)
+      @course.enroll_teacher(@second_teacher, enrollment_state: :active)
+      @course.enroll_teacher(@final_teacher, enrollment_state: :active)
+      @course.enroll_student(student, enrollment_state: :active)
       @assignment = @course.assignments.create!(
         final_grader: @final_teacher,
         grader_count: 2,
-        moderated_grading: true
+        moderated_grading: true,
+        points_possible: 10
       )
-      @assignment.moderation_graders.create!(user: @second_teacher, anonymous_id: '12345')
+      @assignment.grade_student(student, grader: @second_teacher, provisional: true, score: 10)
     end
 
     shared_examples 'grader permissions are checked' do
@@ -6322,6 +6327,29 @@ describe Assignment do
           expect(@assignment.can_be_moderated_grader?(@final_teacher)).to be true
         end
       end
+    end
+  end
+
+  describe '#user_is_moderation_grader?' do
+    before(:once) do
+      @course = Course.create!
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher, enrollment_state: :active)
+      @assignment = @course.assignments.create!(moderated_grading: true, grader_count: 2)
+    end
+
+    it 'returns true if the user is a moderation grader occupying a grader slot' do
+      @assignment.create_moderation_grader(@teacher, occupy_slot: true)
+      expect(@assignment.user_is_moderation_grader?(@teacher)).to be true
+    end
+
+    it 'returns true if the user is a moderation grader not occupying a grader slot' do
+      @assignment.create_moderation_grader(@teacher, occupy_slot: false)
+      expect(@assignment.user_is_moderation_grader?(@teacher)).to be true
+    end
+
+    it 'returns false if the user is not a moderation grader' do
+      expect(@assignment.user_is_moderation_grader?(@teacher)).to be false
     end
   end
 

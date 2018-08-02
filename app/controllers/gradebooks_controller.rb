@@ -617,6 +617,10 @@ class GradebooksController < ApplicationController
       :grader
     end
 
+    if @assignment.moderated_grading? && !@assignment.user_is_moderation_grader?(@current_user)
+      @assignment.create_moderation_grader(@current_user, occupy_slot: false)
+    end
+
     @can_comment_on_submission = !@context.completed? && !@context_enrollment.try(:completed?)
     @disable_unmute_assignment = @assignment.muted && !@assignment.grades_published?
     respond_to do |format|
