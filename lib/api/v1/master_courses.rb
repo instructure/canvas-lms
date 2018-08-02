@@ -81,4 +81,21 @@ module Api::V1::MasterCourses
       json[:exceptions] = exceptions['syllabus'] if exceptions
     end
   end
+
+  def course_summary_json(course, opts={})
+    can_read_sis = opts[:can_read_sis] || course.account.grants_any_right?(@current_user, :read_sis, :manage_sis)
+    hash = api_json(course, @current_user, session, :only => %w{id name course_code})
+    hash['sis_course_id'] = course.sis_source_id if can_read_sis
+    hash['term_name'] = course.enrollment_term.name
+    hash['teachers'] = course.teachers.map { |teacher| user_display_json(teacher) } if opts[:include_teachers]
+    hash
+  end
+
+  def child_subscription_json(sub)
+    {
+      id: sub.id,
+      template_id: sub.master_template_id,
+      blueprint_course: course_summary_json(sub.master_template.course)
+    }
+  end
 end

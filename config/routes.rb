@@ -2049,6 +2049,7 @@ CanvasRails::Application.routes.draw do
 
       put 'courses/:course_id/blueprint_templates/:template_id/restrict_item', action: :restrict_item
 
+      get 'courses/:course_id/blueprint_subscriptions', action: :subscriptions_index, as: :course_blueprint_subscriptions
       get 'courses/:course_id/blueprint_subscriptions/:subscription_id/migrations', action: :imports_index, as: :course_blueprint_imports
       get 'courses/:course_id/blueprint_subscriptions/:subscription_id/migrations/:id', action: :imports_show
       get 'courses/:course_id/blueprint_subscriptions/:subscription_id/migrations/:id/details', action: :import_details
