@@ -1371,6 +1371,7 @@ CanvasRails::Application.routes.draw do
       get 'accounts/:id', action: :show, as: :account
       put 'accounts/:id', action: :update
       get 'accounts/:account_id/terms_of_service', action: :terms_of_service
+      get 'accounts/:account_id/help_links', action: :help_links
       get 'accounts/:account_id/courses', action: :courses_api, as: 'account_courses'
       get 'accounts/:account_id/sub_accounts', action: :sub_accounts, as: 'sub_accounts'
       get 'accounts/:account_id/courses/:id', controller: :courses, action: :show, as: 'account_course_show'

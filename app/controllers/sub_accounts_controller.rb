@@ -17,6 +17,7 @@
 #
 
 # @API Accounts
+# @subtopic Subaccounts
 class SubAccountsController < ApplicationController
   include Api::V1::Account
 

@@ -139,8 +139,142 @@ require 'csv'
 #         }
 #       }
 #     }
+#
+# @model HelpLink
+#     {
+#       "id": "HelpLink",
+#       "description": "",
+#       "properties":
+#       {
+#         "id": {
+#           "description": "The ID of the help link",
+#           "example": "instructor_question",
+#           "type": "string"
+#         },
+#         "text": {
+#           "description": "The name of the help link",
+#           "example": "Ask Your Instructor a Question",
+#           "type": "string"
+#         },
+#         "subtext": {
+#           "description": "The description of the help link",
+#           "example": "Questions are submitted to your instructor",
+#           "type": "string"
+#         },
+#         "url": {
+#           "description": "The URL of the help link",
+#           "example": "#teacher_feedback",
+#           "type": "string"
+#         },
+#         "type": {
+#           "description": "The type of the help link",
+#           "enum":
+#           [
+#             "default",
+#             "custom"
+#           ],
+#           "example": "default",
+#           "type": "string"
+#         },
+#         "available_to": {
+#           "description": "The roles that have access to this help link",
+#           "example": ["user", "student", "teacher", "admin", "observer", "unenrolled"],
+#           "type": "array",
+#           "items": { "type": "string" }
+#         }
+#       }
+#     }
+#
+# @model HelpLinks
+#     {
+#       "id": "HelpLinks",
+#       "description": "",
+#       "properties":
+#       {
+#         "help_link_name": {
+#           "description": "Help link button title",
+#           "example": "Help And Policies",
+#           "type": "string"
+#         },
+#         "help_link_icon": {
+#           "description": "Help link button icon",
+#           "example": "help",
+#           "type": "string"
+#         },
+#         "custom_help_links": {
+#           "description": "Help links defined by the account. Could include default help links.",
+#           "type": "array",
+#           "items": { "$ref": "HelpLink" },
+#           "example": [
+#             {
+#               "id": "link1",
+#               "text": "Custom Link!",
+#               "subtext": "Something something.",
+#               "url": "https://google.com",
+#               "type": "custom",
+#               "available_to": [
+#                 "user",
+#                 "student",
+#                 "teacher",
+#                 "admin",
+#                 "observer",
+#                 "unenrolled"
+#               ]
+#             }
+#           ]
+#         },
+#         "default_help_links": {
+#           "description": "Default help links provided when account has not set help links of their own.",
+#           "type": "array",
+#           "items": { "$ref": "HelpLink" },
+#           "example": [
+#             {
+#               "available_to": [
+#                 "student"
+#               ],
+#               "text": "Ask Your Instructor a Question",
+#               "subtext": "Questions are submitted to your instructor",
+#               "url": "#teacher_feedback",
+#               "type": "default",
+#               "id": "instructor_question"
+#             },
+#             {
+#               "available_to": [
+#                 "user",
+#                 "student",
+#                 "teacher",
+#                 "admin",
+#                 "observer",
+#                 "unenrolled"
+#               ],
+#               "text": "Search the Canvas Guides",
+#               "subtext": "Find answers to common questions",
+#               "url": "http://community.canvaslms.com/community/answers/guides",
+#               "type": "default",
+#               "id": "search_the_canvas_guides"
+#             },
+#             {
+#               "available_to": [
+#                 "user",
+#                 "student",
+#                 "teacher",
+#                 "admin",
+#                 "observer",
+#                 "unenrolled"
+#               ],
+#               "text": "Report a Problem",
+#               "subtext": "If Canvas misbehaves, tell us about it",
+#               "url": "#create_ticket",
+#               "type": "default",
+#               "id": "report_a_problem"
+#             }
+#           ]
+#         }
+#       }
+#     }
+
 class AccountsController < ApplicationController
-  before_action :require_user, :only => [:index, :terms_of_service]
+  before_action :require_user, :only => [:index, :terms_of_service, :help_links]
   before_action :reject_student_view_student
   before_action :get_context
   before_action :rich_content_service_config, only: [:settings]
@@ -314,6 +448,23 @@ class AccountsController < ApplicationController
     res = tos.attributes.slice(*keys)
     res['content'] = tos.terms_of_service_content&.content
     render :json => res
+  end
+
+  # @API Get help links
+  #
+  # Returns the help links for that account
+  #
+  # @returns HelpLinks
+  def help_links
+    render :json => {} unless @account == @domain_root_account
+    help_links = edit_help_links_env
+    links = {
+      help_link_name: help_links[:help_link_name],
+      help_link_icon: help_links[:help_link_icon],
+      custom_help_links: help_links[:CUSTOM_HELP_LINKS],
+      default_help_links: help_links[:DEFAULT_HELP_LINKS],
+    }
+    render :json => links
   end
 
   include Api::V1::Course

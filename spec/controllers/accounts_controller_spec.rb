@@ -727,7 +727,7 @@ describe AccountsController do
       expect(response.body).to match(/\"content\":\"custom content\"/)
     end
 
-    it "should return the terms of service content as student" do
+    it "should return the terms of service content as teacher" do
       @account.update_terms_of_service(terms_type: "custom", content: "custom content")
 
       user_session(@teacher)
@@ -737,7 +737,7 @@ describe AccountsController do
       expect(response.body).to match(/\"content\":\"custom content\"/)
     end
 
-    it "should return the terms of service content as teacher" do
+    it "should return the terms of service content as student" do
       @account.update_terms_of_service(terms_type: "custom", content: "custom content")
 
       user_session(@student)
@@ -745,6 +745,67 @@ describe AccountsController do
 
       expect(response).to be_successful
       expect(response.body).to match(/\"content\":\"custom content\"/)
+    end
+  end
+
+  describe "help links" do
+    before do
+      account_with_admin_logged_in
+      @account.settings[:custom_help_links] = [
+        {
+          id: 'link1',
+          text: 'Custom Link!',
+          subtext: 'Custom subtext',
+          url: 'https://canvas.instructure.com/guides',
+          type: 'custom',
+          available_to: ['user', 'student', 'teacher'],
+        },
+      ]
+      @account.save
+      course_with_teacher(account: @account)
+      course_with_student(course: @course)
+    end
+
+    it "should return default help links" do
+      get 'help_links', params: {account_id: @account.id}
+
+      expect(response).to be_successful
+      expect(response.body).to match(/\"help_link_name\":\"Help\"/)
+      expect(response.body).to match(/\"help_link_icon\":\"help\"/)
+      expect(response.body).to match(/\"id\":\"report_a_problem\"/)
+      expect(response.body).to match(/\"id\":\"instructor_question\"/)
+      expect(response.body).to match(/\"id\":\"search_the_canvas_guides\"/)
+      expect(response.body).to match(/\"type\":\"default\"/)
+    end
+
+    it "should return custom help links" do
+      @account.settings[:help_link_name] = 'Help and Policies'
+      @account.settings[:help_link_icon] = 'paperclip'
+      @account.save
+      get 'help_links', params: {account_id: @account.id}
+
+      expect(response).to be_successful
+      expect(response.body).to match(/\"help_link_name\":\"Help and Policies\"/)
+      expect(response.body).to match(/\"help_link_icon\":\"paperclip\"/)
+      expect(response.body).to match(/\"id\":\"link1\"/)
+      expect(response.body).to match(/\"type\":\"custom\"/)
+      expect(response.body).to match(/\"url\":\"https:\/\/canvas.instructure.com\/guides\"/)
+    end
+
+    it "should return the help links as student" do
+      user_session(@student)
+      get 'help_links', params: {account_id: @account.id}
+
+      expect(response).to be_successful
+      expect(response.body).to match(/\"help_link_name\":\"Help\"/)
+    end
+
+    it "should return the help links as teacher" do
+      user_session(@teacher)
+      get 'help_links', params: {account_id: @account.id}
+
+      expect(response).to be_successful
+      expect(response.body).to match(/\"help_link_name\":\"Help\"/)
     end
   end
 
