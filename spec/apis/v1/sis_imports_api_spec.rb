@@ -185,6 +185,7 @@ describe SisImportsApiController, type: :request do
     api_call(:put, "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}/restore_states",
              {controller: 'sis_imports_api', action: 'restore_states', format: 'json',
               account_id: @account.id.to_s, id: batch.id.to_s})
+    run_jobs
     expect(batch.reload.workflow_state).to eq 'restored'
   end
 
