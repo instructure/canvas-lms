@@ -184,14 +184,16 @@ class ApplicationController < ActionController::Base
   helper_method :js_env
 
   # add keys to JS environment necessary for the RCE at the given risk level
-  def rce_js_env(risk_level, root_account: @domain_root_account, domain: request.env['HTTP_HOST'], context: @context)
+  def rce_js_env(risk_level, root_account: @domain_root_account, domain: request.env['HTTP_HOST'])
     rce_env_hash = Services::RichContent.env_for(root_account,
                                             risk_level: risk_level,
                                             user: @current_user,
                                             domain: domain,
                                             real_user: @real_current_user,
-                                            context: context)
-    js_env(rce_env_hash)
+                                            context: @context)
+    rce_env_hash[:RICH_CONTENT_FILES_TAB_DISABLED] = !@context.grants_right?(@current_user, session, :read_as_admin) &&
+                                                     !tab_enabled?(@context.class::TAB_FILES, :no_render => true) if @context.is_a?(Course)
+    js_env(rce_env_hash, true) # Allow overriding in case this gets called more than once
   end
   helper_method :rce_js_env
 

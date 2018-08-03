@@ -47,6 +47,23 @@ describe("Sidebar", () => {
     assert.ok(tree.subTree("FilesPanel"));
   });
 
+  it("does not render the file panel when filesTabDisabled is true", () => {
+    let tree = sd.shallowRender(
+      <Sidebar
+        hidden={false}
+        theme={{ loaded: true, variables: {} }}
+        contextType="course"
+        collections={collections}
+        session={{}}
+        startUpload={() => {}}
+        filesTabDisabled
+      />
+    );
+    assert.ok(tree.subTree("LinksPanel"));
+    assert.ok(tree.subTree("ImagesPanel"));
+    assert.ok(!tree.subTree("FilesPanel"));
+  });
+
   it("renders a hidden div when hidden", () => {
     let tree = sd.shallowRender(
       <Sidebar hidden={true} contextType="course" collections={collections} />

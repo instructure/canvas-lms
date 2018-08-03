@@ -51,6 +51,7 @@ import splitAssetString from 'compiled/str/splitAssetString'
         refreshToken: refreshToken(ENV.JWT),
         host: ENV.RICH_CONTENT_APP_HOST,
         canUploadFiles: ENV.RICH_CONTENT_CAN_UPLOAD_FILES,
+        filesTabDisabled: ENV.RICH_CONTENT_FILES_TAB_DISABLED,
         contextType: context[0],
         contextId: context[1],
         themeUrl: ENV.active_brand_config_json_url

@@ -1276,7 +1276,7 @@ class DiscussionTopic < ActiveRecord::Base
   #
   # Returns a boolean.
   def visible_for?(user = nil)
-    RequestCache.cache('discussion_visible_for', self, user) do
+    RequestCache.cache('discussion_visible_for', self, is_announcement, user) do
       # user is the topic's author
       next true if user && user.id == self.user_id
 
