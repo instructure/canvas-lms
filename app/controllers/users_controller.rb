@@ -2275,8 +2275,9 @@ class UsersController < ApplicationController
       root_account_uuid: @domain_root_account.uuid
     }
 
-    auth_token = Canvas::Security.create_jwt(auth_body, expires_at, sekrit)
-    props_token = Canvas::Security.create_jwt(props_body, nil, sekrit)
+    private_key = OpenSSL::PKey::EC.new(Base64.decode64(sekrit))
+    auth_token = Canvas::Security.create_jwt(auth_body, expires_at, private_key, :ES512)
+    props_token = Canvas::Security.create_jwt(props_body, nil, private_key, :ES512)
     render json: {
       url: settings["url"],
       auth_token: auth_token,
