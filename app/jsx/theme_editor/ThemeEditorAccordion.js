@@ -107,7 +107,7 @@ export default class ThemeEditorAccordion extends React.Component {
           <ThemeEditorVariableGroup
             key={variableGroup.group_name}
             summary={
-              <Text as="h3" weight="bold">
+              <Text as="h2" weight="bold">
                 {variableGroup.group_name}
               </Text>
             }

@@ -78,7 +78,7 @@ export default class ThemeEditorImageRow extends Component {
         <div className="te-Flex">
           <div className="Theme__editor-form--upload">
             <div className="Theme__editor-upload_header">
-              <h4 className="Theme__editor-upload_title">{this.props.varDef.human_name}</h4>
+              <h3 className="Theme__editor-upload_title">{this.props.varDef.human_name}</h3>
               <span className="Theme__editor-upload_restrictions">
                 {this.props.varDef.helper_text}
               </span>
