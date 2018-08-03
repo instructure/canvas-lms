@@ -125,6 +125,8 @@ module Api::V1::Quiz
     return nil unless quiz.is_a?(Quizzes::Quiz) && quiz_params.is_a?(ActionController::Parameters)
     update_params = filter_params(quiz_params)
 
+    update_params['description'] = process_incoming_html_content(update_params['description'])
+
     # make sure assignment_group_id belongs to context
     if update_params.has_key?("assignment_group_id")
       ag_id = update_params.delete("assignment_group_id").presence

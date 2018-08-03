@@ -278,6 +278,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
 
       question_data = params[:question]&.to_unsafe_h
       question_data ||= {}
+      question_data[:question_text] = process_incoming_html_content(question_data[:question_text])
 
       if question_data[:quiz_group_id]
         @group = @quiz.quiz_groups.find(question_data[:quiz_group_id])
@@ -351,7 +352,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
       @question = @quiz.quiz_questions.active.find(params[:id])
       question_data = params[:question].to_unsafe_h
       question_data[:regrade_user] = @current_user
-      question_data ||= {}
+      question_data[:question_text] = process_incoming_html_content(question_data[:question_text])
 
       if question_data[:quiz_group_id]
         @group = @quiz.quiz_groups.find(question_data[:quiz_group_id])
