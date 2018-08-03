@@ -65,11 +65,6 @@ describe GraphQLController do
         request.headers["GraphQL-Metrics"] = "true"
         post :execute, params: {query: '{legacyNode(User, 1) { id }'}
       end
-
-      it "doesn't report normally" do
-        expect_any_instance_of(Tracers::DatadogTracer).not_to receive :trace
-        post :execute, params: {query: '{legacyNode(User, 1) { id }'}
-      end
     end
   end
 

@@ -25,17 +25,16 @@ class GraphQLController < ApplicationController
   def execute
     query = params[:query]
     variables = params[:variables] || {}
-    tracers = if request.headers["GraphQL-Metrics"] == "true"
-                domain = request.host_with_port.sub(':', '_')
-                [Tracers::DatadogTracer.new(domain)]
-              else
-                []
-              end
     context = {
       current_user: @current_user,
       session: session,
       request: request,
-      tracers: tracers
+      tracers: [
+        Tracers::DatadogTracer.new(
+          request.host_with_port.sub(':', '_'),
+          request.headers["GraphQL-Metrics"] == "true"
+        )
+      ]
     }
     result = nil
 
