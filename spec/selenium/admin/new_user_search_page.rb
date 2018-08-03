@@ -43,7 +43,7 @@ module NewUserSearchPage
   end
 
   def add_user_button_jqcss
-    'button:has([name="IconPlusLine"]):contains("People")'
+    'button:has([name="IconPlus"]):contains("People")'
   end
 
   def add_user_button
