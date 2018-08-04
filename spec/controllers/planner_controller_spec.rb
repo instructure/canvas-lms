@@ -294,7 +294,9 @@ describe PlannerController do
           )
         end
 
-        it "filters all_ungraded_todo_items for teachers" do
+        it "filters all_ungraded_todo_items for teachers, including unpublished items" do
+          @course_page.unpublish
+          @group_topic.unpublish
           user_session @course1.teachers.first
           get :index, params: {
             filter: 'all_ungraded_todo_items',
@@ -308,6 +310,25 @@ describe PlannerController do
             [['discussion_topic', @course_topic.id],
              ['discussion_topic', @group_topic.id],
              ['wiki_page', @course_page.id],
+             ['wiki_page', @group_page.id]]
+          )
+        end
+
+        it "filters out unpublished todo items for students" do
+          @course_page.unpublish
+          @group_topic.unpublish
+          user_session @course1.students.first
+          get :index, params: {
+            filter: 'all_ungraded_todo_items',
+            context_codes: [@course1.asset_string, @group.asset_string],
+            start_date: 2.weeks.ago.iso8601,
+            end_date: 2.weeks.from_now.iso8601
+          }
+          response_json = json_parse(response.body)
+          items = response_json.map{|i| [i['plannable_type'], i['plannable_id']]}
+          expect(items).to match_array(
+            [['discussion_topic', @course_topic.id],
+             ['discussion_topic', @group_topic.id], # turns out groups let all members view unpublished items
              ['wiki_page', @group_page.id]]
           )
         end
@@ -520,10 +541,16 @@ describe PlannerController do
       context "cross-sharding" do
         specs_require_sharding
 
-        it "should ignore shards other than the current account's" do
+        before :once do
+          @original_course = @course
           @shard1.activate do
             @another_account = Account.create!
             @another_course = @another_account.courses.create!(:workflow_state => 'available')
+         end
+        end
+
+        it "should ignore shards other than the current account's" do
+          @shard1.activate do
             @another_assignment = @another_course.assignments.create!(:title => "title", :due_at => 1.day.from_now)
             @student = user_with_pseudonym(:active_all => true, :account => @another_account)
             @another_course.enroll_student(@student, :enrollment_state => 'active')
@@ -538,6 +565,31 @@ describe PlannerController do
           get :index
           response_json = json_parse(response.body)
           expect(response_json.map { |i| i["plannable_id"]}).to eq [announcement.id, @assignment.id, @assignment2.id]
+        end
+
+        it "returns all_ungraded_todo_items across shards" do
+          @shard1.activate do
+            @original_topic = @original_course.discussion_topics.create! todo_date: 1.day.from_now, title: 'fuh'
+            @original_page = @original_course.wiki_pages.create! todo_date: 1.day.from_now, title: 'duh'
+            @other_topic = @another_course.discussion_topics.create! todo_date: 1.day.from_now, title: 'buh'
+            @other_page = @another_course.wiki_pages.create! todo_date: 1.day.from_now, title: 'uh'
+            @another_course.enroll_student(@student).accept!
+          end
+          user_session @student
+          get :index, params: {
+            filter: 'all_ungraded_todo_items',
+            context_codes: [@original_course.asset_string, @another_course.asset_string],
+            start_date: 2.weeks.ago.iso8601,
+            end_date: 2.weeks.from_now.iso8601
+          }
+          json = json_parse(response.body)
+          items = json.map{|i| [i['plannable_type'], i['plannable_id']]}
+          expect(items).to match_array(
+            [['discussion_topic', @original_topic.id],
+             ['discussion_topic', @other_topic.id],
+             ['wiki_page', @original_page.id],
+             ['wiki_page', @other_page.id]]
+          )
         end
       end
 

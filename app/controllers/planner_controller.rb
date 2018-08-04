@@ -185,19 +185,14 @@ class PlannerController < ApplicationController
 
   # returns all pages and ungraded discussions in supplied contexts with todo dates (no needing-viewing filter)
   def all_ungraded_todo_items
+    @unpub_contexts, @pub_contexts = @contexts.partition { |c| c.grants_right?(@current_user, :view_unpublished_items) }
     collections = []
-    collections << item_collection('course_pages',
-        WikiPage.active.where(context_type: 'Course', context_id: @course_ids, todo_date: @start_date..@end_date),
-        WikiPage, [:todo_date, :created_at], :id)
-    collections << item_collection('group_pages',
-        WikiPage.active.where(context_type: 'Group', context_id: @group_ids, todo_date: @start_date..@end_date),
-        WikiPage, [:todo_date, :created_at], :id)
-    collections << item_collection('ungraded_course_discussions',
-        DiscussionTopic.published.where(context_type: 'Course', context_id: @course_ids, todo_date: @start_date..@end_date),
-        DiscussionTopic, [:todo_date, :posted_at, :created_at], :id)
-    collections << item_collection('ungraded_group_discussions',
-        DiscussionTopic.published.where(context_type: 'Group', context_id: @group_ids, todo_date: @start_date..@end_date),
-        DiscussionTopic, [:todo_date, :posted_at, :created_at], :id)
+    wiki_page_todo_scopes.each_with_index do |scope, i|
+      collections << item_collection("pages_#{i}", scope, WikiPage, [:todo_date, :created_at], :id)
+    end
+    discussion_topic_todo_scopes.each_with_index do |scope, i|
+      collections << item_collection("discussions_#{i}", scope, DiscussionTopic, [:todo_date, :posted_at, :created_at], :id)
+    end
     BookmarkedCollection.merge(*collections)
   end
 
@@ -309,10 +304,10 @@ class PlannerController < ApplicationController
     @page = params[:page] || 'first'
     @include_concluded = includes.include? 'concluded'
     if params[:context_codes]
-      contexts = Context.from_context_codes(Array(params[:context_codes])).select{ |c| c.grants_right?(@current_user, :read) }
-      @course_ids = contexts.select{ |c| c.is_a? Course }.map(&:id)
-      @group_ids = contexts.select{ |c| c.is_a? Group }.map(&:id)
-      @user_ids = contexts.select{ |c| c.is_a? User }.map(&:id)
+      @contexts = Context.from_context_codes(Array(params[:context_codes])).select{ |c| c.grants_right?(@current_user, :read) }
+      @course_ids = @contexts.select{ |c| c.is_a? Course }.map(&:id)
+      @group_ids = @contexts.select{ |c| c.is_a? Group }.map(&:id)
+      @user_ids = @contexts.select{ |c| c.is_a? User }.map(&:id)
     else
       @course_ids = @current_user.course_ids_for_todo_lists(:student, default_opts)
       @group_ids = @current_user.group_ids_for_todo_lists(default_opts)
@@ -340,5 +335,29 @@ class PlannerController < ApplicationController
       user_ids: @user_ids,
       limit: per_page.to_i + 1, # needs a + 1 because otherwise folio might think there aren't any more objects
     }
+  end
+
+  # return pages of the proper state in @pub_/@unpub_contexts, with todo_date: @start_date..@end_date
+  def wiki_page_todo_scopes
+    scopes = []
+    Shard.partition_by_shard(@pub_contexts) do |contexts|
+      scopes << WikiPage.where(todo_date: @start_date..@end_date).polymorphic_where(context: contexts).active
+    end
+    Shard.partition_by_shard(@unpub_contexts) do |contexts|
+      scopes << WikiPage.where(todo_date: @start_date..@end_date).polymorphic_where(context: contexts).not_deleted
+    end
+    scopes
+  end
+
+  # return discussions of the proper state in @pub_/@unpub_contexts, with todo_date: @start_date..@end_date
+  def discussion_topic_todo_scopes
+    scopes = []
+    Shard.partition_by_shard(@pub_contexts) do |contexts|
+      scopes << DiscussionTopic.where(todo_date: @start_date..@end_date).polymorphic_where(context: contexts).published
+    end
+    Shard.partition_by_shard(@unpub_contexts) do |contexts|
+      scopes << DiscussionTopic.where(todo_date: @start_date..@end_date).polymorphic_where(context: contexts).active
+    end
+    scopes
   end
 end
