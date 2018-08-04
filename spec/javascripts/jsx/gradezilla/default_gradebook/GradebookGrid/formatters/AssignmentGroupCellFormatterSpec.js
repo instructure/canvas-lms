@@ -70,6 +70,12 @@ QUnit.module('AssignmentGroupCellFormatter', function (hooks) {
     equal(renderCell().querySelector('.percentage').innerHTML.trim(), '82.35%');
   });
 
+  test('avoids floating point calculation issues', function () {
+    grade.score = 946.65;
+    grade.possible = 1000
+    equal(renderCell().querySelector('.percentage').innerHTML.trim(), '94.67%');
+  });
+
   test('renders a dash "-" when the grade has zero points possible', function () {
     grade.possible = 0;
     equal(renderCell().querySelector('.percentage').innerHTML.trim(), '-');

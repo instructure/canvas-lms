@@ -250,6 +250,10 @@ describe Assignment do
       expect(@assignment.permits_moderation?(assistant)).to be false
     end
 
+    it 'returns false if user is nil' do
+      expect(@assignment.permits_moderation?(nil)).to be false
+    end
+
     it 'returns true if the user is the final grader' do
       expect(@assignment.permits_moderation?(@teacher)).to be true
     end
@@ -592,6 +596,42 @@ describe Assignment do
     end
   end
 
+  describe '#anonymize_students?' do
+    before(:once) do
+      @assignment = @course.assignments.build
+    end
+
+    it 'returns false when the assignment is not graded anonymously' do
+      expect(@assignment).not_to be_anonymize_students
+    end
+
+    context 'when the assignment is anonymously graded' do
+      before(:once) do
+        @assignment.anonymous_grading = true
+      end
+
+      it 'returns true when the assignment is muted' do
+        @assignment.muted = true
+        expect(@assignment).to be_anonymize_students
+      end
+
+      it 'returns false when the assignment is unmuted' do
+        expect(@assignment).not_to be_anonymize_students
+      end
+
+      it 'returns true when the assignment is moderated and grades are unpublished' do
+        @assignment.moderated_grading = true
+        expect(@assignment).to be_anonymize_students
+      end
+
+      it 'returns false when the assignment is moderated and grades are published' do
+        @assignment.moderated_grading = true
+        @assignment.grades_published_at = Time.zone.now
+        expect(@assignment).not_to be_anonymize_students
+      end
+    end
+  end
+
   describe '#can_view_student_names?' do
     let_once(:admin) do
       admin = account_admin_user
@@ -638,8 +678,32 @@ describe Assignment do
         expect(assignment.can_view_student_names?(@teacher)).to be false
       end
 
-      it 'returns false when the user is an admin' do
+      it 'returns false when the user is an admin and the assignment is muted' do
         expect(assignment.can_view_student_names?(admin)).to be false
+      end
+
+      it 'returns true when the user is an admin and the assignment is unmuted' do
+        assignment.muted = false
+        expect(assignment.can_view_student_names?(admin)).to be true
+      end
+
+      context 'when the assignment is moderated' do
+        before(:once) do
+          assignment.moderated_grading = true
+        end
+
+        it 'returns false when the user is not an admin' do
+          expect(assignment.can_view_student_names?(@teacher)).to be false
+        end
+
+        it 'returns true when the user is an admin and grades are published' do
+          assignment.grades_published_at = Time.zone.now
+          expect(assignment.can_view_student_names?(admin)).to be true
+        end
+
+        it 'returns false when the user is an admin and grades are unpublished' do
+          expect(assignment.can_view_student_names?(admin)).to be false
+        end
       end
     end
   end
@@ -885,7 +949,7 @@ describe Assignment do
   end
 
   describe ".clean_up_duplicating_assignments" do
-    before { allow(described_class).to receive(:duplicating_for_too_long) }
+    before { allow(described_class).to receive(:duplicating_for_too_long).and_return(double()) }
 
     it "marks all assignments that have been duplicating for too long as failed_to_duplicate" do
       now = double('now')
@@ -924,7 +988,7 @@ describe Assignment do
   end
 
   describe ".cleanup_importing_assignments" do
-    before { allow(described_class).to receive(:importing_for_too_long) }
+    before { allow(described_class).to receive(:importing_for_too_long).and_return(double()) }
 
     it "marks all assignments that have been importing for too long as failed_to_import" do
       now = double('now')
@@ -1310,7 +1374,7 @@ describe Assignment do
 
     context 'with an excused assignment' do
       before :once do
-        @result = @assignment.grade_student(@user, :excuse => true)
+        @result = @assignment.grade_student(@user, grader: @teacher, excuse: true)
         @assignment.reload
       end
 
@@ -1386,6 +1450,13 @@ describe Assignment do
         expect(@assignment.moderation_graders).to have(1).item
       end
 
+      it 'raises an error if an invalid score is passed for a provisional grade' do
+        expect { @assignment.grade_student(@student, grader: @first_teacher, provisional: true, grade: 'bad') }.
+          to raise_error(Assignment::GradeError) do |error|
+            expect(error.error_code).to eq 'PROVISIONAL_GRADE_INVALID_SCORE'
+          end
+      end
+
       context 'with a final grader' do
         before(:once) do
           teacher_in_course(active_all: true)
@@ -1408,6 +1479,43 @@ describe Assignment do
           @assignment.grade_student(@student, grader: @second_teacher, provisional: true, score: 2)
 
           expect(@assignment.moderation_graders).to have(3).items
+        end
+
+        describe 'excusing a moderated assignment' do
+          it 'does not accept an excusal from a provisional grader' do
+            expect { @assignment.grade_student(@student, grader: @first_teacher, provisional: true, excused: true) }.
+              to raise_error(Assignment::GradeError)
+          end
+
+          it 'does not allow a provisional grader to un-excuse an assignment' do
+            @assignment.grade_student(@student, grader: @final_grader, provisional: true, excused: true)
+            @assignment.grade_student(@student, grader: @first_teacher, provisional: true, excused: false)
+            expect(@assignment).to be_excused_for(@student)
+          end
+
+          it 'accepts an excusal from the final grader' do
+            @assignment.grade_student(@student, grader: @final_grader, provisional: true, excused: true)
+            expect(@assignment).to be_excused_for(@student)
+          end
+
+          it 'allows the final grader to un-excuse an assignment if a score is provided' do
+            @assignment.grade_student(@student, grader: @final_grader, provisional: true, excused: true)
+            @assignment.grade_student(@student, grader: @final_grader, provisional: true, excused: false, score: 100)
+            expect(@assignment).not_to be_excused_for(@student)
+          end
+
+          it 'accepts an excusal from an admin' do
+            admin = account_admin_user
+            @assignment.grade_student(@student, grader: admin, provisional: true, excused: true)
+            expect(@assignment).to be_excused_for(@student)
+          end
+
+          it 'allows an admin to un-excuse an assignment if a score is provided' do
+            admin = account_admin_user
+            @assignment.grade_student(@student, grader: @final_grader, provisional: true, excused: true)
+            @assignment.grade_student(@student, grader: admin, provisional: true, excused: false, score: 100)
+            expect(@assignment).not_to be_excused_for(@student)
+          end
         end
       end
     end
@@ -2011,15 +2119,12 @@ describe Assignment do
 
       context "when excusing an assignment" do
         it "marks the assignment as excused" do
-          submission, _ = @assignment.grade_student(@student, excuse: true)
+          submission, = @assignment.grade_student(@student, grader: @teacher, excuse: true)
           expect(submission).to be_excused
         end
 
         it "doesn't mark everyone in the group excused" do
-          sub1, sub2 = @assignment.grade_student(
-            @student1,
-            excuse: true,
-          )
+          sub1, sub2 = @assignment.grade_student(@student1, grader: @teacher, excuse: true)
 
           expect(sub1.user).to eq @student1
           expect(sub1).to be_excused
@@ -2055,7 +2160,7 @@ describe Assignment do
         end
 
         it "doesn't overwrite the grades of group members who have been excused" do
-          sub1 = @assignment.grade_student(@student1, excuse: true).first
+          sub1 = @assignment.grade_student(@student1, grader: @teacher, excuse: true).first
           expect(sub1).to be_excused
 
           sub2, sub3 = @assignment.grade_student(@student2, grade: 10, grader: @teacher)

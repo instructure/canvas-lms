@@ -43,26 +43,6 @@ describe "Gradezilla - total column menu options" do
       end
     end
 
-    def open_display_dialog
-      Gradezilla.select_total_column_option('grade-display-switcher')
-    end
-
-    def close_display_dialog
-      f(".ui-icon-closethick").click
-    end
-
-    def toggle_grade_display
-      open_display_dialog
-      dialog = fj('.ui-dialog:visible')
-      submit_dialog(dialog, '.ui-button')
-    end
-
-    def close_dialog_and_dont_show_again
-      dialog = fj('.ui-dialog:visible')
-      fj("#hide_warning").click
-      submit_dialog(dialog, '.ui-button')
-    end
-
     it "shows points when group weights are not set" do
       @course.show_total_grade_as_points = true
       @course.save!
@@ -86,19 +66,19 @@ describe "Gradezilla - total column menu options" do
 
     it "should warn the teacher that studens will see a change" do
       Gradezilla.visit(@course)
-      open_display_dialog
+      Gradezilla.open_display_dialog
       dialog = fj('.ui-dialog:visible')
       expect(dialog).to include_text("Warning")
     end
 
     it 'should allow toggling display by points or percent', priority: "1", test_id: 164012 do
       should_show_percentages
-      toggle_grade_display
+      Gradezilla.toggle_grade_display
 
       wait_for_ajax_requests
       should_show_points(15, 10, 10)
 
-      toggle_grade_display
+      Gradezilla.toggle_grade_display
       wait_for_ajax_requests
       should_show_percentages
     end
@@ -110,7 +90,7 @@ describe "Gradezilla - total column menu options" do
       dropdown_text << f('[data-menu-item-id="grade-display-switcher"]').text
 
       Gradezilla.select_total_column_option('grade-display-switcher', already_open: true)
-      close_dialog_and_dont_show_again
+      Gradezilla.close_dialog_and_dont_show_again
 
       Gradezilla.select_total_column_option()
       dropdown_text << f('[data-menu-item-id="grade-display-switcher"]').text
@@ -124,10 +104,10 @@ describe "Gradezilla - total column menu options" do
     end
 
     it 'should not show the warning once dont show is checked' do
-      open_display_dialog
-      close_dialog_and_dont_show_again
+      Gradezilla.open_display_dialog
+      Gradezilla.close_dialog_and_dont_show_again
 
-      open_display_dialog
+      Gradezilla.open_display_dialog
       expect(f("body")).not_to contain_jqcss('.ui-dialog:visible')
     end
   end

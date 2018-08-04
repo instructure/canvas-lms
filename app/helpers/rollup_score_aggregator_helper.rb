@@ -22,6 +22,13 @@ module RollupScoreAggregatorHelper
     {score: agg_score, results: score_sets.pluck(:result)}
   end
 
+  def median_aggregate_score
+    scores = score_sets.pluck(:score)
+    sorted = scores.sort
+    median = (sorted[(sorted.size - 1)/2] + sorted[sorted.size/2]) / 2.0
+    {score: median, results: score_sets.pluck(:result)}
+  end
+
   private
   def latest_result
     latest_result = @outcome_results.max_by{|result| result_time(result) }

@@ -19,36 +19,45 @@ import React from 'react';
 import { shallow, mount } from 'enzyme';
 import PlannerEmptyState from '../index';
 
-it('renders empty page', () => {
-  const wrapper = shallow(<PlannerEmptyState changeToDashboardCardView={() => {}} />, );
+function defaultProps(opts={}) {
+  return {
+    changeDashboardView: ()=>{},
+    onAddToDo: ()=>{},
+    isCompletelyEmpty: true,
+    ...opts
+  };
+}
+
+it('renders desert when completely empty', () => {
+  const wrapper = shallow(<PlannerEmptyState {...defaultProps()} />);
   expect(wrapper).toMatchSnapshot();
 });
 
-it('does not changeToDashboardCardView on mount', () => {
-  const mockDispatch = jest.fn();
-
-  const changeToDashboardCardView = mockDispatch;
-
-  mount(<PlannerEmptyState changeToDashboardCardView={changeToDashboardCardView} />, );
-  expect(changeToDashboardCardView).not.toHaveBeenCalled();
+it('renders balloons when not completely empty', () => {
+  const wrapper = shallow(<PlannerEmptyState {...defaultProps({isCompletelyEmpty: false})} /> );
+  expect(wrapper.find('.balloons').length).toEqual(1);
+  expect(wrapper.find('.desert').length).toEqual(0);
 });
 
-it('calls changeToDashboardCardView on link click', () => {
+it('does not changeDashboardView on mount', () => {
   const mockDispatch = jest.fn();
+  const changeDashboardView = mockDispatch;
+  mount(<PlannerEmptyState {...defaultProps({changeDashboardView})} /> );
+  expect(changeDashboardView).not.toHaveBeenCalled();
+});
 
-  const changeToDashboardCardView = mockDispatch;
-
-  const wrapper = mount(<PlannerEmptyState changeToDashboardCardView={changeToDashboardCardView} />, );
-  const button = wrapper.find('Link').find('button');
-
+it('calls changeDashboardView on link click', () => {
+  const mockDispatch = jest.fn();
+  const changeDashboardView = mockDispatch;
+  const wrapper = mount(<PlannerEmptyState {...defaultProps({changeDashboardView, isCompletelyEmpty: true})} /> );
+  const button = wrapper.find('#PlannerEmptyState_CardView');
   button.simulate('click');
-  expect(changeToDashboardCardView).toHaveBeenCalled();
+  expect(changeDashboardView).toHaveBeenCalledWith('cards');
 });
 
-it('does not call changeToDashboardCardView on false prop', () => {
-  const wrapper = mount(<PlannerEmptyState/>, );
-  const button = wrapper.find('Link').find('button');
-
+it('does not call changeDashboardView on false prop', () => {
+  const wrapper = mount(<PlannerEmptyState {...defaultProps({isCompletelyEmpty:true})} /> );
+  const button = wrapper.find('#PlannerEmptyState_CardView');
   button.simulate('click');
   expect(() => {
     button.simulate('click');

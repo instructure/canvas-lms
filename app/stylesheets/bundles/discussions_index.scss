@@ -32,6 +32,21 @@
   border-bottom: 0px;
   background-color: #f9f9f9;
 }
+
+.toggle-button {
+  @include ic-focus-base;
+  &:focus-within {
+    @include ic-focus-variant;
+  }
+  border: none;
+  background: transparent;
+}
+
+.disabled-toggle-button {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 // We had to create our own overlay because instui
 // Currently doesn't support overlays in a portal
 .discussion-settings-v2-spinner-container {

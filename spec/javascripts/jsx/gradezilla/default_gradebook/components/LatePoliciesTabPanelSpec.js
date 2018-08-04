@@ -193,7 +193,7 @@ QUnit.module('LatePoliciesTabPanel: missing submission deduction checkbox', {
 });
 
 test('calls the changeLatePolicy function when the missing submission deduction checkbox is changed', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   this.wrapper = mountComponent({}, { changeLatePolicy });
   missingDeductionCheckbox(this.wrapper).simulate('change', { target: { checked: false } });
   strictEqual(changeLatePolicy.callCount, 1, 'calls changeLatePolicy');
@@ -202,7 +202,7 @@ test('calls the changeLatePolicy function when the missing submission deduction 
 
 test('does not send any changes to the changeLatePolicy function on the second action if ' +
   'the missing submission deduction checkbox is unchecked and then checked', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   this.wrapper = mountComponent({}, { changeLatePolicy });
   const checkbox = missingDeductionCheckbox(this.wrapper);
   checkbox.simulate('change', { target: { checked: false } });
@@ -230,7 +230,7 @@ test('disables the missing deduction input if the missing deduction checkbox is 
 
 test('calls the changeLatePolicy function with a new deduction when the missing submission ' +
   'deduction input is changed and is valid', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   this.wrapper = mountComponent({}, { changeLatePolicy });
   missingDeductionInput(this.wrapper).simulate('change', { target: { value: '22' } });
   strictEqual(changeLatePolicy.callCount, 1, 'calls changeLatePolicy');
@@ -239,7 +239,7 @@ test('calls the changeLatePolicy function with a new deduction when the missing 
 
 test('does not send any changes to the changeLatePolicy function when the missing submission ' +
   'deduction input is changed back to its initial value', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   this.wrapper = mountComponent({}, { changeLatePolicy });
   const input = missingDeductionInput(this.wrapper);
   input.simulate('change', { target: { value: '22' } });
@@ -250,7 +250,7 @@ test('does not send any changes to the changeLatePolicy function when the missin
 
 test('calls the changeLatePolicy function with a validationError if the missing submission ' +
   'deduction input is changed and is not numeric', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   this.wrapper = mountComponent({}, { changeLatePolicy });
   missingDeductionInput(this.wrapper).simulate('change', { target: { value: 'abc' } });
   strictEqual(changeLatePolicy.callCount, 1, 'calls changeLatePolicy');
@@ -263,7 +263,7 @@ test('calls the changeLatePolicy function with a validationError if the missing 
 });
 
 test('does not allow entering negative numbers for missing submission deduction', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   this.wrapper = mountComponent({}, { changeLatePolicy });
   const input = missingDeductionInput(this.wrapper);
   input.simulate('change', { target: { value: '-0.1' } });
@@ -273,7 +273,7 @@ test('does not allow entering negative numbers for missing submission deduction'
 
 test('calls the changeLatePolicy function with a validationError if the missing submission ' +
   'deduction input is changed and is greater than 100', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   this.wrapper = mountComponent({}, { changeLatePolicy });
   missingDeductionInput(this.wrapper).simulate('change', { target: { value: '100.1' } });
   strictEqual(changeLatePolicy.callCount, 1, 'calls changeLatePolicy');
@@ -287,7 +287,7 @@ test('calls the changeLatePolicy function with a validationError if the missing 
 
 test('calls the changeLatePolicy function without a validationError for missing submission ' +
   'deduction if a valid input is entered after an invalid input is entered', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   this.wrapper = mountComponent(
     { validationErrors: { missingSubmissionDeduction: 'Missing submission grade must be between 0 and 100' } },
     { changeLatePolicy }
@@ -308,7 +308,7 @@ QUnit.module('LatePoliciesTabPanel: late submission deduction checkbox', {
 });
 
 test('calls the changeLatePolicy function when the late submission deduction checkbox is changed', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   const data = { ...latePolicyData, lateSubmissionDeductionEnabled: false };
   this.wrapper = mountComponent({ data }, { changeLatePolicy });
   lateDeductionCheckbox(this.wrapper).simulate('change', { target: { checked: true } });
@@ -318,7 +318,7 @@ test('calls the changeLatePolicy function when the late submission deduction che
 
 test('does not send any changes to the changeLatePolicy function on the second action if ' +
   'the late submission deduction checkbox is unchecked and then checked', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   this.wrapper = mountComponent({}, { changeLatePolicy });
   const checkbox = lateDeductionCheckbox(this.wrapper);
   checkbox.simulate('change', { target: { checked: false } });
@@ -329,7 +329,7 @@ test('does not send any changes to the changeLatePolicy function on the second a
 
 test('sets lateSubmissionMinimumPercentEnabled to true when the late submission deduction ' +
   'checkbox is checked and the late submission minimum percent is greater than zero', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   const data = { ...latePolicyData, lateSubmissionMinimumPercent: 1, lateSubmissionDeductionEnabled: false };
   this.wrapper = mountComponent({ data }, { changeLatePolicy });
   lateDeductionCheckbox(this.wrapper).simulate('change', { target: { checked: true } });
@@ -343,7 +343,7 @@ test('sets lateSubmissionMinimumPercentEnabled to true when the late submission 
 
 test('does not set lateSubmissionMinimumPercentEnabled to true when the late submission deduction ' +
   'checkbox is checked and the late submission minimum percent is zero', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   const data = { ...latePolicyData, lateSubmissionDeductionEnabled: false };
   this.wrapper = mountComponent({ data }, { changeLatePolicy });
   lateDeductionCheckbox(this.wrapper).simulate('change', { target: { checked: true } });
@@ -374,7 +374,7 @@ test('enables the late deduction input if the late deduction checkbox is checked
 
 test('calls the changeLatePolicy function with a new deduction when the late submission ' +
   'deduction input is changed and is valid', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   this.wrapper = mountComponent({}, { changeLatePolicy });
   lateDeductionInput(this.wrapper).simulate('change', { target: { value: '22' } });
   strictEqual(changeLatePolicy.callCount, 1, 'calls changeLatePolicy');
@@ -387,7 +387,7 @@ test('calls the changeLatePolicy function with a new deduction when the late sub
 
 test('does not send any changes to the changeLatePolicy function when the late submission ' +
   'deduction input is changed back to its initial value', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   this.wrapper = mountComponent({}, { changeLatePolicy });
   const input = lateDeductionInput(this.wrapper);
   input.simulate('change', { target: { value: '22' } });
@@ -398,7 +398,7 @@ test('does not send any changes to the changeLatePolicy function when the late s
 
 test('calls the changeLatePolicy function with a validationError if the late submission ' +
   'deduction input is changed and is not numeric', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   this.wrapper = mountComponent({}, { changeLatePolicy });
   lateDeductionInput(this.wrapper).simulate('change', { target: { value: 'abc' } });
   strictEqual(changeLatePolicy.callCount, 1, 'calls changeLatePolicy');
@@ -419,7 +419,7 @@ test('does not allow entering negative numbers for late submission deduction', f
 
 test('calls the changeLatePolicy function with a validationError if the late submission ' +
   'deduction input is changed and is greater than 100', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   this.wrapper = mountComponent({}, { changeLatePolicy });
   lateDeductionInput(this.wrapper).simulate('change', { target: { value: '100.1' } });
   strictEqual(changeLatePolicy.callCount, 1, 'calls changeLatePolicy');
@@ -433,7 +433,7 @@ test('calls the changeLatePolicy function with a validationError if the late sub
 
 test('calls the changeLatePolicy function without a validationError for late submission ' +
   'deduction if a valid input is entered after an invalid input is entered', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   this.wrapper = mountComponent(
     { validationErrors: { lateSubmissionDeduction: 'Late submission deduction must be between 0 and 100' } },
     { changeLatePolicy }
@@ -466,7 +466,7 @@ test('enables the late deduction interval select if the late deduction checkbox 
 
 test('calls the changeLatePolicy function with a new deduction interval when the late ' +
   'sumbmission deduction interval select is changed', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   this.wrapper = mountComponent({}, { changeLatePolicy });
   lateDeductionIntervalSelect(this.wrapper).simulate('change', { target: { value: 'hour' } });
   strictEqual(changeLatePolicy.callCount, 1, 'calls changeLatePolicy');
@@ -479,7 +479,7 @@ test('calls the changeLatePolicy function with a new deduction interval when the
 
 test('does not send any changes to the changeLatePolicy function when the late submission ' +
   'deduction interval is changed back to its initial value', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   this.wrapper = mountComponent({}, { changeLatePolicy });
   const select = lateDeductionIntervalSelect(this.wrapper);
   select.simulate('change', { target: { value: 'hour' } });
@@ -496,7 +496,7 @@ QUnit.module('LatePoliciesTabPanel: late submission minimum percent input', {
 
 test('calls the changeLatePolicy function with a new percent when the late submission ' +
   'minimum percent input is changed and is valid', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   const data = {
     ...latePolicyData,
     lateSubmissionMinimumPercent: 60,
@@ -514,7 +514,7 @@ test('calls the changeLatePolicy function with a new percent when the late submi
 
 test('does not send any changes to the changeLatePolicy function when the late submission ' +
   'minimum percent input is changed back to its initial value', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   const data = {
     ...latePolicyData,
     lateSubmissionMinimumPercent: 60,
@@ -530,7 +530,7 @@ test('does not send any changes to the changeLatePolicy function when the late s
 
 test('sets lateSubmissionMinimumPercentEnabled to true if the minimum percent is changed ' +
   'from zero to non-zero', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   this.wrapper = mountComponent({}, { changeLatePolicy });
   const input = lateSubmissionMinimumPercentInput(this.wrapper);
   input.simulate('change', { target: { value: '22' } });
@@ -544,7 +544,7 @@ test('sets lateSubmissionMinimumPercentEnabled to true if the minimum percent is
 
 test('sets lateSubmissionMinimumPercentEnabled to false if the minimum percent is changed ' +
   'from non-zero to zero', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   const data = {
     ...latePolicyData,
     lateSubmissionMinimumPercent: 60,
@@ -563,7 +563,7 @@ test('sets lateSubmissionMinimumPercentEnabled to false if the minimum percent i
 
 test('calls the changeLatePolicy function with a validationError if the late submission ' +
   'minimum percent input is changed and is not numeric', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   this.wrapper = mountComponent({}, { changeLatePolicy });
   lateSubmissionMinimumPercentInput(this.wrapper).simulate('change', { target: { value: 'abc' } });
   strictEqual(changeLatePolicy.callCount, 1, 'calls changeLatePolicy');
@@ -584,7 +584,7 @@ test('does not allow entering negative numbers for late submission minimum perce
 
 test('calls the changeLatePolicy function with a validationError if the late submission ' +
   'minimum percent input is changed and is greater than 100', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   this.wrapper = mountComponent({}, { changeLatePolicy });
   lateSubmissionMinimumPercentInput(this.wrapper).simulate('change', { target: { value: '100.1' } });
   strictEqual(changeLatePolicy.callCount, 1, 'calls changeLatePolicy');
@@ -598,7 +598,7 @@ test('calls the changeLatePolicy function with a validationError if the late sub
 
 test('calls the changeLatePolicy function without a validationError for late submission ' +
   'minimum percent if a valid input is entered after an invalid input is entered', function () {
-  const changeLatePolicy = this.stub();
+  const changeLatePolicy = sinon.stub();
   this.wrapper = mountComponent(
     { validationErrors: { lateSubmissionMinimumPercent: 'Lowest possible grade must be between 0 and 100' } },
     { changeLatePolicy }

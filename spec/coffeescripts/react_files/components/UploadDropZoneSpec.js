@@ -43,7 +43,7 @@ test('displays dropzone when active', function() {
 })
 
 test('handles drop event on target', function() {
-  this.stub(this.uploadZone, 'onDrop')
+  sandbox.stub(this.uploadZone, 'onDrop')
   this.uploadZone.setState({active: true})
   const dataTransfer = {types: ['Files']}
   const n = this.uploadZone.getDOMNode()

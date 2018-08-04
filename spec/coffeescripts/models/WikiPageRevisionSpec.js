@@ -107,7 +107,7 @@ test('restore POSTs to the revision', function() {
       pageUrl: 'page-url'
     }
   )
-  const mock = this.mock($)
+  const mock = sandbox.mock($)
   mock
     .expects('ajaxJSON')
     .atLeast(1)
@@ -119,7 +119,7 @@ test('restore POSTs to the revision', function() {
 QUnit.module('WikiPageRevision::fetch')
 
 test('the summary flag is passed to the server', function() {
-  this.stub($, 'ajax').returns($.Deferred())
+  sandbox.stub($, 'ajax').returns($.Deferred())
   const revision = new WikiPageRevision(
     {},
     {
@@ -135,7 +135,7 @@ test('the summary flag is passed to the server', function() {
 test('pollForChanges performs a fetch at most every interval', function() {
   const revision = new WikiPageRevision({}, {pageUrl: 'page-url'})
   const clock = sinon.useFakeTimers()
-  this.stub(revision, 'fetch').returns($.Deferred())
+  sandbox.stub(revision, 'fetch').returns($.Deferred())
   revision.pollForChanges(5000)
   revision.pollForChanges(5000)
   clock.tick(4000)

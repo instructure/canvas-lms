@@ -28,7 +28,7 @@ define(['rubric_assessment', 'i18n!rubric_assessment'], (rubric_assessment, I18n
   });
 
   test('formats given number with I18n.n', function () {
-    this.stub(I18n, 'n').returns('formatted_number');
+    sandbox.stub(I18n, 'n').returns('formatted_number');
     strictEqual(rubric_assessment.roundAndFormat(42), 'formatted_number');
     strictEqual(I18n.n.callCount, 1);
     ok(I18n.n.calledWith(42));

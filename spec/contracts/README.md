@@ -71,18 +71,32 @@ LMS Live Events". Click on the document icon to view the contract, if you like.
 
 ### Verify the Contracts
 
-To verify the Live Events contracts for Canvas LMS, start Canvas on your
-computer---either in docker or natively---then run:
+Because we're only verifying the Quiz LTI contracts, you'll first want to open
+`canvas-lms/spec/contracts/service_consumers/pact_config.rb` and comment out all
+constants in the `Consumers` module with the exception of `QUIZ_LTI` and `ALL`.
+For example:
 
-```sh
-bin/contract-verify-live-events
+```ruby
+module Consumers
+  # GENERIC_CONSUMER = 'Generic Consumer'.freeze
+  QUIZ_LTI = 'Quiz LTI'.freeze
+  ALL = Consumers.constants.map { |c| Consumers.const_get(c) }.freeze
+end
 ```
 
-The spec(s) should pass. You're finished!
+This avoids attempting to verify contracts for consumers whose Pact files we
+didn't generate (otherwise you'd get errors). Now you're ready to verify the
+Quiz LTI contracts.
 
-Note: As of 3 May 2018, no API clients have published a Pact file for Canvas to
-verify. If you'd like to run the "Generic Consumer" Canvas API contract tests,
-follow the instructions in /spec/contracts/service_providers/canvas_lms/README.md
+To verify the contracts, start Canvas on your computer---either in docker or
+natively---and then run:
+
+```sh
+bin/contracts-verify-live-events
+bin/contracts-verify-api
+```
+
+The specs should pass. You're finished!
 
 ## More Info
 

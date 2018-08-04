@@ -314,16 +314,16 @@ module AccountReports
     def add_outcomes_data(row)
       row['learning outcome mastered'] = unless row['learning outcome mastered'].nil?
                                            row['learning outcome mastered'] ? 1 : 0
-                                         end
+      end
       outcome_data = if row['learning outcome data'].present?
                        YAML.safe_load(row['learning outcome data'])[:rubric_criterion]
                      else
-                       {}
-                     end
+                       LearningOutcome.default_rubric_criterion
+      end
       row['learning outcome mastery score'] = outcome_data[:mastery_points]
 
       score = row['outcome score']
-      if score.present? && row['assessment_type'] != 'quiz'
+      if score.present? && row['assessment type'] != 'quiz'
         ratings = outcome_data[:ratings]&.sort_by { |r| r[:points] }&.reverse || []
         rating = ratings.detect { |r| r[:points] <= score } || {}
         row['learning outcome rating'] = rating[:description]

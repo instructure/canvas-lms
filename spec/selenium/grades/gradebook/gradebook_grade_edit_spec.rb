@@ -51,7 +51,7 @@ describe "editing grades" do
 
   it "should update a graded quiz and have the points carry over to the quiz attempts page", priority: "1", test_id: 220310 do
     points = 50
-    q = factory_with_protected_attributes(@course.quizzes, :title => "new quiz", :points_possible => points, :quiz_type => 'assignment', :workflow_state => 'available')
+    q = factory_with_protected_attributes(@course.quizzes, title: "new quiz", points_possible: points, quiz_type: 'assignment', workflow_state: 'available')
     q.save!
     qs = q.generate_submission(@student_1)
     Quizzes::SubmissionGrader.new(qs).grade_submission
@@ -123,7 +123,7 @@ describe "editing grades" do
   end
 
   it "should allow setting a letter grade on a no-points assignment", priority: "1", test_id: 220313 do
-    assignment_model(:course => @course, :grading_type => 'letter_grade', :points_possible => nil, :title => 'no-points')
+    assignment_model(course: @course, grading_type: 'letter_grade', points_possible: nil, title: 'no-points')
     Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
 
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .b5', 'A-')
@@ -218,7 +218,7 @@ describe "editing grades" do
 
   it "should not factor non graded assignments into group total", priority: "1", test_id: 220323 do
     expected_totals = [@student_1_total_ignoring_ungraded, @student_2_total_ignoring_ungraded]
-    ungraded_submission = @ungraded_assignment.submit_homework(@student_1, :body => 'student 1 submission ungraded assignment')
+    ungraded_submission = @ungraded_assignment.submit_homework(@student_1, body: 'student 1 submission ungraded assignment')
     @ungraded_assignment.grade_student(@student_1, grade: 20, grader: @teacher)
     ungraded_submission.save!
     Gradebook::MultipleGradingPeriods.visit_gradebook(@course)

@@ -15,11 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
-
 <ul class='page-action-list'>
   <h2><%= t 'titles.related_items', "Related Items" %></h2>
-  <% if (@can_view_grades || @can_grade || (@context.concluded? && can_do(@context, @current_user, :read_as_admin))) &&
-    @assignment.can_view_speed_grader?(@current_user) %>
+  <% if @assignment_presenter.can_view_speed_grader_link?(@current_user) %>
     <li id="assignment-speedgrader-link"
       <% if @assignment.unpublished? %>
         class="hidden"

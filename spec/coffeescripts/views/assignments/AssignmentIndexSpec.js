@@ -78,7 +78,7 @@ QUnit.module('assignmentIndex', {
         assignment_sort_base_url: 'test'
       }
     })
-    this.enable_spy = this.spy(IndexView.prototype, 'enableSearch')
+    this.enable_spy = sandbox.spy(IndexView.prototype, 'enableSearch')
   },
 
   teardown() {
@@ -190,7 +190,7 @@ QUnit.module('student index view', {
 })
 
 test('should clear search on toggle', function() {
-  const clear_spy = this.spy(IndexView.prototype, 'clearSearch')
+  const clear_spy = sandbox.spy(IndexView.prototype, 'clearSearch')
   const view = assignmentIndex()
   view.$('#search_term').val('something')
   view.showByView.initializeCache()

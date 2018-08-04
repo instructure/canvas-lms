@@ -33,6 +33,7 @@ if ENV['COVERAGE'] == "1"
 end
 
 require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
+
 require 'rspec/rails'
 
 require 'webmock'
@@ -215,6 +216,8 @@ if defined?(Spec::DSL::Main)
   end
 end
 
+RSpec::Mocks.configuration.allow_message_expectations_on_nil = false
+
 RSpec::Matchers.define_negated_matcher :not_eq, :eq
 RSpec::Matchers.define_negated_matcher :not_have_key, :have_key
 
@@ -312,7 +315,7 @@ RSpec::Expectations.configuration.on_potential_false_positives = :raise
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures = false
-  config.fixture_path = Rails.root+'spec/fixtures/'
+  config.fixture_path = Rails.root.join('spec', 'fixtures')
   config.infer_spec_type_from_file_location!
   config.raise_errors_for_deprecations!
   config.color = true
@@ -473,6 +476,37 @@ RSpec.configure do |config|
       Shackles.activate(:deploy) { Canvas.redis.flushdb }
     end
     Canvas.redis_used = false
+  end
+
+  if Bullet.enable?
+    config.before(:each) do |example|
+      Bullet.start_request
+      possible_objects, impossible_objects =
+        example.example_group.onceler.instance_variable_get(:@bullet_state)
+      possible_objects&.each { |object| Bullet::Detector::NPlusOneQuery.possible_objects.add(object) }
+      impossible_objects&.each { |object| Bullet::Detector::NPlusOneQuery.impossible_objects.add(object) }
+    end
+
+    config.after(:each) do
+      Bullet.perform_out_of_channel_notifications if Bullet.notification?
+      Bullet.end_request
+    end
+
+    Onceler.configure do |config|
+      config.before(:record) do
+        Bullet.start_request
+      end
+
+      config.after(:record) do |tape|
+        tape.onceler.instance_variable_set(:@bullet_state, [
+          Bullet::Detector::NPlusOneQuery.possible_objects.registry.values.map(&:to_a).flatten,
+          Bullet::Detector::NPlusOneQuery.impossible_objects.registry.values.map(&:to_a).flatten,
+        ])
+
+        Bullet.perform_out_of_channel_notifications if Bullet.notification?
+        Bullet.end_request
+      end
+    end
   end
 
   #****************************************************************
@@ -845,9 +879,15 @@ RSpec.configure do |config|
       klass.connection.bulk_insert klass.table_name, records
       return if return_type == :nil
       scope = klass.order("id DESC").limit(records.size)
-      return_type == :record ?
-        scope.to_a.reverse :
+      if return_type == :record
+        records = scope.to_a.reverse
+        if Bullet.enable?
+          records.each { |record| Bullet::Detector::NPlusOneQuery.add_impossible_object(record) }
+        end
+        records
+      else
         scope.pluck(:id).reverse
+      end
     end
   end
 end

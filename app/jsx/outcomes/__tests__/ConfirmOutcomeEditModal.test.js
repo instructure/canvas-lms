@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
+import sinon from 'sinon'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { shallow } from 'enzyme'
@@ -81,8 +81,10 @@ describe('showConfirmOutcomeEdit', () => {
   afterEach(() => {
     const parent = document.querySelector('.confirm-outcome-edit-modal-container')
     if (parent) {
+      const skipScroll = sinon.stub(window, 'scroll').callsFake(() => {})
       ReactDOM.unmountComponentAtNode(parent)
       parent.remove()
+      skipScroll.restore()
     }
   })
 

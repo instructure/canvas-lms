@@ -231,14 +231,17 @@ $icon-size: 1.4rem;
 
 .full_width {
   #left_side {
-    width: 100%;
+    width: calc(100% + 1px); // i.e., 100% + 8px (margin-left) - 7px (right_side width)
+    overflow-x: hidden;
     margin-#{direction(left)}: -8px;
     #left_side_inner {
       margin-#{direction(left)}: 8px;
+      width: calc(100% - 7px);
     }
   }
   #right_side {
     width: 7px;
+    overflow: hidden;
   }
   #rightside_inner {
     display: none;
@@ -247,7 +250,7 @@ $icon-size: 1.4rem;
 
 .full_height {
   height: 100%;
-  overflow-x: scroll;
+  overflow-x: auto;
 }
 
 .media_comments_visible {
@@ -343,6 +346,7 @@ $icon-size: 1.4rem;
   position: absolute;
   top: 0;
   bottom: 0;
+  overflow-y: hidden;
   #{direction(left)}: 0;
   #{direction(right)}: 25%;
   #submissions_container, #left_side_inner, iframe, #doc_preview_holder, #iframe_holder, #resize_overlay {

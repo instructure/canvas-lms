@@ -17,7 +17,7 @@
  */
 
 import moment from 'moment-timezone';
-import formatMessage from 'format-message';
+import formatMessage from '../../format-message';
 import Animation from '../animation';
 import {loadPastUntilToday} from '../../actions/loading-actions';
 import { alert } from '../../utilities/alertUtils';
@@ -35,16 +35,18 @@ export class ScrollToToday extends Animation {
 }
 
 export function scrollAndFocusTodayItem (manager, todayElem) {
-  const {component, isToday} = findTodayOrNext(manager.getRegistry());
+  const {component, when} = findTodayOrNearest(manager.getRegistry());
   if (component) {
     if (component.getScrollable()) {
       // scroll Today into view
       manager.getAnimator().scrollTo(todayElem, manager.totalOffset(), () => {
         // then, if necessary, scroll today's or next todo item into view but not all the way to the top
         manager.getAnimator().scrollTo(component.getScrollable(), manager.totalOffset() + todayElem.offsetHeight, () => {
-          if (!isToday) {
+          if (when === 'after') {
             // tell the user where we wound up
-            alert(formatMessage("Nothing planned today. Next item loaded."));
+            alert(formatMessage("Nothing planned today. Selecting next item."));
+          } else if (when === 'before') {
+            alert(formatMessage("Nothing planned today. Selecting most recent item."));
           }
           // finally, focus the item
           if (component.getFocusable()) {
@@ -59,11 +61,41 @@ export function scrollAndFocusTodayItem (manager, todayElem) {
   }
 }
 
-function findTodayOrNext (registry) {
+// Find an item that's due that's
+// 1. the first item due today, and if there isn't one
+// 2. the next item due after today, and if there isn't one
+// 3. the most recent item still due from the past
+function findTodayOrNearest (registry) {
   const today = moment().startOf('day');
-  const todayOrNextItem = registry.getAllItemsSorted().find(item => {
-    return item.component.props.date >= today;
-  });
-  const component = todayOrNextItem && todayOrNextItem.component;
-  return {component, isToday: component.props.date.isSame(today, 'day')};
+  const allItems = registry.getAllItemsSorted();
+  let lastInPast = null;
+  let firstInFuture = null;
+
+  // find the before and after today items due closest to today
+  for (let i = 0; i < allItems.length; ++i) {
+    const item = allItems[i];
+    if (item.component && item.component.props.date) {
+      const date = item.component.props.date;
+      if (date.isBefore(today, 'day')) {
+        lastInPast = item.component;
+      } else if (date.isSame(today, 'day') || date.isAfter(today, 'day')) {
+        firstInFuture = item.component;
+        break;
+      }
+    }
+  }
+  // if there's an item in the future, prefer it
+  const component = firstInFuture || lastInPast;
+
+  let when = 'never';
+  if (component === firstInFuture) {
+    if (component.props.date.isSame(today, 'day')) {
+      when = 'today';
+    } else {
+      when = 'after';
+    }
+  } else if (component === lastInPast) {
+    when = 'before';
+  }
+  return {component, when};
 }

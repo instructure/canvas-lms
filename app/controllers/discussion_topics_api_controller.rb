@@ -250,6 +250,11 @@ class DiscussionTopicsApiController < ApplicationController
     if @topic.pinned
       new_topic.position = @topic.context.discussion_topics.maximum(:position) + 1
     end
+    # People that can't moderate don't have power to publish separately, so
+    # just publish their topics straightaway.
+    if !@context.grants_right?(@current_user, session, :moderate_forum)
+      new_topic.publish
+    end
     if new_topic.save!
       result = discussion_topic_api_json(new_topic, @context, @current_user, session,
         :include_sections => true)

@@ -28,7 +28,6 @@ describe "discussions index" do
       @teacher = user_with_pseudonym(active_user: true)
       course_with_teacher(user: @teacher, active_course: true, active_enrollment: true)
       course_with_student(course: @course, active_enrollment: true)
-      DiscussionsIndex.set_section_specific_discussions_flag(@course,'on')
 
       # Discussion attributes: title, message, delayed_post_at, user
       @discussion1 = @course.discussion_topics.create!(

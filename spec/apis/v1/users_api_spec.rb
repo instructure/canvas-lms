@@ -2048,6 +2048,12 @@ describe "Users API", type: :request do
       expect(json[0]['id']).to eq assign.id
     end
 
+    it "paginates properly when multiple submissions have the same cached_due_date" do
+      id1 = api_call(:get, @path, @params.merge(per_page: 1, page: 1))[0]['id'].to_i
+      id2 = api_call(:get, @path, @params.merge(per_page: 1, page: 2))[0]['id'].to_i
+      expect([id1, id2]).to eq @course.assignments.pluck(:id).sort
+    end
+
     it "should not return locked assignments if filter is set to 'submittable'" do
       @course.assignments.create!(due_at: 3.days.ago,
                                   workflow_state: 'published',
@@ -2129,7 +2135,7 @@ describe "Users API", type: :request do
         with('events', service: 'pandata').and_return(fake_secrets)
     end
 
-    it 'should return token and expiration' do
+    it 'returns token and expiration' do
       Setting.set("pandata_events_token_allowed_developer_key_ids", DeveloperKey.default.global_id)
       json = api_call(:post, "/api/v1/users/self/pandata_events_token",
           { controller: 'users', action: 'pandata_events_token', format:'json', id: @user.to_param },
@@ -2141,7 +2147,7 @@ describe "Users API", type: :request do
       expect(json['expires_at']).to be_present
     end
 
-    it 'should return bad_request for incorrect app keys' do
+    it 'returns bad_request for incorrect app keys' do
       Setting.set("pandata_events_token_allowed_developer_key_ids", DeveloperKey.default.global_id)
       json = api_call(:post, "/api/v1/users/self/pandata_events_token",
           { controller: 'users', action: 'pandata_events_token', format:'json', id: @user.to_param },
@@ -2151,7 +2157,7 @@ describe "Users API", type: :request do
       expect(json['message']).to eq "Invalid app key"
     end
 
-    it 'should return forbidden if the tokens key is not authorized' do
+    it 'returns forbidden if the tokens key is not authorized' do
       json = api_call(:post, "/api/v1/users/self/pandata_events_token",
           { controller: 'users', action: 'pandata_events_token', format:'json', id: @user.to_param },
           { app_key: 'IOS_key'}

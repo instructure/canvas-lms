@@ -80,7 +80,7 @@ describe EportfoliosController do
           'cdn-host' => 'rce.docker'
         })
         get 'user_index'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:js_env][:RICH_CONTENT_SERVICE_ENABLED]).to be_truthy
       end
     end
@@ -122,20 +122,20 @@ describe EportfoliosController do
 
       it "should show portfolio" do
         get 'show', params: {:id => @portfolio.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:portfolio]).not_to be_nil
       end
 
       it "should create a category if one doesn't exist" do
         get 'show', params: {:id => @portfolio.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:category]).not_to be_nil
       end
 
       it "should create an entry in the first category if one doesn't exist" do
         @portfolio.eportfolio_categories.create!(:name => "Home")
         get 'show', params: {:id => @portfolio.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:page]).not_to be_nil
       end
 
@@ -255,7 +255,7 @@ describe EportfoliosController do
       expect(c2.position).to eql(2)
       expect(c3.position).to eql(3)
       post 'reorder_categories', params: {:eportfolio_id => @portfolio.id, :order => "#{c2.id},#{c3.id},#{c1.id}"}
-      expect(response).to be_success
+      expect(response).to be_successful
       c1.reload
       c2.reload
       c3.reload

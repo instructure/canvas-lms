@@ -263,7 +263,7 @@ XML
   end
 
   def check_failure(failure_type = 'unsupported', error_message = nil)
-    expect(response).to be_success
+    expect(response).to be_successful
     expect(response.content_type).to eq 'application/xml'
     xml = Nokogiri::XML.parse(response.body)
     expect(xml.at_css('imsx_POXEnvelopeResponse > imsx_POXHeader > imsx_POXResponseHeaderInfo > imsx_statusInfo > imsx_codeMajor').content).to eq failure_type
@@ -274,7 +274,7 @@ XML
   end
 
   def check_success
-    expect(response).to be_success
+    expect(response).to be_successful
     expect(response.content_type).to eq 'application/xml'
     expect(Nokogiri::XML.parse(response.body).at_css('imsx_POXEnvelopeResponse > imsx_POXHeader > imsx_POXResponseHeaderInfo > imsx_statusInfo > imsx_codeMajor').content).to eq 'success'
   end
@@ -348,7 +348,7 @@ XML
 
     it "should fail if no score and not submission data" do
       make_call('body' => replace_result(score: nil, sourceid: nil))
-      expect(response).to be_success
+      expect(response).to be_successful
       xml = Nokogiri::XML.parse(response.body)
       expect(xml.at_css('imsx_codeMajor').content).to eq 'failure'
       expect(xml.at_css('imsx_description').content).to match /^No score given/
@@ -358,7 +358,7 @@ XML
 
     it "should fail if bad score given" do
       make_call('body' => replace_result(score: '1.5', sourceid: nil))
-      expect(response).to be_success
+      expect(response).to be_successful
       xml = Nokogiri::XML.parse(response.body)
       expect(xml.at_css('imsx_codeMajor').content).to eq 'failure'
       expect(xml.at_css('imsx_description').content).to match /^Score is not between 0 and 1/
@@ -369,7 +369,7 @@ XML
     it "should fail if assignment has no points possible" do
       @assignment.update_attributes(:points_possible => nil, :grading_type => 'percent')
       make_call('body' => replace_result(score: '0.75', sourceid: nil))
-      expect(response).to be_success
+      expect(response).to be_successful
       xml = Nokogiri::XML.parse(response.body)
       expect(xml.at_css('imsx_codeMajor').content).to eq 'failure'
       expect(xml.at_css('imsx_description').content).to match /^Assignment has no points possible\./
@@ -392,7 +392,7 @@ XML
     it "should notify users if it fails because the assignment has no points" do
       @assignment.update_attributes(:points_possible => nil, :grading_type => 'percent')
       make_call('body' => replace_result(score: '0.75', sourceid: nil))
-      expect(response).to be_success
+      expect(response).to be_successful
       submissions = @assignment.submissions.where(user_id: @student).to_a
       comments    = submissions.first.submission_comments
       expect(submissions.count).to eq 1
@@ -680,7 +680,7 @@ to because the assignment has no points possible.
     end
 
     def check_success
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(response.content_type).to eq 'application/xml'
       xml = Nokogiri::XML.parse(response.body)
       expect(xml.at_css('message_response > statusinfo > codemajor').content).to eq 'Success'
@@ -689,7 +689,7 @@ to because the assignment has no points possible.
     end
 
     def check_failure(failure_type = 'Failure', error_message = nil)
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(response.content_type).to eq 'application/xml'
       xml = Nokogiri::XML.parse(response.body)
       expect(xml.at_css('message_response > statusinfo > codemajor').content).to eq failure_type

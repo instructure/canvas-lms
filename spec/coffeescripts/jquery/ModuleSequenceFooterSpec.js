@@ -53,7 +53,7 @@ QUnit.module('ModuleSequenceFooter: init', {
   setup() {
     this.$testEl = $('<div>')
     $('#fixtures').append(this.$testEl)
-    this.stub($.fn.moduleSequenceFooter.MSFClass.prototype, 'fetch').returns({done() {}})
+    sandbox.stub($.fn.moduleSequenceFooter.MSFClass.prototype, 'fetch').returns({done() {}})
   },
 
   teardown() {
@@ -87,7 +87,7 @@ test('attaches msfAnimation function', function() {
 
 test('accepts animation option', function() {
   $.fn.moduleSequenceFooter.MSFClass.prototype.fetch.restore()
-  this.stub($.fn.moduleSequenceFooter.MSFClass.prototype, 'fetch').callsFake(function() {
+  sandbox.stub($.fn.moduleSequenceFooter.MSFClass.prototype, 'fetch').callsFake(function() {
     this.success({
       items: [
         {
@@ -316,7 +316,7 @@ test('if url has a module_item_id use that as the assetID and ModuleItem as the 
 })
 
 test('show gets called when rendering', function() {
-  this.stub(this.$testEl, 'show')
+  sandbox.stub(this.$testEl, 'show')
   this.server.respondWith('GET', default_course_url, server_200_response(itemTooltipData))
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
   this.server.respond()

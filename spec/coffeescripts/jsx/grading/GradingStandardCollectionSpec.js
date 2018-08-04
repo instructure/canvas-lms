@@ -28,9 +28,9 @@ const {Simulate} = TestUtils
 
 QUnit.module('GradingStandardCollection', {
   setup() {
-    this.stub($, 'flashMessage')
-    this.stub($, 'flashError')
-    this.stub(window, 'confirm')
+    sandbox.stub($, 'flashMessage')
+    sandbox.stub($, 'flashError')
+    sandbox.stub(window, 'confirm')
     this.server = sinon.fakeServer.create()
     ENV.current_user_roles = ['admin', 'teacher']
     ENV.GRADING_STANDARDS_URL = '/courses/1/grading_standards'
@@ -163,7 +163,7 @@ test('adds the default standard when the add button is clicked', function() {
 })
 
 test('does not save the new standard on the backend when the add button is clicked', function() {
-  const saveGradingStandard = this.spy(this.gradingStandardCollection, 'saveGradingStandard')
+  const saveGradingStandard = sandbox.spy(this.gradingStandardCollection, 'saveGradingStandard')
   Simulate.click(this.gradingStandardCollection.refs.addButton.getDOMNode())
   ok(saveGradingStandard.notCalled)
 })
@@ -316,7 +316,7 @@ test('shows a message that says "No grading schemes to display" if there are no 
 })
 
 test('deleteGradingStandard calls confirmDelete', function() {
-  const confirmDelete = this.spy($.fn, 'confirmDelete')
+  const confirmDelete = sandbox.spy($.fn, 'confirmDelete')
   const deleteButton = this.gradingStandardCollection.refs.gradingStandard1.refs.deleteButton.getDOMNode()
   Simulate.click(deleteButton)
   ok(confirmDelete.calledOnce)

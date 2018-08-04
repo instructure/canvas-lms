@@ -26,12 +26,12 @@ describe "Gradezilla" do
     before :once do
       gradebook_data_setup
       @da_assignment = assignment_model({
-        :course => @course,
-        :name => 'DA assignment',
-        :points_possible => @assignment_1_points,
-        :submission_types => 'online_text_entry',
-        :assignment_group => @group,
-        :only_visible_to_overrides => true
+        course: @course,
+        name: 'DA assignment',
+        points_possible: @assignment_1_points,
+        submission_types: 'online_text_entry',
+        assignment_group: @group,
+        only_visible_to_overrides: true
       })
       @override = create_section_override_for_assignment(@da_assignment, course_section: @other_section)
     end

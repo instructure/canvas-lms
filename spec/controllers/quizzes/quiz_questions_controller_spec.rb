@@ -205,7 +205,7 @@ describe Quizzes::QuizQuestionsController do
 
       user_session(@teacher)
       put 'update', params: {:course_id => @course.id, :quiz_id => @quiz, :id => linked_question.id, :question => {:correct_comments_html => ""}}
-      expect(response).to be_success
+      expect(response).to be_successful
 
       linked_question.reload
       expect(linked_question.question_data['correct_comments_html']).to be_blank

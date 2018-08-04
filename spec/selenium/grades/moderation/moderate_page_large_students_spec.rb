@@ -42,9 +42,6 @@ GRADES = [["10", "8"].freeze, ["9", "7"].freeze, ["5", "3"].freeze].freeze
       moderated_grading: true
     )
 
-    # submit assignment as student 1 and 2
-    @assignment.submit_homework(@students[0], :body => 'student 1 submission moderated assignment')
-    @assignment.submit_homework(@students[1], :body => 'student 2 submission moderated assignment')
     # teachers 1, 2, and 3 grade the assignment for students 1 and 2
     3.times do |count|
       @assignment.grade_student(@students[0], grade: GRADES[count][0], grader: @teachers[count], provisional: true)

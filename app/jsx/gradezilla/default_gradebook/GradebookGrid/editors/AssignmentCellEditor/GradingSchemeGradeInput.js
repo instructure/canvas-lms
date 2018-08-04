@@ -17,7 +17,7 @@
  */
 
 import React, {Component} from 'react'
-import {arrayOf, bool, element, instanceOf, number, shape, string} from 'prop-types'
+import {arrayOf, bool, element, func, instanceOf, number, shape, string} from 'prop-types'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Menu, {MenuItem} from '@instructure/ui-menu/lib/components/Menu'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
@@ -65,7 +65,8 @@ export default class GradingSchemeInput extends Component {
         type: string.isRequired
       })
     ).isRequired,
-    onMenuDismiss: Menu.propTypes.onDismiss,
+    onMenuDismiss: func,
+    onMenuShow: func,
     pendingGradeInfo: shape({
       excused: bool.isRequired,
       grade: string,
@@ -80,8 +81,9 @@ export default class GradingSchemeInput extends Component {
 
   static defaultProps = {
     disabled: false,
-    menuContentRef: null,
-    onMenuDismiss: null,
+    menuContentRef() {},
+    onMenuDismiss() {},
+    onMenuShow() {},
     pendingGradeInfo: null
   }
 
@@ -166,7 +168,11 @@ export default class GradingSchemeInput extends Component {
   }
 
   handleToggle(isOpen) {
-    this.setState({menuIsOpen: isOpen})
+    this.setState({menuIsOpen: isOpen}, () => {
+      if (isOpen) {
+        this.props.onMenuShow()
+      }
+    })
   }
 
   hasGradeChanged() {

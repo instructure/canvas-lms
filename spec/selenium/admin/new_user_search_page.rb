@@ -71,7 +71,7 @@ module NewUserSearchPage
   end
 
   def send_message_button(user_name)
-    fj("[data-automation='users list'] tr:contains('#{user_name}') [role=button]:has([name='IconMessageLine'])")
+    fj("[data-automation='users list'] tr:contains('#{user_name}') [role=button]:has([name='IconMessage'])")
   end
 
   def edit_user_button(user_name)
@@ -84,6 +84,18 @@ module NewUserSearchPage
 
   def page_next_button
     fj("[role=button]:has([title='Next Page'])")
+  end
+
+  def results_alert
+    f('#content .alert')
+  end
+
+  def results_body
+    f('#content')
+  end
+
+  def results_row
+    ('[data-automation="users list"] tr')
   end
 
   # ---------------------- Actions ----------------------
@@ -119,8 +131,8 @@ module NewUserSearchPage
     masquerade_button(user_name).click
   end
 
-  def click_message_button
-    send_message_button.click
+  def click_message_button(user_name)
+    send_message_button(user_name).click
   end
 
   def click_edit_button(user_name)

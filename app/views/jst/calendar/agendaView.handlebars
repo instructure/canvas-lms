@@ -59,7 +59,7 @@
                   <div class="agenda-event__icon group_{{contextCode}}">
                     <i class="icon-{{iconType}}"></i>
                   </div>
-                  <span class="screenreader-only">{{#t}}Open event menu{{/t}}</span>
+                  <span class="screenreader-only">{{#t}}Open event menu for{{/t}} {{title}}</span>
                   <div class="agenda-event__time" aria-hidden="true">
                     {{#if assignment}}
                       {{#t "due"}}Due {{/t}} {{fcMomentToString originalStart "tiny"}}

@@ -36,7 +36,7 @@ describe GradebookCsvsController do
 
       get 'show', params: {course_id: @course.id}, format: :json
       json = json_parse(response.body)
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(json).to have_key 'attachment_id'
       expect(json).to have_key 'progress_id'
     end

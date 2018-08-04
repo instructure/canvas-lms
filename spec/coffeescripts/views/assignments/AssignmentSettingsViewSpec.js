@@ -226,8 +226,8 @@ test('disables the Save and Cancel button handlers', function() {
     weighted: true,
     assignmentGroups: groups
   })
-  this.spy(view, 'saveFormData')
-  this.spy(view, 'cancel')
+  sandbox.spy(view, 'saveFormData')
+  sandbox.spy(view, 'cancel')
   view.$('#cancel-assignment-settings').click()
   view.$('#update-assignment-settings').click()
   notOk(view.saveFormData.called)

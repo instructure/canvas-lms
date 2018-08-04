@@ -31,7 +31,7 @@ class Course < ActiveRecord::Base
   include OutcomeImportContext
 
   attr_accessor :teacher_names, :master_course
-  attr_writer :student_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :primary_enrollment_date, :invitation, :updating_master_template_id
+  attr_writer :student_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :primary_enrollment_date, :invitation, :master_migration
 
   time_zone_attribute :time_zone
   def time_zone
@@ -629,7 +629,7 @@ class Course < ActiveRecord::Base
   scope :recently_ended, -> { where(:conclude_at => 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
   scope :recently_created, -> { where("created_at>?", 1.month.ago).order("created_at DESC").limit(50).preload(:teachers) }
   scope :for_term, lambda {|term| term ? where(:enrollment_term_id => term) : all }
-  scope :active_first, -> { order("CASE WHEN courses.workflow_state='available' THEN 0 ELSE 1 END, #{best_unicode_collation_key('name')}") }
+  scope :active_first, -> { order(Arel.sql("CASE WHEN courses.workflow_state='available' THEN 0 ELSE 1 END, #{best_unicode_collation_key('name')}")) }
   scope :name_like, lambda {|name| where(coalesced_wildcard('courses.name', 'courses.sis_source_id', 'courses.course_code', name)) }
   scope :needs_account, lambda { |account, limit| where(:account_id => nil, :root_account_id => account).limit(limit) }
   scope :active, -> { where("courses.workflow_state<>'deleted'") }
@@ -1138,11 +1138,14 @@ class Course < ActiveRecord::Base
 
   def handle_syllabus_changes_for_master_migration
     if self.syllabus_body_changed?
-      if @updating_master_template_id
+      self.syllabus_updated_at = Time.now.utc
+      if @master_migration
+        updating_master_template_id = @master_migration.master_course_subscription.master_template_id
         # master migration sync
-        self.syllabus_master_template_id ||= @updating_master_template_id if self.syllabus_body_was.blank? # sync if there was no syllabus before
-        if self.syllabus_master_template_id.to_i != @updating_master_template_id
+        self.syllabus_master_template_id ||= updating_master_template_id if self.syllabus_body_was.blank? # sync if there was no syllabus before
+        if self.syllabus_master_template_id.to_i != updating_master_template_id
           self.restore_syllabus_body! # revert the change
+          @master_migration.add_skipped_item(:syllabus)
         end
       elsif self.syllabus_master_template_id
         # local change - remove the template id to prevent future syncs
@@ -2790,6 +2793,7 @@ class Course < ActiveRecord::Base
 
   add_setting :timetable_data, :arbitrary => true
   add_setting :syllabus_master_template_id
+  add_setting :syllabus_updated_at
 
   def user_can_manage_own_discussion_posts?(user)
     return true if allow_student_discussion_editing?

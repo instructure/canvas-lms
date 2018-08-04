@@ -31,7 +31,6 @@ import 'jquery.instructure_date_and_time'
 
 import Badge from '@instructure/ui-elements/lib/components/Badge'
 import View from '@instructure/ui-layout/lib/components/View'
-import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
 import Grid, { GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 
@@ -496,32 +495,44 @@ export class DiscussionRow extends Component {
 
   renderDueDate = () => {
     const assignment = this.props.discussion.assignment // eslint-disable-line
-    const dueDateString = assignment && assignment.due_at
-      ? I18n.t('Due %{date}', { date: $.datetimeString(assignment.due_at) })
-      : null
+    let dueDateString = null;
+    let className = '';
+    if (assignment && assignment.due_at) {
+      className = 'due-date'
+      dueDateString = I18n.t('Due %{date}', { date: $.datetimeString(assignment.due_at) });
+    } else if (this.props.discussion.todo_date) {
+      className = 'todo-date'
+      dueDateString = I18n.t('To do %{date}', { date: $.datetimeString(this.props.discussion.todo_date)});
+    }
     return (
-      <div className="ic-discussion-row__content">
+      <div className={`ic-discussion-row__content ${className}`}>
         { dueDateString }
       </div>
     )
   }
 
   getAvailabilityString = () => {
-    const availabilityBegin = this.props.discussion.delayed_post_at
-    const availabilityEnd = this.props.discussion.lock_at
-    if (availabilityBegin && !isPassedDelayedPostAt({ checkDate: null, delayedDate: availabilityBegin })) {
+    const assignment = this.props.discussion.assignment
+
+    const availabilityBegin =
+      this.props.discussion.delayed_post_at || (assignment && assignment.unlock_at)
+    const availabilityEnd = this.props.discussion.lock_at || (assignment && assignment.lock_at)
+
+    if (
+      availabilityBegin &&
+      !isPassedDelayedPostAt({checkDate: null, delayedDate: availabilityBegin})
+    ) {
       return I18n.t('Not available until %{date}', {date: $.datetimeString(availabilityBegin)})
     }
     if (availabilityEnd) {
-      if (isPassedDelayedPostAt({ checkDate: null, delayedDate: availabilityEnd })) {
+      if (isPassedDelayedPostAt({checkDate: null, delayedDate: availabilityEnd})) {
         return I18n.t('Was locked at %{date}', {date: $.datetimeString(availabilityEnd)})
       } else {
-        return I18n.t('Available until %{date}',{date: $.datetimeString(availabilityEnd)})
+        return I18n.t('Available until %{date}', {date: $.datetimeString(availabilityEnd)})
       }
     }
-    return ""
+    return ''
   }
-
   renderAvailabilityDate = () => {
     // Check if we are too early for the topic to be available
     const availabilityString = this.getAvailabilityString();
@@ -630,14 +641,14 @@ export class DiscussionRow extends Component {
     return (
       this.props.connectDropTarget(this.props.connectDragSource(
         <div style={{ opacity: (this.props.isDragging) ? 0 : 1 }} className={`${classes} ic-discussion-row`}>
-          <Flex width="100%">
-            <FlexItem shrink padding="xx-small">
+          <div className="ic-discussion-row-container">
+            <span className="ic-drag-handle-container">
               {this.renderDragHandleIfAppropriate()}
-            </FlexItem>
-            <FlexItem shrink padding="xx-small">
+            </span>
+            <span className="ic-drag-handle-container">
               {this.renderIcon()}
-            </FlexItem>
-            <FlexItem padding="xx-small" grow shrink>
+            </span>
+            <span className="ic-discussion-content-container">
               <Grid startAt="medium" vAlign="middle" rowSpacing="none" colSpacing="none">
                 <GridRow vAlign="middle">
                   <GridCol vAlign="middle" textAlign="start">
@@ -666,8 +677,8 @@ export class DiscussionRow extends Component {
                   </GridCol>
                 </GridRow>
               </Grid>
-            </FlexItem>
-          </Flex>
+          </span>
+          </div>
         </div>, {dropEffect: 'copy'}
       ))
     )

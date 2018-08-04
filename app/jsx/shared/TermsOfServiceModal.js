@@ -57,9 +57,9 @@ export default class TermsOfServiceModal extends React.Component {
   render() {
     return (
       <span id="terms_of_service_modal">
-       <Link ref={(c) => { this.link = c; }} onClick={this.handleLinkClick}>
+       <a className="terms_link"  href="#" ref={(c) => { this.link = c; }} onClick={this.handleLinkClick}>
          {this.props.preview ? I18n.t('Preview') : termsOfServiceText}
-       </Link>
+       </a>
        <Modal
          open={this.state.open}
          onDismiss={this.handleCloseModal}

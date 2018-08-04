@@ -21,9 +21,7 @@ import { shallow } from 'enzyme'
 import RubricManagement from '../RubricManagement'
 
 const defaultProps = (props = {}) => (
-  Object.assign({
-    accountId: '1'
-  }, props)
+  { accountId: '1', ...props }
 )
 
 it('renders the RubricManagement component', () => {

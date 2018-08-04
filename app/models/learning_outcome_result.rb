@@ -123,6 +123,16 @@ class LearningOutcomeResult < ActiveRecord::Base
   scope :for_association, lambda { |association| where(:association_type => association.class.to_s, :association_id => association.id) }
   scope :for_associated_asset, lambda { |associated_asset| where(:associated_asset_type => associated_asset.class.to_s, :associated_asset_id => associated_asset.id) }
   scope :active, lambda { where("content_tags.workflow_state <> 'deleted'").joins(:alignment) }
+  # rubocop:disable Metrics/LineLength
+  scope :exclude_muted_associations, -> {
+    joins("LEFT JOIN #{RubricAssociation.quoted_table_name} rassoc ON rassoc.id = learning_outcome_results.association_id AND learning_outcome_results.association_type = 'RubricAssociation'").
+      joins("LEFT JOIN #{Assignment.quoted_table_name} ra ON ra.id = rassoc.association_id AND rassoc.association_type = 'Assignment' AND rassoc.purpose = 'grading'").
+      joins("LEFT JOIN #{Quizzes::Quiz.quoted_table_name} ON quizzes.id = learning_outcome_results.association_id AND learning_outcome_results.association_type = 'Quizzes::Quiz'").
+      joins("LEFT JOIN #{Assignment.quoted_table_name} qa ON qa.id = quizzes.assignment_id").
+      joins("LEFT JOIN #{Assignment.quoted_table_name} sa ON sa.id = learning_outcome_results.association_id AND learning_outcome_results.association_type = 'Assignment'").
+      where('(ra.muted IS NULL AND qa.muted IS NULL AND sa.muted IS NULL) OR ra.muted IS FALSE OR qa.muted IS FALSE OR sa.muted IS FALSE')
+  }
+  # rubocop:enable Metrics/LineLength
 
   private
 

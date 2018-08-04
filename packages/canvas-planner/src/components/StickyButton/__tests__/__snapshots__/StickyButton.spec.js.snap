@@ -1,39 +1,45 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`adds aria-hidden when specified 1`] = `
-<button
-  aria-disabled={null}
-  aria-hidden="true"
-  className=""
-  onClick={[Function]}
-  style={
-    Object {
-      "zIndex": null,
+<span>
+  <button
+    aria-describedby={null}
+    aria-disabled={null}
+    aria-hidden="true"
+    className=""
+    onClick={[Function]}
+    style={
+      Object {
+        "zIndex": null,
+      }
     }
-  }
-  type="button"
->
-  <span>
-    Click me
-  </span>
-</button>
+    type="button"
+  >
+    <span>
+      Click me
+    </span>
+  </button>
+</span>
 `;
 
 exports[`renders 1`] = `
-<button
-  aria-disabled={null}
-  aria-hidden={null}
-  className=""
-  onClick={[Function]}
-  style={
-    Object {
-      "zIndex": null,
+<span>
+  <button
+    aria-describedby={null}
+    aria-disabled={null}
+    aria-hidden={null}
+    className=""
+    onClick={[Function]}
+    style={
+      Object {
+        "zIndex": null,
+      }
     }
-  }
-  type="button"
->
-  <span>
-    I am a Sticky Button
-  </span>
-</button>
+    type="button"
+  >
+    <span>
+      I am a Sticky Button
+    </span>
+  </button>
+</span>
 `;

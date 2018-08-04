@@ -53,9 +53,9 @@ describe("Upload data actions", () => {
   };
 
   beforeEach(() => {
-    successSource.uploadFRD.reset();
+    successSource.uploadFRD.resetHistory();
     successSource.uploadFRD.returns(Promise.resolve(results));
-    successSource.setUsageRights.reset();
+    successSource.setUsageRights.resetHistory();
   });
 
   const defaults = {
@@ -415,12 +415,8 @@ describe("Upload data actions", () => {
       });
 
       it("link image on image type and text selected", () => {
-        sinon.stub(Bridge, "existingContentToLink", () => {
-          return true;
-        });
-        sinon.stub(Bridge, "existingContentToLinkIsImg", () => {
-          return false;
-        });
+        sinon.stub(Bridge, "existingContentToLink").callsFake(() => true);
+        sinon.stub(Bridge, "existingContentToLinkIsImg").callsFake(() => false);
         actions.embedUploadResult({ "content-type": "image/png" }, "files");
         sinon.assert.calledWithMatch(Bridge.insertLink, {
           embed: { type: "image" }
@@ -430,12 +426,8 @@ describe("Upload data actions", () => {
       });
 
       it("embed image on image type and image selected", () => {
-        sinon.stub(Bridge, "existingContentToLink", () => {
-          return true;
-        });
-        sinon.stub(Bridge, "existingContentToLinkIsImg", () => {
-          return true;
-        });
+        sinon.stub(Bridge, "existingContentToLink").callsFake(() => true);
+        sinon.stub(Bridge, "existingContentToLinkIsImg").callsFake(() => true);
         actions.embedUploadResult({ "content-type": "image/png" }, "images");
         sinon.assert.calledWithMatch(Bridge.insertImage, {
           "content-type": "image/png"

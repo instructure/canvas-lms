@@ -52,7 +52,7 @@ test('model change event updates components state', function() {
 })
 
 test('clicking a published cloud opens restricted dialog', function() {
-  this.stub(ReactDOM, 'render')
+  sandbox.stub(ReactDOM, 'render')
   Simulate.click(this.publishCloud.refs.publishCloud.getDOMNode())
   ok(ReactDOM.render.calledOnce, 'renders a component inside the dialog')
 })

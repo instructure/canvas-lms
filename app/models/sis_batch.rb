@@ -271,18 +271,20 @@ class SisBatch < ActiveRecord::Base
   end
 
   def self.process_all_for_account(account)
-    return if use_parallel_importers?(account) && account.sis_batches.importing.exists? # will be requeued after the current batch finishes
-    start_time = Time.now
-    loop do
-      batches = account.sis_batches.needs_processing.limit(50).order(:created_at).to_a
-      break if batches.empty?
-      batches.each do |batch|
-        batch.process_without_send_later
-        return if batch.importing? # we'll requeue afterwards
-        if Time.now - start_time > Setting.get('max_time_per_sis_batch', 60).to_i
-          # requeue the job to continue processing more batches
-          queue_job_for_account(account)
-          return
+    account.shard.activate do
+      return if use_parallel_importers?(account) && account.sis_batches.importing.exists? # will be requeued after the current batch finishes
+      start_time = Time.now
+      loop do
+        batches = account.sis_batches.needs_processing.limit(50).order(:created_at).to_a
+        break if batches.empty?
+        batches.each do |batch|
+          batch.process_without_send_later
+          return if batch.importing? # we'll requeue afterwards
+          if Time.now - start_time > Setting.get('max_time_per_sis_batch', 60).to_i
+            # requeue the job to continue processing more batches
+            queue_job_for_account(account)
+            return
+          end
         end
       end
     end
@@ -339,7 +341,10 @@ class SisBatch < ActiveRecord::Base
     previous_zip = previous_batch.try(:download_zip)
     return unless previous_zip
 
-    return if change_threshold && (1-previous_zip.size.to_f/@data_file.size.to_f).abs > (0.01 * change_threshold)
+    if change_threshold && (1-previous_zip.size.to_f/@data_file.size.to_f).abs > (0.01 * change_threshold)
+      SisBatch.add_error(nil, "Diffing not performed because file size difference exceeded threshold", sis_batch: self)
+      return
+    end
 
     diffed_data_file = SIS::CSV::DiffGenerator.new(self.account, self).generate(previous_zip.path, @data_file.path)
     return :empty_diff_file unless diffed_data_file # just end if there's nothing to import
@@ -512,8 +517,9 @@ class SisBatch < ActiveRecord::Base
       if self.using_parallel_importers?
         data = Enrollment::BatchStateUpdater.destroy_batch(batch, sis_batch: self, batch_mode: true)
         SisBatchRollBackData.bulk_insert_roll_back_data(data)
-        enrollment_count += data.count
-        current_row += data.count
+        batch_count = data.count{|d| d.context_type == "Enrollment"} # data can include group membership deletions
+        enrollment_count += batch_count
+        current_row += batch_count
       else
         batch.each do |enrollment|
           enrollment.destroy

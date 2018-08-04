@@ -60,4 +60,28 @@ module.exports = [
   'instructure',
 
    // 'jsx/shared/rce/RichContentEditor'
+  'lodash',
+  '@instructure/ui-layout/lib/components/Grid',
+
+  // didn't import all of '@instructure/ui-forms/lib/components' to avoid pulling in decimal.js w/ NumberInput
+  '@instructure/ui-forms/lib/components/Checkbox',
+  '@instructure/ui-forms/lib/components/CheckboxGroup',
+  '@instructure/ui-forms/lib/components/DateInput',
+  '@instructure/ui-forms/lib/components/FormField',
+  '@instructure/ui-forms/lib/components/Select',
+  '@instructure/ui-forms/lib/components/TextArea',
+  '@instructure/ui-forms/lib/components/TextInput',
+  '@instructure/ui-forms/lib/components/RadioInputGroup',
+
+  '@instructure/ui-elements/lib/components',
+  '@instructure/ui-overlays/lib/components',
+  'jsx/shared/components/InstuiModal',
+  '@instructure/ui-menu/lib/components',
+  '@instructure/ui-buttons/lib/components',
+  '@instructure/ui-alerts/lib/components',
+  '@instructure/ui-pagination/lib/components',
+  '@instructure/ui-tabs/lib/components',
+  '@instructure/ui-themeable/lib/components/ApplyTheme',
+  '@instructure/ui-icons/lib/Solid/IconSettings',
+
 ]

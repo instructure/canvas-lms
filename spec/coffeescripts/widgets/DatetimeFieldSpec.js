@@ -116,8 +116,8 @@ test('uses first day of week for moment locale', function() {
   const momentLocale = 'MOMENT_LOCALE'
   const firstDayOfWeek = 1
   fakeENV.setup({MOMENT_LOCALE: momentLocale})
-  this.stub(moment, 'localeData').returns({firstDayOfWeek: () => firstDayOfWeek})
-  this.stub(this.$field, 'datepicker')
+  sandbox.stub(moment, 'localeData').returns({firstDayOfWeek: () => firstDayOfWeek})
+  sandbox.stub(this.$field, 'datepicker')
   this.field.addDatePicker({})
   ok(moment.localeData.calledWith(momentLocale))
   ok(this.$field.datepicker.calledWithMatch({firstDay: firstDayOfWeek}))
@@ -492,7 +492,7 @@ QUnit.module('alertScreenreader', {
     // not feasible to confirm $.screenReaderFlashMessageExclusive itself gets
     // called. but we can confirm this step, despite the coupling to
     // implementation
-    this.spy(this.field, 'debouncedSRFME')
+    sandbox.spy(this.field, 'debouncedSRFME')
   }
 })
 

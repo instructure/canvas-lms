@@ -163,16 +163,18 @@ export default class AnnouncementsIndex extends Component {
     const pages = Array.from(Array(this.props.announcementsLastPage)).map((_, i) =>
       this.renderPageButton(i + 1)
     )
-
-    return (
-      <Pagination
-        variant="compact"
-        labelNext={I18n.t('Next Announcements Page')}
-        labelPrev={I18n.t('Previous Announcements Page')}
-      >
-        {pages}
-      </Pagination>
-    )
+    if (pages.length > 1 && !this.props.isLoadingAnnouncements) {
+      return (
+        <Pagination
+          variant="compact"
+          labelNext={I18n.t('Next Announcements Page')}
+          labelPrev={I18n.t('Previous Announcements Page')}
+        >
+          {pages}
+        </Pagination>
+      )
+    }
+    return null
   }
 
   render() {

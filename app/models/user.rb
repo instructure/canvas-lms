@@ -270,7 +270,7 @@ class User < ActiveRecord::Base
   def self.order_by_sortable_name(options = {})
     clause = sortable_name_order_by_clause
     sort_direction = options[:direction] == :descending ? 'DESC' : 'ASC'
-    scope = self.order("#{clause} #{sort_direction}").order("#{self.table_name}.id #{sort_direction}")
+    scope = self.order(Arel.sql("#{clause} #{sort_direction}")).order(Arel.sql("#{self.table_name}.id #{sort_direction}"))
     if scope.select_values.empty?
       scope = scope.select(self.arel_table[Arel.star])
     end

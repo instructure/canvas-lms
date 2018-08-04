@@ -237,6 +237,11 @@ describe GradebookUserIds do
       expect(gradebook_user_ids.user_ids).to include @concluded_student.id
     end
 
+    it "does not include concluded student ids if the course is soft concluded" do
+      @course.conclude_at = 1.day.ago
+      expect(gradebook_user_ids.user_ids).not_to include @concluded_student.id
+    end
+
     context 'with pg_collkey installed' do
       before do
         skip 'requires pg_collkey installed SD-2747' unless has_pg_collkey
@@ -338,6 +343,11 @@ describe GradebookUserIds do
         )
       end
 
+      it "does not include concluded student ids if the course is soft concluded" do
+        @course.conclude_at = 1.day.ago
+        expect(gradebook_user_ids.user_ids).not_to include @concluded_student.id
+      end
+
       context 'when pg_collkey is installed' do
         before do
           skip 'requires pg_collkey installed SD-2747' unless has_pg_collkey
@@ -426,6 +436,11 @@ describe GradebookUserIds do
         )
       end
 
+      it "does not include concluded student ids if the course is soft concluded" do
+        @course.conclude_at = 1.day.ago
+        expect(gradebook_user_ids.user_ids).not_to include @concluded_student.id
+      end
+
       context 'when pg_collkey is installed' do
         before do
           skip 'requires pg_collkey installed SD-2747' unless has_pg_collkey
@@ -482,6 +497,11 @@ describe GradebookUserIds do
         expect(gradebook_user_ids.user_ids).to match_array(
           [@student1.id, @student2.id, @student4.id, @student3.id, @concluded_student.id, @fake_student.id]
         )
+      end
+
+      it "does not include concluded student ids if the course is soft concluded" do
+        @course.conclude_at = 1.day.ago
+        expect(gradebook_user_ids.user_ids).not_to include @concluded_student.id
       end
 
       context "ascending" do
@@ -799,6 +819,11 @@ describe GradebookUserIds do
     it "includes concluded student ids if the user preferences include show_concluded_enrollments" do
       @teacher.preferences[:gradebook_settings][@course.id][:show_concluded_enrollments] = "true"
       expect(gradebook_user_ids.user_ids).to include @concluded_student.id
+    end
+
+    it "does not include concluded student ids if the course is soft concluded" do
+      @course.conclude_at = 1.day.ago
+      expect(gradebook_user_ids.user_ids).not_to include @concluded_student.id
     end
 
     context "Multiple Grading Periods" do

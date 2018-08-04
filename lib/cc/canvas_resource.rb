@@ -150,6 +150,7 @@ JOKE
         atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
         atts << :grading_standard_enabled
         atts << :storage_quota
+        atts << :restrict_enrollments_to_course_dates
 
         if @course.image_url.present?
           atts << :image_url

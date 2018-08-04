@@ -104,7 +104,7 @@ export function render (element, options) {
         <PlannerApp
           appRef={app => dynamicUiManager.setApp(app)}
           stickyOffset={opts.stickyOffset}
-          changeToDashboardCardView={opts.changeToDashboardCardView}
+          changeDashboardView={opts.changeDashboardView}
           plannerActive={plannerActive}
           currentUser={opts.currentUser}
           focusFallback={() => dynamicUiManager.focusFallback('item')}
@@ -134,10 +134,15 @@ export function renderHeader (element, auxElement, options) {
 }
 
 // This method allows you to render the To Do Sidebar into a separate DOM node
-export function renderToDoSidebar (element) {
+export function renderToDoSidebar (element, options) {
   ReactDOM.render(
     <Provider store={store}>
-      <ToDoSidebar courses={window.ENV.STUDENT_PLANNER_COURSES} timeZone={ENV.TIMEZONE} locale={ENV.LOCALE} />
+      <ToDoSidebar
+        courses={window.ENV.STUDENT_PLANNER_COURSES}
+        timeZone={ENV.TIMEZONE}
+        locale={ENV.LOCALE}
+        changeDashboardView={options.changeDashboardView}
+      />
     </Provider>
   , element);
 }
@@ -153,7 +158,7 @@ function applyTheme (el, theme) {
   ): el;
 }
 
-export default function loadPlannerDashboard ({changeToCardView, getActiveApp, flashError, flashMessage, srFlashMessage, externalFallbackFocusable, env}) {
+export default function loadPlannerDashboard ({changeDashboardView, getActiveApp, flashError, flashMessage, srFlashMessage, externalFallbackFocusable, env}) {
   const element = document.getElementById('dashboard-planner');
   const headerElement = document.getElementById('dashboard-planner-header');
   const headerAuxElement = document.getElementById('dashboard-planner-header-aux');
@@ -194,7 +199,7 @@ export default function loadPlannerDashboard ({changeToCardView, getActiveApp, f
     stickyOffset: stickyOffset,
     courses: courses,
     groups: groups,
-    changeToDashboardCardView: changeToCardView,
+    changeDashboardView,
   };
 
   if (element) {

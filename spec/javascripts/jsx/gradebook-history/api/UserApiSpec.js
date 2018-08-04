@@ -22,7 +22,7 @@ import UserApi from 'jsx/gradebook-history/api/UserApi';
 QUnit.module('UserApi', {
   setup () {
     this.courseId = 525600;
-    this.getStub = this.stub(axios, 'get')
+    this.getStub = sandbox.stub(axios, 'get')
       .returns(Promise.resolve({
         response: {}
       }));

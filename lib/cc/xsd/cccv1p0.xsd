@@ -87,6 +87,7 @@
         <xs:element name="home_page_announcement_limit" type="optional_integer" minOccurs="0"/>
         <xs:element name="restrict_student_future_view" type="xs:boolean" minOccurs="0"/>
         <xs:element name="restrict_student_past_view" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="restrict_enrollments_to_course_dates" type="xs:boolean" minOccurs="0"/>
         <xs:element name="public_syllabus_to_auth" type="xs:boolean" minOccurs="0"/>
         <xs:element name="show_total_grade_as_points" type="xs:boolean" minOccurs="0"/>
         <xs:element name="organize_epub_by_content_type" type="xs:boolean" minOccurs="0"/>

@@ -30,14 +30,14 @@ QUnit.module('QuizArrowApplicator', {
 })
 
 test("applies 'correct' and 'incorrect' arrows when the quiz is not a survey", function() {
-  this.spy(this.arrowApplicator, 'applyCorrectAndIncorrectArrows')
+  sandbox.spy(this.arrowApplicator, 'applyCorrectAndIncorrectArrows')
   ENV.IS_SURVEY = false
   this.arrowApplicator.applyArrows()
   ok(this.arrowApplicator.applyCorrectAndIncorrectArrows.calledOnce)
 })
 
 test("does not apply 'correct' and 'incorrect' arrows when the quiz is a survey", function() {
-  this.spy(this.arrowApplicator, 'applyCorrectAndIncorrectArrows')
+  sandbox.spy(this.arrowApplicator, 'applyCorrectAndIncorrectArrows')
   ENV.IS_SURVEY = true
   this.arrowApplicator.applyArrows()
   ok(this.arrowApplicator.applyCorrectAndIncorrectArrows.notCalled)

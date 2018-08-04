@@ -43,7 +43,7 @@ QUnit.module('FileUploader', {
 })
 
 test('posts to the files endpoint to kick off upload', function() {
-  this.stub($, 'ajaxJSON')
+  sandbox.stub($, 'ajaxJSON')
   this.uploader.upload()
   equal($.ajaxJSON.calledWith('/api/v1/folders/1/files'), true, 'kicks off upload')
 })
@@ -55,7 +55,7 @@ test('stores params from preflight for actual upload', function() {
     {'Content-Type': 'application/json'},
     '{"upload_url": "/upload/url", "upload_params": {"key": "value"}}'
   ])
-  this.stub(this.uploader, '_actualUpload')
+  sandbox.stub(this.uploader, '_actualUpload')
   this.uploader.upload()
   server.respond()
   equal(this.uploader.uploadData.upload_url, '/upload/url')
@@ -71,8 +71,8 @@ test('completes upload after preflight', function(assert) {
     {'Content-Type': 'application/json'},
     '{"upload_url": "/s3/upload/url", "upload_params": {"success_url": "/success/url"}}'
   ])
-  this.stub(this.uploader, 'addFileToCollection')
-  this.stub(uploader, 'completeUpload').returns(Promise.resolve({id: 's3-id'}))
+  sandbox.stub(this.uploader, 'addFileToCollection')
+  sandbox.stub(uploader, 'completeUpload').returns(Promise.resolve({id: 's3-id'}))
   const promise = this.uploader.upload()
   server.respond()
   return promise.then(() => {
@@ -83,12 +83,12 @@ test('completes upload after preflight', function(assert) {
 })
 
 test('roundProgress returns back rounded values', function() {
-  this.stub(this.uploader, 'getProgress').returns(0.18) // progress is [0 .. 1]
+  sandbox.stub(this.uploader, 'getProgress').returns(0.18) // progress is [0 .. 1]
   equal(this.uploader.roundProgress(), 18)
 })
 
 test('roundProgress returns back values no greater than 100', function() {
-  this.stub(this.uploader, 'getProgress').returns(1.1) // something greater than 100%
+  sandbox.stub(this.uploader, 'getProgress').returns(1.1) // something greater than 100%
   equal(this.uploader.roundProgress(), 100)
 })
 

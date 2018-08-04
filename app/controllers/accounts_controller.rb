@@ -387,7 +387,7 @@ class AccountsController < ApplicationController
     end
 
     opts = { :include_crosslisted_courses => value_to_boolean(params[:include_crosslisted_courses]) }
-    @courses = @account.associated_courses(opts).order(order).where(:workflow_state => params[:state])
+    @courses = @account.associated_courses(opts).order(Arel.sql(order)).where(:workflow_state => params[:state])
 
     if params[:hide_enrollmentless_courses] || value_to_boolean(params[:with_enrollments])
       @courses = @courses.with_enrollments
@@ -464,6 +464,7 @@ class AccountsController < ApplicationController
 
     ActiveRecord::Associations::Preloader.new.preload(@courses, [:account, :root_account])
     ActiveRecord::Associations::Preloader.new.preload(@courses, [:teachers]) if includes.include?("teachers")
+    ActiveRecord::Associations::Preloader.new.preload(@courses, [:enrollment_term]) if includes.include?("term")
 
     if includes.include?("total_students")
       student_counts = StudentEnrollment.not_fake.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')").

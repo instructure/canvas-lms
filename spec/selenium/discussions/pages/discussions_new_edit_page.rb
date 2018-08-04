@@ -26,10 +26,6 @@ class DiscussionNewEdit
       get("/courses/#{course.id}/discussion_topics/new")
     end
 
-    def set_section_specific_discussion_flag(course, state)
-      course.account.set_feature_flag! :section_specific_discussions, state
-    end
-
     def new_discussion_url
       '/discussion_topics/new'
     end

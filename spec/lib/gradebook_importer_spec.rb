@@ -367,6 +367,25 @@ describe GradebookImporter do
     expect(@gi.missing_assignments).to eq [@assignment3]
   end
 
+  it "parses assignments correctly with existing custom columns" do
+    course_model
+    @assignment1 = @course.assignments.create! name: 'Assignment 1'
+    @assignment3 = @course.assignments.create! name: 'Assignment 3'
+    @custom_column1 = @course.custom_gradebook_columns.create! title: "Custom Column 1"
+
+    importer_with_rows(
+      'Student,ID,Section,Custom Column 1,Assignment 1,Assignment 2',
+      'Some Student,,,,,'
+    )
+
+    expect(@gi.assignments.length).to eq 2
+    expect(@gi.assignments.first).to eq @assignment1
+    expect(@gi.assignments.last.title).to eq 'Assignment 2'
+    expect(@gi.assignments.last).to be_new_record
+    expect(@gi.assignments.last.id).to be < 0
+    expect(@gi.missing_assignments).to eq [@assignment3]
+  end
+
   it "parses CSVs with the SIS Login ID column" do
     course = course_model
     user = user_model
@@ -377,6 +396,42 @@ describe GradebookImporter do
     )
 
     expect{importer.parse!}.not_to raise_error
+  end
+
+  it "parses CSVs with semicolons" do
+    course = course_model
+    user = user_model
+    progress = Progress.create!(tag: "test", context: @user)
+    upload = GradebookUpload.create!(course: course, user: @user, progress: progress)
+    new_gradebook_importer(
+      attachment_with_rows(
+        'Student;ID;Section;An Assignment',
+        'A Student;1;Section 13;2',
+        'Another Student;2;Section 13;10'
+      ),
+      upload,
+      user,
+      progress
+    )
+    expect(upload.gradebook["students"][1]["name"]).to eql 'Another Student'
+  end
+
+  it "parses CSVs with commas" do
+    course = course_model
+    user = user_model
+    progress = Progress.create!(tag: "test", context: @user)
+    upload = GradebookUpload.create!(course: course, user: @user, progress: progress)
+    new_gradebook_importer(
+      attachment_with_rows(
+        'Student,ID,Section,An Assignment',
+        'A Student,1,Section 13,2',
+        'Another Student,2,Section 13,10'
+      ),
+      upload,
+      user,
+      progress
+    )
+    expect(upload.gradebook["students"][1]["name"]).to eql 'Another Student'
   end
 
   it "does not include missing assignments if no new assignments" do
@@ -875,52 +930,52 @@ describe GradebookImporter do
       expect(submission['grade']).to eq ""
     end
   end
-end
 
-def new_gradebook_importer(attachment = valid_gradebook_contents, upload = nil, user = gradebook_user, progress = nil)
-  @user = user
-  @progress = progress || Progress.create!(tag: "test", context: @user)
-  upload ||= GradebookUpload.create!(course: @course, user: @user, progress: @progress)
-  if attachment.is_a?(String)
-    attachment = attachment_with_rows(attachment)
+  def new_gradebook_importer(attachment = valid_gradebook_contents, upload = nil, user = gradebook_user, progress = nil)
+    @user = user
+    @progress = progress || Progress.create!(tag: "test", context: @user)
+    upload ||= GradebookUpload.create!(course: @course, user: @user, progress: @progress)
+    if attachment.is_a?(String)
+      attachment = attachment_with_rows(attachment)
+    end
+    @gi = GradebookImporter.new(upload, attachment, @user, @progress)
+    @gi.parse!
+    @gi
   end
-  @gi = GradebookImporter.new(upload, attachment, @user, @progress)
-  @gi.parse!
-  @gi
-end
 
-def valid_gradebook_contents
-  attachment_with_file(File.join(File.dirname(__FILE__), %w(.. fixtures gradebooks basic_course.csv)))
-end
-
-def valid_gradebook_contents_with_sis_login_id
-  attachment_with_file(File.join(File.dirname(__FILE__), %w(.. fixtures gradebooks basic_course_with_sis_login_id.csv)))
-end
-
-def attachment_with
-  a = attachment_model
-  file = Tempfile.new("gradebook_import.csv")
-  yield file
-  file.close
-  allow(a).to receive(:open).and_return(file)
-  a
-end
-
-def attachment_with_file(path)
-  contents = File.read(path)
-  attachment_with do |tempfile|
-    tempfile.write(contents)
+  def valid_gradebook_contents
+    attachment_with_file(File.join(File.dirname(__FILE__), %w(.. fixtures gradebooks basic_course.csv)))
   end
-end
 
-def attachment_with_rows(*rows)
-  attachment_with do |tempfile|
-    rows.each do |row|
-      tempfile.puts(row)
+  def valid_gradebook_contents_with_sis_login_id
+    attachment_with_file(File.join(File.dirname(__FILE__), %w(.. fixtures gradebooks basic_course_with_sis_login_id.csv)))
+  end
+
+  def attachment_with
+    a = attachment_model
+    file = Tempfile.new("gradebook_import.csv")
+    yield file
+    file.close
+    allow(a).to receive(:open).and_return(file)
+    a
+  end
+
+  def attachment_with_file(path)
+    contents = File.read(path)
+    attachment_with do |tempfile|
+      tempfile.write(contents)
     end
   end
-end
 
-def importer_with_rows(*rows)
-  new_gradebook_importer(attachment_with_rows(rows))
+  def attachment_with_rows(*rows)
+    attachment_with do |tempfile|
+      rows.each do |row|
+        tempfile.puts(row)
+      end
+    end
+  end
+
+  def importer_with_rows(*rows)
+    new_gradebook_importer(attachment_with_rows(rows))
+  end
 end

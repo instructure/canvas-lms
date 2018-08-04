@@ -534,11 +534,11 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
         text = "Some long string of text that probably shouldn't be a header, but rather should be paragraph text. I need to be shorter please"
         heading_html = "<h2>#{text}</h2>"
         wysiwyg_state_setup(heading_html, html: true)
-        f('div[aria-label="Check Accessibility"] button').click
+        f('[aria-label="Check Accessibility"] button').click
         wait_for_ajaximations
         fj('label:contains("Change heading tag to paragraph")').click
-        fj('.tinymce-a11y-checker-container button:contains("Apply")').click
-        expect(fj('.tinymce-a11y-checker-container p:contains("No accessibility issues were detected.")')).to be_displayed
+        fj('[aria-label="Accessibility Checker"] button:contains("Apply")').click
+        expect(fj('[aria-label="Accessibility Checker"] p:contains("No accessibility issues were detected.")')).to be_displayed
         f('form.edit-form button.submit').click
         wait_for_ajaximations
         expect(f("#wiki_page_show")).not_to contain_css('h2')

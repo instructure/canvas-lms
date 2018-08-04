@@ -63,7 +63,7 @@ const Rubric = (props) => {
     const ignore = (c) => _.isUndefined(c) ? true : c.ignore_for_scoring
     const points = data
       .filter((result) => !ignore(criteriaById[result.criterion_id]))
-      .map((result) => result.points !== null ? result.points : 0)
+      .map((result) => _.get(result, 'points.value', 0))
 
     onAssessmentChange({
       ...rubricAssessment,
@@ -105,14 +105,25 @@ const Rubric = (props) => {
   const hideScoreTotal = _.get(rubricAssociation, 'hide_score_total') === true
   const noScore = _.get(rubricAssociation, 'score') === null
   const showTotalPoints = !hidePoints && !hideScoreTotal
+  const criteriaClass = (isSummary || !showPointsColumn()) ? 'rubric-larger-criteria' : undefined
+  const maxRatings = _.max(rubric.criteria.map((c) => c.ratings.length))
+  const minSize = () => {
+    if (isSummary) return {}
+    else {
+      const ratingCorrection = freeForm ? 0 : 7.5 * maxRatings
+      return { 'minWidth': `${30 + (ratingCorrection)}rem` }
+    }
+  }
 
   return (
-    <div className="react-rubric">
+    <div className="react-rubric" style={minSize()}>
       <Table caption={rubric.title}>
         <thead>
           <tr>
-            <th scope="col">{I18n.t('Criteria')}</th>
-            <th scope="col">{I18n.t('Ratings')}</th>
+            <th scope="col" className={criteriaClass}>
+              {I18n.t('Criteria')}
+            </th>
+            <th scope="col" className="ratings">{I18n.t('Ratings')}</th>
             {
               showPointsColumn() && (
                 <th scope="col">{I18n.t('Pts')}</th>

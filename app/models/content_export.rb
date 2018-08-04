@@ -318,7 +318,7 @@ class ContentExport < ActiveRecord::Base
     return false unless obj
     return true unless selective_export?
 
-    return master_migration.export_object?(obj) if for_master_migration?
+    return true if for_master_migration? && master_migration.export_object?(obj) # fallback to selected_content otherwise
 
     # because Announcement.table_name == 'discussion_topics'
     if obj.is_a?(Announcement)
@@ -343,13 +343,12 @@ class ContentExport < ActiveRecord::Base
   #
   # Returns: bool
   def export_symbol?(symbol)
-    return false if symbol == :all_course_settings && should_skip_course_settings?
     selected_content.empty? || is_set?(selected_content[symbol]) || is_set?(selected_content[:everything])
   end
 
   def add_item_to_export(obj, type=nil)
     return unless obj && (type || obj.class.respond_to?(:table_name))
-    return unless selective_export? && !for_master_migration?
+    return unless selective_export?
 
     asset_type = type || obj.class.table_name
     selected_content[asset_type] ||= {}
@@ -365,18 +364,6 @@ class ContentExport < ActiveRecord::Base
       end
     end
     @selective_export
-  end
-
-  def should_skip_course_settings?
-    if for_master_migration?
-      if master_migration.migration_settings.has_key?(:copy_settings)
-        !master_migration.migration_settings[:copy_settings]
-      else
-        selective_export?
-      end
-    else
-      false
-    end
   end
 
   def exported_assets

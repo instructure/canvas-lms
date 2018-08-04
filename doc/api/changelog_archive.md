@@ -6,6 +6,74 @@ The Change Log Archive page displays previous API changes in the <a href="file.c
 
 <h2>Prior Updates</h2>
 
+<h2>2018-05-12</h2>
+
+<h3>Changes</h3>
+<table class="changelog">
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="accounts.html">Accounts API</a></td>
+<td>List Active Courses in an Account endpoint</td>
+<td>sort parameter: replaced <i>subaccount</i> value with <i>account_name</i> value. Subaccount can still be used as a value for backward compatibility.</td>
+</tr>
+<tr>
+<td><a href="user_observees.html">User Observees API</a></td>
+<td>List Observees endpoint</td>
+<td>Clarifies that the returned observees will include the observation_link_root_account_ids attribute</td>
+</tr>
+</table>
+
+<h3>Additions</h3>
+<table class="changelog">
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="accounts.html">Accounts API</a></td>
+<td>List Active Courses in an Account endpoint</td>
+<td>Include parameter: Added account_name value</td>
+</tr>
+<tr>
+<td><a href="communication_channels.html">Communication Channels API</a></td>
+<td>Delete a Push Notification endpoint</td>
+<td>Added endpoint</td>
+</tr>
+<tr>
+<td><a href="courses.html">Courses API</a></td>
+<td>List Your Courses endpoint<br><br>
+  List Courses for a User endpoint<br><br>
+Get a Single Course endpoint</td>
+<td>include parameter: Added account object</td>
+</tr>
+<tr>
+<td><a href="enrollments.html">Enrollments API</a></td>
+<td>List Enrollments endpoint</td>
+<td>Added enrollment_term_id parameter</td>
+</tr>
+<tr>
+<td><a href="submissions.html">Submissions API</a></td>
+<td>List Submissions for Multiple Assignments endpoint</td>
+<td>Added graded_since parameter</td>
+</tr>
+<td><a href="users.html">Users API</a></td>
+<td>Create a User endpoint</td>
+<td>Added destination parameter</td>
+</tr>
+<tr>
+<td><a href="user_observees.html">User Observees API</a></td>
+<td>Add an Observee with Credentials endpoint<br><br>
+  Add an Observee endpoint<br><br>
+  Remove an Observee endpoint</td>
+<td>Added root_account_id parameter</td>
+</tr>
+</table>
+
 <h2>2018-04-21</h2>
 <h3>Changes</h3>
 <table class="changelog">
@@ -51,13 +119,7 @@ Added overrides as an allowed value in the include parameter</td>
 <td>Create Course Section endpoint</td>
 <td>course_section[integration_id] parameter: sets the integration_id of the section</td>
 </tr>
-<tr>
-<td><a href="file.sis_csv.html">SIS CSV Format</a></td>
-<td>changes_sis_id.csv</td>
-<td>Added group_category as a type<br><br>
-old_integration_id field: description clarifies that this field does not support group categories<br><br>
-new_integration_id field: description clarifies that this field does not support group categories</td>
-</tr>
+
 <tr>
 <td><a href="sis_imports.html">SIS Imports API</a></td>
 <td>Import SIS Data endpoint</td>
@@ -69,6 +131,7 @@ new_integration_id field: description clarifies that this field does not support
 <td>Returns a jwt token, which can be used to send events to Canvas Data</td>
 </tr>
 </table>
+<p></p>
 <p></p>
 <table class="changelog">
 <tr>
@@ -95,5 +158,20 @@ Returns full examples for items and modules arrays</td>
 <td>SISImport object</td>
 <td>workflow_state parameter: returns whether the SIS import was aborted<br><br>
 skip_deletes parameter: returns whether the import skipped any deleted objects</td>
+</tr>
+</table>
+<p></p>
+<table class="changelog">
+<tr>
+<th>CSV Format</th>
+<th>File</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="file.sis_csv.html">SIS CSV Format</a></td>
+<td>changes_sis_id.csv</td>
+<td>Added group_category as a type<br><br>
+old_integration_id field: description clarifies that this field does not support group categories<br><br>
+new_integration_id field: description clarifies that this field does not support group categories</td>
 </tr>
 </table>

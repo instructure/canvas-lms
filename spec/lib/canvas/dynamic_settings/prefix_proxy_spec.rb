@@ -119,6 +119,28 @@ module Canvas
           proxy.for_prefix('baz')
         end
       end
+
+      describe '#set_keys' do
+        let(:kvs) { {foo1: 'bar1', foo2: 'bar2', foo3: 'bar3'} }
+
+        it 'sets multiple key value pairs' do
+          transaction_double = double(:transaction)
+          expect(transaction_double).to receive(:set).with('foo/bar/foo1', 'bar1')
+          expect(transaction_double).to receive(:set).with('foo/bar/foo2', 'bar2')
+          expect(transaction_double).to receive(:set).with('foo/bar/foo3', 'bar3')
+          allow(client).to receive(:transaction).and_yield(transaction_double)
+          proxy.set_keys(kvs)
+        end
+
+        it 'sets multiple global key value pairs' do
+          transaction_double = double(:transaction)
+          expect(transaction_double).to receive(:set).with('global/foo/bar/foo1', 'bar1')
+          expect(transaction_double).to receive(:set).with('global/foo/bar/foo2', 'bar2')
+          expect(transaction_double).to receive(:set).with('global/foo/bar/foo3', 'bar3')
+          allow(client).to receive(:transaction).and_yield(transaction_double)
+          proxy.set_keys(kvs, global: true)
+        end
+      end
     end
   end
 end

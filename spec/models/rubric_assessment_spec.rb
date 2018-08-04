@@ -167,6 +167,24 @@ describe RubricAssessment do
         @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
       end
 
+      it 'should use default ratings for scoring' do
+        @outcome.update!(data: nil)
+        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        assessment = @association.assess({
+          :user => @student,
+          :assessor => @teacher,
+          :artifact => @assignment.find_or_create_submission(@student),
+          :assessment => {
+            :assessment_type => 'grading',
+            criterion_id => {
+              :points => '3'
+            }
+          }
+        })
+        expect(assessment.score).to be 3.0
+        expect(assessment.artifact.score).to be 3.0
+      end
+
       it "should not allow points to exceed max points possible" do
         criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
         assessment = @association.assess({

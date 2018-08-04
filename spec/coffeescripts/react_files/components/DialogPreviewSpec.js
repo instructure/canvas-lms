@@ -29,7 +29,7 @@ QUnit.module('DialogPreview')
 test('DP: single item rendered with FilesystemObjectThumbnail', function() {
   const file = new File({name: 'Test File', thumbnail_url: 'blah'})
   file.url = () => 'some_url'
-  const fsObjStub = this.stub(FilesystemObjectThumbnail.prototype, 'render').returns(<div />)
+  const fsObjStub = sandbox.stub(FilesystemObjectThumbnail.prototype, 'render').returns(<div />)
   const dialogPreview = TestUtils.renderIntoDocument(<DialogPreview itemsToShow={[file]} />)
   ok(fsObjStub.calledOnce)
   ReactDOM.unmountComponentAtNode(dialogPreview.getDOMNode().parentNode)

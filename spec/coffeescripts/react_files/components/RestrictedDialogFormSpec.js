@@ -84,7 +84,7 @@ QUnit.module('RestrictedDialogForm#handleSubmit', {
 })
 
 test('calls save on the model with only hidden if calendarOption is false', function() {
-  const stubbedSave = this.spy(this.restrictedDialogForm.props.models[0], 'save')
+  const stubbedSave = sandbox.spy(this.restrictedDialogForm.props.models[0], 'save')
   Simulate.submit(this.restrictedDialogForm.refs.dialogForm.getDOMNode())
   ok(
     stubbedSave.calledWithMatch({}, {attrs: {hidden: true}}),
@@ -103,7 +103,7 @@ test(
     const endDate = new Date(2016, 5, 4)
     $(refs.restrictedSelection.refs.unlock_at.getDOMNode()).data('unfudged-date', startDate)
     $(refs.restrictedSelection.refs.lock_at.getDOMNode()).data('unfudged-date', endDate)
-    const stubbedSave = this.spy(this.restrictedDialogForm.props.models[0], 'save')
+    const stubbedSave = sandbox.spy(this.restrictedDialogForm.props.models[0], 'save')
     Simulate.submit(refs.dialogForm.getDOMNode())
     ok(
       stubbedSave.calledWithMatch(
@@ -129,7 +129,7 @@ test('accepts blank unlock_at date', function() {
   const endDate = new Date(2016, 5, 4)
   $(refs.restrictedSelection.refs.unlock_at.getDOMNode()).data('unfudged-date', null)
   $(refs.restrictedSelection.refs.lock_at.getDOMNode()).data('unfudged-date', endDate)
-  const stubbedSave = this.spy(this.restrictedDialogForm.props.models[0], 'save')
+  const stubbedSave = sandbox.spy(this.restrictedDialogForm.props.models[0], 'save')
   Simulate.submit(refs.dialogForm.getDOMNode())
   ok(
     stubbedSave.calledWithMatch(
@@ -154,7 +154,7 @@ test('accepts blank lock_at date', function() {
   const startDate = new Date(2016, 5, 4)
   $(refs.restrictedSelection.refs.unlock_at.getDOMNode()).data('unfudged-date', startDate)
   $(refs.restrictedSelection.refs.lock_at.getDOMNode()).data('unfudged-date', null)
-  const stubbedSave = this.spy(this.restrictedDialogForm.props.models[0], 'save')
+  const stubbedSave = sandbox.spy(this.restrictedDialogForm.props.models[0], 'save')
   Simulate.submit(refs.dialogForm.getDOMNode())
   ok(
     stubbedSave.calledWithMatch(
@@ -180,7 +180,7 @@ test('rejects unlock_at date after lock_at date', function() {
   const endDate = new Date(2016, 5, 1)
   $(refs.restrictedSelection.refs.unlock_at.getDOMNode()).data('unfudged-date', startDate)
   $(refs.restrictedSelection.refs.lock_at.getDOMNode()).data('unfudged-date', endDate)
-  const stubbedSave = this.spy(this.restrictedDialogForm.props.models[0], 'save')
+  const stubbedSave = sandbox.spy(this.restrictedDialogForm.props.models[0], 'save')
   Simulate.submit(refs.dialogForm.getDOMNode())
   equal(stubbedSave.callCount, 0)
 })

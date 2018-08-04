@@ -23,47 +23,36 @@ describe "Individual View Gradebook" do
   include_context 'in-process server selenium tests'
   include GradebookCommon
 
-  before(:each) do
+  before(:once) do
     # create a course with a teacher
-    course_with_teacher(course_name: 'Course1', active_all: true)
+    @teacher1 = course_with_teacher(course_name: 'Course1', active_all: true).user
+
+    # enroll a second teacher
+    @teacher2 = course_with_teacher(course: @course, name: 'Teacher2', active_all: true).user
 
     # enroll two students
-    @student1 = User.create!(name: 'Student1')
-    @student1.register!
-    @course.enroll_student(@student1, enrollment_state: 'active')
-
-    @student2 = User.create!(name: 'Student2')
-    @student2.register!
-    @course.enroll_student(@student2, enrollment_state: 'active')
+    @student1 = course_with_student(course: @course, name: 'Student1', active_all: true).user
+    @student2 = course_with_student(course: @course, name: 'Student2', active_all: true).user
   end
 
   context 'with a moderated assignment' do
-    before(:each) do
-      # enroll a second teacher
-      @teacher2 = User.create!(name: 'Teacher2')
-      @teacher2.register!
-      @course.enroll_teacher(@teacher2, enrollment_state: 'active')
-
+    before(:once) do
       # create moderated assignment
       @moderated_assignment = @course.assignments.create!(
         title: 'Moderated Assignment1',
         grader_count: 2,
-        final_grader_id: @teacher.id,
+        final_grader_id: @teacher1.id,
         grading_type: 'points',
         points_possible: 15,
         submission_types: 'online_text_entry',
         moderated_grading: true
       )
 
-      # enroll a student
-      @student1 = User.create!(name: 'Student1')
-      @student1.register!
-      @course.enroll_student(@student1, enrollment_state: 'active')
-
       # give a grade as non-final grader
-      @student1_submission = @moderated_assignment.submit_homework(@student1, :body => 'student 1 submission moderated assignment')
       @student1_submission = @moderated_assignment.grade_student(@student1, grade: 13, grader: @teacher2, provisional: true).first
+    end
 
+    before(:each) do
       # switch session to non-final-grader
       user_session(@teacher2)
     end
@@ -78,17 +67,6 @@ describe "Individual View Gradebook" do
       expect(SRGB.assignment_muted_checkbox.attribute('disabled')).to eq 'true'
     end
 
-    it 'allows unmuting the assignment after grades are posted', priority: '2', test_id: 3504343 do
-      @moderated_assignment.update!(grades_published_at: Time.zone.now)
-
-      SRGB.visit(@course.id)
-      SRGB.select_assignment(@moderated_assignment)
-      wait_for_ajaximations
-      scroll_into_view('#assignment_muted_check')
-
-      expect(SRGB.assignment_muted_checkbox.attribute('disabled')).to be nil
-    end
-
     it 'prevents grading for the assignment before grades are posted', priority: '2', test_id: 3505171 do
       SRGB.visit(@course.id)
       SRGB.select_student(@student1)
@@ -97,20 +75,35 @@ describe "Individual View Gradebook" do
 
       expect(SRGB.main_grade_input.attribute('disabled')).to eq 'true'
     end
+    context 'when grades are posted' do
+      before(:once) do
+        @moderated_assignment.update!(grades_published_at: Time.zone.now)
+      end
 
-    it 'allows grading for the assignment after grades are posted', priority: '2', test_id: 3505171 do
-      @moderated_assignment.update!(grades_published_at: Time.zone.now)
-      SRGB.visit(@course.id)
-      SRGB.select_student(@student1)
-      SRGB.select_assignment(@moderated_assignment)
+      before(:each) do
+        SRGB.visit(@course.id)
+      end
 
-      SRGB.enter_grade('15')
-      expect(SRGB.current_grade).to eq '15'
+      it 'allows grading for the assignment', priority: '2', test_id: 3505171 do
+        SRGB.select_student(@student1)
+        SRGB.select_assignment(@moderated_assignment)
+
+        SRGB.enter_grade('15')
+        expect(SRGB.current_grade).to eq '15'
+      end
+
+      it 'allows unmuting the assignment', priority: '2', test_id: 3504343 do
+        SRGB.select_assignment(@moderated_assignment)
+        wait_for_ajaximations
+        scroll_into_view('#assignment_muted_check')
+
+        expect(SRGB.assignment_muted_checkbox.attribute('disabled')).to be nil
+      end
     end
   end
 
   context 'with an anonymous assignment' do
-    before(:each) do
+    before(:once) do
       # create a new anonymous assignment
       @anonymous_assignment = @course.assignments.create!(
         title: 'Anonymous Assignment',
@@ -127,8 +120,10 @@ describe "Individual View Gradebook" do
         points_possible: 10
       )
       @unmuted_anonymous_assignment.unmute!
+    end
 
-      user_session(@teacher)
+    before(:each) do
+      user_session(@teacher1)
       SRGB.visit(@course.id)
     end
 

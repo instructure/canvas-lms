@@ -8,8 +8,17 @@
   "all_items_loaded_aa256183": {
     "message": "Tout eleman yo chaje"
   },
+  "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
+    "message": "GEn yon erè ki fèt pandan tantativ pou rejte opòtinite a."
+  },
+  "announcement_fb4cb645": {
+    "message": "Anons"
+  },
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "Èske vrèman ou vle elemine eleman planifikatè sa a?"
+  },
+  "assignment_976578a8": {
+    "message": "Sesyon"
   },
   "assignmenttype_title_6612d008": {
     "message": "{ assignmentType } { title }."
@@ -31,6 +40,9 @@
   },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Kòmansman Istwa Tach ou yo"
+  },
+  "calendar_event_89aadc1c": {
+    "message": "Kalandriye Aktivite"
   },
   "canvas_planner_98ed106": {
     "message": "Planifikatè Canvas"
@@ -71,6 +83,12 @@
   "details_98a31b68": {
     "message": "Detay"
   },
+  "discussion_6719c51d": {
+    "message": "Diskisyon"
+  },
+  "dismiss_itemtitle_a9fae1b3": {
+    "message": "Rejte { itemTitle }"
+  },
   "dismiss_opportunityname_5995176f": {
     "message": "Rejte { opportunityName }"
   },
@@ -109,9 +127,6 @@
   },
   "feedback_6dcc1991": {
     "message": "Kòmantè"
-  },
-  "go_to_dashboard_card_view_10398ef6": {
-    "message": "Ale nan Tablo Afichaj Kat"
   },
   "graded_25cd3fcd": {
     "message": "Klase"
@@ -182,17 +197,20 @@
   "nothing_new_needs_attention_3ac548d4": {
     "message": "Pa gen anyen nouvo ki bezwen atansyon."
   },
-  "nothing_planned_today_next_item_loaded_5a199868": {
-    "message": "Pa gen anyen ki planifye pou jodi a. Pwochen eleman chaje"
-  },
   "nothing_planned_yet_8675ffe9": {
     "message": "Poko Gen Anyen Planifye"
+  },
+  "numpoints_points_8621a43b": {
+    "message": "{ numPoints } pwen"
   },
   "only_most_recent_grading_period_shown_f1ad6458": {
     "message": "*Peryòd notasyon ki pi resan an ki afiche sèlman."
   },
   "optional_add_course_ef0d70fc": {
     "message": "Opsyonèl: Ajoute Kou"
+  },
+  "page_50c4823d": {
+    "message": "Paj"
   },
   "points_bceb5005": {
     "message": "pwen"
@@ -205,6 +223,9 @@
   },
   "pts_699bd9aa": {
     "message": "pwen"
+  },
+  "quiz_e0dcce8f": {
+    "message": "Quiz"
   },
   "replies_4a8577c8": {
     "message": "Repons"
@@ -241,6 +262,9 @@
   },
   "to_do_1d554f36": {
     "message": "Pou Fè"
+  },
+  "to_do_items_loading_d1cdfcd5": {
+    "message": "Eleman Lis Tach yo ap Chaje"
   },
   "today_76e10f9c": {
     "message": "Jodi a"

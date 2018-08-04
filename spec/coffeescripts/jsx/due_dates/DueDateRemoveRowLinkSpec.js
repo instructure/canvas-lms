@@ -27,7 +27,7 @@ QUnit.module('DueDateRemoveRowLink', {
     const props = {
       handleClick() {}
     }
-    this.handleClick = this.stub(props, 'handleClick')
+    this.handleClick = sandbox.stub(props, 'handleClick')
     const DueDateRemoveRowLinkElement = <DueDateRemoveRowLink {...props} />
     this.DueDateRemoveRowLink = ReactDOM.render(
       DueDateRemoveRowLinkElement,

@@ -17,33 +17,19 @@
 
 PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
-    provider_state 'a student' do
-      set_up do
-        student = User.create!(name: 'student')
-        Pseudonym.create!(user: student, unique_id: 'testuser@instructure.com')
-        token = student.access_tokens.create!().full_token
-        provider_param :token, token
-      end
-    end
 
-    provider_state 'a teacher' do
-      set_up do
-        teacher = User.create!(name: 'teacher')
-        Pseudonym.create!(user: teacher, unique_id: 'testuser@instructure.com')
-        token = teacher.access_tokens.create!().full_token
-        provider_param :token, token
-
-      end
-    end
-
+    # Student ID: 5 || Name: Student1
     provider_state 'a student with a to do item' do
       set_up do
-        student = User.create!(name: 'student')
-        Pseudonym.create!(user: student, unique_id: 'testuser@instructure.com')
-        token = student.access_tokens.create!().full_token
-
+        student = Pact::Canvas.base_state.students.first
         planner_note_model(user: student)
-        provider_param :token, token
+      end
+    end
+
+    provider_state 'a teacher not in a course' do
+      set_up do
+        @teacher = user_factory(active_all: true, name: "Teacher2")
+        @teacher.pseudonyms.create!(unique_id: "Teacher2@instructure.com", password: 'password', password_confirmation: 'password')
       end
     end
   end

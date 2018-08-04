@@ -66,7 +66,7 @@ test("freshNode returns the given element if it's not on the dom", () => {
 QUnit.module('RichContentEditor - preloading', {
   setup() {
     fakeENV.setup()
-    this.stub(RCELoader, 'preload')
+    sandbox.stub(RCELoader, 'preload')
   },
   teardown() {
     fakeENV.teardown()
@@ -95,7 +95,7 @@ QUnit.module('RichContentEditor - loading editor', {
     fixtures.setup()
     this.$target = fixtures.create('<textarea id="myEditor" />')
     sinon.stub(RCELoader, 'loadOnTarget')
-    this.stub(Sidebar, 'show')
+    sandbox.stub(Sidebar, 'show')
   },
   teardown() {
     fakeENV.teardown()
@@ -163,7 +163,7 @@ test('hides resize handle when called', function() {
 })
 
 test('onFocus calls options.onFocus if exists', function() {
-  const options = {onFocus: this.spy()}
+  const options = {onFocus: sinon.spy()}
   RichContentEditor.loadNewEditor(this.$target, options)
   const {onFocus} = RCELoader.loadOnTarget.firstCall.args[1]
   const editor = {}

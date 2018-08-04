@@ -23,14 +23,14 @@ import IconArrowDownLine from '@instructure/ui-icons/lib/Line/IconArrowDown';
 
 
 it('renders', () => {
-  const wrapper = shallow(<StickyButton>I am a Sticky Button</StickyButton>);
+  const wrapper = shallow(<StickyButton id="sb">I am a Sticky Button</StickyButton>);
   expect(wrapper).toMatchSnapshot();
 });
 
 it('calls the onClick prop when clicked', () => {
   const fakeOnClick = jest.fn();
   const wrapper = shallow(
-    <StickyButton onClick={fakeOnClick}>
+    <StickyButton id="sb" onClick={fakeOnClick}>
       Click me
     </StickyButton>
   );
@@ -42,7 +42,7 @@ it('calls the onClick prop when clicked', () => {
 it('does not call the onClick prop when disabled', () => {
   const fakeOnClick = jest.fn();
   const wrapper = shallow(
-    <StickyButton onClick={fakeOnClick} disabled>
+    <StickyButton id="sb" onClick={fakeOnClick} disabled>
       Disabled button
     </StickyButton>
   );
@@ -56,7 +56,7 @@ it('does not call the onClick prop when disabled', () => {
 
 it('renders the correct up icon', () => {
   const wrapper = shallow(
-    <StickyButton direction="up">
+    <StickyButton id="sb" direction="up">
       Click me
     </StickyButton>
   );
@@ -65,7 +65,7 @@ it('renders the correct up icon', () => {
 
 it('renders the correct down icon', () => {
   const wrapper = shallow(
-    <StickyButton direction="down">
+    <StickyButton id="sb" direction="down">
       Click me
     </StickyButton>
   );
@@ -74,10 +74,20 @@ it('renders the correct down icon', () => {
 
 it('adds aria-hidden when specified', () => {
   const wrapper = shallow(
-    <StickyButton hidden>
+    <StickyButton id="sb" hidden>
       Click me
     </StickyButton>
   );
 
   expect(wrapper).toMatchSnapshot();
 });
+
+it('shows aria-describedby when a description is given', () => {
+  const wrapper = shallow(
+    <StickyButton id="sb" description="hello world">
+      Click me
+    </StickyButton>
+  );
+  expect(wrapper.find('button[aria-describedby="sb_desc"]')).toHaveLength(1);
+  expect(wrapper.find('#sb_desc')).toHaveLength(1);
+})

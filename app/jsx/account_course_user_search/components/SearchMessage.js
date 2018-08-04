@@ -17,7 +17,7 @@
  */
 
 import React, { Component } from 'react'
-import Pagination, {PaginationButton} from './CopyOfInstUIPaginationThatFixesPerfBug'
+import Pagination, {PaginationButton} from '@instructure/ui-pagination/lib/components/Pagination'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import { array, func, string, shape, oneOf } from 'prop-types'
 import I18n from 'i18n!account_course_user_search'

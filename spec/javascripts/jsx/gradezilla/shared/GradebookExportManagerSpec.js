@@ -207,7 +207,7 @@ define([
   });
 
   test('clears any new export and returns a rejected promise if no monitoring is possible', function () {
-    this.stub(GradebookExportManager.prototype, 'monitoringUrl').returns(undefined);
+    sandbox.stub(GradebookExportManager.prototype, 'monitoringUrl').returns(undefined);
     this.subject = new GradebookExportManager(exportingUrl, currentUserId);
 
     return this.subject.startExport().catch((reason) => {

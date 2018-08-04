@@ -84,6 +84,14 @@ QUnit.module('TotalGradeCellFormatter', function (hooks) {
     equal(renderCell().querySelector('.gradebook-tooltip').innerText.trim(), '82.35%');
   });
 
+  test('avoids floating point calculation issues when computing the percentage', function () {
+    grade.score = 946.65
+    grade.possible = 1000
+    const floatingPointResult = (grade.score / grade.possible) * 100
+    equal(floatingPointResult, 94.66499999999999)
+    equal(renderCell().querySelector('.gradebook-tooltip').innerText.trim(), '94.67%')
+  })
+
   test('renders a dash "-" in the tooltip when the grade has zero points possible', function () {
     grade.possible = 0;
     equal(renderCell().querySelector('.gradebook-tooltip').innerText, '-');

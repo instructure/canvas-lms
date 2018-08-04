@@ -20,7 +20,7 @@ import $ from 'jquery'
 import _ from 'underscore'
 import htmlEscape from './str/htmlEscape'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
-import waitForProcessing from 'jsx/gradebook/uploads/wait_for_processing'
+import {waitForProcessing} from 'jsx/gradezilla/uploads/wait_for_processing'
 import ProcessGradebookUpload from 'jsx/gradebook/uploads/process_gradebook_upload'
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
 import './vendor/slickgrid' /* global Slick */
@@ -328,7 +328,7 @@ import './jquery.templateData' /* fillTemplateData */
                       return sub.user_id == student.id && sub.assignment_id == val;
                     });
                     if (original_submission) {
-                      submission.original_grade = I18n.n(original_submission.score);
+                      submission.original_grade = original_submission.score !== '' ? I18n.n(original_submission.score) : '';
                     }
                   });
                 } else if (thing === 'student') {
@@ -339,7 +339,7 @@ import './jquery.templateData' /* fillTemplateData */
                       return sub.user_id == obj.id && sub.assignment_id == submission.assignment_id;
                     });
                     if (original_submission) {
-                      submission.original_grade = I18n.n(original_submission.score);
+                      submission.original_grade = original_submission.score !== '' ? I18n.n(original_submission.score) : '';
                     }
                   });
                 }

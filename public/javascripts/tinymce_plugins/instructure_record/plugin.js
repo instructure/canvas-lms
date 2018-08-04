@@ -18,12 +18,13 @@
 
 import tinymce from 'compiled/editor/stocktiny'
 import mediaEditorLoader from 'tinymce_plugins/instructure_record/mediaEditorLoader'
+import I18n from 'i18n!editor'
 
   tinymce.create('tinymce.plugins.InstructureRecord', {
     init : function(ed, url) {
       ed.addCommand('instructureRecord', mediaEditorLoader.insertEditor.bind(mediaEditorLoader, ed));
       ed.addButton('instructure_record', {
-        title: 'Record/Upload Media',
+        title: I18n.t('Record/Upload Media'),
         cmd: 'instructureRecord',
         icon: 'video icon-video'
       });

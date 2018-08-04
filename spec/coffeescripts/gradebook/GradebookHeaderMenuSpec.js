@@ -25,8 +25,8 @@ import CurveGradesDialog from 'compiled/shared/CurveGradesDialog'
 QUnit.module('GradebookHeaderMenu#menuPopupOpenHandler', {
   setup() {
     this.menuPopupOpenHandler = GradebookHeaderMenu.prototype.menuPopupOpenHandler
-    this.hideMenuActionsWithUnmetDependencies = this.stub()
-    this.disableUnavailableMenuActions = this.stub()
+    this.hideMenuActionsWithUnmetDependencies = sinon.stub()
+    this.disableUnavailableMenuActions = sinon.stub()
     this.menu = 'mockMenu'
   },
   teardown() {
@@ -267,8 +267,8 @@ QUnit.module('GradebookHeaderMenu#setDefaultGrade', {
     })
     this.setDefaultGrade = GradebookHeaderMenu.prototype.setDefaultGrade
     this.options = {assignment: {inClosedGradingPeriod: false}}
-    this.spy($, 'flashError')
-    this.dialogStub = this.stub(SetDefaultGradeDialog.prototype, 'show')
+    sandbox.spy($, 'flashError')
+    this.dialogStub = sandbox.stub(SetDefaultGradeDialog.prototype, 'show')
   },
   teardown() {
     fakeENV.teardown()
@@ -308,8 +308,8 @@ QUnit.module('GradebookHeaderMenu#curveGrades', {
     })
     this.curveGrades = GradebookHeaderMenu.prototype.curveGrades
     this.options = {assignment: {inClosedGradingPeriod: false}}
-    this.spy($, 'flashError')
-    this.dialogStub = this.stub(CurveGradesDialog.prototype, 'show')
+    sandbox.spy($, 'flashError')
+    this.dialogStub = sandbox.stub(CurveGradesDialog.prototype, 'show')
   },
   teardown() {
     fakeENV.teardown()

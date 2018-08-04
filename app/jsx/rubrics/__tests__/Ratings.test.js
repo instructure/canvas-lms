@@ -130,13 +130,15 @@ describe('The Ratings component', () => {
     })
   })
 
-  it('does not scale points if points possible is 0', () => {
 
-  })
+  const ratingComponent = (overrides) => (
+    // eslint-disable-next-line react/prop-types
+    <Rating {...props.tiers[0]} isSummary={false} assessing {...overrides} />
+  )
 
   it('is navigable and clickable when assessing', () => {
     const onClick = sinon.spy()
-    const wrapper = shallow(<Rating {...props.tiers[0]} assessing onClick={onClick} />)
+    const wrapper = shallow(ratingComponent({ onClick }))
     const div = wrapper.find('div').at(0)
     expect(div.prop('tabIndex')).toEqual(0)
     div.simulate('click')
@@ -145,7 +147,7 @@ describe('The Ratings component', () => {
 
   it('is not navigable or clickable when not assessing', () => {
     const onClick = sinon.spy()
-    const wrapper = shallow(<Rating {...props.tiers[0]} assessing={false} onClick={onClick} />)
+    const wrapper = shallow(ratingComponent({ assessing: false, onClick }))
     const div = wrapper.find('div').at(0)
     expect(div.prop('tabIndex')).toBeNull()
     expect(div.prop('role')).toBeNull()

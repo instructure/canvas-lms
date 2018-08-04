@@ -86,7 +86,7 @@ test('@options.rceOptions can extend the default RichContentEditor opts', () => 
 })
 
 test("createDone does not throw error when editButton doesn't exist", function() {
-  this.stub($.fn, 'click').callsArg(0)
+  sandbox.stub($.fn, 'click').callsArg(0)
   EditorToggle.prototype.createDone.call({
     options: {doneText: ''},
     display() {}
@@ -103,10 +103,10 @@ test('createTextArea returns element with unique id', () => {
 })
 
 test('replaceTextArea', function() {
-  this.stub(RichContentEditor, 'destroyRCE')
-  this.stub($.fn, 'insertBefore')
-  this.stub($.fn, 'remove')
-  this.stub($.fn, 'detach')
+  sandbox.stub(RichContentEditor, 'destroyRCE')
+  sandbox.stub($.fn, 'insertBefore')
+  sandbox.stub($.fn, 'remove')
+  sandbox.stub($.fn, 'detach')
 
   const textArea = $('<textarea/>')
   const et = {
@@ -140,11 +140,11 @@ test('edit', function() {
     trigger() {},
     options: {}
   }
-  this.stub(RichContentEditor, 'loadNewEditor')
-  this.stub(RichContentEditor, 'freshNode').returns(fresh)
-  this.stub($.fn, 'val')
-  this.stub($.fn, 'insertBefore')
-  this.stub($.fn, 'detach')
+  sandbox.stub(RichContentEditor, 'loadNewEditor')
+  sandbox.stub(RichContentEditor, 'freshNode').returns(fresh)
+  sandbox.stub($.fn, 'val')
+  sandbox.stub($.fn, 'insertBefore')
+  sandbox.stub($.fn, 'detach')
 
   EditorToggle.prototype.edit.call(et)
 

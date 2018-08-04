@@ -1,6 +1,10 @@
 #!/bin/bash 
 
 generic_consumer_version='0.15'
+sha=$(git rev-parse --short HEAD)
+version="$generic_consumer_version+$sha"
+
+echo Publishing version: $version
 
 set -e
 
@@ -11,12 +15,12 @@ if [ -f config/consul.yml ]; then # canvas is running in docker
     -u $PACT_BROKER_USERNAME \
     -p $PACT_BROKER_PASSWORD \
     -b https://inst-pact-broker.inseng.net \
-    -a $generic_consumer_version
+    -a $version
 else
   RAILS_ENV=test \
     bundle exec pact-broker publish pacts/generic_consumer-canvas_lms_api.json \
     -u $PACT_BROKER_USERNAME \
     -p $PACT_BROKER_PASSWORD \
     -b https://inst-pact-broker.inseng.net \
-    -a $generic_consumer_version
+    -a $version
 fi

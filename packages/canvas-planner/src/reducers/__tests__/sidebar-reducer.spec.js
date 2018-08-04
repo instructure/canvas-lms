@@ -89,13 +89,13 @@ it('records the loading range on SIDEBAR_ITEMS_LOADING', () => {
   expect(actual.range).toMatchObject(range);
 });
 
-it('sets loaded to true and loading to false on SIDEBAR_ALL_ITEMS_LOADED', () => {
+it('sets loaded to true and loading to false on SIDEBAR_ENOUGH_ITEMS_LOADED', () => {
   const initialState = getInitialState({
     loading: true,
     loaded: false,
   });
   const actual = reducer(initialState, {
-    type: 'SIDEBAR_ALL_ITEMS_LOADED'
+    type: 'SIDEBAR_ENOUGH_ITEMS_LOADED'
   });
   const expected = {
     loading: false,

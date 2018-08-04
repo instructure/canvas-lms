@@ -17,10 +17,10 @@
 #
 module Lti
   class JWKKeyPair
-    attr_reader :public_key, :private_key
+    attr_reader :public_key, :private_key, :alg, :use
     def to_jwk
       time = Time.now.utc.iso8601
-      private_key.to_jwk(kid: time)
+      private_key.to_jwk(kid: time, alg:alg, use:use)
     end
   end
 end

@@ -62,7 +62,7 @@ test('conditional content is hidden when disabled', () => {
 
 QUnit.module('WikiPageEditView:StudentPlanner', {
   setup() {
-    fakeENV.setup({student_planner_enabled: true})
+    fakeENV.setup({STUDENT_PLANNER_ENABLED: true})
   },
 
   teardown() {
@@ -240,7 +240,7 @@ const setupUnsavedChangesTest = function(test, attributes) {
     const model = this.wikiPage
     const {bodyInput} = this
     const {editorBox} = bodyInput
-    this.stub($.fn, 'editorBox').callsFake(function(options) {
+    sandbox.stub($.fn, 'editorBox').callsFake(function(options) {
       if (options === 'is_dirty') {
         return bodyInput.val() !== model.get('body')
       } else {
@@ -280,8 +280,8 @@ test('check for unsaved changes on model with data', function() {
 
 test('warn on cancel if unsaved changes', function() {
   setupUnsavedChangesTest(this, {title: 'nooo', body: 'blargh'})
-  this.spy(this.view, 'trigger')
-  this.stub(window, 'confirm')
+  sandbox.spy(this.view, 'trigger')
+  sandbox.stub(window, 'confirm')
   this.titleInput.val('mwhaha')
 
   window.confirm.returns(false)

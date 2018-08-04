@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from 'lodash'
+import { fillAssessment } from '../helpers'
 
 export const rubric = {
   "id": "7",
@@ -95,7 +96,7 @@ export const rubric = {
   ]
 }
 
-export const pointsAssessment = {
+const pointsAssessment = {
   "id": "2",
   "rubric_id": "7",
   "rubric_association_id": "8",
@@ -148,7 +149,7 @@ export const pointsAssessment = {
   }
 }
 
-export const freeFormAssessment = {
+const freeFormAssessment = {
   "id": "3",
   "rubric_id": "8",
   "rubric_association_id": "9",
@@ -211,6 +212,10 @@ export const rubrics = {
 }
 
 export const assessments = {
-  points: pointsAssessment,
-  freeForm: freeFormAssessment
+  points: fillAssessment(rubric, pointsAssessment),
+  freeForm: fillAssessment(rubrics.freeForm, freeFormAssessment),
+  server: {
+    points: pointsAssessment,
+    freeForm: freeFormAssessment
+  }
 }

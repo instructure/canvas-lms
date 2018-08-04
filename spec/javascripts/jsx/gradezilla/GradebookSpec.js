@@ -186,8 +186,8 @@ test('renders the StatusesModal', function () {
     gotSubmissions: $.Deferred(),
     gotCustomColumnData: $.Deferred()
   };
-  this.stub(DataLoader, 'loadGradebookData').returns(loaderPromises);
-  this.stub(Gradebook.prototype, 'renderActionMenu');
+  sandbox.stub(DataLoader, 'loadGradebookData').returns(loaderPromises);
+  sandbox.stub(Gradebook.prototype, 'renderActionMenu');
   const gradebook = createGradebook();
   [
     'renderViewOptionsMenu',
@@ -199,8 +199,8 @@ test('renders the StatusesModal', function () {
     'renderAnonymousSpeedGraderAlert',
     'updatePostGradesFeatureButton',
     'initPostGradesStore',
-  ].forEach(fn => this.stub(gradebook, fn));
-  const renderStatusesModalStub = this.stub(gradebook, 'renderStatusesModal');
+  ].forEach(fn => sandbox.stub(gradebook, fn));
+  const renderStatusesModalStub = sandbox.stub(gradebook, 'renderStatusesModal');
   gradebook.gridReady.reject();
   gradebook.initialize();
   loaderPromises.gotCustomColumns.resolve([]);
@@ -217,7 +217,7 @@ QUnit.module('Gradebook#gotCustomColumnDataChunk', {
       1101: { id: '1101', assignment_201: {}, assignment_202: {} },
       1102: { id: '1102', assignment_201: {} }
     };
-    this.stub(this.gradebook, 'invalidateRowsForStudentIds')
+    sandbox.stub(this.gradebook, 'invalidateRowsForStudentIds')
   }
 });
 
@@ -312,7 +312,7 @@ QUnit.module('Gradebook#initialize', {
       gotSubmissions: $.Deferred(),
       gotCustomColumnData: $.Deferred()
     };
-    this.stub(DataLoader, 'loadGradebookData').returns(this.loaderPromises);
+    sandbox.stub(DataLoader, 'loadGradebookData').returns(this.loaderPromises);
     $fixtures.innerHTML = `
       <div id="search-filter-container">
         <input type="text" />
@@ -403,7 +403,7 @@ test('builds rows when student ids are loaded', function () {
 test('stores context modules when loaded', function () {
   const contextModules = [{ id: '2601' }, { id: '2602' }];
   const gradebook = this.createInitializedGradebook({ context_modules_url: '/context-modules' });
-  this.stub(gradebook, 'renderViewOptionsMenu');
+  sandbox.stub(gradebook, 'renderViewOptionsMenu');
   this.loaderPromises.gotContextModules.resolve(contextModules);
   equal(gradebook.listContextModules(), contextModules);
 });
@@ -411,7 +411,7 @@ test('stores context modules when loaded', function () {
 test('sets context modules as loaded', function () {
   const contextModules = [{ id: '2601' }, { id: '2602' }];
   const gradebook = this.createInitializedGradebook({ context_modules_url: '/context-modules' });
-  this.stub(gradebook, 'renderViewOptionsMenu');
+  sandbox.stub(gradebook, 'renderViewOptionsMenu');
   this.loaderPromises.gotContextModules.resolve(contextModules);
   strictEqual(gradebook.contentLoadStates.contextModulesLoaded, true);
 });
@@ -419,7 +419,7 @@ test('sets context modules as loaded', function () {
 test('re-renders the view options menu after storing the loaded context modules', function () {
   const contextModules = [{ id: '2601' }, { id: '2602' }];
   const gradebook = this.createInitializedGradebook({ context_modules_url: '/context-modules' });
-  this.stub(gradebook, 'renderViewOptionsMenu').callsFake(() => {
+  sandbox.stub(gradebook, 'renderViewOptionsMenu').callsFake(() => {
     equal(gradebook.listContextModules(), contextModules);
   });
   this.loaderPromises.gotContextModules.resolve(contextModules);
@@ -433,14 +433,14 @@ test('updates students load state when loaded', function () {
 
 test('re-renders the column headers when students are loaded', function () {
   const gradebook = this.createInitializedGradebook();
-  this.stub(gradebook, 'updateColumnHeaders');
+  sandbox.stub(gradebook, 'updateColumnHeaders');
   this.loaderPromises.gotStudents.resolve();
   strictEqual(gradebook.updateColumnHeaders.callCount, 1);
 });
 
 test('re-renders the column headers after updating students load state', function () {
   const gradebook = this.createInitializedGradebook();
-  this.stub(gradebook, 'updateColumnHeaders').callsFake(() => {
+  sandbox.stub(gradebook, 'updateColumnHeaders').callsFake(() => {
     strictEqual(gradebook.contentLoadStates.studentsLoaded, true, 'students load state was already updated');
   });
   this.loaderPromises.gotStudents.resolve();
@@ -448,14 +448,14 @@ test('re-renders the column headers after updating students load state', functio
 
 test('re-renders the filters when students are loaded', function () {
   const gradebook = this.createInitializedGradebook();
-  this.stub(gradebook, 'renderFilters');
+  sandbox.stub(gradebook, 'renderFilters');
   this.loaderPromises.gotStudents.resolve();
   strictEqual(gradebook.renderFilters.callCount, 1);
 });
 
 test('re-renders the filters after updating students load state', function () {
   const gradebook = this.createInitializedGradebook();
-  this.stub(gradebook, 'renderFilters').callsFake(() => {
+  sandbox.stub(gradebook, 'renderFilters').callsFake(() => {
     strictEqual(gradebook.contentLoadStates.studentsLoaded, true, 'students load state was already updated');
   });
   this.loaderPromises.gotStudents.resolve();
@@ -469,14 +469,14 @@ test('updates submissions load state when loaded', function () {
 
 test('re-renders the column headers when submissions are loaded', function () {
   const gradebook = this.createInitializedGradebook();
-  this.stub(gradebook, 'updateColumnHeaders');
+  sandbox.stub(gradebook, 'updateColumnHeaders');
   this.loaderPromises.gotSubmissions.resolve();
   strictEqual(gradebook.updateColumnHeaders.callCount, 1);
 });
 
 test('re-renders the column headers after updating submissions load state', function () {
   const gradebook = this.createInitializedGradebook();
-  this.stub(gradebook, 'updateColumnHeaders').callsFake(() => {
+  sandbox.stub(gradebook, 'updateColumnHeaders').callsFake(() => {
     strictEqual(gradebook.contentLoadStates.submissionsLoaded, true, 'submissions load state was already updated');
   });
   this.loaderPromises.gotSubmissions.resolve();
@@ -484,14 +484,14 @@ test('re-renders the column headers after updating submissions load state', func
 
 test('re-renders the filters when submissions are loaded', function () {
   const gradebook = this.createInitializedGradebook();
-  this.stub(gradebook, 'renderFilters');
+  sandbox.stub(gradebook, 'renderFilters');
   this.loaderPromises.gotSubmissions.resolve();
   strictEqual(gradebook.renderFilters.callCount, 1);
 });
 
 test('re-renders the filters after updating submissions load state', function () {
   const gradebook = this.createInitializedGradebook();
-  this.stub(gradebook, 'renderFilters').callsFake(() => {
+  sandbox.stub(gradebook, 'renderFilters').callsFake(() => {
     strictEqual(gradebook.contentLoadStates.submissionsLoaded, true, 'submissions load state was already updated');
   });
   this.loaderPromises.gotSubmissions.resolve();
@@ -518,7 +518,7 @@ QUnit.module('Gradebook#reloadStudentData', {
       gotStudents: $.Deferred(),
       gotSubmissions: $.Deferred(),
     };
-    this.stub(DataLoader, 'loadGradebookData').returns(this.loaderPromises);
+    sandbox.stub(DataLoader, 'loadGradebookData').returns(this.loaderPromises);
     $fixtures.innerHTML = `
       <div id="search-filter-container">
         <input type="text" />
@@ -547,14 +547,14 @@ test('sets the submissions as not loaded', function () {
 
 test('re-renders the filters', function () {
   const gradebook = createGradebook();
-  this.stub(gradebook, 'renderFilters');
+  sandbox.stub(gradebook, 'renderFilters');
   gradebook.reloadStudentData();
   strictEqual(gradebook.renderFilters.callCount, 1);
 });
 
 test('re-renders the filters after students load status is updated', function () {
   const gradebook = createGradebook();
-  this.stub(gradebook, 'renderFilters').callsFake(() => {
+  sandbox.stub(gradebook, 'renderFilters').callsFake(() => {
     strictEqual(gradebook.contentLoadStates.studentsLoaded, false);
   });
   gradebook.reloadStudentData();
@@ -562,7 +562,7 @@ test('re-renders the filters after students load status is updated', function ()
 
 test('re-renders the filters after submissions load status is updated', function () {
   const gradebook = createGradebook();
-  this.stub(gradebook, 'renderFilters').callsFake(() => {
+  sandbox.stub(gradebook, 'renderFilters').callsFake(() => {
     strictEqual(gradebook.contentLoadStates.submissionsLoaded, false);
   });
   gradebook.reloadStudentData();
@@ -605,7 +605,7 @@ test('includes the students page callback when calling DataLoader.loadGradebookD
 test('includes students params when calling DataLoader.loadGradebookData', function () {
   const exampleStudentsParams = { example: true };
   const gradebook = createGradebook();
-  this.stub(gradebook, 'studentsParams').returns(exampleStudentsParams);
+  sandbox.stub(gradebook, 'studentsParams').returns(exampleStudentsParams);
   gradebook.reloadStudentData();
   const [options] = DataLoader.loadGradebookData.lastCall.args;
   equal(options.studentsParams, exampleStudentsParams);
@@ -687,7 +687,7 @@ test('requests data for hidden custom columns', function () {
 
 test('calls gotGradingPeriodAssignments after grading period assignments are loaded', function () {
   const gradebook = createGradebook({ grading_period_set: this.gradingPeriodSet })
-  this.stub(gradebook, 'gotGradingPeriodAssignments')
+  sandbox.stub(gradebook, 'gotGradingPeriodAssignments')
   gradebook.reloadStudentData({ getGradingPeriodAssignments: true })
   this.loaderPromises.gotGradingPeriodAssignments.resolve({ grading_period_assignments: {} })
   strictEqual(gradebook.gotGradingPeriodAssignments.callCount, 1)
@@ -695,7 +695,7 @@ test('calls gotGradingPeriodAssignments after grading period assignments are loa
 
 test('calls updateColumns after grading period assignments are loaded', function () {
   const gradebook = createGradebook({ grading_period_set: this.gradingPeriodSet })
-  this.stub(gradebook, 'updateColumns')
+  sandbox.stub(gradebook, 'updateColumns')
   gradebook.reloadStudentData({ getGradingPeriodAssignments: true })
   this.loaderPromises.gotGradingPeriodAssignments.resolve({ grading_period_assignments: {} })
   strictEqual(gradebook.updateColumns.callCount, 1)
@@ -711,7 +711,7 @@ test('calls the afterColumnsUpdated function (if it is supplied) when grading pe
 
 test('calls the afterColumnsUpdated function after columns are updated', function () {
   const gradebook = createGradebook({ grading_period_set: this.gradingPeriodSet })
-  this.stub(gradebook, 'updateColumns')
+  sandbox.stub(gradebook, 'updateColumns')
   const afterColumnsUpdated = sinon.stub()
   gradebook.reloadStudentData(true, afterColumnsUpdated)
   this.loaderPromises.gotGradingPeriodAssignments.resolve({ grading_period_assignments: {} })
@@ -752,7 +752,7 @@ test('updates students load state when loaded', function () {
 test('re-renders the column headers when students are loaded', function () {
   const gradebook = createGradebook();
   gradebook.reloadStudentData();
-  this.stub(gradebook, 'updateColumnHeaders');
+  sandbox.stub(gradebook, 'updateColumnHeaders');
   this.loaderPromises.gotStudents.resolve();
   strictEqual(gradebook.updateColumnHeaders.callCount, 1);
 });
@@ -760,7 +760,7 @@ test('re-renders the column headers when students are loaded', function () {
 test('re-renders the column headers after updating students load state', function () {
   const gradebook = createGradebook();
   gradebook.reloadStudentData();
-  this.stub(gradebook, 'updateColumnHeaders').callsFake(() => {
+  sandbox.stub(gradebook, 'updateColumnHeaders').callsFake(() => {
     strictEqual(gradebook.contentLoadStates.studentsLoaded, true, 'students load state was already updated');
   });
   this.loaderPromises.gotStudents.resolve();
@@ -769,7 +769,7 @@ test('re-renders the column headers after updating students load state', functio
 test('re-renders the filters when students are loaded', function () {
   const gradebook = createGradebook();
   gradebook.reloadStudentData();
-  this.stub(gradebook, 'renderFilters');
+  sandbox.stub(gradebook, 'renderFilters');
   this.loaderPromises.gotStudents.resolve();
   strictEqual(gradebook.renderFilters.callCount, 1);
 });
@@ -777,7 +777,7 @@ test('re-renders the filters when students are loaded', function () {
 test('re-renders the filters after updating students load state', function () {
   const gradebook = createGradebook();
   gradebook.reloadStudentData();
-  this.stub(gradebook, 'renderFilters').callsFake(() => {
+  sandbox.stub(gradebook, 'renderFilters').callsFake(() => {
     strictEqual(gradebook.contentLoadStates.studentsLoaded, true, 'students load state was already updated');
   });
   this.loaderPromises.gotStudents.resolve();
@@ -793,7 +793,7 @@ test('updates submissions load state when loaded', function () {
 test('re-renders the column headers when submissions are loaded', function () {
   const gradebook = createGradebook();
   gradebook.reloadStudentData();
-  this.stub(gradebook, 'updateColumnHeaders');
+  sandbox.stub(gradebook, 'updateColumnHeaders');
   this.loaderPromises.gotSubmissions.resolve();
   strictEqual(gradebook.updateColumnHeaders.callCount, 1);
 });
@@ -801,7 +801,7 @@ test('re-renders the column headers when submissions are loaded', function () {
 test('re-renders the column headers after updating submissions load state', function () {
   const gradebook = createGradebook();
   gradebook.reloadStudentData();
-  this.stub(gradebook, 'updateColumnHeaders').callsFake(() => {
+  sandbox.stub(gradebook, 'updateColumnHeaders').callsFake(() => {
     strictEqual(gradebook.contentLoadStates.submissionsLoaded, true, 'submissions load state was already updated');
   });
   this.loaderPromises.gotSubmissions.resolve();
@@ -810,7 +810,7 @@ test('re-renders the column headers after updating submissions load state', func
 test('re-renders the filters when submissions are loaded', function () {
   const gradebook = createGradebook();
   gradebook.reloadStudentData();
-  this.stub(gradebook, 'renderFilters');
+  sandbox.stub(gradebook, 'renderFilters');
   this.loaderPromises.gotSubmissions.resolve();
   strictEqual(gradebook.renderFilters.callCount, 1);
 });
@@ -818,7 +818,7 @@ test('re-renders the filters when submissions are loaded', function () {
 test('re-renders the filters after updating submissions load state', function () {
   const gradebook = createGradebook();
   gradebook.reloadStudentData();
-  this.stub(gradebook, 'renderFilters').callsFake(() => {
+  sandbox.stub(gradebook, 'renderFilters').callsFake(() => {
     strictEqual(gradebook.contentLoadStates.submissionsLoaded, true, 'submissions load state was already updated');
   });
   this.loaderPromises.gotSubmissions.resolve();
@@ -830,7 +830,7 @@ QUnit.module('Gradebook#gotChunkOfStudents', {
     this.gradebook = createGradebook();
     this.gradebook.courseContent.students.addUserStudents([placeholderStudent]);
     this.gradebook.gridData.rows.push(placeholderStudent);
-    this.stub(this.gradebook.gradebookGrid, 'render');
+    sandbox.stub(this.gradebook.gradebookGrid, 'render');
     this.students = [
       {
         id: '1101',
@@ -886,13 +886,13 @@ test('updates the row for each student', function () {
 
 test('builds rows when filtering with search', function () {
   this.gradebook.userFilterTerm = 'searching';
-  this.stub(this.gradebook, 'buildRows');
+  sandbox.stub(this.gradebook, 'buildRows');
   this.gradebook.gotChunkOfStudents(this.students);
   strictEqual(this.gradebook.buildRows.callCount, 1);
 });
 
 test('does not build rows when not filtering with search', function () {
-  this.stub(this.gradebook, 'buildRows');
+  sandbox.stub(this.gradebook, 'buildRows');
   this.gradebook.gotChunkOfStudents(this.students);
   strictEqual(this.gradebook.buildRows.callCount, 0);
 });
@@ -946,7 +946,7 @@ QUnit.module('Gradebook#calculateStudentGrade', {
 
 test('calculates grades using properties from the gradebook', function () {
   const gradebook = this.createGradebook();
-  this.stub(CourseGradeCalculator, 'calculate').returns(createGrades());
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(createGrades());
   gradebook.calculateStudentGrade({
     id: '101',
     loaded: true,
@@ -961,7 +961,7 @@ test('calculates grades using properties from the gradebook', function () {
 
 test('scopes effective due dates to the user', function () {
   const gradebook = this.createGradebook();
-  this.stub(CourseGradeCalculator, 'calculate').returns(createGrades());
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(createGrades());
   gradebook.calculateStudentGrade({
     id: '101',
     loaded: true,
@@ -979,7 +979,7 @@ test('calculates grades without grading period data when grading period set is n
   const gradebook = this.createGradebook({
     gradingPeriodSet: null
   });
-  this.stub(CourseGradeCalculator, 'calculate').returns(createGrades());
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(createGrades());
   gradebook.calculateStudentGrade({
     id: '101',
     loaded: true,
@@ -997,7 +997,7 @@ test('calculates grades without grading period data when effective due dates are
   const gradebook = this.createGradebook({
     effectiveDueDates: null
   });
-  this.stub(CourseGradeCalculator, 'calculate').returns(createGrades());
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(createGrades());
   gradebook.calculateStudentGrade({
     id: '101',
     loaded: true,
@@ -1015,7 +1015,7 @@ test('stores the current grade on the student when not including ungraded assign
   const gradebook = this.createGradebook({
     include_ungraded_assignments: false
   });
-  this.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades);
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades);
   const student = {
     id: '101',
     loaded: true,
@@ -1029,7 +1029,7 @@ test('stores the final grade on the student when including ungraded assignments'
   const gradebook = this.createGradebook({
     include_ungraded_assignments: true
   });
-  this.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades);
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades);
   const student = {
     id: '101',
     loaded: true,
@@ -1044,7 +1044,7 @@ test('stores the current grade from the selected grading period when not includi
     include_ungraded_assignments: false
   });
   gradebook.setFilterColumnsBySetting('gradingPeriodId', '701');
-  this.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades);
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades);
   const student = {
     id: '101',
     loaded: true,
@@ -1059,7 +1059,7 @@ test('stores the final grade from the selected grading period when including ung
     include_ungraded_assignments: true
   });
   gradebook.setFilterColumnsBySetting('gradingPeriodId', '701');
-  this.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades);
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades);
   const student = {
     id: '101',
     loaded: true,
@@ -1071,7 +1071,7 @@ test('stores the final grade from the selected grading period when including ung
 
 test('does not calculate when the student is not loaded', function () {
   const gradebook = this.createGradebook();
-  this.stub(CourseGradeCalculator, 'calculate').returns(createGrades());
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(createGrades());
   gradebook.calculateStudentGrade({
     id: '101',
     loaded: false,
@@ -1082,7 +1082,7 @@ test('does not calculate when the student is not loaded', function () {
 
 test('does not calculate when the student is not initialized', function () {
   const gradebook = this.createGradebook();
-  this.stub(CourseGradeCalculator, 'calculate').returns(createGrades());
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(createGrades());
   gradebook.calculateStudentGrade({
     id: '101',
     loaded: true,
@@ -1131,7 +1131,7 @@ test('returns 0 for a grade with an undefined score', function () {
 QUnit.module('Gradebook#localeSort');
 
 test('delegates to natcompare.strings', function () {
-  this.spy(natcompare, 'strings');
+  sandbox.spy(natcompare, 'strings');
   const gradebook = createGradebook();
   gradebook.localeSort('a', 'b');
   equal(natcompare.strings.callCount, 1);
@@ -1139,7 +1139,7 @@ test('delegates to natcompare.strings', function () {
 });
 
 test('substitutes falsy args with empty string', function () {
-  this.spy(natcompare, 'strings');
+  sandbox.spy(natcompare, 'strings');
   const gradebook = createGradebook();
   gradebook.localeSort(0, false);
   equal(natcompare.strings.callCount, 1);
@@ -1338,12 +1338,12 @@ QUnit.module('Gradebook#makeColumnSortFn', {
 
   setup () {
     this.gradebook = createGradebook();
-    this.stub(this.gradebook, 'wrapColumnSortFn');
-    this.stub(this.gradebook, 'compareAssignmentPositions');
-    this.stub(this.gradebook, 'compareAssignmentDueDates');
-    this.stub(this.gradebook, 'compareAssignmentNames');
-    this.stub(this.gradebook, 'compareAssignmentPointsPossible');
-    this.stub(this.gradebook, 'compareAssignmentModulePositions');
+    sandbox.stub(this.gradebook, 'wrapColumnSortFn');
+    sandbox.stub(this.gradebook, 'compareAssignmentPositions');
+    sandbox.stub(this.gradebook, 'compareAssignmentDueDates');
+    sandbox.stub(this.gradebook, 'compareAssignmentNames');
+    sandbox.stub(this.gradebook, 'compareAssignmentPointsPossible');
+    sandbox.stub(this.gradebook, 'compareAssignmentModulePositions');
   }
 });
 
@@ -1398,27 +1398,27 @@ test('wraps compareAssignmentModulePositions when called with a sortType of modu
 QUnit.module('Gradebook#wrapColumnSortFn');
 
 test('returns -1 if second argument is of type total_grade', function () {
-  const sortFn = createGradebook().wrapColumnSortFn(this.stub());
+  const sortFn = createGradebook().wrapColumnSortFn(sinon.stub());
   equal(sortFn({}, { type: 'total_grade' }), -1);
 });
 
 test('returns 1 if first argument is of type total_grade', function () {
-  const sortFn = createGradebook().wrapColumnSortFn(this.stub());
+  const sortFn = createGradebook().wrapColumnSortFn(sinon.stub());
   equal(sortFn({ type: 'total_grade' }, {}), 1);
 });
 
 test('returns -1 if second argument is an assignment_group and the first is not', function () {
-  const sortFn = createGradebook().wrapColumnSortFn(this.stub());
+  const sortFn = createGradebook().wrapColumnSortFn(sinon.stub());
   equal(sortFn({}, { type: 'assignment_group' }), -1);
 });
 
 test('returns 1 if first arg is an assignment_group and second arg is not', function () {
-  const sortFn = createGradebook().wrapColumnSortFn(this.stub());
+  const sortFn = createGradebook().wrapColumnSortFn(sinon.stub());
   equal(sortFn({type: 'assignment_group'}, {}), 1);
 });
 
 test('returns difference in object.positions if both args are assignement_groups', function () {
-  const sortFn = createGradebook().wrapColumnSortFn(this.stub());
+  const sortFn = createGradebook().wrapColumnSortFn(sinon.stub());
   const a = { type: 'assignment_group', object: { position: 10 }};
   const b = { type: 'assignment_group', object: { position: 5 }};
 
@@ -1426,14 +1426,14 @@ test('returns difference in object.positions if both args are assignement_groups
 });
 
 test('calls wrapped function when either column is not total_grade nor assignment_group', function () {
-  const wrappedFn = this.stub();
+  const wrappedFn = sinon.stub();
   const sortFn = createGradebook().wrapColumnSortFn(wrappedFn);
   sortFn({}, {});
   ok(wrappedFn.called);
 });
 
 test('calls wrapped function with arguments in given order when no direction is given', function () {
-  const wrappedFn = this.stub();
+  const wrappedFn = sinon.stub();
   const sortFn = createGradebook().wrapColumnSortFn(wrappedFn);
   const first = { field: 1 };
   const second = { field: 2 };
@@ -1446,7 +1446,7 @@ test('calls wrapped function with arguments in given order when no direction is 
 });
 
 test('calls wrapped function with arguments in given order when direction is ascending', function () {
-  const wrappedFn = this.stub();
+  const wrappedFn = sinon.stub();
   const sortFn = createGradebook().wrapColumnSortFn(wrappedFn, 'ascending');
   const first = { field: 1 };
   const second = { field: 2 };
@@ -1459,7 +1459,7 @@ test('calls wrapped function with arguments in given order when direction is asc
 });
 
 test('calls wrapped function with arguments in reverse order when direction is descending', function () {
-  const wrappedFn = this.stub();
+  const wrappedFn = sinon.stub();
   const sortFn = createGradebook().wrapColumnSortFn(wrappedFn, 'descending');
   const first = { field: 1 };
   const second = { field: 2 };
@@ -1523,7 +1523,7 @@ QUnit.module('Gradebook#makeCompareAssignmentCustomOrderFn');
 test('returns position difference if both are defined in the index', function () {
   const sortOrder = { customOrder: ['foo', 'bar'] };
   const gradeBook = createGradebook();
-  this.stub(gradeBook, 'compareAssignmentPositions');
+  sandbox.stub(gradeBook, 'compareAssignmentPositions');
   const sortFn = gradeBook.makeCompareAssignmentCustomOrderFn(sortOrder);
 
   const a = { id: 'foo' };
@@ -1534,7 +1534,7 @@ test('returns position difference if both are defined in the index', function ()
 test('returns -1 if the first arg is in the order and the second one is not', function () {
   const sortOrder = { customOrder: ['foo', 'bar'] };
   const gradeBook = createGradebook();
-  this.stub(gradeBook, 'compareAssignmentPositions');
+  sandbox.stub(gradeBook, 'compareAssignmentPositions');
   const sortFn = gradeBook.makeCompareAssignmentCustomOrderFn(sortOrder);
 
   const a = { id: 'foo' };
@@ -1545,7 +1545,7 @@ test('returns -1 if the first arg is in the order and the second one is not', fu
 test('returns 1 if the second arg is in the order and the first one is not', function () {
   const sortOrder = { customOrder: ['foo', 'bar'] };
   const gradeBook = createGradebook();
-  this.stub(gradeBook, 'compareAssignmentPositions');
+  sandbox.stub(gradeBook, 'compareAssignmentPositions');
   const sortFn = gradeBook.makeCompareAssignmentCustomOrderFn(sortOrder);
 
   const a = { id: 'NO' };
@@ -1556,7 +1556,7 @@ test('returns 1 if the second arg is in the order and the first one is not', fun
 test('calls wrapped compareAssignmentPositions otherwise', function () {
   const sortOrder = { customOrder: ['foo', 'bar'] };
   const gradeBook = createGradebook();
-  this.stub(gradeBook, 'compareAssignmentPositions');
+  sandbox.stub(gradeBook, 'compareAssignmentPositions');
   const sortFn = gradeBook.makeCompareAssignmentCustomOrderFn(sortOrder);
 
   const a = { id: 'taco' };
@@ -1568,7 +1568,7 @@ test('calls wrapped compareAssignmentPositions otherwise', function () {
 test('falls back to object id for the indexes if field is not in the map', function () {
   const sortOrder = { customOrder: ['5', '11'] };
   const gradeBook = createGradebook();
-  this.stub(gradeBook, 'compareAssignmentPositions');
+  sandbox.stub(gradeBook, 'compareAssignmentPositions');
   const sortFn = gradeBook.makeCompareAssignmentCustomOrderFn(sortOrder);
 
   const a = { id: 'NO', object: { id: 5 }};
@@ -1727,7 +1727,7 @@ QUnit.module('Gradebook#compareAssignmentModulePositions - when neither record h
     this.gradebook.setContextModules([
       { id: '1', name: 'Module 1', position: 1 },
     ]);
-    this.spy(this.gradebook, 'compareAssignmentPositions');
+    sinon.spy(this.gradebook, 'compareAssignmentPositions');
 
     this.firstRecord = {
       object: {
@@ -2309,27 +2309,27 @@ QUnit.module('Gradebook#studentsParams', {
 });
 
 test('enrollment_state includes "completed" when concluded filter is on', function () {
-  this.stub(this.gradebook, 'getEnrollmentFilters').returns({ concluded: true, inactive: false });
+  sandbox.stub(this.gradebook, 'getEnrollmentFilters').returns({ concluded: true, inactive: false });
   ok(this.gradebook.studentsParams().enrollment_state.includes('completed'));
 });
 
 test('enrollment_state excludes "completed" when concluded filter is off', function () {
-  this.stub(this.gradebook, 'getEnrollmentFilters').returns({ concluded: false, inactive: false });
+  sandbox.stub(this.gradebook, 'getEnrollmentFilters').returns({ concluded: false, inactive: false });
   notOk(this.gradebook.studentsParams().enrollment_state.includes('completed'));
 });
 
 test('enrollment_state includes "inactive" when inactive filter is on', function () {
-  this.stub(this.gradebook, 'getEnrollmentFilters').returns({ concluded: false, inactive: true });
+  sandbox.stub(this.gradebook, 'getEnrollmentFilters').returns({ concluded: false, inactive: true });
   ok(this.gradebook.studentsParams().enrollment_state.includes('inactive'));
 });
 
 test('enrollment_state excludes "inactive" when inactive filter is off', function () {
-  this.stub(this.gradebook, 'getEnrollmentFilters').returns({ concluded: false, inactive: false });
+  sandbox.stub(this.gradebook, 'getEnrollmentFilters').returns({ concluded: false, inactive: false });
   notOk(this.gradebook.studentsParams().enrollment_state.includes('inactive'));
 });
 
 test('enrollment_state includes "active" and "invited" by default', function () {
-  this.stub(this.gradebook, 'getEnrollmentFilters').returns({ concluded: false, inactive: false });
+  sandbox.stub(this.gradebook, 'getEnrollmentFilters').returns({ concluded: false, inactive: false });
   ok(this.gradebook.studentsParams().enrollment_state.includes('active'));
   ok(this.gradebook.studentsParams().enrollment_state.includes('invited'));
 });
@@ -2390,13 +2390,13 @@ QUnit.module('Gradebook#switchTotalDisplay', {
     });
     this.gradebook.gradebookGrid.gridSupport = {
       columns: {
-        updateColumnHeaders: this.stub()
+        updateColumnHeaders: sinon.stub()
       }
     }
 
-    this.stub(this.gradebook.gradebookGrid, 'invalidate');
+    sandbox.stub(this.gradebook.gradebookGrid, 'invalidate');
     // Stub this here so the AJAX calls in Dataloader don't get stubbed too
-    this.stub($, 'ajaxJSON');
+    sandbox.stub($, 'ajaxJSON');
   },
 
   teardown () {
@@ -2454,10 +2454,10 @@ QUnit.module('Gradebook#togglePointsOrPercentTotals', {
       show_total_grade_as_points: true,
       setting_update_url: 'http://settingUpdateUrl'
     });
-    this.stub(this.gradebook, 'switchTotalDisplay');
+    sandbox.stub(this.gradebook, 'switchTotalDisplay');
 
     // Stub this here so the AJAX calls in Dataloader don't get stubbed too
-    this.stub($, 'ajaxJSON');
+    sandbox.stub($, 'ajaxJSON');
   },
 
   teardown () {
@@ -2475,7 +2475,7 @@ test('when user is ignoring warnings, immediately toggles the total grade displa
 });
 
 test('when user is ignoring warnings and a callback is given, immediately invokes callback', function () {
-  const callback = this.stub();
+  const callback = sinon.stub();
   UserSettings.contextSet('warned_about_totals_display', true);
 
   this.gradebook.togglePointsOrPercentTotals(callback);
@@ -2494,7 +2494,7 @@ test('when user is not ignoring warnings, return a dialog', function () {
 });
 
 test('when user is not ignoring warnings, the dialog has a save property which is the switchTotalDisplay function', function () {
-  this.stub(UserSettings, 'contextGet').withArgs('warned_about_totals_display').returns(false);
+  sandbox.stub(UserSettings, 'contextGet').withArgs('warned_about_totals_display').returns(false);
   const dialog = this.gradebook.togglePointsOrPercentTotals();
 
   equal(dialog.options.save, this.gradebook.switchTotalDisplay);
@@ -2503,8 +2503,8 @@ test('when user is not ignoring warnings, the dialog has a save property which i
 });
 
 test('when user is not ignoring warnings, the dialog has a onClose property which is the callback function', function () {
-  const callback = this.stub();
-  this.stub(UserSettings, 'contextGet').withArgs('warned_about_totals_display').returns(false);
+  const callback = sinon.stub();
+  sandbox.stub(UserSettings, 'contextGet').withArgs('warned_about_totals_display').returns(false);
   const dialog = this.gradebook.togglePointsOrPercentTotals(callback);
 
   equal(dialog.options.onClose, callback);
@@ -2514,10 +2514,10 @@ test('when user is not ignoring warnings, the dialog has a onClose property whic
 
 QUnit.module('Gradebook#showNotesColumn', {
   setup () {
-    this.stub(DataLoader, 'getDataForColumn');
+    sandbox.stub(DataLoader, 'getDataForColumn');
     const teacherNotes = { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: true };
     this.gradebook = createGradebook({ teacher_notes: teacherNotes });
-    this.stub(this.gradebook, 'toggleNotesColumn');
+    sandbox.stub(this.gradebook, 'toggleNotesColumn');
   }
 });
 
@@ -2581,7 +2581,7 @@ test('disabled is false if the teacher notes column is not updating', function (
 
 test('onSelect calls createTeacherNotes if there are no teacher notes', function () {
   const gradebook = createGradebook({ teacher_notes: null });
-  this.stub(gradebook, 'createTeacherNotes');
+  sandbox.stub(gradebook, 'createTeacherNotes');
   const props = gradebook.getTeacherNotesViewOptionsMenuProps();
   props.onSelect();
   equal(gradebook.createTeacherNotes.callCount, 1);
@@ -2590,7 +2590,7 @@ test('onSelect calls createTeacherNotes if there are no teacher notes', function
 test('onSelect calls setTeacherNotesHidden with false if teacher notes are visible', function () {
   const teacherNotes = { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: true };
   const gradebook = createGradebook({ teacher_notes: teacherNotes });
-  this.stub(gradebook, 'setTeacherNotesHidden');
+  sandbox.stub(gradebook, 'setTeacherNotesHidden');
   const props = gradebook.getTeacherNotesViewOptionsMenuProps();
   props.onSelect();
   equal(gradebook.setTeacherNotesHidden.callCount, 1);
@@ -2600,7 +2600,7 @@ test('onSelect calls setTeacherNotesHidden with false if teacher notes are visib
 test('onSelect calls setTeacherNotesHidden with true if teacher notes are hidden', function () {
   const teacherNotes = { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false };
   const gradebook = createGradebook({ teacher_notes: teacherNotes });
-  this.stub(gradebook, 'setTeacherNotesHidden');
+  sandbox.stub(gradebook, 'setTeacherNotesHidden');
   const props = gradebook.getTeacherNotesViewOptionsMenuProps();
   props.onSelect();
   equal(gradebook.setTeacherNotesHidden.callCount, 1);
@@ -2642,7 +2642,7 @@ QUnit.module('Gradebook#getColumnSortSettingsViewOptionsMenuProps', {
 
   setup () {
     this.gradebook = createGradebook();
-    this.stub(this.gradebook, 'arrangeColumnsBy');
+    sandbox.stub(this.gradebook, 'arrangeColumnsBy');
   }
 });
 
@@ -2767,9 +2767,9 @@ QUnit.module('Gradebook#getFilterSettingsViewOptionsMenuProps', {
     this.gradebook.gradingPeriodSet = { id: '1501' };
     this.gradebook.setContextModules([{ id: '2601' }, { id: '2602' }]);
     this.gradebook.sections_enabled = true;
-    this.stub(this.gradebook, 'renderViewOptionsMenu');
-    this.stub(this.gradebook, 'renderFilters');
-    this.stub(this.gradebook, 'saveSettings');
+    sandbox.stub(this.gradebook, 'renderViewOptionsMenu');
+    sandbox.stub(this.gradebook, 'renderFilters');
+    sandbox.stub(this.gradebook, 'saveSettings');
   }
 });
 
@@ -2849,8 +2849,8 @@ QUnit.module('Gradebook#getViewOptionsMenuProps', {
     this.gradebook = createGradebook();
     this.teacherNotesProps = { propsFor: 'teacherNotes' };
     this.columnSortSettingProps = { propsFor: 'columnSortSettings' };
-    this.stub(this.gradebook, 'getTeacherNotesViewOptionsMenuProps').returns(this.teacherNotesProps);
-    this.stub(this.gradebook, 'getColumnSortSettingsViewOptionsMenuProps').returns(this.columnSortSettingProps);
+    sandbox.stub(this.gradebook, 'getTeacherNotesViewOptionsMenuProps').returns(this.teacherNotesProps);
+    sandbox.stub(this.gradebook, 'getColumnSortSettingsViewOptionsMenuProps').returns(this.columnSortSettingProps);
 
     this.props = this.gradebook.getViewOptionsMenuProps();
   }
@@ -2884,10 +2884,10 @@ QUnit.module('Gradebook#createTeacherNotes', {
         return this;
       }
     };
-    this.stub(GradebookApi, 'createTeacherNotesColumn').returns(this.promise);
+    sandbox.stub(GradebookApi, 'createTeacherNotesColumn').returns(this.promise);
     this.gradebook = createGradebook({ context_id: '1201' });
-    this.stub(this.gradebook, 'showNotesColumn');
-    this.stub(this.gradebook, 'renderViewOptionsMenu');
+    sandbox.stub(this.gradebook, 'showNotesColumn');
+    sandbox.stub(this.gradebook, 'renderViewOptionsMenu');
   }
 });
 
@@ -2943,7 +2943,7 @@ test('re-renders the view options menu after request resolves', function () {
 });
 
 test('displays a flash error after request rejects', function () {
-  this.stub($, 'flashError');
+  sandbox.stub($, 'flashError');
   this.gradebook.createTeacherNotes();
   this.promise.catchFn(new Error('FAIL'));
   equal($.flashError.callCount, 1);
@@ -2974,7 +2974,7 @@ QUnit.module('Gradebook#setTeacherNotesHidden - showing teacher notes', {
         return this;
       }
     };
-    this.stub(GradebookApi, 'updateTeacherNotesColumn').returns(this.promise);
+    sandbox.stub(GradebookApi, 'updateTeacherNotesColumn').returns(this.promise);
     this.gradebook = createGradebook({ context_id: '1201' });
     this.gradebook.gradebookContent.customColumns = [
       { id: '2401', teacher_notes: true, hidden: true, title: 'Notes' },
@@ -2993,9 +2993,9 @@ QUnit.module('Gradebook#setTeacherNotesHidden - showing teacher notes', {
       setColumns () {},
       setNumberOfColumnsToFreeze () {}
     };
-    this.stub(DataLoader, 'getDataForColumn');
-    this.stub(this.gradebook, 'reorderCustomColumns');
-    this.stub(this.gradebook, 'renderViewOptionsMenu');
+    sandbox.stub(DataLoader, 'getDataForColumn');
+    sandbox.stub(this.gradebook, 'reorderCustomColumns');
+    sandbox.stub(this.gradebook, 'renderViewOptionsMenu');
   }
 });
 
@@ -3054,7 +3054,7 @@ test('re-renders the view options menu after request resolves', function () {
 });
 
 test('displays a flash message after request rejects', function () {
-  this.stub($, 'flashError');
+  sandbox.stub($, 'flashError');
   this.gradebook.setTeacherNotesHidden(false);
   this.promise.catchFn(new Error('FAIL'));
   equal($.flashError.callCount, 1);
@@ -3085,7 +3085,7 @@ QUnit.module('Gradebook#setTeacherNotesHidden - hiding teacher notes', {
         return this;
       }
     };
-    this.stub(GradebookApi, 'updateTeacherNotesColumn').returns(this.promise);
+    sandbox.stub(GradebookApi, 'updateTeacherNotesColumn').returns(this.promise);
     this.gradebook = createGradebook({
       context_id: '1201',
       teacher_notes: { id: '2401', teacher_notes: true, hidden: false }
@@ -3103,7 +3103,7 @@ QUnit.module('Gradebook#setTeacherNotesHidden - hiding teacher notes', {
       setColumns () {},
       setNumberOfColumnsToFreeze () {}
     };
-    this.stub(this.gradebook, 'renderViewOptionsMenu');
+    sandbox.stub(this.gradebook, 'renderViewOptionsMenu');
   }
 });
 
@@ -3148,7 +3148,7 @@ test('re-renders the view options menu after request resolves', function () {
 });
 
 test('displays a flash message after request rejects', function () {
-  this.stub($, 'flashError');
+  sandbox.stub($, 'flashError');
   this.gradebook.setTeacherNotesHidden(true);
   this.promise.catchFn(new Error('FAIL'));
   equal($.flashError.callCount, 1);
@@ -3267,11 +3267,11 @@ QUnit.module('Gradebook#updateCurrentSection', {
 
     this.gradebook = createGradebook({ settings_update_url: '/settingUrl' })
     this.gradebook.postGradesStore = {
-      setSelectedSection: this.stub()
+      setSelectedSection: sinon.stub()
     };
-    this.stub(this.gradebook, 'reloadStudentData');
-    this.spy(this.gradebook, 'saveSettings')
-    this.stub(this.gradebook, 'updateSectionFilterVisibility');
+    sandbox.stub(this.gradebook, 'reloadStudentData');
+    sinon.spy(this.gradebook, 'saveSettings')
+    sandbox.stub(this.gradebook, 'updateSectionFilterVisibility');
   },
 
   teardown () {
@@ -3550,8 +3550,8 @@ QUnit.module('setupGrading', {
   setup () {
     this.gradebook = createGradebook();
     this.students = [{ id: '1101' }, { id: '1102' }];
-    this.stub(this.gradebook, 'setAssignmentVisibility');
-    this.stub(this.gradebook, 'invalidateRowsForStudentIds');
+    sandbox.stub(this.gradebook, 'setAssignmentVisibility');
+    sandbox.stub(this.gradebook, 'invalidateRowsForStudentIds');
   }
 });
 
@@ -3588,7 +3588,7 @@ test('initializes a new submission state map', function () {
 
 test('calls setupGrading', function () {
   const gradebook = createGradebook();
-  this.spy(gradebook, 'setupGrading');
+  sinon.spy(gradebook, 'setupGrading');
   gradebook.resetGrading();
   strictEqual(gradebook.setupGrading.callCount, 1);
 });
@@ -3596,8 +3596,8 @@ test('calls setupGrading', function () {
 test('sends all students when calling setupGrading', function () {
   const allStudents = [{ id: '1101', assignment_201: {}, assignment_202: {} }];
   const gradebook = createGradebook();
-  this.stub(gradebook.courseContent.students, 'listStudents').returns(allStudents);
-  this.spy(gradebook, 'setupGrading');
+  sandbox.stub(gradebook.courseContent.students, 'listStudents').returns(allStudents);
+  sinon.spy(gradebook, 'setupGrading');
   gradebook.resetGrading();
   const [students] = gradebook.setupGrading.lastCall.args;
   strictEqual(students, allStudents);
@@ -3655,7 +3655,7 @@ QUnit.module('Gradebook#updateStudentRow', {
   setup () {
     this.gradebook = createGradebook();
     this.gradebook.gridData.rows = [{ id: '1101' }, { id: '1102' }, { id: '1103' }];
-    this.stub(this.gradebook.gradebookGrid, 'invalidateRow');
+    sandbox.stub(this.gradebook.gradebookGrid, 'invalidateRow');
   }
 });
 
@@ -3824,10 +3824,10 @@ QUnit.module('sortByAssignmentColumn', {
     this.gradebook = createGradebook();
     this.studentA = { name: 'Adam Jones' };
     this.studentB = { name: 'Betty Ford' };
-    this.stub(this.gradebook, 'sortRowsBy').callsFake(sortFn => sortFn(this.studentA, this.studentB));
-    this.stub(this.gradebook, 'gradeSort');
-    this.stub(this.gradebook, 'missingSort');
-    this.stub(this.gradebook, 'lateSort');
+    sandbox.stub(this.gradebook, 'sortRowsBy').callsFake(sortFn => sortFn(this.studentA, this.studentB));
+    sandbox.stub(this.gradebook, 'gradeSort');
+    sandbox.stub(this.gradebook, 'missingSort');
+    sandbox.stub(this.gradebook, 'lateSort');
   }
 });
 
@@ -3880,8 +3880,8 @@ QUnit.module('sortByAssignmentGroupColumn', {
     this.gradebook = createGradebook();
     this.studentA = { name: 'Adam Jones' };
     this.studentB = { name: 'Betty Ford' };
-    this.stub(this.gradebook, 'sortRowsBy').callsFake(sortFn => sortFn(this.studentA, this.studentB));
-    this.stub(this.gradebook, 'gradeSort');
+    sandbox.stub(this.gradebook, 'sortRowsBy').callsFake(sortFn => sortFn(this.studentA, this.studentB));
+    sandbox.stub(this.gradebook, 'gradeSort');
   }
 });
 
@@ -3922,8 +3922,8 @@ QUnit.module('sortByTotalGradeColumn', {
     this.gradebook = createGradebook();
     this.studentA = { name: 'Adam Jones' };
     this.studentB = { name: 'Betty Ford' };
-    this.stub(this.gradebook, 'sortRowsBy').callsFake(sortFn => sortFn(this.studentA, this.studentB));
-    this.stub(this.gradebook, 'gradeSort');
+    sandbox.stub(this.gradebook, 'sortRowsBy').callsFake(sortFn => sortFn(this.studentA, this.studentB));
+    sandbox.stub(this.gradebook, 'gradeSort');
   }
 });
 
@@ -3966,14 +3966,14 @@ QUnit.module('Gradebook#sortGridRows', {
 });
 
 test('sorts by the student column by default', function () {
-  this.stub(this.gradebook, 'sortByStudentColumn');
+  sandbox.stub(this.gradebook, 'sortByStudentColumn');
   this.gradebook.sortGridRows();
   equal(this.gradebook.sortByStudentColumn.callCount, 1);
 });
 
 test('uses the saved sort setting for student column sorting', function () {
   this.gradebook.setSortRowsBySetting('student_name', 'sortable_name', 'ascending');
-  this.stub(this.gradebook, 'sortByStudentColumn');
+  sandbox.stub(this.gradebook, 'sortByStudentColumn');
   this.gradebook.sortGridRows();
 
   const [settingKey, direction] = this.gradebook.sortByStudentColumn.getCall(0).args;
@@ -3983,14 +3983,14 @@ test('uses the saved sort setting for student column sorting', function () {
 
 test('optionally sorts by a custom column', function () {
   this.gradebook.setSortRowsBySetting('custom_col_501', null, 'ascending');
-  this.stub(this.gradebook, 'sortByCustomColumn');
+  sandbox.stub(this.gradebook, 'sortByCustomColumn');
   this.gradebook.sortGridRows();
   equal(this.gradebook.sortByCustomColumn.callCount, 1);
 });
 
 test('uses the saved sort setting for custom column sorting', function () {
   this.gradebook.setSortRowsBySetting('custom_col_501', null, 'ascending');
-  this.stub(this.gradebook, 'sortByCustomColumn');
+  sandbox.stub(this.gradebook, 'sortByCustomColumn');
   this.gradebook.sortGridRows();
 
   const [columnId, direction] = this.gradebook.sortByCustomColumn.getCall(0).args;
@@ -4000,14 +4000,14 @@ test('uses the saved sort setting for custom column sorting', function () {
 
 test('optionally sorts by an assignment column', function () {
   this.gradebook.setSortRowsBySetting('assignment_201', 'grade', 'ascending');
-  this.stub(this.gradebook, 'sortByAssignmentColumn');
+  sandbox.stub(this.gradebook, 'sortByAssignmentColumn');
   this.gradebook.sortGridRows();
   equal(this.gradebook.sortByAssignmentColumn.callCount, 1);
 });
 
 test('uses the saved sort setting for assignment sorting', function () {
   this.gradebook.setSortRowsBySetting('assignment_201', 'grade', 'ascending');
-  this.stub(this.gradebook, 'sortByAssignmentColumn');
+  sandbox.stub(this.gradebook, 'sortByAssignmentColumn');
   this.gradebook.sortGridRows();
 
   const [columnId, settingKey, direction] = this.gradebook.sortByAssignmentColumn.getCall(0).args;
@@ -4018,14 +4018,14 @@ test('uses the saved sort setting for assignment sorting', function () {
 
 test('optionally sorts by an assignment group column', function () {
   this.gradebook.setSortRowsBySetting('assignment_group_301', 'grade', 'ascending');
-  this.stub(this.gradebook, 'sortByAssignmentGroupColumn');
+  sandbox.stub(this.gradebook, 'sortByAssignmentGroupColumn');
   this.gradebook.sortGridRows();
   equal(this.gradebook.sortByAssignmentGroupColumn.callCount, 1);
 });
 
 test('uses the saved sort setting for assignment group sorting', function () {
   this.gradebook.setSortRowsBySetting('assignment_group_301', 'grade', 'ascending');
-  this.stub(this.gradebook, 'sortByAssignmentGroupColumn');
+  sandbox.stub(this.gradebook, 'sortByAssignmentGroupColumn');
   this.gradebook.sortGridRows();
 
   const [columnId, settingKey, direction] = this.gradebook.sortByAssignmentGroupColumn.getCall(0).args;
@@ -4036,14 +4036,14 @@ test('uses the saved sort setting for assignment group sorting', function () {
 
 test('optionally sorts by the total grade column', function () {
   this.gradebook.setSortRowsBySetting('total_grade', 'grade', 'ascending');
-  this.stub(this.gradebook, 'sortByTotalGradeColumn');
+  sandbox.stub(this.gradebook, 'sortByTotalGradeColumn');
   this.gradebook.sortGridRows();
   equal(this.gradebook.sortByTotalGradeColumn.callCount, 1);
 });
 
 test('uses the saved sort setting for total grade sorting', function () {
   this.gradebook.setSortRowsBySetting('total_grade', 'grade', 'ascending');
-  this.stub(this.gradebook, 'sortByTotalGradeColumn');
+  sandbox.stub(this.gradebook, 'sortByTotalGradeColumn');
   this.gradebook.sortGridRows();
 
   const [direction] = this.gradebook.sortByTotalGradeColumn.getCall(0).args;
@@ -4052,21 +4052,21 @@ test('uses the saved sort setting for total grade sorting', function () {
 
 test('optionally sorts by missing', function () {
   this.gradebook.setSortRowsBySetting('assignment_201', 'missing', 'ascending');
-  this.stub(this.gradebook, 'sortByAssignmentColumn');
+  sandbox.stub(this.gradebook, 'sortByAssignmentColumn');
   this.gradebook.sortGridRows();
   equal(this.gradebook.sortByAssignmentColumn.callCount, 1);
 });
 
 test('optionally sorts by late', function () {
   this.gradebook.setSortRowsBySetting('assignment_201', 'late', 'ascending');
-  this.stub(this.gradebook, 'sortByAssignmentColumn');
+  sandbox.stub(this.gradebook, 'sortByAssignmentColumn');
   this.gradebook.sortGridRows();
   equal(this.gradebook.sortByAssignmentColumn.callCount, 1);
 });
 
 test('updates the column headers after sorting', function () {
-  this.stub(this.gradebook, 'sortByStudentColumn');
-  this.stub(this.gradebook, 'updateColumnHeaders').callsFake(() => {
+  sandbox.stub(this.gradebook, 'sortByStudentColumn');
+  sandbox.stub(this.gradebook, 'updateColumnHeaders').callsFake(() => {
     equal(this.gradebook.sortByStudentColumn.callCount, 1, 'sorting method was called first');
   });
   this.gradebook.sortGridRows();
@@ -4242,7 +4242,7 @@ QUnit.module('Gradebook Grid Events', function (suiteHooks) {
 
   test('sets focus on the student grades link when a "student" body cell becomes active', function () {
     const clock = sinon.useFakeTimers();
-    this.stub(this.gradebook.gradebookGrid.gridSupport.state, 'getActiveNode')
+    sandbox.stub(this.gradebook.gradebookGrid.gridSupport.state, 'getActiveNode')
       .returns($fixtures.querySelector('#example-gradebook-cell'));
     this.triggerEvent('onActiveLocationChanged', {}, { columnId: 'student', region: 'body' });
     clock.tick(0);
@@ -4254,7 +4254,7 @@ QUnit.module('Gradebook Grid Events', function (suiteHooks) {
     const clock = sinon.useFakeTimers();
     const previousActiveElement = document.activeElement;
     $fixtures.querySelector('#example-gradebook-cell').innerHTML = 'Student Name';
-    this.stub(this.gradebook.gradebookGrid.gridSupport.state, 'getActiveNode')
+    sandbox.stub(this.gradebook.gradebookGrid.gridSupport.state, 'getActiveNode')
       .returns($fixtures.querySelector('#example-gradebook-cell'));
     this.triggerEvent('onActiveLocationChanged', {}, { columnId: 'student', region: 'body' });
     clock.tick(0);
@@ -4622,7 +4622,7 @@ QUnit.module('Gradebook#updateColumnHeaders', {
     this.gradebook = createGradebook();
     this.gradebook.gradebookGrid.gridSupport = {
       columns: {
-        updateColumnHeaders: this.stub()
+        updateColumnHeaders: sinon.stub()
       }
     };
     this.gradebook.gradebookGrid.grid = {
@@ -4665,7 +4665,7 @@ QUnit.module('Gradebook#updateRowCellsForStudentIds', {
       { id: '1102' }
     ];
     this.gradebook.gradebookGrid.grid = {
-      updateCell: this.stub(),
+      updateCell: sinon.stub(),
       getColumns () { return columns },
     };
   }
@@ -4706,8 +4706,8 @@ QUnit.module('Gradebook#invalidateRowsForStudentIds', {
       { id: '1101' },
       { id: '1102' }
     ];
-    this.stub(this.gradebook.gradebookGrid, 'invalidateRow');
-    this.stub(this.gradebook.gradebookGrid, 'render');
+    sandbox.stub(this.gradebook.gradebookGrid, 'invalidateRow');
+    sandbox.stub(this.gradebook.gradebookGrid, 'render');
   }
 });
 
@@ -4925,7 +4925,7 @@ test('sets the "sort rows by" setting', function () {
 
 test('sorts the grid rows after updating the setting', function () {
   const gradebook = createGradebook();
-  this.stub(gradebook, 'sortGridRows').callsFake(() => {
+  sandbox.stub(gradebook, 'sortGridRows').callsFake(() => {
     const sortRowsBySetting = gradebook.getSortRowsBySetting();
     equal(sortRowsBySetting.columnId, 'assignment_201', 'sortRowsBySetting.columnId was set beforehand');
     equal(sortRowsBySetting.settingKey, 'grade', 'sortRowsBySetting.settingKey was set beforehand');
@@ -5187,11 +5187,11 @@ QUnit.module('Gradebook#toggleEnrollmentFilter', {
     this.gradebook = createGradebook();
     this.gradebook.gradebookGrid.gridSupport = {
       columns: {
-        updateColumnHeaders: this.stub()
+        updateColumnHeaders: sinon.stub()
       }
     };
-    this.stub(this.gradebook, 'reloadStudentData').returns({});
-    this.stub(this.gradebook, 'saveSettings').callsFake((_data, callback) => { callback() });
+    sandbox.stub(this.gradebook, 'reloadStudentData').returns({});
+    sandbox.stub(this.gradebook, 'saveSettings').callsFake((_data, callback) => { callback() });
   }
 });
 
@@ -5469,14 +5469,14 @@ QUnit.module('Gradebook#saveSettings', {
 test('calls ajaxJSON with the settings_update_url', function () {
   const options = { settings_update_url: 'http://someUrl/' };
   const gradebook = createGradebook({ ...options });
-  const ajaxJSONStub = this.stub($, 'ajaxJSON');
+  const ajaxJSONStub = sandbox.stub($, 'ajaxJSON');
   gradebook.saveSettings();
   equal(ajaxJSONStub.firstCall.args[0], options.settings_update_url);
 });
 
 test('calls ajaxJSON as a PUT request', function () {
   const gradebook = createGradebook();
-  const ajaxJSONStub = this.stub($, 'ajaxJSON');
+  const ajaxJSONStub = sandbox.stub($, 'ajaxJSON');
   gradebook.saveSettings();
   equal(ajaxJSONStub.firstCall.args[1], 'PUT');
 });
@@ -5522,7 +5522,7 @@ test('calls ajaxJSON with default gradebook_settings', function () {
       student_column_secondary_info: 'none',
     }
   });
-  const ajaxJSONStub = this.stub($, 'ajaxJSON');
+  const ajaxJSONStub = sandbox.stub($, 'ajaxJSON');
   gradebook.saveSettings();
   deepEqual(ajaxJSONStub.firstCall.args[2], { gradebook_settings: { ...expectedSettings }});
 });
@@ -5543,7 +5543,7 @@ test('ensures selected_view_options_filters is not empty in order to force the s
       student_column_secondary_info: 'none',
     }
   });
-  const ajaxJSONStub = this.stub($, 'ajaxJSON');
+  const ajaxJSONStub = sandbox.stub($, 'ajaxJSON');
   gradebook.saveSettings();
   const settings = ajaxJSONStub.firstCall.args[2];
   deepEqual(settings.gradebook_settings.selected_view_options_filters, ['']);
@@ -5565,7 +5565,7 @@ test('calls ajaxJSON with parameters', function () {
       show_unpublished_assignments: 'true'
     }
   });
-  const ajaxJSONStub = this.stub($, 'ajaxJSON');
+  const ajaxJSONStub = sandbox.stub($, 'ajaxJSON');
   gradebook.saveSettings({
     selected_view_options_filters: [],
     showConcludedEnrollments: false,
@@ -5617,7 +5617,7 @@ test('calls successFn when response is successful', function () {
   this.server.respondWith('POST', this.options.settings_update_url, [
     200, { 'Content-Type': 'application/json' }, '{}'
   ]);
-  const successFn = this.stub();
+  const successFn = sinon.stub();
   const gradebook = createGradebook(this.options);
   gradebook.saveSettings({}, successFn, null);
 
@@ -5630,7 +5630,7 @@ test('calls errorFn when response is not successful', function () {
   this.server.respondWith('POST', this.options.settings_update_url, [
     401, { 'Content-Type': 'application/json' }, '{}'
   ]);
-  const errorFn = this.stub();
+  const errorFn = sinon.stub();
   const gradebook = createGradebook(this.options);
   gradebook.saveSettings({}, null, errorFn);
 
@@ -5747,8 +5747,8 @@ QUnit.module('Gradebook#toggleUnpublishedAssignments');
 test('toggles showUnpublishedAssignments to true when currently false', function () {
   const gradebook = createGradebook();
   gradebook.showUnpublishedAssignments = false;
-  this.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu');
-  this.stub(gradebook, 'saveSettings');
+  sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+  sandbox.stub(gradebook, 'saveSettings');
   gradebook.toggleUnpublishedAssignments();
 
   strictEqual(gradebook.showUnpublishedAssignments, true);
@@ -5757,8 +5757,8 @@ test('toggles showUnpublishedAssignments to true when currently false', function
 test('toggles showUnpublishedAssignments to false when currently true', function () {
   const gradebook = createGradebook();
   gradebook.showUnpublishedAssignments = true;
-  this.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu');
-  this.stub(gradebook, 'saveSettings');
+  sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+  sandbox.stub(gradebook, 'saveSettings');
   gradebook.toggleUnpublishedAssignments();
 
   strictEqual(gradebook.showUnpublishedAssignments, false);
@@ -5767,10 +5767,10 @@ test('toggles showUnpublishedAssignments to false when currently true', function
 test('calls updateColumnsAndRenderViewOptionsMenu after toggling', function () {
   const gradebook = createGradebook();
   gradebook.showUnpublishedAssignments = true;
-  const stubFn = this.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu').callsFake(function () {
+  const stubFn = sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu').callsFake(function () {
     strictEqual(gradebook.showUnpublishedAssignments, false);
   });
-  this.stub(gradebook, 'saveSettings');
+  sandbox.stub(gradebook, 'saveSettings');
   gradebook.toggleUnpublishedAssignments();
 
   strictEqual(stubFn.callCount, 1);
@@ -5778,8 +5778,8 @@ test('calls updateColumnsAndRenderViewOptionsMenu after toggling', function () {
 
 test('calls saveSettings after updateColumnsAndRenderViewOptionsMenu', function () {
   const gradebook = createGradebook();
-  const updateColumnsAndRenderViewOptionsMenuStub = this.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu');
-  const saveSettingsStub = this.stub(gradebook, 'saveSettings');
+  const updateColumnsAndRenderViewOptionsMenuStub = sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+  const saveSettingsStub = sandbox.stub(gradebook, 'saveSettings');
   gradebook.toggleUnpublishedAssignments();
 
   sinon.assert.callOrder(updateColumnsAndRenderViewOptionsMenuStub, saveSettingsStub);
@@ -5788,8 +5788,8 @@ test('calls saveSettings after updateColumnsAndRenderViewOptionsMenu', function 
 test('calls saveSettings with showUnpublishedAssignments', function () {
   const gradebook = createGradebook();
   gradebook.showUnpublishedAssignments = true;
-  this.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu');
-  const saveSettingsStub = this.stub(gradebook, 'saveSettings');
+  sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+  const saveSettingsStub = sandbox.stub(gradebook, 'saveSettings');
   gradebook.toggleUnpublishedAssignments();
 
   const { showUnpublishedAssignments } = gradebook;
@@ -5805,8 +5805,8 @@ test('calls saveSettings successfully', function () {
 
   const gradebook = createGradebook({ options });
   gradebook.showUnpublishedAssignments = true;
-  this.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu');
-  const saveSettingsStub = this.spy(gradebook, 'saveSettings');
+  sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+  const saveSettingsStub = sinon.spy(gradebook, 'saveSettings');
   gradebook.toggleUnpublishedAssignments();
 
   strictEqual(saveSettingsStub.callCount, 1);
@@ -5822,7 +5822,7 @@ test('calls saveSettings and rollsback on failure', function () {
 
   const gradebook = createGradebook({ options });
   gradebook.showUnpublishedAssignments = true;
-  const stubFn = this.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+  const stubFn = sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu');
   stubFn.onFirstCall().callsFake(function () {
     strictEqual(gradebook.showUnpublishedAssignments, false);
   });
@@ -5839,8 +5839,8 @@ QUnit.module('Gradebook#renderViewOptionsMenu');
 test('passes showUnpublishedAssignments to props', function () {
   const gradebook = createGradebook();
   gradebook.showUnpublishedAssignments = true;
-  const createElementStub = this.stub(React, 'createElement');
-  this.stub(ReactDOM, 'render');
+  const createElementStub = sandbox.stub(React, 'createElement');
+  sandbox.stub(ReactDOM, 'render');
   gradebook.renderViewOptionsMenu();
 
   strictEqual(createElementStub.firstCall.args[1].showUnpublishedAssignments, gradebook.showUnpublishedAssignments);
@@ -5849,8 +5849,8 @@ test('passes showUnpublishedAssignments to props', function () {
 test('passes toggleUnpublishedAssignments as onSelectShowUnpublishedAssignments to props', function () {
   const gradebook = createGradebook();
   gradebook.toggleUnpublishedAssignments = () => {};
-  const createElementStub = this.stub(React, 'createElement');
-  this.stub(ReactDOM, 'render');
+  const createElementStub = sandbox.stub(React, 'createElement');
+  sandbox.stub(ReactDOM, 'render');
   gradebook.renderViewOptionsMenu();
 
   strictEqual(createElementStub.firstCall.args[1].toggleUnpublishedAssignments, gradebook.onSelectShowUnpublishedAssignments);
@@ -5871,13 +5871,13 @@ QUnit.module('Gradebook#updateSubmission', {
 });
 
 test('formats the grade for the submission', function () {
-  this.spy(GradeFormatHelper, 'formatGrade');
+  sandbox.spy(GradeFormatHelper, 'formatGrade');
   this.gradebook.updateSubmission(this.submission);
   equal(GradeFormatHelper.formatGrade.callCount, 1);
 });
 
 test('includes submission attributes when formatting the grade', function () {
-  this.spy(GradeFormatHelper, 'formatGrade');
+  sandbox.spy(GradeFormatHelper, 'formatGrade');
   this.gradebook.updateSubmission(this.submission);
   const [grade, options] = GradeFormatHelper.formatGrade.getCall(0).args;
   equal(grade, '123.45', 'parameter 1 is the submission grade');
@@ -5886,13 +5886,13 @@ test('includes submission attributes when formatting the grade', function () {
 });
 
 test('sets the formatted grade on submission', function () {
-  this.stub(GradeFormatHelper, 'formatGrade').returns('123.45%');
+  sandbox.stub(GradeFormatHelper, 'formatGrade').returns('123.45%');
   this.gradebook.updateSubmission(this.submission);
   equal(this.submission.grade, '123.45%');
 });
 
 test('sets the raw grade on submission', function () {
-  this.stub(GradeFormatHelper, 'formatGrade').returns('123.45%');
+  sandbox.stub(GradeFormatHelper, 'formatGrade').returns('123.45%');
   this.gradebook.updateSubmission(this.submission);
   equal(this.submission.rawGrade, '123.45');
 });
@@ -5916,8 +5916,8 @@ QUnit.module('Gradebook#arrangeColumnsBy', {
 });
 
 test('renders the view options menu', function () {
-  this.stub(this.gradebook, 'renderViewOptionsMenu');
-  this.stub(this.gradebook, 'updateColumnHeaders');
+  sandbox.stub(this.gradebook, 'renderViewOptionsMenu');
+  sandbox.stub(this.gradebook, 'updateColumnHeaders');
 
   this.gradebook.arrangeColumnsBy({ sortBy: 'due_date', direction: 'ascending' }, false);
 
@@ -5944,12 +5944,12 @@ QUnit.module('Gradebook#updateCurrentGradingPeriod', {
         selected_view_options_filters: ['gradingPeriods']
       }
     });
-    this.spy(this.gradebook, 'saveSettings');
-    this.stub(this.gradebook, 'resetGrading');
-    this.stub(this.gradebook, 'sortGridRows');
-    this.stub(this.gradebook, 'updateFilteredContentInfo');
-    this.stub(this.gradebook, 'updateColumnsAndRenderViewOptionsMenu');
-    this.stub(this.gradebook, 'renderActionMenu');
+    sinon.spy(this.gradebook, 'saveSettings');
+    sandbox.stub(this.gradebook, 'resetGrading');
+    sandbox.stub(this.gradebook, 'sortGridRows');
+    sandbox.stub(this.gradebook, 'updateFilteredContentInfo');
+    sandbox.stub(this.gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+    sandbox.stub(this.gradebook, 'renderActionMenu');
   },
 
   teardown () {
@@ -6028,10 +6028,10 @@ QUnit.module('Gradebook#updateCurrentModule', {
       { id: '2', name: 'Another Module', position: 2 },
       { id: '3', name: 'Module 2', position: 3 },
     ]);
-    this.spy(this.gradebook, 'setFilterColumnsBySetting');
-    this.spy($, 'ajaxJSON')
-    this.stub(this.gradebook, 'updateFilteredContentInfo');
-    this.stub(this.gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+    sinon.spy(this.gradebook, 'setFilterColumnsBySetting');
+    sandbox.spy($, 'ajaxJSON')
+    sandbox.stub(this.gradebook, 'updateFilteredContentInfo');
+    sandbox.stub(this.gradebook, 'updateColumnsAndRenderViewOptionsMenu');
   },
 
   teardown () {
@@ -6105,10 +6105,10 @@ QUnit.module('Gradebook#updateCurrentAssignmentGroup', {
       '1': { id: '1' },
       '2': { id: '2' }
     })
-    this.spy(this.gradebook, 'setFilterColumnsBySetting');
-    this.spy($, 'ajaxJSON')
-    this.stub(this.gradebook, 'updateFilteredContentInfo');
-    this.stub(this.gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+    sinon.spy(this.gradebook, 'setFilterColumnsBySetting');
+    sandbox.spy($, 'ajaxJSON')
+    sandbox.stub(this.gradebook, 'updateFilteredContentInfo');
+    sandbox.stub(this.gradebook, 'updateColumnsAndRenderViewOptionsMenu');
   },
 
   teardown () {
@@ -6188,7 +6188,7 @@ test('sets the submission state map .hasGradingPeriods to false when no grading 
 
 test('sets the submission state map .selectedGradingPeriodID to the "grading period to show"', function () {
   const gradebook = createGradebook();
-  this.stub(gradebook, 'getGradingPeriodToShow').returns('1401');
+  sandbox.stub(gradebook, 'getGradingPeriodToShow').returns('1401');
   gradebook.initSubmissionStateMap();
   strictEqual(gradebook.submissionStateMap.selectedGradingPeriodID, '1401');
 });
@@ -6231,7 +6231,7 @@ test('sets postGradesLtis to conform to ActionMenu.propTypes.postGradesLtis', fu
   gradebook.initPostGradesLtis();
   const props = gradebook.postGradesLtis;
 
-  this.spy(console, 'error');
+  sandbox.spy(console, 'error');
   PropTypes.checkPropTypes({postGradesLtis: ActionMenu.propTypes.postGradesLtis}, props, 'prop', 'ActionMenu');
   ok(console.error.notCalled); // eslint-disable-line no-console
 });
@@ -6568,11 +6568,11 @@ QUnit.module('Gradebook#setSelectedPrimaryInfo', {
     this.gradebook = createGradebook();
     this.gradebook.gradebookGrid.gridSupport = {
       columns: {
-        updateColumnHeaders: this.stub()
+        updateColumnHeaders: sinon.stub()
       }
     };
-    this.stub(this.gradebook, 'saveSettings');
-    this.stub(this.gradebook, 'buildRows');
+    sandbox.stub(this.gradebook, 'saveSettings');
+    sandbox.stub(this.gradebook, 'buildRows');
   }
 });
 
@@ -6611,11 +6611,11 @@ QUnit.module('Gradebook#setSelectedSecondaryInfo', {
     this.gradebook = createGradebook();
     this.gradebook.gradebookGrid.gridSupport = {
       columns: {
-        updateColumnHeaders: this.stub()
+        updateColumnHeaders: sinon.stub()
       }
     };
-    this.stub(this.gradebook, 'saveSettings');
-    this.stub(this.gradebook, 'buildRows');
+    sandbox.stub(this.gradebook, 'saveSettings');
+    sandbox.stub(this.gradebook, 'buildRows');
   }
 });
 
@@ -6652,8 +6652,8 @@ test('includes the "student" column id when updating column headers', function (
 QUnit.module('Gradebook#setSortRowsBySetting', {
   setup () {
     this.gradebook = createGradebook();
-    this.stub(this.gradebook, 'saveSettings');
-    this.stub(this.gradebook, 'sortGridRows');
+    sandbox.stub(this.gradebook, 'saveSettings');
+    sandbox.stub(this.gradebook, 'sortGridRows');
 
     this.gradebook.setSortRowsBySetting('assignment_1', 'grade', 'descending');
   }
@@ -6729,7 +6729,7 @@ QUnit.module('Gradebook#onGridBlur', {
     this.gradebook.gradebookGrid.gridSupport.state.setActiveLocation('body', { cell: 0, row: 0 });
     clock.restore();
 
-    this.spy(this.gradebook.gradebookGrid.gridSupport.state, 'blur');
+    sinon.spy(this.gradebook.gradebookGrid.gridSupport.state, 'blur');
   },
 
   teardown () {
@@ -6745,7 +6745,7 @@ test('closes grid details tray when open', function () {
 });
 
 test('does not close grid details tray when not open', function () {
-  const closeSubmissionTrayStub = this.stub(this.gradebook, 'closeSubmissionTray');
+  const closeSubmissionTrayStub = sandbox.stub(this.gradebook, 'closeSubmissionTray');
   this.gradebook.setSubmissionTrayState(false, '1101', '2301');
   this.gradebook.onGridBlur({ target: document.body });
   strictEqual(closeSubmissionTrayStub.callCount, 0);
@@ -6786,8 +6786,8 @@ QUnit.module('GridColor', {
 
 test('is rendered on init', function () {
   const gradebook = createGradebook();
-  const renderGridColorStub = this.stub(gradebook, 'renderGridColor');
-  this.stub(gradebook, 'onGridInit');
+  const renderGridColorStub = sandbox.stub(gradebook, 'renderGridColor');
+  sandbox.stub(gradebook, 'onGridInit');
   gradebook.initGrid();
   ok(renderGridColorStub.called);
 });
@@ -6835,15 +6835,15 @@ QUnit.module('Gradebook#updateSubmissionsFromExternal', {
       getSubmissionState () { return { locked: false } }
     };
     this.gradebook.gradebookGrid.grid = {
-      updateCell: this.stub(),
+      updateCell: sinon.stub(),
       getColumns () { return columns },
     };
     this.gradebook.gradebookGrid.gridSupport = {
       columns: {
-        updateColumnHeaders: this.stub()
+        updateColumnHeaders: sinon.stub()
       }
     };
-    this.stub(this.gradebook, 'updateSubmission');
+    sandbox.stub(this.gradebook, 'updateSubmission');
   }
 });
 
@@ -6852,7 +6852,7 @@ test('updates row cells', function () {
     { assignment_id: '201', user_id: '1101', score: 10, assignment_visible: true },
     { assignment_id: '201', user_id: '1102', score: 8, assignment_visible: true }
   ];
-  this.stub(this.gradebook, 'updateRowCellsForStudentIds');
+  sandbox.stub(this.gradebook, 'updateRowCellsForStudentIds');
   this.gradebook.updateSubmissionsFromExternal(submissions);
   strictEqual(this.gradebook.updateRowCellsForStudentIds.callCount, 1);
 });
@@ -6863,7 +6863,7 @@ test('updates row cells only once for each student', function () {
     { assignment_id: '202', user_id: '1101', score: 9, assignment_visible: true },
     { assignment_id: '201', user_id: '1102', score: 8, assignment_visible: true }
   ];
-  this.stub(this.gradebook, 'updateRowCellsForStudentIds');
+  sandbox.stub(this.gradebook, 'updateRowCellsForStudentIds');
   this.gradebook.updateSubmissionsFromExternal(submissions);
   const [studentIds] = this.gradebook.updateRowCellsForStudentIds.lastCall.args;
   deepEqual(studentIds, ['1101', '1102']);
@@ -6875,7 +6875,7 @@ test('ignores submissions for students not currently loaded', function () {
     { assignment_id: '201', user_id: '1103', score: 9, assignment_visible: true },
     { assignment_id: '201', user_id: '1102', score: 8, assignment_visible: true }
   ];
-  this.stub(this.gradebook, 'updateRowCellsForStudentIds');
+  sandbox.stub(this.gradebook, 'updateRowCellsForStudentIds');
   this.gradebook.updateSubmissionsFromExternal(submissions);
   const [studentIds] = this.gradebook.updateRowCellsForStudentIds.lastCall.args;
   deepEqual(studentIds, ['1101', '1102']);
@@ -7314,7 +7314,7 @@ test('shows a submission tray when the related submission has not loaded for the
 });
 
 test('calls getSubmissionTrayProps with the student', function () {
-  this.spy(this.gradebook, 'getSubmissionTrayProps');
+  sinon.spy(this.gradebook, 'getSubmissionTrayProps');
   this.gradebook.setSubmissionTrayState(true, '1101', '2301');
   this.gradebook.renderSubmissionTray(this.gradebook.student('1101'));
   deepEqual(this.gradebook.getSubmissionTrayProps.firstCall.args, [this.gradebook.student('1101')]);
@@ -7636,13 +7636,13 @@ QUnit.module('Gradebook#loadTrayStudent', function (hooks) {
 QUnit.module('Gradebook#updateRowAndRenderSubmissionTray', {
   setup () {
     this.gradebook = createGradebook();
-    this.stub(this.gradebook, 'updateRowCellsForStudentIds');
-    this.stub(this.gradebook, 'renderSubmissionTray');
+    sandbox.stub(this.gradebook, 'updateRowCellsForStudentIds');
+    sandbox.stub(this.gradebook, 'renderSubmissionTray');
   }
 });
 
 test('unloads comments for the submission', function () {
-  this.stub(this.gradebook, 'unloadSubmissionComments');
+  sandbox.stub(this.gradebook, 'unloadSubmissionComments');
   this.gradebook.updateRowAndRenderSubmissionTray('1');
 
   strictEqual(this.gradebook.unloadSubmissionComments.callCount, 1);
@@ -7671,7 +7671,7 @@ QUnit.module('Gradebook#toggleSubmissionTrayOpen', {
         focus () {}
       }
     };
-    this.stub(this.gradebook, 'updateRowAndRenderSubmissionTray');
+    sandbox.stub(this.gradebook, 'updateRowAndRenderSubmissionTray');
   }
 });
 
@@ -7710,7 +7710,7 @@ QUnit.module('Gradebook#closeSubmissionTray', {
       }
     };
     this.gradebook.setSubmissionTrayState(true, '1101', '2');
-    this.stub(this.gradebook, 'updateRowAndRenderSubmissionTray');
+    sandbox.stub(this.gradebook, 'updateRowAndRenderSubmissionTray');
   }
 });
 
@@ -7731,7 +7731,7 @@ test('calls updateRowAndRenderSubmissionTray with the student id for the active 
 });
 
 test('puts the active grid cell back into "editing" mode', function () {
-  this.stub(this.gradebook.gradebookGrid.gridSupport.helper, 'beginEdit');
+  sandbox.stub(this.gradebook.gradebookGrid.gridSupport.helper, 'beginEdit');
   this.gradebook.closeSubmissionTray();
   strictEqual(this.gradebook.gradebookGrid.gridSupport.helper.beginEdit.callCount, 1);
 });
@@ -7741,8 +7741,8 @@ QUnit.module('Gradebook#setSubmissionTrayState', {
     this.gradebook = createGradebook();
     this.gradebook.gradebookGrid.gridSupport = {
       helper: {
-        commitCurrentEdit: this.stub(),
-        focus: this.stub()
+        commitCurrentEdit: sinon.stub(),
+        focus: sinon.stub()
       }
     };
   }
@@ -7911,7 +7911,7 @@ QUnit.module('Gradebook#applyLatePolicy', {
     this.gradingStandard = [['A', 0]];
     this.gradebook = createGradebook({ grading_standard: this.gradingStandard });
     this.gradebook.gradingPeriodSet = { gradingPeriods: [{ id: 100, isClosed: true }, { id: 101, isClosed: false }] };
-    this.latePolicyApplicator = this.stub(LatePolicyApplicator, 'processSubmission').returns(true);
+    this.latePolicyApplicator = sandbox.stub(LatePolicyApplicator, 'processSubmission').returns(true);
 
     this.submission1 = {
       user_id: 10,
@@ -8524,13 +8524,13 @@ QUnit.module('Gradebook#updateSubmissionAndRenderSubmissionTray', {
       user_id: '1101'
     })
 
-    this.stub(GradebookApi, 'updateSubmission').returns(this.promise);
+    sandbox.stub(GradebookApi, 'updateSubmission').returns(this.promise);
     this.gradebook.setSubmissionTrayState(true, '1101', '2301');
   }
 });
 
 test('stores the pending grade info before sending the request', function () {
-  this.stub(this.gradebook, 'renderSubmissionTray');
+  sandbox.stub(this.gradebook, 'renderSubmissionTray');
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
   strictEqual(this.gradebook.submissionIsUpdating(this.submission), true);
 });
@@ -8564,22 +8564,22 @@ test('includes "valid" when storing the pending grade info', function () {
 })
 
 test('renders the tray before sending the request', function () {
-  this.stub(this.gradebook, 'renderSubmissionTray');
+  sandbox.stub(this.gradebook, 'renderSubmissionTray');
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
   strictEqual(this.gradebook.renderSubmissionTray.callCount, 1);
 });
 
 test('on success the pending grade info is removed', function () {
-  this.stub(this.gradebook, 'renderSubmissionTray');
-  this.stub(this.gradebook, 'updateSubmissionsFromExternal');
+  sandbox.stub(this.gradebook, 'renderSubmissionTray');
+  sandbox.stub(this.gradebook, 'updateSubmissionsFromExternal');
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
   this.promise.thenFn({ data: { all_submissions: [{ id: '293', ...this.submission }] } });
   strictEqual(this.gradebook.getPendingGradeInfo(this.submission), null)
 });
 
 test('on success the tray has been rendered a second time', function () {
-  this.stub(this.gradebook, 'renderSubmissionTray');
-  this.stub(this.gradebook, 'updateSubmissionsFromExternal');
+  sandbox.stub(this.gradebook, 'renderSubmissionTray');
+  sandbox.stub(this.gradebook, 'updateSubmissionsFromExternal');
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
   this.promise.thenFn({ data: { all_submissions: [{ id: '293', ...this.submission }] } });
   strictEqual(this.gradebook.renderSubmissionTray.callCount, 2);
@@ -8588,7 +8588,7 @@ test('on success the tray has been rendered a second time', function () {
 test('on failure the pending grade info is removed', function () {
   // without a retry strategy, clearing the request data is the only way to
   // revert to a stable state
-  this.stub(this.gradebook, 'renderSubmissionTray');
+  sandbox.stub(this.gradebook, 'renderSubmissionTray');
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
   return this.promise.catchFn(new Error('A failure')).catch(() => {
     strictEqual(this.gradebook.getPendingGradeInfo(this.submission), null)
@@ -8596,7 +8596,7 @@ test('on failure the pending grade info is removed', function () {
 });
 
 test('on failure the student row is updated', function () {
-  this.stub(this.gradebook, 'renderSubmissionTray')
+  sandbox.stub(this.gradebook, 'renderSubmissionTray')
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
   sinon.spy(this.gradebook, 'updateRowCellsForStudentIds')
   return this.promise.catchFn(new Error('A failure')).catch(() => {
@@ -8605,7 +8605,7 @@ test('on failure the student row is updated', function () {
 })
 
 test('includes the student id when updating its row on failure', function () {
-  this.stub(this.gradebook, 'renderSubmissionTray')
+  sandbox.stub(this.gradebook, 'renderSubmissionTray')
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
   sinon.spy(this.gradebook, 'updateRowCellsForStudentIds')
   return this.promise.catchFn(new Error('A failure')).catch(() => {
@@ -8615,7 +8615,7 @@ test('includes the student id when updating its row on failure', function () {
 })
 
 test('on failure the submission has been rendered a second time', function () {
-  this.stub(this.gradebook, 'renderSubmissionTray');
+  sandbox.stub(this.gradebook, 'renderSubmissionTray');
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
   return this.promise.catchFn(new Error('A failure')).catch(() => {
     strictEqual(this.gradebook.renderSubmissionTray.callCount, 2);
@@ -8623,8 +8623,8 @@ test('on failure the submission has been rendered a second time', function () {
 });
 
 test('on failure a flash error is triggered', function () {
-  this.stub(this.gradebook, 'renderSubmissionTray');
-  this.stub($, 'flashError');
+  sandbox.stub(this.gradebook, 'renderSubmissionTray');
+  sandbox.stub($, 'flashError');
   this.gradebook.updateSubmissionAndRenderSubmissionTray({submission: this.submission})
   return this.promise.catchFn(new Error('A failure')).catch(() => {
     strictEqual($.flashError.callCount, 1);
@@ -8666,7 +8666,7 @@ QUnit.module('#updateSubmissionComments', {
 });
 
 test('calls renderSubmissionTray', function () {
-  const renderSubmissionTrayStub = this.stub(this.gradebook, 'renderSubmissionTray');
+  const renderSubmissionTrayStub = sandbox.stub(this.gradebook, 'renderSubmissionTray');
   this.gradebook.updateSubmissionComments([]);
   strictEqual(renderSubmissionTrayStub.callCount, 1);
 });
@@ -8679,31 +8679,31 @@ test('sets the edited comment ID to null', function () {
 });
 
 test('calls setSubmissionComments', function () {
-  const setSubmissionCommentsStub = this.stub(this.gradebook, 'setSubmissionComments');
+  const setSubmissionCommentsStub = sandbox.stub(this.gradebook, 'setSubmissionComments');
   this.gradebook.unloadSubmissionComments();
   strictEqual(setSubmissionCommentsStub.callCount, 1);
 });
 
 test('calls setSubmissionComments', function () {
-  const setSubmissionCommentsStub = this.stub(this.gradebook, 'setSubmissionComments');
+  const setSubmissionCommentsStub = sandbox.stub(this.gradebook, 'setSubmissionComments');
   this.gradebook.unloadSubmissionComments();
   strictEqual(setSubmissionCommentsStub.callCount, 1);
 });
 
 test('calls setSubmissionComments with an empty collection of comments', function () {
-  const setSubmissionCommentsStub = this.stub(this.gradebook, 'setSubmissionComments');
+  const setSubmissionCommentsStub = sandbox.stub(this.gradebook, 'setSubmissionComments');
   this.gradebook.unloadSubmissionComments();
   deepEqual(setSubmissionCommentsStub.firstCall.args[0], []);
 });
 
 test('calls setSubmissionCommentsLoaded', function () {
-  const setSubmissionCommentsLoadedStub = this.stub(this.gradebook, 'setSubmissionCommentsLoaded');
+  const setSubmissionCommentsLoadedStub = sandbox.stub(this.gradebook, 'setSubmissionCommentsLoaded');
   this.gradebook.unloadSubmissionComments();
   strictEqual(setSubmissionCommentsLoadedStub.callCount, 1);
 });
 
 test('calls setSubmissionCommentsLoaded with an empty collection of comments', function () {
-  const setSubmissionCommentsLoadedStub = this.stub(this.gradebook, 'setSubmissionCommentsLoaded');
+  const setSubmissionCommentsLoadedStub = sandbox.stub(this.gradebook, 'setSubmissionCommentsLoaded');
   this.gradebook.unloadSubmissionComments();
   strictEqual(setSubmissionCommentsLoadedStub.firstCall.args[0], false);
 });
@@ -8723,7 +8723,7 @@ test('calls the success function on a successful call', function () {
   moxios.stubRequest(url, { status: 200, response: { submission_comments: [] }});
 
   this.gradebook.setSubmissionTrayState(false, '3', '2');
-  const updateSubmissionCommentsStub = this.stub(this.gradebook, 'updateSubmissionComments');
+  const updateSubmissionCommentsStub = sandbox.stub(this.gradebook, 'updateSubmissionComments');
   const promise = this.gradebook.apiCreateSubmissionComment('a comment');
   return promise.then(function () {
     strictEqual(updateSubmissionCommentsStub.callCount, 1);
@@ -8736,7 +8736,7 @@ test('calls showFlashSuccess on a successful call', function () {
   moxios.stubRequest(url, { status: 200, response: { submission_comments: [] }});
 
   this.gradebook.setSubmissionTrayState(false, '3', '2');
-  const showFlashSuccessStub = this.stub(FlashAlert, 'showFlashSuccess');
+  const showFlashSuccessStub = sandbox.stub(FlashAlert, 'showFlashSuccess');
   const promise = this.gradebook.apiCreateSubmissionComment('a comment');
   return promise.then(function () {
     strictEqual(showFlashSuccessStub.callCount, 1);
@@ -8748,7 +8748,7 @@ test('calls the success function on an unsuccessful call', function () {
   moxios.stubRequest(url, { status: 401, response: [] });
 
   this.gradebook.setSubmissionTrayState(false, '3', '2');
-  const setCommentsUpdatingStub = this.stub(this.gradebook, 'setCommentsUpdating');
+  const setCommentsUpdatingStub = sandbox.stub(this.gradebook, 'setCommentsUpdating');
   const promise = this.gradebook.apiCreateSubmissionComment('a comment');
   return promise.then(function () {
     strictEqual(setCommentsUpdatingStub.callCount, 1);
@@ -8760,7 +8760,7 @@ test('calls showFlashError on an unsuccessful call', function () {
   moxios.stubRequest(url, { status: 401, response: [] });
 
   this.gradebook.setSubmissionTrayState(false, '3', '2');
-  const showFlashErrorStub = this.stub(FlashAlert, 'showFlashError');
+  const showFlashErrorStub = sandbox.stub(FlashAlert, 'showFlashError');
   const promise = this.gradebook.apiCreateSubmissionComment('a comment');
   return promise.then(function () {
     strictEqual(showFlashErrorStub.callCount, 1);
@@ -8894,7 +8894,7 @@ test('calls the success function on a successful call', function () {
 
   moxios.stubRequest(url, { status: 200, response: [] });
 
-  const removeSubmissionCommentStub = this.stub(this.gradebook, 'removeSubmissionComment');
+  const removeSubmissionCommentStub = sandbox.stub(this.gradebook, 'removeSubmissionComment');
   const promise = this.gradebook.apiDeleteSubmissionComment('42');
   return promise.then(function () {
     strictEqual(removeSubmissionCommentStub.callCount, 1);
@@ -8906,7 +8906,7 @@ test('calls showFlashSuccess on a successful call', function () {
   const url = '/submission_comments/42';
   moxios.stubRequest(url, { status: 200, response: [] });
 
-  const showFlashSuccessStub = this.stub(FlashAlert, 'showFlashSuccess');
+  const showFlashSuccessStub = sandbox.stub(FlashAlert, 'showFlashSuccess');
   const promise = this.gradebook.apiDeleteSubmissionComment('42');
   return promise.then(function () {
     strictEqual(showFlashSuccessStub.callCount, 1);
@@ -8918,7 +8918,7 @@ test('calls the success function on an unsuccessful call', function () {
   const url = '/submission_comments/42';
   moxios.stubRequest(url, { status: 401, response: [] });
 
-  const showFlashErrorStub = this.stub(FlashAlert, 'showFlashError').returns(() => {})
+  const showFlashErrorStub = sandbox.stub(FlashAlert, 'showFlashError').returns(() => {})
   const promise = this.gradebook.apiDeleteSubmissionComment('42');
   return promise.then(function() {
     strictEqual(showFlashErrorStub.callCount, 1);
@@ -8930,8 +8930,8 @@ test('calls removeSubmissionComment on success', function () {
 
   moxios.stubRequest(url, { status: 200, response: [] });
 
-  const successStub = this.stub();
-  const removeSubmissionCommentStub = this.stub(this.gradebook, 'removeSubmissionComment');
+  const successStub = sinon.stub();
+  const removeSubmissionCommentStub = sandbox.stub(this.gradebook, 'removeSubmissionComment');
   const promise = this.gradebook.apiDeleteSubmissionComment('42', successStub, () => {});
   return promise.then(function() {
     strictEqual(removeSubmissionCommentStub.callCount, 1);
@@ -8958,14 +8958,14 @@ QUnit.module('#removeSubmissionComment', {
 });
 
 test('removes matching comment id', function () {
-  this.stub(this.gradebook, 'renderSubmissionTray');
+  sandbox.stub(this.gradebook, 'renderSubmissionTray');
   this.gradebook.setSubmissionComments(this.comments());
   this.gradebook.removeSubmissionComment('42');
   deepEqual(this.gradebook.getSubmissionComments(), []);
 });
 
 test('removes none if no matching comment id', function () {
-  this.stub(this.gradebook, 'renderSubmissionTray');
+  sandbox.stub(this.gradebook, 'renderSubmissionTray');
   this.gradebook.setSubmissionComments([{ id: '84' }]);
   this.gradebook.removeSubmissionComment('42');
   deepEqual(this.gradebook.getSubmissionComments(), [{ id: '84' }]);

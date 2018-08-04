@@ -80,7 +80,6 @@ class DiscussionTopic < ActiveRecord::Base
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validate :validate_draft_state_change, :if => :workflow_state_changed?
   validate :section_specific_topics_must_have_sections
-  validate :feature_must_be_enabled_for_section_specific
   validate :only_course_topics_can_be_section_specific
   validate :assignments_cannot_be_section_specific
   validate :course_group_discussion_cannot_be_section_specific
@@ -107,15 +106,6 @@ class DiscussionTopic < ActiveRecord::Base
     else
       true
     end
-  end
-
-  def feature_must_be_enabled_for_section_specific
-    return true unless self.is_section_specific && !self.is_announcement
-
-    if !self.context.root_account.feature_enabled?(:section_specific_discussions)
-      return self.errors.add(:is_section_specific, t("Section-specific discussions are disabled"))
-    end
-    return true
   end
 
   def only_course_topics_can_be_section_specific
@@ -511,13 +501,17 @@ class DiscussionTopic < ActiveRecord::Base
   # Do not use the lock options unless you truly need
   # the lock, for instance to update the count.
   # Careless use has caused database transaction deadlocks
-  def unread_count(current_user = nil, lock: false)
+  def unread_count(current_user = nil, lock: false, opts: {})
     current_user ||= self.current_user
     return 0 unless current_user # default for logged out users
 
     environment = lock ? :master : :slave
     Shackles.activate(environment) do
-      topic_participant = discussion_topic_participants.where(user_id: current_user).select(:unread_entry_count).lock(lock).first
+      topic_participant = if opts[:use_preload] && self.association(:discussion_topic_participants).loaded?
+        self.discussion_topic_participants.find{|dtp| dtp.user_id == current_user.id}
+      else
+        discussion_topic_participants.where(user_id: current_user).select(:unread_entry_count).lock(lock).take
+      end
       topic_participant&.unread_entry_count || self.default_unread_count
     end
   end
@@ -539,16 +533,19 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
-  def subscribed?(current_user = nil)
+  def subscribed?(current_user = nil, opts: {})
     current_user ||= self.current_user
     return false unless current_user # default for logged out user
 
     if root_topic?
       participant = DiscussionTopicParticipant.where(user_id: current_user.id,
-        discussion_topic_id: child_topics.pluck(:id)).first
+        discussion_topic_id: child_topics.pluck(:id)).take
     end
-    participant ||= discussion_topic_participants.where(:user_id => current_user.id).first
-
+    participant ||= if opts[:use_preload] && self.association(:discussion_topic_participants).loaded?
+        self.discussion_topic_participants.find{|dtp| dtp.user_id == current_user.id}
+      else
+        discussion_topic_participants.where(user_id: current_user).take
+      end
     if participant
       if participant.subscribed.nil?
         # if there is no explicit subscription, assume the author and posters
@@ -1462,6 +1459,10 @@ class DiscussionTopic < ActiveRecord::Base
       end
       item
     end.compact
+  end
+
+  def self.term_ended(context)
+    context.is_a?(Course) && !context.enrollment_term.end_at.nil? && Time.now.utc > context.enrollment_term.end_at
   end
 
   def initial_post_required?(user, session=nil)

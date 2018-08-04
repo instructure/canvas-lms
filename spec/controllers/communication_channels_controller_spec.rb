@@ -30,7 +30,7 @@ describe CommunicationChannelsController do
     it "should create a new CC unconfirmed" do
       user_session(@user)
       post 'create', params: {:user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email'  }}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(@user.communication_channels.length).to eq 1
       expect(@user.email_channel).to be_unconfirmed
       expect(@user.email_channel.path).to eq 'jt@instructure.com'
@@ -41,7 +41,7 @@ describe CommunicationChannelsController do
       cc = u.communication_channels.create!(:path => 'jt@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
       user_session(@user)
       post 'create', params: {:user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email' }}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(@user.communication_channels.length).to eq 1
       expect(@user.email_channel).not_to eq cc
       expect(@user.email_channel).to be_unconfirmed
@@ -55,7 +55,7 @@ describe CommunicationChannelsController do
       }
       user_session(@user)
       post 'create', params: {:user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email' }}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(@user.communication_channels.length).to eq 1
       expect(@user.email_channel).to be_unconfirmed
       expect(@user.email_channel.path).to eq 'jt@instructure.com'
@@ -66,7 +66,7 @@ describe CommunicationChannelsController do
       cc = @user.communication_channels.create!(:path => 'jt@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
       user_session(@user)
       post 'create', params: {:user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email' }}
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
     end
   end
 
@@ -107,7 +107,7 @@ describe CommunicationChannelsController do
         code = @cc.confirmation_code
         @cc.confirm
         get 'confirm', params: {:nonce => code}
-        expect(response).not_to be_success
+        expect(response).not_to be_successful
         expect(response).to render_template("confirm_failed")
         @cc.reload
         expect(@cc).to be_active
@@ -118,7 +118,7 @@ describe CommunicationChannelsController do
         CommunicationChannel.where(id: @cc).update_all(path: 'not-an-email')
         user_session(@user, @pseudonym)
         get 'confirm', params: {nonce: @cc.confirmation_code}
-        expect(response).not_to be_success
+        expect(response).not_to be_successful
         expect(response).to render_template("confirm_failed")
       end
 
@@ -218,7 +218,7 @@ describe CommunicationChannelsController do
 
         # @domain_root_account == Account.default
         post 'confirm', params: {:nonce => @cc.confirmation_code}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response).to render_template('confirm')
         expect(assigns[:pseudonym]).to eq @pseudonym
         expect(assigns[:root_account]).to eq @account
@@ -242,7 +242,7 @@ describe CommunicationChannelsController do
         expect(@enrollment).to be_invited
 
         get 'confirm', params: {:nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:pseudonym]).to be_new_record
         expect(assigns[:pseudonym].unique_id).to eq 'jt@instructure.com'
       end
@@ -280,7 +280,7 @@ describe CommunicationChannelsController do
         controller.instance_variable_set(:@current_user, @user)
 
         get 'confirm', params: {:nonce => @cc.confirmation_code}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:pseudonym]).to be_new_record
         expect(assigns[:pseudonym].unique_id).to eq 'jt@instructure.com'
       end
@@ -317,7 +317,7 @@ describe CommunicationChannelsController do
         expect(@enrollment).to be_invited
 
         get 'confirm', params: {:nonce => @cc.confirmation_code}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:pseudonym]).to be_new_record
         expect(assigns[:pseudonym].unique_id).to eq 'jt@instructure.com'
         expect(assigns[:pseudonym].account).to eq @account
@@ -357,7 +357,7 @@ describe CommunicationChannelsController do
         expect(@user).to be_creation_pending
 
         get 'confirm', params: {:nonce => @cc.confirmation_code}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:pseudonym]).to be_new_record
         expect(assigns[:pseudonym].unique_id).to eq 'jt@instructure.com'
         expect(assigns[:pseudonym].account).to eq @account
@@ -396,7 +396,7 @@ describe CommunicationChannelsController do
         expect(@enrollment).to be_invited
         @pseudonym = @user.pseudonyms.create!(:unique_id => 'jt@instructure.com')
         get 'confirm', params: {:nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:pseudonym]).to eq @pseudonym
       end
 
@@ -438,7 +438,7 @@ describe CommunicationChannelsController do
         expect(@enrollment).to be_invited
 
         get 'confirm', params: {:nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:pseudonym]).to be_new_record
         expect(assigns[:pseudonym].unique_id).to be_blank
       end
@@ -624,7 +624,7 @@ describe CommunicationChannelsController do
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
 
         get 'confirm', params: {:nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:current_user]).to be_nil
         expect(assigns[:pseudonym]).to be_new_record
         expect(assigns[:pseudonym].unique_id).to eq 'jt@instructure.com'
@@ -749,7 +749,7 @@ describe CommunicationChannelsController do
       user_session(@user)
       session[:become_user_id] = u.id
       post 'reset_bounce_count', params: {:user_id => u.id, :id => cc1.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       cc1.reload
       expect(cc1.bounce_count).to eq(0)
     end
@@ -1182,7 +1182,7 @@ describe CommunicationChannelsController do
       Notification.create(:name => 'Confirm Email Communication Channel')
       user_session(@user)
       get 're_send_confirmation', params: {:user_id => @pseudonym.user_id, :id => @cc.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:user]).to eql(@user)
       expect(assigns[:cc]).to eql(@cc)
       expect(assigns[:cc].messages_sent).not_to be_nil
@@ -1205,7 +1205,7 @@ describe CommunicationChannelsController do
       user_session(@user)
       user_with_pseudonym(:active_all => true) # new user
       get 're_send_confirmation', params: {:user_id => @pseudonym.user_id, :id => @cc.id}
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should re-send enrollment invitation for an invited user" do
@@ -1217,7 +1217,7 @@ describe CommunicationChannelsController do
       Notification.create(:name => 'Enrollment Invitation')
 
       get 're_send_confirmation', params: {:user_id => @pseudonym.user_id, :id => @cc.id, :enrollment_id => @enrollment.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:user]).to eql(@user)
       expect(assigns[:enrollment]).to eql(@enrollment)
       expect(assigns[:enrollment].messages_sent).not_to be_nil
@@ -1245,7 +1245,7 @@ describe CommunicationChannelsController do
         end
         Notification.create(:name => 'Enrollment Invitation')
         post 're_send_confirmation', params: {:user_id => enrollment.user_id, :enrollment_id => enrollment.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:enrollment]).to eql(enrollment)
         expect(assigns[:enrollment].messages_sent).not_to be_nil
       end

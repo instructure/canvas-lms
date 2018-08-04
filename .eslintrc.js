@@ -10,6 +10,7 @@ module.exports = {
     "prettier",
     "prettier/react",
     "plugin:jest/recommended",
+    "plugin:jsx-a11y/recommended"
   ],
   parserOptions: {
     ecmaVersion: 7,

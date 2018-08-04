@@ -30,7 +30,7 @@ const plannerDays = [
 
 function defaultProps (options) {
   return {
-    courses: [{id: "1", shortName: "Course Short Name", informStudentsOfOverdueSubmissions: true}],
+    courses: [{id: "1", longName: "Course Long Name", shortName: "Course Short Name", informStudentsOfOverdueSubmissions: true}],
     opportunities: {
       items: [{id: "1", course_id: "1", due_at: "2017-03-09T20:40:35Z", html_url: "http://www.non_default_url.com", name: "learning object title"}],
       nextUrl: null
@@ -108,8 +108,8 @@ it('sends focus back to the add new item button', () => {
   const wrapper = mount(
     <PlannerHeader {...defaultProps()} cancelEditingPlannerItem={mockCancel}/>
   );
-  wrapper.instance().toggleUpdateItemTray();
-  wrapper.instance().handleToggleTray();
+  wrapper.instance().handleToggleTray();  // simulate clicking the + button
+  wrapper.instance().handleCloseTray();   // simulate cancelling
   expect(mockCancel).toHaveBeenCalled();
 });
 
@@ -160,9 +160,9 @@ it('does not call getNextOpportunities when component has loaded all opportuniti
   const mockDispatch = jest.fn();
   const props = defaultProps();
   props.courses = [
-    {id: "1", shortName: "Course Short Name"},
-    {id: "2", shortName: "Course Other Name"},
-    {id: "3", shortName: "Course Big Name"}
+    {id: "1", longName: "Course Long Name", shortName: "Course Short Name"},
+    {id: "2", longName: "Course Other Long Name", shortName: "Course Other Name"},
+    {id: "3", longName: "Course Big Long Name", shortName: "Course Big Name"}
   ];
 
   props.opportunities.items = [
@@ -207,9 +207,9 @@ it('does call getNextOpportunities when component has 9 opportunities', () => {
   const mockDispatch = jest.fn();
   const props = defaultProps();
   props.courses = [
-    {id: "1", shortName: "Course Short Name"},
-    {id: "2", shortName: "Course Other Name"},
-    {id: "3", shortName: "Course Big Name"}
+    {id: "1", longName: "Course Long Name", shortName: "Course Short Name"},
+    {id: "2", longName: "Course Other Long Name", shortName: "Course Other Name"},
+    {id: "3", longName: "Course Big Long Name", shortName: "Course Big Name"}
   ];
 
   props.opportunities.items = [
@@ -249,9 +249,9 @@ it('opens tray if todo update item props is set', () => {
   const mockDispatch = jest.fn();
   const props = defaultProps();
   props.courses = [
-    {id: "1", shortName: "Course Short Name"},
-    {id: "2", shortName: "Course Other Name"},
-    {id: "3", shortName: "Course Big Name"}
+    {id: "1", longName: "Course Long Name", shortName: "Course Short Name"},
+    {id: "2", longName: "Course Other Long Name", shortName: "Course Other Name"},
+    {id: "3", longName: "Course Big Long Name", shortName: "Course Big Name"}
   ];
 
   props.opportunities.items = [
@@ -269,18 +269,16 @@ it('opens tray if todo update item props is set', () => {
     {id: "10", course_id: "2", due_at: "2017-17-09T20:40:35Z", html_url: "http://www.non_default_url.com", name: "learning object title"}
   ];
 
+  props.getNextOpportunities = mockDispatch;
+  const wrapper = shallow(
+    <PlannerHeader {...props} />
+  );
+
   props.todo = {
     updateTodoItem: {
       id: 10
     }
   };
-
-  props.updateTodoItem = true;
-
-  props.getNextOpportunities = mockDispatch;
-  const wrapper = shallow(
-    <PlannerHeader {...props} />
-  );
 
   wrapper.setProps(props);
   expect(wrapper.state().trayOpen).toEqual(true);
@@ -290,9 +288,9 @@ it('shows all opportunities on badge even when we have over 10 items', () => {
   const mockDispatch = jest.fn();
   const props = defaultProps();
   props.courses = [
-    {id: "1", shortName: "Course Short Name"},
-    {id: "2", shortName: "Course Other Name"},
-    {id: "3", shortName: "Course Big Name"}
+    {id: "1", longName: "Course Long Name", shortName: "Course Short Name"},
+    {id: "2", longName: "Course Other Long Name", shortName: "Course Other Name"},
+    {id: "3", longName: "Course Big Long Name", shortName: "Course Big Name"}
   ];
 
   props.opportunities.items = [
@@ -511,4 +509,21 @@ describe('decision to show new activity indicator', () => {
     expect(wrapper.instance().newActivityAboveView()).toEqual(true);
   });
 
+});
+
+describe('today button', () => {
+  it('is displayed when the planner has items', () => {
+    const props = defaultProps();
+    const wrapper = shallow(<PlannerHeader {...props} />);
+    const todaybtn = wrapper.find('#planner-today-btn');
+    expect(todaybtn.length).toEqual(1)
+  });
+
+  it('is not displayed when the planner has no items to display', () => {
+    const props = defaultProps();
+    props.days = [];
+    const wrapper = shallow(<PlannerHeader {...props} />);
+    const todaybtn = wrapper.find('#planner-today-btn');
+    expect(todaybtn.length).toEqual(0)
+  });
 });

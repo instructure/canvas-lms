@@ -125,7 +125,7 @@ import ColumnHeaders from 'compiled/react_files/components/ColumnHeaders'
           role='columnheader'
         >
           <span className='screenreader-only'>
-            {I18n.t('Links')}
+            {I18n.t('Actions')}
           </span>
         </div>
       </header>

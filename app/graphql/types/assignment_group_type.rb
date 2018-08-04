@@ -16,26 +16,36 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Types
-  AssignmentGroupType = GraphQL::ObjectType.define do
-    name "AssignmentGroup"
+  class AssignmentGroupType < ApplicationObjectType
+    graphql_name "AssignmentGroup"
 
     implements GraphQL::Relay::Node.interface
-    interfaces [Interfaces::TimestampInterface]
+    implements Interfaces::TimestampInterface
 
-    global_id_field :id
-    field :_id, !types.ID, "legacy canvas id", property: :id
-    field :name, types.String
-    field :rules, AssignmentGroupRulesType, property: :rules_hash
-    field :groupWeight, types.Float, property: :group_weight
-    field :position, types.Int
-    field :state, !AssignmentGroupState, property: :workflow_state
-    connection :assignmentsConnection, AssignmentType.connection_type, property: :assignments
-  end
+    AssignmentGroupState = GraphQL::EnumType.define do
+      name "AssignmentGroupState"
+      description "States that Assignment Group can be in"
+      value "available"
+      value "deleted"
+    end
 
-  AssignmentGroupState = GraphQL::EnumType.define do
-    name "AssignmentGroupState"
-    description "States that Assignment Group can be in"
-    value "available"
-    value "deleted"
+    field :_id, ID, "legacy canvas id", method: :id, null: false
+    field :name, String, null: true
+    field :rules, AssignmentGroupRulesType, method: :rules_hash, null: true
+    field :group_weight, Float, null: true
+    field :position, Int, null: true
+    field :state, AssignmentGroupState, method: :workflow_state, null: false
+
+    implements Interfaces::AssignmentsConnectionInterface
+    def assignments_connection(filter: {})
+      load_association(:context) { |course|
+        super(course: course, filter: filter)
+      }
+    end
+
+    def assignments_scope(*args)
+      super(*args).where(assignment_group_id: object.id)
+    end
+    private :assignments_scope
   end
 end

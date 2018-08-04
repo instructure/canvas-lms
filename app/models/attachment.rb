@@ -1333,22 +1333,24 @@ class Attachment < ActiveRecord::Base
   # this will delete the content of the attachment but not delete the attachment
   # object. It will replace the attachment content with a file_removed file.
   def destroy_content_and_replace(deleted_by_user = nil)
-    att = self.root_attachment_id? ? self.root_attachment : self
-    return true if Purgatory.where(attachment_id: att).active.exists?
-    att.send_to_purgatory(deleted_by_user)
-    att.destroy_content
-    att.thumbnail&.destroy
-    new_name = 'file_removed.pdf'
-    file_removed_file = File.open Rails.root.join('public', 'file_removed', new_name)
-    # TODO set the instfs_uuid of the attachment to a single "file removed" file to avoid
-    # upload the same file over and over. This instfs_uuid should be retrieved from the inst-fs services
-    Attachments::Storage.store_for_attachment(att, file_removed_file)
-    att.filename = new_name
-    att.display_name = new_name
-    att.content_type = "application/pdf"
-    CrocodocDocument.where(attachment_id: att.children_and_self.select(:id)).delete_all
-    Canvadoc.where(attachment_id: att.children_and_self.select(:id)).delete_all
-    att.save!
+    self.shard.activate do
+      att = self.root_attachment_id? ? self.root_attachment : self
+      return true if Purgatory.where(attachment_id: att).active.exists?
+      att.send_to_purgatory(deleted_by_user)
+      att.destroy_content
+      att.thumbnail&.destroy
+      new_name = 'file_removed.pdf'
+      file_removed_file = File.open Rails.root.join('public', 'file_removed', new_name)
+      # TODO set the instfs_uuid of the attachment to a single "file removed" file to avoid
+      # upload the same file over and over. This instfs_uuid should be retrieved from the inst-fs services
+      Attachments::Storage.store_for_attachment(att, file_removed_file)
+      att.filename = new_name
+      att.display_name = new_name
+      att.content_type = "application/pdf"
+      CrocodocDocument.where(attachment_id: att.children_and_self.select(:id)).delete_all
+      Canvadoc.where(attachment_id: att.children_and_self.select(:id)).delete_all
+      att.save!
+    end
   end
 
   # this method does not destroy anything. It copies the content to a new s3object

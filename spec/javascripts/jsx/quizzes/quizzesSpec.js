@@ -46,12 +46,8 @@ define([
 
   QUnit.module('isChangeMultiFuncBound', {
     setup () {
-      this.sandb = this.sandbox.create();
-      this.sandb.stub($, '_data');
-      this.sandb.stub($.fn, 'ready');
-    },
-    teardown () {
-      this.sandb.restore();
+      sandbox.stub($, '_data');
+      sandbox.stub($.fn, 'ready');
     }
   })
 
@@ -91,19 +87,12 @@ define([
     });
   });
 
-  let sandbx;
   QUnit.module('rebindMultiChange', {
     setup () {
-      sandbx = this.sandbox.create();
-      this.sandb = this.sandbox.create();
-      this.sandb.stub($questionContent, 'bind');
-      this.sandb.stub($, '_data');
-      this.sandb.stub($.fn, 'ready');
+      sandbox.stub($questionContent, 'bind');
+      sandbox.stub($, '_data');
+      sandbox.stub($.fn, 'ready');
       $questionContent.bind.returns({change () {}});
-    },
-    teardown () {
-      this.sandb.restore();
-      sandbx.restore();
     }
   });
 
@@ -115,7 +104,7 @@ define([
     }
     $._data.returns(events);
     require(['quizzes'], ({quiz}) => {
-      sandbx.stub(quiz, 'loadJQueryElemById');
+      sandbox.stub(quiz, 'loadJQueryElemById');
       quiz.loadJQueryElemById.returns($questionContent);
       quiz.rebindMultiChange(questionType, 'question_content_0', {});
       equal($questionContent.bind.callCount, 1);
@@ -131,7 +120,7 @@ define([
     }
     $._data.returns(events);
     require(['quizzes'], ({quiz}) => {
-      sandbx.stub(quiz, 'loadJQueryElemById');
+      sandbox.stub(quiz, 'loadJQueryElemById');
       quiz.loadJQueryElemById.returns($questionContent);
       quiz.rebindMultiChange(questionType, 'question_content_0', {});
       equal($questionContent.bind.callCount, 0);
@@ -147,7 +136,7 @@ define([
     }
     $._data.returns(events);
     require(['quizzes'], ({quiz}) => {
-      sandbx.stub(quiz, 'loadJQueryElemById');
+      sandbox.stub(quiz, 'loadJQueryElemById');
       quiz.loadJQueryElemById.returns($questionContent);
       quiz.rebindMultiChange(questionType, 'question_content_0', {});
       equal($questionContent.bind.callCount, 0);

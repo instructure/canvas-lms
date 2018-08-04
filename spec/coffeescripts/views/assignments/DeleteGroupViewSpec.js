@@ -57,9 +57,9 @@ test('should be accessible', assert => {
 })
 
 test('it should delete a group without assignments', function() {
-  this.stub(window, 'confirm').returns(true)
+  sandbox.stub(window, 'confirm').returns(true)
   const view = createView(false, true)
-  this.stub(view, 'destroyModel')
+  sandbox.stub(view, 'destroyModel')
   view.render()
   view.open()
   ok(window.confirm.called)
@@ -89,7 +89,7 @@ test('assignment and ag counts should update', () => {
 })
 
 test('it should delete a group with assignments', function() {
-  const destroy_stub = this.stub(DeleteGroupView.prototype, 'destroy')
+  const destroy_stub = sandbox.stub(DeleteGroupView.prototype, 'destroy')
   const view = createView(true, true)
   view.render()
   view.open()
@@ -99,9 +99,9 @@ test('it should delete a group with assignments', function() {
 })
 
 test('it should not delete the last assignment group', function() {
-  const alert_stub = this.stub(window, 'alert').returns(true)
+  const alert_stub = sandbox.stub(window, 'alert').returns(true)
   const view = createView(true, false)
-  const destroy_spy = this.spy(view, 'destroyModel')
+  const destroy_spy = sandbox.spy(view, 'destroyModel')
   view.render()
   view.open()
   ok(alert_stub.called)

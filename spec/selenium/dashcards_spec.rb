@@ -128,7 +128,7 @@ describe 'dashcards' do
       expect(f('a.discussions .unread_count').text).to include('1')
       # The notifications should go away after visiting the show page of discussions
       expect_new_page_load{f('a.discussions').click}
-      expect_new_page_load{fln('discussion 1').click}
+      expect_new_page_load{f('.discussion-title').click}
       get '/'
       expect(f("#content")).not_to contain_css('a.discussions .unread_count')
     end

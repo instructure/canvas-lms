@@ -19,13 +19,16 @@
 import React from 'react';
 import I18n from 'i18n!dashboard';
 import axios from 'axios';
-import { bool, func, string } from 'prop-types';
+import { bool, func, string, object } from 'prop-types';
+import loadPlannerDashboard, { renderToDoSidebar } from 'canvas-planner';
 import { showFlashAlert, showFlashError } from '../shared/FlashAlert'
 import DashboardOptionsMenu from '../dashboard_card/DashboardOptionsMenu';
 import loadCardDashboard from '../bundles/dashboard_card'
 
+
 /**
- * This component renders the header for the user dashboard and loads the current dashboard.
+ * This component renders the header and the to do sidebar for the user
+ * dashboard and loads the current dashboard.
  */
 class DashboardHeader extends React.Component {
 
@@ -48,6 +51,7 @@ class DashboardHeader extends React.Component {
 
   componentDidMount () {
     this.showDashboard(this.state.currentDashboard)
+    this.props.showTodoList(this.changeDashboard)
   }
 
   getActiveApp = () => this.state.currentDashboard
@@ -61,18 +65,14 @@ class DashboardHeader extends React.Component {
   }
 
   loadPlannerComponent () {
-    require.ensure([], (require) => {
-      const Planner = require('canvas-planner')
-      const props = {
-        changeToCardView: () => this.changeDashboard('cards'),
-        getActiveApp: this.getActiveApp,
-        flashError: (message) => showFlashAlert({message, type: 'error'}),
-        flashMessage: (message) => showFlashAlert({message, type: 'info'}),
-        srFlashMessage: this.props.screenReaderFlashMessage,
-        externalFallbackFocusable: this.menuButtonFocusable,
-        env: this.props.env,
-      }
-      Planner.default(props)
+    loadPlannerDashboard({
+      changeDashboardView: this.changeDashboard,
+      getActiveApp: this.getActiveApp,
+      flashError: (message) => showFlashAlert({message, type: 'error'}),
+      flashMessage: (message) => showFlashAlert({message, type: 'info'}),
+      srFlashMessage: this.props.screenReaderFlashMessage,
+      externalFallbackFocusable: this.menuButtonFocusable,
+      env: this.props.env,
     })
   }
 
@@ -172,19 +172,36 @@ class DashboardHeader extends React.Component {
   }
 }
 
+// extract this out to a property so tests can override it and not have to mock
+// out the timers in every single test.
+function showTodoList (changeDashboard) {
+  // The sidebar itself is loaded via a separate fetch from the server. This
+  // means we need to wait for the element to appear on the page before we can
+  // render the to do list.
+  const interval = window.setInterval(() => {
+    const container = document.querySelector('.Sidebar__TodoListContainer')
+    if (container) {
+      renderToDoSidebar(container, {
+        changeDashboardView: changeDashboard,
+      });
+      window.clearInterval(interval);
+    }
+  }, 100);
+}
+
 DashboardHeader.propTypes = {
   dashboard_view: string,
   planner_enabled: bool.isRequired,
-  flashError: func,
-  flashMessage: func,
   screenReaderFlashMessage: func,
+  env: object, // eslint-disable-line react/forbid-prop-types
+  showTodoList: func
 }
 
 DashboardHeader.defaultProps = {
   dashboard_view: 'cards',
-  flashError: () => {},
-  flashMessage: () => {},
   screenReaderFlashMessage: () => {},
+  env: {},
+  showTodoList,
 }
 
 export default DashboardHeader;

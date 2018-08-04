@@ -121,11 +121,18 @@ class PlannerController < ApplicationController
   # ]
   def index
     # fetch a meta key so we can invalidate just this info and not the whole of the user's cache
-    planner_overrides_meta_key = Rails.cache.fetch(planner_meta_cache_key, expires_in: 30.minutes) do
+    planner_overrides_meta_key = Rails.cache.fetch(planner_meta_cache_key, expires_in: 120.minutes) do
       SecureRandom.uuid
     end
 
-    items_response = Rails.cache.fetch(['planner_items', planner_overrides_meta_key, page, params[:filter], default_opts].cache_key, expires_in: 120.minutes) do
+    composite_cache_key = ['planner_items',
+                           planner_overrides_meta_key,
+                           page,
+                           params[:filter],
+                           default_opts,
+                           contexts_cache_key].cache_key
+
+    items_response = Rails.cache.fetch(composite_cache_key, expires_in: 120.minutes) do
       items = collection_for_filter(params[:filter])
       items = Api.paginate(items, self, api_v1_planner_items_url)
       {
@@ -146,6 +153,8 @@ class PlannerController < ApplicationController
       unread_items
     when 'ungraded_todo_items'
       ungraded_todo_items
+    when 'all_ungraded_todo_items'
+      all_ungraded_todo_items
     else
       planner_items
     end
@@ -171,6 +180,24 @@ class PlannerController < ApplicationController
   def ungraded_todo_items
     collections = [page_collection,
                    ungraded_discussion_collection]
+    BookmarkedCollection.merge(*collections)
+  end
+
+  # returns all pages and ungraded discussions in supplied contexts with todo dates (no needing-viewing filter)
+  def all_ungraded_todo_items
+    collections = []
+    collections << item_collection('course_pages',
+        WikiPage.where(context_type: 'Course', context_id: @course_ids, todo_date: @start_date..@end_date),
+        WikiPage, [:todo_date, :created_at], :id)
+    collections << item_collection('group_pages',
+        WikiPage.where(context_type: 'Group', context_id: @group_ids, todo_date: @start_date..@end_date),
+        WikiPage, [:todo_date, :created_at], :id)
+    collections << item_collection('ungraded_course_discussions',
+        DiscussionTopic.where(context_type: 'Course', context_id: @course_ids, todo_date: @start_date..@end_date),
+        DiscussionTopic, [:todo_date, :posted_at, :created_at], :id)
+    collections << item_collection('ungraded_group_discussions',
+        DiscussionTopic.where(context_type: 'Group', context_id: @group_ids, todo_date: @start_date..@end_date),
+        DiscussionTopic, [:todo_date, :posted_at, :created_at], :id)
     BookmarkedCollection.merge(*collections)
   end
 
@@ -291,6 +318,12 @@ class PlannerController < ApplicationController
       @group_ids = @current_user.group_ids_for_todo_lists(default_opts)
       @user_ids = [@current_user.id]
     end
+  end
+
+  def contexts_cache_key
+    [Context.last_updated_at(Course, @course_ids),
+     Context.last_updated_at(User, @user_ids),
+     Context.last_updated_at(Group, @group_ids)].compact.max || Time.zone.today
   end
 
   def default_opts

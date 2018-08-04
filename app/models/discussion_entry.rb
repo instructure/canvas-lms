@@ -48,6 +48,7 @@ class DiscussionEntry < ActiveRecord::Base
   before_validation :set_depth, :on => :create
   validate :validate_depth, on: :create
   validate :discussion_not_deleted, on: :create
+  validate :must_be_reply_to_same_discussion, on: :create
 
   sanitize_field :message, CanvasSanitize::SANITIZE
 
@@ -113,6 +114,12 @@ class DiscussionEntry < ActiveRecord::Base
 
   def discussion_not_deleted
     errors.add(:base, "Requires non-deleted discussion topic") if self.discussion_topic.deleted?
+  end
+
+  def must_be_reply_to_same_discussion
+    if self.parent_entry && self.parent_entry.discussion_topic_id != self.discussion_topic_id
+      errors.add(:parent_id, "Parent entry must belong to the same discussion topic")
+    end
   end
 
   def reply_from(opts)

@@ -317,7 +317,7 @@ define([
     setup () {
       commonSetup();
       ENV.assignment_groups = createAssignmentGroups();
-      this.stub($, 'screenReaderFlashMessageExclusive');
+      sandbox.stub($, 'screenReaderFlashMessageExclusive');
       setPageHtmlFixture();
     },
 
@@ -340,7 +340,7 @@ define([
   });
 
   test('localizes displayed grade', function () {
-    this.stub(I18n, 'n').returns('1,234');
+    sandbox.stub(I18n, 'n').returns('1,234');
     GradeSummary.calculateTotals(createExampleGrades(), 'current', 'percent');
     const $teaser = $fixtures.find('.student_assignment.final_grade .score_teaser');
     ok($teaser.text().includes('1,234'), 'includes internationalized score');
@@ -413,21 +413,26 @@ define([
   QUnit.module('GradeSummary.calculatePercentGrade');
 
   test('returns properly computed and rounded value', function () {
-    const percentGrade = GradeSummary.calculatePercentGrade(1, 3);
-    ok(percentGrade === 33.33);
-  });
+    const percentGrade = GradeSummary.calculatePercentGrade(1, 3)
+    strictEqual(percentGrade, 33.33)
+  })
+
+  test('avoids floating point calculation issues', function () {
+    const percentGrade = GradeSummary.calculatePercentGrade(946.65, 1000)
+    strictEqual(percentGrade, 94.67)
+  })
 
   QUnit.module('GradeSummary.formatPercentGrade');
 
   test('returns an internationalized number value', function () {
-    this.stub(I18n, 'n').withArgs(1234).returns('1,234%');
+    sandbox.stub(I18n, 'n').withArgs(1234).returns('1,234%');
     equal(GradeSummary.formatPercentGrade(1234), '1,234%');
   });
 
   QUnit.module('GradeSummary.calculateGrade');
 
   test('returns an internationalized percentage when given a score and nonzero points possible', function () {
-    this.stub(I18n, 'n').callsFake(number => `${number}%`);
+    sandbox.stub(I18n, 'n').callsFake(number => `${number}%`);
     equal(GradeSummary.calculateGrade(97, 100), '97%');
     equal(I18n.n.getCall(0).args[1].percentage, true);
   });
@@ -454,7 +459,7 @@ define([
       ENV.effective_due_dates = { 201: { 101: { grading_period_id: '701' } } };
       ENV.student_id = '101';
       exampleGrades = GradeCalculatorSpecHelper.createCourseGradesWithGradingPeriods();
-      this.stub(CourseGradeCalculator, 'calculate').returns(exampleGrades);
+      sandbox.stub(CourseGradeCalculator, 'calculate').returns(exampleGrades);
     },
 
     teardown () {
@@ -507,13 +512,13 @@ define([
   });
 
   test('returns course grades when no grading period id is provided', function () {
-    this.stub(GradeSummary, 'getSelectedGradingPeriodId').returns(null);
+    sandbox.stub(GradeSummary, 'getSelectedGradingPeriodId').returns(null);
     const grades = GradeSummary.calculateGrades();
     equal(grades, exampleGrades);
   });
 
   test('scopes grades to the provided grading period id', function () {
-    this.stub(GradeSummary, 'getSelectedGradingPeriodId').returns('701');
+    sandbox.stub(GradeSummary, 'getSelectedGradingPeriodId').returns('701');
     const grades = GradeSummary.calculateGrades();
     equal(grades, exampleGrades.gradingPeriods[701]);
   });
@@ -540,7 +545,7 @@ define([
   });
 
   test('uses I18n to parse the .student_entered_score value', function () {
-    this.spy(GradeSummary, 'parseScoreText');
+    sandbox.spy(GradeSummary, 'parseScoreText');
     this.$assignment.find('.student_entered_score').text('7');
     GradeSummary.setup();
     equal(GradeSummary.parseScoreText.callCount, 1, 'GradeSummary.parseScoreText was called once');
@@ -595,7 +600,7 @@ define([
   });
 
   test('triggers onScoreChange for the assignment', function () {
-    this.stub(GradeSummary, 'onScoreChange');
+    sandbox.stub(GradeSummary, 'onScoreChange');
     this.$showWhatIfScoresButton.click();
     equal(GradeSummary.onScoreChange.callCount, 1, 'called once for each assignment (only one in fixture)');
     const [$assignment, options] = GradeSummary.onScoreChange.getCall(0).args;
@@ -604,8 +609,8 @@ define([
   });
 
   test('uses I18n to parse the .student_entered_score value', function () {
-    this.stub(GradeSummary, 'onScoreChange');
-    this.spy(GradeSummary, 'parseScoreText');
+    sandbox.stub(GradeSummary, 'onScoreChange');
+    sandbox.spy(GradeSummary, 'parseScoreText');
     this.$assignment.find('.student_entered_score').text('7');
     this.$showWhatIfScoresButton.click();
     equal(GradeSummary.parseScoreText.callCount, 1, 'GradeSummary.parseScoreText was called once');
@@ -620,7 +625,7 @@ define([
   });
 
   test('ignores assignments without What-If scores', function () {
-    this.stub(GradeSummary, 'onScoreChange');
+    sandbox.stub(GradeSummary, 'onScoreChange');
     this.$assignment.find('.student_entered_score').text('');
     this.$showWhatIfScoresButton.click();
     const $scoreValue = $fixtures.find('.assignment_score .score_value').first();
@@ -630,7 +635,7 @@ define([
   });
 
   test('ignores assignments with invalid What-If score text', function () {
-    this.stub(GradeSummary, 'onScoreChange');
+    sandbox.stub(GradeSummary, 'onScoreChange');
     this.$assignment.find('.student_entered_score').text('null');
     this.$showWhatIfScoresButton.click();
     const $scoreValue = $fixtures.find('.assignment_score .score_value').first();
@@ -650,8 +655,8 @@ define([
   });
 
   test('displays a screenreader message indicating visibility of What-If scores', function () {
-    this.stub(GradeSummary, 'onScoreChange');
-    this.stub($, 'screenReaderFlashMessageExclusive');
+    sandbox.stub(GradeSummary, 'onScoreChange');
+    sandbox.stub($, 'screenReaderFlashMessageExclusive');
     this.$showWhatIfScoresButton.click();
     equal($.screenReaderFlashMessageExclusive.callCount, 1, 'screenReaderFlashMessageExclusive is called once');
     const [message] = $.screenReaderFlashMessageExclusive.getCall(0).args;
@@ -759,7 +764,7 @@ define([
 
   test('uses I18n to parse the existing "What-If" score', function () {
     $fixtures.find('.assignment_score').first().find('.what_if_score').text('1.234,56');
-    this.stub(numberHelper, 'parse').withArgs('1.234,56').returns('654321');
+    sandbox.stub(numberHelper, 'parse').withArgs('1.234,56').returns('654321');
     this.onEditWhatIfScore();
     const $gradeEntry = $fixtures.find('#grade_entry').first();
     equal($gradeEntry.val(), '654321', 'the previous "What-If" score might have been internationalized');
@@ -792,7 +797,7 @@ define([
   QUnit.module('GradeSummary.onScoreChange', {
     setup () {
       fullPageSetup();
-      this.stub($, 'ajaxJSON');
+      sandbox.stub($, 'ajaxJSON');
       this.$assignment = $fixtures.find('#grades_summary .student_assignment').first();
       // reproduce the destructive part of .onEditWhatIfScore
       this.$assignment.find('.assignment_score').find('.grade').empty().append($('#grade_entry'));
@@ -814,7 +819,7 @@ define([
   });
 
   test('uses I18n to parse the #grade_entry score', function () {
-    this.stub(numberHelper, 'parse').withArgs('1.234,56').returns('654321');
+    sandbox.stub(numberHelper, 'parse').withArgs('1.234,56').returns('654321');
     this.onScoreChange('1.234,56');
     equal(this.$assignment.find('.what_if_score').text(), '654321');
   });
@@ -826,7 +831,7 @@ define([
   });
 
   test('uses I18n to parse the previous .what_if_score value', function () {
-    this.stub(numberHelper, 'parse').withArgs('9.0').returns('654321');
+    sandbox.stub(numberHelper, 'parse').withArgs('9.0').returns('654321');
     this.$assignment.find('.what_if_score').text('9.0');
     this.onScoreChange('');
     equal(this.$assignment.find('.what_if_score').text(), '654321');
@@ -909,7 +914,7 @@ define([
   });
 
   test('updates the score for the given assignment', function () {
-    this.stub(GradeSummary, 'updateScoreForAssignment');
+    sandbox.stub(GradeSummary, 'updateScoreForAssignment');
     this.onScoreChange('5');
     equal(GradeSummary.updateScoreForAssignment.callCount, 1);
     const [assignmentId, score] = GradeSummary.updateScoreForAssignment.getCall(0).args;
@@ -995,7 +1000,7 @@ define([
   });
 
   test('updates the score for the assignment', function () {
-    this.stub(GradeSummary, 'updateScoreForAssignment');
+    sandbox.stub(GradeSummary, 'updateScoreForAssignment');
     this.onScoreRevert();
     equal(GradeSummary.updateScoreForAssignment.callCount, 1);
     const [assignmentId, score] = GradeSummary.updateScoreForAssignment.getCall(0).args;
@@ -1005,15 +1010,15 @@ define([
 
   test('updates the score for the assignment with null when the .original_points is blank', function () {
     this.$assignment.find('.original_points').text('');
-    this.stub(GradeSummary, 'updateScoreForAssignment');
+    sandbox.stub(GradeSummary, 'updateScoreForAssignment');
     this.onScoreRevert();
     const score = GradeSummary.updateScoreForAssignment.getCall(0).args[1];
     strictEqual(score, null);
   });
 
   test('updates the student grades after updating the assignment score', function () {
-    this.stub(GradeSummary, 'updateScoreForAssignment');
-    this.stub(GradeSummary, 'updateStudentGrades').callsFake(() => {
+    sandbox.stub(GradeSummary, 'updateScoreForAssignment');
+    sandbox.stub(GradeSummary, 'updateStudentGrades').callsFake(() => {
       equal(GradeSummary.updateScoreForAssignment.callCount, 1, 'updateScoreForAssignment is performed first');
     });
     this.onScoreRevert();

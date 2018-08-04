@@ -19,7 +19,7 @@
 require_relative '../../spec_helper'
 
 describe Assignment::GradeError do
-  subject { Assignment::GradeError.new('test message', :bad_status) }
+  subject { Assignment::GradeError.new('test message', :bad_status, error_code: 'CATASTROPHE') }
 
   it 'has a message equal to the one supplied at construction' do
     expect(subject.message).to eq 'test message'
@@ -27,5 +27,14 @@ describe Assignment::GradeError do
 
   it 'has a status code equal to the one supplied at construction' do
     expect(subject.status_code).to eq :bad_status
+  end
+
+  it 'has an error code equal to the one supplied at construction' do
+    expect(subject.error_code).to eq 'CATASTROPHE'
+  end
+
+  it 'defaults to a nil error code' do
+    error = Assignment::GradeError.new
+    expect(error.error_code).to be nil
   end
 end

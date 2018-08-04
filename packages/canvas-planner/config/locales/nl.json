@@ -8,8 +8,17 @@
   "all_items_loaded_aa256183": {
     "message": "Alle items geladen"
   },
+  "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
+    "message": "Er is een fout opgetreden bij het afwijzen van de mogelijkheid."
+  },
+  "announcement_fb4cb645": {
+    "message": "Aankondiging"
+  },
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "Weet je zeker dat je dit planneritem wilt verwijderen?"
+  },
+  "assignment_976578a8": {
+    "message": "Opdracht"
   },
   "assignmenttype_title_6612d008": {
     "message": "{ assignmentType } { title }."
@@ -31,6 +40,9 @@
   },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Begin van je To-do-historie"
+  },
+  "calendar_event_89aadc1c": {
+    "message": "Gebeurtenis op kalender"
   },
   "canvas_planner_98ed106": {
     "message": "Canvas planner"
@@ -71,6 +83,12 @@
   "details_98a31b68": {
     "message": "Details"
   },
+  "discussion_6719c51d": {
+    "message": "Discussie"
+  },
+  "dismiss_itemtitle_a9fae1b3": {
+    "message": "{ itemTitle } afwijzen"
+  },
   "dismiss_opportunityname_5995176f": {
     "message": "{ opportunityName } afwijzen"
   },
@@ -109,9 +127,6 @@
   },
   "feedback_6dcc1991": {
     "message": "Feedback"
-  },
-  "go_to_dashboard_card_view_10398ef6": {
-    "message": "Ga naar de weergave Dashboardkaarten"
   },
   "graded_25cd3fcd": {
     "message": "Beoordeeld"
@@ -182,17 +197,20 @@
   "nothing_new_needs_attention_3ac548d4": {
     "message": "Er is niets nieuws waarnaar gekeken moet worden."
   },
-  "nothing_planned_today_next_item_loaded_5a199868": {
-    "message": "Niks gepland voor vandaag. Volgend item geladen."
-  },
   "nothing_planned_yet_8675ffe9": {
     "message": "Nog niets gepland"
+  },
+  "numpoints_points_8621a43b": {
+    "message": "{ numPoints } punten"
   },
   "only_most_recent_grading_period_shown_f1ad6458": {
     "message": "*Alleen meest recente beoordelingsperiode wordt weergegeven."
   },
   "optional_add_course_ef0d70fc": {
     "message": "Optioneel: Cursus toevoegen"
+  },
+  "page_50c4823d": {
+    "message": "Pagina"
   },
   "points_bceb5005": {
     "message": "punten"
@@ -205,6 +223,9 @@
   },
   "pts_699bd9aa": {
     "message": "ptn"
+  },
+  "quiz_e0dcce8f": {
+    "message": "Toets"
   },
   "replies_4a8577c8": {
     "message": "Antwoorden"
@@ -241,6 +262,9 @@
   },
   "to_do_1d554f36": {
     "message": "To-do lijst"
+  },
+  "to_do_items_loading_d1cdfcd5": {
+    "message": "To-do-items laden"
   },
   "today_76e10f9c": {
     "message": "Vandaag"

@@ -176,7 +176,7 @@ test('does not disable the submit button when only to date is entered', function
 });
 
 test('calls getGradebookHistory prop on mount', function () {
-  const props = { getGradebookHistory: this.stub() };
+  const props = { getGradebookHistory: sinon.stub() };
   const wrapper = mount(<SearchFormComponent {...defaultProps()} {...props} />);
   strictEqual(props.getGradebookHistory.callCount, 1);
   wrapper.unmount();
@@ -184,7 +184,7 @@ test('calls getGradebookHistory prop on mount', function () {
 
 QUnit.module('SearchForm when button is clicked', {
   setup () {
-    this.props = { getGradebookHistory: this.stub() };
+    this.props = { getGradebookHistory: sinon.stub() };
     this.wrapper = mountComponent(this.props);
   },
 
@@ -235,9 +235,9 @@ QUnit.module('SearchForm Autocomplete', {
     this.props = {
       ...defaultProps(),
       fetchHistoryStatus: 'started',
-      clearSearchOptions: this.stub(),
-      getSearchOptions: this.stub(),
-      getSearchOptionsNextPage: this.stub(),
+      clearSearchOptions: sinon.stub(),
+      getSearchOptions: sinon.stub(),
+      getSearchOptionsNextPage: sinon.stub(),
     };
 
     this.wrapper = mount(<SearchFormComponent {...this.props} />);
@@ -328,7 +328,7 @@ test('getSearchOptionsNextPage is called if there are more options to load', fun
 
 QUnit.module('SearchForm Autocomplete options', {
   setup () {
-    this.props = { ...defaultProps(), clearSearchOptions: this.stub() };
+    this.props = { ...defaultProps(), clearSearchOptions: sinon.stub() };
     this.assignments = Fixtures.assignmentArray();
     this.graders = Fixtures.userArray();
     this.students = Fixtures.userArray();

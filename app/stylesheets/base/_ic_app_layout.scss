@@ -115,10 +115,14 @@ body:not(.course-menu-expanded) {
 
 .ic-app-footer {
   .terms-of-service__link {
-    button {
-      margin-top: -2px !important;
-      color: var(--ic-brand-font-color-dark-lightened-15) !important;
+    a {
+      @include ic-focus-base;
+      &:focus {
+        @include ic-focus-variant;
+      }
     }
+    margin-top: -2px !important;
+    color: var(--ic-brand-font-color-dark-lightened-15) !important;
   }
   box-sizing: border-box;
   padding: $ic-sp 0;

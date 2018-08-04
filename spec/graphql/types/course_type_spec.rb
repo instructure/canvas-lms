@@ -72,7 +72,7 @@ describe Types::CourseType do
         expect(
           course_type.assignmentsConnection(
             current_user: @student,
-            args: {filter: {gradingPeriodId: @term1.id.to_s}}
+            args: {filter: {grading_period_id: @term1.id.to_s}}
           )
         ).to eq [@term1_assignment1]
       end
@@ -81,7 +81,7 @@ describe Types::CourseType do
         expect(
           course_type.assignmentsConnection(
             current_user: @student,
-            args: {filter: {gradingPeriodId: nil}}
+            args: {filter: {grading_period_id: nil}}
           )
         ).to eq course.assignments.published
       end
@@ -121,8 +121,9 @@ describe Types::CourseType do
         course_type.submissionsConnection(
           current_user: @teacher,
           args: {
-            studentIds: [@student1.id.to_s, @student2.id.to_s],
-            orderBy: [{field: "id", direction: "asc"}],
+            student_ids: [@student1.id.to_s, @student2.id.to_s],
+            filter: nil,
+            order_by: [{field: "id", direction: "asc"}],
           }
         )
       ).to eq [
@@ -137,7 +138,9 @@ describe Types::CourseType do
         course_type.submissionsConnection(
           current_user: @student2,
           args: {
-            studentIds: [@student1.id.to_s, @student2.id.to_s],
+            student_ids: [@student1.id.to_s, @student2.id.to_s],
+            filter: nil,
+            order_by: nil
           }
         )
       ).to eq [@student2a1_submission]
@@ -149,8 +152,9 @@ describe Types::CourseType do
           course_type.submissionsConnection(
             current_user: @teacher,
             args: {
-              studentIds: [@student1.id.to_s, @student2.id.to_s],
-              orderBy: [{field: "graded_at", direction: "desc"}],
+              student_ids: [@student1.id.to_s, @student2.id.to_s],
+              filter: nil,
+              order_by: [{field: "graded_at", direction: "desc"}]
             }
           )
         ).to eq [
@@ -172,8 +176,9 @@ describe Types::CourseType do
           course_type.submissionsConnection(
             current_user: @teacher,
             args: {
-              studentIds: [@student1.id.to_s, @student2.id.to_s],
-              orderBy: [{field: "graded_at", direction: direction}],
+              student_ids: [@student1.id.to_s, @student2.id.to_s],
+              filter: nil,
+              order_by: [{field: "graded_at", direction: direction}],
             }
           )
         ).to eq [
@@ -190,8 +195,9 @@ describe Types::CourseType do
           course_type.submissionsConnection(
             current_user: @teacher,
             args: {
-              studentIds: [@student1.id.to_s],
-              filter: {states: %[unsubmitted]}
+              student_ids: [@student1.id.to_s],
+              filter: {states: %[unsubmitted]},
+              order_by: nil,
             }
           )
         ).to eq [ ]
@@ -222,7 +228,7 @@ describe Types::CourseType do
       expect(
         course_type.usersConnection(
           current_user: @teacher,
-          args: {userIds: @student1}
+          args: {user_ids: @student1}
         )
       ).to eq [@student1]
 
@@ -230,7 +236,7 @@ describe Types::CourseType do
       expect(
         course_type.usersConnection(
           current_user: @teacher,
-          args: {filter: {userIds: @student1}}
+          args: {filter: {user_ids: @student1}}
         )
       ).to eq [@student1]
     end
@@ -247,7 +253,7 @@ describe Types::CourseType do
       expect(
         course_type.usersConnection(
           current_user: @teacher,
-          args: {filter: {enrollmentStates: ["active", "completed"]}}
+          args: {filter: {enrollment_states: ["active", "completed"]}}
         )
       ).to eq [@teacher, @student1, @student2, @concluded_user]
     end

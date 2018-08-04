@@ -65,13 +65,13 @@ define([
 
     stubCreateSuccess(){
       const success = Promise.resolve(exampleSet);
-      this.stub(setsApi, 'create').returns(success);
+      sandbox.stub(setsApi, 'create').returns(success);
       return success;
     },
 
     stubCreateFailure(){
       const failure = Promise.reject(new Error('FAIL'));
-      this.stub(setsApi, 'create').returns(failure);
+      sandbox.stub(setsApi, 'create').returns(failure);
       return failure;
     },
 
@@ -106,7 +106,7 @@ define([
 
   test('the "Display totals for All Grading Periods option" checkbox state is included when the set is created', function () {
     const promise = this.stubCreateSuccess();
-    const addSetStub = this.stub();
+    const addSetStub = sinon.stub();
     const form = this.renderComponent({ addGradingPeriodSet: addSetStub });
     Simulate.change(form.refs.titleInput, { target: { value: 'Howbow dah' } });
     Simulate.click(ReactDOM.findDOMNode(form.refs.createButton));
@@ -121,7 +121,7 @@ define([
     const promise = this.stubCreateSuccess();
     const form = this.renderComponent();
     Simulate.change(form.refs.titleInput, { target: { value: 'Watch me whip' } });
-    this.stub(form, 'isValid').returns(true);
+    sandbox.stub(form, 'isValid').returns(true);
     Simulate.click(ReactDOM.findDOMNode(form.refs.createButton));
     return promise.then(() => { assertDisabled(form.refs.cancelButton); });
   });
@@ -142,7 +142,7 @@ define([
         handler(new Error('FAIL'));
       }
     };
-    this.stub(setsApi, 'create').returns(fakePromise);
+    sandbox.stub(setsApi, 'create').returns(fakePromise);
     const form = this.renderComponent();
     Simulate.change(form.refs.titleInput, { target: { value: 'Watch me nay nay' } });
     Simulate.click(ReactDOM.findDOMNode(form.refs.cancelButton));
@@ -158,7 +158,7 @@ define([
         handler(new Error('FAIL'));
       }
     };
-    this.stub(setsApi, 'create').returns(fakePromise);
+    sandbox.stub(setsApi, 'create').returns(fakePromise);
     const form = this.renderComponent();
     Simulate.change(form.refs.titleInput, { target: { value: ':D' } });
     Simulate.click(ReactDOM.findDOMNode(form.refs.createButton));
@@ -168,21 +168,21 @@ define([
   test('showFlashAlert is not called when title is present', function () {
     const form = this.renderComponent();
     form.setState({ title: 'foo' });
-    const showFlashAlertStub = this.stub(FlashAlert, 'showFlashAlert');
+    const showFlashAlertStub = sandbox.stub(FlashAlert, 'showFlashAlert');
     form.isTitlePresent();
     strictEqual(showFlashAlertStub.callCount, 0);
   });
 
   test('showFlashAlert called when title is not present', function () {
     const form = this.renderComponent();
-    const showFlashAlertStub = this.stub(FlashAlert, 'showFlashAlert');
+    const showFlashAlertStub = sandbox.stub(FlashAlert, 'showFlashAlert');
     form.isTitlePresent();
     strictEqual(showFlashAlertStub.callCount, 1);
   });
 
   test('showFlashAlert called with message when title is not present', function () {
     const form = this.renderComponent();
-    const showFlashAlertStub = this.stub(FlashAlert, 'showFlashAlert');
+    const showFlashAlertStub = sandbox.stub(FlashAlert, 'showFlashAlert');
     form.isTitlePresent();
     deepEqual(showFlashAlertStub.firstCall.args[0], {
       type: 'error',
@@ -192,14 +192,14 @@ define([
 
   test('submitSucceeded calls showFlashAlert once', function () {
     const form = this.renderComponent();
-    const showFlashAlertStub = this.stub(FlashAlert, 'showFlashAlert');
+    const showFlashAlertStub = sandbox.stub(FlashAlert, 'showFlashAlert');
     form.submitSucceeded({});
     deepEqual(showFlashAlertStub.callCount, 1);
   });
 
   test('submitSucceeded calls showFlashAlert with message', function () {
     const form = this.renderComponent();
-    const showFlashAlertStub = this.stub(FlashAlert, 'showFlashAlert');
+    const showFlashAlertStub = sandbox.stub(FlashAlert, 'showFlashAlert');
     form.submitSucceeded();
     deepEqual(showFlashAlertStub.firstCall.args[0], {
       type: 'success',
@@ -209,14 +209,14 @@ define([
 
   test('submitFailed calls showFlashAlert once', function () {
     const form = this.renderComponent();
-    const showFlashAlertStub = this.stub(FlashAlert, 'showFlashAlert');
+    const showFlashAlertStub = sandbox.stub(FlashAlert, 'showFlashAlert');
     form.submitFailed();
     deepEqual(showFlashAlertStub.callCount, 1);
   });
 
   test('submitFailed calls showFlashAlert with message', function () {
     const form = this.renderComponent();
-    const showFlashAlertStub = this.stub(FlashAlert, 'showFlashAlert');
+    const showFlashAlertStub = sandbox.stub(FlashAlert, 'showFlashAlert');
     form.submitFailed();
     deepEqual(showFlashAlertStub.firstCall.args[0], {
       type: 'error',

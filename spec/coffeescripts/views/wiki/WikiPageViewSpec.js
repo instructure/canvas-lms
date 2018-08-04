@@ -128,7 +128,7 @@ test('useAsFrontPage for published wiki_pages_path', function() {
     published: true
   })
   const view = new WikiPageView({model})
-  const stub = this.stub(model, 'setFrontPage')
+  const stub = sandbox.stub(model, 'setFrontPage')
   view.useAsFrontPage()
   ok(stub.calledOnce)
 })
@@ -139,7 +139,7 @@ test('useAsFrontPage should not work on unpublished wiki_pages_path', function()
     published: false
   })
   const view = new WikiPageView({model})
-  const stub = this.stub(model, 'setFrontPage')
+  const stub = sandbox.stub(model, 'setFrontPage')
   view.useAsFrontPage()
   notOk(stub.calledOnce)
 })

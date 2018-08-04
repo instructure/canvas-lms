@@ -68,8 +68,8 @@ define([
 
   QUnit.module('CurveGradesDialogManager.createCurveGradesAction.onSelect', {
     setup () {
-      this.flashErrorSpy = this.spy($, 'flashError');
-      this.stub(CurveGradesDialog.prototype, 'show');
+      this.flashErrorSpy = sandbox.spy($, 'flashError');
+      sandbox.stub(CurveGradesDialog.prototype, 'show');
     },
     onSelect ({ isAdmin = false, inClosedGradingPeriod = false } = {}) {
       createCurveGradesAction({ inClosedGradingPeriod }, [], isAdmin, 'http://contextUrl/', true).onSelect()

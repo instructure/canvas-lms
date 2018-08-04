@@ -208,7 +208,7 @@ $discussion-dark-text: $ic-color-dark;
   color: $discussion-dark-text;
 }
 
-.discussion-pubdate {
+.discussion-pubdate, .discussion-tododate {
   @include fontSize(11px);
   color: $discussion-dark-text;
   line-height: 23px;

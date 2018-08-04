@@ -53,7 +53,7 @@ describe DiscussionEntriesController do
     it "should assign variables" do
       user_session(@student)
       get 'show', params: {:course_id => @course.id, :id => @entry.id}, :format => :json
-      # response.should be_success
+      # response.should be_successful
       expect(assigns[:entry]).not_to be_nil
       expect(assigns[:entry]).to eql(@entry)
     end

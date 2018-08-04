@@ -58,6 +58,12 @@ export const mergePastItemsForToday = (newPastItems, response) => (dispatch, get
  return mergePastItemsFor(didWeFindToday, newPastItems, response, dispatch, getState);
 };
 
+export const consumePeekIntoPast = (newPastItems, response) => (dispatch, getState) => {
+  const hasSomeItems = newPastItems.length > 0;
+  dispatch(LA.peekedIntoPast({hasSomeItems}));
+  return true;
+};
+
 function mergeCompleteDays (completeDays, dispatch, allItemsLoaded, response) {
   if (completeDays.length || allItemsLoaded) {
     dispatch(LA.gotDaysSuccess(completeDays, response));

@@ -24,7 +24,7 @@ describe "/gradebooks/speed_grader" do
   include GroupsCommon
 
   let(:locals) do
-    { anonymous_grading: false }
+    { anonymize_students: false }
   end
 
   before do
@@ -141,9 +141,6 @@ describe "/gradebooks/speed_grader" do
   end
 
   context 'grading box' do
-    before(:once) do
-    end
-
     let(:html) do
       render template: 'gradebooks/speed_grader', locals: locals
       Nokogiri::HTML.fragment(response.body)

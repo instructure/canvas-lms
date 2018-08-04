@@ -20,7 +20,8 @@ define [
   'ember'
   '../../../util/round'
   'jsx/gradebook/GradingSchemeHelper'
-], (I18n, Ember, round, {scoreToGrade}) ->
+  'jsx/gradebook/shared/helpers/GradeCalculationHelper'
+], (I18n, Ember, round, {scoreToGrade}, {scoreToPercentage}) ->
 
   AssignmentSubtotalGradesComponent = Ember.Component.extend
 
@@ -49,11 +50,9 @@ define [
       "#{I18n.n(round(values.score, round.DEFAULT))} / #{I18n.n(round(values.possible, round.DEFAULT))}"
     ).property('values')
 
-    # This method returns the raw percentage, float errors and all e.g. 54.5 / 100 * 100 will return 54.50000000000001
-    # It's use is in any further calculations so we're not using a pre-rounded number.
     rawPercent:(->
       values = @get('values')
-      values.score / values.possible * 100
+      scoreToPercentage(values.score, values.possible)
     ).property('values')
 
     percent:(->

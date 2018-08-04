@@ -497,6 +497,8 @@ export default class EventDataSource {
     if (ENV.STUDENT_PLANNER_ENABLED) {
       eventDataSources.push(['/api/v1/planner_notes', params])
       eventDataSources.push(['/api/v1/planner/items', _.extend({filter: 'ungraded_todo_items'}, params)])
+    } else if (ENV.PLANNER_ENABLED) {
+      eventDataSources.push(['/api/v1/planner/items', _.extend({filter: 'all_ungraded_todo_items'}, params)])
     }
     return this.startFetch(eventDataSources, dataCB, doneCB, options)
   }
@@ -664,7 +666,6 @@ export default class EventDataSource {
       item.start_at = item.plannable.todo_date
       item.end_at = item.plannable.todo_date
       item.title = item.plannable.title
-      item.can_edit = false
       /* eslint-enable no-param-reassign */
     })
     return items

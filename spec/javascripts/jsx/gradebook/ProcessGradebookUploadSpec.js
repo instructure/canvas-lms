@@ -407,7 +407,7 @@ define([
 
   QUnit.module('ProcessGradebookUpload.upload', {
     setup () {
-      this.stub(window, 'alert');
+      sandbox.stub(window, 'alert');
       xhr = sinon.useFakeXMLHttpRequest();
       requests = [];
 

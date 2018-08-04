@@ -124,6 +124,7 @@ describe SisBatch do
       ]
       expect(Pseudonym.where(:sis_user_id => %w{user_1 user_2 user_3}).count).to eq 3
       expect(Course.where(:sis_source_id => %w{course_1 course_2 course_3 course_4}).count).to eq 4
+      expect(batch.reload.data[:counts].slice(:users, :courses)).to eq({:users => 3, :courses => 4})
     end
 
     it 'should set rows_for_parallel' do
@@ -807,6 +808,8 @@ test_4,TC 104,Test Course 104,,term1,active
       b3 = process_csv_data([
         %{course_id,short_name,long_name,account_id,term_id,status
       }], diffing_data_set_identifier: 'default', change_threshold: 1)
+      expect(b3).to be_imported_with_messages
+      expect(b3.processing_warnings.first.last).to include("Diffing not performed")
 
       # no change threshold, _should_ delete everything maybe?
       b4 = process_csv_data([

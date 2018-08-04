@@ -180,7 +180,7 @@ describe UsersController do
     course2 = @course
 
     get 'manageable_courses', params: {:user_id => @teacher.id, :term => "MyCourse"}
-    expect(response).to be_success
+    expect(response).to be_successful
 
     courses = json_parse
     expect(courses.map { |c| c['id'] }).to eq [course2.id]
@@ -193,7 +193,7 @@ describe UsersController do
     end
 
     get 'manageable_courses', params: {:user_id => @teacher.id}
-    expect(response).to be_success
+    expect(response).to be_successful
 
     courses = json_parse
     expect(courses.map { |c| c['label'] }).to eq %w(a B c d)
@@ -202,7 +202,7 @@ describe UsersController do
   describe "POST 'create'" do
     it "should not allow creating when self_registration is disabled and you're not an admin'" do
       post 'create', params: {:pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }}
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
     end
 
     context 'self registration' do
@@ -233,7 +233,7 @@ describe UsersController do
           course_with_student(:user => @user, :active_all => true)
 
           post 'create', params: {:pseudonym => { :unique_id => 'jane@example.com' }, :observee => { :unique_id => @pseudonym.unique_id, :password => 'lolwut12' }, :user => { :name => 'Jane Observer', :terms_of_use => '1', :initial_enrollment_type => 'observer' }}, format: 'json'
-          expect(response).to be_success
+          expect(response).to be_successful
           new_pseudo = Pseudonym.where(unique_id: 'jane@example.com').first
           new_user = new_pseudo.user
           expect(new_user.linked_students).to eq [@user]
@@ -265,7 +265,7 @@ describe UsersController do
             }
           }, format: 'json'
 
-          expect(response).to be_success
+          expect(response).to be_successful
           new_pseudo = Pseudonym.where(unique_id: 'jon@example.com').first
           new_user = new_pseudo.user
           expect(new_user.linked_students).to eq [@student]
@@ -305,7 +305,7 @@ describe UsersController do
             }
           }, format: 'json', session: { oauth2: provider.session_hash }
 
-          expect(response).to be_success
+          expect(response).to be_successful
           json = json_parse
           expect(json['destination']).to eq 'http://test.host/login/oauth2/confirm'
         end
@@ -318,7 +318,7 @@ describe UsersController do
 
       it "should create a pre_registered user" do
         post 'create', params: {:pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' }}
-        expect(response).to be_success
+        expect(response).to be_successful
 
         p = Pseudonym.where(unique_id: 'jacob@instructure.com').first
         expect(p).to be_active
@@ -335,7 +335,7 @@ describe UsersController do
         post 'create', params: {:pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' }}
         json = JSON.parse(response.body)
         accepted_terms = json["user"]["user"]["preferences"]["accepted_terms"]
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(accepted_terms).to be_present
         expect(Time.parse(accepted_terms)).to be_within(1.minute.to_i).of(Time.now.utc)
       end
@@ -345,7 +345,7 @@ describe UsersController do
           :pseudonym => { :unique_id => 'jacob@instructure.com'},
           :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :skip_registration => '1' }
         })
-        expect(response).to be_success
+        expect(response).to be_successful
 
         p = Pseudonym.where(unique_id: 'jacob@instructure.com').first
         expect(p).to be_active
@@ -374,7 +374,7 @@ describe UsersController do
         cc3 = user3.communication_channels.create!(:path => 'jacob@instructure.com', :path_type => 'email') { |cc| cc.workflow_state == 'retired' }
 
         post 'create', params: {:pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' }}
-        expect(response).to be_success
+        expect(response).to be_successful
 
         p = Pseudonym.where(unique_id: 'jacob@instructure.com').first
         expect(p).to be_active
@@ -390,7 +390,7 @@ describe UsersController do
         u = User.create! { |u| u.workflow_state = 'creation_pending' }
         p = Pseudonym.create!(:unique_id => 'jacob@instructure.com', :user => u)
         post 'create', params: {:pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' }}
-        expect(response).to be_success
+        expect(response).to be_successful
 
         expect(Pseudonym.by_unique_id('jacob@instructure.com')).to eq [p]
         p.reload
@@ -402,7 +402,7 @@ describe UsersController do
         expect(p.user.communication_channels.first.path).to eq 'jacob@instructure.com'
 
         post 'create', params: {:pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' }}
-        expect(response).not_to be_success
+        expect(response).not_to be_successful
       end
 
       it "should validate acceptance of the terms" do
@@ -416,7 +416,7 @@ describe UsersController do
       it "should not validate acceptance of the terms if terms are passive" do
         Account.default.create_terms_of_service!(terms_type: "default")
         post 'create', params: {:pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }}
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it "should not validate acceptance of the terms if not required by account" do
@@ -425,7 +425,7 @@ describe UsersController do
         default_account.save!
 
         post 'create', params: {:pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }}
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it "should require email pseudonyms by default" do
@@ -451,7 +451,7 @@ describe UsersController do
 
       it "should ignore the password if not self enrolling" do
         post 'create', params: {:pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :initial_enrollment_type => 'student' }}
-        expect(response).to be_success
+        expect(response).to be_successful
         u = User.where(name: 'Jacob Fugal').first
         expect(u).to be_pre_registered
         expect(u.pseudonym).to be_password_auto_generated
@@ -466,12 +466,12 @@ describe UsersController do
 
         it "should strip the self enrollment code before validation" do
           post 'create', params: {:pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code + ' ', :initial_enrollment_type => 'student' }, :self_enrollment => '1'}
-          expect(response).to be_success
+          expect(response).to be_successful
         end
 
         it "should ignore the password if self enrolling with an email pseudonym" do
           post 'create', params: {:pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'email', :self_enrollment => '1'}
-          expect(response).to be_success
+          expect(response).to be_successful
           u = User.where(name: 'Jacob Fugal').first
           expect(u).to be_pre_registered
           expect(u.pseudonym).to be_password_auto_generated
@@ -487,7 +487,7 @@ describe UsersController do
 
         it "should auto-register the user if self enrolling" do
           post 'create', params: {:pseudonym => { :unique_id => 'jacob', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1'}
-          expect(response).to be_success
+          expect(response).to be_successful
           u = User.where(name: 'Jacob Fugal').first
           expect(@course.students).to include(u)
           expect(u).to be_registered
@@ -508,10 +508,10 @@ describe UsersController do
         user_with_pseudonym(:active_all => true, :password => 'lolwut12')
 
         post 'create', params: {:pseudonym => { :unique_id => 'jacob@instructure.com' }, :observee => { :unique_id => @pseudonym.unique_id, :password => 'lolwut12' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :initial_enrollment_type => 'observer' }}
-        expect(response).to be_success
+        expect(response).to be_successful
         u = User.where(name: 'Jacob Fugal').first
         expect(u).to be_pre_registered
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(u.linked_students).to include(@user)
       end
     end
@@ -529,7 +529,7 @@ describe UsersController do
 
         it "should create a pre_registered user (in the correct account)" do
           post 'create', params: {:account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :sis_user_id => 'testsisid' }, :user => { :name => 'Jacob Fugal' }}, format: 'json'
-          expect(response).to be_success
+          expect(response).to be_successful
           p = Pseudonym.where(unique_id: 'jacob@instructure.com').first
           expect(p.account_id).to eq account.id
           expect(p).to be_active
@@ -539,7 +539,7 @@ describe UsersController do
 
         it "should create users with non-email pseudonyms" do
           post 'create', params: {account_id: account.id, pseudonym: { unique_id: 'jacob', sis_user_id: 'testsisid', integration_id: 'abc', path: '' }, user: { name: 'Jacob Fugal' }}, format: 'json'
-          expect(response).to be_success
+          expect(response).to be_successful
           p = Pseudonym.where(unique_id: 'jacob').first
           expect(p.account_id).to eq account.id
           expect(p).to be_active
@@ -550,14 +550,14 @@ describe UsersController do
 
         it "should create users with non-email pseudonyms and an email" do
           post 'create', params: {account_id: account.id, pseudonym: { unique_id: 'testid', path: 'testemail@example.com' }, user: { name: 'test' }}, format: 'json'
-          expect(response).to be_success
+          expect(response).to be_successful
           p = Pseudonym.where(unique_id: 'testid').first
           expect(p.user.email).to eq "testemail@example.com"
         end
 
         it "should not require acceptance of the terms" do
           post 'create', params: {:account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }}
-          expect(response).to be_success
+          expect(response).to be_successful
         end
 
         it "should allow setting a password" do
@@ -574,7 +574,7 @@ describe UsersController do
               unique_id: 'jacob@instructure.com', password: 'asdfasdf',
               password_confirmation: 'asdfasdf', force_self_registration: "1",
             }, user: { name: 'Jacob Fugal' }}
-          expect(response).to be_success
+          expect(response).to be_successful
           u = User.where(name: 'Jacob Fugal').first
           expect(u).to be_present
           expect(u.pseudonym).not_to be_password_auto_generated
@@ -582,18 +582,18 @@ describe UsersController do
 
         it "should not throw a 500 error without user params'" do
           post 'create', params: {:pseudonym => { :unique_id => 'jacob@instructure.com' }, account_id: account.id}
-          expect(response).to be_success
+          expect(response).to be_successful
         end
 
         it "should not throw a 500 error without pseudonym params'" do
           post 'create', params: {:user => { :name => 'Jacob Fugal' }, account_id: account.id}
           assert_status(400)
-          expect(response).not_to be_success
+          expect(response).not_to be_successful
         end
 
         it "strips whitespace from the unique_id" do
           post 'create', params: {:account_id => account.id, :pseudonym => { :unique_id => 'spaceman@example.com ' }, :user => { :name => 'Spaceman' }}, format: 'json'
-          expect(response).to be_success
+          expect(response).to be_successful
           json = JSON.parse(response.body)
           p = Pseudonym.find(json["pseudonym"]["pseudonym"]["id"])
           expect(p.unique_id).to eq 'spaceman@example.com'
@@ -606,7 +606,7 @@ describe UsersController do
         admin = account_admin_user_with_role_changes(:account => account, :role_changes => {'manage_sis' => false})
         user_session(admin)
         post 'create', params: {:account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :sis_user_id => 'testsisid' }, :user => { :name => 'Jacob Fugal' }}, format: 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
         p = Pseudonym.where(unique_id: 'jacob@instructure.com').first
         expect(p.account_id).to eq account.id
         expect(p).to be_active
@@ -627,7 +627,7 @@ describe UsersController do
         notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
 
         post 'create', params: {:account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :send_confirmation => '0' }, :user => { :name => 'Jacob Fugal' }}, format: 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
         p = Pseudonym.where(unique_id: 'jacob@instructure.com').first
         expect(Message.where(:communication_channel_id => p.user.email_channel, :notification_id => notification).first).to be_present
       end
@@ -644,7 +644,7 @@ describe UsersController do
         u = User.create! { |u| u.workflow_state = 'registered' }
         u.communication_channels.create!(:path => 'jacob@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
         post 'create', params: {:account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :send_confirmation => '0' }, :user => { :name => 'Jacob Fugal' }}, format: 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
         p = Pseudonym.where(unique_id: 'jacob@instructure.com').first
         expect(Message.where(:communication_channel_id => p.user.email_channel, :notification_id => notification).first).to be_nil
       end
@@ -1041,7 +1041,7 @@ describe UsersController do
                 user_session(student1)
 
                 get 'grades'
-                expect(response).to be_success
+                expect(response).to be_successful
                 selected_period_id = assigns[:grading_periods][@course2.id][:selected_period_id]
                 expect(selected_period_id).to eq @grading_period2.id
               end
@@ -1064,7 +1064,7 @@ describe UsersController do
 
       user_session(@teacher)
       get 'grades', params: {:course_id => @course.id}
-      expect(response).to be_success
+      expect(response).to be_successful
 
       teacher_enrollments = assigns[:presenter].teacher_enrollments
       expect(teacher_enrollments).not_to be_nil
@@ -1113,7 +1113,7 @@ describe UsersController do
         end
 
         get 'grades'
-        expect(response).to be_success
+        expect(response).to be_successful
         enrollments = assigns[:presenter].teacher_enrollments
         expect(enrollments).to include(@e2)
       end
@@ -1227,7 +1227,7 @@ describe UsersController do
       pseudonym(@admin)
       user_with_pseudonym(:account => account)
       get 'admin_merge', params: {:user_id => @admin.id, :pending_user_id => @user.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:pending_other_user]).to be_nil
     end
   end
@@ -1247,7 +1247,7 @@ describe UsersController do
         user_session(@teacher)
 
         get 'show', params: {:id => @teacher.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:enrollments].sort_by(&:id)).to eq [@enrollment, @e2]
       end
 
@@ -1263,7 +1263,7 @@ describe UsersController do
         user_session(@user)
 
         get 'show', params: {:id => @teacher.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:enrollments].sort_by(&:id)).to eq [@enrollment, @e2]
       end
     end
@@ -1279,7 +1279,7 @@ describe UsersController do
       user_session(@admin)
 
       get 'show', params: {:id => @teacher.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:enrollments].sort_by(&:id)).to eq [@enrollment1, @enrollment2]
     end
 
@@ -1290,7 +1290,7 @@ describe UsersController do
       user_with_pseudonym(:user => @admin, :account => account)
       user_session(@admin)
       get 'show', params: {:id  => @student.id}, format: 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
       user = json_parse
       expect(user['name']).to eq @student.name
     end
@@ -1512,7 +1512,7 @@ describe UsersController do
       post :toggle_hide_dashcard_color_overlays
 
       expect(@user.reload.preferences[:hide_dashcard_color_overlays]).to be_truthy
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(JSON.parse(response.body)).to be_empty
     end
   end
@@ -1559,7 +1559,7 @@ describe UsersController do
       user_session(@user)
 
       post 'invite_users', params: {:course_id => @course.id}
-      expect(response).to be_success # yes, even though we didn't do anything
+      expect(response).to be_successful # yes, even though we didn't do anything
     end
 
     it 'works with a teacher with open_registration' do
@@ -1567,7 +1567,7 @@ describe UsersController do
       course_with_teacher_logged_in(:active_all => true)
 
       post 'invite_users', params: {:course_id => @course.id}
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it 'invites a bunch of users' do
@@ -1577,7 +1577,7 @@ describe UsersController do
       user_list = [{'email' => 'example1@example.com'}, {'email' => 'example2@example.com', 'name' => 'Hurp Durp'}]
 
       post 'invite_users', params: {:course_id => @course.id, :users => user_list}
-      expect(response).to be_success
+      expect(response).to be_successful
       json = JSON.parse(response.body)
       expect(json['invited_users'].count).to eq 2
 
@@ -1596,7 +1596,7 @@ describe UsersController do
       user_list = [{'email' => 'example1@example.com'}]
 
       post 'invite_users', params: {:course_id => @course.id, :users => user_list}
-      expect(response).to be_success
+      expect(response).to be_successful
 
       json = JSON.parse(response.body)
       expect(json['invited_users']).to be_empty

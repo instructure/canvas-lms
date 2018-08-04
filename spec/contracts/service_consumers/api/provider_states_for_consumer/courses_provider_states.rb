@@ -17,138 +17,44 @@
 
 PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
-    provider_state 'a student in a course with a discussion' do
-      set_up do
-        course_with_teacher(active_all: true)
-        @course.discussion_topics.create!(title: "title", message: nil, user: @teacher, discussion_type: 'threaded')
-        Pseudonym.create!(user: @teacher, unique_id: 'testuser@instructure.com')
-        token = @teacher.access_tokens.create!().full_token
 
-        provider_param :token, token
-        provider_param :course_id, @course.id.to_s
+    # Course ID: 1
+    # Quizzes ID: 1
+    provider_state 'a quiz in a course' do
+      set_up do
+        @course = Pact::Canvas.base_state.course
+        @course.quizzes.create(title:'Test Quiz', description: 'Its a Quiz figure it out', due_at: 'Whenever')
       end
     end
 
-    provider_state 'a student in a course with a quiz' do
-      set_up do
-          course_with_teacher(active_all: true)
-          @course.quizzes.create(title:'Test Quiz', description: 'Its a Quiz figure it out', due_at: 'Whenever')
-          Pseudonym.create!(user: @teacher, unique_id: 'testuser@instructure.com')
-          token = @teacher.access_tokens.create!().full_token
-
-          provider_param :token, token
-          provider_param :course_id, @course.id.to_s
-      end
-    end
-
-    provider_state 'a student in a course' do
-      set_up do
-        course_with_student(active_all: true)
-        Pseudonym.create!(user: @student, unique_id: 'testuser@instructure.com')
-        token = @student.access_tokens.create!().full_token
-
-        provider_param :token, token
-        provider_param :course_id, @course.id.to_s
-      end
-    end
-
-    provider_state 'a teacher in a course' do
-      set_up do
-        course_with_teacher(active_all: true)
-        Pseudonym.create!(user: @teacher, unique_id: 'testuser@instructure.com')
-        token = @teacher.access_tokens.create!().full_token
-
-        provider_param :token, token
-        provider_param :course_id, @course.id.to_s
-      end
-    end
-
-    provider_state 'a ta in a course' do
-      set_up do
-        course_with_ta(active_all: true)
-        Pseudonym.create!(user: @ta, unique_id: 'testuser@instructure.com')
-        token = @ta.access_tokens.create!().full_token
-
-        provider_param :token, token
-        provider_param :course_id, @course.id.to_s
-      end
-    end
-
-    provider_state 'an observer in a course' do
-      set_up do
-        course_with_observer(active_all: true)
-        u = User.create!(name: 'teacher')
-        @course.enroll_user(u, 'TeacherEnrollment')
-        Pseudonym.create!(user: u, unique_id: 'testuser@instructure.com')
-        token = u.access_tokens.create!().full_token
-
-        provider_param :token, token
-        provider_param :course_id, @course.id.to_s
-      end
-    end
-
-    provider_state 'an admin in a course' do
-      set_up do
-        @admin = account_admin_user
-        @course = course_model
-
-        Pseudonym.create!(user:@admin, unique_id: 'testaccountuser@instructure.com')
-        token = @admin.access_tokens.create!().full_token
-        
-        provider_param :token, token
-        provider_param :account_id, @admin.id.to_s
-        provider_param :course_id, @course.id.to_s
-      end
-    end
-
+    # Course ID: 1
     provider_state 'multiple sections in a course' do
       set_up do
-        course_with_teacher
+        @course = Pact::Canvas.base_state.course
         add_section("section1", @course)
         add_section("section2", @course)
         add_section("section3", @course)
         add_section("section4", @course)
-
-        Pseudonym.create!(user: @teacher, unique_id: 'testuser@instructure.com')
-        token = @teacher.access_tokens.create!().full_token
-        provider_param :token, token
-        provider_param :course_id, @course.id.to_s
       end
     end
 
-    provider_state 'a wiki page in a course' do
-      set_up do
-        course_with_teacher
-        wiki_page_model
-        Pseudonym.create!(user: @teacher, unique_id: 'testuser@instructure.com')
-        token = @teacher.access_tokens.create!().full_token
-
-        provider_param :token, token
-        provider_param :course_id, @course.id.to_s
-      end
-    end
-
+    # Student ID: 5 || Name: Student1
+    # Course ID: 1
+    # Quizzes ID: 1
     provider_state 'a student in a course with a submitted assignment' do
       set_up do
-        course_with_student_and_submitted_homework
-        Pseudonym.create!(user: @teacher, unique_id: 'testuser@instructure.com')
-        token = @teacher.access_tokens.create!().full_token
-
-        provider_param :course_id, @course.id.to_s
-        provider_param :token, token
-
+        @student = Pact::Canvas.base_state.students.first
+        @course = Pact::Canvas.base_state.course
+        @assignment = @course.assignments.create!({ title: "some assignment", submission_types: "online_url,online_upload" })
+        @submission = @assignment.submit_homework(@student, { submission_type: "online_url", url: "http://www.google.com" })
       end
     end
 
+    # Course ID: 1
     provider_state 'a student in a course with a missing assignment' do
       set_up do
-        course_with_student
+        @course = Pact::Canvas.base_state.course
         Assignment.create!(context: @course, title: "Missing Assignment", due_at: Time.zone.now - 2)
-        Pseudonym.create!(user: @student, unique_id: 'testuser@instructure.com')
-        token = @student.access_tokens.create!().full_token
-
-        provider_param :course_id, @course.id.to_s
-        provider_param :token, token
       end
     end
   end

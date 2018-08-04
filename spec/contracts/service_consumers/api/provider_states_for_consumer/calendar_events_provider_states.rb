@@ -17,21 +17,23 @@
 
 PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
+
+    # User ID: 2 || Name: Admin1
+    # Event ID: 1
     provider_state 'a user with a calendar event' do
       set_up do
-        user_factory(name: 'Bob', active_user: true)
-        Pseudonym.create!(user: @user, unique_id: 'testuser@instructure.com')
-        token = @user.access_tokens.create!().full_token
+        @user = Pact::Canvas.base_state.account_admins.first
         @event = @user.calendar_events.create!
-
-        provider_param :token, token
-        provider_param :event_id, @event.id.to_s
       end
     end
 
+    # Student ID: 2 || Name: Student1
+    # Teacher ID: 4 || Name: Teacher1
+    # Event ID: 1
     provider_state 'a user with a robust calendar event' do
       set_up do
-        course_with_teacher(:active_all => true)
+        @course = Pact::Canvas.base_state.course
+        @student = Pact::Canvas.base_state.students.first
         @ag = AppointmentGroup.create!(
           title: "Rohan's Special Day",
           location_name: "bollywood",
@@ -44,7 +46,6 @@ PactConfig::Consumers::ALL.each do |consumer|
             ["2012-01-01 13:59:59", "2012-01-01 14:59:59"]
           ]
         )
-        course_with_student(course: @course, active_all: true)
         @ag.publish!
         @event = @ag.appointments.first
         @event.update!(all_day: true, all_day_date: '2015-09-22', description: "", location_name: "", location_address: "")
@@ -56,31 +57,18 @@ PactConfig::Consumers::ALL.each do |consumer|
         course_with_student(course: @course, active_all: true)
         @student2 = @student
         @event.reserve_for(@student2, @student2)
-
-        Pseudonym.create!(user: @student, unique_id: 'testuser@instructure.com')
-        token = @student.access_tokens.create!().full_token
-
-        provider_param :token, token
-        provider_param :event_id, @event.id.to_s
       end
     end
 
+    # User ID: 2 || Name: Admin1
+    # Event ID: 1, 2, 3, 4.
     provider_state 'a user with many calendar events' do
       set_up do
-        user_factory(name: 'Bob', active_user: true)
-        Pseudonym.create!(user: @user, unique_id: 'testuser@instructure.com')
-        token = @user.access_tokens.create!().full_token
-
+        @user = Pact::Canvas.base_state.account_admins.first
         @event0 = @user.calendar_events.create!
         @event1 = @user.calendar_events.create!
         @event2 = @user.calendar_events.create!
         @event3 = @user.calendar_events.create!
-
-        provider_param :token, token
-        provider_param :event_id0, @event0.id.to_s
-        provider_param :event_id1, @event1.id.to_s
-        provider_param :event_id2, @event2.id.to_s
-        provider_param :event_id3, @event3.id.to_s
       end
     end
   end

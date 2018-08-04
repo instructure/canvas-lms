@@ -52,7 +52,7 @@ define([
   QUnit.module('AccountGradingPeriod', {
     renderComponent(props = {}) {
       let attrs = _.defaults(props, defaultProps);
-      attrs.onDelete = this.stub();
+      attrs.onDelete = sinon.stub();
       const element = React.createElement(GradingPeriod, attrs);
       return ReactDOM.render(element, wrapper);
     },
@@ -140,7 +140,7 @@ define([
   });
 
   test('does not delete the period if the user cancels the delete confirmation', function () {
-    this.stub(window, 'confirm').returns(false);
+    sandbox.stub(window, 'confirm').returns(false);
     let period = this.renderComponent();
     Simulate.click(ReactDOM.findDOMNode(period.refs.deleteButton));
     ok(period.props.onDelete.notCalled);
@@ -148,8 +148,8 @@ define([
 
   test('calls onDelete if the user confirms deletion and the ajax call succeeds', function () {
     const deletePromise = new Promise(resolve => resolve());
-    this.stub(axios, 'delete').returns(deletePromise);
-    this.stub(window, 'confirm').returns(true);
+    sandbox.stub(axios, 'delete').returns(deletePromise);
+    sandbox.stub(window, 'confirm').returns(true);
     let period = this.renderComponent();
     Simulate.click(ReactDOM.findDOMNode(period.refs.deleteButton));
     return deletePromise.then(() => {

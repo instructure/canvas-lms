@@ -242,4 +242,13 @@ module Context
   def nickname_for(_user, fallback = :name)
     self.send fallback if fallback
   end
+
+  def self.last_updated_at(klass, ids)
+    raise ArgumentError unless CONTEXT_TYPES.include?(klass.class_name.to_sym)
+    klass.where(id: ids)
+         .where.not(updated_at: nil)
+         .order("updated_at DESC")
+         .limit(1)
+         .pluck(:updated_at)&.first
+  end
 end

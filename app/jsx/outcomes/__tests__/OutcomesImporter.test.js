@@ -18,24 +18,26 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import sinon from 'sinon'
 import { render, shallow } from 'enzyme'
 import { merge } from 'lodash'
 import OutcomesImporter, { showOutcomesImporterIfInProgress } from '../OutcomesImporter'
 
-jest.mock('../../shared/FlashAlert');
 import { showFlashAlert } from '../../shared/FlashAlert'
-
-jest.mock('../apiClient');
 import * as apiClient from '../apiClient'
+
+jest.mock('../../shared/FlashAlert');
+jest.mock('../apiClient');
 
 jest.useFakeTimers()
 
+const file = sinon.createStubInstance(File)
 const defaultProps = (props = {}) => (
   merge({
-    mount: null,
+    hide: () => {},
     disableOutcomeViews: () => {},
     resetOutcomeViews: () => {},
-    file: {},
+    file,
     contextUrlRoot: '/accounts/1',
     invokedImport: true
   }, props)
@@ -99,7 +101,7 @@ it('uploads file when the upload begins', () => {
   const modal = shallow(<OutcomesImporter {...defaultProps({ disableOutcomeViews })}/>)
   apiClient.createImport.mockReturnValue(Promise.resolve({data: {id: 3}}))
   modal.instance().beginUpload()
-  expect(apiClient.createImport).toBeCalledWith('/accounts/1', {})
+  expect(apiClient.createImport).toBeCalledWith('/accounts/1', file)
 })
 
 it('starts polling for import status after the upload begins', () => {

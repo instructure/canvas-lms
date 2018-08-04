@@ -30,7 +30,7 @@ test('#constructor: it sets up the proper context', () => {
 
 QUnit.skip('capturing: it works', function() {
   const tracker = new Subject()
-  const capture = this.stub()
+  const capture = sinon.stub()
   tracker.install(capture)
 
   // this will never be ok because .install only triggers the

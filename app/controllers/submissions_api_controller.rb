@@ -596,7 +596,8 @@ class SubmissionsApiController < ApplicationController
       api_attachment_preflight(
         @user, request,
         check_quota: false, # we don't check quota when uploading a file for assignment submission
-        folder: @user.submissions_folder(@context) # organize attachment into the course submissions folder
+        folder: @user.submissions_folder(@context), # organize attachment into the course submissions folder
+        assignment: @assignment
       )
     end
   end

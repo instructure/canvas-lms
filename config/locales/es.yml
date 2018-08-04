@@ -140,6 +140,7 @@ es:
     tab_users: Usuarios
     turnitin_pledge: "Esta presentación de tarea, es mi propio trabajo"
   account_97b34646: Cuenta
+  account_and_subaccount_40c6430: "Cuenta y subcuenta"
   account_authorization_config: 
     default_delegated_login_handle_name: "Iniciar sesión"
     default_login_handle_name: "Correo electrónico"
@@ -251,6 +252,7 @@ es:
   account_course_and_user_search_22bf297a: "Búsqueda del curso y usuario de la cuenta"
   account_domain_78f43049: "Dominio de la cuenta"
   account_domain_lookups_f9d1147e: "Búsquedas en el dominio de la cuenta"
+  account_groups_2f301732: "Grupos de cuentas"
   account_id_2c3b4f15: "ID de la cuenta"
   account_id_73966078: account_id
   account_id_f6e26867: "ID de cuenta"
@@ -413,8 +415,11 @@ es:
       open_registration_delegated_warning_dialog: "Un proveedor externo de identidad está activo"
       what_are_quiz_ip_filters: "¿Cuáles son los Filtros de IP para evaluaciones?"
     user: Usuario
+  account_settings_fe083453: "Configuraciones de cuenta"
+  account_settings_subaccount_navigation_3af6f7f5: "Configuraciones de cuenta (Navegación de subcuenta)"
   account_sis_id_2e4a461: "Identificación de SIS de la cuenta"
   account_sis_id_5da8fd2d: "Identificación de SIS de la cuenta"
+  account_statistics_2b52a1c9: "Estadísticas de la cuenta"
   account_surveys_b0039876: "Encuestas de la cuenta"
   account_user: 
     types: 
@@ -1529,6 +1534,8 @@ es:
   add_folder_ba50d107: "Agregar carpeta"
   add_grading_period_6f774dc3: "Agregar período de calificación"
   add_grading_scheme_81e23c05: "Agregar esquema de calificaciones"
+  add_group_c84f9e9d: "Agregar grupo"
+  add_group_set_f9809e11: "Agregar conjunto de grupos"
   add_help_menu_links_de9fc34f: "Agregar enlaces de menú de ayuda"
   add_icon_567dbcaa: "agregar ícono"
   add_link_5c01c1e8: "Agregar enlace"
@@ -1586,13 +1593,24 @@ es:
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "Configuración de tarea sincronizada de SIS adicional, evaluación y foro"
   addressbook_microservice_a4940422: "AddressBook microservicios"
   addressbook_performance_tap_98ddf67: "AddressBook rendimiento optimizado"
+  adds_analytics_link_on_the_user_settings_menu_3a048816: "Agrega un enlace al análisis en el menú de configuraciones del usuario."
+  adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Agrega análisis a la tarjeta de contexto de un alumno."
   adjust_final_grade_fa45e7e0: "Ajustar nota final"
   admin_4d3ba42f: Admin
   admin_csv_f8d1b3eb: "Administrar CSV"
   admin_navigation_menu_77b801a2: "Menú de navegación de administrador"
+  admin_tools_grade_change_logs_d804833f: "Herramientas del administrador (Registros de cambio de calificación)"
+  admin_tools_logging_tab_680698f3: "Herramientas del administrador (Pestaña Inicio de sesión (Logging))"
+  admin_tools_notifications_tab_120d6cdf: "Herramientas del administrador (Pestaña Notificaciones (Notifications))"
+  admin_tools_restore_courses_tab_b07bbfa7: "Herramientas del administrador (Pestaña Restaurar cursos (Restore Courses))"
+  admin_tools_undelete_courses_d9bd8631: "Herramientas del administrador (Recuperar cursos (Undelete Courses))"
   admin_user_name_29dd115a: admin_user_name
+  admin_view_a2f4cd5c: "Vista del administrador"
   admins_3e1dce15: Administradores
   admins_add_remove_26811ce5: "Administradores: agregar/eliminar"
+  affects_viewing_the_publish_course_conclude_course_76d2f601: |-
+      Afecta la vista de los botones Publicar curso (Publish Course), Concluir curso (Conclude Course) y Borrar de manera permanente este curso (Permanently Delete this Course).
+      El botón Borrar de manera permanente este curso (Permanently Delete this Course) solamente aparece para los cursos creados manualmente.
   after_48b9d69: Después...
   after_4c71e718: Después
   after_cbb5ebae: Después...
@@ -1654,6 +1672,7 @@ es:
       recipients_required: "Al menos un recipiente es necesario"
       threshold_should_be_numeric: "Este debería ser un número positivo"
   alerts_add_edit_delete_d71091c6: "Alertas: agregar/editar/eliminar"
+  alerts_course_settings_53551794: "Alertas (Configuraciones del curso)"
   all_4321c3a1: Todo
   all_account_types_e83c1516: "Todos los tipos de cuentas"
   all_accounts_3bafc860: "Todas las cuentas"
@@ -1716,13 +1735,244 @@ es:
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Permitir que esta herramienta acceda a los nombres IMS y servicio de aprovisionamiento de rol"
   allow_users_to_comment_45b8f753: "Permitir que los usuarios comenten"
   allowed_attempts_4e229caa: "Intentos permitidos"
+  allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Permite a un usuario acceder al enlace Actuar como usuario (Act as User) en las tarjetas de contexto del alumno."
+  allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "Permite a un usuario ver la ID de SIS en los detalles de inicio de sesión de un usuario."
+  allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Permite a un usuario ver las ID de SIS en una página de Personas del curso."
+  allows_admin_user_to_view_account_statistics_341f00d9: "Permite al usuario administrador ver las estadísticas de la cuenta."
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Permite crear anuncios para una sección específica"
   allows_creating_discussions_for_a_specific_section_6bf44036: "Permite crear foros para una sección específica"
+  allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Permite a quienes tengan roles basados en profesor/diseñador/profesor auxiliar acceder a la herramienta de Chat."
+  allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Permite a quienes tengan roles basados en profesor/profesor auxiliar acceder a la herramienta de Asistencia."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Permitir que los profesores marquen los datos de calificación para ser exportados en cantidad a las integraciones de SIS."
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "Permite la duplicación de módulos en Canvas"
   allows_the_duplicating_of_objects_in_canvas_c86f3665: "Permite la duplicación de objetos en Canvas"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "Permite la duplicación del Calendario de eventos"
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Permite la programación de los eventos recurrentes del calendario"
+  allows_user_to_access_and_edit_the_admin_settings__b3390b66: "Permite al usuario acceder y editar las configuraciones del Administrador en Commons. Permite al usuario crear y administrar Grupos. Permite al usuario administrar recursos compartidos en la cuenta."
+  allows_user_to_access_speedgrader_from_an_assignme_3b908f7: "Permite al usuario acceder a SpeedGrader desde una tarea."
+  allows_user_to_access_the_announcements_link_in_co_b0ef1a10: |-
+      Permite al usuario acceder al enlace de Anuncios (Announcements) en la navegación del curso.
+      Permite al usuario ver los anuncios del curso.
+      Permite al usuario ver los anuncios recientes en la página de inicio del curso.
+  allows_user_to_access_the_blueprint_courses_sideba_cb5f6a46: "Permite al usuario acceder a la barra lateral de los Cursos de proyectos. Permite al usuario administrar las configuraciones de contenido de los Cursos de proyectos en Configuraciones del curso. Permite al usuario quitar un curso asociado. Permite al usuario editar configuraciones de bloqueo de proyectos sobre tareas, páginas o foros individuales"
+  allows_user_to_access_the_files_tab_in_the_content_a5187929: "Permite al usuario acceder a la pestaña Archivos (Files) en el Selector de contenido."
+  allows_user_to_access_the_restore_courses_tab_in_a_3ff3086c: "Permite al usuario acceder a la pestaña Restaurar cursos (Restore Courses) en Herramientas del administrador."
+  allows_user_to_access_the_student_progress_page_aca95197: "Permite al usuario acceder a la página Progreso del alumno (Student Progress)."
+  allows_user_to_access_the_theme_editor_26691f9a: "Permite al usuario acceder al Editor de temas."
+  allows_user_to_access_the_users_link_in_account_na_d77e46de: "Permite al usuario acceder al enlace de Usuarios (Users) en la navegación de la cuenta."
+  allows_user_to_access_the_view_notifications_tab_i_71995596: "Permite al usuario acceder a la pestaña Ver notificaciones (View Notifications) en Herramientas del administrador."
+  allows_user_to_act_as_other_users_in_the_account_195628ae: "Permite al usuario actuar como otros usuarios en la cuenta."
+  allows_user_to_add_and_remove_other_account_admins_7834ea9a: "Permite al usuario agregar y quitar otros administradores de cuenta."
+  allows_user_to_add_discussions_in_the_discussions__f5479e2c: |-
+      Permite al usuario agregar foros a la página Foros (Discussions).
+      Permite al usuario cerrar para comentarios, mover, anclar/desanclar, editar y eliminar temas de foros creados por otros usuarios.
+  allows_user_to_add_edit_and_delete_course_files_an_2cbdc89a: |-
+      Permite al usuario agregar, editar y eliminar archivos y carpetas del curso.
+      Permite al usuario descargar archivos en un archivo zip, importar un archivo zip y bloquear/desbloquear archivos.
+  allows_user_to_add_edit_and_delete_course_sections_91e4c96f: |-
+      Permite al usuario agregar, editar y eliminar secciones del curso.
+      Permite al usuario hacer una lista cruzada de las secciones.
+  allows_user_to_add_edit_and_delete_events_in_the_c_14413268: "Permite al usuario agregar, editar y eliminar eventos en el calendario del curso."
+  allows_user_to_add_edit_and_delete_global_announce_8463e383: "Permite al usuario agregar, editar y eliminar anuncios globales."
+  allows_user_to_add_edit_and_update_grades_in_the_g_f9c62224: |-
+      Permite al usuario agregar, editar y actualizar calificaciones en el Libro de calificaciones y en SpeedGrader.
+      Permite al usuario acceder al historial del Libro de calificaciones.
+  allows_user_to_add_edit_delete_and_publish_unpubli_bc6374cf: "Permite al usuario agregar, editar, eliminar y publicar/quitar la publicación de evaluaciones."
+  allows_user_to_add_edit_delete_and_publish_unpubli_f1906287: |-
+      Permite al usuario agregar, editar, eliminar y publicar/quitar la publicación de tareas.
+      Permite al usuario administrar las configuraciones de tareas.
+      Permite al usuario agregar grupos de tareas en un curso.
+      Permite al usuario habilitar y editar la ponderación del grupo de tareas en un curso.
+  allows_user_to_add_new_assignments_to_a_module_51ae198c: "Permite al usuario agregar nuevas tareas a un módulo."
+  allows_user_to_add_remove_other_teachers_course_de_702821d4: |-
+      Permite al usuario agregar/quitar otros profesores, diseñadores de cursos o profesores auxiliares.
+      Permite al usuario agregar/quitar observadores al curso.
+      Permite al usuario ver la información de ID de inicio de sesión de profesores, diseñadores y profesores auxiliares.
+      Permite al usuario ver el menú de configuraciones de profesores, diseñadores de cursos, profesores auxiliares y observadores.
+      Permite al usuario ver los detalles de usuario de profesores, diseñadores de cursos y profesores auxiliares.
+      Permite al usuario limitar a los alumnos para que solo vean los miembros de sección compañeros.
+  allows_user_to_add_remove_other_teachers_course_de_b29d680: |-
+      Permite al usuario agregar/quitar otros profesores/diseñadores de cursos o profesores auxiliares.
+      Permite al usuario agregar/quitar observadores.
+      Permite al usuario ver la información de ID de inicio de sesión de profesores, diseñadores y profesores auxiliares.
+      Permite al usuario ver los detalles de usuario de cualquier usuario.
+      Permite al usuario editar la sección o el rol de un usuario.
+  allows_user_to_add_remove_students_allows_user_to__44718712: "Permite al usuario agregar/quitar alumnos. Permite al usuario agregar/quitar observadores. Permite al usuario ver la información de ID de inicio de sesión de alumnos. Permite al usuario ver las inscripciones anteriores. Permite al usuario acceder al menú de configuraciones y los detalles de usuario de un usuario. Permite al usuario editar la sección o el rol de un alumno. Permite al usuario reenviar invitaciones del curso desde la página Personas del curso."
+  allows_user_to_add_remove_students_to_the_course_a_f5b48d9: |-
+      Permite al usuario agregar/quitar alumnos al curso.
+      Permite al usuario agregar/quitar observadores al curso.
+      Permite al usuario ver la información de ID de inicio de sesión de alumnos.
+      Permite al usuario ver las inscripciones anteriores.
+      Permite al usuario acceder al menú de configuraciones y los detalles de usuario de un usuario.
+      Permite al usuario concluir o eliminar inscripciones en la página de detalles del alumno.
+      Permite al usuario volver a enviar las invitaciones del curso.
+  allows_user_to_add_students_to_a_course_from_the_a_3b752dd2: "Permite al usuario agregar alumnos a un curso desde la página Cursos de la cuenta."
+  allows_user_to_add_teachers_course_designers_or_ta_a7fdaceb: "Permite al usuario agregar profesores, diseñadores de cursos o profesores auxiliares a un curso desde la página Cursos de la cuenta."
+  allows_user_to_configure_alerts_in_course_settings_40a81b1d: "Permite al usuario configurar alertas en las configuraciones del curso. Las alertas son una función raramente usada que está diseñada para enviar una alerta a alumnos, profesores o administradores para activaciones específicas (por ejemplo, ninguna interacción entre alumno y profesor durante 7 días). Se revisan cada día, y las notificaciones se enviarán al alumno y/o al profesor hasta que el problema que generó la activación se resuelva."
+  allows_user_to_configure_alerts_in_course_settings_806397b5: "Permite al usuario configurar alertas en las Configuraciones del curso. Las alertas son una función raramente usada que está diseñada para enviar una alerta a alumnos, profesores o administradores para activaciones específicas (por ejemplo, ninguna interacción entre alumno y profesor durante 7 días). Se revisan cada día, y las notificaciones se enviarán al alumno y/o al profesor hasta que el problema que generó la activación se resuelva."
+  allows_user_to_create_accounts_for_new_users_with__37a233d7: |-
+      Permite al usuario crear cuentas para nuevos usuarios con el botón Agregar personas (Add People) de nivel de la cuenta.
+      Permite al usuario quitar y fusionar usuarios en una cuenta.
+      Permite al usuario modificar detalles de las cuentas de usuario como nombre, correo electrónico y zona horaria. Permite al usuario ver y modificar información de inicio de sesión de un usuario.
+  allows_user_to_create_and_manage_appointments_on_t_393e9e84: "Permite al usuario crear y administrar citas en el calendario utilizando el Programador."
+  allows_user_to_create_and_modify_grading_schemes_e4433a19: "Permite al usuario crear y modificar esquemas de calificación."
+  allows_user_to_create_collaborations_allows_user_t_96f8c3be: "Permite al usuario crear colaboraciones. Permite al usuario ver, editar y eliminar conferencias que creó."
+  allows_user_to_create_collaborations_allows_user_t_eff2a175: "Permite al usuario crear colaboraciones. Permite al usuario ver, editar y eliminar colaboraciones que creó."
+  allows_user_to_create_developer_keys_for_accounts_76bedd2b: "Permite al usuario crear claves de desarrollador para las cuentas."
+  allows_user_to_create_edit_and_delete_account_grou_abc8c12: "Permite al usuario crear, editar y eliminar grupos de cuentas."
+  allows_user_to_create_edit_and_delete_course_group_36097d72: "Permite al usuario crear, editar y eliminar grupos de cursos. Permite al usuario crear, editar y eliminar grupos de cursos creados por alumnos."
+  allows_user_to_create_edit_and_delete_course_group_cbac4c96: |-
+      Permite al usuario crear, editar y eliminar grupos de cursos.
+      Permite al usuario crear, editar y eliminar grupos de cursos creados por alumnos.
+  allows_user_to_create_edit_and_delete_course_rubri_92b58f29: "Permite al usuario crear, editar y eliminar rúbricas de cursos creadas en el enlace Rúbricas (Rubrics)."
+  allows_user_to_create_edit_and_delete_rubrics_1c0acc08: "Permite al usuario crear, editar y eliminar rúbricas."
+  allows_user_to_create_import_edit_and_delete_outco_472c842e: |-
+      Permite al usuario crear, importar, editar y eliminar resultados y grupos de resultados a
+      nivel del curso.
+  allows_user_to_create_new_conferences_allows_user__89cebec2: "Permite al usuario crear conferencias. Permite al usuario iniciar conferencias que creó."
+  allows_user_to_designate_a_course_as_a_blueprint_c_bc5ff9bc: |-
+      Permite al usuario designar un curso como Curso de proyectos.
+      Permite al usuario administrar las configuraciones del Curso de proyectos en Configuraciones del curso.
+      Permite al usuario agregar cursos asociados.
+  allows_user_to_differentiate_assignments_to_indivi_37f701a5: "Permite al usuario diferenciar tareas asignadas a alumnos individuales."
+  allows_user_to_edit_assignment_details_on_individu_3e50993a: "Permite al usuario editar detalles de la tarea en foros individuales. Módulos: Permite al usuario agregar nuevas tareas a un módulo."
+  allows_user_to_edit_assignment_details_on_individu_ecf19e63: "Permite al usuario editar detalles de la tarea en foros individuales."
+  allows_user_to_edit_blueprint_content_lock_setting_25128c82: "Permite al usuario editar las configuraciones de bloqueo de contenido de proyectos en foros individuales."
+  allows_user_to_edit_blueprint_content_lock_setting_fd580fab: "Permite al usuario editar las configuraciones de bloqueo de contenido de proyectos en configuraciones individuales si el usuario está inscrito en un curso maestro de proyectos."
+  allows_user_to_edit_blueprint_lock_settings_on_the_371aeb2a: "Permite al usuario editar las configuraciones de bloqueo de proyectos en la página de índice de Páginas en un curso maestro de proyectos."
+  allows_user_to_edit_blueprint_lock_settings_on_the_3a90958b: |-
+      Permite al usuario editar las configuraciones de bloqueo de proyectos en las páginas de índice de Tareas y Evaluaciones
+      en un curso maestro de proyectos.
+  allows_user_to_edit_blueprint_lock_settings_on_the_94a44495: "Permite al usuario editar las configuraciones de bloqueo de proyectos en la página de índice de Foros en un curso maestro de proyectos."
+  allows_user_to_edit_blueprint_lock_settings_on_the_9f51663c: "Permite al usuario editar las configuraciones de bloqueo de proyectos en la página Archivos en un curso maestro de proyectos."
+  allows_user_to_edit_configurations_for_manually_ad_7e0f496c: "Permite al usuario editar configuraciones para aplicaciones externas agregadas manualmente."
+  allows_user_to_edit_grades_and_add_comments_in_spe_dc18e3c0: "Permite al usuario editar calificaciones y agregar comentarios en SpeedGrader."
+  allows_user_to_edit_grades_in_the_gradebook_allows_b1e33afc: "Permite al usuario editar calificaciones en el Libro de calificaciones. Permite al usuario acceder al historial del Libro de calificaciones."
+  allows_user_to_edit_grading_schemes_98c35117: "Permite al usuario editar los esquemas de calificación."
+  allows_user_to_edit_the_course_sis_id_e1eccee3: "Permite al usuario editar la ID de SIS del curso."
+  allows_user_to_edit_the_course_syllabus_a28ff262: "Permite al usuario editar el programa del curso."
+  allows_user_to_filter_for_blueprint_courses_as_the_a67832c8: |-
+      Permite al usuario filtrar los cursos de proyectos como nivel de la cuenta.
+      Permite al usuario agregar cursos asociados.
+  allows_user_to_generate_a_pairing_code_on_behalf_o_9ea9bb0a: "Permite al usuario generar un código de sincronización en nombre de un alumno para compartir con un observador."
+  allows_user_to_generate_login_logout_activity_repo_bba62f2: "Permite al usuario generar un informe de actividad de inicio/cierre de sesión en Herramientas del administrador."
+  allows_user_to_import_content_using_the_course_imp_4a4ec4c7: "Permite al usuario importar contenido utilizando la herramienta Importar curso."
+  allows_user_to_import_learning_outcomes_17fce84a: "Permite al usuario importar resultados de aprendizaje."
+  allows_user_to_import_learning_outcomes_to_rubrics_45331ded: "Permite al usuario importar resultados de aprendizaje a rúbricas."
+  allows_user_to_import_resources_from_commons_into__255ad23: |-
+      Permite al usuario importar recursos desde Commons a un curso.
+      Permite al usuario compartir tareas a Commons o editar contenido compartido anteriormente.
+  allows_user_to_import_sis_data_583b20a5: "Permite al usuario importar datos de SIS."
+  allows_user_to_like_discussion_posts_when_the_only_7390d91c: "Permite al usuario dar “me gusta” a publicaciones de foros cuando se selecciona la casilla de verificación Solamente los calificadores pueden dar me gusta."
+  allows_user_to_manage_feature_options_in_account_s_c3c8ee03: "Permite al usuario administrar las opciones de Función en las Configuraciones del curso."
+  allows_user_to_manage_modules_create_add_items_edi_1afafd65: |-
+      Permite al usuario administrar los módulos (crear, agregar elementos, editar configuraciones del módulo,
+      publicar/eliminar publicación, etc.).
+  allows_user_to_manage_observers_associated_with_st_4b45f2be: "Permite al usuario administrar observadores asociados con alumnos en la cuenta."
+  allows_user_to_manage_rubrics_326eedc2: "Permite al usuario administrar las rúbricas."
+  allows_user_to_manually_add_an_app_in_account_sett_c5ce3789: "Permite al usuario agregar manualmente una aplicación en las Configuraciones de la cuenta."
+  allows_user_to_manually_add_and_delete_an_app_in_c_18250cad: "Permite al usuario agregar manualmente y eliminar una aplicación en las Configuraciones del curso."
+  allows_user_to_moderate_a_quiz_6953d369: "Permite al usuario moderar una evaluación."
+  allows_user_to_moderate_a_quiz_settings_allows_use_e454b94e: "Permite al usuario moderar una evaluación. Configuraciones: Permite al usuario editar los esquemas de calificación."
+  allows_user_to_publish_conclude_and_delete_courses_336cf352: "Permite al usuario publicar, concluir y eliminar cursos."
+  allows_user_to_reply_to_a_discussion_post_83f43e19: "Permite al usuario responder a una publicación de un foro."
+  allows_user_to_restore_a_course_32084c5c: "Permite al usuario restaurar un curso."
+  allows_user_to_review_an_audit_trail_in_assignment_9ca5d03d: "Permite al usuario revisar un informe de auditoría en tareas, tanto moderadas como anónimas."
+  allows_user_to_search_by_assignment_id_in_grade_ch_ae195b94: "Permite al usuario buscar por ID de tarea en registros de cambio de calificación."
+  allows_user_to_search_by_course_id_or_assignment_i_b30d9175: "Permite al usuario buscar por ID de curso o ID de tarea en los registros de cambio de calificación en Herramientas del administrador."
+  allows_user_to_search_for_account_users_via_primar_7a58eb6e: |-
+      Permite al usuario buscar usuarios de cuenta a través de la dirección principal de correo electrónico en la página Personas de la cuenta.
+      Permite al usuario buscar otros usuarios a través de la dirección principal de correo electrónico en una página de Personas del curso.
+  allows_user_to_search_for_other_users_by_login_id__97d49785: |-
+      Permite al usuario buscar otros usuarios mediante la ID de inicio de sesión en la página Personas de la cuenta.
+      Permite al usuario ver las ID de inicio de sesión en una página de Personas del curso.
+  allows_user_to_search_for_other_users_via_primary__c95888c8: "Permite al usuario buscar otros usuarios a través de las direcciones principales de correo electrónico en la página de Personas."
+  allows_user_to_see_the_list_of_courses_in_the_acco_5fa0142f: "Permite al usuario ver la lista de cursos en la cuenta."
+  allows_user_to_see_the_list_of_recently_started_en_1012704d: "Permite al usuario ver la lista de cursos iniciados/terminados recientemente en las estadísticas de la cuenta."
+  allows_user_to_select_final_grade_for_moderated_as_c5e28a9c: "Permite al usuario seleccionar la calificación final para tareas moderadas."
+  allows_user_to_send_a_message_in_conversations_wit_d48abf1a: "Permite al usuario enviar un mensaje en Conversaciones sin seleccionar un curso."
+  allows_user_to_send_a_message_to_all_in_course_nam_697703a0: |-
+      Permite al usuario enviar un mensaje a “Todos en [course name]”.
+      Permite al usuario enviar un mensaje a “Todos en [course group]”.
+  allows_user_to_send_a_message_to_all_in_course_nam_992e425: "Permite al usuario enviar un mensaje a “Todos en [course name]” o a “Todos en [course group]”."
+  allows_user_to_send_messages_to_individual_course__9347e1e2: "Permite al usuario enviar mensajes a miembros individuales del curso."
+  allows_user_to_share_a_quiz_to_commons_6746e0da: "Permite al usuario compartir una evaluación en Commons."
+  allows_user_to_view_a_course_s_sis_id_5c4a4c50: "Permite al usuario ver la ID de SIS de un curso."
+  allows_user_to_view_a_link_to_speedgrader_from_ass_8ed9b342: "Permite al usuario ver un enlace a SpeedGrader desde las tareas."
+  allows_user_to_view_account_analytics_98fbc6ad: "Permite al usuario ver el análisis de la cuenta."
+  allows_user_to_view_all_course_groups_not_just_tho_bad6d687: "Permite al usuario ver todos los grupos del curso, no solo aquellos que están inscritos, en la ventana Colaborar con (Collaborate With)."
+  allows_user_to_view_all_student_assignment_submiss_d8ee5830: "Permite al usuario ver todos los envíos de tareas del alumno y agregar comentarios."
+  allows_user_to_view_and_add_users_in_a_collaborati_9ec3c68b: "Permite al usuario ver y agregar usuarios en una colaboración."
+  allows_user_to_view_and_configure_reports_in_accou_413e4e41: |-
+      Permite al usuario ver y configurar informes en las Configuraciones de la cuenta.
+      Permite al usuario ver los Informes de acceso y los Informes de interacción del alumno.
+      Permite al usuario ver información de la última actividad y la actividad total en la página de Personas.
+  allows_user_to_view_and_edit_the_sis_id_and_integr_f206fdcb: "Permite al usuario ver y editar la ID de SIS y la ID de integración en los Detalles de inicio de sesión de un usuario"
+  allows_user_to_view_and_insert_data_in_the_sis_id__921967c: "Permite al usuario ver e insertar datos en el campo ID de SIS."
+  allows_user_to_view_and_link_questions_in_a_quiz_t_b971e002: |-
+      Permite al usuario ver y vincular preguntas en una evaluación a bancos de
+      preguntas a nivel de la cuenta. Si está desactivado, el usuario solamente podrá ver y vincular a bancos de preguntas de un curso. Permite el enlace Administrar bancos de preguntas en la página de índice Evaluaciones.
+  allows_user_to_view_and_link_questions_in_a_quiz_t_d312a571: "Permite al usuario ver y vincular preguntas en una evaluación a bancos de preguntas a nivel de la cuenta. Si está desactivado, el usuario solamente podrá ver y vincular a bancos de preguntas de un curso."
+  allows_user_to_view_and_manage_authentication_opti_e1bb0ad3: "Permite al usuario ver y administrar opciones de autentificación para toda la cuenta."
+  allows_user_to_view_and_manage_courses_in_the_acco_12333da2: "Permite al usuario ver y administrar cursos en la cuenta."
+  allows_user_to_view_and_manage_permissions_bdc80a1d: "Permite al usuario ver y administrar permisos."
+  allows_user_to_view_and_manage_quotas_tab_in_accou_935a7874: "Permite al usuario ver y administrar la pestaña Cupos (Quotas) en las configuraciones de la cuenta. El usuario puede establecer cupos de almacenamiento por defecto para cursos, usuarios y grupos."
+  allows_user_to_view_and_manage_subaccounts_for_the_37d5120b: "Permite al usuario ver y administrar subcuentas para la cuenta."
+  allows_user_to_view_and_manage_terms_for_the_accou_4547d971: "Permite al usuario ver y administrar los términos para la cuenta."
+  allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: "Permite al usuario ver y administrar las pestañas Configuraciones (Settings) y Notificaciones (Notifications) en las Configuraciones de la cuenta."
+  allows_user_to_view_choose_home_page_and_course_se_6fd35f37: "Permite al usuario ver los botones Elegir página de inicio (Choose Home Page) y Lista de comprobación de la configuración del curso (Course Setup Checklist) en la página Inicio."
+  allows_user_to_view_course_analytics_through_the_c_5f24ec08: "Permite al usuario ver el análisis del curso a través del tablero del curso. Permite al usuario ver el análisis del alumno."
+  allows_user_to_view_course_and_student_analytics_f_5e3dca12: "Permite al usuario ver el análisis del curso y del alumno desde la página de Inicio del curso o la página de Personas."
+  allows_user_to_view_course_sis_id_3a1818a5: "Permite al usuario ver la ID de SIS del curso."
+  allows_user_to_view_course_status_choose_home_page_b97cee14: |-
+      Permite al usuario ver los botones Estado del curso (Course Status), Elegir página de inicio (Choose Home Page) y
+      Lista de comprobación de la configuración del curso (Course Setup Checklist) en la página Inicio.
+  allows_user_to_view_create_edit_delete_and_publish_48716e21: "Permite al usuario ver, crear, editar, eliminar y publicar/quitar la publicación de páginas.\n\
+      Permite al usuario ver el historial de páginas y establecer la portada. "
+  allows_user_to_view_create_edit_delete_and_publish_9d6c0bfa: |-
+      Permite al usuario ver, crear, editar, eliminar y publicar/quitar la publicación de páginas.
+      Permite al usuario ver el historial de páginas y establecer la portada.
+  allows_user_to_view_enrollments_on_the_sections_ta_6279a03e: "Permite al usuario ver las inscripciones en la pestaña Secciones (Sections)."
+  allows_user_to_view_gradebook_allows_user_to_expor_c454271d: |-
+      Permite al usuario ver el Libro de calificaciones.
+      Permite al usuario exportar el Libro de calificaciones a un archivo de valores separados por comas (CSV).
+  allows_user_to_view_grader_comments_on_a_rubric_in_2ac9f890: "Permite al usuario ver los comentarios del calificador en una rúbrica en SpeedGrader."
+  allows_user_to_view_groups_in_a_course_8a95805b: "Permite al usuario ver grupos en un curso."
+  allows_user_to_view_last_activity_and_total_activi_786a7286: "Permite al usuario ver información de la Última actividad y la Actividad total en la página de Personas."
+  allows_user_to_view_last_activity_total_activity_a_e0bee860: "Permite al usuario ver los informes de Última actividad, Actividad total e Interacciones del alumno."
+  allows_user_to_view_list_of_users_in_the_account_1802ad42: "Permite al usuario ver la lista de usuarios en la cuenta."
+  allows_user_to_view_list_of_users_in_the_course_pe_1b0b4bab: |-
+      Permite al usuario ver la lista de usuarios en la página de Personas del curso.
+      Permite al usuario ver el botón Inscripciones anteriores (Prior Enrollments) en la página de Personas del curso.
+  allows_user_to_view_login_ids_in_a_course_people_p_b2cfd83e: "Permite al usuario ver las ID de inicio de sesión en una página de Personas del curso."
+  allows_user_to_view_login_logout_activity_of_users_9bf218f0: |-
+      Permite al usuario ver la actividad de inicio/cierre de sesión en Herramientas del administrador.
+      Permite al usuario buscar registros de cambio de calificación por calificador o alumno en Herramientas del administrador
+  allows_user_to_view_previously_created_collaborati_31f4cfe2: |-
+      Permite al usuario ver colaboraciones creadas anteriormente.
+      Permite al usuario editar el título y la descripción, o quitar colaboradores en todas las colaboraciones.
+  allows_user_to_view_published_and_unpublished_cour_25a5dcc0: "Permite al usuario ver contenido del curso publicado o no publicado."
+  allows_user_to_view_student_context_cards_in_annou_dadef934: "Permite al usuario ver las tarjetas de contexto del alumno en respuestas a anuncios y foros."
+  allows_user_to_view_student_grades_pages_e0091b20: "Permite al usuario ver las páginas Calificaciones del alumno."
+  allows_user_to_view_student_quiz_logs_e1c4491: "Permite al usuario ver los registros de la evaluación del alumno."
+  allows_user_to_view_student_results_and_or_access__60fac9: "Permite al usuario ver los resultados del alumno y/o acceder a una evaluación en SpeedGrader."
+  allows_user_to_view_student_specific_data_in_analy_4abbf6be: "Permite al usuario ver datos específicos del alumno en Análisis."
+  allows_user_to_view_the_announcements_link_in_cour_f6b03e9a: "Permite al usuario ver el enlace de Anuncios (Announcements) en la navegación del curso. Permite al usuario ver los anuncios del curso."
+  allows_user_to_view_the_course_grading_scheme_32a6042: "Permite al usuario ver el esquema de calificación del curso."
+  allows_user_to_view_the_course_statistics_button_i_f44b2c7a: "Permite al usuario ver el botón Estadísticas del curso (Course Statistics) en las Configuraciones del curso."
+  allows_user_to_view_the_discussions_link_in_course_2604505d: |-
+      Permite al usuario ver el enlace de Foros (Discussions) en la navegación del curso.
+      Permite al usuario ver los foros del curso.
+  allows_user_to_view_the_group_home_pages_of_all_st_9d747525: |-
+      Permite al usuario ver las páginas de inicio de todos los grupos de alumnos.
+      Permite a los alumnos acceder a otros grupos de alumnos dentro de un conjunto de grupos con un enlace directo.
+  allows_user_to_view_the_moderate_button_for_modera_5f3c6d21: "Permite al usuario ver el botón Moderar (Moderate) para tareas moderadas. NOTA: Este permiso está cayendo en desuso. Para permitir a los usuarios ver el botón Moderar (Moderate), habilite Calificaciones - Seleccionar calificación final para la moderación (Grades - Select final grade for moderation)."
+  allows_user_to_view_the_new_announcement_button_in_4aa7f936: |-
+      Permite al usuario ver el botón Nuevo anuncio (New Announcement) en la página de Inicio.
+      Permite al usuario agregar anuncios a la página Anuncios (Announcements).
+  allows_user_to_view_the_people_link_in_course_navi_58b38f5d: "Permite al usuario ver el enlace de Personas (People) en la navegación del curso."
+  allows_user_to_view_user_sis_ids_68a9d218: "Permite al usuario ver las ID de SIS del usuario."
+  allows_users_to_edit_conferences_2d3c960c: "Permite a los usuarios editar Conferencias."
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Permite que los usuarios con números de teléfono internacionales reciban mensajes de texto de Canvas."
   alumno_88c80e37: Alumno
   always_3a59e701: Siempre
@@ -1805,8 +2055,10 @@ es:
     student_in_course: 
       analytics: Análisis
       page_title: "Análisis: %{course} -- %{student}"
+  analytics_account_c2bf8cf6: "Análisis (Cuenta)"
   analytics_account_name_filter_name_c0fb1a7b: "Análisis: %{account_name} -- %{filter_name}"
   analytics_c94ba601: Análisis
+  analytics_course_5d53aef7: "Análisis (Curso)"
   analytics_course_code_student_name_d63bab4c: "Análisis: %{course_code} -- %{student_name}"
   and_count_more_43eae021: "y %{count} más…"
   and_more_1c35b232: "y más..."
@@ -1868,6 +2120,7 @@ es:
     podcast_feed_description_group: "Cualquier archivo de medios enlazado desde o integrado dentro de los anuncios en el grupo \"%{group}\" aparecerá en este canal."
     podcast_feed_name: "%{course} Canal de Anuncios de Podcast"
   announcements_a4b8ed4a: Anuncios
+  announcements_account_4e9df626: "Anuncios (Cuenta)"
   announcements_cannot_be_duplicated_2de8824c: "los anuncios no pueden estar duplicados"
   announcements_deleted_successfully_7d77e9e1: "Anuncios borrados exitosamente"
   announcements_list_c75fc413: "Lista de anuncios"
@@ -1910,6 +2163,7 @@ es:
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Las respuestas se mostrarán tras su último intento"
   any_sub_account_ec7069f2: "Cualquier subcuenta"
   any_term_d49af19f: "Cualquier período"
+  api_7bd66e19: API
   api_token_scopes_67b11c16: "Alcances del autentificador de API"
   api_token_scoping_d4f30a1b: "Alcance del Token API"
   api_url_3ee7cb0a: "URL de la API"
@@ -2142,6 +2396,7 @@ es:
   assignment_details_expanded_20c6f0c7: "detalles de tarea expandidos"
   assignment_does_not_exist_74178c34: "la tarea no existe"
   assignment_excused_eb6c08fa: "Tarea justificada"
+  assignment_graded_grade_on_assignment_name_in_cour_5082fd1: "Tarea calificada: %{grade} sobre %{assignment_name} en %{course_code}"
   assignment_graded_score_on_assignmentname_in_cours_1acbf85f: "Tarea calificada: %{score} sobre %{assignmentName} en %{courseName}"
   assignment_grades_have_already_been_published_ff2d84c6: "Las calificaciones de la tarea ya se han publicado."
   assignment_group: 
@@ -2175,6 +2430,7 @@ es:
   assignment_id_96baa1b7: "ID de la tarea"
   assignment_id_b040cee0: "ID de la tarea"
   assignment_menu_91fe3716: "Menú de tarea"
+  assignment_missing_assignment_name_in_course_code_7f940b35: "Tarea faltante: %{assignment_name} en %{course_code}"
   assignment_missing_assignment_name_in_course_name_680a8338: "Tarea faltante: %{assignment_name} en %{course_name}"
   assignment_muted_4cb590a4: "Tarea silenciada"
   assignment_muted_8d74bfa0: "Tarea silenciada"
@@ -2326,6 +2582,7 @@ es:
       due: "Fecha límite"
       due_date: "Fecha límite"
       multiple_dates: "Varias fechas"
+      todo_date: "Por hacer"
     delete_group: 
       cancel: Cancelar
       delete: "Eliminar grupo"
@@ -2578,6 +2835,7 @@ es:
       reviews_per_user: "Revisiones por usuario"
     points_possible_number: "Puntos posibles debe ser un número"
     positive_number: "Debe utilizar un número positivo"
+    processing_submission: "Canvas está procesando actualmente su envío. Puede navegar de manera segura fuera de esta página y le enviaremos un correo electrónico cuando su envío se haya procesado."
     redirect_page: 
       redirect_message: |-
           Esta presentación era una URL, lo estamos llevando a la URL ahora.
@@ -2817,8 +3075,10 @@ es:
         originality_report_visible_after_grading: "Después de que la tarea se califique"
         originality_report_visible_immediately: Inmediatamente
   assignments_1e02582c: Tareas
+  assignments_and_gradebook_37e43d4f: "Tareas y Libro de calificaciones"
   assignments_and_quizzes_add_edit_delete_5bac17ed: "Tareas y evaluaciones: agregar/editar/eliminar"
   assignments_and_quizzes_view_answer_matrix_e7a65578: "Tareas y evaluaciones: ver matriz de respuestas"
+  assignments_and_speedgrader_7a7cd90: "Tareas y SpeedGrader"
   assignments_api: 
     invalid_date_time: "Fecha y hora no válidas para %{attribute}"
     invalid_submission_types: "Tipos de presentación no válidos"
@@ -2871,6 +3131,7 @@ es:
       mark_all_as_present: "Marcar a todos como Presentes"
     titles: 
       attendance_help: "Ayuda de Asistencia"
+  attendance_ca433183: Asistencia
   attention_aaca1f1d: ¡Atención!
   attribute_d9f3af72: Atributo
   attributes_locked_1a1a0f46: "%{attributes} bloqueado"
@@ -2884,6 +3145,7 @@ es:
     corrupted: "Información no disponible"
     login: "INICIAR SESIÓN"
     logout: "CERRAR SESIÓN"
+  authentication_1b518c38: Autentificación
   authentication_context_60748f2f: "Contexto de autentificación"
   authentication_provider: 
     default_delegated_login_handle_name: "Iniciar sesión"
@@ -3023,6 +3285,7 @@ es:
   available_until_lock_at_ab022445: "Disponible hasta %{lock_at}"
   availableslots_available_87b8b69d: "%{availableSlots} disponibles"
   availableslots_more_available_be5193a8: "%{availableSlots} mayor disponibilidad"
+  avatar_8a8aa935: Avatar
   avatar_for_author_2eabbf55: "Avatar para %{author}"
   avatar_for_studentname_8ea511ae: "Avatar para %{studentName}"
   average_49c63f9b: Promedio
@@ -3085,7 +3348,43 @@ es:
   blueprint_course_sync_in_progress_a1e2622b: "La sincronización del curso de proyectos está en proceso"
   blueprint_courses_9dd321b8: "Cursos plantilla"
   blueprint_courses_add_edit_associate_delete_bc26d5c2: "Cursos de proyecto (agregar/editar/asociar/eliminar)"
+  blueprint_courses_are_an_account_level_feature_opt_3388f731: "Los Cursos de proyectos son una opción de función a nivel de la cuenta.\n\n\
+      Para editar las configuraciones de bloqueo de proyectos desde la página de índice de Foros (Discussions), también deben estar habilitados Curso - agregar/editar/eliminar (Course - add / edit / delete) y Foros - moderar (Discussions - moderate). "
   blueprint_courses_create_edit_associate_delete_bf41988e: "Cursos plantilla (crear/editar/asociar/eliminar)"
+  blueprint_courses_is_an_account_level_feature_opti_38676924: "Cursos de proyectos es una opción de función a nivel de la cuenta. Los roles del curso solamente pueden administrar Cursos de proyectos si se agregan al Curso de proyectos con rol de profesor, profesor auxiliar o diseñador. Para acceder a la barra lateral Cursos de proyectos, debe estar habilitado Curso - agregar/editar/eliminar (Course - add / edit / delete). Para agregar un curso asociado, también debe estar habilitado Curso - agregar/editar/eliminar (Course - add / edit / delete). Para editar las configuraciones de bloqueo en cualquier tipo de objeto del proyecto, debe estar habilitado Curso - agregar/editar/eliminar (Course - add / edit / delete)."
+  blueprint_courses_is_an_account_level_feature_opti_3bf307d: "Cursos de proyectos es una opción de función a nivel de la cuenta. Para editar las configuraciones de bloqueo del proyecto en la página de índice de Foros (Discussions), también deben estar habilitados Cursos - agregar/editar/eliminar (Courses - add / edit / delete) y Foros - ver (Discussions - view). Si este permiso no está habilitado, y Cursos - agregar/editar/eliminar (Courses - add / edit / delete) y Foros - ver (Discussions - view) están habilitados, las configuraciones de bloqueo del proyecto se pueden editar en foros individuales."
+  blueprint_courses_is_an_account_level_feature_opti_4c9fa399: |-
+      Cursos de proyectos es una opción de función a nivel de la cuenta.
+      Para editar las configuraciones de bloqueo del proyecto desde la página de índice de Tareas (Assignments), también debe estar habilitado Curso - agregar/editar/eliminar (Course - add / edit / delete). Si el permiso no está habilitado, y Cursos - agregar/editar/eliminar (Courses - add / edit / delete) está habilitado, las configuraciones de bloqueo del proyecto se pueden administrar desde la página de detalles de la tarea.
+      Para editar las configuraciones de bloqueo del proyecto en una evaluación individual, o en la página de índice Evaluaciones (Quizzes), también debe estar habilitado Cursos - agregar/editar/eliminar (Courses - add / edit / delete).
+  blueprint_courses_is_an_account_level_feature_opti_580ba84e: |-
+      Cursos de proyectos es una opción de función a nivel de la cuenta.
+      Para editar las configuraciones de bloqueo del proyecto en la página de índice de Páginas (Pages), también debe estar habilitado Curso - agregar/editar/eliminar (Course - add / edit / delete). Si este permiso no está habilitado, y Cursos - agregar/editar/eliminar (Courses - add / edit / delete) está habilitado, las configuraciones de bloqueo del proyecto se pueden editar en páginas individuales.
+  blueprint_courses_is_an_account_level_feature_opti_8429207: "Cursos de proyectos es una opción de función a nivel de la cuenta. Para editar configuraciones del curso de proyectos en las Configuraciones del curso, también debe estar habilitado Cursos de proyectos - agregar/asociar/editar/eliminar (Blueprint Courses - add / edit / associate / delete). Para agregar un curso asociado, también deben estar habilitados Cursos de proyectos - agregar/editar/asociar/eliminar (Blueprint Courses - add / edit / associate / delete) y Cursos - ver lista (Courses - view list). Para editar las configuraciones de bloqueo en cualquier objeto del proyecto, este permiso debe estar habilitado. Para editar las configuraciones en archivos, también debe estar habilitado Archivos del curso - agregar/editar/eliminar (Course Files - add / edit / delete). Para editar las configuraciones en evaluaciones, también debe estar habilitado Tareas y evaluaciones - agregar/editar/eliminar (Assignments and Quizzes - add / edit / delete)."
+  blueprint_courses_is_an_account_level_feature_opti_a90144eb: |-
+      Cursos de proyectos es una opción de función a nivel de la cuenta.
+      
+      Para agregar cursos asociados, también deben estar habilitados Cursos de proyectos - agregar/editar/asociar/eliminar (Blueprint Courses - add / edit / associate / delete) y Cursos - agregar/editar/eliminar (Courses - add / edit /delete).
+  blueprint_courses_must_be_enabled_for_an_account_b_188041e1: |-
+      Un administrador debe habilitar los Cursos de proyectos para una cuenta.
+      Para editar las configuraciones de bloqueo del proyecto para archivos del curso, también debe estar habilitado Curso - agregar/editar/eliminar (Course - add / edit / delete).
+  blueprint_courses_must_be_enabled_for_an_account_b_25a8af6a: |-
+      Un administrador debe habilitar los Cursos de proyectos para una cuenta.
+      Los roles del curso solamente pueden administrar el contenido en Cursos de proyectos si se agregan al Curso de proyectos con rol de profesor, profesor auxiliar o diseñador.
+  blueprint_courses_must_be_enabled_for_an_account_b_45d8df0c: |-
+      Un administrador debe habilitar los Cursos de proyectos para una cuenta.
+      
+      Los roles del curso solamente pueden administrar el contenido en los Cursos de proyectos si se agregan al Curso de proyectos con rol de profesor, profesor auxiliar o diseñador.
+      
+      Para editar las configuraciones de bloqueo del proyecto desde la página de índice de Foros (Discussions), también debe estar habilitado Foros - moderar (Discussions - moderate).
+  blueprint_courses_must_be_enabled_for_an_account_b_79b2d93e: |-
+      Un administrador debe habilitar los Cursos de proyectos para una cuenta.
+      Los roles del curso solamente pueden administrar el contenido en Cursos de proyectos si se agregan al Curso de proyectos con rol de profesor, profesor auxiliar o diseñador.
+      Si este permiso está desactivado, un usuario aún puede ajustar las configuraciones de bloqueo del contenido en páginas individuales en un curso maestro de proyectos.
+  blueprint_courses_must_be_enabled_for_an_account_b_e8e1984d: |-
+      Un administrador debe habilitar los Cursos de proyectos para una cuenta.
+      Los roles del curso solamente pueden administrar el contenido en Cursos de proyectos si se agregan al Curso de proyectos con rol de profesor, profesor auxiliar o diseñador.
+      Si este permiso está desactivado y Foros - ver (Discussions - view) está habilitado, un usuario aún puede ajustar las configuraciones de bloqueo del contenido en foros individuales en un curso maestro de proyectos.
   blueprint_information_95dcef55: "Información del plano"
   blueprint_settings_233e909a: "Configuración del proyecto"
   body_9f663faf: Cuerpo
@@ -3237,6 +3536,10 @@ es:
     view_account_roster: "Ver Nómina de la Cuenta"
     view_course_roster: "Ver Nómina del Curso"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Todos los vínculos están habilitados de manera predeterminada para un curso. Los alumnos no verán los vínculos a las secciones que no tienen contenido. Por ejemplo, si no ha creado ninguna evaluación, no verán el vínculo a ellas. Puede ordenar y deshabilitar específicamente los vínculos con partes del curso a las que no desea que accedan los alumnos. "
+  by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
+      Por defecto, los alumnos pueden crear grupos; para evitar que los alumnos creen
+      grupos, anule la selección de la casilla de verificación Permitir a los alumnos organizar sus propios grupos (Let students organize their own groups) en las Configuraciones del curso.
+  by_default_students_can_always_create_groups_in_a__149d08b7: "Por defecto, los alumnos siempre pueden crear grupos en un curso. Para evitar que los alumnos creen grupos, Cursos - agregar/editar/eliminar (Courses - add / edit / delete) debe estar habilitado y se debe anular la selección de la casilla de verificación Permitir a los alumnos organizar sus propios grupos (Let students organize their own groups)."
   by_lti_2_registration_url_e421e523: "A través de la URL de registro LTI 2"
   by_url_a163275e: "Por URL"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
@@ -3653,6 +3956,10 @@ es:
   can_edit_this_page_role_selection_6ccec3c7: "Puede editar la selección de rol de esta página"
   can_interact_with_users_in_their_section_only_48cb8c43: "Puede interactuar con usuarios solamente en su sección"
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "No se puede calcular el puntaje hasta que una tarea tenga puntos asociados"
+  can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n\
+      \x20             No se pueden eliminar tareas basándose en las asociaciones de rúbrica.\n\
+      \x20             Para quitar estas asociaciones, debe quitar la fila de la rúbrica del activo\n\
+      \x20           "
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "No se pueden eliminar las asignaciones basadas en asociaciones de rúbricas. Para eliminar estas asociaciones debe eliminar la fila en la rúbrica de la tarea."
   can_t_enable_anonymous_grading_and_group_assignmen_9938416e: "Las calificaciones anónimas y las tareas grupales no pueden habilitarse al mismo tiempo"
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "No se puede realizar diferenciación con más de un archivo del mismo tipo"
@@ -3729,6 +4036,7 @@ es:
   canvas_cartridge_display: "Canvas Common Cartridge"
   canvas_cartridge_file_description: "Paquete de exportación de cursos de Canvas"
   canvas_cartridge_name: "Importador de cartuchos de Canvas"
+  canvas_catalog_87f39420: "Canvas Catalog"
   canvas_cloud_information_fdd404f2: "Información de la nube de Canvas"
   canvas_course_id_db4de2b8: canvas_course_id
   canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: "Los enlaces del tablero de Canvas navegarán al tablero de catálogo"
@@ -4063,6 +4371,7 @@ es:
   common_cartridge_html_file_to_page_conversion_7bf9678: "Archivo HTML de Common Cartridge a conversión de página"
   common_cartridge_name: "Importador de cartucho común"
   common_timezones_2b00baba: "Zonas horarias comunes"
+  commons_ed0252fb: Commons
   communicate_to_your_students_exactly_what_will_be__57a679c5: |-
       Comuníqueles a sus alumnos qué tendrán que hacer exactamente
       durante el curso en orden cronológico. Genere un
@@ -5070,6 +5379,8 @@ es:
     unstar: "No destacar"
     unstar_conversation: "Conversaciones no destacadas"
   conversations_69a8dc26: Conversaciones
+  conversations_send_messages_to_entire_class_3f414741: "Conversaciones - enviar mensajes a toda la clase"
+  conversations_send_messages_to_individual_course_m_733620b: "Conversaciones - enviar mensajes a miembros individuales del curso"
   copy_9748f9f: Copiar
   copy_to_folder_32ecc3c3: "Copiar a la carpeta"
   copying_628a9607: Copiando...
@@ -5276,6 +5587,7 @@ es:
   course_add_remove_students_8d03ba9d: "Curso: agregar/eliminar alumnos"
   course_add_remove_teachers_course_designers_or_ta__d6aca35f: "Curso: agregar/eliminar profesores, diseñadores del curso o profesores auxiliares"
   course_and_user_search_ebc1ae41: "Búsqueda de curso y usuario"
+  course_announcement_title_in_course_code_2e317aa2: "Anuncio del curso: \"%{title}\" en %{course_code}"
   course_announcements_76b07340: "Anuncios del curso"
   course_assignments_833b8cf1: "Tareas del curso"
   course_assignments_menu_fa6aeb23: "Menú de tareas del curso"
@@ -5352,10 +5664,14 @@ es:
   course_files_add_edit_delete_24678a2f: "Archivos del curso: agregar/editar/eliminar"
   course_found_f5a40cd3: "Curso encontrado"
   course_found_not_deleted_a20f72f0: "Curso encontrado (no eliminado)"
+  course_grade_grade_in_course_code_9fa854db: "Calificación del curso: %{grade}% en %{course_code}"
   course_grade_grade_in_coursename_3cdd8551: "Calificación del curso: %{grade} en %{courseName}"
   course_grades_22adc27e: "Calificaciones del curso"
+  course_grading_schemes_can_be_enabled_disabled_in__26b298b3: "Los Esquemas de calificación del curso se pueden activar/desactivar en las Configuraciones del curso."
+  course_groups_e8239a1e: "Grupos del curso"
   course_has_no_active_instructors_with_this_id_74f1d8a: "el curso no tiene ningún instructor activo con esta identificación."
   course_home_4c4c0107: "Página de inicio del curso"
+  course_home_page_5c61dba7: "Página de inicio del curso"
   course_home_sub_navigation_b1ee6b03: "Subnavegación del inicio del curso"
   course_id_8bd2a21c: "ID del curso"
   course_id_a7c924d5: "ID del curso"
@@ -5515,7 +5831,13 @@ es:
       move_course: "Mover el curso"
       reset_course_content_dialog_help: "Restablecer el contenido del curso"
       section_enrollments: "Inscripciones por sección"
+  course_settings_course_details_tab_allows_user_to__2eb67ad2: "Configuraciones del curso (pestaña Detalles del curso (Course Details)): Permite al usuario acceder a la pestaña Navegación (Navigation) en las Configuraciones del curso. Permite al usuario acceder a los botones Vista de alumno (alumno de prueba) (Student View (test student)), Copiar este curso (Copy this Course), Restablecer el contenido del curso (Reset Course Content) y Borrar de manera permanente el curso (Permanently Delete Course). Permite al usuario editar la imagen del curso, el nombre, el código del curso, la zona horaria, la subcuenta, el plazo y otras opciones en la pestaña Detalles del curso (Course Details)."
+  course_settings_course_details_tab_fabf1adc: "Configuraciones del curso (pestaña Detalles del curso (Course Details))"
+  course_settings_f6d0bbf8: "Configuraciones del curso"
+  course_settings_sections_tab_4ae03a9a: "Configuraciones del curso (pestaña Secciones (Sections))"
   course_settings_sub_navigation_b95deae: "Subnavegación de la configuración del curso"
+  course_setup_checklist_78dcff7e: "Lista de comprobación de la configuración del curso"
+  course_setup_checklist_course_home_page_f8baa04a: "Lista de comprobación de la configuración del curso, página de inicio del curso"
   course_setup_wizard_is_showing_a7c087c1: "Aparece el asistente de configuración del curso."
   course_sis_7ae8f649: "SIS del curso"
   course_sis_df8b379: "Sis del curso"
@@ -6057,9 +6379,15 @@ es:
     unauthorized: 
       invalid_link: "El enlace de inscripción que usó aparece que ya no es válido. Por favor contacte al instructor del curso y asegúrese que sigue inscrito."
   courses_43204aae: Cursos
+  courses_account_72e4fca7: "Cursos (Cuenta)"
+  courses_account_navigation_f84fdec3: "Cursos (Navegación de la cuenta)"
+  courses_add_edit_delete_aa2b55d3: "Cursos - agregar/editar/eliminar"
   courses_navigation_menu_b3638384: "Menú de navegación de cursos"
   courses_people_680bb173: "Cursos y personas"
   courses_undelete_1f689a97: "Cursos: restablecer"
+  courses_view_change_logs_25af6a45: "Cursos - ver registros de cambios"
+  courses_view_list_47885585: "Cursos - ver lista"
+  courses_view_usage_reports_3daed8fe: "Cursos - ver informes de uso"
   create_132b3be1: Crear
   create_14873ed7: crear
   create_a_64f6f82: "Crear un"
@@ -6512,6 +6840,7 @@ es:
   delete_requirement_bce2d943: "Eliminar requisito"
   delete_role_label_succeeded_1690aa28: "Se eliminó el rol %{label} con éxito"
   delete_rubric_9b66412d: "Eliminar rúbrica"
+  delete_rubric_title_ac3a24e6: "Eliminar rúbrica: %{title}"
   delete_section_name_a48d9d79: "Eliminar la sección “%{name}”"
   delete_selected_a023ccf8: "Eliminar lo seleccionado"
   delete_selected_announcements_69e23710: "Eliminar los anuncios seleccionados"
@@ -6625,6 +6954,22 @@ es:
   description_436c48d7: Descripción
   details_98a31b68: Detalles
   details_a6f427c3: "Detalles:"
+  determines_visibility_and_management_of_outcomes_t_79ca45b: |-
+      Determina la visibilidad y la administración de la pestaña Resultados (Outcomes) en la navegación de la cuenta.
+      Permite al usuario crear, importar, editar y eliminar resultados y grupos de resultados a niveles de la cuenta y del curso.
+  determines_visibility_and_management_of_rubrics_ta_88a65a22: |-
+      Determina la visibilidad y la administración de la pestaña Rúbricas (Rubrics) en la navegación de la cuenta.
+      Permite al usuario administrar las rúbricas.
+  determines_visibility_and_management_of_sis_import_a91ed255: "Determina la visibilidad y la administración de la pestaña Importación de SIS en la navegación de la cuenta."
+  determines_visibility_and_management_of_the_questi_fbf70ba9: "Determina la visibilidad y la administración en el enlace de navegación de cuenta Bancos de preguntas."
+  determines_visibility_of_sis_import_tab_in_account_5180b8e8: |-
+      Determina la visibilidad de la pestaña Importación de SIS en la navegación de la cuenta.
+      Permite al usuario ver las fechas de importación de SIS anteriores, los errores y los elementos importados.
+  determines_visibility_of_the_course_activity_optio_2446c4b3: "Determina la visibilidad de la opción Actividad del curso en la pestaña Inicio de sesión en Herramientas del administrador (Admin Tools Logging). Permite al usuario ver la información de la actividad del curso para la cuenta."
+  determines_visibility_of_the_grade_change_activity_6c23036b: "Determina la visibilidad de la opción Actividad de cambios de calificación (Grade Change Activity) en la pestaña Inicio de sesión en Herramientas del administrador (Admin Tools Logging)."
+  determines_whether_a_publish_course_option_is_incl_9bf770e9: "Determina si una opción de Publicar curso (Publish Course) está incluida en la Página de inicio del curso."
+  determines_whether_a_publish_course_option_is_incl_ac5eed8f: "Determina si una opción de Publicar curso (Publish Course) está incluida en la Lista de comprobación de la configuración del curso y en la Página de inicio del curso."
+  determines_whether_the_course_setup_checklist_opti_fd5a8f70: "Determina si la opción Lista de comprobación de la configuración del curso está incluida en la Página de inicio del curso."
   developer_key: 
     api_key: "Clave: *%{api_key}*"
     created: "Creado:"
@@ -6699,6 +7044,9 @@ es:
   disabling_f594bda: Desactivando...
   disabling_post_to_sis_is_not_available_for_non_pub_ee031373: "La opción de desactivar Publicar en SIS no está disponible para cursos no publicados"
   disabling_sync_to_name_failed_e7521ebb: "No se pudo desactivar la sincronización con %{name}"
+  disabling_this_permission_will_override_if_enabled_8d9c42f5: |-
+      Desactivar este permiso anulará (si está habilitado) el permiso Rúbricas - agregar/editar/eliminar (Rubrics - add / edit / delete), evitando que el usuario cree o edite rúbricas
+      desde una tarea individual. Sin embargo, si Resultados de aprendizaje - agregar/editar/eliminar (Learning Outcomes - add / edit / delete) está habilitado, el usuario aún puede agregar rúbricas a través de Resultados - Administrar rúbricas (Outcomes - Manage Rubrics).
   disallow_comments_6d04b47a: "Deshabilitar comentarios"
   disallow_replies_for_title_ca3806b2: "Deshabilitar respuestas para %{title}"
   disccussions_515a3a99: Debates
@@ -6744,6 +7092,8 @@ es:
         other: "Este es un foro con calificación: *vale %{count} puntos*"
       show_due_dates: "Mostrar fechas límite"
       until: Hasta
+    assignment_todo: 
+      todo_date: "Fecha de tareas por hacer: %{date}"
     cannot_unpublish_with_replies: "No se puede cancelar la publicación si hay respuestas de alumnos"
     confirm_delete_announcement: 
       one: "¿Está seguro que desea eliminar este anuncio?"
@@ -7064,6 +7414,7 @@ es:
   divide_into_equal_time_slots_in_minutes_234312fa: "Dividir en intervalos de tiempo iguales (en minutos)"
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "No cuente esta tarea para la calificación final"
   do_nothing_9672b478: "No hacer nada"
+  does_not_meet_expectations_b0736d20: "No cumple con las Expectativas"
   domain_3b54c511: Dominio
   domain_is_required_1d4c8b25: "El dominio es obligatorio"
   dominican_republic_1_3cef4021: "República Dominicana (+1)"
@@ -7157,6 +7508,7 @@ es:
   duplicate_modules_8ea35557: "Duplicar módulos"
   duplicate_objects_120eda73: "Duplicar objetos"
   duplicate_provider_provider_d9842134: "Duplicar el proveedor %{provider}"
+  duplicate_this_module_79ca8243: "Duplicar este módulo"
   duplicating_calendar_events_9932cd37: "Duplicación de los eventos del calendario"
   duplicating_module_9727f5e4: "Duplicando módulo..."
   duplicating_module_ae6670b0: "Duplicando módulo"
@@ -7246,6 +7598,7 @@ es:
       criterion_long_description: "Descripción detallada de los criterios"
       edit_rubric_rating: "Editar calificación"
       find_existing_rubric: "Encontrar rúbrica existente"
+  edit_rubric_title_104d6fd2: "Editar rúbrica: %{title}"
   edit_section_name_558cc89: "Editar la sección “%{name}”"
   edit_survey_b0d6890d: "Editar la encuesta"
   edit_term_name_29a8a322: "Editar período %{name}"
@@ -7810,6 +8163,7 @@ es:
   example_https_schoolofrock_edu_d4326f03: "ejemplo: \"https://schoolofrock.edu\""
   example_item_scores_6726c689: "Ejemplo de calificaciones de elementos"
   example_school_of_rock_41f32c31: "ejemplo: \"School of Rock\""
+  exceeds_expectations_5910fc3a: "Excede las Expectativas"
   exceeds_mastery_1f995dce: "Excede Dominio"
   excuse_this_assignment_for_the_selected_student_af04e132: "Hacer al alumno Seleccionado Exento de esta Tarea"
   excused_3aab77: justificada
@@ -7838,6 +8192,8 @@ es:
   export_to_quizzes_2_format_45b3ec25: "Exportar a formato Evaluaciones 2"
   exported_package_history_bfca44b9: "Historial de paquete exportado"
   exporting_b1eab154: Exportando...
+  external_apps_account_course_settings_c44af5ef: "Aplicaciones externas (Configuraciones de la cuenta/curso)"
+  external_apps_course_settings_1f045644: "Aplicaciones externas (Configuraciones del curso)"
   external_apps_f5490181: "Aplicaciones externas"
   external_collaborations_tool_a4899abb: "Herramienta externa de Colaboraciones"
   external_content: 
@@ -8053,6 +8409,8 @@ es:
   feature_flags_52141c74: "Mostrar marcadores"
   feature_flags_enable_disable_32e8f1ab: "Indicadores de funciones: habilitar/deshabilitar"
   feature_options_37a2c317: "Opciones de características"
+  feature_options_account_settings_294a39f8: "Opciones de función (Configuraciones de la cuenta)"
+  feature_options_enable_disable_7e748054: "Opciones de función - activar/desactivar"
   features: 
     allow_opt_out_of_inbox: "Permitir a los usuarios autoexcluirse de la bandeja de entrada"
     better_file_browsing: "Exploración de archivos mejorada"
@@ -8281,8 +8639,10 @@ es:
   for_all_devices_1f603968: "Para todos los dispositivos"
   for_an_instant_answer_see_if_your_issue_is_address_48280e89: "Para una respuesta inmediata, compruebe si la solución a su problema se encuentra en las *Guías de Canvas*."
   for_best_results_crop_image_to_262px_wide_by_146px_af81a540: "Para obtener los mejores resultados, recortar la imagen a 262 px. de ancho por 146 px. de alto. Tipos de archivo JPG, PNG o GIF aceptados"
+  for_course_level_users_deleting_a_course_is_part_o_932f7a98: "Para usuarios a nivel del curso, eliminar un curso es parte del permiso Estado del curso - administrar (Course State - manage). Sin embargo, para usuarios a nivel de la cuenta, eliminar un curso requiere este permiso y Curso - agregar/editar/eliminar (Course- add / edit / delete). "
   for_development_of_features_for_new_gradebook_7ee1830f: "Para el desarrollo de funciones del nuevo libro de calificaciones."
   for_each_late_62aecf41: "Por cada retraso"
+  forgot_password_f0c3fbac: "¿Olvidó la contraseña?"
   forgot_password_url_3f9c04b: "Olvidó URL de la contraseña"
   form_background_fb654518: "Fondo del formulario"
   form_border_f61f12dc: "Borde del formulario"
@@ -8329,6 +8689,7 @@ es:
   getting_started_with_collaborations_794240ba: "Cómo empezar con colaboraciones"
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Dar a todos los alumnos la misma calificación para *%{assignment.name}* ingresando y presentando un valor de la calificación a continuación:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Dar a todos los alumnos la misma calificación *porcentual* para **%{assignment.name}** ingresando y presentando un valor de la calificación a continuación:"
+  global_announcements_a78912c8: "Anuncios globales"
   global_announcements_add_edit_delete_843ca4d2: "Anuncios globales: agregar/editar/eliminar"
   global_branding_df1cae12: "Marca global"
   global_message_icons: 
@@ -8358,6 +8719,7 @@ es:
   goto_next_page_e8e1ae6f: "Ir a la página siguiente"
   goto_page_page_num_bd656bd5: "Ir a la página %{page_num} "
   goto_previous_page_85b2fa49: "Ir a la página anterior"
+  governs_account_related_sis_ids_i_e_subaccount_sis_b7dd0954: "Rige las ID de SIS relacionadas con la cuenta (es decir, ID de SIS de subcuenta)."
   gpa_scale_6710e2ee: "Escala de GPA"
   gpa_scale_a6d1cdea: "Escala GPA"
   grade_10d1e5a1: "%{grade}"
@@ -8660,6 +9022,9 @@ es:
     ungraded: "No se ha tenido en cuenta en la calificación"
   gradebook_1620a0aa: "Libro de Calificaciones"
   gradebook_5fd8ef0: "Libro de calificaciones..."
+  gradebook_and_speedgrader_3b122556: "Libro de calificaciones y SpeedGrader"
+  gradebook_and_speedgrader_will_be_inaccessible_if__4de0e869: "No se podrá acceder al Libro de calificaciones y SpeedGrader si Calificaciones - editar (Grades - edit) y Calificaciones - ver (Grades - view) están desactivados."
+  gradebook_and_speedgrader_will_be_inaccessible_if__e654ff22: "No se podrá acceder al Libro de calificaciones y SpeedGrader si tanto Calificaciones - editar (Grades - edit) como Calificaciones - ver (Grades - view) están desactivados."
   gradebook_context_name_9dbae5bc: "Libro de calificaciones - %{context_name}"
   gradebook_csvs: 
     grades_filename: Calificaciones
@@ -9007,7 +9372,10 @@ es:
   grades_moderate_317fce84: "Calificaciones: moderar"
   grades_posted_c274d9f8: "Calificaciones publicadas"
   grades_posting_bc7cfc1a: "Publicación de calificaciones"
+  grades_select_final_grade_for_moderation_c66284f4: "Calificaciones - Seleccionar calificación final para la moderación"
   grades_view_all_grades_8bf9f8d3: "Calificaciones: ver todas las calificaciones"
+  grades_view_audit_trail_db7364b1: "Calificaciones - Ver informe de auditoría"
+  grades_view_change_logs_6bc1b959: "Calificaciones - ver registros de cambios"
   grades_visible_to_students_1584fa83: "Calificaciones visibles para los alumnos"
   grades_were_successfully_published_to_the_gradeboo_79203993: "Las calificaciones se publicaron de manera exitosa en el libro de calificaciones."
   gradezilla: 
@@ -9583,6 +9951,7 @@ es:
       En realidad es como un minicurso en el que puede trabajar con una cantidad inferior de alumnos para centrarse
       más en un proyecto determinado.
   groups_cannot_have_size_restrictions_to_assign_by__7d36fa32: "Los grupos no pueden tener restricciones de tamaño para asignar por sección"
+  groups_course_c73e4c2c: "Grupos (Curso)"
   groups_must_be_empty_to_assign_by_section_a9fafa72: "Los grupos deben estar vacíos para asignar por sección"
   groups_navigation_menu_76b5acc6: "Menú de navegación de grupos"
   groups_view_all_student_groups_39bd1b85: "Grupos: ver todos los grupos de los alumnos"
@@ -9803,6 +10172,18 @@ es:
   idp_entity_id_25c51837: "ID de entidad IdP"
   idp_metadata_uri_dae5314a: "URl de metadatos  IdP"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Si un atributo está marcado como aprovisionamiento solamente, entonces solo será utilizado cuando Aprovisionamiento de Justo a Tiempo cree un nuevo usuario, y no se mantendrá al día cada vez que el usuario inicie sesión."
+  if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Si tanto Calificaciones - editar (Grades - edit) como Calificaciones - ver todas las calificaciones (Grades - view all grades) están desactivados, el Libro de calificaciones estará oculto de la navegación del curso."
+  if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "Si tanto Calificaciones - editar (Grades - edit) como Calificaciones - ver todas las calificaciones (Grades - view all grades) están desactivados, el Libro de calificaciones estará oculto de la navegación del curso."
+  if_disabled_the_outcomes_page_becomes_read_only_an_29ea1940: "Si están desactivados, la página Resultados (Outcomes) se vuelve de solo lectura y oculta el botón Administrar rúbricas (Manage Rubrics). El usuario aún puede acceder a rúbricas de tareas individuales a través de Tareas (Assignments)."
+  if_disabled_user_can_still_view_and_download_files_336ffc30: "Si están desactivados, el usuario aún puede ver y descargar los archivos en un archivo zip."
+  if_disabled_user_will_still_have_access_to_course__6816d525: |-
+      Si están desactivados, el usuario aún podrá tener acceso a las Configuraciones el curso.
+      
+      El usuario no puede administrar contenido individual del curso sin el permiso
+      apropiado para ese elemento de contenido.
+      
+      Si la visibilidad del curso está limitada a los usuarios inscritos en el curso, el permiso
+      permite al usuario ver el contenido del curso sin estar inscrito en el curso.
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Si está habilitado, permite que se dé un puntaje mayor al máximo posible para un resultado en una rúbrica determinada."
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Si se habilita, los importadores de Common Cartridge convertirán archivos de HTML en Páginas"
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "En caso de estar habilitado, los diseñadores de contenido deben proporcionar los derechos de autor y la información sobre la licencia de los archivos antes de ser publicados. Solo aplica si el explorador Better File también está habilitado."
@@ -9818,6 +10199,21 @@ es:
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "En caso de estar habilitados, los usuarios podrán configurar las herramientas LTI 2."
   if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: "(Si no se ha seleccionado ninguno, enviar a todos en la cuenta completa)"
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(Si no se ha seleccionado ninguno, enviar a todos en la subcuenta completa)"
+  if_statistics_view_or_users_manage_login_details_i_da650b69: "Si Estadísticas - ver (Statistics - view) o Usuarios - administrar detalles de inicio de sesión (Users- manage login details) están habilitados, un usuario podrá generar actividad de inicio/cierre de sesión en Herramientas del administrador. Para ocultar la opción de la actividad de inicio/cierre de sesión en las Herramientas del administrador, estos dos permisos deben estar desactivados."
+  if_the_open_registration_account_setting_is_enable_f3b9a75f: "Si la configuración de la cuenta Inscripción abierta está activada, los usuarios con este permiso pueden agregar alumnos u observadores a un curso a través de la dirección de correo electrónico o ID de inicio de sesión incluso si el alumno o el observador aún no tienen una cuenta de Canvas."
+  if_this_permission_is_disabled_and_courses_add_edi_9bafd797: |-
+      Si este permiso está desactivado y Cursos - agregar/editar/eliminar (Courses - add / edit / delete) está habilitado,
+      los usuarios pueden agregar un nuevo curso con el botón Agregar un nuevo curso (Add a New Course) en las Configuraciones de la
+      cuenta.
+  if_this_permission_is_disabled_at_the_account_leve_39648abb: "Si este permiso está desactivado, a nivel de la cuenta, los usuarios no pueden ver ningún grupo de cuentas existente. A nivel del curso, los usuarios pueden ver, pero no acceder a, cualquier grupo existente, lo que incluye grupos creados por los alumnos. Para ver grupos, también debe estar habilitado Usuarios - ver lista (Users - view list). Para agregar grupos a nivel de la cuenta a través de CSV, también debe estar habilitado Datos de SIS - importar (SIS Data- import)."
+  if_this_permission_is_disabled_users_can_only_view_b68143d5: "Si este permiso está desactivado, los usuarios solamente pueden ver los grupos existentes, lo que incluye los grupos creados por alumnos."
+  if_this_permission_is_disabled_users_can_still_cre_76a2d4b8: "Si este permiso está desactivado, los usuarios aún pueden crear o agregar rúbricas a tareas si Tareas y evaluaciones - agregar/editar/eliminar (Assignments and Quizzes - add / edit / delete) está habilitado."
+  if_this_permission_is_disabled_users_can_still_ins_4e3cef83: "Si este permiso está desactivado, los usuarios aún pueden instalar aplicaciones aprobadas a través del Centro de aplicaciones de Canvas (si está habilitado por su institución). Además, si este permiso está desactivado, los usuarios no pueden eliminar manualmente las aplicaciones agregadas externamente."
+  if_this_permission_is_enabled_and_courses_view_lis_cdf22691: "Si este permiso está habilitado y Cursos - ver lista (Courses - view list) está habilitado, los usuarios pueden agregar un nuevo curso con el botón Agregar un nuevo curso (Add a New Course) en las Configuraciones de la cuenta."
+  if_this_permission_is_enabled_users_do_not_need_th_e3d0f334: |-
+      Si este permiso está habilitado, los usuarios no necesitan que el permiso Datos de SIS - leer (SIS Data - read) esté habilitado. El permiso de cuenta anula el permiso del curso. Para dejar de permitir a los usuarios administrar las ID de SIS a nivel del curso, deben estar deshabilitados Datos de SIS - administrar (SIS Data - manage) y Datos de SIS - leer (SIS data - read).
+      Para agregar usuarios a cursos a través de ID de SIS, también deben estar habilitados Usuarios - agregar/quitar alumnos de los cursos (Users - add / remove students from courses) y/o Usuarios - agregar/quitar profesores, diseñadores de cursos o profesores auxiliares de cursos (Users - add / remove teachers, course designers, or TAs from courses).
+  if_users_manage_login_details_or_statistics_view_i_22ca94b8: "Si Usuarios - administrar detalles de inicio de sesión (Users - manage login details) o Estadísticas - ver (Statistics - view) están habilitados, un usuario podrá generar actividad de inicio/cierre de sesión en Herramientas del administrador. Para ocultar la opción de la actividad de inicio/cierre de sesión en las Herramientas del administrador, estos dos permisos deben estar desactivados."
   if_you_change_an_assignment_s_points_possible_exis_505e6015: "Si modifica el número de puntos posibles de la tarea, las calificaciones existentes serán automáticamente escaladas."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Si modifica el número de puntos posibles de la tarea, deberá calificarla de nuevo."
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "Si modifica el número de puntos posibles de la tarea, deberá calificar de nuevo cualquier otra presentación."
@@ -9966,11 +10362,13 @@ es:
       Ingresar y distribuir las calificaciones de los estudiantes. Mostrar calificaciones como
       puntos, porcentajes, completo o incompleto, aprobado o desaprobado, escala de GPA
       y calificación por letras. Agrupar tareas para la ponderación de la calificación.
+  insert_equella_links_49a8dacd: "Insertar enlaces de Equella"
   insert_math_equation_57c6e767: "Insertar la ecuación matemática"
   insert_row_below_25187f89: "Insertar fila debajo"
   installed_7b284a91: Instalada
   installed_by_admin_97c3a721: "Instalado por el administrador"
   institution_14179014: Institución
+  institution_announcement_announcement_title_f017c1e0: "Anuncio de la institución: \"%{announcement_title}\""
   instructions: 
     authorize_google_docs: "Antes de poder colaborar en documentos, debe autorizar a Canvas para poder tener acceso a su cuenta de Google Docs:"
     authorize_google_drive: "Antes de poder colaborar en los documentos, debe autorizar a Canvas para que pueda acceder a su cuenta de Google Drive:"
@@ -10436,6 +10834,7 @@ es:
   link_text_d2c702f9: "Texto del enlace"
   link_title_189888b7: "Título del enlace"
   link_title_d959a7b3: "Título del vínculo"
+  link_to_url_52dd935c: "URL del enlace"
   link_url_a213671c: "URL del enlace"
   link_url_cf96376: "URL del vínculo"
   linked_assignment_message: "vinculado con la tarea '%{title}'"
@@ -10805,6 +11204,7 @@ es:
   media_recordings_749aef6d: "Grabaciones de medios"
   median_ed291842: Mediana
   median_score_4657e907: "Mediana: %{score}"
+  meets_expectations_bb179565: "Cumple con las Expectativas"
   meets_mastery_754e1c06: "Reúne el dominio"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} miembros de un máximo de %{max_membership}"
   members_af25c21d: Miembros
@@ -13008,6 +13408,7 @@ es:
   nav_logo_background_ba33fb7f: "Fondo del logotipo de navegación"
   nav_text_94206145: "Texto de navegación"
   nav_text_active_a924ae88: "Activo del texto de navegación"
+  navigation_allows_user_to_view_the_people_link_in__dd533d29: "Navegación: permite al usuario ver el enlace de Personas (People) en la navegación del curso."
   navigation_icon_45db938e: "Ícono de navegación"
   near_mastery_f25174a4: "Cerca del dominio"
   need_a_canvas_account_221d18ed: "¿Necesita un cuenta de Canvas?"
@@ -13159,8 +13560,11 @@ es:
   not_a_valid_date_d3ac20ba: "No es una fecha válida"
   not_a_valid_utf_8_string_string_7f6819c: "No es una secuencia utf-8 válida: %{string}"
   not_all_sections_will_be_assigned_this_item_4e2b8eaa: "Este elemento no se asignará a todas las secciones."
+  not_all_settings_options_are_available_at_the_suba_20efaa98: "No todas las opciones de configuración están disponibles a nivel de la subcuenta, lo que incluye la pestaña Notificaciones (Notifications)."
   not_anonymously_graded_87574f91: "No calificado anónimamente"
   not_available_487d3648: "No está disponible "
+  not_available_at_the_subaccount_level_3fc74ab: "No disponible a nivel de la subcuenta."
+  not_available_at_the_subaccount_level_6ee9b41f: "No disponible a nivel de la subcuenta"
   not_available_during_sync_ae645e8c: "No disponible durante la sincronización"
   not_available_until_date_3c1c73c2: "No disponible hasta %{date}"
   not_available_until_next_submission_2175158: "No está disponible hasta la próxima entrega"
@@ -13442,6 +13846,7 @@ es:
   notification_preferences_cf47083d: "Preferencias de Notificación"
   notifications_cbfa7704: Notificaciones
   notifications_search_results_80a0b06f: "Resultados de búsqueda de notificaciones"
+  notifications_view_f9a60770: "Notificaciones - ver"
   notify_users_this_quiz_has_changed_c5b05995: "Informar a los usuarios que esta evaluación ha cambiado"
   now_click_the_agenda_button_607fb40e: "Ahora haga clic en el botón *Agenda*"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Ahora que su curso está creado y disponible, es probable que no necesite más esta lista de comprobación. De todos modos, la mantendremos a mano en caso de que decida probar algo nuevo o desee contar con una ayuda extra a medida que vaya haciendo cambios en el contenido de su curso."
@@ -13541,6 +13946,7 @@ es:
   object_type_e4f3bbeb: "Tipo de objeto"
   observees: 
     being_observed: "Alumnos en observación"
+    new_observee_pairing_code: "Código de sincronización del alumno"
     new_observee_password: Contraseña
     new_observee_username: "Nombre de usuario"
     observee_added: "En observación ahora %{user}"
@@ -13599,6 +14005,7 @@ es:
   open_complete_incomplete_menu_cfe2033b: "Abrir menú Completo/Incompleto"
   open_discussion_title_for_comments_6baa3fa: "Abrir foro %{title} para comentarios"
   open_event_menu_e9a21e39: "Abrir el menú de eventos"
+  open_event_menu_for_783510e3: "Menú de evento abierto para"
   open_for_comments_1810648: "Abrir para comentarios"
   open_for_comments_f8f7641e: "Abrir para comentar"
   open_grading_scheme_menu_5f889203: "Abrir menú del esquema de calificaciones"
@@ -13810,6 +14217,8 @@ es:
         average_percent: "Porcentaje Promedio"
         latest_score: "Calificación más reciente"
         outcome: Resultado
+  outcomes_and_rubrics_account_course_68d0bf1d: "Resultados y Rúbricas (Cuenta/Curso)"
+  outcomes_and_rubrics_f893d141: "Resultados y Rúbricas"
   outcomes_are_created_here_to_track_mastery_in_a_co_2f487549: "Aquí se crean resultados para realizar un seguimiento del dominio en un curso. Para comenzar, compruebe la barra de menú en la parte superior. Haga clic en el botón Nuevo resultado para crear un nuevo resultado, o el botón Nuevo grupo para crear un nuevo grupo donde organizar sus resultados. El botón Buscar le permitirá usar resultados que han sido creados por su estado o su institución. Al crear y usar resultados, podrá usar el panel a la izquierda para navegar por sus resultados. Puede arrastrar y soltar resultados entre diferentes niveles para crear una estructura."
   outcomes_csv_format_9005acfb: "Resultados en formato CSV"
   outcomes_d1b18d33: Resultados
@@ -13857,7 +14266,7 @@ es:
     cancel_button: Cancelar
     cannot_unpublish_front_page: "No se puede ocultar la página principal"
     delete_button: Eliminar
-    delete_confirmation: "¿Está seguro que desea eliminar esta página wiki?"
+    delete_confirmation: "¿Está seguro de que desea eliminar esta página?"
     delete_dialog_title: "Eliminar página wiki"
     deleting_button: Eliminando...
     edit_dialog_title: "Editar página"
@@ -13925,7 +14334,11 @@ es:
   penalty_adjusted_707df573: "*%{penalty}* **%{adjusted}**"
   pending_3e506a5b: Pendiente
   pending_message_2d9a8796: "Pendiente: %{message}"
+  people_account_30bbffec: "Personas (Cuenta)"
+  people_account_course_305043bb: "Personas (Cuenta/Curso)"
   people_b4ebb13c: Personas
+  people_course_ddd9a66: "Personas (Curso)"
+  people_groups_tab_b245a614: "Personas (pestaña Grupos (Groups))"
   people_options_cfb419a6: "Opciones de personas"
   people_tutorial_tray_a87a6c48: "Bandeja de tutoriales: personas"
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "Otros verán este nombre en los foros, mensajes y comentarios."
@@ -13942,7 +14355,7 @@ es:
   permission_must_be_enabled_for_someone_397e1ce3: "El permiso debe ser habilitado para alguien"
   permission_not_found_620b80d1: "No se han encontrado los permisos"
   permissions: 
-    manage_webhooks: "Gestionar webhooks"
+    manage_webhooks: "Webhooks - administrar"
     provision_catalog: "Proporcionar un catálogo"
     provision_uuid: "Proveer ID únicas universales para Quiz.Next"
   permissions_365c49e: Permisos
@@ -13966,6 +14379,7 @@ es:
   place_item_2acc18b9: "Colocar \"%{item}\""
   place_section_before_5b45714e: "Colocar \"%{section}\" antes:"
   place_title_2c183274: "Colocar \"%{title}\""
+  placeholder_for_webhooks_access_in_canvas_catalog_b8c9d864: "Marcador de posición para el acceso a webhooks en Canvas Catalog."
   placements_5b5e056b: Colocaciones
   plagiarism_detection_platform_6ce67e66: "Plataforma de detección de plagio"
   plagiarism_detection_platform_assignments_fc19e0bd: "Tareas de la plataforma de detección de plagio"
@@ -14550,6 +14964,7 @@ es:
   processing_2fcc9739: Procesando
   product_name: Canvas
   proficiency_rating_6346119f: "Calificación de competencia"
+  proficiency_rating_deleted_77827473: "Calificación de aptitud eliminada"
   proficiency_ratings_2bbabdcd: "Calificaciones de competencia"
   proficiency_ratings_e4078451: "Calificaciones de aptitud"
   profile: 
@@ -14923,6 +15338,8 @@ es:
       email_sent: "Correo de confirmación enviado a %{email}, asegúrese de revisar su bandeja de spam"
       link_invalid: "El enlace que ha utilizado ya no es válido. Si no puede iniciar sesión, haga clic en \"¿Olvidó su contraseña? para restablecer su contraseña."
       password_changed: "Contraseña cambiada"
+  pseudonyms_mobile_login: 
+    parent_signup: "Registro para padres"
   pts_51d69f4a: Ptos.
   pts_699bd9aa: ptos.
   public_a749f507: Público
@@ -15081,6 +15498,9 @@ es:
       move_copy: Mover/Copiar
       select_bank: "Seleccione el destino del banco de preguntas para esta pregunta:"
       show_details: "Mostrar los detalles de la pregunta"
+  question_banks_45bdf347: "Bancos de preguntas"
+  question_banks_account_navigation_9a7ab7c2: "Bancos de preguntas (Navegación de la cuenta)"
+  question_banks_view_and_link_e6d9cde2: "Bancos de preguntas - ver y vincular"
   question_banks_view_and_link_to_f1bca68b: "Bancos de preguntas: ver y enlazar a"
   question_f06476d1: pregunta
   question_group_837b8014: "Banco de preguntas"
@@ -16336,8 +16756,11 @@ es:
   quizzes/quiz: 
     submission_action_take_quiz: "Extraer %{title}"
   quizzes_7e598f57: Evaluaciones
+  quizzes_and_question_banks_9b7569e3: "Evaluaciones y Bancos de preguntas"
   quizzes_next_importing_75e63f67: "Importación de Quizzes.Next"
   quizzes_tutorial_tray_6f87cdd3: "Bandeja de tutoriales: cuestionarios"
+  quizzes_view_submission_log_ec105e3e: "Evaluaciones - ver registro de envíos"
+  quotas_account_settings_22c12b8d: "Cupos (Configuraciones de la cuenta)"
   radio_button_option_1_a8ec51f9: "Opción de botón de radio 1"
   radio_button_option_2_31e50043: "Opción de botón de radio 2"
   range_56b2f310: Rango
@@ -16448,6 +16871,7 @@ es:
       one: 1 sección
       other: "%{count} secciones"
   record_media_6637ff19: "Grabar contenido de medios"
+  record_upload_media_5fdce166: "Registrar/cargar medios"
   record_with_microphone_only_e4ee07aa: "Grabar solo con micrófono"
   record_with_webcam_af21e07c: "Grabar con cámara web"
   recording_was_deleted_b989eaff: "Se eliminó la grabación"
@@ -16457,6 +16881,8 @@ es:
   redirect_uris_a54bd82f: "Redireccionar URI:"
   reference_code_3e8355dd: "Código de referencia"
   reference_code_is_required_c32c757f: "Se requiere el código de referencia"
+  regardless_of_whether_this_permission_is_enabled_o_437ee269: "Sin importar si el permiso está activado o desactivado, el usuario aún podrá administrar eventos en su calendario personal."
+  regardless_of_whether_this_permission_is_enabled_o_a16e31b5: "Sin importar si el permiso está activado o desactivado, los usuarios aún podrán administrar eventos en su calendario personal."
   regenerate_3e4679f8: Regenerar
   regenerate_epub_395c8e56: "Regenerar publicación electrónica"
   region_47e29025: "Región:"
@@ -16471,7 +16897,10 @@ es:
       remember_me: Recordarme
       sign_in: "Iniciar sesión"
     new_parent_dialog: 
+      anchor: 
+        pairing_code: "¿Qué es un código de sincronización?"
       buttons: 
+        cancel: Cancelar
         start_participating: "Comenzar a participar"
       labels: 
         code: "Código de sincronización del alumno"
@@ -16561,6 +16990,8 @@ es:
   reply_to_topic_12412b0f: "Contestar al tema"
   report_has_been_aborted_2b5763ed: "Se ha cancelado el informe"
   reported_3de7086a: Informado
+  reports_1b9ab7a7: Informes
+  reports_account_settings_78f5336a: "Informes (Configuraciones de la cuenta)"
   require_an_access_code_600e06e8: "Requiere un código de acceso"
   require_assignment_due_date_778b200d: "Solicitar fecha límite de tareas"
   require_group_members_to_be_in_the_same_section_7f6c36af: "Hacer obligatorio que los miembros de grupos pertenezcan a la misma sección"
@@ -16568,6 +16999,7 @@ es:
   require_usage_rights_for_uploaded_files_4507865b: "Requerir los derechos de uso para los archivos cargados"
   required_access_code_592902d7: "Código de acceso requerido"
   required_email_address_379b2392: "Se requiere la dirección de correo electrónico"
+  required_fields_include_key_name_owner_email_tool__b8e42174: "Los campos obligatorios incluyen nombre clave, correo electrónico del propietario, ID de herramienta, redirigir URL, y URL del ícono."
   required_to_view_quiz_results_dba7368b: "Obligatorio para ver los resultados de la evaluación"
   requirement_f5b75da1: Requisito
   requirement_subject_7cfac6c8: "Materia requisito"
@@ -16645,6 +17077,7 @@ es:
       create_accounts: "Crear nuevas cuentas de nivel superior"
       create_collaborations: "Crear colaboraciones entre alumnos"
       create_conferences: "Crear conferencias en línea"
+      manage_: "Administrar (agregar/editar/eliminar) "
       manage_account_memberships: "Agregar/eliminar otros administradores para esta cuenta"
       manage_account_settings: "Maneje las configuraciones a nivel de cuenta"
       manage_admin_users: "Agregar/eliminar otros profesores, diseñadores de curso o APs del curso"
@@ -16692,7 +17125,7 @@ es:
       suspend_accounts: "Suspender cuentas"
       undelete_courses: "Recuperar cursos"
       view_all_grades: "Ver todas las calificaciones"
-      view_analytics: "Ver páginas de análisis"
+      view_analytics: "Análisis - ver páginas"
       view_course_changes: "Ver los registros de los cambios de los cursos"
       view_error_reports: "Ver los informes de errores"
       view_grade_changes: "Ver los registros de cambio de calificaciones"
@@ -16840,6 +17273,7 @@ es:
         are_you_sure_remove: "¿Seguro que quiere remover esta rúbrica de su lista?"
       remove_rubric: "Eliminar esta rúbrica de mi lista"
   rubrics_add_edit_delete_8299eff7: "Rúbricas: agregar/editar/eliminar"
+  rubrics_and_speedgrader_ececaed4: "Rúbricas y SpeedGrader"
   rubrics_b5ef369b: Rúbricas
   running_c5a4998d: "En ejecución"
   russia_7_87bc99d5: "Rusia (+7)"
@@ -16872,6 +17306,9 @@ es:
   saving_new_role_458f4ba8: "Guardando rol nuevo"
   saving_recording_e111cb05: "Guardando grabación..."
   schedule_student_availability_332154a: "Programar la disponibilidad de los alumnos"
+  scheduler_65b5ac91: Programador
+  scheduler_must_be_enabled_by_your_canvas_admin_7508c8c2: "El Programador debe ser habilitado por el administrador de Canvas."
+  scheduler_must_be_enabled_for_your_account_e6e53972: "El Programador debe estar habilitado para su cuenta."
   scheduler_shown_df77ca6f: "Programador mostrado"
   school_of_rock_4b7b1fd0: "Escuela de rock"
   score_68107950: "%{score}%"
@@ -17330,6 +17767,10 @@ es:
   set_name_f83b658: "Establecer nombre"
   set_of_grading_periods_545b37e9: "Conjunto de períodos de calificación"
   set_some_up_now_1749bb44: "Configurar ahora algunas"
+  set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\
+      \x20           Configure cómo sus calificaciones de aptitud aparecen en el Libro de calificaciones de dominio del aprendizaje.\n\
+      \x20           Ajustar número de calificaciones, nivel de dominio, puntos y colores.\n\
+      \x20         "
   set_up_how_your_proficiency_ratings_appear_inside__f25d5da8: "Configure cómo sus calificaciones de aptitud aparecen en el Libro de calificaciones de dominio del aprendizaje. Ajustar número de calificaciones, nivel de dominio, puntos y colores."
   settings: 
     recaptcha_settings: 
@@ -18176,6 +18617,7 @@ es:
       processing_takes_awhile: "esto puede tomar un tiempo..."
     status: 
       processing: Procesando
+  sis_import_14517892: "Importación de SIS"
   sis_import_errors_d7fe542b: "Errores de importación de SIS"
   sis_import_refactor_ca9484ac: "Refactor de importación de SIS"
   sis_imports_17308c02: "Importaciones de SIS"
@@ -18367,6 +18809,7 @@ es:
     exact_answer: "%{exact_value} +/- %{margin}"
     inexact_answer: "%{lower_bound} a %{upper_bound}"
     no_answer: "Sin respuesta"
+  statistics_4573b730: Estadísticas
   statistics_for_name_f4b7b0fc: "Estadística para %{name}"
   statistics_view_b19458: "Estadísticas: ver"
   stats_9272cef3: Estadísticas
@@ -18387,6 +18830,9 @@ es:
   student_assignment_outcome_map_title: "Competencias de los alumnos"
   student_collaborations_create_b9e312c1: "Colaboraciones de los alumnos: crear"
   student_context_card_ad59967e: "Tarjeta de contexto del alumno"
+  student_context_cards_376d2072: "Tarjetas de contexto del alumno"
+  student_context_cards_must_be_enabled_for_an_accou_f194b7c4: "Un administrador debe habilitar las tarjetas de contexto del alumno para una cuenta. Si este permiso no está habilitado, los usuarios aún pueden ver las tarjetas de contexto del alumno a través del Libro de calificaciones."
+  student_context_cards_must_be_enabled_for_an_accou_f84169cb: "Un administrador debe habilitar las tarjetas de contexto del alumno para una cuenta."
   student_details_49901ceb: "Detalles del alumno"
   student_extensions_d35a907: "Extensiones de alumnos"
   student_grades_4cbc59a1: "Calificaciones del alumno"
@@ -18412,6 +18858,7 @@ es:
       en los resultados del aprendizaje del curso. Los resultados aparecen en un formato similar al de un libro de calificaciones y el progreso se muestra tanto en formato numérico como con la clasificación dominado/casi dominio/medidas correctoras.
   student_planner_aee76000: "Agenda organizadora del alumno"
   student_planner_date_4cc73abb: "Fecha del planificador de alumnos:"
+  student_position_6d3b7750: "Alumno %{position}"
   student_settings_354d9a7e: "Configuración de los alumnos"
   student_sis_6721040e: "Sis del alumno"
   student_sis_d9f0cd39: "SIS del alumno"
@@ -18420,6 +18867,7 @@ es:
   student_summary: 
     student_summary_table_ascending: "Tabla de resumen del alumno en orden ascendente por %{sortText}"
     student_summary_table_descending: "Tabla de resumen del alumno en orden descendente por %{sortText}"
+  student_view_ac9b672f: "Vista de alumno"
   student_viewed_document_9065adb8: "Documento visto por el alumno"
   studentcount_student_scores_updated_232ad7b7: 
     one: "1 puntaje actualizado del alumno"
@@ -18431,6 +18879,7 @@ es:
   students_are_loading_206c5246: "Los alumnos se están cargando"
   students_are_not_allowed_to_access_test_installati_11b9078: "Los alumnos no tienen permitido acceder a las instalaciones de prueba."
   students_being_observed_4de3e520: "Los alumnos en observación"
+  students_can_edit_and_view_page_history_if_allowed_39a47edc: "Los alumnos pueden editar y ver el historial de páginas si está permitido en las opciones individuales de la página."
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Los estudiantes solo pueden participar en el curso entre estas fechas"
   students_can_see_originality_score_797fe634: "Los alumnos pueden ver el puntaje de originalidad"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Los alumnos no pueden ver las respuestas de la evaluación hasta que finalice el curso"
@@ -18487,6 +18936,8 @@ es:
       one: 1 subcuenta
       other: "%{count} subcuentas"
   subaccount_91f4c279: "Subcuenta "
+  subaccount_settings_8549eff7: "Configuraciones de la subcuenta"
+  subaccounts_efd02bd4: Subcuentas
   subdomain_url_1e43b6f0: "URL del subdominio"
   subject_114b2e98: Asunto
   subject_must_contain_fewer_than_255_characters_2e72cd02: "El asunto debe contener menos de 255 caracteres."
@@ -18767,6 +19218,7 @@ es:
   take_the_survey_again_24ce22c2: "Volver a realizar la encuesta"
   teacher_5a73b637: Profesor
   teacher_s_fdefb2c: Profesor(s)
+  teacher_view_b2047bc6: "Vista del profesor"
   teachers_52e2423f: Profesores
   teal_f729a294: "Verde azulado"
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Cuéntenos cómo y cuándo le gustaría ser notificado de los eventos en Canvas."
@@ -18841,10 +19293,12 @@ es:
         unspecified: "siempre que"
       timespan: "%{start_at} *a* %{end_at}"
   terms_35d91184: "Períodos:"
+  terms_4d979628: Términos
   terms_not_found_terms_must_be_included_with_multi__ca2e5c25: "Términos no encontrados. Los términos deben incluirse con multi_term_batch_mode"
   terms_of_service_attributes_not_valid_f3f9fca9: "Atributos inválidos de Términos de servicio"
   terms_of_service_bedefcaf: "Términos de servicio"
   terms_of_service_f183ff7f: "Términos de servicio"
+  test_cluster_only_70e61c19: "Solamente grupos de pruebas"
   text_document_eacbcdb7: "Documento de texto"
   text_entry_submission_7b0ae0c5: "Presentación de entrada de texto"
   text_entry_submission_cannot_be_empty_3d187cae: "La presentación de la entrada del texto no puede estar vacía"
@@ -18853,16 +19307,27 @@ es:
   that_user_account_has_been_deleted_please_contact__350e0e0: "Esa cuenta de usuario ha sido eliminada. Por favor contacte a su administrador del sistema para que su cuenta sea reactivada."
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "El ID de la cuenta de la cuenta a la cual el usuario que informa pertenece"
   the_algorithm_to_use_for_signing_authnrequest_logo_67a75cc9: "El algoritmo a usar para firmar mensajes AuthnRequest, LogoutRequest, y LogoutResponse enviados al IdP."
+  the_analytics_feature_must_be_enabled_in_account_s_37b80011: |-
+      La función de análisis debe estar habilitada en Configuraciones de la cuenta para ver las páginas de análisis.
+      Para ver el enlace Análisis (Analytics) en la barra lateral del usuario desde la página de Personas, Perfiles (Profiles) debe estar desactivado en su cuenta.
+  the_analytics_feature_must_be_enabled_in_account_s_b4e77562: |
+      La función de análisis debe estar habilitada en Configuraciones de la cuenta para ver las páginas de análisis.
+      Para ver el enlace Análisis (Analytics) en la barra lateral del usuario desde la página de Personas, Perfiles (Profiles) debe estar desactivado en su cuenta.
   the_announcement_title_could_not_be_linked_to_the__78c747f3: "El anuncio \"%{title}\" no se pudo vincular al módulo \"%{mod_title}\""
+  the_announcements_tab_is_always_visible_to_admins__eb447785: "La pestaña Anuncios (Announcements) siempre está visible para los administradores; sin embargo, para administrar anuncios, debe estar habilitado Anuncios globales - agregar/editar/eliminar (Global Announcements - add / edit / delete)."
   the_app_was_activated_a84e055f: "Se activó la aplicación"
   the_app_was_added_58e2836a: "Se agregó la aplicación"
   the_app_was_added_successfully_3f785a23: "Se agregó la aplicación correctamente"
   the_app_was_deactivated_573520ab: "Se desactivó la aplicación"
   the_app_was_updated_successfully_3d71cd1b: "Se actualizó la aplicación correctamente"
+  the_attendance_tool_must_be_enabled_by_your_canvas_108e6dca: "La herramienta de Asistencia debe ser habilitada por el administrador de Canvas."
   the_canvas_saml_entity_id_is_metadata_url_and_the__af7349ab: |-
       El ID de entidad SAML de Canvas es %{metadata_url}, y el metadato del Proveedor de servicio
       está disponible en esa URL.
+  the_chat_tool_must_be_enabled_by_your_canvas_admin_e3b26123: "La herramienta de Chat debe ser habilitada por el administrador de Canvas."
   the_course_link_validator_searches_through_course__76f0bc63: "El validador del enlace del curso busca en el contenido del curso y devuelve todos los enlaces con los que se encuentra que no son válidos o que no responden. Por favor tenga en cuenta que algunos enlaces marcados como que no responden son simplemente inaccesibles desde nuestros servidores y seguirán funcionando para los alumnos."
+  the_course_state_manage_permission_allows_users_to_67e16652: "El permiso Estado del curso - administrar (Course State - manage) permite a los usuarios publicar cursos que no contengan módulos. Para publicar/anular la publicación de contenido del módulo, debe estar habilitado Contenido del curso - agregar/editar/eliminar (Course Content - add / edit / delete)."
+  the_course_status_buttons_unpublished_and_publishe_e2dca595: "Los botones Estado del curso (Course Status) (publicado o sin publicar) solamente se muestran hasta que se reciba el envío de un alumno. No se puede anular la publicación de los cursos con envíos de alumnos."
   the_download_process_has_started_this_can_take_awh_7e616db1: |-
       El proceso de descarga ha comenzado. Esto
       puede tomar un tiempo para cursos grandes. Puede abandonar la
@@ -18926,7 +19391,9 @@ es:
   the_profile_picture_has_been_reported_d609d6dd: "La imagen de perfil ha sido informada"
   the_provided_academic_benchmark_file_has_an_error_4ad2c631: "El archivo Academic Benchmark proporcionado tiene un error"
   the_question_text_for_the_question_question_name_w_3a68a2c7: "El texto de la pregunta para la pregunta \"%{question_name}\" era demasiado largo."
+  the_quiz_log_auditing_feature_option_must_be_enabl_77bf321e: "La opción de función Auditar registro de le evaluación (Quiz Log Auditing) debe estar habilitada en las Configuraciones del curso."
   the_quiz_name_must_be_under_length_characters_68e7de3a: "El nombre del cuestionario debe tener menos de %{length} caracteres"
+  the_roles_api_refers_to_this_permission_as_become__bededd25: "La API de roles se refiere a este permiso como become_user."
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "los roles del usuario que informa (alumno, profesor, administrador, etc)"
   the_salesforce_account_id_if_it_exists_e7949706: "El identificación de la cuenta de Salesforce (si existe)"
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "La herramienta del planeador le permite configurar los intervalos de tiempo en que los alumnos (o grupos de alumnos) se pueden inscribir. Para comenzar, haga clic en el botón de más abajo."
@@ -18936,12 +19403,14 @@ es:
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "El usuario especificado (%{id}) no es un alumno en este curso"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "El usuario especificado no es un alumno en este curso"
   the_state_parameter_is_required_ffadf213: "El parámetro de estado es obligatorio"
+  the_term_has_ended_for_this_course_f0ab367: "El plazo ha terminado para este curso"
   the_title_cannot_be_longer_than_length_characters_7a822943: "El título no puede ser superior a %{length} caracteres"
   the_title_of_the_following_question_bank_was_trunc_b6c86975: "El título del siguiente banco de preguntas está truncado: \"%{title}\""
   the_top_track_represents_days_on_which_the_student_2a347099: "La pista superior representa los días en los que el *alumno envía mensajes* al instructor. La pista inferior muestra los **mensajes de los instructores** al alumno."
   the_unique_id_used_for_representing_the_specific_r_3bdf5870: "El id único usado para representar la solicitud/respuesta específica alterna este informe de error ocurrido alrededor"
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "La URL que un usuario lo suficientemente privilegiado podría usar para hacerse pasar por alguien que informa en la misma página para tratar y reproducir el problema"
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "La URL de la página en la que el usuario estaba cuando informaron el error"
+  the_user_must_also_be_enrolled_as_an_instructor_in_e7e22eea: "El usuario también debe estar inscrito como instructor en los cursos en los que está intentando hacer una lista cruzada."
   theme_52404e51: Tema
   theme_editor_b7b00f6b: "Editor de tema"
   theme_editor_changes_have_been_cancelled_2af5cc5f: "Se han cancelado los cambios al editor de tema."
@@ -19082,6 +19551,7 @@ es:
   this_is_a_preview_of_the_draft_version_of_the_quiz_910a02e0: "Esta es una vista previa del borrador de esta evaluación"
   this_is_a_preview_of_the_published_version_of_the__70e0c8: "Esta es una vista previa de la versión publicada de la evaluación"
   this_is_a_what_if_score_cbdc04f9: "Esta es una calificación \"que pasa si\""
+  this_is_an_account_setting_that_must_be_turned_on__4c939dea: "Esta es una configuración de cuenta que debe ser activada por el Gerente de clientes satisfechos."
   this_is_just_a_dev_only_feature_you_can_turn_on_to_7f88c58f: "Esta es solo una función de sólo desarrollo que se puede activar para obtener una vista previa de cómo se verían las páginas en un entorno de RTL, sin tener que cambiar su idioma a uno que normalmente es de RTL "
   this_is_not_a_valid_grade_9cc2cb8: "No es una calificación válida"
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: "Esta es la calificación elegida actualmente para este alumno."
@@ -19113,6 +19583,14 @@ es:
   this_package_includes_the_question_type_pattern_ma_ce3dadc6: "Este paquete incluye el tipo de pregunta, la coincidencia de patrón, que no es compatible con Canvas. Hemos convertido el tipo de pregunta a Completar el espacio en blanco"
   this_page_cannot_be_modified_because_grades_have_a_48646991: "Esta página no puede ser modificada debido a que las calificaciones ya se han publicado."
   this_panel_lists_the_users_ready_to_be_added_to_th_79efad22: "Este panel enumera los usuarios listos para ser agregados a este curso."
+  this_permission_does_not_affect_ability_to_manage__64b0f272: |-
+      Este permiso no afecta la capacidad de administrar bancos de preguntas a nivel del curso en Evaluaciones. En cambio, los Bancos de preguntas dependen del permiso Tareas y evaluaciones - agregar/editar/eliminar (Assignments and Quizzes - add / edit / delete).
+      Para una administración completa de los bancos de preguntas del curso, deben estar habilitados este permiso y Tareas y evaluaciones - agregar/editar/eliminar (Assignments and Quizzes - add / edit / delete).
+  this_permission_is_available_for_all_canvas_accoun_25cd5444: "Este permiso está disponible para todas las cuentas de Canvas pero solamente está en uso para las instituciones asociadas con una cuenta de Canvas Catalog. El permiso actualmente no tiene efectos por adelantado, pero ingeniería sugiere que el permiso permanezca habilitado para los administradores. Para otros roles, el permiso puede estar desactivado."
+  this_permission_only_affects_course_announcements__6bc2b0a5: "Este permiso solamente afecta los anuncios del curso; para administrar los anuncios globales, debe estar habilitado Anuncios globales - agregar/editar/eliminar (Global Announcements - add / edit / delete)."
+  this_permission_only_controls_adding_users_at_the__f33e8ae8: |-
+      Este permiso solamente controla el agregado de usuarios a nivel de la cuenta. Para agregar usuarios
+      a un curso, también deben estar habilitados Usuarios - agregar/quitar alumnos de los cursos (Users - add / remove students from courses) o Usuarios - agregar/quitar profesores, diseñadores de cursos o profesores auxiliares de cursos (Users - add / remove teachers, course designers, or TAs from courses).
   this_question_group_is_set_to_pick_more_questions__2e3552c4: "Este banco de preguntas se establece para recoger más preguntas de las que están disponibles."
   this_question_will_show_a_checkbox_next_to_each_an_169cd6d9: "Esta pregunta mostrará una casilla junto a cada respuesta."
   this_quiz_has_been_excused_d89d2b74: "Esta evaluación ha sido justificada.  "
@@ -19393,7 +19871,60 @@ es:
   tls_7a2eaba5: TLS
   to_35c6baa2: a
   to_51406be9: A
+  to_access_assignment_submissions_through_assignmen_30c5c8f2: "Para acceder a envíos de tareas a través de Tareas (Asignaciones) o el Libro de calificaciones y ver en SpeedGrader, también deben estar habilitados Calificaciones - ver todas las calificaciones (Grades - view all grades) o Calificaciones - editar (Grades - edit)."
+  to_access_assignment_submissions_through_assignmen_ce438715: |-
+      Para acceder a los envíos de tareas a través de Tareas (Assignments) y SpeedGrader, también debe estar habilitado Calificaciones - editar (Grades - edit).
+      Para editar o agregar comentarios en SpeedGrader o en el Libro de calificaciones, también debe estar habilitado Calificaciones - editar (Grades - edit).
+  to_access_assignment_submissions_through_assignmen_ecbb8fb7: |-
+      Para acceder a envíos de tareas a través de Tareas (Assignments) y el
+      Libro de calificaciones, también debe estar habilitado Calificaciones - ver todas las calificaciones (Grades - view all grades).
+  to_access_the_account_courses_page_courses_view_li_e1da6165: "Para acceder a la página Cursos de la cuenta, también debe estar habilitado Cursos - ver lista (Courses - view list)."
+  to_access_the_assignments_index_page_course_conten_a5b00f98: "Para acceder a la página de índice Tareas (Assignments), debe estar habilitado Contenido del curso - ver (Course Content - view). Para diferenciar las tareas asignadas a alumnos individuales, también debe estar habilitado Usuarios - ver lista (Users - view list)."
+  to_access_the_people_page_and_view_groups_users_vi_43aceac3: "Para acceder a la página de Personas y ver los Grupos, debe estar habilitado Usuarios - ver lista (Users - view list)."
+  to_access_the_people_page_users_view_list_must_be__5a5475fe: "Para acceder a la página de Personas, debe estar habilitado Usuarios - ver lista (Users - view list)."
+  to_access_the_people_page_users_view_list_must_be__756d7188: |-
+      Para acceder a la página de Personas, debe estar habilitado Usuarios - ver lista (Users - view list).
+      Si la configuración de la cuenta Inscripción abierta está activada, los usuarios con este permiso pueden agregar alumnos a un curso a través de la dirección de correo electrónico si el usuario aún no tiene una cuenta de Canvas.
+      Para ver ID de SIS, debe estar habilitado Datos de SIS - leer (SIS Data - read). Para agregar un usuario a un curso a través de ID de SIS, también debe estar habilitado Datos de SIS - administrar (SIS Data - manage).
+      Para editar la sección de un alumno, también deben estar habilitados Usuarios - ver lista (Users - view list) y Conversaciones - enviar mensajes a miembros individuales del curso (Conversations - send messages to individual course members).
+      Para vincular un observador con un alumno, también debe estar habilitado Conversaciones - enviar mensajes a miembros individuales del curso (Conversations - send messages to individual course members).
+  to_access_the_people_page_users_view_list_must_be__f6fcb6bc: "Para acceder a la página de Personas, debe estar habilitado Usuarios - ver lista (Users - view list). Si el permiso está habilitado, y si Usuarios - ver dirección principal de correo electrónico (Users - view primary email address) está desactivado, los usuarios verán las direcciones de correo electrónico utilizadas como ID de inicio de sesión."
+  to_access_the_people_page_users_view_list_must_be__f89c8e5a: |-
+      Para acceder a la página de Personas, debe estar habilitado Usuarios - ver lista (Users - view list).
+      
+      Si este permiso está desactivado, y Usuarios - ver ID de inicio de sesión (Users - view login IDs) está habilitado, los usuarios aún verán las direcciones de correo electrónico utilizadas como ID de usuario.
   to_activate_sms_enter_the_four_character_confirmat_3982a3ec: "Para activar los SMS, introduzca el código de confirmación de cuatro caracteres enviado a%{sms_number}."
+  to_add_announcements_discussions_moderate_must_als_2496cbd7: "Para agregar anuncios, también debe estar habilitado Foros - moderar (Discussions - moderate). Para ver anuncios recientes en la página de inicio, la casilla de verificación Mostrar anuncios recientes en la página de inicio del curso (Show recent announcements on Course home page) debe estar seleccionada en las Configuraciones del curso."
+  to_add_edit_or_delete_groups_groups_add_edit_delet_b826f547: "Para agregar, editar o eliminar grupos, también debe estar habilitado Grupos - agregar/editar/eliminar (Groups - add / edit / delete)."
+  to_add_users_to_a_course_users_add_remove_students_5036ad25: |-
+      Para agregar usuarios a un curso, también
+      deben estar habilitados Usuarios - agregar/quitar alumnos de los cursos para el curso (Users - add / remove students from courses for the course) y/o Usuarios - agregar/quitar profesores, diseñadores de cursos o profesores auxiliares de cursos (Users - add / remove teachers, course designers, or TAs from courses).
+  to_add_users_to_a_course_users_add_remove_students_888b391e: |-
+      Para agregar usuarios a un curso, también deben estar habilitados Usuarios - agregar/quitar alumnos de los cursos (Users - add / remove students from courses) y/o Usuarios - agregar/quitar profesores, diseñadores de cursos o profesores auxiliares de cursos (Users - add / remove teachers, course designers, or TAs from courses).
+      Para editar la sección de un alumno, deben estar habilitados Conversaciones - enviar mensajes a miembros individuales del curso (Conversations - send messages to individual course members) y Usuarios - agregar/quitar alumnos de cursos (Users - add / remove students from courses).
+      Para editar la sección de un profesor, diseñador de cursos o profesor auxiliar, también deben estar habilitados Conversaciones - enviar mensajes a miembros individuales del curso (Conversations - send messages to individual course members)​y Usuarios - agregar/quitar profesores, diseñadores de cursos o profesores auxiliares de cursos (Users - add / remove teachers, course designers, or TAs from courses).
+  to_allow_a_user_to_add_students_to_a_moderation_se_3f51a218: "Para permitir a un usuario agregar alumnos a un conjunto de moderación, también debe estar habilitado Calificaciones - ver todas las calificaciones (Grades - view all grades)."
+  to_allow_a_user_to_add_students_to_a_moderation_se_cd881a9d: |-
+      Para permitir a un usuario agregar alumnos a un conjunto de moderación, también debe estar habilitado Calificaciones - ver todas las calificaciones (Grades - view all grades).
+      Para permitir a un usuario agregar alumnos a un conjunto de moderación, revisar una tarea moderada en SpeedGrader, y publicar calificaciones finales para una tarea moderada, también debe estar habilitado Calificaciones - editar (Grades - edit).
+  to_allow_a_user_to_publish_final_grades_for_a_mode_b0aaaadd: "Para permitir a un usuario publicar calificaciones finales para una tarea moderada, también debe estar habilitado Calificaciones - editar (Grades - edit)."
+  to_allow_a_user_to_review_a_moderated_assignment_i_6aa43d7f: "Para permitir a un usuario revisar una tarea moderada en SpeedGrader, también debe estar habilitado Calificaciones - editar (Grades - edit)."
+  to_allow_full_management_of_conferences_created_by_902e96e4: |-
+      Para permitir la administración completa de conferencias creadas por el usuario o por otros, también debe estar habilitado Contenido del curso - agregar/editar/eliminar (Course Content - add / edit / delete).
+      Para terminar una conferencia prolongada, debe estar habilitado Contenido del curso - agregar/editar/eliminar (Course Content - add / edit / delete).
+      Si Contenido del curso - agregar/editar/eliminar (Course Content - add / edit / delete) está habilitado y Conferencias web - crear (Web Conferences - create) está desactivado, el usuario aún puede administrar conferencias.
+      Este permiso controla la capacidad de un usuario de crear conferencias en cursos y grupos.
+  to_allow_full_management_of_conferences_created_by_feec1984: |-
+      Para permitir la administración completa de conferencias creadas por el usuario o por otros, también debe estar habilitado Contenido del curso - agregar/editar/eliminar (Course Content - add / edit / delete).
+      Para terminar una conferencia prolongada, debe estar habilitado Contenido del curso - agregar/editar/eliminar (Course Content - add / edit / delete).
+      Si Contenido del curso - agregar/editar/eliminar (Course Content - add / edit / delete) está habilitado y Conferencias web - crear (Web Conferences - create) está desactivado, el usuario aún puede administrar conferencias.
+      Este permiso controla la capacidad de un usuario de crear conferencias en cursos y grupos.
+  to_allow_user_to_moderate_grades_grades_select_fin_e98c1f0e: "Para permitir al usuario moderar calificaciones, también debe estar habilitado Calificaciones - Seleccionar calificación final para la moderación (Grades - Select final grade for moderation)."
+  to_allow_view_edit_and_delete_functionality_of_col_17533079: |-
+      Para permitir ver, editar y eliminar la funcionalidad de colaboraciones creadas por otros usuarios, también debe estar habilitado Contenido del curso - agregar/editar/eliminar (Course Content - add / edit / delete).
+      Si Contenido del curso - agregar/editar/eliminar (Course Content - add / edit / delete) está habilitado y Colaboraciones del alumno - crear (Student Collaborations - create) está desactivado, el usuario no podrá crear nuevas colaboraciones, pero podrá ver, editar y eliminar todas las colaboraciones.
+      Para agregar alumnos a una colaboración, también debe estar habilitado Usuarios - ver lista (Users - view list). Para agregar un grupo de cursos a una colaboración, también debe estar habilitado Grupos - agregar/editar/eliminar (Groups - add / edit / delete).
+  to_allow_view_edit_delete_functionality_of_collabo_442490c4: "Para permitir ver/editar/eliminar la funcionalidad de colaboraciones creadas por otros usuarios, también debe estar habilitado Contenido del curso - agregar/editar/eliminar (Course Content - add / edit / delete). Si Contenido del curso - agregar/editar/eliminar (Course Content - add / edit / delete) está habilitado y Colaboraciones del alumno - crear (Student Collaborations - create) está desactivado, el usuario no podrá crear nuevas colaboraciones, pero podrá ver/editar/eliminar todas las colaboraciones. Para agregar alumnos a una colaboración, también debe estar habilitado Usuarios - ver lista (Users - view list). Para agregar un grupo de cursos a una colaboración, también debe estar habilitado Grupos - ver todos los grupos de alumnos (Groups - view all student groups)."
   to_be_added_2959cc72: "Por agregarse"
   to_be_removed_d4b48586: "Por eliminarse"
   to_c4c44f4b: hasta
@@ -19404,23 +19935,156 @@ es:
       obtener el ID del cliente y el secreto del cliente.
       
       Si el proveedor puede configurar una retrollamada válida o URL de redirección, use %{callback_url}.
+  to_cross_list_a_section_course_sections_add_edit_d_160006f7: "Para realizar una lista cruzada de una sección, también debe estar habilitado Secciones del curso - agregar/editar/eliminar (Course Sections - add / edit / delete). Para editar la ID de SIS del curso, también debe estar habilitado Datos de SIS - administrar (SIS Data - manage). Para permitir que un usuario a nivel de la cuenta elimine un curso, también debe estar habilitado Estado del curso - administrar (Course State - manage)."
+  to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "Para realizar una lista cruzada de una sección, también debe estar habilitado Secciones del curso - agregar/editar/eliminar (Course Sections - add / edit / delete). Para editar la ID de SIS del curso, también debe estar habilitado Datos de SIS - administrar (SIS Data - manage). Para permitir que un usuario a nivel de la cuenta elimine un curso, también debe estar habilitado Estado del curso - administrar (Course State - manage)."
+  to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "Para realizar una lista cruzada de secciones, también debe estar habilitado Curso - agregar/editar/eliminar (Course - add / edit / delete)."
   to_date_can_t_come_before_from_date_cf9e18aa: "\"Hasta la fecha\" no puede ser anterior a \"Fecha desde\"."
   to_date_cannot_come_before_from_date_3eeb2633: "Hasta la fecha no puede ser anterior a Desde la fecha"
+  to_differentiate_assignments_to_individual_student_6cc40fde: "Para diferenciar las tareas asignadas a alumnos individuales, también debe estar habilitado Usuarios - ver lista (Users - view list)."
   to_do_1d554f36: "Por hacer"
   to_do_5526f10a: "Por hacer:"
+  to_do_date_d6b79bfd: "Por hacer %{date}"
   to_do_date_ddfb582c: "Fecha de las tareas por hacer:"
   to_do_items_loading_d1cdfcd5: "Cargando los elementos por hacer"
   to_do_list_dashboard_d741f64e: "Tablero con lista de tareas por hacer"
   to_do_time_a7e17623: "Hora de las tareas por hacer"
+  to_edit_a_grade_or_add_comments_in_speedgrader_or__ee4a36e: "Para editar o agregar comentarios en SpeedGrader o en el Libro de calificaciones, debe estar habilitado Calificaciones - editar (Grades - edit)."
+  to_edit_a_student_s_section_users_add_remove_stude_1f188d80: |-
+      Para editar la sección de un alumno, también deben estar habilitados Usuarios - agregar/quitar alumnos en cursos (Users - add / remove students in courses) y Usuarios - ver lista (Users - view list).
+      Para editar una sección para un profesor, diseñador de curso o profesor auxiliar, también deben estar habilitados Usuarios - agregar/quitar profesores, diseñadores de cursos o profesores auxiliares en cursos (Users - add / remove teachers, course designers, or TAs in courses) y Usuarios - ver lista (Users - view list).
+  to_edit_a_student_s_section_users_add_remove_stude_aab8752b: |-
+      Para editar la sección de un alumno, también deben estar habilitados Usuarios - agregar/quitar alumnos de los cursos (Users - add / remove students from courses) y Usuarios - ver lista (Users - view list).
+      Para editar una sección para un profesor, diseñador de cursos o profesor auxiliar, también deben estar habilitados Usuarios - agregar/quitar profesores, diseñadores de cursos o profesores auxiliares de los cursos (Users - add / remove teachers, course designers, or TAs from courses) y Usuarios - ver lista (Users - view list).
+  to_edit_a_student_s_section_users_add_remove_stude_f974cf: |-
+      Para editar la sección de un alumno, también deben estar habilitados Usuarios - agregar/quitar alumnos de los cursos (Users - add / remove students from courses) y Enviar mensajes a miembros individuales del curso (Send messages to individual course members).
+      Para editar la sección de un profesor, profesor auxiliar o diseñador de cursos, también deben estar habilitados Usuarios - agregar/quitar profesores, diseñadores de cursos o profesores auxiliares de los cursos al curso (Users - add / remove teachers, course designers, or TAs from courses to course) y Conversaciones - enviar mensajes a miembros individuales del curso (Conversations - send messages to individual course members).
+  to_edit_course_grading_schemes_courses_add_edit_de_bdcf3563: "Para editar los esquemas de calificación del curso, también debe estar habilitado Curso - agregar/editar/eliminar (Course - add / edit / delete)."
+  to_edit_course_settings_courses_add_edit_delete_mu_7354470c: "Para editar las configuraciones de un curso, debe estar habilitado Curso - agregar/editar/eliminar (Course - add / edit / delete)."
+  to_edit_user_details_modify_login_details_or_chang_381a5b72: |-
+      Para editar los detalles del usuario, modificar los detalles de inicio de sesión o cambiar las contraseñas del usuario, también debe estar habilitado Usuarios - administrar detalles de inicio de sesión (Users - manage login details).
+      Para ver las vistas de página del usuario, también debe estar habilitado Estadísticas - ver (Statistics - view).
+      Para actuar como otros usuarios, también debe estar habilitado Usuarios - actuar como (Users - act as).
+  to_generate_a_pairing_code_from_a_student_s_user_d_9c907ed3: "Para generar un código de sincronización desde la página Detalles del usuario de un alumno, también debe estar habilitado el permiso Usuarios - agregar/quitar alumnos en cursos (Users - add / remove students in courses)."
+  to_generate_a_pairing_code_from_a_student_s_user_s_e36358b3: |-
+      Para generar un código de sincronización desde la página Configuraciones del usuario de un alumno, también debe estar habilitado el permiso Usuario - actuar como (User - act as).
+      Para generar un código de sincronización desde la página Detalles del usuario de un alumno, también debe estar habilitado el permiso Usuarios - agregar/quitar alumnos desde cursos (Users - add / remove students from courses).
+  to_generate_login_logout_activity_in_admin_tools_u_c5712e03: "Para generar actividad de inicio/cierre de sesión en Herramientas del administrador, también deben estar habilitados Usuarios - administrar detalles de inicio de sesión (Users - manage login details) o Estadísticas - ver (Statistics - view). Para generar registros de cambios de calificaciones en Herramientas del administrador, también debe estar habilitado Calificaciones - ver registros de cambios (Grades - view change logs)."
+  to_import_assignments_and_quizzes_using_the_course_86c5bdbb: "Para importar tareas y evaluaciones utilizando la Herramienta importar curso (Course Import Tool), también debe estar habilitado Contenido del curso - agregar/editar/eliminar (Course Content - add / edit / delete)."
+  to_import_files_using_the_course_import_tool_cours_a0c2db0c: "Para importar archivos utilizando la Herramienta importar curso (Course Import Tool), también debe estar habilitado Contenido del curso - agregar/editar/eliminar (Course Content - add / edit / delete)."
+  to_import_sis_data_sis_data_import_must_also_be_en_52bdf01: "Para editar los datos de SIS, también debe estar habilitado Datos de SIS - importar (SIS Data - import)."
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Para conectar a un observador del curso *%{name}* a un alumno, comience a escribir el nombre del alumnos más abajo para encontrarle y luego haga clic en Actualizar."
+  to_manage_blueprint_course_settings_in_course_sett_c3bfdd4f: "Para administrar las configuraciones del curso de proyectos en las Configuraciones del curso, también debe estar habilitado Cursos - agregar/editar/eliminar (Courses - add / edit / delete)."
+  to_manage_discussions_discussions_moderate_must_al_51d7646f: |-
+      Para administrar foros, también debe estar habilitado Foros - moderar (Discussions - moderate).
+      
+      Para responder a un foro, también debe estar habilitado Foros - publicar (Discussion - post).
+  to_manage_discussions_discussions_post_and_discuss_a27d31c4: "Para administrar foros, también deben estar habilitados Foros - publicar (Discussions - post) y Foros - moderar (Discussions - moderate). Para responder a un foro, también debe estar habilitado Foros - publicar (Discussion - post)."
+  to_manage_moderated_grading_grades_moderate_must_a_6502844b: "Para administrar la calificación moderada, también debe estar habilitado Calificaciones - moderar (Grades - moderate)."
+  to_manage_moderated_grading_grades_moderate_must_a_ed821722: |-
+      Para administrar la calificación moderada, también debe estar habilitado Calificaciones - moderar (Grades - moderate).
+      NOTA: Este permiso reemplazará Calificaciones - moderar (Grades - moderate), que está cayendo en desuso.
+  to_manage_sis_data_sis_data_manage_must_also_be_en_cc52f042: "Para administrar los datos de SIS, también debe estar habilitado Datos de SIS - administrar (SIS Data - manage)."
+  to_manage_sis_data_sis_data_manage_must_be_enabled_23f57d2: "Para ver los datos de SIS, debe estar habilitado Datos de SIS - administrar (SIS Data - manage). Si Datos de SIS - administrar (SIS Data - manage) está habilitado y Datos de SIS - leer (SIS Data - read) está desactivado, el permiso de cuenta anula el permiso del curso. Si Datos de SIS - administrar (SIS Data - manage) está desactivado y Datos de SIS- leer (SIS Data - read) está habilitado, los usuarios solamente pueden ver el curso, el usuario y la ID de SIS de la subcuenta. Para dejar de permitir a los usuarios ver cualquier ID de SIS a nivel del curso, deben estar deshabilitados Datos de SIS - administrar (SIS Data - manage) y Datos de SIS - leer (SIS data - read)."
   to_minscore_43e5452e: "a %{minScore}%"
+  to_moderate_a_quiz_assignments_and_quizzes_add_edi_9747d5fb: "Para moderar una evaluación, también debe estar habilitado Tareas y evaluaciones - agregar/editar/eliminar (Assignments and Quizzes - add / edit / delete)."
+  to_moderate_a_quiz_assignments_and_quizzes_add_edi_ebdecaf8: "Para moderar una evaluación, también debe estar habilitado Tareas y evaluaciones - agregar/editar/eliminar (Assignments and Quizzes - add / edit / delete)."
+  to_moderate_a_quiz_grades_edit_must_also_be_enable_72ca6ca1: "Para moderar una evaluación, también debe estar habilitado Calificaciones - editar (Grades - edit)."
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "Para anclar un foro en la parte superior de la página, arrastre un foro aquí o seleccione Anclar en el menú de configuración de foros."
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "Para previsualizar la marca del Editor de tema usted tendrá que *apagar la Interfaz del usuario de Alto contraste*."
+  to_publish_and_unpublish_module_content_courses_ad_4c7fc3c9: |-
+      Para publicar y eliminar la publicación del contenido del módulo, también deben estar habilitados Cursos - agregar/editar/eliminar (Courses - add / edit / delete) y Contenido del curso - ver (Course Content - view).
+      No se puede eliminar la publicación de los elementos del módulo si son envíos de alumnos.
+  to_publish_and_unpublish_module_content_courses_ad_fd53792f: "Para publicar y eliminar la publicación del contenido del módulo, también deben estar habilitados Cursos - agregar/editar/eliminar (Courses - add / edit / delete) y Contenido del curso - ver (Course Content - view)."
+  to_publish_unpublish_module_content_course_content_efc294d4: "Para publicar/anular la publicación de contenido del módulo, debe estar habilitado Contenido del curso - agregar/editar/eliminar (Course Content - add / edit / delete)."
+  to_restore_a_deleted_course_courses_undelete_and_c_dc2d0470: "Para restaurar un curso eliminado, también deben estar habilitados Cursos - recuperar (Courses - undelete) y Contenido del curso - ver (Course Content - view)."
+  to_restrict_students_from_creating_groups_deselect_6269c8cb: "Para evitar que los alumnos creen grupos, anule la selección de la casilla de verificación Permitir a los alumnos organizar sus propios grupos (Let students organize their own groups) en las Configuraciones del curso."
   to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: "Para restringir a los usuarios de un distrito específico de Clever, ingrese el ID de Clever del distrito aquí. Esto es necesario para el Inicio de sesión instantáneo de Clever para trabajar en un entorno de multi-inquilino."
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "Para restringir a los usuarios de los dominios específicos de Google Apps, ingrese el dominio aquí."
   to_restrict_to_users_of_your_azure_active_director_df7cdd41: "Para restringir a los usuarios de su Azure Active Directory, ingrese su inquilino aquí."
+  to_search_and_view_notifications_for_a_user_users__becfb733: "Para buscar y ver notificaciones para un usuario, también debe estar habilitado Usuarios - ver lista (Users - view list)."
+  to_search_by_grader_or_student_id_users_view_list__66bf658d: |-
+      Para buscar por calificador o ID de alumno, también debe estar habilitado Usuarios - ver lista (Users - view list).
+      Para buscar por ID de curso o ID de tarea, también debe estar habilitado Calificaciones - editar (Grades - edit).
+      Para buscar por ID de tarea solamente, también debe estar habilitado Calificaciones - ver todas las calificaciones (Grades - view all grades).
+  to_search_for_a_course_in_the_restore_courses_tab__46e75739: |-
+      Para buscar un curso en la pestaña Restaurar cursos (Restore Courses), también debe estar habilitado Contenido del curso - ver (Course Content - view).
+      Para restaurar un curso eliminado en una cuenta,  deben estar habilitados Cursos - agregar/editar/eliminar (Courses - add / edit / delete), Contenido del curso - ver (Course Content - view) y Cursos - recuperar (Courses - undelete).
+  to_search_grade_change_logs_grades_view_change_log_8d2f6d30: "Para buscar registros de cambios de calificaciones, también debe estar habilitado Calificaciones - ver registros de cambios (Grades - view change logs)."
+  to_search_grade_change_logs_grades_view_change_log_d4d40cf2: "Para buscar registros de cambio de calificaciones, también debe estar habilitado Calificaciones - ver registros de cambios (Grades - view change logs)."
+  to_see_the_course_setup_checklist_option_on_the_co_41322a29: "Para ver la opción de Lista de comprobación de la configuración del curso (Course Setup Checklist) en la Página de inicio del curso, también debe estar habilitado Administrar (agregar/editar/eliminar) cursos (Manage ( add / edit / delete ))."
+  to_send_a_message_to_an_individual_user_conversati_8d86a0da: "Para enviar un mensaje a un usuario individual, también debe estar habilitado Conversaciones - enviar mensajes a miembros individuales del curso (Conversations - send messages to individual course members)."
+  to_share_a_discussion_to_commons_course_content_ad_962c5e53: "Para compartir un foro con Commons, también debe estar habilitado Contenido del curso - agregar/editar/eliminar (Course Content - add / edit / delete)."
+  to_share_a_discussion_to_commons_discussions_view__df0fd6ac: "Para compartir un Foro con Commons, también debe estar habilitado Foros - ver (Discussions - view)."
+  to_view_a_course_outcomes_page_as_read_only_course_5bb7241f: |-
+      Para ver la página de Resultados de un curso (Course Outcomes) como solo lectura, también debe estar habilitado Contenido del curso - ver (Course Content - view).
+      Para importar resultados de aprendizaje desde la página Resultados (Outcomes), también debe estar habilitado Rúbricas - agregar/editar/eliminar (Rubrics - add / edit / delete).
+      Los usuarios pueden acceder y crear (pero no editar) rúbricas de tareas individuales a través de Tareas (Assignments) cuando Contenido del curso - ver (Course Content - view) y Tareas y evaluaciones - agregar/editar/eliminar (Assignments and Quizzes - add / edit / delete) estén habilitados.
+  to_view_a_user_s_login_details_users_view_list_and_6d42118b: "Para ver los detalles de inicio de sesión de un usuario, también deben estar habilitados Usuarios - ver lista (Users - view list) y Modificar detalles de inicio de sesión para usuarios (Modify login details for users)."
+  to_view_account_level_groups_groups_add_edit_delet_bf12e984: "Para ver grupos a nivel de la cuenta, también debe estar habilitado Grupos - agregar/editar/eliminar (Groups - add / edit / delete)."
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "Para ver todas las notificaciones que se han enviado a un usuario de Canvas, seleccione el usuario y el intervalo de fechas en su búsqueda."
+  to_view_announcements_announcements_view_must_also_75f652df: "Para ver anuncios, también debe estar habilitado Anuncios - ver (Announcements - view)."
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "Para ver las tareas, asegúrese de que esté activa la vista *Agenda*."
+  to_view_discussions_in_a_course_discussions_view_m_18c3fa0b: |-
+      Para ver los foros en un curso, también debe estar habilitado Foros - ver (Discussions - view).
+      Para administrar foros, debe estar habilitado Foros - moderar (Discussions - moderate).
+  to_view_discussions_in_a_course_discussions_view_m_5804d225: |-
+      Para ver los foros en un curso, debe estar habilitado Foros - ver (Discussions - view).
+      Para responder a un foro, también debe estar habilitado Foros - publicar (Discussion - post).
+      Para editar los detalles de la tarea en un foro, también debe estar habilitado Tareas y evaluaciones - agregar/editar/eliminar (Assignments and Quizzes - add / edit / delete).
+  to_view_discussions_in_a_course_discussions_view_m_7c986cd2: |-
+      Para ver los foros en un curso, debe estar habilitado Foros - ver (Discussions - view).
+      Para responder a un foro, también debe estar habilitado Foros - publicar (Discussion - post). Para editar los detalles de la tarea en un foro, también debe estar habilitado Tareas y evaluaciones - agregar/editar/eliminar (Assignments and Quizzes - add / edit / delete).
+  to_view_discussions_in_a_course_discussions_view_m_bf14b0e: |-
+      Para ver los foros en un curso, también debe estar habilitado Foros - ver (Discussions - view).
+      Para administrar foros, debe estar habilitado Foros - moderar (Discussions - moderate).
+  to_view_grades_in_a_course_grades_view_all_grades__acecd649: "Para ver calificaciones en un curso, también debe estar habilitado Calificaciones - ver todas las calificaciones (Grades - view all grades)."
+  to_view_last_activity_and_total_activity_informati_a06859f3: |-
+      Para ver la información de Última actividad y Actividad total en la página de Personas del curso (Course People), también debe estar habilitado Usuarios - ver lista (Users - view list).
+      Para acceder a una página de Personas del curso (Course People), debe estar habilitado Usuarios - ver lista (Users - view list).
+  to_view_module_progression_grades_view_all_grades__b9fc4d6f: "Para ver la progresión del módulo, también debe estar habilitado Calificaciones - ver todas las calificaciones (Grades - view all grades)."
+  to_view_or_edit_a_user_s_sis_id_or_integration_id__9abfc21d: "Para ver o editar la ID de SIS o la ID de integración de un usuario, también deben estar habilitados Usuarios - ver lista (Users - view list) y Usuarios - administrar detalles de inicio de sesión (Users - manage login details)."
+  to_view_recent_announcements_on_the_home_page_cour_ffc52530: "Para ver anuncios recientes en la página de inicio, Contenido del curso - ver (Course content - view) debe estar habilitado y la casilla de verificación Mostrar anuncios recientes en la página de inicio del curso (Show recent announcements on Course home page) debe estar seleccionada en las Configuraciones del curso. Para administrar anuncios del curso, también debe estar habilitado Foros - moderar (Discussions - moderate)."
+  to_view_student_analytics_analytics_view_must_also_8a41d86e: "Para ver el análisis del alumno, también debe estar habilitado Análisis - ver (Analytics - view)."
+  to_view_student_analytics_in_course_analytics_anal_9466b742: "Para ver el análisis del alumno en el análisis del curso, también debe estar habilitado Análisis - ver (Analytics - view)."
+  to_view_student_analytics_in_course_analytics_grad_91d58a8a: "Para ver el análisis del alumno en el análisis del curso, también debe estar habilitado Calificaciones - ver todas las calificaciones (Grades - view all grades)."
+  to_view_student_analytics_users_view_list_and_anal_2c2776b2: "Para ver el análisis del alumno, también deben estar habilitados Usuarios - ver lista (Users - view list) y Análisis - ver (Analytics - view)."
+  to_view_student_analytics_users_view_list_and_anal_41d32ecb: "Para ver el análisis del alumno, también deben estar habilitados Usuarios - ver lista (Users - view list) y Análisis (Analytics)."
+  to_view_student_analytics_users_view_list_and_grad_59d0da3e: "Para ver el análisis del alumno, también deben estar habilitados Usuarios - ver lista (Users - view list) y Calificaciones - ver todas las calificaciones (Grades - view all grades)."
+  to_view_the_account_people_page_users_view_list_mu_f44cef80: "Para ver la página de Personas de la cuenta, debe estar habilitado Usuarios - ver lista (Users - view list). Si este permiso está desactivado, y Usuarios - ver ID de inicio de sesión (Users - view login IDs) está habilitado, los usuarios aún verán las direcciones de correo electrónico utilizadas como ID de usuario."
+  to_view_the_list_of_users_in_an_account_users_view_401b8462: "Para ver la lista de usuarios en una cuenta, debe estar habilitado Usuarios - ver lista (Users - view list)."
+  to_view_the_list_of_users_in_an_account_users_view_e08a4f3c: "Para ver la lista de usuarios en una cuenta, debe estar habilitado Usuarios - ver lista (Users - view list)."
+  to_view_the_list_of_users_in_the_course_users_view_26412777: "Para ver la lista de usuarios en el curso, debe estar habilitado Usuarios - ver lista (Users - view list). Para agregar usuarios a través de ID de SIS, también deben estar habilitados Usuarios - agregar/quitar alumnos de los cursos (Users - add / remove students from courses) y/o Usuarios - agregar/quitar profesores, diseñadores de cursos o profesores auxiliares de cursos al curso (Users - add / remove teachers, course designers, or TAs from courses to the course)."
+  to_view_the_list_of_users_in_the_course_users_view_524275e5: |-
+      Para ver la lista de usuarios en el curso, debe estar habilitado Usuarios - ver lista (Users - view list).
+      Para ver ID de SIS, debe estar habilitado Datos de SIS - leer (SIS Data - read).
+      Para editar la sección de un profesor o profesor auxiliar, también deben estar habilitados Usuarios - ver lista (Users - view list) y Conversaciones - enviar mensajes a miembros individuales del curso (Conversations - send messages to individual course members).
+      Para vincular un observador con un alumno, también debe estar habilitado Conversaciones - enviar mensajes a miembros individuales del curso (Conversations - send messages to individual course members).
+  to_view_the_list_of_users_in_the_course_users_view_63e7f0c3: |-
+      Para ver la lista de usuarios en el curso, debe estar habilitado Usuarios - ver lista (Users - view list).
+      Para agregar usuarios a través de ID de SIS, también deben estar habilitados Usuarios - agregar/quitar alumnos de los cursos (Users - add / remove students from courses) y/o Usuarios - agregar/quitar profesores, diseñadores de cursos o profesores auxiliares de cursos (Users - add / remove teachers, course designers, or TAs from courses).
+  to_view_the_list_of_users_in_the_course_users_view_b1e0773b: |-
+      Para ver la lista de usuarios en el curso, debe estar habilitado Usuarios - ver lista (Users - view list).
+      Para ver ID de SIS, debe estar habilitado Datos de SIS - leer (SIS Data - read). Para agregar un usuario a un curso a través de ID de SIS, también debe estar habilitado Datos de SIS - administrar (SIS Data - manage).
+      Para editar la sección de un profesor o de un profesor auxiliar, también debe estar habilitado Conversaciones - enviar mensajes a miembros individuales del curso (Conversations - send messages to individual course members).
+      Para vincular un observador con un alumno, también debe estar habilitado Conversaciones - enviar mensajes a miembros individuales del curso (Conversations - send messages to individual course members).
+  to_view_the_list_of_users_in_the_course_users_view_f5a54b37: |
+      Para ver la lista de usuarios en el curso, debe estar habilitado Usuarios - ver lista (Users - view list).
+      Para ver ID de SIS, debe estar habilitado Datos de SIS - leer (SIS Data - read). Para agregar un usuario a un curso a través de ID de SIS, también debe estar habilitado Datos de SIS - administrar (SIS Data - manage).
+      Para editar la sección de un alumno y rol del curso, también deben estar habilitados Usuarios - ver lista (Users - view list) y Conversaciones - enviar mensajes a miembros individuales del curso (Conversations - send messages to individual course members).
+      Para anular la inscripción de usuarios en la página de detalles del usuario, también deben estar habilitados Ver la lista de cursos (View the list of courses) y Ver la lista de usuarios (See the list of users).
+      Permite al usuario reenviar invitaciones del curso desde la página Personas del curso.
+      Si la configuración de la cuenta Inscripción abierta está activada, los usuarios con este permiso pueden agregar alumnos a un curso desde la página de Personas del curso (Course People) a través de direcciones de correo electrónico si el usuario aún no tiene una cuenta de Canvas.
+      Para vincular un observador con un alumno, deben estar habilitados Usuarios - administrar detalles de inicio de sesión (Users - manage login details) y Conversaciones - enviar mensajes a miembros individuales del curso (Conversations - send messages to individual course members).
+  to_view_the_outcomes_page_as_read_only_course_cont_d176be65: |-
+      Para ver la página de Resultados (Outcomes) como solo lectura, también debe estar habilitado Contenido del curso - ver (Course Content - view).
+      Los usuarios pueden acceder a rúbricas de tareas individuales a través de Tareas (Assignments) cuando estén habilitados Contenido del curso - ver (Course Content - view) y Tareas y evaluaciones - agregar/editar/eliminar (Assignments and Quizzes - add / edit / delete).
+  to_view_the_reports_tab_courses_view_usage_reports_d371ec85: "Para ver la pestaña Informes (Reports), también debe estar habilitado Cursos - ver informes de uso (Courses - view usage reports)."
+  to_view_user_page_views_users_view_list_must_also__f4246239: "Para ver las vistas de página del usuario, también debe estar habilitado Usuarios - ver lista (Users - view list)."
+  to_view_users_and_user_account_details_users_view__99807b12: |-
+      Para ver a los usuarios y detalles de cuenta del usuario, debe estar habilitado Usuarios - ver lista (Users - view list).
+      Para cambiar las contraseñas de los usuarios, debe estar habilitado Usuarios - ver lista (Users - view list).
+      Para ver la ID de SIS de un usuario, también deben estar
+      habilitados Datos de SIS - administrar (SIS Data - manage) o Datos de SIS - leer (SIS Data - read). Para ver la ID de integración de un usuario, también debe estar habilitado Datos de SIS - administrar (SIS Data - manage).
   today_76e10f9c: Hoy
   toggle_alignment_details_for_title_944f605: "Cambiar detalles de alineación para %{title}"
   toggle_course_card_color_overlays_b5b8137a: "Cambiar las superposiciones de colores de la ficha del curso"
@@ -20160,8 +20824,17 @@ es:
           más cursos o para configurar su perfil.
       welcome_to_happiness: "¡Bienvenido a Canvas!"
   users_act_as_d922940: "Usuarios: actuar como"
+  users_add_remove_observers_d1273d9: "Usuarios - agregar/quitar observadores"
+  users_add_remove_students_in_courses_efe7e748: "Usuarios - agregar/quitar alumnos en cursos"
+  users_add_remove_teachers_course_designers_or_tas__b480dd9: "Usuarios - agregar/quitar profesores, diseñadores de cursos o profesores auxiliares en cursos"
+  users_and_terms_are_located_at_the_account_so_the__4184557b: |-
+      Los usuarios y plazos se ubican en la cuenta, así que el resultado de SIS siempre confirma el permiso del usuario de acuerdo con la cuenta. Las subcuentas solamente tienen la titularidad de cursos y secciones; no poseen los datos del usuario.
+      Los administradores de las subcuentas no pueden ver información de SIS a menos que también reciban el rol de instructor en un curso. Los administradores de las subcuentas no pueden ver información de SIS sin la asociación del curso, ya que el rol de instructor tiene permiso para leer los datos de SIS a nivel de la cuenta.
+  users_can_access_the_manage_question_banks_link_on_e411d01: "Los usuarios pueden acceder al enlace Administrar bancos de preguntas (Manage Question Banks) en la página de índice Evaluaciones (Quizzes) cuando estén habilitados Contenido del curso - ver (Course Content - view) y Tareas y evaluaciones - agregar/editar/eliminar (Assignments and Quizzes - add / edit / delete)."
   users_d1b60cb0: Usuarios
+  users_generate_observer_pairing_codes_for_students_6975caad: "Usuarios - Generar códigos de sincronización de observador para alumnos"
   users_manage_log_in_details_b944568b: "Usuarios: administrar detalles de inicio de sesión"
+  users_manage_login_details_9462b30f: "Usuario - administrar detalles de inicio de sesión"
   users_matching_search_term_c604db9e: "Usuarios que coinciden con \"%{search_term}\""
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Puede que los usuarios de lectores de pantalla tengan que apagar el cursor virtual con el fin de utilizar estos atajos del teclado"
   users_view_list_861c7a3f: "Usuarios: ver lista"
@@ -20303,6 +20976,7 @@ es:
   what_does_provisioning_only_mean_eac9a4a1: "¿Qué significa aprovisionamiento solamente?"
   what_should_the_csv_file_look_like_985a59ac: "¿Cómo se debería ver el archivo CSV?"
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Al agregar múltiples usuarios, utilice una coma o un salto de línea para separar los usuarios."
+  when_disabled_students_can_still_send_individual_m_567a911c: "Cuando esté desactivado, los alumnos aún pueden enviar mensajes individuales a los profesores del curso, profesores auxiliares del curso y alumnos que pertenezcan a grupos del mismo nivel de cuenta."
   when_enabled_global_javascript_and_css_files_can_b_ea21d216: "Cuando están habilitados, JavaScript global y los archivos de CSS pueden ser subidos en el  *%{t_theme_editor}*."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Esta es la página que verá la persona que visite el curso. Puede configurarla para que muestre un flujo de actividad, la lista de módulos del curso, el programa del curso o una página personalizada que haya escrito usted mismo. La vista predeterminada es la del flujo de actividad del curso."
   when_people_visit_your_course_this_is_the_first_pa_5093ec45: |-
@@ -20365,6 +21039,8 @@ es:
         settings: Configuraciones
       unpublished_indicator: "No publicado"
       view_page_history_wiki: "Ver el historial de páginas"
+      wiki: 
+        todo_date: "Fecha de tareas por hacer:"
     wiki_page_content: 
       page_locked: "Esta página está bloqueada"
       page_locked_by_modules: "Esta página estará disponible cuando haya finalizado estos módulos:"
@@ -20395,6 +21071,7 @@ es:
         creation_date: "Fecha de creación"
         last_edit: "Última edición"
         page_title: "Título de la página"
+        todo_date: "Fecha de tareas por hacer"
       loading: Cargando...
       loading_more: "Cargando más..."
       no_pages: "Todavía no se ha creado ninguna página."

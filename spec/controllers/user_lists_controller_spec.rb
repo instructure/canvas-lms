@@ -26,7 +26,7 @@ describe UserListsController do
     user_session(@user)
 
     post 'create', params: {:course_id => @course.id, :user_list => ''}, format: "json"
-    expect(response).to be_success
+    expect(response).to be_successful
   end
 
   it "should use version 2 if requested" do
@@ -35,6 +35,6 @@ describe UserListsController do
 
     expect(UserListV2).to receive(:new).once.with('list', search_type: 'unique_id', root_account: Account.default, current_user: @user, can_read_sis: true)
     post 'create', params: {:course_id => @course.id, :user_list => 'list', :v2 => true, :search_type => 'unique_id'}, format: "json"
-    expect(response).to be_success
+    expect(response).to be_successful
   end
 end

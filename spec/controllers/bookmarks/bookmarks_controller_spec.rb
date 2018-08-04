@@ -36,14 +36,14 @@ describe Bookmarks::BookmarksController do
     describe "GET 'index'" do
       it "should succeed" do
         get 'index', format: 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
 
     describe "GET 'show'" do
       it "should succeed" do
         get 'show', params: {id: bookmark.id}, format: 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it "includes data" do
@@ -57,7 +57,7 @@ describe Bookmarks::BookmarksController do
         u2 = user_factory
         bookmark2 = Bookmarks::Bookmark.create(user_id: u2.id, name: 'bio 101', url: '/courses/1')
         get 'show', params: {id: bookmark2.id}, format: 'json'
-        expect(response).to_not be_success
+        expect(response).to_not be_successful
       end
     end
 
@@ -66,7 +66,7 @@ describe Bookmarks::BookmarksController do
 
       it "should succeed" do
         post 'create', params: params, format: 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it "should create a bookmark" do
@@ -102,14 +102,14 @@ describe Bookmarks::BookmarksController do
     describe "PUT 'update'" do
       it "should succeed" do
         put 'update', params: {id: bookmark.id}, format: 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
 
     describe "DELETE 'delete'" do
       it "should succeed" do
         delete 'destroy', params: {id: bookmark.id}, format: 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
   end

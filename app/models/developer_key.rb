@@ -65,6 +65,12 @@ class DeveloperKey < ActiveRecord::Base
     self.save
   end
 
+  def usable?
+    return false if DeveloperKey.test_cluster_checks_enabled? &&
+      test_cluster_only? && !ApplicationController.test_cluster?
+    active?
+  end
+
   def redirect_uri=(value)
     super(value.presence)
   end
@@ -139,6 +145,10 @@ class DeveloperKey < ActiveRecord::Base
         @sns = Aws::SNS::Client.new(settings) if settings
       end
       @sns
+    end
+
+    def test_cluster_checks_enabled?
+      Setting.get("dev_key_test_cluster_checks_enabled", nil).present?
     end
 
     def find_cached(id)

@@ -54,7 +54,7 @@ test('have after render behavior', function() {
 
 test('click & keydown .more-details', function() {
   this.outcomeView.render()
-  const showSpy = this.stub(this.outcomeView.dialog, 'show')
+  const showSpy = sandbox.stub(this.outcomeView.dialog, 'show')
   this.outcomeView.$el.find('a.more-details').trigger(this.e('click'))
   ok(showSpy.called)
   showSpy.reset()

@@ -220,8 +220,6 @@ class Gradezilla
     def visit(course)
       Account.default.enable_feature!(:new_gradebook)
       get "/courses/#{course.id}/gradebook/change_gradebook_version?version=default"
-      # the pop over menus is too lengthy so make screen bigger
-      make_full_screen
     end
 
     def visit_upload(course)
@@ -440,6 +438,26 @@ class Gradezilla
 
     def total_cell_warning_icon_select
       total_cell_warning_icon
+    end
+
+    def open_display_dialog
+      select_total_column_option('grade-display-switcher')
+    end
+
+    def close_display_dialog
+      f(".ui-icon-closethick").click
+    end
+
+    def toggle_grade_display
+      open_display_dialog
+      dialog = fj('.ui-dialog:visible')
+      submit_dialog(dialog, '.ui-button')
+    end
+
+    def close_dialog_and_dont_show_again
+      dialog = fj('.ui-dialog:visible')
+      fj("#hide_warning").click
+      submit_dialog(dialog, '.ui-button')
     end
 
     def content_selector

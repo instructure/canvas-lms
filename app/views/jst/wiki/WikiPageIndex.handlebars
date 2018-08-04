@@ -27,6 +27,13 @@
           <th scope="col" width="20%" role="columnheader">
             <a href="#" data-sort-field="updated_at" tabindex="0" role="button" class="sort-field">{{#t 'headers.last_edit'}}Last edit{{/t}} <i></i></a>
           </th>
+          {{#if collectionHasTodoDate}}
+            <th scope="col" width="20%" role="columnheader">
+              <a href="#" data-sort-field="todo_date" tabindex="0" role="button" class="sort-field">{{#t 'headers.todo_date'}}To-Do Date{{/t}}
+                <i></i>
+              </a>
+            </th>
+          {{/if}}
           <th scope="col" width="5%" role="columnheader">
             <span class="screenreader-only">{{#t}}Master Lock{{/t}}</span>
           </th>

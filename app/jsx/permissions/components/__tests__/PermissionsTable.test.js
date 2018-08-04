@@ -58,8 +58,8 @@ it('calls setAndOpenRoleTray on clicking one of the top headers', () => {
   props.setAndOpenRoleTray = setAndOpenRoleTrayMock
 
   const tree = shallow(<PermissionsTable {...props} />)
-  const node = tree.find('Button')
-  expect(node).toHaveLength(2)
+  const node = tree.find('#role_1')
+  expect(node).toHaveLength(1)
   node.at(0).simulate('click')
   expect(setAndOpenRoleTrayMock).toHaveBeenCalledWith(props.roles[0])
 })
@@ -70,8 +70,8 @@ it('calls setAndOpenPermissionTray on clicking one of the side headers', () => {
   props.setAndOpenPermissionTray = setAndOpenPermissionTrayMock
 
   const tree = shallow(<PermissionsTable {...props} />)
-  const node = tree.find('Link')
-  expect(node).toHaveLength(2)
+  const node = tree.find('#permission_permission_1')
+  expect(node).toHaveLength(1)
   node.at(0).simulate('click')
   expect(setAndOpenPermissionTrayMock).toHaveBeenCalledWith(props.permissions[0])
 })

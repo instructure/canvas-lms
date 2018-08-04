@@ -27,7 +27,7 @@ describe "gradebook" do
   before(:each) { user_session(@teacher) }
 
   it "should handle multiple enrollments correctly" do
-    @course.enroll_student(@student_1, :section => @other_section, :allow_multiple_enrollments => true)
+    @course.enroll_student(@student_1, section: @other_section, allow_multiple_enrollments: true)
 
     get "/courses/#{@course.id}/gradebook"
 

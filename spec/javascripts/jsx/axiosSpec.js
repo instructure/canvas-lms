@@ -39,7 +39,7 @@ define(['axios', 'moxios'], (axios, moxios) => {
       done();
     });
 
-    moxios.wait();
+    moxios.wait(() => {});
   });
 
   test('passes X-Requested-With header', (assert) => {
@@ -55,6 +55,6 @@ define(['axios', 'moxios'], (axios, moxios) => {
       done();
     });
 
-    moxios.wait();
+    moxios.wait(() => {});
   });
 });

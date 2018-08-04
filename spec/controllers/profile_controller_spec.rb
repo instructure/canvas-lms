@@ -79,7 +79,7 @@ describe ProfileController do
       @cc2 = @user.communication_channels.create!(:path => 'email2@example.com', :workflow_state => 'active')
       expect(@cc2.position).to eq 2
       put 'update', params: {:user_id => @user.id, :default_email_id => @cc2.id}, format: 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(@cc2.reload.position).to eq 1
       expect(@cc.reload.position).to eq 2
     end
@@ -90,7 +90,7 @@ describe ProfileController do
         user_session(@user, @pseudonym)
         @cc2 = @user.communication_channels.create!(:path => 'email2@example.com', :workflow_state => 'active')
         put 'update', params: {:user_id => @user.id, :default_email_id => @cc2.id}, format: 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(@user.email).to eq @cc2.path
       end
     end
@@ -104,7 +104,7 @@ describe ProfileController do
       @cc2 = @user.communication_channels.create!(:path => 'email2@example.com', :workflow_state => 'active')
       expect(@cc2.position).to eq 2
       put 'update', params: {:user_id => @user.id, :default_email_id => @cc2.id}, format: 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(@cc2.reload.position).to eq 1
       expect(@cc.reload.position).to eq 2
     end
@@ -137,7 +137,7 @@ describe ProfileController do
       cc.notification_policies.create!(:notification => nil, :frequency => 'daily')
 
       get 'communication'
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 
@@ -157,7 +157,7 @@ describe ProfileController do
           params: {:user => {:short_name => 'Monsturd', :name => 'Jenkins'},
           :user_profile => {:bio => '...', :title => '!!!'}},
           format: 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
 
       @user.reload
       expect(@user.short_name).to eql 'Monsturd'
@@ -177,7 +177,7 @@ describe ProfileController do
           params: {:user => {:short_name => 'Monsturd', :name => 'Jenkins'},
           :user_profile => {:bio => '...', :title => '!!!'}},
           format: 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
 
       @user.reload
       expect(@user.short_name).to eql old_name
@@ -194,7 +194,7 @@ describe ProfileController do
         params: {:user_profile => {:bio => '...'},
         :user_services => {:twitter => "1", :skype => "false"}},
         format: 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
 
       @user.reload
       expect(@user.user_services.where(service: 'skype').first.visible?).to be_falsey
@@ -207,7 +207,7 @@ describe ProfileController do
         :link_urls => ['example.com', 'foo.com', ''],
         :link_titles => ['Example.com', 'Foo', '']},
         format: 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
 
       @user.reload
       expect(@user.profile.links.map { |l| [l.url, l.title] }).to eq [

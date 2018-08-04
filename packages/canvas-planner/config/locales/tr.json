@@ -53,6 +53,9 @@
   "today_76e10f9c": {
     "message": "Bugün"
   },
+  "edit_c5fbea07": {
+    "message": "Düzenle"
+  },
   "save_11a80ec3": {
     "message": "Kaydet"
   },
@@ -61,9 +64,6 @@
   },
   "delete_a6efa79d": {
     "message": "Sil"
-  },
-  "go_to_dashboard_card_view_10398ef6": {
-    "message": "Kontrol Paneli Kartı Görünümüne Git"
   },
   "discussion_6719c51d": {
     "message": "Tartışma"

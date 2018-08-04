@@ -33,7 +33,7 @@ describe "speed grader" do
     course_with_teacher(course: @course)
     @teacher2 = @teacher
 
-    @assignment = @course.assignments.create(:name => 'assignment with rubric', :points_possible => 10)
+    @assignment = @course.assignments.create(name: 'assignment with rubric', points_possible: 10)
   end
 
   context "alerts" do
@@ -69,8 +69,7 @@ describe "speed grader" do
       expect(f("#comment_attachments")).not_to contain_css("input")
 
       # add comment
-      f('#add_a_comment textarea').send_keys('grader comment')
-      submit_form('#add_a_comment')
+      submit_comment('grader comment')
       expect(f('#comments > .comment')).to be_displayed
       expect(f('#comments > .comment')).to include_text('grader comment')
       expect(f('#add_a_comment textarea').text).to be_empty
@@ -98,8 +97,7 @@ describe "speed grader" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       # add comment
-      f('#add_a_comment textarea').send_keys('grader comment')
-      submit_form('#add_a_comment')
+      submit_comment('grader comment')
       expect(f('#comments > .comment')).to be_displayed
       @submission.reload
       @comment = @submission.submission_comments.first
@@ -130,8 +128,7 @@ describe "speed grader" do
       expect(f("#avatar_image")).not_to have_attribute('src', 'blank.png')
 
       # add comment
-      f('#add_a_comment textarea').send_keys('grader comment')
-      submit_form('#add_a_comment')
+      submit_comment('grader comment')
       expect(f('#comments > .comment')).to be_displayed
       expect(f('#comments > .comment')).to include_text('grader comment')
 
@@ -157,7 +154,7 @@ describe "speed grader" do
       expect(@account.service_enabled?(:avatars)).to be_truthy
 
       sub = student_submission
-      sub.add_comment(:comment => "ohai teacher")
+      sub.add_comment(comment: "ohai teacher")
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       expect(f("#avatar_image")).to be_displayed
@@ -175,9 +172,7 @@ describe "speed grader" do
       expect(f('#comments > .comment .author_name')).to include_text('Student')
 
       # add teacher comment
-      f('#add_a_comment textarea').send_keys('grader comment')
-      scroll_into_view("#comment_submit_button")
-      submit_form('#add_a_comment')
+      submit_comment('grader comment')
       expect(ff('#comments > .comment')).to have_size(2)
 
       # make sure name and avatar show up for teacher comment
@@ -189,7 +184,7 @@ describe "speed grader" do
       @teacher1.preferences = { gradebook_settings: { @course.id => { 'show_inactive_enrollments' => 'true' } } }
       @teacher1.save
 
-      student_submission(:username => 'inactivestudent@example.com')
+      student_submission(username: 'inactivestudent@example.com')
       en = @student.student_enrollments.first
       en.deactivate
 

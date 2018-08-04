@@ -23,11 +23,12 @@ import { getFirstLoadedMoment, getLastLoadedMoment } from '../utilities/dateUtil
 import { transformApiToInternalGrade } from '../utilities/apiUtils';
 
 import {
-  gotItemsError, sendFetchRequest, gotGradesSuccess, gotGradesError,
+  gotItemsError, sendFetchRequest, gotGradesSuccess, gotGradesError, peekedIntoPast
 } from './loading-actions';
 
 import {
-  mergeFutureItems, mergePastItems, mergePastItemsForNewActivity, mergePastItemsForToday
+  mergeFutureItems, mergePastItems, mergePastItemsForNewActivity,
+  mergePastItemsForToday, consumePeekIntoPast,
 } from './saga-actions';
 
 
@@ -43,6 +44,7 @@ function* watchForSagas () {
   yield takeEvery('START_LOADING_PAST_UNTIL_NEW_ACTIVITY_SAGA', loadPastUntilNewActivitySaga);
   yield takeEvery('START_LOADING_GRADES_SAGA', loadGradesSaga);
   yield takeEvery('START_LOADING_PAST_UNTIL_TODAY_SAGA', loadPastUntilTodaySaga);
+  yield takeEvery('PEEK_INTO_PAST_SAGA', peekIntoPastSaga);
 }
 
 // fromMomentFunction: function
@@ -72,7 +74,6 @@ function* loadingLoop (fromMomentFunction, actionCreator, opts) {
     }
   } catch (e) {
     yield put(gotItemsError(e));
-    throw e;
   }
 }
 
@@ -86,6 +87,10 @@ export function* loadFutureSaga () {
 
 export function* loadPastUntilNewActivitySaga () {
   yield* loadingLoop(fromMomentPast, mergePastItemsForNewActivity, {intoThePast: true});
+}
+
+export function* peekIntoPastSaga () {
+  yield* loadingLoop(fromMomentPast, consumePeekIntoPast, {intoThePast: true, perPage: 1});
 }
 
 export function* loadGradesSaga () {

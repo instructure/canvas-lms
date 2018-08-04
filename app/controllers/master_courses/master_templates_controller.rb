@@ -310,7 +310,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       end
 
       if ids_to_remove.any?
-        @template.child_subscriptions.active.where(:child_course_id => ids_to_remove).preload(:child_course => :wiki).each(&:destroy)
+        @template.child_subscriptions.active.where(:child_course_id => ids_to_remove).preload(:child_course).each(&:destroy)
       end
 
       render :json => {:success => true}
@@ -463,6 +463,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       locked = !!tag&.restrictions&.values&.any?
       changed_asset_json(asset, action, locked)
     end
+    changes << changed_syllabus_json(@course) if @course.syllabus_updated_at&.>(cutoff_time)
 
     render :json => changes
   end
@@ -631,6 +632,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       next unless result = results[sub.id]
       skipped_items = result[:skipped]
       next unless skipped_items.present?
+      get_syllabus_exception!(skipped_items, sub, exceptions)
       sub.content_tags.where(:migration_id => skipped_items).each do |child_tag|
         exceptions[child_tag.migration_id] ||= []
         exceptions[child_tag.migration_id] << { :course_id => sub.child_course_id,
@@ -641,9 +643,17 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     exceptions
   end
 
+  def get_syllabus_exception!(skipped_items, child_subscription, exceptions)
+    if skipped_items.delete(:syllabus)
+      exceptions['syllabus'] ||= []
+      exceptions['syllabus'] << { :course_id => child_subscription.child_course_id, :conflicting_changes => ['content'] }
+    end
+  end
+
   def render_changes(tag_association, subscriptions)
     changes = []
     exceptions = get_exceptions_by_subscription(subscriptions)
+    updated_syllabus = @mm.export_results[:selective][:updated].delete('syllabus')
 
     [:created, :updated, :deleted].each do |action|
       migration_ids = @mm.export_results[:selective][action].values.flatten
@@ -655,6 +665,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
                                       tag.migration_id, exceptions)
       end
     end
+    changes << changed_syllabus_json(@course, exceptions) if updated_syllabus
 
     render :json => changes
   end

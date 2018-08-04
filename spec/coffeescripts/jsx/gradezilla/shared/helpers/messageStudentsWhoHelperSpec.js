@@ -194,7 +194,7 @@ test('returns the student ids filtered by the correct criteria', function() {
   const option = {
     criteriaFn: (student, cutoff) => student.score > cutoff
   }
-  this.stub(MessageStudentsWhoHelper, 'findOptionByText').returns(option)
+  sandbox.stub(MessageStudentsWhoHelper, 'findOptionByText').returns(option)
   const students = [{user_data: {id: '1', score: 8}}, {user_data: {id: '2', score: 4}}]
   const cutoff = 5
   const selected = 'Scored more than'
@@ -209,7 +209,7 @@ test('generates a function that returns the subject string', function() {
   const option = {
     subjectFn: (assignment, cutoff) => `name: ${assignment.name}, cutoff: ${cutoff}`
   }
-  this.stub(MessageStudentsWhoHelper, 'findOptionByText').returns(option)
+  sandbox.stub(MessageStudentsWhoHelper, 'findOptionByText').returns(option)
   const assignment = {id: '1', name: 'Shootbags'}
   const cutoff = 5
   const subjectCallbackFn = MessageStudentsWhoHelper.generateSubjectCallbackFn(assignment)

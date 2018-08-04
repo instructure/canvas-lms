@@ -15,16 +15,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
+require_relative '../spec_helper'
+require_relative '../sharding_spec_helper'
 
 describe DiscussionTopicsController do
   before :once do
-    course_with_teacher(:active_all => true)
-    course_with_observer(:active_all => true, :course => @course)
+    course_with_teacher(active_all: true)
+    course_with_observer(active_all: true, course: @course)
     @observer_enrollment = @enrollment
-    student_in_course(:active_all => true)
+    ta_in_course(active_all: true, course: @course)
+    student_in_course(active_all: true, course: @course)
   end
 
   def course_topic(opts={})
@@ -79,7 +79,7 @@ describe DiscussionTopicsController do
       user_session(@student)
 
       get 'index', params: {:group_id => @group.id}
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     context "graded group discussion" do
@@ -106,15 +106,26 @@ describe DiscussionTopicsController do
         user_session(@student)
 
         get 'index', params: {:group_id => @group.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns["topics"]).to include(@child_topic)
+      end
+
+      it "should not assign the create permission if the term is concluded" do
+        term = @course.account.enrollment_terms.create!(:name => 'mew', :end_at => Time.now.utc - 1.minute)
+        @course.enrollment_term = term
+        @course.save!
+        user_session(@teacher)
+
+        get 'index', params: {:course_id => @course.id}
+
+        expect(assigns[:js_env][:permissions][:create]).to be_falsey
       end
 
       it "should not return graded group discussions if a student has no visibility" do
         user_session(@student)
 
         get 'index', params: {:group_id => @group.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns["topics"]).not_to include(@child_topic)
       end
 
@@ -162,7 +173,7 @@ describe DiscussionTopicsController do
       user_session(@student)
 
       get 'index', params: {:group_id => @group.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns["topics"]).to include(@topic)
     end
 
@@ -176,47 +187,13 @@ describe DiscussionTopicsController do
       group_topic.save!
       group_id = group_topic.child_topics.first.group.id
       get 'index', params: { group_id: group_id }, :format => :json
-      expect(response).to be_success
+      expect(response).to be_successful
       parsed_json = json_parse(response.body)
       expect(parsed_json.length).to eq 1
       parsed_topic = parsed_json.first
       # barf
       expect(parsed_topic["delayed_post_at"].to_json).to eq delayed_post_time.to_json
       expect(parsed_topic["lock_at"].to_json).to eq lock_at_time.to_json
-    end
-
-    it "does not filter module locked discussion by default" do
-      course_topic(user: @teacher)
-      @locked_topic = @topic
-      course_topic(user: @teacher)
-      @module = @course.context_modules.create!(name: 'some module')
-      @module.add_item(type: 'discussion_topic', id: @topic.id)
-      @locked_module = @course.context_modules.create!(name: 'some locked module')
-      @locked_module.add_item(type: 'discussion_topic', id: @locked_topic.id)
-      @locked_module.unlock_at = 2.months.from_now
-      @locked_module.save!
-      user_session(@student)
-
-      get 'index', params: {course_id: @course.id}
-      expect(response).to be_success
-      expect(assigns["topics"]).to include(@locked_topic)
-    end
-
-    it "filters module locked discussions when asked to" do
-      course_topic(user: @teacher)
-      @locked_topic = @topic
-      course_topic(user: @teacher)
-      @module = @course.context_modules.create!(name: 'some module')
-      @module.add_item(type: 'discussion_topic', id: @topic.id)
-      @locked_module = @course.context_modules.create!(name: 'some locked module')
-      @locked_module.add_item(type: 'discussion_topic', id: @locked_topic.id)
-      @locked_module.unlock_at = 2.months.from_now
-      @locked_module.save!
-      user_session(@student)
-
-      get 'index', params: {course_id: @course.id, exclude_context_module_locked_topics: true}
-      expect(response).to be_success
-      expect(assigns["topics"]).not_to include(@locked_topic)
     end
   end
 
@@ -255,7 +232,7 @@ describe DiscussionTopicsController do
       ann = @course.announcements.create!(message: "testing", is_section_specific: true, course_sections: [section1])
       ann.save!
       get 'show', params: {:course_id => @course.id, :id => ann}
-      expect(assigns[:js_env][:TOTAL_USER_COUNT]).to eq(4)
+      expect(assigns[:js_env][:TOTAL_USER_COUNT]).to eq(5)
     end
 
     it "js_env COURSE_SECTIONS is set correctly for section specific announcements" do
@@ -288,7 +265,7 @@ describe DiscussionTopicsController do
         :message => "some message"
       )
       get 'show', params: {:course_id => @course.id, :id => @announcement.id}
-      expect(response).to_not be_success
+      expect(response).to_not be_successful
     end
 
     it "should not display announcements in private courses to users who aren't logged in" do
@@ -316,7 +293,7 @@ describe DiscussionTopicsController do
       it "should be visible to students in specific section" do
         user_session(@student1)
         get 'show', params: {:course_id => @course.id, :id => @announcement.id}
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it "should not be visible to students not in specific section announcements" do
@@ -329,7 +306,6 @@ describe DiscussionTopicsController do
 
     context 'section specific discussions' do
       before(:once) do
-        @course.root_account.enable_feature!(:section_specific_discussions)
         course_with_teacher(active_course: true)
         @section = @course.course_sections.create!(name: 'test section')
 
@@ -347,7 +323,7 @@ describe DiscussionTopicsController do
       it "should be visible to students in specific section" do
         user_session(@student1)
         get 'show', params: {:course_id => @course.id, :id => @discussion.id}
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it "should not be visible to students not in specific section discussions" do
@@ -380,7 +356,7 @@ describe DiscussionTopicsController do
       it "doesn't show overrides to students" do
         user_session(@student)
         get 'show', params: {:course_id => @course.id, :id => @topic.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).not_to match 'discussion-topic-due-dates'
         due_date = OverrideListPresenter.new.due_at(@topic.assignment)
         expect(response.body).to match "due #{due_date}"
@@ -389,7 +365,7 @@ describe DiscussionTopicsController do
       it "doesn't show overrides for observers" do
         user_session(@observer)
         get 'show', params: {:course_id => @course.id, :id => @topic.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).not_to match 'discussion-topic-due-dates'
         due_date = OverrideListPresenter.new.due_at(@topic.assignment.overridden_for(@observer))
         expect(response.body).to match "due #{due_date}"
@@ -398,7 +374,7 @@ describe DiscussionTopicsController do
       it "does show overrides to teachers" do
         user_session(@teacher)
         get 'show', params: {:course_id => @course.id, :id => @topic.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).to match 'discussion-topic-due-dates'
       end
 
@@ -411,7 +387,7 @@ describe DiscussionTopicsController do
       @topic.reload
       expect(@topic.discussion_entries).not_to be_empty
       get 'show', params: {:course_id => @course.id, :id => @topic.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:topic]).not_to be_nil
       expect(assigns[:topic]).to eql(@topic)
     end
@@ -431,12 +407,38 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]).to be_nil
     end
 
-    it "should hide speedgrader when moderated graders limit is reached" do
+    it "shows speedgrader when user can view all grades but not manage grades" do
+      @course.account.role_overrides.create!(permission: 'manage_grades', role: ta_role, enabled: false)
+      user_session(@ta)
+      course_topic(user: @teacher, with_assignment: true)
+      get 'show', params: {course_id: @course.id, id: @topic.id}
+      expect(assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]).to be_truthy
+    end
+
+    it "shows speedgrader when user can manage grades but not view all grades" do
+      @course.account.role_overrides.create!(permission: 'view_all_grades', role: ta_role, enabled: false)
+      user_session(@ta)
+      course_topic(user: @teacher, with_assignment: true)
+      get 'show', params: {course_id: @course.id, id: @topic.id}
+      expect(assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]).to be_truthy
+    end
+
+    it "does not show speedgrader when user can neither view all grades nor manage grades" do
+      @course.account.role_overrides.create!(permission: 'view_all_grades', role: ta_role, enabled: false)
+      @course.account.role_overrides.create!(permission: 'manage_grades', role: ta_role, enabled: false)
+      user_session(@ta)
+      course_topic(user: @teacher, with_assignment: true)
+      get 'show', params: {course_id: @course.id, id: @topic.id}
+      expect(assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]).to be_nil
+    end
+
+    it "shows speedgrader when course concluded and user can read as admin" do
       user_session(@teacher)
       course_topic(user: @teacher, with_assignment: true)
-      allow_any_instance_of(Assignment).to receive(:can_be_moderated_grader?).and_return(false)
-      get 'show', params: {:course_id => @course.id, :id => @topic.id}
-      expect(assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]).to be_nil
+      @course.soft_conclude!
+      expect(@course.grants_right?(@teacher, :read_as_admin)).to be true
+      get 'show', params: {course_id: @course.id, id: @topic.id}
+      expect(assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]).to be_truthy
     end
 
     it "should setup speedgrader template for variable substitution" do
@@ -490,9 +492,9 @@ describe DiscussionTopicsController do
       course_topic
       @enrollment.conclude
       get 'show', params: {:course_id => @course.id, :id => @topic.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       get 'index', params: {:course_id => @course.id}
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should allow concluded students to see discussions" do
@@ -500,9 +502,9 @@ describe DiscussionTopicsController do
       course_topic
       @enrollment.conclude
       get 'show', params: {:course_id => @course.id, :id => @topic.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       get 'index', params: {:course_id => @course.id}
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     context 'group discussions' do
@@ -539,7 +541,7 @@ describe DiscussionTopicsController do
         asmt.save!
 
         get 'show', params: {:course_id => @course.id, :id => @topic.id}
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:groups]).to eq([@group2])
       end
 
@@ -769,7 +771,7 @@ describe DiscussionTopicsController do
       group = group_model(:context => @course)
       group_topic = group.discussion_topics.create!(:title => "title")
       get(:edit, params: {group_id: group, id: group_topic})
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:js_env]).to have_key(:active_grading_periods)
     end
 
@@ -1098,7 +1100,6 @@ describe DiscussionTopicsController do
     # TODO: fix this terribleness
     describe 'section specific discussions' do
       before(:each) do
-        @course.root_account.enable_feature!(:section_specific_discussions)
         user_session(@teacher)
         @section1 = @course.course_sections.create!(name: "Section 1")
         @section2 = @course.course_sections.create!(name: "Section 2")
@@ -1145,7 +1146,7 @@ describe DiscussionTopicsController do
         topic.course_sections << @section1
         topic.save!
         get 'index', params: { :course_id => @course.id }, :format => :json
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:topics].length).to eq(1)
       end
 
@@ -1165,15 +1166,6 @@ describe DiscussionTopicsController do
         expect(response).to have_http_status :success
         expect(DiscussionTopic.last.course_sections.first).to eq @section1
         expect(DiscussionTopicSectionVisibility.count).to eq 1
-      end
-
-      it 'does not create a discussion with sections if the feature is disabled' do
-        @course.root_account.disable_feature!(:section_specific_discussions)
-        post 'create',
-          params: topic_params(@course, {specific_sections: @section1.id.to_s}), :format => :json
-        expect(response).to have_http_status 400
-        expect(DiscussionTopic.count).to eq 0
-        expect(DiscussionTopicSectionVisibility.count).to eq 0
       end
 
       it 'does not allow creation of group discussions that are section specific' do
@@ -1391,7 +1383,6 @@ describe DiscussionTopicsController do
     end
 
     it 'does not allow setting specific sections for group discussions' do
-      @course.root_account.enable_feature!(:section_specific_discussions)
       user_session(@teacher)
       section1 = @course.course_sections.create!(name: "Section 1")
       section2 = @course.course_sections.create!(name: "Section 2")
@@ -1434,7 +1425,6 @@ describe DiscussionTopicsController do
 
     it "Allows an admin to update a section-specific discussion" do
       account = @course.root_account
-      account.enable_feature!(:section_specific_discussions)
       section = @course.course_sections.create!(name: "Section")
       admin = account_admin_user(account: account, role: admin_role, active_user: true)
       user_session(admin)
@@ -1450,7 +1440,6 @@ describe DiscussionTopicsController do
 
     it "can turn graded topic into ungraded section-specific topic in one edit" do
       user_session(@teacher)
-      @course.root_account.enable_feature!(:section_specific_discussions)
       assign = @course.assignments.create!(title: 'Graded Topic 1', submission_types: 'discussion_topic')
       section1 = @course.course_sections.create!(name: "Section 1")
       section2 = @course.course_sections.create!(name: "Section 2")
@@ -1567,7 +1556,7 @@ describe DiscussionTopicsController do
       data = fixture_file_upload("docs/txt.txt", "text/plain", true)
       attachment_model :context => @course, :uploaded_data => data, :folder => Folder.unfiled_folder(@course)
       put 'update', params: {course_id: @course.id, topic_id: @topic.id, attachment: data}, format: 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
       json = JSON.parse(response.body)
       new_file = Attachment.find(json['attachments'][0]['id'])
       expect(new_file.display_name).to match /txt-[0-9]+\.txt/
@@ -1581,7 +1570,7 @@ describe DiscussionTopicsController do
       @topic.save!
       @topic.unlock!
       put('update', params: {course_id: @course.id, topic_id: @topic.id, remove_attachment: '1'}, format: 'json')
-      expect(response).to be_success
+      expect(response).to be_successful
 
       expect(@topic.reload.attachment).to be_nil
       expect(attachment.reload).to be_deleted
@@ -1612,7 +1601,7 @@ describe DiscussionTopicsController do
       @announcement.save!
       put('update', params: {course_id: @course.id, topic_id: @announcement.id, message: 'Foobar',
         is_announcement: true, specific_sections: "all"})
-      expect(response).to be_success
+      expect(response).to be_successful
       visibilities = DiscussionTopicSectionVisibility.active.
         where(:discussion_topic_id => @announcement.id)
       expect(visibilities.empty?).to eq true
@@ -1630,7 +1619,7 @@ describe DiscussionTopicsController do
 
       put('update', params: {course_id: @course.id, topic_id: @announcement.id, message: 'Foobar',
         is_announcement: true})
-      expect(response).to be_success
+      expect(response).to be_successful
       visibilities = DiscussionTopicSectionVisibility.active.
         where(:discussion_topic_id => @announcement.id)
       expect(visibilities.count).to eq 2
@@ -1649,7 +1638,7 @@ describe DiscussionTopicsController do
       expect(topics.map(&:position)).to eq [1, 2, 3]
       t1, t2, _ = topics
       post 'reorder', params: {:course_id => @course.id, :order => "#{t2.id},#{t1.id}"}, :format => 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
       topics.each &:reload
       expect(topics.map(&:position)).to eq [2, 1, 3]
     end

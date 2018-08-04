@@ -31,6 +31,7 @@ import './jquery.templateData'
 import './vendor/jquery.scrollTo'
 import 'compiled/jquery.rails_flash_notifications' // eslint-disable-line
 import Rubric from 'jsx/rubrics/Rubric'
+import { fillAssessment } from 'jsx/rubrics/helpers'
 
 // TODO: stop managing this in the view and get it out of the global scope submissions/show.html.erb
 /*global rubricAssessment*/
@@ -219,7 +220,7 @@ window.rubricAssessment = {
       assessment.data.forEach((criteriaAssessment) => {
         const pre = `rubric_assessment[criterion_${criteriaAssessment.criterion_id}]`
         const section = (key) => `${pre}${key}`
-        const points = numberHelper.parse(criteriaAssessment.points)
+        const points = criteriaAssessment.points.value
         data[section("[points]")] = !Number.isNaN(points) ? points : undefined
         data[section("[description]")] = criteriaAssessment.description
         data[section("[comments]")] = criteriaAssessment.comments || ''
@@ -275,19 +276,7 @@ window.rubricAssessment = {
     }
   },
 
-  fillAssessment: function(rubric, partialAssessment) {
-    const fillText = (c) => ({
-      pointsText: _.isNil(c.points) && _.isUndefined(c.pointsText) ? '--' : c.pointsText,
-      ...c
-    })
-    const defaultCriteria = (id) => ({ criterion_id: id, pointsText: '' })
-    const prior = _.keyBy(_.cloneDeep(partialAssessment.data), (c) => c.criterion_id)
-    return {
-      score: 0,
-      ...partialAssessment,
-      data: rubric.criteria.map((c) => fillText(prior[c.id] || defaultCriteria(c.id)))
-    }
-  },
+  fillAssessment,
 
   populateNewRubric: function(container, assessment, rubricAssociation) {
     if (ENV.nonScoringRubrics && ENV.rubric) {

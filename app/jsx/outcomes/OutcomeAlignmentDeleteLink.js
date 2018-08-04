@@ -27,6 +27,10 @@ import $ from 'jquery'
       has_rubric_association: PropTypes.string
     }
 
+    static defaultProps = {
+      has_rubric_association: null
+    }
+
     handleClick = (e) => {
       const $li = $(e.target).parents('li.alignment');
 
@@ -50,13 +54,15 @@ import $ from 'jquery'
         return (
           <span className="locked_alignment_link">
             <i className="icon-lock" aria-hidden="true" />
-            <span className="screenreader-only"> {I18n.t(
-              "Can't delete alignments based on rubric associations.  To remove these associations you need to remove the row from the asset's rubric"
-            )} </span>
+            <span className="screenreader-only"> {I18n.t(`
+              Can't delete alignments based on rubric associations.
+              To remove these associations you need to remove the row from the asset's rubric"
+            `)} </span>
           </span>
         );
       }
       return (
+        // eslint-disable-next-line jsx-a11y/anchor-is-valid
         <a
           className="delete_alignment_link no-hover"
           href="" onClick={this.handleClick}

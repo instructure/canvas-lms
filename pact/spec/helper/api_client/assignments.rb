@@ -23,8 +23,8 @@ module Helper
   module ApiClient
     class Assignments < ApiClientBase
       base_uri PactConfig.mock_provider_service_base_uri
+      headers 'Authorization' => 'Bearer some_token'
 
-      # TODO: modify these to use params
       def list_assignments(course_id, user_id)
         JSON.parse(self.class.get("/api/v1/users/#{user_id}/courses/#{course_id}/assignments").body)
       rescue

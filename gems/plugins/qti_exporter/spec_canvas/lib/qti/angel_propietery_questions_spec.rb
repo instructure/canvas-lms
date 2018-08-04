@@ -127,7 +127,7 @@ module AngelPropExpected
       {
           :incorrect_comments=>"",
           :question_type=>"multiple_choice_question",
-          :migration_id=>"",
+          :migration_id=>nil,
           :question_text=>"<div>This is annoying.</div>",
           :answers=>
               [{:text=>"True", :migration_id=>"ChoiceTrue", :weight=>100},
@@ -141,7 +141,7 @@ module AngelPropExpected
           :incorrect_comments_html=>"<p>You wrong!</p><br><p>so wrong</p>",
           :incorrect_comments=>"You wrong!so wrong",
           :question_type=>"multiple_choice_question",
-          :migration_id=>"",
+          :migration_id=>nil,
           :question_text=>"<div>What is an LMS</div>",
           :answers=>
               [{:text=>"Learning microsoft system",
@@ -164,7 +164,7 @@ module AngelPropExpected
       {
           :incorrect_comments=>"",
           :question_type=>"essay_question",
-          :migration_id=>"",
+          :migration_id=>nil,
           :question_text=>"<div>Rhode Island is neither a road nor an island. Discuss</div>",
           :answers=>[],
           :question_name=>"Essay question title here",
@@ -184,7 +184,7 @@ module AngelPropExpected
                 :migration_id=>"scale_2"}],
           :question_type=>"multiple_choice_question",
           :correct_comments=>"",
-          :migration_id=>"",
+          :migration_id=>nil,
           :question_text=>"<div>How good <em>is</em> Instructure</div>"}
 
   MULTIPLE_ANSWER =
@@ -200,7 +200,7 @@ module AngelPropExpected
           :points_possible=>1,
           :question_type=>"multiple_answers_question",
           :correct_comments=>"ok ok",
-          :migration_id=>"",
+          :migration_id=>nil,
           :question_text=>"<div>go!</div>"}
 
   SHORT_ANSWER =
@@ -208,7 +208,7 @@ module AngelPropExpected
        :correct_comments=>"",
        :question_name=>"Short answer question",
        :incorrect_comments=>"",
-       :migration_id=>"",
+       :migration_id=>nil,
        :points_possible=>1,
        :question_type=>"short_answer_question",
        :question_text=>"<div>What is your answer</div>"}
@@ -217,7 +217,7 @@ module AngelPropExpected
       {
           :incorrect_comments=>"",
           :question_type=>"essay_question",
-          :migration_id=>"",
+          :migration_id=>nil,
           :question_text=>"<div>State one advantage Pandas have over Darwin.</div>",
           :answers=>[],
           :question_name=>"",
@@ -230,7 +230,7 @@ module AngelPropExpected
           :correct_comments=>"",
           :question_name=>"Matching question",
           :incorrect_comments=>"",
-          :migration_id=>"",
+          :migration_id=>nil,
           :points_possible=>1,
           :question_type=>"matching_question",
           :question_text=>"<div>matching question</div>",
@@ -244,7 +244,7 @@ module AngelPropExpected
        :correct_comments=>"jkl;",
        :question_name=>"Ordering question",
        :incorrect_comments=>"asdf",
-       :migration_id=>"",
+       :migration_id=>nil,
        :points_possible=>1,
        :question_type=>"matching_question",
        :question_text=>"<div>Order these</div>",
@@ -256,7 +256,7 @@ module AngelPropExpected
           :correct_comments=>"",
           :question_name=>"offline item?",
           :incorrect_comments=>"",
-          :migration_id=>"",
+          :migration_id=>nil,
           :points_possible=>1,
           :question_type=>"file_upload_question",
           :question_text=>"<div>This is an offline item. I don't know what to do.</div>",
@@ -273,7 +273,7 @@ module AngelPropExpected
           :correct_comments=>"",
           :incorrect_comments=>"",
           :question_name=>"Fill in the blank(s)",
-          :migration_id=>"",
+          :migration_id=>nil,
           :points_possible=>1,
           :question_text=>"<div>The [l1] brown [l2] jumped over the lazy [l3] .</div> [l4]  [l5] ",
           :question_type=>"fill_in_multiple_blanks_question"}

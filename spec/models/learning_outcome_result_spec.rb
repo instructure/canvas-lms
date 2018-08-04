@@ -20,11 +20,15 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe LearningOutcomeResult do
 
-  let_once :learning_outcome_result do
-    create_and_associate_lor(quiz_model)
+  let_once :quiz do
+    quiz_model(assignment: assignment_model)
   end
 
-  def create_and_associate_lor(association_object)
+  let_once :learning_outcome_result do
+    create_and_associate_lor(quiz)
+  end
+
+  def create_and_associate_lor(association_object, associated_asset = nil)
     assignment_model
     outcome = @course.created_learning_outcomes.create!(title: 'outcome')
 
@@ -32,13 +36,14 @@ describe LearningOutcomeResult do
       alignment: ContentTag.create!({
         title: 'content',
         context: @course,
-        learning_outcome: outcome})
-      ).tap do |lor|
-        lor.association_object = association_object
-        lor.context = @course
-        lor.associated_asset = association_object
-        lor.save!
-      end
+        learning_outcome: outcome
+      })
+    ).tap do |lor|
+      lor.association_object = association_object
+      lor.context = @course
+      lor.associated_asset = associated_asset || association_object
+      lor.save!
+    end
   end
 
   describe '#submitted_or_assessed_at' do
@@ -59,7 +64,61 @@ describe LearningOutcomeResult do
       })
       expect(learning_outcome_result.submitted_or_assessed_at).to eq(@assessed_at)
     end
+  end
 
+  describe 'exclude_muted_associations scope' do
+    shared_examples_for 'muting assignment' do
+      context 'unmuted assignment' do
+        it 'includes assignment result' do
+          total = LearningOutcomeResult.count
+          expect(LearningOutcomeResult.exclude_muted_associations.count).to eq total
+        end
+      end
+
+      context 'muted assignment' do
+        before do
+          assignment.mute!
+        end
+
+        it 'excludes assignment result' do
+          total = LearningOutcomeResult.count
+          expect(LearningOutcomeResult.exclude_muted_associations.count).to eq(total-1)
+        end
+      end
+    end
+
+    context 'with quiz assignment' do
+      let_once :assignment do
+        quiz.assignment
+      end
+
+      include_examples 'muting assignment'
+    end
+
+    context 'with assignment result' do
+      let_once :assignment do
+        assignment_model
+      end
+
+      let_once :assignment_learning_outcome_result do
+        create_and_associate_lor(assignment)
+      end
+
+      include_examples 'muting assignment'
+    end
+
+    context 'with rubric association result' do
+      let_once :assignment do
+        assignment_model
+      end
+
+      let_once :assignment_learning_outcome_result do
+        rubric_assessment_model(user: @user, context: @course, association_object: assignment, purpose: 'grading')
+        create_and_associate_lor(@rubric_association, assignment)
+      end
+
+      include_examples 'muting assignment'
+    end
   end
 
   describe "active scope" do

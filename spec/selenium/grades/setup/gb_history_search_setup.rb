@@ -32,10 +32,6 @@ module GradebookHistorySetup
     create_assignment_due_one_day(now)
     create_assignment_due_one_week(now)
 
-    Timecop.freeze(now) do
-      student_submits_assignments
-    end
-
     number_of_history_records.times do
       teacher_grades_assignments
     end
@@ -69,13 +65,6 @@ module GradebookHistorySetup
       due_at: 1.week.from_now(now),
       submission_types: 'online_text_entry'
     )
-  end
-
-  def student_submits_assignments
-    # as a student submit all assignments
-    @assignment_past_due_day.submit_homework(@course.students.first, body: 'submitting my homework')
-    @assignment_due_one_day.submit_homework(@course.students.first, body: 'submitting my homework')
-    @assignment_due_one_week.submit_homework(@course.students.first, body: 'submitting my homework')
   end
 
   def teacher_grades_assignments

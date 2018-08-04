@@ -9,9 +9,8 @@
   background: var(--background);
 }
 
-.desert {
+.desert, .balloons {
   display: block;
-  transform: scale(1.4);
   margin-inline-start: auto;
   margin-inline-end: auto;
   text-align: center;

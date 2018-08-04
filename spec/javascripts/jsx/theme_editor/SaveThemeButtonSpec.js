@@ -54,8 +54,8 @@ test('save', function (assert) {
   const done = assert.async()
   let component = ReactDOM.render(<SaveThemeButton {...props} />, elem)
   const updatedBrandConfig = {}
-  this.stub(jQuery, 'ajaxJSON').callsArgOnWith(3, component, updatedBrandConfig)
-  this.spy(component, 'setState')
+  sandbox.stub(jQuery, 'ajaxJSON').callsArgOnWith(3, component, updatedBrandConfig)
+  sandbox.spy(component, 'setState')
   component.save()
   ok(
     jQuery.ajaxJSON.calledWithMatch(props.accountID, 'PUT'),

@@ -28,7 +28,7 @@ const createClick = function() {
 test('redirects clicks', function() {
   const sourceDiv = $('<div></div>')
   const targetDiv = $('<div></div>')
-  const targetDivSpy = this.spy()
+  const targetDivSpy = sinon.spy()
   targetDiv.on('click', targetDivSpy)
 
   sourceDiv.redirectClickTo(targetDiv)

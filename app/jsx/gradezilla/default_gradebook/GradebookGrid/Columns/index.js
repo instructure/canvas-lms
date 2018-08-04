@@ -16,6 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+function minimize (column) {
+  if (!column.cssClass.includes('minimized')) {
+    column.cssClass += ' minimized'; // eslint-disable-line no-param-reassign
+  }
+
+  if (!column.headerCssClass.includes('minimized')) {
+    column.headerCssClass += ' minimized'; // eslint-disable-line no-param-reassign
+  }
+
+  const $columnNodes = document.querySelectorAll(`.${column.id}`);
+  for (let i = 0; i < $columnNodes.length; i++) {
+    $columnNodes[i].classList.add('minimized');
+  }
+}
+
+function unminimize (column) {
+  /* eslint-disable no-param-reassign */
+  column.cssClass = column.cssClass.replace(/\s*\bminimized\b/, '');
+  column.headerCssClass = column.headerCssClass.replace(/\s*\bminimized\b/, '');
+  /* eslint-enable no-param-reassign */
+
+  const $columnNodes = document.querySelectorAll(`.${column.id}`);
+  for (let i = 0; i < $columnNodes.length; i++) {
+    $columnNodes[i].classList.remove('minimized');
+  }
+}
+
 export default class Columns {
   constructor (gradebookGrid) {
     this.gradebookGrid = gradebookGrid;
@@ -36,9 +63,19 @@ export default class Columns {
       }
     });
 
-    gridSupport.events.onColumnsResized.subscribe((event, columns) => {
+    gridSupport.events.onColumnsResized.subscribe((_event, columns) => {
       for (let i = 0; i < columns.length; i++) {
         gridData.columns.definitions[columns[i].id] = columns[i];
+      }
+
+      const assignmentColumns = columns.filter(column => column.type === 'assignment');
+      for (let i = 0; i < assignmentColumns.length; i++) {
+        const column = assignmentColumns[i];
+        if (column.width <= column.minWidth) {
+          minimize(column);
+        } else {
+          unminimize(column);
+        }
       }
 
       events.onColumnsResized.trigger(event, columns);

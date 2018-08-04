@@ -57,6 +57,7 @@ define [
       @itemViewOptions.indexView = @
       @itemViewOptions.collection = @collection
       @itemViewOptions.WIKI_RIGHTS = @WIKI_RIGHTS
+      @itemViewOptions.collectionHasTodoDate = @collectionHasTodoDate
       @focusAfterRenderSelector = null
 
       @contextAssetString = options?.contextAssetString
@@ -144,6 +145,10 @@ define [
         $('body').addClass('index')
         @$el.show()
 
+    collectionHasTodoDate: ->
+      return false unless ENV.STUDENT_PLANNER_ENABLED
+      !!@collection.find((m) -> m.has('todo_date'))
+
     toJSON: ->
       json = super
       json.CAN =
@@ -153,4 +158,5 @@ define [
       json.CAN.VIEW_TOOLBAR = json.CAN.CREATE
       json.fetched = !!@fetched
       json.fetchedLast = !!@fetchedLast
+      json.collectionHasTodoDate = @collectionHasTodoDate()
       json

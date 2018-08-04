@@ -25,15 +25,15 @@ import SearchResultsActions from 'jsx/gradebook-history/actions/SearchResultsAct
 QUnit.module('SearchResultsActionsSpec getHistoryNextPage', {
   setup () {
     this.response = Fixtures.historyResponse();
-    this.getNextPageStub = this.stub(HistoryApi, 'getNextPage')
+    this.getNextPageStub = sandbox.stub(HistoryApi, 'getNextPage')
       .returns(Promise.resolve(this.response));
 
-    this.dispatchSpy = this.spy(GradebookHistoryStore, 'dispatch');
+    this.dispatchSpy = sandbox.spy(GradebookHistoryStore, 'dispatch');
   }
 });
 
 test('dispatches fetchHistoryNextPageStart', function () {
-  const fetchSpy = this.spy(HistoryActions, 'fetchHistoryNextPageStart');
+  const fetchSpy = sandbox.spy(HistoryActions, 'fetchHistoryNextPageStart');
   const promise = this.dispatchSpy(SearchResultsActions.getHistoryNextPage('http://example.com'));
   return promise.then(() => {
     strictEqual(fetchSpy.callCount, 1);
@@ -41,7 +41,7 @@ test('dispatches fetchHistoryNextPageStart', function () {
 });
 
 test('dispatches fetchHistoryNextPageSuccess with response data and headers on success', function () {
-  const fetchSpy = this.spy(HistoryActions, 'fetchHistoryNextPageSuccess');
+  const fetchSpy = sandbox.spy(HistoryActions, 'fetchHistoryNextPageSuccess');
   const promise = this.dispatchSpy(SearchResultsActions.getHistoryNextPage('http://example.com'));
   return promise.then(() => {
     strictEqual(fetchSpy.callCount, 1);
@@ -52,7 +52,7 @@ test('dispatches fetchHistoryNextPageSuccess with response data and headers on s
 
 test('dispatches fetchHistoryNextPageFailure on failure', function () {
   this.getNextPageStub.returns(Promise.reject(new Error('FAIL')));
-  const fetchSpy = this.spy(HistoryActions, 'fetchHistoryNextPageFailure');
+  const fetchSpy = sandbox.spy(HistoryActions, 'fetchHistoryNextPageFailure');
   const promise = this.dispatchSpy(SearchResultsActions.getHistoryNextPage('http://example.com'));
   return promise.then(() => {
     strictEqual(fetchSpy.callCount, 1);

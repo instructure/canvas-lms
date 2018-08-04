@@ -37,7 +37,7 @@ QUnit.module('MissingDateDialogView', {
           return true
         }
       },
-      success: this.spy()
+      success: sinon.spy()
     })
   },
   teardown() {

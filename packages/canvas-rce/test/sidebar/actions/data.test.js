@@ -78,7 +78,7 @@ describe("Sidebar data actions", () => {
     it("dispatches requestPage first", () => {
       let store = spiedStore(setupState());
       store.dispatch(actions.fetchPage(collectionKey));
-      let callArgs = store.spy.firstCall.args[0];
+      let callArgs = store.spy.getCall(1).args[0];
       assert.equal(callArgs.type, actions.REQUEST_PAGE);
       assert.equal(callArgs.key, collectionKey);
     });

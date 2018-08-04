@@ -17,6 +17,7 @@
  */
 import React, { Component } from 'react';
 import classnames from 'classnames';
+import { momentObj } from 'react-moment-proptypes';
 import themeable from '@instructure/ui-themeable/lib';
 import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleDetails';
 import Pill from '@instructure/ui-elements/lib/components/Pill';
@@ -41,6 +42,7 @@ export class CompletedItemsFacade extends Component {
     registerAnimatable: func,
     deregisterAnimatable: func,
     notificationBadge: oneOf(['none', 'newActivity', 'missing']),
+    date: momentObj,  // the scroll-to-today animation requires a date on each component in the planner
   };
   static defaultProps = {
     badges: [],

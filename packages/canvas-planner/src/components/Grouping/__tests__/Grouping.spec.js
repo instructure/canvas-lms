@@ -17,6 +17,7 @@
  */
 import React from 'react';
 import { shallow, mount } from 'enzyme';
+import moment from 'moment-timezone';
 import {Grouping} from '../index';
 
 const getDefaultProps = () => ({
@@ -24,7 +25,7 @@ const getDefaultProps = () => ({
     id: "5",
     uniqueId: "five",
     title: 'San Juan',
-    date: '2017-04-25T05:06:07-08:00',
+    date: moment.tz('2017-04-25T05:06:07-08:00', "America/Denver"),
     context: {
       url: 'example.com',
       color: "#5678",
@@ -34,7 +35,7 @@ const getDefaultProps = () => ({
   }, {
     id: "6",
     uniqueId: "six",
-    date: '2017-04-25T05:06:07-08:00',
+    date: moment.tz('2017-04-25T05:06:07-08:00', "America/Denver"),
     title: 'Roll for the Galaxy',
     context: {
       color: "#5678",
@@ -73,7 +74,7 @@ it('renders to do items correctly', () => {
       id: "700",
       uniqueId: "seven hundred",
       title: 'To Do 700',
-      date: '2017-06-16T05:06:07-06:00',
+      date: moment.tz('2017-06-16T05:06:07-06:00', "America/Denver"),
       context: null,
     }],
     timeZone: "America/Denver",

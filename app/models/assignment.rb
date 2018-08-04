@@ -1612,7 +1612,12 @@ class Assignment < ActiveRecord::Base
     grade, score = compute_grade_and_score(opts[:grade], opts[:score])
 
     did_grade = false
-    submission.attributes = opts.slice(:excused, :submission_type, :url, :body)
+    submission.attributes = opts.slice(:submission_type, :url, :body)
+
+    # Only moderators or admins may excuse an assignment under moderation
+    if !opts[:provisional] || permits_moderation?(grader)
+      submission.excused = opts[:excused] && score.blank?
+    end
 
     unless opts[:provisional]
       submission.grader = grader
@@ -1620,7 +1625,6 @@ class Assignment < ActiveRecord::Base
       submission.grade = grade
       submission.score = score
       submission.graded_anonymously = opts[:graded_anonymously] if opts.key?(:graded_anonymously)
-      submission.excused = false if score.present?
       did_grade = true if score.present? || submission.excused?
     end
 
@@ -1639,6 +1643,8 @@ class Assignment < ActiveRecord::Base
     previously_graded ? submission.with_versioning(:explicit => true) { submission.save! } : submission.save!
 
     if opts[:provisional]
+      raise GradeError, error_code: 'PROVISIONAL_GRADE_INVALID_SCORE' unless score.present? || submission.excused
+
       submission.find_or_create_provisional_grade!(grader,
         grade: grade,
         score: score,
@@ -1760,8 +1766,9 @@ class Assignment < ActiveRecord::Base
   end
   private :save_comment_to_submission
 
-  SUBMIT_HOMEWORK_ATTRS = %w[body url submission_type
-                             media_comment_id media_comment_type]
+  SUBMIT_HOMEWORK_ATTRS = %w[
+    body url submission_type media_comment_id media_comment_type submitted_at
+  ].freeze
   ALLOWABLE_SUBMIT_HOMEWORK_OPTS = (SUBMIT_HOMEWORK_ATTRS +
                                     %w[comment group_comment attachments]).to_set
 
@@ -1806,7 +1813,7 @@ class Assignment < ActiveRecord::Base
           :workflow_state => submitted ? "submitted" : "unsubmitted",
           :group => group
         })
-        homework.submitted_at = Time.zone.now
+        homework.submitted_at = opts[:submitted_at] || Time.zone.now
         homework.lti_user_id = Lti::Asset.opaque_identifier_for(student)
         homework.turnitin_data[:eula_agreement_timestamp] = eula_timestamp if eula_timestamp.present?
         homework.with_versioning(:explicit => (homework.submission_type != "discussion_topic")) do
@@ -2754,6 +2761,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def permits_moderation?(user)
+    return false unless user
     final_grader_id == user.id || context.account_membership_allows(user, :select_final_grade)
   end
 
@@ -2829,8 +2837,19 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  def anonymize_students?
+    return false unless anonymous_grading?
+
+    # Only anonymize students for moderated assignments if grades have not been published.
+    # Only anonymize students for non-moderated assignments if the assignment is muted.
+    moderated_grading? ? !grades_published? : muted?
+  end
+  alias anonymize_students anonymize_students?
+
   def can_view_student_names?(user)
-    !anonymous_grading && context.grants_any_right?(user, :manage_grades, :view_all_grades)
+    return false if anonymize_students?
+
+    context.grants_any_right?(user, :manage_grades, :view_all_grades)
   end
 
   private

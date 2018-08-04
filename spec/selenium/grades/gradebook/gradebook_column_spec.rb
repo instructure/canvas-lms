@@ -85,11 +85,11 @@ describe "assignment column headers" do
     }
     @user.save!
     @fourth_assignment = assignment_model({
-      :course => @course,
-      :name => "new assignment",
-      :due_at => nil,
-      :points_possible => 150,
-      :assignment_group => nil,
+      course: @course,
+      name: "new assignment",
+      due_at: nil,
+      points_possible: 150,
+      assignment_group: nil,
       })
     @fourth_assignment.grade_student(@student_1, grade: 150, grader: @teacher)
 

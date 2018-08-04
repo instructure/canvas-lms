@@ -76,7 +76,7 @@ test('the options are displayed in the same order as they were sent in', functio
 });
 
 test('selecting an option calls the onSelect prop', function () {
-  const props = { ...defaultProps(), onSelect: this.stub() };
+  const props = { ...defaultProps(), onSelect: sinon.stub() };
   this.wrapper = mount(<GradebookFilter {...props} />);
   this.wrapper.find('select').simulate('change', { target: { value: '2' }});
 
@@ -84,7 +84,7 @@ test('selecting an option calls the onSelect prop', function () {
 });
 
 test('selecting an option calls the onSelect prop with the module id', function () {
-  const props = { ...defaultProps(), onSelect: this.stub() };
+  const props = { ...defaultProps(), onSelect: sinon.stub() };
   this.wrapper = mount(<GradebookFilter {...props} />);
   this.wrapper.find('select').simulate('change', { target: { value: '2' }});
 
@@ -92,7 +92,7 @@ test('selecting an option calls the onSelect prop with the module id', function 
 });
 
 test('selecting an option while the control is disabled does not call the onSelect prop', function () {
-  const props = { ...defaultProps(), onSelect: this.stub(), disabled: true };
+  const props = { ...defaultProps(), onSelect: sinon.stub(), disabled: true };
   this.wrapper = mount(<GradebookFilter {...props} />);
   this.wrapper.find('select').simulate('change', { target: { value: '2' }});
 

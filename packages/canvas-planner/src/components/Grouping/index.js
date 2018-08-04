@@ -155,6 +155,9 @@ export class Grouping extends Component {
           showNotificationBadge={showNotificationBadgeOnItem}
           currentUser={this.props.currentUser}
           feedback={item.feedback}
+          location={item.location}
+          endTime={item.endTime}
+          dateStyle={item.dateStyle}
         />
       </li>
     ));
@@ -163,6 +166,8 @@ export class Grouping extends Component {
   renderFacade (completedItems, animatableIndex) {
     const showNotificationBadgeOnItem = this.getLayout() !== 'large';
     if (!this.state.showCompletedItems && completedItems.length > 0) {
+      const theDay = completedItems[0].date.clone();
+      theDay.startOf('day');
       let missing = false;
       let newActivity = false;
       const completedItemIds = completedItems.map(item => {
@@ -194,6 +199,7 @@ export class Grouping extends Component {
             theme={{
               labelColor: this.props.color
             }}
+            date={theDay}
           />
         </li>
       );

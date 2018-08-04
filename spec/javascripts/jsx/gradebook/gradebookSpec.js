@@ -78,7 +78,7 @@ test('calculates percentage from given  score and possible values', function () 
 
 test('displays percentage as "-" when group total score is positive infinity', function () {
   const gradebook = new Gradebook({ settings: {}, sections: {} });
-  this.stub(gradebook, 'calculateAndRoundGroupTotalScore').returns(Number.POSITIVE_INFINITY);
+  sandbox.stub(gradebook, 'calculateAndRoundGroupTotalScore').returns(Number.POSITIVE_INFINITY);
   const groupTotalOutput = gradebook.groupTotalFormatter(0, 0, { score: 9, possible: 0 }, {});
   ok(groupTotalOutput.includes('9 / 0'));
   ok(groupTotalOutput.includes('-'));
@@ -86,7 +86,7 @@ test('displays percentage as "-" when group total score is positive infinity', f
 
 test('displays percentage as "-" when group total score is negative infinity', function () {
   const gradebook = new Gradebook({ settings: {}, sections: {} });
-  this.stub(gradebook, 'calculateAndRoundGroupTotalScore').returns(Number.NEGATIVE_INFINITY);
+  sandbox.stub(gradebook, 'calculateAndRoundGroupTotalScore').returns(Number.NEGATIVE_INFINITY);
   const groupTotalOutput = gradebook.groupTotalFormatter(0, 0, { score: 9, possible: 0 }, {});
   ok(groupTotalOutput.includes('9 / 0'));
   ok(groupTotalOutput.includes('-'));
@@ -94,7 +94,7 @@ test('displays percentage as "-" when group total score is negative infinity', f
 
 test('displays percentage as "-" when group total score is not a number', function () {
   const gradebook = new Gradebook({ settings: {}, sections: {} });
-  this.stub(gradebook, 'calculateAndRoundGroupTotalScore').returns(NaN);
+  sandbox.stub(gradebook, 'calculateAndRoundGroupTotalScore').returns(NaN);
   const groupTotalOutput = gradebook.groupTotalFormatter(0, 0, { score: 9, possible: 0 }, {});
   ok(groupTotalOutput.includes('9 / 0'));
   ok(groupTotalOutput.includes('-'));
@@ -120,16 +120,16 @@ QUnit.module('Gradebook#switchTotalDisplay', {
         return true;
       },
       grid: {
-        invalidate: this.stub()
+        invalidate: sinon.stub()
       },
       totalHeader: {
-        switchTotalDisplay: this.stub()
+        switchTotalDisplay: sinon.stub()
       }
     }
   },
 
   setup () {
-    this.stub($, 'ajaxJSON');
+    sandbox.stub($, 'ajaxJSON');
     this.switchTotalDisplay = Gradebook.prototype.switchTotalDisplay;
   },
 
@@ -192,12 +192,12 @@ QUnit.module('Gradebook#togglePointsOrPercentTotals', {
         show_total_grade_as_points: true,
         setting_update_url: 'http://settingUpdateUrl'
       },
-      switchTotalDisplay: this.stub()
+      switchTotalDisplay: sinon.stub()
     }
   },
 
   setup () {
-    this.stub($, 'ajaxJSON');
+    sandbox.stub($, 'ajaxJSON');
     this.togglePointsOrPercentTotals = Gradebook.prototype.togglePointsOrPercentTotals;
   },
 
@@ -229,7 +229,7 @@ test('when user is not ignoring warnings, return a dialog', function () {
 });
 
 test('when user is not ignoring warnings, the dialog has a save property which is the switchTotalDisplay function', function () {
-  this.stub(UserSettings, 'contextGet').withArgs('warned_about_totals_display').returns(false);
+  sandbox.stub(UserSettings, 'contextGet').withArgs('warned_about_totals_display').returns(false);
   const self = this.setupThis(true);
   const dialog = this.togglePointsOrPercentTotals.call(self);
 

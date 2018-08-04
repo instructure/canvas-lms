@@ -61,12 +61,13 @@ class DiscussionTopicPresenter
     end
   end
 
-  def has_peer_reviews?(user)
-    peer_reviews_for(user).present?
-  end
-
   def peer_reviews_for(user)
-    user.assigned_submission_assessments.for_assignment(assignment.id)
+    reviews = user.assigned_submission_assessments.for_assignment(assignment.id).to_a
+    if reviews.any?
+      valid_student_ids = assignment.context.participating_students.where(:id => reviews.map(&:user_id)).pluck(:id).to_set
+      reviews = reviews.select{|r| valid_student_ids.include?(r.user_id)}
+    end
+    reviews
   end
 
   # Public: Determine if this discussion's assignment has an attached rubric.

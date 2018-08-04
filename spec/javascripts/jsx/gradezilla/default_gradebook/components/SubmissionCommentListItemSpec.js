@@ -215,8 +215,8 @@ QUnit.module('SubmissionCommentListItem#deleteSubmissionComment', {
 });
 
 test('clicking the trash icon calls deleteSubmissionComment', function () {
-  const confirmStub = this.stub(window, 'confirm').returns(true);
-  const deleteSubmissionComment = this.stub();
+  const confirmStub = sandbox.stub(window, 'confirm').returns(true);
+  const deleteSubmissionComment = sinon.stub();
   this.mountComponent({ deleteSubmissionComment });
   this.wrapper.find(IconTrashLine).simulate('click');
   strictEqual(deleteSubmissionComment.callCount, 1);
@@ -224,8 +224,8 @@ test('clicking the trash icon calls deleteSubmissionComment', function () {
 });
 
 test('clicking the trash icon calls deleteSubmissionComment with the id', function () {
-  const confirmStub = this.stub(window, 'confirm').returns(true);
-  const deleteSubmissionComment = this.stub();
+  const confirmStub = sandbox.stub(window, 'confirm').returns(true);
+  const deleteSubmissionComment = sinon.stub();
   const id = '42';
   this.mountComponent({ id, deleteSubmissionComment });
   this.wrapper.find(IconTrashLine).simulate('click');
@@ -234,7 +234,7 @@ test('clicking the trash icon calls deleteSubmissionComment with the id', functi
 });
 
 test('clicking the trash icon prompts for confirmation', function () {
-  const confirmStub = this.stub(window, 'confirm').returns(true);
+  const confirmStub = sandbox.stub(window, 'confirm').returns(true);
   this.mountComponent();
   this.wrapper.find(IconTrashLine).simulate('click');
   strictEqual(window.confirm.callCount, 1);
@@ -242,7 +242,7 @@ test('clicking the trash icon prompts for confirmation', function () {
 });
 
 test('confirm is called with a message', function () {
-  const confirmStub = this.stub(window, 'confirm').returns(true);
+  const confirmStub = sandbox.stub(window, 'confirm').returns(true);
   this.mountComponent();
   this.wrapper.find(IconTrashLine).simulate('click');
   strictEqual(window.confirm.args[0][0], 'Are you sure you want to delete this comment?');
@@ -250,8 +250,8 @@ test('confirm is called with a message', function () {
 });
 
 test('when confirm is false, deleteSubmissionComment is not called', function () {
-  const confirmStub = this.stub(window, 'confirm').returns(false);
-  const deleteSubmissionComment = this.stub();
+  const confirmStub = sandbox.stub(window, 'confirm').returns(false);
+  const deleteSubmissionComment = sinon.stub();
   this.mountComponent({ deleteSubmissionComment });
   this.wrapper.find(IconTrashLine).simulate('click');
   strictEqual(deleteSubmissionComment.callCount, 0);

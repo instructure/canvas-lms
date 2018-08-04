@@ -107,7 +107,7 @@ Object.entries({
     })
 
     test(`clicking the ${label} column header calls onChangeSort with ${columnID}`, function() {
-      const sortSpy = this.spy()
+      const sortSpy = sinon.spy()
       const wrapper = mount(<UsersList {...{
         ...props,
         onUpdateFilters: sortSpy

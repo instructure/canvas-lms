@@ -8,8 +8,17 @@
   "all_items_loaded_aa256183": {
     "message": "تم تحميل كافة العناصر"
   },
+  "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
+    "message": "حدث خطأ أثناء محاولة تجاهل الفرصة."
+  },
+  "announcement_fb4cb645": {
+    "message": "الإعلان"
+  },
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "هل أنت متأكد أنك تريد حذف عنصر المخطط هذا؟"
+  },
+  "assignment_976578a8": {
+    "message": "المهمة"
   },
   "assignmenttype_title_6612d008": {
     "message": "{ assignmentType } { title }."
@@ -31,6 +40,9 @@
   },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "بداية سجل قائمة المهام الخاصة بك"
+  },
+  "calendar_event_89aadc1c": {
+    "message": "حدث التقويم"
   },
   "canvas_planner_98ed106": {
     "message": "مخطِط Canvas"
@@ -71,6 +83,12 @@
   "details_98a31b68": {
     "message": "التفاصيل"
   },
+  "discussion_6719c51d": {
+    "message": "النقاش"
+  },
+  "dismiss_itemtitle_a9fae1b3": {
+    "message": "تجاهل { itemTitle }"
+  },
   "dismiss_opportunityname_5995176f": {
     "message": "تجاهل { opportunityName }"
   },
@@ -109,9 +127,6 @@
   },
   "feedback_6dcc1991": {
     "message": "التعليقات"
-  },
-  "go_to_dashboard_card_view_10398ef6": {
-    "message": "اذهب إلى طريقة عرض بطاقة لوحة المعلومات"
   },
   "graded_25cd3fcd": {
     "message": "تم تقييم الدرجة"
@@ -182,17 +197,20 @@
   "nothing_new_needs_attention_3ac548d4": {
     "message": "لا يوجد شيء جديد يستدعي الاهتمام."
   },
-  "nothing_planned_today_next_item_loaded_5a199868": {
-    "message": "لم يتم اليوم تخطيط أي شيء. تم تحميل العنصر التالي."
-  },
   "nothing_planned_yet_8675ffe9": {
     "message": "لم يتم تخطيط أي شيء بعد"
+  },
+  "numpoints_points_8621a43b": {
+    "message": "نقاط { numPoints }"
   },
   "only_most_recent_grading_period_shown_f1ad6458": {
     "message": "*إظهار أحدث فترة تقييم فقط."
   },
   "optional_add_course_ef0d70fc": {
     "message": "اختياري: إضافة مساق"
+  },
+  "page_50c4823d": {
+    "message": "صفحة"
   },
   "points_bceb5005": {
     "message": "نقاط"
@@ -205,6 +223,9 @@
   },
   "pts_699bd9aa": {
     "message": "نقاط"
+  },
+  "quiz_e0dcce8f": {
+    "message": "الاختبار الموجز"
   },
   "replies_4a8577c8": {
     "message": "ردود"
@@ -241,6 +262,9 @@
   },
   "to_do_1d554f36": {
     "message": "قائمة مهام"
+  },
+  "to_do_items_loading_d1cdfcd5": {
+    "message": "تحميل عناصر قائمة المهام"
   },
   "today_76e10f9c": {
     "message": "اليوم"

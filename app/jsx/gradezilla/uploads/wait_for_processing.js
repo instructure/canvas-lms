@@ -19,28 +19,27 @@
 import $ from 'jquery'
 import I18n from 'i18n!gradezilla_uploads'
 import 'spin.js/jquery.spin'
-  function waitForProcessing(progress) {
-    var dfd = $.Deferred();
-    var spinner = $("#spinner").spin();
 
-    var amIDoneYet = (progress) => {
-      if (progress.workflow_state == "completed") {
-        $.ajaxJSON(ENV.uploaded_gradebook_data_path, "GET").then((uploadedGradebook) => {
-          spinner.hide();
-          dfd.resolve(uploadedGradebook)
-        });
-      } else if (progress.workflow_state == "failed") {
-        dfd.reject(I18n.t("Invalid CSV file. Grades could not be updated."));
-      } else {
-        setTimeout(function() {
-          $.ajaxJSON(`/api/v1/progress/${progress.id}`, "GET")
+export function waitForProcessing(progress) {
+  const dfd = $.Deferred();
+  const spinner = $("#spinner").spin();
+
+  const amIDoneYet = (currentProgress) => {
+    if (currentProgress.workflow_state === "completed") {
+      $.ajaxJSON(ENV.uploaded_gradebook_data_path, "GET").then((uploadedGradebook) => {
+        spinner.hide();
+        dfd.resolve(uploadedGradebook)
+      });
+    } else if (currentProgress.workflow_state === "failed") {
+      dfd.reject(I18n.t("Invalid CSV file. Grades could not be updated."));
+    } else {
+      setTimeout(() => {
+        $.ajaxJSON(`/api/v1/progress/${currentProgress.id}`, "GET")
           .then(amIDoneYet);
-        }, 2000);
-      }
+      }, 2000);
     }
-    amIDoneYet(progress);
-
-    return dfd;
   }
+  amIDoneYet(progress);
 
-export default waitForProcessing
+  return dfd;
+}

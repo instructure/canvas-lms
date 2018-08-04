@@ -174,7 +174,7 @@ define [
       classes.push('resubmitted') if submission.grade_matches_current_submission == false
       classes.push('late') if submission.late
       classes.push('ungraded') if ''+assignment.submission_types is "not_graded"
-      if assignment.anonymous_grading and (assignment.muted or assignment.moderation_in_progress)
+      if assignment.anonymize_students
         classes.push('anonymous')
       else if assignment.moderation_in_progress
         classes.push('moderated')

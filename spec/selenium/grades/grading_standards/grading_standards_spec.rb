@@ -52,8 +52,8 @@ describe "grading standards" do
   it "should allow setting a grading standard for an assignment", priority: "1", test_id: 217599 do
     course_with_teacher_logged_in
 
-    @assignment = @course.assignments.create!(:title => "new assignment")
-    @standard = @course.grading_standards.create!(:title => "some standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
+    @assignment = @course.assignments.create!(title: "new assignment")
+    @standard = @course.grading_standards.create!(title: "some standard", standard_data: {a: {name: 'A', value: '95'}, b: {name: 'B', value: '80'}, f: {name: 'F', value: ''}})
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
     f("#assignment_points_possible").clear()
@@ -94,7 +94,7 @@ describe "grading standards" do
     skip_if_safari(:alert)
     course_with_teacher_logged_in
 
-    @standard = @course.grading_standards.create!(:title => "some standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
+    @standard = @course.grading_standards.create!(title: "some standard", standard_data: {a: {name: 'A', value: '95'}, b: {name: 'B', value: '80'}, f: {name: 'F', value: ''}})
 
     get "/courses/#{@course.id}/settings"
     form = f("#course_form")
@@ -138,11 +138,11 @@ describe "grading standards" do
 
   it "should extend ranges to fractional values at the boundary with the next range", priority: "1", test_id: 217597 do
     student = user_factory(active_all: true)
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher_logged_in(active_all: true)
     @course.enroll_student(student).accept!
     @course.update_attribute :grading_standard_id, 0
     @course.assignment_groups.create!
-    @assignment = @course.assignments.create!(:title => "new assignment", :points_possible => 1000, :assignment_group => @course.assignment_groups.first, :grading_type => 'points')
+    @assignment = @course.assignments.create!(title: "new assignment", points_possible: 1000, assignment_group: @course.assignment_groups.first, grading_type: 'points')
     @assignment.grade_student(student, grade: 899, grader: @teacher)
     get "/courses/#{@course.id}/grades/#{student.id}"
     grading_scheme = driver.execute_script "return ENV.grading_scheme"

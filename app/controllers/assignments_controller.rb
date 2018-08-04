@@ -79,6 +79,7 @@ class AssignmentsController < ApplicationController
   def show
     rce_js_env(:highrisk)
     @assignment ||= @context.assignments.find(params[:id])
+    @assignment_presenter = AssignmentPresenter.new(@assignment)
     if @assignment.deleted?
       respond_to do |format|
         flash[:notice] = t 'notices.assignment_delete', "This assignment has been deleted"
@@ -338,7 +339,11 @@ class AssignmentsController < ApplicationController
       ).to_a
       @syllabus_body = syllabus_user_content
 
-      hash = { :CONTEXT_ACTION_SOURCE => :syllabus }
+      hash = {
+        CONTEXT_ACTION_SOURCE: :syllabus,
+        # don't check for student enrollments because we want this to show for the teacher as well
+        STUDENT_PLANNER_ENABLED: @domain_root_account&.feature_enabled?(:student_planner)
+      }
       append_sis_data(hash)
       js_env(hash)
       set_tutorial_js_env
@@ -361,7 +366,7 @@ class AssignmentsController < ApplicationController
 
     respond_to do |format|
       if @assignment && @assignment.send(method)
-        format.json { render :json => @assignment }
+        format.json { render json: @assignment.as_json(methods: :anonymize_students) }
       else
         format.json { render :json => @assignment, :status => :bad_request }
       end

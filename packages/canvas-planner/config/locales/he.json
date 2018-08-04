@@ -113,6 +113,9 @@
   "no_due_dates_assigned_e8f5bac8": {
     "message": "לא הוגדרו תאריכי יעד"
   },
+  "edit_c5fbea07": {
+    "message": "עריכה"
+  },
   "save_11a80ec3": {
     "message": "שמירה "
   },
@@ -124,9 +127,6 @@
   },
   "delete_a6efa79d": {
     "message": "ביטול"
-  },
-  "go_to_dashboard_card_view_10398ef6": {
-    "message": "מעבר לתצוגת כרטיס לוח המחוונים"
   },
   "discussion_6719c51d": {
     "message": "דיון"

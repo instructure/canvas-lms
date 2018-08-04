@@ -48,7 +48,7 @@ describe ConversationsController do
       @course.update_attributes! :enrollment_term => term
 
       get 'index'
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:js_env]).not_to be_nil
     end
 
@@ -57,7 +57,7 @@ describe ConversationsController do
       conversation
 
       get 'index', :format => 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:js_env]).to be_nil
       expect(assigns[:conversations_json].map{|c|c[:id]}).to eq @user.conversations.map(&:conversation_id)
     end
@@ -68,7 +68,7 @@ describe ConversationsController do
       conversation
 
       get 'index', :format => 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:conversations_json].map{|c|c[:id]}).to eq @user.conversations.map(&:conversation_id)
     end
 
@@ -80,7 +80,7 @@ describe ConversationsController do
       @c3.update_attribute :workflow_state, 'archived'
 
       get 'index', params: {:scope => 'sent'}, :format => 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:conversations_json].size).to eql 3
     end
 
@@ -95,7 +95,7 @@ describe ConversationsController do
       @c2 = conversation(:num_other_users => 1, :course => @other_course)
 
       get 'index', params: {:filter => @other_course.asset_string}, :format => 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:conversations_json].size).to eql 1
       expect(assigns[:conversations_json][0][:id]).to eq @c2.conversation_id
     end
@@ -112,19 +112,19 @@ describe ConversationsController do
       @c3 = conversation(:course => @course2)
 
       get 'index', params: {:filter => [@course1.asset_string, @course2.asset_string], :filter_mode => 'or'}, :format => 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:conversations_json].map{|c| c[:id]}.sort).to eql [@c1, @c2, @c3].map(&:conversation_id).sort
 
       get 'index', params: {:filter => [@course2.asset_string, @user.asset_string], :filter_mode => 'or'}, :format => 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:conversations_json].map{|c| c[:id]}.sort).to eql [@c1, @c2, @c3].map(&:conversation_id).sort
 
       get 'index', params: {:filter => [@course2.asset_string, @user.asset_string], :filter_mode => 'and'}, :format => 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:conversations_json].map{|c| c[:id]}.sort).to eql [@c2, @c3].map(&:conversation_id).sort
 
       get 'index', params: {:filter => [@course1.asset_string, @course2.asset_string], :filter_mode => 'and'}, :format => 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:conversations_json]).to eql []
     end
 
@@ -139,7 +139,7 @@ describe ConversationsController do
       @c2 = conversation(:num_other_users => 1, :course => @other_course)
 
       get 'index', params: {:filter => @user.asset_string, :include_all_conversation_ids => 1}, :format => 'json'
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:conversations_json].size).to eql 2
     end
 
@@ -171,13 +171,13 @@ describe ConversationsController do
 
       it "should filter conversations" do
         get 'index', :format => 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:conversations_json].size).to eql 1
       end
 
       it "should filter conversations when returning ids" do
         get 'index', params: {:include_all_conversation_ids => true}, :format => 'json'
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:conversations_json][:conversations].size).to eql 1
         expect(assigns[:conversations_json][:conversation_ids].size).to eql 1
       end
@@ -190,7 +190,7 @@ describe ConversationsController do
         @c1 = conversation
 
         get 'index'
-        expect(response).to be_success
+        expect(response).to be_successful
         @user.reload
         expect(@user.unread_conversations_count).to eq 0
       end
@@ -214,7 +214,7 @@ describe ConversationsController do
 
     it "should assign variables" do
       get 'show', params: {:id => @conversation.conversation_id}, xhr: true
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:conversation]).to eq @conversation
     end
   end
@@ -233,7 +233,7 @@ describe ConversationsController do
       enrollment.workflow_state = 'active'
       enrollment.save
       post 'create', params: { recipients: [new_user.id.to_s], body: "yo" }
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:conversation]).not_to be_nil
     end
 
@@ -247,7 +247,7 @@ describe ConversationsController do
       @course.account.role_overrides.create!(:permission => :send_messages, :role => student_role, :enabled => false)
 
       post 'create', params: { recipients: [new_user.id.to_s], body: "yo", context_code: @course.asset_string }
-      expect(response).to_not be_success
+      expect(response).to_not be_successful
     end
 
     it "should allow sending to instructors even if permissions are disabled" do
@@ -255,7 +255,7 @@ describe ConversationsController do
       @course.account.role_overrides.create!(:permission => :send_messages, :role => student_role, :enabled => false)
 
       post 'create', params: { recipients: [@teacher.id.to_s], body: "yo", context_code: @course.asset_string }
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:conversation]).not_to be_nil
     end
 
@@ -276,7 +276,7 @@ describe ConversationsController do
           user_session(student1)
           post 'create', params: { recipients: [student2.id.to_s], body: "yo", message: "you suck", group_conversation: true,
                course: course1.asset_string, context_code: course1.asset_string }
-          expect(response).to be_success
+          expect(response).to be_successful
         end
 
         course2 = course_factory(active_all: true)
@@ -291,7 +291,7 @@ describe ConversationsController do
 
         post 'create', params: { recipients: [student2.id.to_s], body: "yo again", message: "you still suck", group_conversation: true,
              course: course2.asset_string, context_code: course2.asset_string }
-        expect(response).to be_success
+        expect(response).to be_successful
 
         c = Conversation.where(:context_type => "Course", :context_id => course2).first
         c.conversation_participants.each do |cp|
@@ -309,7 +309,7 @@ describe ConversationsController do
       enrollment.workflow_state = 'active'
       enrollment.save
       post 'create', params: { recipients: [new_user.id.to_s], body: "here's the info", forwarded_message_ids: @conversation.messages.map(&:id) }
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:conversation]).not_to be_nil
       expect(assigns[:conversation].messages.first.forwarded_message_ids).to eql(@conversation.messages.first.id.to_s)
     end
@@ -334,7 +334,7 @@ describe ConversationsController do
       ["1", "true", "yes", "on"].each do |truish|
         it "should create a conversation shared by all recipients if group_conversation=#{truish.inspect}" do
           post 'create', params: { recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: "yo", group_conversation: truish }
-          expect(response).to be_success
+          expect(response).to be_successful
 
           expect(Conversation.count).to eql(@old_count + 1)
         end
@@ -343,7 +343,7 @@ describe ConversationsController do
       [nil, "", "0", "false", "no", "off", "wat"].each do |falsish|
         it "should create one conversation per recipient if group_conversation=#{falsish.inspect}" do
           post 'create', params: { recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: "yo", group_conversation: falsish }
-          expect(response).to be_success
+          expect(response).to be_successful
 
           expect(Conversation.count).to eql(@old_count + 2)
         end
@@ -351,7 +351,7 @@ describe ConversationsController do
 
       it "should set the root account id to the participants for group conversations" do
         post 'create', params: { recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: "yo", group_conversation: "true" }
-        expect(response).to be_success
+        expect(response).to be_successful
 
         json = json_parse(response.body)
         json.each do |conv|
@@ -364,7 +364,7 @@ describe ConversationsController do
 
       it "should set the root account id to the participants for bulk private messages" do
         post 'create', params: { recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: "yo", mode: "sync" }
-        expect(response).to be_success
+        expect(response).to be_successful
 
         json = json_parse(response.body)
         json.each do |conv|
@@ -411,7 +411,7 @@ describe ConversationsController do
 
       post 'create', params: { recipients: [@course2.asset_string + "_students", @group1.asset_string],
                                  body: "yo", group_conversation: true, context_code: @group3.asset_string }
-      expect(response).to be_success
+      expect(response).to be_successful
 
       c = Conversation.first
       expect(c.tags.sort).to eql [@course1.asset_string, @course2.asset_string, @group1.asset_string, @course3.asset_string, @group3.asset_string].sort
@@ -428,7 +428,7 @@ describe ConversationsController do
       enrollment.workflow_state = 'active'
       enrollment.save
       post 'create', params: { recipients: [new_user.id.to_s], body: "yo", subject: "greetings" }
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:conversation].conversation.subject).not_to be_nil
     end
 
@@ -444,7 +444,7 @@ describe ConversationsController do
       enrollment2.workflow_state = 'active'
       enrollment2.save
       post 'create', params: { recipients: [new_user1.id.to_s, new_user2.id.to_s], body: "later", subject: "farewell" }
-      expect(response).to be_success
+      expect(response).to be_successful
       json = json_parse(response.body)
       expect(json.size).to eql 2
       json.each { |c|
@@ -473,7 +473,7 @@ describe ConversationsController do
       conversation(:num_other_users => 2).update_attribute(:workflow_state, "unread")
 
       post 'update', params: {:id => @conversation.conversation_id, :conversation => {:subscribed => "0", :workflow_state => "archived", :starred => "1"}}
-      expect(response).to be_success
+      expect(response).to be_successful
       @conversation.reload
       expect(@conversation.subscribed?).to be_falsey
       expect(@conversation).to be_archived
@@ -490,7 +490,7 @@ describe ConversationsController do
       @conversation.save!
 
       post 'add_message', params: { conversation_id: @conversation.conversation_id, body: "hello world" }
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(@conversation.messages.size).to eq 2
       expect(@conversation.reload.last_message_at).to eql expected_lma
     end
@@ -514,7 +514,7 @@ describe ConversationsController do
       allow_any_instance_of(ConversationParticipant).to receive(:should_process_immediately?).and_return(false)
 
       post 'add_message', params: { conversation_id: @conversation.conversation_id, body: "hello world" }
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(@conversation.reload.messages.count(:all)).to eq 1
       run_jobs
       expect(@conversation.reload.messages.count(:all)).to eq 2
@@ -527,13 +527,13 @@ describe ConversationsController do
       conversation
 
       post 'add_message', params: { conversation_id: @conversation.conversation_id, body: "hello world" }
-      expect(response).to be_success
+      expect(response).to be_successful
       message = @conversation.messages.first # newest message is first
       student = message.recipients.first
       expect(student.user_notes.size).to eq 0
 
       post 'add_message', params: { conversation_id: @conversation.conversation_id, body: "make a note", user_note: 1 }
-      expect(response).to be_success
+      expect(response).to be_successful
       message = @conversation.messages.first
       student = message.recipients.first
       expect(student.user_notes.size).to eq 1
@@ -553,7 +553,7 @@ describe ConversationsController do
       enrollment.workflow_state = 'active'
       enrollment.save
       post 'add_recipients', params: {:conversation_id => @conversation.conversation_id, :recipients => [new_user.id.to_s]}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(@conversation.reload.participants.size).to eq 4 # includes @user
     end
 
@@ -563,7 +563,7 @@ describe ConversationsController do
       2.times{ @group.users << User.create }
 
       post 'add_recipients', params: {:conversation_id => @conversation.conversation_id, :recipients => [@group.asset_string]}
-      expect(response).to be_success
+      expect(response).to be_successful
 
       c = Conversation.first
       expect(c.tags.sort).to eql [@course.asset_string, @group.asset_string]
@@ -579,7 +579,7 @@ describe ConversationsController do
       message = conversation.add_message('another')
 
       post 'remove_messages', params: {:conversation_id => @conversation.conversation_id, :remove => [message.id.to_s]}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(@conversation.messages.size).to eq 1
     end
 
@@ -597,7 +597,7 @@ describe ConversationsController do
       conversation
 
       delete 'destroy', params: {:id => @conversation.conversation_id}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(@user.conversations).to be_blank # the conversation_participant is no longer there
       expect(@conversation.conversation).not_to be_nil # though the conversation is
     end
@@ -627,7 +627,7 @@ describe ConversationsController do
       conversation
       get 'public_feed', params: {:feed_code => @student.feed_code}, :format => 'atom'
       expect(assigns[:entries].length).to eq 1
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should not include messages the user is not a part of" do
@@ -723,7 +723,7 @@ describe ConversationsController do
 
         get 'index', params: {:include_all_conversation_ids => true}, :format => 'json'
 
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:js_env]).to be_nil
         # Should assign :conversations and :conversation_ids in json result
         json = assigns[:conversations_json][:conversations]
@@ -755,7 +755,7 @@ describe ConversationsController do
         users.each do |user|
           user_session(user) # should work for both users
           get 'show', params: {:id => @conversation.global_id}, :format => 'json'
-          expect(response).to be_success
+          expect(response).to be_successful
         end
       end
     end

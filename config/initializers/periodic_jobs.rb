@@ -212,6 +212,10 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(ObserverAlert, :create_assignment_missing_alerts)
   end
 
+  Delayed::Periodic.cron 'LTI::KeyStorage.rotateKeys', '0 0 1 * *', priority: Delayed::LOW_PRIORITY do
+    LTI::KeyStorage.rotateKeys
+  end
+
   Delayed::Periodic.cron 'abandoned job cleanup', '*/10 * * * *' do
     Delayed::Worker::HealthCheck.reschedule_abandoned_jobs
   end

@@ -25,7 +25,7 @@ define([
 ], (React, PropTypes, ReactDOM, { mount }, GradebookSelector) => {
   QUnit.module('GradebookSelector', {
     setup () {
-      this.setLocationStub = this.stub(GradebookSelector.prototype, 'setLocation');
+      this.setLocationStub = sandbox.stub(GradebookSelector.prototype, 'setLocation');
       this.wrapper = mount(
         <GradebookSelector
           courseUrl="http://someUrl/"
@@ -64,8 +64,8 @@ define([
         secondOnClick: PropTypes.func.isRequired,
       };
 
-      this.firstOnClickStub = this.stub();
-      this.secondOnClickStub = this.stub();
+      this.firstOnClickStub = sinon.stub();
+      this.secondOnClickStub = sinon.stub();
       const ICTabsProps = {
         firstOnClick: this.firstOnClickStub,
         secondOnClick: this.secondOnClickStub

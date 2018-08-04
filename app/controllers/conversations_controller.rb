@@ -374,10 +374,12 @@ class ConversationsController < ApplicationController
     return render_error('body', 'blank') if params[:body].blank?
     context_type = nil
     context_id = nil
+    shard = Shard.current
     if params[:context_code].present?
       context = Context.find_by_asset_string(params[:context_code])
       return render_error('context_code', 'invalid') unless valid_context?(context)
 
+      shard = context.shard
       context_type = context.class.name
       context_id = context.id
     end
@@ -398,27 +400,29 @@ class ConversationsController < ApplicationController
       return render_error('recipients', 'too many for group conversation')
     end
 
-    if batch_private_messages || batch_group_messages
-      mode = params[:mode] == 'async' ? :async : :sync
-      batch = ConversationBatch.generate(message, @recipients, mode,
-        subject: params[:subject], context_type: context_type,
-        context_id: context_id, tags: @tags, group: batch_group_messages)
+    shard.activate do
+      if batch_private_messages || batch_group_messages
+        mode = params[:mode] == 'async' ? :async : :sync
+        batch = ConversationBatch.generate(message, @recipients, mode,
+          subject: params[:subject], context_type: context_type,
+          context_id: context_id, tags: @tags, group: batch_group_messages)
 
-      if mode == :async
-        headers['X-Conversation-Batch-Id'] = batch.id.to_s
-        return render :json => [], :status => :accepted
+        if mode == :async
+          headers['X-Conversation-Batch-Id'] = batch.id.to_s
+          return render :json => [], :status => :accepted
+        end
+
+        # reload and preload stuff
+        conversations = ConversationParticipant.where(:id => batch.conversations).preload(:conversation).order("visible_last_authored_at DESC, last_message_at DESC, id DESC")
+        Conversation.preload_participants(conversations.map(&:conversation))
+        ConversationParticipant.preload_latest_messages(conversations, @current_user)
+        visibility_map = infer_visibility(conversations)
+        render :json => conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => visibility_map[c.conversation_id]) }, :status => :created
+      else
+        @conversation = @current_user.initiate_conversation(@recipients, !group_conversation, :subject => params[:subject], :context_type => context_type, :context_id => context_id)
+        @conversation.add_message(message, :tags => @tags, :update_for_sender => false, :cc_author => true)
+        render :json => [conversation_json(@conversation.reload, @current_user, session, :include_indirect_participants => true, :messages => [message])], :status => :created
       end
-
-      # reload and preload stuff
-      conversations = ConversationParticipant.where(:id => batch.conversations).preload(:conversation).order("visible_last_authored_at DESC, last_message_at DESC, id DESC")
-      Conversation.preload_participants(conversations.map(&:conversation))
-      ConversationParticipant.preload_latest_messages(conversations, @current_user)
-      visibility_map = infer_visibility(conversations)
-      render :json => conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => visibility_map[c.conversation_id]) }, :status => :created
-    else
-      @conversation = @current_user.initiate_conversation(@recipients, !group_conversation, :subject => params[:subject], :context_type => context_type, :context_id => context_id)
-      @conversation.add_message(message, :tags => @tags, :update_for_sender => false, :cc_author => true)
-      render :json => [conversation_json(@conversation.reload, @current_user, session, :include_indirect_participants => true, :messages => [message])], :status => :created
     end
   rescue ActiveRecord::RecordInvalid => err
     render :json => err.record.errors, :status => :bad_request

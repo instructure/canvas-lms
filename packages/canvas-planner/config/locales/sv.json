@@ -8,8 +8,17 @@
   "all_items_loaded_aa256183": {
     "message": "Alla objekt inlästa"
   },
+  "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
+    "message": "Ett fel uppstod när möjligheten skulle avvisas."
+  },
+  "announcement_fb4cb645": {
+    "message": "Meddelande"
+  },
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "Är du säker på att du vill ta bort det här Planner-objektet?"
+  },
+  "assignment_976578a8": {
+    "message": "Uppgift"
   },
   "assignmenttype_title_6612d008": {
     "message": "{ assignmentType } { title }."
@@ -31,6 +40,9 @@
   },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Början av din Att göra-historik"
+  },
+  "calendar_event_89aadc1c": {
+    "message": "Kalenderhändelse"
   },
   "canvas_planner_98ed106": {
     "message": "Canvas Planner"
@@ -71,6 +83,12 @@
   "details_98a31b68": {
     "message": "Detaljer"
   },
+  "discussion_6719c51d": {
+    "message": "Diskussion"
+  },
+  "dismiss_itemtitle_a9fae1b3": {
+    "message": "Avvisa { itemTitle }"
+  },
   "dismiss_opportunityname_5995176f": {
     "message": "Avvisa { opportunityName }"
   },
@@ -109,9 +127,6 @@
   },
   "feedback_6dcc1991": {
     "message": "Återkoppling"
-  },
-  "go_to_dashboard_card_view_10398ef6": {
-    "message": "Gå till översikten Kortvy"
   },
   "graded_25cd3fcd": {
     "message": "Omdöme har getts"
@@ -182,17 +197,20 @@
   "nothing_new_needs_attention_3ac548d4": {
     "message": "Inget nytt som kräver uppmärksamhet."
   },
-  "nothing_planned_today_next_item_loaded_5a199868": {
-    "message": "Inget planerat i dag. Nästa objekt har lästs in."
-  },
   "nothing_planned_yet_8675ffe9": {
     "message": "Inget planerat än"
+  },
+  "numpoints_points_8621a43b": {
+    "message": "{ numPoints } poäng"
   },
   "only_most_recent_grading_period_shown_f1ad6458": {
     "message": "*Endast den senaste omdömesperioden visas."
   },
   "optional_add_course_ef0d70fc": {
     "message": "Valfritt: Lägg till kurs"
+  },
+  "page_50c4823d": {
+    "message": "Sida"
   },
   "points_bceb5005": {
     "message": "poäng"
@@ -205,6 +223,9 @@
   },
   "pts_699bd9aa": {
     "message": "poäng"
+  },
+  "quiz_e0dcce8f": {
+    "message": "Quiz"
   },
   "replies_4a8577c8": {
     "message": "Svar"
@@ -241,6 +262,9 @@
   },
   "to_do_1d554f36": {
     "message": "Att göra"
+  },
+  "to_do_items_loading_d1cdfcd5": {
+    "message": "Läser in att göra-objekt"
   },
   "today_76e10f9c": {
     "message": "Idag"

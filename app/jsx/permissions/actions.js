@@ -18,6 +18,7 @@
 import I18n from 'i18n!permissions'
 import {createActions} from 'redux-actions'
 import $ from 'jquery'
+import {ALL_ROLES_VALUE} from './propTypes'
 
 import * as apiClient from './apiClient'
 
@@ -32,6 +33,8 @@ const types = [
   'DISPLAY_ADD_TRAY',
   'DISPLAY_PERMISSION_TRAY',
   'DISPLAY_ROLE_TRAY',
+  'FILTER_DELETED_ROLE',
+  'FILTER_NEW_ROLE',
   'FIX_FOCUS',
   'UPDATE_ROLE',
   'GET_PERMISSIONS_START',
@@ -41,6 +44,7 @@ const types = [
   'UPDATE_PERMISSIONS',
   'UPDATE_PERMISSIONS_SEARCH',
   'UPDATE_ROLE_FILTERS',
+  'UPDATE_SELECTED_ROLES',
   'DELETE_ROLE_SUCCESS'
 ]
 
@@ -62,9 +66,11 @@ actions.searchPermissions = function searchPermissions({permissionSearchString, 
   }
 }
 
-actions.createNewRole = function(label, baseRole) {
+actions.createNewRole = function(label, baseRole, context) {
   return (dispatch, getState) => {
     dispatch(actions.addTraySavingStart())
+    const roleContext = context
+    const selectedRoles = getState().selectedRoles
     apiClient
       .postNewRole(getState(), label, baseRole)
       .then(res => {
@@ -73,6 +79,11 @@ actions.createNewRole = function(label, baseRole) {
         dispatch(actions.addTraySavingSuccess())
         dispatch(actions.hideAllTrays())
         dispatch(actions.displayRoleTray({role: createdRole}))
+        const newSelectedRoles = [...selectedRoles, createdRole]
+        dispatch(
+          actions.updateRoleFilters({selectedRoles: newSelectedRoles, contextType: roleContext})
+        )
+        dispatch(actions.filterNewRole(createdRole))
       })
       .catch(error => {
         dispatch(actions.addTraySavingFail())
@@ -130,7 +141,17 @@ actions.setAndOpenPermissionTray = function(permission) {
 
 actions.filterRoles = function filterRoles({selectedRoles, contextType}) {
   return (dispatch, _getState) => {
-    dispatch(actions.updateRoleFilters({selectedRoles, contextType}))
+    dispatch(actions.updateSelectedRoles(selectedRoles))
+
+    if (selectedRoles.length === 0 || selectedRoles[0].value !== ALL_ROLES_VALUE) {
+      dispatch(actions.updateRoleFilters({selectedRoles, contextType}))
+    }
+  }
+}
+
+actions.filterRemovedRole = function filterRemovedRole(contextType) {
+  return (dispatch, getState) => {
+    dispatch(actions.updateRoleFilters({selectedRoles: getState().selectedRoles, contextType}))
   }
 }
 
@@ -181,11 +202,13 @@ actions.modifyPermissions = function modifyPermissions({
 
 actions.deleteRole = function(role, successCallback, failCallback) {
   return (dispatch, getState) => {
+    const selectedRoles = getState().selectedRoles
     apiClient
       .deleteRole(getState().contextId, role)
       .then(_ => {
         successCallback()
         dispatch(actions.deleteRoleSuccess(role))
+        dispatch(actions.filterDeletedRole({role, selectedRoles}))
         showFlashSuccess(I18n.t('Delete role %{label} succeeded', {label: role.label}))()
       })
       .catch(_error => {

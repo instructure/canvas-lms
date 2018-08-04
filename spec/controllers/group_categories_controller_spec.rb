@@ -36,7 +36,7 @@ describe GroupCategoriesController do
       @group = @course.groups.create(:name => "some groups")
       create_users_in_course(@course, 5) # plus one student in before block
       post 'create', params: {:course_id => @course.id, :category => {:name => "Study Groups", :split_group_count => 2, :split_groups => '1'}}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:group_category]).not_to be_nil
       groups = assigns[:group_category].groups
       expect(groups.length).to eql(2)
@@ -47,7 +47,7 @@ describe GroupCategoriesController do
     it "should give the new groups the right group_category" do
       user_session(@teacher)
       post 'create', params: {:course_id => @course.id, :category => {:name => "Study Groups", :split_group_count => 1, :split_groups => '1'}}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:group_category]).not_to be_nil
       expect(assigns[:group_category].groups[0].group_category.name).to eq "Study Groups"
     end
@@ -55,26 +55,26 @@ describe GroupCategoriesController do
     it "should error if the group name is protected" do
       user_session(@teacher)
       post 'create', params: {:course_id => @course.id, :category => {:name => "Student Groups"}}
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
     end
 
     it "should error if the group name is already in use" do
       user_session(@teacher)
       @course.group_categories.create(:name => "My Category")
       post 'create', params: {:course_id => @course.id, :category => {:name => "My Category"}}
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
     end
 
     it "should require the group name" do
       user_session(@teacher)
       post 'create', params: {:course_id => @course.id, :category => {}}
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
     end
 
     it "should respect enable_self_signup" do
       user_session(@teacher)
       post 'create', params: {:course_id => @course.id, :category => {:name => "Study Groups", :enable_self_signup => '1'}}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:group_category]).not_to be_nil
       expect(assigns[:group_category]).to be_self_signup
       expect(assigns[:group_category]).to be_unrestricted_self_signup
@@ -83,7 +83,7 @@ describe GroupCategoriesController do
     it "should use create_group_count when self-signup" do
       user_session(@teacher)
       post 'create', params: {:course_id => @course.id, :category => {:name => "Study Groups", :enable_self_signup => '1', :create_group_count => '3'}}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:group_category]).not_to be_nil
       expect(assigns[:group_category].groups.size).to eq 3
     end
@@ -91,7 +91,7 @@ describe GroupCategoriesController do
     it "respects auto_leader params" do
       user_session(@teacher)
       post 'create', params: {:course_id => @course.id, :category => {:name => "Study Groups", :enable_auto_leader => '1', :auto_leader_type => 'RANDOM'}}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:group_category]).not_to be_nil
       expect(assigns[:group_category].auto_leader).to eq 'random'
     end
@@ -100,7 +100,7 @@ describe GroupCategoriesController do
       user_session(@teacher)
       Setting.set('max_groups_in_new_category', '5')
       post 'create', params: {:course_id => @course.id, :category => {:name => "Study Groups", :enable_self_signup => '1', :create_group_count => '7'}}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:group_category].groups.size).to eq 5
     end
 
@@ -108,7 +108,7 @@ describe GroupCategoriesController do
       user_session(@teacher)
       create_users_in_course(@course, 3)
       post 'create', params: {:course_id => @course.id, :category => {:name => "Study Groups", :enable_self_signup => '1', :create_category_count => '2'}}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:group_category]).not_to be_nil
       assigns[:group_category].groups.all?{ |g| expect(g.users).to be_empty }
     end
@@ -116,7 +116,7 @@ describe GroupCategoriesController do
     it "should respect restrict_self_signup" do
       user_session(@teacher)
       post 'create', params: {:course_id => @course.id, :category => {:name => "Study Groups", :enable_self_signup => '1', :restrict_self_signup => '1'}}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:group_category]).not_to be_nil
       expect(assigns[:group_category]).to be_restricted_self_signup
     end
@@ -135,7 +135,7 @@ describe GroupCategoriesController do
     it "should update category" do
       user_session(@teacher)
       put 'update', params: {:course_id => @course.id, :id => @group_category.id, :category => {:name => "Different Category", :enable_self_signup => "1"}}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:group_category]).to eql(@group_category)
       expect(assigns[:group_category].name).to eql("Different Category")
       expect(assigns[:group_category]).to be_self_signup
@@ -144,33 +144,33 @@ describe GroupCategoriesController do
     it "should leave the name alone if not given" do
       user_session(@teacher)
       put 'update', params: {:course_id => @course.id, :id => @group_category.id, :category => {}}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:group_category].name).to eq "My Category"
     end
 
     it "should not accept a sent but empty name" do
       user_session(@teacher)
       put 'update', params: {:course_id => @course.id, :id => @group_category.id, :category => {:name => ''}}
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
     end
 
     it "should error if the name is protected" do
       user_session(@teacher)
       put 'update', params: {:course_id => @course.id, :id => @group_category.id, :category => {:name => "Student Groups"}}
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
     end
 
     it "should error if the name is already in use" do
       user_session(@teacher)
       @course.group_categories.create(:name => "Other Category")
       put 'update', params: {:course_id => @course.id, :id => @group_category.id, :category => {:name => "Other Category"}}
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
     end
 
     it "should not error if the name is the current name" do
       user_session(@teacher)
       put 'update', params: {:course_id => @course.id, :id => @group_category.id, :category => {:name => "My Category"}}
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:group_category].name).to eql("My Category")
     end
 
@@ -185,7 +185,7 @@ describe GroupCategoriesController do
 
       user_session(@teacher)
       put 'update', params: {:course_id => @course.id, :id => @group_category.id, :category => {:enable_self_signup => '1', :restrict_self_signup => '1'}}
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
     end
   end
 
@@ -203,7 +203,7 @@ describe GroupCategoriesController do
       @course.groups.create(:name => "some group", :group_category => category1)
       @course.groups.create(:name => "another group", :group_category => category2)
       delete 'destroy', params: {:course_id => @course.id, :id => category1.id}
-      expect(response).to be_success
+      expect(response).to be_successful
       @course.reload
       expect(@course.all_group_categories.length).to eql(2)
       expect(@course.group_categories.length).to eql(1)
@@ -214,13 +214,13 @@ describe GroupCategoriesController do
     it "should fail if category doesn't exist" do
       user_session(@teacher)
       delete 'destroy', params: {:course_id => @course.id, :id => 11235}
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
     end
 
     it "should fail if category is protected" do
       user_session(@teacher)
       delete 'destroy', params: {:course_id => @course.id, :id => GroupCategory.student_organized_for(@course).id}
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
     end
   end
 
@@ -243,7 +243,7 @@ describe GroupCategoriesController do
       get 'users', params: {:course_id => @course.id, :group_category_id => @category.id, include: ['group_submissions']}
       json = JSON.parse(response.body[9,response.body.length])
 
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(json.count).to be_equal 1
       expect(json[0]["group_submissions"][0]).to be_equal @sub.id
     end
@@ -253,7 +253,7 @@ describe GroupCategoriesController do
       get 'users', params: {:course_id => @course.id, :group_category_id => @category.id}
       json = JSON.parse(response.body[9,response.body.length])
 
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(json.count).to be_equal 1
       expect(json[0]["group_submissions"]).to be_equal nil
     end

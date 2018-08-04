@@ -17,8 +17,8 @@
  */
 
 import { canvas } from '@instructure/ui-themes/lib'
-import './support/sinon/sinon-qunit-1.0.0'
 import en_US from 'timezone/en_US'
+import './jsx/spec-support/specProtection'
 
 if (process.env.SENTRY_DSN) {
   // This should allow us to capture more errors rather than just

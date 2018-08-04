@@ -67,9 +67,9 @@ QUnit.module('StudentColumnHeader', {
   setup () {
     this.props = defaultProps({
       props: {
-        addGradebookElement: this.stub(),
-        removeGradebookElement: this.stub(),
-        onMenuDismiss: this.stub()
+        addGradebookElement: sinon.stub(),
+        removeGradebookElement: sinon.stub(),
+        onMenuDismiss: sinon.stub()
       }
     });
     this.wrapper = mountComponent(this.props);
@@ -212,7 +212,7 @@ test('includes a Section MenuItem', function () {
 });
 
 test('calls onSelectSecondaryInfo once', function () {
-  const onSelectSecondaryInfo = this.stub();
+  const onSelectSecondaryInfo = sinon.stub();
   const props = defaultProps({ props: { onSelectSecondaryInfo } });
   const section = findMenuItem.call(this, props, 'Secondary info', 'Section');
   section.simulate('click');
@@ -220,7 +220,7 @@ test('calls onSelectSecondaryInfo once', function () {
 });
 
 test('calls onSelectSecondaryInfo with "section"', function () {
-  const onSelectSecondaryInfo = this.stub();
+  const onSelectSecondaryInfo = sinon.stub();
   const props = defaultProps({ props: { onSelectSecondaryInfo } });
   const section = findMenuItem.call(this, props, 'Secondary info', 'Section');
   section.simulate('click');
@@ -251,7 +251,7 @@ test('includes an SIS ID MenuItem', function () {
 });
 
 test('calls onSelectSecondaryInfo once', function () {
-  const onSelectSecondaryInfo = this.stub();
+  const onSelectSecondaryInfo = sinon.stub();
   const props = defaultProps({ props: { onSelectSecondaryInfo } });
   const SISID = findMenuItem.call(this, props, 'Secondary info', 'SIS ID');
   SISID.simulate('click');
@@ -260,7 +260,7 @@ test('calls onSelectSecondaryInfo once', function () {
 });
 
 test('calls onSelectSecondaryInfo with "sis id"', function () {
-  const onSelectSecondaryInfo = this.stub();
+  const onSelectSecondaryInfo = sinon.stub();
   const props = defaultProps({ props: { onSelectSecondaryInfo } });
   const SISID = findMenuItem.call(this, props, 'Secondary info', 'SIS ID');
   SISID.simulate('click');
@@ -285,7 +285,7 @@ test('includes a Login ID MenuItem', function () {
 });
 
 test('calls onSelectSecondaryInfo once', function () {
-  const onSelectSecondaryInfo = this.stub();
+  const onSelectSecondaryInfo = sinon.stub();
   const props = defaultProps({ props: { onSelectSecondaryInfo } });
   const loginID = findMenuItem.call(this, props, 'Secondary info', 'Login ID');
   loginID.simulate('click');
@@ -294,7 +294,7 @@ test('calls onSelectSecondaryInfo once', function () {
 });
 
 test('calls onSelectSecondaryInfo with "login id"', function () {
-  const onSelectSecondaryInfo = this.stub();
+  const onSelectSecondaryInfo = sinon.stub();
   const props = defaultProps({ props: { onSelectSecondaryInfo } });
   const loginID = findMenuItem.call(this, props, 'Secondary info', 'Login ID');
   loginID.simulate('click');
@@ -319,7 +319,7 @@ test('includes a None MenuItem', function () {
 });
 
 test('calls onSelectSecondaryInfo once', function () {
-  const onSelectSecondaryInfo = this.stub();
+  const onSelectSecondaryInfo = sinon.stub();
   const props = defaultProps({ props: { onSelectSecondaryInfo } });
   const none = findMenuItem.call(this, props, 'Secondary info', 'None');
   none.simulate('click');
@@ -328,7 +328,7 @@ test('calls onSelectSecondaryInfo once', function () {
 });
 
 test('calls onSelectSecondaryInfo with "none"', function () {
-  const onSelectSecondaryInfo = this.stub();
+  const onSelectSecondaryInfo = sinon.stub();
   const props = defaultProps({ props: { onSelectSecondaryInfo } });
   const none = findMenuItem.call(this, props, 'Secondary info', 'None');
   none.simulate('click');
@@ -368,7 +368,7 @@ test('does not select "A–Z" when isSortColumn is false', function () {
 });
 
 test('clicking "A–Z" calls onSortBySortableNameAscending', function () {
-  const onSortBySortableNameAscending = this.stub();
+  const onSortBySortableNameAscending = sinon.stub();
   const props = defaultProps({ sortBySetting: { onSortBySortableNameAscending } });
   findMenuItem.call(this, props, 'Sort by', 'A–Z').simulate('click');
   strictEqual(onSortBySortableNameAscending.callCount, 1);
@@ -398,7 +398,7 @@ test('does not select "Z–A" when isSortColumn is false', function () {
 });
 
 test('clicking "Z–A" calls onSortBySortableNameDescending', function () {
-  const onSortBySortableNameDescending = this.stub();
+  const onSortBySortableNameDescending = sinon.stub();
   const props = defaultProps({ sortBySetting: { onSortBySortableNameDescending } });
   findMenuItem.call(this, props, 'Sort by', 'Z–A').simulate('click');
   strictEqual(onSortBySortableNameDescending.callCount, 1);
@@ -468,28 +468,28 @@ test('includes "Last, First Name"', function () {
 });
 
 test('calls onSelectPrimaryInfo when "First, Last Name" MenuItem is clicked', function () {
-  const onSelectPrimaryInfo = this.stub();
+  const onSelectPrimaryInfo = sinon.stub();
   const props = defaultProps({ props: { onSelectPrimaryInfo } });
   findMenuItem.call(this, props, 'Display as', 'First, Last Name').simulate('click');
   strictEqual(onSelectPrimaryInfo.callCount, 1);
 });
 
 test('calls onSelectPrimaryInfo with "first_last" when "First, Last Name" MenuItem is clicked', function () {
-  const onSelectPrimaryInfo = this.stub();
+  const onSelectPrimaryInfo = sinon.stub();
   const props = defaultProps({ props: { onSelectPrimaryInfo } });
   findMenuItem.call(this, props, 'Display as', 'First, Last Name').simulate('click');
   ok(onSelectPrimaryInfo.calledWithExactly('first_last'));
 });
 
 test('calls onSelectPrimaryInfo when "Last, FirstName" MenuItem is clicked', function () {
-  const onSelectPrimaryInfo = this.stub();
+  const onSelectPrimaryInfo = sinon.stub();
   const props = defaultProps({ props: { onSelectPrimaryInfo } });
   findMenuItem.call(this, props, 'Display as', 'Last, First Name').simulate('click');
   strictEqual(onSelectPrimaryInfo.callCount, 1);
 });
 
 test('calls onSelectPrimaryInfo with "last_first" when "Last, First Name" MenuItem is clicked', function () {
-  const onSelectPrimaryInfo = this.stub();
+  const onSelectPrimaryInfo = sinon.stub();
   const props = defaultProps({ props: { onSelectPrimaryInfo } });
   findMenuItem.call(this, props, 'Display as', 'Last, First Name').simulate('click');
   ok(onSelectPrimaryInfo.calledWithExactly('last_first'));
@@ -538,7 +538,7 @@ test('includes a MenuItem for "Concluded Enrollments"', function () {
 });
 
 test('calls onToggleEnrollmentFilter when "Inactive enrollments" is clicked', function () {
-  const onToggleEnrollmentFilter = this.stub();
+  const onToggleEnrollmentFilter = sinon.stub();
   const props = defaultProps({ props: { onToggleEnrollmentFilter } });
   const menuContent = findMenuContent.call(this, props);
   const menuItemGroups = menuContent.find('MenuItemGroup').map(group => group);
@@ -550,7 +550,7 @@ test('calls onToggleEnrollmentFilter when "Inactive enrollments" is clicked', fu
 });
 
 test('calls onToggleEnrollmentFilter with "inactive" when "Inactive enrollments" is clicked', function () {
-  const onToggleEnrollmentFilter = this.stub();
+  const onToggleEnrollmentFilter = sinon.stub();
   const props = defaultProps({ props: { onToggleEnrollmentFilter } });
   const menuContent = findMenuContent.call(this, props);
   const menuItemGroups = menuContent.find('MenuItemGroup').map(group => group);
@@ -562,7 +562,7 @@ test('calls onToggleEnrollmentFilter with "inactive" when "Inactive enrollments"
 });
 
 test('calls onToggleEnrollmentFilter when "Concuded enrollments" is clicked', function () {
-  const onToggleEnrollmentFilter = this.stub();
+  const onToggleEnrollmentFilter = sinon.stub();
   const props = defaultProps({ props: { onToggleEnrollmentFilter } });
   const menuContent = findMenuContent.call(this, props);
   const menuItemGroups = menuContent.find('MenuItemGroup').map(group => group);
@@ -574,7 +574,7 @@ test('calls onToggleEnrollmentFilter when "Concuded enrollments" is clicked', fu
 });
 
 test('calls onToggleEnrollmentFilter with "concluded" when "Concluded enrollments" is clicked', function () {
-  const onToggleEnrollmentFilter = this.stub();
+  const onToggleEnrollmentFilter = sinon.stub();
   const props = defaultProps({ props: { onToggleEnrollmentFilter } });
   const menuContent = findMenuContent.call(this, props);
   const menuItemGroups = menuContent.find('MenuItemGroup').map(group => group);

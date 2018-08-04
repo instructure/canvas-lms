@@ -38,7 +38,7 @@ describe CalendarEventsController do
     it "should assign variables" do
       user_session(@student)
       get 'show', params: {:course_id => @course.id, :id => @event.id}, :format => :json
-      # response.should be_success
+      # response.should be_successful
       expect(assigns[:event]).not_to be_nil
       expect(assigns[:event]).to eql(@event)
     end

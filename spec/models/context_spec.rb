@@ -220,4 +220,44 @@ describe Context do
       ])
     end
   end
+
+  describe "last_updated_at" do
+    before :once do
+      @course1 = Course.create!(name: "course1", updated_at: 1.year.ago)
+      @course2 = Course.create!(name: "course2", updated_at: 1.day.ago)
+      @user1 = User.create!(name: "user1", updated_at: 1.year.ago)
+      @user2 = User.create!(name: "user2", updated_at: 1.day.ago)
+      @group1 = Account.default.groups.create!(:name => "group1", updated_at: 1.year.ago)
+      @group2 = Account.default.groups.create!(:name => "group2", updated_at: 1.day.ago)
+      @account1 = Account.create!(name: "account1", updated_at: 1.year.ago)
+      @account2 = Account.create!(name: "account2", updated_at: 1.day.ago)
+    end
+
+    it "returns the latest updated_at date for a given set of context ids" do
+      expect(Context.last_updated_at(Course, [@course1.id, @course2.id])).to eq @course2.updated_at
+      expect(Context.last_updated_at(User, [@user1.id, @user2.id])).to eq @user2.updated_at
+      expect(Context.last_updated_at(Group, [@group1.id, @group2.id])).to eq @group2.updated_at
+      expect(Context.last_updated_at(Account, [@account1.id, @account2.id])).to eq @account2.updated_at
+    end
+
+    it "raises an error if the class passed is not a context type" do
+      expect {Context.last_updated_at(Hash, [1])}.to raise_error ArgumentError
+    end
+
+    it "ignores contexts with null updated_at values" do
+      @course2.updated_at = nil
+      @course2.save!
+
+      expect(Context.last_updated_at(Course, [@course1.id, @course2.id])).to eq @course1.updated_at
+    end
+
+    it "returns nil when no updated_at is found for the given contexts" do
+      [@course1, @course2].each do |c|
+        c.updated_at = nil
+        c.save!
+      end
+
+      expect(Context.last_updated_at(Course, [@course1.id, @course2.id])).to be_nil
+    end
+  end
 end

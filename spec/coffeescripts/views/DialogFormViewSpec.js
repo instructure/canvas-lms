@@ -38,7 +38,7 @@ const sendResponse = (method, json) =>
 
 QUnit.module('DialogFormView', {
   setup() {
-    this.closeSpy = this.spy(DialogFormView.prototype, 'close')
+    this.closeSpy = sandbox.spy(DialogFormView.prototype, 'close')
     server = sinon.fakeServer.create()
     model = new Backbone.Model({
       id: 1,

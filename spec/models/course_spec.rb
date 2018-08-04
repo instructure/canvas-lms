@@ -1678,7 +1678,7 @@ describe Course, "gradebook_to_csv" do
 
   it "marks excused assignments" do
     a = @course.assignments.create! name: "asdf", points_possible: 10
-    a.grade_student @student, excuse: true
+    a.grade_student(@student, grader: @teacher, excuse: true)
     csv = CSV.parse(GradebookExporter.new(@course, @teacher).to_csv)
     _name, _id, _section, _sis_login_id, score, _ = csv[-1]
     expect(score).to eq "EX"

@@ -114,14 +114,14 @@ test('renders', function() {
 })
 
 test('tells RCE to manage the parent', function() {
-  const lne = this.stub(RichContentEditor, 'loadNewEditor')
+  const lne = sandbox.stub(RichContentEditor, 'loadNewEditor')
   const view = this.editView()
   view.loadNewEditor()
   ok(lne.firstCall.args[1].manageParent, 'manageParent flag should be set')
 })
 
 test('does not tell RCE to manage the parent of locked content', function() {
-  const lne = this.stub(RichContentEditor, 'loadNewEditor')
+  const lne = sandbox.stub(RichContentEditor, 'loadNewEditor')
   const view = this.editView({lockedItems: {content: true}})
   view.loadNewEditor()
   ok(lne.callCount === 0, 'RCE not called')
@@ -456,7 +456,7 @@ test('conditional release editor is updated on tab change', function() {
   view.renderTabs()
   view.renderGroupCategoryOptions()
   view.loadConditionalRelease()
-  const stub = this.stub(view.conditionalReleaseEditor, 'updateAssignment')
+  const stub = sandbox.stub(view.conditionalReleaseEditor, 'updateAssignment')
   view.$discussionEditView.tabs('option', 'active', 1)
   ok(stub.calledOnce)
   stub.reset()
@@ -470,7 +470,7 @@ test('validates conditional release', function(assert) {
   const resolved = assert.async()
   const view = this.editView({withAssignment: true})
   return defer(() => {
-    const stub = this.stub(view.conditionalReleaseEditor, 'validateBeforeSave').returns('foo')
+    const stub = sandbox.stub(view.conditionalReleaseEditor, 'validateBeforeSave').returns('foo')
     const errors = view.validateBeforeSave(view.getFormData(), {})
     ok(errors.conditional_release === 'foo')
     return resolved()
@@ -489,7 +489,7 @@ test('calls save in conditional release', function(assert) {
       .promise()
     const mockSuper = sinon.mock(EditView.__super__)
     mockSuper.expects('saveFormData').returns(superPromise)
-    const stub = this.stub(view.conditionalReleaseEditor, 'save').returns(crPromise)
+    const stub = sandbox.stub(view.conditionalReleaseEditor, 'save').returns(crPromise)
     const finalPromise = view.saveFormData()
     return finalPromise.then(() => {
       mockSuper.verify()

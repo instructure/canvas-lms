@@ -22,13 +22,13 @@ module GradebooksHelper
   end
 
   def force_anonymous_grading?(assignment)
-    anonymous_survey?(assignment) || assignment.anonymous_grading?
+    anonymous_survey?(assignment) || assignment.anonymize_students?
   end
 
   def force_anonymous_grading_reason(assignment)
     if anonymous_survey?(assignment)
       I18n.t("Student names must be hidden because this is an anonymous survey.")
-    elsif assignment.anonymous_grading?
+    elsif assignment.anonymize_students?
       I18n.t("Student names must be hidden because anonymous grading is required.")
     else
       ""

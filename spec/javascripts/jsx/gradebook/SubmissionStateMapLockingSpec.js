@@ -66,8 +66,8 @@ define([
     strictEqual(state.locked, false);
   });
 
-  test ('submission is locked if anonymous and muted', function() {
-    const assignment = { id: '1', anonymous_grading: true, muted: true };
+  test ('submission is locked if anonymize_students is true', function() {
+    const assignment = { id: '1', anonymize_students: true };
     const map = createAndSetupMap(assignment);
     const state = map.getSubmissionState({ user_id: student.id, assignment_id: assignment.id });
     strictEqual(state.locked, true);

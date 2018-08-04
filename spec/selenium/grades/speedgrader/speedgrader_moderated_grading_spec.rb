@@ -114,7 +114,7 @@ describe "speed grader" do
 
   context "as a moderator" do
     before do
-      course_with_teacher_logged_in(:course => @course, :active_all => true)
+      course_with_teacher_logged_in(course: @course, active_all: true)
       @moderator = @teacher
       @is_moderator = true
     end
@@ -124,7 +124,7 @@ describe "speed grader" do
 
   context "as a provisional grader" do
     before do
-      course_with_ta_logged_in(:course => @course, :active_all => true)
+      course_with_ta_logged_in(course: @course, active_all: true)
       @is_moderator = false
     end
 
@@ -140,7 +140,7 @@ describe "speed grader" do
     end
 
     it "should lock a provisional grader out if graded by someone else" do
-      other_ta = course_with_ta(:course => @course, :active_all => true).user
+      other_ta = course_with_ta(course: @course, active_all: true).user
       @assignment.moderation_graders.create!(user: other_ta, anonymous_id: '12345')
       @submission.find_or_create_provisional_grade!(other_ta, score: 7)
 
@@ -149,7 +149,7 @@ describe "speed grader" do
     end
 
     it "should lock a provisional grader out if graded by someone else while switching students" do
-      other_ta = course_with_ta(:course => @course, :active_all => true).user
+      other_ta = course_with_ta(course: @course, active_all: true).user
       original_sub = @submission
       student_submission
 
@@ -178,7 +178,7 @@ describe "speed grader" do
 
     it "should not lock a provisional grader out if someone else graded but more grader slots are available" do
       @assignment.update_attribute :grader_count, 2
-      other_ta = course_with_ta(:course => @course, :active_all => true).user
+      other_ta = course_with_ta(course: @course, active_all: true).user
       @assignment.moderation_graders.create!(user: other_ta, anonymous_id: '12345')
       @submission.find_or_create_provisional_grade!(other_ta, score: 7)
 
@@ -189,7 +189,7 @@ describe "speed grader" do
 
     it "should not lock a provisional grader out if someone else graded but grader is final grader" do
       @assignment.update_attribute :final_grader, @ta
-      other_ta = course_with_ta(:course => @course, :active_all => true).user
+      other_ta = course_with_ta(course: @course, active_all: true).user
       @assignment.moderation_graders.create!(user: other_ta, anonymous_id: '12345')
       @submission.find_or_create_provisional_grade!(other_ta, score: 7)
 

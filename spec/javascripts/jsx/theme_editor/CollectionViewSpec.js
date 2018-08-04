@@ -73,7 +73,7 @@ define([
       'returns explicit values from the brand config'
     )
 
-    this.spy(c, 'brandVariableValue')
+    sandbox.spy(c, 'brandVariableValue')
     const config = {variables: {}}
     equal(
       c.brandVariableValue(config, 'otherFoo'),
@@ -96,7 +96,7 @@ define([
     // chrome doesn't let you stub window.sessionStorage.removeItem so we just have to check manually
     window.sessionStorage.setItem('sharedBrandConfigBeingEdited', 'blah')
 
-    this.stub(jQuery.fn, 'submit') // prevent reloading the page :(
+    sandbox.stub(jQuery.fn, 'submit') // prevent reloading the page :(
     new CollectionView(props).startEditing({md5ToActivate: 'junk2c3d4e5f67890a1b2c3d4e5f6789'})
     equal(window.sessionStorage.getItem('sharedBrandConfigBeingEdited'), null,
       'removes sharedBrandConfigBeingEdited from session store'
@@ -105,7 +105,7 @@ define([
 
   test('startEditing: working on existing saved theme',  function () {
     window.sessionStorage.removeItem('sharedBrandConfigBeingEdited')
-    this.stub(jQuery.fn, 'submit') // prevent reloading the page :(
+    sandbox.stub(jQuery.fn, 'submit') // prevent reloading the page :(
 
     new CollectionView(props).startEditing({
       mdd5ToActivate: 'junk2c3d4e5f67890a1b2c3d4e5f6789',
@@ -118,7 +118,7 @@ define([
 
   test('deteteSharedBrandConfig', function () {
     const id = 'abc123'
-    this.mock(jQuery).expects('ajaxJSON').withArgs(`/api/v1/shared_brand_configs/${id}`, 'DELETE')
+    sandbox.mock(jQuery).expects('ajaxJSON').withArgs(`/api/v1/shared_brand_configs/${id}`, 'DELETE')
     const c = new CollectionView(props)
     c.deleteSharedBrandConfig(id)
   })
