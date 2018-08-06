@@ -59,6 +59,21 @@ it("shows spinner when loading", () => {
 })
 
 describe("Pagination Handling", () => {
+  it('can handle lots of pages', () => {
+    const props = getProps()
+    props.collection.links.last.page = '1000'
+    const wrapper = mount(<SearchMessage {...props} />)
+
+    const buttons2 = wrapper.find('PaginationButton').map(x => x.text())
+    expect(buttons2).toEqual(['1', '4', '5', '6', '7', '8', '1,000'])
+
+    wrapper.find('button[aria-label="Page 1,000"]').simulate('click')
+    wrapper.setProps({}) // Make sure it triggers componentWillReceiveProps
+
+    const buttons = wrapper.find('PaginationButton').map(x => x.text())
+    expect(buttons).toEqual(['1', '4', '5', '6', '7', '8', '1,000'])
+  })
+
   it("shows the loading spinner on the page that is becoming current", () => {
     const props = getProps();
     const wrapper = mount(<SearchMessage {...props} />);
@@ -74,7 +89,7 @@ describe("Pagination Handling", () => {
     delete props.collection.links.last;
     props.collection.links.next = { url: "next", page: "2" };
     wrapper.setProps(props);
-    expect(wrapper.state().lastUnknown).toBe(true);
+    expect(wrapper.instance().isLastPageUnknown()).toBe(true);
   })
 
   it("sets state to lastUnknown false if there is a last link", () => {
@@ -84,6 +99,6 @@ describe("Pagination Handling", () => {
     props.collection.links.next = { url: "next", page: "2" };
     wrapper.setProps(props);
     wrapper.setProps(getProps());
-    expect(wrapper.state().lastUnknown).toBe(false);
+    expect(wrapper.instance().isLastPageUnknown()).toBe(false);
   })
 });
