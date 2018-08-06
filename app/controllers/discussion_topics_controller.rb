@@ -380,15 +380,8 @@ class DiscussionTopicsController < ApplicationController
         end
 
         grant_create_rights = @context.discussion_topics.temp_record.grants_right?(@current_user, session, :create)
-
-        # rescind rights to create discussions if the term, course and section are ended
-        if @context.any_date_open?
-          create_discussions = grant_create_rights
-        elsif @context.is_a?(Group) && @context.context.is_a?(Account)
-          create_discussions = grant_create_rights
-        else
-          create_discussions = false
-        end
+        # rescind rights to create discussions if the term is ended
+        create_discussions =  DiscussionTopic.term_ended(@context) ? false : grant_create_rights
 
         hash = {
           USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),

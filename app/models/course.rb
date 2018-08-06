@@ -1551,26 +1551,6 @@ class Course < ActiveRecord::Base
     self.restrict_enrollments_to_course_dates = true
   end
 
-  def any_date_open?
-    course_open? || one_section_open? || term_open?
-  end
-
-  def course_open?
-    self.end_at.blank? || Time.now.utc < self.end_at
-  end
-
-  def one_section_open?
-    one_section_open = false
-    self.course_sections.each do |section|
-      one_section_open = section.end_at.present? && Time.now.utc < section.end_at
-    end
-    one_section_open
-  end
-
-  def term_open?
-    self.enrollment_term.end_at.blank? || Time.now.utc < self.enrollment_term.end_at
-  end
-
   def concluded?(enrollment_type = nil)
     completed? || soft_concluded?(enrollment_type)
   end
