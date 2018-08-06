@@ -379,15 +379,11 @@ class DiscussionTopicsController < ApplicationController
           js_env openTopics: open_topics, lockedTopics: locked_topics, newTopicURL: named_context_url(@context, :new_context_discussion_topic_url)
         end
 
-        grant_create_rights = @context.discussion_topics.temp_record.grants_right?(@current_user, session, :create)
-        # rescind rights to create discussions if the term is ended
-        create_discussions =  DiscussionTopic.term_ended(@context) ? false : grant_create_rights
-
         hash = {
           USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),
           totalDiscussions: scope.count,
           permissions: {
-            create: create_discussions,
+            create: @context.discussion_topics.temp_record.grants_right?(@current_user, session, :create),
             moderate: user_can_moderate,
             change_settings: user_can_edit_course_settings?,
             manage_content: @context.grants_right?(@current_user, session, :manage_content),
@@ -1078,11 +1074,6 @@ class DiscussionTopicsController < ApplicationController
 
   def process_discussion_topic_runner(is_new = false)
     @errors = {}
-
-    if DiscussionTopic.term_ended(@context)
-      @errors[:term_dates] = t('The term has ended for this course')
-    end
-
     model_type = if value_to_boolean(params[:is_announcement]) &&
         @context.announcements.temp_record.grants_right?(@current_user, session, :create)
                     :announcements
