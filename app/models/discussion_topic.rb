@@ -1461,10 +1461,6 @@ class DiscussionTopic < ActiveRecord::Base
     end.compact
   end
 
-  def self.term_ended(context)
-    context.is_a?(Course) && !context.enrollment_term.end_at.nil? && Time.now.utc > context.enrollment_term.end_at
-  end
-
   def initial_post_required?(user, session=nil)
     if require_initial_post?
       associated_user_ids = user.observer_enrollments.active.where(course_id: self.course).pluck(:associated_user_id).compact
