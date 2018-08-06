@@ -209,32 +209,6 @@ class Group < ActiveRecord::Base
     end
   end
 
-  def any_date_open?
-    course_open? || one_section_open? || term_open?
-  end
-
-  def course_open?
-    if self.context.present? && self.context.is_a?(Course)
-      self.context.end_at.blank? || Time.now.utc < self.context.end_at
-    end
-  end
-
-  def one_section_open?
-    one_section_open = false
-    if self.context.present? && self.context.is_a?(Course)
-      self.context.course_sections.each do |section|
-        one_section_open = section.end_at.present? && Time.now.utc < section.end_at
-      end
-    end
-    one_section_open
-  end
-
-  def term_open?
-    if self.context.present? && self.context.is_a?(Course)
-      self.context.enrollment_term.end_at.blank? || Time.now.utc < self.context.enrollment_term.end_at
-    end
-  end
-
   def appointment_context_codes
     {:primary => [context_string], :secondary => [group_category.asset_string]}
   end
