@@ -51,9 +51,7 @@ export default class CoursesListRow extends React.Component {
   static defaultProps = {
     roles: [],
     can_create_enrollments:
-      window.ENV &&
-      window.ENV.PERMISSIONS &&
-      window.ENV.PERMISSIONS.can_create_enrollments
+      window.ENV && window.ENV.PERMISSIONS && window.ENV.PERMISSIONS.can_create_enrollments
   }
 
   constructor(props) {
@@ -67,7 +65,9 @@ export default class CoursesListRow extends React.Component {
 
   getSections = () =>
     this.promiseToGetSections ||
-    (this.promiseToGetSections = get(`/api/v1/courses/${this.props.id}/sections?per_page=100`)).then(resp => resp.data)
+    (this.promiseToGetSections = get(
+      `/api/v1/courses/${this.props.id}/sections?per_page=100`
+    )).then(resp => resp.data)
 
   uniqueTeachers = () => uniqBy(this.props.teachers, 'id')
 
@@ -142,13 +142,13 @@ export default class CoursesListRow extends React.Component {
     return (
       <tr>
         <th scope="row">
-        {isPublished && (
-          <Tooltip tip={I18n.t('Published')}>
-            <span className="published-status published">
-              <i className="icon-publish" />
-            </span>
-          </Tooltip>
-        )}
+          {isPublished && (
+            <Tooltip tip={I18n.t('Published')}>
+              <span className="published-status published">
+                <i className="icon-publish" />
+              </span>
+            </Tooltip>
+          )}
         </th>
         <td>
           <a href={url}>
@@ -167,13 +167,13 @@ export default class CoursesListRow extends React.Component {
         <td>
           {(teachersToShow || []).map(teacher => (
             <div>
-            <UserLink
-              key={teacher.id}
-              href={teacher.html_url}
-              name={teacher.display_name}
-              avatar_url={teacher.avatar_image_url}
-              size="x-small"
-            />
+              <UserLink
+                key={teacher.id}
+                href={teacher.html_url}
+                name={teacher.display_name}
+                avatar_url={teacher.avatar_image_url}
+                size="x-small"
+              />
             </div>
           ))}
           {teachers.length > 2 &&

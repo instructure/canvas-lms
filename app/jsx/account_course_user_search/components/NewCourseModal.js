@@ -102,7 +102,7 @@ export default class NewCourseModal extends React.Component {
           size="small"
           label={I18n.t('Add a New Course')}
         >
-          <form onSubmit={preventDefault(this.onSubmit)} style={{margin:0}}>
+          <form onSubmit={preventDefault(this.onSubmit)} style={{margin: 0}}>
             <ModalBody>
               <FormFieldGroup layout="stacked" rowSpacing="small" description="">
                 <TextInput
@@ -142,9 +142,7 @@ export default class NewCourseModal extends React.Component {
                       {term.name}
                     </option>
                   ))}
-                  {terms.loading && (
-                    <option disabled>{I18n.t('Loading more terms...')}</option>
-                  )}
+                  {terms.loading && <option disabled>{I18n.t('Loading more terms...')}</option>}
                 </Select>
               </FormFieldGroup>
             </ModalBody>

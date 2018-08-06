@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import Pagination, {PaginationButton} from '@instructure/ui-pagination/lib/components/Pagination'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import { array, func, string, shape, oneOf } from 'prop-types'
+import {array, func, string, shape, oneOf} from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
 import View from '@instructure/ui-layout/lib/components/View'
 
@@ -28,13 +28,11 @@ const linkPropType = shape({
   page: string.isRequired
 }).isRequired
 
-
 export default class SearchMessage extends Component {
-
   static propTypes = {
     collection: shape({
       data: array.isRequired,
-      links: shape({ current: linkPropType })
+      links: shape({current: linkPropType})
     }).isRequired,
     setPage: func.isRequired,
     noneFoundMessage: string.isRequired,
@@ -43,7 +41,7 @@ export default class SearchMessage extends Component {
   }
 
   static defaultProps = {
-    getLiveAlertRegion () {
+    getLiveAlertRegion() {
       return document.getElementById('flash_screenreader_holder')
     }
   }
@@ -58,7 +56,7 @@ export default class SearchMessage extends Component {
     }
   }
 
-  handleSetPage = (page) => {
+  handleSetPage = page => {
     this.setState({pageBecomingCurrent: page}, () => this.props.setPage(page))
   }
 
@@ -100,16 +98,16 @@ export default class SearchMessage extends Component {
     )
   }
 
-  render () {
-    const { collection, noneFoundMessage } = this.props
-    const errorLoadingMessage = I18n.t('There was an error with your query; please try a different search')
+  render() {
+    const {collection, noneFoundMessage} = this.props
+    const errorLoadingMessage = I18n.t(
+      'There was an error with your query; please try a different search'
+    )
 
     if (collection.error) {
       return (
         <div className="text-center pad-box">
-          <div className="alert alert-error">
-            {errorLoadingMessage}
-          </div>
+          <div className="alert alert-error">{errorLoadingMessage}</div>
         </div>
       )
     } else if (collection.loading) {
@@ -155,7 +153,7 @@ export default class SearchMessage extends Component {
         </Pagination>
       )
     } else {
-      return (<div />)
+      return <div />
     }
   }
 }
