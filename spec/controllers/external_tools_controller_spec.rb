@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../lti_1_3_spec_helper')
 
 describe ExternalToolsController do
   include ExternalToolsSpecHelper
@@ -96,6 +97,8 @@ describe ExternalToolsController do
 
   describe "GET 'show'" do
     context 'resource link request' do
+      include_context 'lti_1_3_spec_helper'
+
       let(:tool) do
         tool = @course.context_external_tools.new(
           name: "bob",

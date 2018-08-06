@@ -14,20 +14,19 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/spec_helper.rb')
 
-describe Lti::RSAKeyPair do
-  describe "initialize" do
-    it 'generates a public key of default size 2048' do
-      keys = Lti::RSAKeyPair.new
-      expect(/\d+/.match(keys.public_key.to_text())[0]).to eq "2048"
-    end
+RSpec.shared_context "lti_1_3_spec_helper", shared_context: :metadata do
+  let(:fallback_proxy) do
+    Canvas::DynamicSettings::FallbackProxy.new({
+      Lti::KeyStorage::PAST => Lti::RSAKeyPair.new.to_jwk.to_json,
+      Lti::KeyStorage::PRESENT => Lti::RSAKeyPair.new.to_jwk.to_json,
+      Lti::KeyStorage::FUTURE => Lti::RSAKeyPair.new.to_jwk.to_json
+    })
+  end
 
-    it 'generates a private key of default size 2048' do
-      keys = Lti::RSAKeyPair.new
-      expect(/\d+/.match(keys.private_key.to_text())[0]).to eq "2048"
-    end
+  before do
+    allow(Canvas::DynamicSettings).to receive(:kv_proxy).and_return(fallback_proxy)
   end
 end

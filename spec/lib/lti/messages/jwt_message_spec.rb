@@ -15,9 +15,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../../../lti_1_3_spec_helper')
 
 describe Lti::Messages::JwtMessage do
+  include_context 'lti_1_3_spec_helper'
+
   let(:return_url) { 'http://www.platform.com/return_url' }
   let(:user) { @student }
   let(:opts) { { resource_type: 'course_navigation' } }
@@ -69,7 +71,12 @@ describe Lti::Messages::JwtMessage do
 
   let(:decoded_jwt) do
     jws = jwt_message.generate_post_payload
-    JSON::JWT.decode(jws[:id_token], :skip_verification)
+    JSON::JWT.decode(jws[:id_token], pub_key)
+  end
+
+  let(:pub_key) do
+    jwk = JSON::JWK.new(Lti::KeyStorage.retrieve_keys['jwk-present.json'])
+    jwk.to_key.public_key
   end
 
   let_once(:course) do
@@ -79,37 +86,57 @@ describe Lti::Messages::JwtMessage do
 
   let_once(:assignment) { assignment_model(course: course) }
 
-  xdescribe '#add_security_claims!' do
-    it 'sets the "aud" claim' do
+  describe 'signing' do
+    it 'signs the id token with the current canvas private key' do
+      jws = jwt_message.generate_post_payload
+
+      expect do
+        JSON::JWT.decode(jws[:id_token], pub_key)
+      end.not_to raise_exception
+    end
+  end
+
+  describe 'security claims' do
+    xit 'sets the "aud" claim' do
       expect(decoded_jwt.aud).to eq ''
     end
 
-    it 'sets the "azp" claim' do
+    xit 'sets the "azp" claim' do
       expect(decoded_jwt.azp).to eq ''
     end
 
-    it 'sets the "deployment_id" claim' do
+    xit 'sets the "deployment_id" claim' do
       expect(decoded_jwt.deployment_id).to eq ''
     end
 
-    it 'sets the "exp" claim' do
-      expect(decoded_jwt.exp).to eq ''
+    it 'sets the "exp" claim to lti.oauth2.access_token.exp' do
+      Timecop.freeze do
+        expect(decoded_jwt['exp']).to eq Setting.get('lti.oauth2.access_token.exp', 1.hour).to_i.seconds.from_now.to_i
+      end
     end
 
-    it 'sets the "iat" claim' do
-      expect(decoded_jwt.iat).to eq ''
+    it 'sets the "iat" claim to the current time' do
+      Timecop.freeze do
+        expect(decoded_jwt['iat']).to eq Time.zone.now.to_i
+      end
     end
 
-    it 'sets the "iss" claim' do
-      expect(decoded_jwt.iss).to eq ''
+    it 'sets the "iss" to "https://canvas.instructure.com"' do
+      config = "test:\n  lti_iss: 'https://canvas.instructure.com'"
+      allow(Canvas::Security).to receive(:config).and_return(YAML.safe_load(config)[Rails.env])
+      expect(decoded_jwt['iss']).to eq 'https://canvas.instructure.com'
     end
 
-    it 'sets the "nonce" claim' do
-      expect(decoded_jwt.nonce).to eq ''
+    it 'sets the "nonce" claim to a unique ID' do
+      first_nonce = decoded_jwt['nonce']
+      jws = jwt_message.generate_post_payload
+      second_nonce = JSON::JWT.decode(jws[:id_token], pub_key)['nonce']
+
+      expect(first_nonce).not_to eq second_nonce
     end
 
     it 'sets the "sub" claim' do
-      expect(decoded_jwt.sub).to eq ''
+      expect(decoded_jwt['sub']).to eq user.lti_context_id
     end
   end
 
@@ -314,7 +341,7 @@ describe Lti::Messages::JwtMessage do
 
         let(:account_jwt) do
           jws = account_jwt_message.generate_post_payload
-          JSON::JWT.decode(jws[:id_token], :skip_verification)
+          JSON::JWT.decode(jws[:id_token], pub_key)
         end
 
         it 'adds the canvas account id' do

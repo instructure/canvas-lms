@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../lti_1_3_spec_helper')
 
 describe ApplicationController do
 
@@ -545,6 +546,8 @@ describe ApplicationController do
         end
 
         describe 'LTI 1.3' do
+          include_context 'lti_1_3_spec_helper'
+
           before do
             tool.settings['use_1_3'] = true
             tool.save!

@@ -40,19 +40,18 @@ module Lti::Messages
       add_private_claims!
 
       @expander.expand_variables!(@message.extensions)
-      { id_token: @message.to_jws(OpenSSL::PKey::RSA.new(1024)) }
+      { id_token: @message.to_jws(Lti::KeyStorage.present_key) }
     end
 
     private
 
     def add_security_claims!
-      @message.aud = 'TODO: aud'
-      @message.azp = 'TODO: azp'
-      @message.deployment_id = 'TODO: deployment id'
-      @message.exp = 'TODO: exp'
+      @message.aud = "TODO: Client ID"
+      @message.deployment_id = 'TODO: Deployment ID'
+      @message.exp = Setting.get('lti.oauth2.access_token.exp', 1.hour).to_i.seconds.from_now.to_i
       @message.iat = Time.zone.now.to_i
-      @message.iss = 'TODO: iss'
-      @message.nonce = 'TODO: nonce'
+      @message.iss = Canvas::Security.config['lti_iss']
+      @message.nonce = SecureRandom.uuid
       @message.sub = Lti::Asset.opaque_identifier_for(@user)
     end
 
