@@ -4,11 +4,13 @@ production:
   port: 8500
   ssl: true
   acl_token: "xxxxxxxx-yyyy-zzzz-1111-222222222222"
+  global_dc: "localhost"
 test:
   environment: "test"
   host: test.domain
   port: 8500
   ssl: false
+  global_dc: "localhost"
 development:
   environment: "dev"
   host: dev.domain
