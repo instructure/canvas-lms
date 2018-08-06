@@ -18,32 +18,18 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import TabList, { TabPanel, Tab } from '@instructure/ui-tabs/lib/components/TabList'
+import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleDetails'
+import View from '@instructure/ui-layout/lib/components/View'
 import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
+import IconMiniArrowDown from '@instructure/ui-icons/lib/Solid/IconMiniArrowDown'
+import IconMiniArrowEnd from '@instructure/ui-icons/lib/Solid/IconMiniArrowEnd'
 import classNames from 'classnames'
 import I18n from 'i18n!cyoe_assignment_sidebar'
 import {transformScore} from '../../shared/conditional_release/score'
 import { assignmentShape, studentShape } from '../shapes/index'
 import StudentRange from './student-range'
 
-  const { array, func, object } = PropTypes
-
-  const tabsTheme = {
-    [Tab.theme]: {
-      accordionBackgroundColor: '#f7f7f7',
-      accordionBackgroundColorSelected: '#f7f7f7',
-      accordionBackgroundColorHover: '#e7e7e7',
-      accordionTextColor: '#000000',
-      accordionTextColorSelected: '#000000',
-
-      spacingSmall: '10px',
-      spacingExtraSmall: '12px',
-    },
-
-    [TabPanel.theme]: {
-      borderColor: 'transparent',
-    },
-  }
+const { array, func, object } = PropTypes
 
 export default class StudentRangesView extends React.Component {
     static propTypes = {
@@ -53,22 +39,42 @@ export default class StudentRangesView extends React.Component {
       student: studentShape,
 
       // actions
-      selectStudent: func.isRequired,
-      selectRange: func.isRequired,
+      selectStudent: func.isRequired
+    }
+
+    constructor (props) {
+      super()
+      this.state = {selectedRange: props.selectedPath.range}
+    }
+
+    handleToggle = (i) => {
+      this.setState({selectedRange: i})
     }
 
     renderTabs () {
       return this.props.ranges.map((range, i) => {
+        const expanded = this.state.selectedRange === i
         const lower = transformScore(range.scoring_range.lower_bound, this.props.assignment, false)
         const upper = transformScore(range.scoring_range.upper_bound, this.props.assignment, true)
         const rangeTitle = `> ${lower} - ${upper}`
         return (
-          <TabPanel key={i} title={rangeTitle}>
-            <StudentRange
-              range={range}
-              onStudentSelect={this.props.selectStudent}
-             />
-          </TabPanel>
+          <View as='div' padding='xxx-small'>
+            <ToggleDetails
+              variant='filled'
+              key={i}
+              expanded={expanded}
+              summary={rangeTitle}
+              onToggle={() => this.handleToggle(i)}
+              size='large'
+              iconExpanded={IconMiniArrowDown}
+              icon={IconMiniArrowEnd}
+            >
+              <StudentRange
+                range={range}
+                onStudentSelect={this.props.selectStudent}
+               />
+            </ToggleDetails>
+          </View>
         )
       })
     }
@@ -85,11 +91,7 @@ export default class StudentRangesView extends React.Component {
           <header className='crs-ranges-view__header'>
             <h4>{I18n.t('Mastery Paths Breakdown')}</h4>
           </header>
-          <ApplyTheme theme={tabsTheme}>
-            <TabList variant='accordion' selectedIndex={this.props.selectedPath.range} onChange={this.props.selectRange}>
-              {this.renderTabs()}
-            </TabList>
-          </ApplyTheme>
+            {this.renderTabs()}
         </div>
       )
     }
