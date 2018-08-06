@@ -81,7 +81,17 @@ module Api::V1::Course
   #
   def course_json(course, user, session, includes, enrollments)
     if includes.include?('access_restricted_by_date') && enrollments && enrollments.all?(&:inactive?)
-      return {'id' => course.id, 'access_restricted_by_date' => true}
+      schoo_admin = AccountUser
+        .where(role: Role.find_by(name: 'AccountAdmin'))
+        .where(user: @current_user)
+        .where(account: Account.default).first
+
+      return {'id' => course.id, 'access_restricted_by_date' => true} unless
+        Account.site_admin.users.any? { |admin_user| admin_user == @current_user } ||
+        school_admin ||
+        course.admins.include?(@current_user) ||
+        course.teachers.include?(@current_user) ||
+        course.tas.include?(@current_user)
     end
 
     Api::V1::CourseJson.to_hash(course, user, includes, enrollments) do |builder, allowed_attributes, methods, permissions_to_include|
