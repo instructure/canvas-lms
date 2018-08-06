@@ -242,46 +242,54 @@ describe "assignment groups" do
     expect(ags.collect(&:position)).to eq [1,3,2,4,5]
   end
 
-  it "should allow quick-adding an assignment to a group", priority: "1", test_id: 210083 do
-    @course.require_assignment_group
-    ag = @course.assignment_groups.first
-    time = DateTime.new(Time.now.year,2,7,4,15)
-    Timecop.freeze(time) do
-      current_time = format_time_for_view(time)
-      assignment_name, assignment_points = ["Do this", "13"]
+  context 'quick-adding an assignment to a group' do
+    let(:assignment_group) { @course.assignment_groups.first }
+    let(:assignment_name) { "Do this" }
+    let(:assignment_points) { "13" }
+    let(:time) {Time.zone.local(2018,2,7,4,15)}
+    let(:current_time) {format_time_for_view(time)}
 
-      # Navigates to assignments index page.
-      get "/courses/#{@course.id}/assignments"
-      wait_for_ajaximations
+    before :each do
+      @course.require_assignment_group
 
-      # Finds and clicks the Add Assignment button on an assignment group.
-      f("#assignment_group_#{ag.id} .add_assignment").click
-      wait_for_ajaximations
+      Timecop.freeze(time) do
+        # Navigate to assignments index page.
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
 
-      # Enters in values for Name, Due, and Points, then clicks save.
-      replace_content(f("#ag_#{ag.id}_assignment_name"), assignment_name)
-      replace_content(f("#ag_#{ag.id}_assignment_due_at"), current_time)
-      replace_content(f("#ag_#{ag.id}_assignment_points"), assignment_points)
-      fj('.create_assignment:visible').click
-      wait_for_ajaximations
-      refresh_page
+        # Finds and click the Add Assignment button on an assignment group.
+        f("#assignment_group_#{assignment_group.id} .add_assignment").click
+        wait_for_ajaximations
 
-      # Checks for correct values in back end.
-      a = ag.reload.assignments.last
-      expect(a.name).to eq "Do this"
-      expect(a.due_at).to eq time
-      expect(a.points_possible).to eq 13
+        # Enter in values for Name, Due, and Points, then clicks save.
+        replace_content(f("#ag_#{assignment_group.id}_assignment_name"), assignment_name)
+        replace_content(f("#ag_#{assignment_group.id}_assignment_due_at"), current_time)
+        replace_content(f("#ag_#{assignment_group.id}_assignment_points"), assignment_points)
+        fj('.create_assignment:visible').click
+        wait_for_ajaximations
+      end
+    end
 
-      # Checks Assignments Index page UI for correct values.
-      expect(ff("#assignment_group_#{ag.id} .ig-title").last.text).to match assignment_name.to_s
-      expect(ff("#assignment_group_#{ag.id} .assignment-date-due").last.text).to match current_time
-      expect(f("#assignment_#{a.id} .non-screenreader").text).to match "#{assignment_points} pts"
+    it 'persisted the correct values of the assignment', priority: '1', test_id: 210083 do
+      assignment = assignment_group.reload.assignments.last
+      expect(assignment.name).to eq "Do this"
+      # Frontend automatically changes selected time to include 59 seconds
+      expect(assignment.due_at).to eq time.change({ sec: 59 })
+    end
 
+    it 'reflects the new assignment in the Assignments Index page', priority: '1', test_id: 210083 do
+      assignment = assignment_group.reload.assignments.last
+      expect(ff("#assignment_group_#{assignment_group.id} .ig-title").last.text).to match assignment_name.to_s
+      expect(ff("#assignment_group_#{assignment_group.id} .assignment-date-due").last.text).to match current_time
+      expect(f("#assignment_#{assignment.id} .non-screenreader").text).to match "#{assignment_points} pts"
+    end
+
+    it 'reflects the new assignment in the Assignment Show page', priority: '1', test_id: 210083 do
+      assignment = assignment_group.reload.assignments.last
       # Navigates to Assignment Show page.
-      get "/courses/#{@course.id}/assignments/#{a.id}"
+      get "/courses/#{@course.id}/assignments/#{assignment.id}"
       wait_for_ajaximations
 
-      # Checks Assignment Show page for correct values.
       expect(f(".title").text).to match assignment_name.to_s
       expect(f(".points_possible").text).to match assignment_points.to_s
       expect(f(".assignment_dates").text).to match current_time.to_s

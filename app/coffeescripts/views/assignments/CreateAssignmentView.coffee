@@ -70,7 +70,7 @@ define [
     getFormData: =>
       data = super
       unfudged = $.unfudgeDateForProfileTimezone(data.due_at)
-      data.due_at = unfudged.toISOString() if unfudged?
+      data.due_at = @_getDueAt(unfudged) if unfudged?
       data.published = true if @shouldPublish
       data.points_possible = numberHelper.parse(data.points_possible)
       return data
@@ -203,10 +203,30 @@ define [
         ]
       errors
 
+    _getDueAt: (dueAt) ->
+      # The UI doesn't allow settings seconds to 59, but when a new assignment
+      # is created, the seconds are set to 59. Thus, to avoid issues where
+      # the date is edited after creation, we set seconds to 59 behind the
+      # scenes here. However, to ensure that we don't fudge with specifically
+      # set seconds value through the assignments api, if the date is not
+      # changed in the UI form, we keep the previous seconds value.
+      if @_dueAtHasChanged(dueAt.toISOString())
+        dueAt.setSeconds(59)
+      else
+        dueAt.setSeconds(new Date(@model.dueAt()).getSeconds())
+
+      dueAt.toISOString()
+
     _dueAtHasChanged: (dueAt) =>
-      originalDueAt = new Date(@model.dueAt()).getTime()
-      newDueAt = new Date(dueAt).getTime()
-      originalDueAt != newDueAt
+      originalDueAt = new Date(@model.dueAt())
+      newDueAt = new Date(dueAt)
+
+      # Since a user can't edit the seconds field in the UI and the form also
+      # thinks that the seconds is always set to 00, we compare by everything
+      # except seconds.
+      originalDueAt.setSeconds(0)
+      newDueAt.setSeconds(0)
+      originalDueAt.getTime() != newDueAt.getTime()
 
     _validateDueDate: (data, errors) ->
       return errors unless data.due_at

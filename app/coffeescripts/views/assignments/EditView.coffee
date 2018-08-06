@@ -379,6 +379,36 @@ define [
       keyboardShortcutsView.render().$el.insertBefore($(".rte_switch_views_link:first"))
 
     # -- Data for Submitting --
+    _dueAtHasChanged: (dueAt) =>
+      originalDueAt = new Date(@model.dueAt())
+      newDueAt = new Date(dueAt)
+
+      # Since a user can't edit the seconds field in the UI and the form also
+      # thinks that the seconds is always set to 00, we compare by everything
+      # except seconds.
+      originalDueAt.setSeconds(0)
+      newDueAt.setSeconds(0)
+      originalDueAt.getTime() != newDueAt.getTime()
+
+    _getDueAt: (defaultDates) ->
+      # The UI doesn't allow settings seconds to 59, but when a new assignment
+      # is created, the seconds are set to 59. Thus, to avoid issues where
+      # the date is edited after creation, we set seconds to 59 behind the
+      # scenes here. However, to ensure that we don't fudge with specifically
+      # set seconds value through the assignments api, if the date is not
+      # changed in the UI form, we keep the previous seconds value.
+      date = defaultDates?.get('due_at')
+      return null unless date
+
+      due_at = new Date(date)
+
+      if @_dueAtHasChanged(date)
+        due_at.setSeconds(59)
+      else
+        due_at.setSeconds(new Date(@model.dueAt()).getSeconds())
+
+      due_at.toISOString()
+
     getFormData: =>
       data = super
       data = @_inferSubmissionTypes data
@@ -392,7 +422,7 @@ define [
       defaultDates = @dueDateOverrideView.getDefaultDueDate()
       data.lock_at = defaultDates?.get('lock_at') or null
       data.unlock_at = defaultDates?.get('unlock_at') or null
-      data.due_at = defaultDates?.get('due_at') or null
+      data.due_at = @_getDueAt(defaultDates)
       data.only_visible_to_overrides = !@dueDateOverrideView.overridesContainDefault()
       data.assignment_overrides = @dueDateOverrideView.getOverrides()
       data.published = true if @shouldPublish
