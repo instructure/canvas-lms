@@ -141,6 +141,28 @@ class RoleOverride < ActiveRecord::Base
         :restrict_future_enrollments => true,
         :applies_to_concluded => ['TeacherEnrollment', 'TaEnrollment']
       },
+      :create_forum => {
+        :label => lambda { t("Create new discussions") },
+        :label_v2 => lambda { t("Discussions - create") },
+        :available_to => [
+          'StudentEnrollment',
+          'TaEnrollment',
+          'DesignerEnrollment',
+          'TeacherEnrollment',
+          'TeacherlessStudentEnrollment',
+          'ObserverEnrollment',
+          'AccountAdmin',
+          'AccountMembership'
+        ],
+        :true_for => [
+          'StudentEnrollment',
+          'TaEnrollment',
+          'DesignerEnrollment',
+          'TeacherEnrollment',
+          'AccountAdmin'
+        ],
+        :restrict_future_enrollments => true
+      },
       :moderate_forum => {
         :label => lambda { t('permissions.moderate_form', "Moderate discussions ( delete / edit other's posts, lock topics)") },
         :label_v2 => lambda { t("Discussions - moderate") },

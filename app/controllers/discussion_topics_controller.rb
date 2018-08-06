@@ -1074,6 +1074,7 @@ class DiscussionTopicsController < ApplicationController
 
   def process_discussion_topic_runner(is_new = false)
     @errors = {}
+
     model_type = if value_to_boolean(params[:is_announcement]) &&
         @context.announcements.temp_record.grants_right?(@current_user, session, :create)
                     :announcements
