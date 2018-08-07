@@ -1922,7 +1922,7 @@ class Submission < ActiveRecord::Base
   end
 
   def moderated_grading_whitelist(current_user = self.user, loaded_attachments: nil)
-    return [] unless assignment.moderated_grading? && current_user.present?
+    return nil unless assignment.moderated_grading? && current_user.present?
 
     has_crocodoc = (loaded_attachments || attachments).any?(&:crocodoc_available?)
     moderation_whitelist_for_user(current_user).map do |user|
