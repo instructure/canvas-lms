@@ -5,6 +5,7 @@ Bullet.unused_eager_loading_enable = false
 Bullet.counter_cache_enable = false
 
 Bullet.rails_logger = true
+Bullet.raise = true
 Bullet.stacktrace_excludes = [
   # chains to root_topic, but it should be cached fairly often, so we don't want
   # to unnecessarily preload
