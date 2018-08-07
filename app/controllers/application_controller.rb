@@ -2402,7 +2402,9 @@ class ApplicationController < ActionController::Base
         analytics: @account.service_enabled?(:analytics),
         can_masquerade: @account.grants_right?(@current_user, session, :become_user),
         can_message_users: @account.grants_right?(@current_user, session, :send_messages),
-        can_edit_users: @account.grants_any_right?(@current_user, session, :manage_students, :manage_user_logins)
+        can_edit_users: @account.grants_any_right?(@current_user, session, :manage_students, :manage_user_logins),
+        can_manage_groups: @account.grants_right?(@current_user, session, :manage_groups),           # access to view user groups?
+        can_manage_admin_users: @account.grants_right?(@current_user, session, :manage_admin_users)  # access to manage user avatars page?
       }
     })
     render html: '', layout: true

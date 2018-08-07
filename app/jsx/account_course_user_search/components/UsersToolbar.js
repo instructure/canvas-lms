@@ -89,24 +89,39 @@ export default function UsersToolbar(props) {
               </Button>
             </CreateOrUpdateUserModal>
           )}{' '}
-          <Menu
-            trigger={
-              <Button theme={{iconPlusTextMargin: '0'}}>
-                <IconMoreLine margin="0" title={I18n.t('More People Options')} />
-              </Button>
-            }
-          >
-            <MenuItem onClick={() => window.location = `/accounts/${props.accountId}/avatars`}>
-              <IconStudentViewLine /> {I18n.t('Manage profile pictures')}
-            </MenuItem>
-            <MenuItem onClick={() => window.location = `/accounts/${props.accountId}/groups`}>
-              <IconGroupLine /> {I18n.t('View user groups')}
-            </MenuItem>
-          </Menu>
+          {renderKabobMenu(props.accountId)}
         </GridCol>
       </FormFieldGroup>
     </form>
   )
+}
+
+function renderKabobMenu(accountId) {
+  const showAvatarItem = ENV.PERMISSIONS.can_manage_admin_users // see accounts_controller#avatars
+  const showGroupsItem = ENV.PERMISSIONS.can_manage_groups      // see groups_controller#context_index
+  if (showAvatarItem || showGroupsItem) {
+    return (
+      <Menu
+        trigger={
+          <Button theme={{iconPlusTextMargin: '0'}}>
+            <IconMoreLine margin="0" title={I18n.t('More People Options')} />
+          </Button>
+        }
+      >
+        {showAvatarItem && (
+          <MenuItem onClick={() => window.location = `/accounts/${accountId}/avatars`}>
+            <IconStudentViewLine /> {I18n.t('Manage profile pictures')}
+          </MenuItem>
+        )}
+        {showGroupsItem && (
+          <MenuItem onClick={() => window.location = `/accounts/${accountId}/groups`}>
+            <IconGroupLine /> {I18n.t('View user groups')}
+          </MenuItem>
+        )}
+      </Menu>
+    )
+  }
+  return null
 }
 
 UsersToolbar.propTypes = {
