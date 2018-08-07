@@ -154,7 +154,12 @@ export default class AnnouncementsIndex extends Component {
         onClick={this.selectPage(page)}
         current={page === this.props.announcementsPage}
       >
+      <ScreenReaderContent>
+        {I18n.t('Page %{pageNum}', {pageNum: page})}
+      </ScreenReaderContent>
+      <span aria-hidden="true">
         {page}
+      </span>
       </PaginationButton>
     )
   }
