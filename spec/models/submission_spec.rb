@@ -3741,15 +3741,15 @@ describe Submission do
 
     let(:user_ids_in_whitelist) { whitelist.map { |user| user.fetch(:global_id)&.to_i } }
 
-    it 'returns an empty array when the assignment is not moderated' do
+    it 'returns nil when the assignment is not moderated' do
       # Skipping validations here because they'd prevent turning off Moderated Grading
       # for an assignment with graded submissions.
       @assignment.update_column(:moderated_grading, false)
-      expect(@submission.moderated_grading_whitelist).to eq []
+      expect(@submission.moderated_grading_whitelist).to be_nil
     end
 
-    it 'returns an empty array when the user is not present' do
-      expect(@submission.moderated_grading_whitelist(nil)).to eq []
+    it 'returns nil when the user is not present' do
+      expect(@submission.moderated_grading_whitelist(nil)).to be_nil
     end
 
     it 'returns an empty array when the user is not permitted to view annotations for the submission' do
