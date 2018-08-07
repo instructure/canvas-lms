@@ -194,14 +194,16 @@ import Toolbar from '../files/Toolbar'
         </div>
         <div className='ef-footer grid-row'>
           {userCanManageFilesForContext && (
-            <FilesUsage
-              className='col-xs-4'
-              contextType={contextType}
-              contextId={contextId}
-            />
+            <div className='col-xs-6'>
+              <FilesUsage
+                className='col-xs-4'
+                contextType={contextType}
+                contextId={contextId}
+               />
+            </div>
           )}
           {(!filesEnv.showingAllContexts) && (
-            <div className='col-xs'>
+            <div className='col-xs-6'>
               <div>
                 <a className='pull-right' href='/files'>
                   {I18n.t('All My Files')}
