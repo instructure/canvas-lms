@@ -1624,3 +1624,43 @@ module TableRename
 end
 
 ActiveRecord::ConnectionAdapters::SchemaCache.prepend(TableRename)
+
+
+if CANVAS_RAILS5_1
+  module EnforceRawSqlWhitelist
+    COLUMN_NAME_ORDER_WHITELIST = /
+        \A
+        (?:\w+\.)?
+        \w+
+        (?:\s+asc|\s+desc)?
+        (?:\s+nulls\s+(?:first|last))?
+        \z
+      /ix
+
+    def enforce_raw_sql_whitelist(args, whitelist: COLUMN_NAME_WHITELIST) # :nodoc:
+      unexpected = args.reject do |arg|
+        arg.kind_of?(Arel::Node) ||
+          arg.is_a?(Arel::Nodes::SqlLiteral) ||
+          arg.is_a?(Arel::Attributes::Attribute) ||
+          arg.to_s.split(/\s*,\s*/).all? { |part| whitelist.match?(part) }
+      end
+
+      return if unexpected.none?
+
+      raise(
+            "Query method called with non-attribute argument(s): " +
+              unexpected.map(&:inspect).join(", ")
+      )
+    end
+
+    def validate_order_args(order_args)
+      enforce_raw_sql_whitelist(
+        order_args.flat_map { |a| a.is_a?(Hash) ? a.keys : a },
+        whitelist: COLUMN_NAME_ORDER_WHITELIST
+      )
+      super
+    end
+  end
+
+  ActiveRecord::Relation.prepend(EnforceRawSqlWhitelist)
+end
