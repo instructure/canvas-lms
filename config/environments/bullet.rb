@@ -6,6 +6,9 @@ Bullet.counter_cache_enable = false
 
 Bullet.rails_logger = true
 Bullet.stacktrace_excludes = [
+  # chains to root_topic, but it should be cached fairly often, so we don't want
+  # to unnecessarily preload
+  ['app/models/discussion_topic.rb', 'low_level_locked_for?'],
   # impossible to know what should be preloaded ahead-of-time, and we only process
   # messages one-at-a-time anyway
   ['app/models/message.rb', 'infer_defaults'],

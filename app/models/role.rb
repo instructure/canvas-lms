@@ -35,10 +35,10 @@ class Role < ActiveRecord::Base
   module AssociationHelper
     # this is an override to take advantage of built-in role caching since those are by far the most common
     def role
-      self.association(:role).target ||= self.shard.activate do
+      return super if association(:role).loaded?
+      self.role = self.shard.activate do
         Role.get_role_by_id(read_attribute(:role_id)) || (self.respond_to?(:default_role) ? self.default_role : nil)
       end
-      super
     end
 
     def role=(role)

@@ -31,7 +31,7 @@ module Api::V1::Role
       :permissions => {}
     }
 
-    json[:account] = account_json(role.account, current_user, session, []) if role.account
+    json[:account] = account_json(role.account, current_user, session, []) if role.account_id
 
     RoleOverride.manageable_permissions(account).keys.each do |permission|
       perm = RoleOverride.permission_for(account, permission, role, account)

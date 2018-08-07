@@ -25,6 +25,11 @@ module Api::V1::Assignment
   include SubmittablesGradingPeriodProtection
   include Api::V1::PlannerOverride
 
+  PRELOADS = [:external_tool_tag,
+              :duplicate_of,
+              :rubric,
+              :rubric_association].freeze
+
   API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS = {
     :only => %w(
       id

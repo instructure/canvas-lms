@@ -550,7 +550,8 @@ class ContextModuleItemsApiController < ApplicationController
     else
       assignment_ids = response[:body]['assignments'].map {|a| a['assignment_id'].try(&:to_i) }
       # assignment occurs in delayed job, may not be fully visible to user until job completes
-      assignments = @context.assignments.published.where(id: assignment_ids)
+      assignments = @context.assignments.published.where(id: assignment_ids).
+        preload(Api::V1::Assignment::PRELOADS)
 
       Assignment.preload_context_module_tags(assignments)
 

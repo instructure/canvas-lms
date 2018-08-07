@@ -91,7 +91,7 @@ describe UsersController, type: :request do
         @assignment.update_attribute(:due_at, 1.week.from_now)
         @assignment.update_attribute(:due_at, 2.weeks.from_now)
         # manually set the pre-datafixup state for one of them
-        val = StreamItem.where(:asset_type => "Message", :id => @user.visible_stream_item_instances.map(&:stream_item)).
+        val = StreamItem.where(:asset_type => "Message", :id => @user.visible_stream_item_instances.map(&:stream_item_id)).
           limit(1).update_all(:notification_category => nil)
       end
       json = api_call(:get, "/api/v1/users/self/activity_stream/summary.json",

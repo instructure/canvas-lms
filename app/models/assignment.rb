@@ -1527,7 +1527,7 @@ class Assignment < ActiveRecord::Base
 
     ensure_grader_can_adjudicate(grader: opts[:grader], provisional: opts[:provisional]) do
       if grade_group_students
-        find_or_create_submissions(students, Submission.preload(:grading_period)) do |submission|
+        find_or_create_submissions(students, Submission.preload(:grading_period, :stream_item)) do |submission|
           submissions << save_grade_to_submission(submission, original_student, group, opts)
         end
       else

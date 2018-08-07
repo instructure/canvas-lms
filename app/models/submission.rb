@@ -2399,6 +2399,7 @@ class Submission < ActiveRecord::Base
             submissions.each { |s| graded_user_ids << s.user_id }
             submission = submissions.first
           end
+          submission.user = user
 
           assessment = user_data[:rubric_assessment]
           if assessment.is_a?(Hash) && assignment.rubric_association
