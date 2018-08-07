@@ -257,21 +257,19 @@ class WikiPagesApiController < ApplicationController
       scope = WikiPage.search_by_attribute(scope, :title, params[:search_term])
 
       order_clause = case params[:sort]
-        when 'title'
-          WikiPage.title_order_by_clause
-        when 'created_at'
-          'wiki_pages.created_at'
-        when 'updated_at'
-          'wiki_pages.updated_at'
-        when 'todo_date'
-          'wiki_pages.todo_date'
-      end
+                     when 'title'
+                       WikiPage.title_order_by_clause
+                     when 'created_at',
+                       'updated_at',
+                       'todo_date'
+                       params[:sort].to_sym
+                     end
       if order_clause
-        order_clause += ' DESC' if params[:order] == 'desc'
-        scope = scope.order(WikiPage.send(:sanitize_sql, order_clause))
+        order_clause = { order_clause => :desc } if params[:order] == 'desc'
+        scope = scope.order(order_clause)
       end
-      id_clause = "wiki_pages.id"
-      id_clause += ' DESC' if params[:order] == 'desc'
+      id_clause = :id
+      id_clause = { id: :desc } if params[:order] == 'desc'
       scope = scope.order(id_clause)
 
       wiki_pages = Api.paginate(scope, self, pages_route)

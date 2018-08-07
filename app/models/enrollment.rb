@@ -1269,7 +1269,7 @@ class Enrollment < ActiveRecord::Base
     raise "top_enrollment_by_user must be scoped" unless all.where_clause.present?
 
     key = key.to_s
-    order("#{key}, #{type_rank_sql(rank_order)}").distinct_on(key)
+    order(Arel.sql("#{key}, #{type_rank_sql(rank_order)}")).distinct_on(key)
   end
 
   def assign_uuid

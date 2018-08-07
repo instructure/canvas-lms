@@ -96,7 +96,7 @@ class AnnouncementsApiController < ApplicationController
     @start_date ||= 14.days.ago.beginning_of_day
     @end_date ||= @start_date + 28.days
     scope = scope.where('COALESCE(delayed_post_at, posted_at, created_at) BETWEEN ? AND ?', @start_date, @end_date)
-    scope = scope.order('COALESCE(delayed_post_at, posted_at, created_at) DESC')
+    scope = scope.order(Arel.sql('COALESCE(delayed_post_at, posted_at, created_at) DESC'))
 
     @topics = Api.paginate(scope, self, api_v1_announcements_url)
 

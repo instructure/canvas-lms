@@ -26,7 +26,7 @@ class TermsController < ApplicationController
     @context.default_enrollment_term
     @terms = @context.enrollment_terms.active.
       preload(:enrollment_dates_overrides).
-      order("COALESCE(start_at, created_at) DESC").to_a
+      order(Arel.sql("COALESCE(start_at, created_at) DESC")).to_a
     @course_counts_by_term = EnrollmentTerm.course_counts(@terms)
   end
 
