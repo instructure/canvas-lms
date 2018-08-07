@@ -332,7 +332,7 @@ class AccountsController < ApplicationController
         ).select("accounts.id").distinct.pluck(:id).map{|id| Shard.global_id_for(id)}
       end
       course_accounts = BookmarkedCollection.wrap(Account::Bookmarker, Account.where(:id => account_ids))
-      @accounts = Api.paginate(course_accounts, self, api_v1_accounts_url)
+      @accounts = Api.paginate(course_accounts, self, api_v1_course_accounts_url)
     else
       @accounts = []
     end
