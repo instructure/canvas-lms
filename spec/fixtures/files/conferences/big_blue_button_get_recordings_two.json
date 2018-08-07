@@ -23,7 +23,7 @@
         {
           "type": "presentation",
           "url": "https://bbb.blah.com/instructure/18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031612456/presentation/",
-          "length": "0",
+          "length": "2",
           "preview": {
             "images":
             [
@@ -36,7 +36,7 @@
         {
           "type": "video",
           "url": "https://bbb.blah.com/instructure/18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031612456/capture/",
-          "length": "0"
+          "length": "2"
         }
       ]
     },
@@ -61,7 +61,7 @@
         {
           "type": "presentation",
           "url": "https://bbb.blah.com/instructure/18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031142256/presentation/",
-          "length": "0",
+          "length": "2",
           "preview": {
             "images":
             [
@@ -74,7 +74,7 @@
         {
           "type": "video",
           "url": "https://bbb.blah.com/instructure/18974fe54920ac60ba913e34f49e4a9dabfeea2c-1513031142256/capture/",
-          "length": "0"
+          "length": "2"
         }
       ]
     }

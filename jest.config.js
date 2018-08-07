@@ -18,6 +18,9 @@ module.exports = {
   testMatch: [
     '**/__tests__/**/?(*.)(spec|test).js'
   ],
+
+  coverageDirectory: '<rootDir>/coverage-jest/',
+
   transform: {
     '^i18n': '<rootDir>/jest/i18nTransformer.js',
     '^.+\\.jsx?$': 'babel-jest'

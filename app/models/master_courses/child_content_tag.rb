@@ -32,6 +32,7 @@ class MasterCourses::ChildContentTag < ActiveRecord::Base
                                      :learning_outcome,
                                      :learning_outcome_group,
                                      :rubric,
+                                     :wiki,
                                      :wiki_page,
                                      quiz: 'Quizzes::Quiz'
   ]
@@ -42,6 +43,6 @@ class MasterCourses::ChildContentTag < ActiveRecord::Base
   before_create :set_migration_id
 
   def set_migration_id
-    self.migration_id ||= content.migration_id
+    self.migration_id ||= content.migration_id if content.respond_to?(:migration_id)
   end
 end

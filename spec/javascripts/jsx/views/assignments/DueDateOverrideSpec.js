@@ -17,7 +17,9 @@
  */
 
 import $ from 'jquery';
+import DateValidator from 'compiled/util/DateValidator';
 import DueDateOverrideView from 'compiled/views/assignments/DueDateOverride';
+import fakeENV from 'helpers/fakeENV'
 import StudentGroupStore from 'jsx/due_dates/StudentGroupStore';
 import 'jquery.instructure_forms';  // errorBox
 
@@ -83,3 +85,71 @@ test('Does not date restrict individual student overrides', function () {
     const errs = view.validateGroupOverrides(data, {});
     strictEqual(errs.invalidGroupOverride, undefined);
 });
+
+QUnit.module('DueDateOverride#validateDatetimes', () => {
+  test('skips overrides whose row key has already been validated', () => {
+    const overrides = [
+      { rowKey: '1', student_ids: [1] },
+      { rowKey: '1', student_ids: [1] }
+    ]
+    const data = { assignment_overrides: overrides }
+
+    const validateSpy = sinon.spy(DateValidator.prototype, 'validateDatetimes')
+    const view = new DueDateOverrideView()
+    sinon.stub(view, 'postToSIS').returns(false)
+
+    view.validateDatetimes(data, {})
+
+    strictEqual(validateSpy.callCount, 1)
+    validateSpy.restore()
+  })
+
+  QUnit.module('when a valid date range is specified', (hooks) => {
+    hooks.beforeEach(() => {
+      const start_at = {
+        date: new Date('Nov 10, 2018').toISOString(),
+        date_context: 'course'
+      }
+      const end_at = {
+        date: new Date('Nov 20, 2018').toISOString(),
+        date_context: 'course'
+      }
+
+      fakeENV.setup({
+        VALID_DATE_RANGE: {start_at, end_at}
+      })
+    })
+
+    hooks.afterEach(() => {
+      fakeENV.teardown()
+    })
+
+    test('allows dates for individual students to fall outside of the specified date range', () => {
+      const dueDate = new Date('Nov 30, 2018').toISOString()
+      const overrides = [
+        { rowKey: '1', student_ids: [1], due_at: dueDate }
+      ]
+      const data = { assignment_overrides: overrides }
+
+      const view = new DueDateOverrideView()
+      sinon.stub(view, 'postToSIS').returns(false)
+
+      const errors = view.validateDatetimes(data, {})
+      strictEqual(Object.keys(errors).length, 0)
+    })
+
+    test('requires non-individual-student overrides to be within specified date range', () => {
+      const dueDate = new Date('Nov 30, 2018').toISOString()
+      const overrides = [
+        { rowKey: '1', course_section_id: '1', due_at: dueDate }
+      ]
+      const data = { assignment_overrides: overrides }
+
+      const view = new DueDateOverrideView()
+      sinon.stub(view, 'postToSIS').returns(false)
+
+      const errors = view.validateDatetimes(data, {})
+      strictEqual(errors.due_at.message, 'Due date cannot be after course end')
+    })
+  })
+})

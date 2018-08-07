@@ -160,21 +160,6 @@ describe DiscussionTopicsController, type: :request do
   include Api::V1::User
   include AvatarHelper
 
-  it 'does not update topics when course is concluded' do
-    term = @course.account.enrollment_terms.create!(:name => 'mew', :end_at => Time.now.utc - 1.minute)
-    @course.enrollment_term = term
-    @course.save!
-    @topic = @course.discussion_topics.create
-    api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-             {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param,
-              :topic_id => @topic.to_param, :course => @course},
-             {:title => "meow",
-              :message => "purrr",
-              :discussion_type => "threaded"})
-
-    expect(response).to have_http_status 401
-  end
-
   context 'locked api item' do
     include_examples 'a locked api item'
 

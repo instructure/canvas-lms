@@ -20,6 +20,40 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe 'Moderated Grades API', type: :request do
+  shared_examples 'assignment moderation permissions' do
+    it 'is unauthorized when the user is neither the final grader nor an admin' do
+      user_session(@teacher)
+      raw_api_call(api_method, api_url, api_params, api_body_params)
+      expect(response.status).to eq 401
+    end
+
+    it 'is authorized when the user is the final grader' do
+      @assignment.update!(final_grader: @teacher)
+      user_session(@teacher)
+      raw_api_call(api_method, api_url, api_params, api_body_params)
+      expect(response).to be_success
+    end
+
+    it 'is authorized when the user is an admin with the "select final grade" permission' do
+      admin = account_admin_user(account: @course.root_account)
+      user_session(admin)
+      raw_api_call(api_method, api_url, api_params, api_body_params)
+      expect(response).to be_success
+    end
+
+    it 'is unauthorized when the user is an admin without the "select final grade" permission' do
+      admin = account_admin_user(account: @course.root_account)
+      @course.root_account.role_overrides.create!(
+        role: admin_role,
+        permission: 'select_final_grade',
+        enabled: false
+      )
+      user_session(admin)
+      raw_api_call(api_method, api_url, api_params, api_body_params)
+      expect(response.status).to eq 401
+    end
+  end
+
   before :once do
     course_with_teacher active_all: true
     sec1 = @course.course_sections.create!(:name => "section 1")
@@ -35,38 +69,53 @@ describe 'Moderated Grades API', type: :request do
     @user = @teacher
   end
 
-  before :each do
-    user_session @teacher
-  end
-
   describe '#index' do
+    let(:index_params) do
+      {
+        controller: 'moderation_set',
+        action: 'index',
+        format: 'json',
+        course_id: @course.id,
+        assignment_id: @assignment.id
+      }
+    end
+
+    let(:index_url) { "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/moderated_students" }
+
     it 'returns moderated_grading_selections' do
-      json = api_call :get,
-        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/moderated_students",
-      {controller: 'moderation_set', action: 'index',
-       format: 'json', course_id: @course.id, assignment_id: @assignment.id}
-      expect(response).to be_success
+      @assignment.update!(final_grader: @teacher)
+      user_session(@teacher)
+      json = api_call(:get, index_url, index_params)
       expect(json.size).to eq 3
       expect(json.first["id"]).to eq @student1.id
     end
 
-    it 'requires moderate_grades permissions' do
-      @user = @student1
-      raw_api_call :get,
-        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/moderated_students",
-      {controller: 'moderation_set', action: 'index',
-       format: 'json', course_id: @course.id, assignment_id: @assignment.id}
-      expect(response.status).to eq 401
+    it_behaves_like 'assignment moderation permissions' do
+      let(:api_body_params) { {} }
+      let(:api_method) { :get }
+      let(:api_params) { index_params }
+      let(:api_url) { index_url }
     end
   end
 
   describe 'POST create' do
+    let(:create_params) do
+      {
+        controller: 'moderation_set',
+        action: 'create',
+        format: 'json',
+        course_id: @course.id,
+        assignment_id: @assignment.id
+      }
+    end
+
+    let(:create_url) { "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/moderated_students" }
+
     context 'when no student_ids are passed in' do
       before(:each) do
-        @parsed_json = api_call :post,
-          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/moderated_students",
-          {controller: 'moderation_set', action: 'create',
-            format: 'json', course_id: @course.id, assignment_id: @assignment.id}, {}, {}
+        @assignment.update!(final_grader: @teacher)
+        user_session @teacher
+        @parsed_json = api_call(:post, create_url, create_params, {}, {})
       end
 
       it 'responds with a bad request' do
@@ -79,24 +128,18 @@ describe 'Moderated Grades API', type: :request do
     end
 
     it "creates student selections" do
-      json = api_call :post,
-        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/moderated_students",
-        {controller: 'moderation_set', action: 'create',
-         format: 'json', course_id: @course.id, assignment_id: @assignment.id},
-        student_ids: [@student2.id]
-
+      @assignment.update!(final_grader: @teacher)
+      user_session(@teacher)
+      json = api_call(:post, create_url, create_params, student_ids: [@student2.id])
       expect(response).to be_success
       expect(json.size).to eq 1
       expect(json.first["id"]).to eq @student2.id
     end
 
     it "doesn't make duplicate selections" do
-      json = api_call :post,
-        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/moderated_students",
-        {controller: 'moderation_set', action: 'create',
-         format: 'json', course_id: @course.id, assignment_id: @assignment.id},
-        student_ids: [@student1.id, @student2.id]
-
+      @assignment.update!(final_grader: @teacher)
+      user_session(@teacher)
+      json = api_call(:post, create_url, create_params, student_ids: [@student1.id, @student2.id])
       expect(response).to be_success
       expect(json.size).to eq 2
       json_student_ids = json.map { |user| user['id'] }
@@ -105,24 +148,18 @@ describe 'Moderated Grades API', type: :request do
     end
 
     it "creates a single selection for students in multiple sections" do
-      json = api_call :post,
-        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/moderated_students",
-        {controller: 'moderation_set', action: 'create',
-         format: 'json', course_id: @course.id, assignment_id: @assignment.id},
-        student_ids: [@student3.id]
-
+      @assignment.update!(final_grader: @teacher)
+      user_session(@teacher)
+      json = api_call(:post, create_url, create_params, student_ids: [@student3.id])
       expect(json.size).to eq 1
       expect(json.first["id"]).to eq @student3.id
     end
 
-    it 'requires moderate_grades permissions' do
-      @user = @student1
-      raw_api_call :post,
-        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/moderated_students",
-        {controller: 'moderation_set', action: 'create',
-         format: 'json', course_id: @course.id, assignment_id: @assignment.id},
-        student_ids: [@student1.id, @student2.id]
-      expect(response.status).to eq 401
+    it_behaves_like 'assignment moderation permissions' do
+      let(:api_body_params) { { student_ids: [@student1.id, @student2.id] } }
+      let(:api_method) { :post }
+      let(:api_params) { create_params }
+      let(:api_url) { create_url }
     end
   end
 end

@@ -63,6 +63,7 @@ export function mockAnimator () {
     elementPositionMemo: jest.fn(),
     maintainViewportPositionFromMemo: jest.fn(),
     scrollTo: jest.fn(((scrollable, offset, callback) => {callback && callback()})),
+    forceScrollTo: jest.fn(((scrollable, offset, callback) => {callback && callback()})),
     scrollToTop: jest.fn(),
     isAboveScreen: jest.fn(),
     isBelowScreen: jest.fn(),

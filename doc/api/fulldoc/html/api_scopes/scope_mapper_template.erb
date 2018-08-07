@@ -42,7 +42,8 @@ class ApiScopeMapper
   }.freeze
 
   def self.lookup_resource(controller, action)
-    SCOPE_MAP.dig(controller, action)
+    controller_class = controller.to_s.split('/').last.to_sym
+    SCOPE_MAP.dig(controller_class, action)
   end
 
   def self.name_for_resource(resource)

@@ -150,6 +150,7 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
 
 .ic-DashboardCard__action-layout {
   position: relative;
+  font-size: $ic-DashboardCard-icon-size
 }
 
 .ic-DashboardCard__action-badge {
@@ -163,6 +164,7 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
 .ic-DashboardCard__action-container {
   box-sizing: border-box;
   display: flex;
+  align-items: flex-end;
   padding: 0 0 $ic-sp;
   margin-top: $ic-sp * 0.75;
   height: 2.5rem; // maintain nav height when there are no action links
@@ -179,11 +181,12 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
 
   .no-touch & {
     &:focus {
-      @if $use_high_contrast {
-        outline: 1px solid var(--ic-link-color);
-        outline-offset: 0.125rem;
+      outline: none;
+      svg, i {
+        outline-offset: .25rem;
+        outline-style: solid;
+        outline-width: 1px;
       }
-      @else { outline: none; }
     }
     &:hover { color: var(--ic-brand-primary); }
   }

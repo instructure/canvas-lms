@@ -61,7 +61,6 @@ export default {
 
   propTypes: {
     query: PropTypes.object.isRequired,
-    toggleAllSelected: PropTypes.func.isRequired,
     areAllItemsSelected: PropTypes.func.isRequired
   },
 

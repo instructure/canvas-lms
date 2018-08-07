@@ -98,7 +98,7 @@ module Importers
         end
 
         if question_bank.workflow_state == 'deleted'
-          question_bank.assessment_questions.destroy_all
+          question_bank.assessment_questions.preload(:assessment_question_bank).destroy_all
           question_bank.workflow_state = 'active'
         end
 

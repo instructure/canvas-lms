@@ -25,36 +25,33 @@ class GraphQLController < ApplicationController
   def execute
     query = params[:query]
     variables = params[:variables] || {}
-    tracers = if request.headers["GraphQL-Metrics"] == "true"
-                domain = request.host_with_port.sub(':', '_')
-                [Tracers::DatadogTracer.new(domain)]
-              else
-                []
-              end
     context = {
       current_user: @current_user,
       session: session,
       request: request,
-      tracers: tracers
+      tracers: [
+        Tracers::DatadogTracer.new(
+          request.host_with_port.sub(':', '_'),
+          request.headers["GraphQL-Metrics"] == "true"
+        )
+      ]
     }
     result = nil
 
-    ActiveRecord::Base.transaction do
-      timeout = Integer(Setting.get('graphql_statement_timeout', '60_000'))
-      ActiveRecord::Base.connection.execute "SET statement_timeout = #{timeout}"
+    overall_timeout = Setting.get('graphql_overall_timeout', '300').to_i.seconds
+    Timeout.timeout(overall_timeout) do
+      ActiveRecord::Base.transaction do
+        statement_timeout = Integer(Setting.get('graphql_statement_timeout', '60_000'))
+        ActiveRecord::Base.connection.execute "SET statement_timeout = #{statement_timeout}"
 
-      result = CanvasSchema.execute(query, variables: variables, context: context)
+        result = CanvasSchema.execute(query, variables: variables, context: context)
+      end
     end
 
     render json: result
   end
 
   def graphiql
-    if Rails.env.production? &&
-        !::Account.site_admin.grants_right?(@current_user, session, :read_as_admin)
-       render plain: "unauthorized", status: :unauthorized
-    else
-      render :graphiql, layout: 'bare'
-    end
+    render :graphiql, layout: 'bare'
   end
 end

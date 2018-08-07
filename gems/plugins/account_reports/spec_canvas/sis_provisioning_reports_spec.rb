@@ -1318,6 +1318,22 @@ describe "Default Account Reports" do
                                        ["user_sis_id_04", "user_sis_id_03", "active"]]
         expect(parsed.length).to eq 2
       end
+
+      it 'should not include unassociated observers when running from a sub-account' do
+        parameters = {}
+        parameters["user_observers"] = true
+        parsed = read_report("sis_export_csv", {account: @sub_account, params: parameters, order: 0, header: true})
+        expect(parsed).to match_array [['observer_id', 'student_id', 'status']]
+      end
+
+      it "should include associated observers when running from a sub-account" do
+        course_with_student(:account => @sub_account, :user => @user1)
+        parameters = {}
+        parameters["user_observers"] = true
+        parsed = read_report("sis_export_csv", {account: @sub_account, params: parameters, order: 0, header: true})
+        expect(parsed).to match_array [['observer_id', 'student_id', 'status'],
+          ["user_sis_id_02", "user_sis_id_01", "active"]]
+      end
     end
 
     describe 'admins' do

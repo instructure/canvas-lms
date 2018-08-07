@@ -243,12 +243,12 @@ describe "new_gradebook" do
 
   it "allows admins to enable the new gradebook" do
     ngb_trans_proc.call(admin, course, nil, transitions)
-    expect(transitions).to include({ "on" => UNLOCKED, "off" => UNLOCKED })
+    expect(transitions).to include({ "on" => {}, "off" => UNLOCKED })
   end
 
   it "allows teachers to enable the new gradebook" do
     ngb_trans_proc.call(teacher, course, nil, transitions)
-    expect(transitions).to include({ "on" => UNLOCKED, "off" => UNLOCKED })
+    expect(transitions).to include({ "on" => {}, "off" => UNLOCKED })
   end
 
   it "doesn't allow tas to enable the new gradebook" do
@@ -261,7 +261,7 @@ describe "new_gradebook" do
     expect(transitions).to include({ "on" => LOCKED })
   end
 
-  describe "coursel-level backwards compatibility" do
+  describe "course-level backwards compatibility" do
     let(:student) { student_in_course(course: course).user }
     let!(:assignment) { course.assignments.create!(title: 'assignment', points_possible: 10) }
     let(:submission) { assignment.submissions.find_by(user: student) }
@@ -271,7 +271,7 @@ describe "new_gradebook" do
       submission.save!
 
       ngb_trans_proc.call(admin, course, nil, transitions)
-      expect(transitions).to include({ "on" => LOCKED, "off" => LOCKED })
+      expect(transitions).to include({ "on" => {}, "off" => LOCKED })
     end
 
     it "blocks disabling new gradebook on a course if there are any submissions with a late_policy_status of missing" do
@@ -279,7 +279,7 @@ describe "new_gradebook" do
       submission.save!
 
       ngb_trans_proc.call(admin, course, nil, transitions)
-      expect(transitions).to include({ "on" => LOCKED, "off" => LOCKED })
+      expect(transitions).to include({ "off" => LOCKED })
     end
 
     it "blocks disabling new gradebook on a course if there are any submissions with a late_policy_status of late" do
@@ -287,26 +287,26 @@ describe "new_gradebook" do
       submission.save!
 
       ngb_trans_proc.call(admin, course, nil, transitions)
-      expect(transitions).to include({ "on" => LOCKED, "off" => LOCKED })
+      expect(transitions).to include({ "off" => LOCKED })
     end
 
     it "allows disabling new gradebook on a course if there are no submissions with a late_policy_status" do
       ngb_trans_proc.call(admin, course, nil, transitions)
-      expect(transitions).to include({ "on" => UNLOCKED, "off" => UNLOCKED })
+      expect(transitions).to include({ "off" => UNLOCKED })
     end
 
     it "blocks disabling new gradebook on a course if a late policy is configured" do
       course.late_policy = LatePolicy.new(late_submission_deduction_enabled: true)
 
       ngb_trans_proc.call(admin, course, nil, transitions)
-      expect(transitions).to include({ "on" => LOCKED, "off" => LOCKED })
+      expect(transitions).to include({ "off" => LOCKED })
     end
 
     it "blocks disabling new gradebook on a course if a missing policy is configured" do
       course.late_policy = LatePolicy.new(missing_submission_deduction_enabled: true)
 
       ngb_trans_proc.call(admin, course, nil, transitions)
-      expect(transitions).to include({ "on" => LOCKED, "off" => LOCKED })
+      expect(transitions).to include({ "off" => LOCKED })
     end
 
     it "blocks disabling new gradebook on a course if both a late and missing policy is configured" do
@@ -314,7 +314,7 @@ describe "new_gradebook" do
         LatePolicy.new(late_submission_deduction_enabled: true, missing_submission_deduction_enabled: true)
 
       ngb_trans_proc.call(admin, course, nil, transitions)
-      expect(transitions).to include({ "on" => LOCKED, "off" => LOCKED })
+      expect(transitions).to include({ "off" => LOCKED })
     end
 
     it "allows disabling new gradebook on a course if both policies are disabled" do
@@ -322,7 +322,7 @@ describe "new_gradebook" do
         LatePolicy.new(late_submission_deduction_enabled: false, missing_submission_deduction_enabled: false)
 
       ngb_trans_proc.call(admin, course, nil, transitions)
-      expect(transitions).to include({ "on" => UNLOCKED, "off" => UNLOCKED })
+      expect(transitions).to include({ "off" => UNLOCKED })
     end
   end
 

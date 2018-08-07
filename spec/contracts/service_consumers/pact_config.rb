@@ -17,19 +17,29 @@
 #
 
 module PactConfig
+  EXTERNAL_BROKER_HOST = 'pact-broker.instructure.com'.freeze
   # These constants ensure we use the correct strings and thus help avoid our
   # accidentally breaking the contract tests
   module Providers
     CANVAS_LMS_API = 'Canvas LMS API'.freeze
-    CANVAS_API_VERSION = '1.0'.freeze
+    sha = `git rev-parse --short HEAD`.strip
+    CANVAS_API_VERSION = '1.0' + "+#{sha}".freeze
     CANVAS_LMS_LIVE_EVENTS = 'Canvas LMS Live Events'.freeze
     ALL = Providers.constants.map { |c| Providers.const_get(c) }.freeze
   end
 
   # Add new API and LiveEvents consumers to this Consumers module
   module Consumers
-    GENERIC_CONSUMER = 'Generic Consumer'.freeze
-    QUIZ_LTI = 'Quiz LTI'.freeze
+    my_broker_host = ENV.fetch('PACT_BROKER_HOST', 'pact-broker.docker')
+    if my_broker_host.include?(EXTERNAL_BROKER_HOST)
+      # external consumers
+      GENERIC_CONSUMER = 'Generic Consumer'.freeze
+    else
+      # internal consumers
+      GENERIC_CONSUMER = 'Generic Consumer'.freeze
+      QUIZ_LTI = 'Quiz LTI'.freeze
+      SISTEMIC = 'Sistemic'.freeze
+    end
     ALL = Consumers.constants.map { |c| Consumers.const_get(c) }.freeze
   end
 

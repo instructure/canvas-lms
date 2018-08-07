@@ -20,19 +20,22 @@ require 'datadog/statsd'
 
 module Tracers
   class DatadogTracer
-    def initialize(domain)
+    def initialize(domain, first_party)
       @domain = domain
       @statsd = Datadog::Statsd.new('localhost', 8125)
+      @third_party = !first_party
     end
 
     def trace(key, metadata)
       if key == "execute_query"
         @statsd.batch do |statsd|
-          query_name = metadata[:query].operation_name || "unnamed"
+          query_name = @third_party ?
+            "3rdparty" :
+            metadata[:query].operation_name || "unnamed"
           tags = [
-            "query_md5:#{Digest::MD5.hexdigest(metadata[:query].query_string)}",
             "domain:#@domain",
           ]
+          tags << "query_md5:#{Digest::MD5.hexdigest(metadata[:query].query_string)}" if !@third_party
           statsd.increment("graphql.#{query_name}.count", tags: tags)
           statsd.time("graphql.#{query_name}.time", tags: tags) do
             yield

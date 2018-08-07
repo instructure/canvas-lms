@@ -231,8 +231,9 @@ describe UsersController do
         it "should allow observers to self register" do
           user_with_pseudonym(:active_all => true, :password => 'lolwut12')
           course_with_student(:user => @user, :active_all => true)
+          pairing_code = @student.generate_observer_pairing_code
 
-          post 'create', params: {:pseudonym => { :unique_id => 'jane@example.com' }, :observee => { :unique_id => @pseudonym.unique_id, :password => 'lolwut12' }, :user => { :name => 'Jane Observer', :terms_of_use => '1', :initial_enrollment_type => 'observer' }}, format: 'json'
+          post 'create', params: {:pseudonym => { :unique_id => 'jane@example.com' }, :pairing_code => { code: pairing_code.code }, :user => { :name => 'Jane Observer', :terms_of_use => '1', :initial_enrollment_type => 'observer' }}, format: 'json'
           expect(response).to be_successful
           new_pseudo = Pseudonym.where(unique_id: 'jane@example.com').first
           new_user = new_pseudo.user
@@ -246,7 +247,6 @@ describe UsersController do
           course_with_student
           @domain_root_account = @course.account
           pairing_code = @student.generate_observer_pairing_code
-          @course.account.enable_feature!(:observer_pairing_code)
 
           post 'create', params: {
             pseudonym: {
@@ -286,7 +286,6 @@ describe UsersController do
           course_with_student
           @domain_root_account = @course.account
           pairing_code = @student.generate_observer_pairing_code
-          @course.account.enable_feature!(:observer_pairing_code)
 
           post 'create', params: {
             pseudonym: {
@@ -495,19 +494,11 @@ describe UsersController do
         end
       end
 
-      it "should validate the observee's credentials" do
-        user_with_pseudonym(:active_all => true, :password => 'lolwut12')
-
-        post 'create', params: {:pseudonym => { :unique_id => 'jacob@instructure.com' }, :observee => { :unique_id => @pseudonym.unique_id, :password => 'not it' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :initial_enrollment_type => 'observer' }}
-        assert_status(400)
-        json = JSON.parse(response.body)
-        expect(json["errors"]["observee"]["unique_id"]).to be_present
-      end
-
       it "should link the user to the observee" do
-        user_with_pseudonym(:active_all => true, :password => 'lolwut12')
+        user = user_with_pseudonym(:active_all => true, :password => 'lolwut12')
+        pairing_code = user.generate_observer_pairing_code
 
-        post 'create', params: {:pseudonym => { :unique_id => 'jacob@instructure.com' }, :observee => { :unique_id => @pseudonym.unique_id, :password => 'lolwut12' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :initial_enrollment_type => 'observer' }}
+        post 'create', params: {:pseudonym => { :unique_id => 'jacob@instructure.com' }, :pairing_code => { :code => pairing_code.code }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :initial_enrollment_type => 'observer' }}
         expect(response).to be_successful
         u = User.where(name: 'Jacob Fugal').first
         expect(u).to be_pre_registered

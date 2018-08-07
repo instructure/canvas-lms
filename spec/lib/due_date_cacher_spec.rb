@@ -285,7 +285,7 @@ describe DueDateCacher do
           @assignment2.only_visible_to_overrides = true
           @assignment2.save!
 
-          Submission.destroy_all
+          Submission.delete_all
 
           expect { DueDateCacher.recompute_course(@course) }.to change {
             Submission.active.count

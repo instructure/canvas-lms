@@ -71,8 +71,12 @@ class GradebookExporter
   end
 
   def csv_data
-    enrollment_scope = @course.apply_enrollment_visibility(gradebook_enrollment_scope, @user, nil,
-                                                           include: gradebook_includes).preload(:root_account, :sis_pseudonym)
+    enrollment_scope = @course.apply_enrollment_visibility(
+      gradebook_enrollment_scope(user: @user, course: @course),
+      @user,
+      nil,
+      include: gradebook_includes(user: @user, course: @course)
+    ).preload(:root_account, :sis_pseudonym)
     student_enrollments = enrollments_for_csv(enrollment_scope)
 
     student_section_names = {}
@@ -258,6 +262,7 @@ class GradebookExporter
     includes = {:user => {:pseudonyms => :account}, :course_section => [], :scores => []}
 
     enrollments = scope.preload(includes).eager_load(:user).order_by_sortable_name.to_a
+    enrollments.each { |e| e.course = @course }
     enrollments.partition { |e| e.type != "StudentViewEnrollment" }.flatten
   end
 

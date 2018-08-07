@@ -29,7 +29,9 @@ import splitAssetString from 'compiled/str/splitAssetString'
 
   Breadcrumbs.renderSingleCrumb = function (folder, isLastCrumb, isRootCrumb) {
     const [contextType, contextId] = splitAssetString(this.props.contextAssetString, false);
-    const isContextRoot = !!(folder && (folder.get("context_type") || "").toLowerCase() === contextType && (folder.get("context_id") || -1).toString() === contextId);
+    const isContextRoot = !folder || 
+                          !!(folder && (folder.get("context_type") || "").toLowerCase() === contextType && 
+                             (folder.get("context_id") || -1).toString() === contextId);
     const name = (isRootCrumb  && isContextRoot) ? I18n.t('files', 'Files') : folder && (folder.get('custom_name') || folder.get('name'));
 
     return (

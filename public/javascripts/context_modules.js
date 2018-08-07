@@ -1063,7 +1063,7 @@ function scrollTo ($thing, time = 500) {
         const contextId = response.data.context_module.context_id
         const modulesPage = `/courses/${contextId}/modules`
         axios.get(modulesPage).then((getResponse) => {
-          const $newContent = $(getResponse.data);
+          const $newContent = $(getResponse.data)
           const $newModule = $newContent.find(`#context_module_${newModuleId}`)
           $tempElement.remove()
           $newModule.insertAfter(duplicatedModuleElement)
@@ -1074,6 +1074,9 @@ function scrollTo ($thing, time = 500) {
           $('.delete_module_link').die()
           $('.duplicate_module_link').die()
           $('.add_module_link').die()
+          $('.edit_module_link').die()
+          $("#add_context_module_form .add_prerequisite_link").off()
+          $('#add_context_module_form .add_completion_criterion_link').off()
           $(".context_module").find(".expand_module_link,.collapse_module_link").bind('click keyclick', toggleModuleCollapse)
           modules.initModuleManagement()
         }).catch(showFlashError(I18n.t('Error rendering duplicated module')))
@@ -1370,8 +1373,8 @@ function scrollTo ($thing, time = 500) {
     })
 
     $(".edit_module_link").live('click', function(event) {
-      event.preventDefault();
-      modules.editModule($(this).parents(".context_module"));
+      event.preventDefault()
+      modules.editModule($(this).parents(".context_module"))
     });
 
     $(".add_module_link").live('click', function(event) {

@@ -251,10 +251,12 @@ module SIS
         })[:error_report]
         error_message = I18n.t("Error while importing CSV. Please contact support. "\
                                  "(Error report %{number})", number: err_id.to_s)
-        SisBatch.add_error(nil, error_message, sis_batch: @batch, failure: true, backtrace: e.try(:backtrace))
-        @batch.workflow_state = :failed_with_messages
-        @batch.finish(false)
-        @batch.save!
+        @batch.shard.activate do
+          SisBatch.add_error(nil, error_message, sis_batch: @batch, failure: true, backtrace: e.try(:backtrace))
+          @batch.workflow_state = :failed_with_messages
+          @batch.finish(false)
+          @batch.save!
+        end
       end
 
       private

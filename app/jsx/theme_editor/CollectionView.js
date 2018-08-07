@@ -216,7 +216,7 @@ export default React.createClass({
         {thingsToShow.globalThemes &&
           <div className="ic-ThemeCard-container">
 
-            <h3 className="ic-ThemeCard-container__Heading">
+            <h2 className="ic-ThemeCard-container__Heading">
               <span className="ic-ThemeCard-container__Heading-text">
                 {I18n.t('Templates')}
                 <button
@@ -228,7 +228,7 @@ export default React.createClass({
                   <i className="icon-question" aria-hidden="true" />
                 </button>
               </span>
-            </h3>
+            </h2>
 
             <div className="ic-ThemeCard-container__Main">
               {thingsToShow.globalThemes.map(this.renderCard)}
@@ -239,11 +239,11 @@ export default React.createClass({
 
         {thingsToShow.accountSpecificThemes &&
           <div className="ic-ThemeCard-container">
-            <h3 className="ic-ThemeCard-container__Heading">
+            <h2 className="ic-ThemeCard-container__Heading">
               <span className="ic-ThemeCard-container__Heading-text">
                 {I18n.t('My Themes')}
               </span>
-            </h3>
+            </h2>
             <div className="ic-ThemeCard-container__Main">
               {thingsToShow.accountSpecificThemes.map(this.renderCard)}
             </div>

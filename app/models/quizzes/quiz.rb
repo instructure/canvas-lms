@@ -1097,24 +1097,24 @@ class Quizzes::Quiz < ActiveRecord::Base
     from("(WITH overrides AS (
           SELECT DISTINCT ON (o.quiz_id, o.user_id) *
           FROM (
-            SELECT ao.quiz_id, aos.user_id, ao.due_at, ao.due_at_overridden, 1 AS priority, ao.id AS override_id
+            SELECT ao.quiz_id, aos.user_id, ao.due_at, ao.due_at_overridden, 1 AS priority
             FROM #{AssignmentOverride.quoted_table_name} ao
             INNER JOIN #{AssignmentOverrideStudent.quoted_table_name} aos ON ao.id = aos.assignment_override_id AND ao.set_type = 'ADHOC'
             WHERE aos.user_id = #{User.connection.quote(user)}
               AND ao.workflow_state = 'active'
               AND aos.workflow_state <> 'deleted'
             UNION
-            SELECT ao.quiz_id, e.user_id, ao.due_at, ao.due_at_overridden, 1 AS priority, ao.id AS override_id
+            SELECT ao.quiz_id, e.user_id, ao.due_at, ao.due_at_overridden, 1 AS priority
             FROM #{AssignmentOverride.quoted_table_name} ao
             INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_section_id = ao.set_id AND ao.set_type = 'CourseSection'
             WHERE e.user_id = #{User.connection.quote(user)}
-              AND e.workflow_state NOT IN ('rejected', 'deleted')
+              AND e.workflow_state NOT IN ('rejected', 'deleted', 'inactive')
               AND ao.workflow_state = 'active'
             UNION
-            SELECT q.id, e.user_id, q.due_at, FALSE as due_at_overridden, 2 AS priority, NULL as override_id
+            SELECT q.id, e.user_id, q.due_at, FALSE as due_at_overridden, 2 AS priority
             FROM #{Quizzes::Quiz.quoted_table_name} q
             INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_id = q.context_id
-            WHERE e.workflow_state NOT IN ('rejected', 'deleted')
+            WHERE e.workflow_state NOT IN ('rejected', 'deleted', 'inactive')
               AND e.type in ('StudentEnrollment', 'StudentViewEnrollment')
               AND e.user_id = #{User.connection.quote(user)}
               AND q.assignment_id IS NULL

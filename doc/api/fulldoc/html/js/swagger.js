@@ -985,7 +985,7 @@ var SwaggerRequest = function(type, url, params, opts, successCallback, errorCal
           var name = param.name;
           var value = this.params[name];
           if (value !== undefined) {
-              if (param.tags && param.tags.type == "array") {
+              if (((param.tags && param.tags.type) || param.type) == "array") {
                 var sepValues = splitStrip(value);
                 for (var j = 0; j < sepValues.length; j++) {
                   var sepValue = sepValues[j];

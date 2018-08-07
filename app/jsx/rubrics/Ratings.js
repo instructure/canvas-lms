@@ -29,13 +29,13 @@ import { ratingShape, tierShape } from './types'
 const pointString = (points, endOfRangePoints) => {
   if (endOfRangePoints !== null) {
     return I18n.t('%{points} to >%{endOfRangePoints} pts', {
-      points: I18n.toNumber(points, { precision : 1 }),
-      endOfRangePoints: I18n.toNumber(endOfRangePoints, { precision : 1 })
+      points: I18n.toNumber(points, { precision: 2, strip_insignificant_zeros: true }),
+      endOfRangePoints: I18n.toNumber(endOfRangePoints, { precision: 2, strip_insignificant_zeros: true })
     })
   }
   else {
     return I18n.t('%{points} pts', {
-      points: I18n.toNumber(points, { precision : 1 })
+      points: I18n.toNumber(points, { precision: 2, strip_insignificant_zeros: true })
     })
   }
 }

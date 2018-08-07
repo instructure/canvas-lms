@@ -35,11 +35,11 @@ export class ScrollToToday extends Animation {
 }
 
 export function scrollAndFocusTodayItem (manager, todayElem) {
-  const {component, when} = findTodayOrNearest(manager.getRegistry());
+  const {component, when} = findTodayOrNearest(manager.getRegistry(), manager.getStore().getState().timeZone);
   if (component) {
     if (component.getScrollable()) {
       // scroll Today into view
-      manager.getAnimator().scrollTo(todayElem, manager.totalOffset(), () => {
+      manager.getAnimator().forceScrollTo(todayElem, manager.totalOffset(), () => {
         // then, if necessary, scroll today's or next todo item into view but not all the way to the top
         manager.getAnimator().scrollTo(component.getScrollable(), manager.totalOffset() + todayElem.offsetHeight, () => {
           if (when === 'after') {
@@ -57,7 +57,7 @@ export function scrollAndFocusTodayItem (manager, todayElem) {
     }
   } else {
     // there's nothing to focus. leave focus on Today button
-    manager.getAnimator().scrollTo(todayElem, this.manager().totalOffset());
+    manager.getAnimator().forceScrollTo(todayElem, manager.totalOffset());
   }
 }
 
@@ -65,8 +65,8 @@ export function scrollAndFocusTodayItem (manager, todayElem) {
 // 1. the first item due today, and if there isn't one
 // 2. the next item due after today, and if there isn't one
 // 3. the most recent item still due from the past
-function findTodayOrNearest (registry) {
-  const today = moment().startOf('day');
+function findTodayOrNearest (registry, tz) {
+  const today = moment().tz(tz).startOf('day');
   const allItems = registry.getAllItemsSorted();
   let lastInPast = null;
   let firstInFuture = null;
@@ -88,14 +88,16 @@ function findTodayOrNearest (registry) {
   const component = firstInFuture || lastInPast;
 
   let when = 'never';
-  if (component === firstInFuture) {
-    if (component.props.date.isSame(today, 'day')) {
-      when = 'today';
-    } else {
-      when = 'after';
+  if (component) {
+    if (component === firstInFuture) {
+      if (component.props.date.isSame(today, 'day')) {
+        when = 'today';
+      } else {
+        when = 'after';
+      }
+    } else if (component === lastInPast) {
+      when = 'before';
     }
-  } else if (component === lastInPast) {
-    when = 'before';
   }
   return {component, when};
 }

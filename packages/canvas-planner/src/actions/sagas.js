@@ -23,7 +23,7 @@ import { getFirstLoadedMoment, getLastLoadedMoment } from '../utilities/dateUtil
 import { transformApiToInternalGrade } from '../utilities/apiUtils';
 
 import {
-  gotItemsError, sendFetchRequest, gotGradesSuccess, gotGradesError, peekedIntoPast
+  gotItemsError, sendFetchRequest, gotGradesSuccess, gotGradesError
 } from './loading-actions';
 
 import {
@@ -70,7 +70,13 @@ function* loadingLoop (fromMomentFunction, actionCreator, opts) {
       const loadingOptions = {fromMoment, getState, ...opts};
       const {transformedItems, response} = yield call(sendFetchRequest, loadingOptions);
       const thunk = yield call(actionCreator, transformedItems, response);
-      continueLoading = !(yield put(thunk));
+      const stopLoading = yield put(thunk);
+      // the saga lib catches exceptions thrown by `put` and returns undefined in that case.
+      // make sure we got a boolean like we expect.
+      if (typeof stopLoading !== 'boolean') {
+        throw new Error(`saga error invoking action ${actionCreator.name}. It returned a non-boolean: ${stopLoading}`);
+      }
+      continueLoading = !stopLoading;
     }
   } catch (e) {
     yield put(gotItemsError(e));

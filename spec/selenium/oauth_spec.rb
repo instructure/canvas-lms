@@ -90,13 +90,18 @@ describe "oauth2 flow" do
       expect(f('.ic-Login-confirmation__auth-icon')).to be_displayed
     end
 
-    it "should show remember authorization checkbox for scoped token requests" do
+    it "should show remember authorization checkbox only for 'auth/userinfo' scoped token requests" do
       get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=http%3A%2F%2Fwww.example.com&scopes=%2Fauth%2Fuserinfo"
       expect(f('#remember_access')).to be_displayed
     end
 
     it "should not show remember authorization checkbox for unscoped requests" do
       get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=http%3A%2F%2Fwww.example.com"
+      expect(f("#content")).not_to contain_css('#remember_access')
+    end
+
+    it "should not show remember authorization checkbox for other scope requests" do
+      get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=http%3A%2F%2Fwww.example.com&scopes=url%3AGET%7C%2Fapi%2Fv1%2Faccounts"
       expect(f("#content")).not_to contain_css('#remember_access')
     end
 

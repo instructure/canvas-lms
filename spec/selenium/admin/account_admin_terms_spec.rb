@@ -47,19 +47,8 @@ describe "account admin terms" do
       validate_term_display
     end
 
-    it "should edit default term" do
-      edit_term_name = 'edited term title'
-      click_term_action_link(@default_term, '.edit_term_link')
-      replace_content(f('#enrollment_term_name'), edit_term_name)
-      f('.submit_button').click
-      wait_for_ajax_requests
-      validate_term_display(0, edit_term_name)
-      check_element_has_focus f(".edit_term_link", @default_term)
-    end
-
     it "should cancel editing" do
       click_term_action_link(@default_term, '.edit_term_link')
-      replace_content(f('#enrollment_term_name'), 'cancel this edit')
       f('.cancel_button').click
       wait_for_animations
       validate_term_display

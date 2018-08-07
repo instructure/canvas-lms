@@ -314,11 +314,17 @@ class Conversation < ActiveRecord::Base
   end
 
   def preload_users_and_context_codes
+    # Bullet doesn't catch our sneaky narrow preload here, so manually notify it
+    if defined?(Bullet) && Bullet.start?
+      conversation_participants.each do |record|
+        Bullet::Detector::Association.add_object_associations(record, :user)
+      end
+    end
     users = User.where(:id => conversation_participants.map(&:user_id)).pluck(:id, :updated_at).map do |id, updated_at|
       User.send(:instantiate, 'id' => id, 'updated_at' => updated_at)
     end
     User.preload_conversation_context_codes(users)
-    users = users.index_by(&:id)
+    users.index_by(&:id)
   end
 
   # Add the message to the conversation for all the participants.
@@ -561,7 +567,11 @@ class Conversation < ActiveRecord::Base
       ConversationParticipant.suspend_callbacks(:destroy_conversation_message_participants) do
         conversation_participants.reload.each do |cp|
           if new_cp = new_participants[cp.user_id]
-            new_cp.update_attribute(:workflow_state, cp.workflow_state) if cp.unread? || new_cp.archived?
+            if cp.unread? || new_cp.archived?
+              ConversationParticipant.where(id: new_cp).update_all(workflow_state: cp.workflow_state)
+              new_cp.workflow_state = cp.workflow_state
+              new_cp.send(:update_unread_count_for_update)
+            end
             # backcompat
             cp.conversation_message_participants.update_all(conversation_participant_id: new_cp.id)
             # remove the duplicate participant
@@ -578,7 +588,7 @@ class Conversation < ActiveRecord::Base
             # conversation shared a shard with the user OR the target
             # conversation
             if self.shard == other.shard || self.shard == cp.user.shard
-              cp.update_attribute(:conversation, other)
+              ConversationParticipant.where(id: cp).update_all(conversation_id: other.id)
             else
               cp.destroy
             end
@@ -695,9 +705,10 @@ class Conversation < ActiveRecord::Base
       return [] if private? && participants.size == 1
 
       threshold ||= participants.size / 2
+      preloaded_users_hash ||= preload_users_and_context_codes
 
       participants.inject([]){ |ary, cp|
-        cp.user = preloaded_users_hash[cp.user_id] if preloaded_users_hash
+        cp.user = preloaded_users_hash[cp.user_id]
         cp.user ? ary.concat(cp.user.conversation_context_codes) : ary
       }.sort.inject({}){ |hash, str|
         hash[str] = (hash[str] || 0) + 1

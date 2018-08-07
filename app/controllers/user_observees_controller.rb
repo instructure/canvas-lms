@@ -98,7 +98,7 @@ class UserObserveesController < ApplicationController
       end
       @student = verified_token.user
       common_root_accounts = common_root_accounts_for(observer, student)
-    elsif @domain_root_account.feature_enabled?(:observer_pairing_code) && params[:pairing_code]
+    elsif params[:pairing_code]
       code = ObserverPairingCode.active.where(code: params[:pairing_code]).first
       if code.nil?
         render json: {errors: [{'message' => 'Invalid pairing code.'}]}, status: 422

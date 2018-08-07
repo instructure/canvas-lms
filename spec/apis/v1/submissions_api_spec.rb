@@ -4112,6 +4112,7 @@ describe 'Submissions API', type: :request do
     assignment.moderated_grading_selections.
       where(student_id: @student.id).first.
       update_attribute(:provisional_grade, provisional_grade)
+    provisional_grade.publish!
     assignment.update(grades_published_at: 1.hour.ago)
     submission.reload
     submission.attachments.first.create_crocodoc_document(uuid: '1234',
@@ -4502,10 +4503,6 @@ describe 'Submissions API', type: :request do
         @params = { :controller => 'submissions_api', :action => 'gradeable_students',
                     :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.to_param,
                     :include => [ 'provisional_grades' ] }
-      end
-
-      it "requires :moderate_grades permission" do
-        api_call_as_user(@ta, :get, @path, @params, {}, {}, { :expected_status => 401 })
       end
 
       it "is unauthorized when the user is not the assigned final grader" do

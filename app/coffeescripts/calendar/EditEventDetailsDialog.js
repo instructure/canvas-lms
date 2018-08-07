@@ -120,7 +120,8 @@ export default class EditEventDetailsDialog {
   canManageAppointments = () => {
     if (
       ENV.CALENDAR.BETTER_SCHEDULER &&
-      _.some(this.event.allPossibleContexts, c => c.can_create_appointment_groups)
+      _.some(this.event.allPossibleContexts, c => c.can_create_appointment_groups) &&
+      (this.event.eventType.match(/appointment/) || this.event.eventType.match(/generic/))
     ) {
       return true
     }

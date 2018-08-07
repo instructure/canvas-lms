@@ -158,5 +158,83 @@ describe 'Discussions', :pact do
     expect(response['id']).to eq 1
     expect(response['title']).to eq 'New Discussion'
   end
+
+  it 'should Post a Discussion Response' do
+    canvas_lms_api.given('a teacher in a course with a discussion').
+      upon_receiving('Post a Discussion Response').
+        with(
+          method: :post,
+          headers: {
+            'Authorization': 'Bearer some_token',
+            'Auth-User': 'Teacher1',
+            'Connection': 'close',
+            'Host': PactConfig.mock_provider_service_base_uri,
+            'Version': 'HTTP/1.1',
+            'Content-Type': 'application/json'
+          },
+          'path' => '/api/v1/courses/1/discussion_topics/1/entries',
+          'body' =>
+          {
+            'message': 'Great Discussion!'
+          },
+        query: ''
+      ).
+      will_respond_with(
+        status: 201,
+        body: Pact.like(
+          "id": 1,
+          "user_id": 7,
+          "parent_id": nil,
+          "created_at": "2018-07-12T17:55:37Z",
+          "updated_at": "2018-07-12T17:55:37Z",
+          "rating_count": nil,
+          "rating_sum": nil,
+          "user_name": "T1",
+          "message": "Great Discussion!",
+          "user": {
+              "id": 7,
+              "display_name": "T1",
+              "avatar_image_url": "http://canvas.instructure.com/images/messages/avatar-50.png",
+              "html_url": "http://localhost:3000/courses/3/users/7"
+          },
+          "read_state": "read",
+          "forced_read_state": false
+        )
+      )
+    discussions_api.authenticate_as_user('Teacher1')
+    response = discussions_api.post_discussion_response(1, 1, 'Great Discussion!')
+    expect(response['id']).to eq 1
+    expect(response['message']).to eq 'Great Discussion!'
+  end
+
+  it 'should Update a Discussion' do
+    canvas_lms_api.given('a teacher in a course with a discussion').
+      upon_receiving('Update a Discussion').
+      with(
+        method: :put,
+          headers: {
+            'Authorization': 'Bearer some_token',
+            'Auth-User': 'Teacher1',
+            'Connection': 'close',
+            'Host': PactConfig.mock_provider_service_base_uri,
+            'Version': 'HTTP/1.1',
+            'Content-Type': 'application/json'
+          },
+          'path' => '/api/v1/courses/1/discussion_topics/1',
+          'body' =>
+          {
+            'title': 'Updated Discussion'
+          },
+        query: ''
+      ).
+      will_respond_with(
+        status: 200,
+        body: Pact.like('id': 1, 'title': 'Updated Discussion')
+      )
+    discussions_api.authenticate_as_user('Teacher1')
+    response = discussions_api.update_discussion(1, 1, 'Updated Discussion')
+    expect(response['id']).to eq 1
+    expect(response['title']).to eq 'Updated Discussion'
+  end
 end
 

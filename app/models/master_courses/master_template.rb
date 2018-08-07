@@ -162,7 +162,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     child_counts = MasterCourses::ChildSubscription.active.where(:master_template_id => templates).
       joins(:child_course).where.not(:courses => {:workflow_state => "deleted"}).group(:master_template_id).count
     last_export_times = Hash[MasterCourses::MasterMigration.where(:master_template_id => templates, :workflow_state => "completed").
-      order("master_template_id, id DESC").pluck("DISTINCT ON (master_template_id) master_template_id, imports_completed_at")]
+      order(:master_template_id, id: :desc).pluck(Arel.sql("DISTINCT ON (master_template_id) master_template_id, imports_completed_at"))]
 
     templates.each do |template|
       template.child_course_count = child_counts[template.id] || 0
@@ -242,7 +242,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   def deletions_since_last_export
     return {} unless last_export_started_at
     deletions_by_type = {}
-    MasterCourses::ALLOWED_CONTENT_TYPES.each do |klass|
+    MasterCourses::CONTENT_TYPES_FOR_DELETIONS.each do |klass|
       item_scope = case klass
       when 'Attachment'
         course.attachments.where(:file_state => 'deleted')

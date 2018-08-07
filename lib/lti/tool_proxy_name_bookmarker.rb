@@ -38,7 +38,7 @@ module Lti
           "OR #{name_collation_key} #{comparison} #{placeholder_collation_key}",
           bookmark[0], bookmark[1], bookmark[0])
       end
-      scope.order("#{name_collation_key}, lti_tool_proxies.id")
+      scope.order(name_collation_key, :id)
     end
   end
 end

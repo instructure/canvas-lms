@@ -254,7 +254,6 @@ END
             transitions['off']['locked'] = true if transitions&.dig('off')
           else
             should_lock = context.gradebook_backwards_incompatible_features_enabled?
-            transitions['on']['locked'] = should_lock if transitions&.dig('on')
             transitions['off']['locked'] = should_lock if transitions&.dig('off')
           end
         elsif context.is_a?(Account)
@@ -681,12 +680,6 @@ END
       description: -> { I18n.t('If enabled, the option will be presented to have non-scoring rubrics.') },
       applies_to: 'RootAccount',
       state: 'allowed'
-    },
-    'observer_pairing_code' => {
-      display_name: -> { I18n.t('Use pairing code for parent sign up') },
-      description: -> { I18n.t('If enabled, the parent sign up form will require a student pairing code instead of the child username and password') },
-      applies_to: 'RootAccount',
-      state: 'hidden'
     }
   )
 

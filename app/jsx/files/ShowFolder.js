@@ -18,6 +18,7 @@
 
 import React from 'react'
 import _ from 'underscore'
+import classnames from 'classnames'
 import I18n from 'i18n!react_files'
 import ShowFolder from 'compiled/react_files/components/ShowFolder'
 import FilePreview from '../files/FilePreview'
@@ -28,6 +29,12 @@ import CurrentUploads from '../files/CurrentUploads'
 import LoadingIndicator from '../files/LoadingIndicator'
 import page from 'page'
 import FocusStore from 'compiled/react_files/modules/FocusStore'
+
+  ShowFolder.getInitialState = function () {
+    return {
+      hideToggleAll: true,
+    }
+  }
 
   ShowFolder.closeFilePreview = function (url) {
     page(url)
@@ -116,28 +123,48 @@ import FocusStore from 'compiled/react_files/modules/FocusStore'
 
     var foldersNextPageOrFilesNextPage = this.props.currentFolder.folders.fetchingNextPage || this.props.currentFolder.files.fetchingNextPage;
 
+    const selectAllLabelClass = classnames({
+      'screenreader-only': this.state.hideToggleAll
+    });
+
+    // We have to put the "select all" checkbox out here because VO won't read the table properly
+    // if it's in the table header, and won't read it at all if it's outside the table but inside
+    // the <div role="grid">.
     return (
-      <div role='grid' style={{flex: "1 1 auto"}} >
-        <div
-          ref='accessibilityMessage'
-          className='ShowFolder__accessbilityMessage col-xs'
-          tabIndex={0}
-        >
-          {I18n.t("Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu.")}
-        </div>
-        <UploadDropZone currentFolder={this.props.currentFolder} />
-        <CurrentUploads />
-        <ColumnHeaders
-          ref='columnHeaders'
-          query={this.props.query}
-          pathname={this.props.pathname}
-          toggleAllSelected={this.props.toggleAllSelected}
-          areAllItemsSelected={this.props.areAllItemsSelected}
-          usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
+      <div>
+        <input
+          id='selectAllCheckbox'
+          className={selectAllLabelClass}
+          type='checkbox'
+          onFocus={(event) => this.setState({hideToggleAll: false})}
+          onBlur={(event) => this.setState({hideToggleAll: true})}
+          checked={this.props.areAllItemsSelected()}
+          onChange={(event) => this.props.toggleAllSelected(event.target.checked)}
         />
-        { this.renderFolderChildOrEmptyContainer() }
-        <LoadingIndicator isLoading={foldersNextPageOrFilesNextPage} />
-        {this.renderFilePreview() }
+        <label htmlFor='selectAllCheckbox' className={selectAllLabelClass}>
+          {I18n.t('select_all', 'Select All')}
+        </label>
+        <div role='grid' style={{flex: "1 1 auto"}} >
+          <div
+            ref='accessibilityMessage'
+            className='ShowFolder__accessbilityMessage col-xs'
+            tabIndex={0}
+          >
+            {I18n.t("Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu.")}
+          </div>
+          <UploadDropZone currentFolder={this.props.currentFolder} />
+          <CurrentUploads />
+          <ColumnHeaders
+            ref='columnHeaders'
+            query={this.props.query}
+            pathname={this.props.pathname}
+            areAllItemsSelected={this.props.areAllItemsSelected}
+            usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
+          />
+          { this.renderFolderChildOrEmptyContainer() }
+          <LoadingIndicator isLoading={foldersNextPageOrFilesNextPage} />
+          {this.renderFilePreview() }
+        </div>
       </div>
     );
   }

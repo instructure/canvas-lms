@@ -1,0 +1,199 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly with no custom outcomeProficiency 1`] = `
+"<span>
+  <Popover placement=\\"bottom\\" onToggle={[Function]} onClick={[Function]} onFocus={[Function]} onBlur={[Function]} onMouseOver={[Function]} onMouseOut={[Function]} onShow={[Function]} onDismiss={[Function]} stacking=\\"topmost\\" offsetX={0} offsetY={0} variant=\\"default\\" on={{...}} contentRef={[Function]} defaultShow={false} withArrow={true} trackPosition={true} constrain=\\"window\\" onPositioned={[Function]} onPositionChanged={[Function]} shouldRenderOffscreen={false} shouldContainFocus={false} shouldReturnFocus={true} shouldCloseOnDocumentClick={true} shouldCloseOnEscape={true} defaultFocusElement={{...}} label={{...}} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} positionTarget={{...}} alignArrow={false}>
+    <PopoverTrigger>
+      <Link onClick={[Function]} variant=\\"default\\" as=\\"button\\" linkRef={[Function]} ellipsis={false} iconPlacement=\\"start\\">
+        <span style={{...}}>
+          <IconInfo />
+        </span>
+        <span>
+          <ScreenReaderContent as=\\"span\\">
+            Click to expand outcome details
+          </ScreenReaderContent>
+        </span>
+      </Link>
+    </PopoverTrigger>
+    <PopoverContent>
+      <View as=\\"div\\" padding=\\"small\\" maxWidth=\\"30rem\\" display=\\"auto\\">
+        <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+          <Flex alignItems=\\"stretch\\" direction=\\"row\\" justifyItems=\\"space-between\\" as=\\"span\\" inline={false} visualDebug={false} wrapItems={false}>
+            <FlexItem grow={true} shrink={true} as=\\"span\\">
+              <div>
+                Last Assessment: 
+                <DatetimeDisplay datetime={{...}} format=\\"%b %d, %l:%M %p\\" />
+              </div>
+            </FlexItem>
+            <FlexItem grow={true} shrink={true} align=\\"stretch\\" as=\\"span\\">
+              <Text size=\\"small\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+                <div>
+                  <div style={{...}}>
+                    Meets Mastery
+                  </div>
+                </div>
+              </Text>
+            </FlexItem>
+          </Flex>
+          <hr role=\\"presentation\\" />
+          <div>
+            <Text size=\\"small\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+              Calculation Method
+            </Text>
+            <div>
+              Highest Score
+            </div>
+            <div style={{...}}>
+              <Text size=\\"small\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+                Example
+              </Text>
+            </div>
+            <div>
+              Mastery score reflects the highest score of a graded assignment or quiz.
+            </div>
+            <div>
+              1- Item Scores: 1, 4, 2, 3
+            </div>
+            <div>
+              2- Final Score: 4
+            </div>
+          </div>
+        </Text>
+      </View>
+    </PopoverContent>
+  </Popover>
+  <FlexItem as=\\"span\\" grow={false} shrink={false} />
+</span>"
+`;
+
+exports[`renders correctly with no results 1`] = `
+"<span>
+  <Popover placement=\\"bottom\\" onToggle={[Function]} onClick={[Function]} onFocus={[Function]} onBlur={[Function]} onMouseOver={[Function]} onMouseOut={[Function]} onShow={[Function]} onDismiss={[Function]} stacking=\\"topmost\\" offsetX={0} offsetY={0} variant=\\"default\\" on={{...}} contentRef={[Function]} defaultShow={false} withArrow={true} trackPosition={true} constrain=\\"window\\" onPositioned={[Function]} onPositionChanged={[Function]} shouldRenderOffscreen={false} shouldContainFocus={false} shouldReturnFocus={true} shouldCloseOnDocumentClick={true} shouldCloseOnEscape={true} defaultFocusElement={{...}} label={{...}} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} positionTarget={{...}} alignArrow={false}>
+    <PopoverTrigger>
+      <Link onClick={[Function]} variant=\\"default\\" as=\\"button\\" linkRef={[Function]} ellipsis={false} iconPlacement=\\"start\\">
+        <span style={{...}}>
+          <IconInfo />
+        </span>
+        <span>
+          <ScreenReaderContent as=\\"span\\">
+            Click to expand outcome details
+          </ScreenReaderContent>
+        </span>
+      </Link>
+    </PopoverTrigger>
+    <PopoverContent>
+      <View as=\\"div\\" padding=\\"small\\" maxWidth=\\"30rem\\" display=\\"auto\\">
+        <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+          <Flex alignItems=\\"stretch\\" direction=\\"row\\" justifyItems=\\"space-between\\" as=\\"span\\" inline={false} visualDebug={false} wrapItems={false}>
+            <FlexItem grow={true} shrink={true} as=\\"span\\">
+              <div>
+                Last Assessment: 
+                No submissions
+              </div>
+            </FlexItem>
+            <FlexItem grow={true} shrink={true} align=\\"stretch\\" as=\\"span\\">
+              <Text size=\\"small\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+                <div>
+                  <div style={{...}}>
+                    I am Groot
+                  </div>
+                </div>
+              </Text>
+            </FlexItem>
+          </Flex>
+          <hr role=\\"presentation\\" />
+          <div>
+            <Text size=\\"small\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+              Calculation Method
+            </Text>
+            <div>
+              Highest Score
+            </div>
+            <div style={{...}}>
+              <Text size=\\"small\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+                Example
+              </Text>
+            </div>
+            <div>
+              Mastery score reflects the highest score of a graded assignment or quiz.
+            </div>
+            <div>
+              1- Item Scores: 1, 4, 2, 3
+            </div>
+            <div>
+              2- Final Score: 4
+            </div>
+          </div>
+        </Text>
+      </View>
+    </PopoverContent>
+  </Popover>
+  <FlexItem as=\\"span\\" grow={false} shrink={false} />
+</span>"
+`;
+
+exports[`renders the OutcomePopover component 1`] = `
+"<span>
+  <Popover placement=\\"bottom\\" onToggle={[Function]} onClick={[Function]} onFocus={[Function]} onBlur={[Function]} onMouseOver={[Function]} onMouseOut={[Function]} onShow={[Function]} onDismiss={[Function]} stacking=\\"topmost\\" offsetX={0} offsetY={0} variant=\\"default\\" on={{...}} contentRef={[Function]} defaultShow={false} withArrow={true} trackPosition={true} constrain=\\"window\\" onPositioned={[Function]} onPositionChanged={[Function]} shouldRenderOffscreen={false} shouldContainFocus={false} shouldReturnFocus={true} shouldCloseOnDocumentClick={true} shouldCloseOnEscape={true} defaultFocusElement={{...}} label={{...}} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} positionTarget={{...}} alignArrow={false}>
+    <PopoverTrigger>
+      <Link onClick={[Function]} variant=\\"default\\" as=\\"button\\" linkRef={[Function]} ellipsis={false} iconPlacement=\\"start\\">
+        <span style={{...}}>
+          <IconInfo />
+        </span>
+        <span>
+          <ScreenReaderContent as=\\"span\\">
+            Click to expand outcome details
+          </ScreenReaderContent>
+        </span>
+      </Link>
+    </PopoverTrigger>
+    <PopoverContent>
+      <View as=\\"div\\" padding=\\"small\\" maxWidth=\\"30rem\\" display=\\"auto\\">
+        <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+          <Flex alignItems=\\"stretch\\" direction=\\"row\\" justifyItems=\\"space-between\\" as=\\"span\\" inline={false} visualDebug={false} wrapItems={false}>
+            <FlexItem grow={true} shrink={true} as=\\"span\\">
+              <div>
+                Last Assessment: 
+                <DatetimeDisplay datetime={{...}} format=\\"%b %d, %l:%M %p\\" />
+              </div>
+            </FlexItem>
+            <FlexItem grow={true} shrink={true} align=\\"stretch\\" as=\\"span\\">
+              <Text size=\\"small\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+                <div>
+                  <div style={{...}}>
+                    I am Groot
+                  </div>
+                </div>
+              </Text>
+            </FlexItem>
+          </Flex>
+          <hr role=\\"presentation\\" />
+          <div>
+            <Text size=\\"small\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+              Calculation Method
+            </Text>
+            <div>
+              Highest Score
+            </div>
+            <div style={{...}}>
+              <Text size=\\"small\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+                Example
+              </Text>
+            </div>
+            <div>
+              Mastery score reflects the highest score of a graded assignment or quiz.
+            </div>
+            <div>
+              1- Item Scores: 1, 4, 2, 3
+            </div>
+            <div>
+              2- Final Score: 4
+            </div>
+          </div>
+        </Text>
+      </View>
+    </PopoverContent>
+  </Popover>
+  <FlexItem as=\\"span\\" grow={false} shrink={false} />
+</span>"
+`;

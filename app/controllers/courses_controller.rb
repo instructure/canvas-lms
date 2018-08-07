@@ -2733,7 +2733,7 @@ class CoursesController < ApplicationController
       SubmissionComment.where(:provisional_grade_id => pg_scope).delete_all
       pg_scope.delete_all
       OriginalityReport.where(:submission_id => @fake_student.all_submissions).delete_all
-      @fake_student.all_submissions.destroy_all
+      @fake_student.all_submissions.preload(:all_submission_comments, :lti_result, :versions).destroy_all
       @fake_student.quiz_submissions.each{|qs| qs.events.destroy_all}
       @fake_student.quiz_submissions.destroy_all
 

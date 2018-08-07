@@ -60,25 +60,25 @@ describe 'Wiki Pages', :pact do
   it 'should Post Wiki Pages' do
     canvas_lms_api.given('a teacher enrolled in a course').
       upon_receiving('Post Wiki Pages').
-        with(
-          method: :post,
-          headers: {
-            'Authorization': 'Bearer some_token',
-            'Auth-User': 'Teacher1',
-            'Connection': 'close',
-            'Host': PactConfig.mock_provider_service_base_uri,
-            'Version': 'HTTP/1.1',
-            'Content-Type': 'application/json'
-          },
-          'path' => '/api/v1/courses/1/pages',
-          'body' =>
+      with(
+        method: :post,
+        headers: {
+          'Authorization': 'Bearer some_token',
+          'Auth-User': 'Teacher1',
+          'Connection': 'close',
+          'Host': PactConfig.mock_provider_service_base_uri,
+          'Version': 'HTTP/1.1',
+          'Content-Type': 'application/json'
+        },
+        'path' => '/api/v1/courses/1/pages',
+        'body' =>
+        {
+          'wiki_page':
           {
-            'wiki_page':
-            {
-              'title': 'WikiPage',
-            }
-          },
-        query: ''
+            'title': 'WikiPage',
+          }
+        },
+      query: ''
       ).
       will_respond_with(
         status: 200,
@@ -88,5 +88,77 @@ describe 'Wiki Pages', :pact do
     response = wiki_page_api.post_wiki_pages(1)
     expect(response['page_id']).to eq 1
     expect(response['title']).to eq 'WikiPage'
+  end
+
+  it 'should update a Wiki Page' do
+    canvas_lms_api.given('a wiki page in a course').
+      upon_receiving('update a Wiki Page').
+      with(
+        method: :put,
+        headers: {
+          'Authorization': 'Bearer some_token',
+          'Auth-User': 'Teacher1',
+          'Connection': 'close',
+          'Host': PactConfig.mock_provider_service_base_uri,
+          'Version': 'HTTP/1.1',
+          'Content-Type': 'application/json'
+        },
+        'path' => '/api/v1/courses/1/pages/wiki-page',
+        'body' =>
+        {
+          'wiki_page':
+          {
+            'title': 'New Title',
+          }
+        },
+        query: ''
+      ).
+      will_respond_with(
+        status: 200,
+        body: Pact.like('page_id': 1, 'title': 'New Title')
+      )
+    wiki_page_api.authenticate_as_user('Teacher1')
+    response = wiki_page_api.update_wiki_page(1, 'wiki-page')
+    expect(response['page_id']).to eq 1
+    expect(response['title']).to eq 'New Title'
+  end
+
+  it 'should Delete a Wiki Page' do
+    canvas_lms_api.given('a wiki page in a course').
+      upon_receiving('Delete a Wiki Page').
+      with(
+        method: :delete,
+        headers: {
+          'Authorization': 'Bearer some_token',
+          'Auth-User': 'Teacher1',
+          'Connection': 'close',
+          'Host': PactConfig.mock_provider_service_base_uri,
+          'Version': 'HTTP/1.1'
+        },
+        'path' => '/api/v1/courses/1/pages/wiki-page',
+        query: 'event=delete'
+      ).
+      will_respond_with(
+        status: 200,
+        body: Pact.like(
+          {
+            "url": "wiki-page",
+            "title": "Test Page",
+            "created_at": "2018-07-12T15:49:05Z",
+            "editing_roles": "teachers",
+            "page_id": 8,
+            "published": false,
+            "hide_from_students": true,
+            "front_page": false,
+            "html_url": "http://localhost:3000/courses/3/pages/test-page",
+            "updated_at": "2018-07-12T15:49:05Z",
+            "locked_for_user": false,
+            "body": "message"
+          }
+        )
+      )
+    wiki_page_api.authenticate_as_user('Teacher1')
+    response = wiki_page_api.delete_wiki(1)
+    expect(response['url']).to eq 'wiki-page'
   end
 end

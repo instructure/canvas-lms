@@ -271,18 +271,20 @@ class SisBatch < ActiveRecord::Base
   end
 
   def self.process_all_for_account(account)
-    return if use_parallel_importers?(account) && account.sis_batches.importing.exists? # will be requeued after the current batch finishes
-    start_time = Time.now
-    loop do
-      batches = account.sis_batches.needs_processing.limit(50).order(:created_at).to_a
-      break if batches.empty?
-      batches.each do |batch|
-        batch.process_without_send_later
-        return if batch.importing? # we'll requeue afterwards
-        if Time.now - start_time > Setting.get('max_time_per_sis_batch', 60).to_i
-          # requeue the job to continue processing more batches
-          queue_job_for_account(account)
-          return
+    account.shard.activate do
+      return if use_parallel_importers?(account) && account.sis_batches.importing.exists? # will be requeued after the current batch finishes
+      start_time = Time.now
+      loop do
+        batches = account.sis_batches.needs_processing.limit(50).order(:created_at).to_a
+        break if batches.empty?
+        batches.each do |batch|
+          batch.process_without_send_later
+          return if batch.importing? # we'll requeue afterwards
+          if Time.now - start_time > Setting.get('max_time_per_sis_batch', 60).to_i
+            # requeue the job to continue processing more batches
+            queue_job_for_account(account)
+            return
+          end
         end
       end
     end

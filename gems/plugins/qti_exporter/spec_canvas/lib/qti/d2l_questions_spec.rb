@@ -68,6 +68,10 @@ describe "Converting D2L QTI" do
     expect(get_question_hash(d2l_question_dir, 'math', true, @opts)).to eq D2LExpected::MATH
   end
 
+  it "should convert a simple math question to a numeric question" do
+    expect(get_question_hash(d2l_question_dir, 'simple_math', true, @opts)).to eq D2LExpected::SIMPLE_MATH
+  end
+
   it "should convert long answer" do
     expect(get_question_hash(d2l_question_dir, 'long_answer', true, @opts)).to eq D2LExpected::LONG_ANSWER
   end
@@ -286,6 +290,19 @@ module D2LExpected
                    {:scale=>1, :min=>0.1, :max=>0.9, :name=>"y"},
                    {:scale=>0, :min=>100, :max=>150, :name=>"z"}],
           :correct_comments=>""}
+
+  SIMPLE_MATH = {:answers=>[],
+    :question_type=>"numerical_question",
+    :question_bank_id=>"SECT_3981973",
+    :incorrect_comments=>"",
+    :points_possible=>3.0,
+    :question_bank_name=>"02gilback",
+    :question_text=>"whats 1 plus 1",
+    :question_name=>"single variable math",
+    :migration_id=>"QUES_979792_1194510",
+    :answers=>
+      [{:weight=>100, :text=>"answer_text", :numerical_answer_type=>"exact_answer", :exact=>10.0}],
+    :correct_comments=>""}
 
   FIB = {:migration_id=>"QUES_979782_1194494",
          :answers=>

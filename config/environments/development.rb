@@ -62,13 +62,7 @@ environment_configuration(defined?(config) && config) do |config|
   config.eager_load = false
 
   config.after_initialize do
-    require 'bullet'
-
-    Bullet.enable = true
-    Bullet.unused_eager_loading_enable = false
-    Bullet.counter_cache_enable = false
-
-    Bullet.rails_logger = true
+    require_relative 'bullet'
   end
 
   # eval <env>-local.rb if it exists

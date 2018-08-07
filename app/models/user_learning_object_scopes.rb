@@ -259,16 +259,16 @@ module UserLearningObjectScopes
     objects_needing('Assignment', 'moderation', :instructor, 120.minutes, opts) do |assignment_scope, options|
       scope = assignment_scope.active.
         expecting_submission.
-        where(:moderated_grading => true).
+        where(final_grader: self, moderated_grading: true).
         where("assignments.grades_published_at IS NULL").
-        where(:id => ModeratedGrading::ProvisionalGrade.joins(:submission).
+        where(id: ModeratedGrading::ProvisionalGrade.joins(:submission).
           where("submissions.assignment_id=assignments.id").
           where(Submission.needs_grading_conditions).distinct.select(:assignment_id)).
         preload(:context)
       if options[:scope_only]
         scope # Also need to check the rights like below
       else
-        scope.lazy.select{|a| a.context.grants_right?(self, :moderate_grades)}.take(options[:limit]).to_a
+        scope.lazy.select{|a| a.permits_moderation?(self)}.take(options[:limit]).to_a
       end
     end
   end

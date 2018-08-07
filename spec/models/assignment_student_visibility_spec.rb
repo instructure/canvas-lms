@@ -479,11 +479,11 @@ describe "differentiated_assignments" do
       end
 
       it "excludes student ids for deleted enrollments" do
-        course.enrollments.find_by(user_id: first_student).destroy
         expected_visibilities = {
           assignment.id => [],
           assignment_only_visible_to_overrides.id => []
         }
+        course.enrollments.find_by(user_id: first_student).destroy
         expect(assignments_with_visibilities).to eq expected_visibilities
       end
 

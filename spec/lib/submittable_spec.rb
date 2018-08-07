@@ -95,3 +95,32 @@ describe WikiPage do
     end
   end
 end
+
+describe "section specific topic" do
+  def add_section_to_topic(topic, section)
+    topic.is_section_specific = true
+    topic.discussion_topic_section_visibilities <<
+      DiscussionTopicSectionVisibility.new(
+        :discussion_topic => topic,
+        :course_section => section,
+        :workflow_state => 'active'
+      )
+    topic.save!
+  end
+
+  it "filters section specific topics properly" do
+    course = course_factory(active_course: true)
+    section1 = course.course_sections.create!(name: "test section")
+    section2 = course.course_sections.create!(name: "second test section")
+    section_specific_topic1 = course.discussion_topics.create!(:title => "section specific topic 1")
+    section_specific_topic2 = course.discussion_topics.create!(:title => "section specific topic 2")
+    add_section_to_topic(section_specific_topic1, section1)
+    add_section_to_topic(section_specific_topic2, section2)
+    student = create_users(1, return_type: :record).first
+    course.enroll_student(student, :section => section1)
+    course.reload
+    vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student.id], :item_type => :discussion)
+    expect(vis_hash[student.id].length).to eq(1)
+    expect(vis_hash[student.id].first).to eq(section_specific_topic1.id)
+  end
+end

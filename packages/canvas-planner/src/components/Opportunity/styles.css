@@ -81,9 +81,3 @@
 .dueText {
   font-weight: var(--dueTextFontWeight);
 }
-
-
-
-.closeButtonIcon {
-  font-size: var(--closeButtonIconSize);
-}

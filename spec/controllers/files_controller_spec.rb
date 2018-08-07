@@ -1279,9 +1279,19 @@ describe FilesController do
             context_id: assignment.id
           )
         end
+        let(:attachment) do
+          Attachment.create!(
+            context: assignment,
+            user: @student,
+            filename: 'cats.jpg',
+            uploaded_data: StringIO.new('meow?')
+          )
+        end
+        let!(:homework_service) { Services::SubmitHomeworkService.new(attachment, assignment) }
 
         before do
           allow(Mailer).to receive(:deliver)
+          allow(Services::SubmitHomeworkService).to(receive(:new)).and_return(homework_service)
         end
 
         it "works with an Assignment as the context" do
@@ -1322,7 +1332,7 @@ describe FilesController do
           end
 
           it 'should not submit the attachment' do
-            expect(Services::SubmitHomeworkService).not_to receive(:submit)
+            expect(homework_service).not_to receive(:submit)
             request
           end
         end
@@ -1338,29 +1348,28 @@ describe FilesController do
             assignment_params.merge(
               progress_id: progress.id,
               submit_assignment: true,
-              eula_agreement_timestamp: "1522419910"
+              eula_agreement_timestamp: eula_agreement_timestamp
             )
           end
+          let(:eula_agreement_timestamp) { '1522419910' }
           let(:request) { post "api_capture", params: progress_params }
 
           before do
-            allow(Services::SubmitHomeworkService).to receive(:successful_email)
-            allow(Services::SubmitHomeworkService).to receive(:failure_email)
+            allow(homework_service).to receive(:queue_email)
           end
 
           it 'should submit the attachment' do
-            expect(Services::SubmitHomeworkService).to receive(:submit).with(
-              kind_of(Attachment),
-              assignment,
+            expect(homework_service).to receive(:submit).with(
               progress.created_at,
-              "1522419910"
+              eula_agreement_timestamp
             )
             request
           end
 
           it 'should save the eula_agreement_timestamp' do
             request
-            expect(Submission.where(assignment_id: progress.assignment.id).first.turnitin_data[:eula_agreement_timestamp]).to eq("1522419910")
+            submission = Submission.where(assignment_id: assignment.id)
+            expect(submission.first.turnitin_data[:eula_agreement_timestamp]).to eq(eula_agreement_timestamp)
           end
 
           it "returns a 201 http status" do
@@ -1369,15 +1378,15 @@ describe FilesController do
           end
 
           it 'should send a successful email' do
-            expect(Services::SubmitHomeworkService).to receive(:successful_email).with(kind_of(Attachment), kind_of(Assignment)).once
+            expect(homework_service).to receive(:successful_email)
             request
 
             expect(progress.reload.workflow_state).to eq 'completed'
           end
 
           it 'should send a failure email' do
-            allow(Services::SubmitHomeworkService).to receive(:submit).and_raise('error')
-            expect(Services::SubmitHomeworkService).to receive(:failure_email).with(kind_of(Attachment), kind_of(Assignment)).once
+            allow(homework_service).to receive(:submit).and_raise('error')
+            expect(homework_service).to receive(:failure_email)
             request
 
             expect(progress.reload.workflow_state).to eq 'failed'
@@ -1398,8 +1407,8 @@ describe FilesController do
           end
           let(:request) { post "api_capture", params: progress_params }
 
-          it 'should submit the attachment' do
-            expect(Services::SubmitHomeworkService).not_to receive(:submit).with(kind_of(Attachment), progress.created_at)
+          it 'should not submit the attachment' do
+            expect(homework_service).not_to receive(:submit)
             request
           end
 
@@ -1408,6 +1417,29 @@ describe FilesController do
             assert_status(201)
           end
         end
+      end
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should create the attachment on the context's shard" do
+        user = @shard1.activate{ User.create!(name: "me") }
+        post "api_capture", params: {
+          user_id: user.global_id,
+          context_type: "User",
+          context_id: user.global_id,
+          token: @token,
+          name: "test.txt",
+          size: 42,
+          content_type: "text/plain",
+          instfs_uuid: 1,
+          folder_id: user.profile_pics_folder.global_id,
+        }
+        assert_status(201)
+        attachment = assigns[:attachment]
+        expect(attachment).not_to be_nil
+        expect(attachment.shard).to eq @shard1
       end
     end
   end

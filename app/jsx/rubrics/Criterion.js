@@ -95,7 +95,7 @@ const Threshold = ({ threshold }) => (
   <Text size="x-small" weight="normal">
     {
       I18n.t('threshold: %{pts}', {
-        pts: I18n.toNumber(threshold, { precision: 1 } )
+        pts: I18n.toNumber(threshold, { precision: 2, strip_insignificant_zeros: true } )
       })
     }
   </Text>

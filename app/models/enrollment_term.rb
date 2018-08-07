@@ -30,6 +30,7 @@ class EnrollmentTerm < ActiveRecord::Base
   has_many :course_sections
 
   validates_presence_of :root_account_id, :workflow_state
+  validate :prevent_default_term_name_change
   validate :check_if_deletable
   validate :consistent_account_associations
 
@@ -39,6 +40,12 @@ class EnrollmentTerm < ActiveRecord::Base
 
   include StickySisFields
   are_sis_sticky :name, :start_at, :end_at
+
+  def prevent_default_term_name_change
+    if self.name_changed? && self.name_was == DEFAULT_TERM_NAME && self == self.root_account.default_enrollment_term
+      self.errors.add(:name, t("Cannot change the default term name"))
+    end
+  end
 
   def check_if_deletable
     if self.workflow_state_changed? && self.workflow_state == "deleted"

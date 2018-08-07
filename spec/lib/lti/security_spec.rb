@@ -177,7 +177,6 @@ describe Lti::Security do
         nonce: nonce,
         timestamp: timestamp
       )
-      puts header.send(:signature_base)
       expect(header.valid?(signature: signed_params['oauth_signature'])).to eq true
 
     end

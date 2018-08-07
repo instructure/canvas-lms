@@ -20,6 +20,8 @@ require_dependency 'services/submit_homework_service'
 
 module Services
   describe SubmitHomeworkService do
+    subject { described_class.new(attachment, assignment) }
+
     let(:user) { user_factory }
     let(:assignment) { assignment_model }
     let(:attachment) do
@@ -78,14 +80,19 @@ module Services
     end
 
     describe '.submit_job' do
+      let(:service) { described_class.new(attachment, assignment)}
       let(:progress) { Progress.create(context: assignment, tag: 'test') }
       let!(:worker) { described_class.submit_job(progress, attachment, eula_agreement_timestamp, executor) }
+
+      before { allow(described_class).to receive(:new).and_return(service) }
 
       it 'should clone and submit the url' do
         allow(worker).to receive(:attachment).and_return(attachment)
         expect(attachment).to receive(:clone_url).with(url, dup_handling, check_quota, opts)
-        expect(described_class).to receive(:submit).with(attachment, assignment, progress.created_at, eula_agreement_timestamp)
+        expect(service).to receive(:submit).with(progress.created_at, eula_agreement_timestamp)
         worker.perform
+
+        expect(progress.reload.workflow_state).to eq 'completed'
       end
 
       context 'on an error' do
@@ -119,12 +126,15 @@ module Services
           expect(email_job.handler).to match(/#{described_class::EmailWorker.name}/)
           expect(Mailer).to receive(:deliver).with(Mailer.create_message(successful_email))
           email_job.invoke_job
+
+          expect(progress.reload.workflow_state).to eq 'completed'
         end
       end
     end
 
     describe '#submit' do
-      let(:submission) { described_class.submit(attachment, assignment, submitted_at, eula_agreement_timestamp) }
+      let(:submission) { subject.submit(submitted_at, eula_agreement_timestamp) }
+      let(:recent_assignment) { assignment.reload }
 
       it 'should set submitted_at to the Progress#created_at' do
         expect(submission.submitted_at).to eq submitted_at
@@ -144,7 +154,7 @@ module Services
 
       describe '#successful_email' do
         it 'enqueues a successful email' do
-          described_class.successful_email(attachment, assignment)
+          subject.successful_email
           expect(email_job.handler).to match(/#{described_class::EmailWorker.name}/)
           expect(Mailer).to receive(:deliver).with(Mailer.create_message(successful_email))
           email_job.invoke_job
@@ -153,7 +163,7 @@ module Services
 
       describe '#failure_email' do
         it 'enqueues a failure email' do
-          described_class.failure_email(attachment, assignment)
+          subject.failure_email
           expect(email_job.handler).to match(/#{described_class::EmailWorker.name}/)
           expect(Mailer).to receive(:deliver).with(Mailer.create_message(failure_email))
           email_job.invoke_job

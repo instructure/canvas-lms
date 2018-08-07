@@ -100,6 +100,45 @@ require 'csv'
 #       }
 #     }
 #
+# @model TermsOfService
+#     {
+#       "id": "TermsOfService",
+#       "description": "",
+#       "properties":
+#       {
+#         "id": {
+#           "description": "Terms Of Service id",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "terms_type": {
+#           "description": "The given type for the Terms of Service",
+#           "enum":
+#           [
+#             "default",
+#             "custom",
+#             "no_terms"
+#           ],
+#           "example": "default",
+#           "type": "string"
+#         },
+#         "passive": {
+#           "description": "Boolean dictating if the user must accept Terms of Service",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "account_id": {
+#           "description": "The id of the root account that owns the Terms of Service",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "content": {
+#           "description": "Content of the Terms of Service",
+#           "example": "To be or not to be that is the question",
+#           "type": "string"
+#         }
+#       }
+#     }
 class AccountsController < ApplicationController
   before_action :require_user, :only => [:index, :terms_of_service]
   before_action :reject_student_view_student
@@ -264,7 +303,9 @@ class AccountsController < ApplicationController
     render :json => @accounts.map { |a| account_json(a, @current_user, session, []) }
   end
 
-  # @API Returns the terms of service for that account
+  # @API Get the Terms of Service
+  #
+  # Returns the terms of service for that account
   #
   # @returns TermsOfService
   def terms_of_service
@@ -462,7 +503,7 @@ class AccountsController < ApplicationController
     page_opts[:total_entries] = nil if params[:search_term] # doesn't calculate a total count
     @courses = Api.paginate(@courses, self, api_v1_account_courses_url, page_opts)
 
-    ActiveRecord::Associations::Preloader.new.preload(@courses, [:account, :root_account])
+    ActiveRecord::Associations::Preloader.new.preload(@courses, [:account, :root_account, course_account_associations: :account])
     ActiveRecord::Associations::Preloader.new.preload(@courses, [:teachers]) if includes.include?("teachers")
     ActiveRecord::Associations::Preloader.new.preload(@courses, [:enrollment_term]) if includes.include?("term")
 

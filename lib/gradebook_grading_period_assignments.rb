@@ -50,7 +50,7 @@ class GradebookGradingPeriodAssignments
       where(enrollments: { course_id: @course, type: ['StudentEnrollment', 'StudentViewEnrollment'] }).
       where.not(grading_period_id: nil, enrollments: { workflow_state: excluded_workflow_states }).
       group(:grading_period_id).
-      pluck(:grading_period_id, "array_agg(DISTINCT assignment_id)").
+      pluck(:grading_period_id, Arel.sql("array_agg(DISTINCT assignment_id)")).
       to_h
   end
 end

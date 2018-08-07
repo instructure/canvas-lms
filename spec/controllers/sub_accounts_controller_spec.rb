@@ -41,7 +41,7 @@ describe SubAccountsController do
       root_account = Account.default
       account_admin_user(:active_all => true)
       user_session(@user)
-
+      
       sub_account = root_account.sub_accounts.create(:name => 'sub account')
 
       post 'create', params: {:account_id => sub_account.id, :account => { :parent_account_id => sub_account.id, :name => 'sub sub account 2' }}
@@ -50,6 +50,17 @@ describe SubAccountsController do
       expect(sub_sub_account_2.name).to eq 'sub sub account 2'
       expect(sub_sub_account_2.parent_account).to eq sub_account
       expect(sub_sub_account_2.root_account).to eq root_account
+    end
+
+    it 'should report errors encountered while creating a sub account' do
+      root_account = Account.default
+      account_admin_user(:active_all => true)
+      user_session(@user)
+      post 'create', params: {:account_id => root_account.id, :account => { :sis_account_id => "C001", :name => 'sub account 1' }}
+      expect(response.status).to eq(200)
+      post 'create', params: {:account_id => root_account.id, :account => { :sis_account_id => "C001", :name => 'sub account 2' }}
+      expect(response.status).to eq(400)
+      expect(JSON.parse(response.body)).to have_key("errors")
     end
   end
 

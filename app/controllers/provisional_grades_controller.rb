@@ -94,7 +94,7 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
   # @API Select provisional grade
   #
   # Choose which provisional grade the student should receive for a submission.
-  # The caller must have :moderate_grades rights.
+  # The caller must be the final grader for the assignment or an admin with :select_final_grade rights.
   #
   # @example_response
   #   {

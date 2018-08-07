@@ -30,7 +30,7 @@ import _ from 'underscore'
     focus() {
       if (tinymce !== undefined) {
         let editor = tinymce.get(this._textareaEl.id)
-        editor && editor.focus()
+        editor && editor.focus(true)
       }
     }
   }

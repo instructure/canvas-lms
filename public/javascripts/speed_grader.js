@@ -304,44 +304,58 @@ function mergeStudentsAndSubmission() {
     }
   }
 
-  // by default the list is sorted alphabetically by student last name so we
-  // don't have to do any more work here, if the cookie to sort it by
-  // submitted_at is set we need to sort by submitted_at.
   if (isAnonymous) {
-    jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(student => student.anonymous_id))
-
-    // update index again to be in line with the anonymous_id sorting
-    jsonData.studentsWithSubmissions.forEach((student, index) => {
-      student.index = index /* eslint-disable-line no-param-reassign */
+    // When student anonymity is enabled, the students must be indexed
+    // consistently. For a given anonymous id, the student name (e.g. Student 1)
+    // must be consistent regardless of how the students are sorted.
+    const orderedIds = Object.keys(window.jsonData.studentMap).sort()
+    orderedIds.forEach((id, index) => {
+      window.jsonData.studentMap[id].index = index
     })
-  } else if (utils.shouldHideStudentNames() && userSettings.get('eg_sort_by') === 'alphabetically') {
-    window.jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(function (student) {
-      return student && student.submission && student.submission.id;
-    }));
-  } else if (userSettings.get("eg_sort_by") == "submitted_at") {
-    window.jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(function (student) {
-      var submittedAt = student &&
-        student.submission &&
-        student.submission.submitted_at;
-      if (submittedAt) {
-        return +tz.parse(submittedAt);
-      } else {
-        // puts the unsubmitted assignments at the bottom
-        return Number.NaN;
+  }
+
+  switch(userSettings.get("eg_sort_by")) {
+    case 'submitted_at': {
+      window.jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(student => {
+        const submittedAt = student && student.submission && student.submission.submitted_at;
+        if (submittedAt) {
+          return +tz.parse(submittedAt);
+        } else {
+          // puts the unsubmitted assignments at the bottom
+          return Number.NaN;
+        }
+      }));
+      break;
+    }
+
+    case 'submission_status': {
+      const states = {
+        "not_graded": 1,
+        "resubmitted": 2,
+        "not_submitted": 3,
+        "graded": 4,
+        "not_gradeable": 5
+      };
+      window.jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(student => (
+        student && states[SpeedgraderHelpers.submissionState(student, ENV.grading_role)]
+      )));
+      break;
+    }
+
+    default: {
+      // The list of students is sorted alphabetically on the server by student
+      // last name.
+
+      if (isAnonymous) {
+        // When student anonymity is enabled, sort by the student's related
+        // anonymous id.
+        window.jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(student => student.anonymous_id))
+      } else if (utils.shouldHideStudentNames()) {
+        window.jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(student => (
+          student && student.submission && student.submission.id
+        )));
       }
-    }));
-  } else if (userSettings.get("eg_sort_by") == "submission_status") {
-    var states = {
-      "not_graded": 1,
-      "resubmitted": 2,
-      "not_submitted": 3,
-      "graded": 4,
-      "not_gradeable": 5
-    };
-    window.jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(function (student) {
-      return student &&
-        states[SpeedgraderHelpers.submissionState(student, ENV.grading_role)];
-    }));
+    }
   }
 }
 
@@ -365,7 +379,7 @@ function initDropdown(){
     let {name} = student
     const className = SpeedgraderHelpers.classNameBasedOnStudent({submission_state, submission})
     if (hideStudentNames || isAnonymous) {
-      name = I18n.t("Student %{number}", {number: index + 1})
+      name = I18n.t("Student %{number}", {number: student.index + 1})
     }
 
     return {[anonymizableId]: student[anonymizableId], anonymizableId, name, className};
@@ -1694,10 +1708,15 @@ EG = {
           $.isPreviewable(attachment.content_type, 'google')) {
         inlineableAttachments.push(attachment);
       }
-      var viewedAtHTML = studentViewedAtTemplate({
-        viewed_at: $.datetimeString(attachment.viewed_at)
-      });
+
+      let viewedAtHTML = ''
+      if (!jsonData.anonymize_students || isAdmin) {
+        viewedAtHTML = studentViewedAtTemplate({
+          viewed_at: $.datetimeString(attachment.viewed_at)
+        })
+      }
       $submission_attachment_viewed_at.html($.raw(viewedAtHTML));
+
       if (browserableCssClasses.test(attachment.mime_class)) {
         browserableAttachments.push(attachment);
       }
@@ -1855,6 +1874,7 @@ EG = {
       });
 
       innerHTML = submissionsDropdownTemplate({
+        showSubmissionStatus: !jsonData.anonymize_students || isAdmin,
         singleSubmission: submissionHistory.length == 1,
         submissions: templateSubmissions,
         linkToQuizHistory: jsonData.too_many_quiz_submissions,
@@ -1951,6 +1971,7 @@ EG = {
     $(".speedgrader_alert").hide();
     if (!this.currentStudent.submission || !this.currentStudent.submission.submission_type || this.currentStudent.submission.workflow_state == 'unsubmitted') {
       $this_student_does_not_have_a_submission.show();
+      this.emptyIframeHolder()
     } else if (this.currentStudent.submission && this.currentStudent.submission.submitted_at && jsonData.context.quiz && jsonData.context.quiz.anonymous_submissions) {
       $this_student_has_a_submission.show();
     } else if (attachment) {
@@ -2278,10 +2299,12 @@ EG = {
     }
     // anonymous commentors
     if (comment.author_name == null) {
-      if (provisionalGraderDisplayNames == null) this.setupProvisionalGraderDisplayNames()
       const {provisional_grade_id} = EG.currentStudent.submission.provisional_grades.find(pg =>
         pg.anonymous_grader_id === comment.anonymous_id
       )
+      if (provisionalGraderDisplayNames == null || provisionalGraderDisplayNames[provisional_grade_id] == null) {
+        this.setupProvisionalGraderDisplayNames()
+      }
       comment.author_name = provisionalGraderDisplayNames[provisional_grade_id]
     }
     commentElement = commentElement.fillTemplateData({ data: comment });
@@ -2562,20 +2585,22 @@ EG = {
     };
 
     const submissionError = (data, _xhr, _textStatus, _errorThrown) => {
-      EG.handleGradingError(data);
+      EG.handleGradingError(data)
 
+      let selectedGrade
       if (ENV.grading_role === 'moderator') {
-        // Revert to the previously-selected provisional grade, which will not
-        // necessarily be the value in EG.currentStudent.submission
-        const selectedGrade = currentStudentProvisionalGrades().find(provisionalGrade => provisionalGrade.selected)
-        if (selectedGrade) {
-          EG.setActiveProvisionalGradeFields({
-            grade: selectedGrade,
-            label: provisionalGraderDisplayNames[selectedGrade.provisional_grade_id]
-          })
-        }
+        selectedGrade = currentStudentProvisionalGrades().find(provisionalGrade => provisionalGrade.selected)
+      }
+
+      // Revert to the previously selected provisional grade (if we're moderating) or
+      // the last valid value (if not moderating or no provisional grade was chosen)
+      if (selectedGrade) {
+        EG.setActiveProvisionalGradeFields({
+          grade: selectedGrade,
+          label: provisionalGraderDisplayNames[selectedGrade.provisional_grade_id]
+        })
       } else {
-        EG.showGrade();
+        EG.showGrade()
       }
     };
 
@@ -2719,6 +2744,8 @@ EG = {
   },
 
   compareStudentsBy: function (f) {
+    const secondaryAttr = isAnonymous ? 'anonymous_id' : 'sortable_name'
+
     return function (studentA, studentB) {
       var a = f(studentA);
       var b = f(studentB);
@@ -2726,7 +2753,7 @@ EG = {
       if ((!a && !b) || a === b) {
         // chrome / safari sort isn't stable, so we need to sort by name in
         // case of tie
-        return natcompare.strings(studentA.sortable_name, studentB.sortable_name);
+        return natcompare.strings(studentA[secondaryAttr], studentB[secondaryAttr]);
       } else if (!a || a > b) {
         return 1;
       }
@@ -2836,26 +2863,26 @@ EG = {
 
   setupProvisionalGraderDisplayNames() {
     provisionalGraderDisplayNames = {};
-
     let provisionalGrades = currentStudentProvisionalGrades();
-    // For anonymous assignments, we sort by anonymous grader ID and
-    // number our graders based on that order
-    if (provisionalGrades.length > 0 && provisionalGrades[0].anonymous_grader_id) {
-      provisionalGrades = _.sortBy(provisionalGrades, (grade) => grade.anonymous_grader_id);
+    const anonymous_grader_ids = window.jsonData.anonymous_grader_ids || [];
+    const anonymousIdToProvisionalName = {};
+
+    // By doing this, we guarantee that the provisional graders will
+    // maintain the same order within the same speedgrader session.
+    for (let i = 0; i < anonymous_grader_ids.length; i += 1) {
+      anonymousIdToProvisionalName[anonymous_grader_ids[i]] = I18n.t('Grader %{index}',{index: i+1});
     }
 
-    let provisionalGradesCounted = 0;
     provisionalGrades.forEach((grade) => {
       if (grade.readonly) {
-        provisionalGradesCounted += 1;
         const displayName = grade.anonymous_grader_id
-          ? I18n.t('Grader %{graderIndex}', {graderIndex: provisionalGradesCounted})
+          ? anonymousIdToProvisionalName[grade.anonymous_grader_id]
           : grade.scorer_name;
         provisionalGraderDisplayNames[grade.provisional_grade_id] = displayName;
       } else {
         provisionalGraderDisplayNames[grade.provisional_grade_id] = customProvisionalGraderLabel;
       }
-    })
+    });
   },
 
   fetchProvisionalGrades() {

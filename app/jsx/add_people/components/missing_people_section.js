@@ -24,7 +24,7 @@ import Table from '@instructure/ui-elements/lib/components/Table'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
-import Link from '@instructure/ui-elements/lib/components/Link'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 
   const namePrompt = I18n.t('Click to add a name');
   const nameLabel = I18n.t("New user's name");
@@ -66,15 +66,15 @@ import Link from '@instructure/ui-elements/lib/components/Link'
       eatEvent(event);
 
       // user may have clicked on the link. if so, put focus on the adjacent checkbox
-      if (!(event.target.tagName === 'INPUT' && event.target.getAttribute('type') === 'checkbox')) {
+      if (!(event.currentTarget.tagName === 'INPUT' && event.currentTarget.getAttribute('type') === 'checkbox')) {
         // The link was rendered with the attribute data-address=address for this row.
         // Use it to find the checkbox with the matching value.
-        const checkbox = this.tbodyNode.querySelector(`input[type="checkbox"][value="${event.target.getAttribute('data-address')}"]`);
+        const checkbox = this.tbodyNode.querySelector(`input[type="checkbox"][value="${event.currentTarget.getAttribute('data-address')}"]`);
         if (checkbox) {
           checkbox.focus();
         }
       }
-      const address = event.target.value || event.target.getAttribute('data-address');
+      const address = event.currentTarget.value || event.currentTarget.getAttribute('data-address');
       this.onSelectNewForMissingByAddress(address);
     }
 
@@ -96,8 +96,8 @@ import Link from '@instructure/ui-elements/lib/components/Link'
 
     // check or uncheck all the missing users' checkboxes
     onSelectNewForMissingAll = (event) => {
-      this.setState({selectAll: event.target.checked});
-      if (event.target.checked) {
+      this.setState({selectAll: event.currentTarget.checked});
+      if (event.currentTarget.checked) {
         Object.keys(this.props.missing).forEach(address => this.onSelectNewForMissingByAddress(address));
       } else {
         Object.keys(this.props.missing).forEach(address => this.onUncheckUserByAddress(address));
@@ -108,17 +108,17 @@ import Link from '@instructure/ui-elements/lib/components/Link'
     // changes, we come here collect the input
     // @param event: the event that triggered the change
     onNewForMissingChange = (event) => {
-      const field = event.target.getAttribute('name');
-      const address = event.target.getAttribute('data-address');
+      const field = event.currentTarget.getAttribute('name');
+      const address = event.currentTarget.getAttribute('data-address');
       const newUserInfo = this.props.missing[address].newUserInfo;
-      newUserInfo[field] = event.target.value;
+      newUserInfo[field] = event.currentTarget.value;
       this.props.onChange(address, newUserInfo);
     }
 
     // when user unchecks a checked new user
     // @param event: the click event
     onUncheckUser = (event) => {
-      this.onUncheckUserByAddress(event.target.value);
+      this.onUncheckUserByAddress(event.currentTarget.value);
       this.setState({selectAll: false});
     }
     onUncheckUserByAddress = (address) => {
@@ -197,9 +197,9 @@ import Link from '@instructure/ui-elements/lib/components/Link'
                 />
               </td>
               <td colSpan="2">
-                <Link onClick={this.onSelectNewForMissing} data-address={missing.address}>
+                <Button variant="link" onClick={this.onSelectNewForMissing} data-address={missing.address}>
                   {namePrompt}
-                </Link>
+                </Button>
               </td>
               <th scope="row">{missing.address}</th>
             </tr>
@@ -259,9 +259,9 @@ import Link from '@instructure/ui-elements/lib/components/Link'
                 />
               </td>
               <td>
-                <Link onClick={this.onSelectNewForMissing} data-address={missing.address}>
+                <Button variant="link" onClick={this.onSelectNewForMissing} data-address={missing.address}>
                   {namePrompt}
-                </Link>
+                </Button>
               </td>
               <th scope="row">{missing.address}</th>
             </tr>

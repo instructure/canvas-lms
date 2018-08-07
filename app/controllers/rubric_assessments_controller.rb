@@ -51,7 +51,7 @@ class RubricAssessmentsController < ApplicationController
       opts = {}
       if value_to_boolean(params[:provisional])
         opts[:provisional_grader] = @current_user
-        opts[:final] = true if value_to_boolean(params[:final]) && @context.grants_right?(@current_user, :moderate_grades)
+        opts[:final] = true if mark_provisional_grade_as_final?
       end
 
       @asset, @user = @association_object.find_asset_for_assessment(@association, user_id, opts)
@@ -106,5 +106,9 @@ class RubricAssessmentsController < ApplicationController
         assignment_id: @association.association_id
       ).user_id
     end
+  end
+
+  def mark_provisional_grade_as_final?
+    value_to_boolean(params[:final]) && @association_object.permits_moderation?(@current_user)
   end
 end

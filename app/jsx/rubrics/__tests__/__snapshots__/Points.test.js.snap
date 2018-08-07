@@ -7,7 +7,7 @@ exports[`The Points component renders the component when assessing with the expe
       <TextInput inline={true} label={{...}} messages={{...}} onChange={[Function]} value=\\"1\\" width=\\"4rem\\" type=\\"text\\" size=\\"medium\\" textAlign=\\"start\\" disabled={false} readOnly={false} inputRef={[Function]} layout=\\"stacked\\" />
     </FlexItem>
     <FlexItem margin=\\"small none none none\\" as=\\"span\\" grow={false} shrink={false}>
-      / 2.0 pts
+      / 2 pts
     </FlexItem>
   </Flex>
 </div>"
@@ -15,6 +15,6 @@ exports[`The Points component renders the component when assessing with the expe
 
 exports[`The Points component renders the root component as expected 1`] = `
 "<div className=\\"react-rubric-cell graded-points\\">
-  1 / 2.0 pts
+  1 / 2 pts
 </div>"
 `;

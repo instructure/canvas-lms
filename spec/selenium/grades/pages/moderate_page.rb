@@ -36,6 +36,10 @@ class ModeratePage
       post_grades_button.click
     end
 
+    def click_display_to_students_button
+        display_to_students_button.click
+    end
+
     def click_page_number(page_number)
       page_buttons.find {|e| e.text == page_number.to_s}.click
     end
@@ -96,6 +100,10 @@ class ModeratePage
 
     def grades_posted_button
       fj("button:contains('Grades Posted')")
+    end
+
+    def display_to_students_button
+      fj("button:contains('Display')")
     end
 
     def page_buttons

@@ -51,7 +51,8 @@ export default function CoursesToolbar({
   isLoading,
   errors,
   draftFilters,
-  show_blueprint_courses_checkbox
+  show_blueprint_courses_checkbox,
+  toggleSRMessage
 }) {
   const groupedTerms = groupBy(terms.data, termGroup)
   const searchLabel =
@@ -116,6 +117,15 @@ export default function CoursesToolbar({
                       value={draftFilters.search_term}
                       placeholder={searchLabel}
                       onChange={e => onUpdateFilters({search_term: e.target.value})}
+                      onKeyUp={e => {
+                        if (e.key === "Enter") {
+                          toggleSRMessage(true)
+                        } else {
+                          toggleSRMessage(false)
+                        }
+                      }}
+                      onBlur={ () => toggleSRMessage(true) }
+                      onFocus={ () => toggleSRMessage(false) }
                       messages={errors.search_term && [{type: 'error', text: errors.search_term}]}
                     />
                   </GridCol>
@@ -158,6 +168,7 @@ export default function CoursesToolbar({
 }
 
 CoursesToolbar.propTypes = {
+  toggleSRMessage: func.isRequired,
   can_create_courses: bool,
   show_blueprint_courses_checkbox: bool,
   onUpdateFilters: func.isRequired,
