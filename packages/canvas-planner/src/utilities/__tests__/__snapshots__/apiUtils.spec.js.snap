@@ -369,6 +369,38 @@ Object {
 }
 `;
 
+exports[`transformApiToInternalItem extracts and transforms the proper date for a peer review 1`] = `
+Object {
+  "completed": false,
+  "context": Object {
+    "color": "#abffaa",
+    "id": "1",
+    "image_url": "blah_url",
+    "title": "blah",
+    "type": "Course",
+    "url": undefined,
+  },
+  "course_id": "1",
+  "date": "2018-03-27T18:58:51.000Z",
+  "dateBucketMoment": "2018-03-27T00:00:00.000Z",
+  "dateStyle": "due",
+  "feedback": undefined,
+  "html_url": undefined,
+  "id": "1",
+  "location": null,
+  "newActivity": false,
+  "originallyCompleted": false,
+  "overrideAssignId": undefined,
+  "overrideId": null,
+  "points": undefined,
+  "status": false,
+  "title": "review me",
+  "toggleAPIPending": false,
+  "type": "Peer Review",
+  "uniqueId": "assessment_request-1",
+}
+`;
+
 exports[`transformApiToInternalItem handles account-level group items 1`] = `
 Object {
   "completed": false,

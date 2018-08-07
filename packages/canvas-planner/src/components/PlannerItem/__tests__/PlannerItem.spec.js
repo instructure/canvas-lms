@@ -213,6 +213,20 @@ it('renders Assignment correctly with just date', () => {
   expect(wrapper).toMatchSnapshot();
 });
 
+it('renders assignment peer reviews correctly', () => {
+  const wrapper = shallow(
+    <PlannerItem {
+      ...defaultProps(
+        {
+          associated_item: 'Peer Review',
+          title: 'some reviewable assignment',
+        }
+      )
+    } />
+  );
+  expect(wrapper).toMatchSnapshot();
+})
+
 it('renders Discussion correctly with everything', () => {
   const wrapper = shallow(
     <PlannerItem {

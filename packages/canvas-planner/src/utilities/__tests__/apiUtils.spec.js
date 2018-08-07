@@ -290,6 +290,12 @@ function makeCalendarEvent(overrides = {}) {
   }
 }
 
+function makeAssessmentRequest(overrides = {}) {
+  return {
+    workflow_state: 'assigned'
+  }
+}
+
 describe('transformApiToInternalItem', () => {
   it('extracts and transforms the proper data for responses containing a status', () => {
     const apiResponse = makeApiResponse({
@@ -457,6 +463,22 @@ describe('transformApiToInternalItem', () => {
     expect(result).toMatchSnapshot();
   });
 
+  it('extracts and transforms the proper date for a peer review', () => {
+    // primarily testing that the internal item pulls its title from the assignment
+    const apiResponse = makeApiResponse({
+      plannable_type: 'assessment_request',
+      plannable: {
+        id: '1',
+        assignment: makeAssignment({
+          name: "review me",
+        }),
+      },
+    });
+
+    const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
+    expect(result).toMatchSnapshot();
+  });
+
   it('adds the dateBucketMoment field', () => {
     const apiResponse = makeApiResponse({
       plannable_type: 'assignment',
@@ -581,6 +603,28 @@ describe('transformApiToInternalItem', () => {
     // submitted but user marked not complete => not complete
     apiResponse.submissions.submitted = true;
     apiResponse.planner_override = {marked_complete: false}
+    result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
+    expect(result.completed).toBeFalsy();
+
+    // assessment_request (they're different)
+    // - assigned => not complete
+    apiResponse.plannable = makeAssessmentRequest();
+    result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
+    expect(result.completed).toBeFalsy();
+
+    // - assigned with completed override => complete
+    apiResponse.planner_override = {marked_complete: true};
+    result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
+    expect(result.completed).toBeTruthy();
+
+    // - completed with no override => complete
+    apiResponse.plannable.workflow_state = 'completed';
+    apiResponse.planner_override = null;
+    result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
+    expect(result.completed).toBeTruthy();
+
+    // - completed with incomplete override => not complete
+    apiResponse.planner_override = {marked_complete: false};
     result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
     expect(result.completed).toBeFalsy();
   })

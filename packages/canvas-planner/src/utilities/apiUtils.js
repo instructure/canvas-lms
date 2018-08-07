@@ -23,16 +23,11 @@ import { makeEndOfDayIfMidnight } from './dateUtils';
 const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
   let { plannable, plannable_type, planner_override } = apiResponse;
   const plannableId = plannable.id || plannable.page_id;
-  const markedComplete = planner_override;
 
   const details = {
     course_id: plannable.course_id || apiResponse.course_id,
-    title: plannable.name || plannable.title,
-    // items are completed if the user marks it as complete or made a submission
-    completed: (markedComplete != null)
-      ? markedComplete.marked_complete
-      : (apiResponse.submissions && apiResponse.submissions.submitted
-    ),
+    title: getPlannableTitle(plannable, plannable_type),
+    completed: isComplete(apiResponse),
     points: plannable.points_possible,
     html_url: apiResponse.html_url || plannable.html_url,
     overrideId: planner_override && planner_override.id,
@@ -71,6 +66,7 @@ const TYPE_MAPPING = {
   announcement: "Announcement",
   planner_note: "To Do",
   calendar_event: "Calendar Event",
+  assessment_request: "Peer Review",
 };
 
 const getItemType = (plannableType) => {
@@ -233,4 +229,27 @@ function getGroupContext(apiResponse, group) {
     color: group.color,
     url: group.url
   };
+}
+
+function getPlannableTitle(plannable, type) {
+  if (type === 'assessment_request') {
+    return plannable.assignment.name;
+  }
+  return plannable.name || plannable.title;
+}
+
+// is the item complete?
+// either marked as complete by the user, or because the work was completed.
+function isComplete(apiResponse) {
+  const { plannable, plannable_type, planner_override, submissions } = apiResponse;
+
+  let complete = false;
+  if (planner_override) {
+    complete = planner_override.marked_complete
+  } else if (plannable_type === 'assessment_request') {
+    complete = plannable.workflow_state === 'completed';
+  } else if (submissions) {
+    complete = submissions.submitted
+  }
+  return complete;
 }

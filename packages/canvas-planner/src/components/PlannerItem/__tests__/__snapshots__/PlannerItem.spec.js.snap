@@ -3799,6 +3799,121 @@ exports[`renders Quiz correctly without right side content 1`] = `
 </div>
 `;
 
+exports[`renders assignment peer reviews correctly 1`] = `
+<div
+  className="planner-item"
+>
+  <div>
+    <ApplyTheme
+      immutable={false}
+      theme={Object {}}
+    >
+      <Checkbox
+        checked={false}
+        disabled={false}
+        indeterminate={false}
+        inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Peer Review some reviewable assignment is not marked as done.
+          </ScreenReaderContent>
+        }
+        onChange={[Function]}
+        size="medium"
+        variant="simple"
+      />
+    </ApplyTheme>
+  </div>
+  <div
+    aria-hidden="true"
+    style={
+      Object {
+        "color": "#d71f85",
+      }
+    }
+  >
+    <IconPeerReview />
+  </div>
+  <div>
+    <div>
+      <div
+        className=""
+      >
+        <div>
+          <Text
+            as="span"
+            color="secondary"
+            letterSpacing="normal"
+            size="x-small"
+          >
+            A Course about being Diffrient Peer Review
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={true}
+            href="#"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Peer Review some reviewable assignment, due Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
+            <PresentationContent
+              as="span"
+            >
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                some reviewable assignment
+              </Text>
+            </PresentationContent>
+          </Link>
+        </div>
+      </div>
+      <div
+        className=""
+      >
+        <div />
+        <div
+          className=""
+        >
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                Reminder: 3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
 exports[`renders correctly 1`] = `
 <div
   className="planner-item"
