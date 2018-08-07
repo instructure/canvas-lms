@@ -1964,6 +1964,24 @@ describe Submission do
         })
       end
 
+      it "prioritizes recent originality report if multiple exist for an attachment" do
+        AttachmentAssociation.create!(context: submission, attachment_id: attachment)
+        submission.update_attributes(attachment_ids: attachment.id.to_s)
+        first_report = OriginalityReport.create!(
+          attachment: attachment,
+          submission: submission,
+          workflow_state: 'pending'
+        )
+        second_report = OriginalityReport.create!(
+          attachment: attachment,
+          submission: submission,
+          originality_score: 50
+        )
+
+        report_data = submission.originality_data[attachment.asset_string]
+        expect(report_data[:similarity_score]).to eq second_report.originality_score
+      end
+
       it "includes tii data" do
         tii_data = {
           similarity_score: 10,
