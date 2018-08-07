@@ -105,7 +105,10 @@ export function insertImage(editor, image) {
 
 // checks if there's an existing anchor containing the cursor
 function currentLink(editor, link) {
-  const cursor = link.selectionDetails.node;
+  const cursor =
+    link.selectionDetails && link.selectionDetails.node
+      ? link.selectionDetails.node
+      : editor.selection.getNode(); // This doesn't work in IE 11, but will stop brokeness in other browsers
   return editor.dom.getParent(cursor, "a");
 }
 
@@ -117,8 +120,11 @@ function hasSelection(editor) {
 }
 
 export function existingContentToLink(editor, link) {
-  return !editor.isHidden() &&
-         ((link && (currentLink(editor, link) || !!link.selectedContent)) || hasSelection(editor));
+  return (
+    !editor.isHidden() &&
+    ((link && (currentLink(editor, link) || !!link.selectedContent)) ||
+      hasSelection(editor))
+  );
 }
 
 function selectionIsImg(editor) {
@@ -131,7 +137,7 @@ export function existingContentToLinkIsImg(editor) {
 }
 
 function insertUndecoratedLink(editor, link) {
-  editor.focus()
+  editor.focus();
   if (existingContentToLink(editor, link)) {
     if (!hasSelection(editor)) {
       // editor.selection doesn't work so well in IE 11 so we handle that case

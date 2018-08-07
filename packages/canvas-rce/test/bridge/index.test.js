@@ -51,6 +51,19 @@ describe("Bridge actions, embed image", () => {
   });
 
   it("inserts a link through the bridge", () => {
+    mockEditor.props = {
+      textareaId: "fake_editor",
+      tinymce: {
+        get(id) {
+          return {
+            selection: {
+              getRng: sinon.stub().returns("some-range"),
+              getNode: sinon.stub().returns("some-node")
+            }
+          };
+        }
+      }
+    };
     mockEditor.existingContentToLink.returns(true);
     Bridge.embedImage({});
     sinon.assert.calledWithMatch(mockEditor.insertLink, {
