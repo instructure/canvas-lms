@@ -81,7 +81,7 @@ module Api::V1::Course
   #
   def course_json(course, user, session, includes, enrollments)
     if includes.include?('access_restricted_by_date') && enrollments && enrollments.all?(&:inactive?)
-      schoo_admin = AccountUser
+      school_admin = AccountUser
         .where(role: Role.find_by(name: 'AccountAdmin'))
         .where(user: @current_user)
         .where(account: Account.default).first
