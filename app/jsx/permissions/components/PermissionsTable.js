@@ -26,7 +26,7 @@ import 'compiled/jquery.rails_flash_notifications' // eslint-disable-line
 
 import Link from '@instructure/ui-elements/lib/components/Link'
 import Text from '@instructure/ui-elements/lib/components/Text'
-
+import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
 import View from '@instructure/ui-layout/lib/components/View'
 
 import actions from '../actions'
@@ -109,14 +109,24 @@ export default class PermissionsTable extends Component {
                 className="ic-permissions__header-content ic-permissions__header-content-col"
                 id={`ic-permissions__role-header-for-role-${role.id}`}
               >
-                <Link
-                  as="button"
+                <Tooltip
+                  as={Link}
+                  tip={role.label}
                   onClick={() => this.openRoleTray(role)}
                   id={`role_${role.id}`}
                   onFocus={this.fixScrollHeader}
                 >
-                  <Text size="small">{role.label} </Text>
-                </Link>
+                  <div
+                    style={{
+                      width: '140px',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}
+                  >
+                    <Text size="small">{role.label}</Text>
+                  </div>
+                </Tooltip>
               </div>
             </div>
           </th>
@@ -173,7 +183,7 @@ export default class PermissionsTable extends Component {
         {this.props.roles.map(role => (
           <td key={role.id}>
             <div className="ic-permissions__cell-content">
-              <input type="checkbox" aria-label="toggle some mini permission" />
+              <input type="checkbox" aria-label="toggle sub-permission" />
             </div>
           </td>
         ))}
