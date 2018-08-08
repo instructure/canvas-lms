@@ -247,6 +247,7 @@ describe UsersController do
           @domain_root_account = @course.account
           pairing_code = @student.generate_observer_pairing_code
           @course.account.enable_feature!(:observer_pairing_code)
+          @domain_root_account.enable_self_registration()
 
           post 'create', params: {
             pseudonym: {
@@ -287,6 +288,7 @@ describe UsersController do
           @domain_root_account = @course.account
           pairing_code = @student.generate_observer_pairing_code
           @course.account.enable_feature!(:observer_pairing_code)
+          @course.account.enable_self_registration()
 
           post 'create', params: {
             pseudonym: {

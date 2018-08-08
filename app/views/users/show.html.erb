@@ -29,7 +29,10 @@
         <%= t('buttons.faculty_journal_for', 'Faculty Journal for %{user}', :user => context_user_name(@context, @user)) %>
       </a>
     <% end %>
-    <% if @context_account.is_a?(Account) && @context_account.grants_right?(@current_user, :generate_observer_pairing_code) && @user.has_student_enrollment? %>
+    <% if @context_account.is_a?(Account) &&
+          @context_account.grants_right?(@current_user, :generate_observer_pairing_code) &&
+          @user.has_student_enrollment? &&
+          @context_account.self_registration? %>
       <div id="pairing-code"></div>
     <% end %>
   </div>

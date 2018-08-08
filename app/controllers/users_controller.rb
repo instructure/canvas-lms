@@ -2478,7 +2478,8 @@ class UsersController < ApplicationController
     @user ||= @pseudonym&.user
     @user ||= @context.shard.activate { User.new }
 
-    use_pairing_code = @domain_root_account.feature_enabled?(:observer_pairing_code)
+    use_pairing_code = @domain_root_account.feature_enabled?(:observer_pairing_code) &&
+                       @domain_root_account.self_registration?
     force_validations = value_to_boolean(params[:force_validations])
     manage_user_logins = @context.grants_right?(@current_user, session, :manage_user_logins)
     self_enrollment = params[:self_enrollment].present?
