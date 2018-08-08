@@ -72,9 +72,9 @@ module LtiAdvantage::Messages
           context: LtiAdvantage::Claims::Context.new
         )
         message.validate
-        expect(message.errors.messages[:context]).to match_array [
-          { id: ["can't be blank"] }
-        ]
+        expect(message.errors.messages[:context].first.messages).to eq(
+          {:id => ["can't be blank"]}
+        )
       end
 
       it 'verifies that "aud" is an array' do

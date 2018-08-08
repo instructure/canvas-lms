@@ -31,6 +31,7 @@ module LtiAdvantage::Messages
     }.freeze
 
     attr_accessor *REQUIRED_CLAIMS
+    attr_accessor *TYPED_ATTRIBUTES.keys
     attr_accessor :address,
                   :birthdate,
                   :custom,
