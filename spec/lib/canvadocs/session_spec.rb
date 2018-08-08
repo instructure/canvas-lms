@@ -95,49 +95,54 @@ describe Canvadocs::Session do
   end
 
   describe ".canvadoc_permissions_for_user" do
+    before(:once) do
+      @course = course_factory(active_all: true)
+      @student = user_factory(active_all: true, active_state: 'active')
+      @assignment = @course.assignments.create!(title: 'assignment 1', name: 'assignment 1', submission_types: 'online_upload')
+      @submission = submission_model(user: @student, course: @course, assignment: @assignment)
+    end
+
     it "should return read permissions for observers" do
-      course = course_factory(active_all: true)
-      student = user_factory(active_all: true, active_state: 'active')
       observer = user_factory(active_all: true, active_state: 'active')
-      assignment = course.assignments.create!(title: 'assignment 1', name: 'assignment 1')
-      section = course.course_sections.create!(name: 'Section A')
-      observer_enrollment = course.enroll_user(
+      section = @course.course_sections.create!(name: 'Section A')
+      observer_enrollment = @course.enroll_user(
         observer,
         'ObserverEnrollment',
         enrollment_state: 'active',
         section: section
       )
-      observer_enrollment.update!(associated_user_id: student.id)
-      assignment.update!(submission_types: 'online_upload')
-      @submission = submission_model(user: student, course: course, assignment: assignment)
+      observer_enrollment.update!(associated_user_id: @student.id)
       permissions = canvadoc_permissions_for_user(observer, true)
       expect(permissions[:permissions]).to eq "read"
     end
+
     it "should return readwrite permissions for owner" do
-      course = course_factory(active_all: true)
-      student = user_factory(active_all: true, active_state: 'active')
-      assignment = course.assignments.create!(title: 'assignment 1', name: 'assignment 1')
-      assignment.update!(submission_types: 'online_upload')
-      @submission = submission_model(user: student, course: course, assignment: assignment)
-      permissions = canvadoc_permissions_for_user(student, true)
+      permissions = canvadoc_permissions_for_user(@student, true)
       expect(permissions[:permissions]).to eq "readwrite"
     end
+
     it "should return readwritemanage permissions for teacher" do
-      course = course_factory(active_all: true)
-      student = user_factory(active_all: true, active_state: 'active')
       teacher = user_factory(active_all: true, active_state: 'active')
-      assignment = course.assignments.create!(title: 'assignment 1', name: 'assignment 1')
-      section = course.course_sections.create!(name: 'Section A')
-      course.enroll_user(
+      section = @course.course_sections.create!(name: 'Section A')
+      @course.enroll_user(
         teacher,
         'TeacherEnrollment',
         enrollment_state: 'active',
         section: section
       )
-      assignment.update!(submission_types: 'online_upload')
-      @submission = submission_model(user: student, course: course, assignment: assignment)
       permissions = canvadoc_permissions_for_user(teacher, true)
       expect(permissions[:permissions]).to eq "readwritemanage"
+    end
+
+    it 'applies the moderated grading whitelist if it is provided and not nil' do
+      whitelist = []
+      expect(self).to receive(:canvadocs_apply_whitelist).with(anything, whitelist).once
+      canvadoc_permissions_for_user(@student, true, whitelist)
+    end
+
+    it 'does not apply the moderated grading whitelist if it is nil' do
+      expect(self).not_to receive(:canvadocs_apply_whitelist)
+      canvadoc_permissions_for_user(@student, true, nil)
     end
   end
 end
