@@ -191,7 +191,7 @@ define [
           cssClass: 'outcome-student-cell'
           headerCssClass: 'outcome-student-header-cell'
           formatter: Grid.View.studentCell
-        }, _.extend(Grid.Util.COLUMN_OPTIONS, studentOptions))
+        }, _.extend({}, Grid.Util.COLUMN_OPTIONS, studentOptions))
 
       # Public: Translate an array of rollup data to rows that can be passed to SlickGrid.
       #

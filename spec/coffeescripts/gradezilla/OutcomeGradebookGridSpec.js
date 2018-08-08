@@ -204,6 +204,11 @@ test('Grid.Util.toColumns for xss', () => {
   ok(isEqual(columns[1].name, '&lt;script&gt;'))
 })
 
+test('Grid.Util._studentColumn does not modify default options', () => {
+  Grid.Util._studentColumn()
+  ok(isEqual(121, Grid.Util.COLUMN_OPTIONS.width))
+})
+
 test('Grid.Util.toColumns hasResults', () => {
   const outcomes = [
     {
