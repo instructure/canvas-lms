@@ -16,25 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Multipart
-  class FileParam
-    attr_accessor :k, :filename, :content
-
-    def initialize(k, content)
-      @k = k
-      @filename = (content.respond_to?(:path) && content.path) || k.to_s || "file.csv"
-      @content = content
-    end
-
+  class Terminator
     def to_multipart_stream(boundary)
-      SequencedStream.new([
-        StringIO.new("--#{boundary}\r\n" \
-                     "Content-Disposition: form-data; name=\"#{k}\"; filename=\"#{filename}\"\r\n" \
-                     "Content-Transfer-Encoding: binary\r\n" \
-                     "Content-Type: #{MIME::Types.type_for(filename).first}\r\n" \
-                     "\r\n"),
-        content,
-        StringIO.new("\r\n")
-      ])
+      StringIO.new("--#{boundary}--\r\n")
     end
   end
+
+  TERMINATOR = Terminator.new
 end
