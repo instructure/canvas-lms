@@ -636,6 +636,21 @@ describe "Users API", type: :request do
       end
     end
 
+    it "doesn't kersplode when filtering by role and sorting" do
+      @account = Account.default
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
+        { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param },
+        { :role_filter_id => student_role.id.to_s, :sort => "sis_id"})
+      
+      expect(json.map{|r| r['id']}).to eq [@student.id]
+
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
+        { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param },
+        { :role_filter_id => student_role.id.to_s, :sort => "email"})
+
+      expect(json.map{|r| r['id']}).to eq [@student.id]
+    end
+
     it "includes last login info" do
       @account = Account.default
       u = User.create!(name: 'test user')
