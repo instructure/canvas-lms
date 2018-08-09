@@ -113,7 +113,6 @@ export default class ToDoItem extends React.Component {
         </div>
         <div className="ToDoSidebarItem__Close">
           <CloseButton
-            placement="start"
             variant="icon"
             size="small"
             onClick={this.handleClick}
