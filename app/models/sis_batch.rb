@@ -141,6 +141,7 @@ class SisBatch < ActiveRecord::Base
     state :aborted
     state :failed
     state :failed_with_messages
+    state :restoring
     state :partially_restored
     state :restored
   end
@@ -670,63 +671,99 @@ class SisBatch < ActiveRecord::Base
     file
   end
 
-  def restore_states_for_type(type, scope)
+  def update_restore_progress(progress, data, count, total)
+    count += roll_back_data.active.where(id: data).update_all(workflow_state: 'restored', updated_at: Time.zone.now)
+    progress&.calculate_completion!(count, total)
+    count
+  end
+
+  def restore_states_for_type(type, scope, progress, count, total)
     case type
     when 'GroupCategory'
-      restore_group_categories(scope)
+      return restore_group_categories(scope, progress, count, total)
     when 'Enrollment'
-      restore_enrollment_data(scope)
+      return restore_enrollment_data(scope, progress, count, total)
     else
-      restore_workflow_states(scope, type)
+      return restore_workflow_states(scope, type, progress, count, total)
     end
   end
 
-  def restore_enrollment_data(scope)
-    Enrollment.where(id: scope.where(previous_workflow_state: 'deleted').select(:context_id)).find_in_batches do |enrollments|
-      Enrollment::BatchStateUpdater.destroy_batch(enrollments)
-    end
-    scope = scope.where.not(previous_workflow_state: 'deleted')
-    restore_workflow_states(scope, 'Enrollment')
-    Enrollment.where(id: scope.where.not(previous_workflow_state: 'deleted').select(:context_id)).find_in_batches do |enrollments|
-      Enrollment::BatchStateUpdater.run_call_backs_for(enrollments)
-    end
-  end
-
-  def restore_group_categories(scope)
-    scope.where(previous_workflow_state: 'active').find_in_batches do |gcs|
-      GroupCategory.where(id: gcs.map(&:context_id)).update_all(deleted_at: nil, updated_at: Time.zone.now)
-    end
-    scope.where.not(previous_workflow_state: 'active').find_in_batches do |gcs|
-      GroupCategory.where(id: gcs.map(&:context_id)).update_all(deleted_at: Time.zone.now, updated_at: Time.zone.now)
-    end
-  end
-
-  def restore_workflow_states(scope, type)
-    type.constantize.transaction do
-      scope.order(:context_id).find_in_batches(batch_size: 5_000) do |data|
-        type.constantize.connection.execute(restore_sql(type, data.map(&:to_restore_array)))
+  def restore_enrollment_data(scope, progress, count, total)
+    Shackles.activate(:slave) do
+      scope.active.where(previous_workflow_state: 'deleted').find_in_batches do |batch|
+        Shackles.activate(:master) do
+          Enrollment::BatchStateUpdater.destroy_batch(batch.map(&:context_id))
+          count = update_restore_progress(progress, batch, count, total)
+        end
+      end
+      scope = scope.where.not(previous_workflow_state: 'deleted')
+      Shackles.activate(:master) do
+        count = restore_workflow_states(scope, 'Enrollment', progress, count, total)
+        Enrollment.where(id: scope.where.not(previous_workflow_state: 'deleted').select(:context_id)).find_in_batches do |enrollments|
+          Enrollment::BatchStateUpdater.run_call_backs_for(enrollments)
+        end
       end
     end
+    count
   end
 
-  def restore_states_for_batch(batch_mode: nil, undelete_only: false)
-    roll_back = self.roll_back_data.active
+  def restore_group_categories(scope, progress, count, total)
+    Shackles.activate(:slave) do
+      scope.active.where(previous_workflow_state: 'active').find_in_batches do |gcs|
+        Shackles.activate(:master) do
+          GroupCategory.where(id: gcs.map(&:context_id)).update_all(deleted_at: nil, updated_at: Time.zone.now)
+          count = update_restore_progress(progress, gcs, count, total)
+        end
+      end
+      scope.active.where.not(previous_workflow_state: 'active').find_in_batches do |gcs|
+        Shackles.activate(:master) do
+          GroupCategory.where(id: gcs.map(&:context_id)).update_all(deleted_at: Time.zone.now, updated_at: Time.zone.now)
+          count = update_restore_progress(progress, gcs, count, total)
+        end
+      end
+    end
+    count
+  end
+
+  def restore_workflow_states(scope, type, progress, count, total)
+    Shackles.activate(:slave) do
+      scope.active.order(:context_id).find_in_batches(batch_size: 5_000) do |data|
+        Shackles.activate(:master) do
+          type.constantize.connection.execute(restore_sql(type, data.map(&:to_restore_array)))
+          count = update_restore_progress(progress, data, count, total)
+        end
+      end
+    end
+    count
+  end
+
+  def restore_states_later(batch_mode: nil, undelete_only: false)
+    progress = account.progresses.create! tag: "sis_batch_state_restore", completion: 0.0
+    progress.process_job(self, :restore_states_for_batch,
+                         {singleton: "restore_states_for_batch:#{account.global_id}}"},
+                         {batch_mode: batch_mode, undelete_only: undelete_only})
+    progress
+  end
+
+  def restore_states_for_batch(progress=nil, batch_mode: nil, undelete_only: false)
+    self.update_attribute(:workflow_state, 'restoring')
+    roll_back = self.roll_back_data
     roll_back = roll_back.where(updated_workflow_state: %w(retired deleted)) if undelete_only
     roll_back = roll_back.where(batch_mode_delete: batch_mode) if batch_mode
-    types = roll_back.distinct.order(:context_type).pluck(:context_type)
+    types = roll_back.active.distinct.order(:context_type).pluck(:context_type)
+    total = roll_back.active.count if progress
+    count = 0
     SisBatchRollBackData::RESTORE_ORDER.each do |type|
       next unless types.include? type
       scope = roll_back.where(context_type: type)
-      restore_states_for_type(type, scope)
+      count = restore_states_for_type(type, scope, progress, count, total)
     end
-    roll_back.find_in_batches(batch_size: 10_000) do |batch|
-      SisBatchRollBackData.where(id: batch).update_all(workflow_state: 'restored', updated_at: Time.zone.now)
-    end
+    progress&.update_completion!(100)
     self.workflow_state = (undelete_only || batch_mode) ? 'partially_restored' : 'restored'
     self.save!
   end
 
-  # retuns values "(1,'deleted'),(2,'deleted'),(3,'other_state'),(4,'active')"
+  # returns values "(1,'deleted'),(2,'deleted'),(3,'other_state'),(4,'active')"
   def to_sql_values(data)
     data.map { |v| "(#{v.first},'#{v.last}')" }.join(',')
   end

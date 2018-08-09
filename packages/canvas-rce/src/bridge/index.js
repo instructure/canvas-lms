@@ -67,6 +67,13 @@ const Bridge = {
 
   insertLink(link) {
     if (focusedEditor) {
+      const { selection } = focusedEditor.props.tinymce.get(
+        focusedEditor.props.textareaId
+      );
+      link.selectionDetails = {
+        node: selection.getNode(),
+        range: selection.getRng()
+      };
       focusedEditor.insertLink(link);
     } else {
       console.warn("clicked sidebar link without a focused editor");
