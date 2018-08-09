@@ -190,6 +190,10 @@ Cassandra configuration isn't enabled by default. Add `docker-compose/cassandra.
 Then:
 - Uncomment configuration in config/cassandra.yml
 - See config/cassandra.yml.example for further setup instructions
+- to invoke cqlsh as directed in cassandra.yml.example use:
+```sh
+docker-compose exec cassandra cqlsh
+```
 
 ### Mail Catcher
 
@@ -198,7 +202,7 @@ To enable Mail Catcher: Add `docker-compose/mailcatcher.override.yml` to your `C
 Email is often sent through background jobs if you spin up the `jobs` container.
 If you would like to test or preview any notifications, simply trigger the email
 through its normal actions, and it should immediately show up in the emulated
-webmail inbox available here: http://mailcatcher.canvaslms.docker/
+webmail inbox available here: http://mail.canvas.docker/
 
 ## Tips
 
