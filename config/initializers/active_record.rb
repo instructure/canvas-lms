@@ -1432,9 +1432,7 @@ end
 
 module UnscopeCallbacks
   def run_callbacks(*args)
-    # workaround for a rails 5.2.0 problem where .all sometimes tries to merge in a current_scope with a `skip_query_cache_value` and explodes
-    # TODO: can undo it when this is fixed https://github.com/rails/rails/issues/32640
-    scope = (self.class.current_scope || self.class.all).klass.unscoped
+    scope = self.class.all.klass.unscoped
     scope.scoping { super }
   end
 end

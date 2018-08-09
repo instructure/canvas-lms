@@ -42,13 +42,12 @@ module ActiveSupport::Cache
 
   unless CANVAS_RAILS5_1
     module AllowMocksInStore
-      def should_compress?(*args)
+      def compress!(*args)
         if @value && Rails.env.test?
           begin
-            marshaled_value
-            true
+            super
           rescue TypeError => e
-            false
+            return
           end
         else
           super

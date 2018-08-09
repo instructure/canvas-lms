@@ -29,6 +29,8 @@ class DiscussionTopicSectionVisibility < ActiveRecord::Base
 
   validates_uniqueness_of :course_section_id, scope: :discussion_topic_id, conditions: -> { where(:workflow_state => 'active') }
 
+  before_validation :set_discussion_topic_id
+
   workflow do
     state :active
     state :deleted
@@ -53,5 +55,10 @@ class DiscussionTopicSectionVisibility < ActiveRecord::Base
 
   def new_discussion_topic?
     self.discussion_topic&.new_record?
+  end
+
+  def set_discussion_topic_id
+    # rails 5.2.1 tries to validate the visibility after saving the topic but before setting the topic_id :/
+    self.discussion_topic_id ||= self.discussion_topic&.id
   end
 end

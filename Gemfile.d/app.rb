@@ -18,7 +18,7 @@
 if CANVAS_RAILS5_1
   gem 'rails', '5.1.6'
 else
-  gem 'rails', '5.2.0'
+  gem 'rails', '5.2.1'
 end
 
 gem 'rack', '2.0.4'
@@ -38,7 +38,7 @@ gem 'active_model_serializers',   '0.9.0alpha1',
 gem 'authlogic', '4.0.1'
   gem 'scrypt', '3.0.5'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
-gem 'switchman', '1.12.2'
+gem 'switchman', '1.12.3'
   gem 'open4', '1.3.4', require: false
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
