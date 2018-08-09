@@ -1044,7 +1044,7 @@ class User < ActiveRecord::Base
     can :read and can :read_grades and can :read_profile and can :read_as_admin and can :manage and
       can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and
       can :update_avatar and can :manage_feature_flags and can :api_show_user and
-      can :read_email_addresses and can :view_user_logins
+      can :read_email_addresses and can :view_user_logins and can :generate_observer_pairing_code
 
     given { |user| user == self && user.user_can_edit_name? }
     can :rename
@@ -1060,6 +1060,9 @@ class User < ActiveRecord::Base
 
     given { |user| self.check_courses_right?(user, :manage_user_notes) }
     can :create_user_notes and can :read_user_notes
+
+    given { |user| self.check_courses_right?(user, :generate_observer_pairing_code) }
+    can :generate_observer_pairing_code
 
     given {|user| self.check_accounts_right?(user, :manage_user_notes) }
     can :create_user_notes and can :read_user_notes and can :delete_user_notes
