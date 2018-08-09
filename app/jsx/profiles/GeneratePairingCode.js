@@ -86,10 +86,10 @@ export default class GeneratePairingCode extends Component {
 
   render () {
     const messageWithName = I18n.t(`Share the following pairing code with an observer to allow
-    them to connect with %{name}. This code will expire in 24 hours,
+    them to connect with %{name}. This code will expire in seven days,
     or after one use.`, { name: this.props.name })
     const messageWithoutName = I18n.t(`Share the following pairing code with an observer to allow
-    them to connect with you. This code will expire in 24 hours,
+    them to connect with you. This code will expire in seven days,
     or after one use.`)
     return (
       <div>
