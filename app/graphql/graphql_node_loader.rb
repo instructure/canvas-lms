@@ -59,6 +59,8 @@ module GraphQLNodeLoader
           .load(page)
           .then(check_read_permission)
       end
+    when "AssignmentGroup"
+      Loaders::IDLoader.for(AssignmentGroup).load(id).then(check_read_permission)
     else
       raise UnsupportedTypeError.new("don't know how to load #{type}")
     end

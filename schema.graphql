@@ -119,8 +119,6 @@ type AssignmentGroup implements AssignmentsConnectionInterface & Node & Timestam
   ): AssignmentConnection
   createdAt: DateTime
   groupWeight: Float
-
-  # ID of the object.
   id: ID!
   name: String
   position: Int
@@ -613,6 +611,7 @@ interface Node {
 
 enum NodeType {
   Assignment
+  AssignmentGroup
   Course
   Enrollment
   GradingPeriod

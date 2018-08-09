@@ -20,6 +20,7 @@ Types::LegacyNodeType = GraphQL::EnumType.define do
   name "NodeType"
 
   value "Assignment"
+  value "AssignmentGroup"
   value "Course"
   value "Section"
   value "User"

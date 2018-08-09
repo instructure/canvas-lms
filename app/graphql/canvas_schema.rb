@@ -36,6 +36,7 @@ CanvasSchema = GraphQL::Schema.define do
     case obj
     when Course then Types::CourseType
     when Assignment then Types::AssignmentType
+    when AssignmentGroup then Types::AssignmentGroupType
     when CourseSection then Types::SectionType
     when User then Types::UserType
     when Enrollment then Types::EnrollmentType
