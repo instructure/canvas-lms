@@ -74,7 +74,7 @@
         <%= link[:text] %>
       </a>
     <% end %>
-    <% if @context.grants_right?(@current_user, :generate_observer_pairing_code) &&
+    <% if @user.grants_right?(@current_user, :generate_observer_pairing_code) &&
           @user.has_student_enrollment? &&
           @domain_root_account.self_registration? %>
       <div id="pairing-code"></div>
