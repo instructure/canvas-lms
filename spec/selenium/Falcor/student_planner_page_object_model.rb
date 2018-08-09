@@ -137,12 +137,12 @@ module PlannerPageObject
 
   def discussion_index_page_detail
     # might need to change when implementing
-    f('.ig-details__item')
+    f('.todo-date')
   end
 
   def discussion_show_page_detail
     # might need to change when implementing
-    f('.discussion-pubdate')
+    f('.discussion-tododate')
   end
 
   def pages_detail

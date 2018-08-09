@@ -185,6 +185,7 @@ describe "student planner" do
 
     it "navigates to the submissions page once the graded discussion has a reply" do
       skip('skip until ADMIN-179')
+      go_to_list_view
       @discussion.reply_from(user: @student1, text: 'user reply')
       # for discussion, submissions page has the users id. So, sending the student object instead of submission for id
       validate_link_to_submissions(@assignment_d, @student1, 'assignments')
@@ -223,15 +224,15 @@ describe "student planner" do
     end
 
     it 'shows the date in the index page' do
-      skip('unskip with ADMIN-1160')
       get "/courses/#{@course.id}/discussion_topics/"
-      expect(discussion_index_page_detail.text).to eq(format_time_for_view(@ungraded_discussion.todo_date))
+      todo_date = discussion_index_page_detail.text.split("To do ")[1]
+      expect(todo_date).to eq(format_time_for_view(@ungraded_discussion.todo_date))
     end
 
     it 'shows the date in the show page' do
-      skip('unskip with ADMIN-1160')
       get "/courses/#{@course.id}/discussion_topics/#{@ungraded_discussion.id}/"
-      expect(discussion_show_page_detail.text).to eq(format_time_for_view(@ungraded_discussion.todo_date))
+      todo_date = discussion_show_page_detail.text.split("To-Do Date: ")[1]
+      expect(todo_date).to eq(format_time_for_view(@ungraded_discussion.todo_date))
     end
   end
 
