@@ -44,6 +44,7 @@ function markAndCombineArrays(courseArray, accountArray) {
   return markedCourseArray.concat(markedAccountArray)
 }
 
+
 function isAlert(element){
     return element.permission_name === "manage_interaction_alerts"
 }
@@ -54,11 +55,16 @@ if(!ENV.CURRENT_ACCOUNT.account.settings.enable_alerts) {
     permissions.splice(permissions.findIndex(isAlert), 1)
 }
 
+// Find the account admin role, give it permission-related properties
+const accountAdmin = ENV.ACCOUNT_ROLES.find((element) => element.role === "AccountAdmin");
+accountAdmin.displayed=false
+accountAdmin.contextType="Account"
+
 const initialState = {
   contextId: ENV.ACCOUNT_ID, // This is at present always an account, I think?
   permissions: markAndCombineArrays(permissions,
   flattenPermissions(ENV.ACCOUNT_PERMISSIONS)),
-  roles: getSortedRoles(markAndCombineArrays(ENV.COURSE_ROLES, ENV.ACCOUNT_ROLES)),
+  roles: getSortedRoles(markAndCombineArrays(ENV.COURSE_ROLES, ENV.ACCOUNT_ROLES), accountAdmin),
   selectedRoles: [{value: ALL_ROLES_VALUE, label: ALL_ROLES_LABEL}]
 }
 
