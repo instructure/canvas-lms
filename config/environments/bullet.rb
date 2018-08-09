@@ -15,6 +15,8 @@ Bullet.stacktrace_excludes = [
   ['app/models/message.rb', 'parse!'],
   # Accessing only one item of a collection
   ['lib/grade_calculator.rb', 'compute_course_scores_from_weighted_grading_periods?'],
+  # Some weirdness in the spec only
+  'spec/migrations/reassociate_conversation_attachments_spec.rb',
 ]
 
 # keep track of Bullet objects consistently in the face of sharding

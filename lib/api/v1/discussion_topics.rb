@@ -67,7 +67,7 @@ module Api::V1::DiscussionTopics
     if opts[:include_sections_user_count] && context
       opts[:context_user_count] = context.enrollments.not_fake.active_or_pending_by_date_ignoring_access.count
     end
-    ActiveRecord::Associations::Preloader.new.preload(topics, [:user, :attachment])
+    ActiveRecord::Associations::Preloader.new.preload(topics, [:user, :attachment, :root_topic, :context])
     topics.inject([]) do |result, topic|
       if topic.visible_for?(user)
         result << discussion_topic_api_json(topic, context || topic.context, user, session, opts, root_topics)

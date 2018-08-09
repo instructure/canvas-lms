@@ -40,7 +40,7 @@ describe Types::EnrollmentType do
     it "uses the current grading period by default" do
       grades = enrollment_type.grades(current_user: @teacher)
       expect(grades.enrollment).to eq enrollment
-      expect(grades.grading_period).to eq @gp1
+      expect(grades.grading_period_id).to eq @gp1.id
     end
 
     it "lets you specify a different grading period" do
@@ -48,14 +48,14 @@ describe Types::EnrollmentType do
         gradingPeriodId: @gp2.id.to_s
       })
       expect(grades.enrollment).to eq enrollment
-      expect(grades.grading_period).to eq @gp2
+      expect(grades.grading_period_id).to eq @gp2.id
     end
 
     it "works for courses with no grading periods" do
       @course.enrollment_term.update_attribute :grading_period_group, nil
       grades = enrollment_type.grades(current_user: @teacher)
       expect(grades.enrollment).to eq enrollment
-      expect(grades.grading_period).to eq nil
+      expect(grades.grading_period_id).to eq nil
     end
 
     it "returns a dummy object when scores don't exist" do

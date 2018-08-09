@@ -4180,7 +4180,7 @@ describe Assignment do
       @a.update_submission(@u1, :comment => "woot", :group_comment => "1", author: @teacher)
       @a.mute!
 
-      comments = @a.submissions.map(&:submission_comments).flatten
+      comments = @a.submissions.preload(:submission_comments).map(&:submission_comments).flatten
       expect(comments.map(&:hidden?)).to all(be true)
     end
 
@@ -4188,7 +4188,7 @@ describe Assignment do
       @a.update_submission(@u1, :comment => "woot", :group_comment => "1", author: @u1)
       @a.mute!
 
-      comments = @a.submissions.map(&:submission_comments).flatten
+      comments = @a.submissions.preload(:submission_comments).map(&:submission_comments).flatten
       expect(comments.map(&:hidden?)).to all(be false)
     end
 
@@ -4197,7 +4197,7 @@ describe Assignment do
       @a.update_submission(@u1, :comment => "woot", :group_comment => "1", author: @teacher)
       @a.unmute!
 
-      comments = @a.submissions.map(&:submission_comments).flatten
+      comments = @a.submissions.preload(:submission_comments).map(&:submission_comments).flatten
       expect(comments.map(&:hidden?)).to all(be false)
     end
 

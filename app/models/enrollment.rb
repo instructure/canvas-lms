@@ -120,13 +120,13 @@ class Enrollment < ActiveRecord::Base
   end
 
   def valid_course?
-    if self.course.deleted? && !self.deleted?
+    if !deleted? && course.deleted?
       self.errors.add(:course_id, "is not a valid course")
     end
   end
 
   def valid_section?
-    unless self.course_section.active? || self.deleted?
+    unless deleted? || course_section.active?
       self.errors.add(:course_section_id, "is not a valid section")
     end
   end
@@ -1096,11 +1096,21 @@ class Enrollment < ActiveRecord::Base
     id_opts ||= Score.params_for_course
     valid_keys = %i(course_score grading_period grading_period_id assignment_group assignment_group_id)
     return nil if id_opts.except(*valid_keys).any?
-    if scores.loaded?
+    result = if scores.loaded?
       scores.detect { |score| score.attributes >= id_opts.with_indifferent_access }
     else
       scores.where(id_opts).first
     end
+    if result
+      result.enrollment = self
+      # have to go through gymnastics to force-preload a has_one :through without causing a db transaction
+      if association(:course).loaded?
+        assn = result.association(:course)
+        assn.target = course
+        Bullet::Detector::Association.add_object_associations(result, :course) if defined?(Bullet) && Bullet.start?
+      end
+    end
+    result
   end
 
   def graded_at

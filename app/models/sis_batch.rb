@@ -513,6 +513,7 @@ class SisBatch < ActiveRecord::Base
   def remove_non_batch_enrollments(enrollments, total_rows, current_row)
     enrollment_count = 0
     current_row ||= 0
+    enrollments = enrollments.preload(:user, :course, :enrollment_state) unless using_parallel_importers?
     # delete enrollments for courses that weren't in this batch, in the selected term
     enrollments.find_in_batches do |batch|
       if self.using_parallel_importers?

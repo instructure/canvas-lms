@@ -169,7 +169,7 @@ describe "course people" do
       expect(f("#user_#{@student.id}")).to include_text(section_name)
       expect(ff("#user_#{@student.id} .section").length).to eq 2
       @student.reload
-      expect(@student.enrollments.detect{|e| e.course_section == @course_section}).to be_present
+      expect(@student.enrollments.where(course_section: @course_section)).to be_exists
     end
 
     it "should view the users enrollment details" do
