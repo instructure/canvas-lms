@@ -84,16 +84,42 @@ module PlannerHelper
     planner_override
   end
 
+  # Handles real Submissions associated with graded things
   def complete_planner_override_for_submission(submission)
     planner_override = find_planner_override_for_submission(submission)
+    complete_planner_override planner_override
+  end
+
+  # Ungraded surveys are submitted as a Quizzes::QuizSubmission that
+  # had no submission attribute pointing to a real Submission
+  def complete_planner_override_for_quiz_submission(quiz_submission)
+    return if quiz_submission.submission # handled by Submission model
+    planner_override = PlannerOverride.find_by(
+      plannable_id: quiz_submission.quiz_id,
+      plannable_type: PLANNABLE_TYPES['quiz'],
+      user_id: quiz_submission.user_id
+    )
     if planner_override
+      complete_planner_override planner_override
+    else
+      planner_override = PlannerOverride.new(
+        plannable_type: PLANNABLE_TYPES['quiz'],
+        plannable_id: quiz_submission.quiz_id, 
+        marked_complete: true,
+        dismissed: false,
+        user_id: quiz_submission.user_id)
+      planner_override.save
+    end
+  end
+
+  def complete_planner_override(planner_override)
+    if planner_override&.is_a? PlannerOverride
       planner_override.marked_complete = true
       if planner_override.save
         Rails.cache.delete(planner_meta_cache_key)
       end
     end
   end
-
 
   private
   def mark_doneable_tag(item)

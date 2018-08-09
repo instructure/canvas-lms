@@ -192,5 +192,24 @@ describe PlannerHelper do
         expect(@quiz2_po.marked_complete).to be_truthy
       end
     end
+
+    describe "#complete_planner_item_for_quiz_submission" do
+      it "completes an ungraded survey override" do
+        survey = @course.quizzes.create!(:title => "survey", :due_at => 1.day.from_now, :quiz_type => "survey")
+        survey_po = planner_override_model(user: @student, plannable: survey, marked_complete: false)
+        sub = survey.generate_submission(@user)
+        Quizzes::SubmissionGrader.new(sub).grade_submission
+        survey_po.reload
+        expect(survey_po.marked_complete).to be_truthy
+      end
+
+      it "creates completed override when ungraded survey is submitted" do
+        survey = @course.quizzes.create!(:title => "survey", :due_at => 1.day.from_now, :quiz_type => "survey")
+        sub = survey.generate_submission(@user)
+        Quizzes::SubmissionGrader.new(sub).grade_submission
+        survey_po = PlannerOverride.find_by(user: @student, plannable: survey)
+        expect(survey_po.marked_complete).to be_truthy
+      end
+    end
   end
 end
