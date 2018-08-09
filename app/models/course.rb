@@ -1777,7 +1777,11 @@ class Course < ActiveRecord::Base
         end
       end
     end
-    return [[enrollment_ids, res, "text/csv"]]
+    if enrollment_ids.any?
+      [[enrollment_ids, res, "text/csv"]]
+    else
+      []
+    end
   end
 
   def expire_pending_grade_publishing_statuses(last_publish_attempt_at)
