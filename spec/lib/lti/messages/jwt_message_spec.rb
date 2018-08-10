@@ -24,28 +24,6 @@ describe Lti::Messages::JwtMessage do
   let(:user) { @student }
   let(:opts) { { resource_type: 'course_navigation' } }
 
-  let(:tool) do
-    tool = course.context_external_tools.new(
-      name: 'bob',
-      consumer_key: 'key',
-      shared_secret: 'secret',
-      url: 'http://www.example.com/basic_lti'
-    )
-    tool.course_navigation = {
-      enabled: true,
-      message_type: 'ResourceLinkRequest',
-      selection_width: '500',
-      selection_height: '400',
-      custom_fields: {
-        has_expansion: '$User.id',
-        no_expansion: 'foo'
-      }
-    }
-    tool.settings['use_1_3'] = true
-    tool.save!
-    tool
-  end
-
   let(:expander) do
     Lti::VariableExpander.new(
       course.root_account,
@@ -85,6 +63,29 @@ describe Lti::Messages::JwtMessage do
   end
 
   let_once(:assignment) { assignment_model(course: course) }
+  let_once(:tool) do
+    tool = course.context_external_tools.new(
+      name: 'bob',
+      consumer_key: 'key',
+      shared_secret: 'secret',
+      url: 'http://www.example.com/basic_lti',
+      developer_key: developer_key
+    )
+    tool.course_navigation = {
+      enabled: true,
+      message_type: 'ResourceLinkRequest',
+      selection_width: '500',
+      selection_height: '400',
+      custom_fields: {
+        has_expansion: '$User.id',
+        no_expansion: 'foo'
+      }
+    }
+    tool.settings['use_1_3'] = true
+    tool.save!
+    tool
+  end
+  let_once(:developer_key) { DeveloperKey.create! }
 
   describe 'signing' do
     it 'signs the id token with the current canvas private key' do
@@ -97,12 +98,8 @@ describe Lti::Messages::JwtMessage do
   end
 
   describe 'security claims' do
-    xit 'sets the "aud" claim' do
-      expect(decoded_jwt.aud).to eq ''
-    end
-
-    xit 'sets the "azp" claim' do
-      expect(decoded_jwt.azp).to eq ''
+    it 'sets the "aud" claim' do
+      expect(decoded_jwt['aud']).to eq developer_key.global_id
     end
 
     xit 'sets the "deployment_id" claim' do

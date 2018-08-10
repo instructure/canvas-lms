@@ -546,9 +546,11 @@ describe ApplicationController do
         end
 
         describe 'LTI 1.3' do
+          let_once(:developer_key) { DeveloperKey.create! }
           include_context 'lti_1_3_spec_helper'
 
           before do
+            tool.developer_key = developer_key
             tool.settings['use_1_3'] = true
             tool.save!
           end

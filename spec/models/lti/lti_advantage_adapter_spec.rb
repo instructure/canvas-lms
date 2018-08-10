@@ -24,18 +24,6 @@ describe Lti::LtiAdvantageAdapter do
   let(:return_url) { 'http://www.platform.com/return_url' }
   let(:user) { @student }
   let(:opts) { { resource_type: 'course_navigation' } }
-  let(:tool) do
-    tool = course.context_external_tools.new(
-      name: 'bob',
-      consumer_key: 'key',
-      shared_secret: 'secret',
-      url: 'http://www.example.com/basic_lti'
-    )
-    tool.course_navigation = { enabled: true, message_type: 'ResourceLinkRequest' }
-    tool.settings['use_1_3'] = true
-    tool.save!
-    tool
-  end
   let(:expander) do
     Lti::VariableExpander.new(
       course.root_account,
@@ -62,6 +50,19 @@ describe Lti::LtiAdvantageAdapter do
   let_once(:course) do
     course_with_student
     @course
+  end
+  let(:tool) do
+    tool = course.context_external_tools.new(
+      name: 'bob',
+      consumer_key: 'key',
+      shared_secret: 'secret',
+      url: 'http://www.example.com/basic_lti'
+    )
+    tool.course_navigation = { enabled: true, message_type: 'ResourceLinkRequest' }
+    tool.settings['use_1_3'] = true
+    tool.developer_key = DeveloperKey.create!
+    tool.save!
+    tool
   end
 
   describe '#generate_post_payload' do

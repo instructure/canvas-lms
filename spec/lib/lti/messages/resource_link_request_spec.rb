@@ -24,27 +24,6 @@ describe Lti::Messages::ResourceLinkRequest do
   let(:return_url) { 'http://www.platform.com/return_url' }
   let(:opts) { { resource_type: 'course_navigation' } }
   let(:lti_assignment) { Lti::LtiAssignmentCreator.new(assignment).convert }
-  let(:tool) do
-    tool = course.context_external_tools.new(
-      name: 'bob',
-      consumer_key: 'key',
-      shared_secret: 'secret',
-      url: 'http://www.example.com/basic_lti'
-    )
-    tool.course_navigation = {
-      enabled: true,
-      message_type: 'ResourceLinkRequest',
-      selection_width: '500',
-      selection_height: '400',
-      custom_fields: {
-        has_expansion: '$User.id',
-        no_expansion: 'foo'
-      }
-    }
-    tool.settings['use_1_3'] = true
-    tool.save!
-    tool
-  end
   let(:expander) do
     Lti::VariableExpander.new(
       course.root_account,
@@ -72,6 +51,28 @@ describe Lti::Messages::ResourceLinkRequest do
   let_once(:course) do
     course_with_student
     @course
+  end
+  let(:tool) do
+    tool = course.context_external_tools.new(
+      name: 'bob',
+      consumer_key: 'key',
+      shared_secret: 'secret',
+      url: 'http://www.example.com/basic_lti'
+    )
+    tool.course_navigation = {
+      enabled: true,
+      message_type: 'ResourceLinkRequest',
+      selection_width: '500',
+      selection_height: '400',
+      custom_fields: {
+        has_expansion: '$User.id',
+        no_expansion: 'foo'
+      }
+    }
+    tool.settings['use_1_3'] = true
+    tool.developer_key = DeveloperKey.create!
+    tool.save!
+    tool
   end
 
   describe '#initialize' do

@@ -108,6 +108,7 @@ describe ExternalToolsController do
         tool.url = "http://www.example.com/basic_lti"
         tool.course_navigation = { enabled: true }
         tool.settings['use_1_3'] = true
+        tool.developer_key = DeveloperKey.create!
         tool.save!
         tool
       end
