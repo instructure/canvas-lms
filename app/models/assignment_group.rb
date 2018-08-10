@@ -26,6 +26,9 @@ class AssignmentGroup < ActiveRecord::Base
   include Canvas::SoftDeletable
 
   attr_readonly :context_id, :context_type
+
+  attr_accessor :saved_by
+
   belongs_to :context, polymorphic: [:course]
   acts_as_list scope: { context: self, workflow_state: 'available' }
   has_a_broadcast_policy
@@ -69,7 +72,9 @@ class AssignmentGroup < ActiveRecord::Base
 
   def update_student_grades
     if self.saved_change_to_rules? || self.saved_change_to_group_weight?
-      self.class.connection.after_transaction_commit { self.context.recompute_student_scores }
+      unless self.saved_by == :migration
+        self.class.connection.after_transaction_commit { self.context.recompute_student_scores }
+      end
     end
   end
 

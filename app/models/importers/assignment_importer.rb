@@ -42,13 +42,15 @@ module Importers
       assignment_records = []
       context = migration.context
 
-      Assignment.suspend_callbacks(:update_submissions_later) do
-        assignments.each do |assign|
-          if migration.import_object?("assignments", assign['migration_id'])
-            begin
-              assignment_records << import_from_migration(assign, context, migration, nil, nil)
-            rescue
-              migration.add_import_warning(t('#migration.assignment_type', "Assignment"), assign[:title], $!)
+      AssignmentGroup.suspend_callbacks(:update_student_grades) do
+        Assignment.suspend_callbacks(:update_submissions_later) do
+          assignments.each do |assign|
+            if migration.import_object?("assignments", assign['migration_id'])
+              begin
+                assignment_records << import_from_migration(assign, context, migration, nil, nil)
+              rescue
+                migration.add_import_warning(t('#migration.assignment_type', "Assignment"), assign[:title], $!)
+              end
             end
           end
         end
@@ -111,6 +113,7 @@ module Importers
       item ||= Assignment.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
       item ||= context.assignments.temp_record #new(:context => context)
 
+      item.saved_by = :migration
       item.mark_as_importing!(migration)
       master_migration = migration&.for_master_course_import?  # propagate null dates only for blueprint syncs
 
