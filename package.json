@@ -102,6 +102,7 @@
   },
   "devDependencies": {
     "@sentry/webpack-plugin": "^1.5.2",
+    "@yarnpkg/lockfile": "^1.0.2",
     "axe-core": "~2.1.7",
     "babel-cli": "^6",
     "babel-core": "^6",
@@ -229,7 +230,8 @@
     "jspec": "./spec/jspec.sh",
     "jspec-watch": "./spec/jspec.sh --watch",
     "a11y-report": "./spec/jspec.sh --a11y",
-    "upgrade-and-dedupe": "rm -rf yarn.lock node_modules && yes 1 | yarn install --flat --production --ignore-scripts && git checkout package.json && yarn install && git add yarn.lock"
+    "upgrade-and-dedupe": "rm -rf yarn.lock node_modules && yes 1 | yarn install --flat --production --ignore-scripts && git checkout package.json && yarn install && git add yarn.lock",
+    "upgrade-instructure-ui": "script/upgrade-instructure-ui"
   },
   "resolutions": {
     "@instructure/ui-a11y": "5.16.0-rc.4",
