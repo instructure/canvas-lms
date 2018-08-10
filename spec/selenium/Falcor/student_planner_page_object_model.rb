@@ -46,10 +46,10 @@ module PlannerPageObject
     expect(url).to eq(expected_url)
   end
 
-  def validate_submissions_url(object_type, object, submission)
+  def validate_submissions_url(object_type, object, user)
     url = driver.current_url
     domain = url.split('courses')[0]
-    expected_url = domain + "courses/#{@course.id}/#{object_type}/#{object.id}/submissions/#{submission.id}"
+    expected_url = domain + "courses/#{@course.id}/#{object_type}/#{object.id}/submissions/#{user.id}"
     expect(url).to eq(expected_url)
   end
 
@@ -100,9 +100,9 @@ module PlannerPageObject
     object.is_a?(CalendarEvent) ? validate_calendar_url(object) : validate_url(url_type, object)
   end
 
-  def validate_link_to_submissions(object, submission, url_type)
+  def validate_link_to_submissions(object, user, url_type)
     navigate_to_course_object(object)
-    validate_submissions_url(url_type, object, submission)
+    validate_submissions_url(url_type, object, user)
   end
 
   def view_todo_item

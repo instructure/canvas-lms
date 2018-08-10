@@ -94,12 +94,12 @@ describe "student planner" do
       validate_link_to_url(@assignment, 'assignments')
     end
 
-    it "navigates to the assignment submissions page when they are submitted" do
-      skip('skip until ADMIN-179')
-      submission = @assignment.submit_homework(@student1, submission_type: "online_text_entry",
+    it "navigates to the assignment submissions page when they are submitted." do
+      @assignment.submit_homework(@student1, submission_type: "online_text_entry",
                                   body: "Assignment submitted")
       go_to_list_view
-      validate_link_to_submissions(@assignment, submission,'assignments')
+      fj("button:contains('Show 1 completed item')").click
+      validate_link_to_submissions(@assignment, @student1,'assignments')
     end
 
     it "enables the checkbox when an assignment is completed", priority: "1", test_id: 3306201 do
