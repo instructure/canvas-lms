@@ -61,14 +61,6 @@ describe "new account user search" do
     end
   end
 
-  it "should not show the people tab without permission" do
-    @account.role_overrides.create! :role => admin_role, :permission => 'read_roster', :enabled => false
-
-    get "/accounts/#{@account.id}"
-
-    expect(f("#left-side #section-tabs")).not_to include_text("People")
-  end
-
   it "should be able to create users" do
     get "/accounts/#{@account.id}/users"
 
@@ -202,7 +194,7 @@ describe "new account user search" do
     end
   end
 
-  describe 'Page Object Converted Tests Sub Account' do
+  describe 'Page Object Converted No Default Page Visit' do
     include NewUserSearchPage
     include NewUserEditModalPage
     include MasqueradePage
@@ -211,6 +203,12 @@ describe "new account user search" do
     before do
       @user.update_attribute(:name, "Test User")
       @sub_account = Account.create!(name: "sub", parent_account: @account)
+    end
+
+    it "should not show the people tab without permission" do
+      @account.role_overrides.create! :role => admin_role, :permission => 'read_roster', :enabled => false
+      visit(@account)
+      expect(left_navigation).not_to include_text("People")
     end
 
     it "should show the create users button user has permission on the root_account" do

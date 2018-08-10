@@ -110,6 +110,10 @@ module NewUserSearchPage
     ff(results_row)
   end
 
+  def left_navigation
+    f('#left-side #section-tabs')
+  end
+
   # ---------------------- Actions ----------------------
   def select_role(role_name)
     role_dropdown.click
