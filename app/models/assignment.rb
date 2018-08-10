@@ -2805,6 +2805,22 @@ class Assignment < ActiveRecord::Base
     moderation_graders.with_slot_taken.order(:anonymous_id)
   end
 
+  def moderation_grader_users_with_slot_taken
+    User.joins(
+      "INNER JOIN #{ModerationGrader.quoted_table_name} ON moderation_graders.user_id = users.id"
+    ).merge(moderation_graders.with_slot_taken)
+  end
+
+  def anonymous_grader_identities_by_user_id
+    # Response looks like: { user_id => { id: anonymous_id, name: anonymous_name } }
+    @anonymous_grader_identities_by_user_id ||= anonymous_grader_identities(index_by: :user_id)
+  end
+
+  def anonymous_grader_identities_by_anonymous_id
+    # Response looks like: { anonymous_id => { id: anonymous_id, name: anonymous_name } }
+    @anonymous_grader_identities_by_anonymous_id ||= anonymous_grader_identities(index_by: :anonymous_id)
+  end
+
   def moderated_grading_max_grader_count
     max_course_count = course.moderated_grading_max_grader_count
     return max_course_count if grader_count.blank?
@@ -2829,7 +2845,7 @@ class Assignment < ActiveRecord::Base
 
   def can_view_other_grader_identities?(user)
     return false unless context.grants_any_right?(user, :manage_grades, :view_all_grades)
-    return true unless moderated_grading?
+    return true unless moderated_grading? && !grades_published?
 
     return grader_names_visible_to_final_grader? if final_grader_id == user.id
     return true if context.account_membership_allows(user, :select_final_grade)
@@ -2918,6 +2934,17 @@ class Assignment < ActiveRecord::Base
   end
 
   private
+
+  def anonymous_grader_identities(index_by:)
+    return {} unless moderated_grading?
+
+    ordered_moderation_graders_with_slot_taken.each_with_object({}).with_index(1) do |(moderation_grader, anonymous_identities), grader_number|
+      anonymous_identities[moderation_grader.public_send(index_by)] = {
+        name: I18n.t("Grader %{grader_number}", { grader_number: grader_number }),
+        id: moderation_grader.anonymous_id
+      }
+    end
+  end
 
   def ensure_moderation_grader_slot_available(user)
     if moderated_grader_limit_reached? && user.id != final_grader_id

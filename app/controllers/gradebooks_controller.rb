@@ -635,6 +635,7 @@ class GradebooksController < ApplicationController
           settings_url: speed_grader_settings_course_gradebook_path,
           new_gradebook_enabled: new_gradebook_enabled?,
           force_anonymous_grading: force_anonymous_grading?(@assignment),
+          anonymous_identities: @assignment.anonymous_grader_identities_by_anonymous_id,
           grading_role: grading_role,
           grading_type: @assignment.grading_type,
           lti_retrieve_url: retrieve_course_external_tools_url(

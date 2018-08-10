@@ -108,8 +108,8 @@ module CoursesHelper
     cr[:count] == 0 && cr[:workflow_state] == 'inactive'
   end
 
-  def user_type(course, user)
-    enrollment = course.enrollments.find_by(user: user)
+  def user_type(course, user, enrollments = nil)
+    enrollment = enrollments ? enrollments[user.id] : course.enrollments.find_by(user: user)
 
     if enrollment.nil?
       return course.account_membership_allows(user) ? "admin" : nil

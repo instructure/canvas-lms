@@ -1793,6 +1793,13 @@ describe GradebooksController do
       get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
       expect(assigns[:js_env][:new_gradebook_enabled]).to eq false
     end
+
+    it 'includes anonymous identities keyed by anonymous_id in the ENV' do
+      @assignment.update!(moderated_grading: true, grader_count: 2)
+      anonymous_id = @assignment.create_moderation_grader(@teacher, occupy_slot: true).anonymous_id
+      get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
+      expect(assigns[:js_env][:anonymous_identities]).to have_key anonymous_id
+    end
   end
 
   describe "POST 'speed_grader_settings'" do

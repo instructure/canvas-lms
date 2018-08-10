@@ -20,6 +20,7 @@ class Assignment
     include GradebookSettingsHelpers
     include CoursesHelper
     include Api::V1::SubmissionComment
+    include CanvadocsHelper
 
     def initialize(assignment, current_user, avatars: false, grading_role: :grader)
       @assignment = assignment
@@ -178,10 +179,6 @@ class Assignment
         end
       end
 
-      if anonymous_graders?(current_user: @current_user, assignment: @assignment)
-        res[:anonymous_grader_ids] = @assignment.ordered_moderation_graders_with_slot_taken.pluck(:anonymous_id)
-      end
-
       res[:submissions] = @submissions.map do |sub|
         json = sub.as_json(
           include_root: false,
@@ -232,7 +229,7 @@ class Assignment
         }
 
         if url_opts[:enable_annotations]
-          url_opts[:enrollment_type] = user_type(@course, @current_user)
+          url_opts[:enrollment_type] = canvadocs_user_role(@course, @current_user)
         end
 
         if json['submission_history'] && (@assignment.quiz.nil? || too_many)

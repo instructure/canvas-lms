@@ -1944,6 +1944,35 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  def moderation_whitelist_for_user(current_user)
+    whitelist = []
+    return whitelist unless current_user.present? && assignment.moderated_grading?
+
+    if assignment.grades_published?
+      whitelist.push(self.grader, self.user, current_user)
+    elsif self.user == current_user
+      # Requesting user is the student.
+      whitelist << current_user
+    elsif assignment.permits_moderation?(current_user)
+      # Requesting user is the final grader or an administrator.
+      whitelist.push(*assignment.moderation_grader_users_with_slot_taken, self.user, current_user)
+    elsif assignment.can_be_moderated_grader?(current_user)
+      # Requesting user is a provisional grader, or eligible to be one.
+      if assignment.grader_comments_visible_to_graders
+        whitelist.push(*assignment.moderation_grader_users_with_slot_taken, self.user, current_user)
+      else
+        whitelist.push(current_user, self.user)
+      end
+    end
+    whitelist.compact.uniq
+  end
+
+  def anonymous_identities
+    @anonymous_identities ||= assignment.anonymous_grader_identities_by_user_id.merge({
+      user_id => { name: I18n.t('Student'), id: anonymous_id }
+    })
+  end
+
   def add_comment(opts={})
     opts = opts.symbolize_keys
     opts[:author] ||= opts[:commenter] || opts[:author] || opts[:user] || self.user unless opts[:skip_author]
@@ -2493,27 +2522,6 @@ class Submission < ActiveRecord::Base
   end
 
   private
-
-  def moderation_whitelist_for_user(current_user)
-    whitelist = []
-    if assignment.grades_published?
-      whitelist.push(self.grader, self.user, current_user)
-    elsif self.user == current_user
-      # Requesting user is the student.
-      whitelist << current_user
-    elsif assignment.permits_moderation?(current_user)
-      # Requesting user is the final grader or an administrator.
-      whitelist.push(*assignment.moderation_grader_users, self.user, current_user)
-    elsif assignment.can_be_moderated_grader?(current_user)
-      # Requesting user is a provisional grader, or eligible to be one.
-      if assignment.grader_comments_visible_to_graders
-        whitelist.push(*assignment.moderation_grader_users, self.user, current_user)
-      else
-        whitelist.push(current_user, self.user)
-      end
-    end
-    whitelist.compact.uniq
-  end
 
   def set_anonymous_id
     self.anonymous_id = Anonymity.generate_id(existing_ids: Submission.anonymous_ids_for(assignment))

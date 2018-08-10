@@ -2871,19 +2871,11 @@ EG = {
   setupProvisionalGraderDisplayNames() {
     provisionalGraderDisplayNames = {};
     let provisionalGrades = currentStudentProvisionalGrades();
-    const anonymous_grader_ids = window.jsonData.anonymous_grader_ids || [];
-    const anonymousIdToProvisionalName = {};
-
-    // By doing this, we guarantee that the provisional graders will
-    // maintain the same order within the same speedgrader session.
-    for (let i = 0; i < anonymous_grader_ids.length; i += 1) {
-      anonymousIdToProvisionalName[anonymous_grader_ids[i]] = I18n.t('Grader %{index}',{index: i+1});
-    }
 
     provisionalGrades.forEach((grade) => {
       if (grade.readonly) {
         const displayName = grade.anonymous_grader_id
-          ? anonymousIdToProvisionalName[grade.anonymous_grader_id]
+          ? ENV.anonymous_identities[grade.anonymous_grader_id].name
           : grade.scorer_name;
         provisionalGraderDisplayNames[grade.provisional_grade_id] = displayName;
       } else {

@@ -427,6 +427,11 @@ QUnit.module('SpeedGrader#renderComment', {
       assessor_id: 1
     };
 
+    ENV.anonymous_identities = {
+      mry2b: { id: 'mry2b', name: 'Grader 2' },
+      asdfg: { id: 'asdfg', name: 'Grader 1' }
+    };
+
     const commentBlankHtml = `
       <div class="comment">
         <span class="comment"></span>
@@ -4185,57 +4190,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         EG.submitSelectedProvisionalGrade(1, false)
         strictEqual(EG.renderProvisionalGradeSelector.callCount, 1)
       })
-    })
-  })
-
-  QUnit.module('provisional grader display names', (hooks) => {
-    const EG = SpeedGrader.EG
-    let originalWindowJson
-
-    hooks.beforeEach(() => {
-      setupFixtures(`
-        <div id='grading_details_mount_point'></div>
-        <div id='grading-box-selected-grader'></div>
-        <div id='grade_container'>
-          <input type='text' id='grading-box-extended' />
-        </div>
-      `);
-      SpeedGrader.setup()
-      originalWindowJson = window.jsonData
-      window.jsonData = { anonymous_grader_ids: ['aaaaa', 'bbbbb'] }
-
-      sinon.stub(EG, 'submitSelectedProvisionalGrade')
-      sinon.spy(EG, 'setActiveProvisionalGradeFields')
-    })
-
-    hooks.afterEach(() => {
-      EG.setActiveProvisionalGradeFields.restore()
-      EG.submitSelectedProvisionalGrade.restore()
-      window.jsonData = originalWindowJson
-      SpeedGrader.teardown()
-      window.location.hash = ''
-
-      teardownFixtures()
-    })
-
-    test('assigns anonymous grader names based on sorted anonymous grader ID', () => {
-      EG.currentStudent = {
-        anonymous_id: 'abcde',
-        submission: {
-          provisional_grades: [
-            {provisional_grade_id: '1', readonly: true, anonymous_grader_id: 'bbbbb', grade: 11},
-            {provisional_grade_id: '2', readonly: true, anonymous_grader_id: 'aaaaa', grade: 22},
-          ],
-          updated_at: 'never'
-        }
-      }
-      EG.setupProvisionalGraderDisplayNames()
-
-      const selectedGrade = EG.currentStudent.submission.provisional_grades[0]
-      EG.handleProvisionalGradeSelected({selectedGrade})
-
-      const {label} = EG.setActiveProvisionalGradeFields.firstCall.args[0]
-      strictEqual(label, 'Grader 2')
     })
   })
 

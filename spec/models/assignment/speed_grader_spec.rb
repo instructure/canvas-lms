@@ -2252,18 +2252,6 @@ describe Assignment::SpeedGrader do
       end
     end
 
-    context 'when the grader cannot see names of other graders' do
-      let(:json) do
-        assignment.update!(anonymous_grading: true, graders_anonymous_to_graders: true)
-        Assignment::SpeedGrader.new(assignment, teacher, avatars: true, grading_role: :provisional_grader).json
-      end
-
-      it "includes the anonymous grader ids of moderation graders ordered alphanumerically" do
-        sorted_ids = assignment.moderation_graders.order(:anonymous_id).pluck(:anonymous_id)
-        expect(json[:anonymous_grader_ids]).to eq sorted_ids
-      end
-    end
-
     context "when the user can view student names" do
       let(:json) do
         assignment.update!(anonymous_grading: false, graders_anonymous_to_graders: false)
