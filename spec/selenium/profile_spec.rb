@@ -328,6 +328,23 @@ describe "profile" do
     end
   end
 
+  describe "pairing codes" do
+    before(:each) do
+      @domain_root_account = Account.default
+      course_with_student_logged_in(account: @domain_root_account, active_all: true)
+    end
+
+    it "should show the pairing code button only when self registration is enabled" do
+      get "/profile/settings"
+      expect(f("body")).not_to contain_css("#pairing-code")
+
+      @domain_root_account.enable_self_registration()
+      get "/profile/settings"
+      expect(f("#pairing-code")).to be_present
+    end
+  end
+
+
   describe "profile pictures local tests" do
     before do
       local_storage!
