@@ -17,10 +17,11 @@
 
 require_relative '../../common'
 require_relative '../pages/moderate_page'
+require_relative '../pages/speedgrader_page'
 
 GRADES = [["10", "8"].freeze, ["9", "7"].freeze, ["5", "3"].freeze].freeze
 
-  describe 'Moderation Page' do
+describe 'Moderation Page' do
   include_context 'in-process server selenium tests'
 
   before(:once) do
@@ -48,6 +49,7 @@ GRADES = [["10", "8"].freeze, ["9", "7"].freeze, ["5", "3"].freeze].freeze
       @assignment.grade_student(@students[1], grade: GRADES[count][1], grader: @teachers[count], provisional: true)
     end
 
+
   end
   before(:each) do
     user_session(@teachers[3])
@@ -73,4 +75,18 @@ GRADES = [["10", "8"].freeze, ["9", "7"].freeze, ["5", "3"].freeze].freeze
     expect(ModeratePage.fetch_student_count).to eq 5
   end
 
+  it 'navigates to student submission in speedgrader', priority: "1", test_id:3638363  do
+    skip('Unskip in GRADE-1459')
+    ModeratePage.click_student_link(@students[1])
+    expect(Speedgrader.selected_student).to include_text @students[1].name
   end
+
+  it 'navigates to anonymous student submission in speedgrader', priority: "1", test_id:3638364 do
+    skip('Unskip in GRADE-1459')
+    @assignment.update_attribute :anonymous_grading, true
+    refresh_page
+    ModeratePage.click_student_link("Student 1")
+    expect(Speedgrader.selected_student).to include_text 'Student 1'
+  end
+
+end
