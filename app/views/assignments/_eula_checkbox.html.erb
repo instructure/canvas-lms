@@ -26,9 +26,8 @@
           <% if eula_url.present? %>
             <%= t "I agree to the tool's" %>
             <%= raw("<a href='#{eula_url}'>#{t 'End-User License Agreement.'}</a>") %>
-          <% else %>
-            <%= @similarity_pledge %>
           <% end %>
+          <div><%= @similarity_pledge %></div>
         </label>
       </td>
     </tr>
