@@ -979,12 +979,12 @@ describe ConversationsController, type: :request do
 
             @message = conversation(@me, :sender => @bob).messages.first
           end
-
           json = api_call(:post, "/api/v1/conversations/#{@conversation.conversation_id}/add_message",
             { :controller => 'conversations', :action => 'add_message', :id => @conversation.conversation_id.to_s, :format => 'json' },
             { :body => "wut wut", :included_messages => [@message.id]})
 
           expect(json['last_message']).to eq "wut wut"
+          expect(@conversation.reload.message_count).to eq 2 # should not double-update
         end
       end
 

@@ -341,7 +341,7 @@ class Conversation < ActiveRecord::Base
   # * <tt>:tags</tt> - Array of tags for the message data.
   def add_message_to_participants(message, options = {})
     unless options[:new_message]
-      skip_user_ids = message.conversation_message_participants.active.pluck(:user_id)
+      skip_participants = message.conversation_message_participants.active.select(:user_id).to_a
     end
 
     self.conversation_participants.shard(self).activate do |cps|
@@ -350,7 +350,7 @@ class Conversation < ActiveRecord::Base
       cps = cps.visible if options[:only_existing]
 
       unless options[:new_message]
-        cps = cps.where("user_id NOT IN (?)", skip_user_ids) if skip_user_ids.present?
+        cps = cps.where("user_id NOT IN (?)", skip_participants.map(&:user_id)) if skip_participants.present?
       end
 
       cps = cps.where(:user_id => (options[:only_users]+[message.author]).map(&:id)) if options[:only_users]
