@@ -361,8 +361,7 @@ describe "student planner" do
       expect(f('body')).not_to contain_css(todo_sidebar_modal_selector)
     end
 
-    it "edits a To Do.", priority: "1", test_id: 3281714 do
-      skip('build breaking, I believe because selenium is running against stale code. skipping so this commit can move forward.')
+    it "edits a To Do", priority: "1", test_id: 3281714 do
       @student1.planner_notes.create!(todo_date: 2.days.from_now, title: "Title Text")
       go_to_list_view
       # Opens the To Do edit sidebar
@@ -384,9 +383,12 @@ describe "student planner" do
       expect(f('body')).not_to contain_css(todo_sidebar_modal_selector)
     end
 
-    it "edits a completed To Do", priority: "1" do
-      skip("build breaking, for some reason, it won't click a:contains('Title Text') 12 lines down.")
-      @student1.planner_notes.create!(todo_date: 2.days.from_now, title: "Title Text")
+    it "edits a completed To Do.", priority: "1" do
+      # The following student planner is added to avoid the `beginning of to-do history` image
+      # which makes the page to scroll and causes flakiness
+      @student1.planner_notes.create!(todo_date: 1.day.ago, title: "Past Title")
+
+      @student1.planner_notes.create!(todo_date: 1.day.from_now, title: "Title Text")
       go_to_list_view
 
       # complete it
