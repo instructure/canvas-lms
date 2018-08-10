@@ -26,6 +26,24 @@ describe ContextExternalTool do
     @course.update_attribute(:account, @account)
   end
 
+  describe 'associations' do
+    let_once(:developer_key) { DeveloperKey.create! }
+    let_once(:tool) do
+      ContextExternalTool.create!(
+        context: @course,
+        consumer_key: 'key',
+        shared_secret: 'secret',
+        name: 'test tool',
+        url: 'http://www.tool.com/launch',
+        developer_key: developer_key
+      )
+    end
+
+    it 'allows setting the developer key' do
+      expect(tool.developer_key).to eq developer_key
+    end
+  end
+
   describe '#duplicated_in_context?' do
     shared_examples_for 'detects duplication in contexts' do
       let(:context) { raise 'Override in spec' }

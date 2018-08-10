@@ -28,6 +28,7 @@ class DeveloperKey < ActiveRecord::Base
   has_many :page_views
   has_many :access_tokens, -> { where(:workflow_state => "active") }
   has_many :developer_key_account_bindings, inverse_of: :developer_key, dependent: :destroy
+  has_many :context_external_tools
 
   has_one :tool_consumer_profile, :class_name => 'Lti::ToolConsumerProfile'
   serialize :scopes, Array

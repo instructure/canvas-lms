@@ -23,6 +23,7 @@ class ContextExternalTool < ActiveRecord::Base
   has_many :context_external_tool_placements, :autosave => true
 
   belongs_to :context, polymorphic: [:course, :account]
+  belongs_to :developer_key
 
   include MasterCourses::Restrictor
   restrict_columns :content, [:name, :description]
