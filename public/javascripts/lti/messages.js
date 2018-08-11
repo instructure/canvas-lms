@@ -28,7 +28,7 @@ function findDomForWindow(sourceWindow) {
   return null;
 }
 
-export function messageResizer(e) {
+export function ltiMessageHandler(e) {
   try {
     var message = JSON.parse(e.data);
     switch (message.subject) {
@@ -85,6 +85,6 @@ export function messageResizer(e) {
 
 export function monitorLtiMessages() {
   window.addEventListener('message', function(e) {
-    messageResizer(e);
+    ltiMessageHandler(e);
   });
 }
