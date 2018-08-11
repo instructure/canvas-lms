@@ -9934,7 +9934,7 @@ ar:
     tabs: 
       discussions: المناقشات
       files: الملفات
-      home: البداية
+      home: "الصفحة الرئيسية"
       pages: الصفحات
       people: الأشخاص
   group_a8f5ed9c: المجموعة
@@ -14151,7 +14151,7 @@ ar:
       submission_comment: "تعليق الإرسال"
     conversation_created_description: "قمت بإنشاء محادثة"
     conversation_created_display: "المحادثات التي قمتُ بإنشائها"
-    conversation_message_description: "رسائل جديدة في علبة الوارد"
+    conversation_message_description: "رسائل جديدة في البريد الوارد"
     conversation_message_display: "رسالة المحادثة"
     course_content_description: |-
         التغيير إلى محتوى مساق:
@@ -19969,7 +19969,7 @@ ar:
     eportfolios: المحفظات
     files: الملفات
     grades: الدرجات
-    home: المنزل
+    home: "الصفحة الرئيسية"
     logout: "تسجيل الخروج"
     modules: الوحدات
     observees: ملاحظة
