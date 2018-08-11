@@ -8,97 +8,97 @@
   "assignment_976578a8": {
     "message": "تکلیف"
   },
-  "course_8a63b4a3": {
-    "message": "درس"
-  },
-  "pts_699bd9aa": {
-    "message": "امتیازها"
-  },
-  "due_5d7267be": {
-    "message": "مهلت:"
-  },
-  "loading_25990131": {
-    "message": "در حال بارگذاری..."
-  },
-  "next_month_749b1778": {
-    "message": "ماه بعد"
-  },
   "calendar_event_89aadc1c": {
     "message": "رویداد تقویم"
   },
-  "submitted_318fad53": {
-    "message": "ارسال شد"
+  "close_d634289d": {
+    "message": "بستن"
   },
-  "excused_cf8792eb": {
-    "message": "معاف شد"
-  },
-  "today_76e10f9c": {
-    "message": "امروز"
-  },
-  "edit_c5fbea07": {
-    "message": "ویرایش"
-  },
-  "save_11a80ec3": {
-    "message": "ذخیره سازی"
-  },
-  "time_2b5aac58": {
-    "message": "زمان"
-  },
-  "delete_a6efa79d": {
-    "message": "حذف"
-  },
-  "discussion_6719c51d": {
-    "message": "بحث"
-  },
-  "points_bceb5005": {
-    "message": "امتیازها"
-  },
-  "title_ee03d132": {
-    "message": "عنوان"
+  "course_8a63b4a3": {
+    "message": "درس"
   },
   "date_ee500367": {
     "message": "تاریخ"
   },
-  "late_2be42b88": {
-    "message": "با تأخیر"
-  },
-  "yesterday_c6bd6abf": {
-    "message": "دیروز"
-  },
-  "graded_25cd3fcd": {
-    "message": "نمره گذاری شده"
-  },
-  "page_50c4823d": {
-    "message": "صفحه"
-  },
-  "to_do_1d554f36": {
-    "message": "برای انجام"
-  },
-  "missing_1a256b3b": {
-    "message": "جا افتاده"
-  },
-  "quiz_e0dcce8f": {
-    "message": "آزمون"
-  },
-  "previous_month_bb1e3c84": {
-    "message": "ماه قبل"
-  },
-  "to_do_items_loading_d1cdfcd5": {
-    "message": "در حال بارگزاری موارد اقدام"
-  },
-  "loading_725811ca": {
-    "message": "در حال بارگذاری"
-  },
-  "tomorrow_9a6c9a00": {
-    "message": "فردا"
-  },
-  "load_more_a36f9cf9": {
-    "message": "بارگذاری بیشتر"
+  "delete_a6efa79d": {
+    "message": "حذف"
   },
   "details_98a31b68": {
     "message": "اطلاعات"
   },
-  "close_d634289d": {
-    "message": "بستن"
+  "discussion_6719c51d": {
+    "message": "بحث"
+  },
+  "due_5d7267be": {
+    "message": "مهلت:"
+  },
+  "edit_c5fbea07": {
+    "message": "ویرایش"
+  },
+  "excused_cf8792eb": {
+    "message": "معاف شد"
+  },
+  "graded_25cd3fcd": {
+    "message": "نمره گذاری شده"
+  },
+  "late_2be42b88": {
+    "message": "با تأخیر"
+  },
+  "load_more_a36f9cf9": {
+    "message": "بارگذاری بیشتر"
+  },
+  "loading_25990131": {
+    "message": "در حال بارگذاری..."
+  },
+  "loading_725811ca": {
+    "message": "در حال بارگذاری"
+  },
+  "missing_1a256b3b": {
+    "message": "جا افتاده"
+  },
+  "next_month_749b1778": {
+    "message": "ماه بعد"
+  },
+  "page_50c4823d": {
+    "message": "صفحه"
+  },
+  "points_bceb5005": {
+    "message": "امتیازها"
+  },
+  "previous_month_bb1e3c84": {
+    "message": "ماه قبل"
+  },
+  "pts_699bd9aa": {
+    "message": "امتیازها"
+  },
+  "quiz_e0dcce8f": {
+    "message": "آزمون"
+  },
+  "save_11a80ec3": {
+    "message": "ذخیره سازی"
+  },
+  "submitted_318fad53": {
+    "message": "ارسال شد"
+  },
+  "time_2b5aac58": {
+    "message": "زمان"
+  },
+  "title_ee03d132": {
+    "message": "عنوان"
+  },
+  "to_do_1d554f36": {
+    "message": "برای انجام"
+  },
+  "to_do_items_loading_d1cdfcd5": {
+    "message": "در حال بارگزاری موارد اقدام"
+  },
+  "today_76e10f9c": {
+    "message": "امروز"
+  },
+  "tomorrow_9a6c9a00": {
+    "message": "فردا"
+  },
+  "yesterday_c6bd6abf": {
+    "message": "دیروز"
   }
 }
