@@ -121,7 +121,11 @@ class ModeratePage
     end
 
     def display_to_students_button
-      fj("button:contains('Display')")
+      fj("button:contains('Display to Students')")
+    end
+
+    def grades_visible_to_students_button
+      fj("button:contains('Grades Visible to Students')")
     end
 
     def page_buttons
