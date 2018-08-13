@@ -2206,6 +2206,7 @@ class Course < ActiveRecord::Base
             new_file.folder_id = new_folder_id
             new_file.save_without_broadcasting!
             cm.add_imported_item(new_file)
+            cm.add_imported_item(new_file.folder, key: new_file.folder.id)
             map_merge(file, new_file)
           rescue
             cm.add_warning(t(:file_copy_error, "Couldn't copy file \"%{name}\"", :name => file.display_name || file.path_name), $!)
