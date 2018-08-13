@@ -73,10 +73,10 @@ it('does not notify the manager of unchanged state when the state has changed', 
   expect(mockManager.uiStateUnchanged).not.toHaveBeenCalled();
 });
 
-it('does not notify the manager of the action handling when it throws', () => {
+it('notifies the manager of the action before it is processed by the reducers', () => {
   const mockManager = createManager();
   const mockStore = createStore();
   const actionFailure = () => { throw new Error('foo'); };
   expect(() => createMiddleware(mockManager)(mockStore)(actionFailure)({some: 'action'})).toThrow();
-  expect(mockManager.handleAction).not.toHaveBeenCalled();
+  expect(mockManager.handleAction).toHaveBeenCalled();
 });
