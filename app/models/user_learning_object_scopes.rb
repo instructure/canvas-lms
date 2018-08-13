@@ -17,6 +17,7 @@
 #
 
 module UserLearningObjectScopes
+  include PlannerHelper
 
   def ignore_item!(asset, purpose, permanent = false)
     begin
@@ -280,7 +281,7 @@ module UserLearningObjectScopes
   end
 
   def submission_statuses(opts = {})
-    Rails.cache.fetch(['assignment_submission_statuses', self, opts].cache_key, :expires_in => 120.minutes) do
+    Rails.cache.fetch(['assignment_submission_statuses', self, get_planner_cache_id(self), opts].cache_key, :expires_in => 120.minutes) do
       opts[:due_after] ||= 2.weeks.ago
 
       {

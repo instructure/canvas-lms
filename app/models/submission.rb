@@ -2354,6 +2354,7 @@ class Submission < ActiveRecord::Base
     return true if new_state == self.read_state(current_user)
 
     StreamItem.update_read_state_for_asset(self, new_state, current_user.id)
+    clear_planner_cache(current_user)
 
     ContentParticipation.create_or_update({
       :content => self,
