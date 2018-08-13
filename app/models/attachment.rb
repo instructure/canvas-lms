@@ -21,6 +21,10 @@ require 'crocodoc'
 
 # See the uploads controller and views for examples on how to use this model.
 class Attachment < ActiveRecord::Base
+  self.ignored_columns = %i[last_lock_at last_unlock_at enrollment_id cached_s3_url s3_url_cached_at
+      scribd_account_id scribd_user scribd_mime_type_id submitted_to_scribd_at scribd_doc scribd_attempts
+      cached_scribd_thumbnail last_inline_view local_filename]
+
   def self.display_name_order_by_clause(table = nil)
     col = table ? "#{table}.display_name" : 'display_name'
     best_unicode_collation_key(col)
@@ -436,8 +440,6 @@ class Attachment < ActiveRecord::Base
     self.display_name = nil if self.display_name && self.display_name.empty?
     self.display_name ||= unencoded_filename
     self.file_state ||= "available"
-    self.last_unlock_at = self.unlock_at if self.unlock_at
-    self.last_lock_at = self.lock_at if self.lock_at
     self.assert_file_extension
     self.folder_id = nil if !self.folder || self.folder.context != self.context
     self.folder_id = nil if self.folder && self.folder.deleted? && !self.deleted?

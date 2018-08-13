@@ -19,6 +19,8 @@
 require 'set'
 
 class Folder < ActiveRecord::Base
+  self.ignored_columns = %i[last_lock_at last_unlock_at]
+
   def self.name_order_by_clause(table = nil)
     col = table ? "#{table}.name" : 'name'
     best_unicode_collation_key(col)
@@ -42,7 +44,6 @@ class Folder < ActiveRecord::Base
   acts_as_list :scope => :parent_folder
 
   before_save :infer_full_name
-  before_save :default_values
   after_save :update_sub_folders
   after_destroy :clean_up_children
   after_save :touch_context
@@ -132,11 +133,6 @@ class Folder < ActiveRecord::Base
       names << folder.name if folder
     end
     names.reverse.join("/")
-  end
-
-  def default_values
-    self.last_unlock_at = self.unlock_at if self.unlock_at
-    self.last_lock_at = self.lock_at if self.lock_at
   end
 
   def infer_hidden_state

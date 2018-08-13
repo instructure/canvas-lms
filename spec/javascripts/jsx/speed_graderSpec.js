@@ -374,8 +374,6 @@ QUnit.module('SpeedGrader#renderComment', {
               filename: 'SampleVideo_1280x720_1mb.mp4',
               folder_id: null,
               id: 21,
-              last_lock_at: null,
-              last_unlock_at: null,
               lock_at: null,
               locked: false,
               md5: 'd55bddf8d62910879ed9f605522149a8',
