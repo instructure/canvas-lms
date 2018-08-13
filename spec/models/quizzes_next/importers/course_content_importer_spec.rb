@@ -26,61 +26,68 @@ describe QuizzesNext::Importers::CourseContentImporter do
   context '.import_content' do
     let(:course) { course_factory() }
     let(:migration) { ContentMigration.create!(:context => course) }
-    let(:assignment1) { instance_double('Assignment') }
-    let(:assignment2) { instance_double('Assignment') }
-    let(:assignment3) { instance_double('Assignment') }
-    let(:quiz1) { instance_double('Quizzes::Quiz') }
-    let(:quiz2) { instance_double('Quizzes::Quiz') }
-    let(:quiz3) { instance_double('Quizzes::Quiz') }
+    let!(:quiz01) do
+      Quizzes::Quiz.create(
+        context: course
+      )
+    end
+    let!(:assignment01) do
+      quiz01.build_assignment
+      quiz01.assignment
+    end
+    let!(:quiz02) do
+      Quizzes::Quiz.create(
+        context: course
+      )
+    end
+    let!(:assignment02) do
+      quiz02.build_assignment
+      quiz02.assignment
+    end
+    let!(:quiz03) do
+      Quizzes::Quiz.create(
+        context: course
+      )
+    end
+    let!(:practice_quiz) do
+      Quizzes::Quiz.create(
+        context: course,
+        quiz_type: 'practice_quiz',
+        title: practice_quiz_title
+      )
+    end
+
+    let(:practice_quiz_title) { SecureRandom.hex(40) }
+
     let(:data) { double }
-    let(:time_now) { Time.zone.parse('03 May 2018 00:00:00 +0000') }
 
     before do
       allow(migration).
         to receive(:imported_migration_items_by_class).
-        with(Assignment).
-        and_return([assignment1, assignment2])
-      allow(migration).
-        to receive(:imported_migration_items_by_class).
         with(Quizzes::Quiz).
-        and_return([quiz1, quiz2, quiz3])
-      allow(Time.zone).to receive(:now).and_return(time_now)
-      allow(assignment1).to receive(:quiz?).and_return(true)
-      allow(assignment2).to receive(:quiz?).and_return(true)
-      allow(assignment3).to receive(:quiz?).and_return(false)
-      allow(assignment1).to receive(:quiz).and_return(quiz1)
-      allow(assignment2).to receive(:quiz).and_return(quiz2)
-      allow(assignment1).to receive(:global_id).and_return(112_233)
-      allow(assignment2).to receive(:global_id).and_return(888_777)
-      allow(quiz1).to receive(:global_id).and_return(123_456)
-      allow(quiz2).to receive(:global_id).and_return(22_345)
+        and_return([quiz01, quiz02, quiz03, practice_quiz])
     end
 
     it 'makes lti assignments' do
       expect(Importers::CourseContentImporter).
         to receive(:import_content)
-      expect(assignment1).to receive(:workflow_state=).with('importing')
-      expect(assignment1).to receive(:importing_started_at=).with(time_now)
-      expect(assignment1).to receive(:quiz_lti!).and_return(true)
-      expect(assignment1).to receive(:save!)
-      expect(assignment2).to receive(:workflow_state=).with('importing')
-      expect(assignment2).to receive(:importing_started_at=).with(time_now)
-      expect(assignment2).to receive(:quiz_lti!).and_return(true)
-      expect(assignment2).to receive(:save!)
-      expect(quiz1).to receive(:destroy)
-      expect(quiz2).to receive(:destroy)
-      expect(quiz2).not_to receive(:destroy)
-
       original_setup_assets_imported = importer.method(:setup_assets_imported)
       expect(importer).to receive(:setup_assets_imported) do |lti_assignment_quiz_set|
         expect(migration.workflow_state).not_to eq('imported')
         original_setup_assets_imported.call(lti_assignment_quiz_set)
       end
-      importer.import_content(double)
-
+      expect { importer.import_content(double) }.to change(Assignment, :count).by(2)
       expect(migration.workflow_state).to eq('imported')
+      practice_assginment = Assignment.find_by(title: practice_quiz_title)
+      expect(practice_assginment).not_to be_nil
       expect(migration.migration_settings[:imported_assets][:lti_assignment_quiz_set]).
-        to eq([[112_233, 123_456], [888_777, 22_345]])
+        to eq([
+          [assignment01.global_id, quiz01.global_id],
+          [assignment02.global_id, quiz02.global_id],
+          [quiz03.assignment.global_id, quiz03.global_id],
+          [practice_assginment.global_id, practice_quiz.global_id]
+        ])
+      expect(practice_assginment.omit_from_final_grade).to be(true)
     end
   end
 
