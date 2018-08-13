@@ -55,6 +55,19 @@ class ModeratePage
       wait_for_new_page_load(student_link(student).click)
     end
 
+    def fetch_selected_final_grade_text(student)
+      grade_input(student).click
+      text = grade_input_dropdown_list(student).find{|e| e.attribute('aria-selected') == "true"}.text
+      # close the menu
+      grade_input(student).send_keys(:escape)
+      text
+    end
+
+    def accept_grades_for_grader(grader)
+      # implement with GRADE-1327
+      # click button to accept grades for given grader name
+    end
+
     # Methods
 
     def fetch_student_count

@@ -30,7 +30,7 @@ describe 'Moderation Page' do
     # create and enroll 4 teachers in course
     @teachers = create_users_in_course(@moderated_course, 4, return_type: :record, name_prefix: "Boss", enrollment_type: 'TeacherEnrollment')
     # create 25 students enrolled in moderated_course
-    @students = create_users_in_course(@moderated_course, 25, return_type: :record, name_prefix: "Student")
+    @students = create_users_in_course(@moderated_course, 25, return_type: :record, name_prefix: "Slave")
 
     # create moderated assignment with teacher4 as final grader
     @assignment = @moderated_course.assignments.create!(
@@ -48,7 +48,16 @@ describe 'Moderation Page' do
       @assignment.grade_student(@students[0], grade: GRADES[count][0], grader: @teachers[count], provisional: true)
       @assignment.grade_student(@students[1], grade: GRADES[count][1], grader: @teachers[count], provisional: true)
     end
-
+    # grade the rest of the students, one grader to student
+    (2..8).map do |i|
+      @assignment.grade_student(@students[i], grade: Random.rand(11), grader: @teachers[0], provisional: true)
+    end
+    (9..16).map do |i|
+      @assignment.grade_student(@students[i], grade: Random.rand(11), grader: @teachers[1], provisional: true)
+    end
+    (17..24).map do |i|
+      @assignment.grade_student(@students[i], grade: Random.rand(11), grader: @teachers[2], provisional: true)
+    end
 
   end
   before(:each) do
@@ -75,18 +84,33 @@ describe 'Moderation Page' do
     expect(ModeratePage.fetch_student_count).to eq 5
   end
 
-  it 'navigates to student submission in speedgrader', priority: "1", test_id:3638363  do
+  it 'navigates to student submission in speedgrader', priority: "1", test_id: 3638363  do
     skip('Unskip in GRADE-1459')
     ModeratePage.click_student_link(@students[1])
     expect(Speedgrader.selected_student).to include_text @students[1].name
   end
 
-  it 'navigates to anonymous student submission in speedgrader', priority: "1", test_id:3638364 do
+  it 'navigates to anonymous student submission in speedgrader', priority: "1", test_id: 3638364 do
     skip('Unskip in GRADE-1459')
     @assignment.update_attribute :anonymous_grading, true
     refresh_page
     ModeratePage.click_student_link("Student 1")
     expect(Speedgrader.selected_student).to include_text 'Student 1'
+  end
+
+  it 'accepts all grades for provisional grader', priority: "1", test_id: 3513993 do
+    skip('Unskip in GRADE-1327')
+    ModeratePage.accept_grades_for_grader(@teachers[0])
+
+    (2..8).map do |i|
+      expect(ModeratePage.fetch_selected_final_grade_text(@students[i])).to include(@teachers[0].name)
+    end
+  end
+
+  it 'will not accept grades when more than one grader', priority: "1", test_id: 3513993 do
+    skip('Unskip in GRADE-1327')
+    ModeratePage.accept_grades_for_grader(@teachers[0])
+    expect(ModeratePage.fetch_selected_final_grade_text(@students[0])).not_to include(@teachers[0].name)
   end
 
 end
