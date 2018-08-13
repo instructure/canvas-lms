@@ -26,7 +26,7 @@ const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
   const markedComplete = planner_override;
 
   const details = {
-    course_id: plannable.course_id,
+    course_id: plannable.course_id || apiResponse.course_id,
     title: plannable.name || plannable.title,
     // items are completed if the user marks it as complete or made a submission
     completed: (markedComplete != null)

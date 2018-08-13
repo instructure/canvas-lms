@@ -61,7 +61,7 @@ export default class DashboardHeader extends React.Component {
 
   componentDidMount () {
     this.showDashboard(this.state.currentDashboard)
-    this.props.showTodoList(this.changeDashboard)
+    this.props.showTodoList(this.switchDashboard)
   }
 
   getActiveApp = () => this.state.currentDashboard
@@ -132,6 +132,10 @@ export default class DashboardHeader extends React.Component {
 
   changeDashboard = (newView) => {
     this.saveDashboardView(newView)
+    this.switchDashboard(newView)
+  }
+
+  switchDashboard = (newView) => {
     this.showDashboard(newView)
     this.setState({ currentDashboard: newView })
   }

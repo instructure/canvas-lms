@@ -34,9 +34,11 @@ if (ENV.DASHBOARD_SIDEBAR_URL) {
 
 const dashboardHeaderContainer = document.getElementById('dashboard_header_container');
 if (dashboardHeaderContainer) {
+  const dashboard_view = ENV.PREFERENCES.dashboard_view;
+
   ReactDOM.render(
     <DashboardHeader
-      dashboard_view={ENV.PREFERENCES.dashboard_view}
+      dashboard_view={dashboard_view}
       planner_enabled={ENV.STUDENT_PLANNER_ENABLED}
       flashError={$.flashError}
       flashMessage={$.flashMessage}

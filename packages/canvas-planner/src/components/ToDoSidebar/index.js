@@ -40,13 +40,15 @@ export class ToDoSidebar extends Component {
     courses: arrayOf(object).isRequired,
     timeZone: string,
     locale: string,
-    changeDashboardView: func.isRequired,
+    changeDashboardView: func,
+    forCourse: string,
   };
 
   static defaultProps = {
     loaded: false,
     timeZone: moment.tz.guess(),
     locale: 'en',
+    forCourse: undefined,
   }
 
   constructor () {
@@ -56,7 +58,7 @@ export class ToDoSidebar extends Component {
   }
 
   componentDidMount () {
-    this.props.sidebarLoadInitialItems(moment.tz(this.props.timeZone).startOf('day'));
+    this.props.sidebarLoadInitialItems(moment.tz(this.props.timeZone).startOf('day'), this.props.forCourse);
   }
 
   componentDidUpdate () {
@@ -78,21 +80,29 @@ export class ToDoSidebar extends Component {
   }
 
   renderShowAll () {
-    return (
-      <View as="div" textAlign="center">
-        <Button variant="link" onClick={() => this.props.changeDashboardView('planner')}>
-          {formatMessage('Show All')}
-        </Button>
-      </View>
-    );
+    if (this.props.changeDashboardView) {
+      return (
+        <View as="div" textAlign="center">
+          <Button variant="link" onClick={() => this.props.changeDashboardView('planner')}>
+            {formatMessage('Show All')}
+          </Button>
+        </View>
+      );
+    }
+    return null;
   }
 
   render () {
     if (!this.props.loaded) {
       return (
-        <View as="div" textAlign="center">
-          <Spinner title={formatMessage('To Do Items Loading')} size="small" />
-        </View>
+        <div>
+          <h2 className="todo-list-header">
+            {formatMessage('To Do')}
+          </h2>
+          <View as="div" textAlign="center">
+            <Spinner title={formatMessage('To Do Items Loading')} size="small" />
+          </View>
+        </div>
       );
     }
 
