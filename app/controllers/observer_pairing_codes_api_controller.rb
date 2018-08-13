@@ -25,19 +25,11 @@ class ObserverPairingCodesApiController < ApplicationController
   def create
     user = api_find(User, params[:user_id])
     return render_unauthorized_action unless user.has_student_enrollment?
-    
-    # 1. Students can generate pairing codes for themselves
-    # 2. Admins can if they have the permission
-    # 3. Anyone else can if they have the permission as well
-    if user == @current_user || 
-        @current_user.account.grants_right?(@current_user, :generate_observer_pairing_code) ||
-        @current_user.courses.any? { |c| c.grants_right?(@current_user, :generate_observer_pairing_code) }
+
+    if authorized_action(user, @current_user, :generate_observer_pairing_code)
       code = user.generate_observer_pairing_code
       render json: presenter(code)
-      return
     end
-
-    render_unauthorized_action
   end
 
   def presenter(code)
