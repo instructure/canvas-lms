@@ -543,7 +543,7 @@ describe RoleOverride do
       let(:permission) { RoleOverride.permissions[:view_audit_trail] }
 
       it 'is enabled by default for teachers, TAs and admins' do
-        expect(permission[:true_for]).to match_array %w(TeacherEnrollment AccountAdmin)
+        expect(permission[:true_for]).to match_array %w(AccountAdmin)
       end
 
       it 'is available to teachers, TAs, admins and account memberships' do

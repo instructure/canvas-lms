@@ -939,7 +939,7 @@ class RoleOverride < ActiveRecord::Base
       },
       :view_audit_trail => {
         :label => -> { t('Grades - View audit trail') },
-        :true_for => %w(TeacherEnrollment AccountAdmin),
+        :true_for => %w(AccountAdmin),
         :available_to => %w(TeacherEnrollment AccountAdmin AccountMembership)
       },
       :generate_observer_pairing_code => {
