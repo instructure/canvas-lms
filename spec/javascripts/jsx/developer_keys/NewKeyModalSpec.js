@@ -19,7 +19,7 @@
 import React from 'react'
 import {mount, shallow} from 'enzyme'
 import DeveloperKeyModal from 'jsx/developer_keys/NewKeyModal'
-import $ from '../../../../app/coffeescripts/jquery.rails_flash_notifications'
+import $ from 'compiled/jquery.rails_flash_notifications'
 
 QUnit.module('NewKeyModal')
 
@@ -471,4 +471,5 @@ test('allows saving if the key previously had scopes', () => {
   wrapper.node.submitForm()
   notOk(flashStub.called)
   flashStub.restore()
+  wrapper.unmount()
 })
