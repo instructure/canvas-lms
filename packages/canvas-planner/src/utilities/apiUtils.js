@@ -128,7 +128,7 @@ export function transformApiToInternalItem (apiResponse, courses, groups, timeZo
     dateBucketMoment: moment.tz(plannableDate, timeZone).startOf('day'),
     type: getItemType(apiResponse.plannable_type),
     status: apiResponse.submissions,
-    newActivity: apiResponse.new_activity,
+    newActivity: apiResponse.new_activity && (apiResponse.plannable_type !== 'discussion_topic' || details.unread_count > 0),
     toggleAPIPending: false,
     date: plannableDate,
     ...details,

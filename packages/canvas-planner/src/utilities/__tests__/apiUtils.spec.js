@@ -345,7 +345,6 @@ describe('transformApiToInternalItem', () => {
       plannable: makeDiscussionTopic({
         title: "How to make enemies",
         points_possible: 40,
-        todo_date: "2017-05-19T05:59:59Z",
         unread_count: 10,
         todo_date: undefined,
       })
@@ -366,6 +365,21 @@ describe('transformApiToInternalItem', () => {
     });
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
     expect(result).toMatchSnapshot();
+  });
+
+  it("shouldn't show new activity for discussions with a 0 unread count", () => {
+    const apiResponse = makeApiResponse({
+      plannable_type: 'discussion_topic',
+      submissions: false,
+      new_activity: true,
+      plannable: makeDiscussionTopic({
+        title: "How to make enemies",
+        todo_date: "2017-05-19T05:59:59Z",
+        unread_count: 0
+      })
+    });
+    const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
+    expect(result).toMatchObject({newActivity: false})
   });
 
   it('extracts and transforms the proper data for an assignment response', () => {
