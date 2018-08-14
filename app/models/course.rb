@@ -326,14 +326,15 @@ class Course < ActiveRecord::Base
   end
 
   def module_items_visible_to(user)
-    if user_is_teacher = self.grants_right?(user, :view_unpublished_items)
-      tags = self.context_module_tags.not_deleted.joins(:context_module).where("context_modules.workflow_state <> 'deleted'")
-    else
-      tags = self.context_module_tags.active.joins(:context_module).where(:context_modules => {:workflow_state => 'active'})
-    end
+    Shackles.activate(:slave) do
+      if user_is_teacher = self.grants_right?(user, :view_unpublished_items)
+        tags = self.context_module_tags.not_deleted.joins(:context_module).where("context_modules.workflow_state <> 'deleted'")
+      else
+        tags = self.context_module_tags.active.joins(:context_module).where(:context_modules => {:workflow_state => 'active'})
+      end
 
-    tags = DifferentiableAssignment.scope_filter(tags, user, self, is_teacher: user_is_teacher)
-    tags
+      DifferentiableAssignment.scope_filter(tags, user, self, is_teacher: user_is_teacher)
+    end
   end
 
   def sequential_module_item_ids
@@ -619,10 +620,14 @@ class Course < ActiveRecord::Base
   end
 
   def associated_accounts
-    accounts = self.non_unique_associated_accounts.to_a.uniq
-    accounts << self.account if account_id && !accounts.find { |a| a.id == account_id }
-    accounts << self.root_account if root_account_id && !accounts.find { |a| a.id == root_account_id }
-    accounts
+    Rails.cache.fetch(["associated_accounts", self]) do
+      Shackles.activate(:slave) do
+        accounts = self.non_unique_associated_accounts.to_a.uniq
+        accounts << self.account if account_id && !accounts.find { |a| a.id == account_id }
+        accounts << self.root_account if root_account_id && !accounts.find { |a| a.id == root_account_id }
+        accounts
+      end
+    end
   end
 
   scope :recently_started, -> { where(:start_at => 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }

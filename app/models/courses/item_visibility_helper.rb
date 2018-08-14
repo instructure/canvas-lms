@@ -52,16 +52,18 @@ module Courses
     end
 
     def get_visibilities_for_user_ids(item_type, user_ids)
-      opts = {user_id: user_ids, course_id: [self.id]}
-      case item_type
-      when :assignment
-        AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(opts)
-      when :discussion
-        DiscussionTopic.visible_ids_by_user(opts)
-      when :page
-        WikiPage.visible_ids_by_user(opts)
-      when :quiz
-        Quizzes::QuizStudentVisibility.visible_quiz_ids_in_course_by_user(opts)
+      Shackles.activate(:slave) do
+        opts = {user_id: user_ids, course_id: [self.id]}
+        case item_type
+        when :assignment
+          AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(opts)
+        when :discussion
+          DiscussionTopic.visible_ids_by_user(opts)
+        when :page
+          WikiPage.visible_ids_by_user(opts)
+        when :quiz
+          Quizzes::QuizStudentVisibility.visible_quiz_ids_in_course_by_user(opts)
+        end
       end
     end
   end

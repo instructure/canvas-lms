@@ -2498,6 +2498,38 @@ describe User do
         expect(@root_admin.grants_right?(other_admin, :manage_user_details)).to eq false
       end
     end
+
+    describe ":generate_observer_pairing_code" do
+      before :once do
+        @root_account = Account.default
+        @root_admin = account_admin_user(account: @root_account)
+        @sub_account = Account.create! root_account: @root_account
+        @sub_admin = account_admin_user(account: @sub_account)
+        @student = course_with_student(account: @sub_account, active_all: true).user
+      end
+
+      it "is granted to self" do
+        expect(@student.grants_right?(@student, :generate_observer_pairing_code)).to eq true
+      end
+
+      it "is granted to root account admins" do
+        expect(@student.grants_right?(@root_admin, :generate_observer_pairing_code)).to eq true
+      end
+
+      it "is not granted to root account w/o :generate_observer_pairing_code" do
+        @root_account.role_overrides.create!(role: admin_role, enabled: false, permission: :generate_observer_pairing_code)
+        expect(@student.grants_right?(@root_admin, :generate_observer_pairing_code)).to eq false
+      end
+
+      it "is granted to sub-account admins" do
+        expect(@student.grants_right?(@sub_admin, :generate_observer_pairing_code)).to eq true
+      end
+
+      it "is not granted to sub-account admins w/o :generate_observer_pairing_code" do
+        @root_account.role_overrides.create!(role: admin_role, enabled: false, permission: :generate_observer_pairing_code)
+        expect(@student.grants_right?(@sub_admin, :generate_observer_pairing_code)).to eq false
+      end
+    end
   end
 
   describe "check_accounts_right?" do
