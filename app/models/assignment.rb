@@ -2948,7 +2948,8 @@ class Assignment < ActiveRecord::Base
   # method will simply execute the provided block without any additional checks.
   def ensure_grader_can_adjudicate(grader:, provisional: false, occupy_slot:)
     unless provisional && moderated_grading?
-      yield and return
+      yield if block_given?
+      return
     end
 
     Assignment.transaction do
@@ -2966,7 +2967,7 @@ class Assignment < ActiveRecord::Base
         moderation_grader.update!(slot_taken: occupy_slot)
       end
 
-      yield
+      yield if block_given?
 
       # If we added a grader, attempt to handle a potential race condition:
       # multiple new graders could have tried to add themselves simultaneously

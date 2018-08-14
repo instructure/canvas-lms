@@ -17,7 +17,27 @@
 #
 
 class AnonymousOrModerationEvent < ApplicationRecord
-  EVENT_TYPES = %w[assignment_updated grades_posted].freeze
+  EVENT_TYPES = %w[
+    assignment_updated
+    docviewer_annotation_deleted
+    docviewer_area_created
+    docviewer_area_updated
+    docviewer_comment_created
+    docviewer_comment_deleted
+    docviewer_comment_updated
+    docviewer_free_draw_created
+    docviewer_free_draw_updated
+    docviewer_free_text_created
+    docviewer_free_text_updated
+    docviewer_highlight_created
+    docviewer_highlight_updated
+    docviewer_point_created
+    docviewer_point_updated
+    docviewer_strikeout_created
+    docviewer_strikeout_updated
+    grades_posted
+  ].freeze
+
   GRADES_POSTED = 'grades_posted'.freeze
 
   belongs_to :assignment

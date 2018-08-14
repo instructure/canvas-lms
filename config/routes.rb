@@ -28,6 +28,7 @@ CanvasRails::Application.routes.draw do
 
   resources :submissions, only: [] do
     resources :submission_comments, path: :comments, only: :index, defaults: { format: :pdf }
+    resources :docviewer_audit_events, only: [:create], constraints: { format: :json }
   end
   resources :submission_comments, only: [:update, :destroy]
 
