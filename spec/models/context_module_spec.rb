@@ -303,6 +303,21 @@ describe ContextModule do
       tag = @module.add_item(type: 'context_module_sub_header', title: 'unpublished header')
       expect(tag.unpublished?).to be_truthy
     end
+
+    it "should add an external url" do
+      course_module
+      @tag = @module.add_item(
+        :type => 'external_url',
+        :url => "http://www.instructure.com",
+        :new_tab => true,
+        :title => "Instructure",
+        :indent => 0
+      )
+      @module.workflow_state = 'published'
+      @module.save!
+
+      expect(@module.content_tags).to be_include(@tag)
+    end
   end
 
   describe "completion_requirements=" do
