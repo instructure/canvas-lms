@@ -620,10 +620,14 @@ class Course < ActiveRecord::Base
   end
 
   def associated_accounts
-    accounts = self.non_unique_associated_accounts.to_a.uniq
-    accounts << self.account if account_id && !accounts.find { |a| a.id == account_id }
-    accounts << self.root_account if root_account_id && !accounts.find { |a| a.id == root_account_id }
-    accounts
+    Rails.cache.fetch(["associated_accounts", self]) do
+      Shackles.activate(:slave) do
+        accounts = self.non_unique_associated_accounts.to_a.uniq
+        accounts << self.account if account_id && !accounts.find { |a| a.id == account_id }
+        accounts << self.root_account if root_account_id && !accounts.find { |a| a.id == root_account_id }
+        accounts
+      end
+    end
   end
 
   scope :recently_started, -> { where(:start_at => 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
