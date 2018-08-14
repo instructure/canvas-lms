@@ -81,9 +81,8 @@ module DataFixup
               role_id: ta_role.id
             }
           end
-
-          RoleOverride.bulk_insert(new_role_overrides)
         end
+        RoleOverride.bulk_insert(new_role_overrides)
       end
     end
   end
