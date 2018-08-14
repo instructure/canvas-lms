@@ -46,6 +46,9 @@ function expandCohortMagicFields(ele) {
 	if(!ele)
 		ele = document.querySelector("body");
 
+	if(document.getElementById("my-current-cohort-json") == null)
+		return;
+
 	var cohort = JSON.parse(document.getElementById("my-current-cohort-json").innerHTML);
 
 	var dupes = ele.querySelectorAll(".duplicate-for-each-cohort-member");
