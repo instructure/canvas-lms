@@ -52,7 +52,7 @@ export default {
 
   why: () =>
     formatMessage(
-      "Text is difficult to read without suffcient contrast between the text and the background, especially for those with low vision."
+      "Text is difficult to read without sufficient contrast between the text and the background, especially for those with low vision."
     ),
 
   link: "https://www.w3.org/TR/WCAG20-TECHS/G17.html"
