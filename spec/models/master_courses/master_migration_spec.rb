@@ -1096,6 +1096,17 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to.start_at).to eq @copy_from.start_at
       expect(@copy_to.conclude_at).to eq @copy_from.conclude_at
       expect(@copy_to.restrict_enrollments_to_course_dates).to be_truthy
+      
+      run_master_migration # selective without settings
+      expect(@copy_to.reload.start_at).to_not be_nil # keep the dates
+      expect(@copy_to.conclude_at).to_not be_nil
+
+      Timecop.freeze(1.minute.from_now) do
+        @copy_from.update_attributes(:start_at => nil, :conclude_at => nil)
+      end
+      run_master_migration(:copy_settings => true) # selective with settings
+      expect(@copy_to.reload.start_at).to be_nil # remove the dates
+      expect(@copy_to.conclude_at).to be_nil
     end
 
     it "should copy front wiki pages" do

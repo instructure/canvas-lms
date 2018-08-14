@@ -74,7 +74,7 @@ module CC::Importer::Canvas
       end
       ['start_at', 'conclude_at'].each do |date_type|
         val = get_time_val(doc, date_type)
-        course[date_type] = val unless val.nil?
+        course[date_type] = val
       end
       ['grading_standard_id', 'home_page_announcement_limit'].each do |int_val|
         if val = get_int_val(doc, int_val)

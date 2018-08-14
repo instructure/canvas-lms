@@ -129,8 +129,8 @@ JOKE
       ) do |c|
         c.title @course.name
         c.course_code @course.course_code
-        c.start_at ims_datetime(@course.start_at) if @course.start_at
-        c.conclude_at ims_datetime(@course.conclude_at) if @course.conclude_at
+        c.start_at ims_datetime(@course.start_at, nil)
+        c.conclude_at ims_datetime(@course.conclude_at, nil)
         if @course.tab_configuration.present?
           tab_config = []
           @course.tab_configuration.each do |t|
