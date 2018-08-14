@@ -1025,6 +1025,8 @@ class User < ActiveRecord::Base
     # check if the user we are given is an admin in one of this user's accounts
     return false unless user
     return true if Account.site_admin.grants_right?(user, sought_right)
+    return self.account.grants_right?(user, sought_right) if self.fake_student? # doesn't have account association
+
     common_shards = associated_shards & user.associated_shards
     search_method = ->(shard) do
       associated_accounts.shard(shard).any?{|a| a.grants_right?(user, sought_right) }
