@@ -258,8 +258,6 @@ END
             transitions['off']['locked'] = should_lock if transitions&.dig('off')
           end
         elsif context.is_a?(Account)
-          transitions['on']['locked'] = true if transitions&.dig('on')
-
           new_gradebook_feature_flag = FeatureFlag.where(feature: :new_gradebook, state: :on)
           all_active_sub_account_ids = Account.sub_account_ids_recursive(context.id)
           relevant_accounts = Account.joins(:feature_flags).where(id: [context.id].concat(all_active_sub_account_ids))
