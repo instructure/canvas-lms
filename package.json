@@ -234,7 +234,6 @@
     "upgrade-instructure-ui": "script/upgrade-instructure-ui"
   },
   "resolutions": {
-    "@instructure/ui-presets": "5.24.1-rc.3",
     "jquery": "https://github.com/ryankshaw/jquery.git#a755a3e9c99d5a70d8ea570836f94ae1ba56046d",
     "moment": "2.10.6",
     "canvas-rce/**/babel-helper-evaluate-path": "0.4.1",

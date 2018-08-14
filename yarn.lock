@@ -459,7 +459,7 @@
     babel-runtime "^6"
     prop-types "^15"
 
-"@instructure/ui-presets@5.24.1-rc.3", "@instructure/ui-presets@^4.6.0 || ^5", "@instructure/ui-presets@rc || ^5":
+"@instructure/ui-presets@rc || ^5":
   version "5.24.1-rc.3"
   resolved "https://registry.yarnpkg.com/@instructure/ui-presets/-/ui-presets-5.24.1-rc.3.tgz#9aaf6ca03a4a11b764b47aea8436786c5955156c"
   dependencies:
@@ -1812,16 +1812,7 @@ babel-plugin-dynamic-import-node@^2.0.0:
     babel-plugin-syntax-dynamic-import "^6.18.0"
     object.assign "^4.1.0"
 
-babel-plugin-extract-format-message@^5.1.3:
-  version "5.2.3"
-  resolved "https://registry.yarnpkg.com/babel-plugin-extract-format-message/-/babel-plugin-extract-format-message-5.2.3.tgz#22898945fa688c918eb6585273cddc3cddd002cb"
-  dependencies:
-    format-message-estree-util "^5.2.3"
-    format-message-generate-id "^5.2.1"
-    format-message-parse "^5.1.2"
-    format-message-print "^5.1.2"
-
-babel-plugin-extract-format-message@^6.0.4:
+"babel-plugin-extract-format-message@5 - 6", babel-plugin-extract-format-message@^6.0.4:
   version "6.0.4"
   resolved "https://registry.yarnpkg.com/babel-plugin-extract-format-message/-/babel-plugin-extract-format-message-6.0.4.tgz#5e069ff6a5260b8196a30cb15dc37f688a6a09d5"
   dependencies:
@@ -2186,21 +2177,7 @@ babel-plugin-transform-flow-strip-types@^6.22.0:
     babel-plugin-syntax-flow "^6.18.0"
     babel-runtime "^6.22.0"
 
-babel-plugin-transform-format-message@^5.2.0:
-  version "5.2.6"
-  resolved "https://registry.yarnpkg.com/babel-plugin-transform-format-message/-/babel-plugin-transform-format-message-5.2.6.tgz#89209ca7f1fe27babe6019973f250c2c2fbdd94d"
-  dependencies:
-    babel-core "^6.26.0"
-    babylon "^6.18.0"
-    format-message "^5.2.6"
-    format-message-estree-util "^5.2.3"
-    format-message-formats "^5.1.0"
-    format-message-generate-id "^5.2.1"
-    format-message-parse "^5.1.2"
-    lookup-closest-locale "^5.1.0"
-    source-map "^0.5.7"
-
-babel-plugin-transform-format-message@^6.0.4:
+"babel-plugin-transform-format-message@5 - 6", babel-plugin-transform-format-message@^6.0.4:
   version "6.0.4"
   resolved "https://registry.yarnpkg.com/babel-plugin-transform-format-message/-/babel-plugin-transform-format-message-6.0.4.tgz#ac2484a197ca2bd682daa5ab3b8e8d792abdd987"
   dependencies:
@@ -2263,7 +2240,7 @@ babel-plugin-transform-react-jsx@^6.24.1:
     babel-plugin-syntax-jsx "^6.8.0"
     babel-runtime "^6.22.0"
 
-babel-plugin-transform-react-remove-prop-types@^0.4, babel-plugin-transform-react-remove-prop-types@^0.4.6:
+babel-plugin-transform-react-remove-prop-types@^0.4:
   version "0.4.13"
   resolved "https://registry.yarnpkg.com/babel-plugin-transform-react-remove-prop-types/-/babel-plugin-transform-react-remove-prop-types-0.4.13.tgz#331cfc05099a808238311d78319c27460d481189"
 
@@ -5111,23 +5088,11 @@ escope@^3.6.0:
     esrecurse "^4.1.0"
     estraverse "^4.1.1"
 
-eslint-config-airbnb-base@^11.3.0:
-  version "11.3.2"
-  resolved "https://registry.yarnpkg.com/eslint-config-airbnb-base/-/eslint-config-airbnb-base-11.3.2.tgz#8703b11abe3c88ac7ec2b745b7fdf52e00ae680a"
-  dependencies:
-    eslint-restricted-globals "^0.1.1"
-
 eslint-config-airbnb-base@^12.1.0:
   version "12.1.0"
   resolved "https://registry.yarnpkg.com/eslint-config-airbnb-base/-/eslint-config-airbnb-base-12.1.0.tgz#386441e54a12ccd957b0a92564a4bafebd747944"
   dependencies:
     eslint-restricted-globals "^0.1.1"
-
-eslint-config-airbnb@^15.0.1:
-  version "15.1.0"
-  resolved "https://registry.yarnpkg.com/eslint-config-airbnb/-/eslint-config-airbnb-15.1.0.tgz#fd432965a906e30139001ba830f58f73aeddae8e"
-  dependencies:
-    eslint-config-airbnb-base "^11.3.0"
 
 eslint-config-airbnb@^16.1.0:
   version "16.1.0"
@@ -5145,36 +5110,12 @@ eslint-config-react-app@^2:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/eslint-config-react-app/-/eslint-config-react-app-2.1.0.tgz#23c909f71cbaff76b945b831d2d814b8bde169eb"
 
-eslint-config-standard-jsx@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/eslint-config-standard-jsx/-/eslint-config-standard-jsx-5.0.0.tgz#4abfac554f38668e0078c664569e7b2384e5d2aa"
-
-"eslint-config-standard-react@>= 2.3.0":
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/eslint-config-standard-react/-/eslint-config-standard-react-6.0.0.tgz#d366d6c3c092426fd3ae794a4ca0b3cb131f2964"
-  dependencies:
-    eslint-config-standard-jsx "^5.0.0"
-
-"eslint-config-standard@>= 5.1.0":
-  version "11.0.0"
-  resolved "https://registry.yarnpkg.com/eslint-config-standard/-/eslint-config-standard-11.0.0.tgz#87ee0d3c9d95382dc761958cbb23da9eea31e0ba"
-
 eslint-import-resolver-node@^0.3.1:
   version "0.3.2"
   resolved "https://registry.yarnpkg.com/eslint-import-resolver-node/-/eslint-import-resolver-node-0.3.2.tgz#58f15fb839b8d0576ca980413476aab2472db66a"
   dependencies:
     debug "^2.6.9"
     resolve "^1.5.0"
-
-eslint-loader@^1.3.0:
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/eslint-loader/-/eslint-loader-1.9.0.tgz#7e1be9feddca328d3dcfaef1ad49d5beffe83a13"
-  dependencies:
-    loader-fs-cache "^1.0.0"
-    loader-utils "^1.0.2"
-    object-assign "^4.0.1"
-    object-hash "^1.1.4"
-    rimraf "^2.6.1"
 
 eslint-loader@^2, eslint-loader@^2.0.0:
   version "2.0.0"
@@ -5193,17 +5134,13 @@ eslint-module-utils@^2.2.0:
     debug "^2.6.8"
     pkg-dir "^1.0.0"
 
-eslint-plugin-chai-friendly@^0.3.6:
-  version "0.3.6"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-chai-friendly/-/eslint-plugin-chai-friendly-0.3.6.tgz#25df1a8f91326e05767fd857a908be99ddedfc57"
-
 eslint-plugin-flowtype@^2:
   version "2.49.3"
   resolved "https://registry.yarnpkg.com/eslint-plugin-flowtype/-/eslint-plugin-flowtype-2.49.3.tgz#ccca6ee5ba2027eb3ed36bc2ec8c9a842feee841"
   dependencies:
     lodash "^4.17.10"
 
-"eslint-plugin-format-message@>= 5.2.0", eslint-plugin-format-message@^6.0.4:
+eslint-plugin-format-message@^6.0.4:
   version "6.0.4"
   resolved "https://registry.yarnpkg.com/eslint-plugin-format-message/-/eslint-plugin-format-message-6.0.4.tgz#4213ea5e45c38cecd7ab3dbc68788d2c3001c6e0"
   dependencies:
@@ -5213,7 +5150,7 @@ eslint-plugin-flowtype@^2:
     format-message-parse "^6.0.4"
     lookup-closest-locale "^6.0.4"
 
-"eslint-plugin-import@>= 2.3.0", eslint-plugin-import@^2, eslint-plugin-import@^2.13.0:
+eslint-plugin-import@^2, eslint-plugin-import@^2.13.0:
   version "2.13.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-import/-/eslint-plugin-import-2.13.0.tgz#df24f241175e312d91662dc91ca84064caec14ed"
   dependencies:
@@ -5252,18 +5189,6 @@ eslint-plugin-jsx-a11y@6.0.3:
     emoji-regex "^6.1.0"
     jsx-ast-utils "^2.0.0"
 
-eslint-plugin-jsx-a11y@^5.0.1:
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jsx-a11y/-/eslint-plugin-jsx-a11y-5.1.1.tgz#5c96bb5186ca14e94db1095ff59b3e2bd94069b1"
-  dependencies:
-    aria-query "^0.7.0"
-    array-includes "^3.0.3"
-    ast-types-flow "0.0.7"
-    axobject-query "^0.1.0"
-    damerau-levenshtein "^1.0.0"
-    emoji-regex "^6.1.0"
-    jsx-ast-utils "^1.4.0"
-
 eslint-plugin-jsx-a11y@^6:
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-jsx-a11y/-/eslint-plugin-jsx-a11y-6.1.0.tgz#569f6f2d29546cab82cedaa077ec829693b0c42d"
@@ -5277,20 +5202,11 @@ eslint-plugin-jsx-a11y@^6:
     has "^1.0.3"
     jsx-ast-utils "^2.0.1"
 
-"eslint-plugin-mocha@>= 4.5.1", eslint-plugin-mocha@^5, eslint-plugin-mocha@^5.1.0:
+eslint-plugin-mocha@^5, eslint-plugin-mocha@^5.1.0:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-mocha/-/eslint-plugin-mocha-5.1.0.tgz#3637cdde93155e650591d7ab14e7a66485f0f7c1"
   dependencies:
     ramda "^0.25.0"
-
-eslint-plugin-node@>=5.0.0:
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-node/-/eslint-plugin-node-6.0.1.tgz#bf19642298064379315d7a4b2a75937376fa05e4"
-  dependencies:
-    ignore "^3.3.6"
-    minimatch "^3.0.4"
-    resolve "^1.3.3"
-    semver "^5.4.1"
 
 eslint-plugin-notice@^0.7, eslint-plugin-notice@^0.7.7:
   version "0.7.7"
@@ -5307,7 +5223,7 @@ eslint-plugin-prettier@^2.6.0:
     fast-diff "^1.1.1"
     jest-docblock "^21.0.0"
 
-"eslint-plugin-promise@>= 1.1.0", eslint-plugin-promise@^3:
+eslint-plugin-promise@^3:
   version "3.8.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-promise/-/eslint-plugin-promise-3.8.0.tgz#65ebf27a845e3c1e9d6f6a5622ddd3801694b621"
 
@@ -5315,7 +5231,7 @@ eslint-plugin-qunit@^3:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/eslint-plugin-qunit/-/eslint-plugin-qunit-3.2.1.tgz#06cd468d598ca1ba2634b149c000349997dd43c2"
 
-"eslint-plugin-react@>= 5.0.1", eslint-plugin-react@^7, eslint-plugin-react@^7.9.1:
+eslint-plugin-react@^7, eslint-plugin-react@^7.9.1:
   version "7.10.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-react/-/eslint-plugin-react-7.10.0.tgz#af5c1fef31c4704db02098f9be18202993828b50"
   dependencies:
@@ -5323,10 +5239,6 @@ eslint-plugin-qunit@^3:
     has "^1.0.3"
     jsx-ast-utils "^2.0.1"
     prop-types "^15.6.2"
-
-"eslint-plugin-standard@>= 1.3.1":
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-standard/-/eslint-plugin-standard-3.1.0.tgz#2a9e21259ba4c47c02d53b2d0c9135d4b1022d47"
 
 eslint-restricted-globals@^0.1.1:
   version "0.1.1"
@@ -5350,7 +5262,7 @@ eslint-visitor-keys@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/eslint-visitor-keys/-/eslint-visitor-keys-1.0.0.tgz#3f3180fb2e291017716acb4c9d6d5b5c34a6a81d"
 
-eslint@3.x, eslint@^3.19.0:
+eslint@^3.19.0:
   version "3.19.0"
   resolved "https://registry.yarnpkg.com/eslint/-/eslint-3.19.0.tgz#c8fc6201c7f40dd08941b87c085767386a679acc"
   dependencies:
@@ -6327,29 +6239,13 @@ format-message-cli@^6:
     safe-buffer "^5.1.1"
     source-map "^0.5.7"
 
-format-message-estree-util@^5.2.3:
-  version "5.2.3"
-  resolved "https://registry.yarnpkg.com/format-message-estree-util/-/format-message-estree-util-5.2.3.tgz#d362f72d5c124b68a240ad2513966b0d724fab75"
-
 format-message-estree-util@^6.0.4:
   version "6.0.4"
   resolved "https://registry.yarnpkg.com/format-message-estree-util/-/format-message-estree-util-6.0.4.tgz#cf476b5421b2152326af4014c3b6496baaf3b7b3"
 
-format-message-formats@^5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/format-message-formats/-/format-message-formats-5.1.0.tgz#c9c49334a0891bf74dd9d4bbb3f626ab2de30b1d"
-
 format-message-formats@^6.0.4:
   version "6.0.4"
   resolved "https://registry.yarnpkg.com/format-message-formats/-/format-message-formats-6.0.4.tgz#126fb4310e45091df71854aeae8b315485edae84"
-
-format-message-generate-id@^5.2.1:
-  version "5.2.1"
-  resolved "https://registry.yarnpkg.com/format-message-generate-id/-/format-message-generate-id-5.2.1.tgz#d317091c69b6f1e8e9b088604cfea4bd9f4cb214"
-  dependencies:
-    crc32 "^0.2.2"
-    format-message-parse "^5.1.2"
-    format-message-print "^5.1.2"
 
 format-message-generate-id@^6, format-message-generate-id@^6.0.4:
   version "6.0.4"
@@ -6359,13 +6255,6 @@ format-message-generate-id@^6, format-message-generate-id@^6.0.4:
     format-message-parse "^6.0.4"
     format-message-print "^6.0.4"
 
-format-message-interpret@^5.2.1:
-  version "5.2.1"
-  resolved "https://registry.yarnpkg.com/format-message-interpret/-/format-message-interpret-5.2.1.tgz#7c533c1f6ce01e75a443750994bc8c2f74162e3d"
-  dependencies:
-    format-message-formats "^5.1.0"
-    lookup-closest-locale "^5.1.0"
-
 format-message-interpret@^6.0.4:
   version "6.0.4"
   resolved "https://registry.yarnpkg.com/format-message-interpret/-/format-message-interpret-6.0.4.tgz#0e71536f905cfd787ee7641624fd412484689bbd"
@@ -6373,31 +6262,13 @@ format-message-interpret@^6.0.4:
     format-message-formats "^6.0.4"
     lookup-closest-locale "^6.0.4"
 
-format-message-parse@^5.1.2:
-  version "5.1.2"
-  resolved "https://registry.yarnpkg.com/format-message-parse/-/format-message-parse-5.1.2.tgz#bc5cf9f7ffd6b221927c4018b21bee551b99234d"
-
 format-message-parse@^6, format-message-parse@^6.0.4:
   version "6.0.4"
   resolved "https://registry.yarnpkg.com/format-message-parse/-/format-message-parse-6.0.4.tgz#161f020ba6cb4606e6fe9e35a327992f66edce56"
 
-format-message-print@^5.1.2:
-  version "5.1.2"
-  resolved "https://registry.yarnpkg.com/format-message-print/-/format-message-print-5.1.2.tgz#eb8621ff53764b9b5aaae2f077582a8d9a3e2527"
-
 format-message-print@^6, format-message-print@^6.0.4:
   version "6.0.4"
   resolved "https://registry.yarnpkg.com/format-message-print/-/format-message-print-6.0.4.tgz#9e9df984966e0e599a1e89278031b338af524e1e"
-
-format-message@^5.2.6:
-  version "5.2.6"
-  resolved "https://registry.yarnpkg.com/format-message/-/format-message-5.2.6.tgz#f8fbc0736ceafe2e6b3130399db2639c2206ea9e"
-  dependencies:
-    format-message-formats "^5.1.0"
-    format-message-interpret "^5.2.1"
-    format-message-parse "^5.1.2"
-    lookup-closest-locale "^5.1.0"
-    object-assign "^4.1.1"
 
 format-message@^6, format-message@^6.0.4:
   version "6.0.4"
@@ -7926,7 +7797,7 @@ ignore-walk@^3.0.1:
   dependencies:
     minimatch "^3.0.4"
 
-ignore@^3.2.0, ignore@^3.3.3, ignore@^3.3.5, ignore@^3.3.6:
+ignore@^3.2.0, ignore@^3.3.3, ignore@^3.3.5:
   version "3.3.10"
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-3.3.10.tgz#0a97fb876986e8081c631160f8f9f389157f0043"
 
@@ -9374,10 +9245,6 @@ jstransform@^6.2.0:
     esprima-fb "~6001.1.0-dev-harmony-fb"
     source-map "0.1.31"
 
-jsx-ast-utils@^1.4.0:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/jsx-ast-utils/-/jsx-ast-utils-1.4.1.tgz#3867213e8dd79bf1e8f2300c0cfc1efb182c0df1"
-
 jsx-ast-utils@^2.0.0, jsx-ast-utils@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/jsx-ast-utils/-/jsx-ast-utils-2.0.1.tgz#e801b1b39985e20fffc87b40e3748080e2dcac7f"
@@ -10166,10 +10033,6 @@ longest@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/longest/-/longest-1.0.1.tgz#30a0b2da38f73770e8294a0d22e6625ed77d0097"
 
-lookup-closest-locale@^5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/lookup-closest-locale/-/lookup-closest-locale-5.1.0.tgz#da2f820c31663b3f91e099580d689f0aa774d2d4"
-
 lookup-closest-locale@^6.0.4:
   version "6.0.4"
   resolved "https://registry.yarnpkg.com/lookup-closest-locale/-/lookup-closest-locale-6.0.4.tgz#1279fed7546a601647bbc980f64423ee990a8590"
@@ -10543,7 +10406,7 @@ mime@1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/mime/-/mime-1.4.1.tgz#121f9ebc49e3766f311a76e1fa1c8003c4b03aa6"
 
-mime@^1.2.11, mime@^1.3.4, mime@^1.4.1, mime@^1.5.0:
+mime@^1.3.4, mime@^1.4.1, mime@^1.5.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/mime/-/mime-1.6.0.tgz#32cd9e5c64553bd58d19a568af452acff04981b1"
 
@@ -12370,16 +12233,6 @@ postcss-unique-selectors@^2.0.2:
     postcss "^5.0.4"
     uniqs "^2.0.0"
 
-postcss-url@^6.0.0:
-  version "6.3.1"
-  resolved "https://registry.yarnpkg.com/postcss-url/-/postcss-url-6.3.1.tgz#7fc6467db29ee013b7c6a5885ba1e6bf7cd43086"
-  dependencies:
-    mime "^1.2.11"
-    minimatch "^3.0.0"
-    mkdirp "^0.5.0"
-    postcss "^5.0.0"
-    xxhashjs "^0.2.1"
-
 postcss-url@^7.1.2:
   version "7.3.2"
   resolved "https://registry.yarnpkg.com/postcss-url/-/postcss-url-7.3.2.tgz#5fea273807fb84b38c461c3c9a9e8abd235f7120"
@@ -12683,31 +12536,6 @@ querystringify@^2.0.0:
 quick-lru@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/quick-lru/-/quick-lru-1.1.0.tgz#4360b17c61136ad38078397ff11416e186dcfbb8"
-
-quiz-presets@^5.0.4:
-  version "5.0.4"
-  resolved "https://registry.yarnpkg.com/quiz-presets/-/quiz-presets-5.0.4.tgz#191484082a1acde8bc685221e267a862999c731e"
-  dependencies:
-    "@instructure/ui-presets" "^4.6.0 || ^5"
-    babel-plugin-extract-format-message "^5.1.3"
-    babel-plugin-transform-format-message "^5.2.0"
-    babel-plugin-transform-react-remove-prop-types "^0.4.6"
-    cssnano "^3.10.0"
-    eslint "3.x"
-    eslint-config-airbnb "^15.0.1"
-    eslint-config-standard ">= 5.1.0"
-    eslint-config-standard-react ">= 2.3.0"
-    eslint-loader "^1.3.0"
-    eslint-plugin-chai-friendly "^0.3.6"
-    eslint-plugin-format-message ">= 5.2.0"
-    eslint-plugin-import ">= 2.3.0"
-    eslint-plugin-jsx-a11y "^5.0.1"
-    eslint-plugin-mocha ">= 4.5.1"
-    eslint-plugin-node ">=5.0.0"
-    eslint-plugin-promise ">= 1.1.0"
-    eslint-plugin-react ">= 5.0.1"
-    eslint-plugin-standard ">= 1.3.1"
-    postcss-url "^6.0.0"
 
 qunit-parser@~0.2.0:
   version "0.2.0"
@@ -13635,7 +13463,7 @@ resolve@1.1.7, resolve@1.1.x, resolve@~1.1.0:
   version "1.1.7"
   resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.1.7.tgz#203114d82ad2c5ed9e8e0411b3932875e889e97b"
 
-resolve@^1.1.6, resolve@^1.1.7, resolve@^1.3.3, resolve@^1.5.0, resolve@^1.6.0, resolve@^1.8.1:
+resolve@^1.1.6, resolve@^1.1.7, resolve@^1.5.0, resolve@^1.6.0, resolve@^1.8.1:
   version "1.8.1"
   resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.8.1.tgz#82f1ec19a423ac1fbd080b0bab06ba36e84a7a26"
   dependencies:

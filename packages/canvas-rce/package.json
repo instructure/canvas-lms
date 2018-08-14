@@ -28,7 +28,7 @@
     "presets": [
       "@instructure/ui-presets/babel",
       [
-        "quiz-presets/babel-preset-instructure-quizzes",
+        "@instructure/babel-preset-pretranslated-format-message",
         {
           "translationsDir": "locales",
           "extractDefaultTranslations": false
@@ -156,6 +156,7 @@
     "babel-eslint": "^8.2.2",
     "babel-loader": "^7.1.4",
     "babel-plugin-inline-json-import": "^0.2.0",
+    "@instructure/babel-preset-pretranslated-format-message": "^1",
     "babel-plugin-minify-constant-folding": "^0.4.1",
     "babel-plugin-minify-dead-code-elimination": "^0.4.1",
     "babel-plugin-minify-guarded-expressions": "^0.4.1",
@@ -175,7 +176,6 @@
     "nyc": "^12",
     "prettier": "^1.12.1",
     "proxyquire": "1.7.4",
-    "quiz-presets": "^5.0.4",
     "react-addons-test-utils": "^15.0.0",
     "sinon": "^6",
     "skin-deep": "^1",
