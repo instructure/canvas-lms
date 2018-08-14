@@ -97,7 +97,6 @@ exports[`render matches snapshot with errors 1`] = `
               >
                 <Popover
                   alignArrow={false}
-                  closeButtonLabel="Close"
                   constrain="window"
                   contentRef={[Function]}
                   defaultFocusElement={null}
@@ -126,6 +125,7 @@ exports[`render matches snapshot with errors 1`] = `
                   shouldContainFocus={true}
                   shouldRenderOffscreen={false}
                   shouldReturnFocus={true}
+                  show={false}
                   stacking="topmost"
                   trackPosition={true}
                   variant="default"
@@ -139,6 +139,8 @@ exports[`render matches snapshot with errors 1`] = `
                       fluidWidth={false}
                       icon={[Function]}
                       margin="0"
+                      onClick={[Function]}
+                      onDismiss={[Function]}
                       size="medium"
                       type="button"
                       variant="icon"
@@ -156,6 +158,17 @@ exports[`render matches snapshot with errors 1`] = `
                       padding="medium"
                       width="16rem"
                     >
+                      <CloseButton
+                        buttonRef={[Function]}
+                        margin="0"
+                        offset="x-small"
+                        onClick={[Function]}
+                        placement="end"
+                        size="small"
+                        variant="icon"
+                      >
+                        Close
+                      </CloseButton>
                       <Text
                         as="span"
                         letterSpacing="normal"
