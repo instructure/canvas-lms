@@ -58,7 +58,7 @@ module Api::V1::StreamItem
         hash['total_root_discussion_entries'] = data.total_root_discussion_entries
         hash['require_initial_post'] = data.require_initial_post
         hash['user_has_posted'] = data.respond_to?(:user_has_posted) ? data.user_has_posted : nil
-        hash['root_discussion_entries'] = (data.root_discussion_entries || [])[0,StreamItem::ROOT_DISCUSSION_ENTRY_LIMIT].map do |entry|
+        hash['root_discussion_entries'] = (data.root_discussion_entries || [])[0,StreamItem::LATEST_ENTRY_LIMIT].map do |entry|
           {
             'user' => {
               'user_id' => entry.user_id,
@@ -75,6 +75,7 @@ module Api::V1::StreamItem
         hash['private'] = data.private
         hash['participant_count'] = data.participant_count
         hash['html_url'] = conversation_url(stream_item.asset_id)
+        hash['latest_messages'] = data.latest_messages_from_stream_item if data.latest_messages_from_stream_item.present?
       when 'Message'
         hash['message_id'] = stream_item.asset_id
         # this type encompasses a huge number of different types of messages,

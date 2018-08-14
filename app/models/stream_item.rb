@@ -61,6 +61,8 @@ class StreamItem < ActiveRecord::Base
       res.total_root_discussion_entries = data.delete(:total_root_discussion_entries)
     when 'Submission'
       data['body'] = nil
+    when 'Conversation'
+      res.latest_messages_from_stream_item = data.delete(:latest_messages)
     end
     if data.has_key?('users')
       users = data.delete('users')
@@ -125,6 +127,18 @@ class StreamItem < ActiveRecord::Base
     if res['participant_count'] <= 8
       res['participants'] = conversation.participants.map{ |u| prepare_user(u) }
     end
+
+    messages = conversation.conversation_messages.human.order(:created_at => :desc).limit(LATEST_ENTRY_LIMIT).to_a.reverse
+    res['latest_messages'] = messages.map do |message|
+      {
+        "id" => message.id,
+        "created_at" => message.created_at,
+        "author_id" => message.author_id,
+        "message" => message.body.present? ? message.body[0, 4.kilobytes] : "",
+        "participating_user_ids" => message.conversation_message_participants.active.pluck(:user_id).sort
+      }
+    end
+
     res
   end
 
@@ -152,7 +166,7 @@ class StreamItem < ActiveRecord::Base
     item.try(:destroy)
   end
 
-  ROOT_DISCUSSION_ENTRY_LIMIT = 3
+  LATEST_ENTRY_LIMIT = 3
   def generate_data(object)
     self.context ||= object.try(:context) unless object.is_a?(Message)
 
@@ -161,7 +175,7 @@ class StreamItem < ActiveRecord::Base
       res = object.attributes
       res['user_ids_that_can_see_responses'] = object.user_ids_who_have_posted_and_admins if object.require_initial_post?
       res['total_root_discussion_entries'] = object.root_discussion_entries.active.count
-      res[:root_discussion_entries] = object.root_discussion_entries.active.reverse[0,ROOT_DISCUSSION_ENTRY_LIMIT].reverse.map do |entry|
+      res[:root_discussion_entries] = object.root_discussion_entries.active.order(:created_at => :desc).limit(LATEST_ENTRY_LIMIT).to_a.reverse.map do |entry|
         hash = entry.attributes
         hash['user_short_name'] = entry.user.short_name if entry.user
         hash['message'] = hash['message'][0, 4.kilobytes] if hash['message'].present?
@@ -419,6 +433,10 @@ class StreamItem < ActiveRecord::Base
           res.total_root_discussion_entries = original_res.total_root_discussion_entries
           res.readonly!
         end
+      end
+    when Conversation
+      if res.latest_messages_from_stream_item
+        res.latest_messages_from_stream_item.select!{|m| m["participating_user_ids"].include?(viewing_user_id)}
       end
     end
 
