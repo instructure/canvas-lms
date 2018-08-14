@@ -135,6 +135,7 @@ exports[`render matches snapshot with errors 1`] = `
                     <Button
                       as="button"
                       buttonRef={[Function]}
+                      cursor="pointer"
                       fluidWidth={false}
                       icon={[Function]}
                       margin="0"
@@ -234,6 +235,7 @@ exports[`render matches snapshot with errors 1`] = `
             <Checkbox
               checked={true}
               disabled={false}
+              indeterminate={false}
               inline={false}
               label="Select Field"
               name="checkbox"
@@ -319,6 +321,7 @@ exports[`render matches snapshot with errors 1`] = `
                     aria-label="Previous"
                     as="button"
                     buttonRef={[Function]}
+                    cursor="pointer"
                     fluidWidth={false}
                     margin="0 small 0 0"
                     onClick={[Function]}
@@ -331,6 +334,7 @@ exports[`render matches snapshot with errors 1`] = `
                   <Button
                     as="button"
                     buttonRef={[Function]}
+                    cursor="pointer"
                     fluidWidth={false}
                     margin="0"
                     onClick={[Function]}
@@ -348,6 +352,7 @@ exports[`render matches snapshot with errors 1`] = `
                   <Button
                     as="button"
                     buttonRef={[Function]}
+                    cursor="pointer"
                     disabled={true}
                     fluidWidth={false}
                     margin="0"
