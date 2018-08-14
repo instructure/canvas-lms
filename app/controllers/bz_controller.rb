@@ -95,7 +95,8 @@ class BzController < ApplicationController
           obj["enrollment_id"] = enrollment.id
           obj["id"] = enrollment.user.id
           obj["name"] = enrollment.user.name
-          obj["email"] = enrollment.user.email
+          obj["email"] = enrollment.user.pseudonym.unique_id
+          obj["contact_email"] = enrollment.user.email
           obj["type"] = enrollment.type
           si["enrollments"] << obj
         end
