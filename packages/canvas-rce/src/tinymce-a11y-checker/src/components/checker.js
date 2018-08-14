@@ -41,7 +41,8 @@ export default class Checker extends React.Component {
     formState: {},
     formStateValid: false,
     errorIndex: 0,
-    config: {}
+    config: {},
+    showWhyPopover: false
   }
 
   static defaultProps = {
@@ -331,12 +332,21 @@ export default class Checker extends React.Component {
                       <GridCol width="auto">
                         <Popover
                           on="click"
+                          show={this.state.showWhyPopover}
                           shouldContainFocus
                           shouldReturnFocus
-                          closeButtonLabel={formatMessage("Close")}
                         >
                           <PopoverTrigger>
-                            <Button variant="icon" icon={IconQuestionLine}>
+                            <Button
+                              variant="icon"
+                              icon={IconQuestionLine}
+                              onDismiss={() => {
+                                this.setState({ showWhyPopover: false })
+                              }}
+                              onClick={() =>
+                                this.setState({ showWhyPopover: true })
+                              }
+                            >
                               <ScreenReaderContent>
                                 {formatMessage("Why")}
                               </ScreenReaderContent>
@@ -348,6 +358,16 @@ export default class Checker extends React.Component {
                               display="block"
                               width="16rem"
                             >
+                              <CloseButton
+                                placement="end"
+                                offset="x-small"
+                                variant="icon"
+                                onClick={() =>
+                                  this.setState({ showWhyPopover: false })
+                                }
+                              >
+                                {formatMessage("Close")}
+                              </CloseButton>
                               <Text>
                                 <p>
                                   {rule.why() + " "}
