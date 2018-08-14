@@ -1,4 +1,6 @@
 import $ from 'jquery'
+import 'compiled/jquery.rails_flash_notifications'
+import htmlEscape from 'str/htmlEscape'
 import ToolLaunchResizer from './tool_launch_resizer'
 
 var beforeUnloadHandler;

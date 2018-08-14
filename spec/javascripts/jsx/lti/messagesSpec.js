@@ -138,4 +138,55 @@ QUnit.module('Messages', function (suiteHooks) {
     ok(html.scrollTop() === wrapper.offset().top)
     ltiToolWrapperFixture.empty()
   })
+
+  test('sets the unload message', () => {
+    const message = {
+      subject: 'lti.setUnloadMessage',
+      message: 'unload message',
+    }
+    const e = {
+      data: JSON.stringify(message),
+    };
+
+    sinon.spy(window, 'addEventListener')
+    ok(window.addEventListener.calledOnce === false)
+    ltiMessageHandler(e)
+    ok(window.addEventListener.calledOnce === true)
+  })
+
+  test('remove the unload message', () => {
+    const messageInit = {
+      subject: 'lti.setUnloadMessage',
+      message: 'unload message',
+    }
+    const eInit = {
+      data: JSON.stringify(messageInit),
+    };
+    ltiMessageHandler(eInit)
+
+    const message = {
+      subject: 'lti.removeUnloadMessage',
+    }
+    const e = {
+      data: JSON.stringify(message),
+    };
+    sinon.spy(window, 'removeEventListener')
+    ok(window.removeEventListener.calledOnce === false)
+    ltiMessageHandler(e)
+    ok(window.removeEventListener.calledOnce === true)
+  })
+
+  test('triggers a screen reader alert', () => {
+    const message = {
+      subject: 'lti.screenReaderAlert',
+      body: 'Alert message',
+    }
+    const e = {
+      data: JSON.stringify(message),
+    };
+    sinon.spy($, 'screenReaderFlashMessageExclusive')
+    ltiMessageHandler(e);
+    ok($.screenReaderFlashMessageExclusive.calledOnce === true)
+  })
+
 })
