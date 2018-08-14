@@ -541,11 +541,11 @@ class SubmissionsController < SubmissionsBaseController
   private :plagiarism_report
 
   def resubmit_to_plagiarism(type)
-    return head 400 unless params_are_integers?(:assignment_id, :submission_id)
+    return head 400 unless params_are_integers?(:assignment_id)
 
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])
-      @submission = @assignment.submissions.where(user_id: params[:submission_id]).first
+      @submission = plagiarism_resubmit_submission(@assignment)
       Canvas::LiveEvents.plagiarism_resubmit(@submission)
 
       if type == 'vericite'
@@ -573,6 +573,12 @@ class SubmissionsController < SubmissionsBaseController
     params.require(:submission).permit(always_permitted_params)
   end
   private :always_permitted_create_params
+
+  def plagiarism_resubmit_submission(assignment)
+    return assignment.submissions.find_by(user_id: params[:submission_id]) unless params[:anonymous]
+    assignment.submissions.find_by(anonymous_id: params[:submission_id])
+  end
+  private :plagiarism_resubmit_submission
 
   protected
 

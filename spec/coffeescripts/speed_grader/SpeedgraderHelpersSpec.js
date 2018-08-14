@@ -402,6 +402,24 @@ test("prevents the button's default action", () => {
   $.ajaxJSON = previousAjaxJson
 })
 
+test("sets the 'anonymous' param to true if anonymizableUserId is 'anonymous_id'", () => {
+  $('#fixtures').append('<button id="resubmit-button">Click Here</button>')
+  const ajaxStub = sinon.stub()
+  ajaxStub.returns({
+    status: 200,
+    data: {}
+  })
+  const previousAjaxJson = $.ajaxJSON
+  $.ajaxJSON = ajaxStub
+  const event = {
+    preventDefault: sinon.spy(),
+    target: document.getElementById('resubmit-button')
+  }
+  SpeedgraderHelpers.plagiarismResubmitHandler(event, 'http://www.test.com', 'anonymous_id')
+  deepEqual(ajaxStub.args[0][2], {anonymous: true})
+  $.ajaxJSON = previousAjaxJson
+})
+
 test("changes the button's text to 'Resubmitting...'", () => {
   $('#fixtures').append('<button id="resubmit-button">Click Here</button>')
   const ajaxStub = sinon.stub()

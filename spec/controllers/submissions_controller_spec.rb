@@ -673,9 +673,9 @@ describe SubmissionsController do
   end
 
   describe 'POST resubmit_to_turnitin' do
-    it 'returns 400 if submission_id is not integer' do
+    it 'returns 400 if assignment_id is not integer' do
       assignment = assignment_model
-      post 'resubmit_to_turnitin', params: {:course_id => assignment.context_id, :assignment_id => assignment.id, :submission_id => '{ user_id }'}
+      post 'resubmit_to_turnitin', params: {course_id: assignment.context_id, assignment_id: 'assignment-id', submission_id: test_student.id}
       expect(response.response_code).to eq 400
     end
 
@@ -689,6 +689,17 @@ describe SubmissionsController do
       expect(Canvas::LiveEvents).to receive(:plagiarism_resubmit)
       post 'resubmit_to_turnitin', params: {course_id: assignment.context_id, assignment_id: assignment.id, submission_id: test_student.id}
     end
+  end
+
+  it "redirects to speed grader when an anonymous submission id is used" do
+    params = {
+      course_id: assignment.context_id,
+      assignment_id: assignment.id,
+      submission_id: assignment.submission_for_student(test_student).anonymous_id,
+      anonymous: true
+    }
+    post 'resubmit_to_turnitin', params: params
+    expect(response).to be_redirect
   end
 
   describe 'POST resubmit_to_vericite' do

@@ -1651,7 +1651,7 @@ EG = {
       $('#plagiarism_platform_info_container').hide();
     } else {
       const resubmitUrl = SpeedgraderHelpers.plagiarismResubmitUrl(submission, anonymizableUserId)
-      $('#plagiarism_resubmit_button').on('click', (e) => { SpeedgraderHelpers.plagiarismResubmitHandler(e, resubmitUrl) })
+      $('#plagiarism_resubmit_button').on('click', (e) => { SpeedgraderHelpers.plagiarismResubmitHandler(e, resubmitUrl, anonymizableUserId) })
     }
 
     if(vericiteEnabled){
