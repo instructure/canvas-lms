@@ -19,6 +19,7 @@
 import React from 'react'
 import {mount} from 'enzyme'
 
+import {speedGraderUrl} from 'jsx/assignments/GradeSummary/assignment/AssignmentApi'
 import GridRow from 'jsx/assignments/GradeSummary/components/GradesGrid/GridRow'
 import {STARTED} from 'jsx/assignments/GradeSummary/grades/GradeActions'
 
@@ -57,6 +58,10 @@ QUnit.module('GradeSummary GridRow', suiteHooks => {
       },
       onGradeSelect() {},
       row: {
+        speedGraderUrl: speedGraderUrl('1201', '2301', {
+          anonymousStudents: false,
+          studentId: '1111'
+        }),
         studentId: '1111',
         studentName: 'Adam Jones'
       },
@@ -83,6 +88,12 @@ QUnit.module('GradeSummary GridRow', suiteHooks => {
     mountComponent()
     const header = wrapper.find('th.GradesGrid__BodyRowHeader')
     equal(header.text(), 'Adam Jones')
+  })
+
+  test('links the student name to the student in SpeedGrader', () => {
+    mountComponent()
+    const link = wrapper.find('th.GradesGrid__BodyRowHeader a')
+    equal(link.prop('href'), props.row.speedGraderUrl)
   })
 
   test('includes a cell for each grader', () => {

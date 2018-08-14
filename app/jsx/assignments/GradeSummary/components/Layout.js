@@ -32,7 +32,13 @@ import Header from './Header'
 
 class Layout extends Component {
   static propTypes = {
+    assignment: shape({
+      courseId: string.isRequired,
+      gradesPublished: bool.isRequired,
+      id: string.isRequired
+    }).isRequired,
     canEditCustomGrades: bool.isRequired,
+    canViewStudentIdentities: bool.isRequired,
     finalGrader: shape({
       graderId: string.isRequired
     }),
@@ -41,7 +47,6 @@ class Layout extends Component {
         graderId: string.isRequired
       })
     ).isRequired,
-    gradesPublished: bool.isRequired,
     loadStudents: func.isRequired,
     provisionalGrades: shape({}).isRequired,
     selectGrade: func.isRequired,
@@ -64,7 +69,7 @@ class Layout extends Component {
   }
 
   render() {
-    const onGradeSelect = this.props.gradesPublished ? null : this.props.selectGrade
+    const onGradeSelect = this.props.assignment.gradesPublished ? null : this.props.selectGrade
 
     return (
       <div>
@@ -76,6 +81,8 @@ class Layout extends Component {
           <View as="div" margin="large 0 0 0">
             {this.props.students.length > 0 ? (
               <GradesGrid
+                anonymousStudents={!this.props.canViewStudentIdentities}
+                assignment={this.props.assignment}
                 disabledCustomGrade={!this.props.canEditCustomGrades}
                 finalGrader={this.props.finalGrader}
                 graders={this.props.graders}
@@ -96,13 +103,18 @@ class Layout extends Component {
 
 function mapStateToProps(state) {
   const {currentUser, finalGrader} = state.context
-  const {gradesPublished} = state.assignment.assignment
+  const {assignment} = state.assignment
 
   return {
-    canEditCustomGrades: !(gradesPublished || !finalGrader || currentUser.id !== finalGrader.id),
+    assignment,
+    canEditCustomGrades: !(
+      assignment.gradesPublished ||
+      !finalGrader ||
+      currentUser.id !== finalGrader.id
+    ),
+    canViewStudentIdentities: currentUser.canViewStudentIdentities,
     finalGrader,
     graders: state.context.graders,
-    gradesPublished,
     provisionalGrades: state.grades.provisionalGrades,
     selectProvisionalGradeStatuses: state.grades.selectProvisionalGradeStatuses,
     students: state.students.list

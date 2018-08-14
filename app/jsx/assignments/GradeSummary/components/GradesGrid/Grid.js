@@ -43,6 +43,7 @@ export default class Grid extends Component {
     onGradeSelect: func,
     rows: arrayOf(
       shape({
+        speedGraderUrl: string.isRequired,
         studentId: string.isRequired,
         studentName: string.isRequired
       }).isRequired

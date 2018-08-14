@@ -40,10 +40,12 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
         title: 'Example Assignment'
       },
       currentUser: {
+        canViewStudentIdentities: true,
         graderId: 'admin',
         id: '1100'
       },
       finalGrader: {
+        canViewStudentIdentities: true,
         graderId: 'teach',
         id: '1105'
       },
