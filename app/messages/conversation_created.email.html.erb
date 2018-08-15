@@ -63,14 +63,6 @@
   </p>
 <% end %>
 
-<% if asset.has_media_objects? %>
-<p><%= t :audio_comment, "This message includes media comments. To listen or reply, click the link below:" %></p>
-<% else %>
-<p><%= t :reply_to_conversation_message, "You can reply to this message in Courseware by replying directly to this email." %></p>
-<% end %>
-
-
-
 <% unless asset.attachments.empty? %>
 <div style="margin-top: 20px; padding: 10px; background-color: #f3f3f3;">
   <p style="margin: 0px;"><%= t :attached_files, "Attached Files:" %></p>
