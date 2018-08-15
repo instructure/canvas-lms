@@ -41,7 +41,8 @@ class AssignmentScoreStatisticsGenerator
     # note: because a score is needed for max/min/ave we are not filtering
     # by assignment_student_visibilities, if a stat is added that doesn't
     # require score then add a filter when the DA feature is on
-    statistics = course.assignments.published.preload(score_statistic: :assignment).
+    statistics = Shackles.activate(:slave) do
+      course.assignments.published.preload(score_statistic: :assignment).
       joins(:submissions).
       joins("INNER JOIN #{Enrollment.quoted_table_name} enrollments ON submissions.user_id = enrollments.user_id").
       merge(course.all_enrollments.of_student_type.active_or_pending).
@@ -49,7 +50,8 @@ class AssignmentScoreStatisticsGenerator
       where.not(submissions: { score: nil }).
       where(submissions: { workflow_state: 'graded' }).
       group("assignments.id").
-      select("assignments.id, max(score) max, min(score) min, avg(score) avg, count(submissions.id) count")
+      select("assignments.id, max(score) max, min(score) min, avg(score) avg, count(submissions.id) count").to_a
+    end
 
     statistics.map do |assignment|
       assignment_stats = {
