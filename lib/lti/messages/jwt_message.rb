@@ -47,7 +47,7 @@ module Lti::Messages
 
     def add_security_claims!
       @message.aud = @tool.developer_key.global_id
-      @message.deployment_id = 'TODO: Deployment ID'
+      @message.deployment_id = @tool.deployment_id
       @message.exp = Setting.get('lti.oauth2.access_token.exp', 1.hour).to_i.seconds.from_now.to_i
       @message.iat = Time.zone.now.to_i
       @message.iss = Canvas::Security.config['lti_iss']

@@ -102,8 +102,8 @@ describe Lti::Messages::JwtMessage do
       expect(decoded_jwt['aud']).to eq developer_key.global_id
     end
 
-    xit 'sets the "deployment_id" claim' do
-      expect(decoded_jwt.deployment_id).to eq ''
+    it 'sets the "deployment_id" claim' do
+      expect(decoded_jwt['https://purl.imsglobal.org/spec/lti/claim/deployment_id']).to eq "#{tool.id}:#{Lti::Asset.opaque_identifier_for(tool.context)}"
     end
 
     it 'sets the "exp" claim to lti.oauth2.access_token.exp' do

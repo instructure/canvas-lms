@@ -44,6 +44,23 @@ describe ContextExternalTool do
     end
   end
 
+  describe '#deployment_id' do
+    let_once(:tool) do
+      ContextExternalTool.create!(
+        id: 1,
+        context: @course,
+        consumer_key: 'key',
+        shared_secret: 'secret',
+        name: 'test tool',
+        url: 'http://www.tool.com/launch'
+      )
+    end
+
+    it 'returns the correct deployment_id' do
+      expect(tool.deployment_id).to eq "#{tool.id}:#{Lti::Asset.opaque_identifier_for(tool.context)}"
+    end
+  end
+
   describe '#duplicated_in_context?' do
     shared_examples_for 'detects duplication in contexts' do
       let(:context) { raise 'Override in spec' }

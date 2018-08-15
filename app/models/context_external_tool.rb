@@ -77,6 +77,10 @@ class ContextExternalTool < ActiveRecord::Base
     self.find_external_tool(launch_url, assignment.context)
   end
 
+  def deployment_id
+    "#{self.id}:#{Lti::Asset.opaque_identifier_for(self.context)}"
+  end
+
   def content_migration_configured?
     settings.key?('content_migration') &&
       settings['content_migration'].is_a?(Hash) &&
