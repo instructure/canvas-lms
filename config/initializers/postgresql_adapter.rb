@@ -261,6 +261,12 @@ module PostgreSQLAdapterExtensions
   end
 
   def column_definitions(table_name)
+    # migrations need to see any interstitial states; also, we don't
+    # want to pollute the cache with an interstitial state
+    return super if ActiveRecord::Base.in_migration
+
+    # be wary of error reporting inside of MultiCache triggering a
+    # separate model access
     return super if @nested_column_definitions
     @nested_column_definitions = true
     begin
