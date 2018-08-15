@@ -981,10 +981,17 @@ describe Assignment::SpeedGrader do
       json.fetch('submissions').find { |s| s.fetch('workflow_state') != 'unsubmitted' }
     end
 
-    it "returns all three comments" do
+    it "includes provisional comments when grades have not been posted" do
       json = Assignment::SpeedGrader.new(assignment, ta, grading_role: :provisional_grader).json
       comments = find_real_submission(json).fetch('submission_comments').map { |comment| comment.fetch('comment') }
       expect(comments).to match_array ['student comment', 'teacher provisional comment', 'ta provisional comment']
+    end
+
+    it "excludes provisional comments when grades have been posted" do
+      assignment.update(grades_published_at: Date.yesterday)
+      json = Assignment::SpeedGrader.new(assignment, ta, grading_role: :provisional_grader).json
+      comments = find_real_submission(json).fetch('submission_comments').map { |comment| comment.fetch('comment') }
+      expect(comments).to match_array ['student comment']
     end
 
     context "for provisional grader" do
@@ -1001,7 +1008,7 @@ describe Assignment::SpeedGrader do
         expect(scorer_ids).to contain_exactly(teacher_pg.scorer_id.to_s, ta_pg.scorer_id.to_s)
       end
 
-      it "has all three comments" do
+      it "includes all comments" do
         comments = find_real_submission(json)['submission_comments'].map { |comment| comment['comment'] }
         expect(comments).to match_array ['student comment', 'teacher provisional comment', 'ta provisional comment']
       end
@@ -1016,7 +1023,7 @@ describe Assignment::SpeedGrader do
     context "for final grader" do
       let(:json) { Assignment::SpeedGrader.new(assignment, teacher, grading_role: :moderator).json }
 
-      it "has all three comments" do
+      it "includes all comments" do
         s = find_real_submission(json)
         expect(s['score']).to eq 2
         comments = s['submission_comments'].map { |comment| comment['comment'] }

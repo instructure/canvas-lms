@@ -94,7 +94,11 @@ class Assignment
 
       includes = [{ versions: :versionable }, :quiz_submission, :user, :attachment_associations, :assignment, :originality_reports]
       grader_comments_hidden = grader_comments_hidden?(current_user: @current_user, assignment: @assignment)
-      key = grader_comments_hidden ? :submission_comments : :all_submission_comments
+      key = if @assignment.grades_published? || grader_comments_hidden
+        :submission_comments
+      else
+        :all_submission_comments
+      end
 
       includes << {key => {submission: {assignment: { context: :root_account }}}}
       @submissions = @assignment.submissions.where(:user_id => @students).preload(*includes)
@@ -190,7 +194,9 @@ class Assignment
           json.merge! provisional_grade_to_json(provisional_grade)
         end
 
-        comments = if grader_comments_hidden
+        comments = if @assignment.grades_published?
+          sub.submission_comments
+        elsif grader_comments_hidden
           (provisional_grade || sub).submission_comments
         else
           sub.all_submission_comments
