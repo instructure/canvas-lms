@@ -696,12 +696,8 @@ class SisBatch < ActiveRecord::Base
           count = update_restore_progress(progress, batch, count, total)
         end
       end
-      scope = scope.where.not(previous_workflow_state: 'deleted')
       Shackles.activate(:master) do
         count = restore_workflow_states(scope, 'Enrollment', progress, count, total)
-        Enrollment.where(id: scope.where.not(previous_workflow_state: 'deleted').select(:context_id)).find_in_batches do |enrollments|
-          Enrollment::BatchStateUpdater.run_call_backs_for(enrollments)
-        end
       end
     end
     count
@@ -729,7 +725,11 @@ class SisBatch < ActiveRecord::Base
     Shackles.activate(:slave) do
       scope.active.order(:context_id).find_in_batches(batch_size: 5_000) do |data|
         Shackles.activate(:master) do
-          type.constantize.connection.execute(restore_sql(type, data.map(&:to_restore_array)))
+          # restore the items and return the ids of the items that changed
+          ids = type.constantize.connection.select_values(restore_sql(type, data.map(&:to_restore_array)))
+          if type == 'Enrollment'
+            ids.each_slice(1000) {|slice| Enrollment::BatchStateUpdater.send_later(:run_call_backs_for, slice)}
+          end
           count = update_restore_progress(progress, data, count, total)
         end
       end
@@ -775,6 +775,7 @@ class SisBatch < ActiveRecord::Base
         SET workflow_state = x.workflow_state
         FROM (VALUES #{to_sql_values(data)}) AS x(id, workflow_state)
         WHERE t.id=x.id AND x.workflow_state IS DISTINCT FROM t.workflow_state
+        RETURNING t.id
     SQL
   end
 end

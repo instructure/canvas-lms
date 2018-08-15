@@ -29,8 +29,6 @@ describe "Enrollment::BatchStateUpdater" do
     @user2 = @enrollment2.user
     @enrollment = student_in_course(active_all: true, course: @course)
   end
-  # destroy_batch needs to account for all the callbacks in Enrollment
-
 
   describe '.mark_enrollments_as_deleted' do
     it 'should delete each enrollment and scores' do
