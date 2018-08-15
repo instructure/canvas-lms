@@ -261,8 +261,21 @@ module PostgreSQLAdapterExtensions
   end
 
   def column_definitions(table_name)
-    MultiCache.fetch(["schema", table_name]) do
+    return super if @nested_column_definitions
+    @nested_column_definitions = true
+    begin
+      got_inside = false
+      MultiCache.fetch(["schema", table_name]) do
+        got_inside = true
+        super
+      end
+    rescue
+      raise if got_inside
+      # we never got inside, so something is wrong with the cache,
+      # just ignore it
       super
+    ensure
+      @nested_column_definitions = false
     end
   end
 end
