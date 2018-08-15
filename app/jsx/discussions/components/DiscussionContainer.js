@@ -191,7 +191,7 @@ export class DiscussionsContainer extends Component {
           >
             {!this.props.pinned ?
             <span className="recent-activity-text-container">
-              <Text fontStyle="italic">{I18n.t('Ordered by Recent Activity')}</Text>
+              <Text>{I18n.t('Ordered by Recent Activity')}</Text>
             </span> : null }
             {this.props.discussions.length ? this.renderDiscussions() : this.renderBackgroundImage()}
           </ToggleDetails>
