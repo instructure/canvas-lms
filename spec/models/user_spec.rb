@@ -820,29 +820,33 @@ describe User do
 
   context "check_courses_right?" do
     before :once do
-      course_with_teacher(:active_all => true)
-      @student = user_model
-    end
+      course_with_teacher(active_all: true)
+      course_with_student(course: @course, active_all: true)
+      @teacher1 = @teacher
+      @student1 = @student
+      @active_course = @course
 
-    before :each do
-      allow(@course).to receive(:grants_right?).and_return(true)
+      course_with_teacher(active_all: true)
+      course_with_student(course: @course, active_all: true)
+      @teacher2 = @teacher
+      @student2 = @student
+      @concluded_course = @course
+      @concluded_course.complete!
     end
 
     it "should require parameters" do
-      expect(@student.check_courses_right?(nil, :some_right)).to be_falsey
-      expect(@student.check_courses_right?(@teacher, nil)).to be_falsey
+      expect(@student1.check_courses_right?(nil, :some_right)).to be_falsey
+      expect(@student1.check_courses_right?(@teacher1, nil)).to be_falsey
     end
 
-    it "should check current courses" do
-      expect(@student).to receive(:courses).once.and_return([@course])
-      expect(@student).to receive(:concluded_courses).never
-      expect(@student.check_courses_right?(@teacher, :some_right)).to be_truthy
+    it "should check both active and concluded courses" do
+      expect(@student1.check_courses_right?(@teacher1, :manage_wiki)).to be_truthy
+      expect(@student2.check_courses_right?(@teacher2, :read_forum)).to be_truthy
+      @concluded_course.grants_right?(@teacher2, :manage_wiki)
     end
 
-    it "should check concluded courses" do
-      expect(@student).to receive(:courses).once.and_return([])
-      expect(@student).to receive(:concluded_courses).once.and_return([@course])
-      expect(@student.check_courses_right?(@teacher, :some_right)).to be_truthy
+    it "allows for narrowing courses by enrollments" do
+      expect(@student2.check_courses_right?(@teacher2, :manage_account_memberships, @student2.enrollments.concluded)).to be_falsey
     end
   end
 

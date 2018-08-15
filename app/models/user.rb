@@ -1011,14 +1011,13 @@ class User < ActiveRecord::Base
     self.courses
   end
 
-  def check_courses_right?(user, sought_right)
+  def check_courses_right?(user, sought_right, enrollments_to_check=nil)
+    enrollments_to_check ||= enrollments.current_and_concluded
     # Look through the currently enrolled courses first.  This should
     # catch most of the calls.  If none of the current courses grant
     # the right then look at the concluded courses.
-    user && sought_right && (
-      self.courses.any?{ |c| c.grants_right?(user, sought_right) } ||
-      self.concluded_courses.any?{ |c| c.grants_right?(user, sought_right) }
-    )
+    user && sought_right &&
+      self.courses_for_enrollments(enrollments_to_check).any?{ |c| c.grants_right?(user, sought_right) }
   end
 
   def check_accounts_right?(user, sought_right)
@@ -1064,7 +1063,7 @@ class User < ActiveRecord::Base
     given { |user| self.check_courses_right?(user, :manage_user_notes) }
     can :create_user_notes and can :read_user_notes
 
-    given { |user| self.check_courses_right?(user, :generate_observer_pairing_code) }
+    given { |user| self.check_courses_right?(user, :generate_observer_pairing_code, enrollments.not_deleted) }
     can :generate_observer_pairing_code
 
     given {|user| self.check_accounts_right?(user, :manage_user_notes) }
