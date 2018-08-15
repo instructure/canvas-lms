@@ -256,12 +256,7 @@ describe "new_gradebook" do
     expect(transitions).to include({ "on" => LOCKED, "off" => LOCKED })
   end
 
-  it "does not allow enabling new gradebook on an entire account" do
-    ngb_trans_proc.call(admin, root_account, nil, transitions)
-    expect(transitions).to include({ "on" => LOCKED })
-  end
-
-  describe "coursel-level backwards compatibility" do
+  describe "course-level backwards compatibility" do
     let(:student) { student_in_course(course: course).user }
     let!(:assignment) { course.assignments.create!(title: 'assignment', points_possible: 10) }
     let(:submission) { assignment.submissions.find_by(user: student) }
