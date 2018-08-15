@@ -536,6 +536,10 @@ class SisImportsApiController < ApplicationController
   #   If set, will only restore items that were deleted. This will ignore any
   #   items that were created or modified.
   #
+  # @argument unconclude_only [Boolean]
+  #   If set, will only restore enrollments that were concluded. This will
+  #   ignore any items that were created or deleted.
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/<account_id>/sis_imports/<sis_import_id>/restore_states \
   #     -H 'Authorization: Bearer <token>'
@@ -546,7 +550,11 @@ class SisImportsApiController < ApplicationController
       @batch = @account.sis_batches.find(params[:id])
       batch_mode = value_to_boolean(params[:batch_mode])
       undelete_only = value_to_boolean(params[:undelete_only])
-      progress = @batch.restore_states_later(batch_mode: batch_mode, undelete_only: undelete_only)
+      unconclude_only = value_to_boolean(params[:unconclude_only])
+      if undelete_only && unconclude_only
+        return render json: 'cannot set both undelete_only and unconclude_only', status: :bad_request
+      end
+      progress = @batch.restore_states_later(batch_mode: batch_mode, undelete_only: undelete_only, unconclude_only: unconclude_only)
       render json: progress_json(progress, @current_user, session)
     end
   end

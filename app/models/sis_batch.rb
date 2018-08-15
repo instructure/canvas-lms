@@ -738,18 +738,19 @@ class SisBatch < ActiveRecord::Base
     count
   end
 
-  def restore_states_later(batch_mode: nil, undelete_only: false)
+  def restore_states_later(batch_mode: nil, undelete_only: false, unconclude_only: false)
     progress = account.progresses.create! tag: "sis_batch_state_restore", completion: 0.0
     progress.process_job(self, :restore_states_for_batch,
                          {singleton: "restore_states_for_batch:#{account.global_id}}"},
-                         {batch_mode: batch_mode, undelete_only: undelete_only})
+                         {batch_mode: batch_mode, undelete_only: undelete_only, unconclude_only: unconclude_only})
     progress
   end
 
-  def restore_states_for_batch(progress=nil, batch_mode: nil, undelete_only: false)
+  def restore_states_for_batch(progress=nil, batch_mode: nil, undelete_only: false, unconclude_only: false)
     self.update_attribute(:workflow_state, 'restoring')
     roll_back = self.roll_back_data
     roll_back = roll_back.where(updated_workflow_state: %w(retired deleted)) if undelete_only
+    roll_back = roll_back.where(updated_workflow_state: %w(completed)) if unconclude_only
     roll_back = roll_back.where(batch_mode_delete: batch_mode) if batch_mode
     types = roll_back.active.distinct.order(:context_type).pluck(:context_type)
     total = roll_back.active.count if progress
@@ -760,7 +761,7 @@ class SisBatch < ActiveRecord::Base
       count = restore_states_for_type(type, scope, progress, count, total)
     end
     progress&.update_completion!(100)
-    self.workflow_state = (undelete_only || batch_mode) ? 'partially_restored' : 'restored'
+    self.workflow_state = (undelete_only || unconclude_only || batch_mode) ? 'partially_restored' : 'restored'
     self.save!
   end
 
