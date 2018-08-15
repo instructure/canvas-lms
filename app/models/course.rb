@@ -1505,7 +1505,7 @@ class Course < ActiveRecord::Base
     is_unpublished = self.created? || self.claimed?
     @enrollment_lookup ||= {}
     @enrollment_lookup[user.id] ||= shard.activate do
-      self.enrollments.active_or_pending.for_user(user).except(:preload).preload(:enrollment_state).
+      self.enrollments.active_or_pending.for_user(user).preload(:enrollment_state).to_a.
         reject { |e| (is_unpublished && !(e.admin? || e.fake_student?)) || [:inactive, :completed].include?(e.state_based_on_date)}
     end
 
