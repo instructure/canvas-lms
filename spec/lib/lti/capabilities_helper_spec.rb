@@ -106,7 +106,8 @@ module Lti
          com.instructure.Group.name
          Canvas.membership.roles
          com.instructure.Course.groupIds
-         com.Instructure.membership.roles)
+         com.Instructure.membership.roles
+         com.instructure.Assignment.anonymous_grading)
     }
 
     describe '#supported_capabilities' do
