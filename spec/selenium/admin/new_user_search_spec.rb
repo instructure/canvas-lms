@@ -201,7 +201,8 @@ describe "new account user search" do
 
     it "should search by name" do
       user_with_pseudonym(:account => @account, :name => "diffrient user")
-      enter_search("Test")
+      refresh_page
+      user_search_box.send_keys("Test")
       wait_for_loading_to_disappear
       expect(results_rows.count).to eq 1
       expect(results_rows.first).to include_text("Test")
