@@ -326,15 +326,13 @@ class Course < ActiveRecord::Base
   end
 
   def module_items_visible_to(user)
-    Shackles.activate(:slave) do
-      if user_is_teacher = self.grants_right?(user, :view_unpublished_items)
-        tags = self.context_module_tags.not_deleted.joins(:context_module).where("context_modules.workflow_state <> 'deleted'")
-      else
-        tags = self.context_module_tags.active.joins(:context_module).where(:context_modules => {:workflow_state => 'active'})
-      end
-
-      DifferentiableAssignment.scope_filter(tags, user, self, is_teacher: user_is_teacher)
+    if user_is_teacher = self.grants_right?(user, :view_unpublished_items)
+      tags = self.context_module_tags.not_deleted.joins(:context_module).where("context_modules.workflow_state <> 'deleted'")
+    else
+      tags = self.context_module_tags.active.joins(:context_module).where(:context_modules => {:workflow_state => 'active'})
     end
+
+    DifferentiableAssignment.scope_filter(tags, user, self, is_teacher: user_is_teacher)
   end
 
   def sequential_module_item_ids
