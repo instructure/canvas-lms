@@ -657,7 +657,7 @@ class ContextModuleItemsApiController < ApplicationController
 
       # assemble a sequence of content tags in the course
       # (break ties on module position by module id)
-      tag_ids = @context.sequential_module_item_ids & @context.module_items_visible_to(@current_user).reorder(nil).pluck(:id)
+      tag_ids = @context.sequential_module_item_ids & Shackles.activate(:slave) { @context.module_items_visible_to(@current_user).reorder(nil).pluck(:id) }
 
       # find content tags to include
       tag_indices = []
