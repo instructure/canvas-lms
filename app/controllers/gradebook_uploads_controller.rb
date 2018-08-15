@@ -77,12 +77,15 @@ class GradebookUploadsController < ApplicationController
   end
 
   private
+
   def gradebook_env(progress)
     {
+      course_id: @context.id,
       progress: progress_json(progress, @current_user, session),
       uploaded_gradebook_data_path: "/courses/#{@context.id}/gradebook_upload/data",
       gradebook_path: course_gradebook_path(@context),
       bulk_update_path: "/api/v1/courses/#{@context.id}/submissions/update_grades",
+      bulk_update_custom_columns_path: api_v1_course_custom_gradebook_column_bulk_data_path(@context),
       create_assignment_path: api_v1_course_assignments_path(@context),
       new_gradebook_upload_path: new_course_gradebook_upload_path(@context),
     }
