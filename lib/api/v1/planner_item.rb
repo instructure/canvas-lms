@@ -95,11 +95,12 @@ module Api::V1::PlannerItem
       end
     end
     ActiveRecord::Associations::Preloader.new.preload(preload_items, :planner_overrides, ::PlannerOverride.where(user: user))
-    _events, other_items = preload_items.partition{|i| i.is_a?(::CalendarEvent)}
+    events, other_items = preload_items.partition{|i| i.is_a?(::CalendarEvent)}
+    ActiveRecord::Associations::Preloader.new.preload(events, :context) if events.any?
     notes, context_items = other_items.partition{|i| i.is_a?(::PlannerNote)}
     ActiveRecord::Associations::Preloader.new.preload(notes, user: {pseudonym: :account}) if notes.any?
     wiki_pages, other_context_items = context_items.partition{|i| i.is_a?(::WikiPage)}
-    ActiveRecord::Associations::Preloader.new.preload(wiki_pages, wiki: [{course: :root_account}, {group: :root_account}]) if wiki_pages.any?
+    ActiveRecord::Associations::Preloader.new.preload(wiki_pages, {context: :root_account}) if wiki_pages.any?
     ActiveRecord::Associations::Preloader.new.preload(other_context_items, {context: :root_account}) if other_context_items.any?
     ss = user.submission_statuses(opts)
     discussions, _assign_quiz_items = other_context_items.partition{|i| i.is_a?(::DiscussionTopic)}
@@ -132,7 +133,7 @@ module Api::V1::PlannerItem
         reject{|comment| comment.author_id == user.id}. # omit comments by the user's own self
         sort_by(&:updated_at).
         last
-      
+
       if feedback_data.present?
         submission_status[:submissions][:feedback] = {
           comment: feedback_data.comment,
