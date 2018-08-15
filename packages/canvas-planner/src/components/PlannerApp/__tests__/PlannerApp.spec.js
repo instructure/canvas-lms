@@ -19,7 +19,7 @@ import React from 'react';
 import moment from 'moment-timezone';
 import MockDate from 'mockdate';
 import { shallow, mount } from 'enzyme';
-import { PlannerApp } from '../index';
+import { PlannerApp, mapStateToProps } from '../index';
 
 const TZ = 'Asia/Tokyo';
 
@@ -203,5 +203,49 @@ describe('PlannerApp', () => {
       expect(emptyDaysSpy).toHaveBeenCalledTimes(2);        // each time we find <3 consecutive empty days
       expect(oneDaySpy).toHaveBeenCalledTimes(6 + 3); // each time we find a day with items + a day with no items
     });
+  });
+});
+
+describe('mapStateToProps', () => {
+  it('maps isLoading to true when when state.loading.isLoading is true', () => {
+    const state = {
+      loading: {
+        isLoading: true,
+        hasSomeItems: false,
+        partialPastDays: [],
+        partialFutureDays: [],
+      },
+      days: []
+    };
+    const props = mapStateToProps(state);
+    expect(props).toMatchObject({isLoading: true});
+  });
+
+  it('maps isLoading to true when hasSomeItems is null', () => {
+    const state = {
+      loading: {
+        isLoading: false,
+        hasSomeItems: null,
+        partialPastDays: [],
+        partialFutureDays: [],
+      },
+      days: []
+    };
+    const props = mapStateToProps(state);
+    expect(props).toMatchObject({isLoading: true});
+  });
+
+  it('maps isLoading to false when hasSomeItems is false', () => {
+    const state = {
+      loading: {
+        isLoading: false,
+        hasSomeItems: false,
+        partialPastDays: [],
+        partialFutureDays: [],
+      },
+      days: []
+    };
+    const props = mapStateToProps(state);
+    expect(props).toMatchObject({isLoading: false});
   });
 });

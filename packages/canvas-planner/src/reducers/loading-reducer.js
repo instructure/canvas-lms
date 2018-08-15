@@ -141,7 +141,7 @@ export default handleActions({
   GOT_GRADES_ERROR: (state, action) => ({
      ...state, loadingGrades: false, gradesLoaded: false,
      gradesLoadingError: action.payload.message}),
-  
+
 }, loadingState({}, {
   isLoading: false,
   loadingPast: false,
@@ -156,9 +156,10 @@ export default handleActions({
   seekingNewActivity: false,
   partialPastDays: [],
   partialFutureDays: [],
-  hasSomeItems: false,    // set to true if the first peek into the past returns an item
-                          // reset to false if an item is deleted, because we can't know
-                          // if it was the last one
+  hasSomeItems: null,     // Tri-state. Initially null because we haven't checked yet.
+                          // Set to true if the first peek into the past returns an item.
+                          // Reset to false if an item is deleted, because we can't know
+                          // if it was the last one.
   loadingGrades: false,
   gradesLoaded: false,
   gradesLoadingError: null,

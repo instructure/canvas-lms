@@ -630,10 +630,6 @@ exports[`PlannerApp shows only the loading component when the isLoading prop is 
       Load prior dates
     </ShowOnFocusButton>
   </View>
-  <LoadingPastIndicator
-    allPastItemsLoaded={false}
-    loadingPast={false}
-  />
   <View
     display="block"
     padding="xx-large medium"
