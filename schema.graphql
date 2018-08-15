@@ -719,6 +719,8 @@ type StudentSummaryAnalytics {
 }
 
 type Submission implements Node & Timestamped {
+  # legacy canvas id
+  _id: ID!
   assignment: Assignment
   createdAt: DateTime
 
