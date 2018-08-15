@@ -259,6 +259,12 @@ module PostgreSQLAdapterExtensions
 
     super
   end
+
+  def column_definitions(table_name)
+    MultiCache.fetch(["schema", table_name]) do
+      super
+    end
+  end
 end
 
 ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(PostgreSQLAdapterExtensions)
