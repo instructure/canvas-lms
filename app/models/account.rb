@@ -762,15 +762,17 @@ class Account < ActiveRecord::Base
         end
 
         if starting_account_id
-          ids = Account.connection.select_values(<<-SQL)
-                WITH RECURSIVE t AS (
-                  SELECT * FROM #{Account.quoted_table_name} WHERE id=#{Shard.local_id_for(starting_account_id).first}
-                  UNION
-                  SELECT accounts.* FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id
-                )
-                SELECT id FROM t
-              SQL
-          id_chain.concat(ids.map(&:to_i))
+          Shackles.activate(:slave) do
+            ids = Account.connection.select_values(<<-SQL)
+                  WITH RECURSIVE t AS (
+                    SELECT * FROM #{Account.quoted_table_name} WHERE id=#{Shard.local_id_for(starting_account_id).first}
+                    UNION
+                    SELECT accounts.* FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id
+                  )
+                  SELECT id FROM t
+                SQL
+            id_chain.concat(ids.map(&:to_i))
+          end
         end
         id_chain
       end
