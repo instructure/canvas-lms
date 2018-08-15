@@ -16,18 +16,11 @@
   </a>
 <% end %>
 
-
 <% if asset.conversation.subject.present? %>
   Subject: <%= asset.conversation.subject %>
 <% end %>
 
 <%= asset.body %>
-
-<% if asset.has_media_objects? %>
-  <%= t("This message includes media comments. To listen or reply, click this link: %{link}.", link: content(:link)) %>
-<% else %>
-  <%= t("You can reply to this message in Courseware by replying directly to this email, or by clicking this link: %{link}.", link: content(:link)) %>
-<% end %>
 
 <% unless asset.attachments.empty? %>
   <%= t :attached_files, "Attached Files:" %>
