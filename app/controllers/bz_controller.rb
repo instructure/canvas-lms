@@ -13,7 +13,8 @@ class BzController < ApplicationController
 
   # magic field dump / for cohorts uses an access token instead
   # and courses_for_email is unauthenticated since it isn't really sensitive
-  before_filter :require_user, :except => [:magic_field_dump, :courses_for_email, :magic_fields_for_cohort, :course_cohort_information]
+  # user_retained_data_batch is sensitive, but it can also be done via access_token
+  before_filter :require_user, :except => [:magic_field_dump, :courses_for_email, :magic_fields_for_cohort, :course_cohort_information, :user_retained_data_batch]
   skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user, :user_retained_data_batch]
 
   # this is meant to be used for requests from external services like LL kits
@@ -90,6 +91,8 @@ class BzController < ApplicationController
 
         si["enrollments"] = []
         section.enrollments.each do |enrollment|
+          next if enrollment.user.nil?
+          next if enrollment.user.pseudonym.nil?
           next if enrollment.user.name == "Test Student" # we dont need to filter this everywhere else!
           obj = {}
           obj["enrollment_id"] = enrollment.id
@@ -529,11 +532,49 @@ class BzController < ApplicationController
   end
 
   def user_retained_data_batch
+
+    user = nil
+
+    if params[:access_token]
+      access_token = AccessToken.authenticate(params[:access_token])
+      if access_token.nil?
+        render :json => "Access denied, bad access token"
+        return
+      end
+
+      if params[:user]
+        if requesting_user.id != 1
+          render :json => "Access denied, not admin"
+          return
+        end
+
+        if params[:user].match(/[0-9]+/)
+          user = User.find(params[:user])
+        else
+          user = Pseudonym.active.where(:unique_id => params[:user]).first
+        end
+
+        if user.nil?
+          render :json => "Access denied, no such user"
+          return
+        end
+      else
+        user = access_token.user
+      end
+    else
+      user = @current_user
+    end
+
+    if user.nil?
+        render :json => "Access denied, not logged in"
+        return
+    end
+
     data = {}
     if params[:names]
       params[:names].each do |name|
         next if data[name]
-        result = RetainedData.where(:user_id => @current_user.id, :name => name)
+        result = RetainedData.where(:user_id => user.id, :name => name)
         data[name] = result.empty? ? '' : result.first.value
       end
     end
