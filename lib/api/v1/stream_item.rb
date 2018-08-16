@@ -169,69 +169,71 @@ module Api::V1::StreamItem
   def api_render_stream_summary(contexts = nil)
     items = []
 
-    @current_user.shard.activate do
-      base_scope = @current_user.visible_stream_item_instances(:contexts => contexts).joins(:stream_item)
+    Shackles.activate(:slave) do
+      @current_user.shard.activate do
+        base_scope = @current_user.visible_stream_item_instances(:contexts => contexts).joins(:stream_item)
 
-      full_counts = base_scope.except(:order).group('stream_items.asset_type', 'stream_items.notification_category',
-        'stream_item_instances.workflow_state').count
-        # as far as I can tell, the 'type' column previously extracted by stream_item_json is identical to asset_type
-       # oh wait, except for Announcements -_-
-      if full_counts.keys.any?{|k| k[0] == 'DiscussionTopic'}
-        ann_counts = base_scope.where(:stream_items => {:asset_type => "DiscussionTopic"}).
-          joins("INNER JOIN #{DiscussionTopic.quoted_table_name} ON discussion_topics.id=stream_items.asset_id").
-          where("discussion_topics.type = ?", "Announcement").except(:order).group('stream_item_instances.workflow_state').count
+        full_counts = base_scope.except(:order).group('stream_items.asset_type', 'stream_items.notification_category',
+          'stream_item_instances.workflow_state').count
+          # as far as I can tell, the 'type' column previously extracted by stream_item_json is identical to asset_type
+         # oh wait, except for Announcements -_-
+        if full_counts.keys.any?{|k| k[0] == 'DiscussionTopic'}
+          ann_counts = base_scope.where(:stream_items => {:asset_type => "DiscussionTopic"}).
+            joins("INNER JOIN #{DiscussionTopic.quoted_table_name} ON discussion_topics.id=stream_items.asset_id").
+            where("discussion_topics.type = ?", "Announcement").except(:order).group('stream_item_instances.workflow_state').count
 
-        ann_counts.each do |wf_state, ann_count|
-          full_counts[['Announcement', nil, wf_state]] = ann_count
-          full_counts[['DiscussionTopic', nil, wf_state]] -= ann_count # subtract the announcement count from the "true" discussion topics
-        end
-      end
-
-      total_counts = {}
-      unread_counts = {}
-      full_counts.each do |k, count|
-        new_key = k.dup
-        wf_state = new_key.pop
-        if wf_state == 'unread'
-          unread_counts[new_key] = count
-        end
-        total_counts[new_key] ||= 0
-        total_counts[new_key] += count
-      end
-
-      # TODO: can remove after DataFixup::PopulateStreamItemNotificationCategory is run
-      if total_counts.delete(['Message', nil]) # i.e. there are Message stream items without notification_category
-        unread_counts.delete(['Message', nil])
-        base_scope.where(:stream_items => {:asset_type => "Message", :notification_category => nil}).
-          eager_load(:stream_item).each do |i|
-
-          category = i.stream_item.get_notification_category
-          key = ['Message', category]
-          total_counts[key] ||= 0
-          total_counts[key] += 1
-          unless i.read?
-            unread_counts[key] ||= 0
-            unread_counts[key] += 1
+          ann_counts.each do |wf_state, ann_count|
+            full_counts[['Announcement', nil, wf_state]] = ann_count
+            full_counts[['DiscussionTopic', nil, wf_state]] -= ann_count # subtract the announcement count from the "true" discussion topics
           end
         end
-      end
 
-      cross_shard_totals, cross_shard_unreads = cross_shard_stream_item_counts(contexts)
-      cross_shard_totals.each do |k, v|
-        total_counts[k] ||= 0
-        total_counts[k] += v
-      end
-      cross_shard_unreads.each do |k, v|
-        unread_counts[k] ||= 0
-        unread_counts[k] += v
-      end
+        total_counts = {}
+        unread_counts = {}
+        full_counts.each do |k, count|
+          new_key = k.dup
+          wf_state = new_key.pop
+          if wf_state == 'unread'
+            unread_counts[new_key] = count
+          end
+          total_counts[new_key] ||= 0
+          total_counts[new_key] += count
+        end
 
-      total_counts.each do |key, count|
-        type, category = key
-        items << {:type => type, :notification_category => category,
-          :count => count, :unread_count => unread_counts[key] || 0}
+        # TODO: can remove after DataFixup::PopulateStreamItemNotificationCategory is run
+        if total_counts.delete(['Message', nil]) # i.e. there are Message stream items without notification_category
+          unread_counts.delete(['Message', nil])
+          base_scope.where(:stream_items => {:asset_type => "Message", :notification_category => nil}).
+            eager_load(:stream_item).each do |i|
+
+            category = i.stream_item.get_notification_category
+            key = ['Message', category]
+            total_counts[key] ||= 0
+            total_counts[key] += 1
+            unless i.read?
+              unread_counts[key] ||= 0
+              unread_counts[key] += 1
+            end
+          end
+        end
+
+        cross_shard_totals, cross_shard_unreads = cross_shard_stream_item_counts(contexts)
+        cross_shard_totals.each do |k, v|
+          total_counts[k] ||= 0
+          total_counts[k] += v
+        end
+        cross_shard_unreads.each do |k, v|
+          unread_counts[k] ||= 0
+          unread_counts[k] += v
+        end
+
+        total_counts.each do |key, count|
+          type, category = key
+          items << {:type => type, :notification_category => category,
+            :count => count, :unread_count => unread_counts[key] || 0}
+        end
+        items.sort_by!{|i| i[:type]}
       end
-      items.sort_by!{|i| i[:type]}
     end
     render :json => items
   end
