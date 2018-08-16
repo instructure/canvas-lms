@@ -273,6 +273,14 @@ class Speedgrader
       f('.ui-resizable .ui-dialog-titlebar-close')
     end
 
+    def audit_link
+      # TODO in GRADE-1075 locator for audit link
+    end
+
+    def audit_entries
+      # TODO in GRADE-1075 locator all of the audit entries
+    end
+
     # action
     def visit(course_id, assignment_id)
       get "/courses/#{course_id}/gradebook/speed_grader?assignment_id=#{assignment_id}"
@@ -397,6 +405,10 @@ class Speedgrader
     def wait_for_grade_input
       wait = Selenium::WebDriver::Wait.new(timeout: 5)
       wait.until { grade_input.attribute('value') != "" }
+    end
+
+    def click_audit_link
+      audit_link.click
     end
 
     # quizzes
