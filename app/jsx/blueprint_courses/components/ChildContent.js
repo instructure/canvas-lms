@@ -59,7 +59,7 @@ export default class ChildContent extends Component {
   }
 
   clearRoutes = () => {
-    this.props.routeTo('#!/')
+    this.props.routeTo('#!/blueprint')
   }
 
   showChangeLog (params) {
