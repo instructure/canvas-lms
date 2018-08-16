@@ -374,7 +374,6 @@ class CalendarEventsApiController < ApplicationController
     if @errors.empty?
       calendar_events, assignments = events.partition { |e| e.is_a?(CalendarEvent) }
       ActiveRecord::Associations::Preloader.new.preload(calendar_events, [:context, :parent_event])
-      ActiveRecord::Associations::Preloader.new.preload(assignments, Api::V1::Assignment::PRELOADS)
       ActiveRecord::Associations::Preloader.new.preload(assignments.map(&:context), [:account, :grading_period_groups])
 
       json = events.map do |event|
