@@ -94,6 +94,10 @@ module Gradebook
 
       public
 
+      def student_name_link(student_id)
+        f("a[data-student_id='#{student_id}']")
+      end
+
       def assignment_header_label(name)
         assignment_header(name).find('.assignment-name')
       end
