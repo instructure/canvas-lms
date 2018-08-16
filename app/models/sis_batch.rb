@@ -28,6 +28,7 @@ class SisBatch < ActiveRecord::Base
   has_many :parallel_importers, inverse_of: :sis_batch
   has_many :sis_batch_errors, inverse_of: :sis_batch, autosave: false
   has_many :roll_back_data, inverse_of: :sis_batch, class_name: 'SisBatchRollBackData', autosave: false
+  has_many :progresses, inverse_of: :sis_batch
   belongs_to :generated_diff, class_name: 'Attachment'
   belongs_to :batch_mode_term, class_name: 'EnrollmentTerm'
   belongs_to :user
@@ -671,57 +672,57 @@ class SisBatch < ActiveRecord::Base
     file
   end
 
-  def update_restore_progress(progress, data, count, total)
+  def update_restore_progress(restore_progress, data, count, total)
     count += roll_back_data.active.where(id: data).update_all(workflow_state: 'restored', updated_at: Time.zone.now)
-    progress&.calculate_completion!(count, total)
+    restore_progress&.calculate_completion!(count, total)
     count
   end
 
-  def restore_states_for_type(type, scope, progress, count, total)
+  def restore_states_for_type(type, scope, restore_progress, count, total)
     case type
     when 'GroupCategory'
-      return restore_group_categories(scope, progress, count, total)
+      restore_group_categories(scope, restore_progress, count, total)
     when 'Enrollment'
-      return restore_enrollment_data(scope, progress, count, total)
+      restore_enrollment_data(scope, restore_progress, count, total)
     else
-      return restore_workflow_states(scope, type, progress, count, total)
+      restore_workflow_states(scope, type, restore_progress, count, total)
     end
   end
 
-  def restore_enrollment_data(scope, progress, count, total)
+  def restore_enrollment_data(scope, restore_progress, count, total)
     Shackles.activate(:slave) do
       scope.active.where(previous_workflow_state: 'deleted').find_in_batches do |batch|
         Shackles.activate(:master) do
           Enrollment::BatchStateUpdater.destroy_batch(batch.map(&:context_id))
-          count = update_restore_progress(progress, batch, count, total)
+          count = update_restore_progress(restore_progress, batch, count, total)
         end
       end
       Shackles.activate(:master) do
-        count = restore_workflow_states(scope, 'Enrollment', progress, count, total)
+        count = restore_workflow_states(scope, 'Enrollment', restore_progress, count, total)
       end
     end
     count
   end
 
-  def restore_group_categories(scope, progress, count, total)
+  def restore_group_categories(scope, restore_progress, count, total)
     Shackles.activate(:slave) do
       scope.active.where(previous_workflow_state: 'active').find_in_batches do |gcs|
         Shackles.activate(:master) do
           GroupCategory.where(id: gcs.map(&:context_id)).update_all(deleted_at: nil, updated_at: Time.zone.now)
-          count = update_restore_progress(progress, gcs, count, total)
+          count = update_restore_progress(restore_progress, gcs, count, total)
         end
       end
       scope.active.where.not(previous_workflow_state: 'active').find_in_batches do |gcs|
         Shackles.activate(:master) do
           GroupCategory.where(id: gcs.map(&:context_id)).update_all(deleted_at: Time.zone.now, updated_at: Time.zone.now)
-          count = update_restore_progress(progress, gcs, count, total)
+          count = update_restore_progress(restore_progress, gcs, count, total)
         end
       end
     end
     count
   end
 
-  def restore_workflow_states(scope, type, progress, count, total)
+  def restore_workflow_states(scope, type, restore_progress, count, total)
     Shackles.activate(:slave) do
       scope.active.order(:context_id).find_in_batches(batch_size: 5_000) do |data|
         Shackles.activate(:master) do
@@ -730,7 +731,7 @@ class SisBatch < ActiveRecord::Base
           if type == 'Enrollment'
             ids.each_slice(1000) {|slice| Enrollment::BatchStateUpdater.send_later(:run_call_backs_for, slice)}
           end
-          count = update_restore_progress(progress, data, count, total)
+          count = update_restore_progress(restore_progress, data, count, total)
         end
       end
     end
@@ -738,28 +739,31 @@ class SisBatch < ActiveRecord::Base
   end
 
   def restore_states_later(batch_mode: nil, undelete_only: false, unconclude_only: false)
-    progress = account.progresses.create! tag: "sis_batch_state_restore", completion: 0.0
-    progress.process_job(self, :restore_states_for_batch,
-                         {singleton: "restore_states_for_batch:#{account.global_id}}"},
-                         {batch_mode: batch_mode, undelete_only: undelete_only, unconclude_only: unconclude_only})
-    progress
+    self.shard.activate do
+      restore_progress = Progress.create! context: self, tag: "sis_batch_state_restore", completion: 0.0
+      restore_progress.process_job(self, :restore_states_for_batch,
+                                   {singleton: "restore_states_for_batch:#{account.global_id}}"},
+                                   {batch_mode: batch_mode, undelete_only: undelete_only, unconclude_only: unconclude_only})
+      restore_progress
+    end
   end
 
-  def restore_states_for_batch(progress=nil, batch_mode: nil, undelete_only: false, unconclude_only: false)
+  def restore_states_for_batch(restore_progress=nil, batch_mode: nil, undelete_only: false, unconclude_only: false)
+    restore_progress&.start
     self.update_attribute(:workflow_state, 'restoring')
     roll_back = self.roll_back_data
     roll_back = roll_back.where(updated_workflow_state: %w(retired deleted)) if undelete_only
     roll_back = roll_back.where(updated_workflow_state: %w(completed)) if unconclude_only
     roll_back = roll_back.where(batch_mode_delete: batch_mode) if batch_mode
     types = roll_back.active.distinct.order(:context_type).pluck(:context_type)
-    total = roll_back.active.count if progress
+    total = roll_back.active.count if restore_progress
     count = 0
     SisBatchRollBackData::RESTORE_ORDER.each do |type|
       next unless types.include? type
       scope = roll_back.where(context_type: type)
-      count = restore_states_for_type(type, scope, progress, count, total)
+      count = restore_states_for_type(type, scope, restore_progress, count, total)
     end
-    progress&.update_completion!(100)
+    restore_progress&.complete
     self.workflow_state = (undelete_only || unconclude_only || batch_mode) ? 'partially_restored' : 'restored'
     self.save!
   end
