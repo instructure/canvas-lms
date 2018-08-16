@@ -17,16 +17,16 @@
  */
 
 import I18n from 'i18n!discussions_v2'
-import React, { Component } from 'react'
-import { string, func, bool } from 'prop-types'
-import { connect } from 'react-redux'
-import { debounce } from 'lodash'
-import { bindActionCreators } from 'redux'
+import React, {Component} from 'react'
+import {string, func, bool} from 'prop-types'
+import {connect} from 'react-redux'
+import {debounce} from 'lodash'
+import {bindActionCreators} from 'redux'
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import Select from '@instructure/ui-core/lib/components/Select'
-import Grid, { GridCol, GridRow } from '@instructure/ui-layout/lib/components/Grid'
+import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
 import View from '@instructure/ui-layout/lib/components/View'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
@@ -57,42 +57,41 @@ export default class IndexHeader extends Component {
     saveSettings: func.isRequired,
     searchDiscussions: func.isRequired,
     toggleModalOpen: func.isRequired,
-    userSettings: propTypes.userSettings.isRequired,
+    userSettings: propTypes.userSettings.isRequired
   }
 
   static defaultProps = {
-    courseSettings: {},
+    courseSettings: {}
   }
 
   state = {
-    searchTerm: "",
-    filter: 'all',
+    searchTerm: '',
+    filter: 'all'
   }
 
   componentDidMount() {
     this.props.fetchUserSettings()
-    if(this.props.contextType === 'course' && this.props.permissions.change_settings) {
+    if (this.props.contextType === 'course' && this.props.permissions.change_settings) {
       this.props.fetchCourseSettings()
     }
   }
 
-  onSearchStringChange = (e) => {
+  onSearchStringChange = e => {
     this.setState({searchTerm: e.target.value}, this.filterDiscussions)
   }
 
-  onFilterChange = (e) => {
+  onFilterChange = e => {
     this.setState({filter: e.target.value}, this.filterDiscussions)
   }
 
   // This is needed to make the search results do not keep cutting each
   // other off when typing fasting and using a screen reader
-  filterDiscussions = debounce(
-    () => this.props.searchDiscussions(this.state),
-    SEARCH_DELAY,
-    {leading: false, trailing: true}
-  )
+  filterDiscussions = debounce(() => this.props.searchDiscussions(this.state), SEARCH_DELAY, {
+    leading: false,
+    trailing: true
+  })
 
-  render () {
+  render() {
     return (
       <View>
         <View display="block">
@@ -103,15 +102,22 @@ export default class IndexHeader extends Component {
                   name="filter-dropdown"
                   onChange={this.onFilterChange}
                   size="medium"
-                  label={<ScreenReaderContent>{I18n.t('Discussion Filter')}</ScreenReaderContent>}>
-                  {
-                    Object.keys(filters).map((filter) => (<option key={filter} value={filter}>{filters[filter]}</option>))
-                  }
+                  label={<ScreenReaderContent>{I18n.t('Discussion Filter')}</ScreenReaderContent>}
+                >
+                  {Object.keys(filters).map(filter => (
+                    <option key={filter} value={filter}>
+                      {filters[filter]}
+                    </option>
+                  ))}
                 </Select>
               </GridCol>
               <GridCol width={4}>
                 <TextInput
-                  label={<ScreenReaderContent>{I18n.t('Search discussion by title')}</ScreenReaderContent>}
+                  label={
+                    <ScreenReaderContent>
+                      {I18n.t('Search discussion by title')}
+                    </ScreenReaderContent>
+                  }
                   placeholder={I18n.t('Search')}
                   icon={() => <IconSearchLine />}
                   onChange={this.onSearchStringChange}
@@ -119,27 +125,30 @@ export default class IndexHeader extends Component {
                 />
               </GridCol>
               <GridCol width={6} textAlign="end">
-                {this.props.permissions.create &&
+                {this.props.permissions.create && (
                   <Button
-                    href={`/${this.props.contextType}s/${this.props.contextId}/discussion_topics/new`}
+                    href={`/${this.props.contextType}s/${
+                      this.props.contextId
+                    }/discussion_topics/new`}
                     variant="primary"
                     id="add_discussion"
-                  ><IconPlus />
+                  >
+                    <IconPlus />
                     <ScreenReaderContent>{I18n.t('Add discussion')}</ScreenReaderContent>
                     <PresentationContent>{I18n.t('Discussion')}</PresentationContent>
                   </Button>
-                }
-                {Object.keys(this.props.userSettings).length ?
-                    <DiscussionSettings
-                      courseSettings={this.props.courseSettings}
-                      userSettings={this.props.userSettings}
-                      permissions={this.props.permissions}
-                      saveSettings={this.props.saveSettings}
-                      toggleModalOpen={this.props.toggleModalOpen}
-                      isSettingsModalOpen={this.props.isSettingsModalOpen}
-                      isSavingSettings={this.props.isSavingSettings}
-                    />
-                    : null}
+                )}
+                {Object.keys(this.props.userSettings).length ? (
+                  <DiscussionSettings
+                    courseSettings={this.props.courseSettings}
+                    userSettings={this.props.userSettings}
+                    permissions={this.props.permissions}
+                    saveSettings={this.props.saveSettings}
+                    toggleModalOpen={this.props.toggleModalOpen}
+                    isSettingsModalOpen={this.props.isSettingsModalOpen}
+                    isSavingSettings={this.props.isSavingSettings}
+                  />
+                ) : null}
               </GridCol>
             </GridRow>
           </Grid>
@@ -149,16 +158,28 @@ export default class IndexHeader extends Component {
   }
 }
 
-const connectState = state => Object.assign({
-}, select(state, [
-  'contextType',
-  'contextId',
-  'permissions',
-  'userSettings',
-  'courseSettings',
-  'isSavingSettings',
-  'isSettingsModalOpen',
-]))
-const selectedActions = ['fetchUserSettings', 'searchDiscussions', 'fetchCourseSettings', 'saveSettings', 'toggleModalOpen']
+const connectState = state =>
+  Object.assign(
+    {},
+    select(state, [
+      'contextType',
+      'contextId',
+      'permissions',
+      'userSettings',
+      'courseSettings',
+      'isSavingSettings',
+      'isSettingsModalOpen'
+    ])
+  )
+const selectedActions = [
+  'fetchUserSettings',
+  'searchDiscussions',
+  'fetchCourseSettings',
+  'saveSettings',
+  'toggleModalOpen'
+]
 const connectActions = dispatch => bindActionCreators(select(actions, selectedActions), dispatch)
-export const ConnectedIndexHeader = connect(connectState, connectActions)(IndexHeader)
+export const ConnectedIndexHeader = connect(
+  connectState,
+  connectActions
+)(IndexHeader)

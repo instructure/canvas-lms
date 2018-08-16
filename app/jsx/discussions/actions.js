@@ -17,17 +17,21 @@
  */
 
 import I18n from 'i18n!discussions_v2'
-import { createActions } from 'redux-actions'
+import {createActions} from 'redux-actions'
 import $ from 'jquery'
 
 import * as apiClient from './apiClient'
-import { createPaginationActions } from '../shared/reduxPagination'
+import {createPaginationActions} from '../shared/reduxPagination'
 
 const getDiscussionOpts = {
   fetchAll: true,
-  totalCount: ENV.totalDiscussions,
+  totalCount: ENV.totalDiscussions
 }
-const discussionActions = createPaginationActions('discussions', apiClient.getDiscussions, getDiscussionOpts)
+const discussionActions = createPaginationActions(
+  'discussions',
+  apiClient.getDiscussions,
+  getDiscussionOpts
+)
 
 const types = [
   ...discussionActions.actionTypes,
@@ -64,13 +68,10 @@ const types = [
   'CLEAN_DISCUSSION_FOCUS'
 ]
 
-const actions = Object.assign(
-  createActions(...types),
-  discussionActions.actionCreators,
-)
+const actions = Object.assign(createActions(...types), discussionActions.actionCreators)
 
 function copyAndUpdateDiscussion(discussion, updatedFields, focusOn) {
-  const discussionCopy = Object.assign({}, discussion);
+  const discussionCopy = Object.assign({}, discussion)
   Object.keys(updatedFields).forEach(key => {
     if (!Object.prototype.hasOwnProperty.call(discussion, key)) {
       throw new Error(`field ${key} does not exist in the discussion`)
@@ -83,10 +84,16 @@ function copyAndUpdateDiscussion(discussion, updatedFields, focusOn) {
   return discussionCopy
 }
 
-actions.updateDiscussion = function(discussion, updatedFields, { successMessage, failMessage }, focusOn) {
+actions.updateDiscussion = function(
+  discussion,
+  updatedFields,
+  {successMessage, failMessage},
+  focusOn
+) {
   return (dispatch, getState) => {
     dispatch(actions.updateDiscussionStart())
-    apiClient.updateDiscussion(getState(), discussion, updatedFields)
+    apiClient
+      .updateDiscussion(getState(), discussion, updatedFields)
       .then(res => {
         const newDiscussion = res.data
 
@@ -96,8 +103,8 @@ actions.updateDiscussion = function(discussion, updatedFields, { successMessage,
         // because we don't know if the menu disappears until we get the result
         // back from this call. This is terrible.
         if (focusOn) {
-          if (focusOn === "manageMenu") {
-            const realFocus = newDiscussion.permissions.delete ? "manageMenu" : "title"
+          if (focusOn === 'manageMenu') {
+            const realFocus = newDiscussion.permissions.delete ? 'manageMenu' : 'title'
             newDiscussion.focusOn = realFocus
           } else {
             newDiscussion.focusOn = focusOn
@@ -111,14 +118,15 @@ actions.updateDiscussion = function(discussion, updatedFields, { successMessage,
       })
       .catch(err => {
         $.screenReaderFlashMessage(failMessage || I18n.t('Updating discussion failed'))
-        dispatch(actions.updateDiscussionFail({
-          message: failMessage || I18n.t('Updating discussion failed'),
-          err
-        }))
+        dispatch(
+          actions.updateDiscussionFail({
+            message: failMessage || I18n.t('Updating discussion failed'),
+            err
+          })
+        )
       })
   }
 }
-
 
 // We need to assume success here, so that when we drag and drop something
 // it does not snap back to its current location and then move to the
@@ -132,12 +140,14 @@ actions.handleDrop = function(discussion, updatedFields, order) {
     const originalOrder = order ? getState().pinnedDiscussionIds.slice() : undefined
     const discussionCopy = copyAndUpdateDiscussion(discussion, updatedFields)
     dispatch(actions.dragAndDropStart({discussion: discussionCopy, order}))
-    apiClient.updateDiscussion(getState(), discussion, updatedFields)
+    apiClient
+      .updateDiscussion(getState(), discussion, updatedFields)
       .then(() => {
         // Only need to make this API call if reordering the pinned discussions
-        const promise = (discussionCopy.pinned && order !== undefined)
-          ? apiClient.reorderPinnedDiscussions(getState(), order)
-          : new Promise(resolve => resolve())
+        const promise =
+          discussionCopy.pinned && order !== undefined
+            ? apiClient.reorderPinnedDiscussions(getState(), order)
+            : new Promise(resolve => resolve())
 
         promise
           .then(() => {
@@ -148,44 +158,50 @@ actions.handleDrop = function(discussion, updatedFields, order) {
             // the pinned order here. By default, if this is a discussion that
             // that just got moved to the pinned container, we will move it to
             // the bottom of the pinned discussions on error
-            if (discussionCopy.pinned) { originalOrder.push(discussionCopy.id) }
-            dispatch(actions.dragAndDropFail({
-              message: I18n.t('Failed to update discussion'),
-              discussion: discussionCopy,
-              order: originalOrder,
-              err,
-            }))
+            if (discussionCopy.pinned) {
+              originalOrder.push(discussionCopy.id)
+            }
+            dispatch(
+              actions.dragAndDropFail({
+                message: I18n.t('Failed to update discussion'),
+                discussion: discussionCopy,
+                order: originalOrder,
+                err
+              })
+            )
           })
       })
       .catch(err => {
         // reset order and discussion back to original state
-        dispatch(actions.dragAndDropFail({
-          message: I18n.t('Failed to update discussion'),
-          discussion,
-          order: originalOrder,
-          err,
-        }))
+        dispatch(
+          actions.dragAndDropFail({
+            message: I18n.t('Failed to update discussion'),
+            discussion,
+            order: originalOrder,
+            err
+          })
+        )
       })
   }
 }
 
-
-actions.searchDiscussions = function searchDiscussions ({ searchTerm, filter }) {
+actions.searchDiscussions = function searchDiscussions({searchTerm, filter}) {
   return (dispatch, getState) => {
-    dispatch(actions.updateDiscussionsSearch({ searchTerm, filter }))
-    const { allDiscussions } = getState()
-    const unfiltered = Object.keys(allDiscussions).filter((id) => {
+    dispatch(actions.updateDiscussionsSearch({searchTerm, filter}))
+    const {allDiscussions} = getState()
+    const unfiltered = Object.keys(allDiscussions).filter(id => {
       const discussion = allDiscussions[id]
       return !discussion.filtered
     })
     const numDisplayed = unfiltered.length
-    $.screenReaderFlashMessageExclusive(I18n.t('%{count} discussions found.', { count: numDisplayed }))
+    $.screenReaderFlashMessageExclusive(
+      I18n.t('%{count} discussions found.', {count: numDisplayed})
+    )
   }
 }
 
-
 function nextFocusableDiscussion(state, discussionId) {
-  const { allDiscussions } = state
+  const {allDiscussions} = state
   const pinned = state.pinnedDiscussionIds
   const unpinned = state.unpinnedDiscussionIds
   const closed = state.closedForCommentsDiscussionIds
@@ -206,7 +222,7 @@ function nextFocusableDiscussion(state, discussionId) {
     container = closed
     index = closedIndex
   } else {
-    throw new Error("discussionId does not exist in any container")
+    throw new Error('discussionId does not exist in any container')
   }
 
   // 0 is a special case, where we have to go back out to the toggle button
@@ -217,11 +233,11 @@ function nextFocusableDiscussion(state, discussionId) {
   // there aren't any elements left in this container, and push the focus back
   // to the containers toggle button as well.
   let focusId, focusOn
-  if(index === 0) {
+  if (index === 0) {
     const nextDiscussion = allDiscussions[container[index + 1]]
     if (nextDiscussion) {
       focusId = nextDiscussion.id
-      focusOn = "toggleButton"
+      focusOn = 'toggleButton'
     }
   } else {
     const prevDiscussion = allDiscussions[container[index - 1]]
@@ -241,33 +257,40 @@ actions.deleteDiscussion = function(discussion) {
   return (dispatch, getState) => {
     const state = getState()
     dispatch(actions.deleteDiscussionStart())
-    apiClient.deleteDiscussion(state, {discussion})
+    apiClient
+      .deleteDiscussion(state, {discussion})
       .then(_ => {
         const nextFocusDiscussion = nextFocusableDiscussion(state, discussion.id)
         dispatch(actions.deleteFocusPending())
         dispatch(actions.deleteDiscussionSuccess({discussion, nextFocusDiscussion}))
-        $.screenReaderFlashMessage(I18n.t('Successfully deleted discussion %{title}', { title: discussion.title }))
+        $.screenReaderFlashMessage(
+          I18n.t('Successfully deleted discussion %{title}', {title: discussion.title})
+        )
       })
       .catch(err => {
-        $.screenReaderFlashMessage(I18n.t('Failed to delete discussion %{title}', { title: discussion.title }))
-        dispatch(actions.deleteDiscussionFail({
-          message: I18n.t('Failed to delete discussion %{title}', { title: discussion.title }),
-          discussion,
-          err
-        }))
+        $.screenReaderFlashMessage(
+          I18n.t('Failed to delete discussion %{title}', {title: discussion.title})
+        )
+        dispatch(
+          actions.deleteDiscussionFail({
+            message: I18n.t('Failed to delete discussion %{title}', {title: discussion.title}),
+            discussion,
+            err
+          })
+        )
       })
   }
 }
 
 actions.deleteFocusDone = function() {
-  return (dispatch) => dispatch(actions.deleteFocusCleanup())
+  return dispatch => dispatch(actions.deleteFocusCleanup())
 }
-
 
 actions.fetchUserSettings = function() {
   return (dispatch, getState) => {
     dispatch(actions.getUserSettingsStart())
-    apiClient.getUserSettings(getState())
+    apiClient
+      .getUserSettings(getState())
       .then(resp => {
         dispatch(actions.getUserSettingsSuccess(resp.data))
       })
@@ -280,7 +303,8 @@ actions.fetchUserSettings = function() {
 actions.fetchCourseSettings = function() {
   return (dispatch, getState) => {
     dispatch(actions.getCourseSettingsStart())
-    apiClient.getCourseSettings(getState())
+    apiClient
+      .getCourseSettings(getState())
       .then(resp => {
         dispatch(actions.getCourseSettingsSuccess(resp.data))
       })
@@ -291,7 +315,8 @@ actions.fetchCourseSettings = function() {
 }
 
 function saveCourseSettings(dispatch, getState, userSettings, courseSettings) {
-  apiClient.saveCourseSettings(getState(), courseSettings)
+  apiClient
+    .saveCourseSettings(getState(), courseSettings)
     .then(resp => {
       $.screenReaderFlashMessage(I18n.t('Saved discussion settings successfully'))
       dispatch(actions.savingSettingsSuccess({userSettings, courseSettings: resp.data}))
@@ -307,9 +332,10 @@ actions.saveSettings = function(userSettings, courseSettings) {
     dispatch(actions.savingSettingsStart())
     const userSettingsCopy = Object.assign(getState().userSettings, {})
     userSettingsCopy.manual_mark_as_read = userSettings.markAsRead
-    apiClient.saveUserSettings(getState(), userSettingsCopy)
+    apiClient
+      .saveUserSettings(getState(), userSettingsCopy)
       .then(resp => {
-        if(courseSettings) {
+        if (courseSettings) {
           saveCourseSettings(dispatch, getState, resp.data, courseSettings)
         } else {
           $.screenReaderFlashMessage(I18n.t('Saved discussion settings successfully'))
@@ -327,23 +353,32 @@ actions.duplicateDiscussion = function(discussionId) {
   return (dispatch, getState) => {
     // This is a no-op, just here to maintain a pattern
     dispatch(actions.duplicateDiscussionStart())
-    apiClient.duplicateDiscussion(getState(), discussionId).then(response => {
-      const newDiscussion = response.data
-      newDiscussion.focusOn = 'title'
-      const successMessage = I18n.t('Duplication of %{title} succeeded', { title: newDiscussion.title })
-      $.screenReaderFlashMessageExclusive(successMessage)
-      dispatch(actions.duplicateDiscussionSuccess({
-        newDiscussion,
-        originalId: discussionId
-      }))
-    }).catch(err => {
-      const failMessage = I18n.t('Duplication failed')
-      $.screenReaderFlashMessageExclusive(failMessage)
-      dispatch(actions.duplicateDiscussionFail({
-        message: failMessage,
-        err
-      }))
-    })
+    apiClient
+      .duplicateDiscussion(getState(), discussionId)
+      .then(response => {
+        const newDiscussion = response.data
+        newDiscussion.focusOn = 'title'
+        const successMessage = I18n.t('Duplication of %{title} succeeded', {
+          title: newDiscussion.title
+        })
+        $.screenReaderFlashMessageExclusive(successMessage)
+        dispatch(
+          actions.duplicateDiscussionSuccess({
+            newDiscussion,
+            originalId: discussionId
+          })
+        )
+      })
+      .catch(err => {
+        const failMessage = I18n.t('Duplication failed')
+        $.screenReaderFlashMessageExclusive(failMessage)
+        dispatch(
+          actions.duplicateDiscussionFail({
+            message: failMessage,
+            err
+          })
+        )
+      })
   }
 }
 
@@ -353,26 +388,34 @@ actions.toggleSubscriptionState = function(discussion) {
   return (dispatch, getState) => {
     if (discussion.subscription_hold === undefined) {
       dispatch(actions.toggleSubscribeStart())
-      const toggleFunc = discussion.subscribed ? apiClient.unsubscribeFromTopic : apiClient.subscribeToTopic
+      const toggleFunc = discussion.subscribed
+        ? apiClient.unsubscribeFromTopic
+        : apiClient.subscribeToTopic
 
       toggleFunc(getState(), discussion)
         .then(_ => {
-          const params = { id: discussion.id, subscribed: !discussion.subscribed }
+          const params = {id: discussion.id, subscribed: !discussion.subscribed}
           dispatch(actions.toggleSubscribeSuccess(params))
         })
         .catch(err => {
-          const failMessage = discussion.subscribed ? I18n.t('Unsubscribed failed') : I18n.t('Subscribe failed')
+          const failMessage = discussion.subscribed
+            ? I18n.t('Unsubscribed failed')
+            : I18n.t('Subscribe failed')
           $.screenReaderFlashMessageExclusive(failMessage)
-          dispatch(actions.toggleSubscribeFail({
-            message: failMessage,
-            err
-          }))
+          dispatch(
+            actions.toggleSubscribeFail({
+              message: failMessage,
+              err
+            })
+          )
         })
     }
   }
 }
 
-const actionTypes = types.reduce((typesMap, actionType) =>
-  Object.assign(typesMap, { [actionType]: actionType }), {})
+const actionTypes = types.reduce(
+  (typesMap, actionType) => Object.assign(typesMap, {[actionType]: actionType}),
+  {}
+)
 
-export { actionTypes, actions as default }
+export {actionTypes, actions as default}

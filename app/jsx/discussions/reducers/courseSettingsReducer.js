@@ -15,17 +15,20 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { handleActions } from 'redux-actions'
-import { actionTypes } from '../actions'
+import {handleActions} from 'redux-actions'
+import {actionTypes} from '../actions'
 
-const courseSettingsReducer = handleActions({
-  [actionTypes.GET_COURSE_SETTINGS_SUCCESS]: (state, action) => action.payload,
-  [actionTypes.SAVING_SETTINGS_SUCCESS]: (state, action) => {
-    if (action.payload.courseSettings) {
-      return action.payload.courseSettings
+const courseSettingsReducer = handleActions(
+  {
+    [actionTypes.GET_COURSE_SETTINGS_SUCCESS]: (state, action) => action.payload,
+    [actionTypes.SAVING_SETTINGS_SUCCESS]: (state, action) => {
+      if (action.payload.courseSettings) {
+        return action.payload.courseSettings
+      }
+      return state
     }
-    return state
   },
-}, {})
+  {}
+)
 
 export default courseSettingsReducer

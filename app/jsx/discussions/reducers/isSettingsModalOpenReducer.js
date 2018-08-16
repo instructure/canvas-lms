@@ -15,13 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { handleActions } from 'redux-actions'
-import { actionTypes } from '../actions'
+import {handleActions} from 'redux-actions'
+import {actionTypes} from '../actions'
 
-const isSettingsModalOpenReducer = handleActions({
-  [actionTypes.TOGGLE_MODAL_OPEN]: (state) => !state,
-  [actionTypes.SAVING_SETTINGS_SUCCESS]: () => false,
-  [actionTypes.SAVING_SETTINGS_FAIL]: () => true,
-}, false)
+const isSettingsModalOpenReducer = handleActions(
+  {
+    [actionTypes.TOGGLE_MODAL_OPEN]: state => !state,
+    [actionTypes.SAVING_SETTINGS_SUCCESS]: () => false,
+    [actionTypes.SAVING_SETTINGS_FAIL]: () => true
+  },
+  false
+)
 
 export default isSettingsModalOpenReducer

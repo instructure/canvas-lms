@@ -17,8 +17,8 @@
  */
 import orderBy from 'lodash/orderBy'
 
-import { handleActions } from 'redux-actions'
-import { actionTypes } from '../actions'
+import {handleActions} from 'redux-actions'
+import {actionTypes} from '../actions'
 import duplicationReducerMap from './duplicationReducerMap'
 import deleteReducerMap from './deleteReducerMap'
 
@@ -45,18 +45,15 @@ const reducerMap = {
       }
       return acc
     }, [])
-    const sorted = orderBy(closedDiscussions, ((d) => new Date(d.last_reply_at)), 'desc')
+    const sorted = orderBy(closedDiscussions, d => new Date(d.last_reply_at), 'desc')
     return sorted.map(d => d.id)
   },
-  [actionTypes.UPDATE_DISCUSSION_SUCCESS]: (state, action) => (
+  [actionTypes.UPDATE_DISCUSSION_SUCCESS]: (state, action) =>
+    copyAndUpdateDiscussionState(state, action.payload.discussion),
+  [actionTypes.DRAG_AND_DROP_START]: (state, action) =>
+    copyAndUpdateDiscussionState(state, action.payload.discussion),
+  [actionTypes.DRAG_AND_DROP_FAIL]: (state, action) =>
     copyAndUpdateDiscussionState(state, action.payload.discussion)
-  ),
-  [actionTypes.DRAG_AND_DROP_START]: (state, action) => (
-    copyAndUpdateDiscussionState(state, action.payload.discussion)
-  ),
-  [actionTypes.DRAG_AND_DROP_FAIL]: (state, action) => (
-    copyAndUpdateDiscussionState(state, action.payload.discussion)
-  ),
 }
 
 Object.assign(reducerMap, duplicationReducerMap, deleteReducerMap)

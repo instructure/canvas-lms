@@ -15,15 +15,18 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { handleActions } from 'redux-actions'
-import { actionTypes } from '../actions'
+import {handleActions} from 'redux-actions'
+import {actionTypes} from '../actions'
 
 // Pending is called if a delete action has just happened, and we may need to
 // handle some focus management stuff in a special way because of it. Cleanup
 // will be called when everything has been properly handled.
-const deleteFocusReducer = handleActions({
-  [actionTypes.DELETE_FOCUS_PENDING]: () => true,
-  [actionTypes.DELETE_FOCUS_CLEANUP]: () => false,
-}, false)
+const deleteFocusReducer = handleActions(
+  {
+    [actionTypes.DELETE_FOCUS_PENDING]: () => true,
+    [actionTypes.DELETE_FOCUS_CLEANUP]: () => false
+  },
+  false
+)
 
 export default deleteFocusReducer

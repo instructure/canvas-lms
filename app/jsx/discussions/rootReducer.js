@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { combineReducers } from 'redux'
-import { reduceNotifications } from '../shared/reduxNotifications'
-import { createPaginatedReducer } from '../shared/reduxPagination'
+import {combineReducers} from 'redux'
+import {reduceNotifications} from '../shared/reduxNotifications'
+import {createPaginatedReducer} from '../shared/reduxPagination'
 import allDiscussionsReducer from './reducers/allDiscussionsReducer'
 import pinnedDiscussionReducer from './reducers/pinnedDiscussionReducer'
 import unpinnedDiscussionReducer from './reducers/unpinnedDiscussionReducer'
@@ -29,9 +29,7 @@ import courseSettingsReducer from './reducers/courseSettingsReducer'
 import isSavingSettingsReducer from './reducers/isSavingSettingsReducer'
 import isSettingsModalOpenReducer from './reducers/isSettingsModalOpenReducer'
 
-const identity = (defaultState = null) => (
-  state => (state === undefined ? defaultState : state)
-)
+const identity = (defaultState = null) => state => (state === undefined ? defaultState : state)
 
 export default combineReducers({
   allDiscussions: allDiscussionsReducer,
@@ -52,5 +50,5 @@ export default combineReducers({
   pinnedDiscussionIds: pinnedDiscussionReducer,
   roles: identity({}),
   unpinnedDiscussionIds: unpinnedDiscussionReducer,
-  userSettings: userSettingsReducer,
+  userSettings: userSettingsReducer
 })

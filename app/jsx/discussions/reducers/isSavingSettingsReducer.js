@@ -15,13 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { handleActions } from 'redux-actions'
-import { actionTypes } from '../actions'
+import {handleActions} from 'redux-actions'
+import {actionTypes} from '../actions'
 
-const isSavingSettingsReducer = handleActions({
+const isSavingSettingsReducer = handleActions(
+  {
     [actionTypes.SAVING_SETTINGS_START]: () => true,
     [actionTypes.SAVING_SETTINGS_SUCCESS]: () => false,
-    [actionTypes.SAVING_SETTINGS_FAIL]: () => false,
-}, false)
+    [actionTypes.SAVING_SETTINGS_FAIL]: () => false
+  },
+  false
+)
 
 export default isSavingSettingsReducer
