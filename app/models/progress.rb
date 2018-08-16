@@ -19,7 +19,7 @@
 class Progress < ActiveRecord::Base
   belongs_to :context, polymorphic:
       [:content_migration, :course, :account, :group_category, :content_export,
-       :assignment, :attachment, :epub_export,
+       :assignment, :attachment, :epub_export, :sis_batch,
        { context_user: 'User', quiz_statistics: 'Quizzes::QuizStatistics' }]
   belongs_to :user
 

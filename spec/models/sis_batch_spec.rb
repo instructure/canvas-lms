@@ -984,6 +984,7 @@ test_1,u1,student,active}
           expect(batch.reload.workflow_state).to eq 'imported'
           # there will be no progress for this batch, but it should still work
           batch.restore_states_for_batch
+          run_jobs
           expect(batch.reload).to be_restored
           expect(@e1.reload).to be_active
           expect(@e2.reload).to be_active
