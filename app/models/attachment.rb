@@ -809,9 +809,6 @@ class Attachment < ActiveRecord::Base
   end
 
   def can_be_proxied?
-    # we don't support proxying from instfs yet (no equivalent to
-    # s3object.get.body)
-    return false if instfs_hosted?
     mime_class == 'html' && size < Setting.get('max_inline_html_proxy_size', 128 * 1024).to_i ||
     mime_class == 'flash' && size < Setting.get('max_swf_proxy_size', 1024 * 1024).to_i ||
     content_type == 'text/css' && size < Setting.get('max_css_proxy_size', 64 * 1024).to_i

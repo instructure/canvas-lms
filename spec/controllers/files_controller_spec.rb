@@ -609,12 +609,8 @@ describe FilesController do
         allow(HostUrl).to receive(:file_host).and_return('files.test')
         request.host = 'files.test'
         @file.update_attribute(:content_type, 'text/html')
-        s3object = double()
-        allow(s3object).to receive(:content_length).and_return(5)
-        allow(s3object).to receive(:get).and_return(s3object)
-        allow(s3object).to receive(:body).and_return(s3object)
-        allow(s3object).to receive(:read).and_return('hello')
-        allow_any_instantiation_of(@file).to receive(:s3object).and_return(s3object)
+        handle = double(read: 'hello')
+        allow_any_instantiation_of(@file).to receive(:open).and_return(handle)
         get "show_relative", params: {file_id: @file.id, course_id: @course.id, file_path: @file.full_display_path, inline: 1, download: 1}
         expect(response).to be_successful
         expect(response.body).to eq 'hello'
