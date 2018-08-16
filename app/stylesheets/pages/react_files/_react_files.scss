@@ -90,7 +90,6 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
 
 .ef-selected-count {
   @include fontSize($ic-font-size--xsmall);
-  font-style: italic;
   white-space: nowrap;
   padding-#{direction(left)}: $ic-sp;
 }
