@@ -125,7 +125,7 @@ stability of large SIS imports. The functionality of SIS imports has not changed
 END
         )},
         applies_to: 'RootAccount',
-        state: 'allowed'
+        state: 'on'
       },
     'permissions_v2_ui' =>
     {

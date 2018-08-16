@@ -267,6 +267,7 @@ module SIS
           next unless importers
           importers.each do |pi|
             run_parallel_importer(pi)
+            @batch.data[:completed_importers] << importer_type
             return false if %w{aborted failed failed_with_messages}.include?(@batch.workflow_state)
           end
         end
