@@ -153,11 +153,11 @@ class SearchResultsComponent extends Component {
     }
 
     if (this.noResultsFound()) {
-      return (<Text fontStyle="italic">{I18n.t('No results found.')}</Text>);
+      return (<Text>{I18n.t('No results found.')}</Text>);
     }
 
     if (!this.props.requestingResults && !this.props.nextPage && this.hasHistory()) {
-      return (<Text fontStyle="italic">{I18n.t('No more results to load.')}</Text>);
+      return (<Text>{I18n.t('No more results to load.')}</Text>);
     }
 
     return null;
