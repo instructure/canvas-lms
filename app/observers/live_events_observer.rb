@@ -35,6 +35,7 @@ class LiveEventsObserver < ActiveRecord::Observer
           :account_notification,
           :course_section,
           :context_module,
+          :context_module_progression,
           :content_tag
 
   NOP_UPDATE_FIELDS = [ "updated_at", "sis_batch_id" ].freeze
@@ -97,6 +98,10 @@ class LiveEventsObserver < ActiveRecord::Observer
       Canvas::LiveEvents.course_section_updated(obj)
     when ContextModule
       Canvas::LiveEvents.module_updated(obj)
+    when ContextModuleProgression
+      if changes["completed_at"] && CourseProgress.new(obj.context_module.course, obj.user).completed?
+        Canvas::LiveEvents.course_completed(obj)
+      end
     when ContentTag
       Canvas::LiveEvents.module_item_updated(obj) if obj.tag_type == "context_module"
     end
