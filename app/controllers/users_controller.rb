@@ -1253,7 +1253,18 @@ class UsersController < ApplicationController
                                                                         current_user: @current_user,
                                                                         current_pseudonym: @current_pseudonym,
                                                                         tool: @tool})
-    adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @domain_root_account).prepare_tool_launch(@return_url, variable_expander,  opts)
+    adapter = if @tool.settings.fetch('use_1_3', false)
+      Lti::LtiAdvantageAdapter.new(
+        tool: @tool,
+        user: @current_user,
+        context: @domain_root_account,
+        return_url: @return_url,
+        expander: variable_expander,
+        opts: opts
+      )
+    else
+      Lti::LtiOutboundAdapter.new(@tool, @current_user, @domain_root_account).prepare_tool_launch(@return_url, variable_expander,  opts)
+    end
     @lti_launch.params = adapter.generate_post_payload
 
     @lti_launch.resource_url = @tool.user_navigation(:url)
