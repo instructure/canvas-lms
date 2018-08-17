@@ -18,30 +18,85 @@
 
 module PermissionsHelper
   def manageable_enrollments_by_permission(permission)
-    raise "invalid permission" unless RoleOverride.permissions.keys.include?(permission.to_sym)
+    permission = permission.to_sym
+    raise "invalid permission" unless RoleOverride.permissions.keys.include?(permission)
 
-    enrollments = cached_current_enrollments(preload_courses: true)
+    enrollments = cached_current_enrollments(preload_courses: true, preload_dates: true)
     allowed_ens = []
     Shard.partition_by_shard(enrollments) do |sharded_enrollments|
-      perms_hash = get_permission_info_by_account(sharded_enrollments, permission)
+      perms_hash = get_permissions_info_by_account(sharded_enrollments, [permission])
       allowed_ens += sharded_enrollments.select do |e|
         perm_hash = perms_hash[e.course.account_id]
-        perm_hash && enabled_for_enrollment(e.role_id, e.type, perm_hash, permission)
+        perm_hash && enabled_for_enrollment(e.role_id, e.type, e.state_based_on_date, perm_hash, permission)
       end
     end
     allowed_ens
   end
 
-  def enabled_for_enrollment(role_id, role_type, perm_hash, permission)
-    true_for_roles = RoleOverride.permissions[permission.to_sym][:true_for]
+  # will return a hash linking global course ids with precalculated permissions
+  # e.g. {10000000000001 => {:manage_calendar => true, :manage_assignments => false}}
+  def precalculate_permissions_for_courses(courses, permissions)
+    courses = courses.reject(&:deleted?) # just in case
+    permissions = permissions.map(&:to_sym)
+    nonexistent_permissions = permissions - RoleOverride.permissions.keys
+    raise "invalid permissions - #{nonexistent_permissions}" if nonexistent_permissions.any?
+
+    precalculated_map = {}
+    Shard.partition_by_shard(courses, lambda(&:shard)) do |sharded_courses|
+      unpublished, published = sharded_courses.partition(&:unpublished?)
+      all_applicable_enrollments = []
+      enrollment_scope = Enrollment.not_inactive_by_date.for_user(self).select("enrollments.*, enrollment_states.state AS date_based_state_in_db")
+      all_applicable_enrollments += enrollment_scope.where(:course_id => unpublished).
+        where(:type => ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentViewEnrollment']).to_a if unpublished.any?
+      all_applicable_enrollments += enrollment_scope.where(:course_id => published).to_a if published.any?
+
+      grouped_enrollments = all_applicable_enrollments.group_by(&:course_id)
+      sharded_courses.each do |course|
+        grouped_enrollments[course.id] ||= []
+        grouped_enrollments[course.id].each{|e| e.course = course}
+      end
+      all_permissions_data = get_permissions_info_by_account(all_applicable_enrollments, permissions)
+
+      sharded_courses.each do |course|
+        course_permissions = {}
+        permissions.each do |permission|
+          perm_hash = all_permissions_data[course.account_id]
+          course_permissions[permission] = !!(perm_hash && grouped_enrollments[course.id].any?{|e|
+            enabled_for_enrollment(e.role_id, e.type, e.date_based_state_in_db.to_sym, perm_hash, permission)})
+        end
+        precalculated_map[course.global_id] = course_permissions
+      end
+    end
+    precalculated_map
+  end
+
+  def enabled_for_enrollment(role_id, role_type, enrollment_state, perm_hash, permission)
+    permission_details = RoleOverride.permissions[permission]
+    true_for_roles = permission_details[:true_for]
+    available_to_roles = permission_details[:available_to]
     # enabled by account role
     return true if perm_hash[:admin_roles].any? do |role|
-      role_on = perm_hash.dig(:role_overrides, role.id, :enabled) && perm_hash.dig(:role_overrides, role.id, :self)
-      role_on.nil? ? true_for_roles.include?(role.base_role_type) : role_on
+      if available_to_roles.include?(role.base_role_type)
+        role_on = perm_hash.dig(:role_overrides, [role.id, permission], :enabled) && perm_hash.dig(:role_overrides, [role.id, permission], :self)
+        role_on.nil? ? true_for_roles.include?(role.base_role_type) : role_on
+      end
     end
+
+    if enrollment_state == :completed
+      concluded_roles = permission_details[:applies_to_concluded]
+      return false unless concluded_roles
+      return false if concluded_roles.is_a?(Array) && !concluded_roles.include?(role_type)
+    elsif enrollment_state != :active # future
+      return false if permission_details[:restrict_future_enrollments]
+    end
+
     # enabled for enrollment role
-    role_on = perm_hash.dig(:role_overrides, role_id, :enabled) && perm_hash.dig(:role_overrides, role_id, :self)
-    role_on.nil? ? true_for_roles.include?(role_type) : role_on
+    if available_to_roles.include?(role_type)
+      role_on = perm_hash.dig(:role_overrides, [role_id, permission], :enabled) && perm_hash.dig(:role_overrides, [role_id, permission], :self)
+      role_on.nil? ? true_for_roles.include?(role_type) : role_on
+    else
+      false
+    end
   end
 
   # examines permissions for accounts related to enrollments and returns a map from account_id to a hash containing
@@ -49,28 +104,28 @@ module PermissionsHelper
   #  role_overrides: map from role id to hash containing :enabled, :locked, :self, :children
   #   (these are calculated for the specific account, taking inheritance and locking into account)
   #  admin_roles: set of Roles the user has active account memberships for in this account
-  def get_permission_info_by_account(enrollments, permission)
-    account_roles = AccountUser.where(user: self).active.preload(:role)
+  def get_permissions_info_by_account(enrollments, permissions)
+    account_roles = AccountUser.where(user: self).active.preload(:role).to_a
     role_ids = (enrollments.map(&:role_id) + account_roles.map(&:role_id)).uniq
     root_account_ids = enrollments.map(&:root_account_id).uniq
     query = <<-SQL
-      WITH RECURSIVE t(id, name, parent_account_id, role_id, enabled, locked, self, children) AS (
+      WITH RECURSIVE t(id, name, parent_account_id, role_id, enabled, locked, self, children, permission) AS (
         SELECT accounts.id, name, parent_account_id, ro.role_id, ro.enabled, ro.locked,
-          ro.applies_to_self, ro.applies_to_descendants
+          ro.applies_to_self, ro.applies_to_descendants, ro.permission
         FROM #{Account.quoted_table_name}
         LEFT JOIN #{RoleOverride.quoted_table_name} AS ro ON ro.context_id = accounts.id
                                                          AND ro.context_type = 'Account'
-                                                         AND ro.permission = :permission
+                                                         AND ro.permission IN (:permissions)
                                                          AND ro.role_id IN (:role_ids)
         WHERE accounts.id IN (:account_ids)
       UNION
         SELECT accounts.id, accounts.name, accounts.parent_account_id, ro.role_id, ro.enabled,
-          ro.locked, ro.applies_to_self, ro.applies_to_descendants
+          ro.locked, ro.applies_to_self, ro.applies_to_descendants, ro.permission
         FROM #{Account.quoted_table_name}
         INNER JOIN t ON accounts.id = t.parent_account_id
         LEFT JOIN #{RoleOverride.quoted_table_name} AS ro ON ro.context_id = accounts.id
                                                          AND ro.context_type = 'Account'
-                                                         AND ro.permission = :permission
+                                                         AND ro.permission IN (:permissions)
                                                          AND ro.role_id IN (:role_ids)
         WHERE accounts.workflow_state = 'active'
       )
@@ -79,7 +134,7 @@ module PermissionsHelper
       SQL
     params = {
       account_ids: enrollments.map { |e| e.course.account_id },
-      permission: permission,
+      permissions: permissions,
       role_ids: role_ids
     }
     rows = User.connection.execute(sanitize_sql([query, params]))
@@ -96,9 +151,12 @@ module PermissionsHelper
       account_id = row['id']
       parent_id = row['parent_account_id']
       role_id = row['role_id']
-      override = {enabled: row['enabled'], locked: row['locked'], self: row['self'], children: row['children']}
+      permission = row['permission']
       perms_hash[account_id] ||= new_perm.deep_dup
-      perms_hash[account_id][:role_overrides][role_id] = override if role_id
+      if role_id && permission
+        override = {enabled: row['enabled'], locked: row['locked'], self: row['self'], children: row['children']}
+        perms_hash[account_id][:role_overrides][[role_id, permission.to_sym]] = override
+      end
       perms_hash[account_id][:admin_roles] += account_roles.select{|au| au.account_id == account_id}.map(&:role)
       if parent_id
         perms_hash[parent_id] ||= new_perm.deep_dup
