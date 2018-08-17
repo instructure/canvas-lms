@@ -93,7 +93,9 @@ module.exports = {
       // now to conform to prettier.
       files: [
         'app/jsx/permissions/**/*.js',
-        'app/jsx/account_course_user_search/**/*.js'
+        'app/jsx/account_course_user_search/**/*.js',
+        'app/jsx/discussions/**/*.js',
+        'app/jsx/announcements/**/*.js'
       ],
       rules: {
         'prettier/prettier': 'error'

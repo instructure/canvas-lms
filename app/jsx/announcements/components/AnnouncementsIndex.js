@@ -55,11 +55,11 @@ export default class AnnouncementsIndex extends Component {
     masterCourseData: masterCourseDataShape,
     deleteAnnouncements: func.isRequired,
     toggleAnnouncementsLock: func.isRequired,
-    announcementsLocked: bool.isRequired,
+    announcementsLocked: bool.isRequired
   }
 
   static defaultProps = {
-    masterCourseData: null,
+    masterCourseData: null
   }
 
   componentDidMount() {
@@ -68,23 +68,25 @@ export default class AnnouncementsIndex extends Component {
     }
   }
 
-  onManageAnnouncement = (e, { action, id, lock }) => {
+  onManageAnnouncement = (e, {action, id, lock}) => {
     switch (action) {
       case 'delete':
         showConfirmDelete({
           selectedCount: 1,
-          modalRef: (modal) => { this.deleteModal = modal },
+          modalRef: modal => {
+            this.deleteModal = modal
+          },
           onConfirm: () => {
             this.props.deleteAnnouncements(id)
             if (this.searchInput) this.searchInput.focus()
-          },
+          }
         })
-        break;
+        break
       case 'lock':
         this.props.toggleAnnouncementsLock(id, lock)
-        break;
+        break
       default:
-        break;
+        break
     }
   }
 
@@ -94,13 +96,7 @@ export default class AnnouncementsIndex extends Component {
 
   renderEmptyAnnouncements() {
     if (this.props.hasLoadedAnnouncements && !this.props.announcements.length) {
-      return (
-        <AnnouncementEmptyState
-          canCreate={
-            this.props.permissions.create
-          }
-        />
-      )
+      return <AnnouncementEmptyState canCreate={this.props.permissions.create} />
     } else {
       return null
     }
@@ -154,12 +150,8 @@ export default class AnnouncementsIndex extends Component {
         onClick={this.selectPage(page)}
         current={page === this.props.announcementsPage}
       >
-      <ScreenReaderContent>
-        {I18n.t('Page %{pageNum}', {pageNum: page})}
-      </ScreenReaderContent>
-      <span aria-hidden="true">
-        {page}
-      </span>
+        <ScreenReaderContent>{I18n.t('Page %{pageNum}', {pageNum: page})}</ScreenReaderContent>
+        <span aria-hidden="true">{page}</span>
       </PaginationButton>
     )
   }
@@ -188,7 +180,11 @@ export default class AnnouncementsIndex extends Component {
         <ScreenReaderContent>
           <Heading level="h1">{I18n.t('Announcements')}</Heading>
         </ScreenReaderContent>
-        <ConnectedIndexHeader searchInputRef={(c) => { this.searchInput = c }} />
+        <ConnectedIndexHeader
+          searchInputRef={c => {
+            this.searchInput = c
+          }}
+        />
         {this.renderSpinner(this.props.isLoadingAnnouncements, I18n.t('Loading Announcements'))}
         {this.renderEmptyAnnouncements()}
         {this.renderAnnouncements()}
@@ -201,14 +197,23 @@ export default class AnnouncementsIndex extends Component {
 const connectState = state =>
   Object.assign(
     {
-      isCourseContext: state.contextType === 'course',
+      isCourseContext: state.contextType === 'course'
     },
     selectPaginationState(state, 'announcements'),
     select(state, ['permissions', 'masterCourseData', 'announcementsLocked'])
   )
 const connectActions = dispatch =>
-  bindActionCreators(select(actions,
-    ['getAnnouncements', 'announcementSelectionChangeStart', 'deleteAnnouncements', 'toggleAnnouncementsLock']
-  ), dispatch)
+  bindActionCreators(
+    select(actions, [
+      'getAnnouncements',
+      'announcementSelectionChangeStart',
+      'deleteAnnouncements',
+      'toggleAnnouncementsLock'
+    ]),
+    dispatch
+  )
 
-export const ConnectedAnnouncementsIndex = connect(connectState, connectActions)(AnnouncementsIndex)
+export const ConnectedAnnouncementsIndex = connect(
+  connectState,
+  connectActions
+)(AnnouncementsIndex)

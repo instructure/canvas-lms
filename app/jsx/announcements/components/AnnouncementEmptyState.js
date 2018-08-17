@@ -31,7 +31,7 @@ const AnnouncementEmptyState = props => (
   <View margin="large auto" textAlign="center" display="block">
     <PresentationContent>
       <View margin="small auto" size="x-small" display="block">
-        <SVGWrapper url="/images/announcements/announcements-airhorn.svg"/>
+        <SVGWrapper url="/images/announcements/announcements-airhorn.svg" />
       </View>
     </PresentationContent>
     <Heading margin="x-small">{I18n.t('No Announcements')}</Heading>
