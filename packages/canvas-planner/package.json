@@ -109,9 +109,6 @@
     "redux-devtools-extension": "^2.13.2",
     "webpack": "^3"
   },
-  "resolutions": {
-    "moment": "2.10.6"
-  },
   "lint-staged": {
     "*.js": "eslint"
   }

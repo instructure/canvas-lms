@@ -186,7 +186,7 @@ export default function loadPlannerDashboard ({changeDashboardView, getActiveApp
       srAlertCallback: srFlashMessage
     },
     externalFallbackFocusable,
-    locale: env.LOCALE,
+    locale: env.MOMENT_LOCALE,
     timeZone: env.TIMEZONE,
     currentUser: {
       id: env.current_user.id,
