@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import buildReducer from '../buildReducer'
+import {buildReducer, updateIn} from '../ReducerHelpers'
 import {
   SET_PUBLISH_GRADES_STATUS,
   SET_UNMUTE_ASSIGNMENT_STATUS,
@@ -25,25 +25,23 @@ import {
 
 const handlers = {}
 
-handlers[SET_PUBLISH_GRADES_STATUS] = (state, {payload}) => ({
-  ...state,
-  publishGradesStatus: payload.status
-})
+handlers[SET_PUBLISH_GRADES_STATUS] = (state, {payload}) =>
+  updateIn(state, 'assignment', {publishGradesStatus: payload.status})
 
-handlers[SET_UNMUTE_ASSIGNMENT_STATUS] = (state, {payload}) => ({
-  ...state,
-  unmuteAssignmentStatus: payload.status
-})
+handlers[SET_UNMUTE_ASSIGNMENT_STATUS] = (state, {payload}) =>
+  updateIn(state, 'assignment', {unmuteAssignmentStatus: payload.status})
 
-handlers[UPDATE_ASSIGNMENT] = (state, {payload}) => ({
-  ...state,
-  assignment: {...state.assignment, ...payload.assignment}
-})
+handlers[UPDATE_ASSIGNMENT] = (state, {payload}) =>
+  updateIn(state, 'assignment', {
+    assignment: {...state.assignment.assignment, ...payload.assignment}
+  })
 
 export default function buildAssignmentReducer(env) {
   return buildReducer(handlers, {
-    assignment: env.assignment,
-    publishGradesStatus: null,
-    unmuteAssignmentStatus: null
+    assignment: {
+      assignment: env.assignment,
+      publishGradesStatus: null,
+      unmuteAssignmentStatus: null
+    }
   })
 }

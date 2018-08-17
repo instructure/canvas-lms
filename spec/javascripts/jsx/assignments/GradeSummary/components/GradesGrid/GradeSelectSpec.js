@@ -220,10 +220,6 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
   function clickOff() {
     return new Promise(resolve => {
       resolveOpenCloseState = resolve
-      setTimeout(() => {
-        console.warn('<Select> onClose was never called, even though it probably should have been')
-        resolve()
-      }, 20)
       blurElement(getTextInput())
     })
   }
@@ -332,8 +328,7 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
       equal(getTextInput().value, customLabel('11'))
     })
 
-    // manually testing this, it does indeed change to "–" and if put a debugger and check it it does, but this spec as ran on jenkins says it doesn't
-    QUnit.skip('resets the input to the "no selection" option when no grade is selected', async () => {
+    test('resets the input to the "no selection" option when no grade is selected', async () => {
       await mountAndClick()
       setInputText('')
       await clickOff()
@@ -679,7 +674,6 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
   })
 
   QUnit.module('when entered text does not match grades or grader names', () => {
-
     test('includes only the custom grade when the text is a valid score', async () => {
       await mountAndClick()
       setInputText('3')
@@ -739,7 +733,7 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
 
     test('dismisses the options list', () => {
       keyUpOnInput(keyCodes.ESCAPE)
-      equal(getOptionList(), null)
+      strictEqual(getOptionList(), null)
     })
 
     test('does not call the onSelect prop', () => {
@@ -768,7 +762,7 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
     test('dismisses the options list', () => {
       focusOption(labelForGrader('robin'))
       keyUpOnOption(labelForGrader('robin'), keyCodes.ESCAPE)
-      equal(getOptionList(), null)
+      strictEqual(getOptionList(), null)
     })
 
     test('does not call the onSelect prop', () => {
@@ -792,7 +786,7 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
 
     test('dismisses the options list', async () => {
       await keyDownOnInput(keyCodes.ENTER)
-      equal(getOptionList(), null)
+      strictEqual(getOptionList(), null)
     })
 
     test('calls the onSelect prop when the input has changed', async () => {
@@ -838,7 +832,7 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
 
     test('dismisses the options list', async () => {
       await openAndSelect(labelForGrader('robin'))
-      equal(getOptionList(), null)
+      strictEqual(getOptionList(), null)
     })
 
     test('calls the onSelect prop when the input has changed', async () => {
@@ -890,6 +884,7 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
       await clickInputToOpenMenu()
       const graderOptionLabels = ['frizz', 'robin', 'feeny'].map(labelForGrader)
       deepEqual(getOptionLabels(), [...graderOptionLabels, customLabel('5')])
+      await clickOff()
     })
   })
 

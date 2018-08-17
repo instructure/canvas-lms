@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import buildReducer from '../buildReducer'
+import {buildReducer, updateIn} from '../ReducerHelpers'
 import {ADD_STUDENTS, SET_LOAD_STUDENTS_STATUS} from './StudentActions'
 
 function addStudents(state, students) {
-  return {...state, list: [...state.list, ...students]}
+  return updateIn(state, 'students', {list: [...state.students.list, ...students]})
 }
 
 function setLoadStudentsStatus(state, loadStudentsStatus) {
-  return {...state, loadStudentsStatus}
+  return updateIn(state, 'students', {loadStudentsStatus})
 }
 
 const handlers = {}
@@ -35,6 +35,8 @@ handlers[SET_LOAD_STUDENTS_STATUS] = (state, {payload}) =>
   setLoadStudentsStatus(state, payload.status)
 
 export default buildReducer(handlers, {
-  list: [],
-  loadStudentsStatus: null
+  students: {
+    list: [],
+    loadStudentsStatus: null
+  }
 })

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import buildReducer from '../buildReducer'
+import {buildReducer, updateIn} from '../ReducerHelpers'
 import {
   ADD_PROVISIONAL_GRADES,
   SET_SELECTED_PROVISIONAL_GRADE,
@@ -27,16 +27,16 @@ import {
 } from './GradeActions'
 
 function addProvisionalGrades(state, grades) {
-  const provisionalGrades = {...state.provisionalGrades}
+  const provisionalGrades = {...state.grades.provisionalGrades}
   grades.forEach(grade => {
     provisionalGrades[grade.studentId] = provisionalGrades[grade.studentId] || {}
     provisionalGrades[grade.studentId][grade.graderId] = grade
   })
-  return {...state, provisionalGrades}
+  return updateIn(state, 'grades', {provisionalGrades})
 }
 
 function setSelectedProvisionalGrade(state, gradeInfo) {
-  const provisionalGrades = {...state.provisionalGrades}
+  const provisionalGrades = {...state.grades.provisionalGrades}
   const studentGrades = {...provisionalGrades[gradeInfo.studentId]}
   Object.keys(studentGrades).forEach(graderId => {
     if (studentGrades[graderId].selected) {
@@ -45,23 +45,23 @@ function setSelectedProvisionalGrade(state, gradeInfo) {
   })
   studentGrades[gradeInfo.graderId] = {...gradeInfo, selected: true}
   provisionalGrades[gradeInfo.studentId] = studentGrades
-  return {...state, provisionalGrades}
+  return updateIn(state, 'grades', {provisionalGrades})
 }
 
 function setSelectProvisionalGradeStatus(state, gradeInfo, status) {
-  const selectProvisionalGradeStatuses = {...state.selectProvisionalGradeStatuses}
+  const selectProvisionalGradeStatuses = {...state.grades.selectProvisionalGradeStatuses}
   selectProvisionalGradeStatuses[gradeInfo.studentId] = status
-  return {...state, selectProvisionalGradeStatuses}
+  return updateIn(state, 'grades', {selectProvisionalGradeStatuses})
 }
 
 function setUpdateGradeStatus(state, gradeInfo, status) {
-  const statuses = state.updateGradeStatuses.filter(
+  const statuses = state.grades.updateGradeStatuses.filter(
     updateGradeStatus =>
       // Remove existing items for the same student or for previous successes.
       updateGradeStatus.gradeInfo.studentId !== gradeInfo.studentId && status !== SUCCESS
   )
   const updateGradeStatuses = statuses.concat([{gradeInfo, status}])
-  return {...state, updateGradeStatuses}
+  return updateIn(state, 'grades', {updateGradeStatuses})
 }
 
 const handlers = {}
@@ -81,7 +81,9 @@ handlers[SET_UPDATE_GRADE_STATUS] = (state, {payload}) =>
 handlers[UPDATE_GRADE] = (state, {payload}) => addProvisionalGrades(state, [payload.gradeInfo])
 
 export default buildReducer(handlers, {
-  provisionalGrades: {},
-  selectProvisionalGradeStatuses: {},
-  updateGradeStatuses: []
+  grades: {
+    provisionalGrades: {},
+    selectProvisionalGradeStatuses: {},
+    updateGradeStatuses: []
+  }
 })
