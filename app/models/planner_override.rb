@@ -69,6 +69,11 @@ class PlannerOverride < ActiveRecord::Base
     end
   end
 
+  def associated_assignment_id
+    return self.plannable.id if self.plannable_type == 'Assignment'
+    self.plannable.assignment_id if self.plannable.respond_to? :assignment_id
+  end
+
   def self.update_for(obj)
     overrides = PlannerOverride.where(plannable_id: obj.id, plannable_type: obj.class.to_s)
     overrides.update_all(workflow_state: plannable_workflow_state(obj)) if overrides.exists?

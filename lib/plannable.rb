@@ -44,6 +44,11 @@ module Plannable
   end
 
   def planner_override_for(user)
+    if self.respond_to? :submittable_object
+      submittable_override = self.submittable_object&.planner_override_for(user)
+      return submittable_override if submittable_override
+    end
+
     if self.association(:planner_overrides).loaded?
       self.planner_overrides.find{|po| po.user_id == user.id && po.workflow_state != 'deleted'}
     else

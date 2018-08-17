@@ -34,7 +34,9 @@ export default handleActions({
   ADD_OPPORTUNITIES: setOpportunityState,
   DISMISSED_OPPORTUNITY: (state, action) => {
     let stateCopy = cloneDeep(state);
-    let dismissedOpportunity = stateCopy.items.find((opportunity) => opportunity.id === action.payload.plannable_id + "");
+    let dismissedOpportunity = stateCopy.items.find(
+      opportunity => opportunity.id === action.payload.assignment_id
+    );
     if (dismissedOpportunity.planner_override) {
       dismissedOpportunity.planner_override.dismissed = action.payload.dismissed;
     } else {

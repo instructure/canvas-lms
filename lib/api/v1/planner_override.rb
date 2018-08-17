@@ -25,6 +25,7 @@ module Api::V1::PlannerOverride
     json = api_json(override, user, session)
     type = override.plannable.type if override.plannable_type == 'DiscussionTopic' && type.nil?
     json['plannable_type'] = PLANNABLE_TYPES.key(type || json['plannable_type'])
+    json['assignment_id'] = override.associated_assignment_id
     json
   end
 end

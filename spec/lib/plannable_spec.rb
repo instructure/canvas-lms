@@ -24,6 +24,36 @@ describe Plannable do
       course_with_student(active_all: true)
     end
 
+    it "returns a regular assignment's override" do
+      assignment = assignment_model
+      override = assignment.planner_overrides.create!(user: @student)
+      expect(assignment.planner_override_for(@student)).to eq override
+    end
+
+    it "returns the assignment's associated override" do
+      assignment = assignment_model(submission_types: 'discussion_topic')
+      discussion = assignment.discussion_topic
+      discussion_override = discussion.planner_overrides.create!(user: @student)
+      expect(assignment.planner_override_for(@student)).to eq discussion_override
+    end
+
+    it "returns the assignment's override if the associated object does not have an override" do
+      assignment = assignment_model()
+      assignment_override = assignment.planner_overrides.create!(user: @student)
+      assignment.submission_types = "discussion_topic"
+      assignment.save!
+      expect(assignment.planner_override_for(@student)).to eq assignment_override
+    end
+
+    it "prefers the associated object's override if both have an override" do
+      assignment = assignment_model()
+      assignment_override = assignment.planner_overrides.create!(user: @student)
+      assignment.submission_types = "discussion_topic"
+      assignment.save!
+      discussion_override = assignment.discussion_topic.planner_overrides.create!(user: @student)
+      expect(assignment.planner_override_for(@student)).to eq discussion_override
+    end
+
     it 'should not return deleted overrides' do
       assignment = assignment_model
       override = assignment.planner_overrides.create!(user: @student)
