@@ -14,22 +14,21 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
-module Lti
-  class JWKKeyPair
-    attr_reader :public_key, :private_key, :alg, :use
-    def to_jwk
-      private_key.to_jwk(kid: kid, alg: alg, use: use)
+
+module Canvas::Oauth
+  class InvalidRequestError < RequestError
+    def to_render_data
+      {
+        status: 400,
+        json: {
+          error: :invalid_request,
+          error_description: @message
+        }
+      }
     end
 
-    def public_jwk
-      private_key.public_key.to_jwk(kid: kid, alg: alg, use: use)
-    end
-
-    private
-
-    def kid
-      @_kid ||= Time.now.utc.iso8601
+    def http_status
+      400
     end
   end
 end
