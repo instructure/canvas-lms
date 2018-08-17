@@ -149,7 +149,7 @@ export default class Checker extends React.Component {
     const errorNode = this.errorNode()
     if (errorNode) {
       this.getFormState()
-      dom.select(errorNode)
+      dom.select(this.props.editor, errorNode)
     } else {
       this.firstError()
     }

@@ -62,6 +62,7 @@
     "@instructure/ui-overlays": "^5 || rc",
     "@instructure/ui-themes": "^5 || rc",
     "axios": "^0.18.0",
+    "bloody-offset": "^0.0.0",
     "format-message": "^6",
     "format-message-generate-id": "^6",
     "prevent-default": "^1.0.0",

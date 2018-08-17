@@ -2168,7 +2168,7 @@ blob@0.0.4:
   version "0.0.4"
   resolved "https://registry.yarnpkg.com/blob/-/blob-0.0.4.tgz#bcf13052ca54463f30f9fc7e95b9a47630a94921"
 
-bloody-offset@0.0.0:
+bloody-offset@0.0.0, bloody-offset@^0.0.0:
   version "0.0.0"
   resolved "https://registry.yarnpkg.com/bloody-offset/-/bloody-offset-0.0.0.tgz#ce9b898ac526c0aa39f02f02567fc0993069d629"
 

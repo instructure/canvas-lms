@@ -7,7 +7,7 @@ const promisify = util.promisify
 
 jest.mock("../../rules/index")
 
-let component, instance, node, child, child2, body
+let component, instance, node, child, child2, body, fakeEditor, fakeIframe
 
 beforeAll(() => {
   // jsdom doesn't support selection apis
@@ -27,10 +27,16 @@ beforeAll(() => {
 beforeEach(() => {
   body = document.createElement("body")
   node = document.createElement("div")
+  fakeIframe = document.createElement("iframe")
   body.appendChild(node)
+  fakeEditor = {
+    getContainer: () => ({
+      querySelector: () => fakeIframe
+    })
+  }
   child = node.appendChild(document.createElement("div"))
   child2 = node.appendChild(document.createElement("div"))
-  component = shallow(<Checker getBody={() => node} />)
+  component = shallow(<Checker getBody={() => node} editor={fakeEditor} />)
   instance = component.instance()
 })
 
@@ -77,7 +83,11 @@ describe("check", () => {
     }
 
     component = shallow(
-      <Checker getBody={() => node} additionalRules={[asyncTestRule]} />
+      <Checker
+        getBody={() => node}
+        additionalRules={[asyncTestRule]}
+        editor={fakeEditor}
+      />
     )
     instance = component.instance()
     await promisify(instance.check.bind(instance))()
@@ -130,19 +140,22 @@ describe("check", () => {
 
   test("calls beforeCheck and afterCheck providing a done callback and an editor instance", async () => {
     component = shallow(
-      <Checker getBody={() => node} editor={{ someObject: true }} />
+      <Checker
+        getBody={() => node}
+        editor={{ ...fakeEditor, someObject: true }}
+      />
     )
     instance = component.instance()
     const beforeCallback = jest.fn()
     const afterCallback = jest.fn()
 
     const beforeCheck = (ed, done) => {
-      expect(ed).toEqual({ someObject: true })
+      expect(ed).toEqual(expect.objectContaining({ someObject: true }))
       beforeCallback()
       done()
     }
     const afterCheck = (ed, done) => {
-      expect(ed).toEqual({ someObject: true })
+      expect(ed).toEqual(expect.objectContaining({ someObject: true }))
       afterCallback()
       done()
     }

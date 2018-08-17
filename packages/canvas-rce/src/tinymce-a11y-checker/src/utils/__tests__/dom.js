@@ -15,18 +15,25 @@ test("walk calls function with each child element depth first", () => {
 })
 
 describe("select", () => {
-  let node, doc, range, sel
+  let node, doc, range, sel, editor, indicateFn
 
   beforeEach(() => {
     range = { selectNode: jest.fn() }
     sel = { addRange: jest.fn(), removeAllRanges: jest.fn() }
     doc = { createRange: () => range, getSelection: () => sel }
     node = { scrollIntoView: jest.fn(), ownerDocument: doc, childNodes: [] }
+    editor = {}
+    indicateFn = jest.fn()
   })
 
-  test("select creates a range for the doc and selects the node", () => {
-    dom.select(node)
-    expect(range.selectNode).toBeCalledWith(node)
+  test("scrolls the node into view", () => {
+    dom.select(editor, node, indicateFn)
+    expect(node.scrollIntoView).toBeCalled()
+  })
+
+  test("calls the indicator function with the editor and the node", () => {
+    dom.select(editor, node, indicateFn)
+    expect(indicateFn).toHaveBeenCalledWith(editor, node)
   })
 
   test("select does not throw if node is underfined or null", () => {

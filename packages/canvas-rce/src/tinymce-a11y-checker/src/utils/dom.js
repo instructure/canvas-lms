@@ -1,3 +1,5 @@
+import indicate from "./indicate"
+
 const ELEMENT_NODE = 1
 const WALK_BATCH_SIZE = 25
 
@@ -26,23 +28,12 @@ export function walk(node, fn, done) {
   processBatch()
 }
 
-export function select(elem) {
+export function select(editor, elem, indicateFn = indicate) {
   if (elem == null) {
     return
   }
-  const doc = elem.ownerDocument
-  const sel = doc.getSelection()
-  const range = doc.createRange()
-  if (sel.rangeCount > 0) {
-    sel.removeAllRanges()
-  }
-  if (elem.childNodes.length > 0) {
-    range.selectNodeContents(elem)
-  } else {
-    range.selectNode(elem)
-  }
-  sel.addRange(range)
   elem.scrollIntoView()
+  indicateFn(editor, elem)
 }
 
 export function prepend(parent, child) {
