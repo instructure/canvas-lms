@@ -179,13 +179,16 @@ describe SisImportsApiController, type: :request do
     expect(json).to eq expected_data
   end
 
-  it 'should restore batch on restore_states' do
+  it 'should restore batch on restore_states and return progress' do
     batch = @account.sis_batches.create
-    api_call(:put, "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}/restore_states",
-             {controller: 'sis_imports_api', action: 'restore_states', format: 'json',
-              account_id: @account.id.to_s, id: batch.id.to_s})
+    json = api_call(:put, "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}/restore_states",
+                    {controller: 'sis_imports_api', action: 'restore_states', format: 'json',
+                     account_id: @account.id.to_s, id: batch.id.to_s})
     run_jobs
     expect(batch.reload.workflow_state).to eq 'restored'
+
+    params = {controller: 'progress', action: 'show', id: json['id'].to_param, format: 'json'}
+    api_call(:get, "/api/v1/progress/#{json['id']}", params, {}, {}, expected_status: 200)
   end
 
   it 'should abort batch on abort' do

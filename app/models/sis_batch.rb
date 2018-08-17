@@ -51,6 +51,11 @@ class SisBatch < ActiveRecord::Base
     }
   end
 
+  set_policy do
+    given { |user| self.account.grants_any_right?(user, :manage_sis, :import_sis) }
+    can :read
+  end
+
   # If you are going to change any settings on the batch before it's processed,
   # do it in the block passed into this method, so that the changes are saved
   # before the batch is marked created and eligible for processing.
