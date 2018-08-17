@@ -1122,10 +1122,16 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :provisional_grades) do
-      get "courses/:course_id/assignments/:assignment_id/provisional_grades/status", action: :status, as: "course_assignment_provisional_status"
-      post "courses/:course_id/assignments/:assignment_id/provisional_grades/publish", action: :publish, as: 'publish_provisional_grades'
-      put "courses/:course_id/assignments/:assignment_id/provisional_grades/:provisional_grade_id/select", action: :select, as: 'select_provisional_grade'
-      post "courses/:course_id/assignments/:assignment_id/provisional_grades/:provisional_grade_id/copy_to_final_mark", action: :copy_to_final_mark, as: 'copy_to_final_mark'
+      put "courses/:course_id/assignments/:assignment_id/provisional_grades/bulk_select",
+        action: :bulk_select, as: 'bulk_select_provisional_grades'
+      get "courses/:course_id/assignments/:assignment_id/provisional_grades/status",
+        action: :status, as: "course_assignment_provisional_status"
+      post "courses/:course_id/assignments/:assignment_id/provisional_grades/publish",
+        action: :publish, as: 'publish_provisional_grades'
+      put "courses/:course_id/assignments/:assignment_id/provisional_grades/:provisional_grade_id/select",
+        action: :select, as: 'select_provisional_grade'
+      post "courses/:course_id/assignments/:assignment_id/provisional_grades/:provisional_grade_id/copy_to_final_mark",
+        action: :copy_to_final_mark, as: 'copy_to_final_mark'
     end
 
     post '/courses/:course_id/assignments/:assignment_id/submissions/:user_id/comments/files', action: :create_file, controller: :submission_comments_api
