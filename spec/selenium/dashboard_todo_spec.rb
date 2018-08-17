@@ -68,11 +68,10 @@ describe "dashboard" do
       assignment.created_at = 1.month.ago
       assignment.save!
 
-      Timecop.freeze(1.hour.ago) do
-        @course.start_at = 1.month.ago
-        @course.soft_conclude!
-        @course.save!
-      end
+      @course.start_at = 1.month.ago
+      @course.conclude_at = 2.weeks.ago
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
 
       get "/"
 
