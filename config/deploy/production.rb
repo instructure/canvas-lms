@@ -27,11 +27,11 @@ set :branch, 'bz-master'
 #
 # Global options
 # --------------
-#  set :ssh_options, {
-#    keys: %w(/home/rlisowski/.ssh/id_rsa),
+  set :ssh_options, {
+    keys: %w(/home/braven-admin/keys/id_rsa)
 #    forward_agent: false,
 #    auth_methods: %w(password)
-#  }
+  }
 #
 # And/or per server (overrides global)
 # ------------------------------------
