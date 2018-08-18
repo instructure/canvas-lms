@@ -3,11 +3,13 @@
 --- 
 en-CA: 
   1_item_scores_5512cd03: "1- Item scores"
+  1_item_scores_examplescores_9736236: "1- Item Scores: %{exampleScores}"
   1_user_found_76399771: "1 user found."
   1st_reviewer_3c1d0119: "1st Reviewer"
   25th_75th_ile_406a67bf: "25th-75th %ile"
   25th_75th_percentile_aa4c11f2: "25th-75th Percentile"
   2_final_score_7b0fd15e: "2- Final score"
+  2_final_score_exampleresult_922edf9c: "2- Final Score: %{exampleResult}"
   2nd_reviewer_94fdbcd: "2nd Reviewer"
   451_message: 
     description: "You are not authorized to access this site because you are located in a country subject to U.S. trade restrictions."
@@ -1466,6 +1468,7 @@ en-CA:
   affects_viewing_the_publish_course_conclude_course_76d2f601: |-
       Affects viewing the Publish Course, Conclude Course, and Permanently Delete this Course buttons.
       The Permanently Delete this Course button only appears for manually created courses.
+  afghanistan_93_ab06805: "Afghanistan (+93)"
   after_48b9d69: After..
   after_4c71e718: After
   after_cbb5ebae: After...
@@ -3612,6 +3615,7 @@ en-CA:
   cannot_be_present_when_course_id_is_present_785e6a59: "cannot be present when course_id is present"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Cannot change an override due date                                              to a date within a closed grading period"
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "Cannot change role name to %{label}: already in use"
+  cannot_change_the_default_term_name_edc2279b: "Cannot change the default term name"
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Cannot change the due date of an override in a closed grading period"
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "Cannot change the due date to a date within a closed grading period"
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: "Cannot change the due date when due in a closed grading period"
@@ -3773,10 +3777,12 @@ en-CA:
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Click on a snapshot to revert back to your trial as it was when the snapshot was taken. Note: You will lose any work you have done since the snapshot was taken and it cannot be undone!"
   click_to_add_a_name_6cf551b0: "Click to add a name"
   click_to_change_profile_picture_for_display_name_6a4b41db: "Click to change profile picture for %{display_name}"
+  click_to_collapse_outcome_details_1d751617: "Click to collapse outcome details"
   click_to_create_a_new_user_for_address_325f6683: "Click to create a new user for %{address}"
   click_to_create_a_new_user_for_login_56d2daf5: "Click to create a new user for %{login}"
   click_to_edit_drag_to_reorder_ab725681: "Click to edit, drag to reorder"
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Click to enter comments, if the student chooses this answer"
+  click_to_expand_outcome_details_74a2a967: "Click to expand outcome details"
   click_to_load_a020891b: "(click to load)"
   click_to_report_profile_picture_370f9625: "Click to report profile picture"
   click_to_report_profile_picture_for_display_name_9ffbcc86: "Click to report profile picture for %{display_name}"
@@ -8054,6 +8060,7 @@ en-CA:
   grader_d1198a9c: Grader
   grader_graderindex_45e04e57: "Grader %{graderIndex}"
   grader_gradernumber_fef5d5cf: "Grader %{graderNumber}"
+  grader_index_a55577a2: "Grader %{index}"
   grader_is_required_62c88f67: "Grader is required"
   grader_that_determines_final_grade_cc55f20: "Grader that determines final grade"
   graders_can_view_each_other_s_comments_d836b848: "Graders can view each other's comments"
@@ -8596,9 +8603,11 @@ en-CA:
   hide_groups_navigation_menu_62e8b3d0: "Hide Groups Navigation Menu"
   hide_key_e8fe1e8c: "Hide Key"
   hide_navigation_menu_f0b3e90: "Hide Navigation Menu"
+  hide_outcomes_with_no_results_7e4ce06f: "Hide outcomes with no results"
   hide_score_total_for_assessment_results_d0ef117f: "Hide score total for assessment results"
   hide_sidebar_2b5b3776: "Hide Sidebar"
   hide_student_names_3e59e862: "Hide Student Names"
+  hide_students_with_no_results_6a22f991: "Hide students with no results"
   hide_sub_accounts_for_account_name_a6de98bd: "Hide Sub-Accounts for %{account_name}"
   high_b5cbd048: High
   high_contrast_description: |-
@@ -9029,6 +9038,7 @@ en-CA:
       Features, settings and styles that make more sense specifically in a K-12 environment. For now, this only
       applies some style changes, but more K-12 specific things may be added in the future.
   k_2521301c: k
+  kazakhstan_7_8fe892c: "Kazakhstan (+7)"
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "Keep in mind, this submission will count for everyone in your %{groupType} group."
   keep_submissions_anonymous_5cbaf419: "Keep Submissions Anonymous"
   kenya_254_2945663a: "Kenya (+254)"
@@ -9044,6 +9054,7 @@ en-CA:
   kind_7f0a88c4: Kind
   labels: 
     lock_module_until: "Lock until"
+  last_assessment_cd5659b6: "Last Assessment: "
   last_changed_b544504d: "Last changed:"
   last_changed_date_82f1ce56: "Last changed: %{date}"
   last_day_attended_b72d623c: "Last day attended"
@@ -11501,6 +11512,7 @@ en-CA:
   new_course_role_6a7bb75f: "New Course Role"
   new_criterion_6054bc7f: "New Criterion"
   new_criterion_canceled_d8c2a655: "New Criterion Canceled"
+  new_discussion_dae4fae3: "New Discussion"
   new_event_for_course_name_2ba1f734: "New event for %{course_name}"
   new_export_3ab758: "New Export"
   new_features_for_developer_key_management_994090dc: "New Features for Developer Key management"
@@ -11596,6 +11608,7 @@ en-CA:
   no_subject_58b7941c: "No Subject"
   no_subject_970aad80: "No subject"
   no_submission_for_assignment_a9cb6fe2: "No submission for %{assignment}"
+  no_submissions_164cea23: "No submissions"
   no_terms_eab5ee7b: "No Terms"
   no_tls_618add1a: "No TLS"
   no_unassigned_terms_deb7b76b: "No unassigned terms"
@@ -12260,7 +12273,7 @@ en-CA:
     cannot_unpublish_front_page: "Cannot unpublish the front page"
     delete_button: Delete
     delete_confirmation: "Are you sure you want to delete this page?"
-    delete_dialog_title: "Delete Wiki Page"
+    delete_dialog_title: "Delete Page"
     deleting_button: Deleting...
     edit_dialog_title: "Edit Page"
     errors: 
@@ -14894,6 +14907,7 @@ en-CA:
   rubrics_b5ef369b: Rubrics
   running_c5a4998d: Running
   russia_7_87bc99d5: "Russia (+7)"
+  rwanda_250_1a6b344b: "Rwanda (+250)"
   salesforce_account_id_eb5c78ad: "Salesforce Account Id"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce has a different login host for sanbox accounts than it does for production accounts, so if you're using a Salesforce sanbox account and you don't check this box it won't be able to authenticate (and this works in reverse too, if you have a production account and you DO check this box it won't authenticate)"
   salesforce_ticketing_webtocase_connector_80f75716: "Salesforce Ticketing WebToCase Connector"
@@ -16357,6 +16371,7 @@ en-CA:
     this_was_submitted_multiple_times_choose_a_submission_to_view: "Submitted multiple times, choose which to view:"
     update_grade: "Update Grade"
     view_rubric_assessment_in_the_speedgrader: "View Rubric Assessment in the SpeedGrader"
+  submission_index_e960f9bf: "Submission %{index}"
   submission_score_b7a291e8: "submission score"
   submission_tray_429ac3df: "Submission tray"
   submissions: 
@@ -16798,6 +16813,7 @@ en-CA:
   there_was_a_problem_updating_the_comment_5f3595b9: "There was a problem updating the comment"
   there_was_a_problem_updating_the_grade_1b6c8b4c: "There was a problem updating the grade."
   there_was_a_problem_updating_the_submission_6e5280a1: "There was a problem updating the submission."
+  there_was_an_error_fetching_course_statistics_96e9dbad: "There was an error fetching course statistics"
   there_was_an_error_fetching_outcome_results_45c57590: "There was an error fetching outcome results"
   there_was_an_error_fetching_submission_comments_ce153077: "There was an error fetching Submission Comments"
   there_was_an_error_generating_the_pairing_code_9edd639b: "There was an error generating the pairing code"
@@ -17203,6 +17219,7 @@ en-CA:
   to_access_the_account_courses_page_courses_view_li_e1da6165: "To access the account Courses page, Courses - view list must be enabled."
   to_access_the_assignments_index_page_course_conten_a5b00f98: "To access the Assignments Index Page, Course Content - view must be enabled. To differentiate assignments to individual students, Users - view list ​must also be enabled."
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "To access the People page and view Groups, Users - view list must also be enabled."
+  to_access_the_people_page_users_view_list_must_be__2f01333b: "To access the People page, Users - view list must be enabled. If this permission is enabled, and if Users - view primary email address is disabled, users will see email addresses used as login IDs. To view login IDs, Users - add / remove students in courses and Users - add / remove teachers, course designers, or TAs in courses must also be enabled."
   to_access_the_people_page_users_view_list_must_be__5a5475fe: "To access the People Page, Users - view list​ must be enabled."
   to_access_the_people_page_users_view_list_must_be__756d7188: |-
       To access the People Page, Users - view list​ must be enabled.
@@ -17265,6 +17282,7 @@ en-CA:
   to_differentiate_assignments_to_individual_student_6cc40fde: "To differentiate assignments to individual students, Users - view list ​must also be enabled."
   to_do_1d554f36: "To Do"
   to_do_5526f10a: "To Do:"
+  to_do_6ac7b2dc: "to do:"
   to_do_date_d6b79bfd: "To do %{date}"
   to_do_date_ddfb582c: "To Do Date:"
   to_do_items_loading_d1cdfcd5: "To Do Items Loading"
@@ -18466,6 +18484,7 @@ en-CA:
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "You have reached the maximum webhooks per user limit (%{max})"
   you_have_unsynced_changes_that_will_sync_to_all_as_9028e711: "You have unsynced changes that will sync to all associated courses when a new association is saved."
   you_just_sent_a_message_in_canvas_86b4945c: "You just sent a message in Canvas"
+  you_left_the_required_name_field_empty_8f9bce5c: "You left the required name field empty."
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "You'll definitely want some of these.  What's the fun of teaching a course if nobody's even listening?"
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "You'll need a refresh token, follow the steps at this link, you may want a technical expert to help"
   you_may_not_reproduce_or_communicate_any_of_the_co_7636b552: |-
