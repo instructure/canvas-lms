@@ -3,11 +3,13 @@
 --- 
 zh-Hant: 
   1_item_scores_5512cd03: "1- 項目分數"
+  1_item_scores_examplescores_9736236: "1- 項目分數：%{exampleScores}"
   1_user_found_76399771: "找到 1 個使用者。"
   1st_reviewer_3c1d0119: "第 1 檢閲人"
   25th_75th_ile_406a67bf: "第 25-75 %i 百分位數"
   25th_75th_percentile_aa4c11f2: "第 25-75 百分位數"
   2_final_score_7b0fd15e: "2- 最終分數"
+  2_final_score_exampleresult_922edf9c: "2- 最終分數：%{exampleResult}"
   2nd_reviewer_94fdbcd: "第 2 檢閲人"
   451_message: 
     description: 因為您所在國家受美國貿易限制的約束，所以您無法獲得此網站的訪問授權。
@@ -1605,6 +1607,7 @@ zh-Hant:
   affects_viewing_the_publish_course_conclude_course_76d2f601: |-
       影響查看「發佈課程」、「結束課程」及「永久刪除此課程」按鈕。
       只有手動創建的課程方會顯示「永久刪除此課程」按鈕。
+  afghanistan_93_ab06805: "阿富汗 (+93)"
   after_48b9d69: 之後...
   after_4c71e718: 之後
   after_cbb5ebae: 之後......
@@ -3973,6 +3976,7 @@ zh-Hant:
   cannot_be_present_when_course_id_is_present_785e6a59: "當 course_id 呈現時，無法呈現"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: 無法將重寫到期日變更為封閉評分期內的日期
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "無法變更身份名稱至 %{label}：已在使用中"
+  cannot_change_the_default_term_name_edc2279b: 無法變更預設學期名稱
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: 無法變更在封閉評分期內的重寫到期日
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: 無法將到期日變更為封閉評分期內的日期
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: 無法變更在封閉評分期內到期的到期日
@@ -4140,10 +4144,12 @@ zh-Hant:
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: 當快照拍攝好時，點擊快照可恢復為您的試用版本。注：您將失去自拍攝快照以來所做的任何工作，而且無法撤銷！
   click_to_add_a_name_6cf551b0: 點擊以添加名稱
   click_to_change_profile_picture_for_display_name_6a4b41db: "點擊以更換檔案圖片%{display_name}"
+  click_to_collapse_outcome_details_1d751617: 點按以收起成果詳情
   click_to_create_a_new_user_for_address_325f6683: "點擊以創建一個新使用者%{address}"
   click_to_create_a_new_user_for_login_56d2daf5: "點擊以創建一個新使用者%{login}"
   click_to_edit_drag_to_reorder_ab725681: 按一下以編輯，拖放以重新排序
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: 如果學生選擇此答案，則按一下以為其輸入評論
+  click_to_expand_outcome_details_74a2a967: 點按以展開成果詳情
   click_to_load_a020891b: （按一下以載入）
   click_to_modify_89fa26aa: 按一下進行修改
   click_to_order_by_email_ascending_98b1a697: 按此通過電子郵件升序排序
@@ -9341,6 +9347,7 @@ zh-Hant:
   grader_d1198a9c: 評分人
   grader_graderindex_45e04e57: "評分員%{graderIndex}"
   grader_gradernumber_fef5d5cf: "評分員%{graderNumber}"
+  grader_index_a55577a2: "評分員%{index}"
   grader_is_required_62c88f67: 評分員必須為
   grader_that_determines_final_grade_cc55f20: 評分員決定最終評分
   graders_can_view_each_other_s_comments_d836b848: 評分員可以查看彼此的評論
@@ -10090,9 +10097,11 @@ zh-Hant:
   hide_key_e8fe1e8c: 隱藏金鑰
   hide_navigation_menu_f0b3e90: 隱藏導航工具選單
   hide_notes_column_7749f408: 隱藏注釋列
+  hide_outcomes_with_no_results_7e4ce06f: 隱藏無成績的學習成果
   hide_score_total_for_assessment_results_d0ef117f: 隱藏評估成績的總分
   hide_sidebar_2b5b3776: 隱藏邊欄
   hide_student_names_3e59e862: 隱藏學生姓名
+  hide_students_with_no_results_6a22f991: 隱藏無成績的學生
   hide_sub_accounts_for_account_name_a6de98bd: "隱藏子帳戶%{account_name}"
   high_b5cbd048: 高
   high_contrast_description: "高對比度可以增強 UI （文字、按鈕等）與背景的反差，讓這些內容更清晰可見。注意：機構品牌推廣功能將被停用。"
@@ -10563,6 +10572,7 @@ zh-Hant:
   jwts_4f397c85: JWTs
   k12_description: "各種更合理的功能、設置和樣式，尤其是在 K-12 環境中。目前，這僅適用於某些樣式更改，但在未來可能會添加更多的 K-12 具體事項。"
   k_2521301c: k
+  kazakhstan_7_8fe892c: "哈薩克斯坦 (+7)"
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "謹記，此提交項目對於您的 %{groupType} 群組中的每個人而言都很重要。"
   keep_submissions_anonymous_5cbaf419: 保持提交件匿名
   kenya_254_2945663a: "肯亞 (+254)"
@@ -10579,6 +10589,7 @@ zh-Hant:
   kind_7f0a88c4: 類型
   labels: 
     lock_module_until: 鎖定直至
+  last_assessment_cd5659b6: 最新的評估：
   last_changed_b544504d: 上次變更：
   last_changed_date_82f1ce56: "上次變更：%{date}"
   last_day_attended_b72d623c: 最後一次加入日期
@@ -13381,6 +13392,7 @@ zh-Hant:
   new_course_role_6a7bb75f: 新課程角色
   new_criterion_6054bc7f: 新標準
   new_criterion_canceled_d8c2a655: 已取消新標準
+  new_discussion_dae4fae3: 新討論區
   new_event_for_course_name_2ba1f734: "%{course_name} 的新事件"
   new_export_3ab758: 新導出
   new_features_for_developer_key_management_994090dc: 開發人員金鑰管理的新功能
@@ -13484,6 +13496,7 @@ zh-Hant:
   no_subject_58b7941c: 無主題
   no_subject_970aad80: 無主題
   no_submission_for_assignment_a9cb6fe2: "沒有提交%{assignment}"
+  no_submissions_164cea23: 沒有提交項目
   no_terms_eab5ee7b: 無條款
   no_tls_618add1a: "沒有 TLS"
   no_unassigned_terms_deb7b76b: 沒有未指派的學期
@@ -14212,7 +14225,7 @@ zh-Hant:
     cannot_unpublish_front_page: 無法取消發佈標題版
     delete_button: 刪除
     delete_confirmation: 是否確定要刪除此內容頁？
-    delete_dialog_title: "刪除 Wiki 頁面"
+    delete_dialog_title: 刪除頁面
     deleting_button: 正在刪除...
     edit_dialog_title: 編輯頁面
     errors: 
@@ -17211,6 +17224,7 @@ zh-Hant:
   rubrics_b5ef369b: 評分標準
   running_c5a4998d: 運行
   russia_7_87bc99d5: "俄羅斯 (+7)"
+  rwanda_250_1a6b344b: "盧旺達 (+250)"
   salesforce_account_id_eb5c78ad: "銷售人員帳戶 ID"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: 除了產品帳戶之外，銷售人員有一個用於安全帳戶登入的不同主機。因此，如果您使用的是銷售人員的安全帳戶，並且而您沒有勾選此複選框，那麼您將無法進行身份驗證（同理，如果您有一個產品帳戶，並且您勾選了此複選框，也無法進行驗證）。
   salesforce_ticketing_webtocase_connector_80f75716: "銷售人員票務 WebToCase 連接器"
@@ -18907,6 +18921,7 @@ zh-Hant:
     update_grade: 更新成績
     view_rubric_assessment_in_the_speedgrader: "在 SpeedGrader 中檢視評估量表評估"
   submission_in_another_grading_period_e754b329: 另一個評分週期內的提交件
+  submission_index_e960f9bf: "提交項目%{index}"
   submission_options_5184a65b: 提交件選項
   submission_score_b7a291e8: 提交項目分數
   submission_status_3079e730: 提交項目狀態
@@ -19392,6 +19407,7 @@ zh-Hant:
   there_was_a_problem_updating_the_comment_5f3595b9: 在更新評論時發生了一個問題
   there_was_a_problem_updating_the_grade_1b6c8b4c: 更新評分時發生問題。
   there_was_a_problem_updating_the_submission_6e5280a1: 更新提交件時發生問題。
+  there_was_an_error_fetching_course_statistics_96e9dbad: 獲取課程統計資料時出現錯誤。
   there_was_an_error_fetching_outcome_results_45c57590: 獲取學習成果結果時出現錯誤。
   there_was_an_error_fetching_submission_comments_ce153077: 讀取提交項目評論時出現錯誤。
   there_was_an_error_generating_the_pairing_code_9edd639b: 產生配對代碼時出現錯誤
@@ -19805,6 +19821,7 @@ zh-Hant:
   to_access_the_account_courses_page_courses_view_li_e1da6165: "要存取帳戶的課程頁面，必須啟用「課程 - 查看清單」。"
   to_access_the_assignments_index_page_course_conten_a5b00f98: "要存取作業列表的索引頁，必須啟用「課程內容 - 查看」。要向個別學生分發不同的作業，必須同時啟用「使用者 - 查看清單」。"
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "要存取成員頁面並查看小組，必須同時啟用「使用者 - 查看清單」。"
+  to_access_the_people_page_users_view_list_must_be__2f01333b: "要存取成員頁面，必須啟用「使用者 - 查看清單」。如果啟用此權限，而「使用者 - 查看主電郵地址」已停用，使用者則會看見電郵地址被用作登入 ID。要透過檢視登入 ID，必須同時啟用「使用者 - 於課程添加 / 移除學生」及「使用者 - 於課程添加 / 移除教師、課程設計者或助教」。"
   to_access_the_people_page_users_view_list_must_be__5a5475fe: "要存取成員頁面，必須啟用「使用者 - 查看清單」。"
   to_access_the_people_page_users_view_list_must_be__756d7188: |-
       要存取成員頁面，必須啟用「使用者 - 查看清單」。
@@ -19864,6 +19881,7 @@ zh-Hant:
   to_differentiate_assignments_to_individual_student_6cc40fde: "要向個別學生分發不同的作業，必須同時啟用「使用者 - 查看清單」。"
   to_do_1d554f36: 待辦事項
   to_do_5526f10a: 待辦事項：
+  to_do_6ac7b2dc: 待辦事項：
   to_do_date_d6b79bfd: "待辦事項%{date}"
   to_do_date_ddfb582c: 待辦日期：
   to_do_items_loading_d1cdfcd5: 正在載入待辦事項
@@ -21185,6 +21203,7 @@ zh-Hant:
   you_have_submitted_the_assignment_7ef8a51a: 您已提交任務
   you_have_unsynced_changes_that_will_sync_to_all_as_9028e711: 您有尚未同步的變更，它們會在您保存新的關聯時同步至所有已關聯的課程。
   you_just_sent_a_message_in_canvas_86b4945c: "您剛剛在 Canvas 發送了一條訊息"
+  you_left_the_required_name_field_empty_8f9bce5c: 尚未輸入必須填寫的名稱欄。
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: 您一定會想要收穫這些體驗。試想一下，假若無人聽講，那麼講課還有何樂趣可言？
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: 您將需要一個刷新的令牌；請遵循這個連結中的步驟，您可能需要一位技術專家提供支援
   you_may_not_reproduce_or_communicate_any_of_the_co_7636b552: |-
