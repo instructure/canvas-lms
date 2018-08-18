@@ -78,6 +78,16 @@ describe SIS::CSV::GroupMembershipImporter do
     expect(importer.errors.last.last).to eq "User U001 doesn't have an enrollment in the course of group G002."
   end
 
+  it "should find active gm first" do
+    g = group_model(context: @account, sis_source_id: "G002")
+    g.group_memberships.create!(user: @user1, workflow_state: 'accepted')
+    g.group_memberships.create!(user: @user1, workflow_state: 'deleted')
+    importer = process_csv_data_cleanly(
+      "group_id,user_id,status",
+      "G002,U001,accepted")
+    expect(importer.errors).to eq []
+  end
+
   it 'should create rollback data' do
     @account.enable_feature!(:refactor_of_sis_imports)
     batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
