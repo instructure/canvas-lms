@@ -3,11 +3,13 @@
 --- 
 da: 
   1_item_scores_5512cd03: "1 element| elementer"
+  1_item_scores_examplescores_9736236: "1- element får: %{exampleScores}"
   1_user_found_76399771: "1 bruger fundet."
   1st_reviewer_3c1d0119: "1. bedømmer"
   25th_75th_ile_406a67bf: "25.-75. %i"
   25th_75th_percentile_aa4c11f2: "25.-75. percentil"
   2_final_score_7b0fd15e: "2- Endeligt resultat"
+  2_final_score_exampleresult_922edf9c: "2- endeligt resultat: %{exampleResult}"
   2nd_reviewer_94fdbcd: "2. bedømmer"
   451_message: 
     description: "Du har ikke tilladelse til at få adgang til denne webside, fordi du befinder dig i et land, som er underlagt amerikanske handelsrestriktioner."
@@ -1605,6 +1607,7 @@ da:
   affects_viewing_the_publish_course_conclude_course_76d2f601: |-
       Påvirker visning af knapperne Offentliggør fag, Afslut fag og Slet dette fag permanent.
       Knappen Slet dette fag permanent vises for manuelt oprettede fag.
+  afghanistan_93_ab06805: "Afghanistan (+93)"
   after_48b9d69: "Efter ..."
   after_4c71e718: Efter
   after_cbb5ebae: "Efter ..."
@@ -3972,6 +3975,7 @@ da:
   cannot_be_present_when_course_id_is_present_785e6a59: "kan ikke være til stede, når course_id er til stede"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Kan ikke ændre en tilsidesæt forfaldsdato til en dato inden for en lukket karakterperiode"
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "Kan ikke ændre rollenavn til %{label}: allerede i brug"
+  cannot_change_the_default_term_name_edc2279b: "Kan ikke ændre standardnavnet for semestret"
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Kan ikke ændre forfaldsdatoen på en tilsidesættelse i en lukket karakterperiode"
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "Kan ikke ændre forfaldsdatoen til en dato inden for en lukket karakterperiode"
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: "Kan ikke ændre forfaldsdatoen, når den forfalder i en lukket karakterperiode"
@@ -4139,10 +4143,12 @@ da:
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Klik på et øjebliksbillede for at vende tilbage til din prøve, som den var, da øjebliksbilledet blev taget. Bemærk: Du vil miste det arbejde, du har udført, siden øjebliksbilledet blev taget, og det kan ikke fortrydes!"
   click_to_add_a_name_6cf551b0: "Klik for at tilføje et navn"
   click_to_change_profile_picture_for_display_name_6a4b41db: "Klik for at ændre profilbillede for %{display_name}"
+  click_to_collapse_outcome_details_1d751617: "Klik for at skjule detaljer om læringsudbytte"
   click_to_create_a_new_user_for_address_325f6683: "Klik for at oprette en ny bruger til %{address}"
   click_to_create_a_new_user_for_login_56d2daf5: "Klik for at oprette en ny bruger til %{login}"
   click_to_edit_drag_to_reorder_ab725681: "Klik for at redigere, træk for at omorganisere"
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Klik for at indtaste kommentarer, hvis den studerende vælger dette svar"
+  click_to_expand_outcome_details_74a2a967: "Klik for at udvide detaljer om læringsudbytte"
   click_to_load_a020891b: "(klik for at indlæse)"
   click_to_modify_89fa26aa: "Klik for at modificere"
   click_to_order_by_email_ascending_98b1a697: "Klik for at ordne i stigende rækkefølge efter mail"
@@ -9345,6 +9351,7 @@ da:
   grader_d1198a9c: Karaktergiver
   grader_graderindex_45e04e57: "Karaktergiver %{graderIndex}"
   grader_gradernumber_fef5d5cf: "Karaktergiver %{graderNumber}"
+  grader_index_a55577a2: "Karaktergiver %{index}"
   grader_is_required_62c88f67: "Bedømmer er påkrævet"
   grader_that_determines_final_grade_cc55f20: "Bedømmer, der bestemmer den endelig karakter"
   graders_can_view_each_other_s_comments_d836b848: "Karaktergivere kan se hinandens kommentarer"
@@ -10099,9 +10106,11 @@ da:
   hide_key_e8fe1e8c: "Skjul nøgle"
   hide_navigation_menu_f0b3e90: "Skjul navigationsmenu"
   hide_notes_column_7749f408: "Skjul notekolonnen"
+  hide_outcomes_with_no_results_7e4ce06f: "Skjul læringsudbytter uden resultater"
   hide_score_total_for_assessment_results_d0ef117f: "Skjul samlede resultat for bedømmelsesresultater"
   hide_sidebar_2b5b3776: "Skjul sidepanel"
   hide_student_names_3e59e862: "Skjul studerendes navne"
+  hide_students_with_no_results_6a22f991: "Skjul studerende uden resultater"
   hide_sub_accounts_for_account_name_a6de98bd: "Skjul underkonti for %{account_name}"
   high_b5cbd048: Høj
   high_contrast_description: |-
@@ -10585,6 +10594,7 @@ da:
       Funktioner, indstillinger og stile, som giver mere mening i et K-12-miljø. For øjeblikket gælder
       dette kun for stilændringer, men der tilføjes muligvis flere K-12-specifikke ting i fremtiden.
   k_2521301c: k
+  kazakhstan_7_8fe892c: "Kasakhstan (+7)"
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "Husk på, at denne aflevering gælder for alle i din %{groupType} gruppe."
   keep_submissions_anonymous_5cbaf419: "Hold afleveringer anonyme"
   kenya_254_2945663a: "Kenya (+254)"
@@ -10601,6 +10611,7 @@ da:
   kind_7f0a88c4: Type
   labels: 
     lock_module_until: "Lås indtil"
+  last_assessment_cd5659b6: "Seneste vurdering: "
   last_changed_b544504d: "Sidst ændret:"
   last_changed_date_82f1ce56: "Sidst ændret: %{date}"
   last_day_attended_b72d623c: "Sidste dag tilstedeværende"
@@ -13432,6 +13443,7 @@ da:
   new_course_role_6a7bb75f: "Ny fag-rolle"
   new_criterion_6054bc7f: "Nyt kriterie"
   new_criterion_canceled_d8c2a655: "Nyt kriterie annulleret"
+  new_discussion_dae4fae3: "Ny diskussion"
   new_event_for_course_name_2ba1f734: "Ny begivenhed for %{course_name}"
   new_export_3ab758: "Ny eksport"
   new_features_for_developer_key_management_994090dc: "Nye funktioner til håndtering af udvikler-nøgle"
@@ -13538,6 +13550,7 @@ da:
   no_subject_58b7941c: "Intet emne"
   no_subject_970aad80: "Intet emne"
   no_submission_for_assignment_a9cb6fe2: "Ingen indsendelse for %{assignment}"
+  no_submissions_164cea23: "Ingen afleveringer"
   no_terms_eab5ee7b: "Ingen semestre"
   no_tls_618add1a: "Ingen TLS"
   no_unassigned_terms_deb7b76b: "Ingen utildelte betingelser"
@@ -14262,7 +14275,7 @@ da:
     cannot_unpublish_front_page: "Kan ikke fjerne forsiden"
     delete_button: Slet
     delete_confirmation: "Er du sikker på, at du ønsker at slette denne side?"
-    delete_dialog_title: "Slet wikiside"
+    delete_dialog_title: "Slet side"
     deleting_button: "sletter ..."
     edit_dialog_title: "Rediger side"
     errors: 
@@ -17274,6 +17287,7 @@ da:
   rubrics_b5ef369b: Rubrikker
   running_c5a4998d: Kører
   russia_7_87bc99d5: "Rusland (+7)"
+  rwanda_250_1a6b344b: "Rwanda (+250)"
   salesforce_account_id_eb5c78ad: "Salesforce konto-id"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce bruger en anden login-host til sandbox-konti end den, der bruges til produktionskonti. Hvis du bruger en Salesforce sandbox-konto og ikke sætter flueben i dette felt, så er den ikke i stand til at godkende (og dette gælder også i modsat tilfælde, hvis du har en produktionskonto og IKKE sætter flueben i dette felt)"
   salesforce_ticketing_webtocase_connector_80f75716: "Salesforce Ticketing WebToCase Connector"
@@ -18973,6 +18987,7 @@ da:
     update_grade: "Opdater karakter"
     view_rubric_assessment_in_the_speedgrader: "Vis rubrik-bedømmelse i SpeedGrader"
   submission_in_another_grading_period_e754b329: "Aflevering i en anden bedømmelsesperiode"
+  submission_index_e960f9bf: "Aflevering %{index}"
   submission_options_5184a65b: Afleveringsmuligheder
   submission_score_b7a291e8: afleveringsresultat
   submission_status_3079e730: Afleveringsstatus
@@ -19462,6 +19477,7 @@ da:
   there_was_a_problem_updating_the_comment_5f3595b9: "Der opstod et problem ved opdatering af kommentaren"
   there_was_a_problem_updating_the_grade_1b6c8b4c: "Der opstod et problem ved opdatering af karakteren."
   there_was_a_problem_updating_the_submission_6e5280a1: "Der opstod et problem ved opdatering af afleveringen."
+  there_was_an_error_fetching_course_statistics_96e9dbad: "Der opstod en fejl under hentning af fagstatistik"
   there_was_an_error_fetching_outcome_results_45c57590: "Der opstod en fejl under hentning af læringsudbytteresultater"
   there_was_an_error_fetching_submission_comments_ce153077: "Der opstod en fejl under hentning af afleveringskommentarer"
   there_was_an_error_generating_the_pairing_code_9edd639b: "Der opstod en fejl, da parringskoden skulle genereres"
@@ -19879,6 +19895,7 @@ da:
   to_access_the_account_courses_page_courses_view_li_e1da6165: "For at få adgang til siden Fag på kontoen skal Fag - vis liste være aktiveret."
   to_access_the_assignments_index_page_course_conten_a5b00f98: "For at få adgang til indekssiden Opgaver skal Fagindhold - vis være aktiveret. For at differentiere opgaver for enkelte studerende skal Brugere - vis liste også være aktiveret."
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "For at få adgang til siden Deltagere og få vist grupper skal Brugere - vis liste også være aktiveret."
+  to_access_the_people_page_users_view_list_must_be__2f01333b: "For at få adgang til siden Deltagere skal Brugere - vis liste være aktiveret. Hvis denne tilladelse er aktiveret, og Brugere - vis primær e-mailadresse er deaktiveret, ser brugere e-mailadresser, der er brugt som login-id’er. For at se login-id'er, Brugere - tilføj / fjern studerende i fag og Brugere - tilføj / fjern lærere skal fagdesignere eller undervisningsassistenter i fag også være aktiveret."
   to_access_the_people_page_users_view_list_must_be__5a5475fe: "For at få adgang til siden Deltagere skal Brugere - vis liste være aktiveret."
   to_access_the_people_page_users_view_list_must_be__756d7188: |-
       For at få adgang til siden Deltagere skal Brugere - vis liste være aktiveret.
@@ -19945,6 +19962,7 @@ da:
   to_differentiate_assignments_to_individual_student_6cc40fde: "For at differentiere opgaver for enkelte studerende skal Brugere - vis liste også være aktiveret."
   to_do_1d554f36: Opgaveliste
   to_do_5526f10a: "Opgaveliste:"
+  to_do_6ac7b2dc: "opgaveliste:"
   to_do_date_d6b79bfd: "Opgaveliste %{date}"
   to_do_date_ddfb582c: "Opgaveliste dato:"
   to_do_items_loading_d1cdfcd5: "Elementer i opgaveliste indlæses"
@@ -21271,6 +21289,7 @@ da:
   you_have_submitted_the_assignment_7ef8a51a: "Du har indsendt opgaven"
   you_have_unsynced_changes_that_will_sync_to_all_as_9028e711: "Du har usynkroniserede ændringer, der synkroniseres med alle tilknyttede fag, når en ny tilknytning gemmes."
   you_just_sent_a_message_in_canvas_86b4945c: "Du har lige sendt en besked i Canvas"
+  you_left_the_required_name_field_empty_8f9bce5c: "Du indtastede ikke noget i det obligatoriske navnefelt."
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "Du vil helt sikkert gerne have nogle af disse. Der er ikke noget sjov i at undervise, hvis ingen hører efter?"
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "Du har brug for et opdateringstoken og skal følge nedenstående trin. Du kan bede om hjælp fra en tekniker"
   you_may_not_reproduce_or_communicate_any_of_the_co_7636b552: |-
