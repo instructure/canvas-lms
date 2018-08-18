@@ -3,11 +3,13 @@
 --- 
 pt: 
   1_item_scores_5512cd03: "1- Pontuações de itens"
+  1_item_scores_examplescores_9736236: "1- Pontuação de Itens: %{exampleScores}"
   1_user_found_76399771: "1 utilizador encontrado."
   1st_reviewer_3c1d0119: "1º Revisor"
   25th_75th_ile_406a67bf: "25º-75º %"
   25th_75th_percentile_aa4c11f2: "25º-75º Por cento"
   2_final_score_7b0fd15e: "2- Pontuação final"
+  2_final_score_exampleresult_922edf9c: "2- Pontuação Final: %{exampleResult}"
   2nd_reviewer_94fdbcd: "2º Revisor"
   451_message: 
     description: "Não tem autorização para aceder a este site porque se encontra num país sujeito a restrições comerciais dos E.U.A."
@@ -1611,6 +1613,7 @@ pt:
   affects_viewing_the_publish_course_conclude_course_76d2f601: |-
       Afeta a visualização dos botões Publicar disciplina, Concluir disciplina e Eliminar permanentemente este disciplina.
       O botão Eliminar permanentemente este disciplina é exibido apenas para disciplinas criados manualmente.
+  afghanistan_93_ab06805: "Afeganistão (+93)"
   after_48b9d69: Após...
   after_4c71e718: Depois
   after_cbb5ebae: "Depois de..."
@@ -3983,6 +3986,7 @@ pt:
   cannot_be_present_when_course_id_is_present_785e6a59: "não pode estar presente quando a couse_id está presente"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Não é possível alterar uma data de vencimento de substituição para uma data dentro de um período de classificação fechado"
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "Não é possível alterar o nome da função para %{label}: já em uso"
+  cannot_change_the_default_term_name_edc2279b: "Não é possível alterar o nome do termo padrão"
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Não é possível alterar a data de vencimento de uma substituição em um período de classificação fechado"
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "Não é possível alterar a data de vencimento para uma data dentro de um período de classificação fechado"
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: "Não é possível alterar a data de vencimento quando vencida em um período de classificação fechado"
@@ -4150,10 +4154,12 @@ pt:
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Clique em um instantâneo para voltar ao seu teste como era quando o instantâneo foi tirado. Nota: Você perderá todo o trabalho que você fêz desde que o instantâneo foi tirado e não pode ser desfeito!"
   click_to_add_a_name_6cf551b0: "Clique para adicionar um nome"
   click_to_change_profile_picture_for_display_name_6a4b41db: "Clique para alterar a imagem do perfil para %{display_name}"
+  click_to_collapse_outcome_details_1d751617: "Clique para recolher detalhes do resultado"
   click_to_create_a_new_user_for_address_325f6683: "Clique para criar um novo utilizador para %{address}"
   click_to_create_a_new_user_for_login_56d2daf5: "Clique para criar um novo utilizador para %{login}"
   click_to_edit_drag_to_reorder_ab725681: "Clique para editar, arraste para reordenar"
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Clique para inserir comentários, se o aluno escolher esta resposta"
+  click_to_expand_outcome_details_74a2a967: "Clique para expandir os detalhes do resultado"
   click_to_load_a020891b: "(clique para carregar)"
   click_to_modify_89fa26aa: "Clique para modificar"
   click_to_order_by_email_ascending_98b1a697: "Clique para pedir por e-mail ascendente"
@@ -9364,6 +9370,7 @@ pt:
   grader_d1198a9c: Avaliador
   grader_graderindex_45e04e57: "Avaliador %{graderIndex}"
   grader_gradernumber_fef5d5cf: "Avaliador %{graderNumber}"
+  grader_index_a55577a2: "Avaliador %{index}"
   grader_is_required_62c88f67: "Motoniveladora é obrigatória"
   grader_that_determines_final_grade_cc55f20: "Motoniveladora que determina a nota final"
   graders_can_view_each_other_s_comments_d836b848: "Avaliadores podem ver os comentários uns dos outros"
@@ -10116,9 +10123,11 @@ pt:
   hide_key_e8fe1e8c: "Ocultar chave"
   hide_navigation_menu_f0b3e90: "Ocultar Menu de navegação"
   hide_notes_column_7749f408: "Ocultar coluna de notas"
+  hide_outcomes_with_no_results_7e4ce06f: "Ocultar resultados sem resultados"
   hide_score_total_for_assessment_results_d0ef117f: "Ocultar total de pontos dos resultados da avaliação"
   hide_sidebar_2b5b3776: "Ocultar barra lateral"
   hide_student_names_3e59e862: "Ocultar nomes dos alunos"
+  hide_students_with_no_results_6a22f991: "Ocultar alunos sem resultados"
   hide_sub_accounts_for_account_name_a6de98bd: "Ocultar Sub-Contas para %{account_name}"
   high_b5cbd048: Alta
   high_contrast_description: |-
@@ -10602,6 +10611,7 @@ pt:
       Funcionalidades, definições e estilos que fazem mais sentido num ambiente de K-12. Por enquanto, são
       aplicadas apenas algumas mudanças de estilo, mas é possível que sejam adicionados elementos mais específicos de K-12 no futuro.
   k_2521301c: k
+  kazakhstan_7_8fe892c: "Cazaquistão (+7)"
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "Tenha em mente que este envio contará para todos em seu %{groupType} grupo."
   keep_submissions_anonymous_5cbaf419: "Manter os envios anônimos"
   kenya_254_2945663a: "Quênia (+254)"
@@ -10618,6 +10628,7 @@ pt:
   kind_7f0a88c4: Tipo
   labels: 
     lock_module_until: "Travar até"
+  last_assessment_cd5659b6: "Última Avaliação: "
   last_changed_b544504d: "Última alteração:"
   last_changed_date_82f1ce56: "Última alteração: %{date}"
   last_day_attended_b72d623c: "Último dia atendido"
@@ -13448,6 +13459,7 @@ pt:
   new_course_role_6a7bb75f: "Nova função de disciplina"
   new_criterion_6054bc7f: "Novo critério"
   new_criterion_canceled_d8c2a655: "Novo critério cancelado"
+  new_discussion_dae4fae3: "Nova Discussão"
   new_event_for_course_name_2ba1f734: "Novo evento para %{course_name}"
   new_export_3ab758: "Nova Exportação"
   new_features_for_developer_key_management_994090dc: "Novos recursos para gestão de chave do desenvolvedor"
@@ -13554,6 +13566,7 @@ pt:
   no_subject_58b7941c: "Sem assunto"
   no_subject_970aad80: "Sem assunto"
   no_submission_for_assignment_a9cb6fe2: "Nenhuma submissão para %{assignment}"
+  no_submissions_164cea23: "Sem submissões"
   no_terms_eab5ee7b: "Sem termos"
   no_tls_618add1a: "Sem TLS"
   no_unassigned_terms_deb7b76b: "Sem datas não definidas"
@@ -14280,7 +14293,7 @@ pt:
     cannot_unpublish_front_page: "Não é possível anular a publicação da primeira página"
     delete_button: Eliminar
     delete_confirmation: "Tem a certeza de que deseja eliminar esta página?"
-    delete_dialog_title: "Eliminar página wiki"
+    delete_dialog_title: "Eliminar Página"
     deleting_button: "A eliminar..."
     edit_dialog_title: "Editar Página"
     errors: 
@@ -17311,6 +17324,7 @@ pt:
   rubrics_b5ef369b: Protocolos
   running_c5a4998d: "A executar"
   russia_7_87bc99d5: "Rússia (+7)"
+  rwanda_250_1a6b344b: "Ruanda (+250)"
   salesforce_account_id_eb5c78ad: "ID de conta Salesforce"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce tem um acesso diferente para contas sandbox diferente das contas para produção, portanto se está a utilizar uma conta sandbox Salesforce e se não verificar esta opção, não será possível autenticar (e também funciona em modo contrário, se tem uma conta de produção e se VERIFICAR  esta opção não vai autenticar)"
   salesforce_ticketing_webtocase_connector_80f75716: "Conetor de Notas Salesforce WebToCase"
@@ -19020,6 +19034,7 @@ pt:
     update_grade: "Atualizar nota"
     view_rubric_assessment_in_the_speedgrader: "Exibir avaliação de protocolo no SpeedGrader"
   submission_in_another_grading_period_e754b329: "Submeter noutro período de classificação"
+  submission_index_e960f9bf: "Submissão %{index}"
   submission_options_5184a65b: "Opções de submissão"
   submission_score_b7a291e8: "pontuação do envio"
   submission_status_3079e730: "Status de submissão"
@@ -19511,6 +19526,7 @@ pt:
   there_was_a_problem_updating_the_comment_5f3595b9: "Ocorreu um problema ao atualizar o comentário"
   there_was_a_problem_updating_the_grade_1b6c8b4c: "Ocorreu um problema ao atualizar a classificação."
   there_was_a_problem_updating_the_submission_6e5280a1: "Ocorreu um problema na atualização do envio."
+  there_was_an_error_fetching_course_statistics_96e9dbad: "Houve um erro ao buscar as estatísticas da disciplina"
   there_was_an_error_fetching_outcome_results_45c57590: "Ocorreu um erro ao obter resultados"
   there_was_an_error_fetching_submission_comments_ce153077: "Ocorreu um erro ao buscar comentários de envio"
   there_was_an_error_generating_the_pairing_code_9edd639b: "Ocorreu um erro ao gerar o código de pareamento"
@@ -19928,6 +19944,7 @@ pt:
   to_access_the_account_courses_page_courses_view_li_e1da6165: "Para acessar a página Disciplinas da conta, Disciplinas - a lista de visualizações deve estar ativada."
   to_access_the_assignments_index_page_course_conten_a5b00f98: "Para acessar a Página de Índice de atribuições, o conteúdo da disciplina - a visualização deve estar ativada. Para diferenciar atribuições para alunos individuais, a lista Utilizadores - visão também deve estar ativada."
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "Para acessar a página Pessoas e visualizar Grupos, Utilizadores - a lista de visualizações também deve estar ativada."
+  to_access_the_people_page_users_view_list_must_be__2f01333b: "Para acessar a página Pessoas, Utilizadores - a lista de visualizações deve estar ativada. Se essa permissão estiver ativada e se Utilizadores - visualizar o endereço de e-mail principal estiver desabilitado, os utilizadores verão os endereços de e-mail usados ​​como IDs de login. Para visualizar IDs de login, utilizadores - adicionar / remover alunos em disciplinas e utilizadores - adicionar / remover professores, designers de disciplina ou TAs em disciplinas também devem estar ativados."
   to_access_the_people_page_users_view_list_must_be__5a5475fe: "Para acessar a página Pessoas, a lista de visualizações Utilizadores deve estar ativada."
   to_access_the_people_page_users_view_list_must_be__756d7188: |-
       Para acessar a página Pessoas, a lista de visualizações Utilizadores deve estar ativada.
@@ -19990,6 +20007,7 @@ pt:
   to_differentiate_assignments_to_individual_student_6cc40fde: "Para diferenciar atribuições para alunos individuais, a lista Utilizadores - ver também deve estar ativada."
   to_do_1d554f36: "A Fazer"
   to_do_5526f10a: "Tarefa:"
+  to_do_6ac7b2dc: "tarefa:"
   to_do_date_d6b79bfd: "Tarefa %{date}"
   to_do_date_ddfb582c: "Data da tarefa:"
   to_do_items_loading_d1cdfcd5: "A carregar itens a fazer"
@@ -21318,6 +21336,7 @@ pt:
   you_have_submitted_the_assignment_7ef8a51a: "Enviou a tarefa"
   you_have_unsynced_changes_that_will_sync_to_all_as_9028e711: "Você possui alterações não sincronizadas que serão sincronizadas com todos os cursos associados quando uma nova associação for guardada."
   you_just_sent_a_message_in_canvas_86b4945c: "Acabou de enviar uma mensagem no Canvas"
+  you_left_the_required_name_field_empty_8f9bce5c: "Você deixou o campo de nome obrigatório vazio."
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "De certeza que vai querer alguns destes. Qual é a piada de ensinar uma disciplina se ninguém estiver a ouvir?"
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "Vai precisar de um token atualizado, siga os passos nesta ligação, pode precisar de um especialista técnico para ajudar"
   you_may_not_reproduce_or_communicate_any_of_the_co_7636b552: |-
