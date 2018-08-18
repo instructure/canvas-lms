@@ -3,11 +3,13 @@
 --- 
 pl: 
   1_item_scores_5512cd03: "1- Wyniki punktowe elementów"
+  1_item_scores_examplescores_9736236: "1- Wynik elementu: %{exampleScores}"
   1_user_found_76399771: "Znaleziono 1 użytkownika."
   1st_reviewer_3c1d0119: "1szy Recenzent"
   25th_75th_ile_406a67bf: " 25-75 %yl"
   25th_75th_percentile_aa4c11f2: "Percentyl 25-75"
   2_final_score_7b0fd15e: "2- Końcowy wynik"
+  2_final_score_exampleresult_922edf9c: "2- Wynik końcowy: %{exampleResult}"
   2nd_reviewer_94fdbcd: "2gi Recenzent"
   451_message: 
     description: "Nie masz prawa dostępu do niniejszej strony, ponieważ przebywasz w kraju podlegającym ograniczeniom handlowym Stanów Zjednoczonych."
@@ -1629,6 +1631,7 @@ pl:
   affects_viewing_the_publish_course_conclude_course_76d2f601: |-
       Wpływa na wyświetlanie przycisków Opublikuj kurs, Zakończ kurs i Trwale usuń ten kurs.
       Przycisk Trwale usuń ten kurs pojawia się tylko w przypadku kursów utworzonych ręcznie.
+  afghanistan_93_ab06805: "Afganistan (+93)"
   after_48b9d69: Po...
   after_4c71e718: Po
   after_cbb5ebae: Po...
@@ -4024,6 +4027,7 @@ pl:
   cannot_be_present_when_course_id_is_present_785e6a59: "nie może być obecny gdy ID_kursu jest obecne"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Nie można zmienić zastępowanego terminu na datę w zamkniętym okresie oceniania"
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "Nie można zmienić nazwy roli na %{label}: już w użyciu"
+  cannot_change_the_default_term_name_edc2279b: "Nie można zmienić domyślnej nazwy daty"
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Nie można zmienić terminu zastąpienia na datę w zamkniętym okresie oceniania"
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "Nie można zmienić terminu na datę w zamkniętym okresie oceniania"
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: "Nie można zmienić terminu, gdy termin znajduje się w zamkniętym okresie oceniania"
@@ -4191,10 +4195,12 @@ pl:
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Kliknij migawkę, aby powrócić do wersji próbnej zgodnej ze stanem, gdy wykonywano migawkę. Uwaga: Utracisz wszelkie efekty pracy od chwili wykonania migawki; tej operacji nie można cofnąć!"
   click_to_add_a_name_6cf551b0: "Kliknij, aby dodać imię"
   click_to_change_profile_picture_for_display_name_6a4b41db: "Kliknij, aby zmienić zdjęcie profilowe dla %{display_name}"
+  click_to_collapse_outcome_details_1d751617: "Kliknij, aby schować szczegóły wyników"
   click_to_create_a_new_user_for_address_325f6683: "Kliknij, aby utworzyć nowego użytkownika dla %{address}"
   click_to_create_a_new_user_for_login_56d2daf5: "Kliknij, aby utworzyć nowego użytkownika dla %{login}"
   click_to_edit_drag_to_reorder_ab725681: "Kliknij, aby edytować; przeciągnij aby zmienić kolejność"
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Kliknij aby dodać komentarze, jezeli uczeń wybierzę tę odpowiedź"
+  click_to_expand_outcome_details_74a2a967: "Kliknij, aby rozwinąć szczegóły wyników"
   click_to_load_a020891b: "(klinknij aby załadować)"
   click_to_modify_89fa26aa: "Kliknij aby zmienić"
   click_to_order_by_email_ascending_98b1a697: "Kliknij, aby uporządkować rosnąco wg wiadomości"
@@ -9556,6 +9562,7 @@ pl:
   grader_d1198a9c: Oceniający
   grader_graderindex_45e04e57: "Oceniający %{graderIndex}"
   grader_gradernumber_fef5d5cf: "Oceniający %{graderNumber}"
+  grader_index_a55577a2: "Oceniający %{index}"
   grader_is_required_62c88f67: "Wymagany jest oceniający"
   grader_that_determines_final_grade_cc55f20: "Oceniający, który decyduje o ostatecznej ocenie"
   graders_can_view_each_other_s_comments_d836b848: "Oceniający mogą wyświetlać wzajemnie komentarze"
@@ -10321,9 +10328,11 @@ pl:
   hide_key_e8fe1e8c: "Ukryj klucz"
   hide_navigation_menu_f0b3e90: "Ukryj menu nawigacji"
   hide_notes_column_7749f408: "Ukryj kolumnę uwag"
+  hide_outcomes_with_no_results_7e4ce06f: "Schowaj wyniki bez rezultatów"
   hide_score_total_for_assessment_results_d0ef117f: "Nie pokazuj łącznej liczby punktów przy wynikach zadania"
   hide_sidebar_2b5b3776: "Ukryj pasek boczny"
   hide_student_names_3e59e862: "Ukryj nazwy uczestników"
+  hide_students_with_no_results_6a22f991: "Schowaj studentów bez rezultatów"
   hide_sub_accounts_for_account_name_a6de98bd: "Ukryj podkonta dla %{account_name}"
   high_b5cbd048: Wysoki
   high_contrast_description: |-
@@ -10803,6 +10812,7 @@ pl:
       Funkcje, ustawienia i style o większym znaczeniu, w szczególności w środowisku K-12. Obecnie odnosi się to jedynie do
       niektórych zmian stylu, jednak więcej elementów charakterystycznych dla K-12 może zostać w przyszłości dodanych.
   k_2521301c: k
+  kazakhstan_7_8fe892c: "Kazachstan (+7)"
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "Należy pamiętać, że ten przesłany materiał będzie uwzględniony dla każdego w grupie %{groupType}."
   keep_submissions_anonymous_5cbaf419: "Nie wyświetlaj autora przesłanego zadania"
   kenya_254_2945663a: "Kenia (+254)"
@@ -10819,6 +10829,7 @@ pl:
   kind_7f0a88c4: Typ
   labels: 
     lock_module_until: "Zablokuj do"
+  last_assessment_cd5659b6: "Ostatnia ocena: "
   last_changed_b544504d: "Ostatnia zmiana:"
   last_changed_date_82f1ce56: "Ostatnia zmiana: %{date}"
   last_day_attended_b72d623c: "Ostatni dzień uczestnictwa"
@@ -13693,6 +13704,7 @@ pl:
   new_course_role_6a7bb75f: "Nowa rola kursu"
   new_criterion_6054bc7f: "Nowe kryterium"
   new_criterion_canceled_d8c2a655: "Anulowano nowe kryterium"
+  new_discussion_dae4fae3: "Nowa dyskusja"
   new_event_for_course_name_2ba1f734: "Nowe wydarzenie dla kursu %{course_name}"
   new_export_3ab758: "Nowe eksportowanie"
   new_features_for_developer_key_management_994090dc: "Nowe funkcje do zarządzania kluczami deweloperów"
@@ -13796,6 +13808,7 @@ pl:
   no_subject_58b7941c: "Brak tematu"
   no_subject_970aad80: "Brak tematu"
   no_submission_for_assignment_a9cb6fe2: "Brak przesłanych materiałów dla %{assignment}"
+  no_submissions_164cea23: "Brak zgłoszeń"
   no_terms_eab5ee7b: "Brak warunków"
   no_tls_618add1a: "Brak TLS"
   no_unassigned_terms_deb7b76b: "Brak nieprzypisanych terminów"
@@ -14534,7 +14547,7 @@ pl:
     cannot_unpublish_front_page: "Nie można cofnąć publikacji pierwszej strony"
     delete_button: Usuń
     delete_confirmation: "Czy na pewno chcesz usunąć tę stronę?"
-    delete_dialog_title: "Usuń stronę typu Wiki"
+    delete_dialog_title: "Usuń stronę"
     deleting_button: "Trwa usuwanie..."
     edit_dialog_title: "Edytuj stronę"
     errors: 
@@ -17646,6 +17659,7 @@ pl:
   rubrics_b5ef369b: "Kryteria ocen"
   running_c5a4998d: Uruchomiono
   russia_7_87bc99d5: "Rosja (+7)"
+  rwanda_250_1a6b344b: "Rwanda (+250)"
   salesforce_account_id_eb5c78ad: "Identyfikator konta Salesforce"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce posiada inny host logowania dla kont sandbox niż w przypadku kont produkcji, więc jeśli używasz konta Salesforce sandbox i nie zaznaczysz tego pola, nie będzie w stanie uwierzytelnić (działa to również w drugą stronę - jeśli posiadasz konto produkcyjne i zaznaczysz to pole - nie będzie mógł uwierzytelnić)"
   salesforce_ticketing_webtocase_connector_80f75716: "Łącznik biletów WebToCase Salesforce"
@@ -19376,6 +19390,7 @@ pl:
     update_grade: "Aktualizuj ocenę"
     view_rubric_assessment_in_the_speedgrader: "Pokaż ocenianie wg kryteriów ocen w programie SpeedGrader"
   submission_in_another_grading_period_e754b329: "Składanie w innym okresie klasyfikacji"
+  submission_index_e960f9bf: "Podanie %{index}"
   submission_options_5184a65b: "Opcje wysyłki"
   submission_score_b7a291e8: "wynik przesłanego zadania"
   submission_status_3079e730: "Stan przesłania"
@@ -19870,6 +19885,7 @@ pl:
   there_was_a_problem_updating_the_comment_5f3595b9: "Wystąpił problem z aktualizowanie komentarza"
   there_was_a_problem_updating_the_grade_1b6c8b4c: "Wystąpił problem z aktualizacją oceny."
   there_was_a_problem_updating_the_submission_6e5280a1: "Wystąpił problem z aktualizacją tych materiałów."
+  there_was_an_error_fetching_course_statistics_96e9dbad: "Wystąpił błąd podczas pobierania statystyk kursu"
   there_was_an_error_fetching_outcome_results_45c57590: "Wystąpił problem z pobieraniem wyników."
   there_was_an_error_fetching_submission_comments_ce153077: "Wystąpił błąd z pobieraniem komentarzy do przesłanych materiałów"
   there_was_an_error_generating_the_pairing_code_9edd639b: "Wystąpił błąd podczas generowania kodu parowania"
@@ -20287,6 +20303,7 @@ pl:
   to_access_the_account_courses_page_courses_view_li_e1da6165: "Aby uzyskać dostęp do strony konta Kursy, należy włączyć uprawnienia Kursy - Wyświetl listę."
   to_access_the_assignments_index_page_course_conten_a5b00f98: "Aby uzyskać dostęp do strony Indeks zadań, należy włączyć opcję Zawartość kursu - Wyświetl. Aby rozróżnić między zadania dla poszczególnych uczestników, należy włączyć także opcję Użytkownicy - Wyświetl listę."
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "Aby uzyskać dostęp do strony Ludzie i wyświetlić grupy, należy także włączyć uprawnienie Użytkownicy - Wyświetl listę."
+  to_access_the_people_page_users_view_list_must_be__2f01333b: "Aby uzyskać dostęp do strony Ludzie, należy także włączyć uprawnienie Użytkownicy - Wyświetl listę. Jeśli to uprawnienie jest włączone oraz wyłączono opcję Użytkownicy - Wyświetl główny adres e-mail, użytkownicy będą wyświetlać adresy e-mail używane jako loginy. Aby wyświetlić identyfikatory logowania, należy również włączyć użytkowników - dodać/ usunąć studentów w kursach i użytkowników – dodać / usunąć nauczycieli, projektantów kursów lub TA w kursach."
   to_access_the_people_page_users_view_list_must_be__5a5475fe: "Aby uzyskać dostęp do strony Ludzie, należy także włączyć uprawnienie Użytkownicy - Wyświetl listę."
   to_access_the_people_page_users_view_list_must_be__756d7188: |-
       Aby uzyskać dostęp do strony Ludzie, należy także włączyć uprawnienie Użytkownicy - Wyświetl listę.
@@ -20346,6 +20363,7 @@ pl:
   to_differentiate_assignments_to_individual_student_6cc40fde: "Aby rozróżnić między zadania dla poszczególnych uczestników, należy włączyć także opcję Użytkownicy - Wyświetl listę."
   to_do_1d554f36: "Lista zadań"
   to_do_5526f10a: "Lista zadań:"
+  to_do_6ac7b2dc: "do zrobienia:"
   to_do_date_d6b79bfd: "Lista zadań %{date}"
   to_do_date_ddfb582c: "Lista zadań:"
   to_do_items_loading_d1cdfcd5: "Wczytywanie listy zadań"
@@ -21698,6 +21716,7 @@ pl:
   you_have_submitted_the_assignment_7ef8a51a: "Przesłałeś zadanie"
   you_have_unsynced_changes_that_will_sync_to_all_as_9028e711: "Masz niezsynchronizowane zmiany, które zostaną przesłane do wszystkich powiązanych kursów po zapisaniu nowego powiązania."
   you_just_sent_a_message_in_canvas_86b4945c: "Właśnie wysłałeś wiadomość w systemie Canvas."
+  you_left_the_required_name_field_empty_8f9bce5c: "Zostały nieuzupełnione pola z nazwą."
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "Na pewno przydadzą się uczestnicy. Prowadzenie kursu bez nich nie jest żadną przyjemnością."
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "Potrzebujesz odświeżonego tokena, postępuj zgodnie z krokami zawartymi w tym linku, może będziesz wymagać pomocy eksperta technicznego"
   you_may_not_reproduce_or_communicate_any_of_the_co_7636b552: |-
