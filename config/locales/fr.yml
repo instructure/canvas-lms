@@ -3,11 +3,13 @@
 --- 
 fr: 
   1_item_scores_5512cd03: "1- Notes par élément"
+  1_item_scores_examplescores_9736236: "1- Score de l'élément : %{exampleScores}"
   1_user_found_76399771: "1 utilisateur trouvé."
   1st_reviewer_3c1d0119: "1er examinateur"
   25th_75th_ile_406a67bf: "25e-75e Centile"
   25th_75th_percentile_aa4c11f2: "25e-75e Centile"
   2_final_score_7b0fd15e: "2- Note finale"
+  2_final_score_exampleresult_922edf9c: "2- Score final : %{exampleResult}"
   2nd_reviewer_94fdbcd: "2ème examinateur"
   451_message: 
     description: "Vous n’êtes pas autorisé à accéder à ce site, parce que vous vous trouvez dans un pays soumis aux restrictions américaines sur les échanges commerciaux."
@@ -1611,6 +1613,7 @@ fr:
   affects_viewing_the_publish_course_conclude_course_76d2f601: |-
       Affecte l'affichage des boutons Publier le cours, Terminer le cours et Supprimer définitivement ce cours.
       Le bouton Supprimer définitivement ce cours n'apparaît que pour les cours créés manuellement.
+  afghanistan_93_ab06805: "Afghanistan (+93)"
   after_48b9d69: Après...
   after_4c71e718: Après
   after_cbb5ebae: Après...
@@ -3990,6 +3993,7 @@ fr:
   cannot_be_present_when_course_id_is_present_785e6a59: "ne peut être présent lorsque course_id est présente"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Impossible de déplacer une date limite substituée dans une période non ouverte à la notation"
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "Impossible de changer le nom du rôle par %{label} : déjà utilisé"
+  cannot_change_the_default_term_name_edc2279b: "Impossible de changer le nom du trimestre par défaut"
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Impossible de déplacer la date limite d'une substitution dans une période non ouverte à la notation"
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "Impossible de déplacer la date limite dans une période non ouverte à la notation "
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: "Impossible de changer une date limite située dans une période non ouverte à la notation"
@@ -4157,10 +4161,12 @@ fr:
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Cliquez sur un point de restauration pour revenir à votre essai tel qu’il était au moment où le point a été enregistré. Remarque : Vous perdrez tout travail effectué depuis que ce point de restauration a été enregistré. Cette opération ne peut être annulée."
   click_to_add_a_name_6cf551b0: "Cliquez pour ajouter un nom"
   click_to_change_profile_picture_for_display_name_6a4b41db: "Cliquez pour changer la photo de profil de %{display_name}"
+  click_to_collapse_outcome_details_1d751617: "Cliquez pour réduire les détails des résultats"
   click_to_create_a_new_user_for_address_325f6683: "Cliquez pour créer un nouvel utilisateur pour %{address}"
   click_to_create_a_new_user_for_login_56d2daf5: "Cliquez pour créer un nouvel utilisateur pour %{login}"
   click_to_edit_drag_to_reorder_ab725681: "Cliquez dans une page pour la modifier, ou faites-la glisser pour la classer"
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Cliquer pour saisir des commentaires, si l'étudiant choisit cette réponse"
+  click_to_expand_outcome_details_74a2a967: "Cliquez pour agrandir les détails des résultats"
   click_to_load_a020891b: "(cliquer pour charger)"
   click_to_modify_89fa26aa: "Cliquer pour modifier"
   click_to_order_by_email_ascending_98b1a697: "Cliquez pour commander par email en ordre croissant"
@@ -9368,6 +9374,7 @@ fr:
   grader_d1198a9c: Correcteur
   grader_graderindex_45e04e57: "Correcteur %{graderIndex}"
   grader_gradernumber_fef5d5cf: "Correcteur %{graderNumber}"
+  grader_index_a55577a2: "Correcteur %{index}"
   grader_is_required_62c88f67: "Une note est requise"
   grader_that_determines_final_grade_cc55f20: "Une note qui détermine la note finale"
   graders_can_view_each_other_s_comments_d836b848: "Les correcteurs peuvent consulter les commentaires des uns et des autres."
@@ -10115,9 +10122,11 @@ fr:
   hide_key_e8fe1e8c: "Masquer la clé"
   hide_navigation_menu_f0b3e90: "Masquer le menu de navigation"
   hide_notes_column_7749f408: "Masquer les colonnes de notes"
+  hide_outcomes_with_no_results_7e4ce06f: "Masquer les acquis sans résultat"
   hide_score_total_for_assessment_results_d0ef117f: "Masquer le total des notes dans les résultats de l’évaluation"
   hide_sidebar_2b5b3776: "Masquer la barre latérale"
   hide_student_names_3e59e862: "Masquer le nom des étudiants"
+  hide_students_with_no_results_6a22f991: "Masquer les élèves qui n'ont pas de résultats"
   hide_sub_accounts_for_account_name_a6de98bd: "Masquer les sous-comptes pour %{account_name}"
   high_b5cbd048: Élevé
   high_contrast_description: |-
@@ -10600,6 +10609,7 @@ fr:
       Des fonctions, des paramètres  et des styles qui sont mieux adaptés à un environnement K-12. Pour le moment, cela
       applique uniquement quelques changements de style, mais d’autres éléments propres au niveau K-12 peuvent être ajoutés par la suite.
   k_2521301c: k
+  kazakhstan_7_8fe892c: "Kazakhstan (+7)"
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "N’oubliez pas que cette soumission comptera pour tous les membres de votre groupe %{groupType}."
   keep_submissions_anonymous_5cbaf419: "Conserver l'anonymat des soumissions"
   kenya_254_2945663a: "Kenya (+254)"
@@ -10616,6 +10626,7 @@ fr:
   kind_7f0a88c4: Type
   labels: 
     lock_module_until: "Verrouiller jusqu'à/au/en"
+  last_assessment_cd5659b6: "Dernière évaluation : "
   last_changed_b544504d: "Dernière modification :"
   last_changed_date_82f1ce56: "Dernière modification : %{date}"
   last_day_attended_b72d623c: "Dernier jour de participation"
@@ -13447,6 +13458,7 @@ fr:
   new_course_role_6a7bb75f: "Nouveau rôle de cours"
   new_criterion_6054bc7f: "Nouveau critère"
   new_criterion_canceled_d8c2a655: "Nouveau critère annulé"
+  new_discussion_dae4fae3: "Nouvelle discussion"
   new_event_for_course_name_2ba1f734: "Nouvel événement pour %{course_name}"
   new_export_3ab758: "Nouvel export"
   new_features_for_developer_key_management_994090dc: "Nouvelles fonctionnalités pour la gestion des clés développeur"
@@ -13555,6 +13567,7 @@ fr:
   no_subject_58b7941c: "Aucun sujet"
   no_subject_970aad80: "Aucun sujet"
   no_submission_for_assignment_a9cb6fe2: "Aucune soumission pour %{assignment}"
+  no_submissions_164cea23: "Aucune soumission"
   no_terms_eab5ee7b: "Aucun terme"
   no_tls_618add1a: "Pas de TLS"
   no_unassigned_terms_deb7b76b: "Aucune période non-assignée"
@@ -14281,7 +14294,7 @@ fr:
     cannot_unpublish_front_page: "Impossible d’annuler la publication de la première page"
     delete_button: Supprimer
     delete_confirmation: "Êtes-vous sûr de vouloir supprimer cette page ?"
-    delete_dialog_title: "Supprimer la page Wiki"
+    delete_dialog_title: "Supprimer la page"
     deleting_button: Suppression...
     edit_dialog_title: "Modifier la page"
     errors: 
@@ -17315,6 +17328,7 @@ fr:
   rubrics_b5ef369b: Barèmes
   running_c5a4998d: "En cours"
   russia_7_87bc99d5: "Russie (+7)"
+  rwanda_250_1a6b344b: "Rwanda (+250)"
   salesforce_account_id_eb5c78ad: "ID de compte Salesforce"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce possède des hôtes de connexion différents pour les comptes test par rapport aux comptes de production, donc si vous utilisiez un compte test de Salesforce et que vous ne cochiez pas cette case, l'authentification deviendrait impossible (et ceci marche dans l'autre sens, si vous aviez un compte de production et que vous cochiez cette case, l'authentification serait aussi impossible)"
   salesforce_ticketing_webtocase_connector_80f75716: "Connecteur de billetterie Salesforce WebToCase"
@@ -19023,6 +19037,7 @@ fr:
     update_grade: "Actualiser la note"
     view_rubric_assessment_in_the_speedgrader: "Afficher l’évaluation par barème dans SpeedGrader"
   submission_in_another_grading_period_e754b329: "Soumission lors d'une autre période de notation"
+  submission_index_e960f9bf: "Soumission %{index}"
   submission_options_5184a65b: "Options de soumission..."
   submission_score_b7a291e8: "Note de l’envoi"
   submission_status_3079e730: "Statut de l'envoi"
@@ -19512,6 +19527,7 @@ fr:
   there_was_a_problem_updating_the_comment_5f3595b9: "Un problème est survenu lors de la mise à jour du commentaire"
   there_was_a_problem_updating_the_grade_1b6c8b4c: "Un problème est survenu lors de la mise à jour de la note."
   there_was_a_problem_updating_the_submission_6e5280a1: "Un problème est survenu pendant la mise à jour de la soumission."
+  there_was_an_error_fetching_course_statistics_96e9dbad: "Une erreur est survenue en récupérant les statistiques du cours."
   there_was_an_error_fetching_outcome_results_45c57590: "Une erreur est survenue lors de l'extraction des résultats"
   there_was_an_error_fetching_submission_comments_ce153077: "Une erreur est survenue pendant la récupération des commentaires de soumission"
   there_was_an_error_generating_the_pairing_code_9edd639b: "Un problème est survenu lors de la génération du code d'appariement."
@@ -19927,6 +19943,7 @@ fr:
   to_access_the_account_courses_page_courses_view_li_e1da6165: "Pour accéder à la page des cours du compte, Cours - afficher la liste doit être activé."
   to_access_the_assignments_index_page_course_conten_a5b00f98: "Pour accéder à la page d'index des Travaux, Contenu du cours - afficher doit être activé. Pour différencier les travaux des élèves individuels, Utilisateurs - afficher la liste doit également être activé."
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "Pour accéder à la page Personnes et afficher les Groupes, Utilisateurs - afficher la liste doit également être activé."
+  to_access_the_people_page_users_view_list_must_be__2f01333b: "Pour accéder à la page Personnes, Utilisateurs - afficher la liste doit être activé. Si cette permission est activée, et si Utilisateurs - afficher l'adresse mail principale est désactivé, les utilisateurs verront les adresses mail utilisées comme identifiants de connexion. Pour afficher les identifiants de connexion, Utilisateurs - ajouter / supprimer des élèves dans les cours et Utilisateurs - ajouter / supprimer des enseignants, des concepteurs de cours ou des aides-enseignants dans les cours doivent également être activés."
   to_access_the_people_page_users_view_list_must_be__5a5475fe: "Pour accéder à la page Personnes, Utilisateurs - afficher la liste doit être activé."
   to_access_the_people_page_users_view_list_must_be__756d7188: |-
       Pour accéder à la page Personnes, Utilisateurs - afficher la liste doit être activé.
@@ -19989,6 +20006,7 @@ fr:
   to_differentiate_assignments_to_individual_student_6cc40fde: "Pour différencier les travaux des élèves individuels, Utilisateurs - afficher la liste doit également être activé."
   to_do_1d554f36: "À faire"
   to_do_5526f10a: "À faire :"
+  to_do_6ac7b2dc: "à faire :"
   to_do_date_d6b79bfd: "À faire %{date}"
   to_do_date_ddfb582c: "Date à faire :"
   to_do_items_loading_d1cdfcd5: "Chargement des éléments de choses à faire"
@@ -21318,6 +21336,7 @@ fr:
   you_have_submitted_the_assignment_7ef8a51a: "Vous avez envoyé le travail"
   you_have_unsynced_changes_that_will_sync_to_all_as_9028e711: "Vous avez des modifications non synchronisées qui seront synchronisées avec tous les cours associés lorsqu'une nouvelle association est enregistrée."
   you_just_sent_a_message_in_canvas_86b4945c: "Vous venez juste d’envoyer un message dans Canvas"
+  you_left_the_required_name_field_empty_8f9bce5c: "Vous avez laissé le champ de nom requis vide."
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "Vous en voudrez vous aussi. Quel est l’intérêt de dispenser un cours si personne n’écoute ?"
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "Vous aurez besoin d'un jeton d'actualisation, suivez les étapes présentées à ce lien, vous pourriez vouloir l'aide d'un expert technique"
   you_may_not_reproduce_or_communicate_any_of_the_co_7636b552: |-
