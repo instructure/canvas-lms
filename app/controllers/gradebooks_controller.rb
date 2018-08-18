@@ -657,6 +657,10 @@ class GradebooksController < ApplicationController
           env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
         end
 
+        unless @assignment.grades_published? || @assignment.can_view_other_grader_identities?(@current_user)
+          env[:current_anonymous_id] = @assignment.moderation_graders.find_by!(user_id: @current_user.id).anonymous_id
+        end
+
         if new_gradebook_enabled?
           env[:selected_section_id] = gradebook_settings.dig(@context.id, 'filter_rows_by', 'section_id')
         end

@@ -58,6 +58,7 @@ class Assignment
         :include_root => false
       )
       res['anonymize_students'] = @assignment.anonymize_students?
+      res['anonymize_graders'] = !@assignment.can_view_other_grader_identities?(@current_user)
 
       # include :provisional here someday if we need to distinguish
       # between provisional and real comments (also in

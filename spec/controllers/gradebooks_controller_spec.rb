@@ -1800,6 +1800,49 @@ describe GradebooksController do
       get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
       expect(assigns[:js_env][:anonymous_identities]).to have_key anonymous_id
     end
+
+    describe 'current_anonymous_id' do
+      before(:each) do
+        user_session(@teacher)
+      end
+
+      context 'for a moderated assignment' do
+        let(:moderated_assignment) do
+          @course.assignments.create!(
+            moderated_grading: true,
+            grader_count: 1,
+            final_grader: @teacher
+          )
+        end
+
+        it 'is set to the anonymous ID for the viewing grader if grader identities are concealed' do
+          moderated_assignment.update!(grader_names_visible_to_final_grader: false)
+          moderated_assignment.moderation_graders.create!(user: @teacher, anonymous_id: 'zxcvb')
+
+          get 'speed_grader', params: {course_id: @course, assignment_id: moderated_assignment}
+          expect(assigns[:js_env][:current_anonymous_id]).to eq 'zxcvb'
+        end
+
+        it 'is not set if grader identities are visible' do
+          get 'speed_grader', params: {course_id: @course, assignment_id: moderated_assignment}
+          expect(assigns[:js_env]).not_to include(:current_anonymous_id)
+        end
+
+        it 'is not set if grader identities are concealed but grades are published' do
+          moderated_assignment.update!(
+            grader_names_visible_to_final_grader: false,
+            grades_published_at: Time.zone.now
+          )
+          get 'speed_grader', params: {course_id: @course, assignment_id: moderated_assignment}
+          expect(assigns[:js_env]).not_to include(:current_anonymous_id)
+        end
+      end
+
+      it 'is not set if the assignment is not moderated' do
+        get 'speed_grader', params: {course_id: @course, assignment_id: @assignment}
+        expect(assigns[:js_env]).not_to include(:current_anonymous_id)
+      end
+    end
   end
 
   describe "POST 'speed_grader_settings'" do

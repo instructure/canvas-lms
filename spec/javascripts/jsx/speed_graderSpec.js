@@ -4447,4 +4447,250 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       })
     })
   })
+
+  QUnit.module('a moderated assignment with a rubric', hooks => {
+    let originalJsonData
+    let moderatorProvisionalGrade
+    let provisionalGraderProvisionalGrade
+    let otherGraderProvisionalGrade
+    let submission
+    let student
+    let testJsonData
+
+    hooks.beforeEach(() => {
+      fakeENV.setup({
+        ...ENV,
+        anonymous_identities: {
+          'aaaaa': { id: 'aaaaa', name: 'Grader 1' },
+          'bbbbb': { id: 'bbbbb', name: 'Grader 2' },
+          'zzzzz': { id: 'zzzzz', name: 'Grader 3' }
+        },
+        current_anonymous_id: 'zzzzz',
+        current_user_id: '1',
+        RUBRIC_ASSESSMENT: {
+          assessment_type: 'grading',
+          assessor_id: '1'
+        }
+      })
+
+      moderatorProvisionalGrade = {
+        provisional_grade_id: '1',
+        scorer_id: '1',
+        scorer_name: 'Urd',
+        readonly: true,
+        rubric_assessments: [
+          {
+            id: '1',
+            assessor_id: '1',
+            assessor_name: 'Urd',
+            data: [{ points: 2, criterion_id: '9' }]
+          }
+        ]
+      }
+
+      provisionalGraderProvisionalGrade = {
+        provisional_grade_id: '3',
+        scorer_id: '3',
+        scorer_name: 'Verdandi',
+        readonly: true,
+        rubric_assessments: [
+          {
+            id: '3',
+            assessor_id: '3',
+            assessor_name: 'Verdandi',
+            data: [{ points: 4, criterion_id: '9' }]
+          }
+        ]
+      }
+
+      otherGraderProvisionalGrade = {
+        provisional_grade_id: '2',
+        scorer_id: '2',
+        scorer_name: 'Skuld',
+        readonly: true,
+        rubric_assessments: [
+          {
+            id: '2',
+            assessor_id: '2',
+            assessor_name: 'Skuld',
+            data: [{ points: 4, criterion_id: '9' }]
+          }
+        ]
+      }
+
+      submission = {
+        user_id: '10',
+        provisional_grades: [moderatorProvisionalGrade, otherGraderProvisionalGrade, provisionalGraderProvisionalGrade]
+      }
+
+      student = {
+        id: '10',
+        name: 'Sextus Student',
+        rubric_assessments: []
+      }
+
+      testJsonData = {
+        context: {
+          students: [student],
+          enrollments: [{user_id: '10', workflow_state: 'active', course_setion_id: 1}],
+          active_course_sections: [{ id: 1, name: 'The Only Section' }],
+        },
+        submissions: [submission],
+        rubric_association: {},
+        anonymous_grader_ids: ['zzzzz', 'bbbbb', 'aaaaa']
+      }
+
+      originalJsonData = window.jsonData
+
+      setupFixtures(`
+        <div id="rubric_summary_holder">
+          <div id="rubric_assessments_list_and_edit_button_holder">
+            <span id="rubric_assessments_list">
+              <select id="rubric_assessments_select"></select>
+            </span>
+          </div>
+          <div id="rubric_summary_container">
+            <div class="button-container">
+              <div class="edit"></div>
+            </div>
+          </div>
+        </div>
+        <select id="rubric_assessments_select">
+        </select>
+        <div id="rubric_summary_container">
+        </div>
+      `)
+
+      const getFromCache = sinon.stub(JQuerySelectorCache.prototype, 'get');
+      getFromCache.withArgs('#rubric_full').returns($('#rubric_full'));
+      getFromCache.withArgs('#rubric_assessments_select').returns($('#rubric_assessments_select'));
+
+      sandbox.stub(SpeedGrader.EG, 'handleFragmentChanged')
+    })
+
+    hooks.afterEach(() => {
+      SpeedGrader.EG.handleFragmentChanged.restore()
+      JQuerySelectorCache.prototype.get.restore();
+
+      window.jsonData = originalJsonData
+      SpeedGrader.teardown()
+      window.location.hash = ''
+      teardownFixtures()
+    })
+
+    QUnit.module('when the viewer is a provisional grader', graderHooks => {
+      const finishSetup = () => {
+        SpeedGrader.setup()
+        window.jsonData = testJsonData
+        SpeedGrader.EG.jsonReady()
+        SpeedGrader.EG.currentStudent = student
+        SpeedGrader.EG.showRubric()
+      }
+
+      graderHooks.beforeEach(() => {
+        fakeENV.setup({
+          ...ENV,
+          current_anonymous_id: 'bbbbb',
+          current_user_id: '3',
+          grading_role: 'provisional_grader'
+        })
+      })
+
+      test('shows a button to edit the assessment', () => {
+        finishSetup()
+        ok($('#rubric_assessments_list_and_edit_button_holder .edit').is(':visible'))
+      })
+
+      test('hides the dropdown for selecting rubrics', () => {
+        finishSetup()
+        notOk($('#rubric_assessments_select').is(':visible'))
+      })
+    })
+
+    QUnit.module('when the viewer is a moderator', graderHooks => {
+      const finishSetup = () => {
+        SpeedGrader.setup()
+        window.jsonData = testJsonData
+        SpeedGrader.EG.jsonReady()
+        SpeedGrader.EG.currentStudent = testJsonData.context.students[0]
+        SpeedGrader.EG.setupProvisionalGraderDisplayNames()
+        SpeedGrader.EG.setCurrentStudentRubricAssessments()
+        SpeedGrader.EG.showRubric()
+      }
+
+      graderHooks.beforeEach(() => {
+        fakeENV.setup({
+          ...ENV,
+          grading_role: 'moderator'
+        })
+      })
+
+      test('shows all available rubrics in the dropdown', () => {
+        finishSetup()
+        strictEqual($('#rubric_assessments_select option').length, 3)
+      })
+
+      test('includes the moderator-submitted assessment at the top', () => {
+        finishSetup()
+        strictEqual($('#rubric_assessments_select option').first().val(), '1')
+      })
+
+      test('includes a blank assessment if the moderator has not submitted one', () => {
+        submission.provisional_grades = [otherGraderProvisionalGrade, provisionalGraderProvisionalGrade]
+
+        finishSetup()
+        strictEqual($('#rubric_assessments_select option:first').val(), '')
+      })
+
+      test('shows a button to edit if the assessment belonging to the moderator is selected', () => {
+        finishSetup()
+
+        $('#rubric_assessments_select').val('1').change()
+        ok($('#rubric_assessments_list_and_edit_button_holder .edit').is(':visible'))
+      })
+
+      test('does not show a button to edit if a different assessment is selected', () => {
+        finishSetup()
+
+        $('#rubric_assessments_select').val('3').change()
+        notOk($('#rubric_assessments_list_and_edit_button_holder .edit').is(':visible'))
+      })
+
+      test('labels the moderator-submitted assessment as "Custom"', () => {
+        finishSetup()
+        strictEqual($('#rubric_assessments_select option[value="1"]').text(), 'Custom')
+      })
+
+      test('appends "Rubric" to the grader name in the dropdown if graders are anonymous', () => {
+        testJsonData.anonymize_graders = true
+        moderatorProvisionalGrade.anonymous_grader_id = 'zzzzz'
+        moderatorProvisionalGrade.rubric_assessments[0].anonymous_assessor_id = 'zzzzz'
+        otherGraderProvisionalGrade.anonymous_grader_id = 'aaaaa'
+        otherGraderProvisionalGrade.rubric_assessments[0].anonymous_assessor_id = 'aaaaa'
+        provisionalGraderProvisionalGrade.anonymous_grader_id = 'bbbbb'
+        provisionalGraderProvisionalGrade.rubric_assessments[0].anonymous_assessor_id = 'bbbbb'
+
+        finishSetup()
+        strictEqual($('#rubric_assessments_select option[value="3"]').text(), 'Grader 2 Rubric')
+      })
+
+      test('does not append "Rubric" to the grader name in the dropdown if grader names are shown', () => {
+        finishSetup()
+        strictEqual($('#rubric_assessments_select option[value="3"]').text(), 'Verdandi')
+      })
+
+      test('defaults to the assessment by the moderator if there is one', () => {
+        finishSetup()
+        strictEqual($('#rubric_assessments_select').val(), '1')
+      })
+
+      test('defaults to the first assessment of type "grading" if the moderator does not have one', () => {
+        submission.provisional_grades = [otherGraderProvisionalGrade, provisionalGraderProvisionalGrade]
+        provisionalGraderProvisionalGrade.rubric_assessments[0].assessment_type = 'grading'
+
+        finishSetup()
+        strictEqual($('#rubric_assessments_select').val(), '3')
+      })
+    })
+  })
 })

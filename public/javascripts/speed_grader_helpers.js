@@ -26,6 +26,10 @@ export function setupIsAnonymous ({anonymize_students}) {
   return anonymize_students
 }
 
+export function setupAnonymousGraders ({anonymize_graders}) {
+  return anonymize_graders
+}
+
 export function setupAnonymizableId (isAnonymous) {
   return isAnonymous ? 'anonymous_id' : 'id'
 }
@@ -174,6 +178,7 @@ export function setupAnonymizableAuthorId (isAnonymous) {
     },
 
     setupIsAnonymous,
+    setupAnonymousGraders,
     setupAnonymizableId,
     setupAnonymizableUserId,
     setupAnonymizableStudentId,

@@ -93,6 +93,11 @@ class RubricAssessmentsController < ApplicationController
             json[:artifact] = @asset.submission.
               as_json(Submission.json_serialization_full_parameters(include_root: false)).
               merge(@asset.grade_attributes)
+
+            if @association_object.moderated_grading? && !@association_object.can_view_other_grader_identities?(@current_user)
+              current_user_moderation_grader = @association_object.moderation_graders.find_by(user: @current_user)
+              json[:anonymous_assessor_id] = current_user_moderation_grader.anonymous_id
+            end
           end
 
           render json: json

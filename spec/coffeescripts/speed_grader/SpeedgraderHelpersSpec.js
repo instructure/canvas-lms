@@ -19,6 +19,7 @@
 import fakeENV from 'helpers/fakeENV'
 import SpeedgraderHelpers, {
   setupIsAnonymous,
+  setupAnonymousGraders,
   setupAnonymizableId,
   setupAnonymizableUserId,
   setupAnonymizableStudentId,
@@ -481,6 +482,21 @@ QUnit.module('SpeedgraderHelpers.setupIsAnonymous', suiteHooks => {
 
   test('returns false when assignment has anonymize_students set to false', () => {
     strictEqual(setupIsAnonymous({anonymize_students: false}), false)
+  })
+})
+
+QUnit.module('SpeedgraderHelpers.setupAnonymousGraders', suiteHooks => {
+  suiteHooks.afterEach(() => {
+    fakeENV.teardown()
+  })
+
+  test('returns true when assignment has anonymize_graders set to true', () => {
+    strictEqual(setupAnonymousGraders({anonymize_graders: true}), true)
+    fakeENV.teardown()
+  })
+
+  test('returns false when assignment has anonymize_graders set to false', () => {
+    strictEqual(setupAnonymousGraders({anonymize_graders: false}), false)
   })
 })
 

@@ -1468,6 +1468,10 @@ describe Assignment::SpeedGrader do
         submission_1.add_comment(author: student_2, comment: "Sample")
         expect(student_comments).not_to be_empty
       end
+
+      it 'sets anonymize_students to false in the response' do
+        expect(json['anonymize_students']).to be false
+      end
     end
 
     context "when the user cannot view student names" do
@@ -1605,6 +1609,10 @@ describe Assignment::SpeedGrader do
 
           expect(returned_anonymous_ids.uniq).to eq [submission.anonymous_id]
         end
+      end
+
+      it 'sets anonymize_students to true in the response' do
+        expect(json['anonymize_students']).to be true
       end
     end
   end
@@ -1892,6 +1900,10 @@ describe Assignment::SpeedGrader do
         ta_assessments = submission_json['final_provisional_grade']['rubric_assessments']
         expect(ta_assessments).to all(include("anonymous_assessor_id" => ta_anonymous_id))
       end
+
+      it 'sets anonymize_graders to true in the response' do
+        expect(json['anonymize_graders']).to be true
+      end
     end
 
     context "when the user is the final grader and can view other grader names" do
@@ -2056,6 +2068,10 @@ describe Assignment::SpeedGrader do
         ta_pg.update!(final: true)
         ta_assessments = submission_json['final_provisional_grade']['rubric_assessments']
         expect(ta_assessments).to all(not_have_key("anonymous_assessor_id"))
+      end
+
+      it 'sets anonymize_graders to false in the response' do
+        expect(json['anonymize_graders']).to be false
       end
     end
 
@@ -2249,6 +2265,10 @@ describe Assignment::SpeedGrader do
         ta_pg.update!(final: true)
         ta_assessments = submission_json['final_provisional_grade']['rubric_assessments']
         expect(ta_assessments).to all(include("anonymous_assessor_id" => ta_anonymous_id))
+      end
+
+      it 'sets anonymize_graders to true in the response' do
+        expect(json['anonymize_graders']).to be true
       end
     end
 
@@ -2487,6 +2507,10 @@ describe Assignment::SpeedGrader do
         ta_pg.update!(final: true)
         ta_assessments = submission_json['final_provisional_grade']['rubric_assessments']
         expect(ta_assessments).to all(not_have_key("anonymous_assessor_id"))
+      end
+
+      it 'sets anonymize_graders to false in the response' do
+        expect(json['anonymize_graders']).to be false
       end
     end
   end

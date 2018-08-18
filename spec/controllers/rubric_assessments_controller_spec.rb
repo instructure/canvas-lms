@@ -229,6 +229,28 @@ describe RubricAssessmentsController do
           expect(response_json.dig('errors', 'error_code')).to eq 'MAX_GRADERS_REACHED'
         end
       end
+
+      describe 'returned JSON' do
+        before(:each) do
+          assignment.moderation_graders.create!(user: provisional_grader, anonymous_id: 'noooo')
+        end
+
+        it 'includes the anonymous assessor ID if the caller cannot view grader names' do
+          assignment.update!(graders_anonymous_to_graders: true)
+          user_session(provisional_grader)
+          put(:update, params: update_params(assessor: provisional_grader))
+
+          expect(json_parse['anonymous_assessor_id']).to eq 'noooo'
+        end
+
+        it 'omits the anonymous assessor ID if the caller can view grader names' do
+          assignment.update!(graders_anonymous_to_graders: false)
+          user_session(provisional_grader)
+          put(:update, params: update_params(assessor: provisional_grader))
+
+          expect(json_parse).not_to include 'anonymous_assessor_id'
+        end
+      end
     end
 
     context 'when submitting an assessment for a non-assignment' do

@@ -49,6 +49,7 @@ import SpeedgraderHelpers, {
   setupAnonymizableStudentId,
   setupAnonymizableUserId,
   setupAnonymizableAuthorId,
+  setupAnonymousGraders,
   setupIsAnonymous
 } from './speed_grader_helpers';
 import turnitinInfoTemplate from 'jst/_turnitinInfo';
@@ -81,6 +82,7 @@ const SPEED_GRADER_SUBMISSION_COMMENTS_DOWNLOAD_MOUNT_POINT = 'speed_grader_subm
 const SPEED_GRADER_SETTINGS_MOUNT_POINT = 'speed_grader_settings_mount_point';
 
 let isAnonymous
+let anonymousGraders
 let anonymizableId
 let anonymizableUserId
 let anonymizableStudentId
@@ -803,6 +805,18 @@ function getSelectedAssessment(){
   ))[0];
 }
 
+function assessmentBelongsToCurrentUser(assessment) {
+  if (!assessment) {
+    return false
+  }
+
+  if (anonymousGraders) {
+    return ENV.current_anonymous_id === assessment.anonymous_assessor_id
+  } else {
+    return ENV.current_user_id === assessment.assessor_id
+  }
+}
+
 function handleSelectedRubricAssessmentChanged({validateEnteredData = true} = {}) {
   // This function is triggered both when we assess a student and when we switch
   // students. In the former case, we want populateNewRubricSummary to check the
@@ -812,12 +826,16 @@ function handleSelectedRubricAssessmentChanged({validateEnteredData = true} = {}
   // data is switched over to the new student, we don't want to perform the
   // comparison since it could result in specious alerts being shown.
   const editingData = validateEnteredData ? rubricAssessment.assessmentData($("#rubric_full")) : null
+  const selectedAssessment = getSelectedAssessment()
   rubricAssessment.populateNewRubricSummary(
     $("#rubric_summary_holder .rubric_summary"),
-    getSelectedAssessment(),
+    selectedAssessment,
     jsonData.rubric_association,
     editingData
   );
+
+  const showEditButton = !selectedAssessment || assessmentBelongsToCurrentUser(selectedAssessment)
+  $('#rubric_assessments_list_and_edit_button_holder .edit').showIf(showEditButton)
 }
 
 function initRubricStuff(){
@@ -1140,6 +1158,7 @@ EG = {
 
   jsonReady: function(){
     isAnonymous = setupIsAnonymous(jsonData)
+    anonymousGraders = setupAnonymousGraders(jsonData)
     anonymizableId = setupAnonymizableId(isAnonymous)
     anonymizableUserId = setupAnonymizableUserId(isAnonymous)
     anonymizableStudentId = setupAnonymizableStudentId(isAnonymous)
@@ -1334,6 +1353,49 @@ EG = {
     }
   },
 
+  setCurrentStudentRubricAssessments () {
+    // currentStudent.rubric_assessments only includes assessments submitted
+    // by the current user, so if the viewer is a moderator, get other
+    // graders' assessments from their provisional grades.
+    const provisionalAssessments = []
+
+    // If the moderator has just saved a new assessment, this array will have
+    // entries not present elsewhere, so don't clobber them.
+    const currentAssessmentsById = {}
+    if (this.currentStudent.rubric_assessments) {
+      this.currentStudent.rubric_assessments.forEach(assessment => {
+        currentAssessmentsById[assessment.id] = true
+      })
+    }
+
+    currentStudentProvisionalGrades().forEach(grade => {
+      // TODO: decide what to do if a provisional grade contains multiple
+      // assessments (currently we're not sure if this can actually happen
+      // for a moderated assignment).
+      if (grade.rubric_assessments && grade.rubric_assessments.length > 0) {
+        // Add the assessor display name to the assessment while we have easy
+        // access to the provisional grade data
+        const assessment = grade.rubric_assessments[0]
+        assessment.assessor_name = provisionalGraderDisplayNames[grade.provisional_grade_id]
+        if (!currentAssessmentsById[assessment.id]) {
+          provisionalAssessments.push(assessment)
+        }
+      }
+    })
+
+    if (provisionalAssessments.length > 0) {
+      if (!this.currentStudent.rubric_assessments) {
+        this.currentStudent.rubric_assessments = []
+      }
+
+      this.currentStudent.rubric_assessments = this.currentStudent.rubric_assessments.concat(provisionalAssessments)
+    }
+
+    if (anonymousGraders) {
+      this.currentStudent.rubric_assessments.sort((a, b) => natcompare.strings(a.anonymous_assessor_id, b.anonymous_assessor_id))
+    }
+  },
+
   showStudent: function(){
     $rightside_inner.scrollTo(0);
     if (this.currentStudent.submission_state == 'not_gradeable' && ENV.grading_role == "provisional_grader") {
@@ -1344,10 +1406,11 @@ EG = {
       $rightside_inner.show();
     }
     if (ENV.grading_role == "moderator") {
+      this.renderProvisionalGradeSelector({showingNewStudent: true})
+      this.setCurrentStudentRubricAssessments()
+
       this.current_prov_grade_index = null;
       this.removeModerationBarAndShowSubmission();
-
-      this.renderProvisionalGradeSelector({showingNewStudent: true})
 
       const selectedGrade = currentStudentProvisionalGrades().find(grade => grade.selected);
       if (selectedGrade) {
@@ -2136,34 +2199,55 @@ EG = {
     if (jsonData.rubric_association) {
       ENV.RUBRIC_ASSESSMENT.assessment_user_id = this.currentStudent[anonymizableId];
 
-      var assessmentsByMe = $.grep(EG.currentStudent.rubric_assessments, function(n,i){
-        return n.assessor_id === ENV.RUBRIC_ASSESSMENT.assessor_id;
-      });
-      var gradingAssessments = $.grep(EG.currentStudent.rubric_assessments, function(n,i){
-        return n.assessment_type == 'grading';
+      const isModerator = ENV.grading_role === 'moderator'
+      const selectMenuOptions = []
+
+      const assessmentsByMe = EG.currentStudent.rubric_assessments
+        .filter(assessment => assessmentBelongsToCurrentUser(assessment))
+      if (assessmentsByMe.length > 0) {
+        assessmentsByMe.forEach(assessment => {
+          const displayName = isModerator ? customProvisionalGraderLabel : assessment.assessor_name
+          selectMenuOptions.push({ id: assessment.id, name: displayName })
+        })
+      } else if (isModerator) {
+        // Moderators can create a custom assessment if they don't have one
+        selectMenuOptions.push({ id: '', name: customProvisionalGraderLabel })
+      }
+
+      const assessmentsByOthers = EG.currentStudent.rubric_assessments
+        .filter(assessment => !assessmentBelongsToCurrentUser(assessment))
+
+      assessmentsByOthers.forEach(assessment => {
+        // Display anonymous graders as "Grader 1 Rubric" (but don't use the
+        // "Rubric" suffix for named graders)
+        let displayName = assessment.assessor_name
+        if (anonymousGraders) {
+          displayName += ' Rubric'
+        }
+
+        selectMenuOptions.push({ id: assessment.id, name: displayName })
       });
 
       selectMenu.find("option").remove();
-      $.each(this.currentStudent.rubric_assessments, function(){
-        selectMenu.append(`<option value="${htmlEscape(this.id)}">${htmlEscape(this.assessor_name)}</option>`);
-      });
+      selectMenuOptions.forEach(option => {
+        selectMenu.append(`<option value="${htmlEscape(option.id)}">${htmlEscape(option.name)}</option>`)
+      })
 
-      //select the assessment that meets these rules:
-      // 1. the assessment by me
-      // 2. the assessment with assessment_type = 'grading'
-      var idToSelect = null;
-      if (gradingAssessments.length) {
-        idToSelect = gradingAssessments[0].id;
-      }
-      if (assessmentsByMe.length) {
-        idToSelect = assessmentsByMe[0].id;
-      }
-      if (idToSelect) {
-        selectMenu.val(idToSelect);
+      let idToSelect = ''
+      if (assessmentsByMe.length > 0) {
+        idToSelect = assessmentsByMe[0].id
+      } else {
+        const gradingAssessment = EG.currentStudent.rubric_assessments
+          .find(assessment => assessment.assessment_type === 'grading')
+
+        if (gradingAssessment) {
+          idToSelect = gradingAssessment.id
+        }
       }
 
-      // hide the select box if there is not >1 option
-      $("#rubric_assessments_list").showIf(selectMenu.find("option").length > 1);
+      selectMenu.val(idToSelect)
+      $("#rubric_assessments_list").showIf(isModerator || selectMenu.find("option").length > 1);
+
       handleSelectedRubricAssessmentChanged({validateEnteredData});
     }
   },
