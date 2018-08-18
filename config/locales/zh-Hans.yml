@@ -3,11 +3,13 @@
 --- 
 zh-Hans: 
   1_item_scores_5512cd03: "1- 项目分数"
+  1_item_scores_examplescores_9736236: "1- 项目评分：%{exampleScores}"
   1_user_found_76399771: "找到 1 个用户"
   1st_reviewer_3c1d0119: 第1个审阅者
   25th_75th_ile_406a67bf: "第25-75个 %i点"
   25th_75th_percentile_aa4c11f2: 第25-75百分点
   2_final_score_7b0fd15e: "2- 最终分数"
+  2_final_score_exampleresult_922edf9c: "2- 最终评分：%{exampleResult}"
   2nd_reviewer_94fdbcd: 第2个审阅者
   451_message: 
     description: 因为您所在的国家/地区受美国贸易限制的约束，您无法获得此网站的访问授权。
@@ -1611,6 +1613,7 @@ zh-Hans:
   affects_viewing_the_publish_course_conclude_course_76d2f601: |-
       影响查看“发布课程”、“结束课程”和“永久删除此课程”按钮。
       “永久删除此课程”按钮仅对手动创建的课程显示。
+  afghanistan_93_ab06805: "阿富汗 (+93)"
   after_48b9d69: "...之后"
   after_4c71e718: 之后
   after_cbb5ebae: "...之后"
@@ -3971,6 +3974,7 @@ zh-Hans:
   cannot_be_present_when_course_id_is_present_785e6a59: course_id，不能呈现。
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: 无法把置换项截止日期更改为关闭评分周期内的日期
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "无法将角色名称更改为 %{label}：已经使用"
+  cannot_change_the_default_term_name_edc2279b: 无法更改默认学期名称
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: 无法更改关闭评分周期内的置换项截止日期
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: 无法把截止日期更改为关闭评分周期内的日期
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: 无法更改截止于关闭评分周期内的截止日期
@@ -4138,10 +4142,12 @@ zh-Hans:
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: 单击快照以退回到捕捉快照时的测试。注意：已经捕捉快照且无法取消，因此您将丢失您已经完成的任何工作！
   click_to_add_a_name_6cf551b0: 单击以添加名称
   click_to_change_profile_picture_for_display_name_6a4b41db: "单击以更改个人资料照片%{display_name}"
+  click_to_collapse_outcome_details_1d751617: 点击以折叠结果详情
   click_to_create_a_new_user_for_address_325f6683: "单击以为……创建新用户%{address}"
   click_to_create_a_new_user_for_login_56d2daf5: "单击以为……创建新用户%{login}"
   click_to_edit_drag_to_reorder_ab725681: 单击可编辑，拖放可重新排序
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: 如果学生选择此答案，点击此处，输入评论
+  click_to_expand_outcome_details_74a2a967: 点击以扩展结果详情
   click_to_load_a020891b: (点击加载)
   click_to_modify_89fa26aa: 点击修改
   click_to_order_by_email_ascending_98b1a697: 点击以按电子邮件升序排序
@@ -9331,6 +9337,7 @@ zh-Hans:
   grader_d1198a9c: 评分器
   grader_graderindex_45e04e57: "评分人%{graderIndex}"
   grader_gradernumber_fef5d5cf: "评分器%{graderNumber}"
+  grader_index_a55577a2: "评分人%{index}"
   grader_is_required_62c88f67: 评分人必填
   grader_that_determines_final_grade_cc55f20: 确定最终评分的评分人
   graders_can_view_each_other_s_comments_d836b848: 评分人可以查看彼此的评论
@@ -10080,9 +10087,11 @@ zh-Hans:
   hide_key_e8fe1e8c: 隐藏密钥
   hide_navigation_menu_f0b3e90: 隐藏导航菜单
   hide_notes_column_7749f408: 隐藏备注栏
+  hide_outcomes_with_no_results_7e4ce06f: 隐藏没有成绩的结果
   hide_score_total_for_assessment_results_d0ef117f: 隐藏测验结果的总分
   hide_sidebar_2b5b3776: 隐藏侧栏
   hide_student_names_3e59e862: 隐藏学生姓名
+  hide_students_with_no_results_6a22f991: 隐藏没有成绩的学生
   hide_sub_accounts_for_account_name_a6de98bd: "隐藏子帐户%{account_name}"
   high_b5cbd048: 高的
   high_contrast_description: "高对比度增强了用户界面 (文本、按钮等) 的颜色对比，使得这些项目更加不同和更容易识别。注意：禁用机构的品牌推广。"
@@ -10554,6 +10563,7 @@ zh-Hans:
       在 K-12 环境中特别有用的功能、设置和样式。目前，这仅仅
       适用某些样式更改，但将来可能会添加更多特定于 K-12 的内容。
   k_2521301c: k
+  kazakhstan_7_8fe892c: "哈萨克斯坦 (+7)"
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "请记住，此提交项将会计入您的%{groupType}小组中的每个人上。"
   keep_submissions_anonymous_5cbaf419: 保持匿名提交
   kenya_254_2945663a: "肯尼亚 (+254)"
@@ -10570,6 +10580,7 @@ zh-Hans:
   kind_7f0a88c4: 类型、种类
   labels: 
     lock_module_until: 锁定直到
+  last_assessment_cd5659b6: 最后一次评估：
   last_changed_b544504d: 上次更改日期：
   last_changed_date_82f1ce56: "上次更改日期：%{date}"
   last_day_attended_b72d623c: 上次出勤日期
@@ -13398,6 +13409,7 @@ zh-Hans:
   new_course_role_6a7bb75f: 新建课程角色
   new_criterion_6054bc7f: 新标准
   new_criterion_canceled_d8c2a655: 已取消新标准
+  new_discussion_dae4fae3: 新讨论
   new_event_for_course_name_2ba1f734: "%{course_name} 的新活动"
   new_export_3ab758: 新导出
   new_features_for_developer_key_management_994090dc: 开发者密钥管理的新功能
@@ -13501,6 +13513,7 @@ zh-Hans:
   no_subject_58b7941c: 无主题
   no_subject_970aad80: 无主题
   no_submission_for_assignment_a9cb6fe2: "无提交项%{assignment}"
+  no_submissions_164cea23: 无提交项
   no_terms_eab5ee7b: 无学期
   no_tls_618add1a: 没有TLS
   no_unassigned_terms_deb7b76b: 未指定的学期
@@ -14221,7 +14234,7 @@ zh-Hans:
     cannot_unpublish_front_page: 无法取消发布上一页
     delete_button: 删除
     delete_confirmation: 是否确定要删除此页面？
-    delete_dialog_title: 删除维基页面
+    delete_dialog_title: 删除页面
     deleting_button: 正在删除...
     edit_dialog_title: 编辑页面
     errors: 
@@ -17248,6 +17261,7 @@ zh-Hans:
   rubrics_b5ef369b: 评分标准说明
   running_c5a4998d: 正在运行
   russia_7_87bc99d5: "俄罗斯 (+7)"
+  rwanda_250_1a6b344b: "卢旺达 (+250)"
   salesforce_account_id_eb5c78ad: "Salesforce 帐户 ID"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: 销售团队有一个与它的产品帐户不同的登录主机砂盒的帐户，因此，如果您使用的是销售团队的砂盒帐户，而您又没有勾选此复选框，那将无法进行身份验证（相反，这也同样起作用，如果您有一个产品帐户，以及勾选了不会验证的复选框）。
   salesforce_ticketing_webtocase_connector_80f75716: 销售团队的票务WebToCase连接器
@@ -18951,6 +18965,7 @@ zh-Hans:
     update_grade: 更新评分
     view_rubric_assessment_in_the_speedgrader: 在SpeedGrader中查看评分标准测验
   submission_in_another_grading_period_e754b329: 在另一个评分周期提交
+  submission_index_e960f9bf: "提交%{index}"
   submission_options_5184a65b: 提交选项
   submission_score_b7a291e8: 提交项分数
   submission_status_3079e730: 提交状态
@@ -19438,6 +19453,7 @@ zh-Hans:
   there_was_a_problem_updating_the_comment_5f3595b9: 更新评论时出现问题
   there_was_a_problem_updating_the_grade_1b6c8b4c: 更新评分时出现问题。
   there_was_a_problem_updating_the_submission_6e5280a1: 更新作业时出现问题。
+  there_was_an_error_fetching_course_statistics_96e9dbad: 获取课程统计信息时出错
   there_was_an_error_fetching_outcome_results_45c57590: 抓取结果时出错
   there_was_an_error_fetching_submission_comments_ce153077: 提取提交评论时出错
   there_was_an_error_generating_the_pairing_code_9edd639b: 生成配对代码时出错。
@@ -19851,6 +19867,7 @@ zh-Hans:
   to_access_the_account_courses_page_courses_view_li_e1da6165: "要访问帐户“课程”页面，必须启用“课程 - 查看列表”。"
   to_access_the_assignments_index_page_course_conten_a5b00f98: "要访问“作业”索引页面，必须启用“课程内容 - 查看”。要区分个别学生的作业，还必须启用“用户 - 查看列表”。"
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "要访问“人员”页面并查看“组”，还必须启用“用户 - 查看列表”。"
+  to_access_the_people_page_users_view_list_must_be__2f01333b: "要访问“人员”页面，必须启用“用户 - 查看列表”。如果启用此权限，并且如果禁用了“用户 - 查看主要电子邮件地址”，则用户将看到用作登录ID的电子邮件地址。要查看登录 ID，还必须启用“用户 - 在课程中添加/删除学生”和“用户 - 在课程中添加/删除教师、课程设计者或助教。"
   to_access_the_people_page_users_view_list_must_be__5a5475fe: "要访问“人员”页面，必须启用“用户 - 查看列表”。"
   to_access_the_people_page_users_view_list_must_be__756d7188: |-
       要访问“人员”页面，必须启用“用户 - 查看列表”。
@@ -19911,6 +19928,7 @@ zh-Hans:
   to_differentiate_assignments_to_individual_student_6cc40fde: "要区分个别学生的作业，还必须启用“用户 - 查看列表”。"
   to_do_1d554f36: 待办事项
   to_do_5526f10a: 待办事项：
+  to_do_6ac7b2dc: 待办事项：
   to_do_date_d6b79bfd: "待办事项%{date}"
   to_do_date_ddfb582c: 待办日期：
   to_do_items_loading_d1cdfcd5: 正在加载待办事项
@@ -21224,6 +21242,7 @@ zh-Hans:
   you_have_submitted_the_assignment_7ef8a51a: 您已提交了作业。
   you_have_unsynced_changes_that_will_sync_to_all_as_9028e711: 您有未同步的更改将在保存新关联时同步到所有关联课程。
   you_just_sent_a_message_in_canvas_86b4945c: 您在Canvas发送了一条信息
+  you_left_the_required_name_field_empty_8f9bce5c: 您没有填写必填的姓名字段。
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: 您肯定想要这么一些内容。如果没人听讲，教一门课程有何乐趣可言？
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: 您需要一个刷新的令牌，遵循这个链接的步骤。您可能需要一个技术专家帮助。
   you_may_not_reproduce_or_communicate_any_of_the_co_7636b552: 未事先得到您的组织的书面允许，您不可复制或传播此课程的任何内容，包括从此课程中导出的文件。向您的组织索取具体的网络用户协议指南。
