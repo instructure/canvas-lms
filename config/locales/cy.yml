@@ -3,10 +3,12 @@
 --- 
 cy: 
   1_item_scores_5512cd03: "1- Sgoriau eitem"
+  1_item_scores_examplescores_9736236: "1- Sgôr Eitem: %{exampleScores}"
   1st_reviewer_3c1d0119: "Adolygydd 1af"
   25th_75th_ile_406a67bf: "Canradd 25-75"
   25th_75th_percentile_aa4c11f2: "Canradd 25-75"
   2_final_score_7b0fd15e: "2 - Sgôr derfynol"
+  2_final_score_exampleresult_922edf9c: "2- Sgôr Derfynol %{exampleResult}"
   2nd_reviewer_94fdbcd: "2il Adolygydd"
   451_message: 
     description: "Does gennych chi ddim hawl i fynd i’r safle hwn, oherwydd rydych chi mewn gwlad sydd o dan gyfyngiadau masnach Unol Daleithiau America."
@@ -1356,6 +1358,7 @@ cy:
   affects_viewing_the_publish_course_conclude_course_76d2f601: |-
       Yn cael effaith ar weld y botymau Cyhoeddi Cwrs, Dirwyn Cwrs i Ben, a Dileu’r Cwrs Hwn am Byth.
       Dim ond ar gyfer cyrsiau rydych chi wedi’u creu eich hun y mae’r botwm Dileu'r Cwrs Hwn am Byth yn ymddangos.
+  afghanistan_93_ab06805: "Afghanistan (+93)"
   after_48b9d69: "Ar ôl..."
   after_4c71e718: "Ar ôl"
   after_date_981cd41b: "Ar ôl %{date}"
@@ -3443,6 +3446,7 @@ cy:
   cannot_be_present_when_course_id_is_present_785e6a59: "yn methu bod yn bresennol os yw course_id yn bresennol"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Does dim modd newid dyddiad diystyru i ddyddiad sydd o fewn cyfnod graddio sydd wedi dod i ben"
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "Methu newid enw rôl i %{label}: yn cael ei ddefnyddio’n barod"
+  cannot_change_the_default_term_name_edc2279b: "Does dim modd newid enw diofyn y tymor"
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Does dim modd newid dyddiad diystyru sydd o fewn cyfnod graddio sydd wedi dod i ben"
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "Does dim modd newid y dyddiad erbyn i ddyddiad sydd o fewn cyfnod graddio sydd wedi dod i ben"
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: "Does dim modd newid dyddiad erbyn sydd o fewn cyfnod graddio sydd wedi dod i ben"
@@ -3595,10 +3599,12 @@ cy:
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Cliciwch ar giplun i fynd yn ôl i’r treial, fel yr oedd pan wnaed y ciplun. Nodyn: Byddwch yn colli unrhyw waith rydych wedi’i wneud ers y ciplun, a does dim modd dad-wneud hyn!"
   click_to_add_a_name_6cf551b0: "Cliciwch i ychwanegu enw"
   click_to_change_profile_picture_for_display_name_6a4b41db: "Cliciwch i newid llun proffil ar gyfer %{display_name}"
+  click_to_collapse_outcome_details_1d751617: "Cliciwch i grebachu manylion canlyniad"
   click_to_create_a_new_user_for_address_325f6683: "Cliciwch i greu defnyddiwr newydd ar gyfer %{address}"
   click_to_create_a_new_user_for_login_56d2daf5: "Cliciwch i greu defnyddiwr newydd ar gyfer %{login}"
   click_to_edit_drag_to_reorder_ab725681: "Cliciwch i olygu, a llusgo i aildrefnu"
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Cliciwch i roi sylwadau, os bydd y myfyriwr yn dewis yr ateb hwn"
+  click_to_expand_outcome_details_74a2a967: "Cliciwch i ehangu manylion canlyniad"
   click_to_load_a020891b: "(cliciwch i lwytho)"
   click_to_report_profile_picture_370f9625: "Cliciwch i riportio llun proffil"
   click_to_report_profile_picture_for_display_name_9ffbcc86: "Cliciwch i riportio llun proffil ar gyfer %{display_name}"
@@ -7851,6 +7857,7 @@ cy:
   grader_d1198a9c: Graddiwr
   grader_graderindex_45e04e57: "Graddiwr %{graderIndex}"
   grader_gradernumber_fef5d5cf: "Graddiwr %{graderNumber}"
+  grader_index_a55577a2: "Graddiwr %{index}"
   grader_is_required_62c88f67: "Mae’n rhaid rhoi graddiwr"
   grader_that_determines_final_grade_cc55f20: "Graddiwr sy’n penderfynu ar y radd derfynol"
   graders_can_view_each_other_s_comments_d836b848: "Gall graddwyr weld sylwadau ei gilydd"
@@ -8378,9 +8385,11 @@ cy:
   hide_groups_navigation_menu_62e8b3d0: "Cuddio Dewislen Crwydro - Grwpiau"
   hide_key_e8fe1e8c: "Cuddio’r Allwedd"
   hide_navigation_menu_f0b3e90: "Cuddio Dewislen Crwydro"
+  hide_outcomes_with_no_results_7e4ce06f: "Cuddio deilliannau heb ganlyniadau"
   hide_score_total_for_assessment_results_d0ef117f: "Cuddio cyfanswm y sgôr ar gyfer canlyniadau asesiadau"
   hide_sidebar_2b5b3776: "Cuddio Bar Ochr"
   hide_student_names_3e59e862: "Cuddio Enwau Myfyrwyr"
+  hide_students_with_no_results_6a22f991: "Cuddio myfyrwyr heb ganlyniadau"
   hide_sub_accounts_for_account_name_a6de98bd: "Cuddio Isgyfrifon ar gyfer %{account_name}"
   high_b5cbd048: Uchel
   high_contrast_description: "Mae Cyferbynnedd Uchel yn creu mwy o gyferbyniad rhwng y lliwiau ar ryngwyneb y defnyddiwr (testun, botymau ac ati), sy’n gwneud yr eitemau hynny’n gliriach ac yn haws eu hadnabod.  Nodyn: Bydd y nodwedd brand sefydliad wedi’i hanalluogi."
@@ -8795,6 +8804,7 @@ cy:
   jwts_4f397c85: JWTs
   k12_description: "Nodweddion, gosodiadau ac arddulliau sy’n fwy addas mewn amgylchedd K-12 yn benodol. Am y tro, dim ond rhywfaint o newidiadau arddull fydd yn cael eu rhoi ar waith, ond mae’n bosib y bydd mwy o bethau sy’n benodol i K-12 yn cael eu hychwanegu yn y dyfodol."
   k_2521301c: k
+  kazakhstan_7_8fe892c: "Kazakhstan (+7)"
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "Cofiwch y bydd y cyflwyniad hwn yn cyfrif i bawb yn eich grŵp %{groupType}."
   keep_submissions_anonymous_5cbaf419: "Cadw cyflwyniadau’n ddienw"
   kenya_254_2945663a: "Kenya (+254)"
@@ -8809,6 +8819,7 @@ cy:
   kind_7f0a88c4: Caredig
   labels: 
     lock_module_until: "Wedi cloi tan"
+  last_assessment_cd5659b6: "Aseiniad Olaf "
   last_changed_b544504d: "Wedi newid ddiwethaf:"
   last_changed_date_82f1ce56: "Wedi newid ddiwethaf: %{date}"
   last_day_attended_b72d623c: "Diwrnod mynychwyd ddiwethaf"
@@ -11232,6 +11243,7 @@ cy:
   new_course_role_6a7bb75f: "Rôl ar Gwrs Newydd"
   new_criterion_6054bc7f: "Maen Prawf Newydd"
   new_criterion_canceled_d8c2a655: "Maen Prawf newydd wedi'i ganslo"
+  new_discussion_dae4fae3: "Trafodaeth Newydd"
   new_event_for_course_name_2ba1f734: "Digwyddiad newydd ar gyfer %{course_name}"
   new_export_3ab758: "Allgludo Newydd"
   new_features_for_developer_key_management_994090dc: "Nodweddion newydd ar gyfer rheoli Allwedd Datblygwr"
@@ -11322,6 +11334,7 @@ cy:
   no_subject_58b7941c: "Dim Pwnc"
   no_subject_970aad80: "Dim pwnc"
   no_submission_for_assignment_a9cb6fe2: "Dim byd wedi’i gyflwyno ar gyfer %{assignment}"
+  no_submissions_164cea23: "Dim cyflwyniadau"
   no_terms_eab5ee7b: "Dim Tymhorau"
   no_tls_618add1a: "Dim TLS"
   no_unassigned_terms_deb7b76b: "Dim tymhorau lle does dim wedi’i neilltuo ar eu cyfer"
@@ -11966,7 +11979,7 @@ cy:
     cannot_unpublish_front_page: "Dim modd dad-gyhoeddi'r dudalen flaen"
     delete_button: Dileu
     delete_confirmation: "Ydych chi’n siŵr eich bod am ddileu’r dudalen hon?"
-    delete_dialog_title: "Dileu Tudalen Wici"
+    delete_dialog_title: "Dileu Tudalen"
     deleting_button: "Wrthi’n dileu..."
     edit_dialog_title: "Golygu Tudalen"
     errors: 
@@ -14613,6 +14626,7 @@ cy:
   rubrics_b5ef369b: "Cyfarwyddiadau Sgorio"
   running_c5a4998d: Rhedeg
   russia_7_87bc99d5: "Rwsia (+7)"
+  rwanda_250_1a6b344b: "Rwanda (+250)"
   salesforce_account_id_eb5c78ad: "ID Cyfrif Salesforce"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Mae gan Salesforce letywr mewngofnodi gwahanol ar gyfer cyfrifon sanbox na’r hyn sydd ganddo ar gyfer cyfrifon cynhyrchu, felly os ydych chi’n defnyddio cyfrif sanbox Salesforce a’ch bod yn anghofio rhoi tic yn y blwch hwn, ni fydd yn gallu dilysu (ac mae hyn yn gweithio i'r gwrthwyneb hefyd, os oes gennych chi gyfrif cynhyrchu a’ch BOD yn rhoi tic yn y blwch hwn, ni fydd yn dilysu)"
   salesforce_ticketing_webtocase_connector_80f75716: "Cysylltydd WebToCase Tocynnau Salesforce"
@@ -16057,6 +16071,7 @@ cy:
     this_was_submitted_multiple_times_choose_a_submission_to_view: "Wedi cyflwyno sawl gwaith, dewiswch pa un i’w weld:"
     update_grade: "Diweddaru gradd"
     view_rubric_assessment_in_the_speedgrader: "Gweld Asesiad Cyfarwyddyd Sgorio yn SpeedGrader"
+  submission_index_e960f9bf: "Cyflwyniad %{index}"
   submission_score_b7a291e8: "sgôr cyflwyniad"
   submission_tray_429ac3df: "Ardal cyflwyniad"
   submissions: 
@@ -16498,6 +16513,7 @@ cy:
   there_was_a_problem_updating_the_comment_5f3595b9: "Problem wrth ddiweddaru’r sylw"
   there_was_a_problem_updating_the_grade_1b6c8b4c: "Problem wrth ddiweddaru’r radd."
   there_was_a_problem_updating_the_submission_6e5280a1: "Problem wrth ddiweddaru’r cyflwyniad."
+  there_was_an_error_fetching_course_statistics_96e9dbad: "Gwall wrth nôl manylion cwrs"
   there_was_an_error_fetching_outcome_results_45c57590: "Gwall wrth nôl canlyniadau deilliant"
   there_was_an_error_fetching_submission_comments_ce153077: "Gwall wrth nôl Sylwadau ar Gyflwyniad"
   there_was_an_error_generating_the_pairing_code_9edd639b: "Gwall wrth greu’r cod paru"
@@ -16894,6 +16910,7 @@ cy:
   to_access_the_account_courses_page_courses_view_li_e1da6165: "I gael mynediad at y dudalen Cyrsiau cyfrif - rhaid i’r adran Cyrsiau - gweld rhestr fod wedi cael ei galluogi."
   to_access_the_assignments_index_page_course_conten_a5b00f98: "I gael mynediad at y Dudalen Mynegai Aseiniadau, rhaid i’r adran Cynnwys Cwrs - gweld fod wedi cael ei galluogi. I roi aseiniadau gwahanol i fyfyrwyr unigol, rhaid i’r adran Defnyddwyr - gweld rhestr fod wedi cael ei galluogi hefyd."
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "I gael mynediad at y dudalen Pobl a gweld Grwpiau, rhaid i’r adran Defnyddwyr - gweld rhestr fod wedi cael ei galluogi hefyd."
+  to_access_the_people_page_users_view_list_must_be__2f01333b: "I gael mynediad at y dudalen Pobl, rhaid i’r adran Defnyddwyr - gweld rhestr fod wedi cael ei galluogi. Os yw’r hawl hon wedi’i galluogi, a bod yr adran Defnyddwyr - gweld prif gyfeiriad e-bost wedi’i hanalluogi, yna bydd defnyddwyr yn gweld cyfeiriadau e-bost sy’n cael eu defnyddio fel IDs Mewngofnodi. I weld IDs Mewngofnodi, rhaid i’r adran Defnyddwyr - ychwanegu / tynnu myfyrwyr o gyrsiau a’r adran Defnyddwyr - ychwanegu / tynnu athrawon, dylunwyr cyrsiau, neu gynorthwywyr dysgu o gyrsiau fod wedi cael eu galluogi hefyd."
   to_access_the_people_page_users_view_list_must_be__5a5475fe: "I gael mynediad at y dudalen Pobl, rhaid i’r adran Defnyddwyr - gweld rhestr fod wedi cael ei galluogi."
   to_access_the_people_page_users_view_list_must_be__756d7188: |-
       I gael mynediad at y dudalen Pobl, rhaid i’r adran Defnyddwyr - gweld rhestr fod wedi cael ei galluogi.
@@ -16953,6 +16970,7 @@ cy:
   to_differentiate_assignments_to_individual_student_6cc40fde: "I roi aseiniadau gwahanol i fyfyrwyr unigol, rhaid i’r adran Defnyddwyr - gweld rhestr fod wedi cael ei galluogi hefyd."
   to_do_1d554f36: "Tasgau i’w Gwneud"
   to_do_5526f10a: "Tasgau i’w Gwneud:"
+  to_do_6ac7b2dc: "Tasgau i’w gwneud:"
   to_do_date_d6b79bfd: "Tasgau i’w gwneud %{date}"
   to_do_date_ddfb582c: "Dyddiad Tasgau i’w Gwneud:"
   to_do_items_loading_d1cdfcd5: "Wrthi’n llwytho eitemau i’w gwneud"
@@ -18137,6 +18155,7 @@ cy:
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "Rydych chi wedi cyrraedd y terfyn ar gyfer y nifer mwyaf o fachau gwe fesul defnyddiwr (/%{max})."
   you_have_unsynced_changes_that_will_sync_to_all_as_9028e711: "Mae gennych chi newidiadau heb eu cysoni a fydd yn cael eu cysoni â'r holl gyrsiau cysylltiedig pan fydd cysylltiad newydd yn cael ei gadw."
   you_just_sent_a_message_in_canvas_86b4945c: "Rydych chi newydd anfon neges yn Canvas"
+  you_left_the_required_name_field_empty_8f9bce5c: "Rydych chi wedi gadael y maes enw gofynnol yn wag."
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "Byddwch chi’n sicr am gael rhai o’r rhain.  Dydy dysgu cwrs a neb yn gwrando ddim yn hwyl o gwbl."
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "Bydd angen tocyn adnewyddu arnoch chi - dilynwch y camau gyda’r ddolen hon, ac efallai y byddwch chi am gael help gan arbenigwr technegol"
   you_may_not_reproduce_or_communicate_any_of_the_co_7636b552: "Chewch chi ddim ailgreu na rhannu unrhyw beth sy’n rhan o’r cwrs hwn, gan gynnwys y ffeiliau sydd wedi’u hallgludo o’r cwrs hwn, heb gael caniatâd gan eich sefydliad ymlaen llaw.  Holwch eich sefydliad ynghylch canllawiau penodol ar-lein ar gyfer cytundebau defnyddwyr."
