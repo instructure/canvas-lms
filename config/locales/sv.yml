@@ -3,11 +3,13 @@
 --- 
 sv: 
   1_item_scores_5512cd03: "1- Resultat på objekt"
+  1_item_scores_examplescores_9736236: "1- Objektpoäng: %{exampleScores}"
   1_user_found_76399771: "1 användare hittades."
   1st_reviewer_3c1d0119: "1:a bedömare"
   25th_75th_ile_406a67bf: "25:e-75:e %ile"
   25th_75th_percentile_aa4c11f2: "25:e-75:e percentilen"
   2_final_score_7b0fd15e: "2- Slutpoäng"
+  2_final_score_exampleresult_922edf9c: "2- Slutlig poäng: %{exampleResult}"
   2nd_reviewer_94fdbcd: "2:a bedömare"
   451_message: 
     description: "Du har inte behörighet att besöka den här hemsidan då du befinner dig i ett land som är föremål för handelsrestriktioner med USA."
@@ -1613,6 +1615,7 @@ sv:
   affects_viewing_the_publish_course_conclude_course_76d2f601: |-
       Påverkar visning av knapparna Publicera kurs, Avsluta kurs och Ta bort den här kursen permanent.
       Knappen Ta bort den här kursen permanent visas endast för kurser som skapats manuellt.
+  afghanistan_93_ab06805: "Afghanistan (+93)"
   after_48b9d69: Efter...
   after_4c71e718: Efter
   after_cbb5ebae: Efter...
@@ -3999,6 +4002,7 @@ sv:
   cannot_be_present_when_course_id_is_present_785e6a59: "kan inte vara nuvarande när course_id är nuvarande"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Kan inte åsidosätta inlämningsdatum till ett datum i en stängd omdömesperiod"
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "Det går inte att ändra rollnamnet till %{label}: används redan"
+  cannot_change_the_default_term_name_edc2279b: "Det går inte att ändra standardnamnet för terminen"
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Kan inte ändra ett åsidosatt  inlämningsdatum i en stängd omdömesperiod"
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "Kan inte ändra inlämningsdatum till ett datum i en stängd omdömesperiod"
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: "Kan inte ändra inlämningsdatum när datumet är i en stängd omdömesperiod"
@@ -4166,10 +4170,12 @@ sv:
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Klicka på en ögonblicksbild för att återgå till testversionen som det var när ögonblicksbilden togs. Notera: Du kommer att förlora eventuellt arbete som du har gjort sedan ögonblicksbilden togs, och det kan inte göras ogjort!"
   click_to_add_a_name_6cf551b0: "Klicka för att lägga till ett namn"
   click_to_change_profile_picture_for_display_name_6a4b41db: "Klicka för att ändra profilbild för %{display_name}"
+  click_to_collapse_outcome_details_1d751617: "Klicka för att dölja information om lärandemål"
   click_to_create_a_new_user_for_address_325f6683: "Klicka för att skapa en ny användare för %{address}"
   click_to_create_a_new_user_for_login_56d2daf5: "Klicka för att skapa en ny användare för %{login}"
   click_to_edit_drag_to_reorder_ab725681: "Klicka för att redigera, dra och omorganisera"
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Klicka för att lägga till kommentarer, ifall studenten väljer det här svaret"
+  click_to_expand_outcome_details_74a2a967: "Klicka för att visa information om lärandemål"
   click_to_load_a020891b: "(klicka för att ladda)"
   click_to_modify_89fa26aa: "Klicka för att ändra"
   click_to_order_by_email_ascending_98b1a697: "Klicka för att beställa via e-post stigande"
@@ -9393,6 +9399,7 @@ sv:
   grader_d1198a9c: Bedömare
   grader_graderindex_45e04e57: "Bedömare %{graderIndex}"
   grader_gradernumber_fef5d5cf: "Bedömare %{graderNumber}"
+  grader_index_a55577a2: "Bedömare %{index}"
   grader_is_required_62c88f67: "Omdömessättare krävs"
   grader_that_determines_final_grade_cc55f20: "Omdömessättare som bestämmer slutomdömet"
   graders_can_view_each_other_s_comments_d836b848: "Bedömare kan se varandras kommentarer"
@@ -10148,9 +10155,11 @@ sv:
   hide_key_e8fe1e8c: "Dölj nyckel"
   hide_navigation_menu_f0b3e90: "Dölj navigeringsmeny"
   hide_notes_column_7749f408: "Dölj anteckningskolumnen"
+  hide_outcomes_with_no_results_7e4ce06f: "Dölj lärandemål utan resultat"
   hide_score_total_for_assessment_results_d0ef117f: "Dölj totala poäng för bedömningsresultat"
   hide_sidebar_2b5b3776: "Dölj sidofält"
   hide_student_names_3e59e862: "Dölj studenters namn"
+  hide_students_with_no_results_6a22f991: "Dölj studenter utan resultat"
   hide_sub_accounts_for_account_name_a6de98bd: "Göm underkonto för %{account_name}"
   high_b5cbd048: Högsta
   high_contrast_description: |-
@@ -10633,6 +10642,7 @@ sv:
       nu gäller det
       bara för vissa stiländringar, men fler K-12 saker kan läggas till i framtiden.
   k_2521301c: k
+  kazakhstan_7_8fe892c: "Kazakstan (+7)"
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "Kom ihåg att den här inlämningen berör alla i din %{groupType} grupp."
   keep_submissions_anonymous_5cbaf419: "Håll inlämningarna anonyma"
   kenya_254_2945663a: "Kenya (+254)"
@@ -10649,6 +10659,7 @@ sv:
   kind_7f0a88c4: Sort
   labels: 
     lock_module_until: "Lås tills"
+  last_assessment_cd5659b6: "Senaste bedömning: "
   last_changed_b544504d: "Senast ändrad:"
   last_changed_date_82f1ce56: "Senast ändrad: %{date}"
   last_day_attended_b72d623c: "Sista dagen som deltagare"
@@ -13493,6 +13504,7 @@ sv:
   new_course_role_6a7bb75f: "Ny kursroll"
   new_criterion_6054bc7f: "Nytt kriterium"
   new_criterion_canceled_d8c2a655: "Nytt kriterium avbrutet"
+  new_discussion_dae4fae3: "Ny diskussion"
   new_event_for_course_name_2ba1f734: "Ny händelse för %{course_name}"
   new_export_3ab758: "Ny export"
   new_features_for_developer_key_management_994090dc: "Nya funktioner för utvecklarens nyckelhantering"
@@ -13600,6 +13612,7 @@ sv:
   no_subject_58b7941c: "Inget ämne"
   no_subject_970aad80: "Inget ämne"
   no_submission_for_assignment_a9cb6fe2: "Ingen inlämning för %{assignment}"
+  no_submissions_164cea23: "Ingen inlämning"
   no_terms_eab5ee7b: "Inga villkor"
   no_tls_618add1a: "Ingen TLS"
   no_unassigned_terms_deb7b76b: "Inga ej tilldelade terminer"
@@ -14329,7 +14342,7 @@ sv:
     cannot_unpublish_front_page: "Kan inte avpublicera från förstasidan"
     delete_button: Radera
     delete_confirmation: "Är du säker på att du vill ta bort denna sidan?"
-    delete_dialog_title: "Radera wikisida"
+    delete_dialog_title: "Radera sida"
     deleting_button: Raderar...
     edit_dialog_title: "Redigera sida"
     errors: 
@@ -17353,6 +17366,7 @@ sv:
   rubrics_b5ef369b: Matriser
   running_c5a4998d: Körs
   russia_7_87bc99d5: "Ryssland (+7)"
+  rwanda_250_1a6b344b: "Rwanda (+250)"
   salesforce_account_id_eb5c78ad: "Salesforce Konto-Id"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce har olika inloggningsvärdar för sanboxkonton och produktionskonton, så om du använder ett Salesforce sanboxkonto och inte markerar den här rutan kommer den inte kunna verifiera (det gäller åt andra hållet också, och du har ett produktionskonto och MARKERAR rutan kan den inte verifiera)"
   salesforce_ticketing_webtocase_connector_80f75716: "Salesforce Ticketing WebToCase Connector"
@@ -19061,6 +19075,7 @@ sv:
     update_grade: "Uppdatera omdöme"
     view_rubric_assessment_in_the_speedgrader: "Visa matris utvärdering i SpeedGrader"
   submission_in_another_grading_period_e754b329: "Inläming i annan betygsperiod"
+  submission_index_e960f9bf: "Inlämning %{index}"
   submission_options_5184a65b: Inlämningsalternativ
   submission_score_b7a291e8: "poäng på inlämning"
   submission_status_3079e730: Inlämningsstatus
@@ -19554,6 +19569,7 @@ sv:
   there_was_a_problem_updating_the_comment_5f3595b9: "Det gick inte att uppdatera kommentaren"
   there_was_a_problem_updating_the_grade_1b6c8b4c: "Det gick inte att uppdatera bedömningen."
   there_was_a_problem_updating_the_submission_6e5280a1: "Det gick inte att uppdatera inlämningen."
+  there_was_an_error_fetching_course_statistics_96e9dbad: "Det gick inte att hämta kursstatistiken"
   there_was_an_error_fetching_outcome_results_45c57590: "Det uppstod ett fel vid hämtning av utkomst-resultat"
   there_was_an_error_fetching_submission_comments_ce153077: "Det gick inte att hämta inlämningskommentarer"
   there_was_an_error_generating_the_pairing_code_9edd639b: "Det gick inte att generera sammankopplingskoden"
@@ -19969,6 +19985,7 @@ sv:
   to_access_the_account_courses_page_courses_view_li_e1da6165: "För åtkomst till kontots sida Kurser måste även Kurser – visa lista vara aktiverad."
   to_access_the_assignments_index_page_course_conten_a5b00f98: "För åtkomst till indexeringssidan Uppgifter måste Kursinnehåll – visa vara aktiverad. För att du ska kunna se enskilda studenters uppgifter måste Användare – visa lista vara aktiverad."
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "För åtkomst till sidan Personer och för att visa Grupper måste Användare – visa lista vara aktiverad."
+  to_access_the_people_page_users_view_list_must_be__2f01333b: "För åtkomst till sidan Personer måste Användare – visa lista vara aktiverad. Om den här behörigheten är aktiverad och om Användare – visa primär e-postadress är inaktiverad kommer användare att se e-postadresser som används som inloggnings-ID:n. För att visa inloggnings-ID:n måste även Användare – lägg till/ta bort studenter i kurser samt Användare – lägg till/ta bort lärare, kursdesigner eller TA:er vara aktiverade."
   to_access_the_people_page_users_view_list_must_be__5a5475fe: "För åtkomst till sidan Personer måste Användare – visa lista vara aktiverad."
   to_access_the_people_page_users_view_list_must_be__756d7188: |-
       För åtkomst till sidan Personer måste Användare – visa lista vara aktiverad.
@@ -20028,6 +20045,7 @@ sv:
   to_differentiate_assignments_to_individual_student_6cc40fde: "För att du ska kunna se enskilda studenters uppgifter måste Användare – visa lista vara aktiverad."
   to_do_1d554f36: "Att göra"
   to_do_5526f10a: "Att göra:"
+  to_do_6ac7b2dc: "att göra:"
   to_do_date_d6b79bfd: "Att göra %{date}"
   to_do_date_ddfb582c: "Att göra-datum:"
   to_do_items_loading_d1cdfcd5: "Atta göra föremål laddar"
@@ -21361,6 +21379,7 @@ sv:
   you_have_submitted_the_assignment_7ef8a51a: "Du har lämnat in uppgiften"
   you_have_unsynced_changes_that_will_sync_to_all_as_9028e711: "Du har osynkroniserade förändringar som synkroniseras med alla tillhörande kurser när en ny organisation sparas."
   you_just_sent_a_message_in_canvas_86b4945c: "Du skickade just ett meddelande i Canvas"
+  you_left_the_required_name_field_empty_8f9bce5c: "Du lämnade det obligatoriska namnfältet tomt."
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "Du vill såklart ha några av dessa. Hur kul är det att undervisa i en kurs om ingen lyssnar?"
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "Du måste uppdatera token, följ stegen i den här länken, du kan behöva hjälp från en expert"
   you_may_not_reproduce_or_communicate_any_of_the_co_7636b552: |-
