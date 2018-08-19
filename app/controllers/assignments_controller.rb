@@ -363,6 +363,7 @@ class AssignmentsController < ApplicationController
     return render_unauthorized_action if !toggle_value && !@assignment.grades_published?
 
     method = toggle_value ? :mute! : :unmute!
+    @assignment.updating_user = @current_user
 
     respond_to do |format|
       if @assignment && @assignment.send(method)

@@ -100,6 +100,7 @@ class Assignment < ActiveRecord::Base
   validate :moderation_setting_ok?
   validate :assignment_name_length_ok?
   validates :lti_context_id, presence: true, uniqueness: true
+  validates :grader_count, numericality: true
 
   with_options unless: :moderated_grading? do
     validates :graders_anonymous_to_graders, absence: true
@@ -402,6 +403,7 @@ class Assignment < ActiveRecord::Base
     graders_anonymous_to_graders
     grader_comments_visible_to_graders
     grader_names_visible_to_final_grader
+    grader_count
   ).freeze
 
   def external_tool?
@@ -457,7 +459,6 @@ class Assignment < ActiveRecord::Base
               :mute_if_changed_to_anonymous,
               :mute_if_changed_to_moderated
 
-
   after_save  :update_submissions_and_grades_if_details_changed,
               :update_grading_period_grades,
               :touch_assignment_group,
@@ -469,9 +470,41 @@ class Assignment < ActiveRecord::Base
               :delete_empty_abandoned_children,
               :update_cached_due_dates,
               :apply_late_policy,
-              :touch_submissions_if_muted_changed
+              :touch_submissions_if_muted_changed,
+              :create_audit_event
 
   has_a_broadcast_policy
+
+  def create_audit_event
+    auditable_attributes = %w[
+      muted
+      due_at
+      points_possible
+      anonymous_grading
+      moderated_grading
+      final_grader_id
+      grader_count
+      omit_from_final_grade
+      grader_names_visible_to_final_grader
+      grader_comments_visible_to_graders
+      graders_anonymous_to_graders
+      anonymous_instructor_annotations
+    ]
+    auditable_changes = saved_changes.slice(*auditable_attributes)
+    return true if auditable_changes.empty? || @updating_user.nil?
+
+    AnonymousOrModerationEvent.create!(
+      assignment: self,
+      user: @updating_user,
+      event_type: 'assignment_update',
+      payload: {
+        assignment_changes: auditable_changes
+      }
+    )
+
+    true
+  end
+  private :create_audit_event
 
   after_save :remove_assignment_updated_flag # this needs to be after has_a_broadcast_policy for the message to be sent
 
@@ -3033,7 +3066,7 @@ class Assignment < ActiveRecord::Base
 
   def clear_moderated_grading_attributes(assignment)
     assignment.final_grader_id = nil
-    assignment.grader_count = nil
+    assignment.grader_count = 0
     assignment.grader_names_visible_to_final_grader = true
     assignment.grader_comments_visible_to_graders = true
     assignment.graders_anonymous_to_graders = false

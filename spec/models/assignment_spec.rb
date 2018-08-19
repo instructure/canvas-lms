@@ -108,6 +108,17 @@ describe Assignment do
     expect(@assignment.errors[:grading_type]).not_to be_nil
   end
 
+  describe 'default values' do
+    it 'sets grader_count to 0' do
+      assignment = Assignment.create!(
+        course: @course,
+        name: 'some assignment',
+        anonymous_grading: true
+      )
+      expect(assignment.grader_count).to be 0
+    end
+  end
+
   describe 'callbacks' do
     describe 'apply_late_policy' do
       it "calls apply_late_policy for the assignment if points_possible changes" do
@@ -6510,12 +6521,12 @@ describe Assignment do
           expect(assignment.final_grader_id).to be_nil
         end
 
-        it 'before validation, sets grader_count to nil if it is present' do
+        it 'before validation, sets grader_count to 0 if it is present' do
           teacher = User.create!
           @course.enroll_teacher(teacher, active_all: true)
-          assignment.grader_count = 2
+          assignment.grader_count = nil
           assignment.validate
-          expect(assignment.grader_count).to be_nil
+          expect(assignment.grader_count).to be 0
         end
       end
 
@@ -6631,6 +6642,132 @@ describe Assignment do
           end
         end
       end
+    end
+  end
+
+  describe 'after save' do
+    before :once do
+      @ta = ta_in_course(course: @course, enrollment_state: :active).user
+    end
+
+    let(:anonymous_assignment) do
+      assignment = Assignment.create!(course: @course, name: 'anonymous assignment', anonymous_grading: true)
+      assignment.updating_user = @teacher
+      assignment
+    end
+
+    let(:moderated_assignment) do
+      assignment = Assignment.create!(
+        course: @course,
+        name: 'moderated assignment',
+        moderated_grading: true,
+        final_grader: @teacher,
+        grader_count: 2
+      )
+      assignment.updating_user = @teacher
+      assignment
+    end
+
+    def event_property_for_assignment(assignment, property)
+      event = AnonymousOrModerationEvent.where(assignment: assignment).last
+      event.payload.fetch('assignment_changes').fetch(property)
+    end
+
+    it 'creates an AnonymousOrModerationEvent on creation of an anonymous assignment' do
+      assignment = Assignment.create!(
+        course: @course,
+        name: 'anonymous assignment',
+        anonymous_grading: true,
+        updating_user: @teacher
+      )
+      events = AnonymousOrModerationEvent.where(assignment: assignment)
+      expect(events.count).to be 1
+    end
+
+    it 'creates an AnonymousOrModerationEvent on creation of a moderated assignment' do
+      assignment = Assignment.create!(
+        course: @course,
+        name: 'anonymous assignment',
+        moderated_grading: true,
+        final_grader: @teacher,
+        grader_count: 2,
+        updating_user: @teacher
+      )
+      events = AnonymousOrModerationEvent.where(assignment: assignment)
+      expect(events.count).to be 1
+    end
+
+    it 'creates an AnonymousOrModerationEvent with assignment changes when muted is changed' do
+      assignment = anonymous_assignment
+      assignment.update!(muted: false)
+      expect(event_property_for_assignment(assignment, 'muted')).to eq [true, false]
+    end
+
+    it 'creates an AnonymousOrModerationEvent with assignment changes when due_at is changed' do
+      due_at = Time.zone.parse('2018-04-08 23:59:59')
+      assignment = anonymous_assignment
+      assignment.update!(due_at: due_at)
+      expect(event_property_for_assignment(assignment, 'due_at')).to eq [nil, '2018-04-08T23:59:59Z']
+    end
+
+    it 'creates an AnonymousOrModerationEvent with assignment changes when points_possible is changed' do
+      assignment = moderated_assignment
+      assignment.update!(points_possible: 23)
+      expect(event_property_for_assignment(assignment, 'points_possible')).to eq [nil, 23.0]
+    end
+
+    it 'creates an AnonymousOrModerationEvent with assignment changes when anonymous_grading is changed' do
+      assignment = anonymous_assignment
+      assignment.update!(anonymous_grading: false)
+      expect(event_property_for_assignment(assignment, 'anonymous_grading')).to eq [true, false]
+    end
+
+    it 'creates an AnonymousOrModerationEvent with assignment changes when moderated_grading is changed' do
+      assignment = moderated_assignment
+      assignment.update!(moderated_grading: false)
+      expect(event_property_for_assignment(assignment, 'moderated_grading')).to eq [true, false]
+    end
+
+    it 'creates an AnonymousOrModerationEvent with assignment changes when final_grader_id is changed' do
+      assignment = moderated_assignment
+      assignment.update!(final_grader: @ta)
+      expect(event_property_for_assignment(assignment, 'final_grader_id')).to eq [@teacher.id, @ta.id]
+    end
+
+    it 'creates an AnonymousOrModerationEvent with assignment changes when grader_count is changed' do
+      assignment = moderated_assignment
+      assignment.update!(grader_count: 70)
+      expect(event_property_for_assignment(assignment, 'grader_count')).to eq [2, 70]
+    end
+
+    it 'creates an AnonymousOrModerationEvent with assignment changes when omit_from_final_grade is changed' do
+      assignment = anonymous_assignment
+      assignment.update!(omit_from_final_grade: true)
+      expect(event_property_for_assignment(assignment, 'omit_from_final_grade')).to eq [false, true]
+    end
+
+    it 'creates an AnonymousOrModerationEvent with assignment changes when grader_names_visible_to_final_grader is changed' do
+      assignment = moderated_assignment
+      assignment.update!(grader_names_visible_to_final_grader: false)
+      expect(event_property_for_assignment(assignment, 'grader_names_visible_to_final_grader')).to eq [true, false]
+    end
+
+    it 'creates an AnonymousOrModerationEvent with assignment changes when grader_comments_visible_to_graders is changed' do
+      assignment = moderated_assignment
+      assignment.update!(grader_comments_visible_to_graders: false)
+      expect(event_property_for_assignment(assignment, 'grader_comments_visible_to_graders')).to eq [true, false]
+    end
+
+    it 'creates an AnonymousOrModerationEvent with assignment changes when graders_anonymous_to_graders is changed' do
+      assignment = moderated_assignment
+      assignment.update!(graders_anonymous_to_graders: true)
+      expect(event_property_for_assignment(assignment, 'graders_anonymous_to_graders')).to eq [false, true]
+    end
+
+    it 'creates an AnonymousOrModerationEvent with assignment changes when anonymous_instructor_annotations is changed' do
+      assignment = anonymous_assignment
+      assignment.update!(anonymous_instructor_annotations: true)
+      expect(event_property_for_assignment(assignment, 'anonymous_instructor_annotations')).to eq [false, true]
     end
   end
 
