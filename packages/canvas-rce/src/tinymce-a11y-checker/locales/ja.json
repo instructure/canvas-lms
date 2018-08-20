@@ -179,9 +179,6 @@
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "表には、少なくとも1つのヘッダーが含まれていなければなりません。"
   },
-  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
-    "message": "テキストは、テキストと背景との間に十分なコントラストがなければ、特に視力の弱い人にとっては読みにくくなります。"
-  },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "18pt（または太字14pt）より大きいテキストは、3：1の最小コントラスト比で表示しなければなりません。"
   },

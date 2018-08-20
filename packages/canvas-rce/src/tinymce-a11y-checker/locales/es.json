@@ -179,9 +179,6 @@
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "Las tablas deben incluir al menos un encabezado."
   },
-  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
-    "message": "El texto es difícil de leer sin un contraste suficiente entre el texto y el fondo, especialmente para las personas con visión reducida."
-  },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "El texto de tamaño mayor de 18pt (o 14pt en negrita) debe mostrar una relación de contraste mínima de 3:1."
   },

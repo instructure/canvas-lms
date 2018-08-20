@@ -179,9 +179,6 @@
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "Tables should include at least one header."
   },
-  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
-    "message": "Text is difficult to read without sufficient contrast between the text and the background, especially for those with impaired vision."
-  },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "Text larger than 18pt (or bold 14pt) should display a minimum contrast ratio of 3:1."
   },

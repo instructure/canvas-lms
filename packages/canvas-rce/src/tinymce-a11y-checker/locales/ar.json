@@ -179,9 +179,6 @@
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "يجب أن تتضمن الجداول رأسًا واحدًا على الأقل."
   },
-  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
-    "message": "تصعب قراءة النص بدون تباين كافٍ بين النص والخلفية، خصوصًا لمن يتمتعون برؤية إبصار ضعيفة."
-  },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "يجب أن يعرض النص الأكبر من 18 نقطة (أو 14 نقطة بخط عريض) معدل تباين لا يقل عن 3:1."
   },

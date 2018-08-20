@@ -179,9 +179,6 @@
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "Tabeller bør inkludere minst en tittel."
   },
-  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
-    "message": "Tekst er vanskelig å lese uten tilstrekkelig kontrast mellom teksten og bakgrunne, særlig for de med nedsatte synsevner."
-  },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "Tekst større enn 18pkt (eller tykk 14pkt) bør vises med en minimums kontrastrate på 3:1."
   },

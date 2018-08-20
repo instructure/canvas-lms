@@ -179,9 +179,6 @@
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "表格应包括至少一个标题。"
   },
-  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
-    "message": "如果文字与背景之间的对比不充分，则文字读起来困难，尤其是对视力低的人而言。"
-  },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "文字大于 18 磅（或粗体 14 磅）时显示的对比度应至少为 3:1。"
   },

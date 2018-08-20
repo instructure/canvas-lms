@@ -179,9 +179,6 @@
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "Tabellen moeten minstens één kop hebben."
   },
-  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
-    "message": "Tekst is moeilijk te lezen zonder voldoende contrast tussen de tekst en de achtergrond, met name voor slechtzienden."
-  },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "Voor tekst groter dan 18pt (of vet 14pt) geldt een miinimum contrastverhouding van 3:1."
   },
