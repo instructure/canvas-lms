@@ -448,6 +448,10 @@ class WikiPage < ActiveRecord::Base
     result
   end
 
+  def can_duplicate?
+    true
+  end
+
   def initialize_wiki_page(user)
     if wiki.grants_right?(user, :publish_page)
       # Leave the page unpublished if the user is allowed to publish it later
