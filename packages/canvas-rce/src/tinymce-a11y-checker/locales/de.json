@@ -179,9 +179,6 @@
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "Tabellen sollten mindestens eine Überschrift haben."
   },
-  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
-    "message": "Text ist, insbesondere für Menschen mit Sehschwäche, schwer zu lesen, wenn der Kontrast zwischen Text und Hintergrund nicht ausreicht."
-  },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "Text, der größer als 18 Punkte ist (bei Fettdruck 14 Punkte), sollte einen Mindestkontrastverhältnis von 3:1 haben."
   },

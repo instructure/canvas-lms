@@ -179,9 +179,6 @@
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "表格應包括最少一個標題。"
   },
-  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
-    "message": "文字與背景之間對比不足，難以閱讀文字，對於視力較差的人尤其如是。"
-  },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "大小為 18pt（或粗體 14pt）以上的文字的色彩比最少應達到 3:1。"
   },

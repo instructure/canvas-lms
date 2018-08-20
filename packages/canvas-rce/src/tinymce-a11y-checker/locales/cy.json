@@ -179,9 +179,6 @@
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "Dylai tablau gynnwys o leiaf un pennawd."
   },
-  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
-    "message": "Mae’n anodd darllen testun heb ddigon o gyferbyniad rhwng y testun a’r cefndir, yn enwedig i’r rheini nad ydynt yn gweld yn dda."
-  },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "Dylai testun mwy na 18pt (neu 14pt trwm) fod â chyferbyniad 3:1 o leiaf."
   },

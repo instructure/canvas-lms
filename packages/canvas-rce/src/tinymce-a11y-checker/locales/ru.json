@@ -179,9 +179,6 @@
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "Таблицы должны содержать как минимум один заголовок."
   },
-  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
-    "message": "Текст трудно поддается чтению без достаточной контрастности между текстом и фоном, особенно для тех, кто плохо видит."
-  },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "Текст крупнее 18pt (или полужирный 14pt) должен отображаться с минимальным коэффициентом контрастности 3:1."
   },

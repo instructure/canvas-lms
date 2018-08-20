@@ -179,9 +179,6 @@
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "Tablo yo dwe gen omwen yon antèt."
   },
-  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
-    "message": "Tèks difidil pou li san ase kontras ant tèks la e fon an, espesyalman pou moun ki pa wè byen yo."
-  },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "Tèks ki pi gwo ke 18pt (oswa an gra 14pt) ta dwe afiche yon to kontras de 3:1."
   },

@@ -179,9 +179,6 @@
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "Tabeller ska innehålla minst en rubrik."
   },
-  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
-    "message": "Text är svår att läsa utan tillräcklig kontrast mellan texten och bakgrunden, speciellt för personer med nedsatt syn."
-  },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "Text som är större än 18pt (eller fetstil 14pt) ska visa ett minimum-kontrastförhållande på 3:1."
   },

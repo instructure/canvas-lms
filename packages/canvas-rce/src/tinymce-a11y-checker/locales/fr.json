@@ -179,9 +179,6 @@
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "Les tableaux devraient comprendre au moins un en-tête."
   },
-  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
-    "message": "Le texte devient difficile à lire si le contraste entre ce dernier et le fond est trop faible, en particulier chez les personnes malvoyantes."
-  },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "Les textes d’une taille supérieure à 18pt (ou 14pt en gras) devraient respecter un ratio de contraste d’au moins 3:1."
   },

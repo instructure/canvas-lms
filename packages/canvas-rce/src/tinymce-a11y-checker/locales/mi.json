@@ -179,9 +179,6 @@
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "Me whakauru ngā ripanga i te iti rawa o te pane kotahi."
   },
-  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
-    "message": "He uaua te pānui, kaore he rerekētanga i waenga i te kuputuhi me te papamuri, ina koa mo te hunga e iti ana te kite."
-  },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "Ko te kuputuhi nui ake i te 18pt (me te maia 14pt) me whakaatu i te ōwehenga rerekē iti o te 3: 1."
   },

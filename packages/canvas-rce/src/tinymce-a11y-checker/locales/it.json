@@ -179,9 +179,6 @@
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "Le tabelle devono includere almeno un''intestazione."
   },
-  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
-    "message": "Il testo è difficile da leggere senza un sufficiente contrasto tra il testo e lo sfondo, soprattutto per gli utenti ipovedenti."
-  },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "Il testo con dimensioni maggiori di 18 pt (o in grassetto 14 pt) deve visualizzare un rapporto di contrasto minimo pari a 3:1."
   },

@@ -179,9 +179,6 @@
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "Töflur ættu að hafa að minnsta kosti einn haus."
   },
-  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
-    "message": "Ef ekki eru nægileg birtuskil milli leturs og bakgrunns er erfitt að lesa texta, sérstaklega ef um er að ræða einstakling sem sér illa."
-  },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "Hlutfall hámarks- og lágmarksbirtu fyrir letur sem er stærra en 18 punkta (14 punkta ef feitletrað) ætti að vera að lágmarki 3:1."
   },

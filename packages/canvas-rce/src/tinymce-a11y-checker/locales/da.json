@@ -179,9 +179,6 @@
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "Tabeller skal indeholde mindst et overskrift."
   },
-  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
-    "message": "Tekst er vanskelig at læse uden tilstrækkelig kontrast mellem tekst og baggrund, især for personer med dårligt syn."
-  },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "Tekst større end 18pt (eller fed 14pt) skal have et kontrastforhold på mindst 3:1."
   },
