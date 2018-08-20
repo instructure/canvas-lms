@@ -690,15 +690,37 @@ class SisBatch < ActiveRecord::Base
   end
 
   def restore_workflow_states(scope, type, restore_progress, count, total)
+    count = 0
     Shackles.activate(:slave) do
       scope.active.order(:context_id).find_in_batches(batch_size: 5_000) do |data|
         Shackles.activate(:master) do
-          # restore the items and return the ids of the items that changed
-          ids = type.constantize.connection.select_values(restore_sql(type, data.map(&:to_restore_array)))
-          if type == 'Enrollment'
-            ids.each_slice(1000) {|slice| Enrollment::BatchStateUpdater.send_later(:run_call_backs_for, slice)}
+          ActiveRecord::Base.unique_constraint_retry do |retry_count|
+            if retry_count == 0
+              # restore the items and return the ids of the items that changed
+              ids = type.constantize.connection.select_values(restore_sql(type, data.map(&:to_restore_array)))
+              if type == 'Enrollment'
+                ids.each_slice(1000) {|slice| Enrollment::BatchStateUpdater.send_later(:run_call_backs_for, slice)}
+              end
+              count += update_restore_progress(restore_progress, data, count, total)
+            else
+              # try to restore each row one at a time
+              successful_ids = []
+              failed_data = []
+              data.each do |row|
+                ActiveRecord::Base.unique_constraint_retry do |retry_count|
+                  if retry_count == 0
+                    successful_ids += type.constantize.connection.select_values(restore_sql(type, [row.to_restore_array]))
+                  else
+                    failed_data << row
+                    SisBatch.add_error(nil, "Couldn't rollback SIS batch data for row - #{row.inspect}", sis_batch: self)
+                  end
+                end
+              end
+              successful_ids.each_slice(1000) {|slice| Enrollment::BatchStateUpdater.send_later(:run_call_backs_for, slice)}
+              count += update_restore_progress(restore_progress, data - failed_data, count, total)
+              roll_back_data.active.where(id: failed_data).update_all(workflow_state: 'failed', updated_at: Time.zone.now)
+            end
           end
-          count = update_restore_progress(restore_progress, data, count, total)
         end
       end
     end
