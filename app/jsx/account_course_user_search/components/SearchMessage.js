@@ -17,11 +17,13 @@
  */
 
 import React, {Component} from 'react'
+import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
 import Pagination, {PaginationButton} from '@instructure/ui-pagination/lib/components/Pagination'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import {array, func, string, shape, oneOf} from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
 import View from '@instructure/ui-layout/lib/components/View'
+import EmptyDesert from './EmptyDesert'
 
 const linkPropType = shape({
   url: string.isRequired,
@@ -118,9 +120,7 @@ export default class SearchMessage extends Component {
       )
     } else if (!collection.data.length) {
       return (
-        <div className="text-center pad-box">
-          <div className="alert alert-info">{noneFoundMessage}</div>
-        </div>
+        <Billboard size="large" heading={noneFoundMessage} headingAs="h2" hero={<EmptyDesert />} />
       )
     } else if (collection.links) {
       const lastPageNumber = this.lastKnownPageNumber()

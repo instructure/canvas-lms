@@ -183,7 +183,7 @@ describe "new account user search" do
 
     it "should search but not find bogus user", priority: "1", test_id: 3399649 do
       enter_search('jtsdumbthing')
-      expect(results_alert).to include_text('No users found')
+      expect(f('#content h2')).to include_text('No users found')
       expect(results_body).not_to contain_css(results_row)
     end
 
