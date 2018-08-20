@@ -751,21 +751,6 @@ describe "new groups" do
           expect(CourseGroups.groupset_tabs.count).to eq 2
         end
 
-        it "should clone group set when removing a student from a group with submission" do
-          group_test_setup
-          add_user_to_group(@students.first,@testgroup[0])
-          create_and_submit_assignment_from_group(@students.first)
-
-          CourseGroups.visit_course_groups(@course.id)
-          CourseGroups.remove_student_from_group(@students.first.id, @testgroup.first.name)
-          CourseGroups.clone_category_confirm
-          CourseGroups.toggle_group_detail_view(@testgroup.first.name)
-
-          # Verifies student has not changed groups and there is a new groupset tab
-          expect(CourseGroups.all_users_in_group.first.text).to eq @students.first.name
-          expect(CourseGroups.groupset_tabs.count).to eq 2
-        end
-
         it "should clone group set when deleting a group with submission" do
           group_test_setup
           add_user_to_group(@students.first,@testgroup.first)
