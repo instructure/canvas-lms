@@ -32,6 +32,7 @@ const exec = promisify(require('child_process').exec)
 const yarnFile = fs.readFileSync('yarn.lock', 'utf8')
 const yarnJson = lockfile.parse(yarnFile)
 
+let versionToPutInCommitMsg
 console.log('Removing "@instructue" entries from yarn.lock and configuring package.json "resolutions" for all instUI stuff...')
 const promises = Object.keys(yarnJson.object)
   .filter(k => k.startsWith('@instructure'))
@@ -39,7 +40,7 @@ const promises = Object.keys(yarnJson.object)
     delete yarnJson.object[k]
     const pkgName = `@${k.split('@')[1]}`
     if (!packageJson.resolutions[pkgName]) {
-      const latestRcOnRegistry = (await exec(`npm view ${pkgName} dist-tags.rc`)).stdout.trim()
+      const latestRcOnRegistry = versionToPutInCommitMsg = (await exec(`npm view ${pkgName} dist-tags.rc`)).stdout.trim()
       packageJson.resolutions[pkgName] = `${latestRcOnRegistry}`
     }
   })
@@ -54,6 +55,6 @@ Promise.all(promises).then(async () => {
   await exec(`yarn`)
   await exec(`git add yarn.lock`)
   console.log('Commiting changes...')
-  await exec(`git commit -m "upgrade instUI to the latest rc"`)
-  console.log('Made a commit to upgrade instUI to the latest rc. You should push it to gerrit.')
+  await exec(`git commit -m "upgrade instUI to ${versionToPutInCommitMsg}"`)
+  console.log(`Made a commit to upgrade instUI to ${versionToPutInCommitMsg}. You should push it to gerrit.`)
 })
