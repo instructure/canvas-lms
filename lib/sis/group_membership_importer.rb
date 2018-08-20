@@ -51,7 +51,7 @@ module SIS
         return if @batch.skip_deletes? && status =~ /deleted/i
 
         pseudo = @root_account.pseudonyms.where(sis_user_id: user_id).take
-        user = pseudo.try(:user)
+        user = pseudo&.user
 
         group = @groups_cache[group_id]
         group ||= @root_account.all_groups.where(sis_source_id: group_id).preload(:context).take
@@ -60,8 +60,13 @@ module SIS
         raise ImportError, "User #{user_id} didn't exist for group user" unless user
         raise ImportError, "Group #{group_id} didn't exist for group user" unless group
 
+        if group.context.is_a?(Course) && !group.context.all_real_users.where(id: user.id).exists?
+          raise ImportError, "User #{user_id} doesn't have an enrollment in the course of group #{group_id}."
+        end
+
         # can't query group.group_memberships, since that excludes deleted memberships
-        group_membership = GroupMembership.where(group_id: group, user_id: user).take
+        group_membership = GroupMembership.where(group_id: group, user_id: user).
+          order(Arel.sql("CASE WHEN workflow_state = 'accepted' THEN 0 ELSE 1 END")).take
         group_membership ||= group.group_memberships.build(:user => user)
 
         group_membership.sis_batch_id = @batch.id
@@ -71,10 +76,6 @@ module SIS
           group_membership.workflow_state = 'accepted'
         when /deleted/i
           group_membership.workflow_state = 'deleted'
-        end
-
-        if group.context.is_a?(Course) && !group.context.all_real_users.where(id: user.id).exists?
-          raise ImportError, "User #{user_id} doesn't have an enrollment in the course of group #{group_id}."
         end
 
         if group_membership.valid?

@@ -372,6 +372,10 @@ class CalendarEventsApiController < ApplicationController
     end
 
     if @errors.empty?
+      calendar_events, assignments = events.partition { |e| e.is_a?(CalendarEvent) }
+      ActiveRecord::Associations::Preloader.new.preload(calendar_events, [:context, :parent_event])
+      ActiveRecord::Associations::Preloader.new.preload(assignments.map(&:context), [:account, :grading_period_groups, :enrollment_term])
+
       json = events.map do |event|
         subs = submissions[event.id] if submissions
         sub = subs.sort_by(&:submitted_at).last if subs

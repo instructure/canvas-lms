@@ -3,11 +3,13 @@
 --- 
 ja: 
   1_item_scores_5512cd03: "1- アイテムのスコア"
+  1_item_scores_examplescores_9736236: "1- 項目スコア：%{exampleScores}"
   1_user_found_76399771: "1 人のユーザが見つかりました。"
   1st_reviewer_3c1d0119: 1番目の評価者
   25th_75th_ile_406a67bf: "25-75 %ile"
   25th_75th_percentile_aa4c11f2: 25パーセンタイル-75パーセンタイル
   2_final_score_7b0fd15e: "2- 最終スコア"
+  2_final_score_exampleresult_922edf9c: "2- 最終スコア：%{exampleResult}"
   2nd_reviewer_94fdbcd: 2番目の評価者
   451_message: 
     description: 米国の貿易制限が適用される国からはこのサイトにアクセスできません。
@@ -1609,6 +1611,7 @@ ja:
   affects_viewing_the_publish_course_conclude_course_76d2f601: |-
       コースを公開、コースを終了、このコースを完全削除するボタンの表示に影響を与えます。
       このコースを完全に削除するボタンは、手動で作成したコースにのみ表示されます。
+  afghanistan_93_ab06805: "アフガニスタン (+93)"
   after_48b9d69: "...後"
   after_4c71e718: 後
   after_cbb5ebae: "...の後"
@@ -3977,6 +3980,7 @@ ja:
   cannot_be_present_when_course_id_is_present_785e6a59: コース_idが現在であるとき、現在になるはずはありません。
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: 上書き締め切り日を終了した採点期間内の日付に変更することはできません
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "役割名を%{label}「使用中」に変更することはできません： 既に使用中です"
+  cannot_change_the_default_term_name_edc2279b: 初期設定の用語名を変更することはできません
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: 上書き締め切り日を終了した採点期間内の日付に変更することはできません
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: 締め切り日を終了した採点期間内の日付に変更することはできません
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: 締め切り日を終了した採点期間の締め切り後に変更することはできません
@@ -4144,10 +4148,12 @@ ja:
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "スナップショットがクリックされたときの状態に戻すには、スナップショットをクリックします。注意:スナップショット撮影時点からの作業がすべて失われます。元に戻すことはできません！"
   click_to_add_a_name_6cf551b0: クリックして名前を追加する
   click_to_change_profile_picture_for_display_name_6a4b41db: "クリックしてプロフィール画像を変更する%{display_name}"
+  click_to_collapse_outcome_details_1d751617: クリックして結果の詳細を折りたたむ
   click_to_create_a_new_user_for_address_325f6683: "クリックして～の新規ユーザーを作成する%{address}"
   click_to_create_a_new_user_for_login_56d2daf5: "クリックして～の新規ユーザーを作成する%{login}"
   click_to_edit_drag_to_reorder_ab725681: クリックで編集、ドラッグで並べ替え
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: クリックして、受講生がこの解答を選択した場合のコメントを入力
+  click_to_expand_outcome_details_74a2a967: クリックして結果の詳細を展開する
   click_to_load_a020891b: (クリックで読み込み)
   click_to_modify_89fa26aa: クリックして変更する
   click_to_order_by_email_ascending_98b1a697: クリックしてメールを昇順で並べ替える
@@ -9341,6 +9347,7 @@ ja:
   grader_d1198a9c: 評価者
   grader_graderindex_45e04e57: "評価者%{graderIndex}"
   grader_gradernumber_fef5d5cf: "評価者%{graderNumber}"
+  grader_index_a55577a2: "評価者%{index}"
   grader_is_required_62c88f67: グレーダーは必須です
   grader_that_determines_final_grade_cc55f20: 最終グレードを決定するグレーダー
   graders_can_view_each_other_s_comments_d836b848: 評価者は互いのコメントを見ることができます
@@ -10093,9 +10100,11 @@ ja:
   hide_key_e8fe1e8c: キーを非表示にする
   hide_navigation_menu_f0b3e90: ナビゲーションメニューを非表示にする
   hide_notes_column_7749f408: メモ列を非表示
+  hide_outcomes_with_no_results_7e4ce06f: 結果のない結果を非表示にする
   hide_score_total_for_assessment_results_d0ef117f: アセスメント結果の合計スコアを非表示
   hide_sidebar_2b5b3776: サイドバーの非表示
   hide_student_names_3e59e862: 受講生の名前を非表示
+  hide_students_with_no_results_6a22f991: 結果のない受講生を非表示にする
   hide_sub_accounts_for_account_name_a6de98bd: "サブアカウントを非表示にする%{account_name}"
   high_b5cbd048: 高
   high_contrast_description: |-
@@ -10572,6 +10581,7 @@ ja:
       K-12 環境で意味を持つ機能、設定、およびスタイルです。現時点では、一部のスタイル変更のみに当てはまりますが、
       将来的に K-12 固有の項目が追加される可能性があります。
   k_2521301c: k
+  kazakhstan_7_8fe892c: "カザフスタン (+7)"
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "この提出は、あなたの%{groupType}グループの全員に当てはまりますので、注意してください。"
   keep_submissions_anonymous_5cbaf419: 提出物の匿名状態を維持
   kenya_254_2945663a: "ケニヤ (+254)"
@@ -10588,6 +10598,7 @@ ja:
   kind_7f0a88c4: 種類
   labels: 
     lock_module_until: ロック終了時刻
+  last_assessment_cd5659b6: 最終アセスメント：
   last_changed_b544504d: 最終変更：
   last_changed_date_82f1ce56: "最終変更：%{date}"
   last_day_attended_b72d623c: 最終出席日
@@ -13417,6 +13428,7 @@ ja:
   new_course_role_6a7bb75f: 新しいコースの役割
   new_criterion_6054bc7f: 新しい基準
   new_criterion_canceled_d8c2a655: 新しい基準はキャンセルされました
+  new_discussion_dae4fae3: 新しいディスカッション
   new_event_for_course_name_2ba1f734: "%{course_name} の新しいイベント"
   new_export_3ab758: 次のエクスポート
   new_features_for_developer_key_management_994090dc: 開発者キー管理の新機能
@@ -13520,6 +13532,7 @@ ja:
   no_subject_58b7941c: 件名なし
   no_subject_970aad80: 件名なし
   no_submission_for_assignment_a9cb6fe2: "～の提出なし%{assignment}"
+  no_submissions_164cea23: 提出はありません
   no_terms_eab5ee7b: 期間なし
   no_tls_618add1a: "TLS なし"
   no_unassigned_terms_deb7b76b: 割り当てられていない期間はありません
@@ -14242,7 +14255,7 @@ ja:
     cannot_unpublish_front_page: "トップ ページは非公開にできません"
     delete_button: 削除
     delete_confirmation: このページを削除してもよろしいですか？
-    delete_dialog_title: "Wiki ページの削除"
+    delete_dialog_title: ページを削除
     deleting_button: 削除中...
     edit_dialog_title: ページを編集
     errors: 
@@ -17261,6 +17274,7 @@ ja:
   rubrics_b5ef369b: 注釈
   running_c5a4998d: 実行中
   russia_7_87bc99d5: ロシア（+7）
+  rwanda_250_1a6b344b: "ルワンダ (+250)"
   salesforce_account_id_eb5c78ad: "Salesforce アカウント ID"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: セールスフォースには、制作アカウントより、サンドボックスアカウント用の異なるログインホストがあるので、セールスフォースアカウントを使用していて、このボックスをチェックしない場合は、認証されません。(そして、これは逆の場合でも起こります。制作アカウントを所持していて、このボックスをチェックする場合は、認証されません。)
   salesforce_ticketing_webtocase_connector_80f75716: "セールスフォース・チケット WebToCase コネクタ"
@@ -18968,6 +18982,7 @@ ja:
     update_grade: 成績を更新
     view_rubric_assessment_in_the_speedgrader: "注釈のアセスメントを SpeedGrader で表示する"
   submission_in_another_grading_period_e754b329: 別の採点期間の提出物
+  submission_index_e960f9bf: "提出%{index}"
   submission_options_5184a65b: 提出のオプション
   submission_score_b7a291e8: 提出物のスコア
   submission_status_3079e730: 提出状態
@@ -19456,6 +19471,7 @@ ja:
   there_was_a_problem_updating_the_comment_5f3595b9: コメントを更新中に問題がありました
   there_was_a_problem_updating_the_grade_1b6c8b4c: 成績を更新する際に問題がありました。
   there_was_a_problem_updating_the_submission_6e5280a1: この提出の更新中、問題がありました。
+  there_was_an_error_fetching_course_statistics_96e9dbad: コース統計を取得中にエラーが発生しました
   there_was_an_error_fetching_outcome_results_45c57590: 結果を取得中にエラーが発生しました
   there_was_an_error_fetching_submission_comments_ce153077: コメント提出を実行中にエラーが起こりました。
   there_was_an_error_generating_the_pairing_code_9edd639b: ペア設定コードの生成中にエラーがありました。
@@ -19869,6 +19885,7 @@ ja:
   to_access_the_account_courses_page_courses_view_li_e1da6165: "アカウントコースページにアクセスするには、コース - 表示リストが有効にされていなければなりません。"
   to_access_the_assignments_index_page_course_conten_a5b00f98: "課題のインデックスページにアクセスするには、コース内容 - 表示が有効有効にされていなければなりません。課題を個々の受講生と差別化するためには、ユーザー - 表示リストも有効有効にされていなければなりません。"
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "人物ページにアクセスしてグループを表示するには、ユーザー - 表示リストも有効にされていなければなりません。"
+  to_access_the_people_page_users_view_list_must_be__2f01333b: "人物ページにアクセスするには、ユーザー - 表示リストが有効にされていなければなりません。この権限が有効で、ユーザー - プライマリ電子メールアドレスの表示が無効である場合、ユーザーにはログインIDとして使用される電子メールアドレスが表示されます。ログインIDを表示するには、コース内の受講生の追加/削除 - コース内の講師、コースデザイナー、またはTAの追加/削除も有効にする必要があります。"
   to_access_the_people_page_users_view_list_must_be__5a5475fe: "人物ページにアクセスするには、ユーザー - 表示リストが有効にされていなければなりません。"
   to_access_the_people_page_users_view_list_must_be__756d7188: |-
       人物ページにアクセスするには、ユーザー - 表示リストが有効にされていなければなりません。
@@ -19929,6 +19946,7 @@ ja:
   to_differentiate_assignments_to_individual_student_6cc40fde: "課題を個々の受講生と差別化するためには、ユーザー - 表示リストも有効有効にされていなければなりません。"
   to_do_1d554f36: タスク
   to_do_5526f10a: タスク：
+  to_do_6ac7b2dc: タスク：
   to_do_date_d6b79bfd: "タスク%{date}"
   to_do_date_ddfb582c: タスク日付：
   to_do_items_loading_d1cdfcd5: タスクの読み込み
@@ -21250,6 +21268,7 @@ ja:
   you_have_submitted_the_assignment_7ef8a51a: 課題を提出しています
   you_have_unsynced_changes_that_will_sync_to_all_as_9028e711: 新しい関連付けが保存されたときに、関連付けられているすべてのコースに同期する変更を同期していません。
   you_just_sent_a_message_in_canvas_86b4945c: "経った今、Canvas 内でメッセージを送信しました。"
+  you_left_the_required_name_field_empty_8f9bce5c: 必須の名前フィールドが空欄のままです。
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: もちろん受講生が必要になるでしょう。誰も聞いていないコースを教えても意味がありません。
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: このリンクのステップに従い、トークンのリフレッシュが必要となります。テクニカル・エクスパートの助けが必要な可能性があります。
   you_may_not_reproduce_or_communicate_any_of_the_co_7636b552: "あなたは、このコースからエクスポートされたファイルを含め、このコースのコンテンツは事前にあなたの期間から書面にて許可を得ていない限り、複製または伝達することはできません。                  特定のオンラインユーザー合意ガイドラインについては、あなたの期間に問い合わせてください。"

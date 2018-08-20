@@ -3,11 +3,13 @@
 --- 
 ar: 
   1_item_scores_5512cd03: "1- درجات العنصر"
+  1_item_scores_examplescores_9736236: "1- درجة العنصر: %{exampleScores}"
   1_user_found_76399771: "تم العثور على مستخدم واحد."
   1st_reviewer_3c1d0119: "المراجع الأول"
   25th_75th_ile_406a67bf: "المئين 25-75"
   25th_75th_percentile_aa4c11f2: "المئين 25-75"
   2_final_score_7b0fd15e: "2- الدرجة النهائية"
+  2_final_score_exampleresult_922edf9c: "2- الدرجة النهائية: %{exampleResult}"
   2nd_reviewer_94fdbcd: "المراجع الثاني"
   451_message: 
     description: "أنت لست مخوّلاً للوصول إلى هذا الموقع لأنك موجود في بلد خاضع لقيود تجارية أمريكية."
@@ -1644,6 +1646,7 @@ ar:
   affects_viewing_the_publish_course_conclude_course_76d2f601: |-
       يؤثر على عرض أزرار نشر المساق وإنهاء المساق والحذف الدائم لهذا المساق.
       يظهر زر الحذف الدائم لهذا المساق فقط للمساقات المنشأة يدويًا.
+  afghanistan_93_ab06805: "أفغانستان (+93)"
   after_48b9d69: بعد..
   after_4c71e718: بعد
   after_cbb5ebae: بعد...
@@ -4069,6 +4072,7 @@ ar:
   cannot_be_present_when_course_id_is_present_785e6a59: "لا يمكن أن يكون حاضراً عندما يكون course_id حاضراً"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "يتعذر تغيير تاريخ استحقاق إلغاء إلى تاريخ خلال فترة منح مغلقة لمنح العلامات"
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "لا يمكن تغيير اسم الدور إلى %{label}: قيد الاستخدام بالفعل"
+  cannot_change_the_default_term_name_edc2279b: "يتعذر تغيير اسم الفصل الدراسي الافتراضي"
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "يتعذر تغيير تاريخ استحقاق إلغاء في فترة منح مغلقة لمنح العلامات"
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "يتعذر تغيير تاريخ استحقاق إلى تاريخ خلال فترة منح مغلقة لمنح العلامات"
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: "يتعذر تغيير تاريخ استحقاق عند استحقاقه في فترة منح مغلقة لمنح العلامات"
@@ -4236,10 +4240,12 @@ ar:
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "انقر فوق لقطة للعودة إلى نسختك التجريبية كما كانت عند أخذ اللقطة. ملاحظة: ستفقد أي عمل قمت به منذ أخذ اللقطة ولا يمكن التراجع عن هذا!"
   click_to_add_a_name_6cf551b0: "انقر لإضافة اسم"
   click_to_change_profile_picture_for_display_name_6a4b41db: "انقر لتغيير صورة ملف التعريف لـ %{display_name}"
+  click_to_collapse_outcome_details_1d751617: "انقر لطي تفاصيل الحصيلة"
   click_to_create_a_new_user_for_address_325f6683: "انقر لإنشاء مستخدم جديد لـ %{address}"
   click_to_create_a_new_user_for_login_56d2daf5: "انقر لإنشاء مستخدم جديد لـ %{login}"
   click_to_edit_drag_to_reorder_ab725681: "انقر للتحرير، وقم بالسحب لإعادة الترتيب"
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "انقر لإدخال تعليقات، إذا اختار الطالب هذه الإجابة"
+  click_to_expand_outcome_details_74a2a967: "انقر لتوسيع تفاصيل الحصيلة"
   click_to_load_a020891b: "(انقر للتحميل)"
   click_to_modify_89fa26aa: "انقر للتعديل"
   click_to_order_by_email_ascending_98b1a697: "انقر للترتيب تصاعديًا بالبريد الإلكتروني"
@@ -9746,6 +9752,7 @@ ar:
   grader_d1198a9c: التقييم
   grader_graderindex_45e04e57: "مقيّم الدرجة %{graderIndex}"
   grader_gradernumber_fef5d5cf: "مقيّم الدرجة %{graderNumber}"
+  grader_index_a55577a2: "مقيّم الدرجة %{index}"
   grader_is_required_62c88f67: "مطلوب القائمين بالتقييم"
   grader_that_determines_final_grade_cc55f20: "القائم بالتقييم الذي يحدد الدرجة النهائية"
   graders_can_view_each_other_s_comments_d836b848: "يمكن للمقيّمين عرض تعليقات بعضهم البعض"
@@ -10534,9 +10541,11 @@ ar:
   hide_key_e8fe1e8c: "إخفاء المفتاح"
   hide_navigation_menu_f0b3e90: "إخفاء قائمة التنقل"
   hide_notes_column_7749f408: "إخفاء عمود الملاحظات"
+  hide_outcomes_with_no_results_7e4ce06f: "إخفاء الحصائل بدون نتائج"
   hide_score_total_for_assessment_results_d0ef117f: "إخفاء إجمالي النتيجة لنتائج التقييم"
   hide_sidebar_2b5b3776: "إخفاء الشريط الجانبي"
   hide_student_names_3e59e862: "إخفاء أسماء الطلاب"
+  hide_students_with_no_results_6a22f991: "إخفاء الطلاب بدون نتائج"
   hide_sub_accounts_for_account_name_a6de98bd: "إخفاء الحسابات الفرعية لـ %{account_name}"
   high_b5cbd048: عالية
   high_contrast_description: |-
@@ -11015,6 +11024,7 @@ ar:
       ميزات وإعدادات وأنماط مفيدة بشكل خاص في بيئة التعليم الأساسي والثانوي K-12. يطبق هذا الآن
       بعض تغييرات الأنماط فقط، ولكن ستتم إضافة المزيد من الميزات الخاصة بالتعليم الأساسي والثانوي في المستقبل.
   k_2521301c: k
+  kazakhstan_7_8fe892c: "كازاخستان (+7)"
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "تذكر أن هذا الإرسال يخص كل شخص في مجموعة %{groupType} الخاصة بك."
   keep_submissions_anonymous_5cbaf419: "إبقاء الإرسالات مجهولة الهوية"
   kenya_254_2945663a: "كينيا (+254)"
@@ -11031,6 +11041,7 @@ ar:
   kind_7f0a88c4: النوع
   labels: 
     lock_module_until: "التأمين حتى"
+  last_assessment_cd5659b6: "التقييم الأخير: "
   last_changed_b544504d: "تاريخ آخر تغيير:"
   last_changed_date_82f1ce56: "تاريخ آخر تغيير: %{date}"
   last_day_attended_b72d623c: "آخر يوم حضور"
@@ -13924,6 +13935,7 @@ ar:
   new_course_role_6a7bb75f: "دور مساق جديد"
   new_criterion_6054bc7f: "معيار جديد"
   new_criterion_canceled_d8c2a655: "تم إلغاء معيار جديد"
+  new_discussion_dae4fae3: "نقاش جديد"
   new_event_for_course_name_2ba1f734: "حدث جديد لـ %{course_name}"
   new_export_3ab758: "تصدير جديد"
   new_features_for_developer_key_management_994090dc: "ميزات جديدة لإدارة مفتاح المطور"
@@ -14027,6 +14039,7 @@ ar:
   no_subject_58b7941c: "لا يوجد موضوع"
   no_subject_970aad80: "لا يوجد موضوع"
   no_submission_for_assignment_a9cb6fe2: "لا يوجد إرسال لـ %{assignment}"
+  no_submissions_164cea23: "لا توجد إرسالات"
   no_terms_eab5ee7b: "لا توجد فصول دراسية"
   no_tls_618add1a: "لا يوجد TLS"
   no_unassigned_terms_deb7b76b: "لا توجد فصول غير معينة"
@@ -14773,7 +14786,7 @@ ar:
     cannot_unpublish_front_page: "لا يمكن إلغاء نشر الصفحة الأمامية"
     delete_button: حذف
     delete_confirmation: "هل تريد بالتأكيد حذف هذه الصفحة؟"
-    delete_dialog_title: "حذف صفحة Wiki"
+    delete_dialog_title: "حذف الصفحة"
     deleting_button: "جارٍ الحذف..."
     edit_dialog_title: "تحرير صفحة"
     errors: 
@@ -17976,6 +17989,7 @@ ar:
   rubrics_b5ef369b: "معايير التقييم"
   running_c5a4998d: "جارٍ التشغيل"
   russia_7_87bc99d5: "روسيا (+7)"
+  rwanda_250_1a6b344b: "رواندا (+250)"
   salesforce_account_id_eb5c78ad: "معرف حساب Salesforce"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "يختلف مضيف تسجيل دخول Salesforce لحسابات sandbox عن مضيف الحسابات الإنتاجية، فإذا كنت تستخدم حساب sandbox التابع لـ Salesforce ولم تقم بتحديد هذه الخانة، ستصبح المصادقة غير ممكنة (ونفس الشيء في الاتجاه الآخر، فإذا كنت تستخدم حساب إنتاج وتقوم بتحديد هذه الخانة، ستصبح المصادقة غير ممكنة)"
   salesforce_ticketing_webtocase_connector_80f75716: "رابط تذاكر WebToCase لـ Salesforce"
@@ -19751,6 +19765,7 @@ ar:
     update_grade: "تحديث الدرجة"
     view_rubric_assessment_in_the_speedgrader: "عرض تقييم العنوان في SpeedGrader"
   submission_in_another_grading_period_e754b329: "الإرسال في مرحلة تقييم أخرى"
+  submission_index_e960f9bf: "إرسال %{index}"
   submission_options_5184a65b: "خيارات الإرسال"
   submission_score_b7a291e8: "درجة الإرسال"
   submission_status_3079e730: "حالة الإرسال"
@@ -20256,6 +20271,7 @@ ar:
   there_was_a_problem_updating_the_comment_5f3595b9: "حدثت مشكلة أثناء تحديث التعليق"
   there_was_a_problem_updating_the_grade_1b6c8b4c: "حدثت مشكلة أثناء تحديث الدرجة."
   there_was_a_problem_updating_the_submission_6e5280a1: "حدثت مشكلة أثناء تحديث الإرسال."
+  there_was_an_error_fetching_course_statistics_96e9dbad: "حدث خطأ أثناء إحضار إحصائيات المساق"
   there_was_an_error_fetching_outcome_results_45c57590: "حدث خطأ أثناء جلب نتائج النواتج"
   there_was_an_error_fetching_submission_comments_ce153077: "حدث خطأ أثناء جلب التعليقات المرسلة"
   there_was_an_error_generating_the_pairing_code_9edd639b: "حدث خطأ أثناء إنشاء رمز الإقران"
@@ -20677,6 +20693,7 @@ ar:
   to_access_the_account_courses_page_courses_view_li_e1da6165: "للوصول إلى صفحة مساقات الحساب، يجب أيضًا تمكين المساقات - عرض القائمة."
   to_access_the_assignments_index_page_course_conten_a5b00f98: "للوصول إلى صفحة فهرس المهام، يجب تمكين محتوى المساق - عرض. لتوزيع المهام على الطلاب كل على حدة، يجب أيضًا تمكين المستخدمون - عرض القائمة."
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "للوصول إلى صفحة الأشخاص وعرض المجموعات، يجب أيضًا تمكين المستخدمون - عرض القائمة."
+  to_access_the_people_page_users_view_list_must_be__2f01333b: "للوصول إلى صفحة الأشخاص، يجب تمكين المستخدمون - عرض القائمة. إذا كان هذا الإذن ممكّنًا، وإذا كانت ميزة المستخدمون - عرض عنوان البريد الإلكتروني الرئيسي معطلة، فسيتمكن المستخدمون من رؤية عناوين البريد الإلكتروني المستخدمة كمعرفات تسجيل دخول. لعرض معرفات تسجيل الدخول - يجب أيضًا تمكين المستخدمون / إضافة /إزالة الطلاب من المساقات والمستخدمون - إضافة / إزالة المعلمين أو مصممي المساقات أو المعلمين المساعدين في المساقات."
   to_access_the_people_page_users_view_list_must_be__5a5475fe: "للوصول إلى صفحة الأشخاص، يجب تمكين المستخدمون - عرض القائمة."
   to_access_the_people_page_users_view_list_must_be__756d7188: |-
       للوصول إلى صفحة الأشخاص، يجب تمكين المستخدمون - عرض القائمة.
@@ -20736,6 +20753,7 @@ ar:
   to_differentiate_assignments_to_individual_student_6cc40fde: "لتوزيع المهام على الطلاب كل على حدة، يجب أيضًا تمكين المستخدمون - عرض القائمة."
   to_do_1d554f36: "قائمة مهام"
   to_do_5526f10a: "قائمة مهام:"
+  to_do_6ac7b2dc: "قائمة المهام:"
   to_do_date_d6b79bfd: "قائمة المهام %{date}"
   to_do_date_ddfb582c: "تاريخ قائمة المهام:"
   to_do_items_loading_d1cdfcd5: "تحميل عناصر قائمة المهام"
@@ -22108,6 +22126,7 @@ ar:
   you_have_submitted_the_assignment_7ef8a51a: "قمت بإرسال المهمة"
   you_have_unsynced_changes_that_will_sync_to_all_as_9028e711: "لديك تغييرات غير متزامنة ستتم مزامنتها إلى جميع المساقات المقترنة عند حفظ اقتران جديد."
   you_just_sent_a_message_in_canvas_86b4945c: "أرسلت رسالة للتو في Canvas"
+  you_left_the_required_name_field_empty_8f9bce5c: "لقد تركت حقل الاسم المطلوب فارغًا."
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "ستحتاج بالتأكيد إلى بعض هؤلاء. ما متعة تدريس مساق ولا أحد يستمع؟"
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "ستحتاج لرمز تحديث، تابع الخطوات الموجودة على هذا الارتباط، قد تحتاج إلى مساعدة خبير تقني"
   you_may_not_reproduce_or_communicate_any_of_the_co_7636b552: |-

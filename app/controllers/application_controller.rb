@@ -539,8 +539,15 @@ class ApplicationController < ActionController::Base
     tabs = Rails.cache.fetch(['tabs_available', @context, @current_user, @domain_root_account,
       session[:enrollment_uuid]].cache_key, expires_in: 1.hour) do
 
+      precalculated_permissions = @context.is_a?(Course) && @current_user &&
+        @current_user.precalculate_permissions_for_courses([@context], SectionTabHelper::PERMISSIONS_TO_PRECALCULATE).values.first
+
       @context.tabs_available(@current_user,
-        :session => session, :include_hidden_unused => true, :root_account => @domain_root_account)
+        :session => session,
+        :include_hidden_unused => true,
+        :root_account => @domain_root_account,
+        :precalculated_permissions => precalculated_permissions
+      )
     end
     valid = tabs.any?{|t| t[:id] == id }
     render_tab_disabled unless valid || opts[:no_render]

@@ -187,7 +187,7 @@ class Enrollment::BatchStateUpdater
   def self.run_call_backs_for(batch)
     raise ArgumentError, 'Cannot call with more than 1000 enrollments' if batch.count > 1_000
     Enrollment.transaction do
-      EnrollmentState.send_later_if_production(:force_recalculation, batch.map(&:id))
+      EnrollmentState.send_later_if_production(:force_recalculation, batch)
       students = Enrollment.of_student_type.where(id: batch).preload(user: :linked_observers).to_a
       user_ids = Enrollment.where(id: batch).distinct.pluck(:user_id)
       courses = Course.where(id: Enrollment.where(id: batch).select(:course_id).distinct).to_a
