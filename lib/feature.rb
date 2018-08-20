@@ -558,6 +558,33 @@ END
       beta: true,
       development: true,
     },
+    'hide_inbox' =>
+    {
+      display_name: -> { "Hide Inbox" },
+      description: -> { "Hides the inbox." },
+      applies_to: "RootAccount",
+      state: "allowed",
+      beta: false,
+      development: false,
+    },
+    'zero_out_past_due' =>
+    {
+      display_name: -> { "Auto-grade past due assignments" },
+      description: -> { "Automatically assign a grade of zero to past due assignments." },
+      applies_to: "RootAccount",
+      state: "allowed",
+      beta: false,
+      development: false,
+    },
+    'auto_due_dates' =>
+    {
+      display_name: -> { "Distribute due dates on import" },
+      description: -> { "Distribute due dates evenly across the duration of the course" },
+      applies_to: "RootAccount",
+      state: "allowed",
+      beta: false,
+      development: false,
+    }
   )
 
   def self.definitions

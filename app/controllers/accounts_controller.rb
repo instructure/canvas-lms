@@ -774,8 +774,8 @@ class AccountsController < ApplicationController
         PERMISSIONS: {
           :create_tool_manually => @account.grants_right?(@current_user, session, :create_tool_manually),
         },
-        ZERO_OUT_PASTDUE_ASSIGNMENTS: ENV['ZERO_OUT_PASTDUE_ASSIGNMENTS'] && ENV['ZERO_OUT_PASTDUE_ASSIGNMENTS'].downcase == 'true' ? 'true': 'false',
-        AUTOMATIC_DUE_DATES: ENV['AUTOMATIC_DUE_DATES'] && ENV['AUTOMATIC_DUE_DATES'].downcase == 'true' ? 'true': 'false' 
+        ZERO_OUT_PASTDUE_ASSIGNMENTS: Account.first.feature_flags.find_by(feature: 'zero_out_past_due').try(:enabled?),
+        AUTOMATIC_DUE_DATES: Account.first.feature_flags.find_by(feature: 'auto_due_dates').try(:enabled?),
       })
     end
   end
