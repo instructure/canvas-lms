@@ -41,6 +41,7 @@
     "enzyme-to-json": "^3.0.1",
     "format-message-cli": "^6",
     "jest": "^23",
+    "jest-canvas-mock": "^1.1.0",
     "moxios": "^0.4.0",
     "prettier": "^1.7.3",
     "quiz-presets": "^5",
@@ -72,7 +73,8 @@
   },
   "jest": {
     "setupFiles": [
-      "./jest-setup.js"
+      "./jest-setup.js",
+      "jest-canvas-mock"
     ],
     "snapshotSerializers": [
       "<rootDir>/node_modules/enzyme-to-json/serializer"
