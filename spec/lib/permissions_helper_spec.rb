@@ -367,7 +367,7 @@ describe PermissionsHelper do
       })
     end
 
-    it 'should return enrollments that have permission from a direct account override' do
+    it 'should return true for enrollments that have permission from a direct account override' do
       student_enrollment = course_with_student(active_all: true)
       teacher_enrollment = course_with_teacher(user: @user, active_all: true)
       RoleOverride.create!(permission: 'manage_calendar', enabled: true, role: student_role, account: Account.default)
@@ -380,7 +380,7 @@ describe PermissionsHelper do
       })
     end
 
-    it 'should return enrollments that have permission from an ancestor account override' do
+    it 'should return true for enrollments that have permission from an ancestor account override' do
       root_account = Account.default
       sub_account1 = Account.create!(name: 'Sub-account 1', parent_account: root_account)
       sub_account2 = Account.create!(name: 'Sub-account 2', parent_account: sub_account1)
@@ -395,7 +395,7 @@ describe PermissionsHelper do
       })
     end
 
-    it 'should only return enrollments that have permission for the given override' do
+    it 'should only return true for enrollments that have permission for the given override' do
       student_enrollment = course_with_student(active_all: true)
       teacher_enrollment = course_with_teacher(user: @user, active_all: true)
       RoleOverride.create!(permission: 'manage_grades', enabled: true, role: student_role, account: Account.default) # can't actually turn manage_grades on for students
@@ -408,7 +408,7 @@ describe PermissionsHelper do
       })
     end
 
-    it 'should return enrollments that have permission from an account role' do
+    it 'should return true for enrollments that have permission from an account role' do
       student_enrollment = course_with_student(active_all: true)
       teacher_enrollment = course_with_teacher(user: @user, active_all: true)
       custom_role = custom_account_role('OverrideTest', account: Account.default)

@@ -103,6 +103,7 @@ module PermissionsHelper
       end
     end
 
+    # enabled for enrollment role
     if enrollment_state == :completed
       concluded_roles = permission_details[:applies_to_concluded]
       return false unless concluded_roles
@@ -111,7 +112,6 @@ module PermissionsHelper
       return false if permission_details[:restrict_future_enrollments]
     end
 
-    # enabled for enrollment role
     if available_to_roles.include?(role_type)
       role_on = perm_hash.dig(:role_overrides, [role_id, permission], :enabled) && perm_hash.dig(:role_overrides, [role_id, permission], :self)
       role_on.nil? ? true_for_roles.include?(role_type) : role_on
