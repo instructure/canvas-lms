@@ -45,6 +45,9 @@ class DeveloperKey < ActiveRecord::Base
 
   validates_as_url :redirect_uri, allowed_schemes: nil
   validate :validate_redirect_uris
+  validate :validate_public_jwk
+
+  attr_reader :private_jwk
 
   scope :nondeleted, -> { where("workflow_state<>'deleted'") }
   scope :not_active, -> { where("workflow_state<>'active'") } # search for deleted & inactive keys
@@ -102,6 +105,13 @@ class DeveloperKey < ActiveRecord::Base
 
   def generate_api_key(overwrite=false)
     self.api_key = CanvasSlug.generate(nil, 64) if overwrite || !self.api_key
+  end
+
+  def generate_rsa_keypair!(overwrite: false)
+    return if public_jwk.present? && !overwrite
+    key_pair = Lti::RSAKeyPair.new
+    @private_jwk = key_pair.to_jwk
+    self.public_jwk = key_pair.public_jwk.to_h
   end
 
   def set_auto_expire_tokens
@@ -226,6 +236,18 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   private
+
+  def validate_public_jwk
+    return true if public_jwk.blank?
+
+    if public_jwk['kty'] != Lti::RSAKeyPair::KTY
+      errors.add :public_jwk, "Must use #{Lti::RSAKeyPair::KTY} kty"
+    end
+
+    if public_jwk['alg'] != Lti::RSAKeyPair::ALG
+      errors.add :public_jwk, "Must use #{Lti::RSAKeyPair::ALG} alg"
+    end
+  end
 
   def invalidate_access_tokens_if_scopes_removed!
     return unless developer_key_management_and_scoping_on?
