@@ -2,3 +2,6 @@ source 'https://rubygems.org'
 
 # Specify your gem's dependencies in canvas_http.gemspec
 gemspec
+
+gem 'multipart', path: '../multipart'
+gem "canvas_slug", path: "../canvas_slug"
