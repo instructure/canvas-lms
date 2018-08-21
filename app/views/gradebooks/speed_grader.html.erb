@@ -215,6 +215,7 @@
                 <a class="submission-file-download icon-download" title="<%= t("Download this file") %>" href="<%= download_url %>"></a>
                 <span class="turnitin_score_container"></span>
                 <a class="display_name no-hover" href="<%= preview_url %>" title="<%= t('titles.preview_file', "Preview this File") %>">???</a>
+                <span id="react_pill_container"></span>
               </div>
             </div>
             <% if @assignment.assignment_configuration_tool_lookup_ids.present? %>

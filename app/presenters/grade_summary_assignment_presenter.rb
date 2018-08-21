@@ -27,6 +27,16 @@ class GradeSummaryAssignmentPresenter
     @originality_reports = @submission.originality_reports_for_display if @submission
   end
 
+  def upload_status
+    return unless submission
+
+    submission.attachments.
+      where(workflow_state: ['errored', 'pending_upload']).
+      order(:workflow_state).
+      pluck(:workflow_state).
+      first
+  end
+
   def originality_report?
     @originality_reports.present?
   end
