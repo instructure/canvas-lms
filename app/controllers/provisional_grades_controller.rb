@@ -222,7 +222,15 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
     final_mark = pg.copy_to_final_mark!(@current_user)
     selection.provisional_grade = final_mark
     selection.save!
-    render :json => provisional_grade_json(final_mark, pg.submission, @assignment, @current_user, %w(submission_comments rubric_assessment crocodoc_urls)).merge(:selected => true)
+    render json: provisional_grade_json(
+      course: @context,
+      assignment: @assignment,
+      submission: pg.submission,
+      provisional_grade: final_mark,
+      current_user: @current_user,
+      avatars: service_enabled?(:avatars) && !@assignment.grade_as_group?,
+      includes: %w(submission_comments rubric_assessment crocodoc_urls)
+    ).merge(selected: true)
   end
 
   # @API Publish provisional grades for an assignment

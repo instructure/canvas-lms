@@ -203,7 +203,7 @@ class Assignment
         if @assignment.grade_as_group?
           comments = comments.reject { |comment| comment.group_comment_id.nil? }
         end
-        json[:submission_comments] = anonymous_moderated_submission_comments(
+        json[:submission_comments] = anonymous_moderated_submission_comments_json(
           assignment: @assignment,
           course: @course,
           current_user: @current_user,

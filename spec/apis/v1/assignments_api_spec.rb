@@ -924,11 +924,15 @@ describe AssignmentsApiController, type: :request do
             :include => ['submission']
              )
       assign = json.first
-      expect(assign['submission']).to eq(
-        json_parse(
-          controller.submission_json(submission, assignment, @user, session, { include: ['submission'] }).to_json
-        )
-      )
+      s_json = controller.submission_json(
+        submission,
+        assignment,
+        @user,
+        session,
+        assignment.context,
+        { include: ['submission'] }
+      ).to_json
+      expect(assign['submission']).to eq(json_parse(s_json))
     end
 
     it "includes all_dates with include flag" do
@@ -4193,11 +4197,15 @@ describe AssignmentsApiController, type: :request do
           :format => "json", :course_id => @course.id.to_s,
           :id => assignment.id.to_s},
           {:include => ['submission']})
-        expect(json['submission']).to eq(
-          json_parse(
-            controller.submission_json(submission, assignment, @user, session, { include: ['submission'] }).to_json
-          )
-        )
+        s_json = controller.submission_json(
+          submission,
+          assignment,
+          @user,
+          session,
+          assignment.context,
+          { include: ['submission'] }
+        ).to_json
+        expect(json['submission']).to eq(json_parse(s_json))
       end
 
       context "AssignmentFreezer plugin disabled" do
