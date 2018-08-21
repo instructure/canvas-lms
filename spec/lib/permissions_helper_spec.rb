@@ -351,6 +351,20 @@ describe PermissionsHelper do
   end
 
   describe "precalculate_permissions_for_courses" do
+    def exclude_reads(permissions_hash)
+      Hash[permissions_hash.map{|k, v| [k, v.except(:read, :read_grades, :read_as_admin, :participate_as_student)]}]
+    end
+
+    it "should return other course-level (non-standard) permission values for active enrollments" do
+      invited_student_enrollment = course_with_student(:active_course => true)
+      active_student_enrollment = course_with_student(:user => @user, :active_all => true)
+      courses = [invited_student_enrollment.course, active_student_enrollment.course]
+      expect(@user.precalculate_permissions_for_courses(courses, [:manage_calendar])).to eq({
+        invited_student_enrollment.global_course_id => {:manage_calendar => false},
+        active_student_enrollment.global_course_id => {:manage_calendar => false, :read => true, :read_grades => true, :participate_as_student => true}
+      })
+    end
+
     it 'should return enrollments that have permission from a direct account override' do
       student_enrollment = course_with_student(active_all: true)
       teacher_enrollment = course_with_teacher(user: @user, active_all: true)
@@ -358,7 +372,7 @@ describe PermissionsHelper do
       RoleOverride.create!(permission: 'manage_calendar', enabled: false, role: teacher_role, account: Account.default)
 
       courses = [student_enrollment.course, teacher_enrollment.course]
-      expect(@user.precalculate_permissions_for_courses(courses, [:manage_calendar])).to eq({
+      expect(exclude_reads(@user.precalculate_permissions_for_courses(courses, [:manage_calendar]))).to eq({
         student_enrollment.global_course_id => {:manage_calendar => true},
         teacher_enrollment.global_course_id => {:manage_calendar => false}
       })
@@ -373,7 +387,7 @@ describe PermissionsHelper do
       RoleOverride.create!(permission: 'manage_calendar', enabled: true, role: student_role, account: sub_account1)
 
       courses = [student_enrollment1.course, student_enrollment2.course]
-      expect(@user.precalculate_permissions_for_courses(courses, [:manage_calendar])).to eq({
+      expect(exclude_reads(@user.precalculate_permissions_for_courses(courses, [:manage_calendar]))).to eq({
         student_enrollment1.global_course_id => {:manage_calendar => false},
         student_enrollment2.global_course_id => {:manage_calendar => true}
       })
@@ -386,7 +400,7 @@ describe PermissionsHelper do
       RoleOverride.create!(permission: 'manage_grades', enabled: false, role: teacher_role, account: Account.default)
 
       courses = [student_enrollment.course, teacher_enrollment.course]
-      expect(@user.precalculate_permissions_for_courses(courses, [:manage_calendar, :manage_grades])).to eq({
+      expect(exclude_reads(@user.precalculate_permissions_for_courses(courses, [:manage_calendar, :manage_grades]))).to eq({
         student_enrollment.global_course_id => {:manage_calendar => false, :manage_grades => false},
         teacher_enrollment.global_course_id => {:manage_calendar => true, :manage_grades => false}
       })
@@ -399,13 +413,13 @@ describe PermissionsHelper do
       @user.account_users.create!(account: Account.default, role: custom_role)
 
       courses = [student_enrollment.course, teacher_enrollment.course]
-      expect(@user.precalculate_permissions_for_courses(courses, [:manage_calendar, :manage_grades])).to eq({
+      expect(exclude_reads(@user.precalculate_permissions_for_courses(courses, [:manage_calendar, :manage_grades]))).to eq({
         student_enrollment.global_course_id => {:manage_calendar => false, :manage_grades => false},
         teacher_enrollment.global_course_id => {:manage_calendar => true, :manage_grades => true}
       })
 
       RoleOverride.create!(permission: 'manage_calendar', enabled: true, role: custom_role, account: Account.default)
-      expect(@user.precalculate_permissions_for_courses(courses, [:manage_calendar, :manage_grades])).to eq({
+      expect(exclude_reads(@user.precalculate_permissions_for_courses(courses, [:manage_calendar, :manage_grades]))).to eq({
         student_enrollment.global_course_id => {:manage_calendar => true, :manage_grades => false},
         teacher_enrollment.global_course_id => {:manage_calendar => true, :manage_grades => true}
       })
@@ -417,7 +431,7 @@ describe PermissionsHelper do
       active_student_enrollment = course_with_student(:user => @user, :active_all => true)
 
       courses = [invited_student_enrollment.course, active_student_enrollment.course]
-      expect(@user.precalculate_permissions_for_courses(courses, [:read_roster, :post_to_forum])).to eq({
+      expect(exclude_reads(@user.precalculate_permissions_for_courses(courses, [:read_roster, :post_to_forum]))).to eq({
         invited_student_enrollment.global_course_id => {:read_roster => true, :post_to_forum => false},
         active_student_enrollment.global_course_id => {:read_roster => true, :post_to_forum => true}
       })
@@ -439,7 +453,7 @@ describe PermissionsHelper do
       active_student_enrollment = course_with_student(:user => @user, :active_all => true)
 
       courses = [concluded_student_enrollment.course, concluded_teacher_enrollment.course, active_student_enrollment.course]
-      expect(@user.precalculate_permissions_for_courses(courses, [:moderate_forum, :read_forum, :post_to_forum])).to eq({
+      expect(exclude_reads(@user.precalculate_permissions_for_courses(courses, [:moderate_forum, :read_forum, :post_to_forum]))).to eq({
         concluded_student_enrollment.global_course_id => {:moderate_forum => false, :read_forum => true, :post_to_forum => false}, # concluded students can't post
         concluded_teacher_enrollment.global_course_id => {:moderate_forum => false, :read_forum => true, :post_to_forum => true}, # concluded teachers can
         active_student_enrollment.global_course_id => {:moderate_forum => true, :read_forum => true, :post_to_forum => true} # active student can do all of it
