@@ -2880,6 +2880,43 @@ class Assignment < ActiveRecord::Base
     moderation_grader_users.exists?(user)
   end
 
+  # This is a helper method intended to ensure the number of provisional graders
+  # for a moderated assignment doesn't exceed the prescribed maximum. Currently,
+  # it is used for submitting grades, comments, and rubrics via SpeedGrader.
+  # If the assignment is not moderated or the item is not provisional, this
+  # method will simply execute the provided block without any additional checks.
+  def ensure_grader_can_adjudicate(grader:, provisional: false, occupy_slot:)
+    unless provisional && moderated_grading?
+      yield and return
+    end
+
+    Assignment.transaction do
+      # If we can't add a new grader, this will raise an error and abort
+      # the transaction.
+      moderation_grader = moderation_graders.find_by(user: grader)
+      if moderation_grader.nil?
+        create_moderation_grader(grader, occupy_slot: occupy_slot)
+        filled_available_slot = occupy_slot
+      elsif moderation_grader.slot_taken != occupy_slot
+        if occupy_slot
+          ensure_moderation_grader_slot_available(grader)
+          filled_available_slot = true
+        end
+        moderation_grader.update!(slot_taken: occupy_slot)
+      end
+
+      yield
+
+      # If we added a grader, attempt to handle a potential race condition:
+      # multiple new graders could have tried to add themselves simultaneously
+      # when there weren't enough slots open for all of them. If we ended up
+      # with too many provisional graders, throw an error to roll things back.
+      if filled_available_slot && provisional_moderation_graders.count > grader_count
+        raise MaxGradersReachedError
+      end
+    end
+  end
+
   private
 
   def ensure_moderation_grader_slot_available(user)
@@ -2973,42 +3010,5 @@ class Assignment < ActiveRecord::Base
     assignment.grader_names_visible_to_final_grader = true
     assignment.grader_comments_visible_to_graders = true
     assignment.graders_anonymous_to_graders = false
-  end
-
-  # This is a helper method intended to ensure the number of provisional graders
-  # for a moderated assignment doesn't exceed the prescribed maximum. Currently,
-  # it is used for submitting grades and comments via SpeedGrader. If the assignment
-  # is not moderated or the grade/comment being issued is not provisional, this
-  # method will simply execute the provided block without any additional checks.
-  def ensure_grader_can_adjudicate(grader:, provisional: false, occupy_slot:)
-    unless provisional && moderated_grading?
-      yield and return
-    end
-
-    Assignment.transaction do
-      # If we can't add a new grader, this will raise an error and abort
-      # the transaction.
-      moderation_grader = moderation_graders.find_by(user: grader)
-      if moderation_grader.nil?
-        create_moderation_grader(grader, occupy_slot: occupy_slot)
-        filled_available_slot = occupy_slot
-      elsif moderation_grader.slot_taken != occupy_slot
-        if occupy_slot
-          ensure_moderation_grader_slot_available(grader)
-          filled_available_slot = true
-        end
-        moderation_grader.update!(slot_taken: occupy_slot)
-      end
-
-      yield
-
-      # If we added a grader, attempt to handle a potential race condition:
-      # multiple new graders could have tried to add themselves simultaneously
-      # when there weren't enough slots open for all of them. If we ended up
-      # with too many provisional graders, throw an error to roll things back.
-      if filled_available_slot && provisional_moderation_graders.count > grader_count
-        raise MaxGradersReachedError
-      end
-    end
   end
 end

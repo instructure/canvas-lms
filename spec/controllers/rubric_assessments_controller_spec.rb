@@ -144,6 +144,137 @@ describe RubricAssessmentsController do
         expect(provisonal_grade).not_to be_final
       end
     end
+
+    context 'when assessing a moderated assignment as a provisional grader' do
+      let(:course) { Course.create! }
+      let(:assignment) do
+        course.assignments.create!(
+          moderated_grading: true,
+          final_grader: teacher,
+          grader_count: 1
+        )
+      end
+
+      let(:teacher) { User.create! }
+      let(:provisional_grader) { User.create! }
+      let(:interloper) { User.create! }
+      let(:student) { User.create! }
+
+      let(:rubric) do
+        Rubric.create!(
+          context: course,
+          data: [
+            {
+              description: 'Some criterion',
+              points: 10,
+              id: 'crit1',
+              ratings: [
+                { description: 'Good', points: 10, id: 'rat1', criterion_id: 'crit1' },
+                { description: 'Bad', points: 0, id: 'rat2', criterion_id: 'crit1' }
+              ]
+            }
+          ]
+        )
+      end
+
+      let(:rubric_association) do
+        association_params = {association_object: assignment, use_for_grading: '1', purpose: 'grading'}
+        RubricAssociation.generate(teacher, rubric, course, association_params)
+      end
+      let(:slotted_grader_ids) { assignment.moderation_graders.with_slot_taken.pluck(:user_id) }
+
+      def update_params(assessor:, assessment_type: 'grading')
+        {
+          course_id: course.id.to_s,
+          id: '',
+          provisional: true,
+          rubric_assessment: { user_id: assessor.id.to_s, assessment_type: assessment_type },
+          rubric_association_id: rubric_association.id.to_s
+        }
+      end
+
+      before(:each) do
+        course.enroll_teacher(teacher, enrollment_state: 'active')
+        course.enroll_ta(provisional_grader, enrollment_state: 'active')
+        course.enroll_ta(interloper, enrollment_state: 'active')
+        course.enroll_student(student, enrollment_state: 'active')
+      end
+
+      context 'when submitting a grading assessment' do
+        it 'claims a moderated grading slot for the submitter' do
+          user_session(provisional_grader)
+          put(:update, params: update_params(assessor: provisional_grader))
+
+          expect(slotted_grader_ids).to match_array([provisional_grader.id])
+        end
+
+        it 'does not occupy a slot if no slots are available' do
+          user_session(provisional_grader)
+          put(:update, params: update_params(assessor: provisional_grader))
+
+          user_session(interloper)
+          put(:update, params: update_params(assessor: interloper))
+
+          expect(slotted_grader_ids).to match_array([provisional_grader.id])
+        end
+
+        it 'returns a MAX_GRADERS_REACHED error code if no slots are available' do
+          user_session(provisional_grader)
+          put(:update, params: update_params(assessor: provisional_grader))
+
+          user_session(interloper)
+          put(:update, params: update_params(assessor: interloper))
+
+          response_json = JSON.parse(response.body)
+          expect(response_json.dig('errors', 'error_code')).to eq 'MAX_GRADERS_REACHED'
+        end
+      end
+    end
+
+    context 'when submitting an assessment for a non-assignment' do
+      let(:course) { Course.create! }
+      let(:teacher) { User.create! }
+
+      let(:rubric) do
+        Rubric.create!(
+          context: course,
+          data: [
+            {
+              description: 'Some criterion',
+              points: 10,
+              id: 'crit1',
+              ratings: [
+                { description: 'Good', points: 10, id: 'rat1', criterion_id: 'crit1' },
+                { description: 'Bad', points: 0, id: 'rat2', criterion_id: 'crit1' }
+              ]
+            }
+          ]
+        )
+      end
+
+      let(:rubric_association) do
+        association_params = {association_object: course, use_for_grading: '1', purpose: 'grading'}
+        RubricAssociation.generate(teacher, rubric, course, association_params)
+      end
+
+      # This test is meant to provide some sort of blanket coverage for what
+      # happens when we call the endpoint with a non-assignment association
+      # object; namely, it crashes (and doesn't handle the error) because it
+      # tries to call a method that only exists on Assignment.
+      it 'fails with an unhandled error' do
+        user_session(teacher)
+
+        params = {
+          course_id: course.id.to_s,
+          id: '',
+          rubric_assessment: { user_id: teacher.id.to_s, assessment_type: 'grading' },
+          rubric_association_id: rubric_association.id.to_s
+        }
+
+        put(:update, params: params)
+        expect(response).not_to be_successful
+      end
+    end
   end
 
   describe "POST 'remind'" do

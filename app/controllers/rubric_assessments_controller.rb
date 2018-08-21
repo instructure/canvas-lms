@@ -49,36 +49,58 @@ class RubricAssessmentsController < ApplicationController
       return
     else
       opts = {}
-      if value_to_boolean(params[:provisional])
+      provisional = value_to_boolean(params[:provisional])
+      if provisional
         opts[:provisional_grader] = @current_user
         opts[:final] = true if mark_provisional_grade_as_final?
       end
 
-      @asset, @user = @association_object.find_asset_for_assessment(@association, user_id, opts)
-      return render_unauthorized_action unless @association.user_can_assess_for?(assessor: @current_user, assessee: @user)
+      # For a moderated assignment, submitting an assessment claims a grading
+      # slot for the submitting provisional grader (or throws an error if no
+      # slots remain).
+      begin
+        ensure_adjudication_possible(provisional: provisional) do
+          @asset, @user = @association_object.find_asset_for_assessment(@association, user_id, opts)
+          unless @association.user_can_assess_for?(assessor: @current_user, assessee: @user)
+            return render_unauthorized_action
+          end
 
-      @assessment = @association.assess(:assessor => @current_user, :user => @user, :artifact => @asset, :assessment => params[:rubric_assessment],
-        :graded_anonymously => value_to_boolean(params[:graded_anonymously]))
-      @asset.reload
-      artifact_includes =
-        case @asset
-        when Submission
-          { :artifact => Submission.json_serialization_full_parameters, :rubric_association => {} }
-        when ModeratedGrading::ProvisionalGrade
-          { :rubric_association => {} }
-        else
-          [:artifact, :rubric_association]
+          @assessment = @association.assess(
+            assessor: @current_user,
+            user: @user,
+            artifact: @asset,
+            assessment: params[:rubric_assessment],
+            graded_anonymously: value_to_boolean(params[:graded_anonymously])
+          )
+          @asset.reload
+
+          artifact_includes =
+            case @asset
+            when Submission
+              { artifact: Submission.json_serialization_full_parameters, rubric_association: {} }
+            when ModeratedGrading::ProvisionalGrade
+              { rubric_association: {} }
+            else
+              [:artifact, :rubric_association]
+            end
+          json = @assessment.as_json(
+            methods: [:ratings, :assessor_name, :related_group_submissions_and_assessments],
+            include: artifact_includes,
+            include_root: false
+          )
+
+          if @asset.is_a?(ModeratedGrading::ProvisionalGrade)
+            json[:artifact] = @asset.submission.
+              as_json(Submission.json_serialization_full_parameters(include_root: false)).
+              merge(@asset.grade_attributes)
+          end
+
+          render json: json
         end
-      json = @assessment.as_json(:methods => [:ratings, :assessor_name, :related_group_submissions_and_assessments],
-        :include => artifact_includes, :include_root => false)
-
-      if @asset.is_a?(ModeratedGrading::ProvisionalGrade)
-        json[:artifact] = @asset.submission.
-          as_json(Submission.json_serialization_full_parameters(:include_root => false)).
-          merge(@asset.grade_attributes)
+      rescue Assignment::GradeError => error
+        json = {errors: {base: error.to_s, error_code: error.error_code}}
+        render json: json, status: error.status_code || :bad_request
       end
-
-      render :json => json
     end
   end
 
@@ -110,5 +132,21 @@ class RubricAssessmentsController < ApplicationController
 
   def mark_provisional_grade_as_final?
     value_to_boolean(params[:final]) && @association_object.permits_moderation?(@current_user)
+  end
+
+  def ensure_adjudication_possible(provisional:)
+    # Non-assignment association objects crash if they're passed into this
+    # controller, since find_asset_for_assessment only exists on assignments.
+    # The check here thus serves only to make sure the crash doesn't happen on
+    # the call below.
+    return yield unless @association_object.is_a?(Assignment)
+
+    @association_object.ensure_grader_can_adjudicate(
+      grader: @current_user,
+      provisional: provisional,
+      occupy_slot: true
+    ) do
+      yield
+    end
   end
 end
