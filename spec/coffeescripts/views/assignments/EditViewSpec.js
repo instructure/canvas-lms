@@ -1183,6 +1183,27 @@ test('it is hidden if the plagiarism_detection_platform flag is disabled', funct
   equal(view.$('#similarity_detection_tools').css('display'), 'none')
 })
 
+QUnit.module('EditView: Assignment External Tools', {
+  setup() {
+    fakeENV.setup({})
+    this.server = sinon.fakeServer.create()
+  },
+
+  teardown() {
+    this.server.restore()
+    fakeENV.teardown()
+  },
+
+  editView() {
+    return editView.apply(this, arguments)
+  }
+})
+
+test('it attaches assignment external tools component', function() {
+  const view = this.editView()
+  equal(view.$assignmentExternalTools.children().size(), 1)
+})
+
 QUnit.module('EditView: Quizzes 2', {
   setup() {
     fakeENV.setup({

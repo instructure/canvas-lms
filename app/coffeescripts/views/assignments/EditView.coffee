@@ -42,6 +42,7 @@ define [
   '../../util/SisValidationHelper'
   'jsx/assignments/AssignmentConfigurationTools'
   'jsx/assignments/ModeratedGradingFormFieldGroup'
+  'jsx/assignments/AssignmentExternalTools'
   'jqueryui/dialog'
   'jquery.toJSON'
   '../../jquery.rails_flash_notifications'
@@ -51,7 +52,7 @@ define [
   VeriCiteSettings, TurnitinSettingsDialog, preventDefault, MissingDateDialog,
   AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly,
   RCEKeyboardShortcuts, ConditionalRelease, deparam, SisValidationHelper,
-  SimilarityDetectionTools, ModeratedGradingFormFieldGroup) ->
+  SimilarityDetectionTools, ModeratedGradingFormFieldGroup, AssignmentExternalTools) ->
 
   RichContentEditor.preloadRemoteModule()
 
@@ -93,6 +94,7 @@ define [
     CONDITIONAL_RELEASE_TARGET = '#conditional_release_target'
     SIMILARITY_DETECTION_TOOLS = '#similarity_detection_tools'
     ANONYMOUS_GRADING_BOX = '#assignment_anonymous_grading'
+    ASSIGNMENT_EXTERNAL_TOOLS = '#assignment_external_tools'
 
     els: _.extend({}, @::els, do ->
       els = {}
@@ -123,6 +125,7 @@ define [
       els["#{SIMILARITY_DETECTION_TOOLS}"] = '$similarityDetectionTools'
       els["#{SECURE_PARAMS}"] = '$secureParams'
       els["#{ANONYMOUS_GRADING_BOX}"] = '$anonymousGradingBox'
+      els["#{ASSIGNMENT_EXTERNAL_TOOLS}"] = '$assignmentExternalTools'
       els
     )
 
@@ -331,6 +334,12 @@ define [
             parseInt(ENV.SELECTED_CONFIG_TOOL_ID),
             ENV.SELECTED_CONFIG_TOOL_TYPE,
             ENV.REPORT_VISIBILITY_SETTING)
+
+      @AssignmentExternalTools = AssignmentExternalTools.attach(
+            @$assignmentExternalTools.get(0),
+            "assignment_edit",
+            parseInt(ENV.COURSE_ID),
+            parseInt(@assignment.id))
 
       @_attachEditorToDescription()
       @addTinyMCEKeyboardShortcuts()

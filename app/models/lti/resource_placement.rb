@@ -20,6 +20,7 @@ module Lti
   class ResourcePlacement < ActiveRecord::Base
 
     ACCOUNT_NAVIGATION = 'account_navigation'
+    ASSIGNMENT_EDIT = 'assignment_edit'
     ASSIGNMENT_SELECTION = 'assignment_selection'
     COURSE_NAVIGATION = 'course_navigation'
     LINK_SELECTION = 'link_selection'
@@ -33,6 +34,7 @@ module Lti
 
     PLACEMENTS = [:account_navigation,
                   :similarity_detection,
+                  :assignment_edit,
                   :assignment_menu,
                   :assignment_selection,
                   :collaboration,
@@ -57,6 +59,7 @@ module Lti
 
     PLACEMENT_LOOKUP = {
       'Canvas.placements.accountNavigation' => ACCOUNT_NAVIGATION,
+      'Canvas.placements.assignmentEdit' => ASSIGNMENT_EDIT,
       'Canvas.placements.assignmentSelection' => ASSIGNMENT_SELECTION,
       'Canvas.placements.courseNavigation' => COURSE_NAVIGATION,
       'Canvas.placements.linkSelection' => LINK_SELECTION,

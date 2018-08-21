@@ -136,6 +136,15 @@ iframe.tool_launch {
   max-width: 100%;
 }
 
+#assignment_external_tools {
+  iframe.tool_launch {
+    display: block;
+  }
+  iframe.tool_launch:not(:first-of-type) {
+    margin-top: 10px;
+  }
+}
+
 #skip_navigation_link {
   @include accessibility-prompt;
   position: absolute;

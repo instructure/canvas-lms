@@ -92,6 +92,7 @@ export default React.createClass({
     placements() {
       var allPlacements = {
         "account_navigation":I18n.t("Account Navigation"),
+        "assignment_edit":I18n.t("Assignment Edit"),
         "assignment_selection":I18n.t("Assignment Selection"),
         "similarity_detection":I18n.t("Similarity Detection"),
         "assignment_menu":I18n.t("Assignment Menu"),

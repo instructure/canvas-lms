@@ -337,6 +337,10 @@ class Quizzes::QuizzesController < ApplicationController
         hash[:active_grading_periods] = GradingPeriod.json_for(@context, @current_user)
       end
 
+      if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :read)
+        hash[:COURSE_ID] = @context.id.to_s
+      end
+
       append_sis_data(hash)
       js_env(hash)
 
