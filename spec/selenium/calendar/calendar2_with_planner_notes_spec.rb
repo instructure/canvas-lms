@@ -227,4 +227,20 @@ describe "calendar2" do
       expect(discussion.reload).to be_deleted
     end
   end
+
+  context "with teacher and student enrollments" do
+    it "includes todo items from both" do
+      course1 = @course
+      course2 = course_with_student(user: @user, active_all: true).course
+      page1 = course1.wiki_pages.create!(title: 'Page1', todo_date: Date.today, workflow_state: 'unpublished')
+      page2 = course2.wiki_pages.create!(title: 'Page2', todo_date: Date.today, workflow_state: 'published')
+      user_session(@user)
+      get '/calendar2'
+      wait_for_ajax_requests
+      fj('.fc-title:contains("Page1")').click
+      expect(f('.event-details')).to contain_css('.edit_event_link')
+      fj('.fc-title:contains("Page2")').click
+      expect(f('.event-details')).not_to contain_css('.edit_event_link')
+    end
+  end
 end
