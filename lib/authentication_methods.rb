@@ -155,7 +155,7 @@ module AuthenticationMethods
     if !@current_pseudonym
       if @policy_pseudonym_id
         @current_pseudonym = Pseudonym.where(id: @policy_pseudonym_id).first
-      elsif @pseudonym_session = PseudonymSession.find
+      elsif (@pseudonym_session = PseudonymSession.with_scope(find_options: Pseudonym.eager_load(:user)) { PseudonymSession.find })
         @current_pseudonym = @pseudonym_session.record
 
         # if the session was created before the last time the user explicitly

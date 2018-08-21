@@ -279,7 +279,7 @@ class PlannerController < ApplicationController
     context_codes += @group_ids.map{|id| "group_#{id}"}
     context_codes += @user_ids.map{|id| "user_#{id}"}
     item_collection('calendar_events', @current_user.calendar_events_for_contexts(context_codes, start_at: start_date,
-      end_at: end_date, exclude_assignments: true),
+      end_at: end_date),
       CalendarEvent, [:start_at, :created_at], :id)
   end
 
