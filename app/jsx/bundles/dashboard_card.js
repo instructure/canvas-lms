@@ -20,17 +20,36 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import DashboardCardBox from '../dashboard_card/DashboardCardBox'
 import getDroppableDashboardCardBox from '../dashboard_card/getDroppableDashboardCardBox'
+import {get} from 'axios'
+
+let promiseToGetDashboardCards
+
+const sessionStorageKey = `dashcards_for_user_${ENV && ENV.current_user_id}`
 
 export default function loadCardDashboard () {
   const Box = ENV.DASHBOARD_REORDERING_ENABLED ? getDroppableDashboardCardBox() : DashboardCardBox
-
   const dashboardContainer = document.getElementById('DashboardCard_Container')
 
-  ReactDOM.render(
-    <Box
-      courseCards={ENV.DASHBOARD_COURSES}
-      reorderingEnabled={ENV.DASHBOARD_REORDERING_ENABLED}
-      hideColorOverlays={ENV.PREFERENCES.hide_dashcard_color_overlays}
-    />, dashboardContainer
-  )
+  function render(dashboardCards) {
+    ReactDOM.render(
+      <Box
+        courseCards={dashboardCards}
+        reorderingEnabled={ENV.DASHBOARD_REORDERING_ENABLED}
+        hideColorOverlays={ENV.PREFERENCES.hide_dashcard_color_overlays}
+      />, dashboardContainer
+    )
+  }
+
+  // Cache the fetched dashcards in sessionStorage so we can render instantly next
+  // time they come to their dashboard (while still fetching the most current data)
+  const cachedCards = sessionStorage.getItem(sessionStorageKey)
+  if (cachedCards) render(JSON.parse(cachedCards))
+
+  if (!promiseToGetDashboardCards) {
+    promiseToGetDashboardCards = get('/dashboard/dashboard_cards').then(({data}) => data)
+    promiseToGetDashboardCards.then((dashboardCards) =>
+      sessionStorage.setItem(sessionStorageKey, JSON.stringify(dashboardCards))
+    )
+  }
+  promiseToGetDashboardCards.then(render)
 }

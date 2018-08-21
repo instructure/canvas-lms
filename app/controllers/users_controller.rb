@@ -554,6 +554,14 @@ class UsersController < ApplicationController
     end
   end
 
+  def dashboard_cards
+    cancel_cache_buster
+
+    dashboard_courses = map_courses_for_menu(@current_user.menu_courses, :include_section_tabs => true)
+    Rails.cache.write(['last_known_dashboard_cards_count', @current_user].cache_key, dashboard_courses.count)
+    render json: dashboard_courses
+  end
+
   def cached_upcoming_events(user)
     Rails.cache.fetch(['cached_user_upcoming_events', user].cache_key,
       :expires_in => 3.minutes) do
