@@ -2637,11 +2637,13 @@ class Course < ActiveRecord::Base
       tabs.delete_if {|t| t[:id] == TAB_SETTINGS }
       tabs << settings_tab
 
-      check_for_permission = lambda do |permission|
-        if opts[:precalculated_permissions]&.has_key?(permission)
-          opts[:precalculated_permissions][permission]
-        else
-          self.grants_right?(user, opts[:session], permission)
+      check_for_permission = lambda do |*permissions|
+        permissions.any? do |permission|
+          if opts[:precalculated_permissions]&.has_key?(permission)
+            opts[:precalculated_permissions][permission]
+          else
+            self.grants_right?(user, opts[:session], permission)
+          end
         end
       end
 
@@ -2659,7 +2661,7 @@ class Course < ActiveRecord::Base
 
       # remove tabs that the user doesn't have access to
       unless opts[:for_reordering]
-        unless self.grants_any_right?(user, opts[:session], :read) || check_for_permission.call(:manage_content)
+        unless check_for_permission.call(:read, :manage_content)
           tabs.delete_if { |t| t[:id] == TAB_HOME }
           tabs.delete_if { |t| t[:id] == TAB_ANNOUNCEMENTS }
           tabs.delete_if { |t| t[:id] == TAB_PAGES }
@@ -2668,46 +2670,45 @@ class Course < ActiveRecord::Base
           tabs.delete_if { |t| t[:id] == TAB_COLLABORATIONS }
           tabs.delete_if { |t| t[:id] == TAB_MODULES }
         end
-        unless self.grants_any_right?(user, opts[:session], :participate_as_student, :read_as_admin)
+        unless check_for_permission.call(:participate_as_student, :read_as_admin)
           tabs.delete_if{ |t| t[:visibility] == 'members' }
         end
-        unless self.grants_right?(user, opts[:session], :read) || check_for_permission.call(:manage_content) || check_for_permission.call(:manage_assignments)
+        unless check_for_permission.call(:read, :manage_content, :manage_assignments)
           tabs.delete_if { |t| t[:id] == TAB_ASSIGNMENTS }
           tabs.delete_if { |t| t[:id] == TAB_QUIZZES }
         end
-        unless self.grants_any_right?(user, opts[:session], :read, :read_syllabus) || check_for_permission.call(:manage_content) || check_for_permission.call(:manage_assignments)
+        unless check_for_permission.call(:read, :read_syllabus, :manage_content, :manage_assignments)
           tabs.delete_if { |t| t[:id] == TAB_SYLLABUS }
         end
-        tabs.delete_if{ |t| t[:visibility] == 'admins' } unless self.grants_right?(user, opts[:session], :read_as_admin)
-        if check_for_permission.call(:manage_content) || check_for_permission.call(:manage_assignments)
+        tabs.delete_if{ |t| t[:visibility] == 'admins' } unless check_for_permission.call(:read_as_admin)
+        if check_for_permission.call(:manage_content, :manage_assignments)
           tabs.detect { |t| t[:id] == TAB_ASSIGNMENTS }[:manageable] = true
           tabs.detect { |t| t[:id] == TAB_SYLLABUS }[:manageable] = true
           tabs.detect { |t| t[:id] == TAB_QUIZZES }[:manageable] = true
         end
-        tabs.delete_if { |t| t[:hidden] && t[:external] } unless opts[:api] && self.grants_right?(user,  :read_as_admin)
-        tabs.delete_if { |t| t[:id] == TAB_GRADES } unless self.grants_any_right?(user, opts[:session], :read_grades) || check_for_permission.call(:view_all_grades) || check_for_permission.call(:manage_grades)
-        tabs.detect { |t| t[:id] == TAB_GRADES }[:manageable] = true if check_for_permission.call(:view_all_grades) || check_for_permission.call(:manage_grades)
-        tabs.delete_if { |t| t[:id] == TAB_PEOPLE } unless check_for_permission.call(:read_roster) || check_for_permission.call(:manage_students) || check_for_permission.call(:manage_admin_users)
-        tabs.detect { |t| t[:id] == TAB_PEOPLE }[:manageable] = true if check_for_permission.call(:manage_students) || check_for_permission.call(:manage_admin_users)
-        tabs.delete_if { |t| t[:id] == TAB_FILES } unless self.grants_any_right?(user, opts[:session], :read) || check_for_permission.call(:manage_files)
+        tabs.delete_if { |t| t[:hidden] && t[:external] } unless opts[:api] && check_for_permission.call(:read_as_admin)
+        tabs.delete_if { |t| t[:id] == TAB_GRADES } unless check_for_permission.call(:read_grades, :view_all_grades, :manage_grades)
+        tabs.detect { |t| t[:id] == TAB_GRADES }[:manageable] = true if check_for_permission.call(:view_all_grades, :manage_grades)
+        tabs.delete_if { |t| t[:id] == TAB_PEOPLE } unless check_for_permission.call(:read_roster, :manage_students, :manage_admin_users)
+        tabs.detect { |t| t[:id] == TAB_PEOPLE }[:manageable] = true if check_for_permission.call(:manage_students, :manage_admin_users)
+        tabs.delete_if { |t| t[:id] == TAB_FILES } unless check_for_permission.call(:read, :manage_files)
         tabs.detect { |t| t[:id] == TAB_FILES }[:manageable] = true if check_for_permission.call(:manage_files)
-        tabs.delete_if { |t| t[:id] == TAB_DISCUSSIONS } unless check_for_permission.call(:read_forum) || check_for_permission.call(:post_to_forum) ||
-          check_for_permission.call(:create_forum) || check_for_permission.call(:moderate_forum)
+        tabs.delete_if { |t| t[:id] == TAB_DISCUSSIONS } unless check_for_permission.call(:read_forum, :post_to_forum, :create_forum, :moderate_forum)
         tabs.detect { |t| t[:id] == TAB_DISCUSSIONS }[:manageable] = true if check_for_permission.call(:moderate_forum)
-        tabs.delete_if { |t| t[:id] == TAB_SETTINGS } unless self.grants_right?(user, opts[:session], :read_as_admin)
+        tabs.delete_if { |t| t[:id] == TAB_SETTINGS } unless check_for_permission.call(:read_as_admin)
 
-        unless announcements.temp_record.grants_right?(user, :read)
+        unless check_for_permission.call(:read_announcements)
           tabs.delete_if { |t| t[:id] == TAB_ANNOUNCEMENTS }
         end
 
         if !user || !check_for_permission.call(:manage_content)
           # remove outcomes tab for logged-out users or non-students
-          unless grants_any_right?(user, :read_as_admin, :participate_as_student)
+          unless check_for_permission.call(:participate_as_student, :read_as_admin)
             tabs.delete_if { |t| t[:id] == TAB_OUTCOMES }
           end
 
           # remove hidden tabs from students
-          unless self.grants_right?(user, opts[:session], :read_as_admin)
+          unless check_for_permission.call(:read_as_admin)
             tabs.delete_if {|t| (t[:hidden] || (t[:hidden_unused] && !opts[:include_hidden_unused])) && !t[:manageable] }
           end
         end
