@@ -1,7 +1,8 @@
-require "json"
-require "selenium-webdriver"
-require "rspec"
-include RSpec::Expectations
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
+# require "json"
+# require "selenium-webdriver"
+# require "rspec"
+# include RSpec::Expectations
 
 describe "UntitledTestCase" do
 
@@ -12,12 +13,12 @@ describe "UntitledTestCase" do
     @driver.manage.timeouts.implicit_wait = 30
     @verification_errors = []
   end
-  
+
   after(:each) do
     @driver.quit
     @verification_errors.should == []
   end
-  
+
   it "test_untitled_test_case" do
     @driver.get "http://localhost:3000/login/canvas"
     @driver.find_element(:name, "pseudonym_session[unique_id]").clear
@@ -34,29 +35,30 @@ describe "UntitledTestCase" do
     @driver.navigate.refresh
     @driver.find_element(:id, "global_nav_conversations_link").click
   end
-  
+
   def element_present?(how, what)
-    ${receiver}.find_element(how, what)
+    byebug
+    # ${receiver}.find_element(how, what)
     true
   rescue Selenium::WebDriver::Error::NoSuchElementError
     false
   end
-  
+
   def alert_present?()
-    ${receiver}.switch_to.alert
+    # ${receiver}.switch_to.alert
     true
   rescue Selenium::WebDriver::Error::NoAlertPresentError
     false
   end
-  
+
   def verify(&blk)
     yield
   rescue ExpectationNotMetError => ex
     @verification_errors << ex
   end
-  
+
   def close_alert_and_get_its_text(how, what)
-    alert = ${receiver}.switch_to().alert()
+    # alert = ${receiver}.switch_to().alert()
     alert_text = alert.text
     if (@accept_next_alert) then
       alert.accept()
