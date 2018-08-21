@@ -773,9 +773,7 @@ class AccountsController < ApplicationController
         MASKED_APP_CENTER_ACCESS_TOKEN: @account.settings[:app_center_access_token].try(:[], 0...5),
         PERMISSIONS: {
           :create_tool_manually => @account.grants_right?(@current_user, session, :create_tool_manually),
-        },
-        ZERO_OUT_PASTDUE_ASSIGNMENTS: Account.first.feature_flags.find_by(feature: 'zero_out_past_due').try(:enabled?),
-        AUTOMATIC_DUE_DATES: Account.first.feature_flags.find_by(feature: 'auto_due_dates').try(:enabled?),
+        }
       })
     end
   end

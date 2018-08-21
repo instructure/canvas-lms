@@ -83,10 +83,8 @@ Rails.configuration.after_initialize do
     Reporting::CountsReport.process
   end
 
-  if Account.first.feature_flags.find_by(feature: 'auto_due_dates').try(:enabled?)
-    Delayed::Periodic.cron 'Zero Out Past Due', '0 * * * *' do
-       GradesService.zero_out_grades!
-    end
+  Delayed::Periodic.cron 'Zero Out Past Due', '0 * * * *' do
+     GradesService.zero_out_grades!
   end
 
   Delayed::Periodic.cron 'Account.update_all_update_account_associations', '0 10 * * 0' do
