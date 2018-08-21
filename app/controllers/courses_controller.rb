@@ -2938,15 +2938,22 @@ class CoursesController < ApplicationController
       preloads << { enrollment_term: { grading_period_group: :grading_periods } }
       preloads << { grading_period_groups: :grading_periods }
     end
+    preloads << { context_modules: :content_tags } if includes.include?('course_progress')
     ActiveRecord::Associations::Preloader.new.preload(courses, preloads)
 
-    if includes.include?('total_scores') || includes.include?('current_grading_period_scores')
-      ActiveRecord::Associations::Preloader.new.preload(enrollments, scores: :course)
+    preloads = []
+    preloads << :course_section if includes.include?('sections')
+    preloads << { scores: :course } if includes.include?('total_scores') || includes.include?('current_grading_period_scores')
+
+    ActiveRecord::Associations::Preloader.new.preload(enrollments, preloads) unless preloads.empty?
+    if includes.include?('course_progress')
+      progressions = ContextModuleProgression.joins(:context_module).where(user: user, context_modules: { course: courses }).select("context_module_progressions.*, context_modules.context_id AS course_id").to_a.group_by { |cmp| cmp['course_id'] }
     end
 
     enrollments_by_course.each do |course_enrollments|
       course = course_enrollments.first.course
-      hash << course_json(course, @current_user, session, includes, course_enrollments, user)
+      hash << course_json(course, @current_user, session, includes, course_enrollments, user,
+                          preloaded_progressions: progressions)
     end
     hash
   end
