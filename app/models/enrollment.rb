@@ -1017,18 +1017,6 @@ class Enrollment < ActiveRecord::Base
     GradeCalculator.recompute_final_score(*args)
   end
 
-  def self.recompute_final_score_if_stale(course, user=nil, compute_score_opts = {})
-    Rails.cache.fetch(
-      ['recompute_final_scores', course.id, user, compute_score_opts[:grading_period_id]].cache_key,
-      expires_in: Setting.get('recompute_grades_window', 600).to_i.seconds
-    ) do
-      user_id = user ? user.id : course.student_enrollments.except(:preload).distinct.pluck(:user_id)
-      recompute_final_score(user_id, course.id, compute_score_opts)
-      yield if block_given?
-      true
-    end
-  end
-
   # This method is intended to not duplicate work for a single user.
   def self.recompute_final_score_in_singleton(user_id, course_id, opts = {})
     # Guard against getting more than one user_id

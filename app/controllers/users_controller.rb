@@ -2041,7 +2041,6 @@ class UsersController < ApplicationController
                            enrollment.course.grants_right?(@current_user, :read_reports) &&
                            enrollment.course.apply_enrollment_visibility(enrollment.course.all_student_enrollments, @teacher).where(id: enrollment).first
           if should_include
-            Enrollment.recompute_final_score_if_stale(enrollment.course, student) { enrollment.reload }
             @courses[enrollment.course] = teacher_activity_report(@teacher, enrollment.course, [enrollment])
           end
         end
@@ -2057,7 +2056,6 @@ class UsersController < ApplicationController
           flash[:error] = t('errors.user_not_teacher', "That user is not a teacher in this course")
           redirect_to_referrer_or_default(root_url)
         elsif authorized_action(course, @current_user, :read_reports)
-          Enrollment.recompute_final_score_if_stale(course)
           enrollments = course.apply_enrollment_visibility(course.all_student_enrollments, @teacher)
           @courses[course] = teacher_activity_report(@teacher, course, enrollments)
         end
