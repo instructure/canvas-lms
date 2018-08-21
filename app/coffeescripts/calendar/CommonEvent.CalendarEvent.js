@@ -111,7 +111,7 @@ Object.assign(CalendarEvent.prototype, {
   },
 
   displayTimeString() {
-    if (this.calendarEvent.all_day) {
+    if (this.calendarEvent.all_day && this.calendarEvent.start_at === this.calendarEvent.end_at) {
       return this.formatTime(this.startDate(), true)
     } else {
       return semanticDateRange(this.calendarEvent.start_at, this.calendarEvent.end_at)

@@ -1013,6 +1013,16 @@ describe CalendarEventsApiController, type: :request do
       expect(json['start_at']).to eql '2012-01-09T12:00:00Z'
     end
 
+    it 'should not update event if all_day, start_at, and end_at are provided in a request' do
+      event = @course.calendar_events.create(:title => 'event', :start_at => '2012-01-08 12:00:00')
+
+      json = api_call(:put, "/api/v1/calendar_events/#{event.id}",
+                      {:controller => 'calendar_events_api', :action => 'update', :id => event.id.to_s, :format => 'json'},
+                      {:calendar_event => {:start_at => '2012-01-08 12:00:00',:end_at => '2012-01-09 12:00:00', :all_day => true, :title => "ohai"}})
+      expect(json['all_day']).to eql true
+      expect(json['end_at']).to eql '2012-01-09T00:00:00Z'
+    end
+
     it 'should process html content in description on update' do
       event = @course.calendar_events.create(:title => 'event', :start_at => '2012-01-08 12:00:00')
 
