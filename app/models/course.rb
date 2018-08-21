@@ -317,11 +317,19 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def modules_visible_to(user)
+  def modules_visible_to(user, array_is_okay: false)
     if self.grants_right?(user, :view_unpublished_items)
-      self.context_modules.not_deleted
+      if array_is_okay && association(:context_modules).loaded?
+        context_modules.select { |cm| !cm.deleted? }
+      else
+        context_modules.not_deleted
+      end
     else
-      self.context_modules.active
+      if array_is_okay && association(:context_modules).loaded?
+        context_modules.select(&:active?)
+      else
+        context_modules.active
+      end
     end
   end
 
