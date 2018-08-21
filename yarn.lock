@@ -7715,9 +7715,9 @@ i18nliner-handlebars@^0.2.2:
   dependencies:
     jsdom "~8.5.0"
 
-i18nliner@0.2.3:
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/i18nliner/-/i18nliner-0.2.3.tgz#6b45aed6413a6e27705606d62de62392a6bcc687"
+i18nliner@^0.2.6:
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/i18nliner/-/i18nliner-0.2.6.tgz#e5e1079c302538dc76b34e261fadcd6bf13f2d47"
   dependencies:
     babel-traverse "^6.0.0"
     babylon "^6.0.0"

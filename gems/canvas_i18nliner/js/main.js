@@ -30,6 +30,9 @@ var CallHelpers = require("i18nliner/dist/lib/call_helpers").default;
 
 var glob = require("glob");
 
+// tell i18nliner's babylon how to handle `import('../foo').then`
+I18nliner.config.babylonPlugins.push('dynamicImport')
+
 // explict subdirs, to work around perf issues
 // https://github.com/jenseng/i18nliner-js/issues/7
 JsProcessor.prototype.directories = [
@@ -55,7 +58,7 @@ JsProcessor.prototype.sourceFor = function(file) {
     if (file.match(/\.coffee$/)) {
       data.source = CoffeeScript.compile(source, {});
     }
-    data.ast = babylon.parse(data.source, { plugins: ["jsx", "classProperties", "objectRestSpread"], sourceType: "module" });
+    data.ast = babylon.parse(data.source, { plugins: I18nliner.config.babylonPlugins, sourceType: "module" });
   }
   return data;
 };
