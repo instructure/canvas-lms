@@ -454,12 +454,10 @@ class CoursesController < ApplicationController
   def index
     respond_to do |format|
       format.html {
-        all_enrollments = @current_user.enrollments.not_deleted.shard(@current_user).to_a
+        all_enrollments = Shackles.activate(:slave) { @current_user.enrollments.not_deleted.shard(@current_user).preload(:enrollment_state, :course, :course_section).to_a }
         @past_enrollments = []
         @current_enrollments = []
         @future_enrollments  = []
-        Canvas::Builders::EnrollmentDateBuilder.preload(all_enrollments)
-        ActiveRecord::Associations::Preloader.new.preload(all_enrollments, :course_section)
 
         all_enrollments.group_by{|e| [e.course_id, e.type]}.values.each do |enrollments|
           e = enrollments.sort_by{|e| e.state_with_date_sortable}.first
@@ -473,8 +471,7 @@ class CoursesController < ApplicationController
             ([:active, :invited].include?(state) && e.section_or_course_date_in_past?) # strictly speaking, these enrollments are perfectly active but enrollment dates are terrible
             @past_enrollments << e unless e.workflow_state == "invited"
           elsif !e.hard_inactive?
-            start_at, end_at = e.enrollment_dates.first
-            if start_at && start_at > Time.now.utc
+            if e.enrollment_state.pending? || state == :creation_pending || (e.admin? && e.course.start_at&.>(Time.now.utc))
               @future_enrollments << e unless e.restrict_future_listing?
             elsif state != :inactive
               @current_enrollments << e
