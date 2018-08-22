@@ -43,10 +43,10 @@ describe 'Moderation Page' do
       moderated_grading: true
     )
 
-    # teachers 1, 2, and 3 grade the assignment for students 1 and 2
-    3.times do |count|
-      @assignment.grade_student(@students[0], grade: GRADES[count][0], grader: @teachers[count], provisional: true)
-      @assignment.grade_student(@students[1], grade: GRADES[count][1], grader: @teachers[count], provisional: true)
+    # teachers 2 and 3 grade the assignment for students 1 and 2
+    (1..2).map do |i|
+      @assignment.grade_student(@students[0], grade: GRADES[i][0], grader: @teachers[i], provisional: true)
+      @assignment.grade_student(@students[1], grade: GRADES[i][1], grader: @teachers[i], provisional: true)
     end
     # grade the rest of the students, one grader to student
     (2..8).map do |i|
@@ -58,8 +58,8 @@ describe 'Moderation Page' do
     (17..24).map do |i|
       @assignment.grade_student(@students[i], grade: Random.rand(11), grader: @teachers[2], provisional: true)
     end
-
   end
+
   before(:each) do
     user_session(@teachers[3])
     ModeratePage.visit(@moderated_course.id, @assignment.id)
@@ -71,8 +71,8 @@ describe 'Moderation Page' do
   end
 
   it 'displays grades', priority: "1", test_id: 3505169 do
-    expect(ModeratePage.fetch_grades(@students[0])).to contain_exactly(GRADES[0][0], GRADES[1][0], GRADES[2][0])
-    expect(ModeratePage.fetch_grades(@students[1])).to contain_exactly(GRADES[0][1], GRADES[1][1], GRADES[2][1])
+    expect(ModeratePage.fetch_grades(@students[0])).to contain_exactly(GRADES[1][0], GRADES[2][0], '–')
+    expect(ModeratePage.fetch_grades(@students[1])).to contain_exactly(GRADES[1][1], GRADES[2][1], '–')
   end
 
   it 'displays first 20 students', priority: "1", test_id: 3505169 do
@@ -97,7 +97,6 @@ describe 'Moderation Page' do
   end
 
   it 'accepts all grades for provisional grader', priority: "1", test_id: 3513993 do
-    skip('Unskip in GRADE-1327')
     ModeratePage.accept_grades_for_grader(@teachers[0])
 
     (2..8).map do |i|
@@ -106,9 +105,6 @@ describe 'Moderation Page' do
   end
 
   it 'will not accept grades when more than one grader', priority: "1", test_id: 3513993 do
-    skip('Unskip in GRADE-1327')
-    ModeratePage.accept_grades_for_grader(@teachers[0])
-    expect(ModeratePage.fetch_selected_final_grade_text(@students[0])).not_to include(@teachers[0].name)
+    expect(ModeratePage.accept_grades_button(@teachers[1])).to be_disabled
   end
-
 end

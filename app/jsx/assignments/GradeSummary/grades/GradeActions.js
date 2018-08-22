@@ -20,7 +20,9 @@ import * as GradesApi from './GradesApi'
 
 export const ADD_PROVISIONAL_GRADES = 'ADD_PROVISIONAL_GRADES'
 export const FAILURE = 'FAILURE'
+export const SET_BULK_SELECT_PROVISIONAL_GRADE_STATUS = 'SET_BULK_SELECT_PROVISIONAL_GRADE_STATUS'
 export const SET_SELECTED_PROVISIONAL_GRADE = 'SET_SELECTED_PROVISIONAL_GRADE'
+export const SET_SELECTED_PROVISIONAL_GRADES = 'SET_SELECTED_PROVISIONAL_GRADES'
 export const SET_SELECT_PROVISIONAL_GRADE_STATUS = 'SET_SELECT_PROVISIONAL_GRADE_STATUS'
 export const SET_UPDATE_GRADE_STATUS = 'SET_UPDATE_GRADE_STATUS'
 export const STARTED = 'STARTED'
@@ -35,8 +37,16 @@ export function setSelectProvisionalGradeStatus(gradeInfo, status) {
   return {type: SET_SELECT_PROVISIONAL_GRADE_STATUS, status, payload: {gradeInfo, status}}
 }
 
+export function setBulkSelectProvisionalGradesStatus(graderId, status) {
+  return {type: SET_BULK_SELECT_PROVISIONAL_GRADE_STATUS, status, payload: {graderId, status}}
+}
+
 export function setSelectedProvisionalGrade(gradeInfo) {
   return {type: SET_SELECTED_PROVISIONAL_GRADE, payload: {gradeInfo}}
+}
+
+export function setSelectedProvisionalGrades(provisionalGradeIds) {
+  return {type: SET_SELECTED_PROVISIONAL_GRADES, payload: {provisionalGradeIds}}
 }
 
 export function setUpdateGradeStatus(gradeInfo, status) {
@@ -45,6 +55,25 @@ export function setUpdateGradeStatus(gradeInfo, status) {
 
 export function updateGrade(gradeInfo) {
   return {type: UPDATE_GRADE, payload: {gradeInfo}}
+}
+
+export function acceptGraderGrades(graderId) {
+  return function(dispatch, getState) {
+    const {assignment} = getState().assignment
+    const {bulkSelectionDetails} = getState().grades
+    const {provisionalGradeIds} = bulkSelectionDetails[graderId]
+
+    dispatch(setBulkSelectProvisionalGradesStatus(graderId, STARTED))
+
+    GradesApi.bulkSelectProvisionalGrades(assignment.courseId, assignment.id, provisionalGradeIds)
+      .then(() => {
+        dispatch(setSelectedProvisionalGrades(provisionalGradeIds))
+        dispatch(setBulkSelectProvisionalGradesStatus(graderId, SUCCESS))
+      })
+      .catch(() => {
+        dispatch(setBulkSelectProvisionalGradesStatus(graderId, FAILURE))
+      })
+  }
 }
 
 function selectProvisionalGrade(gradeInfo) {

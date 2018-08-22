@@ -18,15 +18,16 @@
 
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
-import {bool, func, oneOf, shape, string} from 'prop-types'
+import {arrayOf, bool, func, oneOf, shape, string} from 'prop-types'
 import Alert from '@instructure/ui-alerts/lib/components/Alert'
+import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import Text from '@instructure/ui-elements/lib/components/Text'
-import View from '@instructure/ui-layout/lib/components/View'
 import I18n from 'i18n!assignment_grade_summary'
 
 import * as AssignmentActions from '../assignment/AssignmentActions'
 import DisplayToStudentsButton from './DisplayToStudentsButton'
+import GradersTable from './GradersTable'
 import PostButton from './PostButton'
 
 /* eslint-disable no-alert */
@@ -40,6 +41,12 @@ class Header extends Component {
     assignment: shape({
       title: string.isRequired
     }).isRequired,
+    graders: arrayOf(
+      shape({
+        graderName: string,
+        graderId: string.isRequired
+      })
+    ).isRequired,
     publishGrades: func.isRequired,
     publishGradesStatus: oneOf(enumeratedStatuses(AssignmentActions)),
     showNoGradersMessage: bool.isRequired,
@@ -101,20 +108,28 @@ class Header extends Component {
 
         <Text size="x-large">{this.props.assignment.title}</Text>
 
-        <View as="div" margin="large 0 0 0" textAlign="end">
-          <PostButton
-            gradesPublished={this.props.assignment.gradesPublished}
-            margin="0 x-small 0 0"
-            onClick={this.handlePublishClick}
-            publishGradesStatus={this.props.publishGradesStatus}
-          />
+        {this.props.graders.length > 0 && (
+          <Flex as="div" margin="large 0 0 0">
+            <FlexItem as="div" grow>
+              <GradersTable />
+            </FlexItem>
 
-          <DisplayToStudentsButton
-            assignment={this.props.assignment}
-            onClick={this.handleUnmuteClick}
-            unmuteAssignmentStatus={this.props.unmuteAssignmentStatus}
-          />
-        </View>
+            <FlexItem align="end" as="div" justifyItems="end">
+              <PostButton
+                gradesPublished={this.props.assignment.gradesPublished}
+                margin="0 x-small 0 0"
+                onClick={this.handlePublishClick}
+                publishGradesStatus={this.props.publishGradesStatus}
+              />
+
+              <DisplayToStudentsButton
+                assignment={this.props.assignment}
+                onClick={this.handleUnmuteClick}
+                unmuteAssignmentStatus={this.props.unmuteAssignmentStatus}
+              />
+            </FlexItem>
+          </Flex>
+        )}
       </header>
     )
   }
@@ -125,6 +140,7 @@ function mapStateToProps(state) {
 
   return {
     assignment,
+    graders: state.context.graders,
     publishGradesStatus,
     showNoGradersMessage: !assignment.gradesPublished && state.context.graders.length === 0,
     unmuteAssignmentStatus

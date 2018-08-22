@@ -63,8 +63,7 @@ class ModeratePage
     end
 
     def accept_grades_for_grader(grader)
-      # implement with GRADE-1327
-      # click button to accept grades for given grader name
+      accept_grades_button(grader).click
     end
 
     # Methods
@@ -97,6 +96,10 @@ class ModeratePage
 
     def main_content_area
       f("#main")
+    end
+
+    def accept_grades_button(grader)
+      fj("tr#grader-row-#{grader.id} button:contains('Accept')")
     end
 
     def student_table_headers
