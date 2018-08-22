@@ -538,7 +538,7 @@ class ApplicationController < ActionController::Base
       session[:enrollment_uuid]].cache_key, expires_in: 1.hour) do
 
       precalculated_permissions = @context.is_a?(Course) && @current_user &&
-        @current_user.precalculate_permissions_for_courses([@context], SectionTabHelper::PERMISSIONS_TO_PRECALCULATE).values.first
+        @current_user.precalculate_permissions_for_courses([@context], SectionTabHelper::PERMISSIONS_TO_PRECALCULATE, [@domain_root_account]).values.first
 
       @context.tabs_available(@current_user,
         :session => session,

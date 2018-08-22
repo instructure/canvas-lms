@@ -358,10 +358,12 @@ describe PermissionsHelper do
     it "should return other course-level (non-standard) permission values for active enrollments" do
       invited_student_enrollment = course_with_student(:active_course => true)
       active_student_enrollment = course_with_student(:user => @user, :active_all => true)
-      courses = [invited_student_enrollment.course, active_student_enrollment.course]
+      teacher_enrollment = course_with_teacher(user: @user, active_all: true)
+      courses = [invited_student_enrollment.course, active_student_enrollment.course, teacher_enrollment.course]
       expect(@user.precalculate_permissions_for_courses(courses, [:manage_calendar])).to eq({
-        invited_student_enrollment.global_course_id => {:manage_calendar => false},
-        active_student_enrollment.global_course_id => {:manage_calendar => false, :read => true, :read_grades => true, :participate_as_student => true}
+        invited_student_enrollment.global_course_id => {:manage_calendar => false, :read_as_admin => false},
+        active_student_enrollment.global_course_id => {:manage_calendar => false, :read => true, :read_grades => true, :participate_as_student => true, :read_as_admin => false},
+        teacher_enrollment.global_course_id => {:manage_calendar => true, :read => true, :read_as_admin => true}
       })
     end
 

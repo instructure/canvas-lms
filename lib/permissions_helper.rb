@@ -36,7 +36,7 @@ module PermissionsHelper
 
   # will return a hash linking global course ids with precalculated permissions
   # e.g. {10000000000001 => {:manage_calendar => true, :manage_assignments => false}}
-  def precalculate_permissions_for_courses(courses, permissions)
+  def precalculate_permissions_for_courses(courses, permissions, loaded_root_accounts=[])
     courses = courses.reject(&:deleted?) # just in case
     permissions = permissions.map(&:to_sym)
     nonexistent_permissions = permissions - RoleOverride.permissions.keys
@@ -56,7 +56,14 @@ module PermissionsHelper
         grouped_enrollments[course.id] ||= []
         grouped_enrollments[course.id].each{|e| e.course = course}
       end
-      all_permissions_data = get_permissions_info_by_account(sharded_courses, all_applicable_enrollments, permissions)
+
+      root_account_ids = sharded_courses.map(&:root_account_id).uniq
+      unloaded_ra_ids = root_account_ids - loaded_root_accounts.map(&:id)
+      root_accounts = loaded_root_accounts + (unloaded_ra_ids.any? ? Account.where(:id => unloaded_ra_ids).to_a : [])
+
+      is_account_admin = root_accounts.any?{|ra| self.roles(ra).include?('admin')}
+      account_roles = is_account_admin ? AccountUser.where(user: self).active.preload(:role).to_a : []
+      all_permissions_data = get_permissions_info_by_account(all_applicable_enrollments, permissions, account_roles)
 
       sharded_courses.each do |course|
         course_permissions = {}
@@ -74,8 +81,11 @@ module PermissionsHelper
           course_permissions[:read_grades] = true
           course_permissions[:participate_as_student] = true
         end
-        course_permissions[:read_as_admin] = true if active_ens.any?(&:admin?)
-
+        if active_ens.any?(&:admin?)
+          course_permissions[:read_as_admin] = true
+        elsif !is_account_admin
+          course_permissions[:read_as_admin] = false # wait a second i can totally mark this one as false if they don't have any account users
+        end
         precalculated_map[course.global_id] = course_permissions
       end
     end
@@ -124,8 +134,8 @@ module PermissionsHelper
   #  role_overrides: map from role id to hash containing :enabled, :locked, :self, :children
   #   (these are calculated for the specific account, taking inheritance and locking into account)
   #  admin_roles: set of Roles the user has active account memberships for in this account
-  def get_permissions_info_by_account(courses, enrollments, permissions)
-    account_roles = AccountUser.where(user: self).active.preload(:role).to_a
+  def get_permissions_info_by_account(enrollments, permissions, account_roles=nil)
+    account_roles ||= AccountUser.where(user: self).active.preload(:role).to_a
     role_ids = (enrollments.map(&:role_id) + account_roles.map(&:role_id)).uniq
     root_account_ids = enrollments.map(&:root_account_id).uniq
     query = <<-SQL
