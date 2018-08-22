@@ -20,7 +20,9 @@ class Feature
   ATTRS = [:feature, :display_name, :description, :applies_to, :state,
            :root_opt_in, :enable_at, :beta, :development,
            :release_notes_url, :custom_transition_proc,
-           :after_state_change_proc, :autoexpand, :touch_context].freeze
+           :after_state_change_proc, :autoexpand, :touch_context,
+           :use_settings_service].freeze
+
   attr_reader *ATTRS
 
   def initialize(opts = {})
@@ -566,6 +568,7 @@ END
       state: "allowed",
       beta: false,
       development: false,
+      use_settings_service: true
     },
     'zero_out_past_due' =>
     {
@@ -575,6 +578,7 @@ END
       state: "allowed",
       beta: false,
       development: false,
+      use_settings_service: true
     },
     'auto_due_dates' =>
     {
@@ -584,6 +588,7 @@ END
       state: "allowed",
       beta: false,
       development: false,
+      use_settings_service: true
     }
   )
 

@@ -226,10 +226,22 @@ class FeatureFlagsController < ApplicationController
   # @returns FeatureFlag
   def update
     if authorized_action(@context, @current_user, :manage_feature_flags)
+
       return render json: { message: "must specify feature" }, status: :bad_request unless params[:feature].present?
 
       feature_def = Feature.definitions[params[:feature]]
+
+
       return render json: { message: "invalid feature" }, status: :bad_request unless feature_def
+
+      if feature_def.use_settings_service
+        SettingsService.update_settings(
+          object: 'school',
+          id: 1,
+          setting: params[:feature],
+          value: params[:state]
+        )
+      end
 
       # check whether the feature is locked
       MultiCache.delete(@context.feature_flag_cache_key(params[:feature]))

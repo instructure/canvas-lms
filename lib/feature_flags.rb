@@ -23,8 +23,15 @@ module FeatureFlags
 
   def feature_enabled?(feature)
     flag = lookup_feature_flag(feature)
-    return flag.enabled? if flag
-    false
+    return false unless flag
+
+    feature_definition = Feature.definitions[feature]
+
+    if feature_definition && feature_definition.use_settings_service
+      SettingsService.get_setting(object: 'school', id: 1)[flag.to_sym] == 'on'
+    else
+      return flag.enabled?
+    end
   end
 
   def feature_allowed?(feature, exclude_enabled: false)
@@ -138,4 +145,3 @@ module FeatureFlags
     @feature_flag_cache[feature] = retval
   end
 end
-
