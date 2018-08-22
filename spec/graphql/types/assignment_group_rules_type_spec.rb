@@ -17,7 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
+require File.expand_path(File.dirname(__FILE__) + '/../../helpers/legacy_type_tester')
 
 describe Types::AssignmentGroupRulesType do
 
@@ -33,7 +33,7 @@ describe Types::AssignmentGroupRulesType do
     group.rules_hash = rules
   end
 
-  let(:rules_type) { GraphQLTypeTester.new(Types::AssignmentGroupRulesType, rules) }
+  let(:rules_type) { LegacyTypeTester.new(Types::AssignmentGroupRulesType, rules) }
   context "returns from hash:" do
     it "never drop" do
       expect(rules_type.neverDrop).to eq([@assignment])

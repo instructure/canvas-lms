@@ -17,7 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
+require File.expand_path(File.dirname(__FILE__) + '/../../helpers/legacy_type_tester')
 
 describe Types::SubmissionType do
   before(:once) do
@@ -26,7 +26,7 @@ describe Types::SubmissionType do
     @submission, _ = @assignment.grade_student(@student, score: 8, grader: @teacher)
   end
 
-  let(:submission_type) { GraphQLTypeTester.new(Types::SubmissionType, @submission) }
+  let(:submission_type) { LegacyTypeTester.new(Types::SubmissionType, @submission) }
 
   it "works" do
     expect(submission_type.user).to eq @student
@@ -83,7 +83,7 @@ describe Types::SubmissionType do
       @quiz_submission.quiz_submission = Quizzes::QuizSubmission.new(quiz_id: 1)
     end
 
-    let(:submission_type_quiz) { GraphQLTypeTester.new(Types::SubmissionType, @quiz_submission) }
+    let(:submission_type_quiz) { LegacyTypeTester.new(Types::SubmissionType, @quiz_submission) }
 
     it "should contain submissionStatus and gradingStatus fields" do
       expect(submission_type.submissionStatus).to eq :unsubmitted

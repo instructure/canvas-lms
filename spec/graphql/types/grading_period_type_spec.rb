@@ -17,7 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
+require File.expand_path(File.dirname(__FILE__) + '/../../helpers/legacy_type_tester')
 
 describe Types::GradingPeriodType do
   let_once(:grading_period) {
@@ -28,7 +28,7 @@ describe Types::GradingPeriodType do
   }
 
   let(:grading_period_type) {
-    GraphQLTypeTester.new(Types::GradingPeriodType, grading_period)
+    LegacyTypeTester.new(Types::GradingPeriodType, grading_period)
   }
 
   it "works" do

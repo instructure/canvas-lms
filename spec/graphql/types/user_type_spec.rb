@@ -17,11 +17,11 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
+require File.expand_path(File.dirname(__FILE__) + '/../../helpers/legacy_type_tester')
 
 describe Types::UserType do
   let_once(:user) { student_in_course(active_all: true); @student }
-  let(:user_type) { GraphQLTypeTester.new(Types::UserType, user) }
+  let(:user_type) { LegacyTypeTester.new(Types::UserType, user) }
 
   it "works" do
     expect(user_type._id).to eq user.id

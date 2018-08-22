@@ -17,7 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
+require File.expand_path(File.dirname(__FILE__) + '/../../helpers/legacy_type_tester')
 
 describe Types::AssignmentGroupType do
 
@@ -36,7 +36,7 @@ describe Types::AssignmentGroupType do
     end
 
     before do
-      @group_type = GraphQLTypeTester.new(Types::AssignmentGroupType, @group)
+      @group_type = LegacyTypeTester.new(Types::AssignmentGroupType, @group)
     end
 
     it "returns information about the group" do

@@ -17,13 +17,13 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
+require File.expand_path(File.dirname(__FILE__) + '/../../helpers/legacy_type_tester')
 
 describe Types::PageType do
   let_once(:course) { course_factory(active_all: true) }
   let_once(:wiki) { course.create_wiki! has_no_front_page: false, title: "asdf" }
   let_once(:page) { wiki.front_page }
-  let(:page_type) { GraphQLTypeTester.new(Types::PageType, page) }
+  let(:page_type) { LegacyTypeTester.new(Types::PageType, page) }
 
   it "works" do
     expect(page_type.title).to eq page.title

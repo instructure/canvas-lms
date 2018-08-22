@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class GraphQLTypeTester
+class LegacyTypeTester
   def initialize(type, test_object, user=nil)
     @type = case
             when GraphQL::ObjectType === type then type

@@ -17,10 +17,10 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
+require File.expand_path(File.dirname(__FILE__) + '/../../helpers/legacy_type_tester')
 
 describe Types::QueryType do
-  let(:query_type) { GraphQLTypeTester.new(Types::QueryType, nil) }
+  let(:query_type) { LegacyTypeTester.new(Types::QueryType, nil) }
 
   it "works" do
     # set up courses, teacher, and enrollments

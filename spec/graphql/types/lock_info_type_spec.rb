@@ -17,11 +17,11 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
+require File.expand_path(File.dirname(__FILE__) + '/../../helpers/legacy_type_tester')
 
 describe Types::LockInfoType do
   def lock_info_type(lock_info)
-    GraphQLTypeTester.new(Types::LockInfoType, lock_info)
+    LegacyTypeTester.new(Types::LockInfoType, lock_info)
   end
 
   it "works when lock_info is false" do

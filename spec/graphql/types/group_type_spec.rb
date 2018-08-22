@@ -17,7 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
+require File.expand_path(File.dirname(__FILE__) + '/../../helpers/legacy_type_tester')
 
 describe Types::GroupType do
   before(:once) do
@@ -27,7 +27,7 @@ describe Types::GroupType do
     @group.add_user(@student)
   end
 
-  let(:group_type) { GraphQLTypeTester.new(Types::GroupType, @group) }
+  let(:group_type) { LegacyTypeTester.new(Types::GroupType, @group) }
 
   it "works" do
     expect(group_type._id).to eq @group.id

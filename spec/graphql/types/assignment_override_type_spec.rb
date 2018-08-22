@@ -17,7 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
+require File.expand_path(File.dirname(__FILE__) + '/../../helpers/legacy_type_tester')
 
 describe Types::AssignmentOverrideType do
   let_once(:course) { course_factory(active_all: true) }
@@ -39,7 +39,7 @@ describe Types::AssignmentOverrideType do
   let_once(:section_override) { assignment.assignment_overrides.create!(set: section) }
 
   def assignment_override_type(override)
-    GraphQLTypeTester.new(Types::AssignmentOverrideType, override)
+    LegacyTypeTester.new(Types::AssignmentOverrideType, override)
   end
 
   it "works" do
@@ -55,7 +55,7 @@ describe Types::AssignmentOverrideType do
   end
 
   describe Types::AdhocStudentsType do
-    let(:adhoc_students_type) { GraphQLTypeTester.new(Types::AdhocStudentsType, adhoc_override) }
+    let(:adhoc_students_type) { LegacyTypeTester.new(Types::AdhocStudentsType, adhoc_override) }
     it "it returns students" do
       expect(adhoc_students_type.students).to eq [student]
     end

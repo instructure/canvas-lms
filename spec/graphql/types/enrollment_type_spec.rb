@@ -17,11 +17,11 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
+require File.expand_path(File.dirname(__FILE__) + '/../../helpers/legacy_type_tester')
 
 describe Types::EnrollmentType do
   let_once(:enrollment) { student_in_course(active_all: true) }
-  let(:enrollment_type) { GraphQLTypeTester.new(Types::EnrollmentType, enrollment) }
+  let(:enrollment_type) { LegacyTypeTester.new(Types::EnrollmentType, enrollment) }
 
   it "works" do
     expect(enrollment_type._id).to eq enrollment.id

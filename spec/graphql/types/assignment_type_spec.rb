@@ -17,7 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
+require File.expand_path(File.dirname(__FILE__) + '/../../helpers/legacy_type_tester')
 
 describe Types::AssignmentType do
   # create course
@@ -37,7 +37,7 @@ describe Types::AssignmentType do
                                    workflow_state: "published")
   end
   # create assignment type from assignment
-  let(:assignment_type) {GraphQLTypeTester.new(Types::AssignmentType, assignment)}
+  let(:assignment_type) {LegacyTypeTester.new(Types::AssignmentType, assignment)}
 
   it "has submissions that need grading" do
     # enroll users

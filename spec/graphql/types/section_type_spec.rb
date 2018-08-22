@@ -17,12 +17,12 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
+require File.expand_path(File.dirname(__FILE__) + '/../../helpers/legacy_type_tester')
 
 describe Types::SectionType do
   let_once(:course) { Course.create! name: "Foo" }
   let_once(:section) { course.course_sections.create! name: "Whatever" }
-  let(:section_type) { GraphQLTypeTester.new(Types::SectionType, section) }
+  let(:section_type) { LegacyTypeTester.new(Types::SectionType, section) }
 
   it "works" do
     expect(section_type._id).to eq section.id
