@@ -12,6 +12,14 @@ exports[`renders correctly expanded 1`] = `
 
 exports[`renders correctly expanded with no results 1`] = `
 "<ToggleGroup summary={{...}} toggleLabel=\\"Toggle alignment details for My outcome\\" expanded={true} onToggle={[Function]} border={false} size=\\"medium\\" icon={[Function: IconArrowOpenEnd]} iconExpanded={[Function: IconArrowOpenDown]} defaultExpanded={false} transition={true} as=\\"span\\" elementRef={[Function: elementRef]}>
+  <List variant=\\"unstyled\\" delimiter=\\"dashed\\" as=\\"ul\\" margin=\\"none\\" size=\\"medium\\">
+    <UnassessedAssignment assignment={{...}} />
+  </List>
+</ToggleGroup>"
+`;
+
+exports[`renders correctly expanded with no results or assignments 1`] = `
+"<ToggleGroup summary={{...}} toggleLabel=\\"Toggle alignment details for My outcome\\" expanded={true} onToggle={[Function]} border={false} size=\\"medium\\" icon={[Function: IconArrowOpenEnd]} iconExpanded={[Function: IconArrowOpenDown]} defaultExpanded={false} transition={true} as=\\"span\\" elementRef={[Function: elementRef]}>
   <View as=\\"div\\" padding=\\"small\\" display=\\"auto\\">
     <Text as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
       No alignments are available for this outcome.

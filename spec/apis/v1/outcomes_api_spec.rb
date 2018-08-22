@@ -645,7 +645,7 @@ describe "Outcomes API", type: :request do
       assignment_model({:course => @course})
       @account = Account.default
       account_admin_user
-      @outcome =@course.created_learning_outcomes.create!(
+      @outcome = @course.created_learning_outcomes.create!(
         :title => "My Outcome",
         :description => "Description of my outcome",
         :vendor_guid => "vendorguid9000"
@@ -694,6 +694,49 @@ describe "Outcomes API", type: :request do
                        :format => 'json')
           expect(json).to eq(outcome_json(@outcome, {:has_updateable_rubrics => true}))
         end
+      end
+    end
+
+    describe "alignments_for_student" do
+      before :once do
+        student_in_course(active_all: true)
+        @assignment1 = assignment_model({:course => @course})
+        @assignment2 = assignment_model({:course => @course})
+        outcome_with_rubric
+        @rubric.associate_with(@assignment1, @course, purpose: 'grading')
+        @rubric.associate_with(@assignment2, @course, purpose: 'grading')
+      end
+
+      it "should return aligned assignments for a student" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/outcome_alignments?student_id=#{@student.id}",
+                       :controller => 'outcomes_api',
+                       :action => 'outcome_alignments',
+                       :course_id => @course.id.to_s,
+                       :student_id => @student.id.to_s,
+                       :format => 'json')
+        expect(json.map{ |j| j["assignment_id"] }.sort).to eq([@assignment1.id, @assignment2.id].sort)
+      end
+
+      it "should not return assignments that a student does not have visibility for" do
+        assignment_model({course: @course, only_visible_to_overrides: true})
+        section = @course.course_sections.create!(name: "test section")
+        create_section_override_for_assignment(@assignment, course_section: section)
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/outcome_alignments?student_id=#{@student.id}",
+                       :controller => 'outcomes_api',
+                       :action => 'outcome_alignments',
+                       :course_id => @course.id.to_s,
+                       :student_id => @student.id.to_s,
+                       :format => 'json')
+        expect(json.map{ |j| j["assignment_id"] }.sort).to eq([@assignment1.id, @assignment2.id].sort)
+      end
+
+      it "requires a student_id to be present" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/outcome_alignments",
+                       :controller => 'outcomes_api',
+                       :action => 'outcome_alignments',
+                       :course_id => @course.id.to_s,
+                       :format => 'json')
+        expect(json['message']).to eq("student_id is required")
       end
     end
 

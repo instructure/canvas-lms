@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!outcomes'
 import View from '@instructure/ui-layout/lib/components/View'
@@ -27,6 +28,7 @@ import Pill from '@instructure/ui-elements/lib/components/Pill'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import natcompare from 'compiled/util/natcompare'
 import AssignmentResult from './AssignmentResult'
+import UnassessedAssignment from './UnassessedAssignment'
 import OutcomePopover from './OutcomePopover'
 import * as shapes from './shapes'
 
@@ -48,8 +50,8 @@ export default class Outcome extends React.Component {
 
   renderHeader () {
     const { outcome, outcomeProficiency } = this.props
-    const { mastered, results, title } = outcome
-    const numAlignments = results.length
+    const { assignments, mastered, title } = outcome
+    const numAlignments = assignments.length
 
     return (
       <Flex direction="row" justifyItems="space-between">
@@ -83,14 +85,23 @@ export default class Outcome extends React.Component {
 
   renderDetails () {
     const { outcome, outcomeProficiency } = this.props
-    const { results } = outcome
+    const { assignments, results } = outcome
+    const assignmentsWithResults = results.map((r) => r.assignment.id.split('_')[1])
+    const unassessedAssignments = _.reject(assignments, (a) => (
+      _.includes(assignmentsWithResults, a.assignment_id.toString()
+    )))
     return (
       <List variant="unstyled" delimiter="dashed">
       {
-          results.sort(natcompare.byKey('submitted_or_assessed_at')).reverse().map((result) => (
-            <ListItem key={result.id}>
-              <AssignmentResult result={result} outcome={outcome} outcomeProficiency={outcomeProficiency} />
-            </ListItem>
+        results.sort(natcompare.byKey('submitted_or_assessed_at')).reverse().map((result) => (
+          <ListItem key={result.id}>
+            <AssignmentResult result={result} outcome={outcome} outcomeProficiency={outcomeProficiency} />
+          </ListItem>
+        ))
+      }
+      {
+        unassessedAssignments.map((assignment) => (
+          <UnassessedAssignment assignment={assignment}/>
         ))
       }
       </List>
@@ -107,8 +118,8 @@ export default class Outcome extends React.Component {
 
   render () {
     const { outcome, expanded } = this.props
-    const { results, title } = outcome
-    const hasResults = results.length > 0
+    const { assignments, title } = outcome
+    const hasAlignments = assignments.length > 0
     return (
       <ToggleGroup
         summary={this.renderHeader()}
@@ -117,7 +128,7 @@ export default class Outcome extends React.Component {
         onToggle={this.handleToggle}
         border={false}
       >
-        { hasResults ? this.renderDetails() : this.renderEmpty() }
+        { hasAlignments ? this.renderDetails() : this.renderEmpty() }
       </ToggleGroup>
     )
   }

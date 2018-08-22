@@ -61,18 +61,21 @@ const fetchOutcomes = (courseId, studentId) => {
   let outcomeGroups
   let outcomeLinks
   let outcomeRollups
+  let outcomeAssignmentsByOutcomeId
   let outcomeResultsByOutcomeId
   let assignmentsByAssignmentId
 
   return Promise.all([
     fetchUrl(`/api/v1/courses/${courseId}/outcome_groups?per_page=100`),
     fetchUrl(`/api/v1/courses/${courseId}/outcome_group_links?outcome_style=full&per_page=100`),
-    fetchUrl(`/api/v1/courses/${courseId}/outcome_rollups?user_ids[]=${studentId}&per_page=100`)
+    fetchUrl(`/api/v1/courses/${courseId}/outcome_rollups?user_ids[]=${studentId}&per_page=100`),
+    fetchUrl(`/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}`)
   ])
-    .then(([groups, links, rollups]) => {
+    .then(([groups, links, rollups, alignments]) => {
       outcomeGroups = groups
       outcomeLinks = links
       outcomeRollups = rollups
+      outcomeAssignmentsByOutcomeId = _.groupBy(alignments, 'learning_outcome_id');
     })
     .then(() => (
       Promise.all(outcomeLinks.map((outcomeLink) => (
@@ -111,6 +114,7 @@ const fetchOutcomes = (courseId, studentId) => {
 
       // add results, assignments
       outcomes.forEach((outcome) => {
+        outcome.assignments = outcomeAssignmentsByOutcomeId[outcome.id] || [] // eslint-disable-line no-param-reassign
         outcome.results = outcomeResultsByOutcomeId[outcome.id] || [] // eslint-disable-line no-param-reassign
         outcome.results.forEach((result) => {
           result.assignment = assignmentsByAssignmentId[result.links.assignment] // eslint-disable-line no-param-reassign

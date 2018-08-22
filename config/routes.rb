@@ -1850,6 +1850,7 @@ CanvasRails::Application.routes.draw do
       get "outcomes/:id", action: :show, as: "outcome"
       put "outcomes/:id", action: :update
       delete "outcomes/:id", action: :destroy
+      get "courses/:course_id/outcome_alignments", action: :outcome_alignments
     end
 
     scope(controller: :outcome_results) do
