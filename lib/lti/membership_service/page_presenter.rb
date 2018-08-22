@@ -45,7 +45,7 @@ module Lti
       def next_page_query_params
         query = {}
         query[:role] = @membership_collator.role if @membership_collator.role
-        query[:page] = @membership_collator.page + 2
+        query[:page] = @membership_collator.next_page
         query[:per_page] = @membership_collator.per_page
         query
       end
