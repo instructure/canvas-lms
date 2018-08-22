@@ -240,7 +240,11 @@ module.exports = {
     // sets these environment variables in compiled code.
     // process.env.NODE_ENV will make it so react and others are much smaller and don't run their
     // debug/propType checking in prod.
-    new webpack.EnvironmentPlugin(['NODE_ENV']),
+    new webpack.EnvironmentPlugin({
+      NODE_ENV: null,
+      DEPRECATION_SENTRY_DSN: null,
+      GIT_COMMIT: null
+    }),
 
     new WebpackCleanupPlugin({
       exclude: ['selinimum-manifest.json']
