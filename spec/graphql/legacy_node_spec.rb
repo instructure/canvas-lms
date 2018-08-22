@@ -27,35 +27,6 @@ describe "legacyNode" do
     CanvasSchema.execute(query, context: {current_user: user})
   end
 
-  context "courses" do
-    before(:once) do
-      @query = <<-GQL
-      query {
-        course: legacyNode(type: Course, _id: "#{@course.id}") {
-          ... on Course {
-            _id,
-            name
-          }
-        }
-      }
-      GQL
-    end
-
-    it "works" do
-      expect(
-        run_query(@query, @student)["data"]["course"]["_id"]
-      ).to eq @course.id.to_s
-    end
-
-    it "needs read permission" do
-      @course1, @student1 = @course, @student
-      course_with_student
-      @course2, @student2 = @course, @student
-
-      expect(run_query(@query, @student2)["data"]["course"]).to be_nil
-    end
-  end
-
   context "assignments" do
     before(:once) do
       @assignment = @course.assignments.create! name: "Some Assignment"
