@@ -29,14 +29,7 @@ module Lti
 
       private
 
-      def users
-        @users ||= user_scope.
-          preload(:communication_channels).
-          offset(@page * @per_page).
-          limit(@per_page + 1)
-      end
-
-      def user_scope
+      def scope
         @user_scope ||= @user.nil? ? @context.participating_users : UserSearch.scope_for(@context, @user)
       end
 
