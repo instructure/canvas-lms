@@ -60,6 +60,7 @@ class GraphQLTypeTester
   end
 
   def extract_results(result)
+    return result unless result.respond_to?(:reduce)
     result.reduce(nil) do |result, (k, v)|
       case v
       when Hash then extract_results(v)
