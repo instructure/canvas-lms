@@ -25,16 +25,13 @@ module Factories
     allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
     allow(Canvas::DynamicSettings).to receive(:find).with("rich-content-service", default_ttl: 5.minutes).and_return(
       ActiveSupport::HashWithIndifferentAccess.new({
-        "app-host":"",
-        "cdn-host":"",
-        "skip-sidebar":"true",
-        "sidebar-source":"fake"
+        "app-host":"http://localhost:3000",
       })
     )
     allow(Canvas::DynamicSettings).to receive(:find).with("canvas").and_return(
       {
-        "signing-secret" => "asdfasdfasdfasdfasdfasdfasdfasdf",
-        "encryption-secret" => "jkl;jkl;jkl;jkl;jkl;jkl;jkl;jkl;"
+        "signing-secret" => "astringthatisactually32byteslong",
+        "encryption-secret" => "astringthatisactually32byteslong"
       }
     )
   end

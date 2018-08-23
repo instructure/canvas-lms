@@ -48,6 +48,14 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       end
     end
 
+    it 'should be able to click on things in the sidebar' do
+      @course.wiki_pages.create!(title: 'Page1')
+      get "/courses/#{@course.id}/pages/Page1/edit"
+      f('#right-side button').click
+      sleep 2
+      expect(f('#right-side ul')).to include_text('Page1')
+    end
+
     it "should type a web address link, save it, "\
     "and validate auto link plugin worked correctly", priority: "1", test_id: 312410 do
       text = "http://www.google.com/"
