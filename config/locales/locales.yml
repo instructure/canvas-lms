@@ -203,6 +203,47 @@ de:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+el:
+  bigeasy_locale: el_GR
+  crowdsourced: true
+  date:
+    abbr_month_names:
+      - ~
+      - Ιαν
+      - Φεβ
+      - Μαρ
+      - Απρ
+      - Μαι
+      - Ιουν
+      - Ιουλ
+      - Αυγ
+      - Σεπ
+      - Οκτ
+      - Νοε
+      - Δεκ
+    formats:
+      date_at_time: "%b %-d at %l:%M%P"
+      default: "%Y-%m-%d"
+      full: "%b %-d, %Y %-l:%M%P"
+      full_with_weekday: "%a %b %-d, %Y %-l:%M%P"
+      long: "%B %-d, %Y"
+      long_with_weekday: "%A, %B %-d"
+      medium: "%b %-d, %Y"
+      medium_month: "%b %Y"
+      medium_with_weekday: "%a %b %-d, %Y"
+      short: "%b %-d"
+      short_month: "%b"
+      short_weekday: "%a"
+      short_with_weekday: "%a, %b %-d"
+      weekday: "%A"
+  dow_offset: 1
+  locales:
+    el: Ελληνικά
+  time:
+    event: "%{date} στις %{time}"
+    formats:
+      tiny: "%l:%M%P"
+      tiny_on_the_hour: "%l%P"
 en:
   bigeasy_locale: en_US
   locales:
@@ -567,6 +608,47 @@ ht:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+hu:
+  bigeasy_locale: hu_HU
+  crowdsourced: true
+  date:
+    abbr_month_names:
+      - ~
+      - jan
+      - feb
+      - márc
+      - ápr
+      - máj
+      - jún
+      - júl
+      - aug
+      - szept
+      - okt
+      - nov
+      - dec
+    formats:
+      date_at_time: "%b %-d, %H:%M"
+      default: "%Y. %m. %d."
+      full: " %Y %b %-d, %H:%M"
+      full_with_weekday: "%Y %b %-d, %a, %H:%M"
+      long: "%Y. %B %-d"
+      long_with_weekday: "%A, %B %-d"
+      medium: "%Y. %b %-d"
+      medium_month: "%Y. %b"
+      medium_with_weekday: "%Y. %b %-d, %a "
+      short: "%b %-d"
+      short_month: "%b"
+      short_weekday: "%a"
+      short_with_weekday: "%a, %b %-d"
+      weekday: "%A"
+  dow_offset: 1
+  locales:
+    hu: Magyar
+  time:
+    event: "%{date},  %{time}"
+    formats:
+      tiny: "%H:%M "
+      tiny_on_the_hour: "%H:%M"
 hy:
   bigeasy_locale: hy_AM
   crowdsourced: true
@@ -1248,6 +1330,47 @@ tr:
     tr: Türkçe
   time:
     event: "%{date} %{time}"
+    formats:
+      tiny: "%l:%M%P"
+      tiny_on_the_hour: "%l%P"
+uk:
+  bigeasy_locale: uk_UA
+  crowdsourced: true
+  date:
+    abbr_month_names:
+      - ~
+      - Jan
+      - Feb
+      - Mar
+      - Apr
+      - May
+      - Jun
+      - Jul
+      - Aug
+      - Sep
+      - Oct
+      - Nov
+      - Dec
+    formats:
+      date_at_time: "%b %-d at %l:%M%P"
+      default: "%Y-%m-%d"
+      full: "%b %-d, %Y %-l:%M%P"
+      full_with_weekday: "%a %b %-d, %Y %-l:%M%P"
+      long: "%B %-d, %Y"
+      long_with_weekday: "%A, %B %-d"
+      medium: "%b %-d, %Y"
+      medium_month: "%b %Y"
+      medium_with_weekday: "%a %b %-d, %Y"
+      short: "%b %-d"
+      short_month: "%b"
+      short_weekday: "%a"
+      short_with_weekday: "%a, %b %-d"
+      weekday: "%A"
+  dow_offset: 1
+  locales:
+    uk: український
+  time:
+    event: "%{date} о %{time}"
     formats:
       tiny: "%l:%M%P"
       tiny_on_the_hour: "%l%P"
