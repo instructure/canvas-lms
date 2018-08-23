@@ -1059,27 +1059,6 @@ describe Enrollment do
     end
   end
 
-  context "recompute_final_score_if_stale" do
-    before(:once) { course_with_student }
-    it "should only call recompute_final_score once within the cache window" do
-      expect(Enrollment).to receive(:recompute_final_score).once
-      enable_cache do
-        Enrollment.recompute_final_score_if_stale @course
-        Enrollment.recompute_final_score_if_stale @course
-      end
-    end
-
-    it "should yield iff it calls recompute_final_score" do
-      expect(Enrollment).to receive(:recompute_final_score).once
-      count = 1
-      enable_cache do
-        Enrollment.recompute_final_score_if_stale(@course, @user){ count += 1 }
-        Enrollment.recompute_final_score_if_stale(@course, @user){ count += 1 }
-      end
-      expect(count).to eql 2
-    end
-  end
-
   context "recompute_final_score_in_singleton" do
     before(:once) { course_with_student }
 

@@ -26,6 +26,7 @@ module SectionTabHelper
     :manage_students,
     :moderate_forum,
     :post_to_forum,
+    :read_announcements,
     :read_course_content,
     :read_forum,
     :read_roster,

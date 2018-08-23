@@ -64,6 +64,16 @@ module PermissionsHelper
           course_permissions[permission] = !!(perm_hash && grouped_enrollments[course.id].any?{|e|
             enabled_for_enrollment(e.role_id, e.type, e.date_based_state_in_db.to_sym, perm_hash, permission)})
         end
+
+        # load some other permissions that we can possibly skip calculating - we can't say for sure they're false but we can mark them true
+        active_ens = grouped_enrollments[course.id].select{|e| e.date_based_state_in_db.to_sym == :active}
+        course_permissions[:read] = true if active_ens.any?
+        if active_ens.any?(&:student?)
+          course_permissions[:read_grades] = true
+          course_permissions[:participate_as_student] = true
+        end
+        course_permissions[:read_as_admin] = true if active_ens.any?(&:admin?)
+
         precalculated_map[course.global_id] = course_permissions
       end
     end
@@ -71,6 +81,7 @@ module PermissionsHelper
   end
 
   def enabled_for_enrollment(role_id, role_type, enrollment_state, perm_hash, permission)
+    role_type = "StudentEnrollment" if role_type == "StudentViewEnrollment"
     permission_details = RoleOverride.permissions[permission]
     true_for_roles = permission_details[:true_for]
     available_to_roles = permission_details[:available_to]

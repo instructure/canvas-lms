@@ -568,7 +568,7 @@ module ApplicationHelper
         @current_user.precalculate_permissions_for_courses(courses, SectionTabHelper::PERMISSIONS_TO_PRECALCULATE)
       end
     mapped = courses.map do |course|
-      tabs = opts[:include_section_tabs] && available_section_tabs(course, precalculated_tab_permissions[course.global_id])
+      tabs = opts[:include_section_tabs] && available_section_tabs(course, precalculated_tab_permissions&.dig(course.global_id))
       presenter = CourseForMenuPresenter.new(course, tabs, @current_user, @domain_root_account)
       presenter.to_h
     end

@@ -529,9 +529,7 @@ class ApplicationController < ActionController::Base
   end
 
   def user_url(*opts)
-    opts[0] == @current_user && !@current_user.grants_right?(@current_user, session, :view_statistics) ?
-      user_profile_url(@current_user) :
-      super
+    opts[0] == @current_user ? user_profile_url(@current_user) : super
   end
 
   def tab_enabled?(id, opts = {})
