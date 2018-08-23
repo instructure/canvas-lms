@@ -345,10 +345,11 @@ describe SIS::CSV::EnrollmentImporter do
       "user_1,user1,User,Uno,user@example.com,active"
     )
     # should be able to create an enrollment in a deleted state
-    process_csv_data_cleanly(
+    importer = process_csv_data_cleanly(
       "course_id,user_id,role,section_id,status,associated_user_id",
       "test_1,user_1,student,,deleted,"
     )
+    expect(importer.batch.data[:counts][:enrollments]).to eq 1
     @course = Course.where(sis_source_id: 'test_1').first
     scope = Enrollment.where(:course_id => @course)
     expect(scope.count).to eq 1
