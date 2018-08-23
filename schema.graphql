@@ -165,13 +165,16 @@ input AssignmentInput {
   name: String!
 }
 
-type AssignmentOverride implements Timestamped {
+type AssignmentOverride implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
   allDay: Boolean
   assignment: Assignment
   createdAt: DateTime
   dueAt: DateTime
+
+  # ID of the object.
+  id: ID!
   lockAt: DateTime
 
   # This object specifies what students this override applies to

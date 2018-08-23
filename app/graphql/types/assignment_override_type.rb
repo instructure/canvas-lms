@@ -17,42 +17,6 @@
 #
 
 module Types
-  AssignmentOverrideType = GraphQL::ObjectType.define do
-    name "AssignmentOverride"
-
-    interfaces [Interfaces::TimestampInterface]
-
-    field :_id, !types.ID, "legacy canvas id", property: :id
-
-    field :assignment, AssignmentType, resolve: ->(override, _, _) {
-      Loaders::AssociationLoader.for(AssignmentOverride, :assignment)
-        .load(override)
-        .then { override.assignment }
-    }
-
-    field :title, types.String
-
-    field :set, AssignmentOverrideSetUnion do
-      description "This object specifies what students this override applies to"
-
-      resolve ->(override, _, _) {
-        if override.set_type == "ADHOC"
-          # AdhocStudentsType will load the actual students
-          override
-        else
-          Loaders::AssociationLoader.for(AssignmentOverride, :set)
-            .load(override)
-            .then { override.set }
-        end
-      }
-    end
-
-    field :dueAt, DateTimeType, property: :due_at
-    field :lockAt, DateTimeType, property: :lock_at
-    field :unlockAt, DateTimeType, property: :unlock_at
-    field :allDay, types.Boolean, property: :all_day
-  end
-
   AssignmentOverrideSetUnion = GraphQL::UnionType.define do
     name "AssignmentOverrideSet"
 
@@ -81,5 +45,38 @@ module Types
       .then { override.assignment_override_students.map(&:user) }
     }
 
+  end
+  class AssignmentOverrideType < ApplicationObjectType
+    graphql_name "AssignmentOverride"
+
+    implements GraphQL::Relay::Node.interface
+    implements Interfaces::TimestampInterface
+
+    alias :override :object
+
+    field :_id, ID, "legacy canvas id", method: :id, null: false
+
+    field :assignment, AssignmentType, null: true
+    def assignment
+      load_association(:assignment)
+    end
+
+    field :title, String, null: true
+
+    field :set, AssignmentOverrideSetUnion,
+      "This object specifies what students this override applies to",
+      null: true
+    def set
+      if override.set_type == "ADHOC"
+        override
+      else
+        load_association(:set)
+      end
+    end
+
+    field :due_at, DateTimeType, null: true
+    field :lock_at, DateTimeType, null: true
+    field :unlock_at, DateTimeType, null: true
+    field :all_day, Boolean, null: true
   end
 end
