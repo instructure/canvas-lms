@@ -586,6 +586,13 @@ describe CoursesController, type: :request do
     expect(json.map { |course| course['id'] }).to eq([c2.id])
   end
 
+  it "should include tabs (and precalculate stuff in theory) if requested" do
+    c1 = course_with_student(course_name: 'def', active_all: true).course
+
+    json = api_call(:get, "/api/v1/courses.json?include[]=tabs", controller: 'courses', action: 'index', format: 'json', include: ['tabs'])
+    expect(json.first['tabs']).to be_present
+  end
+
   describe "user index" do
     specs_require_sharding
     before :once do

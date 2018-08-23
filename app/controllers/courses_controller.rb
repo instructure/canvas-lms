@@ -2947,10 +2947,14 @@ class CoursesController < ApplicationController
       progressions = ContextModuleProgression.joins(:context_module).where(user: user, context_modules: { course: courses }).select("context_module_progressions.*, context_modules.context_id AS course_id").to_a.group_by { |cmp| cmp['course_id'] }
     end
 
+    all_precalculated_permissions = includes.include?('tabs') ?
+      user.precalculate_permissions_for_courses(courses, SectionTabHelper::PERMISSIONS_TO_PRECALCULATE) : nil
+
     enrollments_by_course.each do |course_enrollments|
       course = course_enrollments.first.course
       hash << course_json(course, @current_user, session, includes, course_enrollments, user,
-                          preloaded_progressions: progressions)
+                          preloaded_progressions: progressions,
+                          precalculated_permissions: all_precalculated_permissions&.dig(course.global_id))
     end
     hash
   end
