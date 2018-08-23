@@ -37,7 +37,7 @@ $darkRowBg: #f9f9f9;
   }
   button {
     @include ic-focus-base;
-    &:focus-within {
+    &:focus {
       @include ic-focus-variant;
     }
     border: none;
