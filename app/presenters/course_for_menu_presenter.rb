@@ -42,7 +42,6 @@ class CourseForMenuPresenter
       courseCode: course.course_code,
       assetString: course.asset_string,
       href: course_path(course, invitation: course.read_attribute(:invitation)),
-      informStudentsOfOverdueSubmissions: course.feature_enabled?(:new_gradebook),
       term: term || nil,
       subtitle: subtitle,
       id: course.id,

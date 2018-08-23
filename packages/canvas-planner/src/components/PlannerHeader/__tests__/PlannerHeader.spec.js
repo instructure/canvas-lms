@@ -30,7 +30,7 @@ const plannerDays = [
 
 function defaultProps (options) {
   return {
-    courses: [{id: "1", longName: "Course Long Name", shortName: "Course Short Name", informStudentsOfOverdueSubmissions: true}],
+    courses: [{id: "1", longName: "Course Long Name", shortName: "Course Short Name"}],
     opportunities: {
       items: [{id: "1", course_id: "1", due_at: "2017-03-09T20:40:35Z", html_url: "http://www.non_default_url.com", name: "learning object title"}],
       nextUrl: null

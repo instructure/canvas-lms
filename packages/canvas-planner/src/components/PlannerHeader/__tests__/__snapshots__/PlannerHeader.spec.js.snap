@@ -129,7 +129,6 @@ exports[`new activity button does not show when there is no new activity 1`] = `
           Array [
             Object {
               "id": "1",
-              "informStudentsOfOverdueSubmissions": true,
               "longName": "Course Long Name",
               "shortName": "Course Short Name",
             },
@@ -194,7 +193,6 @@ exports[`new activity button does not show when there is no new activity 1`] = `
         Array [
           Object {
             "id": "1",
-            "informStudentsOfOverdueSubmissions": true,
             "longName": "Course Long Name",
             "shortName": "Course Short Name",
           },
@@ -252,7 +250,6 @@ exports[`new activity button does not show when there is no new activity 1`] = `
           Array [
             Object {
               "id": "1",
-              "informStudentsOfOverdueSubmissions": true,
               "longName": "Course Long Name",
               "shortName": "Course Short Name",
             },
@@ -414,7 +411,6 @@ exports[`new activity button shows when there is new activity 1`] = `
           Array [
             Object {
               "id": "1",
-              "informStudentsOfOverdueSubmissions": true,
               "longName": "Course Long Name",
               "shortName": "Course Short Name",
             },
@@ -479,7 +475,6 @@ exports[`new activity button shows when there is new activity 1`] = `
         Array [
           Object {
             "id": "1",
-            "informStudentsOfOverdueSubmissions": true,
             "longName": "Course Long Name",
             "shortName": "Course Short Name",
           },
@@ -537,7 +532,6 @@ exports[`new activity button shows when there is new activity 1`] = `
           Array [
             Object {
               "id": "1",
-              "informStudentsOfOverdueSubmissions": true,
               "longName": "Course Long Name",
               "shortName": "Course Short Name",
             },
@@ -699,7 +693,6 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
           Array [
             Object {
               "id": "1",
-              "informStudentsOfOverdueSubmissions": true,
               "longName": "Course Long Name",
               "shortName": "Course Short Name",
             },
@@ -764,7 +757,6 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
         Array [
           Object {
             "id": "1",
-            "informStudentsOfOverdueSubmissions": true,
             "longName": "Course Long Name",
             "shortName": "Course Short Name",
           },
@@ -822,7 +814,6 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
           Array [
             Object {
               "id": "1",
-              "informStudentsOfOverdueSubmissions": true,
               "longName": "Course Long Name",
               "shortName": "Course Short Name",
             },

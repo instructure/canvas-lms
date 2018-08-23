@@ -56,7 +56,6 @@ it('renders grouping correctly when having itemsForDay', () => {
       type: 'Course',
       id: 128,
       url:"http://www.non_default_url.com",
-      inform_students_of_overdue_submissions: true
     }
   }, {
     title: 'San Juan',
@@ -65,7 +64,6 @@ it('renders grouping correctly when having itemsForDay', () => {
       type: 'Course',
       id: 256,
       url:"http://www.non_default_url.com",
-      inform_students_of_overdue_submissions: true
     }
   }, {
     title: 'Roll for the Galaxy',
@@ -74,7 +72,6 @@ it('renders grouping correctly when having itemsForDay', () => {
       type: 'Course',
       id: 256,
       url:"http://www.non_default_url.com",
-      inform_students_of_overdue_submissions: true
     }
   }, {
       title: 'Same id, different type',
@@ -82,7 +79,6 @@ it('renders grouping correctly when having itemsForDay', () => {
       context: {
         type: 'Group',
         id: 256,
-        inform_students_of_overdue_submissions: false
       }
   }];
 
@@ -99,7 +95,6 @@ it('groups itemsForDay that have no context into the "Notes" category', () => {
     context: {
       type: 'Course',
       id: 128,
-      inform_students_of_overdue_submissions: true
     }
   }, {
     title: 'San Juan',
@@ -107,7 +102,6 @@ it('groups itemsForDay that have no context into the "Notes" category', () => {
     context: {
       type: 'Course',
       id: 256,
-      inform_students_of_overdue_submissions: true
     }
   }, {
     title: 'Roll for the Galaxy',
@@ -115,7 +109,6 @@ it('groups itemsForDay that have no context into the "Notes" category', () => {
     context: {
       type: 'Course',
       id: 256,
-      inform_students_of_overdue_submissions: true
     }
   }, {
     title: 'Get work done!'
@@ -135,7 +128,6 @@ it('groups itemsForDay that come in on prop changes', () => {
     context: {
       type: 'Course',
       id: 128,
-      inform_students_of_overdue_submissions: true
     }
   }, {
     title: 'San Juan',
@@ -143,7 +135,6 @@ it('groups itemsForDay that come in on prop changes', () => {
     context: {
       type: 'Course',
       id: 256,
-      inform_students_of_overdue_submissions: true
     }
   }];
 
@@ -159,7 +150,6 @@ it('groups itemsForDay that come in on prop changes', () => {
     context: {
       type: 'Course',
       id: 256,
-      inform_students_of_overdue_submissions: true
     }
   }, {
     title: 'Get work done!'
@@ -183,12 +173,12 @@ it('registers itself as animatable', () => {
   const fakeRegister = jest.fn();
   const fakeDeregister = jest.fn();
   const firstItems = [
-    {title: 'asdf', date: moment.tz('2017-04-25T23:59:00Z', TZ), context: {id: 128, inform_students_of_overdue_submissions: true}, id: '1', uniqueId: 'first'},
-    {title: 'jkl',  date: moment.tz('2017-04-25T23:59:00Z', TZ), context: {id: 256, inform_students_of_overdue_submissions: true}, id: '2', uniqueId: 'second'}
+    {title: 'asdf', date: moment.tz('2017-04-25T23:59:00Z', TZ), context: {id: 128}, id: '1', uniqueId: 'first'},
+    {title: 'jkl',  date: moment.tz('2017-04-25T23:59:00Z', TZ), context: {id: 256}, id: '2', uniqueId: 'second'}
   ];
   const secondItems = [
-    {title: 'qwer', date: moment.tz('2017-04-25T23:59:00Z', TZ), context: {id: 128, inform_students_of_overdue_submissions: true}, id: '3', uniqueId: 'third'},
-    {title: 'uiop', date: moment.tz('2017-04-25T23:59:00Z', TZ), context: {id: 256, inform_students_of_overdue_submissions: true}, id: '4', uniqueId: 'fourth'}
+    {title: 'qwer', date: moment.tz('2017-04-25T23:59:00Z', TZ), context: {id: 128}, id: '3', uniqueId: 'third'},
+    {title: 'uiop', date: moment.tz('2017-04-25T23:59:00Z', TZ), context: {id: 256}, id: '4', uniqueId: 'fourth'}
   ];
   const wrapper = mount(
     <Day

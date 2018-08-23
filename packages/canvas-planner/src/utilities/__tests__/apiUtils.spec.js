@@ -29,7 +29,6 @@ const courses = [{
   shortName: 'blah',
   image: 'blah_url',
   color: '#abffaa',
-  informStudentsOfOverdueSubmissions: true,
 }];
 const groups = [{
   id: '9',

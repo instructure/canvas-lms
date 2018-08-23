@@ -71,7 +71,6 @@ function groupProps (option) {
       "type": "Group",
       "id": "9",
       "title": "Account-level group 1",
-      "inform_students_of_overdue_submissions": false,
       "color": "#F06291",
       "url": "/groups/9"
     },

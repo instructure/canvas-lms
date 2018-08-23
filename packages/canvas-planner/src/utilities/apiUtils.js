@@ -218,7 +218,6 @@ function getCourseContext(course) {
     id: course.id,
     title: course.shortName,
     image_url: course.image,
-    inform_students_of_overdue_submissions: course.informStudentsOfOverdueSubmissions,
     color: course.color,
     url: course.href
   };
@@ -231,7 +230,6 @@ function getGroupContext(apiResponse, group) {
     id: group.id,
     title: group.name,
     image_url: undefined,
-    inform_students_of_overdue_submissions: false,  // group items don't have submissions
     color: group.color,
     url: group.url
   };
