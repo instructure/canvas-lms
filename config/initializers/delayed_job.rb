@@ -67,16 +67,15 @@ end
 # configure autoscaling plugin
 if (config = Delayed::CLI.instance&.config&.[](:auto_scaling))
   require 'jobs_autoscaling'
+  actions = [JobsAutoscaling::LoggerAction.new]
   if config[:asg_name]
     aws_config = config[:aws_config] || {}
     aws_config[:region] ||= ApplicationController.region
-    action = JobsAutoscaling::AwsAction.new(asg_name: config[:asg_name],
+    actions << JobsAutoscaling::AwsAction.new(asg_name: config[:asg_name],
                                             aws_config: aws_config,
                                             instance_id: ApplicationController.instance_id)
-  else
-    action = JobsAutoscaling::LoggerAction.new
   end
-  autoscaler = JobsAutoscaling::Monitor.new(action: action)
+  autoscaler = JobsAutoscaling::Monitor.new(action: actions)
   autoscaler.activate!
 end
 
