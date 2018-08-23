@@ -18,7 +18,6 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import View from '@instructure/ui-layout/lib/components/View';
 import Select from '@instructure/ui-core/lib/components/Select';
 
 export default function SelectMenu (props) {
@@ -33,19 +32,17 @@ export default function SelectMenu (props) {
   });
 
   return (
-    <View as="div" margin="small small small 0">
-      <Select
-        defaultValue={props.defaultValue}
-        disabled={props.disabled}
-        id={props.id}
-        inline
-        label={props.label}
-        onChange={props.onChange}
-        width="15rem"
-      >
-        {options}
-      </Select>
-    </View>
+    <Select
+      defaultValue={props.defaultValue}
+      disabled={props.disabled}
+      id={props.id}
+      inline
+      label={props.label}
+      onChange={props.onChange}
+      width="15rem"
+    >
+      {options}
+    </Select>
   );
 }
 
