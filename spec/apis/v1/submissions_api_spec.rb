@@ -3899,7 +3899,6 @@ describe 'Submissions API', type: :request do
 
           it 'encodes capture_params in the token' do
             capture_params = {
-              "submit_assignment" => nil,
               "eula_agreement_timestamp" => nil,
               "context_type" => "User",
               "context_id" => @student1.id.to_s,
@@ -3938,7 +3937,7 @@ describe 'Submissions API', type: :request do
 
       context 'for url upload using DelayedJob' do
         let(:json_response) do
-          preflight(url: 'http://example.com/test', filename: 'test.txt', submit_assignment: true)
+          preflight(url: 'http://example.com/test', filename: 'test.txt')
           JSON.parse(response.body)
         end
 
