@@ -50,5 +50,19 @@ describe "/submissions/show_preview" do
     render "submissions/show_preview"
     expect(response.body).to match(/No Preview Available/)
   end
-end
 
+  it "a DocViewer url that includes the submission id" do
+    course_with_student
+    view_context
+    assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_upload")
+    attachment = Attachment.create!(context: @student, uploaded_data: stub_png_data, filename: "homework.png")
+    submission = assignment.submit_homework(@user, attachments: [attachment])
+    allow(Canvadocs).to receive(:enabled?).and_return(true)
+    allow(Canvadocs).to receive(:config).and_return({a: 1})
+    allow(Canvadoc).to receive(:mime_types).and_return("image/png")
+    assign(:assignment, assignment)
+    assign(:submission, submission)
+    render template: "submissions/show_preview", locals: {anonymize_students: assignment.anonymize_students?}
+    expect(response.body.include?("%22submission_id%22:#{submission.id}")).to be true
+  end
+end

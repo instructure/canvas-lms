@@ -59,6 +59,14 @@ describe AttachmentHelper do
     expect(attrs).to match "enrollment_type%22:%22teacher"
   end
 
+  it "includes submission id in canvadoc url" do
+    id = 23
+    @current_user = @teacher
+    allow(@att).to receive(:canvadocable?).and_return(true)
+    attrs = doc_preview_attributes(@att, { enable_annotations: true, enrollment_type: "teacher", submission_id: id })
+    expect(attrs).to match "%22submission_id%22:#{id}"
+  end
+
   describe "set_cache_header" do
     it "should not allow caching of instfs redirects" do
       allow(@att).to receive(:instfs_hosted?).and_return(true)

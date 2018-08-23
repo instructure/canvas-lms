@@ -204,12 +204,33 @@ describe CanvadocSessionsController do
           user_id: @student.global_id,
           type: "canvadoc",
           enable_annotations: true,
-          enrollment_type: 'student'
+          enrollment_type: 'student',
+          submission_id: @submission.id
         }
       end
       let(:hmac) { Canvas::Security.hmac_sha1(blob.to_json) }
 
-      it "enables submission annotations for an anonymously-graded assignment" do
+      it "sends along the submission id when annotations are enabled" do
+        # The controller fetches different instances of the model objects we're
+        # working with here, so unfortunately we can't mock them specifically.
+        expect_any_instance_of(Canvadoc).to receive(:session_url).
+          with(hash_including(submission_id: @submission.id))
+
+        get :show, params: {blob: blob.to_json, hmac: hmac}
+      end
+
+      it "sends along the audit callback url when annotations are enabled" do
+        domain = @submission.context.root_account.domain
+        url = "https://#{domain}/submissions/#{@submission.id}/docviewer_audit_events"
+        # The controller fetches different instances of the model objects we're
+        # working with here, so unfortunately we can't mock them specifically.
+        expect_any_instance_of(Canvadoc).to receive(:session_url).
+          with(hash_including(audit_url: url))
+
+        get :show, params: {blob: blob.to_json, hmac: hmac}
+      end
+
+      it "disables submission annotations for an anonymously-graded assignment" do
         @assignment.update!(anonymous_grading: true)
         # The controller fetches different instances of the model objects we're
         # working with here, so unfortunately we can't mock them specifically.

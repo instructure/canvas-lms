@@ -20,7 +20,6 @@
 
 <% user_name = params[:hide_student_name] ? t(:anonymous_username, "This Student") : submission_author_name_for(@assessment_request) %>
 <% content_for :page_title do %><%= join_title @assignment.title, submission_author_name_for(@assessment_request) %><% end %>
-
 <% if @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic %>
   <div style="width: 600px; margin: 10px auto;">
     <p>
@@ -218,7 +217,8 @@
                   anonymous_instructor_annotations: @anonymous_instructor_annotations,
                   enable_annotations: true,
                   enrollment_type: @enrollment_type,
-                  moderated_grading_whitelist: @moderated_grading_whitelist
+                  moderated_grading_whitelist: @moderated_grading_whitelist,
+                  submission_id: @submission.id
                 )
               %>
             >

@@ -226,7 +226,8 @@ class Assignment
           moderated_grading_whitelist: sub.moderated_grading_whitelist(
             @current_user,
             loaded_attachments: attachments_for_submission[sub]
-          )
+          ),
+          submission_id: sub.id
         }
 
         if url_opts[:enable_annotations]
