@@ -213,24 +213,17 @@ module UserLearningObjectScopes
   end
 
   def assignments_needing_grading_count(opts={})
-    original_shard = Shard.current
-    as = shard.activate do
-      course_ids = course_ids_for_todo_lists(:instructor, opts)
-      Shard.partition_by_shard(course_ids) do |shard_course_ids|
-        next unless Shard.current == original_shard # only provide scope on current shard
-        Submission.active.
-          needs_grading.
-          joins(assignment: :course).
-          where(courses: { id: shard_course_ids }).
-          merge(Assignment.expecting_submission).
-          where("NOT EXISTS (?)",
-            Ignore.where(asset_type: 'Assignment',
-                       user_id: self,
-                       purpose: 'grading').where('asset_id=submissions.assignment_id'))
-      end
-    end
-
-    as.size
+    course_ids = course_ids_for_todo_lists(:instructor, opts)
+    Submission.active.
+      needs_grading.
+      joins(assignment: :course).
+      where(courses: { id: course_ids }).
+      merge(Assignment.expecting_submission).
+      merge(Assignment.published).
+      where("NOT EXISTS (?)",
+        Ignore.where(asset_type: 'Assignment',
+                     user_id: self,
+                     purpose: 'grading').where('asset_id=submissions.assignment_id')).count
   end
 
   def assignments_needing_grading(opts={})
