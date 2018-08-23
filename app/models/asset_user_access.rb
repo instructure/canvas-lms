@@ -219,8 +219,11 @@ class AssetUserAccess < ActiveRecord::Base
     name
   end
 
-  def get_correct_context(context)
-    if context.is_a?(UserProfile)
+  def self.get_correct_context(context, accessed_asset)
+    if accessed_asset[:category] == "files" && accessed_asset[:code]&.starts_with?('attachment')
+      attachment_id = accessed_asset[:code].match(/\A\w+_(\d+)\z/)[1]
+      Attachment.find_by(id: attachment_id)&.context
+    elsif context.is_a?(UserProfile)
       context.user
     elsif context.is_a?(AssessmentQuestion)
       context.context
@@ -229,14 +232,25 @@ class AssetUserAccess < ActiveRecord::Base
     end
   end
 
-  def log( kontext, accessed )
+  def self.log(user, context, accessed_asset)
+    return unless user && accessed_asset[:code]
+    correct_context = self.get_correct_context(context, accessed_asset)
+    return unless correct_context && Context::CONTEXT_TYPES.include?(correct_context.class_name.to_sym)
+    access = AssetUserAccess.where(user: user, asset_code: accessed_asset[:code]).
+      polymorphic_where(context: correct_context).first_or_initialize
+    accessed_asset[:level] ||= 'view'
+    access.log correct_context, accessed_asset
+  end
+
+  def log(kontext, accessed)
     self.asset_category ||= accessed[:category]
     self.asset_group_code ||= accessed[:group_code]
     self.membership_type ||= accessed[:membership_type]
-    self.context = get_correct_context(kontext)
+    self.context = kontext
     self.last_access = Time.now.utc
     log_action(accessed[:level])
     save
+    self
   end
 
   def log_action(level)

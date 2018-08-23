@@ -64,8 +64,7 @@ module Lti
           update_all(['total_activity_time = COALESCE(total_activity_time, 0) + ?', seconds])
       end
 
-      access = AssetUserAccess.where(user_id: user, asset_code: tool.asset_string).first_or_initialize
-      access.log(course, group_code: "external_tools", category: "external_tools")
+      AssetUserAccess.log(user, course, code: tool.asset_string, group_code: "external_tools", category: "external_tools")
 
       if PageView.page_views_enabled?
         PageView.new(user: user, context: course, account: course.account).tap { |p|
