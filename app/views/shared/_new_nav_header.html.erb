@@ -80,7 +80,8 @@
               </div>
             </a>
           </li>
-          <% if !ENV['HIDE_INBOX_LINK']%>
+
+          <% unless SettingsService.get_settings(object: :school, id: 1)['hide_inbox'] == 'on' %>
           <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/conversations') %>">
             <a id="global_nav_conversations_link" href="/conversations" class="ic-app-header__menu-list-link">
               <div class="menu-item-icon-container" aria-hidden="true">

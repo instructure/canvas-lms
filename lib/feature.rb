@@ -20,7 +20,9 @@ class Feature
   ATTRS = [:feature, :display_name, :description, :applies_to, :state,
            :root_opt_in, :enable_at, :beta, :development,
            :release_notes_url, :custom_transition_proc,
-           :after_state_change_proc, :autoexpand, :touch_context].freeze
+           :after_state_change_proc, :autoexpand, :touch_context,
+           :use_settings_service].freeze
+
   attr_reader *ATTRS
 
   def initialize(opts = {})
@@ -558,6 +560,36 @@ END
       beta: true,
       development: true,
     },
+    'hide_inbox' =>
+    {
+      display_name: -> { "Hide Inbox" },
+      description: -> { "Hides the inbox." },
+      applies_to: "RootAccount",
+      state: "allowed",
+      beta: false,
+      development: false,
+      use_settings_service: true
+    },
+    'zero_out_past_due' =>
+    {
+      display_name: -> { "Auto-grade past due assignments" },
+      description: -> { "Automatically assign a grade of zero to past due assignments." },
+      applies_to: "RootAccount",
+      state: "allowed",
+      beta: false,
+      development: false,
+      use_settings_service: true
+    },
+    'auto_due_dates' =>
+    {
+      display_name: -> { "Distribute due dates on import" },
+      description: -> { "Distribute due dates evenly across the duration of the course" },
+      applies_to: "RootAccount",
+      state: "allowed",
+      beta: false,
+      development: false,
+      use_settings_service: true
+    }
   )
 
   def self.definitions

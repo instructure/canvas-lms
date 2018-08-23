@@ -83,12 +83,10 @@ Rails.configuration.after_initialize do
     Reporting::CountsReport.process
   end
 
-  if ENV['ZERO_OUT_PASTDUE_ASSIGNMENTS'] and ENV['ZERO_OUT_PASTDUE_ASSIGNMENTS'].downcase == "true"
-    Delayed::Periodic.cron 'Zero Out Past Due', '0 * * * *' do
-       GradesService.zero_out_grades!
-    end
+  Delayed::Periodic.cron 'Zero Out Past Due', '0 * * * *' do
+     GradesService.zero_out_grades!
   end
-  
+
   Delayed::Periodic.cron 'Account.update_all_update_account_associations', '0 10 * * 0' do
     with_each_shard_by_database(Account, :update_all_update_account_associations)
   end

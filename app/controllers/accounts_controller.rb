@@ -773,9 +773,7 @@ class AccountsController < ApplicationController
         MASKED_APP_CENTER_ACCESS_TOKEN: @account.settings[:app_center_access_token].try(:[], 0...5),
         PERMISSIONS: {
           :create_tool_manually => @account.grants_right?(@current_user, session, :create_tool_manually),
-        },
-        ZERO_OUT_PASTDUE_ASSIGNMENTS: ENV['ZERO_OUT_PASTDUE_ASSIGNMENTS'] && ENV['ZERO_OUT_PASTDUE_ASSIGNMENTS'].downcase == 'true' ? 'true': 'false',
-        AUTOMATIC_DUE_DATES: ENV['AUTOMATIC_DUE_DATES'] && ENV['AUTOMATIC_DUE_DATES'].downcase == 'true' ? 'true': 'false' 
+        }
       })
     end
   end

@@ -175,6 +175,11 @@ describe "Feature.register" do
     t_feature_hash.merge(development: true)
   end
 
+  it "should be able to use the SettingsService" do
+    Feature.register(some_feature: t_feature_hash.merge(use_settings_service: true))
+    expect(Feature.definitions['some_feature'].use_settings_service).to eq true
+  end
+
   it "should register a feature" do
     Feature.register({some_feature: t_feature_hash})
     expect(Feature.definitions).to be_frozen
