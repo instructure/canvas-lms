@@ -1234,22 +1234,28 @@ class ApplicationController < ActionController::Base
     # or it's not an update to an already-existing page_view.  We check to make sure
     # it's not an update because if the page_view already existed, we don't want to
     # double-count it as multiple views when it's really just a single view.
-    if @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
-      @access = AssetUserAccess.where(user_id: user.id, asset_code: @accessed_asset[:code]).first_or_initialize
-      @accessed_asset[:level] ||= 'view'
-      @access.log @context, @accessed_asset
-
-      if @page_view.nil? && page_views_enabled? && %w{participate submit}.include?(@accessed_asset[:level])
-        generate_page_view(user)
-      end
-
-      if @page_view
-        @page_view.participated = %w{participate submit}.include?(@accessed_asset[:level])
-        @page_view.asset_user_access = @access
-      end
-
-      @page_view_update = true
+    return unless @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
+    if @accessed_asset[:category] == "files" && @accessed_asset[:code].starts_with?('attachment')
+      attachment_id = @accessed_asset[:code].match(/\A\w+_(\d+)\z/)[1]
+      @file_context = Attachment.find_by(id: attachment_id)&.context || @context
     end
+    if @context
+      @access = AssetUserAccess.where(user_id: user.id, asset_code: @accessed_asset[:code]).
+        polymorphic_where(context: @file_context || @context).first_or_initialize
+      @accessed_asset[:level] ||= 'view'
+      @access.log @file_context || @context, @accessed_asset
+    end
+
+    if @page_view.nil? && page_views_enabled? && %w{participate submit}.include?(@accessed_asset[:level])
+      generate_page_view(user)
+    end
+
+    if @page_view
+      @page_view.participated = %w{participate submit}.include?(@accessed_asset[:level])
+      @page_view.asset_user_access = @access
+    end
+
+    @page_view_update = true
   end
 
   def log_gets
