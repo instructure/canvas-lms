@@ -105,6 +105,7 @@ exports[`new activity button does not show when there is no new activity 1`] = `
         <Badge
           count={1}
           elementRef={[Function]}
+          formatOutput={[Function]}
           formatOverflowText={[Function]}
           placement="top end"
           pulse={false}
@@ -116,11 +117,6 @@ exports[`new activity button does not show when there is no new activity 1`] = `
             display="auto"
           >
             <IconAlerts />
-            <ScreenReaderContent
-              as="span"
-            >
-              1 opportunity
-            </ScreenReaderContent>
           </View>
         </Badge>
       </Button>
@@ -137,8 +133,22 @@ exports[`new activity button does not show when there is no new activity 1`] = `
           ]
         }
         dismiss={[Function]}
+        dismissedOpportunities={
+          Array [
+            Object {
+              "course_id": "1",
+              "due_at": "2017-03-09T20:40:35Z",
+              "html_url": "http://www.non_default_url.com",
+              "id": "2",
+              "name": "learning object title",
+              "planner_override": Object {
+                "dismissed": true,
+              },
+            },
+          ]
+        }
         maxHeight="none"
-        opportunities={
+        newOpportunities={
           Array [
             Object {
               "course_id": "1",
@@ -389,6 +399,7 @@ exports[`new activity button shows when there is new activity 1`] = `
         <Badge
           count={1}
           elementRef={[Function]}
+          formatOutput={[Function]}
           formatOverflowText={[Function]}
           placement="top end"
           pulse={false}
@@ -400,11 +411,6 @@ exports[`new activity button shows when there is new activity 1`] = `
             display="auto"
           >
             <IconAlerts />
-            <ScreenReaderContent
-              as="span"
-            >
-              1 opportunity
-            </ScreenReaderContent>
           </View>
         </Badge>
       </Button>
@@ -421,8 +427,22 @@ exports[`new activity button shows when there is new activity 1`] = `
           ]
         }
         dismiss={[Function]}
+        dismissedOpportunities={
+          Array [
+            Object {
+              "course_id": "1",
+              "due_at": "2017-03-09T20:40:35Z",
+              "html_url": "http://www.non_default_url.com",
+              "id": "2",
+              "name": "learning object title",
+              "planner_override": Object {
+                "dismissed": true,
+              },
+            },
+          ]
+        }
         maxHeight="none"
-        opportunities={
+        newOpportunities={
           Array [
             Object {
               "course_id": "1",
@@ -673,6 +693,7 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
         <Badge
           count={1}
           elementRef={[Function]}
+          formatOutput={[Function]}
           formatOverflowText={[Function]}
           placement="top end"
           pulse={false}
@@ -684,11 +705,6 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
             display="auto"
           >
             <IconAlerts />
-            <ScreenReaderContent
-              as="span"
-            >
-              1 opportunity
-            </ScreenReaderContent>
           </View>
         </Badge>
       </Button>
@@ -705,8 +721,22 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
           ]
         }
         dismiss={[Function]}
+        dismissedOpportunities={
+          Array [
+            Object {
+              "course_id": "1",
+              "due_at": "2017-03-09T20:40:35Z",
+              "html_url": "http://www.non_default_url.com",
+              "id": "2",
+              "name": "learning object title",
+              "planner_override": Object {
+                "dismissed": true,
+              },
+            },
+          ]
+        }
         maxHeight="none"
-        opportunities={
+        newOpportunities={
           Array [
             Object {
               "course_id": "1",

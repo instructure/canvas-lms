@@ -21,6 +21,7 @@ import themeable from '@instructure/ui-themeable/lib';
 import Button from '@instructure/ui-buttons/lib/components/Button';
 import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton';
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
+import AccessibleContent from '@instructure/ui-a11y/lib/components/AccessibleContent'
 import View from '@instructure/ui-layout/lib/components/View';
 import Portal from '@instructure/ui-portal/lib/components/Portal';
 import IconPlusLine from '@instructure/ui-icons/lib/Line/IconPlus';
@@ -114,12 +115,14 @@ export class PlannerHeader extends Component {
   constructor (props) {
     super(props);
 
+    const [newOpportunities, dismissedOpportunities] = this.segregateOpportunities(props.opportunities)
+
     this.state = {
-      opportunities: props.opportunities.items,
+      newOpportunities,
+      dismissedOpportunities,
       trayOpen: false,
       gradesTrayOpen: false,
       opportunitiesOpen: false,
-      dismissedTabSelected: false
     };
   }
 
@@ -128,7 +131,7 @@ export class PlannerHeader extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    let opportunities = nextProps.opportunities.items.filter((opportunity) => this.isOpportunityVisible(opportunity));
+    let [newOpportunities, dismissedOpportunities] = this.segregateOpportunities(nextProps.opportunities);
 
     if (!nextProps.loading.allOpportunitiesLoaded &&
         !nextProps.loading.loadingOpportunities) {
@@ -138,9 +141,7 @@ export class PlannerHeader extends Component {
     if (this.props.todo.updateTodoItem !== nextProps.todo.updateTodoItem) {
       this.setUpdateItemTray(!!nextProps.todo.updateTodoItem);
     }
-    if (this.props.opportunities !== opportunities) {
-      this.setState({opportunities});
-    }
+    this.setState({newOpportunities, dismissedOpportunities});
   }
 
   componentWillUpdate () {
@@ -176,6 +177,21 @@ export class PlannerHeader extends Component {
     }
   }
 
+  // segregate new and dismissed opportunities
+  segregateOpportunities (opportunities) {
+    const newOpportunities = []; 
+    const dismissedOpportunities = [];
+    
+    opportunities.items.forEach(opportunity => {
+      if (opportunity.planner_override && opportunity.planner_override.dismissed) {
+        dismissedOpportunities.push(opportunity)
+      } else {
+        newOpportunities.push(opportunity)
+      }
+    });
+    return [newOpportunities, dismissedOpportunities];
+  }
+
   // sets the tray open state and tells dynamic-ui what just happened
   // via open/cancelEditingPlannerItem
   setUpdateItemTray (trayOpen) {
@@ -199,14 +215,6 @@ export class PlannerHeader extends Component {
       this.props.ariaHideElement.setAttribute('aria-hidden', 'true');
     } else {
       this.props.ariaHideElement.removeAttribute('aria-hidden');
-    }
-  }
-
-  isOpportunityVisible = (opportunity) => {
-    if(this.state.dismissedTabSelected) {
-      return opportunity.planner_override ? opportunity.planner_override.dismissed : false;
-    } else {
-      return opportunity.planner_override ? !opportunity.planner_override.dismissed : true;
     }
   }
 
@@ -255,7 +263,7 @@ export class PlannerHeader extends Component {
         =0 {# opportunities}
         one {# opportunity}
         other {# opportunities}
-      }`, { count: this.state.opportunities.length })
+      }. Click to open Opportunity Center popup.`, { count: this.state.newOpportunities.length })
     );
   }
 
@@ -325,6 +333,31 @@ export class PlannerHeader extends Component {
     return null;
   }
 
+  renderOpportunitiesBadge () {
+    const props = {}
+    if (this.props.loading.allOpportunitiesLoaded && this.state.newOpportunities.length) {
+      props.count = this.state.newOpportunities.length;
+      props.formatOutput=(formattedCount) => {
+        return (
+          <AccessibleContent alt={this.opportunityTitle()}>
+            {formattedCount}
+          </AccessibleContent>
+        );
+      };
+    } else {
+      props.formatOutput=() => {
+        return <AccessibleContent alt={this.opportunityTitle()}/>;
+      }
+    }
+    return (
+      <Badge {...props}>
+        <View>
+          <IconAlertsLine/>
+        </View>
+      </Badge>
+    );
+  }
+
   render () {
     const verticalRoom = this.getPopupVerticalRoom();
 
@@ -363,18 +396,14 @@ export class PlannerHeader extends Component {
               ref={(b) => { this.opportunitiesButton = b; }}
               buttonRef={(b) => { this.opportunitiesHtmlButton = b; }}
             >
-              <Badge {...this.props.loading.allOpportunitiesLoaded && this.state.opportunities.length ? {count :this.state.opportunities.length} : {}}>
-                <View>
-                  <IconAlertsLine/>
-                  <ScreenReaderContent>{this.opportunityTitle()}</ScreenReaderContent>
-                </View>
-              </Badge>
+              {this.renderOpportunitiesBadge()}
             </Button>
           </PopoverTrigger>
           <PopoverContent>
             <Opportunities
               togglePopover={this.closeOpportunitiesDropdown}
-              opportunities={this.state.opportunities}
+              newOpportunities={this.state.newOpportunities}
+              dismissedOpportunities={this.state.dismissedOpportunities}
               courses={this.props.courses}
               timeZone={this.props.timeZone}
               dismiss={this.props.dismissOpportunity}

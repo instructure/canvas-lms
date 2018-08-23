@@ -35,6 +35,6 @@ export default function generator ({ colors, spacing, typography }) {
     pointsNumberFontSize: typography.fontSizeLarge,
     pointsLineHeight: typography.lineHeightFit,
     titleMargin: spacing.xSmall,
-    closeButtonIconSize: typography.fontSizeSmall
+    closeButtonIconSize: "1.75rem", // to match instui Button smallHeight
   };
 }

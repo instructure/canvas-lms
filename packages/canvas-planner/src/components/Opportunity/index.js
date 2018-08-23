@@ -57,6 +57,7 @@ export class Opportunity extends Component {
   static defaultProps = {
     registerAnimatable: () => {},
     deregisterAnimatable: () => {},
+    dismiss: () => {},
   }
 
   componentDidMount () {
@@ -79,6 +80,33 @@ export class Opportunity extends Component {
 
   getFocusable () {
     return this.link;
+  }
+
+  dismiss = () => {
+    if (this.props.dismiss) {
+      this.props.dismiss(this.props.id, this.props.plannerOverride)
+    }
+  }
+
+  renderButton () {
+    const isDismissed = this.props.plannerOverride && this.props.plannerOverride.dismissed;
+    return (
+      <div className={styles.close}>
+        {isDismissed ? null : (
+          <Button
+            onClick={this.dismiss}
+            variant="icon"
+            icon={IconXLine}
+            size="small"
+            title={formatMessage("Dismiss {opportunityName}", {opportunityName: this.props.opportunityTitle})}
+          >
+            <ScreenReaderContent>
+              {formatMessage("Dismiss {opportunityName}", {opportunityName: this.props.opportunityTitle})}
+            </ScreenReaderContent>
+          </Button>
+        )}
+      </div>
+    )
   }
 
   render () {
@@ -112,19 +140,7 @@ export class Opportunity extends Component {
             </PresentationContent>
           </div>
         </div>
-        <div className={styles.close}>
-            <Button
-              onClick={() => this.props.dismiss(this.props.id, this.props.plannerOverride)}
-              variant="icon"
-              icon={IconXLine}
-              size="small"
-              title={formatMessage("Dismiss {opportunityName}", {opportunityName: this.props.opportunityTitle})}
-            >
-              <ScreenReaderContent>
-                {formatMessage("Dismiss {opportunityName}", {opportunityName: this.props.opportunityTitle})}
-              </ScreenReaderContent>
-            </Button>
-          </div>
+        {this.renderButton()}
       </div>
     );
   }

@@ -20,7 +20,7 @@ import { shallow, mount } from 'enzyme';
 import { Opportunity } from '../index';
 import Pill from '@instructure/ui-elements/lib/components/Pill';
 
-function defaultProps (options) {
+function defaultProps (options = {}) {
   return {
     id: "1",
     dueAt: "2017-03-09T20:40:35Z",
@@ -33,6 +33,7 @@ function defaultProps (options) {
     registerAnimatable: () => {},
     deregisterAnimatable: () => {},
     animatableIndex: 1,
+    ...options
   };
 }
 
@@ -90,3 +91,9 @@ it('registers itself as animatable', () => {
   wrapper.unmount();
   expect(fakeDeregister).toHaveBeenCalledWith('opportunity', instance, ['2']);
 });
+
+it('renders no close icon if dismissed', () => {
+  const props = defaultProps({plannerOverride: {dismissed: true}});
+  const wrapper = shallow(<Opportunity {...props} />);
+  expect(wrapper.find('Button').length).toEqual(0)
+})

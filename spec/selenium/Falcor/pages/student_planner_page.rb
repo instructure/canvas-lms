@@ -34,7 +34,7 @@ module PlannerPageObject
   end
 
   def close_opportunities_selector
-    "button[title='Close opportunities popover']"
+    "button:contains('Close Opportunity Center popup')"
   end
 
   #------------------------- Elements --------------------------
@@ -133,7 +133,7 @@ module PlannerPageObject
   end
 
   def close_opportunities_dropdown
-    f(close_opportunities_selector).click
+    fj(close_opportunities_selector).click
   end
 
   def navigate_to_course_object(object)

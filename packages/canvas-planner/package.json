@@ -48,6 +48,7 @@
     "@instructure/ui-icons": "^5 || rc",
     "@instructure/ui-layout": "^5 || rc",
     "@instructure/ui-overlays": "^5 || rc",
+    "@instructure/ui-tabs": "^5 || rc",
     "@instructure/ui-themeable": "^5 || rc",
     "@instructure/ui-toggle-details": "^5 || rc",
     "@instructure/ui-utils": "^5 || rc",

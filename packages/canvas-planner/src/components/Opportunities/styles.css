@@ -40,20 +40,3 @@
 .loading {
   text-align: center;
 }
-
-.closeButtonContainer {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-around;
-}
-.closeButtonIcon {
-  /* using !important to override Inst-UI rule that usually makes sense, but makes the X look too big here */
-  font-size: var(--closeButtonIconSize) !important; /* stylelint-disable-line declaration-no-important */
-}
-
-.closeButtonText {
-  text-transform: uppercase;
-  letter-spacing: 0.0625rem;
-  margin-inline-end: .5rem;
-}

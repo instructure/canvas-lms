@@ -10,34 +10,69 @@ exports[`renders nothing if no opportunities 1`] = `
     }
   }
 >
-  <div>
-    <Button
-      as="button"
-      buttonRef={[Function]}
-      cursor="pointer"
-      fluidWidth={false}
-      margin="0"
-      onClick={[Function]}
-      size="medium"
-      title="Close opportunities popover"
-      type="button"
-      variant="link"
+  <CloseButton
+    buttonRef={[Function]}
+    margin="0"
+    offset="x-small"
+    onClick={[Function]}
+    placement="end"
+    size="small"
+    variant="icon"
+  >
+    Close Opportunity Center popup
+  </CloseButton>
+  <TabList
+    defaultSelectedIndex={0}
+    focus={false}
+    variant="minimal"
+  >
+    <TabPanel
+      id={null}
+      labelledBy={null}
+      maxHeight="auto"
+      padding="small"
+      selected={false}
+      tabRef={[Function]}
+      title={
+        <AccessibleContent
+          alt="New Opportunities"
+          as="span"
+        >
+          New
+        </AccessibleContent>
+      }
+      variant="simple"
     >
       <div>
-        <span>
-          Close
-        </span>
-        <IconX />
+        Nothing new needs attention.
       </div>
-    </Button>
-  </div>
-  <ol>
-    Nothing new needs attention.
-  </ol>
+    </TabPanel>
+    <TabPanel
+      id={null}
+      labelledBy={null}
+      maxHeight="auto"
+      padding="small"
+      selected={false}
+      tabRef={[Function]}
+      title={
+        <AccessibleContent
+          alt="Dismissed Opportunities"
+          as="span"
+        >
+          Dismissed
+        </AccessibleContent>
+      }
+      variant="simple"
+    >
+      <div>
+        Nothing here needs attention.
+      </div>
+    </TabPanel>
+  </TabList>
 </div>
 `;
 
-exports[`renders the base component correctly with one opportunity 1`] = `
+exports[`renders the base component correctly with one of each kind of opportunity 1`] = `
 <div
   id="opportunities_parent"
   onKeyDown={[Function]}
@@ -47,41 +82,87 @@ exports[`renders the base component correctly with one opportunity 1`] = `
     }
   }
 >
-  <div>
-    <Button
-      as="button"
-      buttonRef={[Function]}
-      cursor="pointer"
-      fluidWidth={false}
-      margin="0"
-      onClick={[Function]}
-      size="medium"
-      title="Close opportunities popover"
-      type="button"
-      variant="link"
+  <CloseButton
+    buttonRef={[Function]}
+    margin="0"
+    offset="x-small"
+    onClick={[Function]}
+    placement="end"
+    size="small"
+    variant="icon"
+  >
+    Close Opportunity Center popup
+  </CloseButton>
+  <TabList
+    defaultSelectedIndex={0}
+    focus={false}
+    variant="minimal"
+  >
+    <TabPanel
+      id={null}
+      labelledBy={null}
+      maxHeight="auto"
+      padding="small"
+      selected={false}
+      tabRef={[Function]}
+      title={
+        <AccessibleContent
+          alt="New Opportunities"
+          as="span"
+        >
+          New
+        </AccessibleContent>
+      }
+      variant="simple"
     >
-      <div>
-        <span>
-          Close
-        </span>
-        <IconX />
-      </div>
-    </Button>
-  </div>
-  <ol>
-    <li>
-      <Animatable(Opportunity)
-        animatableIndex={0}
-        courseName="Course Short Name"
-        dismiss={[Function]}
-        dueAt="2017-03-09T20:40:35Z"
-        id="1"
-        opportunityTitle="learning object title"
-        timeZone="America/Denver"
-        url="http://www.non_default_url.com"
-      />
-    </li>
-  </ol>
+      <ol>
+        <li>
+          <Animatable(Opportunity)
+            animatableIndex={0}
+            courseName="Course Short Name"
+            dismiss={[Function]}
+            dueAt="2017-03-09T20:40:35Z"
+            id="1"
+            opportunityTitle="learning object title"
+            timeZone="America/Denver"
+            url="http://www.non_default_url.com"
+          />
+        </li>
+      </ol>
+    </TabPanel>
+    <TabPanel
+      id={null}
+      labelledBy={null}
+      maxHeight="auto"
+      padding="small"
+      selected={false}
+      tabRef={[Function]}
+      title={
+        <AccessibleContent
+          alt="Dismissed Opportunities"
+          as="span"
+        >
+          Dismissed
+        </AccessibleContent>
+      }
+      variant="simple"
+    >
+      <ol>
+        <li>
+          <Animatable(Opportunity)
+            animatableIndex={0}
+            courseName="Course Short Name"
+            dismiss={null}
+            dueAt="2017-03109T20:40:35Z"
+            id="2"
+            opportunityTitle="another learning object title"
+            timeZone="America/Denver"
+            url="http://www.non_default_url.com"
+          />
+        </li>
+      </ol>
+    </TabPanel>
+  </TabList>
 </div>
 `;
 
@@ -95,52 +176,98 @@ exports[`renders the right course with the right opportunity 1`] = `
     }
   }
 >
-  <div>
-    <Button
-      as="button"
-      buttonRef={[Function]}
-      cursor="pointer"
-      fluidWidth={false}
-      margin="0"
-      onClick={[Function]}
-      size="medium"
-      title="Close opportunities popover"
-      type="button"
-      variant="link"
+  <CloseButton
+    buttonRef={[Function]}
+    margin="0"
+    offset="x-small"
+    onClick={[Function]}
+    placement="end"
+    size="small"
+    variant="icon"
+  >
+    Close Opportunity Center popup
+  </CloseButton>
+  <TabList
+    defaultSelectedIndex={0}
+    focus={false}
+    variant="minimal"
+  >
+    <TabPanel
+      id={null}
+      labelledBy={null}
+      maxHeight="auto"
+      padding="small"
+      selected={false}
+      tabRef={[Function]}
+      title={
+        <AccessibleContent
+          alt="New Opportunities"
+          as="span"
+        >
+          New
+        </AccessibleContent>
+      }
+      variant="simple"
     >
-      <div>
-        <span>
-          Close
-        </span>
-        <IconX />
-      </div>
-    </Button>
-  </div>
-  <ol>
-    <li>
-      <Animatable(Opportunity)
-        animatableIndex={0}
-        courseName="Course Short Name"
-        dismiss={[Function]}
-        dueAt="2017-03-09T20:40:35Z"
-        id="1"
-        opportunityTitle="learning object title"
-        timeZone="America/Denver"
-        url="http://www.non_default_url.com"
-      />
-    </li>
-    <li>
-      <Animatable(Opportunity)
-        animatableIndex={1}
-        courseName="A different Course Name"
-        dismiss={[Function]}
-        dueAt="2017-03-09T20:40:35Z"
-        id="2"
-        opportunityTitle="other learning object"
-        timeZone="America/Denver"
-        url="http://www.non_default_url.com"
-      />
-    </li>
-  </ol>
+      <ol>
+        <li>
+          <Animatable(Opportunity)
+            animatableIndex={0}
+            courseName="Course Short Name"
+            dismiss={[Function]}
+            dueAt="2017-03-09T20:40:35Z"
+            id="1"
+            opportunityTitle="learning object title"
+            timeZone="America/Denver"
+            url="http://www.non_default_url.com"
+          />
+        </li>
+        <li>
+          <Animatable(Opportunity)
+            animatableIndex={1}
+            courseName="A different Course Name"
+            dismiss={[Function]}
+            dueAt="2017-03-09T20:40:35Z"
+            id="2"
+            opportunityTitle="other learning object"
+            timeZone="America/Denver"
+            url="http://www.non_default_url.com"
+          />
+        </li>
+      </ol>
+    </TabPanel>
+    <TabPanel
+      id={null}
+      labelledBy={null}
+      maxHeight="auto"
+      padding="small"
+      selected={false}
+      tabRef={[Function]}
+      title={
+        <AccessibleContent
+          alt="Dismissed Opportunities"
+          as="span"
+        >
+          Dismissed
+        </AccessibleContent>
+      }
+      variant="simple"
+    >
+      <ol>
+        <li>
+          <Animatable(Opportunity)
+            animatableIndex={0}
+            courseName="Course Short Name"
+            dismiss={null}
+            dueAt="2017-03109T20:40:35Z"
+            id="2"
+            opportunityTitle="another learning object title"
+            timeZone="America/Denver"
+            url="http://www.non_default_url.com"
+          />
+        </li>
+      </ol>
+    </TabPanel>
+  </TabList>
 </div>
 `;
