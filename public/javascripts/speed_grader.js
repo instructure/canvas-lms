@@ -294,6 +294,9 @@ function mergeStudentsAndSubmission() {
     jsonData.submissionsMap[submission[anonymizableUserId]] = submission;
   });
 
+  // need to presort by anonymous_id for anonymous assignments so that the index property can be consistent
+  if (isAnonymous) jsonData.studentsWithSubmissions.sort((a, b) => a.anonymous_id > b.anonymous_id ? 1 : -1)
+
   jsonData.studentsWithSubmissions.forEach((student, index) => {
     /* eslint-disable no-param-reassign */
     student.enrollments = jsonData.studentEnrollmentMap[student[anonymizableId]];
@@ -307,7 +310,6 @@ function mergeStudentsAndSubmission() {
   });
 
   // handle showing students only in a certain section.
-
   if (!jsonData.GROUP_GRADING_MODE) {
     if (ENV.new_gradebook_enabled) {
       sectionToShow = ENV.selected_section_id
@@ -327,16 +329,6 @@ function mergeStudentsAndSubmission() {
       alert(I18n.t('alerts.no_students_in_section', "Could not find any students in that section, falling back to showing all sections."));
       EG.changeToSection('all')
     }
-  }
-
-  if (isAnonymous) {
-    // When student anonymity is enabled, the students must be indexed
-    // consistently. For a given anonymous id, the student name (e.g. Student 1)
-    // must be consistent regardless of how the students are sorted.
-    const orderedIds = Object.keys(window.jsonData.studentMap).sort()
-    orderedIds.forEach((id, index) => {
-      window.jsonData.studentMap[id].index = index
-    })
   }
 
   switch(userSettings.get("eg_sort_by")) {
@@ -367,18 +359,11 @@ function mergeStudentsAndSubmission() {
       break;
     }
 
+    // The list of students is sorted alphabetically on the server by student last name.
     default: {
-      // The list of students is sorted alphabetically on the server by student
-      // last name.
-
-      if (isAnonymous) {
-        // When student anonymity is enabled, sort by the student's related
-        // anonymous id.
-        window.jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(student => student.anonymous_id))
-      } else if (utils.shouldHideStudentNames()) {
-        window.jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(student => (
-          student && student.submission && student.submission.id
-        )));
+      // sorting for isAnonymous occurred earlier before setting up studentMap
+      if (!isAnonymous && utils.shouldHideStudentNames()) {
+        window.jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(student => student.submission.id))
       }
     }
   }
@@ -388,7 +373,7 @@ function initDropdown(){
   var hideStudentNames = utils.shouldHideStudentNames();
   $("#hide_student_names").attr('checked', hideStudentNames);
 
-  const optionsArray = jsonData.studentsWithSubmissions.map((student, index) => {
+  const optionsArray = jsonData.studentsWithSubmissions.map(student => {
     const {submission_state, submission} = student
     let {name} = student
     const className = SpeedgraderHelpers.classNameBasedOnStudent({submission_state, submission})
@@ -1211,6 +1196,7 @@ EG = {
     anonymizableAuthorId = setupAnonymizableAuthorId(isAnonymous)
 
     mergeStudentsAndSubmission();
+
     if (jsonData.GROUP_GRADING_MODE && !jsonData.studentsWithSubmissions.length) {
       if (window.history.length === 1) {
         alert(I18n.t('alerts.no_students_in_groups_close', "Sorry, submissions for this assignment cannot be graded in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to close this window."))
@@ -2985,6 +2971,7 @@ EG = {
     });
   },
 
+  // Note: do not use compareStudentsBy if your dataset includes 0.
   compareStudentsBy: function (f) {
     const secondaryAttr = isAnonymous ? 'anonymous_id' : 'sortable_name'
 
@@ -2993,8 +2980,7 @@ EG = {
       var b = f(studentB);
 
       if ((!a && !b) || a === b) {
-        // chrome / safari sort isn't stable, so we need to sort by name in
-        // case of tie
+        // sort isn't guaranteed to be stable, so we need to sort by name in case of tie
         return natcompare.strings(studentA[secondaryAttr], studentB[secondaryAttr]);
       } else if (!a || a > b) {
         return 1;

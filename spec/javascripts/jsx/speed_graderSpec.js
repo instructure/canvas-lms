@@ -1547,85 +1547,80 @@ QUnit.module('SpeedGrader', suiteHooks => {
     })
 
     QUnit.module('when students are anonymous', contextHooks => {
+      const alpha = {anonymous_id: '00000'}
+      const beta  = {anonymous_id: '99999'}
+      const gamma = {anonymous_id: 'aaaaa'}
+      const delta = {anonymous_id: 'zzzzz'}
+
       contextHooks.beforeEach(() => {
         window.jsonData.anonymize_students = true
         window.jsonData.context = {
           active_course_sections: ['2001'],
           enrollments: [
-            {course_section_id: '2001', anonymous_id: '12345', workflow_state: 'active'},
-            {course_section_id: '2001', anonymous_id: '23456', workflow_state: 'active'},
-            {course_section_id: '2001', anonymous_id: '34567', workflow_state: 'active'},
-            {course_section_id: '2001', anonymous_id: '45678', workflow_state: 'active'}
+            {course_section_id: '2001', workflow_state: 'active', ...alpha},
+            {course_section_id: '2001', workflow_state: 'active', ...beta},
+            {course_section_id: '2001', workflow_state: 'active', ...gamma},
+            {course_section_id: '2001', workflow_state: 'active', ...delta}
           ],
-          students: [
-            {anonymous_id: '23456'},
-            {anonymous_id: '12345'},
-            {anonymous_id: '45678'},
-            {anonymous_id: '34567'}
-          ]
+          students: [beta, alpha, gamma, delta]
         }
 
-        window.jsonData.submissions = [
-          {
-            anonymous_id: '23456',
-            grade: null,
-            grade_matches_current_submission: false,
-            id: '2501',
-            score: null,
-            submitted_at: '2015-05-05T12:00:00Z',
-            workflow_state: 'submitted'
-          },
-
-          {
-            anonymous_id: '12345',
-            grade: null,
-            grade_matches_current_submission: false,
-            id: '2502',
-            score: null,
-            submitted_at: null,
-            workflow_state: 'unsubmitted'
-          },
-
-          {
-            anonymous_id: '45678',
-            grade: 'F',
-            grade_matches_current_submission: false,
-            id: '2503',
-            score: 0,
-            submitted_at: '2015-05-06T12:00:00Z',
-            workflow_state: 'resubmitted'
-          },
-
-          {
-            anonymous_id: '34567',
-            grade: 'A',
-            grade_matches_current_submission: true,
-            id: '2504',
-            score: 10,
-            submitted_at: '2015-05-04T12:00:00Z',
-            workflow_state: 'graded'
-          }
-        ]
+        window.jsonData.submissions = [{
+          grade: null,
+          grade_matches_current_submission: false,
+          id: '2501',
+          score: null,
+          submitted_at: '2015-05-05T12:00:00Z',
+          workflow_state: 'submitted',
+          ...beta,
+        }, {
+          grade: null,
+          grade_matches_current_submission: false,
+          id: '2502',
+          score: null,
+          submitted_at: null,
+          workflow_state: 'unsubmitted',
+          ...alpha
+        }, {
+          grade: 'F',
+          grade_matches_current_submission: false,
+          id: '2503',
+          score: 0,
+          submitted_at: '2015-05-06T12:00:00Z',
+          workflow_state: 'resubmitted',
+          ...delta
+        }, {
+          grade: 'A',
+          grade_matches_current_submission: true,
+          id: '2504',
+          score: 10,
+          submitted_at: '2015-05-04T12:00:00Z',
+          workflow_state: 'graded',
+          ...gamma
+        }]
       })
 
       test('sorts students by anonymous_id when sorting alphabetically', () => {
         SpeedGrader.EG.jsonReady()
         const ids = window.jsonData.studentsWithSubmissions.map(student => student.anonymous_id)
-        deepEqual(ids, ['12345', '23456', '34567', '45678'])
+        const expectedIds = [alpha, beta, gamma, delta].map(student => student.anonymous_id)
+        deepEqual(ids, expectedIds)
       })
 
       test('sorts students by anonymous_id when no sorting preference is set', () => {
         userSettings.get.withArgs('eg_sort_by').returns(undefined)
         SpeedGrader.EG.jsonReady()
         const ids = window.jsonData.studentsWithSubmissions.map(student => student.anonymous_id)
-        deepEqual(ids, ['12345', '23456', '34567', '45678'])
+        const expectedIds = [alpha, beta, gamma, delta].map(student => student.anonymous_id)
+        deepEqual(ids, expectedIds)
       })
 
       test('sorts students by submission "submitted_at" when sorting by submission date', () => {
         userSettings.get.withArgs('eg_sort_by').returns('submitted_at')
         SpeedGrader.EG.jsonReady()
         const ids = window.jsonData.studentsWithSubmissions.map(student => student.anonymous_id)
-        deepEqual(ids, ['34567', '23456', '45678', '12345'])
+        const expectedIds = [gamma, beta, delta, alpha].map(student => student.anonymous_id)
+        deepEqual(ids, expectedIds)
       })
 
       test('sorts students by anonymous_id when submission "submitted_at" dates match', () => {
@@ -1633,14 +1628,16 @@ QUnit.module('SpeedGrader', suiteHooks => {
         userSettings.get.withArgs('eg_sort_by').returns('submitted_at')
         SpeedGrader.EG.jsonReady()
         const ids = window.jsonData.studentsWithSubmissions.map(student => student.anonymous_id)
-        deepEqual(ids, ['34567', '45678', '12345', '23456'])
+        const expectedIds = [gamma, delta, alpha, beta].map(student => student.anonymous_id)
+        deepEqual(ids, expectedIds)
       })
 
       test('sorts students by submission status', () => {
         userSettings.get.withArgs('eg_sort_by').returns('submission_status')
         SpeedGrader.EG.jsonReady()
         const ids = window.jsonData.studentsWithSubmissions.map(student => student.anonymous_id)
-        deepEqual(ids, ['23456', '45678', '12345', '34567'])
+        const expectedIds = [beta, delta, alpha, gamma].map(student => student.anonymous_id)
+        deepEqual(ids, expectedIds)
       })
 
       test('sorts students by anonymous_id when submission statuses match', () => {
@@ -1648,7 +1645,8 @@ QUnit.module('SpeedGrader', suiteHooks => {
         userSettings.get.withArgs('eg_sort_by').returns('submission_status')
         SpeedGrader.EG.jsonReady()
         const ids = window.jsonData.studentsWithSubmissions.map(student => student.anonymous_id)
-        deepEqual(ids, ['12345', '23456', '45678', '34567'])
+        const expectedIds = [alpha, beta, delta, gamma].map(student => student.anonymous_id)
+        deepEqual(ids, expectedIds)
       })
     })
   })
@@ -1871,6 +1869,9 @@ QUnit.module('SpeedGrader - clicking save rubric button', function(hooks) {
 });
 
 QUnit.module('SpeedGrader - clicking save rubric button for an anonymous assignment', (hooks) => {
+  const originalWindowJsonData = window.jsonData
+  const originalSpeedGraderEGCurrentStudent = SpeedGrader.EG.currentStudent
+
   hooks.beforeEach(() => {
     sinon.stub($, 'ajaxJSON');
     disableWhileLoadingStub = sinon.stub($.fn, 'disableWhileLoading');
@@ -1879,7 +1880,11 @@ QUnit.module('SpeedGrader - clicking save rubric button for an anonymous assignm
       course_id: '3',
       help_url: '',
       show_help_menu_item: false,
-      RUBRIC_ASSESSMENT: {},
+      SUBMISSION: {grading_role: 'teacher'},
+      RUBRIC_ASSESSMENT: {
+        assessment_type: 'grading',
+        assessor_id: 1
+      }
     });
 
     sinon.stub(SpeedGrader.EG, 'handleFragmentChanged')
@@ -1893,8 +1898,7 @@ QUnit.module('SpeedGrader - clicking save rubric button for an anonymous assignm
     `);
     SpeedGrader.setup()
     SpeedGrader.EG.currentStudent = {
-      id: 4,
-      name: 'P. Sextus Rubricius',
+      anonymous_id: 'a1b2c',
       rubric_assessments: [],
       submission_state: 'not_graded',
       submission: {
@@ -1915,13 +1919,13 @@ QUnit.module('SpeedGrader - clicking save rubric button for an anonymous assignm
       context: {
         students: [
           {
-            id: 4,
+            anonymous_id: 'a1b2c',
             name: 'P. Sextus Rubricius'
           }
         ],
         enrollments: [
           {
-            user_id: 4,
+            anonymous_id: 'a1b2c',
             workflow_state: 'active',
             course_section_id: 1
           }
@@ -1929,30 +1933,24 @@ QUnit.module('SpeedGrader - clicking save rubric button for an anonymous assignm
         active_course_sections: [1]
       },
       studentMap: {
-        4: SpeedGrader.EG.currentStudent
+        a1b2c: SpeedGrader.EG.currentStudent
       }
     }
-    ENV.SUBMISSION = {
-      grading_role: 'teacher'
-    };
-    ENV.RUBRIC_ASSESSMENT = {
-      assessment_type: 'grading',
-      assessor_id: 1
-    };
 
     SpeedGrader.EG.jsonReady();
   })
 
   hooks.afterEach(() => {
-    rubricAssessmentDataStub.restore();
-    SpeedGrader.teardown()
-    window.location.hash = ''
-    SpeedGrader.EG.handleFragmentChanged.restore();
-
+    window.jsonData = originalWindowJsonData
+    SpeedGrader.EG.currentStudent = originalSpeedGraderEGCurrentStudent
     teardownFixtures()
+    rubricAssessmentDataStub.restore();
+    SpeedGrader.EG.handleFragmentChanged.restore();
     fakeENV.teardown();
     disableWhileLoadingStub.restore();
     $.ajaxJSON.restore();
+    SpeedGrader.teardown()
+    window.location.hash = ''
   })
 
   test('sends the anonymous submission ID in rubric_assessment[anonymous_id] if the assignment is anonymous', () => {
@@ -2012,10 +2010,11 @@ QUnit.module('SpeedGrader - no gateway timeout', {
 });
 
 test('does not show an error when the gateway times out', function () {
-  sandbox.stub(SpeedGrader.EG, 'domReady');
+  const domReadyStub = sinon.stub(SpeedGrader.EG, 'domReady');
   ENV.assignment_title = 'Assignment Title';
   SpeedGrader.setup();
   strictEqual($('#speed_grader_timeout_alert').text(), '');
+  domReadyStub.restore()
 });
 
 QUnit.module('SpeedGrader', function(suiteHooks) {
@@ -2780,13 +2779,13 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         strictEqual(button.css('display'), 'none')
       });
 
-      test('renderComment uses a generic student name', () => {
+      test('renderComment uses an anonymous name', () => {
         const firstStudentComment = SpeedGrader.EG.currentStudent.submission.submission_comments[0];
         const renderedFirst = SpeedGrader.EG.renderComment(firstStudentComment, commentRenderingOptions);
         strictEqual(renderedFirst.find('.author_name').text(), 'Student 1');
       });
 
-      test('renderComment uses a second generic student name', () => {
+      test('renderComment uses a second anonymous student name', () => {
         const secondStudentComment = SpeedGrader.EG.currentStudent.submission.submission_comments[1];
         const renderedSecond = SpeedGrader.EG.renderComment(secondStudentComment, commentRenderingOptions);
         strictEqual(renderedSecond.find('.author_name').text(), 'Student 2');
