@@ -37,7 +37,7 @@ class ModeratePage
     end
 
     def click_display_to_students_button
-        display_to_students_button.click
+      display_to_students_button.click
     end
 
     def click_page_number(page_number)
@@ -50,8 +50,8 @@ class ModeratePage
       grade_input_dropdown_list(student).find {|k| k.text == "#{grade} (Custom)"}.click
     end
 
-    def click_student_link(student_name)
-      wait_for_new_page_load(student_link(student_name).click)
+    def click_student_link(student)
+      wait_for_new_page_load(student_link(student).click)
     end
 
     def fetch_selected_final_grade_text(student)
@@ -151,7 +151,7 @@ class ModeratePage
     end
 
     def student_link(student_name)
-      fj("a:contains(#{student_name})")
+      fj(".GradesGrid__BodyRow a:contains('#{student_name}')")
     end
   end
 end

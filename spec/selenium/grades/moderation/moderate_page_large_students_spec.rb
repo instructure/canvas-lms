@@ -84,12 +84,12 @@ describe 'Moderation Page' do
     expect(ModeratePage.fetch_student_count).to eq 5
   end
 
-  it 'navigates to student submission in speedgrader', priority: "1", test_id: 3638363  do
+  it 'navigates to the student submission in speedgrader', priority: "1", test_id: 3638363 do
     ModeratePage.click_student_link(@students[1].name)
     expect(Speedgrader.selected_student).to include_text @students[1].name
   end
 
-  it 'navigates to anonymous student submission in speedgrader', priority: "1", test_id: 3638364 do
+  it 'navigates to an anonymous student submission in speedgrader', priority: "1", test_id: 3638364 do
     @assignment.update_attribute :anonymous_grading, true
     refresh_page
     ModeratePage.click_student_link("Student 1")
