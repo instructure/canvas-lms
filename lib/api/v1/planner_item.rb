@@ -82,6 +82,13 @@ module Api::V1::PlannerItem
         hash[:plannable] = assignment_json(item, user, session, {include_discussion_topic: true}.merge(assignment_opts))
         hash[:html_url] = assignment_html_url(item, user, hash[:submissions])
       end
+    end.tap do |hash|
+      if (context = item.try(:context) || item.try(:course))
+        hash[:context_name] = context.try(:nickname_for, @user) || context.name
+        if context.is_a?(::Course) && context.feature_enabled?(:course_card_images)
+          hash[:context_image] = context.image
+        end
+      end
     end
   end
 

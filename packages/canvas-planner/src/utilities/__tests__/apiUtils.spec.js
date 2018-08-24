@@ -38,8 +38,17 @@ const groups = [{
   url: '/groups/9'
 }];
 
+const addContextInfo = resp =>
+  resp.course_id
+    ? {
+        context_name: `course name for course id ${resp.course_id}`,
+        context_image: `https://example.com/course/${resp.course_id}/image`,
+        ...resp
+      }
+    : resp
+
 function makeApiResponse (overrides = {}, assignmentOverrides = {}) {
-  return {
+  return addContextInfo({
     plannable_id: "10",
     context_type: "Course",
     course_id: "1",
@@ -53,11 +62,11 @@ function makeApiResponse (overrides = {}, assignmentOverrides = {}) {
     new_activity: false,
     plannable_date: '2018-03-27T18:58:51Z',
     ...overrides,
-  };
+  });
 }
 
 function makePlannerNoteApiResponse (overrides = {}) {
-  return {
+  return addContextInfo({
     id: 14,
     todo_date: '2017-06-21T18:58:51Z',
     title: 'abc123',
@@ -68,7 +77,7 @@ function makePlannerNoteApiResponse (overrides = {}) {
     created_at: '2017-06-21T18:58:57Z',
     updated_at: '2017-06-21T18:58:57Z',
     ...overrides
-  };
+  });
 }
 
 function makePlannerNote (overrides = {}) {

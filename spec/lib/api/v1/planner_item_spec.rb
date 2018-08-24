@@ -82,6 +82,23 @@ describe Api::V1::PlannerItem do
       expect(event_hash[:plannable_date]).to eq event_start_date
     end
 
+    it 'should return with a context_name and context_image for the respective item' do
+      asg_hash = api.planner_item_json(@assignment, @student, session)
+      expect(asg_hash[:context_name]).to eq @course.name
+      expect(asg_hash[:context_image]).to be_nil
+
+      @course.name = "test course name"
+      expect(api.planner_item_json(@assignment, @student, session)[:context_name]).to eq "test course name"
+
+      # still no image if feature flag is off
+      @course.image_url = "path/to/course/image.png"
+      expect(api.planner_item_json(@assignment, @student, session)[:context_image]).to be_nil
+
+      # ok, now that course has an image and the feature flag is on there should be an image
+      @course.enable_feature!(:course_card_images)
+      expect(api.planner_item_json(@assignment, @student, session)[:context_image]).to eq "path/to/course/image.png"
+    end
+
     context 'planner overrides' do
       it 'should return the planner override id' do
         teacher_hash = api.planner_item_json(@assignment, @teacher, session)
