@@ -37,12 +37,15 @@ module QuizzesNext::Importers
     def migration_lti!
       lti_assignment_quiz_set = []
       @migration.imported_migration_items_by_class(Quizzes::Quiz).each do |quiz|
-        assignment = quiz_assignmet(quiz)
+        assignment = quiz_assignment(quiz)
         next unless assignment
         lti_assignment_quiz_set << [assignment.global_id, quiz.global_id]
         assignment.workflow_state = 'importing'
         assignment.importing_started_at = Time.zone.now
-        assignment.quiz_lti! && assignment.save!
+        if assignment.quiz_lti!
+          assignment.quiz = nil
+          assignment.save!
+        end
 
         # Quizzes will be created in Quizzes.Next app
         # assignment.quiz_lti! breaks relation to quiz. Destroying Quizzes:Quiz wouldn't
@@ -52,17 +55,17 @@ module QuizzesNext::Importers
       setup_assets_imported(lti_assignment_quiz_set)
     end
 
-    def quiz_assignmet(quiz)
-      assignment_quiz_assignmet(quiz) || practice_quiz_assignmet(quiz)
+    def quiz_assignment(quiz)
+      assignment_quiz_assignment(quiz) || practice_quiz_assignment(quiz)
     end
 
-    def assignment_quiz_assignmet(quiz)
+    def assignment_quiz_assignment(quiz)
       return unless quiz.assignment?
       quiz.build_assignment unless quiz.assignment
       quiz.assignment
     end
 
-    def practice_quiz_assignmet(quiz)
+    def practice_quiz_assignment(quiz)
       return unless quiz.quiz_type == 'practice_quiz'
       assignment = quiz.assignment
       unless assignment
