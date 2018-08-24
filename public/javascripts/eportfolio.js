@@ -112,17 +112,16 @@ import 'jqueryui/sortable'
       $('#application').append('<div id="eportfolios_move_to_modal_root"></div>')
       modalRoot = document.querySelector('#eportfolios_move_to_modal_root')
     }
-    ReactDOM.render(React.createElement(MoveToDialog, {
-      source: source,
-      destinations: destinations,
-      appElement: appElement,
-      triggerElement: triggerElement,
-      header: dialogLabel,
-      onClose: function() {
+    ReactDOM.render(<MoveToDialog
+      source={source}
+      destinations={destinations}
+      appElement={appElement}
+      triggerElement={triggerElement}
+      header={dialogLabel}
+      onClose={function() {
         setTimeout(function() { ReactDOM.unmountComponentAtNode(modalRoot) })
-      },
-      onMove: onMove
-    }), modalRoot)
+      }}
+      onMove={onMove} />, modalRoot)
   }
 
   $(document).ready(function() {

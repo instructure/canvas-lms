@@ -624,14 +624,16 @@ function renderCommentTextArea () {
   const textAreaProps = {
     height: '4rem',
     id: 'speed_grader_comment_textarea',
-    label: React.createElement(ScreenReaderContent, null, I18n.t('Add a Comment')),
+    label: <ScreenReaderContent>
+      {I18n.t('Add a Comment')}
+    </ScreenReaderContent>,
     placeholder: I18n.t('Add a Comment'),
     resize: 'vertical',
     textareaRef
   };
 
   ReactDOM.render(
-    React.createElement(TextArea, textAreaProps),
+    <TextArea {...textAreaProps} />,
     document.getElementById(SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT)
   );
 }
@@ -3126,7 +3128,9 @@ function speedGraderJSONErrorFn (data, _xhr, _textStatus, _errorThrown) {
       { assignmentTitle: ENV.assignment_title }
     );
     ReactDOM.render(
-      React.createElement(Alert, alertProps, alertMessage),
+      <Alert {...alertProps}>
+        {alertMessage}
+      </Alert>,
       document.getElementById('speed_grader_timeout_alert')
     );
   }
