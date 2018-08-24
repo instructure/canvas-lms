@@ -658,7 +658,7 @@ class AccountsController < ApplicationController
     @courses = Api.paginate(@courses, self, api_v1_account_courses_url, page_opts)
 
     ActiveRecord::Associations::Preloader.new.preload(@courses, [:account, :root_account, course_account_associations: :account])
-    ActiveRecord::Associations::Preloader.new.preload(@courses, [:teachers]) if includes.include?("teachers")
+    preload_teachers(@courses) if includes.include?("teachers")
     ActiveRecord::Associations::Preloader.new.preload(@courses, [:enrollment_term]) if includes.include?("term")
 
     if includes.include?("total_students")

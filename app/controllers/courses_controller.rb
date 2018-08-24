@@ -2948,7 +2948,7 @@ class CoursesController < ApplicationController
     enrollments_by_course = Api.paginate(enrollments_by_course, self, paginate_url) if api_request?
     courses = enrollments_by_course.map(&:first).map(&:course)
     preloads = %i/account root_account/
-    preloads << :teachers if includes.include?('teachers')
+    preload_teachers(courses) if includes.include?('teachers')
     preloads << :grading_standard if includes.include?('total_scores')
     preloads << :account if includes.include?('subaccount') || includes.include?('account')
     if includes.include?('current_grading_period_scores')
