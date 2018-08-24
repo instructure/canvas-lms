@@ -296,8 +296,7 @@ class Speedgrader
     def visit_section(section)
       students_dropdown_button.click
       hover(sections_menu_link)
-      section.click
-      wait_for_dom_ready
+      wait_for_new_page_load(section.click)
     end
 
     def enter_grade(grade)
