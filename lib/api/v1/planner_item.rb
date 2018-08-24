@@ -61,14 +61,14 @@ module Api::V1::PlannerItem
         hash[:planner_override] ||= planner_override_json(item.planner_override_for(user), user, session)
       elsif item.is_a?(Announcement)
         hash[:plannable_date] = item.posted_at || item.created_at
-        hash[:plannable] = discussion_topic_api_json(item, item.context, user, session, use_preload: true)
+        hash[:plannable] = discussion_topic_api_json(item, item.context, user, session, use_preload: true, user_can_moderate: false, skip_permissions: true)
         hash[:html_url] = named_context_url(item.context, :context_discussion_topic_url, item.id)
       elsif item.is_a?(DiscussionTopic) || (item.respond_to?(:discussion_topic?) && item.discussion_topic?)
         topic = item.is_a?(DiscussionTopic) ? item : item.discussion_topic
         hash[:plannable_id] = topic.id
         hash[:plannable_date] = item[:user_due_date] || topic.todo_date || topic.posted_at || topic.created_at
         hash[:plannable_type] = PLANNABLE_TYPES.key(topic.class_name)
-        hash[:plannable] = discussion_topic_api_json(topic, topic.context, user, session, assignment_opts: assignment_opts, use_preload: true)
+        hash[:plannable] = discussion_topic_api_json(topic, topic.context, user, session, assignment_opts: assignment_opts, use_preload: true, user_can_moderate: false, skip_permissions: true)
         hash[:html_url] = discussion_topic_html_url(topic, user, hash[:submissions])
         hash[:planner_override] ||= planner_override_json(topic.planner_override_for(user), user, session, topic.class_name)
       else
