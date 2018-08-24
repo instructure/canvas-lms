@@ -2169,6 +2169,23 @@ describe CalendarEventsApiController, type: :request do
       @me = @observer
     end
 
+    context "as manually enrolled observer" do
+      before :once do
+        course_with_observer(course: @course, active_enrollment: true, associated_user_id: @student.id)
+      end
+
+      it "should return calendar events" do
+        3.times do |idx|
+          @course.calendar_events.create(title: "event #{idx}", workflow_state: 'active')
+        end
+        json = api_call(:get,
+          "/api/v1/users/#{@student.id}/calendar_events?all_events=true&context_codes[]=#{@ctx_str}", {
+          controller: 'calendar_events_api', action: 'user_index', format: 'json',
+          context_codes: @contexts, all_events: true, user_id: @student.id})
+        expect(json.length).to eql 3
+      end
+    end
+
     it "should return observee's calendar events" do
       3.times do |idx|
         @course.calendar_events.create(title: "event #{idx}", workflow_state: 'active')
