@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import _ from 'underscore'
 import createStore from '../shared/helpers/createStore'
 import ContextColorer from 'compiled/contextColorer'

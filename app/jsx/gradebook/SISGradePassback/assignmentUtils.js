@@ -18,7 +18,6 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import createStore from 'react'
 import '../../shared/helpers/createStore'
 
   let assignmentUtils = {

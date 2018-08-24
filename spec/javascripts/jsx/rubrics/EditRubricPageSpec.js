@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import EditRubricPage from 'compiled/views/rubrics/EditRubricPage'
 import assertions from 'helpers/assertions'
 
