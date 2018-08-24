@@ -119,7 +119,6 @@ import MovementUtils from './MovementUtils'
             backgroundColor={this.colorForCard(card.assetString)}
             handleColorChange={this.handleColorChange.bind(this, card.assetString)}
             image={card.image}
-            imagesEnabled={card.imagesEnabled}
             reorderingEnabled={this.props.reorderingEnabled}
             hideColorOverlays={this.props.hideColorOverlays}
             position={position}

@@ -40,7 +40,6 @@ export default class DashboardCard extends Component {
     term: PropTypes.string,
     href: PropTypes.string.isRequired,
     links: PropTypes.arrayOf(PropTypes.object),
-    imagesEnabled: PropTypes.bool,
     image: PropTypes.string,
     handleColorChange: PropTypes.func,
     hideColorOverlays: PropTypes.bool,
@@ -58,7 +57,6 @@ export default class DashboardCard extends Component {
     term: null,
     links: [],
     hideColorOverlays: false,
-    imagesEnabled: false,
     handleColorChange: () => {},
     image: '',
     reorderingEnabled: false,
@@ -209,13 +207,12 @@ export default class DashboardCard extends Component {
 
   renderHeaderHero () {
     const {
-      imagesEnabled,
       image,
       backgroundColor,
       hideColorOverlays
     } = this.props;
 
-    if (imagesEnabled && image) {
+    if (image) {
       return (
         <div
           className="ic-DashboardCard__header_image"
@@ -299,7 +296,7 @@ export default class DashboardCard extends Component {
         <div className="ic-DashboardCard__header">
           <span className="screenreader-only">
             {
-              this.props.imagesEnabled && this.props.image ?
+              this.props.image ?
                 I18n.t('Course image for %{course}', {course: this.state.nicknameInfo.nickname})
                 : I18n.t('Course card color region for %{course}', {course: this.state.nicknameInfo.nickname})
             }
