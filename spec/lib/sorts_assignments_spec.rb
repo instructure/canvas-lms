@@ -215,17 +215,17 @@ describe SortsAssignments do
       end
 
       it "stores the past assignments" do
-        expect(sorted_assignments.past).to eq SortsAssignments.past(assignments)
+        expect(sorted_assignments.past.call).to eq SortsAssignments.past(assignments)
       end
 
       it "stores the undated assignments" do
-        expect(sorted_assignments.undated).to eq(
+        expect(sorted_assignments.undated.call).to eq(
           SortsAssignments.undated(assignments)
         )
       end
 
       it "stores the ungraded assignments" do
-        expect(sorted_assignments.ungraded).to eq(
+        expect(sorted_assignments.ungraded.call).to eq(
           SortsAssignments.ungraded_for_user_and_session(
             assignments,user,session
         )
@@ -233,17 +233,17 @@ describe SortsAssignments do
       end
 
       it "stores the upcoming assignments" do
-        expect(sorted_assignments.upcoming).to eq(
+        expect(sorted_assignments.upcoming.call).to eq(
           SortsAssignments.upcoming(assignments,1.week.from_now)
         )
       end
 
       it "stores the future events" do
-        expect(sorted_assignments.future).to eq SortsAssignments.future(assignments)
+        expect(sorted_assignments.future.call).to eq SortsAssignments.future(assignments)
       end
 
       it "and_return the overdue assignments" do
-        expect(sorted_assignments.overdue).to eq SortsAssignments.overdue(assignments, user, session, submissions)
+        expect(sorted_assignments.overdue.call).to eq SortsAssignments.overdue(assignments, user, session, submissions)
       end
 
     end
@@ -311,6 +311,7 @@ describe SortsAssignments do
   end
 
   describe "unsubmitted_for_user_and_session" do
+    let(:course) { double }
     let(:user) { double }
     let(:current_user) { double }
     let(:session) { double }
@@ -319,9 +320,9 @@ describe SortsAssignments do
     let(:assignment3) { double }
     let(:assignments) { [ assignment1, assignment2, assignment3 ] }
     before :each do
+      allow(course).to receive_messages(:grants_right? => true)
       assignments.each { |assignment|
         allow(assignment).to receive_messages(
-          :grants_right? => true,
           :expects_submission? => true,
           :submission_for_student => {id: nil}
         )
@@ -329,21 +330,20 @@ describe SortsAssignments do
     end
 
     it "only includes assignments that current user has permission to view" do
-      expect(assignment1).to receive(:grants_right?).with(current_user,session,:grade).
-        and_return false
-      expect(SortsAssignments.unsubmitted_for_user_and_session(assignments,user,current_user,session)).
-        to match_array [ assignment2, assignment3 ]
+      expect(course).to receive(:grants_right?).with(current_user,session,:manage_grades).and_return false
+      expect(SortsAssignments.unsubmitted_for_user_and_session(course,assignments,user,current_user,session)).
+        to eq [ ]
     end
 
     it "only includes assignments that are expecting a submission" do
       allow(assignment2).to receive_messages({:expects_submission? => false})
-      expect(SortsAssignments.unsubmitted_for_user_and_session(assignments,user,current_user,session)).
+      expect(SortsAssignments.unsubmitted_for_user_and_session(course,assignments,user,current_user,session)).
         to match_array [ assignment1, assignment3 ]
     end
 
     it "only includes assignments that do not have a saved submission for the user" do
       allow(assignment3).to receive_messages(:submission_for_student => {id: 1})
-      expect(SortsAssignments.unsubmitted_for_user_and_session(assignments,user,current_user,session)).
+      expect(SortsAssignments.unsubmitted_for_user_and_session(course,assignments,user,current_user,session)).
         to match_array [ assignment1, assignment2 ]
     end
   end
