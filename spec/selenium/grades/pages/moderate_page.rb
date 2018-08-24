@@ -50,9 +50,8 @@ class ModeratePage
       grade_input_dropdown_list(student).find {|k| k.text == "#{grade} (Custom)"}.click
     end
 
-    def click_student_link(student)
-      # use student_link locator to find and then click
-      wait_for_new_page_load(student_link(student).click)
+    def click_student_link(student_name)
+      wait_for_new_page_load(student_link(student_name).click)
     end
 
     def fetch_selected_final_grade_text(student)
@@ -148,8 +147,8 @@ class ModeratePage
       f('ul', student_table_row_by_displayed_name(student.name))
     end
 
-    def student_link(student)
-      # get student link by name if possible
+    def student_link(student_name)
+      fj("a:contains(#{student_name})")
     end
   end
 end

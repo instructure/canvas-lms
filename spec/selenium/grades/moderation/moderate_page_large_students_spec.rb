@@ -85,13 +85,11 @@ describe 'Moderation Page' do
   end
 
   it 'navigates to student submission in speedgrader', priority: "1", test_id: 3638363  do
-    skip('Unskip in GRADE-1459')
-    ModeratePage.click_student_link(@students[1])
+    ModeratePage.click_student_link(@students[1].name)
     expect(Speedgrader.selected_student).to include_text @students[1].name
   end
 
   it 'navigates to anonymous student submission in speedgrader', priority: "1", test_id: 3638364 do
-    skip('Unskip in GRADE-1459')
     @assignment.update_attribute :anonymous_grading, true
     refresh_page
     ModeratePage.click_student_link("Student 1")
