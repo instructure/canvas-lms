@@ -239,6 +239,7 @@ class SisBatch < ActiveRecord::Base
 
   def abort_batch
     SisBatch.not_completed.where(id: self).update_all(workflow_state: 'aborted')
+    self.class.queue_job_for_account(account, 10.minutes.from_now) if self.account.sis_batches.needs_processing.exists?
   end
 
   def batch_aborted(message)
