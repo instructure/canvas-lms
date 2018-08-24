@@ -42,30 +42,8 @@ if (process.env.NODE_ENV !== 'production' && process.env.DEPRECATION_SENTRY_DSN)
     release: process.env.GIT_COMMIT
   }).install();
 
-  const CONSOLE_LEVELS = ['debug', 'info', 'warn', 'error'];
-  CONSOLE_LEVELS.forEach(level => {
-    window.console[level] = (...args) => {
-      const msg = args.join(' ');
-      if (msg.includes('deprecated')) {
-        let trace = null;
-        try {
-          throw new Error('');
-        } catch (e) {
-          trace = e.stack;
-        }
-        const data = {
-          level: level === 'warn' ? 'warning' : level,
-          logger: 'console',
-          extra: {
-            arguments: args,
-            stackTrace: trace
-          }
-        };
-
-        Raven.captureMessage(msg, data);
-      }
-    }
-  });
+  const setupRavenConsoleLoggingPlugin = require('../jsx/shared/helpers/setupRavenConsoleLoggingPlugin');
+  setupRavenConsoleLoggingPlugin(Raven, { loggerName: 'console' });
 }
 
 // setup the inst-ui default theme

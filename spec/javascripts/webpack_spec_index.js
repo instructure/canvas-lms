@@ -20,6 +20,7 @@ import Adapter from 'enzyme-adapter-react-14'
 import { canvas } from '@instructure/ui-themes/lib'
 import en_US from 'timezone/en_US'
 import './jsx/spec-support/specProtection'
+import setupRavenConsoleLoggingPlugin from '../../app/jsx/shared/helpers/setupRavenConsoleLoggingPlugin'
 
 Enzyme.configure({ adapter: new Adapter() })
 
@@ -31,12 +32,37 @@ if (process.env.SENTRY_DSN) {
     release: process.env.GIT_COMMIT
   }).install();
 
+  let deprecationsReporter = null;
+
+  if (process.env.DEPRECATION_SENTRY_DSN) {
+    // We'll use this to collect deprecation warnings
+    // Doing this like this isn't exactly... documented per se, but there is a
+    // nice comment in the code about it here:
+    // https://github.com/getsentry/sentry-javascript/blob/master/packages/raven-js/src/singleton.js#L33
+    deprecationsReporter = new Raven.Client();
+    deprecationsReporter.config(process.env.DEPRECATION_SENTRY_DSN, {
+      release: process.env.GIT_COMMIT
+    });
+
+    setupRavenConsoleLoggingPlugin(deprecationsReporter, { loggerName: 'console-qunit' });
+
+  }
+
+
   // QUnit is assumed global
   QUnit.testStart(({module, name}) => {
     Raven.setExtraContext(); // Clear all extra data from the context.
-    Raven.setExtraContext({
+
+    const context = {
       spec: `${module}: ${name}`
-    });
+    };
+    Raven.setExtraContext(context);
+
+    if (deprecationsReporter) {
+      deprecationsReporter.setExtraContext();
+      deprecationsReporter.setExtraContext(context);
+    }
+
   })
 }
 
