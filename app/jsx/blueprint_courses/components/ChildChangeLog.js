@@ -17,7 +17,9 @@
  */
 
 import I18n from 'i18n!blueprint_courses'
-import React, { Component, PropTypes } from 'react'
+import PropTypes from 'prop-types';
+
+import React, { Component } from 'react';
 import { connect } from 'react-redux'
 
 import Text from '@instructure/ui-elements/lib/components/Text'
