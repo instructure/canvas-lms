@@ -437,6 +437,14 @@ describe PermissionsHelper do
       })
     end
 
+    it "should work with unenrolled account admins" do
+      course_factory
+      account_admin_user(:active_all => true)
+      result = @user.precalculate_permissions_for_courses([@course], SectionTabHelper::PERMISSIONS_TO_PRECALCULATE)
+      expected = Hash[SectionTabHelper::PERMISSIONS_TO_PRECALCULATE.map{|p| [p, true]}] # should be true for everything
+      expect(result).to eq({@course.global_id => expected})
+    end
+
     it "should work with concluded-available permissions" do
       RoleOverride.create!(permission: 'moderate_forum', enabled: true, role: student_role, account: Account.default)
       concluded_student_enrollment = course_with_student(:active_all => true)

@@ -24,10 +24,11 @@ module PermissionsHelper
     enrollments = cached_current_enrollments(preload_courses: true, preload_dates: true)
     allowed_ens = []
     Shard.partition_by_shard(enrollments) do |sharded_enrollments|
-      perms_hash = get_permissions_info_by_account(sharded_enrollments, [permission])
+      perms_hash = get_permissions_info_by_account(sharded_enrollments.map(&:course), sharded_enrollments, [permission])
       allowed_ens += sharded_enrollments.select do |e|
         perm_hash = perms_hash[e.course.account_id]
-        perm_hash && enabled_for_enrollment(e.role_id, e.type, e.state_based_on_date, perm_hash, permission)
+        perm_hash && (enabled_for_account_admin(perm_hash, permission) ||
+          enabled_for_enrollment(e.role_id, e.type, e.state_based_on_date, perm_hash, permission))
       end
     end
     allowed_ens
@@ -55,14 +56,15 @@ module PermissionsHelper
         grouped_enrollments[course.id] ||= []
         grouped_enrollments[course.id].each{|e| e.course = course}
       end
-      all_permissions_data = get_permissions_info_by_account(all_applicable_enrollments, permissions)
+      all_permissions_data = get_permissions_info_by_account(sharded_courses, all_applicable_enrollments, permissions)
 
       sharded_courses.each do |course|
         course_permissions = {}
         permissions.each do |permission|
           perm_hash = all_permissions_data[course.account_id]
-          course_permissions[permission] = !!(perm_hash && grouped_enrollments[course.id].any?{|e|
-            enabled_for_enrollment(e.role_id, e.type, e.date_based_state_in_db.to_sym, perm_hash, permission)})
+          course_permissions[permission] = !!(perm_hash &&
+            (enabled_for_account_admin(perm_hash, permission) || grouped_enrollments[course.id].any?{|e|
+                enabled_for_enrollment(e.role_id, e.type, e.date_based_state_in_db.to_sym, perm_hash, permission)}))
         end
 
         # load some other permissions that we can possibly skip calculating - we can't say for sure they're false but we can mark them true
@@ -80,18 +82,25 @@ module PermissionsHelper
     precalculated_map
   end
 
-  def enabled_for_enrollment(role_id, role_type, enrollment_state, perm_hash, permission)
-    role_type = "StudentEnrollment" if role_type == "StudentViewEnrollment"
+  def enabled_for_account_admin(perm_hash, permission)
+    # enabled by account role
     permission_details = RoleOverride.permissions[permission]
     true_for_roles = permission_details[:true_for]
     available_to_roles = permission_details[:available_to]
-    # enabled by account role
-    return true if perm_hash[:admin_roles].any? do |role|
+
+    perm_hash[:admin_roles].any? do |role|
       if available_to_roles.include?(role.base_role_type)
         role_on = perm_hash.dig(:role_overrides, [role.id, permission], :enabled) && perm_hash.dig(:role_overrides, [role.id, permission], :self)
         role_on.nil? ? true_for_roles.include?(role.base_role_type) : role_on
       end
     end
+  end
+
+  def enabled_for_enrollment(role_id, role_type, enrollment_state, perm_hash, permission)
+    role_type = "StudentEnrollment" if role_type == "StudentViewEnrollment"
+    permission_details = RoleOverride.permissions[permission]
+    true_for_roles = permission_details[:true_for]
+    available_to_roles = permission_details[:available_to]
 
     if enrollment_state == :completed
       concluded_roles = permission_details[:applies_to_concluded]
@@ -115,7 +124,7 @@ module PermissionsHelper
   #  role_overrides: map from role id to hash containing :enabled, :locked, :self, :children
   #   (these are calculated for the specific account, taking inheritance and locking into account)
   #  admin_roles: set of Roles the user has active account memberships for in this account
-  def get_permissions_info_by_account(enrollments, permissions)
+  def get_permissions_info_by_account(courses, enrollments, permissions)
     account_roles = AccountUser.where(user: self).active.preload(:role).to_a
     role_ids = (enrollments.map(&:role_id) + account_roles.map(&:role_id)).uniq
     root_account_ids = enrollments.map(&:root_account_id).uniq
@@ -144,7 +153,7 @@ module PermissionsHelper
       FROM t
       SQL
     params = {
-      account_ids: enrollments.map { |e| e.course.account_id },
+      account_ids: courses.map(&:account_id),
       permissions: permissions,
       role_ids: role_ids
     }
