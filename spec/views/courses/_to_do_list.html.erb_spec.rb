@@ -22,6 +22,16 @@ describe "courses/_to_do_list.html.erb" do
   include AssignmentsHelper
 
   context "as a student" do
+    describe "with no assignments" do
+      it "shows the new planner to do list anyway" do
+        course_with_student(active_all: true)
+        @course.root_account.enable_feature!(:student_planner)
+        view_context
+        render partial: "courses/to_do_list", locals: {contexts: nil}
+        expect(response).to include '<div class="todo-list">'
+      end
+    end
+
     describe "assignments due" do
       it "shows assignment data" do
         course_with_student(active_all: true)
