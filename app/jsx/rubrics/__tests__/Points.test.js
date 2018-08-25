@@ -44,14 +44,14 @@ describe('The Points component', () => {
     expect(component({
       assessment: { ...id, points: validPoints('1.1') },
       pointsPossible: 2
-    }).find('div').text()).toEqual('1.1 / 2.0 pts')
+    }).find('div').text()).toEqual('1.1 / 2 pts')
   })
 
   it('renders the provided value on page load with no point text', () => {
     expect(component({
-      assessment: { ...id, points: { text: null, valid: true, value: 1.25 } },
+      assessment: { ...id, points: { text: null, valid: true, value: 1.255 } },
       pointsPossible: 2
-    }).find('div').text()).toEqual('1.3 / 2.0 pts')
+    }).find('div').text()).toEqual('1.26 / 2 pts')
   })
 
   it('renders no errors with point text verbatim when valid', () => {
@@ -67,7 +67,7 @@ describe('The Points component', () => {
       assessing: false,
       assessment: null,
       pointsPossible: 2
-    }).find('div').text()).toEqual('2.0 pts')
+    }).find('div').text()).toEqual('2 pts')
   })
 
   const withPoints = (points) => component({

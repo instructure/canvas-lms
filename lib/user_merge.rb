@@ -331,11 +331,11 @@ class UserMerge
 
       ContextModuleProgression.
         where(context_module_id: cmp.context_module_id, user_id: [from_user, target_user]).
-        order("CASE WHEN workflow_state = 'completed' THEN 0
-                    WHEN workflow_state = 'started' THEN 1
-                    WHEN workflow_state = 'unlocked' THEN 2
-                    WHEN workflow_state = 'locked' THEN 3
-                END DESC").first.destroy
+        order(Arel.sql("CASE WHEN workflow_state = 'completed' THEN 0
+                       WHEN workflow_state = 'started' THEN 1
+                       WHEN workflow_state = 'unlocked' THEN 2
+                       WHEN workflow_state = 'locked' THEN 3
+                       END DESC")).first.destroy
     end
   end
 
@@ -364,15 +364,15 @@ class UserMerge
   def enrollment_keeper(scope)
     # prefer active enrollments to have no impact to the end user.
     # then just keep the newest one.
-    scope.order("CASE WHEN workflow_state='active' THEN 1
-                      WHEN workflow_state='invited' THEN 2
-                      WHEN workflow_state='creation_pending' THEN 3
-                      WHEN workflow_state='completed' THEN 4
-                      WHEN workflow_state='rejected' THEN 5
-                      WHEN workflow_state='inactive' THEN 6
-                      WHEN workflow_state='deleted' THEN 7
-                      ELSE 8
-                      END, updated_at DESC").first
+    scope.order(Arel.sql("CASE WHEN workflow_state='active' THEN 1
+                          WHEN workflow_state='invited' THEN 2
+                          WHEN workflow_state='creation_pending' THEN 3
+                          WHEN workflow_state='completed' THEN 4
+                          WHEN workflow_state='rejected' THEN 5
+                          WHEN workflow_state='inactive' THEN 6
+                          WHEN workflow_state='deleted' THEN 7
+                          ELSE 8
+                          END, updated_at DESC")).first
   end
 
   def update_enrollment_state(scope, keeper, user_merge_data)

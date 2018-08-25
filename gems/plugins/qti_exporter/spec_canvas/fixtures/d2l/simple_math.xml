@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<questestinterop>
+  <objectbank ident="QLIB_730739" xmlns:d2l_2p0="http://desire2learn.com/xsd/d2lcp_v2p0">
+    <section d2l_2p0:id="1" ident="SECT_3981973" title="02gilback">
+      <item d2l_2p0:id="2" ident="OBJ_3563546" label="QUES_979792_1194510" d2l_2p0:page="1" title="single variable math">
+        <itemmetadata>
+          <qtimetadata>
+            <qti_metadatafield>
+              <fieldlabel>qmd_computerscored</fieldlabel>
+              <fieldentry>yes</fieldentry>
+            </qti_metadatafield>
+            <qti_metadatafield>
+              <fieldlabel>qmd_questiontype</fieldlabel>
+              <fieldentry>Arithmetic</fieldentry>
+            </qti_metadatafield>
+            <qti_metadatafield>
+              <fieldlabel>qmd_weighting</fieldlabel>
+              <fieldentry>3.000000000</fieldentry>
+            </qti_metadatafield>
+          </qtimetadata>
+        </itemmetadata>
+        <itemproc_extension>
+          <d2l_2p0:difficulty>1</d2l_2p0:difficulty>
+          <d2l_2p0:isbonus>no</d2l_2p0:isbonus>
+          <d2l_2p0:ismandatory>no</d2l_2p0:ismandatory>
+        </itemproc_extension>
+        <presentation>
+          <flow>
+            <material>
+              <mattext texttype="text/html">whats 1 plus 1</mattext>
+              <mat_extension>
+                <variable name="x">
+                  <minvalue>10</minvalue>
+                  <maxvalue>10</maxvalue>
+                  <decimalplaces>3</decimalplaces>
+                  <step>1</step>
+                </variable>
+                <formula>{x}</formula>
+              </mat_extension>
+            </material>
+            <response_num ident="QUES_979792_1194510_NUM" rcardinality="Single" rtiming="no">
+              <render_fib fibtype="Decimal" prompt="Box">
+                <response_label ident="QUES_979792_1194510_A1"/>
+              </render_fib>
+            </response_num>
+            <response_str ident="QUES_979792_1194510_STR" rcardinality="Single" rtiming="no">
+              <render_fib fibtype="String" prompt="Box">
+                <response_label ident="QUES_979792_1194510_A2"/>
+              </render_fib>
+            </response_str>
+          </flow>
+        </presentation>
+        <resprocessing>
+          <respcondition title="Single Condition">
+            <respcond_extension>
+              <formula>{x}</formula>
+              <precision type="decimalplaces" d2l_2p0:precision_enforced="no">2
+              </precision>
+              <tolerance type="units">2</tolerance>
+              <units d2l_2p0:worth="5" casesensitive="no">2</units>
+            </respcond_extension>
+            <conditionvar>
+              <other/>
+            </conditionvar>
+            <setvar action="Set">100</setvar>
+          </respcondition>
+        </resprocessing>
+      </item>
+    </section>
+  </objectbank>
+</questestinterop>

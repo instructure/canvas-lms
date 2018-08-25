@@ -36,7 +36,7 @@
     <div class="alert-error error_message"></div>
   </div>
 
-  <hr />
+  <hr aria-hidden="true"/>
 
   <div id="export_files">
     <% @exports.each do |export| %>
@@ -66,7 +66,7 @@
     <p><em><%= t "Content export files cannot be downloaded after %{days} days.", days: ContentExport.expire_days %></em></p>
   <% end %>
 
-  <hr />
+  <hr aria-hidden="true"/>
 
   <div class="form" style="<%= hidden if @current_export_id %>">
     <% if @context.is_a?(Course) %>

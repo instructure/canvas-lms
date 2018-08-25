@@ -455,9 +455,6 @@ class ProfileController < ApplicationController
     if @domain_root_account.parent_registration?
       js_env(AUTH_TYPE: @domain_root_account.parent_auth_type)
     end
-    if @domain_root_account.feature_enabled?(:observer_pairing_code)
-      js_env(USE_PAIRING_CODE: true)
-    end
     @user ||= @current_user
     @active_tab = 'observees'
     @context = @user.profile if @user == @current_user

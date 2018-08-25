@@ -141,7 +141,9 @@ describe SisImportsApiController, type: :request do
     json.delete("user")
     expected_data = {
           "data" => { "import_type" => "instructure_csv",
-                      "use_parallel_imports" => false,
+                      "use_parallel_imports" => true,
+                      "completed_importers" => ["user"],
+                      "running_immediately" => true,
                       "supplied_batches" => ["user"],
                       "counts" => { "change_sis_ids"=>0,
                                     "abstract_courses" => 0,
@@ -175,8 +177,6 @@ describe SisImportsApiController, type: :request do
           "diffing_drop_status" => nil,
           "change_threshold" => nil
     }
-    expected_data["data"]["completed_importers"] = ["user"] if SisBatch.use_parallel_importers?(@account)
-    expected_data["data"]["use_parallel_imports"] = true if SisBatch.use_parallel_importers?(@account)
     expect(json).to eq expected_data
   end
 
@@ -673,7 +673,9 @@ describe SisImportsApiController, type: :request do
 
     expected_data = {"sis_imports"=>[{
                       "data" => { "import_type" => "instructure_csv",
-                                  "use_parallel_imports" => false,
+                                  "use_parallel_imports" => true,
+                                  "completed_importers" => ["account"],
+                                  "running_immediately" => true,
                                   "supplied_batches" => ["account"],
                                   "counts" => { "change_sis_ids"=>0,
                                                 "abstract_courses" => 0,
@@ -708,8 +710,6 @@ describe SisImportsApiController, type: :request do
           "change_threshold" => nil,
       }]
     }
-    expected_data["sis_imports"].first["data"]["completed_importers"] = ["account"] if SisBatch.use_parallel_importers?(@account)
-    expected_data["sis_imports"].first["data"]["use_parallel_imports"] = true if SisBatch.use_parallel_importers?(@account)
     expect(json).to eq expected_data
 
     links = Api.parse_pagination_links(response.headers['Link'])

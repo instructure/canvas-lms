@@ -51,7 +51,37 @@ module Helper
                   }
               }.to_json,
             :headers => {'Content-Type' => 'application/json'}
-           ).body
+          ).body
+        )
+      rescue
+        nil
+      end
+
+      def post_discussion_response(course_id, topic_id, discussion_response)
+        JSON.parse(
+          self.class.post(
+            "/api/v1/courses/#{course_id}/discussion_topics/#{topic_id}/entries",
+            :body =>
+              {
+                :message => discussion_response
+              }.to_json,
+            :headers => {'Content-Type' => 'application/json'}
+          ).body
+        )
+      rescue
+        nil
+      end
+
+      def update_discussion(course_id, topic_id, update)
+        JSON.parse(
+          self.class.put(
+            "/api/v1/courses/#{course_id}/discussion_topics/#{topic_id}",
+            :body =>
+              {
+                :title => update
+              }.to_json,
+            :headers => {'Content-Type' => 'application/json'}
+          ).body
         )
       rescue
         nil

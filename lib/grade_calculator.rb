@@ -134,8 +134,9 @@ class GradeCalculator
 
   def create_course_grade_alerts(scores)
     @course.shard.activate do
+      ActiveRecord::Associations::Preloader.new.preload(scores, :enrollment)
       scores.each do |score|
-        thresholds = ObserverAlertThreshold.active.where(student: score.enrollment.user, alert_type: ['course_grade_high', 'course_grade_low'])
+        thresholds = ObserverAlertThreshold.active.where(student: score.enrollment.user_id, alert_type: ['course_grade_high', 'course_grade_low'])
         previous_score = score.current_score
         score.reload
         thresholds.each do |threshold|

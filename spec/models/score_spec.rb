@@ -150,7 +150,7 @@ describe Score do
       describe 'score_metadata association' do
         it 'also permanently destroys score metadata' do
           metadata.score.destroy_permanently!
-          expect(metadata).to be_destroyed
+          expect { metadata.reload }.to raise_error(ActiveRecord::RecordNotFound)
         end
       end
     end

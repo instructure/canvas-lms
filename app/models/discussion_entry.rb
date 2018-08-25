@@ -29,7 +29,7 @@ class DiscussionEntry < ActiveRecord::Base
   has_many :unordered_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "parent_id"
   has_many :flattened_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "root_entry_id"
   has_many :discussion_entry_participants
-  belongs_to :discussion_topic
+  belongs_to :discussion_topic, inverse_of: :discussion_entries
   # null if a root entry
   belongs_to :parent_entry, :class_name => 'DiscussionEntry', :foreign_key => :parent_id
   # also null if a root entry
@@ -139,10 +139,9 @@ class DiscussionEntry < ActiveRecord::Base
       raise "Message body cannot be blank"
     else
       self.shard.activate do
-        entry = DiscussionEntry.new(:message => message)
-        entry.discussion_topic_id = self.discussion_topic_id
-        entry.parent_entry = self
-        entry.user = user
+        entry = discussion_topic.discussion_entries.new(message: message,
+                                                        user: user,
+                                                        parent_entry: self)
         if entry.grants_right?(user, :create)
           entry.save!
           entry

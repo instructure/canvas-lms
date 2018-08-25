@@ -132,7 +132,8 @@ describe "dashboard" do
           title: "some assignment",
           submission_types: ['online_text_entry'],
           moderated_grading: true,
-          grader_count: 2
+          grader_count: 2,
+          final_grader: @teacher
         )
         @assignment.submit_homework(@student, :body => "submission")
       end

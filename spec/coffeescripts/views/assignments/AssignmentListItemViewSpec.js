@@ -880,6 +880,16 @@ QUnit.module('AssignmentListItemViewSpec - editing assignments', function(hooks)
     strictEqual(json.canEdit, true)
   })
 
+  test('canEdit is false if canManage is true and the update parameter does not exist', function() {
+    const view = createView(this.model, {
+      canManage: true,
+      individualAssignmentPermissions: {}
+    })
+
+    const json = view.toJSON()
+    strictEqual(json.canEdit, false)
+  })
+
   test('edit link is enabled when the individual assignment is editable', function() {
     const view = createView(this.model, {
       individualAssignmentPermissions: {update: true}

@@ -3,11 +3,13 @@
 --- 
 is: 
   1_item_scores_5512cd03: "1- atriði einkunnir"
+  1_item_scores_examplescores_9736236: "1- Hlutastig: %{exampleScores}"
   1_user_found_76399771: "1 notandi fannst"
   1st_reviewer_3c1d0119: "1. matsaðili"
   25th_75th_ile_406a67bf: "25.-75. %ile"
   25th_75th_percentile_aa4c11f2: "25-75 hundraðshlutar"
   2_final_score_7b0fd15e: 2-Lokaeinkunn
+  2_final_score_exampleresult_922edf9c: "2- Lokastig: %{exampleResult}"
   2nd_reviewer_94fdbcd: "2. matsaðili"
   451_message: 
     description: "Þú hefur ekki heimild til aðgangs að þessu svæði því þú ert staddur/stödd í landi sem er háð viðskiptahömlum Bandaríkjanna."
@@ -1511,6 +1513,7 @@ is:
   affects_viewing_the_publish_course_conclude_course_76d2f601: |-
       Hefur áhrif á skoðun Birta námskeið, Ljúka námskeiði, og Eyða þessu námskeiði varanlega hnappana.
       Eyða þessu námskeiði varanlega hnappurinn birtist aðeins fyrir námskeið sem búin eru til handvirkt.
+  afghanistan_93_ab06805: "Afganistan (+93)"
   after_48b9d69: Eftir...
   after_4c71e718: Eftir
   after_cbb5ebae: "Eftir... "
@@ -3652,6 +3655,7 @@ is:
   cannot_be_present_when_course_id_is_present_785e6a59: "getur ekki verið til staðar þegar course_id er til staðar"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Ekki hægt að breyta hunsuðum skiladegi  innan lokaðs matstímabils"
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "Ekki er hægt að breyta hlutverkaheiti í %{label}: það er þegar í notkun"
+  cannot_change_the_default_term_name_edc2279b: "Ekki er hægt að breyta sjálfgefnu hugtaki"
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Ekki hægt að breyta skiladegi hunsunar á lokuðu matstímabili"
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "Ekki hægt að breyta skiladegi í dag á lokuðu matstímabili"
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: "Ekki hægt að breyta skiladegi þegar skiladagur er á lokuðu matstímabili"
@@ -3816,10 +3820,12 @@ is:
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Smelltu á skyndimynd til að að fara aftur á reynslutímann eins og hann var  þegar myndin var tekin. Ath: Þú tapar öllu sem þú hefur gert síðan myndin var tekin og þetta verður ekki afturkallað!"
   click_to_add_a_name_6cf551b0: "Smelltu til að bæta við nafni"
   click_to_change_profile_picture_for_display_name_6a4b41db: "Smelltu hér til að skipta um mynd fyrir %{display_name}"
+  click_to_collapse_outcome_details_1d751617: "Ýttu til að loka niðurstöðuatriðum"
   click_to_create_a_new_user_for_address_325f6683: "Smelltu hér til að stofna nýjan notanda fyrir %{address}"
   click_to_create_a_new_user_for_login_56d2daf5: "Smelltu hér til að stofna nýjan notanda fyrir %{login}"
   click_to_edit_drag_to_reorder_ab725681: "Smelltu til að breyta, dragðu til að endurraða"
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Smelltu hér til að skrá athugasemdir ef nemandi velur þetta svar"
+  click_to_expand_outcome_details_74a2a967: "Ýttu til að opna niðurstöðuatriði"
   click_to_load_a020891b: "(smelltu til að hlaða)"
   click_to_order_by_email_ascending_98b1a697: "Smella til að panta eftir netfangi, eftir hækkandi röð"
   click_to_order_by_last_login_ascending_502b6ad2: "Smella til að panta eftir síðustu innskráningu, eftir hækkandi röð"
@@ -8093,6 +8099,7 @@ is:
   grader_d1198a9c: Matsaðili
   grader_graderindex_45e04e57: "Matsaðili %{graderIndex}"
   grader_gradernumber_fef5d5cf: "Matsaðili %{graderNumber}"
+  grader_index_a55577a2: "Matsaðili %{index}"
   grader_is_required_62c88f67: "Einkunnagjafa er krafist"
   grader_that_determines_final_grade_cc55f20: "Einkunnagjafi sem ákvarðar lokaeinkunn"
   graders_can_view_each_other_s_comments_d836b848: "Matsaðilar geta skoðað athugasemdir hvers annars"
@@ -8636,9 +8643,11 @@ is:
   hide_groups_navigation_menu_62e8b3d0: "Fela leiðarstýringarvalmynd hópa"
   hide_key_e8fe1e8c: "Fela lykil"
   hide_navigation_menu_f0b3e90: "Fela leiðarstýringarvalmynd"
+  hide_outcomes_with_no_results_7e4ce06f: "Fela útkomur með engar niðurstöður"
   hide_score_total_for_assessment_results_d0ef117f: "Fela heildareinkunn fyrir matsniðurstöður"
   hide_sidebar_2b5b3776: "Fela hliðarslá"
   hide_student_names_3e59e862: "Fela nöfn nemenda"
+  hide_students_with_no_results_6a22f991: "Fela nemendur með engar niðurstöður"
   hide_sub_accounts_for_account_name_a6de98bd: "Fela undirreikninga fyrir %{account_name}"
   high_b5cbd048: Hátt
   high_contrast_description: "Háskerpa eykur litaskerpu UI (texti, hnappar, o.s.frv.) og gerir hlutina auðþekkjanlegri. Ath: Stofnanamerking verður aftengd."
@@ -9056,6 +9065,7 @@ is:
   jwts_4f397c85: JWT
   k12_description: "Einkenni, stillingar og stílar sem eru skynsamlegri í K-12 umhverfi. Eins og er breytir þetta bara stíl en síðar kunna að bætast við sértækari eiginleikar fyrir K-12."
   k_2521301c: k
+  kazakhstan_7_8fe892c: "Kasakstan (+7)"
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "Hafa ber í huga að þessi skil gilda fyrir alla í %{groupType} hópnum þínum."
   keep_submissions_anonymous_5cbaf419: "Hafa skil nafnlaus"
   kenya_254_2945663a: "Kenía (+254)"
@@ -9072,6 +9082,7 @@ is:
   kind_7f0a88c4: Tegund
   labels: 
     lock_module_until: "Læsa til"
+  last_assessment_cd5659b6: "Síðasta mat: "
   last_changed_b544504d: "Síðast breytt"
   last_changed_date_82f1ce56: "Síðast breytt %{date}"
   last_day_attended_b72d623c: "Dagsetning síðustu mætingar"
@@ -11498,6 +11509,7 @@ is:
   new_course_role_6a7bb75f: "Nýtt hlutverk námskeiðs"
   new_criterion_6054bc7f: "Nýr flokkur"
   new_criterion_canceled_d8c2a655: "Hætt við nýja forsendu"
+  new_discussion_dae4fae3: "Ný umræða"
   new_event_for_course_name_2ba1f734: "Nýr viðburður fyrir %{course_name}"
   new_export_3ab758: "Nýr útflutningur"
   new_features_for_developer_key_management_994090dc: "Nýir eiginleikar fyrir lyklastjórnun forritara"
@@ -11591,6 +11603,7 @@ is:
   no_subject_58b7941c: "Ekkert efnisheiti"
   no_subject_970aad80: "Ekkert efnisheiti"
   no_submission_for_assignment_a9cb6fe2: "Engin skil fyrir %{assignment}"
+  no_submissions_164cea23: "Engin skil"
   no_terms_eab5ee7b: "Engir skilmálar"
   no_tls_618add1a: "Ekkert TLS"
   no_unassigned_terms_deb7b76b: "Engar óúthlutaðar annir"
@@ -12253,7 +12266,7 @@ is:
     cannot_unpublish_front_page: "Get ekki afbirt forsíðu"
     delete_button: Eyða
     delete_confirmation: "Viltu örugglega eyða þessari síðu?"
-    delete_dialog_title: "Eyða Wiki-síðu"
+    delete_dialog_title: "Eyða síðu"
     deleting_button: Eyði...
     edit_dialog_title: "Breyta síðu"
     errors: 
@@ -14875,6 +14888,7 @@ is:
   rubrics_b5ef369b: Matsviðmið
   running_c5a4998d: Keyrir
   russia_7_87bc99d5: "Rússland (+7)"
+  rwanda_250_1a6b344b: "Rúanda (+250)"
   salesforce_account_id_eb5c78ad: "Auðkenni Salesforce-reiknings"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce hefur aðra hýsitölvu fyrir innskráningu sanbox-reikninga en framleiðslureikninga og ef þú notar sanbox-reikning Salesforce og hakar ekki í þennan reit, er ekki hægt að auðkenna (og þetta virkar líka öfugt, ef þú hefur framleiðslureikning og hakar í reitinn er heldur ekki hægt að auðkenna)"
   salesforce_ticketing_webtocase_connector_80f75716: "Tenging beiðna Salesforce við WebToCase"
@@ -16342,6 +16356,7 @@ is:
     this_was_submitted_multiple_times_choose_a_submission_to_view: "Lagt fram mörgum sinnum, veldu hvað þú vilt sjá:"
     update_grade: "Uppfæra einkunn"
     view_rubric_assessment_in_the_speedgrader: "Skoða mat matsviðmiðs í SpeedGrader"
+  submission_index_e960f9bf: "Skil %{index}"
   submission_score_b7a291e8: skilaeinkunn
   submission_status_3079e730: "Staða á skilum"
   submission_tray_429ac3df: Skilabakki
@@ -16784,6 +16799,7 @@ is:
   there_was_a_problem_updating_the_comment_5f3595b9: "Vandamál kom upp þegar uppfæra átti athugasemd þína"
   there_was_a_problem_updating_the_grade_1b6c8b4c: "Vandamál kom upp við að uppfæra einkunnina."
   there_was_a_problem_updating_the_submission_6e5280a1: "Vandamál kom upp við að uppfæra innsendingu."
+  there_was_an_error_fetching_course_statistics_96e9dbad: "Villa við opnun tölfræði námsskeiðs"
   there_was_an_error_fetching_outcome_results_45c57590: "Villa kom upp við að sækja útkomu"
   there_was_an_error_fetching_submission_comments_ce153077: "Villa kom upp við að ná í athugasemdir við innsendingu."
   there_was_an_error_generating_the_pairing_code_9edd639b: "Villa kom upp við sköpun pörunarkóða"
@@ -17187,6 +17203,7 @@ is:
   to_access_the_account_courses_page_courses_view_li_e1da6165: "Til að fá aðgang að reikningsnámskeið síðunni þarf að virkja námskeið - skoða lista."
   to_access_the_assignments_index_page_course_conten_a5b00f98: "Til að fá aðgang að verkefnaatriðaskráasíðunni, þarf að virkja efni námskeiðs - skoða. Til að aðgreina verkefni að einstökum nemendum þarf einnig að virkja notendur - skoða lista."
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "Til að fá aðgang að fólk-síðunni og skoða hópa, þarf notendur - skoða lista að vera virkt líka."
+  to_access_the_people_page_users_view_list_must_be__2f01333b: "Til að fá aðgang að Fólk-síðunni, þarf að virkja „Notendur - Skoða lista“. Ef þetta leyfi er virkjað og ef „Notendur - skoða aðalnetföng“ er óvirkt munu notendur sjá netföng sem innskráningarauðkenni. Til þess að sjá innskráningarauðkenni þarf að virkja „Notendur - bæta við/fjarlægja nemendur“ undir námskeiði og „Notendur - bæta við/fjarlægja kennara, námskeiðshönnuð eða kennaranema“ undir námskeiði."
   to_access_the_people_page_users_view_list_must_be__5a5475fe: "Til að fá aðgang að fólk-síðunni þarf notendur - skoða lista að vera virkt líka."
   to_access_the_people_page_users_view_list_must_be__756d7188: |-
       Til að fá aðgang að fólk-síðunni þarf notendur - skoða lista að vera virkt líka.
@@ -17246,6 +17263,7 @@ is:
   to_differentiate_assignments_to_individual_student_6cc40fde: "Til að aðgreina verkefni að einstökum nemendum þarf einnig að virkja notendur - skoða lista."
   to_do_1d554f36: Verkefni
   to_do_5526f10a: "Verkefni:"
+  to_do_6ac7b2dc: "verkefnalisti:"
   to_do_date_d6b79bfd: "Verkefni %{date}"
   to_do_date_ddfb582c: "Dagsetning verkefnis:"
   to_do_items_loading_d1cdfcd5: "Hleð inn verkefnalista"
@@ -18444,6 +18462,7 @@ is:
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "Þú hefur náð hámörkum vefkrækja fyrir notanda (%{max})"
   you_have_unsynced_changes_that_will_sync_to_all_as_9028e711: "Þú hefur ósamhæfðar breytingar sem samhæfast við öll tengd námskeið þegar ný tenging er vistuð."
   you_just_sent_a_message_in_canvas_86b4945c: "Þú varst að senda skilaboð í Canvas"
+  you_left_the_required_name_field_empty_8f9bce5c: "Þú skildir tilskilinn nafnareit eftir auðan."
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "Þú vilt eitthvað af þessu. Ekkert gaman að kenna námskeið ef enginn hlustar."
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "Þú þarft glæðingartákn, farðu eftir leiðbeiningunum á þessum tengli, hugsanlega þarftu tækniaðstoð"
   you_may_not_reproduce_or_communicate_any_of_the_co_7636b552: "Þér er óheimilt að endurnýta eða miðla efni þessa námskeiðs, þar á meðal skrár sem fluttar eru út frá námskeiðinu án fyrirliggjandi skriflegrar heimildar skólans þíns. Fáðu upplýsingar um notendaskilmála hjá skólanum."

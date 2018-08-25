@@ -16,9 +16,26 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module SectionTabHelper
-  def available_section_tabs(context)
+  PERMISSIONS_TO_PRECALCULATE = [
+    :create_conferences,
+    :manage_admin_users,
+    :manage_assignments,
+    :manage_content,
+    :manage_files,
+    :manage_grades,
+    :manage_students,
+    :moderate_forum,
+    :post_to_forum,
+    :read_announcements,
+    :read_course_content,
+    :read_forum,
+    :read_roster,
+    :view_all_grades
+  ].freeze
+
+  def available_section_tabs(context, precalculated_permissions=nil)
     AvailableSectionTabs.new(
-      context, @current_user, @domain_root_account, session
+      context, @current_user, @domain_root_account, session, precalculated_permissions
     ).to_a
   end
 
@@ -59,11 +76,12 @@ module SectionTabHelper
   end
 
   class AvailableSectionTabs
-    def initialize(context, current_user, domain_root_account, session)
+    def initialize(context, current_user, domain_root_account, session, precalculated_permissions=nil)
       @context = context
       @current_user = current_user
       @domain_root_account = domain_root_account
       @session = session
+      @precalculated_permissions = precalculated_permissions
     end
     attr_reader :context, :current_user, :domain_root_account, :session
 
@@ -75,7 +93,8 @@ module SectionTabHelper
 
         context.tabs_available(current_user, {
           session: session,
-          root_account: domain_root_account
+          root_account: domain_root_account,
+          precalculated_permissions: @precalculated_permissions
         }).select { |tab|
           tab_has_required_attributes?(tab)
         }.reject { |tab|

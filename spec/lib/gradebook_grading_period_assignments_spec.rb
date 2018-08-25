@@ -79,7 +79,7 @@ describe GradebookGradingPeriodAssignments do
       it "excludes deleted submissions" do
         assignment_in_gp2 = @example_course.assignments.create!(due_at: 1.day.from_now)
         assignment_in_gp2.destroy
-        assignment_in_gp2.submissions.map(&:destroy)
+        assignment_in_gp2.submissions.preload(:all_submission_comments, :lti_result, :versions).map(&:destroy)
         expect(hash[@period2.id]).not_to include(assignment_in_gp2.id.to_s)
       end
 

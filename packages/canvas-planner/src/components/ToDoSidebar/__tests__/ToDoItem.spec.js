@@ -85,7 +85,7 @@ it('renders note icon for planner_notes', () => {
   const wrapper = shallow(
     <ToDoItem {...getDefaultProps({ type: '' })} />
   );
-  expect(wrapper.find('IconNoteLight').exists()).toBe(true);
+  expect(wrapper.find('IconNote').exists()).toBe(true);
 });
 
 it('renders the courses short name when the item has an associated course', () => {
@@ -135,12 +135,12 @@ it('renders out the title as a Text when not given an href prop', () => {
   expect(title.text()).toBe('Introduction to Board Games');
 });
 
-it('renders unique aria string for dismiss button', () => {
+it('renders unique text for dismiss button', () => {
   const wrapper = mount(
     <ToDoItem {...getDefaultProps()} />
   );
   const dismissButton = wrapper.find('.ToDoSidebarItem__Close').find('Button');
-  expect(dismissButton.props()['aria-label']).toBe('Dismiss Introduction to Board Games');
+  expect(dismissButton.text()).toBe('Dismiss Introduction to Board Games');
 });
 
 it('calls the handleDismissClick prop when the dismiss X is clicked', () => {

@@ -79,27 +79,29 @@ class LearningOutcomeGroup < ActiveRecord::Base
   # commit!
   def add_outcome_group(original, opts={})
     # copy group into this group
-    copy = child_outcome_groups.build
-    copy.title = original.title
-    copy.description = original.description
-    copy.vendor_guid = original.vendor_guid
-    copy.context = self.context
-    copy.save!
+    transaction do
+      copy = child_outcome_groups.build
+      copy.title = original.title
+      copy.description = original.description
+      copy.vendor_guid = original.vendor_guid
+      copy.context = self.context
+      copy.save!
 
-    # copy the group contents
-    original.child_outcome_groups.active.each do |group|
-      next if opts[:only] && opts[:only][group.asset_string] != "1"
-      copy.add_outcome_group(group, opts)
+      # copy the group contents
+      original.child_outcome_groups.active.each do |group|
+        next if opts[:only] && opts[:only][group.asset_string] != "1"
+        copy.add_outcome_group(group, opts)
+      end
+
+      original.child_outcome_links.active.each do |link|
+        next if opts[:only] && opts[:only][link.asset_string] != "1"
+        copy.add_outcome(link.content)
+      end
+
+      touch_parent_group
+      # done
+      copy
     end
-
-    original.child_outcome_links.active.each do |link|
-      next if opts[:only] && opts[:only][link.asset_string] != "1"
-      copy.add_outcome(link.content)
-    end
-
-    touch_parent_group
-    # done
-    copy
   end
 
   # moves an existing outcome link from the same context to be under this

@@ -19,7 +19,7 @@
 class Score < ActiveRecord::Base
   include Canvas::SoftDeletable
 
-  belongs_to :enrollment
+  belongs_to :enrollment, inverse_of: :scores
   belongs_to :grading_period, optional: true
   belongs_to :assignment_group, optional: true
   has_one :course, through: :enrollment
@@ -52,7 +52,7 @@ class Score < ActiveRecord::Base
   alias original_destroy_permanently! destroy_permanently!
   private :original_destroy_permanently!
   def destroy_permanently!
-    score_metadata.destroy_permanently! if score_metadata.present?
+    ScoreMetadata.where(score: self).delete_all
     original_destroy_permanently!
   end
 

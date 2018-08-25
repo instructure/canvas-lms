@@ -319,17 +319,20 @@ define [
         return inverse(this)
       fn(this)
 
-    # {{#eachWithIndex records}}
+    # {{#eachWithIndex records startingIndex=0}}
     #   <li class="legend_item{{_index}}"><span></span>{{Name}}</li>
     # {{/each_with_index}}
+    #
+    # (startingIndex will default to 0 if not specified)
     eachWithIndex: (context, options) ->
       fn = options.fn
       inverse = options.inverse
+      startingValue = parseInt(options.hash.startingValue || 0, 10)
       ret = ''
 
       if context and context.length > 0
         for own index, ctx of context
-          ctx._index = index
+          ctx._index = parseInt(index, 10) + startingValue
           ret += fn ctx
       else
         ret = inverse this

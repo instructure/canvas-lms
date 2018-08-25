@@ -377,7 +377,7 @@ define [
       data.unlock_at = defaultDate?.get('unlock_at') or null
       data.due_at = defaultDate?.get('due_at') or null
       data.assignment_overrides = @dueDateOverrideView.getOverrides()
-      data.only_visible_to_overrides = @dueDateOverrideView.containsSectionsWithoutOverrides()
+      data.only_visible_to_overrides = !@dueDateOverrideView.overridesContainDefault()
 
       assignment = @model.get('assignment')
       assignment or= @model.createAssignment()

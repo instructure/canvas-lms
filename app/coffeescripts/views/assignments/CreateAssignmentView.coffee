@@ -59,6 +59,10 @@ define [
     onSaveSuccess: =>
       @shouldPublish = false
       super
+      # Person who creates the assignment should always have permission to update it
+      ENV.PERMISSIONS.by_assignment_id && ENV.PERMISSIONS.by_assignment_id[@model.id] = {
+        update: true
+      }
       if @assignmentGroup
         @assignmentGroup.get('assignments').add(@model)
         @model = @generateNewAssignment()

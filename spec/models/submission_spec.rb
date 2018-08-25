@@ -3632,6 +3632,7 @@ describe Submission do
     before(:once) do
       @assignment.grader_count = 1
       @assignment.moderated_grading = true
+      @assignment.final_grader = @teacher
       @assignment.save!
       submission_spec_model
 
@@ -3696,15 +3697,17 @@ describe Submission do
       expect(@submission.provisional_grades.first.graded_anonymously).to eql true
     end
 
-    it "raises an exception if final is true and user is not allowed to moderate grades" do
+    it "raises an exception if final is true and user is not allowed to select final grade" do
       expect{ @submission.find_or_create_provisional_grade!(@student, final: true) }
         .to raise_error(Assignment::GradeError, "User not authorized to give final provisional grades")
     end
 
     it "raises an exception if grade is not final and student does not need a provisional grade" do
-      @assignment.grade_student(@student, grade: 2, grader: @teacher, provisional: true)
+      @assignment.grade_student(@student, grade: 2, grader: @teacher2, provisional: true)
+      third_teacher = User.create!
+      @course.enroll_teacher(third_teacher, enrollment_state: :active)
 
-      expect{ @submission.find_or_create_provisional_grade!(@teacher2, final: false) }
+      expect{ @submission.find_or_create_provisional_grade!(third_teacher, final: false) }
         .to raise_error(Assignment::GradeError, "Student already has the maximum number of provisional grades")
     end
 
@@ -5076,6 +5079,7 @@ describe Submission do
 
   describe '#provisional_grade' do
     before(:once) do
+      @assignment.update!(moderated_grading: true, grader_count: 2, final_grader: @teacher)
       @assignment.grade_student(@student, score: 10, grader: @teacher, provisional: true)
       @assignment.grade_student(@student, score: 50, grader: @teacher, provisional: true, final: true)
     end
@@ -5124,7 +5128,7 @@ describe Submission do
       it 'updates the lti_result score_given if the score has changed' do
         expect(lti_result.result_score).to eq submission.score
         submission.update!(score: 1)
-        expect(lti_result.result_score).to eq submission.score
+        expect(lti_result.reload.result_score).to eq submission.score
       end
     end
   end

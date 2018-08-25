@@ -2233,6 +2233,22 @@ describe CalendarEventsApiController, type: :request do
       expect(response.body.match(/DTSTART:\s*#{expected_override_date_output}/)).not_to be_nil
     end
 
+    it "should include the appointment details in the teachers export" do
+      get "/feeds/calendars/#{@teacher.feed_code}.ics"
+      expect(response).to be_success
+      cal = Icalendar.parse(response.body.dup)[0]
+      appointment_text = "Unnamed Course\n" + "\n" + "Participants: \n" + "User\n" + "\n"
+      expect(cal.events[1].description).to eq appointment_text
+      expect(cal.events[2].description).to eq appointment_text
+    end
+
+    it "should not expose details of other students appts to a student" do
+      get "/feeds/calendars/#{@user.feed_code}.ics"
+      expect(response).to be_success
+      cal = Icalendar.parse(response.body.dup)[0]
+      expect(cal.events[1].description).to eq nil
+    end
+
     it "should render unauthorized feed for bad code" do
       get "/feeds/calendars/user_garbage.ics"
       expect(response).to render_template('shared/unauthorized_feed')

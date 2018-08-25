@@ -70,6 +70,7 @@ define([
     data,
     gradingPeriods,
     userIsAdmin,
+    forIndividualStudents = false,
     hasGradingPeriods = true,
     postToSIS = null,
     dueDateRequiredForAccount = false
@@ -88,6 +89,7 @@ define([
         }
       },
       hasGradingPeriods: true,
+      forIndividualStudents,
       userIsAdmin,
       data,
       gradingPeriods,
@@ -216,4 +218,66 @@ define([
       dueDateRequiredForAccount: false });
     ok(isValid(validator));
   });
+
+  QUnit.module('when applied to one or more individual students', (hooks) => {
+    let makeIndividualValidator
+
+    hooks.beforeEach(() => {
+      makeIndividualValidator = (data, params = {}) => createValidator({
+        data,
+        dueDateRequiredForAccount: false,
+        forIndividualStudents: true,
+        gradingPeriods: null,
+        hasGradingPeriods: false,
+        postToSIS: true,
+        userIsAdmin: false,
+        ...params
+      })
+    })
+
+    test('allows a due date before the prescribed start date', () => {
+      const data = generateData({
+        due_at: '2014-01-23T03:59:59Z',
+      })
+
+      const validator = makeIndividualValidator(data)
+      ok(isValid(validator))
+    })
+
+    test('allows an unlock date before the prescribed start date', () => {
+      const data = generateData({
+        unlock_at: '2014-01-23T03:59:59Z',
+      })
+
+      const validator = makeIndividualValidator(data)
+      ok(isValid(validator))
+    })
+
+    test('allows a due date after the prescribed end date', () => {
+      const data = generateData({
+        due_at: '2017-01-23T03:59:59Z',
+      })
+      const validator = makeIndividualValidator(data)
+      ok(isValid(validator))
+    })
+
+    test('allows a lock date after the prescribed end date', () => {
+      const data = generateData({
+        lock_at: '2017-01-23T03:59:59Z',
+      })
+      const validator = makeIndividualValidator(data)
+      ok(isValid(validator))
+    })
+
+    test('does not allow a new override with a date in a closed grading period', function () {
+      const data = generateData({
+        due_at: DATE_IN_CLOSED_PERIOD,
+        persisted: false
+      })
+
+      const gradingPeriods = generateGradingPeriods()
+      const validator = makeIndividualValidator(data, {hasGradingPeriods: true, gradingPeriods})
+      notOk(isValid(validator))
+    });
+  })
 });

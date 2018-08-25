@@ -27,8 +27,6 @@ QUnit.module('account course user search createStore', hooks => {
 
   hooks.beforeEach(() => {
     store = createStore({ getUrl: () => 'store-url' })
-    testXhr = { then: () => {} }
-    sinon.stub($, 'ajax').returns(testXhr)
     sinon.stub(ajaxJSON, 'abortRequest')
   })
 
@@ -38,11 +36,31 @@ QUnit.module('account course user search createStore', hooks => {
   })
 
   test('load aborts previous load request', () => {
+    testXhr = { then: () => {} }
+    sinon.stub($, 'ajax').returns(testXhr)
     store.load({})
     store.load({})
     ok(ajaxJSON.abortRequest.calledWith(undefined))
     ok(ajaxJSON.abortRequest.calledWith(testXhr))
   })
+
+  test('load does not set the error flag if the request is aborted', () => {
+    testXhr = { then: (success, failure) => {
+      failure({}, 'abort');
+    } }
+    sinon.stub($, 'ajax').returns(testXhr)
+    store.load({});
+    ok(!store.getState()['{}'].error)
+  });
+
+  test('load sets the error flag on non-abort failures', () => {
+    testXhr = { then: (success, failure) => {
+      failure({}, 'error');
+    } }
+    sinon.stub($, 'ajax').returns(testXhr)
+    store.load({});
+    ok(store.getState()['{}'].error)
+  });
 })
 
 

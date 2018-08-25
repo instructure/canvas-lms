@@ -398,7 +398,7 @@ class UsersController < ApplicationController
   # @returns [User]
   def index
     get_context
-    if !api_request? && @context.feature_enabled?(:course_user_search)
+    if !api_request? && @context.feature_enabled?(:course_user_search) && !params.key?(:term)
       @account ||= @context
       return course_user_search
     end
@@ -2030,7 +2030,6 @@ class UsersController < ApplicationController
                            enrollment.course.grants_right?(@current_user, :read_reports) &&
                            enrollment.course.apply_enrollment_visibility(enrollment.course.all_student_enrollments, @teacher).where(id: enrollment).first
           if should_include
-            Enrollment.recompute_final_score_if_stale(enrollment.course, student) { enrollment.reload }
             @courses[enrollment.course] = teacher_activity_report(@teacher, enrollment.course, [enrollment])
           end
         end
@@ -2046,7 +2045,6 @@ class UsersController < ApplicationController
           flash[:error] = t('errors.user_not_teacher', "That user is not a teacher in this course")
           redirect_to_referrer_or_default(root_url)
         elsif authorized_action(course, @current_user, :read_reports)
-          Enrollment.recompute_final_score_if_stale(course)
           enrollments = course.apply_enrollment_visibility(course.all_student_enrollments, @teacher)
           @courses[course] = teacher_activity_report(@teacher, course, enrollments)
         end
@@ -2299,10 +2297,10 @@ class UsersController < ApplicationController
       student[:last_interaction] = [student[:last_interaction], date].compact.max
     end
     scope = ConversationMessage.
-        joins("INNER JOIN #{ConversationParticipant.quoted_table_name} ON conversation_participants.conversation_id=conversation_messages.conversation_id").
-        where('conversation_messages.author_id = ? AND conversation_participants.user_id IN (?) AND NOT conversation_messages.generated', teacher, ids)
+        joins(:conversation_message_participants).
+        where('conversation_messages.author_id = ? AND conversation_message_participants.user_id IN (?) AND NOT conversation_messages.generated', teacher, ids)
     # fake_arel can't pass an array in the group by through the scope
-    last_message_dates = scope.group(['conversation_participants.user_id', 'conversation_messages.author_id']).maximum(:created_at)
+    last_message_dates = scope.group(['conversation_message_participants.user_id', 'conversation_messages.author_id']).maximum(:created_at)
     last_message_dates.each do |key, date|
       next unless (student = data[key.first.to_i])
       student[:last_interaction] = [student[:last_interaction], date].compact.max
@@ -2465,6 +2463,7 @@ class UsersController < ApplicationController
         @pseudonym.save!
         @user = @pseudonym.user
         @user.workflow_state = 'registered'
+
         @user.update_account_associations
       end
     end
@@ -2478,8 +2477,7 @@ class UsersController < ApplicationController
     @user ||= @pseudonym&.user
     @user ||= @context.shard.activate { User.new }
 
-    use_pairing_code = @domain_root_account.feature_enabled?(:observer_pairing_code) &&
-                       @domain_root_account.self_registration?
+    use_pairing_code = @user.initial_enrollment_type == 'observer' && @domain_root_account.self_registration?
     force_validations = value_to_boolean(params[:force_validations])
     manage_user_logins = @context.grants_right?(@current_user, session, :manage_user_logins)
     self_enrollment = params[:self_enrollment].present?
@@ -2563,19 +2561,12 @@ class UsersController < ApplicationController
     @invalid_observee_creds = nil
     @invalid_observee_code = nil
     if @user.initial_enrollment_type == 'observer'
-      if use_pairing_code
-        @pairing_code = ObserverPairingCode.active.where(code: params[:pairing_code][:code]).first
-        if !@pairing_code.nil?
-          @observee = @pairing_code.user
-        else
-          @invalid_observee_code = ObserverPairingCode.new
-          @invalid_observee_code.errors.add('code', 'invalid')
-        end
-      elsif (observee_pseudonym = authenticate_observee)
-        @observee = observee_pseudonym.user
+      @pairing_code = ObserverPairingCode.active.where(code: params[:pairing_code][:code]).first
+      if !@pairing_code.nil?
+        @observee = @pairing_code.user
       else
-        @invalid_observee_creds = Pseudonym.new
-        @invalid_observee_creds.errors.add('unique_id', 'bad_credentials')
+        @invalid_observee_code = ObserverPairingCode.new
+        @invalid_observee_code.errors.add('code', 'invalid')
       end
     end
 

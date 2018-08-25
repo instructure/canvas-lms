@@ -41,6 +41,10 @@ import {send} from 'jsx/shared/rce/RceCommandShim'
 
     this.id = editor.id;
     this.selectedContent = editor.selection.getContent();
+    this.selectionDetails = {
+      node: editor.selection.getNode(),
+      range: editor.selection.getRng()
+    }
     this.$editorEl = $editorEl;
 
     /**
@@ -74,7 +78,8 @@ import {send} from 'jsx/shared/rce/RceCommandShim'
         url: text,
         classes: classes,
         selectedContent: this.selectedContent,
-        dataAttributes: dataAttrs
+        dataAttributes: dataAttrs,
+        selectionDetails: this.selectionDetails
       });
     };
   };

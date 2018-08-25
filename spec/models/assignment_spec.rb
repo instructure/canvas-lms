@@ -187,6 +187,18 @@ describe Assignment do
         assignment.update!(moderated_grading: !assignment.moderated_grading, grader_count: 2)
       end
 
+      it 'invokes DueDateCacher after save when moderated_grading becomes enabled' do
+        assignment = @course.assignments.create!(assignment_valid_attributes)
+        assignment.reload
+
+        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+
+        assignment.moderated_grading = true
+        assignment.grader_count = 2
+
+        assignment.update_cached_due_dates
+      end
+
       it 'invokes DueDateCacher if called in a before_save context' do
         assignment = @course.assignments.new(assignment_valid_attributes)
         allow(assignment).to receive(:update_cached_due_dates?).and_return(true)
@@ -233,6 +245,25 @@ describe Assignment do
     it 'excludes submissions for assignments not expecting submissions' do
       assignment_model(submission_types: "none", course: @course)
       expect(Assignment.submittable).to be_empty
+    end
+  end
+
+  describe '#ordered_moderation_graders' do
+    let(:teacher1) { @course.enroll_teacher(User.create!, enrollment_state: :active).user }
+    let(:teacher2) { @course.enroll_teacher(User.create!, enrollment_state: :active).user }
+    let(:assignment) do
+      @course.assignments.create!(
+        moderated_grading: true,
+        grader_count: 3,
+        final_grader: @teacher
+      )
+    end
+
+    it 'returns moderation graders ordered by anonymous id' do
+      mod_teacher1 = assignment.moderation_graders.create!(user: teacher1, anonymous_id: 'VFH2Y')
+      mod_teacher2 = assignment.moderation_graders.create!(user: teacher2, anonymous_id: 'A23FH')
+      mod_teacher = assignment.moderation_graders.create!(user: @teacher, anonymous_id: 'R2D22')
+      expect(assignment.ordered_moderation_graders).to eq [mod_teacher2, mod_teacher, mod_teacher1]
     end
   end
 

@@ -57,7 +57,7 @@ end
 
 module Pact::Canvas
   def self.base_state=(base_state)
-    @base_state ||= base_state
+    @base_state = base_state
   end
 
   def self.base_state
@@ -90,6 +90,11 @@ module Pact::Canvas
       @account = opts[:account] || Account.default
       @course = opts[:course] || seed_course
       seed_users(opts)
+      enable_features
+    end
+
+    def enable_features
+     @account.enable_feature!(:student_planner)
     end
 
     def seed_course

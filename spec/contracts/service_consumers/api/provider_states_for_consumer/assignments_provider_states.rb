@@ -27,7 +27,11 @@ PactConfig::Consumers::ALL.each do |consumer|
     provider_state 'a student in a course with an assignment' do
       set_up do
         course = Pact::Canvas.base_state.course
-        Assignment.create!(context: course, title: "Assignment1")
+        course.assignments.create({
+                                   name: 'Assignment 1',
+                                   due_at: Time.zone.now + 1.day,
+                                   submission_types: 'online_text_entry'
+                                 })
       end
     end
 
@@ -38,6 +42,21 @@ PactConfig::Consumers::ALL.each do |consumer|
         assignment.submission_types = 'external_tool'
         assignment.external_tool_tag_attributes = {resource_link_id: '9b4ef1eea0eb4c3498983e09a6ef88f1'}
         assignment.save!
+      end
+    end
+
+    provider_state 'an assignment with overrides' do
+      set_up do
+        course = Pact::Canvas.base_state.course
+        student = Pact::Canvas.base_state.students.first
+        assignment = course.assignments.create({
+                                   name: 'Assignment Override',
+                                   due_at: Time.zone.now + 1.day,
+                                   submission_types: 'online_text_entry'
+                                 })
+
+        override = assignment.assignment_overrides.create!
+        override.assignment_override_students.create!(:user => student)
       end
     end
   end

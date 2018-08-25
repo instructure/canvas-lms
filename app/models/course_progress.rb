@@ -22,14 +22,19 @@ class CourseProgress
   attr_accessor :course, :user, :read_only
 
   # use read_only to avoid triggering more progression evaluations
-  def initialize(course, user, read_only: false)
+  def initialize(course, user, read_only: false, preloaded_progressions: nil)
     @course = course
     @user = user
     @read_only = read_only
+    @preloaded_progressions = preloaded_progressions
   end
 
   def modules
-    @_modules ||= course.modules_visible_to(user).preload(:content_tags).to_a
+    @_modules ||= begin
+      result = course.modules_visible_to(user, array_is_okay: true).to_a
+      ActiveRecord::Associations::Preloader.new.preload(result, :content_tags)
+      result
+                    end
   end
 
   def current_module
@@ -47,8 +52,13 @@ class CourseProgress
   end
 
   def module_progressions
-    @_module_progressions ||= course.context_module_progressions.
+    @_module_progressions ||= if @preloaded_progressions
+                                module_ids = modules.map(&:id)
+                                @preloaded_progressions[course.id]&.select { |cmp| module_ids.include?(cmp.context_module_id) } || []
+                              else
+                                course.context_module_progressions.
                                   where(user_id: user, context_module_id: modules).to_a
+                              end
   end
 
   def current_position

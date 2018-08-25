@@ -42,7 +42,7 @@ class ProvisionalGradesBaseController < ApplicationController
     submission = @assignment.submissions.where(user_id: @student).first
 
     return render json: json if submission&.updated_at.to_i == last_updated.to_i
-    return render_unauthorized_action unless @context.grants_right?(@current_user, session, :moderate_grades)
+    return render_unauthorized_action unless @assignment.permits_moderation?(@current_user)
 
     selection = @assignment.moderated_grading_selections.where(student_id: @student).first
 

@@ -173,7 +173,7 @@ module Importers
           item.workflow_state = (hash[:available] || !item.can_unpublish?) ? 'available' : 'unpublished'
           item.saved_by = :migration
           item.quiz_groups.destroy_all
-          item.quiz_questions.destroy_all
+          item.quiz_questions.preload(assessment_question: :assessment_question_bank).destroy_all
           item.save
         end
       end

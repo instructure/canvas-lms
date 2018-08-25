@@ -3,11 +3,13 @@
 --- 
 nl: 
   1_item_scores_5512cd03: "1- Item scores"
+  1_item_scores_examplescores_9736236: "1- Itemscores: %{exampleScores}"
   1_user_found_76399771: "1 gebruiker gevonden."
   1st_reviewer_3c1d0119: "1e Revisor"
   25th_75th_ile_406a67bf: "25e-75e %iel"
   25th_75th_percentile_aa4c11f2: "25e-75e percentiel"
   2_final_score_7b0fd15e: "2. Uiteindelijke score"
+  2_final_score_exampleresult_922edf9c: "2- Eindscore: %{exampleResult}"
   2nd_reviewer_94fdbcd: "2e Revisor"
   451_message: 
     description: "Je hebt geen toestemming tot deze website, omdat je in een land bent dat onderhevig is aan VS handelsbeperkingen."
@@ -1608,6 +1610,7 @@ nl:
   affects_viewing_the_publish_course_conclude_course_76d2f601: |-
       Bepaalt de weergave van de knoppen Cursus publiceren, Cursus afsluiten en Deze cursus definitief verwijderen.
       De knop Deze cursus definitief verwijderen wordt alleen weergegeven voor handmatig gemaakte cursussen.
+  afghanistan_93_ab06805: "Afghanistan (+93)"
   after_48b9d69: Na...
   after_4c71e718: Na
   after_cbb5ebae: Na...
@@ -3968,6 +3971,7 @@ nl:
   cannot_be_present_when_course_id_is_present_785e6a59: "mag niet aanwezig zijn als course_id aanwezig is"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Kan geen overschreven inleverdatum wijzigen in een datum binnen een afgesloten beoordelingsperiode"
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "Kan rolnaam %{label} niet wijzigen: is al in gebruik"
+  cannot_change_the_default_term_name_edc2279b: "Kan de standaard periodenaam niet wijzigen"
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Kan de inleverdatum van een overschrijving niet wijzigen binnen een afgesloten beoordelingsperiode"
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "Kan de inleverdatum niet wijzigen in een datum binnen een afgesloten beoordelingsperiode"
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: "Kan de inleverdatum niet wijzigen wanneer deze binnen een afgesloten beoordelingsperiode valt"
@@ -4135,10 +4139,12 @@ nl:
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Klik op een snapshot om terug te keren naar je proefversie zoals deze was op het moment dat de snapshot werd gemaakt. Opmerking: Je verliest al het werk dat je hebt uitgevoerd sinds de snapshot is gemaakt. Dit kan niet ongedaan worden gemaakt!"
   click_to_add_a_name_6cf551b0: "Klik om een naam toe te voegen"
   click_to_change_profile_picture_for_display_name_6a4b41db: "Klikken om profielfoto te wijzigen voor %{display_name}"
+  click_to_collapse_outcome_details_1d751617: "Klik om leerdoeldetails samen te vouwen"
   click_to_create_a_new_user_for_address_325f6683: "Klik om een nieuwe gebruiker te maken voor %{address}"
   click_to_create_a_new_user_for_login_56d2daf5: "Klik om een nieuwe gebruiker te maken voor %{login}"
   click_to_edit_drag_to_reorder_ab725681: "Klikken om te bewerken, slepen om volgorde te wijzigen"
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Klik om opmerkingen toe te voegen, als de cursist dit antwoord kiest"
+  click_to_expand_outcome_details_74a2a967: "Klik om leerdoeldetails uit te vouwen"
   click_to_load_a020891b: "(klik om te laden)"
   click_to_modify_89fa26aa: "Klikken om weer te wijzigen"
   click_to_order_by_email_ascending_98b1a697: "Klik om te rangschikken op e-mail oplopend"
@@ -9328,6 +9334,7 @@ nl:
   grader_d1198a9c: Revisor
   grader_graderindex_45e04e57: "Beoordelaar %{graderIndex}"
   grader_gradernumber_fef5d5cf: "Revisor %{graderNumber}"
+  grader_index_a55577a2: "Beoordelaar %{index}"
   grader_is_required_62c88f67: "Beoordelaar is vereist"
   grader_that_determines_final_grade_cc55f20: "Beoordelaar die het eindcijfer bepaalt"
   graders_can_view_each_other_s_comments_d836b848: "Beoordelaars kunnen elkaars opmerkingen bekijken"
@@ -10079,9 +10086,11 @@ nl:
   hide_key_e8fe1e8c: "Sleutel verbergen"
   hide_navigation_menu_f0b3e90: "Navigatiemenu verbergen"
   hide_notes_column_7749f408: "Opmerkingen in kolom verbergen"
+  hide_outcomes_with_no_results_7e4ce06f: "Verberg leerdoelen zonder resultaten"
   hide_score_total_for_assessment_results_d0ef117f: "Totaalscore van beoordelingsresultaten verbergen"
   hide_sidebar_2b5b3776: "Zijbalk verbergen"
   hide_student_names_3e59e862: "Namen van cursisten verbergen"
+  hide_students_with_no_results_6a22f991: "Verberg cursisten zonder resultaten"
   hide_sub_accounts_for_account_name_a6de98bd: "Subaccounts verbergen voor %{account_name}"
   high_b5cbd048: Hoog
   high_contrast_description: |-
@@ -10555,6 +10564,7 @@ nl:
       Functies, instellingen en stijlen die meer van toepassing zijn in een omgeving van het basisonderwijs, het lager en hoger middelbaar onderwijs. Voor nu, houdt dit slechts
       enkele stijlwijzigingen in, maar meer specifieke aanpassingen voor het basisonderwijs, het lager en hoger middelbaar onderwijs kunnen in de toekomst toegevoegd worden.
   k_2521301c: k
+  kazakhstan_7_8fe892c: "Kazachstan (+7)"
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "Hou in gedachten: deze inzending zal voor iedereen van jouw %{groupType}-groep tellen."
   keep_submissions_anonymous_5cbaf419: "Inzendingen anoniem houden"
   kenya_254_2945663a: "Kenia (+254)"
@@ -10571,6 +10581,7 @@ nl:
   kind_7f0a88c4: Soort
   labels: 
     lock_module_until: "Vergrendelen tot"
+  last_assessment_cd5659b6: "Laatste beoordeling: "
   last_changed_b544504d: "Laatst gewijzigd:"
   last_changed_date_82f1ce56: "Laatst gewijzigd: %{date}"
   last_day_attended_b72d623c: "Datum laatste keer bijgewoond "
@@ -13423,6 +13434,7 @@ nl:
   new_course_role_6a7bb75f: "Nieuwe cursusfunctie"
   new_criterion_6054bc7f: "Nieuw criterium"
   new_criterion_canceled_d8c2a655: "Nieuw criterium geannuleerd"
+  new_discussion_dae4fae3: "Nieuwe discussie"
   new_event_for_course_name_2ba1f734: "Nieuwe gebeurtenis voor %{course_name}"
   new_export_3ab758: "Nieuwe export"
   new_features_for_developer_key_management_994090dc: "Nieuwe functies voor beheer van ontwikkelaarssleutel"
@@ -13526,6 +13538,7 @@ nl:
   no_subject_58b7941c: "Geen onderwerp"
   no_subject_970aad80: "Geen onderwerp"
   no_submission_for_assignment_a9cb6fe2: "Geen inlevering voor %{assignment}"
+  no_submissions_164cea23: "Geen inleveringen"
   no_terms_eab5ee7b: "Geen voorwaarden"
   no_tls_618add1a: "Geen TLS"
   no_unassigned_terms_deb7b76b: "Geen toegewezen periodes"
@@ -14246,7 +14259,7 @@ nl:
     cannot_unpublish_front_page: "Publicatie van de voorpagina kan niet ongedaan worden gemaakt"
     delete_button: Verwijderen
     delete_confirmation: "Weet je zeker dat je deze pagina wilt verwijderen?"
-    delete_dialog_title: "Wikipagina verwijderen"
+    delete_dialog_title: "Pagina verwijderen"
     deleting_button: "Bezig met verwijderen..."
     edit_dialog_title: "Pagina bewerken"
     errors: 
@@ -17261,6 +17274,7 @@ nl:
   rubrics_b5ef369b: Rubrieken
   running_c5a4998d: Uitvoeren
   russia_7_87bc99d5: "Rusland (+7)"
+  rwanda_250_1a6b344b: "Rwanda (+250)"
   salesforce_account_id_eb5c78ad: "ID van account in Salesforce "
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce heeft een andere aanmeldingshost voor sandbox accounts dan voor de productie van accounts, dus als je een Salesforce Sandbox-account gebruikt,en je dit veld niet aanvinkt, zal het niet geverifieerd worden (dit werkt ook omgekeerd, als je een productie account hebt en je het vakje WEL aanvinkt, zal het niet geverifieerd worden)"
   salesforce_ticketing_webtocase_connector_80f75716: "Salesforce Ticketing WebToCase Connector"
@@ -18957,6 +18971,7 @@ nl:
     update_grade: "Cijfer bijwerken"
     view_rubric_assessment_in_the_speedgrader: "Beoordeling van rubriek weergeven in SpeedGrader"
   submission_in_another_grading_period_e754b329: "Inzending in een andere beoordelingsperiode"
+  submission_index_e960f9bf: "Inzending %{index}"
   submission_options_5184a65b: "Opties voor inleveringen"
   submission_score_b7a291e8: "score van inzending"
   submission_status_3079e730: Inzendingsstatus
@@ -19442,6 +19457,7 @@ nl:
   there_was_a_problem_updating_the_comment_5f3595b9: "Er is een probleem met het bijwerken van de opmerking"
   there_was_a_problem_updating_the_grade_1b6c8b4c: "Er is een probleem met het bijwerken van het cijfer."
   there_was_a_problem_updating_the_submission_6e5280a1: "Er is een probleem met het bijwerken van de inzending."
+  there_was_an_error_fetching_course_statistics_96e9dbad: "Er is een fout met het ophalen van cursusstatistieken"
   there_was_an_error_fetching_outcome_results_45c57590: "Er is een fout met het ophalen van leerdoelresultaten"
   there_was_an_error_fetching_submission_comments_ce153077: "Er is een fout met het ophalen van opmerkingen bij de inzending"
   there_was_an_error_generating_the_pairing_code_9edd639b: "Er is een fout opgetreden bij het genereren van de koppelingscode"
@@ -19855,6 +19871,7 @@ nl:
   to_access_the_account_courses_page_courses_view_li_e1da6165: "Om de accountpagina Cursussen te openen, moet Cursussen - lijst weergeven zijn ingeschakeld."
   to_access_the_assignments_index_page_course_conten_a5b00f98: "Voor toegang tot de indexpagina Opdrachten, moet Cursusinhoud - weergeven zijn ingeschakeld. Om andere opdrachten aan verschillende cursisten toe te wijzen, moet Gebruikers - lijst weergeven ook zijn ingeschakeld."
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "Om de pagina Personen te openen en groepen weer te geven, moet Gebruikers - lijst weergeven ook zijn ingeschakeld."
+  to_access_the_people_page_users_view_list_must_be__2f01333b: "Om de pagina Personen te openen, moet Gebruikers - lijst weergeven zijn ingeschakeld. Als deze machtiging is ingeschakeld en als Gebruikers - primair e-mailadres weergeven is uitgeschakeld, krijgen gebruikers e-mailadressen te zien die worden gebruikt als aanmeldings-ID's. Om aanmeldings-ID's weer te geven, moeten Gebruikers - cursisten toevoegen aan/verwijderen uit cursussen en Gebruikers - cursusleiders, cursusontwerpers of onderwijsassistenten toevoegen aan/verwijderen uit cursussen ook zijn ingeschakeld."
   to_access_the_people_page_users_view_list_must_be__5a5475fe: "Om de pagina Personen te openen, moet Gebruikers - lijst weergeven zijn ingeschakeld."
   to_access_the_people_page_users_view_list_must_be__756d7188: |-
       Om de pagina Personen te openen, moet Gebruikers - lijst weergeven zijn ingeschakeld.
@@ -19914,6 +19931,7 @@ nl:
   to_differentiate_assignments_to_individual_student_6cc40fde: "Om andere opdrachten aan verschillende cursisten toe te wijzen, moet Gebruikers - lijst weergeven ook zijn ingeschakeld."
   to_do_1d554f36: "To-do lijst"
   to_do_5526f10a: "To-do:"
+  to_do_6ac7b2dc: "To-do:"
   to_do_date_d6b79bfd: "To-do %{date}"
   to_do_date_ddfb582c: "Datum to-do:"
   to_do_items_loading_d1cdfcd5: "To-do-items laden"
@@ -21225,6 +21243,7 @@ nl:
   you_have_submitted_the_assignment_7ef8a51a: "Je  hebt de opdracht ingeleverd"
   you_have_unsynced_changes_that_will_sync_to_all_as_9028e711: "U heeft niet-gesynchroniseerde wijzigingen die gesynchroniseerd zullen worden met alle gekoppelde cursussen zodra een nieuwe koppeling wordt opgeslagen."
   you_just_sent_a_message_in_canvas_86b4945c: "Je hebt net een bericht in Canvas verzonden"
+  you_left_the_required_name_field_empty_8f9bce5c: "Je hebt het vereiste naamveld leeg gelaten."
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "Jij zult er zeker enkele van deze willen zien. Wat is de lol om een cursus te geven als niemand luistert? "
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "Je moet een token verversen, volg de stappen onder deze link, mogelijk heb je een technische expert nodig om je te helpen"
   you_may_not_reproduce_or_communicate_any_of_the_co_7636b552: "Je mag niets uit deze cursus reproduceren of communiceren, met inbegrip van bestanden die vanuit deze cursus worden geëxporteerd, zonder voorafgaande schriftelijke toestemming van je opleidingsinstituut.  Vraag bij het instituut naar specifieke richtlijnen voor online gebruikersovereenkomsten"

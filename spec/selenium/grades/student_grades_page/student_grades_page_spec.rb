@@ -98,4 +98,62 @@ describe "gradebook - logged in as a student" do
       end
     end
   end
+
+  describe 'grade-only assignment' do
+    before :once do
+      skip('Unskip in GRADE-1359')
+      course_with_teacher(name: "Teacher Boss", active_course: true, active_user: true)
+      course_with_student(course: @course, name: "Student Slave", active_all: true)
+      @assignment = @course.assignments.create!(
+        title: 'Grade Only Assignment',
+        grading_type: 'grade_only',
+        points_possible: 10,
+        submission_types: 'online_text_entry'
+      )
+      @assignment.grade_student(@student, grade: 'A', grader: @teacher)
+    end
+
+    before :each do
+      skip('Unskip in GRADE-1359')
+      user_session(@student)
+      StudentGradesPage.visit_as_student(@course)
+    end
+
+    it 'does not show point/percentage on student grades page' do
+      skip('Unskip in GRADE-1359')
+
+      expect(StudentGradesPage.fetch_assignment_score(@assignment)).to eql "A"
+      expect(StudentGradesPage.assignment_row(@assignment)).not_to include_text "10"
+    end
+
+    it 'shows total grade not as points' do
+      skip('Unskip in GRADE-1359')
+
+      @assignment2 = @course.assignments.create!(
+        title: 'Another Grade Only Assignment',
+        grading_type: 'grade_only',
+        points_possible: 50,
+        submission_types: 'online_text_entry'
+      )
+      @assignment2.grade_student(@student, grade: 'B', grader: @teacher)
+
+      expect(StudentGradesPage.final_grade.text).to eql 'A-'
+      expect(StudentGradesPage.final_points_possible).to eql 'A-'
+    end
+
+    it 'does not calculate into total points' do
+      skip('Unskip in GRADE-1359')
+
+      @assignment2 = @course.assignments.create!(
+        title: 'Points Assignment',
+        grading_type: 'points',
+        points_possible: 100,
+        submission_types: 'online_text_entry'
+      )
+      @assignment2.grade_student(@student, grade: 80, grader: @teacher)
+
+      expect(StudentGradePage.final_points_possible).to include_text '80 / 100'
+      expect(StudentGradePage.final_grade.text).to eql '80%'
+    end
+  end
 end

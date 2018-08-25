@@ -18,7 +18,6 @@
 
 import I18n from 'i18n!permission_button'
 import PropTypes from 'prop-types'
-import Parser from 'html-react-parser'
 import React, {Component} from 'react'
 import {renderToString} from 'react-dom/server'
 import {connect} from 'react-redux'
@@ -43,6 +42,31 @@ const MENU_ID_ENABLED_AND_LOCKED = 3
 const MENU_ID_DISABLED = 4
 const MENU_ID_DISABLED_AND_LOCKED = 5
 
+const BUTTONS = {
+  enabled: {
+    __html: renderToString(
+      <Text color="success">
+        <IconPublish size="x-small" />
+      </Text>
+    )
+  },
+  disabled: {
+    __html: renderToString(
+      <Text color="error">
+        <IconTrouble size="x-small" />
+      </Text>
+    )
+  }
+}
+
+const lockIcon = {
+  __html: renderToString(
+    <Text color="primary">
+      <IconLock />
+    </Text>
+  )
+}
+
 export default class PermissionButton extends Component {
   static propTypes = {
     cleanFocus: PropTypes.func.isRequired,
@@ -55,18 +79,15 @@ export default class PermissionButton extends Component {
     roleLabel: PropTypes.string,
     roleId: PropTypes.string.isRequired,
     setFocus: PropTypes.bool.isRequired,
-    onFocus: PropTypes.func.isRequired,
-    useCaching: PropTypes.bool // Allows disabling of cache for unit tests
+    onFocus: PropTypes.func.isRequired
   }
 
   static defaultProps = {
-    useCaching: true,
     roleLabel: ''
   }
 
   state = {
-    showMenu: false,
-    useCaching: this.props.useCaching
+    showMenu: false
   }
 
   componentDidMount = () => {
@@ -74,14 +95,6 @@ export default class PermissionButton extends Component {
       this.button.focus()
       this.props.cleanFocus()
     }
-  }
-
-  componentWillReceiveProps() {
-    // When updating an already rendered component we need to not use the
-    // caching, otherwise we could end up with a button that has a different
-    // react-id, and that just ruins everything. The caching is a speed up for
-    // initial page load, swapping between tabs, etc.
-    this.setState({useCaching: false})
   }
 
   componentDidUpdate = () => {
@@ -93,48 +106,6 @@ export default class PermissionButton extends Component {
 
   setupButtonRef = c => {
     this.button = c
-  }
-
-  getCachedButton = isEnabled => {
-    const storageKey = isEnabled ? 'enabledButton' : 'disabledButton'
-
-    if (this.state.useCaching) {
-      const retrievedObject = localStorage.getItem(storageKey)
-      if (retrievedObject) {
-        return Parser(retrievedObject)
-      }
-    }
-
-    const button = (
-      <Text color={isEnabled ? 'success' : 'error'}>
-        {isEnabled ? <IconPublish size="x-small" /> : <IconTrouble size="x-small" />}
-      </Text>
-    )
-
-    if (this.state.useCaching) {
-      localStorage.setItem(storageKey, renderToString(button))
-    }
-    return button
-  }
-
-  getCachedLockIcon = () => {
-    if (this.state.useCaching) {
-      const retrievedObject = localStorage.getItem('lockedIcon')
-      if (retrievedObject) {
-        return Parser(retrievedObject)
-      }
-    }
-
-    const icon = (
-      <Text color="primary">
-        <IconLock />
-      </Text>
-    )
-
-    if (this.state.useCaching) {
-      localStorage.setItem('lockedIcon', renderToString(icon))
-    }
-    return icon
   }
 
   openMenu = () => {
@@ -186,9 +157,8 @@ export default class PermissionButton extends Component {
         onClick={this.state.showMenu ? this.closeMenu : this.openMenu}
         disabled={this.props.permission.readonly}
         onFocus={this.props.onFocus}
-      >
-        {this.getCachedButton(this.props.permission.enabled)}
-      </button>
+        dangerouslySetInnerHTML={BUTTONS[this.props.permission.enabled ? 'enabled' : 'disabled']}
+      />
     )
   }
 
@@ -335,9 +305,8 @@ export default class PermissionButton extends Component {
               ? null
               : 'ic-hidden-button'
           }
-        >
-          {this.getCachedLockIcon()}
-        </div>
+          dangerouslySetInnerHTML={lockIcon}
+        />
       </div>
     )
   }

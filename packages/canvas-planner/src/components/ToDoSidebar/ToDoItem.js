@@ -18,6 +18,7 @@
 
 import React from 'react';
 import Button from '@instructure/ui-buttons/lib/components/Button';
+import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton';
 import Link from '@instructure/ui-elements/lib/components/Link';
 import Text from '@instructure/ui-elements/lib/components/Text';
 import List from '@instructure/ui-elements/lib/components/List';
@@ -27,7 +28,7 @@ import AssignmentIcon from   '@instructure/ui-icons/lib/Line/IconAssignment';
 import QuizIcon from         '@instructure/ui-icons/lib/Line/IconQuiz';
 import AnnouncementIcon from '@instructure/ui-icons/lib/Line/IconAnnouncement';
 import DiscussionIcon from   '@instructure/ui-icons/lib/Line/IconDiscussion';
-import NoteIcon from         '@instructure/ui-icons/lib/Line/IconNoteLight';
+import NoteIcon from         '@instructure/ui-icons/lib/Line/IconNote';
 import CalendarIcon from     '@instructure/ui-icons/lib/Line/IconCalendarMonth';
 import PageIcon from         '@instructure/ui-icons/lib/Line/IconMsWord';
 import XIcon from            '@instructure/ui-icons/lib/Line/IconX';
@@ -111,15 +112,14 @@ export default class ToDoItem extends React.Component {
           </List>
         </div>
         <div className="ToDoSidebarItem__Close">
-          <Button
+          <CloseButton
             variant="icon"
             size="small"
             onClick={this.handleClick}
             buttonRef={(elt) => {this.buttonRef = elt;}}
-            aria-label={formatMessage('Dismiss {itemTitle}', {itemTitle: this.props.item.title})}
           >
-            <XIcon className="ToDoSidebarItem__CloseIcon" />
-          </Button>
+            {formatMessage('Dismiss {itemTitle}', {itemTitle: this.props.item.title})}
+          </CloseButton>
         </div>
       </div>
     );

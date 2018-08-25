@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React from 'react';
 import {shape, func, arrayOf, string} from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
 import _ from 'underscore'
@@ -24,6 +24,7 @@ import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReade
 import UsersList from './UsersList'
 import UsersToolbar from './UsersToolbar'
 import SearchMessage from './SearchMessage'
+import SRSearchMessage from './SRSearchMessage'
 import UserActions from '../actions/UserActions'
 
 const MIN_SEARCH_LENGTH = 3;
@@ -50,6 +51,7 @@ export default class UsersPane extends React.Component {
 
     this.state = {
       userList: props.store.getState().userList,
+      srMessageDisplayed: false
     }
   }
 
@@ -112,6 +114,11 @@ export default class UsersPane extends React.Component {
           {...searchFilter}
           accountId={accountId.toString()}
           roles={this.props.roles}
+          toggleSRMessage={
+            (show = false) => {
+              this.setState({ srMessageDisplayed: show})
+            }
+          }
         />}
 
         {!_.isEmpty(users) && !isLoading &&
@@ -123,14 +130,19 @@ export default class UsersPane extends React.Component {
           handleSubmitEditUserForm={this.handleSubmitEditUserForm}
           permissions={this.state.userList.permissions}
         />
-          }
-
+        }
         <SearchMessage
           collection={{data: users, loading: isLoading, links}}
           setPage={this.handleSetPage}
           noneFoundMessage={I18n.t('No users found')}
           dataType="User"
         />
+        {this.state.srMessageDisplayed && (
+          <SRSearchMessage
+            collection={{data: users, loading: isLoading, links}}
+            dataType="User"
+          />
+        )}
       </div>
     )
   }

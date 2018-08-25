@@ -57,7 +57,7 @@ class Course < ActiveRecord::Base
   has_many :active_course_sections, -> { where(workflow_state: 'active') }, class_name: 'CourseSection'
   has_many :enrollments, -> { where("enrollments.workflow_state<>'deleted'") }, inverse_of: :course
 
-  has_many :all_enrollments, :class_name => 'Enrollment'
+  has_many :all_enrollments, class_name: 'Enrollment', inverse_of: :course
   has_many :current_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')").preload(:user) }, class_name: 'Enrollment'
   has_many :all_current_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')").preload(:user) }, class_name: 'Enrollment'
   has_many :prior_enrollments, -> { preload(:user, :course).where(workflow_state: 'completed') }, class_name: 'Enrollment'
@@ -162,7 +162,7 @@ class Course < ActiveRecord::Base
   belongs_to :default_grading_standard, :class_name => 'GradingStandard', :foreign_key => 'grading_standard_id'
   has_many :grading_standards, -> { where("workflow_state<>'deleted'") }, as: :context, inverse_of: :context
   has_many :web_conferences, -> { order('created_at DESC') }, as: :context, inverse_of: :context, dependent: :destroy
-  has_many :collaborations, -> { order("#{Collaboration.quoted_table_name}.title, #{Collaboration.quoted_table_name}.created_at") }, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :collaborations, -> { order(Arel.sql("collaborations.title, collaborations.created_at")) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :context_modules, -> { order(:position) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :context_module_progressions, through: :context_modules
   has_many :active_context_modules, -> { where(workflow_state: 'active') }, as: :context, inverse_of: :context, class_name: 'ContextModule'
@@ -317,11 +317,19 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def modules_visible_to(user)
+  def modules_visible_to(user, array_is_okay: false)
     if self.grants_right?(user, :view_unpublished_items)
-      self.context_modules.not_deleted
+      if array_is_okay && association(:context_modules).loaded?
+        context_modules.select { |cm| !cm.deleted? }
+      else
+        context_modules.not_deleted
+      end
     else
-      self.context_modules.active
+      if array_is_okay && association(:context_modules).loaded?
+        context_modules.select(&:active?)
+      else
+        context_modules.active
+      end
     end
   end
 
@@ -620,7 +628,11 @@ class Course < ActiveRecord::Base
   def associated_accounts
     Rails.cache.fetch(["associated_accounts", self]) do
       Shackles.activate(:slave) do
-        accounts = self.non_unique_associated_accounts.to_a.uniq
+        if association(:course_account_associations).loaded? && !association(:non_unique_associated_accounts).loaded?
+          accounts = course_account_associations.map(&:account).uniq
+        else
+          accounts = self.non_unique_associated_accounts.to_a.uniq
+        end
         accounts << self.account if account_id && !accounts.find { |a| a.id == account_id }
         accounts << self.root_account if root_account_id && !accounts.find { |a| a.id == root_account_id }
         accounts
@@ -931,7 +943,7 @@ class Course < ActiveRecord::Base
       end
       self.account_id ||= self.root_account_id
     end
-    self.root_account_id ||= Account.default.id
+    self.root_account = Account.default if root_account_id.nil?
     self.account_id ||= self.root_account_id
     self.enrollment_term = nil if self.enrollment_term.try(:root_account_id) != self.root_account_id
     self.enrollment_term ||= self.root_account.default_enrollment_term
@@ -1505,11 +1517,12 @@ class Course < ActiveRecord::Base
     is_unpublished = self.created? || self.claimed?
     @enrollment_lookup ||= {}
     @enrollment_lookup[user.id] ||= shard.activate do
-      self.enrollments.active_or_pending.for_user(user).preload(:enrollment_state).to_a.
-        reject { |e| (is_unpublished && !(e.admin? || e.fake_student?)) || [:inactive, :completed].include?(e.state_based_on_date)}
+      scope = self.enrollments.for_user(user).active_or_pending_by_date.select("enrollments.*, enrollment_states.state AS date_based_state_in_db")
+      scope = scope.where(:type => ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentViewEnrollment']) if is_unpublished
+      scope.to_a
     end
 
-    @enrollment_lookup[user.id].any? {|e| (allow_future || e.state_based_on_date == :active) && e.has_permission_to?(permission) }
+    @enrollment_lookup[user.id].any? {|e| (allow_future || e.date_based_state_in_db == 'active') && e.has_permission_to?(permission) }
   end
 
   def self.find_all_by_context_code(codes)
@@ -2627,13 +2640,23 @@ class Course < ActiveRecord::Base
       tabs.delete_if {|t| t[:id] == TAB_SETTINGS }
       tabs << settings_tab
 
+      check_for_permission = lambda do |*permissions|
+        permissions.any? do |permission|
+          if opts[:precalculated_permissions]&.has_key?(permission)
+            opts[:precalculated_permissions][permission]
+          else
+            self.grants_right?(user, opts[:session], permission)
+          end
+        end
+      end
+
       tabs.each do |tab|
         tab[:hidden_unused] = true if tab[:id] == TAB_MODULES && !active_record_types[:modules]
         tab[:hidden_unused] = true if tab[:id] == TAB_FILES && !active_record_types[:files]
         tab[:hidden_unused] = true if tab[:id] == TAB_QUIZZES && !active_record_types[:quizzes]
         tab[:hidden_unused] = true if tab[:id] == TAB_ASSIGNMENTS && !active_record_types[:assignments]
         tab[:hidden_unused] = true if tab[:id] == TAB_PAGES && !active_record_types[:pages] && !allow_student_wiki_edits
-        tab[:hidden_unused] = true if tab[:id] == TAB_CONFERENCES && !active_record_types[:conferences] && !self.grants_right?(user, :create_conferences)
+        tab[:hidden_unused] = true if tab[:id] == TAB_CONFERENCES && !active_record_types[:conferences] && !check_for_permission.call(:create_conferences)
         tab[:hidden_unused] = true if tab[:id] == TAB_ANNOUNCEMENTS && !active_record_types[:announcements]
         tab[:hidden_unused] = true if tab[:id] == TAB_OUTCOMES && !active_record_types[:outcomes]
         tab[:hidden_unused] = true if tab[:id] == TAB_DISCUSSIONS && !active_record_types[:discussions] && !allow_student_discussion_topics
@@ -2641,7 +2664,7 @@ class Course < ActiveRecord::Base
 
       # remove tabs that the user doesn't have access to
       unless opts[:for_reordering]
-        unless self.grants_any_right?(user, opts[:session], :read, :manage_content)
+        unless check_for_permission.call(:read, :manage_content)
           tabs.delete_if { |t| t[:id] == TAB_HOME }
           tabs.delete_if { |t| t[:id] == TAB_ANNOUNCEMENTS }
           tabs.delete_if { |t| t[:id] == TAB_PAGES }
@@ -2650,45 +2673,45 @@ class Course < ActiveRecord::Base
           tabs.delete_if { |t| t[:id] == TAB_COLLABORATIONS }
           tabs.delete_if { |t| t[:id] == TAB_MODULES }
         end
-        unless self.grants_any_right?(user, opts[:session], :participate_as_student, :read_as_admin)
+        unless check_for_permission.call(:participate_as_student, :read_as_admin)
           tabs.delete_if{ |t| t[:visibility] == 'members' }
         end
-        unless self.grants_any_right?(user, opts[:session], :read, :manage_content, :manage_assignments)
+        unless check_for_permission.call(:read, :manage_content, :manage_assignments)
           tabs.delete_if { |t| t[:id] == TAB_ASSIGNMENTS }
           tabs.delete_if { |t| t[:id] == TAB_QUIZZES }
         end
-        unless self.grants_any_right?(user, opts[:session], :read, :read_syllabus, :manage_content, :manage_assignments)
+        unless check_for_permission.call(:read, :read_syllabus, :manage_content, :manage_assignments)
           tabs.delete_if { |t| t[:id] == TAB_SYLLABUS }
         end
-        tabs.delete_if{ |t| t[:visibility] == 'admins' } unless self.grants_right?(user, opts[:session], :read_as_admin)
-        if self.grants_any_right?(user, opts[:session], :manage_content, :manage_assignments)
+        tabs.delete_if{ |t| t[:visibility] == 'admins' } unless check_for_permission.call(:read_as_admin)
+        if check_for_permission.call(:manage_content, :manage_assignments)
           tabs.detect { |t| t[:id] == TAB_ASSIGNMENTS }[:manageable] = true
           tabs.detect { |t| t[:id] == TAB_SYLLABUS }[:manageable] = true
           tabs.detect { |t| t[:id] == TAB_QUIZZES }[:manageable] = true
         end
-        tabs.delete_if { |t| t[:hidden] && t[:external] } unless opts[:api] && self.grants_right?(user,  :read_as_admin)
-        tabs.delete_if { |t| t[:id] == TAB_GRADES } unless self.grants_any_right?(user, opts[:session], :read_grades, :view_all_grades, :manage_grades)
-        tabs.detect { |t| t[:id] == TAB_GRADES }[:manageable] = true if self.grants_any_right?(user, opts[:session], :view_all_grades, :manage_grades)
-        tabs.delete_if { |t| t[:id] == TAB_PEOPLE } unless self.grants_any_right?(user, opts[:session], :read_roster, :manage_students, :manage_admin_users)
-        tabs.detect { |t| t[:id] == TAB_PEOPLE }[:manageable] = true if self.grants_any_right?(user, opts[:session], :manage_students, :manage_admin_users)
-        tabs.delete_if { |t| t[:id] == TAB_FILES } unless self.grants_any_right?(user, opts[:session], :read, :manage_files)
-        tabs.detect { |t| t[:id] == TAB_FILES }[:manageable] = true if self.grants_right?(user, opts[:session], :manage_files)
-        tabs.delete_if { |t| t[:id] == TAB_DISCUSSIONS } unless self.grants_any_right?(user, opts[:session], :read_forum, :moderate_forum, :post_to_forum)
-        tabs.detect { |t| t[:id] == TAB_DISCUSSIONS }[:manageable] = true if self.grants_right?(user, opts[:session], :moderate_forum)
-        tabs.delete_if { |t| t[:id] == TAB_SETTINGS } unless self.grants_right?(user, opts[:session], :read_as_admin)
+        tabs.delete_if { |t| t[:hidden] && t[:external] } unless opts[:api] && check_for_permission.call(:read_as_admin)
+        tabs.delete_if { |t| t[:id] == TAB_GRADES } unless check_for_permission.call(:read_grades, :view_all_grades, :manage_grades)
+        tabs.detect { |t| t[:id] == TAB_GRADES }[:manageable] = true if check_for_permission.call(:view_all_grades, :manage_grades)
+        tabs.delete_if { |t| t[:id] == TAB_PEOPLE } unless check_for_permission.call(:read_roster, :manage_students, :manage_admin_users)
+        tabs.detect { |t| t[:id] == TAB_PEOPLE }[:manageable] = true if check_for_permission.call(:manage_students, :manage_admin_users)
+        tabs.delete_if { |t| t[:id] == TAB_FILES } unless check_for_permission.call(:read, :manage_files)
+        tabs.detect { |t| t[:id] == TAB_FILES }[:manageable] = true if check_for_permission.call(:manage_files)
+        tabs.delete_if { |t| t[:id] == TAB_DISCUSSIONS } unless check_for_permission.call(:read_forum, :post_to_forum, :moderate_forum)
+        tabs.detect { |t| t[:id] == TAB_DISCUSSIONS }[:manageable] = true if check_for_permission.call(:moderate_forum)
+        tabs.delete_if { |t| t[:id] == TAB_SETTINGS } unless check_for_permission.call(:read_as_admin)
 
-        unless announcements.temp_record.grants_right?(user, :read)
+        unless check_for_permission.call(:read_announcements)
           tabs.delete_if { |t| t[:id] == TAB_ANNOUNCEMENTS }
         end
 
-        if !user || !self.grants_right?(user, :manage_content)
+        if !user || !check_for_permission.call(:manage_content)
           # remove outcomes tab for logged-out users or non-students
-          unless grants_any_right?(user, :read_as_admin, :participate_as_student)
+          unless check_for_permission.call(:participate_as_student, :read_as_admin)
             tabs.delete_if { |t| t[:id] == TAB_OUTCOMES }
           end
 
           # remove hidden tabs from students
-          unless self.grants_right?(user, opts[:session], :read_as_admin)
+          unless check_for_permission.call(:read_as_admin)
             tabs.delete_if {|t| (t[:hidden] || (t[:hidden_unused] && !opts[:include_hidden_unused])) && !t[:manageable] }
           end
         end

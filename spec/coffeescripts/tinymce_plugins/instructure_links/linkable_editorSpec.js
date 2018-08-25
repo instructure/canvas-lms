@@ -29,7 +29,9 @@ QUnit.module('LinkableEditor', {
     rawEditor = {
       id: 'some_editor',
       selection: {
-        getContent: () => 'Some Content'
+        getContent: () => 'Some Content',
+        getNode: () => {},
+        getRng: () => {}
       }
     }
   },
@@ -58,6 +60,10 @@ test('shipping a new link to the editor instance', function() {
     classes: '',
     dataAttributes: undefined,
     selectedContent: 'Some Content',
+    selectionDetails: {
+      node: undefined,
+      range: undefined
+    },
     url: 'Link HREF'
   }
   const edMock = sandbox.mock(jqueryEditor)
@@ -68,7 +74,11 @@ test('shipping a new link to the editor instance', function() {
 test('createLink passes data attributes to create_link command', function() {
   sandbox.stub(RceCommandShim, 'send')
   const dataAttrs = {}
-  const le = new LinkableEditor({selection: {getContent: () => ({})}})
+  const le = new LinkableEditor({selection: {
+    getContent: () => ({}),
+    getNode: () => {},
+    getRng: () => {}
+  }})
   le.createLink('text', 'classes', dataAttrs)
   equal(RceCommandShim.send.firstCall.args[2].dataAttributes, dataAttrs)
 })

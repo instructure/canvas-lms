@@ -106,10 +106,6 @@ describe EnrollmentTerm do
 
           expect(term.name).to eq "mreT tluafeD"
           expect(term.read_attribute(:name)).to eq EnrollmentTerm::DEFAULT_TERM_NAME
-          term.name = "my term name"
-          term.save!
-          expect(term.read_attribute(:name)).to eq "my term name"
-          expect(term.name).to eq "my term name"
           term.name = "mreT tluafeD"
           term.save!
           expect(term.read_attribute(:name)).to eq EnrollmentTerm::DEFAULT_TERM_NAME

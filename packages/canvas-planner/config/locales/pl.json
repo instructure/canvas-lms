@@ -1,4 +1,7 @@
 {
+  "add_to_do_7537af64": {
+    "message": "Dodaj listę zadań"
+  },
   "add_to_do_7def3c37": {
     "message": "Dodaj do listy zadań"
   },
@@ -23,11 +26,20 @@
   "assignmenttype_title_6612d008": {
     "message": "{ assignmentType } { title }."
   },
+  "assignmenttype_title_all_day_on_datetime_9768903c": {
+    "message": "{ assignmentType } { title }, cały dzień w { datetime }."
+  },
   "assignmenttype_title_at_datetime_478f0709": {
     "message": "{ assignmentType } { title }, o { datetime }."
   },
+  "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
+    "message": "{ assignmentType } { title }, o godz. { datetime } do { endTime }"
+  },
   "assignmenttype_title_due_datetime_a112d8ff": {
     "message": "{ assignmentType } { title }, termin { datetime }."
+  },
+  "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
+    "message": "{ assignmentType } { title } ma czas na zadanie o godz. { datetime }."
   },
   "assignmenttype_title_is_marked_as_done_a8dc46ef": {
     "message": "{ assignmentType } { title } oznaczono jako gotowe."
@@ -35,8 +47,8 @@
   "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
     "message": "{ assignmentType } { title } nie oznaczono jako gotowe."
   },
-  "assignmenttype_title_on_datetime_446013fb": {
-    "message": "{ assignmentType } { title }, w dniu { datetime }."
+  "assignmenttype_title_posted_datetime_cab69444": {
+    "message": "{ assignmentType } { title } opublikował(a) { datetime }."
   },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Początek historii listy zadań"
@@ -95,8 +107,11 @@
   "due_5d7267be": {
     "message": "Termin:"
   },
-  "due_date_8ce289b6": {
+  "due_date_124fdd99": {
     "message": "Termin: { date }"
+  },
+  "edit_c5fbea07": {
+    "message": "Edytuj"
   },
   "edit_title_72e5a21e": {
     "message": "Edytuj { title }"
@@ -127,6 +142,9 @@
   },
   "feedback_6dcc1991": {
     "message": "Informacje zwrotne"
+  },
+  "go_to_card_view_dashboard_9d03970e": {
+    "message": "Przejdź do panelu nawigacyjnego widoku karty"
   },
   "graded_25cd3fcd": {
     "message": "Oceniono"
@@ -194,8 +212,17 @@
   "no_grade_3b4d7f3e": {
     "message": "Brak oceny"
   },
+  "nothing_more_to_do_b665da42": {
+    "message": "Nic więcej do zrobienia"
+  },
   "nothing_new_needs_attention_3ac548d4": {
     "message": "Nic nie wymaga uwagi."
+  },
+  "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
+    "message": "Nic na dziś nie zaplanowano. Wybór najnowszego elementu."
+  },
+  "nothing_planned_today_selecting_next_item_f6718aa": {
+    "message": "Nic na dziś nie zaplanowano. Wybór następnego elementu."
   },
   "nothing_planned_yet_8675ffe9": {
     "message": "Nic jeszcze nie zaplanowano"
@@ -233,11 +260,23 @@
   "save_11a80ec3": {
     "message": "Zapisz"
   },
+  "scroll_up_to_see_your_history_19b14cad": {
+    "message": "Przewiń w górę, aby wyświetlić historię!"
+  },
+  "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
+    "message": "Przewija w górę do poprzedniego elementu z nową aktywnością."
+  },
+  "show_all_ae37d610": {
+    "message": "Pokaż wszystko"
+  },
   "show_my_grades_ebd08684": {
     "message": "Pokaż moje oceny"
   },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } do { endDate }"
+  },
+  "starttime_to_endtime_d7cc249d": {
+    "message": "{ startTime } do { endTime }"
   },
   "submitted_318fad53": {
     "message": "Przesłano"
@@ -263,6 +302,9 @@
   "to_do_1d554f36": {
     "message": "Lista zadań"
   },
+  "to_do_date_4b211ad0": {
+    "message": "Lista zadań: { date }"
+  },
   "to_do_items_loading_d1cdfcd5": {
     "message": "Wczytywanie listy zadań"
   },
@@ -286,6 +328,9 @@
   },
   "yesterday_c6bd6abf": {
     "message": "Wczoraj"
+  },
+  "you_have_media_feedback_f5f9aba8": {
+    "message": "Masz informacje zwrotne dotyczące multimediów."
   },
   "you_must_provide_a_date_and_time_a86839d2": {
     "message": "Wymagane są data i godzina."

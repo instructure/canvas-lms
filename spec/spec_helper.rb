@@ -495,6 +495,10 @@ RSpec.configure do |config|
     Onceler.configure do |config|
       config.before(:record) do
         Bullet.start_request
+        possible_objects, impossible_objects =
+          onceler.parent&.instance_variable_get(:@bullet_state)
+        possible_objects&.each { |object| Bullet::Detector::NPlusOneQuery.possible_objects.add(object) }
+        impossible_objects&.each { |object| Bullet::Detector::NPlusOneQuery.impossible_objects.add(object) }
       end
 
       config.after(:record) do |tape|

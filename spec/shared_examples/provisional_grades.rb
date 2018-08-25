@@ -55,6 +55,19 @@ RSpec.shared_examples 'a provisional grades status action' do |controller|
       expect(json.fetch('errors')).to include({'message' => 'The specified resource does not exist.'})
     end
 
+    it 'is authorized when the user is an admin with permission to select final grade' do
+      admin = account_admin_user(account: @course.account)
+      api_call_as_user(admin, :get, @path, @params.merge(last_updated_at: 1.day.ago(@submission.updated_at)), {}, {})
+      expect(response).to be_success
+    end
+
+    it 'is unauthorized when the user is an admin without permission to select final grade' do
+      admin = account_admin_user(account: @course.account)
+      @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :select_final_grade)
+      api_call_as_user(admin, :get, @path, @params.merge(last_updated_at: 1.day.ago(@submission.updated_at)), {}, {})
+      expect(response).to be_unauthorized
+    end
+
     context 'when called as a moderator' do
       let(:provisional_grades_json) do
         json = api_call_as_user(@teacher, :get, @path, @params, {}, {}, { expected_status: 200 })

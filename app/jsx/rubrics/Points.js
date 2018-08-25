@@ -26,14 +26,14 @@ import I18n from 'i18n!edit_rubric'
 import { assessmentShape } from './types'
 
 export const roundIfWhole = (n) => (
-  I18n.toNumber(n, { precision: Math.floor(n) === n ? 0 : 1 })
+  I18n.toNumber(n, { precision: Math.floor(n) === n ? 0 : 2, strip_insignificant_zeros: true })
 )
 const pointString = (points) =>
   _.isNull(points.text) ? roundIfWhole(points.value) : points.text
 
 export const possibleString = (possible) =>
   I18n.t('%{possible} pts', {
-    possible: I18n.toNumber(possible, { precision : 1 })
+    possible: I18n.toNumber(possible, { precision: 2, strip_insignificant_zeros: true })
   })
 
 export const scoreString = (points, possible) =>

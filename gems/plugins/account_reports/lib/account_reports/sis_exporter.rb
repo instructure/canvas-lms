@@ -803,10 +803,17 @@ module AccountReports
                 user_observers.sis_batch_id AS o_batch_id").
         joins("INNER JOIN #{UserObservationLink.quoted_table_name} ON pseudonyms.user_id=user_observers.user_id
                INNER JOIN #{Pseudonym.quoted_table_name} AS p2 ON p2.user_id=user_observers.observer_id").
-        where("p2.account_id=pseudonyms.account_id")
+        where("p2.account_id=pseudonyms.account_id").
+        where(:user_observers => {:root_account_id => root_account})
 
       observers = observers.where.not(user_observers: {sis_batch_id: nil}) if @created_by_sis || @sis_format
       observers = observers.active.where.not(user_observers: {workflow_state: 'deleted'}) unless @include_deleted
+
+      if account != root_account
+        observers = observers.
+          where("EXISTS (SELECT user_id FROM #{UserAccountAssociation.quoted_table_name} uaa
+                WHERE uaa.account_id = ? AND uaa.user_id=pseudonyms.user_id)", account)
+      end
 
       generate_and_run_report headers do |csv|
         observers.find_each do |observer|

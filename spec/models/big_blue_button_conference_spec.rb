@@ -116,6 +116,11 @@ describe BigBlueButtonConference do
           :recording_enabled => true,
         })
       ])
+      @bbb = BigBlueButtonConference.new
+      @bbb.user_settings = { :record => true }
+      @bbb.user = user_factory
+      @bbb.context = course_factory
+      @bbb.save!
     end
 
     it "should have visible record user_setting" do
@@ -123,50 +128,39 @@ describe BigBlueButtonConference do
     end
 
     it "should send record flag if record user_setting is set" do
-      bbb = BigBlueButtonConference.new
-      bbb.user_settings = { :record => true }
-      bbb.user = user_factory
-      bbb.context = course_factory
-      bbb.save!
-      expect(bbb).to receive(:send_request).with(:create, hash_including(record: "true"))
-      bbb.initiate_conference
+      expect(@bbb).to receive(:send_request).with(:create, hash_including(record: "true"))
+      @bbb.initiate_conference
     end
 
     it "should not send record flag if record user setting is unset" do
-      bbb = BigBlueButtonConference.new
-      bbb.user_settings = { :record => false }
-      bbb.user = user_factory
-      bbb.context = course_factory
-      bbb.save!
-      expect(bbb).to receive(:send_request).with(:create, hash_including(record: "false"))
-      bbb.initiate_conference
+      @bbb.user_settings = { :record => false }
+      @bbb.save!
+      expect(@bbb).to receive(:send_request).with(:create, hash_including(record: "false"))
+      @bbb.initiate_conference
     end
 
     it "should properly serialize a response with no recordings" do
-      bbb = BigBlueButtonConference.new
-      allow(bbb).to receive(:conference_key).and_return('12345')
-      bbb.user_settings = { record: true }
-      bbb.user = user_factory
-      bbb.context = course_factory
-      bbb.save!
+      allow(@bbb).to receive(:conference_key).and_return('12345')
       response = {returncode: 'SUCCESS', recordings: "\n  ",
                   messageKey: 'noRecordings', message: 'There are no recordings for the meeting(s).'}
-      allow(bbb).to receive(:send_request).and_return(response)
-      recordings = bbb.recordings
-      expect(recordings).to eq []
+      allow(@bbb).to receive(:send_request).and_return(response)
+      expect(@bbb.recordings).to eq []
     end
 
     it "should properly serialize a response with recordings" do
-      bbb = BigBlueButtonConference.new
-      allow(bbb).to receive(:conference_key).and_return('12345')
-      bbb.user_settings = { record: true }
-      bbb.user = user_factory
-      bbb.context = course_factory
-      bbb.save!
+      allow(@bbb).to receive(:conference_key).and_return('12345')
       response = JSON.parse(get_recordings_fixture, {symbolize_names: true})
-      allow(bbb).to receive(:send_request).and_return(response)
-      recordings = bbb.recordings
-      expect(recordings).not_to eq []
+      allow(@bbb).to receive(:send_request).and_return(response)
+      expect(@bbb.recordings).not_to eq []
+    end
+
+    it "should not have duration_minutes set to 0" do
+      allow(@bbb).to receive(:conference_key).and_return('12345')
+      response = JSON.parse(get_recordings_fixture, {symbolize_names: true})
+      allow(@bbb).to receive(:send_request).and_return(response)
+      @bbb.recordings.each do |recording|
+        expect(recording[:duration_minutes]).not_to eq(0)
+      end
     end
 
     describe "looking for recordings based on user setting" do

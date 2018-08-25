@@ -189,16 +189,16 @@ class PlannerController < ApplicationController
   def all_ungraded_todo_items
     collections = []
     collections << item_collection('course_pages',
-        WikiPage.where(context_type: 'Course', context_id: @course_ids, todo_date: @start_date..@end_date),
+        WikiPage.active.where(context_type: 'Course', context_id: @course_ids, todo_date: @start_date..@end_date),
         WikiPage, [:todo_date, :created_at], :id)
     collections << item_collection('group_pages',
-        WikiPage.where(context_type: 'Group', context_id: @group_ids, todo_date: @start_date..@end_date),
+        WikiPage.active.where(context_type: 'Group', context_id: @group_ids, todo_date: @start_date..@end_date),
         WikiPage, [:todo_date, :created_at], :id)
     collections << item_collection('ungraded_course_discussions',
-        DiscussionTopic.where(context_type: 'Course', context_id: @course_ids, todo_date: @start_date..@end_date),
+        DiscussionTopic.published.where(context_type: 'Course', context_id: @course_ids, todo_date: @start_date..@end_date),
         DiscussionTopic, [:todo_date, :posted_at, :created_at], :id)
     collections << item_collection('ungraded_group_discussions',
-        DiscussionTopic.where(context_type: 'Group', context_id: @group_ids, todo_date: @start_date..@end_date),
+        DiscussionTopic.published.where(context_type: 'Group', context_id: @group_ids, todo_date: @start_date..@end_date),
         DiscussionTopic, [:todo_date, :posted_at, :created_at], :id)
     BookmarkedCollection.merge(*collections)
   end

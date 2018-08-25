@@ -40,6 +40,8 @@ define [
 
     averageFn: 'mean'
 
+    section: undefined
+
     dataSource: {}
 
     outcomes: []
@@ -85,7 +87,7 @@ define [
         (currentSection) ->
           rows = Grid.Util.toRows(Grid.dataSource.rollups, section: currentSection)
           grid.setData(rows, false)
-          Grid.View.redrawHeader(grid)
+          Grid.View.redrawHeader(grid, Grid.averageFn, currentSection)
           grid.invalidate()
 
       # Public: Sort and rerender the grid.
@@ -137,7 +139,7 @@ define [
       _sortResults: (a, b, sortAsc, field) ->
         scoreA = a[field]
         scoreB = b[field]
-        val = numberCompare(scoreA, scoreB, descending: !sortAsc)
+        val = numberCompare(scoreA?.score, scoreB?.score, descending: !sortAsc)
         if val == 0
           Grid.Events._sortStudents(a, b, sortAsc)
         else
@@ -156,21 +158,23 @@ define [
       # Returns an array with [columns, rows].
       toGrid: (response, options = { column: {}, row: {} }) ->
         Grid.dataSource = response
-        [Grid.Util.toColumns(response.linked.outcomes, options.column),
+        [Grid.Util.toColumns(response.linked.outcomes, response.rollups, options.column),
          Grid.Util.toRows(response.rollups, options.row)]
 
       # Public: Translate an array of outcomes to columns that can be used by SlickGrid.
       #
       # outcomes - An array of outcomes from the outcome rollups API.
+      # rollups  - An array of rollups from the outcome rollups API.
       #
       # Returns an array of columns.
-      toColumns: (outcomes, options = {}) ->
+      toColumns: (outcomes, rollups, options = {}) ->
         options = _.extend({}, Grid.Util.COLUMN_OPTIONS, options)
         columns = _.map outcomes, (outcome) ->
           _.extend(id: "outcome_#{outcome.id}",
                    name: _.escape(outcome.title),
                    field: "outcome_#{outcome.id}",
                    cssClass: 'outcome-result-cell',
+                   hasResults: _.some(rollups, (r) => _.find(r.scores, (s) => s.links.outcome == outcome.id)),
                    outcome: outcome, options)
         [Grid.Util._studentColumn()].concat(columns)
 
@@ -313,28 +317,6 @@ define [
         else
           parseFloat((total / values.length).toString().slice(0, 4))
 
-      median: (values) ->
-        sortedValues = _.sortBy(values, _.identity)
-        if values.length % 2 == 0
-          i = values.length / 2
-          Grid.Math.mean(sortedValues.slice(i - 1, i + 1))
-        else
-          sortedValues[Math.floor(values.length / 2)]
-
-      mode: (values) ->
-        counts = _.chain(values)
-          .countBy(_.identity)
-          .reduce((t, v, k) ->
-            t.push([v, parseInt(k)])
-            t
-          , [])
-          .sortBy(_.first)
-          .reverse()
-          .value()
-        max = counts[0][0]
-        mode = _.reject(counts, (n) -> n[0] < max)
-        mode = Grid.Math.mean(_.map(mode, _.last), true)
-
       max: (values) -> Math.max(values...)
 
       min: (values) -> Math.min(values...)
@@ -410,26 +392,41 @@ define [
           .filter(_.isObject)
           .value()
 
-      headerRowCell: ({node, column, grid}, fn = Grid.averageFn) ->
+      headerRowCell: ({node, column, grid}, score = undefined) ->
         return Grid.View.studentHeaderRowCell(node, column, grid) if column.field == 'student'
 
         results = Grid.View.getColumnResults(grid.getData(), column)
         return $(node).empty() unless results.length
-        scores = _.map results, (result) -> result.score
-        hide_points = _.every results, (result) -> result.hide_points
-        score = Grid.Math[fn].call(this, (scores))
-        $(node).empty().append(Grid.View.cellHtml(score, hide_points, column, false))
+        $(node).empty().append(Grid.View.cellHtml(score?.score, score?.hide_points, column, false))
 
-      redrawHeader: (grid, fn = Grid.averageFn) ->
+      _aggregateUrl: (stat) ->
+        course = ENV.context_asset_string.split('_')[1]
+        sectionParam = if Grid.section and Grid.section != "0" then "&section_id=#{Grid.section}" else ""
+        "/api/v1/courses/#{course}/outcome_rollups?aggregate=course&aggregate_stat=#{stat}#{sectionParam}"
+
+      redrawHeaderWithSection: (grid, fn = Grid.averageFn) ->
+        Grid.View.redrawHeader(grid, fn, Grid.section)
+
+      redrawHeader: (grid, fn = Grid.averageFn, section) ->
         Grid.averageFn = fn
+        Grid.section = section
         cols = grid.getColumns()
-        _.each(cols, (col) ->
-          header = grid.getHeaderRowColumn(col.id)
-          Grid.View.headerRowCell(node: header, column: col, grid: grid, fn))
+        dfd = $.getJSON(Grid.View._aggregateUrl(fn)).fail((e) ->
+          $.flashError(I18n.t('There was an error fetching course statistics'))
+        )
+        dfd.then (response, status, xhr) =>
+          # do for each column
+          _.each(cols, (col) ->
+            header = grid.getHeaderRowColumn(col.id)
+            score = if col.outcome
+                      _.find(response['rollups'][0]['scores'], (s) -> s.links.outcome == col.outcome.id)
+                    else
+                      undefined
+            Grid.View.headerRowCell(node: header, column: col, grid: grid, score))
 
       studentHeaderRowCell: (node, column, grid) ->
         $(node).addClass('average-filter')
-        view = new HeaderFilterView(grid: grid, redrawFn: Grid.View.redrawHeader)
+        view = new HeaderFilterView(grid: grid, redrawFn: Grid.View.redrawHeaderWithSection)
         view.render()
         $(node).append(view.$el)
 
@@ -445,6 +442,6 @@ define [
         ratings.result_count = results.length
         points = _.pluck ratings, 'points'
         counts = _.countBy results, (result) ->
-          _.find points, (x) -> x <= result
+          _.find points, (x) -> result && x <= result.score
         _.each ratings, (rating) ->
           rating.percent = Math.round((counts[rating.points] || 0) / results.length * 100)

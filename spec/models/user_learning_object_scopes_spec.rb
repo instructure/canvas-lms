@@ -746,7 +746,13 @@ describe UserLearningObjectScopes do
 
       # make some assignments and submissions
       [@course1, @course2].each do |course|
-        assignment = course.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
+        assignment = course.assignments.create!(
+          final_grader: @teacher,
+          grader_count: 2,
+          moderated_grading: true,
+          submission_types: ['online_text_entry'],
+          title: 'some assignment'
+        )
         [@student_a, @student_b].each do |student|
           assignment.submit_homework student, body: "submission for #{student.name}"
         end
@@ -759,19 +765,34 @@ describe UserLearningObjectScopes do
       expect(@teacher.assignments_needing_moderation.length).to eq 0
     end
 
-    it "should count assignments needing moderation" do
+    it "shows a count for final grader" do
       assmt = @course2.assignments.first
-      assmt.grade_student(@student_a, :grade => "1", :grader => @teacher, :provisional => true)
-      expect(@teacher.assignments_needing_moderation.length).to eq 1
+      assmt.update!(final_grader: @teacher)
+      assmt.grade_student(@student_a, grade: "1", grader: @teacher, provisional: true)
+      expect(@teacher.assignments_needing_moderation).to eq [assmt]
+    end
 
-      assmt.update_attribute(:grades_published_at, Time.now.utc)
-      expect(@teacher.assignments_needing_moderation.length).to eq 0 # should not count anymore once grades are published
+    it "does not show a count for admins that can moderate grades but are not final grader" do
+      admin = account_admin_user(account: @course2.account)
+      assmt = @course2.assignments.first
+      assmt.update!(final_grader: @teacher)
+      assmt.grade_student(@student_a, grade: "1", grader: @teacher, provisional: true)
+      expect(admin.assignments_needing_moderation).to be_empty
+    end
+
+    it "does not count assignments whose grades have been published" do
+      assmt = @course2.assignments.first
+      assmt.update!(final_grader: @teacher)
+      assmt.grade_student(@student_a, grade: "1", grader: @teacher, provisional: true)
+      assmt.update!(grades_published_at: Time.now.utc)
+      expect(@teacher.assignments_needing_moderation).to be_empty
     end
 
     it "should not return duplicates" do
       assmt = @course2.assignments.first
-      assmt.grade_student(@student_a, :grade => "1", :grader => @teacher, :provisional => true)
-      assmt.grade_student(@student_b, :grade => "2", :grader => @teacher, :provisional => true)
+      assmt.update!(final_grader: @teacher)
+      assmt.grade_student(@student_a, grade: "1", grader: @teacher, provisional: true)
+      assmt.grade_student(@student_b, grade: "2", grader: @teacher, provisional: true)
       expect(@teacher.assignments_needing_moderation.length).to eq 1
       expect(@teacher.assignments_needing_moderation.first).to eq assmt
     end

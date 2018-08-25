@@ -19,6 +19,7 @@
 import I18n from 'i18n!react_files'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import PropTypes from 'prop-types'
 import UsageRightsDialog from 'jsx/files/UsageRightsDialog'
 import downloadStuffAsAZip from '../utils/downloadStuffAsAZip'
 import customPropTypes from '../modules/customPropTypes'
@@ -32,7 +33,8 @@ export default {
   propTypes: {
     currentFolder: customPropTypes.folder, // not required as we don't have it on the first render
     contextType: customPropTypes.contextType.isRequired,
-    contextId: customPropTypes.contextId.isRequired
+    contextId: customPropTypes.contextId.isRequired,
+    showingSearchResults: PropTypes.bool,
   },
 
   componentWillMount() {

@@ -78,7 +78,7 @@ module BroadcastPolicies
       !course.concluded? &&
       !assignment.muted? &&
       assignment.published? &&
-      submission.quiz_submission.nil? &&
+      submission.quiz_submission_id.nil? &&
       user_active_or_invited?
     end
 

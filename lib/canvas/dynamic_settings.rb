@@ -86,19 +86,24 @@ module Canvas
       # @param cluster [String] An optional cluster to override region or global settings
       # @param default_ttl [ActiveSupport::Duration] How long to retain cached
       #   values
-      def find(prefix = nil,
-                     tree: :config,
-                     service: :canvas,
-                     cluster: nil,
-                     default_ttl: DynamicSettings::PrefixProxy::DEFAULT_TTL)
+      def find( prefix = nil,
+                tree: :config,
+                service: :canvas,
+                cluster: nil,
+                default_ttl: DynamicSettings::PrefixProxy::DEFAULT_TTL,
+                data_center: nil
+              )
         if kv_client
-          PrefixProxy.new(prefix,
+          PrefixProxy.new(
+            prefix,
             tree: tree,
             service: service,
             environment: @environment,
             cluster: cluster,
             default_ttl: default_ttl,
-            kv_client: kv_client)
+            kv_client: kv_client,
+            data_center: data_center
+          )
         else
           proxy = root_fallback_proxy
           proxy = proxy.for_prefix(tree)

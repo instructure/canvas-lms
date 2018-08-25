@@ -32,16 +32,16 @@ module DataFixup::RemoveDuplicateEnrollments
       # prefer active enrollments to have no impact to the end user.
       # then prefer enrollments that were created by sis imports
       # then just keep the newest one.
-      keeper = scope.order("CASE WHEN workflow_state='active' THEN 1
-                                 WHEN workflow_state='invited' THEN 2
-                                 WHEN workflow_state='creation_pending' THEN 3
-                                 WHEN sis_batch_id IS NOT NULL THEN 4
-                                 WHEN workflow_state='completed' THEN 5
-                                 WHEN workflow_state='rejected' THEN 6
-                                 WHEN workflow_state='inactive' THEN 7
-                                 WHEN workflow_state='deleted' THEN 8
-                                 ELSE 9
-                                 END, sis_batch_id DESC, updated_at DESC").first
+      keeper = scope.order(Arel.sql("CASE WHEN workflow_state='active' THEN 1
+                                     WHEN workflow_state='invited' THEN 2
+                                     WHEN workflow_state='creation_pending' THEN 3
+                                     WHEN sis_batch_id IS NOT NULL THEN 4
+                                     WHEN workflow_state='completed' THEN 5
+                                     WHEN workflow_state='rejected' THEN 6
+                                     WHEN workflow_state='inactive' THEN 7
+                                     WHEN workflow_state='deleted' THEN 8
+                                     ELSE 9
+                                     END, sis_batch_id DESC, updated_at DESC")).first
 
       # delete all duplicate
       scope.where("id<>?", keeper).delete_all

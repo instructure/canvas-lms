@@ -623,7 +623,7 @@ class ContentMigration < ActiveRecord::Base
 
   def process_master_deletions(deletions)
     deletions.keys.each do |klass|
-      next unless MasterCourses::ALLOWED_CONTENT_TYPES.include?(klass)
+      next unless MasterCourses::CONTENT_TYPES_FOR_DELETIONS.include?(klass)
       mig_ids = deletions[klass]
       item_scope = case klass
       when 'Attachment'

@@ -342,7 +342,6 @@ describe UserObserveesController, type: :request do
     end
 
     it 'should add an observee with a pairing code' do
-      student.pseudonym.account.enable_feature!(:observer_pairing_code)
       code = student.generate_observer_pairing_code
 
       expect(create_call({ pairing_code: code.code }, api_user: parent)).to eq student.id

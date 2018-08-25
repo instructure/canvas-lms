@@ -104,8 +104,11 @@ export function insertImage(editor, image) {
 /*** link insertion ***/
 
 // checks if there's an existing anchor containing the cursor
-function currentLink(editor) {
-  const cursor = editor.selection.getNode();
+function currentLink(editor, link) {
+  const cursor =
+    link.selectionDetails && link.selectionDetails.node
+      ? link.selectionDetails.node
+      : editor.selection.getNode(); // This doesn't work in IE 11, but will stop brokeness in other browsers
   return editor.dom.getParent(cursor, "a");
 }
 
@@ -116,8 +119,12 @@ function hasSelection(editor) {
   return !!selection && selection != "";
 }
 
-export function existingContentToLink(editor) {
-  return !editor.isHidden() && (currentLink(editor) || hasSelection(editor));
+export function existingContentToLink(editor, link) {
+  return (
+    !editor.isHidden() &&
+    ((link && (currentLink(editor, link) || !!link.selectedContent)) ||
+      hasSelection(editor))
+  );
 }
 
 function selectionIsImg(editor) {
@@ -130,7 +137,13 @@ export function existingContentToLinkIsImg(editor) {
 }
 
 function insertUndecoratedLink(editor, link) {
-  if (existingContentToLink(editor)) {
+  editor.focus();
+  if (existingContentToLink(editor, link)) {
+    if (!hasSelection(editor)) {
+      // editor.selection doesn't work so well in IE 11 so we handle that case
+      // here by setting our range to what it was prior to the insertion
+      editor.selection.setRng(link.selectionDetails.range);
+    }
     // link selected content or update existing link containing selected
     // content / cursor. given a non-empty selection outside any existing link,
     // will wrap a new link around the selection. alternately, given a

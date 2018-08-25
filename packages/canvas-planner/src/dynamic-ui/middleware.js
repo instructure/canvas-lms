@@ -21,6 +21,8 @@ export function createDynamicUiMiddleware (uiManager) {
     uiManager.setStore(store);
     return next => action => {
       const beforeState = store.getState();
+      // manager has to be notified before the reducers run so the animations
+      // will be ready when the UI updates
       uiManager.handleAction(action);
       const result = next(action);
       const afterState = store.getState();

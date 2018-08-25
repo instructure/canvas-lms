@@ -53,9 +53,9 @@ class DiscussionTopic < ActiveRecord::Base
 
   attr_readonly :context_id, :context_type, :user_id
 
-  has_many :discussion_entries, -> { order(:created_at) }, dependent: :destroy
+  has_many :discussion_entries, -> { order(:created_at) }, dependent: :destroy, inverse_of: :discussion_topic
   has_many :rated_discussion_entries, -> { order(
-    ['COALESCE(parent_id, 0)', 'COALESCE(rating_sum, 0) DESC', :created_at]) }, class_name: 'DiscussionEntry'
+    Arel.sql('COALESCE(parent_id, 0)'), Arel.sql('COALESCE(rating_sum, 0) DESC'), :created_at) }, class_name: 'DiscussionEntry'
   has_many :root_discussion_entries, -> { preload(:user).where("discussion_entries.parent_id IS NULL AND discussion_entries.workflow_state<>'deleted'") }, class_name: 'DiscussionEntry'
   has_one :external_feed_entry, :as => :asset
   belongs_to :external_feed
@@ -678,7 +678,7 @@ class DiscussionTopic < ActiveRecord::Base
   scope :by_position_legacy, -> { order("discussion_topics.position DESC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
   scope :by_last_reply_at, -> { order("discussion_topics.last_reply_at DESC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
 
-  scope :by_posted_at, -> { order(<<-SQL)
+  scope :by_posted_at, -> { order(Arel.sql(<<-SQL))
       COALESCE(discussion_topics.delayed_post_at, discussion_topics.posted_at, discussion_topics.created_at) DESC,
       discussion_topics.created_at DESC,
       discussion_topics.id DESC
@@ -917,11 +917,7 @@ class DiscussionTopic < ActiveRecord::Base
       nil
     else
       self.shard.activate do
-        entry = DiscussionEntry.new({
-          :message => message,
-          :discussion_topic => self,
-          :user => user,
-        })
+        entry = discussion_entries.new(message: message, user: user)
         if !entry.grants_right?(user, :create)
           raise IncomingMail::Errors::ReplyToLockedTopic
         else

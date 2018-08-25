@@ -57,7 +57,7 @@ class CalculatedInteraction < AssessmentItemConverter
 
     apply_d2l_fixes if @flavor == Qti::Flavors::D2L
 
-    if @question[:formulas].empty? && @question[:imported_formula]
+    if @question[:formulas]&.empty? && @question[:imported_formula]
       @question[:formulas] << {:formula => @question[:imported_formula]}
     end
     @question
@@ -121,6 +121,18 @@ class CalculatedInteraction < AssessmentItemConverter
       method_substitutions = {"sqr" => "sqrt", "Factorial" => "fact", "exp" => "e"}
       method_substitutions.each do |orig_method, new_method|
         @question[:imported_formula].gsub!("#{orig_method}(", "#{new_method}(")
+      end
+    end
+    if @question[:variables].count == 1
+      # is this secretly a simple numeric question in disguise
+      var = @question[:variables].first
+      if (var[:min] == var[:max]) && (@question[:imported_formula] == var[:name]) # yup the formula for the answer is "x" and there's only one possible value
+        [:variables, :formulas, :imported_formula, :formula_decimal_places, :answer_tolerance].each{|k| @question.delete(k)}
+        @question[:question_type] = 'numerical_question'
+        @question[:answers] = [
+          {:weight => 100, :id => unique_local_id, :text => 'answer_text',
+            :numerical_answer_type => "exact_answer", :exact => var[:min]}
+        ]
       end
     end
   end

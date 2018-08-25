@@ -74,7 +74,7 @@ test('does not render the RSSFeedList component when user is student', () => {
 
 test('renders the external feeds link', () => {
   const tree = mount(<ExternalFeedsTray {...defaultProps()} />)
-  const node = tree.find('Link')
+  const node = tree.find('Button')
   expect(node.text()).toBe('External feeds')
 })
 

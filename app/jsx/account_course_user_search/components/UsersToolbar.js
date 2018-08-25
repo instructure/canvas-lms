@@ -64,6 +64,15 @@ export default function UsersToolbar(props) {
           label={<ScreenReaderContent>{placeholder}</ScreenReaderContent>}
           placeholder={placeholder}
           onChange={e => props.onUpdateFilters({search_term: e.target.value})}
+          onKeyUp={e => {
+            if (e.key === "Enter") {
+              props.toggleSRMessage(true)
+            } else {
+              props.toggleSRMessage(false)
+            }
+          }}
+          onBlur={ () => props.toggleSRMessage(true) }
+          onFocus={ () => props.toggleSRMessage(false) }
           messages={!!props.errors.search_term && [{type: 'error', text: props.errors.search_term}]}
         />
 
@@ -101,6 +110,7 @@ export default function UsersToolbar(props) {
 }
 
 UsersToolbar.propTypes = {
+  toggleSRMessage: func.isRequired,
   onUpdateFilters: func.isRequired,
   onApplyFilters: func.isRequired,
   search_term: string,

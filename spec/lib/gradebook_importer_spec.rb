@@ -590,6 +590,56 @@ describe GradebookImporter do
     end
   end
 
+  context "moderated assignments" do
+    let(:course) { course_model }
+    let(:user) do
+      user = User.create!
+      course.enroll_teacher(user).accept!
+      user
+    end
+    let(:progress) { Progress.create!(tag: "test", context: user) }
+
+    before :each do
+      @existing_moderated_assignment = Assignment.create!(
+        context: course,
+        name: 'An Assignment',
+        moderated_grading: true,
+        grader_count: 1
+      )
+    end
+
+    it "allows importing grades of assignments when user is final grader" do
+      @existing_moderated_assignment.update!(final_grader: user)
+      upload = GradebookUpload.create!(course: course, user: user, progress: progress)
+      new_gradebook_importer(
+        attachment_with_rows(
+          'Student;ID;Section;An Assignment',
+          'A Student;1;Section 13;2',
+          'Another Student;2;Section 13;10'
+        ),
+        upload,
+        user,
+        progress
+      )
+      expect(upload.gradebook["students"][1]["submissions"][0]["gradeable"]).to be true
+    end
+
+    it "does not allow importing grades of assignments when user is not final grader" do
+      upload = GradebookUpload.create!(course: course, user: user, progress: progress)
+      new_gradebook_importer(
+        attachment_with_rows(
+          'Student;ID;Section;An Assignment',
+          'A Student;1;Section 13;2',
+          'Another Student;2;Section 13;10'
+        ),
+        upload,
+        user,
+        progress
+      )
+      expect(upload.gradebook["students"][1]["submissions"][0]["gradeable"]).to be false
+    end
+  end
+
   context "differentiated assignments" do
     def setup_DA
       course_with_teacher(active_all: true)

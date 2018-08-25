@@ -884,7 +884,7 @@ describe GradeCalculator do
     end
 
     let(:student_enrollment) { @student.enrollments.first }
-    let(:scores) { @student.enrollments.first.scores.index_by(&:grading_period_id) }
+    let(:scores) { @student.enrollments.first.scores.preload(:score_metadata).index_by(&:grading_period_id) }
     let(:overall_course_score) { @student.enrollments.first.scores.find_by(course_score: true) }
     let(:submission_for_first_assignment) { Submission.find_by(user: @student, assignment: @assignments[1]) }
     let(:submission_for_second_assignment) { Submission.find_by(user: @student, assignment: @assignments[4]) }

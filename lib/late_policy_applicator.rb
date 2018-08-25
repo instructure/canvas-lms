@@ -55,6 +55,7 @@ class LatePolicyApplicator
 
     @assignments.each do |assignment|
       relevant_submissions(assignment).find_each do |submission|
+        submission.assignment = assignment
         user_ids << submission.user_id if process_submission(late_policy, assignment, submission)
       end
     end
@@ -85,7 +86,7 @@ class LatePolicyApplicator
         query = missing_submissions_for(assignment)
       end
 
-      query.left_joins(:grading_period).merge(GradingPeriod.open)
+      query.eager_load(:grading_period).merge(GradingPeriod.open).preload(:stream_item, :user)
     end
   end
 

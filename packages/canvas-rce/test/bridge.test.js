@@ -70,9 +70,26 @@ describe("Editor/Sidebar bridge", () => {
 
   describe("insertLink", () => {
     let link = {};
+    let editor = {};
 
     beforeEach(() => {
       sinon.stub(console, "warn");
+      editor = {
+        insertLink: sinon.spy(),
+        props: {
+          textareaId: "fake_editor",
+          tinymce: {
+            get(_id) {
+              return {
+                selection: {
+                  getRng: sinon.stub().returns("some-range"),
+                  getNode: sinon.stub().returns("some-node")
+                }
+              };
+            }
+          }
+        }
+      };
     });
 
     afterEach(() => {
@@ -81,7 +98,7 @@ describe("Editor/Sidebar bridge", () => {
     });
 
     it("insertLink with an active editor forwards the link to createLink", () => {
-      let editor = { insertLink: sinon.spy() };
+
       Bridge.focusEditor(editor);
       Bridge.insertLink(link);
       assert.ok(editor.insertLink.calledWith(link));
@@ -92,6 +109,17 @@ describe("Editor/Sidebar bridge", () => {
       assert.doesNotThrow(() => Bridge.insertLink(link), TypeError);
       // eslint-disable-next-line no-console
       assert.ok(console.warn.called);
+    });
+
+    it("adds selectionDetails to links", () => {
+      Bridge.focusEditor(editor);
+      Bridge.insertLink({});
+      sinon.assert.calledWithMatch(editor.insertLink, {
+        selectionDetails: {
+          node: "some-node",
+          range: "some-range"
+        }
+      });
     });
   });
 });

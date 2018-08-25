@@ -93,17 +93,6 @@ export default class SearchMessage extends Component {
     });
   }
 
-  renderSearchDoneAlert = (isLoading, message) => {
-    if (isLoading) {
-      return null;
-    }
-    return (
-      <Alert screenReaderOnly liveRegion={this.props.getLiveAlertRegion}>
-        {message}
-      </Alert>
-    );
-  };
-
   renderPaginationButton(pageIndex) {
     const pageNumber = pageIndex + 1
     const isCurrent = this.state.pageBecomingCurrent
@@ -145,7 +134,6 @@ export default class SearchMessage extends Component {
       return (
         <div className="text-center pad-box">
           <div className="alert alert-error">
-            {this.renderSearchDoneAlert(collection.loading, errorLoadingMessage)}
             {errorLoadingMessage}
           </div>
         </div>
@@ -159,7 +147,6 @@ export default class SearchMessage extends Component {
     } else if (!collection.data.length) {
       return (
         <div className="text-center pad-box">
-          {this.renderSearchDoneAlert(collection.loading, noneFoundMessage)}
           <div className="alert alert-info">{noneFoundMessage}</div>
         </div>
       )
@@ -175,8 +162,6 @@ export default class SearchMessage extends Component {
       }
 
       return (
-        <div>
-          {this.renderSearchDoneAlert(collection.loading, resultsFoundMessage)}
           <Pagination
             as="nav"
             variant="compact"
@@ -188,14 +173,9 @@ export default class SearchMessage extends Component {
               : []
             )}
           </Pagination>
-        </div>
       )
     } else {
-      return (
-        <div>
-          {this.renderSearchDoneAlert(collection.loading, resultsFoundMessage)}
-        </div>
-      )
+      return (<div />)
     }
   }
 }

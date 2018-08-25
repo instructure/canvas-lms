@@ -25,9 +25,9 @@ import ToggleGroup from '@instructure/ui-toggle-details/lib/components/ToggleGro
 import List, { ListItem } from '@instructure/ui-elements/lib/components/List'
 import Pill from '@instructure/ui-elements/lib/components/Pill'
 import Text from '@instructure/ui-elements/lib/components/Text'
-import IconOutcomes from '@instructure/ui-icons/lib/Line/IconOutcomes'
 import natcompare from 'compiled/util/natcompare'
 import AssignmentResult from './AssignmentResult'
+import OutcomePopover from './OutcomePopover'
 import * as shapes from './shapes'
 
 export default class Outcome extends React.Component {
@@ -47,7 +47,7 @@ export default class Outcome extends React.Component {
   }
 
   renderHeader () {
-    const { outcome } = this.props
+    const { outcome, outcomeProficiency } = this.props
     const { mastered, results, title } = outcome
     const numAlignments = results.length
 
@@ -58,7 +58,9 @@ export default class Outcome extends React.Component {
             <FlexItem>
               <Text size="medium">
                 <Flex>
-                  <FlexItem><IconOutcomes /></FlexItem>
+                  <FlexItem>
+                    <OutcomePopover outcome={outcome} outcomeProficiency={outcomeProficiency}/>
+                  </FlexItem>
                   <FlexItem padding="0 x-small">{ title }</FlexItem>
                 </Flex>
               </Text>

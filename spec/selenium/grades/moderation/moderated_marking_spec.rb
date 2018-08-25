@@ -19,6 +19,7 @@ require_relative '../../common'
 require_relative '../../assignments/page_objects/assignment_page'
 require_relative '../pages/moderate_page'
 require_relative '../pages/gradebook_page'
+require_relative '../pages/student_grades_page'
 
 describe 'Moderated Marking' do
   include_context 'in-process server selenium tests'
@@ -27,7 +28,7 @@ describe 'Moderated Marking' do
     Account.default.enable_feature!(:moderated_grading)
 
     # create a course with three teachers
-    @moderated_course = course_factory(course_name: 'moderated_course')
+    @moderated_course = course_factory(course_name: 'moderated_course', active_course: true)
     @teachers = create_users_in_course(@moderated_course, 3, return_type: :record, name_prefix: "TeacherBoss", enrollment_type: 'TeacherEnrollment')
     @teacher1 = @teachers[0]
     @teacher2 = @teachers[1]
@@ -136,13 +137,6 @@ describe 'Moderated Marking' do
       ModeratePage.visit(@moderated_course.id, @moderated_assignment.id)
     end
 
-    it 'allows viewing provisional grades', priority: '1', test_id: 3503385 do
-      # expect to see two students with two provisional grades
-      expect(ModeratePage.fetch_student_count).to eq 2
-      expect(ModeratePage.fetch_provisional_grade_count_for_student(@student1)).to eq 2
-      expect(ModeratePage.fetch_provisional_grade_count_for_student(@student2)).to eq 2
-    end
-
     it 'allows viewing provisional grades and posting final grade', priority: '1', test_id: 3503385 do
       # # select a provisional grade for each student
       ModeratePage.select_provisional_grade_for_student_by_position(@student1, 1)
@@ -159,6 +153,43 @@ describe 'Moderated Marking' do
       # expect grades to be shown
       expect(Gradebook::MultipleGradingPeriods.grading_cell_attributes(0, 0).text).to eq('15')
       expect(Gradebook::MultipleGradingPeriods.grading_cell_attributes(0, 1).text).to eq('12')
+    end
+
+    it 'display to student allows viewing final grade as student', priority: '1', test_id: 3513992 do
+      # select a provisional grade for each student
+      ModeratePage.select_provisional_grade_for_student_by_position(@student1, 1)
+      ModeratePage.select_provisional_grade_for_student_by_position(@student2, 2)
+
+      # post the grades
+      ModeratePage.click_post_grades_button
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+      # wait for info header stating grades are posted
+      wait = Selenium::WebDriver::Wait.new(timeout: 5)
+      wait.until { ff("#content header div").size > 3 }
+      # unmute using Display to Students button
+      ModeratePage.click_display_to_students_button
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+      # wait for flash alert stating grades are visible to students
+      wait.until {ff("#flashalert_message_holder div").size > 1}
+
+      # switch session to student
+      user_session(@student1)
+
+      StudentGradesPage.visit_as_student(@moderated_course)
+      expect(StudentGradesPage.fetch_assignment_score(@moderated_assignment)).to eq '15'
+    end
+
+    it 'display to students button disabled until grades are posted', priority: '1', test_id: 3513991 do
+      expect(ModeratePage.display_to_students_button).to be_disabled
+    end
+
+    it 'allows viewing provisional grades', priority: '1', test_id: 3503385 do
+      # expect to see two students with two provisional grades
+      expect(ModeratePage.fetch_student_count).to eq 2
+      expect(ModeratePage.fetch_provisional_grade_count_for_student(@student1)).to eq 2
+      expect(ModeratePage.fetch_provisional_grade_count_for_student(@student2)).to eq 2
     end
 
     it 'shows student names in row headers', priority: '1', test_id: 3503464 do

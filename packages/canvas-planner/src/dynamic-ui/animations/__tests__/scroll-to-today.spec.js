@@ -22,13 +22,14 @@ import {initialize} from '../../../utilities/alertUtils';
 import {ScrollToToday} from '../scroll-to-today';
 import {createAnimation, mockRegistryEntry} from './test-utils';
 
+const today = '2018-04-15';
 const TZ = 'Asia/Tokyo';
 const successalert = jest.fn();
 const pastMessage = 'Nothing planned today. Selecting most recent item.';
 const futureMessage = 'Nothing planned today. Selecting next item.';
 
 beforeAll(() => {
-  MockDate.set('2018-04-15', TZ);
+  MockDate.set(today, TZ);
   initialize({
     visualSuccessCallback: successalert,
     visualErrorCallback: jest.fn(),
@@ -48,23 +49,30 @@ describe('items are in the planner', () => {
     const {animation, animator, store, registry, manager} = createAnimation(ScrollToToday);
     manager.getDocument().querySelector = function () {return today_elem;};
     const mockRegistryEntries = [
-      mockRegistryEntry('some-item', 'i1', moment.tz(TZ)),
+      mockRegistryEntry('some-item', 'i1', moment.tz(today, TZ)),
     ];
     mockRegistryEntries[0].component.getScrollable.mockReturnValue(today_elem);
     registry.getAllItemsSorted.mockReturnValue(mockRegistryEntries);
+    store.getState.mockReturnValue({
+      timeZone: TZ,
+    });
 
     animation.uiDidUpdate();
-    expect(animator.scrollTo.mock.calls[0][0]).toEqual(today_elem);
+    expect(animator.forceScrollTo.mock.calls[0][0]).toEqual(today_elem);
+    expect(animator.scrollTo).toHaveBeenCalled()
     expect(animator.scrollToTop).not.toHaveBeenCalled();
     expect(store.dispatch).not.toHaveBeenCalled();
   });
 
   it('scrolls to the top when it cannot find today', () => {
-    const {animation, animator, registry} = createAnimation(ScrollToToday);
+    const {animation, animator, store, registry} = createAnimation(ScrollToToday);
     const mockRegistryEntries = [
-      mockRegistryEntry('some-item', 'i1', moment.tz(TZ)),
+      mockRegistryEntry('some-item', 'i1', moment.tz(today, TZ)),
     ];
     registry.getAllItemsSorted.mockReturnValue(mockRegistryEntries);
+    store.getState.mockReturnValue({
+      timeZone: TZ,
+    });
 
     animation.uiDidUpdate();
     expect(animator.scrollTo).not.toHaveBeenCalled();
@@ -76,14 +84,19 @@ describe('items are in the planner', () => {
     const {animation, animator, store, registry, manager} = createAnimation(ScrollToToday);
     manager.getDocument().querySelector = function () {return today_elem;};
     const mockRegistryEntries = [
-      mockRegistryEntry('some-item', 'i1', moment.tz('2018-04-16', TZ)),  // in the future
+      mockRegistryEntry('some-item', 'i1', moment.tz(today, TZ).add(1, 'day')),  // in the future
     ];
     mockRegistryEntries[0].component.getScrollable.mockReturnValue(today_elem);
     registry.getAllItemsSorted.mockReturnValue(mockRegistryEntries);
+    store.getState.mockReturnValue({
+      timeZone: TZ,
+    });
 
     animation.uiDidUpdate();
     expect(successalert).toHaveBeenCalledWith(futureMessage)
-    expect(animator.scrollTo).toHaveBeenCalledTimes(2);
+    expect(animator.forceScrollTo).toHaveBeenCalledTimes(1);
+    expect(animator.forceScrollTo.mock.calls[0][0]).toEqual(today_elem);
+    expect(animator.scrollTo).toHaveBeenCalledTimes(1);
     expect(animator.focusElement).toHaveBeenCalledWith('i1-focusable');
   });
 
@@ -92,14 +105,19 @@ describe('items are in the planner', () => {
     const {animation, animator, store, registry, manager} = createAnimation(ScrollToToday);
     manager.getDocument().querySelector = function () {return today_elem;};
     const mockRegistryEntries = [
-      mockRegistryEntry('some-item', 'i1', moment.tz('2018-04-13', TZ)),  // in the past
+      mockRegistryEntry('some-item', 'i1', moment.tz(today, TZ).add(-1, 'day')),  // in the past
     ];
     mockRegistryEntries[0].component.getScrollable.mockReturnValue(today_elem);
     registry.getAllItemsSorted.mockReturnValue(mockRegistryEntries);
+    store.getState.mockReturnValue({
+      timeZone: TZ,
+    });
 
     animation.uiDidUpdate();
     expect(successalert).toHaveBeenCalledWith(pastMessage);
-    expect(animator.scrollTo).toHaveBeenCalledTimes(2);
+    expect(animator.forceScrollTo).toHaveBeenCalledTimes(1);
+    expect(animator.forceScrollTo.mock.calls[0][0]).toEqual(today_elem);
+    expect(animator.scrollTo).toHaveBeenCalledTimes(1);
     expect(animator.focusElement).toHaveBeenCalledWith('i1-focusable');
   });
 
@@ -108,16 +126,20 @@ describe('items are in the planner', () => {
     const {animation, animator, store, registry, manager} = createAnimation(ScrollToToday);
     manager.getDocument().querySelector = function () {return some_elem;};
     const mockRegistryEntries = [
-      mockRegistryEntry('past-item', 'p1', moment.tz('2018-04-13', TZ)),  // in the past
-      mockRegistryEntry('some-item', 'f1', moment.tz('2018-06-16', TZ)),  // way in the future
+      mockRegistryEntry('past-item', 'p1', moment.tz(today, TZ).add(-1,'day')),  // in the past
+      mockRegistryEntry('some-item', 'f1', moment.tz(today, TZ).add(10,'day')),  // way in the future
     ];
     mockRegistryEntries[0].component.getScrollable.mockReturnValue(some_elem);
     mockRegistryEntries[1].component.getScrollable.mockReturnValue(some_elem);
     registry.getAllItemsSorted.mockReturnValue(mockRegistryEntries);
+    store.getState.mockReturnValue({
+      timeZone: TZ,
+    });
 
     animation.uiDidUpdate();
     expect(successalert).toHaveBeenCalledWith(futureMessage)
-    expect(animator.scrollTo).toHaveBeenCalledTimes(2);
+    expect(animator.forceScrollTo).toHaveBeenCalledTimes(1);
+    expect(animator.scrollTo).toHaveBeenCalledTimes(1);
     expect(animator.focusElement).toHaveBeenCalledWith('f1-focusable');
   });
 
@@ -127,16 +149,20 @@ describe('items are in the planner', () => {
     const {animation, animator, store, registry, manager} = createAnimation(ScrollToToday);
     manager.getDocument().querySelector = function () {return some_elem;};
     const mockRegistryEntries = [
-      mockRegistryEntry('past-item', 'p1', moment.tz('2018-04-13', TZ)),  // in the past
+      mockRegistryEntry('past-item', 'p1', moment.tz(today, TZ).add(-1, 'day')),  // in the past
       mockRegistryEntry('some-item', 'f1', undefined),
     ];
     mockRegistryEntries[0].component.getScrollable.mockReturnValue(some_elem);
     mockRegistryEntries[1].component.getScrollable.mockReturnValue(some_elem);
     registry.getAllItemsSorted.mockReturnValue(mockRegistryEntries);
+    store.getState.mockReturnValue({
+      timeZone: TZ,
+    });
 
     animation.uiDidUpdate();
     expect(successalert).toHaveBeenCalledWith(pastMessage)
-    expect(animator.scrollTo).toHaveBeenCalledTimes(2);
+    expect(animator.forceScrollTo).toHaveBeenCalledTimes(1);
+    expect(animator.scrollTo).toHaveBeenCalledTimes(1);
     expect(animator.focusElement).toHaveBeenCalledWith('p1-focusable');
   });
 
@@ -149,5 +175,57 @@ describe('items require loading', () => {
     animation.uiDidUpdate();
     expect(animator.scrollToTop).toHaveBeenCalled();
     expect(store.dispatch).toHaveBeenCalled();
+  });
+});
+
+describe('there are no items', () => {
+  it('leaves focus on the Today button', () => {
+    const today_elem = {};
+    const {animation, animator, store, registry, manager} = createAnimation(ScrollToToday);
+    manager.getDocument().querySelector = function () {return today_elem;};
+    registry.getAllItemsSorted.mockReturnValue([]);
+    store.getState.mockReturnValue({
+      timeZone: TZ,
+    });
+
+    animation.uiDidUpdate();
+    expect(animator.forceScrollTo.mock.calls[0][0]).toEqual(today_elem);
+    expect(animator.focusElement).not.toHaveBeenCalled();
+  });
+});
+
+describe('when there is no component', () => {
+  it('leaves focus on the Today button', () => {
+    const today_elem = {};
+    const {animation, animator, store, registry, manager} = createAnimation(ScrollToToday);
+    manager.getDocument().querySelector = function () {return today_elem;};
+    registry.getAllItemsSorted.mockReturnValue([{}]);
+    store.getState.mockReturnValue({
+      timeZone: TZ,
+    });
+
+    animation.uiDidUpdate();
+    expect(animator.forceScrollTo.mock.calls[0][0]).toEqual(today_elem);
+    expect(animator.focusElement).not.toHaveBeenCalled();
+  });
+});
+
+describe('when there is no component.scrollable', () => {
+  it('leaves focus on the Today button', () => {
+    const today_elem = {};
+    const {animation, animator, store, registry, manager} = createAnimation(ScrollToToday);
+    manager.getDocument().querySelector = function () {return today_elem;};
+    const mockRegistryEntries = [
+      mockRegistryEntry('some-item', 'i1', moment.tz(today, TZ)),
+    ];
+    mockRegistryEntries[0].component.getFocusable = jest.fn(()=> undefined);
+    registry.getAllItemsSorted.mockReturnValue(mockRegistryEntries);
+    store.getState.mockReturnValue({
+      timeZone: TZ,
+    });
+
+    animation.uiDidUpdate();
+    expect(animator.forceScrollTo.mock.calls[0][0]).toEqual(today_elem);
+    expect(animator.focusElement).not.toHaveBeenCalled();
   });
 });

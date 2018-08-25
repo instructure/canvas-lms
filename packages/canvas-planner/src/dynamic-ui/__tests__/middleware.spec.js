@@ -56,7 +56,7 @@ it('behaves as middleware', () => {
 it('notifies the manager when the state is unchanged', () => {
   const mockManager = createManager();
   const mockStore = createStore();
-  const theState = {}
+  const theState = {};
   mockStore.getState.mockReturnValue(theState);
   const theAction = {type: 'an action'};
   createMiddleware(mockManager)(mockStore)(jest.fn())(theAction);
@@ -71,4 +71,12 @@ it('does not notify the manager of unchanged state when the state has changed', 
     .mockReturnValueOnce({state: 'second'});
   createMiddleware(mockManager)(mockStore)(jest.fn())({some: 'action'});
   expect(mockManager.uiStateUnchanged).not.toHaveBeenCalled();
+});
+
+it('notifies the manager of the action before it is processed by the reducers', () => {
+  const mockManager = createManager();
+  const mockStore = createStore();
+  const actionFailure = () => { throw new Error('foo'); };
+  expect(() => createMiddleware(mockManager)(mockStore)(actionFailure)({some: 'action'})).toThrow();
+  expect(mockManager.handleAction).toHaveBeenCalled();
 });

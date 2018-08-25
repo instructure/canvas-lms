@@ -139,8 +139,12 @@ export default function factory(spec) {
 
         const links = parseLinkHeader(xhr.getResponseHeader('Link'))
         this.mergeState(key, {data, links, loading: false})
-      }, () => {
-        this.mergeState(key, {error: true, loading: false})
+      }, (_data, textStatus) => {
+        if (textStatus === 'abort') {
+          this.mergeState(key, {loading: false})
+        } else {
+          this.mergeState(key, {error: true, loading: false})
+        }
       })
     },
 

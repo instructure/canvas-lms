@@ -22,10 +22,11 @@ import {ScrollToLoadedToday} from '../scroll-to-loaded-today';
 import {createAnimation, mockRegistryEntry} from './test-utils';
 import {startLoadingPastUntilTodaySaga, gotDaysSuccess} from '../../../actions/loading-actions';
 
+const today = '2018-04-15';
 const TZ = 'Asia/Tokyo';
 
 beforeAll(() => {
-  MockDate.set('2018-04-15', TZ);
+  MockDate.set(today, TZ);
   initialize({
     visualSuccessCallback: jest.fn(),
     visualErrorCallback: jest.fn(),
@@ -45,13 +46,16 @@ function createReadyAnimation () {
 
 it('scrolls to the newly loaded today', () => {
   const today_elem = {};
-  const {animation, animator, registry, manager} = createReadyAnimation();
+  const {animation, animator, registry, store, manager} = createReadyAnimation();
   manager.getDocument().querySelector = function () {return today_elem;};
   const mockRegistryEntries = [
-    mockRegistryEntry('some-item', 'i1', moment.tz(TZ)),
+    mockRegistryEntry('some-item', 'i1', moment.tz(today, TZ)),
   ];
   mockRegistryEntries[0].component.getScrollable.mockReturnValue(today_elem);
   registry.getAllItemsSorted.mockReturnValue(mockRegistryEntries);
+  store.getState.mockReturnValue({
+    timeZone: TZ,
+  });
 
   animation.uiDidUpdate();
   expect(animator.scrollTo.mock.calls[0][0]).toEqual(today_elem);

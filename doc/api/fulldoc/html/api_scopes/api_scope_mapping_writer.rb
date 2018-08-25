@@ -44,7 +44,8 @@ class ApiScopeMappingWriter
   def process_controllers(controllers, name, resource_hash)
     controllers.each_with_object(resource_hash) do |controller, hash|
       scope_resource = controller.name.to_s.underscore.gsub('_controller', '')
-      hash[scope_resource] = process_children(controller.children, name)
+      children = process_children(controller.children, name)
+      hash[scope_resource] = hash[scope_resource].nil? ? children : hash[scope_resource].merge(children)
     end
   end
 

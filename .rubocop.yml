@@ -143,6 +143,8 @@ RSpec/VerifiedDoubles:
   Enabled: false
 RSpec/NamedSubject:
   Enabled: false
+RSpec/NotToNot:
+  Enabled: false
 # RSpec cops we care extra about
 RSpec/EmptyExampleGroup:
   Severity: error

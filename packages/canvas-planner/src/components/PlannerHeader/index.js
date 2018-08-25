@@ -333,19 +333,19 @@ export class PlannerHeader extends Component {
         {this.renderToday()}
         <Button
           variant="icon"
+          icon={IconPlusLine}
           margin="0 medium 0 0"
           onClick={this.handleToggleTray}
           ref={(b) => { this.addNoteBtn = b; }}
         >
-          <IconPlusLine/>
           <ScreenReaderContent>{formatMessage("Add To Do")}</ScreenReaderContent>
         </Button>
         <Button
           variant="icon"
+          icon={IconGradebookLine}
           margin="0 medium 0 0"
           onClick={this.toggleGradesTray}
         >
-          <IconGradebookLine/>
           <ScreenReaderContent>{formatMessage("Show My Grades")}</ScreenReaderContent>
         </Button>
         <Popover

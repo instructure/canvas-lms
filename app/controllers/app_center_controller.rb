@@ -30,7 +30,7 @@ class AppCenterController < ApplicationController
   end
 
   def app_api
-    @app_api ||= AppCenter::AppApi.new
+    @app_api ||= AppCenter::AppApi.new(@context)
   end
 
   def page
@@ -41,7 +41,7 @@ class AppCenterController < ApplicationController
     per_page = Api.per_page_for(self, default: 72, max: 72)
     endpoint_scope = (@context.is_a?(Account) ? 'account' : 'course')
     base_url = send("api_v1_#{endpoint_scope}_app_center_apps_url")
-    response = app_api.get_apps(page, per_page, app_list_token) || {}
+    response = app_api.get_apps(page, per_page) || {}
     if response['lti_apps']
       collection = PaginatedCollection.build do |pager|
         map_tools_to_apps!(@context, response['lti_apps'])
@@ -52,14 +52,6 @@ class AppCenterController < ApplicationController
       render :json => Api.paginate(collection, self, base_url, :per_page => per_page.to_i)
     else
       render :json => response
-    end
-  end
-
-  def app_list_token
-    if @context.is_a?(Account)
-      @account.calculate_inherited_setting(:app_center_access_token)[:value]
-    else
-      @context.account.calculate_inherited_setting(:app_center_access_token)[:value]
     end
   end
 end

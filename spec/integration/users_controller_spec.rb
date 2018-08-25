@@ -47,6 +47,20 @@ describe UsersController do
       expect(Nokogiri::HTML(response.body).at_css('table.report tbody tr:first td:nth(2)').text).to match(/less than 1 day/)
     end
 
+    it "should use conversation message participants when calculating interaction" do
+      other_student = user_factory(:active_all => true)
+      @e1.course.enroll_student(other_student, :enrollment_state => 'active')
+
+      @conversation = Conversation.initiate([@e1.user, other_student, @teacher], false)
+      @conversation.add_message(@teacher, "hello", :only_users => [@e1.user]) # only send to one user
+
+      get user_student_teacher_activity_url(@teacher, @e1.user)
+      expect(Nokogiri::HTML(response.body).at_css('table.report tbody tr:first td:nth(2)').text).to match(/less than 1 day/)
+
+      get user_student_teacher_activity_url(@teacher, other_student)
+      expect(Nokogiri::HTML(response.body).at_css('table.report tbody tr:first td:nth(2)').text).to match(/never/)
+    end
+
     it "should only include students the teacher can view" do
       get user_course_teacher_activity_url(@teacher, @course)
       expect(response).to be_success

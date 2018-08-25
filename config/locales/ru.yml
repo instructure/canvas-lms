@@ -3,11 +3,13 @@
 --- 
 ru: 
   1_item_scores_5512cd03: "1 - Оценки за элементы"
+  1_item_scores_examplescores_9736236: "1- Оценки элементов: %{exampleScores}"
   1_user_found_76399771: "Найден 1 пользователь."
   1st_reviewer_3c1d0119: "1ый рецензент"
   25th_75th_ile_406a67bf: "25-ые-75-ые %iили"
   25th_75th_percentile_aa4c11f2: "25-ые-75-ые процентили"
   2_final_score_7b0fd15e: "2- Итоговая оценка"
+  2_final_score_exampleresult_922edf9c: "2- Итоговая оценка: %{exampleResult}"
   2nd_reviewer_94fdbcd: "2ой рецензент"
   451_message: 
     description: "Вы не авторизованы для доступа к этому сайту, поскольку находитесь в стране, на которую распространяются торговые ограничения США."
@@ -1629,6 +1631,7 @@ ru:
   affects_viewing_the_publish_course_conclude_course_76d2f601: |-
       Влияет на просмотр кнопок «Опубликовать курс», «Завершить курс» и «Навсегда удалить этот курс».
       Кнопка «Навсегда удалить этот курс» появляется только для созданных вручную курсов.
+  afghanistan_93_ab06805: "Афганистан (+93)"
   after_48b9d69: После...
   after_4c71e718: После
   after_cbb5ebae: После...
@@ -4019,6 +4022,7 @@ ru:
   cannot_be_present_when_course_id_is_present_785e6a59: "не может присутствовать,  если присутствует course_id"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Невозможно изменить новую дату истечения срока выполнения на дату в закрытом периоде оценки успеваемости"
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "Невозможно изменить название роли для %{label}: уже используется"
+  cannot_change_the_default_term_name_edc2279b: "Невозможно изменить имя термина по умолчанию"
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Невозможно изменить новую дату истечения срока выполнения на дату в закрытом периоде оценки успеваемости"
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "Невозможно изменить дату истечения срока выполнения на дату в закрытом периоде оценки успеваемости"
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: "Невозможно изменить дату истечения срока выполнения, наступающую в закрытом периоде оценки успеваемости"
@@ -4186,10 +4190,12 @@ ru:
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Нажмите на снэпшот, чтобы вернуться к вашему испытанию на момент, когда он был сделан. Примечание: Вся работа, выполненная вами с того момента, как был сделан снэпшот, будет безвозвратно потеряна!"
   click_to_add_a_name_6cf551b0: "Нажмите, чтобы добавить имя"
   click_to_change_profile_picture_for_display_name_6a4b41db: "Нажмите, чтобы изменить пиктограмму профиля для %{display_name}"
+  click_to_collapse_outcome_details_1d751617: "Щелкните, чтобы свернуть информацию по результатам"
   click_to_create_a_new_user_for_address_325f6683: "Нажмите, чтобы создать нового пользователя для %{address}"
   click_to_create_a_new_user_for_login_56d2daf5: "Нажмите, чтобы создать нового пользователя для %{login}"
   click_to_edit_drag_to_reorder_ab725681: "Щелкните для редактирования, перетащите для изменения порядка"
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Щелкните для ввода комментариев, если студент выбирает этот ответ"
+  click_to_expand_outcome_details_74a2a967: "Щелкните, чтобы развернуть информацию по результатам"
   click_to_load_a020891b: "(Нажмите, чтобы загрузить)"
   click_to_modify_89fa26aa: "Нажмите, чтобы изменить"
   click_to_order_by_email_ascending_98b1a697: "Щелкните для расположения по времени получения сообщений в восходящем порядке"
@@ -9537,6 +9543,7 @@ ru:
   grader_d1198a9c: "Средство оценки"
   grader_graderindex_45e04e57: "Оценщик %{graderIndex}"
   grader_gradernumber_fef5d5cf: "Средство оценки %{graderNumber}"
+  grader_index_a55577a2: "Оценщик %{index}"
   grader_is_required_62c88f67: "Необходим оценщик"
   grader_that_determines_final_grade_cc55f20: "Оценщик, определяющий конечную оценку"
   graders_can_view_each_other_s_comments_d836b848: "Оценщики могут просматривать комментарии друг друга"
@@ -10304,9 +10311,11 @@ ru:
   hide_key_e8fe1e8c: "Скрыть ключ"
   hide_navigation_menu_f0b3e90: "Скрыть меню навигации"
   hide_notes_column_7749f408: "Скрыть столбец заметок"
+  hide_outcomes_with_no_results_7e4ce06f: "Скрыть информацию без результатов"
   hide_score_total_for_assessment_results_d0ef117f: "Скрыть общие баллы для результатов проверки"
   hide_sidebar_2b5b3776: "Скрыть боковую панель"
   hide_student_names_3e59e862: "Скрыть имена студентов"
+  hide_students_with_no_results_6a22f991: "Скрыть студентов без результатов"
   hide_sub_accounts_for_account_name_a6de98bd: "Скрыть субучетные записи для %{account_name}"
   high_b5cbd048: Высокий
   high_contrast_description: |-
@@ -10780,6 +10789,7 @@ ru:
       Возможности, настройки и стили, которые особенно заметны в среде K-12. На данный момент это относится только
       к некоторым изменениям в стиле, однако в будущем, вполне возможно, у K-12 появятся и другие особенности.
   k_2521301c: k
+  kazakhstan_7_8fe892c: "Казахстан (+7)"
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "Имейте в виду, что эта отправка заданий будет учитываться для каждого члена вашей группы %{groupType}."
   keep_submissions_anonymous_5cbaf419: "Сохранить отправки анонимными"
   kenya_254_2945663a: "Кения (+254)"
@@ -10796,6 +10806,7 @@ ru:
   kind_7f0a88c4: Тип
   labels: 
     lock_module_until: "Заблокировать до"
+  last_assessment_cd5659b6: "Последняя оценка: "
   last_changed_b544504d: "Последнее изменение:"
   last_changed_date_82f1ce56: "Последнее изменение: %{date}"
   last_day_attended_b72d623c: "День последнего посещения"
@@ -13660,6 +13671,7 @@ ru:
   new_course_role_6a7bb75f: "Новая роль курса"
   new_criterion_6054bc7f: "Новый критерий"
   new_criterion_canceled_d8c2a655: "Новый критерий отменен"
+  new_discussion_dae4fae3: "Новая дискуссия"
   new_event_for_course_name_2ba1f734: "Новое событие для %{course_name}"
   new_export_3ab758: "Новый экспорт"
   new_features_for_developer_key_management_994090dc: "Новые функции для управления ключами программиста"
@@ -13766,6 +13778,7 @@ ru:
   no_subject_58b7941c: "Нет темы"
   no_subject_970aad80: "Нет темы"
   no_submission_for_assignment_a9cb6fe2: "Нет сданных работ для %{assignment}"
+  no_submissions_164cea23: "Нет отправок"
   no_terms_eab5ee7b: "Нет сроков"
   no_tls_618add1a: "Отсутствует TLS"
   no_unassigned_terms_deb7b76b: "Нет неназначенных сроков"
@@ -14500,7 +14513,7 @@ ru:
     cannot_unpublish_front_page: "Нельзя снять с публикации титульную страницу"
     delete_button: Удалить
     delete_confirmation: "Вы действительно хотите удалить эту страницу?"
-    delete_dialog_title: "Удалить вики-страницу"
+    delete_dialog_title: "Удалить страницу"
     deleting_button: Удаление…
     edit_dialog_title: "Редактировать страницу"
     errors: 
@@ -17622,6 +17635,7 @@ ru:
   rubrics_b5ef369b: Рубрики
   running_c5a4998d: Выполняется
   russia_7_87bc99d5: "Россия (+7)"
+  rwanda_250_1a6b344b: "Руанда (+250)"
   salesforce_account_id_eb5c78ad: "Идентификатор учетной записи Salesforce"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce имеет другой хост входа для учетных записей тестовой среды, отличный от рабочих аккаунтов, так что если вы используете аккаунт Salesforce в тестовой среде, и вы не установите этот флажок, то будет невозможно аутентифицировать (этот принцип работает и в обратном порядке, если у вас есть рабочий аккаунт, и вы установите этот флажок, он не будет аутентифицирован)"
   salesforce_ticketing_webtocase_connector_80f75716: "Коннектор для системы отслеживания веб-элемент Salesforce"
@@ -19363,6 +19377,7 @@ ru:
     update_grade: "Обновить оценку"
     view_rubric_assessment_in_the_speedgrader: "Просмотр оценки рубрики в SpeedGrader"
   submission_in_another_grading_period_e754b329: "Предоставление материалов в другом оценочном периоде"
+  submission_index_e960f9bf: "Отправка %{index}"
   submission_options_5184a65b: "Опции представления"
   submission_score_b7a291e8: "оценка отправки"
   submission_status_3079e730: "Статус отправки"
@@ -19858,6 +19873,7 @@ ru:
   there_was_a_problem_updating_the_comment_5f3595b9: "Возникла проблема при обновлении комментария"
   there_was_a_problem_updating_the_grade_1b6c8b4c: "Возникла проблема при обновлении оценки."
   there_was_a_problem_updating_the_submission_6e5280a1: "При обновлении документа возникла проблема."
+  there_was_an_error_fetching_course_statistics_96e9dbad: "Произошла ошибка при получении статистики по курсу"
   there_was_an_error_fetching_outcome_results_45c57590: "Произошла ошибка при получении конечных результатов"
   there_was_an_error_fetching_submission_comments_ce153077: "Произошла ошибка при получении комментариев по отправке"
   there_was_an_error_generating_the_pairing_code_9edd639b: "Произошла ошибка при создании кода сопряжения"
@@ -20275,6 +20291,7 @@ ru:
   to_access_the_account_courses_page_courses_view_li_e1da6165: "Для доступа к странице учетной записи «Курсы» необходимо включить «Курсы - просмотреть список»."
   to_access_the_assignments_index_page_course_conten_a5b00f98: "Для доступа к странице-указателю «Задания», должен быть включен параметр «Содержание курса - просмотреть». Чтобы дифференцировать задания между отдельными студентами, также должен быть включен параметр «Пользователи - просмотреть список»."
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "Для доступа к станице «Люди» и просмотра параметра «Группы» также должен быть включен параметр «Пользователи - просмотреть список»."
+  to_access_the_people_page_users_view_list_must_be__2f01333b: "Для доступа к странице «Люди» необходимо включить «Пользователи - просмотреть список». Если это разрешение включено, и если отключен параметр «Пользователи - просмотреть основной адрес электронной почты», пользователи будут видеть адреса электронной почты, используемые в качестве идентификаторов входа. Для просмотра идентификаторов входа перейдите по пути Пользователи - добавить / удалить студентов в курсах и Пользователи - добавить / удалить преподавателей, разработчики курсов или ассистенты преподавателей в курсах также должны быть активированы"
   to_access_the_people_page_users_view_list_must_be__5a5475fe: "Для доступа к странице «Люди» необходимо включить «Пользователи - просмотреть список»."
   to_access_the_people_page_users_view_list_must_be__756d7188: |-
       Для доступа к странице «Люди» необходимо включить «Пользователи - просмотреть список».
@@ -20335,6 +20352,7 @@ ru:
   to_differentiate_assignments_to_individual_student_6cc40fde: "Чтобы дифференцировать задания между отдельными студентами, также должен быть включен параметр «Пользователи - просмотреть список»."
   to_do_1d554f36: Задачи
   to_do_5526f10a: "Задачи:"
+  to_do_6ac7b2dc: "выполните:"
   to_do_date_d6b79bfd: "Задачи %{date}"
   to_do_date_ddfb582c: "Дата выполнения:"
   to_do_items_loading_d1cdfcd5: "Для выполнения загрузки позиций"
@@ -21672,6 +21690,7 @@ ru:
   you_have_submitted_the_assignment_7ef8a51a: "Вы отправили задание"
   you_have_unsynced_changes_that_will_sync_to_all_as_9028e711: "У вас есть несинхронизированные изменения, которые будут синхронизированы со всеми связанными курсами при сохранении новой ассоциации."
   you_just_sent_a_message_in_canvas_86b4945c: "Вы только что отправили сообщение в Canvas"
+  you_left_the_required_name_field_empty_8f9bce5c: "Вы не заполнили обязательное поле с именем."
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "Вы определенно захотите некоторые из них. Разве интересно преподавать на курсе, если никто даже не слушает?"
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "Вам потребуется обновить токен, следуйте инструкциям,предоставленным в этой ссылке, вам может потребоваться помощь технического эксперта"
   you_may_not_reproduce_or_communicate_any_of_the_co_7636b552: "Воспроизведение и распространение содержимого этого курса, включая файлы, экспортированные из этого курса, не допускается без предварительного письменного разрешения вашего учреждения.  Уточните политику онлайновых пользовательских соглашений, принятую в вашем учреждении."

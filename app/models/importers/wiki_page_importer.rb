@@ -36,6 +36,10 @@ module Importers
     end
 
     def self.process_migration(data, migration)
+      if migration.for_master_course_import? # make a tag if it doesn't exist
+        migration.context.wiki.load_tag_for_master_course_import!(migration.child_subscription_id)
+      end
+
       wikis = data['wikis'] ? data['wikis']: []
       wikis.each do |wiki|
         unless wiki
@@ -96,7 +100,19 @@ module Importers
         item.workflow_state = 'unpublished' if item.deleted?
       end
 
-      item.set_as_front_page! if !!hash[:front_page] && context.wiki.has_no_front_page
+      if migration.for_master_course_import?
+        if context.wiki.can_update_front_page_for_master_courses?
+          if hash[:front_page]
+            context.wiki.set_front_page_url!(item.url) unless item.unpublished?
+          elsif item.persisted? && context.wiki.front_page == item
+            context.wiki.unset_front_page!
+          end
+        end
+      else
+        if !!hash[:front_page] && context.wiki.has_no_front_page
+          item.set_as_front_page!
+        end
+      end
       item.migration_id = hash[:migration_id]
       item.todo_date = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:todo_date])
 

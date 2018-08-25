@@ -874,7 +874,7 @@ class ExternalToolsController < ApplicationController
   #   URL.
   def create_tool_with_verification
     if authorized_action(@context, @current_user, :update)
-      app_api = AppCenter::AppApi.new
+      app_api = AppCenter::AppApi.new(@context)
 
       required_params = [
         :consumer_key,
