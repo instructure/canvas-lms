@@ -358,10 +358,12 @@ describe PermissionsHelper do
     it "should return other course-level (non-standard) permission values for active enrollments" do
       invited_student_enrollment = course_with_student(:active_course => true)
       active_student_enrollment = course_with_student(:user => @user, :active_all => true)
-      courses = [invited_student_enrollment.course, active_student_enrollment.course]
+      teacher_enrollment = course_with_teacher(user: @user, active_all: true)
+      courses = [invited_student_enrollment.course, active_student_enrollment.course, teacher_enrollment.course]
       expect(@user.precalculate_permissions_for_courses(courses, [:manage_calendar])).to eq({
-        invited_student_enrollment.global_course_id => {:manage_calendar => false},
-        active_student_enrollment.global_course_id => {:manage_calendar => false, :read => true, :read_grades => true, :participate_as_student => true}
+        invited_student_enrollment.global_course_id => {:manage_calendar => false, :read_as_admin => false},
+        active_student_enrollment.global_course_id => {:manage_calendar => false, :read => true, :read_grades => true, :participate_as_student => true, :read_as_admin => false},
+        teacher_enrollment.global_course_id => {:manage_calendar => true, :read => true, :read_as_admin => true}
       })
     end
 
@@ -437,6 +439,16 @@ describe PermissionsHelper do
       })
     end
 
+    it "should work with unenrolled account admins" do
+      @course1 = course_factory
+      sub_account = Account.default.sub_accounts.create!
+      @course2 = course_factory(:account => sub_account)
+      account_admin_user(:active_all => true)
+      result = @user.precalculate_permissions_for_courses([@course1, @course2], SectionTabHelper::PERMISSIONS_TO_PRECALCULATE)
+      expected = Hash[SectionTabHelper::PERMISSIONS_TO_PRECALCULATE.map{|p| [p, true]}] # should be true for everything
+      expect(result).to eq({@course1.global_id => expected, @course2.global_id => expected})
+    end
+
     it "should work with concluded-available permissions" do
       RoleOverride.create!(permission: 'moderate_forum', enabled: true, role: student_role, account: Account.default)
       concluded_student_enrollment = course_with_student(:active_all => true)
@@ -485,6 +497,15 @@ describe PermissionsHelper do
             expect(all_data[course.global_id][permission]).to eq course.grants_right?(@user, permission)
           end
         end
+      end
+
+      it "should not try to precalculate for a cross-shard admin" do
+        @shard1.activate do
+          @another_account = Account.create!
+          @cs_course = course_factory(active_all: true, account: @another_account)
+        end
+        site_admin_user(:active_all => true)
+        expect(@user.precalculate_permissions_for_courses([@cs_course], [:read_forum])).to eq nil
       end
     end
   end
