@@ -2260,7 +2260,7 @@ class User < ActiveRecord::Base
 
     return @roles if @roles
     root_account.shard.activate do
-      @roles = Rails.cache.fetch(['user_roles_for_root_account3', self, root_account].cache_key) do
+      @roles = Rails.cache.fetch(['user_roles_for_root_account4', self, root_account].cache_key) do
         user_roles(root_account)
       end
     end
@@ -2831,6 +2831,7 @@ class User < ActiveRecord::Base
       roles << 'admin'
       root_ids = [root_account.id,  Account.site_admin.id]
       roles << 'root_admin' if account_users.any?{|au| root_ids.include?(au.account_id) }
+      roles << 'consortium_admin' if account_users.any?{|au| au.shard != root_account.shard}
     end
     roles
   end
