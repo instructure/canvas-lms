@@ -16,9 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../common'
-require_relative './new_user_search_page'
-require_relative './new_user_edit_modal_page.rb'
-require_relative './masquerade_page.rb'
+require_relative 'pages/new_user_search_page'
+require_relative 'pages/new_user_edit_modal_page.rb'
+require_relative 'pages/masquerade_page.rb'
 require_relative '../conversations/conversations_new_message_modal_page.rb'
 
 describe "new account user search" do
