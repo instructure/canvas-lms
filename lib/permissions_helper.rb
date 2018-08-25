@@ -61,7 +61,9 @@ module PermissionsHelper
       unloaded_ra_ids = root_account_ids - loaded_root_accounts.map(&:id)
       root_accounts = loaded_root_accounts + (unloaded_ra_ids.any? ? Account.where(:id => unloaded_ra_ids).to_a : [])
 
-      is_account_admin = root_accounts.any?{|ra| self.roles(ra).include?('admin')}
+      roles = root_accounts.map{|ra| self.roles(ra)}.flatten.uniq
+      return nil if roles.include?('consortium_admin') # cross-shard precalculation doesn't work - just fallback to the usual calculations
+      is_account_admin = roles.include?('admin')
       account_roles = is_account_admin ? AccountUser.where(user: self).active.preload(:role).to_a : []
       all_permissions_data = get_permissions_info_by_account(all_applicable_enrollments, permissions, account_roles)
 
@@ -137,7 +139,7 @@ module PermissionsHelper
   def get_permissions_info_by_account(enrollments, permissions, account_roles=nil)
     account_roles ||= AccountUser.where(user: self).active.preload(:role).to_a
     role_ids = (enrollments.map(&:role_id) + account_roles.map(&:role_id)).uniq
-    root_account_ids = enrollments.map(&:root_account_id).uniq
+    root_account_ids = courses.map(&:root_account_id).uniq
     query = <<-SQL
       WITH RECURSIVE t(id, name, parent_account_id, role_id, enabled, locked, self, children, permission) AS (
         SELECT accounts.id, name, parent_account_id, ro.role_id, ro.enabled, ro.locked,
