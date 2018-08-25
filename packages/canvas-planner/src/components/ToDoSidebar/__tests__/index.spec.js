@@ -150,7 +150,8 @@ it('does not render out items that are completed', () => {
   expect(wrapper.find('ToDoItem')).toHaveLength(0);
 });
 
-it('can suppress the Show All', () => {
-    const wrapper = shallow(<ToDoSidebar {...defaultProps} changeDashboardView={null} />);
-    expect(wrapper).toMatchSnapshot();
+it('can handles no items', () => {
+  // suppress Show All button and display "Nothing for now" instead of list
+  const wrapper = shallow(<ToDoSidebar {...defaultProps} changeDashboardView={null} />);
+  expect(wrapper).toMatchSnapshot();
 });

@@ -30,10 +30,10 @@ cache(safe_cache_key([@current_user, contexts, 'to_do_list_view']), cache_opts) 
  presenter = ToDoListPresenter.new(self, @current_user, contexts)
 %>
 
-<% if presenter.any_assignments? %>
-  <% if @domain_root_account&.feature_enabled?(:student_planner) %>
+<% if @domain_root_account&.feature_enabled?(:student_planner) %>
     <div class="todo-list"></div>
-  <% else %>
+<% else %>
+  <% if presenter.any_assignments? %>
     <h2 class="todo-list-header" tabindex="-1"><%= t('headings.to_do', %{To Do}) %></h2>
     <ul class="right-side-list to-do-list">
       <% presenter.needs_grading.each_with_index do |assignment, i| %>

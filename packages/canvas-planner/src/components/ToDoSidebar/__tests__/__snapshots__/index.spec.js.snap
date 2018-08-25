@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`can suppress the Show All 1`] = `
+exports[`can handles no items 1`] = `
 <div>
   <h2
     className="todo-list-header"
@@ -11,12 +11,12 @@ exports[`can suppress the Show All 1`] = `
       To Do
     </span>
   </h2>
-  <List
-    as="ul"
-    delimiter="none"
-    margin="none"
-    size="medium"
-    variant="unstyled"
-  />
+  <Text
+    as="span"
+    letterSpacing="normal"
+    size="small"
+  >
+    Nothing for now
+  </Text>
 </div>
 `;
