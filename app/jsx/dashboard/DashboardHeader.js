@@ -17,7 +17,6 @@
  */
 
 import React from 'react';
-import $ from 'jquery'
 import I18n from 'i18n!dashboard';
 import axios from 'axios';
 import { bool, func, string, object } from 'prop-types';
@@ -25,6 +24,9 @@ import loadPlannerDashboard, { renderToDoSidebar } from 'canvas-planner';
 import { showFlashAlert, showFlashError } from '../shared/FlashAlert'
 import DashboardOptionsMenu from '../dashboard_card/DashboardOptionsMenu';
 import loadCardDashboard from '../bundles/dashboard_card'
+import $ from 'jquery'
+import 'jquery.disableWhileLoading'
+
 
 const [show, hide] = ['block', 'none'].map(displayVal => id => {
   const el = document.getElementById(id)
@@ -61,7 +63,6 @@ export default class DashboardHeader extends React.Component {
 
   componentDidMount () {
     this.showDashboard(this.state.currentDashboard)
-    this.props.showTodoList(this.switchDashboard)
   }
 
   getActiveApp = () => this.state.currentDashboard
@@ -117,6 +118,12 @@ export default class DashboardHeader extends React.Component {
       this.loadCardDashboard()
     } else if (newView === 'activity') {
       this.loadStreamItemDashboard()
+    }
+
+    // also load the sidebar if we need to (no sidebar is shown in planner dashboard)
+    if ((newView !== 'planner') && !this.sidebarHasLoaded) {
+      this.props.showTodoList(this.changeDashboard)
+      this.sidebarHasLoaded = true
     }
 
     this.setState({loadedViews: this.state.loadedViews.concat(newView)})
@@ -189,17 +196,22 @@ export default class DashboardHeader extends React.Component {
 
 // extract this out to a property so tests can override it and not have to mock
 // out the timers in every single test.
-function showTodoList (changeDashboard) {
-  // The sidebar itself is loaded via a separate fetch from the server. This
-  // means we need to wait for the element to appear on the page before we can
-  // render the to do list.
-  const interval = window.setInterval(() => {
-    const container = document.querySelector('.Sidebar__TodoListContainer')
-    if (container) {
-      renderToDoSidebar(container, {
-        changeDashboardView: changeDashboard,
-      });
-      window.clearInterval(interval);
-    }
-  }, 100);
+function showTodoList(changeDashboardView) {
+  if (ENV.DASHBOARD_SIDEBAR_URL) {
+    const rightSide = $('#right-side')
+    const promiseToGetNewCourseForm = import('compiled/util/newCourseForm')
+    const promiseToGetHtml = $.get(ENV.DASHBOARD_SIDEBAR_URL)
+    rightSide.disableWhileLoading(
+      Promise.all([promiseToGetNewCourseForm, promiseToGetHtml]).then(([newCourseForm, html]) => {
+        // inject the erb html we got from the server
+        rightSide.html(html)
+        newCourseForm()
+
+        // the injected html has a .Sidebar__TodoListContainer element in it,
+        // render the canvas-planner ToDo list into it
+        const container = document.querySelector('.Sidebar__TodoListContainer')
+        if (container) renderToDoSidebar(container, { changeDashboardView })
+      })
+    )
+  }
 }

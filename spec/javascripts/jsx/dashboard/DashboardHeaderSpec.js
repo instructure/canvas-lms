@@ -104,25 +104,58 @@ test('it renders', () => {
   ok(dashboardHeader)
 })
 
-test('it waits for the parent element to appear and then renders the the ToDoSidebar', () => {
-  const clock = sinon.useFakeTimers(new Date('2018-01-01'))
-  try {
-    ReactDOM.render(
-      <FakeDashboard
-        planner_enabled={false}
-        dashboard_view='activity'
-        showTodoList={null}
-      />, container)
-      clock.tick(510) // don't bork when the element isn't there
-      notOk(container.textContent.match(/Loading/), 'container should not contain "Loading"')
-      const todoContainer = document.createElement('div')
-      todoContainer.className = 'Sidebar__TodoListContainer'
-      container.appendChild(todoContainer)
-      clock.tick(510)
-      ok(todoContainer.textContent.match(/Loading/), 'container should contain "Loading"')
-    } finally {
-      clock.restore()
-    }
+test('it waits for the erb html to be injected before rendering the ToDoSidebar', assert => {
+  const done = assert.async()
+  ENV.DASHBOARD_SIDEBAR_URL = 'fake-dashboard-sidebar-url'
+  const $fakeRightSide = $('<div id="right-side">').appendTo(document.body)
+  const fakeServerResponse = Promise.resolve(`
+    <div class="Sidebar__TodoListContainer"></div>
+    This came from the server
+  `)
+
+  sandbox
+    .mock($)
+    .expects('get')
+    .once()
+    .withArgs('fake-dashboard-sidebar-url')
+    .returns(fakeServerResponse)
+
+  moxios.stubOnce('GET', '/api/v1/planner/items', {
+    status: 200,
+    responseText: {}
+  })
+  const promiseToGetNewCourseForm = import('compiled/util/newCourseForm')
+
+  ReactDOM.render(
+    <FakeDashboard planner_enabled={false} dashboard_view="activity" showTodoList={null} />,
+    container
+  )
+  notOk(
+    $fakeRightSide
+      .find('.Sidebar__TodoListContainer')
+      .text()
+      .includes('Loading'),
+    'container should not contain "Loading"'
+  )
+
+  Promise.all([promiseToGetNewCourseForm, promiseToGetNewCourseForm]).then(() => {
+    moxios.wait(() => {
+      ok(
+        $fakeRightSide.text().includes('This came from the server'),
+        'injects the server erb html where it should'
+      )
+
+      ok(
+        $fakeRightSide
+          .find('.Sidebar__TodoListContainer')
+          .text()
+          .includes('Loading'),
+        'container should contain "Loading"'
+      )
+      $fakeRightSide.remove()
+      done()
+    })
+  })
 })
 
 test('it should switch dashboard view appropriately when changeDashboard is called', () => {
