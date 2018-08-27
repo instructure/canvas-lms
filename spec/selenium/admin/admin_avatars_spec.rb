@@ -121,6 +121,8 @@ describe "admin avatars" do
   end
 
   context "student tray in original gradebook" do
+    include StudentContextTray
+
     before(:each) do
       @account = Account.default
       @account.enable_feature!(:student_context_cards)
@@ -131,9 +133,9 @@ describe "admin avatars" do
     end
 
     it "should display student avatar in tray", priority: "1", test_id: 3299466 do
-      StudentContextTray.wait_for_student_tray
+      wait_for_student_tray
 
-      expect(StudentContextTray.student_avatar_link).to be_displayed
+      expect(student_avatar_link).to be_displayed
     end
   end
 end

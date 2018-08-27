@@ -15,21 +15,125 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative '../../common'
 
 module PlannerPageObject
 
-  def click_dashboard_settings
-    expect(f('#DashboardOptionsMenu_Container')).to be_displayed # Ensure the page is loaded and the element is visible
-    f('#DashboardOptionsMenu_Container').click
+  #------------------------- Selectors --------------------------
+
+  def todo_sidebar_modal_selector(title = nil)
+    if title
+      "[aria-label = 'Edit #{title}']"
+    else
+      "[aria-label = 'Add To Do']"
+    end
   end
 
-  def select_list_view
-    fj('span[role="menuitemradio"]:contains("List View")').click
+  def load_prior_button_selector
+    "button:contains('Load prior')"
   end
 
-  def select_dashboard_view
-    fj('span[role="menuitemradio"]:contains("Card View")').click
+  def close_opportunities_selector
+    "button[title='Close opportunities popover']"
+  end
+
+  #------------------------- Elements --------------------------
+
+  def planner_app_div
+    f('.PlannerApp')
+  end
+
+  def select_dashboard_view_menuitem
+    fj('span[role="menuitemradio"]:contains("Card View")')
+  end
+
+  def todo_info_holder
+    f(".planner-grouping ol")
+  end
+
+  def items_displayed
+    ff('li', planner_app_div)
+  end
+
+  def title_input(title = nil)
+    modal = todo_sidebar_modal(title)
+    ff('input', modal)[0]
+  end
+
+  def time_input
+    modal = todo_sidebar_modal
+    ff('input', modal)[2]
+  end
+
+  def todo_save_button
+    fj("button:contains('Save')")
+  end
+
+  def todo_details
+    modal = todo_sidebar_modal
+    f('textarea', modal)
+  end
+
+  def todo_sidebar_modal(title = nil)
+    f(todo_sidebar_modal_selector(title))
+  end
+
+  def discussion_index_page_detail
+    # might need to change when implementing
+    f('.todo-date')
+  end
+
+  def discussion_show_page_detail
+    # might need to change when implementing
+    f('.discussion-tododate')
+  end
+
+  def pages_detail
+    # Complete this while fixing ADMIN-1161
+  end
+
+  def todo_modal_button
+    fj("button:contains('Add To Do')")
+  end
+
+  def new_activity_button
+    fj("button:contains('New Activity')")
+  end
+
+  def today_button
+    f("#planner-today-btn")
+  end
+
+  def planner_item_open_arrow
+    f("svg[name='IconArrowOpenEnd']")
+  end
+
+  def dashboard_options_menu_container
+    f('#DashboardOptionsMenu_Container')
+  end
+
+  def course_assignment_link(course_name, scope)
+    fxpath("//span[contains(text(),'#{course_name}')]", scope)
+  end
+
+  def course_assignment_by_due_at(time=nil)
+    fxpath("//div[contains(@class, 'PlannerApp')]//span[contains(text(),'Due: #{time}')]")
+  end
+
+  #----------------------- Actions & Methods -------------------------
+
+  def expand_planner_item_open_arrow
+    if planner_item_open_arrow.displayed?
+      planner_item_open_arrow.click
+    end
+  end
+
+  def open_opportunities_dropdown
+    fj("button:contains('opportunit')").click
+  end
+
+  def close_opportunities_dropdown
+    f(close_opportunities_selector).click
   end
 
   def navigate_to_course_object(object)
@@ -62,8 +166,8 @@ module PlannerPageObject
   end
 
   # Pass what type of object it is. Ensure object's name starts with a capital letter
-  def validate_object_displayed(object_type)
-    expect(fxpath("//*[contains(@class, 'PlannerApp')]//span[contains(text(),'Unnamed Course #{object_type}')]")).to be_displayed
+  def validate_object_displayed(course_name, object_type)
+    expect(fxpath("//*[contains(@class, 'PlannerApp')]//span[contains(text(),'#{course_name} #{object_type}')]")).to be_displayed
   end
 
   def validate_no_due_dates_assigned
@@ -75,7 +179,7 @@ module PlannerPageObject
 
   def go_to_dashcard_view
     click_dashboard_settings
-    select_dashboard_view
+    select_dashboard_view_menuitem.click
     wait_for_dashboard_load
   end
 
@@ -135,40 +239,6 @@ module PlannerPageObject
                                            message: "new reply from teacher")
   end
 
-  def discussion_index_page_detail
-    # might need to change when implementing
-    f('.todo-date')
-  end
-
-  def discussion_show_page_detail
-    # might need to change when implementing
-    f('.discussion-tododate')
-  end
-
-  def pages_detail
-    # Complete this while fixing ADMIN-1161
-  end
-
-  def open_opportunities_dropdown
-    fj("button:contains('opportunit')").click
-  end
-
-  def close_opportunities_dropdown
-    fj("button[title='Close opportunities popover']").click
-  end
-
-  def todo_modal_button
-    fj("button:contains('Add To Do')")
-  end
-
-  def new_activity_button
-    fj("button:contains('New Activity')")
-  end
-
-  def today_button
-    f("#planner-today-btn")
-  end
-
   def wait_for_planner_load
     wait_for_dom_ready
     wait_for_ajaximations
@@ -182,44 +252,9 @@ module PlannerPageObject
     f('.ic-dashboard-app')
   end
 
-  def title_input(title = nil)
-    modal = todo_sidebar_modal(title)
-    ff('input', modal)[0]
-  end
-
-  def time_input
-    modal = todo_sidebar_modal
-    ff('input', modal)[2]
-  end
-
-  def todo_save_button
-    fj("button:contains('Save')")
-  end
-
-  def todo_details
-    modal = todo_sidebar_modal
-    f('textarea', modal)
-  end
-
-  def todo_sidebar_modal_selector(title = nil)
-    if title
-      "[aria-label = 'Edit #{title}']"
-    else
-      "[aria-label = 'Add To Do']"
-    end
-  end
-
-  def todo_sidebar_modal(title = nil)
-    f(todo_sidebar_modal_selector(title))
-  end
-
   def wait_for_spinner
-    fj("title:contains('Loading')", f('.PlannerApp')) # the loading spinner appears
-    expect(f('.PlannerApp')).not_to contain_jqcss("title:contains('Loading')")
-  end
-
-  def items_displayed
-    ff('li', f('.PlannerApp'))
+    fj("title:contains('Loading')", planner_app_div) # the loading spinner appears
+    expect(planner_app_div).not_to contain_jqcss("title:contains('Loading')")
   end
 
   def first_item_on_page
@@ -233,14 +268,15 @@ module PlannerPageObject
     [old, older, oldest]
   end
 
-  def todo_info_holder
-    f('ol')
-  end
-
   def create_new_todo
     modal = todo_sidebar_modal
     element = f('input', modal)
     element.send_keys("Title Text")
     todo_save_button.click
+  end
+
+  def click_dashboard_settings
+    expect(dashboard_options_menu_container).to be_displayed # Ensure the page is loaded and the element is visible
+    dashboard_options_menu_container.click
   end
 end
