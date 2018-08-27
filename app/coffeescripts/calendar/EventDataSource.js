@@ -491,9 +491,10 @@ export default class EventDataSource {
       return donecb(list)
     }
     const eventDataSources = [
-      ['/api/v1/calendar_events', this.indexParams(params)],
-      ['/api/v1/calendar_events', this.assignmentParams(params)]
+      ['/api/v1/calendar_events', this.indexParams(params)]
     ]
+    params.context_codes = params.context_codes.filter(context => !context.match(/^appointment_group_/))
+    eventDataSources.push(['/api/v1/calendar_events', this.assignmentParams(params)])
     if (ENV.STUDENT_PLANNER_ENABLED) {
       eventDataSources.push(['/api/v1/planner_notes', params])
     }
@@ -535,9 +536,7 @@ export default class EventDataSource {
   }
 
   assignmentParams(params) {
-    const p = {type: 'assignment', ...params}
-    p.context_codes = p.context_codes.filter(context => !context.match(/^appointment_group_/))
-    return p
+    return {type: 'assignment', ...params}
   }
 
   getParticipants(appointmentGroup, registrationStatus, cb) {
