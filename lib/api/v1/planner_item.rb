@@ -50,7 +50,7 @@ module Api::V1::PlannerItem
         quiz = item.is_a?(Quizzes::Quiz) ? item : item.quiz
         hash[:plannable_id] = quiz.id
         hash[:plannable_type] = PLANNABLE_TYPES.key(quiz.class_name)
-        hash[:plannable] = quiz_json(quiz, quiz.context, user, session)
+        hash[:plannable] = quiz_json(quiz, quiz.context, user, session, skip_permissions: true)
         hash[:html_url] = named_context_url(quiz.context, :context_quiz_url, quiz.id)
         hash[:planner_override] ||= planner_override_json(quiz.planner_override_for(user), user, session)
       elsif item.is_a?(WikiPage) || (item.respond_to?(:wiki_page?) && item.wiki_page?)

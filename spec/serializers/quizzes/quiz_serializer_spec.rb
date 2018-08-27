@@ -50,6 +50,7 @@ describe Quizzes::QuizSerializer do
     allow(controller).to receive(:session).and_return session
     allow(controller).to receive(:context).and_return context
     allow(@quiz).to receive(:grants_right?).at_least(:once).and_return true
+    allow(@context).to receive(:grants_right?).at_least(:once).and_return true
     @serializer = quiz_serializer
     @json = @serializer.as_json[:quiz]
   end
@@ -137,12 +138,13 @@ describe Quizzes::QuizSerializer do
 
     # Students shouldn't be able to see speed_grader_url
     allow(@quiz).to receive(:grants_right?).and_return false
+    allow(@context).to receive(:grants_right?).and_return false
     expect(@serializer.as_json[:quiz]).not_to have_key :speed_grader_url
   end
 
   it "doesn't include the section count unless the user can grade" do
     result = true
-    allow(quiz).to receive(:grants_right?).with(@user, :grade) { result }
+    allow(quiz.context).to receive(:grants_right?).with(@user, :manage_grades) { result }
     expect(serializer.as_json[:quiz]).to have_key :section_count
 
     result = false
@@ -156,7 +158,7 @@ describe Quizzes::QuizSerializer do
 
   it "sends the message_students_url when user can grade" do
     result = true
-    allow(quiz).to receive(:grants_right?) { result }
+    allow(quiz.context).to receive(:grants_right?) { result }
     expect(serializer.as_json[:quiz][:message_students_url]).to eq(
       controller.send(:api_v1_course_quiz_submission_users_message_url, quiz, quiz.context)
     )
@@ -167,21 +169,21 @@ describe Quizzes::QuizSerializer do
 
   describe "access code" do
     it "is included if the user can grade" do
-      expect(quiz).to receive(:grants_right?).with(@user, :grade).
+      expect(quiz.context).to receive(:grants_right?).with(@user, :manage_grades).
         at_least(:once).and_return true
       expect(serializer.as_json[:quiz]).to have_key :access_code
     end
 
     it "is included if the user can manage" do
-      expect(quiz).to receive(:grants_right?).with(@user, :manage).
+      expect(quiz.context).to receive(:grants_right?).with(@user, :manage_assignments).
         at_least(:once).and_return true
       expect(serializer.as_json[:quiz]).to have_key :access_code
     end
 
     it "is not included if the user can't grade or manage" do
-      expect(quiz).to receive(:grants_right?).with(@user, :grade).
+      expect(quiz.context).to receive(:grants_right?).with(@user, :manage_grades).
         at_least(:once).and_return false
-      expect(quiz).to receive(:grants_right?).with(@user, :manage).
+      expect(quiz.context).to receive(:grants_right?).with(@user, :manage_assignments).
         at_least(:once).and_return false
       expect(serializer.as_json[:quiz]).not_to have_key :access_code
     end
@@ -238,13 +240,10 @@ describe Quizzes::QuizSerializer do
 
     it "is not present unless the user can manage the quiz's assignments" do
       manage_result = true
-      allow(quiz).to receive(:grants_right?).with(any_args).and_call_original
-      allow(quiz).to receive(:grants_right?).with(@user, :manage) { manage_result }
+      allow(context).to receive(:grants_right?).with(@user, :manage_assignments) { manage_result }
       expect(serializer.filter(serializer.class._attributes)).to include :unpublishable
 
       manage_result = false
-      expect(quiz).to receive(:grants_right?).with(@user, :grade).at_least(:once).and_return false
-      quiz.grants_right?(@user, :manage)
       expect(serializer.filter(serializer.class._attributes)).not_to include :unpublishable
     end
   end
@@ -384,34 +383,34 @@ describe Quizzes::QuizSerializer do
 
     describe 'quiz_reports' do
       it 'sends the url' do
-        allow(quiz).to receive_messages(context: Account.default.courses.new.tap { |c| c.id = 3 })
+        allow(quiz).to receive_messages(context: Account.default.courses.create!)
         expect(serializer.as_json[:quiz]['links']['quiz_reports']).to eq(
-          controller.send(:api_v1_course_quiz_reports_url, 3, quiz.id)
+          controller.send(:api_v1_course_quiz_reports_url, quiz.context.id, quiz.id)
         )
       end
 
       it 'sends the url as quiz_reports_url' do
         expect(controller).to receive(:accepts_jsonapi?).at_least(:once).and_return false
-        allow(quiz).to receive_messages(context: Account.default.courses.new.tap { |c| c.id = 3 })
+        allow(quiz).to receive_messages(context: Account.default.courses.create!)
         expect(serializer.as_json[:quiz][:quiz_reports_url]).to eq(
-          controller.send(:api_v1_course_quiz_reports_url, 3, quiz.id)
+          controller.send(:api_v1_course_quiz_reports_url, quiz.context.id, quiz.id)
         )
       end
     end
 
     describe "quiz_statistics" do
       it "sends the url" do
-        allow(quiz).to receive_messages(context: Account.default.courses.new.tap { |c| c.id = 3 })
+        allow(quiz).to receive_messages(context: Account.default.courses.create!)
         expect(serializer.as_json[:quiz]['links']['quiz_statistics']).to eq(
-          controller.send(:api_v1_course_quiz_statistics_url, 3, quiz.id)
+          controller.send(:api_v1_course_quiz_statistics_url, quiz.context.id, quiz.id)
         )
       end
 
       it "sends the url in non-JSONAPI too" do
         expect(controller).to receive(:accepts_jsonapi?).at_least(:once).and_return false
-        allow(quiz).to receive_messages(context: Account.default.courses.new.tap { |c| c.id = 3 })
+        allow(quiz).to receive_messages(context: Account.default.courses.create!)
         expect(serializer.as_json[:quiz][:quiz_statistics_url]).to eq(
-          controller.send(:api_v1_course_quiz_statistics_url, 3, quiz.id)
+          controller.send(:api_v1_course_quiz_statistics_url, quiz.context.id, quiz.id)
         )
       end
     end
@@ -422,6 +421,7 @@ describe Quizzes::QuizSerializer do
         course_with_student(active_all: true)
         @quiz.unstub(:check_right?)
         @quiz.unstub(:grants_right?)
+        @quiz.context.unstub(:grants_right?)
         serializer = quiz_serializer(scope: @student)
         expect(serializer.as_json[:quiz]['links']).not_to have_key 'unsubmitted_students'
       end
@@ -444,6 +444,7 @@ describe Quizzes::QuizSerializer do
       it "sends nil if user can't grade" do
         @quiz.unstub(:check_right?)
         @quiz.unstub(:grants_right?)
+        @quiz.context.unstub(:grants_right?)
         course_with_student(active_all: true)
         serializer = quiz_serializer(scope: @student)
         expect(serializer.as_json[:quiz]['links']).not_to have_key 'unsubmitted_students'
