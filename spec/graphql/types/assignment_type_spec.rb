@@ -114,4 +114,58 @@ describe Types::AssignmentType do
     assignment.update_attribute :grading_type, "fakefakefake"
     expect(assignment_type.resolve("gradingType")).to be_nil
   end
+
+  describe Types::AssignmentOverrideType do
+    it "works for groups" do
+      gc = assignment.group_category = GroupCategory.create! name: "asdf", context: course
+      group = gc.groups.create! name: "group", context: course
+      assignment.update_attributes group_category: gc
+      group_override = assignment.assignment_overrides.create!(set: group)
+      expect(
+        assignment_type.resolve(<<~GQL, current_user: teacher)
+          assignmentOverrides { edges { node { set {
+            ... on Group {
+              _id
+            }
+          } } } }
+        GQL
+      ).to eq [group.id.to_s]
+    end
+
+    it "works for sections" do
+      section = course.course_sections.create! name: "section"
+      section_override = assignment.assignment_overrides.create!(set: section)
+      expect(
+        assignment_type.resolve(<<~GQL, current_user: teacher)
+          assignmentOverrides { edges { node { set {
+            ... on Section {
+              _id
+            }
+          } } } }
+        GQL
+      ).to eq [section.id.to_s]
+    end
+
+    it "works for adhoc students" do
+      adhoc_override = assignment.assignment_overrides.new(set_type: "ADHOC")
+      adhoc_override.assignment_override_students.build(
+        assignment: assignment,
+        user: student,
+        assignment_override: adhoc_override
+      )
+      adhoc_override.save!
+
+      expect(
+        assignment_type.resolve(<<~GQL, current_user: teacher)
+          assignmentOverrides { edges { node { set {
+            ... on AdhocStudents {
+              students {
+                _id
+              }
+            }
+          } } } }
+        GQL
+      ).to eq [[student.id.to_s]]
+    end
+  end
 end
