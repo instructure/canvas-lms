@@ -164,6 +164,10 @@ class Assignment < ActiveRecord::Base
     assignment_titles.union(wiki_titles)
   end
 
+  def auditable?
+    anonymous_grading? || moderated_grading?
+  end
+
   # The relevant associations that are copied are:
   #
   # learning_outcome_alignments, rubric_association, wiki_page

@@ -36,8 +36,10 @@ class AnonymousOrModerationEvent < ApplicationRecord
     docviewer_strikeout_created
     docviewer_strikeout_updated
     grades_posted
+    submission_comment_created
+    submission_comment_updated
+    submission_comment_deleted
   ].freeze
-
   GRADES_POSTED = 'grades_posted'.freeze
 
   belongs_to :assignment

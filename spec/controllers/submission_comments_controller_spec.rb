@@ -96,6 +96,75 @@ RSpec.describe SubmissionCommentsController do
       delete 'destroy', params: {:id => @submission_comment.id}, format: "json"
       expect(response).to be_successful
     end
+
+    describe 'audit event logging' do
+      let(:course) { Course.create! }
+      let(:student) { course.enroll_student(User.create!, enrollment_state: 'active').user }
+      let(:teacher) { course.enroll_teacher(User.create!, enrollment_state: 'active').user }
+      let(:assignment) { course.assignments.create!(title: 'hi', anonymous_grading: true) }
+      let(:submission) { assignment.submission_for_student(student) }
+
+      let!(:comment) do
+        submission.submission_comments.create!(
+          author: student,
+          comment: 'initial comment'
+        )
+      end
+
+      let!(:draft_comment) do
+        submission.submission_comments.create!(
+          author: student,
+          draft: true,
+          comment: 'this is a draft'
+        )
+      end
+
+      let(:audit_events) do
+        AnonymousOrModerationEvent.where(
+          assignment: assignment,
+          submission: submission,
+        ).reload
+      end
+      let(:last_event) { audit_events.last }
+
+      context 'when an assignment is auditable' do
+        before(:each) do
+          user_session(teacher)
+        end
+
+        it 'creates an event when a published comment is destroyed' do
+          expect { delete(:destroy, params: {id: comment.id}) }.
+            to change(audit_events, :count).by(1)
+        end
+
+        it 'records the user_id of the destroyer' do
+          delete(:destroy, params: {id: comment.id})
+          expect(last_event.user_id).to eq teacher.id
+        end
+
+        it 'sets the event_type of the event to "submission_comment_deleted"' do
+          delete(:destroy, params: {id: comment.id})
+          expect(last_event.event_type).to eq 'submission_comment_deleted'
+        end
+
+        it 'includes the ID of the destroyed comment in the payload' do
+          delete(:destroy, params: {id: comment.id})
+          expect(last_event.payload['id']).to eq comment.id
+        end
+      end
+
+      it 'does not create an event if the assignment is not auditable' do
+        assignment.update!(anonymous_grading: false)
+
+        expect { delete(:destroy, params: {id: comment.id}) }.
+          not_to change(audit_events, :count)
+      end
+
+      it 'does not create an event if the comment is a draft' do
+        expect { delete(:destroy, params: {id: draft_comment.id}) }.
+          not_to change(audit_events, :count)
+      end
+    end
   end
 
   describe "PATCH 'update'" do
@@ -152,6 +221,96 @@ RSpec.describe SubmissionCommentsController do
 
     it "allows updating the status field" do
       expect { patch "update", params: @test_params }.to change { SubmissionComment.draft.count }.by(-1)
+    end
+
+    describe 'audit event logging' do
+      let(:course) { Course.create! }
+      let(:student) { course.enroll_student(User.create!, enrollment_state: 'active').user }
+      let(:assignment) { course.assignments.create!(title: 'hi', anonymous_grading: true) }
+      let(:submission) { assignment.submission_for_student(student) }
+
+      let!(:comment) do
+        submission.submission_comments.create!(
+          author: student,
+          comment: 'initial comment'
+        )
+      end
+
+      let!(:draft_comment) do
+        submission.submission_comments.create!(
+          author: student,
+          draft: true,
+          comment: 'this is a draft'
+        )
+      end
+
+      let(:audit_events) do
+        AnonymousOrModerationEvent.where(
+          assignment: assignment,
+          submission: submission
+        ).reload
+      end
+      let(:last_event) { audit_events.last }
+
+      before(:each) do
+        user_session(student)
+      end
+
+      context 'when an assignment is auditable' do
+        it 'creates an event when a non-draft comment is edited' do
+          expect { patch(:update, params: {id: comment.id, submission_comment: {comment: 'update!'}}) }.
+            to change(audit_events, :count).by(1)
+        end
+
+        it 'sets the user_id of the event to the editing user' do
+          patch(:update, params: {id: comment.id, submission_comment: {comment: 'update!!'}})
+          expect(last_event.user_id).to eq student.id
+        end
+
+        it 'sets the event_type of the event to "submission_comment_updated"' do
+          patch(:update, params: {id: comment.id, submission_comment: {comment: 'update!!!'}})
+          expect(last_event.event_type).to eq 'submission_comment_updated'
+        end
+
+        it 'includes the ID of the updated comment in the payload' do
+          patch(:update, params: {id: comment.id, submission_comment: {comment: 'update!!!!'}})
+          expect(last_event.payload['id']).to eq comment.id
+        end
+
+        it 'does not create an event when a comment is saved as a draft' do
+          expect {
+            patch(:update, params: {id: draft_comment.id, submission_comment: {comment: 'update!!!!!'}})
+          }.not_to change(audit_events, :count)
+        end
+
+        context 'when publishing an existing draft' do
+          it 'sets the event_type to "submission_comment_created"' do
+            patch(:update, params: {id: draft_comment.id, submission_comment: {draft: false}})
+            expect(last_event.event_type).to eq 'submission_comment_created'
+          end
+
+          it 'records changed values as if saving a new comment' do
+            comment_params = {draft: false, comment: 'this is NO LONGER a draft'}
+            patch(:update, params: {id: draft_comment.id, submission_comment: comment_params})
+
+            expect(last_event.payload['comment']).to eq 'this is NO LONGER a draft'
+          end
+        end
+
+        it 'captures changes to the comment field' do
+          new_text = 'update!!!!!!'
+          patch(:update, params: {id: comment.id, submission_comment: {comment: new_text}})
+
+          expect(last_event.payload['comment']).to eq ['initial comment', new_text]
+        end
+      end
+
+      it 'does not create an event when the assignment is not auditable' do
+        assignment.update!(anonymous_grading: false)
+        expect {
+          patch(:update, params: {id: comment.id, submission_comment: {comment: 'update!!!!!!!'}})
+        }.not_to change(audit_events, :count)
+      end
     end
   end
 end

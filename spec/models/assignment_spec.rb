@@ -6500,6 +6500,31 @@ describe Assignment do
     end
   end
 
+  describe '#auditable?' do
+    let(:course) { Course.create! }
+    let(:assignment) { course.assignments.create!(title: 'hi') }
+    let(:teacher) { course.enroll_teacher(User.create!, enrollment_state: 'active').user }
+
+    it 'is true if the assignment is anonymous' do
+      assignment.update!(anonymous_grading: true, moderated_grading: false)
+      expect(assignment).to be_auditable
+    end
+
+    it 'is true if the assignment is moderated' do
+      assignment.update!(
+        anonymous_grading: false,
+        moderated_grading: true,
+        grader_count: 1,
+        final_grader: teacher
+      )
+      expect(assignment).to be_auditable
+    end
+
+    it 'is false if the assignment is neither anonymous nor moderated' do
+      expect(assignment).not_to be_auditable
+    end
+  end
+
   describe 'Anonymous Moderated Marking setting validation' do
     before(:once) do
       assignment_model(course: @course)
