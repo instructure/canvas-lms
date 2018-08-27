@@ -134,9 +134,7 @@ module Api::V1::SubmissionComment
   def students(course:, assignment:, current_user:)
     @students ||= begin
       includes = gradebook_includes(user: current_user, course: course)
-      assignment.representatives(current_user, includes: includes) do |rep, others|
-        others.each { |s| res[:context][:rep_for_student][s.id] = rep.id }
-      end
+      assignment.representatives(current_user, includes: includes)
     end
   end
 
