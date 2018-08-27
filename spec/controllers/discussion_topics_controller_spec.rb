@@ -476,6 +476,24 @@ describe DiscussionTopicsController do
       expect(@topic.reload.read_state(@student)).to eq 'read'
     end
 
+    it "should mark as read when topic is in the future as teacher" do
+      course_topic(:skip_set_user => true)
+      teacher2 = @course.shard.activate { user_factory() }
+      teacher2enrollment = @course.enroll_user(teacher2, "TeacherEnrollment")
+      teacher2.save!
+      teacher2enrollment.course = @course # set the reverse association
+      teacher2enrollment.workflow_state = 'active'
+      teacher2enrollment.save!
+      @course.reload
+      @topic.available_from = 1.day.from_now
+      @topic.save!
+      @topic.reload
+      expect(@topic.read_state(teacher2)).to eq 'unread'
+      user_session(teacher2)
+      get 'show', params: {:course_id => @course.id, :id => @topic.id}
+      expect(@topic.reload.read_state(teacher2)).to eq 'read'
+    end
+
     it "should not mark as read if not visible" do
       user_session(@student)
       course_topic(:skip_set_user => true)

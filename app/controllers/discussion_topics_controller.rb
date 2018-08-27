@@ -608,7 +608,7 @@ class DiscussionTopicsController < ApplicationController
     else
       @headers = !params[:headless]
       # we still need the lock info even if the current user policies unlock the topic. check the policies manually later if you need to override the lockout.
-      @locked = @topic.locked_for?(@current_user, :check_policies => false, :deep_check_if_needed => true)
+      @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
       @unlock_at = @topic.available_from_for(@current_user)
       @topic.change_read_state('read', @current_user) unless @locked.is_a?(Hash) && !@locked[:can_view]
       if @topic.for_group_discussion?
