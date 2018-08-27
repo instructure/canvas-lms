@@ -1280,8 +1280,7 @@ QUnit.module('EditView: anonymous grading', (hooks) => {
 QUnit.module('EditView: Anonymous Instructor Annotations', (hooks) => {
   let server
 
-  hooks.beforeEach(() => {
-    fixtures.innerHTML = '<span data-component="ModeratedGradingFormFieldGroup"></span>'
+  function setupFakeEnv(envOptions = {}) {
     fakeENV.setup({
       AVAILABLE_MODERATORS: [],
       current_user_roles: ['teacher'],
@@ -1290,8 +1289,13 @@ QUnit.module('EditView: Anonymous Instructor Annotations', (hooks) => {
       MODERATED_GRADING_ENABLED: true,
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
-      COURSE_ID: 1
+      COURSE_ID: 1,
+      ...envOptions
     })
+  }
+
+  hooks.beforeEach(() => {
+    fixtures.innerHTML = '<span data-component="ModeratedGradingFormFieldGroup"></span>'
     server = sinon.fakeServer.create()
   })
 
@@ -1301,9 +1305,19 @@ QUnit.module('EditView: Anonymous Instructor Annotations', (hooks) => {
     fixtures.innerHTML = ''
   })
 
-  test('shows a checkbox', () => {
-    const view = editView()
-    strictEqual(view.$el.find('input#assignment_anonymous_instructor_annotations').length, 1)
+  test('when environment is not set, does not enable editing the property', function() {
+    setupFakeEnv()
+    strictEqual(editView().$el.find('input#assignment_anonymous_instructor_annotations').length, 0)
+  })
+
+  test('when environment is set to false, does not enable editing the property', function() {
+    setupFakeEnv({ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED: false})
+    strictEqual(editView().$el.find('input#assignment_anonymous_instructor_annotations').length, 0)
+  })
+
+  test('when environment is set to true, enables editing the property', function() {
+    setupFakeEnv({ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED: true})
+    strictEqual(editView().$el.find('input#assignment_anonymous_instructor_annotations').length, 1)
   })
 })
 

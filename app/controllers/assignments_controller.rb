@@ -522,12 +522,12 @@ class AssignmentsController < ApplicationController
       end
 
       hash[:ANONYMOUS_GRADING_ENABLED] = @context.feature_enabled?(:anonymous_marking)
-
       hash[:MODERATED_GRADING_ENABLED] = @context.feature_enabled?(:moderated_grading)
+      hash[:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED] = @context.feature_enabled?(:anonymous_instructor_annotations)
 
       append_sis_data(hash)
       if context.is_a?(Course)
-        hash[:allow_self_signup] = true  # for group creation
+        hash[:allow_self_signup] = true # for group creation
         hash[:group_user_type] = 'student'
       end
       js_env(hash)

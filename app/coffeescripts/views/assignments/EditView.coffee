@@ -361,6 +361,7 @@ define [
         conditionalReleaseServiceEnabled: ENV?.CONDITIONAL_RELEASE_SERVICE_ENABLED or false
         lockedItems: @lockedItems
         anonymousGradingEnabled: ENV?.ANONYMOUS_GRADING_ENABLED or false
+        anonymousInstructorAnnotationsEnabled: ENV?.ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED or false
 
     _attachEditorToDescription: =>
       return if @lockedItems.content

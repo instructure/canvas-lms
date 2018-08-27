@@ -1000,6 +1000,40 @@ describe AssignmentsController do
       expect(assigns[:js_env][:MODERATED_GRADING_MAX_GRADER_COUNT]).to eq @assignment.moderated_grading_max_grader_count
     end
 
+    describe 'js_env ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED' do
+      before(:each) do
+        user_session(@teacher)
+      end
+
+      it 'is true when the course has anonymous_instructor_annotations on' do
+        @course.enable_feature!(:anonymous_instructor_annotations)
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+
+        expect(assigns[:js_env][:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED]).to be true
+      end
+
+      it 'is true when the account has anonymous_instructor_annotations on' do
+        @course.account.enable_feature!(:anonymous_instructor_annotations)
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+
+        expect(assigns[:js_env][:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED]).to be true
+      end
+
+      it 'is false when the course has anonymous_instructor_annotations off' do
+        @course.disable_feature!(:anonymous_instructor_annotations)
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+
+        expect(assigns[:js_env][:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED]).to be false
+      end
+
+      it 'is false when the account has anonymous_instructor_annotations off' do
+        @course.account.disable_feature!(:anonymous_instructor_annotations)
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+
+        expect(assigns[:js_env][:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED]).to be false
+      end
+    end
+
     context 'plagiarism detection platform' do
       include_context 'lti2_spec_helper'
 
