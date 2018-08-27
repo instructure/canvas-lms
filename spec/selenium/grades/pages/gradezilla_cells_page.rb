@@ -47,6 +47,10 @@ class Gradezilla
         f("#{grading_cell_selector(student, assignment)} .Grid__AssignmentRowCell__#{menu_selector}Menu button")
       end
 
+      def grade_tray_button
+        f('.Grid__AssignmentRowCell__Options button')
+      end
+
       def get_grade(student, assignment)
         grading_cell(student, assignment).text
       end
@@ -91,10 +95,9 @@ class Gradezilla
       end
 
       def open_tray(student, assignment)
-        cell = grading_cell(student, assignment)
-        cell.click
-        driver.action.send_keys(:escape).perform
-        driver.action.send_keys('c').perform
+        grading_cell(student, assignment).click
+        grade_tray_button.click
+        Gradezilla::GradeDetailTray.submission_tray_full_content
         wait_for_ajaximations
       end
 
