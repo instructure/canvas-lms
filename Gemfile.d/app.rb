@@ -18,7 +18,7 @@
 if CANVAS_RAILS5_1
   gem 'rails', '5.1.6'
 else
-  gem 'rails', '5.2.0'
+  gem 'rails', '5.2.1'
 end
 
 gem 'rack', '2.0.4'
@@ -38,7 +38,7 @@ gem 'active_model_serializers',   '0.9.0alpha1',
 gem 'authlogic', '4.0.1'
   gem 'scrypt', '3.0.5'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
-gem 'switchman', '1.12.2'
+gem 'switchman', '1.12.3'
   gem 'open4', '1.3.4', require: false
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
@@ -60,10 +60,10 @@ gem 'bcrypt', '3.1.11'
 gem 'canvas_connect', '0.3.11'
   gem 'adobe_connect', '1.0.6', require: false
 gem 'canvas_webex', '0.17'
-gem 'inst-jobs', '0.14.8'
+gem 'inst-jobs', '0.15.1'
   gem 'rufus-scheduler', '3.4.2', require: false
     gem 'et-orbi', '1.0.8', require: false
-gem 'switchman-inst-jobs', '1.1.7'
+gem 'switchman-inst-jobs', '1.2.1'
 gem 'inst-jobs-autoscaling', '1.0.4'
   gem 'aws-sdk-autoscaling', '1.5.0', require: false
 # ffi 1.9.2x seem to have issues on RHEL & CentOS causing segfaults
@@ -132,6 +132,8 @@ gem 'academic_benchmarks', '0.0.10', require: false
 gem 'graphql', '1.8.3'
 gem 'graphql-batch', '0.3.9'
 
+gem 'prawn-rails', '1.2.0'
+
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'
 gem 'acts_as_list', path: 'gems/acts_as_list'
 gem 'adheres_to_policy', path: 'gems/adheres_to_policy'
@@ -165,6 +167,7 @@ gem 'json_token', path: 'gems/json_token'
 gem 'linked_in', path: 'gems/linked_in'
 gem 'live_events', path: 'gems/live_events'
 gem 'diigo', path: 'gems/diigo'
+gem 'lti-advantage', path: 'gems/lti-advantage'
 gem 'lti_outbound', path: 'gems/lti_outbound'
 gem 'multipart', path: 'gems/multipart'
 gem 'paginated_collection', path: 'gems/paginated_collection'

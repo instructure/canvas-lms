@@ -15,12 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { actionTypes } from '../actions'
+import {actionTypes} from '../actions'
 
 const deleteReducerMap = {
-  [actionTypes.DELETE_DISCUSSION_SUCCESS]: (state, action) => (
-    state.filter((id) => id !== action.payload.discussion.id)
-  )
+  [actionTypes.DELETE_DISCUSSION_SUCCESS]: (state, action) =>
+    state.filter(id => id !== action.payload.discussion.id)
 }
 
 export default deleteReducerMap

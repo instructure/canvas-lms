@@ -48,9 +48,10 @@ export default class BlueprintCourse {
   }
 
   render () {
+    const routeTo = isBlueprintShabang() ? this.router.page : noop
     ReactDOM.render(
       <Provider store={this.store}>
-        <ConnectedCourseSidebar routeTo={this.router.page} realRef={(c) => { this.app = c }} />
+        <ConnectedCourseSidebar routeTo={routeTo} realRef={(c) => { this.app = c }} />
       </Provider>,
       this.root
     )
@@ -59,8 +60,14 @@ export default class BlueprintCourse {
   start () {
     FlashNotifications.subscribe(this.store)
     this.render()
-    if (window.location.hash.indexOf('#!/blueprint') === 0) {
+    if (isBlueprintShabang()) {
       this.setupRouter()
     }
   }
+}
+
+function noop() {}
+
+function isBlueprintShabang() {
+  return window.location.hash.indexOf('#!/blueprint') === 0
 }

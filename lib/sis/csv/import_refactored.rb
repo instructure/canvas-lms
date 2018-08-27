@@ -38,6 +38,8 @@ module SIS
                      xlist user enrollment admin group_category group group_membership
                      grade_publishing_results user_observer}.freeze
 
+      HEADERS_TO_EXCLUDE_FOR_DOWNLOAD = %w{password ssha_password}.freeze
+
       def initialize(root_account, opts = {})
         opts = opts.with_indifferent_access
         @root_account = root_account
@@ -73,7 +75,6 @@ module SIS
         end
         @rows_for_parallel = nil
         update_pause_vars
-        @batch.data[:use_parallel_imports] = true
         sleep(@pause_duration)
       end
 
@@ -83,12 +84,9 @@ module SIS
         importer
       end
 
-      def use_parallel_imports?
-        true
-      end
-
       def prepare
         @tmp_dirs = []
+        @batch.data[:downloadable_attachment_ids] ||= []
         @files.each do |file|
           if File.file?(file)
             if File.extname(file).downcase == '.zip'
@@ -341,6 +339,12 @@ module SIS
               row.each(&:downcase!)
               importer = IMPORTERS.index do |type|
                 if SIS::CSV.const_get(type.to_s.camelcase + 'Importer').send(type.to_s + '_csv?', row)
+                  if type == :user && (row & HEADERS_TO_EXCLUDE_FOR_DOWNLOAD).any?
+                    filtered_att = create_filtered_csv(csv, row)
+                    @batch.data[:downloadable_attachment_ids] << filtered_att.id
+                  else
+                    @batch.data[:downloadable_attachment_ids] << att.id
+                  end
                   @csvs[type] << csv
                   @headers[type].merge(row)
                   true
@@ -389,6 +393,21 @@ module SIS
         true
       rescue Iconv::Failure
         false
+      end
+
+      def create_filtered_csv(csv, headers)
+        Dir.mktmpdir do |tmp_dir|
+          path = File.join(tmp_dir, File.basename(csv[:fullpath]).sub(/\.csv$/i, "_filtered.csv"))
+          new_csv = ::CSV.open(path, 'wb', headers: headers - HEADERS_TO_EXCLUDE_FOR_DOWNLOAD, write_headers: true)
+          ::CSV.foreach(csv[:fullpath], CSVBaseImporter::PARSE_ARGS) do |row|
+            HEADERS_TO_EXCLUDE_FOR_DOWNLOAD.each do |header|
+              row.delete(header)
+            end
+            new_csv << row
+          end
+          new_csv.close
+          create_batch_attachment(path)
+        end
       end
     end
   end

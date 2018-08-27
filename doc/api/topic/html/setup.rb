@@ -51,12 +51,22 @@ def indent(str, amount = 2, char = ' ')
   str.gsub(/^/, char * amount)
 end
 
-def render_comment(string)
-  if string
-    indent(word_wrap(string), 1, '// ')
-  else
-    ""
-  end
+def deprecation_message(property)
+  return '' if property.key?('properties') || !property['deprecated']
+
+  parse_swagger_model(property)
+  indent_chars = '// '
+  deprecation_title = "#{indent_chars}[DEPRECATED] This property is deprecated, effective #{property['deprecation_effective']} (notice given #{property['deprecation_notice']}):\n"
+  deprecation_description = indent(word_wrap(property['deprecation_description'], 80 - indent_chars.length), 1, indent_chars)
+  "#{deprecation_title}#{deprecation_description}"
+end
+
+def render_comment(property)
+  indent_chars = '// '
+  description = property['description'] ? indent(word_wrap(property['description'], 80 - indent_chars.length), 1, indent_chars) : ''
+  deprecation = deprecation_message(property)
+  separator = description.present? && deprecation.present? ? "//\n" : ''
+  "#{description}#{separator}#{deprecation}"
 end
 
 def render_value(prop)
@@ -83,20 +93,32 @@ def render_value(prop)
 end
 
 def render_properties(json)
-  json = JSON.parse(json)
   if (properties = json['properties'])
     result = ''
     if json['description'].present?
-      result << render_comment(json['description'])
+      result << render_comment(json)
     end
     result << "{\n" + indent(
-    properties.map do |name, prop|
-      render_comment(prop['description']) +
-      %{"#{name}": } + render_value(prop)
-    end.join(",\n")) +
-    "\n}"
+      properties.map do |name, prop|
+        render_comment(prop) +
+        %{"#{name}": } + render_value(prop)
+      end.join(",\n")
+    ) + "\n}"
   end
 rescue
   puts "error rendering properties for model:\n#{json}"
   raise
+end
+
+def parse_swagger_model(model)
+  @description_key = :deprecation_description
+  @description = model['deprecation_description']
+  validate_deprecation_description
+
+  @deprecated_date_key = :deprecation_notice
+  @effective_date_key = :deprecation_effective
+
+  @deprecation_date = model['deprecation_notice']
+  @effective_date = model['deprecation_effective']
+  validate_deprecation_dates(deprecation_notice: @deprecation_date, deprecation_effective: @effective_date)
 end

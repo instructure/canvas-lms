@@ -192,26 +192,22 @@ describe "manage groups" do
       expect(fj(".group-summary:visible:last").text).to eq "0 students"
 
       # Move the user from one group into the other
-      fj(".groups .group .group-user .group-user-actions").click
-      wait_for_ajaximations
+      f(".groups .group .group-user .group-user-actions").click
       fj(".edit-group-assignment:first").click
-      wait_for_ajaximations
-      ff(".move-select .move-select__group option").last.click
-      wait_for_ajaximations
-      fj(".move-select button[type='submit']").click
-      wait_for_ajaximations
+      sleep 0.1 # uses sleep because it has an animation that can't be waited on by wait_for_ajaximations
+      f(".move-select .move-select__group option:last-child").click
+      expect(f('body')).to contain_jqcss(".move-select button[type='submit']:visible")
+      f(".move-select button[type='submit']").click
       expect(fj(".group-summary:visible:first").text).to eq "0 students"
       expect(fj(".group-summary:visible:last").text).to eq "1 student"
 
       # Move the user back
-      fj(".groups .group .group-user .group-user-actions").click
-      wait_for_ajaximations
+      f(".groups .group .group-user .group-user-actions").click
       fj(".edit-group-assignment:first").click
-      wait_for_ajaximations
+      sleep 0.1 # uses sleep because it has an animation that can't be waited on by wait_for_ajaximations
       ff(".move-select .move-select__group option").last.click
-      wait_for_ajaximations
-      fj('.move-select button[type="submit"]').click
-      wait_for_ajaximations
+      expect(f('body')).to contain_jqcss(".move-select button[type='submit']:visible")
+      f(".move-select button[type='submit']").click
       expect(fj(".group-summary:visible:first").text).to eq "1 student"
       expect(fj(".group-summary:visible:last").text).to eq "0 students"
     end

@@ -278,6 +278,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
 
       question_data = params[:question]&.to_unsafe_h
       question_data ||= {}
+      question_data[:question_text] = process_incoming_html_content(question_data[:question_text])
 
       if question_data[:quiz_group_id]
         @group = @quiz.quiz_groups.find(question_data[:quiz_group_id])
@@ -297,7 +298,8 @@ class Quizzes::QuizQuestionsController < ApplicationController
       @assessment_questions = @bank.assessment_questions.active.where(id: params[:assessment_questions_ids].split(",")).to_a
       @group = @quiz.quiz_groups.where(id: params[:quiz_group_id]).first if params[:quiz_group_id].to_i > 0
       @questions = @quiz.add_assessment_questions(@assessment_questions, @group)
-
+      bank_outcome_ids = @bank.learning_outcome_alignments.select(:learning_outcome_id)
+      LearningOutcome.ensure_presence_in_context(bank_outcome_ids, @context)
       render json: questions_json(@questions, @current_user, session, [:assessment_question])
     end
   end
@@ -351,7 +353,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
       @question = @quiz.quiz_questions.active.find(params[:id])
       question_data = params[:question].to_unsafe_h
       question_data[:regrade_user] = @current_user
-      question_data ||= {}
+      question_data[:question_text] = process_incoming_html_content(question_data[:question_text])
 
       if question_data[:quiz_group_id]
         @group = @quiz.quiz_groups.find(question_data[:quiz_group_id])

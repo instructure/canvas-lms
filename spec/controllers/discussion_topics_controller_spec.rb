@@ -110,6 +110,31 @@ describe DiscussionTopicsController do
         expect(assigns["topics"]).to include(@child_topic)
       end
 
+      it "should assign the create permission if the term is concluded and course is open" do
+        @course.update_attribute(:restrict_enrollments_to_course_dates, true)
+        term = @course.account.enrollment_terms.create!(:name => 'mew', :end_at => Time.now.utc - 1.minute)
+        @course.enrollment_term = term
+        @course.update_attribute(:conclude_at, Time.now.utc + 1.hour)
+        @course.save!
+        user_session(@teacher)
+
+        get 'index', params: {:course_id => @course.id}
+
+        expect(assigns[:js_env][:permissions][:create]).to be_truthy
+      end
+
+      it "should not assign the create permission if the term and course are concluded" do
+        term = @course.account.enrollment_terms.create!(:name => 'mew', :end_at => Time.now.utc - 1.minute)
+        @course.enrollment_term = term
+        @course.update_attribute(:conclude_at, Time.now.utc - 1.minute)
+        @course.save!
+        user_session(@teacher)
+
+        get 'index', params: {:course_id => @course.id}
+
+        expect(assigns[:js_env][:permissions][:create]).to be_falsy
+      end
+
       it "should not return graded group discussions if a student has no visibility" do
         user_session(@student)
 
@@ -867,7 +892,7 @@ describe DiscussionTopicsController do
         allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
         allow(ConditionalRelease::Service).to receive(:env_for).and_return({ dummy: 'value' })
         get :edit, params: {course_id: @course.id, id: @topic.id}
-        expect(response).to have_http_status :success
+        expect(response).to be_successful
         expect(controller.js_env[:dummy]).to eq 'value'
       end
 
@@ -875,7 +900,7 @@ describe DiscussionTopicsController do
         allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(false)
         allow(ConditionalRelease::Service).to receive(:env_for).and_return({ dummy: 'value' })
         get :edit, params: {course_id: @course.id, id: @topic.id}
-        expect(response).to have_http_status :success
+        expect(response).to be_successful
         expect(controller.js_env).not_to have_key :dummy
       end
     end
@@ -1103,7 +1128,7 @@ describe DiscussionTopicsController do
         post 'create',
           params: topic_params(@course, {is_announcement: true, specific_sections: @section1.id.to_s}),
           :format => :json
-        expect(response).to have_http_status :success
+        expect(response).to be_successful
         expect(DiscussionTopic.last.course_sections.first).to eq @section1
         expect(DiscussionTopicSectionVisibility.count).to eq 1
       end
@@ -1113,7 +1138,7 @@ describe DiscussionTopicsController do
         post 'create',
           params: topic_params(@course, {is_announcement: true}),
           :format => :json
-        expect(response).to have_http_status :success
+        expect(response).to be_successful
         expect(DiscussionTopic.count).to eq old_count + 1
         expect(DiscussionTopic.last.is_section_specific).to be_falsey
       end
@@ -1145,14 +1170,14 @@ describe DiscussionTopicsController do
         post 'create',
           params: topic_params(@course, {is_announcement: true, specific_sections: @section1.id.to_s}),
           :format => :json
-        expect(response).to have_http_status :success
+        expect(response).to be_successful
         expect(DiscussionTopic.last.course_sections.first).to eq @section1
       end
 
       it 'creates a discussion with sections' do
         post 'create',
           params: topic_params(@course, {specific_sections: @section1.id.to_s}), :format => :json
-        expect(response).to have_http_status :success
+        expect(response).to be_successful
         expect(DiscussionTopic.last.course_sections.first).to eq @section1
         expect(DiscussionTopicSectionVisibility.count).to eq 1
       end
@@ -1228,7 +1253,7 @@ describe DiscussionTopicsController do
       params = topic_params(@course, {is_announcement: true})
       params.delete(:locked)
       post('create', params: params, format: :json)
-      expect(response).to have_http_status :success
+      expect(response).to be_successful
       expect(DiscussionTopic.last.locked).to be_truthy
     end
 
@@ -1237,7 +1262,7 @@ describe DiscussionTopicsController do
       params = topic_params(@course, {is_announcement: false})
       params.delete(:locked)
       post('create', params: params, format: :json)
-      expect(response).to have_http_status :success
+      expect(response).to be_successful
       expect(DiscussionTopic.last.locked).to be_falsy
     end
 

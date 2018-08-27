@@ -1,0 +1,19 @@
+{
+  "name": "@instructure/babel-preset-pretranslated-format-message",
+  "version": "1.0.0",
+  "description": "The babel preset for the pretranslated format message stuff Instructure uses (without anything else)",
+  "main": "index.js",
+  "license": "MIT",
+  "homepage": "https://github.com/instructure/canvas-lms/packages/babel-preset-pretranslated-format-message",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/instructure/canvas-lms.git"
+  },
+  "scripts": {
+    "test": "node --eval \"assert.deepStrictEqual(require('.')(), {plugins: []})\""
+  },
+  "dependencies": {
+    "babel-plugin-extract-format-message": "5 - 6",
+    "babel-plugin-transform-format-message": "5 - 6"
+  }
+}

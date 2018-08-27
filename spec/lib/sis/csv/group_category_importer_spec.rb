@@ -136,15 +136,14 @@ describe SIS::CSV::GroupCategoryImporter do
   end
 
   it "should not fail on refactored importer" do
-    @account.enable_feature!(:refactor_of_sis_imports)
     importer = process_csv_data_cleanly(
       "group_category_id,account_id,category_name,status",
-      "Gc002,A001,Group Cat 2,deleted")
+      "Gc002,A001,Group Cat 2,deleted"
+    )
     expect(importer.errors).to eq []
   end
 
   it 'should create rollback data' do
-    @account.enable_feature!(:refactor_of_sis_imports)
     batch1 = @account.sis_batches.create! {|sb| sb.data = {}}
     process_csv_data_cleanly(
       "group_category_id,account_id,category_name,status",

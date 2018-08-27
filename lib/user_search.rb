@@ -80,9 +80,9 @@ module UserSearch
 
     users = if options[:sort] == "last_login"
               if options[:order] == 'desc'
-                users.order("MAX(current_login_at) desc, id desc")
+                users.order(Arel.sql("MAX(current_login_at) DESC NULLS LAST, id DESC"))
               else
-                users.order("MAX(current_login_at), id")
+                users.order(Arel.sql("MAX(current_login_at), id"))
               end
             elsif options[:sort] == "username"
               if options[:order] == 'desc'

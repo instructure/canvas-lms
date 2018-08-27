@@ -2598,6 +2598,7 @@ exports[`renders Note correctly with everything 1`] = `
               <Button
                 as="button"
                 buttonRef={[Function]}
+                cursor="pointer"
                 fluidWidth={false}
                 icon={[Function]}
                 margin="0"
@@ -2744,6 +2745,7 @@ exports[`renders Note correctly without Course 1`] = `
               <Button
                 as="button"
                 buttonRef={[Function]}
+                cursor="pointer"
                 fluidWidth={false}
                 icon={[Function]}
                 margin="0"

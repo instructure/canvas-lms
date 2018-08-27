@@ -43,7 +43,7 @@ module NewUserSearchPage
   end
 
   def add_user_button_jqcss
-    'button:has([name="IconPlusLine"]):contains("People")'
+    'button:has([name="IconPlus"]):contains("People")'
   end
 
   def add_user_button
@@ -108,6 +108,10 @@ module NewUserSearchPage
 
   def results_rows
     ff(results_row)
+  end
+
+  def left_navigation
+    f('#left-side #section-tabs')
   end
 
   # ---------------------- Actions ----------------------

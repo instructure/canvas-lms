@@ -34,7 +34,7 @@ const mountDialog = (opts = {}) => {
     destinations: [{ label: 'bar', id: '1' }, { label: 'baz', id: '2' }]
   }, opts)
 
-  const element = React.createElement(MoveToDialog, opts)
+  const element = <MoveToDialog {...opts} />
   const dialog = ReactDOM.render(element, root)
   return dialog
 }

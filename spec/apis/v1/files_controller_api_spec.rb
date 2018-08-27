@@ -437,7 +437,7 @@ describe "Files API", type: :request do
     it "should omit verifiers using session auth" do
       user_session(@user)
       get @files_path
-      expect(response).to be_success
+      expect(response).to be_successful
       json = json_parse
       json.map{|f|f['url']}.each { |url| expect(url).not_to include 'verifier=' }
     end
@@ -445,7 +445,7 @@ describe "Files API", type: :request do
     it "should not omit verifiers using session auth if params[:use_verifiers] is given" do
       user_session(@user)
       get @files_path + "?use_verifiers=1"
-      expect(response).to be_success
+      expect(response).to be_successful
       json = json_parse
       json.map{|f|f['url']}.each { |url| expect(url).to include 'verifier=' }
     end
@@ -853,7 +853,7 @@ describe "Files API", type: :request do
     it "should omit verifiers when using session auth" do
       user_session(@user)
       get @file_path
-      expect(response).to be_success
+      expect(response).to be_successful
       json = json_parse
       expect(json['url']).to eq file_download_url(@att, :download => '1', :download_frd => '1')
     end
@@ -861,7 +861,7 @@ describe "Files API", type: :request do
     it "should not omit verifiers when using session auth and params[:use_verifiers] is given" do
       user_session(@user)
       get @file_path + "?use_verifiers=1"
-      expect(response).to be_success
+      expect(response).to be_successful
       json = json_parse
       expect(json['url']).to eq file_download_url(@att, :download => '1', :download_frd => '1', :verifier => @att.uuid)
     end

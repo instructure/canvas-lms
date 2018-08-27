@@ -49,7 +49,7 @@ class GradebookUserIds
 
   def sort_by_student_name
     students.
-      order("#{Enrollment.table_name}.type = 'StudentViewEnrollment'").
+      order(Arel.sql("enrollments.type = 'StudentViewEnrollment'")).
       order_by_sortable_name(direction: @direction.to_sym).
       pluck(:id).
       uniq
@@ -60,9 +60,9 @@ class GradebookUserIds
       joins("LEFT JOIN #{Submission.quoted_table_name} ON submissions.user_id=users.id AND
              submissions.workflow_state<>'deleted' AND
              submissions.assignment_id=#{Submission.connection.quote(assignment_id)}").
-      order("#{Enrollment.table_name}.type = 'StudentViewEnrollment'").
-      order("#{Submission.table_name}.score #{sort_direction} NULLS LAST").
-      order("#{Submission.table_name}.id IS NULL").
+      order(Arel.sql("enrollments.type = 'StudentViewEnrollment'")).
+      order(Arel.sql("submissions.score #{sort_direction} NULLS LAST")).
+      order(Arel.sql("submissions.id IS NULL")).
       order_by_sortable_name(direction: @direction.to_sym).
       pluck(:id).
       uniq
@@ -172,8 +172,8 @@ class GradebookUserIds
                 LEFT JOIN #{Score.quoted_table_name} ON scores.enrollment_id=enrollments.id AND
                 scores.workflow_state='active' AND #{score_scope}").
       merge(student_enrollments_scope).
-      order("#{Enrollment.table_name}.type = 'StudentViewEnrollment'").
-      order("#{Score.table_name}.unposted_current_score #{sort_direction} NULLS LAST").
+      order(Arel.sql("enrollments.type = 'StudentViewEnrollment'")).
+      order(Arel.sql("scores.unposted_current_score #{sort_direction} NULLS LAST")).
       order_by_sortable_name(direction: @direction.to_sym).
       pluck(:id).uniq
   end

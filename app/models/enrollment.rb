@@ -45,7 +45,7 @@ class Enrollment < ActiveRecord::Base
   has_many :role_overrides, :as => :context, :inverse_of => :context
   has_many :pseudonyms, :primary_key => :user_id, :foreign_key => :user_id
   has_many :course_account_associations, :foreign_key => 'course_id', :primary_key => 'course_id'
-  has_many :scores, -> { active }, inverse_of: :enrollment
+  has_many :scores, -> { active }
 
   validates_presence_of :user_id, :course_id, :type, :root_account_id, :course_section_id, :workflow_state, :role_id
   validates_inclusion_of :limit_privileges_to_course_section, :in => [true, false]
@@ -90,10 +90,24 @@ class Enrollment < ActiveRecord::Base
   scope :current_and_concluded, -> { joins(:course).where(QueryBuilder.new(:current_and_concluded).conditions).readonly(false) }
 
   def self.not_yet_started(course)
-    collection = where(course_id: course).to_a
+    collection = self.where(course_id: course).to_a
     Canvas::Builders::EnrollmentDateBuilder.preload(collection)
     collection.select do |enrollment|
       enrollment.effective_start_at > Time.zone.now
+    end
+  end
+
+  def self.section_ended(course_id)
+    collection = self.where(course_id: course_id).to_a
+    Canvas::Builders::EnrollmentDateBuilder.preload(collection)
+    courses = Course.where(id: course_id)
+    unless courses[0].nil?
+      collection.select do |enrollment|
+        (!enrollment.course_section.end_at.nil? &&
+         enrollment.course_section.end_at < courses[0].time_zone.now) ||
+          (!enrollment.course_section.start_at.nil? &&
+           enrollment.course_section.start_at >  courses[0].time_zone.now)
+      end
     end
   end
 
@@ -628,8 +642,8 @@ class Enrollment < ActiveRecord::Base
   STATE_BY_DATE_RANK = ['active', ['invited', 'creation_pending', 'pending_active', 'pending_invited'], 'completed', 'inactive', 'rejected', 'deleted']
   STATE_BY_DATE_RANK_HASH = rank_hash(STATE_BY_DATE_RANK)
   def self.state_by_date_rank_sql
-    @state_by_date_rank_sql ||= Arel.sql(rank_sql(STATE_BY_DATE_RANK, 'enrollment_states.state').
-      sub(/^CASE/, "CASE WHEN enrollment_states.restricted_access THEN #{STATE_BY_DATE_RANK.index('inactive')}")) # pretend restricted access is the same as inactive
+    @state_by_date_rank_sql ||= rank_sql(STATE_BY_DATE_RANK, 'enrollment_states.state').
+      sub(/^CASE/, "CASE WHEN enrollment_states.restricted_access THEN #{STATE_BY_DATE_RANK.index('inactive')}") # pretend restricted access is the same as inactive
   end
 
   def state_with_date_sortable
@@ -783,7 +797,9 @@ class Enrollment < ActiveRecord::Base
   end
 
   def restrict_future_listing?
-    self.enrollment_state.pending? && self.enrollment_state.restricted_access? && self.course.account.restrict_student_future_listing[:value]
+    self.enrollment_state.pending? &&
+      (self.enrollment_state.restricted_access? || (!self.admin? && self.course.unpublished?)) &&
+      self.course.account.restrict_student_future_listing[:value]
   end
 
   def active?

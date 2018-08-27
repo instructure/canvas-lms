@@ -1,0 +1,60 @@
+#!/usr/bin/env node
+
+/*
+ * Copyright (C) 2018 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
+ * Removes all "@instructure/ui-<whatever>" entries from yarn.lock so that the
+ * next time you run yarn it uses all of the latest versions available on npm
+ */
+
+const fs = require('fs')
+const lockfile = require('@yarnpkg/lockfile')
+const packageJson = require('../package.json')
+const {promisify} = require('util')
+const exec = promisify(require('child_process').exec)
+
+const yarnFile = fs.readFileSync('yarn.lock', 'utf8')
+const yarnJson = lockfile.parse(yarnFile)
+
+let versionToPutInCommitMsg
+console.log('Removing "@instructue" entries from yarn.lock and configuring package.json "resolutions" for all instUI stuff...')
+const promises = Object.keys(yarnJson.object)
+  .filter(k => k.startsWith('@instructure'))
+  .map(async k => {
+    delete yarnJson.object[k]
+    const pkgName = `@${k.split('@')[1]}`
+    if (!packageJson.resolutions[pkgName]) {
+      const latestRcOnRegistry = versionToPutInCommitMsg = (await exec(`npm view ${pkgName} dist-tags.rc`)).stdout.trim()
+      packageJson.resolutions[pkgName] = `${latestRcOnRegistry}`
+    }
+  })
+
+Promise.all(promises).then(async () => {
+  fs.writeFileSync('yarn.lock', lockfile.stringify(yarnJson.object), 'utf8')
+  fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2), 'utf8')
+  console.log('Running `yarn` to install new package versions...')
+  await exec(`yarn --ignore-scripts`)
+  console.log('Cleaning up "resolutions" from package.json...')
+  await exec(`git checkout package.json`)
+  await exec(`yarn`)
+  await exec(`git add yarn.lock`)
+  console.log('Commiting changes...')
+  await exec(`git commit -m "upgrade instUI to ${versionToPutInCommitMsg}"`)
+  console.log(`Made a commit to upgrade instUI to ${versionToPutInCommitMsg}. You should push it to gerrit.`)
+})

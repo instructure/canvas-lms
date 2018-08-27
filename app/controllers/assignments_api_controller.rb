@@ -671,7 +671,7 @@ class AssignmentsApiController < ApplicationController
         end
         scope = scope.where(id: params[:assignment_ids])
       end
-      scope = scope.reorder("#{Assignment.best_unicode_collation_key('assignments.title')}, assignment_groups.position, assignments.position, assignments.id") if params[:order_by] == 'name'
+      scope = scope.reorder(Arel.sql("#{Assignment.best_unicode_collation_key('assignments.title')}, assignment_groups.position, assignments.position, assignments.id")) if params[:order_by] == 'name'
 
       assignments = Api.paginate(scope, self, api_v1_course_assignments_url(@context))
 

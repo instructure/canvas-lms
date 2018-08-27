@@ -42,7 +42,7 @@ module SIS
           Shackles.activate(:master) do
             new_data = Enrollment::BatchStateUpdater.destroy_batch(enrollments, sis_batch: @batch)
             importer.roll_back_data.push(*new_data)
-            SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data) if @batch.using_parallel_importers?
+            SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data)
             importer.roll_back_data = []
           end
         end

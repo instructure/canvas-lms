@@ -158,7 +158,7 @@ describe "Outcomes API", type: :request do
                      :action => 'show',
                      :id => @outcome.id.to_s,
                      :format => 'json')
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it "should require read permission" do
@@ -181,7 +181,7 @@ describe "Outcomes API", type: :request do
                      :action => 'show',
                      :id => @outcome.id.to_s,
                      :format => 'json')
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it "should still require a user for global outcomes" do

@@ -113,6 +113,7 @@ module InstFS
     def direct_upload(file_name:, file_object:)
       # example of a call to direct_upload:
       # > res = InstFS.direct_upload(
+      # >   host: "canvas.docker",
       # >   file_name: "a.png",
       # >   file_object: File.open("public/images/a.png")
       # > )
@@ -123,7 +124,7 @@ module InstFS
       data = {}
       data[file_name] = file_object
 
-      response = CanvasHttp.post(url, form_data: data, multipart: true, streaming: true)
+      response = CanvasHttp.post(url, form_data: data, multipart:true)
       if response.class == Net::HTTPCreated
         json_response = JSON.parse(response.body)
         return json_response["instfs_uuid"] if json_response.key?("instfs_uuid")

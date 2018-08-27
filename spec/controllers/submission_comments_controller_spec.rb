@@ -16,9 +16,78 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require_relative '../spec_helper'
 
-describe SubmissionCommentsController do
+RSpec.describe SubmissionCommentsController do
+  describe "GET 'index'" do
+    before :once do
+      course = Account.default.courses.create!
+      @teacher = course_with_teacher(course: course, active_all: true).user
+      @student = course_with_student(course: course, active_all: true).user
+      @assignment = course.assignments.create!
+      @submission = @assignment.submissions.find_by!(user: @student)
+      @submission.submission_comments.create!(author: @teacher, comment: 'a comment')
+    end
+
+    context 'given a teacher session' do
+      before { user_session(@teacher) }
+
+      context 'given a standard request' do
+        before do
+          get :index, params: { submission_id: @submission.id }, format: :pdf
+        end
+
+        specify { expect(response).to have_http_status :ok }
+        specify { expect(response).to render_template(:index) }
+        specify { expect(response.headers.fetch('Content-Type')).to match(/\Aapplication\/pdf/) }
+      end
+
+      context 'given a request where no submission is present' do
+        before do
+          @submission.all_submission_comments.destroy_all
+          @submission.destroy
+          get :index, params: { submission_id: @submission.id }, format: :pdf
+        end
+
+        specify { expect(response).to have_http_status :not_found }
+        specify { expect(response).to render_template('shared/errors/404_message') }
+        specify { expect(response.headers.fetch('Content-Type')).to match(/\Atext\/html/) }
+      end
+
+      context 'given a request where no submission comments are present' do
+        before do
+          @submission.all_submission_comments.destroy_all
+          get :index, params: { submission_id: @submission.id }, format: :pdf
+        end
+
+        specify { expect(response).to have_http_status :ok }
+        specify { expect(response).to render_template(:index) }
+        specify { expect(response.headers.fetch('Content-Type')).to match(/\Aapplication\/pdf/) }
+      end
+
+      context 'given an anonymized assignment' do
+        before do
+          @assignment.update!(anonymous_grading: true)
+          get :index, params: { submission_id: @submission.id }, format: :pdf
+        end
+
+        specify { expect(response).to have_http_status :unauthorized }
+        specify { expect(response).to render_template('shared/unauthorized') }
+        specify { expect(response.headers.fetch('Content-Type')).to match(/\Atext\/html/) }
+      end
+    end
+
+    context 'given a student session' do
+      before do
+        user_session(@student)
+        get :index, params: { submission_id: @submission.id }, format: :pdf
+      end
+
+      specify { expect(response).to have_http_status :unauthorized }
+      specify { expect(response).to render_template('shared/unauthorized') }
+      specify { expect(response.headers.fetch('Content-Type')).to match(/\Atext\/html/) }
+    end
+  end
 
   describe "DELETE 'destroy'" do
     it "should delete the comment" do
@@ -27,7 +96,6 @@ describe SubmissionCommentsController do
       delete 'destroy', params: {:id => @submission_comment.id}, format: "json"
       expect(response).to be_successful
     end
-
   end
 
   describe "PATCH 'update'" do

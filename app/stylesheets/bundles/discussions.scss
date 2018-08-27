@@ -226,7 +226,6 @@ $discussion-dark-text: $ic-color-dark;
 
 
 .discussion-fyi {
-  font-style: italic;
   @include fontSize(12px);
   color: darken($ic-color-neutral, 45);
 }
@@ -359,7 +358,7 @@ $discussion-dark-text: $ic-color-dark;
   padding-top: 5px;
 
   .author.unknown {
-    font-style: italic;
+    font-style: normal;
   }
 }
 
@@ -403,7 +402,6 @@ $discussion-dark-text: $ic-color-dark;
   }
   .discussion-title {
     @include fontSize(12px);
-    font-style: italic;
   }
 }
 

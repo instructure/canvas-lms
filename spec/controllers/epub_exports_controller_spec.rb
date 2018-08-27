@@ -55,7 +55,7 @@ describe EpubExportsController do
         get :index
 
         expect(response).to render_template(:index)
-        expect(response).to have_http_status(:success)
+        expect(response).to be_successful
         expect(assigns(:courses).size).to eq(@n + @n_more)
       end
     end

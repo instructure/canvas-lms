@@ -138,10 +138,11 @@ export function renderToDoSidebar (element, options) {
   ReactDOM.render(
     <Provider store={store}>
       <ToDoSidebar
-        courses={window.ENV.STUDENT_PLANNER_COURSES}
+        courses={options.courses || window.ENV.STUDENT_PLANNER_COURSES}
         timeZone={ENV.TIMEZONE}
         locale={ENV.LOCALE}
         changeDashboardView={options.changeDashboardView}
+        forCourse={options.forCourse}
       />
     </Provider>
   , element);

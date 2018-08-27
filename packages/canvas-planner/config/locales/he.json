@@ -1,12 +1,39 @@
 {
+  "add_to_do_7def3c37": {
+    "message": "הוספת מטלה לביצוע"
+  },
   "all_day_fb42c4fc": {
     "message": "כל היום"
+  },
+  "all_items_loaded_aa256183": {
+    "message": "כל הפריטים נטענו"
   },
   "announcement_fb4cb645": {
     "message": "הכרזה"
   },
+  "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
+    "message": "האם אתם בטוחים שברצונכם למחוק את פריט המתכנן הזה?"
+  },
   "assignment_976578a8": {
     "message": "משימה"
+  },
+  "beginning_of_your_to_do_history_61ef2dce": {
+    "message": "התחלת ההיסטוריה של המטלות לביצוע שלך"
+  },
+  "calendar_event_89aadc1c": {
+    "message": "אירוע יומן"
+  },
+  "canvas_planner_98ed106": {
+    "message": "מתכנן קנבס"
+  },
+  "close_d634289d": {
+    "message": "סגירה"
+  },
+  "close_opportunities_popover_f4e50551": {
+    "message": "חלון סגירת הזדמנויות"
+  },
+  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
+    "message": "{ count, plural,\n     =0 {# הזדמנויות}\n    one {הזדמנות #}\n  other {# הזדמנויות}\n}"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {הצגת פריט # שהושלם}\n  other {הצגת # פריטים שהושלמו}\n}"
@@ -14,59 +41,131 @@
   "course_8a63b4a3": {
     "message": "קורס"
   },
-  "pts_699bd9aa": {
-    "message": "נקודות"
-  },
-  "failed_to_save_to_do_ddc7503b": {
-    "message": "שמירת המטלה לביצוע נכשלה"
-  },
   "course_to_do_bcbbab54": {
     "message": "{ course } לביצוע"
   },
-  "canvas_planner_98ed106": {
-    "message": "מתכנן קנבס"
+  "date_at_time_dbdb1b99": {
+    "message": "בתאריך { date } בשעה { time }"
   },
-  "looks_like_there_isn_t_anything_here_d9bcef49": {
-    "message": "נראה שאין פה כלום"
+  "date_ee500367": {
+    "message": "תאריך"
   },
-  "points_points_63e59cce": {
-    "message": "{ points } נקודות"
+  "delete_a6efa79d": {
+    "message": "ביטול"
   },
-  "loading_planner_items_947a813d": {
-    "message": "טעינת פריטי המתכנן"
+  "details_98a31b68": {
+    "message": "פרטים"
   },
-  "add_to_do_7def3c37": {
-    "message": "הוספת מטלה לביצוע"
+  "discussion_6719c51d": {
+    "message": "דיון"
   },
-  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
-    "message": "{ count, plural,\n     =0 {# הזדמנויות}\n    one {הזדמנות #}\n  other {# הזדמנויות}\n}"
+  "dismiss_opportunityname_5995176f": {
+    "message": "ויתור על { opportunityName }"
   },
   "due_5d7267be": {
     "message": "תאריך יעד:"
   },
+  "edit_c5fbea07": {
+    "message": "עריכה"
+  },
+  "edit_title_72e5a21e": {
+    "message": "עריכת { title }"
+  },
+  "error_loading_more_items_3f109d9f": {
+    "message": "שגיאה בטעינת פריטים נוספים"
+  },
+  "error_loading_past_items_2881dbb1": {
+    "message": "שגיאה בטעינת פריטים קודמים"
+  },
+  "excused_cf8792eb": {
+    "message": "נסלח"
+  },
+  "failed_to_delete_to_do_64edff49": {
+    "message": "ביטול המטלה לביצוע נכשל"
+  },
+  "failed_to_get_new_activity_17e7ec7c": {
+    "message": "כשלון בקבלת פעילות חדשה"
+  },
+  "failed_to_load_opportunities_52ab6404": {
+    "message": "טעינת הזדמנויות נכשלה"
+  },
+  "failed_to_save_to_do_ddc7503b": {
+    "message": "שמירת המטלה לביצוע נכשלה"
+  },
   "feedback_6dcc1991": {
     "message": "משוב"
   },
-  "loading_25990131": {
-    "message": "בטעינה... "
+  "graded_25cd3fcd": {
+    "message": "ניתן ציון"
   },
-  "next_month_749b1778": {
-    "message": "החודש הבא"
+  "late_2be42b88": {
+    "message": "איחור"
   },
-  "beginning_of_your_to_do_history_61ef2dce": {
-    "message": "התחלת ההיסטוריה של המטלות לביצוע שלך"
-  },
-  "yesterday_at_date_1aa6d18e": {
-    "message": "אתמול, בתאריך { date }"
-  },
-  "calendar_event_89aadc1c": {
-    "message": "אירוע יומן"
+  "load_more_a36f9cf9": {
+    "message": "טענו עוד"
   },
   "load_prior_dates_f2b0f6f0": {
     "message": "טעינת מועדים קודמים"
   },
-  "all_items_loaded_aa256183": {
-    "message": "כל הפריטים נטענו"
+  "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
+    "message": "נטענו { count, plural,\n     =0 {# פריטים}\n    one {פריט #}\n  other {# פריטים}\n}"
+  },
+  "loading_25990131": {
+    "message": "בטעינה... "
+  },
+  "loading_725811ca": {
+    "message": "טוען"
+  },
+  "loading_past_items_ca499e75": {
+    "message": "בטעינת פריטים קודמים"
+  },
+  "loading_planner_items_947a813d": {
+    "message": "טעינת פריטי המתכנן"
+  },
+  "looks_like_there_isn_t_anything_here_d9bcef49": {
+    "message": "נראה שאין פה כלום"
+  },
+  "missing_1a256b3b": {
+    "message": "חסר"
+  },
+  "new_activity_8b84847d": {
+    "message": "פעילות חדשה"
+  },
+  "next_month_749b1778": {
+    "message": "החודש הבא"
+  },
+  "no_due_dates_assigned_e8f5bac8": {
+    "message": "לא הוגדרו תאריכי יעד"
+  },
+  "nothing_new_needs_attention_3ac548d4": {
+    "message": "אין כל דבר חדש לציין"
+  },
+  "optional_add_course_ef0d70fc": {
+    "message": "אופציונלי: הוספת קורס"
+  },
+  "page_50c4823d": {
+    "message": "דף"
+  },
+  "points_bceb5005": {
+    "message": "נקודות"
+  },
+  "points_points_63e59cce": {
+    "message": "{ points } נקודות"
+  },
+  "previous_month_bb1e3c84": {
+    "message": "החודש הקודם"
+  },
+  "pts_699bd9aa": {
+    "message": "נקודות"
+  },
+  "quiz_e0dcce8f": {
+    "message": "בוחן"
+  },
+  "replies_4a8577c8": {
+    "message": "תגובות"
+  },
+  "save_11a80ec3": {
+    "message": "שמירה "
   },
   "submitted_318fad53": {
     "message": "הוגשה"
@@ -74,136 +173,37 @@
   "task_16b0ef38": {
     "message": "מטלה"
   },
-  "excused_cf8792eb": {
-    "message": "נסלח"
-  },
-  "replies_4a8577c8": {
-    "message": "תגובות"
-  },
-  "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
-    "message": "האם אתם בטוחים שברצונכם למחוק את פריט המתכנן הזה?"
-  },
-  "dismiss_opportunityname_5995176f": {
-    "message": "ויתור על { opportunityName }"
-  },
-  "failed_to_get_new_activity_17e7ec7c": {
-    "message": "כשלון בקבלת פעילות חדשה"
-  },
-  "title_is_required_6ddcab69": {
-    "message": "דרושה כותרת"
-  },
-  "date_at_time_dbdb1b99": {
-    "message": "בתאריך { date } בשעה { time }"
-  },
-  "loading_past_items_ca499e75": {
-    "message": "בטעינת פריטים קודמים"
-  },
-  "tomorrow_at_date_b53f2cf1": {
-    "message": "מחר, בתאריך { date }"
-  },
-  "today_76e10f9c": {
-    "message": "היום"
-  },
-  "edit_title_72e5a21e": {
-    "message": "עריכת { title }"
-  },
-  "error_loading_past_items_2881dbb1": {
-    "message": "שגיאה בטעינת פריטים קודמים"
-  },
-  "no_due_dates_assigned_e8f5bac8": {
-    "message": "לא הוגדרו תאריכי יעד"
-  },
-  "edit_c5fbea07": {
-    "message": "עריכה"
-  },
-  "save_11a80ec3": {
-    "message": "שמירה "
-  },
   "time_2b5aac58": {
     "message": "זמן "
-  },
-  "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
-    "message": "גללת אחורה למטלה לביצוע הראשונה שלך!"
-  },
-  "delete_a6efa79d": {
-    "message": "ביטול"
-  },
-  "discussion_6719c51d": {
-    "message": "דיון"
-  },
-  "points_bceb5005": {
-    "message": "נקודות"
-  },
-  "nothing_new_needs_attention_3ac548d4": {
-    "message": "אין כל דבר חדש לציין"
   },
   "title_ee03d132": {
     "message": "כותרת"
   },
-  "date_ee500367": {
-    "message": "תאריך"
-  },
-  "late_2be42b88": {
-    "message": "איחור"
-  },
-  "yesterday_c6bd6abf": {
-    "message": "אתמול"
-  },
-  "graded_25cd3fcd": {
-    "message": "ניתן ציון"
-  },
-  "page_50c4823d": {
-    "message": "דף"
+  "title_is_required_6ddcab69": {
+    "message": "דרושה כותרת"
   },
   "to_do_1d554f36": {
     "message": "לביצוע"
   },
-  "missing_1a256b3b": {
-    "message": "חסר"
-  },
-  "error_loading_more_items_3f109d9f": {
-    "message": "שגיאה בטעינת פריטים נוספים"
-  },
-  "optional_add_course_ef0d70fc": {
-    "message": "אופציונלי: הוספת קורס"
-  },
-  "quiz_e0dcce8f": {
-    "message": "בוחן"
-  },
-  "failed_to_load_opportunities_52ab6404": {
-    "message": "טעינת הזדמנויות נכשלה"
-  },
-  "previous_month_bb1e3c84": {
-    "message": "החודש הקודם"
-  },
-  "new_activity_8b84847d": {
-    "message": "פעילות חדשה"
-  },
-  "failed_to_delete_to_do_64edff49": {
-    "message": "ביטול המטלה לביצוע נכשל"
-  },
-  "loading_725811ca": {
-    "message": "טוען"
-  },
-  "close_opportunities_popover_f4e50551": {
-    "message": "חלון סגירת הזדמנויות"
-  },
-  "tomorrow_9a6c9a00": {
-    "message": "מחר"
-  },
-  "load_more_a36f9cf9": {
-    "message": "טענו עוד"
+  "today_76e10f9c": {
+    "message": "היום"
   },
   "today_at_date_8ac30d6": {
     "message": "היום, בתאריך { date }"
   },
-  "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-    "message": "נטענו { count, plural,\n     =0 {# פריטים}\n    one {פריט #}\n  other {# פריטים}\n}"
+  "tomorrow_9a6c9a00": {
+    "message": "מחר"
   },
-  "details_98a31b68": {
-    "message": "פרטים"
+  "tomorrow_at_date_b53f2cf1": {
+    "message": "מחר, בתאריך { date }"
   },
-  "close_d634289d": {
-    "message": "סגירה"
+  "yesterday_at_date_1aa6d18e": {
+    "message": "אתמול, בתאריך { date }"
+  },
+  "yesterday_c6bd6abf": {
+    "message": "אתמול"
+  },
+  "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
+    "message": "גללת אחורה למטלה לביצוע הראשונה שלך!"
   }
 }

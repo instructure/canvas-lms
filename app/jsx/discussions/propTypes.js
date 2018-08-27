@@ -16,38 +16,38 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { shape, bool, number, string } from 'prop-types'
+import {shape, bool, number, string} from 'prop-types'
 
 const propTypes = {}
 
 propTypes.permissions = shape({
   create: bool.isRequired,
   manage_content: bool.isRequired,
-  moderate: bool.isRequired,
+  moderate: bool.isRequired
 })
 
 propTypes.discussionTopicMenuTools = shape({
   base_url: string.isRequired,
   canvas_icon_class: string.isRequired,
   icon_url: string.isRequired,
-  title: string.isRequired,
+  title: string.isRequired
 })
 
 propTypes.courseSettings = shape({
-allow_student_discussion_editing: bool,
-allow_student_discussion_topics: bool,
-allow_student_forum_attachments: bool,
-allow_student_organized_groups: bool,
-grading_standard_enabled: bool,
-grading_standard_id: bool,
-hide_distribution_graphs: bool,
-hide_final_grades: bool,
-home_page_announcement_limit: number,
+  allow_student_discussion_editing: bool,
+  allow_student_discussion_topics: bool,
+  allow_student_forum_attachments: bool,
+  allow_student_organized_groups: bool,
+  grading_standard_enabled: bool,
+  grading_standard_id: bool,
+  hide_distribution_graphs: bool,
+  hide_final_grades: bool,
+  home_page_announcement_limit: number
 })
 
 propTypes.userSettings = shape({
   collapse_global_nav: bool,
-  manual_mark_as_read: bool,
+  manual_mark_as_read: bool
 })
 
 export default propTypes

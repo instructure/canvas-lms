@@ -3,12 +3,14 @@
 #   port: 8500
 #   ssl: true
 #   environment: prod
+#   dc: "consul"
 #   acl_token: "xxxxxxxx-yyyy-zzzz-1111-222222222222"
 # test:
 #   host: consul
 #   port: 8500
 #   ssl: false
 #   environment: test
+#   dc: "consul"
 #   init_values:
 #     canvas:
 #       signing-secret: astringthatisactually32byteslong

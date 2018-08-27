@@ -16,29 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {applyMiddleware, combineReducers, createStore} from 'redux'
+import {applyMiddleware, createStore} from 'redux'
 import ReduxThunk from 'redux-thunk'
 
 import buildAssignmentReducer from './assignment/buildAssignmentReducer'
 import gradesReducer from './grades/gradesReducer'
 import studentsReducer from './students/studentsReducer'
+import {composeReducers} from './ReducerHelpers'
 
 const createStoreWithMiddleware = applyMiddleware(ReduxThunk)(createStore)
 
 export default function configureStore(env) {
-  const contextReducer = state =>
-    state || {
+  const reducers = [buildAssignmentReducer(env), gradesReducer, studentsReducer]
+
+  const composedReducer = composeReducers(reducers)
+
+  const initialState = {
+    context: {
       currentUser: env.currentUser,
       finalGrader: env.finalGrader,
       graders: env.graders
     }
+  }
 
-  const reducer = combineReducers({
-    assignment: buildAssignmentReducer(env),
-    context: contextReducer,
-    grades: gradesReducer,
-    students: studentsReducer
+  reducers.forEach(reducer => {
+    Object.assign(initialState, reducer.initialState)
   })
 
-  return createStoreWithMiddleware(reducer)
+  return createStoreWithMiddleware(composedReducer, initialState)
 }

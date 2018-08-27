@@ -23,6 +23,7 @@ class ContextExternalTool < ActiveRecord::Base
   has_many :context_external_tool_placements, :autosave => true
 
   belongs_to :context, polymorphic: [:course, :account]
+  belongs_to :developer_key
 
   include MasterCourses::Restrictor
   restrict_columns :content, [:name, :description]
@@ -51,6 +52,9 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   set_policy do
+    given { |user, session| self.context.grants_right?(user, session, :update) }
+    can :read and can :delete
+
     given { |user, session| self.context.grants_right?(user, session, :lti_add_edit) }
     can :read and can :update and can :delete and can :update_manually
   end
@@ -74,6 +78,10 @@ class ContextExternalTool < ActiveRecord::Base
     return unless tag
     launch_url = assignment.external_tool_tag.url
     self.find_external_tool(launch_url, assignment.context)
+  end
+
+  def deployment_id
+    "#{self.id}:#{Lti::Asset.opaque_identifier_for(self.context)}"
   end
 
   def content_migration_configured?

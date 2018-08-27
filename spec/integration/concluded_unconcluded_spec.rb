@@ -32,9 +32,9 @@ describe "concluded/unconcluded courses" do
                             :user => u,
                             :active_enrollment => true
     @e.save!
-    
+
     user_session(@user, @pseudonym)
-    
+
     user_model
     @student = @user
     @course.enroll_student(@student).accept
@@ -48,69 +48,69 @@ describe "concluded/unconcluded courses" do
     @qsub.save!
     @sub = @qsub.submission
   end
-  
+
   it "should let the teacher change grades in the speed grader by default" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    expect(response).to be_success
-    
+    expect(response).to be_successful
+
     html = Nokogiri::HTML(response.body)
     expect(html.css('#add_a_comment').length).to eq 1
     expect(html.css('#grade_container').length).to eq 1
   end
-  
+
   it "should not let the teacher change grades in the speed grader when concluded" do
     @e.conclude
-    
+
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    expect(response).to be_success
-    
+    expect(response).to be_successful
+
     html = Nokogiri::HTML(response.body)
     expect(html.css('#add_a_comment').length).to eq 0
     expect(html.css('#grade_container').length).to eq 0
   end
-  
+
   it "should let the teacher change grades on the submission details page by default" do
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
-    expect(response).to be_success
-    
+    expect(response).to be_successful
+
     html = Nokogiri::HTML(response.body)
     expect(html.css('.submission_details .grading_box').length).to eq 1
     expect(html.css('#add_comment_form').length).to eq 1
   end
-  
+
   it "should not let the teacher change grades on the submission details page when concluded" do
     @e.conclude
-    
+
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
-    expect(response).to be_success
-    
+    expect(response).to be_successful
+
     html = Nokogiri::HTML(response.body)
     expect(html.css('.submission_details .grading_box').length).to eq 0
     expect(html.css('#add_comment_form')[0]['style']).to match(/display: none/)
   end
-  
+
   it "should let the teacher change quiz submission scores by default" do
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@qsub.id}"
-    expect(response).to be_success
-    
+    expect(response).to be_successful
+
     html = Nokogiri::HTML(response.body)
     expect(html.css('#fudge_points_entry').length).to eq 1
     expect(html.css('.quiz_comment textarea').length).to eq 1
     expect(html.css('.user_points .question_input').length).to eq 1
   end
-  
+
   it "should not let the teacher change quiz submission scores when concluded" do
     @e.conclude
-    
+
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@qsub.id}"
-    expect(response).to be_success
-    
+    expect(response).to be_successful
+
     html = Nokogiri::HTML(response.body)
     expect(html.css('#fudge_points_entry').length).to eq 0
     expect(html.css('.quiz_comment textarea').length).to eq 0
     expect(html.css('.user_points .question_input').length).to eq 0
   end
-  
+
 end
 
 

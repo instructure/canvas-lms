@@ -22,7 +22,7 @@ import Button from '@instructure/ui-buttons/lib/components/Button'
 import Tray from '@instructure/ui-overlays/lib/components/Tray'
 import IconX from '@instructure/ui-icons/lib/Solid/IconX'
 import I18n from 'i18n!cyoe_assignment_sidebar'
-import StudentRangeView from './student-ranges-view'
+import StudentRangesView from './student-ranges-view'
 import StudentDetailsView from './student-details-view'
 import { assignmentShape, selectedPathShape } from '../shapes/index'
 
@@ -38,7 +38,6 @@ export default class BreakdownDetails extends React.Component {
       showDetails: bool.isRequired,
 
       // actions
-      selectRange: func.isRequired,
       selectStudent: func.isRequired,
       closeSidebar: func.isRequired
     }
@@ -105,11 +104,10 @@ export default class BreakdownDetails extends React.Component {
                   </span>
                 </Button>
               </span>
-              <StudentRangeView
+              <StudentRangesView
                 assignment={this.props.assignment}
                 ranges={ranges}
                 selectedPath={selectedPath}
-                selectRange={this.props.selectRange}
                 selectStudent={this.props.selectStudent}
                 student={selectedStudent}
               />

@@ -17,8 +17,9 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {mount} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
 
+import {speedGraderUrl} from 'jsx/assignments/GradeSummary/assignment/AssignmentApi'
 import Grid from 'jsx/assignments/GradeSummary/components/GradesGrid/Grid'
 import GridRow from 'jsx/assignments/GradeSummary/components/GradesGrid/GridRow'
 import {STARTED, SUCCESS} from 'jsx/assignments/GradeSummary/grades/GradeActions'
@@ -26,6 +27,10 @@ import {STARTED, SUCCESS} from 'jsx/assignments/GradeSummary/grades/GradeActions
 QUnit.module('GradeSummary Grid', suiteHooks => {
   let props
   let wrapper
+
+  function speedGraderUrlFor(studentId) {
+    return speedGraderUrl('1201', '2301', {anonymousStudents: false, studentId})
+  }
 
   suiteHooks.beforeEach(() => {
     props = {
@@ -83,10 +88,10 @@ QUnit.module('GradeSummary Grid', suiteHooks => {
       horizontalScrollRef: sinon.spy(),
       onGradeSelect() {},
       rows: [
-        {studentId: '1111', studentName: 'Adam Jones'},
-        {studentId: '1112', studentName: 'Betty Ford'},
-        {studentId: '1113', studentName: 'Charlie Xi'},
-        {studentId: '1114', studentName: 'Dana Smith'}
+        {speedGraderUrl: speedGraderUrlFor('1111'), studentId: '1111', studentName: 'Adam Jones'},
+        {speedGraderUrl: speedGraderUrlFor('1112'), studentId: '1112', studentName: 'Betty Ford'},
+        {speedGraderUrl: speedGraderUrlFor('1113'), studentId: '1113', studentName: 'Charlie Xi'},
+        {speedGraderUrl: speedGraderUrlFor('1114'), studentId: '1114', studentName: 'Dana Smith'}
       ],
       selectProvisionalGradeStatuses: {
         1111: SUCCESS,

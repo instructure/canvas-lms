@@ -543,7 +543,23 @@ class UsersController < ApplicationController
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
     @pending_invitations = @current_user.cached_invitations(:include_enrollment_uuid => session[:enrollment_uuid], :preload_course => true)
+  end
+
+  def dashboard_stream_items
+    cancel_cache_buster
+
     @stream_items = @current_user.try(:cached_recent_stream_items) || []
+    if stale?(etag: @stream_items)
+      render partial: 'shared/recent_activity', layout: false
+    end
+  end
+
+  def dashboard_cards
+    cancel_cache_buster
+
+    dashboard_courses = map_courses_for_menu(@current_user.menu_courses, :include_section_tabs => true)
+    Rails.cache.write(['last_known_dashboard_cards_count', @current_user].cache_key, dashboard_courses.count)
+    render json: dashboard_courses
   end
 
   def cached_upcoming_events(user)
@@ -1253,7 +1269,18 @@ class UsersController < ApplicationController
                                                                         current_user: @current_user,
                                                                         current_pseudonym: @current_pseudonym,
                                                                         tool: @tool})
-    adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @domain_root_account).prepare_tool_launch(@return_url, variable_expander,  opts)
+    adapter = if @tool.settings.fetch('use_1_3', false)
+      Lti::LtiAdvantageAdapter.new(
+        tool: @tool,
+        user: @current_user,
+        context: @domain_root_account,
+        return_url: @return_url,
+        expander: variable_expander,
+        opts: opts
+      )
+    else
+      Lti::LtiOutboundAdapter.new(@tool, @current_user, @domain_root_account).prepare_tool_launch(@return_url, variable_expander,  opts)
+    end
     @lti_launch.params = adapter.generate_post_payload
 
     @lti_launch.resource_url = @tool.user_navigation(:url)
@@ -2273,8 +2300,9 @@ class UsersController < ApplicationController
       root_account_uuid: @domain_root_account.uuid
     }
 
-    auth_token = Canvas::Security.create_jwt(auth_body, expires_at, sekrit)
-    props_token = Canvas::Security.create_jwt(props_body, nil, sekrit)
+    private_key = OpenSSL::PKey::EC.new(Base64.decode64(sekrit))
+    auth_token = Canvas::Security.create_jwt(auth_body, expires_at, private_key, :ES512)
+    props_token = Canvas::Security.create_jwt(props_body, nil, private_key, :ES512)
     render json: {
       url: settings["url"],
       auth_token: auth_token,

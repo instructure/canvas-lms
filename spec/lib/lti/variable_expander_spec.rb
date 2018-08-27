@@ -294,6 +294,39 @@ module Lti
     end
 
     describe "#variable expansions" do
+      context '$com.instructure.Assignment.anonymous_grading' do
+        let(:exp_hash) { {test: '$com.instructure.Assignment.anonymous_grading'} }
+
+        it 'is true if the assignment has anonymous grading on' do
+          assignment.anonymous_grading = true
+          variable_expander = VariableExpander.new(
+            root_account,
+            account,
+            controller,
+            current_user: user,
+            tool: tool,
+            assignment: assignment
+          )
+
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq true
+        end
+
+        it 'is false if the assignment does not have anonymous grading on' do
+          variable_expander = VariableExpander.new(
+            root_account,
+            account,
+            controller,
+            current_user: user,
+            tool: tool,
+            assignment: assignment
+          )
+
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq false
+        end
+      end
+
       it 'has a substitution for com.instructure.Assignment.lti.id' do
         exp_hash = {test: '$com.instructure.Assignment.lti.id'}
         variable_expander.expand_variables!(exp_hash)
@@ -770,6 +803,16 @@ module Lti
           exp_hash = {test: '$Canvas.membership.roles'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 'teacher,student'
+        end
+
+        it 'has substitution for $com.Instructure.membership.roles' do
+          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+          allow(substitution_helper).to receive(:current_canvas_roles_lis_v2).and_return(
+            'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student'
+          )
+          exp_hash = {test: '$com.Instructure.membership.roles'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student'
         end
 
         it 'has substitution for $Canvas.membership.concludedRoles' do

@@ -64,7 +64,7 @@ module Lti
         tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
         tool_proxy.save!
         post create_endpoint, params: { subscription: subscription }, headers: request_headers
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'checks that the tool proxy has the correct enabled capabilities' do
@@ -127,7 +127,7 @@ module Lti
       it 'deletes subscriptions' do
         allow(subscription_service).to receive_messages(tool_proxy_subscription: ok_response)
         delete delete_endpoint, headers: request_headers
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'gives 404 if subscription does not exist' do
@@ -165,7 +165,7 @@ module Lti
       it 'shows subscriptions' do
         allow(subscription_service).to receive_messages(tool_proxy_subscription: ok_response)
         get show_endpoint, headers: request_headers
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'gives gives 404 if subscription does not exist' do
@@ -203,7 +203,7 @@ module Lti
 
       it 'updates subscriptions' do
         put update_endpoint, params: {subscription: subscription}, headers: request_headers
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'gives gives 404 if subscription does not exist' do
@@ -293,7 +293,7 @@ module Lti
       it 'shows subscriptions for a tool proxy from a pagination response' do
         allow(subscription_service).to receive(:tool_proxy_subscriptions) { ok_pagination_response }
         get index_endpoint, headers: request_headers
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'includes pagination headers' do
@@ -305,7 +305,7 @@ module Lti
       it 'shows subscriptions for a tool proxy with optional pagination header' do
         allow(subscription_service).to receive(:tool_proxy_subscriptions) { ok_pagination_response }
         get index_endpoint, headers: pagination_request_headers
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'requires JWT Access token' do

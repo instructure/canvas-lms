@@ -522,7 +522,14 @@ import 'vendor/slickgrid/slick.core'
     if (columnDef.active) {
       value = value || {};
       var $input;
-      var defaultValue = value.grade;
+      let defaultValue;
+
+      if (columnDef.editorFormatter === 'custom_column') {
+        defaultValue = value.new_content;
+      } else {
+        defaultValue = value.grade;
+      }
+
       var scope = this;
 
       this.init = function() {
@@ -564,6 +571,9 @@ import 'vendor/slickgrid/slick.core'
             $input[0].defaultValue = value.grade;
             $input.val(defaultValue);
           }
+        } else if(columnDef.editorFormatter === 'custom_column') {
+          $input[0].defaultValue = value.new_content;
+          $input.val(defaultValue);
         }
 
         $input.appendTo($container);
@@ -590,6 +600,8 @@ import 'vendor/slickgrid/slick.core'
       this.applyValue = function(item, state) {
         if (typeof(columnDef.editorParser) === 'function') {
           item[columnDef.id].grade = columnDef.editorParser(state);
+        } else if(columnDef.editorParser === 'custom_column') {
+          item[columnDef.id].new_content = state;
         } else {
           item[columnDef.id].grade = state;
         }

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {mount} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
 import {Provider} from 'react-redux'
 
 import * as GradeActions from 'jsx/assignments/GradeSummary/grades/GradeActions'
@@ -40,10 +40,12 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
         title: 'Example Assignment'
       },
       currentUser: {
+        canViewStudentIdentities: true,
         graderId: 'admin',
         id: '1100'
       },
       finalGrader: {
+        canViewStudentIdentities: true,
         graderId: 'teach',
         id: '1105'
       },

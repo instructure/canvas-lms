@@ -499,7 +499,7 @@ function getSelectMenuGroupProps() {
 
 function renderSelectMenuGroup() {
   ReactDOM.render(
-    React.createElement(SelectMenuGroup, GradeSummary.getSelectMenuGroupProps()),
+    <SelectMenuGroup {...GradeSummary.getSelectMenuGroupProps()} />,
     document.getElementById('GradeSummarySelectMenuGroup')
   )
 }

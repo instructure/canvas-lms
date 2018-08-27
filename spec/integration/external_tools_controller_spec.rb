@@ -46,7 +46,7 @@ describe ExternalToolsController do
         params: post_body,
         headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
       )
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:tool]).not_to be_nil
     end
 
@@ -106,7 +106,7 @@ describe ExternalToolsController do
         params: post_body,
         headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
       )
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(assigns[:tool]).not_to be_nil
     end
 
@@ -187,7 +187,7 @@ describe ExternalToolsController do
           headers: {'CONTENT_TYPE' => 'application/json'}
         )
 
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:tool].name).to eq app_center_response['name']
       end
 
@@ -213,7 +213,7 @@ describe ExternalToolsController do
           headers: {'CONTENT_TYPE' => 'application/json'}
         )
 
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:tool].settings[:course_navigation]).not_to be_truthy
       end
 
@@ -227,7 +227,7 @@ describe ExternalToolsController do
           headers: {'CONTENT_TYPE' => 'application/json'}
         )
 
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns[:tool].name).to eq app_center_response['name']
       end
     end

@@ -87,6 +87,14 @@ class StudentGradesPage
       f("#submission_#{assignment_id} .assignment_score .grade").text
     end
 
+    def comment_button
+      ffxpath('//a[@aria-label="Read comments"]').select(&:displayed?).first
+    end
+
+    def comments(assignment)
+      ff("#comments_thread_#{assignment.id} table tbody tr")
+    end
+
     def fetch_assignment_score(assignment)
       if assignment.grading_type == "letter_grade"
         assignment_row(assignment).find_element(css: '.assignment_score .score_value').text

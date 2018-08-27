@@ -86,11 +86,11 @@ class Course < ActiveRecord::Base
   has_many :all_real_users, :through => :all_real_enrollments, :source => :user
   has_many :all_real_student_enrollments, -> { where("enrollments.type = 'StudentEnrollment' AND enrollments.workflow_state <> 'deleted'").preload(:user) }, class_name: 'StudentEnrollment'
   has_many :all_real_students, :through => :all_real_student_enrollments, :source => :user
-  has_many :teacher_enrollments, -> { where("enrollments.workflow_state <> 'deleted' AND enrollments.type = 'TeacherEnrollment'").preload(:user) }, class_name: 'TeacherEnrollment'
+  has_many :teacher_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted') AND enrollments.type = 'TeacherEnrollment'").preload(:user) }, class_name: 'TeacherEnrollment'
   has_many :teachers, -> { order("sortable_name") }, :through => :teacher_enrollments, :source => :user
-  has_many :ta_enrollments, -> { where("enrollments.workflow_state<>'deleted'").preload(:user) }, class_name: 'TaEnrollment'
+  has_many :ta_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted')").preload(:user) }, class_name: 'TaEnrollment'
   has_many :tas, :through => :ta_enrollments, :source => :user
-  has_many :observer_enrollments, -> { where("enrollments.workflow_state<>'deleted'").preload(:user) }, class_name: 'ObserverEnrollment'
+  has_many :observer_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted')").preload(:user) }, class_name: 'ObserverEnrollment'
   has_many :observers, :through => :observer_enrollments, :source => :user
   has_many :participating_observers, -> { where(enrollments: { workflow_state: 'active' }) }, through: :observer_enrollments, source: :user
   has_many :participating_observers_by_date, -> { where(enrollments: { type: 'ObserverEnrollment', workflow_state: 'active' }).
@@ -348,7 +348,7 @@ class Course < ActiveRecord::Base
       self.context_module_tags.not_deleted.joins(:context_module).
         where("context_modules.workflow_state <> 'deleted'").
         where("content_tags.content_type <> 'ContextModuleSubHeader'").
-        reorder("COALESCE(context_modules.position, 0), context_modules.id, content_tags.position NULLS LAST").
+        reorder(Arel.sql("COALESCE(context_modules.position, 0), context_modules.id, content_tags.position NULLS LAST")).
         pluck(:id)
     end
   end
@@ -1789,7 +1789,11 @@ class Course < ActiveRecord::Base
         end
       end
     end
-    return [[enrollment_ids, res, "text/csv"]]
+    if enrollment_ids.any?
+      [[enrollment_ids, res, "text/csv"]]
+    else
+      []
+    end
   end
 
   def expire_pending_grade_publishing_statuses(last_publish_attempt_at)
@@ -2211,6 +2215,7 @@ class Course < ActiveRecord::Base
             new_file.folder_id = new_folder_id
             new_file.save_without_broadcasting!
             cm.add_imported_item(new_file)
+            cm.add_imported_item(new_file.folder, key: new_file.folder.id)
             map_merge(file, new_file)
           rescue
             cm.add_warning(t(:file_copy_error, "Couldn't copy file \"%{name}\"", :name => file.display_name || file.path_name), $!)
@@ -2696,7 +2701,7 @@ class Course < ActiveRecord::Base
         tabs.detect { |t| t[:id] == TAB_PEOPLE }[:manageable] = true if check_for_permission.call(:manage_students, :manage_admin_users)
         tabs.delete_if { |t| t[:id] == TAB_FILES } unless check_for_permission.call(:read, :manage_files)
         tabs.detect { |t| t[:id] == TAB_FILES }[:manageable] = true if check_for_permission.call(:manage_files)
-        tabs.delete_if { |t| t[:id] == TAB_DISCUSSIONS } unless check_for_permission.call(:read_forum, :post_to_forum, :moderate_forum)
+        tabs.delete_if { |t| t[:id] == TAB_DISCUSSIONS } unless check_for_permission.call(:read_forum, :post_to_forum, :create_forum, :moderate_forum)
         tabs.detect { |t| t[:id] == TAB_DISCUSSIONS }[:manageable] = true if check_for_permission.call(:moderate_forum)
         tabs.delete_if { |t| t[:id] == TAB_SETTINGS } unless check_for_permission.call(:read_as_admin)
 

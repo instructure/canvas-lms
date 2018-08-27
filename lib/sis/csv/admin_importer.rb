@@ -34,7 +34,6 @@ module SIS
         messages = []
         count = SIS::AdminImporter.new(@root_account, importer_opts).process do |i|
           csv_rows(csv, index, count) do |row|
-            update_progress
             begin
               i.process_admin(user_id: row['user_id'], account_id: row['account_id'],
                               role_id: row['role_id'], role: row['role'],

@@ -146,6 +146,7 @@
 
 <%
   css_bundle :dashboard
+  css_bundle :react_todo_sidebar if planner_enabled?
   case @course_home_view
   when 'wiki'
     css_bundle :tinymce

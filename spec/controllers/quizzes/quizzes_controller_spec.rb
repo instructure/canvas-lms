@@ -217,7 +217,7 @@ describe Quizzes::QuizzesController do
       context "if xhr request" do
         it "returns the new quiz's edit url" do
           post 'new', params: {:course_id => @course.id}, xhr: true
-          expect(response).to have_http_status :success
+          expect(response).to be_successful
           expect(JSON.parse(response.body)['url']).to match(%r{/courses/\w+/quizzes/\w+/edit$})
         end
       end
@@ -495,7 +495,7 @@ describe Quizzes::QuizzesController do
 
         user_session(@teacher)
         get 'show', params: { course_id: @course.id, id: @quiz.id, take: '1', preview: '1' }
-        expect(response).to have_http_status(:success)
+        expect(response).to be_successful
       end
     end
   end
@@ -1151,7 +1151,7 @@ describe Quizzes::QuizzesController do
 
         user_session(@teacher)
         get 'history', params: { course_id: @course.id, quiz_id: @quiz.id, quiz_submission_id: quiz_submission.id }
-        expect(response).to have_http_status(:success)
+        expect(response).to be_successful
       end
     end
   end

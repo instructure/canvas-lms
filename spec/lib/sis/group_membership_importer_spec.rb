@@ -40,9 +40,11 @@ module SIS
     it 'does not blow up if you hand it integers' do
       create_group
       create_user
-      GroupMembershipImporter.new(Account.default, {batch: Account.default.sis_batches.create!}).process do |importer|
-        importer.add_group_membership(12345, 54321, 'accepted')
-      end
+      expect do
+        GroupMembershipImporter.new(Account.default, {batch: Account.default.sis_batches.create!}).process do |importer|
+          importer.add_group_membership(12345, 54321, 'accepted')
+        end
+      end.to_not raise_error
     end
 
     describe 'validation' do

@@ -57,4 +57,4 @@ define [
 
     recalculateHeader: (key) ->
       key = 'mean' if key is 'average'
-      @redrawFn(@grid, key, Grid.section)
+      @redrawFn(@grid, key)

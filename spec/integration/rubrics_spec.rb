@@ -30,7 +30,7 @@ describe "rubrics" do
 
     get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
 
-    expect(response).to be_success
+    expect(response).to be_successful
     page = Nokogiri::HTML(response.body)
     expect(page.css('#rubrics .rubric_table .criterion:nth-child(1) .edit_criterion_link')).to be_empty
     expect(page.css('#rubrics .rubric_table .criterion:nth-child(2) .edit_criterion_link')).not_to be_empty

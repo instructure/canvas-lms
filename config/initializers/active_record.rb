@@ -671,7 +671,7 @@ module UsefulFindInBatches
     # prefer copy unless we're in a transaction (which would be bad,
     # because we might open a separate connection in the block, and not
     # see the contents of our current transaction)
-    if connection.open_transactions == 0 && !options[:start] && eager_load_values.empty?
+    if connection.open_transactions == 0 && !options[:start] && eager_load_values.empty? && !ActiveRecord::Base.in_migration
       self.activate { |r| r.find_in_batches_with_copy(options, &block) }
     elsif should_use_cursor? && !options[:start] && eager_load_values.empty?
       self.activate { |r| r.find_in_batches_with_cursor(options, &block) }
@@ -1432,9 +1432,7 @@ end
 
 module UnscopeCallbacks
   def run_callbacks(*args)
-    # workaround for a rails 5.2.0 problem where .all sometimes tries to merge in a current_scope with a `skip_query_cache_value` and explodes
-    # TODO: can undo it when this is fixed https://github.com/rails/rails/issues/32640
-    scope = (self.class.current_scope || self.class.all).klass.unscoped
+    scope = self.class.all.klass.unscoped
     scope.scoping { super }
   end
 end
@@ -1624,3 +1622,43 @@ module TableRename
 end
 
 ActiveRecord::ConnectionAdapters::SchemaCache.prepend(TableRename)
+
+
+if CANVAS_RAILS5_1
+  module EnforceRawSqlWhitelist
+    COLUMN_NAME_ORDER_WHITELIST = /
+        \A
+        (?:\w+\.)?
+        \w+
+        (?:\s+asc|\s+desc)?
+        (?:\s+nulls\s+(?:first|last))?
+        \z
+      /ix
+
+    def enforce_raw_sql_whitelist(args, whitelist: COLUMN_NAME_WHITELIST) # :nodoc:
+      unexpected = args.reject do |arg|
+        arg.kind_of?(Arel::Node) ||
+          arg.is_a?(Arel::Nodes::SqlLiteral) ||
+          arg.is_a?(Arel::Attributes::Attribute) ||
+          arg.to_s.split(/\s*,\s*/).all? { |part| whitelist.match?(part) }
+      end
+
+      return if unexpected.none?
+
+      raise(
+            "Query method called with non-attribute argument(s): " +
+              unexpected.map(&:inspect).join(", ")
+      )
+    end
+
+    def validate_order_args(order_args)
+      enforce_raw_sql_whitelist(
+        order_args.flat_map { |a| a.is_a?(Hash) ? a.keys : a },
+        whitelist: COLUMN_NAME_ORDER_WHITELIST
+      )
+      super
+    end
+  end
+
+  ActiveRecord::Relation.prepend(EnforceRawSqlWhitelist)
+end

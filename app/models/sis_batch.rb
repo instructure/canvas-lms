@@ -239,6 +239,7 @@ class SisBatch < ActiveRecord::Base
 
   def abort_batch
     SisBatch.not_completed.where(id: self).update_all(workflow_state: 'aborted')
+    self.class.queue_job_for_account(account, 10.minutes.from_now) if self.account.sis_batches.needs_processing.exists?
   end
 
   def batch_aborted(message)
@@ -260,14 +261,6 @@ class SisBatch < ActiveRecord::Base
   scope :not_completed, -> { where(workflow_state: %w[initializing created importing cleanup_batch]) }
   scope :succeeded, -> { where(:workflow_state => %w[imported imported_with_messages]) }
 
-  def self.use_parallel_importers?(account)
-    account.feature_enabled?(:refactor_of_sis_imports)
-  end
-
-  def using_parallel_importers?
-    self&.data&.dig(:use_parallel_imports)
-  end
-
   def self.strand_for_account(account)
     "sis_batch:account:#{Shard.birth.activate { account.id }}"
   end
@@ -279,15 +272,15 @@ class SisBatch < ActiveRecord::Base
 
   def self.process_all_for_account(account)
     account.shard.activate do
-      return if use_parallel_importers?(account) && account.sis_batches.importing.exists? # will be requeued after the current batch finishes
-      start_time = Time.now
+      return if account.sis_batches.importing.exists? # will requeue after the current batch finishes
+      start_time = Time.zone.now
       loop do
         batches = account.sis_batches.needs_processing.limit(50).order(:created_at).to_a
         break if batches.empty?
         batches.each do |batch|
           batch.process_without_send_later
           return if batch.importing? # we'll requeue afterwards
-          if Time.now - start_time > Setting.get('max_time_per_sis_batch', 60).to_i
+          if Time.zone.now - start_time > Setting.get('max_time_per_sis_batch', 60).to_i
             # requeue the job to continue processing more batches
             queue_job_for_account(account)
             return
@@ -321,15 +314,12 @@ class SisBatch < ActiveRecord::Base
       return
     end
 
-    use_parallel = self.class.use_parallel_importers?(self.account)
-    import_class = use_parallel ? SIS::CSV::ImportRefactored : SIS::CSV::Import
-    importer = import_class.process(self.account,
-                                        files: [@data_file.path],
-                                        batch: self,
-                                        override_sis_stickiness: options[:override_sis_stickiness],
-                                        add_sis_stickiness: options[:add_sis_stickiness],
-                                        clear_sis_stickiness: options[:clear_sis_stickiness])
-    finish importer.finished unless use_parallel
+    SIS::CSV::ImportRefactored.process(self.account,
+                                       files: [@data_file.path],
+                                       batch: self,
+                                       override_sis_stickiness: options[:override_sis_stickiness],
+                                       add_sis_stickiness: options[:add_sis_stickiness],
+                                       clear_sis_stickiness: options[:clear_sis_stickiness])
   end
 
   def generate_diff
@@ -391,7 +381,7 @@ class SisBatch < ActiveRecord::Base
     self.ended_at = Time.now.utc
     self.save!
 
-    if self.class.use_parallel_importers?(account) && !self.data[:running_immediately] && self.account.sis_batches.needs_processing.exists?
+    if !self.data[:running_immediately] && self.account.sis_batches.needs_processing.exists?
       self.class.queue_job_for_account(account) # check if there's anything that needs to be run
     end
   end
@@ -437,19 +427,9 @@ class SisBatch < ActiveRecord::Base
     # delete courses that weren't in this batch, in the selected term
     current_row ||= 0
     courses.find_in_batches do |batch|
-      if self.using_parallel_importers?
-        count = Course.destroy_batch(batch, sis_batch: self, batch_mode: true)
-        finish_course_destroy(batch)
-        current_row += count
-      else
-        batch.each do |course|
-          course.clear_sis_stickiness(:workflow_state)
-          course.skip_broadcasts = true
-          course.destroy
-          Auditors::Course.record_deleted(course, self.user, :source => :sis, :sis_batch => self)
-          current_row += 1
-        end
-      end
+      count = Course.destroy_batch(batch, sis_batch: self, batch_mode: true)
+      finish_course_destroy(batch)
+      current_row += count
       self.fast_update_progress(current_row.to_f / total_rows * 100)
     end
 
@@ -486,18 +466,9 @@ class SisBatch < ActiveRecord::Base
     current_row ||= 0
     # delete sections who weren't in this batch, whose course was in the selected term
     sections.find_in_batches do |batch|
-      if self.using_parallel_importers?
-        count = CourseSection.destroy_batch(batch, sis_batch: self, batch_mode: true)
-        section_count += count
-        current_row += count
-      else
-        batch.each do |section|
-          section.destroy
-          section_count += 1
-          current_row += 1
-          self.fast_update_progress(current_row.to_f / total_rows * 100)
-        end
-      end
+      count = CourseSection.destroy_batch(batch, sis_batch: self, batch_mode: true)
+      section_count += count
+      current_row += count
     end
     self.data[:counts][:batch_sections_deleted] = section_count
     current_row
@@ -521,19 +492,11 @@ class SisBatch < ActiveRecord::Base
     current_row ||= 0
     # delete enrollments for courses that weren't in this batch, in the selected term
     enrollments.find_in_batches do |batch|
-      if self.using_parallel_importers?
-        data = Enrollment::BatchStateUpdater.destroy_batch(batch, sis_batch: self, batch_mode: true)
-        SisBatchRollBackData.bulk_insert_roll_back_data(data)
-        batch_count = data.count{|d| d.context_type == "Enrollment"} # data can include group membership deletions
-        enrollment_count += batch_count
-        current_row += batch_count
-      else
-        batch.each do |enrollment|
-          enrollment.destroy
-          enrollment_count += 1
-          current_row += 1
-        end
-      end
+      data = Enrollment::BatchStateUpdater.destroy_batch(batch, sis_batch: self, batch_mode: true)
+      SisBatchRollBackData.bulk_insert_roll_back_data(data)
+      batch_count = data.count{|d| d.context_type == "Enrollment"} # data can include group membership deletions
+      enrollment_count += batch_count
+      current_row += batch_count
       self.fast_update_progress(current_row.to_f/total_rows * 100)
     end
     self.data[:counts][:batch_enrollments_deleted] = enrollment_count
@@ -808,5 +771,27 @@ class SisBatch < ActiveRecord::Base
         WHERE t.id=x.id AND x.workflow_state IS DISTINCT FROM t.workflow_state
         RETURNING t.id
     SQL
+  end
+
+  attr_writer :downloadable_attachments
+  def self.load_downloadable_attachments(batches)
+    batches = Array(batches)
+    all_ids = batches.map{|sb| sb.data&.dig(:downloadable_attachment_ids) || []}.flatten
+    all_attachments = all_ids.any? ? Attachment.where(:context_type => self.name, :context_id => batches, :id => all_ids).to_a.group_by(&:context_id) : {}
+    batches.each do |b|
+      b.downloadable_attachments = all_attachments[b.id] || []
+    end
+  end
+
+  def downloadable_attachments
+    @downloadable_attachments ||=
+      begin
+        ids = data[:downloadable_attachment_ids]
+        if ids.present?
+          self.shard.activate { Attachment.where(:id => ids).polymorphic_where(:context => self).to_a }
+        else
+          []
+        end
+      end
   end
 end

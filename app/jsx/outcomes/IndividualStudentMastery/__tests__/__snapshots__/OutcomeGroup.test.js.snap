@@ -2,10 +2,10 @@
 
 exports[`renders correctly expanded 1`] = `
 "<View as=\\"div\\" className=\\"outcomeGroup\\" display=\\"auto\\">
-  <ToggleGroup summary={{...}} toggleLabel=\\"Toggle outcomes for My group\\" expanded={true} onToggle={[Function]} size=\\"medium\\" icon={[Function]} iconExpanded={[Function]} defaultExpanded={false} transition={true} as=\\"span\\" elementRef={[Function]} border={true}>
+  <ToggleGroup summary={{...}} toggleLabel=\\"Toggle outcomes for My group\\" expanded={true} onToggle={[Function]} size=\\"medium\\" icon={[Function: IconArrowOpenEnd]} iconExpanded={[Function: IconArrowOpenDown]} defaultExpanded={false} transition={true} as=\\"span\\" elementRef={[Function: elementRef]} border={true}>
     <List variant=\\"unstyled\\" delimiter=\\"solid\\" as=\\"ul\\" margin=\\"none\\" size=\\"medium\\">
       <ListItem margin=\\"0\\">
-        <Outcome outcome={{...}} expanded={false} onExpansionChange={[Function]} outcomeProficiency={{...}} />
+        <Outcome outcome={{...}} expanded={false} onExpansionChange={[Function: onExpansionChange]} outcomeProficiency={{...}} />
       </ListItem>
     </List>
   </ToggleGroup>
@@ -14,10 +14,10 @@ exports[`renders correctly expanded 1`] = `
 
 exports[`renders the OutcomeGroup component 1`] = `
 "<View as=\\"div\\" className=\\"outcomeGroup\\" display=\\"auto\\">
-  <ToggleGroup summary={{...}} toggleLabel=\\"Toggle outcomes for My group\\" expanded={false} onToggle={[Function]} size=\\"medium\\" icon={[Function]} iconExpanded={[Function]} defaultExpanded={false} transition={true} as=\\"span\\" elementRef={[Function]} border={true}>
+  <ToggleGroup summary={{...}} toggleLabel=\\"Toggle outcomes for My group\\" expanded={false} onToggle={[Function]} size=\\"medium\\" icon={[Function: IconArrowOpenEnd]} iconExpanded={[Function: IconArrowOpenDown]} defaultExpanded={false} transition={true} as=\\"span\\" elementRef={[Function: elementRef]} border={true}>
     <List variant=\\"unstyled\\" delimiter=\\"solid\\" as=\\"ul\\" margin=\\"none\\" size=\\"medium\\">
       <ListItem margin=\\"0\\">
-        <Outcome outcome={{...}} expanded={false} onExpansionChange={[Function]} outcomeProficiency={{...}} />
+        <Outcome outcome={{...}} expanded={false} onExpansionChange={[Function: onExpansionChange]} outcomeProficiency={{...}} />
       </ListItem>
     </List>
   </ToggleGroup>

@@ -16,7 +16,7 @@ exports[`renders the ProficiencyRating component 1`] = `
   <td className=\\"color\\" style={{...}}>
     <Popover on=\\"click\\" show={false} onToggle={[Function]} onClick={[Function]} onFocus={[Function]} onBlur={[Function]} onMouseOver={[Function]} onMouseOut={[Function]} onShow={[Function]} onDismiss={[Function]} placement=\\"bottom center\\" stacking=\\"topmost\\" offsetX={0} offsetY={0} variant=\\"default\\" contentRef={[Function]} defaultShow={false} withArrow={true} trackPosition={true} constrain=\\"window\\" onPositioned={[Function]} onPositionChanged={[Function]} shouldRenderOffscreen={false} shouldContainFocus={false} shouldReturnFocus={true} shouldCloseOnDocumentClick={true} shouldCloseOnEscape={true} defaultFocusElement={{...}} label={{...}} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} positionTarget={{...}} alignArrow={false}>
       <PopoverTrigger>
-        <Button variant=\\"link\\" as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" fluidWidth={false} buttonRef={[Function]}>
+        <Button variant=\\"link\\" as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" fluidWidth={false} buttonRef={[Function]} cursor=\\"pointer\\">
           <div>
             <span className=\\"colorPickerIcon\\" style={{...}} />
             Change
@@ -28,7 +28,7 @@ exports[`renders the ProficiencyRating component 1`] = `
       </PopoverContent>
     </Popover>
     <div className=\\"delete\\">
-      <Button disabled={false} buttonRef={[Function]} onClick={[Function]} variant=\\"icon\\" icon={{...}} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" fluidWidth={false}>
+      <Button disabled={false} buttonRef={[Function]} onClick={[Function]} variant=\\"icon\\" icon={{...}} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" fluidWidth={false} cursor=\\"pointer\\">
         <ScreenReaderContent as=\\"span\\">
           Delete proficiency rating
         </ScreenReaderContent>

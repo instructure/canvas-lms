@@ -16,18 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../../lti_1_3_spec_helper')
+
 require_dependency "lti/ims/security_controller"
 
 module Lti::Ims
   RSpec.describe SecurityController, type: :request do
-    before do
-      @fallback_proxy = Canvas::DynamicSettings::FallbackProxy.new({
-        Lti::KeyStorage::PAST => Lti::RSAKeyPair.new.to_jwk.to_json,
-        Lti::KeyStorage::PRESENT => Lti::RSAKeyPair.new.to_jwk.to_json,
-        Lti::KeyStorage::FUTURE => Lti::RSAKeyPair.new.to_jwk.to_json
-      })
-      allow(Canvas::DynamicSettings).to receive(:kv_proxy).and_return(@fallback_proxy)
-    end
+    include_context 'lti_1_3_spec_helper'
 
     let(:url) { Rails.application.routes.url_helpers.jwks_show_path }
     let(:json) { JSON.parse(response.body) }

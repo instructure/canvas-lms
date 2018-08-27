@@ -1,0 +1,54 @@
+<form action='#' id='edit_to_do_item_form' style='padding: 5px; width: 500px'>
+  <div class="event-details-content">
+    <table class="formtable" style="width: 100%;" role="presentation">
+      <tr>
+        <td style="vertical-align: top;"><label for="to_do_item_title">{{#t "title"}}Title:{{/t}}</label></td>
+        <td>
+          {{#if lockedTitle}}
+            {{title}}
+          {{else}}
+            <input id="to_do_item_title" name="title" size="30" maxlength="255" style="width: 165px;" type="text" value="{{title}}"/>
+          {{/if}}
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;"><label for="to_do_item_date">{{#t "date"}}Date:{{/t}}</label></td>
+        <td>
+          <div class='date_field_container'>
+            <label class='screenreader-only' id='to_do_item_date_accessible_label'>
+              {{#t}}To Do Date:{{/t}}
+              {{datepickerScreenreaderPrompt 'date'}}
+            </label>
+            <input id="to_do_item_date" type="text"
+              value="{{fcMomentToDateString date "medium_with_weekday"}}"
+              name="date" style="width: 120px;" class="date_field"
+              aria-labelledby='to_do_item_date_accessible_label'
+              data-tooltip title="{{accessibleDateFormat 'date'}}"/>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;"><label for="to_do_item_time">{{#t "time"}}Time:{{/t}}</label></td>
+        <td>
+          <div style="display: inline-block;">
+            <div class='date_field_container'>
+              <label class='screenreader-only' id='to_do_item_time_accessible_label'>
+                {{#t}}To Do Time{{/t}}
+                {{datepickerScreenreaderPrompt 'time'}}
+              </label>
+              <input id="to_do_item_time" type="text"
+                name="time" style="width: 80px;"
+                class="time_field note_time"
+                aria-labelledby='to_do_item_time_accessible_label'
+                data-tooltip title="{{accessibleDateFormat 'time'}}"/>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="popover-links-holder event-details-footer pull-right">
+    <a href="#" class="event_button btn btn-secondary more_options_link">{{#t "links.more_options"}}More Options{{/t}}</a>
+    <button type="submit" class="event_button btn btn-primary save_note">{{#t "#buttons.submit"}}Submit{{/t}}</button>
+  </div>
+</form>

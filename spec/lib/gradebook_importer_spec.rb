@@ -111,14 +111,14 @@ describe GradebookImporter do
 
         it 'normalizes pure numbers' do
           expected_grades = %w[123.4 1234.5 1234.5 -1234.50 1234.5 1234.5]
-          actual_grades = @gi.students.map { |student_row| student_row.gradebook_importer_submissions[0]['grade'] }
+          actual_grades = @gi.upload.gradebook.fetch('students').map { |student| student.fetch('submissions').first.fetch('grade') }
 
           expect(actual_grades).to match_array(expected_grades)
         end
 
         it 'normalizes percentages' do
           expected_grades = %w[57.4% 4200.3% 4200.3% -4200.30% 4200.3% 4200.3%]
-          actual_grades = @gi.students.map { |student_row| student_row.gradebook_importer_submissions[1]['grade'] }
+          actual_grades = @gi.upload.gradebook.fetch('students').map { |student| student.fetch('submissions').second.fetch('grade') }
 
           expect(actual_grades).to match_array(expected_grades)
         end
@@ -158,14 +158,14 @@ describe GradebookImporter do
 
         it 'normalizes pure numbers' do
           expected_grades = %w[123.4 1234.5 1234.5 -1234.50 1234.5 1234.5]
-          actual_grades = @gi.students.map { |student_row| student_row.gradebook_importer_submissions[0]['grade'] }
+          actual_grades = @gi.upload.gradebook.fetch('students').map { |student| student.fetch('submissions').first.fetch('grade') }
 
           expect(actual_grades).to match_array(expected_grades)
         end
 
         it 'normalizes percentages' do
           expected_grades = %w[57.4% 4200.3% 4200.3% -4200.30% 4200.3% 4200.3%]
-          actual_grades = @gi.students.map { |student_row| student_row.gradebook_importer_submissions[1]['grade'] }
+          actual_grades = @gi.upload.gradebook.fetch('students').map { |student| student.fetch('submissions').second.fetch('grade') }
 
           expect(actual_grades).to match_array(expected_grades)
         end
@@ -546,10 +546,49 @@ describe GradebookImporter do
         ",#{@student.id},,10"
     )
     expect(@gi.assignments).to eq [@assignment1]
-    submission = @gi.students.first.gradebook_importer_submissions.first
+    submission = @gi.upload.gradebook.fetch('students').first.fetch('submissions').first
     expect(submission['original_grade']).to eq '8.0'
     expect(submission['grade']).to eq '10'
     expect(submission['assignment_id']).to eq @assignment1.id
+  end
+
+  context "custom gradebook columns" do
+    before do
+      @student = User.create!
+      course_with_student(course: @course, user: @student, active_enrollment: true)
+      @course.custom_gradebook_columns.create!({title: "CustomColumn1", read_only: false})
+      @course.custom_gradebook_columns.create!({title: "CustomColumn2", read_only: false})
+    end
+
+    it "includes non read only custom columns" do
+      importer_with_rows(
+        "Student,ID,Section,CustomColumn1,CustomColumn2,Assignment 1",
+        ",#{@student.id},,test 1,test 2,10"
+      )
+      col = @gi.upload.gradebook.fetch('custom_columns').map do |custom_column|
+        custom_column.fetch('title')
+      end
+      expect(col).to eq ['CustomColumn1', 'CustomColumn2']
+    end
+
+    it "excludes read only custom columns" do
+      @course.custom_gradebook_columns.create!({title: "CustomColumn3", read_only: true})
+      importer_with_rows(
+        "Student,ID,Section,CustomColumn1,CustomColumn2,CustomColumn3,Assignment 1",
+        ",#{@student.id},,test 1,test 2,test 3,10"
+      )
+      col = @gi.upload.gradebook.fetch('custom_columns').find { |custom_column| custom_column.fetch('title') == 'CustomColumn3' }
+      expect(col).to eq nil
+    end
+
+    it "expects custom column datum from non read only columns" do
+      importer_with_rows(
+        "Student,ID,Section,CustomColumn1,CustomColumn2,Assignment 1",
+        ",#{@student.id},,test 1,test 2,10"
+      )
+      col = @gi.upload.gradebook.fetch('students').first.fetch('custom_column_data').map { |custom_column| custom_column.fetch('new_content') }
+      expect(col).to eq ['test 1', 'test 2']
+    end
   end
 
   context "to_json" do
@@ -565,15 +604,18 @@ describe GradebookImporter do
 
     describe "simplified json output" do
       it "has only the specified keys" do
-        keys = [:assignments, :missing_objects,
-                :original_submissions, :students,
+        keys = [:assignments,
+                :custom_columns,
+                :missing_objects,
+                :original_submissions,
+                :students,
                 :unchanged_assignments,
                 :warning_messages]
         expect(hash.keys.sort).to eql(keys)
       end
 
       it "a student only has specified keys" do
-        keys = [:id, :last_name_first, :name, :previous_id, :submissions]
+        keys = [:custom_column_data, :id, :last_name_first, :name, :previous_id, :submissions]
         expect(student.keys.sort).to eql(keys)
       end
 
@@ -802,6 +844,14 @@ describe GradebookImporter do
             expect(student_submissions.map {|s| s['assignment_id']}).to include @open_assignment.id
           end
         end
+
+        it "marks excused submission as 'EX' even if 'ex' is not capitalized" do
+          importer_with_rows(
+            "Student,ID,Section,Assignment in closed period,Assignment in open period",
+            ",#{@student.id},,,eX",
+          )
+          expect(student_submissions.first.fetch('grade')).to eq 'EX'
+        end
       end
 
       context "assignments with overrides" do
@@ -924,8 +974,6 @@ describe GradebookImporter do
     let(:course) { Course.create account: account }
     let(:student) do
       student = User.create
-      student.gradebook_importer_submissions = [{ "grade" => "",
-                                                  "original_grade" => ""}]
       student
     end
     let(:assignment) do
@@ -938,46 +986,53 @@ describe GradebookImporter do
     let(:progress) { Progress.create tag: "test", context: student }
     let(:gradebook_upload){ GradebookUpload.create!(course: course, user: student, progress: progress) }
     let(:importer) { GradebookImporter.new(gradebook_upload, "", student, progress) }
-    let(:submission) { student.gradebook_importer_submissions.first }
 
-    it "translates positive score in submission['grade'] to complete" do
-      submission['grade'] = "3"
-      importer.translate_pass_fail(assignments, students)
+    it "translates positive score in gradebook_importer_assignments grade to complete" do
+      gradebook_importer_assignments = { student.id => [{ "grade" => "3", "original_grade" => ""}] }
+      importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
+      grade = gradebook_importer_assignments.fetch(student.id).first['grade']
 
-      expect(submission['grade']).to eq "complete"
+      expect(grade).to eq "complete"
     end
 
-    it "translates positive grade in submission['original_grade'] to complete" do
-      submission['original_grade'] = "3"
-      importer.translate_pass_fail(assignments, students)
+    it "translates positive grade in gradebook_importer_assignments original_grade to complete" do
+      gradebook_importer_assignments = { student.id => [{ "grade" => "", "original_grade" => "5"}] }
+      importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
+      original_grade = gradebook_importer_assignments.fetch(student.id).first['original_grade']
 
-      expect(submission['original_grade']).to eq "complete"
+      expect(original_grade).to eq "complete"
     end
 
-    it "translates 0 grade in submission['grade'] to incomplete" do
-      submission['grade'] = "0"
-      importer.translate_pass_fail(assignments, students)
+    it "translates 0 grade in gradebook_importer_assignments grade to incomplete" do
+      gradebook_importer_assignments = { student.id => [{ "grade" => "0", "original_grade" => ""}] }
+      importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
+      grade = gradebook_importer_assignments.fetch(student.id).first['grade']
 
-      expect(submission['grade']).to eq "incomplete"
+      expect(grade).to eq "incomplete"
     end
 
-    it "translates 0 grade in submission['original_grade'] to incomplete" do
-      submission['original_grade'] = "0"
-      importer.translate_pass_fail(assignments, students)
+    it "translates 0 grade in gradebook_importer_assignments original_grade to incomplete" do
+      gradebook_importer_assignments = { student.id => [{ "grade" => "", "original_grade" => "0"}] }
+      importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
+      original_grade = gradebook_importer_assignments.fetch(student.id).first['original_grade']
 
-      expect(submission['original_grade']).to eq "incomplete"
+      expect(original_grade).to eq "incomplete"
     end
 
-    it "doesn't change empty string grade in submission['grade']" do
-      importer.translate_pass_fail(assignments, students)
+    it "doesn't change empty string grade in gradebook_importer_assignments grade" do
+      gradebook_importer_assignments = { student.id => [{ "grade" => "", "original_grade" => ""}] }
+      importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
+      grade = gradebook_importer_assignments.fetch(student.id).first['grade']
 
-      expect(submission['grade']).to eq ""
+      expect(grade).to eq ""
     end
 
-    it "doesn't change empty string grade in submission['original_grade']" do
-      importer.translate_pass_fail(assignments, students)
+    it "doesn't change empty string grade in gradebook_importer_assignments original_grade" do
+      gradebook_importer_assignments = { student.id => [{ "grade" => "", "original_grade" => ""}] }
+      importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
+      original_grade = gradebook_importer_assignments.fetch(student.id).first['original_grade']
 
-      expect(submission['grade']).to eq ""
+      expect(original_grade).to eq ""
     end
   end
 

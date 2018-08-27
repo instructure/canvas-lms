@@ -133,16 +133,5 @@ describe Canvadocs::Session do
       permissions = canvadoc_permissions_for_user(teacher, true)
       expect(permissions[:permissions]).to eq "readwritemanage"
     end
-
-    it 'applies the moderated grading whitelist if it is provided and not nil' do
-      whitelist = []
-      expect(self).to receive(:canvadocs_apply_whitelist).with(anything, whitelist).once
-      canvadoc_permissions_for_user(@student, true, whitelist)
-    end
-
-    it 'does not apply the moderated grading whitelist if it is nil' do
-      expect(self).not_to receive(:canvadocs_apply_whitelist)
-      canvadoc_permissions_for_user(@student, true, nil)
-    end
   end
 end

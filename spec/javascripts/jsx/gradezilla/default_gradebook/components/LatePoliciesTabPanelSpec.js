@@ -17,7 +17,7 @@
  */
 
 import React from 'react';
-import { mount } from 'enzyme';
+import { mount } from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme';
 import _ from 'underscore';
 import Alert from '@instructure/ui-alerts/lib/components/Alert';
 import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup';

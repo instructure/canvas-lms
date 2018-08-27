@@ -334,7 +334,7 @@ RSpec.shared_examples 'a submission update action' do |controller|
         it 'returns success for an authorized user' do
           user_session(@teacher)
           put :update, params: @params, format: :json
-          expect(response).to be_success
+          expect(response).to be_successful
         end
 
         it 'creates a final provisional comment' do

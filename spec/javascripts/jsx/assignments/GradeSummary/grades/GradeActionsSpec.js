@@ -105,6 +105,104 @@ QUnit.module('GradeSummary GradeActions', suiteHooks => {
     })
   })
 
+  QUnit.module('.acceptGraderGrades()', methodHooks => {
+    let provisionalGrades
+    let selectProvisionalGradePromise
+
+    methodHooks.beforeEach(() => {
+      selectProvisionalGradePromise = wrapPromise()
+
+      sinon.stub(GradesApi, 'bulkSelectProvisionalGrades').returns(selectProvisionalGradePromise)
+
+      provisionalGrades = [
+        {
+          grade: 'A',
+          graderId: '1101',
+          id: '4601',
+          score: 9.5,
+          selected: false,
+          studentId: '1111'
+        },
+        {
+          grade: 'B',
+          graderId: '1102',
+          id: '4602',
+          score: 8.5,
+          selected: false,
+          studentId: '1112'
+        },
+        {
+          grade: 'C',
+          graderId: '1101',
+          id: '4603',
+          score: 7.5,
+          selected: false,
+          studentId: '1113'
+        }
+      ]
+    })
+
+    methodHooks.afterEach(() => {
+      GradesApi.bulkSelectProvisionalGrades.restore()
+    })
+
+    function acceptGraderGrades() {
+      store = configureStore(storeEnv)
+      store.dispatch(GradeActions.addProvisionalGrades(provisionalGrades))
+      store.dispatch(GradeActions.acceptGraderGrades('1101'))
+    }
+
+    test('sets the "set bulk select provisional grades" status to "started" for the given grader', () => {
+      acceptGraderGrades()
+      const {bulkSelectProvisionalGradeStatuses} = store.getState().grades
+      equal(bulkSelectProvisionalGradeStatuses[1101], GradeActions.STARTED)
+    })
+
+    test('bulk selects the provisional grades through the api', () => {
+      acceptGraderGrades()
+      strictEqual(GradesApi.bulkSelectProvisionalGrades.callCount, 1)
+    })
+
+    test('includes the course id when selecting through the api', () => {
+      acceptGraderGrades()
+      const [courseId] = GradesApi.bulkSelectProvisionalGrades.lastCall.args
+      strictEqual(courseId, '1201')
+    })
+
+    test('includes the assignment id when selecting through the api', () => {
+      acceptGraderGrades()
+      const [, assignmentId] = GradesApi.bulkSelectProvisionalGrades.lastCall.args
+      strictEqual(assignmentId, '2301')
+    })
+
+    test('includes the provisional grade id when selecting through the api', () => {
+      acceptGraderGrades()
+      const [, , provisionalGradeIds] = GradesApi.bulkSelectProvisionalGrades.lastCall.args
+      deepEqual(provisionalGradeIds, ['4601', '4603'])
+    })
+
+    test('updates the selected provisional grades in the store when the request succeeds', async () => {
+      acceptGraderGrades()
+      await selectProvisionalGradePromise.resolve()
+      const grades = store.getState().grades.provisionalGrades
+      strictEqual(grades[1113][1101].selected, true)
+    })
+
+    test('sets the "set selected provisional grades" status to "success" when the request succeeds', async () => {
+      acceptGraderGrades()
+      await selectProvisionalGradePromise.resolve()
+      const {bulkSelectProvisionalGradeStatuses} = store.getState().grades
+      equal(bulkSelectProvisionalGradeStatuses[1101], GradeActions.SUCCESS)
+    })
+
+    test('sets the "set selected provisional grades" status to "failure" when a failure occurs', async () => {
+      acceptGraderGrades()
+      await selectProvisionalGradePromise.reject(new Error('server error'))
+      const {bulkSelectProvisionalGradeStatuses} = store.getState().grades
+      equal(bulkSelectProvisionalGradeStatuses[1101], GradeActions.FAILURE)
+    })
+  })
+
   QUnit.module('.selectFinalGrade()', methodHooks => {
     let provisionalGrades
     let selectProvisionalGradePromise

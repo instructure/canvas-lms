@@ -20,6 +20,7 @@ class Assignment
     include GradebookSettingsHelpers
     include CoursesHelper
     include Api::V1::SubmissionComment
+    include CanvadocsHelper
 
     def initialize(assignment, current_user, avatars: false, grading_role: :grader)
       @assignment = assignment
@@ -57,6 +58,7 @@ class Assignment
         :include_root => false
       )
       res['anonymize_students'] = @assignment.anonymize_students?
+      res['anonymize_graders'] = !@assignment.can_view_other_grader_identities?(@current_user)
 
       # include :provisional here someday if we need to distinguish
       # between provisional and real comments (also in
@@ -94,7 +96,11 @@ class Assignment
 
       includes = [{ versions: :versionable }, :quiz_submission, :user, :attachment_associations, :assignment, :originality_reports]
       grader_comments_hidden = grader_comments_hidden?(current_user: @current_user, assignment: @assignment)
-      key = grader_comments_hidden ? :submission_comments : :all_submission_comments
+      key = if @assignment.grades_published? || grader_comments_hidden
+        :submission_comments
+      else
+        :all_submission_comments
+      end
 
       includes << {key => {submission: {assignment: { context: :root_account }}}}
       @submissions = @assignment.submissions.where(:user_id => @students).preload(*includes)
@@ -124,7 +130,7 @@ class Assignment
             assignment: @assignment,
             course: @course,
             submissions: @submissions
-          ).fetch(enrollment.user_id.to_s)
+          ).fetch(enrollment.user_id.to_s, nil)
           enrollment_json.delete(:user_id)
         end
         enrollment_json
@@ -174,10 +180,6 @@ class Assignment
         end
       end
 
-      if anonymous_graders?(current_user: @current_user, assignment: @assignment)
-        res[:anonymous_grader_ids] = @assignment.ordered_moderation_graders.pluck(:anonymous_id)
-      end
-
       res[:submissions] = @submissions.map do |sub|
         json = sub.as_json(
           include_root: false,
@@ -190,7 +192,9 @@ class Assignment
           json.merge! provisional_grade_to_json(provisional_grade)
         end
 
-        comments = if grader_comments_hidden
+        comments = if @assignment.grades_published?
+          sub.submission_comments
+        elsif grader_comments_hidden
           (provisional_grade || sub).submission_comments
         else
           sub.all_submission_comments
@@ -226,7 +230,7 @@ class Assignment
         }
 
         if url_opts[:enable_annotations]
-          url_opts[:enrollment_type] = user_type(@course, @current_user)
+          url_opts[:enrollment_type] = canvadocs_user_role(@course, @current_user)
         end
 
         if json['submission_history'] && (@assignment.quiz.nil? || too_many)

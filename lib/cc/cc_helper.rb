@@ -253,7 +253,8 @@ module CCHelper
             # for all other types,
             # create a migration id for the object, and use that as the new link
             migration_id = @key_generator.create_key(obj)
-            new_url = "#{OBJECT_TOKEN}/#{match.type}/#{migration_id}#{match.query}"
+            query = translate_module_item_query(match.query)
+            new_url = "#{OBJECT_TOKEN}/#{match.type}/#{migration_id}#{query}"
           end
         elsif match.obj_id
           new_url = "#{COURSE_TOKEN}/#{match.type}/#{match.obj_id}#{match.rest}"
@@ -268,6 +269,14 @@ module CCHelper
       port = ConfigFile.load("domain").try(:[], :domain).try(:split, ':').try(:[], 1)
       @url_prefix = "#{protocol}://#{host}"
       @url_prefix += ":#{port}" if !host.include?(':') && port.present?
+    end
+
+    def translate_module_item_query(query)
+      return query unless query&.include?("module_item_id=")
+      original_param = query.sub("?", "").split("&").detect{|p| p.include?("module_item_id=")}
+      tag_id = original_param.split("=").last
+      new_param = "module_item_id=#{@key_generator.create_key("content_tag_#{tag_id}")}"
+      query.sub(original_param, new_param)
     end
 
     attr_reader :course, :user

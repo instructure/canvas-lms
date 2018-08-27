@@ -51,6 +51,18 @@ describe('The Ratings component', () => {
       .forEach((el) => expect(el.shallow().debug()).toMatchSnapshot())
   })
 
+  it('properly selects ratings when two tiers have the same point value', () => {
+    const tiers = [
+      { description: 'Superb', points: 10 },
+      { description: 'Meh', points: 5 },
+      { description: 'Meh 2, The Sequel', points: 5 },
+      { description: 'Subpar', points: 1 }
+    ]
+    const selected = component({ tiers }).find('Rating').map((el) =>
+      el.prop('selected'))
+    expect(selected).toEqual([false, true, true, false])
+  })
+
   it('highlights the right rating', () => {
     const ratings = (points, useRange = false) =>
       component({ points, useRange }).find('Rating').map((el) => el.shallow().hasClass('selected'))

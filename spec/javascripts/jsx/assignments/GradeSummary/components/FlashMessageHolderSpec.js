@@ -152,6 +152,58 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
     strictEqual(FlashAlert.showFlashAlert.callCount, 0)
   })
 
+  QUnit.module('when a bulk provisional grade selection succeeds', hooks => {
+    hooks.beforeEach(() => {
+      mountComponent()
+      store.dispatch(
+        GradeActions.setBulkSelectProvisionalGradesStatus('1101', GradeActions.SUCCESS)
+      )
+    })
+
+    test('displays a flash alert', () => {
+      strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+    })
+
+    test('uses the success type', () => {
+      const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
+      equal(type, 'success')
+    })
+
+    test('includes a "Grades saved" message', () => {
+      const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
+      equal(message, 'Grades saved.')
+    })
+  })
+
+  QUnit.module('when a bulk provisional grade selection fails', hooks => {
+    hooks.beforeEach(() => {
+      mountComponent()
+      store.dispatch(
+        GradeActions.setBulkSelectProvisionalGradesStatus('1101', GradeActions.FAILURE)
+      )
+    })
+
+    test('displays a flash alert', () => {
+      strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+    })
+
+    test('uses the error type', () => {
+      const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
+      equal(type, 'error')
+    })
+
+    test('includes a message about saving the grade', () => {
+      const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
+      equal(message, 'There was a problem saving the grades.')
+    })
+  })
+
+  test('does not display a flash alert when publishing grades starts', () => {
+    mountComponent()
+    store.dispatch(AssignmentActions.setPublishGradesStatus(AssignmentActions.STARTED))
+    strictEqual(FlashAlert.showFlashAlert.callCount, 0)
+  })
+
   QUnit.module('when updating a selected grade succeeds', hooks => {
     hooks.beforeEach(() => {
       mountComponent()

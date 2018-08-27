@@ -34,6 +34,22 @@ QUnit.module('GradeSummary AssignmentApi', suiteHooks => {
     QUnit.config.testTimeout = qunitTimeout
   })
 
+  QUnit.module('.speedGraderUrl()', () => {
+    test('returns the SpeedGrader url for the given course, assignment, and student', () => {
+      const studentIdParameter = '#%7B%22student_id%22%3A%221101%22%7D'
+      const expected = `/courses/1201/gradebook/speed_grader?assignment_id=2301${studentIdParameter}`
+      const options = {anonymousStudents: false, studentId: '1101'}
+      equal(AssignmentApi.speedGraderUrl('1201', '2301', options), expected)
+    })
+
+    test('optionally uses the anonymous_id key for the student id', () => {
+      const studentIdParameter = '#%7B%22anonymous_id%22%3A%22abcde%22%7D'
+      const expected = `/courses/1201/gradebook/speed_grader?assignment_id=2301${studentIdParameter}`
+      const options = {anonymousStudents: true, studentId: 'abcde'}
+      equal(AssignmentApi.speedGraderUrl('1201', '2301', options), expected)
+    })
+  })
+
   QUnit.module('.publishGrades()', () => {
     const url = `/api/v1/courses/1201/assignments/2301/provisional_grades/publish`
 

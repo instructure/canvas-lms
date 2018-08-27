@@ -29,11 +29,12 @@ const defaultPrimaryInfo = 'first_last';
 const secondaryInfoLabels = {
   section: I18n.t('Section'),
   sis_id: I18n.t('SIS ID'),
+  integration_id: I18n.t('Integration ID'),
   login_id: I18n.t('Login ID'),
   none: I18n.t('None')
 };
 
-const secondaryInfoKeys = ['section', 'sis_id', 'login_id', 'none'];
+const secondaryInfoKeys = ['section', 'sis_id', 'integration_id', 'login_id', 'none'];
 const defaultSecondaryInfo = 'none';
 const sectionSecondaryInfo = 'section';
 

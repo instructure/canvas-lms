@@ -27,7 +27,7 @@ describe GroupsController do
     @group = Group.create!(:name => "group1", :group_category => group_category, :context => @course)
 
     get "/courses/#{@course.id}/groups/#{@group.id}"
-    expect(response).to be_success
+    expect(response).to be_successful
 
     html = Nokogiri::HTML(response.body)
     expect(html.css('#right-side a#add-announcement').attribute("href").text).to eq "/groups/#{@group.id}/announcements#new"
@@ -51,6 +51,6 @@ describe GroupsController do
     group = Account.default.groups.create!(name: 'SIS imported')
 
     get "/groups/#{group.id}"
-    expect(response).to be_success
+    expect(response).to be_successful
   end
 end

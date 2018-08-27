@@ -100,6 +100,12 @@ module DiscussionHelpers
                                                   enabled: false)
     end
 
+    def disable_create_discussions(course, context_role)
+      course.root_account.role_overrides.create!(permission: 'create_forum',
+                                                  role: context_role,
+                                                  enabled: false)
+    end
+
     def disable_post_to_discussions(course, context_role)
       course.root_account.role_overrides.create!(permission: 'post_to_forum',
                                                   role: context_role,

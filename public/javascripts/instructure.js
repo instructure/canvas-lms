@@ -368,7 +368,11 @@ function handleYoutubeLink () {
                 $.trackEvent('hide_embedded_content', 'hide_file_preview');
               });
             $div.prepend($minimizeLink);
-            $minimizeLink.focus();
+            if (Object.prototype.hasOwnProperty.call(event, "originalEvent")) {
+              // Only focus this link if the open preview link was initiated by a real browser event
+              // If it was triggered by our auto_open stuff it shouldn't focus here.
+              $minimizeLink.focus();
+            }
             $.trackEvent('show_embedded_content', 'show_file_preview');
           }
         }, function() {

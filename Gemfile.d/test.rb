@@ -42,7 +42,7 @@ group :test do
   gem 'once-ler', '0.1.4'
 
   # Keep this gem synced with docker-compose/seleniumff/Dockerfile
-  gem 'selenium-webdriver', '2.53.4'
+  gem 'selenium-webdriver', '3.14.0'
     gem 'childprocess', '0.9.0', require: false
     gem 'websocket', '1.2.5', require: false
   gem 'chromedriver-helper', require: false

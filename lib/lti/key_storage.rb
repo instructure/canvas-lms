@@ -49,12 +49,19 @@ module Lti
 
       # Retrieve the public keys in JWK format
       #
-      # @return [Hash] The hash of public key in JWK format
+      # @return [Array] The array of public keys in JWK format
       def public_keyset
         retrieve_keys.values.map do |private_jwk|
           public_jwk = private_jwk.to_key.public_key.to_jwk
           public_jwk.merge(private_jwk.select{|k,_| %w(alg use kid).include?(k) })
         end
+      end
+
+      # Retrieve the present key
+      #
+      # @return [JSON::JWK] the present private key
+      def present_key
+        JSON::JWK.new(Lti::KeyStorage.retrieve_keys[PRESENT])
       end
 
       private

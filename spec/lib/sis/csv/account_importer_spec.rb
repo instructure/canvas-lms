@@ -216,7 +216,6 @@ describe SIS::CSV::AccountImporter do
   end
 
   it 'should create rollback data' do
-    @account.enable_feature!(:refactor_of_sis_imports)
     batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(
       "Account_ID,Parent_Account_ID,Name,Status",

@@ -1,9 +1,17 @@
 <%= htmlify(@docstring.strip, :markdown) %>
 
-<% @json_objects.each do |name, json| %>
+<% @json_objects.each do |name, unparsed_json| %>
+<% json = JSON.parse(unparsed_json) %>
 <% properties = render_properties(json) %>
   <div class='object_definition'>
   <h3><a name="<%= name %>"><%= name[0,1] =~ /[aeiou]/i ? "An" : "A" %> <%= name %> object looks like:</a></h3>
-  <pre class="example code prettyprint"><code class="language-js"><%= h properties || json %></code></pre>
+  <pre class="example code prettyprint"><code class="language-js"><%= h properties || unparsed_json %></code></pre>
   </div>
+  <% if json['deprecated'] %>
+    <% parse_swagger_model(json) %>
+    <p class="note deprecated">
+      <strong>[DEPRECATED] The <%= h name %> model is deprecated, effective <%= h json['deprecation_effective'] %> (notice given <%= h json['deprecation_notice'] %>):</strong><br/>
+      <%= h json['deprecation_description'] %>
+    </p>
+  <% end %>
 <% end %>

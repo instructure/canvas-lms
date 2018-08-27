@@ -21,6 +21,7 @@ import $ from 'jquery'
 import fcUtil from '../util/fcUtil'
 import 'jquery.ajaxJSON'
 import 'vendor/jquery.ba-tinypubsub'
+import splitAssetString from 'compiled/str/splitAssetString'
 
 export default function CommonEvent(data, contextInfo, actualContextInfo) {
   this.eventType = 'generic'
@@ -39,7 +40,9 @@ Object.assign(CommonEvent.prototype, {
     discussion: I18n.t('Discussion'),
     event: I18n.t('Event'),
     quiz: I18n.t('Quiz'),
-    note: I18n.t('To Do')
+    note: I18n.t('To Do'),
+    wiki_page: I18n.t('Page'),
+    discussion_topic: I18n.t('Discussion')
   },
 
   isNewEvent() {
@@ -64,6 +67,11 @@ Object.assign(CommonEvent.prototype, {
       (this.object && this.object.context_code) ||
       (this.contextInfo && this.contextInfo.asset_string)
     )
+  },
+
+  contextApiPrefix() {
+    const context = splitAssetString(this.contextCode())
+    return `/api/v1/${encodeURIComponent(context[0])}/${encodeURIComponent(context[1])}`
   },
 
   isUndated() {

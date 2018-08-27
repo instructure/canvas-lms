@@ -23,7 +23,7 @@ module SIS
       start = Time.zone.now
       importer = Work.new(@batch, @root_account, @logger)
       yield importer
-      SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data) if @batch.using_parallel_importers?
+      SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data)
       @logger.debug("Group categories took #{Time.zone.now - start} seconds")
       importer.success_count
     end
@@ -110,9 +110,7 @@ module SIS
       end
 
       def should_build_roll_back_data?(group_category)
-        return false unless @batch.using_parallel_importers?
-        return true if group_category.id_before_last_save.nil?
-        return true if group_category.saved_change_to_deleted_at?
+        return true if group_category.id_before_last_save.nil? || group_category.saved_change_to_deleted_at?
         false
       end
 

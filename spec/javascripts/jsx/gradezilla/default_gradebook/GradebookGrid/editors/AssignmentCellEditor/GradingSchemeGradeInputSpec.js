@@ -19,7 +19,7 @@
 /* eslint-disable qunit/no-identical-names */
 
 import React from 'react'
-import {mount, ReactWrapper} from 'enzyme'
+import {mount, ReactWrapper} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
 import GradeInput from 'jsx/gradezilla/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/GradeInput'
 
 QUnit.module('GradeInput using GradingSchemeGradeInput', suiteHooks => {

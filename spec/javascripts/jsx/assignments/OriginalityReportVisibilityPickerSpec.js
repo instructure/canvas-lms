@@ -16,71 +16,41 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import React from 'react'
-import { mount } from 'enzyme'
+import {shallow} from 'enzyme'
 import OriginalityReportVisibilityPicker from 'jsx/assignments/OriginalityReportVisibilityPicker'
 
-QUnit.module('OriginalityReportVisibilityPicker', {
-  setup () {}
-});
+QUnit.module('OriginalityReportVisibilityPicker')
 
 test('it renders', () => {
-  const wrapper = mount(
+  const wrapper = shallow(
     <OriginalityReportVisibilityPicker
-      isEnabled={true}
-      selectedOption='immediate'
-   />
-  );
-  ok(wrapper.exists());
-});
+      isEnabled
+      selectedOption="immediate"
+    />
+  )
+  ok(wrapper.exists())
+})
 
-test('it renders "immediate" option', () => {
-  const wrapper = mount(
-    <OriginalityReportVisibilityPicker
-      isEnabled={true}
-      selectedOption='immediate'
-   />
-  );
-  ok(wrapper.find("option[value='immediate']"));
-});
-
-test('it renders "after_grading" option', () => {
-  const wrapper = mount(
-    <OriginalityReportVisibilityPicker
-      isEnabled={true}
-      selectedOption='immediate'
-   />
-  );
-  ok(wrapper.find("option[value='after_grading']"));
-});
-
-test('it renders "after_due_date" option', () => {
-  const wrapper = mount(
-    <OriginalityReportVisibilityPicker
-      isEnabled={true}
-      selectedOption='immediate'
-   />
-  );
-  ok(wrapper.find("option[value='after_due_date']"));
-});
-
-test('it renders "never" option', () => {
-  const wrapper = mount(
-    <OriginalityReportVisibilityPicker
-      isEnabled={true}
-      selectedOption='immediate'
-   />
-  );
-  ok(wrapper.find("option[value='never']"));
-});
+const options = ['immediate', 'after_grading', 'after_due_date', 'never']
+options.forEach(option => {
+  test(`it renders "${option}" option`, () => {
+    const wrapper = shallow(
+      <OriginalityReportVisibilityPicker
+        isEnabled
+        selectedOption="immediate"
+      />
+    )
+    ok(wrapper.find(`option[value='${option}']`).exists())
+  })
+})
 
 test('it selects the "selectedOption"', () => {
-  const wrapper = mount(
+  const wrapper = shallow(
     <OriginalityReportVisibilityPicker
-      isEnabled={true}
-      selectedOption='after_due_date'
-   />
-  );
-  ok(wrapper.find('#report_visibility_picker_select').node.value, 'after_due_date')
-});
+      isEnabled
+      selectedOption="after_due_date"
+    />
+  )
+  ok(wrapper.find('#report_visibility_picker_select').prop('value'), 'after_due_date')
+})

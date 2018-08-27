@@ -242,18 +242,18 @@ class CalendarEvent < ActiveRecord::Base
   def populate_all_day_flag
     # If the all day flag has been changed to all day, set the times to 00:00
     if self.all_day_changed? && self.all_day?
-      self.start_at = self.end_at = zoned_start_at.beginning_of_day rescue nil
+      self.start_at = zoned_start_at.beginning_of_day rescue nil
+      self.end_at = zoned_end_at.beginning_of_day rescue nil
 
     elsif self.start_at_changed? || self.end_at_changed?
       if self.start_at && self.start_at == self.end_at && zoned_start_at.strftime("%H:%M") == '00:00'
         self.all_day = true
-      else
-        self.all_day = false
       end
     end
 
     if self.all_day && (!self.all_day_date || self.start_at_changed? || self.all_day_date_changed?)
-      self.start_at = self.end_at = zoned_start_at.beginning_of_day rescue nil
+      self.start_at = zoned_start_at.beginning_of_day rescue nil
+      self.end_at = zoned_end_at.beginning_of_day rescue nil
       self.all_day_date = (zoned_start_at.to_date rescue nil)
     end
   end
@@ -262,6 +262,11 @@ class CalendarEvent < ActiveRecord::Base
   # Localized start_at
   def zoned_start_at
     self.start_at && ActiveSupport::TimeWithZone.new(self.start_at.utc,
+        ((ActiveSupport::TimeZone.new(self.time_zone_edited) rescue nil) || Time.zone))
+  end
+
+  def zoned_end_at
+    self.end_at && ActiveSupport::TimeWithZone.new(self.end_at.utc,
         ((ActiveSupport::TimeZone.new(self.time_zone_edited) rescue nil) || Time.zone))
   end
 
@@ -628,9 +633,7 @@ class CalendarEvent < ActiveRecord::Base
       end
 
       if @event.is_a?(CalendarEvent)
-        loc_string = ""
-        loc_string << @event.location_name + ", " if @event.location_name.present?
-        loc_string << @event.location_address if @event.location_address.present?
+        loc_string = [@event.location_name, @event.location_address].reject { |e| e.blank? }.join(", ")
       else
         loc_string = nil
       end
@@ -660,7 +663,7 @@ class CalendarEvent < ActiveRecord::Base
 
       # This will change when there are other things that have calendars...
       # can't call calendar_url or calendar_url_for here, have to do it manually
-      event.url           "http://#{HostUrl.context_host(@event.context)}/calendar?include_contexts=#{@event.context.asset_string}&month=#{start_at.try(:strftime, "%m")}&year=#{start_at.try(:strftime, "%Y")}##{tag_name}_#{@event.id}"
+      event.url           "https://#{HostUrl.context_host(@event.context)}/calendar?include_contexts=#{@event.context.asset_string}&month=#{start_at.try(:strftime, "%m")}&year=#{start_at.try(:strftime, "%Y")}##{tag_name}_#{@event.id}"
       event.uid           "event-#{tag_name.gsub('_', '-')}-#{@event.id}"
       event.sequence      0
 

@@ -59,9 +59,9 @@ describe 'Student reports' do
       :sortable_name => 'Astley, Rick', :username => 'rick@roll.com',
       :sis_user_id => 'user_sis_id_03')
 
-    enrollment_params = {enrollment_state: 'active', type: 'StudentEnrollment'}
-    @e_u1_c1, @e_u2_c1 = Enrollment.find(create_enrollments(@course1, [@user1, @user2], enrollment_params))
-    @e_u1_c2, @e_u2_c2 = Enrollment.find(create_enrollments(@course2, [@user1, @user2], enrollment_params))
+    enrollment_params = {enrollment_state: 'active', type: 'StudentEnrollment', return_type: :record}
+    @e_u1_c1, @e_u2_c1 = create_enrollments(@course1, [@user1, @user2], enrollment_params)
+    @e_u1_c2, @e_u2_c2 = create_enrollments(@course2, [@user1, @user2], enrollment_params)
 
     @section1 = @course1.course_sections.first
     @section2 = @course2.course_sections.first

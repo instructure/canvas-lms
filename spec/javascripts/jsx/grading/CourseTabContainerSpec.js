@@ -18,7 +18,7 @@
 
 define([
   'react',
-  'enzyme',
+  'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme',
   'jquery',
   'underscore',
   'jsx/grading/CourseTabContainer',

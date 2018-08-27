@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { actionTypes } from '../actions'
+import {actionTypes} from '../actions'
 
 const duplicationReducerMap = {
   [actionTypes.DUPLICATE_DISCUSSION_SUCCESS]: (state, action) => {
-    const { originalId, newDiscussion } = action.payload
+    const {originalId, newDiscussion} = action.payload
     const oldIndex = state.indexOf(originalId)
     if (oldIndex === -1) {
       return state

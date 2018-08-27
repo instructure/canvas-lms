@@ -50,6 +50,26 @@ test('Grid.Util._toRow', () => {
   )
 })
 
+test('Grid.Util.toRows', () => {
+  Grid.students = {1: {id: 1}, 2: {id: 2}, 3: {id: 3}}
+  Grid.sections = {1: {}}
+  const rollups = [
+    {
+      links: { section: "1", user: "3" }
+    },
+    {
+      links: { section: "1", user: "1" }
+    },
+    {
+      links: { section: "1", user: "2" }
+    }
+  ]
+  ok(
+    isEqual(Grid.Util.toRows(rollups).map((r) => r.student.id), [3, 1, 2]),
+    'returns rows in the same user order as rollups'
+  )
+})
+
 test('Grid.View.masteryDetails', () => {
   const outcome = {mastery_points: 5, points_possible: 10}
   const spy = sinon.spy(Grid.View, 'legacyMasteryDetails')
@@ -151,50 +171,6 @@ test('Grid.View.legacyMasteryDetails', () => {
   )
 })
 
-test('Grid.Events.sort', () => {
-  const rows = [
-    {
-      student: {sortable_name: 'Draper, Don'},
-      outcome_1: {
-        score: 3
-      }
-    },
-    {
-      student: {sortable_name: 'Olson, Peggy'},
-      outcome_1: {
-        score: 4
-      }
-    },
-    {
-      student: {sortable_name: 'Campbell, Pete'},
-      outcome_1: {
-        score: 3
-      }
-    },
-    {
-      student: {sortable_name: 'Darko, Donnie'}
-    }
-  ]
-  const outcomeSort = rows.sort((a, b) => Grid.Events._sortResults(a, b, true, 'outcome_1')).slice()
-  const reverseOutcomeSort = rows.sort((a, b) => Grid.Events._sortResults(a, b, false, 'outcome_1')).slice()
-  const userSort = rows.sort((a, b) => Grid.Events._sortStudents(a, b, true)).slice()
-  ok(isEqual([3, 3, 4, null], pluck(outcomeSort, 'outcome_1').map((s) => s ? s.score : null)), 'sorts by result value')
-  ok(isEqual([4, 3, 3, null], pluck(reverseOutcomeSort, 'outcome_1').map((s) => s ? s.score : null)), 'sorts by reverse result value')
-  ok(
-    outcomeSort.map(r => r.student.sortable_name)[0] === 'Campbell, Pete',
-    'result sort falls back to sortable name'
-  )
-  ok(
-    isEqual(userSort.map(r => r.student.sortable_name), [
-      'Campbell, Pete',
-      'Darko, Donnie',
-      'Draper, Don',
-      'Olson, Peggy'
-    ]),
-    'sorts by student name'
-  )
-})
-
 test('Grid.Util.toColumns for xss', () => {
   const outcome = {
     id: 1,
@@ -202,6 +178,11 @@ test('Grid.Util.toColumns for xss', () => {
   }
   const columns = Grid.Util.toColumns([outcome], [])
   ok(isEqual(columns[1].name, '&lt;script&gt;'))
+})
+
+test('Grid.Util._studentColumn does not modify default options', () => {
+  Grid.Util._studentColumn()
+  ok(isEqual(121, Grid.Util.COLUMN_OPTIONS.width))
 })
 
 test('Grid.Util.toColumns hasResults', () => {

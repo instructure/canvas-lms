@@ -63,8 +63,8 @@ test('it should render with only a color picker if reordering is not enabled', f
   const done = assert.async()
 
   const handleShow = () => {
-    ok(this.wrapper.node._colorPicker)
-    notOk(this.wrapper.node._tabList)
+    ok(this.wrapper.instance()._colorPicker)
+    notOk(this.wrapper.instance()._tabList)
     done()
   }
 
@@ -87,10 +87,10 @@ test('it should render a tabList with colorpicker and movement menu with reorder
   const done = assert.async()
 
   const handleShow = () => {
-    ok(this.wrapper.node._tabList)
-    ok(this.wrapper.node._colorPicker)
+    ok(this.wrapper.instance()._tabList)
+    ok(this.wrapper.instance()._colorPicker)
     getTabWithText('Move').click()
-    ok(this.wrapper.node._movementMenu)
+    ok(this.wrapper.instance()._movementMenu)
     done()
   }
 
@@ -108,7 +108,7 @@ test('it should close the popover on close button click', function (assert) {
   }
 
   const handleShow = () => {
-    this.wrapper.node._closeButton.click()
+    this.wrapper.instance()._closeButton.click()
     notOk(popoverContent)
     done()
   }
@@ -127,7 +127,7 @@ test('it should close the popover on color picker close', function (assert) {
   }
 
   const handleShow = () => {
-    this.wrapper.node._colorPicker.closeModal()
+    this.wrapper.instance()._colorPicker.closeModal()
     notOk(popoverContent)
     done()
   }

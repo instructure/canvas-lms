@@ -80,7 +80,7 @@ module Api::V1::Course
   #     "uuid" => "WvAHhY5FINzq5IyRIJybGeiXyFkG3SqHUPb7jZY5"
   #   }
   #
-  def course_json(course, user, session, includes, enrollments, subject_user = user, preloaded_progressions: nil)
+  def course_json(course, user, session, includes, enrollments, subject_user = user, preloaded_progressions: nil,  precalculated_permissions: nil)
     if includes.include?('access_restricted_by_date') && enrollments && enrollments.all?(&:inactive?)
       return {'id' => course.id, 'access_restricted_by_date' => true}
     end
@@ -99,7 +99,7 @@ module Api::V1::Course
       hash['passback_status'] = post_grades_status_json(course) if includes.include?('passback_status')
       hash['is_favorite'] = course.favorite_for_user?(user) if includes.include?('favorites')
       hash['teachers'] = course.teachers.distinct.map { |teacher| user_display_json(teacher) } if includes.include?('teachers')
-      hash['tabs'] = tabs_available_json(course, user, session, ['external']) if includes.include?('tabs')
+      hash['tabs'] = tabs_available_json(course, user, session, ['external'], precalculated_permissions: precalculated_permissions) if includes.include?('tabs')
       hash['locale'] = course.locale unless course.locale.nil?
       hash['account'] = account_json(course.account, user, session, []) if includes.include?('account')
       # undocumented, but leaving for backwards compatibility.

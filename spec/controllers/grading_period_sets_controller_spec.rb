@@ -67,8 +67,8 @@ RSpec.describe GradingPeriodSetsController, type: :controller do
         @groups.take(5).map(&:destroy)
         @groups.take(5).each { |group| group.update!(workflow_state: 'active') }
         get :index, params: {account_id: root_account.to_param}, session: valid_session
-        set_ids = json_parse.fetch('grading_period_sets').map {|set| set['id']}
-        expect(set_ids).to eql @groups.map(&:id).map(&:to_s).sort
+        set_ids = json_parse.fetch('grading_period_sets').map { |set| set['id'] }
+        expect(set_ids).to eql @groups.sort_by(&:id).map { |group| group.id.to_s }
       end
     end
 

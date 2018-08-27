@@ -122,6 +122,8 @@ module YARD::Templates::Helpers::BaseHelper
 end
 
 module YARD::Templates::Helpers::HtmlHelper
+  include CanvasAPI::Deprecatable
+
   def topicize(str)
     str.gsub(' ', '_').underscore
   end

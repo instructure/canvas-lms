@@ -127,7 +127,8 @@ module Canvas
           environment: environment,
           cluster: cluster,
           default_ttl: default_ttl,
-          kv_client: @kv_client
+          kv_client: @kv_client,
+          data_center: @data_center
         )
       end
 
@@ -138,7 +139,7 @@ module Canvas
       # @param global [boolean] Is it a global key?
       # @return [Imperium::TransactionResponse]
       def set_keys(kvs, global: false)
-        opts = @data_center.nil? ? {} : { dc: @data_center }
+        opts = @data_center.present? && global ? { dc: @data_center } : {}
         @kv_client.transaction(opts) do |tx|
           kvs.each { |k, v| tx.set(full_key(k, global: global), v) }
         end

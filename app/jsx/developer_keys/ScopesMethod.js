@@ -38,6 +38,7 @@ export default class ScopesMethod extends React.Component {
   render() {
     return (
       <Pill
+        data-automation="developer-key-scope-pill"
         text={this.props.method}
         variant={this.methodColorMap()[this.props.method.toLowerCase()]}
         margin={this.props.margin}

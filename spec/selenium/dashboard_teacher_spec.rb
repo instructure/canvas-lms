@@ -120,6 +120,8 @@ describe "dashboard" do
         wait_for_ajaximations
 
         get "/"
+        f('#DashboardOptionsMenu_Container button').click
+        fj('span[role="menuitemradio"]:contains("Recent Activity")').click
         expect(f('.no_recent_messages')).to be_truthy
       end
     end

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,17 +14,22 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-class CleanseTheSyckness < ActiveRecord::Migration[4.2]
-  tag :postdeploy
+require 'spec_helper'
 
-  def up
-    if User.exists? # don't raise for a fresh install
-      raise "WARNING:\n
-        This migration needs to be run under Rails 4.2.\n"
-    end
+describe AnonymousOrModerationEvent do
+  describe 'relationships' do
+    it { is_expected.to belong_to(:assignment) }
+    it { is_expected.to belong_to(:user) }
+    it { is_expected.to belong_to(:submission) }
+    it { is_expected.to belong_to(:canvadoc) }
   end
 
-  def down
+  describe 'validations' do
+    it { is_expected.to validate_presence_of(:assignment_id) }
+    it { is_expected.to validate_presence_of(:user_id) }
+    it { is_expected.to validate_presence_of(:event_type) }
+    it { is_expected.to validate_presence_of(:payload) }
   end
 end

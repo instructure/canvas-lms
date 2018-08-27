@@ -115,6 +115,10 @@
   <h4><%= t("Some submissions are not gradeable; grade changes for those submissions have been ignored.") %></h4>
 </div>
 
+<div id="prevented_changing_read_only_column" style="display:none;">
+  <h4><%= t("Some custom columns could not be changed because they were read only; changes for those columns have been ignored.") %></h4>
+</div>
+
 <style>
   /*keep this here because jquery.rule needs it to stick in dynamic styles for the slick.grid to keep all of the columns the same width*/
 </style>

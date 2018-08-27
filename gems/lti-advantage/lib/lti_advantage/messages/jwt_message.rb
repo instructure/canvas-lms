@@ -1,3 +1,5 @@
+require 'json/jwt'
+
 module LtiAdvantage::Messages
   # Abstract base class for all LTI 1.3 JWT message types
   class JwtMessage
@@ -29,9 +31,9 @@ module LtiAdvantage::Messages
     }.freeze
 
     attr_accessor *REQUIRED_CLAIMS
+    attr_accessor *TYPED_ATTRIBUTES.keys
     attr_accessor :address,
                   :birthdate,
-                  :context,
                   :custom,
                   :email,
                   :email_verified,
@@ -55,7 +57,8 @@ module LtiAdvantage::Messages
                   :role_scope_mentor,
                   :updated_at,
                   :website,
-                  :zoneinfo
+                  :zoneinfo,
+                  :id
 
     def context
       @context ||= TYPED_ATTRIBUTES[:context].new
@@ -85,5 +88,16 @@ module LtiAdvantage::Messages
       @tool_platform ||= TYPED_ATTRIBUTES[:tool_platform].new
     end
 
+    def read_attribute(attribute)
+      self.send(attribute)
+    end
+
+    def to_h
+      LtiAdvantage::Serializers::JwtMessageSerializer.new(self).serializable_hash
+    end
+
+    def to_jws(private_key, alg = :RS256)
+      JSON::JWT.new(self.to_h).sign(private_key, alg).to_s
+    end
   end
 end

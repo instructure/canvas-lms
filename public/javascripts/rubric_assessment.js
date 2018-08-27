@@ -287,14 +287,15 @@ window.rubricAssessment = {
       }
 
       const render = (currentAssessment) => {
-        ReactDOM.render(React.createElement(Rubric, {
-          allowExtraCredit: ENV.outcome_extra_credit_enabled,
-          onAssessmentChange: assessing ? setCurrentAssessment : null,
-          rubric: ENV.rubric,
-          rubricAssessment: currentAssessment,
-          customRatings: ENV.outcome_proficiency ? ENV.outcome_proficiency.ratings : [],
-          rubricAssociation
-        }, null), container.get(0))
+        ReactDOM.render(<Rubric
+          allowExtraCredit={ENV.outcome_extra_credit_enabled}
+          onAssessmentChange={assessing ? setCurrentAssessment : null}
+          rubric={ENV.rubric}
+          rubricAssessment={currentAssessment}
+          customRatings={ENV.outcome_proficiency ? ENV.outcome_proficiency.ratings : []}
+          rubricAssociation={rubricAssociation}>
+          {null}
+        </Rubric>, container.get(0))
       }
 
       setCurrentAssessment(rubricAssessment.fillAssessment(ENV.rubric, assessment || {}))
@@ -375,13 +376,14 @@ window.rubricAssessment = {
     if (ENV.nonScoringRubrics && ENV.rubric) {
       if(assessment) {
         const filled = rubricAssessment.fillAssessment(ENV.rubric, assessment || {})
-        ReactDOM.render(React.createElement(Rubric, {
-          customRatings: ENV.outcome_proficiency ? ENV.outcome_proficiency.ratings : [],
-          rubric: ENV.rubric,
-          rubricAssessment: filled,
-          rubricAssociation,
-          isSummary: true
-        }, null), container.get(0))
+        ReactDOM.render(<Rubric
+          customRatings={ENV.outcome_proficiency ? ENV.outcome_proficiency.ratings : []}
+          rubric={ENV.rubric}
+          rubricAssessment={filled}
+          rubricAssociation={rubricAssociation}
+          isSummary={true}>
+          {null}
+        </Rubric>, container.get(0))
       } else {
         container.get(0).innerHTML = ''
       }

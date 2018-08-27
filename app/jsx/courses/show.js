@@ -25,6 +25,7 @@ import axios from 'axios'
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
+import { renderToDoSidebar } from 'canvas-planner';
 
 const defaultViewStore = createStore({
   selectedDefaultView: ENV.COURSE.default_view,
@@ -127,3 +128,21 @@ const container = document.getElementById('choose_home_page')
 if (container) {
   ReactDOM.render(<ChooseHomePageButton store={defaultViewStore} />, container)
 }
+
+
+
+const addToDoSidebar = (parent) => {
+  renderToDoSidebar(parent, {
+    courses: [],  // with no courses info, the sidebar won't try to render the course name with each item
+                  // which would be redundant on the course's page
+    forCourse: `${ENV.COURSE_ID}`
+  })
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const todo_container = document.querySelector('.todo-list')
+  if (todo_container) {
+    addToDoSidebar(todo_container)
+  }
+})
+  

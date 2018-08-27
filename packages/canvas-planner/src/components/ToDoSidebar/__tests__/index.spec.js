@@ -41,6 +41,15 @@ it('calls loadItems prop on mount', () => {
   expect(fakeLoadItems).toHaveBeenCalled();
 });
 
+it('includes course_id in call loadItems prop on mount', () => {
+  const fakeLoadItems = jest.fn();
+  const course_id = "17";
+  mount(<ToDoSidebar {...defaultProps} sidebarLoadInitialItems={fakeLoadItems} forCourse={course_id} />);
+  expect(fakeLoadItems).toHaveBeenCalled();
+  expect(fakeLoadItems.mock.calls[0][1]).toEqual(course_id);
+});
+
+
 it('renders out ToDoItems for each item', () => {
   const items = [{
     uniqueId: '1',
@@ -139,4 +148,9 @@ it('does not render out items that are completed', () => {
     />
   );
   expect(wrapper.find('ToDoItem')).toHaveLength(0);
+});
+
+it('can suppress the Show All', () => {
+    const wrapper = shallow(<ToDoSidebar {...defaultProps} changeDashboardView={null} />);
+    expect(wrapper).toMatchSnapshot();
 });

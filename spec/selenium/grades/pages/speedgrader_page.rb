@@ -57,7 +57,7 @@ class Speedgrader
     end
 
     def settings_link
-      f('#speedgrader-settings button')
+      f('#speed_grader_settings_mount_point button')
     end
 
     def options_link
@@ -109,7 +109,7 @@ class Speedgrader
     end
 
     def new_comment_text_area
-      f('#speedgrader_comment_textarea')
+      f('#speed_grader_comment_textarea')
     end
 
     def comment_submit_button
@@ -149,7 +149,7 @@ class Speedgrader
     end
 
     def submission_status_pill(status)
-      fj("[title='#{status}']:contains('#{status}')")
+      fj(".submission-#{status}-pill:contains('#{status}')")
     end
 
     def late_points_deducted_text
@@ -273,6 +273,14 @@ class Speedgrader
       f('.ui-resizable .ui-dialog-titlebar-close')
     end
 
+    def audit_link
+      # TODO in GRADE-1075 locator for audit link
+    end
+
+    def audit_entries
+      # TODO in GRADE-1075 locator all of the audit entries
+    end
+
     # action
     def visit(course_id, assignment_id)
       get "/courses/#{course_id}/gradebook/speed_grader?assignment_id=#{assignment_id}"
@@ -288,8 +296,7 @@ class Speedgrader
     def visit_section(section)
       students_dropdown_button.click
       hover(sections_menu_link)
-      section.click
-      wait_for_dom_ready
+      wait_for_new_page_load(section.click)
     end
 
     def enter_grade(grade)
@@ -397,6 +404,10 @@ class Speedgrader
     def wait_for_grade_input
       wait = Selenium::WebDriver::Wait.new(timeout: 5)
       wait.until { grade_input.attribute('value') != "" }
+    end
+
+    def click_audit_link
+      audit_link.click
     end
 
     # quizzes

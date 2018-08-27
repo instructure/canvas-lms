@@ -17,14 +17,14 @@
 #
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-describe "Session Timeout" do 
+describe "Session Timeout" do
   context " when sessions timeout is set to 30 minutes" do
     before do
       plugin_setting = PluginSetting.new(:name => "sessions", :settings => {"session_timeout" => "30"})
       plugin_setting.save!
     end
 
-    context "when a user logs in" do 
+    context "when a user logs in" do
       before do
         course_with_student(:active_all => true, :user => user_with_pseudonym(:active_user => true))
       end
@@ -34,7 +34,7 @@ describe "Session Timeout" do
 
         now = Time.now
         get "/"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         allow(Time).to receive(:now).and_return(now + 40.minutes)
         get "/"
@@ -46,15 +46,15 @@ describe "Session Timeout" do
 
         now = Time.now
         get "/"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         allow(Time).to receive(:now).and_return(now + 20.minutes)
         get "/"
-        expect(response).to be_success
+        expect(response).to be_successful
 
         allow(Time).to receive(:now).and_return(now + 40.minutes)
         get "/"
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
   end

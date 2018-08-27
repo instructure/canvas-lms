@@ -33,6 +33,29 @@ describe PlannerOverride do
                                                         marked_complete: false)
   end
 
+  it 'should link the planner override to the parent topic for a group discussion if given a child topic id' do
+    group_assignment_discussion(course: @course)
+    override1 = PlannerOverride.create!(user: @student, plannable: @topic)
+    expect(override1.plannable_type).to eq 'DiscussionTopic'
+    expect(override1.plannable_id).to eq @topic.root_topic_id
+  end
+
+  it "should link the planner override to its submittable object instead of assignment if it has one" do
+    assignment_model(course: @course, submission_types: 'discussion_topic')
+    override1 = PlannerOverride.create!(user: @student, plannable: @assignment)
+    expect(override1.plannable_type).to eq 'DiscussionTopic'
+    expect(override1.plannable_id).to eq @assignment.discussion_topic.id
+
+    wiki_page_assignment_model(course: @course)
+    override2 = PlannerOverride.create!(user: @student, plannable: @page.assignment)
+    expect(override2.plannable_type).to eq 'WikiPage'
+    expect(override2.plannable_id).to eq @page.id
+
+    assignment_model(course: @course, submission_types: 'online_quiz', quiz: quiz_model(course: @course))
+    override3 = PlannerOverride.create!(user: @student, plannable: @assignment)
+    expect(override3.plannable_type).to eq 'Quizzes::Quiz'
+    expect(override3.plannable_id).to eq @assignment.quiz.id
+  end
 
   describe "::plannable_workflow_state" do
     context "respond_to?(:published?)" do

@@ -16,74 +16,89 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from "react";
-import { mount } from "enzyme";
-import SearchMessage from "../SearchMessage";
+import React from 'react'
+import {mount} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import SearchMessage from '../SearchMessage'
 
 const getProps = () => ({
   collection: {
     data: [1, 2, 3],
     links: {
       current: {
-        url: "abc",
-        page: "5"
+        url: 'abc',
+        page: '5'
       },
       last: {
-        url: "abc10",
-        page: "10"
+        url: 'abc10',
+        page: '10'
       }
     }
   },
   setPage: jest.fn(),
-  noneFoundMessage: "None Found!",
-  dataType: "Course"
-});
-
-let flashElements;
-beforeEach(() => {
-  flashElements = document.createElement("div");
-  flashElements.setAttribute("id", "flash_screenreader_holder");
-  flashElements.setAttribute("role", "alert");
-  document.body.appendChild(flashElements);
-});
-
-afterEach(() => {
-  document.body.removeChild(flashElements);
-});
-
-it("shows spinner when loading", () => {
-  const props = getProps();
-  props.collection.loading = true;
-  const wrapper = mount(<SearchMessage {...props} />);
-  expect(wrapper.find('Spinner').exists()).toBe(true);
+  noneFoundMessage: 'None Found!',
+  dataType: 'Course'
 })
 
-describe("Pagination Handling", () => {
-  it("shows the loading spinner on the page that is becoming current", () => {
-    const props = getProps();
-    const wrapper = mount(<SearchMessage {...props} />);
-    wrapper.setProps({}); // Make sure it triggers componentWillReceiveProps
-    wrapper.instance().handleSetPage(6);
-    const buttons = wrapper.find("PaginationButton").map(x => x.text());
-    expect(buttons).toEqual(["1", "5", "Loading...", "7", "8", "9", "10"]);
-  });
+let flashElements
+beforeEach(() => {
+  flashElements = document.createElement('div')
+  flashElements.setAttribute('id', 'flash_screenreader_holder')
+  flashElements.setAttribute('role', 'alert')
+  document.body.appendChild(flashElements)
+})
 
-  it("sets state to lastUnknown if there is no last link", () => {
-    const props = getProps();
-    const wrapper = mount(<SearchMessage {...props} />);
-    delete props.collection.links.last;
-    props.collection.links.next = { url: "next", page: "2" };
-    wrapper.setProps(props);
-    expect(wrapper.state().lastUnknown).toBe(true);
+afterEach(() => {
+  document.body.removeChild(flashElements)
+})
+
+it('shows spinner when loading', () => {
+  const props = getProps()
+  props.collection.loading = true
+  const wrapper = mount(<SearchMessage {...props} />)
+  expect(wrapper.find('Spinner').exists()).toBe(true)
+})
+
+describe('Pagination Handling', () => {
+  it('can handle lots of pages', () => {
+    const props = getProps()
+    props.collection.links.last.page = '1000'
+    const wrapper = mount(<SearchMessage {...props} />)
+
+    const buttons2 = wrapper.find('PaginationButton').map(x => x.text())
+    expect(buttons2).toEqual(['1', '4', '5', '6', '7', '8', '1,000'])
+
+    wrapper.find('button[aria-label="Page 1,000"]').simulate('click')
+    wrapper.setProps({}) // Make sure it triggers componentWillReceiveProps
+
+    const buttons = wrapper.find('PaginationButton').map(x => x.text())
+    expect(buttons).toEqual(['1', '4', '5', '6', '7', '8', '1,000'])
   })
 
-  it("sets state to lastUnknown false if there is a last link", () => {
-    const props = getProps();
-    const wrapper = mount(<SearchMessage {...props} />);
-    delete props.collection.links.last;
-    props.collection.links.next = { url: "next", page: "2" };
-    wrapper.setProps(props);
-    wrapper.setProps(getProps());
-    expect(wrapper.state().lastUnknown).toBe(false);
+  it('shows the loading spinner on the page that is becoming current', () => {
+    const props = getProps()
+    const wrapper = mount(<SearchMessage {...props} />)
+    wrapper.setProps({}) // Make sure it triggers componentWillReceiveProps
+    wrapper.instance().handleSetPage(6)
+    const buttons = wrapper.find('PaginationButton').map(x => x.text())
+    expect(buttons).toEqual(['1', '5', 'Loading...', '7', '8', '9', '10'])
   })
-});
+
+  it('sets state to lastUnknown if there is no last link', () => {
+    const props = getProps()
+    const wrapper = mount(<SearchMessage {...props} />)
+    delete props.collection.links.last
+    props.collection.links.next = {url: 'next', page: '2'}
+    wrapper.setProps(props)
+    expect(wrapper.instance().isLastPageUnknown()).toBe(true)
+  })
+
+  it('sets state to lastUnknown false if there is a last link', () => {
+    const props = getProps()
+    const wrapper = mount(<SearchMessage {...props} />)
+    delete props.collection.links.last
+    props.collection.links.next = {url: 'next', page: '2'}
+    wrapper.setProps(props)
+    wrapper.setProps(getProps())
+    expect(wrapper.instance().isLastPageUnknown()).toBe(false)
+  })
+})

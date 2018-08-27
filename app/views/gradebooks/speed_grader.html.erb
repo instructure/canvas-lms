@@ -53,7 +53,7 @@
           </span>
         </button>
 
-        <span id="speedgrader-settings"></span>
+        <span id="speed_grader_settings_mount_point"></span>
       </div>
       <div class="assignmentDetails">
         <a id="assignment_url" href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>">
@@ -274,7 +274,7 @@
               <div id="rubric_summary_holder">
                 <div id="rubric_assessments_list_and_edit_button_holder">
                   <span id="rubric_assessments_list">
-                    <%= before_label(:show_assessment_by, "Show Assessment By") %>
+                    <h2><%= t("Select Rubric") %></h2>
                     <select id="rubric_assessments_select"></select>
                   </span>
                 </div>
@@ -319,7 +319,7 @@
 
           <% if @can_comment_on_submission %>
             <form id="add_a_comment">
-              <div id="speedgrader_comment_textarea_mount_point"></div>
+              <div id="speed_grader_comment_textarea_mount_point"></div>
               <div id="media_media_recording" style="display: none;">
                 <div class="media_recording"></div>
               </div>
@@ -386,6 +386,8 @@
               </div>
             </form>
           <% end %>
+
+          <div id="speed_grader_submission_comments_download_mount_point"></div>
         </div>
       </div>
     </div>

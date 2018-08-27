@@ -53,6 +53,7 @@ exports[`renders the base component correctly 1`] = `
     <Button
       as="button"
       buttonRef={[Function]}
+      cursor="pointer"
       fluidWidth={false}
       icon={[Function]}
       margin="0"
@@ -123,6 +124,7 @@ exports[`renders the base component correctly without points 1`] = `
     <Button
       as="button"
       buttonRef={[Function]}
+      cursor="pointer"
       fluidWidth={false}
       icon={[Function]}
       margin="0"

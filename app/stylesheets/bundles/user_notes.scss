@@ -49,13 +49,12 @@
         padding-bottom: 5px;
         @include fontSize(16px);
         color: $ic-font-color-dark;
-        font-weight: normal;
+        font-weight: bold;
       }
       .sub_title {
         margin-#{direction(left)}: 0px;
         padding: 0 0 5px 0;
         color: $ic-font-color--subdued;
-        font-style: italic;
       }
     }
 

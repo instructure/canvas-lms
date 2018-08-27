@@ -39,6 +39,7 @@ class CustomGradebookColumnDataApiController < ApplicationController
   before_action :require_context, :require_user
 
   include Api::V1::CustomGradebookColumn
+  include Api::V1::Progress
 
   # @API List entries for a column
   #
@@ -97,6 +98,51 @@ class CustomGradebookColumnDataApiController < ApplicationController
         end
       end
     end
+  end
+
+  # @API Bulk update column data
+  #
+  # Set the content of custom columns
+  #
+  # @argument column_data[] [Required, Array]
+  #   Column content. Setting this to an empty string will delete the data object.
+  #
+  # @example_request
+  #
+  # {
+  #   "column_data": [
+  #     {
+  #       "column_id": example_column_id,
+  #       "user_id": example_student_id,
+  #       "content": example_content
+  #       },
+  #       {
+  #       "column_id": example_column_id,
+  #       "user_id": example_student_id,
+  #       "content: example_content
+  #     }
+  #   ]
+  # }
+  #
+  # @returns Progress
+
+  def bulk_update
+    bulk_update_params = params.permit(column_data: [:user_id, :column_id, :content])
+    column_data_as_array = bulk_update_params.to_h[:column_data]
+    raise ActionController::BadRequest if column_data_as_array.blank?
+
+    column_ids = column_data_as_array.map { |entry| entry.fetch(:column_id) }
+
+    cc = @context.custom_gradebook_columns.find(column_ids)
+    cc.each do |col|
+      return render_unauthorized_action unless authorized_action? col, @current_user, :read
+    end
+
+    user_ids = column_data_as_array.map { |entry| entry.fetch(:user_id)&.to_i }
+    return render_unauthorized_action if (user_ids - allowed_users.pluck(:id)).any?
+
+    progress = CustomGradebookColumnDatum.queue_bulk_update_custom_columns(@context, column_data_as_array)
+    render json: progress_json(progress, @current_user, session)
   end
 
   def allowed_users

@@ -179,8 +179,11 @@ const ConversationsRouter = Backbone.Router.extend({
     })
     if (_.include(['inbox', 'archived'], this.filters.type)) {
       this.list.collection.remove(messages)
-      this.selectConversation(null)
+      this.header.onModelChange(null, null)
+      this.detail.onModelChange(null, null)
+      this.detail.renderEmpty()
     }
+
     let $focusNext = $(focusNext)
     if ($focusNext.length === 0) {
       $focusNext = $('#compose-message-recipients')
@@ -206,7 +209,7 @@ const ConversationsRouter = Backbone.Router.extend({
     this.list.collection.remove(messages)
     this.header.updateUi(null)
     $.flashMessage(delmsg)
-    this.detail.render()
+    this.detail.renderEmpty()
 
     let $focusNext = $(focusNext)
     if ($focusNext.length === 0) {

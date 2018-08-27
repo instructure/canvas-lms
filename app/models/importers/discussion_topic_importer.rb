@@ -93,12 +93,13 @@ module Importers
       return unless options.importable?
       [:migration_id, :title, :discussion_type, :position, :pinned,
        :require_initial_post, :allow_rating, :only_graders_can_rate,
-       :sort_by_rating, :locked].each do |attr|
+       :sort_by_rating].each do |attr|
         next if options[attr].nil? && item.class.columns_hash[attr.to_s].type == :boolean
         item.send("#{attr}=", options[attr])
       end
 
       type = item.is_a?(Announcement) ? :announcement : :discussion_topic
+      item.locked = options[:locked] if !options[:locked].nil? && type == :announcement
       if options.message
         item.message = migration.convert_html(options.message, type, options[:migration_id], :message)
       else

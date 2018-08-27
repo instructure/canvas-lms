@@ -16,26 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { Component } from 'react'
+import React, {Component} from 'react'
+import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
 import Pagination, {PaginationButton} from '@instructure/ui-pagination/lib/components/Pagination'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import { array, func, string, shape, oneOf } from 'prop-types'
+import {array, func, string, shape, oneOf} from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
-import Alert from '@instructure/ui-alerts/lib/components/Alert'
 import View from '@instructure/ui-layout/lib/components/View'
+import EmptyDesert from './EmptyDesert'
 
 const linkPropType = shape({
   url: string.isRequired,
   page: string.isRequired
 }).isRequired
 
-
 export default class SearchMessage extends Component {
-
   static propTypes = {
     collection: shape({
       data: array.isRequired,
-      links: shape({ current: linkPropType })
+      links: shape({current: linkPropType})
     }).isRequired,
     setPage: func.isRequired,
     noneFoundMessage: string.isRequired,
@@ -44,60 +43,47 @@ export default class SearchMessage extends Component {
   }
 
   static defaultProps = {
-    getLiveAlertRegion () {
+    getLiveAlertRegion() {
       return document.getElementById('flash_screenreader_holder')
     }
   }
 
-  constructor (props) {
-    super(props);
-    this.state = {
-      pageNumbers: []
-    }
+  state = {}
 
-  }
-
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (!nextProps.collection.loading) {
-      const newState = {
-        hasLoaded: true
-      };
-
-      if (nextProps.collection.links.last) {
-        newState.lastKnownPage = nextProps.collection.links.last;
-        newState.lastUnknown = false
-      } else {
-        newState.lastKnownPage = nextProps.collection.links.next;
-        newState.lastUnknown = true
-      }
-      if (this.state.pageNumbers.length !== Number(newState.lastKnownPage.page)) {
-        newState.pageNumbers = Array.from(Array(Number(newState.lastKnownPage.page)))
-      }
-      newState.currentPage = this.state.pageBecomingCurrent || Number(nextProps.collection.links.current.page)
-
-      if (this.state.pageBecomingCurrent) {
-        newState.pageBecomingCurrent = null
-      }
-
+      const newState = {}
+      if (this.state.pageBecomingCurrent) newState.pageBecomingCurrent = null
       this.setState(newState)
     }
-
-
   }
 
-  handleSetPage = (page) => {
-    this.setState({
-      pageBecomingCurrent: page,
-    }, () => {
-      this.props.setPage(page);
-    });
+  handleSetPage = page => {
+    this.setState({pageBecomingCurrent: page}, () => this.props.setPage(page))
+  }
+
+  isLastPageUnknown() {
+    return !this.props.collection.links.last
+  }
+
+  currentPage() {
+    return this.state.pageBecomingCurrent || Number(this.props.collection.links.current.page)
+  }
+
+  lastKnownPageNumber() {
+    const link =
+      this.props.collection.links &&
+      (this.props.collection.links.last || this.props.collection.links.next)
+
+    if (!link) return 0
+    return Number(link.page)
   }
 
   renderPaginationButton(pageIndex) {
     const pageNumber = pageIndex + 1
     const isCurrent = this.state.pageBecomingCurrent
       ? pageNumber === this.state.pageBecomingCurrent
-      : pageNumber === this.state.currentPage
+      : pageNumber === this.currentPage()
     return (
       <PaginationButton
         key={pageNumber}
@@ -114,28 +100,16 @@ export default class SearchMessage extends Component {
     )
   }
 
-
-  render () {
-    const { collection, noneFoundMessage } = this.props
-    let resultsFoundMessage = ''
-    switch (this.props.dataType) {
-      case 'User':
-        resultsFoundMessage = I18n.t('User results updated.')
-        break;
-      case 'Course':
-        resultsFoundMessage = I18n.t('Course results updated.');
-        break;
-      default:
-        break;
-    }
-    const errorLoadingMessage = I18n.t('There was an error with your query; please try a different search')
+  render() {
+    const {collection, noneFoundMessage} = this.props
+    const errorLoadingMessage = I18n.t(
+      'There was an error with your query; please try a different search'
+    )
 
     if (collection.error) {
       return (
         <div className="text-center pad-box">
-          <div className="alert alert-error">
-            {errorLoadingMessage}
-          </div>
+          <div className="alert alert-error">{errorLoadingMessage}</div>
         </div>
       )
     } else if (collection.loading) {
@@ -146,39 +120,40 @@ export default class SearchMessage extends Component {
       )
     } else if (!collection.data.length) {
       return (
-        <div className="text-center pad-box">
-          <div className="alert alert-info">{noneFoundMessage}</div>
-        </div>
+        <Billboard size="large" heading={noneFoundMessage} headingAs="h2" hero={<EmptyDesert />} />
       )
     } else if (collection.links) {
-      const lastIndex = this.state.pageNumbers.length - 1
-      const paginationButtons = []
+      const lastPageNumber = this.lastKnownPageNumber()
+      const lastIndex = lastPageNumber - 1
+      const paginationButtons = Array.from(Array(lastPageNumber))
       paginationButtons[0] = this.renderPaginationButton(0)
       paginationButtons[lastIndex] = this.renderPaginationButton(lastIndex)
-      const visiblePageRangeStart = Math.max(this.state.currentPage - 2, 0)
-      const visiblePageRangeEnd = Math.min(this.state.currentPage + 5, lastIndex)
+      const visiblePageRangeStart = Math.max(this.currentPage() - 10, 0)
+      const visiblePageRangeEnd = Math.min(this.currentPage() + 10, lastIndex)
       for (let i = visiblePageRangeStart; i < visiblePageRangeEnd; i++) {
         paginationButtons[i] = this.renderPaginationButton(i)
       }
 
       return (
-          <Pagination
-            as="nav"
-            variant="compact"
-            labelNext={I18n.t('Next Page')}
-            labelPrev={I18n.t('Previous Page')}
-          >
-            {paginationButtons.concat(this.state.lastUnknown
-              ? <span key="page-count-is-unknown-indicator" aria-hidden>...</span>
-              : []
-            )}
-          </Pagination>
+        <Pagination
+          as="nav"
+          variant="compact"
+          labelNext={I18n.t('Next Page')}
+          labelPrev={I18n.t('Previous Page')}
+        >
+          {paginationButtons.concat(
+            this.isLastPageUnknown() ? (
+              <span key="page-count-is-unknown-indicator" aria-hidden>
+                ...
+              </span>
+            ) : (
+              []
+            )
+          )}
+        </Pagination>
       )
     } else {
-      return (<div />)
+      return <div />
     }
   }
 }
-
-
-

@@ -454,12 +454,10 @@ class CoursesController < ApplicationController
   def index
     respond_to do |format|
       format.html {
-        all_enrollments = @current_user.enrollments.not_deleted.shard(@current_user).to_a
+        all_enrollments = Shackles.activate(:slave) { @current_user.enrollments.not_deleted.shard(@current_user).preload(:enrollment_state, :course, :course_section).to_a }
         @past_enrollments = []
         @current_enrollments = []
         @future_enrollments  = []
-        Canvas::Builders::EnrollmentDateBuilder.preload(all_enrollments)
-        ActiveRecord::Associations::Preloader.new.preload(all_enrollments, :course_section)
 
         all_enrollments.group_by{|e| [e.course_id, e.type]}.values.each do |enrollments|
           e = enrollments.sort_by{|e| e.state_with_date_sortable}.first
@@ -473,8 +471,7 @@ class CoursesController < ApplicationController
             ([:active, :invited].include?(state) && e.section_or_course_date_in_past?) # strictly speaking, these enrollments are perfectly active but enrollment dates are terrible
             @past_enrollments << e unless e.workflow_state == "invited"
           elsif !e.hard_inactive?
-            start_at, end_at = e.enrollment_dates.first
-            if start_at && start_at > Time.now.utc
+            if e.enrollment_state.pending? || state == :creation_pending || (e.admin? && e.course.start_at&.>(Time.now.utc))
               @future_enrollments << e unless e.restrict_future_listing?
             elsif state != :inactive
               @current_enrollments << e
@@ -925,7 +922,7 @@ class CoursesController < ApplicationController
         end
 
         users = Api.paginate(users, self, api_v1_course_users_url)
-        includes = Array(params[:include])
+        includes = Array(params[:include]).concat(['sis_user_id'])
 
         # user_json_preloads loads both active/accepted and deleted
         # group_memberships when passed "group_memberships: true." In a
@@ -990,7 +987,7 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read_reports)
       scope = User.for_course_with_last_login(@context, @context.root_account_id, 'StudentEnrollment')
-      scope = scope.order('login_info_exists, last_login DESC')
+      scope = scope.order('last_login DESC NULLS LAST')
       users = Api.paginate(scope, self, api_v1_course_recent_students_url)
       user_json_preloads(users)
       render :json => users.map { |u| user_json(u, @current_user, session, ['last_login']) }
@@ -2950,10 +2947,14 @@ class CoursesController < ApplicationController
       progressions = ContextModuleProgression.joins(:context_module).where(user: user, context_modules: { course: courses }).select("context_module_progressions.*, context_modules.context_id AS course_id").to_a.group_by { |cmp| cmp['course_id'] }
     end
 
+    all_precalculated_permissions = includes.include?('tabs') ?
+      user.precalculate_permissions_for_courses(courses, SectionTabHelper::PERMISSIONS_TO_PRECALCULATE) : nil
+
     enrollments_by_course.each do |course_enrollments|
       course = course_enrollments.first.course
       hash << course_json(course, @current_user, session, includes, course_enrollments, user,
-                          preloaded_progressions: progressions)
+                          preloaded_progressions: progressions,
+                          precalculated_permissions: all_precalculated_permissions&.dig(course.global_id))
     end
     hash
   end

@@ -30,7 +30,7 @@ module SIS
       importer.accounts_to_set_sis_batch_ids.to_a.in_groups_of(1000, false) do |batch|
         Account.where(:id => batch).update_all(:sis_batch_id => @batch.id)
       end
-      SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data) if @batch.using_parallel_importers?
+      SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data)
 
       @logger.debug("Accounts took #{Time.zone.now - start} seconds")
       importer.success_count

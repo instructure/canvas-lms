@@ -21,19 +21,22 @@ import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 import {func, number, node} from 'prop-types'
 
-import Modal, { ModalBody, ModalFooter } from '../../shared/components/InstuiModal'
+import Modal, {ModalBody, ModalFooter} from '../../shared/components/InstuiModal'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 
-export function showConfirmDelete (props) {
+export function showConfirmDelete(props) {
   const parent = document.createElement('div')
   parent.setAttribute('class', 'confirm-delete-modal-container')
   document.body.appendChild(parent)
 
-  function showConfirmDeleteRef (modal) {
+  function showConfirmDeleteRef(modal) {
     if (modal) modal.show()
   }
 
-  ReactDOM.render(<ConfirmDeleteModal {...props} parent={parent} ref={showConfirmDeleteRef} />, parent)
+  ReactDOM.render(
+    <ConfirmDeleteModal {...props} parent={parent} ref={showConfirmDeleteRef} />,
+    parent
+  )
 }
 
 export default class ConfirmDeleteModal extends Component {
@@ -43,25 +46,25 @@ export default class ConfirmDeleteModal extends Component {
     onCancel: func,
     onHide: func,
     modalRef: func,
-    parent: node,
+    parent: node
   }
 
   static defaultProps = {
     onCancel: null,
     onHide: null,
     parent: null,
-    modalRef: null,
+    modalRef: null
   }
 
   state = {
-    show: false,
+    show: false
   }
 
-  componentDidMount () {
+  componentDidMount() {
     if (this.props.modalRef) this.props.modalRef(this)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     if (this.props.modalRef) this.props.modalRef(null)
   }
 
@@ -75,19 +78,18 @@ export default class ConfirmDeleteModal extends Component {
     this.hide()
   }
 
-  show () {
-    this.setState({ show: true })
+  show() {
+    this.setState({show: true})
   }
 
-  hide () {
-    this.setState({ show: false },
-      () => {
-        if (this.props.onHide) setTimeout(this.props.onHide)
-        if (this.props.parent) ReactDOM.unmountComponentAtNode(this.props.parent)
-      })
+  hide() {
+    this.setState({show: false}, () => {
+      if (this.props.onHide) setTimeout(this.props.onHide)
+      if (this.props.parent) ReactDOM.unmountComponentAtNode(this.props.parent)
+    })
   }
 
-  render () {
+  render() {
     return (
       <Modal
         open={this.state.show}
@@ -96,24 +98,35 @@ export default class ConfirmDeleteModal extends Component {
         label={I18n.t('Confirm Delete')}
       >
         <ModalBody>
-          {I18n.t({
-            one: 'You are about to delete 1 announcement. Are you sure?',
-            other: 'You are about to delete %{count} announcements. Are you sure?',
-          }, { count: this.props.selectedCount })}
+          {I18n.t(
+            {
+              one: 'You are about to delete 1 announcement. Are you sure?',
+              other: 'You are about to delete %{count} announcements. Are you sure?'
+            },
+            {count: this.props.selectedCount}
+          )}
         </ModalBody>
         <ModalFooter>
           <Button
-            ref={(c) => {this.cancelBtn = c}}
+            ref={c => {
+              this.cancelBtn = c
+            }}
             onClick={this.onCancel}
-          >{I18n.t('Cancel')}</Button>&nbsp;
+          >
+            {I18n.t('Cancel')}
+          </Button>&nbsp;
           <Button
-            ref={(c) => {this.confirmBtn = c}}
+            ref={c => {
+              this.confirmBtn = c
+            }}
             id="confirm_delete_announcements"
             onClick={this.onConfirm}
-            variant="danger">{I18n.t('Delete')}</Button>
+            variant="danger"
+          >
+            {I18n.t('Delete')}
+          </Button>
         </ModalFooter>
       </Modal>
     )
   }
 }
-

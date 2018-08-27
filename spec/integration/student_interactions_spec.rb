@@ -46,20 +46,20 @@ describe "student interactions links" do
 
   it "should show the student link on the student's page" do
     get "/courses/#{@course.id}/users/#{@student.id}"
-    expect(response).to be_success
+    expect(response).to be_successful
     expect(response.body).to match(/Interactions Report/)
     expect(response.body).not_to match(/Student Interactions Report/)
   end
 
   it "should show the teacher link on the teacher's page" do
     get "/courses/#{@course.id}/users/#{@teacher.id}"
-    expect(response).to be_success
+    expect(response).to be_successful
     expect(response.body).to match(/Student Interactions Report/)
   end
 
   it "should show mail link for teachers" do
     get "/users/#{@teacher.id}/teacher_activity/course/#{@course.id}"
-    expect(response).to be_success
+    expect(response).to be_successful
     html = Nokogiri::HTML(response.body)
     expect(html.css('.message_student_link')).not_to be_nil
   end
@@ -69,7 +69,7 @@ describe "student interactions links" do
     Account.site_admin.account_users.create!(user: @user)
     user_session(@user)
     get "/users/#{@teacher.id}/teacher_activity/course/#{@course.id}"
-    expect(response).to be_success
+    expect(response).to be_successful
     html = Nokogiri::HTML(response.body)
     expect(html.css('.message_student_link')).to be_empty
   end

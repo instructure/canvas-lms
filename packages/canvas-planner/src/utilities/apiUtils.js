@@ -26,7 +26,7 @@ const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
   const markedComplete = planner_override;
 
   const details = {
-    course_id: plannable.course_id,
+    course_id: plannable.course_id || apiResponse.course_id,
     title: plannable.name || plannable.title,
     // items are completed if the user marks it as complete or made a submission
     completed: (markedComplete != null)
@@ -128,7 +128,7 @@ export function transformApiToInternalItem (apiResponse, courses, groups, timeZo
     dateBucketMoment: moment.tz(plannableDate, timeZone).startOf('day'),
     type: getItemType(apiResponse.plannable_type),
     status: apiResponse.submissions,
-    newActivity: apiResponse.new_activity,
+    newActivity: apiResponse.new_activity && (apiResponse.plannable_type !== 'discussion_topic' || details.unread_count > 0),
     toggleAPIPending: false,
     date: plannableDate,
     ...details,

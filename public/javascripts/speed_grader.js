@@ -49,6 +49,7 @@ import SpeedgraderHelpers, {
   setupAnonymizableStudentId,
   setupAnonymizableUserId,
   setupAnonymizableAuthorId,
+  setupAnonymousGraders,
   setupIsAnonymous
 } from './speed_grader_helpers';
 import turnitinInfoTemplate from 'jst/_turnitinInfo';
@@ -76,9 +77,12 @@ import './jquery.disableWhileLoading';
 import 'compiled/jquery/fixDialogButtons';
 
 const selectors = new JQuerySelectorCache();
-const SPEEDGRADER_COMMENT_TEXTAREA_MOUNT_POINT = 'speedgrader_comment_textarea_mount_point';
+const SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT = 'speed_grader_comment_textarea_mount_point';
+const SPEED_GRADER_SUBMISSION_COMMENTS_DOWNLOAD_MOUNT_POINT = 'speed_grader_submission_comments_download_mount_point';
+const SPEED_GRADER_SETTINGS_MOUNT_POINT = 'speed_grader_settings_mount_point';
 
 let isAnonymous
+let anonymousGraders
 let anonymizableId
 let anonymizableUserId
 let anonymizableStudentId
@@ -286,12 +290,17 @@ function mergeStudentsAndSubmission() {
   });
 
   // handle showing students only in a certain section.
-  // the sectionToShow will be remembered for a given user in a given browser across all assignments in this course
+
   if (!jsonData.GROUP_GRADING_MODE) {
-    sectionToShow = userSettings.contextGet('grading_show_only_section');
-    sectionToShow = sectionToShow && String(sectionToShow);
+    if (ENV.new_gradebook_enabled) {
+      sectionToShow = ENV.selected_section_id
+    } else {
+      sectionToShow = userSettings.contextGet('grading_show_only_section')
+    }
   }
+
   if (sectionToShow) {
+    sectionToShow = sectionToShow.toString()
     var tempArray  = $.grep(jsonData.studentsWithSubmissions, function(student, i){
       return $.inArray(sectionToShow, student.section_ids) != -1;
     });
@@ -299,8 +308,7 @@ function mergeStudentsAndSubmission() {
       jsonData.studentsWithSubmissions = tempArray;
     } else {
       alert(I18n.t('alerts.no_students_in_section', "Could not find any students in that section, falling back to showing all sections."));
-      userSettings.contextRemove('grading_show_only_section');
-      SpeedgraderHelpers.reloadPage();
+      EG.changeToSection('all')
     }
   }
 
@@ -359,17 +367,6 @@ function mergeStudentsAndSubmission() {
   }
 }
 
-function changeToSection (sectionId) {
-  if (sectionId === 'all') {
-    // We're removing all filters and resetting to default
-    userSettings.contextRemove('grading_show_only_section');
-  } else {
-    userSettings.contextSet('grading_show_only_section', sectionId);
-  }
-
-  SpeedgraderHelpers.reloadPage();
-}
-
 function initDropdown(){
   var hideStudentNames = utils.shouldHideStudentNames();
   $("#hide_student_names").attr('checked', hideStudentNames);
@@ -397,7 +394,7 @@ function initDropdown(){
 
     if (newStudentOrSection && newStudentOrSection.match(/^section_(\d+|all)$/)) {
       const sectionId = newStudentOrSection.replace(/^section_/, '');
-      changeToSection(sectionId);
+      EG.changeToSection(sectionId)
     } else {
       EG.handleStudentChanged();
     }
@@ -406,7 +403,6 @@ function initDropdown(){
   if (jsonData.context.active_course_sections.length && jsonData.context.active_course_sections.length > 1 && !jsonData.GROUP_GRADING_MODE) {
     const $selectmenu_list = $selectmenu.data('selectmenu').list;
     const $menu = $("#section-menu");
-
 
     $menu.find('ul').append($.raw($.map(jsonData.context.active_course_sections, function(section, i){
       return '<li><a class="section_' + section.id + '" data-section-id="'+ section.id +'" href="#">'+ htmlEscape(section.name) +'</a></li>';
@@ -421,7 +417,7 @@ function initDropdown(){
       .hide()
       .menu()
       .delegate('a', 'click mousedown', function(){
-        changeToSection($(this).data('section-id'));
+        EG.changeToSection($(this).data('section-id'))
       });
 
     if (sectionToShow) {
@@ -613,7 +609,7 @@ function setupHeader () {
 }
 
 function unmountCommentTextArea () {
-  const node = document.getElementById(SPEEDGRADER_COMMENT_TEXTAREA_MOUNT_POINT);
+  const node = document.getElementById(SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT);
   ReactDOM.unmountComponentAtNode(node);
 }
 
@@ -627,16 +623,18 @@ function renderCommentTextArea () {
 
   const textAreaProps = {
     height: '4rem',
-    id: 'speedgrader_comment_textarea',
-    label: React.createElement(ScreenReaderContent, null, I18n.t('Add a Comment')),
+    id: 'speed_grader_comment_textarea',
+    label: <ScreenReaderContent>
+      {I18n.t('Add a Comment')}
+    </ScreenReaderContent>,
     placeholder: I18n.t('Add a Comment'),
     resize: 'vertical',
     textareaRef
   };
 
   ReactDOM.render(
-    React.createElement(TextArea, textAreaProps),
-    document.getElementById(SPEEDGRADER_COMMENT_TEXTAREA_MOUNT_POINT)
+    <TextArea {...textAreaProps} />,
+    document.getElementById(SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT)
   );
 }
 
@@ -809,6 +807,18 @@ function getSelectedAssessment(){
   ))[0];
 }
 
+function assessmentBelongsToCurrentUser(assessment) {
+  if (!assessment) {
+    return false
+  }
+
+  if (anonymousGraders) {
+    return ENV.current_anonymous_id === assessment.anonymous_assessor_id
+  } else {
+    return ENV.current_user_id === assessment.assessor_id
+  }
+}
+
 function handleSelectedRubricAssessmentChanged({validateEnteredData = true} = {}) {
   // This function is triggered both when we assess a student and when we switch
   // students. In the former case, we want populateNewRubricSummary to check the
@@ -818,12 +828,16 @@ function handleSelectedRubricAssessmentChanged({validateEnteredData = true} = {}
   // data is switched over to the new student, we don't want to perform the
   // comparison since it could result in specious alerts being shown.
   const editingData = validateEnteredData ? rubricAssessment.assessmentData($("#rubric_full")) : null
+  const selectedAssessment = getSelectedAssessment()
   rubricAssessment.populateNewRubricSummary(
     $("#rubric_summary_holder .rubric_summary"),
-    getSelectedAssessment(),
+    selectedAssessment,
     jsonData.rubric_association,
     editingData
   );
+
+  const showEditButton = !selectedAssessment || assessmentBelongsToCurrentUser(selectedAssessment)
+  $('#rubric_assessments_list_and_edit_button_holder .edit').showIf(showEditButton)
 }
 
 function initRubricStuff(){
@@ -1004,6 +1018,17 @@ function rubricAssessmentToPopulate () {
   return assessment;
 }
 
+function renderSubmissionCommentsDownloadLink(submission) {
+  const mountPoint = document.getElementById(SPEED_GRADER_SUBMISSION_COMMENTS_DOWNLOAD_MOUNT_POINT);
+  if (isAnonymous) {
+    mountPoint.innerHTML = '';
+  } else {
+    mountPoint.innerHTML =
+      `<a href="/submissions/${htmlEscape(submission.id)}/comments.pdf" target="_blank">${htmlEscape(I18n.t('Download Submission Comments'))}</a>`;
+  }
+  return mountPoint;
+}
+
 // Public Variables and Methods
 EG = {
   currentStudent: null,
@@ -1135,6 +1160,7 @@ EG = {
 
   jsonReady: function(){
     isAnonymous = setupIsAnonymous(jsonData)
+    anonymousGraders = setupAnonymousGraders(jsonData)
     anonymizableId = setupAnonymizableId(isAnonymous)
     anonymizableUserId = setupAnonymizableUserId(isAnonymous)
     anonymizableStudentId = setupAnonymizableStudentId(isAnonymous)
@@ -1329,6 +1355,49 @@ EG = {
     }
   },
 
+  setCurrentStudentRubricAssessments () {
+    // currentStudent.rubric_assessments only includes assessments submitted
+    // by the current user, so if the viewer is a moderator, get other
+    // graders' assessments from their provisional grades.
+    const provisionalAssessments = []
+
+    // If the moderator has just saved a new assessment, this array will have
+    // entries not present elsewhere, so don't clobber them.
+    const currentAssessmentsById = {}
+    if (this.currentStudent.rubric_assessments) {
+      this.currentStudent.rubric_assessments.forEach(assessment => {
+        currentAssessmentsById[assessment.id] = true
+      })
+    }
+
+    currentStudentProvisionalGrades().forEach(grade => {
+      // TODO: decide what to do if a provisional grade contains multiple
+      // assessments (currently we're not sure if this can actually happen
+      // for a moderated assignment).
+      if (grade.rubric_assessments && grade.rubric_assessments.length > 0) {
+        // Add the assessor display name to the assessment while we have easy
+        // access to the provisional grade data
+        const assessment = grade.rubric_assessments[0]
+        assessment.assessor_name = provisionalGraderDisplayNames[grade.provisional_grade_id]
+        if (!currentAssessmentsById[assessment.id]) {
+          provisionalAssessments.push(assessment)
+        }
+      }
+    })
+
+    if (provisionalAssessments.length > 0) {
+      if (!this.currentStudent.rubric_assessments) {
+        this.currentStudent.rubric_assessments = []
+      }
+
+      this.currentStudent.rubric_assessments = this.currentStudent.rubric_assessments.concat(provisionalAssessments)
+    }
+
+    if (anonymousGraders) {
+      this.currentStudent.rubric_assessments.sort((a, b) => natcompare.strings(a.anonymous_assessor_id, b.anonymous_assessor_id))
+    }
+  },
+
   showStudent: function(){
     $rightside_inner.scrollTo(0);
     if (this.currentStudent.submission_state == 'not_gradeable' && ENV.grading_role == "provisional_grader") {
@@ -1339,10 +1408,11 @@ EG = {
       $rightside_inner.show();
     }
     if (ENV.grading_role == "moderator") {
+      this.renderProvisionalGradeSelector({showingNewStudent: true})
+      this.setCurrentStudentRubricAssessments()
+
       this.current_prov_grade_index = null;
       this.removeModerationBarAndShowSubmission();
-
-      this.renderProvisionalGradeSelector({showingNewStudent: true})
 
       const selectedGrade = currentStudentProvisionalGrades().find(grade => grade.selected);
       if (selectedGrade) {
@@ -1659,7 +1729,7 @@ EG = {
       $('#plagiarism_platform_info_container').hide();
     } else {
       const resubmitUrl = SpeedgraderHelpers.plagiarismResubmitUrl(submission, anonymizableUserId)
-      $('#plagiarism_resubmit_button').on('click', (e) => { SpeedgraderHelpers.plagiarismResubmitHandler(e, resubmitUrl) })
+      $('#plagiarism_resubmit_button').on('click', (e) => { SpeedgraderHelpers.plagiarismResubmitHandler(e, resubmitUrl, anonymizableUserId) })
     }
 
     if(vericiteEnabled){
@@ -1768,6 +1838,7 @@ EG = {
 
     // load up a preview of one of the attachments if we can.
     this.loadSubmissionPreview(preview_attachment, submission);
+    renderSubmissionCommentsDownloadLink(submission);
 
     // if there is any submissions after this one, show a notice that they are not looking at the newest
     $submission_not_newest_notice.showIf($submission_to_view.filter(":visible").find(":selected").nextAll().length);
@@ -1990,6 +2061,7 @@ EG = {
 
   //load in the iframe preview.  if we are viewing a past version of the file pass the version to preview in the url
   renderSubmissionPreview (domElement = 'iframe') {
+    // TODO: this is duplicate code from line 1972 and should be removed
     if (!this.currentStudent.submission) {
       $this_student_does_not_have_a_submission.show();
       return
@@ -2129,34 +2201,55 @@ EG = {
     if (jsonData.rubric_association) {
       ENV.RUBRIC_ASSESSMENT.assessment_user_id = this.currentStudent[anonymizableId];
 
-      var assessmentsByMe = $.grep(EG.currentStudent.rubric_assessments, function(n,i){
-        return n.assessor_id === ENV.RUBRIC_ASSESSMENT.assessor_id;
-      });
-      var gradingAssessments = $.grep(EG.currentStudent.rubric_assessments, function(n,i){
-        return n.assessment_type == 'grading';
+      const isModerator = ENV.grading_role === 'moderator'
+      const selectMenuOptions = []
+
+      const assessmentsByMe = EG.currentStudent.rubric_assessments
+        .filter(assessment => assessmentBelongsToCurrentUser(assessment))
+      if (assessmentsByMe.length > 0) {
+        assessmentsByMe.forEach(assessment => {
+          const displayName = isModerator ? customProvisionalGraderLabel : assessment.assessor_name
+          selectMenuOptions.push({ id: assessment.id, name: displayName })
+        })
+      } else if (isModerator) {
+        // Moderators can create a custom assessment if they don't have one
+        selectMenuOptions.push({ id: '', name: customProvisionalGraderLabel })
+      }
+
+      const assessmentsByOthers = EG.currentStudent.rubric_assessments
+        .filter(assessment => !assessmentBelongsToCurrentUser(assessment))
+
+      assessmentsByOthers.forEach(assessment => {
+        // Display anonymous graders as "Grader 1 Rubric" (but don't use the
+        // "Rubric" suffix for named graders)
+        let displayName = assessment.assessor_name
+        if (anonymousGraders) {
+          displayName += ' Rubric'
+        }
+
+        selectMenuOptions.push({ id: assessment.id, name: displayName })
       });
 
       selectMenu.find("option").remove();
-      $.each(this.currentStudent.rubric_assessments, function(){
-        selectMenu.append(`<option value="${htmlEscape(this.id)}">${htmlEscape(this.assessor_name)}</option>`);
-      });
+      selectMenuOptions.forEach(option => {
+        selectMenu.append(`<option value="${htmlEscape(option.id)}">${htmlEscape(option.name)}</option>`)
+      })
 
-      //select the assessment that meets these rules:
-      // 1. the assessment by me
-      // 2. the assessment with assessment_type = 'grading'
-      var idToSelect = null;
-      if (gradingAssessments.length) {
-        idToSelect = gradingAssessments[0].id;
-      }
-      if (assessmentsByMe.length) {
-        idToSelect = assessmentsByMe[0].id;
-      }
-      if (idToSelect) {
-        selectMenu.val(idToSelect);
+      let idToSelect = ''
+      if (assessmentsByMe.length > 0) {
+        idToSelect = assessmentsByMe[0].id
+      } else {
+        const gradingAssessment = EG.currentStudent.rubric_assessments
+          .find(assessment => assessment.assessment_type === 'grading')
+
+        if (gradingAssessment) {
+          idToSelect = gradingAssessment.id
+        }
       }
 
-      // hide the select box if there is not >1 option
-      $("#rubric_assessments_list").showIf(selectMenu.find("option").length > 1);
+      selectMenu.val(idToSelect)
+      $("#rubric_assessments_list").showIf(isModerator || selectMenu.find("option").length > 1);
+
       handleSelectedRubricAssessmentChanged({validateEnteredData});
     }
   },
@@ -2864,19 +2957,11 @@ EG = {
   setupProvisionalGraderDisplayNames() {
     provisionalGraderDisplayNames = {};
     let provisionalGrades = currentStudentProvisionalGrades();
-    const anonymous_grader_ids = window.jsonData.anonymous_grader_ids || [];
-    const anonymousIdToProvisionalName = {};
-
-    // By doing this, we guarantee that the provisional graders will
-    // maintain the same order within the same speedgrader session.
-    for (let i = 0; i < anonymous_grader_ids.length; i += 1) {
-      anonymousIdToProvisionalName[anonymous_grader_ids[i]] = I18n.t('Grader %{index}',{index: i+1});
-    }
 
     provisionalGrades.forEach((grade) => {
       if (grade.readonly) {
         const displayName = grade.anonymous_grader_id
-          ? anonymousIdToProvisionalName[grade.anonymous_grader_id]
+          ? ENV.anonymous_identities[grade.anonymous_grader_id].name
           : grade.scorer_name;
         provisionalGraderDisplayNames[grade.provisional_grade_id] = displayName;
       } else {
@@ -2991,6 +3076,23 @@ EG = {
 
     const gradeSelector = <SpeedGraderProvisionalGradeSelector {...props} />
     ReactDOM.render(gradeSelector, mountPoint)
+  },
+
+  changeToSection (sectionId) {
+    // Update the selected section in old gradebook
+    if (sectionId === 'all') {
+      // We're removing all filters and resetting to default
+      userSettings.contextRemove('grading_show_only_section');
+    } else {
+      userSettings.contextSet('grading_show_only_section', sectionId);
+    }
+
+    // ...and in new gradebook
+    if (ENV.settings_url) {
+      $.post(ENV.settings_url, { selected_section_id: sectionId }, () => { SpeedgraderHelpers.reloadPage() })
+    } else {
+      SpeedgraderHelpers.reloadPage();
+    }
   }
 }
 
@@ -3026,7 +3128,9 @@ function speedGraderJSONErrorFn (data, _xhr, _textStatus, _errorThrown) {
       { assignmentTitle: ENV.assignment_title }
     );
     ReactDOM.render(
-      React.createElement(Alert, alertProps, alertMessage),
+      <Alert {...alertProps}>
+        {alertMessage}
+      </Alert>,
       document.getElementById('speed_grader_timeout_alert')
     );
   }
@@ -3038,7 +3142,7 @@ function setupSelectors() {
   // so that the jquery selector does not have to be run every time.
   $add_a_comment = $('#add_a_comment')
   $add_a_comment_submit_button = $add_a_comment.find('button:submit')
-  $add_a_comment_textarea = $(`#${SPEEDGRADER_COMMENT_TEXTAREA_MOUNT_POINT}`)
+  $add_a_comment_textarea = $(`#${SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT}`)
   $add_attachment = $('#add_attachment')
   $assignment_submission_originality_report_url = $('#assignment_submission_originality_report_url')
   $assignment_submission_resubmit_to_vericite_url = $('#assignment_submission_resubmit_to_vericite_url')
@@ -3137,7 +3241,7 @@ function renderSettingsMenu () {
   }
 
   const settingsMenu = <SpeedGraderSettingsMenu {...props} />
-  ReactDOM.render(settingsMenu, document.getElementById('speedgrader-settings'))
+  ReactDOM.render(settingsMenu, document.getElementById(SPEED_GRADER_SETTINGS_MOUNT_POINT))
 }
 
 // Helper function that guard against provisional_grades being null, allowing

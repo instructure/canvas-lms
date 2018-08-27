@@ -5,12 +5,15 @@
       <th class="param-name">Parameter</th>
       <th class="param-req"></th>
       <th class="param-type">Type</th>
+      <% if @request_parameters.any?(&:deprecated?) %>
+        <th class="param-deprecated"></th>
+      <% end %>
       <th class="param-desc">Description</th>
     </tr>
   </thead>
   <tbody>
     <% @request_parameters.each do |param| %>
-    <tr class="request-param">
+    <tr class="request-param <%= param.deprecated? ? 'deprecated' : '' %>">
       <td><%= h param.name(json: false) %></td>
       <td>
         <% if param.required? %>
@@ -18,6 +21,16 @@
         <% end %>
       </td>
       <td><%= h param.swagger_type %></td>
+
+      <% if @request_parameters.any?(&:deprecated?) %>
+        <td>
+          <% if param.deprecated? %>
+            <div><strong>[DEPRECATED]</strong></div>
+            <div>Effective <%= h param.effective_date %> (notice given <%= h param.notice_date %>)</div>
+          <% end %>
+        </td>
+      <% end %>
+
       <td class="param-desc">
         <%= htmlify param.desc %>
         <% if param.enums.present? %>

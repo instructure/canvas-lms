@@ -27,12 +27,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function setupParentSignup () {
   const element = document.querySelector('#coenrollment_link a')
-  element.addEventListener(eventToBindTo, (e) => {
-    e.preventDefault()
-    const template = element.getAttribute('data-template')
-    const path = element.getAttribute('data-path')
-    signupDialog(template, I18n.t('parent_signup', 'Parent Signup'), path)
-  })
+  if (element) {
+    element.addEventListener(eventToBindTo, (e) => {
+      e.preventDefault()
+      const template = element.getAttribute('data-template')
+      const path = element.getAttribute('data-path')
+      signupDialog(template, I18n.t('parent_signup', 'Parent Signup'), path)
+    })
+  }
 }
 
 function setupForgotPassword () {

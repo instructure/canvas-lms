@@ -152,7 +152,6 @@ describe SIS::CSV::TermImporter do
   end
 
   it 'should create rollback data' do
-    @account.enable_feature!(:refactor_of_sis_imports)
     process_csv_data_cleanly(
       "term_id,name,status,start_date,end_date",
       "T001,Winter11,active,2011-1-05 00:00:00,2011-4-14 00:00:00"

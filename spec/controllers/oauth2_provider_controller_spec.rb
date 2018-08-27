@@ -311,14 +311,20 @@ describe Oauth2ProviderController do
       redis
     end
 
-    it 'renders a 401 if theres no client_id' do
-      post :token
+    it 'renders a 401 if theres no client_id with authorization_code' do
+      post :token, params: { grant_type: 'authorization_code' }
+      assert_status(401)
+      expect(response.body).to match /unknown client/
+    end
+
+    it 'renders a 401 if theres no client_id with refresh_token' do
+      post :token, params: { grant_type: 'refresh_token' }
       assert_status(401)
       expect(response.body).to match /unknown client/
     end
 
     it 'renders a 401 if the secret is invalid' do
-      post :token, params: {:client_id => key.id, :client_secret => key.api_key + "123"}
+      post :token, params: {:client_id => key.id, :client_secret => key.api_key + "123", grant_type: 'authorization_code'}
       assert_status(401)
       expect(response.body).to match /invalid client/
     end
@@ -445,6 +451,13 @@ describe Oauth2ProviderController do
     context 'unsupported grant_type' do
       it 'returns a 400' do
         post :token, params: {:client_id => key.id, :client_secret => key.api_key, :grant_type => "client_credentials"}
+        assert_status(400)
+        json = JSON.parse(response.body)
+        expect(json['error']).to eq "unsupported_grant_type"
+      end
+
+      it 'returns a 400 when grant_type missing' do
+        post :token, params: {:client_id => key.id, :client_secret => key.api_key}
         assert_status(400)
         json = JSON.parse(response.body)
         expect(json['error']).to eq "unsupported_grant_type"

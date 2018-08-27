@@ -26,5 +26,5 @@ group :development, :test do
   gem 'yard', '0.9.5'
   gem 'yard-appendix', '0.1.8'
 
-  gem 'bullet', '5.7.5', require: false, github: 'flyerhzm/bullet', ref: '0e852d87bc9c461d4a9b807c12af1c0d27c1d1b6'
+  gem 'bullet', '5.7.5', require: false, github: 'flyerhzm/bullet', ref: '1677bc0ff78ed550e82a8fd5ecb97f64c7e83e36'
 end

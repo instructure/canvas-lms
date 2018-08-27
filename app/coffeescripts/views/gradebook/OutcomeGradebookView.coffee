@@ -55,6 +55,8 @@ define [
 
     @optionProperty 'gradebook'
 
+    @optionProperty 'router'
+
     hasOutcomes: $.Deferred()
 
     # child views rendered using the {{view}} helper in the template
@@ -69,6 +71,10 @@ define [
 
     events:
       'click .sidebar-toggle': 'onSidebarToggle'
+
+    sortField: 'student'
+
+    sortOrderAsc: true
 
     constructor: (options) ->
       super
@@ -130,11 +136,14 @@ define [
     #
     # Returns nothing.
     _attachEvents: ->
+      _this = @
       view.on('togglestate', @_createFilter("rating_#{i}")) for view, i in @checkboxes
-      $.subscribe('currentSection/change', Grid.Events.sectionChangeFunction(@grid))
+      $.subscribe('currentSection/change', (section) ->
+        Grid.section = section
+        _this._rerender()
+      )
       $.subscribe('currentSection/change', @updateExportLink)
       @updateExportLink(@gradebook.sectionToShow)
-      _this = @
       @$('#no_results_outcomes').change(() -> _this._toggleOutcomesWithNoResults(this.checked))
       @$('#no_results_students').change(() -> _this._toggleStudentsWithNoResults(this.checked))
 
@@ -158,11 +167,24 @@ define [
 
     _toggleStudentsWithNoResults: (enabled) ->
       @_setFilterSetting('students_no_results', enabled)
+      @_rerender()
+
+    _rerender: ->
       @grid.setData([])
       @grid.invalidate()
       @hasOutcomes = $.Deferred()
       $.when(@hasOutcomes).then(@renderGrid)
       @_loadOutcomes()
+
+    _toggleSort: (e, {grid, sortAsc, sortCol}) =>
+      if sortCol.field == @sortField
+        # Change sort direction
+        @sortOrderAsc = !@sortOrderAsc
+      else
+        # Change in sort column
+        @sortField = sortCol.field
+        @sortOrderAsc = true
+      @_rerender()
 
     # Internal: Listen for events on grid.
     #
@@ -170,7 +192,7 @@ define [
     _attachGridEvents: ->
       @grid.onHeaderRowCellRendered.subscribe(Grid.Events.headerRowCellRendered)
       @grid.onHeaderCellRendered.subscribe(Grid.Events.headerCellRendered)
-      @grid.onSort.subscribe(Grid.Events.sort)
+      @grid.onSort.subscribe(@_toggleSort)
 
     # Public: Create object to be passed to the view.
     #
@@ -198,19 +220,20 @@ define [
     #
     # Returns nothing.
     renderGrid: (response) =>
-      Grid.filter = _.range(@checkboxes.length).map (i) -> "rating_#{i}"
+      Grid.filter = _.filter(_.range(@checkboxes.length), (i) => @checkboxes[i].checked).map (i) -> "rating_#{i}"
       Grid.ratings = @ratings
       Grid.Util.saveOutcomes(response.linked.outcomes)
       Grid.Util.saveStudents(response.linked.users)
       Grid.Util.saveOutcomePaths(response.linked.outcome_paths)
       Grid.Util.saveSections(@gradebook.sections) # might want to put these into the api results at some point
-      [columns, rows] = Grid.Util.toGrid(response, column: { formatter: Grid.View.cell }, row: { section: @menu.currentSection })
+      [columns, rows] = Grid.Util.toGrid(response, column: { formatter: Grid.View.cell })
       @columns = columns
       if @$('#no_results_outcomes:checkbox:checked').length == 1
         columns = [columns[0]].concat(_.filter(columns, (c) => c.hasResults))
       if @grid
         @grid.setData(rows)
         @grid.setColumns(columns)
+        Grid.View.redrawHeader(@grid, Grid.averageFn)
       else
         @grid = new Slick.Grid(
           '.outcome-gradebook-wrapper',
@@ -221,7 +244,7 @@ define [
         @grid.init()
         Grid.Events.init(@grid)
         @_attachEvents()
-        Grid.View.redrawHeader(@grid,  Grid.averageFn, @menu.currentSection)
+        Grid.View.redrawHeader(@grid,  Grid.averageFn)
 
     isLoaded: false
     onShow: ->
@@ -233,21 +256,37 @@ define [
       })
       $(".post-grades-button-placeholder").hide();
 
+
+    # Public: Load a specific result page
+    #
+    # Returns nothing.
+    loadPage: (page) ->
+      @hasOutcomes = $.Deferred()
+      $.when(@hasOutcomes).then(@renderGrid)
+      @_loadOutcomes(page)
+
     # Public: Load all outcome results from API.
     #
     # Returns nothing.
     loadOutcomes: () ->
       $.when(@gradebook.hasSections).then(@_loadOutcomes)
 
-    _rollupsUrl: (course, exclude) ->
+    _rollupsUrl: (course, exclude, page) ->
       excluding = if exclude == '' then '' else "&exclude[]=#{exclude}"
-      "/api/v1/courses/#{course}/outcome_rollups?per_page=100&include[]=outcomes&include[]=users&include[]=outcome_paths#{excluding}"
+      sortField = @sortField
+      sortOutcomeId = null
+      [sortField, sortOutcomeId] = sortField.split('_') if sortField.startsWith('outcome_')
+      sortParams = "&sort_by=#{sortField}"
+      sortParams = "#{sortParams}&sort_outcome_id=#{sortOutcomeId}" if sortOutcomeId
+      sortParams = "#{sortParams}&sort_order=desc" if !@sortOrderAsc
+      sectionParam = if Grid.section then "&section_id=#{Grid.section}" else ""
+      "/api/v1/courses/#{course}/outcome_rollups?per_page=20&include[]=outcomes&include[]=users&include[]=outcome_paths#{excluding}&page=#{page}#{sortParams}#{sectionParam}"
 
-    _loadOutcomes: =>
+    _loadOutcomes: (page = 1) =>
       exclude = if @$('#no_results_students').prop('checked') then 'missing_user_rollups' else ''
       course = ENV.context_asset_string.split('_')[1]
       @$('.outcome-gradebook-wrapper').disableWhileLoading(@hasOutcomes)
-      @_loadPage(@_rollupsUrl(course, exclude))
+      @_loadPage(@_rollupsUrl(course, exclude, page))
 
     # Internal: Load a page of outcome results from the given URL.
     #
@@ -261,10 +300,11 @@ define [
       )
       dfd.then (response, status, xhr) =>
         outcomes = @_mergeResponses(outcomes, response)
-        if response.meta.pagination.next
-          @_loadPage(response.meta.pagination.next, outcomes)
-        else
-          @hasOutcomes.resolve(outcomes)
+        @hasOutcomes.resolve(outcomes)
+        @router.renderPagination(
+          response.meta.pagination.page,
+          response.meta.pagination.page_count
+        )
 
     # Internal: Merge two API responses into one.
     #
@@ -295,6 +335,7 @@ define [
         el: $('.section-button-placeholder'),
       )
       @menu.render()
+      Grid.section = @menu.currentSection
 
     # Internal: Create an event listener function used to filter SlickGrid results.
     #

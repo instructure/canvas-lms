@@ -45,25 +45,31 @@ const MENU_ID_DISABLED_AND_LOCKED = 5
 const BUTTONS = {
   enabled: {
     __html: renderToString(
-      <Text color="success">
-        <IconPublish size="x-small" />
-      </Text>
+      <span disabled="true">
+        <Text color="success">
+          <IconPublish size="x-small" />
+        </Text>
+      </span>
     )
   },
   disabled: {
     __html: renderToString(
-      <Text color="error">
-        <IconTrouble size="x-small" />
-      </Text>
+      <span disabled="true">
+        <Text color="error">
+          <IconTrouble size="x-small" />
+        </Text>
+      </span>
     )
   }
 }
 
 const lockIcon = {
   __html: renderToString(
-    <Text color="primary">
-      <IconLock />
-    </Text>
+    <span disabled="true">
+      <Text color="primary">
+        <IconLock />
+      </Text>
+    </span>
   )
 }
 

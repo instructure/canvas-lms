@@ -20,7 +20,6 @@ import I18n from 'i18n!user_actions'
 import UsersStore from '../store/UsersStore'
 
 export default {
-
   gotUserList(users, xhr) {
     return {
       type: 'GOT_USERS',
@@ -66,7 +65,11 @@ export default {
     return (dispatch, getState) => {
       const searchFilter = getState().userList.searchFilter
 
-      if (!searchFilter || searchFilter.search_term.length >= minSearchLength || searchFilter.search_term === '') {
+      if (
+        !searchFilter ||
+        searchFilter.search_term.length >= minSearchLength ||
+        searchFilter.search_term === ''
+      ) {
         dispatch(this.loadingUsers())
         store.load(searchFilter).then((response, _, xhr) => {
           dispatch(this.gotUserList(response, xhr))

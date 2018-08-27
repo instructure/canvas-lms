@@ -207,7 +207,10 @@ export default class GradeSelect extends Component {
   }
 
   handleClose() {
-    if (this.$input === document.activeElement || this.$menu.contains(document.activeElement)) {
+    if (
+      this.$input === document.activeElement ||
+      (this.$menu && this.$menu.contains(document.activeElement))
+    ) {
       this.select.focus()
     }
 

@@ -77,22 +77,46 @@ describe SisBatch do
   end
 
   it 'should make parallel importers' do
-    @account.enable_feature!(:refactor_of_sis_imports)
-
     batch = process_csv_data([%{user_id,login_id,status
                                 user_1,user_1,active},
                               %{course_id,short_name,long_name,term_id,status
                                 course_1,course_1,course_1,term_1,active}])
     expect(batch.parallel_importers.count).to eq 2
     expect(batch.parallel_importers.pluck(:importer_type)).to match_array %w(course user)
-    expect(batch.data[:use_parallel_imports]).to eq true
+  end
+
+  it 'should create filtered versions of csvs with passwords' do
+    batch = process_csv_data([%{user_id,password,login_id,status,ssha_password
+                                user_1,supersecurepwdude,user_1,active,hunter2}])
+    expect(batch).to be_imported
+    atts = batch.downloadable_attachments
+    expect(atts.count).to eq 1
+
+    atts.first.open do |file|
+      @row = ::CSV.new(file, :headers => true).first.to_h
+    end
+    expect(@row).to eq({"user_id" => "user_1", "login_id" => "user_1", "status" => "active"})
+  end
+
+  it 'should be able to preload downloadable attachments' do
+    batch1 = process_csv_data([%{user_id,password,login_id,status,ssha_password
+                                user_1,supersecurepwdude,user_1,active,hunter2},
+                              %{course_id,short_name,long_name,term_id,status
+                                course_1,course_1,course_1,term_1,active}])
+    batch2 = @account.sis_batches.create!
+    SisBatch.load_downloadable_attachments([batch1, batch2])
+
+    expect(batch2.instance_variable_get(:@downloadable_attachments)).to eq []
+    atts = batch1.instance_variable_get(:@downloadable_attachments)
+    expect(atts.count).to eq 2
+    expect(atts.map(&:id)).to match_array(batch1.data[:downloadable_attachment_ids])
   end
 
   it "should keep the batch in initializing state during create_with_attachment" do
-    batch = SisBatch.create_with_attachment(@account, 'instructure_csv', stub_file_data('test.csv', 'abc', 'text'), user_factory) do |batch|
-      expect(batch.attachment).not_to be_new_record
-      expect(batch.workflow_state).to eq 'initializing'
-      batch.options = { :override_sis_stickiness => true }
+    batch = SisBatch.create_with_attachment(@account, 'instructure_csv', stub_file_data('test.csv', 'abc', 'text'), user_factory) do |b|
+      expect(b.attachment).not_to be_new_record
+      expect(b.workflow_state).to eq 'initializing'
+      b.options = { :override_sis_stickiness => true }
     end
 
     expect(batch.workflow_state).to eq 'created'
@@ -104,7 +128,6 @@ describe SisBatch do
   describe "parallel imports" do
     it "should do cool stuff" do
       PluginSetting.create!(name: 'sis_import', settings: {parallelism: '12'})
-      @account.enable_feature!(:refactor_of_sis_imports)
       batch = process_csv_data([
         %{user_id,login_id,status
           user_1,user_1,active
@@ -166,15 +189,16 @@ test_1,TC 101,Test Course 101,,term1,deleted
 
     describe "with parallel importers" do
       before :each do
-        @account.enable_feature!(:refactor_of_sis_imports)
         @batch1 = create_csv_data(
           [%{user_id,login_id,status
           user_1,user_1,active
-          user_2,user_2,active}])
+          user_2,user_2,active}]
+        )
         @batch2 = create_csv_data(
           [%{course_id,short_name,long_name,term_id,status
           course_1,course_1,course_1,term_1,active
-          course_2,course_2,course_2,term_1,active}])
+          course_2,course_2,course_2,term_1,active}]
+        )
       end
 
       it "should run all batches immediately if they are small enough" do
@@ -199,7 +223,6 @@ test_1,TC 101,Test Course 101,,term1,deleted
     describe "with non-standard batches" do
       it "should only queue one 'process_all_for_account' job and run together" do
         begin
-          @account.enable_feature!(:refactor_of_sis_imports)
           SisBatch.valid_import_types["silly_sis_batch"] = {
             :callback => lambda {|batch| batch.data[:silliness_complete] = true; batch.finish(true) }
           }
@@ -277,7 +300,6 @@ test_1,TC 101,Test Course 101,,term1,deleted
     end
   end
 
-  shared_examples_for 'sis_import_feature' do
   describe "batch mode" do
     it "should not remove anything if no term is given" do
       @subacct = @account.sub_accounts.create(:name => 'sub1')
@@ -620,23 +642,6 @@ s2,test_1,section2,active},
       expect(@section2.reload).not_to be_deleted
     end
   end
-  end
-
-  context 'sis_import_feature on' do
-    include_examples 'sis_import_feature'
-    before do
-      allow_any_instance_of(Account).to receive(:feature_enabled?).and_call_original
-      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:refactor_of_sis_imports).and_return(true)
-    end
-  end
-
-  context 'sis_import_feature off' do
-    include_examples 'sis_import_feature'
-    before do
-      allow_any_instance_of(Account).to receive(:feature_enabled?).and_call_original
-      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:refactor_of_sis_imports).and_return(false)
-    end
-  end
 
   it "should write all warnings/errors to a file" do
     batch = @account.sis_batches.create!
@@ -906,16 +911,17 @@ test_1,u1,student,active}
 test_1,TC 101,Test Course 101,,term1,active},
             %{course_id,user_id,role,status,section_id
 test_1,u1,student,active}
-          ]) do |batch|
-          batch.options = {}
-          batch.batch_mode = true
-          batch.options[:skip_deletes] = true
-          batch.save!
-          batch.process_without_send_later
+          ]
+        ) do |b|
+          b.options = {}
+          b.batch_mode = true
+          b.options[:skip_deletes] = true
+          b.save!
+          b.process_without_send_later
           run_jobs
         end
 
-        expect(batch.workflow_state).to eq 'imported'
+        expect(batch.reload.workflow_state).to eq 'imported'
         expect(@e1.reload).to be_active
         expect(@e2.reload).to be_active
       end
@@ -960,7 +966,6 @@ test_1,u1,student,active}
         end
 
         it 'should use multi_term_batch_mode' do
-          @account.enable_feature!(:refactor_of_sis_imports)
           batch = create_csv_data([
                                     %{term_id,name,status
                                       term1,term1,active

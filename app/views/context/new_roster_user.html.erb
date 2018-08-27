@@ -161,6 +161,9 @@
           </tr>
         <% end %>
       </table>
+      <% if @context.is_a?(Course) && can_do(@context, @current_user, :manage_admin_users) %>
+        <div id="student_last_attended__component"></div>
+      <% end %>
     </fieldset>
     <%= render :partial => 'courses/link_enrollment' %>
   <% end %>

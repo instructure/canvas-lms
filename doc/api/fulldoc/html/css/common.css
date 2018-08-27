@@ -36,6 +36,11 @@ p {
   font-family: monospace;
 }
 
+.note.deprecated { background: #ffe5e5; border-color: #e9dada; padding: 1.33em; }
+.note.title.deprecated { background: #ffe5e5; border-color: #e9dada; }
+.request-param.deprecated, .response-field.deprecated { background: #ffe5e5; border-color: #e9dada; }
+.param-deprecated { width: 185px; }
+
 h1 a:link, h1 a:visited,
 h2 a:link, h2 a:visited,
 h3 a:link, h3 a:visited,
@@ -362,36 +367,38 @@ code.enum {
   padding: 12px;
   font-size: 1.1em;
 }
-table.request-params {
+table.request-params, table.response-fields {
   table-layout: fixed;
   width: 100%;
+  margin-bottom: 1.33em;
 }
-table.request-params, table.request-params th, table.request-params td {
+
+table.request-params, table.request-params th, table.request-params td, table.response-fields, table.response-fields th, table.response-fields td {
   border: 0;
   text-align: left;
 }
-table.request-params td {
+table.request-params td, table.response-fields td {
   border-bottom: 1px solid #ccc;
   vertical-align: text-top;
   font-family: Monaco, Lucida Console, monospace;
   font-size: 12px;
   word-wrap: break-word;
 }
-table.request-params td.param-desc {
+table.request-params td.param-desc, table.response-fields td.param-desc {
   font-family: "Helvetica Neue", Helvetica;
 }
-table.request-params td.param-desc ul {
+table.request-params td.param-desc ul, table.response-fields td.param-desc ul {
   padding: 0;
   list-style-position: inside;
 }
 
-.param-name {
+.param-name, .field-name {
   width: 20em;
 }
 .param-req {
   width: 5em;
 }
-.param-type {
+.param-type, .param-deprecated, .param-effective, .field-type, .field-deprecated, .field-effective, {
   width: 10em;
 }
 .param-desc {

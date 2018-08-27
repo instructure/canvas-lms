@@ -22,6 +22,7 @@ require 'json'
 
 require_dependency 'canvadocs/session'
 module Canvadocs
+  extend CanvadocsHelper
   RENDER_O365     = 'office_365'
   RENDER_BOX      = 'box_view'
   RENDER_CROCODOC = 'crocodoc'
@@ -207,5 +208,95 @@ module Canvadocs
   # annotations_supported? calls enabled?
   def self.hijack_crocodoc_sessions?
     annotations_supported? && Canvas::Plugin.value_to_boolean(config["hijack_crocodoc_sessions"])
+  end
+
+  def self.user_session_params(attachment, current_user)
+    submission = Submission.find_by(
+      id: AttachmentAssociation.where(context_type: 'Submission', attachment: attachment).select(:context_id)
+    )
+    return {} if submission.blank?
+    assignment = submission.assignment
+    enrollments = assignment.course.enrollments.index_by(&:user_id)
+    session_params = current_user_session_params(submission, current_user, enrollments)
+    if assignment.moderated_grading?
+      session_params[:user_filter] = moderated_grading_user_filter(submission, current_user, enrollments)
+      session_params[:restrict_annotations_to_user_filter] = true
+    elsif assignment.anonymize_students?
+      session_params[:user_filter] = anonymous_unmoderated_user_filter(submission, current_user, enrollments)
+      session_params[:restrict_annotations_to_user_filter] = current_user.id == submission.user_id
+    end
+
+    session_params
+  end
+
+  class << self
+    private
+
+    def current_user_session_params(submission, current_user, enrollments)
+      # Always include the current user's anonymous ID and real ID, regardless
+      # of the settings for the current assignment
+      current_user_params = {
+        user: current_user,
+        user_id: canvadocs_user_id(current_user),
+        user_role: canvadocs_user_role(submission.assignment.course, current_user, enrollments),
+        user_name: canvadocs_user_name(current_user)
+      }
+
+      # Not calling submission.anonymous_identities here because we want to include
+      # anonymous_ids for moderation_graders that have not yet taken a slot
+      anonymous_id = if submission.user_id == current_user.id
+        submission.anonymous_id
+      elsif submission.assignment.moderated_grading?
+        submission.assignment.moderation_graders.find_by(user: current_user)&.anonymous_id
+      end
+
+      current_user_params[:user_anonymous_id] = anonymous_id if anonymous_id
+      current_user_params
+    end
+
+    def moderated_grading_user_filter(submission, current_user, enrollments)
+      submission.moderation_whitelist_for_user(current_user).map do |user|
+        user_filter_entry(
+          user,
+          submission,
+          role: canvadocs_user_role(submission.assignment.course, user, enrollments),
+          anonymize: anonymize_user_for_moderated_assignment?(user, current_user, submission),
+        )
+      end
+    end
+
+    def anonymous_unmoderated_user_filter(submission, current_user, enrollments)
+      [user_filter_entry(
+        submission.user,
+        submission,
+        role: canvadocs_user_role(submission.assignment.course, submission.user, enrollments),
+        anonymize: current_user.id != submission.user_id
+      )]
+    end
+
+    def anonymize_user_for_moderated_assignment?(user, current_user, submission)
+      # You never see your own annotations anonymized, and students never see anonymized annotations from anyone.
+      return false if current_user == user || current_user == submission.user
+
+      if user == submission.user
+        submission.assignment.anonymize_students?
+      else
+        !submission.assignment.can_view_other_grader_identities?(current_user)
+      end
+    end
+
+    def user_filter_entry(user, submission, role:, anonymize:)
+      if anonymize
+        id = submission.anonymous_identities.dig(user.id, :id).to_s
+        type = 'anonymous'
+        name = submission.anonymous_identities.dig(user.id, :name)
+      else
+        id = user.global_id.to_s
+        type = 'real'
+        name = canvadocs_user_name(user)
+      end
+
+      { id: id, type: type, role: role, name: name }
+    end
   end
 end

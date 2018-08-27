@@ -21,6 +21,173 @@ require_relative '../api_spec_helper'
 describe 'Provisional Grades API', type: :request do
   it_behaves_like 'a provisional grades status action', :provisional_grades
 
+  describe "bulk_select" do
+    let_once(:course) { course_factory }
+    let_once(:teacher) { teacher_in_course(active_all: true, course: course).user }
+    let_once(:ta_1) { ta_in_course(active_all: true, course: course).user }
+    let_once(:ta_2) { ta_in_course(active_all: true, course: course).user }
+    let_once(:students) { 3.times.map {|n| student_in_course(active_all: true, course: course, name: "Student #{n}").user } }
+
+    let_once(:assignment) do
+      course.assignments.create!(
+        final_grader_id: teacher.id,
+        grader_count: 2,
+        moderated_grading: true,
+        points_possible: 10
+      )
+    end
+
+    let_once(:submissions) { students.map {|student| student.submissions.first} }
+    let_once(:grades) do
+      [
+        grade_student(assignment, students[0], ta_1, 5),
+        grade_student(assignment, students[1], ta_1, 6),
+        grade_student(assignment, students[1], ta_2, 7),
+        grade_student(assignment, students[2], ta_2, 8)
+      ]
+    end
+
+    def grade_student(assignment, student, grader, score)
+      graded_submissions = assignment.grade_student(student, grader: grader, score: score, provisional: true)
+      graded_submissions.first.provisional_grade(grader)
+    end
+
+    def bulk_select(provisional_grades, user = teacher)
+      path = "/api/v1/courses/#{course.id}/assignments/#{assignment.id}/provisional_grades/bulk_select"
+      params = {
+        action: 'bulk_select',
+        assignment_id: assignment.to_param,
+        controller: 'provisional_grades',
+        course_id: course.to_param,
+        format: 'json',
+        provisional_grade_ids: provisional_grades.map(&:id)
+      }
+      api_call_as_user(user, :put, path, params)
+    end
+
+    def selected_grades
+      assignment.moderated_grading_selections.map(&:provisional_grade).compact
+    end
+
+    it "selects multiple provisional grades" do
+      bulk_select(grades[0..1])
+      expect(selected_grades).to match_array(grades[0..1])
+    end
+
+    it "selects provisional grades for different graders" do
+      bulk_select([grades[0], grades[2]])
+      expect(selected_grades).to match_array([grades[0], grades[2]])
+    end
+
+    it "selects the later grade when given multiple provisional grade ids for the same student" do
+      bulk_select(grades[0..2])
+      expect(selected_grades).to match_array([grades[0], grades[2]])
+    end
+
+    it "returns json including the id of each selected provisional grade" do
+      json = bulk_select(grades[0..1])
+      ids = json.map {|grade| grade['selected_provisional_grade_id']}
+      expect(ids).to match_array(grades[0..1].map(&:id))
+    end
+
+    it "touches submissions related to the selected provisional grades" do
+      expect { bulk_select(grades[0..1]) }.to change { submissions[0].reload.updated_at }
+    end
+
+    it "does not touch submissions not related to the selected provisional grades" do
+      expect { bulk_select(grades[0..1]) }.not_to change { submissions[2].reload.updated_at }
+    end
+
+    it "excludes the anonymous ids for submissions when the user can view student identities" do
+      json = bulk_select(grades[0..1])
+      expect(json).to all(not_have_key("anonymous_id"))
+    end
+
+    it "includes the anonymous ids for submissions when the user cannot view student identities" do
+      assignment.update!(anonymous_grading: true)
+      json = bulk_select(grades[0..1])
+      ids = json.map {|grade| grade["anonymous_id"]}
+      expect(ids).to match_array(submissions[0..1].map(&:anonymous_id))
+    end
+
+    it "excludes the student ids for submissions when the user cannot view student identities" do
+      assignment.update!(anonymous_grading: true)
+      json = bulk_select(grades[0..1])
+      expect(json).to all(not_have_key("student_id"))
+    end
+
+    context "when given a provisional grade id for an already-selected provisional grade" do
+      before(:once) do
+        selection = assignment.moderated_grading_selections.find_by!(student_id: students[0].id)
+        selection.selected_provisional_grade_id = grades[0].id
+        selection.save!
+      end
+
+      it "excludes the already-selected provisional grade from the returned json" do
+        json = bulk_select(grades[0..1])
+        ids = json.map {|grade| grade['selected_provisional_grade_id']}
+        expect(ids).to match_array([grades[1].id])
+      end
+
+      it "does not touch the submission for the already-selected provisional grade" do
+        expect { bulk_select(grades[0..1]) }.not_to change { submissions[0].reload.updated_at }
+      end
+    end
+
+    context "when given a provisional grade id for a different assignment" do
+      let_once(:other_assignment) do
+        course.assignments.create!(
+          final_grader_id: teacher.id,
+          grader_count: 2,
+          moderated_grading: true,
+          points_possible: 10
+        )
+      end
+      let_once(:other_grade) { grade_student(other_assignment, students[0], ta_1, 10) }
+
+      it "does not select the unrelated provisional grade" do
+        bulk_select(grades[0..1] + [other_grade])
+        expect(other_grade.reload.selection).not_to be_present
+      end
+
+      it "excludes the unrelated provisional grade from the returned json" do
+        json = bulk_select(grades[0..1] + [other_grade])
+        ids = json.map {|grade| grade['selected_provisional_grade_id']}
+        expect(ids).to match_array(grades[0..1].map(&:id))
+      end
+    end
+
+    it "ignores ids not associated with a provisional grade" do
+      invalid_id = ModeratedGrading::ProvisionalGrade.maximum(:id).next # ensure the id is not used
+      invalid_grade = ModeratedGrading::ProvisionalGrade.new(id: invalid_id)
+      json = bulk_select(grades[0..1] + [invalid_grade])
+      ids = json.map {|grade| grade['selected_provisional_grade_id']}
+      expect(ids).to match_array(grades[0..1].map(&:id))
+    end
+
+    it 'is unauthorized when the user is not the assigned final grader' do
+      assignment.update_attribute(:final_grader_id, nil)
+      bulk_select(grades[0..1])
+      assert_status(401)
+    end
+
+    it 'is unauthorized when the user is an account admin without "Select Final Grade for Moderation" permission' do
+      course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :select_final_grade)
+      bulk_select(grades[0..1], account_admin_user)
+      assert_status(401)
+    end
+
+    it 'is authorized when the user is the final grader' do
+      bulk_select(grades[0..1])
+      assert_status(200)
+    end
+
+    it 'is authorized when the user is an account admin with "Select Final Grade for Moderation" permission' do
+      bulk_select(grades[0..1], account_admin_user)
+      assert_status(200)
+    end
+  end
+
   describe "select" do
     before(:once) do
       course_with_student :active_all => true

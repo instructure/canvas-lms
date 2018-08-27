@@ -14,13 +14,21 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-module Multipart
-  class Terminator
-    def to_multipart_stream(boundary)
-      StringIO.new("--#{boundary}--\r\n")
-    end
+module CanvadocsHelper
+  include CoursesHelper
+
+  private
+  def canvadocs_user_name(user)
+    user.short_name.delete(',')
   end
 
-  TERMINATOR = Terminator.new
+  def canvadocs_user_id(user)
+    user.global_id.to_s
+  end
+
+  def canvadocs_user_role(course, user, enrollments=nil)
+    user_type(course, user, enrollments)
+  end
 end

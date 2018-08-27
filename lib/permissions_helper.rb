@@ -24,10 +24,11 @@ module PermissionsHelper
     enrollments = cached_current_enrollments(preload_courses: true, preload_dates: true)
     allowed_ens = []
     Shard.partition_by_shard(enrollments) do |sharded_enrollments|
-      perms_hash = get_permissions_info_by_account(sharded_enrollments, [permission])
+      perms_hash = get_permissions_info_by_account(sharded_enrollments.map(&:course), sharded_enrollments, [permission])
       allowed_ens += sharded_enrollments.select do |e|
         perm_hash = perms_hash[e.course.account_id]
-        perm_hash && enabled_for_enrollment(e.role_id, e.type, e.state_based_on_date, perm_hash, permission)
+        perm_hash && (enabled_for_account_admin(perm_hash, permission) ||
+          enabled_for_enrollment(e.role_id, e.type, e.state_based_on_date, perm_hash, permission))
       end
     end
     allowed_ens
@@ -35,7 +36,7 @@ module PermissionsHelper
 
   # will return a hash linking global course ids with precalculated permissions
   # e.g. {10000000000001 => {:manage_calendar => true, :manage_assignments => false}}
-  def precalculate_permissions_for_courses(courses, permissions)
+  def precalculate_permissions_for_courses(courses, permissions, loaded_root_accounts=[])
     courses = courses.reject(&:deleted?) # just in case
     permissions = permissions.map(&:to_sym)
     nonexistent_permissions = permissions - RoleOverride.permissions.keys
@@ -55,14 +56,24 @@ module PermissionsHelper
         grouped_enrollments[course.id] ||= []
         grouped_enrollments[course.id].each{|e| e.course = course}
       end
-      all_permissions_data = get_permissions_info_by_account(all_applicable_enrollments, permissions)
+
+      root_account_ids = sharded_courses.map(&:root_account_id).uniq
+      unloaded_ra_ids = root_account_ids - loaded_root_accounts.map(&:id)
+      root_accounts = loaded_root_accounts + (unloaded_ra_ids.any? ? Account.where(:id => unloaded_ra_ids).to_a : [])
+
+      roles = root_accounts.map{|ra| self.roles(ra)}.flatten.uniq
+      return nil if roles.include?('consortium_admin') # cross-shard precalculation doesn't work - just fallback to the usual calculations
+      is_account_admin = roles.include?('admin')
+      account_roles = is_account_admin ? AccountUser.where(user: self).active.preload(:role).to_a : []
+      all_permissions_data = get_permissions_info_by_account(sharded_courses, all_applicable_enrollments, permissions, account_roles)
 
       sharded_courses.each do |course|
         course_permissions = {}
         permissions.each do |permission|
           perm_hash = all_permissions_data[course.account_id]
-          course_permissions[permission] = !!(perm_hash && grouped_enrollments[course.id].any?{|e|
-            enabled_for_enrollment(e.role_id, e.type, e.date_based_state_in_db.to_sym, perm_hash, permission)})
+          course_permissions[permission] = !!(perm_hash &&
+            (enabled_for_account_admin(perm_hash, permission) || grouped_enrollments[course.id].any?{|e|
+                enabled_for_enrollment(e.role_id, e.type, e.date_based_state_in_db.to_sym, perm_hash, permission)}))
         end
 
         # load some other permissions that we can possibly skip calculating - we can't say for sure they're false but we can mark them true
@@ -72,12 +83,29 @@ module PermissionsHelper
           course_permissions[:read_grades] = true
           course_permissions[:participate_as_student] = true
         end
-        course_permissions[:read_as_admin] = true if active_ens.any?(&:admin?)
-
+        if active_ens.any?(&:admin?)
+          course_permissions[:read_as_admin] = true
+        elsif !is_account_admin
+          course_permissions[:read_as_admin] = false # wait a second i can totally mark this one as false if they don't have any account users
+        end
         precalculated_map[course.global_id] = course_permissions
       end
     end
     precalculated_map
+  end
+
+  def enabled_for_account_admin(perm_hash, permission)
+    # enabled by account role
+    permission_details = RoleOverride.permissions[permission]
+    true_for_roles = permission_details[:true_for]
+    available_to_roles = permission_details[:available_to]
+
+    perm_hash[:admin_roles].any? do |role|
+      if available_to_roles.include?(role.base_role_type)
+        role_on = perm_hash.dig(:role_overrides, [role.id, permission], :enabled) && perm_hash.dig(:role_overrides, [role.id, permission], :self)
+        role_on.nil? ? true_for_roles.include?(role.base_role_type) : role_on
+      end
+    end
   end
 
   def enabled_for_enrollment(role_id, role_type, enrollment_state, perm_hash, permission)
@@ -85,14 +113,8 @@ module PermissionsHelper
     permission_details = RoleOverride.permissions[permission]
     true_for_roles = permission_details[:true_for]
     available_to_roles = permission_details[:available_to]
-    # enabled by account role
-    return true if perm_hash[:admin_roles].any? do |role|
-      if available_to_roles.include?(role.base_role_type)
-        role_on = perm_hash.dig(:role_overrides, [role.id, permission], :enabled) && perm_hash.dig(:role_overrides, [role.id, permission], :self)
-        role_on.nil? ? true_for_roles.include?(role.base_role_type) : role_on
-      end
-    end
 
+    # enabled for enrollment role
     if enrollment_state == :completed
       concluded_roles = permission_details[:applies_to_concluded]
       return false unless concluded_roles
@@ -101,7 +123,6 @@ module PermissionsHelper
       return false if permission_details[:restrict_future_enrollments]
     end
 
-    # enabled for enrollment role
     if available_to_roles.include?(role_type)
       role_on = perm_hash.dig(:role_overrides, [role_id, permission], :enabled) && perm_hash.dig(:role_overrides, [role_id, permission], :self)
       role_on.nil? ? true_for_roles.include?(role_type) : role_on
@@ -115,10 +136,10 @@ module PermissionsHelper
   #  role_overrides: map from role id to hash containing :enabled, :locked, :self, :children
   #   (these are calculated for the specific account, taking inheritance and locking into account)
   #  admin_roles: set of Roles the user has active account memberships for in this account
-  def get_permissions_info_by_account(enrollments, permissions)
-    account_roles = AccountUser.where(user: self).active.preload(:role).to_a
+  def get_permissions_info_by_account(courses, enrollments, permissions, account_roles=nil)
+    account_roles ||= AccountUser.where(user: self).active.preload(:role).to_a
     role_ids = (enrollments.map(&:role_id) + account_roles.map(&:role_id)).uniq
-    root_account_ids = enrollments.map(&:root_account_id).uniq
+    root_account_ids = courses.map(&:root_account_id).uniq
     query = <<-SQL
       WITH RECURSIVE t(id, name, parent_account_id, role_id, enabled, locked, self, children, permission) AS (
         SELECT accounts.id, name, parent_account_id, ro.role_id, ro.enabled, ro.locked,
@@ -144,7 +165,7 @@ module PermissionsHelper
       FROM t
       SQL
     params = {
-      account_ids: enrollments.map { |e| e.course.account_id },
+      account_ids: courses.map(&:account_id),
       permissions: permissions,
       role_ids: role_ids
     }

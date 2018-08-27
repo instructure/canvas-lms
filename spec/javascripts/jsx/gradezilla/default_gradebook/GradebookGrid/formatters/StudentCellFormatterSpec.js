@@ -50,6 +50,7 @@ QUnit.module('StudentCellFormatter', function (hooks) {
       name: 'Adam Jones',
       sections: ['2001', '2003', '2004'],
       sis_user_id: 'sis_student_1101',
+      integration_id: 'integration_id_1101',
       sortable_name: 'Jones, Adam'
     };
   });
@@ -88,7 +89,7 @@ QUnit.module('StudentCellFormatter', function (hooks) {
   });
 
   test('renders the student name when displaying names as "first, last"', function () {
-    equal(studentGradesLink().innerHTML, 'Adam Jones');
+    equal(studentGradesLink().innerHTML, student.name);
   });
 
   test('does not escape html in the student name when displaying names as "first, last"', function () {
@@ -115,7 +116,7 @@ QUnit.module('StudentCellFormatter', function (hooks) {
 
   test('renders section names when secondary info is "section"', function () {
     gradebook.setSelectedSecondaryInfo('section', true); // skipRedraw
-    equal(renderCell().querySelector('.secondary-info').innerHTML, 'Freshmen, Juniors, and Seniors');
+    equal(renderCell().querySelector('.secondary-info').innerText, 'Freshmen, Juniors, and Seniors');
   });
 
   test('does not escape html in the section names', function () {
@@ -134,12 +135,23 @@ QUnit.module('StudentCellFormatter', function (hooks) {
 
   test('renders the student login id when secondary info is "login_in"', function () {
     gradebook.setSelectedSecondaryInfo('login_id', true); // skipRedraw
-    equal(renderCell().querySelector('.secondary-info').innerHTML, 'adam.jones@example.com');
+    equal(renderCell().querySelector('.secondary-info').innerText, student.login_id);
   });
 
   test('renders the student SIS user id when secondary info is "sis_id"', function () {
     gradebook.setSelectedSecondaryInfo('sis_id', true); // skipRedraw
-    equal(renderCell().querySelector('.secondary-info').innerHTML, 'sis_student_1101');
+    equal(renderCell().querySelector('.secondary-info').innerText, student.sis_user_id);
+  });
+
+  test('renders the Integration ID when secondary info is "integration_id"', function () {
+    gradebook.setSelectedSecondaryInfo('integration_id', true); // skipRedraw
+    equal(renderCell().querySelector('.secondary-info').innerText, student.integration_id);
+  });
+
+  test('does not render secondary info when any secondary info is null and secondary info is not "none"', function () {
+    student.login_id = null;
+    gradebook.setSelectedSecondaryInfo('login_id', true); // skipRedraw
+    equal(renderCell().querySelector('.secondary-info'), null);
   });
 
   test('does not render secondary info when secondary info is "none"', function () {
@@ -163,13 +175,13 @@ QUnit.module('StudentCellFormatter', function (hooks) {
 
   test('renders the "inactive" status label', function () {
     student.isInactive = true;
-    equal(renderCell().querySelector('.label').innerHTML, 'inactive');
+    equal(renderCell().querySelector('.label').innerText, 'inactive');
   });
 
   QUnit.module('#render with an concluded student');
 
   test('renders the "concluded" status label', function () {
     student.isConcluded = true;
-    equal(renderCell().querySelector('.label').innerHTML, 'concluded');
+    equal(renderCell().querySelector('.label').innerText, 'concluded');
   });
 });

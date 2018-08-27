@@ -163,4 +163,84 @@ describe "calendar2" do
       end
     end
   end
+
+  context "as the teacher" do
+    before :each do
+      user_session(@teacher)
+    end
+
+    it "edits a todo page" do
+      page = @course.wiki_pages.create!(title: 'Page1', todo_date: Date.today)
+      get '/calendar2'
+      wait_for_ajax_requests
+      f('.fc-content').click
+      f('.event-details .edit_event_link').click
+      expect(f('#edit_todo_item_form_holder .more_options_link').attribute('href')).to include "/courses/#{@course.id}/pages/#{page.url}/edit"
+      replace_content f('#edit_todo_item_form_holder #to_do_item_title'), 'edit-page-title'
+      replace_content f('#edit_todo_item_form_holder #to_do_item_date'), '2018-01-01'
+      f('#edit_todo_item_form_holder button[type="submit"]').click
+      wait_for_ajax_requests
+      expect(page.reload.todo_date).to eq Date.new(2018, 1, 1)
+      expect(page.title).to eq 'edit-page-title'
+    end
+
+    it "deletes a todo page" do
+      page = @course.wiki_pages.create!(title: 'Page1', todo_date: Date.today)
+      get '/calendar2'
+      wait_for_ajax_requests
+      f('.fc-content').click
+      f('.event-details .delete_event_link').click
+      expect(f('#delete_event_dialog').text).to include "Are you sure you want to delete this page?"
+      f('#delete_event_dialog').find_element(:xpath, '..').find_element(:css, ".btn-primary").click
+      wait_for_ajax_requests
+      expect(page.reload).to be_deleted
+    end
+
+    it "edits a todo discussion" do
+      discussion = @course.discussion_topics.create!(user: @teacher, title: "topic 1",
+                                        message: "somebody topic message",
+                                        todo_date: Date.today)
+      get '/calendar2'
+      wait_for_ajax_requests
+      f('.fc-content').click
+      f('.event-details .edit_event_link').click
+      expect(f('#edit_todo_item_form_holder .more_options_link').attribute('href')).to include "/courses/#{@course.id}/discussion_topics/#{discussion.id}/edit"
+      replace_content f('#edit_todo_item_form_holder #to_do_item_title'), 'changed title eh'
+      replace_content f('#edit_todo_item_form_holder #to_do_item_date'), '2018-01-01'
+      f('#edit_todo_item_form_holder button[type="submit"]').click
+      wait_for_ajax_requests
+      expect(discussion.reload.todo_date).to eq Date.new(2018, 1, 1)
+      expect(discussion.title).to eq 'changed title eh'
+    end
+
+    it "deletes a todo discussion" do
+      discussion = @course.discussion_topics.create!(user: @teacher, title: "topic 1",
+                                        message: "somebody topic message",
+                                        todo_date: Date.today)
+      get '/calendar2'
+      wait_for_ajax_requests
+      f('.fc-content').click
+      f('.event-details .delete_event_link').click
+      expect(f('#delete_event_dialog').text).to include "Are you sure you want to delete this discussion?"
+      f('#delete_event_dialog').find_element(:xpath, '..').find_element(:css, ".btn-primary").click
+      wait_for_ajax_requests
+      expect(discussion.reload).to be_deleted
+    end
+  end
+
+  context "with teacher and student enrollments" do
+    it "includes todo items from both" do
+      course1 = @course
+      course2 = course_with_student(user: @user, active_all: true).course
+      page1 = course1.wiki_pages.create!(title: 'Page1', todo_date: Date.today, workflow_state: 'unpublished')
+      page2 = course2.wiki_pages.create!(title: 'Page2', todo_date: Date.today, workflow_state: 'published')
+      user_session(@user)
+      get '/calendar2'
+      wait_for_ajax_requests
+      fj('.fc-title:contains("Page1")').click
+      expect(f('.event-details')).to contain_css('.edit_event_link')
+      fj('.fc-title:contains("Page2")').click
+      expect(f('.event-details')).not_to contain_css('.edit_event_link')
+    end
+  end
 end

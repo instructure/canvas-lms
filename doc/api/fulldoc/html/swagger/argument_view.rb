@@ -16,16 +16,23 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_relative 'canvas_api/deprecatable'
 require 'hash_view'
 
 class ArgumentView < HashView
-  attr_reader :line, :http_verb, :path_variables
+  include CanvasAPI::Deprecatable
+
+  attr_reader :line, :http_verb, :path_variables, :effective_date, :notice_date
   attr_reader :name, :type, :desc
 
   DEFAULT_TYPE = "[String]"
   DEFAULT_DESC = "no description"
 
-  def initialize(line, http_verb = "get", path_variables = [])
+  def initialize(line, http_verb = "get", path_variables = [], deprecated: false)
+    @deprecated = deprecated
+    @deprecated_date_key = :NOTICE
+    @effective_date_key = :EFFECTIVE
+    @tag_declaration_line = line
     @line, @name, @type, @desc = parse_line(line)
     @http_verb = http_verb
     @path_variables = path_variables
@@ -33,7 +40,14 @@ class ArgumentView < HashView
   end
 
   def parse_line(line)
-    name, remaining = (line || "").split(/\s/, 2)
+    if deprecated?
+      parse_deprecation_info(line)
+      name_and_remaining = line_without_deprecation_tags(line)
+    else
+      name_and_remaining = line
+    end
+
+    name, remaining = (name_and_remaining || "").split(/\s/, 2)
     raise(ArgumentError, "param name missing:\n#{line}") unless name
     name.strip!
     type, desc = split_type_desc(remaining || "")
@@ -138,6 +152,7 @@ class ArgumentView < HashView
       "type" => swagger_type,
       "format" => swagger_format,
       "required" => required?,
+      "deprecated" => deprecated?,
     }
     swagger['enum'] = enums unless enums.empty?
     if array?

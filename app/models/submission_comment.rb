@@ -20,7 +20,9 @@ class SubmissionComment < ActiveRecord::Base
   include SendToStream
   include HtmlTextHelper
 
-  belongs_to :submission #, :touch => true
+  alias_attribute :body, :comment
+
+  belongs_to :submission
   belongs_to :author, :class_name => 'User'
   belongs_to :assessment_request
   belongs_to :context, polymorphic: [:course]
@@ -46,10 +48,11 @@ class SubmissionComment < ActiveRecord::Base
   scope :after, lambda { |date| where("submission_comments.created_at>?", date) }
   scope :for_final_grade, -> { where(:provisional_grade_id => nil) }
   scope :for_provisional_grade, ->(id) { where(:provisional_grade_id => id) }
+  scope :for_provisional_grades, -> { where.not(provisional_grade_id: nil) }
   scope :for_assignment_id, lambda { |assignment_id| where(:submissions => { :assignment_id => assignment_id }).joins(:submission) }
 
   def delete_other_comments_in_this_group
-    update_other_comments_in_this_group &:destroy
+    update_other_comments_in_this_group(&:destroy)
   end
 
   def publish_other_comments_in_this_group
@@ -127,7 +130,16 @@ class SubmissionComment < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :submission_comment
-    p.to { ([submission.user] + User.observing_students_in_course(submission.user, submission.assignment.context)) - [author] }
+    p.to do
+      course_id = /\d+/.match(submission.context_code).to_s.to_i
+      section_ended =
+        Enrollment.where({
+                           user_id: submission.user.id
+                         }).section_ended(course_id).length > 0
+      unless section_ended
+        ([submission.user] + User.observing_students_in_course(submission.user, submission.assignment.context)) - [author]
+      end
+    end
     p.whenever {|record|
       # allows broadcasting when this record is initially saved (assuming draft == false) and also when it gets updated
       # from draft to final

@@ -84,22 +84,6 @@ module GradebooksHelper
     }
   end
 
-  def format_grade?(grade)
-    return false if grade.blank?
-    (grade.to_s =~ /^\d+\.?\d*%?$/).present?
-  end
-
-  def percentage?(grade)
-    (grade.to_s =~ /^\d+\.?\d*%$/).present?
-  end
-
-  def format_grade(grade)
-    return grade unless format_grade?(grade)
-
-    formatted_grade = grade.delete('%')
-    I18n.n(formatted_grade, percentage: percentage?(grade))
-  end
-
   def display_grade(grade)
     grade.blank? ? '-' : grade
   end

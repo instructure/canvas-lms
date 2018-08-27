@@ -20,12 +20,13 @@
 module PlannerHelper
   PLANNABLE_TYPES = {
     'discussion_topic' => 'DiscussionTopic',
-    'announcement' => 'DiscussionTopic',
+    'announcement' => 'Announcement',
     'quiz' => 'Quizzes::Quiz',
     'assignment' => 'Assignment',
     'wiki_page' => 'WikiPage',
     'planner_note' => 'PlannerNote',
-    'calendar_event' => 'CalendarEvent'
+    'calendar_event' => 'CalendarEvent',
+    'assessment_request' => 'AssessmentRequest'
   }.freeze
 
   class InvalidDates < StandardError; end
@@ -84,6 +85,43 @@ module PlannerHelper
     planner_override
   end
 
+  # Handles real Submissions associated with graded things
+  def complete_planner_override_for_submission(submission)
+    planner_override = find_planner_override_for_submission(submission)
+    complete_planner_override planner_override
+  end
+
+  # Ungraded surveys are submitted as a Quizzes::QuizSubmission that
+  # had no submission attribute pointing to a real Submission
+  def complete_planner_override_for_quiz_submission(quiz_submission)
+    return if quiz_submission.submission # handled by Submission model
+    planner_override = PlannerOverride.find_by(
+      plannable_id: quiz_submission.quiz_id,
+      plannable_type: PLANNABLE_TYPES['quiz'],
+      user_id: quiz_submission.user_id
+    )
+    if planner_override
+      complete_planner_override planner_override
+    else
+      planner_override = PlannerOverride.new(
+        plannable_type: PLANNABLE_TYPES['quiz'],
+        plannable_id: quiz_submission.quiz_id, 
+        marked_complete: true,
+        dismissed: false,
+        user_id: quiz_submission.user_id)
+      planner_override.save
+    end
+  end
+
+  def complete_planner_override(planner_override)
+    if planner_override&.is_a? PlannerOverride
+      planner_override.marked_complete = true
+      if planner_override.save
+        Rails.cache.delete(planner_meta_cache_key)
+      end
+    end
+  end
+
   private
   def mark_doneable_tag(item)
     doneable_tags = item.context_module_tags.select do |tag|
@@ -91,6 +129,35 @@ module PlannerHelper
         req[:id] == tag.id && req[:type] == "must_mark_done"
       end
     end
-    return doneable_tags.length == 1 ? doneable_tags.first : nil
+    doneable_tags.length == 1 ? doneable_tags.first : nil
+  end
+
+  # until the graded objects are handled more uniformly,
+  # we have to look around for an associated override
+  def find_planner_override_for_submission(submission)
+    return unless submission&.respond_to?(:submission_type) && submission&.respond_to?(:assignment_id)
+
+    planner_override = case submission.submission_type
+      when "discussion_topic"
+        discussion_topic_id = DiscussionTopic.find_by(assignment_id: submission.assignment_id)&.id
+        PlannerOverride.find_by(
+          plannable_id: discussion_topic_id,
+          plannable_type: PLANNABLE_TYPES['discussion_topic'],
+          user_id: submission.user_id
+        )
+      when "online_quiz"
+        quiz_id = Quizzes::Quiz.find_by(assignment_id: submission.assignment_id)&.id
+        PlannerOverride.find_by(
+          plannable_id: quiz_id,
+          plannable_type: PLANNABLE_TYPES['quiz'],
+          user_id: submission.user_id
+        )
+    end
+    planner_override ||= PlannerOverride.find_by(
+      plannable_id: submission.assignment_id,
+      plannable_type: PLANNABLE_TYPES['assignment'],
+      user_id: submission.user_id
+    )
+    planner_override
   end
 end

@@ -337,6 +337,11 @@
         @include fontSize(16px);
         vertical-align: middle;
       }
+      &:focus {
+        outline: 1px solid var(--ic-link-color-darkened-10);
+        outline-offset: -1px;
+        padding: 2px;
+      }
     }
   }
   * + .events_list { margin-top: $ic-sp * 1.5; }

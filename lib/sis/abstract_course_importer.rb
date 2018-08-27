@@ -28,7 +28,7 @@ module SIS
       importer.abstract_courses_to_update_sis_batch_id.in_groups_of(1000, false) do |batch|
         AbstractCourse.where(:id => batch).update_all(:sis_batch_id => @batch.id)
       end
-      SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data) if @batch.using_parallel_importers?
+      SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data)
 
       @logger.debug("AbstractCourses took #{Time.zone.now - start} seconds")
       importer.success_count

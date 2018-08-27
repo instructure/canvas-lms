@@ -17,7 +17,7 @@
  */
 
 import React from 'react';
-import { mount, ReactWrapper, shallow } from 'enzyme';
+import { mount, ReactWrapper, shallow } from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme';
 import SubmissionCommentCreateForm from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentCreateForm';
 import SubmissionTray from 'jsx/gradezilla/default_gradebook/components/SubmissionTray';
 

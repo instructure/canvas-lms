@@ -28,16 +28,16 @@ export default React.createClass({
   displayName: 'IndexMenu',
 
   propTypes: {
-    store: React.PropTypes.object.isRequired,
-    contextType: React.PropTypes.string.isRequired,
-    contextId: React.PropTypes.number.isRequired,
-    setTrigger: React.PropTypes.func.isRequired,
-    setDisableTrigger: React.PropTypes.func.isRequired,
-    registerWeightToggle: React.PropTypes.func.isRequired,
-    disableSyncToSis: React.PropTypes.func.isRequired,
-    sisName: React.PropTypes.string.isRequired,
-    postToSisDefault: React.PropTypes.bool.isRequired,
-    hasAssignments: React.PropTypes.bool.isRequired,
+    store: PropTypes.object.isRequired,
+    contextType: PropTypes.string.isRequired,
+    contextId: PropTypes.number.isRequired,
+    setTrigger: PropTypes.func.isRequired,
+    setDisableTrigger: PropTypes.func.isRequired,
+    registerWeightToggle: PropTypes.func.isRequired,
+    disableSyncToSis: PropTypes.func.isRequired,
+    sisName: PropTypes.string.isRequired,
+    postToSisDefault: PropTypes.bool.isRequired,
+    hasAssignments: PropTypes.bool.isRequired,
   },
 
   getInitialState () {

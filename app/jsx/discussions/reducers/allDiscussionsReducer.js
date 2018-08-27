@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { handleActions } from 'redux-actions'
-import { actionTypes } from '../actions'
+import {handleActions} from 'redux-actions'
+import {actionTypes} from '../actions'
 
 // Note that we use 'allDiscussions' instead of 'discussions', as discussions
 // is used by the pagination stuff we are using (and really shouldn't be using
@@ -31,26 +31,25 @@ const reducerMap = {
     }, {})
   },
   [actionTypes.UPDATE_DISCUSSIONS_SEARCH]: (state, action) => {
-    const { filter, searchTerm } = action.payload
-    const regex = new RegExp(searchTerm, "i")
+    const {filter, searchTerm} = action.payload
+    const regex = new RegExp(searchTerm, 'i')
 
     return Object.keys(state).reduce((obj, id) => {
       const discussion = state[id]
       const searchMatch = regex.test(discussion.title)
-      const filterMatch = filter === 'unread'
-        ? discussion.read_state !== 'read' || discussion.unread_count > 0
-        : true
-      const filtered = (!searchMatch || !filterMatch)
-      obj[id] = { ...discussion, filtered } // eslint-disable-line no-param-reassign
+      const filterMatch =
+        filter === 'unread' ? discussion.read_state !== 'read' || discussion.unread_count > 0 : true
+      const filtered = !searchMatch || !filterMatch
+      obj[id] = {...discussion, filtered} // eslint-disable-line no-param-reassign
       return obj
     }, {})
   },
   [actionTypes.TOGGLE_SUBSCRIBE_SUCCESS]: (state, action) => {
-    const { id, subscribed } = action.payload
+    const {id, subscribed} = action.payload
     return Object.keys(state).reduce((obj, key) => {
       const discussion = state[key]
       if (discussion.id === id) {
-        obj[discussion.id] = { ...discussion, subscribed } // eslint-disable-line no-param-reassign
+        obj[discussion.id] = {...discussion, subscribed} // eslint-disable-line no-param-reassign
       } else {
         obj[discussion.id] = discussion // eslint-disable-line no-param-reassign
       }
@@ -63,14 +62,13 @@ const reducerMap = {
     newState[updatedDiscussion.id] = updatedDiscussion
     return newState
   },
-  [actionTypes.CLEAN_DISCUSSION_FOCUS]: (state) => (
+  [actionTypes.CLEAN_DISCUSSION_FOCUS]: state =>
     Object.keys(state).reduce((obj, id) => {
       const newDiscussion = Object.assign(state[id])
       delete newDiscussion.focusOn
-      obj[id] = newDiscussion  // eslint-disable-line no-param-reassign
+      obj[id] = newDiscussion // eslint-disable-line no-param-reassign
       return obj
-    }, {})
-  ),
+    }, {}),
   [actionTypes.DRAG_AND_DROP_START]: (state, action) => {
     const updatedDiscussion = action.payload.discussion
     const newState = Object.assign({}, state)
@@ -84,7 +82,7 @@ const reducerMap = {
     return newState
   },
   [actionTypes.DELETE_DISCUSSION_SUCCESS]: (state, action) => {
-    const { focusId, focusOn } = action.payload.nextFocusDiscussion
+    const {focusId, focusOn} = action.payload.nextFocusDiscussion
     const newState = Object.assign({}, state)
     delete newState[action.payload.discussion.id]
     if (focusId) {
@@ -93,7 +91,7 @@ const reducerMap = {
     return newState
   },
   [actionTypes.DUPLICATE_DISCUSSION_SUCCESS]: (state, action) => {
-    const { newDiscussion } = action.payload
+    const {newDiscussion} = action.payload
     const newState = Object.assign({}, state)
 
     // Add our new discussion to the store
@@ -103,7 +101,7 @@ const reducerMap = {
     // state to be consistent with the new values in the database.
     const newPositions = newDiscussion.new_positions
     if (newPositions) {
-      Object.keys(newPositions).forEach((discussionId) => {
+      Object.keys(newPositions).forEach(discussionId => {
         const newPosition = newPositions[discussionId]
         newState[discussionId] = {...newState[discussionId], position: newPosition}
       })
@@ -111,7 +109,7 @@ const reducerMap = {
     }
 
     return newState
-  },
+  }
 }
 
 const allDiscussionsReducer = handleActions(reducerMap, {})

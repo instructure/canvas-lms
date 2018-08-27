@@ -199,10 +199,15 @@ class GradebookExporter
 
         student_ids = student_enrollments_batch.map(&:user_id)
 
-        visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(
-          user_id: student_ids,
-          course_id: @course.id
-        )
+        visible_assignments = @course.submissions.
+          active.
+          where(user_id: student_ids.uniq).
+          pluck(:assignment_id, :user_id).
+          each_with_object(Hash.new {|hash, key| hash[key] = Set.new}) do |ids, reducer|
+            assignment_key = ids.first
+            student_key = ids.second
+            reducer[assignment_key].add(student_key)
+          end
 
         # Custom Columns, custom_column_data are hashes
         custom_column_data = CustomGradebookColumnDatum.where(
@@ -214,9 +219,7 @@ class GradebookExporter
           student = student_enrollment.user
           student_sections = student_section_names[student.id].sort.to_sentence
           student_submissions = assignments.map do |a|
-            if visible_assignments[student.id] && !visible_assignments[student.id].include?(a.id)
-              "N/A"
-            else
+            if visible_assignments[a.id].include? student.id
               submission = submissions[[student.id, a.id]]
               if submission.try(:excused?)
                 "EX"
@@ -225,6 +228,8 @@ class GradebookExporter
               else
                 I18n.n(submission.try(:score))
               end
+            else
+              "N/A"
             end
           end
           row = [student_name(student), student.id]

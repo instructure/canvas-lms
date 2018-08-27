@@ -67,6 +67,13 @@ QUnit.module('ExternalApps.DeleteExternalToolButton', {
   }
 })
 
+test('renders when the canAddEdit permission is false', () => {
+  const tool = {name: 'test tool'}
+  const component = renderComponent({ tool, canAddEdit: false })
+  const node = ReactDOM.findDOMNode(component)
+  ok(node.querySelector("a[aria-label='Delete test tool App']"))
+})
+
 test('open and close modal', function() {
   const data = {tool: this.tools[1]}
   const [component, btnTriggerDelete] = Array.from(getDOMNodes(data))

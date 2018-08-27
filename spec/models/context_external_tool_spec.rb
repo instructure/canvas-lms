@@ -26,6 +26,41 @@ describe ContextExternalTool do
     @course.update_attribute(:account, @account)
   end
 
+  describe 'associations' do
+    let_once(:developer_key) { DeveloperKey.create! }
+    let_once(:tool) do
+      ContextExternalTool.create!(
+        context: @course,
+        consumer_key: 'key',
+        shared_secret: 'secret',
+        name: 'test tool',
+        url: 'http://www.tool.com/launch',
+        developer_key: developer_key
+      )
+    end
+
+    it 'allows setting the developer key' do
+      expect(tool.developer_key).to eq developer_key
+    end
+  end
+
+  describe '#deployment_id' do
+    let_once(:tool) do
+      ContextExternalTool.create!(
+        id: 1,
+        context: @course,
+        consumer_key: 'key',
+        shared_secret: 'secret',
+        name: 'test tool',
+        url: 'http://www.tool.com/launch'
+      )
+    end
+
+    it 'returns the correct deployment_id' do
+      expect(tool.deployment_id).to eq "#{tool.id}:#{Lti::Asset.opaque_identifier_for(tool.context)}"
+    end
+  end
+
   describe '#duplicated_in_context?' do
     shared_examples_for 'detects duplication in contexts' do
       let(:context) { raise 'Override in spec' }
@@ -1204,8 +1239,38 @@ describe ContextExternalTool do
     end
 
     describe 'set_policy' do
-      let(:tool) do
-        @course.context_external_tools.create(
+      let_once(:admin) { account_admin_user }
+      let_once(:course) do
+        course_with_teacher(:active_all => true, :account => Account.default)
+        @course
+      end
+
+      let_once(:teacher) do
+        teacher = user_factory(active_all: true)
+        course.enroll_teacher(teacher).accept!
+        teacher
+      end
+
+      let_once(:designer) do
+        designer = user_factory(active_all: true)
+        course.enroll_designer(designer).accept!
+        designer
+      end
+
+      let_once(:ta) do
+        ta = user_factory(active_all: true)
+        course.enroll_ta(ta).accept!
+        ta
+      end
+
+      let_once(:student) do
+        student = user_factory(active_all: true)
+        course.enroll_student(student).accept!
+        student
+      end
+
+      let_once(:tool) do
+        course.context_external_tools.create(
           name: "a",
           consumer_key: '12345',
           shared_secret: 'secret',
@@ -1214,26 +1279,27 @@ describe ContextExternalTool do
       end
 
       it 'should grant update_manually to the proper individuals' do
-        @admin = account_admin_user()
+        expect(tool.grants_right?(admin, :update_manually)).to be_truthy
+        expect(tool.grants_right?(teacher, :update_manually)).to be_truthy
+        expect(tool.grants_right?(designer, :update_manually)).to be_truthy
+        expect(tool.grants_right?(ta, :update_manually)).to be_truthy
+        expect(tool.grants_right?(student, :update_manually)).to be_falsey
+      end
 
-        course_with_teacher(:active_all => true, :account => Account.default)
-        @teacher = user_factory(active_all: true)
-        @course.enroll_teacher(@teacher).accept!
+      it 'should grant read to the proper individuals' do
+        expect(tool.grants_right?(admin, :read)).to be_truthy
+        expect(tool.grants_right?(teacher, :read)).to be_truthy
+        expect(tool.grants_right?(designer, :read)).to be_truthy
+        expect(tool.grants_right?(ta, :read)).to be_truthy
+        expect(tool.grants_right?(student, :read)).to be_falsey
+      end
 
-        @designer = user_factory(active_all: true)
-        @course.enroll_designer(@designer).accept!
-
-        @ta = user_factory(active_all: true)
-        @course.enroll_ta(@ta).accept!
-
-        @student = user_factory(active_all: true)
-        @course.enroll_student(@student).accept!
-
-        expect(tool.grants_right?(@admin, :update_manually)).to be_truthy
-        expect(tool.grants_right?(@teacher, :update_manually)).to be_truthy
-        expect(tool.grants_right?(@designer, :update_manually)).to be_truthy
-        expect(tool.grants_right?(@ta, :update_manually)).to be_truthy
-        expect(tool.grants_right?(@student, :update_manually)).to be_falsey
+      it 'should grant delete to the proper individuals' do
+        expect(tool.grants_right?(admin, :delete)).to be_truthy
+        expect(tool.grants_right?(teacher, :delete)).to be_truthy
+        expect(tool.grants_right?(designer, :delete)).to be_truthy
+        expect(tool.grants_right?(ta, :delete)).to be_truthy
+        expect(tool.grants_right?(student, :delete)).to be_falsey
       end
     end
   end

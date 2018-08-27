@@ -97,7 +97,8 @@ class Login::SamlController < ApplicationController
       # and it's easier to not interweave them so the legacy code can be easily stripped
       # in the future
       assertion = response.assertions.first
-      provider_attributes = assertion&.attribute_statements&.first&.to_h || {}
+      # yes, they could be _that_ busted that we put a dangling rescue here.
+      provider_attributes = assertion&.attribute_statements&.first&.to_h || {} rescue {}
       subject_name_id = assertion&.subject&.name_id
       unique_id = if aac.login_attribute == 'NameID'
         subject_name_id&.id

@@ -3303,7 +3303,7 @@ describe Course, 'grade_publishing' do
       expect(lambda { quick_sanity_check(@user, false) }).to raise_error("publishing disallowed for this publishing user")
     end
 
-    it 'should publish csv' do
+    it 'should not publish empty csv' do
       @user = user_with_pseudonym
       @pseudonym.sis_user_id = "U1"
       @pseudonym.account_id = @course.root_account_id
@@ -3319,9 +3319,7 @@ describe Course, 'grade_publishing' do
       @ps.save!
 
       @course.grading_standard_id = 0
-      csv = "publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id,student_id," +
-          "student_sis_id,enrollment_id,enrollment_status,score,grade\n"
-      expect(SSLCommon).to receive(:post_data).with("http://localhost/endpoint", csv, "text/csv", {})
+      expect(SSLCommon).to_not receive(:post_data) # like c'mon dude why send an empty csv file
       @course.publish_final_grades(@user)
     end
 

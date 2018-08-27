@@ -37,7 +37,7 @@ QUnit.module('CustomColumnHeader#handleKeyDown', {
   },
 
   handleKeyDown (which, shiftKey = false) {
-    return this.wrapper.node.handleKeyDown({ which, shiftKey, preventDefault: this.preventDefault });
+    return this.wrapper.instance().handleKeyDown({ which, shiftKey, preventDefault: this.preventDefault });
   },
 
   teardown () {
@@ -80,13 +80,13 @@ QUnit.module('CustomColumnHeader: focus', {
 test('#focusAtStart has no effect', function () {
   // This ensures no issues calling .focusAtStart on an instance of this
   // component.
-  this.wrapper.node.focusAtStart();
+  this.wrapper.instance().focusAtStart();
   equal(document.activeElement, this.activeElement);
 });
 
 test('#focusAtEnd has no effect', function () {
   // This ensures no issues calling .focusAtEnd on an instance of this
   // component.
-  this.wrapper.node.focusAtEnd();
+  this.wrapper.instance().focusAtEnd();
   equal(document.activeElement, this.activeElement);
 });

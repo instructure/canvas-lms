@@ -48,8 +48,10 @@ describe "Api::V1::ModerationGrader" do
     let(:json) { api.moderation_graders_json(assignment, teacher, session) }
 
     before :once do
-      assignment.moderation_graders.create!(anonymous_id: "abcde", user: grader_1)
-      assignment.moderation_graders.create!(anonymous_id: "fghij", user: grader_2)
+      student = User.create!
+      @course.enroll_student(student, enrollment_state: :active)
+      assignment.grade_student(student, grader: grader_1, provisional: true, score: 10)
+      assignment.grade_student(student, grader: grader_2, provisional: true, score: 5)
     end
 
     context "when the user can view other grader identities" do
@@ -92,7 +94,8 @@ describe "Api::V1::ModerationGrader" do
       end
 
       it "includes anonymous_id on graders" do
-        expect(json.map {|grader| grader['anonymous_id']}).to match_array(["abcde", "fghij"])
+        anonymous_ids = assignment.moderation_graders.pluck(:anonymous_id)
+        expect(json.map {|grader| grader['anonymous_id']}).to match_array(anonymous_ids)
       end
 
       it "includes ids on graders" do

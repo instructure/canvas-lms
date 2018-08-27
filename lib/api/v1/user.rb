@@ -47,7 +47,7 @@ module Api::V1::User
     excludes ||= []
     api_json(user, current_user, session, API_USER_JSON_OPTS).tap do |json|
       enrollment_json_opts = { current_grading_period_scores: includes.include?('current_grading_period_scores') }
-      if !excludes.include?('pseudonym') && user_json_is_admin?(context, current_user)
+      if includes.include?('sis_user_id') || (!excludes.include?('pseudonym') && user_json_is_admin?(context, current_user))
         include_root_account = @domain_root_account.trust_exists?
         sis_context = enrollment || @domain_root_account
         pseudonym = SisPseudonym.for(user, sis_context, type: :implicit, require_sis: false)
@@ -60,11 +60,14 @@ module Api::V1::User
           json.merge! :sis_user_id => pseudonym&.sis_user_id,
                       :integration_id => pseudonym&.integration_id
         end
-        json[:sis_import_id] = pseudonym&.sis_batch_id if @domain_root_account.grants_right?(current_user, session, :manage_sis)
-        json[:root_account] = HostUrl.context_host(pseudonym&.account) if include_root_account
 
-        if pseudonym && context.grants_right?(current_user, session, :view_user_logins)
-          json[:login_id] = pseudonym.unique_id
+        if !excludes.include?('pseudonym') && user_json_is_admin?(context, current_user)
+          json[:sis_import_id] = pseudonym&.sis_batch_id if @domain_root_account.grants_right?(current_user, session, :manage_sis)
+          json[:root_account] = HostUrl.context_host(pseudonym&.account) if include_root_account
+
+          if pseudonym && context.grants_right?(current_user, session, :view_user_logins)
+            json[:login_id] = pseudonym.unique_id
+          end
         end
       end
 

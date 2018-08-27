@@ -34,6 +34,18 @@ if (typeof ENV !== 'undefined') {
   if (ENV.BIGEASY_LOCALE) tz.changeLocale(ENV.BIGEASY_LOCALE, ENV.MOMENT_LOCALE)
 }
 
+// This will inject and set up sentry for deprecation reporting.  It should be
+// stripped out and be a no-op in production.
+if (process.env.NODE_ENV !== 'production' && process.env.DEPRECATION_SENTRY_DSN) {
+  const Raven = require('raven-js')
+  Raven.config(process.env.DEPRECATION_SENTRY_DSN, {
+    release: process.env.GIT_COMMIT
+  }).install();
+
+  const setupRavenConsoleLoggingPlugin = require('../jsx/shared/helpers/setupRavenConsoleLoggingPlugin');
+  setupRavenConsoleLoggingPlugin(Raven, { loggerName: 'console' });
+}
+
 // setup the inst-ui default theme
 if (ENV.use_high_contrast) {
   canvasTheme.use({ accessible: true })

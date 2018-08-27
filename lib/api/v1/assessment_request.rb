@@ -20,6 +20,7 @@ module Api::V1::AssessmentRequest
   include Api::V1::Json
   include Api::V1::Submission
   include Api::V1::SubmissionComment
+  include Api::V1::Assignment
 
   def assessment_request_json(assessment_request, user, session, includes = Set.new)
     assignment = assessment_request.asset.assignment
@@ -35,6 +36,10 @@ module Api::V1::AssessmentRequest
       unless assignment.anonymous_peer_reviews? && !assignment.grants_any_right?(user, session, :grade)
         hash['assessor'] = user_display_json(assessment_request.assessor, @context)
       end
+    end
+
+    if includes.include?("assignment")
+      hash['assignment'] = assignment_json(assignment, assessment_request.user, session)
     end
 
     if includes.include?("submission_comments")

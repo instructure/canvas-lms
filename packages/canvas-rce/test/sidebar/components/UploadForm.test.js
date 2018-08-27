@@ -103,6 +103,16 @@ describe("UploadForm", () => {
       assert.ok(toggleSpy.called);
     });
 
+    it("renders a Loading folders options when upload.loadingFolders is true", () => {
+      upload.loadingFolders = true;
+      let uploadComp = sd.shallowRender(<UploadForm {...defaultProps} />);
+      let instance = uploadComp.getMountedInstance();
+      let uploadForm = sd.shallowRender(instance.renderForm());
+      let options = uploadForm.subTree("Select").everySubTree("option");
+      assert(options.length === 1);
+      assert(options[0].text() === "Loading folders...");
+    });
+
     it("renders an option per folder", () => {
       upload.formExpanded = true;
       upload.folders = {

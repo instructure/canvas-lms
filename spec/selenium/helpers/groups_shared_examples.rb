@@ -175,6 +175,7 @@ shared_examples 'announcements_page_v2' do
     get announcements_page
     f('#external_feed').click
     wait_for_ajaximations
+    sleep 0.2 # have to wait for InstUI animations
     f('#external-rss-feed__toggle-button').click
     wait_for_ajaximations
     expect(f('#external-rss-feed__submit-button-group')).to be_displayed

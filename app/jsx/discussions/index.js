@@ -18,20 +18,20 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Provider } from 'react-redux'
+import {Provider} from 'react-redux'
 
-import { subscribeFlashNotifications } from '../shared/reduxNotifications'
-import { ConnectedDiscussionsIndex } from './components/DiscussionsIndex'
+import {subscribeFlashNotifications} from '../shared/reduxNotifications'
+import {ConnectedDiscussionsIndex} from './components/DiscussionsIndex'
 import createStore from './store'
 
-export default function createDiscussionsIndex (root, data = {}) {
+export default function createDiscussionsIndex(root, data = {}) {
   const store = createStore(data)
 
-  function unmount () {
+  function unmount() {
     ReactDOM.unmountComponentAtNode(root)
   }
 
-  function render () {
+  function render() {
     ReactDOM.render(
       <Provider store={store}>
         <ConnectedDiscussionsIndex />
@@ -42,5 +42,5 @@ export default function createDiscussionsIndex (root, data = {}) {
 
   subscribeFlashNotifications(store)
 
-  return { unmount, render }
+  return {unmount, render}
 }

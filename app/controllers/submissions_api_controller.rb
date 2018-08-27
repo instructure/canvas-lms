@@ -235,6 +235,8 @@ class SubmissionsApiController < ApplicationController
         submissions = submissions.order(:user_id)
 
         submissions = submissions.preload(:group) if includes.include?("group")
+        submissions = submissions.preload(:quiz_submission) unless params[:exclude_response_fields]&.include?('preview_url')
+        submissions = submissions.preload(:attachment) unless params[:exclude_response_fields]&.include?('attachments')
 
         submissions = Api.paginate(submissions, self,
                                    polymorphic_url([:api_v1, @section || @context, @assignment, :submissions]))
@@ -465,6 +467,7 @@ class SubmissionsApiController < ApplicationController
       if params[:workflow_state].present?
         submissions_scope = submissions_scope.where(:workflow_state => params[:workflow_state])
       end
+      submissions_scope = submissions_scope.preload(:attachment) unless params[:exclude_response_fields]&.include?('attachments')
       submissions = submissions_scope.preload(:originality_reports, :quiz_submission).to_a
       bulk_load_attachments_and_previews(submissions)
       submissions_for_user = submissions.group_by(&:user_id)
@@ -523,6 +526,7 @@ class SubmissionsApiController < ApplicationController
       submissions = submissions.where("submitted_at>?", submitted_since_date) if submitted_since_date
       submissions = submissions.where("graded_at>?", graded_since_date) if graded_since_date
       submissions = submissions.preload(:user, :originality_reports, :quiz_submission)
+      submissions = submissions.preload(:attachment) unless params[:exclude_response_fields]&.include?('attachments')
 
       # this will speed up pagination for large collections when order_direction is asc
       if order_by == 'graded_at' && order_direction == 'asc'

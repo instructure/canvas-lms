@@ -91,7 +91,6 @@
     // this is for things like "nothing for the next week"
     small {
       display: block;
-      font-style: italic;
       @include fontSize(13px);
     }
     b, em, p {
@@ -112,7 +111,6 @@
       }
     }
     .more_link {
-      font-style: italic;
       padding-top: 6px;
     }
   }

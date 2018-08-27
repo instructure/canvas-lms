@@ -363,6 +363,7 @@ class AssignmentsController < ApplicationController
     return render_unauthorized_action if !toggle_value && !@assignment.grades_published?
 
     method = toggle_value ? :mute! : :unmute!
+    @assignment.updating_user = @current_user
 
     respond_to do |format|
       if @assignment && @assignment.send(method)
@@ -561,20 +562,19 @@ class AssignmentsController < ApplicationController
   protected
 
   def show_moderate_env
-    current_grader_id = @current_user.id
-    final_grader_id = @assignment.final_grader_id
     can_view_grader_identities = @assignment.can_view_other_grader_identities?(@current_user)
 
-    unless @assignment.can_view_other_grader_identities?(@current_user)
-      moderation_graders_by_id = @assignment.moderation_graders.index_by(&:user_id)
-
+    if can_view_grader_identities
+      current_grader_id = @current_user.id
+      final_grader_id = @assignment.final_grader_id
+    else
       # When the user cannot view other grader identities, the moderation page
       # will be loaded with grader data that has been anonymized. This includes
       # the current user's grader information. The relevant id must be provided
       # to the front end in this case.
 
-      current_grader_id = moderation_graders_by_id[current_grader_id]&.anonymous_id
-      final_grader_id = moderation_graders_by_id[final_grader_id]&.anonymous_id
+      current_grader_id = @assignment.grader_ids_to_anonymous_ids[@current_user.id.to_s]
+      final_grader_id = @assignment.grader_ids_to_anonymous_ids[@assignment.final_grader_id&.to_s]
     end
 
     {

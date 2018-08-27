@@ -133,6 +133,11 @@ Style/FrozenStringLiteralComment:
   Enabled: false
 Style/AsciiComments:
   Enabled: false
+Style/BlockDelimiters:
+  Enabled: true
+  Exclude:
+    - spec/**/*_spec.rb
+    - spec/shared_examples/**/*.rb
 
 # RSpec cops we don't care about
 RSpec/MessageSpies:

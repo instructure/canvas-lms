@@ -31,14 +31,14 @@ describe 'Moderated Grades API', type: :request do
       @assignment.update!(final_grader: @teacher)
       user_session(@teacher)
       raw_api_call(api_method, api_url, api_params, api_body_params)
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it 'is authorized when the user is an admin with the "select final grade" permission' do
       admin = account_admin_user(account: @course.root_account)
       user_session(admin)
       raw_api_call(api_method, api_url, api_params, api_body_params)
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it 'is unauthorized when the user is an admin without the "select final grade" permission' do
@@ -131,7 +131,7 @@ describe 'Moderated Grades API', type: :request do
       @assignment.update!(final_grader: @teacher)
       user_session(@teacher)
       json = api_call(:post, create_url, create_params, student_ids: [@student2.id])
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(json.size).to eq 1
       expect(json.first["id"]).to eq @student2.id
     end
@@ -140,7 +140,7 @@ describe 'Moderated Grades API', type: :request do
       @assignment.update!(final_grader: @teacher)
       user_session(@teacher)
       json = api_call(:post, create_url, create_params, student_ids: [@student1.id, @student2.id])
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(json.size).to eq 2
       json_student_ids = json.map { |user| user['id'] }
 

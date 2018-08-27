@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`can suppress the Show All 1`] = `
+<div>
+  <h2
+    className="todo-list-header"
+  >
+    <span
+      tabIndex="-1"
+    >
+      To Do
+    </span>
+  </h2>
+  <List
+    as="ul"
+    delimiter="none"
+    margin="none"
+    size="medium"
+    variant="unstyled"
+  />
+</div>
+`;

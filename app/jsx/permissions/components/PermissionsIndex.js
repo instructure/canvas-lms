@@ -114,7 +114,11 @@ export default class PermissionsIndex extends Component {
                 <TextInput
                   label={<ScreenReaderContent>{I18n.t('Search Permissions')}</ScreenReaderContent>}
                   placeholder={I18n.t('Search Permissions')}
-                  icon={() => <IconSearchLine />}
+                  icon={() => (
+                    <span disabled="true">
+                      <IconSearchLine focusable={false} />
+                    </span>
+                  )}
                   onChange={this.onSearchStringChange}
                   name="permission_search"
                 />

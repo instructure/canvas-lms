@@ -30,14 +30,61 @@ import 'jquery.ajaxJSON'
 
   const ProcessGradebookUpload = {
     upload (gradebook) {
-      if (gradebook != null && _.isArray(gradebook.assignments) && _.isArray(gradebook.students)) {
-        const createAssignmentsResponses = this.createAssignments(gradebook);
+      if (gradebook != null && (_.isArray(gradebook.assignments) || _.isArray(gradebook.custom_columns)) && _.isArray(gradebook.students)) {
+        if (gradebook.custom_columns) {
+          this.uploadCustomColumnData(gradebook);
+        }
 
+        const createAssignmentsResponses = this.createAssignments(gradebook);
         return $.when(...createAssignmentsResponses).then((...responses) => {
           this.uploadGradeData(gradebook, responses);
         });
       }
       return undefined;
+    },
+
+    uploadCustomColumnData (gradebook) {
+      const customColumnData = gradebook.students.reduce((accumulator, student) => {
+        const student_id = Number.parseInt(student.id, 10);
+        if (!(student_id in accumulator)) {
+          accumulator[student_id] = student.custom_column_data // eslint-disable-line no-param-reassign
+        }
+        return accumulator;
+      }, {});
+
+      if (!_.isEmpty(customColumnData)) {
+        this.parseCustomColumnData(customColumnData);
+      }
+
+      if (!gradebook.assignments.length) {
+        alert(successMessage); // eslint-disable-line no-alert
+        this.goToGradebook();
+      }
+    },
+
+    parseCustomColumnData (customColumnData) {
+      const data = [];
+      Object.keys(customColumnData).forEach(studentId => {
+        customColumnData[studentId].forEach((column) => {
+          data.push({
+            column_id: Number.parseInt(column.column_id, 10),
+            user_id: studentId,
+            content: column.new_content
+          })
+        });
+      })
+
+      this.submitCustomColumnData(data);
+      return data;
+    },
+
+    submitCustomColumnData (data) {
+      return $.ajaxJSON(ENV.bulk_update_custom_columns_path,
+        'PUT',
+        JSON.stringify({column_data: data}),
+        null,
+        null,
+        {contentType: 'application/json'});
     },
 
     createAssignments (gradebook) {

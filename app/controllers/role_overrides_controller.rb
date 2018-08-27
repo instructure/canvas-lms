@@ -278,6 +278,7 @@ class RoleOverridesController < ApplicationController
   #     read_forum                       -- [STADO] View discussions
   #     moderate_forum                   -- [sTADo] Moderate discussions (delete/edit others' posts, lock topics)
   #     post_to_forum                    -- [STADo] Post to discussions
+  #     create_forum                     -- [STADo] Create discussions
   #     read_announcements               -- [STADO] View announcements
   #     read_question_banks              -- [ TADo] View and link to question banks
   #     read_reports                     -- [ TAD ] View usage reports for the course
