@@ -17,25 +17,24 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/legacy_type_tester')
+require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
 
 describe Types::CoursePermissionsType do
   let_once(:course) { course_with_student(active_all: true); @course }
-
-  def view_all_grades(user)
-    loader = Loaders::CoursePermissionsLoader.new(
-      @course,
-      current_user: user, session: nil
-    )
-    GraphQL::Batch.batch {
-      Types::CoursePermissionsType.fields["viewAllGrades"]
-        .resolve(loader, nil, nil)
-    }
-  end
+  let(:course_type) { GraphQLTypeTester.new(course) }
 
   it "works" do
-    expect(view_all_grades(nil)).to eq false
-    expect(view_all_grades(@student)).to eq false
-    expect(view_all_grades(@teacher)).to eq true
+    expect(
+      course_type.resolve(
+        "permissions { viewAllGrades }",
+        current_user: @student
+      )
+    ).to eq false
+    expect(
+      course_type.resolve(
+        "permissions { viewAllGrades }",
+        current_user: @teacher
+      )
+    ).to eq true
   end
 end
