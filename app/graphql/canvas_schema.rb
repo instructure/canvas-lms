@@ -43,6 +43,8 @@ CanvasSchema = GraphQL::Schema.define do
     when GradingPeriod then Types::GradingPeriodType
     when ContextModule then Types::ModuleType
     when WikiPage then Types::PageType
+    when DiscussionTopic then Types::DiscussionType
+    when Quizzes::Quiz then Types::QuizType
     end
   }
 

@@ -17,14 +17,13 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/legacy_type_tester')
+require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
 
 describe Types::QuizType do
-  let_once(:quiz) { quiz_with_submission()}
-
-  let(:quiz_type) { LegacyTypeTester.new(Types::QuizType, quiz) }
+  let_once(:quiz) { quiz_model }
+  let(:quiz_type) { GraphQLTypeTester.new(quiz, current_user: @teacher) }
 
   it "works" do
-    expect(quiz_type._id).to eq quiz.id
+    expect(quiz_type.resolve("_id")).to eq quiz.id.to_s
   end
 end
