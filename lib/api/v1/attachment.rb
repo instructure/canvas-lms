@@ -296,7 +296,7 @@ module Api::V1::Attachment
             @attachment,
             :clone_url,
             {
-              n_strand: 'file_download',
+              n_strand: Attachment.clone_url_strand(params[:url]),
               preserve_method_args: true,
               priority: Delayed::HIGH_PRIORITY
             },
