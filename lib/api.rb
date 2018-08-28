@@ -383,7 +383,8 @@ module Api
     }
   end
 
-  PAGINATION_PARAMS = [:current, :next, :prev, :first, :last]
+  PAGINATION_PARAMS = [:current, :next, :prev, :first, :last].freeze
+  ESSENTIAL_PAGINATION_PARAMS = [:next].freeze
   EXCLUDE_IN_PAGINATION_LINKS = %w(page per_page access_token api_key)
   def self.build_links(base_url, opts={})
     links = build_links_hash(base_url, opts)
@@ -403,10 +404,19 @@ module Api
     qp = opts[:query_parameters] || {}
     qp = qp.with_indifferent_access.except(*EXCLUDE_IN_PAGINATION_LINKS)
     base_url += "#{qp.to_query}&" if qp.present?
-    PAGINATION_PARAMS.each_with_object({}) do |param, obj|
+    pagination_params(base_url).each_with_object({}) do |param, obj|
       if opts[param].present?
         obj[param] = "#{base_url}page=#{opts[param]}&per_page=#{opts[:per_page]}"
       end
+    end
+  end
+
+  def self.pagination_params(base_url)
+    if base_url.length > Setting.get('pagination_max_base_url_for_links', '1000').to_i
+      # to prevent Link headers from consuming too much of the 8KB Apache allows in response headers
+      ESSENTIAL_PAGINATION_PARAMS
+    else
+      PAGINATION_PARAMS
     end
   end
 
