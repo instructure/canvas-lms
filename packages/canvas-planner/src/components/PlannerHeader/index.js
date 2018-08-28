@@ -329,7 +329,7 @@ export class PlannerHeader extends Component {
     const verticalRoom = this.getPopupVerticalRoom();
 
     return (
-      <div className={styles.root}>
+      <div className={`${styles.root} PlannerHeader`}>
         {this.renderToday()}
         <Button
           variant="icon"

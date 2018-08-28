@@ -27,6 +27,6 @@ function mergeGradesIntoCourses (courses, action) {
 }
 
 export default handleActions({
-  INITIAL_OPTIONS: (state, action) => action.payload.courses,
+  INITIAL_OPTIONS: (state, action) => action.payload.env.STUDENT_PLANNER_COURSES,
   GOT_GRADES_SUCCESS: mergeGradesIntoCourses,
 }, []);

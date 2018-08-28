@@ -25,7 +25,6 @@ import { Provider } from 'react-redux';
 import PlannerApp from './components/PlannerApp';
 import PlannerHeader from './components/PlannerHeader';
 import ToDoSidebar from './components/ToDoSidebar';
-import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme';
 import i18n from './i18n';
 import configureStore from './store/configureStore';
 import {
@@ -36,17 +35,6 @@ import { registerScrollEvents } from './utilities/scrollUtils';
 import { initialize as initializeAlerts } from './utilities/alertUtils';
 import moment from 'moment-timezone';
 import {DynamicUiManager, DynamicUiProvider, specialFallbackFocusId} from './dynamic-ui';
-
-const defaultOptions = {
-  locale: 'en',
-  timeZone: moment.tz.guess(),
-  currentUser: {},
-  theme: 'canvas',
-  courses: [],
-  groups: [],
-  stickyOffset: 0,
-  stickyZIndex: 5,
-};
 
 let externalPlannerActive;
 const plannerActive = () => externalPlannerActive ? externalPlannerActive() : false;
@@ -75,139 +63,182 @@ function externalFocusableWrapper (externalFallbackFocusable) {
   };
 }
 
-export function render (element, options) {
-  // Using this pattern because default params don't merge objects
-  const opts = { ...defaultOptions, ...options };
-  i18n.init(opts.locale);
-  moment.locale(opts.locale);
-  moment.tz.setDefault(opts.timeZone);
-  dynamicUiManager.setStickyOffset(opts.stickyOffset);
-  dynamicUiManager.registerAnimatable(
-    'item', externalFocusableWrapper(options.externalFallbackFocusable), -1, [specialFallbackFocusId('item')]
-  );
+const defaultOptions = {
+  getActiveApp: () => '',
+  stickyZIndex: 3,
+};
+
+const defaultEnv = {};
+
+function mergeDefaultOptions (options) {
+  const newOpts = {...defaultOptions, ...options};
+  newOpts.env = {...defaultEnv, ...options.env};
+
+  // special handling for these env vars because sometimes they come in
+  // explicitly set to false instead of just not being defined in options.env
+  if (!newOpts.env.STUDENT_PLANNER_COURSES) newOpts.env.STUDENT_PLANNER_COURSES = [];
+  if (!newOpts.env.STUDENT_PLANNER_GROUPS) newOpts.env.STUDENT_PLANNER_GROUPS = [];
+  return newOpts;
+}
+
+function initializeCourseAndGroupColors (options) {
+  if (!options.env.PREFERENCES) return;
+  options.env.STUDENT_PLANNER_COURSES = options.env.STUDENT_PLANNER_COURSES.map(dc => ({
+    ...dc,
+    color: options.env.PREFERENCES.custom_colors[dc.assetString]
+  }));
+  options.env.STUDENT_PLANNER_GROUPS = options.env.STUDENT_PLANNER_GROUPS.map(dg => ({
+    ...dg,
+    color: options.env.PREFERENCES.custom_colors[dg.assetString] || '#666666'
+  }));
+}
+
+// You have to call this first, before you call loadPlannerDashboard or renderToDoSidebar
+// options: {
+// env: {                       <required: ENV from Canvas>
+//   MOMENT_LOCALE,             <required>
+//   TIMEZONE,                  <required>
+//   current_user: {            <required>
+//     id,
+//     display_name,
+//     avatar_image_url,
+//   }
+//   PREFERENCES: {             <optional>
+//     custom_colors,
+//   },
+//   STUDENT_PLANNER_COURSES,   <default: []>
+//   STUDENT_PLANNER_GROUPS,    <default: []>
+// }
+// flashError,                  <required>
+// flashMessage,                <required>
+// srFlashMessage,              <required>
+// externalFallbackFocusable,   <optional - element where focus goes when it should go before planner>
+// getActiveApp,                <optional - method to get the current dashboard>
+// changeDashboardView,         <optional - method to change the current dashboard>
+// forCourse,                   <optional - course id if this is a sidebar for a specific course page>
+let initializedOptions = null;
+export function initializePlanner (options) {
+  if (initializedOptions) throw new Error('initializePlanner may not be called more than once');
+
+  options = mergeDefaultOptions(options);
+
+  if (!(options.env.MOMENT_LOCALE && options.env.TIMEZONE)) {
+    throw new Error('env.MOMENT_LOCALE and env.TIMEZONE are required options for initializePlanner');
+  }
+
+  const {flashError, flashMessage, srFlashMessage} = options;
+  if (!(flashError && flashMessage && srFlashMessage)) {
+    throw new Error('flash message callbacks are required options for initializePlanner');
+  }
+
+  externalPlannerActive = () => options.getActiveApp() === 'planner';
+
+  i18n.init(options.env.MOMENT_LOCALE);
+  moment.locale(options.env.MOMENT_LOCALE);
+  moment.tz.setDefault(options.env.TIMEZONE);
+  initializeAlerts({
+    visualSuccessCallback: flashMessage,
+    visualErrorCallback: flashError,
+    srAlertCallback: srFlashMessage,
+  });
+
+  const stickyElement = document.getElementById('dashboard_header_container');
+  if (stickyElement) {
+    const stickyElementRect = stickyElement.getBoundingClientRect();
+    options.stickyOffset = stickyElementRect.bottom - stickyElementRect.top + 24;
+    dynamicUiManager.setStickyOffset(options.stickyOffset);
+  }
+
+  if (options.externalFallbackFocusable) {
+    dynamicUiManager.registerAnimatable(
+      'item', externalFocusableWrapper(options.externalFallbackFocusable), -1, [specialFallbackFocusId('item')]
+    );
+  }
+
+  initializeCourseAndGroupColors(options);
+
+  initializedOptions = options;
+  store.dispatch(initialOptions(options));
+}
+
+export function resetPlanner () {
+  initializedOptions = null;
+}
+
+function render (element) {
   registerScrollEvents({
     scrollIntoPast: handleScrollIntoPastAttempt,
     scrollIntoFuture: handleScrollIntoFutureAttempt,
     scrollPositionChange: pos => dynamicUiManager.handleScrollPositionChange(pos),
   });
-  if (!opts.flashAlertFunctions) {
-    throw new Error('You must provide callbacks to handle flash messages');
-  }
-  initializeAlerts(opts.flashAlertFunctions);
 
-  store.dispatch(initialOptions(opts));
-  store.dispatch(getPlannerItems(moment.tz(opts.timeZone).startOf('day')));
-
-  ReactDOM.render(applyTheme(
+  ReactDOM.render(
     <DynamicUiProvider manager={dynamicUiManager} >
       <Provider store={store}>
         <PlannerApp
           appRef={app => dynamicUiManager.setApp(app)}
-          stickyOffset={opts.stickyOffset}
-          changeDashboardView={opts.changeDashboardView}
+          stickyOffset={initializedOptions.stickyOffset}
+          changeDashboardView={initializedOptions.changeDashboardView}
           plannerActive={plannerActive}
-          currentUser={opts.currentUser}
+          currentUser={store.getState().currentUser}
           focusFallback={() => dynamicUiManager.focusFallback('item')}
         />
       </Provider>
-    </DynamicUiProvider>
-  , opts.theme), element);
+    </DynamicUiProvider>, element);
+
+  store.dispatch(getPlannerItems(moment.tz(initializedOptions.env.timeZone).startOf('day')));
 }
 
 // This method allows you to render the header items into a separate DOM node
-export function renderHeader (element, auxElement, options) {
+function renderHeader (element, auxElement) {
+  const ariaHideElement = document.getElementById('application');
+
   // Using this pattern because default params don't merge objects
-  const opts = { ...defaultOptions, ...options };
-  ReactDOM.render(applyTheme(
+  ReactDOM.render(
     <DynamicUiProvider manager={dynamicUiManager} >
       <Provider store={store}>
         <PlannerHeader
-          stickyZIndex={opts.stickyZIndex}
-          timeZone={opts.timeZone}
-          locale={opts.locale}
-          ariaHideElement={opts.ariaHideElement}
+          stickyZIndex={initializedOptions.stickyZIndex}
+          timeZone={initializedOptions.env.TIMEZONE}
+          locale={initializedOptions.env.MOMENT_LOCALE}
+          ariaHideElement={ariaHideElement}
           auxElement={auxElement}
         />
       </Provider>
-    </DynamicUiProvider>
-  , opts.theme), element);
+    </DynamicUiProvider>, element);
 }
 
 // This method allows you to render the To Do Sidebar into a separate DOM node
-export function renderToDoSidebar (element, options) {
+export function renderToDoSidebar (element) {
+  if (!initializedOptions) throw new Error('initializePlanner must be called before renderToDoSidebar');
+
+  const env = initializedOptions.env;
+
   ReactDOM.render(
     <Provider store={store}>
       <ToDoSidebar
-        courses={options.courses || window.ENV.STUDENT_PLANNER_COURSES}
-        timeZone={ENV.TIMEZONE}
-        locale={ENV.LOCALE}
-        changeDashboardView={options.changeDashboardView}
-        forCourse={options.forCourse}
+        courses={env.STUDENT_PLANNER_COURSES}
+        timeZone={env.TIMEZONE}
+        locale={env.MOMENT_LOCALE}
+        changeDashboardView={initializedOptions.changeDashboardView}
+        forCourse={initializedOptions.forCourse}
       />
     </Provider>
   , element);
 }
 
-function applyTheme (el, theme) {
-  return theme ? (
-    <ApplyTheme
-      theme={ApplyTheme.generateTheme(theme.key)}
-      immutable={theme.accessible}
-    >
-      {el}
-    </ApplyTheme>
-  ): el;
-}
+export function loadPlannerDashboard () {
+  if (!initializedOptions) throw new Error('initializePlanner must be called before loadPlannerDashboard');
 
-export default function loadPlannerDashboard ({changeDashboardView, getActiveApp, flashError, flashMessage, srFlashMessage, externalFallbackFocusable, env}) {
   const element = document.getElementById('dashboard-planner');
   const headerElement = document.getElementById('dashboard-planner-header');
   const headerAuxElement = document.getElementById('dashboard-planner-header-aux');
-  const stickyElement = document.getElementById('dashboard_header_container');
-  const courses = env.STUDENT_PLANNER_COURSES.map(dc => ({
-    ...dc,
-    color: env.PREFERENCES.custom_colors[dc.assetString]
-  }));
-
-  const groups = env.STUDENT_PLANNER_GROUPS ?
-    env.STUDENT_PLANNER_GROUPS.map(dg => ({
-      ...dg,
-      color: env.PREFERENCES.custom_colors[dg.assetString] || '#666666'
-    })) : [];
-
-  const stickyElementRect = stickyElement.getBoundingClientRect();
-  const stickyOffset = stickyElementRect.bottom - stickyElementRect.top + 24;
-  externalPlannerActive = () => getActiveApp() === 'planner';
-
-  const options = {
-    flashAlertFunctions: {
-      visualErrorCallback: flashError,
-      visualSuccessCallback: flashMessage,
-      srAlertCallback: srFlashMessage
-    },
-    externalFallbackFocusable,
-    locale: env.MOMENT_LOCALE,
-    timeZone: env.TIMEZONE,
-    currentUser: {
-      id: env.current_user.id,
-      displayName: env.current_user.display_name,
-      avatarUrl: env.current_user.avatar_is_fallback ? null : env.current_user.avatar_image_url,
-      color: env.PREFERENCES.custom_colors[`user_${env.current_user.id}`]
-    },
-    ariaHideElement: document.getElementById('application'),
-    theme: '',
-    stickyZIndex: 3,
-    stickyOffset: stickyOffset,
-    courses: courses,
-    groups: groups,
-    changeDashboardView,
-  };
 
   if (element) {
-    render(element, options);
+    render(element);
   }
 
   if (headerElement) {
-    renderHeader(headerElement, headerAuxElement, options);
+    renderHeader(headerElement, headerAuxElement);
   }
 }

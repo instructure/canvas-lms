@@ -24,6 +24,7 @@ import moxios from 'moxios'
 import sinon from 'sinon'
 import $ from 'jquery'
 import DashboardHeader from 'jsx/dashboard/DashboardHeader'
+import { resetPlanner } from 'canvas-planner'
 
 const container = document.getElementById('fixtures')
 
@@ -39,6 +40,7 @@ const FakeDashboard = function (props) {
         planner_enabled={props.planner_enabled}
         dashboard_view={props.dashboard_view}
         showTodoList={showTodoList}
+        env={window.ENV}
       />
       <div
         id="flashalert_message_holder"
@@ -83,6 +85,9 @@ let plannerStub
 QUnit.module('Dashboard Header', {
   setup () {
     window.ENV = {
+      MOMENT_LOCALE: 'en',
+      TIMEZONE: 'UTC',
+      current_user: {},
       PREFERENCES: {},
       STUDENT_PLANNER_COURSES: [],
     }
@@ -91,6 +96,7 @@ QUnit.module('Dashboard Header', {
   },
 
   teardown () {
+    resetPlanner()
     moxios.uninstall()
     plannerStub.restore()
     ReactDOM.unmountComponentAtNode(container)
@@ -99,13 +105,14 @@ QUnit.module('Dashboard Header', {
 
 test('it renders', () => {
   const dashboardHeader = shallow(
-    <DashboardHeader planner_enabled planner_selected />
+    <DashboardHeader planner_enabled planner_selected env={window.ENV} />
   )
   ok(dashboardHeader)
 })
 
 test('it waits for the erb html to be injected before rendering the ToDoSidebar', assert => {
   const done = assert.async()
+  ENV.STUDENT_PLANNER_ENABLED = true
   ENV.DASHBOARD_SIDEBAR_URL = 'fake-dashboard-sidebar-url'
   const $fakeRightSide = $('<div id="right-side">').appendTo(document.body)
   const fakeServerResponse = Promise.resolve(`

@@ -20,7 +20,7 @@ import React from 'react';
 import I18n from 'i18n!dashboard';
 import axios from 'axios';
 import { bool, func, string, object } from 'prop-types';
-import loadPlannerDashboard, { renderToDoSidebar } from 'canvas-planner';
+import { initializePlanner, loadPlannerDashboard, renderToDoSidebar } from 'canvas-planner';
 import { showFlashAlert, showFlashError } from '../shared/FlashAlert'
 import DashboardOptionsMenu from '../dashboard_card/DashboardOptionsMenu';
 import loadCardDashboard from '../bundles/dashboard_card'
@@ -52,6 +52,21 @@ export default class DashboardHeader extends React.Component {
     showTodoList
   }
 
+  constructor (...args) {
+    super(...args)
+    if (ENV.STUDENT_PLANNER_ENABLED) {
+      initializePlanner({
+        changeDashboardView: this.changeDashboard,
+        getActiveApp: this.getActiveApp,
+        flashError: (message) => showFlashAlert({message, type: 'error'}),
+        flashMessage: (message) => showFlashAlert({message, type: 'info'}),
+        srFlashMessage: this.props.screenReaderFlashMessage,
+        externalFallbackFocusable: this.menuButtonFocusable,
+        env: this.props.env,
+      })
+    }
+  }
+
   state = {
     currentDashboard: ['cards', 'activity', this.props.planner_enabled && 'planner']
       .filter(Boolean)
@@ -76,15 +91,7 @@ export default class DashboardHeader extends React.Component {
   }
 
   loadPlannerComponent () {
-    loadPlannerDashboard({
-      changeDashboardView: this.changeDashboard,
-      getActiveApp: this.getActiveApp,
-      flashError: (message) => showFlashAlert({message, type: 'error'}),
-      flashMessage: (message) => showFlashAlert({message, type: 'info'}),
-      srFlashMessage: this.props.screenReaderFlashMessage,
-      externalFallbackFocusable: this.menuButtonFocusable,
-      env: this.props.env,
-    })
+    loadPlannerDashboard();
   }
 
   loadCardDashboard () {
@@ -122,7 +129,7 @@ export default class DashboardHeader extends React.Component {
 
     // also load the sidebar if we need to (no sidebar is shown in planner dashboard)
     if ((newView !== 'planner') && !this.sidebarHasLoaded) {
-      this.props.showTodoList(this.changeDashboard)
+      this.props.showTodoList()
       this.sidebarHasLoaded = true
     }
 
@@ -196,7 +203,7 @@ export default class DashboardHeader extends React.Component {
 
 // extract this out to a property so tests can override it and not have to mock
 // out the timers in every single test.
-function showTodoList(changeDashboardView) {
+function showTodoList () {
   if (ENV.DASHBOARD_SIDEBAR_URL) {
     const rightSide = $('#right-side')
     const promiseToGetNewCourseForm = import('compiled/util/newCourseForm')
@@ -210,7 +217,7 @@ function showTodoList(changeDashboardView) {
         // the injected html has a .Sidebar__TodoListContainer element in it,
         // render the canvas-planner ToDo list into it
         const container = document.querySelector('.Sidebar__TodoListContainer')
-        if (container) renderToDoSidebar(container, { changeDashboardView })
+        if (container) renderToDoSidebar(container)
       })
     )
   }

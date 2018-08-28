@@ -1,7 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`new activity button does not show when there is no new activity 1`] = `
-<div>
+<div
+  className="undefined PlannerHeader"
+>
   <Button
     as="button"
     buttonRef={[Function]}
@@ -283,7 +285,9 @@ exports[`new activity button does not show when there is no new activity 1`] = `
 `;
 
 exports[`new activity button shows when there is new activity 1`] = `
-<div>
+<div
+  className="undefined PlannerHeader"
+>
   <Button
     as="button"
     buttonRef={[Function]}
@@ -565,7 +569,9 @@ exports[`new activity button shows when there is new activity 1`] = `
 `;
 
 exports[`renders the base component correctly with buttons and trays 1`] = `
-<div>
+<div
+  className="undefined PlannerHeader"
+>
   <Button
     as="button"
     buttonRef={[Function]}

@@ -28,15 +28,25 @@ import savePlannerItem from './save-item-reducer';
 import sidebar from './sidebar-reducer';
 
 const locale = handleAction('INITIAL_OPTIONS', (state, action) => {
-  return action.payload.locale;
+  return action.payload.env.MOMENT_LOCALE;
 }, 'en');
 
 const timeZone = handleAction('INITIAL_OPTIONS', (state, action) => {
-  return action.payload.timeZone;
+  return action.payload.env.TIMEZONE;
 }, 'UTC');
 
 const currentUser = handleAction('INITIAL_OPTIONS', (state, action) => {
-  return action.payload.currentUser;
+  const env = action.payload.env;
+  const user = env.current_user;
+  const userColor = env.PREFERENCES &&
+    env.PREFERENCES.custom_colors &&
+    env.PREFERENCES.custom_colors[`user_${user.id}`];
+  return {
+    id: user.id,
+    displayName: user.display_name,
+    avatarUrl: env.current_user.avatar_is_fallback ? null : env.current_user.avatar_image_url,
+    color: userColor,
+  };
 }, {});
 
 const firstNewActivityDate = handleAction('FOUND_FIRST_NEW_ACTIVITY_DATE', (state, action) => {
