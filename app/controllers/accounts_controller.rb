@@ -664,7 +664,9 @@ class AccountsController < ApplicationController
       @courses.each {|c| c.student_count = student_counts[c.id] || 0 }
     end
 
-    render :json => @courses.map { |c| course_json(c, @current_user, session, includes, nil) }
+    all_precalculated_permissions = @current_user.precalculate_permissions_for_courses(@courses, [:read_sis, :manage_sis])
+    render :json => @courses.map { |c| course_json(c, @current_user, session, includes, nil,
+      precalculated_permissions: all_precalculated_permissions&.dig(c.global_id)) }
   end
 
   # Delegated to by the update action (when the request is an api_request?)

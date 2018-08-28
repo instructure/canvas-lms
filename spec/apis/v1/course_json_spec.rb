@@ -203,7 +203,8 @@ module Api
       end
 
       describe '#set_sis_course_id' do
-        let(:sis_course) { double(grants_any_right?: @has_right, sis_source_id: @sis_id, sis_batch_id: @batch, root_account: root_account) }
+        let(:sis_course) { double(grants_right?: @has_right, sis_source_id: @sis_id, sis_batch_id: @batch, root_account: root_account) }
+        let(:sis_course_json) { CourseJson.new( sis_course, user, includes, [] ) }
         let(:root_account) { double(grants_right?: @has_right ) }
         let(:hash) { Hash.new }
 
@@ -217,7 +218,7 @@ module Api
           before { @has_right = true }
 
           it 'adds sis the key-value pair to the hash' do
-            course_json.set_sis_course_id( hash, sis_course, user )
+            sis_course_json.set_sis_course_id(hash)
             expect(hash['sis_course_id']).to eq 1357
           end
 
@@ -225,7 +226,7 @@ module Api
             before do
               @sis_id = nil
               @batch = nil
-              course_json.set_sis_course_id( hash, sis_course, user )
+              sis_course_json.set_sis_course_id(hash)
             end
 
             it 'allows the nil value to go into the has' do
@@ -233,14 +234,22 @@ module Api
             end
 
             it 'does not get cleared out before translation to json' do
-              expect(course_json.clear_unneeded_fields( hash )).to eq({ 'sis_course_id' => nil, 'sis_import_id' => nil})
+              expect(sis_course_json.clear_unneeded_fields( hash )).to eq({ 'sis_course_id' => nil, 'sis_import_id' => nil})
             end
           end
         end
 
         it 'doesnt add the sis_course_id key at all if the rights are NOT present' do
-          course_json.set_sis_course_id( hash, sis_course, user)
+          sis_course_json.set_sis_course_id(hash)
           expect(hash).to eq({})
+        end
+
+        it 'uses precalculated permissions if available' do
+          precalculated_permissions = {:read_sis => false, :manage_sis => true}
+          course_json_with_perms = CourseJson.new( sis_course, user, includes, [], precalculated_permissions: precalculated_permissions)
+          expect(sis_course).to_not receive(:grants_right?)
+          course_json_with_perms.set_sis_course_id(hash)
+          expect(hash['sis_course_id']).to eq 1357
         end
       end
 
