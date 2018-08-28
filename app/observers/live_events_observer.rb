@@ -99,7 +99,7 @@ class LiveEventsObserver < ActiveRecord::Observer
     when ContextModule
       Canvas::LiveEvents.module_updated(obj)
     when ContextModuleProgression
-      if changes["completed_at"] && CourseProgress.new(obj.context_module.course, obj.user).completed?
+      if changes["completed_at"] && CourseProgress.new(obj.context_module.course, obj.user, read_only: true).completed?
         Canvas::LiveEvents.course_completed(obj)
       end
     when ContentTag

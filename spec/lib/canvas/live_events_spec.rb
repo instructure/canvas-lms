@@ -866,22 +866,20 @@ describe Canvas::LiveEvents do
 
   describe '.course_completed' do
     it 'should trigger a course completed live event' do
-      Timecop.freeze(Time.zone.now) do
-        course = course_model
-        user = user_model
-        context_module = course.context_modules.create!
-        context_module_progression = context_module.context_module_progressions.create!(user_id: user.id, workflow_state: 'completed')
+      course = course_model
+      user = user_model
+      context_module = course.context_modules.create!
+      context_module_progression = context_module.context_module_progressions.create!(user_id: user.id, workflow_state: 'completed')
 
-        expected_event_body = {
-          course_id: course.id.to_s,
-          user_id: user.id.to_s,
-          completed_at: Time.zone.now
-        }
+      expected_event_body = {
+        progress: CourseProgress.new(course, user, read_only: true).to_json,
+        user: { id: user.id.to_s, name: user.name, email: user.email },
+        course: { id: course.id.to_s, name: course.name }
+      }
 
-        expect_event('course_completed', expected_event_body).once
+      expect_event('course_completed', expected_event_body).once
 
-        Canvas::LiveEvents.course_completed(context_module_progression)
-      end
+      Canvas::LiveEvents.course_completed(context_module_progression)
     end
   end
 end
