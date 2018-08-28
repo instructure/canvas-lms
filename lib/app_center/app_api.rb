@@ -136,11 +136,9 @@ module AppCenter
     def app_center_token_by_context
       context = @context.is_a?(Account) ? @context : @context.account
 
-      if context.settings[:app_center_access_token].present?
-        context.calculate_inherited_setting(:app_center_access_token)[:value]
-      else
-        @app_center.settings['token']
-      end
+      context.settings[:app_center_access_token].presence ||
+      context.calculate_inherited_setting(:app_center_access_token)[:value] ||
+      @app_center.settings['token']
     end
   end
 end
