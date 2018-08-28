@@ -384,7 +384,7 @@ module Api
   end
 
   PAGINATION_PARAMS = [:current, :next, :prev, :first, :last].freeze
-  ESSENTIAL_PAGINATION_PARAMS = [:next].freeze
+  LINK_PRIORITY = [:next, :last, :prev, :current, :first].freeze
   EXCLUDE_IN_PAGINATION_LINKS = %w(page per_page access_token api_key)
   def self.build_links(base_url, opts={})
     links = build_links_hash(base_url, opts)
@@ -404,9 +404,17 @@ module Api
     qp = opts[:query_parameters] || {}
     qp = qp.with_indifferent_access.except(*EXCLUDE_IN_PAGINATION_LINKS)
     base_url += "#{qp.to_query}&" if qp.present?
-    pagination_params(base_url).each_with_object({}) do |param, obj|
+
+    # Apache limits the HTTP response headers to 8KB total; with lots of query parameters, link headers can exceed this
+    # so prioritize the links we include and don't exceed (by default) 6KB in total
+    max_link_headers_size = Setting.get('pagination_max_link_headers_size', '6144').to_i
+    link_headers_size = 0
+    LINK_PRIORITY.each_with_object({}) do |param, obj|
       if opts[param].present?
-        obj[param] = "#{base_url}page=#{opts[param]}&per_page=#{opts[:per_page]}"
+        link = "#{base_url}page=#{opts[param]}&per_page=#{opts[:per_page]}"
+        return obj if link_headers_size + link.size > max_link_headers_size
+        link_headers_size += link.size
+        obj[param] = link
       end
     end
   end
