@@ -1913,6 +1913,24 @@ describe Attachment do
     end
   end
 
+  describe ".clone_url_strand" do
+    it "falls back for invalid URLs" do
+      expect(Attachment.clone_url_strand("")).to eq "file_download"
+    end
+
+    it "gives the host for 'local' host" do
+      expect(Attachment.clone_url_strand("http://localhost:9090/image.jpg")).to eq ["file_download", "localhost"]
+    end
+
+    it "gives the full host for simple domain" do
+      expect(Attachment.clone_url_strand("http://google.com/image.jpg")).to eq ["file_download", "google.com"]
+    end
+
+    it "strips subdomains" do
+      expect(Attachment.clone_url_strand("http://cdn.google.com/image.jpg")).to eq ["file_download", "google.com"]
+    end
+  end
+
   describe ".clone_url_as_attachment" do
     it "should reject invalid urls" do
       expect { Attachment.clone_url_as_attachment("ftp://some/stuff") }.to raise_error(ArgumentError)

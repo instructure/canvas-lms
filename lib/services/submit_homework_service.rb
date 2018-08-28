@@ -98,7 +98,7 @@ module Services
       def submit_job(progress, attachment, eula_agreement_timestamp, clone_url_executor)
         SubmitWorker.new(progress.id, attachment.id, eula_agreement_timestamp, clone_url_executor).
           tap do |worker|
-            Delayed::Job.enqueue(worker, n_strand: 'file_download')
+            Delayed::Job.enqueue(worker, n_strand: Attachment.clone_url_strand(clone_url_executor.url))
           end
       end
     end
