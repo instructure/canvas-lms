@@ -21,10 +21,23 @@ class Setting < ActiveRecord::Base
 
   self.shard_category = :unsharded if self.respond_to?(:shard_category=)
 
+  def self.skip_cache
+    @skip_cache, old_enabled = true, @skip_cache
+    yield
+  ensure
+    @skip_cache = old_enabled
+  end
+
   def self.get(name, default, cache_options: nil)
     begin
       cache.fetch(name, cache_options) do
-        Setting.where(name: name).first&.value || default&.to_s
+        if @skip_cache
+          Setting.where(name: name).first&.value || default&.to_s
+        else
+          MultiCache.fetch(["settings", name], cache_options) do
+            Setting.where(name: name).first&.value || default&.to_s
+          end
+        end
       end
     rescue ActiveRecord::StatementInvalid, ActiveRecord::ConnectionNotEstablished => e
       # the db may not exist yet
@@ -39,6 +52,7 @@ class Setting < ActiveRecord::Base
     s = Setting.where(name: name).first_or_initialize
     s.value = value.try(:to_s)
     s.save!
+    MultiCache.delete(["settings", name])
   end
 
   def self.get_or_set(name, new_val)
@@ -58,5 +72,6 @@ class Setting < ActiveRecord::Base
   def self.remove(name)
     cache.delete(name)
     Setting.where(name: name).delete_all
+    MultiCache.delete(["settings", name])
   end
 end
