@@ -23,16 +23,15 @@ module Lti
     def initialize(account)
       @account = account
     end
-    
 
     def cache_key
-      Rails.cache.fetch([@account, CACHE_KEY].cache_key) { SecureRandom.uuid }
+      RequestCache.cache("account_navigation_cache_key", @account) do
+        Rails.cache.fetch([@account, CACHE_KEY].cache_key) { SecureRandom.uuid }
+      end
     end
 
     def invalidate_cache_key
       Rails.cache.delete([@account, CACHE_KEY].cache_key)
     end
-
-
   end
 end
