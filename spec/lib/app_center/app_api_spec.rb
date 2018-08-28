@@ -158,57 +158,78 @@ describe AppCenter::AppApi do
          ]
       }
     end
+    let(:app_center_id) { 'pr_youtube' }
+    let(:config_settings) { { custom_param: 'custom_value' } }
+    let(:sub_account) { Account.create!(parent_account: @account, name: 'sub_account') }
+    let(:sub_api) { AppCenter::AppApi.new(sub_account) }
+    let(:get_app_config_url) { api.get_app_config_url(app_center_id, config_settings) }
+    let(:get_sub_app_config_url) { sub_api.get_app_config_url(app_center_id, config_settings) }
+
 
     it 'gets the details of the specified app' do
-      allow(api).to receive(:fetch_app_center_response).and_return(app_center_response)
-      app_center_id = 'pr_youtube'
       config_settings = {}
+
+      allow(api).to receive(:fetch_app_center_response).and_return(app_center_response)
+
       url = api.get_app_config_url(app_center_id, config_settings)
       expect(url).to eq app_center_response['config_xml_url']
     end
 
     it 'appends config settings to an existing query string' do
       allow(api).to receive(:fetch_app_center_response).and_return(app_center_response)
-      app_center_id = 'pr_youtube'
-      config_settings = {custom_param: 'custom_value'}
-      url = api.get_app_config_url(app_center_id, config_settings)
-      expect(url).to eq "#{app_center_response['config_xml_url']}&custom_param=custom_value"
+
+      expect(get_app_config_url).to eq "#{app_center_response['config_xml_url']}&custom_param=custom_value"
     end
 
     it 'creates a query string populated with config settings' do
       app_center_response['config_xml_url'] = "https://www.edu-apps.org/lti_public_resources/config.xml"
       allow(api).to receive(:fetch_app_center_response).and_return(app_center_response)
-      app_center_id = 'pr_youtube'
-      config_settings = {custom_param: 'custom_value'}
-      url = api.get_app_config_url(app_center_id, config_settings)
-      expect(url).to eq "#{app_center_response['config_xml_url']}?custom_param=custom_value"
+
+      expect(get_app_config_url).to eq "#{app_center_response['config_xml_url']}?custom_param=custom_value"
     end
 
     it 'returns nil if app center id is invalid' do
       app_center_response = ""
+
       allow(api).to receive(:fetch_app_center_response).and_return(app_center_response)
-      app_center_id = 'pr_youtube'
-      config_settings = {custom_param: 'custom_value'}
-      url = api.get_app_config_url(app_center_id, config_settings)
-      expect(url).to be_nil
+
+      expect(get_app_config_url).to be_nil
     end
 
     it 'sends the app center token' do
       endpoint = "/api/v1/lti_apps/pr_youtube?access_token=#{api.app_center.settings['token']}"
+
       allow(api).to receive(:fetch_app_center_response).with(endpoint, 300, 1, 1).and_return(app_center_response)
-      app_center_id = 'pr_youtube'
-      config_settings = {custom_param: 'custom_value'}
-      url = api.get_app_config_url(app_center_id, config_settings)
-      expect(url).to eq "#{app_center_response['config_xml_url']}&custom_param=custom_value"
+
+      expect(get_app_config_url).to eq "#{app_center_response['config_xml_url']}&custom_param=custom_value"
     end
 
-    it 'uses the correct app center token by context if set' do
+    it 'uses the current context app center token if set' do
       @account.settings[:app_center_access_token] = 'account_token'
-      app_center_id = 'pr_youtube'
-      config_settings = {custom_param: 'custom_value'}
       endpoint = "/api/v1/lti_apps/pr_youtube?access_token=account_token"
+
       expect(api).to receive(:fetch_app_center_response).with(endpoint, 5.minutes, 1, 1).and_return(app_center_response)
-      api.get_app_config_url(app_center_id, config_settings)
+      get_app_config_url
+    end
+
+    it 'uses the inherited access token if not set at current context' do
+      sub_account.settings[:app_center_access_token] = nil
+      @account.settings[:app_center_access_token] = 'root_account_token'
+      endpoint = "/api/v1/lti_apps/pr_youtube?access_token=root_account_token"
+
+      allow_any_instance_of(Account).to receive(:calculate_inherited_setting).and_return({locked: false, value: 'root_account_token'})
+
+      expect(sub_api).to receive(:fetch_app_center_response).with(endpoint, 5.minutes, 1, 1).and_return(app_center_response)
+      get_sub_app_config_url
+    end
+
+    it 'defaults to the plugin setting access token if no current context token is set' do
+      sub_account.settings[:app_center_access_token] = nil
+      @account.settings[:app_center_access_token] = nil
+      endpoint = "/api/v1/lti_apps/pr_youtube?access_token=ABCDEFG1234567"
+
+      expect(sub_api).to receive(:fetch_app_center_response).with(endpoint, 5.minutes, 1, 1).and_return(app_center_response)
+      get_sub_app_config_url
     end
   end
 
