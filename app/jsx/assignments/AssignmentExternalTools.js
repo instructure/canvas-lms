@@ -82,7 +82,7 @@ class AssignmentExternalTools extends React.Component {
         });
       }, self),
       error(_xhr) {
-        $.flashError(I18n.t('Error retrieving assignment edit tools'));
+        $.flashError(I18n.t('Error retrieving assignment external tools'));
       }
     });
   }
@@ -92,9 +92,9 @@ class AssignmentExternalTools extends React.Component {
   }
 
   getLaunch(tool) {
-    const url = tool.placements.assignment_edit.url
+    const url = tool.placements[this.props.placement].url
 
-    let query = `?borderless=true&url=${encodeURIComponent(url)}&placement=assignment_edit`;
+    let query = `?borderless=true&url=${encodeURIComponent(url)}&placement=${this.props.placement}`;
     if (this.props.assignmentId) {
       query += `&assignment_id=${this.props.assignmentId}`
     }
@@ -130,12 +130,12 @@ class AssignmentExternalTools extends React.Component {
   renderTool(tool) {
     const styles = {}
     $.extend(styles, this.state.iframeStyle)
-    if (tool.placements.assignment_edit.launch_height) {
-      styles.height = tool.placements.assignment_edit.launch_height
+    if (tool.placements[this.props.placement].launch_height) {
+      styles.height = tool.placements[this.props.placement].launch_height
       styles.minHeight = 'unset'
     }
-    if (tool.placements.assignment_edit.launch_width) {
-      styles.width = tool.placements.assignment_edit.launch_width
+    if (tool.placements[this.props.placement].launch_width) {
+      styles.width = tool.placements[this.props.placement].launch_width
     }
     return(
       <iframe

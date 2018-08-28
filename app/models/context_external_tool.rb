@@ -562,6 +562,9 @@ class ContextExternalTool < ActiveRecord::Base
       scope = ContextExternalTool.shard(context.shard).polymorphic_where(context: contexts).active
       scope = scope.placements(*placements)
       scope = scope.selectable if Canvas::Plugin.value_to_boolean(options[:selectable])
+      if Canvas::Plugin.value_to_boolean(options[:only_visible])
+        scope = scope.visible(options[:current_user], context, options[:session], options[:visibility_placements], scope)
+      end
       scope.order(ContextExternalTool.best_unicode_collation_key('context_external_tools.name')).order(Arel.sql('context_external_tools.id'))
     end
   end
@@ -635,6 +638,32 @@ class ContextExternalTool < ActiveRecord::Base
   }
 
   scope :selectable, lambda { where("context_external_tools.not_selectable IS NOT TRUE") }
+
+  scope :visible, lambda { |user, context, session, placements, current_scope=ContextExternalTool.all|
+    if context.grants_right?(user, session, :read_as_admin)
+      all
+    elsif !placements
+      none
+    else
+      allowed_visibility = ['public']
+      allowed_visibility.push('members') if context.grants_any_right?(user, session, :participate_as_student, :read_as_admin)
+      allowed_visibility.push('admins') if context.grants_right?(user, session, :read_as_admin)
+      # To get at the visibility setting for each tool we need to use active record.  We will limit this to just the candidate tools using the current scope.
+      valid_tools = current_scope.select{|cet|
+        include_tool = false
+        placements.each do |placement|
+          tool_settings = cet.settings.with_indifferent_access
+          # The tool must have no visibility settings, or else a visibility threshold met by the current user.
+          if tool_settings[placement] && (!tool_settings[placement][:visibility] || allowed_visibility.include?(tool_settings[placement][:visibility]))
+            include_tool = true
+          end
+          break if include_tool
+        end
+        include_tool
+      }.pluck(:id)
+      where(id: valid_tools)
+    end
+  }
 
   def self.find_for(id, context, type, raise_error=true)
     id = id[Api::ID_REGEX] if id.is_a?(String)

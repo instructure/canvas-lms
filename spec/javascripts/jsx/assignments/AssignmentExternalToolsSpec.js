@@ -38,6 +38,13 @@ QUnit.module('AssignmentExternalTools', hooks => {
             message_type: 'basic-lti-launch-request',
             url: 'https://lti-tool-provider-example.herokuapp.com/messages/blti',
             title: 'assignment_edit Text'
+          },
+          assignment_view: {
+            message_type: 'basic-lti-launch-request',
+            url: 'https://lti-tool-provider-example.herokuapp.com/messages/blti',
+            title: 'assignment_view Text',
+            launch_width: 600,
+            launch_height: 500
           }
         }
       },
@@ -51,6 +58,11 @@ QUnit.module('AssignmentExternalTools', hooks => {
           assignment_edit: {
             message_type: 'basic-lti-launch-request',
             url: 'http://my-lti.docker/course-navigation',
+            title: 'My LTI'
+          },
+          assignment_view: {
+            message_type: 'basic-lti-launch-request',
+            url: 'http://my-lti.docker/assignment-view',
             title: 'My LTI'
           }
         }
@@ -195,6 +207,34 @@ QUnit.module('AssignmentExternalTools', hooks => {
     equal(wrapper.state().beforeExternalContentAlertClass, 'screenreader-only')
     equal(wrapper.state().afterExternalContentAlertClass, 'screenreader-only')
     deepEqual(wrapper.state().iframeStyle, {})
+  })
+
+  test("it renders multiple iframes", () => {
+    wrapper = mount(
+      <AssignmentExternalTools.configTools
+        placement="assignment_view"
+        courseId={1}
+        assignmentId={1}
+      />
+    )
+    wrapper.setState({tools: toolDefinitions})
+    equal(wrapper.find('.tool_launch').length, 2)
+  })
+
+  test('it sets correct placement in launch url', () => {
+    wrapper = mount(
+      <AssignmentExternalTools.configTools
+        placement="assignment_view"
+        courseId={1}
+        assignmentId={1}
+      />
+    );
+    const tool = toolDefinitions[0]
+    const correctUrl = `${'/courses/1/external_tools/retrieve?borderless=true&' +
+                       'url=https%3A%2F%2Flti-tool-provider-example.herokuapp.com%2Fmessages%2Fblti&' +
+                       'placement=assignment_view&assignment_id=1'}`
+    const computedUrl = wrapper.instance().getLaunch(tool)
+    equal(computedUrl, correctUrl);
   })
 
 })

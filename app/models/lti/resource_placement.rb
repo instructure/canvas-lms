@@ -22,6 +22,7 @@ module Lti
     ACCOUNT_NAVIGATION = 'account_navigation'
     ASSIGNMENT_EDIT = 'assignment_edit'
     ASSIGNMENT_SELECTION = 'assignment_selection'
+    ASSIGNMENT_VIEW = 'assignment_view'
     COURSE_NAVIGATION = 'course_navigation'
     LINK_SELECTION = 'link_selection'
     POST_GRADES = 'post_grades'
@@ -37,6 +38,7 @@ module Lti
                   :assignment_edit,
                   :assignment_menu,
                   :assignment_selection,
+                  :assignment_view,
                   :collaboration,
                   :course_assignments_menu,
                   :course_home_sub_navigation,
@@ -61,6 +63,7 @@ module Lti
       'Canvas.placements.accountNavigation' => ACCOUNT_NAVIGATION,
       'Canvas.placements.assignmentEdit' => ASSIGNMENT_EDIT,
       'Canvas.placements.assignmentSelection' => ASSIGNMENT_SELECTION,
+      'Canvas.placements.assignmentView' => ASSIGNMENT_VIEW,
       'Canvas.placements.courseNavigation' => COURSE_NAVIGATION,
       'Canvas.placements.linkSelection' => LINK_SELECTION,
       'Canvas.placements.postGrades' => POST_GRADES,

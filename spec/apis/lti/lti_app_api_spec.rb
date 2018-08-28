@@ -54,13 +54,88 @@ module Lti
         expect(json.detect {|j| j['definition_type'] == @external_tool.class.name && j['definition_id'] == @external_tool.id}).not_to be_nil
       end
 
-      it 'returns unauthorized for a student' do
+      it 'returns authorized for a student but with no results when no placement is specified' do
         course_with_student(active_all: true, user: user_with_pseudonym, account: account)
 
-        api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
           {controller: 'lti/lti_apps', action: 'launch_definitions', format: 'json', course_id: @course.id.to_s})
 
-        expect(response.status).to eq 401
+        expect(response.status).to eq 200
+        expect(json.count).to eq 0
+      end
+
+      it 'student can not get definition with admin visibility' do
+        course_with_student(active_all: true, user: user_with_pseudonym, account: account)
+        resource_tool = new_valid_external_tool(account, true)
+        resource_tool.settings[:resource_selection][:visibility] = 'admins'
+        resource_tool.save!
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
+          {controller: 'lti/lti_apps', action: 'launch_definitions', format: 'json', course_id: @course.id.to_s, placements: %w(resource_selection)})
+
+        expect(response.status).to eq 200
+        expect(json.count).to eq 0
+      end
+
+      it 'student can get definition with member visibility' do
+        course_with_student(active_all: true, user: user_with_pseudonym, account: account)
+        resource_tool = new_valid_external_tool(account, true)
+        resource_tool.settings[:resource_selection][:visibility] = 'members'
+        resource_tool.save!
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
+          {controller: 'lti/lti_apps', action: 'launch_definitions', format: 'json', course_id: @course.id.to_s, placements: %w(resource_selection)})
+
+        expect(response.status).to eq 200
+        expect(json.count).to eq 1
+        expect(json.detect {|j| j['definition_type'] == resource_tool.class.name && j['definition_id'] == resource_tool.id}).not_to be_nil
+      end
+
+      it 'student can get definition with public visibility' do
+        course_with_student(active_all: true, user: user_with_pseudonym, account: account)
+        resource_tool = new_valid_external_tool(account, true)
+        resource_tool.settings[:resource_selection][:visibility] = 'public'
+        resource_tool.save!
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
+          {controller: 'lti/lti_apps', action: 'launch_definitions', format: 'json', course_id: @course.id.to_s, placements: %w(resource_selection)})
+
+        expect(response.status).to eq 200
+        expect(json.count).to eq 1
+        expect(json.detect {|j| j['definition_type'] == resource_tool.class.name && j['definition_id'] == resource_tool.id}).not_to be_nil
+      end
+
+      it 'student can get definition for tool with unspecified visibility' do
+        course_with_student(active_all: true, user: user_with_pseudonym, account: account)
+        resource_tool = new_valid_external_tool(account, true)
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
+          {controller: 'lti/lti_apps', action: 'launch_definitions', format: 'json', course_id: @course.id.to_s, placements: %w(resource_selection)})
+
+        expect(response.status).to eq 200
+        expect(json.count).to eq 1
+        expect(json.detect {|j| j['definition_type'] == resource_tool.class.name && j['definition_id'] == resource_tool.id}).not_to be_nil
+      end
+
+      it 'public can get definition for tool with public visibility' do
+        @course = create_course(active_all: true, account: account)
+        resource_tool = new_valid_external_tool(account, true)
+        resource_tool.settings[:resource_selection][:visibility] = 'public'
+        resource_tool.save!
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
+          {controller: 'lti/lti_apps', action: 'launch_definitions', format: 'json', course_id: @course.id.to_s, placements: %w(resource_selection)})
+
+        expect(response.status).to eq 200
+        expect(json.count).to eq 1
+        expect(json.detect {|j| j['definition_type'] == resource_tool.class.name && j['definition_id'] == resource_tool.id}).not_to be_nil
+      end
+
+      it 'public can not get definition for tool with members visibility' do
+        @course = create_course(active_all: true, account: account)
+        resource_tool = new_valid_external_tool(account, true)
+        resource_tool.settings[:resource_selection][:visibility] = 'members'
+        resource_tool.save!
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
+          {controller: 'lti/lti_apps', action: 'launch_definitions', format: 'json', course_id: @course.id.to_s, placements: %w(resource_selection)})
+
+        expect(response.status).to eq 200
+        expect(json.count).to eq 0
       end
 
       it 'returns global_navigation launches for a student using account context' do

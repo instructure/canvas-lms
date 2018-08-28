@@ -601,6 +601,21 @@ describe ContextExternalTool do
       placements = Lti::ResourcePlacement::DEFAULT_PLACEMENTS + ['resource_selection']
       expect(ContextExternalTool.all_tools_for(@course, placements: placements).to_a).to eql([tool1, tool3].sort_by(&:name))
     end
+
+    it 'honors only_visible option' do
+      course_with_student(active_all: true, user: user_with_pseudonym, account: @account)
+      @tools = []
+      @tools << @root_account.context_external_tools.create!(:name => "f", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @tools << @course.context_external_tools.create!(:name => "d", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret',
+                                                        :settings => {:assignment_view => {:visibility => 'admins'}})
+      @tools << @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret',
+                                                        :settings => {:assignment_view => {:visibility => 'members'}})
+      tools = ContextExternalTool.all_tools_for(@course)
+      expect(tools.count).to eq 3
+      tools = ContextExternalTool.all_tools_for(@course, only_visible: true, current_user: @user, visibility_placements: ["assignment_view"])
+      expect(tools.count).to eq 1
+      expect(tools[0].name).to eq 'a'
+    end
   end
 
   describe "placements" do
@@ -638,6 +653,67 @@ describe ContextExternalTool do
       tool3.not_selectable = true
       tool3.save!
       expect(ContextExternalTool.all_tools_for(@course).placements(*Lti::ResourcePlacement::DEFAULT_PLACEMENTS).to_a).to eql([tool1])
+    end
+
+  end
+
+  describe "visible" do
+
+    it "returns all tools to admins" do
+      course_with_teacher(active_all: true, user: user_with_pseudonym, account: @account)
+      tool1 = @course.context_external_tools.create!(:name => "1", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
+      tool2 = @course.context_external_tools.new(:name => "2", :consumer_key => "key", :shared_secret => "secret")
+      tool2.settings[:assignment_view] = {:url => "http://www.example.com"}.with_indifferent_access
+      tool2.save!
+      expect(ContextExternalTool.all_tools_for(@course).visible(@user, @course, nil, []).to_a).to eql([tool1, tool2].sort_by(&:name))
+    end
+
+    it "returns nothing if a non-admin requests without specifying placement" do
+      course_with_student(active_all: true, user: user_with_pseudonym, account: @account)
+      tool1 = @course.context_external_tools.create!(:name => "1", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
+      tool2 = @course.context_external_tools.new(:name => "2", :consumer_key => "key", :shared_secret => "secret")
+      tool2.settings[:assignment_view] = {:url => "http://www.example.com"}.with_indifferent_access
+      tool2.save!
+      expect(ContextExternalTool.all_tools_for(@course).visible(@user, @course, nil, []).to_a).to eql([])
+    end
+
+    it "returns only tools with placements matching the requested placement" do
+      course_with_student(active_all: true, user: user_with_pseudonym, account: @account)
+      tool1 = @course.context_external_tools.create!(:name => "1", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
+      tool2 = @course.context_external_tools.new(:name => "2", :consumer_key => "key", :shared_secret => "secret")
+      tool2.settings[:assignment_view] = {:url => "http://www.example.com"}.with_indifferent_access
+      tool2.save!
+      expect(ContextExternalTool.all_tools_for(@course).visible(@user, @course, nil, ["assignment_view"]).to_a).to eql([tool2])
+    end
+
+    it "does not return admin tools to students" do
+      course_with_student(active_all: true, user: user_with_pseudonym, account: @account)
+      tool = @course.context_external_tools.create!(:name => "1", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
+      tool.settings[:assignment_view] = {:url => "http://www.example.com", :visibility => 'admins'}.with_indifferent_access
+      tool.save!
+      expect(ContextExternalTool.all_tools_for(@course).visible(@user, @course, nil, ["assignment_view"]).to_a).to eql([])
+    end
+
+    it "does return member tools to students" do
+      course_with_student(active_all: true, user: user_with_pseudonym, account: @account)
+      tool = @course.context_external_tools.create!(:name => "1", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
+      tool.settings[:assignment_view] = {:url => "http://www.example.com", :visibility => 'members'}.with_indifferent_access
+      tool.save!
+      expect(ContextExternalTool.all_tools_for(@course).visible(@user, @course, nil, ["assignment_view"]).to_a).to eql([tool])
+    end
+
+    it "does not return member tools to public" do
+      tool = @course.context_external_tools.create!(:name => "1", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
+      tool.settings[:assignment_view] = {:url => "http://www.example.com", :visibility => 'members'}.with_indifferent_access
+      tool.save!
+      expect(ContextExternalTool.all_tools_for(@course).visible(nil, @course, nil, ["assignment_view"]).to_a).to eql([])
+    end
+
+    it "does return public tools to public" do
+      tool = @course.context_external_tools.create!(:name => "1", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
+      tool.settings[:assignment_view] = {:url => "http://www.example.com", :visibility => 'public'}.with_indifferent_access
+      tool.save!
+      expect(ContextExternalTool.all_tools_for(@course).visible(nil, @course, nil, ["assignment_view"]).to_a).to eql([tool])
     end
 
   end

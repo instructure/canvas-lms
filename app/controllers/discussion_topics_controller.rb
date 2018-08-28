@@ -705,6 +705,7 @@ class DiscussionTopicsController < ApplicationController
               :SORT_BY_RATING => @topic.sort_by_rating,
               :TODO_DATE => @topic.todo_date,
               :IS_ASSIGNMENT => @topic.assignment_id?,
+              :ASSIGNMENT_ID => @topic.assignment_id,
               :IS_GROUP => @topic.group_category_id?
             }
             if params[:hide_student_names]
