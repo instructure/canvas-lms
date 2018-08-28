@@ -471,7 +471,8 @@ class Assignment < ActiveRecord::Base
               :update_cached_due_dates,
               :apply_late_policy,
               :touch_submissions_if_muted_changed,
-              :create_audit_event
+              :create_audit_event,
+              :create_audit_event_if_grades_posted
 
   has_a_broadcast_policy
 
@@ -505,6 +506,19 @@ class Assignment < ActiveRecord::Base
     true
   end
   private :create_audit_event
+
+  def create_audit_event_if_grades_posted
+    changes = saved_changes.slice(:grades_published_at)
+    return if changes.empty? || @updating_user.nil?
+
+    AnonymousOrModerationEvent.create!(
+      assignment: self,
+      event_type: AnonymousOrModerationEvent::GRADES_POSTED,
+      payload: saved_changes.slice(:grades_published_at),
+      user: @updating_user
+    )
+  end
+  private :create_audit_event_if_grades_posted
 
   after_save :remove_assignment_updated_flag # this needs to be after has_a_broadcast_policy for the message to be sent
 

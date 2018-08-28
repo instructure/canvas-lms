@@ -6673,6 +6673,12 @@ describe Assignment do
       event.payload.fetch('assignment_changes').fetch(property)
     end
 
+    it "does not create an AnonymousOrModerationEvent when non- grading-related attributes are updated" do
+      expect { anonymous_assignment.update!(title: "Different Name") }.not_to change {
+        AnonymousOrModerationEvent.where(assignment: anonymous_assignment).count
+      }
+    end
+
     it 'creates an AnonymousOrModerationEvent on creation of an anonymous assignment' do
       assignment = Assignment.create!(
         course: @course,
@@ -6768,6 +6774,33 @@ describe Assignment do
       assignment = anonymous_assignment
       assignment.update!(anonymous_instructor_annotations: true)
       expect(event_property_for_assignment(assignment, 'anonymous_instructor_annotations')).to eq [false, true]
+    end
+
+    context "when grades were posted" do
+      let(:assignment) { anonymous_assignment }
+      let(:published_at) { Time.zone.parse("2018-04-08T23:59:59Z") }
+      let(:event) do
+        AnonymousOrModerationEvent.where(
+          assignment: assignment, event_type: AnonymousOrModerationEvent::GRADES_POSTED
+        ).last
+      end
+
+      it "creates an AnonymousOrModerationEvent with an 'event_type' of '#{AnonymousOrModerationEvent::GRADES_POSTED}'" do
+        expect { assignment.update!(grades_published_at: published_at) }.to change {
+          AnonymousOrModerationEvent.where(assignment: assignment, event_type: AnonymousOrModerationEvent::GRADES_POSTED).count
+        }.from(0).to(1)
+      end
+
+      it "sets the event user to the 'updating_user' on the assignment" do
+        assignment.updating_user = @teacher
+        assignment.update!(grades_published_at: published_at)
+        expect(event.user).to eql @teacher
+      end
+
+      it "includes the 'grades_published_at' attribute in the event data" do
+        assignment.update!(grades_published_at: published_at)
+        expect(event.payload.fetch("grades_published_at")).to eq [nil, "2018-04-08T23:59:59Z"]
+      end
     end
   end
 

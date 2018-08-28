@@ -299,6 +299,7 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
 
     grades_to_publish.each(&:publish!)
     @context.touch_admins_later # just in case nothing got published
+    @assignment.updating_user = @current_user
     @assignment.update_attribute(:grades_published_at, Time.now.utc)
     render :json => { :message => "OK" }
   end
