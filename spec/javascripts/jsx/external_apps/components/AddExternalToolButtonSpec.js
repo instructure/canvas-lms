@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
-import {mount} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import {mount} from 'enzyme'
 import AddExternalToolButton from 'jsx/external_apps/components/AddExternalToolButton'
 
 QUnit.module('AddExternalToolButton', suiteHooks => {
