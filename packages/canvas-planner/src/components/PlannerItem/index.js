@@ -193,11 +193,11 @@ export class PlannerItem extends Component {
       }
 
       if (this.hasDueTime()) {
-        if (this.props.dateStyle === 'todo') {
-          return formatMessage("To Do: {date}", {date: this.props.date.format("LT")});
-        } if (this.props.associated_item === "Peer Review") {
+        if (this.props.associated_item === "Peer Review") {
           return formatMessage("Reminder: {date}", {date: this.props.date.format("LT")});
-        } else {
+        } else if (this.props.dateStyle === 'todo') {
+          return formatMessage("To Do: {date}", {date: this.props.date.format("LT")});
+        }  else {
           return formatMessage("Due: {date}", {date: this.props.date.format("LT")});
         }
       }

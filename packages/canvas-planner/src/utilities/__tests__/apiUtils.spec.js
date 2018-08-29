@@ -88,7 +88,6 @@ function makePlannerNote (overrides = {}) {
     details: "Some To Do Note Details :)",
     user_id: '1',
     course_id: '1',
-    workflow_state: 'active',
     ...overrides
   };
 }
@@ -96,46 +95,11 @@ function makePlannerNote (overrides = {}) {
 function makeAssignment (overrides = {}) {
   return {
     id: "10",
-    description: "<p>Lorem ipsum etc.</p>",
     due_at: "2017-05-19T05:59:59Z",
-    unlock_at: null,
-    lock_at: null,
     points_possible: 100,
-    grading_type: "points",
-    assignment_group_id: "2",
-    grading_standard_id: null,
     created_at: "2017-05-15T14:36:03Z",
     updated_at: "2017-05-15T16:20:35Z",
-    peer_reviews: false,
-    automatic_peer_reviews: false,
-    position: 2,
-    grade_group_students_individually: false,
-    anonymous_peer_reviews: false,
-    group_category_id: null,
-    post_to_sis: false,
-    moderated_grading: false,
-    omit_from_final_grade: false,
-    intra_group_peer_reviews: false,
-    secure_params: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9",
-    course_id: "1",
-    name: "",
-    submission_types: [
-      "online_text_entry",
-      "online_upload"
-    ],
-    has_submitted_submissions: false,
-    due_date_required: false,
-    max_name_length: 255,
-    in_closed_grading_period: false,
-    is_quiz_assignment: false,
-    muted: false,
-    html_url: `/courses/1/assignments/10`,
-    quiz_id: "1",
-    anonymous_submissions: false,
-    published: true,
-    only_visible_to_overrides: false,
-    locked_for_user: false,
-    submissions_download_url: `/courses/1/quizzes/1/submissions?zip=1`,
+    title: "",
     ...overrides,
   };
 }
@@ -144,52 +108,8 @@ function makeDiscussionTopic (overrides = {}) {
   return {
     id: "1",
     title: "",
-    last_reply_at: "2017-05-15T16:32:34Z",
-    delayed_post_at: null,
-    posted_at: "2017-05-15T16:32:34Z",
     assignment_id: 9,
-    root_topic_id: null,
-    position: null,
-    podcast_has_student_posts: false,
-    discussion_type: "side_comment",
-    lock_at: null,
-    allow_rating: false,
-    only_graders_can_rate: false,
-    sort_by_rating: false,
-    user_name: "clay@instructure.com",
-    discussion_subentry_count: 0,
-    permissions: {
-      attach: false,
-      update: false,
-      reply: true,
-      delete: false
-    },
-    require_initial_post: null,
-    user_can_see_posts: true,
-    podcast_url: null,
-    read_state: "unread",
     unread_count: 0,
-    subscribed: false,
-    topic_children: [],
-    attachments: [],
-    published: true,
-    can_unpublish: false,
-    locked: false,
-    can_lock: false,
-    comments_disabled: false,
-    author: {
-      id: "1",
-      display_name: "Carl Chudyk",
-      avatar_image_url: "http://canvas.instructure.com/images/messages/avatar-50.png",
-      html_url: `/courses/1/users/1`
-    },
-    html_url: `/courses/1/discussion_topics/10`,
-    url: `/courses/1/discussion_topics/10`,
-    pinned: false,
-    group_category_id: null,
-    can_group: true,
-    locked_for_user: false,
-    message: "<p>Some prompt</p>",
     ...overrides,
   };
 }
@@ -198,78 +118,21 @@ function makeGradedDiscussionTopic (overrides = {}) {
   return {
     id: "1",
     title: "",
-    last_reply_at: "2017-05-15T16:32:34Z",
-    delayed_post_at: null,
-    posted_at: null,
     assignment_id: 10,
-    root_topic_id: null,
-    assignment: {due_at: "2017-05-15T16:32:34Z"},
-    position: null,
-    podcast_has_student_posts: false,
-    discussion_type: "side_comment",
-    lock_at: null,
-    allow_rating: false,
-    only_graders_can_rate: false,
-    sort_by_rating: false,
-    user_name: "clay@instructure.com",
-    discussion_subentry_count: 0,
-    permissions: {
-      attach: false,
-      update: false,
-      reply: true,
-      delete: false
-    },
-    require_initial_post: null,
-    user_can_see_posts: true,
-    podcast_url: null,
-    read_state: "unread",
+    due_at: "2017-05-15T16:32:34Z",
     unread_count: 0,
-    subscribed: false,
-    topic_children: [],
-    attachments: [],
-    published: true,
-    can_unpublish: false,
-    locked: false,
-    can_lock: false,
-    comments_disabled: false,
-    author: {
-      id: "1",
-      display_name: "Carl Chudyk",
-      avatar_image_url: "http://canvas.instructure.com/images/messages/avatar-50.png",
-      html_url: `/courses/1/users/1`
-    },
-    html_url: `/courses/1/discussion_topics/10`,
-    url: `/courses/1/discussion_topics/10`,
-    pinned: false,
-    group_category_id: null,
-    can_group: true,
-    locked_for_user: false,
-    message: "<p>Some prompt</p>",
     ...overrides,
   };
 }
 
 function makeWikiPage(overrides = {}) {
   return {
+    id: '1',
     title: 'wiki_page title',
     created_at: "2017-06-16 10:08:00Z",
     url: 'wiki-page-title',
-    editing_roles: 'teachers',
-    page_id: '1',
-    last_edited_by: {
-      id: '1',
-      display_name: 'Carl Chudyk',
-      avatar_image_url: "http://canvas.instructure.com/images/messages/avatar-50.png",
-      html_url: `/courses/1/users/1`,
-    },
-    published: true,
-    hide_from_students: false,
-    front_page: false,
-    html_url: `/courses/1/pages/wiki-page-title`,
     todo_date: "2017-06-16 10:08:00Z",
     updated_at: "2017-06-16 10:08:00Z",
-    locked_for_user: false,
-    body: 'body of wiki page',
     ...overrides,
   };
 }
@@ -278,14 +141,11 @@ function makeCalendarEvent(overrides = {}) {
   return {
     id: 1,
     title: 'calendar_event title',
+    location_name: 'Home',
     created_at: "2018-04-28 00:36:25Z",
     start_at: '2018-05-04 19:00:00Z',
     description: 'calendar event description',
     all_day: false,
-    effective_context_code: 'course_1',
-    url: '/api/v1/calendar_event/1',
-    html_url: '/calendar?event_id=1&include_contexts=course_1',
-    todo_date: undefined,
     ...overrides,
   }
 }
@@ -317,10 +177,9 @@ describe('transformApiToInternalItem', () => {
     const apiResponse = makeApiResponse({
       plannable_type: 'quiz',
       plannable: makeAssignment({
-        name: 'How to make friends',
-        submission_types: [ 'online_quiz' ],
-        todo_date: undefined,
-      })
+        title: 'How to make friends',
+      }),
+      html_url: "/courses/1/assignments/10",
     });
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
     expect(result).toMatchSnapshot();
@@ -330,10 +189,9 @@ describe('transformApiToInternalItem', () => {
     const apiResponse = makeApiResponse({
       plannable_type: 'discussion_topic',
       plannable: makeGradedDiscussionTopic({
-        name: 'How to make friends part 2',
-        submission_types: [ 'discussion_topic' ],
-        todo_date: undefined,
-      })
+        title: 'How to make friends part 2',
+      }),
+      html_url: "/courses/1/discussion_topics/10",
     });
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
     expect(result).toMatchSnapshot();
@@ -346,13 +204,14 @@ describe('transformApiToInternalItem', () => {
         title: "How to make enemies",
         points_possible: 40,
         todo_date: "2017-05-19T05:59:59Z",
-      })
+      }),
+      html_url: "/courses/1/discussion_topics/10",
     });
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
     expect(result).toMatchSnapshot();
   });
 
-  it('extracts and transforms the proper data for a graded discussion reponse with an unread count', () => {
+  it('extracts and transforms the proper data for a graded discussion response with an unread count', () => {
     const apiResponse = makeApiResponse({
       plannable_type: 'discussion_topic',
       submissions: { submitted: true },
@@ -361,7 +220,8 @@ describe('transformApiToInternalItem', () => {
         points_possible: 40,
         unread_count: 10,
         todo_date: undefined,
-      })
+      }),
+      html_url: "/courses/1/discussion_topics/10",
     });
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
     expect(result).toMatchSnapshot();
@@ -375,7 +235,8 @@ describe('transformApiToInternalItem', () => {
         title: "How to make enemies",
         todo_date: "2017-05-19T05:59:59Z",
         unread_count: 10
-      })
+      }),
+      html_url: "/courses/1/discussion_topics/10",
     });
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
     expect(result).toMatchSnapshot();
@@ -401,9 +262,10 @@ describe('transformApiToInternalItem', () => {
       plannable_type: 'assignment',
       plannable: makeAssignment({
         points_possible: 50,
-        name: "How to be neutral",
+        title: "How to be neutral",
         todo_date: undefined,
       }),
+      html_url: "/courses/1/assignments/10",
     });
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
     expect(result).toMatchSnapshot();
@@ -447,7 +309,8 @@ describe('transformApiToInternalItem', () => {
   it('extracts and transforms the proper data for a calendar event response', () => {
     const apiResponse = makeApiResponse({
       plannable_type: 'calendar_event',
-      plannable: makeCalendarEvent()
+      plannable: makeCalendarEvent(),
+      html_url: "/calendar?event_id=1&include_contexts=course_1",
     });
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
     expect(result).toMatchSnapshot();
@@ -456,7 +319,8 @@ describe('transformApiToInternalItem', () => {
   it('extracts and transforms the proper data for a calendar event response with an all day date', () => {
     const apiResponse = makeApiResponse({
       plannable_type: 'calendar_event',
-      plannable: makeCalendarEvent({all_day: true})
+      plannable: makeCalendarEvent({all_day: true}),
+      html_url: "/calendar?event_id=1&include_contexts=course_1",
     });
 
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
@@ -469,9 +333,7 @@ describe('transformApiToInternalItem', () => {
       plannable_type: 'assessment_request',
       plannable: {
         id: '1',
-        assignment: makeAssignment({
-          name: "review me",
-        }),
+        title: "review me",
       },
     });
 
@@ -524,7 +386,7 @@ describe('transformApiToInternalItem', () => {
       "group_id": "9",
       "plannable_date": "2018-01-12T05:00:00Z",
       "plannable_type": "wiki_page",
-      "plannable": makeWikiPage({page_id: "25", html_url:"/groups/9/pages/25"}),
+      "plannable": makeWikiPage({id: "25", html_url:"/groups/9/pages/25"}),
       "html_url": "/groups/9/pages/25"
     });
 
@@ -552,6 +414,7 @@ describe('transformApiToInternalItem', () => {
         location_name: "A galaxy far far away",
       }),
       dateStyle: "none",
+      html_url: "/calendar?event_id=1&include_contexts=course_1",
     });
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC');
     expect(result).toMatchSnapshot();

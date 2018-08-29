@@ -175,8 +175,8 @@ describe PlannerController do
         get :index
         response_json = json_parse(response.body)
         peer_review = response_json.detect { |i| i["plannable_type"] == 'assessment_request' }
-        expect(peer_review["plannable"]["id"]).to eq assessment_request.id
-        expect(peer_review["plannable"]["assignment"]["id"]).to eq @assignment.id
+        expect(peer_review['plannable']['id']).to eq assessment_request.id
+        expect(peer_review['plannable']['title']).to eq @assignment.title
         expect(peer_review['html_url']).to match "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
       end
 
@@ -931,6 +931,26 @@ describe PlannerController do
             reply.change_read_state('read', @student)
             get :index, params: {filter: "new_activity"}
             expect(json_parse(response.body)).to be_empty
+          end
+
+          it 'should calculate unread count correctly' do
+            get :index
+            topic_json = json_parse(response.body).first
+            expect(topic_json['plannable']['unread_count']).to be 0
+            entry = @topic.discussion_entries.create!(message: "Hello!", user: @teacher)
+            get :index
+            topic_json = json_parse(response.body).first
+            expect(topic_json['plannable']['unread_count']).to be 1
+            @topic.change_read_state('read', @student)
+            entry.change_read_state('read', @student)
+            get :index
+            topic_json = json_parse(response.body).first
+            expect(topic_json['plannable']['unread_count']).to be 0
+            reply = entry.reply_from(user: @student, text: 'wat?')
+            reply = entry.reply_from(user: @teacher, text: "ohai!")
+            get :index
+            topic_json = json_parse(response.body).first
+            expect(topic_json['plannable']['unread_count']).to be 1
           end
         end
       end

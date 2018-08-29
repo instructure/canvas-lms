@@ -21,15 +21,10 @@ describe Api::V1::PlannerItem do
   class PlannerItemHarness
     include Api::V1::PlannerItem
 
-    def assignment_json(*args); end
-    def quiz_json(*args); end
-    def wiki_page_json(*args); end
-    def discussion_topic_api_json(*args); end
     def submission_json(*args); end
     def named_context_url(*args); "named_context_url"; end
     def course_assignment_submission_url(*args); 'course_assignment_submission_url'; end
-    def calendar_event_json(*args); end
-    def assessment_request_json(*args); end
+    def calendar_url_for(*args); end
   end
 
   before :once do
@@ -60,26 +55,32 @@ describe Api::V1::PlannerItem do
       asg = assignment_model course: @course, submission_types: 'online_text_entry', due_at: asg_due_at
       asg_hash = api.planner_item_json(asg, @student, session)
       expect(asg_hash[:plannable_date]).to eq asg_due_at
+      expect(asg_hash[:plannable]).to include('id', 'title', 'due_at', 'points_possible')
 
       dt_todo_date = 1.week.from_now
       dt = discussion_topic_model course: @course, todo_date: dt_todo_date
       dt_hash = api.planner_item_json(dt, @student, session)
       expect(dt_hash[:plannable_date]).to eq dt_todo_date
+      expect(dt_hash[:plannable]).to include('id', 'title', 'todo_date', 'assignment_id')
 
       wiki_todo_date = 1.day.ago
       wiki = wiki_page_model course: @course, todo_date: wiki_todo_date
       wiki_hash = api.planner_item_json(wiki, @student, session)
       expect(wiki_hash[:plannable_date]).to eq wiki_todo_date
+      expect(wiki_hash[:plannable]).to include('id', 'title', 'todo_date')
 
       annc_post_date = 1.day.from_now
       annc = announcement_model context: @course, posted_at: annc_post_date
       annc_hash = api.planner_item_json(annc, @student, session)
       expect(annc_hash[:plannable_date]).to eq annc_post_date
+      expect(annc_hash[:plannable]).not_to include 'todo_date'
+      expect(annc_hash[:plannable]).to include('id', 'title', 'created_at')
 
       event_start_date = 2.days.from_now
       event = calendar_event_model(start_at: event_start_date)
       event_hash = api.planner_item_json(event, @student, session)
       expect(event_hash[:plannable_date]).to eq event_start_date
+      expect(event_hash[:plannable].keys).to include('id', 'title', 'start_at', 'end_at', 'all_day', 'description')
     end
 
     it 'should return with a context_name and context_image for the respective item' do
@@ -120,6 +121,8 @@ describe Api::V1::PlannerItem do
         @peer_review = AssessmentRequest.create!(user: @student, asset: submission, assessor_asset: @reviewer, assessor: @student)
         json = api.planner_item_json(@peer_review, @student, session, { start_at: 1.week.ago })
         expect(json[:plannable_type]).to eq "assessment_request"
+        expect(json[:plannable][:title]).to eq @assignment.title
+        expect(json[:plannable][:todo_date]).to eq @assignment.due_at
       end
     end
 

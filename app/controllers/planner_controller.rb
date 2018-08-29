@@ -124,7 +124,7 @@ class PlannerController < ApplicationController
       # fetch a meta key so we can invalidate just this info and not the whole of the user's cache
       planner_overrides_meta_key = get_planner_cache_id(@current_user)
 
-      composite_cache_key = ['planner_items2',
+      composite_cache_key = ['planner_items3',
                              planner_overrides_meta_key,
                              page,
                              params[:filter],
@@ -206,7 +206,7 @@ class PlannerController < ApplicationController
     # grading = @current_user.assignments_needing_grading(default_opts) if @domain_root_account.grants_right?(@current_user, :manage_grades)
     # moderation = @current_user.assignments_needing_moderation(default_opts)
     viewing = @current_user.assignments_for_student('viewing', default_opts).
-      preload({quiz: :assignment_overrides}, :discussion_topic, :wiki_page, :assignment_overrides, :external_tool_tag)
+      preload(:quiz, :discussion_topic, :wiki_page)
     scopes = {viewing: viewing}
     # TODO: Add when ready (see above comment)
     # scopes[:grading] = grading if grading

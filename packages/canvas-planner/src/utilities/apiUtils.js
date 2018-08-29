@@ -26,7 +26,7 @@ const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
 
   const details = {
     course_id: plannable.course_id || apiResponse.course_id,
-    title: getPlannableTitle(plannable, plannable_type),
+    title: plannable.title,
     completed: isComplete(apiResponse),
     points: plannable.points_possible,
     html_url: apiResponse.html_url || plannable.html_url,
@@ -229,13 +229,6 @@ function getGroupContext(apiResponse, group) {
     color: group.color,
     url: group.url
   };
-}
-
-function getPlannableTitle(plannable, type) {
-  if (type === 'assessment_request') {
-    return plannable.assignment.name;
-  }
-  return plannable.name || plannable.title;
 }
 
 // is the item complete?

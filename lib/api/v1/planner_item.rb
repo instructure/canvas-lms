@@ -29,6 +29,13 @@ module Api::V1::PlannerItem
   include Api::V1::AssessmentRequest
   include PlannerHelper
 
+  API_PLANNABLE_FIELDS = [:id, :title, :course_id, :location_name, :todo_date, :details, :url, :unread_count,
+                          :created_at, :updated_at].freeze
+  CALENDAR_PLANNABLE_FIELDS = [:all_day, :description, :start_at, :end_at].freeze
+  GRADABLE_FIELDS = [:assignment_id, :points_possible, :due_at].freeze
+  PLANNER_NOTE_FIELDS = [:user_id].freeze
+  ASSESSMENT_REQUEST_FIELDS = [:workflow_state].freeze
+
   def planner_item_json(item, user, session, opts = {})
     context_data(item, use_effective_code: true).merge({
       :plannable_id => item.id,
@@ -36,13 +43,13 @@ module Api::V1::PlannerItem
       :plannable_type => PLANNABLE_TYPES.key(item.class_name),
       :new_activity => new_activity(item, user, opts)
     }).merge(submission_statuses_for(user, item, opts)).tap do |hash|
-      assignment_opts = {exclude_response_fields: ['rubric']}
       if item.is_a?(::CalendarEvent)
         hash[:plannable_date] = item.start_at || item.created_at
-        hash[:plannable] = event_json(item, user, session)
+        hash[:plannable] = plannable_json(item.attributes, extra_fields: CALENDAR_PLANNABLE_FIELDS)
+        hash[:html_url] = calendar_url_for(item.effective_context, event: item)
       elsif item.is_a?(::PlannerNote)
         hash[:plannable_date] = item.todo_date || item.created_at
-        hash[:plannable] = planner_note_json(item, user, session)
+        hash[:plannable] = plannable_json(item.attributes, extra_fields: PLANNER_NOTE_FIELDS)
         # TODO: We don't currently have an html_url for individual planner items.
         # hash[:html_url] = ???
       elsif item.is_a?(Quizzes::Quiz) || (item.respond_to?(:quiz?) && item.quiz?)
@@ -50,36 +57,39 @@ module Api::V1::PlannerItem
         quiz = item.is_a?(Quizzes::Quiz) ? item : item.quiz
         hash[:plannable_id] = quiz.id
         hash[:plannable_type] = PLANNABLE_TYPES.key(quiz.class_name)
-        hash[:plannable] = quiz_json(quiz, quiz.context, user, session, skip_permissions: true)
+        hash[:plannable] = plannable_json(quiz.attributes, extra_fields: GRADABLE_FIELDS)
         hash[:html_url] = named_context_url(quiz.context, :context_quiz_url, quiz.id)
         hash[:planner_override] ||= planner_override_json(quiz.planner_override_for(user), user, session)
       elsif item.is_a?(WikiPage) || (item.respond_to?(:wiki_page?) && item.wiki_page?)
         item = item.wiki_page if item.respond_to?(:wiki_page?) && item.wiki_page?
         hash[:plannable_date] = item.todo_date || item.created_at
         hash[:plannable_type] = PLANNABLE_TYPES.key(item.class_name)
-        hash[:plannable] = wiki_page_json(item, user, session, false, assignment_opts: assignment_opts)
+        hash[:plannable] = plannable_json(item.attributes)
         hash[:html_url] = named_context_url(item.context, :context_wiki_page_url, item.url)
         hash[:planner_override] ||= planner_override_json(item.planner_override_for(user), user, session)
       elsif item.is_a?(Announcement)
+        ann_hash = item.attributes
+        ann_hash.delete('todo_date')
         hash[:plannable_date] = item.posted_at || item.created_at
-        hash[:plannable] = discussion_topic_api_json(item, item.context, user, session, use_preload: true, user_can_moderate: false, skip_permissions: true)
+        hash[:plannable] = plannable_json({unread_count: unread_count_for(user, item.id, opts[:unread_counts])[item.id]}.merge(ann_hash))
         hash[:html_url] = named_context_url(item.context, :context_discussion_topic_url, item.id)
       elsif item.is_a?(DiscussionTopic) || (item.respond_to?(:discussion_topic?) && item.discussion_topic?)
         topic = item.is_a?(DiscussionTopic) ? item : item.discussion_topic
+        unread = unread_count_for(user, topic.id, opts[:unread_counts])[topic.id]
         hash[:plannable_id] = topic.id
         hash[:plannable_date] = item[:user_due_date] || topic.todo_date || topic.posted_at || topic.created_at
         hash[:plannable_type] = PLANNABLE_TYPES.key(topic.class_name)
-        hash[:plannable] = discussion_topic_api_json(topic, topic.context, user, session, assignment_opts: assignment_opts, use_preload: true, user_can_moderate: false, skip_permissions: true)
+        hash[:plannable] = plannable_json({unread_count: unread}.merge(item.attributes).merge(topic.attributes), extra_fields: GRADABLE_FIELDS)
         hash[:html_url] = discussion_topic_html_url(topic, user, hash[:submissions])
         hash[:planner_override] ||= planner_override_json(topic.planner_override_for(user), user, session, topic.class_name)
       elsif item.is_a?(AssessmentRequest)
-        hash[:plannable_type] = 'assessment_request'
-        hash[:plannable_date] = item.asset.assignment.peer_reviews_due_at
-        hash[:plannable] = assessment_request_json(item, user, session, %w{user assignment})
+        hash[:plannable_type] = PLANNABLE_TYPES.key(item.class_name)
+        hash[:plannable_date] = item.asset.assignment.peer_reviews_due_at || item.asset.try(:cached_due_date)
+        hash[:plannable] = plannable_json({todo_date: hash[:plannable_date], title: item.asset&.assignment&.title}.merge(item.attributes), extra_fields: ASSESSMENT_REQUEST_FIELDS)
         hash[:html_url] = course_assignment_submission_url(item.asset.assignment.context_id, item.asset.assignment_id, item.user_id)
       else
         hash[:plannable_date] = item[:user_due_date] || item.due_at
-        hash[:plannable] = assignment_json(item, user, session, {include_discussion_topic: true}.merge(assignment_opts))
+        hash[:plannable] = plannable_json(item.attributes, extra_fields: GRADABLE_FIELDS)
         hash[:html_url] = assignment_html_url(item, user, hash[:submissions])
       end
     end.tap do |hash|
@@ -117,11 +127,20 @@ module Api::V1::PlannerItem
     ActiveRecord::Associations::Preloader.new.preload(other_context_items, {context: :root_account}) if other_context_items.any?
     ss = user.submission_statuses(opts)
     discussions, _assign_quiz_items = other_context_items.partition{|i| i.is_a?(::DiscussionTopic)}
-    ActiveRecord::Associations::Preloader.new.preload(discussions, :discussion_topic_participants, DiscussionTopicParticipant.where(user: user))
+    topic_unread_counts = unread_count_for(user, discussions.map(&:id))
 
     items.map do |item|
-      planner_item_json(item, user, session, opts.merge(submission_statuses: ss))
+      planner_item_json(item, user, session, opts.merge(submission_statuses: ss, unread_counts: topic_unread_counts))
     end
+  end
+
+  # This method was built to save time from the standard assignment/quiz/discussion_topic_json
+  # methods.  DO NOT add fields that are not on the object unless you load them all at once
+  # as has been done with discussion topics unread count
+  def plannable_json(item_hash, extra_fields: [])
+    item_hash = item_hash.with_indifferent_access
+    item_hash[:due_at] = item_hash.delete(:user_due_date) if item_hash.key?(:user_due_date)
+    item_hash.slice(*API_PLANNABLE_FIELDS, *extra_fields)
   end
 
   def submission_statuses_for(user, item, opts = {})
@@ -163,6 +182,26 @@ module Api::V1::PlannerItem
     end
 
     submission_status
+  end
+
+  def unread_count_for(user, topic_ids, counts = {})
+    counts ||= {}
+    countless_topic_ids = Array(topic_ids) - counts.keys
+    if countless_topic_ids.any?
+      participant_info = DiscussionTopic.select("discussion_topics.id, COALESCE(dtp.unread_entry_count, COUNT(de.id)) AS unread_entry_count").
+        joins("LEFT JOIN #{DiscussionTopicParticipant.quoted_table_name} AS dtp
+                 ON dtp.discussion_topic_id = discussion_topics.id
+                AND dtp.user_id = #{User.connection.quote(user)}
+               LEFT JOIN #{DiscussionEntry.quoted_table_name} AS de
+                 ON de.discussion_topic_id = discussion_topics.id
+                AND dtp.id IS NULL").
+        where(id: countless_topic_ids).
+        group("discussion_topics.id, dtp.id")
+      participant_info.each do |pi|
+        counts[pi[:id]] = pi[:unread_entry_count]
+      end
+    end
+    counts.slice(*topic_ids)
   end
 
   def new_activity(item, user, opts = {})

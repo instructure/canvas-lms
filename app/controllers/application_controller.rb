@@ -1677,9 +1677,9 @@ class ApplicationController < ActionController::Base
     options[:query] ||= {}
     contexts_to_link_to = Array(contexts_to_link_to)
     unless contexts_to_link_to.empty?
-      options[:anchor] = "#{contexts_to_link_to.first.asset_string}"
+      options[:anchor] = contexts_to_link_to.first.asset_string
     end
-    options[:query][:include_contexts] = contexts_to_link_to.map{|c| c.asset_string}.join(",") unless contexts_to_link_to.empty?
+    options[:query][:include_contexts] = contexts_to_link_to.map{|c| c.is_a? String ? c : c.asset_string}.join(",") unless contexts_to_link_to.empty?
     url_for(
       options[:query].merge({
         :controller => 'files',
