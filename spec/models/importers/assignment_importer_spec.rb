@@ -365,13 +365,39 @@ describe "Importing assignments" do
       }
     end
 
-    it "creates a assignment_configuration_tool_lookup" do
-      course_model
-      migration = @course.content_migrations.create!
-      assignment = @course.assignments.create! :title => "test", :due_at => Time.now, :unlock_at => 1.day.ago, :lock_at => 1.day.from_now, :peer_reviews_due_at => 2.days.from_now, :migration_id => migration_id
-      Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
-      assignment.reload
-      expect(assignment.assignment_configuration_tool_lookups).to exist
+    context 'when plagiarism detection tools are being imported' do
+      let(:course) { course_model }
+      let(:migration) { course.content_migrations.create! }
+      let(:assignment) do
+        course.assignments.create!(
+          title: "test",
+          due_at: Time.zone.now,
+          unlock_at: 1.day.ago,
+          lock_at: 1.day.from_now,
+          peer_reviews_due_at: 2.days.from_now,
+          migration_id: migration_id
+        )
+      end
+
+      it "creates a assignment_configuration_tool_lookup" do
+        assignment
+        Importers::AssignmentImporter.import_from_migration(assign_hash, course, migration)
+        assignment.reload
+        expect(assignment.assignment_configuration_tool_lookups).to exist
+      end
+
+      it "does not create duplicate assignment_configuration_tool_lookups" do
+        assignment.assignment_configuration_tool_lookups.create!(
+          tool_vendor_code: vendor_code,
+          tool_product_code: product_code,
+          tool_resource_type_code: resource_type_code,
+          tool_type: 'Lti::MessageHandler'
+        )
+
+        Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
+        assignment.reload
+        expect(assignment.assignment_configuration_tool_lookups.count).to eq 1
+      end
     end
 
     it "sets the vendor/product/resource_type codes" do
