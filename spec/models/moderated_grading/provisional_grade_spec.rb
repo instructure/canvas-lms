@@ -18,18 +18,20 @@
 require 'spec_helper'
 
 describe ModeratedGrading::ProvisionalGrade do
-  subject(:provisional_grade) do
-    submission.provisional_grades.new(grade: 'A', score: 100.0, scorer: scorer).tap do |grade|
-      grade.scorer = scorer
-    end
-  end
+  subject(:provisional_grade) { submission.provisional_grades.build(scorer: scorer) }
+
+  let(:account) { Account.default }
+  let(:course) { account.courses.create! }
+  let(:assignment) { course.assignments.create!(submission_types: 'online_text_entry', anonymous_grading: true) }
   let(:submission) { assignment.submissions.find_by!(user: student) }
-  let(:assignment) { course.assignments.create! submission_types: 'online_text_entry' }
-  let(:account) { a = account_model; a}
-  let(:course) { c = account.courses.create!; c  }
-  let(:scorer) { u = user_factory(active_user: true); course.enroll_teacher(u, :enrollment_state => 'active'); u }
-  let(:student) { u = user_factory(active_user: true); course.enroll_student(u, :enrollment_state => 'active'); u }
-  let(:now) { Time.zone.now }
+  let(:scorer) { user_factory(active_user: true).tap {|u| course.enroll_teacher(u, enrollment_state: 'active') } }
+  let(:student) { user_factory(active_user: true).tap {|u| course.enroll_student(u, enrollment_state: 'active') } }
+
+  before(:once) do
+    @graded_at = @now = Time.zone.now.change(usec: 0)
+  end
+
+  around(:all) { |example| Timecop.freeze(@graded_at, &example) }
 
   it { is_expected.to be_valid }
 
@@ -38,6 +40,7 @@ describe ModeratedGrading::ProvisionalGrade do
       with_foreign_key(:selected_provisional_grade_id).
       class_name('ModeratedGrading::Selection')
   end
+
   it { is_expected.to belong_to(:submission) }
   it { is_expected.to belong_to(:scorer).class_name('User') }
   it { is_expected.to have_many(:rubric_assessments) }
@@ -45,7 +48,189 @@ describe ModeratedGrading::ProvisionalGrade do
   it { is_expected.to validate_presence_of(:scorer) }
   it { is_expected.to validate_presence_of(:submission) }
 
+  describe '#auditable?' do
+    subject(:provisional_grade) { submission.provisional_grades.build(valid_params) }
+
+    let(:valid_params) { { scorer: scorer, current_user: scorer } }
+
+    context 'new object' do
+      it { is_expected.to be_auditable }
+
+      context "given no changes" do
+        subject(:provisional_grade) { submission.provisional_grades.build(valid_params.except(:scorer)) }
+
+        it { is_expected.not_to be_auditable }
+      end
+
+      context "given no current_user" do
+        subject(:provisional_grade) { submission.provisional_grades.build(valid_params.except(:current_user)) }
+
+        it { is_expected.not_to be_auditable }
+      end
+
+      context "given a submission that is not auditable" do
+        before { allow(submission).to receive(:assignment_auditable?).and_return(false) }
+
+        it { is_expected.not_to be_auditable }
+      end
+    end
+
+    context 'created object' do
+      # `reload` to simulate a fresh object that would normally be fetch
+      # through an association or `find` with no saved_change_attributes
+      subject(:provisional_grade) { submission.provisional_grades.create!(scorer: scorer).reload }
+
+      context "given auditable changes" do
+        before { provisional_grade.assign_attributes(score: 10, current_user: scorer) }
+
+        it { is_expected.to be_auditable }
+      end
+
+      context "given no auditable changes" do
+        before { provisional_grade.current_user = scorer }
+
+        it { is_expected.not_to be_auditable }
+      end
+
+      context "given no current_user" do
+        before { provisional_grade.score = 10 }
+
+        it { is_expected.not_to be_auditable }
+      end
+    end
+
+    context 'destroyed object' do
+      subject(:provisional_grade) { created_provisional_grade.destroy! }
+
+      let(:created_provisional_grade) { submission.provisional_grades.create!(scorer: scorer, current_user: scorer).reload }
+
+      it { is_expected.to be_auditable }
+    end
+  end
+
+  describe 'Auditing' do
+    subject(:event) { AnonymousOrModerationEvent.last }
+
+    before(:once) do
+      student = User.create!
+      @teacher = User.create!.tap do |teacher|
+        teacher.accept_terms
+        teacher.register!
+      end
+      course = Course.create!
+      course.enroll_student(student, enrollment_state: 'active')
+      course.enroll_teacher(@teacher, enrollment_state: 'active')
+      assignment = course.assignments.create!(moderated_grading: true, grader_count: 2, final_grader: @teacher)
+      @submission = assignment.submissions.find_by!(user: student)
+      @provisional_grade = @submission.provisional_grades.build(scorer: @teacher, current_user: @teacher)
+    end
+
+    let(:score) { 90 }
+    let(:grade) { 'A' }
+    let(:final) { false }
+    let(:source_provisional_grade_id) { nil }
+    let(:graded_anonymously) { false }
+
+    it { expect(@provisional_grade).to be_auditable }
+
+    describe 'created event' do
+      let(:event_type) { 'provisional_grade_created' }
+
+      it "creates a provisional_grade_created audit event on creation" do
+        expect { @provisional_grade.save! }.to change {
+          AnonymousOrModerationEvent.where(event_type: event_type, submission: @submission).count
+        }.by(1)
+      end
+
+      context 'given a persisted provisional grade' do
+        before(:once) do
+          @provisional_grade.assign_attributes(
+            scorer: @teacher,
+            score: score,
+            grade: grade,
+            final: final,
+            source_provisional_grade_id: source_provisional_grade_id,
+            graded_anonymously: graded_anonymously,
+          )
+          @provisional_grade.save!
+        end
+
+        it { is_expected.to have_attributes(assignment: @submission.assignment) }
+        it { is_expected.to have_attributes(submission: @submission) }
+        it { is_expected.to have_attributes(user: @teacher) }
+        it { is_expected.to have_attributes(event_type: event_type) }
+        it { expect(event.payload.fetch('id')).to be_present }
+        it { expect(event.payload).to include('score' => score) }
+        it { expect(event.payload).to include('grade' => grade) }
+        it { expect(event.payload).to include('graded_at' => @graded_at.iso8601) }
+        it { expect(event.payload).to include('final' => final) }
+        it { expect(event.payload).to include('source_provisional_grade_id' => source_provisional_grade_id) }
+        it { expect(event.payload).to include('graded_anonymously' => graded_anonymously) }
+        it { expect(event.payload).to include('scorer_id' => @teacher.id) }
+      end
+    end
+
+    describe 'Updated event' do
+      let(:event_type) { 'provisional_grade_updated' }
+
+      it "creates a provisional_grade_updated audit event on update" do
+        @provisional_grade.save!
+        expect { @provisional_grade.update!(score: 1) }.to change {
+          AnonymousOrModerationEvent.where(event_type: event_type, submission: @submission).count
+        }.by(1)
+      end
+
+      context 'given a persisted and then upated provisional grade' do
+        before(:once) do
+          @updated_scorer = user_factory
+          @provisional_grade.assign_attributes(
+            scorer: @teacher,
+            score: score,
+            grade: grade,
+            final: final,
+            source_provisional_grade_id: source_provisional_grade_id,
+            graded_anonymously: graded_anonymously,
+          )
+          @provisional_grade.save!
+          Timecop.freeze(updated_graded_at) do
+            @provisional_grade.update!(
+              score: updated_score,
+              grade: updated_grade,
+              final: updated_final,
+              source_provisional_grade_id: updated_source_provisional_grade_id,
+              graded_anonymously: updated_graded_anonymously,
+              scorer: @updated_scorer,
+              current_user: @teacher
+            )
+          end
+        end
+
+        let(:updated_graded_at) { 36.hours.from_now(@graded_at) }
+        let(:updated_score) { score.next }
+        let(:updated_grade) { grade.next }
+        let(:updated_final) { !final }
+        let(:updated_source_provisional_grade_id) { @provisional_grade.id }
+        let(:updated_graded_anonymously) { !graded_anonymously }
+
+        it { is_expected.to have_attributes(assignment: @submission.assignment) }
+        it { is_expected.to have_attributes(submission: @submission) }
+        it { is_expected.to have_attributes(user: @teacher) }
+        it { is_expected.to have_attributes(event_type: event_type) }
+        it { expect(event.payload.fetch('id')).to be_present }
+        it { expect(event.payload).to include('score' => [score, updated_score]) }
+        it { expect(event.payload).to include('grade' => [grade, updated_grade]) }
+        it { expect(event.payload).to include('graded_at' => [@graded_at.iso8601, updated_graded_at.iso8601]) }
+        it { expect(event.payload).to include('final' => [final, updated_final]) }
+        it { expect(event.payload).to include('source_provisional_grade_id' => [source_provisional_grade_id, updated_source_provisional_grade_id]) }
+        it { expect(event.payload).to include('graded_anonymously' => [graded_anonymously, updated_graded_anonymously]) }
+        it { expect(event.payload).to include('scorer_id' => [@teacher.id, @updated_scorer.id]) }
+      end
+    end
+  end
+
   describe 'grade_attributes' do
+    subject(:provisional_grade) { submission.provisional_grades.build(score: 100.0, grade: 'A', scorer: scorer) }
+
     it "returns the proper format" do
       json = provisional_grade.grade_attributes
       expect(json).to eq({
@@ -141,22 +326,22 @@ describe ModeratedGrading::ProvisionalGrade do
   describe '#graded_at when a grade changes' do
     it { expect(provisional_grade.graded_at).to be_nil }
     it 'updates the graded_at timestamp when changing grade' do
-      Timecop.freeze(now) do
+      Timecop.freeze(@now) do
         provisional_grade.update_attributes(grade: 'B')
-        expect(provisional_grade.graded_at).to eql now
+        expect(provisional_grade.graded_at).to eql @now
       end
     end
     it 'updates the graded_at timestamp when changing score' do
-      Timecop.freeze(now) do
+      Timecop.freeze(@now) do
         provisional_grade.update_attributes(score: 80)
-        expect(provisional_grade.graded_at).to eql now
+        expect(provisional_grade.graded_at).to eql @now
       end
     end
     it 'updated graded_at when force_save is set, regardless of whether the grade actually changed' do
-      Timecop.freeze(now) do
+      Timecop.freeze(@now) do
         provisional_grade.force_save = true
         provisional_grade.save!
-        expect(provisional_grade.graded_at).to eql now
+        expect(provisional_grade.graded_at).to eql @now
       end
     end
   end
@@ -346,54 +531,6 @@ describe ModeratedGrading::ProvisionalGrade do
         crocodoc_url: 'fake_url',
         canvadoc_url: 'fake_canvadoc_url'
       })
-    end
-  end
-end
-
-describe ModeratedGrading::NullProvisionalGrade do
-  describe 'grade_attributes' do
-    it "returns the proper format" do
-      expect(ModeratedGrading::NullProvisionalGrade.new(nil, 1, false).grade_attributes).to eq({
-        'provisional_grade_id' => nil,
-        'grade' => nil,
-        'score' => nil,
-        'graded_at' => nil,
-        'scorer_id' => 1,
-        'graded_anonymously' => nil,
-        'final' => false,
-        'grade_matches_current_submission' => true
-      })
-
-      expect(ModeratedGrading::NullProvisionalGrade.new(nil, 2, true).grade_attributes).to eq({
-        'provisional_grade_id' => nil,
-        'grade' => nil,
-        'score' => nil,
-        'graded_at' => nil,
-        'scorer_id' => 2,
-        'graded_anonymously' => nil,
-        'final' => true,
-        'grade_matches_current_submission' => true
-      })
-    end
-  end
-
-  it "should return the original submission's submission comments" do
-    sub = double
-    comments = double
-    expect(sub).to receive(:submission_comments).and_return(comments)
-    expect(ModeratedGrading::NullProvisionalGrade.new(sub, 1, false).submission_comments).to eq(comments)
-  end
-
-  describe 'scorer' do
-    it 'returns the associated scorer if scorer_id is present' do
-      scorer = user_factory(active_user: true)
-      scored_grade = ModeratedGrading::NullProvisionalGrade.new(nil, scorer.id, true)
-      expect(scored_grade.scorer).to eq scorer
-    end
-
-    it 'returns nil if scorer_id is nil' do
-      scored_grade = ModeratedGrading::NullProvisionalGrade.new(nil, nil, true)
-      expect(scored_grade.scorer).to be nil
     end
   end
 end

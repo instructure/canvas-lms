@@ -237,7 +237,7 @@ describe DiscussionTopic do
 
     it "should not grant moderate permissions without read permissions" do
       @course.account.role_overrides.create!(:role => teacher_role, :permission => 'read_forum', :enabled => false)
-      expect((@topic.check_policy(@teacher2) & @relevant_permissions)).to be_empty
+      expect(@topic.reload.check_policy(@teacher2)).to eql [:create]
     end
 
     it "should grant permissions if it not locked" do
@@ -276,7 +276,6 @@ describe DiscussionTopic do
 
   describe "visibility" do
     before(:once) do
-      #student_in_course(:active_all => 1)
       @topic = @course.discussion_topics.create!(:user => @teacher)
     end
 

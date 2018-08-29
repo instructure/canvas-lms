@@ -190,7 +190,7 @@ describe DocviewerAuditEventsController do
   end
 
   context "as an admin" do
-    before(:each) do
+    before(:once) do
       @assignment = Assignment.create!(
         course: @course,
         name: 'moderated',
@@ -210,7 +210,7 @@ describe DocviewerAuditEventsController do
       @assignment.update!(grader_count: 1)
       expect{ annotate_as_admin }.to change {
         AnonymousOrModerationEvent.where(assignment: @assignment, submission: @submission).count
-      }.from(0).to(1)
+      }.by(1)
     end
 
     it "does not occupy a slot when annotating" do

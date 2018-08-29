@@ -234,6 +234,9 @@ class Submission < ActiveRecord::Base
   end
   alias needs_review? pending_review?
 
+  delegate :auditable?, to: :assignment, prefix: true
+  delegate :can_be_moderated_grader?, to: :assignment, prefix: true
+
   def self.anonymous_ids_for(assignment)
     anonymized.for_assignment(assignment).pluck(:anonymous_id)
   end
@@ -1916,25 +1919,14 @@ class Submission < ActiveRecord::Base
   def find_or_create_provisional_grade!(scorer, attrs = {})
     ModeratedGrading::ProvisionalGrade.unique_constraint_retry do
       if attrs[:final] && !self.assignment.permits_moderation?(scorer)
-        raise Assignment::GradeError.new("User not authorized to give final provisional grades")
+        raise Assignment::GradeError, 'User not authorized to give final provisional grades'
       end
 
       pg = find_existing_provisional_grade(scorer, attrs[:final]) || self.provisional_grades.build
-
-      update_provisional_grade(pg, scorer, attrs)
+      pg = update_provisional_grade(pg, scorer, attrs)
       pg.save! if attrs[:force_save] || pg.new_record? || pg.changed?
       pg
     end
-  end
-
-  def update_provisional_grade(pg, scorer, attrs = {})
-    pg.scorer = scorer
-    pg.final = !!attrs[:final]
-    pg.grade = attrs[:grade] unless attrs[:grade].nil?
-    pg.score = attrs[:score] unless attrs[:score].nil?
-    pg.source_provisional_grade = attrs[:source_provisional_grade] if attrs.key?(:source_provisional_grade)
-    pg.graded_anonymously = attrs[:graded_anonymously] unless attrs[:graded_anonymously].nil?
-    pg.force_save = !!attrs[:force_save]
   end
 
   def find_existing_provisional_grade(scorer, final)
@@ -2534,5 +2526,16 @@ class Submission < ActiveRecord::Base
 
   def set_anonymous_id
     self.anonymous_id = Anonymity.generate_id(existing_ids: Submission.anonymous_ids_for(assignment))
+  end
+
+  def update_provisional_grade(pg, scorer, attrs = {})
+    pg.scorer = pg.current_user = scorer
+    pg.final = !!attrs[:final]
+    pg.grade = attrs[:grade] unless attrs[:grade].nil?
+    pg.score = attrs[:score] unless attrs[:score].nil?
+    pg.source_provisional_grade = attrs[:source_provisional_grade] if attrs.key?(:source_provisional_grade)
+    pg.graded_anonymously = attrs[:graded_anonymously] unless attrs[:graded_anonymously].nil?
+    pg.force_save = !!attrs[:force_save]
+    pg
   end
 end

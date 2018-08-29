@@ -44,6 +44,9 @@ describe Submission do
   it { is_expected.to validate_numericality_of(:seconds_late_override).is_greater_than_or_equal_to(0).allow_nil }
   it { is_expected.to validate_inclusion_of(:late_policy_status).in_array(["none", "missing", "late"]).allow_nil }
 
+  it { is_expected.to delegate_method(:auditable?).to(:assignment).with_prefix(true) }
+  it { is_expected.to delegate_method(:can_be_moderated_grader?).to(:assignment).with_prefix(true) }
+
   describe '#anonymous_id' do
     subject { submission.anonymous_id }
 
@@ -3721,15 +3724,41 @@ describe Submission do
       @context.enroll_teacher(@teacher2)
     end
 
+    context "when force_save is true" do
+      it {
+        expect { @submission.find_or_create_provisional_grade!(@teacher, force_save: true) }.
+          to change { AnonymousOrModerationEvent.provisional_grade_created.count }.by(1)
+      }
+
+      it {
+        expect { @submission.find_or_create_provisional_grade!(@teacher, force_save: true) }.
+          to_not change { AnonymousOrModerationEvent.provisional_grade_updated.count }
+      }
+
+      context 'given an existing provisional grade' do
+        before(:once) { @submission.find_or_create_provisional_grade!(@teacher, force_save: true) }
+
+        it {
+          expect { @submission.find_or_create_provisional_grade!(@teacher, force_save: true) }.
+            to change { AnonymousOrModerationEvent.provisional_grade_updated.count }.by(1)
+        }
+
+        it {
+          expect { @submission.find_or_create_provisional_grade!(@teacher, force_save: true) }.
+            not_to change { AnonymousOrModerationEvent.provisional_grade_created.count }
+        }
+      end
+    end
+
     it "properly creates a provisional grade with all default values but scorer" do
       @submission.find_or_create_provisional_grade!(@teacher)
 
-      expect(@submission.provisional_grades.length).to eql 1
+      expect(@submission.provisional_grades.length).to be 1
 
       pg = @submission.provisional_grades.first
 
       expect(pg.scorer_id).to eql @teacher.id
-      expect(pg.final).to eql false
+      expect(pg.final).to be false
       expect(pg.graded_anonymously).to be_nil
       expect(pg.grade).to be_nil
       expect(pg.score).to be_nil
@@ -3738,21 +3767,22 @@ describe Submission do
 
     it "properly amends information to an existing provisional grade" do
       @submission.find_or_create_provisional_grade!(@teacher)
-      @submission.find_or_create_provisional_grade!(@teacher,
+      @submission.find_or_create_provisional_grade!(
+        @teacher,
         score: 15.0,
         grade: "20",
         graded_anonymously: true
       )
 
-      expect(@submission.provisional_grades.length).to eql 1
+      expect(@submission.provisional_grades.length).to be 1
 
       pg = @submission.provisional_grades.first
 
       expect(pg.scorer_id).to eql @teacher.id
-      expect(pg.final).to eql false
-      expect(pg.graded_anonymously).to eql true
+      expect(pg.final).to be false
+      expect(pg.graded_anonymously).to be true
       expect(pg.grade).to eql "20"
-      expect(pg.score).to eql 15.0
+      expect(pg.score).to be 15.0
       expect(pg.source_provisional_grade).to be_nil
     end
 
@@ -3779,8 +3809,8 @@ describe Submission do
     end
 
     it "raises an exception if final is true and user is not allowed to select final grade" do
-      expect{ @submission.find_or_create_provisional_grade!(@student, final: true) }
-        .to raise_error(Assignment::GradeError, "User not authorized to give final provisional grades")
+      expect{ @submission.find_or_create_provisional_grade!(@student, final: true) }.
+        to raise_error(Assignment::GradeError, "User not authorized to give final provisional grades")
     end
 
     it "raises an exception if grade is not final and student does not need a provisional grade" do
@@ -3788,14 +3818,26 @@ describe Submission do
       third_teacher = User.create!
       @course.enroll_teacher(third_teacher, enrollment_state: :active)
 
-      expect{ @submission.find_or_create_provisional_grade!(third_teacher, final: false) }
-        .to raise_error(Assignment::GradeError, "Student already has the maximum number of provisional grades")
+      expect{ @submission.find_or_create_provisional_grade!(third_teacher, final: false) }.
+        to raise_error(Assignment::GradeError, "Student already has the maximum number of provisional grades")
     end
 
     it "raises an exception if the grade is final and no non-final provisional grades exist" do
-      expect{ @submission.find_or_create_provisional_grade!(@teacher, final: true) }
-        .to raise_error(Assignment::GradeError,
+      expect{ @submission.find_or_create_provisional_grade!(@teacher, final: true) }.
+        to raise_error(Assignment::GradeError,
           "Cannot give a final mark for a student with no other provisional grades")
+    end
+
+    it 'sets the source provisional grade if one is provided' do
+      new_source = ModeratedGrading::ProvisionalGrade.new
+      provisional_grade = @submission.find_or_create_provisional_grade!(@teacher, source_provisional_grade: new_source)
+      expect(provisional_grade.source_provisional_grade).to be new_source
+    end
+
+    it 'does not wipe out the existing source provisional grade, if a source_provisional_grade is not provided' do
+      @submission.find_or_create_provisional_grade!(@teacher)
+      expect { @submission.find_or_create_provisional_grade!(@teacher, force_save: true) }.
+        not_to change { @submission.provisional_grades.last.source_provisional_grade }
     end
   end
 
@@ -5285,27 +5327,6 @@ describe Submission do
         hash = { 'entered_grade' => 10 }
         expect(submission.filter_attributes_for_user(hash, user, session)).not_to have_key('entered_grade')
       end
-    end
-  end
-
-  describe '#update_provisional_grade' do
-    before(:once) do
-      @submission = @assignment.submissions.find_by!(user_id: @student)
-      @provisional_grade = ModeratedGrading::ProvisionalGrade.new
-      @source = ModeratedGrading::ProvisionalGrade.new
-      @provisional_grade.source_provisional_grade = @source
-      @scorer = User.new
-    end
-
-    it 'sets the source provisional grade if one is provided' do
-      new_source = ModeratedGrading::ProvisionalGrade.new
-      @submission.update_provisional_grade(@provisional_grade, @scorer, source_provisional_grade: new_source)
-      expect(@provisional_grade.source_provisional_grade).to be new_source
-    end
-
-    it 'does not wipe out the existing source provisional grade, if a source_provisional_grade is not provided' do
-      @submission.update_provisional_grade(@provisional_grade, @scorer)
-      expect(@provisional_grade.source_provisional_grade).to be @source
     end
   end
 

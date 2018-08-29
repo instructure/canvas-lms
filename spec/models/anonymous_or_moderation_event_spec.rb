@@ -25,7 +25,7 @@ describe AnonymousOrModerationEvent do
     {
       user_id: user.id,
       assignment_id: assignment.id,
-      event_type: :assignment_updated,
+      event_type: :assignment_created,
       payload: { foo: :bar }
     }
   end
@@ -50,8 +50,15 @@ describe AnonymousOrModerationEvent do
 
     it { expect { AnonymousOrModerationEvent.new.validate }.not_to raise_error }
 
-    context '"assignment_updated" events' do
+    context 'assignment_created events' do
       subject { AnonymousOrModerationEvent.new(params) }
+
+      it { is_expected.to validate_absence_of(:canvadoc_id) }
+      it { is_expected.to validate_absence_of(:submission_id) }
+    end
+
+    context 'assignment_updated events' do
+      subject { AnonymousOrModerationEvent.new(params.merge(event_type: :assignment_updated)) }
 
       it { is_expected.to validate_absence_of(:canvadoc_id) }
       it { is_expected.to validate_absence_of(:submission_id) }
