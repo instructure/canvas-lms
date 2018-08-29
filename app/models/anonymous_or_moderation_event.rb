@@ -17,6 +17,7 @@
 #
 
 class AnonymousOrModerationEvent < ApplicationRecord
+  EVENT_TYPES = %w[assignment_updated grades_posted].freeze
   GRADES_POSTED = 'grades_posted'.freeze
 
   belongs_to :assignment
@@ -27,5 +28,6 @@ class AnonymousOrModerationEvent < ApplicationRecord
   validates :assignment_id, presence: true
   validates :user_id, presence: true
   validates :event_type, presence: true
+  validates :event_type, inclusion: EVENT_TYPES
   validates :payload, presence: true
 end

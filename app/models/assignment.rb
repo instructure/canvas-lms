@@ -497,10 +497,8 @@ class Assignment < ActiveRecord::Base
     AnonymousOrModerationEvent.create!(
       assignment: self,
       user: @updating_user,
-      event_type: 'assignment_update',
-      payload: {
-        assignment_changes: auditable_changes
-      }
+      event_type: :assignment_updated,
+      payload: auditable_changes
     )
 
     true

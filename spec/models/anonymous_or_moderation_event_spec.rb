@@ -30,6 +30,7 @@ describe AnonymousOrModerationEvent do
     it { is_expected.to validate_presence_of(:assignment_id) }
     it { is_expected.to validate_presence_of(:user_id) }
     it { is_expected.to validate_presence_of(:event_type) }
+    it { is_expected.to validate_inclusion_of(:event_type).in_array(AnonymousOrModerationEvent::EVENT_TYPES) }
     it { is_expected.to validate_presence_of(:payload) }
   end
 end
