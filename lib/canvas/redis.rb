@@ -49,7 +49,7 @@ module Canvas::Redis
   COMPACT_LINE = "Redis (%{request_time_ms}ms) %{command} %{key} [%{host}]".freeze
   def self.log_style
     # supported: 'off', 'compact', 'json'
-    Setting.get('redis_log_style', 'compact')
+    @log_style ||= ConfigFile.load('redis')&.[]('log_style') || 'compact'
   end
 
   def self.redis_failure?(redis_name)
@@ -67,7 +67,9 @@ module Canvas::Redis
   end
 
   def self.handle_redis_failure(failure_retval, redis_name)
-    return failure_retval if redis_failure?(redis_name)
+    Setting.skip_cache do
+      return failure_retval if redis_failure?(redis_name)
+    end
     reply = yield
     raise reply if reply.is_a?(Exception)
     reply
@@ -85,12 +87,14 @@ module Canvas::Redis
     CanvasStatsd::Statsd.increment("redis.errors.#{CanvasStatsd::Statsd.escape(redis_name)}")
     Rails.logger.error "Failure handling redis command on #{redis_name}: #{e.inspect}"
 
-    if self.ignore_redis_failures?
-      Canvas::Errors.capture(e, type: :redis)
-      last_redis_failure[redis_name] = Time.now
-      failure_retval
-    else
-      raise
+    Setting.skip_cache do
+      if self.ignore_redis_failures?
+        Canvas::Errors.capture(e, type: :redis)
+        last_redis_failure[redis_name] = Time.now
+        failure_retval
+      else
+        raise
+      end
     end
   end
 

@@ -181,9 +181,7 @@ describe "Canvas::Redis" do
     let(:key) { 'mykey' }
     let(:key2) { 'mykey2' }
     let(:val) { 'myvalue' }
-    before(:once) { Setting.set('redis_log_style', 'json') }
-    # cache to avoid capturing a log line for db lookup
-    before(:each) { Canvas::Redis.log_style }
+    before { allow(Canvas::Redis).to receive(:log_style).and_return('json') }
 
     def json_logline(get = :shift)
       # drop the non-json logging at the start of the line
@@ -285,9 +283,7 @@ describe "Canvas::Redis" do
   end
 
   it "should allow disabling redis logging" do
-    Setting.set('redis_log_style', 'off')
-    # cache to avoid capturing a log line for db lookup
-    Canvas::Redis.log_style
+    allow(Canvas::Redis).to receive(:log_style).and_return('off')
     Rails.logger.capture_messages do
       Canvas.redis.set('mykey', 'myvalue')
       expect(Rails.logger.captured_messages).to be_empty

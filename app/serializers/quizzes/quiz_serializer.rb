@@ -193,8 +193,8 @@ module Quizzes
       !serializer_option(:skip_date_overrides) && due_dates == all_dates
     end
 
-    def include_unpublishable?
-      quiz.grants_right?(current_user, :manage)
+    def include_permissions?
+      !serializer_option(:skip_permissions)
     end
 
     def filter(keys)
@@ -203,7 +203,7 @@ module Quizzes
         when :all_dates
           include_all_dates?
         when :unpublishable, :can_unpublish
-          include_unpublishable?
+          user_may_manage?
         when :section_count,
              :speed_grader_url,
              :message_students_url,
@@ -225,6 +225,8 @@ module Quizzes
           !serializer_option(:skip_lock_tests)
         when :anonymous_submissions
           quiz.survey?
+        when :permissions
+          include_permissions?
         else true
         end
       end
@@ -361,11 +363,11 @@ module Quizzes
     end
 
     def user_may_grade?
-      quiz.grants_right?(current_user, :grade)
+      context.grants_right?(current_user, :manage_grades)
     end
 
     def user_may_manage?
-      quiz.grants_right?(current_user, :manage)
+      context.grants_right?(current_user, :manage_assignments)
     end
 
     def user_finder

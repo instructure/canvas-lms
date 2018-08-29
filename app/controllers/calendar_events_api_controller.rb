@@ -1093,6 +1093,7 @@ class CalendarEventsApiController < ApplicationController
 
       scope = scope.active.order(:due_at, :id)
       scope = scope.send(*date_scope_and_args(:due_between_with_overrides)) unless @all_events
+
       last_scope = scope
       collections << [Shard.current.id, BookmarkedCollection.wrap(bookmarker, scope)]
     end
@@ -1147,7 +1148,7 @@ class CalendarEventsApiController < ApplicationController
       }
 
     # in courses with diff assignments on, only show the visible assignments
-    scope = scope.filter_by_visibilities_in_given_courses(student_ids, courses_to_filter_assignments.map(&:id))
+    scope = scope.filter_by_visibilities_in_given_courses(student_ids, courses_to_filter_assignments.map(&:id)).group('assignments.id')
     scope
   end
 
