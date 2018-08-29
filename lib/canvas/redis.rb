@@ -67,10 +67,10 @@ module Canvas::Redis
   end
 
   def self.handle_redis_failure(failure_retval, redis_name)
-    reply = Setting.skip_cache do
+    Setting.skip_cache do
       return failure_retval if redis_failure?(redis_name)
-      yield
     end
+    reply = yield
     raise reply if reply.is_a?(Exception)
     reply
   rescue ::Redis::BaseConnectionError, SystemCallError, ::Redis::CommandError => e
