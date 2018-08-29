@@ -118,11 +118,13 @@ Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
   shard_id = job.current_shard.try(:id).to_i
   stats = ["delayedjob.queue", "delayedjob.queue.tag.#{obj_tag}.#{method_tag}", "delayedjob.queue.shard.#{shard_id}"]
   stats << "delayedjob.queue.jobshard.#{job.shard.id}" if job.respond_to?(:shard)
+  stats << "delayedjob.queue.strand.#{job.strand}" if job.strand
   CanvasStatsd::Statsd.timing(stats, lag)
 
   begin
     stats = ["delayedjob.perform", "delayedjob.perform.tag.#{obj_tag}.#{method_tag}", "delayedjob.perform.shard.#{shard_id}"]
     stats << "delayedjob.perform.jobshard.#{job.shard.id}" if job.respond_to?(:shard)
+    stats << "delayedjob.perform.strand.#{job.strand}" if job.strand
     CanvasStatsd::Statsd.time(stats) do
       block.call(worker, job)
     end
