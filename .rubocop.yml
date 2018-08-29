@@ -155,6 +155,8 @@ RSpec/EmptyExampleGroup:
   Severity: error
 RSpec/RepeatedDescription:
   Severity: error
+RSpec/ExpectChange:
+  Enabled: false
 
 # this isn't good for us because of how we pin dependencies
 Bundler/OrderedGems:
@@ -201,6 +203,9 @@ Lint/EndAlignment:
 # Performance changes
 Performance/Detect:
   Severity: warning
+Performance/TimesMap:
+  Exclude:
+    - spec/**/*
 
 # these need better configuration than the default:
 Style/AndOr:
