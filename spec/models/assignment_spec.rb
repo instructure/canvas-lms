@@ -6728,13 +6728,13 @@ describe Assignment do
         let(:event) do
           AnonymousOrModerationEvent.find_by!(
             assignment: assignment,
-            event_type: AnonymousOrModerationEvent::GRADES_POSTED
+            event_type: :grades_posted
           )
         end
 
-        it "creates an AnonymousOrModerationEvent with an 'event_type' of '#{AnonymousOrModerationEvent::GRADES_POSTED}'" do
+        it "creates an AnonymousOrModerationEvent with an 'event_type' of 'grades_posted'" do
           expect { assignment.update!(grades_published_at: now) }.to change {
-            AnonymousOrModerationEvent.where(assignment: assignment, event_type: AnonymousOrModerationEvent::GRADES_POSTED).count
+            AnonymousOrModerationEvent.where(assignment: assignment, event_type: :grades_posted).count
           }.from(0).to(1)
         end
 

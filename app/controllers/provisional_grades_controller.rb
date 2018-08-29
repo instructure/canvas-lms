@@ -124,6 +124,7 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
         next unless selection.selected_provisional_grade_id_changed?
 
         selection.save!
+        selection.create_moderation_event(@current_user)
         changed_submission_ids.push(map[:submission].id)
         selection_json = selection.as_json(include_root: false, only: %w(assignment_id student_id selected_provisional_grade_id))
 
@@ -186,6 +187,7 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
     return render :json => { :message => 'student not in moderation set' }, :status => :bad_request unless selection
     selection.provisional_grade = pg
     selection.save!
+    selection.create_moderation_event(@current_user)
 
     # When users with visibility of the provisional grades and final grade
     # selection are using SpeedGrader when this selection occurs, update the

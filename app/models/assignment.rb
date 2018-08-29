@@ -515,7 +515,7 @@ class Assignment < ActiveRecord::Base
 
     AnonymousOrModerationEvent.create!(
       assignment: self,
-      event_type: AnonymousOrModerationEvent::GRADES_POSTED,
+      event_type: :grades_posted,
       payload: saved_changes.slice(:grades_published_at),
       user: @updating_user
     )

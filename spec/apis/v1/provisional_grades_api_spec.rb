@@ -79,6 +79,12 @@ describe 'Provisional Grades API', type: :request do
       expect(selected_grades).to match_array([grades[0], grades[2]])
     end
 
+    it "creates a moderation event for each selection made" do
+      expect { bulk_select([grades[0], grades[2]]) }.to change {
+        AnonymousOrModerationEvent.where(user: teacher, event_type: :provisional_grade_selected).count
+      }.from(0).to(2)
+    end
+
     it "selects the later grade when given multiple provisional grade ids for the same student" do
       bulk_select(grades[0..2])
       expect(selected_grades).to match_array([grades[0], grades[2]])
@@ -219,6 +225,12 @@ describe 'Provisional Grades API', type: :request do
                            'selected_provisional_grade_id' => @pg.id
                          })
       expect(@assignment.moderated_grading_selections.where(student_id: @student.id).first.provisional_grade).to eq(@pg)
+    end
+
+    it "creates a moderation event for the selection" do
+      expect { api_call_as_user(@teacher, :put, @path, @params) }.to change {
+        AnonymousOrModerationEvent.where(user: @teacher, event_type: :provisional_grade_selected).count
+      }.from(0).to(1)
     end
 
     it "should use anonymous_id instead of student_id if user cannot view student names" do

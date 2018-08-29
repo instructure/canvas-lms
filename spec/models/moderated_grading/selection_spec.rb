@@ -31,7 +31,7 @@ describe ModeratedGrading::Selection do
       class_name('User')
   end
 
-  it "is restricted to one selection per assignment/student pair" do
+  it 'is restricted to one selection per assignment/student pair' do
     # Setup an existing record for shoulda-matcher's uniqueness validation since we have
     # not-null constraints
     course = Course.create!
@@ -42,5 +42,43 @@ describe ModeratedGrading::Selection do
     end
 
     is_expected.to validate_uniqueness_of(:student_id).scoped_to(:assignment_id)
+  end
+
+  describe '#create_moderation_event' do
+    before(:once) do
+      course = Course.create!
+      @teacher = User.create!
+      course.enroll_teacher(@teacher, enrollment_state: :active)
+      student = User.create!
+      course.enroll_student(student, enrollment_state: :active)
+      assignment = course.assignments.create!(moderated_grading: true, grader_count: 2)
+      assignment.grade_student(student, grader: @teacher, provisional: true, score: 10)
+      @provisional_grade = assignment.provisional_grades.find_by(scorer: @teacher)
+      @selection = assignment.moderated_grading_selections.find_by(student: student)
+    end
+
+    it 'raises an error if there is no selected provisional grade' do
+      expect { @selection.create_moderation_event(@teacher) }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it 'creates an event if there is a selected provisional grade' do
+      @selection.update!(provisional_grade: @provisional_grade)
+      expect { @selection.create_moderation_event(@teacher) }.to change {
+        AnonymousOrModerationEvent.where(user: @teacher, event_type: :provisional_grade_selected).count
+      }.from(0).to(1)
+    end
+
+    context 'given a selection that is updated by a teacher' do
+      subject(:event) { @selection.create_moderation_event(@teacher) }
+
+      before(:once) { @selection.update!(provisional_grade: @provisional_grade) }
+
+      it { is_expected.to have_attributes(assignment_id: @selection.assignment_id) }
+      it { is_expected.to have_attributes(user_id: @teacher.id) }
+      it { is_expected.to have_attributes(submission_id: @provisional_grade.submission_id) }
+      it { is_expected.to have_attributes(event_type: 'provisional_grade_selected') }
+      it { expect(event.payload).to include('id' => @selection.selected_provisional_grade_id) }
+      it { expect(event.payload).to include('student_id' => @selection.student_id) }
+    end
   end
 end

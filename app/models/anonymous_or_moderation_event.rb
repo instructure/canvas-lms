@@ -36,11 +36,11 @@ class AnonymousOrModerationEvent < ApplicationRecord
     docviewer_strikeout_created
     docviewer_strikeout_updated
     grades_posted
+    provisional_grade_selected
     submission_comment_created
     submission_comment_updated
     submission_comment_deleted
   ].freeze
-  GRADES_POSTED = 'grades_posted'.freeze
 
   belongs_to :assignment
   belongs_to :user
@@ -52,4 +52,37 @@ class AnonymousOrModerationEvent < ApplicationRecord
   validates :event_type, presence: true
   validates :event_type, inclusion: EVENT_TYPES
   validates :payload, presence: true
+
+  with_options if: ->(e) { e.event_type == "assignment_updated" } do
+    validates :canvadoc_id, absence: true
+    validates :submission_id, absence: true
+  end
+
+  with_options if: ->(e) { e.event_type&.start_with?('docviewer') } do
+    validates :canvadoc_id, presence: true
+    validates :submission_id, presence: true
+    validate :payload_annotation_body_present
+  end
+
+  with_options if: ->(e) { e.event_type == "grades_posted" } do
+    validates :canvadoc_id, absence: true
+    validates :submission_id, absence: true
+  end
+
+  with_options if: ->(e) { e.event_type == "provisional_grade_selected" } do
+    validates :canvadoc_id, absence: true
+    validates :submission_id, presence: true
+    validate :payload_id_present
+    validate :payload_student_id_present
+  end
+
+  private
+
+  %w[id student_id annotation_body].each do |key|
+    define_method "payload_#{key}_present" do
+      if payload[key].blank?
+        errors.add(:payload, "#{key} can't be blank")
+      end
+    end
+  end
 end
