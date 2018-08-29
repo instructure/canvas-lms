@@ -54,7 +54,7 @@ Object.assign(ToDoItem.prototype, {
     data.end_at = data.plannable.todo_date
     data.all_day = false
     data.title = data.plannable.title
-    data.url = data.plannable.html_url
+    data.url = data.html_url
 
     this.object = this.calendarEvent = data // eslint-disable-line no-multi-assign
     this.object.id = this.id = `${data.plannable_type}_${data.plannable_id}` // eslint-disable-line no-multi-assign
@@ -93,7 +93,7 @@ Object.assign(ToDoItem.prototype, {
   },
 
   fullDetailsURL() {
-    return this.object.plannable.html_url
+    return this.object.html_url
   },
 
   saveParams(todo_date, title) {
@@ -144,10 +144,10 @@ Object.assign(ToDoItem.prototype, {
     // here we need to preserve the necessary fields that the planner api returns outside of plannable
     // (additionally we need to preserve the transformed ones from EventDataSource)
     const { type, context_code, all_context_codes, plannable_type, plannable_id,
-            planner_override, new_activity, submissions } = this.object
+            planner_override, new_activity, submissions, html_url } = this.object
 
     return {
-      type, context_code, all_context_codes, plannable_type, plannable_id, planner_override, new_activity, submissions,
+      type, context_code, all_context_codes, plannable_type, plannable_id, planner_override, new_activity, submissions, html_url,
       plannable_date: data.todo_date,
       plannable: data // replace the plannable with the wiki page / discussion topic API update result
     }

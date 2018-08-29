@@ -182,8 +182,8 @@ test('sets can_edit/can_delete/fullDetailsURL/readableType on discussion_topics'
     {
       context_code: 'course_1',
       plannable_type: 'discussion_topic',
-      plannable: { id: '123', title: 'some title', todo_date: '2016-12-01T12:30:00Z',
-                   html_url: 'http://example.org/courses/1/discussion_topics/123' }
+      html_url: 'http://example.org/courses/1/discussion_topics/123',
+      plannable: { id: '123', title: 'some title', todo_date: '2016-12-01T12:30:00Z' }
     },
     [{asset_string: 'course_1', can_update_discussion_topic: true, can_update_todo_date: true}]
   )
@@ -199,8 +199,8 @@ test('sets can_edit/can_delete/fullDetailsURL/readableType on wiki pages', () =>
     {
       context_code: 'course_1',
       plannable_type: 'wiki_page',
-      plannable: { url: 'some_page', title: 'some page', todo_date: '2016-12-01T12:30:00Z',
-                   html_url: 'http://example.org/courses/1/pages/some-page' }
+      html_url: 'http://example.org/courses/1/pages/some-page',
+      plannable: { url: 'some_page', title: 'some page', todo_date: '2016-12-01T12:30:00Z' }
     },
     [{asset_string: 'course_1', can_update_wiki_page: true, can_update_todo_date: true}]
   )
