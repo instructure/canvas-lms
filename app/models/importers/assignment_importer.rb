@@ -359,7 +359,7 @@ module Importers
         vendor_code = similarity_tool["vendor_code"]
         product_code = similarity_tool["product_code"]
         resource_type_code = similarity_tool["resource_type_code"]
-        item.assignment_configuration_tool_lookups.create(
+        item.assignment_configuration_tool_lookups.find_or_create_by!(
           tool_vendor_code: vendor_code,
           tool_product_code: product_code,
           tool_resource_type_code: resource_type_code,
