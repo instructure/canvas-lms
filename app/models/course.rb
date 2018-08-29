@@ -301,8 +301,9 @@ class Course < ActiveRecord::Base
       EnrollmentState.send_later_if_production(:invalidate_states_for_course_or_section, self) if self.enrollments.exists?
       # if the course date settings have been changed, we'll end up reprocessing all the access values anyway, so no need to queue below for other setting changes
     end
-    if @changed_settings
-      changed_keys = (@changed_settings & [:restrict_student_future_view, :restrict_student_past_view])
+    if saved_change_to_account_id? || @changed_settings
+      state_settings = [:restrict_student_future_view, :restrict_student_past_view]
+      changed_keys = saved_change_to_account_id? ? state_settings : (@changed_settings & state_settings)
       if changed_keys.any?
         EnrollmentState.send_later_if_production(:invalidate_access_for_course, self, changed_keys)
       end
