@@ -4499,6 +4499,8 @@ describe 'Submissions API', type: :request do
 
     describe "include[]=provisional_grades" do
       before(:once) do
+        @course.root_account.enable_service(:avatars)
+        @course.root_account.save!
         @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/gradeable_students?include[]=provisional_grades"
         @params = { :controller => 'submissions_api', :action => 'gradeable_students',
                     :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.to_param,

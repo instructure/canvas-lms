@@ -897,7 +897,7 @@ class SubmissionsApiController < ApplicationController
             assignment: @assignment,
             submission: submission,
             current_user: @current_user,
-            avatars: service_enabled?(:avatars) && !@assignment.graded_as_group?,
+            avatars: service_enabled?(:avatars) && !@assignment.grade_as_group?,
             includes: includes
           )
           json.merge!({ provisional_grades: pg_list })
