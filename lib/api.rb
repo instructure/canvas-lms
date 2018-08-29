@@ -599,7 +599,6 @@ module Api
 
   # Return a template url that follows the root links key for the jsonapi.org
   # standard.
-  #
   def templated_url(method, *args)
     format = /^\{.*\}$/
     placeholder = "PLACEHOLDER"
