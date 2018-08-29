@@ -3,13 +3,17 @@
 #
 # # The recommended setup is to define your redis server(s) in this file, and
 # # then in cache_store.yml specify cache_store: redis_store without any servers
-# # listed, which will tell Canvas to use this same server list.
+# # listed, which will tell Canvas to use this same server list. You can also
+# # reverse this by configuring servers in cache_store.yml, and referencing them
+# # here with servers: cache_store
 #
 # production:
 #   servers:
 #   # list of redis servers to use in the ring
 #   - redis://redis01
 #   - redis://redis02
+#   # off, compact, or json
+#   # log_style: compact
 
 test:
   # only tests that are exercising the integration with redis require redis to run.
