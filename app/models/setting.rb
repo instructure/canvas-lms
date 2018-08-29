@@ -28,15 +28,21 @@ class Setting < ActiveRecord::Base
     @skip_cache = old_enabled
   end
 
-  def self.get(name, default, cache_options: nil)
+  def self.get(name, default, cache_options: nil, set_if_nx: false)
     begin
       cache.fetch(name, cache_options) do
-        if @skip_cache
-          Setting.where(name: name).first&.value || default&.to_s
-        else
-          MultiCache.fetch(["settings", name], cache_options) do
-            Setting.where(name: name).first&.value || default&.to_s
+        check = Proc.new do
+          object = Setting.where(name: name).take
+          if !object && set_if_nx
+            Setting.create!(name: name, value: default&.to_s)
           end
+          object&.value || default&.to_s
+        end
+
+        if @skip_cache
+          check.call
+        else
+          MultiCache.fetch(["settings", name], cache_options) { check.call }
         end
       end
     rescue ActiveRecord::StatementInvalid, ActiveRecord::ConnectionNotEstablished => e
@@ -49,14 +55,11 @@ class Setting < ActiveRecord::Base
   # Note that after calling this, you should send SIGHUP to all running Canvas processes
   def self.set(name, value)
     cache.delete(name)
-    s = Setting.where(name: name).first_or_initialize
-    s.value = value.try(:to_s)
+    s = Setting.where(name: name).take
+    s ||= Setting.new(name: name)
+    s.value = value&.to_s
     s.save!
     MultiCache.delete(["settings", name])
-  end
-
-  def self.get_or_set(name, new_val)
-    Setting.where(name: name).first_or_create(value: new_val).value
   end
 
   # this cache doesn't get invalidated by other rails processes, obviously, so
