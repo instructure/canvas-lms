@@ -201,7 +201,6 @@ describe "new account user search" do
     include ConversationsNewMessageModalPage
 
     before do
-      @user.update_attribute(:name, "Test User")
       @sub_account = Account.create!(name: "sub", parent_account: @account)
     end
 
@@ -221,6 +220,26 @@ describe "new account user search" do
       user_session(@admin)
       visit_subaccount(@sub_account)
       expect(results_body).not_to contain_jqcss(add_user_button_jqcss)
+    end
+
+    it "should paginate" do
+      ('A'..'Z').each do |letter|
+        user_with_pseudonym(:account => @account, :name => "Test User #{letter}")
+      end
+      visit(@account)
+
+      expect(get_rows.count).to eq 15
+      expect(get_rows.first).to include_text("Test User A")
+      expect(all_results).to_not include_text("Test User O")
+      expect(results_body).not_to contain_jqcss(page_previous_jqcss)
+
+      click_page_number_button("2")
+      wait_for_ajaximations
+
+      expect(get_rows.count).to eq 12
+      expect(get_rows.first).to include_text("Test User O")
+      expect(get_rows.last).to include_text("Test User Z")
+      expect(all_results).not_to include_text("Test User A")
     end
   end
 end

@@ -86,12 +86,20 @@ module NewUserSearchPage
     fj("[data-automation='users list'] tr:contains('#{user_name}') [role=button]:has([name='IconEdit'])")
   end
 
+  def page_previous_jqcss
+    'button:has([name="IconArrowOpenStart"])'
+  end
+
   def page_previous_button
-    fj("[role=button]:has([title='Previous Page'])")
+    fj(page_previous_jqcss)
   end
 
   def page_next_button
-    fj("[role=button]:has([title='Next Page'])")
+    fj("[role=button]:has([name='IconArrowOpenEnd'])")
+  end
+
+  def page_number_button(number)
+    fj("nav button:contains(\"#{number}\")")
   end
 
   def results_alert
@@ -100,6 +108,10 @@ module NewUserSearchPage
 
   def results_body
     f('#content')
+  end
+
+  def all_results
+    f('[data-automation="users list"]')
   end
 
   def results_row
@@ -161,6 +173,10 @@ module NewUserSearchPage
 
   def click_next_button
     page_next_button.click
+  end
+
+  def click_page_number_button(number)
+    page_number_button(number).click
   end
 
   def click_people_more_options
