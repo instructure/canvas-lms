@@ -17,79 +17,8 @@
 #
 
 module Types
-  EnrollmentType = GraphQL::ObjectType.define do
-    name "Enrollment"
-
-    implements GraphQL::Relay::Node.interface
-    interfaces [Interfaces::TimestampInterface]
-
-    global_id_field :id
-    field :_id, !types.ID, "legacy canvas id", property: :id
-
-    field :user, UserType do
-      resolve ->(enrollment, _, ctx) {
-        Loaders::IDLoader.for(User).load(enrollment.user_id)
-      }
-    end
-    field :course, CourseType do
-      resolve ->(enrollment, _, _) {
-        Loaders::IDLoader.for(Course).load(enrollment.course_id)
-      }
-    end
-    field :section, SectionType do
-      resolve ->(enrollment, _, _) {
-        Loaders::IDLoader.for(CourseSection).load(enrollment.course_section_id)
-      }
-    end
-
-    field :state, !EnrollmentWorkflowState, property: :workflow_state
-
-    field :type, !EnrollmentTypeType
-
-    field :grades, GradesType do
-      argument :gradingPeriodId, types.ID,
-        "The grading period to return grades for. If not specified, will use the current grading period (or the course grade for courses that don't use grading periods)",
-        prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("GradingPeriod")
-
-      resolve ->(enrollment, args, ctx) {
-        grades_resolver = ->(grading_period_id) do
-          grades = grading_period_id ?
-            enrollment.find_score(grading_period_id: grading_period_id.to_i) :
-            enrollment.find_score(course_score: true)
-
-          # make a dummy score so that the grade object is always returned (if
-          # the user has permission to read it)
-          if grades.nil?
-            score_attrs = grading_period_id ?
-              {enrollment: enrollment, grading_period_id: grading_period_id} :
-              {enrollment: enrollment, course_score: true}
-
-            grades = Score.new(score_attrs)
-          end
-
-          grades.grants_right?(ctx[:current_user], :read) ?
-            grades :
-            nil
-        end
-
-        Loaders::AssociationLoader.for(Enrollment, [:scores, :user, :course]).
-          load(enrollment).then do
-            if args.key?(:gradingPeriodId)
-              grades_resolver.call(args[:gradingPeriodId])
-            else
-              Loaders::CurrentGradingPeriodLoader.load(enrollment.course).then { |gp, _|
-                grades_resolver.call(gp&.id)
-              }
-            end
-          end
-      }
-    end
-
-    field :lastActivityAt, DateTimeType, property: :last_activity_at
-  end
-
-  EnrollmentWorkflowState = GraphQL::EnumType.define do
-    name "EnrollmentWorkflowState"
+  class EnrollmentWorkflowState < Types::BaseEnum
+    graphql_name "EnrollmentWorkflowState"
     value "invited"
     value "creation_pending"
     value "active"
@@ -99,13 +28,87 @@ module Types
     value "inactive"
   end
 
-  EnrollmentTypeType = GraphQL::EnumType.define do
-    name "EnrollmentType"
+  class EnrollmentTypeType < Types::BaseEnum
+    graphql_name "EnrollmentType"
     value "StudentEnrollment"
     value "TeacherEnrollment"
     value "TaEnrollment"
     value "ObserverEnrollment"
     value "DesignerEnrollment"
     value "StudentViewEnrollment"
+  end
+
+  class EnrollmentType < ApplicationObjectType
+    graphql_name "Enrollment"
+
+    implements GraphQL::Relay::Node.interface
+    implements Interfaces::TimestampInterface
+
+    alias :enrollment :object
+
+    global_id_field :id
+    field :_id, ID, "legacy canvas id", method: :id, null: false
+
+    field :user, UserType, null: true
+    def user
+      load_association(:user)
+    end
+
+    field :course, CourseType, null: true
+    def course
+      load_association(:course)
+    end
+
+    field :section, SectionType, null: true
+    def section
+      load_association(:course_section)
+    end
+
+    field :state, EnrollmentWorkflowState, method: :workflow_state, null: false
+
+    field :type, EnrollmentTypeType, null: false
+
+    field :grades, GradesType, null: true do
+      argument :grading_period_id, ID,
+        "The grading period to return grades for. If not specified, will use the current grading period (or the course grade for courses that don't use grading periods)",
+        required: false,
+        prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("GradingPeriod")
+    end
+    DEFAULT_GRADING_PERIOD = "default_grading_period"
+    def grades(grading_period_id: DEFAULT_GRADING_PERIOD)
+      Loaders::AssociationLoader.for(Enrollment, [:scores, :user, :course]).
+        load(enrollment).then do
+          if grading_period_id == DEFAULT_GRADING_PERIOD
+            Loaders::CurrentGradingPeriodLoader.load(enrollment.course).then { |gp, _|
+              load_grades(gp&.id)
+            }
+          else
+            load_grades(grading_period_id)
+          end
+        end
+    end
+
+    def load_grades(grading_period_id)
+      grades = grading_period_id ?
+        enrollment.find_score(grading_period_id: grading_period_id.to_i) :
+        enrollment.find_score(course_score: true)
+
+      # make a dummy score so that the grade object is always returned (if
+      # the user has permission to read it)
+      if grades.nil?
+        score_attrs = grading_period_id ?
+          {enrollment: enrollment, grading_period_id: grading_period_id} :
+          {enrollment: enrollment, course_score: true}
+
+        grades = Score.new(score_attrs)
+      end
+
+      grades.grants_right?(current_user, :read) ?
+        grades :
+        nil
+    end
+    private :load_grades
+
+    field :last_activity_at, DateTimeType, null: true
   end
 end

@@ -45,7 +45,7 @@ describe Types::EnrollmentType do
 
     it "lets you specify a different grading period" do
       grades = enrollment_type.grades(current_user: @teacher, args: {
-        gradingPeriodId: @gp2.id.to_s
+        grading_period_id: @gp2.id.to_s
       })
       expect(grades.enrollment).to eq enrollment
       expect(grades.grading_period_id).to eq @gp2.id
@@ -64,6 +64,12 @@ describe Types::EnrollmentType do
 
       grades = enrollment_type.grades(current_user: @teacher)
       expect(grades.id).to be_nil
+    end
+  end
+
+  context "section" do
+    it "works" do
+      expect(enrollment_type.section).to eq enrollment.course_section
     end
   end
 end
