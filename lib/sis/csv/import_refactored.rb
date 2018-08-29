@@ -279,7 +279,7 @@ module SIS
         next_importer_type = IMPORTERS.detect{|i| !@batch.data[:completed_importers].include?(i) && @parallel_importers[i].present?}
         return finish unless next_importer_type
 
-        enqueue_args = { :priority => Delayed::LOW_PRIORITY, :on_permanent_failure => :fail_with_error! }
+        enqueue_args = { :priority => Delayed::LOW_PRIORITY, :on_permanent_failure => :fail_with_error!, :max_attempts => 5}
         if next_importer_type == :account
           enqueue_args[:strand] = "sis_account_import:#{@root_account.global_id}" # run one at a time
         else
