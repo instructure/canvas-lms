@@ -55,7 +55,7 @@ describe OutcomesController do
     end
 
     it "should assign variables" do
-      user_session(@student)
+      user_session(@teacher)
       get 'index', params: {:course_id => @course.id}
       expect(response).to be_successful
     end

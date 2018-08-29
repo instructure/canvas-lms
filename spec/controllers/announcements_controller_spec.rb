@@ -59,6 +59,7 @@ describe AnnouncementsController do
 
     it "returns new bundle for course announcements if section specific enabled" do
       user_session(@user)
+      @course.announcements.create!(message: 'hello!')
       get 'index', params: { :course_id => @course.id }
       expect(response).to be_successful
       expect(assigns[:js_bundles].length).to eq 1

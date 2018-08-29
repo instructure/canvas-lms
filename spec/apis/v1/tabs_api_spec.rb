@@ -275,8 +275,23 @@ describe TabsController, type: :request do
 
     it "doesn't include hidden tabs for student" do
       course_with_student(active_all: true)
-      tab_ids = [0, 1, 3, 8, 5, 6, 14, 2, 11, 15, 4, 10, 13]
-      hidden_tabs = [3, 8, 5]
+      tab_ids = [
+        Course::TAB_HOME,
+        Course::TAB_SYLLABUS,
+        Course::TAB_ASSIGNMENTS,
+        Course::TAB_DISCUSSIONS,
+        Course::TAB_GRADES,
+        Course::TAB_PEOPLE,
+        Course::TAB_ANNOUNCEMENTS,
+        Course::TAB_PAGES,
+        Course::TAB_FILES,
+        Course::TAB_OUTCOMES,
+        Course::TAB_QUIZZES,
+        Course::TAB_MODULES,
+        Course::TAB_OUTCOMES
+      ]
+      hidden_tabs = [Course::TAB_ASSIGNMENTS, Course::TAB_DISCUSSIONS, Course::TAB_GRADES]
+
       @course.tab_configuration = tab_ids.map do |n|
         hash = {'id' => n}
         hash['hidden'] = true if hidden_tabs.include?(n)
@@ -285,8 +300,11 @@ describe TabsController, type: :request do
       @course.save
       json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs", { :controller => 'tabs', :action => 'index',
                                                                     :course_id => @course.to_param, :format => 'json'})
-      expect(json.count).to eq 3
-      json.each {|t| expect(%w{home syllabus people}).to include(t['id'])}
+      expect(json).to match_array([
+        a_hash_including({"id" => "home"}),
+        a_hash_including({"id" => "syllabus"}),
+        a_hash_including({"id" => "people"}),
+      ])
     end
 
     describe "teacher in a course" do

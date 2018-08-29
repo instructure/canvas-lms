@@ -170,6 +170,7 @@ describe "better_file_browsing" do
     include_context "public course as a logged out user"
 
     it "should display course files", priority: "1", test_id: 270032 do
+      public_course.attachments.create!(:filename => "somefile.doc", :uploaded_data => StringIO.new('test'))
       get "/courses/#{public_course.id}/files"
       expect(f('.ef-main')).to be_displayed
     end
