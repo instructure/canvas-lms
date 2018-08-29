@@ -49,7 +49,7 @@ module Canvas::Redis
   COMPACT_LINE = "Redis (%{request_time_ms}ms) %{command} %{key} [%{host}]".freeze
   def self.log_style
     # supported: 'off', 'compact', 'json'
-    Setting.get('redis_log_style', 'compact')
+    @log_style ||= ConfigFile.load('redis')&.[]('log_style') || 'compact'
   end
 
   def self.redis_failure?(redis_name)
