@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
 import Table from '@instructure/ui-elements/lib/components/Table'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import React from 'react'
@@ -23,6 +24,8 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!react_developer_keys'
 
 import DeveloperKey from './DeveloperKey'
+
+import 'compiled/jquery.rails_flash_notifications'
 
 class DeveloperKeysTable extends React.Component {
   createSetFocusCallback = (developerKeyId) => {
