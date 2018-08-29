@@ -1740,13 +1740,26 @@ class Attachment < ActiveRecord::Base
 
   class OverQuotaError < StandardError; end
 
-  def self.clone_url_strand(url)
-    _, uri = CanvasHttp.validate_url(url) rescue nil
-    return "file_download" unless uri&.host
-    first_dot = uri.host.rindex('.')
-    second_dot = uri.host.rindex('.', first_dot - 1) if first_dot
-    return ["file_download", uri.host] unless second_dot
-    ["file_download", uri.host[second_dot + 1..-1]]
+  class << self
+    def clone_url_strand_overrides
+      @clone_url_strand_overrides ||= YAML.load(Canvas::DynamicSettings.find(tree: :private)['clone_url_strand.yml'] || '{}')
+    end
+
+    def reset_clone_url_strand_overrides
+      @clone_url_strand_overrides = nil
+    end
+    Canvas::Reloader.on_reload { Attachment.reset_clone_url_strand_overrides }
+
+    def clone_url_strand(url)
+      _, uri = CanvasHttp.validate_url(url) rescue nil
+      return "file_download" unless uri&.host
+      return ["file_download", clone_url_strand_overrides[uri.host]] if clone_url_strand_overrides[uri.host]
+
+      first_dot = uri.host.rindex('.')
+      second_dot = uri.host.rindex('.', first_dot - 1) if first_dot
+      return ["file_download", uri.host] unless second_dot
+      ["file_download", uri.host[second_dot + 1..-1]]
+    end
   end
 
   def clone_url(url, duplicate_handling, check_quota, opts={})
