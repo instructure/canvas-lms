@@ -476,14 +476,6 @@ END
       development: true,
       root_opt_in: false
     },
-    'allow_rtl' =>
-    {
-      display_name: -> { I18n.t('Allow RTL users to see RTL interface') },
-      description: -> { I18n.t('This feature enables users of right-to-left (RTL) languages to see the RTL layout under development. Eventually, this will become the default behavior and this option will be removed.') },
-      applies_to: 'RootAccount',
-      state: 'allowed',
-      beta: true,
-    },
     'force_rtl' =>
     {
       display_name: -> { I18n.t('Turn on RTL Even For Non-RTL Languages') },

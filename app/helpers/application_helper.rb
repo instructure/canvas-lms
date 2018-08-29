@@ -245,7 +245,7 @@ module ApplicationHelper
   end
 
   def use_rtl?
-    @current_user.try(:feature_enabled?, :force_rtl) || (@domain_root_account.try(:feature_enabled?, :allow_rtl) && I18n.rtl?)
+    I18n.rtl? || @current_user.try(:feature_enabled?, :force_rtl)
   end
 
   # this is exactly the same as our sass helper with the same name
