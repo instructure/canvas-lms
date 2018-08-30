@@ -119,7 +119,7 @@ class GradebooksController < ApplicationController
       courses_with_grades: courses_with_grades_json,
       effective_due_dates: effective_due_dates,
       exclude_total: @exclude_total,
-      non_scoring_rubrics_enabled: @context.root_account.feature_enabled?(:non_scoring_rubrics),
+      gradebook_non_scoring_rubrics_enabled: @context.root_account.feature_enabled?(:non_scoring_rubrics),
       rubric_assessments: rubric_assessments_json(@presenter.rubric_assessments, @current_user, session, style: 'full'),
       rubrics: rubrics_json(@presenter.rubrics, @current_user, session, style: 'full'),
       save_assignment_order_url: course_save_assignment_order_url(@context),
