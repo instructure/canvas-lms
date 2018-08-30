@@ -17,6 +17,9 @@
 %>
 
 <%
+  js_env ga_page_title: "Grades for User"
+%>
+<%
   content_for :page_title, join_title(t(:page_title, "Grades"), @current_user.name)
   js_bundle :user_grades
   css_bundle :user_grades

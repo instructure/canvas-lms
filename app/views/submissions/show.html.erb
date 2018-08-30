@@ -17,6 +17,9 @@
 %>
 
 <%
+  js_env ga_page_title: "#{@assignment.title} Submission Details"
+%>
+<%
   currently_peer_reviewing = @assessment_request.try(:assigned?)
   js_bundle :submissions
   css_bundle :submission

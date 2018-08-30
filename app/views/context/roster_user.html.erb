@@ -17,6 +17,9 @@
 %>
 
 <%
+  js_env ga_page_title: "Roster User"
+%>
+<%
   add_crumb(t('#crumbs.people', "People"), context_url(@context, :context_users_url))
   add_crumb(context_user_name(@context, @user), context_url(@context, :context_user_url, @user))
   @active_tab="people"
