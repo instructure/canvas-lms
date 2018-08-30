@@ -25,17 +25,18 @@ class SortsAssignments
     user = opts.fetch( :user )
     current_user = opts[:current_user] || opts.fetch( :user )
     session = opts.fetch( :session )
-    submissions = opts.fetch( :submissions )
+    submissions = opts[:submissions]
     upcoming_limit = opts[:upcoming_limit] || 1.week.from_now
+    course = opts[:course]
 
     AssignmentsSortedByDueDate.new(
-      past(assignments),
-      overdue(assignments, user, session, submissions),
-      undated(assignments),
-      ungraded_for_user_and_session(assignments, user, current_user, session),
-      unsubmitted_for_user_and_session(assignments, user, current_user, session),
-      upcoming(assignments, upcoming_limit),
-      future(assignments)
+      -> { past(assignments) },
+      -> { overdue(assignments, user, session, submissions) },
+      -> { undated(assignments) },
+      -> { ungraded_for_user_and_session(assignments, user, current_user, session) },
+      -> { unsubmitted_for_user_and_session(course, assignments, user, current_user, session) },
+      -> { upcoming(assignments, upcoming_limit) },
+      -> { future(assignments) }
     )
   end
 
@@ -54,10 +55,10 @@ class SortsAssignments
     assignments.select{ |assignment| assignment.due_at == nil }
   end
 
-  def self.unsubmitted_for_user_and_session(assignments, user, current_user, session)
+  def self.unsubmitted_for_user_and_session(course, assignments, user, current_user, session)
+    return [] unless course.grants_right?(current_user, session, :manage_grades)
     assignments ||= []
     assignments.select do |assignment|
-      assignment.grants_right?(current_user, session, :grade) &&
         assignment.expects_submission? &&
         assignment.submission_for_student(user)[:id].blank?
     end
@@ -126,13 +127,14 @@ class SortsAssignments
     end
 
     sorted_assignments = self.by_due_date(
+      :course => context,
       :assignments => overridden_assignments,
       :user => user_for_sorting,
       :current_user => current_user,
       :session => session,
       :submissions => submissions_for_user
     )
-    filtered_assignment_ids = sorted_assignments.send(bucket).map(&:id)
+    filtered_assignment_ids = sorted_assignments.send(bucket).call.map(&:id)
     given_scope.where(id: filtered_assignment_ids)
   end
 

@@ -1746,6 +1746,15 @@ class Attachment < ActiveRecord::Base
 
   class OverQuotaError < StandardError; end
 
+  def self.clone_url_strand(url)
+    _, uri = CanvasHttp.validate_url(url) rescue nil
+    return "file_download" unless uri&.host
+    first_dot = uri.host.rindex('.')
+    second_dot = uri.host.rindex('.', first_dot - 1) if first_dot
+    return ["file_download", uri.host] unless second_dot
+    ["file_download", uri.host[second_dot + 1..-1]]
+  end
+
   def clone_url(url, duplicate_handling, check_quota, opts={})
     begin
       Attachment.clone_url_as_attachment(url, :attachment => self)

@@ -910,23 +910,15 @@ class ApplicationController < ActionController::Base
 
     log_course(course)
 
-    if @current_user
-      submissions = @current_user.submissions.shard(@current_user).to_a
-      submissions.each{ |s| s.mute if s.muted_assignment? }
-    else
-      submissions = []
-    end
-
     assignments.map! {|a| a.overridden_for(@current_user)}
     sorted = SortsAssignments.by_due_date({
       :assignments => assignments,
       :user => @current_user,
       :session => session,
-      :upcoming_limit => 1.week.from_now,
-      :submissions => submissions
+      :upcoming_limit => 1.week.from_now
     })
 
-    sorted.upcoming.sort
+    sorted.upcoming.call.sort
   end
 
   def log_course(course)

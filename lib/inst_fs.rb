@@ -23,6 +23,7 @@ module InstFS
     end
 
     def login_pixel(user, session, oauth_host)
+      return if session[:oauth2] # don't stomp an existing oauth flow in progress
       if !session[:shown_instfs_pixel] && user && enabled?
         session[:shown_instfs_pixel] = true
         pixel_url = login_pixel_url(token: session_jwt(user, oauth_host))

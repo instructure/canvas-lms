@@ -41,14 +41,14 @@ describe QuizzesNext::Service do
   describe '.active_lti_assignments_for_course' do
     it 'returns active lti assignments in the course' do
       course = course_model
-      lti_assignment_active1 = assignment_model(course: course)
-      lti_assignment_active2 = assignment_model(course: course)
-      lti_assignment_inactive = assignment_model(course: course)
-      assignment_active = assignment_model(course: course)
+      lti_assignment_active1 = assignment_model(course: course, submission_types: "external_tool")
+      lti_assignment_active2 = assignment_model(course: course, submission_types: "external_tool")
+      lti_assignment_inactive = assignment_model(course: course, submission_types: "external_tool")
+      assignment_active = assignment_model(course: course, submission_types: "external_tool")
 
-      allow(lti_assignment_inactive).to receive(:active?).and_return(false)
-      allow(lti_assignment_active1).to receive(:quiz_lti?).and_return(true)
-      allow(lti_assignment_active2).to receive(:quiz_lti?).and_return(true)
+      lti_assignment_inactive.destroy
+      allow_any_instantiation_of(lti_assignment_active1).to receive(:quiz_lti?).and_return(true)
+      allow_any_instantiation_of(lti_assignment_active2).to receive(:quiz_lti?).and_return(true)
 
       active_lti_assignments = Service.active_lti_assignments_for_course(course)
 
@@ -56,6 +56,10 @@ describe QuizzesNext::Service do
       expect(active_lti_assignments).to include(lti_assignment_active2)
       expect(active_lti_assignments).not_to include(lti_assignment_inactive)
       expect(active_lti_assignments).not_to include(assignment_active)
+
+      filtered_assignments = Service.active_lti_assignments_for_course(course,
+        selected_assignment_ids: [lti_assignment_active2.id, assignment_active.id])
+      expect(filtered_assignments).to eq [lti_assignment_active2]
     end
   end
 

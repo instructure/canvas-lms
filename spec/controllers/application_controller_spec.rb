@@ -45,7 +45,9 @@ describe ApplicationController do
 
       expect(GoogleDrive::Connection).to receive(:new).with("real_current_user_token", "real_current_user_secret", 30)
 
-      controller.send(:google_drive_connection)
+      Setting.skip_cache do
+        controller.send(:google_drive_connection)
+      end
     end
 
     it "uses @current_user second" do
@@ -58,7 +60,9 @@ describe ApplicationController do
       expect(Rails.cache).to receive(:fetch).with(['google_drive_tokens', mock_current_user].cache_key).and_return(["current_user_token", "current_user_secret"])
 
       expect(GoogleDrive::Connection).to receive(:new).with("current_user_token", "current_user_secret", 30)
-      controller.send(:google_drive_connection)
+      Setting.skip_cache do
+        controller.send(:google_drive_connection)
+      end
     end
 
     it "queries user services if token isn't in the cache" do
@@ -73,7 +77,9 @@ describe ApplicationController do
       expect(mock_user_services).to receive(:where).with(service: "google_drive").and_return(double(first: double(token: "user_service_token", secret: "user_service_secret")))
 
       expect(GoogleDrive::Connection).to receive(:new).with("user_service_token", "user_service_secret", 30)
-      controller.send(:google_drive_connection)
+      Setting.skip_cache do
+        controller.send(:google_drive_connection)
+      end
     end
 
     it "uses the session values if no users are set" do

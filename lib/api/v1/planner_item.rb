@@ -50,7 +50,7 @@ module Api::V1::PlannerItem
         quiz = item.is_a?(Quizzes::Quiz) ? item : item.quiz
         hash[:plannable_id] = quiz.id
         hash[:plannable_type] = 'quiz'
-        hash[:plannable] = quiz_json(quiz, quiz.context, user, session)
+        hash[:plannable] = quiz_json(quiz, quiz.context, user, session, skip_permissions: true)
         hash[:html_url] = named_context_url(quiz.context, :context_quiz_url, quiz.id)
         hash[:planner_override] ||= planner_override_json(quiz.planner_override_for(user), user, session)
       elsif item.is_a?(WikiPage) || (item.respond_to?(:wiki_page?) && item.wiki_page?)
@@ -63,14 +63,14 @@ module Api::V1::PlannerItem
       elsif item.is_a?(Announcement)
         hash[:plannable_date] = item.posted_at || item.created_at
         hash[:plannable_type] = 'announcement'
-        hash[:plannable] = discussion_topic_api_json(item, item.context, user, session, use_preload: true)
+        hash[:plannable] = discussion_topic_api_json(item, item.context, user, session, use_preload: true, user_can_moderate: false, skip_permissions: true)
         hash[:html_url] = named_context_url(item.context, :context_discussion_topic_url, item.id)
       elsif item.is_a?(DiscussionTopic) || (item.respond_to?(:discussion_topic?) && item.discussion_topic?)
         topic = item.is_a?(DiscussionTopic) ? item : item.discussion_topic
         hash[:plannable_id] = topic.id
         hash[:plannable_date] = item[:user_due_date] || topic.todo_date || topic.posted_at || topic.created_at
         hash[:plannable_type] = 'discussion_topic'
-        hash[:plannable] = discussion_topic_api_json(topic, topic.context, user, session, assignment_opts: assignment_opts, use_preload: true)
+        hash[:plannable] = discussion_topic_api_json(topic, topic.context, user, session, assignment_opts: assignment_opts, use_preload: true, user_can_moderate: false, skip_permissions: true)
         hash[:html_url] = discussion_topic_html_url(topic, user, hash[:submissions])
         hash[:planner_override] ||= planner_override_json(topic.planner_override_for(user), user, session)
       else

@@ -53,6 +53,12 @@ describe QuizzesNext::ExportService do
       end
     end
 
+    it "filters to selected assignments with selective exports" do
+      export_opts = {:selective => true, :exported_assets => ['assignment_42', 'wiki_page_84']}
+      expect(QuizzesNext::Service).to receive(:active_lti_assignments_for_course).with(course, selected_assignment_ids: ["42"]).and_return([])
+      ExportService.begin_export(course, export_opts)
+    end
+
     it 'returns metadata for each assignment' do
       assignment1 = double('assignment')
       assignment2 = double('assignment')

@@ -22,6 +22,8 @@ module Services
   describe LiveEventsSubscriptionService do
     include WebMock::API
 
+    around { |example| Setting.skip_cache(&example) }
+
     context 'service unavailable' do
       before do
         allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
@@ -212,6 +214,7 @@ module Services
           allow(tool_proxy).to receive(:context).and_return(root_account_context)
           allow(root_account_context).to receive(:root_account).and_return(root_account_object)
           expect(Timeout).to receive(:timeout).and_raise(Timeout::Error)
+          expect(Canvas::Errors).to receive(:capture_exception)
           expect { LiveEventsSubscriptionService.tool_proxy_subscriptions(tool_proxy) }.to raise_error(Timeout::Error)
         end
       end

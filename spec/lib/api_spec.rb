@@ -980,6 +980,24 @@ describe Api do
       })
       expect(links.first).to eq "<www.example.com/?page=4&per_page=10>; rel=\"next\""
     end
+
+    it "prevents link headers from consuming more than 6K of header space" do
+      links = Api.build_links("www.example.com/", {
+        :query_parameters => { :blah => 'a' * 2000 },
+        :per_page => 10,
+        :current => 8,
+        :next => 4,
+        :prev => 2,
+        :first => 1,
+        :last => 10,
+      })
+      expect(links.all?{ |l| l =~ /www.example.com\/\?/ }).to be_truthy
+      expect(links.find{ |l| l.match(/rel="current"/)}).to be_nil
+      expect(links.find{ |l| l.match(/rel="next"/)}).to match /page=4&per_page=10>/
+      expect(links.find{ |l| l.match(/rel="prev"/)}).to match /page=2&per_page=10>/
+      expect(links.find{ |l| l.match(/rel="first"/)}).to be_nil
+      expect(links.find{ |l| l.match(/rel="last"/)}).to match /page=10&per_page=10>/
+    end
   end
 
   describe "#accepts_jsonapi?" do

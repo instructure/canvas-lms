@@ -21,10 +21,29 @@ class Setting < ActiveRecord::Base
 
   self.shard_category = :unsharded if self.respond_to?(:shard_category=)
 
-  def self.get(name, default, cache_options: nil)
+  def self.skip_cache
+    @skip_cache, old_enabled = true, @skip_cache
+    yield
+  ensure
+    @skip_cache = old_enabled
+  end
+
+  def self.get(name, default, cache_options: nil, set_if_nx: false)
     begin
       cache.fetch(name, cache_options) do
-        Setting.where(name: name).first&.value || default&.to_s
+        check = Proc.new do
+          object = Setting.where(name: name).take
+          if !object && set_if_nx
+            Setting.create!(name: name, value: default&.to_s)
+          end
+          object&.value || default&.to_s
+        end
+
+        if @skip_cache
+          check.call
+        else
+          MultiCache.fetch(["settings", name], cache_options) { check.call }
+        end
       end
     rescue ActiveRecord::StatementInvalid, ActiveRecord::ConnectionNotEstablished => e
       # the db may not exist yet
@@ -36,13 +55,11 @@ class Setting < ActiveRecord::Base
   # Note that after calling this, you should send SIGHUP to all running Canvas processes
   def self.set(name, value)
     cache.delete(name)
-    s = Setting.where(name: name).first_or_initialize
-    s.value = value.try(:to_s)
+    s = Setting.where(name: name).take
+    s ||= Setting.new(name: name)
+    s.value = value&.to_s
     s.save!
-  end
-
-  def self.get_or_set(name, new_val)
-    Setting.where(name: name).first_or_create(value: new_val).value
+    MultiCache.delete(["settings", name])
   end
 
   # this cache doesn't get invalidated by other rails processes, obviously, so
@@ -58,5 +75,6 @@ class Setting < ActiveRecord::Base
   def self.remove(name)
     cache.delete(name)
     Setting.where(name: name).delete_all
+    MultiCache.delete(["settings", name])
   end
 end

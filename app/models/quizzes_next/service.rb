@@ -20,10 +20,10 @@ module QuizzesNext
       context&.feature_enabled?(:quizzes_next)
     end
 
-    def self.active_lti_assignments_for_course(course)
-      course.assignments.map do |assignment|
-        assignment if assignment.active? && assignment.quiz_lti?
-      end.compact
+    def self.active_lti_assignments_for_course(course, selected_assignment_ids: nil)
+      scope = course.assignments.active.where(:submission_types => 'external_tool')
+      scope = scope.where(:id => selected_assignment_ids) if selected_assignment_ids
+      scope.to_a.select(&:quiz_lti?)
     end
 
     def self.assignment_duplicated?(assignment_hash)
