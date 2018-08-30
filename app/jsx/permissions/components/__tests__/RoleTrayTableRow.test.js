@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {shallow} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import {shallow} from 'enzyme'
 
 import {ROLES} from '../../__tests__/examples'
 import RoleTrayTableRow from '../RoleTrayTableRow'
@@ -33,12 +33,7 @@ it('renders the title', () => {
   const tree = shallow(<RoleTrayTableRow {...createRowProps('banana', '1')} />)
   const node = tree.find('Text')
   expect(node.exists()).toBeTruthy()
-  expect(
-    node
-      .at(0)
-      .dive()
-      .text()
-  ).toEqual('banana')
+  expect(node.children().text()).toEqual('banana')
 })
 
 it('renders the expandable button if expandable prop is true', () => {
@@ -67,7 +62,7 @@ it('renders the description if provided', () => {
   expect(
     node
       .at(1)
-      .dive()
+      .children()
       .text()
   ).toEqual("it's a fruit")
 })
