@@ -34,4 +34,10 @@ describe SisBatchRollBackData do
     SisBatchRollBackData.bulk_insert_roll_back_data([d1, d2])
     expect(@batch.roll_back_data.count).to eq 2
   end
+
+  it 'should have each context respond to updated_at' do
+    SisBatchRollBackData::RESTORE_ORDER.each do |type|
+      expect(type.constantize.column_names.include?('updated_at')).to eq true
+    end
+  end
 end
