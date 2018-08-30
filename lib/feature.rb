@@ -116,6 +116,15 @@ class Feature
   # TODO: register built-in features here
   # (plugins may register additional features during application initialization)
   register(
+    'integrate_arc_rce' =>
+    {
+      display_name: -> { I18n.t('Arc Media Recorder in RCE') },
+      description: -> { I18n.t('Use HTML5 Recorder in Content Editor instead of Flash') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      root_opt_in: true,
+      development: true
+    },
     'google_docs_domain_restriction' =>
     {
       display_name: -> { I18n.t('features.google_docs_domain_restriction', 'Google Docs Domain Restriction') },

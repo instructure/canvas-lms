@@ -284,40 +284,62 @@
     normalize-path "^2.0.1"
     through2 "^2.0.3"
 
-"@instructure/babel-plugin-themeable-styles@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/babel-plugin-themeable-styles/-/babel-plugin-themeable-styles-5.28.0.tgz#f2f368db2ecc18cf9b311f0c14c5cae835076ff0"
+"@instructure/babel-plugin-themeable-styles@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/babel-plugin-themeable-styles/-/babel-plugin-themeable-styles-5.28.1.tgz#75bd923c90a6196f57f7002e261f57a256522340"
   dependencies:
-    "@instructure/pkg-utils" "^5.28.0"
-    "@instructure/postcss-themeable-styles" "^5.28.0"
+    "@instructure/pkg-utils" "^5.28.1"
+    "@instructure/postcss-themeable-styles" "^5.28.1"
     babel-template "^6.26.0"
     css-modules-require-hook "^4.2.3"
 
-"@instructure/babel-plugin-transform-class-display-name@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/babel-plugin-transform-class-display-name/-/babel-plugin-transform-class-display-name-5.28.0.tgz#526e3381588448e2819496282d333c10d7ead222"
+"@instructure/babel-plugin-transform-class-display-name@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/babel-plugin-transform-class-display-name/-/babel-plugin-transform-class-display-name-5.28.1.tgz#2caed2708eb5fc42c1e3fbf279721544ec3d2899"
 
 "@instructure/canvas-supported-browsers@latest":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@instructure/canvas-supported-browsers/-/canvas-supported-browsers-1.0.0.tgz#dd82d1ab612892edea11693f6e5057b565eb467e"
 
-"@instructure/config-loader@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/config-loader/-/config-loader-5.28.0.tgz#aaf1e7a942bfe76933ea738240331144395c5fff"
+"@instructure/config-loader@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/config-loader/-/config-loader-5.28.1.tgz#d6f00699a628e3ddb1b96d2123a2d9eca210f8e2"
 
-"@instructure/cz-lerna-changelog@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/cz-lerna-changelog/-/cz-lerna-changelog-5.28.0.tgz#2ab19dfb99bf73d35609c65c3dfdfef432c70dd8"
+"@instructure/cz-lerna-changelog@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/cz-lerna-changelog/-/cz-lerna-changelog-5.28.1.tgz#cc280ca79c6cccb2e5f13f750f47711a947e4429"
   dependencies:
-    "@instructure/pkg-utils" "^5.28.0"
+    "@instructure/pkg-utils" "^5.28.1"
     "@semantic-release/commit-analyzer" "^5.0.5"
     chalk "^2.4.1"
     cz-customizable "^5.2.0"
     inquirer-autocomplete-prompt "^0.12.2"
 
-"@instructure/pkg-utils@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/pkg-utils/-/pkg-utils-5.28.0.tgz#54a127bcf08d02d8b265324660a673d5941172dd"
+"@instructure/media-capture@^5.25.0":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/media-capture/-/media-capture-5.28.1.tgz#5c38a64dc6d08da86c10c1c727cc371881322285"
+  dependencies:
+    "@instructure/ui-a11y" "^5.28.1"
+    "@instructure/ui-alerts" "^5.28.1"
+    "@instructure/ui-buttons" "^5.28.1"
+    "@instructure/ui-elements" "^5.28.1"
+    "@instructure/ui-forms" "^5.28.1"
+    "@instructure/ui-icons" "^5.28.1"
+    "@instructure/ui-menu" "^5.28.1"
+    "@instructure/ui-themeable" "^5.28.1"
+    "@instructure/ui-utils" "^5.28.1"
+    babel-runtime "^6"
+    classnames "^2"
+    luxon "^0.3.1"
+    prop-types "^15"
+    react-redux "^5.0.6"
+    redux "^3.7.2"
+    redux-thunk "^2.2.0"
+    ts-ebml "^2.0.2"
+
+"@instructure/pkg-utils@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/pkg-utils/-/pkg-utils-5.28.1.tgz#bc5fd463adf544d5baec8d3ef3751d4e965adaca"
   dependencies:
     "@lerna/package" "3.0.0-beta.17"
     glob "^7.1.2"
@@ -325,9 +347,9 @@
     read-pkg-up "^4.0.0"
     shelljs "0.8.2"
 
-"@instructure/postcss-themeable-styles@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/postcss-themeable-styles/-/postcss-themeable-styles-5.28.0.tgz#5f3fbd9948389ad031e130d733d45c9fbaa05899"
+"@instructure/postcss-themeable-styles@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/postcss-themeable-styles/-/postcss-themeable-styles-5.28.1.tgz#7db298b9587ef4886d28c4d1f3cacb0f19393309"
   dependencies:
     postcss "^6"
 
@@ -338,258 +360,258 @@
     data-uri-to-blob "^0.0.4"
     prop-types "^15"
 
-"@instructure/ui-a11y@^5 || rc", "@instructure/ui-a11y@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-a11y/-/ui-a11y-5.28.0.tgz#fcb35b2181a9094968d1f456d5d25181c629a358"
+"@instructure/ui-a11y@^5 || rc", "@instructure/ui-a11y@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-a11y/-/ui-a11y-5.28.1.tgz#49da4050ec49b5a99f0a1dcd956d7f7775101215"
   dependencies:
-    "@instructure/ui-themeable" "^5.28.0"
-    "@instructure/ui-utils" "^5.28.0"
+    "@instructure/ui-themeable" "^5.28.1"
+    "@instructure/ui-utils" "^5.28.1"
     babel-runtime "^6"
     keycode "^2"
     prop-types "^15"
 
-"@instructure/ui-alerts@^5 || rc", "@instructure/ui-alerts@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-alerts/-/ui-alerts-5.28.0.tgz#0a237390ce56ac7a7d606fe8a45df870e5d07689"
+"@instructure/ui-alerts@^5 || rc", "@instructure/ui-alerts@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-alerts/-/ui-alerts-5.28.1.tgz#141ecdf3d7383424498c18b6c37d167bd4986bf4"
   dependencies:
-    "@instructure/ui-a11y" "^5.28.0"
-    "@instructure/ui-buttons" "^5.28.0"
-    "@instructure/ui-icons" "^5.28.0"
-    "@instructure/ui-layout" "^5.28.0"
-    "@instructure/ui-motion" "^5.28.0"
-    "@instructure/ui-themeable" "^5.28.0"
-    "@instructure/ui-utils" "^5.28.0"
-    babel-runtime "^6"
-    classnames "^2"
-    keycode "^2"
-    prop-types "^15"
-
-"@instructure/ui-billboard@^5 || rc", "@instructure/ui-billboard@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-billboard/-/ui-billboard-5.28.0.tgz#25750fd58f8a2ff2e1d963bad613038f77deb0d6"
-  dependencies:
-    "@instructure/ui-elements" "^5.28.0"
-    "@instructure/ui-layout" "^5.28.0"
-    "@instructure/ui-themeable" "^5.28.0"
-    "@instructure/ui-utils" "^5.28.0"
-    babel-runtime "^6"
-    classnames "^2"
-    prop-types "^15"
-
-"@instructure/ui-breadcrumb@^5 || rc", "@instructure/ui-breadcrumb@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-breadcrumb/-/ui-breadcrumb-5.28.0.tgz#81b97e461db2dcec3a57fd7ab868a337604c3141"
-  dependencies:
-    "@instructure/ui-a11y" "^5.28.0"
-    "@instructure/ui-elements" "^5.28.0"
-    "@instructure/ui-icons" "^5.28.0"
-    "@instructure/ui-layout" "^5.28.0"
-    "@instructure/ui-themeable" "^5.28.0"
-    "@instructure/ui-utils" "^5.28.0"
-    babel-runtime "^6"
-    classnames "^2"
-    prop-types "^15"
-
-"@instructure/ui-buttons@^5 || rc", "@instructure/ui-buttons@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-buttons/-/ui-buttons-5.28.0.tgz#7a03d0d0d472b3dfe29ee9598fa610740e27a0ee"
-  dependencies:
-    "@instructure/ui-a11y" "^5.28.0"
-    "@instructure/ui-icons" "^5.28.0"
-    "@instructure/ui-layout" "^5.28.0"
-    "@instructure/ui-themeable" "^5.28.0"
-    "@instructure/ui-utils" "^5.28.0"
+    "@instructure/ui-a11y" "^5.28.1"
+    "@instructure/ui-buttons" "^5.28.1"
+    "@instructure/ui-icons" "^5.28.1"
+    "@instructure/ui-layout" "^5.28.1"
+    "@instructure/ui-motion" "^5.28.1"
+    "@instructure/ui-themeable" "^5.28.1"
+    "@instructure/ui-utils" "^5.28.1"
     babel-runtime "^6"
     classnames "^2"
     keycode "^2"
     prop-types "^15"
 
-"@instructure/ui-container@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-container/-/ui-container-5.28.0.tgz#c8bdbffcf6820904fff32c8d169618560bcf96d7"
+"@instructure/ui-billboard@^5 || rc", "@instructure/ui-billboard@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-billboard/-/ui-billboard-5.28.1.tgz#2993729fdfdd1697f9eabf8b3577fd9572e63c2e"
   dependencies:
-    "@instructure/ui-themeable" "^5.28.0"
-    "@instructure/ui-utils" "^5.28.0"
+    "@instructure/ui-elements" "^5.28.1"
+    "@instructure/ui-layout" "^5.28.1"
+    "@instructure/ui-themeable" "^5.28.1"
+    "@instructure/ui-utils" "^5.28.1"
+    babel-runtime "^6"
+    classnames "^2"
+    prop-types "^15"
+
+"@instructure/ui-breadcrumb@^5 || rc", "@instructure/ui-breadcrumb@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-breadcrumb/-/ui-breadcrumb-5.28.1.tgz#24f10f1b82b3cd04e2136eb67dc611bcd9e14039"
+  dependencies:
+    "@instructure/ui-a11y" "^5.28.1"
+    "@instructure/ui-elements" "^5.28.1"
+    "@instructure/ui-icons" "^5.28.1"
+    "@instructure/ui-layout" "^5.28.1"
+    "@instructure/ui-themeable" "^5.28.1"
+    "@instructure/ui-utils" "^5.28.1"
+    babel-runtime "^6"
+    classnames "^2"
+    prop-types "^15"
+
+"@instructure/ui-buttons@^5 || rc", "@instructure/ui-buttons@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-buttons/-/ui-buttons-5.28.1.tgz#1f54dec7612e06e08e012a62d4eb6fffe56d4a9e"
+  dependencies:
+    "@instructure/ui-a11y" "^5.28.1"
+    "@instructure/ui-icons" "^5.28.1"
+    "@instructure/ui-layout" "^5.28.1"
+    "@instructure/ui-themeable" "^5.28.1"
+    "@instructure/ui-utils" "^5.28.1"
+    babel-runtime "^6"
+    classnames "^2"
+    keycode "^2"
+    prop-types "^15"
+
+"@instructure/ui-container@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-container/-/ui-container-5.28.1.tgz#8dde1c70ab8c825c50a655a3f311999795c8763a"
+  dependencies:
+    "@instructure/ui-themeable" "^5.28.1"
+    "@instructure/ui-utils" "^5.28.1"
     babel-runtime "^6"
     classnames "^2"
     prop-types "^15"
 
 "@instructure/ui-core@^5 || rc":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-core/-/ui-core-5.28.0.tgz#b5edb7cfcf429ec788cb23ad177123e2e773e9e0"
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-core/-/ui-core-5.28.1.tgz#96effc7c0e9c8f50412289c0b763ea06d1b27cc1"
   dependencies:
-    "@instructure/ui-a11y" "^5.28.0"
-    "@instructure/ui-alerts" "^5.28.0"
-    "@instructure/ui-billboard" "^5.28.0"
-    "@instructure/ui-breadcrumb" "^5.28.0"
-    "@instructure/ui-buttons" "^5.28.0"
-    "@instructure/ui-container" "^5.28.0"
-    "@instructure/ui-elements" "^5.28.0"
-    "@instructure/ui-forms" "^5.28.0"
-    "@instructure/ui-i18n" "^5.28.0"
-    "@instructure/ui-icons" "^5.28.0"
-    "@instructure/ui-layout" "^5.28.0"
-    "@instructure/ui-menu" "^5.28.0"
-    "@instructure/ui-motion" "^5.28.0"
-    "@instructure/ui-overlays" "^5.28.0"
-    "@instructure/ui-pagination" "^5.28.0"
-    "@instructure/ui-portal" "^5.28.0"
-    "@instructure/ui-tabs" "^5.28.0"
-    "@instructure/ui-themeable" "^5.28.0"
-    "@instructure/ui-toggle-details" "^5.28.0"
-    "@instructure/ui-tree-browser" "^5.28.0"
-    "@instructure/ui-utils" "^5.28.0"
+    "@instructure/ui-a11y" "^5.28.1"
+    "@instructure/ui-alerts" "^5.28.1"
+    "@instructure/ui-billboard" "^5.28.1"
+    "@instructure/ui-breadcrumb" "^5.28.1"
+    "@instructure/ui-buttons" "^5.28.1"
+    "@instructure/ui-container" "^5.28.1"
+    "@instructure/ui-elements" "^5.28.1"
+    "@instructure/ui-forms" "^5.28.1"
+    "@instructure/ui-i18n" "^5.28.1"
+    "@instructure/ui-icons" "^5.28.1"
+    "@instructure/ui-layout" "^5.28.1"
+    "@instructure/ui-menu" "^5.28.1"
+    "@instructure/ui-motion" "^5.28.1"
+    "@instructure/ui-overlays" "^5.28.1"
+    "@instructure/ui-pagination" "^5.28.1"
+    "@instructure/ui-portal" "^5.28.1"
+    "@instructure/ui-tabs" "^5.28.1"
+    "@instructure/ui-themeable" "^5.28.1"
+    "@instructure/ui-toggle-details" "^5.28.1"
+    "@instructure/ui-tree-browser" "^5.28.1"
+    "@instructure/ui-utils" "^5.28.1"
     babel-runtime "^6"
     classnames "^2"
     keycode "^2.1.8"
     prop-types "^15"
 
-"@instructure/ui-elements@^5 || rc", "@instructure/ui-elements@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-elements/-/ui-elements-5.28.0.tgz#5445e526f02478f787674caab2499317a2f2c713"
+"@instructure/ui-elements@^5 || rc", "@instructure/ui-elements@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-elements/-/ui-elements-5.28.1.tgz#18a9b0cdccc22c54e15c60189e32e6c2f37d1703"
   dependencies:
-    "@instructure/ui-a11y" "^5.28.0"
-    "@instructure/ui-container" "^5.28.0"
-    "@instructure/ui-icons" "^5.28.0"
-    "@instructure/ui-layout" "^5.28.0"
-    "@instructure/ui-motion" "^5.28.0"
-    "@instructure/ui-overlays" "^5.28.0"
-    "@instructure/ui-themeable" "^5.28.0"
-    "@instructure/ui-utils" "^5.28.0"
+    "@instructure/ui-a11y" "^5.28.1"
+    "@instructure/ui-container" "^5.28.1"
+    "@instructure/ui-icons" "^5.28.1"
+    "@instructure/ui-layout" "^5.28.1"
+    "@instructure/ui-motion" "^5.28.1"
+    "@instructure/ui-overlays" "^5.28.1"
+    "@instructure/ui-themeable" "^5.28.1"
+    "@instructure/ui-utils" "^5.28.1"
     babel-runtime "^6"
     classnames "^2"
     escape-html "^1"
     prop-types "^15"
 
-"@instructure/ui-forms@^5 || rc", "@instructure/ui-forms@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-forms/-/ui-forms-5.28.0.tgz#d28ce5d2dab2132a5a7e013f96bd5bb41fbb9be6"
+"@instructure/ui-forms@^5 || rc", "@instructure/ui-forms@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-forms/-/ui-forms-5.28.1.tgz#a6fc34a8351ed6ca83248cda96ee90b81028d154"
   dependencies:
-    "@instructure/ui-a11y" "^5.28.0"
-    "@instructure/ui-buttons" "^5.28.0"
-    "@instructure/ui-elements" "^5.28.0"
-    "@instructure/ui-i18n" "^5.28.0"
-    "@instructure/ui-icons" "^5.28.0"
-    "@instructure/ui-layout" "^5.28.0"
-    "@instructure/ui-overlays" "^5.28.0"
-    "@instructure/ui-svg-images" "^5.28.0"
-    "@instructure/ui-themeable" "^5.28.0"
-    "@instructure/ui-utils" "^5.28.0"
+    "@instructure/ui-a11y" "^5.28.1"
+    "@instructure/ui-buttons" "^5.28.1"
+    "@instructure/ui-elements" "^5.28.1"
+    "@instructure/ui-i18n" "^5.28.1"
+    "@instructure/ui-icons" "^5.28.1"
+    "@instructure/ui-layout" "^5.28.1"
+    "@instructure/ui-overlays" "^5.28.1"
+    "@instructure/ui-svg-images" "^5.28.1"
+    "@instructure/ui-themeable" "^5.28.1"
+    "@instructure/ui-utils" "^5.28.1"
     babel-runtime "^6"
     classnames "^2"
     keycode "^2"
     prop-types "^15"
 
-"@instructure/ui-i18n@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-i18n/-/ui-i18n-5.28.0.tgz#beab90bf2abfa0bbf7a9aa66b68daf4fdb257e67"
+"@instructure/ui-i18n@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-i18n/-/ui-i18n-5.28.1.tgz#af3b467d7b3c54620f70baacc2fdb12d0471bfd0"
   dependencies:
-    "@instructure/ui-utils" "^5.28.0"
+    "@instructure/ui-utils" "^5.28.1"
     babel-runtime "^6"
     decimal.js "^10"
     moment-timezone "^0.5"
     prop-types "^15"
 
-"@instructure/ui-icons@^5 || rc", "@instructure/ui-icons@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-icons/-/ui-icons-5.28.0.tgz#2b6dfc6df29deb824a324db0072a1ecaef2cbe9c"
+"@instructure/ui-icons@^5 || rc", "@instructure/ui-icons@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-icons/-/ui-icons-5.28.1.tgz#3fce3bad05831db9256b9e8240f8af88f7980264"
   dependencies:
-    "@instructure/ui-svg-images" "^5.28.0"
+    "@instructure/ui-svg-images" "^5.28.1"
     babel-runtime "^6"
     prop-types "^15"
 
-"@instructure/ui-layout@^5 || rc", "@instructure/ui-layout@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-layout/-/ui-layout-5.28.0.tgz#d4e976c12856b6a5273b987bcb2a37694b753cef"
+"@instructure/ui-layout@^5 || rc", "@instructure/ui-layout@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-layout/-/ui-layout-5.28.1.tgz#761f4c14828c215d9b15db39561b2a94b2f1ad68"
   dependencies:
-    "@instructure/ui-a11y" "^5.28.0"
-    "@instructure/ui-i18n" "^5.28.0"
-    "@instructure/ui-motion" "^5.28.0"
-    "@instructure/ui-portal" "^5.28.0"
-    "@instructure/ui-themeable" "^5.28.0"
-    "@instructure/ui-utils" "^5.28.0"
+    "@instructure/ui-a11y" "^5.28.1"
+    "@instructure/ui-i18n" "^5.28.1"
+    "@instructure/ui-motion" "^5.28.1"
+    "@instructure/ui-portal" "^5.28.1"
+    "@instructure/ui-themeable" "^5.28.1"
+    "@instructure/ui-utils" "^5.28.1"
     babel-runtime "^6"
     classnames "^2"
     prop-types "^15"
 
-"@instructure/ui-menu@^5 || rc", "@instructure/ui-menu@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-menu/-/ui-menu-5.28.0.tgz#2b50b1e5aa1d0f396947836dc79f65ae1ae1236c"
+"@instructure/ui-menu@^5 || rc", "@instructure/ui-menu@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-menu/-/ui-menu-5.28.1.tgz#1a43c98b10a4c7ab069547f1426a55ba7b9e8627"
   dependencies:
-    "@instructure/ui-a11y" "^5.28.0"
-    "@instructure/ui-elements" "^5.28.0"
-    "@instructure/ui-icons" "^5.28.0"
-    "@instructure/ui-layout" "^5.28.0"
-    "@instructure/ui-overlays" "^5.28.0"
-    "@instructure/ui-themeable" "^5.28.0"
-    "@instructure/ui-utils" "^5.28.0"
+    "@instructure/ui-a11y" "^5.28.1"
+    "@instructure/ui-elements" "^5.28.1"
+    "@instructure/ui-icons" "^5.28.1"
+    "@instructure/ui-layout" "^5.28.1"
+    "@instructure/ui-overlays" "^5.28.1"
+    "@instructure/ui-themeable" "^5.28.1"
+    "@instructure/ui-utils" "^5.28.1"
     babel-runtime "^6"
     classnames "^2"
     keycode "^2"
     prop-types "^15"
 
-"@instructure/ui-motion@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-motion/-/ui-motion-5.28.0.tgz#25555c150202ff31ad31e72d1b73578d4272033a"
+"@instructure/ui-motion@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-motion/-/ui-motion-5.28.1.tgz#89643d890ad8819e04d6c4ef780e9c5bc52e2e3d"
   dependencies:
-    "@instructure/ui-themeable" "^5.28.0"
-    "@instructure/ui-utils" "^5.28.0"
+    "@instructure/ui-themeable" "^5.28.1"
+    "@instructure/ui-utils" "^5.28.1"
     babel-runtime "^6"
     prop-types "^15"
 
-"@instructure/ui-overlays@^5 || rc", "@instructure/ui-overlays@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-overlays/-/ui-overlays-5.28.0.tgz#7c8112012db77aea8caf14b68b456a880cf0ba56"
+"@instructure/ui-overlays@^5 || rc", "@instructure/ui-overlays@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-overlays/-/ui-overlays-5.28.1.tgz#40527c0440df13c47f994abe439a5f053f85f0be"
   dependencies:
-    "@instructure/ui-a11y" "^5.28.0"
-    "@instructure/ui-buttons" "^5.28.0"
-    "@instructure/ui-i18n" "^5.28.0"
-    "@instructure/ui-layout" "^5.28.0"
-    "@instructure/ui-motion" "^5.28.0"
-    "@instructure/ui-portal" "^5.28.0"
-    "@instructure/ui-themeable" "^5.28.0"
-    "@instructure/ui-utils" "^5.28.0"
+    "@instructure/ui-a11y" "^5.28.1"
+    "@instructure/ui-buttons" "^5.28.1"
+    "@instructure/ui-i18n" "^5.28.1"
+    "@instructure/ui-layout" "^5.28.1"
+    "@instructure/ui-motion" "^5.28.1"
+    "@instructure/ui-portal" "^5.28.1"
+    "@instructure/ui-themeable" "^5.28.1"
+    "@instructure/ui-utils" "^5.28.1"
     babel-runtime "^6"
     classnames "^2"
     no-scroll "^2.1.0"
     prop-types "^15"
 
-"@instructure/ui-pagination@^5 || rc", "@instructure/ui-pagination@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-pagination/-/ui-pagination-5.28.0.tgz#804fd256c5c1f36f0e88fea45f8f4c28743d3e8a"
+"@instructure/ui-pagination@^5 || rc", "@instructure/ui-pagination@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-pagination/-/ui-pagination-5.28.1.tgz#c45f891653f36bb25cf2aceabc858e4bdaee1dda"
   dependencies:
-    "@instructure/ui-a11y" "^5.28.0"
-    "@instructure/ui-buttons" "^5.28.0"
-    "@instructure/ui-elements" "^5.28.0"
-    "@instructure/ui-icons" "^5.28.0"
-    "@instructure/ui-layout" "^5.28.0"
-    "@instructure/ui-overlays" "^5.28.0"
-    "@instructure/ui-portal" "^5.28.0"
-    "@instructure/ui-themeable" "^5.28.0"
-    "@instructure/ui-utils" "^5.28.0"
+    "@instructure/ui-a11y" "^5.28.1"
+    "@instructure/ui-buttons" "^5.28.1"
+    "@instructure/ui-elements" "^5.28.1"
+    "@instructure/ui-icons" "^5.28.1"
+    "@instructure/ui-layout" "^5.28.1"
+    "@instructure/ui-overlays" "^5.28.1"
+    "@instructure/ui-portal" "^5.28.1"
+    "@instructure/ui-themeable" "^5.28.1"
+    "@instructure/ui-utils" "^5.28.1"
     babel-runtime "^6"
     prop-types "^15"
 
-"@instructure/ui-portal@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-portal/-/ui-portal-5.28.0.tgz#013ddfd203e9e05344185411410a0a8a3391fabd"
+"@instructure/ui-portal@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-portal/-/ui-portal-5.28.1.tgz#b3a91df1164d92b1e402840ede977668f95fe964"
   dependencies:
-    "@instructure/ui-i18n" "^5.28.0"
-    "@instructure/ui-utils" "^5.28.0"
+    "@instructure/ui-i18n" "^5.28.1"
+    "@instructure/ui-utils" "^5.28.1"
     babel-runtime "^6"
     prop-types "^15"
 
 "@instructure/ui-presets@^5 || rc":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-presets/-/ui-presets-5.28.0.tgz#85817363f5b390778c4b06a453d4662eb381637e"
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-presets/-/ui-presets-5.28.1.tgz#48d4a9051f38e0cb1e774c86e1e69e805d1c284e"
   dependencies:
-    "@instructure/babel-plugin-themeable-styles" "^5.28.0"
-    "@instructure/babel-plugin-transform-class-display-name" "^5.28.0"
+    "@instructure/babel-plugin-themeable-styles" "^5.28.1"
+    "@instructure/babel-plugin-transform-class-display-name" "^5.28.1"
     "@instructure/canvas-supported-browsers" "^1"
-    "@instructure/config-loader" "^5.28.0"
-    "@instructure/cz-lerna-changelog" "^5.28.0"
-    "@instructure/pkg-utils" "^5.28.0"
-    "@instructure/postcss-themeable-styles" "^5.28.0"
+    "@instructure/config-loader" "^5.28.1"
+    "@instructure/cz-lerna-changelog" "^5.28.1"
+    "@instructure/pkg-utils" "^5.28.1"
+    "@instructure/postcss-themeable-styles" "^5.28.1"
     autoprefixer "^8.6.5"
     babel-cli "^6.26.0"
     babel-core "^6.26.0"
@@ -616,7 +638,7 @@
     eslint "^4.17.0"
     eslint-loader "^2.0.0"
     eslint-plugin-import "^2.13.0"
-    eslint-plugin-instructure-ui "^5.28.0"
+    eslint-plugin-instructure-ui "^5.28.1"
     eslint-plugin-jsx-a11y "6.0.3"
     eslint-plugin-mocha "^5.1.0"
     eslint-plugin-notice "^0.7.7"
@@ -661,78 +683,78 @@
     webpack-dev-server "^2.11.0"
     which "^1.3.1"
 
-"@instructure/ui-svg-images@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-svg-images/-/ui-svg-images-5.28.0.tgz#1d7e209db7a29c9263606292f7e0d3f055262664"
+"@instructure/ui-svg-images@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-svg-images/-/ui-svg-images-5.28.1.tgz#5f27e2be01242e38dc3f35b7c8528f2954bb0f45"
   dependencies:
-    "@instructure/ui-themeable" "^5.28.0"
-    "@instructure/ui-utils" "^5.28.0"
+    "@instructure/ui-themeable" "^5.28.1"
+    "@instructure/ui-utils" "^5.28.1"
     babel-runtime "^6"
     classnames "^2"
     prop-types "^15"
 
-"@instructure/ui-tabs@^5 || rc", "@instructure/ui-tabs@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-tabs/-/ui-tabs-5.28.0.tgz#db0ec08852d405e7dd88e5aecb3859c8ec428432"
+"@instructure/ui-tabs@^5 || rc", "@instructure/ui-tabs@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-tabs/-/ui-tabs-5.28.1.tgz#c526fb2be3b761b1f65583aa5cd36d9a0645ed22"
   dependencies:
-    "@instructure/ui-layout" "^5.28.0"
-    "@instructure/ui-motion" "^5.28.0"
-    "@instructure/ui-themeable" "^5.28.0"
-    "@instructure/ui-utils" "^5.28.0"
+    "@instructure/ui-layout" "^5.28.1"
+    "@instructure/ui-motion" "^5.28.1"
+    "@instructure/ui-themeable" "^5.28.1"
+    "@instructure/ui-utils" "^5.28.1"
     babel-runtime "^6"
     classnames "^2"
     keycode "^2"
     prop-types "^15"
 
-"@instructure/ui-themeable@^5 || rc", "@instructure/ui-themeable@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-themeable/-/ui-themeable-5.28.0.tgz#c9505fbf542ec0533bfdd73876d75cf77cdc7929"
+"@instructure/ui-themeable@^5 || rc", "@instructure/ui-themeable@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-themeable/-/ui-themeable-5.28.1.tgz#26b6e57a91129d1c2a0c301ca8f49b92dce61206"
   dependencies:
-    "@instructure/ui-utils" "^5.28.0"
+    "@instructure/ui-utils" "^5.28.1"
     babel-runtime "^6"
     glamor "^2.20.37"
     prop-types "^15"
     tinycolor2 "^1.4.1"
 
 "@instructure/ui-themes@^5 || rc":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-themes/-/ui-themes-5.28.0.tgz#a5811c24745d548089b332bbd69ecfb1bfd549cd"
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-themes/-/ui-themes-5.28.1.tgz#d413cee97b3536efc895c14c74ad34c754b78399"
   dependencies:
-    "@instructure/ui-themeable" "^5.28.0"
+    "@instructure/ui-themeable" "^5.28.1"
     babel-runtime "^6"
 
-"@instructure/ui-toggle-details@^5 || rc", "@instructure/ui-toggle-details@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-toggle-details/-/ui-toggle-details-5.28.0.tgz#a5a475ed0c3148f7f193b66840a41df4c71ca417"
+"@instructure/ui-toggle-details@^5 || rc", "@instructure/ui-toggle-details@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-toggle-details/-/ui-toggle-details-5.28.1.tgz#03dfbe4c01955c9d350f08d75a80471cc543d056"
   dependencies:
-    "@instructure/ui-a11y" "^5.28.0"
-    "@instructure/ui-buttons" "^5.28.0"
-    "@instructure/ui-elements" "^5.28.0"
-    "@instructure/ui-icons" "^5.28.0"
-    "@instructure/ui-layout" "^5.28.0"
-    "@instructure/ui-menu" "^5.28.0"
-    "@instructure/ui-motion" "^5.28.0"
-    "@instructure/ui-themeable" "^5.28.0"
-    "@instructure/ui-utils" "^5.28.0"
+    "@instructure/ui-a11y" "^5.28.1"
+    "@instructure/ui-buttons" "^5.28.1"
+    "@instructure/ui-elements" "^5.28.1"
+    "@instructure/ui-icons" "^5.28.1"
+    "@instructure/ui-layout" "^5.28.1"
+    "@instructure/ui-menu" "^5.28.1"
+    "@instructure/ui-motion" "^5.28.1"
+    "@instructure/ui-themeable" "^5.28.1"
+    "@instructure/ui-utils" "^5.28.1"
     babel-runtime "^6"
     classnames "^2"
     prop-types "^15"
 
-"@instructure/ui-tree-browser@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-tree-browser/-/ui-tree-browser-5.28.0.tgz#c6eac34db3b533a33cf4329f0603aa516b7c5d58"
+"@instructure/ui-tree-browser@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-tree-browser/-/ui-tree-browser-5.28.1.tgz#c70b944cd21f5bde620253c6d4a3e9b5f5b47828"
   dependencies:
-    "@instructure/ui-icons" "^5.28.0"
-    "@instructure/ui-themeable" "^5.28.0"
-    "@instructure/ui-utils" "^5.28.0"
+    "@instructure/ui-icons" "^5.28.1"
+    "@instructure/ui-themeable" "^5.28.1"
+    "@instructure/ui-utils" "^5.28.1"
     babel-runtime "^6"
     classnames "^2"
     keycode "^2"
     prop-types "^15"
 
-"@instructure/ui-utils@^5 || rc", "@instructure/ui-utils@^5.28.0":
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-utils/-/ui-utils-5.28.0.tgz#368ab045774d9e02dcfb7a56f70b7ab80d08b690"
+"@instructure/ui-utils@^5 || rc", "@instructure/ui-utils@^5.28.1":
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-utils/-/ui-utils-5.28.1.tgz#b755e7b99348bf9e5822638ef4ca62ce2d07460c"
   dependencies:
     babel-runtime "^6"
     bowser "^1.9.4"
@@ -1588,6 +1610,10 @@ async-limiter@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/async-limiter/-/async-limiter-1.0.0.tgz#78faed8c3d074ab81f22b4e985d79e8738f720f8"
 
+async@1.0.0, async@~1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/async/-/async-1.0.0.tgz#f8fc04ca3a13784ade9e1641af98578cfbd647a9"
+
 async@1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/async/-/async-1.5.0.tgz#2796642723573859565633fc6274444bee2f8ce3"
@@ -1613,10 +1639,6 @@ async@~0.2.10, async@~0.2.6:
 async@~0.9.0:
   version "0.9.2"
   resolved "https://registry.yarnpkg.com/async/-/async-0.9.2.tgz#aea74d5e61c1f899613bf64bda66d4c78f2fd17d"
-
-async@~1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/async/-/async-1.0.0.tgz#f8fc04ca3a13784ade9e1641af98578cfbd647a9"
 
 asynckit@^0.4.0:
   version "0.4.0"
@@ -2987,6 +3009,17 @@ buffer@^4.3.0:
     ieee754 "^1.1.4"
     isarray "^1.0.0"
 
+buffer@^5.0.7:
+  version "5.2.1"
+  resolved "https://registry.yarnpkg.com/buffer/-/buffer-5.2.1.tgz#dd57fa0f109ac59c602479044dca7b8b3d0b71d6"
+  dependencies:
+    base64-js "^1.0.2"
+    ieee754 "^1.1.4"
+
+buffers@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/buffers/-/buffers-0.1.1.tgz#b24579c3bed4d6d396aeee6d9a8ae7f5482ab7bb"
+
 buildmail@4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/buildmail/-/buildmail-4.0.1.tgz#877f7738b78729871c9a105e3b837d2be11a7a72"
@@ -4095,6 +4128,10 @@ crc32@^0.2.2, crc32@~0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/crc32/-/crc32-0.2.2.tgz#7ad220d6ffdcd119f9fc127a7772cacea390a4ba"
 
+crc@3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/crc/-/crc-3.2.1.tgz#5d9c8fb77a245cd5eca291e5d2d005334bab0082"
+
 create-ecdh@^4.0.0:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/create-ecdh/-/create-ecdh-4.0.3.tgz#c9111b6f33045c4697f144787f9254cdc77c45ff"
@@ -4476,6 +4513,13 @@ date-now@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/date-now/-/date-now-0.1.4.tgz#eaf439fd4d4848ad74e5cc7dbef200672b9e345b"
 
+dateformat@1.0.11:
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/dateformat/-/dateformat-1.0.11.tgz#f27cbee7a012bbfb82ea051562d3977f6093dbb1"
+  dependencies:
+    get-stdin "*"
+    meow "*"
+
 dateformat@1.0.2-1.2.3:
   version "1.0.2-1.2.3"
   resolved "https://registry.yarnpkg.com/dateformat/-/dateformat-1.0.2-1.2.3.tgz#b0220c02de98617433b72851cf47de3df2cdbee9"
@@ -4518,6 +4562,10 @@ debug@3.1.0, debug@3.X, debug@=3.1.0, debug@^3.0.0, debug@^3.1.0, debug@~3.1.0:
   resolved "https://registry.yarnpkg.com/debug/-/debug-3.1.0.tgz#5bb5a0672628b64149566ba16819e61518c67261"
   dependencies:
     ms "2.0.0"
+
+debug@~0.7.2:
+  version "0.7.4"
+  resolved "http://registry.npmjs.org/debug/-/debug-0.7.4.tgz#06e1ea8082c2cb14e39806e22e2f6f757f92af39"
 
 debug@~2.2.0:
   version "2.2.0"
@@ -4934,6 +4982,17 @@ each-async@^1.0.0:
     onetime "^1.0.0"
     set-immediate-shim "^1.0.0"
 
+ebml-block@^1.1.0:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/ebml-block/-/ebml-block-1.1.2.tgz#fd49951b0faf5a3049bdd61c851a76b5e679c290"
+
+ebml@^2.2.1:
+  version "2.2.4"
+  resolved "https://registry.yarnpkg.com/ebml/-/ebml-2.2.4.tgz#85df1fe096f1c614c470715ebc037c751d5ab0e7"
+  dependencies:
+    buffers "^0.1.1"
+    debug "~3.1.0"
+
 ecc-jsbn@~0.1.1:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/ecc-jsbn/-/ecc-jsbn-0.1.2.tgz#3a83a904e54353287874c564b7549386849a98c9"
@@ -5349,11 +5408,11 @@ eslint-plugin-import@^2, eslint-plugin-import@^2.13.0:
     read-pkg-up "^2.0.0"
     resolve "^1.6.0"
 
-eslint-plugin-instructure-ui@^5.28.0:
-  version "5.28.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-instructure-ui/-/eslint-plugin-instructure-ui-5.28.0.tgz#fe39e9f426b077196c7cb87f5ef2384f5cf14998"
+eslint-plugin-instructure-ui@^5.28.1:
+  version "5.28.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-instructure-ui/-/eslint-plugin-instructure-ui-5.28.1.tgz#c7dfb6f7e6609620c9c1d3e55880fe9ab6507937"
   dependencies:
-    "@instructure/pkg-utils" "^5.28.0"
+    "@instructure/pkg-utils" "^5.28.1"
     eslint-module-utils "^2.2.0"
     eslint-plugin-import "^2.13.0"
 
@@ -5691,7 +5750,7 @@ eventlistener@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/eventlistener/-/eventlistener-0.0.1.tgz#ed2baabb852227af2bcf889152c72c63ca532eb8"
 
-events@^1.0.0:
+events@^1.0.0, events@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/events/-/events-1.1.1.tgz#9ebdb7635ad099c70dcc4c2a1f5004288e8bd924"
 
@@ -6336,6 +6395,12 @@ flux-standard-action@^2.0.3:
   dependencies:
     lodash "^4.0.0"
 
+follow-redirects@0.0.3:
+  version "0.0.3"
+  resolved "http://registry.npmjs.org/follow-redirects/-/follow-redirects-0.0.3.tgz#6ce67a24db1fe13f226c1171a72a7ef2b17b8f65"
+  dependencies:
+    underscore ""
+
 follow-redirects@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.0.0.tgz#8e34298cbd2e176f254effec75a1c78cc849fd37"
@@ -6718,6 +6783,10 @@ get-pkg-repo@^1.0.0:
     parse-github-repo-url "^1.3.0"
     through2 "^2.0.0"
 
+get-stdin@*, get-stdin@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/get-stdin/-/get-stdin-6.0.0.tgz#9e09bf712b360ab9225e812048f71fde9c89657b"
+
 get-stdin@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/get-stdin/-/get-stdin-4.0.1.tgz#b968c6b0a04384324902e8bf1a5df32579a450fe"
@@ -6725,10 +6794,6 @@ get-stdin@^4.0.1:
 get-stdin@^5.0.0, get-stdin@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/get-stdin/-/get-stdin-5.0.1.tgz#122e161591e21ff4c52530305693f20e6393a398"
-
-get-stdin@^6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/get-stdin/-/get-stdin-6.0.0.tgz#9e09bf712b360ab9225e812048f71fde9c89657b"
 
 get-stream@^3.0.0:
   version "3.0.0"
@@ -8244,6 +8309,10 @@ inquirer@^6.0.0, inquirer@^6.1.0:
 install@~0.1.7:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/install/-/install-0.1.8.tgz#9980ef93e30dfb534778d163bc86ddd472ad5fe8"
+
+int64-buffer@^0.1.9:
+  version "0.1.10"
+  resolved "https://registry.yarnpkg.com/int64-buffer/-/int64-buffer-0.1.10.tgz#277b228a87d95ad777d07c13832022406a473423"
 
 internal-ip@1.2.0:
   version "1.2.0"
@@ -10267,6 +10336,10 @@ lru-queue@0.1:
   dependencies:
     es5-ext "~0.10.2"
 
+luxon@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/luxon/-/luxon-0.3.1.tgz#627f78f5fea94ac19e1cf2900f398a9338422bbd"
+
 mailcomposer@4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/mailcomposer/-/mailcomposer-4.0.1.tgz#0e1c44b2a07cf740ee17dc149ba009f19cadfeb4"
@@ -10382,6 +10455,17 @@ mathml-tag-names@^2.0.0, mathml-tag-names@^2.0.1:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/mathml-tag-names/-/mathml-tag-names-2.1.0.tgz#490b70e062ee24636536e3d9481e333733d00f2c"
 
+matroska@^2.2.3:
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/matroska/-/matroska-2.2.3.tgz#11ecec239f18ac34b8489dc6bf1a477bc984ee09"
+  dependencies:
+    async "1.0.0"
+    crc "3.2.1"
+    dateformat "1.0.11"
+    debug "~0.7.2"
+    follow-redirects "0.0.3"
+    mime "1.3"
+
 md5-hex@^1.2.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/md5-hex/-/md5-hex-1.3.0.tgz#d2c4afe983c4370662179b8cad145219135046c4"
@@ -10463,6 +10547,20 @@ memorystream@^0.3.1:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/memorystream/-/memorystream-0.3.1.tgz#86d7090b30ce455d63fbae12dda51a47ddcaf9b2"
 
+meow@*, meow@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/meow/-/meow-5.0.0.tgz#dfc73d63a9afc714a5e371760eb5c88b91078aa4"
+  dependencies:
+    camelcase-keys "^4.0.0"
+    decamelize-keys "^1.0.0"
+    loud-rejection "^1.0.0"
+    minimist-options "^3.0.1"
+    normalize-package-data "^2.3.4"
+    read-pkg-up "^3.0.0"
+    redent "^2.0.0"
+    trim-newlines "^2.0.0"
+    yargs-parser "^10.0.0"
+
 meow@^3.3.0, meow@^3.7.0:
   version "3.7.0"
   resolved "https://registry.yarnpkg.com/meow/-/meow-3.7.0.tgz#72cb668b425228290abbfa856892587308a801fb"
@@ -10491,20 +10589,6 @@ meow@^4.0.0:
     read-pkg-up "^3.0.0"
     redent "^2.0.0"
     trim-newlines "^2.0.0"
-
-meow@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/meow/-/meow-5.0.0.tgz#dfc73d63a9afc714a5e371760eb5c88b91078aa4"
-  dependencies:
-    camelcase-keys "^4.0.0"
-    decamelize-keys "^1.0.0"
-    loud-rejection "^1.0.0"
-    minimist-options "^3.0.1"
-    normalize-package-data "^2.3.4"
-    read-pkg-up "^3.0.0"
-    redent "^2.0.0"
-    trim-newlines "^2.0.0"
-    yargs-parser "^10.0.0"
 
 merge-descriptors@1.0.1, merge-descriptors@~1.0.0:
   version "1.0.1"
@@ -10596,6 +10680,10 @@ mime-types@^2.1.11, mime-types@^2.1.12, mime-types@~2.1.17, mime-types@~2.1.18, 
   resolved "https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.20.tgz#930cb719d571e903738520f8470911548ca2cc19"
   dependencies:
     mime-db "~1.36.0"
+
+mime@1.3:
+  version "1.3.6"
+  resolved "https://registry.yarnpkg.com/mime/-/mime-1.3.6.tgz#591d84d3653a6b0b4a3b9df8de5aa8108e72e5e0"
 
 mime@1.4.1:
   version "1.4.1"
@@ -12975,9 +13063,9 @@ react-redux@^4.4.9:
     loose-envify "^1.1.0"
     prop-types "^15.5.4"
 
-react-redux@^5, react-redux@^5.0.3:
+react-redux@^5, react-redux@^5.0.3, react-redux@^5.0.6:
   version "5.0.7"
-  resolved "https://registry.yarnpkg.com/react-redux/-/react-redux-5.0.7.tgz#0dc1076d9afb4670f993ffaef44b8f8c1155a4c8"
+  resolved "http://registry.npmjs.org/react-redux/-/react-redux-5.0.7.tgz#0dc1076d9afb4670f993ffaef44b8f8c1155a4c8"
   dependencies:
     hoist-non-react-statics "^2.5.0"
     invariant "^2.0.0"
@@ -13322,7 +13410,7 @@ redux-thunk@^2, redux-thunk@^2.2.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/redux-thunk/-/redux-thunk-2.3.0.tgz#51c2c19a185ed5187aaa9a2d08b666d0d6467622"
 
-redux@^3.5.2, redux@^3.7.1:
+redux@^3.5.2, redux@^3.7.1, redux@^3.7.2:
   version "3.7.2"
   resolved "https://registry.yarnpkg.com/redux/-/redux-3.7.2.tgz#06b73123215901d25d065be342eb026bc1c8537b"
   dependencies:
@@ -15432,6 +15520,18 @@ trough@^1.0.0:
   dependencies:
     glob "^7.1.2"
 
+ts-ebml@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/ts-ebml/-/ts-ebml-2.0.2.tgz#5e2c65b35ee6f1c030f51668666f3c018f4d9578"
+  dependencies:
+    buffer "^5.0.7"
+    commander "^2.11.0"
+    ebml "^2.2.1"
+    ebml-block "^1.1.0"
+    events "^1.1.1"
+    int64-buffer "^0.1.9"
+    matroska "^2.2.3"
+
 tslib@^1.9.0:
   version "1.9.3"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.9.3.tgz#d7e4dd79245d85428c4d7e4822a79917954ca286"
@@ -15567,7 +15667,7 @@ underscore.string@~2.4.0:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/underscore.string/-/underscore.string-2.4.0.tgz#8cdd8fbac4e2d2ea1e7e2e8097c42f442280f85b"
 
-underscore@>=1.5.0, underscore@~1.7.0:
+underscore@, underscore@>=1.5.0, underscore@~1.7.0:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.7.0.tgz#6bbaf0877500d36be34ecaa584e0db9fef035209"
 

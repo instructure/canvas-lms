@@ -657,7 +657,8 @@ class GradebooksController < ApplicationController
           can_comment_on_submission: @can_comment_on_submission,
           show_help_menu_item: show_help_link?,
           help_url: help_link_url,
-          outcome_proficiency: outcome_proficiency
+          outcome_proficiency: outcome_proficiency,
+          ARC_RECORDING_FEATURE_ENABLED: @context.root_account.feature_enabled?(:integrate_arc_rce),
         }
         if grading_role(assignment: @assignment) == :moderator
           env[:provisional_copy_url] = api_v1_copy_to_final_mark_path(@context.id, @assignment.id, "{{provisional_grade_id}}")

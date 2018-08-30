@@ -26,7 +26,7 @@ define [
 ], ($,
     DialogManager,
     CommentUiLoader,
-    K5Uploader,
+    {default: K5Uploader},
     UploadViewManager,
     KalturaSessionLoader,
     FileInputManager
@@ -89,6 +89,15 @@ define [
       @uploadViewManager.monitorUpload(@uploader,
                                        @fileInputManager.allowedMedia,
                                        @file)
+
+    doUploadByFile: (inputFile) =>
+      @file = inputFile
+      @resetUploader() if @uploader
+      session = @kSession.generateUploadOptions(["video", "audio", "webm"])
+      @uploader = new K5Uploader(session)
+      @uploader.addEventListener 'K5.fileError', @onFileError
+      @uploader.addEventListener 'K5.complete', @onUploadComplete
+      @uploader.addEventListener 'K5.ready', @onUploaderReady
 
     onFileError: =>
       @createNeededFields()

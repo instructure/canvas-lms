@@ -56,12 +56,17 @@ K5Uploader.prototype.onUiConfComplete = function(result) {
   this.dispatchEvent("K5.ready", {}, this);
 };
 
+
 K5Uploader.prototype.uploadFile = function(file) {
   this.file = file;
   if (!file) {
     return
   }
-  if (this.uiconfig.acceptableFile(file, k5Options.allowedMediaTypes)) {
+
+  if (ENV.ARC_RECORDING_FEATURE_ENABLED && this.uiconfig.acceptableFile(file, k5Options.allowedMediaTypes) || file.type === "webm") {
+    this.uploader = new Uploader();
+    this.uploader.send(this.session, file);
+  } else if (this.uiconfig.acceptableFile(file, k5Options.allowedMediaTypes)) {
     this.uploader = new Uploader();
     this.uploader.send(this.session, file);
   } else {
@@ -76,14 +81,24 @@ K5Uploader.prototype.uploadFile = function(file) {
 
 K5Uploader.prototype.onUploadSuccess = function(result) {
   // combine all needed data and add an entry to kaltura
-  var allParams = [
-    this.uiconfig.asEntryParams(this.file.name),
-    this.session.asEntryParams(),
-    result.asEntryParams(),
-    k5Options.asEntryParams()
-  ];
-  this.entryService.addEntry(allParams);
-};
+  var allParams;
+  if (ENV.ARC_RECORDING_FEATURE_ENABLED) {
+    allParams = [
+      this.session.asEntryParams(),
+      result.asEntryParams(),
+      k5Options.asEntryParams()
+    ]
+    this.entryService.addEntry(allParams)
+  } else {
+    allParams = [
+      this.uiconfig.asEntryParams(this.file.name),
+      this.session.asEntryParams(),
+      result.asEntryParams(),
+      k5Options.asEntryParams()
+    ]
+    this.entryService.addEntry(allParams)
+  }
+}
 
 // Delegate to publicly available K5 events
 K5Uploader.prototype.onProgress = function(e) {
@@ -105,5 +120,6 @@ K5Uploader.prototype.onEntryFail = function(data) {
 K5Uploader.prototype.onUiConfError = function(result) {
   this.dispatchEvent('K5.uiconfError', result, this);
 };
+
 
 export default K5Uploader;

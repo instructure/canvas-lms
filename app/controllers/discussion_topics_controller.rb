@@ -517,7 +517,8 @@ class DiscussionTopicsController < ApplicationController
       HAS_GRADING_PERIODS: @context.grading_periods?,
       SECTION_LIST: sections.map { |section| { id: section.id, name: section.name } },
       ANNOUNCEMENTS_LOCKED: announcements_locked?,
-      CREATE_ANNOUNCEMENTS_UNLOCKED: @current_user.create_announcements_unlocked?
+      CREATE_ANNOUNCEMENTS_UNLOCKED: @current_user.create_announcements_unlocked?,
+      ARC_RECORDING_FEATURE_ENABLED: @context.root_account.feature_enabled?(:integrate_arc_rce)
     }
 
     post_to_sis = Assignment.sis_grade_export_enabled?(@context)
@@ -544,6 +545,7 @@ class DiscussionTopicsController < ApplicationController
     js_hash[:MAX_NAME_LENGTH] = AssignmentUtil.assignment_max_name_length(@context)
     js_hash[:DUE_DATE_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.due_date_required_for_account?(@context)
     js_hash[:SIS_NAME] = AssignmentUtil.post_to_sis_friendly_name(@context)
+    js_hash[:ARC_RECORDING_FEATURE_ENABLED] = @context.root_account.feature_enabled?(:integrate_arc_rce)
 
     if @context.is_a?(Course)
       js_hash['SECTION_LIST'] = sections.map do |section|
@@ -706,7 +708,8 @@ class DiscussionTopicsController < ApplicationController
               :TODO_DATE => @topic.todo_date,
               :IS_ASSIGNMENT => @topic.assignment_id?,
               :ASSIGNMENT_ID => @topic.assignment_id,
-              :IS_GROUP => @topic.group_category_id?
+              :IS_GROUP => @topic.group_category_id?,
+              :ARC_RECORDING_FEATURE_ENABLED => @context.root_account.feature_enabled?(:integrate_arc_rce)
             }
             if params[:hide_student_names]
               env_hash[:HIDE_STUDENT_NAMES] = true
@@ -738,6 +741,7 @@ class DiscussionTopicsController < ApplicationController
             js_hash[:STUDENT_CONTEXT_CARDS_ENABLED] = @context.is_a?(Course) &&
               @domain_root_account.feature_enabled?(:student_context_cards) &&
               @context.grants_right?(@current_user, session, :manage)
+            js_hash[:ARC_RECORDING_FEATURE_ENABLED] = @context.root_account.feature_enabled?(:integrate_arc_rce)
 
             append_sis_data(js_hash)
             js_env(js_hash)

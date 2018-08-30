@@ -21,6 +21,7 @@
     ]
   },
   "dependencies": {
+    "@instructure/media-capture": "^5.25.0",
     "@instructure/ui-alerts": "^5 || rc",
     "@instructure/ui-billboard": "^5 || rc",
     "@instructure/ui-breadcrumb": "^5 || rc",

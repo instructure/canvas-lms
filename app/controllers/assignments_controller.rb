@@ -64,6 +64,7 @@ class AssignmentsController < ApplicationController
         HAS_ASSIGNMENTS: @context.active_assignments.count > 0,
         QUIZ_LTI_ENABLED: quiz_lti_tool_enabled?,
         DUE_DATE_REQUIRED_FOR_ACCOUNT: due_date_required_for_account,
+        ARC_RECORDING_FEATURE_ENABLED: @context.root_account.feature_enabled?(:integrate_arc_rce),
       }
       js_env(hash)
 
@@ -144,7 +145,8 @@ class AssignmentsController < ApplicationController
         :COURSE_ID => @context.id,
         :ASSIGNMENT_ID => @assignment.id,
         :EXTERNAL_TOOLS => external_tools_json(@external_tools, @context, @current_user, session),
-        :EULA_URL => tool_eula_url
+        :EULA_URL => tool_eula_url,
+        ARC_RECORDING_FEATURE_ENABLED: @context.root_account.feature_enabled?(:integrate_arc_rce),
       })
       set_master_course_js_env_data(@assignment, @context)
       conditional_release_js_env(@assignment, includes: :rule)
@@ -500,6 +502,7 @@ class AssignmentsController < ApplicationController
           }
         end,
         VALID_DATE_RANGE: CourseDateRange.new(@context),
+        ARC_RECORDING_FEATURE_ENABLED: @context.root_account.feature_enabled?(:integrate_arc_rce),
       }
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
