@@ -78,7 +78,7 @@ module Api::V1::MasterCourses
       html_url: syllabus_course_assignments_url(course),
       locked: false
     }.tap do |json|
-      json[:exceptions] = exceptions['syllabus'] if exceptions
+      json[:exceptions] = exceptions['syllabus'] || [] if exceptions
     end
   end
 
