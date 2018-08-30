@@ -108,6 +108,7 @@ export default class ConfirmDeleteModal extends Component {
         </ModalBody>
         <ModalFooter>
           <Button
+            id="cancel_delete_announcements"
             ref={c => {
               this.cancelBtn = c
             }}
