@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import {mount} from 'enzyme'
 import $ from 'jquery'
 import PostGradesApp from 'jsx/gradezilla/SISGradePassback/PostGradesApp'
 import GradebookExportManager from 'jsx/gradezilla/shared/GradebookExportManager'
@@ -409,10 +409,6 @@ test('it takes you to the new imports page', function () {
 });
 
 QUnit.module('ActionMenu - disableImports', {
-  setup () {
-    this.wrapper = mount(<ActionMenu {...workingMenuProps()} />);
-  },
-
   teardown () {
     this.wrapper.unmount();
   }
@@ -420,6 +416,7 @@ QUnit.module('ActionMenu - disableImports', {
 
 test('is called once when the component renders', function () {
   const disableImportsSpy = sandbox.spy(ActionMenu.prototype, 'disableImports');
+  this.wrapper = mount(<ActionMenu {...workingMenuProps()} />);
 
   this.wrapper.update();
 
@@ -427,29 +424,28 @@ test('is called once when the component renders', function () {
 });
 
 test('returns false when gradebook is editable and context allows gradebook uploads', function () {
+  this.wrapper = mount(<ActionMenu {...workingMenuProps()} />);
   strictEqual(this.wrapper.instance().disableImports(), false)
 });
 
 test('returns true when gradebook is not editable and context allows gradebook uploads', function () {
   const newImportProps = {
-    ...workingMenuProps().export,
+    ...workingMenuProps(),
     gradebookIsEditable: false
   };
 
-  this.wrapper.setProps(newImportProps, () => {
-    strictEqual(this.wrapper.instance().disableImports(), true)
-  });
+  this.wrapper = mount(<ActionMenu {...newImportProps} />);
+  strictEqual(this.wrapper.instance().disableImports(), true)
 });
 
 test('returns true when gradebook is editable but context does not allow gradebook uploads', function () {
   const newImportProps = {
-    ...workingMenuProps().export,
+    ...workingMenuProps(),
     contextAllowsGradebookUploads: false
   };
 
-  this.wrapper.setProps(newImportProps, () => {
-    strictEqual(this.wrapper.instance().disableImports(), true)
-  });
+  this.wrapper = mount(<ActionMenu {...newImportProps} />);
+  strictEqual(this.wrapper.instance().disableImports(), true)
 });
 
 QUnit.module('ActionMenu - lastExportFromProps', {
