@@ -83,7 +83,7 @@ Rails.configuration.after_initialize do
     Reporting::CountsReport.process
   end
 
-  Delayed::Periodic.cron 'Zero Out Past Due', '0 * * * *' do
+  Delayed::Periodic.cron 'Zero Out Past Due', '5 9 * * *' do
      GradesService.zero_out_grades!
   end
 
