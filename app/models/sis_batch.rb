@@ -377,6 +377,7 @@ class SisBatch < ActiveRecord::Base
     finalize_workflow_state(import_finished)
     write_errors_to_file
     populate_old_warnings_and_errors
+    statistics
     self.progress = 100 if import_finished
     self.ended_at = Time.now.utc
     self.save!
@@ -395,6 +396,24 @@ class SisBatch < ActiveRecord::Base
       self.workflow_state = :failed
       self.workflow_state = :failed_with_messages if self.sis_batch_errors.exists?
     end
+  end
+
+  def statistics
+    stats = {}
+    stats[:total_state_changes] = roll_back_data.count
+    SisBatchRollBackData::RESTORE_ORDER.each do |type|
+      stats[type.to_sym] = {}
+      deleted_state = case type
+                      when CommunicationChannel
+                        'retired'
+                      else
+                        'deleted'
+                      end
+      stats[type.to_sym][:created] = roll_back_data.where(context_type: type).where(previous_workflow_state: 'non-existent').count
+      stats[type.to_sym][:deleted] = roll_back_data.where(context_type: type).where(updated_workflow_state: deleted_state).count
+    end
+    self.data ||= {}
+    self.data[:statistics] = stats
   end
 
   def batch_mode_terms
@@ -732,7 +751,7 @@ class SisBatch < ActiveRecord::Base
     self.shard.activate do
       restore_progress = Progress.create! context: self, tag: "sis_batch_state_restore", completion: 0.0
       restore_progress.process_job(self, :restore_states_for_batch,
-                                   {singleton: "restore_states_for_batch:#{account.global_id}}"},
+                                   {n_strand: "restore_states_for_batch:#{account.global_id}}"},
                                    {batch_mode: batch_mode, undelete_only: undelete_only, unconclude_only: unconclude_only})
       restore_progress
     end
@@ -753,9 +772,21 @@ class SisBatch < ActiveRecord::Base
       scope = roll_back.where(context_type: type)
       count = restore_states_for_type(type, scope, restore_progress, count, total)
     end
+    add_restore_statistics
     restore_progress&.complete
     self.workflow_state = (undelete_only || unconclude_only || batch_mode) ? 'partially_restored' : 'restored'
     self.save!
+  end
+
+  def add_restore_statistics
+    statistics unless self&.data&.key? :statistics
+    stats = self.data[:statistics]
+    stats ||= {}
+    SisBatchRollBackData::RESTORE_ORDER.each do |type|
+      stats[type.to_sym] ||= {}
+      stats[type.to_sym][:restored] = roll_back_data.restored.where(context_type: type).count
+    end
+    self.data[:statistics] = stats
   end
 
   # returns values "(1,'deleted'),(2,'deleted'),(3,'other_state'),(4,'active')"
@@ -766,7 +797,8 @@ class SisBatch < ActiveRecord::Base
   def restore_sql(type, data)
     <<-SQL
       UPDATE #{type.constantize.quoted_table_name} AS t
-        SET workflow_state = x.workflow_state
+        SET workflow_state = x.workflow_state,
+            updated_at = NOW()
         FROM (VALUES #{to_sql_values(data)}) AS x(id, workflow_state)
         WHERE t.id=x.id AND x.workflow_state IS DISTINCT FROM t.workflow_state
         RETURNING t.id

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -25,7 +25,6 @@
 ### NOW:
 ## Everything wrong is due to keith@oreilly.com
 
-require "canvas_slug"
 require "mime/types"
 require "net/http"
 require "cgi"
@@ -34,5 +33,7 @@ require "base64"
 module Multipart
   require "multipart/file_param"
   require "multipart/param"
+  require "multipart/terminator"
+  require "multipart/sequenced_stream"
   require "multipart/post"
 end

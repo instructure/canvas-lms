@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,40 +15,41 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require 'securerandom'
+
 module Multipart
   class Post
-    BOUNDARY = ::CanvasSlug.generate('canvas-rules', 15)
-    HEADER = {"Content-type" => "multipart/form-data; boundary=" + BOUNDARY}
+    def header(boundary)
+      {"Content-type" => "multipart/form-data; boundary=#{boundary}"}
+    end
 
-    def prepare_query (params, field_priority=[])
-      fp = []
-      creds = params.delete :basic_auth
-      if creds
-        puts creds[:username]
-        puts creds[:password]
-        puts Base64.encode64("#{creds[:username]}:#{creds[:password]}")
-      end
+    def prepare_query_stream(params, field_priority=[])
+      params.delete(:basic_auth)
 
-      def file_param(k, v)
-        file_data = v.read rescue nil
-        if file_data
-          file_path = (v.respond_to?(:path) && v.path) || k.to_s
-          FileParam.new(k, file_path, file_data)
-        else
-          Param.new(k, v)
-        end
-      end
-
+      parts = []
       completed_fields = {}
       field_priority.each do |k|
-        if params.has_key?(k) && !completed_fields.has_key?(k)
-          fp.push(file_param(k, params[k]))
-          completed_fields[k] = true
-        end
+        next if completed_fields.key?(k)
+        next unless params.key?(k)
+        parts << Param.from(k, params[k])
+        completed_fields[k] = true
       end
-      params.each { |k, v| fp.push(file_param(k, v)) unless completed_fields.has_key?(k) }
-      query = fp.collect { |p| "--" + BOUNDARY + "\r\n" + p.to_multipart }.join("") + "--" + BOUNDARY + "--" + "\r\n"
-      return query, HEADER
+
+      params.each do |k, v|
+        next if completed_fields.key?(k)
+        parts << Param.from(k, v)
+      end
+
+      parts << TERMINATOR
+
+      boundary = ::SecureRandom.hex(32)
+      streams = parts.map{ |part| part.to_multipart_stream(boundary) }
+      [SequencedStream.new(streams), header(boundary)]
+    end
+
+    def prepare_query(params, field_priority=[])
+      stream, header = prepare_query_stream(params, field_priority)
+      [stream.read, header]
     end
   end
 end
