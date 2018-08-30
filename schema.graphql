@@ -460,6 +460,7 @@ type Grades {
   # The final score includes all assignments
   # (ungraded assignments are counted as 0 points)
   finalScore: Float
+  gradingPeriod: GradingPeriod
 }
 
 type GradingPeriod implements Node & Timestamped {

@@ -32,5 +32,10 @@ module Types
       (ungraded assignments are counted as 0 points)
     DESC
     field :final_grade, String, null: true
+
+    field :grading_period, GradingPeriodType, null: true
+    def grading_period
+      load_association :grading_period
+    end
   end
 end
