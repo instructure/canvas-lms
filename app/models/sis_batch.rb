@@ -797,7 +797,8 @@ class SisBatch < ActiveRecord::Base
   def restore_sql(type, data)
     <<-SQL
       UPDATE #{type.constantize.quoted_table_name} AS t
-        SET workflow_state = x.workflow_state
+        SET workflow_state = x.workflow_state,
+            updated_at = NOW()
         FROM (VALUES #{to_sql_values(data)}) AS x(id, workflow_state)
         WHERE t.id=x.id AND x.workflow_state IS DISTINCT FROM t.workflow_state
         RETURNING t.id

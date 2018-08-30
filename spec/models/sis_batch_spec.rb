@@ -981,6 +981,7 @@ test_1,u1,student,active}
             run_jobs
           end
           expect(@e1.reload).to be_deleted
+          old_time = @e1.updated_at
           expect(@e2.reload).to be_deleted
           expect(@c1.reload).to be_deleted
           expect(@c2.reload).to be_deleted
@@ -992,6 +993,7 @@ test_1,u1,student,active}
           run_jobs
           expect(batch.reload).to be_restored
           expect(@e1.reload).to be_active
+          expect(@e1.updated_at == old_time).to eq false
           expect(@e2.reload).to be_active
           expect(@c1.reload).to be_created
           expect(@c2.reload).to be_created
