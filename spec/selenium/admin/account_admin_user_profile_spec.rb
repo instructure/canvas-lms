@@ -30,19 +30,34 @@ describe "admin account people profile" do
     # add two users to account
     @user1 = user_with_pseudonym(:account => @account, :name => "Test User1")
     @user2 = user_with_pseudonym(:account => @account, :name => "Test User2")
+    @user3 = user_with_pseudonym(:account => @account, :name => "Random User")
   end
 
   context 'in admin merge page' do
     before(:each) do
       user_session(@admin)
       visit_merge_user_accounts(@user1.id)
+      search_username_input.click
+      search_username_input.send_keys("Test")
     end
 
     it "allow searching for a user to merge with another user", priority: "1", test_id: 3647794 do
-      search_username_input.click
-      search_username_input.send_keys("Test")
+      expect(username_search_suggestions).to include_text @user2.name
+      expect(username_search_suggestions).not_to include_text @user3.name
+    end
 
-      expect(username_search_suggestions).to include_text "Test User2"
+    it "displays full user name when a user is selected from suggestions", priority: "1", test_id: 3647794 do
+      choose_suggested_username(@user2.name).click
+
+      expect(selected_user.text).to eq "Test User2"
+      expect(select_user_button.attribute('href')).to include "/admin_merge?pending_user_id=#{@user2.id}"
+    end
+
+    it "navigates to user details page when user is selected", priority: "1", test_id: 3647794 do
+      choose_suggested_username(@user2.name).click
+      select_user_button.click
+
+      expect(merge_user_page_application_div).to contain_css "table.merge_results"
     end
   end
 end

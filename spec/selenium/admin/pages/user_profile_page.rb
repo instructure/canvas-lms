@@ -39,6 +39,22 @@ module UserProfilePage
       f('ul.ui-autocomplete')
     end
 
+    def choose_suggested_username(user_name)
+      fj("a:contains('#{user_name}')")
+    end
+
+    def selected_user
+      f('#selected_name')
+    end
+
+    def select_user_button
+      f('#select_name')
+    end
+
+    def merge_user_page_application_div
+      f("#application")
+    end
+
     # ------------------ Actions & Methods -------------------
 
     def visit_merge_user_accounts(user_id)
