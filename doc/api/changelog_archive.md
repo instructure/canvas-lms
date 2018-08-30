@@ -6,6 +6,40 @@ The Change Log Archive page displays previous API changes in the <a href="file.c
 
 <h2>Prior Updates</h2>
 
+<h2>2018-06-02</h2>
+  <h3>Additions</h3>
+<table class="changelog">
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="content_exports.html">Content Exports API</a></td>
+<td>Export Content Endpoint</td>
+  <td>Added select parameter</td>
+</tr>
+<tr>
+<td><a href="external_tools.html">External Tools API</a></td>
+<td>Create an External Tool Endpoint</td>
+<td>Added account_navigation[display_type] parameter</td>
+</tr>
+<tr>
+<td><a href="file.assignment_tools.html">Grade Passback External Tools</a></td>
+<td>
+  </td>
+<td>Added Submission Details Return Extension documentation, which includes information about supporting Submitted At timestamps</td>
+</tr>
+<td><a href="submissions.html">Submissions API</a></td>
+<td>Submission Summary Endpoint</td>
+<td>Added grouped parameter</td>
+</tr>
+<td><a href="users.html">Users API</a></td>
+<td>Create a User endpoint</td>
+<td>Added destination parameter</td>
+</tr>
+</table>
+
 <h2>2018-05-12</h2>
 
 <h3>Changes</h3>
