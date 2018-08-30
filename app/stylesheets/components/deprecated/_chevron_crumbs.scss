@@ -20,7 +20,7 @@ $crumb_border_radius: 5px;
 
 .chevron-crumbs {
   @include reset-list;
-  margin: 0 0 1em 0;
+  margin: 0 0 1em;
   padding: 0;
   border: 1px solid #ccc;
   border-radius: $crumb_border_radius;

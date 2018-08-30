@@ -43,8 +43,8 @@
   border-bottom: none;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
-  margin: 15px 0 0 0; 
-  padding: 50px 10px 10px 10px; 
+  margin: 15px 0 0; 
+  padding: 50px 10px 10px; 
   position: relative;
   &:after {
     content: 'Example';
@@ -63,7 +63,7 @@
 .Sg-Main .codeBlock,
 .Sg-Main .highlight {
   padding: 50px 4%;
-  margin: 0 0 20px 0;
+  margin: 0 0 20px;
   background: $sg-example-main-color;
   color: $sg-example-tag-color;
   @include fontSize(15px);

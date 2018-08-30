@@ -82,7 +82,7 @@
 
 .ag-weights-message {
   display: block;
-  margin: 20px 20px 0 20px;
+  margin: 20px 20px 0;
 }
 
 .ag-weights-content .checkbox {
@@ -103,12 +103,12 @@
 }
 
 .ag-settings-weights-message {
-  margin: 0 0 20px 0;
+  margin: 0 0 20px;
 }
 
 .disable-sync-to-sis-message {
   display: block;
-  margin: 20px 20px 0 20px;
+  margin: 20px 20px 0;
 }
 
 .sync-to-sis-message-content {
@@ -161,7 +161,7 @@
   margin: 0 0px 0 -30px;
   padding: 0 0px 0 30px;
   a {
-    padding: 20px 0px 10px 0px;
+    padding: 20px 0px 10px;
   }
 }
 
@@ -252,7 +252,7 @@ form[data-view='edit-assignment'] {
 }
 
 .duplicate-failed-actions {
-  margin: 0.5rem 0 0 0;
+  margin: 0.5rem 0 0;
 
   form {
     margin: 0;

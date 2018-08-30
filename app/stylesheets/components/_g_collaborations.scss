@@ -37,7 +37,7 @@ $highlight-blue: #00b5fe;
 .collaboration {
   border: 1px solid $ic-border-color;
   border-radius: $ic-border-radius;
-  margin: 0 0 10px 0;
+  margin: 0 0 10px;
   padding: 10px;
 
   &.etherpad {
@@ -195,7 +195,7 @@ $highlight-blue: #00b5fe;
     border-radius: 10px;
     color: #777;
     @include fontSize($ic-font-size--medium);
-    margin: 36px 8px 8px 8px;
+    margin: 36px 8px 8px;
     padding: 4px;
     text-align: center;
   }

@@ -183,7 +183,7 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
     div.data {
       float: direction(left);
       border: 0px;
-      padding: 2px 5px 2px 5px;
+      padding: 2px 5px;
       &.assignment_title {
         width: 40%;
         margin-#{direction(left)}: 30px;
@@ -225,7 +225,7 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
 
 #groups_for_student {
   .assignment_group {
-    margin: 0 0.5em 1.5em 0.5em;
+    margin: 0 0.5em 1.5em;
     width: auto;
     border: 1px solid #999999;
     color: black;
@@ -258,7 +258,7 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
         }
       }
       &.padding {
-        padding: 0px 0px 5px 0px;
+        padding: 0px 0px 5px;
         display: none;
       }
     }
@@ -288,7 +288,7 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
       div.data {
         float: direction(left);
         border: 0px;
-        padding: 2px 5px 2px 5px;
+        padding: 2px 5px;
         &.assignment_title {
           width: 40%;
           font-weight: bold;

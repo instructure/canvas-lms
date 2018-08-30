@@ -202,7 +202,7 @@ li[id$=service_google_docs] {
   display: block;
   @include fontSize(18px);
   font-weight: bold;
-  padding: 0 0 16px 0;
+  padding: 0 0 16px;
   text-align: center;
   text-decoration: none;
 
@@ -218,7 +218,7 @@ li[id$=service_google_docs] {
 .icon-select-photo {
   display: block !important;
   height: 256px !important;
-  margin: 0 auto 16px auto;
+  margin: 0 auto 16px;
   width: 256px !important;
 
   &:before {
@@ -259,13 +259,13 @@ li[id$=service_google_docs] {
 }
 
 .webcam-clip {
-  margin: 0 auto 16px auto;
+  margin: 0 auto 16px;
   overflow: hidden;
 }
 
 .webcam-preview {
   display: block;
-  margin: 0 auto 16px auto;
+  margin: 0 auto 16px;
   max-height: 350px;
   max-width: 350px;
 }
