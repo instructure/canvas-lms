@@ -17,172 +17,180 @@
  */
 
 import React from 'react'
-import {mount} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import {shallow, mount} from 'enzyme'
 
 import IndexHeader from 'jsx/announcements/components/IndexHeader'
 
-QUnit.module('Announcements IndexHeader', suiteHooks => {
-  let props
-  let qunitTimeout
-  let wrapper
-
-  suiteHooks.beforeEach(() => {
-    qunitTimeout = QUnit.config.testTimeout
-    QUnit.config.testTimeout = 1000 // prevent accidental unresolved async
-
-    props = {
-      applicationElement: () => document.getElementById('fixtures'),
-      contextId: '1',
-      contextType: 'course',
-      deleteSelectedAnnouncements() {},
-      isBusy: false,
-      permissions: {
-        create: true,
-        manage_content: true,
-        moderate: true
-      },
-      searchAnnouncements: sinon.spy(),
-      selectedCount: 0,
-      toggleSelectedAnnouncementsLock: sinon.spy()
-    }
-  })
-
-  suiteHooks.afterEach(() => {
-    wrapper.unmount()
-    QUnit.config.testTimeout = qunitTimeout
-  })
-
-  function mountComponent() {
-    wrapper = mount(<IndexHeader {...props} />)
+function makeProps() {
+  return {
+    applicationElement: () => document.getElementById('fixtures'),
+    contextId: '1',
+    contextType: 'course',
+    deleteSelectedAnnouncements() {},
+    isBusy: false,
+    permissions: {
+      create: true,
+      manage_content: true,
+      moderate: true
+    },
+    searchAnnouncements: () => {},
+    selectedCount: 0,
+    toggleSelectedAnnouncementsLock: () => {}
   }
+}
 
-  QUnit.module('"Add Announcement" button', () => {
-    test('is present when the user has permission to create an announcement', () => {
-      mountComponent()
-      const node = wrapper.find('#add_announcement')
-      ok(node.exists())
-    })
+function waitForSpyToBeCalled(spy) {
+  return new Promise(resolve => {
+    const interval = setInterval(() => {
+      if (spy.callCount > 0) {
+        clearInterval(interval)
+        resolve(spy.lastCall.args)
+      }
+    }, 10)
+  })
+}
 
-    test('is absent when the user does not have permission to create an announcement', () => {
-      props.permissions.create = false
-      const node = wrapper.find('#add_announcement')
-      notOk(node.exists())
-    })
+QUnit.module('"Add Announcement" button', () => {
+  test('is present when the user has permission to create an announcement', () => {
+    const props = makeProps()
+    const wrapper = shallow(<IndexHeader {...props} />)
+    const node = wrapper.find('#add_announcement')
+    ok(node.exists())
   })
 
-  QUnit.module('searching announcements', () => {
-    function waitForSearch() {
-      return new Promise(resolve => {
-        const interval = setInterval(() => {
-          if (props.searchAnnouncements.callCount > 0) {
-            clearInterval(interval)
-            resolve(props.searchAnnouncements.lastCall.args)
-          }
-        }, 10)
-      })
-    }
+  test('is absent when the user does not have permission to create an announcement', () => {
+    const props = makeProps()
+    props.permissions.create = false
+    const wrapper = shallow(<IndexHeader {...props} />)
+    const node = wrapper.find('#add_announcement')
+    notOk(node.exists())
+  })
+})
 
-    test('calls the searchAnnouncements prop with searchInput value after debounce timeout', async () => {
-      mountComponent()
-      const input = wrapper.find('input[name="announcements_search"]')
-      input.node.value = 'foo'
-      input.simulate('change', {target: {value: 'foo'}})
-      const searchOptions = await waitForSearch()
-      deepEqual(searchOptions[0], {term: 'foo'})
-    })
+QUnit.module('searching announcements', () => {
+  test('calls the searchAnnouncements prop with searchInput value after debounce timeout', async () => {
+    const spy = sinon.spy()
+    const props = makeProps()
+    props.searchAnnouncements = spy
+    const wrapper = mount(<IndexHeader {...props} />)
+    const input = wrapper.find('TextInput').find('input')
+    input.instance().value = 'foo'
+    input.simulate('change', {target: {value: 'foo'}})
+    const searchOptions = await waitForSpyToBeCalled(spy)
+    deepEqual(searchOptions[0], {term: 'foo'})
+    wrapper.unmount()
+  })
+})
+
+QUnit.module('"Announcement Filter" select', () => {
+  test('includes two options in the filter select component', () => {
+    const props = makeProps()
+    const wrapper = shallow(<IndexHeader {...props} />)
+    const filtersText = wrapper.find('option').map(option => option.text())
+    deepEqual(filtersText, ['All', 'Unread'])
   })
 
-  QUnit.module('"Announcement Filter" select', () => {
-    test('includes two options in the filter select component', () => {
-      mountComponent()
-      const filtersText = wrapper.find('option').map(option => option.text())
-      deepEqual(filtersText, ['All', 'Unread'])
-    })
-
-    test('calls the searchAnnouncements prop when selecting a filter option', () => {
-      mountComponent()
-      const onChange = wrapper.find('Select').prop('onChange')
-      onChange({target: {value: 'unread'}})
-      strictEqual(props.searchAnnouncements.callCount, 1)
-    })
-
-    test('includes the filter value when calling the searchAnnouncements prop', () => {
-      mountComponent()
-      const onChange = wrapper.find('Select').prop('onChange')
-      onChange({target: {value: 'unread'}})
-      const searchOptions = props.searchAnnouncements.lastCall.args[0]
-      deepEqual(searchOptions, {filter: 'unread'})
-    })
+  test('calls the searchAnnouncements prop when selecting a filter option', () => {
+    const spy = sinon.spy()
+    const props = makeProps()
+    props.searchAnnouncements = spy
+    const wrapper = shallow(<IndexHeader {...props} />)
+    const onChange = wrapper.find('Select').prop('onChange')
+    onChange({target: {value: 'unread'}})
+    strictEqual(spy.callCount, 1)
   })
 
-  QUnit.module('"Lock Selected Announcements" button', () => {
-    test('is present when the user has permission to lock announcements', () => {
-      mountComponent()
-      strictEqual(wrapper.find('#lock_announcements').length, 1)
-    })
+  test('includes the filter value when calling the searchAnnouncements prop', () => {
+    const spy = sinon.spy()
+    const props = makeProps()
+    props.searchAnnouncements = spy
+    const wrapper = shallow(<IndexHeader {...props} />)
+    const onChange = wrapper.find('Select').prop('onChange')
+    onChange({target: {value: 'unread'}})
+    const searchOptions = spy.lastCall.args[0]
+    deepEqual(searchOptions, {filter: 'unread'})
+  })
+})
 
-    test('is absent when the user does not have permission to lock announcements', () => {
-      props.permissions.manage_content = false
-      mountComponent()
-      strictEqual(wrapper.find('#lock_announcements').length, 0)
-    })
-
-    test('is absent when announcements are globally locked', () => {
-      props.announcementsLocked = true
-      mountComponent()
-      strictEqual(wrapper.find('#lock_announcements').length, 0)
-    })
-
-    test('is disabled when "isBusy" is true', () => {
-      props.isBusy = true
-      mountComponent()
-      strictEqual(wrapper.find('#lock_announcements').is('[disabled]'), true)
-    })
-
-    test('is disabled when "selectedCount" is 0', () => {
-      props.selectedCount = 0
-      mountComponent()
-      strictEqual(wrapper.find('#lock_announcements').is('[disabled]'), true)
-    })
-
-    test('calls the toggleSelectedAnnouncementsLock prop when clicked', () => {
-      props.selectedCount = 1
-      mountComponent()
-      wrapper.find('#lock_announcements').simulate('click')
-      strictEqual(props.toggleSelectedAnnouncementsLock.callCount, 1)
-    })
+QUnit.module('"Lock Selected Announcements" button', () => {
+  test('is present when the user has permission to lock announcements', () => {
+    const props = makeProps()
+    const wrapper = shallow(<IndexHeader {...props} />)
+    strictEqual(wrapper.find('#lock_announcements').length, 1)
   })
 
-  QUnit.module('"Delete Selected Announcements" button', () => {
-    test('is present when the user has permission to delete announcements', () => {
-      mountComponent()
-      strictEqual(wrapper.find('#delete_announcements').length, 1)
-    })
+  test('is absent when the user does not have permission to lock announcements', () => {
+    const props = makeProps()
+    props.permissions.manage_content = false
+    const wrapper = shallow(<IndexHeader {...props} />)
+    strictEqual(wrapper.find('#lock_announcements').length, 0)
+  })
 
-    test('is absent when the user does not have permission to delete announcements', () => {
-      props.permissions.manage_content = false
-      mountComponent()
-      strictEqual(wrapper.find('#delete_announcements').length, 0)
-    })
+  test('is absent when announcements are globally locked', () => {
+    const props = makeProps()
+    props.announcementsLocked = true
+    const wrapper = shallow(<IndexHeader {...props} />)
+    strictEqual(wrapper.find('#lock_announcements').length, 0)
+  })
 
-    test('is disabled when "isBusy" is true', () => {
-      props.isBusy = true
-      mountComponent()
-      strictEqual(wrapper.find('#delete_announcements').is('[disabled]'), true)
-    })
+  test('is disabled when "isBusy" is true', () => {
+    const props = makeProps()
+    props.isBusy = true
+    const wrapper = shallow(<IndexHeader {...props} />)
+    strictEqual(wrapper.find('#lock_announcements').is('[disabled]'), true)
+  })
 
-    test('is disabled when "selectedCount" is 0', () => {
-      props.selectedCount = 0
-      mountComponent()
-      strictEqual(wrapper.find('#delete_announcements').is('[disabled]'), true)
-    })
+  test('is disabled when "selectedCount" is 0', () => {
+    const props = makeProps()
+    props.selectedCount = 0
+    const wrapper = shallow(<IndexHeader {...props} />)
+    strictEqual(wrapper.find('#lock_announcements').is('[disabled]'), true)
+  })
 
-    test('shows the "Confirm Delete" modal when clicked', () => {
-      props.selectedCount = 1
-      mountComponent()
-      wrapper.find('#delete_announcements').simulate('click')
-      ok(wrapper.instance().deleteModal)
-      wrapper.instance().deleteModal.hide()
-    })
+  test('calls the toggleSelectedAnnouncementsLock prop when clicked', () => {
+    const spy = sinon.spy()
+    const props = makeProps()
+    props.toggleSelectedAnnouncementsLock = spy
+    props.selectedCount = 1
+    const wrapper = shallow(<IndexHeader {...props} />)
+    wrapper.find('#lock_announcements').simulate('click')
+    strictEqual(spy.callCount, 1)
+  })
+})
+
+QUnit.module('"Delete Selected Announcements" button', () => {
+  test('is present when the user has permission to delete announcements', () => {
+    const props = makeProps()
+    const wrapper = shallow(<IndexHeader {...props} />)
+    strictEqual(wrapper.find('#delete_announcements').length, 1)
+  })
+
+  test('is absent when the user does not have permission to delete announcements', () => {
+    const props = makeProps()
+    props.permissions.manage_content = false
+    const wrapper = shallow(<IndexHeader {...props} />)
+    strictEqual(wrapper.find('#delete_announcements').length, 0)
+  })
+
+  test('is disabled when "isBusy" is true', () => {
+    const props = makeProps()
+    props.isBusy = true
+    const wrapper = shallow(<IndexHeader {...props} />)
+    strictEqual(wrapper.find('#delete_announcements').is('[disabled]'), true)
+  })
+
+  test('is disabled when "selectedCount" is 0', () => {
+    const props = makeProps()
+    props.selectedCount = 0
+    const wrapper = shallow(<IndexHeader {...props} />)
+    strictEqual(wrapper.find('#delete_announcements').is('[disabled]'), true)
+  })
+
+  test('shows the "Confirm Delete" modal when clicked', () => {
+    const props = makeProps()
+    props.selectedCount = 1
+    const wrapper = shallow(<IndexHeader {...props} />)
+    wrapper.find('#delete_announcements').simulate('click')
+    ok(wrapper.instance().deleteModal)
   })
 })
