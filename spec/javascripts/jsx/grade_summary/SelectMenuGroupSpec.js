@@ -17,7 +17,6 @@
 
 import React from 'react';
 import { mount, shallow } from 'enzyme';
-import {mount as oldMount} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
 
 import SelectMenuGroup from 'jsx/grade_summary/SelectMenuGroup';
 
@@ -87,9 +86,9 @@ QUnit.module('SelectMenuGroup', function (suiteHooks) {
   });
 
   test('disables the student select menu if the course select menu has changed', function () {
-    wrapper = oldMount(<SelectMenuGroup {...props} />);
-    wrapper.find('#course_select_menu').simulate('change', { target: { value: '14' } });
-    const menu = wrapper.find('#student_select_menu').node;
+    wrapper = mount(<SelectMenuGroup {...props} />);
+    wrapper.find('#course_select_menu').last().simulate('change', { target: { value: '14' } });
+    const menu = wrapper.find('#student_select_menu').last().getDOMNode();
     strictEqual(menu.getAttribute('aria-disabled'), 'true');
   });
 
@@ -160,9 +159,9 @@ QUnit.module('SelectMenuGroup', function (suiteHooks) {
   });
 
   test('disables the assignment sort order select menu if the course select menu has changed', function () {
-    wrapper = oldMount(<SelectMenuGroup {...props} />);
-    wrapper.find('#course_select_menu').simulate('change', { target: { value: '14' } });
-    const menu = wrapper.find('#assignment_sort_order_select_menu').node;
+    wrapper = mount(<SelectMenuGroup {...props} />);
+    wrapper.find('#course_select_menu').last().simulate('change', { target: { value: '14' } });
+    const menu = wrapper.find('#assignment_sort_order_select_menu').last().getDOMNode();
     strictEqual(menu.getAttribute('aria-disabled'), 'true');
   });
 
@@ -172,24 +171,24 @@ QUnit.module('SelectMenuGroup', function (suiteHooks) {
   });
 
   test('disables the submit button if no select menu options have changed', function () {
-    wrapper = oldMount(<SelectMenuGroup {...props} />);
-    const submitButton = wrapper.find('#apply_select_menus').node;
+    wrapper = mount(<SelectMenuGroup {...props} />);
+    const submitButton = wrapper.find('#apply_select_menus').last().getDOMNode();
     strictEqual(submitButton.getAttribute('aria-disabled'), 'true');
   });
 
   test('enables the submit button if a select menu options is changed', function () {
-    wrapper = oldMount(<SelectMenuGroup {...props} />);
-    wrapper.find('#student_select_menu').simulate('change', { target: { value: '7' } });
-    const submitButton = wrapper.find('#apply_select_menus').node;
+    wrapper = mount(<SelectMenuGroup {...props} />);
+    wrapper.find('#student_select_menu').last().simulate('change', { target: { value: '7' } });
+    const submitButton = wrapper.find('#apply_select_menus').last().getDOMNode();
     strictEqual(submitButton.getAttribute('aria-disabled'), null);
   });
 
   test('disables the submit button after it is clicked', function () {
-    wrapper = oldMount(<SelectMenuGroup {...props} />)
-    wrapper.find('#student_select_menu').simulate('change', { target: { value: '7' } });
-    const submitButton = wrapper.find('#apply_select_menus');
+    wrapper = mount(<SelectMenuGroup {...props} />)
+    wrapper.find('#student_select_menu').last().simulate('change', { target: { value: '7' } });
+    const submitButton = wrapper.find('#apply_select_menus').last();
     submitButton.simulate('click');
-    strictEqual(submitButton.node.getAttribute('aria-disabled'), 'true');
+    strictEqual(submitButton.getDOMNode().getAttribute('aria-disabled'), 'true');
   });
 
   test('calls saveAssignmentOrder when the button is clicked, if assignment order has changed', function () {
@@ -203,9 +202,9 @@ QUnit.module('SelectMenuGroup', function (suiteHooks) {
 
   test('does not call saveAssignmentOrder when the button is clicked, if assignment is unchanged', function () {
     props.saveAssignmentOrder = sinon.stub().resolves();
-    wrapper = oldMount(<SelectMenuGroup {...props} />)
-    wrapper.find('#student_select_menu').simulate('change', { target: { value: '7' } });
-    const submitButton = wrapper.find('#apply_select_menus');
+    wrapper = mount(<SelectMenuGroup {...props} />)
+    wrapper.find('#student_select_menu').last().simulate('change', { target: { value: '7' } });
+    const submitButton = wrapper.find('#apply_select_menus').last();
     submitButton.simulate('click');
     strictEqual(props.saveAssignmentOrder.callCount, 0);
   });
@@ -214,7 +213,7 @@ QUnit.module('SelectMenuGroup', function (suiteHooks) {
     let submitButton
 
     function mountComponent () {
-      return oldMount(<SelectMenuGroup {...props} />);
+      return mount(<SelectMenuGroup {...props} />);
     }
 
     hooks.beforeEach(() => {
@@ -224,8 +223,8 @@ QUnit.module('SelectMenuGroup', function (suiteHooks) {
     QUnit.module('when the student has changed', (contextHooks) => {
       contextHooks.beforeEach(() => {
         wrapper = mountComponent()
-        submitButton = wrapper.find('#apply_select_menus')
-        wrapper.find('#student_select_menu').simulate('change', { target: { value: '7' } })
+        submitButton = wrapper.find('#apply_select_menus').last()
+        wrapper.find('#student_select_menu').last().simulate('change', { target: { value: '7' } })
         submitButton.simulate('click')
       })
 
@@ -243,8 +242,8 @@ QUnit.module('SelectMenuGroup', function (suiteHooks) {
       contextHooks.beforeEach(() => {
         props.selectedCourseID = '2'
         wrapper = mountComponent()
-        submitButton = wrapper.find('#apply_select_menus')
-        wrapper.find('#course_select_menu').simulate('change', { target: { value: '14' } })
+        submitButton = wrapper.find('#apply_select_menus').last()
+        wrapper.find('#course_select_menu').last().simulate('change', { target: { value: '14' } })
         submitButton.simulate('click')
       })
 
@@ -261,8 +260,8 @@ QUnit.module('SelectMenuGroup', function (suiteHooks) {
       contextHooks.beforeEach(() => {
         props.selectedCourseID = '2'
         wrapper = mountComponent()
-        submitButton = wrapper.find('#apply_select_menus')
-        wrapper.find('#course_select_menu').simulate('change', { target: { value: '21' } })
+        submitButton = wrapper.find('#apply_select_menus').last()
+        wrapper.find('#course_select_menu').last().simulate('change', { target: { value: '21' } })
         submitButton.simulate('click')
       })
 
@@ -279,8 +278,8 @@ QUnit.module('SelectMenuGroup', function (suiteHooks) {
       contextHooks.beforeEach(() => {
         props.selectedCourseID = '21'
         wrapper = mountComponent()
-        submitButton = wrapper.find('#apply_select_menus')
-        wrapper.find('#course_select_menu').simulate('change', { target: { value: '2' } })
+        submitButton = wrapper.find('#apply_select_menus').last()
+        wrapper.find('#course_select_menu').last().simulate('change', { target: { value: '2' } })
         submitButton.simulate('click')
       })
 
@@ -298,8 +297,8 @@ QUnit.module('SelectMenuGroup', function (suiteHooks) {
       contextHooks.beforeEach(() => {
         props.selectedCourseID = '21'
         wrapper = mountComponent()
-        submitButton = wrapper.find('#apply_select_menus')
-        wrapper.find('#course_select_menu').simulate('change', { target: { value: '42' } })
+        submitButton = wrapper.find('#apply_select_menus').last()
+        wrapper.find('#course_select_menu').last().simulate('change', { target: { value: '42' } })
         submitButton.simulate('click')
       })
 
@@ -317,8 +316,8 @@ QUnit.module('SelectMenuGroup', function (suiteHooks) {
       contextHooks.beforeEach(() => {
         props.selectedCourseID = '21'
         wrapper = mountComponent()
-        submitButton = wrapper.find('#apply_select_menus')
-        wrapper.find('#course_select_menu').simulate('change', { target: { value: '60' } })
+        submitButton = wrapper.find('#apply_select_menus').last()
+        wrapper.find('#course_select_menu').last().simulate('change', { target: { value: '60' } })
         submitButton.simulate('click')
       })
 
