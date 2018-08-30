@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import {mount} from 'enzyme'
 import ModeratedGradingFormFieldGroup from 'jsx/assignments/ModeratedGradingFormFieldGroup'
 
 QUnit.module('ModeratedGradingFormFieldGroup', hooks => {
@@ -85,12 +85,12 @@ QUnit.module('ModeratedGradingFormFieldGroup', hooks => {
     test('renders an unchecked checkbox when passed moderatedGradingEnabled: false', () => {
       props.moderatedGradingEnabled = false
       mountComponent()
-      strictEqual(moderatedGradingCheckbox().node.checked, false)
+      strictEqual(moderatedGradingCheckbox().at(0).getDOMNode().checked, false)
     })
 
     test('renders a checked checkbox when passed moderatedGradingEnabled: true', () => {
       mountComponent()
-      strictEqual(moderatedGradingCheckbox().node.checked, true)
+      strictEqual(moderatedGradingCheckbox().at(0).getDOMNode().checked, true)
     })
 
     test('hides the moderated grading content when the checkbox is unchecked', () => {
@@ -137,12 +137,12 @@ QUnit.module('ModeratedGradingFormFieldGroup', hooks => {
     test('renders an unchecked checkbox when passed graderCommentsVisibleToGraders: false', () => {
       props.graderCommentsVisibleToGraders = false
       mountComponent()
-      strictEqual(graderCommentsVisibleToGradersCheckbox().node.checked, false)
+      strictEqual(graderCommentsVisibleToGradersCheckbox().at(0).getDOMNode().checked, false)
     })
 
     test('renders a checked checkbox when passed graderCommentsVisibleToGraders: true', () => {
       mountComponent()
-      strictEqual(graderCommentsVisibleToGradersCheckbox().node.checked, true)
+      strictEqual(graderCommentsVisibleToGradersCheckbox().at(0).getDOMNode().checked, true)
     })
   })
 
@@ -159,12 +159,12 @@ QUnit.module('ModeratedGradingFormFieldGroup', hooks => {
     test('renders an unchecked checkbox when passed graderNamesVisibleToFinalGrader: false', () => {
       props.graderNamesVisibleToFinalGrader = false
       mountComponent()
-      strictEqual(graderNamesVisibleToFinalGraderCheckbox().node.checked, false)
+      strictEqual(graderNamesVisibleToFinalGraderCheckbox().at(0).getDOMNode().checked, false)
     })
 
     test('renders a checked checkbox for Moderated Grading when passed graderNamesVisibleToFinalGrader: true', () => {
       mountComponent()
-      strictEqual(graderNamesVisibleToFinalGraderCheckbox().node.checked, true)
+      strictEqual(graderNamesVisibleToFinalGraderCheckbox().at(0).getDOMNode().checked, true)
     })
   })
 })
