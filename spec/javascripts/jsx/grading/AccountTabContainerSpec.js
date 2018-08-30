@@ -18,7 +18,7 @@
 
 define([
   'react',
-  'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme',
+  'enzyme',
   'jquery',
   'axios',
   'underscore',
@@ -39,9 +39,7 @@ define([
       };
       const mergedProps = _.defaults(props, defaults);
 
-      this.wrapper = mount(
-        React.createElement(AccountTabContainer, mergedProps)
-      );
+      this.wrapper = mount(<AccountTabContainer {...mergedProps} />)
     },
 
     setup () {
@@ -58,10 +56,11 @@ define([
 
   test('tabs are present', function () {
     this.renderComponent();
-    equal(this.wrapper.find('.ui-tabs').length, 1);
-    equal(this.wrapper.find('.ui-tabs ul.ui-tabs-nav li').length, 2);
-    equal(this.wrapper.find('#grading-periods-tab').getDOMNode().getAttribute('style'), 'display: block;');
-    equal(this.wrapper.find('#grading-standards-tab').getDOMNode().getAttribute('style'), 'display: none;')
+    const $el = this.wrapper.getDOMNode()
+    strictEqual($el.querySelectorAll('.ui-tabs').length, 1);
+    strictEqual($el.querySelectorAll('.ui-tabs ul.ui-tabs-nav li').length, 2);
+    equal($el.querySelector('#grading-periods-tab').getAttribute('style'), 'display: block;');
+    equal($el.querySelector('#grading-standards-tab').getAttribute('style'), 'display: none;')
   });
 
   test('jquery-ui tabs() is called', function () {
@@ -72,11 +71,11 @@ define([
 
   test('renders the grading periods', function () {
     this.renderComponent();
-    ok(this.wrapper.node.gradingPeriods);
+    ok(this.wrapper.at(0).instance().gradingPeriods);
   });
 
   test('renders the grading standards', function () {
     this.renderComponent();
-    ok(this.wrapper.node.gradingStandards);
+    ok(this.wrapper.at(0).instance().gradingStandards);
   });
 });
