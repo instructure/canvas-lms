@@ -266,7 +266,8 @@ module UserLearningObjectScopes
         active.
         published.
         for_courses_and_groups(options[:shard_course_ids], options[:group_ids]).
-        todo_date_between(opts[:due_after], opts[:due_before])
+        todo_date_between(opts[:due_after], opts[:due_before]).
+        visible_to_student_sections(self)
     end
   end
 

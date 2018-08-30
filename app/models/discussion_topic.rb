@@ -666,6 +666,15 @@ class DiscussionTopic < ActiveRecord::Base
             { :course_sections => course_sections.pluck(:id) }).distinct
   end
 
+  scope :visible_to_student_sections, -> (student) {
+    visibility_scope = DiscussionTopicSectionVisibility.
+      where("discussion_topic_section_visibilities.discussion_topic_id = discussion_topics.id").
+      where("EXISTS (?)", Enrollment.active_or_pending.where(:user_id => student).
+        where("enrollments.course_section_id = discussion_topic_section_visibilities.course_section_id")
+      )
+    where("discussion_topics.context_type <> 'Course' OR discussion_topics.is_section_specific = false OR EXISTS (?)", visibility_scope)
+  }
+
   scope :recent, -> { where("discussion_topics.last_reply_at>?", 2.weeks.ago).order("discussion_topics.last_reply_at DESC") }
   scope :only_discussion_topics, -> { where(:type => nil) }
   scope :for_subtopic_refreshing, -> { where("discussion_topics.subtopics_refreshed_at IS NOT NULL AND discussion_topics.subtopics_refreshed_at<discussion_topics.updated_at").order("discussion_topics.subtopics_refreshed_at") }

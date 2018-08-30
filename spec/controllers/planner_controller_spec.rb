@@ -125,6 +125,17 @@ describe PlannerController do
         expect(event['plannable']['title']).to eq 'appointment group'
       end
 
+      it "should only show section specific announcements to students who can view them" do
+        a1 = @course.announcements.create!(:message => "for the defaults", :is_section_specific => true, :course_sections => [@course.default_section])
+        sec2 = @course.course_sections.create!
+        a2 = @course.announcements.create!(:message => "for my favorites", :is_section_specific => true, :course_sections => [sec2])
+
+        get :index
+        response_json = json_parse(response.body)
+        expect(response_json.select{|i| i['plannable_type'] == 'announcement'}.map{|i| i['plannable_id']}).to eq [a1.id]
+      end
+
+
       it "should show planner overrides created on quizzes" do
         quiz = quiz_model(course: @course, due_at: 1.day.from_now)
         PlannerOverride.create!(plannable_id: quiz.id, plannable_type: Quizzes::Quiz, user_id: @student.id)
