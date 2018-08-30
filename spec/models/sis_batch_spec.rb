@@ -32,13 +32,18 @@ describe SisBatch do
   def create_csv_data(data, add_empty_file: false)
     i = 0
     Dir.mktmpdir("sis_rspec") do |tmpdir|
-      path = "#{tmpdir}/sisfile.zip"
-      Zip::File.open(path, Zip::File::CREATE) do |z|
-        data.each do |dat|
-          z.get_output_stream("csv_#{i}.csv") { |f| f.puts(dat) }
-          i += 1
+      if data.length == 1
+        path = "#{tmpdir}/csv_0.csv"
+        File.write(path, data.first)
+      else
+        path = "#{tmpdir}/sisfile.zip"
+        Zip::File.open(path, Zip::File::CREATE) do |z|
+          data.each do |dat|
+            z.get_output_stream("csv_#{i}.csv") { |f| f.puts(dat) }
+            i += 1
+          end
+          z.get_output_stream("csv_#{i}.csv") {} if add_empty_file
         end
-        z.get_output_stream("csv_#{i}.csv") {} if add_empty_file
       end
 
       batch = File.open(path, 'rb') do |tmp|
