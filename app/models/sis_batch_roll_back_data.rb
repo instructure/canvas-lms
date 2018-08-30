@@ -25,6 +25,7 @@ class SisBatchRollBackData < ActiveRecord::Base
 
   scope :expired_data, -> {where('created_at < ?', 30.days.ago)}
   scope :active, -> {where(workflow_state: 'active')}
+  scope :restored, -> {where(workflow_state: 'restored')}
 
   RESTORE_ORDER = %w{Account EnrollmentTerm AbstractCourse Course CourseSection
                      GroupCategory Group Pseudonym CommunicationChannel
