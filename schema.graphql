@@ -453,11 +453,12 @@ enum EnrollmentWorkflowState {
 type Grades {
   currentGrade: String
 
-  #     The current score includes all graded assignments
+  # The current score includes all graded assignments
   currentScore: Float
   finalGrade: String
 
-  #     The final score includes all assignments (ungraded assignments are counted as 0 points)
+  # The final score includes all assignments
+  # (ungraded assignments are counted as 0 points)
   finalScore: Float
 }
 
