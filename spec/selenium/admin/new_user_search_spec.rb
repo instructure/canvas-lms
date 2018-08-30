@@ -41,26 +41,6 @@ describe "new account user search" do
     expect(f('[data-automation="users list"]')).not_to contain_css('tr:nth-child(2)')
   end
 
-  it "should be able to toggle between 'People' and 'Courses' tabs" do
-    user_with_pseudonym(:account => @account, :name => "Test User")
-    course_factory(:account => @account, :course_name => "Test Course")
-
-    get "/accounts/#{@account.id}"
-    2.times do
-      expect(f("#breadcrumbs")).not_to include_text("People")
-      expect(f("#breadcrumbs")).to include_text("Courses")
-      expect(f('[data-automation="courses list"]')).to include_text("Test Course")
-
-      f('#section-tabs .users').click
-      expect(driver.current_url).to include("/accounts/#{@account.id}/users")
-      expect(f("#breadcrumbs")).to include_text("People")
-      expect(f("#breadcrumbs")).not_to include_text("Courses")
-      expect(f('[data-automation="users list"]')).to include_text("Test User")
-
-      f('#section-tabs .courses').click
-    end
-  end
-
   it "should be able to create users" do
     get "/accounts/#{@account.id}/users"
 
@@ -143,7 +123,7 @@ describe "new account user search" do
 
     before do
       @user.update_attribute(:name, "Test User")
-      visit(@account)
+      visit_users(@account)
     end
 
     it "should bring up user page when clicking name", priority: "1", test_id: 3399648 do
@@ -206,7 +186,7 @@ describe "new account user search" do
 
     it "should not show the people tab without permission" do
       @account.role_overrides.create! :role => admin_role, :permission => 'read_roster', :enabled => false
-      visit(@account)
+      visit_users(@account)
       expect(left_navigation).not_to include_text("People")
     end
 
@@ -226,11 +206,11 @@ describe "new account user search" do
       ('A'..'Z').each do |letter|
         user_with_pseudonym(:account => @account, :name => "Test User #{letter}")
       end
-      visit(@account)
+      visit_users(@account)
 
       expect(get_rows.count).to eq 15
       expect(get_rows.first).to include_text("Test User A")
-      expect(all_results).to_not include_text("Test User O")
+      expect(all_results_users).to_not include_text("Test User O")
       expect(results_body).not_to contain_jqcss(page_previous_jqcss)
 
       click_page_number_button("2")
@@ -239,7 +219,27 @@ describe "new account user search" do
       expect(get_rows.count).to eq 12
       expect(get_rows.first).to include_text("Test User O")
       expect(get_rows.last).to include_text("Test User Z")
-      expect(all_results).not_to include_text("Test User A")
+      expect(all_results_users).not_to include_text("Test User A")
+    end
+
+    it "should be able to toggle between 'People' and 'Courses' tabs" do
+      user_with_pseudonym(:account => @account, :name => "Test User")
+      course_factory(:account => @account, :course_name => "Test Course")
+
+      visit_courses(@account)
+      2.times do
+        expect(breadcrumbs).not_to include_text("People")
+        expect(breadcrumbs).to include_text("Courses")
+        expect(all_results_courses).to include_text("Test Course")
+
+        click_left_nav_users
+        expect(driver.current_url).to include("/accounts/#{@account.id}/users")
+        expect(breadcrumbs).to include_text("People")
+        expect(breadcrumbs).not_to include_text("Courses")
+        expect(all_results_users).to include_text("Test User")
+
+        click_left_nav_courses
+      end
     end
   end
 end

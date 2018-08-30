@@ -19,13 +19,18 @@ require_relative '../../common'
 module NewUserSearchPage
 
   # ---------------------- Page ----------------------
-  def visit(account)
+  def visit_users(account)
     get("/accounts/#{account.id}/users")
     wait_for_ajaximations
   end
 
   def visit_subaccount(sub_account)
     get("/accounts/#{sub_account.id}/users")
+    wait_for_ajaximations
+  end
+
+  def visit_courses(account)
+    get("/accounts/#{account.id}/")
     wait_for_ajaximations
   end
 
@@ -110,8 +115,12 @@ module NewUserSearchPage
     f('#content')
   end
 
-  def all_results
+  def all_results_users
     f('[data-automation="users list"]')
+  end
+
+  def all_results_courses
+    f('[data-automation="courses list"]')
   end
 
   def results_row
@@ -124,6 +133,18 @@ module NewUserSearchPage
 
   def left_navigation
     f('#left-side #section-tabs')
+  end
+
+  def users_left_navigation
+    f('#section-tabs .users')
+  end
+
+  def courses_left_navigation
+    f('#section-tabs .courses')
+  end
+
+  def breadcrumbs
+    f("#breadcrumbs")
   end
 
   # ---------------------- Actions ----------------------
@@ -189,5 +210,13 @@ module NewUserSearchPage
 
   def click_manage_profile_pictures_option
     more_options_profile_pictures.click
+  end
+
+  def click_left_nav_users
+    users_left_navigation.click
+  end
+
+  def click_left_nav_courses
+    courses_left_navigation.click
   end
 end
