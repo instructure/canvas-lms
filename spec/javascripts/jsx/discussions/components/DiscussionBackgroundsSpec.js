@@ -16,15 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-import {shallow} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import {mount} from 'enzyme'
 import {
   pinnedDiscussionBackground,
   unpinnedDiscussionsBackground,
   closedDiscussionBackground
 } from 'jsx/discussions/components/DiscussionBackgrounds'
-
-
 
 const defaultProps = () => ({
   permissions: {
@@ -33,7 +30,7 @@ const defaultProps = () => ({
     moderate: true
   },
   courseID: 12,
-  contextType: "Course"
+  contextType: 'Course'
 })
 
 QUnit.module('DiscussionBackgrounds components')
@@ -41,23 +38,26 @@ QUnit.module('DiscussionBackgrounds components')
 test('renders correct student view for the pinnedDiscussionBackground ', () => {
   const props = defaultProps()
   props.permissions.manage_content = false
-  const tree = shallow(pinnedDiscussionBackground(props))
+  const tree = mount(pinnedDiscussionBackground(props))
   const node = tree.find('Text')
   equal(node.length, '1')
+  tree.unmount()
 })
 
 test('renders correct student view for the unpinnedDiscussionsBackground decorative component', () => {
   const props = defaultProps()
   props.permissions.create = false
-  const tree = shallow(unpinnedDiscussionsBackground(props))
+  const tree = mount(unpinnedDiscussionsBackground(props))
   const node = tree.find('Link')
   equal(node.length, '0')
+  tree.unmount()
 })
 
 test('renders correct student view for the closedDiscussionBackground decorative component', () => {
   const props = defaultProps()
   props.permissions.manage_content = false
-  const tree = shallow(closedDiscussionBackground(props))
+  const tree = mount(closedDiscussionBackground(props))
   const node = tree.find('Text')
   equal(node.length, '1')
+  tree.unmount()
 })
