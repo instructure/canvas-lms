@@ -17,7 +17,7 @@
  */
 
 import React from 'react';
-import { mount } from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme';
+import { mount } from 'enzyme';
 import AssignmentRowCell
 from 'jsx/gradezilla/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/AssignmentRowCell'
 
@@ -34,7 +34,7 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
     const event = new Event('keydown');
     event.which = keyCode
     event.shiftKey = shiftKey;
-    return wrapper.node.handleKeyDown(event);
+    return wrapper.instance().handleKeyDown(event);
   }
 
   suiteHooks.beforeEach(() => {
@@ -90,8 +90,9 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
   QUnit.module('#render', () => {
     test('assigns a reference to its child SubmissionCell container', () => {
       wrapper = mountComponent()
+      const $el = wrapper.getDOMNode()
       ok(
-        wrapper.contains(wrapper.node.contentContainer),
+        $el.contains(wrapper.instance().contentContainer),
         'component node contains the referenced container node'
       )
     })
@@ -108,7 +109,7 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
 
       test('sets focus on the grade input', () => {
         wrapper = mountComponent()
-        const node = wrapper.find('GradeInput input')
+        const node = wrapper.find('GradeInput input').at(0)
         strictEqual(node.getDOMNode(), document.activeElement)
       })
 
@@ -169,7 +170,7 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
 
       test('sets focus on the grade input', () => {
         wrapper = mountComponent()
-        const node = wrapper.find('GradeInput input')
+        const node = wrapper.find('GradeInput input').at(0)
         strictEqual(node.getDOMNode(), document.activeElement)
       })
 
@@ -224,7 +225,7 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
 
       test('sets focus on the grade input', () => {
         wrapper = mountComponent()
-        const node = wrapper.find('GradeInput input')
+        const node = wrapper.find('GradeInput input').at(0)
         strictEqual(node.getDOMNode(), document.activeElement)
       })
 
@@ -274,7 +275,7 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
 
       test('sets focus on the button', () => {
         wrapper = mountComponent()
-        const node = wrapper.find('GradeInput button')
+        const node = wrapper.find('GradeInput button').at(0)
         strictEqual(node.getDOMNode(), document.activeElement)
       })
 
@@ -298,50 +299,50 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
 
       test('skips SlickGrid default behavior when tabbing from grade input', () => {
         wrapper = mountComponent()
-        wrapper.node.gradeInput.focus()
+        wrapper.instance().gradeInput.focus()
         const continueHandling = simulateKeyDown(9, false) // tab to tray button trigger
         strictEqual(continueHandling, false)
       })
 
       test('skips SlickGrid default behavior when shift-tabbing from tray button', () => {
         wrapper = mountComponent()
-        wrapper.node.trayButton.focus()
+        wrapper.instance().trayButton.focus()
         const continueHandling = simulateKeyDown(9, true) // shift+tab back to grade input
         strictEqual(continueHandling, false)
       })
 
       test('skips SlickGrid default behavior when the input handles the event', () => {
         wrapper = mountComponent()
-        wrapper.node.gradeInput.focus()
-        sinon.stub(wrapper.find('GradeInput').node, 'handleKeyDown').returns(false)
+        wrapper.instance().gradeInput.focus()
+        sinon.stub(wrapper.find('GradeInput').instance(), 'handleKeyDown').returns(false)
         const continueHandling = simulateKeyDown(9) // tab within the grade input
         strictEqual(continueHandling, false)
       })
 
       test('does not skip SlickGrid default behavior when tabbing from tray button', () => {
         wrapper = mountComponent()
-        wrapper.node.trayButton.focus()
+        wrapper.instance().trayButton.focus()
         const continueHandling = simulateKeyDown(9, false) // tab out of grid
         equal(typeof continueHandling, 'undefined')
       })
 
       test('does not skip SlickGrid default behavior when shift-tabbing from grade input', () => {
         wrapper = mountComponent()
-        wrapper.node.gradeInput.focus()
+        wrapper.instance().gradeInput.focus()
         const continueHandling = simulateKeyDown(9, true) // shift+tab out of grid
         equal(typeof continueHandling, 'undefined')
       })
 
       test('skips SlickGrid default behavior when pressing enter on tray button', () => {
         wrapper = mountComponent()
-        wrapper.node.trayButton.focus()
+        wrapper.instance().trayButton.focus()
         const continueHandling = simulateKeyDown(13) // enter on tray button (open tray)
         strictEqual(continueHandling, false)
       })
 
       test('does not skip SlickGrid default behavior when pressing enter on grade input', () => {
         wrapper = mountComponent()
-        wrapper.node.gradeInput.focus()
+        wrapper.instance().gradeInput.focus()
         const continueHandling = simulateKeyDown(13) // enter on grade input (commit editor)
         equal(typeof continueHandling, 'undefined')
       })
@@ -353,21 +354,21 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
 
         test('Tab on the invalid grade indicator skips SlickGrid default behavior', () => {
           wrapper = mountComponent()
-          wrapper.node.invalidGradeIndicator.focus()
+          wrapper.instance().invalidGradeIndicator.focus()
           const continueHandling = simulateKeyDown(9, false) // tab to tray button trigger
           strictEqual(continueHandling, false)
         })
 
         test('Shift+Tab on the grade input skips SlickGrid default behavior', () => {
           wrapper = mountComponent()
-          wrapper.node.gradeInput.focus()
+          wrapper.instance().gradeInput.focus()
           const continueHandling = simulateKeyDown(9, true) // shift+tab back to indicator
           strictEqual(continueHandling, false)
         })
 
         test('Shift+Tab on the invalid grade indicator does not skip SlickGrid default behavior', () => {
           wrapper = mountComponent()
-          wrapper.node.invalidGradeIndicator.focus()
+          wrapper.instance().invalidGradeIndicator.focus()
           const continueHandling = simulateKeyDown(9, true) // shift+tab out of grid
           equal(typeof continueHandling, 'undefined')
         })
@@ -379,17 +380,17 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
     test('sets focus on the text input, if one exists, for a GradeInput', () => {
       props.assignment.gradingType = 'points'
       wrapper = mountComponent()
-      wrapper.node.focus()
+      wrapper.instance().focus()
       const input = wrapper.find('GradeInput input')
-      strictEqual(input.node, document.activeElement)
+      strictEqual(input.at(0).getDOMNode(), document.activeElement)
     })
 
     test('sets focus on the button for a GradeInput if no text input exists', () => {
       props.enterGradesAs = 'passFail'
       wrapper = mountComponent()
-      wrapper.node.focus()
+      wrapper.instance().focus()
       const button = wrapper.find('GradeInput button')
-      strictEqual(button.node, document.activeElement)
+      strictEqual(button.at(0).getDOMNode(), document.activeElement)
     })
   })
 
@@ -397,8 +398,8 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
     test('delegates to the "hasGradeChanged" method for a GradeInput', () => {
       props.assignment.gradingType = 'points'
       wrapper = mountComponent()
-      sinon.stub(wrapper.find('GradeInput').node, 'hasGradeChanged').returns(true)
-      strictEqual(wrapper.node.isValueChanged(), true)
+      sinon.stub(wrapper.find('GradeInput').instance(), 'hasGradeChanged').returns(true)
+      strictEqual(wrapper.instance().isValueChanged(), true)
     })
   })
 
@@ -407,20 +408,20 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
       props.submissionIsUpdating = true
       wrapper = mountComponent()
       wrapper.setProps({submissionIsUpdating: false})
-      strictEqual(document.activeElement, wrapper.find('input').get(0))
+      strictEqual(document.activeElement, wrapper.find('input').at(0).getDOMNode())
     })
 
     test('does not set focus on the grade input when the submission has not finished updating', () => {
       props.submissionIsUpdating = true
       wrapper = mountComponent()
       wrapper.setProps({submissionIsUpdating: true})
-      notStrictEqual(document.activeElement, wrapper.find('input').get(0))
+      notStrictEqual(document.activeElement, wrapper.find('input').at(0).getDOMNode())
     })
 
     test('does not set focus on the grade input when the tray button has focus', () => {
       props.submissionIsUpdating = true
       wrapper = mountComponent()
-      const button = wrapper.find('button').get(0)
+      const button = wrapper.find('button').at(0).getDOMNode()
       button.focus()
       wrapper.setProps({submissionIsUpdating: false})
       strictEqual(document.activeElement, button)
