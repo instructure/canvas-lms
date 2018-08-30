@@ -19,7 +19,7 @@
 /* eslint-disable qunit/no-identical-names */
 
 import React from 'react'
-import {mount, ReactWrapper} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import {mount} from 'enzyme'
 import GradeInput from 'jsx/gradezilla/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/GradeInput'
 
 QUnit.module('GradeInput using GradingSchemeGradeInput', suiteHooks => {
@@ -101,16 +101,13 @@ QUnit.module('GradeInput using GradingSchemeGradeInput', suiteHooks => {
   }
 
   function getRenderedOptions() {
-    return new ReactWrapper([...$menuContent.querySelectorAll('[role="menuitem"]')], $menuContent)
+    return [...$menuContent.querySelectorAll('[role="menuitem"]')]
   }
 
   function clickMenuItem(optionText) {
     return new Promise(resolve => {
       resolveClose = resolve
-      const matchingOptions = getRenderedOptions().filterWhere(
-        option => option.text() === optionText
-      )
-      matchingOptions.first().simulate('click')
+      getRenderedOptions().find($option => $option.textContent === optionText).click()
     })
   }
 
@@ -124,7 +121,8 @@ QUnit.module('GradeInput using GradingSchemeGradeInput', suiteHooks => {
 
   test('adds the GradingSchemeInput-suffix class to the container', () => {
     mountComponent()
-    strictEqual(wrapper.hasClass('Grid__AssignmentRowCell__GradingSchemeInput'), true)
+    const classList = wrapper.getDOMNode().classList
+    strictEqual(classList.contains('Grid__AssignmentRowCell__GradingSchemeInput'), true)
   })
 
   test('renders a text input', () => {
@@ -143,7 +141,7 @@ QUnit.module('GradeInput using GradingSchemeGradeInput', suiteHooks => {
   test('optionally disables the menu button', () => {
     props.disabled = true
     mountComponent()
-    const button = wrapper.find('button').node
+    const button = wrapper.find('button').at(0).getDOMNode()
     strictEqual(button.disabled, true)
   })
 
@@ -184,7 +182,8 @@ QUnit.module('GradeInput using GradingSchemeGradeInput', suiteHooks => {
       mountComponent()
       wrapper
         .find('input')
-        .get(0)
+        .at(0)
+        .getDOMNode()
         .focus()
       wrapper.setProps({submission: {...props.submission, enteredScore: 8.0, enteredGrade: 'B-'}})
       strictEqual(getTextInputValue(), '')
@@ -649,7 +648,7 @@ QUnit.module('GradeInput using GradingSchemeGradeInput', suiteHooks => {
     test('sets focus on the input', () => {
       mountComponent()
       wrapper.instance().focus()
-      strictEqual(document.activeElement, wrapper.find('input').get(0))
+      strictEqual(document.activeElement, wrapper.find('input').at(0).getDOMNode())
     })
 
     test('selects the content of the input', () => {
@@ -663,10 +662,11 @@ QUnit.module('GradeInput using GradingSchemeGradeInput', suiteHooks => {
       mountComponent()
       wrapper
         .find('button')
-        .get(0)
+        .at(0)
+        .getDOMNode()
         .focus()
       wrapper.instance().focus()
-      strictEqual(document.activeElement, wrapper.find('button').get(0))
+      strictEqual(document.activeElement, wrapper.find('button').at(0).getDOMNode())
     })
 
     test('does not change focus when the grading scheme menu is open', () => {
@@ -689,8 +689,8 @@ QUnit.module('GradeInput using GradingSchemeGradeInput', suiteHooks => {
     })
 
     function focusOn(element) {
-      const node = wrapper.find(element).get(0)
-      node.focus()
+      const node = wrapper.find(element).at(0)
+      node.getDOMNode().focus()
     }
 
     function handleKeyDown(action) {
@@ -947,7 +947,7 @@ QUnit.module('GradeInput using GradingSchemeGradeInput', suiteHooks => {
       const expectedLabels = props.gradingScheme.map(([key]) => key) // ['A+', 'A', …, 'F']
       mountComponent()
       return clickToOpen().then(() => {
-        const optionsText = getRenderedOptions().map(option => option.text())
+        const optionsText = getRenderedOptions().map($option => $option.textContent)
         deepEqual(optionsText.slice(0, 13), expectedLabels)
       })
     })
@@ -955,12 +955,8 @@ QUnit.module('GradeInput using GradingSchemeGradeInput', suiteHooks => {
     test('includes "Excused" as the last option', () => {
       mountComponent()
       return clickToOpen().then(() => {
-        equal(
-          getRenderedOptions()
-            .last()
-            .text(),
-          'Excused'
-        )
+        const $options = getRenderedOptions()
+        equal($options[$options.length - 1].textContent, 'Excused')
       })
     })
 
