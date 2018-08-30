@@ -102,13 +102,14 @@ module SIS
                 process_file(tmp_dir, file_name, att)
               end
             elsif File.extname(file).downcase == '.csv'
-              att = @batch.attachment unless @batch.attachment&.filename != File.basename(file)
+              att = @batch.attachment if @batch.attachment && File.extname(@batch.attachment.filename).downcase == '.csv'
               att ||= create_batch_attachment file
               process_file(File.dirname(file), File.basename(file), att)
             end
           end
         end
-        @files = nil
+        remove_instance_variable(:@files)
+
         @parallel_importers = {}
         # first run is just to get the total number of lines to determine how
         # many jobs to create
@@ -145,7 +146,7 @@ module SIS
           while faster_csv.shift
             if create_importers && rows % @rows_for_parallel == 0
               @parallel_importers[importer] ||= []
-              @parallel_importers[importer] << create_parallel_importer(csv, importer, rows).id
+              @parallel_importers[importer] << create_parallel_importer(csv, importer, rows)
             end
             rows += 1
           end
@@ -180,11 +181,13 @@ module SIS
         @batch.data[:running_immediately] = @run_immediately
 
         @batch.data[:completed_importers] = []
-        @batch.save!
+        @batch.save! unless @run_immediately # we're about to finish anyway
 
         if @run_immediately
           run_all_importers
         else
+          @parallel_importers = Hash[@parallel_importers.map{|k, v| [k, v.map(&:id)]}] # save as ids in handler
+          remove_instance_variable(:@csvs) # don't need anymore
           queue_next_importer_set
         end
       rescue => e
@@ -209,7 +212,7 @@ module SIS
         SisBatch.where(:id => @batch).where("progress IS NULL or progress < ?", current_progress).update_all(progress: current_progress)
       end
 
-      def run_parallel_importer(id)
+      def run_parallel_importer(id, csv: nil)
         parallel_importer = id.is_a?(ParallelImporter) ? id : ParallelImporter.find(id)
         if @batch.workflow_state == 'aborted'
           parallel_importer.abort
@@ -217,15 +220,17 @@ module SIS
         end
         importer_type = parallel_importer.importer_type.to_sym
         importer_object = SIS::CSV.const_get(importer_type.to_s.camelcase + 'Importer').new(self)
-        att = parallel_importer.attachment
-        file = att.open
-        parallel_importer.start
-        csv = {:fullpath => file.path, :file => att.display_name}
+        csv ||= begin
+          att = parallel_importer.attachment
+          file = att.open
+          parallel_importer.start
+          {:fullpath => file.path, :file => att.display_name}
+        end
         count = importer_object.process(csv, parallel_importer.index, parallel_importer.batch_size)
         parallel_importer.complete(rows_processed: count)
-        update_progress # just update progress on completion - the parallel jobs should be short enough
+        update_progress unless @run_immediately # just update progress on completion - the parallel jobs should be short enough
       rescue => e
-        if parallel_importer.workflow_state == 'running'
+        if parallel_importer.workflow_state != 'retry'
           parallel_importer.write_attribute(:workflow_state, 'retry')
           run_parallel_importer(parallel_importer)
         end
@@ -266,13 +271,13 @@ module SIS
           importers = @parallel_importers[importer_type]
           next unless importers
           importers.each do |pi|
-            run_parallel_importer(pi)
+            run_parallel_importer(pi, csv: @csvs[importer_type].detect{|csv| csv[:attachment] == pi.attachment})
             @batch.data[:completed_importers] << importer_type
             return false if %w{aborted failed failed_with_messages}.include?(@batch.workflow_state)
           end
         end
-        @batch.parallel_importers.group(:importer_type).sum(:rows_processed).each do |type, count|
-          @batch.data[:counts][type.pluralize.to_sym] = count
+        @parallel_importers.each do |type, importers|
+          @batch.data[:counts][type.to_s.pluralize.to_sym] = importers.map(&:rows_processed).sum
         end
         finish
       end
@@ -324,7 +329,6 @@ module SIS
       def update_pause_vars
         # throttling can be set on individual SisBatch instances, and also
         # site-wide in the Setting table.
-        @batch.reload(:select => 'data') # update to catch changes to pause vars
         @batch.data ||= {}
         @pause_duration = (@batch.data[:pause_duration] || Setting.get('sis_batch_pause_duration', 0)).to_f
       end
