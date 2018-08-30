@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import {mount} from 'enzyme'
 import GraderNamesVisibleToFinalGraderCheckbox from 'jsx/assignments/GraderNamesVisibleToFinalGraderCheckbox'
 
 QUnit.module('GraderNamesVisibleToFinalGraderCheckbox', hooks => {
@@ -37,7 +37,7 @@ QUnit.module('GraderNamesVisibleToFinalGraderCheckbox', hooks => {
   }
 
   function formField() {
-    return wrapper.find('input[name="grader_names_visible_to_final_grader"][type="hidden"]').node
+    return wrapper.find('input[name="grader_names_visible_to_final_grader"][type="hidden"]').at(0).getDOMNode()
   }
 
   test('renders a checkbox', () => {
@@ -47,13 +47,13 @@ QUnit.module('GraderNamesVisibleToFinalGraderCheckbox', hooks => {
 
   test('renders an unchecked checkbox when passed checked: false', () => {
     mountComponent()
-    strictEqual(checkbox().node.checked, false)
+    strictEqual(checkbox().at(0).getDOMNode().checked, false)
   })
 
   test('renders a checked checkbox when passed checked: true', () => {
     props.checked = true
     mountComponent()
-    strictEqual(checkbox().node.checked, true)
+    strictEqual(checkbox().at(0).getDOMNode().checked, true)
   })
 
   test('sets the value of the form input to "false" when passed checked: false', () => {
