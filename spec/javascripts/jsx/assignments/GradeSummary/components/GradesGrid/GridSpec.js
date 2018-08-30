@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import {mount} from 'enzyme'
 
 import {speedGraderUrl} from 'jsx/assignments/GradeSummary/assignment/AssignmentApi'
 import Grid from 'jsx/assignments/GradeSummary/components/GradesGrid/Grid'
@@ -183,6 +183,7 @@ QUnit.module('GradeSummary Grid', suiteHooks => {
   test('binds the GradesGrid container using the horizontalScrollRef prop', () => {
     mountComponent()
     const [ref] = props.horizontalScrollRef.lastCall.args
-    strictEqual(ref, wrapper.find('.GradesGrid').get(0))
+    const grid = wrapper.find('.GradesGrid').at(0)
+    strictEqual(ref, grid.getDOMNode())
   })
 })
