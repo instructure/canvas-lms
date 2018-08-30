@@ -16,39 +16,51 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { ReactWrapper } from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme';
-
 const MENU_CONTENT_REF_MAP = {
   'Sort by': 'sortByMenuContent',
   'Display as': 'displayAsMenuContent',
   'Secondary info': 'secondaryInfoMenuContent',
 };
 
+function mouseover($el) {
+  const event = new MouseEvent('mouseover', {
+    bubbles: true,
+    cancelable: true,
+    view: window
+  })
+  $el.dispatchEvent(event)
+}
+
+function getMenuItemWithLabel($parent, label) {
+  const $children = [...$parent.querySelectorAll('[role^="menuitem"]')]
+  return $children.find($child => $child.textContent.trim() === label)
+}
+
+function getFlyoutWithLabel($parent, label) {
+  const $children = [...$parent.querySelectorAll('[role="button"]')]
+  return $children.find($child => $child.textContent.trim() === label)
+}
+
+function getSubmenu($menuItem) {
+  return document.querySelector(`[aria-labelledby="${$menuItem.id}"]`)
+}
+
+export function getMenuItem($menu, ...path) {
+  return path.reduce(($el, label, index) => {
+    if (index < path.length - 1) {
+      const $next = getFlyoutWithLabel($el, label)
+      mouseover($next)
+      return getSubmenu($next)
+    }
+
+    return getMenuItemWithLabel($el, label) || getFlyoutWithLabel($el, label)
+  }, $menu)
+}
+
 // the only requirement is that the individual spec files define their own
 // `mountAndOpenOptions` function on `this`.
-function findMenuContent (props) {
+export function findMenuItem (props, ...path) {
   this.wrapper = this.mountAndOpenOptions(props);
-  return new ReactWrapper([this.wrapper.node.optionsMenuContent], this.wrapper.node);
+  const $el = this.wrapper.instance().optionsMenuContent
+  return getMenuItem($el, ...path)
 }
-
-function findFlyout (props, flyoutLabel) {
-  const menuContent = findMenuContent.call(this, props)
-  const flyouts = menuContent.find('Menu').map(flyout => flyout);
-  return flyouts.find(menuItem => menuItem.text().trim() === flyoutLabel);
-}
-
-function findFlyoutMenuContent (props, flyoutLabel) {
-  const flyout = findFlyout.call(this, props, flyoutLabel)
-  // find menu item
-  flyout.find('button').simulate('mouseOver');
-  const flyoutContentRefFn = MENU_CONTENT_REF_MAP[flyoutLabel];
-  return new ReactWrapper([this.wrapper.node[flyoutContentRefFn]], this.wrapper.node);
-}
-
-function findMenuItem (props, firstMenuItemLabel, secondMenuItemLabel) {
-  const menuContent = findFlyoutMenuContent.call(this, props, firstMenuItemLabel);
-  const subMenuItems = menuContent.find('MenuItem').map(menuItem => menuItem);
-  return subMenuItems.find(menuItem => menuItem.text().trim() === secondMenuItemLabel);
-}
-
-export { findMenuItem, findFlyoutMenuContent, findFlyout, findMenuContent };
