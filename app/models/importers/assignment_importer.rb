@@ -334,23 +334,31 @@ module Importers
       item.save_without_broadcasting!
       item.skip_schedule_peer_reviews = nil
 
-      if item.submission_types == 'external_tool'
-        tag = item.create_external_tool_tag(:url => hash[:external_tool_url], :new_tab => hash[:external_tool_new_tab])
-        if hash[:external_tool_id] && migration && !migration.cross_institution?
-          tool_id = hash[:external_tool_id].to_i
-          tag.content_id = tool_id if ContextExternalTool.all_tools_for(context).where(id: tool_id).exists?
-        elsif hash[:external_tool_migration_id]
-          tool = context.context_external_tools.where(migration_id: hash[:external_tool_migration_id]).first
-          tag.content_id = tool.id if tool
-        end
-        tag.content_type = 'ContextExternalTool'
-        if !tag.save
-          if tag.errors["url"]
-            migration.add_warning(t('errors.import.external_tool_url',
-              "The url for the external tool assignment \"%{assignment_name}\" wasn't valid.",
-              :assignment_name => item.title))
+      if item.submission_types == 'external_tool' && (hash[:external_tool_url] || hash[:external_tool_id] || hash[:external_tool_migration_id])
+        current_tag = item.external_tool_tag
+        needs_new_tag = !current_tag ||
+          (hash[:external_tool_url] && current_tag.url != hash[:external_tool_url]) ||
+          (hash[:external_tool_id] && current_tag.content_id != hash[:external_tool_id]) ||
+          (hash[:external_tool_migration_id] && current_tag.content&.migration_id != hash[:external_tool_migration_id])
+
+        if needs_new_tag
+          tag = item.create_external_tool_tag(:url => hash[:external_tool_url], :new_tab => hash[:external_tool_new_tab])
+          if hash[:external_tool_id] && migration && !migration.cross_institution?
+            tool_id = hash[:external_tool_id].to_i
+            tag.content_id = tool_id if ContextExternalTool.all_tools_for(context).where(id: tool_id).exists?
+          elsif hash[:external_tool_migration_id]
+            tool = context.context_external_tools.where(migration_id: hash[:external_tool_migration_id]).first
+            tag.content_id = tool.id if tool
           end
-          item.association(:external_tool_tag).target = nil # otherwise it will trigger destroy on the tag
+          tag.content_type = 'ContextExternalTool'
+          if !tag.save
+            if tag.errors["url"]
+              migration.add_warning(t('errors.import.external_tool_url',
+                "The url for the external tool assignment \"%{assignment_name}\" wasn't valid.",
+                :assignment_name => item.title))
+            end
+            item.association(:external_tool_tag).target = nil # otherwise it will trigger destroy on the tag
+          end
         end
       end
 

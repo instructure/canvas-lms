@@ -1755,6 +1755,28 @@ describe MasterCourses::MasterMigration do
       expect(ag_to.reload.rules).to eq nil # set to empty if there are no dropping rules
     end
 
+    it "doesn't clear external tool config on exception" do
+      @copy_to = course_factory
+      @sub = @template.add_child_course!(@copy_to)
+
+      a = @copy_from.assignments.create!(:title => "some assignment")
+      run_master_migration
+      a_to = @copy_to.assignments.where(:migration_id => mig_id(a)).first
+
+      Timecop.freeze(60.seconds.from_now) do
+        a.touch
+      end
+
+      tool = @copy_to.context_external_tools.create!(:name => 'some tool', :consumer_key => 'test_key',
+        :shared_secret => 'test_secret', :url => 'http://example.com/launch')
+      a_to.update_attributes(:submission_types => 'external_tool', :external_tool_tag_attributes => {:content => tool})
+      tag = a_to.external_tool_tag
+
+      run_master_migration
+
+      expect(a_to.reload.external_tool_tag).to eq tag # don't change
+    end
+
     it "sends notifications", priority: "2", test_id: 3211103 do
       n0 = Notification.create(:name => "Blueprint Sync Complete")
       n1 = Notification.create(:name => "Blueprint Content Added")
