@@ -18,17 +18,14 @@
 
 module Lti
   module MembershipService
-    class LisPersonCollatorBase
+    class LisPersonCollatorBase < CollatorBase
       attr_reader :role, :per_page, :page
 
       def initialize(opts={})
+        super()
         @role = opts[:role]
         @per_page = [[opts[:per_page].to_i, Api.per_page].max, Api.max_per_page].min
-        @page = [opts[:page].to_i - 1, 0].max
-      end
-
-      def next_page?
-        users.length > @per_page
+        @page = [opts[:page].to_i, 1].max
       end
 
       def memberships
@@ -39,8 +36,12 @@ module Lti
 
       private
 
+      def membership_type
+        User.preload(:communication_channels, :not_ended_enrollments)
+      end
+
       def users
-        []
+        @users ||= bookmarked_collection.paginate(per_page: @per_page)
       end
 
       def generate_member(user)

@@ -7,6 +7,55 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 <li>This page documents API changes for the last four releases. For prior releases, view the <a href="file.changelog_archive.html">API Change Log archive page</a>.</li>
 </ul>
 
+<h2>2018-09-15</h2>
+
+<h3>Additions</h3>
+<table class="changelog">
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="custom_gradebook_columns.html">Custom Gradebook Columns API</a></td>
+<td>Bulk Update Column Data</td>
+<td>Sets the content of custom columns
+</td>
+</tr>
+<tr>
+<td><a href="file.tools_variable_substitutions.html">LTI Variable Substitutions</a></td>
+<td>com.instructure.Assignment.anonymous_grading<br><br>
+    com.Instructure.membership.roles</td>
+<td>Returns true if the assignment has anonymous grading enabled<br><br>
+    Returns true if the assignment has anonymous grading enabled</td>
+</tr>
+<tr>
+<td><a href="sis_imports.html">SIS Imports API</a></td>
+<td>SIS Import Object</td>
+<td>CSV_attachments parameter: Returns an array of CSV files for processing</td>
+</tr>
+</table>
+<p></p>
+<table class="changelog">
+<tr>
+<th>API Responses</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="accounts.html">Accounts API</a></td>
+<td>Get Help Links Endpoint</td>
+<td>Returns the help links for that account</td>
+</tr>
+<tr>
+<td><a href="blueprint_courses.html">Blueprint Courses API</a></td>
+<td>BlueprintSubscription Object<br><br>
+    List Blueprint Subscriptions Endpoint</td>
+<td>Returns the ID of the blueprint course and blueprint template the associated course is subscribed to<br><br>
+  Returns a list of blueprint subscriptions for the given course (currently a course may have no more than one)</td>
+</tr>
+</table>
+
 <h2>2018-08-04</h2>
 
 <h3>Changes</h3>
@@ -46,13 +95,8 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 <tr>
 <td><a href="Outcome_results.html">Outcome Results API</a></td>
 <td>Get Outcome Result Rollups</td>
-<td>Exclude parameter: Specified additional values to exclude. “Missing_user_rollups” excludes rollups for users without results.
-</td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td>Aggregate_stat parameter: If aggregate rollups requested, then this value determines what statistic is used for the aggregate. Defaults to “mean” if this value is not specified.
+<td>Exclude parameter: Specified additional values to exclude. “Missing_user_rollups” excludes rollups for users without results.<br><br>
+  Aggregate_stat parameter: If aggregate rollups requested, then this value determines what statistic is used for the aggregate. Defaults to “mean” if this value is not specified.
 </td>
 </tr>
 </table>
@@ -82,12 +126,12 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 <tr>
 <td><a href="api_token_scopes.html">API Token Scopes</a></td>
 <td></td>
-<td>Added endpoint</td>
+<td>Added API</td>
 </tr>
 <tr>
 <td><a href="proficiency_ratings.html">Proficiency Ratings API</a></td>
 <td></td>
-<td>Added endpoint</td>
+<td>Added API</td>
 </tr>
 </table>
 
@@ -130,41 +174,7 @@ Clarified description in that endpoint is currently only available to the mobile
 <tr>
 <td><a href="sis_imports.html">SIS Imports API</a></td>
 <td>Restore workflow_states of SIS imported items</td>
-<td>Added endpoint to restore states for sis_imports</td>
-</tr>
-</table>
-
-<h2>2018-06-02</h2>
-  <h3>Additions</h3>
-<table class="changelog">
-<tr>
-<th>API Calls</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="content_exports.html">Content Exports API</a></td>
-<td>Export Content Endpoint</td>
-  <td>Added select parameter</td>
-</tr>
-<tr>
-<td><a href="external_tools.html">External Tools API</a></td>
-<td>Create an External Tool Endpoint</td>
-<td>Added account_navigation[display_type] parameter</td>
-</tr>
-<tr>
-<td><a href="file.assignment_tools.html">Grade Passback External Tools</a></td>
-<td>
-  </td>
-<td>Added Submission Details Return Extension documentation, which includes information about supporting Submitted At timestamps</td>
-</tr>
-<td><a href="submissions.html">Submissions API</a></td>
-<td>Submission Summary Endpoint</td>
-<td>Added grouped parameter</td>
-</tr>
-<td><a href="users.html">Users API</a></td>
-<td>Create a User endpoint</td>
-<td>Added destination parameter</td>
+<td>Restore states for sis_imports</td>
 </tr>
 </table>
 <p></p>
