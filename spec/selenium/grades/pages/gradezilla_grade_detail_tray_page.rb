@@ -41,8 +41,8 @@ class Gradezilla
         fj("input[value=#{type}]")
       end
 
-      def late_by_input_css
-        ".SubmissionTray__RadioInput input[id*='NumberInput']"
+      def late_by_input_xpath
+        "//input[contains(@id, 'NumberInput')]"
       end
 
       def late_by_hours
@@ -69,20 +69,12 @@ class Gradezilla
         fj("a:contains('SpeedGrader')")
       end
 
-      def assignment_left_arrow_selector
-        '#assignment-carousel .left-arrow-button-container button'
-      end
-
-      def assignment_right_arrow_selector
-        '#assignment-carousel .right-arrow-button-container button'
-      end
-
       def next_assignment_button
-        f(assignment_right_arrow_selector)
+        f('#assignment-carousel .right-arrow-button-container button')
       end
 
       def previous_assignment_button
-        f(assignment_left_arrow_selector)
+        f('#assignment-carousel .left-arrow-button-container button')
       end
 
       def assignment_link(assignment_name)
@@ -148,12 +140,12 @@ class Gradezilla
       end
 
       def fetch_late_by_value
-        fj(late_by_input_css)['value']
+        fxpath(late_by_input_xpath)['value']
       end
 
       def edit_late_by_input(value)
-        fj(late_by_input_css).click
-        set_value(fj(late_by_input_css), value)
+        fxpath(late_by_input_xpath).click
+        set_value(fxpath(late_by_input_xpath), value)
         # shifting focus from input = saving the changes
         driver.action.send_keys(:tab).perform
         wait_for_ajax_requests

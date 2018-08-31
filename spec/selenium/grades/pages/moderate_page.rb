@@ -64,6 +64,8 @@ class ModeratePage
 
     def accept_grades_for_grader(grader)
       accept_grades_button(grader).click
+      # wait for Accepted button to exist
+      fj("tr#grader-row-#{grader.id} button:contains('Accepted')")
     end
 
     # Methods
