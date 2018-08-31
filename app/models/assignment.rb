@@ -45,6 +45,21 @@ class Assignment < ActiveRecord::Base
 
   LTI_EULA_SERVICE = 'vnd.Canvas.Eula'.freeze
 
+  AUDITABLE_ATTRIBUTES = %w[
+    muted
+    due_at
+    points_possible
+    anonymous_grading
+    moderated_grading
+    final_grader_id
+    grader_count
+    omit_from_final_grade
+    grader_names_visible_to_final_grader
+    grader_comments_visible_to_graders
+    graders_anonymous_to_graders
+    anonymous_instructor_annotations
+  ].freeze
+
   attr_accessor :previous_id, :updating_user, :copying, :user_submitted
 
   attr_reader :assignment_changed
@@ -165,7 +180,10 @@ class Assignment < ActiveRecord::Base
   end
 
   def auditable?
-    anonymous_grading? || moderated_grading?
+    anonymous_grading? ||
+      moderated_grading? ||
+      saved_change_to_anonymous_grading? ||
+      saved_change_to_moderated_grading?
   end
 
   # The relevant associations that are copied are:
@@ -455,6 +473,10 @@ class Assignment < ActiveRecord::Base
     write_attribute(:allowed_extensions, new_value)
   end
 
+  after_create :create_assignment_created_audit_event
+
+  after_update :create_assignment_updated_audit_event
+
   before_save :ensure_post_to_sis_valid,
               :process_if_quiz,
               :default_values,
@@ -475,39 +497,60 @@ class Assignment < ActiveRecord::Base
               :update_cached_due_dates,
               :apply_late_policy,
               :touch_submissions_if_muted_changed,
-              :create_audit_event,
               :create_audit_event_if_grades_posted
 
   has_a_broadcast_policy
 
-  def create_audit_event
-    auditable_attributes = %w[
-      muted
-      due_at
-      points_possible
-      anonymous_grading
-      moderated_grading
-      final_grader_id
-      grader_count
-      omit_from_final_grade
-      grader_names_visible_to_final_grader
-      grader_comments_visible_to_graders
-      graders_anonymous_to_graders
-      anonymous_instructor_annotations
-    ]
-    auditable_changes = saved_changes.slice(*auditable_attributes)
-    return true if auditable_changes.empty? || @updating_user.nil?
+  def create_assignment_created_audit_event
+    return if @updating_user.nil?
+    return unless auditable?
 
+    auditable_changes = AUDITABLE_ATTRIBUTES.each_with_object({}) do |attribute, map|
+      map[attribute] = attributes[attribute] unless attributes[attribute].nil?
+    end
+
+    create_audit_event(event_type: :assignment_created, payload: auditable_changes)
+  end
+  private :create_assignment_created_audit_event
+
+  def create_assignment_updated_audit_event
+    return if @updating_user.nil?
+    return unless auditable? || became_auditable?
+
+    auditable_changes = if became_auditable?
+      AUDITABLE_ATTRIBUTES.each_with_object({}) do |attribute, map|
+        next if attributes[attribute].nil?
+
+        map[attribute] = if saved_changes.key?(attribute)
+          saved_changes[attribute]
+        else
+          [attributes[attribute], attributes[attribute]]
+        end
+      end
+    else
+      saved_changes.slice(*AUDITABLE_ATTRIBUTES)
+    end
+
+    return if auditable_changes.empty?
+
+    create_audit_event(event_type: :assignment_updated, payload: auditable_changes)
+  end
+  private :create_assignment_updated_audit_event
+
+  def create_audit_event(event_type:, payload:)
     AnonymousOrModerationEvent.create!(
       assignment: self,
       user: @updating_user,
-      event_type: :assignment_updated,
-      payload: auditable_changes
+      event_type: event_type,
+      payload: payload
     )
-
-    true
   end
   private :create_audit_event
+
+  def became_auditable?
+    saved_change_to_anonymous_grading?(from: false, to: true) || saved_change_to_moderated_grading?(from: false, to: true)
+  end
+  private :became_auditable?
 
   def create_audit_event_if_grades_posted
     changes = saved_changes.slice(:grades_published_at)

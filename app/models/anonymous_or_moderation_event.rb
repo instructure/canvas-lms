@@ -18,6 +18,7 @@
 
 class AnonymousOrModerationEvent < ApplicationRecord
   EVENT_TYPES = %w[
+    assignment_created
     assignment_updated
     docviewer_annotation_deleted
     docviewer_area_created
