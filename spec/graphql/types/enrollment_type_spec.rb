@@ -29,7 +29,7 @@ describe Types::EnrollmentType do
     expect(enrollment_type.state).to eq "active"
   end
 
-  context "grades" do
+  describe Types::GradesType do
     before(:once) do
       gpg = GradingPeriodGroup.create!(account_id: Account.default)
       @course.enrollment_term.update_attribute :grading_period_group, gpg
@@ -64,6 +64,28 @@ describe Types::EnrollmentType do
 
       grades = enrollment_type.grades(current_user: @teacher)
       expect(grades.id).to be_nil
+    end
+
+    describe Types::GradingPeriodType do
+      it "works" do
+        expect(
+          enrollment_type.resolve(<<~GQL, current_user: @teacher)
+            grades { gradingPeriod { title } }
+          GQL
+        ).to eq @gp1.title
+
+        expect(
+          enrollment_type.resolve(<<~GQL, current_user: @teacher)
+            grades { gradingPeriod { startDate } }
+          GQL
+        ).to eq @gp1.start_date.iso8601
+
+        expect(
+          enrollment_type.resolve(<<~GQL, current_user: @teacher)
+            grades { gradingPeriod { endDate } }
+          GQL
+        ).to eq @gp1.end_date.iso8601
+      end
     end
   end
 
