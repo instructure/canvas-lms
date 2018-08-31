@@ -1,1 +1,8 @@
-The spreadsheet will be emailed to you in several minutes.
+To which email address do you want the report sent?
+
+<%= form_tag({}, {:method => :post}) do %>
+  <%= text_field_tag :email, @current_user.email %>
+  <%= hidden_field_tag :course_id, params[:course_id] %>
+  <%= hidden_field_tag :assignment_id, params[:assignment_id] %>
+  <%= submit_tag 'Request' %>
+<% end %>
