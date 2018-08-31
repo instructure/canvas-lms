@@ -3216,8 +3216,7 @@ class Course < ActiveRecord::Base
   end
 
   def moderators
-    active_instructors = users.merge(Enrollment.active_or_pending.of_instructor_type)
-    active_instructors.select { |user| grants_right?(user, :select_final_grade) }
+    participating_instructors.distinct.select { |user| grants_right?(user, :select_final_grade) }
   end
 
   def moderated_grading_max_grader_count

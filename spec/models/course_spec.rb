@@ -155,9 +155,9 @@ describe Course do
     before(:once) do
       @course = Course.create!
       @teacher = User.create!
-      @course.enroll_teacher(@teacher)
+      @course.enroll_teacher(@teacher, enrollment_state: :active)
       @ta = User.create!
-      @course.enroll_ta(@ta)
+      @course.enroll_ta(@ta, enrollment_state: :active)
     end
 
     it 'includes active teachers' do
@@ -166,6 +166,22 @@ describe Course do
 
     it 'includes active TAs' do
       expect(@course.moderators).to include @ta
+    end
+
+    it 'only includes a user once when they are enrolled multiple times in a course' do
+      section = @course.course_sections.create!
+      @course.enroll_teacher(@teacher, section: section, allow_multiple_enrollments: true, enrollment_state: :active)
+      expect(@course.moderators.count { |user| user == @teacher }).to eq 1
+    end
+
+    it 'excludes invited teachers' do
+      @course.enrollments.find_by!(user: @teacher).update!(workflow_state: :invited)
+      expect(@course.moderators).not_to include @teacher
+    end
+
+    it 'excludes invited TAs' do
+      @course.enrollments.find_by!(user: @ta).update!(workflow_state: :invited)
+      expect(@course.moderators).not_to include @ta
     end
 
     it 'excludes active teachers if teachers have "Select Final Grade" priveleges revoked' do
@@ -179,22 +195,22 @@ describe Course do
     end
 
     it 'excludes inactive teachers' do
-      @course.enrollments.find_by!(user_id: @teacher).deactivate
+      @course.enrollments.find_by!(user: @teacher).deactivate
       expect(@course.moderators).not_to include @teacher
     end
 
     it 'excludes concluded teachers' do
-      @course.enrollments.find_by!(user_id: @teacher).conclude
+      @course.enrollments.find_by!(user: @teacher).conclude
       expect(@course.moderators).not_to include @teacher
     end
 
     it 'excludes inactive TAs' do
-      @course.enrollments.find_by!(user_id: @ta).deactivate
+      @course.enrollments.find_by!(user: @ta).deactivate
       expect(@course.moderators).not_to include @ta
     end
 
     it 'excludes concluded TAs' do
-      @course.enrollments.find_by!(user_id: @ta).conclude
+      @course.enrollments.find_by!(user: @ta).conclude
       expect(@course.moderators).not_to include @ta
     end
 
