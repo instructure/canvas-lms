@@ -65,6 +65,9 @@ development:
         consul_datacenters:
         - dc1
         - dc2
+      clone_url_strand.yml: |
+        lti1.instructure.com: lti1
+        lti2.instructure.com: lti2
   store:
     canvas:
       lti-keys:

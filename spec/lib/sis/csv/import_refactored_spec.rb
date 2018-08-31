@@ -328,10 +328,19 @@ describe SIS::CSV::ImportRefactored do
 
   describe "parallel imports" do
     it 'should retry an importer once' do
-      expect_any_instance_of(Attachment).to receive(:open).twice
+      expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:run_parallel_importer).twice.and_call_original
+      allow_any_instance_of(SIS::CSV::TermImporter).to receive(:process).and_raise("error")
       process_csv_data(
-        "term_id,name,status,start_date,end_date",
-        "T001,Winter13,active,,"
+        "term_id,name,status",
+        "T001,Winter13,active"
+      )
+    end
+
+    it 'should only run an importer once if successful' do
+      expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:run_parallel_importer).once.and_call_original
+      process_csv_data(
+        "term_id,name,status",
+        "T001,Winter13,active"
       )
     end
   end

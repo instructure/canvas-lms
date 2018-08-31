@@ -1929,6 +1929,11 @@ describe Attachment do
     it "strips subdomains" do
       expect(Attachment.clone_url_strand("http://cdn.google.com/image.jpg")).to eq ["file_download", "google.com"]
     end
+
+    it "accepts overrides" do
+      allow(Attachment).to receive(:clone_url_strand_overrides).and_return("cdn.google.com" => "cdn")
+      expect(Attachment.clone_url_strand("http://cdn.google.com/image.jpg")).to eq ["file_download", "cdn"]
+    end
   end
 
   describe ".clone_url_as_attachment" do

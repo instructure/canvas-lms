@@ -275,7 +275,7 @@ class SisBatch < ActiveRecord::Base
       return if account.sis_batches.importing.exists? # will requeue after the current batch finishes
       start_time = Time.zone.now
       loop do
-        batches = account.sis_batches.needs_processing.limit(50).order(:created_at).to_a
+        batches = account.sis_batches.needs_processing.limit(50).order(:created_at).preload(:attachment).to_a
         break if batches.empty?
         batches.each do |batch|
           batch.process_without_send_later
@@ -373,7 +373,8 @@ class SisBatch < ActiveRecord::Base
     @data_file = nil
     return self if workflow_state == 'aborted'
     remove_previous_imports if self.batch_mode? && import_finished
-    import_finished = !self.sis_batch_errors.failed.exists? if import_finished
+    @has_errors = self.sis_batch_errors.exists?
+    import_finished = !(@has_errors && self.sis_batch_errors.failed.exists?) if import_finished
     finalize_workflow_state(import_finished)
     write_errors_to_file
     populate_old_warnings_and_errors
@@ -391,10 +392,10 @@ class SisBatch < ActiveRecord::Base
     if import_finished
       return if workflow_state == 'aborted'
       self.workflow_state = :imported
-      self.workflow_state = :imported_with_messages if self.sis_batch_errors.exists?
+      self.workflow_state = :imported_with_messages if @has_errors
     else
       self.workflow_state = :failed
-      self.workflow_state = :failed_with_messages if self.sis_batch_errors.exists?
+      self.workflow_state = :failed_with_messages if @has_errors
     end
   end
 
@@ -613,6 +614,13 @@ class SisBatch < ActiveRecord::Base
   end
 
   def populate_old_warnings_and_errors
+    self.data ||= {}
+    self.data[:counts] ||= {}
+    unless @has_errors
+      self.data[:counts][:error_count] = 0
+      self.data[:counts][:warning_count] = 0
+      return
+    end
     fail_count = self.sis_batch_errors.failed.count
     warning_count = self.sis_batch_errors.warnings.count
     self.processing_errors = self.sis_batch_errors.failed.limit(24).pluck(:file, :message)
@@ -625,14 +633,12 @@ class SisBatch < ActiveRecord::Base
       self.processing_warnings << ["and #{warning_count - 24} more warnings that were not included",
                                    "Download the error file to see all warnings."]
     end
-    self.data ||= {}
-    self.data[:counts] ||= {}
     self.data[:counts][:error_count] = fail_count
     self.data[:counts][:warning_count] = warning_count
   end
 
   def write_errors_to_file
-    return unless self.sis_batch_errors.exists?
+    return unless @has_errors
     file = temp_error_file_path
     CSV.open(file, "w") do |csv|
       csv << %w(sis_import_id file message row)
