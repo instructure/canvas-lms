@@ -17,6 +17,8 @@
 #
 
 class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::Oauth2
+  attr_accessor :instance_debugging
+
   def self.sti_name
     self == OpenIDConnect ? 'openid_connect'.freeze : super
   end
@@ -41,6 +43,26 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::Oauth2
     return super unless self == OpenIDConnect
     # we allow any attribute
     nil
+  end
+
+  def self.supports_debugging?
+    true
+  end
+
+  def self.debugging_sections
+    [nil]
+  end
+
+  def self.debugging_keys
+    [{
+       debugging: -> { t("Testing state") },
+       nonce: -> { t("Nonce") },
+       authorize_url: -> { t("Authorize URL") },
+       get_token_response: -> { t("Error fetching access token") },
+       claims_response: -> { t("Error fetching user details") },
+       id_token: -> { t("ID Token") },
+       userinfo: -> { t("Userinfo") },
+     }]
   end
 
   alias_attribute :end_session_endpoint, :log_out_url
@@ -89,6 +111,7 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::Oauth2
   def claims(token)
     token.options[:claims] ||= begin
       jwt_string = token.params['id_token']
+      debug_set(:id_token, jwt_string) if instance_debugging
       id_token = begin
         ::Canvas::Security.decode_jwt(jwt_string, [:skip_verification])
       rescue ::Canvas::Security::InvalidToken
@@ -99,6 +122,7 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::Oauth2
       # then request more
       if userinfo_endpoint.present? && !(id_token.keys - requested_claims).empty?
         userinfo = token.get(userinfo_endpoint).parsed
+        debug_set(:userinfo, userinfo.to_json) if instance_debugging
         # but only use it if it's for the user we logged in as
         # see http://openid.net/specs/openid-connect-core-1_0.html#UserInfoResponse
         if userinfo['sub'] == id_token['sub']
