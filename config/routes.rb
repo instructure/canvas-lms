@@ -37,6 +37,7 @@ CanvasRails::Application.routes.draw do
   get 'bz/grade_details' => 'bz#grade_details'
 
   get 'bz/grades_download' => 'bz#grades_download'
+  post 'bz/grades_download' => 'bz#do_grades_download'
 
   get 'bz/linked_in_auth' => 'bz#linked_in_auth'
   get 'bz/linked_in_export' => 'bz#linked_in_export'

@@ -295,6 +295,10 @@ class BzController < ApplicationController
   end
 
   def grades_download
+    # view render
+  end
+
+  def do_grades_download
     download = BzController::ExportGrades.new(@current_user.id, params)
     Delayed::Job.enqueue(download, max_attempts: 1)
   end
@@ -856,7 +860,7 @@ class BzController < ApplicationController
     
     def perform
       csv = Export::GradeDownload.csv(@user, @params)
-      Mailer.bz_message(@user.email, "Export Success: Course #{@params[:course_id]}", "Attached is your export data", "grades_download.csv" => csv).deliver
+      Mailer.bz_message(@params[:email], "Export Success: Course #{@params[:course_id]}", "Attached is your export data", "grades_download.csv" => csv).deliver
       
       csv
     end
