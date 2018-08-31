@@ -19,8 +19,6 @@
 require_relative '../sharding_spec_helper'
 
 describe PlannerController do
-  include PlannerHelper
-
   before :once do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
@@ -69,11 +67,10 @@ describe PlannerController do
       end
 
       it "checks the planner cache" do
-        @current_user = @student
         found_planner_meta_request = false
         found_planner_items_request = false
         allow(Rails.cache).to receive(:fetch) do |cache_key, &block|
-          if cache_key == planner_meta_cache_key
+          if cache_key.include?('planner_items_meta')
             found_planner_meta_request = true
             'meta-cache-key'
           elsif cache_key.include?('meta-cache-key')
