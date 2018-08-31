@@ -79,12 +79,25 @@ describe AuthenticationProvidersController do
 
   end
 
-  describe "saml_testing" do
-    it "requires saml configuration to test" do
-      get "saml_testing", params: {account_id: account.id}, format: :json
-      expect(response).to be_successful
-      expect(response.body).to match("A SAML configuration is required to test SAML")
+  describe "start_debugging" do
+    it "complains about unsupported auth type" do
+      enable_cache do
+        put "start_debugging", params: {account_id: account.id, authentication_provider_id: account.canvas_authentication_provider.id}, format: :json
+        expect(response.status).to eq 400
+        expect(response.body).to match("Unsupported authentication type")
+        expect(account.canvas_authentication_provider).to_not be_debugging
+      end
     end
+
+    it "works for supported auth type" do
+      enable_cache do
+        provider = account.authentication_providers.create!(auth_type: 'saml')
+        put "start_debugging", params: {account_id: account.id, authentication_provider_id: provider.id}, format: :json
+        expect(response).to be_successful
+        expect(provider).to be_debugging
+      end
+    end
+
   end
 
   describe "POST #create" do

@@ -901,31 +901,31 @@ class AuthenticationProvidersController < ApplicationController
     redirect_to :account_authentication_providers
   end
 
-  def saml_testing
-    @account_config = @account.authentication_providers.active.where(auth_type: 'saml').first
+  def start_debugging
+    ap = @account.authentication_providers.active.find(params[:authentication_provider_id])
 
-    unless @account_config
-      render json: {
-                 errors: {
-                     account: t(:saml_required,
-                                "A SAML configuration is required to test SAML")
-                 }
-             }
-      return
+    return render(status: 400, json: { errors: ["Unsupported authentication type"] }) unless ap.class.supports_debugging?
+    ap.start_debugging
+    debug_data(ap)
+  end
+
+  def debug_data(ap = nil)
+    unless ap
+      ap = @account.authentication_providers.active.find(params[:authentication_provider_id])
+      return render(status: 400, json: { errors: ["Provider is not currently debugging"] }) unless ap.debugging?
     end
-    @account_config.start_debugging if params[:start_debugging]
 
     respond_to do |format|
       format.html do
-        render partial: 'saml_testing',
-               locals: { config: @account_config },
+        render partial: 'debug_data',
+               locals: { provider: ap },
                layout: false
       end
       format.json do
         render json: {
-          debugging: @account_config.debugging?,
-          debug_data: render_to_string(partial: 'saml_testing',
-                                       locals: { config: @account_config },
+          debugging: ap.debugging?,
+          debug_data: render_to_string(partial: 'debug_data',
+                                       locals: { provider: ap },
                                        formats: [:html],
                                        layout: false)
         }
@@ -933,9 +933,9 @@ class AuthenticationProvidersController < ApplicationController
     end
   end
 
-  def saml_testing_stop
-    account_config = @account.authentication_providers.active.where(auth_type: "saml").first
-    account_config.finish_debugging if account_config.present?
+  def stop_debugging
+    ap = @account.authentication_providers.active.find(params[:authentication_provider_id])
+    ap.stop_debugging if ap.class.supports_debugging?
     render json: { status: "ok" }
   end
 

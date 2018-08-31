@@ -624,13 +624,15 @@ CanvasRails::Application.routes.draw do
     put 'sso_settings' => 'authentication_providers#update_sso_settings',
         as: :update_sso_settings
 
-    resources :authentication_providers, only: [:index, :create, :update, :destroy]
+    resources :authentication_providers, only: [:index, :create, :update, :destroy] do
+      get :debugging, action: :debug_data
+      put :debugging, action: :start_debugging
+      delete :debugging, action: :stop_debugging
+    end
     get 'test_ldap_connections' => 'authentication_providers#test_ldap_connection'
     get 'test_ldap_binds' => 'authentication_providers#test_ldap_bind'
     get 'test_ldap_searches' => 'authentication_providers#test_ldap_search'
     match 'test_ldap_logins' => 'authentication_providers#test_ldap_login', via: [:get, :post]
-    get 'saml_testing' => 'authentication_providers#saml_testing'
-    get 'saml_testing_stop' => 'authentication_providers#saml_testing_stop'
 
     get 'external_tools/sessionless_launch' => 'external_tools#sessionless_launch'
     resources :external_tools do

@@ -17,4 +17,4 @@
  */
 
 import 'account_authorization_configs'
-import 'saml_testing'
+import 'authentication_provider_debugging'

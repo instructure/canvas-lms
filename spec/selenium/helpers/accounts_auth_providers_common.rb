@@ -78,7 +78,7 @@ module AuthenticationProvidersCommon
   def start_saml_debug
     Account.default.authentication_providers.create!(auth_type: 'saml')
     get "/accounts/#{Account.default.id}/authentication_providers"
-    start = f("#start_saml_debugging")
+    start = f(".start_debugging")
     start.click
   end
 

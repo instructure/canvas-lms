@@ -70,6 +70,10 @@ class AuthenticationProvider < ActiveRecord::Base
     true
   end
 
+  def self.supports_debugging?
+    false
+  end
+
   def self.display_name
     name.try(:demodulize)
   end
@@ -297,6 +301,31 @@ class AuthenticationProvider < ActiveRecord::Base
     end
   end
 
+  def debugging?
+    unless instance_variable_defined?(:@debugging)
+      @debugging = !!Rails.cache.fetch(debug_key(:debugging))
+    end
+    @debugging
+  end
+
+  def stop_debugging
+    self.class.debugging_keys.map(&:keys).flatten.each { |key| Rails.cache.delete(debug_key(key)) }
+  end
+
+  def start_debugging
+    stop_debugging # clear old data
+    debug_set(:debugging, t("Waiting for attempted login"))
+    @debugging = true
+  end
+
+  def debug_get(key)
+    Rails.cache.fetch(debug_key(key))
+  end
+
+  def debug_set(key, value)
+    Rails.cache.write(debug_key(key), value, expires_in: debug_expire)
+  end
+
   protected
 
   def statsd_prefix
@@ -359,6 +388,15 @@ class AuthenticationProvider < ActiveRecord::Base
     return if account.non_canvas_auth_configured?
     account.enable_canvas_authentication
   end
+
+  def debug_key(key)
+    ['auth_provider_debugging', self.id, key.to_s].cache_key
+  end
+
+  def debug_expire
+    Setting.get('auth_provider_debug_expire_minutes', 30).to_i.minutes
+  end
+
 end
 
 # so it doesn't get mixed up with ::CAS, ::LinkedIn and ::Twitter
