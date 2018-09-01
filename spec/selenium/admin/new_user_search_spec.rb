@@ -18,6 +18,7 @@
 require_relative '../common'
 require_relative 'pages/new_user_search_page'
 require_relative 'pages/new_user_edit_modal_page.rb'
+require_relative 'pages/edit_existing_user_modal_page.rb'
 require_relative 'pages/masquerade_page.rb'
 require_relative '../conversations/conversations_new_message_modal_page.rb'
 
@@ -72,54 +73,13 @@ describe "new account user search" do
     expect(fj('[aria-label="Add a New User"] label:contains("Full Name") input').attribute('value')).to eq('')
   end
 
-  it "should be able to create users with confirmation disabled", priority: "1", test_id: 3399311 do
-    name = 'Confirmation Disabled'
-    get "/accounts/#{@account.id}/users"
-
-    fj('button:has([name="IconPlus"]):contains("People")').click
-    modal = f('[aria-label="Add a New User"]')
-
-    set_value(fj('label:contains("Full Name") input', modal), name)
-
-    email = 'someemail@example.com'
-    set_value(fj('label:contains("Email") input', modal), email)
-
-    fj('label:contains("Email the user about this account creation")', modal).click
-
-    f('button[type="submit"]', modal).click
-    wait_for_ajaximations
-
-    new_pseudonym = Pseudonym.where(:unique_id => email).first
-    expect(new_pseudonym.user.name).to eq name
-  end
-
-  it "should paginate" do
-    ('A'..'Z').each do |letter|
-      user_with_pseudonym(:account => @account, :name => "Test User #{letter}")
-    end
-
-    get "/accounts/#{@account.id}/users"
-
-    expect(get_rows.count).to eq 15
-    expect(get_rows.first).to include_text("Test User A")
-    expect(f("[data-automation='users list']")).to_not include_text("Test User O")
-    expect(f("#content")).not_to contain_css('button[title="Previous Page"]')
-
-    fj('nav button:contains("2")').click
-    wait_for_ajaximations
-
-    expect(get_rows.count).to eq 12
-    expect(get_rows.first).to include_text("Test User O")
-    expect(get_rows.last).to include_text("Test User Z")
-    expect(f("[data-automation='users list']")).not_to include_text("Test User A")
-  end
-
   # This describe block will be removed once all tests are converted
   describe 'Page Object Converted Tests Root Account' do
     include NewUserSearchPage
     include NewUserEditModalPage
     include MasqueradePage
     include ConversationsNewMessageModalPage
+    include EditExistingUserModalPage
 
     before do
       @user.update_attribute(:name, "Test User")
@@ -133,7 +93,7 @@ describe "new account user search" do
 
     it "should open the edit user modal when clicking the edit user icon" do
       click_edit_button(@user.name)
-      expect(full_name_input.attribute('value')).to eq(@user.name)
+      expect(edit_full_name_input.attribute('value')).to eq(@user.name)
     end
 
     it "should open the act as page when clicking the masquerade button", priority: "1", test_id: 3453424 do
@@ -240,6 +200,23 @@ describe "new account user search" do
 
         click_left_nav_courses
       end
+    end
+
+    it "should be able to create users with confirmation disabled", priority: "1", test_id: 3399311 do
+      name = 'Confirmation Disabled'
+      email = 'someemail@example.com'
+      visit_users(@account)
+
+      click_add_user
+
+      set_value(full_name_input, name)
+      set_value(email_input, email)
+
+      click_email_creation_check
+      click_modal_submit
+
+      new_pseudonym = Pseudonym.where(:unique_id => email).first
+      expect(new_pseudonym.user.name).to eq name
     end
   end
 end
