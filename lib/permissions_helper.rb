@@ -83,7 +83,8 @@ module PermissionsHelper
           course_permissions[:read_grades] = true
           course_permissions[:participate_as_student] = true
         end
-        if active_ens.any?(&:admin?)
+        if grouped_enrollments[course.id].any?(&:admin?)
+          course_permissions[:read] = true
           course_permissions[:read_as_admin] = true
         elsif !is_account_admin
           course_permissions[:read_as_admin] = false # wait a second i can totally mark this one as false if they don't have any account users
