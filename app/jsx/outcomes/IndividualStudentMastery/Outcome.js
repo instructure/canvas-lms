@@ -26,6 +26,7 @@ import ToggleGroup from '@instructure/ui-toggle-details/lib/components/ToggleGro
 import List, { ListItem } from '@instructure/ui-elements/lib/components/List'
 import Pill from '@instructure/ui-elements/lib/components/Pill'
 import Text from '@instructure/ui-elements/lib/components/Text'
+import TruncateText from '@instructure/ui-elements/lib/components/TruncateText'
 import natcompare from 'compiled/util/natcompare'
 import AssignmentResult from './AssignmentResult'
 import UnassessedAssignment from './UnassessedAssignment'
@@ -55,7 +56,7 @@ export default class Outcome extends React.Component {
 
     return (
       <Flex direction="row" justifyItems="space-between">
-        <FlexItem>
+        <FlexItem shrink>
           <Flex direction="column">
             <FlexItem>
               <Text size="medium">
@@ -63,7 +64,7 @@ export default class Outcome extends React.Component {
                   <FlexItem>
                     <OutcomePopover outcome={outcome} outcomeProficiency={outcomeProficiency}/>
                   </FlexItem>
-                  <FlexItem padding="0 x-small">{ title }</FlexItem>
+                  <FlexItem shrink padding="0 x-small"><TruncateText>{ title }</TruncateText></FlexItem>
                 </Flex>
               </Text>
             </FlexItem>
