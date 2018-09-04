@@ -730,7 +730,7 @@ class DiscussionTopicsController < ApplicationController
             js_hash = {:DISCUSSION => env_hash}
             if @context.is_a?(Course)
               js_hash[:TOTAL_USER_COUNT] = @topic.context.enrollments.not_fake.
-                active_or_pending_by_date_ignoring_access.count
+                active_or_pending_by_date_ignoring_access.distinct.count(:user_id)
             end
             js_hash[:COURSE_ID] = @context.id if @context.is_a?(Course)
             js_hash[:CONTEXT_ACTION_SOURCE] = :discussion_topic
