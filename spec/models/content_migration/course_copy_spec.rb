@@ -461,7 +461,7 @@ describe ContentMigration do
       #compare settings
       expect(@copy_to.conclude_at).to eq nil
       expect(@copy_to.start_at).to eq nil
-      expect(@copy_to.restrict_enrollments_to_course_dates).to eq nil
+      expect(@copy_to.restrict_enrollments_to_course_dates).to eq true
       expect(@copy_to.storage_quota).to eq 444
       expect(@copy_to.hide_final_grades).to eq true
       expect(@copy_to.grading_standard_enabled).to eq true

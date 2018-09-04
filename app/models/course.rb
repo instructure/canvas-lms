@@ -2238,7 +2238,7 @@ class Course < ActiveRecord::Base
       :allow_student_discussion_topics, :allow_student_discussion_editing, :lock_all_announcements,
       :organize_epub_by_content_type, :show_announcements_on_home_page,
       :home_page_announcement_limit, :enable_offline_web_export,
-      :restrict_student_future_view, :restrict_student_past_view
+      :restrict_student_future_view, :restrict_student_past_view, :restrict_enrollments_to_course_dates
     ]
   end
 
