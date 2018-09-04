@@ -42,6 +42,8 @@ module GraphQLNodeLoader
           end
         end
       end
+    when "Group"
+      Loaders::IDLoader.for(Group).load(id).then(check_read_permission)
     when "GradingPeriod"
       Loaders::IDLoader.for(GradingPeriod).load(id).then(check_read_permission)
     when "Module"

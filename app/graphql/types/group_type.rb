@@ -22,6 +22,7 @@ module Types
 
     alias :group :object
 
+    implements GraphQL::Relay::Node.interface
     implements Interfaces::TimestampInterface
 
     field :_id, ID, "legacy canvas id", method: :id, null: false

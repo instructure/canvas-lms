@@ -508,10 +508,13 @@ enum GradingType {
   points
 }
 
-type Group implements Timestamped {
+type Group implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
   createdAt: DateTime
+
+  # ID of the object.
+  id: ID!
   membersConnection(
     # Returns the elements in the list that come after the specified cursor.
     after: String
@@ -620,6 +623,7 @@ enum NodeType {
   Course
   Enrollment
   GradingPeriod
+  Group
   Module
   Page
   Section
