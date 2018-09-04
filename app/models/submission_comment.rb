@@ -362,7 +362,7 @@ class SubmissionComment < ActiveRecord::Base
   def auditable_changes(event_type:)
     if event_type == :submission_comment_created
       AUDITABLE_ATTRIBUTES.each_with_object({}) do |attribute, map|
-        map[attribute] = attributes[attribute] if attributes[attribute].present?
+        map[attribute] = attributes[attribute] unless attributes[attribute].nil?
       end
     else
       saved_changes.slice(*AUDITABLE_ATTRIBUTES)

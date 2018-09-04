@@ -542,4 +542,17 @@ This text has a http://www.google.com link in it...
       end
     end
   end
+
+  describe 'audit event logging' do
+    it 'on creation of the comment, the payload of the event includes boolean values that were set to false' do
+      @assignment.update!(anonymous_grading: true, grader_count: 2)
+      @submission.submission_comments.create!(author: @student, anonymous: false)
+      event = AnonymousOrModerationEvent.find_by(
+        user: @student,
+        assignment: @assignment,
+        event_type: :submission_comment_created
+      )
+      expect(event.payload).to include('anonymous' => false)
+    end
+  end
 end
