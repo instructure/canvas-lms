@@ -642,17 +642,18 @@ class CalendarEvent < ActiveRecord::Base
         # We should only enter this block if a user has made an appointment, so
         # there is always at least one element in current_apts
         current_appts = user_events.select { |appointment| @event.id == appointment[:parent_id]}
+        if current_appts.any?
+          if !event.description.nil?
+            event.description.concat("\n\n" + current_appts[0][:course_name] + "\n\n")
+          else
+            event.description = current_appts[0][:course_name] + "\n\n"
+          end
 
-        if !event.description.nil?
-          event.description.concat("\n\n" + current_appts[0][:course_name] + "\n\n")
-        else
-          event.description = current_appts[0][:course_name] + "\n\n"
+          event.description.concat("Participants: ")
+          current_appts.each { |appt| event.description.concat("\n" + appt[:user]) }
+          comments = current_appts.map{ |appt| appt[:comments] }.join(",\n")
+          event.description.concat("\n\n" + comments)
         end
-
-        event.description.concat("Participants: ")
-        current_appts.each { |appt| event.description.concat("\n" + appt[:user]) }
-        comments = current_appts.map{ |appt| appt[:comments] }.join(",\n")
-        event.description.concat("\n\n" + comments)
       end
 
       event.location = loc_string
