@@ -1096,7 +1096,7 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to.start_at).to eq @copy_from.start_at
       expect(@copy_to.conclude_at).to eq @copy_from.conclude_at
       expect(@copy_to.restrict_enrollments_to_course_dates).to be_truthy
-      
+
       run_master_migration # selective without settings
       expect(@copy_to.reload.start_at).to_not be_nil # keep the dates
       expect(@copy_to.conclude_at).to_not be_nil
@@ -1224,7 +1224,7 @@ describe MasterCourses::MasterMigration do
       end
     end
 
-    it "propagates folder name changes" do
+    it "propagates folder name and state changes" do
       master_parent_folder = nil
       att_tag = nil
       @copy_to = course_factory
@@ -1238,13 +1238,14 @@ describe MasterCourses::MasterMigration do
         run_master_migration
       end
 
-      master_parent_folder.update_attribute(:name, "parent RENAMED")
+      master_parent_folder.update_attributes(:name => "parent RENAMED", :locked => true)
       master_parent_folder.sub_folders.create!(:name => "empty", :context => @copy_from)
 
       run_master_migration
-
+      
       copied_att = @copy_to.attachments.where(:migration_id => att_tag.migration_id).first
       expect(copied_att.full_path).to eq "course files/parent RENAMED/child/file.txt"
+      expect(@copy_to.folders.where(:name => "parent RENAMED").first.locked).to eq true
     end
 
     it "should baleet assignment overrides when an admin pulls a bait-n-switch with date restrictions" do
