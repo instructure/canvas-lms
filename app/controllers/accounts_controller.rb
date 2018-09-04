@@ -377,7 +377,10 @@ class AccountsController < ApplicationController
   # Returns permission information for the calling user and the given account.
   # You may use `self` as the account id to check permissions against the domain root account.
   # The caller must have an account role or admin (teacher/TA/designer) enrollment in a course
-  # in the account. See also {api:CoursesController#permissions the Course counterpart}.
+  # in the account.
+  #
+  # See also the {api:CoursesController#permissions Course} and {api:GroupsController#permissions Group}
+  # counterparts.
   #
   # @argument permissions[] [String]
   #   List of permissions to check against the authenticated user.

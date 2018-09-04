@@ -2677,7 +2677,8 @@ class CoursesController < ApplicationController
 
   # @API Permissions
   # Returns permission information for the calling user in the given course.
-  # See also {api:AccountsController#permissions the Account counterpart}.
+  # See also the {api:AccountsController#permissions Account} and
+  # {api:GroupsController#permissions Group} counterparts.
   #
   # @argument permissions[] [String]
   #   List of permissions to check against the authenticated user.

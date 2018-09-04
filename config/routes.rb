@@ -1527,6 +1527,7 @@ CanvasRails::Application.routes.draw do
       get 'accounts/:account_id/groups', action: :context_index, as: 'account_user_groups'
       get 'courses/:course_id/groups', action: :context_index, as: 'course_user_groups'
       get 'groups/:group_id/users', action: :users, as: 'group_users'
+      get 'groups/:group_id/permissions', action: :permissions
       post 'groups/:group_id/invite', action: :invite
       post 'groups/:group_id/files', action: :create_file
       post 'groups/:group_id/preview_html', action: :preview_html
