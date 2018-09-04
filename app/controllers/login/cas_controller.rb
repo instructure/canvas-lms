@@ -37,6 +37,9 @@ class Login::CasController < ApplicationController
 
   def create
     logger.info "Attempting CAS login with ticket #{params[:ticket]} in account #{@domain_root_account.id}"
+    # only record further information if we're the first incoming ticket to fill out debugging info
+    debugging = aac.debug_set(:ticket_received, params[:ticket], overwrite: false) if aac.debugging?
+
     st = CASClient::ServiceTicket.new(params[:ticket], cas_login_url)
     begin
       default_timeout = Setting.get('cas_timelimit', 5.seconds.to_s).to_f
@@ -48,12 +51,14 @@ class Login::CasController < ApplicationController
       end
     rescue => e
       logger.warn "Failed to validate CAS ticket: #{e.inspect}"
+      aac.debug_set(:validate_service_ticket, t("Failed to validate CAS ticket: %{error}", error: e)) if debugging
       flash[:delegated_message] = t("There was a problem logging in at %{institution}",
                                     institution: @domain_root_account.display_name)
       return redirect_to login_url
     end
 
     if st.is_valid?
+      aac.debug_set(:validate_service_ticket, t("Validated ticket for %{username}", username: st.user)) if debugging
       reset_session_for_login
 
       pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(st.user, aac)
@@ -73,7 +78,14 @@ class Login::CasController < ApplicationController
         redirect_to unknown_user_url
       end
     else
-      logger.warn "Failed CAS login attempt."
+      if debugging
+        if st.failure_code || st.failure_message
+          aac.debug_set(:validate_service_ticket, t("CAS server rejected ticket: %{message} (%{code})", message: st.failure_message, code: st.failure_code))
+        else
+          aac.debug_set(:validate_service_ticket, t("CAS server rejected ticket."))
+        end
+      end
+      logger.warn "Failed CAS login attempt. (#{st.failure_code}: #{st.failure_message})"
       flash[:delegated_message] = t("There was a problem logging in at %{institution}",
                                     institution: @domain_root_account.display_name)
       redirect_to login_url

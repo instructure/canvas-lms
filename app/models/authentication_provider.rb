@@ -303,13 +303,13 @@ class AuthenticationProvider < ActiveRecord::Base
 
   def debugging?
     unless instance_variable_defined?(:@debugging)
-      @debugging = !!Rails.cache.fetch(debug_key(:debugging))
+      @debugging = !!debug_get(:debugging)
     end
     @debugging
   end
 
   def stop_debugging
-    self.class.debugging_keys.map(&:keys).flatten.each { |key| Rails.cache.delete(debug_key(key)) }
+    self.class.debugging_keys.map(&:keys).flatten.each { |key| ::Canvas.redis.del(debug_key(key)) }
   end
 
   def start_debugging
@@ -319,11 +319,11 @@ class AuthenticationProvider < ActiveRecord::Base
   end
 
   def debug_get(key)
-    Rails.cache.fetch(debug_key(key))
+    ::Canvas.redis.get(debug_key(key))
   end
 
-  def debug_set(key, value)
-    Rails.cache.write(debug_key(key), value, expires_in: debug_expire)
+  def debug_set(key, value, overwrite: true)
+    ::Canvas.redis.set(debug_key(key), value, ex: debug_expire.to_i, nx: overwrite ? nil : true)
   end
 
   protected
@@ -390,7 +390,7 @@ class AuthenticationProvider < ActiveRecord::Base
   end
 
   def debug_key(key)
-    ['auth_provider_debugging', self.id, key.to_s].cache_key
+    ['auth_provider_debugging', self.global_id, key.to_s].cache_key
   end
 
   def debug_expire
