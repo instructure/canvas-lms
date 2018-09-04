@@ -637,6 +637,17 @@ it('renders the location if available', () => {
   expect(wrapper).toMatchSnapshot();
 })
 
+it('renders feedback anonymously according to the assignment settings', () => {
+  const props = defaultProps({
+    feedback: {
+      comment: 'Open the pod bay doors, HAL.'
+    },
+    location: "NYC"
+  });
+  const wrapper = shallow(<PlannerItem {...props} />);
+  expect(wrapper).toMatchSnapshot();
+})
+
 it('prefers to render feedback if it and the location are available', () => {
   // I don't believe this is possible, but it's how the code handles it.
   const props = defaultProps({
@@ -677,5 +688,5 @@ it('renders media feedback if available', () => {
     is_media: true,
   }});
   const wrapper = shallow(<PlannerItem {...props} />);
-  expect(wrapper).toMatchSnapshot(); 
+  expect(wrapper).toMatchSnapshot();
 });

@@ -141,7 +141,7 @@ module Api::V1::PlannerItem
     # planner will display the most recent comment not made by the user herself
     if submission_status[:submissions][:has_feedback]
       relevant_submissions = user.recent_feedback.select {|s| s.assignment_id == item.id}
-      ActiveRecord::Associations::Preloader.new.preload(relevant_submissions, [visible_submission_comments: :author])
+      ActiveRecord::Associations::Preloader.new.preload(relevant_submissions, [visible_submission_comments: [:author, submission: :assignment]])
       feedback_data = relevant_submissions.
         flat_map(&:visible_submission_comments).
         reject{|comment| comment.author_id == user.id}. # omit comments by the user's own self
@@ -151,10 +151,14 @@ module Api::V1::PlannerItem
       if feedback_data.present?
         submission_status[:submissions][:feedback] = {
           comment: feedback_data.comment,
-          author_name: feedback_data.author_name,
-          author_avatar_url: feedback_data.author.avatar_url,
           is_media: feedback_data.media_comment_id?
         }
+        if feedback_data.can_read_author?(user, nil)
+          submission_status[:submissions][:feedback].merge!({
+            author_name: feedback_data.author_name,
+            author_avatar_url: feedback_data.author.avatar_url,
+          })
+        end
       end
     end
 

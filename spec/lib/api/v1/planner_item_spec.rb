@@ -266,6 +266,19 @@ describe Api::V1::PlannerItem do
                                                       is_media: true
                                                     })
       end
+
+      it 'should not include an author_name or author_avatar_url if comment is anonymous' do
+        @assignment.anonymous_peer_reviews = true
+        @assignment.save!
+        submission = @assignment.submit_homework(@student, body: "the stuff")
+        submission.add_comment(user: @reviewer, comment: "nice work, fam")
+        submission.update(score: 10)
+        submission.grade_it!
+
+        json = api.planner_item_json(@assignment, @student, session, { start_at: 1.week.ago })
+        expect(json[:submissions][:has_feedback]).to be true
+        expect(json[:submissions][:feedback].keys).not_to include(:author_name, :author_avatar_url)
+      end
     end
   end
 
