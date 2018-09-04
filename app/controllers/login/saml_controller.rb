@@ -62,7 +62,13 @@ class Login::SamlController < ApplicationController
       return redirect_to login_url
     end
 
-    debugging = aac.debugging? && response.is_a?(SAML2::Response) && aac.debug_get(:request_id) == response.in_response_to
+    debugging = if aac.debugging? && response.is_a?(SAML2::Response)
+      if response.in_response_to
+        aac.debug_get(:request_id) == response.in_response_to
+      else
+        aac.debug_set(:request_id, t("IdP Initiated"), overwrite: false)
+      end
+    end
     encrypted_xml = response.to_s if debugging
 
     settings = aac.saml_settings(request.host_with_port)
