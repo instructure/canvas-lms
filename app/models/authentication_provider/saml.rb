@@ -363,8 +363,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
                                                        sig_alg: sig_alg,
                                                        relay_state: relay_state)
 
-    if debugging? && !debug_get(:request_id)
-      debug_set(:request_id, authn_request.id)
+    if debugging? && debug_set(:request_id, authn_request.id, overwrite: false)
       debug_set(:to_idp_url, forward_url)
       debug_set(:to_idp_xml, authn_request.to_s)
       debug_set(:debugging, "Forwarding user to IdP for authentication")

@@ -24,9 +24,8 @@ class Login::Oauth2Controller < Login::OauthBaseController
     jwt = Canvas::Security.create_jwt({ aac_id: @aac.global_id, nonce: nonce, host: request.host_with_port }, expiry)
     authorize_url = @aac.generate_authorize_url(oauth2_login_callback_url, jwt)
 
-    if @aac.debugging?
+    if @aac.debugging? && @aac.debug_set(:nonce, nonce, overwrite: false)
       @aac.debug_set(:debugging, t("Redirected to identity provider"))
-      @aac.debug_set(:nonce, nonce)
       @aac.debug_set(:authorize_url, authorize_url)
     end
 
