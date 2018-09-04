@@ -30,6 +30,7 @@ module ColorCommon
     r_g_b = r_g_b_a[0..2]
     r_g_b.map { |num| format("%02X", num.to_i) }.join('')
   end
+  module_function :rgba_to_hex
 
   def random_hex_color
     values = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f']
