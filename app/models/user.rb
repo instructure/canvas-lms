@@ -1437,6 +1437,10 @@ class User < ActiveRecord::Base
     preferences[:course_nicknames] ||= {}
   end
 
+  def course_nickname_hash
+    course_nicknames.any? ? Digest::MD5.hexdigest(course_nicknames.sort.join(",")) : "default"
+  end
+
   def course_nickname(course)
     shard.activate do
       course_nicknames[course.id]
@@ -1827,7 +1831,7 @@ class User < ActiveRecord::Base
           submissions = submissions.uniq
           submissions.first(opts[:limit])
 
-          ActiveRecord::Associations::Preloader.new.preload(submissions, [:assignment, :user, :submission_comments])
+          ActiveRecord::Associations::Preloader.new.preload(submissions, [{:assignment => :context}, :user, :submission_comments])
           submissions
         end
       end
@@ -2000,7 +2004,7 @@ class User < ActiveRecord::Base
   def select_upcoming_assignments(assignments,opts)
     time = opts[:time] || Time.zone.now
     assignments.select do |a|
-      if a.grants_right?(self, :delete)
+      if a.context.grants_right?(self, :manage_assignments)
         a.dates_hash_visible_to(self).any? do |due_hash|
           due_hash[:due_at] && due_hash[:due_at] >= time && due_hash[:due_at] <= opts[:end_at]
         end

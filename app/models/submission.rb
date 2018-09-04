@@ -1853,7 +1853,11 @@ class Submission < ActiveRecord::Base
   end
 
   def last_teacher_comment
-    submission_comments.published.reverse.find{ |com| com.author_id != user_id }
+    if association(:submission_comments).loaded?
+      submission_comments.reverse.detect{ |com| !com.draft && com.author_id != user_id }
+    else
+      submission_comments.published.where.not(:author_id => user_id).order(:created_at => :desc).first
+    end
   end
 
   def has_submission?

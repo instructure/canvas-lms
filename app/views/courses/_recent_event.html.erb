@@ -26,6 +26,7 @@
   if is_assignment
     if @current_user_submissions
       submission = @current_user_submissions.detect { |s| s.assignment_id == recent_event.id }
+      submission.assignment = recent_event if submission
     elsif @current_user
       submission = @current_user.submissions.select([:id, :assignment_id, :grading_period_id, :score, :grade, :workflow_state, :updated_at]).where(:assignment_id => recent_event).first
     end
@@ -36,7 +37,7 @@
   end
 
   cache([ 'recent_event_render3',
-          @current_user, # needs to be here to bust the cache when the user changes course nicknames
+          @current_user&.course_nickname_hash,
           submission || 'no_submission',
           recent_event || 'blank_event',
           (recent_event.due_at if is_assignment),

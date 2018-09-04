@@ -1815,25 +1815,29 @@ describe User do
   describe "select_upcoming_assignments" do
     it "filters based on assignment date for asignments the user cannot delete" do
       time = Time.now + 1.day
+      context = double
       assignments = [double, double, double]
       user = User.new
+      allow(context).to receive(:grants_right?).with(user, :manage_assignments).and_return false
       assignments.each do |assignment|
         allow(assignment).to receive_messages(:due_at => time)
-        expect(assignment).to receive(:grants_right?).with(user, :delete).and_return false
+        allow(assignment).to receive(:context).and_return(context)
       end
       expect(user.select_upcoming_assignments(assignments,{:end_at => time})).to eq assignments
     end
 
     it "returns assignments that have an override between now and end_at opt" do
       assignments = [double, double, double, double]
+      context = double
       Timecop.freeze(Time.utc(2013,3,13,0,0)) do
         user = User.new
+        allow(context).to receive(:grants_right?).with(user, :manage_assignments).and_return true
         due_date1 = {:due_at => Time.now + 1.day}
         due_date2 = {:due_at => Time.now + 1.week}
         due_date3 = {:due_at => 2.weeks.from_now }
         due_date4 = {:due_at => nil }
         assignments.each do |assignment|
-          expect(assignment).to receive(:grants_right?).with(user, :delete).and_return true
+          allow(assignment).to receive(:context).and_return(context)
         end
         expect(assignments.first).to receive(:dates_hash_visible_to).with(user).
           and_return [due_date1]
