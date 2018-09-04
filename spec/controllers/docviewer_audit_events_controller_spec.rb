@@ -131,7 +131,7 @@ describe DocviewerAuditEventsController do
         expect(response).to have_http_status(:ok)
       end
 
-      it 'renders status unauthorized if no open slot and user is not final grader' do
+      it 'renders status forbidden if no open slot and user is not final grader' do
         assignment = Assignment.create!(
           course: @course,
           name: 'moderated',
@@ -142,7 +142,7 @@ describe DocviewerAuditEventsController do
         @submission = assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
         assignment.grade_student(@student, grade: 10, grader: @first_ta, provisional: true)
         post :create, format: :json, params: default_params.merge({canvas_user_id: @second_ta.id})
-        expect(response).to have_http_status(:unauthorized)
+        expect(response).to have_http_status(:forbidden)
       end
 
       it 'explains that user cannot be a moderation grader, if so' do
@@ -187,6 +187,35 @@ describe DocviewerAuditEventsController do
     post :create, format: :json, params: default_params.merge({canvas_user_id: fake_student.id, document_id: doc.document_id})
     events = AnonymousOrModerationEvent.where(assignment: assignment, submission: @submission)
     expect(events.count).to be 1
+  end
+
+  context "as an admin" do
+    before(:each) do
+      @assignment = Assignment.create!(
+        course: @course,
+        name: 'moderated',
+        moderated_grading: true,
+        grader_count: 2,
+        final_grader: @teacher
+      )
+      @submission = @assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
+      @assignment.grade_student(@student, grade: 10, grader: @first_ta, provisional: true)
+    end
+
+    def annotate_as_admin
+      post :create, format: :json, params: default_params.merge({canvas_user_id: account_admin_user.id})
+    end
+
+    it "can annotate even if there are no slots available" do
+      @assignment.update!(grader_count: 1)
+      expect{ annotate_as_admin }.to change {
+        AnonymousOrModerationEvent.where(assignment: @assignment, submission: @submission).count
+      }.from(0).to(1)
+    end
+
+    it "does not occupy a slot when annotating" do
+      expect{ annotate_as_admin }.not_to change { @assignment.provisional_moderation_graders.count }
+    end
   end
 
   it 'updates an existing moderation grader to occupy slot, if it had not already' do
@@ -288,5 +317,12 @@ describe DocviewerAuditEventsController do
     post :create, format: :json, params: default_params
     event = AnonymousOrModerationEvent.find_by!(assignment: assignment, canvadoc: @attachment.canvadoc, submission: @submission)
     expect(JSON.parse(response.body)['anonymous_or_moderation_event']['id'].to_i).to be event.id
+  end
+
+  it "is okay if related_annotation_id is not passed" do
+    assignment = Assignment.create!(course: @course, anonymous_grading: true, name: 'anonymous')
+    @submission = assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
+    post :create, format: :json, params: default_params.except(:related_annotation_id)
+    expect(response).to have_http_status(:ok)
   end
 end
