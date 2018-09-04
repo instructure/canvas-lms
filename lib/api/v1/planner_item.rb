@@ -162,7 +162,7 @@ module Api::V1::PlannerItem
 
     # planner will display the most recent comment not made by the user herself
     if submission_status[:submissions][:has_feedback]
-      relevant_submissions = user.recent_feedback.select {|s| s.assignment_id == item.id}
+      relevant_submissions = user.recent_feedback(start_at: opts[:due_after]).select {|s| s.assignment_id == item.id}
       ActiveRecord::Associations::Preloader.new.preload(relevant_submissions, [visible_submission_comments: [:author, submission: :assignment]])
       feedback_data = relevant_submissions.
         flat_map(&:visible_submission_comments).

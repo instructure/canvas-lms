@@ -145,7 +145,7 @@ describe UserLearningObjectScopes do
       it "should include assignments with no locks" do
         @quiz.save!
         DueDateCacher.recompute(@quiz.assignment)
-        list = @student.assignments_for_student('submitting', context: [@course])
+        list = @student.assignments_for_student('submitting', contexts: [@course])
         expect(list.size).to be 1
         expect(list.first.title).to eq 'Test Assignment'
       end
@@ -154,7 +154,7 @@ describe UserLearningObjectScopes do
         @quiz.unlock_at = 1.hour.ago
         @quiz.save!
         DueDateCacher.recompute(@quiz.assignment)
-        list = @student.assignments_for_student('submitting', context: [@course])
+        list = @student.assignments_for_student('submitting', contexts: [@course])
         expect(list.size).to be 1
         expect(list.first.title).to eq 'Test Assignment'
       end
@@ -163,7 +163,7 @@ describe UserLearningObjectScopes do
         @quiz.lock_at = 1.hour.from_now
         @quiz.save!
         DueDateCacher.recompute(@quiz.assignment)
-        list = @student.assignments_for_student('submitting', context: [@course])
+        list = @student.assignments_for_student('submitting', contexts: [@course])
         expect(list.size).to be 1
         expect(list.first.title).to eq 'Test Assignment'
       end

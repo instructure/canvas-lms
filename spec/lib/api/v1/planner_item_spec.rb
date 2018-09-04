@@ -120,7 +120,7 @@ describe Api::V1::PlannerItem do
         submission = @assignment.submit_homework(@student, body: "the stuff")
         assessor_submission = @assignment.find_or_create_submission(@reviewer)
         @peer_review = AssessmentRequest.create!(user: @student, asset: submission, assessor_asset: assessor_submission, assessor: @reviewer)
-        json = api.planner_item_json(@peer_review, @student, session, { start_at: 1.week.ago })
+        json = api.planner_item_json(@peer_review, @student, session)
         expect(json[:plannable_type]).to eq "assessment_request"
         expect(json[:plannable][:title]).to eq @assignment.title
         expect(json[:plannable][:todo_date]).to eq @assignment.due_at
@@ -189,7 +189,7 @@ describe Api::V1::PlannerItem do
         submission.update(score: 10)
         submission.grade_it!
 
-        json = api.planner_item_json(@assignment, @student, session, { start_at: 1.week.ago })
+        json = api.planner_item_json(@assignment, @student, session)
         expect(json[:submissions][:has_feedback]).to be true
         expect(json[:submissions][:graded]).to be true
       end
@@ -199,7 +199,7 @@ describe Api::V1::PlannerItem do
         submission.add_comment(user: @teacher, comment: "nice work, fam")
         submission.grade_it!
 
-        json = api.planner_item_json(@assignment, @student, session, { start_at: 1.week.ago })
+        json = api.planner_item_json(@assignment, @student, session)
         expect(json[:submissions][:has_feedback]).to be true
         expect(json[:submissions][:graded]).to be false
       end
@@ -210,7 +210,53 @@ describe Api::V1::PlannerItem do
         submission.update(score: 10)
         submission.grade_it!
 
-        json = api.planner_item_json(@assignment, @student, session, { start_at: 1.week.ago })
+        json = api.planner_item_json(@assignment, @student, session)
+        expect(json[:submissions][:has_feedback]).to be true
+        expect(json[:submissions][:feedback]).to eq({
+                                                      comment: "nice work, fam",
+                                                      author_name: @teacher.name,
+                                                      author_avatar_url: @teacher.avatar_url,
+                                                      is_media: false
+                                                    })
+      end
+
+      it 'should include old comment data for assignments with old feedback' do
+        Timecop.travel(4.months.ago) do
+          assignment_model(course: @course, submission_types: 'online_text_entry')
+          @assignment.workflow_state = "published"
+          @assignment.save!
+
+          submission = @assignment.submit_homework(@student, body: "the stuff")
+          # created_at is set by the database, which doesn't know about Timecop
+          submission.created_at = Time.zone.now
+          submission.add_comment(user: @teacher, comment: "nice work, fam")
+          submission.update(score: 10)
+          submission.grade_it!
+        end
+        json = api.planner_item_json(@assignment, @student, session, { due_after: 5.months.ago })
+        expect(json[:submissions][:has_feedback]).to be true
+        expect(json[:submissions][:feedback]).to eq({
+                                                      comment: "nice work, fam",
+                                                      author_name: @teacher.name,
+                                                      author_avatar_url: @teacher.avatar_url,
+                                                      is_media: false
+                                                    })
+      end
+
+      it 'should include comment data from before the assignment is due' do
+        skip 'skipped because this does not work yet. see ADMIN-1464'
+        assignment_model(course: @course, submission_types: 'online_text_entry', due_at: 2.weeks.from_now)
+        @assignment.workflow_state = "published"
+        @assignment.save!
+        Timecop.travel(4.weeks.ago) do
+          submission = @assignment.submit_homework(@student, body: "the stuff")
+          # created_at is set by the database, which doesn't know about Timecop
+          submission.created_at = Time.zone.now
+          submission.add_comment(user: @teacher, comment: "nice work, fam")
+          submission.update(score: 10)
+          submission.grade_it!
+        end
+        json = api.planner_item_json(@assignment, @student, session, { due_after: 3.weeks.ago })
         expect(json[:submissions][:has_feedback]).to be true
         expect(json[:submissions][:feedback]).to eq({
                                                       comment: "nice work, fam",
@@ -227,7 +273,7 @@ describe Api::V1::PlannerItem do
         submission.update(score: 10)
         submission.grade_it!
 
-        json = api.planner_item_json(@assignment, @student, session, { start_at: 1.week.ago })
+        json = api.planner_item_json(@assignment, @student, session)
         expect(json[:submissions][:has_feedback]).to be true
         expect(json[:submissions][:feedback]).to eq({
                                                       comment: "nice work, fam",
@@ -245,7 +291,7 @@ describe Api::V1::PlannerItem do
         submission.update(score: 10)
         submission.grade_it!
 
-        json = api.planner_item_json(@assignment, @student, session, { start_at: 1.week.ago })
+        json = api.planner_item_json(@assignment, @student, session)
         expect(json[:submissions][:has_feedback]).to be true
         expect(json[:submissions][:feedback]).to eq({
                                                       comment: "don't let it go to your head.",
@@ -261,7 +307,7 @@ describe Api::V1::PlannerItem do
         submission.update(score: 10)
         submission.grade_it!
 
-        json = api.planner_item_json(@assignment, @student, session, { start_at: 1.week.ago })
+        json = api.planner_item_json(@assignment, @student, session)
         expect(json[:submissions][:has_feedback]).to be true
         expect(json[:submissions][:feedback]).to eq({
                                                       comment: "nice work, fam",
@@ -279,7 +325,7 @@ describe Api::V1::PlannerItem do
         submission.update(score: 10)
         submission.grade_it!
 
-        json = api.planner_item_json(@assignment, @student, session, { start_at: 1.week.ago })
+        json = api.planner_item_json(@assignment, @student, session)
         expect(json[:submissions][:has_feedback]).to be true
         expect(json[:submissions][:feedback].keys).not_to include(:author_name, :author_avatar_url)
       end
