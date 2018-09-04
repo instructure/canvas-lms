@@ -996,7 +996,7 @@ module Lti
     #   481
     #   ```
     register_expansion 'com.instructure.Group.id', [],
-                       -> { (@assignment.group_category&.groups & @current_user.groups).first&.id },
+                       -> { @assignment.group_category && (@assignment.group_category.groups & @current_user.groups).first&.id },
                        USER_GUARD,
                        ASSIGNMENT_GUARD,
                        default_name: 'vnd_canvas_group_id'
@@ -1009,7 +1009,7 @@ module Lti
     #   Group One
     #   ```
     register_expansion 'com.instructure.Group.name', [],
-                       -> { (@assignment.group_category&.groups & @current_user.groups).first&.name },
+                       -> { @assignment.group_category && (@assignment.group_category.groups & @current_user.groups).first&.name },
                        USER_GUARD,
                        ASSIGNMENT_GUARD,
                        default_name: 'vnd_canvas_group_name'
