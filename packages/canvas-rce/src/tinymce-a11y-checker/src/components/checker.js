@@ -30,6 +30,7 @@ import describe from "../utils/describe"
 import * as dom from "../utils/dom"
 import rules from "../rules"
 import formatMessage from "../format-message"
+import { clearIndicators } from "../utils/indicate"
 
 const noop = () => {}
 
@@ -146,6 +147,7 @@ export default class Checker extends React.Component {
   }
 
   selectCurrent() {
+    clearIndicators()
     const errorNode = this.errorNode()
     if (errorNode) {
       this.getFormState()
@@ -279,6 +281,7 @@ export default class Checker extends React.Component {
 
   handleClose() {
     this.onLeaveError()
+    clearIndicators()
     this.setState({ open: false })
   }
 
