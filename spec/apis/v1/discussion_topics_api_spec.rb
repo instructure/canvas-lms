@@ -186,11 +186,6 @@ describe DiscussionTopicsController, type: :request do
     @user = user
   end
 
-  # need for user_display_json
-  def blank_fallback
-    nil
-  end
-
   describe "user_display_json" do
     it "should return a html_url based on parent_context" do
       expect(user_display_json(@user)[:html_url]).to eq "http://www.example.com/users/#{@user.id}"

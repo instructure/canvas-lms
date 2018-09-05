@@ -100,14 +100,12 @@ describe AvatarHelper do
 
       it "should return full URIs for users" do
         expect(avatar_url_for_user(user)).to match(%r{\Ahttps?://})
-        expect(avatar_url_for_user(user, true)).to match(%r{\Ahttps?://})
       end
     end
 
     it "should return full URIs for users" do
       user_factory
       expect(avatar_url_for_user(@user)).to match(%r{\Ahttps?://})
-      expect(avatar_url_for_user(@user, true)).to match(%r{\Ahttps?://})
 
       @user.account.set_service_availability(:avatars, true)
       @user.avatar_image_source = 'no_pic'
@@ -115,7 +113,6 @@ describe AvatarHelper do
       # reload to clear instance vars
       @user = User.find(@user.id)
       expect(avatar_url_for_user(@user)).to match(%r{\Ahttps?://})
-      expect(avatar_url_for_user(@user, true)).to match(%r{\Ahttps?://})
 
       @user.avatar_state = 'approved'
 
@@ -134,7 +131,6 @@ describe AvatarHelper do
 
     it "should return full URIs for groups" do
       expect(avatar_url_for_group).to match(%r{\Ahttps?://})
-      expect(avatar_url_for_group(true)).to match(%r{\Ahttps?://})
     end
     context "from other shard" do
       specs_require_sharding

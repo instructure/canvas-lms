@@ -72,7 +72,7 @@ module Api::V1::User
       end
 
       if includes.include?('avatar_url') && user.account.service_enabled?(:avatars)
-        json[:avatar_url] = avatar_url_for_user(user, blank_fallback)
+        json[:avatar_url] = avatar_url_for_user(user)
       end
       if enrollments
         json[:enrollments] = enrollments.map do |enrollment|
@@ -178,7 +178,7 @@ module Api::V1::User
     hash = {
       id: user.id,
       display_name: user.short_name,
-      avatar_image_url: avatar_url_for_user(user, blank_fallback),
+      avatar_image_url: avatar_url_for_user(user),
       html_url: participant_url
     }
     hash[:avatar_is_fallback] = user.avatar_image_url.nil? if includes.include?(:avatar_is_fallback) && avatars_enabled_for_user?(user)

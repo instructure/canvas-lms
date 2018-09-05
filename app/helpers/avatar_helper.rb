@@ -83,11 +83,8 @@ module AvatarHelper
     end
   end
 
-  def avatar_url_for_group(blank_fallback=false)
-    request.base_url + (blank_fallback ?
-      "/images/blank.png" :
-      "/images/messages/avatar-group-50.png" # always fall back to -50, it'll get scaled down if a smaller size is wanted
-    )
+  def avatar_url_for_group
+    request.base_url + "/images/messages/avatar-group-50.png" # always fall back to -50, it'll get scaled down if a smaller size is wanted
   end
 
   def self.avatars_enabled_for_user?(user)
@@ -98,10 +95,8 @@ module AvatarHelper
     AvatarHelper.avatars_enabled_for_user?(user)
   end
 
-  def self.avatar_url_for_user(user, request, blank_fallback=false)
-    default_avatar = User.avatar_fallback_url(
-        blank_fallback ? '/images/blank.png' : User.default_avatar_fallback,
-        request)
+  def self.avatar_url_for_user(user, request)
+    default_avatar = User.avatar_fallback_url(User.default_avatar_fallback, request)
     url = if avatars_enabled_for_user?(user)
       user.avatar_url(nil,
                       (@domain_root_account && @domain_root_account.settings[:avatars] || 'enabled'),
@@ -119,12 +114,8 @@ module AvatarHelper
     url
   end
 
-  def avatar_url_for_user(user, blank_fallback=false)
-    AvatarHelper.avatar_url_for_user(user, request, blank_fallback)
-  end
-
-  def blank_fallback
-    params[:blank_avatar_fallback].nil? ? @blank_fallback : value_to_boolean(params[:blank_avatar_fallback])
+  def avatar_url_for_user(user)
+    AvatarHelper.avatar_url_for_user(user, request)
   end
 
 end
