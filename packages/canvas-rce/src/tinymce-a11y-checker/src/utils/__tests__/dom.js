@@ -129,3 +129,27 @@ describe("onlyContainsLink", () => {
     expect(dom.onlyContainsLink(elem)).toBe(false)
   })
 })
+
+describe("splitStyleAttribute", () => {
+  test("creates an object with key values", () => {
+    expect(
+      dom.splitStyleAttribute("background-color: #000000; color: #ffffff;")
+    ).toMatchObject({ "background-color": "#000000", color: "#ffffff" })
+  })
+
+  test("returns an empty object when given an empty string", () => {
+    expect(dom.splitStyleAttribute("")).toEqual({})
+  })
+})
+
+describe("createStyleString", () => {
+  test("creates a style string given a style object", () => {
+    expect(
+      dom.createStyleString({ "background-color": "#000000", color: "#ffffff" })
+    ).toBe("background-color:#000000;color:#ffffff;")
+  })
+
+  test("returns an empty string when given an empty object", () => {
+    expect(dom.createStyleString({})).toBe("")
+  })
+})

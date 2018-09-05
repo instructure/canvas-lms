@@ -92,3 +92,24 @@ export function onlyContainsLink(elem) {
     return false
   }
 }
+
+export function splitStyleAttribute(styleString) {
+  const split = styleString.split(";")
+  return split.reduce((styleObj, attributeValue) => {
+    const pair = attributeValue.split(":")
+    if (pair.length === 2) {
+      styleObj[pair[0].trim()] = pair[1].trim()
+    }
+    return styleObj
+  }, {})
+}
+
+export function createStyleString(styleObj) {
+  let styleString = Object.keys(styleObj)
+    .map(key => `${key}:${styleObj[key]}`)
+    .join(";")
+  if (styleString) {
+    styleString = `${styleString};`
+  }
+  return styleString
+}
