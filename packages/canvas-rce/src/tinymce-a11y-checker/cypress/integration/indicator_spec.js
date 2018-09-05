@@ -20,7 +20,7 @@ describe("Indicator", () => {
     })
   })
 
-  it.only("should not show the indicator when scrolled up out of the iframe", () => {
+  it("should not show the indicator when scrolled up out of the iframe", () => {
     cy.get("[aria-label='Accessibility Checker']").within(() => {
       // Because of some async stuff the last issue isn't actually at the bottom
       // of the page like we want here
@@ -36,5 +36,28 @@ describe("Indicator", () => {
         .scrollIntoView()
       cy.get(".a11y-checker-selection-indicator").should("be.hidden")
     })
+  })
+
+  it("should remove the indicator when the a11y checker is closed", () => {
+    cy.get(".a11y-checker-selection-indicator").should("be.visible")
+    cy.get("[aria-label='Accessibility Checker']").within(() => {
+      cy.contains("Close Accessibility Checker").click()
+    })
+    cy.get(".a11y-checker-selection-indicator").should("not.exist")
+  })
+})
+
+describe("Indicator Error Interactions", () => {
+  beforeEach(() => {
+    cy.visit("http://127.0.0.1:8080/single_error.html")
+    cy.get("[aria-label='Check Accessibility']").click()
+  })
+
+  it("should remove the indicator after clearing the last error", () => {
+    cy.get("[aria-label='Accessibility Checker']").within(() => {
+      cy.get('[type="checkbox"]').check({ force: true }) // force it because it's under a span
+      cy.contains("Apply").click()
+    })
+    cy.get(".a11y-checker-selection-indicator").should("not.exist")
   })
 })

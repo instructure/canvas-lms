@@ -1,4 +1,4 @@
-import indicate from "../indicate"
+import indicate, { clearIndicators } from "../indicate"
 
 let fakeEditor, fakeIframe, fakeElem
 
@@ -38,4 +38,14 @@ it("removes any existing indicators when run", () => {
   el.id = "this_should_be_gone"
   indicate(fakeEditor, fakeElem)
   expect(document.getElementById("this_should_be_gone")).toBeFalsy()
+})
+
+describe("clearIndicators", () => {
+  it("removes any existing indicators when called", () => {
+    const el = document.createElement("div")
+    el.className = "a11y-checker-selection-indicator"
+    el.id = "this_should_be_gone"
+    clearIndicators()
+    expect(document.getElementById("this_should_be_gone")).toBeFalsy()
+  })
 })

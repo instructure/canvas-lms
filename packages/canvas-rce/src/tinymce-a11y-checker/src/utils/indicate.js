@@ -25,12 +25,16 @@ export function indicatorRegion(
   }
 }
 
-export default function indicate(editor, elem, margin = MARGIN) {
+export function clearIndicators() {
   document
     .querySelectorAll(".a11y-checker-selection-indicator")
     .forEach(existingElem => {
       existingElem.parentNode.removeChild(existingElem)
     })
+}
+
+export default function indicate(editor, elem, margin = MARGIN) {
+  clearIndicators()
 
   const editorFrame = editor.getContainer().querySelector("iframe")
 
