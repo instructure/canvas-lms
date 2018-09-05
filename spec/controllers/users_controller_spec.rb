@@ -287,6 +287,7 @@ describe UsersController do
           expect(response).to be_successful
           new_pseudo = Pseudonym.where(unique_id: 'jon@example.com').first
           new_user = new_pseudo.user
+          expect(new_pseudo.crypted_password).not_to be_nil
           expect(new_user.linked_students).to eq [@student]
           oe = new_user.observer_enrollments.first
           expect(oe.course).to eq @course
