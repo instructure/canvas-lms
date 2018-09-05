@@ -59,6 +59,21 @@ describe DiscussionTopic::MaterializedView do
     end
   end
 
+  it "should requeue the job if replication times out" do
+    view = DiscussionTopic::MaterializedView.where(discussion_topic_id: @topic).first
+    view.update_materialized_view
+    allow(DiscussionTopic::MaterializedView).to receive(:wait_for_replication).and_return(false)
+    run_jobs
+    job = Delayed::Job.where(:strand => "materialized_discussion:#{view.id}").first
+    expect(job.run_at > 1.minute.from_now).to be_truthy
+    expect(view.reload.entry_ids_array).to be_empty
+
+    allow(DiscussionTopic::MaterializedView).to receive(:wait_for_replication).and_return(true)
+    job.update_attribute(:run_at, 1.minute.ago)
+    run_jobs
+    expect(view.reload.entry_ids_array).to match_array(@topic.discussion_entries.map(&:id))
+  end
+
   it "should build a materialized view of the structure, participants and entry ids" do
     view = DiscussionTopic::MaterializedView.where(discussion_topic_id: @topic).first
     view.update_materialized_view_without_send_later
