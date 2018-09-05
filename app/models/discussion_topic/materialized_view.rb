@@ -102,7 +102,15 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
   end
 
   def update_materialized_view(xlog_location: nil, use_master: false)
-    self.class.wait_for_replication(start: xlog_location) unless use_master
+    unless use_master
+      if !self.class.wait_for_replication(start: xlog_location, timeout: 1.minute)
+        # failed to replicate - requeue later
+        self.send_later_enqueue_args(:update_materialized_view_without_send_later,
+          {:singleton => "materialized_discussion:#{ Shard.birth.activate { self.discussion_topic_id } }", :run_at => 5.minutes.from_now},
+          xlog_location: xlog_location, use_master: use_master)
+        raise "timed out waiting for replication"
+      end
+    end
     self.generation_started_at = Time.zone.now
     view_json, user_ids, entry_lookup =
       self.build_materialized_view(use_master: use_master)
