@@ -12,7 +12,7 @@ export default {
     if (alt == null || alt === "") {
       return true
     }
-    return axios.get(elem.src).catch(e => {
+    return axios.head(elem.src).catch(e => {
       if (
         e.response &&
         (e.response.status === 301 || e.response.status === 302)

@@ -1,6 +1,10 @@
 import formatMessage from "../format-message"
 import contrast from "wcag-element-contrast"
-import { onlyContainsLink } from "../utils/dom"
+import {
+  onlyContainsLink,
+  createStyleString,
+  splitStyleAttribute
+} from "../utils/dom"
 import rgbHex from "../utils/rgb-hex"
 
 export default {
@@ -36,12 +40,15 @@ export default {
 
   update: (elem, data) => {
     elem.style.color = data.color
+    const styles = splitStyleAttribute(
+      elem.getAttribute("data-mce-style") || ""
+    )
     if (data && data.color && data.color.indexOf("#") < 0) {
-      elem.setAttribute("data-mce-style", `color: #${rgbHex(data.color)};`)
+      styles.color = `#${rgbHex(data.color)}`
     } else {
-      elem.setAttribute("data-mce-style", `color: ${data.color};`)
+      styles.color = data.color
     }
-
+    elem.setAttribute("data-mce-style", createStyleString(styles))
     return elem
   },
 

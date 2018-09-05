@@ -74,12 +74,20 @@ describe("update", () => {
 
   test("sets the mce-style data attribute with the updated color", () => {
     rule.update(el, { color: "#fff" })
-    expect(el.getAttribute("data-mce-style")).toBe("color: #fff;")
+    expect(el.getAttribute("data-mce-style")).toBe("color:#fff;")
   })
 
   test("converts rgb to hex prior to setting it on the mce-style data attribute", () => {
     rule.update(el, { color: "rgb(255, 255, 255)" })
-    expect(el.getAttribute("data-mce-style")).toBe("color: #ffffff;")
+    expect(el.getAttribute("data-mce-style")).toBe("color:#ffffff;")
+  })
+
+  test("maintains other style properties set on the mce-style data attribute", () => {
+    el.setAttribute("data-mce-style", "background-color: #000000;")
+    rule.update(el, { color: "rgb(255, 255, 255)" })
+    expect(el.getAttribute("data-mce-style")).toBe(
+      "background-color:#000000;color:#ffffff;"
+    )
   })
 })
 
