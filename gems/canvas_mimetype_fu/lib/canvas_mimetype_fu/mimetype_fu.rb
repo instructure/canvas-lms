@@ -22,7 +22,7 @@ class File
     if file.class == File || file.class == Tempfile
       unless RUBY_PLATFORM.include? 'mswin32'
         # INSTRUCTURE: changed to IO.popen to avoid shell injection attacks when paths include user defined content
-        mime = IO.popen(['file', '--mime', '-br', '--', file.path], &:read).strip
+        mime = IO.popen(['file', '--mime', '--brief', '--raw', '--', file.path], &:read).strip
       else
         mime = extensions[File.extname(file.path).gsub('.','').downcase] rescue nil
       end
@@ -34,7 +34,7 @@ class File
       temp.close
       # INSTRUCTURE: changed to IO.popen to be sane and consistent. This one shouldn't be able to contain a user
       # specified path, but that's no reason to not do things the right way.
-      mime = IO.popen(['file', '--mime', '-br', '--', temp.path], &:read).strip
+      mime = IO.popen(['file', '--mime', '--brief', '--raw', '--', temp.path], &:read).strip
       mime = mime.gsub(/^.*: */,"")
       mime = mime.gsub(/;.*$/,"")
       mime = mime.gsub(/,.*$/,"")
