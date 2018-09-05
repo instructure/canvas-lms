@@ -37,7 +37,7 @@ module Lti::MembershipService
 
           # expect(collator.role).to eq(IMS::LIS::ContextType::URNs::Group)
           expect(collator.per_page).to eq(Api.per_page)
-          expect(collator.page).to eq(0)
+          expect(collator.page).to eq(1)
         end
 
         it 'handles negative values for :page option' do
@@ -46,7 +46,7 @@ module Lti::MembershipService
           }
           collator = CourseGroupCollator.new(@course, opts)
 
-          expect(collator.page).to eq(0)
+          expect(collator.page).to eq(1)
         end
 
         it 'handles negative values for :per_page option' do
@@ -110,6 +110,7 @@ module Lti::MembershipService
 
           it 'returns false when there are no more pages' do
             collator = CourseGroupCollator.new(@course, page: 11)
+            collator.memberships
             expect(collator.next_page?).to eq(false)
           end
         end

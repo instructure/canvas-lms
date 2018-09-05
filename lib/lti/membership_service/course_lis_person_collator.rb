@@ -30,13 +30,10 @@ module Lti
       private
 
       def users
-        @users ||= user_scope.
-          preload(:communication_channels, :not_ended_enrollments).
-          offset(@page * @per_page).
-          limit(@per_page + 1)
+        @users ||= bookmarked_collection.paginate(page: @page,per_page: @per_page)
       end
 
-      def user_scope
+      def scope
         options = {
           enrollment_type: ['teacher', 'ta', 'designer', 'observer', 'student'],
           include_inactive_enrollments: false
