@@ -281,7 +281,8 @@ class SisImportsApiController < ApplicationController
       if (created_since = CanvasTime.try_parse(params[:created_since]))
         scope = scope.where("created_at > ?", created_since)
       end
-      @batches = Api.paginate(scope, self, api_v1_account_sis_imports_url)
+      # we don't need to know how many there are
+      @batches = Api.paginate(scope, self, api_v1_account_sis_imports_url, total_entries: nil)
       render json: {sis_imports: sis_imports_json(@batches, @current_user, session)}
     end
   end
