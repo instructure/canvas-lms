@@ -43,7 +43,7 @@ test('DP: multiple file items rendered in i elements', () => {
   file2.url = url
   const dialogPreview = TestUtils.renderIntoDocument(<DialogPreview itemsToShow={[file, file2]} />)
   equal(
-    dialogPreview.getDOMNode().getElementsByTagName('i').length,
+    ReactDOM.findDOMNode(dialogPreview).getElementsByTagName('i').length,
     2,
     'there are two files rendered'
   )

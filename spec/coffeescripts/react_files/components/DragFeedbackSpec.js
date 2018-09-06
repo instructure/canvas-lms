@@ -36,7 +36,7 @@ test('DF: shows a badge with number of items being dragged', () => {
   )
 
   equal(
-    dragFeedback.getDOMNode().getElementsByClassName('badge')[0].innerHTML,
+    ReactDOM.findDOMNode(dragFeedback).getElementsByClassName('badge')[0].innerHTML,
     '2',
     'has two items'
   )

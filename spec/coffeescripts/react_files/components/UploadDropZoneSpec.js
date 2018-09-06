@@ -33,7 +33,7 @@ QUnit.module('UploadDropZone', {
 })
 
 test('displays nothing by default', function() {
-  const displayText = this.uploadZone.getDOMNode().innerHTML.trim()
+  const displayText = ReactDOM.findDOMNode(this.uploadZone).innerHTML.trim()
   equal(displayText, '')
 })
 
@@ -46,7 +46,7 @@ test('handles drop event on target', function() {
   sandbox.stub(this.uploadZone, 'onDrop')
   this.uploadZone.setState({active: true})
   const dataTransfer = {types: ['Files']}
-  const n = this.uploadZone.getDOMNode()
+  const n = ReactDOM.findDOMNode(this.uploadZone)
   Simulate.dragEnter(n, {dataTransfer})
   Simulate.dragOver(n, {dataTransfer})
   Simulate.drop(n)
