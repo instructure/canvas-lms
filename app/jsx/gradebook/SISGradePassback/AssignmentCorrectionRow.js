@@ -30,12 +30,12 @@ import classnames from 'classnames'
     handleDateChanged(e) {
       //send date chosen in jquery date-picker so that
       //the assignment or assignment override due_at is set
-      var $picker = $(this.refs.due_at.getDOMNode())
+      var $picker = $(this.refs.due_at)
       this.props.onDateChanged($picker.data('date'))
     },
 
     initDueAtDateTimeField() {
-      var $picker = $(this.refs.due_at.getDOMNode())
+      var $picker = $(this.refs.due_at)
       $picker.datetime_field().change(this.handleDateChanged)
     },
 
@@ -50,7 +50,7 @@ import classnames from 'classnames'
     checkDueAtChange(e) {
       if(this.props.assignment.overrideForThisSection != undefined) {
         if (e.target.value == "") {
-          $picker = $(this.refs.due_at.getDOMNode()).data("date", null)
+          $picker = $(this.refs.due_at).data("date", null)
           this.props.assignment.due_at = null
         }
         // When a user edits the due_at datetime field, we should reset any
@@ -59,7 +59,7 @@ import classnames from 'classnames'
       }
       else {
         if (e.target.value == "") {
-          $picker = $(this.refs.due_at.getDOMNode()).data("date", null)
+          $picker = $(this.refs.due_at).data("date", null)
           this.props.updateAssignment({due_at: null})
         }
         // When a user edits the due_at datetime field, we should reset any

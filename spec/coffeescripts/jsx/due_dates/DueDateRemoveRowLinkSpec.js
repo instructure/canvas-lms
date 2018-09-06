@@ -44,6 +44,6 @@ test('renders', function() {
 })
 
 test('calls handleClick prop when clicked', function() {
-  Simulate.click(this.DueDateRemoveRowLink.refs.removeRowIcon.getDOMNode())
+  Simulate.click(this.DueDateRemoveRowLink.refs.removeRowIcon)
   ok(this.handleClick.calledOnce)
 })

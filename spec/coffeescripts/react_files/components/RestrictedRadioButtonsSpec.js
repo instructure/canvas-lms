@@ -49,12 +49,12 @@ test('renders an unpublish input field', function() {
 })
 
 test('renders a permissions input field', function() {
-  Simulate.change(this.RestrictedRadioButtons.refs.permissionsInput.getDOMNode())
+  Simulate.change(this.RestrictedRadioButtons.refs.permissionsInput)
   ok(this.RestrictedRadioButtons.refs.permissionsInput, 'should have an permissions input field')
 })
 
 test('renders a calendar option input field', function() {
-  Simulate.change(this.RestrictedRadioButtons.refs.permissionsInput.getDOMNode())
+  Simulate.change(this.RestrictedRadioButtons.refs.permissionsInput)
   ok(this.RestrictedRadioButtons.refs.dateRange, 'should have a dateRange input field')
 })
 
@@ -85,18 +85,18 @@ QUnit.module('RestrictedRadioButtons Multiple Selected Items', {
 })
 
 test('defaults to having nothing selected when non common items are selected', function() {
-  equal(this.RestrictedRadioButtons.refs.publishInput.getDOMNode().checked, false, 'not selected')
-  equal(this.RestrictedRadioButtons.refs.unpublishInput.getDOMNode().checked, false, 'not selected')
+  equal(this.RestrictedRadioButtons.refs.publishInput.checked, false, 'not selected')
+  equal(this.RestrictedRadioButtons.refs.unpublishInput.checked, false, 'not selected')
   equal(
-    this.RestrictedRadioButtons.refs.permissionsInput.getDOMNode().checked,
+    this.RestrictedRadioButtons.refs.permissionsInput.checked,
     false,
     'not selected'
   )
 })
 
 test('selecting the restricted access option default checks the hiddenInput option', function() {
-  this.RestrictedRadioButtons.refs.permissionsInput.getDOMNode().checked = true
-  Simulate.change(this.RestrictedRadioButtons.refs.permissionsInput.getDOMNode())
+  this.RestrictedRadioButtons.refs.permissionsInput.checked = true
+  Simulate.change(this.RestrictedRadioButtons.refs.permissionsInput)
   equal(
     this.RestrictedRadioButtons.refs.link_only.props.checked,
     true,
@@ -122,8 +122,8 @@ QUnit.module('RestrictedRadioButtons#extractFormValues', {
 })
 
 test('returns the correct object to publish an item', function() {
-  this.restrictedRadioButtons.refs.publishInput.getDOMNode().checked = true
-  Simulate.change(this.restrictedRadioButtons.refs.publishInput.getDOMNode())
+  this.restrictedRadioButtons.refs.publishInput.checked = true
+  Simulate.change(this.restrictedRadioButtons.refs.publishInput)
   const expectedObject = {
     hidden: false,
     unlock_at: '',
@@ -138,8 +138,8 @@ test('returns the correct object to publish an item', function() {
 })
 
 test('returns the correct object to unpublish an item', function() {
-  this.restrictedRadioButtons.refs.unpublishInput.getDOMNode().checked = true
-  Simulate.change(this.restrictedRadioButtons.refs.unpublishInput.getDOMNode())
+  this.restrictedRadioButtons.refs.unpublishInput.checked = true
+  Simulate.change(this.restrictedRadioButtons.refs.unpublishInput)
   const expectedObject = {
     hidden: false,
     unlock_at: '',
@@ -154,8 +154,8 @@ test('returns the correct object to unpublish an item', function() {
 })
 
 test('returns the correct object to hide an item', function() {
-  this.restrictedRadioButtons.refs.permissionsInput.getDOMNode().checked = true
-  Simulate.change(this.restrictedRadioButtons.refs.permissionsInput.getDOMNode())
+  this.restrictedRadioButtons.refs.permissionsInput.checked = true
+  Simulate.change(this.restrictedRadioButtons.refs.permissionsInput)
   const expectedObject = {
     hidden: true,
     unlock_at: '',
@@ -170,11 +170,11 @@ test('returns the correct object to hide an item', function() {
 })
 
 test('returns the correct object to restrict an item based on dates', function() {
-  Simulate.change(this.restrictedRadioButtons.refs.permissionsInput.getDOMNode())
-  Simulate.change(this.restrictedRadioButtons.refs.dateRange.getDOMNode())
-  this.restrictedRadioButtons.refs.dateRange.getDOMNode().checked = true
-  $(this.restrictedRadioButtons.refs.unlock_at.getDOMNode()).data('unfudged-date', 'something else')
-  $(this.restrictedRadioButtons.refs.lock_at.getDOMNode()).data('unfudged-date', 'something')
+  Simulate.change(this.restrictedRadioButtons.refs.permissionsInput)
+  Simulate.change(this.restrictedRadioButtons.refs.dateRange)
+  this.restrictedRadioButtons.refs.dateRange.checked = true
+  $(this.restrictedRadioButtons.refs.unlock_at).data('unfudged-date', 'something else')
+  $(this.restrictedRadioButtons.refs.lock_at).data('unfudged-date', 'something')
   const expectedObject = {
     hidden: false,
     unlock_at: 'something else',

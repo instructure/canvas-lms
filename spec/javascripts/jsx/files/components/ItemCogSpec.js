@@ -51,7 +51,7 @@ define([
     for (const prop in config) {
       let button = null;
       if (itemCog.refs && itemCog.refs[prop]) {
-        button = $(itemCog.refs[prop].getDOMNode()).length;
+        button = $(itemCog.refs[prop]).length;
       } else {
         button = false;
       }

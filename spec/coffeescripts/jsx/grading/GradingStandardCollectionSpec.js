@@ -152,30 +152,30 @@ test("getStandardById returns undefined for a id that doesn't match a standard",
 
 test('adds a new standard when the add button is clicked', function() {
   deepEqual(this.gradingStandardCollection.state.standards.length, 1)
-  Simulate.click(this.gradingStandardCollection.refs.addButton.getDOMNode())
+  Simulate.click(this.gradingStandardCollection.refs.addButton)
   deepEqual(this.gradingStandardCollection.state.standards.length, 2)
 })
 
 test('adds the default standard when the add button is clicked', function() {
-  Simulate.click(this.gradingStandardCollection.refs.addButton.getDOMNode())
+  Simulate.click(this.gradingStandardCollection.refs.addButton)
   const newStandard = _.first(this.gradingStandardCollection.state.standards).grading_standard
   deepEqual(newStandard.data, this.processedDefaultData)
 })
 
 test('does not save the new standard on the backend when the add button is clicked', function() {
   const saveGradingStandard = sandbox.spy(this.gradingStandardCollection, 'saveGradingStandard')
-  Simulate.click(this.gradingStandardCollection.refs.addButton.getDOMNode())
+  Simulate.click(this.gradingStandardCollection.refs.addButton)
   ok(saveGradingStandard.notCalled)
 })
 
 test("standardNotCreated returns true for a new standard that hasn't been saved yet", function() {
-  Simulate.click(this.gradingStandardCollection.refs.addButton.getDOMNode())
+  Simulate.click(this.gradingStandardCollection.refs.addButton)
   const newStandard = _.first(this.gradingStandardCollection.state.standards).grading_standard
   ok(this.gradingStandardCollection.standardNotCreated(newStandard))
 })
 
 test('standardNotCreated returns false for standards that have been saved on the backend', function() {
-  Simulate.click(this.gradingStandardCollection.refs.addButton.getDOMNode())
+  Simulate.click(this.gradingStandardCollection.refs.addButton)
   const unsavedStandard = _.first(this.gradingStandardCollection.state.standards).grading_standard
   ok(this.gradingStandardCollection.standardNotCreated(unsavedStandard))
   this.gradingStandardCollection.saveGradingStandard(unsavedStandard)
@@ -194,7 +194,7 @@ test('saveGradingStandard updates an already-saved grading standard', function()
 })
 
 test('setEditingStatus removes the standard if the user clicks "Cancel" on a not-yet-saved standard', function() {
-  Simulate.click(this.gradingStandardCollection.refs.addButton.getDOMNode())
+  Simulate.click(this.gradingStandardCollection.refs.addButton)
   deepEqual(this.gradingStandardCollection.state.standards.length, 2)
   deepEqual(
     _.first(this.gradingStandardCollection.state.standards).grading_standard.data,
@@ -223,18 +223,18 @@ test('anyStandardBeingEdited returns false if no standards are being edited', fu
 })
 
 test('anyStandardBeingEdited returns true after the user clicks "Add grading scheme"', function() {
-  Simulate.click(this.gradingStandardCollection.refs.addButton.getDOMNode())
+  Simulate.click(this.gradingStandardCollection.refs.addButton)
   deepEqual(this.gradingStandardCollection.anyStandardBeingEdited(), true)
 })
 
 test('anyStandardBeingEdited returns false if the user clicks "Add grading scheme" and then clicks "Cancel"', function() {
-  Simulate.click(this.gradingStandardCollection.refs.addButton.getDOMNode())
+  Simulate.click(this.gradingStandardCollection.refs.addButton)
   this.gradingStandardCollection.setEditingStatus(-1, false)
   deepEqual(this.gradingStandardCollection.anyStandardBeingEdited(), false)
 })
 
 test('anyStandardBeingEdited returns false if the user clicks "Add grading scheme" and then clicks "Save"', function() {
-  Simulate.click(this.gradingStandardCollection.refs.addButton.getDOMNode())
+  Simulate.click(this.gradingStandardCollection.refs.addButton)
   const unsavedStandard = _.first(this.gradingStandardCollection.state.standards).grading_standard
   this.gradingStandardCollection.saveGradingStandard(unsavedStandard)
   this.server.respond()
@@ -317,7 +317,7 @@ test('shows a message that says "No grading schemes to display" if there are no 
 
 test('deleteGradingStandard calls confirmDelete', function() {
   const confirmDelete = sandbox.spy($.fn, 'confirmDelete')
-  const deleteButton = this.gradingStandardCollection.refs.gradingStandard1.refs.deleteButton.getDOMNode()
+  const deleteButton = this.gradingStandardCollection.refs.gradingStandard1.refs.deleteButton
   Simulate.click(deleteButton)
   ok(confirmDelete.calledOnce)
 })

@@ -35,7 +35,7 @@ QUnit.module('UploadButton', {
 })
 
 test('hides actual file input form', function() {
-  const form = this.button.refs.form.getDOMNode()
+  const form = this.button.refs.form
   ok(
     $(form)
       .attr('class')

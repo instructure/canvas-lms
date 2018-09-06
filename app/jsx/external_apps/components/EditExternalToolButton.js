@@ -93,7 +93,7 @@ export default React.createClass({
         this.closeModal()
         // Unsure why this is necessary, but the focus is lost if not wrapped in a timeout
         setTimeout(() => {
-          this.refs.editButton.getDOMNode().focus()
+          this.refs.editButton.focus()
         }, 300)
 
         $.flashMessage(I18n.t('The app was updated successfully'))

@@ -53,7 +53,7 @@ QUnit.module('UploadProgress', {
 })
 
 test('getLabel displays file name', function() {
-  equal(this.prog.refs.fileName.getDOMNode().textContent, 'filename')
+  equal(this.prog.refs.fileName.textContent, 'filename')
 })
 
 test('announces upload progress to screen reader when queue changes', function() {

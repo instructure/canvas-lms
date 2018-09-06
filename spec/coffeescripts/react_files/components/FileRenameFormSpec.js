@@ -45,31 +45,31 @@ QUnit.module('FileRenameForm', {
 })
 
 test('switches to editing file name state with button click', function() {
-  Simulate.click(this.form.refs.renameBtn.getDOMNode())
+  Simulate.click(this.form.refs.renameBtn)
   ok(this.form.state.isEditing)
-  ok(this.form.refs.newName.getDOMNode())
+  ok(this.form.refs.newName)
 })
 
 test('isEditing displays options name by default', function() {
-  Simulate.click(this.form.refs.renameBtn.getDOMNode())
+  Simulate.click(this.form.refs.renameBtn)
   ok(this.form.state.isEditing)
-  equal(this.form.refs.newName.getDOMNode().value, 'options_name.txt')
+  equal(this.form.refs.newName.value, 'options_name.txt')
 })
 
 test('isEditing displays file name when no options name exists', function() {
   this.form.setProps({fileOptions: {file: {name: 'file_name.md'}}})
-  Simulate.click(this.form.refs.renameBtn.getDOMNode())
+  Simulate.click(this.form.refs.renameBtn)
   ok(this.form.state.isEditing)
-  equal(this.form.refs.newName.getDOMNode().value, 'file_name.md')
+  equal(this.form.refs.newName.value, 'file_name.md')
 })
 
 test('can go back from isEditing to initial view with button click', function() {
-  Simulate.click(this.form.refs.renameBtn.getDOMNode())
+  Simulate.click(this.form.refs.renameBtn)
   ok(this.form.state.isEditing)
-  ok(this.form.refs.newName.getDOMNode())
-  Simulate.click(this.form.refs.backBtn.getDOMNode())
+  ok(this.form.refs.newName)
+  Simulate.click(this.form.refs.backBtn)
   ok(!this.form.state.isEditing)
-  ok(this.form.refs.replaceBtn.getDOMNode())
+  ok(this.form.refs.replaceBtn)
 })
 
 test('calls passed in props method to resolve conflict', function() {
@@ -80,9 +80,9 @@ test('calls passed in props method to resolve conflict', function() {
       ok(options.name)
     }
   })
-  Simulate.click(this.form.refs.renameBtn.getDOMNode())
+  Simulate.click(this.form.refs.renameBtn)
   ok(this.form.state.isEditing)
-  Simulate.click(this.form.refs.commitChangeBtn.getDOMNode())
+  Simulate.click(this.form.refs.commitChangeBtn)
 })
 
 test('onNameConflictResolved preserves expandZip option when renaming', function() {
@@ -96,9 +96,9 @@ test('onNameConflictResolved preserves expandZip option when renaming', function
       equal(options.expandZip, 'true')
     }
   })
-  Simulate.click(this.form.refs.renameBtn.getDOMNode())
+  Simulate.click(this.form.refs.renameBtn)
   ok(this.form.state.isEditing)
-  Simulate.click(this.form.refs.commitChangeBtn.getDOMNode())
+  Simulate.click(this.form.refs.commitChangeBtn)
 })
 
 test('onNameConflictResolved preserves expandZip option when replacing', function() {
@@ -112,5 +112,5 @@ test('onNameConflictResolved preserves expandZip option when replacing', functio
       equal(options.expandZip, 'true')
     }
   })
-  Simulate.click(this.form.refs.replaceBtn.getDOMNode())
+  Simulate.click(this.form.refs.replaceBtn)
 })

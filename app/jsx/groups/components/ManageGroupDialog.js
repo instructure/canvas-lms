@@ -43,11 +43,11 @@ import 'jquery.instructure_forms'
       e.preventDefault()
       var errors = false;
       if (this.state.name.length == 0) {
-        $(this.refs.nameInput.getDOMNode()).errorBox(I18n.t('Group name is required'));
+        $(this.refs.nameInput).errorBox(I18n.t('Group name is required'));
         errors = true;
       }
       if (this.props.maxMembership && this.state.checked.length > this.props.maxMembership) {
-        $(this.refs.userList.getDOMNode()).errorBox(I18n.t('Too many members'));
+        $(this.refs.userList).errorBox(I18n.t('Too many members'));
         errors = true;
       }
       if (!errors) {

@@ -32,9 +32,8 @@ const createElement = data => (
 const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
 const getDOMNodes = function(data) {
   const component = renderComponent(data)
-  const addToolButtonNode =
-    component.refs.addTool != null ? component.refs.addTool.getDOMNode() : undefined
-  const modalNode = component.refs.modal != null ? component.refs.modal.getDOMNode() : undefined
+  const addToolButtonNode = component.refs.addTool
+  const modalNode = component.refs.modal
   return [component, addToolButtonNode, modalNode]
 }
 
