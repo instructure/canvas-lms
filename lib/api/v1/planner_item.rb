@@ -76,7 +76,7 @@ module Api::V1::PlannerItem
         hash[:plannable_type] = 'assessment_request'
         hash[:plannable_date] = item.asset.assignment.peer_reviews_due_at
         hash[:plannable] = assessment_request_json(item, user, session, %w{user assignment})
-        hash[:html_url] = course_assignment_submission_url(item.asset.context.id, item.asset.id, item.user.id)
+        hash[:html_url] = course_assignment_submission_url(item.asset.assignment.context_id, item.asset.assignment_id, item.user_id)
       else
         hash[:plannable_date] = item[:user_due_date] || item.due_at
         hash[:plannable] = assignment_json(item, user, session, {include_discussion_topic: true}.merge(assignment_opts))

@@ -177,6 +177,7 @@ describe PlannerController do
         peer_review = response_json.detect { |i| i["plannable_type"] == 'assessment_request' }
         expect(peer_review["plannable"]["id"]).to eq assessment_request.id
         expect(peer_review["plannable"]["assignment"]["id"]).to eq @assignment.id
+        expect(peer_review['html_url']).to match "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
       end
 
       it "should mark peer reviews as done when they are completed, if they have been marked as incomplete by an override" do
