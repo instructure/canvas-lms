@@ -116,7 +116,7 @@ test('handleStoreChange', function() {
       `component ${stateName} should equal progress ${stateName}`
     )
   )
-  ReactDOM.unmountComponentAtNode(component.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })
 
 test('isComplete', function() {
@@ -153,14 +153,14 @@ test('poll', function() {
   component.setProps({progress_id: this.progress_id})
   component.poll()
   ok(this.storeSpy.called, 'should fetch when progress id is present')
-  ReactDOM.unmountComponentAtNode(component.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })
 
 test('render', function() {
   const ApiProgressBarElement = <ApiProgressBar progress_id={this.progress_id} />
   const component = TestUtils.renderIntoDocument(ApiProgressBarElement)
-  ok(isNull(component.getDOMNode()), 'should not render to DOM if is not in progress')
+  ok(isNull(ReactDOM.findDOMNode(component)), 'should not render to DOM if is not in progress')
   this.clock.tick(component.props.delay + 5)
-  ok(!isNull(component.getDOMNode()), 'should render to DOM if is not in progress')
-  ReactDOM.unmountComponentAtNode(component.getDOMNode().parentNode)
+  ok(!isNull(ReactDOM.findDOMNode(component)), 'should render to DOM if is not in progress')
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })

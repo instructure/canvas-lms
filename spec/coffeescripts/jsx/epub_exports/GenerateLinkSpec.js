@@ -39,7 +39,7 @@ test('showGenerateLink', function() {
   let GenerateLinkElement = <GenerateLink {...this.props} />
   let component = TestUtils.renderIntoDocument(GenerateLinkElement)
   ok(component.showGenerateLink(), 'should be true without epub_export object')
-  ReactDOM.unmountComponentAtNode(component.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
   this.props.course.epub_export = {permissions: {regenerate: false}}
   GenerateLinkElement = <GenerateLink {...this.props} />
   component = TestUtils.renderIntoDocument(GenerateLinkElement)
@@ -48,7 +48,7 @@ test('showGenerateLink', function() {
   GenerateLinkElement = <GenerateLink {...this.props} />
   component = TestUtils.renderIntoDocument(GenerateLinkElement)
   ok(component.showGenerateLink(), 'should be true with permissions to rengenerate')
-  ReactDOM.unmountComponentAtNode(component.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })
 
 test('state triggered', function() {
@@ -56,14 +56,14 @@ test('state triggered', function() {
   sinon.stub(CourseEpubExportStore, 'create')
   const GenerateLinkElement = <GenerateLink {...this.props} />
   const component = TestUtils.renderIntoDocument(GenerateLinkElement)
-  const node = component.getDOMNode()
+  const node = ReactDOM.findDOMNode(component)
   TestUtils.Simulate.click(node)
   ok(component.state.triggered, 'should set state to triggered')
   clock.tick(1005)
   ok(!component.state.triggered, 'should toggle back to not triggered after 1000')
   clock.restore()
   CourseEpubExportStore.create.restore()
-  ReactDOM.unmountComponentAtNode(component.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })
 
 test('render', function() {
@@ -71,20 +71,20 @@ test('render', function() {
   sinon.stub(CourseEpubExportStore, 'create')
   const GenerateLinkElement = <GenerateLink {...this.props} />
   const component = TestUtils.renderIntoDocument(GenerateLinkElement)
-  let node = component.getDOMNode()
+  let node = ReactDOM.findDOMNode(component)
   equal(node.tagName, 'BUTTON', 'tag should be a button')
   ok(
     node.querySelector('span').textContent.match(I18n.t('Generate ePub')),
     'should show generate text'
   )
   TestUtils.Simulate.click(node)
-  node = component.getDOMNode()
+  node = ReactDOM.findDOMNode(component)
   equal(node.tagName, 'SPAN', 'tag should be span')
   ok(node.textContent.match(I18n.t('Generating...')), 'should show generating text')
   this.props.course.epub_export = {permissions: {regenerate: true}}
   component.setProps(this.props)
   clock.tick(2000)
-  node = component.getDOMNode()
+  node = ReactDOM.findDOMNode(component)
   equal(node.tagName, 'BUTTON', 'tag should be a button')
   ok(
     node.querySelector('span').textContent.match(I18n.t('Regenerate ePub')),
@@ -92,5 +92,5 @@ test('render', function() {
   )
   clock.restore()
   CourseEpubExportStore.create.restore()
-  ReactDOM.unmountComponentAtNode(component.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })

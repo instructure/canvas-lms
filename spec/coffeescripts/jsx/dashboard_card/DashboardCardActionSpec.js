@@ -59,7 +59,7 @@ test('should render actionType as screenreader text if provided', function() {
   const component = TestUtils.renderIntoDocument(
     <DashboardCardAction {...this.props} screenReaderLabel={screen_reader_label} />
   )
-  const $html = $(component.getDOMNode())
+  const $html = $(ReactDOM.findDOMNode(component))
   equal($html.find('span.screenreader-only').text(), screen_reader_label)
 })
 

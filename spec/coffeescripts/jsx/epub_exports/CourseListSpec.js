@@ -44,7 +44,7 @@ test('render', function() {
   ReactDOM.unmountComponentAtNode(node.parentNode)
   CourseListElement = <CourseList courses={this.props} />
   component = TestUtils.renderIntoDocument(CourseListElement)
-  node = component.getDOMNode()
+  node = ReactDOM.findDOMNode(component)
   equal(
     node.querySelectorAll('li').length,
     Object.keys(this.props).length,

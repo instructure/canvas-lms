@@ -27,8 +27,8 @@ QUnit.module('ModalContent')
 test('applies className to parent node', () => {
   const ModalContentElement = <ModalContent className="cat" />
   const component = TestUtils.renderIntoDocument(ModalContentElement)
-  ok($(component.getDOMNode()).hasClass('cat'), 'applies class name')
-  ReactDOM.unmountComponentAtNode(component.getDOMNode().parentNode)
+  ok($(ReactDOM.findDOMNode(component)).hasClass('cat'), 'applies class name')
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })
 
 test('renders children components', () => {
@@ -38,6 +38,6 @@ test('renders children components', () => {
     </ModalContent>
   )
   const component = TestUtils.renderIntoDocument(mC)
-  ok($(component.getDOMNode()).find('.my_fun_div'), 'inserts child component elements')
-  ReactDOM.unmountComponentAtNode(component.getDOMNode().parentNode)
+  ok($(ReactDOM.findDOMNode(component)).find('.my_fun_div'), 'inserts child component elements')
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })

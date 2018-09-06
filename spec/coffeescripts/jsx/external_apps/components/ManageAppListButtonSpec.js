@@ -37,7 +37,7 @@ QUnit.module('ExternalApps.ManageAppListButton', {
 
 test('open and close modal', () => {
   const component = renderComponent({})
-  Simulate.click(component.getDOMNode())
+  Simulate.click(ReactDOM.findDOMNode(component))
   ok(component.state.modalIsOpen, 'modal is open')
   ok(component.refs.btnClose)
   ok(component.refs.btnUpdateAccessToken)

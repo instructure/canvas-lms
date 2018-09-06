@@ -37,7 +37,7 @@ test('getDisplayState', function() {
   let CourseListItemElement = <CourseListItem {...this.props} />
   let component = TestUtils.renderIntoDocument(CourseListItemElement)
   ok(isNull(component.getDisplayState()), 'display state should be null without epub_export')
-  ReactDOM.unmountComponentAtNode(component.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
   this.props.course = {
     epub_export: {
       permissions: {},
@@ -48,12 +48,12 @@ test('getDisplayState', function() {
   component = TestUtils.renderIntoDocument(CourseListItemElement)
   ok(!isNull(component.getDisplayState()), 'display state should not be null with epub_export')
   ok(component.getDisplayState().match('Generating'), 'should include workflow_state')
-  ReactDOM.unmountComponentAtNode(component.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })
 
 test('render', function() {
   const CourseListItemElement = <CourseListItem {...this.props} />
   const component = TestUtils.renderIntoDocument(CourseListItemElement)
-  ok(!isNull(component.getDOMNode()), 'should render with course')
-  ReactDOM.unmountComponentAtNode(component.getDOMNode().parentNode)
+  ok(!isNull(ReactDOM.findDOMNode(component)), 'should render with course')
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })
