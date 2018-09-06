@@ -89,6 +89,8 @@ export default {
     'date.formats.medium+_+time.formats.tiny_on_the_hour',
     'date.formats.medium',              // %b %-d, %Y
     'time.formats.short',               // %d %b %H:%M
+    'date.formats.short+_+time.formats.tiny',
+    'date.formats.short+_+time.formats.tiny_on_the_hour',
     'date.formats.short',               // %b %-d
     'date.formats.default',             // %Y-%m-%d
     'time.formats.tiny',                // %l:%M%P
