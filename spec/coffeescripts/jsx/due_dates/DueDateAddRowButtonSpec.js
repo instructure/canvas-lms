@@ -32,7 +32,7 @@ QUnit.module('DueDateAddRowButton with true display prop', {
     )
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.DueDateAddRowButton.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.DueDateAddRowButton).parentNode)
   }
 })
 
@@ -51,8 +51,8 @@ QUnit.module('DueDateAddRowButton with false display prop', {
     )
   },
   teardown() {
-    if (this.DueDateAddRowButton.getDOMNode()) {
-      ReactDOM.unmountComponentAtNode(this.DueDateAddRowButton.getDOMNode().parentNode)
+    if (ReactDOM.findDOMNode(this.DueDateAddRowButton)) {
+      ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.DueDateAddRowButton).parentNode)
     }
   }
 })

@@ -35,7 +35,7 @@ test('creates a display message based on fileOptions ', () => {
     'Would you like to expand the contents of "neat_file" into the current folder, or upload the zip file as is?',
     'message is displayed'
   )
-  ReactDOM.unmountComponentAtNode(zFOF.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(zFOF).parentNode)
 })
 
 test('handleExpandClick expands zip', function() {
@@ -53,7 +53,7 @@ test('handleExpandClick expands zip', function() {
     }),
     'resolves with correct options'
   )
-  ReactDOM.unmountComponentAtNode(zFOF.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(zFOF).parentNode)
 })
 
 // skip if webpack: CNVS-33471
@@ -76,7 +76,7 @@ if (window.hasOwnProperty('define')) {
       }),
       'resolves with correct options'
     )
-    ReactDOM.unmountComponentAtNode(zFOF.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(zFOF).parentNode)
   })
 } else {
   QUnit.skip('handleUploadClick uploads zip')

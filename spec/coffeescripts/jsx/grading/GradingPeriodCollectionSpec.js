@@ -127,7 +127,7 @@ QUnit.module('GradingPeriodCollection', {
     return this.server.respond()
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.gradingPeriodCollection.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.gradingPeriodCollection).parentNode)
     fakeENV.teardown()
     return this.server.restore()
   }
@@ -494,7 +494,7 @@ QUnit.module('GradingPeriodCollection with read-only grading periods', {
     this.server.respond()
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.gradingPeriodCollection.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.gradingPeriodCollection).parentNode)
     fakeENV.teardown()
     this.server.restore()
   }

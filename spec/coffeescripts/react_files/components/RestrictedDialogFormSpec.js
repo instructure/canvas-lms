@@ -44,7 +44,7 @@ QUnit.module('RestrictedDialogForm Multiple Selected Items', {
     )
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.restrictedDialogForm.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.restrictedDialogForm).parentNode)
     $('#fixtures').empty()
   }
 })
@@ -78,7 +78,7 @@ QUnit.module('RestrictedDialogForm#handleSubmit', {
     )
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.restrictedDialogForm.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.restrictedDialogForm).parentNode)
     $('#fixtures').empty()
   }
 })

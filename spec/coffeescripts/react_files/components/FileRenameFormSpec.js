@@ -39,7 +39,7 @@ QUnit.module('FileRenameForm', {
     )
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.form.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.form).parentNode)
     $('#fixtures').empty()
   }
 })

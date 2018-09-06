@@ -27,13 +27,13 @@ QUnit.module('LoadingIndicator')
 test('display none if no props supplied', () => {
   const loadingIndicator = React.createFactory(LoadingIndicator)
   const rendered = TestUtils.renderIntoDocument(loadingIndicator())
-  equal($(rendered.getDOMNode()).css('display'), 'none', 'loading indicator not shown')
-  ReactDOM.unmountComponentAtNode(rendered.getDOMNode().parentNode)
+  equal($(ReactDOM.findDOMNode(rendered)).css('display'), 'none', 'loading indicator not shown')
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(rendered).parentNode)
 })
 
 test('if props supplied for loading', () => {
   const loadingIndicator = React.createFactory(LoadingIndicator)
   const rendered = TestUtils.renderIntoDocument(loadingIndicator({isLoading: true}))
-  equal($(rendered.getDOMNode()).css('display'), '', 'loading indicator is shown')
-  ReactDOM.unmountComponentAtNode(rendered.getDOMNode().parentNode)
+  equal($(ReactDOM.findDOMNode(rendered)).css('display'), '', 'loading indicator is shown')
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(rendered).parentNode)
 })

@@ -49,7 +49,7 @@ QUnit.module('File Preview Info Panel Specs', {
     )
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.rendered.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.rendered).parentNode)
     this.file = null
   }
 })
@@ -76,7 +76,7 @@ test('displays size', function() {
 
 test('displays date modified', function() {
   equal(
-    $(this.rendered.getDOMNode())
+    $(ReactDOM.findDOMNode(this.rendered))
       .find('#dateModified')
       .find(".visible-desktop")
       .text(),
@@ -87,7 +87,7 @@ test('displays date modified', function() {
 
 test('displays date created', function() {
   equal(
-    $(this.rendered.getDOMNode())
+    $(ReactDOM.findDOMNode(this.rendered))
       .find('#dateCreated')
       .find(".visible-desktop")
       .text(),

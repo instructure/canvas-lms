@@ -35,7 +35,7 @@ QUnit.module('RestrictedRadioButtons', {
     )
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.RestrictedRadioButtons.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.RestrictedRadioButtons).parentNode)
     $('#fixtures').empty()
   }
 })
@@ -79,7 +79,7 @@ QUnit.module('RestrictedRadioButtons Multiple Selected Items', {
     )
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.RestrictedRadioButtons.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.RestrictedRadioButtons).parentNode)
     $('#fixtures').empty()
   }
 })
@@ -116,7 +116,7 @@ QUnit.module('RestrictedRadioButtons#extractFormValues', {
     )
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.restrictedRadioButtons.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.restrictedRadioButtons).parentNode)
     $('#fixtures').empty()
   }
 })
@@ -213,7 +213,7 @@ QUnit.module('RestrictedRadioButtons Multiple Items', {
     )
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.restrictedRadioButtons.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.restrictedRadioButtons).parentNode)
     $('#fixtures').empty()
   }
 })

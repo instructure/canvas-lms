@@ -33,5 +33,5 @@ test('displays search term in no results text', () => {
     `Your search - \"${search_term}\" - did not match any files.`,
     'has the right text'
   )
-  ReactDOM.unmountComponentAtNode(rendered.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(rendered).parentNode)
 })

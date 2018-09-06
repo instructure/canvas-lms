@@ -41,7 +41,7 @@ QUnit.module('PublishCloud', {
     this.publishCloud = ReactDOM.render(<PublishCloud {...props} />, $('#fixtures')[0])
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.publishCloud.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.publishCloud).parentNode)
   }
 })
 
@@ -76,7 +76,7 @@ QUnit.module('PublishCloud Student View', {
     this.publishCloud = ReactDOM.render(<PublishCloud {...props} />, $('#fixtures')[0])
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.publishCloud.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.publishCloud).parentNode)
   }
 })
 
@@ -101,7 +101,7 @@ QUnit.module('PublishCloud#togglePublishedState', {
     this.publishCloud = ReactDOM.render(<PublishCloud {...props} />, $('#fixtures')[0])
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.publishCloud.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.publishCloud).parentNode)
   }
 })
 
@@ -146,7 +146,7 @@ test('sets published initial state based on params model hidden property', funct
   equal(this.publishCloud.state.published, !model.get('locked'), 'not locked is published')
   equal(this.publishCloud.state.restricted, false, 'restricted should be false')
   equal(this.publishCloud.state.hidden, false, 'hidden should be false')
-  ReactDOM.unmountComponentAtNode(this.publishCloud.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.publishCloud).parentNode)
 })
 
 test('restricted is true when lock_at/unlock_at is set', function() {
@@ -159,7 +159,7 @@ test('restricted is true when lock_at/unlock_at is set', function() {
   const props = {model}
   this.publishCloud = ReactDOM.render(<PublishCloud {...props} />, $('#fixtures')[0])
   equal(this.publishCloud.state.restricted, true, 'restricted is true when lock_at/ulock_at is set')
-  ReactDOM.unmountComponentAtNode(this.publishCloud.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.publishCloud).parentNode)
 })
 
 QUnit.module('PublishCloud#extractStateFromModel')
@@ -189,5 +189,5 @@ test('returns object that can be used to set state', function() {
     },
     'returns object to set state with'
   )
-  ReactDOM.unmountComponentAtNode(this.publishCloud.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.publishCloud).parentNode)
 })

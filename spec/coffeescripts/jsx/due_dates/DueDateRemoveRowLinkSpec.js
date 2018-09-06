@@ -35,7 +35,7 @@ QUnit.module('DueDateRemoveRowLink', {
     )
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.DueDateRemoveRowLink.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.DueDateRemoveRowLink).parentNode)
   }
 })
 

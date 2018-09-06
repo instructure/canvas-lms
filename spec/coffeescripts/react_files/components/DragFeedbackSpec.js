@@ -41,5 +41,5 @@ test('DF: shows a badge with number of items being dragged', () => {
     'has two items'
   )
 
-  ReactDOM.unmountComponentAtNode(dragFeedback.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(dragFeedback).parentNode)
 })

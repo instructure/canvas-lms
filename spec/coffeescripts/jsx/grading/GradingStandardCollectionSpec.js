@@ -130,7 +130,7 @@ QUnit.module('GradingStandardCollection', {
     return this.server.respond()
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.gradingStandardCollection.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.gradingStandardCollection).parentNode)
     ENV.current_user_roles = null
     ENV.GRADING_STANDARDS_URL = null
     ENV.DEFAULT_GRADING_STANDARD_DATA = null

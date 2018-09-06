@@ -39,7 +39,7 @@ test('displays nothing by default', function() {
 
 test('displays dropzone when active', function() {
   this.uploadZone.setState({active: true})
-  ok(this.uploadZone.getDOMNode().querySelector('.UploadDropZone__instructions'))
+  ok(ReactDOM.findDOMNode(this.uploadZone).querySelector('.UploadDropZone__instructions'))
 })
 
 test('handles drop event on target', function() {

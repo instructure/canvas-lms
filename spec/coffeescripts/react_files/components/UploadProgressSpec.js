@@ -41,7 +41,7 @@ QUnit.module('UploadProgress', {
     this.prog = this.progressContainer.refs.prog
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.progressContainer.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.progressContainer).parentNode)
     $('#fixtures').empty()
   },
   mockUploader(name, progress) {
