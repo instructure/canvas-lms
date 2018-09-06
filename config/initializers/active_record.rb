@@ -631,8 +631,8 @@ class ActiveRecord::Base
     end
   end
 
-  def self.wait_for_replication(start: nil)
-    return unless Shackles.activate(:slave) { connection.readonly? }
+  def self.wait_for_replication(start: nil, timeout: nil)
+    return true unless Shackles.activate(:slave) { connection.readonly? }
 
     start ||= current_xlog_location
     Shackles.activate(:slave) do
@@ -644,10 +644,13 @@ class ActiveRecord::Base
         "pg_last_xlog_replay_location()"
       # positive == first value greater, negative == second value greater
       # SELECT pg_xlog_location_diff(<START>, pg_last_xlog_replay_location())
+      start_time = Time.now
       while connection.select_value("SELECT #{diff_fn}(#{connection.quote(start)}, #{fn})").to_i >= 0
+        return false if timeout && Time.now > start_time + timeout
         sleep 0.1
       end
     end
+    true
   end
 
   def self.bulk_insert(records)
