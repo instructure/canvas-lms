@@ -68,8 +68,8 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
 
   function getDateInput(inputLabel) {
     const labels = wrapper.find('label')
-    const $label = labels.filterWhere(label => label.text() === inputLabel).at(0).getDOMNode()
-    return wrapper.find(`input[aria-labelledby="${$label.id}"]`).at(0).getDOMNode()
+    const $label = labels.filterWhere(label => label.text() === inputLabel).at(0).instance()
+    return wrapper.find(`input[aria-labelledby="${$label.id}"]`).at(0).instance()
   }
 
   function getDateTimeSuggestions(inputLabel) {
@@ -82,7 +82,7 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
   }
 
   function getInput(id) {
-    return wrapper.find(`input#${id}`).at(0).getDOMNode()
+    return wrapper.find(`input#${id}`).at(0).instance()
   }
 
   function setDateInputValue(label, value) {
@@ -94,7 +94,7 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
   function setInputValue(id, value) {
     // Using Enzyme here is a workaround for React 14 swallowing input events.
     const input = wrapper.find(`input#${id}`).at(0)
-    input.getDOMNode().value = value
+    input.instance().value = value
     input.simulate('change', {target: {value}})
   }
 

@@ -99,19 +99,19 @@ define([
   });
 
   test('defaults to Individual View', function () {
-    equal(this.wrapper.find('select').getDOMNode().value, 'individual-gradebook');
+    equal(this.wrapper.find('select').instance().value, 'individual-gradebook');
   });
 
   test('clicking on learning mastery changes the selected value to learning mastery', function () {
     this.wrapper.find('select').simulate('change', { target: { value: 'learning-mastery' } });
-    equal(this.wrapper.find('select').getDOMNode().value, 'learning-mastery');
+    equal(this.wrapper.find('select').instance().value, 'learning-mastery');
   });
 
   test('clicking on individual view changes the selected value to individual view', function () {
     // by default individual-gradebook is selected
     this.wrapper.find('select').simulate('change', { target: { value: 'learning-mastery' } });
     this.wrapper.find('select').simulate('change', { target: { value: 'individual-gradebook' } });
-    equal(this.wrapper.find('select').getDOMNode().value, 'individual-gradebook');
+    equal(this.wrapper.find('select').instance().value, 'individual-gradebook');
   });
 
 
@@ -124,7 +124,7 @@ define([
           navigate={() => {}}
         />
       );
-      this.menuItems = this.wrapper.find('option').map(option => option.getDOMNode());
+      this.menuItems = this.wrapper.find('option').map(option => option.instance());
     },
     teardown () {
       this.wrapper.unmount();
@@ -157,7 +157,7 @@ define([
           navigate={() => {}}
         />
       );
-      this.menuItems = this.wrapper.find('option').map(option => option.getDOMNode());
+      this.menuItems = this.wrapper.find('option').map(option => option.instance());
     },
     teardown () {
       this.wrapper.unmount();

@@ -349,7 +349,7 @@ test('selecting a grader from options sets state to its id', function () {
     }
   });
 
-  const input = this.wrapper.find('#graders').last().getDOMNode();
+  const input = this.wrapper.find('#graders').last().instance();
   input.click();
 
   const graderNames = this.graders.map(grader => (grader.name));
@@ -367,7 +367,7 @@ test('selecting a student from options sets state to its id', function () {
     }
   });
 
-  const input = this.wrapper.find('#students').last().getDOMNode();
+  const input = this.wrapper.find('#students').last().instance();
   input.click();
 
   const studentNames = this.students.map(student => (student.name));
@@ -385,7 +385,7 @@ test('selecting an assignment from options sets state to its id', function () {
     }
   });
 
-  const input = this.wrapper.find('#assignments').last().getDOMNode();
+  const input = this.wrapper.find('#assignments').last().instance();
   input.click();
 
   const assignmentNames = this.assignments.map(assignment => (assignment.name));
@@ -403,7 +403,7 @@ test('selecting an assignment from options clears options for assignments', func
     }
   });
 
-  const input = this.wrapper.find('#assignments').last().getDOMNode();
+  const input = this.wrapper.find('#assignments').last().instance();
   input.click();
 
   const assignmentNames = this.assignments.map(assignment => (assignment.name));
@@ -422,7 +422,7 @@ test('selecting a grader from options clears options for graders', function () {
     }
   });
 
-  const input = this.wrapper.find('#graders').last().getDOMNode();
+  const input = this.wrapper.find('#graders').last().instance();
   input.click();
 
   const graderNames = this.graders.map(grader => (grader.name));
@@ -441,7 +441,7 @@ test('selecting a student from options clears options for students', function ()
     }
   });
 
-  const input = this.wrapper.find('#students').last().getDOMNode();
+  const input = this.wrapper.find('#students').last().instance();
   input.click();
 
   const studentNames = this.students.map(student => (student.name));
@@ -460,7 +460,7 @@ test('no search records found for students results in a message instead', functi
     }
   });
 
-  this.wrapper.find('#students').last().getDOMNode().click();
+  this.wrapper.find('#students').last().instance().click();
 
   const noRecords = [...document.getElementsByTagName('span')].find(
                       span => span.textContent === 'No students with that name found'
@@ -478,7 +478,7 @@ test('no search records found for graders results in a message instead', functio
     }
   });
 
-  this.wrapper.find('#graders').last().getDOMNode().click();
+  this.wrapper.find('#graders').last().instance().click();
 
   const noRecords = [...document.getElementsByTagName('span')].find(
                       span => span.textContent === 'No graders with that name found'
@@ -496,7 +496,7 @@ test('no search records found for assignments results in a message instead', fun
     }
   });
 
-  this.wrapper.find('#assignments').last().getDOMNode().click();
+  this.wrapper.find('#assignments').last().instance().click();
 
   const noRecords = [...document.getElementsByTagName('span')].find(
                       span => span.textContent === 'No assignments with that name found'

@@ -140,7 +140,7 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
   }
 
   function getTextInput() {
-    return wrapper.find('input').at(0).getDOMNode()
+    return wrapper.find('input').at(0).instance()
   }
 
   function clickInputToOpenMenu() {
@@ -226,7 +226,7 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
 
   function setInputText(value) {
     const input = wrapper.find('input[type="text"]')
-    input.at(0).getDOMNode().value = value
+    input.at(0).instance().value = value
     input.simulate('change', {target: {value}})
   }
 

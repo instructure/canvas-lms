@@ -184,6 +184,6 @@ QUnit.module('GradeSummary Grid', suiteHooks => {
     mountComponent()
     const [ref] = props.horizontalScrollRef.lastCall.args
     const grid = wrapper.find('.GradesGrid').at(0)
-    strictEqual(ref, grid.getDOMNode())
+    strictEqual(ref, grid.instance())
   })
 })

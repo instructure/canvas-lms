@@ -102,7 +102,7 @@ test('trigger is focused', function () {
   const props = defaultProps();
   const wrapper = mount(<ViewOptionsMenu {...props} />, { attachTo: document.getElementById('fixtures') });
   wrapper.instance().focus();
-  equal(document.activeElement, wrapper.find('button').getDOMNode());
+  equal(document.activeElement, wrapper.find('button').instance());
   wrapper.unmount();
 });
 

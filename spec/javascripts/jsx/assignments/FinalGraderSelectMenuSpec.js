@@ -32,7 +32,7 @@ QUnit.module('FinalGraderSelectMenu', hooks => {
     return selectMenu()
       .find('option')
       .map(option => {
-        const $option = option.getDOMNode()
+        const $option = option.instance()
         return {
           hidden: $option.hidden,
           selected: $option.selected,

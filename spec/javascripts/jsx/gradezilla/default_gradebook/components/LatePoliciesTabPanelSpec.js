@@ -210,13 +210,13 @@ QUnit.module('LatePoliciesTabPanel: missing submission deduction input', {
 
 test('enables the missing deduction input if the missing deduction checkbox is checked', function () {
   this.wrapper = mountComponent();
-  notOk(missingDeductionInput(this.wrapper).getDOMNode().getAttribute('aria-disabled'));
+  notOk(missingDeductionInput(this.wrapper).instance().getAttribute('aria-disabled'));
 });
 
 test('disables the missing deduction input if the missing deduction checkbox is unchecked', function () {
   const data = { ...latePolicyData, missingSubmissionDeductionEnabled: false };
   this.wrapper = mountComponent({ data });
-  ok(missingDeductionInput(this.wrapper).getDOMNode().getAttribute('aria-disabled'));
+  ok(missingDeductionInput(this.wrapper).instance().getAttribute('aria-disabled'));
 });
 
 test('calls the changeLatePolicy function with a new deduction when the missing submission ' +
@@ -259,7 +259,7 @@ test('does not allow entering negative numbers for missing submission deduction'
   const input = missingDeductionInput(this.wrapper);
   input.simulate('change', { target: { value: '-0.1' } });
   deepEqual(changeLatePolicy.getCall(0).args[0].changes, {});
-  strictEqual(input.getDOMNode().value, '100');
+  strictEqual(input.instance().value, '100');
 });
 
 test('calls the changeLatePolicy function with a validationError if the missing submission ' +
@@ -355,12 +355,12 @@ QUnit.module('LatePoliciesTabPanel: late submission deduction input', {
 test('disables the late deduction input if the late deduction checkbox is unchecked', function () {
   const data = { ...latePolicyData, lateSubmissionDeductionEnabled: false };
   this.wrapper = mountComponent({ data });
-  ok(lateDeductionInput(this.wrapper).getDOMNode().getAttribute('aria-disabled'));
+  ok(lateDeductionInput(this.wrapper).instance().getAttribute('aria-disabled'));
 });
 
 test('enables the late deduction input if the late deduction checkbox is checked', function () {
   this.wrapper = mountComponent();
-  notOk(lateDeductionInput(this.wrapper).getDOMNode().getAttribute('aria-disabled'));
+  notOk(lateDeductionInput(this.wrapper).instance().getAttribute('aria-disabled'));
 });
 
 test('calls the changeLatePolicy function with a new deduction when the late submission ' +
@@ -405,7 +405,7 @@ test('does not allow entering negative numbers for late submission deduction', f
   this.wrapper = mountComponent();
   const input = lateDeductionInput(this.wrapper);
   input.simulate('change', { target: { value: '-0.1' } });
-  strictEqual(input.getDOMNode().value, '0')
+  strictEqual(input.instance().value, '0')
 });
 
 test('calls the changeLatePolicy function with a validationError if the late submission ' +
@@ -447,12 +447,12 @@ QUnit.module('LatePoliciesTabPanel: late submission deduction interval select', 
 test('disables the late deduction interval select if the late deduction checkbox is unchecked', function () {
   const data = { ...latePolicyData, lateSubmissionDeductionEnabled: false };
   this.wrapper = mountComponent({ data });
-  ok(lateDeductionIntervalSelect(this.wrapper).getDOMNode().getAttribute('aria-disabled'));
+  ok(lateDeductionIntervalSelect(this.wrapper).instance().getAttribute('aria-disabled'));
 });
 
 test('enables the late deduction interval select if the late deduction checkbox is checked', function () {
   this.wrapper = mountComponent();
-  notOk(lateDeductionIntervalSelect(this.wrapper).getDOMNode().getAttribute('aria-disabled'));
+  notOk(lateDeductionIntervalSelect(this.wrapper).instance().getAttribute('aria-disabled'));
 });
 
 test('calls the changeLatePolicy function with a new deduction interval when the late ' +
@@ -570,7 +570,7 @@ test('does not allow entering negative numbers for late submission minimum perce
   this.wrapper = mountComponent();
   const input = lateSubmissionMinimumPercentInput(this.wrapper);
   input.simulate('change', { target: { value: '-0.1' } });
-  strictEqual(input.getDOMNode().value, '0');
+  strictEqual(input.instance().value, '0');
 });
 
 test('calls the changeLatePolicy function with a validationError if the late submission ' +

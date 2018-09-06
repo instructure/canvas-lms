@@ -37,7 +37,7 @@ QUnit.module('GraderNamesVisibleToFinalGraderCheckbox', hooks => {
   }
 
   function formField() {
-    return wrapper.find('input[name="grader_names_visible_to_final_grader"][type="hidden"]').at(0).getDOMNode()
+    return wrapper.find('input[name="grader_names_visible_to_final_grader"][type="hidden"]').at(0).instance()
   }
 
   test('renders a checkbox', () => {
@@ -47,13 +47,13 @@ QUnit.module('GraderNamesVisibleToFinalGraderCheckbox', hooks => {
 
   test('renders an unchecked checkbox when passed checked: false', () => {
     mountComponent()
-    strictEqual(checkbox().at(0).getDOMNode().checked, false)
+    strictEqual(checkbox().at(0).instance().checked, false)
   })
 
   test('renders a checked checkbox when passed checked: true', () => {
     props.checked = true
     mountComponent()
-    strictEqual(checkbox().at(0).getDOMNode().checked, true)
+    strictEqual(checkbox().at(0).instance().checked, true)
   })
 
   test('sets the value of the form input to "false" when passed checked: false', () => {
