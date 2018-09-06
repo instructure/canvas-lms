@@ -52,6 +52,7 @@ gem "aws-sdk-sns", '1.1.0', require: false
 gem "aws-sdk-sqs", '1.3.0', require: false
 gem "aws-sdk-core", "3.22.0", require: false
 gem "aws-sigv4", "1.0.2", require: false
+gem "aws-sdk-kms", "1.7.0", require: false
 
 gem 'barby', '0.6.5', require: false
   gem 'rqrcode', '0.10.1', require: false
