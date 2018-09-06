@@ -34,7 +34,7 @@ class Gradezilla
       end
 
       def status_radio_button(type)
-        fj("label[data-reactid*='#{type}']")
+        fj(".SubmissionTray__RadioInput label:contains('#{type}')")
       end
 
       def status_radio_button_input(type)

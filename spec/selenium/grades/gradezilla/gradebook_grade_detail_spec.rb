@@ -60,7 +60,7 @@ describe 'Grade Detail Tray:' do
 
     it 'updates status when excused-option is selected', priority: "1", test_id: 3337207 do
       Gradezilla::Cells.open_tray(@course.students.first, @a2)
-      Gradezilla::GradeDetailTray.change_status_to('excused')
+      Gradezilla::GradeDetailTray.change_status_to('Excused')
 
       excuse_status = @course.students.first.submissions.find_by(assignment_id:@a2.id).excused
 
@@ -69,7 +69,7 @@ describe 'Grade Detail Tray:' do
 
     it 'updates status when none-option is selected', priority: "2", test_id: 3337208 do
       Gradezilla::Cells.open_tray(@course.students.first, @a2)
-      Gradezilla::GradeDetailTray.change_status_to('none')
+      Gradezilla::GradeDetailTray.change_status_to('None')
 
       late_policy_status = @course.students.first.submissions.find_by(assignment_id:@a2.id).late_policy_status
 
