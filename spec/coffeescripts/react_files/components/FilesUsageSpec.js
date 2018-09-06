@@ -27,7 +27,7 @@ QUnit.module('FilesUsage#update', {
     this.server = sinon.fakeServer.create()
     this.filesUsage = TestUtils.renderIntoDocument(<FilesUsage {...props} />)
     test()
-    ReactDOM.unmountComponentAtNode(this.filesUsage.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.filesUsage).parentNode)
     return this.server.restore()
   }
 })

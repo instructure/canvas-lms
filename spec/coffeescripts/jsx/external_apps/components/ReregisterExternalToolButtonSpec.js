@@ -32,9 +32,7 @@ const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
 
 const getDOMNodes = function(data) {
   const component = renderComponent(data)
-  const btnTriggerReregister =
-    component.refs.reregisterExternalToolButton &&
-    component.refs.reregisterExternalToolButton.getDOMNode()
+  const btnTriggerReregister = component.refs.reregisterExternalToolButton
   return [component, btnTriggerReregister]
 }
 
