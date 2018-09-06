@@ -88,7 +88,7 @@ QUnit.module('SelectMenuGroup', function (suiteHooks) {
   test('disables the student select menu if the course select menu has changed', function () {
     wrapper = mount(<SelectMenuGroup {...props} />);
     wrapper.find('#course_select_menu').last().simulate('change', { target: { value: '14' } });
-    const menu = wrapper.find('#student_select_menu').last().getDOMNode();
+    const menu = wrapper.find('#student_select_menu').last().instance();
     strictEqual(menu.getAttribute('aria-disabled'), 'true');
   });
 
@@ -161,7 +161,7 @@ QUnit.module('SelectMenuGroup', function (suiteHooks) {
   test('disables the assignment sort order select menu if the course select menu has changed', function () {
     wrapper = mount(<SelectMenuGroup {...props} />);
     wrapper.find('#course_select_menu').last().simulate('change', { target: { value: '14' } });
-    const menu = wrapper.find('#assignment_sort_order_select_menu').last().getDOMNode();
+    const menu = wrapper.find('#assignment_sort_order_select_menu').last().instance();
     strictEqual(menu.getAttribute('aria-disabled'), 'true');
   });
 
@@ -172,14 +172,14 @@ QUnit.module('SelectMenuGroup', function (suiteHooks) {
 
   test('disables the submit button if no select menu options have changed', function () {
     wrapper = mount(<SelectMenuGroup {...props} />);
-    const submitButton = wrapper.find('#apply_select_menus').last().getDOMNode();
+    const submitButton = wrapper.find('#apply_select_menus').last().instance();
     strictEqual(submitButton.getAttribute('aria-disabled'), 'true');
   });
 
   test('enables the submit button if a select menu options is changed', function () {
     wrapper = mount(<SelectMenuGroup {...props} />);
     wrapper.find('#student_select_menu').last().simulate('change', { target: { value: '7' } });
-    const submitButton = wrapper.find('#apply_select_menus').last().getDOMNode();
+    const submitButton = wrapper.find('#apply_select_menus').last().instance();
     strictEqual(submitButton.getAttribute('aria-disabled'), null);
   });
 
@@ -188,7 +188,7 @@ QUnit.module('SelectMenuGroup', function (suiteHooks) {
     wrapper.find('#student_select_menu').last().simulate('change', { target: { value: '7' } });
     const submitButton = wrapper.find('#apply_select_menus').last();
     submitButton.simulate('click');
-    strictEqual(submitButton.getDOMNode().getAttribute('aria-disabled'), 'true');
+    strictEqual(submitButton.instance().getAttribute('aria-disabled'), 'true');
   });
 
   test('calls saveAssignmentOrder when the button is clicked, if assignment order has changed', function () {
