@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-import canvasTheme from '@instructure/ui-themes/lib/canvas'
+import canvasBaseTheme from '@instructure/ui-themes/lib/canvas/base'
+import canvasHighContrastTheme from '@instructure/ui-themes/lib/canvas/high-contrast'
 import moment from 'moment'
 import tz from 'timezone_core'
 import './fakeRequireJSFallback'
@@ -48,8 +48,8 @@ if (process.env.NODE_ENV !== 'production' && process.env.DEPRECATION_SENTRY_DSN)
 
 // setup the inst-ui default theme
 if (ENV.use_high_contrast) {
-  canvasTheme.use({ accessible: true })
+  canvasHighContrastTheme.use()
 } else {
   const brandvars = window.CANVAS_ACTIVE_BRAND_VARIABLES || {}
-  canvasTheme.use({ overrides: brandvars })
+  canvasBaseTheme.use({ overrides: brandvars })
 }

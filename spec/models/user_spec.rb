@@ -3075,4 +3075,17 @@ describe User do
       end
     end
   end
+
+  describe 'generate_observer_pairing_code' do
+    before(:once) do
+      course_with_student
+    end
+
+    it 'doesnt create overlapping active codes' do
+      allow(SecureRandom).to receive(:base64).and_return('abc123', 'abc123', '123abc')
+      @student.generate_observer_pairing_code
+      pairing_code = @student.generate_observer_pairing_code
+      expect(pairing_code.code).to eq '123abc'
+    end
+  end
 end

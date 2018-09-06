@@ -86,6 +86,23 @@ Delayed::Worker.on_max_failures = proc do |job, err|
   err.is_a?(Delayed::Backend::RecordNotFound)
 end
 
+module DelayedJobConfig
+  class << self
+    def config
+      @config ||= YAML.load(Canvas::DynamicSettings.find(tree: :private)['delayed_jobs.yml'] || '{}')
+    end
+
+    def strands_to_send_to_statsd
+      @strands_to_send_to_statsd ||= (config['strands_to_send_to_statsd'] || []).to_set
+    end
+
+    def reload
+      @config = @strands_to_send_to_statsd = nil
+    end
+    Canvas::Reloader.on_reload { DelayedJobConfig.reload }
+  end
+end
+
 ### lifecycle callbacks
 
 Delayed::Pool.on_fork = ->{
@@ -116,15 +133,16 @@ Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
   end
   method_tag ||= "unknown"
   shard_id = job.current_shard.try(:id).to_i
+  strand = job.strand && DelayedJobConfig.strands_to_send_to_statsd.include?(job.strand) && job.strand.gsub('/', '-')
   stats = ["delayedjob.queue", "delayedjob.queue.tag.#{obj_tag}.#{method_tag}", "delayedjob.queue.shard.#{shard_id}"]
   stats << "delayedjob.queue.jobshard.#{job.shard.id}" if job.respond_to?(:shard)
-  stats << "delayedjob.queue.strand.#{job.strand}" if job.strand
+  stats << "delayedjob.queue.strand.#{strand}" if strand
   CanvasStatsd::Statsd.timing(stats, lag)
 
   begin
     stats = ["delayedjob.perform", "delayedjob.perform.tag.#{obj_tag}.#{method_tag}", "delayedjob.perform.shard.#{shard_id}"]
     stats << "delayedjob.perform.jobshard.#{job.shard.id}" if job.respond_to?(:shard)
-    stats << "delayedjob.perform.strand.#{job.strand}" if job.strand
+    stats << "delayedjob.perform.strand.#{strand}" if strand
     CanvasStatsd::Statsd.time(stats) do
       block.call(worker, job)
     end
