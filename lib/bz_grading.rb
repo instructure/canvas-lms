@@ -58,7 +58,7 @@ class BZGrading
   end
 
   def find_module_item_id(course_id, wiki_page_name)
-    page = WikiPage.where(:url => wiki_page_name)
+    pages = WikiPage.where(:title => wiki_page_name)
     tag = nil
     pages.each do |page| # Don't know which WikiPage is from this course, need to lookup the ContentTag for each to find the association
       tag = ContentTag.where(:content_id => page.id, :context_id => course_id, :context_type => 'Course', :content_type => 'WikiPage').first
