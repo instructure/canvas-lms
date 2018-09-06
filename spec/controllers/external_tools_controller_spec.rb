@@ -917,7 +917,6 @@ describe ExternalToolsController do
             name: 'tool name',
             consumer_key: consumer_key,
             shared_secret: shared_secret,
-            verify_uniqueness: 'true',
             config_type: 'by_xml',
             config_xml: xml,
             developer_key_id: developer_key.id

@@ -63,7 +63,9 @@ describe ContextExternalTool do
 
   describe '#duplicated_in_context?' do
     shared_examples_for 'detects duplication in contexts' do
+      subject { second_tool.duplicated_in_context? }
       let(:context) { raise 'Override in spec' }
+      let(:second_tool) { tool.dup }
       let(:settings) do
         {
           "editor_button" => {
@@ -79,33 +81,70 @@ describe ContextExternalTool do
         ContextExternalTool.create!(
           settings: settings,
           context: context,
-          name: 'test tool',
+          name: 'first tool',
           consumer_key: 'key',
           shared_secret: 'secret',
           url: 'http://www.tool.com/launch'
         )
       end
 
-      it 'returns true if tool with matching settings if found' do
-        second_tool = tool.dup
-        expect(second_tool.duplicated_in_context?).to eq true
+      context 'when url is not set' do
+        let(:domain) { 'instructure.com' }
+
+        before { tool.update!(url: nil, domain: domain) }
+
+        context 'when no other tools are installed in the context' do
+          it 'does not count as duplicate' do
+            expect(tool.duplicated_in_context?).to eq false
+          end
+        end
+
+        context 'when a tool with matching domain is found' do
+          it { is_expected.to eq true }
+        end
+
+        context 'when a tool with matching domain is found in different context' do
+          before { second_tool.update!(context: course_model) }
+
+          it { is_expected.to eq false }
+        end
+
+        context 'when a tool with matching domain is not found' do
+          before { second_tool.domain = 'different-domain.com' }
+
+          it { is_expected.to eq false }
+        end
       end
 
-      it 'returns true if settings is blank and url matches' do
-        tool.update_attributes!(settings: {})
-        second_tool = tool.dup
-        expect(second_tool.duplicated_in_context?).to eq true
+      context 'when no other tools are installed in the context' do
+        it 'does not count as duplicate' do
+          expect(tool.duplicated_in_context?).to eq false
+        end
       end
 
-      it 'returns false if tool with matching settings is not found' do
-        expect(tool.duplicated_in_context?).to eq false
+      context 'when a tool with matching settings and different URL is found' do
+        before { second_tool.url << '/different/url' }
+
+        it { is_expected.to eq false }
       end
 
-      it 'returns false if settings is blank and url does not match' do
-        tool.update_attributes!(settings: {})
-        second_tool = tool.dup
-        second_tool.url = 'http://www.test.com/a-different-url'
-        expect(second_tool.duplicated_in_context?).to eq false
+      context 'when a tool with different settings and matching URL is found' do
+        before { second_tool.settings[:different_key] = 'different value' }
+
+        it { is_expected.to eq true }
+      end
+
+      context 'when a tool with different settings and different URL is found' do
+        before do
+          second_tool.url << '/different/url'
+          second_tool.settings[:different_key] = 'different value'
+        end
+
+        it { is_expected.to eq false }
+      end
+
+      context 'when a tool with matching settings and matching URL is found' do
+        it { is_expected.to eq true }
       end
     end
 
@@ -396,6 +435,19 @@ describe ContextExternalTool do
       @tool = @root_account.context_external_tools.create!(:name => "e", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @found_tool = ContextExternalTool.find_external_tool("http://www.google.com/", Course.find(@course.id))
       expect(@found_tool).to eql(@tool)
+    end
+
+    context 'when exclude_tool_id is set' do
+      subject { ContextExternalTool.find_external_tool("http://www.google.com", Course.find(course.id), nil, exclude_tool.id) }
+
+      let(:course) { @course }
+      let(:exclude_tool) do
+        course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      end
+
+      it 'should not return the excluded tool' do
+        expect(subject).to be_nil
+      end
     end
 
     context 'preferred_tool_id' do
