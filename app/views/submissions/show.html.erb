@@ -121,7 +121,8 @@
             </span>
           <% end %>
         <% end %>
-        <% elsif @submission.can_view_plagiarism_report('vericite', @current_user, session) && !@assignment.muted? %>
+        <% end %>
+        <% if @submission.can_view_plagiarism_report('vericite', @current_user, session) && !@assignment.muted? %>
           <% if (vericite_score = @submission.vericite_data(true)[@submission.asset_string]) && @submission.turnitin_data[:provider] == :vericite && vericite_score[:similarity_score] %>
             <span class="turnitin_score_container">
               <span class="vericite_score_container_caret <%= vericite_score[:state] %>_score"></span>

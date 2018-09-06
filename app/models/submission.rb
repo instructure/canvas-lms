@@ -482,12 +482,14 @@ class Submission < ActiveRecord::Base
   end
 
   def can_view_plagiarism_report(type, user, session)
-    if(type == "vericite")
+    if type == "vericite"
+      return false unless self.vericite_data_hash[:provider].to_s == "vericite"
       plagData = self.vericite_data_hash
       @submit_to_vericite = false
       settings = assignment.vericite_settings
       type_can_peer_review = true
     else
+      return false unless self.turnitin_data[:provider].to_s != "vericite"
       plagData = self.turnitin_data
       @submit_to_turnitin = false
       settings = assignment.turnitin_settings

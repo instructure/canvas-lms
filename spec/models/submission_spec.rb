@@ -2511,6 +2511,87 @@ describe Submission do
     end
   end
 
+  describe "'view_turnitin_report' right" do
+    let(:teacher) do
+      user = User.create
+      @context.enroll_teacher(user)
+      user
+    end
+
+    before :once do
+      @assignment.update!(submission_types: "online_upload,online_text_entry")
+
+      @submission = @assignment.submit_homework(@user, {body: "hello there", submission_type: 'online_text_entry'})
+      @submission.turnitin_data = {
+        "submission_#{@submission.id}" => {
+          web_overlap: 92,
+          error: true,
+          publication_overlap: 0,
+          state: "failure",
+          object_id: "123456789",
+          student_overlap: 90,
+          similarity_score: 92
+        }
+      }
+      @submission.save!
+    end
+
+    it "is available when the plagiarism report is from turnitin" do
+      expect(@submission).to be_grants_right(teacher, nil, :view_turnitin_report)
+    end
+
+    it "is available when the plagiarism report is blank (defaults to turnitin)" do
+      @submission.turnitin_data.delete(:provider)
+      expect(@submission).to be_grants_right(teacher, nil, :view_turnitin_report)
+    end
+
+    it "is not available when the plagiarism report is from vericite" do
+      @submission.turnitin_data[:provider] = 'vericite'
+      expect(@submission).not_to be_grants_right(teacher, nil, :view_turnitin_report)
+    end
+  end
+
+  describe "'view_vericite_report' right" do
+    let(:teacher) do
+      user = User.create
+      @context.enroll_teacher(user)
+      user
+    end
+
+    before :once do
+      @assignment.update!(submission_types: "online_upload,online_text_entry")
+
+      @submission = @assignment.submit_homework(@user, {body: "hello there", submission_type: 'online_text_entry'})
+      @submission.turnitin_data = {
+        "submission_#{@submission.id}" => {
+          web_overlap: 92,
+          error: true,
+          publication_overlap: 0,
+          state: "failure",
+          object_id: "123456789",
+          student_overlap: 90,
+          similarity_score: 92
+        },
+        provider: 'vericite'
+      }
+      @submission.save!
+    end
+
+    it "is available when the plagiarism report is from vericite" do
+      expect(@submission).to be_grants_right(teacher, nil, :view_vericite_report)
+    end
+
+    it "is not available when the plagiarism report is from turnitin" do
+      @submission.turnitin_data[:provider] = 'turnitin'
+      expect(@submission).not_to be_grants_right(teacher, nil, :view_vericite_report)
+    end
+
+    it "is not available when the plagiarism report is blank (defaults to turnitin)" do
+      @submission.turnitin_data.delete(:provider)
+      expect(@submission).not_to be_grants_right(teacher, nil, :view_vericite_report)
+    end
+  end
+
   context '#external_tool_url' do
     let(:submission) { Submission.new }
     let(:lti_submission) { @assignment.submit_homework @user, submission_type: 'basic_lti_launch', url: 'http://www.example.com' }
