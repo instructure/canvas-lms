@@ -53,10 +53,6 @@ class Gradezilla
         fj("label:contains('Days late')")
       end
 
-      def close_tray_X
-        fj("button[data-reactid*='closeButton']")
-      end
-
       def late_penalty_text
         f("#late-penalty-value").text
       end
