@@ -56,7 +56,7 @@ QUnit.module('DiscussionTopicKeyboardShortcutModal#render', {
     return $('#fixtures').append('<div id="application" />')
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.component.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.component).parentNode)
     $('#fixtures').empty()
   }
 })
