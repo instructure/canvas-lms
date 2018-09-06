@@ -171,7 +171,7 @@ describe "better_file_browsing" do
 
     it "should display course files", priority: "1", test_id: 270032 do
       get "/courses/#{public_course.id}/files"
-      expect(f('div.ef-main[data-reactid]')).to be_displayed
+      expect(f('.ef-main')).to be_displayed
     end
   end
 
