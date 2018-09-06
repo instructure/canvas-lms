@@ -23,10 +23,19 @@ QUnit.module('Date Picker Format Spec')
 
 test('formats medium with weekday correcly', () => {
   const format = datePickerFormat(I18n.t('#date.formats.medium_with_weekday'))
-  equal(format, 'D M d, yy')
+  equal(format, "D M d',' yy")
 })
 
 test('formats medium correctly', () => {
   const format = datePickerFormat(I18n.t('#date.formats.medium'))
-  equal(format, 'M d, yy')
+  equal(format, "M d',' yy")
+})
+
+test('escapes literal strings with single quotes', () => {
+  const format1 = datePickerFormat('%d de %b de %Y')
+  equal(format1, "d 'de' M 'de' yy")
+  const format2 = datePickerFormat('%-d de %b de %Y')
+  equal(format2, "d 'de' M 'de' yy")
+  const format3 = datePickerFormat('%d de %b de')
+  equal(format3, "d 'de' M 'de'")
 })

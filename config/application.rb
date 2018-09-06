@@ -121,6 +121,8 @@ module CanvasRails
       app.config.middleware.insert_before(Rack::MethodOverride, PreventNonMultipartParse)
     end
 
+    config.i18n.load_path << Rails.root.join('config', 'locales', 'locales.yml')
+
     config.to_prepare do
       require_dependency 'canvas/plugins/default_plugins'
       ActiveSupport::JSON::Encoding.escape_html_entities_in_json = true
