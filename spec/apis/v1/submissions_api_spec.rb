@@ -1741,7 +1741,7 @@ describe 'Submissions API', type: :request do
       @provisional_grade.save!
     end
 
-    context "when teacher has moderate_grades rights" do
+    context "when teacher can view provisional grades" do
       it "displays grades" do
         json = api_call(:get,
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json",
@@ -1791,7 +1791,7 @@ describe 'Submissions API', type: :request do
       end
     end
 
-    context "when a TA does not have moderate_grades rights" do
+    context "when a TA cannot view provisional grades" do
       before do
         course_with_ta(course: @course)
         user_session(@ta)

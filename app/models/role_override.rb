@@ -608,12 +608,6 @@ class RoleOverride < ActiveRecord::Base
         'AccountAdmin'
       ]
      },
-    :moderate_grades => {
-      :label => -> { t('Moderate Grades') },
-      :label_v2 => -> { t('Grades - moderate') },
-      :true_for => %w(AccountAdmin TeacherEnrollment),
-      :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment)
-     },
     :view_all_grades => {
       :label => lambda { t('permissions.view_all_grades', "View all grades") },
       :label_v2 => lambda { t("Grades - view all grades") },
