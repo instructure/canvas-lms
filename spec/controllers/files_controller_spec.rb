@@ -1377,13 +1377,6 @@ describe FilesController do
             assert_status(201)
           end
 
-          it 'should send a successful email' do
-            expect(homework_service).to receive(:successful_email)
-            request
-
-            expect(progress.reload.workflow_state).to eq 'completed'
-          end
-
           it 'should send a failure email' do
             allow(homework_service).to receive(:submit).and_raise('error')
             expect(homework_service).to receive(:failure_email)
