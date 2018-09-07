@@ -39,7 +39,7 @@ QUnit.module('CourseListSpec', {
 test('render', function() {
   let CourseListElement = <CourseList courses={{}} />
   let component = TestUtils.renderIntoDocument(CourseListElement)
-  let node = component.getDOMNode()
+  let node = ReactDOM.findDOMNode(component)
   equal(node.querySelectorAll('li').length, 0, 'should not render list items')
   ReactDOM.unmountComponentAtNode(node.parentNode)
   CourseListElement = <CourseList courses={this.props} />
