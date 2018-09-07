@@ -105,6 +105,6 @@ test('does not populates the key test_cluster_only without ENV set', () => {
 test('populates the key test_cluster_only', () => {
   fakeENV.setup({ enableTestClusterChecks: true })
   const input = formFieldOfTypeAndName(developerKey, 'input', 'test_cluster_only')
-  equal(input.defaultChecked, developerKey.test_cluster_only)
+  equal(input.checked, developerKey.test_cluster_only)
   fakeENV.teardown()
 })
