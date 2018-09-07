@@ -160,6 +160,7 @@
     "istanbul-instrumenter-loader": "^3",
     "istanbul-merge": "^1.1.1",
     "jest": "^23",
+    "jest-canvas-mock": "^1",
     "jest-junit": "^5",
     "jest-localstorage-mock": "^2",
     "json-loader": "^0.5.7",
@@ -239,10 +240,8 @@
     "jquery": "https://github.com/ryankshaw/jquery.git#a755a3e9c99d5a70d8ea570836f94ae1ba56046d",
     "canvas-rce/**/babel-helper-evaluate-path": "0.4.1",
     "canvas-quizzes/grunt-contrib-jasmine/jasmine-core": "2.6.4",
-    "graphael": "this is just here so yarn.lock looks the same whether the analytics plugin is checked out or not",
     "graphael": "https://github.com/ryankshaw/graphael.git",
     "karma": "2.0.2",
-    "node-sass": "if we let node-sass upgrade to recent versions, it causes: SIS-3125",
     "node-sass": "4.7.2"
   }
 }

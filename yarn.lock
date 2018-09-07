@@ -8734,6 +8734,10 @@ jasmine_xhr@1.0.2:
   dependencies:
     sinon "^1.10.3"
 
+jest-canvas-mock@^1:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/jest-canvas-mock/-/jest-canvas-mock-1.1.0.tgz#f6ed0998b6be3ae2b7e095d7173441ae62cc831e"
+
 jest-changed-files@^23.2.0:
   version "23.2.0"
   resolved "https://registry.yarnpkg.com/jest-changed-files/-/jest-changed-files-23.2.0.tgz#a145a6e4b66d0129fc7c99cee134dc937a643d9c"

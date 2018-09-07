@@ -103,6 +103,7 @@
     "identity-obj-proxy": "^3.0.0",
     "lint-staged": "^7",
     "jest": "^23",
+    "jest-canvas-mock": "^1",
     "mockdate": "^2.0.2",
     "moxios": "^0.4.0",
     "npm-run-all": "^4",

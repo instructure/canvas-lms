@@ -13,6 +13,7 @@ module.exports = {
   reporters: [ "default", "jest-junit" ],
   setupFiles: [
     'jest-localstorage-mock',
+    'jest-canvas-mock',
     '<rootDir>/jest/jest-setup.js'
   ],
   testMatch: [

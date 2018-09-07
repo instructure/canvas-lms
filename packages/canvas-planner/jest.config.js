@@ -25,6 +25,7 @@ module.exports = {
     'enzyme-to-json/serializer'
   ],
   setupFiles: [
+    'jest-canvas-mock',
     './jest-env.js'
   ],
   testPathIgnorePatterns: [
