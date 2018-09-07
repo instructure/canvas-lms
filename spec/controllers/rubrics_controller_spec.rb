@@ -165,6 +165,60 @@ describe RubricsController do
     end
   end
 
+  describe "POST 'create' for assignment" do
+    describe 'AnonymousOrModerationEvent creation for auditable assignments' do
+      let(:course) { Course.create! }
+      let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
+      let(:assignment) { course.assignments.create!(anonymous_grading: true) }
+
+      let(:association_params) do
+        {association_id: assignment.id, association_type: 'Assignment'}
+      end
+
+      let(:rubric_params) do
+        {
+          criteria: {"0" => { description: 'ok', points: 5 }},
+          points_possible: 10,
+          title: 'hi'
+        }
+      end
+
+      let(:request_params) do
+        {course_id: course.id, rubric_association: association_params, rubric: rubric_params}
+      end
+
+      let(:last_created_event) { AnonymousOrModerationEvent.where(event_type: 'rubric_created').last }
+
+      before(:each) do
+        user_session(teacher)
+      end
+
+      it 'records a rubric_created event for the assignment' do
+        expect {
+          post('create', params: request_params)
+        }.to change {
+          AnonymousOrModerationEvent.where(event_type: 'rubric_created', assignment: assignment).count
+        }.by(1)
+      end
+
+      it 'includes the ID of the newly-created rubric in the payload' do
+        post('create', params: request_params)
+        # (since we don't have a specific ID to match against)
+        expect(last_created_event.payload['id']).to be > 0
+      end
+
+      it 'includes the updating user on the event' do
+        post('create', params: request_params)
+        expect(last_created_event.user_id).to eq teacher.id
+      end
+
+      it 'includes the associated assignment on the event' do
+        post('create', params: request_params)
+        expect(last_created_event.assignment_id).to eq assignment.id
+      end
+    end
+  end
+
   describe "PUT 'update'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -562,6 +616,39 @@ describe RubricsController do
       expect(@course.rubric_associations.bookmarked.include_rubric.to_a.select(&:rubric_id).uniq(&:rubric_id).sort_by{|a| a.rubric.title }.map(&:rubric)).to eq []
       @rubric.reload
       expect(@rubric.deleted?).to be_falsey
+    end
+
+    context 'when associated with an auditable assignment' do
+      let(:course) { Course.create! }
+      let(:assignment) { course.assignments.create!(anonymous_grading: true) }
+      let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
+      let(:rubric) { Rubric.create!(title: 'aaa', context: course) }
+
+      before(:each) do
+        rubric.update_with_association(
+          teacher,
+          {},
+          course,
+          association_object: assignment,
+          purpose: 'grading'
+        )
+        user_session(teacher)
+      end
+
+      it 'creates an AnonymousOrModerationEvent capturing the deletion' do
+        expect {
+          delete('destroy', params: {course_id: course.id, id: rubric.id})
+        }.to change {
+          AnonymousOrModerationEvent.where(event_type: 'rubric_deleted', assignment: assignment, user: teacher).count
+        }.by(1)
+      end
+
+      it 'includes the removed rubric in the event payload' do
+        delete('destroy', params: {course_id: course.id, id: rubric.id})
+
+        event = AnonymousOrModerationEvent.find_by(event_type: 'rubric_deleted', assignment: assignment, user: teacher)
+        expect(event.payload['id']).to eq rubric.id
+      end
     end
   end
 

@@ -22,6 +22,7 @@
 # The other purpose of this class is just to make rubrics reusable.
 class RubricAssociation < ActiveRecord::Base
   attr_accessor :skip_updating_points_possible
+  attr_writer :updating_user
 
   belongs_to :rubric
   belongs_to :association_object, polymorphic: [:account, :course, :assignment],
@@ -43,6 +44,8 @@ class RubricAssociation < ActiveRecord::Base
   before_save :update_old_rubric
   after_destroy :update_rubric
   after_destroy :update_alignments
+  before_save :record_save_audit_event
+  before_destroy :record_deletion_audit_event
   after_save :assert_uniqueness
   after_save :update_alignments
 
@@ -222,7 +225,14 @@ class RubricAssociation < ActiveRecord::Base
       params.delete(:use_for_grading)
       params.delete(:hide_score_total)
     end
-    association ||= rubric.associate_with(association_object, context, :use_for_grading => params[:use_for_grading] == "1", :purpose => params[:purpose], :update_if_existing => update_if_existing)
+    association ||= rubric.associate_with(
+      association_object,
+      context,
+      current_user: current_user,
+      use_for_grading: params[:use_for_grading] == "1",
+      purpose: params[:purpose],
+      update_if_existing: update_if_existing
+    )
     association.rubric = rubric
     association.context = context
     association.skip_updating_points_possible = params.delete :skip_updating_points_possible
@@ -344,5 +354,37 @@ class RubricAssociation < ActiveRecord::Base
       assessment_to_return = assessment if assessment.artifact == opts[:artifact]
     end
     assessment_to_return
+  end
+
+  private
+
+  def record_save_audit_event
+    return unless @updating_user.present? && assignment&.auditable?
+
+    existing_association = assignment.rubric_association
+    event_type = existing_association.present? ? 'rubric_updated' : 'rubric_created'
+    payload = if event_type == 'rubric_created'
+      {id: rubric_id}
+    else
+      {id: [existing_association.rubric_id, rubric_id]}
+    end
+
+    AnonymousOrModerationEvent.create!(
+      assignment: assignment,
+      event_type: event_type,
+      payload: payload,
+      user: @updating_user
+    )
+  end
+
+  def record_deletion_audit_event
+    return unless @updating_user.present? && assignment&.auditable?
+
+    AnonymousOrModerationEvent.create!(
+      assignment: assignment,
+      event_type: 'rubric_deleted',
+      payload: {id: rubric_id},
+      user: @updating_user
+    )
   end
 end

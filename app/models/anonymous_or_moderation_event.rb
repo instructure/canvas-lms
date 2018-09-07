@@ -38,6 +38,9 @@ class AnonymousOrModerationEvent < ApplicationRecord
     docviewer_strikeout_updated
     grades_posted
     provisional_grade_selected
+    rubric_created
+    rubric_deleted
+    rubric_updated
     submission_comment_created
     submission_comment_updated
     submission_comment_deleted

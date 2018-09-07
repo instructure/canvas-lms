@@ -110,12 +110,15 @@ class Rubric < ActiveRecord::Base
   # of rubrics.  The two main values for the 'purpose' field on
   # a rubric_association are 'grading' and 'bookmark'.  Confusing,
   # I know.
-  def destroy_for(context)
+  def destroy_for(context, current_user: nil)
     ras = rubric_associations.where(:context_id => context, :context_type => context.class.to_s)
     if context.class.to_s == 'Course'
       # if rubric is removed at the course level, we want to destroy any
       # assignment associations found in the context of the course
-      ras.each(&:destroy)
+      ras.each do |association|
+        association.updating_user = current_user
+        association.destroy
+      end
     else
       ras.update_all(:bookmarked => false, :updated_at => Time.now.utc)
     end
@@ -183,7 +186,11 @@ class Rubric < ActiveRecord::Base
                                    :use_for_grading => !!opts[:use_for_grading],
                                    :purpose => purpose
     ra.skip_updating_points_possible = opts[:skip_updating_points_possible] || @skip_updating_points_possible
-    ra.tap &:save
+    ra.tap do |association|
+      association.updating_user = opts[:current_user]
+      association.save
+      association.updating_user = nil
+    end
   end
 
   def update_with_association(current_user, rubric_params, context, association_params)

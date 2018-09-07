@@ -286,4 +286,84 @@ describe RubricAssociation do
       expect(assessment.hide_points).to be true
     end
   end
+
+  describe '#generate' do
+    let(:course) { Course.create! }
+    let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
+    let(:assignment) { course.assignments.create!(anonymous_grading: true) }
+    let(:rubric) { Rubric.create!(title: 'hi', context: course) }
+
+    describe 'AnonymousOrModerationEvent creation for auditable assignments' do
+      context 'when the assignment has a prior grading rubric' do
+        let(:old_rubric) { Rubric.create!(title: 'zzz', context: course) }
+        let(:last_updated_event) { AnonymousOrModerationEvent.where(event_type: 'rubric_updated').last }
+
+        before(:each) do
+          RubricAssociation.generate(
+            teacher,
+            old_rubric,
+            course,
+            association_object: assignment,
+            purpose: 'grading'
+          )
+          assignment.reload
+        end
+
+        it 'records a rubric_updated event for the assignment' do
+          expect {
+            RubricAssociation.generate(teacher, rubric, course, association_object: assignment, purpose: 'grading')
+          }.to change {
+            AnonymousOrModerationEvent.where(event_type: 'rubric_updated', assignment: assignment).count
+          }.by(1)
+        end
+
+        it 'includes the ID of the removed rubric in the payload' do
+          RubricAssociation.generate(teacher, rubric, course, association_object: assignment, purpose: 'grading')
+          expect(last_updated_event.payload['id'].first).to eq old_rubric.id
+        end
+
+        it 'includes the ID of the added rubric in the payload' do
+          RubricAssociation.generate(teacher, rubric, course, association_object: assignment, purpose: 'grading')
+          expect(last_updated_event.payload['id'].second).to eq rubric.id
+        end
+
+        it 'includes the updating user on the event' do
+          rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: 'grading')
+          expect(last_updated_event.user_id).to eq teacher.id
+        end
+
+        it 'includes the associated assignment on the event' do
+          rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: 'grading')
+          expect(last_updated_event.assignment_id).to eq assignment.id
+        end
+      end
+
+      context 'when the assignment has no prior grading rubric' do
+        let(:last_created_event) { AnonymousOrModerationEvent.where(event_type: 'rubric_created').last }
+
+        it 'records a rubric_created event for the assignment' do
+          expect {
+            rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: 'grading')
+          }.to change {
+            AnonymousOrModerationEvent.where(event_type: 'rubric_created', assignment: assignment).count
+          }.by(1)
+        end
+
+        it 'includes the ID of the added rubric in the payload' do
+          rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: 'grading')
+          expect(last_created_event.payload['id']).to eq rubric.id
+        end
+
+        it 'includes the updating user on the event' do
+          rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: 'grading')
+          expect(last_created_event.user_id).to eq teacher.id
+        end
+
+        it 'includes the associated assignment on the event' do
+          rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: 'grading')
+          expect(last_created_event.assignment_id).to eq assignment.id
+        end
+      end
+    end
+  end
 end
