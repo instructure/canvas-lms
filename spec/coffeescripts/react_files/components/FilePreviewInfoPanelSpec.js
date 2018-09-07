@@ -55,23 +55,23 @@ QUnit.module('File Preview Info Panel Specs', {
 })
 
 test('displays item name', function() {
-  equal(this.rendered.refs.displayName.props.children, 'some file', 'rendered the display name')
+  equal(this.rendered.refs.displayName.innerText, 'some file', 'rendered the display name')
 })
 
 test('displays status', function() {
-  equal(this.rendered.refs.status.props.children, 'Published', 'rendered the Status')
+  equal(this.rendered.refs.status.innerText, 'Published', 'rendered the Status')
 })
 
 test('displays content type', function() {
   equal(
-    this.rendered.refs.contentType.props.children,
+    this.rendered.refs.contentType.innerText,
     'Plain text',
     'rendered the Kind (content-type)'
   )
 })
 
 test('displays size', function() {
-  equal(this.rendered.refs.size.props.children, '1 KB', 'rendered size')
+  equal(this.rendered.refs.size.innerText, '1 KB', 'rendered size')
 })
 
 test('displays date modified', function() {
@@ -98,21 +98,21 @@ test('displays date created', function() {
 
 test('displays modifed by name with link', function() {
   equal(
-    this.rendered.refs.modifedBy.props.children.props.href,
-    'http://fun.com',
+    this.rendered.refs.modifedBy.querySelector('a').href,
+    'http://fun.com/',
     'make sure its a link to the correct place'
   )
   equal(
-    this.rendered.refs.modifedBy.props.children.props.children,
+    this.rendered.refs.modifedBy.innerText,
     'Jim Bob',
     'check that the name was inserted'
   )
 })
 
 test('displays legal copy', function() {
-  equal(this.rendered.refs.licenseName.props.children, 'best license ever', 'license name')
+  equal(this.rendered.refs.licenseName.innerText, 'best license ever', 'license name')
 })
 
 test('displays license name', function() {
-  equal(this.rendered.refs.legalCopyright.props.children, 'copycat', 'display the copyright')
+  equal(this.rendered.refs.legalCopyright.innerText, 'copycat', 'display the copyright')
 })
