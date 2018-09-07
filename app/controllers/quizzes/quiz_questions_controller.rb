@@ -278,8 +278,9 @@ class Quizzes::QuizQuestionsController < ApplicationController
 
       question_data = params[:question]&.to_unsafe_h
       question_data ||= {}
-      question_data[:question_text] = process_incoming_html_content(question_data[:question_text])
-
+      if question_data.key?(:question_text)
+        question_data[:question_text] = process_incoming_html_content(question_data[:question_text])
+      end
       if question_data[:quiz_group_id]
         @group = @quiz.quiz_groups.find(question_data[:quiz_group_id])
       end
