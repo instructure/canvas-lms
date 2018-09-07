@@ -95,7 +95,7 @@ test('render different right message', () => {
   }
   const uRD = TestUtils.renderIntoDocument(<UsageRightsDialog {...props} />)
   equal(
-    uRD.refs.differentRightsMessage.props.children[1],
+    uRD.refs.differentRightsMessage.innerText,
     'Items selected have different usage rights.',
     'displays correct message'
   )
@@ -127,7 +127,7 @@ test('render folder message for one folder', () => {
   }
   const uRD = TestUtils.renderIntoDocument(<UsageRightsDialog {...props} />)
   equal(
-    uRD.refs.folderBulletList.props.children[0].props.children,
+    uRD.refs.folderBulletList.innerText,
     'some folder',
     'shows display name'
   )
@@ -148,7 +148,7 @@ test('render folder tooltip for multiple folders', () => {
     'hello<br />hello',
     'sets title for multple folders'
   )
-  equal(uRD.refs.folderTooltip.props.children[0], 'and 2 more\u2026', 'sets count text')
+  ok(uRD.refs.folderTooltip.innerText.match('and 2 more\u2026'), 'sets count text')
   ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(uRD).parentNode)
 })
 
