@@ -16,37 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-addons-test-utils',
-  'jsx/external_apps/components/AppDetails',
-  'jsx/external_apps/lib/AppCenterStore'
-], (React, TestUtils, AppDetails, AppCenterStore) => {
+import React from 'react'
+import TestUtils from 'react-addons-test-utils'
+import AppDetails from 'jsx/external_apps/components/AppDetails'
 
-  QUnit.module('External Apps App Details');
+QUnit.module('External Apps App Details')
 
-  test('the back to app center link goes to the proper place', () => {
-
-    const fakeStore = {
-      findAppByShortName () {
-        return {
-          short_name: 'someApp',
-          config_options: []
-        };
+test('the back to app center link goes to the proper place', () => {
+  const fakeStore = {
+    findAppByShortName() {
+      return {
+        short_name: 'someApp',
+        config_options: []
       }
-    };
+    }
+  }
 
-    const component = TestUtils.renderIntoDocument(
-      <AppDetails
-        baseUrl="/someUrl"
-        shortName="someApp"
-        store={fakeStore}
-      />
-    );
+  const component = TestUtils.renderIntoDocument(
+    <AppDetails baseUrl="/someUrl" shortName="someApp" store={fakeStore} />
+  )
 
-    const link = TestUtils.findRenderedDOMComponentWithClass(component, 'app_cancel');
+  const link = TestUtils.findRenderedDOMComponentWithClass(component, 'app_cancel')
 
-    equal(link.props.href, '/someUrl', 'the url matches appropriately');
-  });
-
-});
+  equal(new URL(link.href).pathname, '/someUrl', 'the url matches appropriately')
+})
