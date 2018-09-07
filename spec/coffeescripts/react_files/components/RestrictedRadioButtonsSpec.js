@@ -98,7 +98,7 @@ test('selecting the restricted access option default checks the hiddenInput opti
   this.RestrictedRadioButtons.refs.permissionsInput.checked = true
   Simulate.change(this.RestrictedRadioButtons.refs.permissionsInput)
   equal(
-    this.RestrictedRadioButtons.refs.link_only.props.checked,
+    this.RestrictedRadioButtons.refs.link_only.checked,
     true,
     'default checks hiddenInput'
   )
@@ -220,12 +220,12 @@ QUnit.module('RestrictedRadioButtons Multiple Items', {
 
 test('commonly selected items will open the same defaulted options', function() {
   equal(
-    this.restrictedRadioButtons.refs.permissionsInput.props.checked,
+    this.restrictedRadioButtons.refs.permissionsInput.checked,
     true,
     'permissionsInput is checked for all of the selected items'
   )
   equal(
-    this.restrictedRadioButtons.refs.link_only.props.checked,
+    this.restrictedRadioButtons.refs.link_only.checked,
     true,
     'link_only is checked for all of the selected items'
   )
