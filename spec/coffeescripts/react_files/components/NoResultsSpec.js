@@ -29,7 +29,7 @@ test('displays search term in no results text', () => {
   const search_term = 'texas toast'
   const rendered = TestUtils.renderIntoDocument(noResults({search_term}))
   equal(
-    rendered.refs.yourSearch.props.children,
+    rendered.refs.yourSearch.innerText,
     `Your search - \"${search_term}\" - did not match any files.`,
     'has the right text'
   )
