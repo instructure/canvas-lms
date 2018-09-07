@@ -49,7 +49,7 @@ QUnit.module('Filesystem Object Thumbnail: file', {
 test('displays the thumbnail image', function() {
   equal(
     $(ReactDOM.findDOMNode(this.thumbnail)).attr('style'),
-    "background-image:url('sweet_thumbnail_url');",
+    "background-image: url(\"sweet_thumbnail_url\");",
     'set background image to correct url'
   )
 })

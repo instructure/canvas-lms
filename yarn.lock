@@ -3975,7 +3975,7 @@ create-hmac@^1.1.0, create-hmac@^1.1.2, create-hmac@^1.1.4:
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
 
-create-react-class@^15.6.2, create-react-class@^15.6.3:
+create-react-class@^15.6.0, create-react-class@^15.6.2, create-react-class@^15.6.3:
   version "15.6.3"
   resolved "https://registry.yarnpkg.com/create-react-class/-/create-react-class-15.6.3.tgz#2d73237fb3f970ae6ebe011a9e66f46dbca80036"
   dependencies:
@@ -4923,19 +4923,19 @@ envify@^3.0.0:
     jstransform "^11.0.3"
     through "~2.3.4"
 
-enzyme-adapter-react-14@^1:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/enzyme-adapter-react-14/-/enzyme-adapter-react-14-1.0.6.tgz#f101c5eabfdf53c53dc658629956f206f7e99713"
+enzyme-adapter-react-15@^1:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/enzyme-adapter-react-15/-/enzyme-adapter-react-15-1.1.0.tgz#ca1f699a830730e37ebf81b2eff163119a1682a9"
   dependencies:
-    enzyme-adapter-utils "^1.4.0"
+    enzyme-adapter-utils "^1.6.0"
     object.assign "^4.1.0"
     object.values "^1.0.4"
-    prop-types "^15.6.0"
-    react-is "^16.4.1"
+    prop-types "^15.6.2"
+    react-is "^16.4.2"
 
-enzyme-adapter-utils@^1.4.0:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/enzyme-adapter-utils/-/enzyme-adapter-utils-1.5.0.tgz#a020ab3ae79bb1c85e1d51f48f35e995e0eed810"
+enzyme-adapter-utils@^1.6.0:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/enzyme-adapter-utils/-/enzyme-adapter-utils-1.8.0.tgz#ee9f07250663a985f1f2caaf297720787da559f1"
   dependencies:
     function.prototype.name "^1.1.0"
     object.assign "^4.1.0"
@@ -5874,7 +5874,7 @@ fbjs@^0.6.1:
     ua-parser-js "^0.7.9"
     whatwg-fetch "^0.9.0"
 
-fbjs@^0.8.12, fbjs@^0.8.16, fbjs@^0.8.9:
+fbjs@^0.8.12, fbjs@^0.8.16, fbjs@^0.8.4, fbjs@^0.8.9:
   version "0.8.17"
   resolved "https://registry.yarnpkg.com/fbjs/-/fbjs-0.8.17.tgz#c4d598ead6949112653d6588b01a5cdcd9f90fdd"
   dependencies:
@@ -12706,19 +12706,20 @@ rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-react-addons-css-transition-group@0.14.8:
-  version "0.14.8"
-  resolved "https://registry.yarnpkg.com/react-addons-css-transition-group/-/react-addons-css-transition-group-0.14.8.tgz#c7a2279e71095e743c43a3a4583a1e4f1a2dd61d"
+react-addons-css-transition-group@^15:
+  version "15.6.2"
+  resolved "https://registry.yarnpkg.com/react-addons-css-transition-group/-/react-addons-css-transition-group-15.6.2.tgz#9e4376bcf40b5217d14ec68553081cee4b08a6d6"
+  dependencies:
+    react-transition-group "^1.2.0"
 
-react-addons-pure-render-mixin@0.14.8:
-  version "0.14.8"
-  resolved "https://registry.yarnpkg.com/react-addons-pure-render-mixin/-/react-addons-pure-render-mixin-0.14.8.tgz#4109af2d6ceb72e3897bf343d8ae7f329a6713d4"
+react-addons-pure-render-mixin@^15:
+  version "15.6.2"
+  resolved "https://registry.yarnpkg.com/react-addons-pure-render-mixin/-/react-addons-pure-render-mixin-15.6.2.tgz#6b83f40b6b36ee40735cbd6125eb3f13ce1cddc9"
+  dependencies:
+    fbjs "^0.8.4"
+    object-assign "^4.1.0"
 
-react-addons-test-utils@0.14.8:
-  version "0.14.8"
-  resolved "https://registry.yarnpkg.com/react-addons-test-utils/-/react-addons-test-utils-0.14.8.tgz#dcddc039e71fc3c81d80338e53a3714f14d41e1f"
-
-react-addons-test-utils@^15.0.0:
+react-addons-test-utils@^15, react-addons-test-utils@^15.0.0:
   version "15.6.2"
   resolved "https://registry.yarnpkg.com/react-addons-test-utils/-/react-addons-test-utils-15.6.2.tgz#c12b6efdc2247c10da7b8770d185080a7b047156"
 
@@ -12763,9 +12764,14 @@ react-dnd@^2.5.2:
     lodash "^4.2.0"
     prop-types "^15.5.10"
 
-react-dom@0.14.9, "react-dom@^0.14.7 || ^15", "react-dom@^0.14.8 || ^15.0.0", "react-dom@^0.14.8 || ^15.0.0 || ^16":
-  version "0.14.9"
-  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-0.14.9.tgz#05064a3dcf0fb1880a3b2bfc9d58c55d8d9f6293"
+"react-dom@^0.14.7 || ^15", "react-dom@^0.14.8 || ^15.0.0", "react-dom@^0.14.8 || ^15.0.0 || ^16", react-dom@^15:
+  version "15.6.2"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-15.6.2.tgz#41cfadf693b757faf2708443a1d1fd5a02bef730"
+  dependencies:
+    fbjs "^0.8.9"
+    loose-envify "^1.1.0"
+    object-assign "^4.1.0"
+    prop-types "^15.5.10"
 
 react-element-to-string@^1.0.2:
   version "1.0.2"
@@ -12778,9 +12784,9 @@ react-immutable-proptypes@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/react-immutable-proptypes/-/react-immutable-proptypes-2.1.0.tgz#023d6f39bb15c97c071e9e60d00d136eac5fa0b4"
 
-react-is@^16.4.1:
-  version "16.4.2"
-  resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.4.2.tgz#84891b56c2b6d9efdee577cc83501dfc5ecead88"
+react-is@^16.4.2:
+  version "16.5.0"
+  resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.5.0.tgz#2ec7c192709698591efe13722fab3ef56144ba55"
 
 react-lazy-load@^3.0.13:
   version "3.0.13"
@@ -12830,6 +12836,13 @@ react-redux@^5, react-redux@^5.0.3:
     loose-envify "^1.1.0"
     prop-types "^15.6.0"
 
+react-test-renderer@^15:
+  version "15.6.2"
+  resolved "https://registry.yarnpkg.com/react-test-renderer/-/react-test-renderer-15.6.2.tgz#d0333434fc2c438092696ca770da5ed48037efa8"
+  dependencies:
+    fbjs "^0.8.9"
+    object-assign "^4.1.0"
+
 react-tinymce@^0.7.0:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/react-tinymce/-/react-tinymce-0.7.0.tgz#4dc3f2511d8e33c7ef4511fa22732c497b2faab8"
@@ -12853,7 +12866,7 @@ react-tools@0.11.2, react-tools@^0.11.2:
     esprima-fb "^6001.1.0-dev-harmony-fb"
     jstransform "^6.2.0"
 
-react-transition-group@^1:
+react-transition-group@^1, react-transition-group@^1.2.0:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-1.2.1.tgz#e11f72b257f921b213229a774df46612346c7ca6"
   dependencies:
@@ -12867,12 +12880,22 @@ react@0.10.x:
   version "0.10.0"
   resolved "https://registry.yarnpkg.com/react/-/react-0.10.0.tgz#8c82753593d3f325ca99d820f7400ab02f1ee1f8"
 
-react@0.14.9, "react@^0.14.7 || ^15", "react@^0.14.8 || ^15.0.0", "react@^0.14.8 || ^15.0.0 || ^16":
+react@0.14.9:
   version "0.14.9"
   resolved "https://registry.yarnpkg.com/react/-/react-0.14.9.tgz#9110a6497c49d44ba1c0edd317aec29c2e0d91d1"
   dependencies:
     envify "^3.0.0"
     fbjs "^0.6.1"
+
+"react@^0.14.7 || ^15", "react@^0.14.8 || ^15.0.0", "react@^0.14.8 || ^15.0.0 || ^16", react@^15:
+  version "15.6.2"
+  resolved "https://registry.yarnpkg.com/react/-/react-15.6.2.tgz#dba0434ab439cfe82f108f0f511663908179aa72"
+  dependencies:
+    create-react-class "^15.6.0"
+    fbjs "^0.8.9"
+    loose-envify "^1.1.0"
+    object-assign "^4.1.0"
+    prop-types "^15.5.10"
 
 reactcss@^1.2.0:
   version "1.2.3"
