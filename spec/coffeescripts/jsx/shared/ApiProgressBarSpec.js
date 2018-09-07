@@ -50,8 +50,8 @@ QUnit.module('ApiProgressBarSpec', {
 })
 
 test('shouldComponentUpdate', function() {
-  const ApiProgressBarElement = <ApiProgressBar />
-  const component = TestUtils.renderIntoDocument(ApiProgressBarElement)
+  let ApiProgressBarElement = <ApiProgressBar />
+  let component = TestUtils.renderIntoDocument(ApiProgressBarElement)
   ok(
     component.shouldComponentUpdate({progress_id: this.progress_id}, {}),
     'should update when progress_id prop changes'
@@ -64,7 +64,9 @@ test('shouldComponentUpdate', function() {
     component.shouldComponentUpdate({}, {completion: 10}),
     'should update when completion level changes'
   )
-  component.setProps({progress_id: this.progress_id})
+
+  ApiProgressBarElement = <ApiProgressBar progress_id={this.progress_id} />
+  component = TestUtils.renderIntoDocument(ApiProgressBarElement)
   component.setState({workflow_state: 'running'})
   ok(
     !component.shouldComponentUpdate(
@@ -146,11 +148,13 @@ test('isInProgress', function() {
 })
 
 test('poll', function() {
-  const ApiProgressBarElement = <ApiProgressBar />
-  const component = TestUtils.renderIntoDocument(ApiProgressBarElement)
+  let ApiProgressBarElement = <ApiProgressBar />
+  let component = TestUtils.renderIntoDocument(ApiProgressBarElement)
   component.poll()
   ok(!this.storeSpy.called, 'should not fetch from progress store without progress id')
-  component.setProps({progress_id: this.progress_id})
+
+  ApiProgressBarElement = <ApiProgressBar progress_id={this.progress_id}/>
+  component = TestUtils.renderIntoDocument(ApiProgressBarElement)
   component.poll()
   ok(this.storeSpy.called, 'should fetch when progress id is present')
   ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
