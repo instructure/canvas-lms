@@ -608,6 +608,17 @@ describe ContentMigration do
       expect(@copy_to.reload.syllabus_body).to include "/courses/#{@copy_to.id}/files/#{att2.id}/download"
     end
 
+    it "should copy weird longdesc things" do
+      page = @copy_from.wiki_pages.create!(:title => "page")
+      @copy_from.syllabus_body = "<img longdesc=\"/courses/#{@copy_from.id}/pages/#{page.url}/>"
+      @copy_from.save!
+
+      run_course_copy
+
+      page2 = @copy_to.wiki_pages.where(:migration_id => mig_id(page)).first
+      expect(@copy_to.reload.syllabus_body).to include "/courses/#{@copy_to.id}/pages/#{page2.url}"
+    end
+
     it "should re-use kaltura media objects" do
       expect {
         media_id = '0_deadbeef'

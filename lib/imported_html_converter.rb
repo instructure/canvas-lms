@@ -23,7 +23,7 @@ class ImportedHtmlConverter
   include HtmlTextHelper
 
   CONTAINER_TYPES = ['div', 'p', 'body']
-  LINK_ATTRS = ['rel', 'href', 'src', 'data', 'value']
+  LINK_ATTRS = ['rel', 'href', 'src', 'data', 'value', 'longdesc']
 
   attr_reader :link_parser, :link_resolver, :link_replacer
 
