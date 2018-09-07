@@ -292,6 +292,10 @@ class BzController < ApplicationController
       umf["data-bz-grade-info"] = @response_object["audit_trace"][i].to_json
       i += 1
     end
+
+    cm = bzg.get_context_module(module_item_id)
+    submission = bzg.get_participation_assignment(cm.course, cm).find_or_create_submission(user)
+    @gradebook_grade = submission.nil? ? nil : submission.grade
   end
 
   def grades_download
