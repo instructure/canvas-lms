@@ -18,7 +18,7 @@ RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
 # do this first so npm install can be cached if package.json has not changed
 COPY package.json yarn.lock /usr/src/app/
 RUN yarn \
-    && yarn-private install @inst/sync-format-message-translations; exit 0
+    && yarn-private add @inst/sync-format-message-translations; exit 0
 
 COPY . /usr/src/app
 RUN chown -R docker:docker /usr/src/app
