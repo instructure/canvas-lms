@@ -1463,12 +1463,12 @@ const discussionscreatePermissions = generateActionTemplates(
   [
     {
       title: I18n.t('Announcements'),
-      description: I18n.t(`To create announcements, Discussions - manage must also be enabled.`)
+      description: I18n.t(`To create announcements, Discussions - moderate must also be enabled.`)
     },
     {
       title: I18n.t('Discussions'),
       description: I18n.t(`To view discussions in a course, Discussions - view must be enabled.
-        Both Discussions - create and Discussions - moderate allow a user to create a discussion in the Discussions page. To manage discussions, Discussions - manage must also be enabled.`)
+        Both Discussions - create and Discussions - moderate allow a user to create a discussion in the Discussions page. To manage discussions, Discussions - moderate must also be enabled.`)
     }
   ],
   [
@@ -1480,12 +1480,12 @@ const discussionscreatePermissions = generateActionTemplates(
   [
     {
       title: I18n.t('Announcements'),
-      description: I18n.t(`To create announcements, Discussions - manage must also be enabled.`)
+      description: I18n.t(`To create announcements, Discussions - moderate must also be enabled.`)
     },
     {
       title: I18n.t('Discussions'),
       description: I18n.t(`To view discussions in a course, Discussions - view must be enabled.
-        Both Discussions - create and Discussions - moderate allow a user to create a discussion in the Discussions page. To manage discussions, Discussions - manage must also be enabled.`)
+        Both Discussions - create and Discussions - moderate allow a user to create a discussion in the Discussions page. To manage discussions, Discussions - moderate must also be enabled.`)
     }
   ]
 )
@@ -2225,7 +2225,7 @@ const ltiAddEditPermissions = generateActionTemplates(
     },
     {
       title: I18n.t('Course Settings'),
-      description: I18n.t(`Allows user to manually add and delete an app in Course Settings.`)
+      description: I18n.t(`Allows user to manually add an app in Course Settings.`)
     },
     {
       title: I18n.t('External Apps'),
@@ -2236,14 +2236,14 @@ const ltiAddEditPermissions = generateActionTemplates(
     {
       title: I18n.t('External Apps (Account/Course Settings)'),
       description: I18n.t(
-        'If this permission is disabled, users can still install approved apps through the Canvas App Center (if enabled for your institution). Additionally, if this permission is disabled, users cannot delete manually added external apps.'
+        'If this permission is disabled, users can still install approved apps through the Canvas App Center (if enabled for your institution). Additionally, users can always delete any manually added apps that are not locked.'
       )
     }
   ],
   [
     {
       title: I18n.t('Course Settings'),
-      description: I18n.t(`Allows user to manually add and delete an app in Course Settings.`)
+      description: I18n.t(`Allows user to manually add an app in Course Settings.`)
     },
     {
       title: I18n.t('External Apps (Course Settings)'),
@@ -2254,7 +2254,7 @@ const ltiAddEditPermissions = generateActionTemplates(
     {
       title: I18n.t('External Apps (Course Settings)'),
       description: I18n.t(
-        'If this permission is disabled, users can still install approved apps through the Canvas App Center (if enabled for your institution). Additionally, if this permission is disabled, users cannot delete manually added external apps.'
+        'If this permission is disabled, users can still install approved apps through the Canvas App Center (if enabled for your institution). Additionally, users can always delete any manually added apps that are not locked.'
       )
     }
   ]
@@ -2582,6 +2582,10 @@ const submissionViewCommentsPermissions = generateActionTemplates(
     {
       title: I18n.t('Assignments'),
       description: I18n.t(`Allows user to view all student assignment submissions and add comments.`)
+    },
+    {
+      title: I18n.t('SpeedGrader'),
+      description: I18n.t(`Allows user to download all comments in a student’s submission.`)
     }
   ],
   [
@@ -2600,6 +2604,10 @@ To edit a grade or add comments in SpeedGrader or the Gradebook, Grades - edit m
     {
       title: I18n.t('Assignments'),
       description: I18n.t(`Allows user to view all student assignment submissions and add comments.`)
+    },
+    {
+      title: I18n.t('SpeedGrader'),
+      description: I18n.t(`Allows user to download all comments in a student’s submission.`)
     }
   ],
   [
