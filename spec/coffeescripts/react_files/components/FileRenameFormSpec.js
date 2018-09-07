@@ -24,7 +24,7 @@ import FileRenameForm from 'jsx/files/FileRenameForm'
 
 QUnit.module('FileRenameForm', {
   setup() {
-    const props = {
+    const defaultProps = {
       fileOptions: {
         file: {
           id: 999,
@@ -33,10 +33,11 @@ QUnit.module('FileRenameForm', {
         name: 'options_name.txt'
       }
     }
-    this.form = ReactDOM.render(
-      React.createFactory(FileRenameForm)(props),
-      $('<div>').appendTo('#fixtures')[0]
-    )
+    this.renderForm = props => {
+      this.form = ReactDOM.render(<FileRenameForm {...defaultProps} {...props} />,
+        $('<div>').appendTo('#fixtures')[0]
+      )
+    }
   },
   teardown() {
     ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.form).parentNode)
@@ -45,25 +46,28 @@ QUnit.module('FileRenameForm', {
 })
 
 test('switches to editing file name state with button click', function() {
+  this.renderForm()
   Simulate.click(this.form.refs.renameBtn)
   ok(this.form.state.isEditing)
   ok(this.form.refs.newName)
 })
 
 test('isEditing displays options name by default', function() {
+  this.renderForm()
   Simulate.click(this.form.refs.renameBtn)
   ok(this.form.state.isEditing)
   equal(this.form.refs.newName.value, 'options_name.txt')
 })
 
 test('isEditing displays file name when no options name exists', function() {
-  this.form.setProps({fileOptions: {file: {name: 'file_name.md'}}})
+  this.renderForm({fileOptions: {file: {name: 'file_name.md'}}})
   Simulate.click(this.form.refs.renameBtn)
   ok(this.form.state.isEditing)
   equal(this.form.refs.newName.value, 'file_name.md')
 })
 
 test('can go back from isEditing to initial view with button click', function() {
+  this.renderForm()
   Simulate.click(this.form.refs.renameBtn)
   ok(this.form.state.isEditing)
   ok(this.form.refs.newName)
@@ -74,7 +78,7 @@ test('can go back from isEditing to initial view with button click', function() 
 
 test('calls passed in props method to resolve conflict', function() {
   expect(2)
-  this.form.setProps({
+  this.renderForm({
     fileOptions: {file: {name: 'file_name.md'}},
     onNameConflictResolved(options) {
       ok(options.name)
@@ -87,7 +91,7 @@ test('calls passed in props method to resolve conflict', function() {
 
 test('onNameConflictResolved preserves expandZip option when renaming', function() {
   expect(2)
-  this.form.setProps({
+  this.renderForm({
     fileOptions: {
       file: {name: 'file_name.md'},
       expandZip: 'true'
@@ -103,7 +107,7 @@ test('onNameConflictResolved preserves expandZip option when renaming', function
 
 test('onNameConflictResolved preserves expandZip option when replacing', function() {
   expect(1)
-  this.form.setProps({
+  this.renderForm({
     fileOptions: {
       file: {name: 'file_name.md'},
       expandZip: 'true'
