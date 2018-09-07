@@ -63,6 +63,13 @@ it('renders the base component correctly without points', () => {
   expect(wrapper).toMatchSnapshot();
 });
 
+// to distinguish between no point and 0 points
+it('renders the base component correctly with 0 points', () => {
+  const props = defaultProps({points: 0});
+  const wrapper = shallow(<Opportunity {...props} />);
+  expect(wrapper).toMatchSnapshot();
+});
+
 it('renders a Pill if in the past', () => {
   const props = defaultProps();
   const wrapper = shallow(<Opportunity {...props} />);
@@ -97,3 +104,4 @@ it('renders no close icon if dismissed', () => {
   const wrapper = shallow(<Opportunity {...props} />);
   expect(wrapper.find('Button').length).toEqual(0)
 })
+

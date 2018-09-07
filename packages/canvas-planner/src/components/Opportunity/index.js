@@ -106,7 +106,30 @@ export class Opportunity extends Component {
           </Button>
         )}
       </div>
-    )
+    );
+  }
+
+  renderPoints () {
+    if (typeof this.props.points !== 'number') {
+      return (
+        <ScreenReaderContent>
+          {formatMessage('There are no points associated with this item')}
+        </ScreenReaderContent>
+      );
+    }
+    return (
+      <div className={styles.points}>
+        <ScreenReaderContent>
+            {formatMessage("{points} points", {points: this.props.points})}
+        </ScreenReaderContent>
+        <PresentationContent>
+          <span className={styles.pointsNumber}>
+            {this.props.points}
+          </span>
+          {formatMessage("points")}
+        </PresentationContent>
+      </div>
+    );
   }
 
   render () {
@@ -128,17 +151,7 @@ export class Opportunity extends Component {
                 {formatMessage('Due:')}</span> {this.fullDate}
             </div>
           </div>
-          <div className={styles.points}>
-            <ScreenReaderContent>
-               {formatMessage("{points} points", {points: this.props.points})}
-            </ScreenReaderContent>
-            <PresentationContent>
-              <span className={styles.pointsNumber}>
-                {this.props.points}
-              </span>
-              {formatMessage("points")}
-            </PresentationContent>
-          </div>
+          {this.renderPoints()}
         </div>
         {this.renderButton()}
       </div>
