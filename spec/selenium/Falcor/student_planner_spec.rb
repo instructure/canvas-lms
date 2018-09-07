@@ -41,7 +41,7 @@ describe "student planner" do
 
   it "navigates to the dashcard view from no due dates assigned page.", priority: "1", test_id: 3281739 do
     go_to_list_view
-    go_to_dashcard_view
+    switch_to_dashcard_view
     expect(f('.ic-DashboardCard__header-title')).to include_text(@course.name)
   end
 
@@ -557,6 +557,38 @@ describe "student planner" do
         get("/courses/#{@course.id}/discussion_topics/#{@discussion.id}/edit")
         expect(get_value('input[name="todo_date"]')).to eq "#{format_date_for_view(Time.zone.today)} 11:59pm"
       end
+    end
+  end
+
+  context "interaction with ToDoSidebar" do
+    before :each do
+      user_session(@student1)
+    end
+
+    it "completes planner item when dismissed from card view sidebar" do
+      @student1.planner_notes.create!(todo_date: 2.days.from_now, title: "Title Text")
+      go_to_dashcard_view
+      # wait for the todosidebar to load too
+      list = f('#planner-todosidebar-item-list')
+
+      item_close_button = f('li button', list)
+      item_close_button.click # dismiss the item
+
+      switch_to_list_view
+      expect(planner_app_div).to contain_jqcss('span:contains("Show 1 completed item")')
+    end
+
+    it "completes planner item when dismissed from a course sidebar" do
+      @student1.planner_notes.create!(todo_date: 2.days.from_now, title: "Title Text")
+      get "/courses/#{@course.id}"
+      # wait for the todosidebar to load
+      list = f('#planner-todosidebar-item-list')
+
+      item_close_button = f('li button', list)
+      item_close_button.click # dismiss the item
+
+      go_to_list_view
+      expect(planner_app_div).to contain_jqcss('span:contains("Show 1 completed item")')
     end
   end
 end

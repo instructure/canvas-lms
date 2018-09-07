@@ -47,6 +47,10 @@ module PlannerPageObject
     fj('span[role="menuitemradio"]:contains("Card View")')
   end
 
+  def select_list_view_menuitem
+    fj('span[role="menuitemradio"]:contains("List View")')
+  end
+
   def todo_info_holder
     f(".planner-grouping ol")
   end
@@ -177,10 +181,16 @@ module PlannerPageObject
     ).to be_displayed
   end
 
-  def go_to_dashcard_view
+  def switch_to_dashcard_view
     click_dashboard_settings
     select_dashboard_view_menuitem.click
     wait_for_dashboard_load
+  end
+
+  def switch_to_list_view
+    click_dashboard_settings
+    select_list_view_menuitem.click
+    wait_for_planner_load
   end
 
   def expand_completed_item
@@ -196,6 +206,13 @@ module PlannerPageObject
     @student1.save!
     get '/'
     wait_for_planner_load
+  end
+
+  def go_to_dashcard_view
+    @student1.dashboard_view = "cards"
+    @student1.save!
+    get '/'
+    wait_for_dashboard_load
   end
 
   # should pass the type of object as a string
