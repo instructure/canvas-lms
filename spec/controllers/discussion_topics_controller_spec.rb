@@ -124,7 +124,7 @@ describe DiscussionTopicsController do
       end
 
       it "should not assign the create permission if the term and course are concluded" do
-        term = @course.account.enrollment_terms.create!(:name => 'mew', :end_at => Time.now.utc - 1.minute)
+        term = @course.account.enrollment_terms.create!(:name => 'mew', :start_at => Time.now.utc - 10.minutes, :end_at => Time.now.utc - 1.minute)
         @course.enrollment_term = term
         @course.update_attribute(:conclude_at, Time.now.utc - 1.minute)
         @course.save!

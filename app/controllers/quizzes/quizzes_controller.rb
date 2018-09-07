@@ -365,7 +365,7 @@ class Quizzes::QuizzesController < ApplicationController
       quiz_params = get_quiz_params
       quiz_params[:title] = nil if quiz_params[:title] == "undefined"
       quiz_params[:title] ||= t(:default_title, "New Quiz")
-      quiz_params[:description] = process_incoming_html_content(quiz_params[:description])
+      quiz_params[:description] = process_incoming_html_content(quiz_params[:description]) if quiz_params.key?(:description)
       quiz_params.delete(:points_possible) unless quiz_params[:quiz_type] == 'graded_survey'
       quiz_params[:access_code] = nil if quiz_params[:access_code] == ""
       if quiz_params[:quiz_type] == 'assignment' || quiz_params[:quiz_type] == 'graded_survey'
@@ -424,7 +424,8 @@ class Quizzes::QuizzesController < ApplicationController
       end
 
       quiz_params[:title] = t("New Quiz") if quiz_params[:title] == "undefined"
-      quiz_params[:description] = process_incoming_html_content(quiz_params[:description])
+      quiz_params[:description] = process_incoming_html_content(quiz_params[:description]) if quiz_params.key?(:description)
+
       quiz_params.delete(:points_possible) unless quiz_params[:quiz_type] == 'graded_survey'
       quiz_params[:access_code] = nil if quiz_params[:access_code] == ""
       if quiz_params[:quiz_type] == 'assignment' || quiz_params[:quiz_type] == 'graded_survey' #'new' && params[:quiz][:assignment_group_id]

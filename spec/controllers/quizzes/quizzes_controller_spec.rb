@@ -1488,6 +1488,17 @@ describe Quizzes::QuizzesController do
       expect(override.quiz_id).to eq quiz.id
     end
 
+    it 'should not remove attributes when called with no description param' do
+      user_session(@teacher)
+      quiz = @course.quizzes.create!(title: 'blah', quiz_type: 'assignment', description: 'foobar')
+      post 'update', params: {
+        course_id: @course.id,
+        id: quiz.id,
+      }
+      expect(quiz.reload.title).to eq 'blah'
+      expect(quiz.reload.description).to eq 'foobar'
+    end
+
     describe "DueDateCacher" do
       before :each do
         user_session(@teacher)
