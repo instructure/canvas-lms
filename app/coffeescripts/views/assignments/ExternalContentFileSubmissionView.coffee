@@ -35,7 +35,7 @@ define [
       alert(
         I18n.t(
           "processing_submission",
-          "Canvas is currently processing your submission. You can safely navigate away from this page and we will email you when the submission has processed."
+          "Canvas is currently processing your submission. You can safely navigate away from this page and we will email you if the submission fails to process."
         )
       )
       window.location.reload()
