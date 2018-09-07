@@ -160,11 +160,6 @@ enum AssignmentGroupState {
   deleted
 }
 
-input AssignmentInput {
-  courseId: ID!
-  name: String!
-}
-
 type AssignmentOverride implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
@@ -607,10 +602,6 @@ type Module implements Node & Timestamped {
   updatedAt: DateTime
 }
 
-type Mutation {
-  createAssignment(assignment: AssignmentInput!): Assignment
-}
-
 # An object with an ID.
 interface Node {
   # ID of the object.
@@ -672,7 +663,7 @@ type PageViewAnalysis {
 
 type Query {
   # All courses viewable by the current user
-  allCourses: [Course]
+  allCourses: [Course!]
 
   # Fetches an object given its type and legacy ID
   legacyNode(_id: ID!, type: NodeType!): Node
