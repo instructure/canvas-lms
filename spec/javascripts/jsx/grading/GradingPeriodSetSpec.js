@@ -162,9 +162,15 @@ define([
 
   test('sorts grading periods by start date, ascending', function () {
     const set = this.renderComponent();
-    const periods = set.refs.gradingPeriodList.props.children;
-    const startDates = _.map(periods, period => period.props.period.startDate);
-    ok((startDates[0] < startDates[1]) && (startDates[1] < startDates[2]));
+    const startDates = Array.from(set.refs.gradingPeriodList.children).map(
+      // get the "Nov 1, 2014" from "Starts: Nov 1, 2014"
+      e => e.innerText.match(/Starts: ([^\n]*)\n/)[1]
+    )
+    deepEqual(startDates, [
+      "Nov 1, 2014",
+      "Jan 1, 2015",
+      "Apr 1, 2015"
+    ])
   });
 
   test('calls the onEdit prop when the "edit grading period set" button is clicked', function () {
@@ -298,10 +304,15 @@ define([
     const set = this.renderComponent();
     this.callOnSave(set);
     return success.then(() => {
-      const periods = set.refs.gradingPeriodList.props.children;
-      const periodIds = _.map(periods, period => period.props.period.id);
-      propEqual(periodIds, ['3', '1', '2']);
-    });
+      const titles = Array.from(set.refs.gradingPeriodList.children).map(
+        e => e.querySelector('.GradingPeriodList__period__attribute').innerText
+      )
+      deepEqual(titles, [
+        'Como estas?',
+        'We did it! We did it! We did it! #dora #boots',
+        'Swiper no swiping!'
+      ])
+    })
   });
 
   test('disables the "edit period form"', function () {
@@ -653,7 +664,7 @@ define([
     const set = this.renderComponent();
     this.callOnSave(set);
     return success.then(() => {
-      equal(set.refs.gradingPeriodList.props.children.length, 4);
+      equal(set.refs.gradingPeriodList.children.length, 4);
     });
   });
 
@@ -664,9 +675,15 @@ define([
     const set = this.renderComponent();
     this.callOnSave(set);
     return success.then(() => {
-      const periods = set.refs.gradingPeriodList.props.children;
-      const periodIds = _.map(periods, period => period.props.period.id);
-      propEqual(periodIds, ['3', '1', '4', '2']);
+      const titles = Array.from(set.refs.gradingPeriodList.children).map(
+        e => e.querySelector('.GradingPeriodList__period__attribute').innerText
+      )
+      deepEqual(titles, [
+        "Como estas?",
+        "We did it! We did it! We did it! #dora #boots",
+        "Example Period",
+        "Swiper no swiping!"
+      ])
     });
   });
 
