@@ -2400,7 +2400,7 @@ class Submission < ActiveRecord::Base
 
   def self.queue_bulk_update(context, section, grader, grade_data)
     progress = Progress.create!(:context => context, :tag => "submissions_update")
-    progress.process_job(self, :process_bulk_update, {}, context, section, grader, grade_data)
+    progress.process_job(self, :process_bulk_update, {:n_strand => ["submissions_bulk_update", context.global_id]}, context, section, grader, grade_data)
     progress
   end
 
@@ -2409,7 +2409,7 @@ class Submission < ActiveRecord::Base
     graded_user_ids = Set.new
     preloaded_assignments = Assignment.find(grade_data.keys).index_by(&:id)
 
-
+    Submission.suspend_callbacks(:touch_graders) do
     grade_data.each do |assignment_id, user_grades|
       assignment = preloaded_assignments[assignment_id.to_i]
 
@@ -2479,6 +2479,7 @@ class Submission < ActiveRecord::Base
         end
       end
     end
+    end
 
     if missing_ids.any?
       progress.message = "Couldn't find User(s) with API ids #{missing_ids.map{|id| "'#{id}'"}.join(", ")}"
@@ -2486,6 +2487,7 @@ class Submission < ActiveRecord::Base
       progress.fail
     end
   ensure
+    context.touch_admins_later
     user_ids = graded_user_ids.to_a
     Rails.logger.debug "GRADES: recomputing scores in course #{context.id} for users #{user_ids} because of bulk submission update"
     context.recompute_student_scores(user_ids)
