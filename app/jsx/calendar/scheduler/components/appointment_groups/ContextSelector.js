@@ -20,7 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!appointment_groups'
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import IconMiniArrowRight from '@instructure/ui-icons/lib/Solid/IconMiniArrowRight'
+import IconMiniArrowEnd from '@instructure/ui-icons/lib/Solid/IconMiniArrowEnd'
 import IconMiniArrowDown from '@instructure/ui-icons/lib/Solid/IconMiniArrowDown'
 import Grid, { GridCol, GridRow } from '@instructure/ui-layout/lib/components/Grid'
 
@@ -242,7 +242,7 @@ import Grid, { GridCol, GridRow } from '@instructure/ui-layout/lib/components/Gr
                 <div key={context.asset_string} className="CourseListItem">
                   <div className="CourseListItem-horizontal">
                     <Button onClick={() => this.toggleCourseExpanded(context)} variant="icon">
-                      {expanded ? <IconMiniArrowDown /> : <IconMiniArrowRight /> }
+                      {expanded ? <IconMiniArrowDown /> : <IconMiniArrowEnd /> }
                     </Button>
                     <span className="screenreader-only">{context.name}</span>
                     <input
