@@ -141,7 +141,7 @@ class BzController < ApplicationController
     ul = UserList.new(email)
     ul.users.each do |user|
       if params[:course_id]
-        user.ta_enrollments.each do |tae|
+        user.ta_enrollments.active.each do |tae|
           if tae.course_id.to_s == params[:course_id].to_s
             enrollment = tae
           end
