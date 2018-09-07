@@ -1,1 +1,221 @@
-{}
+{
+  "(c) 2001 Acme Inc.": {
+    "message": "(c) 2001 Acme Inc."
+  },
+  "Announcement List": {
+    "message": "Duyuru Listesi"
+  },
+  "Announcements": {
+    "message": "Duyurular"
+  },
+  "Assignments": {
+    "message": "Ödevler"
+  },
+  "Background Color, press down to select": {
+    "message": "Arkaplan rengi, aşağı tuşa basın ve seçin"
+  },
+  "CC Attribution": {
+    "message": "CC Özelliği"
+  },
+  "CC Attribution No Derivatives": {
+    "message": "CC Özelliği Özgün hali korunacak"
+  },
+  "CC Attribution Non-Commercial": {
+    "message": "CC Özelliği Ticari Olmayan"
+  },
+  "CC Attribution Non-Commercial No Derivatives": {
+    "message": "CC Özelliği Ticari kullanılamayacak Özgün hali korunacak"
+  },
+  "CC Attribution Non-Commercial Share Alike": {
+    "message": "CC Özelliği Ticari kullanılamayacak İlk lisans modeli korunacak"
+  },
+  "CC Attribution Share Alike": {
+    "message": "CC Özelliği İlk lisans modeli korunacak"
+  },
+  "Cancel file upload": {
+    "message": "Dosya yüklemeyi iptal et"
+  },
+  "Cancel image upload": {
+    "message": "Görsel yüklemeyi iptal et"
+  },
+  "Choose usage rights...": {
+    "message": "Kullanıcı haklarını seçin..."
+  },
+  "Click any file to insert a download link for that file.": {
+    "message": "Dosyayı indirmek için herhangi bir dosya bağlantısına tıklayınız."
+  },
+  "Click any image to embed the image in the page.": {
+    "message": "Bu sayfaya bir görsel yerleştirmek için tıklayın."
+  },
+  "Click any page to insert a link to that page.": {
+    "message": "Herhangi bir sayfaya bağlantı eklemek için ilgili sayfaya tıklayın."
+  },
+  "Click to embed image": {
+    "message": "Görsel eklemek için tıklayın"
+  },
+  "Click to embed { imageName }": {
+    "message": "{ imageName } görselini eklemek için tıklayınız"
+  },
+  "Click to insert a link into the editor.": {
+    "message": "Düzenleyiciye bağlantı eklemek için tıklayın."
+  },
+  "Click to insert a link to this item.": {
+    "message": "Bu öğeye bağlantı eklemek için tıklayınız"
+  },
+  "Close Flickr form": {
+    "message": "Flickr formunu kapat"
+  },
+  "Collaborations": {
+    "message": "İşbirliğine Yönelik Çalışmalar"
+  },
+  "Copyright Holder:": {
+    "message": "Telif Sahibi:"
+  },
+  "Course Navigation": {
+    "message": "Ders Gezinme Menüsü"
+  },
+  "Creative Commons License:": {
+    "message": "Creative Commons Lisansı:"
+  },
+  "Discussions": {
+    "message": "Tartışmalar"
+  },
+  "Discussions Index": {
+    "message": "Tartışma Başlıkları"
+  },
+  "Embed Image": {
+    "message": "Görsel Ekle"
+  },
+  "File Upload Form": {
+    "message": "Dosya Yükleme Formu"
+  },
+  "Files": {
+    "message": "Dosyalar"
+  },
+  "Files Index": {
+    "message": "Dosya Başlıkları"
+  },
+  "Folder": {
+    "message": "Klasör"
+  },
+  "Font Size, press down to select": {
+    "message": "Yazı büyüklüğü, aşağı tuşa basın ve seçin"
+  },
+  "Formatting, press down to select": {
+    "message": "Biçimlendirme, aşağı tuşa basın ve seçin"
+  },
+  "Grades": {
+    "message": "Notlar"
+  },
+  "Group Navigation": {
+    "message": "Grup Gezinme Menüsü"
+  },
+  "I have obtained permission to use this file.": {
+    "message": "Bu dosyayı kullanmak için iznim var."
+  },
+  "I hold the copyright": {
+    "message": "Telif hakkı bendedir"
+  },
+  "Image Upload Form": {
+    "message": "Görsel Yükleme Formu"
+  },
+  "Images": {
+    "message": "Görseller"
+  },
+  "Insert Equella Links": {
+    "message": "Equella Bağlantısı Ekle"
+  },
+  "Insert Link": {
+    "message": "Bağlantı Ekle"
+  },
+  "Insert Math Equation": {
+    "message": "Matematik Denklemi Ekle"
+  },
+  "Link": {
+    "message": "Bağlantı"
+  },
+  "Link to a New Page": {
+    "message": "Yeni Sayfaya Bağlantı Ekle"
+  },
+  "Link to other content in the course.": {
+    "message": "Ders içindeki başka bir içeriğe bağla."
+  },
+  "Link to other content in the group.": {
+    "message": "Gruptaki diğer içeriğe bağla"
+  },
+  "Links": {
+    "message": "Bağlantılar"
+  },
+  "Load more results": {
+    "message": "Daha fazla sonuç yükle"
+  },
+  "Loading failed...": {
+    "message": "Yükleme Başarısız..."
+  },
+  "Loading...": {
+    "message": "Yükleniyor..."
+  },
+  "Modules": {
+    "message": "Modüller"
+  },
+  "No results.": {
+    "message": "Sonuç yok."
+  },
+  "Pages": {
+    "message": "Sayfalar"
+  },
+  "People": {
+    "message": "Katılımcılar"
+  },
+  "Quizzes": {
+    "message": "Kısa sınavlar"
+  },
+  "Rich Text Area. Press ALT+F8 for help": {
+    "message": "Zengin Metin Alanı. Yardım için ALT+F8 e basın"
+  },
+  "Search": {
+    "message": "Ara"
+  },
+  "Search Flickr": {
+    "message": "Flickr''da ara"
+  },
+  "Select a folder to upload your file into": {
+    "message": "Dosyanızı yükleyeceğiniz bir klasör seçin"
+  },
+  "Syllabus": {
+    "message": "Ders Programı"
+  },
+  "Text Color, press down to select": {
+    "message": "Yazı rengi, aşağı tuşa basın ve seçin"
+  },
+  "The material is in the public domain": {
+    "message": "Bu malzeme genel kullanıma açık"
+  },
+  "The material is licensed under Creative Commons": {
+    "message": "Bu malzeme Creative Commons a göre lisanslı"
+  },
+  "The material is subject to fair use exception": {
+    "message": "Bu malzeme adil kullanım istisnasına tabidir"
+  },
+  "Upload": {
+    "message": "Yükle"
+  },
+  "Upload a new file": {
+    "message": "Yeni bir dosya yükle"
+  },
+  "Upload a new image": {
+    "message": "Yeni bir görsel yükleyin"
+  },
+  "Usage Right:": {
+    "message": "Kullanım Şartları:"
+  },
+  "What would you like to call the new page?": {
+    "message": "Yeni sayfaya hangi ismi vermek istersiniz?"
+  },
+  "Wiki Home": {
+    "message": "Wiki Ana Sayfası"
+  },
+  "enter search terms": {
+    "message": "arama ifadelerini gir"
+  }
+}

@@ -1,1 +1,191 @@
-{}
+{
+  "Announcement List": {
+    "message": "공지 목록"
+  },
+  "Announcements": {
+    "message": "공지"
+  },
+  "Assignments": {
+    "message": "과제"
+  },
+  "Background Color, press down to select": {
+    "message": "배경색, 선택하려면 누름"
+  },
+  "CC Attribution": {
+    "message": "CC 유형"
+  },
+  "CC Attribution No Derivatives": {
+    "message": "CC 유형 변경금지"
+  },
+  "CC Attribution Non-Commercial": {
+    "message": "CC 유형 비영리"
+  },
+  "CC Attribution Non-Commercial No Derivatives": {
+    "message": "CC 유형 비영리 변경금지"
+  },
+  "CC Attribution Non-Commercial Share Alike": {
+    "message": "CC 유형 비영리 동일조건변경허락 "
+  },
+  "CC Attribution Share Alike": {
+    "message": "CC 유형 동일조건변경허락"
+  },
+  "Cancel file upload": {
+    "message": "Cancel file upload"
+  },
+  "Cancel image upload": {
+    "message": "Cancel image upload"
+  },
+  "Click any file to insert a download link for that file.": {
+    "message": "파일 다운로드 링크를 삽입하려면 해당 파일을 클릭하십시오."
+  },
+  "Click any image to embed the image in the page.": {
+    "message": "페이지에 이미지를 내장하려면 해당 이미지를 클릭하십시오."
+  },
+  "Click any page to insert a link to that page.": {
+    "message": "페이지에 링크를 삽입하려면 해당 페이지를 클릭하십시오."
+  },
+  "Click to embed image": {
+    "message": "이미지를 내장하려면 클릭"
+  },
+  "Click to embed { imageName }": {
+    "message": "Click to embed { imageName }"
+  },
+  "Click to insert a link into the editor.": {
+    "message": "Click to insert a link into the editor."
+  },
+  "Click to insert a link to this item.": {
+    "message": "Click to insert a link to this item."
+  },
+  "Close Flickr form": {
+    "message": "Close Flickr form"
+  },
+  "Collaborations": {
+    "message": "협업"
+  },
+  "Course Navigation": {
+    "message": "과목 탐색"
+  },
+  "Discussions": {
+    "message": "토론"
+  },
+  "Discussions Index": {
+    "message": "토론 색인"
+  },
+  "Embed Image": {
+    "message": "이미지 포함"
+  },
+  "File Upload Form": {
+    "message": "File Upload Form"
+  },
+  "Files": {
+    "message": "파일"
+  },
+  "Files Index": {
+    "message": "파일 색인"
+  },
+  "Folder": {
+    "message": "폴더"
+  },
+  "Font Size, press down to select": {
+    "message": "글자 크기, 선택하려면 누름"
+  },
+  "Formatting, press down to select": {
+    "message": "서식, 선택하려면 누름"
+  },
+  "Grades": {
+    "message": "평점"
+  },
+  "Group Navigation": {
+    "message": "그룹 탐색"
+  },
+  "Image Upload Form": {
+    "message": "Image Upload Form"
+  },
+  "Images": {
+    "message": "이미지"
+  },
+  "Insert Equella Links": {
+    "message": "Insert Equella Links"
+  },
+  "Insert Link": {
+    "message": "링크 삽입"
+  },
+  "Insert Math Equation": {
+    "message": "Insert Math Equation"
+  },
+  "Link": {
+    "message": "Link"
+  },
+  "Link to a New Page": {
+    "message": "새 페이지"
+  },
+  "Link to other content in the course.": {
+    "message": "과목에 있는 다른 내용으로 링크합니다."
+  },
+  "Link to other content in the group.": {
+    "message": "그룹에 있는 다른 내용으로 링크합니다."
+  },
+  "Links": {
+    "message": "링크"
+  },
+  "Load more results": {
+    "message": "Load more results"
+  },
+  "Loading failed...": {
+    "message": "Loading failed..."
+  },
+  "Loading...": {
+    "message": "로드하는 중..."
+  },
+  "Modules": {
+    "message": "모듈"
+  },
+  "No results.": {
+    "message": "No results."
+  },
+  "Pages": {
+    "message": "페이지"
+  },
+  "People": {
+    "message": "사용자"
+  },
+  "Quizzes": {
+    "message": "퀴즈"
+  },
+  "Rich Text Area. Press ALT+F8 for help": {
+    "message": "Rich Text Area. Press ALT+F8 for help"
+  },
+  "Search": {
+    "message": "검색"
+  },
+  "Search Flickr": {
+    "message": "Search Flickr"
+  },
+  "Select a folder to upload your file into": {
+    "message": "Select a folder to upload your file into"
+  },
+  "Syllabus": {
+    "message": "요강"
+  },
+  "Text Color, press down to select": {
+    "message": "텍스트 색, 선택하려면 누름"
+  },
+  "Upload": {
+    "message": "업로드"
+  },
+  "Upload a new file": {
+    "message": "새 파일 업로드"
+  },
+  "Upload a new image": {
+    "message": "새 이미지 업로드"
+  },
+  "What would you like to call the new page?": {
+    "message": "새 페이지의 이름은 무엇입니까?"
+  },
+  "Wiki Home": {
+    "message": "위키 홈"
+  },
+  "enter search terms": {
+    "message": "검색 용어 입력"
+  }
+}

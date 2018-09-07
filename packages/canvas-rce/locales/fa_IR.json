@@ -1,1 +1,221 @@
-{}
+{
+  "(c) 2001 Acme Inc.": {
+    "message": "(c) 2001 Acme Inc."
+  },
+  "Announcement List": {
+    "message": "فهرست اطلاعیه"
+  },
+  "Announcements": {
+    "message": "اطلاعیه ها"
+  },
+  "Assignments": {
+    "message": "تکلیف ها"
+  },
+  "Background Color, press down to select": {
+    "message": "رنگ پس زمینه، کلید down را برای انتخاب فشار دهید"
+  },
+  "CC Attribution": {
+    "message": "ارجاع کریتیو کامنز"
+  },
+  "CC Attribution No Derivatives": {
+    "message": "ارجاع کریتیو کامنز، بدون آثار اشتقاقی"
+  },
+  "CC Attribution Non-Commercial": {
+    "message": "ارجاع کریتیو کامنز، غیر تجاری"
+  },
+  "CC Attribution Non-Commercial No Derivatives": {
+    "message": "ارجاع کریتیو کامنز، غیر تجاری، بدون آثار اشتقاقی"
+  },
+  "CC Attribution Non-Commercial Share Alike": {
+    "message": "ارجاع کریتیو کامنز، غیر تجاری، اشتراک سازی یکسان"
+  },
+  "CC Attribution Share Alike": {
+    "message": "ارجاع کریتیو کامنز، اشتراک سازی یکسان"
+  },
+  "Cancel file upload": {
+    "message": "Cancel file upload"
+  },
+  "Cancel image upload": {
+    "message": "Cancel image upload"
+  },
+  "Choose usage rights...": {
+    "message": "انتخاب حقوق استفاده..."
+  },
+  "Click any file to insert a download link for that file.": {
+    "message": "برای درج پیوند بارگیری برای یک فایل، روی آن فایل کلیک کنید."
+  },
+  "Click any image to embed the image in the page.": {
+    "message": "برای درج یک تصویر در صفحه، روی آن تصویر کلیک کنید."
+  },
+  "Click any page to insert a link to that page.": {
+    "message": "برای درج پیوند به یک صفحه، روی آن صفحه کلیک کنید."
+  },
+  "Click to embed image": {
+    "message": "برای درج تصویر کلیک کنید"
+  },
+  "Click to embed { imageName }": {
+    "message": "Click to embed { imageName }"
+  },
+  "Click to insert a link into the editor.": {
+    "message": "Click to insert a link into the editor."
+  },
+  "Click to insert a link to this item.": {
+    "message": "Click to insert a link to this item."
+  },
+  "Close Flickr form": {
+    "message": "Close Flickr form"
+  },
+  "Collaborations": {
+    "message": "همکاری ها"
+  },
+  "Copyright Holder:": {
+    "message": "دارنده حق نشر:"
+  },
+  "Course Navigation": {
+    "message": "پیمایش درس"
+  },
+  "Creative Commons License:": {
+    "message": "مجوز کریتیو کامنز:"
+  },
+  "Discussions": {
+    "message": "بحث ها"
+  },
+  "Discussions Index": {
+    "message": "فهرست بحث ها"
+  },
+  "Embed Image": {
+    "message": "درج تصویر"
+  },
+  "File Upload Form": {
+    "message": "File Upload Form"
+  },
+  "Files": {
+    "message": "فایل ها"
+  },
+  "Files Index": {
+    "message": "فهرست فایل ها"
+  },
+  "Folder": {
+    "message": "پوشه"
+  },
+  "Font Size, press down to select": {
+    "message": "اندازه قلم، کلید down را برای انتخاب فشار دهید"
+  },
+  "Formatting, press down to select": {
+    "message": "در حال قالب بندی، کلید down را برای انتخاب فشار دهید"
+  },
+  "Grades": {
+    "message": "نمره ها"
+  },
+  "Group Navigation": {
+    "message": "پیمایش گروه"
+  },
+  "I have obtained permission to use this file.": {
+    "message": "مجوز استفاده از این فایل را به دست آورده ام."
+  },
+  "I hold the copyright": {
+    "message": "حق نشر دارم"
+  },
+  "Image Upload Form": {
+    "message": "Image Upload Form"
+  },
+  "Images": {
+    "message": "تصاویر"
+  },
+  "Insert Equella Links": {
+    "message": "Insert Equella Links"
+  },
+  "Insert Link": {
+    "message": "درج پیوند"
+  },
+  "Insert Math Equation": {
+    "message": "درج معادله ریاضی"
+  },
+  "Link": {
+    "message": "پیوند"
+  },
+  "Link to a New Page": {
+    "message": "پیوند دادن به صفحه جدید"
+  },
+  "Link to other content in the course.": {
+    "message": "به محتوای دیگر موجود در درس پیوند دهید."
+  },
+  "Link to other content in the group.": {
+    "message": "به محتوای دیگر در گروه پیوند دهید."
+  },
+  "Links": {
+    "message": "پیوندها"
+  },
+  "Load more results": {
+    "message": "Load more results"
+  },
+  "Loading failed...": {
+    "message": "Loading failed..."
+  },
+  "Loading...": {
+    "message": "در حال بارگذاری..."
+  },
+  "Modules": {
+    "message": "ماژول ها"
+  },
+  "No results.": {
+    "message": "No results."
+  },
+  "Pages": {
+    "message": "صفحه ها"
+  },
+  "People": {
+    "message": "افراد"
+  },
+  "Quizzes": {
+    "message": "آزمون ها"
+  },
+  "Rich Text Area. Press ALT+F8 for help": {
+    "message": "قسمت دارای متن غنی. ALT+F8 را برای راهنمایی فشار دهید."
+  },
+  "Search": {
+    "message": "جستجو"
+  },
+  "Search Flickr": {
+    "message": "Search Flickr"
+  },
+  "Select a folder to upload your file into": {
+    "message": "Select a folder to upload your file into"
+  },
+  "Syllabus": {
+    "message": "سرفصل"
+  },
+  "Text Color, press down to select": {
+    "message": "رنگ متن، کلید down را برای انتخاب فشار دهید"
+  },
+  "The material is in the public domain": {
+    "message": "مطلب در دامنه عمومی است"
+  },
+  "The material is licensed under Creative Commons": {
+    "message": "مطلب تحت مجوز کریتیو کامنز است"
+  },
+  "The material is subject to fair use exception": {
+    "message": "مطلب مشمول استثناء استفاده منصفانه است"
+  },
+  "Upload": {
+    "message": "بارگذاری"
+  },
+  "Upload a new file": {
+    "message": "بارگذاری یک فایل جدید"
+  },
+  "Upload a new image": {
+    "message": "بارگذاری یک تصویر جدید"
+  },
+  "Usage Right:": {
+    "message": "حق استفاده:"
+  },
+  "What would you like to call the new page?": {
+    "message": "مایلید نام این صفحه جدید چه باشد؟"
+  },
+  "Wiki Home": {
+    "message": "صفحه اصلی ویکی"
+  },
+  "enter search terms": {
+    "message": "وارد کردن عبارت های جستجو"
+  }
+}

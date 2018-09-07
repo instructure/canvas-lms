@@ -1,1 +1,242 @@
-{}
+{
+  "(c) 2001 Acme Inc.": {
+    "message": "(c) 2001 Acme Inc."
+  },
+  "Alternative text:": {
+    "message": "Alternativ tekst: "
+  },
+  "Announcement List": {
+    "message": "Kunngjeringsliste"
+  },
+  "Announcements": {
+    "message": "Kunngjeringar"
+  },
+  "Assignments": {
+    "message": "Oppgåver"
+  },
+  "Background Color, press down to select": {
+    "message": "Bakgrunnsfarge, trykk ned for å velje"
+  },
+  "CC Attribution": {
+    "message": " CC Namngjeving BY"
+  },
+  "CC Attribution No Derivatives": {
+    "message": "CC Namngjeving – Ikkje-kommersiell - Del på same vilkår BY-NC-SA"
+  },
+  "CC Attribution Non-Commercial": {
+    "message": "CC Namngjeving - Ingen behandling BY-ND"
+  },
+  "CC Attribution Non-Commercial No Derivatives": {
+    "message": "CC Namngjeving – Ikkje-kommersiell - Ingen behandling BY-NC-ND "
+  },
+  "CC Attribution Non-Commercial Share Alike": {
+    "message": "CC Namngjeving – Ikkje-kommersiell BY-NC"
+  },
+  "CC Attribution Share Alike": {
+    "message": "CC Namngjeving - Del på same vilkår BY-SA"
+  },
+  "Cancel file upload": {
+    "message": "Avbryt filopplasting"
+  },
+  "Cancel image upload": {
+    "message": "Avbryt bildeopplasting"
+  },
+  "Check if the image is decorative": {
+    "message": "Sjekk om bildet har ein dekorativ funksjon"
+  },
+  "Choose usage rights...": {
+    "message": "Vel bruksrett..."
+  },
+  "Click any file to insert a download link for that file.": {
+    "message": "Klikk på ei fil for å sette inn ei nedlastingslenke for fila. "
+  },
+  "Click any image to embed the image in the page.": {
+    "message": "Klikk på eit bilde for å inkludere det på sida. "
+  },
+  "Click any page to insert a link to that page.": {
+    "message": "Klikk på eit sidenamn for å sette inn ei lenke til sida. "
+  },
+  "Click to embed image": {
+    "message": "Klikk for å sette inn bilde"
+  },
+  "Click to embed { imageName }": {
+    "message": "Klikk for å sette inn { imageName }"
+  },
+  "Click to insert a link into the editor.": {
+    "message": "Klikk for å setje inn ei lenke i editoren. "
+  },
+  "Click to insert a link to this item.": {
+    "message": "Klikk for å sette inn ei lenke til dette elementet. "
+  },
+  "Close Flickr form": {
+    "message": "Lukk Flickr-dialog"
+  },
+  "Collaborations": {
+    "message": "Samarbeid"
+  },
+  "Copyright Holder:": {
+    "message": "Rettshavar:"
+  },
+  "Course Navigation": {
+    "message": "Emnenavigering"
+  },
+  "Creative Commons License:": {
+    "message": "Creative Commons-lisens:"
+  },
+  "Decorative image": {
+    "message": "Dekorativt bilde"
+  },
+  "Discussions": {
+    "message": "Diskusjonar"
+  },
+  "Discussions Index": {
+    "message": "Diskusjonsoversikt"
+  },
+  "Embed Image": {
+    "message": "Sett inn bilde"
+  },
+  "Enter the alternative text for this image": {
+    "message": "Legg inn alternativ tekst som skildrar bildet"
+  },
+  "File Upload Form": {
+    "message": "Filopplastingsdialog"
+  },
+  "Files": {
+    "message": "Filer"
+  },
+  "Files Index": {
+    "message": "Filoversikt"
+  },
+  "Folder": {
+    "message": "Mappe"
+  },
+  "Font Size, press down to select": {
+    "message": "Skriftstorleik, trykk ned for å velje"
+  },
+  "Formatting, press down to select": {
+    "message": "Formatering, trykk ned for å velje"
+  },
+  "Grades": {
+    "message": "Karakterar"
+  },
+  "Group Navigation": {
+    "message": "Gruppenavigering"
+  },
+  "I have obtained permission to use this file.": {
+    "message": "Eg har løyve til å bruke denne fila. "
+  },
+  "I hold the copyright": {
+    "message": "Eg er rettshavar"
+  },
+  "If you do not select usage rights now, this file will be unpublished after it's uploaded.": {
+    "message": "Om du ikkje vel bruksrettar no, vil ikkje fila bli publisert etter at ho er lasta opp. "
+  },
+  "Image Upload Form": {
+    "message": "Bildeopplastingsdialog"
+  },
+  "Images": {
+    "message": "Bilde"
+  },
+  "Insert Equella Links": {
+    "message": "Set in Equella-lenker"
+  },
+  "Insert Link": {
+    "message": "Sett inn lenke"
+  },
+  "Insert Math Equation": {
+    "message": "Set inn matematikklikning"
+  },
+  "Link": {
+    "message": "Lenke"
+  },
+  "Link to URL": {
+    "message": "Link til URL"
+  },
+  "Link to a New Page": {
+    "message": "Lenke til ei ny side"
+  },
+  "Link to other content in the course.": {
+    "message": "Opprett ei lenke til anna emneinnhald. "
+  },
+  "Link to other content in the group.": {
+    "message": "Lenke til anna innhald i gruppa. "
+  },
+  "Links": {
+    "message": "Lenker"
+  },
+  "Load more results": {
+    "message": "Last fleire resultat"
+  },
+  "Loading failed...": {
+    "message": "Opplasting mislukkast..."
+  },
+  "Loading...": {
+    "message": "Lastar..."
+  },
+  "Modules": {
+    "message": "Modular"
+  },
+  "No results.": {
+    "message": "Utan resultat. "
+  },
+  "Pages": {
+    "message": "Sider"
+  },
+  "People": {
+    "message": "Personar"
+  },
+  "Quizzes": {
+    "message": "Quizar"
+  },
+  "Rich Text Area. Press ALT+F8 for help": {
+    "message": "Område for rik tekst-format. Trykk ALT+F8 for hjelp"
+  },
+  "Search": {
+    "message": "Søk"
+  },
+  "Search Flickr": {
+    "message": "Søk i Flickr"
+  },
+  "Select a file": {
+    "message": "Vel ei fil"
+  },
+  "Select a folder to upload your file into": {
+    "message": "Vel ei mappe å laste opp fila til"
+  },
+  "Syllabus": {
+    "message": "Emneoversikt"
+  },
+  "Text Color, press down to select": {
+    "message": "Tekstfarge, trykk ned for å velje"
+  },
+  "The material is in the public domain": {
+    "message": "Materialet er ikkje opphavsrettbeskytta"
+  },
+  "The material is licensed under Creative Commons": {
+    "message": "Materialet er lisensiert under Creative Commons"
+  },
+  "The material is subject to fair use exception": {
+    "message": "Materialet er brukt i samsvar med sitatretten"
+  },
+  "Upload": {
+    "message": "Last opp"
+  },
+  "Upload a new file": {
+    "message": "Last opp ei ny fil"
+  },
+  "Upload a new image": {
+    "message": "Last opp eit nytt bilde"
+  },
+  "Usage Right:": {
+    "message": "Bruksrett:"
+  },
+  "What would you like to call the new page?": {
+    "message": "Kva vil du kalle den nye sida? "
+  },
+  "Wiki Home": {
+    "message": "Wiki-startside"
+  },
+  "enter search terms": {
+    "message": "oppgi søkeord"
+  }
+}

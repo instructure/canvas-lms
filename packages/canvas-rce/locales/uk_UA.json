@@ -1,1 +1,242 @@
-{}
+{
+  "(c) 2001 Acme Inc.": {
+    "message": "(c) 2001 Acme Inc."
+  },
+  "Alternative text:": {
+    "message": "Альтернативний текст:"
+  },
+  "Announcement List": {
+    "message": "Список оголошень"
+  },
+  "Announcements": {
+    "message": "Оголошення"
+  },
+  "Assignments": {
+    "message": "Завдання"
+  },
+  "Background Color, press down to select": {
+    "message": "Колір фону, натисніть внизу, щоб обрати"
+  },
+  "CC Attribution": {
+    "message": "CC Атрибуція"
+  },
+  "CC Attribution No Derivatives": {
+    "message": "CC атрибуція непохідна"
+  },
+  "CC Attribution Non-Commercial": {
+    "message": "СС атрибуція некомерційна"
+  },
+  "CC Attribution Non-Commercial No Derivatives": {
+    "message": "CC атрибуція некомерційна і непохідна"
+  },
+  "CC Attribution Non-Commercial Share Alike": {
+    "message": "CC атрибуція некомерційна розповсюджена таким чином"
+  },
+  "CC Attribution Share Alike": {
+    "message": "CC атрибуція розповсюджена таким чином"
+  },
+  "Cancel file upload": {
+    "message": "Відмінити завантаження файлу"
+  },
+  "Cancel image upload": {
+    "message": "Відмінити завантаження зображення"
+  },
+  "Check if the image is decorative": {
+    "message": "Позначте, якщо зображення декоративне"
+  },
+  "Choose usage rights...": {
+    "message": "Виберіть права використання..."
+  },
+  "Click any file to insert a download link for that file.": {
+    "message": "Натисніть на будь-який файл, щоб вставити посилання на нього."
+  },
+  "Click any image to embed the image in the page.": {
+    "message": "Натисніть будь-яке зображення, щоб вставити зображення на сторінку."
+  },
+  "Click any page to insert a link to that page.": {
+    "message": "Натисніть на будь-яку сторінку, щоб вставити посилання на цю сторінку."
+  },
+  "Click to embed image": {
+    "message": "Натисніть на вбудоване зображення"
+  },
+  "Click to embed { imageName }": {
+    "message": "Натисніть на вбудоване { imageName }"
+  },
+  "Click to insert a link into the editor.": {
+    "message": "Натисніть, щоб вставити  посилання на редактор."
+  },
+  "Click to insert a link to this item.": {
+    "message": "Натисніть, щоб вставити посилання на цей елемент."
+  },
+  "Close Flickr form": {
+    "message": "Закрити форму Flickr"
+  },
+  "Collaborations": {
+    "message": "Сумісна робота"
+  },
+  "Copyright Holder:": {
+    "message": "Правовласник:"
+  },
+  "Course Navigation": {
+    "message": "Навігація курсу"
+  },
+  "Creative Commons License:": {
+    "message": "Ліцензія Creative Commons:"
+  },
+  "Decorative image": {
+    "message": "Декоративне зображення"
+  },
+  "Discussions": {
+    "message": "Обговорення"
+  },
+  "Discussions Index": {
+    "message": "Індекс обговорення"
+  },
+  "Embed Image": {
+    "message": "Вставити забраження"
+  },
+  "Enter the alternative text for this image": {
+    "message": "Введіть альтернативний текст для цього зображення"
+  },
+  "File Upload Form": {
+    "message": "Форма завантаження файлу"
+  },
+  "Files": {
+    "message": "Файли"
+  },
+  "Files Index": {
+    "message": "Індекс файлів"
+  },
+  "Folder": {
+    "message": "Папка"
+  },
+  "Font Size, press down to select": {
+    "message": "Розмір шрифту, натисніть внизу, щоб обрати"
+  },
+  "Formatting, press down to select": {
+    "message": "Форматування, натисніть кнопку Вниз, щоб вибрати"
+  },
+  "Grades": {
+    "message": "Оцінки"
+  },
+  "Group Navigation": {
+    "message": "Навігація групи"
+  },
+  "I have obtained permission to use this file.": {
+    "message": "Я отримав дозвіл на використання цього файлу."
+  },
+  "I hold the copyright": {
+    "message": "Я володію авторським правом"
+  },
+  "If you do not select usage rights now, this file will be unpublished after it's uploaded.": {
+    "message": "Якщо ви не виберете права використання, цей файл не буде опублікований після його завантаження."
+  },
+  "Image Upload Form": {
+    "message": "Форма завантаження зображення"
+  },
+  "Images": {
+    "message": "Зображення"
+  },
+  "Insert Equella Links": {
+    "message": "Вставити посилання Equella"
+  },
+  "Insert Link": {
+    "message": "Вставити посилання"
+  },
+  "Insert Math Equation": {
+    "message": "Вставити математичну формулу"
+  },
+  "Link": {
+    "message": "Посилання"
+  },
+  "Link to URL": {
+    "message": "Посилання на URL"
+  },
+  "Link to a New Page": {
+    "message": "Посилання на нову сторінку"
+  },
+  "Link to other content in the course.": {
+    "message": "Посилання на інший вміст у курсі."
+  },
+  "Link to other content in the group.": {
+    "message": "Посилання на інший вміст у групі."
+  },
+  "Links": {
+    "message": "Посилання"
+  },
+  "Load more results": {
+    "message": "Завантажити більше результатів"
+  },
+  "Loading failed...": {
+    "message": "Невдале завантаження..."
+  },
+  "Loading...": {
+    "message": "Завантаження..."
+  },
+  "Modules": {
+    "message": "Розділи"
+  },
+  "No results.": {
+    "message": "Результати відсутні."
+  },
+  "Pages": {
+    "message": "Сторінки"
+  },
+  "People": {
+    "message": "Люди"
+  },
+  "Quizzes": {
+    "message": "Контрольні Роботи"
+  },
+  "Rich Text Area. Press ALT+F8 for help": {
+    "message": "Багатофункціональна область тексту. Натисніть ALT+F8 для довідки"
+  },
+  "Search": {
+    "message": "Пошук"
+  },
+  "Search Flickr": {
+    "message": "Пошук у Flickr"
+  },
+  "Select a file": {
+    "message": "Виберіть файл"
+  },
+  "Select a folder to upload your file into": {
+    "message": "Виберіть теку, до якої завантажити ваш файл"
+  },
+  "Syllabus": {
+    "message": "навчальний план"
+  },
+  "Text Color, press down to select": {
+    "message": "Колір тексту, натисніть внизу, щоб обрати"
+  },
+  "The material is in the public domain": {
+    "message": "Матеріал в публічному домені"
+  },
+  "The material is licensed under Creative Commons": {
+    "message": "Матеріал опубліковано під ліцензією Creative Commons"
+  },
+  "The material is subject to fair use exception": {
+    "message": "Матеріал є предметом виключно сумлінного використання"
+  },
+  "Upload": {
+    "message": "Завантажити"
+  },
+  "Upload a new file": {
+    "message": "Завантажити новий файл"
+  },
+  "Upload a new image": {
+    "message": "Завантажити нове зображення"
+  },
+  "Usage Right:": {
+    "message": "Права використання:"
+  },
+  "What would you like to call the new page?": {
+    "message": "Як би ви хотіли назвати нову сторінку?"
+  },
+  "Wiki Home": {
+    "message": "Домашня сторінка Wiki"
+  },
+  "enter search terms": {
+    "message": "введіть умови пошуку"
+  }
+}
