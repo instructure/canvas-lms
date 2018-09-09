@@ -122,6 +122,9 @@
   "missing_1a256b3b": {
     "message": "חסר"
   },
+  "new_13daf639": {
+    "message": "חדש"
+  },
   "new_activity_8b84847d": {
     "message": "פעילות חדשה"
   },
@@ -142,6 +145,9 @@
   },
   "page_50c4823d": {
     "message": "דף"
+  },
+  "peer_review_74f26a13": {
+    "message": "ביקורת עמיתים"
   },
   "points_bceb5005": {
     "message": "נקודות"

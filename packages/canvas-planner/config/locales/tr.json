@@ -62,6 +62,9 @@
   "missing_1a256b3b": {
     "message": "Eksik"
   },
+  "new_13daf639": {
+    "message": "Yeni"
+  },
   "new_activity_8b84847d": {
     "message": "Yeni Etkinlik"
   },
@@ -76,6 +79,9 @@
   },
   "page_50c4823d": {
     "message": "Sayfa"
+  },
+  "peer_review_74f26a13": {
+    "message": "Akran Değerlendirme"
   },
   "points_bceb5005": {
     "message": "puanlar"

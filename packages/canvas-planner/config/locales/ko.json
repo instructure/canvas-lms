@@ -41,11 +41,17 @@
   "loading_25990131": {
     "message": "로드하는 중..."
   },
+  "new_13daf639": {
+    "message": "새 항목"
+  },
   "nothing_for_now_e3e3ce2a": {
     "message": "현재 없음"
   },
   "page_50c4823d": {
     "message": "페이지"
+  },
+  "peer_review_74f26a13": {
+    "message": "피어 리뷰"
   },
   "points_bceb5005": {
     "message": "점수"
