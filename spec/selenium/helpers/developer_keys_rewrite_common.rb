@@ -19,12 +19,12 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 module DeveloperKeysRewriteCommon
   def click_inherited_tab
-    fj("span:contains('Inherited'):last").click
+    fj('[role="tablist"] [aria-controls]:contains("Inherited"):last').click
     wait_for_ajaximations
   end
 
   def click_account_tab
-    fj("#reactContent span[role='tablist'] span:contains('Account')").click
+    fj('[role="tablist"] [aria-controls]:contains("Account")').click
     wait_for_ajaximations
   end
 
