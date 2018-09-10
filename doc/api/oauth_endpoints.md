@@ -86,6 +86,9 @@ wrong person in, as <a href="http://homakov.blogspot.com/2012/07/saferweb-most-c
   </tbody>
 </table>
 
+- To successfully pass multiple scope values, the scope parameter is included once, with multiple values separated by spaces: `GET https://<canvas-install-url>/login/oauth2/auth?scope=value_0 value_1 value_2`
+- Passing multiple scope parameters, as is common in other areas of Canvas, causes only the last value to be applied to the generated token: `GET https://<canvas-install-url>/login/oauth2/auth?scope=value_0&scope=value_1&scope=value_2` will only be scoped for value_2
+
 </div>
 
 
