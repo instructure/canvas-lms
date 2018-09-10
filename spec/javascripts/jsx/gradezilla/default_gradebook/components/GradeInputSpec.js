@@ -148,7 +148,7 @@ QUnit.module('GradeInput', suiteHooks => {
     test('calls the onSubmissionUpdate prop when the value has changed and the input loses focus', () => {
       props.onSubmissionUpdate = sinon.spy()
       mountComponent()
-      wrapper.find('input').simulate('change', {target: {value: '8.9'}})
+      wrapper.find('input').simulate('input', {target: {value: '8.9'}})
       wrapper.find('input').simulate('blur')
       strictEqual(props.onSubmissionUpdate.callCount, 1)
     })
@@ -156,7 +156,7 @@ QUnit.module('GradeInput', suiteHooks => {
     test('calls the onSubmissionUpdate prop with the submission', () => {
       props.onSubmissionUpdate = sinon.spy()
       mountComponent()
-      wrapper.find('input').simulate('change', {target: {value: '8.9'}})
+      wrapper.find('input').simulate('input', {target: {value: '8.9'}})
       wrapper.find('input').simulate('blur')
       const [updatedSubmission] = props.onSubmissionUpdate.lastCall.args
       strictEqual(updatedSubmission, props.submission)
@@ -168,7 +168,7 @@ QUnit.module('GradeInput', suiteHooks => {
       contextHooks.beforeEach(() => {
         props.onSubmissionUpdate = sinon.spy()
         mountComponent()
-        wrapper.find('input').simulate('change', {target: {value: '8.9'}})
+        wrapper.find('input').simulate('input', {target: {value: '8.9'}})
         wrapper.find('input').simulate('blur')
         gradingData = props.onSubmissionUpdate.lastCall.args[1]
       })
@@ -192,7 +192,7 @@ QUnit.module('GradeInput', suiteHooks => {
       contextHooks.beforeEach(() => {
         props.onSubmissionUpdate = sinon.spy()
         mountComponent()
-        wrapper.find('input').simulate('change', {target: {value: '89%'}})
+        wrapper.find('input').simulate('input', {target: {value: '89%'}})
         wrapper.find('input').simulate('blur')
         gradingData = props.onSubmissionUpdate.lastCall.args[1]
       })
@@ -216,7 +216,7 @@ QUnit.module('GradeInput', suiteHooks => {
       contextHooks.beforeEach(() => {
         props.onSubmissionUpdate = sinon.spy()
         mountComponent()
-        wrapper.find('input').simulate('change', {target: {value: 'B'}})
+        wrapper.find('input').simulate('input', {target: {value: 'B'}})
         wrapper.find('input').simulate('blur')
         gradingData = props.onSubmissionUpdate.lastCall.args[1]
       })
@@ -237,15 +237,15 @@ QUnit.module('GradeInput', suiteHooks => {
     test('does not call the onSubmissionUpdate prop when the value has changed and input maintains focus', () => {
       props.onSubmissionUpdate = sinon.spy()
       mountComponent()
-      wrapper.find('input').simulate('change', {target: {value: '8.9'}})
+      wrapper.find('input').simulate('input', {target: {value: '8.9'}})
       strictEqual(props.onSubmissionUpdate.callCount, 0)
     })
 
     test('does not call the onSubmissionUpdate prop when the value has not changed from initial value', () => {
       props.onSubmissionUpdate = sinon.spy()
       mountComponent()
-      wrapper.find('input').simulate('change', {target: {value: '8.9'}})
-      wrapper.find('input').simulate('change', {target: {value: '7.8'}})
+      wrapper.find('input').simulate('input', {target: {value: '8.9'}})
+      wrapper.find('input').simulate('input', {target: {value: '7.8'}})
       wrapper.find('input').simulate('blur')
       strictEqual(props.onSubmissionUpdate.callCount, 0)
     })
@@ -254,7 +254,7 @@ QUnit.module('GradeInput', suiteHooks => {
       props.pendingGradeInfo = {grade: 'invalid', valid: false, excused: false}
       props.onSubmissionUpdate = sinon.spy()
       mountComponent()
-      wrapper.find('input').simulate('change', {target: {value: '7.8'}})
+      wrapper.find('input').simulate('input', {target: {value: '7.8'}})
       wrapper.find('input').simulate('blur')
       strictEqual(props.onSubmissionUpdate.callCount, 1)
     })
@@ -263,7 +263,7 @@ QUnit.module('GradeInput', suiteHooks => {
       props.pendingGradeInfo = {grade: '10', valid: true, excused: false}
       props.onSubmissionUpdate = sinon.spy()
       mountComponent()
-      wrapper.find('input').simulate('change', {target: {value: '7.8'}})
+      wrapper.find('input').simulate('input', {target: {value: '7.8'}})
       wrapper.find('input').simulate('blur')
       strictEqual(props.onSubmissionUpdate.callCount, 0)
     })
@@ -279,7 +279,7 @@ QUnit.module('GradeInput', suiteHooks => {
     test('displays "Excused" as the input value when input blurs with a value of "EX"', () => {
       mountComponent()
       const input = wrapper.find('input')
-      input.simulate('change', {target: {value: 'EX'}})
+      input.simulate('input', {target: {value: 'EX'}})
       input.simulate('blur')
       strictEqual(getInputValue(), 'Excused')
     })
@@ -287,7 +287,7 @@ QUnit.module('GradeInput', suiteHooks => {
     test('trims whitespace from the input value when blurring', () => {
       mountComponent()
       const input = wrapper.find('input')
-      input.simulate('change', {target: {value: ' EX '}})
+      input.simulate('input', {target: {value: ' EX '}})
       input.simulate('blur')
       strictEqual(getInputValue(), 'Excused')
     })
@@ -346,7 +346,7 @@ QUnit.module('GradeInput', suiteHooks => {
       // its value was already updated after a successful change
       props.submissionUpdating = true
       mountComponent()
-      wrapper.find('input').simulate('change', {target: {value: '8.9'}})
+      wrapper.find('input').simulate('input', {target: {value: '8.9'}})
       const onSubmissionUpdate = sinon.spy()
       const updatedSubmission = {...submission, enteredScore: 8.9, enteredGrade: '8.9'}
       wrapper.setProps({
@@ -361,14 +361,14 @@ QUnit.module('GradeInput', suiteHooks => {
     test('ignores onSubmissionUpdate when not defined', () => {
       delete props.onSubmissionUpdate
       mountComponent()
-      wrapper.find('input').simulate('change', {target: {value: '8.9'}})
+      wrapper.find('input').simulate('input', {target: {value: '8.9'}})
       wrapper.find('input').simulate('blur')
       ok(true, 'missing onSubmissionUpdate prop is ignored')
     })
 
     test('does not update the input when props update without changing the entered score on the submission', () => {
       mountComponent()
-      wrapper.find('input').simulate('change', {target: {value: '8.9'}})
+      wrapper.find('input').simulate('input', {target: {value: '8.9'}})
       wrapper.setProps({submission: {...submission}})
       strictEqual(getInputValue(), '8.9')
     })
@@ -458,7 +458,7 @@ QUnit.module('GradeInput', suiteHooks => {
     test('calls the onSubmissionUpdate prop when the value has changed and the input loses focus', () => {
       props.onSubmissionUpdate = sinon.spy()
       mountComponent()
-      wrapper.find('input').simulate('change', {target: {value: '89%'}})
+      wrapper.find('input').simulate('input', {target: {value: '89%'}})
       wrapper.find('input').simulate('blur')
       strictEqual(props.onSubmissionUpdate.callCount, 1)
     })
@@ -466,7 +466,7 @@ QUnit.module('GradeInput', suiteHooks => {
     test('calls the onSubmissionUpdate prop with the submission', () => {
       props.onSubmissionUpdate = sinon.spy()
       mountComponent()
-      wrapper.find('input').simulate('change', {target: {value: '89%'}})
+      wrapper.find('input').simulate('input', {target: {value: '89%'}})
       wrapper.find('input').simulate('blur')
       const [updatedSubmission] = props.onSubmissionUpdate.lastCall.args
       strictEqual(updatedSubmission, props.submission)
@@ -478,7 +478,7 @@ QUnit.module('GradeInput', suiteHooks => {
       contextHooks.beforeEach(() => {
         props.onSubmissionUpdate = sinon.spy()
         mountComponent()
-        wrapper.find('input').simulate('change', {target: {value: '8.9'}})
+        wrapper.find('input').simulate('input', {target: {value: '8.9'}})
         wrapper.find('input').simulate('blur')
         gradingData = props.onSubmissionUpdate.lastCall.args[1]
       })
@@ -502,7 +502,7 @@ QUnit.module('GradeInput', suiteHooks => {
       contextHooks.beforeEach(() => {
         props.onSubmissionUpdate = sinon.spy()
         mountComponent()
-        wrapper.find('input').simulate('change', {target: {value: '89%'}})
+        wrapper.find('input').simulate('input', {target: {value: '89%'}})
         wrapper.find('input').simulate('blur')
         gradingData = props.onSubmissionUpdate.lastCall.args[1]
       })
@@ -526,7 +526,7 @@ QUnit.module('GradeInput', suiteHooks => {
       contextHooks.beforeEach(() => {
         props.onSubmissionUpdate = sinon.spy()
         mountComponent()
-        wrapper.find('input').simulate('change', {target: {value: 'B'}})
+        wrapper.find('input').simulate('input', {target: {value: 'B'}})
         wrapper.find('input').simulate('blur')
         gradingData = props.onSubmissionUpdate.lastCall.args[1]
       })
@@ -547,15 +547,15 @@ QUnit.module('GradeInput', suiteHooks => {
     test('does not call the onSubmissionUpdate prop when the value has changed and input maintains focus', () => {
       props.onSubmissionUpdate = sinon.spy()
       mountComponent()
-      wrapper.find('input').simulate('change', {target: {value: '89%'}})
+      wrapper.find('input').simulate('input', {target: {value: '89%'}})
       strictEqual(props.onSubmissionUpdate.callCount, 0)
     })
 
     test('does not call the onSubmissionUpdate prop when the value has not changed from initial value', () => {
       props.onSubmissionUpdate = sinon.spy()
       mountComponent()
-      wrapper.find('input').simulate('change', {target: {value: '89%'}})
-      wrapper.find('input').simulate('change', {target: {value: '78%'}})
+      wrapper.find('input').simulate('input', {target: {value: '89%'}})
+      wrapper.find('input').simulate('input', {target: {value: '78%'}})
       wrapper.find('input').simulate('blur')
       strictEqual(props.onSubmissionUpdate.callCount, 0)
     })
@@ -563,7 +563,7 @@ QUnit.module('GradeInput', suiteHooks => {
     test('displays "Excused" as the input value when input blurs with a value of "EX"', () => {
       mountComponent()
       const input = wrapper.find('input')
-      input.simulate('change', {target: {value: 'EX'}})
+      input.simulate('input', {target: {value: 'EX'}})
       input.simulate('blur')
       strictEqual(getInputValue(), 'Excused')
     })
@@ -615,7 +615,7 @@ QUnit.module('GradeInput', suiteHooks => {
       // its value was already updated after a successful change
       props.submissionUpdating = true
       mountComponent()
-      wrapper.find('input').simulate('change', {target: {value: '89%'}})
+      wrapper.find('input').simulate('input', {target: {value: '89%'}})
       const onSubmissionUpdate = sinon.spy()
       const updatedSubmission = {...submission, enteredScore: 8.9, enteredGrade: '89%'}
       wrapper.setProps({
@@ -630,14 +630,14 @@ QUnit.module('GradeInput', suiteHooks => {
     test('ignores onSubmissionUpdate when not defined', () => {
       delete props.onSubmissionUpdate
       mountComponent()
-      wrapper.find('input').simulate('change', {target: {value: '89%'}})
+      wrapper.find('input').simulate('input', {target: {value: '89%'}})
       wrapper.find('input').simulate('blur')
       ok(true, 'missing onSubmissionUpdate prop is ignored')
     })
 
     test('does not update the input when props update without changing the entered score on the submission', () => {
       mountComponent()
-      wrapper.find('input').simulate('change', {target: {value: '89%'}})
+      wrapper.find('input').simulate('input', {target: {value: '89%'}})
       wrapper.setProps({submission: {...submission}})
       strictEqual(getInputValue(), '89%')
     })
@@ -716,7 +716,7 @@ QUnit.module('GradeInput', suiteHooks => {
     test('calls the onSubmissionUpdate prop when the value has changed and the input loses focus', () => {
       props.onSubmissionUpdate = sinon.spy()
       mountComponent()
-      wrapper.find('input').simulate('change', {target: {value: 'A'}})
+      wrapper.find('input').simulate('input', {target: {value: 'A'}})
       wrapper.find('input').simulate('blur')
       strictEqual(props.onSubmissionUpdate.callCount, 1)
     })
@@ -727,7 +727,7 @@ QUnit.module('GradeInput', suiteHooks => {
       contextHooks.beforeEach(() => {
         props.onSubmissionUpdate = sinon.spy()
         mountComponent()
-        wrapper.find('input').simulate('change', {target: {value: '8.9'}})
+        wrapper.find('input').simulate('input', {target: {value: '8.9'}})
         wrapper.find('input').simulate('blur')
         gradingData = props.onSubmissionUpdate.lastCall.args[1]
       })
@@ -751,7 +751,7 @@ QUnit.module('GradeInput', suiteHooks => {
       contextHooks.beforeEach(() => {
         props.onSubmissionUpdate = sinon.spy()
         mountComponent()
-        wrapper.find('input').simulate('change', {target: {value: '89%'}})
+        wrapper.find('input').simulate('input', {target: {value: '89%'}})
         wrapper.find('input').simulate('blur')
         gradingData = props.onSubmissionUpdate.lastCall.args[1]
       })
@@ -775,7 +775,7 @@ QUnit.module('GradeInput', suiteHooks => {
       contextHooks.beforeEach(() => {
         props.onSubmissionUpdate = sinon.spy()
         mountComponent()
-        wrapper.find('input').simulate('change', {target: {value: 'B'}})
+        wrapper.find('input').simulate('input', {target: {value: 'B'}})
         wrapper.find('input').simulate('blur')
         gradingData = props.onSubmissionUpdate.lastCall.args[1]
       })
@@ -796,7 +796,7 @@ QUnit.module('GradeInput', suiteHooks => {
     test('calls the onSubmissionUpdate prop with the submission', () => {
       props.onSubmissionUpdate = sinon.spy()
       mountComponent()
-      wrapper.find('input').simulate('change', {target: {value: 'A'}})
+      wrapper.find('input').simulate('input', {target: {value: 'A'}})
       wrapper.find('input').simulate('blur')
       const [updatedSubmission] = props.onSubmissionUpdate.lastCall.args
       strictEqual(updatedSubmission, props.submission)
@@ -805,7 +805,7 @@ QUnit.module('GradeInput', suiteHooks => {
     test('calls the onSubmissionUpdate prop with the entered grade', () => {
       props.onSubmissionUpdate = sinon.spy()
       mountComponent()
-      wrapper.find('input').simulate('change', {target: {value: 'A'}})
+      wrapper.find('input').simulate('input', {target: {value: 'A'}})
       wrapper.find('input').simulate('blur')
       const [, gradingData] = props.onSubmissionUpdate.lastCall.args
       strictEqual(gradingData.grade, 'A')
@@ -814,15 +814,15 @@ QUnit.module('GradeInput', suiteHooks => {
     test('does not call the onSubmissionUpdate prop when the value has changed and input maintains focus', () => {
       props.onSubmissionUpdate = sinon.spy()
       mountComponent()
-      wrapper.find('input').simulate('change', {target: {value: 'A'}})
+      wrapper.find('input').simulate('input', {target: {value: 'A'}})
       strictEqual(props.onSubmissionUpdate.callCount, 0)
     })
 
     test('does not call the onSubmissionUpdate prop when the value has not changed from initial value', () => {
       props.onSubmissionUpdate = sinon.spy()
       mountComponent()
-      wrapper.find('input').simulate('change', {target: {value: 'A'}})
-      wrapper.find('input').simulate('change', {target: {value: 'C'}})
+      wrapper.find('input').simulate('input', {target: {value: 'A'}})
+      wrapper.find('input').simulate('input', {target: {value: 'C'}})
       wrapper.find('input').simulate('blur')
       strictEqual(props.onSubmissionUpdate.callCount, 0)
     })
@@ -830,7 +830,7 @@ QUnit.module('GradeInput', suiteHooks => {
     test('displays "Excused" as the input value when input blurs with a value of "EX"', () => {
       mountComponent()
       const input = wrapper.find('input')
-      input.simulate('change', {target: {value: 'EX'}})
+      input.simulate('input', {target: {value: 'EX'}})
       input.simulate('blur')
       strictEqual(getInputValue(), 'Excused')
     })
@@ -862,7 +862,7 @@ QUnit.module('GradeInput', suiteHooks => {
       // its value was already updated after a successful change
       props.submissionUpdating = true
       mountComponent()
-      wrapper.find('input').simulate('change', {target: {value: 'A'}})
+      wrapper.find('input').simulate('input', {target: {value: 'A'}})
       const onSubmissionUpdate = sinon.spy()
       const updatedSubmission = {...submission, enteredGrade: 'A'}
       wrapper.setProps({
@@ -877,14 +877,14 @@ QUnit.module('GradeInput', suiteHooks => {
     test('ignores onSubmissionUpdate when not defined', () => {
       delete props.onSubmissionUpdate
       mountComponent()
-      wrapper.find('input').simulate('change', {target: {value: 'A'}})
+      wrapper.find('input').simulate('input', {target: {value: 'A'}})
       wrapper.find('input').simulate('blur')
       ok(true, 'missing onSubmissionUpdate prop is ignored')
     })
 
     test('does not update the input when props update without changing the entered score on the submission', () => {
       mountComponent()
-      wrapper.find('input').simulate('change', {target: {value: 'A'}})
+      wrapper.find('input').simulate('input', {target: {value: 'A'}})
       wrapper.setProps({submission: {...submission}})
       strictEqual(getInputValue(), 'A')
     })
