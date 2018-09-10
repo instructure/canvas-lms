@@ -81,6 +81,13 @@ it('renders page icon for pages', () => {
   expect(wrapper.find('IconMsWord').exists()).toBe(true);
 });
 
+it('renders peer review icon for peer reviews', () => {
+  const wrapper = shallow(
+    <ToDoItem {...getDefaultProps({ type: 'Peer Review' })} />
+  );
+  expect(wrapper.find('IconPeerReview').exists()).toBe(true);
+});
+
 it('renders note icon for planner_notes', () => {
   const wrapper = shallow(
     <ToDoItem {...getDefaultProps({ type: '' })} />
