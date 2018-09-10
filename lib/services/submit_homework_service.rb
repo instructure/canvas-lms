@@ -120,25 +120,7 @@ module Services
     end
 
     def deliver_email
-      if @attachment.errored?
-        failure_email
-      else
-        successful_email
-      end
-    end
-
-    def successful_email
-      body = "Your file, #{@attachment.display_name}, has been successfully "\
-             "uploaded to your Canvas assignment, #{@assignment.name}"
-      user_email = User.find(@attachment.user_id).email
-
-      message = OpenStruct.new(
-        from_name: 'notifications@instructure.com',
-        subject: "Submission upload successful: #{@assignment.name}",
-        to: user_email,
-        body: body
-      )
-      queue_email(message)
+      failure_email if @attachment.errored?
     end
 
     def failure_email
