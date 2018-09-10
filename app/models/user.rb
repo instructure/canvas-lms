@@ -1330,11 +1330,11 @@ class User < ActiveRecord::Base
   end
 
   AVATAR_SETTINGS = ['enabled', 'enabled_pending', 'sis_only', 'disabled']
-  def avatar_url(size=nil, avatar_setting=nil, fallback=nil, request=nil)
+  def avatar_url(size=nil, avatar_setting=nil, fallback=nil, request=nil, use_fallback=true)
     return fallback if avatar_setting == 'disabled'
     size ||= 50
     avatar_setting ||= 'enabled'
-    fallback = self.class.avatar_fallback_url(fallback, request)
+    fallback = use_fallback ? self.class.avatar_fallback_url(fallback, request) : nil
     if avatar_setting == 'enabled' || (avatar_setting == 'enabled_pending' && avatar_approved?) || (avatar_setting == 'sis_only')
       @avatar_url ||= self.avatar_image_url
     end
@@ -1355,7 +1355,6 @@ class User < ActiveRecord::Base
 
   def self.avatar_fallback_url(fallback=nil, request=nil)
     return fallback if fallback == '%{fallback}'
-    return nil if Canvas::Plugin.value_to_boolean(request&.params&.[](:no_avatar_fallback))
     if fallback and uri = URI.parse(fallback) rescue nil
       uri.scheme ||= request ? request.protocol[0..-4] : HostUrl.protocol # -4 to chop off the ://
       if HostUrl.cdn_host

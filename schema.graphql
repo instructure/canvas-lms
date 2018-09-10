@@ -836,7 +836,10 @@ scalar URL
 type User implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
-  avatarUrl: URL
+  avatarUrl(
+    # return a generic image if the user has no custom avatar image
+    useFallback: Boolean = true
+  ): URL
   createdAt: DateTime
   email: String
   enrollments(

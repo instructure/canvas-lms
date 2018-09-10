@@ -1286,9 +1286,6 @@ describe User do
       expect(User.avatar_fallback_url('%{fallback}')).to eq(
         '%{fallback}'
       )
-      expect(User.avatar_fallback_url("http://somedomain/path",
-                                      OpenObject.new(:host => "somedomain", :protocol => "http://",
-                                                     :params => {:no_avatar_fallback => 1}))).to be_nil
     end
 
     describe "#clear_avatar_image_url_with_uuid" do

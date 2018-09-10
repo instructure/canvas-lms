@@ -69,6 +69,11 @@ describe Types::UserType do
       user.account.enable_service(:avatars)
       expect(user_type.resolve("avatarUrl")).to match(/avatar.*png/)
     end
+
+    it "returns nil when a user has no avatar and use_fallback is false" do
+      user.account.enable_service(:avatars)
+      expect(user_type.resolve("avatarUrl(useFallback: false)")).to be_nil
+    end
   end
 
   context "enrollments" do

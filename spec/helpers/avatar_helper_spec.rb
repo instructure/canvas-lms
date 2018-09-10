@@ -95,6 +95,33 @@ describe AvatarHelper do
       end
     end
 
+    describe ".avatar_url_for_user" do
+      before(:once) do
+        Account.default.tap { |a| a.enable_service(:avatars); a.save! }
+      end
+
+      it "returns a fallback avatar if the user doesn't have one" do
+        request = OpenObject.new(:host => "somedomain", :protocol => "http://")
+        expect(AvatarHelper.avatar_url_for_user(user, request)).to eql "http://somedomain/images/messages/avatar-50.png"
+      end
+
+      it "returns null if use_fallback is false" do
+        request = OpenObject.new(:host => "somedomain", :protocol => "http://")
+        expect(AvatarHelper.avatar_url_for_user(user, request, use_fallback: false)).to be_nil
+      end
+
+      it "returns null if params[no_avatar_fallback] is set" do
+        request = OpenObject.new(:host => "somedomain", :protocol => "http://", :params => {:no_avatar_fallback => 1})
+        expect(AvatarHelper.avatar_url_for_user(user, request)).to be_nil
+      end
+
+      it "returns a frd avatar url if one exists" do
+        request = OpenObject.new(:host => "somedomain", :protocol => "http://", :params => {:no_avatar_fallback => 1})
+        user_with_avatar = user_model(avatar_image_url: 'http://somedomain/avatar-frd.png')
+        expect(AvatarHelper.avatar_url_for_user(user_with_avatar, request, use_fallback: false)).to eq 'http://somedomain/avatar-frd.png'
+      end
+    end
+
     context "with avatar service off" do
       let(:services) {{avatars: false}}
 

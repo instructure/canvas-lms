@@ -41,11 +41,16 @@ module Types
       "A short name the user has selected, for use in conversations or other less formal places through the site.",
       null: true
 
-    field :avatar_url, UrlType, null: true
+    field :avatar_url, UrlType, null: true do
+      argument :use_fallback, Boolean,
+        "return a generic image if the user has no custom avatar image",
+        required: false,
+        default_value: true
+    end
 
-    def avatar_url
+    def avatar_url(use_fallback: true)
       object.account.service_enabled?(:avatars) ?
-        AvatarHelper.avatar_url_for_user(object, context[:request]) :
+        AvatarHelper.avatar_url_for_user(object, context[:request], use_fallback: use_fallback) :
         nil
     end
 
