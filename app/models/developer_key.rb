@@ -31,6 +31,7 @@ class DeveloperKey < ActiveRecord::Base
   has_many :context_external_tools
 
   has_one :tool_consumer_profile, :class_name => 'Lti::ToolConsumerProfile'
+  has_one :tool_configuration, class_name: 'Lti::ToolConfiguration'
   serialize :scopes, Array
 
   before_validation :validate_scopes!
