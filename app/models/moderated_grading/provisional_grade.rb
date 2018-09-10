@@ -116,9 +116,11 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
     self.submission.student
   end
 
-  def publish!
-    submission.grade_posting_in_progress = true
+  def publish!(skip_grade_calc: false)
+    original_skip_grade_calc = submission.skip_grade_calc
     previously_graded = submission.grade.present? || submission.excused?
+    submission.skip_grade_calc = skip_grade_calc
+    submission.grade_posting_in_progress = true
     submission.grade = grade
     submission.score = score
     submission.graded_anonymously = graded_anonymously
@@ -130,6 +132,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
     publish_rubric_assessments!
   ensure
     submission.grade_posting_in_progress = false
+    submission.skip_grade_calc = original_skip_grade_calc
   end
 
   def copy_to_final_mark!(scorer)

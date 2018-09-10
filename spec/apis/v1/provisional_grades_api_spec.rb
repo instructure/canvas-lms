@@ -430,54 +430,92 @@ describe 'Provisional Grades API', type: :request do
 
       context "with multiple provisional grades" do
         before(:once) do
-          course_with_user("TaEnrollment", course: @course, active_all: true)
-          @second_ta = @user
+          @first_ta = @ta
+          @first_student = @student
+          @second_ta = course_with_user("TaEnrollment", course: @course, active_all: true).user
+          @second_student = course_with_user("StudentEnrollment", course: @course, active_all: true).user
+          @first_student_submission = @assignment.submit_homework(@first_student, body: "hello")
+          @second_student_submission = @assignment.submit_homework(@second_student, body: "hello")
         end
 
-        it "publishes even when some submissions have no grades" do
-          @submission = @assignment.submit_homework(@student, body: "hello")
+        context "when some submissions have no grades" do
+          it "returns status ok" do
+            api_call_as_user(@teacher, :post, @path, @params)
+            expect(response).to have_http_status(:ok)
+          end
 
-          @user = @teacher
-          raw_api_call(:post, @path, @params)
+          it "publishes assignment" do
+            api_call_as_user(@teacher, :post, @path, @params)
+            expect(@assignment.reload.grades_published_at).not_to be_nil
+          end
 
-          expect(response.response_code).to eq(200)
-          expect(@submission.reload.score).to be_nil
-          expect(@assignment.reload.grades_published_at).not_to be_nil
+          it "does not publish a score for those that were ungraded" do
+            api_call_as_user(@teacher, :post, @path, @params)
+            expect(@first_student_submission.reload.score).to be_nil
+          end
         end
 
-        it "does not publish if none have been explicitly selected" do
-          @submission = @assignment.submit_homework(@student, body: "hello")
-          @assignment.grade_student(@student, grader: @ta, score: 72, provisional: true)
-          @assignment.grade_student(@student, grader: @second_ta, score: 88, provisional: true)
+        context "when no grades have been explicitly selected" do
+          before(:once) do
+            @assignment.grade_student(@first_student, grader: @first_ta, score: 72, provisional: true)
+            @assignment.grade_student(@first_student, grader: @second_ta, score: 88, provisional: true)
+          end
 
-          @user = @teacher
-          raw_api_call(:post, @path, @params)
+          it "returns status unprocessable entity" do
+            api_call_as_user(@teacher, :post, @path, @params)
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
 
-          expect(response.response_code).to eq(422)
-          expect(@submission.reload).not_to be_graded
-          expect(@assignment.reload.grades_published_at).to be_nil
+          it "does not publish the assignment" do
+            api_call_as_user(@teacher, :post, @path, @params)
+            expect(@assignment.reload.grades_published_at).to be_nil
+          end
+
+          it "does not grade the submission" do
+            api_call_as_user(@teacher, :post, @path, @params)
+            expect(@first_student_submission.reload).not_to be_graded
+          end
         end
 
-        it "does not publish any if not all have been explicitly selected" do
-          student_1 = @student
-          student_2 = student_in_course(active_all: true, course: @course).user
-          submission_1 = @assignment.submit_homework(student_1, body: "hello")
-          submission_2 = @assignment.submit_homework(student_2, body: "hello")
-          selection_1 = @assignment.moderated_grading_selections.find_by(student: student_1)
-          @assignment.grade_student(student_1, grader: @ta, score: 12, provisional: true)
-          @assignment.grade_student(student_1, grader: @second_ta, score: 34, provisional: true)
-          @assignment.grade_student(student_2, grader: @ta, score: 56, provisional: true)
-          @assignment.grade_student(student_2, grader: @second_ta, score: 78, provisional: true)
+        context "when not all grades have been explicitly selected" do
+          before(:each) do
+            @assignment.grade_student(@student, grader: @ta, score: 12, provisional: true)
+            @assignment.grade_student(@student, grader: @second_ta, score: 34, provisional: true)
+            @assignment.grade_student(@second_student, grader: @ta, score: 56, provisional: true)
+            @assignment.grade_student(@second_student, grader: @second_ta, score: 78, provisional: true)
+            first_student_selection = @assignment.moderated_grading_selections.find_by(student: @student)
+            first_student_selection.update!(selected_provisional_grade_id: @first_student_submission.provisional_grade(@ta))
+          end
 
-          selection_1.update_attribute(:selected_provisional_grade_id, submission_1.provisional_grade(@ta))
+          it "returns status unprocessable entity" do
+            api_call_as_user(@teacher, :post, @path, @params)
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
 
-          @user = @teacher
-          raw_api_call(:post, @path, @params)
+          it "does not grade the submission" do
+            api_call_as_user(@teacher, :post, @path, @params)
+            expect(@first_student_submission.reload).not_to be_graded
+          end
 
-          expect(response.response_code).to eq(422)
-          expect(submission_1.reload).not_to be_graded
-          expect(submission_2.reload).not_to be_graded
-          expect(@assignment.reload.grades_published_at).to be_nil
+          it "does not publish the assignment" do
+            api_call_as_user(@teacher, :post, @path, @params)
+            expect(@assignment.reload.grades_published_at).to be_nil
+          end
+        end
+
+        it "only calls GradeCalculator once even if there are multiple selections" do
+          @assignment.grade_student(@first_student, grader: @first_ta, score: 12, provisional: true)
+          @assignment.grade_student(@first_student, grader: @second_ta, score: 34, provisional: true)
+          @assignment.grade_student(@second_student, grader: @first_ta, score: 56, provisional: true)
+          @assignment.grade_student(@second_student, grader: @second_ta, score: 78, provisional: true)
+          first_student_selection = @assignment.moderated_grading_selections.find_by(student: @first_student)
+          second_student_selection = @assignment.moderated_grading_selections.find_by(student: @second_student)
+          first_student_selection.update!(selected_provisional_grade_id: @first_student_submission.provisional_grade(@ta))
+          second_student_selection.update!(selected_provisional_grade_id: @second_student_submission.provisional_grade(@second_ta))
+
+          expect(GradeCalculator).to receive(:recompute_final_score).once
+
+          api_call_as_user(@teacher, :post, @path, @params)
         end
       end
 

@@ -457,6 +457,20 @@ describe ModeratedGrading::ProvisionalGrade do
 
       expect(sub.submission_comments.map(&:comment)).to match_array(['provisional', 'normal'])
     end
+
+    it "triggers GradeCalculator#recompute_final_score by default" do
+      sub = assignment.submit_homework(student, submission_type: "online_text_entry", body: "hello")
+      pg = sub.find_or_create_provisional_grade!(scorer, score: 1)
+      expect(GradeCalculator).to receive(:recompute_final_score).once
+      pg.publish!
+    end
+
+    it "does not triggers GradeCalculator#recompute_final_score if passed skip_grade_calc true" do
+      sub = assignment.submit_homework(student, submission_type: "online_text_entry", body: "hello")
+      pg = sub.find_or_create_provisional_grade!(scorer, score: 1)
+      expect(GradeCalculator).not_to receive(:recompute_final_score)
+      pg.publish!(skip_grade_calc: true)
+    end
   end
 
   describe "copy_to_final_mark!" do

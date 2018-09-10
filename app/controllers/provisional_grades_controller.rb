@@ -271,6 +271,8 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
       submission.provisional_grades.any?
     end
 
+    graded_users_ids = graded_submissions.map(&:user_id)
+
     grades_to_publish = graded_submissions.map do |submission|
       if (selection = selections[submission.user_id])
         # student in moderation: choose the selected provisional grade
@@ -299,7 +301,11 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
       selected_provisional_grade
     end
 
-    grades_to_publish.each(&:publish!)
+    grades_to_publish.each { |grade| grade.publish!(skip_grade_calc: true) }
+    # Callbacks in Submission to recompute the score of each enrollment are
+    # suspended when publishing grades to avoid multiple calls to the
+    # GradeCalculator, so instead the call is made here.
+    @context.recompute_student_scores(graded_users_ids)
     @context.touch_admins_later # just in case nothing got published
     @assignment.updating_user = @current_user
     @assignment.update_attribute(:grades_published_at, Time.now.utc)
