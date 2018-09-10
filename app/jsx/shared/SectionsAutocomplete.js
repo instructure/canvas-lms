@@ -88,6 +88,21 @@ export default class SectionsAutocomplete extends React.Component {
   }
 
   render () {
+    // NOTE: the hidden input is used by the erb that this component is rendered in
+    // If we do not have the hidden component then the erb tries to grab the element
+    // and will block the submission because it does not exist
+    // One day we should probably try to decouple this
+    if(this.props.disabled) {
+      return(
+        <div id="disabled_sections_autocomplete">
+          <input
+            name="specific_sections"
+            type="hidden"
+            value={this.state.selectedSectionsValue}/>
+        </div>
+      );
+    }
+
     return (
       <View
         display="block"
