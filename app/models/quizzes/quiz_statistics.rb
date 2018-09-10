@@ -35,6 +35,7 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
 
   after_initialize do
     self.includes_all_versions ||= false
+    self.includes_sis_ids ||= false
   end
 
   # Test a given quiz if it's within the sanity limits for generating stats.
@@ -143,7 +144,10 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| quiz.grants_right?(user, session, :read_statistics) }
+    given do |user, session|
+      quiz.grants_right?(user, session, :read_statistics) &&
+        (!includes_sis_ids || quiz.context.grants_any_right?(user, session, :read_sis, :manage_sis))
+    end
     can :read
   end
 end

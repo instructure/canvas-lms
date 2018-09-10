@@ -195,11 +195,11 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
       columns = []
       columns << I18n.t('statistics.csv_columns.name', 'name') unless anonymous?
       columns << I18n.t('statistics.csv_columns.id', 'id') unless anonymous?
-      columns << I18n.t('statistics.csv_columns.sis_id', 'sis_id') unless anonymous?
+      columns << I18n.t('statistics.csv_columns.sis_id', 'sis_id') if !anonymous? && includes_sis_ids?
       columns << I18n.t('statistics.csv_columns.root_account', 'root_account') if !anonymous? && include_root_accounts
       columns << I18n.t('statistics.csv_columns.section', 'section')
       columns << I18n.t('statistics.csv_columns.section_id', 'section_id')
-      columns << I18n.t('statistics.csv_columns.section_sis_id', 'section_sis_id')
+      columns << I18n.t('statistics.csv_columns.section_sis_id', 'section_sis_id') if includes_sis_ids?
       columns << I18n.t('statistics.csv_columns.submitted', 'submitted')
       columns << I18n.t('statistics.csv_columns.attempt', 'attempt') if includes_all_versions?
       first_question_index = columns.length
@@ -231,13 +231,16 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
           if submission.user
             row << submission.user.name
             row << submission.user_id
-            pseudonym = SisPseudonym.for(submission.user, quiz.context.account, type: :trusted)
-            row << pseudonym.try(:sis_user_id)
+            if includes_sis_ids?
+              pseudonym = SisPseudonym.for(submission.user, quiz.context.account, type: :trusted)
+              row << pseudonym.try(:sis_user_id)
+            end
             row << (pseudonym && HostUrl.context_host(pseudonym.account)) if include_root_accounts
           else
-            3.times do
+            2.times do
               row << ''
             end
+            row << '' if includes_sis_ids?
             row << '' if include_root_accounts
           end
         end
@@ -251,7 +254,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
         end
         row << section_name.join(", ")
         row << section_id.join(", ")
-        row << section_sis_id.join(", ")
+        row << section_sis_id.join(", ") if includes_sis_ids?
         row << submission.finished_at
         row << submission.attempt if includes_all_versions?
         columns[first_question_index..last_question_index].each do |id|

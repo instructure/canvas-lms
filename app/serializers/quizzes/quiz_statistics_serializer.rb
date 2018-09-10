@@ -49,6 +49,10 @@ module Quizzes
       # PS: this is always true for item analysis
       :includes_all_versions,
 
+      # whether statistics report includes sis ids
+      # always false for item analysis
+      :includes_sis_ids,
+
       :points_possible,
       :anonymous_survey,
 
@@ -141,6 +145,10 @@ module Quizzes
 
     def includes_all_versions
       object[:student_analysis].includes_all_versions
+    end
+
+    def includes_sis_ids
+      object[:student_analysis].includes_sis_ids
     end
 
     def points_possible

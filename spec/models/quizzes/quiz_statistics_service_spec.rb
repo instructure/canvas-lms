@@ -58,7 +58,8 @@ describe Quizzes::QuizStatisticsService do
       allow(Quizzes::QuizStatistics).to receive(:large_quiz?).and_return false
 
       expect(quiz).to receive(:current_statistics_for).with('student_analysis', {
-        includes_all_versions: true
+        includes_all_versions: true,
+        includes_sis_ids: true
       }).and_return(student_analysis)
 
       expect(quiz).to receive(:current_statistics_for).with('item_analysis').and_return(item_analysis)
@@ -70,7 +71,8 @@ describe Quizzes::QuizStatisticsService do
       allow(Quizzes::QuizStatistics).to receive(:large_quiz?).and_return false
 
       expect(quiz).to receive(:current_statistics_for).with('student_analysis', {
-        includes_all_versions: false
+        includes_all_versions: false,
+        includes_sis_ids: true
       }).and_return(student_analysis)
 
       expect(quiz).to receive(:current_statistics_for).with('item_analysis').and_return(item_analysis)
