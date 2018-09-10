@@ -18,7 +18,6 @@
 
 class DocviewerAuditEventsController < ApplicationController
   skip_before_action :verify_authenticity_token
-  before_action :check_params
   before_action :check_jwt_token
 
   def create
@@ -42,22 +41,20 @@ class DocviewerAuditEventsController < ApplicationController
     event = AnonymousOrModerationEvent.new(
       assignment: assignment,
       canvadoc: canvadoc,
-      event_type: 'docviewer_' + params[:event_type],
-      payload: {
-        annotation_body: params[:annotation_body].permit(:color, :content, :created_at, :modified_at, :page, :type),
-        related_annotation_id: params[:related_annotation_id]
-      },
+      event_type: "docviewer_#{docviewer_audit_event_params[:event_type]}",
       submission: submission,
-      user: user
+      user: user,
+      payload: {
+        annotation_body: docviewer_audit_event_params[:annotation_body],
+        related_annotation_id: docviewer_audit_event_params[:related_annotation_id]
+      },
     )
 
     respond_to do |format|
       if event.save
-        return render json: event.as_json, status: :ok
+        format.json { render json: event.as_json, status: :ok }
       else
-        format.json do
-          render json: event.errors.as_json.merge(message: 'Invalid param values'), status: :unprocessable_entity
-        end
+        format.json { render json: event.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -71,19 +68,17 @@ class DocviewerAuditEventsController < ApplicationController
   end
 
   def check_jwt_token
-      Canvas::Security.decode_jwt(params[:token], [Canvadoc.jwt_secret])
+    Canvas::Security.decode_jwt(params[:token], [Canvadoc.jwt_secret])
   rescue
-      return render json: {message: 'JWT signature invalid'}, status: :unauthorized
+    return render json: {message: 'JWT signature invalid'}, status: :unauthorized
   end
 
-  def check_params
-    required_params = %i[annotation_body token canvas_user_id document_id event_type submission_id]
-
-    begin
-      params.require(required_params)
-    rescue ActionController::ParameterMissing => error
-      return render json: {message: error.to_s}, status: :bad_request
-    end
+  def docviewer_audit_event_params
+    params.require(:docviewer_audit_event).permit(
+      :event_type,
+      :related_annotation_id,
+      annotation_body: %i[color content created_at modified_at page type]
+    )
   end
 
   def canvadoc_from_submission(submission, document_id)
@@ -96,6 +91,6 @@ class DocviewerAuditEventsController < ApplicationController
       end
     end
 
-    raise ActiveRecord::RecordNotFound.new('No canvadoc with given document id was found for this submission')
+    raise ActiveRecord::RecordNotFound, 'No canvadoc with given document id was found for this submission'
   end
 end

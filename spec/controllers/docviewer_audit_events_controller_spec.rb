@@ -43,19 +43,21 @@ describe DocviewerAuditEventsController do
 
   let(:default_params) do
     {
-      annotation_body: {
-        color: '',
-        content: '',
-        created_at: '',
-        modified_at: '',
-        page: '',
-        type: '',
+      docviewer_audit_event: {
+        annotation_body: {
+          color: '',
+          content: '',
+          created_at: '',
+          modified_at: '',
+          page: '',
+          type: ''
+        },
+        event_type: 'highlight_created',
+        related_annotation_id: 1
       },
       token: Canvas::Security.create_jwt({}, nil, @secret, :HS512),
       canvas_user_id: @teacher.id,
       document_id: @attachment.canvadoc.document_id,
-      event_type: 'highlight_created',
-      related_annotation_id: 1,
       submission_id: @submission.id
     }
   end
@@ -64,29 +66,22 @@ describe DocviewerAuditEventsController do
     it 'renders status unauthorized if not passed a correct jwt auth token' do
       assignment = Assignment.create!(course: @course, name: 'anonymous', anonymous_grading: true)
       @submission = assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
-      post :create, format: :json, params: default_params.merge({token: 'wrong token'})
+      post :create, format: :json, params: default_params.merge(token: 'wrong token')
       expect(response).to have_http_status(:unauthorized)
     end
 
     it 'explains if not passed a correct jwt auth token' do
       assignment = Assignment.create!(course: @course, name: 'anonymous', anonymous_grading: true)
       @submission = assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
-      post :create, format: :json, params: default_params.merge({token: 'wrong token'})
-      expect(JSON.parse(response.body)['message']).to eq 'JWT signature invalid'
+      post :create, format: :json, params: default_params.merge(token: 'wrong token')
+      expect(JSON.parse(response.body).fetch('message')).to eq 'JWT signature invalid'
     end
 
     it 'renders status bad_request if param values are missing' do
       assignment = Assignment.create!(course: @course, name: 'anonymous', anonymous_grading: true)
       @submission = assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
-      post :create, format: :json, params: default_params.except(:event_type)
+      post :create, format: :json, params: default_params.except(:docviewer_audit_event)
       expect(response).to have_http_status(:bad_request)
-    end
-
-    it 'explains that the param values are missing, when rendering status bad_request' do
-      assignment = Assignment.create!(course: @course, name: 'anonymous', anonymous_grading: true)
-      @submission = assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
-      post :create, format: :json, params: default_params.except(:event_type)
-      expect(JSON.parse(response.body)['message']).to eq 'param is missing or the value is empty: event_type'
     end
 
     it 'renders status not_acceptable for a non-moderated, non-anonymous assignment' do
@@ -100,7 +95,7 @@ describe DocviewerAuditEventsController do
       assignment = Assignment.create!(course: @course, name: 'non-moderated and non-anonymous')
       @submission = assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
       post :create, format: :json, params: default_params
-      expect(JSON.parse(response.body)['message']).to eq 'Assignment is neither anonymous nor moderated'
+      expect(JSON.parse(response.body).fetch('message')).to eq 'Assignment is neither anonymous nor moderated'
     end
 
     context 'for a moderated assignment' do
@@ -113,7 +108,7 @@ describe DocviewerAuditEventsController do
           final_grader: @teacher
         )
         @submission = assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
-        post :create, format: :json, params: default_params.merge({canvas_user_id: @first_ta.id})
+        post :create, format: :json, params: default_params.merge(canvas_user_id: @first_ta.id)
         expect(response).to have_http_status(:ok)
       end
 
@@ -141,7 +136,7 @@ describe DocviewerAuditEventsController do
         )
         @submission = assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
         assignment.grade_student(@student, grade: 10, grader: @first_ta, provisional: true)
-        post :create, format: :json, params: default_params.merge({canvas_user_id: @second_ta.id})
+        post :create, format: :json, params: default_params.merge(canvas_user_id: @second_ta.id)
         expect(response).to have_http_status(:forbidden)
       end
 
@@ -155,8 +150,8 @@ describe DocviewerAuditEventsController do
         )
         @submission = assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
         assignment.grade_student(@student, grade: 10, grader: @first_ta, provisional: true)
-        post :create, format: :json, params: default_params.merge({canvas_user_id: @second_ta.id})
-        expect(JSON.parse(response.body)['message']).to eq 'Reached maximum number of graders for assignment'
+        post :create, format: :json, params: default_params.merge(canvas_user_id: @second_ta.id)
+        expect(JSON.parse(response.body).fetch('message')).to eq 'Reached maximum number of graders for assignment'
       end
     end
 
@@ -173,9 +168,9 @@ describe DocviewerAuditEventsController do
   it 'allows students to annotate, if assignment is anonymous or moderated' do
     assignment = Assignment.create!(course: @course, name: 'anonymous', anonymous_grading: true)
     @submission = assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
-    post :create, format: :json, params: default_params.merge({canvas_user_id: @student.id})
-    events = AnonymousOrModerationEvent.where(assignment: assignment, submission: @submission)
-    expect(events.count).to be 1
+    expect {
+      post :create, format: :json, params: default_params.merge(canvas_user_id: @student.id)
+    }.to change { AnonymousOrModerationEvent.where(assignment: assignment, submission: @submission).count }.by(1)
   end
 
   it 'allows fake students to annotate, if assignment is anonymous or moderated' do
@@ -184,9 +179,12 @@ describe DocviewerAuditEventsController do
     doc = Canvadoc.create!(document_id: "abc123#{attachment.id}", attachment_id: attachment.id)
     assignment = Assignment.create!(course: @course, name: 'anonymous', anonymous_grading: true)
     @submission = assignment.submit_homework(fake_student, submission_type: 'online_upload', attachments: [attachment])
-    post :create, format: :json, params: default_params.merge({canvas_user_id: fake_student.id, document_id: doc.document_id})
-    events = AnonymousOrModerationEvent.where(assignment: assignment, submission: @submission)
-    expect(events.count).to be 1
+    params = default_params.merge(canvas_user_id: fake_student.id, document_id: doc.document_id)
+    expect {
+      post :create, format: :json, params: params
+    }.to change {
+      AnonymousOrModerationEvent.where(assignment: assignment, submission: @submission).count
+    }.by(1)
   end
 
   context "as an admin" do
@@ -202,19 +200,19 @@ describe DocviewerAuditEventsController do
       @assignment.grade_student(@student, grade: 10, grader: @first_ta, provisional: true)
     end
 
-    def annotate_as_admin
-      post :create, format: :json, params: default_params.merge({canvas_user_id: account_admin_user.id})
+    subject(:annotate_as_admin) do
+      -> { post :create, format: :json, params: default_params.merge(canvas_user_id: account_admin_user.id) }
     end
 
     it "can annotate even if there are no slots available" do
       @assignment.update!(grader_count: 1)
-      expect{ annotate_as_admin }.to change {
+      is_expected.to change {
         AnonymousOrModerationEvent.where(assignment: @assignment, submission: @submission).count
       }.by(1)
     end
 
     it "does not occupy a slot when annotating" do
-      expect{ annotate_as_admin }.not_to change { @assignment.provisional_moderation_graders.count }
+      is_expected.not_to change { @assignment.provisional_moderation_graders.count }
     end
   end
 
@@ -228,7 +226,7 @@ describe DocviewerAuditEventsController do
     )
     existing_grader = assignment.moderation_graders.create!(user: @first_ta, anonymous_id: '12345', slot_taken: false)
     @submission = assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
-    post :create, format: :json, params: default_params.merge({canvas_user_id: @first_ta.id})
+    post :create, format: :json, params: default_params.merge(canvas_user_id: @first_ta.id)
     expect(existing_grader.reload.slot_taken).to be true
   end
 
@@ -239,9 +237,11 @@ describe DocviewerAuditEventsController do
     @submission = assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
     @submission.update!(submitted_at: 1.hour.ago)
     @submission = assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [second_attachment])
-    post :create, format: :json, params: default_params.merge({canvas_user_id: @teacher.id})
-    events = AnonymousOrModerationEvent.where(assignment: assignment, submission: @submission)
-    expect(events.count).to be 1
+    expect {
+      post :create, format: :json, params: default_params.merge(canvas_user_id: @teacher.id)
+    }.to change {
+      AnonymousOrModerationEvent.where(assignment: assignment, submission: @submission).count
+    }.by(1)
   end
 
   it 'creates a moderation grader' do
@@ -253,7 +253,7 @@ describe DocviewerAuditEventsController do
       final_grader: @teacher
     )
     @submission = assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
-    post :create, format: :json, params: default_params.merge({canvas_user_id: @first_ta.id})
+    post :create, format: :json, params: default_params.merge(canvas_user_id: @first_ta.id)
     expect(assignment.moderation_graders.pluck(:user_id)).to include @first_ta.id
   end
 
@@ -282,31 +282,36 @@ describe DocviewerAuditEventsController do
     @submission = assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
     assignment.grade_student(@student, grade: 10, grader: @teacher, provisional: true)
     assignment.update!(grades_published_at: Time.zone.now)
-    post :create, format: :json, params: default_params.merge({canvas_user_id: @first_ta.id})
-    events = AnonymousOrModerationEvent.where(assignment: assignment, canvadoc: @attachment.canvadoc, submission: @submission)
-    expect(events.count).to be 1
+    expect {
+      post :create, format: :json, params: default_params.merge(canvas_user_id: @first_ta.id)
+    }.to change {
+      AnonymousOrModerationEvent.where(assignment: assignment, canvadoc: @attachment.canvadoc, submission: @submission).count
+    }.by(1)
   end
 
   it 'creates an AnonymousOrModerationEvent' do
     assignment = Assignment.create!(course: @course, anonymous_grading: true, name: 'anonymous')
     @submission = assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
-    post :create, format: :json, params: default_params
-    events = AnonymousOrModerationEvent.where(assignment: assignment, canvadoc: @attachment.canvadoc, submission: @submission)
-    expect(events.count).to be 1
+    expect {
+      post :create, format: :json, params: default_params
+    }.to change {
+      AnonymousOrModerationEvent.where(assignment: assignment, canvadoc: @attachment.canvadoc, submission: @submission).count
+    }.by(1)
   end
 
   it 'saves a copy of the annotation_body in the payload' do
     assignment = Assignment.create!(course: @course, anonymous_grading: true, name: 'anonymous')
     @submission = assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
-    post :create, format: :json, params: default_params.merge({annotation_body: {type: 'a type'}})
+    post :create, format: :json, params: default_params.deep_merge(docviewer_audit_event: { annotation_body: { type: 'a type' } })
     event = AnonymousOrModerationEvent.find_by!(assignment: assignment, canvadoc: @attachment.canvadoc, submission: @submission)
-    expect(event.payload['annotation_body']['type']).to eq 'a type'
+    type = event.payload.fetch('annotation_body').fetch('type')
+    expect(type).to eq 'a type'
   end
 
   it 'saves the related_annotation_id in the payload' do
     assignment = Assignment.create!(course: @course, anonymous_grading: true, name: 'anonymous')
     @submission = assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
-    post :create, format: :json, params: default_params.merge({related_annotation_id: 23})
+    post :create, format: :json, params: default_params.deep_merge(docviewer_audit_event: { related_annotation_id: 23 })
     event = AnonymousOrModerationEvent.find_by!(assignment: assignment, canvadoc: @attachment.canvadoc, submission: @submission)
     expect(event.payload['related_annotation_id']).to eq '23'
   end
@@ -316,7 +321,7 @@ describe DocviewerAuditEventsController do
     @submission = assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
     post :create, format: :json, params: default_params
     event = AnonymousOrModerationEvent.find_by!(assignment: assignment, canvadoc: @attachment.canvadoc, submission: @submission)
-    expect(JSON.parse(response.body)['anonymous_or_moderation_event']['id'].to_i).to be event.id
+    expect(JSON.parse(response.body).fetch('anonymous_or_moderation_event').fetch('id')).to eq event.id
   end
 
   it "is okay if related_annotation_id is not passed" do
