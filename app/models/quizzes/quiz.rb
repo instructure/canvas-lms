@@ -926,10 +926,11 @@ class Quizzes::Quiz < ActiveRecord::Base
     end
   end
 
-  def statistics(include_all_versions = true)
+  def statistics(include_all_versions = true, includes_sis_ids = true)
     quiz_statistics.build(
       :report_type => 'student_analysis',
-      :includes_all_versions => include_all_versions
+      :includes_all_versions => include_all_versions,
+      :includes_sis_ids => includes_sis_ids
     ).report.generate
   end
 
@@ -940,9 +941,13 @@ class Quizzes::Quiz < ActiveRecord::Base
     # most recent), thus we say it always cares about all versions
     options[:includes_all_versions] = true if report_type == 'item_analysis'
 
+    # item analysis doesn't include sis ids
+    options[:includes_sis_ids] = false if report_type == 'item_analysis'
+
     quiz_stats_opts = {
       :report_type => report_type,
       :includes_all_versions => !!options[:includes_all_versions],
+      :includes_sis_ids => !!options[:includes_sis_ids],
       :anonymous => anonymous_submissions?
     }
 

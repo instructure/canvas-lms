@@ -33,6 +33,7 @@ module Quizzes
       report_type
       readable_type
       includes_all_versions
+      includes_sis_ids
       generatable
       anonymous
       url
