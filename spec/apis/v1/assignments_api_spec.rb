@@ -2080,6 +2080,32 @@ describe AssignmentsApiController, type: :request do
         expect(@student.messages.detect{|m| m.notification_id == @notification.id}).to be_present
       end
 
+      it "should send notification on due date update (even if other overrides are passed in)" do
+        section2 = @course.course_sections.create!
+        assignment = @course.assignments.create!(:name => "blah", :workflow_state => 'published', :due_at => 1.hour.from_now)
+        Assignment.where(:id => assignment).update_all(:created_at => 5.hours.ago)
+
+        notification = Notification.create!(:name => "Assignment Due Date Changed")
+        @student.email_channel.notification_policies.create!(notification: notification, frequency: 'immediately')
+
+        @user = @teacher
+        json = api_call(:put,
+          "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+          {
+            :controller => 'assignments_api',
+            :action => 'update', :format => 'json',
+            :course_id => @course.id.to_s,
+            :id => assignment.to_param
+          },
+          {
+            :assignment => {
+              'due_at' => 2.days.from_now.iso8601,
+              'assignment_overrides' => {'0' => {'course_section_id' => section2.id, 'due_at' => 1.day.from_now.iso8601}}
+            }
+          })
+        expect(@student.messages.detect{|m| m.notification_id == notification.id}).to be_present
+      end
+
       it "should use new overrides for notifications of creation on save and publish" do
         assignment = @course.assignments.create!(:name => "blah", :workflow_state => 'unpublished',
           :only_visible_to_overrides => true)
