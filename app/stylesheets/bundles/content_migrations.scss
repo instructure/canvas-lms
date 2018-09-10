@@ -200,3 +200,7 @@ i.course_select_warning {
   padding-#{direction(left)}: $ic-sp;
 }
 
+#selectContentBtn.btn-primary {
+  background: var(--ic-brand-button--primary-bgd);
+  color: var(--ic-brand-button--primary-text);
+}
