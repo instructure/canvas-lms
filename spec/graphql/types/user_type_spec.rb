@@ -17,15 +17,50 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
 require File.expand_path(File.dirname(__FILE__) + '/../../helpers/legacy_type_tester')
 
 describe Types::UserType do
-  let_once(:user) { student_in_course(active_all: true); @student }
-  let(:user_type) { LegacyTypeTester.new(Types::UserType, user) }
+  before(:once) do
+    student = student_in_course(active_all: true).user
+    course = @course
+    teacher = @teacher
+    @other_student = student_in_course(active_all: true).user
 
-  it "works" do
-    expect(user_type._id).to eq user.id
-    expect(user_type.name).to eq "User"
+    @other_course = course_factory
+    @random_person = teacher_in_course(active_all: true).user
+
+    @course = course
+    @student = student
+    @teacher = teacher
+
+  end
+
+  let(:new_user_type) { GraphQLTypeTester.new(@student, current_user: @teacher) }
+  let(:user_type) { LegacyTypeTester.new(Types::UserType, @student) }
+  let(:user) { @student }
+
+  context "node" do
+    it "works" do
+      expect(new_user_type.resolve("_id")).to eq @student.id.to_s
+      expect(new_user_type.resolve("name")).to eq @student.name
+    end
+
+    it "works for users in the same course" do
+      expect(new_user_type.resolve("_id", current_user: @other_student)).to eq @student.id.to_s
+    end
+
+    it "doesn't work for just anyone" do
+      expect(new_user_type.resolve("_id", current_user: @random_person)).to be_nil
+    end
+
+    it "loads inactive and concluded users" do
+      @student.enrollments.update_all workflow_state: "inactive"
+      expect(new_user_type.resolve("_id", current_user: @other_student)).to eq @student.id.to_s
+
+      @student.enrollments.update_all workflow_state: "completed"
+      expect(new_user_type.resolve("_id", current_user: @other_student)).to eq @student.id.to_s
+    end
   end
 
   context "avatarUrl" do
@@ -43,7 +78,7 @@ describe Types::UserType do
     before(:once) do
       @course1 = @course
       @course2 = course_factory
-      student_in_course(user: @student, course: @course2, active_all: true)
+      @course2.enroll_student(@student, enrollment_state: "active")
     end
 
     it "returns enrollments for a given course" do
@@ -80,8 +115,7 @@ describe Types::UserType do
 
   context "email" do
     before(:once) do
-      user.email = "cooldude@example.com"
-      user.save!
+      @student.update_attributes! email: "cooldude@example.com"
     end
 
     it "returns email for teachers/admins" do
@@ -93,13 +127,9 @@ describe Types::UserType do
     end
 
     it "doesn't return email for others" do
-      _student = user
-      other_student = student_in_course(active_all: true).user
-      teacher_in_other_course = teacher_in_course(course: course_factory).user
-
       expect(user_type.email(current_user: nil)).to be_nil
-      expect(user_type.email(current_user: other_student)).to be_nil
-      expect(user_type.email(current_user: teacher_in_other_course)).to be_nil
+      expect(user_type.email(current_user: @other_student)).to be_nil
+      expect(user_type.email(current_user: @random_person)).to be_nil
     end
   end
 end

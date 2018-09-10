@@ -28,9 +28,28 @@ module GraphQLNodeLoader
     when "Section"
       Loaders::IDLoader.for(CourseSection).load(id).then(check_read_permission)
     when "User"
-      Loaders::IDLoader.for(User).load(id).then(
-        make_permission_check(ctx, :manage, :manage_user_details)
-      )
+      Loaders::IDLoader.for(User).load(id).then(->(user) do
+        return nil unless user && ctx[:current_user]
+
+        return user if user.grants_right?(ctx[:current_user], :read_full_profile)
+
+        has_permission = Rails.cache.fetch(["node_user_perm", ctx[:current_user], user].cache_key) do
+          has_perm = Shard.with_each_shard(user.associated_shards & ctx[:current_user].associated_shards) do
+            shared_courses = Enrollment
+              .joins("INNER JOIN #{Enrollment.quoted_table_name} e2 ON e2.course_id = enrollments.course_id")
+              .where("enrollments.user_id = ? AND e2.user_id = ?", user.id, ctx[:current_user].id)
+              .select("enrollments.course_id")
+
+            break true if Course.where(id: shared_courses).any? do |course|
+              course.grants_right?(ctx[:current_user], :read_roster) &&
+                course.enrollments_visible_to(ctx[:current_user], include_concluded: true).where(user_id: user).exists?
+            end
+          end
+          has_perm == true
+        end
+
+        has_permission ? user : nil
+      end)
     when "Enrollment"
       Loaders::IDLoader.for(Enrollment).load(id).then do |enrollment|
         Loaders::IDLoader.for(Course).load(enrollment.course_id).then do |course|
