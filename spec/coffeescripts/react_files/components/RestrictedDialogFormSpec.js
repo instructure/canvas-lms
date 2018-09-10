@@ -50,11 +50,11 @@ QUnit.module('RestrictedDialogForm Multiple Selected Items', {
 })
 
 test('button is disabled but becomes enabled when you select an item', function() {
-  equal(this.restrictedDialogForm.refs.updateBtn.props.disabled, true, 'starts off as disabled')
+  equal(this.restrictedDialogForm.refs.updateBtn.disabled, true, 'starts off as disabled')
   this.restrictedDialogForm.refs.restrictedSelection.refs.publishInput.checked = true
   Simulate.change(this.restrictedDialogForm.refs.restrictedSelection.refs.publishInput)
   equal(
-    this.restrictedDialogForm.refs.updateBtn.props.disabled,
+    this.restrictedDialogForm.refs.updateBtn.disabled,
     false,
     'is enabled after an option is selected'
   )
