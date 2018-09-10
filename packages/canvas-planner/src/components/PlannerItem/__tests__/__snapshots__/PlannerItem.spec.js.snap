@@ -4004,7 +4004,7 @@ exports[`renders assignment peer reviews correctly 1`] = `
             <ScreenReaderContent
               as="span"
             >
-              Peer Review some reviewable assignment, due Saturday, December 17, 2011 3:30 AM.
+              Peer Review some reviewable assignment, reminder Saturday, December 17, 2011 3:30 AM.
             </ScreenReaderContent>
             <PresentationContent
               as="span"

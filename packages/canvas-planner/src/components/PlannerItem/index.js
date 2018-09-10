@@ -234,6 +234,8 @@ export class PlannerItem extends Component {
       if (this.hasDueTime()) {
         if (this.props.dateStyle === 'todo') {
           return formatMessage('{assignmentType} {title} has a to do time at {datetime}.', params);
+        } else if (this.props.associated_item === 'Peer Review') {
+          return formatMessage('{assignmentType} {title}, reminder {datetime}.', params);
         } else {
           return formatMessage('{assignmentType} {title}, due {datetime}.', params);
         }
