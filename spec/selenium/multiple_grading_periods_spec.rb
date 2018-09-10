@@ -185,7 +185,7 @@ describe "interaction with grading periods" do
     end
 
     it 'should display the current grading period and assignments in grades page', priority: "1", test_id: 202326 do
-      expect(f("#grading_period_select_menu option[selected]")).to include_text('Course Grading Period 1')
+      expect(fj("#grading_period_select_menu option:selected")).to include_text('Course Grading Period 1')
       expect(f("#submission_#{assignment1.id} th a")).to include_text('Assignment 1')
     end
 

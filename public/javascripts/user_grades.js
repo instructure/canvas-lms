@@ -22,7 +22,7 @@ import './jquery.ajaxJSON'
   $(document).ready(function() {
     $(".grading_periods_selector").each(function () {
       var $selector = $(this),
-          selectedOption = $selector.find('option[selected]').val();
+          selectedOption = $selector.find('option:selected').val();
       $selector.val(selectedOption);
     });
 
