@@ -1731,14 +1731,6 @@ describe GradebooksController do
       expect(flash[:notice]).to eq 'SpeedGrader is disabled for this course'
     end
 
-    it "redirects if the assignment's moderated grader limit is reached" do
-      allow_any_instance_of(Assignment).to receive(:moderated_grader_limit_reached?).and_return(true)
-
-      get 'speed_grader', params: {:course_id => @course.id, :assignment_id => @assignment.id}
-      expect(response).to be_redirect
-      expect(flash[:notice]).to eq 'The maximum number of graders for this assignment has been reached.'
-    end
-
     it "redirects if the assignment is unpublished" do
       @assignment.unpublish
       get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}

@@ -84,39 +84,6 @@ describe 'Moderated Marking' do
     end
   end
 
-  context 'with max grader count reached' do
-    before(:once) do
-
-      # grader-count = 1, final_grader = Teacher1
-      @moderated_assignment.update(grader_count: 1)
-
-      # give a grade as non-final grader
-      @student1_submission = @moderated_assignment.grade_student(@student1, grade: 13, grader: @teacher3, provisional: true).first
-    end
-
-    it 'final-grader can access speedgrader', priority: '1', test_id: 3496271 do
-      user_session(@teacher1)
-      AssignmentPage.visit(@moderated_course.id, @moderated_assignment.id)
-
-      expect(AssignmentPage.page_action_list.text).to include 'SpeedGrader™'
-    end
-
-    it 'speedgrader link not visible to non-final-grader' do # test_id: 3496271
-      user_session(@teacher2)
-      AssignmentPage.visit(@moderated_course.id, @moderated_assignment.id)
-
-      expect(AssignmentPage.page_action_list.text).not_to include 'SpeedGrader™'
-    end
-
-    it 'informs user that maximum number of grades has been reached for the submission' do # test_id: 3496271
-      user_session(@teacher2)
-      get "/courses/#{@moderated_course.id}/gradebook/speed_grader?assignment_id=#{@moderated_assignment.id}"
-      wait_for_ajaximations
-
-      expect_flash_message :success, 'The maximum number of graders for this assignment has been reached.'
-    end
-  end
-
   context 'moderation page' do
     before(:once) do
       # update the grader count

@@ -6607,15 +6607,15 @@ describe Assignment do
       expect(@assignment.can_view_speed_grader?(@teacher)).to be false
     end
 
-    it 'returns false when user cannot be moderated grader' do
+    it 'returns false when the user cannot view or managed grades' do
+      @course.root_account.role_overrides.create!(permission: 'manage_grades', enabled: false, role: teacher_role)
+      @course.root_account.role_overrides.create!(permission: 'view_all_grades', enabled: false, role: teacher_role)
       expect(@assignment.context).to receive(:allows_speed_grader?).and_return true
-      expect(@assignment).to receive(:can_be_moderated_grader?).and_return false
       expect(@assignment.can_view_speed_grader?(@teacher)).to be false
     end
 
-    it 'returns true when the course allows speed grader and user can be grader' do
+    it 'returns true when the course allows speed grader and user can manage grades' do
       expect(@assignment.context).to receive(:allows_speed_grader?).and_return true
-      expect(@assignment).to receive(:can_be_moderated_grader?).and_return true
       expect(@assignment.can_view_speed_grader?(@teacher)).to be true
     end
   end

@@ -24,8 +24,8 @@ class AssignmentPresenter
 
   def can_view_speed_grader_link?(user)
     return false unless @context&.allows_speed_grader?
-    return true if !@assignment.moderated_grading && @context.grants_any_right?(user, :manage_grades, :view_all_grades)
+    return true if !@context.concluded? && @context.grants_any_right?(user, :manage_grades, :view_all_grades)
     return true if @context.concluded? && @context.grants_right?(user, :read_as_admin)
-    @assignment.can_be_moderated_grader?(user)
+    false
   end
 end

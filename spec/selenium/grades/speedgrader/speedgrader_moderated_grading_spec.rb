@@ -144,7 +144,8 @@ describe "speed grader" do
       @assignment.grade_student(@student, grader: other_ta, provisional: true, score: 7)
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      expect(driver.current_url).to_not match %r{/courses/#{@course.id}/gradebook/speed_grader}
+      expect(f('#grading-box-extended')).not_to be_displayed
+      expect(f('#not_gradeable_message')).to be_displayed
     end
 
     it "should lock a provisional grader out if graded by someone else while switching students" do

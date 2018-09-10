@@ -989,6 +989,10 @@ describe Assignment::SpeedGrader do
       end
     end
 
+    let(:final_grader) do
+      course_with_teacher(course: course, active_all: true, name: "Final Grader").user
+    end
+
     let(:ta_pg) { submission.provisional_grade(ta).tap {|pg| pg.update!(score: 3) } }
 
     before do
@@ -1012,6 +1016,32 @@ describe Assignment::SpeedGrader do
       json = Assignment::SpeedGrader.new(assignment, ta, grading_role: :provisional_grader).json
       comments = find_real_submission(json).fetch('submission_comments').map { |comment| comment.fetch('comment') }
       expect(comments).to match_array ['student comment']
+    end
+
+    it "creates a non-annotatable DocViewer session when the user cannot adjudicate" do
+      assignment.final_grader = final_grader
+      assignment.save!
+      assignment.moderation_graders.create!(user: teacher, anonymous_id: 'ababa')
+      assignment.moderation_graders.create!(user: ta, anonymous_id: 'atata')
+
+      other_ta = course_with_ta(course: course, active_all: true).user
+
+      attachment = attachment_model(
+        context: student,
+        uploaded_data: stub_png_data,
+        filename: "homework.png"
+      )
+      assignment.submit_homework(student, attachments: [attachment])
+
+      allow(Canvadocs).to receive(:enabled?).twice.and_return(true)
+      allow(Canvadocs).to receive(:config).and_return({ a: 1 })
+      allow(Canvadoc).to receive(:mime_types).and_return("image/png")
+
+      json = Assignment::SpeedGrader.new(assignment, other_ta, grading_role: :provisional_grader).json
+      sub = json[:submissions].first[:submission_history].last[:submission]
+
+      canvadoc_url = sub[:versioned_attachments].first.dig(:attachment, :canvadoc_url)
+      expect(canvadoc_url).to include("enable_annotations%22:false")
     end
 
     context "for provisional grader" do

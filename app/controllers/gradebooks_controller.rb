@@ -596,11 +596,6 @@ class GradebooksController < ApplicationController
 
     @assignment = @context.assignments.active.find(params[:assignment_id])
 
-    unless @assignment.can_view_speed_grader?(@current_user)
-      flash[:notice] = t('The maximum number of graders for this assignment has been reached.')
-      return redirect_to(course_gradebook_path(@context))
-    end
-
     if @assignment.unpublished?
       flash[:notice] = t(:speedgrader_enabled_only_for_published_content,
                          'SpeedGrader is enabled only for published content.')

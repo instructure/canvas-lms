@@ -2938,7 +2938,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def can_view_speed_grader?(user)
-    context.allows_speed_grader? && can_be_moderated_grader?(user)
+    context.allows_speed_grader? && context.grants_any_right?(user, :manage_grades, :view_all_grades)
   end
 
   def can_view_other_grader_identities?(user)
