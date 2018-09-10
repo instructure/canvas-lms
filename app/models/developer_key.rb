@@ -30,8 +30,8 @@ class DeveloperKey < ActiveRecord::Base
   has_many :developer_key_account_bindings, inverse_of: :developer_key, dependent: :destroy
   has_many :context_external_tools
 
-  has_one :tool_consumer_profile, :class_name => 'Lti::ToolConsumerProfile'
-  has_one :tool_configuration, class_name: 'Lti::ToolConfiguration'
+  has_one :tool_consumer_profile, :class_name => 'Lti::ToolConsumerProfile', inverse_of: :developer_key
+  has_one :tool_configuration, class_name: 'Lti::ToolConfiguration', dependent: :destroy, inverse_of: :developer_key
   serialize :scopes, Array
 
   before_validation :validate_scopes!
