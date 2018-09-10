@@ -215,9 +215,9 @@ test('given two overlapping grading periods, areNoDatesOverlapping returns false
       weight: null,
       title: 'Spring',
       permissions: {
-        read: false,
-        update: false,
-        delete: false
+        read: true,
+        update: true,
+        delete: true
       }
     },
     {
@@ -227,9 +227,9 @@ test('given two overlapping grading periods, areNoDatesOverlapping returns false
       weight: null,
       title: 'Summer',
       permissions: {
-        read: false,
-        update: false,
-        delete: false
+        read: true,
+        update: true,
+        delete: true
       }
     }
   ]
