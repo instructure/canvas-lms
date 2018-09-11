@@ -67,6 +67,8 @@ module GraphQLNodeLoader
       Loaders::IDLoader.for(DiscussionTopic).load(id).then(check_read_permission)
     when "Quiz"
       Loaders::IDLoader.for(Quizzes::Quiz).load(id).then(check_read_permission)
+    when "Submission"
+      Loaders::IDLoader.for(Submission).load(id).then(check_read_permission)
     else
       raise UnsupportedTypeError.new("don't know how to load #{type}")
     end
