@@ -85,7 +85,6 @@
     "react-lazy-load": "^3.0.13",
     "react-modal": "1.6.5",
     "react-redux": "4.4.5",
-    "react-select-box": "https://github.com/instructure-react/react-select-box.git#b1ddd39223d48793fbe3dc4e87aca00d57197b5f",
     "react-tokeninput": "2.4.0",
     "redux": "^3.5.2",
     "redux-actions": "0.11.0",
