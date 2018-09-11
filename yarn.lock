@@ -4630,7 +4630,7 @@ disposables@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/disposables/-/disposables-1.0.2.tgz#36c6a674475f55a2d6913567a601444e487b4b6e"
 
-dnd-core@^2.0.1:
+dnd-core@^2.6.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/dnd-core/-/dnd-core-2.6.0.tgz#12bad66d58742c6e5f7cf2943fb6859440f809c4"
   dependencies:
@@ -7565,7 +7565,7 @@ hoist-non-react-statics@^1.0.3:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-1.2.0.tgz#aa448cf0986d55cc40773b17174b7dd066cb7cfb"
 
-hoist-non-react-statics@^2.5.0:
+hoist-non-react-statics@^2.1.0, hoist-non-react-statics@^2.5.0:
   version "2.5.5"
   resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-2.5.5.tgz#c5903cf409c0dfd908f388e619d86b9c1174cb47"
 
@@ -12809,20 +12809,22 @@ react-crop@^4.0.2:
     data-uri-to-blob "0.0.4"
     postcss-cli "2.0.0"
 
-react-dnd-html5-backend@2.1.2:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/react-dnd-html5-backend/-/react-dnd-html5-backend-2.1.2.tgz#bcff5866629c335b310b1062fe6537af35073c66"
+react-dnd-html5-backend@^2.5.2:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/react-dnd-html5-backend/-/react-dnd-html5-backend-2.6.0.tgz#590cd1cca78441bb274edd571fef4c0b16ddcf8e"
   dependencies:
     lodash "^4.2.0"
 
-react-dnd@2.1.4:
-  version "2.1.4"
-  resolved "https://registry.yarnpkg.com/react-dnd/-/react-dnd-2.1.4.tgz#dd2afeddddd5ff4507d795a5bd44361c84374c0f"
+react-dnd@^2.5.2:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/react-dnd/-/react-dnd-2.6.0.tgz#7fa25676cf827d58a891293e3c1ab59da002545a"
   dependencies:
     disposables "^1.0.1"
-    dnd-core "^2.0.1"
+    dnd-core "^2.6.0"
+    hoist-non-react-statics "^2.1.0"
     invariant "^2.1.0"
     lodash "^4.2.0"
+    prop-types "^15.5.10"
 
 react-dom@0.14.9, "react-dom@^0.14.7 || ^15", "react-dom@^0.14.8 || ^15.0.0":
   version "0.14.9"

@@ -16,19 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-dom',
-  'react-addons-test-utils',
-  'react-dnd',
-  'react-dnd-test-backend',
-  'jsx/dashboard_card/DraggableDashboardCard',
-  'jsx/dashboard_card/getDroppableDashboardCardBox',
-  'jsx/dashboard_card/DashboardCardBox',
-  'jsx/dashboard_card/DashboardCard',
-  'jsx/dashboard_card/DashboardCardMovementMenu',
-  'helpers/fakeENV'
-], (React, ReactDOM, TestUtils, { DragDropContext }, ReactDndTestBackend, DraggableDashboardCard, getDroppableDashboardCardBox, DashboardCardBox, DashboardCard, DashboardCardMovementMenu, fakeENV) => {
+import React from 'react';
+import ReactDOM from 'react-dom';
+import TestUtils from 'react-addons-test-utils';
+import { DragDropContext } from 'react-dnd';
+import ReactDndTestBackend from 'react-dnd-test-backend';
+import DraggableDashboardCard from 'jsx/dashboard_card/DraggableDashboardCard';
+import getDroppableDashboardCardBox from 'jsx/dashboard_card/getDroppableDashboardCardBox';
+import DashboardCardBox from 'jsx/dashboard_card/DashboardCardBox';
+import DashboardCard from 'jsx/dashboard_card/DashboardCard';
+import DashboardCardMovementMenu from 'jsx/dashboard_card/DashboardCardMovementMenu';
+import fakeENV from 'helpers/fakeENV';
+
   let cards;
   let fakeServer;
 
@@ -75,7 +74,7 @@ define([
   });
 
   test('cards have opacity of 0 while moving', () => {
-    const Card = DraggableDashboardCard.DecoratedComponent.DecoratedComponent;
+    const Card = DraggableDashboardCard.DecoratedComponent;
     const card = TestUtils.renderIntoDocument(
       <Card
         {...cards[0]}
@@ -112,4 +111,3 @@ define([
     equal(renderedAfterDragNDrop[0].getAttribute('aria-label'), 'Intermediate Dashcarding');
     equal(renderedAfterDragNDrop[1].getAttribute('aria-label'), 'Intro to Dashcards 1');
   });
-});
