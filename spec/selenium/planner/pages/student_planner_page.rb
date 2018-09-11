@@ -124,7 +124,39 @@ module PlannerPageObject
     fxpath("//div[contains(@class, 'PlannerApp')]//span[contains(text(),'Due: #{time}')]")
   end
 
+  def dashboard_card_container
+    f("#DashboardCard_Container")
+  end
+
+  def dashboard_card_header_content
+    f(".ic-DashboardCard__header_content")
+  end
+
+  def todosidebar_item_list
+    f('#planner-todosidebar-item-list')
+  end
+
+  def todo_item(todo_title)
+    fj(".ToDoSidebarItem:contains('#{todo_title}')")
+  end
+
+  def dismiss_todo_item_button(todo_title)
+    f(".ToDoSidebarItem__Close button", todo_item(todo_title))
+  end
+
+  def load_more_button
+    fj("button:contains('Load more')")
+  end
+
+  def card_view_todo_item_list
+    ff("ul.to-do-list li")
+  end
+
   #----------------------- Actions & Methods -------------------------
+
+  def dismiss_todo_item(todo_title)
+    dismiss_todo_item_button(todo_title).click
+  end
 
   def expand_planner_item_open_arrow
     if planner_item_open_arrow.displayed?
@@ -236,24 +268,24 @@ module PlannerPageObject
 
   def graded_discussion_in_the_past(due = Time.zone.now - 2.days, title = 'Graded discussion')
     assignment = @course.assignments.create!(name: 'assignment 1',
-                                              due_at: due)
+                                             due_at: due)
     discussion = @course.discussion_topics.create!(user: @teacher,
-                                                    title: title,
-                                                    message: 'Discussion topic message',
-                                                    assignment: assignment)
+                                                   title: title,
+                                                   message: 'Discussion topic message',
+                                                   assignment: assignment)
     discussion.discussion_entries.create!(user: @teacher,
-                                           message: "new reply from teacher")
+                                          message: "new reply from teacher")
   end
 
   def graded_discussion_in_the_future
     assignment = @course.assignments.create!(name: 'assignment 2',
-                                              due_at: Time.zone.now + 2.days)
+                                             due_at: Time.zone.now + 2.days)
     discussion = @course.discussion_topics.create!(user: @teacher,
-                                                    title: 'Graded discussion 2',
-                                                    message: 'Discussion topic message',
-                                                    assignment: assignment)
+                                                   title: 'Graded discussion 2',
+                                                   message: 'Discussion topic message',
+                                                   assignment: assignment)
     discussion.discussion_entries.create!(user: @teacher,
-                                           message: "new reply from teacher")
+                                          message: "new reply from teacher")
   end
 
   def wait_for_planner_load

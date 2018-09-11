@@ -25,7 +25,7 @@ describe "student planner" do
 
   before :once do
     Account.default.enable_feature!(:student_planner)
-    course_with_teacher(active_all: true, new_user: true)
+    course_with_teacher(active_all: true, new_user: true, user_name: 'PlannerTeacher', course_name: 'Planner Course')
     @student1 = User.create!(name: 'Student 1')
     @course.enroll_student(@student1).accept!
   end
@@ -42,7 +42,9 @@ describe "student planner" do
   it "navigates to the dashcard view from no due dates assigned page.", priority: "1", test_id: 3281739 do
     go_to_list_view
     switch_to_dashcard_view
-    expect(f('.ic-DashboardCard__header-title')).to include_text(@course.name)
+
+    expect(dashboard_card_container).to contain_css("[aria-label='#{@course.name}']")
+    expect(dashboard_card_header_content).to contain_css("h2[title='#{@course.name}']")
   end
 
   it "shows and navigates to announcements page from student planner", priority: "1", test_id: 3259302 do
@@ -145,11 +147,11 @@ describe "student planner" do
                                                })
       submission = @assignment.submit_homework(@reviewee, body: "review this")
       @peer_review = AssessmentRequest.create!({
-                                                user: @reviewee,
-                                                asset: submission,
-                                                assessor_asset: @student1,
-                                                assessor: @student1
-                                              })
+                                                 user: @reviewee,
+                                                 asset: submission,
+                                                 assessor_asset: @student1,
+                                                 assessor: @student1
+                                               })
     end
 
     it "shows and navigates to peer review submissions from the student planner" do
@@ -320,13 +322,14 @@ describe "student planner" do
       element = ff('input', @modal)[1]
       element.click
       date = format_date_for_view(Time.zone.now, :long).split(" ")
-      day = if date[1] == '15'
-              date[1] = '20'
-              date[0] + ' 20, ' + date[2]
-            else
-              date[1] = '15'
-              date[0] + ' 15, ' + date[2]
-            end
+      day =
+        if date[1] == '15'
+          date[1] = '20'
+          date[0] + ' 20, ' + date[2]
+        else
+          date[1] = '15'
+          date[0] + ' 15, ' + date[2]
+        end
       fj("button:contains('#{date[1]}')").click
       todo_save_button.click
       @student_to_do.reload
@@ -459,19 +462,19 @@ describe "student planner" do
       Array.new(12){|n| n}.each do |i|
         @course.wiki_pages.create!(title: "Page#{i}", todo_date: Time.zone.now + (i-4).days)
         @course.assignments.create!(name: "assignment#{i}",
-                                              due_at: Time.zone.now.advance(days:(i-4)))
+                                    due_at: Time.zone.now.advance(days:(i-4)))
         @course.discussion_topics.create!(user: @teacher, title: "topic#{i}",
-                                                   message: "somebody topic message ##{i}",
-                                                   todo_date: Time.zone.now + (i-4).days)
+                                          message: "somebody topic message ##{i}",
+                                          todo_date: Time.zone.now + (i-4).days)
       end
     end
 
     it "loads future items at the bottom of the page", priority: "1", test_id: 3263149 do
       go_to_list_view
       current_items = items_displayed.count
-      driver.execute_script("window.scrollTo(0,  document.documentElement.scrollHeight);")
-      fj('button:contains("Load more")').click
+      load_more_button.click
       wait_for_spinner
+
       expect(items_displayed.count).to be > current_items
     end
   end
@@ -487,7 +490,7 @@ describe "student planner" do
     end
 
     it "scrolls to the next immediate new activity", priority: "1", test_id: 3468774 do
-      skip('fragile, need to skip now')
+      skip('fragile, will be fixed in ADMIN-1449')
       go_to_list_view
       new_activity_button.click
       wait_for_spinner
@@ -499,11 +502,12 @@ describe "student planner" do
     end
 
     it "shows new activity if there are activity above the current scroll position", priority: "1", test_id: 3468775 do
-      skip("fragile, need to skip now")
+      skip('fragile, will be fixed in ADMIN-1449')
       past_discussion = graded_discussion_in_the_past
       graded_discussion_in_the_future
       go_to_list_view
       new_activity_button.click
+      wait_for_spinner
       expect(planner_app_div).to contain_link(past_discussion.title.to_s)
       expect(planner_app_div).not_to contain_css("button:contains('New Activity')")
       scroll_page_to_bottom
@@ -563,29 +567,22 @@ describe "student planner" do
   context "interaction with ToDoSidebar" do
     before :each do
       user_session(@student1)
+      @todo_item = @student1.planner_notes.create!(todo_date: 2.days.from_now, title: "Some Todo Item")
     end
 
-    it "completes planner item when dismissed from card view sidebar" do
-      @student1.planner_notes.create!(todo_date: 2.days.from_now, title: "Title Text")
+    it "completes planner item when dismissed from card view sidebar", prirority: "1", test_id: 3659078 do
       go_to_dashcard_view
-      # wait for the todosidebar to load too
-      list = f('#planner-todosidebar-item-list')
-
-      item_close_button = f('li button', list)
-      item_close_button.click # dismiss the item
+      # dismiss the item
+      dismiss_todo_item(@todo_item.title)
 
       switch_to_list_view
       expect(planner_app_div).to contain_jqcss('span:contains("Show 1 completed item")')
     end
 
     it "completes planner item when dismissed from a course sidebar" do
-      @student1.planner_notes.create!(todo_date: 2.days.from_now, title: "Title Text")
       get "/courses/#{@course.id}"
-      # wait for the todosidebar to load
-      list = f('#planner-todosidebar-item-list')
-
-      item_close_button = f('li button', list)
-      item_close_button.click # dismiss the item
+      # dismiss the item
+      dismiss_todo_item(@todo_item.title)
 
       go_to_list_view
       expect(planner_app_div).to contain_jqcss('span:contains("Show 1 completed item")')
