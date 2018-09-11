@@ -54,7 +54,7 @@ QUnit.module('DueDateCalendars', {
 })
 
 test('renders', function() {
-  ok(this.dueDateCalendars.isMounted())
+  ok(this.dueDateCalendars)
 })
 
 test('can get the date for a datetype', function() {

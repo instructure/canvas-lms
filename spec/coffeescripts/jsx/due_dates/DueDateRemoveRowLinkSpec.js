@@ -40,7 +40,7 @@ QUnit.module('DueDateRemoveRowLink', {
 })
 
 test('renders', function() {
-  ok(this.DueDateRemoveRowLink.isMounted())
+  ok(this.DueDateRemoveRowLink)
 })
 
 test('calls handleClick prop when clicked', function() {
