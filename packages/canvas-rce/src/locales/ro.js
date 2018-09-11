@@ -17,6 +17,6 @@
  */
 
 import formatMessage from "../format-message";
-import locale from "../../locales/zh_HK.json";
-import "../rce/languages/zh_TW";
-formatMessage.addLocale({ "zh-Hant": locale });
+import locale from "../../locales/ro.json";
+import "../rce/languages/ro";
+formatMessage.addLocale({ ro: locale });

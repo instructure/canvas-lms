@@ -17,6 +17,6 @@
  */
 
 import formatMessage from "../format-message";
-import locale from "../../locales/pt-BR.json";
+import locale from "../../locales/pt_BR.json";
 import "../rce/languages/pt_BR";
 formatMessage.addLocale({ "pt-BR": locale });

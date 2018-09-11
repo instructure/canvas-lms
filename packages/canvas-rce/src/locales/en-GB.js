@@ -17,6 +17,6 @@
  */
 
 import formatMessage from "../format-message";
-import locale from "../../locales/en-GB.json";
+import locale from "../../locales/en_GB.json";
 import "../rce/languages/en_GB";
 formatMessage.addLocale({ "en-GB": locale });
