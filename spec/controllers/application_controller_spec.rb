@@ -25,7 +25,8 @@ RSpec.describe ApplicationController do
       host_with_port: "www.example.com",
       host: "www.example.com",
       headers: {},
-      format: double(:html? => true)
+      format: double(:html? => true),
+      user_agent: nil
     )
     allow(controller).to receive(:request).and_return(request_double)
   end
@@ -152,7 +153,13 @@ RSpec.describe ApplicationController do
     end
 
     it 'sets LTI_LAUNCH_FRAME_ALLOWANCES' do
-      expect(@controller.js_env[:LTI_LAUNCH_FRAME_ALLOWANCES]).to eq Lti::Launch::FRAME_ALLOWANCES
+      expect(@controller.js_env[:LTI_LAUNCH_FRAME_ALLOWANCES]).to match_array [
+        "geolocation *",
+        "microphone *",
+        "camera *",
+        "midi *",
+        "encrypted-media *"
+      ]
     end
 
     context "sharding" do

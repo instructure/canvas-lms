@@ -15,12 +15,21 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require 'useragent'
+
 module Lti
   class Launch
-    FRAME_ALLOWANCES = ['geolocation *', 'microphone *', 'camera *', 'midi *', 'encrypted-media *'].freeze
+    FRAME_ALLOWANCES = ['geolocation', 'microphone', 'camera', 'midi', 'encrypted-media'].freeze
 
     attr_writer :analytics_id, :analytics_message_type
     attr_accessor :link_text, :resource_url, :params, :launch_type, :tool_dimensions, :base_string
+
+    def self.iframe_allowances(user_agent = nil)
+      if user_agent.blank? || UserAgent.parse(user_agent).browser == 'Chrome'
+        return FRAME_ALLOWANCES.map { |s| "#{s} *" }
+      end
+      FRAME_ALLOWANCES
+    end
 
     def initialize(options = {})
       @post_only = options[:post_only]
