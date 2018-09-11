@@ -167,4 +167,23 @@ describe Types::AssignmentType do
       ).to eq [[student.id.to_s]]
     end
   end
+
+  describe Types::LockInfoType do
+    it "works when lock_info is false" do
+      expect(
+        assignment_type.resolve("lockInfo { isLocked }")
+      ).to eq false
+
+      %i[lockAt unlockAt canView].each { |field|
+        expect(
+          assignment_type.resolve("lockInfo { #{field} }")
+        ).to eq nil
+      }
+    end
+
+    it "works when lock_info is a hash" do
+      assignment.update_attributes! unlock_at: 1.month.from_now
+      expect(assignment_type.resolve("lockInfo { isLocked }")).to eq true
+    end
+  end
 end
