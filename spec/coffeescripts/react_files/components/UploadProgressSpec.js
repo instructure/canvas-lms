@@ -24,14 +24,14 @@ import FileUploader from 'compiled/react_files/modules/FileUploader'
 
 QUnit.module('UploadProgress', {
   setup() {
-    const ProgressContainer = React.createClass({
-      getInitialState() {
-        return {uploader: this.props.uploader}
-      },
+    class ProgressContainer extends React.Component {
+      state = {uploader: this.props.uploader};
+
       render() {
         return <UploadProgress ref="prog" uploader={this.state.uploader} />
       }
-    })
+    }
+
     this.uploader = this.mockUploader('filename', 35)
     this.node = $('<div>').appendTo('#fixtures')[0]
     this.progressContainer = ReactDOM.render(
