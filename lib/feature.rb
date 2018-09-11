@@ -599,9 +599,7 @@ END
       display_name: -> { I18n.t('To Do List Dashboard')},
       description: -> { I18n.t('Provides users with a To Do List Dashboard option.')},
       applies_to: "RootAccount",
-      state: "hidden",
-      beta: true,
-      development: false
+      state: "hidden"
     },
     'rubric_criterion_range' =>
     {
