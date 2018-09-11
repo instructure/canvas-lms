@@ -131,7 +131,7 @@ QUnit.module('ExternalApps.AppFilters', {
 
 test('renders', () => {
   const [component, tabAll, tabNotInstalled, tabInstalled, filterText] = Array.from(getDOMNodes())
-  ok(component.isMounted())
+  ok(component)
   ok(TestUtils.isCompositeComponentWithType(component, AppFilters))
 })
 

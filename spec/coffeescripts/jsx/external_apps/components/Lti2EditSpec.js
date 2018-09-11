@@ -54,6 +54,6 @@ test('renders', () => {
     handleCancel() {}
   }
   const component = renderComponent(data)
-  ok(component.isMounted())
+  ok(component)
   ok(TestUtils.isCompositeComponentWithType(component, Lti2Edit))
 })

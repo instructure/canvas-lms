@@ -62,7 +62,7 @@ test('renders', function() {
     app: this.app
   }
   const [component, addToolButtonNode, modalNode] = Array.from(getDOMNodes(data))
-  ok(component.isMounted())
+  ok(component)
   ok(TestUtils.isCompositeComponentWithType(component, AddApp))
 })
 
