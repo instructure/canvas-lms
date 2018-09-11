@@ -1713,8 +1713,11 @@ class Assignment < ActiveRecord::Base
     did_grade = false
     submission.attributes = opts.slice(:submission_type, :url, :body)
 
-    # Only moderators or admins may excuse an assignment under moderation
+    # A moderated assignment cannot be assigned a score directly, but may be
+    # (un)excused by a moderator or admin. Even though this isn't *really*
+    # a grading action, it needs to be captured for auditing purposes.
     if !opts[:provisional] || permits_moderation?(grader)
+      submission.grader = grader
       submission.excused = opts[:excused] && score.blank?
     end
 
@@ -1731,6 +1734,7 @@ class Assignment < ActiveRecord::Base
       submission.grade_matches_current_submission = true
       submission.regraded = true
     end
+    submission.audit_grade_changes = did_grade || submission.excused_changed?
 
     if (submission.score_changed? ||
         submission.grade_matches_current_submission) &&
@@ -1740,6 +1744,7 @@ class Assignment < ActiveRecord::Base
     submission.group = group
     submission.graded_at = Time.zone.now if did_grade
     previously_graded ? submission.with_versioning(:explicit => true) { submission.save! } : submission.save!
+    submission.audit_grade_changes = false
 
     if opts[:provisional]
       raise GradeError, error_code: 'PROVISIONAL_GRADE_INVALID_SCORE' unless score.present? || submission.excused

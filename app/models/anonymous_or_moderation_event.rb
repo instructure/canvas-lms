@@ -46,6 +46,7 @@ class AnonymousOrModerationEvent < ApplicationRecord
     submission_comment_created
     submission_comment_deleted
     submission_comment_updated
+    submission_updated
   ].freeze
   SUBMISSION_ID_EXCLUDED_EVENT_TYPES = %w[
     assignment_created

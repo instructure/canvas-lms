@@ -71,6 +71,7 @@ class Submission < ActiveRecord::Base
   # policy deductions don't happen again if the submission object is
   # saved again.
   attr_writer :regraded
+  attr_writer :audit_grade_changes
 
   belongs_to :attachment # this refers to the screenshot of the submission if it is a url submission
   belongs_to :assignment, inverse_of: :submissions
@@ -325,6 +326,7 @@ class Submission < ActiveRecord::Base
   after_save :delete_ignores
   after_save :create_alert
   after_save :reset_regraded
+  after_save :create_audit_event!
 
   def reset_regraded
     @regraded = false
@@ -2537,5 +2539,21 @@ class Submission < ActiveRecord::Base
     pg.graded_anonymously = attrs[:graded_anonymously] unless attrs[:graded_anonymously].nil?
     pg.force_save = !!attrs[:force_save]
     pg
+  end
+
+  def create_audit_event!
+    return unless assignment&.auditable? && @audit_grade_changes
+
+    auditable_attributes = %w[score grade excused]
+    auditable_changes = saved_changes.slice(*auditable_attributes)
+    return if auditable_changes.empty?
+
+    AnonymousOrModerationEvent.create!(
+      assignment: assignment,
+      submission: self,
+      user: grader,
+      event_type: 'submission_updated',
+      payload: auditable_changes
+    )
   end
 end

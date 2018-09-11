@@ -1670,6 +1670,130 @@ describe Assignment do
         end
       end
     end
+
+    describe 'AnonymousOrModerationEvent creation on grading a submission' do
+      let_once(:course) { Course.create! }
+      let_once(:assignment) do
+        course.assignments.create!(
+          anonymous_grading: true,
+          grading_type: 'letter_grade',
+          points_possible: 100
+        )
+      end
+
+      let_once(:student) { course.enroll_student(User.create!, active_all: true).user }
+      let_once(:submission) { assignment.submission_for_student(student) }
+      let_once(:teacher) { course.enroll_teacher(User.create!, enrollment_state: 'active').user }
+
+      let(:last_event) do
+        AnonymousOrModerationEvent.where(assignment: assignment, event_type: 'submission_updated').last
+      end
+
+      it 'creates an event when a grader changes a grade' do
+        expect {
+          assignment.grade_student(student, grader: teacher, grade: 'C-')
+        }.to change {
+          AnonymousOrModerationEvent.where(assignment: assignment, event_type: 'submission_updated').count
+        }.by(1)
+      end
+
+      it 'creates an event when a grader changes a score' do
+        expect {
+          assignment.grade_student(student, grader: teacher, score: 60)
+        }.to change {
+          AnonymousOrModerationEvent.where(assignment: assignment, event_type: 'submission_updated').count
+        }.by(1)
+      end
+
+      it 'creates an event when a grader excuses a submission' do
+        expect {
+          assignment.grade_student(student, grader: teacher, excused: true)
+        }.to change {
+          AnonymousOrModerationEvent.where(assignment: assignment, event_type: 'submission_updated').count
+        }.by(1)
+      end
+
+      it 'includes the affected submission on the event' do
+        assignment.grade_student(student, grader: teacher, score: 75)
+        expect(last_event.submission_id).to eq submission.id
+      end
+
+      it 'includes the grader as the user on the event' do
+        assignment.grade_student(student, grader: teacher, score: 91)
+        expect(last_event.user_id).to eq teacher.id
+      end
+
+      it 'includes an event type of submission_updated' do
+        assignment.grade_student(student, grader: teacher, score: -10)
+        expect(last_event.event_type).to eq 'submission_updated'
+      end
+
+      describe 'payload contents' do
+        it 'includes changes to "score" in the payload if changed' do
+          assignment.grade_student(student, grader: teacher, score: 22)
+          assignment.grade_student(student, grader: teacher, score: 11)
+          expect(last_event.payload['score']).to eq [22, 11]
+        end
+
+        it 'includes changes to "grade" in the payload if changed' do
+          assignment.grade_student(student, grader: teacher, grade: 'B+')
+          assignment.grade_student(student, grader: teacher, grade: 'C+')
+          expect(last_event.payload['grade']).to eq ['B+', 'C+']
+        end
+
+        it 'includes changes to "excused" in the payload if changed' do
+          assignment.grade_student(student, grader: teacher, excused: true)
+          assignment.grade_student(student, grader: teacher, grade: 'F')
+          expect(last_event.payload['excused']).to eq [true, false]
+        end
+      end
+
+      context "for a moderated assignment" do
+        let(:moderated_assignment) do
+          course.assignments.create!(
+            title: 'zzz',
+            points_possible: 100,
+            moderated_grading: true,
+            final_grader: teacher,
+            grader_count: 1
+          )
+        end
+        let(:last_event) do
+          AnonymousOrModerationEvent.where(
+            assignment: moderated_assignment,
+            event_type: 'submission_updated'
+          ).last
+        end
+
+        context "when changing the assignment's excused status as a moderator" do
+          it "creates a submission_changed event when excusing the assignment" do
+            moderated_assignment.grade_student(student, grader: teacher, provisional: true, excuse: true)
+
+            expect(last_event.payload['excused']).to eq [nil, true]
+          end
+
+          it "creates a submission_changed event when unexcusing the assignment" do
+            moderated_assignment.grade_student(student, grader: teacher, provisional: true, excuse: true)
+            moderated_assignment.grade_student(student, grader: teacher, provisional: true, score: 40)
+            expect(last_event.payload['excused']).to eq [true, false]
+          end
+
+          it "does not capture score changes in the submission_changed event" do
+            moderated_assignment.grade_student(student, grader: teacher, provisional: true, excuse: true)
+            moderated_assignment.grade_student(student, grader: teacher, provisional: true, score: 40)
+            expect(last_event.payload).not_to include('score')
+          end
+        end
+
+        it "does not create a submission_changed event when issuing a score via a provisional grade" do
+          expect {
+            moderated_assignment.grade_student(student, grader: teacher, provisional: true, score: 80)
+          }.not_to change {
+            AnonymousOrModerationEvent.where(event_type: 'submission_changed').count
+          }
+        end
+      end
+    end
   end
 
   describe "#all_context_module_tags" do
