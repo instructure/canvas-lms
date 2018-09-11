@@ -367,6 +367,21 @@ describe 'Student reports' do
          'Course 4', @course4.id, nil, 'Course 4']
       ]
     end
+
+    it 'should exclude multi-section users who have activity in at least one section' do
+      lonely_section = @course1.course_sections.create!(name: "forever alone")
+      active_enrollment = lonely_section.enroll_user(@user2, 'StudentEnrollment', 'active')
+      active_enrollment.update_attribute(:last_activity_at, 1.day.ago)
+
+      param = {}
+      param['course'] = @course1.id
+      parsed = read_report(@type, {params: param, order: 1})
+
+      expect(parsed).to eq_stringified_array [
+        [@user3.id, 'user_sis_id_03', @user3.sortable_name, @section1.id, @section1.sis_source_id,
+         @section1.name, @course1.id, 'SIS_COURSE_ID_1', 'English 101']
+      ]
+    end
   end
 
   describe 'last user access report' do
