@@ -28,18 +28,6 @@ describe "brandableCss JS integration specs" do
     expect(driver.execute_script("return ENV.ASSET_HOST")).to eq(EXAMPLE_CDN_HOST)
   end
 
-  it "loads css from handlebars correctly" do
-    admin_logged_in
-    get "/accounts/#{Account.default.id}/permissions?account_roles=1"
-
-    css_bundle = 'jst/roles/newRole'
-    data = BrandableCSS.all_fingerprints_for(css_bundle).values.first
-    expect(data[:includesNoVariables]).to be_truthy
-    expect(data[:combinedChecksum]).to match(/\A[a-f0-9]{10}\z/), '10 chars of an MD5'
-    url = "#{app_url}/dist/brandable_css/no_variables/#{css_bundle}-#{data[:combinedChecksum]}.css"
-    expect(fj("head link[rel='stylesheet'][data-loaded-by-brandableCss][href*='#{css_bundle}']")['href']).to eq(url)
-  end
-
   it "loads css from handlebars with variables correctly" do
     course_with_teacher_logged_in
     get '/calendar'
