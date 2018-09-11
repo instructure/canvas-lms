@@ -36,7 +36,7 @@
 >
   <form action="<%= @lti_launch.resource_url %>"
         class="hide"
-        method="POST" 
+        method="POST"
         target="tool_content"
         id="tool_form"
         data-tool-launch-type="<%= @lti_launch.launch_type %>"
@@ -82,7 +82,7 @@
     tabindex:"0",
     title:t('Tool Content'),
     style: "height:#{@lti_launch.tool_dimensions[:selection_height]};width:#{@lti_launch.tool_dimensions[:selection_width]};",
-    allow: Lti::Launch::FRAME_ALLOWANCES.join('; ')
+    allow: Lti::Launch.iframe_allowances(request.user_agent).join('; ')
   ) %>
 
   <div class="after_external_content_info_alert screenreader-only" tabindex="0">
