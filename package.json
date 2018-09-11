@@ -75,7 +75,6 @@
     "prop-types": "^15",
     "qs": "https://github.com/hapijs/qs.git#a341cdf2fadba5ede1ce6c95c7051f6f31f37b81",
     "react": "^15",
-    "react-addons-pure-render-mixin": "^15",
     "react-transition-group": "^1",
     "react-apollo": "^2.1.1",
     "@instructure/react-crop": "^5.0.1",
