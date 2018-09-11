@@ -69,7 +69,7 @@ module Types
         prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
     end
 
-    def enrollments(course_id:)
+    def enrollments(course_id: nil)
       course_ids = [course_id].compact
       Loaders::UserCourseEnrollmentLoader.for(
         course_ids: course_ids

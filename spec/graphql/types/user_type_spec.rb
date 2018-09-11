@@ -18,7 +18,6 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/legacy_type_tester')
 
 describe Types::UserType do
   before(:once) do
@@ -33,44 +32,42 @@ describe Types::UserType do
     @course = course
     @student = student
     @teacher = teacher
-
   end
 
-  let(:new_user_type) { GraphQLTypeTester.new(@student, current_user: @teacher) }
-  let(:user_type) { LegacyTypeTester.new(Types::UserType, @student) }
+  let(:user_type) { GraphQLTypeTester.new(@student, current_user: @teacher) }
   let(:user) { @student }
 
   context "node" do
     it "works" do
-      expect(new_user_type.resolve("_id")).to eq @student.id.to_s
-      expect(new_user_type.resolve("name")).to eq @student.name
+      expect(user_type.resolve("_id")).to eq @student.id.to_s
+      expect(user_type.resolve("name")).to eq @student.name
     end
 
     it "works for users in the same course" do
-      expect(new_user_type.resolve("_id", current_user: @other_student)).to eq @student.id.to_s
+      expect(user_type.resolve("_id", current_user: @other_student)).to eq @student.id.to_s
     end
 
     it "doesn't work for just anyone" do
-      expect(new_user_type.resolve("_id", current_user: @random_person)).to be_nil
+      expect(user_type.resolve("_id", current_user: @random_person)).to be_nil
     end
 
     it "loads inactive and concluded users" do
       @student.enrollments.update_all workflow_state: "inactive"
-      expect(new_user_type.resolve("_id", current_user: @other_student)).to eq @student.id.to_s
+      expect(user_type.resolve("_id", current_user: @other_student)).to eq @student.id.to_s
 
       @student.enrollments.update_all workflow_state: "completed"
-      expect(new_user_type.resolve("_id", current_user: @other_student)).to eq @student.id.to_s
+      expect(user_type.resolve("_id", current_user: @other_student)).to eq @student.id.to_s
     end
   end
 
   context "avatarUrl" do
     it "is nil when avatars are not enabled" do
-      expect(user_type.avatarUrl).to be_nil
+      expect(user_type.resolve("avatarUrl")).to be_nil
     end
 
     it "returns an avatar url when avatars are enabled" do
       user.account.enable_service(:avatars)
-      expect(user_type.avatarUrl).to match /avatar.*png/
+      expect(user_type.resolve("avatarUrl")).to match(/avatar.*png/)
     end
   end
 
@@ -83,32 +80,29 @@ describe Types::UserType do
 
     it "returns enrollments for a given course" do
       expect(
-        user_type.enrollments(
-          args: {course_id: @course1.id.to_s},
-          current_user: @teacher
-        )
-      ).to eq [@student.enrollments.first]
+        user_type.resolve(%|enrollments(courseId: "#{@course1.id}") { _id }|)
+      ).to eq [@student.enrollments.first.to_param]
     end
 
     it "returns all enrollments for a user (that can be read)" do
       @course1.enroll_student(@student, enrollment_state: "active")
 
       expect(
-        user_type.enrollments(current_user: @teacher, args: {course_id: nil})
-      ).to eq [@student.enrollments.first]
+        user_type.resolve("enrollments { _id }")
+      ).to eq [@student.enrollments.first.to_param]
 
       site_admin_user
       expect(
-        user_type.enrollments(current_user: @admin, args: {course_id: nil})
-      ).to eq @student.enrollments
+        user_type.resolve(
+          "enrollments { _id }",
+          current_user: @admin
+        )
+      ).to match_array @student.enrollments.map(&:to_param)
     end
 
     it "doesn't return enrollments for courses the user doesn't have permission for" do
       expect(
-        user_type.enrollments(
-          args: {course_id: @course2.id.to_s},
-          current_user: @teacher
-        )
+        user_type.resolve(%|enrollments(courseId: "#{@course2.id}") { _id }|)
       ).to eq []
     end
   end
@@ -119,17 +113,17 @@ describe Types::UserType do
     end
 
     it "returns email for teachers/admins" do
-      expect(user_type.email(current_user: @teacher)).to eq user.email
+      expect(user_type.resolve("email")).to eq user.email
 
       # this is for the cached branch
       allow(user).to receive(:email_cached?) { true }
-      expect(user_type.email(current_user: @teacher)).to eq user.email
+      expect(user_type.resolve("email")).to eq user.email
     end
 
     it "doesn't return email for others" do
-      expect(user_type.email(current_user: nil)).to be_nil
-      expect(user_type.email(current_user: @other_student)).to be_nil
-      expect(user_type.email(current_user: @random_person)).to be_nil
+      expect(user_type.resolve("email", current_user: nil)).to be_nil
+      expect(user_type.resolve("email", current_user: @other_student)).to be_nil
+      expect(user_type.resolve("email", current_user: @random_person)).to be_nil
     end
   end
 end
