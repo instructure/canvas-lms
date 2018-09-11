@@ -22,116 +22,121 @@ import React from 'react'
 import I18n from 'i18n!link_validator'
 import ValidatorResults from './ValidatorResults'
 
-  var LinkValidator = React.createClass({
-    getInitialState () {
-      return {
-        results: [],
-        displayResults: false,
-        error: false,
-      };
-    },
+class LinkValidator extends React.Component {
+  state = {
+    results: [],
+    displayResults: false,
+    error: false
+  }
 
-    componentWillMount () {
-      this.setLoadingState();
-      this.getResults(true);
-    },
+  componentWillMount() {
+    this.setLoadingState()
+    this.getResults(true)
+  }
 
-    getResults (initial_load) {
-      $.ajax({
-        url: ENV.validation_api_url,
-        dataType: 'json',
-        success: (data) => {
-          // Keep trying until the request has been completed
-          if (data.workflow_state === 'queued' || data.workflow_state === 'running') {
-            setTimeout(() => {
-              this.getResults();
-            }, 10000);
-          } else {
-            if (data.workflow_state === 'completed') {
-              this.setState({
-                buttonMessage: I18n.t("Restart Link Validation"),
-                buttonDisabled: false,
-                results: data.results.issues,
-                displayResults: true,
-                error: false,
-              });
-              $('#all-results').show();
-            } else {
-              this.setState({
-                buttonMessage: I18n.t("Start Link Validation"),
-                buttonDisabled: false
-              });
-              if (data.workflow_state === 'failed' && !initial_load) {
-                this.setState({
-                  error: true
-                });
-              }
-            }
-          }
-        },
-        error: () => {
-          this.setState({
-            error: true
-          });
-        }
-      })
-    },
-    setLoadingState () {
-      this.setState({
-        buttonMessage: I18n.t("Loading..."),
-        buttonDisabled: true,
-        displayResults: false,
-        results: []
-      });
-    },
-    startValidation () {
-      $('#all-results').hide();
-
-      this.setLoadingState();
-      $.screenReaderFlashMessage(I18n.t("Link validation is running"))
-
-      // You need to send a POST request to the API to initialize validation
-      $.ajax({
-        url: ENV.validation_api_url,
-        type: "POST",
-        data: {},
-        success: () => {
-          var getResults = this.getResults;
+  getResults = initial_load => {
+    $.ajax({
+      url: ENV.validation_api_url,
+      dataType: 'json',
+      success: data => {
+        // Keep trying until the request has been completed
+        if (data.workflow_state === 'queued' || data.workflow_state === 'running') {
           setTimeout(() => {
-            getResults();
-          }, 2000);
-        },
-        error: () => {
+            this.getResults()
+          }, 10000)
+        } else if (data.workflow_state === 'completed') {
           this.setState({
-            error: true
-          });
+            buttonMessage: I18n.t('Restart Link Validation'),
+            buttonDisabled: false,
+            results: data.results.issues,
+            displayResults: true,
+            error: false
+          })
+          $('#all-results').show()
+        } else {
+          this.setState({
+            buttonMessage: I18n.t('Start Link Validation'),
+            buttonDisabled: false
+          })
+          if (data.workflow_state === 'failed' && !initial_load) {
+            this.setState({
+              error: true
+            })
+          }
         }
-      });
-    },
-
-    render () {
-      let loadingImage;
-      if (this.state.buttonDisabled) {
-        loadingImage = <img src="/images/ajax-loader.gif" alt={I18n.t('Link validation is running')}/>
+      },
+      error: () => {
+        this.setState({
+          error: true
+        })
       }
+    })
+  }
 
-      return (
-        <div>
-          <button onClick={this.startValidation} className="Button Button--primary"
-                  disabled={this.state.buttonDisabled}
-                  style={this.state.buttonMessageStyle} type="button" role="button">
-            {this.state.buttonMessage}
-          </button>
-          {loadingImage}
+  setLoadingState = () => {
+    this.setState({
+      buttonMessage: I18n.t('Loading...'),
+      buttonDisabled: true,
+      displayResults: false,
+      results: []
+    })
+  }
 
-          <ValidatorResults
-            results={this.state.results}
-            displayResults={this.state.displayResults}
-            error={this.state.error}
-          />
-        </div>
-      );
+  startValidation = () => {
+    $('#all-results').hide()
+
+    this.setLoadingState()
+    $.screenReaderFlashMessage(I18n.t('Link validation is running'))
+
+    // You need to send a POST request to the API to initialize validation
+    $.ajax({
+      url: ENV.validation_api_url,
+      type: 'POST',
+      data: {},
+      success: () => {
+        const getResults = this.getResults
+        setTimeout(() => {
+          getResults()
+        }, 2000)
+      },
+      error: () => {
+        this.setState({
+          error: true
+        })
+      }
+    })
+  }
+
+  render() {
+    let loadingImage
+    if (this.state.buttonDisabled) {
+      loadingImage = (
+        <img src="/images/ajax-loader.gif" alt={I18n.t('Link validation is running')} />
+      )
     }
-  });
+
+    return (
+      <div>
+        <button
+          onClick={this.startValidation}
+          className="Button Button--primary"
+          disabled={this.state.buttonDisabled}
+          style={this.state.buttonMessageStyle}
+          type="button"
+          role="button"
+        >
+          {this.state.buttonMessage}
+        </button>
+        {loadingImage}
+
+        <ValidatorResults
+          results={this.state.results}
+          displayResults={this.state.displayResults}
+          error={this.state.error}
+        />
+      </div>
+    )
+  }
+}
 
 export default LinkValidator

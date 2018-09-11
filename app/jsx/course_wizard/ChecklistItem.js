@@ -21,62 +21,66 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!course_wizard'
 import classnames from 'classnames'
 
-  var ChecklistItem = React.createClass({
-      displayName: 'ChecklistItem',
+class ChecklistItem extends React.Component {
+  static displayName = 'ChecklistItem'
 
-      propTypes: {
-        onClick: PropTypes.func.isRequired,
-        stepKey: PropTypes.string.isRequired,
-        title: PropTypes.string.isRequired,
-        complete: PropTypes.bool.isRequired,
-        isSelected: PropTypes.bool.isRequired,
-        id: PropTypes.string.isRequired
-      },
+  static propTypes = {
+    onClick: PropTypes.func.isRequired,
+    stepKey: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    complete: PropTypes.bool.isRequired,
+    isSelected: PropTypes.bool.isRequired,
+    id: PropTypes.string.isRequired
+  }
 
-      classNameString: '',
+  state = {classNameString: ''}
+  classNameString = ''
 
-      getInitialState: function () {
-        return {classNameString: ''};
-      },
+  componentWillMount() {
+    this.setClassName(this.props)
+  }
 
-      componentWillMount: function () {
-        this.setClassName(this.props);
-      },
+  componentWillReceiveProps(nextProps) {
+    this.setClassName(nextProps)
+  }
 
-      componentWillReceiveProps: function (nextProps) {
-        this.setClassName(nextProps);
-      },
+  handleClick = event => {
+    event.preventDefault()
+    this.props.onClick(this.props.stepKey)
+  }
 
-      handleClick: function (event) {
-        event.preventDefault();
-        this.props.onClick(this.props.stepKey);
-      },
+  setClassName = props => {
+    this.setState({
+      classNameString: classnames({
+        'ic-wizard-box__content-trigger': true,
+        'ic-wizard-box__content-trigger--checked': props.complete,
+        'ic-wizard-box__content-trigger--active': props.isSelected
+      })
+    })
+  }
 
-      setClassName: function (props) {
-        this.setState({
-          classNameString: classnames({
-            "ic-wizard-box__content-trigger": true,
-            "ic-wizard-box__content-trigger--checked": props.complete,
-            "ic-wizard-box__content-trigger--active": props.isSelected
-          })
-        });
-      },
+  render() {
+    const completionMessage = this.props.complete
+      ? I18n.t('(Item Complete)')
+      : I18n.t('(Item Incomplete)')
 
-      render: function () {
-          var completionMessage = (this.props.complete) ? I18n.t('(Item Complete)') : I18n.t('(Item Incomplete)');
-
-        return (
-          <li>
-            <a href='#' id={this.props.id} className={this.state.classNameString} onClick={this.handleClick} aria-label={"Select task: " + this.props.title}>
-              <span>
-                {this.props.title}
-                <span className='screenreader-only'>{completionMessage}</span>
-              </span>
-            </a>
-          </li>
-        );
-      }
-
-  });
+    return (
+      <li>
+        <a
+          href="#"
+          id={this.props.id}
+          className={this.state.classNameString}
+          onClick={this.handleClick}
+          aria-label={`Select task: ${this.props.title}`}
+        >
+          <span>
+            {this.props.title}
+            <span className="screenreader-only">{completionMessage}</span>
+          </span>
+        </a>
+      </li>
+    )
+  }
+}
 
 export default ChecklistItem

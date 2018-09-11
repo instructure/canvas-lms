@@ -26,129 +26,130 @@ import I18n from 'i18n!conditional_release'
 import numberHelper from '../helpers/numberHelper'
 import 'jquery.instructure_forms'
 
-  const SAVE_TIMEOUT = 15000
+const SAVE_TIMEOUT = 15000
 
-  const Editor = React.createClass({
-    displayName: 'ConditionalReleaseEditor',
+class Editor extends React.Component {
+  static displayName = 'ConditionalReleaseEditor'
 
-    propTypes: {
-      env: PropTypes.object.isRequired,
-      type: PropTypes.string.isRequired
-    },
+  static propTypes = {
+    env: PropTypes.object.isRequired,
+    type: PropTypes.string.isRequired
+  }
 
-    getInitialState() {
-      return {
-        editor: null,
-      };
-    },
+  state = {
+    editor: null
+  }
 
-    validateBeforeSave() {
-      const errors = []
-      const rawErrors = this.state.editor ? this.state.editor.getErrors() : null
-      if (rawErrors) {
-        rawErrors.forEach((errorRecord) => {
-          $.screenReaderFlashError(I18n.t('%{error} in mastery paths range %{index}', {
+  validateBeforeSave = () => {
+    const errors = []
+    const rawErrors = this.state.editor ? this.state.editor.getErrors() : null
+    if (rawErrors) {
+      rawErrors.forEach(errorRecord => {
+        $.screenReaderFlashError(
+          I18n.t('%{error} in mastery paths range %{index}', {
             error: errorRecord.error,
-            index: errorRecord.index + 1 }))
-          errors.push({ message: errorRecord.error })
-        })
-      }
-      return errors.length == 0 ? null : errors;
-    },
+            index: errorRecord.index + 1
+          })
+        )
+        errors.push({message: errorRecord.error})
+      })
+    }
+    return errors.length == 0 ? null : errors
+  }
 
-    focusOnError() {
-      if (this.state.editor) {
-        this.state.editor.focusOnError()
-      }
-    },
+  focusOnError = () => {
+    if (this.state.editor) {
+      this.state.editor.focusOnError()
+    }
+  }
 
-    updateAssignment(newAttributes = {}) {
-      if (!this.state.editor) {
-        return
-      }
-      // a not_graded assignment counts as a non-assignment
-      // to cyoe
-      if (newAttributes.grading_type === 'not_graded') {
-        newAttributes.id = null;
-      }
-      this.state.editor.updateAssignment({
-        grading_standard_id: newAttributes.grading_standard_id,
-        grading_type: newAttributes.grading_type,
-        id: newAttributes.id,
-        points_possible: newAttributes.points_possible,
-        submission_types: newAttributes.submission_types
-      });
-    },
+  updateAssignment = (newAttributes = {}) => {
+    if (!this.state.editor) {
+      return
+    }
+    // a not_graded assignment counts as a non-assignment
+    // to cyoe
+    if (newAttributes.grading_type === 'not_graded') {
+      newAttributes.id = null
+    }
+    this.state.editor.updateAssignment({
+      grading_standard_id: newAttributes.grading_standard_id,
+      grading_type: newAttributes.grading_type,
+      id: newAttributes.id,
+      points_possible: newAttributes.points_possible,
+      submission_types: newAttributes.submission_types
+    })
+  }
 
-    save(timeoutMs = SAVE_TIMEOUT) {
-      if (!this.state.editor) {
-        return $.Deferred().reject('mastery paths editor uninitialized')
-      }
-      const saveObject = $.Deferred()
-      setTimeout(() => { saveObject.reject('timeout') }, timeoutMs)
+  save = (timeoutMs = SAVE_TIMEOUT) => {
+    if (!this.state.editor) {
+      return $.Deferred().reject('mastery paths editor uninitialized')
+    }
+    const saveObject = $.Deferred()
+    setTimeout(() => {
+      saveObject.reject('timeout')
+    }, timeoutMs)
 
-      this.state.editor.saveRule()
+    this.state.editor
+      .saveRule()
       .then(() => {
         saveObject.resolve()
       })
-      .catch((err) => {
+      .catch(err => {
         saveObject.reject(err)
       })
 
-      return saveObject.promise();
-    },
+    return saveObject.promise()
+  }
 
-    loadEditor() {
-      var url = this.props.env['editor_url']
-      $.ajax({
-        url,
-        dataType: 'script',
-        cache: true,
-        success: this.createEditor
-      })
-    },
+  loadEditor = () => {
+    const url = this.props.env.editor_url
+    $.ajax({
+      url,
+      dataType: 'script',
+      cache: true,
+      success: this.createEditor
+    })
+  }
 
-    createEditor() {
-      var env = this.props.env
-      const editor = new conditional_release_module.ConditionalReleaseEditor({
-        jwt: env['jwt'],
-        assignment: env['assignment'],
-        courseId: env['context_id'],
-        locale: {
-          locale: env.locale,
-          parseNumber: numberHelper.parse,
-          formatNumber: I18n.n
-        },
-        gradingType: env['grading_type'],
-        baseUrl: env['base_url']
-      })
-      editor.attach(
-        document.getElementById('canvas-conditional-release-editor'),
-        document.getElementById('application'))
-      this.setState({ editor })
-    },
+  createEditor = () => {
+    const env = this.props.env
+    const editor = new conditional_release_module.ConditionalReleaseEditor({
+      jwt: env.jwt,
+      assignment: env.assignment,
+      courseId: env.context_id,
+      locale: {
+        locale: env.locale,
+        parseNumber: numberHelper.parse,
+        formatNumber: I18n.n
+      },
+      gradingType: env.grading_type,
+      baseUrl: env.base_url
+    })
+    editor.attach(
+      document.getElementById('canvas-conditional-release-editor'),
+      document.getElementById('application')
+    )
+    this.setState({editor})
+  }
 
-    componentDidMount() {
-      this.loadEditor();
-    },
+  componentDidMount() {
+    this.loadEditor()
+  }
 
-    render () {
-      return (
-        <div id='canvas-conditional-release-editor'/>
-      )
-    }
-  });
+  render() {
+    return <div id="canvas-conditional-release-editor" />
+  }
+}
 
-  const attach = function(element, type, env) {
-    const editor = (
-      <Editor env={env} type={type} />
-    );
-    return ReactDOM.render(editor, element);
-  };
+const attach = function(element, type, env) {
+  const editor = <Editor env={env} type={type} />
+  return ReactDOM.render(editor, element)
+}
 
-  const ConditionalRelease = {
-    Editor: Editor,
-    attach: attach
-  };
+const ConditionalRelease = {
+  Editor,
+  attach
+}
 
 export default ConditionalRelease

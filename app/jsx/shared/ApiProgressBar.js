@@ -21,106 +21,109 @@ import PropTypes from 'prop-types'
 import _ from 'underscore'
 import ProgressStore from './stores/ProgressStore'
 import ProgressBar from './ProgressBar'
-  var ApiProgressBar = React.createClass({
-    displayName: 'ProgressBar',
-    propTypes: {
-      progress_id: PropTypes.string,
-      onComplete: PropTypes.func,
-      delay: PropTypes.number
-    },
-    intervalID: null,
 
-    //
-    // Preparation
-    //
+class ApiProgressBar extends React.Component {
+  static displayName = 'ProgressBar'
 
-    getDefaultProps(){
-      return {
-        delay: 1000
-      }
-    },
-    getInitialState () {
-      return {
-        completion: 0,
-        workflow_state: null
-      }
-    },
+  static propTypes = {
+    progress_id: PropTypes.string,
+    onComplete: PropTypes.func,
+    delay: PropTypes.number
+  }
 
-    //
-    // Lifecycle
-    //
+  //
+  // Preparation
+  //
 
-    componentDidMount () {
-      ProgressStore.addChangeListener(this.handleStoreChange);
-      this.intervalID = setInterval(this.poll, this.props.delay);
-    },
-    componentWillUnmount () {
-      ProgressStore.removeChangeListener(this.handleStoreChange);
-      if (!_.isNull(this.intervalID)) {
-        clearInterval(this.intervalID);
-        this.intervalID = null;
-      };
-    },
+  static defaultProps = {
+    delay: 1000
+  }
 
-    shouldComponentUpdate (nextProps, nextState) {
-      return this.state.workflow_state != nextState.workflow_state ||
-        this.state.completion != nextState.completion ||
-        this.props.progress_id != nextProps.progress_id;
-    },
-    componentDidUpdate () {
-      if (this.isComplete()) {
-        if (!_.isNull(this.intervalID)) {
-          clearInterval(this.intervalID);
-          this.intervalID = null;
-        };
+  state = {
+    completion: 0,
+    workflow_state: null
+  }
 
-        if (!_.isUndefined(this.props.onComplete)) {
-          this.props.onComplete();
-        };
-      };
-    },
+  intervalID = null
 
-    //
-    // Custom Helpers
-    //
+  //
+  // Lifecycle
+  //
 
-    handleStoreChange () {
-      var progress = ProgressStore.getState()[this.props.progress_id];
+  componentDidMount() {
+    ProgressStore.addChangeListener(this.handleStoreChange)
+    this.intervalID = setInterval(this.poll, this.props.delay)
+  }
 
-      if (_.isObject(progress)) {
-        this.setState({
-          completion: progress.completion,
-          workflow_state: progress.workflow_state
-        });
-      };
-    },
-    isComplete () {
-      return _.contains(['completed', 'failed'], this.state.workflow_state);
-    },
-    isInProgress () {
-      return _.contains(['queued', 'running'], this.state.workflow_state);
-    },
-    poll () {
-      if (!_.isUndefined(this.props.progress_id)) {
-        ProgressStore.get(this.props.progress_id);
-      }
-    },
-
-    //
-    // Render
-    //
-
-    render() {
-      if (!this.isInProgress()) {
-        return null;
-      };
-
-      return (
-        <div style={{width: '300px'}}>
-          <ProgressBar progress={this.state.completion} />
-        </div>
-      );
+  componentWillUnmount() {
+    ProgressStore.removeChangeListener(this.handleStoreChange)
+    if (!_.isNull(this.intervalID)) {
+      clearInterval(this.intervalID)
+      this.intervalID = null
     }
-  });
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return (
+      this.state.workflow_state != nextState.workflow_state ||
+      this.state.completion != nextState.completion ||
+      this.props.progress_id != nextProps.progress_id
+    )
+  }
+
+  componentDidUpdate() {
+    if (this.isComplete()) {
+      if (!_.isNull(this.intervalID)) {
+        clearInterval(this.intervalID)
+        this.intervalID = null
+      }
+
+      if (!_.isUndefined(this.props.onComplete)) {
+        this.props.onComplete()
+      }
+    }
+  }
+
+  //
+  // Custom Helpers
+  //
+
+  handleStoreChange = () => {
+    const progress = ProgressStore.getState()[this.props.progress_id]
+
+    if (_.isObject(progress)) {
+      this.setState({
+        completion: progress.completion,
+        workflow_state: progress.workflow_state
+      })
+    }
+  }
+
+  isComplete = () => _.contains(['completed', 'failed'], this.state.workflow_state)
+
+  isInProgress = () => _.contains(['queued', 'running'], this.state.workflow_state)
+
+  poll = () => {
+    if (!_.isUndefined(this.props.progress_id)) {
+      ProgressStore.get(this.props.progress_id)
+    }
+  }
+
+  //
+  // Render
+  //
+
+  render() {
+    if (!this.isInProgress()) {
+      return null
+    }
+
+    return (
+      <div style={{width: '300px'}}>
+        <ProgressBar progress={this.state.completion} />
+      </div>
+    )
+  }
+}
 
 export default ApiProgressBar

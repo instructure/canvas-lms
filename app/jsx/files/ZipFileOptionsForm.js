@@ -23,57 +23,57 @@ import Modal from '../shared/modal'
 import ModalContent from '../shared/modal-content'
 import ModalButtons from '../shared/modal-buttons'
 
-  var ZipFileOptionsForm = React.createClass({
+class ZipFileOptionsForm extends React.Component {
+  static displayName = 'ZipFileOptionsForm'
 
-    displayName: 'ZipFileOptionsForm',
-    propTypes: {
-      onZipOptionsResolved: PropTypes.func.isRequired
-    },
-    handleExpandClick: function () {
-      this.props.onZipOptionsResolved({file: this.props.fileOptions.file, expandZip: true});
-    },
-    handleUploadClick: function () {
-      this.props.onZipOptionsResolved({file: this.props.fileOptions.file, expandZip: false})
-    },
-    buildMessage: function (fileOptions) {
-      var message = undefined
-      if (this.props.fileOptions) {
-        var name = this.props.fileOptions.file.name;
-        message = I18n.t('message', 'Would you like to expand the contents of "%{fileName}" into the current folder, or upload the zip file as is?', {fileName: name});
-      }
-      return message;
-    },
-    render: function () {
-      return (
-        <Modal
-          className='ReactModal__Content--canvas ReactModal__Content--mini-modal'
-          isOpen={!!this.props.fileOptions}
-          ref='canvasModal'
-          title= { I18n.t('zip_options', 'Zip file options') }
-          onRequestClose = {this.props.onClose}
-        >
-          <ModalContent>
-            <p className="modalMessage">
-              { this.buildMessage() }
-            </p>
-          </ModalContent>
-          <ModalButtons>
-            <button
-              className='btn'
-              onClick= { this.handleExpandClick }
-              >
-              { I18n.t('expand', 'Expand It') }
-            </button>
-            <button
-              className='btn btn-primary'
-              onClick= { this.handleUploadClick }
-            >
-              { I18n.t('upload', 'Upload It') }
-            </button>
-          </ModalButtons>
-        </Modal>
-      );
+  static propTypes = {
+    onZipOptionsResolved: PropTypes.func.isRequired
+  }
+
+  handleExpandClick = () => {
+    this.props.onZipOptionsResolved({file: this.props.fileOptions.file, expandZip: true})
+  }
+
+  handleUploadClick = () => {
+    this.props.onZipOptionsResolved({file: this.props.fileOptions.file, expandZip: false})
+  }
+
+  buildMessage = fileOptions => {
+    let message
+    if (this.props.fileOptions) {
+      const name = this.props.fileOptions.file.name
+      message = I18n.t(
+        'message',
+        'Would you like to expand the contents of "%{fileName}" into the current folder, or upload the zip file as is?',
+        {fileName: name}
+      )
     }
-  });
+    return message
+  }
+
+  render() {
+    return (
+      <Modal
+        className="ReactModal__Content--canvas ReactModal__Content--mini-modal"
+        isOpen={!!this.props.fileOptions}
+        ref="canvasModal"
+        title={I18n.t('zip_options', 'Zip file options')}
+        onRequestClose={this.props.onClose}
+      >
+        <ModalContent>
+          <p className="modalMessage">{this.buildMessage()}</p>
+        </ModalContent>
+        <ModalButtons>
+          <button className="btn" onClick={this.handleExpandClick}>
+            {I18n.t('expand', 'Expand It')}
+          </button>
+          <button className="btn btn-primary" onClick={this.handleUploadClick}>
+            {I18n.t('upload', 'Upload It')}
+          </button>
+        </ModalButtons>
+      </Modal>
+    )
+  }
+}
 
 export default ZipFileOptionsForm

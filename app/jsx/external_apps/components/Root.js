@@ -18,14 +18,6 @@
 
 import React from 'react'
 
-export default React.createClass({
-    displayName: 'Root',
-
-    render() {
-      return (
-        <div className="ExternalAppsRoot">
-          {React.cloneElement(this.props.children, {})}
-        </div>
-      );
-    }
-  });
+export default function Root(props) {
+  return <div className="ExternalAppsRoot">{React.cloneElement(props.children, {})}</div>
+}
