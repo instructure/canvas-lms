@@ -45,6 +45,10 @@ import MovementUtils from './MovementUtils'
       DashboardCardBackgroundStore.setDefaultColors(this.allCourseAssetStrings());
     },
 
+    componentWillUnmount() {
+      DashboardCardBackgroundStore.removeChangeListener(this.colorsUpdated)
+    },
+
     componentWillReceiveProps: function (newProps) {
       DashboardCardBackgroundStore.setDefaultColors(this.allCourseAssetStrings());
 
@@ -61,9 +65,7 @@ import MovementUtils from './MovementUtils'
     },
 
     colorsUpdated: function(){
-      if(this.isMounted()){
-        this.forceUpdate();
-      }
+      this.forceUpdate();
     },
 
     allCourseAssetStrings: function(){
