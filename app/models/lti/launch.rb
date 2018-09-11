@@ -19,7 +19,7 @@ require 'useragent'
 
 module Lti
   class Launch
-    FRAME_ALLOWANCES = ['geolocation', 'microphone', 'camera', 'midi', 'encrypted-media'].freeze
+    FRAME_ALLOWANCES = ['geolocation *', 'microphone *', 'camera *', 'midi *', 'encrypted-media *'].freeze
 
     attr_writer :analytics_id, :analytics_message_type
     attr_accessor :link_text, :resource_url, :params, :launch_type, :tool_dimensions, :base_string
