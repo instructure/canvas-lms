@@ -27,6 +27,8 @@ describe DiscussionTopicsController do
     student_in_course(active_all: true, course: @course)
   end
 
+  let(:now) { Time.zone.now.change(usec: 0) }
+
   def course_topic(opts={})
     @topic = @course.discussion_topics.build(:title => "some topic", :pinned => opts.fetch(:pinned, false))
     user = opts[:user] || @user
@@ -124,10 +126,13 @@ describe DiscussionTopicsController do
       end
 
       it "should not assign the create permission if the term and course are concluded" do
-        term = @course.account.enrollment_terms.create!(:name => 'mew', :start_at => Time.now.utc - 10.minutes, :end_at => Time.now.utc - 1.minute)
+        term = @course.account.enrollment_terms.create!(
+          :name => 'mew',
+          :start_at => 6.months.ago(now),
+          :end_at => 1.months.ago(now)
+        )
         @course.enrollment_term = term
-        @course.update_attribute(:conclude_at, Time.now.utc - 1.minute)
-        @course.save!
+        @course.update!(start_at: 5.months.ago(now), conclude_at: 2.months.ago(now))
         user_session(@teacher)
 
         get 'index', params: {:course_id => @course.id}
