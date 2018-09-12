@@ -93,27 +93,28 @@ import 'compiled/jquery.rails_flash_notifications'
       StudentGroupStore.fetchGroupsForCourse()
     },
 
+    componentWillUnmount() {
+      OverrideStudentStore.removeChangeListener(this.handleStudentStoreChange)
+      StudentGroupStore.removeChangeListener(this.handleStudentGroupStoreChange)
+    },
+
     fetchAdhocStudents(){
       OverrideStudentStore.fetchStudentsByID(this.adhocOverrideStudentIDs())
     },
 
     handleStudentStoreChange(){
-      if( this.isMounted() ){
         this.setState({
           students: OverrideStudentStore.getStudents(),
           currentlySearching: OverrideStudentStore.currentlySearching(),
           allStudentsFetched: OverrideStudentStore.allStudentsFetched()
         })
-      }
     },
 
     handleStudentGroupStoreChange(){
-      if( this.isMounted() ){
         this.setState({
           groups: this.formattedGroupHash(StudentGroupStore.getGroups()),
           selectedGroupSetId: StudentGroupStore.getSelectedGroupSetId()
         })
-      }
     },
 
     // always keep React Overrides in sync with Backbone Collection
