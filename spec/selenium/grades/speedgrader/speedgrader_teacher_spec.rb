@@ -244,9 +244,9 @@ describe "speed grader" do
       sections = @course.course_sections
       section_options_text = f("#section-menu ul")[:textContent] # hidden
       expect(section_options_text).to include(@course_section.name)
-      goto_section(sections[0].id)
+      Speedgrader.visit_section(Speedgrader.section_with_id(sections[0].id))
       expect(ff("#students_selectmenu > option")).to have_size 1
-      goto_section(sections[1].id)
+      Speedgrader.visit_section(Speedgrader.section_with_id(sections[1].id))
       expect(ff("#students_selectmenu > option")).to have_size 1
     end
   end
