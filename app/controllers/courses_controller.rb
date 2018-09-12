@@ -145,6 +145,11 @@ require 'securerandom'
 #            "example": 25,
 #            "type": "integer"
 #         },
+#         "created_at": {
+#           "description": "the date the course was created.",
+#           "example": "2012-05-01T00:00:00-06:00",
+#           "type": "datetime"
+#         },
 #         "start_at": {
 #           "description": "the start date for the course, if applicable",
 #           "example": "2012-06-01T00:00:00-06:00",

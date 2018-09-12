@@ -787,6 +787,7 @@ describe CoursesController, type: :request do
         expect(new_course.time_zone.tzinfo.name).to eql 'America/Juneau'
         course_response.merge!(
           'id' => new_course.id,
+          'created_at' => new_course.created_at.as_json,
           'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{new_course.uuid}.ics" },
           'uuid' => new_course.uuid
         )
@@ -840,6 +841,7 @@ describe CoursesController, type: :request do
         expect(new_course.enrollment_term_id).to eql term.id
         course_response.merge!(
           'id' => new_course.id,
+          'created_at' => new_course.created_at.as_json,
           'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{new_course.uuid}.ics" },
           'uuid' => new_course.uuid
         )
@@ -3186,6 +3188,7 @@ describe CoursesController, type: :request do
         'integration_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
         'hide_final_grades' => @course1.hide_final_grades,
+        'created_at' => @course1.created_at.as_json,
         'start_at' => @course1.start_at,
         'end_at' => @course1.end_at,
         'default_view' => @course1.default_view,
