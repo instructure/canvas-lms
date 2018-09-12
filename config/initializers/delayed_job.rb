@@ -134,8 +134,13 @@ Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
   method_tag ||= "unknown"
   shard_id = job.current_shard.try(:id).to_i
   strand = job.strand && DelayedJobConfig.strands_to_send_to_statsd.include?(job.strand) && job.strand.gsub('/', '-')
-  stats = ["delayedjob.queue", "delayedjob.queue.tag.#{obj_tag}.#{method_tag}", "delayedjob.queue.shard.#{shard_id}"]
-  stats << "delayedjob.queue.jobshard.#{job.shard.id}" if job.respond_to?(:shard)
+  stats = []
+  # don't count stranded jobs in global queued stats; they're likely waiting for each other, and not
+  # indicative of overall jobs health
+  unless job.strand
+    stats = ["delayedjob.queue", "delayedjob.queue.shard.#{shard_id}", "delayedjob.queue.jobshard.#{job.shard.id}"]
+  end
+  stats << "delayedjob.queue.tag.#{obj_tag}.#{method_tag}"
   stats << "delayedjob.queue.strand.#{strand}" if strand
   CanvasStatsd::Statsd.timing(stats, lag)
 
