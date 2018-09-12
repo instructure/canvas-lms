@@ -12826,7 +12826,7 @@ react-dnd@^2.5.2:
     lodash "^4.2.0"
     prop-types "^15.5.10"
 
-react-dom@0.14.9, "react-dom@^0.14.7 || ^15", "react-dom@^0.14.8 || ^15.0.0":
+react-dom@0.14.9, "react-dom@^0.14.7 || ^15", "react-dom@^0.14.8 || ^15.0.0", "react-dom@^0.14.8 || ^15.0.0 || ^16":
   version "0.14.9"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-0.14.9.tgz#05064a3dcf0fb1880a3b2bfc9d58c55d8d9f6293"
 
@@ -12924,7 +12924,7 @@ react@0.10.x:
   version "0.10.0"
   resolved "https://registry.yarnpkg.com/react/-/react-0.10.0.tgz#8c82753593d3f325ca99d820f7400ab02f1ee1f8"
 
-react@0.14.9, "react@^0.14.7 || ^15", "react@^0.14.8 || ^15.0.0":
+react@0.14.9, "react@^0.14.7 || ^15", "react@^0.14.8 || ^15.0.0", "react@^0.14.8 || ^15.0.0 || ^16":
   version "0.14.9"
   resolved "https://registry.yarnpkg.com/react/-/react-0.14.9.tgz#9110a6497c49d44ba1c0edd317aec29c2e0d91d1"
   dependencies:
@@ -13782,6 +13782,12 @@ sass-graph@^2.0.1, sass-graph@^2.2.4:
 sax@^1.1.4, sax@^1.2.4, sax@~1.2.1:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
+
+schedule@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/schedule/-/schedule-0.3.0.tgz#1be2ab2fc2e768536269ce7326efb478d6c045e8"
+  dependencies:
+    object-assign "^4.1.1"
 
 schema-utils@^0.3.0:
   version "0.3.0"
