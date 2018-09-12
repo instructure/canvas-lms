@@ -292,8 +292,9 @@ module Importers
       end
 
       item.root_entries(true) if !item.available? && !item.survey? # reload items so we get accurate points
+      item.notify_of_update = false
       item.save
-      item.assignment.save if item.assignment && item.assignment.changed?
+      item.assignment.save_without_broadcasting if item.assignment && item.assignment.changed?
 
       migration.add_imported_item(item)
       item.saved_by = nil

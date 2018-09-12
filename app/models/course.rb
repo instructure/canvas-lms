@@ -2214,6 +2214,7 @@ class Course < ActiveRecord::Base
               new_folder_id = merge_mapped_id(file.folder)
             end
             new_file.folder_id = new_folder_id
+            new_file.need_notify = false
             new_file.save_without_broadcasting!
             cm.add_imported_item(new_file)
             cm.add_imported_item(new_file.folder, key: new_file.folder.id)

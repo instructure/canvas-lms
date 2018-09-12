@@ -447,7 +447,7 @@ class Quizzes::Quiz < ActiveRecord::Base
         unless deleted?
           a.workflow_state = self.published? ? 'published' : 'unpublished'
         end
-        @notify_of_update ||= a.will_save_change_to_workflow_state? && a.published?
+        @notify_of_update = a.will_save_change_to_workflow_state? && a.published? unless defined?(@notify_of_update)
         a.notify_of_update = @notify_of_update
         a.mark_as_importing!(@importing_migration) if @importing_migration
         a.with_versioning(false) do
