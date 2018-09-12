@@ -24,13 +24,14 @@
 # course, which does get touched, and so the cache expiration works.
 #
 # BTW if you add a new thing here, it probably needs adding to the /users/self/todo API
+show_legacy_todo_list ||= false
 cache_opts = (contexts.present? ? {} : { :expires_in => 3.minutes })
-cache(safe_cache_key([@current_user, contexts, 'to_do_list_view']), cache_opts) do
+cache(safe_cache_key([@current_user, contexts, show_legacy_todo_list, 'to_do_list_view']), cache_opts) do
  hidden_todos = 0
  presenter = ToDoListPresenter.new(self, @current_user, contexts)
 %>
 
-<% if @domain_root_account&.feature_enabled?(:student_planner) %>
+<% if !show_legacy_todo_list && @domain_root_account&.feature_enabled?(:student_planner) %>
     <div class="todo-list"></div>
 <% else %>
   <% if presenter.any_assignments? %>
