@@ -31,7 +31,8 @@ class PeriodicJobs
     Shard.with_each_shard(Shard.in_current_region) do
       klass.send_later_enqueue_args(method, {
           strand: "#{klass}.#{method}:#{Shard.current.database_server.id}",
-          max_attempts: 1
+          max_attempts: 1,
+          priority: 40
       }, *args)
     end
   end
