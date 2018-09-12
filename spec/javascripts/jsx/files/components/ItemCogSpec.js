@@ -116,7 +116,8 @@ define([
     const props = sampleProps(true);
     props.model.destroy = function () { return true; };
     sinon.stub(window, 'confirm').returns(true);
-    const ContainerApp = React.createClass({
+
+    class ContainerApp extends React.Component {
       render () {
         return (
           <div>
@@ -125,7 +126,8 @@ define([
           </div>
         );
       }
-    });
+    }
+
     const itemCogs = ReactDOM.render(<ContainerApp />, $('#fixtures')[0]);
     const renderedCogs = TestUtils.scryRenderedComponentsWithType(itemCogs, ItemCog)
     Simulate.click(ReactDOM.findDOMNode(renderedCogs[1].refs.deleteLink));
@@ -138,7 +140,8 @@ define([
     const props = sampleProps(true);
     props.model.destroy = function () { return true; };
     sinon.stub(window, 'confirm').returns(true);
-    const ContainerApp = React.createClass({
+
+    class ContainerApp extends React.Component {
       render () {
         return (
           <div>
@@ -149,7 +152,8 @@ define([
           </div>
         );
       }
-    });
+    }
+
     const container = ReactDOM.render(<ContainerApp />, $('#fixtures')[0]);
     const renderedCog = TestUtils.findRenderedComponentWithType(container, ItemCog);
     Simulate.click(ReactDOM.findDOMNode(renderedCog.refs.deleteLink));
