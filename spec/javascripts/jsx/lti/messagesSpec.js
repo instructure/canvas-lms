@@ -122,31 +122,6 @@ QUnit.module('Messages', function (suiteHooks) {
     notOk(moduleFooter.is(':visible'))
   })
 
-  test('scrolls to the top of the content wrapper', () => {
-    ltiToolWrapperFixture.append(`
-    <div style="height:333px;">
-    </div>
-    <div id="content-wrapper" class="ic-Layout-contentWrapper">
-      <div id="content" class="ic-Layout-contentMain" role="main">
-        <div class="tool_content_wrapper" data-tool-wrapper-id="b58b20b7-c097-43bd-9f6c-c08adbac0ea3" style="height: ${intialHeight}px;">
-          <iframe src="about:blank" name="tool_content" id="tool_content" class="tool_launch" allowfullscreen="allowfullscreen" webkitallowfullscreen="true" mozallowfullscreen="true" tabindex="0" title="Tool Content" style="height:4000px;width:100%;" allow="geolocation *; microphone *; camera *; midi *; encrypted-media *"></iframe>
-        </div>
-      </div>
-    </div>
-    <div style="height:444px;">
-    </div>
-    `)
-    const wrapper = $('.tool_content_wrapper')
-    const html = $('html,body')
-    const scrolledTo = 1
-
-    html.scrollTop(scrolledTo)
-    equal(html.scrollTop(), scrolledTo)
-    ltiMessageHandler(postMessageEvent(scrollMessage));
-    clock.tick(1000)
-    equal(html.scrollTop(), wrapper.offset().top)
-  })
-
   test('sets the unload message', () => {
     sinon.spy(window, 'addEventListener')
     notOk(window.addEventListener.calledOnce)
