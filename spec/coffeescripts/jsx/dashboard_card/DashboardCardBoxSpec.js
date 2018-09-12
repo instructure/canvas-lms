@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import DashboardCardBox from 'jsx/dashboard_card/DashboardCardBox'
 import CourseActivitySummaryStore from 'jsx/dashboard_card/CourseActivitySummaryStore'
 

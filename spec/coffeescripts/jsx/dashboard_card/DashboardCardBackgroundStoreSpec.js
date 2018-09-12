@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Simulate, SimulateNative} from 'react-addons-test-utils'
 import DashboardCardBackgroundStore from 'jsx/dashboard_card/DashboardCardBackgroundStore'
 import fakeENV from 'helpers/fakeENV'
 

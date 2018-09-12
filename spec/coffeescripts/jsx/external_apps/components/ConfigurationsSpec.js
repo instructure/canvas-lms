@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import Configurations from 'jsx/external_apps/components/Configurations'
 
 const wrapper = document.getElementById('fixtures')

@@ -20,7 +20,7 @@ define([
   'underscore',
   'react',
   'react-dom',
-  'react-addons-test-utils',
+  'react-dom/test-utils',
   'jsx/add_people/components/duplicate_section',
 ], (_, React, ReactDOM, TestUtils, DuplicateSection) => {
   QUnit.module('DuplicateSection')

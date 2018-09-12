@@ -18,7 +18,6 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {Simulate} from 'react-addons-test-utils'
 import $ from 'jquery'
 import UploadButton from 'jsx/files/UploadButton'
 import FileOptionsCollection from 'compiled/react_files/modules/FileOptionsCollection'

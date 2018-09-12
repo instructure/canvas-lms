@@ -20,7 +20,7 @@ import $ from 'jquery'
 import KeyboardShortcutModal from 'jsx/shared/KeyboardShortcutModal'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 
 QUnit.module('KeyboardShortcutModal#handleKeydown', {
   setup() {

@@ -18,7 +18,7 @@
 
 define([
   'react',
-  'react-addons-test-utils',
+  'react-dom/test-utils',
   'jsx/course_settings/components/UploadArea',
 ], (React, TestUtils, UploadArea) => {
 

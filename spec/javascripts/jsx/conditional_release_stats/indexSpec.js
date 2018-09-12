@@ -19,7 +19,7 @@
 define([
   'react',
   'react-dom',
-  'react-addons-test-utils',
+  'react-dom/test-utils',
   'helpers/fakeENV',
   'jsx/conditional_release_stats/index',
   'jsx/conditional_release_stats/components/breakdown-graphs'

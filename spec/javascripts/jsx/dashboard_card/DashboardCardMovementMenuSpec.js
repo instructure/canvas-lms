@@ -18,7 +18,7 @@
 
 define([
   'react',
-  'react-addons-test-utils',
+  'react-dom/test-utils',
   'jsx/dashboard_card/DashboardCardMovementMenu',
 ], (React, TestUtils, DashboardCardMovementMenu) => {
   QUnit.module('DashboardCardMovementMenu');

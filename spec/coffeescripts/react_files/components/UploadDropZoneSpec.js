@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {Simulate} from 'react-addons-test-utils'
+import {Simulate} from 'react-dom/test-utils'
 import UploadDropZone from 'jsx/files/UploadDropZone'
 
 const node = document.querySelector('#fixtures')

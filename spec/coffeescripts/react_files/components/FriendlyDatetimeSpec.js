@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
 import I18n from 'i18nObj'
 import I18nStubber from 'helpers/I18nStubber'

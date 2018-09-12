@@ -20,7 +20,7 @@ define([
   '../../../../coffeescripts/react_files/mockFilesENV',
   'react',
   'react-dom',
-  'react-addons-test-utils',
+  'react-dom/test-utils',
   'jquery',
   'jsx/files/ItemCog',
   'compiled/models/Folder'

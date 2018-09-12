@@ -18,7 +18,7 @@
 
 define([
   'react',
-  'react-addons-test-utils',
+  'react-dom/test-utils',
   'jquery',
   'jsx/shared/ExternalToolModalLauncher',
   'jsx/shared/modal',

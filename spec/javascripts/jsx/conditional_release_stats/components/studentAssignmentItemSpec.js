@@ -18,7 +18,7 @@
 
 define([
   'react',
-  'react-addons-test-utils',
+  'react-dom/test-utils',
   'jsx/conditional_release_stats/components/student-assignment-item',
 ], (React, TestUtils, AssignmentItem) => {
 

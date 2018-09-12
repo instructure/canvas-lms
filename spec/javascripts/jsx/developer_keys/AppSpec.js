@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import {mount} from 'enzyme'
 

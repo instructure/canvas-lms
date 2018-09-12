@@ -19,7 +19,7 @@
 define([
   'jquery',
   'react',
-  'react-addons-test-utils',
+  'react-dom/test-utils',
   'jsx/calendar/scheduler/components/appointment_groups/TimeBlockSelectRow',
   'timezone/Europe/London',
   'timezone',

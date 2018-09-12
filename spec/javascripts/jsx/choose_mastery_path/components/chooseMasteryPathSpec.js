@@ -18,7 +18,7 @@
 
 define([
   'react',
-  'react-addons-test-utils',
+  'react-dom/test-utils',
   'jsx/choose_mastery_path/components/choose-mastery-path',
 ], (React, TestUtils, ChooseMasterPath) => {
 

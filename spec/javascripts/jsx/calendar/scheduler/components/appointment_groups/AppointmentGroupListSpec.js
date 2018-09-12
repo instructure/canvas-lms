@@ -19,7 +19,7 @@
 define([
   'react',
   'react-dom',
-  'react-addons-test-utils',
+  'react-dom/test-utils',
   'jsx/calendar/scheduler/components/appointment_groups/AppointmentGroupList',
 ], (React, ReactDOM, TestUtils, AppointmentGroupList) => {
   QUnit.module('AppointmentGroupList')

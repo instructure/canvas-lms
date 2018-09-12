@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import ReactDOM from 'react-dom'
 import Image from '@instructure/ui-elements/lib/components/Img'
 import Link from '@instructure/ui-elements/lib/components/Link'

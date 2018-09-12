@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import {every, keys, isEmpty, intersection, map} from 'lodash'
 import DueDates from 'jsx/due_dates/DueDates'
 import OverrideStudentStore from 'jsx/due_dates/OverrideStudentStore'

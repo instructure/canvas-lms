@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import ConfigurationFormXml from 'jsx/external_apps/components/ConfigurationFormXml'
 
 const {Simulate} = TestUtils

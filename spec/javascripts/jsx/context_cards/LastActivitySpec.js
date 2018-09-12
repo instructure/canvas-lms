@@ -19,7 +19,7 @@
 define([
   'react',
   'react-dom',
-  'react-addons-test-utils',
+  'react-dom/test-utils',
   'jsx/context_cards/LastActivity',
   'jsx/shared/FriendlyDatetime'
 ], (React, ReactDOM, TestUtils, LastActivity, FriendlyDatetime) => {

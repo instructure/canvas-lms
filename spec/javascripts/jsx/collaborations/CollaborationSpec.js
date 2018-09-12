@@ -18,7 +18,7 @@
 
 define([
   'react',
-  'react-addons-test-utils',
+  'react-dom/test-utils',
   'react-dom',
   'jsx/collaborations/Collaboration',
   'timezone'

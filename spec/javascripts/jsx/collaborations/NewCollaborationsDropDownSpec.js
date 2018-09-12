@@ -19,7 +19,7 @@
 define([
   'react',
   'react-dom',
-  'react-addons-test-utils',
+  'react-dom/test-utils',
   'jsx/collaborations/NewCollaborationsDropDown'
 ], (React, ReactDOM, TestUtils, NewCollaborationsDropDown) => {
 

@@ -19,7 +19,7 @@
 define([
   'react',
   'react-dom',
-  'react-addons-test-utils',
+  'react-dom/test-utils',
   'underscore',
   'jsx/grading/EnrollmentTermInput'
 ], (React, ReactDOM, {findRenderedDOMComponentWithClass}, _, Input) => {

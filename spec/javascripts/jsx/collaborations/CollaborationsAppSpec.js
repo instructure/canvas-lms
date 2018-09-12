@@ -18,7 +18,7 @@
 
 define([
   'react',
-  'react-addons-test-utils',
+  'react-dom/test-utils',
   'jsx/collaborations/CollaborationsApp'
 ], (React, TestUtils, CollaborationsApp) => {
 

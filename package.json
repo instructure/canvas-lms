@@ -182,7 +182,6 @@
     "prettier": "^1",
     "qunitjs": "^1.14.0",
     "raven-js": "^3.26.2",
-    "react-addons-test-utils": "^15",
     "react-test-renderer": "^15",
     "redux-logger": "2.6.1",
     "requirejs": "~2.2.0",

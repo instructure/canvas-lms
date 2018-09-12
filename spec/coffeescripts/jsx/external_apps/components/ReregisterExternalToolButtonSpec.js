@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {Simulate} from 'react-addons-test-utils'
+import {Simulate} from 'react-dom/test-utils'
 import Modal from 'react-modal'
 import ReregisterExternalToolButton from 'jsx/external_apps/components/ReregisterExternalToolButton'
 import store from 'jsx/external_apps/lib/ExternalAppsStore'

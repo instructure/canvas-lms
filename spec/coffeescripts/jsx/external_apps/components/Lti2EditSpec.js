@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import Lti2Edit from 'jsx/external_apps/components/Lti2Edit'
 
 const {Simulate} = TestUtils

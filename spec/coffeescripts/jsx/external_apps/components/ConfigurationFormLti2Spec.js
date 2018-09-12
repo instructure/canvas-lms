@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import ConfigurationFormLti2 from 'jsx/external_apps/components/ConfigurationFormLti2'
 
 const {Simulate} = TestUtils

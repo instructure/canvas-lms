@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import store from 'jsx/external_apps/lib/AppCenterStore'
 import AppFilters from 'jsx/external_apps/components/AppFilters'
 

@@ -19,7 +19,7 @@
 define([
   'react',
   'react-dom',
-  'react-addons-test-utils',
+  'react-dom/test-utils',
   'jsx/add_people/components/people_search',
 ], (React, ReactDOM, TestUtils, PeopleSearch) => {
   QUnit.module('PeopleSearch')

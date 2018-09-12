@@ -19,7 +19,7 @@
 import {isEmpty} from 'lodash'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import App from 'jsx/epub_exports/App'
 import CourseEpubExportStore from 'jsx/epub_exports/CourseStore'
 

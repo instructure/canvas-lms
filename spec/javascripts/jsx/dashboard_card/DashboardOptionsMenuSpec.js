@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import { shallow, mount } from 'enzyme'
 import DashboardOptionsMenu from 'jsx/dashboard_card/DashboardOptionsMenu'
 import moxios from 'moxios';
