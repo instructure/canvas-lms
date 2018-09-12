@@ -18,55 +18,60 @@
 
 import _ from 'underscore'
 import React from 'react'
+import createReactClass from 'create-react-class'
 import PropTypes from 'prop-types'
 import InputMixin from '../../external_apps/mixins/InputMixin'
 
-export default React.createClass({
-    displayName: 'SelectInput',
+export default createReactClass({
+  displayName: 'SelectInput',
 
-    mixins: [InputMixin],
+  mixins: [InputMixin],
 
-    propTypes: {
-      defaultValue: PropTypes.string,
-      allowBlank:   PropTypes.bool,
-      values:       PropTypes.object,
-      label:        PropTypes.string,
-      id:           PropTypes.string,
-      required:     PropTypes.bool,
-      hintText:     PropTypes.string,
-      errors:       PropTypes.object
-    },
+  propTypes: {
+    defaultValue: PropTypes.string,
+    allowBlank: PropTypes.bool,
+    values: PropTypes.object,
+    label: PropTypes.string,
+    id: PropTypes.string,
+    required: PropTypes.bool,
+    hintText: PropTypes.string,
+    errors: PropTypes.object
+  },
 
-    renderSelectOptions() {
-      var options = _.map(this.props.values, function(v, k) {
-        return <option key={k} value={k}>{v}</option>
-      }.bind(this));
-      if (this.props.allowBlank) {
-        options.unshift(<option key="NO_VALUE" value={null}></option>);
-      }
-      return options;
-    },
-
-    handleSelectChange(e) {
-      e.preventDefault();
-      this.setState({ value: e.target.value });
-    },
-
-    render() {
-      return (
-        <div className={this.getClassNames()}>
-          <label>
-            {this.props.label}
-            <select ref="input" className="form-control input-block-level"
-              defaultValue={this.props.defaultValue}
-              required={this.props.required ? "required" : null}
-              onChange={this.handleSelectChange}
-              aria-invalid={!!this.getErrorMessage()}>
-              {this.renderSelectOptions()}
-            </select>
-            {this.renderHint()}
-          </label>
-        </div>
-      )
+  renderSelectOptions() {
+    const options = _.map(
+      this.props.values,
+      (v, k) => <option key={k} value={k}>{v}</option>
+    )
+    if (this.props.allowBlank) {
+      options.unshift(<option key="NO_VALUE" value={null} />)
     }
-  });
+    return options
+  },
+
+  handleSelectChange(e) {
+    e.preventDefault()
+    this.setState({value: e.target.value})
+  },
+
+  render() {
+    return (
+      <div className={this.getClassNames()}>
+        <label>
+          {this.props.label}
+          <select
+            ref="input"
+            className="form-control input-block-level"
+            defaultValue={this.props.defaultValue}
+            required={this.props.required ? 'required' : null}
+            onChange={this.handleSelectChange}
+            aria-invalid={!!this.getErrorMessage()}
+          >
+            {this.renderSelectOptions()}
+          </select>
+          {this.renderHint()}
+        </label>
+      </div>
+    )
+  }
+})

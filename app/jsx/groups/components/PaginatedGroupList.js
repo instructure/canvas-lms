@@ -18,26 +18,34 @@
 
 import I18n from 'i18n!student_groups'
 import React from 'react'
+import createReactClass from 'create-react-class'
 import InfiniteScroll from '../../groups/mixins/InfiniteScroll'
 import Group from '../../groups/components/Group'
-  var PaginatedGroupList = React.createClass({
-    mixins: [InfiniteScroll],
 
-    loadMore() {
-      this.props.loadMore();
-    },
+const PaginatedGroupList = createReactClass({
+  displayName: 'PaginatedGroupList',
+  mixins: [InfiniteScroll],
 
-    render() {
-      var groups = this.props.groups.map(g => <Group key={g.id}
-                                                     group={g}
-                                                     onLeave={() => this.props.onLeave(g)}
-                                                     onJoin={() => this.props.onJoin(g)}
-                                                     onManage={() => this.props.onManage(g)} />);
-      return (
-        <div role="list" aria-label={I18n.t("Groups")}>
-          {groups}
-        </div>);
-    }
-  });
+  loadMore() {
+    this.props.loadMore()
+  },
+
+  render() {
+    const groups = this.props.groups.map(g => (
+      <Group
+        key={g.id}
+        group={g}
+        onLeave={() => this.props.onLeave(g)}
+        onJoin={() => this.props.onJoin(g)}
+        onManage={() => this.props.onManage(g)}
+      />
+    ))
+    return (
+      <div role="list" aria-label={I18n.t('Groups')}>
+        {groups}
+      </div>
+    )
+  }
+})
 
 export default PaginatedGroupList
