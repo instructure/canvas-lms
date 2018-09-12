@@ -26,6 +26,14 @@ describe Importers::ContextExternalToolImporter do
     expect(tool.context).to eq @course
   end
 
+  it 'should not create a new record if "persist" is falsey' do
+    course_model
+    migration = @course.content_migrations.create!
+    expect do
+      Importers::ContextExternalToolImporter.import_from_migration({:title => 'tool', :url => 'http://example.com'}, @course, migration, nil, false)
+    end.not_to change {ContextExternalTool.count}
+  end
+
   it "should work for account-level tools" do
     course_model
     migration = @course.account.content_migrations.create!

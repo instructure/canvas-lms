@@ -35,23 +35,55 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
   let(:tool_configuration) do
     Lti::ToolConfiguration.create!(
       developer_key: developer_key,
-      settings: { foo: 'bar' }
+      settings: settings
     )
   end
 
   let(:settings) do
     {
-      'foo' => 'bar',
-      'banana' => {'test' => '1'},
-      'something' => ['test', 'value']
+      'title' => 'LTI 1.3 Tool',
+      'description' => '1.3 Tool',
+      'launch_url' => 'http://lti13testtool.docker/blti_launch',
+      'custom_fields' => {'has_expansion' => '$Canvas.user.id', 'no_expansion' => 'foo'},
+      'extensions' =>  [
+        {
+          'platform' => 'canvas.instructure.com',
+          'privacy_level' => 'public',
+          'tool_id' => 'LTI 1.3 Test Tool',
+          'domain' => 'http://lti13testtool.docker',
+          'settings' =>  {
+            'icon_url' => 'https://static.thenounproject.com/png/131630-200.png',
+            'selection_height' => 500,
+            'selection_width' => 500,
+            'text' => 'LTI 1.3 Test Tool Extension text',
+            'course_navigation' =>  {
+              'message_type' => 'LtiResourceLinkRequest',
+              'canvas_icon_class' => 'icon-lti',
+              'icon_url' => 'https://static.thenounproject.com/png/131630-211.png',
+              'text' => 'LTI 1.3 Test Tool Course Navigation',
+              'url' =>
+              'http://lti13testtool.docker/launch?placement=course_navigation',
+              'enabled' => true
+            }
+          }
+        }
+      ]
     }
+  end
+
+  let(:new_url) { 'https://www.new-url.com/test' }
+
+  let(:changed_settings) do
+    changed_settings = settings
+    changed_settings['launch_url'] = new_url
+    changed_settings
   end
 
   let(:valid_parameters) do
     {
       developer_key_id: developer_key.id,
       tool_configuration: {
-          settings: settings
+        settings: changed_settings
       }
     }
   end
@@ -109,7 +141,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
 
       it 'updates the tool configuration' do
         new_settings = config_from_response.settings
-        expect(new_settings).to eq valid_parameters.dig(:tool_configuration, :settings)
+        expect(new_settings['launch_url']).to eq new_url
       end
     end
   end
