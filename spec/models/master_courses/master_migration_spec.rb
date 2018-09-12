@@ -1242,7 +1242,7 @@ describe MasterCourses::MasterMigration do
       master_parent_folder.sub_folders.create!(:name => "empty", :context => @copy_from)
 
       run_master_migration
-      
+
       copied_att = @copy_to.attachments.where(:migration_id => att_tag.migration_id).first
       expect(copied_att.full_path).to eq "course files/parent RENAMED/child/file.txt"
       expect(@copy_to.folders.where(:name => "parent RENAMED").first.locked).to eq true
@@ -1332,6 +1332,14 @@ describe MasterCourses::MasterMigration do
         run_master_migration
       end
       expect(assignment_to.reload.rubric).to eq nil
+
+      # create another rubric - it should leave alone
+      other_rubric = outcome_with_rubric(:course => @copy_to)
+      other_rubric.associate_with(assignment_to, @copy_to, purpose: 'grading', use_for_grading: true)
+
+      Assignment.where(:id => @assmt).update_all(:updated_at => 10.minutes.from_now)
+      run_master_migration
+      expect(assignment_to.reload.rubric).to eq other_rubric
     end
 
     it "shouldn't delete module items in associated courses" do

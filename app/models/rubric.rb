@@ -186,11 +186,12 @@ class Rubric < ActiveRecord::Base
                                    :use_for_grading => !!opts[:use_for_grading],
                                    :purpose => purpose
     ra.skip_updating_points_possible = opts[:skip_updating_points_possible] || @skip_updating_points_possible
-    ra.tap do |association|
-      association.updating_user = opts[:current_user]
-      association.save
-      association.updating_user = nil
+    ra.updating_user = opts[:current_user]
+    if ra.save
+      association.mark_downstream_changes(["rubric"]) if association.is_a?(Assignment)
     end
+    ra.updating_user = nil
+    ra
   end
 
   def update_with_association(current_user, rubric_params, context, association_params)

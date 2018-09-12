@@ -206,26 +206,28 @@ module Importers
       # workflow_state) that it did
       item.reload
 
-      rubric = nil
-      rubric = context.rubrics.where(migration_id: hash[:rubric_migration_id]).first if hash[:rubric_migration_id]
-      rubric ||= context.available_rubric(hash[:rubric_id]) if hash[:rubric_id]
-      if rubric
-        assoc = rubric.associate_with(item, context, :purpose => 'grading', :skip_updating_points_possible => true)
-        assoc.use_for_grading = !!hash[:rubric_use_for_grading] if hash.key?(:rubric_use_for_grading)
-        assoc.hide_score_total = !!hash[:rubric_hide_score_total] if hash.key?(:rubric_hide_score_total)
-        assoc.hide_points = !!hash[:rubric_hide_points] if hash.key?(:rubric_hide_points)
-        assoc.hide_outcome_results = !!hash[:rubric_hide_outcome_results] if hash.key?(:rubric_hide_outcome_results)
-        if hash[:saved_rubric_comments]
-          assoc.summary_data ||= {}
-          assoc.summary_data[:saved_comments] ||= {}
-          assoc.summary_data[:saved_comments] = hash[:saved_rubric_comments]
-        end
-        assoc.skip_updating_points_possible = true
-        assoc.save
+      unless master_migration && migration.master_course_subscription.content_tag_for(item)&.downstream_changes&.include?("rubric")
+        rubric = nil
+        rubric = context.rubrics.where(migration_id: hash[:rubric_migration_id]).first if hash[:rubric_migration_id]
+        rubric ||= context.available_rubric(hash[:rubric_id]) if hash[:rubric_id]
+        if rubric
+          assoc = rubric.associate_with(item, context, :purpose => 'grading', :skip_updating_points_possible => true)
+          assoc.use_for_grading = !!hash[:rubric_use_for_grading] if hash.key?(:rubric_use_for_grading)
+          assoc.hide_score_total = !!hash[:rubric_hide_score_total] if hash.key?(:rubric_hide_score_total)
+          assoc.hide_points = !!hash[:rubric_hide_points] if hash.key?(:rubric_hide_points)
+          assoc.hide_outcome_results = !!hash[:rubric_hide_outcome_results] if hash.key?(:rubric_hide_outcome_results)
+          if hash[:saved_rubric_comments]
+            assoc.summary_data ||= {}
+            assoc.summary_data[:saved_comments] ||= {}
+            assoc.summary_data[:saved_comments] = hash[:saved_rubric_comments]
+          end
+          assoc.skip_updating_points_possible = true
+          assoc.save
 
-        item.points_possible ||= rubric.points_possible if item.infer_grading_type == "points"
-      elsif master_migration && item.rubric
-        item.rubric_association.destroy
+          item.points_possible ||= rubric.points_possible if item.infer_grading_type == "points"
+        elsif master_migration && item.rubric
+          item.rubric_association.destroy
+        end
       end
 
       if hash[:assignment_overrides]
