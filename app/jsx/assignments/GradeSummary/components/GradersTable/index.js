@@ -83,6 +83,7 @@ function GradersTable(props) {
                   acceptGradesStatus={row.acceptGradesStatus}
                   onClick={row.onAccept}
                   selectionDetails={row.selectionDetails}
+                  graderName={row.graderName}
                 />
               </View>
             )}
