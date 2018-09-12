@@ -30,7 +30,7 @@ module SendToStream
       after_save :clear_stream_items_on_destroy
       after_destroy :clear_stream_items
     end
-    
+
     def on_update_send_to_streams(&block)
       self.send_to_stream_update_block = block
       after_update :queue_update_stream_items
@@ -38,7 +38,7 @@ module SendToStream
       after_destroy :clear_stream_items
     end
   end
- 
+
   module SendToStreamInstanceMethods
     def queue_create_stream_items
       block = self.class.send_to_stream_block rescue nil
@@ -49,7 +49,7 @@ module SendToStream
       end
       true
     end
-    
+
     def create_stream_items
       return if stream_item_inactive?
       block = self.class.send_to_stream_block
@@ -62,20 +62,20 @@ module SendToStream
         raise
       end
     end
-    
+
     def generate_stream_items(stream_recipients)
       @generated_stream_items ||= []
       self.extend TextHelper
       @stream_item_recipient_ids = stream_recipients.compact.map{|u| User.infer_id(u) }.compact.uniq
       @generated_stream_items = StreamItem.generate_all(self, @stream_item_recipient_ids)
     end
-    
+
     def queue_update_stream_items
       block = self.class.send_to_stream_update_block
       stream_recipients = Array(self.instance_eval(&block)) if block
       if stream_recipients && !stream_recipients.empty?
         send_later_if_production_enqueue_args(:generate_stream_items,
-                                              { :priority => Delayed::LOW_PRIORITY },
+                                              { :priority => 25 },
                                               stream_recipients)
         true
       end
@@ -93,17 +93,17 @@ module SendToStream
     def clear_stream_items_on_destroy
       clear_stream_items if stream_item_inactive?
     end
-    
+
     def clear_stream_items
       # We need to pass the asset_string, not the asset itself, since we're about to delete the asset
       root_object = StreamItem.root_object(self)
       StreamItem.send_later_if_production(:delete_all_for, [root_object.class.base_class.name, root_object.id], [self.class.base_class.name, self.id])
     end
   end
- 
+
   def self.included(klass)
     klass.send :include, SendToStreamInstanceMethods
     klass.extend SendToStreamClassMethods
   end
 end
- 
+
