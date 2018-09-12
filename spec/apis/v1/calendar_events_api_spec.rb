@@ -79,6 +79,22 @@ describe CalendarEventsApiController, type: :request do
       end
     end
 
+    it "should not allow user to create calendar events" do
+      testCourse = course_with_teacher(:active_all => true, :user => user_with_pseudonym(:active_user => true))
+      testCourse.context.destroy!
+      json = api_call(:post, "/api/v1/calendar_events.json", {
+          :controller => 'calendar_events_api', :action => 'create', :format => 'json'
+        }, {
+        :calendar_event => {
+          :context_code => "course_#{testCourse.course_id}",
+          :title => "API Test",
+          :start_at => "2018-09-19T21:00:00Z",
+          :end_at => "2018-09-19T22:00:00Z"
+        }}
+      );
+      expect(json.first[1]).to eql "cannot create event for deleted course"
+    end
+
     context "timezones" do
       before :once do
         @akst = ActiveSupport::TimeZone.new('Alaska')
