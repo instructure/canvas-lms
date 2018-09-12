@@ -2493,8 +2493,14 @@ class UsersController < ApplicationController
         @pseudonym.save!
         @user = @pseudonym.user
         @user.workflow_state = 'registered'
-
         @user.update_account_associations
+        if params[:user][:skip_registration] && params[:communication_channel][:skip_confirmation]
+          cc = CommunicationChannel.where(user_id: @user.id, path_type: :email).order(updated_at: :desc).first
+          return if cc.nil?
+          cc.pseudonym = @pseudonym
+          cc.workflow_state = 'active'
+          cc.save!
+        end
       end
     end
 
