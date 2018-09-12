@@ -398,6 +398,14 @@ function copyAssignmentDescriptionIntoAssignmentSubmission() {
 // this is called in the canvas file public/javascripts/submit_assignment.js
 // to be a custom validator
 function validateMagicFields() {
+
+  try {
+  	// expand ALL toggles to ensure the whole assignment is visible to the student
+	// without this, it might try to focus a hidden field, and that is super confusing to users
+	// as it complains without telling them just what they missed
+    jQuery(".bz-toggle-collapse").parent().removeClass('collapsed').children().not('.bz-toggle-collapse').show();
+  } catch(e) { console.log(e); }
+
   var list = document.querySelectorAll("#assignment_show .description input[type=text][data-bz-retained], #assignment_show .description input[type=url][data-bz-retained], #assignment_show .description textarea[data-bz-retained]");
   for(var a = 0; a < list.length; a++) {
     if(list[a].value == "" && !list[a].classList.contains("bz-optional-magic-field")) {
