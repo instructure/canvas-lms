@@ -89,7 +89,7 @@ QUnit.module('DueDates', {
 })
 
 test('renders', function() {
-  ok(this.dueDates.isMounted())
+  ok(this.dueDates)
 })
 
 test('formats sectionHash properly', function() {
@@ -460,12 +460,12 @@ QUnit.module('DueDates render callbacks', {
 })
 
 test('fetchAdhocStudents does not fire until state is set', function() {
-  const getInitialStateStub = sandbox.stub(DueDates.prototype, 'getInitialState')
   const fetchAdhocStudentsStub = sandbox.stub(OverrideStudentStore, 'fetchStudentsByID')
   const DueDatesElement = <DueDates {...this.props} />
 
-  // provide an initial state that should not get pssed into the fetchStudentsByID call
-  getInitialStateStub.returns({
+  // render with the props (which should provide info for fetchStudentsByID call)
+  this.dueDates = ReactDOM.render(DueDatesElement, $('<div>').appendTo('body')[0])
+  this.dueDates.setState({
     rows: [
       {
         1: {
@@ -478,10 +478,7 @@ test('fetchAdhocStudents does not fire until state is set', function() {
     students: {}
   })
 
-  // render with the props (which should provide info for fetchStudentsByID call)
-  this.dueDates = ReactDOM.render(DueDatesElement, $('<div>').appendTo('body')[0])
-
-  ok(!fetchAdhocStudentsStub.calledWith(['18', '22']))
+  notOk(fetchAdhocStudentsStub.calledWith(['18', '22']))
   ok(fetchAdhocStudentsStub.calledWith(['1', '3']))
 
   ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.dueDates).parentNode)
