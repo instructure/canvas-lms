@@ -256,7 +256,7 @@ to because the assignment has no points possible.
         else
           if attachment
             job_options = {
-              :priority => Delayed::LOW_PRIORITY,
+              :priority => Delayed::HIGH_PRIORITY,
               :max_attempts => 1,
               :n_strand => Attachment.clone_url_strand(url)
             }
