@@ -21,13 +21,21 @@ import {arrayOf, bool, func, oneOf, shape, string} from 'prop-types'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import IconCheckMark from '@instructure/ui-icons/lib/Solid/IconCheckMark'
 import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import I18n from 'i18n!assignment_grade_summary'
 
 import {FAILURE, STARTED, SUCCESS} from '../../grades/GradeActions'
 
 function readyButton(props) {
-  return <Button {...props}>{I18n.t('Accept')}</Button>
+  return (
+    <Button {...props}>
+      <PresentationContent>{I18n.t('Accept')}</PresentationContent>
+      <ScreenReaderContent>
+        {I18n.t('Accept grades by %{graderName}', {graderName: props.graderName})}
+      </ScreenReaderContent>
+    </Button>
+  )
 }
 
 function startedButton(props) {
@@ -79,6 +87,7 @@ export default function AcceptGradesButton(props) {
 
 AcceptGradesButton.propTypes = {
   acceptGradesStatus: oneOf([FAILURE, STARTED, SUCCESS]),
+  graderName: string.isRequired,
   onClick: func.isRequired,
   selectionDetails: shape({
     allowed: bool.isRequired,
