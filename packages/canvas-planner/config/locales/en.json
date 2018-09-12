@@ -50,6 +50,9 @@
   "assignmenttype_title_posted_datetime_cab69444": {
     "message": "{ assignmentType } { title } posted { datetime }."
   },
+  "assignmenttype_title_reminder_datetime_33fa66d5": {
+    "message": "{ assignmentType } { title }, reminder { datetime }."
+  },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Beginning of Your To-Do History"
   },

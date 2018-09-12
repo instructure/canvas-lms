@@ -59,6 +59,9 @@
   "close_d634289d": {
     "message": "Lukk"
   },
+  "close_opportunity_center_popup_9907d981": {
+    "message": "Lukk popup-menyen med val"
+  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Vis # fullført element}\n  other {Vis # fullførte elementer}\n}"
   },
@@ -94,6 +97,12 @@
   },
   "dismiss_opportunityname_5995176f": {
     "message": "Forkast { opportunityName }"
+  },
+  "dismissed_8b0b1fc9": {
+    "message": "Forkasta"
+  },
+  "dismissed_opportunities_f0826640": {
+    "message": "Forkasta val"
   },
   "due_5d7267be": {
     "message": "Frist:"
@@ -189,13 +198,16 @@
     "message": "Mine karakterar"
   },
   "new_13daf639": {
-    "message": "Nye"
+    "message": "Ny"
   },
   "new_activity_8b84847d": {
     "message": "Ny aktivitet"
   },
   "new_activity_for_title_14c9c3af": {
     "message": "Ny aktivitet i { title }"
+  },
+  "new_opportunities_7d349c4d": {
+    "message": "Nye val"
   },
   "next_month_749b1778": {
     "message": "Neste månad"
@@ -208,6 +220,9 @@
   },
   "nothing_for_now_e3e3ce2a": {
     "message": "Ingenting akkurat no"
+  },
+  "nothing_here_needs_attention_c4eaded6": {
+    "message": "Ingenting å følgje opp."
   },
   "nothing_more_to_do_b665da42": {
     "message": "Ingenting meir å gjere"
@@ -253,6 +268,9 @@
   },
   "quiz_e0dcce8f": {
     "message": "Quiz"
+  },
+  "reminder_date_4564d12d": {
+    "message": "Påminning: { date }"
   },
   "replies_4a8577c8": {
     "message": "Svar"
