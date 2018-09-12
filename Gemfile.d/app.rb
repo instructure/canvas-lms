@@ -130,7 +130,7 @@ gem 'gepub', '0.7.0beta4'
 gem 'imperium', '0.5.0', require: false
 gem 'academic_benchmarks', '0.0.10', require: false
 
-gem 'graphql', '1.8.3'
+gem 'graphql', '1.8.8'
 gem 'graphql-batch', '0.3.9'
 
 gem 'prawn-rails', '1.2.0'

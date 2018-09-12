@@ -73,6 +73,9 @@ type AssignmentConnection {
   # A list of edges.
   edges: [AssignmentEdge]
 
+  # A list of nodes.
+  nodes: [Assignment]
+
   # Information to aid in pagination.
   pageInfo: PageInfo!
 }
@@ -132,6 +135,9 @@ type AssignmentGroupConnection {
   # A list of edges.
   edges: [AssignmentGroupEdge]
 
+  # A list of nodes.
+  nodes: [AssignmentGroup]
+
   # Information to aid in pagination.
   pageInfo: PageInfo!
 }
@@ -183,6 +189,9 @@ type AssignmentOverride implements Node & Timestamped {
 type AssignmentOverrideConnection {
   # A list of edges.
   edges: [AssignmentOverrideEdge]
+
+  # A list of nodes.
+  nodes: [AssignmentOverride]
 
   # Information to aid in pagination.
   pageInfo: PageInfo!
@@ -532,6 +541,9 @@ type GroupConnection {
   # A list of edges.
   edges: [GroupEdge]
 
+  # A list of nodes.
+  nodes: [Group]
+
   # Information to aid in pagination.
   pageInfo: PageInfo!
 }
@@ -751,6 +763,9 @@ type SubmissionConnection {
   # A list of edges.
   edges: [SubmissionEdge]
 
+  # A list of nodes.
+  nodes: [Submission]
+
   # Information to aid in pagination.
   pageInfo: PageInfo!
 }
@@ -847,6 +862,9 @@ type User implements Node & Timestamped {
 type UserConnection {
   # A list of edges.
   edges: [UserEdge]
+
+  # A list of nodes.
+  nodes: [User]
 
   # Information to aid in pagination.
   pageInfo: PageInfo!
