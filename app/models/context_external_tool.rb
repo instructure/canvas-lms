@@ -52,9 +52,6 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.context.grants_right?(user, session, :update) }
-    can :read and can :delete
-
     given { |user, session| self.context.grants_right?(user, session, :lti_add_edit) }
     can :read and can :update and can :delete and can :update_manually
   end
