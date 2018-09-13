@@ -116,7 +116,7 @@ module Api::V1::User
       if includes.include?('permissions')
         json[:permissions] = {
           :can_update_name => user.user_can_edit_name?,
-          :can_update_avatar => service_enabled?(:avatars)
+          :can_update_avatar => service_enabled?(:avatars) && !user.avatar_locked?
         }
       end
 

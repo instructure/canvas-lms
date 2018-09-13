@@ -558,6 +558,24 @@ describe "Users API", type: :request do
       expect(json['permissions']).to eq({'can_update_name' => false, 'can_update_avatar' => true})
     end
 
+    it "should retrieve the right avatar permissions" do
+      @user = @other_user
+      json = api_call(:get, "/api/v1/users/self",
+                      { :controller => 'users', :action => 'api_show', :id => 'self', :format => 'json' })
+      expect(json['permissions']['can_update_avatar']).to eq(false)
+
+      Account.default.tap { |a| a.enable_service(:avatars) }.save
+      json = api_call(:get, "/api/v1/users/self",
+                      { :controller => 'users', :action => 'api_show', :id => 'self', :format => 'json' })
+      expect(json['permissions']['can_update_avatar']).to eq(true)
+
+      @user.avatar_state = :locked
+      @user.save
+      json = api_call(:get, "/api/v1/users/self",
+                      { :controller => 'users', :action => 'api_show', :id => 'self', :format => 'json' })
+      expect(json['permissions']['can_update_avatar']).to eq(false)
+    end
+
     it "requires :read_roster or :manage_user_logins permission from the account" do
       account_admin_user_with_role_changes(:role_changes => {:read_roster => false, :manage_user_logins => false})
       api_call(:get, "/api/v1/users/#{@other_user.id}",

@@ -1311,6 +1311,10 @@ class User < ActiveRecord::Base
     [:approved, :locked, :re_reported].include?(avatar_state)
   end
 
+  def avatar_locked?
+    avatar_state == :locked
+  end
+
   def self.avatar_key(user_id)
     user_id = user_id.to_s
     if !user_id.blank? && user_id != '0'
