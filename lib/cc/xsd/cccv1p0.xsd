@@ -58,6 +58,7 @@
         <xs:element name="conclude_at" type="optional_dateTime" minOccurs="0"/>
         <xs:element name="tab_configuration" type="xs:string" minOccurs="0"/>
         <xs:element name="is_public" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="is_public_to_auth_users" type="xs:boolean" minOccurs="0"/>
         <xs:element name="indexed" type="xs:boolean" minOccurs="0"/>
         <xs:element name="publish_grades_immediately" type="xs:boolean" minOccurs="0"/>
         <xs:element name="allow_student_wiki_edits" type="xs:boolean" minOccurs="0"/>
