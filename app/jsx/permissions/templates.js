@@ -2209,11 +2209,11 @@ const ltiAddEditPermissions = generateActionTemplates(
   [
     {
       title: I18n.t('Account Settings'),
-      description: I18n.t(`Allows user to manually add an app in Account Settings.`)
+      description: I18n.t(`Allows user to manually add and delete an app in Account Settings.`)
     },
     {
       title: I18n.t('Course Settings'),
-      description: I18n.t(`Allows user to manually add an app in Course Settings.`)
+      description: I18n.t(`Allows user to manually add and delete an app in Course Settings.`)
     },
     {
       title: I18n.t('External Apps'),
@@ -2224,14 +2224,14 @@ const ltiAddEditPermissions = generateActionTemplates(
     {
       title: I18n.t('External Apps (Account/Course Settings)'),
       description: I18n.t(
-        'If this permission is disabled, users can still install approved apps through the Canvas App Center (if enabled for your institution). Additionally, users can always delete any manually added apps that are not locked.'
+        'If this permission is disabled, users can still install approved apps through the Canvas App Center (if enabled for your institution). Additionally, if this permission is disabled, users cannot delete manually added external apps.'
       )
     }
   ],
   [
     {
       title: I18n.t('Course Settings'),
-      description: I18n.t(`Allows user to manually add an app in Course Settings.`)
+      description: I18n.t(`Allows user to manually add and delete an app in Course Settings.`)
     },
     {
       title: I18n.t('External Apps (Course Settings)'),
@@ -2242,7 +2242,7 @@ const ltiAddEditPermissions = generateActionTemplates(
     {
       title: I18n.t('External Apps (Course Settings)'),
       description: I18n.t(
-        'If this permission is disabled, users can still install approved apps through the Canvas App Center (if enabled for your institution). Additionally, users can always delete any manually added apps that are not locked.'
+        'If this permission is disabled, users can still install approved apps through the Canvas App Center (if enabled for your institution). Additionally, if this permission is disabled, users cannot delete manually added external apps.'
       )
     }
   ]

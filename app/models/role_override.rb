@@ -665,7 +665,7 @@ class RoleOverride < ActiveRecord::Base
      },
     :lti_add_edit => {
       :label => -> { t('LTI add and edit') },
-      :label_v2 => -> { t('LTI - add / edit') },
+      :label_v2 => -> { t('LTI - add / edit / delete') },
       :true_for => %w(TeacherEnrollment TaEnrollment DesignerEnrollment AccountAdmin),
       :available_to => %w(TeacherEnrollment TaEnrollment DesignerEnrollment AccountAdmin AccountMembership)
      },
