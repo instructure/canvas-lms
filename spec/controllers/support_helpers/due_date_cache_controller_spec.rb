@@ -47,9 +47,9 @@ describe SupportHelpers::DueDateCacheController do
 
       context 'course' do
         it "should create a new CourseFixer" do
-          fixer = SupportHelpers::DueDateCache::CourseFixer.new(@user.email, nil, 1234)
+          fixer = SupportHelpers::DueDateCache::CourseFixer.new(@user.email, nil, 1234, @user.id)
           expect(SupportHelpers::DueDateCache::CourseFixer).to receive(:new).
-            with(@user.email, nil, 1234).and_return(fixer)
+            with(@user.email, nil, 1234, @user.id).and_return(fixer)
           expect(fixer).to receive(:monitor_and_fix)
           get :course, params: { course_id: 1234 }
           expect(response.body).to eq("Enqueued CourseFixer ##{fixer.job_id}...")

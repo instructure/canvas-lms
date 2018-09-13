@@ -507,7 +507,7 @@ class Quizzes::QuizzesController < ApplicationController
         end
 
         if @quiz.assignment && (@overrides_affected.to_i > 0 || cached_due_dates_changed || created_quiz)
-          DueDateCacher.recompute(@quiz.assignment, update_grades: true)
+          DueDateCacher.recompute(@quiz.assignment, update_grades: true, executing_user: @current_user)
         end
 
         flash[:notice] = t("Quiz successfully updated")

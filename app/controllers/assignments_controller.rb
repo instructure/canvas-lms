@@ -397,14 +397,16 @@ class AssignmentsController < ApplicationController
     # if no due_at was given, set it to 11:59 pm in the creator's time zone
     @assignment.infer_times
     if authorized_action(@assignment, @current_user, :create)
-      respond_to do |format|
-        if @assignment.save
-          flash[:notice] = t 'notices.created', "Assignment was successfully created."
-          format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
-          format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}), :status => :created}
-        else
-          format.html { render :new }
-          format.json { render :json => @assignment.errors, :status => :bad_request }
+      DueDateCacher.with_executing_user(@current_user) do
+        respond_to do |format|
+          if @assignment.save
+            flash[:notice] = t 'notices.created', "Assignment was successfully created."
+            format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
+            format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}), :status => :created}
+          else
+            format.html { render :new }
+            format.json { render :json => @assignment.errors, :status => :bad_request }
+          end
         end
       end
     end
@@ -550,7 +552,10 @@ class AssignmentsController < ApplicationController
     @assignment = @context.assignments.active.api_id(params[:id])
     if authorized_action(@assignment, @current_user, :delete)
       return render_unauthorized_action if editing_restricted?(@assignment)
-      @assignment.destroy
+
+      DueDateCacher.with_executing_user(@current_user) do
+        @assignment.destroy
+      end
 
       respond_to do |format|
         format.html { redirect_to(named_context_url(@context, :context_assignments_url)) }

@@ -101,6 +101,10 @@ class Assignment < ActiveRecord::Base
   has_many :moderation_graders, inverse_of: :assignment
   has_many :moderation_grader_users, through: :moderation_graders, source: :user
 
+  scope :anonymous, -> { where(anonymous_grading: true) }
+  scope :moderated, -> { where(moderated_grading: true) }
+  scope :auditable, -> { anonymous.or(moderated) }
+
   validates_associated :external_tool_tag, :if => :external_tool?
   validate :group_category_changes_ok?
   validate :anonymous_grading_changes_ok?
@@ -2827,7 +2831,7 @@ class Assignment < ActiveRecord::Base
       Lti::AppLaunchCollator.any?(context, [:post_grades])
   end
 
-  def run_if_overrides_changed!(student_ids=nil)
+  def run_if_overrides_changed!(student_ids=nil, updating_user=nil)
     relocked_modules = []
     self.relock_modules!(relocked_modules, student_ids)
     each_submission_type { |submission| submission&.relock_modules!(relocked_modules, student_ids)}
@@ -2839,10 +2843,10 @@ class Assignment < ActiveRecord::Base
       false
     end
 
-    DueDateCacher.recompute(self, update_grades: update_grades)
+    DueDateCacher.recompute(self, update_grades: update_grades, executing_user: updating_user)
   end
 
-  def run_if_overrides_changed_later!(student_ids=nil)
+  def run_if_overrides_changed_later!(student_ids: nil, updating_user: nil)
     return if self.class.suspended_callback?(:update_cached_due_dates, :save)
 
     enqueuing_args = if student_ids
@@ -2851,7 +2855,7 @@ class Assignment < ActiveRecord::Base
       { singleton: "assignment_overrides_changed_#{self.global_id}" }
     end
 
-    self.send_later_if_production_enqueue_args(:run_if_overrides_changed!, enqueuing_args, student_ids)
+    self.send_later_if_production_enqueue_args(:run_if_overrides_changed!, enqueuing_args, student_ids, updating_user)
   end
 
   def validate_overrides_for_sis(overrides)

@@ -1065,7 +1065,7 @@ class AccountsController < ApplicationController
     @user = api_find(User, params[:user_id])
     raise ActiveRecord::RecordNotFound unless @account.user_account_associations.where(user_id: @user).exists?
     if @user.allows_user_to_remove_from_account?(@account, @current_user)
-      @user.remove_from_root_account(@account)
+      @user.remove_from_root_account(@account, updating_user: @current_user)
       flash[:notice] = t(:user_deleted_message, "%{username} successfully deleted", :username => @user.name)
       respond_to do |format|
         format.html { redirect_to account_users_url(@account) }

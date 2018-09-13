@@ -148,11 +148,14 @@ class GroupMembershipsController < ApplicationController
   def create
     @user = api_find(User, params[:user_id])
     if authorized_action(GroupMembership.new(:group => @group, :user => @user), @current_user, :create)
-      @membership = @group.add_user(@user)
-      if @membership.valid?
-        render :json => group_membership_json(@membership, @current_user, session, include: ['just_created'])
-      else
-        render :json => @membership.errors, :status => :bad_request
+      DueDateCacher.with_executing_user(@current_user) do
+        @membership = @group.add_user(@user)
+
+        if @membership.valid?
+          render :json => group_membership_json(@membership, @current_user, session, include: ['just_created'])
+        else
+          render :json => @membership.errors, :status => :bad_request
+        end
       end
     end
   end
@@ -185,10 +188,13 @@ class GroupMembershipsController < ApplicationController
     if authorized_action(@membership, @current_user, :update)
       attrs = params.permit(*UPDATABLE_MEMBERSHIP_ATTRIBUTES)
       attrs.delete(:workflow_state) unless attrs[:workflow_state] == 'accepted'
-      if @membership.update_attributes(attrs)
-        render :json => group_membership_json(@membership, @current_user, session)
-      else
-        render :json => @membership.errors, :status => :bad_request
+
+      DueDateCacher.with_executing_user(@current_user) do
+        if @membership.update_attributes(attrs)
+          render :json => group_membership_json(@membership, @current_user, session)
+        else
+          render :json => @membership.errors, :status => :bad_request
+        end
       end
     end
   end

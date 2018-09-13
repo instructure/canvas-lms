@@ -1340,11 +1340,13 @@ class CoursesController < ApplicationController
     @course.send_later_if_production_enqueue_args(:touch_content_if_public_visibility_changed,
       { :priority => Delayed::LOW_PRIORITY }, changes)
 
-    if @course.save
-      Auditors::Course.record_updated(@course, @current_user, changes, source: :api)
-      render :json => course_settings_json(@course)
-    else
-      render :json => @course.errors, :status => :bad_request
+    DueDateCacher.with_executing_user(@current_user) do
+      if @course.save
+        Auditors::Course.record_updated(@course, @current_user, changes, source: :api)
+        render :json => course_settings_json(@course)
+      else
+        render :json => @course.errors, :status => :bad_request
+      end
     end
   end
 
@@ -1395,7 +1397,9 @@ class CoursesController < ApplicationController
   def accept_enrollment(enrollment)
     if @current_user && enrollment.user == @current_user
       if enrollment.workflow_state == 'invited'
-        enrollment.accept!
+        DueDateCacher.with_executing_user(@current_user) do
+          enrollment.accept!
+        end
         @pending_enrollment = nil
         flash[:notice] = t('notices.invitation_accepted', 'Invitation accepted!  Welcome to %{course}!', :course => @context.name)
       end
@@ -1947,6 +1951,7 @@ class CoursesController < ApplicationController
       limit_privileges = value_to_boolean(enrollment_options[:limit_privileges_to_course_section])
       enrollment_options[:limit_privileges_to_course_section] = limit_privileges
       enrollment_options[:role] = custom_role if custom_role
+      enrollment_options[:updating_user] = @current_user
 
       list =
         if params[:user_tokens]

@@ -4911,7 +4911,7 @@ describe AssignmentsApiController, type: :request do
 
     it "calls DueDateCacher with update_grades: false when passed calculate_grades: false" do
       update_grade_value = nil
-      expect(DueDateCacher).to receive(:recompute).once do |update_grades:|
+      expect(DueDateCacher).to receive(:recompute).once do |update_grades:, **|
         update_grade_value = update_grades
       end
 
@@ -4938,7 +4938,7 @@ describe AssignmentsApiController, type: :request do
 
     it "calls DueDateCacher with update_grades: true when passed calculate_grades: true" do
       update_grade_value = nil
-      expect(DueDateCacher).to receive(:recompute).once do |update_grades:|
+      expect(DueDateCacher).to receive(:recompute).once do |update_grades:, **|
         update_grade_value = update_grades
       end
 
@@ -4965,7 +4965,7 @@ describe AssignmentsApiController, type: :request do
 
     it "calls DueDateCacher with update_grades: true when not passed calculate_grades" do
       update_grade_value = nil
-      expect(DueDateCacher).to receive(:recompute).once do |update_grades:|
+      expect(DueDateCacher).to receive(:recompute).once do |update_grades:, **|
         update_grade_value = update_grades
       end
 

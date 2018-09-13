@@ -52,6 +52,8 @@ class GroupMembership < ActiveRecord::Base
 
   alias_method :context, :group
 
+  attr_writer :updating_user
+
   set_broadcast_policy do |p|
     p.dispatch :new_context_group_membership
     p.to { self.user }

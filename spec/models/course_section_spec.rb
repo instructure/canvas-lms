@@ -315,8 +315,8 @@ describe CourseSection, "moving to new course" do
     course1.reload
 
     expect(DueDateCacher).to receive(:recompute_users_for_course).
-      with([u.id], course2, nil, run_immediately: true, update_grades: true)
-    cs.move_to_course(course2, :run_jobs_immediately)
+      with([u.id], course2, nil, run_immediately: true, update_grades: true, executing_user: nil)
+    cs.move_to_course(course2, run_jobs_immediately: true)
   end
 
   it 'should call DueDateCacher.recompute_users_for_course with run_immediately false if without :run_jobs_immediately' do
@@ -333,7 +333,7 @@ describe CourseSection, "moving to new course" do
     course1.reload
 
     expect(DueDateCacher).to receive(:recompute_users_for_course).
-      with([u.id], course2, nil, run_immediately: false, update_grades: true)
+      with([u.id], course2, nil, run_immediately: false, update_grades: true, executing_user: nil)
     cs.move_to_course(course2)
   end
 
