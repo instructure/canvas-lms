@@ -20,8 +20,10 @@ import $ from 'jquery'
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
-import Modal from 'react-modal'
+import Modal, { ModalBody } from '../../shared/components/InstuiModal'
 import store from '../../external_apps/lib/ExternalAppsStore'
+import ModalFooter from '@instructure/ui-overlays/lib/components/Modal/ModalFooter';
+import Button from '@instructure/ui-buttons/lib/components/Button';
 
 export default class Lti2ReregistrationUpdateModal extends React.Component {
   static propTypes = {
@@ -64,56 +66,20 @@ export default class Lti2ReregistrationUpdateModal extends React.Component {
   render() {
     return (
       <Modal
-        className="ReactModal__Content--canvas ReactModal__Content--mini-modal"
-        overlayClassName="ReactModal__Overlay--canvas"
-        isOpen={this.state.modalIsOpen}
-        onRequestClose={this.closeModal}
+        open={this.state.modalIsOpen}
+        onDismiss={this.closeModal}
+        label={I18n.t('Update %{tool}', {tool: this.props.tool.name})}
       >
-        <div className="ReactModal__Layout">
-          <div className="ReactModal__Header">
-            <div className="ReactModal__Header-Title">
-              <h4>{I18n.t('Update %{tool}', {tool: this.props.tool.name})}</h4>
-            </div>
-            <div className="ReactModal__Header-Actions">
-              <button
-                className="Button Button--icon-action"
-                type="button"
-                onClick={this.closeModal}
-              >
-                <i className="icon-x" />
-                <span className="screenreader-only">Close</span>
-              </button>
-            </div>
-          </div>
-
-          <div className="ReactModal__Body">
-            {I18n.t('Would you like to accept or dismiss this update?')}
-          </div>
-
-          <div className="ReactModal__Footer">
-            <div className="ReactModal__Footer-Actions">
-              <button ref="btnClose" type="button" className="Button" onClick={this.closeModal}>
-                {I18n.t('Close')}
-              </button>
-              <button
-                ref="btnDelete"
-                type="button"
-                className="Button Button--danger"
-                onClick={this.dismissUpdate}
-              >
-                {I18n.t('Dismiss')}
-              </button>
-              <button
-                ref="btnAccept"
-                type="button"
-                className="Button Button--primary"
-                onClick={this.acceptUpdate}
-              >
-                {I18n.t('Accept')}
-              </button>
-            </div>
-          </div>
-        </div>
+        <ModalBody>
+          {I18n.t('Would you like to accept or dismiss this update?')}
+        </ModalBody>
+        <ModalFooter>
+          <Button onClick={this.closeModal}>{I18n.t('Close')}</Button>
+          &nbsp;
+          <Button onClick={this.dismissUpdate} variant="danger">{I18n.t('Dismiss')}</Button>
+          &nbsp;
+          <Button onClick={this.acceptUpdate} variant="primary">{I18n.t('Accept')}</Button>
+        </ModalFooter>
       </Modal>
     )
   }

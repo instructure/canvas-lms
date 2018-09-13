@@ -22,27 +22,14 @@ import $ from 'jquery'
 import React from 'react'
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types'
-import Modal from 'react-modal'
+import Modal from '../../shared/components/InstuiModal'
 import ConfigOptionField from '../../external_apps/components/ConfigOptionField'
 import ExternalTool from 'compiled/models/ExternalTool'
 import 'jquery.disableWhileLoading'
 import 'compiled/jquery.rails_flash_notifications'
-
-  const modalOverrides = {
-    overlay : {
-      backgroundColor: 'rgba(0,0,0,0.5)'
-    },
-    content : {
-      position: 'static',
-      top: '0',
-      left: '0',
-      right: 'auto',
-      bottom: 'auto',
-      borderRadius: '0',
-      border: 'none',
-      padding: '0'
-    }
-  };
+import ModalBody from '@instructure/ui-overlays/lib/components/Modal/ModalBody';
+import ModalFooter from '@instructure/ui-overlays/lib/components/Modal/ModalFooter';
+import Button from '@instructure/ui-buttons/lib/components/Button';
 
 export default createReactClass({
     displayName: 'AddApp',
@@ -233,41 +220,22 @@ export default createReactClass({
         <div className="AddApp">
           <a href="#" ref="addTool" className="btn btn-primary btn-block add_app icon-add" onClick={this.openModal}>{I18n.t('Add App')}</a>
 
-          <Modal className="ReactModal__Content--canvas"
-            overlayClassName="ReactModal__Overlay--canvas"
-            isOpen={this.state.modalIsOpen}
-            style={modalOverrides}
-            onRequestClose={this.closeModal}>
-
-            <div className="ReactModal__Layout">
-
-              <div className="ReactModal__Header">
-                <div className="ReactModal__Header-Title">
-                  <h4>{I18n.t('Add App')}</h4>
-                </div>
-                <div className="ReactModal__Header-Actions">
-                  <button className="Button Button--icon-action" type="button" onClick={this.closeModal}>
-                    <i className="icon-x"></i>
-                    <span className="screenreader-only">Close</span>
-                  </button>
-                </div>
-              </div>
-
-              <div className="ReactModal__Body">
+          <Modal
+            open={this.state.modalIsOpen}
+            onDismiss={this.closeModal}
+            label={I18n.t('Add App')}
+          >
+            <ModalBody>
                 {this.errorMessage()}
-                <form role="form">
+                <form>
                   {this.configOptions()}
                 </form>
-              </div>
-
-              <div className="ReactModal__Footer">
-                <div className="ReactModal__Footer-Actions">
-                  <button type="button" className="btn btn-default" onClick={this.closeModal}>{I18n.t('Close')}</button>
-                  <button type="button" ref="addButton" className="btn btn-primary" onClick={this.submit}>{I18n.t('Add App')}</button>
-                </div>
-              </div>
-            </div>
-
+            </ModalBody>
+            <ModalFooter>
+              <Button onClick={this.closeModal}>{I18n.t('Close')}</Button>
+              &nbsp;
+              <Button onClick={this.submit} variant="primary">{I18n.t('Add App')}</Button>
+            </ModalFooter>
           </Modal>
         </div>
       );

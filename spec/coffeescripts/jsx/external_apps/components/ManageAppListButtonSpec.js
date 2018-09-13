@@ -18,11 +18,9 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
 import Modal from 'react-modal'
 import ManageAppListButton from 'jsx/external_apps/components/ManageAppListButton'
 
-const {Simulate} = TestUtils
 const wrapper = document.getElementById('fixtures')
 Modal.setAppElement(wrapper)
 const onUpdateAccessToken = function() {}
@@ -37,14 +35,12 @@ QUnit.module('ExternalApps.ManageAppListButton', {
 
 test('open and close modal', () => {
   const component = renderComponent({})
-  Simulate.click(ReactDOM.findDOMNode(component))
+  component.openModal()
   ok(component.state.modalIsOpen, 'modal is open')
-  ok(component.refs.btnClose)
-  ok(component.refs.btnUpdateAccessToken)
-  Simulate.click(component.refs.btnClose)
+
+  component.closeModal()
+
   ok(!component.state.modalIsOpen, 'modal is not open')
-  ok(!component.refs.btnClose)
-  ok(!component.refs.btnUpdateAccessToken)
 })
 
 test('maskedAccessToken', () => {

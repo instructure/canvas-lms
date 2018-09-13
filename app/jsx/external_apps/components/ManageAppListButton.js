@@ -19,24 +19,10 @@
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
-import Modal from 'react-modal'
+import Modal, { ModalBody, ModalFooter } from '../../shared/components/InstuiModal'
 import ConfigOptionField from '../../external_apps/components/ConfigOptionField'
-
-const modalOverrides = {
-  overlay: {
-    backgroundColor: 'rgba(0,0,0,0.5)'
-  },
-  content: {
-    position: 'static',
-    top: '0',
-    left: '0',
-    right: 'auto',
-    bottom: 'auto',
-    borderRadius: '0',
-    border: 'none',
-    padding: '0'
-  }
-}
+import Button from '@instructure/ui-buttons/lib/components/Button';
+import View from '@instructure/ui-layout/lib/components/View';
 
 export default class ManageAppListButton extends React.Component {
   static propTypes = {
@@ -106,83 +92,47 @@ export default class ManageAppListButton extends React.Component {
 
   render() {
     return (
-      <button className="btn lm" onClick={this.openModal}>
-        {I18n.t('Manage App List')}
+      <View>
+        <Button onClick={this.openModal}>{I18n.t('Manage App List')}</Button>
         <Modal
-          className="ReactModal__Content--canvas"
-          overlayClassName="ReactModal__Overlay--canvas"
-          isOpen={this.state.modalIsOpen}
-          onRequestClose={this.closeModal}
-          style={modalOverrides}
+          open={this.state.modalIsOpen}
+          onDismiss={this.closeModal}
+          label={I18n.t('Manage App List')}
         >
-          <div className="ReactModal__Layout">
-            <div className="ReactModal__Header">
-              <div className="ReactModal__Header-Title">
-                <h4 id="modalHeader">{I18n.t('Manage App List')}</h4>
-              </div>
-              <div className="ReactModal__Header-Actions">
-                <button
-                  className="Button Button--icon-action"
-                  type="button"
-                  onClick={this.closeModal}
-                >
-                  <i className="icon-x" />
-                  <span className="screenreader-only">{I18n.t('Close')}</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="ReactModal__Body">
-              <p
-                dangerouslySetInnerHTML={{
-                  __html: I18n.t(
-                    'Enter the access token for your organization from \
-                      *eduappcenter.com*. Once applied, only apps your organization has approved in the \
-                      EduAppCenter will be listed on the External Apps page. \
-                      Learn how to **generate an access token**.',
-                    {
-                      wrappers: [
-                        '<a href="https://www.eduappcenter.com">$1</a>',
-                        '<a href="https://community.canvaslms.com/docs/DOC-3026">$1</a>'
-                      ]
-                    }
-                  )
-                }}
+          <ModalBody>
+            <p
+              dangerouslySetInnerHTML={{
+                __html: I18n.t(
+                  'Enter the access token for your organization from \
+                    *eduappcenter.com*. Once applied, only apps your organization has approved in the \
+                    EduAppCenter will be listed on the External Apps page. \
+                    Learn how to **generate an access token**.',
+                  {
+                    wrappers: [
+                      '<a href="https://www.eduappcenter.com">$1</a>',
+                      '<a href="https://community.canvaslms.com/docs/DOC-3026">$1</a>'
+                    ]
+                  }
+                )
+              }}
+            />
+            <form>
+              <ConfigOptionField
+                name="manage_app_list_token"
+                type="text"
+                description={I18n.t('Access Token')}
+                value={this.state.accessToken}
+                handleChange={this.handleChange}
               />
-              <form role="form">
-                <ConfigOptionField
-                  name="manage_app_list_token"
-                  type="text"
-                  description={I18n.t('Access Token')}
-                  value={this.state.accessToken}
-                  handleChange={this.handleChange}
-                />
-              </form>
-            </div>
-
-            <div className="ReactModal__Footer">
-              <div className="ReactModal__Footer-Actions">
-                <button
-                  type="button"
-                  ref="btnClose"
-                  className="btn btn-default"
-                  onClick={this.closeModal}
-                >
-                  {I18n.t('Cancel')}
-                </button>
-                <button
-                  type="button"
-                  ref="btnUpdateAccessToken"
-                  className="btn btn-primary"
-                  onClick={this.handleSubmit}
-                >
-                  {I18n.t('Save')}
-                </button>
-              </div>
-            </div>
-          </div>
+            </form>
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={this.closeModal}>{I18n.t('Cancel')}</Button>
+            &nbsp;
+            <Button onClick={this.handleSubmit}>{I18n.t('Save')}</Button>
+          </ModalFooter>
         </Modal>
-      </button>
+      </View>
     )
   }
 }

@@ -63,9 +63,7 @@ test('open and close modal', function() {
   const [component, btnTriggerReregister] = Array.from(getDOMNodes(data))
   Simulate.click(btnTriggerReregister)
   ok(component.state.modalIsOpen, 'modal is open')
-  ok(component.refs.btnClose)
-  ok(component.refs.reregisterExternalToolButton)
-  Simulate.click(component.refs.btnClose)
+
+  component.closeModal()
   ok(!component.state.modalIsOpen, 'modal is not open')
-  ok(!component.refs.btnClose)
 })

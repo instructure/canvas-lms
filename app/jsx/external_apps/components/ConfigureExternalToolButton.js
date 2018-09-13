@@ -20,35 +20,23 @@ import $ from 'jquery'
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import {shape} from 'prop-types'
-import Modal from 'react-modal'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import Modal, {ModalBody, ModalFooter}  from '../../shared/components/InstuiModal'
 import iframeAllowances from '../lib/iframeAllowances'
-
-const modalOverrides = {
-  overlay: {
-    backgroundColor: 'rgba(0,0,0,0.5)'
-  },
-  content: {
-    position: 'static',
-    top: '0',
-    left: '0',
-    right: 'auto',
-    bottom: 'auto',
-    borderRadius: '0',
-    border: 'none',
-    padding: '0'
-  }
-}
 
 export default class ConfigureExternalToolButton extends React.Component {
   static propTypes = {
     tool: shape({}).isRequired
   }
 
-  state = {
-    modalIsOpen: false,
-    beforeExternalContentAlertClass: 'screenreader-only',
-    afterExternalContentAlertClass: 'screenreader-only',
-    iframeStyle: {}
+  constructor (props) {
+    super(props)
+    this.state = {
+      modalIsOpen: props.modalIsOpen,
+      beforeExternalContentAlertClass: 'screenreader-only',
+      afterExternalContentAlertClass: 'screenreader-only',
+      iframeStyle: {}
+    }
   }
 
   getLaunchUrl = () => {
@@ -165,45 +153,16 @@ export default class ConfigureExternalToolButton extends React.Component {
           {I18n.t('Configure')}
         </a>
         <Modal
-          className="ReactModal__Content--canvas"
-          overlayClassName="ReactModal__Overlay--canvas"
-          style={modalOverrides}
-          isOpen={this.state.modalIsOpen}
-          onRequestClose={this.closeModal}
-          onAfterOpen={this.onAfterOpen}
+          open={this.state.modalIsOpen}
+          onDismiss={this.closeModal}
+          onEnter={this.onAfterOpen}
+          label={I18n.t('Configure %{tool} App?', {tool: this.props.tool.name})}
+          size="large"
         >
-          <div className="ReactModal__Layout">
-            <div className="ReactModal__Header">
-              <div className="ReactModal__Header-Title">
-                <h4>{I18n.t('Configure %{tool} App?', {tool: this.props.tool.name})}</h4>
-              </div>
-              <div className="ReactModal__Header-Actions">
-                <button
-                  className="Button Button--icon-action"
-                  type="button"
-                  onClick={this.closeModal}
-                >
-                  <i className="icon-x" />
-                  <span className="screenreader-only">Close</span>
-                </button>
-              </div>
-            </div>
-
-            <div
-              className="ReactModal__Body ReactModal__Body--force-no-padding"
-              style={{overflow: 'auto'}}
-            >
-              {this.renderIframe()}
-            </div>
-
-            <div className="ReactModal__Footer">
-              <div className="ReactModal__Footer-Actions">
-                <button ref="btnClose" type="button" className="Button" onClick={this.closeModal}>
-                  {I18n.t('Close')}
-                </button>
-              </div>
-            </div>
-          </div>
+          <ModalBody>{this.renderIframe()}</ModalBody>
+          <ModalFooter>
+            <Button onClick={this.closeModal}>{I18n.t('Close')}</Button>
+          </ModalFooter>
         </Modal>
       </li>
     )
