@@ -26,7 +26,7 @@
 <% if planner_enabled? && !@current_user.non_student_enrollment? %>
   <div class="Sidebar__TodoListContainer"></div>
 <% else %>
-  <%= render :partial => 'courses/to_do_list', :locals => {:contexts => nil} %>
+  <%= render :partial => 'courses/to_do_list', :locals => {:contexts => nil, :show_legacy_todo_list => true} %>
 <% end %>
 <% locals = {
     :title => t('coming_up', "Coming Up"),
