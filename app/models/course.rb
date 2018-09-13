@@ -989,8 +989,12 @@ class Course < ActiveRecord::Base
           if enrollment_info.any?
             data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: enrollment_info, updated_state: 'completed')
             Enrollment.where(:id => enrollment_info.map(&:id)).update_all(:workflow_state => 'completed', :completed_at => Time.now.utc)
-            EnrollmentState.where(:enrollment_id => enrollment_info.map(&:id)).
-              update_all(["state = ?, state_is_current = ?, access_is_current = ?, lock_version = lock_version + 1", 'completed', true, false])
+
+            EnrollmentState.transaction do
+              locked_ids = EnrollmentState.where(:enrollment_id => enrollment_info.map(&:id)).lock(:no_key_update).order(:enrollment_id).pluck(:enrollment_id)
+              EnrollmentState.where(:enrollment_id => locked_ids).
+                update_all(["state = ?, state_is_current = ?, access_is_current = ?, lock_version = lock_version + 1", 'completed', true, false])
+            end
             EnrollmentState.send_later_if_production(:process_states_for_ids, enrollment_info.map(&:id)) # recalculate access
           end
 
@@ -1005,8 +1009,11 @@ class Course < ActiveRecord::Base
             if enrollment_info.any?
               data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: enrollment_info, updated_state: 'deleted')
               Enrollment.where(:id => enrollment_info.map(&:id)).update_all(:workflow_state => 'deleted')
-              EnrollmentState.where(:enrollment_id => enrollment_info.map(&:id)).
-                update_all(["state = ?, state_is_current = ?, lock_version = lock_version + 1", 'deleted', true])
+              EnrollmentState.transaction do
+                locked_ids = EnrollmentState.where(:enrollment_id => enrollment_info.map(&:id)).lock(:no_key_update).order(:enrollment_id).pluck(:enrollment_id)
+                EnrollmentState.where(:enrollment_id => locked_ids).
+                  update_all(["state = ?, state_is_current = ?, lock_version = lock_version + 1", 'deleted', true])
+              end
             end
             User.send_later_if_production(:update_account_associations, user_ids)
           end

@@ -63,7 +63,9 @@ class LiveEventsObserver < ActiveRecord::Observer
     when Enrollment
       Canvas::LiveEvents.enrollment_updated(obj)
     when EnrollmentState
-      Canvas::LiveEvents.enrollment_state_updated(obj)
+      if (changes.keys - ["state_is_current", "lock_version", "access_is_current"]).any?
+        Canvas::LiveEvents.enrollment_state_updated(obj)
+      end
     when GroupCategory
       Canvas::LiveEvents.group_category_updated(obj)
     when Group

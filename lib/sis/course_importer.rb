@@ -26,7 +26,7 @@ module SIS
       blueprint_associations = {}
 
       importer = Work.new(@batch, @root_account, @logger, courses_to_update_sis_batch_id, course_ids_to_update_associations, messages, @batch_user, blueprint_associations)
-      Course.suspend_callbacks(:update_enrollments_later) do
+      Course.suspend_callbacks(:update_enrollments_later, :update_enrollment_states_if_necessary) do
         Course.process_as_sis(@sis_options) do
           Course.skip_updating_account_associations do
             yield importer
@@ -231,6 +231,7 @@ module SIS
         end
 
         enrollment_data = course.update_enrolled_users(sis_batch: @batch) if update_enrollments
+        course.update_enrollment_states_if_necessary
         @roll_back_data.push(*enrollment_data) if enrollment_data
         maybe_write_roll_back_data
 
