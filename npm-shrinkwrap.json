@@ -126,7 +126,7 @@
         "node-sass": {
           "version": "3.4.2",
           "from": "node-sass>=3.4.2 <4.0.0",
-          "resolved": "https://registry.npmjs.org/node-sass/-/node-sass-3.4.2.tgz"
+          "resolved": "https://registry.npmjs.org/node-sass/-/node-sass-3.4.2.tgz",
           "dependencies": {
             "node-gyp": {
               "version": "3.3.1",
