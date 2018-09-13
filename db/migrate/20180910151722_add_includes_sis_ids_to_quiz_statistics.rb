@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,28 +15,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class Quizzes::QuizStatistics::Report
-  extend Forwardable
+class AddIncludesSisIdsToQuizStatistics < ActiveRecord::Migration[5.1]
+  tag :predeploy
 
-  attr_reader :quiz_statistics
-
-  def_delegators :quiz_statistics,
-    :quiz,
-    :includes_all_versions?,
-    :includes_sis_ids?,
-    :anonymous?,
-    :update_progress,
-    :t
-
-  def initialize(quiz_statistics)
-    @quiz_statistics = quiz_statistics
+  def self.up
+    add_column :quiz_statistics, :includes_sis_ids, :boolean
   end
 
-  def generatable?
-    true
-  end
-
-  def readable_type
-    self.class.name.demodulize.underscore
+  def self.down
+    remove_column :quiz_statistics, :includes_sis_ids
   end
 end

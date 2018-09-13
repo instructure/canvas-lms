@@ -21,6 +21,7 @@ class MessageDispatcher < Delayed::PerformableMethod
   def self.dispatch(message)
     Delayed::Job.enqueue(self.new(message, :deliver),
                          run_at: message.dispatch_at,
+                         priority: 30,
                          max_attempts: 15)
   end
 
@@ -34,6 +35,7 @@ class MessageDispatcher < Delayed::PerformableMethod
 
     Delayed::Job.enqueue(self.new(self, :deliver_batch, [messages]),
                          run_at: messages.first.dispatch_at,
+                         priority: 30,
                          max_attempts: 15)
   end
 

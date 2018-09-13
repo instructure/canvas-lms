@@ -9177,7 +9177,7 @@ tr:
   loading_mastery_paths_c558a766: "Mastery Paths Yükleniyor..."
   loading_more_results_def6df65: "Daha fazla sonuç yükleniyor..."
   locales: 
-    tr: "Türkçe (crowd-sourced)"
+    tr: Türkçe
   lock_at_time_3c8a044e: "Kilitle: %{time}"
   lock_date_cannot_be_after_course_end_a473158b: "Kilitleme tarihi dersin bitiş tarihinden sonra olamaz"
   lock_date_cannot_be_after_section_end_d37da70c: "Kilitleme tarihi bölüm sonundan sonra olamaz"

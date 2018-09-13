@@ -27,6 +27,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
   before(:once) { course_factory }
 
   def csv(opts = {}, quiz = @quiz)
+    opts[:includes_sis_ids] = true unless opts.key?(:includes_sis_ids)
     stats = quiz.statistics_csv('student_analysis', opts)
     run_jobs
     stats.reload_csv_attachment.open.read
@@ -168,6 +169,26 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       stats = CSV.parse(csv(:include_all_versions => true))
       expect(stats.last.length).to eq 9
       stats.first.first == "section"
+    end
+
+    it 'should include sis ids when requested' do
+      qs = @quiz.generate_submission(@student)
+      Quizzes::SubmissionGrader.new(qs).grade_submission
+
+      stats = CSV.parse(csv(includes_sis_ids: true))
+      expect(stats.last.length).to eq 12
+      expect(stats.first).to include 'sis_id'
+      expect(stats.first).to include 'section_sis_id'
+    end
+
+    it 'should not include sis ids when not requested' do
+      qs = @quiz.generate_submission(@student)
+      Quizzes::SubmissionGrader.new(qs).grade_submission
+
+      stats = CSV.parse(csv(includes_sis_ids: false))
+      expect(stats.last.length).to eq 10
+      expect(stats.first).not_to include 'sis_id'
+      expect(stats.first).not_to include 'section_sis_id'
     end
 
     it 'should succeed with logged-out user submissions' do

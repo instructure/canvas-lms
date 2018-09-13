@@ -29,6 +29,7 @@ QUnit.module('GradeSummary AcceptGradesButton', suiteHooks => {
   suiteHooks.beforeEach(() => {
     props = {
       acceptGradesStatus: null,
+      graderName: 'Jackie Chan',
       onClick: sinon.stub(),
       selectionDetails: {
         allowed: true,
@@ -49,7 +50,11 @@ QUnit.module('GradeSummary AcceptGradesButton', suiteHooks => {
     contextHooks.beforeEach(mountComponent)
 
     test('is labeled with "Accept"', () => {
-      equal(wrapper.find('button').text(), 'Accept')
+      equal(wrapper.find('button PresentationContent').text(), 'Accept')
+    })
+
+    test('is labeled for screen readers with "Accept grades by"', () => {
+      equal(wrapper.find('button ScreenReaderContent').text(), 'Accept grades by Jackie Chan')
     })
 
     test('is not read-only', () => {
@@ -150,7 +155,11 @@ QUnit.module('GradeSummary AcceptGradesButton', suiteHooks => {
     })
 
     test('is labeled with "Accept"', () => {
-      equal(wrapper.find('button').text(), 'Accept')
+      equal(wrapper.find('button PresentationContent').text(), 'Accept')
+    })
+
+    test('is labeled for screen readers with "Accept grades by"', () => {
+      equal(wrapper.find('button ScreenReaderContent').text(), 'Accept grades by Jackie Chan')
     })
 
     test('is not read-only', () => {
@@ -177,7 +186,11 @@ QUnit.module('GradeSummary AcceptGradesButton', suiteHooks => {
     })
 
     test('is labeled with "Accept"', () => {
-      equal(wrapper.find('button').text(), 'Accept')
+      equal(wrapper.find('button PresentationContent').text(), 'Accept')
+    })
+
+    test('is labeled for screen readers with "Accept grades by"', () => {
+      equal(wrapper.find('button ScreenReaderContent').text(), 'Accept grades by Jackie Chan')
     })
 
     test('is not read-only', () => {

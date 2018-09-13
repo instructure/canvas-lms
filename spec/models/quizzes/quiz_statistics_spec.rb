@@ -58,7 +58,7 @@ describe Quizzes::QuizStatistics do
     @quiz.generate_submission(@student)
 
     stats = CSV.parse(csv(:include_all_versions => true))
-    expect(stats.first.length).to eq 12
+    expect(stats.first.length).to eq 10
   end
 
   it 'should not include previous versions by default' do
@@ -69,7 +69,7 @@ describe Quizzes::QuizStatistics do
     Quizzes::SubmissionGrader.new(qs).grade_submission
 
     stats = CSV.parse(csv)
-    expect(stats.first.length).to eq 12
+    expect(stats.first.length).to eq 10
   end
 
   it 'generates a new quiz_statistics if the quiz changed' do

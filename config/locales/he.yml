@@ -9559,7 +9559,7 @@ he:
   loading_sync_history_9f342cbf: "טוען את הסטורית הסינכרון"
   loading_unsynced_changes_b5d7b202: "טוען שינויים שלא סונכרנו"
   locales: 
-    he: "עברית (crowd-sourced)"
+    he: עברית
   location_e17bd402: מיקום
   lock_at_time_3c8a044e: "נעילה ב: %{time}"
   lock_c341af13: נעילה

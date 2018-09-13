@@ -29,9 +29,13 @@
 class PeriodicJobs
   def self.with_each_shard_by_database_in_region(klass, method, *args)
     Shard.with_each_shard(Shard.in_current_region) do
+      strand = "#{klass}.#{method}:#{Shard.current.database_server.id}"
+      # TODO: allow this to work with redis jobs
+      next if Delayed::Job == Delayed::Backend::ActiveRecord::Job && Delayed::Job.where(strand: strand, shard_id: Shard.current.id, locked_by: nil).exists?
       klass.send_later_enqueue_args(method, {
-          strand: "#{klass}.#{method}:#{Shard.current.database_server.id}",
-          max_attempts: 1
+          strand: strand,
+          max_attempts: 1,
+          priority: 40
       }, *args)
     end
   end
