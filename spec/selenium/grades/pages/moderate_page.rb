@@ -51,7 +51,7 @@ class ModeratePage
     end
 
     def click_student_link(student)
-      wait_for_new_page_load(student_link(student).click)
+      wait_for_new_page_load{ student_link(student).click }
     end
 
     def fetch_selected_final_grade_text(student)

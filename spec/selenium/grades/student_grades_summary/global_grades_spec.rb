@@ -133,7 +133,7 @@ describe 'Global Grades' do
       # grab score to compare
       course_score = GlobalGrades.get_score_for_course(@course_with_gp)
       # find link for Second Course and click
-      wait_for_new_page_load(GlobalGrades.click_course_link(@course_with_gp))
+      wait_for_new_page_load{ GlobalGrades.click_course_link(@course_with_gp) }
 
       # verify url has correct course id
       expect(driver.current_url).to eq app_url + "/courses/#{@course_with_gp.id}/grades/#{@student.id}"
@@ -178,7 +178,7 @@ describe 'Global Grades' do
 
     it 'goes to gradebook page', priority: "1", test_id: 3494790 do
       # find link for Second Course and click
-      wait_for_new_page_load(GlobalGrades.click_course_link(@course_with_gp))
+      wait_for_new_page_load{ GlobalGrades.click_course_link(@course_with_gp) }
 
       # verify url has correct course id
       expect(driver.current_url).to eq app_url + "/courses/#{@course_with_gp.id}/gradebook"
