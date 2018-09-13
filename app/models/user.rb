@@ -1923,20 +1923,6 @@ class User < ActiveRecord::Base
       updated_after(opts[:updated_at])
   end
 
-  def calendar_events_for_calendar(opts={})
-    opts = opts.dup
-    context_codes = opts[:context_codes] || (opts[:contexts] ? setup_context_lookups(opts[:contexts]) : self.cached_context_codes)
-    return [] if !context_codes || context_codes.empty?
-    opts[:start_at] ||= 2.weeks.ago
-    opts[:end_at] ||= 1.week.from_now
-
-    events = []
-    events += calendar_events_for_contexts(context_codes, opts)
-    events += Assignment.published.for_context_codes(context_codes).due_between(opts[:start_at], opts[:end_at]).
-      updated_after(opts[:updated_at]).with_just_calendar_attributes
-    events.sort_by{|e| [e.start_at, Canvas::ICU.collation_key(e.title || CanvasSort::First)] }.uniq
-  end
-
   def upcoming_events(opts={})
     context_codes = opts[:context_codes] || (opts[:contexts] ? setup_context_lookups(opts[:contexts]) : self.cached_context_codes)
     return [] if (!context_codes || context_codes.empty?)

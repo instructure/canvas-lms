@@ -1696,41 +1696,6 @@ describe User do
   end
 
   describe "event methods" do
-    describe "calendar_events_for_calendar" do
-      before(:once) { course_with_student(:active_all => true) }
-      it "should include own scheduled appointments" do
-        ag = AppointmentGroup.create!(:title => 'test appointment', :contexts => [@course], :new_appointments => [[Time.now, Time.now + 1.hour], [Time.now + 1.hour, Time.now + 2.hour]])
-        ag.appointments.first.reserve_for(@user, @user)
-        events = @user.calendar_events_for_calendar
-        expect(events.size).to eql 1
-        expect(events.first.title).to eql 'test appointment'
-      end
-
-      it "should include manageable appointments" do
-        @user = @course.instructors.first
-        ag = AppointmentGroup.create!(:title => 'test appointment', :contexts => [@course], :new_appointments => [[Time.now, Time.now + 1.hour]])
-        events = @user.calendar_events_for_calendar
-        expect(events.size).to eql 1
-        expect(events.first.title).to eql 'test appointment'
-      end
-
-      it "should not include unpublished assignments" do
-        as = @course.assignments.create!({:title => "Published", :due_at => 2.days.from_now})
-        as.publish
-        as2 = @course.assignments.create!({:title => "Unpublished", :due_at => 2.days.from_now})
-        as2.unpublish
-        events = @user.calendar_events_for_calendar(:contexts => [@course])
-        expect(events.size).to eql 1
-        expect(events.first.title).to eql 'Published'
-      end
-
-      it "should not include events for the user if the user asset string is not included" do
-        user_event = @user.calendar_events.create!(context: @user, start_at: 1.minute.from_now, end_at: 5.minutes.from_now)
-        events = @user.calendar_events_for_calendar(contexts: [@course])
-        expect(events).not_to include user_event
-      end
-    end
-
     describe "upcoming_events" do
       before(:once) { course_with_teacher(:active_all => true) }
       it "handles assignments where the applied due_at is nil" do
