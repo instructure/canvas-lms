@@ -110,23 +110,29 @@ class Header extends Component {
 
         {this.props.graders.length > 0 && (
           <Flex as="div" margin="large 0 0 0">
-            <FlexItem as="div" grow>
+            <FlexItem as="div" flex="1" grow>
               <GradersTable />
             </FlexItem>
 
-            <FlexItem align="end" as="div" justifyItems="end">
-              <PostButton
-                gradesPublished={this.props.assignment.gradesPublished}
-                margin="0 x-small 0 0"
-                onClick={this.handlePublishClick}
-                publishGradesStatus={this.props.publishGradesStatus}
-              />
+            <FlexItem align="end" as="div" flex="2" grow>
+              <Flex as="div" justifyItems="end">
+                <FlexItem>
+                  <PostButton
+                    gradesPublished={this.props.assignment.gradesPublished}
+                    margin="0 x-small 0 0"
+                    onClick={this.handlePublishClick}
+                    publishGradesStatus={this.props.publishGradesStatus}
+                  />
+                </FlexItem>
 
-              <DisplayToStudentsButton
-                assignment={this.props.assignment}
-                onClick={this.handleUnmuteClick}
-                unmuteAssignmentStatus={this.props.unmuteAssignmentStatus}
-              />
+                <FlexItem>
+                  <DisplayToStudentsButton
+                    assignment={this.props.assignment}
+                    onClick={this.handleUnmuteClick}
+                    unmuteAssignmentStatus={this.props.unmuteAssignmentStatus}
+                  />
+                </FlexItem>
+              </Flex>
             </FlexItem>
           </Flex>
         )}

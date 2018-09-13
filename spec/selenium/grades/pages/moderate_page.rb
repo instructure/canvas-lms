@@ -65,7 +65,7 @@ class ModeratePage
     def accept_grades_for_grader(grader)
       accept_grades_button(grader).click
       # wait for Accepted button to exist
-      fj("tr#grader-row-#{grader.id} button:contains('Accepted')")
+      fj("#grader-row-#{grader.id} button:contains('Accepted')")
     end
 
     # Methods
@@ -101,7 +101,7 @@ class ModeratePage
     end
 
     def accept_grades_button(grader)
-      fj("tr#grader-row-#{grader.id} button:contains('Accept')")
+      fj("#grader-row-#{grader.id} button:contains('Accept')")
     end
 
     def student_table_headers

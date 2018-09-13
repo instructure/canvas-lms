@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {arrayOf, bool, func, oneOf, shape, string} from 'prop-types'
+import {omit} from 'lodash'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import IconCheckMark from '@instructure/ui-icons/lib/Solid/IconCheckMark'
 import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
@@ -27,9 +28,13 @@ import I18n from 'i18n!assignment_grade_summary'
 
 import {FAILURE, STARTED, SUCCESS} from '../../grades/GradeActions'
 
+function buttonProps(props) {
+  return omit(props, 'graderName')
+}
+
 function readyButton(props) {
   return (
-    <Button {...props}>
+    <Button {...buttonProps(props)}>
       <PresentationContent>{I18n.t('Accept')}</PresentationContent>
       <ScreenReaderContent>
         {I18n.t('Accept grades by %{graderName}', {graderName: props.graderName})}
@@ -42,7 +47,7 @@ function startedButton(props) {
   const title = I18n.t('Accepting')
 
   return (
-    <Button {...props} variant="light">
+    <Button {...buttonProps(props)} variant="light">
       <Spinner size="x-small" title={title} /> <PresentationContent>{title}</PresentationContent>
     </Button>
   )
@@ -51,7 +56,7 @@ function startedButton(props) {
 function successButton(props) {
   /* eslint-disable react/prop-types */
   return (
-    <Button {...props} icon={IconCheckMark} variant={props.disabled ? 'default' : 'light'}>
+    <Button {...buttonProps(props)} icon={IconCheckMark} variant={props.disabled ? 'default' : 'light'}>
       {I18n.t('Accepted')}
     </Button>
   )
@@ -86,6 +91,7 @@ export default function AcceptGradesButton(props) {
 }
 
 AcceptGradesButton.propTypes = {
+  id: string.isRequired,
   acceptGradesStatus: oneOf([FAILURE, STARTED, SUCCESS]),
   graderName: string.isRequired,
   onClick: func.isRequired,

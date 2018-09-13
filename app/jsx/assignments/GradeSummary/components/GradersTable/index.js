@@ -19,6 +19,8 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import {arrayOf, bool, shape, string} from 'prop-types'
+import Grid, {GridRow, GridCol} from '@instructure/ui-layout/lib/components/Grid'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import View from '@instructure/ui-layout/lib/components/View'
@@ -49,47 +51,44 @@ function GradersTable(props) {
     !props.gradesLoading && rows.some(row => (row.selectionDetails || {}).allowed)
 
   return (
-    <View as="table" role="table">
-      <caption>
-        {<ScreenReaderContent>{I18n.t('Grader Details Table')}</ScreenReaderContent>}
-      </caption>
+    <View as="div" padding="0 small">
+      <ScreenReaderContent>
+        <Heading>{I18n.t('Grader Details Table')}</Heading>
+      </ScreenReaderContent>
 
-      <thead>
-        <tr role="row">
-          <View as="th" padding="x-small small" role="columnheader" scope="col" textAlign="start">
-            {I18n.t('Grader')}
-          </View>
+      <Grid rowSpacing="small">
+        <GridRow>
+          <GridCol>
+            <Heading level="h4">{I18n.t('Grader')}</Heading>
+          </GridCol>
 
           {showAcceptGradesColumn && (
-            <View as="th" padding="x-small small" role="columnheader" scope="col" textAlign="start">
-              {I18n.t('Accept Grades')}
-            </View>
+            <GridCol>
+              <Heading level="h4">{I18n.t('Accept Grades')}</Heading>
+            </GridCol>
           )}
-        </tr>
-      </thead>
+        </GridRow>
 
-      <tbody>
         {rows.map(row => (
-          <tr id={`grader-row-${row.graderId}`} key={row.graderId} role="row">
-            <View as="th" padding="xxx-small small" role="rowheader" scope="row" textAlign="start">
-              <View as="div" padding="xx-small none">
-                <Text weight="normal">{row.graderName}</Text>
-              </View>
-            </View>
+          <GridRow id={`grader-row-${row.graderId}`} key={row.graderId}>
+            <GridCol>
+              <label className="grader-label" htmlFor={`grader-row-accept-${row.graderId}`}>{row.graderName}</label>
+            </GridCol>
 
             {showAcceptGradesColumn && (
-              <View as="td" padding="xxx-small small" role="cell">
+              <GridCol>
                 <AcceptGradesButton
+                  id={`grader-row-accept-${row.graderId}`}
                   acceptGradesStatus={row.acceptGradesStatus}
                   onClick={row.onAccept}
                   selectionDetails={row.selectionDetails}
                   graderName={row.graderName}
                 />
-              </View>
+              </GridCol>
             )}
-          </tr>
+          </GridRow>
         ))}
-      </tbody>
+      </Grid>
     </View>
   )
 }
