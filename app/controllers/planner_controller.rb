@@ -279,7 +279,7 @@ class PlannerController < ApplicationController
     item_collection('peer_reviews',
       @current_user.submissions_needing_peer_review(default_opts),
       AssessmentRequest, [{submission: {assignment: :peer_reviews_due_at}},
-                          {submission: :cached_due_date}, :created_at], :id)
+                          {assessor_asset: :cached_due_date}, :created_at], :id)
   end
 
   def item_collection(label, scope, base_model, *order_by)

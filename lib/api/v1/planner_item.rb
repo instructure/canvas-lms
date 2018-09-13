@@ -84,8 +84,9 @@ module Api::V1::PlannerItem
         hash[:planner_override] ||= planner_override_json(topic.planner_override_for(user), user, session, topic.class_name)
       elsif item.is_a?(AssessmentRequest)
         hash[:plannable_type] = PLANNABLE_TYPES.key(item.class_name)
-        hash[:plannable_date] = item.asset.assignment.peer_reviews_due_at || item.asset.try(:cached_due_date)
-        hash[:plannable] = plannable_json({todo_date: hash[:plannable_date], title: item.asset&.assignment&.title}.merge(item.attributes), extra_fields: ASSESSMENT_REQUEST_FIELDS)
+        hash[:plannable_date] = item.asset.assignment.peer_reviews_due_at || item.assessor_asset.cached_due_date
+        title_date = {title: item.asset&.assignment&.title, todo_date: hash[:plannable_date]}
+        hash[:plannable] = plannable_json(title_date.merge(item.attributes), extra_fields: ASSESSMENT_REQUEST_FIELDS)
         hash[:html_url] = course_assignment_submission_url(item.asset.assignment.context_id, item.asset.assignment_id, item.user_id)
       else
         hash[:plannable_date] = item[:user_due_date] || item.due_at
@@ -119,7 +120,7 @@ module Api::V1::PlannerItem
     events, other_items = preload_items.partition{|i| i.is_a?(::CalendarEvent)}
     ActiveRecord::Associations::Preloader.new.preload(events, :context) if events.any?
     assessment_requests, plannable_items = other_items.partition{|i| i.is_a?(::AssessmentRequest)}
-    ActiveRecord::Associations::Preloader.new.preload(assessment_requests, {submission: :assignment}) if assessment_requests.any?
+    ActiveRecord::Associations::Preloader.new.preload(assessment_requests, [:assessor_asset, submission: {assignment: :context}]) if assessment_requests.any?
     notes, context_items = plannable_items.partition{|i| i.is_a?(::PlannerNote)}
     ActiveRecord::Associations::Preloader.new.preload(notes, user: {pseudonym: :account}) if notes.any?
     wiki_pages, other_context_items = context_items.partition{|i| i.is_a?(::WikiPage)}
