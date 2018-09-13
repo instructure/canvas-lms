@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import Cropper from 'react-crop'
+import Cropper from '@instructure/react-crop'
   //
   // The react-crop component requires a wrapper component for interacting
   // with the outside world.
