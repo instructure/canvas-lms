@@ -12838,11 +12838,12 @@ react-tinymce@^0.7.0:
     lodash ">=4.17.4"
     prop-types "^15.6.0"
 
-react-tokeninput@2.4.0:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/react-tokeninput/-/react-tokeninput-2.4.0.tgz#b9c7b173ac2527dad473a4ef0a6d77ab89e07ce4"
+react-tokeninput@^2.5.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/react-tokeninput/-/react-tokeninput-2.5.0.tgz#25ef007e6cc0cfaf8befc9cd818b7ffbf01a67f5"
   dependencies:
     classnames "^2.2.1"
+    prop-types "^15"
 
 react-tools@0.11.2, react-tools@^0.11.2:
   version "0.11.2"

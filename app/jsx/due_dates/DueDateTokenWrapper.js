@@ -19,7 +19,6 @@
 import _ from 'underscore'
 import React from 'react'
 import PropTypes from 'prop-types'
-import ReactModal from 'react-modal'
 import OverrideStudentStore from '../due_dates/OverrideStudentStore'
 import Override from 'compiled/models/AssignmentOverride'
 import TokenInput, {Option as ComboboxOption} from 'react-tokeninput'
