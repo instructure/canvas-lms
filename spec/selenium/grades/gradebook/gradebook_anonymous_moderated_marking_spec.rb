@@ -51,11 +51,11 @@ describe 'Original Gradebook' do
 
     context 'grade cells', priority: '1', test_id: 3496299 do
       before(:each) do
-        Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
+        Gradebook.visit_gradebook(@course)
       end
 
       it 'are disabled and hide grades when assignment is muted', priority: '1', test_id: 3496299 do
-        grade_cell_grayed = Gradebook::MultipleGradingPeriods.grading_cell_content(0,0)
+        grade_cell_grayed = Gradebook.grading_cell_content(0,0)
         class_attribute_fetched = grade_cell_grayed.attribute("class")
 
         expect(class_attribute_fetched).to include "grayed-out cannot_edit"
@@ -81,21 +81,21 @@ describe 'Original Gradebook' do
     end
 
     it 'assignment cannot be unmuted in Gradebook before grades are posted', priority: '1', test_id: 3496195 do
-      Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
-      Gradebook::MultipleGradingPeriods.assignment_header_menu_select(@moderated_assignment.id)
+      Gradebook.visit_gradebook(@course)
+      Gradebook.assignment_header_menu_select(@moderated_assignment.id)
       wait_for_ajaximations
 
-      expect(Gradebook::MultipleGradingPeriods.assignment_header_menu_item_find('Unmute Assignment').attribute('aria-disabled')).to eq 'true'
+      expect(Gradebook.assignment_header_menu_item_find('Unmute Assignment').attribute('aria-disabled')).to eq 'true'
     end
 
     it 'assignment can be unmuted in Gradebook after grades are posted', priority: '1', test_id: 3496195 do
       @moderated_assignment.update!(grades_published_at: Time.zone.now)
 
-      Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
-      Gradebook::MultipleGradingPeriods.assignment_header_menu_select(@moderated_assignment.id)
+      Gradebook.visit_gradebook(@course)
+      Gradebook.assignment_header_menu_select(@moderated_assignment.id)
       wait_for_ajaximations
 
-      expect(Gradebook::MultipleGradingPeriods.assignment_header_menu_item_find('Unmute Assignment').attribute('aria-disabled')).to be nil
+      expect(Gradebook.assignment_header_menu_item_find('Unmute Assignment').attribute('aria-disabled')).to be nil
     end
   end
 end

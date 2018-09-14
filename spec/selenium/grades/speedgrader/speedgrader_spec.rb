@@ -680,7 +680,7 @@ describe 'Speedgrader' do
     it 'navigates to gradebook via link' do
       # make sure gradebook link works
       expect_new_page_load {Speedgrader.gradebook_link.click}
-      expect(Gradebook::MultipleGradingPeriods.grade_grid).to be_displayed
+      expect(Gradebook.grade_grid).to be_displayed
     end
   end
 

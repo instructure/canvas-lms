@@ -128,8 +128,8 @@ describe "admin avatars" do
       @account.enable_feature!(:student_context_cards)
       @student = student_in_course.user
       @student.avatar_image_url = "http://www.example.com"
-      Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
-      Gradebook::MultipleGradingPeriods.student_name_link(@student.id).click
+      Gradebook.visit_gradebook(@course)
+      Gradebook.student_name_link(@student.id).click
     end
 
     it "should display student avatar in tray", priority: "1", test_id: 3299466 do

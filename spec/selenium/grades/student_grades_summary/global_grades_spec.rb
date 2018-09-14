@@ -183,7 +183,7 @@ describe 'Global Grades' do
       # verify url has correct course id
       expect(driver.current_url).to eq app_url + "/courses/#{@course_with_gp.id}/gradebook"
       # verify assignment score is correct
-      expect(Gradebook::MultipleGradingPeriods.student_total_grade(@student)).to eq("#{GRADE_CURRENT_GP.round(2)}%")
+      expect(Gradebook.student_total_grade(@student)).to eq("#{GRADE_CURRENT_GP.round(2)}%")
     end
 
     it 'goes to student interactions report', priority: "1", test_id: 3500433 do
