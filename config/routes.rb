@@ -1586,6 +1586,20 @@ CanvasRails::Application.routes.draw do
       get 'files/:id', action: :api_show, as: 'attachment'
       delete 'files/:id', action: :destroy
       put 'files/:id', action: :api_update
+
+      # exists as an alias of GET for backwards compatibility
+      #
+      # older API clients were told to POST to the value of the Location header
+      # returned after upload to S3, when that was the create_success URL.
+      # that's no longer necessary, but they are still given a Location header
+      # pointed at this endpoint which they can GET for the file details (which
+      # create_success would have provided). for those that are still POSTing,
+      # we'll allow this but it's a noop (as far as side effects)
+      #
+      # to actually change the file metadata (e.g. rename), the PUT route above
+      # must be used.
+      post 'files/:id', action: :api_show
+
       get 'files/:id/:uuid/status', action: :api_file_status, as: 'file_status'
       get 'files/:id/public_url', action: :public_url
       %w(course group user).each do |context|
