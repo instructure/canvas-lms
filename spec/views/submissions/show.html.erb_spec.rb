@@ -354,7 +354,7 @@ describe "/submissions/show" do
         @course.save!
         @assessment_request = @submission.assessment_requests.create!(
           assessor: @student,
-          assessor_asset: @submission.user,
+          assessor_asset: @submission,
           user: @submission.user
         )
       end

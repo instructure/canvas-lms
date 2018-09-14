@@ -25,8 +25,9 @@ describe Ignore do
     quiz_model(course: @course)
     reviewer = @student
     reviewee = student_in_course(course: @course).user
-    submission = @assignment.submissions.where(user: reviewee).take
-    @ar = submission.assessment_requests.create!(assessor: reviewer, user: reviewee, assessor_asset: reviewer)
+    submission = @assignment.find_or_create_submission(reviewee)
+    assessor_submission = @assignment.find_or_create_submission(reviewer)
+    @ar = submission.assessment_requests.create!(assessor: reviewer, user: reviewee, assessor_asset: assessor_submission)
     @ignore_assign = Ignore.create!(asset: @assignment, user: @student, purpose: 'submitting')
     @ignore_quiz = Ignore.create!(asset: @quiz, user: @student, purpose: 'submitting')
     @ignore_ar = Ignore.create!(asset: @ar, user: @student, purpose: 'reviewing')

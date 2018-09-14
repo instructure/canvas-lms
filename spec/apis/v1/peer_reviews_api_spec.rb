@@ -31,13 +31,13 @@ describe PeerReviewsApiController, type: :request do
     })
   end
 
-  def assessment_request(submission, teacher, assessor)
+  def assessment_request(submission, teacher, assessor_submission)
     ra_params = rubric_association_params_for_assignment(submission.assignment)
     rubric_assoc = RubricAssociation.generate(teacher, @rubric, @course, ra_params)
     rubric_assessment = RubricAssessment.create!({
       artifact: submission,
       assessment_type: 'peer_review',
-      assessor: assessor,
+      assessor: assessor_submission.user,
       rubric: @rubric,
       user: submission.user,
       rubric_association: rubric_assoc
@@ -46,8 +46,8 @@ describe PeerReviewsApiController, type: :request do
       rubric_assessment: rubric_assessment,
       user: submission.user,
       asset: submission,
-      assessor_asset: assessor,
-      assessor: assessor)
+      assessor_asset: assessor_submission,
+      assessor: assessor_submission.user)
   end
 
   before :once do
@@ -57,8 +57,9 @@ describe PeerReviewsApiController, type: :request do
     @student2 = student_in_course(active_all: true).user
     @assignment1 = assignment_model(course: @course)
     @submission = @assignment1.find_or_create_submission(@student1)
+    @assessor_submission = @assignment1.find_or_create_submission(@student2)
     @rubric = @course.rubrics.create! { |r| r.user = @teacher }
-    @assessment_request = assessment_request(@submission, @teacher, @student2)
+    @assessment_request = assessment_request(@submission, @teacher, @assessor_submission)
   end
 
   describe "Delete 'delete'" do
@@ -288,13 +289,13 @@ describe PeerReviewsApiController, type: :request do
 
       it 'should return peer reviews for a specific submission' do
         submission2 = @assignment1.find_or_create_submission(@student2)
-        assessment_request(submission2, @teacher, @student1)
+        assessment_request(submission2, @teacher, @submission)
         list_peer_review(@admin, @submission_resource_path, @submission_resource_params)
       end
 
       it 'should return peer reviews for a specific submission in a section' do
         submission2 = @assignment1.find_or_create_submission(@student2)
-        assessment_request(submission2, @teacher, @student1)
+        assessment_request(submission2, @teacher, @submission)
         list_peer_review(@admin, @submission_section_resource_path, @submission_resource_params)
       end
 
@@ -328,7 +329,7 @@ describe PeerReviewsApiController, type: :request do
 
       it 'should return peer reviews for a specific submission' do
         submission2 = @assignment1.find_or_create_submission(@student2)
-        assessment_request(submission2, @teacher, @student1)
+        assessment_request(submission2, @teacher, @submission)
         list_peer_review(@teacher, @submission_resource_path, @submission_resource_params)
       end
 
@@ -427,7 +428,7 @@ describe PeerReviewsApiController, type: :request do
       it 'should return peer reviews for a specific submission' do
         @user = @student1
         submission2 = @assignment1.find_or_create_submission(@student2)
-        assessment_request(submission2, @teacher, @student1)
+        assessment_request(submission2, @teacher, @submission)
         json = api_call(:get, @submission_resource_path, @submission_resource_params)
         expect(json.count).to eq(1)
         expect(json[0]).to eq({"assessor_id"=>@student2.id,

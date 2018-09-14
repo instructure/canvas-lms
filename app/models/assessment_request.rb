@@ -23,7 +23,7 @@ class AssessmentRequest < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :asset, polymorphic: [:submission]
-  belongs_to :assessor_asset, polymorphic: [:submission, :user], polymorphic_prefix: true
+  belongs_to :assessor_asset, polymorphic: [:submission], polymorphic_prefix: true
   belongs_to :assessor, :class_name => 'User'
   belongs_to :rubric_association
   has_many :submission_comments, -> { published }

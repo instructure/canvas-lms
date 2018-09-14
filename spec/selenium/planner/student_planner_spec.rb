@@ -146,10 +146,11 @@ describe "student planner" do
                                                  submission_types: 'online_text_entry'
                                                })
       submission = @assignment.submit_homework(@reviewee, body: "review this")
+      assessor_submission = @assignment.find_or_create_submission(@student1)
       @peer_review = AssessmentRequest.create!({
                                                  user: @reviewee,
                                                  asset: submission,
-                                                 assessor_asset: @student1,
+                                                 assessor_asset: assessor_submission,
                                                  assessor: @student1
                                                })
     end

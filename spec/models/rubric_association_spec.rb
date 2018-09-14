@@ -187,13 +187,14 @@ describe RubricAssociation do
       review_student = student_in_course(active_all: true, course: @course).user
       assignment = @course.assignments.create!
       submission = assignment.find_or_create_submission(submission_student)
+      assessor_submission = assignment.find_or_create_submission(review_student)
       outcome_with_rubric
       ra = @rubric.rubric_associations.create!(
         :association_object => assignment,
         :context => @course,
         :purpose => 'grading'
       )
-      request = AssessmentRequest.create!(user: submission_student, asset: submission, assessor_asset: review_student,
+      request = AssessmentRequest.create!(user: submission_student, asset: submission, assessor_asset: assessor_submission,
         assessor: review_student, rubric_association: ra)
       expect(request).not_to be_nil
       ra.destroy

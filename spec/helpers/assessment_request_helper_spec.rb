@@ -41,6 +41,7 @@ describe AssessmentRequestHelper do
       @student2 = student_in_course(active_all: true).user
       assignment_model(course: @course)
       @submission = @assignment.find_or_create_submission(@student)
+      submission2 = @assignment.find_or_create_submission(@student2)
       @rubric = @course.rubrics.create! { |r| r.user = @teacher }
       ra_params = rubric_association_params_for_assignment(@assignment)
       @rubric_assoc = RubricAssociation.generate(@teacher, @rubric, @course, ra_params)
@@ -53,7 +54,7 @@ describe AssessmentRequestHelper do
         rubric_association: @rubric_assoc
         })
       @assessment_request = AssessmentRequest.create!(rubric_assessment: @rubric_assessment, user: @student1,
-                                                      asset: @submission, assessor_asset: @student2, assessor: @student2)
+                                                      asset: @submission, assessor_asset: submission2, assessor: @student2)
     end
 
     it 'should return assessment user name' do

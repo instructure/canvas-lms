@@ -4541,7 +4541,7 @@ describe Submission do
             assessment_request = submission.assessment_requests.create!(
               user: student,
               assessor: student,
-              assessor_asset: student
+              assessor_asset: submission
             )
             submission.add_comment(comment_params.merge({assessment_request: assessment_request}))
             expect(last_event.payload['assessment_request_id']).to eq assessment_request.id

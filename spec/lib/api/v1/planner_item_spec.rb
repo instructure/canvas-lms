@@ -118,7 +118,8 @@ describe Api::V1::PlannerItem do
     context 'peer reviews' do
       it 'should include submissions needing peer review' do
         submission = @assignment.submit_homework(@student, body: "the stuff")
-        @peer_review = AssessmentRequest.create!(user: @student, asset: submission, assessor_asset: @reviewer, assessor: @student)
+        assessor_submission = @assignment.find_or_create_submission(@reviewer)
+        @peer_review = AssessmentRequest.create!(user: @student, asset: submission, assessor_asset: assessor_submission, assessor: @reviewer)
         json = api.planner_item_json(@peer_review, @student, session, { start_at: 1.week.ago })
         expect(json[:plannable_type]).to eq "assessment_request"
         expect(json[:plannable][:title]).to eq @assignment.title
