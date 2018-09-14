@@ -608,6 +608,30 @@ describe ConversationsController, type: :request do
         expect(json3.first["id"]).to_not eq conv1.id # should make a new one
       end
 
+      it "should not break trying to pull cached conversations for re-use" do
+        course1 = @course
+        course_with_student(:course => course1, :user => @billy, :active_all => true)
+        course2 = course_with_teacher(:user => @me, :active_all => true).course
+        course_with_student(:course => course2, :user => @bob, :active_all => true)
+
+        @user = @me
+        json = api_call(:post, "/api/v1/conversations",
+          { :controller => 'conversations', :action => 'create', :format => 'json' },
+          { :recipients => [@bob.id, @billy.id], :body => "test", :context_code => "course_#{course1.id}" })
+        conv1 = Conversation.find(json.first["id"])
+        expect(conv1.context).to eql(course1)
+
+        # revert one to the old format - leave the other alone
+        old_hash = Conversation.private_hash_for(conv1.conversation_participants.pluck(:user_id))
+        ConversationParticipant.where(:conversation_id => conv1).update_all(:private_hash => old_hash)
+        Conversation.where(:id => conv1).update_all(:private_hash => old_hash)
+
+        json2 = api_call(:post, "/api/v1/conversations",
+          { :controller => 'conversations', :action => 'create', :format => 'json' },
+          { :recipients => [@bob.id, @billy.id], :body => "test", :context_code => "course_#{course1.id}" })
+        expect(json2.map{|r| r["id"]}).to include(conv1.id) # should reuse the conversation
+      end
+
       describe "context is an account for admins validation" do
         it "should allow root account context if the user is an admin on that account" do
           account_admin_user active_all: true
