@@ -122,6 +122,13 @@ module Services
         expect(env2[:RICH_CONTENT_CAN_UPLOAD_FILES]).to eq(false)
       end
 
+      it "does not raise when encyption/signing secrets are nil" do
+        allow(Canvas::Security::ServicesJwt).to receive(:for_user).and_raise(Canvas::Security::InvalidJwtKey)
+        root_account = double("root_account", feature_enabled?: true)
+        env = described_class.env_for(root_account, user: {}, domain: "domain")
+        expect(env[:JWT]).to eq("InvalidJwtKey")
+      end
+
       context "with all flags on" do
         let(:root_account){double("root_account") }
 

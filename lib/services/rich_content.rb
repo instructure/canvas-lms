@@ -23,13 +23,18 @@ module Services
       if enabled
         env_hash = env_hash.merge(service_settings)
         if user && domain
-          env_hash[:JWT] = Canvas::Security::ServicesJwt.for_user(
-            domain,
-            user,
-            context: context,
-            real_user: real_user,
-            workflows: [:rich_content, :ui]
-          )
+          begin
+            env_hash[:JWT] = Canvas::Security::ServicesJwt.for_user(
+              domain,
+              user,
+              context: context,
+              real_user: real_user,
+              workflows: [:rich_content, :ui]
+            )
+          rescue Canvas::Security::InvalidJwtKey => exception
+            Canvas::Errors.capture_exception(:jwt, exception)
+            env_hash[:JWT] = "InvalidJwtKey"
+          end
         end
 
         # TODO: Remove once rich content service pull from jwt
