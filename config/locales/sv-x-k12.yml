@@ -3,10 +3,12 @@
 --- 
 sv-x-k12: 
   1_item_scores_5512cd03: "1- Resultat på objekt"
+  1_item_scores_examplescores_9736236: "1- Objekt resultat: %{exampleScores}"
   1st_reviewer_3c1d0119: "1:a bedömare"
   25th_75th_ile_406a67bf: "25:e-75:e %ile"
   25th_75th_percentile_aa4c11f2: "25:e-75:e percentilen"
   2_final_score_7b0fd15e: "2- Slutresultat"
+  2_final_score_exampleresult_922edf9c: "2- Slutlig resultat: %{exampleResult}"
   2nd_reviewer_94fdbcd: "2:a bedömare"
   451_message: 
     description: "Du har inte behörighet att besöka den här hemsidan då du befinner dig i ett land som omfattas av handelsrestriktioner med USA."
@@ -77,10 +79,13 @@ sv-x-k12:
         partner_id: "Partner ID"
         partner_key: "Partner nyckel"
   accept_2fdd362e: Acceptera
+  accept_grades_4d56a3dd: "Acceptera bedömningar"
   acceptable_use_policy_29a28124: "Acceptable Use Policy (Acceptabel användarpolicy)"
+  accepted_c9f8ab87: Accepterad
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "accepterade format: hex, rgba, tgb, hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "Accepterade format: svg, png, jpg, gif"
   accepted_user_role_type_course_course_2ce91589: "Accepterad: %{user}, %{role_type}, kurs, %{course}"
+  accepting_40ba3b70: Accepterar
   access_report_80d28095: "Tillgång till rapporten"
   access_token_3be22221: Tillgångstoken
   access_token_count_access_token_count_dfb5463c: "Åtkomst Symbolberäkning %{access_token_count}"
@@ -120,6 +125,8 @@ sv-x-k12:
     tab_sub_accounts: Underkonton
     tab_terms: Terminer
   account_97b34646: Konto
+  account_account_b6b3746b: "Konto: %{account}"
+  account_and_subaccount_40c6430: "Konton och underkonton"
   account_authorization_config: 
     default_delegated_login_handle_name: "Logga in"
     default_login_handle_name: E-post
@@ -228,6 +235,7 @@ sv-x-k12:
   account_course_and_user_search_22bf297a: "Konto, kurs och användarsökning"
   account_domain_78f43049: Kontodomän
   account_domain_lookups_f9d1147e: Kontodomän-uppslagningar
+  account_groups_2f301732: Kontogrupper
   account_id_2c3b4f15: Konto-Id
   account_id_73966078: account_id
   account_id_f6e26867: Konto-Id
@@ -384,8 +392,11 @@ sv-x-k12:
       open_registration_delegated_warning_dialog: "En extern identitetsleverantör är aktiverad"
       what_are_quiz_ip_filters: "Vad är Quiz IP-filter?"
     user: Användare
+  account_settings_fe083453: Kontoinställningar
+  account_settings_subaccount_navigation_3af6f7f5: "Kontoinställningar (underkontonavigering)"
   account_sis_id_2e4a461: "Kontots Sis-id"
   account_sis_id_5da8fd2d: "Konto Sis-Id"
+  account_statistics_2b52a1c9: Kontostatistik
   account_surveys_b0039876: Kontoundersökningar
   account_user: 
     types: 
@@ -1366,6 +1377,8 @@ sv-x-k12:
   add_folder_ba50d107: "Lägg till mapp"
   add_grading_period_6f774dc3: "Lägg till bedömningsperiod"
   add_grading_scheme_81e23c05: "Lägg till bedömningsschema"
+  add_group_c84f9e9d: "Lägg till grupp"
+  add_group_set_f9809e11: "Lägg till grupper"
   add_help_menu_links_de9fc34f: "Lägg till hjälpmeny-länkar"
   add_icon_567dbcaa: "lägg till ikon"
   add_link_5c01c1e8: "Lägg till länk"
@@ -1375,6 +1388,7 @@ sv-x-k12:
   add_moderator_review_new_3c183cea: "Lägg till moderators-bedömning (ny)"
   add_more_e1ffaa65: "Lägg till mer"
   add_new_announcement_ddacd624: "Lägg till nytt meddelande"
+  add_new_domain_e097d4a0: "Lägg till ny domän"
   add_new_group_7ac49f31: "Lägg till en ny grupp"
   add_new_set_of_due_dates_e8e240f: "Lägg till en ny grupp av inlämningsdatum"
   add_new_term_d2217c0d: "Lägg till ny termin"
@@ -1416,12 +1430,24 @@ sv-x-k12:
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "Ytterligare SIS synkroniserings uppgifter, quiz, och diskussions inställningar"
   addressbook_microservice_a4940422: "AddressBook mikrotjänst"
   addressbook_performance_tap_98ddf67: "AddressBook Prestanda steg"
+  adds_analytics_link_on_the_user_settings_menu_3a048816: "Lägger till analyslänk på menyn för användarinställningar."
+  adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Lägg till analys på en elevs kontextkort."
   admin_4d3ba42f: Administratör
   admin_csv_f8d1b3eb: "Administratör CVS"
   admin_navigation_menu_77b801a2: "Administratörs navigeringsmeny"
+  admin_tools_grade_change_logs_d804833f: "Administratörsverktyg (ändringsloggar för bedömningar)"
+  admin_tools_logging_tab_680698f3: "Administratörsverktyg (fliken Loggning)"
+  admin_tools_notifications_tab_120d6cdf: "Administratörsverktyg (fliken Notifikationer)"
+  admin_tools_restore_courses_tab_b07bbfa7: "Administratörsverktyg (fliken Återställ kurser)"
+  admin_tools_undelete_courses_d9bd8631: "Administratörsverktyg (Återställ borttagna kurser)"
   admin_user_name_29dd115a: admin_user_name
+  admin_view_a2f4cd5c: Administratörsvy
   admins_3e1dce15: Administratörer
   admins_add_remove_26811ce5: "Administratörer - lägg till / ta bort"
+  affects_viewing_the_publish_course_conclude_course_76d2f601: |-
+      Påverkar visning av knapparna Publicera kurs, Avsluta kurs och Ta bort den här kursen permanent.
+      Knappen Ta bort den här kursen permanent visas endast för kurser som skapats manuellt.
+  afghanistan_93_ab06805: "Afghanistan (+93)"
   after_48b9d69: Efter...
   after_4c71e718: Efter
   after_date_981cd41b: "Efter %{date}"
@@ -1485,6 +1511,7 @@ sv-x-k12:
       recipients_required: "Minst en mottagare krävs"
       threshold_should_be_numeric: "Det här ska vara ett positivt nummer"
   alerts_add_edit_delete_d71091c6: "Aviseringar - lägg till / redigera / radera"
+  alerts_course_settings_53551794: Larm
   all_4321c3a1: Alla
   all_account_types_e83c1516: "Tillåt alla kontotyper"
   all_accounts_3bafc860: "Alla konton"
@@ -1544,12 +1571,247 @@ sv-x-k12:
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Tillåt det här verktyget att komma åt IMS-namnen och roll-leverantörstjänsten"
   allow_users_to_comment_45b8f753: "Tillåt användare att kommentera"
   allowed_attempts_4e229caa: "Tillåtna försök"
+  allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Ger användare åtkomst till länken Agera som användare på elevkontextkort"
+  allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "Gör att användare kan se SIS-ID:t i en användares inloggningsuppgifter."
+  allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Gör att användare kan se SIS-ID:t på sidan Personer i en kurs."
+  allows_admin_user_to_view_account_statistics_341f00d9: "Gör att administratörer kan se statistik för konton."
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Tillåter att skapa meddelanden för en viss sektion"
   allows_creating_discussions_for_a_specific_section_6bf44036: "Tillåter att skapa diskussioner för en viss sektion"
+  allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Ger roller baserade på lärare/designer/TA:er åtkomst till chattverktyget."
+  allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Ger roller baserade på lärare//TA:er åtkomst till närvaroverktyget."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Låter lärare att markera bedömningsdata att exporteras i bulk till SIS integrationer."
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "Tillåter duplicering av moduler i Canvas"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "Tillåter duplicering av kalenderhändelser"
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Tillåt schemaläggning av återkommande kalender-event"
+  allows_user_to_access_and_edit_the_admin_settings__b3390b66: "Ger användare åtkomst- och redigeringsmöjligheter till administrationsinställningarna för Commons. Gör att användare kan skapa och hantera grupper. Gör att användare kan hantera delade resurser i kontot."
+  allows_user_to_access_speedgrader_from_an_assignme_3b908f7: "Ger användare åtkomst till SpeedGrader från en uppgift."
+  allows_user_to_access_the_announcements_link_in_co_b0ef1a10: |-
+      Ger användare åtkomst till länken Meddelande i kursnavigeringen.
+      Gör att användare kan se kursmeddelanden.
+      Gör att användare kan se de senaste meddelandena på kursens startsida.
+  allows_user_to_access_the_blueprint_courses_sideba_cb5f6a46: "Ger användare åtkomst till sidofältet Blueprint-kurser. Gör att användare kan hantera innehållsinställningar för blueprint-kurser i kursinställningarna. Gör att användare kan ta bort en kopplad kurs. Gör att användare kan redigera låsinställningar för blueprint i enskilda uppgifter, sidor eller diskussioner"
+  allows_user_to_access_the_files_tab_in_the_content_a5187929: "Ger användare åtkomst till fliken Filer i innehållsväljaren."
+  allows_user_to_access_the_restore_courses_tab_in_a_3ff3086c: "Ger användare åtkomst till fliken Återställ kurser i Administratörsverktyg"
+  allows_user_to_access_the_student_progress_page_aca95197: "Ger användare åtkomst till sidan Elevframgång."
+  allows_user_to_access_the_theme_editor_26691f9a: "Ger användare åtkomst till temaredigeraren."
+  allows_user_to_access_the_users_link_in_account_na_d77e46de: "Ger användare åtkomst till länken Användare i kontonavigeringen."
+  allows_user_to_access_the_view_notifications_tab_i_71995596: "Ger användare åtkomst till fliken Visa notifikationer i Administratörsverktyg."
+  allows_user_to_act_as_other_users_in_the_account_195628ae: "Gör att användare kan agera som andra användare i kontot."
+  allows_user_to_add_and_remove_other_account_admins_7834ea9a: "Gör att användare kan lägga till och ta bort andra kontoadministratörer."
+  allows_user_to_add_discussions_in_the_discussions__1b3d9a53: "Gör att användare kan lägga till diskussioner på sidan Diskussioner."
+  allows_user_to_add_discussions_in_the_discussions__f5479e2c: |-
+      Gör att användare kan lägga till diskussioner på sidan Diskussioner.
+      Gör att användare kan stänga för kommentarer, flytta, fästa/ta bort, redigera och ta bort diskussionsämnen som andra användare skapat.
+  allows_user_to_add_edit_and_delete_course_files_an_2cbdc89a: |-
+      Gör att användare kan lägga till, redigera och ta bort kursfiler och mappar.
+      Gör att användare kan ladda ned och importera filer i ZIP-format samt låsa/låsa upp filer.
+  allows_user_to_add_edit_and_delete_course_sections_91e4c96f: |-
+      Gör att användare kan lägga till, redigera och ta bort kursavsnitt.
+      Gör att användare kan korsreferera avsnitt.
+  allows_user_to_add_edit_and_delete_events_in_the_c_14413268: "Gör att användare kan lägga till, redigera och ta bort händelser i kurskalendern."
+  allows_user_to_add_edit_and_delete_global_announce_8463e383: "Gör att användare kan lägga till, redigera och ta bort kursavsnitt."
+  allows_user_to_add_edit_and_update_grades_in_the_g_29a4068e: |-
+      Gör det möjligt för användare att lägga till, redigera och uppdatera bedömningar i bedömningsöversikten.
+      Ger användare åtkomst till bedömningsöversiktens historik.
+      Gör det möjligt för användare att få åtkomst till bedömningsöversikten för uppfyllande av lärandemål (om den är aktiverad)
+  allows_user_to_add_edit_delete_and_publish_unpubli_bc6374cf: "Gör att användare kan lägga till, redigera, ta bort och publicera/återkalla quiz."
+  allows_user_to_add_edit_delete_and_publish_unpubli_f1906287: |-
+      Gör att användare kan lägga till, redigera, ta bort och publicera/återkalla uppgifter.
+      Gör att användare kan hantera inställningar för uppgifter.
+      Gör att användare kan lägga till uppgiftsgrupper i en kurs.
+      Gör att användare kan aktivera och redigera relevans för uppgiftsgrupper i en kurs.
+  allows_user_to_add_new_assignments_to_a_module_51ae198c: "Gör att användare kan lägga till nya uppgifter till en modul."
+  allows_user_to_add_remove_other_teachers_course_de_702821d4: |-
+      Gör att användare kan lägga till/ta bort andra lärare, kursdesigner eller TA:er.
+      Gör att användare kan lägga till/ta bort observatörer i kursen.
+      Gör att användare kan se information om inloggnings-ID för lärare, designers och TA:er.
+      Gör att användare kan se inställningsmenyn för lärare, kursdesigner, TA:er och observatörer.
+      Gör att användare kan se användarinformation för lärare, kursdesigner, TA:er och observatörer.
+      Gör att användare kan begränsa inställningar så att elever endast kan se medlemmar i samma avsnitt.
+  allows_user_to_add_remove_other_teachers_course_de_b29d680: |-
+      Gör att användare kan lägga till/ta bort andra lärare, kursdesigner eller TA:er.
+      Gör att användare kan lägga till/ta bort observatörer.
+      Gör att användare kan se information om inloggnings-ID för lärare, designers och TA:er.
+      Gör att användare kan se användarinformation för alla användare.
+      Gör att användare kan redigera en användares avsnitt eller roll.
+  allows_user_to_add_remove_students_allows_user_to__44718712: "Gör att användare kan lägga till/ta bort elever. Gör att användare kan lägga till/ta bort observatörer. Gör att användare kan se information om inloggnings-ID för elever. Gör att användare kan se tidigare registreringar. Ger användare åtkomst till en användares inställningsmeny och användarinformation. Gör att användare kan redigera en elevs avsnitt eller roll. Gör att användare kan skicka om kursinbjudningar från sidan Personer i kursen."
+  allows_user_to_add_remove_students_to_the_course_a_f5b48d9: |-
+      Gör att användare kan lägga till/ta bort elever i kursen.
+      Gör att användare kan lägga till/ta bort observatörer i kursen.
+      Gör att användare kan se information om inloggnings-ID för elever.
+      Gör att användare kan se tidigare registreringar.
+      Ger användare åtkomst till en användares inställningsmeny och användarinformation.
+      Gör att användare kan slutföra eller ta bort registreringar på en elevs informationssida.
+      Gör att användare kan skicka om kursmeddelanden.
+  allows_user_to_add_students_to_a_course_from_the_a_3b752dd2: "Gör att användare kan lägga till elever i en kurs från sidan Kurser i kontot."
+  allows_user_to_add_teachers_course_designers_or_ta_a7fdaceb: "Gör att användare kan lägga till lärare, kursdesigner eller TA:er i en kurs från sidan Kurser i kontot."
+  allows_user_to_configure_alerts_in_course_settings_40a81b1d: "Gör att användare kan konfigurera larm i kursinställningar. Larmfunktionen används sällan och har utformats för att skicka ett larm till elever, lärare eller administratörer vid vissa händelser (t.ex. om en elev/lärare inte har interagerat inom 7 dagar). De kontrolleras varje dag och notifikationer skickas till eleven och/eller läraren tills händelsen som utlöste larmet har lösts."
+  allows_user_to_configure_alerts_in_course_settings_806397b5: "Gör att användare kan konfigurera larm i kursinställningar. Larmfunktionen används sällan och har utformats för att skicka ett larm till elever, lärare eller administratörer vid vissa händelser (t.ex. om en elev/lärare inte har interagerat inom 7 dagar). De kontrolleras varje dag och notifikationer skickas till eleven och/eller läraren tills händelsen som utlöste larmet har lösts."
+  allows_user_to_create_accounts_for_new_users_with__37a233d7: |-
+      Gör att användare kan skapa konton för nya användare på kontonivåknappen Lägg till personer.
+      Gör att användare kan ta bort och slå samman användare i ett konto.
+      Gör att användare kan ändra informationen i ett användarkonto, som t.ex. namn, e-post och tidszon. Gör att användare kan se och ändra inloggningsinformation för en användare.
+  allows_user_to_create_and_manage_appointments_on_t_393e9e84: "Gör att användare kan skapa och hantera möten i kalendern med Schemabokningssystemet."
+  allows_user_to_create_and_modify_grading_schemes_e4433a19: "Gör att användare kan skapa och ändra bedömningsscheman."
+  allows_user_to_create_collaborations_allows_user_t_96f8c3be: "Gör att användare kan skapa samarbeten. Gör att användare kan se, redigera och ta bort konferenser de har skapat."
+  allows_user_to_create_collaborations_allows_user_t_eff2a175: "Gör att användare kan skapa samarbeten. Gör att användare kan se, redigera och ta bort samarbeten de har skapat."
+  allows_user_to_create_developer_keys_for_accounts_76bedd2b: "Gör att användare kan skapa utvecklarnycklar för konton."
+  allows_user_to_create_edit_and_delete_account_grou_abc8c12: "Gör att användare kan skapa, redigera och ta bort kontogrupper."
+  allows_user_to_create_edit_and_delete_course_group_36097d72: "Gör att användare kan skapa, redigera och ta bort kursgrupper. Gör att användare kan skapa, redigera och ta bort grupper som skapats av elever."
+  allows_user_to_create_edit_and_delete_course_group_cbac4c96: |-
+      Gör att användare kan skapa, redigera och ta bort kursgrupper.
+      Gör att användare kan skapa, redigera och ta bort grupper som skapats av elever.
+  allows_user_to_create_edit_and_delete_course_rubri_92b58f29: "Gör att användare kan skapa, redigera och ta bort kursmatriser i länken Matriser."
+  allows_user_to_create_edit_and_delete_rubrics_1c0acc08: "Gör att användare kan skapa, redigera och ta bort matriser."
+  allows_user_to_create_import_edit_and_delete_outco_472c842e: "Gör att användare kan skapa, importera, redigera och ta bort poäng och poänggrupper på kursnivå."
+  allows_user_to_create_new_conferences_allows_user__89cebec2: "Gör att användare kan skapa nya konferenser. Gör att användare kan starta konferenser de skapat."
+  allows_user_to_designate_a_course_as_a_blueprint_c_bc5ff9bc: |-
+      Gör att användare kan beteckna en kurs som en blueprint-kurs.
+      Gör att användare kan hantera inställningar för blueprint-kurser i kursinställningarna.
+      Gör att användare kan lägga till kopplade kurser.
+  allows_user_to_differentiate_assignments_to_indivi_37f701a5: "Gör att användare kan särskilja uppgifter till enskilda elever."
+  allows_user_to_edit_assignment_details_on_individu_3e50993a: "Gör att användare kan redigera information om uppgifter i enskilda diskussioner. Moduler: Gör att användare kan lägga till nya uppgifter till en modul."
+  allows_user_to_edit_assignment_details_on_individu_ecf19e63: "Gör att användare kan redigera information om uppgifter i enskilda diskussioner."
+  allows_user_to_edit_blueprint_content_lock_setting_25128c82: "Gör att användare kan redigera låsinställningar för blueprint-innehåll i enskilda diskussioner."
+  allows_user_to_edit_blueprint_content_lock_setting_fd580fab: "Gör att användare kan redigera låsinställningar för blueprint-innehåll i enskilda inställningar om användaren är registrerad i en blueprint-huvudkurs."
+  allows_user_to_edit_blueprint_lock_settings_on_the_371aeb2a: "Gör att användare kan redigera låsinställningar för blueprint på indexeringssidan Sidor i en blueprint-huvudkurs."
+  allows_user_to_edit_blueprint_lock_settings_on_the_3a90958b: "Gör att användare kan redigera låsinställningar för blueprint på indexeringssidorna Uppgifter och quiz i en blueprint-huvudkurs."
+  allows_user_to_edit_blueprint_lock_settings_on_the_94a44495: "Gör att användare kan redigera låsinställningar för blueprint på indexeringssidan Diskussioner i en blueprint-huvudkurs."
+  allows_user_to_edit_blueprint_lock_settings_on_the_9f51663c: "Gör att användare kan redigera låsinställningar för blueprint på indexeringssidan Filer i en blueprint-huvudkurs."
+  allows_user_to_edit_configurations_for_manually_ad_7e0f496c: "Gör att användare kan redigera konfigurationer för manuellt tillagda externa appar."
+  allows_user_to_edit_grades_and_add_comments_in_spe_dc18e3c0: "Gör att användare kan redigera bedömningar och lägga till kommentarer i SpeedGrader."
+  allows_user_to_edit_grades_in_the_gradebook_allows_74c2723: |-
+      Gör att användare kan redigera bedömningar i bedömningsöversikten.
+      Ger användare åtkomst till historik i bedömningsöversikten.
+      Gör det möjligt för användare att få åtkomst till bedömningsöversikten för uppfyllande av lärandemål (om den är aktiverad)
+  allows_user_to_edit_grading_schemes_98c35117: "Gör att användare kan redigera bedömningsscheman."
+  allows_user_to_edit_the_course_sis_id_e1eccee3: "Gör att användare kan redigera kursens SIS-ID."
+  allows_user_to_edit_the_course_syllabus_a28ff262: "Gör att användare kan redigera kursens kursplan."
+  allows_user_to_filter_for_blueprint_courses_as_the_a67832c8: |-
+      Gör att användare kan filtrera blueprint-kurser på kontonivå.
+      Gör att användare kan lägga till kopplade kurser.
+  allows_user_to_generate_a_pairing_code_on_behalf_o_9ea9bb0a: "Gör att användare kan generera en sammankopplingskod för en elev för delning med en observatör."
+  allows_user_to_generate_login_logout_activity_repo_bba62f2: "Gör att användare kan generera en in-/utloggningsaktivitetsrapport i Administratörsverktyg."
+  allows_user_to_import_content_using_the_course_imp_4a4ec4c7: "Gör att användare kan importera innehåll med hjälp av kursimportverktyget."
+  allows_user_to_import_learning_outcomes_17fce84a: "Gör att användare kan importera måluppfyllelser."
+  allows_user_to_import_learning_outcomes_to_rubrics_45331ded: "Gör att användare kan importera måluppfyllelser till matriser."
+  allows_user_to_import_resources_from_commons_into__255ad23: |-
+      Gör att användare kan importera resurser från Commons till en kurs.
+      Gör att användare kan dela uppgifter till Commons eller redigera tidigare delat innehåll.
+  allows_user_to_import_sis_data_583b20a5: "Gör att användare kan importera SIS-data."
+  allows_user_to_like_discussion_posts_when_the_only_7390d91c: "Gör att användare kan gilla diskussionsinlägg när kryssrutan Endast bedömare kan gilla är markerad."
+  allows_user_to_manage_feature_options_in_account_s_c3c8ee03: "Gör att användare kan hantera funktionsalternativ i kontoinställningarna."
+  allows_user_to_manage_modules_create_add_items_edi_1afafd65: "Gör att användare kan hantera moduler (skapa/lägga till objekt, redigera modulinställningar, publicera/återkalla osv.)."
+  allows_user_to_manage_observers_associated_with_st_4b45f2be: "Gör att användare kan hantera observatörer som är kopplade till elever i kontot."
+  allows_user_to_manage_rubrics_326eedc2: "Gör att användare kan hantera matriser."
+  allows_user_to_manually_add_an_app_in_account_sett_c5ce3789: "Gör att användare kan lägga till en app manuellt i kontoinställningarna."
+  allows_user_to_manually_add_and_delete_an_app_in_c_18250cad: "Gör att användare kan lägga till och ta bort en app manuellt i kursinställningarna."
+  allows_user_to_moderate_a_quiz_6953d369: "Gör att användare kan moderera ett quiz."
+  allows_user_to_publish_conclude_and_delete_courses_336cf352: "Gör att användare kan publicera, avsluta och ta bort kurser."
+  allows_user_to_reply_to_a_discussion_post_83f43e19: "Gör att användare kan svara på ett diskussionsinlägg."
+  allows_user_to_restore_a_course_32084c5c: "Gör att användare kan återställa en kurs."
+  allows_user_to_review_an_audit_trail_in_assignment_9ca5d03d: "Gör att användare kan granska ändringsloggar, både modererade och anonyma, i uppgifter."
+  allows_user_to_search_by_assignment_id_in_grade_ch_ae195b94: "Gör att användare kan söka med uppgifts-ID i ändringsloggarna för en bedömning."
+  allows_user_to_search_by_course_id_or_assignment_i_b30d9175: "Gör att användare kan söka med kurs-ID eller uppgifts-ID i ändringsloggarna för en bedömning i Administratörsverktyg."
+  allows_user_to_search_for_account_users_via_primar_7a58eb6e: |-
+      Gör att användare kan söka efter kontoanvändare med primär e-postadress på sidan Personer för kontot.
+      Gör att användare kan söka efter andra användare med primär e-postadress på sidan Personer för ett konto.
+  allows_user_to_search_for_other_users_by_login_id__2b0bd8c9: "Gör det möjligt för användare att söka efter andra användare med inloggnings-ID i kursens personalsida."
+  allows_user_to_search_for_other_users_by_login_id__3edb3702: "Gör att användare kan söka efter kontoanvändare med inloggnings-ID på sidan Personer för kontot."
+  allows_user_to_search_for_other_users_via_primary__c95888c8: "Gör att användare kan söka efter andra användare med primära e-postadresser på sidan Personer."
+  allows_user_to_see_the_list_of_courses_in_the_acco_5fa0142f: "Gör att användare kan se kurslistan i kontot."
+  allows_user_to_see_the_list_of_recently_started_en_1012704d: "Gör att användare kan se listan över senaste påbörjade/slutförda kurser i kontostatistiken."
+  allows_user_to_select_final_grade_for_moderated_as_c5e28a9c: "Gör att användare kan välja slutbedömning för modererade uppgifter."
+  allows_user_to_send_a_message_in_conversations_wit_d48abf1a: "Gör att användare kan skicka ett meddelande i Konversationer utan att välja en kurs."
+  allows_user_to_send_a_message_to_all_in_course_nam_697703a0: |-
+      Gör att användare kan skicka ett meddelande till "Alla i [course name]”.
+      Gör att användare kan skicka ett meddelande till "Alla i [course group]”.
+  allows_user_to_send_a_message_to_all_in_course_nam_992e425: "Gör att användare kan skicka ett meddelande till \"Alla i [course name]\" eller \"Alla i [course group].\""
+  allows_user_to_send_messages_to_individual_course__9347e1e2: "Gör att användare kan skicka ett meddelande till enskilda kursdeltagare."
+  allows_user_to_share_a_quiz_to_commons_6746e0da: "Gör att användare kan dela en quiz till Commons."
+  allows_user_to_view_a_course_s_sis_id_5c4a4c50: "Gör att användare kan se kursens SIS-ID."
+  allows_user_to_view_a_link_to_speedgrader_from_ass_8ed9b342: "Gör att användare kan se en länk till SpeedGrader från uppgifter."
+  allows_user_to_view_a_link_to_the_faculty_journal__13b353a8: |-
+      Gör det möjligt för en användare att koppla lärarkårjournalen i marginallisten till till sidan användarinformation.
+      Gör det möjligt för en användare att se information i lärarkårsjournalen
+      Gör et möjligt för användare att skapa nya poster i lärarkårsjournalen.
+  allows_user_to_view_a_link_to_the_faculty_journal__61d9560e: |-
+      Gör det möjligt för en användare att koppla lärarkårsjournalen i marginallisten till till sidan användarinformation.
+      Gör det möjligt för  användare att se information i lärarkårsjournalen för enskilda elever.
+      Gör et möjligt för användare att skapa nya poster i lärarkårsjournalen.
+  allows_user_to_view_account_analytics_98fbc6ad: "Gör att användare kan se kontoanalyser."
+  allows_user_to_view_all_course_groups_not_just_tho_bad6d687: "Gör att användare kan se alla kursgrupper och inte bar de som de är registrerade i, i fönstret Samarbeta med."
+  allows_user_to_view_all_student_assignment_submiss_d8ee5830: "Gör att användare kan se alla inlämnade elevuppgifter och lägga till kommentarer."
+  allows_user_to_view_and_add_users_in_a_collaborati_9ec3c68b: "Gör att användare kan se och lägga till användare i ett samarbete."
+  allows_user_to_view_and_configure_reports_in_accou_413e4e41: |-
+      Gör att användare kan se och konfigurera rapporter i kontoinställningarna.
+      Gör att användare kan se åtkomstrapporter och rapporter om elevers interagerande.
+      Gör att användare kan se information om den senaste aktiviteten och total aktivitet på sidan Personer.
+  allows_user_to_view_and_edit_the_sis_id_and_integr_f206fdcb: "Gör att användare kan se och redigera SIS-ID och Integrations-ID i en användares inloggningsinformation"
+  allows_user_to_view_and_insert_data_in_the_sis_id__921967c: "Gör att användare kan se och infoga data i fältet SIS-ID."
+  allows_user_to_view_and_link_questions_in_a_quiz_t_b971e002: "Gör att användare kan se och länka frågor i ett quiz till frågebanker på kontonivå. Om funktionen inaktiveras kan användaren endast se och länka till frågebanker i kursen. Aktiverar länken Hantera frågebanker på indexeringssidan Quiz"
+  allows_user_to_view_and_link_questions_in_a_quiz_t_d312a571: "Gör att användare kan se och länka frågor i ett quiz till frågebanker på kontonivå. Om funktionen inaktiveras kan användaren endast se och länka till frågebanker i kursen."
+  allows_user_to_view_and_manage_authentication_opti_e1bb0ad3: "Gör att användare kan se och hantera autentiseringsalternativ för hela kontot."
+  allows_user_to_view_and_manage_courses_in_the_acco_12333da2: "Gör att användare kan se och hantera kurser i kontot."
+  allows_user_to_view_and_manage_permissions_bdc80a1d: "Gör att användare kan se och hantera behörigheter."
+  allows_user_to_view_and_manage_quotas_tab_in_accou_935a7874: "Gör att användare kan lägga se och hantera fliken Kvoter kontoinställningarna. Användare kan konfigurera standardkurs samt lagringskvoter för grupper."
+  allows_user_to_view_and_manage_subaccounts_for_the_37d5120b: "Gör att användare kan se och hantera underkonton i kontot."
+  allows_user_to_view_and_manage_terms_for_the_accou_4547d971: "Gör att användare kan se och hantera villkoren för kontot."
+  allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: "Gör att användare kan se och hantera flikarna Inställningar och Notifikationer i kontoinställningarna."
+  allows_user_to_view_choose_home_page_and_course_se_6fd35f37: "Gör att användare kan se knapparna Välj startsida och Checklista för kursen på startsidan."
+  allows_user_to_view_course_analytics_through_the_c_5f24ec08: "Gör att användare kan se kursanalyser via kursöversikten. Gör att användare kan se elevanalyser."
+  allows_user_to_view_course_and_student_analytics_f_5e3dca12: "Gör att användare kan se kurs- och elevanalyser från kursens startsida eller sidan Personer."
+  allows_user_to_view_course_sis_id_3a1818a5: "Gör att användare kan se kursens SIS-ID."
+  allows_user_to_view_course_status_choose_home_page_b97cee14: "Gör att användare kan se knapparna Kursstatus, Välj startsida och Checklista för kursen på startsidan."
+  allows_user_to_view_create_edit_delete_and_publish_48716e21: "Gör att användare kan se, skapa, redigera, ta bort och publicera/återkalla sidor.\n\
+      Gör att användare kan se sidhistorik och konfigurera framsidan. "
+  allows_user_to_view_create_edit_delete_and_publish_9d6c0bfa: |-
+      Gör att användare kan se, skapa, redigera, ta bort och publicera/återkalla sidor.
+      Gör att användare kan se sidhistorik och konfigurera framsidan.
+  allows_user_to_view_enrollments_on_the_sections_ta_6279a03e: "Gör att användare kan se registreringar på fliken Avsnitt."
+  allows_user_to_view_faculty_journal_entries_in_the_3f58f09c: "Gör det möjligt för användare att se poster i lärarkårsjournalen i rapport om elevinteraktioner."
+  allows_user_to_view_gradebook_allows_user_to_expor_8ed9dfa8: |-
+      Gör att användare kan se bedömningsöversikten.
+      Gör att användare kan exportera bedömningsöversikten till en kommaavgränsad fil (CSV).
+      Gör det möjligt för användare att få åtkomst till bedömningsöversikten för uppfyllande av lärandemål (om den är aktiverad)
+  allows_user_to_view_grader_comments_on_a_rubric_in_2ac9f890: "Gör att användare kan se bedömningskommentarer i en matris i SpeedGrader."
+  allows_user_to_view_groups_in_a_course_8a95805b: "Gör att användare kan se grupper i en kurs."
+  allows_user_to_view_last_activity_and_total_activi_786a7286: "Gör att användare kan se information om den senaste aktiviteten och total aktivitet på sidan Personer."
+  allows_user_to_view_last_activity_total_activity_a_e0bee860: "Gör att användare kan se senaste aktivitet, total aktivitet och rapporter om elevers interagerande."
+  allows_user_to_view_list_of_users_in_the_account_1802ad42: "Gör att användare kan se användarlistan i kontot."
+  allows_user_to_view_list_of_users_in_the_course_pe_1b0b4bab: |-
+      Gör att användare kan se användarlistan på sidan Personer i kontot.
+      Gör att användare kan se knappen Tidigare registreringar på sidan Personer i kontot.
+  allows_user_to_view_login_ids_in_a_course_people_p_b2cfd83e: "Gör att användare kan se inloggnings-ID:t på sidan Personer i en kurs."
+  allows_user_to_view_login_logout_activity_of_users_9bf218f0: |-
+      Gör att användare kan se in-/utloggningsaktiviteter för användare i Administratörsverktyg.
+      Gör att användare kan söka i ändringsloggar för bedömningar efter bedömare eller elev i Administratörsverktyg
+  allows_user_to_view_previously_created_collaborati_31f4cfe2: |-
+      Gör att användare kan se tidigare skapade samarbeten.
+      Gör att användare kan redigera titel och beskrivning eller ta bort medarbetare för alla samarbeten.
+  allows_user_to_view_published_and_unpublished_cour_25a5dcc0: "Gör att användare kan se publicerat och återkallat kursinnehåll."
+  allows_user_to_view_student_context_cards_in_annou_dadef934: "Gör att användare kan se elevers kontextkort i diskussioner och meddelanden."
+  allows_user_to_view_student_grades_pages_e0091b20: "Gör att användare kan se bedömningssidor."
+  allows_user_to_view_student_quiz_logs_e1c4491: "Gör att användare kan se elevers quizloggar."
+  allows_user_to_view_student_results_and_or_access__60fac9: "Gör att användare kan se elevers poäng och/eller öppna ett quiz i SpeedGrader."
+  allows_user_to_view_student_specific_data_in_analy_4abbf6be: "Gör att användare kan se elevspecifika data i Analyser."
+  allows_user_to_view_the_announcements_link_in_cour_f6b03e9a: "Gör att användare kan se länken Meddelande i kursnavigeringen. Gör att användare kan se kursmeddelanden."
+  allows_user_to_view_the_course_grading_scheme_32a6042: "Gör att användare kan se kursens bedömningsschema."
+  allows_user_to_view_the_course_statistics_button_i_f44b2c7a: "Gör att användare kan se länken Kursstatistik i kursnavigeringen."
+  allows_user_to_view_the_discussions_link_in_course_2604505d: |-
+      Gör att användare kan se länken Diskussioner i kursnavigeringen.
+      Gör att användare kan se diskussioner i kursen.
+  allows_user_to_view_the_faculty_journal_link_in_gl_e3fd6889: "Gör det möjligt för användare att se lärarkårsjournallänken i Global navigation."
+  allows_user_to_view_the_group_home_pages_of_all_st_9d747525: |-
+      Gör att användare kan se gruppstartsidorna för alla elevgrupper.
+      Gör att användare kan öppna andra elevgrupper inom en gruppuppsättning med en direktlänk.
+  allows_user_to_view_the_moderate_button_for_modera_5f3c6d21: "Gör att användare kan se knappen Moderera för moderation av uppgifter. OBS! Den här behörigheter kommer att utgå. Om du vill att användare ska kunna se knappen Moderera, ska du aktivera Bedömningar – Välj slutbedömning för moderering."
+  allows_user_to_view_the_new_announcement_button_in_4aa7f936: |-
+      Gör att användare kan se knappen Nya meddelanden på startsidan.
+      Gör att användare kan lägga till meddelanden på sidan Meddelanden.
+  allows_user_to_view_the_people_link_in_course_navi_58b38f5d: "Gör att användare kan se länken Personer i kursnavigeringen."
+  allows_user_to_view_user_sis_ids_68a9d218: "Gör att användare kan se användarens SIS-ID."
+  allows_users_to_edit_conferences_2d3c960c: "Gör att användare kan redigera konferenser."
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Tillåt användare med internationella telefonnummer att ta emot meddelanden från Canvas."
   alumno_88c80e37: Alumno
   always_3a59e701: Alltid
@@ -1627,8 +1889,10 @@ sv-x-k12:
     student_in_course: 
       analytics: Analyser
       page_title: "Analyser: %{course} -- %{student}"
+  analytics_account_c2bf8cf6: "Analyser (konto)"
   analytics_account_name_filter_name_c0fb1a7b: "Analyser: %{account_name} -- %{filter_name}"
   analytics_c94ba601: Analyser
+  analytics_course_5d53aef7: "Analyser (kurs)"
   analytics_course_code_student_name_d63bab4c: "Analyser: %{course_code} -- %{student_name}"
   and_count_more_43eae021: "och %{count} mer..."
   and_more_1c35b232: "och mer..."
@@ -1681,6 +1945,7 @@ sv-x-k12:
     podcast_feed_description_group: "Alla media filer som antingen är länkade eller inbäddade i gruppen meddelanden \"%{group}\" kommer dyka upp i det här flödet."
     podcast_feed_name: "%{course} Meddelanden Podcastflöde"
   announcements_a4b8ed4a: Meddelanden
+  announcements_account_4e9df626: "Meddelanden (konto)"
   announcements_cannot_be_duplicated_2de8824c: "meddelanden kan inte dupliceras"
   announcements_deleted_successfully_7d77e9e1: "Aviseringar raderas framgångsrikt"
   announcements_list_c75fc413: "Lista med meddelanden"
@@ -1720,6 +1985,7 @@ sv-x-k12:
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Svaren kommer visas efter ditt sista försök"
   any_sub_account_ec7069f2: "Något underkonto"
   any_term_d49af19f: "Något team"
+  api_7bd66e19: API
   api_token_scopes_67b11c16: API-tokenområden
   app_b157c2b3: App
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "App Center kommer synas under \"Appar\" fliken på inställningssidan i antingen kursen eller kontot. URL som uppges bör leda till en giltig App Center slutpunkt (till exempel, %{url} -- se till att utelämna snedstrecket"
@@ -1817,10 +2083,12 @@ sv-x-k12:
   are_you_sure_you_want_to_delete_this_assignment_88be6f5e: "Är du säker på att du vill radera den här uppgiften?"
   are_you_sure_you_want_to_delete_this_comment_4ee386d: "Är du säker på att du vill ta bort den här kommentaren?"
   are_you_sure_you_want_to_delete_this_developer_key_9937481a: "Är du säker på att du vill radera den här utvecklarnyckeln?"
+  are_you_sure_you_want_to_delete_this_discussion_334554e0: "Är du säker på att du vill radera diskussionen?"
   are_you_sure_you_want_to_delete_this_event_824b1e33: "Är du säker på att du vill radera den här händelsen?"
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: "Är du säker på att du vill ta bort det här uppsättningen med bedömningsperioder?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Är du säker på att du vill radera den här bedömningsperioden?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Är du säker på att du vill radera det här bedömningsschemat?"
+  are_you_sure_you_want_to_delete_this_page_2185844: "Är du säker på att du vill ta bort denna sidan?"
   are_you_sure_you_want_to_delete_this_recording_a4aab14b: "Är du säker på att du vill radera denna inspelning?"
   are_you_sure_you_want_to_delete_this_rubric_any_co_29d7ac76: "Är du säker på att du vill radera den här matrisen? Varje kurs som för tillfället är kopplad till denna rubrik har fortfarande tillgång till den, men inga nya kurser kommer att kunna använda den."
   are_you_sure_you_want_to_delete_this_rubric_this_a_d4ff43c7: "Är du säker på att du vill radera den här matrisen? Den här åtgärden tar bort denna rubrikförening från alla uppgifter i den aktuella kursen, och tar bort eventuella befintliga bedömningar."
@@ -1933,6 +2201,7 @@ sv-x-k12:
   assignment_details_expanded_20c6f0c7: "Uppdragsdetaljer expanderade"
   assignment_does_not_exist_74178c34: "uppgift existerar inte"
   assignment_excused_eb6c08fa: "Uppgiften slipper göras"
+  assignment_graded_grade_on_assignment_name_in_cour_5082fd1: "Bedömd uppgift: %{grade} på %{assignment_name} i %{course_code}"
   assignment_graded_score_on_assignmentname_in_cours_1acbf85f: "Uppgiften bedömd: %{score} den %{assignmentName} i %{courseName}"
   assignment_grades_have_already_been_published_ff2d84c6: "Bedömning för uppgift har redan publicerats."
   assignment_group: 
@@ -1966,6 +2235,7 @@ sv-x-k12:
   assignment_id_96baa1b7: uppgifts-id
   assignment_id_b040cee0: Uppgifts-Id
   assignment_menu_91fe3716: Uppgiftsmeny
+  assignment_missing_assignment_name_in_course_code_7f940b35: "Uppgift saknas: %{assignment_name} i %{course_code}"
   assignment_missing_assignment_name_in_course_name_680a8338: "Uppgift saknas: %{assignment_name} i %{course_name}"
   assignment_muted_4cb590a4: "Uppgiften har tystats"
   assignment_muted_8d74bfa0: "Uppgiften är tystad"
@@ -1990,6 +2260,7 @@ sv-x-k12:
   assignment_selection_6bff05c4: Uppgiftssortiment
   assignment_title_82b4422e: "Uppgiftstitel:"
   assignment_title_8a707dd2: uppgiftstitel
+  assignment_title_e3192978: "Uppgift: %{title}"
   assignment_url_37c849c6: "uppgiftss url"
   assignment_was_deleted_8320d26d: "Uppgiften raderades"
   assignment_weights_d4bcf9ab: Uppgiftsvikter
@@ -2069,6 +2340,7 @@ sv-x-k12:
       due: Färdiggjord
       due_date: Färdiggjord
       multiple_dates: "Flera datum"
+      todo_date: "Att göra"
     delete_group: 
       cancel: Avbryt
       delete: "Radera grupp"
@@ -2257,6 +2529,7 @@ sv-x-k12:
       peer_reviews_header: Kamratbedömningar
       reviews_per_user: "Bedömningar per användare"
     points_possible_number: "Möjliga poäng måste vara ett tal"
+    processing_submission: "Canvas behandlar din inlämnade uppgift. Du kan nu lämna den här sidan så skickar vid dig ett e-postmeddelande när din inlämnade uppgiften har behandlats klart."
     redirect_page: 
       redirect_message: |-
           Denna inlämning va en url, vi tar dig till url-länken nu.
@@ -2471,9 +2744,11 @@ sv-x-k12:
   assignments_api: 
     invalid_date_time: "Ogiltig datumtid för %{attribute}"
     invalid_submission_types: "Ogiltiga inlämningstyper"
+  assignments_gradebook_f57c164a: "Uppgifter, bedömningsöversikt"
   assignments_in_this_group_have_no_points_possible__ab0adb72: "Uppgifter i den här gruppen har inga möjliga poäng och kommer inte inkluderas vid uträkningen av bedömning."
   assignments_list_fe3e54be: Uppgiftslista
   assignments_settings_30613d0c: Uppgiftsinställningar
+  assignments_speedgrader_2fbd6df4: "Uppgifter, SpeedGrader"
   assignments_tutorial_tray_4cc844b: "Uppgifter Tutorial Tray"
   associated_74756cc4: Associerad
   associated_account_course_id_d87a01c5: "Associerat konto/kurs-ID"
@@ -2507,6 +2782,7 @@ sv-x-k12:
   attachment_deffe5a9: Bilaga
   attempt_3dd42b18: försök
   attempt_to_detect_an_appropriate_field_separator_i_4e59eb0c: "Försök att upptäcka en lämplig fältseparator i betygsbok-exporter baserat på sifferformatet för ditt språk."
+  attendance_ca433183: Närvaro
   attention_aaca1f1d: Lystring!
   attribute_d9f3af72: Attribut
   attributes_locked_1a1a0f46: "%{attributes} låst"
@@ -2518,6 +2794,7 @@ sv-x-k12:
     corrupted: "Detaljer är inte tillgängliga"
     login: "LOGGA IN"
     logout: "LOGGA UT"
+  authentication_1b518c38: Verifiering
   authentication_context_60748f2f: Autentiseringskontext
   authentication_provider: 
     default_delegated_login_handle_name: "Logga in"
@@ -2653,6 +2930,7 @@ sv-x-k12:
   available_until_lock_at_ab022445: "Tillgänglig tills %{lock_at}"
   availableslots_available_87b8b69d: "%{availableSlots} Tillgänglig"
   availableslots_more_available_be5193a8: "%{availableSlots} mer tillgängligt"
+  avatar_8a8aa935: Profilbild
   avatar_for_author_2eabbf55: "Profilbild för %{author}"
   avatar_for_studentname_8ea511ae: "Profilbild för %{studentName}"
   average_49c63f9b: Genomsnitt
@@ -2704,10 +2982,47 @@ sv-x-k12:
   blueprint_5cca2ef: Blueprint
   blueprint_course_associations_72c9609: "Blueprint kursföreningar"
   blueprint_course_e16ed131: Kursplan
+  blueprint_course_id_9ee357fb: blueprint_course_id
   blueprint_course_information_term_course_10d5cf30: "Blueprint kurs-information: %{term} - %{course}"
   blueprint_courses_9dd321b8: Kursplaner
   blueprint_courses_add_edit_associate_delete_bc26d5c2: "Kursutkast-kurser - lägg till / redigera / associera / radera"
+  blueprint_courses_are_an_account_level_feature_opt_3388f731: "Blueprint-kurser är ett funktionsalternativ på kontonivå.\n\n\
+      Om du vill redigera låsinställningarna från indexeringssidan Diskussioner måste även Kurs – lägg till/redigera/ta bort och Diskussioner – moderera vara aktiverad. "
   blueprint_courses_create_edit_associate_delete_bf41988e: "Planering av kurser (skapa / redigera /associera / ta bort)"
+  blueprint_courses_is_an_account_level_feature_opti_38676924: "Blueprint-kurser är ett funktionsalternativ på kontonivå. Kursroller kan endast hantera blueprint-kurser om de läggs till i blueprint-kursen med lärar-, TA- eller designerroll. Om du vill öppna sidofältet blueprint-kurser måste Kurser – lägg till/redigera/ta bort kurser vara aktiverad. Om du vill lägga till en kopplad kurs måste även Kurser – visa lista och Kurser – lägg till/redigera/ta bort vara aktiverad. Om du vill redigera låsinställningar på blueprint-objekttyper måste även Kurser – lägg till/redigera/ta bort vara aktiverad."
+  blueprint_courses_is_an_account_level_feature_opti_3bf307d: "Blueprint-kurser är ett funktionsalternativ på kontonivå. Om du vill redigera låsinställningarna på indexeringssidan Diskussioner måste även Kurser – lägg till/redigera/ta bort och Diskussioner – visa vara aktiverad. Om den här behörigheten inte är aktiverad och Kurser – lägg till/redigera/ta bort och Diskussioner – visa är aktiverad, kan blueprint-låsinställningar redigeras för enskilda diskussioner."
+  blueprint_courses_is_an_account_level_feature_opti_4c9fa399: |-
+      Blueprint-kurser är ett funktionsalternativ på kontonivå.
+      Om du vill redigera låsinställningarna från indexeringssidan Uppgifter måste även Kurser – lägg till/redigera/ta bort vara aktiverad. Om den här behörigheten inte är aktiverad och Kurser – lägg till/redigera/ta bort är aktiverad, kan blueprint-låsinställningar för en uppgift hanteras från uppgiftens informationssida.
+      Om du vill redigera låsinställningarna på ett enskilt quiz, eller på indexeringssidan Quiz, måste även Kurser – lägg till/redigera/ta bort vara aktiverad.
+  blueprint_courses_is_an_account_level_feature_opti_580ba84e: |-
+      Blueprint-kurser är ett funktionsalternativ på kontonivå.
+      Om du vill redigera låsinställningarna från indexeringssidan Sidor måste även Kurser – lägg till/redigera/ta bort vara aktiverad. Om den här behörigheten inte är aktiverad och Kurser – lägg till/redigera/ta bort och Diskussioner – visa är aktiverad, kan blueprint-låsinställningar redigeras på enskilda sidor.
+  blueprint_courses_is_an_account_level_feature_opti_8429207: "Blueprint-kurser är ett funktionsalternativ på kontonivå. Om du vill redigera blueprint-kursinställningar måste även blueprint-kurser – lägg till/redigera/ta bort vara aktiverad. Om du vill lägga till en kopplad kurs måste även blueprint-kurser – lägg till/redigera/ta bort och Kurser – visa lista vara aktiverade. Om du vill redigera låsinställningar på blueprint-objekttyper måste den här behörigheten vara aktiverad. Om du vill redigera låsinställningarna på filer måste även Kursfiler – lägg till/redigera/ta bort vara aktiverad. Om du vill redigera låsinställningarna för quiz måste även Uppgifter och Quiz – lägg till/redigera/ta bort vara aktiverad."
+  blueprint_courses_is_an_account_level_feature_opti_a90144eb: |-
+      Blueprint-kurser är ett funktionsalternativ på kontonivå.
+      
+      Om du vill lägga till kopplade kurs måste även blueprint-kurser – lägga till/redigera/koppla/ta bort och Kurser – lägg till/redigera/ta bort vara aktiverade.
+  blueprint_courses_must_be_enabled_for_an_account_b_188041e1: |-
+      Administratören måste aktivera blueprint-kurser i ett konto.
+      Om du vill redigera låsinställningarna för kursfiler måste även Kurser – lägg till/redigera/ta bort vara aktiverad.
+  blueprint_courses_must_be_enabled_for_an_account_b_25a8af6a: |-
+      Administratören måste aktivera blueprint-kurser i ett konto.
+      Kursroller kan endast hantera blueprint-kursinnehåll om de läggs till i blueprint-kursen med lärar-, TA- eller designerroll.
+  blueprint_courses_must_be_enabled_for_an_account_b_45d8df0c: |-
+      Administratören måste aktivera blueprint-kurser i ett konto.
+      
+      Kursroller kan endast hantera blueprint-kursinnehåll om de läggs till i blueprint-kursen med lärar-, TA- eller designerroll.
+      
+      Om du vill redigera låsinställningarna från indexeringssidan Diskussioner måste även Diskussioner – moderera vara aktiverad.
+  blueprint_courses_must_be_enabled_for_an_account_b_79b2d93e: |-
+      Administratören måste aktivera blueprint-kurser i ett konto.
+      Kursroller kan endast hantera blueprint-kursinnehåll om de läggs till i blueprint-kursen med lärar-, TA- eller designerroll.
+      Även om den här behörigheten är inaktiverad kan en användare ändå justera låsinställningar för innehåll på enskilda sidor i en blueprint-huvudkurs.
+  blueprint_courses_must_be_enabled_for_an_account_b_e8e1984d: |-
+      Administratören måste aktivera blueprint-kurser i ett konto.
+      Kursroller kan endast hantera blueprint-kursinnehåll om de läggs till i blueprint-kursen med lärar-, TA- eller designerroll.
+      Även om den här inställningen är inaktiverad och Diskussioner –visa är aktiverad, kan en användare ändå justera låsinställningar för innehåll i enskilda diskussioner i en Blueprint-huvudkurs.
   blueprint_information_95dcef55: "Blueprint information"
   blueprint_settings_233e909a: "Blueprints inställningar"
   body_9f663faf: Brödtext
@@ -2717,6 +3032,15 @@ sv-x-k12:
   bookmark_service: 
     default_title: "Ingen titel"
   bookmarks_5b5b81c9: Bokmärken
+  both_discussions_create_and_discussions_moderate_a_c238f67: |-
+      Båda diskussioner - skapa och diskussioner - moderera gör det möjligt för en användare att skapa en diskussion i sidan Diskussioner. Om detta tillstånd är aktiverat, krävs inte Diskussioner - skapa.
+      Om du vill se diskussioner i en kurs måste Diskussioner – visa vara aktiverad.
+      Om du vill svara på en diskussion måste även Diskussioner – publicera inlägg vara aktiverad. Om du vill redigera uppgiftsinformation för en diskussion måste även Uppgifter och Quiz – lägg till/redigera/ta bort vara aktiverad.
+  both_discussions_create_and_discussions_moderate_a_f20cc937: |-
+      Båda diskussioner - skapa och diskussioner - moderera gör det möjligt för en användare att skapa en diskussion i sidan Diskussioner. Om detta tillstånd är aktiverat, krävs inte Diskussioner - skapa.
+      Om du vill se diskussioner i en kurs måste Diskussioner – visa vara aktiverad.
+      Om du vill svara på en diskussion måste även Diskussioner – publicera inlägg vara aktiverad.
+      Om du vill redigera uppgiftsinformation för en diskussion måste även Uppgifter och Quiz – lägg till/redigera/ta bort vara aktiverad.
   bottom_15a2a9be: "Längst ner"
   bounce_count_reset_c4c2218f: "Antal avvisanden återställt!"
   bounce_reason_689ed4c6: Avvisande-anledning
@@ -2724,6 +3048,7 @@ sv-x-k12:
   brazil_55_34103ffa: "Brasilien (+55)"
   breadcrumb_1_cb3c504: "Länkstig 1"
   breadcrumb_2_95ba94be: "Länkstig 2"
+  brick_f2656265: Tegelsten
   bring_existing_content_from_another_course_or_cour_6e740692: |-
       Ta befintligt innehåll från en annan kurs eller
       kurshanteringssystem till din Canvas-kurs.
@@ -2836,6 +3161,8 @@ sv-x-k12:
     unpublished: Avpublicerad
     update: Uppdatera
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Alla länkar är från start aktiverade för en kurs. Elever ser inte en sektion som saknar innehåll. Till exempel, om du inte har skapat en Quiz ser inte eleverna quizmenyn. Du kan sortera och avaktivera enskilda länkar om det är delar av kursen som inte du vill att eleverna ska ha tillgång till."
+  by_default_students_are_able_to_create_groups_to_r_ba7f2450: "Elever kan som standard skapa grupper. Om du vill hindra att elever skapar grupper ska du avmarkera kryssrutan Låt elever organisera egna grupper i kursinställningarna."
+  by_default_students_can_always_create_groups_in_a__149d08b7: "Elever kan som standard skapa grupper i en kurs. Om du vill hindra elever från att skapa grupper måste Kurser – lägg till/redigera/ta bort vara aktiverad, och kryssrutan Låt elever organisera egna grupper i kursinställningar vara avmarkerad."
   by_lti_2_registration_url_e421e523: "Genom LTI 2 Registrerings URL"
   by_url_a163275e: "Genom URL"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
@@ -3058,6 +3385,12 @@ sv-x-k12:
       date: "Datum:"
       time: "Tid:"
       title: "Titel:"
+    edit_to_do_item: 
+      date: "Datum:"
+      links: 
+        more_options: "Fler alternativ"
+      time: "Tid:"
+      title: "Titel:"
     end_before_start_error: "Startiden måste vara före sluttiden"
     ends_in_past_error: "Du kan inte skapa en bokad händelse som slutar i förfluten tid"
     errors: 
@@ -3218,6 +3551,10 @@ sv-x-k12:
   can_edit_this_page_role_selection_6ccec3c7: "Kan redigera den här sidans rollval"
   can_interact_with_users_in_their_section_only_48cb8c43: "Kan bara integrera med användare i sin sektion"
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "Kan inte räkna resultat innan en uppgift har möjliga poäng"
+  can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n\
+      \x20             Det går inte att ta bort uppgifter som är baserade på matriskopplingar.\n\
+      \x20             Om du vill ta bort de här kopplingarna måste du ta bort raden från tillgångens matris\"\n\
+      \x20           "
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Kan inte radera grupperingar baserat på matris-associationer. För att ta bort dessa associeringar måste du ta bort raden från matrisen."
   can_t_enable_anonymous_grading_and_group_assignmen_9938416e: "Kan inte aktivera anonym bedömning och gruppuppgifter tillsammans"
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Kan inte utföra en jämförelse mot mer än en fil av samma typ"
@@ -3246,6 +3583,7 @@ sv-x-k12:
   cannot_be_present_when_course_id_is_present_785e6a59: "kan inte vara nuvarande när course_id är nuvarande"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Kan inte åsidosätta inlämningsdatum till ett datum i en stängd bedömningsperiod"
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "Kan inte ändra rollnamn till %{label}: används redan"
+  cannot_change_the_default_term_name_edc2279b: "Det går inte att ändra standardnamnet för terminen"
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Kan inte ändra ett åsidosatt  inlämningsdatum i en stängd bedömningsperiod"
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "Kan inte ändra inlämningsdatum till ett datum i en stängd bedömningsperiod"
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: "Kan inte ändra inlämningsdatum när datumet är i en stängd bedömningsperiod"
@@ -3288,6 +3626,7 @@ sv-x-k12:
   canvas_cartridge_display: "Canvas Common Cartridge"
   canvas_cartridge_file_description: "Canvas kursexport-paket"
   canvas_cartridge_name: "Canvas Cartridge Importerare"
+  canvas_catalog_87f39420: "Canvas Catalog"
   canvas_cloud_information_fdd404f2: "Canvas Cloud information"
   canvas_course_id_db4de2b8: canvas_course_id
   canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: "Länkar i Canvas översikt kommer navigera till Katalogöversikt"
@@ -3397,10 +3736,12 @@ sv-x-k12:
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Klicka på en ögonblicksbild för att återgå till testversionen som det var när ögonblicksbilden togs. Notera: Du kommer att förlora eventuellt arbete som du har gjort sedan ögonblicksbilden togs, och det kan inte göras ogjort!"
   click_to_add_a_name_6cf551b0: "Klicka för att lägga till ett namn"
   click_to_change_profile_picture_for_display_name_6a4b41db: "Klicka för att ändra profilbild för %{display_name}"
+  click_to_collapse_outcome_details_1d751617: "Klicka för att dölja information om lärandemål"
   click_to_create_a_new_user_for_address_325f6683: "Klicka för att skapa en ny användare för %{address}"
   click_to_create_a_new_user_for_login_56d2daf5: "Klicka för att skapa en ny användare för %{login}"
   click_to_edit_drag_to_reorder_ab725681: "Klicka för att redigera, dra och omorganisera"
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Klicka för att lägga till kommentarer, ifall eleven väljer det här svaret"
+  click_to_expand_outcome_details_74a2a967: "Klicka för att visa information om lärandemål"
   click_to_load_a020891b: "(klicka för att ladda)"
   click_to_report_profile_picture_370f9625: "Klicka för att rapportera profilbilden"
   click_to_report_profile_picture_for_display_name_9ffbcc86: "Klicka för att rapportera profilbild för %{display_name}"
@@ -3584,6 +3925,7 @@ sv-x-k12:
   common_cartridge_html_file_to_page_conversion_7bf9678: "Common Cartridge HTML-fil till sidokonvertering"
   common_cartridge_name: "Common Cartridge importör"
   common_timezones_2b00baba: "vanliga tidszoner"
+  commons_ed0252fb: Commons
   communicate_to_your_students_exactly_what_will_be__7312d45d: "Kommunicera till dina elever exakt vad som kommer att krävas av dem under kursens gång i kronologisk ordning. Generera en inbyggd läroplan baserad på uppgifter och händelser som du har skapat."
   communication_5255723c: Kommunikation
   communication_channel: 
@@ -4436,6 +4778,8 @@ sv-x-k12:
     unarchive: "Ta bort arkivering"
     unstar: "Ta bort stjärnmarkering"
   conversations_69a8dc26: Konversationer
+  conversations_send_messages_to_entire_class_3f414741: "Konversationer – skicka meddelanden till hela klassen"
+  conversations_send_messages_to_individual_course_m_733620b: "Konversationer – skicka meddelanden till enskilda kursdeltagare"
   copy_9748f9f: Kopiera
   copy_to_folder_32ecc3c3: "Kopiera till mapp"
   copying_628a9607: Kopiera...
@@ -4602,6 +4946,7 @@ sv-x-k12:
   course_add_edit_delete_101dde06: "Kurs - lägg till / redigera / radera"
   course_add_remove_students_8d03ba9d: "Kurs - lägg till / ta bort elever"
   course_add_remove_teachers_course_designers_or_ta__d6aca35f: "Kurs - lägg till / ta bort lärare, kursdesigners eller TA:er"
+  course_announcement_title_in_course_code_2e317aa2: "Kursmeddelande: \"%{title}\" i %{course_code}"
   course_announcements_76b07340: Kursmeddelande
   course_assignments_833b8cf1: Kursuppgifter
   course_assignments_menu_fa6aeb23: Kursuppgiftsmeny
@@ -4624,6 +4969,7 @@ sv-x-k12:
   course_copy_name: "Kopiera Canvas-kurs"
   course_copy_no_course_error: "Kurskällan hittades inte"
   course_copy_not_allowed_error: "Du får inte kopiera kurskällan"
+  course_course_d1c78210: "Kurs: %{course}"
   course_discussions_38c0b74f: Kursdiskussioner
   course_ends_at_e8b166df: "Kursen avslutas den"
   course_export_from_date_f4e2a3e4: "*Kursexport från %{date}*"
@@ -4673,10 +5019,14 @@ sv-x-k12:
   course_files_add_edit_delete_24678a2f: "Kursfiler - lägg till / redigera / radera"
   course_found_f5a40cd3: "Kurs hittad"
   course_found_not_deleted_a20f72f0: "Kurs hittad (ej raderad)"
+  course_grade_grade_in_course_code_9fa854db: "Kursbedömning: %{grade}% i %{course_code}"
   course_grade_grade_in_coursename_3cdd8551: "Kursbedömning: %{grade} i %{courseName}"
   course_grades_22adc27e: Kursbedömningar
+  course_grading_schemes_can_be_enabled_disabled_in__26b298b3: "Bedömningsscheman för kurser kan aktiveras/inaktiveras i kursinställningar."
+  course_groups_e8239a1e: Kursgrupper
   course_has_no_active_instructors_with_this_id_74f1d8a: "Kursen har inga aktiva instruktörer med detta ID"
   course_home_4c4c0107: "Kurs hem"
+  course_home_page_5c61dba7: Kursstartsida
   course_home_sub_navigation_b1ee6b03: "Kurs hem Sub Navigation"
   course_id_8bd2a21c: Kurs-ID
   course_id_a7c924d5: kurs-id
@@ -4824,7 +5174,13 @@ sv-x-k12:
       move_course: "Flytta kurs"
       reset_course_content_dialog_help: "Återställ kursinnehållet"
       section_enrollments: Sektionsregistreringar
+  course_settings_course_details_tab_allows_user_to__2eb67ad2: "Kursinställningar (fliken Kursinformation) Ger användare åtkomst till fliken Navigering i kursinställningar. Ger användare åtkomst till knapparna Elevens Vy (testelev), Kopiera den här kursen, Återställ kursinnehåll och Ta bort den här kursen permanent. Gör att användare kan redigera kursbild, kursnamn, kurskod, tidszon, underkonto, kursperiod och andra alternativ i fliken Kursinformation."
+  course_settings_course_details_tab_fabf1adc: "Kursinställningar (fliken Kursinformation)"
+  course_settings_f6d0bbf8: Kursinställningar
+  course_settings_sections_tab_4ae03a9a: "Kursinställningar (fliken Avsnitt)"
   course_settings_sub_navigation_b95deae: "Kursinställningar under-navigering"
+  course_setup_checklist_78dcff7e: "Checklista för kursen"
+  course_setup_checklist_course_home_page_f8baa04a: "Checklista för kursen, kursstartsida"
   course_setup_wizard_is_showing_a7c087c1: "Kursinställning Wizard visas."
   course_sis_7ae8f649: "kurs sis"
   course_sis_df8b379: Kurs-Sis
@@ -5237,8 +5593,14 @@ sv-x-k12:
     unauthorized: 
       invalid_link: "Anmälningslänken du använde är inte längre giltig. Vänligen kontakta kursinstruktören för att säkerställa att du fortfarande är registrerad."
   courses_43204aae: Kurser
+  courses_account_72e4fca7: "Kurser (konto)"
+  courses_account_navigation_f84fdec3: "Kurser (kontonavigering)"
+  courses_add_edit_delete_aa2b55d3: "Kurser – lägga till/redigera/ta bort"
   courses_navigation_menu_b3638384: "Kurs navigeringsmeny"
   courses_undelete_1f689a97: "Kurser - ångra radera"
+  courses_view_change_logs_25af6a45: "Kurser – visa ändringsloggar"
+  courses_view_list_47885585: "Kurser – visa lista"
+  courses_view_usage_reports_3daed8fe: "Kurser – visa användningsrapporter"
   create_132b3be1: Skapa
   create_14873ed7: skapa
   create_a_64f6f82: "Skapa en"
@@ -5264,6 +5626,7 @@ sv-x-k12:
   create_educational_resources_8219326e: "Skapa utbildningsresurser"
   create_failed_15d07ad4: "Skapandet misslyckades"
   create_new_course_e3ef9cd0: "Skapa ny kurs"
+  create_new_discussions_6ab69da2: "Skapa nya diskussioner"
   create_new_e0946c49: "Skapa ny"
   create_slots_71dbb2f8: "Skapa öppningar"
   create_theme_based_on_40651ed3: "Skapa tema baserat på"
@@ -5626,6 +5989,8 @@ sv-x-k12:
   delete_current_message_5da0221a: "Radera nuvarande meddelande"
   delete_current_module_item_21fefc54: "Radera nuvarande modul/objekt"
   delete_discussion_title_a28df8b6: "Ta bort diskussion %{title}"
+  delete_domain_5ba75b7c: "Radera domän"
+  delete_domain_domain_c5b68f5: "Radera domän %{domain}"
   delete_entry_title_5e59727b: "Ta bort inlägg %{title}"
   delete_feedname_1ac9a4a4: "Radera %{feedName}"
   delete_grading_period_dba36e59: "Radera bedömningsperiod"
@@ -5641,6 +6006,7 @@ sv-x-k12:
   delete_requirement_bce2d943: "Radera uppgift"
   delete_role_label_succeeded_1690aa28: "Radering av roll %{label} genomförd"
   delete_rubric_9b66412d: "Ta bort matris"
+  delete_rubric_title_ac3a24e6: "Radera rubrik: %{title}"
   delete_section_name_a48d9d79: "Ta bort avsnitt \"%{name}\""
   delete_selected_a023ccf8: "Radera valda"
   delete_selected_announcements_69e23710: "Radera valda aviseringar"
@@ -5748,6 +6114,22 @@ sv-x-k12:
   description_436c48d7: Beskrivning
   details_98a31b68: Detaljer
   details_a6f427c3: "Detaljer:"
+  determines_visibility_and_management_of_outcomes_t_79ca45b: |-
+      Fastställer synlighet och hantering av fliken Poäng i kontonavigering.
+      Gör att användare kan skapa, importera, redigera och ta bort poäng och resultatgrupper på konto- och kursnivå.
+  determines_visibility_and_management_of_rubrics_ta_88a65a22: |-
+      Fastställer synlighet och hantering av fliken Rubriker i kontonavigering.
+      Gör att användare kan hantera matriser.
+  determines_visibility_and_management_of_sis_import_a91ed255: "Anger synlighet och hantering av fliken Import av Elevinformation i kontonavigering."
+  determines_visibility_and_management_of_the_questi_fbf70ba9: "Anger synlighet och hantering av länken Frågebanker i kontonavigering."
+  determines_visibility_of_sis_import_tab_in_account_5180b8e8: |-
+      Anger synlighet av fliken Import av Elevinformation i kontonavigering.
+      Gör att användare kan se tidigare datum, fel och importerade objekt för SIS-importer.
+  determines_visibility_of_the_course_activity_optio_2446c4b3: "Anger synlighet för alternativet Kursaktivitet i fliken Loggning för Administratörsverktyg. Gör att användare kan se information om kursaktivitet för kontot."
+  determines_visibility_of_the_grade_change_activity_6c23036b: "Anger synlighet för alternativet Ändringsaktivitet för bedömningar i fliken Loggning för Administratörsverktyg."
+  determines_whether_a_publish_course_option_is_incl_9bf770e9: "Anger om alternativet Publicera kurs ska finnas på kursens startsida."
+  determines_whether_a_publish_course_option_is_incl_ac5eed8f: "Anger om alternativet Publicera kurs ska finnas på kursens checklista och startsida."
+  determines_whether_the_course_setup_checklist_opti_fd5a8f70: "Anger om alternativet Checklista för kursen ska finnas på kursens startsida."
   developer_key: 
     edit_key: "Redigera den här nyckeln"
   developer_key_921ddbae: Utvecklingsnyckel
@@ -5808,6 +6190,7 @@ sv-x-k12:
   disabling_f594bda: Avaktiverar...
   disabling_post_to_sis_is_not_available_for_non_pub_ee031373: "Inaktivering av Post till SIS är inte tillgängligt för icke publicerade kurser"
   disabling_sync_to_name_failed_e7521ebb: "Avaktivering av synkronisering för %{name} misslyckades"
+  disabling_this_permission_will_override_if_enabled_8d9c42f5: "Om den här behörigheten inaktiveras åsidosätts (om aktiverad) Rubriker – lägg till/redigera/ta bort behörigheter, och förhindrar användare från att skapa eller redigera matriser från en enskild uppgift. Men även om Måluppfyllelser – lägg till/redigera/ta bort är aktiverad, kan användare ändå lägga till matriser via Poäng – hantera matriser."
   disallow_comments_6d04b47a: "Tillåt inte kommentarer"
   disallow_replies_for_title_ca3806b2: "Tillåt inte svar för %{title}"
   disccussions_515a3a99: Diskussioner
@@ -5850,6 +6233,8 @@ sv-x-k12:
         other: "Det här är en bedömd diskussion: *%{count} poäng möjliga*"
       show_due_dates: "Visa inlämningsdatum"
       until: Tills
+    assignment_todo: 
+      todo_date: "Att göra-datum: %{date}"
     cannot_unpublish_with_replies: "Kan inte avpublicera om det finns svar från elever"
     confirm_delete_announcement: 
       one: "Är du säker på att du vill radera det här meddelandet?"
@@ -6093,6 +6478,7 @@ sv-x-k12:
     unsubscribed: "Prenumerationen avslutad"
     unsubscribed_hint: "Du prenumererar inte på det här ämnet. Klicka för att prenumerera."
   discussions_a5f96392: Diskussioner
+  discussions_create_94dff604: "Diskussioner - skapa"
   discussions_moderate_d1e69c7e: "Diskussioner - moderera"
   discussions_post_62f64091: "Diskussioner - posta"
   discussions_tutorial_tray_4ef79bcc: "Diskussions handledning"
@@ -6115,6 +6501,7 @@ sv-x-k12:
   divide_into_equal_time_slots_in_minutes_234312fa: "Dela in i lika tidsluckor (i minuter"
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Räkna inte med den här uppgiften i slutbedömningen"
   do_nothing_9672b478: "Gör ingenting"
+  does_not_meet_expectations_b0736d20: "Möter inte förväntningarna"
   domain_3b54c511: Domän
   domain_is_required_1d4c8b25: "Domän krävs"
   dominican_republic_1_3cef4021: "Dominikanska Republiken (+1)"
@@ -6137,10 +6524,12 @@ sv-x-k12:
   download_report_77164f62: "Ladda ner rapport"
   download_scores_generated_on_date_ff5b9cd2: "Ladda ner resultat genererade den %{date}"
   download_student_analysis_report_statuslabel_1471c8c2: "Ladda ner elevens analysrapport %{statusLabel}"
+  download_submission_comments_2a6c0395: "Ladda ner inlämningskommentarer"
   download_submissions_7454665f: "Ladda ner inlämningar"
   download_the_complete_list_of_errors_and_warnings__7d993f7b: "Hämta hela listan av fel och varningar här."
   download_this_file_669f9174: "Ladda ner den här filen"
   downloading_course_content_allows_access_to_conten_164d9336: "Nerladdning av kursinnehåll ger tillgång till innehållet offline. Innehållet kan vara filer, sidor, uppgifter, diskussionsämnen eller quizzes. Klicka på \"Generera ePub\" för varje kurs och öppna med en eReader mjukvara för att visa."
+  draft_92507c72: (utkast)
   draft_comment_b2376ea4: "Utkast kommentar"
   drag_and_drop_or_click_to_browse_your_computer_2b46a2b6: "Dra och släpp, eller klicka för att bläddra i din dator"
   drag_and_drop_your_image_here_or_7fba7c14: "Dra och släpp din bild här eller"
@@ -6199,6 +6588,7 @@ sv-x-k12:
   duplicate_module_name_ab26e5c3: "Duplicera %{module_name}"
   duplicate_modules_8ea35557: "Duplicerade moduler"
   duplicate_provider_provider_d9842134: "Duplicera leverantör %{provider}"
+  duplicate_this_module_79ca8243: "Duplicera den här modulen"
   duplicating_calendar_events_9932cd37: "Duplicerar kalenderhändelser"
   duplicating_module_9727f5e4: "Duplicerar modul..."
   duplicating_module_ae6670b0: "Duplicerar modul"
@@ -6272,6 +6662,7 @@ sv-x-k12:
     titles: 
       edit_rubric_rating: "Redigera ranking"
       find_existing_rubric: "Hitta befintlig matris"
+  edit_rubric_title_104d6fd2: "Redigera matris: %{title}"
   edit_section_name_558cc89: "Redigera avsnitt \"%{name}\""
   edit_survey_b0d6890d: "Redigera undersökning"
   edit_term_name_29a8a322: "Redigera term %{name}"
@@ -6793,6 +7184,7 @@ sv-x-k12:
   example_https_schoolofrock_edu_d4326f03: "exempel: \"https://schoolofrock.edu\""
   example_item_scores_6726c689: "Exempel föremålsresultat"
   example_school_of_rock_41f32c31: "exempel: \"School of Rock\""
+  exceeds_expectations_5910fc3a: "Överträffar förväntningarna"
   exceeds_mastery_1f995dce: "Överträffar målen"
   excuse_this_assignment_for_the_selected_student_af04e132: "Låt den valda eleven hoppa över uppgiften"
   excused_3aab77: utelämnas
@@ -6814,6 +7206,8 @@ sv-x-k12:
   export_report_7c5899e: "Exportera rapporten"
   exported_package_history_bfca44b9: "Exporterade pakethistorik"
   exporting_b1eab154: Exporterar
+  external_apps_account_course_settings_c44af5ef: "Externa appar (konto-/kursinställningar)"
+  external_apps_course_settings_1f045644: "Externa appar (kursinställningar)"
   external_apps_f5490181: "Externa Appar"
   external_collaborations_tool_a4899abb: "Externt Samarbetsverktyg"
   external_content: 
@@ -6889,6 +7283,7 @@ sv-x-k12:
   extract_error_error_file_names_a4989ed0: "Extraktfel, %{error}: %{file_names}"
   extreme_critical_emergency_80b3dbda: "EXTREMT KRITISKT NÖDFALL!"
   faculty_journal_5634938e: Lärarkårsjournal
+  faculty_journal_manage_entries_efc09599: "Lärarkårsjournal - hantera poster"
   fail_62dbb06a: misslyckades
   failed_276786d: Misslyckad
   failed_307449e1: "Misslyckades:"
@@ -6906,6 +7301,7 @@ sv-x-k12:
   failed_to_delete_role_label_27959de3: "Kunde inte radera roll %{label}"
   failed_to_import_media_objects_4c1fcb4f: "Misslyckades att importera mediaobjekt"
   failed_to_load_external_feeds_7ac8411d: "Misslyckades med att ladda externa flöden"
+  failed_to_load_recent_activity_d3e5adeb: "Det gick inte att ladda ner senaste aktivitet"
   failed_to_log_in_7ceec561: "Misslyckades att logga in"
   failed_to_save_dashboard_selection_32e71c72: "Misslyckades med att spara meny-alternativet"
   failed_to_save_please_try_again_later_bb7070fb: "Misslyckades att spara, vänligen försök igen senare"
@@ -6937,6 +7333,8 @@ sv-x-k12:
       no_features_available: "Inga funktioner är för närvarande tillgängliga."
   feature_flags_52141c74: Funktionsflaggor
   feature_flags_enable_disable_32e8f1ab: "Funktionsflaggor - aktivera / avaktivera"
+  feature_options_account_settings_294a39f8: "Funktionsalternativ (kontoinställningar)"
+  feature_options_enable_disable_7e748054: "Funktionsalternativ – aktivera/inaktivera"
   features: 
     allow_opt_out_of_inbox: "Tillåt användare att inte använda inkorgen"
     canvas_parent_display_name: "Canvas förälder"
@@ -7097,7 +7495,9 @@ sv-x-k12:
   for_all_devices_1f603968: "För Alla Enheter"
   for_an_instant_answer_see_if_your_issue_is_address_48280e89: "För ett svar direkt, se om ditt problem nämns i *Canvas Guiderna*."
   for_best_results_crop_image_to_262px_wide_by_146px_af81a540: "För bästa resultat beskär bild till 262px bred med 146px hög. JPG, PNG eller GIF filtyper accepteras"
+  for_course_level_users_deleting_a_course_is_part_o_932f7a98: "Användare på kursnivå kan ta bort en kurs med behörigheten Kurstillstånd – hantera. Men för användare på kontonivå som vill ta bort en kurs krävs den här behörigheten samt Kurs – lägg till/redigera/ta bort. "
   for_each_late_62aecf41: "För varje sen"
+  forgot_password_f0c3fbac: "Glömt lösenordet?"
   forgot_password_url_3f9c04b: "Glömt lösenord URL"
   form_background_fb654518: "Forma bakgrund"
   form_border_f61f12dc: "Skapa gräns"
@@ -7137,6 +7537,7 @@ sv-x-k12:
   getting_started_with_collaborations_794240ba: "Komma igång med Samarbeten"
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Ge alla elever samma bedömning för *%{assignment.name}* genom att ange och skicka ett bedömningsvärde nedan:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Ge alla elever samma *procentuella* bedömning för **%{assignment.name}** genom att ange och skicka ett bedömningsvärde nedan:"
+  global_announcements_a78912c8: "Globala meddelanden"
   global_announcements_add_edit_delete_843ca4d2: "Globala meddelanden - lägg till / redigera / radera"
   global_branding_df1cae12: "Global märkning"
   global_message_icons: 
@@ -7166,6 +7567,7 @@ sv-x-k12:
   goto_next_page_e8e1ae6f: "Gå till nästa sida"
   goto_page_page_num_bd656bd5: "Gå till sidan %{page_num}"
   goto_previous_page_85b2fa49: "Gå till föregående sida"
+  governs_account_related_sis_ids_i_e_subaccount_sis_b7dd0954: "Reglerar kontorelaterade SIS-ID:n (dvs. SIS-ID för underkonton)."
   gpa_scale_6710e2ee: "GPA Skala"
   gpa_scale_a6d1cdea: "GPA skala"
   grade_10d1e5a1: "%{grade}"
@@ -7332,6 +7734,8 @@ sv-x-k12:
         score: "VeriCite Liknande resultat - Se detaljrapport"
   gradebook_1620a0aa: Bedömningsöversikt
   gradebook_5fd8ef0: Bedömningsöversikt...
+  gradebook_and_speedgrader_will_be_inaccessible_if__4de0e869: "Bedömningsöversikten och SpeedGrader kommer inte att vara tillgängliga om både Bedömningar – redigera och Bedömningar - visa är inaktiverade."
+  gradebook_and_speedgrader_will_be_inaccessible_if__e654ff22: "Bedömningsöversikten och SpeedGrader kommer inte att vara tillgängliga om både Bedömningar – redigera och Bedömningar - visa är inaktiverade."
   gradebook_context_name_9dbae5bc: "Bedömningsöversikt - %{context_name}"
   gradebook_csvs: 
     grades_filename: Bedömningar
@@ -7341,6 +7745,7 @@ sv-x-k12:
   gradebook_history_b03f8524: Bedömningsöversiktshistorik...
   gradebook_individual_view_8846598e: "Bedömningsöversikt: Individuell vy"
   gradebook_settings_b45c6df9: Bedömningsöversiktsinställningar
+  gradebook_speedgrader_66cb7a6a: "Bedömningsöversikt, SpeedGrader"
   gradebook_tutorial_tray_d835c750: "Bedömningsöversikt handledning"
   gradebook_uploads: 
     no_file_attached: "Vi hittade inte en CSV att ladda upp. Vänligen välj en CSV att ladda upp och försök igen."
@@ -7512,6 +7917,8 @@ sv-x-k12:
   grader_count_cannot_be_0_9228afe4: "Bedömare kan inte vara 0."
   grader_count_is_required_45b6c85b: "Antal bedömare krävs"
   grader_d1198a9c: Bedömare
+  grader_details_table_b1bec24c: "Tabell Information Bedömare"
+  grader_grader_number_e92327d3: "Bedömare %{grader_number}"
   grader_graderindex_45e04e57: "Bedömare %{graderIndex}"
   grader_gradernumber_fef5d5cf: "Bedömare %{graderNumber}"
   grader_is_required_62c88f67: "Bedömare krävs"
@@ -7529,7 +7936,11 @@ sv-x-k12:
   grades_moderate_317fce84: "Bedömningar - moderera"
   grades_posted_c274d9f8: "Bedömningar postade"
   grades_posting_bc7cfc1a: "Bedömningar postas"
+  grades_saved_5954b0bb: "Bedömningar sparade."
+  grades_select_final_grade_for_moderation_c66284f4: "Bedömningar – Välj slutbedömning för moderering"
   grades_view_all_grades_8bf9f8d3: "Bedömningar - visa alla bedömningar"
+  grades_view_audit_trail_db7364b1: "Bedömningar – Visa ändringar"
+  grades_view_change_logs_6bc1b959: "Bedömningar – visa ändringsloggar"
   grades_visible_to_students_1584fa83: "Bedömningar synliga för elever"
   grades_were_successfully_published_to_the_gradeboo_79203993: "Bedömningar har publicerats i betygsboken."
   gradezilla: 
@@ -7898,6 +8309,7 @@ sv-x-k12:
       Det är verkligen som en minikurs där du kan arbeta med ett mindre antal elever på ett
       mer fokuserat projekt.
   groups_cannot_have_size_restrictions_to_assign_by__7d36fa32: "Grupper kan inte ha storleksbegränsningar för anvisning per sektion"
+  groups_course_c73e4c2c: "Grupper (kurs)"
   groups_must_be_empty_to_assign_by_section_a9fafa72: "Grupper måste vara tomma för anvisning per sektion"
   groups_navigation_menu_76b5acc6: "Grupp navigeringsmeny"
   groups_view_all_student_groups_39bd1b85: "Grupper - visa alla elevgrupper"
@@ -8030,9 +8442,11 @@ sv-x-k12:
   hide_groups_navigation_menu_62e8b3d0: "Dölj grupp-navigeringsmeny"
   hide_key_e8fe1e8c: "Dölj nyckel"
   hide_navigation_menu_f0b3e90: "Dölj navigeringsmeny"
+  hide_outcomes_with_no_results_7e4ce06f: "Dölj lärandemål utan poäng"
   hide_score_total_for_assessment_results_d0ef117f: "Dölj totala resultat för uppgiftsresultat"
   hide_sidebar_2b5b3776: "Dölj sidofält"
   hide_student_names_3e59e862: "Dölj elevers namn"
+  hide_students_with_no_results_6a22f991: "Dölj elever utan poäng"
   hide_sub_accounts_for_account_name_a6de98bd: "Göm underkonto för %{account_name}"
   high_b5cbd048: Högsta
   high_contrast_description: "Högupplösning förbättrar färgkontrasten på användargränssnittet (text, knappar, osv.), vilket gör dem tydligare och enklare att se. Notera att \"Institution märkning\" kommer avaktiveras."
@@ -8085,6 +8499,16 @@ sv-x-k12:
   idp_entity_id_25c51837: "IdP Företags ID"
   idp_metadata_uri_dae5314a: "IdP Metadata URI"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Om ett attribut är markerat som endast tillfälligt, kommer det endast att användas som tillfällig inloggning när en ny användare skapas, och kommer inte att hållas uppdaterat varje gång en användare loggar in."
+  if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Om både Bedömningar – redigera och Bedömningar – visa alla bedömningar inaktiveras, döljs Bedömningsöversikten i kursnavigeringen."
+  if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "Om både Bedömningar – redigera och Bedömningar – visa alla bedömningar inaktiveras, döljs Bedömningsöversikten i Kursnavigering."
+  if_disabled_the_outcomes_page_becomes_read_only_an_29ea1940: "Om inaktiverad blir sidan Poäng skrivskyddad och knappen Hantera matriser döljs. Användare kan ändå öppna enskilda matriser för uppgifter via Uppgifter."
+  if_disabled_user_can_still_view_and_download_files_336ffc30: "Om inaktiverad, kan användare ändå se och ladda ned filer i ZIP-format."
+  if_disabled_user_will_still_have_access_to_course__6816d525: |-
+      Om inaktiverad, har användare ändå åtkomst till kursinställningar.
+      
+      Användare kan inte hantera enskilt kursinnehåll utan tillämplig behörighet för innehållsobjektet.
+      
+      Om kursens synlighet begränsas till användare som är registrerade i kursen kan användare som inte är registrerade se kursinnehåll med den här behörigheten.
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Om det är aktiverat tillåter det mer än det maximala möjliga värdet på ett resultat som ska anges på en rubrik."
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Om det är aktiverat, kommer Common Cartridge-importörer att konvertera HTML-filer till sidor"
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Om aktiverad, måste designers tillhandahålla upphovsrätt och licensinformation för filerna innan de publiceras. Gäller endast om Better File Browsing också är aktiverat."
@@ -8096,6 +8520,18 @@ sv-x-k12:
   if_enabled_the_parent_sign_up_form_will_require_a__a9c32041: "Om det är aktiverat, kommer förälderns registreringsformulär att kräva en elevparningskod istället för barnets användarnamn och lösenord."
   if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: "(om ingen väljs, skicka till alla i hela kontot)"
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(om ingen väljs, skicka till alla i hela underkontot)"
+  if_statistics_view_or_users_manage_login_details_i_da650b69: "Om Statistik – visa eller Användare – hantera inloggningsuppgifter är aktiverade kan användare generera in-/utloggningsaktiviteter i Administratörsverktyg. Båda behörigheterna måste inaktiveras för att dölja alternativet för in-/utloggningsaktivitet i Administratörsverktyg."
+  if_the_open_registration_account_setting_is_enable_f3b9a75f: "Om kontoinställningen Öppen registrering är aktiverad kan användare med den här behörigheten lägga till elever eller observatörer i en kurs med hjälp av e-postadresser eller inloggnings-ID även om eleven eller observatören inte har ett Canvas-konto."
+  if_this_permission_is_disabled_and_courses_add_edi_9bafd797: "Om den här behörigheten är inaktiverad och Kurser – lägg till/redigera/ta bort är aktiverad, kan användare lägga till en kurs med knappen Lägg till en ny kurs i kontoinställningar."
+  if_this_permission_is_disabled_at_the_account_leve_39648abb: "Om den här behörigheten är inaktiverad, på kontonivå, kan inte användare se befintliga kontogrupper. På kursnivå kan användare se, men inte öppna, befintliga grupper, däribland grupper som skapats av elever. Även Användare – visa lista måste vara aktiverad för att visa grupper. Även SIS-data – importera måste vara aktiverad för att lägga till grupper på kontonivå via CSV."
+  if_this_permission_is_disabled_users_can_only_view_b68143d5: "Om den här behörigheten är inaktiverad kan användare endast se befintliga grupper, däribland grupper som skapats av elever."
+  if_this_permission_is_disabled_users_can_still_cre_76a2d4b8: "Även om den här behörigheten är inaktiverad kan användare ändå skapa eller lägga till matriser i uppgifter om Uppgifter och quiz – lägg till/redigera/ta bort är aktiverad."
+  if_this_permission_is_disabled_users_can_still_ins_4e3cef83: "Även om den här behörigheten är inaktiverad, kan användare ändå installera godkända appar via Canvas App Center (om aktiverad för din institution). Om den här behörigheten inaktiveras kan dessutom användare inte ta bort manuellt tillagda externa appar."
+  if_this_permission_is_enabled_and_courses_view_lis_cdf22691: "Om den här behörigheten är aktiverad och Kurser – visa lista är inaktiverad, kan användare lägga till en kurs med knappen Lägg till en ny kurs i kontoinställningar."
+  if_this_permission_is_enabled_users_do_not_need_th_e3d0f334: |-
+      Om den här behörigheten är aktiverad behöver inte användare ha läsbehörigheten SIS-data aktiverad. Kontobehörigheten åsidosätter kursbehörigheten. Om du vill hindra användare från att hantera SIS-ID:n på kursnivå måste du inaktivera både SIS-data – hantera och SIS-Data – läsa.
+      Om du vill lägga till användare till kurser via SIS-ID måste även Användare – lägg till/ta bort elever från kurser och/eller Användare – lägg till/ta bort lärare, kursdesigner eller TA:er från kurser vara aktiverade.
+  if_users_manage_login_details_or_statistics_view_i_22ca94b8: "Om Användare – hantera inloggningsuppgifter eller Statistik – visa är aktiverade kan användare generera in-/utloggningsaktiviteter i Administratörsverktyg. Båda behörigheterna måste inaktiveras för att dölja alternativet för in-/utloggningsaktivitet i Administratörsverktyg."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Om du ändrar en uppgifts möjliga poäng måste du bedöma om uppgiften."
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "Om du ändrar en uppgifts möjliga poäng måste du bedöma om eventuella inlämningar."
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Om du inte väljer användarrättigheter nu kommer filen vara avpublicerad efter att den laddats upp."
@@ -8206,10 +8642,12 @@ sv-x-k12:
   inner_box_background_6f9092f: "Inre-ruta bakgrund"
   inner_box_border_d0524b03: "Inre-box gräns"
   input_and_distribute_grades_for_students_display_g_9a2e46a0: "Mata in och fördela bedömningar för elever. Visa bedömningar som poäng, procentandelar, sluförd elelr inte slutförd, godkänd eller inte godkänd, GPA-skala och bokstavsbedömningar. Gruppuppgifter för bedömningsviktning."
+  insert_equella_links_49a8dacd: "För in Equella länkar"
   insert_math_equation_57c6e767: "För in en matematisk ekvation"
   insert_row_below_25187f89: "Lägg till en rad under"
   installed_7b284a91: Installerad
   institution_14179014: Lärofackultet
+  institution_announcement_announcement_title_f017c1e0: "Meddelande från institutionen: \"%{announcement_title}\""
   instructions: 
     authorize_google_drive: "Innan du kan samarbeta på dokument måste du ge Canvas tillåtelse att hantera ditt Google Drive konto:"
   instructions_2f88ee72: Instruktioner
@@ -8279,6 +8717,7 @@ sv-x-k12:
       enter_search_terms: "uppge söktermer"
   instructure_default_73317bb1: "Lärare standard"
   instructure_default_old_66ef6e9b: "Instructure Default (Gammalt)"
+  integration_id_8a20b328: "Integrations ID"
   integration_id_a6977535: "Integrations ID:"
   integration_id_int_id_is_already_in_use_f30f03b5: "Integrations ID \"%{int_id}\" används redan"
   integration_id_integration_id_is_already_in_use_bd1bbb09: "Integrations ID \"%{integration_id}\" används redan"
@@ -8419,6 +8858,7 @@ sv-x-k12:
   jwts_4f397c85: "JWT:er"
   k12_description: "Funktioner, inställningar och stilar som fungerar bättre, framför all i en K-12 mijö. Justnu gäller detbara för vissa stiländringar, men fler K-12 saker kan läggas till i framtiden."
   k_2521301c: k
+  kazakhstan_7_8fe892c: "Kazakstan (+7)"
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "Kom ihåg att den här inlämningen berör alla i din %{groupType} grupp."
   keep_submissions_anonymous_5cbaf419: "Håll inlämningarna anonyma"
   kenya_254_2945663a: "Kenya (+254)"
@@ -8433,6 +8873,7 @@ sv-x-k12:
   kind_7f0a88c4: Sort
   labels: 
     lock_module_until: "Lås tills"
+  last_assessment_cd5659b6: "Senaste bedömning: "
   last_changed_b544504d: "Senast ändrad:"
   last_day_attended_b72d623c: "Sista dagen som deltagare"
   last_enrollment_activity_10fe15ba: "Senaste registreringsaktivitet"
@@ -8638,8 +9079,10 @@ sv-x-k12:
   link_only_995966e: "Endast länk"
   link_selection_1486c5d0: Länksamling
   link_title_189888b7: Länktitel
+  link_to_url_52dd935c: "Länk till URL"
   link_url_a213671c: "Länk URL"
   link_url_cf96376: "Länk Url"
+  link_validation_is_running_caf08ced: "Länkvalidering pågår"
   linked_assignment_message: "länkad till uppgiften '%{title}'"
   linked_discussion_topic_message: "länkad med diskussionsämnet '%{title}'"
   linked_quiz_message: "länkad med Quiz '%{title}'"
@@ -8843,6 +9286,7 @@ sv-x-k12:
   luxembourg_352_85f4124d: "Luxemburg (+352)"
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Moodle Import"
+  magenta_4a65993c: Magenta
   main_text_color_7d65ab1b: "Färg huvudtext"
   make_key_developername_invisible_212ecf72: "Gör nyckel %{developerName} osynlig"
   make_key_developername_visible_97c404bf: "Gör nyckel %{developerName} synlig"
@@ -8958,6 +9402,7 @@ sv-x-k12:
   media_recordings_749aef6d: Mediainspelningar
   median_ed291842: Median
   median_score_4657e907: "Median: %{score}"
+  meets_expectations_bb179565: "Möter förväntningarna"
   meets_mastery_754e1c06: "Möter målen"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} medlemmar av maximalt antal %{max_membership}"
   members_af25c21d: Medlemmar
@@ -10790,6 +11235,7 @@ sv-x-k12:
   nav_logo_background_ba33fb7f: "Nav logga bakgrund"
   nav_text_94206145: "Nav text"
   nav_text_active_a924ae88: "Nav text aktiv"
+  navigation_allows_user_to_view_the_people_link_in__dd533d29: "Navigering gör att användare kan se länken Personer i kursnavigeringen."
   near_mastery_f25174a4: "Nära målen"
   need_a_canvas_account_221d18ed: "Behöver du ett Canvas-konto?"
   needs_grading_9143d47c: "Behöver bedömas"
@@ -10810,6 +11256,7 @@ sv-x-k12:
   new_course_role_6a7bb75f: "Ny kursroll"
   new_criterion_6054bc7f: "Nytt kriterium"
   new_criterion_canceled_d8c2a655: "Nytt kriterium avbrutet"
+  new_discussion_dae4fae3: "Ny diskussion"
   new_event_for_course_name_2ba1f734: "Ny händelse för %{course_name}"
   new_export_3ab758: "Ny export"
   new_features_for_developer_key_management_994090dc: "Nya funktioner för utvecklarens nyckelhantering"
@@ -10893,6 +11340,7 @@ sv-x-k12:
   no_subject_58b7941c: "Inget ämne"
   no_subject_970aad80: "Inget ämne"
   no_submission_for_assignment_a9cb6fe2: "Ingen inlämning för %{assignment}"
+  no_submissions_164cea23: "Ingen inlämning"
   no_terms_eab5ee7b: "Inga villkor"
   no_tls_618add1a: "Ingen TLS"
   no_unassigned_terms_deb7b76b: "Inga ej tilldelade terminer"
@@ -10910,8 +11358,11 @@ sv-x-k12:
   not_a_valid_date_d3ac20ba: "Inte ett giltigt datum"
   not_a_valid_utf_8_string_string_7f6819c: "Ej en giltig utf-8-sträng: %{string}"
   not_all_sections_will_be_assigned_this_item_4e2b8eaa: "Alla sektioner kommer inte tilldelas detta objekt."
+  not_all_settings_options_are_available_at_the_suba_20efaa98: "Inte alla inställningar är tillgängliga på underkontonivå, däribland fliken Notifikationer."
   not_anonymously_graded_87574f91: "Ej anonymt bedömd"
   not_available_487d3648: "Inte tillgänglig"
+  not_available_at_the_subaccount_level_3fc74ab: "Ej tillgänglig på underkontonivå."
+  not_available_at_the_subaccount_level_6ee9b41f: "Ej tillgänglig på underkontonivå"
   not_available_during_sync_ae645e8c: "Ej tillgängliga under synkronisering"
   not_available_until_date_3c1c73c2: "Inte tillgänglig förrän %{date}"
   not_available_until_next_submission_2175158: "Inte tillgänglig förrens nästa inlämning"
@@ -11184,6 +11635,7 @@ sv-x-k12:
   notification_preferences_cf47083d: "Inställningar för aviseringar"
   notifications_cbfa7704: Aviseringar
   notifications_search_results_80a0b06f: "Aviseringar sökresultat"
+  notifications_view_f9a60770: "Notifikationer – visa"
   notify_users_this_quiz_has_changed_c5b05995: "Meddela användare när detta Quiz ändras"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Nu när din kurs är färdiggjord och tillgänglig, behöver du nog inte den här checklistan längre. Fast vi kommer behålla den om du skulle inse att du vill testa något nytt eller om du behöver tips när du ändrar kursens innehåll."
   number: 
@@ -11253,6 +11705,7 @@ sv-x-k12:
   object_type_e4f3bbeb: Föremålstyp
   observees: 
     being_observed: "Elever som observeras"
+    new_observee_pairing_code: "Sammankopplingskod för elev"
     new_observee_password: Lösenord
     new_observee_username: Användarnamn
     observee_added: "Observerar nu %{user}"
@@ -11272,6 +11725,7 @@ sv-x-k12:
   okay_1772bbeb: Okej
   old_policy_39e4f77: "Gammal policy"
   oldest_newest_4de86803: "Äldsta - nyast"
+  olive_6a3e4d6b: Oliv
   oman_968_46f8d901: "Oman (+968)"
   on_8f7190e5: På
   on_paper_46d0ba36: "På papper"
@@ -11299,6 +11753,7 @@ sv-x-k12:
   open_complete_incomplete_menu_cfe2033b: "Öppna Fullgjord / Ej fullständig meny"
   open_discussion_title_for_comments_6baa3fa: "Öppna diskussion %{title} för kommentarer"
   open_event_menu_e9a21e39: "Öppna event meny"
+  open_event_menu_for_783510e3: "Öppna händelsemeny för"
   open_for_comments_1810648: "Öppna för kommentarer"
   open_for_comments_f8f7641e: "Öppen för kommentarer"
   open_grading_scheme_menu_5f889203: "Öppna bedömningsschema-meny"
@@ -11495,6 +11950,8 @@ sv-x-k12:
         average_percent: "Genomsnittlig procent"
         latest_score: "Senaste resultat"
         outcome: Lärandemål
+  outcomes_and_rubrics_account_course_68d0bf1d: "Poäng och rubriker (konto/kurs)"
+  outcomes_and_rubrics_f893d141: "Poäng och rubriker"
   outcomes_are_created_here_to_track_mastery_in_a_co_2f487549: "Resultat skapas här för att spåra bemästring i en kurs. För att komma igång, se menyraden längst upp. Klicka på knappen för nytt resultat för att skapa ett nytt resultat, eller knappen för ny grupp för att skapa en ny grupp för att organisera dina resultat. Hitta-knappen tillåter dig att använda resultat som har skapats av din stat eller institution. När du skapar och använder resultat kan du använda panelen till vänster för att navigera genom dina resultat. Du kan dra och släppa resultat mellan de olika nivåerna för att skapa struktur."
   outcomes_csv_format_9005acfb: "Resultat CSV-format"
   outcomes_d1b18d33: Resultat
@@ -11540,7 +11997,7 @@ sv-x-k12:
     cannot_unpublish_front_page: "Kan inte avpublicera från förstasidan"
     delete_button: Radera
     delete_confirmation: "Är du säker på att du vill radera den här wikisidan?"
-    delete_dialog_title: "Radera wikisida"
+    delete_dialog_title: "Radera sida"
     deleting_button: Raderar...
     edit_dialog_title: "Redigera sida"
     errors: 
@@ -11600,7 +12057,11 @@ sv-x-k12:
   peer_reviews_e3a55964: Kamratbedömningar
   pending_3e506a5b: Väntar
   pending_message_2d9a8796: "Väntar: %{message}"
+  people_account_30bbffec: "Personer (konto)"
+  people_account_course_305043bb: "Personer (konto/kurs)"
   people_b4ebb13c: Personer
+  people_course_ddd9a66: "Personer (kurs)"
+  people_groups_tab_b245a614: "Personer (fliken Grupp)"
   people_tutorial_tray_a87a6c48: "Människor handledning"
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "Det här namnet kommer att visas i diskussioner, meddelanden och kommentarer."
   percent_448ea947: procent
@@ -11633,6 +12094,7 @@ sv-x-k12:
   place_b128fa94: Plats
   place_section_before_5b45714e: "Placera ””%{section}” före:"
   place_title_2c183274: "Placera \"%{title}\""
+  placeholder_for_webhooks_access_in_canvas_catalog_b8c9d864: "Platshållare för webhooks-åtkomst i Canvas Catalog."
   placements_5b5e056b: Placeringar
   plagiarism_detection_platform_assignments_fc19e0bd: "Plagiering Upptäckt Plattform Uppgifter"
   plagiarism_detection_platform_users_b0e5410f: "Plagiering Upptäckt Plattform Användare"
@@ -12161,6 +12623,7 @@ sv-x-k12:
   processing_2fcc9739: Bearbetar
   product_name: Canvas
   proficiency_rating_6346119f: Färdighetsbedömning
+  proficiency_rating_deleted_77827473: "Kunskapsbedömning togs bort"
   proficiency_ratings_2bbabdcd: Färdighetsbedömningar
   proficiency_ratings_e4078451: Färdighetsbedömningar
   profile: 
@@ -12428,7 +12891,7 @@ sv-x-k12:
       take_picture: "Ta bild"
     upload_file_view: 
       choose_a_picture: "välj en bild"
-      crop_instructions: "För att klippa bilden, dra området och klicka på \"Spara\" -knappen nedan."
+      crop_instructions: "För att beskära bilden, dra valet med musen eller använd piltangenterna för att flytta valet och shift-+piltangenter för att ändra storlek på valet. Klicka därefter på knappen ”Spara” nedan."
   progress_9de4af8f: Förlopp
   progress_for_account_name_ef203250: "Framsteg för %{account_name}"
   progress_loading_bar_a26b8861: "Framsteg/laddar flik"
@@ -12486,6 +12949,8 @@ sv-x-k12:
       account_registered: "Kontot registrerat!"
       account_updated: "Kontot uppdaterat!"
       email_sent: "Bekräftelse e-post skickat till %{email}, glöm inte att kolla din skräppost"
+  pseudonyms_mobile_login: 
+    parent_signup: "Registrering för förälder"
   pts_51d69f4a: Poäng
   pts_699bd9aa: poäng
   public_a749f507: Offentlig
@@ -12512,6 +12977,7 @@ sv-x-k12:
   published_click_to_unpublish_title_358122a: "Publiserad.  Klicka för att avpublicera %{title}."
   publishing_is_disabled_for_this_item_efa7803f: "Publicering är avaktiverad för detta föremålet"
   publishing_item_name_is_disabled_8207a9e7: "Publicering %{item_name} är avaktiverad"
+  pumpkin_904428d5: Pumpa
   purple_7678a9fc: Lila
   q_what_goes_black_white_black_white_a_a_panda_roll_c682ee13: "Fråga: Vad blir svar, vit, svart, vit?  Svar: En panda som rullar ner för en backe."
   qatar_974_7e9684ca: "Qatar (+974)"
@@ -12610,6 +13076,9 @@ sv-x-k12:
       move_copy: Flytta/kopiera
       select_bank: "Välj frågebank för frågan:"
       show_details: "Visa frågedetaljer"
+  question_banks_45bdf347: Frågebanker
+  question_banks_account_navigation_9a7ab7c2: "Frågebanker (kontonavigering)"
+  question_banks_view_and_link_e6d9cde2: "Frågebanker – visa och länka till"
   question_banks_view_and_link_to_f1bca68b: "Frågebanker - visa och länka till"
   question_f06476d1: fråga
   question_group_837b8014: Frågegrupp
@@ -13648,8 +14117,11 @@ sv-x-k12:
   quizzes/quiz: 
     submission_action_take_quiz: "Ta %{title}"
   quizzes_7e598f57: Quizzes
+  quizzes_and_question_banks_9b7569e3: "Quiz och frågebanker"
   quizzes_next_importing_75e63f67: "Quizzes.Next Importerar"
   quizzes_tutorial_tray_6f87cdd3: "Quizzes handledning"
+  quizzes_view_submission_log_ec105e3e: "Quiz – visa inlämningslogg"
+  quotas_account_settings_22c12b8d: "Kvoter (kontoinställningar)"
   radio_button_option_1_a8ec51f9: "Radioknapp alternativ 1"
   radio_button_option_2_31e50043: "Radioknapp alternativ 2"
   range_56b2f310: Räckvidd
@@ -13737,6 +14209,7 @@ sv-x-k12:
       one: "1 sektion"
       other: "%{count} sektioner"
   record_media_6637ff19: "Spela in media"
+  record_upload_media_5fdce166: "Spela in/ladda upp media"
   record_with_microphone_only_e4ee07aa: "Spela bara in med mikrofon"
   record_with_webcam_af21e07c: "Spela in med webbkamera"
   recording_was_deleted_b989eaff: "Historiken togs bort"
@@ -13746,6 +14219,8 @@ sv-x-k12:
   redirect_uris_a54bd82f: "Omdirigera URIs:"
   reference_code_3e8355dd: Referenskod
   reference_code_is_required_c32c757f: "Referenskod krävs"
+  regardless_of_whether_this_permission_is_enabled_o_437ee269: "Oavsett om den här behörigheten är aktiverad eller inaktiverad kommer användaren ändå att kunna hantera händelser i sina personliga kalendrar."
+  regardless_of_whether_this_permission_is_enabled_o_a16e31b5: "Oavsett om den här behörigheten är aktiverad eller inaktiverad kommer användarna ändå att kunna hantera händelser i sina personliga kalendrar."
   regenerate_3e4679f8: Regenerera
   regenerate_epub_395c8e56: "Omgenerera ePub"
   region_47e29025: "Region:"
@@ -13760,7 +14235,10 @@ sv-x-k12:
       remember_me: "Kom ihåg mig"
       sign_in: "Logga in"
     new_parent_dialog: 
+      anchor: 
+        pairing_code: "Vad är en kopplingskod?"
       buttons: 
+        cancel: Avbryt
         start_participating: "Påbörja deltagande"
       labels: 
         code: Elev-parningskod
@@ -13842,6 +14320,8 @@ sv-x-k12:
   reply_to_topic_12412b0f: "Svara på ämnet"
   report_has_been_aborted_2b5763ed: "Rapporten har avbrutits"
   reported_3de7086a: Rapporterad
+  reports_1b9ab7a7: Rapporter
+  reports_account_settings_78f5336a: "Rapporter (kontoinställningar)"
   require_an_access_code_600e06e8: "Kräver en tillgångskod"
   require_assignment_due_date_778b200d: "Kräv uppgifter om slutdatum"
   require_group_members_to_be_in_the_same_section_7f6c36af: "Kräv att gruppmedlemmar tillhör samma sektion"
@@ -13849,6 +14329,7 @@ sv-x-k12:
   require_usage_rights_for_uploaded_files_4507865b: "Kräver användarrättigheter för uppladdade filer"
   required_access_code_592902d7: "Tillgångskod krävs"
   required_email_address_379b2392: "Kräver e-postadress"
+  required_fields_include_key_name_owner_email_tool__b8e42174: "Nyckelnamn, ägarens e-postadress, verktygs-ID, omdirigerings-URL och ikon-URL är obligatoriska fält."
   required_to_view_quiz_results_dba7368b: "Nödvändigt för att se quizresultaten"
   requirement_f5b75da1: Krav
   requirement_subject_7cfac6c8: Ämneskrav
@@ -13908,6 +14389,7 @@ sv-x-k12:
       create_accounts: "Skapa nya root-konton"
       create_collaborations: "Skapa elevsamarbeten"
       create_conferences: "Skapa webbkonferenser"
+      manage_: "Hantera – lägga till/redigera/ta bort "
       manage_account_memberships: "Lägg till/ta bort andra administratörer för kontot"
       manage_account_settings: "Hantera konto-nivå-inställningar"
       manage_admin_users: "Lägg till/ta bort lärare, kursdesigners eller lärarassistenter från kursen"
@@ -14089,8 +14571,10 @@ sv-x-k12:
       remove_rubric: "Ta bort den här matrisen från min lista"
   rubrics_add_edit_delete_8299eff7: "Rubriker - lägg till / redigera / radera"
   rubrics_b5ef369b: Matriser
+  rubrics_speedgrader_a6ebec57: "Rubriker, SpeedGrader"
   running_c5a4998d: Körs
   russia_7_87bc99d5: "Ryssland (+7)"
+  rwanda_250_1a6b344b: "Rwanda (+250)"
   salesforce_account_id_eb5c78ad: "Salesforce Konto-Id"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce har olika inloggningsvärdar för sanboxkonton och produktionskonton, så om du använder ett Salesforce sanboxkonto och inte markerar den här rutan kommer den inte kunna verifiera (det gäller åt andra hållet också, och du har ett produktionskonto och MARKERAR rutan kan den inte verifiera)"
   salesforce_ticketing_webtocase_connector_80f75716: "Salesforce Ticketing  WebToCase Connector"
@@ -14118,6 +14602,9 @@ sv-x-k12:
   saving_new_role_458f4ba8: "Sparar ny roll"
   saving_recording_e111cb05: "Sparar inspelning..."
   schedule_student_availability_332154a: "Planera elev-tillgänglighet"
+  scheduler_65b5ac91: Schemabokningssystem
+  scheduler_must_be_enabled_by_your_canvas_admin_7508c8c2: "Schemabokningssystemet måste aktiveras av din Canvas-administratör."
+  scheduler_must_be_enabled_for_your_account_e6e53972: "Schemabokningssystemet måste aktiveras för ditt konto."
   scheduler_shown_df77ca6f: "Schemaläggare visas"
   school_of_rock_4b7b1fd0: Rockskola
   score_does_not_include_groups_because_they_have_no_80d12f42: 
@@ -14125,6 +14612,7 @@ sv-x-k12:
     other: "Resultatet inkluderar inte %{groups} eftersom de inte har några möjliga poäng"
   score_f7ac9e08: Resultat
   score_muted_82eef66: "Resultat: (tystad)"
+  score_n_a_34dfdcda: "Resultat: Ej tillgängligt"
   score_of_score_view_in_speedgrader_a7c1c954: "Resultat av %{score}. Visa i SpeedGrader"
   score_out_of_points_84f44331: "(%{score} av %{points})"
   score_out_of_points_possible_88f370fd: "%{score} av %{points_possible}"
@@ -14430,6 +14918,7 @@ sv-x-k12:
   select_one_of_the_options_c8b0c6e4: "Välj ett av alternativen:"
   select_prerequisite_module_57894963: "Välj förkunskapsmodul"
   select_prerequite_module_e9042bb0: "Välj nödvändig modul"
+  select_rubric_2aa2ffa2: "Välj rubrik"
   select_student_name_caaff244: "Välj elev %{name}"
   select_studentname_e7b7908d: "Välj %{studentName}"
   select_students_for_review_6e004a12: "Välj elever att bedöma"
@@ -14534,6 +15023,10 @@ sv-x-k12:
   set_name_d14182d7: "Namn på grupp..."
   set_name_f83b658: "Namn på grupp"
   set_of_grading_periods_545b37e9: "Grupp med bedömningsperioder"
+  set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\
+      \x20           Ange hur din kunskapsbedömning ska visas i bedömningsöversikt över uppfyllande av lärandemål.\n\
+      \x20           Justera antalet bedömningar, kunskapsnivåer, poäng och färger.\n\
+      \x20         "
   set_up_how_your_proficiency_ratings_appear_inside__f25d5da8: "Konfigurera hur dina färdighetsbedömningar visas i betygsboken uppfyllande av lärandemål. Justera antalet bedömningar, färdighetsnivå, resultat och färger."
   settings: 
     recaptcha_settings: 
@@ -14574,6 +15067,8 @@ sv-x-k12:
       Dela viktig information med alla användare i din kurs.
       Välj att få en kopia av dina egna meddelanden i aviseringar.
   share_important_updates_with_users_97ec11ad: "Dela viktiga uppdateringar med användare"
+  share_the_following_pairing_code_with_an_observer__44f50f99: "Dela följande sammankopplingskod med en observatör för att tillåta dem att kontakta %{name}. Denna kod löper ut om sju dagar eller efter en användning."
+  share_the_following_pairing_code_with_an_observer__9b7c3667: "Dela följande sammankopplingskod med en observatör för att tillåta dem att kontakta dig. Denna kod löper ut om sju dagar eller efter en användning."
   share_the_following_pairing_code_with_an_observer__9cd44f7e: |-
       Dela följande parningskod med en observerare för att de ska kunna
       ansluta till dig. Denna kod löper ut om 24 timmar
@@ -15206,6 +15701,7 @@ sv-x-k12:
       processing_takes_awhile: "det här kan ta en stund..."
     status: 
       processing: Bearbetar
+  sis_import_14517892: "Import av Elevinformation"
   sis_import_errors_d7fe542b: "Fel vid import av studentinformation"
   sis_import_refactor_ca9484ac: "Omstrukturering av import av studentinformation"
   sis_imports_17308c02: "SIS importer"
@@ -15242,6 +15738,7 @@ sv-x-k12:
   snapshots_are_backups_of_your_canvas_trial_taking__f18bd571: "Ögonblicksbilder är säkerhetskopior av ditt Canvas provperiod. Att ta en ögonblicksbild kommer att skapa en unik ”version”, vilket utgör ett perfekt register över läget i din provperiod vid tidpunkten för ögonblicksbilden."
   some_assignments_could_not_be_created_because_they_d91f2f21: "Vissa uppgifter kan inte skapas eftersom de skulle infalla under en stängd bedömningsperiod."
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Vissa konferenser på den här sidan är dolda på grund av fel som uppstod när deras status hämtades"
+  some_custom_columns_could_not_be_changed_because_t_88abc9be: "Vissa anpassade kolumner kunde inte ändras därför att de var skrivskyddade; ändringar för dessa kolumner har ignorerat."
   some_module_items_could_not_be_published_e4be3c0: "Vissa modulföremål kunde inte publiceras"
   some_settings_have_been_administratively_locked_9e3ee880: "Vissa inställningar har låsta av administratör"
   some_settings_have_been_disabled_because_the_assig_6b6cc3b4: "Vissa inställningar har stängs av eftersom uppgiften är i en bedömningsperiod."
@@ -15351,6 +15848,7 @@ sv-x-k12:
       sis_id: sis_id
       submitted: inlämnad
     no_answer: "Inget svar"
+  statistics_4573b730: Statistik
   statistics_for_name_f4b7b0fc: "Statistik för %{name}"
   statistics_view_b19458: "Statistik - vy"
   stats_9272cef3: Statistik
@@ -15371,6 +15869,9 @@ sv-x-k12:
   student_assignment_outcome_map_title: "Elevers kompetenser"
   student_collaborations_create_b9e312c1: "Elevsamarbeten - skapa"
   student_context_card_ad59967e: "Elev innehållskort"
+  student_context_cards_376d2072: Elevkontextkort
+  student_context_cards_must_be_enabled_for_an_accou_f194b7c4: "Studenkontextkort måste vara aktiverade för ett konto av administratören. Även om den här behörigheten inte är aktiverad, kan användare ändå se elevkontextkort via bedömningsöversikten."
+  student_context_cards_must_be_enabled_for_an_accou_f84169cb: "Studenkontextkort måste vara aktiverade för ett konto av administratören."
   student_details_49901ceb: Elevdetaljer
   student_extensions_d35a907: "Elev förlängningar"
   student_grades_4cbc59a1: Elevbedömningar
@@ -15378,10 +15879,13 @@ sv-x-k12:
   student_id_236970d8: student_id
   student_id_7cc45fb5: elev-Id
   student_id_a61d78c7: Elev-Id
+  student_interaction_report_3f3d2ff1: "Rapport om elevinteraktion"
   student_interactions_report_7717b685: Elevsamspelrapport
   student_messages_b0a242d: Elevmeddelanden
   student_must_complete_one_of_these_requirements_6046eb3a: "Elever måste slutföra ett av dessa krav"
+  student_n_a_30b1753f: "Elev: Ej tillgängligt"
   student_name: Elevnamn
+  student_name_a30d555e: "Elev: %{name}"
   student_name_b446c661: Elevnamn
   student_name_c45b2a7: Elevnamn
   student_name_options_cb029725: "Elev namn-val"
@@ -15390,11 +15894,13 @@ sv-x-k12:
   student_number_db6f06c1: "Elev %{number}"
   student_outcome_gradebook_description: "Elevs bedömningsöversikt för Måluppfyllelse ger eleven en överblick över kursutvecklingen baserat på kursens lärandemål. Resultatet presenteras i ett bedömningsöversiktsliknande format och utvecklingen visas i både siffror och definierade kategorier."
   student_planner_date_4cc73abb: "Elev planeringsdatum:"
+  student_position_6d3b7750: "Elev %{position}"
   student_settings_354d9a7e: Elevinställningar
   student_sis_6721040e: Elev-Sis
   student_sis_d9f0cd39: elev-Sis
   student_sis_id_abe6b292: "elev sis id"
   student_studentnumber_f398d9c2: "Elev %{studentNumber}"
+  student_view_ac9b672f: "Elevens Vy"
   student_viewed_document_9065adb8: "Dokument i elevens vy"
   studentcount_student_scores_updated_232ad7b7: 
     one: "1 elevresultat har uppdaterats"
@@ -15406,6 +15912,7 @@ sv-x-k12:
   students_are_loading_206c5246: "Elever laddas"
   students_are_not_allowed_to_access_test_installati_11b9078: "Elever är inte tillåtna att tillgå test installationer."
   students_being_observed_4de3e520: "Elever som observeras"
+  students_can_edit_and_view_page_history_if_allowed_39a47edc: "Elever kan redigera och se sidhistorik om detta tillåts i alternativen för den enskilda sidan."
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Elever kan endast delta i kursen mellan dessa datum"
   students_can_see_originality_score_797fe634: "Eleverna kan se originalitets-resultat"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Eleverna kan inte se Quizsvaren efter att kursen avslutas"
@@ -15461,6 +15968,8 @@ sv-x-k12:
       one: "1 under-konto"
       other: "%{count} under-konton"
   subaccount_91f4c279: Underkonto
+  subaccount_settings_8549eff7: Underkontoinställningar
+  subaccounts_efd02bd4: Underkonton
   subdomain_url_1e43b6f0: "Underdomän URL"
   subject_114b2e98: Ämne
   subject_must_contain_fewer_than_255_characters_2e72cd02: "Ämnet måste innehålla mindre än 255 tecken."
@@ -15498,6 +16007,7 @@ sv-x-k12:
     this_was_submitted_multiple_times_choose_a_submission_to_view: "Inlämnad flera gånger, välj vilken som ska visas:"
     update_grade: "Uppdatera bedömning"
     view_rubric_assessment_in_the_speedgrader: "Visa matris utvärdering i SpeedGrader"
+  submission_index_e960f9bf: "Inlämning %{index}"
   submission_score_b7a291e8: "resultat på inlämning"
   submission_tray_429ac3df: Inlämningsfack
   submissions: 
@@ -15711,6 +16221,7 @@ sv-x-k12:
   take_the_survey_again_24ce22c2: "Gör undersökningen igen"
   teacher_5a73b637: Lärare
   teacher_s_fdefb2c: Lärare
+  teacher_view_b2047bc6: Lärarvy
   teachers_52e2423f: Lärare
   teal_f729a294: Teal
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Berätta för oss hur och när du vill bli meddelad om händelser i Canvas."
@@ -15777,9 +16288,11 @@ sv-x-k12:
         unspecified: "när som helst"
       timespan: "%{start_at} *till* %{end_at}"
   terms_35d91184: "Terminer:"
+  terms_4d979628: Terminer
   terms_not_found_terms_must_be_included_with_multi__ca2e5c25: "Villkor hittades inte. Villkor måste inkluderas med multi_term_batch_mode"
   terms_of_service_attributes_not_valid_f3f9fca9: "Användarvillkor attribut ej giltiga"
   terms_of_service_f183ff7f: Användarvillkor
+  test_cluster_only_70e61c19: "Endast testkluster"
   text_document_eacbcdb7: Textdokument
   text_entry_submission_7b0ae0c5: Textinmatnings-inlämning
   text_entry_submission_cannot_be_empty_3d187cae: "Textinlägg-inlämningar kan inte vara tomma"
@@ -15788,14 +16301,25 @@ sv-x-k12:
   that_user_account_has_been_deleted_please_contact__350e0e0: "Det användarkontot har raderats. Vänligen kontakta din system-administratör om du vill aktivera kontot igen."
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "Konto-ID för kontot som hör till den rapporterande användaren"
   the_algorithm_to_use_for_signing_authnrequest_logo_67a75cc9: "Den algoritm som ska användas för AuthnRequest, LogoutRequest, och LogoutResponse meddelanden som skickas IdP."
+  the_analytics_feature_must_be_enabled_in_account_s_37b80011: |-
+      Analysfunktionen måste aktiveras i kontoinställningar för att analyssidorna ska visas.
+      Om du vill se länken Analyser i användarens sidofält från sidan Personer måste Profiler vara inaktiverat för ditt konto.
+  the_analytics_feature_must_be_enabled_in_account_s_b4e77562: |
+      Analysfunktionen måste aktiveras i kontoinställningar för att analyssidorna ska visas.
+      Om du vill se länken Analyser i användarens sidofält från sidan Personer måste Profiler vara inaktiverat för ditt konto.
   the_announcement_title_could_not_be_linked_to_the__78c747f3: "Meddelandet \"%{title}\" kunde inte länkas till modulen \"%{mod_title}\""
+  the_announcements_tab_is_always_visible_to_admins__eb447785: "Administratörer kan alltid se fliken Meddelanden. Men för att de ska kunna hantera meddelanden måste även Globala meddelanden – lägg till/redigera/ta bort vara aktiverad."
   the_app_was_activated_a84e055f: "Appen har aktiverats"
   the_app_was_added_58e2836a: "Appen har lagts till"
   the_app_was_added_successfully_3f785a23: "Appen lades till"
   the_app_was_deactivated_573520ab: "Appen har avaktiverats"
   the_app_was_updated_successfully_3d71cd1b: "Appen uppdaterades"
+  the_attendance_tool_must_be_enabled_by_your_canvas_108e6dca: "Närvaroverktyget måste aktiveras av din Canvas-administratör."
   the_canvas_saml_entity_id_is_metadata_url_and_the__af7349ab: "Canvas SAML Entity ID är %{metadata_url}, och Service Provider metadatafinns på den URL."
+  the_chat_tool_must_be_enabled_by_your_canvas_admin_e3b26123: "Chattverktyget måste aktiveras av din Canvas-administratör."
   the_course_link_validator_searches_through_course__76f0bc63: "Kursens länkbekräftare söker igenom kursens innehåll och visar alla ogiltiga eller ej fungerade länkar den hittar. Observera att vissa länkar som är flaggade som ej fungerande kan vara otillgängliga från våra servrar och kommer fortfarande att fungera för eleverna."
+  the_course_state_manage_permission_allows_users_to_67e16652: "Med behörigheten Kurstillstånd – hantera kan användare publicera kurser som inte innehåller moduler. Kursinnehåll – lägg till/redigera/ta bort måste aktiveras för att du ska kunna publicera/återkalla modulinnehåll."
+  the_course_status_buttons_unpublished_and_publishe_e2dca595: "Knapparna Kurstillstånd (återkallade och publicerade) visas endast fram till att en elev lämnar in en uppgift. Kurser kan inte återkallas med en inlämnad elevuppgift."
   the_download_process_has_started_this_can_take_awh_7e616db1: |-
       Nedladdningsproceduren har startat Detta
       kan ta en stund för stora kurser. Du kan lämna
@@ -15851,7 +16375,9 @@ sv-x-k12:
   the_profile_picture_has_been_reported_d609d6dd: "Profilbilden har rapporterats"
   the_provided_academic_benchmark_file_has_an_error_4ad2c631: "Den angivna Academic Benchmark-filen har ett fel"
   the_question_text_for_the_question_question_name_w_3a68a2c7: "Frågetexten för frågan \"%{question_name}\" är för lång."
+  the_quiz_log_auditing_feature_option_must_be_enabl_77bf321e: "Funktionen för loggranskning av quiz måste aktiveras i kursinställningarna."
   the_quiz_name_must_be_under_length_characters_68e7de3a: "Detta Quiz namn måste vara under %{length} tecken"
+  the_roles_api_refers_to_this_permission_as_become__bededd25: "Roll-API:t hänvisar till den här behörigheten som become_user."
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "rollerna som hölls av den rapporterande användaren (elev, lärare, administratör, osv.)"
   the_salesforce_account_id_if_it_exists_e7949706: "Salesforce konto-ID (om det finns)"
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "Schemaläggarverktyget låter dig bestämma tider som elever (eller elevgrupper) kan boka in sig på. För att sätta igång klickar du på knappen nedanför."
@@ -15865,6 +16391,7 @@ sv-x-k12:
   the_unique_id_used_for_representing_the_specific_r_3bdf5870: "Den unika id som används för att representera den specifika begäran/respons cykeln för den är felrapporten dök upp runt"
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "url som en tillräckligt privilegierad användare kan använda för att maskeras som den rapporterande användaren på samma sida för att förska återskapa problemet"
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "URL på sidan som användaren var på när de rapporterade problemet"
+  the_user_must_also_be_enrolled_as_an_instructor_in_e7e22eea: "Användaren måste även vara registrerad som instruktör i kursen de försöker korsreferera."
   theme_52404e51: Tema
   theme_editor_b7b00f6b: Temaredigerare
   theme_editor_changes_have_been_cancelled_2af5cc5f: "Ändringar i teamredigeraren har avbrutits."
@@ -15904,6 +16431,7 @@ sv-x-k12:
   there_was_a_problem_posting_the_comment_75d15646: "Det uppstod ett problem vid postande av kommentaren"
   there_was_a_problem_publishing_grades_b0b9202f: "Ett problem uppstod när bedömningar skulle publiceras."
   there_was_a_problem_saving_the_grade_8ea5d2ac: "Det gick inte att spara bedömningen."
+  there_was_a_problem_saving_the_grades_5e61f9e2: "Det var ett problem med att spara bedömningar."
   there_was_a_problem_saving_the_grading_period_243bed6c: "Ett problem uppstod när bedömningsperioden sparades"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "Ett problem uppstod när bedömningsschemat sparades"
   there_was_a_problem_sending_your_message_22b249a5: "Det uppstod ett problem med att skicka ditt meddelande."
@@ -15914,6 +16442,7 @@ sv-x-k12:
   there_was_a_problem_updating_the_comment_5f3595b9: "Det gick inte att uppdatera kommentaren"
   there_was_a_problem_updating_the_grade_1b6c8b4c: "Det inträffade ett problem när bedömningen skulle uppdateras."
   there_was_a_problem_updating_the_submission_6e5280a1: "Det gick inte att uppdatera inlämningen."
+  there_was_an_error_fetching_course_statistics_96e9dbad: "Det gick inte att hämta kursstatistiken"
   there_was_an_error_fetching_outcome_results_45c57590: "Det uppstod ett fel vid hämtning av utkomst-resultat"
   there_was_an_error_fetching_submission_comments_ce153077: "Det gick inte att hämta inlämningskommentarer"
   there_was_an_error_generating_the_pairing_code_9edd639b: "Det inträffade ett fel när parningskoden skulle skapas."
@@ -15989,6 +16518,7 @@ sv-x-k12:
   this_is_a_preview_of_the_draft_version_of_the_quiz_910a02e0: "Det här är en förhandsvisning av utkastet av detta Quiz"
   this_is_a_preview_of_the_published_version_of_the__70e0c8: "Det här är en förhandsvisning av den publicerade versionen av quizet"
   this_is_a_what_if_score_cbdc04f9: "Det här är ett \"Ifall-att\" resultat"
+  this_is_an_account_setting_that_must_be_turned_on__4c939dea: "Detta är en kontoinställning som måste aktiveras av din CSM (Customer Success Manager)."
   this_is_just_a_dev_only_feature_you_can_turn_on_to_7f88c58f: "Det här är bara en utv-endast-funktion som du kan aktivera för att få en förhandsgranskning av hur sidor skulle se ut i en RTL-miljö utan att behöva byta språk till ett som normalt är RTL"
   this_is_not_a_valid_grade_9cc2cb8: "Detta är inte en giltig bedömning"
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: "Det är den nuvarande bedömningen för denna eleven."
@@ -16018,6 +16548,12 @@ sv-x-k12:
   this_package_includes_the_question_type_pattern_ma_ce3dadc6: "Detta paket inkluderar frågetypen, Pattern Match, vilken inte är kompatibel med Canvas. Vi har konverterat frågetypen till Fyll i tomrummen"
   this_page_cannot_be_modified_because_grades_have_a_48646991: "Denna sidan kan inte ändras eftersom bedömningarna redan har gjorts."
   this_panel_lists_the_users_ready_to_be_added_to_th_79efad22: "De här panellistorna gör användarna redo att läggas till i kursen."
+  this_permission_does_not_affect_ability_to_manage__64b0f272: |-
+      Den här behörigheten påverkar inte möjligheten att hantera frågebanker på kursnivå i Quiz. Hantera frågebankar är istället beroende av behörigheten Uppgifter och Quiz – lägg till/redigera/ta bort.
+      Både den här behörigheten och Uppgifter och Quiz – lägg till/redigera/ta bort måste vara aktiverade för full hantering av kursfrågebanker.
+  this_permission_is_available_for_all_canvas_accoun_25cd5444: "Den här behörigheten finns tillgänglig för alla Canvas-konton men används endast av institutioner som är kopplade till ett Canvas Catalog-konto. Behörigheten har för närvarande ingen funktion för användare, men du rekommenderas låta den vara aktiverad för administratörer. För andra roller kan behörigheten inaktiveras."
+  this_permission_only_affects_course_announcements__6bc2b0a5: "Den här behörigheten påverkar endast kursmeddelanden. Globala meddelanden – lägg till/redigera/ta bort måste aktiveras för hantering av globala meddelanden."
+  this_permission_only_controls_adding_users_at_the__f33e8ae8: "Den här behörigheten styr endast tillägg av användare på kontonivå. Om du vill lägga till användare till kurser måste Användare – lägg till/ta bort elever från kurser eller Användare – lägg till/ta bort lärare, kursdesigner eller TA:er från kurser vara aktiverade."
   this_question_group_is_set_to_pick_more_questions__2e3552c4: "Denna frågegruppen ska välja fler frågor än de som finns tillgängliga."
   this_question_will_show_a_checkbox_next_to_each_an_169cd6d9: "Frågan kommer visa en checkruta bredvid svaret."
   this_quiz_has_been_excused_d89d2b74: "Quiz har slutförts."
@@ -16247,6 +16783,7 @@ sv-x-k12:
   timeline_of_messages_between_the_student_and_instr_6dbd9ad3: "Tidslinje med meddelanden mellan elev och handledare"
   timeline_showing_when_assignments_were_turned_in_bb44c8a1: "Tidslinje som visar när uppgifterna lämnades in"
   timeout_when_searching_5c24ff9d: "Avbrott under sökning"
+  timestamp_65f3a0a: "(%{timestamp})"
   tinymce: 
     insert_update_image_view: 
       alt_help_text: "Beskriv bilden för att få tillgång"
@@ -16294,28 +16831,209 @@ sv-x-k12:
   tls_7a2eaba5: TLS
   to_35c6baa2: till
   to_51406be9: Till
+  to_access_assignment_submissions_through_assignmen_30c5c8f2: "Om du vill ha åtkomst till inlämnade uppgifter via Uppgifter eller bedömningsöversikten, och vill kunna se dessa i SpeedGrader, måste även Bedömningar - visa alla eller Bedömningar – redigera vara aktiverade."
+  to_access_assignment_submissions_through_assignmen_ce438715: |-
+      Om du vill ha åtkomst till inlämnade uppgifter via Uppgifter och SpeedGrader, måste även Bedömningar – redigera vara aktiverad.
+      Om du vill bedöma eller lägga till kommentarer i SpeedGrader eller i bedömningsöversikten, måste även Bedömningar – redigera vara aktiverad.
+  to_access_assignment_submissions_through_assignmen_ecbb8fb7: "Om du vill ha åtkomst till inlämnade uppgifter via Uppgifter och bedömningsöversikten, måste även Bedömningar – visa alla bedömningar vara aktiverad."
+  to_access_the_account_courses_page_courses_view_li_e1da6165: "För åtkomst till kontots sida Kurser måste även Kurser – visa lista vara aktiverad."
+  to_access_the_assignments_index_page_course_conten_a5b00f98: "För åtkomst till indexeringssidan Uppgifter måste Kursinnehåll – visa vara aktiverad. För att du ska kunna se enskilda elevers uppgifter måste Användare – visa lista vara aktiverad."
+  to_access_the_people_page_and_view_groups_users_vi_43aceac3: "För åtkomst till sidan Personer och för att visa Grupper måste Användare – visa lista vara aktiverad."
+  to_access_the_people_page_users_view_list_must_be__2f01333b: "För åtkomst till sidan Personer måste Användare – visa lista vara aktiverad. Om den här behörigheten är aktiverad och om Användare – visa primär e-postadress är inaktiverad kommer användare att se e-postadresser som används som inloggnings-ID:n. För att visa inloggnings-ID:n måste även Användare – lägg till/ta bort elever i kurser samt Användare – lägg till/ta bort lärare, kursdesigner eller TA:er vara aktiverade."
+  to_access_the_people_page_users_view_list_must_be__5a5475fe: "För åtkomst till sidan Personer måste Användare – visa lista vara aktiverad."
+  to_access_the_people_page_users_view_list_must_be__756d7188: |-
+      För åtkomst till sidan Personer måste Användare – visa lista vara aktiverad.
+      Om kontoinställningen Öppen registrering är inaktiverad kan användare med den här behörigheten lägga till elever i en kurs med hjälp av e-postadresser även om användaren inte har ett Canvas-konto.
+      SIS-data måste vara aktiverad för att visa SIS-ID:n. Om du vill lägga till en användare med hjälp av SIS-ID måste även SIS-data – hantera vara aktiverad.
+      Om du vill redigera en elevs avsnitt måste även Användare – visa lista och Konversationer – skicka meddelanden till enskilda kursdeltagare vara aktiverade.
+      Om du vill länka en observatör till en elevs måste även Konversationer – skicka meddelanden till enskilda kursdeltagare vara aktiverad.
+  to_access_the_people_page_users_view_list_must_be__f89c8e5a: |-
+      För åtkomst till sidan Personer måste Användare – visa lista vara aktiverad.
+      
+      Om den här behörigheten är inaktiverad och om Användare – visa inloggnings-ID:n är aktiverad kommer användare ändå att se e-postadresser som används som inloggnings-ID:n.
   to_activate_sms_enter_the_four_character_confirmat_3982a3ec: "För att aktivera SMS, fyll i den fyrsiffriga bekräftelsekoden som skickades till %{sms_number}."
+  to_add_announcements_discussions_moderate_must_als_2496cbd7: "Om du vill lägga till meddelanden måste även Diskussioner – moderera vara aktiverad. Om du vill se de senaste meddelandena på startsidan måste kryssrutan Visa de senaste meddelandena på kursens startsida vara markerad i kursinställningarna."
+  to_add_edit_or_delete_groups_groups_add_edit_delet_b826f547: "Om du vill lägga till, redigera eller ta bort grupper måste även Grupper – lägg till/redigera/ta bort vara aktiverad."
+  to_add_users_to_a_course_users_add_remove_students_5036ad25: "Om du vill lägga till användare till en kurs måste även Användare – lägg till/ta bort elever från kurser för kursen och/eller Användare – lägg till/ta bort lärare, kursdesigner eller TA:er från kurser vara aktiverade."
+  to_add_users_to_a_course_users_add_remove_students_888b391e: |-
+      Om du vill lägga till användare till en kurs måste även Användare – lägg till/ta bort elever från kurser och/eller Användare – lägg till/ta bort lärare, kursdesigner eller TA:er från kurser vara aktiverade.
+      Om du vill redigera en elevs avsnitt måste även både Konversationer – skicka meddelanden till enskilda kursdeltagare och Användare – lägg till/ta bort elever från kurser vara aktiverade.
+      Om du vill redigera en lärares, kursdesigners eller TA:s avsnitt måste även både Konversationer – skicka meddelanden till enskilda kursdeltagare och Användare – lägg till/ta bort lärare, kursdesigner eller TA:er från kurser vara aktiverade.
+  to_allow_a_user_to_add_students_to_a_moderation_se_3f51a218: "Om du vill tillåta att användare lägger till elever till en moderationsuppsättning måste även Bedömningar – visa alla vara aktiverad."
+  to_allow_a_user_to_add_students_to_a_moderation_se_cd881a9d: |-
+      Om du vill tillåta att användare lägger till elever till en moderationsuppsättning måste även Bedömningar – visa alla vara aktiverad.
+      Om du vill tillåta att användare lägger till elever till en moderationsuppsättning, granska en ändrad uppgift i SpeedGrader och publicera slutbedömningar för en ändrad uppgift måste även Bedömningar – redigera vara aktiverad.
+  to_allow_a_user_to_publish_final_grades_for_a_mode_b0aaaadd: "Om du vill tillåta att användare publicerar slutbedömningar för en modererad uppgift måste även Bedömningar – redigera vara aktiverad."
+  to_allow_a_user_to_review_a_moderated_assignment_i_6aa43d7f: "Om du vill tillåta att användare granskar en modererad uppgift i SpeedGrader måste även Bedömningar – redigera vara aktiverad."
+  to_allow_full_management_of_conferences_created_by_902e96e4: |-
+      Om du vill tillåta fullständig hantering av konferenser som skapats av användare eller andra måste även Kursinnehåll – lägg till/redigera/ta bort vara aktiverad.
+      Om du vill avsluta en lång konferens måste Kursinnehåll – lägg till/redigera/ta bort vara aktiverad.
+      Även om Kursinnehåll – lägg till/redigera/ta bort är aktiverad och Webbkonferenser – skapa är inaktiverad kan användare fortfarande hantera konferenser.
+      Den här behörigheten styr en användares möjligheter att skapa konferenser i kurser och grupper.
+  to_allow_full_management_of_conferences_created_by_feec1984: |-
+      Om du vill tillåta fullständig hantering av konferenser som skapats av användare eller andra måste även Kursinnehåll – lägg till/redigera/ta bort vara aktiverad.
+      Om du vill avsluta en lång konferens måste Kursinnehåll – lägg till/redigera/ta bort vara aktiverad.
+      Även om Kursinnehåll – lägg till/redigera/ta bort är aktiverad och Webbkonferenser – skapa är inaktiverad kan användare fortfarande hantera konferenser.
+      Den här behörigheten styr en användares möjligheter att skapa konferenser i kurser och grupper.
+  to_allow_user_to_moderate_grades_grades_select_fin_e98c1f0e: "Om du vill tillåta användare att ändra bedömningar måste även Bedömningar – Välj slutbedömning för ändring vara aktiverad."
+  to_allow_view_edit_and_delete_functionality_of_col_17533079: |-
+      Om du vill tillåta samarbetsfunktioner för visning, redigering och borttagning som skapats av andra användare måste även Kursinnehåll – lägg till/redigera/ta bort vara aktiverad.
+      Om Kursinnehåll – lägg till/redigera/ta bort är aktiverad och Elevsamarbeten – skapa är inaktiverad kommer inte användare att kunna skapa nya samarbeten men de kan se, redigera och ta bort alla samarbeten.
+      Om du vill lägga till elever i samarbeten måste Användare – visa lista vara aktiverad. Om du vill lägga till en kursgrupp till ett samarbete måste även Grupper – lägg till/redigera/ta bort vara aktiverad.
+  to_allow_view_edit_delete_functionality_of_collabo_442490c4: "Om du vill tillåta samarbetsfunktioner för visning, redigering och borttagning som skapats av andra användare måste även Kursinnehåll – lägg till/redigera/ta bort vara aktiverad. Om Kursinnehåll – lägg till/redigera/ta bort är aktiverad och Elevsamarbeten – skapa är inaktiverad kommer inte användare att kunna skapa nya samarbeten men de kan se, redigera och ta bort alla samarbeten. Om du vill lägga till elever i samarbeten måste Användare – visa lista vara aktiverad. Om du vill lägga till en kursgrupp till ett samarbete måste även Grupp – visa alla elevgrupper vara aktiverad."
   to_be_added_2959cc72: "Ska läggas till"
   to_be_removed_d4b48586: "Ska tas bort"
   to_c4c44f4b: till
   to_change_sis_account_id_the_user_must_have_manage_4b8a37a8: "För att ändra sis_account_id måste användare ha manage_sis tillåtelse."
   to_close_comments_on_a_discussion_drag_a_discussio_85b27448: "Om du vill stänga kommentarer i en diskussion, drar du hit en diskussion, eller väljer stäng för kommentarer, från menyn för diskussionsinställningar."
   to_configure_an_openid_connect_provider_you_need_t_5c937249: "För att konfigurera en OpenID Ansluten leverantör behöver du godkännings- och token urls, och få tag på ett Klient ID och Klient hemlighet. Om leverantören kan konfigurera giltiga callback eller omdirigera URLs, använd %{callback_url}."
+  to_create_announcements_discussions_manage_must_al_932ac38f: "För att skapa meddelanden, måste Diskussioner - hantera också aktiveras."
+  to_cross_list_a_section_course_sections_add_edit_d_160006f7: "Om du vill korsreferera till ett avsnitt måste även Kursavsnitt – lägg till/redigera/ta bort vara aktiverad. Om du vill redigera SIS-ID måste även SIS-data – hantera vara aktiverad. Om du vill tillåta att en användare på kontonivå ska kunna ta bort en kurs måste även Kurstillstånd – hantera vara aktiverad."
+  to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "Om du vill korsreferera till ett avsnitt måste även Kursavsnitt – lägg till/redigera/ta bort vara aktiverad. Om du vill redigera SIS-ID måste även SIS-data – hantera vara aktiverad. Om du vill tillåta att en användare på kontonivå ska kunna ta bort en kurs måste även Kurstillstånd – hantera vara aktiverad."
+  to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "Om du vill korsreferera till ett avsnitt måste även Kurs – lägg till/redigera/ta bort vara aktiverad."
   to_date_cannot_come_before_from_date_3eeb2633: "Till datum kan inte komma före från datum"
+  to_differentiate_assignments_to_individual_student_6cc40fde: "För att du ska kunna se enskilda elevers uppgifter måste Användare – visa lista vara aktiverad."
   to_do_1d554f36: "Att göra"
   to_do_5526f10a: "Att göra:"
+  to_do_6ac7b2dc: "att göra:"
+  to_do_date_d6b79bfd: "Att göra %{date}"
   to_do_date_ddfb582c: "Att göra-datum:"
+  to_do_item_d76ecb78: "Att göra-objekt"
   to_do_items_loading_d1cdfcd5: "Atta göra föremål laddar"
   to_do_list_dashboard_d741f64e: "”To Do”-lista för panel"
   to_do_time_a7e17623: "Att göra-tid"
+  to_edit_a_grade_or_add_comments_in_speedgrader_or__ee4a36e: "Om du vill redigera en bedömning eller lägga till kommentarer i SpeedGrader eller i bedömningsöversikten, måste även Bedömningar – redigera vara aktiverad."
+  to_edit_a_student_s_section_users_add_remove_stude_1f188d80: |-
+      Om du vill redigera en elevs avsnitt måste även både Användare – lägg till/ta bort elever i kurser och Användare – visa lista vara aktiverade.
+      Om du vill redigera ett avsnitt för en lärare, kursdesigner eller TA måste även både Användare – lägg till/ta bort lärare, kursdesigner eller TA.er i kurser och Användare visa lista vara aktiverade.
+  to_edit_a_student_s_section_users_add_remove_stude_aab8752b: |-
+      Om du vill redigera en elevs avsnitt måste även Användare – lägg till/ta bort elever från kurser och Användare – visa lista vara aktiverade.
+      Om du vill redigera ett avsnitt för en lärare, kursdesigner eller TA måste även Användare – lägg till/ta bort lärare, kursdesigner eller TA.er från kurser och Användare visa lista vara aktiverade.
+  to_edit_a_student_s_section_users_add_remove_stude_f974cf: |-
+      Om du vill redigera en elevs avsnitt måste även Användare – lägg till/ta bort elever från kurser och Användare – skicka meddelanden till enskilda kursdeltagare vara aktiverade.
+      Om du vill redigera ett avsnitt för en lärare, kursdesigner eller TA måste även Användare – lägg till/ta bort lärare, kursdesigner eller TA:er från kurser för kursen och Konversationer – skicka meddelanden till enskilda kursdeltagare vara aktiverade.
+  to_edit_course_grading_schemes_courses_add_edit_de_bdcf3563: "Om du vill redigera bedömningsscheman för en kurs måste även Kurser – lägg till/redigera/ta bort vara aktiverad."
+  to_edit_course_settings_courses_add_edit_delete_mu_7354470c: "Om du vill redigera kursinställningarna för en kurs måste även Kurser – lägg till/redigera/ta bort vara aktiverad."
+  to_edit_user_details_modify_login_details_or_chang_381a5b72: |-
+      Om du vill redigera användarinformation, ändra inloggningsuppgifter eller lösenord för användare måste även Användare – hantera inloggningsuppgifter vara aktiverad.
+      Om du vill visa användares sidvyer måste även Statistik – visa vara aktiverad.
+      Om du vill agera som andra användare måste även Användare – agera som vara aktiverad.
+  to_generate_a_pairing_code_from_a_student_s_user_d_9c907ed3: "Om du vill generera en kopplingskod från en elevs Användarinformation-sida måste även behörigheten Användare – lägg till/ta bort elever i kurser vara aktiverad."
+  to_generate_a_pairing_code_from_a_student_s_user_s_e36358b3: |-
+      Om du vill generera en kopplingskod från en elevs Användarinställningar-sida måste även behörigheten Användare – agera som vara aktiverad.
+      Om du vill generera en kopplingskod från en elevs Användarinformation-sida måste även behörigheten Användare – lägg till/ta bort elever från kurser vara aktiverad.
+  to_generate_login_logout_activity_in_admin_tools_u_c5712e03: "Om du vill generera in-/utloggningsaktivitet i Administratörsverktyg måste även behörigheterna Användare – hantera inloggningsuppgifter eller Statistik – visa vara aktiverade. Om du vill generera ändringsloggar för bedömningar i Administratörsverktyg måste även Bedömningar – visa ändringsloggar vara aktiverad."
+  to_import_assignments_and_quizzes_using_the_course_86c5bdbb: "Om du vill importera uppgifter och quiz med kursimportverktyget måste Kursinnehåll – lägg till/redigera/ta bort vara aktiverad."
+  to_import_files_using_the_course_import_tool_cours_a0c2db0c: "Om du vill importera filer med kursimportverktyget måste även Kursinnehåll – lägg till/redigera/ta bort vara aktiverad."
+  to_import_sis_data_sis_data_import_must_also_be_en_52bdf01: "Om du vill importera SIS-data måste även SIS-data – importera vara aktiverad."
   to_link_the_course_observer_name_to_a_student_star_f993c826: "För att länka kursobservatören *%{name}* till en elev skriver du in elevens namn nedanför för att hitta dem och därefter klickar du på Uppdatera."
+  to_manage_blueprint_course_settings_in_course_sett_c3bfdd4f: "Om du vill hantera blueprint-kursinställningar i kursinställningarna måste även Kurser – lägg till/redigera/ta bort vara aktiverad."
+  to_manage_discussions_discussions_moderate_must_al_51d7646f: |-
+      Om du vill hantera diskussioner måste även Diskussioner – ändra vara aktiverad.
+      
+      Om du vill svara på en diskussion måste även Diskussioner – publicera inlägg vara aktiverad.
+  to_manage_discussions_discussions_post_and_discuss_a27d31c4: "Om du vill hantera diskussioner måste även Diskussioner – publicera inlägg och Diskussioner – ändra vara aktiverade. Om du vill svara på en diskussion måste även Diskussioner – publicera inlägg vara aktiverad."
+  to_manage_moderated_grading_grades_moderate_must_a_6502844b: "Om du vill hantera modererad bedömning måste även Bedömningar – moderera vara aktiverad."
+  to_manage_moderated_grading_grades_moderate_must_a_ed821722: |-
+      Om du vill hantera modererad bedömning måste även Bedömningar – moderera vara aktiverad.
+      OBS! Den här behörigheten kommer att ersätta Bedömningar – moderera som kommer att utgå.
+  to_manage_sis_data_sis_data_manage_must_also_be_en_cc52f042: "Om du vill hantera SIS-data måste även SIS-data – hantera vara aktiverad."
+  to_manage_sis_data_sis_data_manage_must_be_enabled_23f57d2: "Om du vill hantera SIS-data måste SIS-data – hantera vara aktiverad. Om SIS-data – hantera är aktiverad och SIS-data – läsa är inaktiverad åsidosätter kontobehörigheten kursbehörigheten. Om SIS-data – hantera är inaktiverad och SIS-data – läs är aktiverad, kan användare endast se kurs, användare, och SIS-ID:n för underkonton. Om du vill hindra användare från att se SIS-ID:n på kursnivå måste du inaktivera både SIS-data – hantera och SIS-Data – läsa."
   to_minscore_43e5452e: "till %{minScore}%"
+  to_moderate_a_quiz_assignments_and_quizzes_add_edi_9747d5fb: "Om du vill moderera ett quiz måste även Uppgifter och Quiz – lägg till/redigera/ta bort vara aktiverad."
+  to_moderate_a_quiz_assignments_and_quizzes_add_edi_ebdecaf8: "Om du vill moderera ett quiz måste även Uppgifter och Quiz – lägg till/redigera/ta bort vara aktiverad."
+  to_moderate_a_quiz_grades_edit_must_also_be_enable_72ca6ca1: "Om du vill moderera ett quiz måste även Bedömningar – redigera vara aktiverad."
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "För att nåla fast en diskussion högst upp på sidan, drar du hit diskussionen eller så väljer du Nåla i inställningar för diskussioner."
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "För att förhandsvisa Temaredigerings-märkning kommer du att behöva *stänga av högkontrast UI*."
+  to_publish_and_unpublish_module_content_courses_ad_4c7fc3c9: |-
+      Om du vill publicera och återkalla modulinnehåll måste även Kurser – lägg till/redigera/ta bort och Kursinnehåll – visa vara aktiverade.
+      Det går inte att återkalla modulobjekt om det finns inlämnade elevuppgifter.
+  to_publish_and_unpublish_module_content_courses_ad_fd53792f: "Om du vill publicera och återkalla modulinnehåll måste även Kurser – lägg till/redigera/ta bort och Kursinnehåll – visa vara aktiverade."
+  to_publish_unpublish_module_content_course_content_efc294d4: "Kursinnehåll – lägg till/redigera/ta bort måste aktiveras för att du ska kunna publicera/återkalla modulinnehåll."
+  to_restore_a_deleted_course_courses_undelete_and_c_dc2d0470: "Om du vill återställa en borttagen kurs måste även Kurser – återställ och Kursinnehåll – visa vara aktiverade."
+  to_restrict_students_from_creating_groups_deselect_6269c8cb: "Om du vill hindra att elever skapar grupper ska du avmarkera kryssrutan Låt elever organisera egna grupper i kursinställningarna."
   to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: "För att begränsa användare från ett specifikt Clever distrikt, fyll i distriktets Clever ID här. Detta krävs för att Clever Instant-inloggningen ska fungera i en miljö med många användare."
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "Ange domänen här för att begränsa användare från särskilda Google Apps domäner."
   to_restrict_to_users_of_your_azure_active_director_df7cdd41: "För att begränsa användare från din Azure Active katalog, nämn användaren här."
+  to_search_and_view_notifications_for_a_user_users__becfb733: "Om du vill söka efter och visa notifikationer till en användare måste även Användare – visa lista vara aktiverad."
+  to_search_by_grader_or_student_id_users_view_list__66bf658d: |-
+      Om du vill söka på bedömar- eller elev-ID måste Användare – visa lista vara aktiverad.
+      Om du vill söka på kurs- eller uppgifts-ID måste även Bedömningar – redigera vara aktiverad.
+      Om du endast vill söka på uppgifts-ID måste även Bedömningar – visa alla bedömningar vara aktiverad.
+  to_search_for_a_course_in_the_restore_courses_tab__46e75739: |-
+      Om du vill söka efter en kurs i fliken Återställ kurser måste även Kursinnehåll – visa vara aktiverad.
+      Om du vill återställa en borttagen kurs i ett konto måste Kurser – lägg till/redigera/ta bort, Kursinnehåll – visa samt Kurser – återställ vara aktiverade.
+  to_search_grade_change_logs_grades_view_change_log_8d2f6d30: "Om du endast vill söka på ändringsloggar för bedömningar måste även Bedömningar – visa vara aktiverad."
+  to_search_grade_change_logs_grades_view_change_log_d4d40cf2: "Om du endast vill söka på ändringsloggar för bedömningar måste även Bedömningar – visa vara aktiverad."
+  to_see_the_course_setup_checklist_option_on_the_co_41322a29: "Om du vill se alternativen i Checklista för kursen på kursens startsida, måste även Hantera – lägg till/redigera/ta bort kurser vara aktiverad."
+  to_send_a_message_to_an_individual_user_conversati_8d86a0da: "Om du vill skicka ett meddelande till en enskild användare måste även Konversationer – skicka meddelanden till enskilda kursdeltagare vara aktiverad."
+  to_share_a_discussion_to_commons_course_content_ad_962c5e53: "Om du vill dela en diskussion till Commons måste även Kursinnehåll – lägg till/redigera/ta bort vara aktiverad."
+  to_share_a_discussion_to_commons_discussions_view__df0fd6ac: "Om du vill dela en diskussion till Commons måste även Diskussioner – visa vara aktiverad."
+  to_view_a_course_outcomes_page_as_read_only_course_5bb7241f: |-
+      Om du vill visa en kursresultatsida som skrivskyddad måste Kursinnehåll – visa vara aktiverad.
+      Om du vill importera måluppfyllelser från resultatsidan måste Rubriker – lägg till/redigera/ta bort vara aktiverad.
+      Användare kan komma åt och skapa (men inte redigera) enskilda uppgiftsmatriser via Uppgifter om Kursinnehåll – visa och Uppgifter och quiz – lägg till/redigera/ta bort är aktiverade.
+  to_view_a_user_s_login_details_users_view_list_and_6d42118b: "Om du vill se en användares inloggningsuppgifter måste även både Användare – visa lista och Ändra inloggningsuppgifter för användare vara aktiverade."
+  to_view_account_level_groups_groups_add_edit_delet_bf12e984: "Om du vill se grupper på kontonivå måste även Grupper – lägg till/redigera/ta bort vara aktiverad."
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "För att visa alla aviseringar som skickats till en Canvas användare, välj användare och datumintervallet för din sökning."
+  to_view_announcements_announcements_view_must_also_75f652df: "Om du vill se meddelanden måste även Meddelanden – visa vara aktiverad."
+  to_view_discussions_in_a_course_discussions_view_m_18c3fa0b: |-
+      Om du vill se diskussioner i en kurs måste även Diskussioner – visa vara aktiverad.
+      Om du vill hantera diskussioner måste Diskussioner – ändra vara aktiverad.
+  to_view_discussions_in_a_course_discussions_view_m_b7e742bd: |-
+      För att se diskussioner i en kurs, måste Diskussioner - vy vara aktiverad.
+      Båda diskussioner - skapa och diskussioner - moderera gör det möjligt för en användare att skapa en diskussion i sidan Diskussioner. För att hantera meddelanden, måste Diskussioner - hantera också aktiveras.
+  to_view_discussions_in_a_course_discussions_view_m_bf14b0e: |-
+      Om du vill se diskussioner i en kurs måste även Diskussioner – visa vara aktiverad.
+      Om du vill hantera diskussioner måste Diskussioner – ändra vara aktiverad.
+  to_view_grades_in_a_course_grades_view_all_grades__acecd649: "Om du vill se bedömningar i en kurs måste även Bedömningar – visa alla bedömningar vara aktiverad."
+  to_view_last_activity_and_total_activity_informati_a06859f3: |-
+      Om du vill se information om senaste aktivitet och total aktivitet på sidan Personer i kurser måste även Användare – visa lista vara aktiverad.
+      För åtkomst till sidan Personer i kursen måste även Användare – visa lista vara aktiverad.
+  to_view_module_progression_grades_view_all_grades__b9fc4d6f: "Om du vill se framstegen i en modul måste även Bedömningar – visa alla bedömningar vara aktiverad."
+  to_view_or_edit_a_user_s_sis_id_or_integration_id__9abfc21d: "Om du vill se eller redigera en användares SIS-ID eller Integrations-ID måste även både Användare – visa lista och Användare – hantera inloggningsuppgifter vara aktiverade."
+  to_view_recent_announcements_on_the_home_page_cour_ffc52530: "Om du vill se de senaste meddelandena på startsidan måste Kursinnehåll – visa vara aktiverad och kryssrutan Visa de senaste meddelandena på kursens startsida måste vara markerad i kursinställningarna. Om du vill hantera kursmeddelanden måste även Diskussioner – ändra vara aktiverad."
+  to_view_student_analytics_analytics_view_must_also_8a41d86e: "Om du vill se elevanalyser måste även Analyser – visa vara aktiverad."
+  to_view_student_analytics_in_course_analytics_anal_9466b742: "Om du vill se elevanalyser i kursanalyser måste även Analyser – visa vara aktiverad."
+  to_view_student_analytics_in_course_analytics_grad_91d58a8a: "Om du vill se elevanalyser i kursanalyser måste även Bedömningar – visa alla bedömningar vara aktiverad"
+  to_view_student_analytics_users_view_list_and_anal_2c2776b2: "Om du vill se elevanalyser måste även Användare – visa lista och Analyser – visa vara aktiverade."
+  to_view_student_analytics_users_view_list_and_anal_41d32ecb: "Om du vill se elevanalyser måste även Användare – visa lista och Analyser – visa vara aktiverade."
+  to_view_student_analytics_users_view_list_and_grad_59d0da3e: "Om du vill se elevanalyser måste även Användare – visa lista och Bedömningar – visa alla bedömningar vara aktiverade."
+  to_view_the_account_people_page_users_view_list_mu_f44cef80: "Om du vill visa sidan Personer för kontot måste Användare – visa lista vara aktiverad. Om den här behörigheten är inaktiverad och om Användare – visa inloggnings-ID:n är aktiverad kommer användare ändå att se e-postadresser som används som inloggnings-ID:n."
+  to_view_the_list_of_users_in_an_account_users_view_401b8462: "Om du vill visa en lista över användare i ett konto måste Användare – visa lista vara aktiverad."
+  to_view_the_list_of_users_in_an_account_users_view_e08a4f3c: "Om du vill visa en lista över användare i ett konto måste Användare – visa lista vara aktiverad."
+  to_view_the_list_of_users_in_the_course_users_view_26412777: "Om du vill visa en lista över användare i kursen måste även Användare – visa lista vara aktiverad. Om du vill lägga till användare via SIS-ID måste även Användare – lägg till/ta bort elever från kurser och/eller Användare – lägg till/ta bort lärare, kursdesigner eller TA:er från kurser vara aktiverade."
+  to_view_the_list_of_users_in_the_course_users_view_524275e5: |-
+      Om du vill visa en lista över användare i kursen måste Användare – visa lista vara aktiverad.
+      SIS-data måste vara aktiverad för att visa SIS-ID:n.
+      Om du vill redigera en lärares eller en TA:s avsnitt måste även Användare – visa lista och Konversationer – skicka meddelanden till enskilda kursdeltagare vara aktiverade.
+      Om du vill länka en observatör till en elevs måste även Konversationer – skicka meddelanden till enskilda kursdeltagare vara aktiverad.
+  to_view_the_list_of_users_in_the_course_users_view_63e7f0c3: |-
+      Om du vill visa en lista över användare i kursen måste även Användare – visa lista vara aktiverad.
+      Om du vill lägga till användare via SIS-ID måste även Användare – lägg till/ta bort elever från kurser och/eller Användare – lägg till/ta bort lärare, kursdesigner eller TA:er från kurser vara aktiverade.
+  to_view_the_list_of_users_in_the_course_users_view_b1e0773b: |-
+      Om du vill visa en lista över användare i kursen måste Användare – visa lista vara aktiverad.
+      SIS-data måste vara aktiverad för att visa SIS-ID:n. Om du vill lägga till en användare med hjälp av SIS-ID måste även SIS-data – hantera vara aktiverad.
+      Om du vill redigera en lärares eller en TA:s avsnitt måste även Konversationer – skicka meddelanden till enskilda kursdeltagare vara aktiverad.
+      Om du vill länka en observatör till en elevs måste även Konversationer – skicka meddelanden till enskilda kursdeltagare vara aktiverad.
+  to_view_the_list_of_users_in_the_course_users_view_f5a54b37: |
+      Om du vill visa en lista över användare i kursen måste Användare – visa lista vara aktiverad.
+      SIS-data måste vara aktiverad för att visa SIS-ID:n. Om du vill lägga till en användare med hjälp av SIS-ID måste även SIS-data – hantera vara aktiverad.
+      Om du vill redigera en elevs avsnitt och kursroll måste även Användare – visa lista och Konversationer – skicka meddelanden till enskilda kursdeltagare vara aktiverade.
+      Om du vill avregistrera användare på användarinformationssidan måste även Visa lista över kurser och Se listan över användare vara aktiverad.
+      Gör att användare kan skicka om kursinbjudningar från sidan Personer i kursen.
+      Om kontoinställningen Öppen registrering är aktiverad kan användare med den här behörigheten lägga till elever i en kurs från sidan Personer i kurser med hjälp av e-postadresser om användaren inte har ett Canvas-konto.
+      Om du vill länka en observatör till en elev måste även Användare – hantera inloggningsuppgifter och Konversationer – skicka till enskilda kursdeltagare vara aktiverade.
+  to_view_the_outcomes_page_as_read_only_course_cont_d176be65: |-
+      Om du vill se resultatsidan som skrivskyddad måste Kursinnehåll – visa vara aktiverad.
+      Användare kan komma åt enskilda uppgiftsmatriser via Uppgifter om även Kursinnehåll – visa och Uppgifter och quiz – lägg till/redigera/ta bort är aktiverade.
+  to_view_the_reports_tab_courses_view_usage_reports_d371ec85: "Om du vill se fliken Rapporter måste även Kurser visa användningsrapporter vara aktiverad."
+  to_view_the_user_details_page_for_a_student_users__51d98047: "För att se sidan Användarinformation för en elev, måste Användare - lägg till/ta bort elever i kurser också aktiveras."
+  to_view_user_page_views_users_view_list_must_also__f4246239: "Om du vill se användares sidvyer måste även Användare – visa lista vara aktiverad."
+  to_view_users_and_user_account_details_users_view__99807b12: |-
+      Om du vill se användare och information om användarkontot måste Användare – visa lista vara aktiverad.
+      Om du vill ändra användarlösenord måste även Användare – visa lista vara aktiverad.
+      Om du vill se en användares SIS-ID måste även SIS-data – hantera eller SIS-data – läsa vara aktiverade. Om du vill se en användares Integrations-ID måste även SIS-data – hantera vara aktiverad.
   today_76e10f9c: Idag
   toggle_alignment_details_for_title_944f605: "Växla justeringsinformation för %{title}"
   toggle_course_card_color_overlays_b5b8137a: "Växla färgöverlagringar för kurskort"
@@ -16573,6 +17291,7 @@ sv-x-k12:
   user_data_export_from_date_6ba21b89: "*Användardata-export från %{date}*"
   user_date_range_search: 
     cant_come_before_from: "'Till datum' kan inte komma före 'Från datum'"
+  user_details_2613c079: Användardetaljer
   user_details_e9aef9e5: "Användar detaljer"
   user_does_not_have_permission_to_select_final_grad_47560e75: "användaren har inte tillstånd att välja slutlig bedömning"
   user_id_8256faeb: user_id
@@ -16949,8 +17668,17 @@ sv-x-k12:
           fler kurser eller upprätta din profil.
       welcome_to_happiness: "Välkommen till Canvas!"
   users_act_as_d922940: "Användare - agerar som"
+  users_add_remove_observers_d1273d9: "Användare – lägg till/ta bort observatörer"
+  users_add_remove_students_in_courses_efe7e748: "Användare – lägg till/ta bort elever i kurser"
+  users_add_remove_teachers_course_designers_or_tas__b480dd9: "Användare – lägg till/ta bort lärare, kursdesigners eller TA:er i kurser"
+  users_and_terms_are_located_at_the_account_so_the__4184557b: |-
+      Användare och villkor ligger på kontonivå , så att SIS-slutpunkter alltid kan bekräfta användarens behörigheter i enlighet med kontot. Underkonton kan endast äga kurser och avsnitt. De kan inte äga användardata.
+      Administratörer för underkonton kan inte se SIS-information om de inte även har tilldelats en instruktörsroll i kursen. Administratörer för underkonton kan inte se SIS-information utan kurskoppling, eftersom instruktörsrollen har behörigheten att läsa SIS-data på kontonivå.
+  users_can_access_the_manage_question_banks_link_on_e411d01: "Användare kan komma åt länken Hantera frågebanker på indexeringssidan Quiz om Kursinnehåll – visa och Uppgifter och quiz – lägg till/redigera/ta bort är aktiverade."
   users_d1b60cb0: Användare
+  users_generate_observer_pairing_codes_for_students_6975caad: "Användare – Generera observatörskopplingskoder för elever"
   users_manage_log_in_details_b944568b: "Användare - hantera inloggningsinformation"
+  users_manage_login_details_9462b30f: "Användare – hantera inloggningsuppgifter"
   users_matching_search_term_c604db9e: "Matchande användare \"%{search_term}\""
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "De som använder skärmläsare kan behöva stänga av den virtuella muspekaren för att använda dessa snabbkommandon"
   users_view_list_861c7a3f: "Användare - visa lista"
@@ -17076,6 +17804,7 @@ sv-x-k12:
   what_does_provisioning_only_mean_eac9a4a1: "Vad betyder provision?"
   what_should_the_csv_file_look_like_985a59ac: "Hur ser CSV filen ut?"
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "När du lägger till flera användare, använd ett kommatecken eller en radbrytning till separata användare."
+  when_disabled_students_can_still_send_individual_m_567a911c: "Även om den här inställningen är inaktiverad kan elever ändå skicka enskilda meddelanden till lärare, TA:er och elever som tillhör samma grupper på kontonivå i kursen."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Det här är sidan man ser när man besöker din kurs. Du kan välja om den ska visa ett aktivitetsflöde, en lista över kursmoduler, en kursöversikt eller en sidan som du skapat. Den är förinställd på kurs-aktivitetsflöde."
   when_people_visit_your_course_this_is_the_first_pa_5093ec45: |-
       När personer besöker din kurs, är detta första sidan de kommer att se.
@@ -17136,6 +17865,8 @@ sv-x-k12:
         settings: Inställningar
       unpublished_indicator: "Ej publicerad"
       view_page_history_wiki: "Visa sidhistorik"
+      wiki: 
+        todo_date: "Att göra-datum:"
     wiki_page_content: 
       page_locked: "Den här sidan är låst"
       page_locked_by_modules: "Den här sidan kommer bli tillgänglig när du har slutfört dessa modulerna:"
@@ -17165,6 +17896,7 @@ sv-x-k12:
         creation_date: Skapelsedatum
         last_edit: "Senaste redigering"
         page_title: "Sidans titel"
+        todo_date: "Att göra-datum"
       loading: Laddar...
       loading_more: "Laddar mer..."
       no_pages: "Inga sidor har skapats än."
@@ -17339,6 +18071,7 @@ sv-x-k12:
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "Du har nått det högsta antalet beteedendemönster för webbsida per användare (%{max})"
   you_have_unsynced_changes_that_will_sync_to_all_as_9028e711: "Du har osynkroniserade förändringar som synkroniseras med alla tillhörande kurser när en ny organisation sparas."
   you_just_sent_a_message_in_canvas_86b4945c: "Du skickade just ett meddelande i Canvas"
+  you_left_the_required_name_field_empty_8f9bce5c: "Du lämnade det obligatoriska namnfältet tomt."
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "Du vill såklart ha några av dessa. Hur kul är det att undervisa i en kurs om ingen lyssnar?"
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "Du måste uppdatera token, följ stegen i den här länken, du kan behöva hjälp från en expert"
   you_may_not_reproduce_or_communicate_any_of_the_co_7636b552: |-
