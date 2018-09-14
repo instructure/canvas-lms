@@ -115,18 +115,6 @@
             "missing: v8flags@^2.0.10, required by babel-cli@6.18.0"
           ],
           "dependencies": {
-            "babel-register": {
-              "missing": true
-            },
-            "babel-runtime": {
-              "missing": true
-            },
-            "convert-source-map": {
-              "missing": true
-            },
-            "fs-readdir-recursive": {
-              "missing": true
-            },
             "glob": {
               "version": "5.0.15",
               "from": "https://registry.npmjs.org/glob/-/glob-5.0.15.tgz",
@@ -191,21 +179,6 @@
                   "resolved": "https://registry.npmjs.org/path-is-absolute/-/path-is-absolute-1.0.1.tgz"
                 }
               }
-            },
-            "output-file-sync": {
-              "missing": true
-            },
-            "path-is-absolute": {
-              "missing": true
-            },
-            "slash": {
-              "missing": true
-            },
-            "source-map": {
-              "missing": true
-            },
-            "v8flags": {
-              "missing": true
             }
           }
         },
