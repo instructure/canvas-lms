@@ -849,16 +849,14 @@ class UsersController < ApplicationController
   def todo_items
     return render_unauthorized_action unless @current_user
 
-    bookmark = BookmarkedCollection::SimpleBookmarker.new(Assignment, :due_at, :id)
-
+    bookmark = Plannable::Bookmarker.new(Assignment, false, :due_at, :id)
     grading_scope = @current_user.assignments_needing_grading(scope_only: true).
-      reorder(:due_at, :id)
+      reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :quiz).eager_load(:duplicate_of)
     submitting_scope = @current_user.
       assignments_needing_submitting(
         include_ungraded: true,
-        limit: ToDoListPresenter::ASSIGNMENT_LIMIT,
         scope_only: true).
-      reorder(:due_at, :id)
+      reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :quiz).eager_load(:duplicate_of)
 
     grading_collection = BookmarkedCollection.wrap(bookmark, grading_scope)
     grading_collection = BookmarkedCollection.transform(grading_collection) do |a|
@@ -874,7 +872,7 @@ class UsersController < ApplicationController
     ]
 
     if Array(params[:include]).include? 'ungraded_quizzes'
-      quizzes_bookmark = BookmarkedCollection::SimpleBookmarker.new(Quizzes::Quiz, :due_at, :id)
+      quizzes_bookmark = Plannable::Bookmarker.new(Quizzes::Quiz, false, :due_at, :id)
       quizzes_scope = @current_user.
         ungraded_quizzes(
           :needing_submitting => true,
