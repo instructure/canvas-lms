@@ -37,6 +37,18 @@ module PlannerPageObject
     "button:contains('Close Opportunity Center popup')"
   end
 
+  def opportunity_item_selector(item_name)
+    "span:contains('#{item_name}')"
+  end
+
+  def dismiss_opportunity_button_selector(item_name)
+    "button[title='Dismiss #{item_name}']"
+  end
+
+  def no_new_opportunity_msg_selector
+    "div:contains('Nothing new needs attention.')"
+  end
+
   #------------------------- Elements --------------------------
 
   def planner_app_div
@@ -152,7 +164,19 @@ module PlannerPageObject
     ff("ul.to-do-list li")
   end
 
+  def opportunities_parent
+    f('#opportunities_parent')
+  end
+
+  def dismiss_opportunity_button(item_name)
+    f(dismiss_opportunity_button_selector(item_name))
+  end
+
   #----------------------- Actions & Methods -------------------------
+
+  def click_opportunity(item_name)
+    flnpt(item_name, opportunities_parent).click
+  end
 
   def dismiss_todo_item(todo_title)
     dismiss_todo_item_button(todo_title).click

@@ -18,6 +18,7 @@
 require_relative '../common'
 require_relative 'pages/student_planner_page'
 require_relative '../admin/pages/student_context_tray_page'
+require_relative '../assignments/page_objects/assignment_page'
 
 describe "student planner" do
   include_context "in-process server selenium tests"
@@ -418,7 +419,7 @@ describe "student planner" do
 
   context "with existing assignment, open opportunities" do
     before :once do
-      @course.assignments.create!(name: 'assignmentThatHasToBeDoneNow',
+      @assignment_opportunity = @course.assignments.create!(name: 'assignmentThatHasToBeDoneNow',
                                   description: 'This will take a long time',
                                   submission_types: 'online_text_entry',
                                   due_at: Time.zone.now - 2.days)
@@ -428,29 +429,33 @@ describe "student planner" do
       go_to_list_view
       open_opportunities_dropdown
       close_opportunities_dropdown
+
       expect(f('body')).not_to contain_jqcss(close_opportunities_selector)
     end
 
     it "links opportunity to the correct assignment page.", priority: "1", test_id: 3281712 do
       go_to_list_view
       open_opportunities_dropdown
-      parent = f('#opportunities_parent')
-      flnpt('assignmentThatHasToBeDoneNow', parent).click
-      expect(f('.description.user_content')).to include_text("This will take a long time")
+      click_opportunity(@assignment_opportunity.name)
+
+      expect(driver.current_url).to include "courses/#{@course.id}/assignments/#{@assignment_opportunity.id}"
+      expect(AssignmentPage.assignment_description.text).to eq @assignment_opportunity.description
     end
 
     it "dismisses assignment from opportunity dropdown.", priority: "1", test_id: 3281713 do
       go_to_list_view
       open_opportunities_dropdown
-      fj('button:contains("Dismiss assignmentThatHasToBeDoneNow")').click
-      expect(f('#opportunities_parent')).not_to contain_jqcss('div:contains("assignmentThatHasToBeDoneNow")')
-      expect(f('#opportunities_parent')).not_to contain_jqcss('button:contains("Dismiss assignmentThatHasToBeDoneNow")')
+      dismiss_opportunity_button(@assignment_opportunity.name).click
+
+      expect(opportunities_parent).to contain_jqcss(no_new_opportunity_msg_selector)
+      expect(opportunities_parent).not_to contain_jqcss(opportunity_item_selector(@assignment_opportunity.name))
+      expect(opportunities_parent).not_to contain_jqcss(dismiss_opportunity_button_selector(@assignment_opportunity.name))
     end
 
     it "shows missing pill in the opportunities dropdown.", priority: "1", test_id: 3281710 do
       go_to_list_view
       open_opportunities_dropdown
-      expect(f('#opportunities_parent')).to contain_jqcss('span:contains("Missing")')
+      expect(opportunities_parent).to contain_jqcss('span:contains("Missing")')
     end
   end
 
