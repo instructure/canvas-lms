@@ -73,7 +73,7 @@ class ErrorsController < ApplicationController
 
   def index
     params[:page] = params[:page].to_i > 0 ? params[:page].to_i : 1
-    @reports = ErrorReport.preload(:user)
+    @reports = ErrorReport.preload(:user, :account)
 
     @message = params[:message]
     if error_search_enabled? && @message.present?
