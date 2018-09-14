@@ -231,6 +231,8 @@ class SisBatch < ActiveRecord::Base
 
     import_scheme[:callback].call(self)
   rescue => e
+    self.reload # might have failed trying to save
+    self.data ||= {}
     self.data[:error_message] = e.to_s
     self.data[:stack_trace] = "#{e}\n#{e.backtrace.join("\n")}"
     self.workflow_state = "failed"
