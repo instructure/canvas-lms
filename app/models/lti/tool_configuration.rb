@@ -20,10 +20,14 @@ module Lti
     CANVAS_EXTENSION_LABEL = 'canvas.instructure.com'.freeze
 
     belongs_to :developer_key
+
+    before_validation :store_settings_from_url
     before_save :normalize_settings
 
     validates :developer_key_id, :settings, presence: true
     validate :valid_tool_settings?, unless: Proc.new { |c| c.developer_key_id.blank? || c.settings.blank? }
+
+    attr_accessor :settings_url
 
     def new_external_tool(context)
       tool = ContextExternalTool.new(context: context)
@@ -42,7 +46,7 @@ module Lti
     def valid_tool_settings?
       tool = new_external_tool(developer_key.owner_account)
       unless tool.valid?
-        errors.add(:settings, tool.errors.values.join(' '))
+        errors.add(:settings, tool.errors.to_h.map {|k, v| "Tool #{k} #{v}" })
       end
     end
 
@@ -56,7 +60,23 @@ module Lti
 
     def canvas_extensions
       return {} if settings.blank?
-      settings['extensions']&.find { |e| e['platform'] == CANVAS_EXTENSION_LABEL }
+      settings['extensions']&.find { |e| e['platform'] == CANVAS_EXTENSION_LABEL } || {}
+    end
+
+    def store_settings_from_url
+      return if @settings_url.blank?
+
+      response = CC::Importer::BLTIConverter.new.fetch(@settings_url)
+
+      errors.add(:settings_url, 'Content type must be "application/json"') unless response['content-type'].include? 'application/json'
+      return if errors[:settings_url].present?
+
+      errors.add(:settings_url, response.message) unless response.is_a? Net::HTTPSuccess
+      return if errors[:settings_url].present?
+
+      self.settings = JSON.parse(response.body)
+    rescue Timeout::Error
+      errors.add(:settings_url, 'Could not retrieve settings, the server response timed out.')
     end
 
     def normalize_settings

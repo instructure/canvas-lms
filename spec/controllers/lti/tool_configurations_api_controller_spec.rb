@@ -123,21 +123,115 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
   describe 'create_or_update' do
     subject { post :create_or_update, params: valid_parameters }
 
+    shared_examples_for 'an endpoint that accepts a settings_url' do
+      let(:ok_response) do
+        double(
+          body: settings.to_json,
+          is_a?: true,
+          '[]' => 'application/json'
+        )
+      end
+      let(:url) { 'https://www.mytool.com/config/json' }
+      let(:url_parameters) { {developer_key_id: developer_key.id, tool_configuration: {settings_url: url}} }
+
+      context 'when the request does not time out' do
+        before do
+          allow_any_instance_of(Net::HTTP).to receive(:request).and_return(ok_response)
+          post :create_or_update, params: url_parameters
+        end
+
+        it 'uses the tool configuration JSON from the settings_url' do
+          expect(config_from_response.settings['launch_url']).to eq settings['launch_url']
+        end
+      end
+
+      context 'when the request times out' do
+        before do
+          allow_any_instance_of(Net::HTTP).to receive(:request).and_raise(Timeout::Error)
+          post :create_or_update, params: url_parameters
+        end
+
+        it 'responds with 422' do
+          expect(response.code).to eq '422'
+        end
+
+        it 'responds with helpful error message' do
+          expect(json_parse['errors'].first['message']).to eq 'Could not retrieve settings, the server response timed out.'
+        end
+      end
+
+      context 'when the response is not a success' do
+        subject { json_parse['errors'].first['message'] }
+
+        let(:stubbed_response) { double() }
+
+        before do
+          allow(stubbed_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return false
+          allow(stubbed_response).to receive('[]').and_return('application/json')
+          allow_any_instance_of(Net::HTTP).to receive(:request).and_return(stubbed_response)
+        end
+
+        context 'when the response is "not found"' do
+          before do
+            allow(stubbed_response).to receive(:message).and_return('Not found')
+            allow(stubbed_response).to receive(:code).and_return('404')
+            post :create_or_update, params: url_parameters
+          end
+
+          it { is_expected.to eq 'Not found' }
+        end
+
+        context 'when the response is "unauthorized"' do
+          before do
+            allow(stubbed_response).to receive(:message).and_return('Unauthorized')
+            allow(stubbed_response).to receive(:code).and_return('401')
+            post :create_or_update, params: url_parameters
+          end
+
+          it { is_expected.to eq 'Unauthorized' }
+        end
+
+        context 'when the response is "internal server error"' do
+          before do
+            allow(stubbed_response).to receive(:message).and_return('Internal server error')
+            allow(stubbed_response).to receive(:code).and_return('500')
+            post :create_or_update, params: url_parameters
+          end
+
+          it { is_expected.to eq 'Internal server error' }
+        end
+
+        context 'when the response is not JSON' do
+          before do
+            allow(stubbed_response).to receive('[]').and_return('text/html')
+            allow(stubbed_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return true
+            post :create_or_update, params: url_parameters
+          end
+
+          it { is_expected.to eq 'Content type must be "application/json"' }
+        end
+      end
+    end
+
     it_behaves_like 'an action that requires manage developer keys' do
       let(:response) { subject }
     end
 
     context 'when the tool configuration does not exist' do
       it { is_expected.to be_ok }
+
+      it_behaves_like 'an endpoint that accepts a settings_url'
     end
 
     context 'when the tool configuration already exists' do
       before do
         tool_configuration
-        subject
+        post :create_or_update, params: valid_parameters
       end
 
       it { is_expected.to be_ok }
+
+      it_behaves_like 'an endpoint that accepts a settings_url'
 
       it 'updates the tool configuration' do
         new_settings = config_from_response.settings

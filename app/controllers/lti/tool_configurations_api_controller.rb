@@ -45,13 +45,23 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   # not exest. Otherwise updates the tool configuration with the provided
   # parameters.
   #
+  # Settings may be provided directly as JSON through the "settings"
+  # parameter or indirectly through the "settings_url" parameter.
+  #
+  # If both a the "settings" and "settings_url" parameters are set,
+  # the "settings" parameter will be ignored.
+  #
   # @argument settings [Object]
   #   JSON representation of the tool configuration
+  #
+  # @argument settings_url [String]
+  #   URL of settings JSON
   #
   # @returns ToolConfiguration
   def create_or_update
     tool_config = Lti::ToolConfiguration.find_or_initialize_by(developer_key: developer_key).tap do |tc|
       tc.settings = tool_configuration_params[:settings]
+      tc.settings_url = tool_configuration_params[:settings_url]
     end
     tool_config.save!
     render json: tool_config
@@ -89,10 +99,8 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   end
 
   def tool_configuration_params
-    @_tool_configuration_params ||= begin
-      {
-        settings: params.require(:tool_configuration)[:settings].to_unsafe_h
-      }
-    end
+    params.require(:tool_configuration).permit(:settings_url).merge(
+      { settings: params.require(:tool_configuration)[:settings]&.to_unsafe_h }
+    )
   end
 end
