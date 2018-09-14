@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import createReactClass from 'create-react-class';
 import classnames from 'classnames'
 import CurrentUploads from 'compiled/react_files/components/CurrentUploads'
 import UploadProgress from '../files/UploadProgress'
@@ -48,4 +49,4 @@ import UploadProgress from '../files/UploadProgress'
       );
     };
 
-export default React.createClass(CurrentUploads)
+export default createReactClass(CurrentUploads);

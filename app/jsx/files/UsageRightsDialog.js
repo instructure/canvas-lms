@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import createReactClass from 'create-react-class';
 import UsageRightsDialog from 'compiled/react_files/components/UsageRightsDialog'
 import I18n from 'i18n!usage_rights_modal'
 import UsageRightsSelectBox from '../files/UsageRightsSelectBox'
@@ -206,4 +207,4 @@ import htmlEscape from 'str/htmlEscape'
     );
   };
 
-export default React.createClass(UsageRightsDialog)
+export default createReactClass(UsageRightsDialog);

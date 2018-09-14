@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
+import createReactClass from 'create-react-class';
 import ReactModal from 'react-modal'
 import page from 'page'
 import FilesApp from 'compiled/react_files/components/FilesApp'
@@ -228,4 +229,4 @@ import Toolbar from '../files/Toolbar'
     );
   };
 
-export default React.createClass(FilesApp)
+export default createReactClass(FilesApp);

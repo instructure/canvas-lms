@@ -20,6 +20,7 @@ import $ from 'jquery'
 import _ from 'underscore'
 import I18n from 'i18n!react_files'
 import React from 'react'
+import createReactClass from 'create-react-class';
 import classnames from 'classnames'
 import ColumnHeaders from 'compiled/react_files/components/ColumnHeaders'
 
@@ -113,4 +114,4 @@ import ColumnHeaders from 'compiled/react_files/components/ColumnHeaders'
       );
     }
 
-export default React.createClass(ColumnHeaders)
+export default createReactClass(ColumnHeaders);

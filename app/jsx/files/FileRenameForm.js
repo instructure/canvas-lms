@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import createReactClass from 'create-react-class';
 import FileRenameForm from 'compiled/react_files/components/FileRenameForm'
 import Modal from '../shared/modal'
 import ModalContent from '../shared/modal-content'
@@ -152,4 +153,4 @@ import I18n from 'i18n!file_rename_form'
     );
   };
 
-export default React.createClass(FileRenameForm)
+export default createReactClass(FileRenameForm);

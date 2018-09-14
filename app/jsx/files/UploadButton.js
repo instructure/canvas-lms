@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!upload_button'
 import React from 'react'
+import createReactClass from 'create-react-class';
 import FileRenameForm from '../files/FileRenameForm'
 import ZipFileOptionsForm from './ZipFileOptionsForm'
 import UploadButton from 'compiled/react_files/components/UploadButton'
@@ -76,4 +77,4 @@ import UploadButton from 'compiled/react_files/components/UploadButton'
     );
   }
 
-export default React.createClass(UploadButton)
+export default createReactClass(UploadButton);

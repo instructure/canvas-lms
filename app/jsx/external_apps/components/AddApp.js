@@ -20,6 +20,7 @@ import I18n from 'i18n!external_tools'
 import _ from 'underscore'
 import $ from 'jquery'
 import React from 'react'
+import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types'
 import Modal from 'react-modal'
 import ConfigOptionField from '../../external_apps/components/ConfigOptionField'
@@ -43,7 +44,7 @@ import 'compiled/jquery.rails_flash_notifications'
     }
   };
 
-export default React.createClass({
+export default createReactClass({
     displayName: 'AddApp',
 
     propTypes: {

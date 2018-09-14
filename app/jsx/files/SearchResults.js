@@ -19,6 +19,7 @@
 import I18n from 'i18n!react_files'
 import _ from 'underscore'
 import React from 'react'
+import createReactClass from 'create-react-class';
 import SearchResults from 'compiled/react_files/components/SearchResults'
 import NoResults from '../files/NoResults'
 import ColumnHeaders from '../files/ColumnHeaders'
@@ -130,4 +131,4 @@ import FocusStore from 'compiled/react_files/modules/FocusStore'
     }
   };
 
-export default React.createClass(SearchResults)
+export default createReactClass(SearchResults);

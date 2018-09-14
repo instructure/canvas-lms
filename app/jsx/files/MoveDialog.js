@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!react_files'
 import React from 'react'
+import createReactClass from 'create-react-class';
 import MoveDialog from 'compiled/react_files/components/MoveDialog'
 import Modal from '../shared/modal'
 import ModalContent from '../shared/modal-content'
@@ -87,4 +88,4 @@ import classnames from 'classnames'
     );
   };
 
-export default React.createClass(MoveDialog)
+export default createReactClass(MoveDialog);

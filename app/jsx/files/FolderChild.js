@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!react_files'
 import React from 'react'
+import createReactClass from 'create-react-class';
 import FolderChild from 'compiled/react_files/components/FolderChild'
 import filesEnv from 'compiled/react_files/modules/filesEnv'
 import classnames from 'classnames'
@@ -239,4 +240,4 @@ FolderChild.isFolder = function () {
     );
   }
 
-export default React.createClass(FolderChild)
+export default createReactClass(FolderChild);
