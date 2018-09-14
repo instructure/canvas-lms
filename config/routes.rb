@@ -283,6 +283,7 @@ CanvasRails::Application.routes.draw do
         get 'turnitin/:asset_string' => 'submissions#turnitin_report', as: :turnitin_report
         post 'vericite/resubmit' => 'submissions#resubmit_to_vericite', as: :resubmit_to_vericite
         get 'vericite/:asset_string' => 'submissions#vericite_report', as: :vericite_report
+        get 'audit_events' => 'submissions#audit_events', as: :audit_events
       end
       get :rubric
       resource :rubric_association, path: :rubric do

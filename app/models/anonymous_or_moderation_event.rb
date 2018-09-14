@@ -100,6 +100,10 @@ class AnonymousOrModerationEvent < ApplicationRecord
     validate :payload_student_id_present
   end
 
+  def self.events_for_submission(assignment_id:, submission_id:)
+    self.where(assignment_id: assignment_id, submission_id: [nil, submission_id]).order(:created_at)
+  end
+
   EVENT_TYPES.each do |event_type|
     scope event_type, -> { where(event_type: event_type) }
   end

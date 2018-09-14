@@ -744,6 +744,76 @@ describe SubmissionsController do
     end
   end
 
+  describe "GET audit_events" do
+    before(:once) do
+      @course = Course.create!
+      first_student = course_with_user("StudentEnrollment", course: @course, name: "First", active_all: true).user
+      second_student = course_with_user("StudentEnrollment", course: @course, name: "Second", active_all: true).user
+      @teacher = course_with_user("TeacherEnrollment", course: @course, name: "Teacher", active_all: true).user
+      @assignment = @course.assignments.create!(name: "anonymous", anonymous_grading: true, updating_user: @teacher)
+      @submission = @assignment.submissions.find_by!(user: first_student)
+      @submission.submission_comments.create!(author: first_student, comment: "Student comment")
+      @submission.submission_comments.create!(author: @teacher, comment: "Teacher comment")
+      @unrelated_submission = @assignment.submissions.find_by!(user: second_student)
+      @teacher.account.role_overrides.create!(permission: :view_audit_trail, role: teacher_role, enabled: true)
+    end
+
+    before(:each) do
+      user_session(@teacher)
+    end
+
+    let(:params) do
+      {
+        assignment_id: @assignment.id,
+        course_id: @course.id,
+        submission_id: @submission.id
+      }
+    end
+
+    it "renders unauthorized if user does not have view_audit_trail permission" do
+      @teacher.account.role_overrides.where(permission: :view_audit_trail).destroy_all
+      get :audit_events, params: params, format: :json
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it "renders ok if user does have view_audit_trail permission" do
+      get :audit_events, params: params, format: :json
+      expect(response).to have_http_status(:ok)
+    end
+
+    it "returns only related audit events" do
+      @unrelated_submission.submission_comments.create!(author: @teacher, comment: "unrelated Teacher comment")
+      @course.assignments.create!(name: "unrelated", anonymous_grading: true, updating_user: @teacher)
+      get :audit_events, params: params, format: :json
+      audit_events = json_parse(response.body).fetch("audit_events")
+      expect(audit_events.count).to be 3
+    end
+
+    it "returns the assignment audit events" do
+      get :audit_events, params: params, format: :json
+      assignment_audit_events = json_parse(response.body).fetch("audit_events").select do |event|
+        event.fetch("anonymous_or_moderation_event").fetch("event_type").include?("assignment_")
+      end
+      expect(assignment_audit_events.count).to be 1
+    end
+
+    it "returns the submission audit events" do
+      get :audit_events, params: params, format: :json
+      submission_audit_events = json_parse(response.body).fetch("audit_events").select do |event|
+        event.fetch("anonymous_or_moderation_event").fetch("event_type").include?("submission_")
+      end
+      expect(submission_audit_events.count).to be 2
+    end
+
+    it "returns the audit events in order of created at" do
+      get :audit_events, params: params, format: :json
+      audit_event_ids = json_parse(response.body).fetch("audit_events").map do |event|
+        event.fetch("anonymous_or_moderation_event").fetch("id")
+      end
+      expect(audit_event_ids).to eql audit_event_ids.sort
+    end
+  end
+
   describe "copy_attachments_to_submissions_folder" do
     before(:once) do
       course_with_student
