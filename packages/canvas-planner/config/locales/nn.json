@@ -47,6 +47,9 @@
   "assignmenttype_title_posted_datetime_cab69444": {
     "message": "{ assignmentType } { title } levert den { datetime }."
   },
+  "assignmenttype_title_reminder_datetime_33fa66d5": {
+    "message": "{ assignmentType } { title }, påminning om frist den { datetime }."
+  },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Starten på gjeremålhistorikken din"
   },
@@ -307,6 +310,9 @@
   },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "Dato og tidspunkt som er frist for gjeremålet"
+  },
+  "there_are_no_points_associated_with_this_item_449c712a": {
+    "message": "Det er ingen poeng knytta til elementet"
   },
   "time_2b5aac58": {
     "message": "Tidspunkt"
