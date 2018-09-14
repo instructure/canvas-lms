@@ -30,7 +30,7 @@ module Api::V1::PlannerItem
   include PlannerHelper
 
   API_PLANNABLE_FIELDS = [:id, :title, :course_id, :location_name, :todo_date, :details, :url, :unread_count,
-                          :created_at, :updated_at].freeze
+                          :read_state, :created_at, :updated_at].freeze
   CALENDAR_PLANNABLE_FIELDS = [:all_day, :description, :start_at, :end_at].freeze
   GRADABLE_FIELDS = [:assignment_id, :points_possible, :due_at].freeze
   PLANNER_NOTE_FIELDS = [:user_id].freeze
@@ -70,16 +70,18 @@ module Api::V1::PlannerItem
       elsif item.is_a?(Announcement)
         ann_hash = item.attributes
         ann_hash.delete('todo_date')
+        unread_count, read_state = topics_status_for(user, item.id, opts[:topics_status])[item.id]
         hash[:plannable_date] = item.posted_at || item.created_at
-        hash[:plannable] = plannable_json({unread_count: unread_count_for(user, item.id, opts[:unread_counts])[item.id]}.merge(ann_hash))
+        hash[:plannable] = plannable_json({unread_count: unread_count, read_state: read_state}.merge(ann_hash))
         hash[:html_url] = named_context_url(item.context, :context_discussion_topic_url, item.id)
       elsif item.is_a?(DiscussionTopic) || (item.respond_to?(:discussion_topic?) && item.discussion_topic?)
         topic = item.is_a?(DiscussionTopic) ? item : item.discussion_topic
-        unread = unread_count_for(user, topic.id, opts[:unread_counts])[topic.id]
+        unread_count, read_state = topics_status_for(user, topic.id, opts[:topics_status])[topic.id]
+        unread_attributes = {unread_count: unread_count, read_state: read_state}
         hash[:plannable_id] = topic.id
         hash[:plannable_date] = item[:user_due_date] || topic.todo_date || topic.posted_at || topic.created_at
         hash[:plannable_type] = PLANNABLE_TYPES.key(topic.class_name)
-        hash[:plannable] = plannable_json({unread_count: unread}.merge(item.attributes).merge(topic.attributes), extra_fields: GRADABLE_FIELDS)
+        hash[:plannable] = plannable_json(unread_attributes.merge(item.attributes).merge(topic.attributes), extra_fields: GRADABLE_FIELDS)
         hash[:html_url] = discussion_topic_html_url(topic, user, hash[:submissions])
         hash[:planner_override] ||= planner_override_json(topic.planner_override_for(user), user, session, topic.class_name)
       elsif item.is_a?(AssessmentRequest)
@@ -128,10 +130,10 @@ module Api::V1::PlannerItem
     ActiveRecord::Associations::Preloader.new.preload(other_context_items, {context: :root_account}) if other_context_items.any?
     ss = user.submission_statuses(opts)
     discussions, _assign_quiz_items = other_context_items.partition{|i| i.is_a?(::DiscussionTopic)}
-    topic_unread_counts = unread_count_for(user, discussions.map(&:id))
+    topics_status = topics_status_for(user, discussions.map(&:id))
 
     items.map do |item|
-      planner_item_json(item, user, session, opts.merge(submission_statuses: ss, unread_counts: topic_unread_counts))
+      planner_item_json(item, user, session, opts.merge(submission_statuses: ss, topics_status: topics_status))
     end
   end
 
@@ -185,24 +187,25 @@ module Api::V1::PlannerItem
     submission_status
   end
 
-  def unread_count_for(user, topic_ids, counts = {})
-    counts ||= {}
-    countless_topic_ids = Array(topic_ids) - counts.keys
-    if countless_topic_ids.any?
-      participant_info = DiscussionTopic.select("discussion_topics.id, COALESCE(dtp.unread_entry_count, COUNT(de.id)) AS unread_entry_count").
+  def topics_status_for(user, topic_ids, topics_status={})
+    topics_status ||= {}
+    unknown_topic_ids = Array(topic_ids) - topics_status.keys
+    if unknown_topic_ids.any?
+      participant_info = DiscussionTopic.select("discussion_topics.id, COALESCE(dtp.unread_entry_count, COUNT(de.id)) AS unread_entry_count,
+        COALESCE(dtp.workflow_state, 'unread') AS unread_state").
         joins("LEFT JOIN #{DiscussionTopicParticipant.quoted_table_name} AS dtp
                  ON dtp.discussion_topic_id = discussion_topics.id
                 AND dtp.user_id = #{User.connection.quote(user)}
                LEFT JOIN #{DiscussionEntry.quoted_table_name} AS de
                  ON de.discussion_topic_id = discussion_topics.id
                 AND dtp.id IS NULL").
-        where(id: countless_topic_ids).
+        where(id: unknown_topic_ids).
         group("discussion_topics.id, dtp.id")
       participant_info.each do |pi|
-        counts[pi[:id]] = pi[:unread_entry_count]
+        topics_status[pi[:id]] = [pi[:unread_entry_count], pi[:unread_state]]
       end
     end
-    counts.slice(*topic_ids)
+    topics_status
   end
 
   def new_activity(item, user, opts = {})
@@ -213,7 +216,9 @@ module Api::V1::PlannerItem
     end
     if item.is_a?(DiscussionTopic) || item.try(:discussion_topic)
       topic = item.try(:discussion_topic) || item
-      return true if topic && (topic.unread?(user) || topic.unread_count(user) > 0)
+      unread_count, read_state = opts.dig(:topics_status, topic.id)
+      return (read_state == 'unread' || unread_count > 0) if unread_count && read_state
+      return (topic.unread?(user) || topic.unread_count(user) > 0) if topic
     end
     false
   end
