@@ -2011,6 +2011,10 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  def display_avatars?
+    context.root_account.service_enabled?(:avatars) && !grade_as_group?
+  end
+
   def grade_as_group?
     has_group_category? && !grade_group_students_individually?
   end

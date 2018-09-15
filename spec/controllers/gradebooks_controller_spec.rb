@@ -1237,7 +1237,6 @@ describe GradebooksController do
     describe "returned JSON" do
       before(:once) do
         @assignment = @course.assignments.create!(title: "Math 1.1")
-        @student = @course.enroll_user(User.create!(name: "Adam Jones")).user
         @submission = @assignment.submissions.find_by!(user: @student)
       end
 
@@ -1297,26 +1296,45 @@ describe GradebooksController do
           }
         end
 
+        before { user_session(@teacher) }
+
         it 'works with the absence of user_id and the presence of anonymous_id' do
-          user_session(@teacher)
           post(:update_submission, params: post_params, format: :json)
           submissions = json.map {|submission| submission.fetch('submission').fetch('anonymous_id')}
           expect(submissions).to contain_exactly(@submission.anonymous_id)
         end
 
         it 'does not include user_ids for muted anonymous assignments' do
-          user_session(@teacher)
           post(:update_submission, params: post_params, format: :json)
           submissions = json.map {|submission| submission['submission'].key?('user_id')}
           expect(submissions).to contain_exactly(false)
         end
 
         it 'includes user_ids for unmuted anonymous assignments' do
-          user_session(@teacher)
           @assignment.unmute!
           post(:update_submission, params: post_params, format: :json)
           submission = json.first.fetch('submission')
           expect(submission).to have_key('user_id')
+        end
+
+        context "given a student comment" do
+          before(:once) { @submission.add_comment(comment: 'a student comment', author: @student) }
+
+          it 'includes anonymous_ids on submission_comments' do
+            params_with_comment = post_params.deep_merge(submission: {score: 10})
+            post(:update_submission, params: params_with_comment, format: :json)
+            comments = json.first.fetch('submission').fetch('submission_comments').map { |c| c['submission_comment'] }
+            expect(comments).to all have_key('anonymous_id')
+          end
+
+          it 'excludes author_name on submission_comments' do
+            params_with_comment = post_params.deep_merge(submission: {score: 10})
+            post(:update_submission, params: params_with_comment, format: :json)
+            comments = json.first.fetch('submission').fetch('submission_comments').map { |c| c['submission_comment'] }
+            comments.each do |comment|
+              expect(comment).not_to have_key('author_name')
+            end
+          end
         end
       end
     end
@@ -1474,9 +1492,9 @@ describe GradebooksController do
 
         # confirm the response JSON shows provisional information
         json = JSON.parse response.body
-        expect(json[0]['submission']['score']).to eq 100
-        expect(json[0]['submission']['grade_matches_current_submission']).to eq true
-        expect(json[0]['submission']['submission_comments'].first['submission_comment']['comment']).to eq 'provisional!'
+        expect(json.first.fetch('submission').fetch('score')).to eq 100
+        expect(json.first.fetch('submission').fetch('grade_matches_current_submission')).to eq true
+        expect(json.first.fetch('submission').fetch('submission_comments').first.fetch('submission_comment').fetch('comment')).to eq 'provisional!'
       end
 
       context 'when submitting a final provisional grade' do
@@ -1513,28 +1531,26 @@ describe GradebooksController do
 
         let(:submission_json) do
           response_json = JSON.parse(response.body)
-          response_json[0]['submission']
+          response_json[0]['submission'].with_indifferent_access
+        end
+
+        before do
+          post 'update_submission', params: provisional_grade_params, format: :json
+          post 'update_submission', params: final_provisional_grade_params, format: :json
         end
 
         it 'returns the submitted score in the submission JSON' do
-          post 'update_submission', params: provisional_grade_params, format: :json
-          post 'update_submission', params: final_provisional_grade_params, format: :json
-
-          expect(submission_json['score']).to eq 77
+          expect(submission_json.fetch('score')).to eq 77
         end
 
         it 'returns the submitted comments in the submission JSON' do
-          post 'update_submission', params: provisional_grade_params, format: :json
-          post 'update_submission', params: final_provisional_grade_params, format: :json
-
-          all_comments = submission_json['submission_comments']
-          expect(all_comments.first['submission_comment']['comment']).to eq 'THE END'
+          all_comments = submission_json.fetch('submission_comments').
+            map { |c| c.fetch('submission_comment') }.
+            map { |c| c.fetch('comment') }
+          expect(all_comments).to contain_exactly('not the end', 'THE END')
         end
 
         it 'returns the value for grade_matches_current_submission of the submitted grade in the JSON' do
-          post 'update_submission', params: provisional_grade_params, format: :json
-          post 'update_submission', params: final_provisional_grade_params, format: :json
-
           expect(submission_json['grade_matches_current_submission']).to be true
         end
       end
