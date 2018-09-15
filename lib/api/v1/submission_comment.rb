@@ -17,6 +17,21 @@
 #
 
 module Api::V1::SubmissionComment
+  include GradebookSettingsHelpers
+
+  ANONYMOUS_MODERATED_JSON_ATTRIBUTES = %i[
+    author_id
+    author_name
+    cached_attachments
+    comment
+    created_at
+    draft
+    group_comment_id
+    id
+    media_comment_id
+    media_comment_type
+  ].freeze
+
   def submission_comment_json(submission_comment, user)
     sc_hash = submission_comment.as_json(
       :include_root => false,
@@ -53,9 +68,8 @@ module Api::V1::SubmissionComment
   end
 
   def anonymous_moderated_submission_comments_json(assignment:, submissions:, submission_comments:, current_user:, course:, avatars:)
-    @comment_methods ||= avatars ? [:avatar_path] : []
-    @comment_fields ||= %i(attachments author_id author_name cached_attachments comment created_at
-                           draft group_comment_id id media_comment_id media_comment_type)
+    display_avatars = avatars && !assignment.grade_as_group?
+    comment_methods = display_avatars ? [:avatar_path] : []
 
     comments = visible_submission_comments(
       assignment: assignment,
@@ -65,7 +79,7 @@ module Api::V1::SubmissionComment
       course: course
     )
     comments.map do |comment|
-      json = comment.as_json(include_root: false, methods: @comment_methods, only: @comment_fields)
+      json = comment.as_json(include_root: false, methods: comment_methods, only: ANONYMOUS_MODERATED_JSON_ATTRIBUTES)
       author_id = comment.author_id.to_s
 
       json[:publishable] = comment.publishable_for?(current_user)
@@ -76,12 +90,12 @@ module Api::V1::SubmissionComment
         json.delete(:author_id)
         json.delete(:author_name)
         json[:anonymous_id] = student_ids_to_anonymous_ids(current_user: current_user, submissions: submissions, assignment: assignment, course: course)[author_id]
-        json[:avatar_path] = User.default_avatar_fallback if avatars
+        json[:avatar_path] = User.default_avatar_fallback if display_avatars
       elsif anonymous_graders?(current_user: current_user, assignment: assignment) && assignment.grader_ids_to_anonymous_ids.key?(author_id)
         json.delete(:author_id)
         json[:anonymous_id] = assignment.grader_ids_to_anonymous_ids[author_id]
         unless author_id == current_user.id.to_s
-          json[:avatar_path] = User.default_avatar_fallback if avatars
+          json[:avatar_path] = User.default_avatar_fallback if display_avatars
           json.delete(:author_name)
         end
       end
