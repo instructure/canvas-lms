@@ -422,6 +422,27 @@ This text has a http://www.google.com link in it...
     end
   end
 
+  context "given group and nongroup comments" do
+    before(:once) do
+      @group_comment = @submission.submission_comments.create!(group_comment_id: 'foo')
+      @nongroup_comment = @submission.submission_comments.create!
+    end
+
+    describe 'scope: for_groups' do
+      subject { SubmissionComment.for_groups }
+
+      it { is_expected.to include(@group_comment) }
+      it { is_expected.not_to include(@nongroup_comment) }
+    end
+
+    describe 'scope: not_for_groups' do
+      subject { SubmissionComment.not_for_groups }
+
+      it { is_expected.not_to include(@group_comment) }
+      it { is_expected.to include(@nongroup_comment) }
+    end
+  end
+
   describe 'scope: draft' do
     before(:once) do
       @standard_comment = @submission.submission_comments.create!(valid_attributes)
