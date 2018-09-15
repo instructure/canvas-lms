@@ -18,6 +18,7 @@
 
 class TurnOffAnonymousGradingForDiscussionTopicsAndQuizzes < ActiveRecord::Migration[5.1]
   tag :postdeploy
+  disable_ddl_transaction!
 
   def up
     DataFixup::TurnOffAnonymousGradingForDiscussionTopicsAndQuizzes.run
