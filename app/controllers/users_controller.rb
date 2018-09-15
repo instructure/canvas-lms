@@ -157,7 +157,7 @@ class UsersController < ApplicationController
     :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
     :user_dashboard, :toggle_hide_dashcard_color_overlays,
     :masquerade, :external_tool, :dashboard_sidebar, :settings, :activity_stream,
-    :activity_stream_summary, :pandata_events_token]
+    :activity_stream_summary, :pandata_events_token, :dashboard_cards]
   before_action :require_registered_user, :only => [:delete_user_service,
     :create_user_service]
   before_action :reject_student_view_student, :only => [:delete_user_service,

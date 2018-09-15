@@ -818,10 +818,15 @@ describe ApplicationHelper do
         @current_user = @user
         expect(planner_enabled?).to be true
       end
+
+      it "returns false with no user" do
+        expect(planner_enabled?).to be false
+      end
     end
 
     context "with student_planner feature flag disabled" do
       it "returns false" do
+        @current_user = user_factory
         expect(planner_enabled?).to be false
       end
     end
