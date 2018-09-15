@@ -206,7 +206,7 @@ export default class CourseSidebar extends Component {
   }
 
   clearRoutes = () => {
-    this.props.routeTo('#!/')
+    this.props.routeTo('#!/blueprint')
   }
 
   openHistoryModal () {

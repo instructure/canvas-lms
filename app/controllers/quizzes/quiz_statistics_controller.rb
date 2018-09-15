@@ -271,7 +271,7 @@ class Quizzes::QuizStatisticsController < ApplicationController
       else
         json = Rails.cache.fetch(cache_key) do
           all_versions = value_to_boolean(params[:all_versions])
-          statistics = @service.generate_aggregate_statistics(all_versions, {section_ids: params[:section_ids]})
+          statistics = @service.generate_aggregate_statistics(all_versions, include_sis_ids?, {section_ids: params[:section_ids]})
           serialize(statistics)
         end
 
@@ -281,6 +281,10 @@ class Quizzes::QuizStatisticsController < ApplicationController
   end
 
   private
+
+  def include_sis_ids?
+    @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis)
+  end
 
   def prepare_service
     @service = Quizzes::QuizStatisticsService.new(@quiz)

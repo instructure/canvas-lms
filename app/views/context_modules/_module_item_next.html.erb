@@ -47,6 +47,9 @@
   class="
     context_module_item
     <%= 'student-view' if @is_student %>
+    <% if module_item&.content&.respond_to?("can_duplicate?") %>
+      <%= 'cannot-duplicate' if !module_item&.content&.can_duplicate?%>
+    <% end %>
     <%= module_item.content_type_class if module_item %>
     <%= 'also_assignment' if module_item && module_item.graded? %>
     indent_<%= module_item.try_rescue(:indent) || '0' %>

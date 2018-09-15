@@ -92,7 +92,10 @@ module.exports = {
       // to start ensuring conforms to prettier, add it to this array to opt-in
       // now to conform to prettier.
       files: [
-        'app/jsx/permissions/**/*.js'
+        'app/jsx/permissions/**/*.js',
+        'app/jsx/account_course_user_search/**/*.js',
+        'app/jsx/discussions/**/*.js',
+        'app/jsx/announcements/**/*.js'
       ],
       rules: {
         'prettier/prettier': 'error'

@@ -20,7 +20,7 @@ require 'openssl'
 module Lti
   class RSAKeyPair < JWKKeyPair
     ALG = 'RS256'.freeze
-    SIZE = 256
+    SIZE = 2048
     def initialize(use: 'sig')
       @alg = ALG
       @use = use

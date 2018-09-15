@@ -32,15 +32,6 @@ module Services
       )
     end
     let(:submitted_at) { Time.zone.now }
-    let(:successful_email) do
-      OpenStruct.new(
-        from_name: 'notifications@instructure.com',
-        subject: "Submission upload successful: #{assignment.name}",
-        to: user.email,
-        body: "Your file, #{attachment.display_name}, has been successfully "\
-              "uploaded to your Canvas assignment, #{assignment.name}"
-      )
-    end
     let(:failure_email) do
       OpenStruct.new(
         from_name: 'notifications@instructure.com',
@@ -118,17 +109,6 @@ module Services
         it 'enqueues the worker job' do
           expect(worker_job.handler).to include described_class::SubmitWorker.name
         end
-
-        it 'sends a successful email' do
-          worker_job.invoke_job
-
-          email_job = Delayed::Job.order(:id).last
-          expect(email_job.handler).to match(/#{described_class::EmailWorker.name}/)
-          expect(Mailer).to receive(:deliver).with(Mailer.create_message(successful_email))
-          email_job.invoke_job
-
-          expect(progress.reload.workflow_state).to eq 'completed'
-        end
       end
     end
 
@@ -151,15 +131,6 @@ module Services
 
     context 'sending an email' do
       let(:email_job) { Delayed::Job.last }
-
-      describe '#successful_email' do
-        it 'enqueues a successful email' do
-          subject.successful_email
-          expect(email_job.handler).to match(/#{described_class::EmailWorker.name}/)
-          expect(Mailer).to receive(:deliver).with(Mailer.create_message(successful_email))
-          email_job.invoke_job
-        end
-      end
 
       describe '#failure_email' do
         it 'enqueues a failure email' do

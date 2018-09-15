@@ -16,12 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default function buildReducer(handlers, initialState) {
-  return function reducer(state, action) {
-    if (!state) {
-      return initialState
-    }
-
+export function buildReducer(handlers, initialState) {
+  function reducer(state, action) {
     if (handlers[action.type]) {
       try {
         // If the current map of handlers includes this action type, return the
@@ -37,4 +33,22 @@ export default function buildReducer(handlers, initialState) {
 
     return state
   }
+
+  reducer.initialState = initialState
+
+  return reducer
+}
+
+export function composeReducers(reducers) {
+  return function composedReducer(currentState, action) {
+    return reducers.reduce((state, reducer) => reducer(state, action), currentState)
+  }
+}
+
+export function pipeState(currentState, ...handlers) {
+  return handlers.reduce((state, handler) => handler(state), currentState)
+}
+
+export function updateIn(state, key, innerState) {
+  return {...state, [key]: {...state[key], ...innerState}}
 }

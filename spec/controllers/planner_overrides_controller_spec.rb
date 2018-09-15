@@ -74,14 +74,14 @@ describe PlannerOverridesController do
     describe "GET #index" do
       it "returns http success" do
         get :index
-        expect(response).to have_http_status(:success)
+        expect(response).to be_successful
       end
     end
 
     describe "GET #show" do
       it "returns http success" do
         get :show, params: {id: @planner_override.id}
-        expect(response).to have_http_status(:success)
+        expect(response).to be_successful
       end
     end
 
@@ -89,7 +89,7 @@ describe PlannerOverridesController do
       it "returns http success" do
         expect(@planner_override.marked_complete).to be_falsey
         put :update, params: {id: @planner_override.id, marked_complete: true, dismissed: true}
-        expect(response).to have_http_status(:success)
+        expect(response).to be_successful
         expect(@planner_override.reload.marked_complete).to be_truthy
         expect(@planner_override.dismissed).to be_truthy
       end
@@ -114,18 +114,18 @@ describe PlannerOverridesController do
         post :create, params: {plannable_type: "assignment", plannable_id: @assignment2.id, marked_complete: true}
       end
 
-      it "should save announcement overrides with a plannable_type of discussion_topic" do
+      it "should save announcement overrides with a plannable_type of announcement" do
         announcement_model(context: @course)
         post :create, params: {plannable_type: 'announcement', plannable_id: @a.id, user_id: @student.id, marked_complete: true}
         json = json_parse(response.body)
-        expect(json["plannable_type"]).to eq 'discussion_topic'
+        expect(json["plannable_type"]).to eq 'announcement'
       end
     end
 
     describe "DELETE #destroy" do
       it "returns http success" do
         delete :destroy, params: {id: @planner_override.id}
-        expect(response).to have_http_status(:success)
+        expect(response).to be_successful
         expect(@planner_override.reload).to be_deleted
       end
 

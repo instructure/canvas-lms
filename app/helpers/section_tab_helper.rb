@@ -18,6 +18,7 @@
 module SectionTabHelper
   PERMISSIONS_TO_PRECALCULATE = [
     :create_conferences,
+    :create_forum,
     :manage_admin_users,
     :manage_assignments,
     :manage_content,

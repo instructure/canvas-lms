@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`can handles no items 1`] = `
+<div>
+  <h2
+    className="todo-list-header"
+  >
+    <span
+      tabIndex="-1"
+    >
+      To Do
+    </span>
+  </h2>
+  <Text
+    as="span"
+    letterSpacing="normal"
+    size="small"
+  >
+    Nothing for now
+  </Text>
+</div>
+`;

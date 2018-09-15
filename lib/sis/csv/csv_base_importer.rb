@@ -43,10 +43,6 @@ module SIS
         @sis.logger || Rails.logger
       end
 
-      def update_progress
-        @sis.update_progress unless @sis.use_parallel_imports?
-      end
-
       # This will skip rows unless they are bigger than or equal to the index
       # passed. It will return if the current row is bigger than the index+count
       def csv_rows(csv, index=nil, count=nil)

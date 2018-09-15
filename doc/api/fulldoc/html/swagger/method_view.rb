@@ -20,6 +20,8 @@ require 'hash_view'
 require 'argument_view'
 require 'route_view'
 require 'return_view'
+require 'response_field_view'
+require 'deprecated_method_view'
 
 class MethodView < HashView
   def initialize(method)
@@ -52,8 +54,22 @@ class MethodView < HashView
     format(@method.docstring)
   end
 
+  def deprecated?
+    select_tags('deprecated_method').any?
+  end
+
+  def deprecation_description
+    tag = select_tags('deprecated_method').first
+    description = tag ? DeprecatedMethodView.new(tag).description : ''
+    format(description)
+  end
+
   def raw_arguments
-    select_tags("argument")
+    select_tags(['argument', 'deprecated_argument'])
+  end
+
+  def raw_response_fields
+    select_tags(['response_field', 'deprecated_response_field'])
   end
 
   def return_tag
@@ -116,10 +132,11 @@ class MethodView < HashView
     end
   end
 
-protected
-  def select_tags(tag_name)
+  protected
+  def select_tags(tag_names)
+    names = Array.wrap(tag_names)
     @method.tags.select do |tag|
-      tag.tag_name.downcase == tag_name
+      names.include?(tag.tag_name.downcase)
     end
   end
 

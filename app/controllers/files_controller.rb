@@ -310,7 +310,7 @@ class FilesController < ApplicationController
           Attachment.display_name_order_by_clause('attachments')
       end
       order_clause += ' DESC' if params[:order] == 'desc'
-      scope = scope.order(order_clause)
+      scope = scope.order(Arel.sql(order_clause))
 
       if params[:content_types].present?
         scope = scope.by_content_types(Array(params[:content_types]))

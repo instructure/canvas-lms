@@ -24,144 +24,149 @@
 # course, which does get touched, and so the cache expiration works.
 #
 # BTW if you add a new thing here, it probably needs adding to the /users/self/todo API
+show_legacy_todo_list ||= false
 cache_opts = (contexts.present? ? {} : { :expires_in => 3.minutes })
-cache(safe_cache_key([@current_user, contexts, 'to_do_list_view']), cache_opts) do
+cache(safe_cache_key([@current_user, contexts, show_legacy_todo_list, 'to_do_list_view']), cache_opts) do
  hidden_todos = 0
  presenter = ToDoListPresenter.new(self, @current_user, contexts)
 %>
 
-<% if presenter.any_assignments? %>
-  <h2 class="todo-list-header" tabindex="-1"><%= t('headings.to_do', %{To Do}) %></h2>
-  <ul class="right-side-list to-do-list">
-    <% presenter.needs_grading.each_with_index do |assignment, i| %>
-      <li class="todo" style="<%= hidden if i >= presenter.visible_limit %>">
-        <a
-          class="item"
-          href="<%= assignment.gradebook_path %>"
-          data-track-category="dashboard"
-          data-track-label="todo needs grading"
-        >
-          <div class="todo-badge-wrapper">
-            <div class="todo-badge">
-              <span aria-hidden="true"><%= assignment.needs_grading_badge %></span>
-	      <span class="screenreader-only"><%= assignment.needs_grading_label %></span>
+<% if !show_legacy_todo_list && @domain_root_account&.feature_enabled?(:student_planner) %>
+    <div class="todo-list"></div>
+<% else %>
+  <% if presenter.any_assignments? %>
+    <h2 class="todo-list-header" tabindex="-1"><%= t('headings.to_do', %{To Do}) %></h2>
+    <ul class="right-side-list to-do-list">
+      <% presenter.needs_grading.each_with_index do |assignment, i| %>
+        <li class="todo" style="<%= hidden if i >= presenter.visible_limit %>">
+          <a
+            class="item"
+            href="<%= assignment.gradebook_path %>"
+            data-track-category="dashboard"
+            data-track-label="todo needs grading"
+          >
+            <div class="todo-badge-wrapper">
+              <div class="todo-badge">
+                <span aria-hidden="true"><%= assignment.needs_grading_badge %></span>
+                <span class="screenreader-only"><%= assignment.needs_grading_label %></span>
+              </div>
             </div>
-          </div>
-          <div class="todo-details">
-            <b class="todo-details__title"><%= t('Grade %{assignment}', assignment: assignment.title) %></b>
-            <% if presenter.show_context? %>
-              <p class="todo-details__context">
-                <%= assignment.short_context_name %>
-              </p>
-            <% end %>
-            <p>
-              <% if assignment.points_possible %>
-                <%= t({one: '1 point', other: '%{count} points'}, count: round_if_whole(assignment.points_possible)) %>
-                &bullet;
+            <div class="todo-details">
+              <b class="todo-details__title"><%= t('Grade %{assignment}', assignment: assignment.title) %></b>
+              <% if presenter.show_context? %>
+                <p class="todo-details__context">
+                  <%= assignment.short_context_name %>
+                </p>
               <% end %>
-              <%= assignment.formatted_due_date %>
-            </p>
-          </div>
-        </a>
-        <%= render :partial => 'shared/ignore_option_list', :locals => {presenter: assignment} %>
-      </li>
-    <% end %>
-    <% presenter.needs_moderation.each_with_index do |assignment, i| %>
-      <% icon_explanation, icon_aria_label, icon_class = assignment.needs_moderation_icon_data %>
-      <li class="todo" style="<%= hidden if i >= presenter.visible_limit %>">
-        <a
-        class="item"
-        href="<%= assignment.moderate_path %>"
-        data-track-category="dashboard"
-        data-track-label="todo needs moderation"
-        >
-          <i class="<%= icon_class %>" aria-label="<%= icon_aria_label %>"></i>
-          <div class="todo-details">
-            <b class="todo-details__title"><%= t('Moderate %{assignment}', assignment: assignment.title) %></b>
-            <% if presenter.show_context? %>
-              <p class="todo-details__context">
-                <%= assignment.short_context_name %>
+              <p>
+                <% if assignment.points_possible %>
+                  <%= t({one: '1 point', other: '%{count} points'}, count: round_if_whole(assignment.points_possible)) %>
+                  &bullet;
+                <% end %>
+                <%= assignment.formatted_due_date %>
               </p>
-            <% end %>
-            <p>
-              <% if assignment.points_possible %>
-                <%= t({one: '1 point', other: '%{count} points'}, count: round_if_whole(assignment.points_possible)) %>
-                &bullet;
-              <% end %>
-              <%= assignment.formatted_due_date %>
-            </p>
-          </div>
-        </a>
-        <%= render :partial => 'shared/ignore_option_list', :locals => {presenter: assignment} %>
-      </li>
-    <% end %>
-    <% presenter.needs_submitting.each_with_index do |assignment, i| %>
-      <% icon_explanation, icon_aria_label, icon_class = assignment.needs_submitting_icon_data %>
-      <li class="todo" style="<%= hidden if i >= presenter.visible_limit %>">
-        <a
+            </div>
+          </a>
+          <%= render :partial => 'shared/ignore_option_list', :locals => {presenter: assignment} %>
+        </li>
+      <% end %>
+      <% presenter.needs_moderation.each_with_index do |assignment, i| %>
+        <% icon_explanation, icon_aria_label, icon_class = assignment.needs_moderation_icon_data %>
+        <li class="todo" style="<%= hidden if i >= presenter.visible_limit %>">
+          <a
           class="item"
-          href="<%= assignment.assignment_path %>#submit"
+          href="<%= assignment.moderate_path %>"
           data-track-category="dashboard"
-          data-track-label="todo needs submitting"
-        >
-          <i class="<%= icon_class %>" aria-label="<%= icon_aria_label %>"></i>
-          <div class="todo-details">
-            <b  class="todo-details__title"><%= assignment.submission_action_string %></b>
-            <% if presenter.show_context? %>
-              <p class="todo-details__context">
-                <%= assignment.short_context_name %>
-              </p>
-            <% end %>
-            <p>
-              <% if assignment.points_possible %>
-                <%= t({one: '1 point', other: '%{count} points'}, count: round_if_whole(assignment.points_possible)) %>
-                &bullet;
+          data-track-label="todo needs moderation"
+          >
+            <i class="<%= icon_class %>" aria-label="<%= icon_aria_label %>"></i>
+            <div class="todo-details">
+              <b class="todo-details__title"><%= t('Moderate %{assignment}', assignment: assignment.title) %></b>
+              <% if presenter.show_context? %>
+                <p class="todo-details__context">
+                  <%= assignment.short_context_name %>
+                </p>
               <% end %>
-              <%= assignment.formatted_due_date %>
-            </p>
-          </div>
-        </a>
-        <%= render :partial => 'shared/ignore_option_list', :locals => {presenter: assignment} %>
-      </li>
-    <% end %>
-    <% presenter.needs_reviewing.each_with_index do |assessment_request, i| %>
-      <li class="todo" style="<%= hidden if i >= presenter.visible_limit %>">
-      <% assignment = assessment_request.assignment_presenter %>
-        <a
-          class="item"
-          href="<%= assessment_request.submission_path %>"
-          data-track-category="dashboard"
-          data-track-label="todo needs reviewing"
-          title="<%= assessment_request.submission_author_name %>"
-        >
-          <%# Don't need aria-label here because we say that this is a peer review in the text immediately following %>
-          <i class="icon-peer-review"></i>
-          <div class="todo-details">
-            <b class="todo-details__title"><%= t('Peer Review for %{assignment}', assignment: assignment.title) %></b>
-            <% if presenter.show_context? %>
-              <p class="todo-details__context">
-                <%= assessment_request.short_context_name %>
+              <p>
+                <% if assignment.points_possible %>
+                  <%= t({one: '1 point', other: '%{count} points'}, count: round_if_whole(assignment.points_possible)) %>
+                  &bullet;
+                <% end %>
+                <%= assignment.formatted_due_date %>
               </p>
-            <% end %>
-            <p>
-              <% if assignment.try(:points_possible) %>
-                <%= t({one: '1 point', other: '%{count} points'}, count: round_if_whole(assignment.points_possible)) %>
-                &bullet;
+            </div>
+          </a>
+          <%= render :partial => 'shared/ignore_option_list', :locals => {presenter: assignment} %>
+        </li>
+      <% end %>
+      <% presenter.needs_submitting.each_with_index do |assignment, i| %>
+        <% icon_explanation, icon_aria_label, icon_class = assignment.needs_submitting_icon_data %>
+        <li class="todo" style="<%= hidden if i >= presenter.visible_limit %>">
+          <a
+            class="item"
+            href="<%= assignment.assignment_path %>#submit"
+            data-track-category="dashboard"
+            data-track-label="todo needs submitting"
+          >
+            <i class="<%= icon_class %>" aria-label="<%= icon_aria_label %>"></i>
+            <div class="todo-details">
+              <b  class="todo-details__title"><%= assignment.submission_action_string %></b>
+              <% if presenter.show_context? %>
+                <p class="todo-details__context">
+                  <%= assignment.short_context_name %>
+                </p>
               <% end %>
-              <%= assignment.formatted_peer_review_due_date %>
-            </p>
-          </div>
+              <p>
+                <% if assignment.points_possible %>
+                  <%= t({one: '1 point', other: '%{count} points'}, count: round_if_whole(assignment.points_possible)) %>
+                  &bullet;
+                <% end %>
+                <%= assignment.formatted_due_date %>
+              </p>
+            </div>
+          </a>
+          <%= render :partial => 'shared/ignore_option_list', :locals => {presenter: assignment} %>
+        </li>
+      <% end %>
+      <% presenter.needs_reviewing.each_with_index do |assessment_request, i| %>
+        <li class="todo" style="<%= hidden if i >= presenter.visible_limit %>">
+        <% assignment = assessment_request.assignment_presenter %>
+          <a
+            class="item"
+            href="<%= assessment_request.submission_path %>"
+            data-track-category="dashboard"
+            data-track-label="todo needs reviewing"
+            title="<%= assessment_request.submission_author_name %>"
+          >
+            <%# Don't need aria-label here because we say that this is a peer review in the text immediately following %>
+            <i class="icon-peer-review"></i>
+            <div class="todo-details">
+              <b class="todo-details__title"><%= t('Peer Review for %{assignment}', assignment: assignment.title) %></b>
+              <% if presenter.show_context? %>
+                <p class="todo-details__context">
+                  <%= assessment_request.short_context_name %>
+                </p>
+              <% end %>
+              <p>
+                <% if assignment.try(:points_possible) %>
+                  <%= t({one: '1 point', other: '%{count} points'}, count: round_if_whole(assignment.points_possible)) %>
+                  &bullet;
+                <% end %>
+                <%= assignment.formatted_peer_review_due_date %>
+              </p>
+            </div>
+          </a>
+          <%= render :partial => 'shared/ignore_option_list', :locals => {presenter: assessment_request} %>
+        </li>
+      <% end %>
+      <% if presenter.hidden_count > 0 %>
+        <li>
+        <a href="#" class="more_link">
+          <%= t 'links.show_more', '%{count} more...', :count => presenter.hidden_count %>
         </a>
-        <%= render :partial => 'shared/ignore_option_list', :locals => {presenter: assessment_request} %>
-      </li>
+        </li>
+      <% end %>
+    </ul>
     <% end %>
-    <% if presenter.hidden_count > 0 %>
-      <li>
-      <a href="#" class="more_link">
-        <%= t 'links.show_more', '%{count} more...', :count => presenter.hidden_count %>
-      </a>
-      </li>
-    <% end %>
-  </ul>
   <% end %>
 <% end %>

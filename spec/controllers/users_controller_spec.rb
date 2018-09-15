@@ -17,6 +17,7 @@
 #
 
 require_relative '../sharding_spec_helper'
+require File.expand_path(File.dirname(__FILE__) + '/../lti_1_3_spec_helper')
 
 describe UsersController do
   let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
@@ -50,36 +51,51 @@ describe UsersController do
       tool
     end
 
+    let_once(:user) { user_factory(active_all: true) }
+    before do
+      account.account_users.create!(user: user)
+      user_session(user)
+    end
+
     it "removes query string when post_only = true" do
-      u = user_factory(active_all: true)
-      account.account_users.create!(user: u)
-      user_session(@user)
       tool.user_navigation = { text: "example" }
       tool.settings['post_only'] = 'true'
       tool.save!
 
-      get :external_tool, params: {id:tool.id, user_id:u.id}
+      get :external_tool, params: {id:tool.id, user_id:user.id}
       expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti'
     end
 
     it "does not remove query string from url" do
-      u = user_factory(active_all: true)
-      account.account_users.create!(user: u)
-      user_session(@user)
       tool.user_navigation = { text: "example" }
       tool.save!
 
-      get :external_tool, params: {id:tool.id, user_id:u.id}
+      get :external_tool, params: {id:tool.id, user_id:user.id}
       expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti?first=john&last=smith'
     end
 
     it "uses localized labels" do
-      u = user_factory(active_all: true)
-      account.account_users.create!(user: u)
-      user_session(@user)
-
-      get :external_tool, params: {id:tool.id, user_id:u.id}
+      get :external_tool, params: {id:tool.id, user_id:user.id}
       expect(tool.label_for(:user_navigation, :en)).to eq 'English Label'
+    end
+
+    context 'using LTI 1.3 when specified' do
+      include_context 'lti_1_3_spec_helper'
+
+      subject do
+        get :external_tool, params: {id:tool.id, user_id:user.id}
+        JSON::JWT.decode(assigns[:lti_launch].params[:id_token], :skip_verification)
+      end
+
+      before do
+        tool.settings['use_1_3'] = true
+        tool.developer_key = DeveloperKey.create!
+        tool.save!
+      end
+
+      it 'does LTI 1.3 launch' do
+        expect(subject["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
+      end
     end
   end
 
@@ -114,7 +130,8 @@ describe UsersController do
       settings_mock = double()
       allow(settings_mock).to receive(:settings).and_return({})
       authorization_mock = double('authorization', :code= => nil, fetch_access_token!: nil, refresh_token:'refresh_token', access_token: 'access_token')
-      drive_mock = double('drive_mock', about: double(get: nil))
+      drive_mock = Google::APIClient::API.new('mock', {})
+      allow(drive_mock).to receive(:about).and_return(double(get: nil))
       client_mock = double("client", discovered_api:drive_mock, :execute! => double('result', status: 200, data:{'permissionId' => 'permission_id', 'user' => {'emailAddress' => 'blah@blah.com'}}))
       allow(client_mock).to receive(:authorization).and_return(authorization_mock)
       allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)
@@ -137,7 +154,8 @@ describe UsersController do
       settings_mock = double()
       allow(settings_mock).to receive(:settings).and_return({})
       authorization_mock = double('authorization', :code= => nil, fetch_access_token!: nil, refresh_token:'refresh_token', access_token: 'access_token')
-      drive_mock = double('drive_mock', about: double(get: nil))
+      drive_mock = Google::APIClient::API.new('mock', {})
+      allow(drive_mock).to receive(:about).and_return(double(get: nil))
       client_mock = double("client", discovered_api:drive_mock, :execute! => double('result', status: 200, data:{'permissionId' => 'permission_id'}))
       allow(client_mock).to receive(:authorization).and_return(authorization_mock)
       allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)
@@ -157,8 +175,9 @@ describe UsersController do
       allow(settings_mock).to receive(:settings).and_return({})
       authorization_mock = double('authorization')
       allow(authorization_mock).to receive_messages(:code= => nil, fetch_access_token!: nil, refresh_token:'refresh_token', access_token: 'access_token')
-      drive_mock = double('drive_mock', about: double(get: nil))
-      client_mock = double("client", discovered_api:drive_mock, :execute! => double('result', status: 200, data:{'permissionId' => 'permission_id'}))
+      drive_mock = Google::APIClient::API.new('mock', {})
+      allow(drive_mock).to receive(:about).and_return(double(get: nil))
+      client_mock = double("client", discovered_api: drive_mock, :execute! => double('result', status: 200, data:{'permissionId' => 'permission_id'}))
 
       allow(client_mock).to receive(:authorization).and_return(authorization_mock)
       allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)

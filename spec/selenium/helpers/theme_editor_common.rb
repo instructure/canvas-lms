@@ -58,15 +58,15 @@ module ThemeEditorCommon
   end
 
   def click_global_branding
-    fj('h3:contains("Global Branding")').click
+    fj('h2:contains("Global Branding")').click
   end
 
   def click_global_navigation
-    fj('h3:contains("Global Navigation")').click
+    fj('h2:contains("Global Navigation")').click
   end
 
   def click_watermarks_and_other_images
-    fj('h3:contains("Watermarks & Other Images")').click
+    fj('h2:contains("Watermarks & Other Images")').click
   end
 
   def primary_color

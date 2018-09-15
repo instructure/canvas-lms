@@ -666,6 +666,15 @@ class DiscussionTopic < ActiveRecord::Base
             { :course_sections => course_sections.pluck(:id) }).distinct
   end
 
+  scope :visible_to_student_sections, -> (student) {
+    visibility_scope = DiscussionTopicSectionVisibility.
+      where("discussion_topic_section_visibilities.discussion_topic_id = discussion_topics.id").
+      where("EXISTS (?)", Enrollment.active_or_pending.where(:user_id => student).
+        where("enrollments.course_section_id = discussion_topic_section_visibilities.course_section_id")
+      )
+    where("discussion_topics.context_type <> 'Course' OR discussion_topics.is_section_specific = false OR EXISTS (?)", visibility_scope)
+  }
+
   scope :recent, -> { where("discussion_topics.last_reply_at>?", 2.weeks.ago).order("discussion_topics.last_reply_at DESC") }
   scope :only_discussion_topics, -> { where(:type => nil) }
   scope :for_subtopic_refreshing, -> { where("discussion_topics.subtopics_refreshed_at IS NOT NULL AND discussion_topics.subtopics_refreshed_at<discussion_topics.updated_at").order("discussion_topics.subtopics_refreshed_at") }
@@ -1007,12 +1016,12 @@ class DiscussionTopic < ActiveRecord::Base
 
     given { |user, session|
       !is_announcement &&
-      context.grants_right?(user, session, :post_to_forum) &&
+      context.grants_right?(user, session, :create_forum) &&
       context_allows_user_to_create?(user)
     }
     can :create
 
-    given { |user, session| context.respond_to?(:allow_student_forum_attachments) && context.allow_student_forum_attachments && context.grants_right?(user, session, :post_to_forum) }
+    given { |user, session| context.respond_to?(:allow_student_forum_attachments) && context.allow_student_forum_attachments && context.grants_any_right?(user, session, :create_forum, :post_to_forum) }
     can :attach
 
     given { |user, session| !self.root_topic_id && self.context.grants_all_rights?(user, session, :read_forum, :moderate_forum) && self.available_for?(user) }
@@ -1269,7 +1278,7 @@ class DiscussionTopic < ActiveRecord::Base
   def visible_for?(user = nil)
     RequestCache.cache('discussion_visible_for', self, user) do
       # user is the topic's author
-      next true if user && user == self.user
+      next true if user && user.id == self.user_id
 
       next false unless (is_announcement ? context.grants_right?(user, :read_announcements) : context.grants_right?(user, :read_forum))
 

@@ -41,7 +41,9 @@ export default function UsersListRow({accountId, user, permissions, handleSubmit
       </th>
       <td>{user.email}</td>
       <td>{user.sis_user_id}</td>
-      <td><FriendlyDatetime dateTime={user.last_login} /></td>
+      <td>
+        <FriendlyDatetime dateTime={user.last_login} />
+      </td>
       <td style={{whiteSpace: 'nowrap'}}>
         {permissions.can_masquerade && (
           <Tooltip tip={I18n.t('Act as %{name}', {name: user.name})}>

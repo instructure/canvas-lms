@@ -346,7 +346,7 @@ describe FilesController do
 
       # first use to establish session
       get 'show', params: verifier.merge(id: file.id)
-      expect(response).to be_success
+      expect(response).to be_successful
       permissions_key = session[:permissions_key]
 
       # second use after verifier expiration but before session expiration.
@@ -354,7 +354,7 @@ describe FilesController do
       Timecop.freeze((Users::AccessVerifier::TTL_MINUTES + 1).minutes.from_now) do
         get 'show', params: verifier.merge(id: file.id)
       end
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(session[:permissions_key]).not_to eq permissions_key
     end
 
@@ -609,12 +609,8 @@ describe FilesController do
         allow(HostUrl).to receive(:file_host).and_return('files.test')
         request.host = 'files.test'
         @file.update_attribute(:content_type, 'text/html')
-        s3object = double()
-        allow(s3object).to receive(:content_length).and_return(5)
-        allow(s3object).to receive(:get).and_return(s3object)
-        allow(s3object).to receive(:body).and_return(s3object)
-        allow(s3object).to receive(:read).and_return('hello')
-        allow_any_instantiation_of(@file).to receive(:s3object).and_return(s3object)
+        handle = double(read: 'hello')
+        allow_any_instantiation_of(@file).to receive(:open).and_return(handle)
         get "show_relative", params: {file_id: @file.id, course_id: @course.id, file_path: @file.full_display_path, inline: 1, download: 1}
         expect(response).to be_successful
         expect(response.body).to eq 'hello'
@@ -1375,13 +1371,6 @@ describe FilesController do
           it "returns a 201 http status" do
             request
             assert_status(201)
-          end
-
-          it 'should send a successful email' do
-            expect(homework_service).to receive(:successful_email)
-            request
-
-            expect(progress.reload.workflow_state).to eq 'completed'
           end
 
           it 'should send a failure email' do

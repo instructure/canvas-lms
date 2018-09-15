@@ -67,16 +67,15 @@ end
 # configure autoscaling plugin
 if (config = Delayed::CLI.instance&.config&.[](:auto_scaling))
   require 'jobs_autoscaling'
+  actions = [JobsAutoscaling::LoggerAction.new]
   if config[:asg_name]
     aws_config = config[:aws_config] || {}
     aws_config[:region] ||= ApplicationController.region
-    action = JobsAutoscaling::AwsAction.new(asg_name: config[:asg_name],
+    actions << JobsAutoscaling::AwsAction.new(asg_name: config[:asg_name],
                                             aws_config: aws_config,
                                             instance_id: ApplicationController.instance_id)
-  else
-    action = JobsAutoscaling::LoggerAction.new
   end
-  autoscaler = JobsAutoscaling::Monitor.new(action: action)
+  autoscaler = JobsAutoscaling::Monitor.new(action: actions)
   autoscaler.activate!
 end
 
@@ -85,6 +84,23 @@ Delayed::Worker.on_max_failures = proc do |job, err|
   # underlying AR object was destroyed.
   # All other failures are kept for inspection.
   err.is_a?(Delayed::Backend::RecordNotFound)
+end
+
+module DelayedJobConfig
+  class << self
+    def config
+      @config ||= YAML.load(Canvas::DynamicSettings.find(tree: :private)['delayed_jobs.yml'] || '{}')
+    end
+
+    def strands_to_send_to_statsd
+      @strands_to_send_to_statsd ||= (config['strands_to_send_to_statsd'] || []).to_set
+    end
+
+    def reload
+      @config = @strands_to_send_to_statsd = nil
+    end
+    Canvas::Reloader.on_reload { DelayedJobConfig.reload }
+  end
 end
 
 ### lifecycle callbacks
@@ -117,13 +133,21 @@ Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
   end
   method_tag ||= "unknown"
   shard_id = job.current_shard.try(:id).to_i
-  stats = ["delayedjob.queue", "delayedjob.queue.tag.#{obj_tag}.#{method_tag}", "delayedjob.queue.shard.#{shard_id}"]
-  stats << "delayedjob.queue.jobshard.#{job.shard.id}" if job.respond_to?(:shard)
+  strand = job.strand && DelayedJobConfig.strands_to_send_to_statsd.include?(job.strand) && job.strand.gsub('/', '-')
+  stats = []
+  # don't count stranded jobs in global queued stats; they're likely waiting for each other, and not
+  # indicative of overall jobs health
+  unless job.strand
+    stats = ["delayedjob.queue", "delayedjob.queue.shard.#{shard_id}", "delayedjob.queue.jobshard.#{job.shard.id}"]
+  end
+  stats << "delayedjob.queue.tag.#{obj_tag}.#{method_tag}"
+  stats << "delayedjob.queue.strand.#{strand}" if strand
   CanvasStatsd::Statsd.timing(stats, lag)
 
   begin
     stats = ["delayedjob.perform", "delayedjob.perform.tag.#{obj_tag}.#{method_tag}", "delayedjob.perform.shard.#{shard_id}"]
     stats << "delayedjob.perform.jobshard.#{job.shard.id}" if job.respond_to?(:shard)
+    stats << "delayedjob.perform.strand.#{strand}" if strand
     CanvasStatsd::Statsd.time(stats) do
       block.call(worker, job)
     end

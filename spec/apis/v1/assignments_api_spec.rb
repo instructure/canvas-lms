@@ -1115,7 +1115,7 @@ describe AssignmentsApiController, type: :request do
       ta = ta_in_section(section)
 
       api_get_assignments_user_index(student, @course, ta)
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "returns unauthorized for ta who cannot read target student data" do
@@ -1691,7 +1691,7 @@ describe AssignmentsApiController, type: :request do
               'online_url'
             ]}
       })
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should allow valid submission types as a string (quick add dialog)" do
@@ -1704,7 +1704,7 @@ describe AssignmentsApiController, type: :request do
             'name' => 'some assignment',
             'submission_types' => 'not_graded'}
       })
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should not allow unpermitted submission types" do
@@ -2546,7 +2546,7 @@ describe AssignmentsApiController, type: :request do
                                   'lock_at' => '',
                                   'unlock_at' => nil,
                                   'peer_reviews_assign_at' => nil })
-      expect(response).to be_success
+      expect(response).to be_successful
       @assignment.reload
 
       expect(@assignment.due_at).to be_nil
@@ -2664,7 +2664,7 @@ describe AssignmentsApiController, type: :request do
           },
           { assignment: { name: 'a fancy new name' } },
         )
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
 
@@ -4364,7 +4364,7 @@ describe AssignmentsApiController, type: :request do
         course_with_teacher_logged_in(:course => @course, :active_all => true)
 
         json = api_get_assignment_in_course(@assignment, @course)
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(json['id']).to eq @assignment.id
         expect(json['unpublishable']).to eq true
 
@@ -4373,7 +4373,7 @@ describe AssignmentsApiController, type: :request do
         @assignment.submit_homework(@student, :submission_type => "online_text_entry")
         @user = @teacher
         json = api_get_assignment_in_course(@assignment, @course)
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(json['unpublishable']).to eq false
       end
     end

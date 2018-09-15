@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`The Ratings component only renders the single selected Rating with a footer in summary mode 1`] = `
-"<div className=\\"rating-tier selected\\" onClick={{...}} onKeyPress={[Function]} role={{...}} style={{...}} tabIndex={{...}}>
+"<div className=\\"rating-tier selected\\" onClick={{...}} onKeyPress={[Function: onKeyPress]} role={{...}} style={{...}} tabIndex={{...}}>
   <div className=\\"rating-description\\">
     <Text size=\\"small\\" lineHeight=\\"condensed\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
       Meh
@@ -22,7 +22,7 @@ exports[`The Ratings component only renders the single selected Rating with a fo
 `;
 
 exports[`The Ratings component renders a default rating if none of the ratings are selected 1`] = `
-"<div className=\\"rating-tier\\" onClick={{...}} onKeyPress={[Function]} role={{...}} style={{...}} tabIndex={{...}}>
+"<div className=\\"rating-tier\\" onClick={{...}} onKeyPress={[Function: onKeyPress]} role={{...}} style={{...}} tabIndex={{...}}>
   <div className=\\"rating-description\\">
     <Text size=\\"small\\" lineHeight=\\"condensed\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
       No details
@@ -41,7 +41,7 @@ exports[`The Ratings component renders a default rating if none of the ratings a
 `;
 
 exports[`The Ratings component renders the Rating sub-components as expected when range rating enabled 1`] = `
-"<div className=\\"rating-tier\\" onClick={{...}} onKeyPress={[Function]} role={{...}} style={{...}} tabIndex={{...}}>
+"<div className=\\"rating-tier\\" onClick={{...}} onKeyPress={[Function: onKeyPress]} role={{...}} style={{...}} tabIndex={{...}}>
   <div className=\\"rating-points\\">
     <Text size=\\"small\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
       10 to &gt;5 pts
@@ -61,7 +61,7 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
 `;
 
 exports[`The Ratings component renders the Rating sub-components as expected when range rating enabled 2`] = `
-"<div className=\\"rating-tier selected\\" onClick={{...}} onKeyPress={[Function]} role={{...}} style={{...}} tabIndex={{...}}>
+"<div className=\\"rating-tier selected\\" onClick={{...}} onKeyPress={[Function: onKeyPress]} role={{...}} style={{...}} tabIndex={{...}}>
   <div className=\\"rating-points\\">
     <Text size=\\"small\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
       5 to &gt;1 pts
@@ -83,7 +83,7 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
 `;
 
 exports[`The Ratings component renders the Rating sub-components as expected when range rating enabled 3`] = `
-"<div className=\\"rating-tier\\" onClick={{...}} onKeyPress={[Function]} role={{...}} style={{...}} tabIndex={{...}}>
+"<div className=\\"rating-tier\\" onClick={{...}} onKeyPress={[Function: onKeyPress]} role={{...}} style={{...}} tabIndex={{...}}>
   <div className=\\"rating-points\\">
     <Text size=\\"small\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
       1 to &gt;0 pts
@@ -104,8 +104,8 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
 
 exports[`The Ratings component renders the root component as expected 1`] = `
 "<div className=\\"rating-tier-list\\">
-  <Rating assessing={false} classes=\\"rating-tier\\" endOfRangePoints={{...}} footer={{...}} onClick={[Function]} shaderClass={{...}} tierColor=\\"transparent\\" hidePoints={false} isSummary={false} selected={false} width=\\"33.333333333333336%\\" description=\\"Superb\\" points={10} />
-  <Rating assessing={false} classes=\\"rating-tier selected\\" endOfRangePoints={{...}} footer={{...}} onClick={[Function]} shaderClass=\\"nearMasteryShader\\" tierColor={{...}} hidePoints={false} isSummary={false} selected={true} width=\\"33.333333333333336%\\" description=\\"Meh\\" long_description=\\"More Verbosity\\" points={5} />
-  <Rating assessing={false} classes=\\"rating-tier\\" endOfRangePoints={{...}} footer={{...}} onClick={[Function]} shaderClass={{...}} tierColor=\\"transparent\\" hidePoints={false} isSummary={false} selected={false} width=\\"33.333333333333336%\\" description=\\"Subpar\\" points={1} />
+  <Rating assessing={false} classes=\\"rating-tier\\" endOfRangePoints={{...}} footer={{...}} onClick={[Function: onClick]} shaderClass={{...}} tierColor=\\"transparent\\" hidePoints={false} isSummary={false} selected={false} width=\\"33.333333333333336%\\" description=\\"Superb\\" points={10} />
+  <Rating assessing={false} classes=\\"rating-tier selected\\" endOfRangePoints={{...}} footer={{...}} onClick={[Function: onClick]} shaderClass=\\"nearMasteryShader\\" tierColor={{...}} hidePoints={false} isSummary={false} selected={true} width=\\"33.333333333333336%\\" description=\\"Meh\\" long_description=\\"More Verbosity\\" points={5} />
+  <Rating assessing={false} classes=\\"rating-tier\\" endOfRangePoints={{...}} footer={{...}} onClick={[Function: onClick]} shaderClass={{...}} tierColor=\\"transparent\\" hidePoints={false} isSummary={false} selected={false} width=\\"33.333333333333336%\\" description=\\"Subpar\\" points={1} />
 </div>"
 `;

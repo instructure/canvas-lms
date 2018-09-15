@@ -348,6 +348,7 @@ class ConversationParticipant < ActiveRecord::Base
       update_cached_data
       save
     end
+    self.conversation.queue_update_stream_items
   end
 
   def update_attributes(hash)

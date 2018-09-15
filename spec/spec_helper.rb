@@ -481,8 +481,11 @@ RSpec.configure do |config|
   if Bullet.enable?
     config.before(:each) do |example|
       Bullet.start_request
-      possible_objects, impossible_objects =
-        example.example_group.onceler.instance_variable_get(:@bullet_state)
+      # we walk the example group chain until we reach one that actually recorded something
+      oncie = example.example_group
+      oncie = oncie.superclass while oncie && !oncie.onceler&.tape && oncie.superclass.respond_to?(:onceler)
+
+      possible_objects, impossible_objects = oncie.onceler.instance_variable_get(:@bullet_state)
       possible_objects&.each { |object| Bullet::Detector::NPlusOneQuery.possible_objects.add(object) }
       impossible_objects&.each { |object| Bullet::Detector::NPlusOneQuery.impossible_objects.add(object) }
     end
@@ -602,9 +605,7 @@ RSpec.configure do |config|
     path = generate_csv_file(lines)
     opts[:files] = [path]
 
-    use_parallel = SisBatch.use_parallel_importers?(account)
-    import_class = use_parallel ? SIS::CSV::ImportRefactored : SIS::CSV::Import
-    importer = import_class.process(account, opts)
+    importer = SIS::CSV::ImportRefactored.process(account, opts)
     run_jobs
 
     File.unlink path

@@ -102,6 +102,21 @@ describe Conversation do
           expect(Conversation.initiate(users, true)).to eq conversation
         end
       end
+
+      it "should keep the counts from double-incrementing" do
+        @user1 = user_factory(:name => 'a')
+        @shard1.activate { @user2 = user_factory(:name => 'b') }
+        conversation = Conversation.initiate([@user1, @user2], false)
+        message1 = conversation.add_message(@user1, 'first message')
+        cp1 = conversation.conversation_participants.where(:user_id => @user1).first
+        cp2 = conversation.conversation_participants.where(:user_id => @user2).first
+        cs_cp = conversation.conversation_participants.shard(@shard1).where(:user_id => @user2).first
+        cp2.process_new_message([@user2, "reply1"], [@user1, @user2], [message1.id], [])
+        @shard1.activate do
+          cs_cp.process_new_message([@user1, "reply2"], [@user1, @user2], [message1.id], [])
+        end
+        [cp1, cp2, cs_cp].each{|p| expect(p.reload.message_count).to eq 3}
+      end
     end
   end
 

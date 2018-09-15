@@ -70,11 +70,12 @@ module SIS
                                            sliced_ids)
       end
       new_data = Enrollment::BatchStateUpdater.destroy_batch(i.enrollments_to_delete, sis_batch: @batch) if i.enrollments_to_delete.any?
+
       i.roll_back_data.push(*new_data)
-      SisBatchRollBackData.bulk_insert_roll_back_data(i.roll_back_data) if @batch.using_parallel_importers?
+      SisBatchRollBackData.bulk_insert_roll_back_data(i.roll_back_data)
 
       @logger.debug("Enrollments with batch operations took #{Time.zone.now - start} seconds")
-      i.success_count
+      i.success_count + i.enrollments_to_delete.count
     end
 
     class Work
@@ -298,7 +299,7 @@ module SIS
             end
           elsif enrollment_info.status =~ /\Acompleted/i
             enrollment.workflow_state = 'completed'
-            enrollment.completed_at ||= Time.now
+            enrollment.completed_at ||= Time.zone.now
           elsif enrollment_info.status =~ /\Ainactive/i
             enrollment.workflow_state = 'inactive'
           end

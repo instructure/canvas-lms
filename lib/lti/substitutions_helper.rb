@@ -52,7 +52,8 @@ module Lti
       TeacherEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor',
       DesignerEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper',
       ObserverEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor',
-      StudentViewEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner'
+      StudentViewEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner',
+      Course => 'http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering'
     }
 
     LIS_V2_ROLE_NONE = 'http://purl.imsglobal.org/vocab/lis/v2/person#None'
@@ -141,6 +142,11 @@ module Lti
       roles = (course_enrollments + account_enrollments).map(&:role).map(&:name).uniq
       roles = roles.map{|role| role == "AccountAdmin" ? "Account Admin" : role} # to maintain backwards compatibility
       roles.join(',')
+    end
+
+    def current_canvas_roles_lis_v2
+      roles = (course_enrollments + account_enrollments).map(&:class).uniq
+      roles.map { |r| LIS_V2_ROLE_MAP[r] }.join(',')
     end
 
     def enrollment_state

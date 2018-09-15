@@ -199,7 +199,6 @@ See Forms section.
     display: none;
   }
   &::before { // disabled message
-    font-style: italic;
     opacity: 0.8;
     content: attr(data-unchecked);
   }

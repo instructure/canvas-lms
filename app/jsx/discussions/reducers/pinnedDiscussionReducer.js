@@ -17,8 +17,8 @@
  */
 import orderBy from 'lodash/orderBy'
 
-import { handleActions } from 'redux-actions'
-import { actionTypes } from '../actions'
+import {handleActions} from 'redux-actions'
+import {actionTypes} from '../actions'
 import duplicationReducerMap from './duplicationReducerMap'
 import deleteReducerMap from './deleteReducerMap'
 
@@ -46,9 +46,7 @@ function orderPinnedDiscussions(state, order) {
 }
 
 const reducerMap = {
-  [actionTypes.ARRANGE_PINNED_DISCUSSIONS]: (state, action) => (
-    action.payload.order.slice()
-  ),
+  [actionTypes.ARRANGE_PINNED_DISCUSSIONS]: (state, action) => action.payload.order.slice(),
   [actionTypes.GET_DISCUSSIONS_SUCCESS]: (state, action) => {
     const allDiscussions = action.payload.data
     const pinnedDiscussions = allDiscussions.reduce((acc, discussion) => {
@@ -60,9 +58,8 @@ const reducerMap = {
     const sorted = orderBy(pinnedDiscussions, ['position'], ['asc'])
     return sorted.map(d => d.id)
   },
-  [actionTypes.UPDATE_DISCUSSION_SUCCESS]: (state, action) => (
-    copyAndUpdateDiscussionState(state, action.payload.discussion)
-  ),
+  [actionTypes.UPDATE_DISCUSSION_SUCCESS]: (state, action) =>
+    copyAndUpdateDiscussionState(state, action.payload.discussion),
   [actionTypes.DRAG_AND_DROP_START]: (state, action) => {
     const updatedState = copyAndUpdateDiscussionState(state, action.payload.discussion)
     return orderPinnedDiscussions(updatedState, action.payload.order)

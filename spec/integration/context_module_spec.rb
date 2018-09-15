@@ -145,7 +145,7 @@ describe ContextModule do
         if @test_url.match?('files')
           expect(response.status).to eq(403)
         else
-          expect(response).to be_success
+          expect(response).to be_successful
         end
         html = Nokogiri::HTML(response.body)
         expect(html.css('#test_content').length).to eq(@test_content_length || 0)
@@ -171,7 +171,7 @@ describe ContextModule do
 
         # verify the second item is accessible
         get @test_url
-        expect(response).to be_success
+        expect(response).to be_successful
         html = Nokogiri::HTML(response.body)
         if @is_attachment
           expect(html.at_css('#file_content')['src']).to match %r{#{@test_url}}
@@ -261,12 +261,12 @@ describe ContextModule do
 
         user_session teacher1
         get "/courses/#{@course.id}/modules"
-        expect(response).to be_success
+        expect(response).to be_successful
         body1 = Nokogiri::HTML(response.body)
 
         user_session teacher2
         get "/courses/#{@course.id}/modules"
-        expect(response).to be_success
+        expect(response).to be_successful
         body2 = Nokogiri::HTML(response.body)
 
         expect(body1.at_css("#context_module_content_#{mod.id} .unlock_details").text).to match /4am/

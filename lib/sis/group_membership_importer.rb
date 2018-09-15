@@ -23,7 +23,7 @@ module SIS
       start = Time.zone.now
       importer = Work.new(@batch, @root_account, @logger)
       yield importer
-      SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data) if @batch.using_parallel_importers?
+      SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data)
       @logger.debug("Group Users took #{Time.zone.now - start} seconds")
       importer.success_count
     end

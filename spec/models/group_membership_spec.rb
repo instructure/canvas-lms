@@ -375,4 +375,19 @@ describe GroupMembership do
       @group.group_memberships.create!(:user => user_factory)
     end
   end
+
+  it "should run due date updates for discussion assignments" do
+    group_discussion_assignment
+    @assignment.update_attribute(:only_visible_to_overrides, true)
+    override = @assignment.assignment_overrides.create!(:set => @group1)
+    @student1 = student_in_course(course: @course, active_all: true).user
+    membership = @group1.add_user(@student1)
+    @topic.child_topic_for(@student1).reply_from(:user => @student1, :text => "sup")
+    sub = @assignment.submission_for_student(@student1)
+    expect(sub).to be_submitted
+    membership.destroy
+    expect(sub.reload).to be_deleted # no longer part of the group so the assignment no longer applies to them
+    membership.update_attribute(:workflow_state, 'accepted')
+    expect(sub.reload).to be_submitted # back to the way it was
+  end
 end

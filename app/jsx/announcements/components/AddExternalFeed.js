@@ -22,7 +22,7 @@ import {bool, func} from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import $ from 'jquery'
-import 'compiled/jquery.rails_flash_notifications'
+import 'compiled/jquery.rails_flash_notifications' // eslint-disable-line
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import View from '@instructure/ui-layout/lib/components/View'
@@ -33,7 +33,7 @@ import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
 import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGroup'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleDetails'
-import { ConnectedRSSFeedList } from './RSSFeedList'
+import {ConnectedRSSFeedList} from './RSSFeedList'
 
 import actions from '../actions'
 import select from '../../shared/select'
@@ -47,7 +47,7 @@ const verbosityTypes = [
 export default class AddExternalFeed extends React.Component {
   static propTypes = {
     defaultOpen: bool,
-    isSaving: bool.isRequired,
+    isSaving: bool.isRequired, // eslint-disable-line
     addExternalFeed: func.isRequired
   }
 
@@ -65,7 +65,7 @@ export default class AddExternalFeed extends React.Component {
 
   focusOnToggleHeader = () => {
     setTimeout(() => {
-      this.toggleBtn.focus();
+      this.toggleBtn.focus()
     })
   }
 
@@ -80,9 +80,12 @@ export default class AddExternalFeed extends React.Component {
 
   toggleOpenState = (event, expanded) => {
     $.screenReaderFlashMessage(I18n.t('dropdown changed state to %{expanded}.', {expanded}))
-    this.setState({
-      isOpen: expanded
-    }, this.focusOnToggleHeader)
+    this.setState(
+      {
+        isOpen: expanded
+      },
+      this.focusOnToggleHeader
+    )
   }
 
   clearAddRSS = () => {
@@ -126,7 +129,7 @@ export default class AddExternalFeed extends React.Component {
     )
   }
 
-  toggleRef = (c) => {
+  toggleRef = c => {
     this.toggleBtn = c && c.querySelector('button')
   }
 
@@ -152,7 +155,7 @@ export default class AddExternalFeed extends React.Component {
         textAlign="start"
         className="announcements-tray__rss-feed-root"
       >
-        <ConnectedRSSFeedList focusLastElement={this.focusOnToggleHeader}/>
+        <ConnectedRSSFeedList focusLastElement={this.focusOnToggleHeader} />
       </View>
     )
   }
@@ -235,7 +238,11 @@ export default class AddExternalFeed extends React.Component {
             expanded={this.state.isOpen}
             name="external-rss-feed__toggle"
           >
-            <Dialog open={this.state.isOpen} shouldReturnFocus defaultFocusElement={() => this.toggleBtn}>
+            <Dialog
+              open={this.state.isOpen}
+              shouldReturnFocus
+              defaultFocusElement={() => this.toggleBtn}
+            >
               {this.renderTextInput(
                 this.state.feedURL,
                 I18n.t('Feed url'),
@@ -260,4 +267,7 @@ const connectState = state =>
   })
 const connectActions = dispatch =>
   bindActionCreators(select(actions, ['addExternalFeed']), dispatch)
-export const ConnectedAddExternalFeed = connect(connectState, connectActions)(AddExternalFeed)
+export const ConnectedAddExternalFeed = connect(
+  connectState,
+  connectActions
+)(AddExternalFeed)

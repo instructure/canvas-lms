@@ -26,6 +26,11 @@ def header
   route = @routes.first
   @method_link = "method.#{route.requirements[:controller]}.#{route.requirements[:action]}"
   @beta = object.tag('beta') || object.parent.tag('beta')
+
+  if object.has_tag?(:deprecated_method)
+    @deprecated_method = DeprecatedMethodView.new(object.tag(:deprecated_method))
+  end
+
   erb(:header)
 end
 

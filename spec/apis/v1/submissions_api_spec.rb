@@ -574,7 +574,7 @@ describe 'Submissions API', type: :request do
 
       it 'works' do
         put_comment_attachment
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(@assignment.submission_for_student(@student)
         .submission_comments.first
         .attachment_ids).to eq @attachment.id.to_s
@@ -820,7 +820,7 @@ describe 'Submissions API', type: :request do
     expect(Rack::Utils.parse_query(URI(preview_url).query)['version'].to_i).to eq sub.quiz_submission_version
     get preview_url
     follow_redirect! while response.redirect?
-    expect(response).to be_success
+    expect(response).to be_successful
     expect(response.body).to match(/#{@quiz.quiz_title} Results/)
   end
 
@@ -999,7 +999,7 @@ describe 'Submissions API', type: :request do
     url = json[0]['attachments'][0]['url']
     get(url)
     follow_redirect! while response.redirect?
-    expect(response).to be_success
+    expect(response).to be_successful
     expect(response[content_type_key]).to eq 'image/png'
   end
 

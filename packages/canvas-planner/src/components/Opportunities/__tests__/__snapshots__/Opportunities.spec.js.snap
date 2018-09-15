@@ -14,6 +14,7 @@ exports[`renders nothing if no opportunities 1`] = `
     <Button
       as="button"
       buttonRef={[Function]}
+      cursor="pointer"
       fluidWidth={false}
       margin="0"
       onClick={[Function]}
@@ -50,6 +51,7 @@ exports[`renders the base component correctly with one opportunity 1`] = `
     <Button
       as="button"
       buttonRef={[Function]}
+      cursor="pointer"
       fluidWidth={false}
       margin="0"
       onClick={[Function]}
@@ -97,6 +99,7 @@ exports[`renders the right course with the right opportunity 1`] = `
     <Button
       as="button"
       buttonRef={[Function]}
+      cursor="pointer"
       fluidWidth={false}
       margin="0"
       onClick={[Function]}

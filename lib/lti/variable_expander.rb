@@ -549,6 +549,28 @@ module Lti
                        -> { lti_helper.enrollment_state },
                        COURSE_GUARD
 
+    # returns true if the assignment has anonymous grading
+    # enabled.
+    # @example
+    #   ```
+    #   true
+    #   ```
+    register_expansion 'com.instructure.Assignment.anonymous_grading', [],
+                       -> { @assignment.anonymous_grading },
+                       ASSIGNMENT_GUARD,
+                       default_name: 'com_instructure_assignment_anonymous_grading'
+
+    # returns the current course membership roles
+    # using the LIS v2 vocabulary.
+    # @example
+    #   ```
+    #   http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student
+    #   ```
+    register_expansion 'com.Instructure.membership.roles', [],
+                       -> { lti_helper.current_canvas_roles_lis_v2 },
+                       ROLES_GUARD,
+                       default_name: 'com_instructure_membership_roles'
+
     # returns the current course membership roles
     # @example
     #   ```

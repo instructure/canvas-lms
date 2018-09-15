@@ -68,6 +68,15 @@ define [
       @$starToggle = @$el.find('.star-toggle-btn')
       this
 
+    renderEmptyTimeout: () ->
+      $template = noMessage({})
+      @$el.html($template)
+      @$archiveToggle = @$el.find('.archive-btn').click()
+      @$starToggle = @$el.find('.star-toggle-btn')
+
+    renderEmpty: () ->
+      setTimeout((=> @renderEmptyTimeout()), 0)
+
     onModelChange: (newModel) ->
       @detachModelEvents()
       @model = newModel

@@ -176,6 +176,20 @@ describe DeveloperKey do
       developer_key_saved.destroy_permanently!
       expect(DeveloperKeyAccountBinding.find_by(id: binding_id)).to be_nil
     end
+
+    it 'has many context external tools' do
+      tool = ContextExternalTool.create!(
+        context: account,
+        consumer_key: 'key',
+        shared_secret: 'secret',
+        name: 'test tool',
+        url: 'http://www.tool.com/launch',
+        developer_key: developer_key_saved
+      )
+      expect(developer_key_saved.context_external_tools).to match_array [
+        tool
+      ]
+    end
   end
 
   describe '#account_binding_for' do

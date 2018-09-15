@@ -16,7 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import PropTypes from 'prop-types';
+
+import React from 'react';
 import keycode from 'keycode'
 import I18n from 'i18n!act_as'
 
@@ -34,17 +36,17 @@ import ActAsPanda from './ActAsPanda'
 
 export default class ActAsModal extends React.Component {
   static propTypes = {
-    user: React.PropTypes.shape({
-      name: React.PropTypes.string,
-      short_name: React.PropTypes.string,
-      id: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]),
-      avatar_image_url: React.PropTypes.string,
-      sortable_name: React.PropTypes.string,
-      email: React.PropTypes.string,
-      pseudonyms: React.PropTypes.arrayOf(React.PropTypes.shape({
-        login_id: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]),
-        sis_id: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]),
-        integration_id: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string])
+    user: PropTypes.shape({
+      name: PropTypes.string,
+      short_name: PropTypes.string,
+      id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+      avatar_image_url: PropTypes.string,
+      sortable_name: PropTypes.string,
+      email: PropTypes.string,
+      pseudonyms: PropTypes.arrayOf(PropTypes.shape({
+        login_id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+        sis_id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+        integration_id: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
       }))
     }).isRequired
   }
@@ -67,7 +69,7 @@ export default class ActAsModal extends React.Component {
   }
 
   componentDidMount() {
-    this.closeButton.focus();
+    if (this.closeButton) this.closeButton.focus()
   }
 
   handleModalRequestClose = () => {

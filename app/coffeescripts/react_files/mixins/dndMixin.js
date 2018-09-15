@@ -33,11 +33,7 @@ export default {
     }
     // This should be in JSX, but /o\
     ReactDOM.render(
-      React.createElement(DragFeedback, {
-        pageX,
-        pageY,
-        itemsToDrag: this.itemsToDrag()
-      }),
+      <DragFeedback pageX={pageX} pageY={pageY} itemsToDrag={this.itemsToDrag()} />,
       this.dragHolder[0]
     )
   },

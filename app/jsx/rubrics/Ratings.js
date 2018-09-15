@@ -151,12 +151,16 @@ const Ratings = (props) => {
     return { current: tier.points, next: next ? next.points : null }
   })
 
-  const currentIndex = () => pairs.findIndex(({ current, next }) => {
+  const currentIndices = () => pairs.map(({ current, next }, i) => {
     const currentMatch = points === current
     const withinRange = points > next && points <= current
     const zeroAndInLastRange = points === 0 && next === null
-    return currentMatch || (useRange && (withinRange || zeroAndInLastRange))
-  })
+    if (currentMatch || (useRange && (withinRange || zeroAndInLastRange))){
+      return i
+    } else {
+      return -1
+    }
+  }).filter((index) => (index >= 0))
 
   const getRangePoints = (currentPoints, nextTier) => {
     if (nextTier) {
@@ -196,15 +200,16 @@ const Ratings = (props) => {
     $.screenReaderFlashMessage(I18n.t('Rating selected'))
   }
 
-  const selectedIndex = points !== undefined ? currentIndex() : null
+  const selectedIndices = points !== undefined ? currentIndices() : null
+
   const visible = tiers.map((tier, index) => ({
     tier,
     index,
-    selected: selectedIndex === index,
+    selected: _.includes(selectedIndices, index),
   })).filter(({ selected }) => isSummary ? selected : true)
 
   const ratings = visible.map(({ tier, index }) => {
-    const selected = selectedIndex === index
+    const selected = _.includes(selectedIndices, index)
     const classes = classNames({
       'rating-tier': true,
       'selected': selected,

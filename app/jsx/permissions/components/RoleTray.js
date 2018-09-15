@@ -364,7 +364,7 @@ export default class RoleTray extends Component {
         <FlexItem>
           <Container as="div">
             <div style={{maxWidth: '225px'}}>
-              <Heading id="general_tray_header" level="h3" as="h2" ellipsis="true">
+              <Heading id="general_tray_header" level="h3" as="h2">
                 {this.props.label}
               </Heading>
             </div>

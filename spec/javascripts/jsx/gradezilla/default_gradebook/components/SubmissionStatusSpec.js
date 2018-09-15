@@ -56,7 +56,7 @@ QUnit.module('SubmissionStatus - Pills', function (hooks) {
   test('shows the "Muted" pill when the assignment is muted', function () {
     props.assignment.muted = true
     wrapper = mountComponent();
-    const mutedPills = wrapper.find('Pill').nodes.filter(node => node.props.text === 'Muted');
+    const mutedPills = wrapper.find('Pill').getElements().filter(node => node.props.text === 'Muted');
 
     strictEqual(mutedPills.length, 1);
   });
@@ -64,7 +64,7 @@ QUnit.module('SubmissionStatus - Pills', function (hooks) {
   test('does not show the "Muted" pill when the assignment is not muted', function () {
     props.assignment.muted = false
     wrapper = mountComponent();
-    const pills = wrapper.find('Pill').nodes.map(node => node.props.text)
+    const pills = wrapper.find('Pill').getElements().map(node => node.props.text)
 
     strictEqual(pills.length, 0)
   });
@@ -72,7 +72,7 @@ QUnit.module('SubmissionStatus - Pills', function (hooks) {
   test('shows the "Unpublished" pill when the assignment is unpublished', function () {
     props.assignment.published = false;
     wrapper = mountComponent();
-    const unpublishedPills = wrapper.find('Pill').nodes.filter(node => node.props.text === 'Unpublished');
+    const unpublishedPills = wrapper.find('Pill').getElements().filter(node => node.props.text === 'Unpublished');
 
     strictEqual(unpublishedPills.length, 1);
   });
@@ -80,7 +80,7 @@ QUnit.module('SubmissionStatus - Pills', function (hooks) {
   test('does not show the "Unpublished" pill when the assignment is published', function () {
     props.assignment.published = true;
     wrapper = mountComponent();
-    const pills = wrapper.find('Pill').nodes.map(node => node.props.text)
+    const pills = wrapper.find('Pill').getElements().map(node => node.props.text)
 
     strictEqual(pills.length, 0)
   });
@@ -88,7 +88,7 @@ QUnit.module('SubmissionStatus - Pills', function (hooks) {
   test('shows the "Dropped" pill when the submission is dropped', function () {
     props.submission.drop = true;
     wrapper = mountComponent();
-    const droppedPills = wrapper.find('Pill').nodes.filter(node => node.props.text === 'Dropped');
+    const droppedPills = wrapper.find('Pill').getElements().filter(node => node.props.text === 'Dropped');
 
     strictEqual(droppedPills.length, 1);
   });
@@ -96,7 +96,7 @@ QUnit.module('SubmissionStatus - Pills', function (hooks) {
   test('does not show the "Dropped" pill when the submission is not dropped', function () {
     props.submission.drop = false;
     wrapper = mountComponent();
-    const pills = wrapper.find('Pill').nodes.map(node => node.props.text)
+    const pills = wrapper.find('Pill').getElements().map(node => node.props.text)
 
     strictEqual(pills.length, 0)
   });
@@ -104,7 +104,7 @@ QUnit.module('SubmissionStatus - Pills', function (hooks) {
   test('shows the "Excused" pill when the submission is excused', function () {
     props.submission.excused = true;
     wrapper = mountComponent();
-    const excusedPills = wrapper.find('Pill').nodes.filter(node => node.props.text === 'Excused');
+    const excusedPills = wrapper.find('Pill').getElements().filter(node => node.props.text === 'Excused');
 
     strictEqual(excusedPills.length, 1);
   });
@@ -112,7 +112,7 @@ QUnit.module('SubmissionStatus - Pills', function (hooks) {
   test('does not show the "Excused" pill when the submission is not excused', function () {
     props.submission.excused = false;
     wrapper = mountComponent();
-    const pills = wrapper.find('Pill').nodes.map(node => node.props.text)
+    const pills = wrapper.find('Pill').getElements().map(node => node.props.text)
 
     strictEqual(pills.length, 0)
   });
@@ -155,7 +155,7 @@ QUnit.module('SubmissionStatus - Grading Period not in any grading period warnin
   test('when isInNoGradingPeriod is true, warns about submission not being in any grading period', function () {
     props.isInNoGradingPeriod = true;
     wrapper = mountComponent();
-    const warnings = wrapper.find('Message').nodes.filter(node => node.props.message === message)
+    const warnings = wrapper.find('Message').getElements().filter(node => node.props.message === message)
 
     strictEqual(warnings.length, 1)
   });
@@ -163,7 +163,7 @@ QUnit.module('SubmissionStatus - Grading Period not in any grading period warnin
   test('when isInNoGradingPeriod is false, does not warn about submission not being in any grading period', function () {
     props.isInNoGradingPeriod = false;
     wrapper = mountComponent();
-    const warnings = wrapper.find('Message').nodes.map(node => node.props.message)
+    const warnings = wrapper.find('Message').getElements().map(node => node.props.message)
 
     strictEqual(warnings.length, 0)
   });
@@ -206,7 +206,7 @@ QUnit.module('SubmissionStatus - Grading Period is a closed warning', hooks => {
   test('when isInClosedGradingPeriod is true, warns about submission not being in a closed grading period', function () {
     props.isInClosedGradingPeriod = true;
     wrapper = mountComponent();
-    const warnings = wrapper.find('Message').nodes.filter(node => node.props.message === message)
+    const warnings = wrapper.find('Message').getElements().filter(node => node.props.message === message)
 
     strictEqual(warnings.length, 1)
   });
@@ -214,7 +214,7 @@ QUnit.module('SubmissionStatus - Grading Period is a closed warning', hooks => {
   test('when isInClosedGradingPeriod is false, does not warn about submission not being in a closed grading period', function () {
     props.isInClosedGradingPeriod = false;
     wrapper = mountComponent();
-    const warnings = wrapper.find('Message').nodes.map(node => node.props.message)
+    const warnings = wrapper.find('Message').getElements().map(node => node.props.message)
 
     strictEqual(warnings.length, 0)
   });
@@ -257,7 +257,7 @@ QUnit.module('SubmissionStatus - Grading Period is in another period warning', h
   test('when isInOtherGradingPeriod is true, warns about submission not being in another grading period', function () {
     props.isInOtherGradingPeriod = true;
     wrapper = mountComponent();
-    const warnings = wrapper.find('Message').nodes.filter(node => node.props.message === message)
+    const warnings = wrapper.find('Message').getElements().filter(node => node.props.message === message)
 
     strictEqual(warnings.length, 1)
   });
@@ -265,7 +265,7 @@ QUnit.module('SubmissionStatus - Grading Period is in another period warning', h
   test('when isInOtherGradingPeriod is false, does not warn about submission not being in another grading period', function () {
     props.isInOtherGradingPeriod = false;
     wrapper = mountComponent();
-    const warnings = wrapper.find('Message').nodes.map(node => node.props.message)
+    const warnings = wrapper.find('Message').getElements().map(node => node.props.message)
 
     strictEqual(warnings.length, 0)
   });
@@ -308,7 +308,7 @@ QUnit.module('SubmissionStatus - Concluded Enrollment Warning', function (hooks)
   test('when isConcluded is true, warns about enrollment being concluded', function () {
     props.isConcluded = true;
     wrapper = mountComponent();
-    const warnings = wrapper.find('Message').nodes.filter(node => node.props.message === message)
+    const warnings = wrapper.find('Message').getElements().filter(node => node.props.message === message)
 
     strictEqual(warnings.length, 1)
   });
@@ -316,7 +316,7 @@ QUnit.module('SubmissionStatus - Concluded Enrollment Warning', function (hooks)
   test('when isConcluded is false, does not warn about enrollment being concluded', function () {
     props.isConcluded = false;
     wrapper = mountComponent();
-    const warnings = wrapper.find('Message').nodes.map(node => node.props.message)
+    const warnings = wrapper.find('Message').getElements().map(node => node.props.message)
 
     strictEqual(warnings.length, 0)
   });
@@ -359,7 +359,7 @@ QUnit.module('SubmissionStatus - Not calculated in final grade', hooks => {
   test('when isNotCountedForScore is true, the icon warns about score not being used', () => {
     props.isNotCountedForScore = true
     wrapper = mountComponent()
-    const warnings = wrapper.find('Message').nodes.filter(node => node.props.message === message)
+    const warnings = wrapper.find('Message').getElements().filter(node => node.props.message === message)
 
     strictEqual(warnings.length, 1)
   })
@@ -367,7 +367,7 @@ QUnit.module('SubmissionStatus - Not calculated in final grade', hooks => {
   test('when isNotCountedForScore is false, the icon does not warn about enrollment being concluded', () => {
     props.isNotCountedForScore = false
     wrapper = mountComponent()
-    const warnings = wrapper.find('Message').nodes.map(node => node.props.message)
+    const warnings = wrapper.find('Message').getElements().map(node => node.props.message)
 
     strictEqual(warnings.length, 0)
   })

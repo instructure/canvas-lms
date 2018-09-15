@@ -320,8 +320,8 @@ describe AssignmentsController do
       let(:env) { assigns[:js_env] }
 
       before :once do
-        @assignment.moderation_graders.create!(anonymous_id: "abcde", user: grader_1)
-        @assignment.moderation_graders.create!(anonymous_id: "fghij", user: grader_2)
+        @assignment.grade_student(@student, grader: grader_1, provisional: true, score: 10)
+        @assignment.grade_student(@student, grader: grader_2, provisional: true, score: 5)
       end
 
       before :each do

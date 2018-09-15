@@ -45,7 +45,7 @@ test('clearRoutes removes blueprint path', () => {
   const tree = enzyme.shallow(<ChildContent {...props} />)
   const instance = tree.instance()
   instance.clearRoutes()
-  equal(props.routeTo.getCall(0).args[0], '#!/')
+  equal(props.routeTo.getCall(0).args[0], '#!/blueprint')
 })
 
 test('showChangeLog calls selectChangeLog prop with argument', () => {

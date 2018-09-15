@@ -62,7 +62,7 @@ module CanvasHttp
   #
   # Eventually it may be expanded to optionally do cert verification as well.
   def self.request(request_class, url_str, other_headers = {}, redirect_limit: 3, form_data: nil, multipart: false,
-    body: nil, content_type: nil)
+    streaming: false, body: nil, content_type: nil)
     last_scheme = nil
     last_host = nil
 
@@ -72,21 +72,13 @@ module CanvasHttp
       _, uri = CanvasHttp.validate_url(url_str, host: last_host, scheme: last_scheme, check_host: true) # uses the last host and scheme for relative redirects
       http = CanvasHttp.connection_for_uri(uri)
 
-      multipart_query = nil
-      if form_data && multipart
-        multipart_query, multipart_headers = Multipart::Post.new.prepare_query(form_data)
-        other_headers = other_headers.merge(multipart_headers)
-      end
-
       request = request_class.new(uri.request_uri, other_headers)
-      add_form_data(request, form_data) if form_data && !multipart
+      add_form_data(request, form_data, multipart: multipart, streaming: streaming) if form_data
       request.body = body if body
       request.content_type = content_type if content_type
 
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      args = [request]
-      args << multipart_query if multipart
-      http.request(*args) do |response|
+      http.request(request) do |response|
         if response.is_a?(Net::HTTPRedirection) && !response.is_a?(Net::HTTPNotModified)
           last_host = uri.host
           last_scheme = uri.scheme
@@ -106,8 +98,16 @@ module CanvasHttp
     end
   end
 
-  def self.add_form_data(request, form_data)
-    if form_data.is_a?(String)
+  def self.add_form_data(request, form_data, multipart:, streaming:)
+    if multipart
+      if streaming
+        request.body_stream, header = Multipart::Post.new.prepare_query_stream(form_data)
+        request.content_length = request.body_stream.size
+      else
+        request.body, header = Multipart::Post.new.prepare_query(form_data)
+      end
+      request.content_type = header['Content-type']
+    elsif form_data.is_a?(String)
       request.body = form_data
       request.content_type = 'application/x-www-form-urlencoded'
     else
@@ -119,7 +119,12 @@ module CanvasHttp
   def self.validate_url(value, host: nil, scheme: nil, allowed_schemes: %w{http https}, check_host: false)
     value = value.strip
     raise ArgumentError if value.empty?
-    uri = URI.parse(value)
+    uri = begin
+            URI.parse(value)
+          rescue URI::InvalidURIError => e
+            return URI.parse(Addressable::URI.normalized_encode(value).chomp("/")) if e.message =~ /URI must be ascii only/
+            raise e
+          end
     uri.host ||= host
     unless uri.scheme
       scheme ||= "http"

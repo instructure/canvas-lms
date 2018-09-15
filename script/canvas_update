@@ -2,7 +2,12 @@
 
 # TODO: improve usage / help
 function usage {
-  echo "usage: canvas_update [[[-q]] | [-h]]"
+  echo "usage: canvas_update [-qhv] [-n phase]"
+}
+
+function bad_usage {
+  usage
+  exit 1
 }
 
 function echo_console_and_log {
@@ -113,18 +118,30 @@ function tips {
 function update_canvas {
   ensure_in_canvas_root_directory
   intro_message
-  update_plugins
-  rebase_canvas
-  bundle_install_with_check
-  rake_db_migrate_dev_and_test
-  yarn_install
 
-  # skip if QUICK_MODE
-  if ! $1; then
-    compile_assets
+  if [[ -z "$SKIP_CODE" ]] ; then
+    update_plugins
+    rebase_canvas
   fi
 
-  tips
+  if [[ -z "$SKIP_DEPS" ]] ; then
+    bundle_install_with_check
+    yarn_install
+  fi
+
+  if [[ -z "$SKIP_DATA" ]] ; then
+    rake_db_migrate_dev_and_test
+
+    # skip if QUICK_MODE
+    if ! $QUICK_MODE; then
+      compile_assets
+    fi
+  fi
+
+  # We should only display tips if this script is being run standalone
+  if [[ -n "$SKIP_CODE" && -n "$SKIP_DEPS" && -n "$SKIP_DATA" ]] ; then
+    tips
+  fi
 }
 
 LOG="$(pwd)/log/canvas_update.log"
@@ -135,24 +152,38 @@ QUICK_MODE=false
 
 # parse options
 # http://www.tldp.org/LDP/abs/html/internal.html#EX33
-while getopts ":qh" Option
+while getopts ":qhn:v" Option
 do
   case $Option in
     q )
       echo "Quick mode enabled (assumes you have guard running and don't want to generate docs)"
       QUICK_MODE=true;;
     h )
-      PERFORM_UPDATE=false
-      usage;;
+      usage
+      exit 0;;
+    n )
+      case $OPTARG in
+        code )
+          SKIP_CODE=true;;
+        deps )
+          SKIP_DEPS=true;;
+        data )
+          SKIP_DATA=true;;
+        assets )
+          QUICK_MODE=true;;
+        * )
+          bad_usage;;
+      esac
+      echo "Skipping $OPTARG";;
+    v )
+      set -x
+      LOG=/dev/stdout;;
     * )
-      PERFORM_UPDATE=false
-      echo "Sorry, that's not a valid option!"
-      usage;;
+      echo "Sorry, -$OPTARG is not a valid option!"
+      bad_usage;;
   esac
 done
 
 if $PERFORM_UPDATE; then
-  update_canvas $QUICK_MODE
+  update_canvas
 fi
-
-

@@ -23,6 +23,7 @@ module Api::V1::SisImport
   include Api::V1::SisImportError
 
   def sis_imports_json(batches, user, session)
+    SisBatch.load_downloadable_attachments(batches)
     batches.map do |f|
       sis_import_json(f, user, session)
     end
@@ -32,16 +33,17 @@ module Api::V1::SisImport
     json = api_json(batch, user, session)
     if batch.errors_attachment_id
       # skip permission checks since the context is a sis_import it will fail permission checks
-      batch.errors_attachment.skip_submission_attachment_lock_checks = true
       json[:errors_attachment] = attachment_json(
         batch.errors_attachment,
         user,
         {},
         # skip permission checks since the context is a sis_import it will fail permission checks
-        {submission_attachment: true}
+        {skip_permission_checks: true}
       )
     end
     json[:user] = user_json(batch.user, user, session) if batch.user
+    atts = batch.downloadable_attachments
+    json[:csv_attachments] = attachments_json(atts, user, {}, {skip_permission_checks: true}) if atts.any?
     json
   end
 end

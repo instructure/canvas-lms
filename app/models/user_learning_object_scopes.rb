@@ -58,7 +58,7 @@ module UserLearningObjectScopes
       end
 
       course_ids &= opts[:course_ids] if opts[:course_ids]
-      course_ids &= opts[:contexts].select{|c| c.is_a? Course}.map(&:id) if opts[:contexts]
+      course_ids &= Array.wrap(opts[:contexts]).select{|c| c.is_a? Course}.map(&:id) if opts[:contexts]
       course_ids
     end
   end
@@ -179,42 +179,35 @@ module UserLearningObjectScopes
   end
 
   def submissions_needing_peer_review(opts={})
-    course_ids = Shackles.activate(:slave) do
-      if opts[:contexts]
-        Array(opts[:contexts]).map(&:id) &
-        participating_student_course_ids
-      else
-        participating_student_course_ids
+    opts[:due_after] ||= 2.weeks.ago
+    opts[:due_before] ||= 2.weeks.from_now
+    objects_needing('AssessmentRequest', 'peer_review', :student, 15.minutes, opts) do |ar_scope, options|
+      ar_scope = ar_scope.where(assessor_id: id)
+      ar_scope = ar_scope.incomplete unless options[:scope_only]
+      ar_scope = ar_scope.not_ignored_by(self, 'reviewing') unless options[:include_ignored]
+      ar_scope = ar_scope.for_context_codes(options[:shard_course_ids].map { |course_id| "course_#{course_id}"}).
+        eager_load({submission: [:user, {assignment: :course}]})  # avoid n+1 query on the grants_right? check
+
+      # The below merging of scopes mimics a portion of the behavior for checking the access policy
+      # for the submissions, ensuring that the user has access and can read & comment on them.
+      # The check for making sure that the user is a participant in the course is already made
+      # by using `course_ids_for_todo_lists` through `objects_needing`
+      ar_scope = ar_scope.merge(Submission.active).
+        merge(Assignment.published.where(peer_reviews: true))
+
+      if options[:due_before]
+        ar_scope = ar_scope.where("#{Assignment.quoted_table_name}.peer_reviews_due_at <= ?", options[:due_before])
       end
-    end
-    opts = {limit: 15}.merge(opts.slice(:limit))
 
-    shard.activate do
-      Rails.cache.fetch([self, 'submissions_needing_peer_review', course_ids, opts].cache_key, expires_in: 15.minutes) do
-        Shackles.activate(:slave) do
-          limit = opts[:limit]
+      if options[:due_after]
+        ar_scope = ar_scope.where("#{Assignment.quoted_table_name}.peer_reviews_due_at > ?", options[:due_after])
+      end
 
-          result = Shard.partition_by_shard(course_ids) do |shard_course_ids|
-            shard_course_context_codes = shard_course_ids.map { |course_id| "course_#{course_id}"}
-            AssessmentRequest.where(assessor_id: id).incomplete.
-              not_ignored_by(self, 'reviewing').
-              for_context_codes(shard_course_context_codes).
-              preload({submission: :assignment}) # avoid n+1 query on grants_right? check below
-          end
-
-          # only include assessment requests user has permission to perform.
-          # This has 2 parts
-          # 1. the reviewer must have permission to read the submission, and
-          # 2. the submission must still be part of the assignment, which will
-          #    be false if the submitter is no longer assigned the assigment
-          result = result.select do |request|
-            request.submission.grants_right?(self, :read) &&
-            request.submission.assignment.submissions.include?(request.submission)
-          end
-          # outer limit, since there could be limit * n_shards results
-          result = result[0...limit] if limit
-          result
-        end
+      if options[:scope_only]
+        ar_scope
+      else
+        result = options[:limit] ? ar_scope.take(options[:limit]) : ar_scope.to_a
+        result
       end
     end
   end
@@ -279,7 +272,8 @@ module UserLearningObjectScopes
         active.
         published.
         for_courses_and_groups(options[:shard_course_ids], options[:group_ids]).
-        todo_date_between(opts[:due_after], opts[:due_before])
+        todo_date_between(opts[:due_after], opts[:due_before]).
+        visible_to_student_sections(self)
     end
   end
 

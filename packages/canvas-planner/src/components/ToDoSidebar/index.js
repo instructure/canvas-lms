@@ -27,6 +27,7 @@ import ListItem from '@instructure/ui-elements/lib/components/List/ListItem';
 import View from '@instructure/ui-layout/lib/components/View';
 import Spinner from '@instructure/ui-elements/lib/components/Spinner';
 import Button from '@instructure/ui-buttons/lib/components/Button';
+import Text from '@instructure/ui-elements/lib/components/Text'
 
 import { sidebarLoadInitialItems, sidebarCompleteItem } from '../../actions';
 import ToDoItem from './ToDoItem';
@@ -40,13 +41,15 @@ export class ToDoSidebar extends Component {
     courses: arrayOf(object).isRequired,
     timeZone: string,
     locale: string,
-    changeDashboardView: func.isRequired,
+    changeDashboardView: func,
+    forCourse: string,
   };
 
   static defaultProps = {
     loaded: false,
     timeZone: moment.tz.guess(),
     locale: 'en',
+    forCourse: undefined,
   }
 
   constructor () {
@@ -56,7 +59,7 @@ export class ToDoSidebar extends Component {
   }
 
   componentDidMount () {
-    this.props.sidebarLoadInitialItems(moment.tz(this.props.timeZone).startOf('day'));
+    this.props.sidebarLoadInitialItems(moment.tz(this.props.timeZone).startOf('day'), this.props.forCourse);
   }
 
   componentDidUpdate () {
@@ -78,53 +81,71 @@ export class ToDoSidebar extends Component {
   }
 
   renderShowAll () {
-    return (
-      <View as="div" textAlign="center">
-        <Button variant="link" onClick={() => this.props.changeDashboardView('planner')}>
-          {formatMessage('Show All')}
-        </Button>
-      </View>
-    );
-  }
-
-  render () {
-    if (!this.props.loaded) {
+    if (this.props.changeDashboardView) {
       return (
         <View as="div" textAlign="center">
-          <Spinner title={formatMessage('To Do Items Loading')} size="small" />
+          <Button variant="link" onClick={() => this.props.changeDashboardView('planner')}>
+            {formatMessage('Show All')}
+          </Button>
         </View>
       );
     }
+    return null;
+  }
 
+  renderItems () {
     const incompletedFilter = (item) => {
       if (!item) return false;
       return !item.completed;
     };
 
     const visibleTodos = this.props.items.filter(incompletedFilter).slice(0, 5);
-
     this.todoItemComponents = [];
+
+    if (visibleTodos.length === 0) {
+      return <Text size="small">{formatMessage('Nothing for now')}</Text>
+    }
+
+    return (
+      <List variant="unstyled">
+        {
+          visibleTodos.map((item, itemIndex) => (
+            <ListItem key={item.uniqueId}>
+              <ToDoItem
+                ref={component => {this.todoItemComponents[itemIndex] = component;}}
+                item={item}
+                courses={this.props.courses}
+                handleDismissClick={(...args) => this.handleDismissClick(itemIndex, item)}
+                locale={this.props.locale}
+                timeZone={this.props.timeZone}
+              />
+            </ListItem>
+          ))
+        }
+      </List>
+    );
+  }
+
+  render () {
+    if (!this.props.loaded) {
+      return (
+        <div>
+          <h2 className="todo-list-header">
+            {formatMessage('To Do')}
+          </h2>
+          <View as="div" textAlign="center">
+            <Spinner title={formatMessage('To Do Items Loading')} size="small" />
+          </View>
+        </div>
+      );
+    }
+
     return (
       <div>
         <h2 className="todo-list-header">
           <span tabIndex="-1" ref={elt => {this.titleFocus = elt;}}>{formatMessage('To Do')}</span>
         </h2>
-        <List variant="unstyled">
-          {
-            visibleTodos.map((item, itemIndex) => (
-              <ListItem key={item.uniqueId}>
-                <ToDoItem
-                  ref={component => {this.todoItemComponents[itemIndex] = component;}}
-                  item={item}
-                  courses={this.props.courses}
-                  handleDismissClick={(...args) => this.handleDismissClick(itemIndex, item)}
-                  locale={this.props.locale}
-                  timeZone={this.props.timeZone}
-                />
-              </ListItem>
-            ))
-          }
-        </List>
+        { this.renderItems() }
         { this.renderShowAll() }
       </div>
     );

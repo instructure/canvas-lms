@@ -180,6 +180,20 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
   @include overwrite-default-icon-size($ic-DashboardCard-icon-size);
 
   .no-touch & {
+    &:hover { color: var(--ic-brand-primary); }
+  }
+
+  // the focus outline on the svg is broken in safari
+  // and on the <a> is broken in firefox
+  // ff is the only one I can single out
+  .no-touch:not(.ff) & {
+    &:focus {
+      outline-style: solid;
+      outline-width: 1px;
+      outline-offset: -1px;
+    }
+  }
+  .no-touch.ff & {
     &:focus {
       outline: none;
       svg, i {

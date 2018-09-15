@@ -165,7 +165,11 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   private
 
   def publish_submission_comments!
-    copy_submission_comments!(nil)
+    self.submission_comments.for_provisional_grades.each do |prov_comment|
+      pub_comment = prov_comment.dup
+      pub_comment.provisional_grade_id = nil
+      pub_comment.save!
+    end
   end
 
   def copy_submission_comments!(dest_provisional_grade)

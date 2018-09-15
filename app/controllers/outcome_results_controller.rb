@@ -193,6 +193,7 @@ class OutcomeResultsController < ApplicationController
   before_action :require_outcome_context
   before_action :verify_aggregate_parameter, only: :rollups
   before_action :verify_aggregate_stat_parameter, only: :rollups
+  before_action :verify_sort_parameters, only: :rollups
   before_action :verify_include_parameter
   before_action :require_outcomes
   before_action :require_users
@@ -269,6 +270,20 @@ class OutcomeResultsController < ApplicationController
   #   Specify additional values to exclude. "missing_user_rollups" excludes
   #   rollups for users without results.
   #
+  # @argument sort_by [String, "student"|"outcome"]
+  #   If specified, sorts outcome result rollups. "student" sorting will sort
+  #   by a user's sortable name. "outcome" sorting will sort by the given outcome's
+  #   rollup score. The latter requires specifying the "sort_outcome_id" parameter.
+  #   By default, the sort order is ascending.
+  #
+  # @argument sort_outcome_id [Integer]
+  #   If outcome sorting requested, then this determines which outcome to use
+  #   for rollup score sorting.
+  #
+  # @argument sort_order [String, "asc", "desc"]
+  #   If sorting requested, then this allows changing the default sort order of
+  #   ascending to descending.
+  #
   # @example_response
   #    {
   #      "rollups": [OutcomeRollup],
@@ -329,9 +344,45 @@ class OutcomeResultsController < ApplicationController
     outcome_results_rollups(@results, @users, excludes)
   end
 
+  def remove_users_with_no_results
+    userids_with_results = find_results.pluck(:user_id).uniq
+    @users = @users.select { |u| userids_with_results.include? u.id }
+  end
+
   def user_rollups_json
+    return user_rollups_sorted_by_score_json if params[:sort_by] == 'outcome' && params[:sort_outcome_id]
+    excludes = Api.value_to_array(params[:exclude]).uniq
+    # exclude users with no results (if being requested) before we paginate,
+    # otherwise we end up with users in the pagination that may have no rollups,
+    # which will inflate the pagination total count
+    remove_users_with_no_results if excludes.include? 'missing_user_rollups'
     @users = Api.paginate(@users, self, api_v1_course_outcome_rollups_url(@context))
-    json = outcome_results_rollups_json(user_rollups)
+    rollups = user_rollups
+    rollups = @users.map {|u| rollups.find {|r| r.context.id == u.id }}.compact if params[:sort_by] == 'student'
+    json = outcome_results_rollups_json(rollups)
+    json[:meta] = Api.jsonapi_meta(@users, self, api_v1_course_outcome_rollups_url(@context))
+    json
+  end
+
+  def user_rollups_sorted_by_score_json
+    # since we can't sort by rollup score in the db,
+    # get all rollups (for all users), order by a given outcome's rollup score
+    # (sorting by name for duplicate scores), then reorder users
+    # from those rollups, then paginate those users, and finally
+    # only include rollups for those users
+    missing_score_sort = params[:sort_order] == 'desc' ? CanvasSort::First : CanvasSort::Last
+    rollups = user_rollups.sort_by do |r|
+      score = r.scores.find {|s| s.outcome.id.to_s == params[:sort_outcome_id]}&.score
+      [score || missing_score_sort, Canvas::ICU.collation_key(r.context.sortable_name)]
+    end
+    rollups.reverse! if params[:sort_order] == 'desc'
+    # reorder users by score
+    @users = rollups.map(&:context)
+    @users = Api.paginate(@users, self, api_v1_course_outcome_rollups_url(@context))
+    # only include rollups for the paginated users
+    user_ids = @users.map(&:id)
+    rollups = rollups.select {|r| user_ids.include? r.context.id }
+    json = outcome_results_rollups_json(rollups)
     json[:meta] = Api.jsonapi_meta(@users, self, api_v1_course_outcome_rollups_url(@context))
     json
   end
@@ -422,6 +473,20 @@ class OutcomeResultsController < ApplicationController
     true
   end
 
+  def verify_sort_parameters
+    return true unless params[:sort_by]
+    sort_by = params[:sort_by]
+    reject! "invalid sort_by parameter value" if sort_by && !%w(student outcome).include?(sort_by)
+    if sort_by == 'outcome'
+      sort_outcome_id = params[:sort_outcome_id]
+      reject! "missing required sort_outcome_id parameter value" unless sort_outcome_id
+      reject! "invalid sort_outcome_id parameter value" unless sort_outcome_id =~ /\A\d+\z/
+    end
+    sort_order = params[:sort_order]
+    reject! "invalid sort_order parameter value" if sort_by && sort_order && !%w(asc desc).include?(sort_order)
+    true
+  end
+
   def verify_include_parameter
     Api.value_to_array(params[:include]).each do |include_name|
       case include_name
@@ -499,15 +564,25 @@ class OutcomeResultsController < ApplicationController
     elsif params[:section_id]
       @section = @context.course_sections.where(id: params[:section_id].to_i).first
       reject! "invalid section id" unless @section
-      @users = @section.students.to_a
+      @users = apply_sort_order(@section.students).to_a
     end
     @users ||= users_for_outcome_context.to_a
-    @users.sort! {|a,b| a.id <=> b.id}
+    @users.sort! {|a,b| a.id <=> b.id} unless params[:sort_by]
   end
 
   def users_for_outcome_context
     # this only works for courses; when other context types are added, this will
     # need to treat them differently.
-    @context.students
+    apply_sort_order(@context.students)
+  end
+
+  def apply_sort_order(relation)
+    if params[:sort_by] == 'student'
+      order_clause = User.sortable_name_order_by_clause(User.quoted_table_name)
+      order_clause = "#{order_clause} DESC" if params[:sort_order] == 'desc'
+      relation.order(Arel.sql(order_clause))
+    else
+      relation
+    end
   end
 end

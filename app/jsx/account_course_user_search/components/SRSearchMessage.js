@@ -16,20 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from "react";
-import Alert from "@instructure/ui-alerts/lib/components/Alert";
-import { oneOf, func, array, shape, string } from "prop-types";
-import I18n from "i18n!account_course_user_search";
+import React from 'react'
+import Alert from '@instructure/ui-alerts/lib/components/Alert'
+import {oneOf, func, array, shape, string} from 'prop-types'
+import I18n from 'i18n!account_course_user_search'
 
 const errorLoadingMessage = I18n.t(
-  "There was an error with your query; please try a different search"
-);
-const noCoursesFoundMessage = I18n.t("No courses found");
-const noUsersFoundMessage = I18n.t("No users found");
-const userResultsUpdatedMessage = I18n.t("User results updated.");
-const courseResultsUpdatedMessage = I18n.t("Course results updated.");
+  'There was an error with your query; please try a different search'
+)
+const noCoursesFoundMessage = I18n.t('No courses found')
+const noUsersFoundMessage = I18n.t('No users found')
+const userResultsUpdatedMessage = I18n.t('User results updated.')
+const courseResultsUpdatedMessage = I18n.t('Course results updated.')
 
-const TIMEOUT = 5000;
+const TIMEOUT = 5000
 
 const linkPropType = shape({
   url: string.isRequired,
@@ -40,13 +40,9 @@ const linkPropType = shape({
  * This component handles reading the updated message only when rendered and
  * only when the collection has finished loading
  */
-export default function SRSearchMessage({
-  collection,
-  dataType,
-  getLiveAlertRegion
-}) {
+export default function SRSearchMessage({collection, dataType, getLiveAlertRegion}) {
   if (collection.loading) {
-    return <noscript />;
+    return <noscript />
   }
 
   if (collection.error) {
@@ -54,62 +50,54 @@ export default function SRSearchMessage({
       <Alert screenReaderOnly liveRegion={getLiveAlertRegion} timeout={TIMEOUT}>
         {errorLoadingMessage}
       </Alert>
-    );
+    )
   }
   if (!collection.data.length) {
-    if (dataType === "Course") {
+    if (dataType === 'Course') {
       return (
-        <Alert
-          screenReaderOnly
-          liveRegion={getLiveAlertRegion}
-          timeout={TIMEOUT}
-        >
+        <Alert screenReaderOnly liveRegion={getLiveAlertRegion} timeout={TIMEOUT}>
           {noCoursesFoundMessage}
         </Alert>
-      );
+      )
     }
-    if (dataType === "User") {
+    if (dataType === 'User') {
       return (
-        <Alert
-          screenReaderOnly
-          liveRegion={getLiveAlertRegion}
-          timeout={TIMEOUT}
-        >
+        <Alert screenReaderOnly liveRegion={getLiveAlertRegion} timeout={TIMEOUT}>
           {noUsersFoundMessage}
         </Alert>
-      );
+      )
     }
   }
 
-  if (dataType === "Course") {
+  if (dataType === 'Course') {
     return (
       <Alert screenReaderOnly liveRegion={getLiveAlertRegion} timeout={TIMEOUT}>
         {courseResultsUpdatedMessage}
       </Alert>
-    );
+    )
   }
-  if (dataType === "User") {
+  if (dataType === 'User') {
     return (
       <Alert screenReaderOnly liveRegion={getLiveAlertRegion} timeout={TIMEOUT}>
         {userResultsUpdatedMessage}
       </Alert>
-    );
+    )
   }
 
-  return <noscript />;
+  return <noscript />
 }
 
 SRSearchMessage.propTypes = {
   collection: shape({
     data: array.isRequired,
-    links: shape({ current: linkPropType })
+    links: shape({current: linkPropType})
   }).isRequired,
-  dataType: oneOf(["Course", "User"]).isRequired,
+  dataType: oneOf(['Course', 'User']).isRequired,
   getLiveAlertRegion: func
-};
+}
 
 SRSearchMessage.defaultProps = {
   getLiveAlertRegion() {
-    return document.getElementById("flash_screenreader_holder");
+    return document.getElementById('flash_screenreader_holder')
   }
-};
+}

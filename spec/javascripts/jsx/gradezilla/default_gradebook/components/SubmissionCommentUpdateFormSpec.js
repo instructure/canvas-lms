@@ -16,7 +16,7 @@
  */
 
 import React from 'react';
-import { mount } from 'enzyme';
+import { mount } from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme';
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 import SubmissionCommentUpdateForm from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentUpdateForm';
 

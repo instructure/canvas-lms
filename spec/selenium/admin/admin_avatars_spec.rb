@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require File.expand_path(File.dirname(__FILE__) + '/../common')
+require_relative '../grades/pages/gradebook_page'
+require_relative 'pages/student_context_tray_page'
 
 describe "admin avatars" do
   include_context "in-process server selenium tests"
@@ -25,7 +27,6 @@ describe "admin avatars" do
     Account.default.enable_service(:avatars)
     Account.default.settings[:avatars] = 'enabled_pending'
     Account.default.save!
-
   end
 
   def create_avatar_state(avatar_state="submitted", avatar_image_url="http://www.example.com")
@@ -119,21 +120,20 @@ describe "admin avatars" do
     expect(user.avatar_image_url).to be_nil
   end
 
-  context "student tray" do
-
+  context "student tray in original gradebook" do
     before(:each) do
       @account = Account.default
       @account.enable_feature!(:student_context_cards)
-      @student = User.create!
+      @student = student_in_course.user
       @student.avatar_image_url = "http://www.example.com"
-      @course.enroll_student(@student).accept!
+      Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
+      Gradebook::MultipleGradingPeriods.student_name_link(@student.id).click
     end
 
     it "should display student avatar in tray", priority: "1", test_id: 3299466 do
-      skip_if_chrome('fragile in chrome')
-      get("/courses/#{@course.id}/gradebook")
-      f("a[data-student_id='#{@student.id}']").click
-      expect(f(".StudentContextTray__Avatar a span")).to have_attribute('style', /http/)
+      StudentContextTray.wait_for_student_tray
+
+      expect(StudentContextTray.student_avatar_link).to be_displayed
     end
   end
 end

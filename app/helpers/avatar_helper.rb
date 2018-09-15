@@ -94,7 +94,7 @@ module AvatarHelper
     default_avatar = User.avatar_fallback_url(
         blank_fallback ? '/images/blank.png' : User.default_avatar_fallback,
         request)
-    url = if user.account.service_enabled?(:avatars)
+    url = if (@domain_root_account || user.account).service_enabled?(:avatars)
       user.avatar_url(nil,
                       (@domain_root_account && @domain_root_account.settings[:avatars] || 'enabled'),
                       default_avatar,

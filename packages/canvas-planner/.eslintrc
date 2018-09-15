@@ -6,6 +6,7 @@
     "notice"
   ],
   "rules": {
+    "react/no-deprecated": "off",
     "no-extra-semi": "error",
     "no-trailing-spaces": "error",
     "semi": "error",

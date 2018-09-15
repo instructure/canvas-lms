@@ -9549,7 +9549,7 @@ fa:
   loading_sync_history_9f342cbf: "در حال بارگذاری تاریخچه همگام‌سازی"
   loading_unsynced_changes_b5d7b202: "در حال بارگذاری تغییرات همگام سازی نشده"
   locales: 
-    fa: "فارسی (crowd-sourced)"
+    fa: فارسی
   location_e17bd402: موقعیت
   lock_at_time_3c8a044e: "قفل کردن در: %{time}"
   lock_c341af13: "قفل کردن"

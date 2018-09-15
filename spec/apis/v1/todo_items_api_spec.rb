@@ -140,7 +140,7 @@ describe UsersController, type: :request do
              :controller => "users", :action => "ignore_item",
              :format => "json", :purpose => "grading",
              :asset_string => "assignment_#{@a2.id}", :permanent => "1")
-    expect(response).to be_success
+    expect(response).to be_successful
 
     json = api_call(:get, "/api/v1/courses/#{@teacher_course.id}/todo",
                     :controller => "courses", :action => "todo_items",
@@ -157,7 +157,7 @@ describe UsersController, type: :request do
   it "should ignore a todo item until the next change" do
     api_call(:delete, @a2_json['ignore'],
              :controller => "users", :action => "ignore_item", :format => "json", :purpose => "grading", :asset_string => "assignment_#{@a2.id}", :permanent => "0")
-    expect(response).to be_success
+    expect(response).to be_successful
 
     json = api_call(:get, "/api/v1/courses/#{@teacher_course.id}/todo",
                     :controller => "courses", :action => "todo_items", :format => "json", :course_id => @teacher_course.to_param)
@@ -245,7 +245,7 @@ describe UsersController, type: :request do
     json = api_call(:get, "/api/v1/users/self/todo",
                     :controller => "users", :action => "todo_items",
                     :format => "json")
-    expect(response).to be_success
+    expect(response).to be_successful
   end
 
   it "doesnt include anything over 4 weeks old" do

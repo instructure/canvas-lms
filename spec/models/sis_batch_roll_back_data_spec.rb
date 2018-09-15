@@ -22,7 +22,6 @@ describe SisBatchRollBackData do
   before :once do
     @account = account_model
     @batch = @account.sis_batches.create!
-    @batch.data = {use_parallel_imports: true}
   end
 
   it 'should create successfully' do
@@ -34,5 +33,11 @@ describe SisBatchRollBackData do
                                          context: c2)
     SisBatchRollBackData.bulk_insert_roll_back_data([d1, d2])
     expect(@batch.roll_back_data.count).to eq 2
+  end
+
+  it 'should have each context respond to updated_at' do
+    SisBatchRollBackData::RESTORE_ORDER.each do |type|
+      expect(type.constantize.column_names.include?('updated_at')).to eq true
+    end
   end
 end

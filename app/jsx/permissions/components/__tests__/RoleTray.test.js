@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {shallow} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
 
 import {getPermissionsWithLabels} from '../../helper/utils'
 import {ROLES, PERMISSIONS} from '../../__tests__/examples'

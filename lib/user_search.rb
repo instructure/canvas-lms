@@ -80,9 +80,9 @@ module UserSearch
 
     users = if options[:sort] == "last_login"
               if options[:order] == 'desc'
-                users.order("MAX(current_login_at) desc, id desc")
+                users.order(Arel.sql("MAX(current_login_at) DESC NULLS LAST, id DESC"))
               else
-                users.order("MAX(current_login_at), id")
+                users.order(Arel.sql("MAX(current_login_at), id"))
               end
             elsif options[:sort] == "username"
               if options[:order] == 'desc'
@@ -91,27 +91,30 @@ module UserSearch
                 users.order_by_sortable_name
               end
             elsif options[:sort] == "email"
-              if options[:order] == 'desc'
-                users.order("(SELECT unique_id FROM #{Pseudonym.quoted_table_name}
-                                WHERE #{Pseudonym.quoted_table_name}.user_id = #{User.quoted_table_name}.id
-                                AND unique_id ~* \'\\A([^@\\s]+)@((?:[-a-z0-9]+\\.)+[a-z]{2,})\\Z\'
+              users = users.select("users.*, (SELECT path FROM #{CommunicationChannel.quoted_table_name}
+                                WHERE communication_channels.user_id = users.id AND
+                                  communication_channels.path_type = 'email' AND
+                                  communication_channels.workflow_state <> 'retired'
+                                ORDER BY communication_channels.position ASC
                                 LIMIT 1)
-                                DESC, id DESC")
+                                AS email")
+              if options[:order] == 'desc'
+                users.order(Arel.sql("email DESC, id DESC"))
               else
-                users.order("(SELECT unique_id FROM #{Pseudonym.quoted_table_name}
-                                WHERE #{Pseudonym.quoted_table_name}.user_id = #{User.quoted_table_name}.id
-                                AND unique_id ~* \'\\A([^@\\s]+)@((?:[-a-z0-9]+\\.)+[a-z]{2,})\\Z\'
-                                LIMIT 1)")
+                users.order(Arel.sql("email"))
               end
             elsif options[:sort] == "sis_id"
+              users = users.select(User.send(:sanitize_sql, [
+                                "users.*, (SELECT sis_user_id FROM #{Pseudonym.quoted_table_name}
+                                WHERE pseudonyms.user_id = users.id AND
+                                  pseudonyms.workflow_state <> 'deleted' AND
+                                  pseudonyms.account_id = ?
+                                LIMIT 1) AS sis_user_id",
+                                context.root_account_id || context.id]))
               if options[:order] == 'desc'
-                users.order("(SELECT sis_user_id FROM #{Pseudonym.quoted_table_name}
-                                WHERE #{Pseudonym.quoted_table_name}.user_id = #{User.quoted_table_name}.id
-                                LIMIT 1) DESC, id DESC")
+                users.order(Arel.sql("sis_user_id DESC, id DESC"))
               else
-                users.order("(SELECT sis_user_id FROM #{Pseudonym.quoted_table_name}
-                                WHERE #{Pseudonym.quoted_table_name}.user_id = #{User.quoted_table_name}.id
-                                LIMIT 1)")
+                users.order(Arel.sql("sis_user_id"))
               end
             else
               users.order_by_sortable_name

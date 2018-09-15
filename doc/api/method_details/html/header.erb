@@ -7,6 +7,16 @@
       <span class='defined-in'><a href="https://github.com/instructure/canvas-lms/blob/master/<%= @controller_path %>"><%= "#{@route.requirements[:controller].camelize}Controller\##{@route.requirements[:action]}" %></a></span>
     <% end %>
   </h2>
+
+  <% if @deprecated_method.present? %>
+    <div class="deprecated deprecated_method">
+      <div class="note deprecated">
+        <strong>[DEPRECATED] This method is deprecated, effective <%= h @deprecated_method.effective_date %> (notice given <%= h @deprecated_method.notice_date %>):</strong>
+        <%= htmlify_line @deprecated_method.description %>
+      </div>
+    </div>
+  <% end %>
+
   <% if @beta %>
     <h3 class='beta'>BETA: This API endpoint is not finalized, and there could be breaking changes before its final release.</h3>
   <% end %>

@@ -63,7 +63,7 @@ class RouteView < HashView
 
   def query_args
     method_view.raw_arguments.map do |tag|
-      ArgumentView.new(tag.text, verb, path_variables)
+      ArgumentView.new(tag.text, verb, path_variables, deprecated: tag.tag_name&.downcase == 'deprecated_argument')
     end
   end
 
@@ -85,6 +85,10 @@ class RouteView < HashView
     arguments.map { |arg| arg.to_swagger }
   end
 
+  def response_fields
+    method_view.raw_response_fields.map { |tag| ResponseFieldView.new(tag).to_swagger }
+  end
+
   def nickname
     method_view.nickname + method_view.unique_nickname_suffix(self)
   end
@@ -96,6 +100,9 @@ class RouteView < HashView
       "notes" => method_view.desc,
       "nickname" => nickname,
       "parameters" => parameters,
+      "response_fields" => response_fields,
+      "deprecated" => method_view.deprecated?,
+      "deprecation_description" => method_view.deprecation_description
     }.merge(method_view.swagger_type)
   end
 

@@ -248,6 +248,7 @@ class GroupCategory < ActiveRecord::Base
     end
     members = members.to_a
     groups = groups.to_a
+    ActiveRecord::Associations::Preloader.new.preload(groups, :context)
     water_allocation = reserve_space_for_members_in_groups(members.size, groups)
     new_memberships = randomly_add_allocated_members_to_groups(members, groups, water_allocation)
     finish_group_member_assignment

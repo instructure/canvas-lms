@@ -260,6 +260,16 @@ describe GradebooksController do
       expect(submission).to include :workflow_state
     end
 
+    it 'returns submissions of even inactive students' do
+      user_session(@teacher)
+      assignment = @course.assignments.create!(points_possible: 10)
+      assignment.grade_student(@student, grade: 6.6, grader: @teacher)
+      enrollment = @course.enrollments.find_by(user: @student)
+      enrollment.deactivate
+      get :grade_summary, params: { course_id: @course.id, id: @student.id }
+      expect(assigns.fetch(:js_env).fetch(:submissions).first.fetch(:score)).to be 6.6
+    end
+
     context "assignment sorting" do
       let!(:teacher_session) { user_session(@teacher) }
       let!(:assignment1) { @course.assignments.create(title: "Banana", position: 2) }
@@ -1771,6 +1781,68 @@ describe GradebooksController do
       get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
       expect(assigns[:disable_unmute_assignment]).to eq true
     end
+
+    it 'sets new_gradebook_enabled in ENV to true if new gradebook is enabled' do
+      @course.enable_feature!(:new_gradebook)
+      get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
+      expect(assigns[:js_env][:new_gradebook_enabled]).to eq true
+    end
+
+    it 'sets new_gradebook_enabled in ENV to false if new gradebook is not enabled' do
+      @course.disable_feature!(:new_gradebook)
+      get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
+      expect(assigns[:js_env][:new_gradebook_enabled]).to eq false
+    end
+
+    it 'includes anonymous identities keyed by anonymous_id in the ENV' do
+      @assignment.update!(moderated_grading: true, grader_count: 2)
+      anonymous_id = @assignment.create_moderation_grader(@teacher, occupy_slot: true).anonymous_id
+      get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
+      expect(assigns[:js_env][:anonymous_identities]).to have_key anonymous_id
+    end
+
+    describe 'current_anonymous_id' do
+      before(:each) do
+        user_session(@teacher)
+      end
+
+      context 'for a moderated assignment' do
+        let(:moderated_assignment) do
+          @course.assignments.create!(
+            moderated_grading: true,
+            grader_count: 1,
+            final_grader: @teacher
+          )
+        end
+
+        it 'is set to the anonymous ID for the viewing grader if grader identities are concealed' do
+          moderated_assignment.update!(grader_names_visible_to_final_grader: false)
+          moderated_assignment.moderation_graders.create!(user: @teacher, anonymous_id: 'zxcvb')
+
+          get 'speed_grader', params: {course_id: @course, assignment_id: moderated_assignment}
+          expect(assigns[:js_env][:current_anonymous_id]).to eq 'zxcvb'
+        end
+
+        it 'is not set if grader identities are visible' do
+          get 'speed_grader', params: {course_id: @course, assignment_id: moderated_assignment}
+          expect(assigns[:js_env]).not_to include(:current_anonymous_id)
+        end
+
+        it 'is not set if grader identities are concealed but grades are published' do
+          moderated_assignment.update!(
+            grader_names_visible_to_final_grader: false,
+            grades_published_at: Time.zone.now
+          )
+          get 'speed_grader', params: {course_id: @course, assignment_id: moderated_assignment}
+          expect(assigns[:js_env]).not_to include(:current_anonymous_id)
+        end
+      end
+
+      it 'is not set if the assignment is not moderated' do
+        get 'speed_grader', params: {course_id: @course, assignment_id: @assignment}
+        expect(assigns[:js_env]).not_to include(:current_anonymous_id)
+      end
+    end
   end
 
   describe "POST 'speed_grader_settings'" do
@@ -1785,6 +1857,53 @@ describe GradebooksController do
       post 'speed_grader_settings', params: {course_id: @course.id,
         enable_speedgrader_grade_by_question: "0"}
       expect(@teacher.reload.preferences[:enable_speedgrader_grade_by_question]).not_to be_truthy
+    end
+
+    describe 'selected_section_id preference' do
+      let(:course_settings) { @teacher.reload.preferences.dig(:gradebook_settings, @course.id) }
+
+      before(:each) do
+        @teacher.preferences[:gradebook_settings] = { @course.id => {} }
+
+        user_session(@teacher)
+      end
+
+      context 'when new gradebook is enabled' do
+        it 'sets the selected section for the course to the passed-in value' do
+          section_id = @course.course_sections.first.id
+          post 'speed_grader_settings', params: {course_id: @course.id, selected_section_id: section_id}
+
+          expect(course_settings.dig('filter_rows_by', 'section_id')).to eq section_id.to_s
+        end
+
+        it 'clears the selected section for the course if passed the value "all"' do
+          post 'speed_grader_settings', params: {course_id: @course.id, selected_section_id: 'all'}
+
+          expect(course_settings.dig('filter_rows_by', 'section_id')).to be nil
+        end
+
+        it 'clears the selected section if passed an invalid value' do
+          post 'speed_grader_settings', params: {course_id: @course.id, selected_section_id: 'hahahaha'}
+
+          expect(course_settings.dig('filter_rows_by', 'section_id')).to be nil
+        end
+
+        it 'clears the selected section if passed a non-active section in the course' do
+          deleted_section = @course.course_sections.create!
+          deleted_section.destroy!
+
+          post 'speed_grader_settings', params: {course_id: @course.id, selected_section_id: deleted_section.id}
+
+          expect(course_settings.dig('filter_rows_by', 'section_id')).to be nil
+        end
+
+        it 'clears the selected section if passed a section ID not in the course' do
+          section_in_other_course = Course.create!.course_sections.create!
+          post 'speed_grader_settings', params: {course_id: @course.id, selected_section_id: section_in_other_course.id}
+
+          expect(course_settings.dig('filter_rows_by', 'section_id')).to be nil
+        end
+      end
     end
   end
 

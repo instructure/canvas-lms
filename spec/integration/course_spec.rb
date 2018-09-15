@@ -28,14 +28,14 @@ describe "course" do
     course_factory(active_all: true)
     @course.update_attribute(:is_public, true)
     get "/courses/#{@course.id}"
-    expect(response).to be_success
+    expect(response).to be_successful
   end
 
   it "should load syllabus on public course with no user logged in" do
     course_factory(active_all: true)
     @course.update_attribute(:is_public, true)
     get "/courses/#{@course.id}/assignments/syllabus"
-    expect(response).to be_success
+    expect(response).to be_successful
   end
 
   it "should show the migration-in-progress notice" do
@@ -48,13 +48,13 @@ describe "course" do
 
       migration.update_attribute(:workflow_state, 'importing')
       get "/courses/#{@course.id}"
-      expect(response).to be_success
+      expect(response).to be_successful
       body = Nokogiri::HTML(response.body)
       expect(body.css('div.import-in-progress-notice')).not_to be_empty
 
       migration.update_attribute(:workflow_state, 'imported')
       get "/courses/#{@course.id}"
-      expect(response).to be_success
+      expect(response).to be_successful
       body = Nokogiri::HTML(response.body)
       expect(body.css('div.import-in-progress-notice')).to be_empty
     end
@@ -71,7 +71,7 @@ describe "course" do
 
       migration.update_attribute(:workflow_state, 'importing')
       get "/courses/#{@course.id}"
-      expect(response).to be_success
+      expect(response).to be_successful
       body = Nokogiri::HTML(response.body)
       expect(body.css('div.import-in-progress-notice')).to be_empty
     end

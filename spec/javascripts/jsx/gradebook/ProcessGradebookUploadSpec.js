@@ -43,10 +43,10 @@ define([
 
   const newAssignment2 = {id: -1, title: 'New Assignment 2', points_possible: 25, published: true};
 
-  const submissionNew2Change = {assignment_id: -1, grade: '20', original_grade: '25'};
-  const submissionNew2Excused = {assignment_id: -1, grade: 'EX', original_grade: '20'};
+  const submissionNew2Change = {assignment_id: -1, grade: '20', original_grade: '25', type: 'assignment'};
+  const submissionNew2Excused = {assignment_id: -1, grade: 'EX', original_grade: '20', type: 'assignment'};
 
-  const submissionIgnored = {assignment_id: -2, grade: '25', original_grade: '25'};
+  const submissionIgnored = {assignment_id: -2, grade: '25', original_grade: '25', type: 'assignment'};
 
   const createAssignmentResponse1 = {id: 3};
   const createAssignmentResponse2 = {id: 4};
@@ -769,5 +769,114 @@ define([
     requests[2].respond(200, {}, JSON.stringify(progressCompleted));
 
     ok(goToGradebookStub.called);
+  });
+
+  QUnit.module('ProcessGradebookUpload.parseCustomColumnData');
+
+  test('correctly parses data for one student', () => {
+    const customColumnData = {
+      10: [
+        {
+          new_content: "first content",
+          column_id: 1
+        },
+        {
+          new_content: "second content",
+          column_id: 3
+        },
+      ]
+    }
+
+    const data = ProcessGradebookUpload.parseCustomColumnData(customColumnData)
+    equal(data.length, 2);
+    equal(data[0].user_id, 10);
+    equal(data[0].column_id, 1);
+    equal(data[0].content, "first content");
+    equal(data[1].user_id, 10);
+    equal(data[1].column_id, 3);
+    equal(data[1].content, "second content");
+  });
+
+  test('correctly parses data for multiple students', () => {
+    const customColumnData = {
+      10: [
+        {
+          new_content: "first content",
+          column_id: 1
+        },
+      ],
+      1: [
+        {
+          new_content: "second content",
+          column_id: 2
+        },
+      ]
+    }
+
+    const data = ProcessGradebookUpload.parseCustomColumnData(customColumnData)
+    equal(data.length, 2);
+    equal(data[0].user_id, 1);
+    equal(data[0].column_id, 2);
+    equal(data[0].content, "second content");
+    equal(data[1].user_id, 10);
+    equal(data[1].column_id, 1);
+    equal(data[1].content, "first content");
+  });
+
+  QUnit.module('ProcessGradebookUpload.submitCustomColumnData', {
+    setup () {
+      sandbox.stub(window, 'alert');
+      xhr = sinon.useFakeXMLHttpRequest();
+      requests = [];
+
+      xhr.onCreate = function (request) {
+        requests.push(request);
+      };
+
+      goToGradebookStub = sinon.stub(ProcessGradebookUpload, 'goToGradebook');
+
+      clock = sinon.useFakeTimers();
+
+      fakeENV.setup();
+      ENV.bulk_update_custom_columns_path = '/bulk_update_custom_columns_path/url';
+    },
+    teardown () {
+      xhr.restore();
+
+      ProcessGradebookUpload.goToGradebook.restore();
+
+      clock.restore();
+
+      fakeENV.teardown();
+    }
+  });
+
+  test('correctly submits custom column data', () => {
+    const gradeData = [
+      {
+        column_id: 1,
+        user_id: 2,
+        content: "test content"
+      },
+      {
+        column_id: 3,
+        user_id: 4,
+        content: "test content 2"
+      }
+    ];
+
+    ProcessGradebookUpload.submitCustomColumnData(gradeData);
+
+    equal(requests.length, 1);
+    equal(requests[0].url, '/bulk_update_custom_columns_path/url');
+    equal(requests[0].method, 'PUT');
+
+    const bulkUpdateRequest = JSON.parse(requests[0].requestBody);
+    equal(bulkUpdateRequest.column_data[0].column_id, 1);
+    equal(bulkUpdateRequest.column_data[0].user_id, 2);
+    equal(bulkUpdateRequest.column_data[0].content, "test content");
+    equal(bulkUpdateRequest.column_data[1].column_id, 3);
+    equal(bulkUpdateRequest.column_data[1].user_id, 4);
+    equal(bulkUpdateRequest.column_data[1].content, "test content 2");
   });
 });

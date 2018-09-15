@@ -46,18 +46,18 @@ module Api::V1::Attachment
     }
     return hash if options[:only] && options[:only].include?('names')
 
-    options.reverse_merge!(submission_attachment: false)
+    options.reverse_merge!(skip_permission_checks: false)
     includes = options[:include] || []
 
     # it takes loads of queries to figure out that a teacher doesn't have
     # :update permission on submission attachments.  we'll handle the
     # permissions ourselves instead of using the usual stuff to save thousands
     # of queries
-    submission_attachment = options[:submission_attachment]
+    skip_permission_checks = options[:skip_permission_checks]
 
     # this seems like a stupid amount of branching but it avoids expensive
     # permission checks
-    hidden_for_user = if submission_attachment
+    hidden_for_user = if skip_permission_checks
                         false
                       elsif !attachment.hidden?
                         false
@@ -67,7 +67,7 @@ module Api::V1::Attachment
                         !can_view_hidden_files?(attachment.context, user)
                       end
 
-    downloadable = !attachment.locked_for?(user, check_policies: true)
+    downloadable = skip_permission_checks || !attachment.locked_for?(user, check_policies: true)
 
     if downloadable
       # using the multi-parameter form because not every class that mixes in
@@ -97,7 +97,7 @@ module Api::V1::Attachment
       'updated_at' => attachment.updated_at,
       'unlock_at' => attachment.unlock_at,
       'locked' => !!attachment.locked,
-      'hidden' => submission_attachment ? false : !!attachment.hidden?,
+      'hidden' => skip_permission_checks ? false : !!attachment.hidden?,
       'lock_at' => attachment.lock_at,
       'hidden_for_user' => hidden_for_user,
       'thumbnail_url' => thumbnail_url,
@@ -105,7 +105,11 @@ module Api::V1::Attachment
       'mime_class' => attachment.mime_class,
       'media_entry_id' => attachment.media_entry_id
     )
-    locked_json(hash, attachment, user, 'file')
+    if skip_permission_checks
+      hash['locked_for_user'] = false
+    else
+      locked_json(hash, attachment, user, 'file')
+    end
 
     if includes.include? 'user'
       context = attachment.context

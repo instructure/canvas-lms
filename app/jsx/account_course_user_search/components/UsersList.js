@@ -24,12 +24,10 @@ import I18n from 'i18n!account_course_user_search'
 import UsersListRow from './UsersListRow'
 import UsersListHeader from './UsersListHeader'
 
-
 export default class UsersList extends React.Component {
-
   shouldComponentUpdate(nextProps) {
     let count = 0
-    for (let prop in this.props) {
+    for (const prop in this.props) {
       ++count
       if (this.props[prop] !== nextProps[prop]) {
         // a change to searchFilter on it's own should not cause the list
@@ -44,7 +42,10 @@ export default class UsersList extends React.Component {
 
   render() {
     return (
-      <Table margin="small 0" caption={<ScreenReaderContent>{I18n.t('Users')}</ScreenReaderContent>}>
+      <Table
+        margin="small 0"
+        caption={<ScreenReaderContent>{I18n.t('Users')}</ScreenReaderContent>}
+      >
         <thead>
           <tr>
             <UsersListHeader
@@ -85,7 +86,7 @@ export default class UsersList extends React.Component {
           </tr>
         </thead>
         <tbody data-automation="users list">
-          {this.props.users.map(user =>
+          {this.props.users.map(user => (
             <UsersListRow
               handleSubmitEditUserForm={this.props.handleSubmitEditUserForm}
               key={user.id}
@@ -93,7 +94,7 @@ export default class UsersList extends React.Component {
               user={user}
               permissions={this.props.permissions}
             />
-          )}
+          ))}
         </tbody>
       </Table>
     )

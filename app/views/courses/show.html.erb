@@ -121,7 +121,7 @@
         </div>
       </div>
     <% end %>
-    <%= render :partial => 'to_do_list', :locals => {:contexts => [@context]} %>
+    <%= render :partial => 'to_do_list', :locals => {:contexts => [@context], :show_legacy_todo_list => !@context_enrollment&.student?} %>
     <%= render :partial => "group_list", :locals => {:group_list => @user_groups} %>
     <%= nbsp unless @current_user %>
   </div>
@@ -146,6 +146,7 @@
 
 <%
   css_bundle :dashboard
+  css_bundle :react_todo_sidebar if planner_enabled?
   case @course_home_view
   when 'wiki'
     css_bundle :tinymce

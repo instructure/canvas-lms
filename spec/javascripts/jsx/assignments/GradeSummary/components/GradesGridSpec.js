@@ -19,6 +19,7 @@
 import React from 'react'
 import {mount} from 'enzyme'
 
+import {speedGraderUrl} from 'jsx/assignments/GradeSummary/assignment/AssignmentApi'
 import Grid from 'jsx/assignments/GradeSummary/components/GradesGrid/Grid'
 import GradesGrid from 'jsx/assignments/GradeSummary/components/GradesGrid'
 
@@ -28,6 +29,11 @@ QUnit.module('GradeSummary GradesGrid', suiteHooks => {
 
   suiteHooks.beforeEach(() => {
     props = {
+      anonymousStudents: false,
+      assignment: {
+        courseId: '1201',
+        id: '2301'
+      },
       disabledCustomGrade: false,
       finalGrader: {
         graderId: 'teach',
@@ -111,6 +117,10 @@ QUnit.module('GradeSummary GradesGrid', suiteHooks => {
     onPageClick(page)
   }
 
+  function speedGraderUrlFor(studentId, anonymousStudents = false) {
+    return speedGraderUrl('1201', '2301', {anonymousStudents, studentId})
+  }
+
   test('displays the grader names in the column headers', () => {
     mountComponent()
     deepEqual(getGraderNames(), ['Miss Frizzle', 'Mr. Keating'])
@@ -164,12 +174,27 @@ QUnit.module('GradeSummary GradesGrid', suiteHooks => {
     deepEqual(getStudentNames(), ['Adam Jones', 'Betty Ford', 'Charlie Xi', 'Dana Smith'])
   })
 
+  test('links the student names to SpeedGrader', () => {
+    mountComponent()
+    const links = wrapper.find('th.GradesGrid__BodyRowHeader a')
+    const expectedUrls = props.students.map(student => speedGraderUrlFor(student.id))
+    deepEqual(links.map(link => link.prop('href')), expectedUrls)
+  })
+
   test('enumerates students for names when students are anonymous', () => {
     for (let i = 0; i < props.students.length; i++) {
       props.students[i].displayName = null
     }
     mountComponent()
     deepEqual(getStudentNames(), ['Student 1', 'Student 2', 'Student 3', 'Student 4'])
+  })
+
+  test('anonymizes student links to SpeedGrader when students are anonymous', () => {
+    props.anonymousStudents = true
+    mountComponent()
+    const links = wrapper.find('th.GradesGrid__BodyRowHeader a')
+    const expectedUrls = props.students.map(student => speedGraderUrlFor(student.id, true))
+    deepEqual(links.map(link => link.prop('href')), expectedUrls)
   })
 
   test('enumerates additional students for names as they are added', () => {

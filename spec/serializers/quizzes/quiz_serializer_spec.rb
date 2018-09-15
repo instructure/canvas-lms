@@ -622,7 +622,8 @@ describe Quizzes::QuizSerializer do
   it "includes anonymous_submisions if quiz is a survey quiz" do
     expect(json.keys).to_not include(:anonymous_submissions)
 
-    quiz.update_attributes(:quiz_type => "survey", :anonymous_submissions => true)
+    quiz.quiz_type = 'survey'
+    quiz.anonymous_submissions = true
     new_json = quiz_serializer.as_json[:quiz]
     expect(new_json[:anonymous_submissions]).to eq true
   end

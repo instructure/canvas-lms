@@ -61,21 +61,6 @@ describe "new account user search" do
     end
   end
 
-  it "should not show the people tab without permission" do
-    @account.role_overrides.create! :role => admin_role, :permission => 'read_roster', :enabled => false
-
-    get "/accounts/#{@account.id}"
-
-    expect(f("#left-side #section-tabs")).not_to include_text("People")
-  end
-
-  it "should show the create users button user has permission on the root_account" do
-    sub_account = Account.create!(name: "sub", parent_account: @account)
-    get "/accounts/#{sub_account.id}/users"
-
-    expect(f("#content")).to contain_jqcss('button:has([name="IconPlus"]):contains("People")')
-  end
-
   it "should be able to create users" do
     get "/accounts/#{@account.id}/users"
 
@@ -183,7 +168,7 @@ describe "new account user search" do
 
     it "should search but not find bogus user", priority: "1", test_id: 3399649 do
       enter_search('jtsdumbthing')
-      expect(results_alert).to include_text('No users found')
+      expect(f('#content h2')).to include_text('No users found')
       expect(results_body).not_to contain_css(results_row)
     end
 
@@ -201,14 +186,15 @@ describe "new account user search" do
 
     it "should search by name" do
       user_with_pseudonym(:account => @account, :name => "diffrient user")
-      enter_search("Test")
+      refresh_page
+      user_search_box.send_keys("Test")
       wait_for_loading_to_disappear
       expect(results_rows.count).to eq 1
       expect(results_rows.first).to include_text("Test")
     end
   end
 
-  describe 'Page Object Converted Tests Sub Account' do
+  describe 'Page Object Converted No Default Page Visit' do
     include NewUserSearchPage
     include NewUserEditModalPage
     include MasqueradePage
@@ -217,11 +203,23 @@ describe "new account user search" do
     before do
       @user.update_attribute(:name, "Test User")
       @sub_account = Account.create!(name: "sub", parent_account: @account)
+    end
+
+    it "should not show the people tab without permission" do
+      @account.role_overrides.create! :role => admin_role, :permission => 'read_roster', :enabled => false
+      visit(@account)
+      expect(left_navigation).not_to include_text("People")
+    end
+
+    it "should show the create users button user has permission on the root_account" do
       visit_subaccount(@sub_account)
+      expect(results_body).to contain_jqcss(add_user_button_jqcss)
     end
 
     it "should not show the create users button for non-root accounts" do
       account_admin_user(account: @sub_account, active_all: true)
+      user_session(@admin)
+      visit_subaccount(@sub_account)
       expect(results_body).not_to contain_jqcss(add_user_button_jqcss)
     end
   end

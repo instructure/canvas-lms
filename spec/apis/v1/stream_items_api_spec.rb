@@ -91,7 +91,7 @@ describe UsersController, type: :request do
         @assignment.update_attribute(:due_at, 1.week.from_now)
         @assignment.update_attribute(:due_at, 2.weeks.from_now)
         # manually set the pre-datafixup state for one of them
-        val = StreamItem.where(:asset_type => "Message", :id => @user.visible_stream_item_instances.map(&:stream_item)).
+        val = StreamItem.where(:asset_type => "Message", :id => @user.visible_stream_item_instances.map(&:stream_item_id)).
           limit(1).update_all(:notification_category => nil)
       end
       json = api_call(:get, "/api/v1/users/self/activity_stream/summary.json",
@@ -295,8 +295,8 @@ describe UsersController, type: :request do
   it "should format Conversation" do
     @sender = User.create!(:name => 'sender')
     @conversation = Conversation.initiate([@user, @sender], false)
-    @conversation.add_message(@sender, "hello")
-    @message = @conversation.conversation_messages.last
+    @message = @conversation.add_message(@sender, "hello")
+
     json = api_call(:get, "/api/v1/users/activity_stream.json",
                     { :controller => "users", :action => "activity_stream", :format => 'json' }).first
     expect(json).to eq({
@@ -308,12 +308,20 @@ describe UsersController, type: :request do
       'updated_at' => StreamItem.last.updated_at.as_json,
       'title' => nil,
       'message' => nil,
-
       'private' => false,
       'html_url' => "http://www.example.com/conversations/#{@conversation.id}",
-
-      'participant_count' => 2
+      'participant_count' => 2,
+      'latest_messages' => [
+        {'id' => @message.id, "created_at" => @message.created_at.as_json,
+          "author_id" => @sender.id, "message" => "hello",
+          "participating_user_ids" => [@user.id, @sender.id]}]
     })
+
+    @conversation.conversation_participants.where(:user_id => @user).first.remove_messages(@message)
+    # should update the latest messages and not show them the one they can't see anymore
+    json = api_call(:get, "/api/v1/users/activity_stream.json",
+      { :controller => "users", :action => "activity_stream", :format => 'json' }).first
+    expect(json["latest_messages"]).to be_blank
   end
 
   it "should format Message" do

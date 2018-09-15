@@ -21,32 +21,16 @@ import SisValidationHelper from 'compiled/util/SisValidationHelper'
 import Backbone from 'Backbone'
 
 class AssignmentStub extends Backbone.Model {
-  constructor(...args) {
-    {
-      if (false) {
-        super()
-      }
-      const thisFn = (() => {
-        this
-      }).toString()
-      const thisName = thisFn.slice(thisFn.indexOf('{') + 1, thisFn.indexOf(';')).trim()
-      eval(`${thisName} = this;`)
-    }
-    super(...args)
-  }
-  static initClass() {
-    this.prototype.url = '/fake'
-  }
 
   postToSIS = postToSisBoolean => {
-    if (!(arguments.length > 0)) {
+    if (typeof postToSisBoolean === 'undefined') {
       return this.get('post_to_sis')
     }
     return this.set('post_to_sis', postToSisBoolean)
   }
 
   name = newName => {
-    if (!(arguments.length > 0)) {
+    if (typeof newName === 'undefined') {
       return this.get('name')
     }
     return this.set('name', newName)
@@ -55,20 +39,20 @@ class AssignmentStub extends Backbone.Model {
   maxNameLength = () => ENV.MAX_NAME_LENGTH
 
   dueAt = date => {
-    if (!(arguments.length > 0)) {
+    if (typeof date === 'undefined') {
       return this.get('due_at')
     }
     return this.set('due_at', date)
   }
 
   allDates = alldate => {
-    if (!(arguments.length > 0)) {
+    if (typeof alldate === 'undefined') {
       return this.get('all_dates')
     }
     return this.set('all_dates', alldate)
   }
 }
-AssignmentStub.initClass()
+AssignmentStub.prototype.url = '/fake'
 
 QUnit.module('SisValidationHelper')
 

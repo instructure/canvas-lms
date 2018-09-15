@@ -121,8 +121,10 @@ define [
           override.title = ov.title
 
         start_date = null
+        orig_start_date = null
         if start_at
           start_date = new Date start_at.getFullYear(), start_at.getMonth(), start_at.getDate()
+          orig_start_date = Date.parse(json['start_at'])
 
         end_date = null
         if end_at
@@ -131,6 +133,7 @@ define [
         if not lastDate or lastDate['date']?.getTime() != start_date?.getTime()
           lastDate =
             'date': start_date
+            'orig_date': orig_start_date
             'passed': start_date and start_date < today
             'events': []
 

@@ -182,17 +182,26 @@ describe AccountNotification do
       notes = AccountNotification.for_user_and_account(@user, Account.default)
       expect(notes).to include sub_announcement
       expect(notes).to include other_announcement
-      expect(notes).not_to include nother_announcement
+      expect(notes).to include nother_announcement
 
       other_notes = AccountNotification.for_user_and_account(@user, other_root_account)
       expect(other_notes).to include sub_announcement
       expect(other_notes).to include other_announcement
-      expect(other_notes).not_to include nother_announcement
+      expect(other_notes).to include nother_announcement
 
       nother_notes = AccountNotification.for_user_and_account(@user, nother_root_account)
       expect(nother_notes).to include sub_announcement
       expect(nother_notes).to include other_announcement
       expect(nother_notes).to include nother_announcement
+    end
+
+    it "still show sub-account announcements even if the course is unpublished" do
+      # because that makes sense i guess?
+      unpub_sub_announcement = sub_account_notification(subject: 'blah', account: @sub_account)
+      course_with_student(user: @user, account: @sub_account)
+
+      notes = AccountNotification.for_user_and_account(@user, Account.default)
+      expect(notes).to include unpub_sub_announcement
     end
 
     it "restricts to roles within the respective sub-accounts (even if within same root account)" do

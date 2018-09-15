@@ -6285,7 +6285,7 @@ ko:
   links_14b70841: 링크
   loading_25990131: "로드하는 중..."
   locales: 
-    ko: "한국말 (crowd-sourced)"
+    ko: 한국말
   lock_date_cannot_be_before_due_date_ac30f54: "잠금 설정 날짜는 기한으로 설정한 날짜보다 이전일 수 없습니다."
   logged_out_user: "사용자 %{user_counter} 로그 아웃"
   login: 

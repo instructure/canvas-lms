@@ -66,6 +66,7 @@ export default class StudentColumnHeader extends ColumnHeader {
   onShowSectionNames = () => { this.onSelectSecondaryInfo('section'); };
   onHideSecondaryInfo = () => { this.onSelectSecondaryInfo('none'); };
   onShowSisId = () => { this.onSelectSecondaryInfo('sis_id'); };
+  onShowIntegrationId = () => { this.onSelectSecondaryInfo('integration_id'); };
   onShowLoginId = () => { this.onSelectSecondaryInfo('login_id'); };
 
   onShowFirstLastNames = () => { this.onSelectPrimaryInfo('first_last'); };
@@ -206,6 +207,14 @@ export default class StudentColumnHeader extends ColumnHeader {
                           onSelect={this.onShowSisId}
                         >
                           {this.props.sisName || studentRowHeaderConstants.secondaryInfoLabels.sis_id}
+                        </MenuItem>
+
+                        <MenuItem
+                          key="integration_id"
+                          selected={this.props.selectedSecondaryInfo === 'integration_id'}
+                          onSelect={this.onShowIntegrationId}
+                        >
+                          {studentRowHeaderConstants.secondaryInfoLabels.integration_id}
                         </MenuItem>
 
                         <MenuItem

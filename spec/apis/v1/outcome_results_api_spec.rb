@@ -261,7 +261,7 @@ describe "Outcome Results API", type: :request do
         outcome_result
         user_session @user
         get "/courses/#{@course.id}/outcome_rollups.csv"
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.body).to eq "Student name,Student ID,new outcome result,new outcome mastery points\n"+
           "User,#{outcome_student.id},3.0,3.0\n"
       end

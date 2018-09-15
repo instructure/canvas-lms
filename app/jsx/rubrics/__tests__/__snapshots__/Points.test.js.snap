@@ -4,7 +4,7 @@ exports[`The Points component renders the component when assessing with the expe
 "<div className=\\"react-rubric-cell graded-points\\">
   <Flex alignItems=\\"end\\" wrapItems={true} as=\\"span\\" direction=\\"row\\" justifyItems=\\"start\\" inline={false} visualDebug={false}>
     <FlexItem size=\\"4rem\\" margin=\\"none small none none\\" as=\\"span\\" grow={false} shrink={false}>
-      <TextInput inline={true} label={{...}} messages={{...}} onChange={[Function]} value=\\"1\\" width=\\"4rem\\" type=\\"text\\" size=\\"medium\\" textAlign=\\"start\\" disabled={false} readOnly={false} inputRef={[Function]} layout=\\"stacked\\" />
+      <TextInput inline={true} label={{...}} messages={{...}} onChange={[Function: onChange]} value=\\"1\\" width=\\"4rem\\" type=\\"text\\" size=\\"medium\\" textAlign=\\"start\\" disabled={false} readOnly={false} inputRef={[Function: inputRef]} layout=\\"stacked\\" />
     </FlexItem>
     <FlexItem margin=\\"small none none none\\" as=\\"span\\" grow={false} shrink={false}>
       / 2 pts

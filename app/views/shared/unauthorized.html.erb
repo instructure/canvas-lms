@@ -17,12 +17,7 @@
 %>
 
 <% content_for :page_title do %>
-  <% if !@files_domain && !@unauthorized_user  %>
-    <%= t('titles.log_in', %{Please Log In}) %>
-  <% else %>
-    <%= t('titles.unauthorized_action', %{Unauthorized}) %>
-  <% end %>
-
+  <%= t('titles.unauthorized_action', %{Unauthorized}) %>
 <% end %>
 <% @show_left_side = false %>
 <% @show_embedded_chat = false %>
@@ -32,22 +27,13 @@
     <h2 class="ui-state-error">
       <% if @needs_cookies -%>
         <%= t('headings.needs_cookies', %{Cookies Required}) %>
-      <% elsif !@files_domain && @unauthorized_user %>
-        <%= t('headings.needs_login', %{Please Log In}) %>
       <% elsif @unauthorized_reason == :unpublished %>
         <%= t('headings.unpublished', %{Not Yet Available}) %>
       <% else -%>
         <%= t('headings.unauthorized_action', %{Unauthorized}) %>
       <% end -%>
     </h2>
-    <% if @unauthorized_user && @current_user != @unauthorized_user %>
-      <p><%= mt 'unauthorized_user_is_other', "%{current_user}, you are not authorized to view this page.  The link you followed to get here was for **%{unauthorized_user} (%{unauthorized_user_email})**.  If that's you, you may want to log out and log back in with that email address to gain access to this page.", :current_user => @current_user.name, :unauthorized_user => @unauthorized_user.name, :unauthorized_user_email => @unauthorized_user.email %>
-      </p>
-    <% elsif @unauthorized_user %>
-      <p>
-        <%= t "%{user_name}, you'll need to *log in* before you can view that page.", user_name: @unauthorized_user.name, wrapper: link_to(login_url, '\1') %>
-      </p>
-    <% elsif @unauthorized_message %>
+    <% if @unauthorized_message %>
       <p><%= @unauthorized_message %></p>
     <% elsif @needs_cookies %>
       <p><%= t('needs_cookies', %{Cookies are not enabled on your browser. Please adjust this in your security preferences before continuing.}) %></p>

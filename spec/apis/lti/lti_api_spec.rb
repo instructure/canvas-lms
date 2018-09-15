@@ -80,7 +80,7 @@ describe LtiApiController, type: :request do
     it 'accepts valid oauth request' do
       lti_api_call(:post, request_path, request_body.to_json)
       expect(request.headers["Authorization"]).to include 'oauth_body_hash'
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it 'disables the turnitin plugin for the assignment' do

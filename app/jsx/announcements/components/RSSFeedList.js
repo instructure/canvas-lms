@@ -56,8 +56,12 @@ export default class RSSFeedList extends React.Component {
 
   deleteExternalFeed = (id, index) => {
     this.props.deleteExternalFeed({feedId: id})
-    const previousIndex = index - 1;
-    const elFocus = index ? () => { document.getElementById(`feed-row-${previousIndex}`).focus() } : this.props.focusLastElement
+    const previousIndex = index - 1
+    const elFocus = index
+      ? () => {
+          document.getElementById(`feed-row-${previousIndex}`).focus()
+        }
+      : this.props.focusLastElement
 
     setTimeout(() => {
       elFocus()
@@ -75,11 +79,17 @@ export default class RSSFeedList extends React.Component {
     )
   }
 
-  renderFeedRow({ display_name, id, external_feed_entries_count = 0, url }, index) {
+  renderFeedRow({display_name, id, external_feed_entries_count = 0, url}, index) {
     return (
       <div key={id} className="announcements-tray-feed-row">
         <View margin="small 0" display="block">
-          <Grid startAt="medium" vAlign="middle" colSpacing="small" hAlign="space-around" rowSpacing="small">
+          <Grid
+            startAt="medium"
+            vAlign="middle"
+            colSpacing="small"
+            hAlign="space-around"
+            rowSpacing="small"
+          >
             <GridRow>
               <GridCol>
                 <Link margin="0 small" href={url}>
@@ -101,7 +111,7 @@ export default class RSSFeedList extends React.Component {
                   size="small"
                   placement="end"
                 >
-                  <IconXLine title={I18n.t('Delete %{feedName}', { feedName: display_name })} />
+                  <IconXLine title={I18n.t('Delete %{feedName}', {feedName: display_name})} />
                 </Button>
               </GridCol>
             </GridRow>
@@ -121,9 +131,7 @@ export default class RSSFeedList extends React.Component {
     } else {
       return (
         <View id="external_rss_feed__rss-list" display="block" textAlign="start">
-          {this.props.feeds.map((feed, index) =>
-            this.renderFeedRow(feed, index)
-          )}
+          {this.props.feeds.map((feed, index) => this.renderFeedRow(feed, index))}
           <div className="announcements-tray-row" />
         </View>
       )
@@ -141,4 +149,7 @@ const connectActions = dispatch =>
     Object.assign(select(actions, ['getExternalFeeds', 'deleteExternalFeed'])),
     dispatch
   )
-export const ConnectedRSSFeedList = connect(connectState, connectActions)(RSSFeedList)
+export const ConnectedRSSFeedList = connect(
+  connectState,
+  connectActions
+)(RSSFeedList)

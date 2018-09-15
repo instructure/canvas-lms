@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -39,6 +39,28 @@ describe Multipart::Post do
     params = parse_params(query, header)
     expect(params["a"]).to eq("string")
     expect(params["b"][:filename]).to eq("b")
+    expect(params["b"][:tempfile].read).to eq("file in mem")
+  end
+
+  it "should prepare_query_stream with a File" do
+    file = Tempfile.new(["test","txt"])
+    file.write("file on disk")
+    file.rewind
+    stream, header = subject.prepare_query_stream(:a => "string", :b => file)
+    params = parse_params(stream.read, header)
+    expect(params["a"]).to eq("string")
+    expect(params["b"][:filename]).to eq(File.basename(file.path))
+    expect(params["b"][:tempfile].read).to eq("file on disk")
+  end
+
+  it "should prepare_query_stream with a StringIO" do
+    file = Tempfile.new(["test","txt"])
+    file.write("file in mem")
+    file.rewind
+    stream, header = subject.prepare_query_stream(:a => "string", :b => file)
+    params = parse_params(stream.read, header)
+    expect(params["a"]).to eq("string")
+    expect(params["b"][:filename]).to eq(File.basename(file.path))
     expect(params["b"][:tempfile].read).to eq("file in mem")
   end
 end

@@ -72,8 +72,9 @@ module AttachmentHelper
       @headers = false if @files_domain
       send_file(attachment.full_filename, :type => attachment.content_type_with_encoding, :disposition => (inline ? 'inline' : 'attachment'), :filename => attachment.display_name)
     elsif inline && attachment.can_be_proxied?
-      send_file_headers!( :length=> attachment.s3object.content_length, :filename=>attachment.filename, :disposition => 'inline', :type => attachment.content_type_with_encoding)
-      render body: attachment.s3object.get.body.read
+      body = attachment.open.read
+      send_file_headers!(length: body.length, filename: attachment.filename, disposition: 'inline', type: attachment.content_type_with_encoding)
+      render body: body
     elsif inline
       redirect_to authenticated_inline_url(attachment)
     else

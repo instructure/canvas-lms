@@ -24,6 +24,7 @@ class Submission < ActiveRecord::Base
   include CustomValidations
   include SendToStream
   include Workflow
+  include PlannerHelper
 
   GRADE_STATUS_MESSAGES_MAP = {
     success: {
@@ -346,9 +347,22 @@ class Submission < ActiveRecord::Base
 
   after_create :needs_grading_count_updated, if: :needs_grading?
   after_update :needs_grading_count_updated, if: :needs_grading_changed?
+  after_update :update_planner_override
   def needs_grading_count_updated
     self.class.connection.after_transaction_commit do
       touch_assignments
+    end
+  end
+
+  def update_planner_override
+    return unless self.saved_change_to_workflow_state?
+    if self.submission_type == "online_quiz" && self.workflow_state == "graded"
+      # unless it's an auto-graded quiz
+      return unless self.workflow_state_before_last_save == "unsubmitted"
+      complete_planner_override_for_submission(self)
+    else
+      return unless self.workflow_state == "submitted"
+      complete_planner_override_for_submission(self)
     end
   end
 
@@ -396,7 +410,7 @@ class Submission < ActiveRecord::Base
       self.assignment.published? &&
         self.assignment.context.grants_right?(user, session, :manage_grades)
     end
-    can :read and can :comment and can :make_group_comment and can :read_grade
+    can :read and can :comment and can :make_group_comment and can :read_grade and can :read_comments
 
     given do |user, _session|
       can_grade?(user)
@@ -1930,6 +1944,35 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  def moderation_whitelist_for_user(current_user)
+    whitelist = []
+    return whitelist unless current_user.present? && assignment.moderated_grading?
+
+    if assignment.grades_published?
+      whitelist.push(self.grader, self.user, current_user)
+    elsif self.user == current_user
+      # Requesting user is the student.
+      whitelist << current_user
+    elsif assignment.permits_moderation?(current_user)
+      # Requesting user is the final grader or an administrator.
+      whitelist.push(*assignment.moderation_grader_users_with_slot_taken, self.user, current_user)
+    elsif assignment.can_be_moderated_grader?(current_user)
+      # Requesting user is a provisional grader, or eligible to be one.
+      if assignment.grader_comments_visible_to_graders
+        whitelist.push(*assignment.moderation_grader_users_with_slot_taken, self.user, current_user)
+      else
+        whitelist.push(current_user, self.user)
+      end
+    end
+    whitelist.compact.uniq
+  end
+
+  def anonymous_identities
+    @anonymous_identities ||= assignment.anonymous_grader_identities_by_user_id.merge({
+      user_id => { name: I18n.t('Student'), id: anonymous_id }
+    })
+  end
+
   def add_comment(opts={})
     opts = opts.symbolize_keys
     opts[:author] ||= opts[:commenter] || opts[:author] || opts[:user] || self.user unless opts[:skip_author]
@@ -2357,7 +2400,7 @@ class Submission < ActiveRecord::Base
 
   def self.queue_bulk_update(context, section, grader, grade_data)
     progress = Progress.create!(:context => context, :tag => "submissions_update")
-    progress.process_job(self, :process_bulk_update, {}, context, section, grader, grade_data)
+    progress.process_job(self, :process_bulk_update, {:n_strand => ["submissions_bulk_update", context.global_id]}, context, section, grader, grade_data)
     progress
   end
 
@@ -2366,7 +2409,7 @@ class Submission < ActiveRecord::Base
     graded_user_ids = Set.new
     preloaded_assignments = Assignment.find(grade_data.keys).index_by(&:id)
 
-
+    Submission.suspend_callbacks(:touch_graders) do
     grade_data.each do |assignment_id, user_grades|
       assignment = preloaded_assignments[assignment_id.to_i]
 
@@ -2399,6 +2442,7 @@ class Submission < ActiveRecord::Base
             submissions.each { |s| graded_user_ids << s.user_id }
             submission = submissions.first
           end
+          submission.user = user
 
           assessment = user_data[:rubric_assessment]
           if assessment.is_a?(Hash) && assignment.rubric_association
@@ -2435,6 +2479,7 @@ class Submission < ActiveRecord::Base
         end
       end
     end
+    end
 
     if missing_ids.any?
       progress.message = "Couldn't find User(s) with API ids #{missing_ids.map{|id| "'#{id}'"}.join(", ")}"
@@ -2442,6 +2487,7 @@ class Submission < ActiveRecord::Base
       progress.fail
     end
   ensure
+    context.touch_admins_later
     user_ids = graded_user_ids.to_a
     Rails.logger.debug "GRADES: recomputing scores in course #{context.id} for users #{user_ids} because of bulk submission update"
     context.recompute_student_scores(user_ids)
@@ -2478,27 +2524,6 @@ class Submission < ActiveRecord::Base
   end
 
   private
-
-  def moderation_whitelist_for_user(current_user)
-    whitelist = []
-    if assignment.grades_published?
-      whitelist.push(self.grader, self.user, current_user)
-    elsif self.user == current_user
-      # Requesting user is the student.
-      whitelist << current_user
-    elsif assignment.permits_moderation?(current_user)
-      # Requesting user is the final grader or an administrator.
-      whitelist.push(*assignment.moderation_grader_users, self.user, current_user)
-    elsif assignment.can_be_moderated_grader?(current_user)
-      # Requesting user is a provisional grader, or eligible to be one.
-      if assignment.grader_comments_visible_to_graders
-        whitelist.push(*assignment.moderation_grader_users, self.user, current_user)
-      else
-        whitelist.push(current_user, self.user)
-      end
-    end
-    whitelist.compact.uniq
-  end
 
   def set_anonymous_id
     self.anonymous_id = Anonymity.generate_id(existing_ids: Submission.anonymous_ids_for(assignment))

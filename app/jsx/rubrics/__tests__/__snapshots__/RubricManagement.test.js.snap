@@ -2,10 +2,10 @@
 
 exports[`renders the RubricManagement component 1`] = `
 "<TabList defaultSelectedIndex={0} variant=\\"simple\\" focus={false}>
-  <TabPanel title=\\"Account Rubrics\\" id={{...}} variant=\\"simple\\" labelledBy={{...}} selected={false} padding=\\"small\\" tabRef={[Function]}>
+  <TabPanel title=\\"Account Rubrics\\" id={{...}} variant=\\"simple\\" labelledBy={{...}} selected={false} padding=\\"small\\" tabRef={[Function: tabRef]}>
     <RubricPanel />
   </TabPanel>
-  <TabPanel title=\\"Learning Mastery\\" id={{...}} variant=\\"simple\\" labelledBy={{...}} selected={false} padding=\\"small\\" tabRef={[Function]}>
+  <TabPanel title=\\"Learning Mastery\\" id={{...}} variant=\\"simple\\" labelledBy={{...}} selected={false} padding=\\"small\\" tabRef={[Function: tabRef]}>
     <ProficiencyTable focusTab={[Function]} accountId=\\"1\\" />
   </TabPanel>
 </TabList>"

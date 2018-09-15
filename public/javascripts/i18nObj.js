@@ -32,9 +32,10 @@ import './vendor/date'
  * insignificant digits). If you want a different format, do it
  * before you interpolate.
  */
-const {interpolate} = I18n
+const interpolate = I18n.interpolate.bind(I18n)
+
 I18n.interpolate = function(message, origOptions) {
-  const options = $.extend(true, {}, origOptions)
+  const options = {...origOptions}
   const matches = message.match(this.PLACEHOLDER) || []
 
   matches.forEach(placeholder => {
@@ -43,30 +44,29 @@ I18n.interpolate = function(message, origOptions) {
       options[name] = this.localizeNumber(options[name])
     }
   })
-
-  return interpolate.call(this, message, options)
+  return interpolate(message, options)
 }
 
 I18n.locale = document.documentElement.getAttribute('lang')
 
-I18n.lookup = function(scope, options) {
-  const translations = this.prepareOptions(I18n.translations)
+I18n.lookup = function(scope, options={}) {
+  const translations = I18n.translations
   const locales = I18n.getLocaleAndFallbacks(I18n.currentLocale())
-  options = this.prepareOptions(options)
   if (typeof scope === 'object') {
     scope = scope.join(this.defaultSeparator)
   }
 
   if (options.scope) {
-    scope = options.scope.toString() + this.defaultSeparator + scope
+    scope = `${options.scope}${this.defaultSeparator}${scope}`
   }
 
-  let messages, scopes
-  while (!messages && locales.length > 0) {
-    messages = translations[locales.shift()]
-    scopes = scope.split(this.defaultSeparator)
-    while (messages && scopes.length > 0) {
-      const currentScope = scopes.shift()
+  const scopes = scope.split(this.defaultSeparator)
+
+  let messages
+  for (let i = 0; !messages && (i < locales.length); i++) {
+    messages = translations[locales[i]]
+    for (let j = 0; messages && (j < scopes.length); j++) {
+      const currentScope = scopes[j]
       messages = messages[currentScope]
     }
   }
@@ -82,7 +82,7 @@ I18n.getLocaleAndFallbacks = function(locale) {
   if (!I18n.fallbacksMap) {
     I18n.fallbacksMap = I18n.computeFallbacks()
   }
-  return (I18n.fallbacksMap[locale] || [I18n.defaultLocale]).slice()
+  return (I18n.fallbacksMap[locale] || [I18n.defaultLocale])
 }
 
 I18n.computeFallbacks = function() {
@@ -104,7 +104,7 @@ I18n.computeFallbacks = function() {
   return map
 }
 
-const _localize = I18n.localize
+const _localize = I18n.localize.bind(I18n)
 I18n.localize = function(scope, value) {
   let result = _localize.call(this, scope, value)
   if (scope.match(/^(date|time)/)) result = result.replace(/\s{2,}/, ' ')
@@ -259,8 +259,7 @@ I18n.pluralize = function(count, scope, options) {
     return this.missingTranslation(scope)
   }
 
-
-  options = this.prepareOptions(options, {precision: 0})
+  options = {precision: 0, ...options}
   options.count = this.localizeNumber(count, options)
 
   let message
@@ -295,10 +294,8 @@ I18n.CallHelpers.keyPattern = /^\#?\w+(\.\w+)+$/ // handle our absolute keys
 // call), signal to normalizeKey that it shouldn't be scoped.
 // TODO: make i18nliner-js set i18n_inferred_key, which will DRY things up
 // slightly
-const origInferKey = I18n.CallHelpers.inferKey
-I18n.CallHelpers.inferKey = function() {
-  return `#${origInferKey.apply(this, arguments)}`
-}
+const inferKey = I18n.CallHelpers.inferKey.bind(I18n.CallHelpers)
+I18n.CallHelpers.inferKey = (defaultValue, translateOptions) => `#${inferKey(defaultValue, translateOptions)}`
 
 I18n.CallHelpers.normalizeKey = (key, options) => {
   if (key[0] === '#') {

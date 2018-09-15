@@ -2,9 +2,9 @@
 
 exports[`renders correctly with no custom outcomeProficiency 1`] = `
 "<span>
-  <Popover placement=\\"bottom\\" onToggle={[Function]} onClick={[Function]} onFocus={[Function]} onBlur={[Function]} onMouseOver={[Function]} onMouseOut={[Function]} onShow={[Function]} onDismiss={[Function]} stacking=\\"topmost\\" offsetX={0} offsetY={0} variant=\\"default\\" on={{...}} contentRef={[Function]} defaultShow={false} withArrow={true} trackPosition={true} constrain=\\"window\\" onPositioned={[Function]} onPositionChanged={[Function]} shouldRenderOffscreen={false} shouldContainFocus={false} shouldReturnFocus={true} shouldCloseOnDocumentClick={true} shouldCloseOnEscape={true} defaultFocusElement={{...}} label={{...}} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} positionTarget={{...}} alignArrow={false}>
+  <Popover placement=\\"bottom\\" onToggle={[Function: onToggle]} onClick={[Function: onClick]} onFocus={[Function: onFocus]} onBlur={[Function: onBlur]} onMouseOver={[Function: onMouseOver]} onMouseOut={[Function: onMouseOut]} onShow={[Function: onShow]} onDismiss={[Function: onDismiss]} stacking=\\"topmost\\" offsetX={0} offsetY={0} variant=\\"default\\" on={{...}} contentRef={[Function: contentRef]} defaultShow={false} withArrow={true} trackPosition={true} constrain=\\"window\\" onPositioned={[Function: onPositioned]} onPositionChanged={[Function: onPositionChanged]} shouldRenderOffscreen={false} shouldContainFocus={false} shouldReturnFocus={true} shouldCloseOnDocumentClick={true} shouldCloseOnEscape={true} defaultFocusElement={{...}} label={{...}} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} positionTarget={{...}} alignArrow={false}>
     <PopoverTrigger>
-      <Link onClick={[Function]} variant=\\"default\\" as=\\"button\\" linkRef={[Function]} ellipsis={false} iconPlacement=\\"start\\">
+      <Link onClick={[Function: onClick]} variant=\\"default\\" as=\\"button\\" linkRef={[Function: linkRef]} ellipsis={false} iconPlacement=\\"start\\">
         <span style={{...}}>
           <IconInfo />
         </span>
@@ -68,9 +68,9 @@ exports[`renders correctly with no custom outcomeProficiency 1`] = `
 
 exports[`renders correctly with no results 1`] = `
 "<span>
-  <Popover placement=\\"bottom\\" onToggle={[Function]} onClick={[Function]} onFocus={[Function]} onBlur={[Function]} onMouseOver={[Function]} onMouseOut={[Function]} onShow={[Function]} onDismiss={[Function]} stacking=\\"topmost\\" offsetX={0} offsetY={0} variant=\\"default\\" on={{...}} contentRef={[Function]} defaultShow={false} withArrow={true} trackPosition={true} constrain=\\"window\\" onPositioned={[Function]} onPositionChanged={[Function]} shouldRenderOffscreen={false} shouldContainFocus={false} shouldReturnFocus={true} shouldCloseOnDocumentClick={true} shouldCloseOnEscape={true} defaultFocusElement={{...}} label={{...}} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} positionTarget={{...}} alignArrow={false}>
+  <Popover placement=\\"bottom\\" onToggle={[Function: onToggle]} onClick={[Function: onClick]} onFocus={[Function: onFocus]} onBlur={[Function: onBlur]} onMouseOver={[Function: onMouseOver]} onMouseOut={[Function: onMouseOut]} onShow={[Function: onShow]} onDismiss={[Function: onDismiss]} stacking=\\"topmost\\" offsetX={0} offsetY={0} variant=\\"default\\" on={{...}} contentRef={[Function: contentRef]} defaultShow={false} withArrow={true} trackPosition={true} constrain=\\"window\\" onPositioned={[Function: onPositioned]} onPositionChanged={[Function: onPositionChanged]} shouldRenderOffscreen={false} shouldContainFocus={false} shouldReturnFocus={true} shouldCloseOnDocumentClick={true} shouldCloseOnEscape={true} defaultFocusElement={{...}} label={{...}} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} positionTarget={{...}} alignArrow={false}>
     <PopoverTrigger>
-      <Link onClick={[Function]} variant=\\"default\\" as=\\"button\\" linkRef={[Function]} ellipsis={false} iconPlacement=\\"start\\">
+      <Link onClick={[Function: onClick]} variant=\\"default\\" as=\\"button\\" linkRef={[Function: linkRef]} ellipsis={false} iconPlacement=\\"start\\">
         <span style={{...}}>
           <IconInfo />
         </span>
@@ -134,9 +134,9 @@ exports[`renders correctly with no results 1`] = `
 
 exports[`renders the OutcomePopover component 1`] = `
 "<span>
-  <Popover placement=\\"bottom\\" onToggle={[Function]} onClick={[Function]} onFocus={[Function]} onBlur={[Function]} onMouseOver={[Function]} onMouseOut={[Function]} onShow={[Function]} onDismiss={[Function]} stacking=\\"topmost\\" offsetX={0} offsetY={0} variant=\\"default\\" on={{...}} contentRef={[Function]} defaultShow={false} withArrow={true} trackPosition={true} constrain=\\"window\\" onPositioned={[Function]} onPositionChanged={[Function]} shouldRenderOffscreen={false} shouldContainFocus={false} shouldReturnFocus={true} shouldCloseOnDocumentClick={true} shouldCloseOnEscape={true} defaultFocusElement={{...}} label={{...}} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} positionTarget={{...}} alignArrow={false}>
+  <Popover placement=\\"bottom\\" onToggle={[Function: onToggle]} onClick={[Function: onClick]} onFocus={[Function: onFocus]} onBlur={[Function: onBlur]} onMouseOver={[Function: onMouseOver]} onMouseOut={[Function: onMouseOut]} onShow={[Function: onShow]} onDismiss={[Function: onDismiss]} stacking=\\"topmost\\" offsetX={0} offsetY={0} variant=\\"default\\" on={{...}} contentRef={[Function: contentRef]} defaultShow={false} withArrow={true} trackPosition={true} constrain=\\"window\\" onPositioned={[Function: onPositioned]} onPositionChanged={[Function: onPositionChanged]} shouldRenderOffscreen={false} shouldContainFocus={false} shouldReturnFocus={true} shouldCloseOnDocumentClick={true} shouldCloseOnEscape={true} defaultFocusElement={{...}} label={{...}} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} positionTarget={{...}} alignArrow={false}>
     <PopoverTrigger>
-      <Link onClick={[Function]} variant=\\"default\\" as=\\"button\\" linkRef={[Function]} ellipsis={false} iconPlacement=\\"start\\">
+      <Link onClick={[Function: onClick]} variant=\\"default\\" as=\\"button\\" linkRef={[Function: linkRef]} ellipsis={false} iconPlacement=\\"start\\">
         <span style={{...}}>
           <IconInfo />
         </span>

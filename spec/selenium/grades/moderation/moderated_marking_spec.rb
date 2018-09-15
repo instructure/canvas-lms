@@ -164,21 +164,58 @@ describe 'Moderated Marking' do
       ModeratePage.click_post_grades_button
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      # wait for info header stating grades are posted
-      wait = Selenium::WebDriver::Wait.new(timeout: 5)
-      wait.until { ff("#content header div").size > 3 }
+      # wait for element to exist, means page has loaded
+      ModeratePage.grades_posted_button
+
       # unmute using Display to Students button
       ModeratePage.click_display_to_students_button
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      # wait for flash alert stating grades are visible to students
-      wait.until {ff("#flashalert_message_holder div").size > 1}
+      # wait for element to exist, means page has loaded
+      ModeratePage.grades_posted_button
 
       # switch session to student
       user_session(@student1)
 
       StudentGradesPage.visit_as_student(@moderated_course)
       expect(StudentGradesPage.fetch_assignment_score(@moderated_assignment)).to eq '15'
+    end
+
+    it 'displays comments from chosen grader', priority: "1", test_id: 3513994 do
+      skip('Unskip in GRADE-1326')
+      submissions = @moderated_assignment.find_or_create_submissions([@student1, @student2])
+
+      submissions.each do |submission|
+        submission.add_comment(author: @teacher1, comment: 'Just a comment by teacher1')
+        submission.add_comment(author: @teacher2, comment: 'Just a comment by teacher2')
+      end
+
+      # select a provisional grade for each student
+      ModeratePage.select_provisional_grade_for_student_by_position(@student1, 1)
+      ModeratePage.select_provisional_grade_for_student_by_position(@student2, 2)
+
+      # post the grades
+      ModeratePage.click_post_grades_button
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+      # wait for element to exist, means page has loaded
+      ModeratePage.grades_posted_button
+
+      # unmute using Display to Students button
+      ModeratePage.click_display_to_students_button
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+      # wait for element to exist, means page has loaded
+      ModeratePage.grades_visible_to_students_button
+
+      # switch session to student
+      user_session(@student1)
+
+      StudentGradesPage.visit_as_student(@moderated_course)
+      StudentGradesPage.comment_button.click
+
+      expect(StudentGradesPage.comments(@moderated_assignment).count).to eq 1
+      expect(StudentGradesPage.comments(@moderated_assignment).first).to include_text 'Just a comment by teacher1'
     end
 
     it 'display to students button disabled until grades are posted', priority: '1', test_id: 3513991 do

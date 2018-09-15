@@ -39,6 +39,13 @@ describe ContentMigration do
         att.lock_at = @old_start + 3.days
         att.save!
 
+        folder = @copy_from.folders.create!(name: 'shifty',
+                                            unlock_at: @old_start - 3.days,
+                                            lock_at: @old_start + 2.days)
+        dummy_file = @copy_from.attachments.create!(filename: 'blah',
+                                                    uploaded_data: StringIO.new('blah'),
+                                                    folder: folder)
+
         @copy_from.quizzes.create!(:due_at => "05 Jul 2012 06:00:00 UTC +00:00",
                                    :unlock_at => @old_start + 1.days,
                                    :lock_at => @old_start + 5.days,
@@ -83,9 +90,13 @@ describe ContentMigration do
         expect(new_asmnt.lock_at.to_i).to eq (@new_start + 3.day).to_i
         expect(new_asmnt.peer_reviews_due_at.to_i).to eq (@new_start + 4.day).to_i
 
-        new_att = @copy_to.attachments.first
+        new_att = @copy_to.attachments.where(display_name: 'hi.txt').first
         expect(new_att.unlock_at.to_i).to eq (@new_start - 2.day).to_i
         expect(new_att.lock_at.to_i).to eq (@new_start + 3.day).to_i
+
+        new_folder = @copy_to.folders.where(name: 'shifty').first
+        expect(new_folder.unlock_at.to_i).to eq (@new_start - 3.day).to_i
+        expect(new_folder.lock_at.to_i).to eq (@new_start + 2.day).to_i
 
         new_quiz = @copy_to.quizzes.first
         expect(new_quiz.due_at.to_i).to  eq (@new_start + 4.day).to_i
@@ -176,6 +187,10 @@ describe ContentMigration do
         new_att = @copy_to.attachments.first
         expect(new_att.unlock_at).to be_nil
         expect(new_att.lock_at).to be_nil
+
+        new_folder = @copy_to.folders.where(name: 'shifty').first
+        expect(new_folder.unlock_at).to be_nil
+        expect(new_folder.lock_at).to be_nil
 
         new_quiz = @copy_to.quizzes.first
         expect(new_quiz.due_at).to be_nil

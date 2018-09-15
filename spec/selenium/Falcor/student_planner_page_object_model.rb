@@ -25,11 +25,11 @@ module PlannerPageObject
   end
 
   def select_list_view
-    fxpath("//span[contains(text(),'List View')]").click
+    fj('span[role="menuitemradio"]:contains("List View")').click
   end
 
   def select_dashboard_view
-    fxpath("//span[contains(text(),'Card View')]").click
+    fj('span[role="menuitemradio"]:contains("Card View")').click
   end
 
   def navigate_to_course_object(object)
@@ -46,10 +46,10 @@ module PlannerPageObject
     expect(url).to eq(expected_url)
   end
 
-  def validate_submissions_url(object_type, object, submission)
+  def validate_submissions_url(object_type, object, user)
     url = driver.current_url
     domain = url.split('courses')[0]
-    expected_url = domain + "courses/#{@course.id}/#{object_type}/#{object.id}/submissions/#{submission.id}"
+    expected_url = domain + "courses/#{@course.id}/#{object_type}/#{object.id}/submissions/#{user.id}"
     expect(url).to eq(expected_url)
   end
 
@@ -100,9 +100,9 @@ module PlannerPageObject
     object.is_a?(CalendarEvent) ? validate_calendar_url(object) : validate_url(url_type, object)
   end
 
-  def validate_link_to_submissions(object, submission, url_type)
+  def validate_link_to_submissions(object, user, url_type)
     navigate_to_course_object(object)
-    validate_submissions_url(url_type, object, submission)
+    validate_submissions_url(url_type, object, user)
   end
 
   def view_todo_item
@@ -137,12 +137,12 @@ module PlannerPageObject
 
   def discussion_index_page_detail
     # might need to change when implementing
-    f('.ig-details__item')
+    f('.todo-date')
   end
 
   def discussion_show_page_detail
     # might need to change when implementing
-    f('.discussion-pubdate')
+    f('.discussion-tododate')
   end
 
   def pages_detail

@@ -924,9 +924,8 @@ module ApplicationHelper
   end
 
   def planner_enabled?
-    @domain_root_account&.feature_enabled?(:student_planner) &&
-    @current_user.participating_student_course_ids.present?
-
+    !!(@current_user && @domain_root_account&.feature_enabled?(:student_planner) &&
+      @current_user.has_student_enrollment?)
   end
 
   def generate_access_verifier

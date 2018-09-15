@@ -24,6 +24,7 @@ import EditAssignmentDetails from '../calendar/EditAssignmentDetails'
 import EditApptCalendarEventDialog from '../calendar/EditApptCalendarEventDialog'
 import EditAppointmentGroupDetails from '../calendar/EditAppointmentGroupDetails'
 import EditPlannerNoteDetails from '../calendar/EditPlannerNoteDetails'
+import EditToDoItemDetails from '../calendar/EditToDoItemDetails'
 import editEventTemplate from 'jst/calendar/editEvent'
 import 'jqueryui/dialog'
 import 'jqueryui/tabs'
@@ -60,31 +61,47 @@ export default class EditEventDetailsDialog {
         .activate()
     )
 
+    // note: tabs should be removed in descending order, so numbers don't shift
+    // from the indexes of the tabs in app/views/jst/calendar/editEvent.handlebars
     if (this.event.eventType === 'calendar_event') {
       tabs.tabs('select', 0)
+      if (this.canManageAppointments()) tabs.tabs('remove', 4)
+      tabs.tabs('remove', 3)
       tabs.tabs('remove', 2)
       tabs.tabs('remove', 1)
-      if (this.canManageAppointments()) tabs.tabs('remove', 3)
-      this.calendarEventForm.activate()
+     this.calendarEventForm.activate()
     } else if (this.event.eventType.match(/assignment/)) {
       tabs.tabs('select', 1)
+      if (this.canManageAppointments()) tabs.tabs('remove', 4)
+      tabs.tabs('remove', 3)
       tabs.tabs('remove', 2)
       tabs.tabs('remove', 0)
-      if (this.canManageAppointments()) tabs.tabs('remove', 3)
       this.assignmentDetailsForm.activate()
     } else if (this.event.eventType.match(/appointment/) && this.canManageAppointments()) {
-      tabs.tabs('select', 3)
+      tabs.tabs('select', 4)
+      tabs.tabs('remove', 3)
       tabs.tabs('remove', 2)
       tabs.tabs('remove', 1)
       tabs.tabs('remove', 0)
       this.appointmentGroupDetailsForm.activate()
     } else if (this.event.eventType === 'planner_note') {
       tabs.tabs('select', 2)
+      tabs.tabs('remove', 4)
       tabs.tabs('remove', 3)
       tabs.tabs('remove', 1)
       tabs.tabs('remove', 0)
       this.plannerNoteDetailsForm.activate()
+    } else if (this.event.eventType === 'todo_item') {
+      tabs.tabs('select', 3)
+      tabs.tabs('remove', 4)
+      tabs.tabs('remove', 2)
+      tabs.tabs('remove', 1)
+      tabs.tabs('remove', 0)
+      this.toDoItemDetailsForm.activate()
     } else {
+      // to-do pages / discussions cannot be created on the calendar
+      tabs.tabs('remove', 3)
+
       // don't show To Do tab if the planner isn't enabled
       if (!ENV.STUDENT_PLANNER_ENABLED) tabs.tabs('remove', 2)
 
@@ -166,6 +183,17 @@ export default class EditEventDetailsDialog {
           this.closeCB
         )
         formHolder.data('form-widget', this.plannerNoteDetailsForm)
+      }
+
+      if (this.event.eventType === 'todo_item') {
+        formHolder = dialog.find('#edit_todo_item_form_holder')
+        this.toDoItemDetailsForm = new EditToDoItemDetails(
+          formHolder,
+          this.event,
+          this.contextChange,
+          this.closeCB
+        )
+        formHolder.data('form-widget', this.toDoItemDetailsForm)
       }
 
       if (this.event.isNewEvent() && this.canManageAppointments()) {

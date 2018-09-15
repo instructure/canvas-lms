@@ -141,8 +141,7 @@ describe "speed grader" do
 
     it "should lock a provisional grader out if graded by someone else" do
       other_ta = course_with_ta(course: @course, active_all: true).user
-      @assignment.moderation_graders.create!(user: other_ta, anonymous_id: '12345')
-      @submission.find_or_create_provisional_grade!(other_ta, score: 7)
+      @assignment.grade_student(@student, grader: other_ta, provisional: true, score: 7)
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       expect(driver.current_url).to_not match %r{/courses/#{@course.id}/gradebook/speed_grader}
@@ -164,8 +163,7 @@ describe "speed grader" do
       wait_for_ajaximations
 
       # create a mark for the first student
-      @assignment.moderation_graders.create!(user: other_ta, anonymous_id: '12345')
-      original_sub.find_or_create_provisional_grade!(other_ta, score: 7)
+      @assignment.grade_student(@student, grader: other_ta, provisional: true, score: 7)
 
       # go back
       f('#prev-student-button').click

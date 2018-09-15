@@ -206,10 +206,41 @@
 #       }
 #     }
 #   }
+#
+# @model BlueprintSubscription
+#  {
+#    "id" : "BlueprintSubscription",
+#    "description" : "Associates a course with a blueprint",
+#    "properties": {
+#      "id": {
+#        "description": "The ID of the blueprint course subscription",
+#        "example": 101,
+#        "type": "integer",
+#        "format": "int64"
+#      },
+#      "template_id": {
+#        "description": "The ID of the blueprint template the associated course is subscribed to",
+#        "example": 1,
+#        "type": "integer",
+#        "format": "int64"
+#      },
+#      "blueprint_course": {
+#        "description": "The blueprint course subscribed to",
+#        "type": "object",
+#        "example": {
+#          "id": 2,
+#          "name": "Biology 100 Blueprint",
+#          "course_code": "BIOL 100 BP",
+#          "term_name": "Default term"
+#        }
+#      }
+#    }
+#  }
+#
 class MasterCourses::MasterTemplatesController < ApplicationController
   before_action :require_master_courses
   before_action :get_course
-  before_action :get_template, :except => [:import_details, :imports_index, :imports_show]
+  before_action :get_template, :except => [:import_details, :imports_index, :imports_show, :subscriptions_index]
   before_action :get_subscription, :only => [:import_details, :imports_index, :imports_show]
   before_action :require_course_level_manage_rights
   before_action :require_account_level_manage_rights, :only => [:update_associations]
@@ -250,12 +281,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     can_read_sis = @course.account.grants_any_right?(@current_user, :read_sis, :manage_sis)
 
     json = courses.map do |course|
-      # could use course_json but at this point it's got so much overhead...
-      hash = api_json(course, @current_user, session, :only => %w{id name course_code})
-      hash['sis_course_id'] = course.sis_source_id if can_read_sis
-      hash['term_name'] = course.enrollment_term.name
-      hash['teachers'] = course.teachers.map { |teacher| user_display_json(teacher) }
-      hash
+      course_summary_json(course, can_read_sis: can_read_sis, include_teachers: true)
     end
     render :json => json
   end
@@ -520,6 +546,23 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     tag_association = @template.content_tags
 
     return render_changes(tag_association, subscriptions)
+  end
+
+  # @API List blueprint subscriptions
+  # @subtopic Associated Course History
+  #
+  # Returns a list of blueprint subscriptions for the given course. (Currently a course may have no more than one.)
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/courses/2/blueprint_subscriptions \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @returns [BlueprintSubscription]
+  def subscriptions_index
+    scope = @course.master_course_subscriptions.active
+    subs = Api.paginate(scope, self, api_v1_course_blueprint_subscriptions_url)
+    # TODO preload subscription -> master template -> course if we ever support multiple subscriptions
+    render :json => subs.map { |sub| child_subscription_json(sub) }
   end
 
   # @API List blueprint imports

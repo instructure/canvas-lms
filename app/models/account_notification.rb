@@ -57,7 +57,7 @@ class AccountNotification < ActiveRecord::Base
       ObserverAlert.create(student: threshold.student, observer: threshold.observer,
                            observer_alert_threshold: threshold, context: self,
                            alert_type: 'institution_announcement', action_date: self.start_at,
-                           title: I18n.t('Institution announcement: "%{announcement_title}"', { 
+                           title: I18n.t('Institution announcement: "%{announcement_title}"', {
                              announcement_title: self.subject
                            }))
     end
@@ -69,7 +69,7 @@ class AccountNotification < ActiveRecord::Base
     else
       course_ids = user.enrollments.active.shard(user).distinct.pluck(:course_id) # fetch sharded course ids
       # and then fetch account_ids separately - using pluck on a joined column doesn't give relative ids
-      all_account_ids = Course.where(:id => course_ids, :workflow_state => 'available').
+      all_account_ids = Course.where(:id => course_ids).not_deleted.
         distinct.pluck(:account_id, :root_account_id).flatten.uniq
       all_account_ids += user.account_users.active.shard(user).
         joins(:account).where(accounts: {workflow_state: 'active'}).

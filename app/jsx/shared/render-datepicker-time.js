@@ -19,6 +19,7 @@
 import I18n from 'i18n!instructure'
 import tz from 'timezone'
 import React from 'react'
+import ReactDOM from 'react-dom'
 
   var STRINGS = {
     timeLabel: I18n.beforeLabel(I18n.t('Time')),
@@ -71,12 +72,15 @@ import React from 'react'
       );
     }
 
-    return React.renderToStaticMarkup(
+    const containingDiv = document.createElement("div")
+
+    ReactDOM.render(
       <div className='ui-datepicker-time ui-corner-bottom'>
         {label} <span dir="ltr">{hourInput}:{minuteInput}</span> {meridianSelect}
         <button type='button' className='btn btn-mini ui-datepicker-ok'>{STRINGS.doneButton}</button>
-      </div>
+      </div>, containingDiv
     );
+    return containingDiv.innerHTML
   };
 
 export default renderDatepickerTime

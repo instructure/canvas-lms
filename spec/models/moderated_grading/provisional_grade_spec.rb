@@ -200,44 +200,29 @@ describe ModeratedGrading::ProvisionalGrade do
 
   end
 
-  describe "publish_submission_comments!" do
-    it "publishes comments to the submission" do
-      @course = course
-      sub = assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'hallo')
-      pg = sub.find_or_create_provisional_grade!(scorer, score: 1)
-      file = assignment.attachments.create! uploaded_data: default_uploaded_data
-      prov_comment = sub.add_comment(commenter: scorer, message: 'blah', provisional: true, attachments: [file])
-
-      pg.send :publish_submission_comments!
-
-      real_comment = sub.submission_comments.first
-      expect(real_comment.provisional_grade_id).to be_nil
-      expect(real_comment.author).to eq scorer
-      expect(real_comment.comment).to eq prov_comment.comment
-      expect(real_comment.attachments.first).to eq prov_comment.attachments.first
-    end
-  end
-
   describe "publish!" do
-    it "publishes a provisional grade" do
+    it "sets the submission as 'graded'" do
+      assignment.update!(moderated_grading: true, grader_count: 2)
+      sub = submission_model(assignment: assignment, user: student)
+      provisional_grade = sub.find_or_create_provisional_grade!(scorer, score: 80, graded_anonymously: true)
+
+      provisional_grade.publish!
+      sub.reload
+
+      expect(sub.workflow_state).to eq 'graded'
+    end
+
+    it "updates the submission with provisional grade attributes" do
       @course = course
       sub = assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'hallo')
       pg = sub.find_or_create_provisional_grade!(scorer, score: 80, graded_anonymously: true)
       sub.reload
-      expect(sub.workflow_state).to eq 'submitted'
-      expect(sub.graded_at).to be_nil
-      expect(sub.grader_id).to be_nil
-      expect(sub.score).to be_nil
-      expect(sub.grade).to be_nil
-      expect(sub.graded_anonymously).to be_nil
 
-      expect(pg).to receive(:publish_submission_comments!).once
       expect(pg).to receive(:publish_rubric_assessments!).once
       pg.publish!
-
       sub.reload
+
       expect(sub.grade_matches_current_submission).to eq true
-      expect(sub.workflow_state).to eq 'graded'
       expect(sub.graded_at).not_to be_nil
       expect(sub.grader_id).to eq scorer.id
       expect(sub.score).to eq 80
@@ -245,20 +230,47 @@ describe ModeratedGrading::ProvisionalGrade do
       expect(sub.graded_anonymously).to eq true
     end
 
-    context 'for a moderated assignment' do
-      before(:each) do
-        assignment.update!(moderated_grading: true, grader_count: 2)
-      end
+    it "duplicates submission comments from the provisional grade to the submission" do
+      @course = course
+      sub = assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'hallo')
+      pg = sub.find_or_create_provisional_grade!(scorer, score: 1)
+      provisional_comment = sub.add_comment(commenter: scorer, comment: 'blah', provisional: true)
 
-      it 'publishes a provisional grade' do
-        sub = submission_model(assignment: assignment, user: student)
-        provisional_grade = sub.find_or_create_provisional_grade!(scorer, score: 80, graded_anonymously: true)
+      pg.publish!
+      sub.reload
 
-        provisional_grade.publish!
-        sub.reload
+      real_comment = sub.submission_comments.first
+      expect(real_comment.provisional_grade_id).to be_nil
+      expect(real_comment.author).to eq scorer
+      expect(real_comment.comment).to eq provisional_comment.comment
+      expect(real_comment.attachments.first).to eq provisional_comment.attachments.first
+    end
 
-        expect(sub.workflow_state).to eq 'graded'
-      end
+    it "shares attachments between duplicated submission comments" do
+      @course = course
+      sub = assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'hallo')
+      pg = sub.find_or_create_provisional_grade!(scorer, score: 1)
+      file = assignment.attachments.create! uploaded_data: default_uploaded_data
+      provisional_comment = sub.add_comment(commenter: scorer, comment: 'blah', provisional: true, attachments: [file])
+
+      pg.publish!
+      sub.reload
+
+      real_comment = sub.submission_comments.first
+      expect(real_comment.attachments).to eq provisional_comment.attachments
+    end
+
+    it "does not duplicate submission comments not associated with the provisional grade" do
+      @course = course
+      sub = assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'hallo')
+      pg = sub.find_or_create_provisional_grade!(scorer, score: 1)
+      sub.add_comment(commenter: scorer, comment: 'provisional', provisional: true)
+      sub.add_comment(commenter: scorer, comment: 'normal', provisional: false)
+
+      pg.publish!
+      sub.reload
+
+      expect(sub.submission_comments.map(&:comment)).to match_array(['provisional', 'normal'])
     end
   end
 

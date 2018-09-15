@@ -23,6 +23,7 @@ class Quizzes::QuizStatistics::Report
   def_delegators :quiz_statistics,
     :quiz,
     :includes_all_versions?,
+    :includes_sis_ids?,
     :anonymous?,
     :update_progress,
     :t

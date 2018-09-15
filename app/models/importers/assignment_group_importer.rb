@@ -23,18 +23,20 @@ module Importers
     self.item_class = AssignmentGroup
 
     def self.process_migration(data, migration)
-      self.add_groups_for_imported_assignments(data, migration)
-      groups = data['assignment_groups'] ? data['assignment_groups']: []
-      groups.each do |group|
-        if migration.import_object?("assignment_groups", group['migration_id'])
-          begin
-            import_from_migration(group, migration.context, migration)
-          rescue
-            migration.add_import_warning(t('#migration.assignment_group_type', "Assignment Group"), group[:title], $!)
+      AssignmentGroup.suspend_callbacks(:update_student_grades) do
+        self.add_groups_for_imported_assignments(data, migration)
+        groups = data['assignment_groups'] ? data['assignment_groups']: []
+        groups.each do |group|
+          if migration.import_object?("assignment_groups", group['migration_id'])
+            begin
+              import_from_migration(group, migration.context, migration)
+            rescue
+              migration.add_import_warning(t('#migration.assignment_group_type', "Assignment Group"), group[:title], $!)
+            end
           end
         end
+        migration.context.assignment_groups.first.try(:fix_position_conflicts)
       end
-      migration.context.assignment_groups.first.try(:fix_position_conflicts)
     end
 
     def self.add_groups_for_imported_assignments(data, migration)
@@ -60,6 +62,7 @@ module Importers
       item ||= context.assignment_groups.where(name: hash[:title], migration_id: nil).first
       item ||= context.assignment_groups.temp_record
       migration.add_imported_item(item)
+      item.saved_by = :migration
       item.migration_id = hash[:migration_id]
       item.workflow_state = 'available' if item.deleted?
       item.name = hash[:title]

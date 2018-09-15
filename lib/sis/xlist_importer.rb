@@ -20,7 +20,7 @@ module SIS
   class XlistImporter < BaseImporter
 
     def process
-      start = Time.now
+      start = Time.zone.now
       importer = Work.new(@batch, @root_account, @logger)
       Course.suspend_callbacks(:update_enrollments_later) do
         Course.process_as_sis(@sis_options) do
@@ -32,11 +32,10 @@ module SIS
         end
       end
       Course.update_account_associations(importer.course_ids_to_update_associations.to_a) unless importer.course_ids_to_update_associations.empty?
-      @logger.debug("Crosslists took #{Time.now - start} seconds")
-      return importer.success_count
+      @logger.debug("Crosslists took #{Time.zone.now - start} seconds")
+      importer.success_count
     end
 
-  private
     class Work
       attr_accessor :success_count, :course_ids_to_update_associations
 

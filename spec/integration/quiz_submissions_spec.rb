@@ -64,7 +64,7 @@ describe Quizzes::QuizSubmissionsController do
   def backup_answer_1
     put  "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/backup",
          params: {:question_1 => 'blah_overridden', :validation_token => @qs.validation_token}
-    expect(response).to be_success
+    expect(response).to be_successful
   end
 
   def record_answer_2

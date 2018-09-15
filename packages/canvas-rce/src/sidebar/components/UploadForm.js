@@ -196,6 +196,13 @@ class UploadForm extends Component {
         onChange={this.handleFolderChange.bind(this)}
         name="folder_id"
       >
+        {
+          this.props.upload.loadingFolders && (
+            <option key="loading" value="loading">
+              {formatMessage("Loading folders...")}
+            </option>
+          )
+        }
         {flattenedFolders.map(this.renderFolderOption, this)}
       </Select>
     );
@@ -307,6 +314,7 @@ class UploadForm extends Component {
 
 UploadForm.propTypes = {
   upload: PropTypes.shape({
+    loading: PropTypes.bool,
     folders: PropTypes.objectOf(
       PropTypes.shape({
         id: PropTypes.number,

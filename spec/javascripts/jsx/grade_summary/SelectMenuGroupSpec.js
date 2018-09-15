@@ -16,7 +16,8 @@
  */
 
 import React from 'react';
-import { mount } from 'enzyme';
+import { mount, shallow } from 'enzyme';
+import {mount as oldMount} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
 
 import SelectMenuGroup from 'jsx/grade_summary/SelectMenuGroup';
 
@@ -76,111 +77,115 @@ QUnit.module('SelectMenuGroup', function (suiteHooks) {
   });
 
   test('renders a student select menu if the students prop has more than 1 student', function () {
-    wrapper = mountComponent();
+    wrapper = shallow(<SelectMenuGroup {...props} />);
     strictEqual(wrapper.find('#student_select_menu').length, 1);
   });
 
   test('does not render a student select menu if the students prop has only 1 student', function () {
-    props.students = [{ id: '11', name: 'Jane Doe' }];
-    wrapper = mountComponent();
+    wrapper = shallow(<SelectMenuGroup {...props} students={[{ id: '11', name: 'Jane Doe' }]} />);
     strictEqual(wrapper.find('#student_select_menu').length, 0);
   });
 
   test('disables the student select menu if the course select menu has changed', function () {
-    wrapper = mountComponent();
+    wrapper = oldMount(<SelectMenuGroup {...props} />);
     wrapper.find('#course_select_menu').simulate('change', { target: { value: '14' } });
     const menu = wrapper.find('#student_select_menu').node;
     strictEqual(menu.getAttribute('aria-disabled'), 'true');
   });
 
   test('renders a grading period select menu if passed any grading periods', function () {
-    wrapper = mountComponent();
+    wrapper = shallow(<SelectMenuGroup {...props} />);
     strictEqual(wrapper.find('#grading_period_select_menu').length, 1);
   });
 
   test('includes "All Grading Periods" as an option in the grading period select menu', function () {
-    wrapper = mountComponent();
-    const option = wrapper.find('#grading_period_select_menu').node.options[0];
-    strictEqual(option.innerText, 'All Grading Periods');
+    wrapper = mount(<SelectMenuGroup {...props} />);
+    strictEqual(wrapper.find('#grading_period_select_menu option').at(0).text(), 'All Grading Periods');
   });
 
   test('does not render a grading period select menu if passed no grading periods', function () {
-    props.gradingPeriods = [];
-    wrapper = mountComponent();
+    wrapper = shallow(<SelectMenuGroup {...props} gradingPeriods={[]} />);
     strictEqual(wrapper.find('#grading_period_select_menu').length, 0);
   });
 
   test('disables the grading period select menu if the course select menu has changed', function () {
-    wrapper = mountComponent();
-    wrapper.find('#course_select_menu').simulate('change', { target: { value: '14' } });
-    const menu = wrapper.find('#grading_period_select_menu').node;
-    strictEqual(menu.getAttribute('aria-disabled'), 'true');
+    wrapper = mount(<SelectMenuGroup {...props} />);
+    wrapper.find('select#course_select_menu').simulate('change', { target: { value: '14' } });
+    strictEqual(
+      wrapper.find('select#grading_period_select_menu').prop('aria-disabled'),
+      'true'
+    );
   });
 
   test('renders a course select menu if the courses prop has more than 1 course', function () {
-    wrapper = mountComponent();
+    wrapper = shallow(<SelectMenuGroup {...props} />);
     strictEqual(wrapper.find('#course_select_menu').length, 1);
   });
 
   test('does not render a course select menu if the courses prop has only 1 course', function () {
-    props.courses = [{ id: '2', nickname: 'Autos', url: '/courses/2/grades' }];
-    wrapper = mountComponent();
+    wrapper = shallow(<SelectMenuGroup {...props} courses={[{ id: '2', nickname: 'Autos', url: '/courses/2/grades' }]} />);
     strictEqual(wrapper.find('#course_select_menu').length, 0);
   });
 
   test('disables the course select menu if the student select menu has changed', function () {
-    wrapper = mountComponent();
-    wrapper.find('#student_select_menu').simulate('change', { target: { value: '7' } });
-    const menu = wrapper.find('#course_select_menu').node;
-    strictEqual(menu.getAttribute('aria-disabled'), 'true');
+    wrapper = mount(<SelectMenuGroup {...props} />);
+    wrapper.find('select#student_select_menu').simulate('change', { target: { value: '7' } });
+    strictEqual(
+      wrapper.find('select#course_select_menu').prop('aria-disabled'),
+      'true'
+    );
   });
 
   test('disables the course select menu if the grading period select menu has changed', function () {
-    wrapper = mountComponent();
-    wrapper.find('#grading_period_select_menu').simulate('change', { target: { value: '12' } });
-    const menu = wrapper.find('#course_select_menu').node;
-    strictEqual(menu.getAttribute('aria-disabled'), 'true');
+    wrapper = mount(<SelectMenuGroup {...props} />);
+    wrapper.find('select#grading_period_select_menu').simulate('change', { target: { value: '12' } });
+    strictEqual(
+      wrapper.find('select#course_select_menu').prop('aria-disabled'),
+      'true'
+    );
   });
 
   test('disables the course select menu if the assignment sort order select menu has changed', function () {
-    wrapper = mountComponent();
-    wrapper.find('#assignment_sort_order_select_menu').simulate('change', { target: { value: 'title' } });
-    const menu = wrapper.find('#course_select_menu').node;
-    strictEqual(menu.getAttribute('aria-disabled'), 'true');
+    wrapper = mount(<SelectMenuGroup {...props} />);
+    wrapper.find('select#assignment_sort_order_select_menu').simulate('change', { target: { value: 'title' } });
+    strictEqual(
+      wrapper.find('select#course_select_menu').prop('aria-disabled'),
+      'true'
+    );
   });
 
   test('renders an assignment sort order select menu', function () {
-    wrapper = mountComponent();
-    strictEqual(wrapper.find('#assignment_sort_order_select_menu').length, 1);
+    wrapper = mount(<SelectMenuGroup {...props} />);
+    strictEqual(wrapper.find('select#assignment_sort_order_select_menu').length, 1);
   });
 
   test('disables the assignment sort order select menu if the course select menu has changed', function () {
-    wrapper = mountComponent();
+    wrapper = oldMount(<SelectMenuGroup {...props} />);
     wrapper.find('#course_select_menu').simulate('change', { target: { value: '14' } });
     const menu = wrapper.find('#assignment_sort_order_select_menu').node;
     strictEqual(menu.getAttribute('aria-disabled'), 'true');
   });
 
   test('renders a submit button', function () {
-    wrapper = mountComponent();
+    wrapper = shallow(<SelectMenuGroup {...props} />);
     strictEqual(wrapper.find('#apply_select_menus').length, 1);
   });
 
   test('disables the submit button if no select menu options have changed', function () {
-    wrapper = mountComponent();
+    wrapper = oldMount(<SelectMenuGroup {...props} />);
     const submitButton = wrapper.find('#apply_select_menus').node;
     strictEqual(submitButton.getAttribute('aria-disabled'), 'true');
   });
 
   test('enables the submit button if a select menu options is changed', function () {
-    wrapper = mountComponent();
+    wrapper = oldMount(<SelectMenuGroup {...props} />);
     wrapper.find('#student_select_menu').simulate('change', { target: { value: '7' } });
     const submitButton = wrapper.find('#apply_select_menus').node;
     strictEqual(submitButton.getAttribute('aria-disabled'), null);
   });
 
   test('disables the submit button after it is clicked', function () {
-    wrapper = mountComponent();
+    wrapper = oldMount(<SelectMenuGroup {...props} />)
     wrapper.find('#student_select_menu').simulate('change', { target: { value: '7' } });
     const submitButton = wrapper.find('#apply_select_menus');
     submitButton.simulate('click');
@@ -188,18 +193,18 @@ QUnit.module('SelectMenuGroup', function (suiteHooks) {
   });
 
   test('calls saveAssignmentOrder when the button is clicked, if assignment order has changed', function () {
-    props.saveAssignmentOrder = sinon.stub().resolves();
-    wrapper = mountComponent();
+    const stub = sinon.stub().resolves()
+    wrapper = shallow(<SelectMenuGroup {...props} saveAssignmentOrder={stub} />);
     wrapper.find('#assignment_sort_order_select_menu').simulate('change', { target: { value: 'title' } });
     const submitButton = wrapper.find('#apply_select_menus');
     submitButton.simulate('click');
-    strictEqual(props.saveAssignmentOrder.callCount, 1);
+    strictEqual(stub.callCount, 1);
   });
 
   test('does not call saveAssignmentOrder when the button is clicked, if assignment is unchanged', function () {
     props.saveAssignmentOrder = sinon.stub().resolves();
-    wrapper = mountComponent();
-        wrapper.find('#student_select_menu').simulate('change', { target: { value: '7' } });
+    wrapper = oldMount(<SelectMenuGroup {...props} />)
+    wrapper.find('#student_select_menu').simulate('change', { target: { value: '7' } });
     const submitButton = wrapper.find('#apply_select_menus');
     submitButton.simulate('click');
     strictEqual(props.saveAssignmentOrder.callCount, 0);
@@ -207,6 +212,10 @@ QUnit.module('SelectMenuGroup', function (suiteHooks) {
 
   QUnit.module('clicking the submit button', (hooks) => {
     let submitButton
+
+    function mountComponent () {
+      return oldMount(<SelectMenuGroup {...props} />);
+    }
 
     hooks.beforeEach(() => {
       props.goToURL = sinon.stub()

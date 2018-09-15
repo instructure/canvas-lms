@@ -170,11 +170,9 @@ describe "account admin question bank" do
   end
 
   it "should delete a question bank" do
-    f("#right-side .delete_bank_link").click
-    driver.switch_to.alert.accept
-    wait_for_ajaximations
+    expect_new_page_load(true) { f("#right-side .delete_bank_link").click }
     @question_bank.reload
-    keep_trying_until { expect(@question_bank.workflow_state).to eq "deleted" }
+    expect(@question_bank.workflow_state).to eq "deleted"
   end
 
   it "should delete a multiple choice question" do

@@ -22,20 +22,31 @@ require 'json'
 class ModelView < HashView
   attr_reader :name, :properties, :description, :required
 
-  def initialize(name, properties, description = "", required = [])
+  def initialize(name, properties, description = "", required = [], deprecated: false, deprecation_description: '')
     @name = name
     @properties = properties
     @description = description
     @required = required
+    @deprecated = deprecated
+    @deprecation_description = deprecation_description
   end
 
   def self.new_from_model(model)
     lines = model.text.lines.to_a
     json = JSON::parse(lines[1..-1].join)
-    new(lines[0].strip, 
-        json["properties"], 
-        json["description"] ? json["description"] : "",
-        json["required"] ? json["required"] : [])
+
+    new(
+      lines[0].strip,
+      json["properties"],
+      json["description"] ? json["description"] : "",
+      json["required"] ? json["required"] : [],
+      deprecated: json["deprecated"],
+      deprecation_description: json["deprecation_description"]
+    )
+  end
+
+  def deprecated?
+    !!@deprecated
   end
 
   def json_schema
@@ -44,6 +55,8 @@ class ModelView < HashView
         "id" => name,
         "description" => description,
         "required" => required,
+        "deprecated" => deprecated?,
+        "deprecation_description" => format(@deprecation_description),
         "properties" => properties
       }
     }

@@ -175,6 +175,7 @@ export class PlannerApp extends Component {
   }
 
   renderLoadingPast () {
+    if (this.props.isLoading) return;
     return <LoadingPastIndicator
       loadingPast={this.props.loadingPast}
       allPastItemsLoaded={this.props.allPastItemsLoaded}
@@ -400,18 +401,18 @@ export class PlannerApp extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+export const mapStateToProps = (state) => {
   return {
     days: state.days,
-    isLoading: state.loading.isLoading,
+    isLoading: state.loading.isLoading || state.loading.hasSomeItems === null,
     loadingPast: state.loading.loadingPast,
     allPastItemsLoaded: state.loading.allPastItemsLoaded,
     loadingFuture: state.loading.loadingFuture,
     allFutureItemsLoaded: state.loading.allFutureItemsLoaded,
     loadingError: state.loading.loadingError,
     timeZone: state.timeZone,
-    isCompletelyEmpty: !state.loading.hasSomeItems &&
-                        state.days.length == 0 &&
+    isCompletelyEmpty:  state.loading.hasSomeItems === false &&
+                        state.days.length === 0 &&
                         state.loading.partialPastDays.length === 0 &&
                         state.loading.partialFutureDays.length === 0,
   };

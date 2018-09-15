@@ -70,7 +70,7 @@ module SeleniumDriverSetup
 
   # prevents subsequent specs from failing because tooltips are showing etc.
   def move_mouse_to_known_position
-    driver.mouse.move_to(f("body"), 0, 0) if driver.ready_for_interaction
+    driver.action.move_to(f("body"), 0, 0) if driver.ready_for_interaction
   end
 
   class ServerStartupError < RuntimeError; end
@@ -322,7 +322,10 @@ module SeleniumDriverSetup
     def ruby_chrome_driver
       puts "Thread: provisioning local chrome driver"
       Chromedriver.set_version "2.38"
-      Selenium::WebDriver.for :chrome, switches: %w[--disable-impl-side-painting]
+      chrome_options = Selenium::WebDriver::Chrome::Options.new
+      chrome_options.add_argument('--disable-impl-side-painting')
+
+      Selenium::WebDriver.for :chrome, options: chrome_options
     end
 
     def ruby_safari_driver

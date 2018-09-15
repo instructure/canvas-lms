@@ -1,0 +1,19 @@
+<h4><%= YARD::Tags::Library.labels[:response_field] %>:</h4>
+<ul class="response_field">
+  <% @response_fields.each do |field| %>
+    <li>
+      <span class='type'><%= format_types(field.types) %></span>
+      <span class='name'><%= h field.name %></span>
+
+      <% if field.deprecated? %>
+        <div class='response-field deprecated'>
+          <strong>[DEPRECATED] This field is deprecated, effective <%= h field.effective_date %> (notice given <%= h field.notice_date %>):</strong>
+        <div>
+      <% end %>
+
+      <% if field.description.present? %>
+        <%= htmlify_line(field.description) %>
+      <% end %>
+    </li>
+  <% end %>
+</ul>

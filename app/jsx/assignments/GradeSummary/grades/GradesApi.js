@@ -19,6 +19,12 @@
 import axios from 'axios'
 import {camelize, underscore} from 'convert_case'
 
+export function bulkSelectProvisionalGrades(courseId, assignmentId, provisionalGradeIds) {
+  const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/provisional_grades/bulk_select`
+
+  return axios.put(url, {provisional_grade_ids: provisionalGradeIds})
+}
+
 export function selectProvisionalGrade(courseId, assignmentId, provisionalGradeId) {
   const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/provisional_grades/${provisionalGradeId}/select`
 

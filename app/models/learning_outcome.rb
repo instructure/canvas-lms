@@ -348,6 +348,14 @@ class LearningOutcome < ActiveRecord::Base
     LearningOutcome.where(:id => to_delete).update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
   end
 
+  def self.ensure_presence_in_context(outcome_ids, context)
+    return unless outcome_ids && context
+    missing_outcomes = LearningOutcome.where(id: outcome_ids)
+                        .where.not(id: context.linked_learning_outcomes.select(:id))
+                        .active
+    missing_outcomes.each{ |o| context.root_outcome_group.add_outcome(o) }
+  end
+
   scope(:for_context_codes, ->(codes) { where(:context_code => codes) })
   scope(:active, -> { where("learning_outcomes.workflow_state<>'deleted'") })
   scope(:has_result_for_user,

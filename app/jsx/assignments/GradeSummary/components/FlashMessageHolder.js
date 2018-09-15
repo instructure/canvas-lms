@@ -81,6 +81,7 @@ function announceUnmuteAssignmentStatus(status) {
 
 class FlashMessageHolder extends Component {
   static propTypes = {
+    bulkSelectProvisionalGradeStatuses: shape({}).isRequired,
     loadStudentsStatus: oneOf(enumeratedStatuses(StudentActions)),
     publishGradesStatus: oneOf(assignmentStatuses),
     selectProvisionalGradeStatuses: shape({}).isRequired,
@@ -139,6 +140,28 @@ class FlashMessageHolder extends Component {
       })
     }
 
+    if (changes.bulkSelectProvisionalGradeStatuses) {
+      Object.keys(nextProps.bulkSelectProvisionalGradeStatuses).forEach(graderId => {
+        if (
+          nextProps.bulkSelectProvisionalGradeStatuses[graderId] !==
+          this.props.bulkSelectProvisionalGradeStatuses[graderId]
+        ) {
+          const status = nextProps.bulkSelectProvisionalGradeStatuses[graderId]
+          if (status === GradeActions.SUCCESS) {
+            showFlashAlert({
+              message: I18n.t('Grades saved.'),
+              type: 'success'
+            })
+          } else if (status === GradeActions.FAILURE) {
+            showFlashAlert({
+              message: I18n.t('There was a problem saving the grades.'),
+              type: 'error'
+            })
+          }
+        }
+      })
+    }
+
     if (changes.updateGradeStatuses) {
       const newStatuses = nextProps.updateGradeStatuses.filter(
         statusInfo => this.props.updateGradeStatuses.indexOf(statusInfo) === -1
@@ -174,6 +197,7 @@ class FlashMessageHolder extends Component {
 
 function mapStateToProps(state) {
   return {
+    bulkSelectProvisionalGradeStatuses: state.grades.bulkSelectProvisionalGradeStatuses,
     loadStudentsStatus: state.students.loadStudentsStatus,
     publishGradesStatus: state.assignment.publishGradesStatus,
     selectProvisionalGradeStatuses: state.grades.selectProvisionalGradeStatuses,

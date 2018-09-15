@@ -33,6 +33,12 @@ describe BroadcastPolicies::AssignmentParticipants do
       expect(subject.to).to include(@student)
     end
 
+    it 'excludes students in concluded sections' do
+      @section = @course.course_sections.create!(end_at: Time.zone.now - 1.day)
+      create_enrollment @course, @student, section: @section
+      expect(subject.to).not_to include(@ended_section_user)
+    end
+
     context 'with students whose enrollments have not yet started' do
       before :once do
         student_in_course({

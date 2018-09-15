@@ -101,6 +101,8 @@ describe SisImportsApiController, type: :request do
     expect(json.has_key?("started_at")).to eq true
     json.delete("started_at")
     json.delete("user")
+    json.delete("csv_attachments")
+    json['data'].delete("downloadable_attachment_ids")
     batch = SisBatch.last
     expect(json).to eq({
           "data" => { "import_type"=>"instructure_csv"},
@@ -139,9 +141,10 @@ describe SisImportsApiController, type: :request do
     expect(json.has_key?("started_at")).to eq true
     json.delete("started_at")
     json.delete("user")
+    json.delete("csv_attachments")
+    json["data"].delete("downloadable_attachment_ids")
     expected_data = {
           "data" => { "import_type" => "instructure_csv",
-                      "use_parallel_imports" => true,
                       "completed_importers" => ["user"],
                       "running_immediately" => true,
                       "supplied_batches" => ["user"],
@@ -161,7 +164,21 @@ describe SisImportsApiController, type: :request do
                                     "group_memberships" => 0,
                                     "terms" => 0,
                                     "error_count"=>0,
-                                    "warning_count"=>0 }},
+                                    "warning_count"=>0 },
+                      "statistics" => {"total_state_changes"=>2,
+                                       "Account"=>{"created"=>0, "deleted"=>0},
+                                       "EnrollmentTerm"=>{"created"=>0, "deleted"=>0},
+                                       "AbstractCourse"=>{"created"=>0, "deleted"=>0},
+                                       "Course"=>{"created"=>0, "deleted"=>0},
+                                       "CourseSection"=>{"created"=>0, "deleted"=>0},
+                                       "GroupCategory"=>{"created"=>0, "deleted"=>0},
+                                       "Group"=>{"created"=>0, "deleted"=>0},
+                                       "Pseudonym"=>{"created"=>1, "deleted"=>0},
+                                       "CommunicationChannel"=>{"created"=>1, "deleted"=>0},
+                                       "Enrollment"=>{"created"=>0, "deleted"=>0},
+                                       "GroupMembership"=>{"created"=>0, "deleted"=>0},
+                                       "UserObserver"=>{"created"=>0, "deleted"=>0},
+                                       "AccountUser"=>{"created"=>0, "deleted"=>0}}},
           "progress" => 100,
           "id" => batch.id,
           "workflow_state"=>"imported",
@@ -670,10 +687,11 @@ describe SisImportsApiController, type: :request do
     json["sis_imports"].first.delete("ended_at")
     json["sis_imports"].first.delete("started_at")
     json["sis_imports"].first.delete("user")
+    json["sis_imports"].first.delete("csv_attachments")
+    json["sis_imports"].first['data'].delete("downloadable_attachment_ids")
 
     expected_data = {"sis_imports"=>[{
                       "data" => { "import_type" => "instructure_csv",
-                                  "use_parallel_imports" => true,
                                   "completed_importers" => ["account"],
                                   "running_immediately" => true,
                                   "supplied_batches" => ["account"],
@@ -693,7 +711,21 @@ describe SisImportsApiController, type: :request do
                                                 "group_memberships" => 0,
                                                 "terms" => 0,
                                                 "error_count"=>0,
-                                                "warning_count"=>0 }},
+                                                "warning_count"=>0 },
+                                  "statistics" => {"total_state_changes"=>1,
+                                                   "Account"=>{"created"=>1, "deleted"=>0},
+                                                   "EnrollmentTerm"=>{"created"=>0, "deleted"=>0},
+                                                   "AbstractCourse"=>{"created"=>0, "deleted"=>0},
+                                                   "Course"=>{"created"=>0, "deleted"=>0},
+                                                   "CourseSection"=>{"created"=>0, "deleted"=>0},
+                                                   "GroupCategory"=>{"created"=>0, "deleted"=>0},
+                                                   "Group"=>{"created"=>0, "deleted"=>0},
+                                                   "Pseudonym"=>{"created"=>0, "deleted"=>0},
+                                                   "CommunicationChannel"=>{"created"=>0, "deleted"=>0},
+                                                   "Enrollment"=>{"created"=>0, "deleted"=>0},
+                                                   "GroupMembership"=>{"created"=>0, "deleted"=>0},
+                                                   "UserObserver"=>{"created"=>0, "deleted"=>0},
+                                                   "AccountUser"=>{"created"=>0, "deleted"=>0}}},
                       "progress" => 100,
                       "id" => batch.id,
                       "workflow_state"=>"imported",
@@ -714,6 +746,23 @@ describe SisImportsApiController, type: :request do
 
     links = Api.parse_pagination_links(response.headers['Link'])
     expect(links.first[:uri].path).to eq api_v1_account_sis_imports_path
+  end
+
+  it "should return downloadable attachments if available" do
+    batch = post_csv(
+      "user_id,password,login_id,status,ssha_password",
+      "user_1,supersecurepwdude,user_1,active,hunter2"
+    )
+
+    run_jobs
+    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
+      { :controller => 'sis_imports_api', :action => 'index',
+        :format => 'json', :account_id => @account.id.to_s })
+
+    atts_json = json["sis_imports"].first["csv_attachments"]
+    expect(atts_json.count).to eq 1
+    expect(atts_json.first["id"]).to eq batch.downloadable_attachments.last.id
+    expect(atts_json.first["url"]).to be_present
   end
 
   it "should filter sis imports by date if requested" do

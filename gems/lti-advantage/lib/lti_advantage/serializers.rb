@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,13 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class FixRubricAssessmentYaml < ActiveRecord::Migration[4.2]
-  tag :postdeploy
-
-  def up
-    DataFixup::FixRubricAssessmentYAML.send_later_if_production(:run)
-  end
-
-  def down
+module LtiAdvantage
+  module Serializers
+    require_relative 'serializers/jwt_message_serializer'
   end
 end

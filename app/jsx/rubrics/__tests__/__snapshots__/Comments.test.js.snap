@@ -19,4 +19,4 @@ exports[`The Comments component renders a placeholder when no assessment provide
 </span>"
 `;
 
-exports[`The Comments component renders the root component as expected when assessing 1`] = `"<FreeFormComments comments=\\"I award you no points, and may God have mercy on your soul.\\" saveLater={false} savedComments={{...}} setComments={[Function]} setSaveLater={[Function]} />"`;
+exports[`The Comments component renders the root component as expected when assessing 1`] = `"<FreeFormComments comments=\\"I award you no points, and may God have mercy on your soul.\\" saveLater={false} savedComments={{...}} setComments={[Function: proxy]} setSaveLater={[Function: proxy]} />"`;

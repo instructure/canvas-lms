@@ -78,7 +78,6 @@ describe SIS::CSV::GroupImporter do
   end
 
   it 'should create rollback data' do
-    @account.enable_feature!(:refactor_of_sis_imports)
     batch1 = @account.sis_batches.create! {|sb| sb.data = {}}
     process_csv_data_cleanly(
       "group_id,name,status",

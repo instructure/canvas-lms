@@ -406,6 +406,20 @@ describe InstFS do
         )
         expect(res).to eq(instfs_uuid)
       end
+
+      it "requests a streaming upload to allow large files" do
+        instfs_uuid = "1234-abcd"
+        expect(CanvasHttp).to receive(:post).with(anything, hash_including(streaming: true)).and_return(double(
+          class: Net::HTTPCreated,
+          code: 200,
+          body: {instfs_uuid: instfs_uuid}.to_json
+        ))
+
+        InstFS.direct_upload(
+          file_name: "a.png",
+          file_object: File.open("public/images/a.png")
+        )
+      end
     end
   end
 

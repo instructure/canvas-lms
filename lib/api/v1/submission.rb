@@ -95,6 +95,10 @@ module Api::V1::Submission
       hash['grading_status'] = submission.grading_status
     end
 
+    if context.account_membership_allows(current_user)
+      hash['anonymous_id'] = submission.anonymous_id
+    end
+
     hash
   end
 
@@ -167,17 +171,15 @@ module Api::V1::Submission
       attachments = attempt.versioned_attachments.dup
       attachments << attempt.attachment if attempt.attachment && attempt.attachment.context_type == 'Submission' && attempt.attachment.context_id == attempt.id
       hash['attachments'] = attachments.map do |attachment|
-        attachment.skip_submission_attachment_lock_checks = true
         includes = includes.include?('canvadoc_document_id') ? ['preview_url', 'canvadoc_document_id'] : ['preview_url']
         atjson = attachment_json(attachment, user, {},
-                                 submission_attachment: true,
+                                 skip_permission_checks: true,
                                  include: includes,
                                  enable_annotations: true, # we want annotations on submission's attachment preview_urls
                                  moderated_grading_whitelist: attempt.moderated_grading_whitelist,
                                  enrollment_type: user_type(context, user),
                                  anonymous_instructor_annotations: assignment.anonymous_instructor_annotations?
                                 )
-        attachment.skip_submission_attachment_lock_checks = false
         atjson
       end.compact unless attachments.blank?
     end

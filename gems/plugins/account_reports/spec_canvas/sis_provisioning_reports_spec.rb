@@ -298,6 +298,19 @@ describe "Default Account Reports" do
     @gm4.destroy
   end
 
+  def create_some_blueprint_course_stuff
+    @account.enable_feature!(:master_courses)
+    @bc1 = Course.create!(:name => 'bc1', :account => @account, :sis_source_id => "SIS_BLUEPRINT_1")
+    @template1 = MasterCourses::MasterTemplate.set_as_master_course(@bc1)
+    @bc2 = Course.create!(:name => 'bc2', :account => @account, :sis_source_id => "SIS_BLUEPRINT_2")
+    @template2 = MasterCourses::MasterTemplate.set_as_master_course(@bc2)
+    @ac1_a = Course.create!(:name => 'ac1 a', :account => @account, :sis_source_id => "SIS_CHILD_BC1_A")
+    @ac1_b = Course.create!(:name => 'ac1 b', :account => @account, :sis_source_id => "SIS_CHILD_BC1_B")
+    [@ac1_a, @ac1_b].each{|ac| @template1.add_child_course!(ac)}
+    @ac2 = Course.create!(:name => 'ac2', :account => @account, :sis_source_id => "SIS_CHILD_BC2")
+    @template2.add_child_course!(@ac2)
+  end
+
   describe "SIS export and Provisioning reports" do
     before(:once) do
       Notification.where(name: "Report Generated").first_or_create
@@ -639,6 +652,7 @@ describe "Default Account Reports" do
       end
 
       it "should run the provisioning report on a sub account" do
+        @account.enable_feature!(:master_courses)
         parameters = {}
         parameters["courses"] = true
         parsed = read_report("provisioning_csv", {params: parameters, account: @sub_account, order: 3})
@@ -649,7 +663,7 @@ describe "Default Account Reports" do
                                         @sub_account.id.to_s, @sub_account.sis_source_id,
                                         @term1.id.to_s, @term1.sis_source_id, "active",
                                         @course1.start_at.iso8601,
-                                        @course1.conclude_at.iso8601, @course1.course_format, "true"]]
+                                        @course1.conclude_at.iso8601, @course1.course_format, nil, "true"]]
       end
 
       it "should run the sis report with the default term" do
@@ -662,6 +676,24 @@ describe "Default Account Reports" do
         expect(parsed).to match_array [["SIS_COURSE_ID_2", nil, "MAT101", "Math 101", nil,
                                         nil, "active", nil, @course2.end_at.iso8601, @course2.course_format],
                                        ["SIS_COURSE_ID_3", nil, "SCI101", "Science 101", nil, nil, "active", nil, nil, nil]]
+      end
+
+      it "should export blueprint course stuff for sis export" do
+        create_some_blueprint_course_stuff
+        parsed = read_report("sis_export_csv",
+          {params: {"enrollment_term_id" => @default_term.id, "courses" => true}, order: 0, parse_header: true})
+        expect(parsed.detect{|r| r["course_id"] == @ac1_a.sis_source_id}["blueprint_course_id"]).to eq @bc1.sis_source_id
+        expect(parsed.detect{|r| r["course_id"] == @ac1_b.sis_source_id}["blueprint_course_id"]).to eq @bc1.sis_source_id
+        expect(parsed.detect{|r| r["course_id"] == @ac2.sis_source_id}["blueprint_course_id"]).to eq @bc2.sis_source_id
+      end
+
+      it "should export blueprint course stuff for provisioning csv" do
+        create_some_blueprint_course_stuff
+        parsed = read_report("provisioning_csv",
+          {params: {"enrollment_term_id" => @default_term.id, "courses" => true}, order: 0, parse_header: true})
+        expect(parsed.detect{|r| r["course_id"] == @ac1_a.sis_source_id}["blueprint_course_id"]).to eq @bc1.sis_source_id
+        expect(parsed.detect{|r| r["course_id"] == @ac1_b.sis_source_id}["blueprint_course_id"]).to eq @bc1.sis_source_id
+        expect(parsed.detect{|r| r["course_id"] == @ac2.sis_source_id}["blueprint_course_id"]).to eq @bc2.sis_source_id
       end
     end
 

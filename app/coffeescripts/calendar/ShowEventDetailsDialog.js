@@ -59,8 +59,10 @@ export default class ShowEventDetailsDialog {
     if (this.event.isNewEvent()) return
 
     let {url} = event.object
-    // We can't delete assignments via the synthetic calendar_event
-    if (event.assignment) {
+    // We can't delete todo items or assignments via the synthetic calendar_event
+    if (event.deleteObjectURL) {
+      url = event.deleteObjectURL
+    } else if (event.assignment) {
       url = $.replaceTags(this.event.deleteURL, 'id', this.event.object.id)
     }
 
@@ -84,7 +86,7 @@ export default class ShowEventDetailsDialog {
     })
   }
 
-  reserveErrorCB = (data, request) => {
+  reserveErrorCB = (data, request, ...otherArgs) => {
     let errorHandled
     $.publish('CommonEvent/eventSaveFailed', this.event)
     data.forEach(error => {
@@ -132,7 +134,7 @@ export default class ShowEventDetailsDialog {
     if (!errorHandled) {
       // defer to the default error dialog
       $.ajaxJSON.unhandledXHRs.push(request)
-      return $.fn.defaultAjaxError.func.apply($.fn.defaultAjaxError.object, arguments)
+      return $.fn.defaultAjaxError.func.call($.fn.defaultAjaxError.object, data, request, ...otherArgs)
     }
   }
 

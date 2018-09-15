@@ -31,6 +31,7 @@ exports[`renders load more by default 1`] = `
     <Button
       as="button"
       buttonRef={[Function]}
+      cursor="pointer"
       fluidWidth={false}
       margin="0"
       onClick={[Function]}
@@ -100,6 +101,7 @@ exports[`shows an Alert when there's a query error 1`] = `
     <Button
       as="button"
       buttonRef={[Function]}
+      cursor="pointer"
       fluidWidth={false}
       margin="0"
       onClick={[Function]}

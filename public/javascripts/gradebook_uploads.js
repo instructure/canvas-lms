@@ -91,6 +91,7 @@ import './jquery.templateData' /* fillTemplateData */
         $.each(uploadedGradebook.assignments, function(){
           var newGrade = {
             id: this.id,
+            type: 'assignments',
             name: htmlEscape(I18n.t('To')),
             field: this.id,
             width: 125,
@@ -98,7 +99,7 @@ import './jquery.templateData' /* fillTemplateData */
             formatter: self.createNumberFormatter('grade'),
             active: true,
             previous_id: this.previous_id,
-            cssClass: "new-grade"
+            cssClass: 'new-grade'
           };
 
           if (this.grading_type !== 'letter_grade') {
@@ -109,10 +110,10 @@ import './jquery.templateData' /* fillTemplateData */
           }
 
           var conflictingGrade = {
-            id: this.id + "_conflicting",
+            id: `${this.id}_conflicting`,
             width: 125,
             formatter: self.createNumberFormatter('original_grade'),
-            field: this.id + "_conflicting",
+            field: `${this.id}_conflicting`,
             name: htmlEscape(I18n.t('From')),
             cssClass: 'conflicting-grade'
           };
@@ -121,12 +122,49 @@ import './jquery.templateData' /* fillTemplateData */
             id: this.id,
             width: 250,
             name: htmlEscape(this.title),
-            headerCssClass: "assignment"
+            headerCssClass: 'assignment'
           };
 
           labelData.columns.push(assignmentHeaderColumn);
           gridData.columns.push(conflictingGrade);
           gridData.columns.push(newGrade);
+        });
+
+        uploadedGradebook.custom_columns.forEach((column) => {
+          const newCustomColumn = {
+            id: `custom_col_${column.id}`,
+            customColumnId: column.id,
+            type: 'custom_column',
+            name: htmlEscape(I18n.t('To')),
+            field: `custom_col_${column.id}`,
+            width: 125,
+            editor: Slick.Editors.UploadGradeCellEditor,
+            formatter: self.createGeneralFormatter('new_content'),
+            editorFormatter: 'custom_column',
+            editorParser: 'custom_column',
+            active: true,
+            cssClass: 'new-grade'
+          };
+
+          const conflictingCustomColumn = {
+            id: `custom_col_${column.id}_conflicting`,
+            width: 125,
+            formatter: self.createGeneralFormatter('current_content'),
+            field: `custom_col_${column.id}_conflicting`,
+            name: htmlEscape(I18n.t('From')),
+            cssClass: 'conflicting-grade'
+          };
+
+          const customColumnHeaderColumn = {
+            id: `custom_col_${column.id}`,
+            width: 250,
+            name: htmlEscape(column.title),
+            headerCssClass: "assignment"
+          };
+
+          labelData.columns.push(customColumnHeaderColumn);
+          gridData.columns.push(conflictingCustomColumn);
+          gridData.columns.push(newCustomColumn);
         });
 
         $.each(uploadedGradebook.students, function(index){
@@ -135,18 +173,25 @@ import './jquery.templateData' /* fillTemplateData */
             id        : this.id
           };
           $.each(this.submissions, function(){
-            var originalGrade = parseInt(this.original_grade),
-                updatedGrade  = parseInt(this.grade),
-                updateWillRemoveGrade = !isNaN(originalGrade) && isNaN(updatedGrade);
+              const originalGrade = Number.parseInt(this.original_grade, 10);
+              const updatedGrade  = Number.parseInt(this.grade, 10);
+              const updateWillRemoveGrade = !Number.isNaN(originalGrade) && Number.isNaN(updatedGrade);
 
-            if ( (originalGrade > updatedGrade || updateWillRemoveGrade) &&
-                 ((this.grade || "").toUpperCase() !== "EX") ) {
-              rowsToHighlight.push({rowIndex: index, id: this.assignment_id});
-            }
+              if ( (originalGrade > updatedGrade || updateWillRemoveGrade) &&
+                    ((this.grade || "").toUpperCase() !== "EX") ) {
+                rowsToHighlight.push({rowIndex: index, id: this.assignment_id});
+              }
 
-            row['assignmentId'] = this.assignment_id;
-            row[this.assignment_id] = this;
-            row[this.assignment_id + "_conflicting"] = this;
+              row.assignmentId = this.assignment_id;
+              row[this.assignment_id] = this;
+              row[`${this.assignment_id}_conflicting`] = this;
+          });
+          $.each(this.custom_column_data, function(){
+              if (this.current_content !== this.new_content) {
+                rowsToHighlight.push({rowIndex: index, id: `custom_col_${this.column_id}`});
+              }
+              row[`custom_col_${this.column_id}`] = this;
+              row[`custom_col_${this.column_id}_conflicting`] = this;
           });
           gridData.data.push(row);
           row.active = true;
@@ -203,6 +248,10 @@ import './jquery.templateData' /* fillTemplateData */
 
         if (uploadedGradebook.warning_messages.prevented_grading_ungradeable_submission) {
           $("#prevented-grading-ungradeable-submission").show();
+        }
+
+        if (uploadedGradebook.warning_messages.prevented_changing_read_only_column) {
+          $("#prevented_changing_read_only_column").show();
         }
     },
 

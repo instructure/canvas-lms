@@ -55,6 +55,7 @@ QUnit.module('gradebook_uploads#handleThingsNeedingToBeResolved', (hooks) => {
 
     defaultUploadedGradebook = {
       assignments: [{grading_type: null, id: '-1', points_possible: 10, previous_id: null, title: 'imported'}],
+      custom_columns: [],
       missing_objects: {
         assignments: [{grading_type: 'points', id: '73', points_possible: 10, previous_id: null, title: 'existing'}],
         students: []
@@ -65,7 +66,8 @@ QUnit.module('gradebook_uploads#handleThingsNeedingToBeResolved', (hooks) => {
         last_name_first: 'Efron, Zac',
         name: 'Zac Efron',
         previous_id: '1',
-        submissions: [{assignment_id: '-1', grade: '0.0', gradeable: true, original_grade: null}]
+        submissions: [{assignment_id: '-1', grade: '0.0', gradeable: true, original_grade: null}],
+        custom_column_data: [],
       }],
       warning_messages: {
         prevented_grading_ungradeable_submission: false,

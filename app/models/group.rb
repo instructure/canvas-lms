@@ -491,6 +491,7 @@ class Group < ActiveRecord::Base
       can :manage_files and
       can :manage_wiki and
       can :post_to_forum and
+      can :create_forum and
       can :read and
       can :read_forum and
       can :read_announcements and
@@ -539,6 +540,7 @@ class Group < ActiveRecord::Base
       can :manage_wiki and
       can :moderate_forum and
       can :post_to_forum and
+      can :create_forum and
       can :read and
       can :read_forum and
       can :read_announcements and
@@ -550,6 +552,9 @@ class Group < ActiveRecord::Base
 
       given { |user, session| self.context && self.context.grants_all_rights?(user, session, :read_as_admin, :post_to_forum) }
       can :post_to_forum
+
+      given { |user, session| self.context && self.context.grants_all_rights?(user, session, :read_as_admin, :create_forum) }
+      can :create_forum
 
       given { |user, session| self.context && self.context.grants_right?(user, session, :view_group_pages) }
       can :read and can :read_forum and can :read_announcements and can :read_roster

@@ -35,7 +35,7 @@ define(
       const expected = 'Human'
       props.varDef.human_name = expected
       const component = ReactDOM.render(<ThemeEditorImageRow {...props} />, elem)
-      const subject = elem.getElementsByTagName('h4')[0]
+      const subject = elem.getElementsByTagName('h3')[0]
       equal(subject.textContent, expected, 'renders human name')
     })
 

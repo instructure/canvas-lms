@@ -345,10 +345,11 @@ describe SIS::CSV::EnrollmentImporter do
       "user_1,user1,User,Uno,user@example.com,active"
     )
     # should be able to create an enrollment in a deleted state
-    process_csv_data_cleanly(
+    importer = process_csv_data_cleanly(
       "course_id,user_id,role,section_id,status,associated_user_id",
       "test_1,user_1,student,,deleted,"
     )
+    expect(importer.batch.data[:counts][:enrollments]).to eq 1
     @course = Course.where(sis_source_id: 'test_1').first
     scope = Enrollment.where(:course_id => @course)
     expect(scope.count).to eq 1
@@ -854,7 +855,6 @@ describe SIS::CSV::EnrollmentImporter do
   end
 
   it 'should create rollback data' do
-    @account.enable_feature!(:refactor_of_sis_imports)
     batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",

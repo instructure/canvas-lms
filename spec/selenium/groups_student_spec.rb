@@ -45,9 +45,7 @@ describe "student groups" do
 
       f('#edit_group').click
       set_value f('#group_name'), "new group name"
-      f('#ui-id-2').find_element(:css, 'button[type=submit]').click
-      wait_for_ajaximations
-
+      expect_new_page_load {f('#ui-id-2').find_element(:css, 'button[type=submit]').click}
       expect(g1.reload.name).to include("new group name")
     end
 

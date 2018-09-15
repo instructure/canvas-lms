@@ -58,8 +58,8 @@ import 'compiled/jquery.rails_flash_notifications'
       },
 
       componentDidMount: function () {
-        this.refs.closeLink.getDOMNode().focus();
-        $(this.refs.wizardBox.getDOMNode()).removeClass('ic-wizard-box--is-closed');
+        this.closeLink.focus();
+        $(this.wizardBox).removeClass('ic-wizard-box--is-closed');
         $.screenReaderFlashMessageExclusive(I18n.t("Course Setup Wizard is showing."));
       },
 
@@ -67,9 +67,9 @@ import 'compiled/jquery.rails_flash_notifications'
         this.setState({
           showWizard: nextProps.showWizard
         }, () => {
-          $(this.refs.wizardBox.getDOMNode()).removeClass('ic-wizard-box--is-closed');
+          $(this.wizardBox).removeClass('ic-wizard-box--is-closed');
           if (this.state.showWizard) {
-            this.refs.closeLink.getDOMNode().focus();
+            this.closeLink.focus();
           }
         });
       },
@@ -105,7 +105,7 @@ import 'compiled/jquery.rails_flash_notifications'
             overlayClassName={this.props.overlayClassName}
           >
             <main role='main'>
-              <div ref='wizardBox' className='ic-wizard-box'>
+              <div ref={e => (this.wizardBox = e)} className='ic-wizard-box'>
                 <div className='ic-wizard-box__header'>
                   <a href='/' className='ic-wizard-box__logo-link'>
                     <span className='screenreader-only'>{I18n.t('My dashboard')}</span>
@@ -118,7 +118,7 @@ import 'compiled/jquery.rails_flash_notifications'
                 <div className='ic-wizard-box__main'>
                   <div className='ic-wizard-box__close'>
                     <div className='ic-Expand-link ic-Expand-link--from-right'>
-                      <a ref='closeLink' href='#' className='ic-Expand-link__trigger' onClick={this.closeModal}>
+                      <a ref={e => (this.closeLink = e)} href='#' className='ic-Expand-link__trigger' onClick={this.closeModal}>
                         <div className='ic-Expand-link__layout'>
                           <i className='icon-x ic-Expand-link__icon'></i>
                           <span className='ic-Expand-link__text'>{I18n.t('Close and return to Canvas')}</span>

@@ -58,7 +58,7 @@ describe ConferencesController, type: :request do
     group_conference.add_initiator(@user)
 
     get "/courses/#{@course.id}/groups/#{@group.id}"
-    expect(response).to be_success
+    expect(response).to be_successful
     expect(assigns['current_conferences'].map(&:id)).to eq [group_conference.id]
   end
 

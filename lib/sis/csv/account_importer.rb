@@ -33,7 +33,6 @@ module SIS
       def process(csv, index=nil, count=nil)
         count = SIS::AccountImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv, index, count) do |row|
-            update_progress
             begin
               importer.add_account(row['account_id'], row['parent_account_id'],
                                    row['status'], row['name'], row['integration_id'])

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { mount, ReactWrapper, shallow } from 'enzyme'
+import { mount, ReactWrapper, shallow } from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
 import merge from 'lodash/merge'
 
 import DiscussionSettings from 'jsx/discussions/components/DiscussionSettings'

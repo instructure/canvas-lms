@@ -88,22 +88,22 @@ class DeveloperKey extends React.Component {
 
   makeImage (developerKey) {
     if (developerKey.icon_url) {
-      return <FlexItem padding="0 xx-small 0 0">
-        <Image
-          src={developerKey.icon_url}
-          cover
-          width="4rem"
-          height="4rem"
-          margin="xxx-small xx-small xxx-small"
-          alt={I18n.t("%{toolName} Logo", {toolName: this.getToolName()})}
-        />
-      </FlexItem>
+      return (
+        <View as="div"
+              width="4rem"
+              height="4rem"
+              textAlign="center"
+              margin="0 small 0 0"
+        >
+          <Image
+            src={developerKey.icon_url}
+            constrain="contain"
+            alt={I18n.t('%{toolName} Logo', {toolName: this.getToolName()})}
+          />
+        </View>
+      )
     }
-    return <View
-      as="div"
-      height="4rem"
-      width="4rem"
-    />
+    return <View as="div" height="4rem" width="4rem" margin="0 small 0 0" />
   }
 
   makeUserLink (developerKey) {

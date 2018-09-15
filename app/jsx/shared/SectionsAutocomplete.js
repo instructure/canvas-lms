@@ -29,6 +29,12 @@ function extractIds(arr) {
   return arr.map((element) => element.id)
 }
 
+function sortSectionName(a,b) {
+  if(a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+  if(a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+  return 0;
+}
+
 export default class SectionsAutocomplete extends React.Component {
   static propTypes = {
     sections: propTypes.sectionList.isRequired,
@@ -45,7 +51,7 @@ export default class SectionsAutocomplete extends React.Component {
   }
 
   state = {
-    sections: this.props.sections.concat([ALL_SECTIONS_OBJ]),
+    sections: this.props.sections.concat([ALL_SECTIONS_OBJ]).sort(sortSectionName),
     selectedSectionsValue: extractIds(this.props.selectedSections),
     messages: []
   }

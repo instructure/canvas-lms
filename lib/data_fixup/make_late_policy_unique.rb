@@ -18,7 +18,7 @@
 module DataFixup
   module MakeLatePolicyUnique
     def self.run
-      duplicates = LatePolicy.group(:course_id).having("count(id) > 1").pluck("course_id, max(id)").transpose
+      duplicates = LatePolicy.group(:course_id).having("count(id) > 1").pluck(Arel.sql("course_id, max(id)")).transpose
       LatePolicy.where(course_id: duplicates[0]).where.not(id: duplicates[1]).delete_all
     end
   end

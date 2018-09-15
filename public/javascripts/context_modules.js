@@ -66,7 +66,7 @@ function scrollTo ($thing, time = 500) {
 
   function refreshDuplicateLinkStatus($module) {
     $module.find('.duplicate_module_menu_item').hide()
-    if (ENV.DUPLICATE_ENABLED && !$module.find('.context_module_item.quiz').length) {
+    if (ENV.DUPLICATE_ENABLED && !$module.find('.context_module_item.quiz').length && !$module.find('.cannot-duplicate').length) {
       $module.find('.duplicate_module_menu_item').show()
     } else {
       $module.find('.duplicate_module_menu_item').hide()
@@ -1048,7 +1048,7 @@ function scrollTo ($thing, time = 500) {
       event.preventDefault()
       const duplicateRequestUrl = $(this).attr('href')
       const duplicatedModuleElement = $(this).parents(".context_module")
-      const spinner = React.createElement(ModuleDuplicationSpinner, {})
+      const spinner = <ModuleDuplicationSpinner />
       const $tempElement = $('<div id="temporary-spinner" class="item-group-condensed"></div>')
       $tempElement.insertAfter(duplicatedModuleElement)
       ReactDOM.render(spinner, $('#temporary-spinner')[0])
@@ -1629,7 +1629,7 @@ function scrollTo ($thing, time = 500) {
           fileName: file.displayName()
         }
 
-        var Cloud = React.createElement(PublishCloud, props);
+        var Cloud = <PublishCloud {...props} />;
         ReactDOM.render(Cloud, $el[0]);
         return {model: file} // Pretending this is a backbone view
       }

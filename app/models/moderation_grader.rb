@@ -26,4 +26,7 @@ class ModerationGrader < ActiveRecord::Base
     uniqueness: { scope: :assignment_id }
 
   validates :user, uniqueness: { scope: :assignment_id }
+  validates :slot_taken, inclusion: { in: [true, false] }
+
+  scope :with_slot_taken, -> { where(slot_taken: true) }
 end

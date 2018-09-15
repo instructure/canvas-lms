@@ -129,6 +129,7 @@ class CourseGroups
 
     def clone_category_confirm
       clone_category_submit_button.click
+      wait_for_dom_ready
       wait_for_ajaximations
     end
 

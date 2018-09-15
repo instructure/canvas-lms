@@ -26,6 +26,13 @@ import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import Link from '@instructure/ui-elements/lib/components/Link'
 
+function scoreInPoints(score, pointsPossible) {
+  const formattedScore = I18n.n(score, {precision: 2, strip_insignificant_zeros: true})
+  const formattedPointsPossible = I18n.n(pointsPossible, {precision: 2, strip_insignificant_zeros: true})
+  return formattedScore + '/' + formattedPointsPossible
+}
+
+
   class SubmissionProgressBars extends React.Component {
     static propTypes = {
       submissions: PropTypes.arrayOf(
@@ -58,7 +65,7 @@ import Link from '@instructure/ui-elements/lib/components/Link'
         display = SubmissionProgressBars.renderIcon(grade)
       } else {
         // Default to show score out of points possible
-        display = `${score}/${pointsPossible}`
+        display = scoreInPoints(score, pointsPossible)
       }
 
       return display
@@ -76,7 +83,7 @@ import Link from '@instructure/ui-elements/lib/components/Link'
         display = grade
       } else {
         // Default to show score out of points possible
-        display = `${score}/${pointsPossible}`
+        display = scoreInPoints(score, pointsPossible)
       }
 
       return display

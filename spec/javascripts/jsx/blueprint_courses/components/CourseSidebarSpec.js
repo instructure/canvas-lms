@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import $ from 'jquery'
 import { Provider } from 'react-redux'
 import * as enzyme from 'enzyme'
 import moxios from 'moxios'
@@ -85,21 +86,21 @@ test('renders the open CourseSidebar component', () => {
   clock.tick(500)
   ok(sidebarContentRef, 'sidebar contents')
 
-  const sidebar = new enzyme.ReactWrapper(sidebarContentRef, sidebarContentRef)
+  const sidebar = $(sidebarContentRef)
   const rows = sidebar.find('.bcs__row')
 
   // associations
-  ok(rows.at(0).find('button#mcSidebarAsscBtn').exists(), 'Associations button')
-  equal(rows.at(0).text().trim(), `Associations${initialState.existingAssociations.length}`, 'Associations count')
+  ok(rows.eq(0).find('button#mcSidebarAsscBtn').size(), 'Associations button')
+  equal(rows.eq(0).text().trim(), `Associations${initialState.existingAssociations.length}`, 'Associations count')
 
   // sync history
-  ok(rows.at(1).find('button#mcSyncHistoryBtn').exists(), 'sync history button')
+  ok(rows.eq(1).find('button#mcSyncHistoryBtn').size(), 'sync history button')
 
   // unsynced changes
-  ok(rows.at(2).find('button#mcUnsyncedChangesBtn').exists(), 'unsynced changes button')
-  equal(rows.at(2).find('span').at(0).text(), 'Unsynced Changes')
+  ok(rows.eq(2).find('button#mcUnsyncedChangesBtn').size(), 'unsynced changes button')
+  equal(rows.eq(2).find('span').eq(0).text(), 'Unsynced Changes')
 
-  const count = rows.at(2).find('.bcs__row-right-content').text()
+  const count = rows.eq(2).find('.bcs__row-right-content').text()
   equal(count, initialState.unsyncedChanges.length, 'unsynced changes count')
   tree.unmount()
 })
@@ -111,10 +112,10 @@ test('renders no Uncynced Changes link if there are none', () => {
   const tree = enzyme.mount(connect(props, state))
   tree.find('button').simulate('click')
   ok(sidebarContentRef)
-  const sidebar = new enzyme.ReactWrapper(sidebarContentRef, sidebarContentRef)
+  const sidebar = $(sidebarContentRef)
 
   // no unsynced changes
-  notOk(sidebar.find('button#mcUnsyncedChangesBtn').exists())
+  notOk(sidebar.find('button#mcUnsyncedChangesBtn').size())
   tree.unmount()
 })
 
@@ -125,10 +126,10 @@ test('renders no Uncynced Changes link if there are no associations', () => {
   const tree = enzyme.mount(connect(props, state))
   tree.find('button').simulate('click')
   ok(sidebarContentRef)
-  const sidebar = new enzyme.ReactWrapper(sidebarContentRef, sidebarContentRef)
+  const sidebar = $(sidebarContentRef)
 
   // no unsynced changes
-  notOk(sidebar.find('button#mcUnsyncedChangesBtn').exists())
+  notOk(sidebar.find('button#mcUnsyncedChangesBtn').size())
   tree.unmount()
 })
 
@@ -139,10 +140,10 @@ test('renders no Uncynced Changes link if sync is in progress', () => {
   const tree = enzyme.mount(connect(props, state))
   tree.find('button').simulate('click')
   ok(sidebarContentRef)
-  const sidebar = new enzyme.ReactWrapper(sidebarContentRef, sidebarContentRef)
+  const sidebar = $(sidebarContentRef)
 
   // no unsynced changes
-  notOk(sidebar.find('button#mcUnsyncedChangesBtn').exists())
+  notOk(sidebar.find('button#mcUnsyncedChangesBtn').size())
   tree.unmount()
 })
 
@@ -153,10 +154,10 @@ test('renders no Associations link if the user not an admin', () => {
   const tree = enzyme.mount(connect(props, state))
   tree.find('button').simulate('click')
   ok(sidebarContentRef)
-  const sidebar = new enzyme.ReactWrapper(sidebarContentRef, sidebarContentRef)
+  const sidebar = $(sidebarContentRef)
 
   // no unsynced changes
-  notOk(sidebar.find('button#mcSidebarAsscBtn').exists())
+  notOk(sidebar.find('button#mcSidebarAsscBtn').size())
   tree.unmount()
 })
 
@@ -169,9 +170,9 @@ test('renders Sync button if has associations and sync is active and no unsyced 
   tree.find('button').simulate('click')
   clock.tick(500)
   ok(sidebarContentRef)
-  const sidebar = new enzyme.ReactWrapper(sidebarContentRef, sidebarContentRef)
+  const sidebar = $(sidebarContentRef)
 
-  ok(sidebar.find('MigrationSync').exists())
+  ok(sidebar.find('.bcs__migration-sync').size())
   tree.unmount()
 })
 
@@ -182,9 +183,9 @@ test('renders Sync button if has associations and has unsynced changes', () => {
   tree.find('button').simulate('click')
   clock.tick(500)
   ok(sidebarContentRef)
-  const sidebar = new enzyme.ReactWrapper(sidebarContentRef, sidebarContentRef)
+  const sidebar = $(sidebarContentRef)
 
-  ok(sidebar.find('MigrationSync').exists())
+  ok(sidebar.find('.bcs__migration-sync').size())
   tree.unmount()
 })
 
@@ -195,9 +196,9 @@ test('renders no Sync button if there are no associations', () => {
   const tree = enzyme.mount(connect(props, state))
   tree.find('button').simulate('click')
   ok(sidebarContentRef)
-  const sidebar = new enzyme.ReactWrapper(sidebarContentRef, sidebarContentRef)
+  const sidebar = $(sidebarContentRef)
 
-  notOk(sidebar.find('MigrationSync').exists())
+  notOk(sidebar.find('.bcs__migration-sync').size())
   tree.unmount()
 })
 
@@ -208,8 +209,8 @@ test('renders no Sync button if there are associations, but no unsynced changes 
   const tree = enzyme.mount(connect(props, state))
   tree.find('button').simulate('click')
   ok(sidebarContentRef)
-  const sidebar = new enzyme.ReactWrapper(sidebarContentRef, sidebarContentRef)
+  const sidebar = $(sidebarContentRef)
 
-  notOk(sidebar.find('MigrationSync').exists())
+  notOk(sidebar.find('.bcs__migration-sync').size())
   tree.unmount()
 })

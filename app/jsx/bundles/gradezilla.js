@@ -18,6 +18,9 @@
 
 import $ from 'jquery'
 import Backbone from 'Backbone'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import Paginator from '../shared/components/Paginator'
 import UserSettings from 'compiled/userSettings'
 import Gradebook from 'compiled/gradezilla/Gradebook'
 import OutcomeGradebookView from 'compiled/views/gradezilla/OutcomeGradebookView'
@@ -43,7 +46,10 @@ class GradebookRouter extends Backbone.Router {
     ENV.GRADEBOOK_OPTIONS.navigate = this.navigate.bind(this);
     this.views.assignment = new Gradebook(this.gradebookOptions());
     this.views.assignment.initialize();
-    if (ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled) { this.views.outcome = this.initOutcomes() }
+    if (ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled) {
+      this.views.outcome = this.initOutcomes()
+      this.renderPagination(0, 0)
+    }
 
     return this
   }
@@ -57,9 +63,20 @@ class GradebookRouter extends Backbone.Router {
   }
 
   initOutcomes () {
-    const book = new OutcomeGradebookView({el: $('.outcome-gradebook'), gradebook: this.views.assignment})
+    const book = new OutcomeGradebookView({
+      el: $('.outcome-gradebook'),
+      gradebook: this.views.assignment,
+      router: this
+    })
     book.render()
     return book
+  }
+
+  renderPagination(page, pageCount) {
+    ReactDOM.render(
+      <Paginator page={page} pageCount={pageCount} loadPage={(p) => this.views.outcome.loadPage(p)} />,
+      document.getElementById("outcome-gradebook-paginator")
+    )
   }
 
   tabOutcome () {
@@ -86,6 +103,7 @@ class GradebookRouter extends Backbone.Router {
     }
     $('.assignment-gradebook-container, .outcome-gradebook-container > div').addClass('hidden')
     $(`.${view}-gradebook-container, .${view}-gradebook-container div`).removeClass('hidden')
+    $('#outcome-gradebook-paginator').toggleClass('hidden', view !== 'outcome')
     this.views[view].onShow()
     return setGradebookTab(view)
   }

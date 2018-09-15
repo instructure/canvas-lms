@@ -17,65 +17,70 @@
  */
 
 import axios from 'axios'
-import { encodeQueryString } from '../shared/queryString'
+import {encodeQueryString} from '../shared/queryString'
 import makePromisePool from '../shared/makePromisePool'
 
 const MAX_CONCURRENT_REQS = 5
 
-export function getAnnouncements ({ contextType, contextId, announcements, announcementsSearch }, { page }) {
-  const { term, filter } = announcementsSearch
+export function getAnnouncements(
+  {contextType, contextId, announcements, announcementsSearch},
+  {page}
+) {
+  const {term, filter} = announcementsSearch
   const params = [
-    { only_announcements: true },
-    { per_page: 40 },
-    { page: page || announcements.currentPage },
-    { search_term: term || null },
-    { filter_by: filter || null }
+    {only_announcements: true},
+    {per_page: 40},
+    {page: page || announcements.currentPage},
+    {search_term: term || null},
+    {filter_by: filter || null}
   ]
 
   if (contextType === 'course') {
-    params.push({ 'include[]': 'sections_user_count' })
-    params.push({ 'include[]': 'sections' })
+    params.push({'include[]': 'sections_user_count'})
+    params.push({'include[]': 'sections'})
   }
 
   const queryString = encodeQueryString(params)
   return axios.get(`/api/v1/${contextType}s/${contextId}/discussion_topics?${queryString}`)
 }
 
-export function lockAnnouncements ({ contextType, contextId }, announcements, locked = true) {
-  return makePromisePool(announcements, (annId) => {
-    const url = `/api/v1/${contextType}s/${contextId}/discussion_topics/${annId}`
-    return axios.put(url, { locked })
-  }, {
-    poolSize: MAX_CONCURRENT_REQS,
-  })
+export function lockAnnouncements({contextType, contextId}, announcements, locked = true) {
+  return makePromisePool(
+    announcements,
+    annId => {
+      const url = `/api/v1/${contextType}s/${contextId}/discussion_topics/${annId}`
+      return axios.put(url, {locked})
+    },
+    {
+      poolSize: MAX_CONCURRENT_REQS
+    }
+  )
 }
 
-export function deleteAnnouncements ({ contextType, contextId }, announcements) {
-  return makePromisePool(announcements, (annId) => {
-    const url = `/api/v1/${contextType}s/${contextId}/discussion_topics/${annId}`
-    return axios.delete(url)
-  }, {
-    poolSize: MAX_CONCURRENT_REQS,
-  })
+export function deleteAnnouncements({contextType, contextId}, announcements) {
+  return makePromisePool(
+    announcements,
+    annId => {
+      const url = `/api/v1/${contextType}s/${contextId}/discussion_topics/${annId}`
+      return axios.delete(url)
+    },
+    {
+      poolSize: MAX_CONCURRENT_REQS
+    }
+  )
 }
 
-export function getExternalFeeds ({ contextType, contextId }) {
-  const params = encodeQueryString([
-    { per_page: 100 }
-  ])
+export function getExternalFeeds({contextType, contextId}) {
+  const params = encodeQueryString([{per_page: 100}])
   return axios.get(`/api/v1/${contextType}s/${contextId}/external_feeds?${params}`)
 }
 
-export function deleteExternalFeed ({ contextType, contextId}, feedId) {
+export function deleteExternalFeed({contextType, contextId}, feedId) {
   return axios.delete(`/api/v1/${contextType}s/${contextId}/external_feeds/${feedId}`)
 }
 
-export function addExternalFeed ({ contextType, contextId }, { url, verbosity, header_match }) {
-  const params = encodeQueryString([
-    { url },
-    { verbosity },
-    { header_match: header_match || null }
-  ])
+export function addExternalFeed({contextType, contextId}, {url, verbosity, header_match}) {
+  const params = encodeQueryString([{url}, {verbosity}, {header_match: header_match || null}])
 
   return axios.post(`/api/v1/${contextType}s/${contextId}/external_feeds?${params}`)
 }

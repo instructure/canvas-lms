@@ -508,6 +508,26 @@ returns the current course enrollment state.
 ```
 active
 ```
+## com.instructure.Assignment.anonymous_grading
+returns true if the assignment has anonymous grading
+enabled.
+
+**Availability**: *when launched as an assignment*  
+**Launch Parameter**: *com_instructure_assignment_anonymous_grading*  
+
+```
+true
+```
+## com.Instructure.membership.roles
+returns the current course membership roles
+using the LIS v2 vocabulary.
+
+**Availability**: *when launched from a course or an account*  
+**Launch Parameter**: *com_instructure_membership_roles*  
+
+```
+http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student
+```
 ## Canvas.membership.roles
 returns the current course membership roles.
 

@@ -83,7 +83,8 @@ module PermissionsHelper
           course_permissions[:read_grades] = true
           course_permissions[:participate_as_student] = true
         end
-        if active_ens.any?(&:admin?)
+        if grouped_enrollments[course.id].any?(&:admin?)
+          course_permissions[:read] = true
           course_permissions[:read_as_admin] = true
         elsif !is_account_admin
           course_permissions[:read_as_admin] = false # wait a second i can totally mark this one as false if they don't have any account users
@@ -114,6 +115,7 @@ module PermissionsHelper
     true_for_roles = permission_details[:true_for]
     available_to_roles = permission_details[:available_to]
 
+    # enabled for enrollment role
     if enrollment_state == :completed
       concluded_roles = permission_details[:applies_to_concluded]
       return false unless concluded_roles
@@ -122,7 +124,6 @@ module PermissionsHelper
       return false if permission_details[:restrict_future_enrollments]
     end
 
-    # enabled for enrollment role
     if available_to_roles.include?(role_type)
       role_on = perm_hash.dig(:role_overrides, [role_id, permission], :enabled) && perm_hash.dig(:role_overrides, [role_id, permission], :self)
       role_on.nil? ? true_for_roles.include?(role_type) : role_on

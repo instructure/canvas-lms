@@ -87,7 +87,7 @@ describe LtiApiController, type: :request do
       previous_time = e.total_activity_time
 
       make_call('body' => xapi_body)
-      expect(response).to be_success
+      expect(response).to be_successful
 
       expect(e.reload.total_activity_time).to eq previous_time + 600
     end
@@ -123,7 +123,7 @@ describe LtiApiController, type: :request do
       body = xapi_body
       body.delete(:result)
       make_call('body' => body)
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 
@@ -165,7 +165,7 @@ describe LtiApiController, type: :request do
       previous_time = e.total_activity_time
 
       make_call('body' => caliper_body, 'path' => "/api/lti/v1/caliper/#{@token}")
-      expect(response).to be_success
+      expect(response).to be_successful
 
       expect(e.reload.total_activity_time).to eq previous_time + 600
     end
@@ -177,7 +177,7 @@ describe LtiApiController, type: :request do
       body['@type'] = 'did_not_view'
 
       make_call('body' => body, 'path' => "/api/lti/v1/caliper/#{@token}")
-      expect(response).to be_success
+      expect(response).to be_successful
 
       expect(e.reload.total_activity_time).to eq previous_time
     end
@@ -213,7 +213,7 @@ describe LtiApiController, type: :request do
       body = caliper_body
       body.delete('duration')
       make_call('body' => body, 'path' => "/api/lti/v1/caliper/#{@token}")
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 

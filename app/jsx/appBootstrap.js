@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-import canvasTheme from '@instructure/ui-themes/lib/canvas'
+import canvasBaseTheme from '@instructure/ui-themes/lib/canvas/base'
+import canvasHighContrastTheme from '@instructure/ui-themes/lib/canvas/high-contrast'
 import moment from 'moment'
 import tz from 'timezone_core'
 import './fakeRequireJSFallback'
@@ -34,10 +34,22 @@ if (typeof ENV !== 'undefined') {
   if (ENV.BIGEASY_LOCALE) tz.changeLocale(ENV.BIGEASY_LOCALE, ENV.MOMENT_LOCALE)
 }
 
+// This will inject and set up sentry for deprecation reporting.  It should be
+// stripped out and be a no-op in production.
+if (process.env.NODE_ENV !== 'production' && process.env.DEPRECATION_SENTRY_DSN) {
+  const Raven = require('raven-js')
+  Raven.config(process.env.DEPRECATION_SENTRY_DSN, {
+    release: process.env.GIT_COMMIT
+  }).install();
+
+  const setupRavenConsoleLoggingPlugin = require('../jsx/shared/helpers/setupRavenConsoleLoggingPlugin');
+  setupRavenConsoleLoggingPlugin(Raven, { loggerName: 'console' });
+}
+
 // setup the inst-ui default theme
 if (ENV.use_high_contrast) {
-  canvasTheme.use({ accessible: true })
+  canvasHighContrastTheme.use()
 } else {
   const brandvars = window.CANVAS_ACTIVE_BRAND_VARIABLES || {}
-  canvasTheme.use({ overrides: brandvars })
+  canvasBaseTheme.use({ overrides: brandvars })
 }

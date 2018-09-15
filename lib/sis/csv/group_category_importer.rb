@@ -33,7 +33,6 @@ module SIS
       def process(csv, index=nil, count=nil)
         count = SIS::GroupCategoryImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv, index, count) do |row|
-            update_progress
             begin
               importer.add_group_category(row['group_category_id'], row['account_id'],
                                           row['course_id'], row['category_name'], row['status'])

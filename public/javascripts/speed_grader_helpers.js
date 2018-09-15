@@ -26,6 +26,10 @@ export function setupIsAnonymous ({anonymize_students}) {
   return anonymize_students
 }
 
+export function setupAnonymousGraders ({anonymize_graders}) {
+  return anonymize_graders
+}
+
 export function setupAnonymizableId (isAnonymous) {
   return isAnonymous ? 'anonymous_id' : 'id'
 }
@@ -43,7 +47,7 @@ export function setupAnonymizableAuthorId (isAnonymous) {
 }
 
 
-  const speedgraderHelpers = {
+  const speedGraderHelpers = {
     urlContainer: function(submission, defaultEl, originalityReportEl) {
       if (submission.has_originality_report) {
         return originalityReportEl
@@ -94,7 +98,7 @@ export function setupAnonymizableAuthorId (isAnonymous) {
     },
 
     setRightBarDisabled: function(isDisabled){
-      var elements = ['#grading-box-extended', '#speedgrader_comment_textarea', '#add_attachment',
+      var elements = ['#grading-box-extended', '#speed_grader_comment_textarea', '#add_attachment',
                       '#media_comment_button', '#comment_submit_button',
                       '#speech_recognition_button'];
 
@@ -155,12 +159,13 @@ export function setupAnonymizableAuthorId (isAnonymous) {
         return "not_submitted";
       }
     },
-    plagiarismResubmitHandler: (event, resubmitUrl) => {
+    plagiarismResubmitHandler: (event, resubmitUrl, anonymizableUserId = "") => {
       event.preventDefault();
-      $(event.target).attr('disabled', true).text(I18n.t('turnitin.resubmitting', 'Resubmitting...'));
+      const params = anonymizableUserId === 'anonymous_id' ? { anonymous: true } : {}
 
-      $.ajaxJSON(resubmitUrl, "POST", {}, () => {
-        speedgraderHelpers.reloadPage();
+      $(event.target).attr('disabled', true).text(I18n.t('turnitin.resubmitting', 'Resubmitting...'));
+      $.ajaxJSON(resubmitUrl, "POST", params, () => {
+        speedGraderHelpers.reloadPage();
       });
     },
 
@@ -173,10 +178,11 @@ export function setupAnonymizableAuthorId (isAnonymous) {
     },
 
     setupIsAnonymous,
+    setupAnonymousGraders,
     setupAnonymizableId,
     setupAnonymizableUserId,
     setupAnonymizableStudentId,
     setupAnonymizableAuthorId
   }
 
-export default speedgraderHelpers
+export default speedGraderHelpers

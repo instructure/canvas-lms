@@ -328,30 +328,30 @@ describe 'Developer Keys' do
       it "includes proper scopes for scope group" do
         expand_scope_group_by_filter('Assignment Groups', Account.default.id)
         scope_group = f("[data-automation='toggle-scope-group']")
-        expect(scope_group).to contain_css("span[title='GET']")
-        expect(scope_group).to contain_css("span[title='POST']")
-        expect(scope_group).to contain_css("span[title='PUT']")
-        expect(scope_group).to contain_css("span[title='DELETE']")
+        expect(scope_group).to include_text("GET")
+        expect(scope_group).to include_text("POST")
+        expect(scope_group).to include_text("PUT")
+        expect(scope_group).to include_text("DELETE")
       end
 
       it "scope group select all checkbox adds all associated scopes" do
         expand_scope_group_by_filter('Assignment Groups', Account.default.id)
         click_scope_group_checkbox
         # checks that all UI pills have been added to scope group if selected
-        expect(ff("[data-automation='toggle-scope-group'] span[title='GET']")).to have_size(3)
-        expect(ff("[data-automation='toggle-scope-group'] span[title='POST']")).to have_size(2)
-        expect(ff("[data-automation='toggle-scope-group'] span[title='PUT']")).to have_size(2)
-        expect(ff("[data-automation='toggle-scope-group'] span[title='DELETE']")).to have_size(2)
+        expect(ffj("[data-automation='toggle-scope-group'] [data-automation='developer-key-scope-pill']:contains('GET')")).to have_size(3)
+        expect(ffj("[data-automation='toggle-scope-group'] [data-automation='developer-key-scope-pill']:contains('POST')")).to have_size(2)
+        expect(ffj("[data-automation='toggle-scope-group'] [data-automation='developer-key-scope-pill']:contains('PUT')")).to have_size(2)
+        expect(ffj("[data-automation='toggle-scope-group'] [data-automation='developer-key-scope-pill']:contains('DELETE')")).to have_size(2)
       end
 
       it "scope group individual checkbox adds only associated scope" do
         expand_scope_group_by_filter('Assignment Groups', Account.default.id)
         click_scope_checkbox
         # adds a UI pill to scope group with http verb if scope selected
-        expect(ff("[data-automation='toggle-scope-group'] span[title='GET']")).to have_size(3)
-        expect(ff("[data-automation='toggle-scope-group'] span[title='POST']")).to have_size(1)
-        expect(ff("[data-automation='toggle-scope-group'] span[title='PUT']")).to have_size(1)
-        expect(ff("[data-automation='toggle-scope-group'] span[title='DELETE']")).to have_size(1)
+        expect(ffj("[data-automation='toggle-scope-group'] [data-automation='developer-key-scope-pill']:contains('GET')")).to have_size(3)
+        expect(ffj("[data-automation='toggle-scope-group'] [data-automation='developer-key-scope-pill']:contains('POST')")).to have_size(1)
+        expect(ffj("[data-automation='toggle-scope-group'] [data-automation='developer-key-scope-pill']:contains('PUT')")).to have_size(1)
+        expect(ffj("[data-automation='toggle-scope-group'] [data-automation='developer-key-scope-pill']:contains('DELETE')")).to have_size(1)
       end
 
       it "adds scopes to backend developer key via UI" do

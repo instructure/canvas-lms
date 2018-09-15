@@ -255,8 +255,7 @@
     <div class="submission-details-frame">
       <iframe id="preview_frame" src="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :preview => 1, :rand => rand(999999)) %>" allowfullscreen="true" frameborder="0" style="border: 0; width: 100%; height: 300px; display: block;" title="<%= t('Preview') %>"></iframe>
     </div>
-    <div class="submission-details-comments"
-      style="word-wrap: break-word; min-width: 1%; <%= hidden if @assignment.muted && (@assignment.moderated_grading || @assignment.anonymous_grading) %>">
+    <div class="submission-details-comments" style="word-wrap: break-word; min-width: 1%;">
       <div style="background-color: #fff;">
         <a href="#" class="comments_link" style="display: none; <%= 'font-weight: bold;' unless @submission.submission_comments.empty? %>">Comments <% unless @submission.submission_comments.empty? %>(<%= @submission.submission_comments.length %>)<% end %></a>
         <div class="comments">
@@ -270,7 +269,7 @@
               <% end %>
               <br/><br/>
             <% end %>
-            <% @submission.visible_submission_comments.each do |comment| %>
+            <% @submission.submission_comments.each do |comment| %>
               <% if can_do(comment, @current_user, :read) %>
               <div class="comment <%= 'draft' if comment.draft? %>" id="submission_comment_<%= comment.id %>" style="margin-bottom: 10px;">
                 <div class="comment" style="color: #444;">

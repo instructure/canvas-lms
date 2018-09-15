@@ -25,6 +25,7 @@ class SisBatchRollBackData < ActiveRecord::Base
 
   scope :expired_data, -> {where('created_at < ?', 30.days.ago)}
   scope :active, -> {where(workflow_state: 'active')}
+  scope :restored, -> {where(workflow_state: 'restored')}
 
   RESTORE_ORDER = %w{Account EnrollmentTerm AbstractCourse Course CourseSection
                      GroupCategory Group Pseudonym CommunicationChannel
@@ -49,7 +50,7 @@ class SisBatchRollBackData < ActiveRecord::Base
   end
 
   def self.build_dependent_data(sis_batch:, contexts:, updated_state:, batch_mode_delete: false)
-    return nil unless sis_batch&.using_parallel_importers?
+    return unless sis_batch
     data = []
     contexts.each do |context|
       data << sis_batch.roll_back_data.build(context: context,
@@ -64,7 +65,7 @@ class SisBatchRollBackData < ActiveRecord::Base
   end
 
   def self.should_create_roll_back?(object, sis_batch)
-    return false unless sis_batch&.using_parallel_importers?
+    return false unless sis_batch
     object.id_before_last_save.nil? || object.workflow_state_before_last_save != object.workflow_state
   end
 

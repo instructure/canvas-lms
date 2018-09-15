@@ -159,7 +159,7 @@ describe "content migrations", :non_parallel do
       hrefs = source_links.map { |a| a.attribute(:href) }
 
       @course.content_migrations.each do |cm|
-        expect(hrefs.find { |href| href.include?("/files/#{cm.attachment.id}/download") }).not_to be_nil
+        expect(hrefs.find { |href| href.include?("/files/#{cm.attachment_id}/download") }).not_to be_nil
       end
     end
 

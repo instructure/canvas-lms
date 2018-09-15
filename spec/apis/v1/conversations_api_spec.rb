@@ -634,6 +634,24 @@ describe ConversationsController, type: :request do
           expect(conv.context).to eq @course
         end
 
+        # Otherwise, students can't reply to admins because admins are not in the course
+        # context
+        it "should use account context if messages are coming from an admin through a course" do
+          account_admin_user active_all: true
+          json = api_call(:post, "/api/v1/conversations",
+                  { :controller => 'conversations', :action => 'create', :format => 'json'},
+                  { :recipients => [@bob.id], :body => "test", :context_code => @course.asset_string })
+          expect(json.first["context_code"]).to eq "account_#{Account.default.id}"
+        end
+
+        it "should still use course context if messages are NOT coming from an admin through a course " do
+          conversation = conversation(@bob, :context_type => "Course", :context_id => @course.id)
+          json = api_call(:get, "/api/v1/conversations/#{conversation.conversation_id}",
+                          { :controller => 'conversations', :action => 'show', :id => conversation.conversation_id.to_s,
+                            :format => 'json',  })
+          expect(json["context_code"]).to eq @course.asset_string
+        end
+
         it "should always have the right tags when sending a bulk message in course context" do
           other_course = Account.default.courses.create!(:workflow_state => 'available')
           other_course.enroll_teacher(@user).accept!
@@ -657,7 +675,7 @@ describe ConversationsController, type: :request do
             { :controller => 'conversations', :action => 'create', :format => 'json' },
             { :recipients => [@user.id], :body => "hello, me", :context_code => @course.asset_string }
           )
-          expect(response).to be_success
+          expect(response).to be_successful
           expect(json[0]['messages'][0]['participating_user_ids']).to eq([@user.id])
         end
 
@@ -961,12 +979,12 @@ describe ConversationsController, type: :request do
 
             @message = conversation(@me, :sender => @bob).messages.first
           end
-
           json = api_call(:post, "/api/v1/conversations/#{@conversation.conversation_id}/add_message",
             { :controller => 'conversations', :action => 'add_message', :id => @conversation.conversation_id.to_s, :format => 'json' },
             { :body => "wut wut", :included_messages => [@message.id]})
 
           expect(json['last_message']).to eq "wut wut"
+          expect(@conversation.reload.message_count).to eq 2 # should not double-update
         end
       end
 

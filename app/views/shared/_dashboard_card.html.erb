@@ -14,21 +14,21 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-%>
 
-<% css_bundle :dashboard_card %>
+css_bundle :dashboard_card
 
-<%
-dashboard_courses = map_courses_for_menu(@current_user.menu_courses, :include_section_tabs => true)
-js_env({
-  :DASHBOARD_COURSES => dashboard_courses,
-  :DASHBOARD_REORDERING_ENABLED => @domain_root_account.feature_enabled?(:dashcard_reordering)
-})
+js_env(:DASHBOARD_REORDERING_ENABLED => @domain_root_account.feature_enabled?(:dashcard_reordering))
+
+default_number_of_fake_dashcards_to_show = 5
+
+number_of_fake_cards_to_show =
+  Rails.cache.read(['last_known_dashboard_cards_count', @current_user].cache_key) ||
+  default_number_of_fake_dashcards_to_show
 %>
 
 <div id="DashboardCard_Container" style="display: <%= user_dashboard_view == 'cards' ? 'block' : 'none' %>">
   <div class="ic-DashboardCard__box">
-    <% for i in 0..dashboard_courses.length-1 do %>
+    <% for i in 1..number_of_fake_cards_to_show do %>
       <div class="ic-DashboardCard">
         <svg xmlns="http://www.w3.org/2000/svg" class="ic-DashboardCard__placeholder-svg" version="1.1" x="0" y="0" viewBox="-1087 618 260 254" xml:space="preserve">
           <title>Empty Card</title>

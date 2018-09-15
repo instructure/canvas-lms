@@ -25,9 +25,11 @@ describe Api::V1::PlannerItem do
     def quiz_json(*args); end
     def wiki_page_json(*args); end
     def discussion_topic_api_json(*args); end
+    def submission_json(*args); end
     def named_context_url(*args); "named_context_url"; end
     def course_assignment_submission_url(*args); 'course_assignment_submission_url'; end
     def calendar_event_json(*args); end
+    def assessment_request_json(*args); end
   end
 
   before :once do
@@ -35,7 +37,8 @@ describe Api::V1::PlannerItem do
     @course.root_account.enable_feature!(:student_planner)
 
     teacher_in_course active_all: true
-    student_in_course course: @course, active_all: true
+    @reviewer = student_in_course(course: @course, active_all: true).user
+    @student = student_in_course(course: @course, active_all: true).user
     for_course = { course: @course }
 
     assignment_quiz [], for_course
@@ -91,6 +94,15 @@ describe Api::V1::PlannerItem do
       it 'should have a nil planner_override value' do
         json = api.planner_item_json(@quiz.assignment, @student, session)
         expect(json[:planner_override]).to be_nil
+      end
+    end
+
+    context 'peer reviews' do
+      it 'should include submissions needing peer review' do
+        submission = @assignment.submit_homework(@student, body: "the stuff")
+        @peer_review = AssessmentRequest.create!(user: @student, asset: submission, assessor_asset: @reviewer, assessor: @student)
+        json = api.planner_item_json(@peer_review, @student, session, { start_at: 1.week.ago })
+        expect(json[:plannable_type]).to eq "assessment_request"
       end
     end
 
@@ -222,7 +234,7 @@ describe Api::V1::PlannerItem do
                                                     })
       end
 
-      it 'should include indicate is_media if comment has a media_comment_id' do
+      it 'should include is_media if comment has a media_comment_id' do
         submission = @assignment.submit_homework(@student, body: "the stuff")
         submission.add_comment(user: @teacher, comment: "nice work, fam", media_comment_id: 2)
         submission.update(score: 10)

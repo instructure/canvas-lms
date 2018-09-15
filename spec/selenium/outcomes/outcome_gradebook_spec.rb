@@ -24,8 +24,8 @@ describe "outcome gradebook" do
   context "as a teacher" do
     before(:once) do
       gradebook_data_setup
-      @outcome1 = outcome_model(context: @course)
-      @outcome2 = outcome_model(context: @course)
+      @outcome1 = outcome_model(context: @course, title: 'outcome1')
+      @outcome2 = outcome_model(context: @course, title: 'outcome2')
     end
 
     before(:each) do

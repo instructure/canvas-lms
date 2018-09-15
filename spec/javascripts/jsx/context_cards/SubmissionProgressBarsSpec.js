@@ -189,7 +189,7 @@ QUnit.module('StudentContextTray/Progress', (hooks) => {
       test('it renders `score/points_possible`', () => {
         const pointsPossible = 25
         grade = '15'
-        score = '15'
+        score = '15.56789'
         submission = {
           grade,
           score,
@@ -197,7 +197,7 @@ QUnit.module('StudentContextTray/Progress', (hooks) => {
           excused: false,
           assignment: {points_possible: pointsPossible}
         }
-        equal(SubmissionProgressBars.displayScreenreaderGrade(submission), `${score}/${pointsPossible}`)
+        equal(SubmissionProgressBars.displayScreenreaderGrade(submission), `15.57/${pointsPossible}`)
       })
     })
   })
@@ -300,7 +300,7 @@ QUnit.module('StudentContextTray/Progress', (hooks) => {
       ]
 
       const tray = shallow(<SubmissionProgressBars submissions={submissions} />)
-      ok(tray.find("Tooltip").node.props.href.match(/submissions\/99/));
+      ok(tray.find("Tooltip").getElement().props.href.match(/submissions\/99/));
     })
   })
 })

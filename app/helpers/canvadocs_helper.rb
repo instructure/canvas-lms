@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,17 +14,21 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-class CleanseTheSyckness < ActiveRecord::Migration[4.2]
-  tag :postdeploy
+module CanvadocsHelper
+  include CoursesHelper
 
-  def up
-    if User.exists? # don't raise for a fresh install
-      raise "WARNING:\n
-        This migration needs to be run under Rails 4.2.\n"
-    end
+  private
+  def canvadocs_user_name(user)
+    user.short_name.delete(',')
   end
 
-  def down
+  def canvadocs_user_id(user)
+    user.global_id.to_s
+  end
+
+  def canvadocs_user_role(course, user, enrollments=nil)
+    user_type(course, user, enrollments)
   end
 end

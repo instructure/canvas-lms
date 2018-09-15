@@ -46,8 +46,20 @@ end
 # Extend YARD to generate our API documentation
 YARD::Tags::Library.define_tag("Is an API method", :API)
 YARD::Tags::Library.define_tag("API method argument", :argument)
+# Expected Format:
+# @deprecated_argument argument_name NOTICE YYYY-MM-DD EFFECTIVE YYYY-MM-DD
+#   A description of the deprecation. (required)
+YARD::Tags::Library.define_tag("API method argument is deprecated", :deprecated_argument)
+# Expected Format:
+# @deprecated_method NOTICE YYYY-MM-DD EFFECTIVE YYYY-MM-DD
+#   Use {api:FooController#some_action Foo#some_action} instead. A description of the deprecated method. (required)
+YARD::Tags::Library.define_tag("API method is deprecated", :deprecated_method)
 YARD::Tags::Library.define_tag("API response field", :request_field)
 YARD::Tags::Library.define_tag("API response field", :response_field)
+# Expected Format:
+# @deprecated_response_field response_field NOTICE YYYY-MM-DD EFFECTIVE YYYY-MM-DD
+#   A description of the deprecation. (required)
+YARD::Tags::Library.define_tag("API response field is deprecated", :deprecated_response_field)
 YARD::Tags::Library.define_tag("API example request", :example_request)
 YARD::Tags::Library.define_tag("API example response", :example_response)
 YARD::Tags::Library.define_tag("API subtopic", :subtopic)

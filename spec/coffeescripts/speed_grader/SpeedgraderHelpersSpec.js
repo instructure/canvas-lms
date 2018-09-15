@@ -19,6 +19,7 @@
 import fakeENV from 'helpers/fakeENV'
 import SpeedgraderHelpers, {
   setupIsAnonymous,
+  setupAnonymousGraders,
   setupAnonymizableId,
   setupAnonymizableUserId,
   setupAnonymizableStudentId,
@@ -225,7 +226,7 @@ QUnit.module('SpeedgraderHelpers#setRightBarDisabled', {
     this.testArea.id = 'test_area'
     this.fixtureNode.appendChild(this.testArea)
     this.startingHTML =
-      '<input type="text" id="grading-box-extended"><textarea id="speedgrader_comment_textarea"></textarea><button id="add_attachment"></button><button id="media_comment_button"></button><button id="comment_submit_button"></button>'
+      '<input type="text" id="grading-box-extended"><textarea id="speed_grader_comment_textarea"></textarea><button id="add_attachment"></button><button id="media_comment_button"></button><button id="comment_submit_button"></button>'
   },
   teardown() {
     this.fixtureNode.innerHTML = ''
@@ -237,7 +238,7 @@ test('it properly disables the elements we care about in the right bar', functio
   SpeedgraderHelpers.setRightBarDisabled(true)
   equal(
     this.testArea.innerHTML,
-    '<input type="text" id="grading-box-extended" class="ui-state-disabled" aria-disabled="true" readonly="readonly" disabled=""><textarea id="speedgrader_comment_textarea" class="ui-state-disabled" aria-disabled="true" readonly="readonly" disabled=""></textarea><button id="add_attachment" class="ui-state-disabled" aria-disabled="true" readonly="readonly" disabled=""></button><button id="media_comment_button" class="ui-state-disabled" aria-disabled="true" readonly="readonly" disabled=""></button><button id="comment_submit_button" class="ui-state-disabled" aria-disabled="true" readonly="readonly" disabled=""></button>'
+    '<input type="text" id="grading-box-extended" class="ui-state-disabled" aria-disabled="true" readonly="readonly" disabled=""><textarea id="speed_grader_comment_textarea" class="ui-state-disabled" aria-disabled="true" readonly="readonly" disabled=""></textarea><button id="add_attachment" class="ui-state-disabled" aria-disabled="true" readonly="readonly" disabled=""></button><button id="media_comment_button" class="ui-state-disabled" aria-disabled="true" readonly="readonly" disabled=""></button><button id="comment_submit_button" class="ui-state-disabled" aria-disabled="true" readonly="readonly" disabled=""></button>'
   )
 })
 
@@ -402,6 +403,24 @@ test("prevents the button's default action", () => {
   $.ajaxJSON = previousAjaxJson
 })
 
+test("sets the 'anonymous' param to true if anonymizableUserId is 'anonymous_id'", () => {
+  $('#fixtures').append('<button id="resubmit-button">Click Here</button>')
+  const ajaxStub = sinon.stub()
+  ajaxStub.returns({
+    status: 200,
+    data: {}
+  })
+  const previousAjaxJson = $.ajaxJSON
+  $.ajaxJSON = ajaxStub
+  const event = {
+    preventDefault: sinon.spy(),
+    target: document.getElementById('resubmit-button')
+  }
+  SpeedgraderHelpers.plagiarismResubmitHandler(event, 'http://www.test.com', 'anonymous_id')
+  deepEqual(ajaxStub.args[0][2], {anonymous: true})
+  $.ajaxJSON = previousAjaxJson
+})
+
 test("changes the button's text to 'Resubmitting...'", () => {
   $('#fixtures').append('<button id="resubmit-button">Click Here</button>')
   const ajaxStub = sinon.stub()
@@ -463,6 +482,21 @@ QUnit.module('SpeedgraderHelpers.setupIsAnonymous', suiteHooks => {
 
   test('returns false when assignment has anonymize_students set to false', () => {
     strictEqual(setupIsAnonymous({anonymize_students: false}), false)
+  })
+})
+
+QUnit.module('SpeedgraderHelpers.setupAnonymousGraders', suiteHooks => {
+  suiteHooks.afterEach(() => {
+    fakeENV.teardown()
+  })
+
+  test('returns true when assignment has anonymize_graders set to true', () => {
+    strictEqual(setupAnonymousGraders({anonymize_graders: true}), true)
+    fakeENV.teardown()
+  })
+
+  test('returns false when assignment has anonymize_graders set to false', () => {
+    strictEqual(setupAnonymousGraders({anonymize_graders: false}), false)
   })
 })
 

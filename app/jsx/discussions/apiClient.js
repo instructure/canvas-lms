@@ -17,76 +17,78 @@
  */
 
 import axios from 'axios'
-import { encodeQueryString } from '../shared/queryString'
+import {encodeQueryString} from '../shared/queryString'
 
 function discussionQueryString(contextType, page) {
   const params = [
-    { per_page: 50 },
-    { plain_messages: true },
-    { include_assignment: true },
-    { exclude_assignment_descriptions: true },
-    { exclude_context_module_locked_topics: true },
-    { page },
+    {per_page: 50},
+    {plain_messages: true},
+    {include_assignment: true},
+    {exclude_assignment_descriptions: true},
+    {exclude_context_module_locked_topics: true},
+    {page}
   ]
 
   if (contextType === 'course') {
-    params.push({ 'include[]': 'sections_user_count' })
-    params.push({ 'include[]': 'sections' })
+    params.push({'include[]': 'sections_user_count'})
+    params.push({'include[]': 'sections'})
   }
   return encodeQueryString(params)
 }
 
-export function getDiscussions ({ contextType, contextId }, { page }) {
+export function getDiscussions({contextType, contextId}, {page}) {
   const queryString = discussionQueryString(contextType, page)
   return axios.get(`/api/v1/${contextType}s/${contextId}/discussion_topics?${queryString}`)
 }
 
-export function headDiscussions ({ contextType, contextId}) {
+export function headDiscussions({contextType, contextId}) {
   const page = 1
   const queryString = discussionQueryString(contextType, page)
   return axios.head(`/api/v1/${contextType}s/${contextId}/discussion_topics?${queryString}`)
 }
 
-export function updateDiscussion ({ contextType, contextId }, discussion, updatedFields) {
+export function updateDiscussion({contextType, contextId}, discussion, updatedFields) {
   const url = `/api/v1/${contextType}s/${contextId}/discussion_topics/${discussion.id}`
   return axios.put(url, updatedFields)
 }
 
-export function deleteDiscussion ({ contextType, contextId }, { discussion }) {
+export function deleteDiscussion({contextType, contextId}, {discussion}) {
   const url = `/api/v1/${contextType}s/${contextId}/discussion_topics/${discussion.id}`
   return axios.delete(url)
 }
 
-export function subscribeToTopic ({ contextType, contextId }, { id }) {
+export function subscribeToTopic({contextType, contextId}, {id}) {
   return axios.put(`/api/v1/${contextType}s/${contextId}/discussion_topics/${id}/subscribed`)
 }
 
-export function unsubscribeFromTopic ({ contextType, contextId }, { id }) {
+export function unsubscribeFromTopic({contextType, contextId}, {id}) {
   return axios.delete(`/api/v1/${contextType}s/${contextId}/discussion_topics/${id}/subscribed`)
 }
 
-export function getUserSettings ({currentUserId}) {
+export function getUserSettings({currentUserId}) {
   return axios.get(`/api/v1/users/${currentUserId}/settings`)
 }
 
-export function getCourseSettings ({contextId}) {
+export function getCourseSettings({contextId}) {
   return axios.get(`/api/v1/courses/${contextId}/settings`)
 }
 
-export function saveCourseSettings ({contextId}, settings) {
+export function saveCourseSettings({contextId}, settings) {
   return axios.put(`/api/v1/courses/${contextId}/settings`, settings)
 }
 
-export function saveUserSettings ({currentUserId}, settings) {
+export function saveUserSettings({currentUserId}, settings) {
   return axios.put(`/api/v1/users/${currentUserId}/settings`, settings)
 }
 
-export function duplicateDiscussion ({ contextType, contextId }, discussionId) {
-  return axios.post(`/api/v1/${contextType}s/${contextId}/discussion_topics/${discussionId}/duplicate`)
+export function duplicateDiscussion({contextType, contextId}, discussionId) {
+  return axios.post(
+    `/api/v1/${contextType}s/${contextId}/discussion_topics/${discussionId}/duplicate`
+  )
 }
 
-export function reorderPinnedDiscussions ({ contextType, contextId }, order) {
-  const postData = { order: order.join(',') }
+export function reorderPinnedDiscussions({contextType, contextId}, order) {
+  const postData = {order: order.join(',')}
   const url = `/api/v1/${contextType}s/${contextId}/discussion_topics/reorder`
   return axios.post(url, postData)
 }

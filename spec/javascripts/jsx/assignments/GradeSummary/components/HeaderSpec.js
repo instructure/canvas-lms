@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {mount} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
 import {Provider} from 'react-redux'
 
 import * as AssignmentActions from 'jsx/assignments/GradeSummary/assignment/AssignmentActions'
@@ -97,6 +97,19 @@ QUnit.module('GradeSummary Header', suiteHooks => {
     notOk(wrapper.text().includes('Moderation is unable to occur'))
   })
 
+  QUnit.module('Graders Table', () => {
+    test('is not displayed when there are no graders', () => {
+      storeEnv.graders = []
+      mountComponent()
+      strictEqual(wrapper.find('GradersTable').length, 0)
+    })
+
+    test('is displayed when there are graders', () => {
+      mountComponent()
+      strictEqual(wrapper.find('GradersTable').length, 1)
+    })
+  })
+
   QUnit.module('"Post" button', hooks => {
     hooks.beforeEach(() => {
       sinon.stub(window, 'confirm').returns(true)
@@ -108,6 +121,17 @@ QUnit.module('GradeSummary Header', suiteHooks => {
     hooks.afterEach(() => {
       AssignmentActions.publishGrades.restore()
       window.confirm.restore()
+    })
+
+    test('is not displayed when there are no graders', () => {
+      storeEnv.graders = []
+      mountComponent()
+      strictEqual(wrapper.find('PostButton').length, 0)
+    })
+
+    test('is displayed when there are graders', () => {
+      mountComponent()
+      strictEqual(wrapper.find('PostButton').length, 1)
     })
 
     test('receives the assignment gradesPublished property as a prop', () => {
@@ -154,6 +178,17 @@ QUnit.module('GradeSummary Header', suiteHooks => {
     hooks.afterEach(() => {
       AssignmentActions.unmuteAssignment.restore()
       window.confirm.restore()
+    })
+
+    test('is not displayed when there are no graders', () => {
+      storeEnv.graders = []
+      mountComponent()
+      strictEqual(wrapper.find('DisplayToStudentsButton').length, 0)
+    })
+
+    test('is displayed when there are graders', () => {
+      mountComponent()
+      strictEqual(wrapper.find('DisplayToStudentsButton').length, 1)
     })
 
     test('receives the assignment as a prop', () => {

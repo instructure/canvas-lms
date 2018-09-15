@@ -17,7 +17,6 @@
  */
 
 import I18n from 'i18n!react_files'
-import React from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
 import '../../jquery.rails_flash_notifications'

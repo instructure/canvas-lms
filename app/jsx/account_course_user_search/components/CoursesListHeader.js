@@ -27,7 +27,7 @@ import {pick} from 'lodash'
 import preventDefault from 'compiled/fn/preventDefault'
 import CoursesList from './CoursesList'
 
-export default function CourseListHeader ({sort, order, onChangeSort, id, label, tipDesc, tipAsc}) {
+export default function CourseListHeader({sort, order, onChangeSort, id, label, tipDesc, tipAsc}) {
   return (
     <ApplyTheme theme={{[Link.theme]: {fontWeight: 'bold'}}}>
       <Tooltip
@@ -36,10 +36,7 @@ export default function CourseListHeader ({sort, order, onChangeSort, id, label,
         onClick={preventDefault(() => onChangeSort(id))}
       >
         {label}
-        {sort === id
-          ? (order === 'asc' ? <IconMiniArrowDown /> : <IconMiniArrowUp />)
-          : ''
-        }
+        {sort === id ? order === 'asc' ? <IconMiniArrowDown /> : <IconMiniArrowUp /> : ''}
       </Tooltip>
     </ApplyTheme>
   )

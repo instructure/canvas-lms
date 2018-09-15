@@ -18,13 +18,13 @@
 
 import '@instructure/ui-themes/lib/canvas'
 import React from 'react'
-import { shallow } from 'enzyme'
+import {shallow} from 'enzyme'
 import AddExternalFeed from '../AddExternalFeed'
 
 const defaultProps = () => ({
   defaultOpen: false,
   isSaving: false,
-  addExternalFeed: () => {},
+  addExternalFeed: () => {}
 })
 
 test('renders the AddExternalFeed component', () => {
@@ -76,7 +76,11 @@ test('submits the AddExternalFeed with correct arguments', () => {
   })
   tree.instance().handleRadioSelectionSetVerbosity('full')
   tree.instance().addRssSelection()
-  expect(addFeedSpy.mock.calls[0][0]).toMatchObject({"header_match": "phrase", "url": "url", "verbosity": "full"})
+  expect(addFeedSpy.mock.calls[0][0]).toMatchObject({
+    header_match: 'phrase',
+    url: 'url',
+    verbosity: 'full'
+  })
 })
 
 test('isDoneSelecting correctly returns true when all arguments are set', () => {

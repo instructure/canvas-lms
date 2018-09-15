@@ -55,7 +55,7 @@ module Plannable
     class Bookmark < Array
       attr_writer :descending
 
-      def <=>(obj)
+      def <=>(other)
         val = super
         val *= -1 if @descending
         val
@@ -66,20 +66,111 @@ module Plannable
     #   Now you can add some hackyness to your life by passing in an array for some sweet coalescing action
     #   as well as the ability to reverse order
     #   e.g. Plannable::Bookmarker.new(Assignment, true, [:due_at, :created_at], :id)
+    #   You can also pass in a hash with the association name as the key and column name as the value
+    #   to order by the joined values:
+    #   e.g. Plannable::Bookmarker.new(AssessmentRequest, true, {submission: {assignment: :due_at}}, :id)
 
     def initialize(model, descending, *columns)
       @model = model
       @descending = !!descending
-      @columns = columns.map{|c| c.is_a?(Array) ? c.map(&:to_s) : c.to_s}
+      @columns = format_columns(columns)
+    end
+
+    def format_columns(columns)
+      columns.map do |col|
+        col.is_a?(Array) ? col.map {|c| format_column(c)} : format_column(col)
+      end
+    end
+
+    def format_column(col)
+      return col if col.is_a?(Hash)
+      col.to_s
+    end
+
+    # Retrieves the associated object or objects' attributes and values to be used
+    # in the bookmark for comparison
+    def associations_attributes(object, col)
+      return unless col.is_a?(Hash)
+      association = association_to_preload(col)
+      item = object.class.eager_load(association).find(object.id)
+
+      if association.is_a?(Hash)
+        object_or_array = associated_object(item, association)
+      elsif association.is_a?(Symbol)
+        object_or_array = item.send(association)
+      end
+
+      if object_or_array.is_a? ActiveRecord::Associations::CollectionProxy
+        association_pairs = object_or_array.collect { |o| [o.id, o.attributes] }
+        pairs = [association, Hash[association_pairs]]
+      else
+        pairs = [association, object_or_array.attributes]
+      end
+
+      Hash[*pairs.flatten(1)]
+    end
+
+    # Loops through our association array (e.g. [:submission, :assignment, :course]) and grabs the
+    # deepest associated object (e.g. `course` in this example)
+    def associated_object(item, association)
+      result = item
+      association_array(association).each do |relation|
+        result = result.send(relation)
+      end
+      result
+    end
+
+    # Turns an association hash into an array to be used for accessing the deepest
+    # associated object, eg:
+    #   {submission: {assignment: :course}} => [:submission, :assignment, :course]
+    def association_array(obj)
+      assoc = []
+      obj.each_pair do |key, value|
+        assoc << key
+        assoc << value.is_a?(Hash) ? association_array(value) : value
+      end
+      assoc.flatten
+    end
+
+    # Gets the association from a hash or single nested hash to use for preloading
+    # e.g. {submission: :cached_due_date} => :submission
+    # or   {submission: {assignment: :due_at}} => {submission: :assignment}
+    # or   {submission: {assignment: {course: id}}} => {submission: {assignment: :course}}
+    def association_to_preload(col)
+      result = {}
+      col.each_pair do |key, value|
+        return key if value.is_a?(Symbol)
+        result[key] = value.is_a?(Hash) ? association_to_preload(value) : value
+      end
+      result
+    end
+
+    # Retrieves the value from the association if the column specified calls for it
+    # e.g. for an assessment request object with a column specified as {submission: {assignment: :due_at}}, fetch
+    # the value of the due_at column for the assignment that's associated through the submission for the
+    # assessment request
+    def association_value(object, col)
+      return unless col.is_a?(Hash)
+      _table, column = associated_table_column(col)
+      associations_attributes(object, col).values.flat_map {|h| h.slice(column).values}
+    end
+
+    # Grabs the value to use for the bookmark & comparison
+    def column_value(object, col)
+      if col.is_a?(Array)
+        object.attributes.values_at(*col).compact.first # coalesce nulls
+      elsif col.is_a?(Hash)
+        association_value(object, col).compact.first
+      else
+        object.attributes[col]
+      end
     end
 
     def bookmark_for(object)
       bookmark = Bookmark.new
       bookmark.descending = @descending
       @columns.each do |col|
-        val = col.is_a?(Array) ?
-          object.attributes.values_at(*col).compact.first : # coalesce nulls
-          object.attributes[col]
+        val = column_value(object, col)
         val = val.utc.strftime("%Y-%m-%d %H:%M:%S.%6N") if val.respond_to?(:strftime)
         bookmark << val
       end
@@ -121,9 +212,29 @@ module Plannable
       @order_by ||= Arel.sql(@columns.map { |col| column_order(col) }.join(', '))
     end
 
+    # Gets the object or object's associated column name to be used in the SQL query
+    def column_name(col)
+      return associated_table_column_name(col) if col.is_a?(Hash)
+      "#{@model.table_name}.#{col}"
+    end
+
+    # Joins the associated table & column together as a string to be used in a SQL query
+    def associated_table_column_name(col)
+      table, column = associated_table_column(col)
+      [table.to_s.classify.constantize.quoted_table_name, column].join(".")
+    end
+
+    # Finds the relevant table & column name when a hash is passed by checking if
+    # the hash specifies a direct or nested (i.e. the hash's value is also a hash) association
+    # returns an array of [table, column]
+    def associated_table_column(col)
+      return col.to_s unless col.is_a?(Hash)
+      col.values.first.is_a?(Hash) ? col.values.first.first : col.first
+    end
+
     def column_order(col_name)
       if col_name.is_a?(Array)
-        order = "COALESCE(#{col_name.map{|c| "#{@model.table_name}.#{c}"}.join(", ")})"
+        order = "COALESCE(#{col_name.map{|c| column_name(c)}.join(', ')})"
       else
         order = column_comparand(col_name)
         if @model.columns_hash[col_name].null
@@ -136,9 +247,7 @@ module Plannable
 
     def column_comparand(column, comparator = '>', placeholder = nil)
       col_name = placeholder ||
-        (column.is_a?(Array) ?
-        "COALESCE(#{column.map{|c| "#{@model.table_name}.#{c}"}.join(", ")})" :
-        "#{@model.table_name}.#{column}")
+        (column.is_a?(Array) ? "COALESCE(#{column.map{|c| column_name(c)}.join(', ')})" : column_name(column))
       if comparator != "=" && type_for_column(column) == :string
         col_name = BookmarkedCollection.best_unicode_collation_key(col_name)
       end

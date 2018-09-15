@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
-describe SIS::CSV::Import do
+describe SIS::CSV::ImportRefactored do
 
   before { account_model }
 
@@ -327,6 +327,15 @@ describe SIS::CSV::Import do
   end
 
   describe "parallel imports" do
+    it 'should retry an importer once' do
+      expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:run_parallel_importer).twice.and_call_original
+      allow_any_instance_of(SIS::CSV::TermImporter).to receive(:process).and_raise("error")
+      process_csv_data(
+        "term_id,name,status",
+        "T001,Winter13,active"
+      )
+    end
+
     it 'should only run an importer once if successful' do
       expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:run_parallel_importer).once.and_call_original
       process_csv_data(

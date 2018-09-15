@@ -43,7 +43,7 @@ describe Quizzes::QuizReportsController, type: :request do
     end
 
     context 'with privileged access' do
-      before :once do
+      before(:once) do
         teacher_in_course(:active_all => true)
         @quiz = @course.quizzes.create({ title: 'Test Quiz' })
       end
@@ -58,25 +58,33 @@ describe Quizzes::QuizReportsController, type: :request do
           to eq %w[ item_analysis student_analysis ]
       end
 
-      describe 'the `includes_all_versions` flag' do
-        it 'enables it' do
-          json = api_index({ includes_all_versions: true })
-
-          student_analysis = json.detect do |report|
+      context 'flags' do
+        def student_analysis(opts = {})
+          json = api_index(opts)
+          json.detect do |report|
             report['report_type'] == 'student_analysis'
           end
-
-          expect(student_analysis['includes_all_versions']).to eq true
         end
 
-        it 'defaults to false' do
-          json = api_index
-
-          student_analysis = json.detect do |report|
-            report['report_type'] == 'student_analysis'
+        describe 'the `includes_all_versions` flag' do
+          it 'enables it' do
+            expect(student_analysis(includes_all_versions: true)['includes_all_versions']).to eq true
           end
 
-          expect(student_analysis['includes_all_versions']).to eq false
+          it 'defaults to false' do
+            expect(student_analysis()['includes_all_versions']).to eq false
+          end
+        end
+
+        describe 'includes_sis_ids' do
+          it 'includes sis ids for users with access' do
+            expect(student_analysis()['includes_sis_ids']).to eq true
+          end
+
+          it 'does not include sis ids for users without access' do
+            ta_in_course(active_all: true)
+            expect(student_analysis()['includes_sis_ids']).to eq false
+          end
         end
       end
 
@@ -186,7 +194,7 @@ describe Quizzes::QuizReportsController, type: :request do
       end
 
       it "should return 409 when report is being/already generated" do
-        stats = @quiz.current_statistics_for(report_type)
+        stats = @quiz.current_statistics_for(report_type, includes_sis_ids: true)
         stats.generate_csv_in_background
 
         api_create({

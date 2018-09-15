@@ -27,7 +27,7 @@ module LtiAdvantage
     def validate_nested_models(attr, value, record)
       return validate_nested_array(attr, value, record) if value.instance_of? Array
       return unless value.respond_to?(:invalid?)
-      record.errors.add(attr, value.errors.messages) if value.invalid?
+      record.errors.add(attr, value.errors) if value.invalid?
     end
 
     def validate_nested_array(attr, value, record)

@@ -20,7 +20,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 require 'simple_oauth'
 
 describe Lti::Security do
-
   describe '.signed_post_params' do
     let(:params) { {custom_a: 1, custom_b:2} }
     let(:consumer_key) { 'test' }

@@ -33,13 +33,12 @@ module SIS
       def process(csv, index=nil, count=nil)
         messages = []
         count = SIS::CourseImporter.new(@root_account, importer_opts).process(messages) do |importer|
-          update_progress
           csv_rows(csv, index, count) do |row|
             start_date = nil
             end_date = nil
             begin
-              start_date = DateTime.parse(row['start_date']) if row['start_date'].present?
-              end_date = DateTime.parse(row['end_date']) if row['end_date'].present?
+              start_date = Time.zone.parse(row['start_date']) if row['start_date'].present?
+              end_date = Time.zone.parse(row['end_date']) if row['end_date'].present?
             rescue
               messages << SisBatch.build_error(csv, "Bad date format for course #{row['course_id']}", sis_batch: @batch, row: row['lineno'], row_info: row)
             end

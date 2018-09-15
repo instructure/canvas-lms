@@ -94,12 +94,12 @@ describe "student planner" do
       validate_link_to_url(@assignment, 'assignments')
     end
 
-    it "navigates to the assignment submissions page when they are submitted" do
-      skip('skip until ADMIN-179')
-      submission = @assignment.submit_homework(@student1, submission_type: "online_text_entry",
+    it "navigates to the assignment submissions page when they are submitted." do
+      @assignment.submit_homework(@student1, submission_type: "online_text_entry",
                                   body: "Assignment submitted")
       go_to_list_view
-      validate_link_to_submissions(@assignment, submission,'assignments')
+      fj("button:contains('Show 1 completed item')").click
+      validate_link_to_submissions(@assignment, @student1,'assignments')
     end
 
     it "enables the checkbox when an assignment is completed", priority: "1", test_id: 3306201 do
@@ -185,6 +185,7 @@ describe "student planner" do
 
     it "navigates to the submissions page once the graded discussion has a reply" do
       skip('skip until ADMIN-179')
+      go_to_list_view
       @discussion.reply_from(user: @student1, text: 'user reply')
       # for discussion, submissions page has the users id. So, sending the student object instead of submission for id
       validate_link_to_submissions(@assignment_d, @student1, 'assignments')
@@ -223,15 +224,15 @@ describe "student planner" do
     end
 
     it 'shows the date in the index page' do
-      skip('unskip with ADMIN-1160')
       get "/courses/#{@course.id}/discussion_topics/"
-      expect(discussion_index_page_detail.text).to eq(format_time_for_view(@ungraded_discussion.todo_date))
+      todo_date = discussion_index_page_detail.text.split("To do ")[1]
+      expect(todo_date).to eq(format_time_for_view(@ungraded_discussion.todo_date))
     end
 
     it 'shows the date in the show page' do
-      skip('unskip with ADMIN-1160')
       get "/courses/#{@course.id}/discussion_topics/#{@ungraded_discussion.id}/"
-      expect(discussion_show_page_detail.text).to eq(format_time_for_view(@ungraded_discussion.todo_date))
+      todo_date = discussion_show_page_detail.text.split("To-Do Date: ")[1]
+      expect(todo_date).to eq(format_time_for_view(@ungraded_discussion.todo_date))
     end
   end
 
@@ -286,6 +287,29 @@ describe "student planner" do
       go_to_list_view
       validate_object_displayed('Quiz')
       validate_link_to_url(@quiz, 'quizzes')
+    end
+  end
+
+  context "Peer Reviews" do
+    before :once do
+      @reviewee = User.create!(name: 'Student 2')
+      @course.enroll_student(@reviewee).accept!
+      @assignment = @course.assignments.create({
+                                                 name: 'Peer Review Assignment',
+                                                 due_at: 1.day.from_now,
+                                                 submission_types: 'online_text_entry'
+                                               })
+      submission = @assignment.submit_homework(@reviewee, body: "review this")
+      @peer_review = AssessmentRequest.create!({
+                                                user: @reviewee,
+                                                asset: submission,
+                                                assessor_asset: @student1,
+                                                assessor: @student1
+                                              })
+    end
+
+    it "shows and navigates to peer review submissions from the student planner" do
+      skip("unskip with ADMIN-1306")
     end
   end
 
@@ -360,8 +384,7 @@ describe "student planner" do
       expect(f('body')).not_to contain_css(todo_sidebar_modal_selector)
     end
 
-    it "edits a To Do.", priority: "1", test_id: 3281714 do
-      skip('build breaking, I believe because selenium is running against stale code. skipping so this commit can move forward.')
+    it "edits a To Do", priority: "1", test_id: 3281714 do
       @student1.planner_notes.create!(todo_date: 2.days.from_now, title: "Title Text")
       go_to_list_view
       # Opens the To Do edit sidebar
@@ -383,9 +406,12 @@ describe "student planner" do
       expect(f('body')).not_to contain_css(todo_sidebar_modal_selector)
     end
 
-    it "edits a completed To Do", priority: "1" do
-      skip("build breaking, for some reason, it won't click a:contains('Title Text') 12 lines down.")
-      @student1.planner_notes.create!(todo_date: 2.days.from_now, title: "Title Text")
+    it "edits a completed To Do.", priority: "1" do
+      # The following student planner is added to avoid the `beginning of to-do history` image
+      # which makes the page to scroll and causes flakiness
+      @student1.planner_notes.create!(todo_date: 1.day.ago, title: "Past Title")
+
+      @student1.planner_notes.create!(todo_date: 1.day.from_now, title: "Title Text")
       go_to_list_view
 
       # complete it
@@ -489,7 +515,7 @@ describe "student planner" do
       view_todo_item
       modal = todo_sidebar_modal(@student_to_do.title)
       title_input = f('input', modal)
-      course_name_dropdown = fj('span:contains("Course")>span>span>input', modal)
+      course_name_dropdown = fj('span:contains("Course")>span>span>span>input', modal)
 
       expect(title_input[:value]).to eq(@student_to_do.title)
       expect(course_name_dropdown[:value]).to eq("#{@course.name} - #{@course.short_name}")
@@ -501,7 +527,9 @@ describe "student planner" do
 
     it "allows editing the course of a to-do item", priority: "1", test_id: 3418827 do
       view_todo_item
-      fj(":contains('Unnamed Course')>span>input[role=combobox]").click
+      
+      input = driver.execute_script("return $('[aria-label=\"Edit Student to do\"] input[role=combobox]').filter((i,el) => el.value.includes('Unnamed Course'))[0]")
+      input.click
       fj("[role='option'] :contains('Optional: Add Course')").click
       todo_save_button.click
       @student_to_do.reload
@@ -511,7 +539,11 @@ describe "student planner" do
     it "has courses in the course combo box.", priority: "1", test_id: 3263160 do
       go_to_list_view
       todo_modal_button.click
-      fj(":contains('Optional: Add Course')>span>input[role=combobox]").click
+      input = nil
+      keep_trying_until do 
+        input = driver.execute_script("return $('[aria-label=\"Add To Do\"] input[role=combobox]').filter((i,el) => el.value.includes('Optional: Add Course'))[0]")
+      end
+      input.click
       expect(fj("[role='option'] :contains('Unnamed Course')")).to be
     end
 

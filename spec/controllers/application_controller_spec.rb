@@ -16,14 +16,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
+require_relative '../spec_helper'
+require_relative '../lti_1_3_spec_helper'
 
-describe ApplicationController do
-
+RSpec.describe ApplicationController do
   before :each do
-    allow(controller).to receive(:request).and_return(double(:host_with_port => "www.example.com",
-                                            :host => "www.example.com",
-                                            :headers => {}, :format => double(:html? => true)))
+    request_double = double(
+      host_with_port: "www.example.com",
+      host: "www.example.com",
+      headers: {},
+      format: double(:html? => true)
+    )
+    allow(controller).to receive(:request).and_return(request_double)
   end
 
   describe "#google_drive_connection" do
@@ -152,6 +156,7 @@ describe ApplicationController do
     end
 
     context "sharding" do
+      require_relative '../sharding_spec_helper'
       specs_require_sharding
 
       it "should set the global id for the domain_root_account" do
@@ -346,6 +351,7 @@ describe ApplicationController do
 
   describe 'rescue_action_in_public' do
     context 'sharding' do
+      require_relative '../sharding_spec_helper'
       specs_require_sharding
 
       before do
@@ -528,6 +534,59 @@ describe ApplicationController do
         it 'does display the assignment edit sidebar if display type is not "full_width"' do
           controller.send(:content_tag_redirect, course, content_tag, nil)
           expect(assigns[:append_template]).to be_present
+        end
+      end
+
+      context 'lti version' do
+        let(:user) { User.new }
+
+        before do
+          allow(controller).to receive(:named_context_url).and_return('wrong_url')
+          allow(controller).to receive(:lti_grade_passback_api_url).and_return('wrong_url')
+          allow(controller).to receive(:blti_legacy_grade_passback_api_url).and_return('wrong_url')
+          allow(controller).to receive(:lti_turnitin_outcomes_placement_url).and_return('wrong_url')
+
+          allow(controller).to receive(:render)
+          allow(controller).to receive_messages(js_env:[])
+          controller.instance_variable_set(:"@context", course)
+          allow(content_tag).to receive(:id).and_return(42)
+          allow(controller).to receive(:require_user) { user_model }
+          controller.instance_variable_set(:@current_user, user)
+          controller.instance_variable_set(:@domain_root_account, course.account)
+          content_tag.update_attributes!(context: assignment_model)
+        end
+
+        describe 'LTI 1.3' do
+          let_once(:developer_key) { DeveloperKey.create! }
+          include_context 'lti_1_3_spec_helper'
+
+          before do
+            tool.developer_key = developer_key
+            tool.settings['use_1_3'] = true
+            tool.save!
+          end
+
+          context 'assignments' do
+            it 'creates a resource link request when tool is configured to use LTI 1.3' do
+              controller.send(:content_tag_redirect, course, content_tag, nil)
+              jwt = JSON::JWT.decode(assigns[:lti_launch].params[:id_token], :skip_verification)
+              expect(jwt["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
+            end
+          end
+
+          context 'module items' do
+            it 'creates a resource link request when tool is configured to use LTI 1.3' do
+              content_tag.update!(context: course.account)
+              controller.send(:content_tag_redirect, course, content_tag, nil)
+              jwt = JSON::JWT.decode(assigns[:lti_launch].params[:id_token], :skip_verification)
+              expect(jwt["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
+            end
+          end
+        end
+
+        it 'creates a basic lti launch request when tool is not configured to use LTI 1.3' do
+          controller.send(:content_tag_redirect, course, content_tag, nil)
+          expect(assigns[:lti_launch].params["lti_message_type"]).to eq "basic-lti-launch-request"
         end
       end
 
@@ -782,6 +841,7 @@ describe ApplicationController do
     end
 
     context "sharding" do
+      require_relative '../sharding_spec_helper'
       specs_require_sharding
 
       it "should not asplode with cross-shard groups" do
@@ -1287,6 +1347,86 @@ describe CoursesController do
         expect(controller).not_to receive(:api_request?)
         controller.send(:validate_scopes)
       end
+    end
+  end
+end
+
+RSpec.describe ApplicationController, '#render_unauthorized_action' do
+  controller do
+    def index
+      render_unauthorized_action
+    end
+  end
+
+  before :once do
+    @teacher = course_with_teacher(active_all: true).user
+  end
+
+  before do
+    user_session(@teacher)
+    get :index, format: format
+  end
+
+  describe 'pdf format' do
+    let(:format) { :pdf }
+
+    specify { expect(response.headers.fetch('Content-Type')).to match(/\Atext\/html/) }
+    specify { expect(response).to have_http_status :unauthorized }
+    specify { expect(response).to render_template('shared/unauthorized') }
+  end
+
+  describe 'html format' do
+    let(:format) { :html }
+
+    specify { expect(response.headers.fetch('Content-Type')).to match(/\Atext\/html/) }
+    specify { expect(response).to have_http_status :unauthorized }
+    specify { expect(response).to render_template('shared/unauthorized') }
+  end
+
+  describe 'json format' do
+    let(:format) { :json }
+
+    specify { expect(response.headers['Content-Type']).to match(/\Aapplication\/json/) }
+    specify { expect(response).to have_http_status :unauthorized }
+    specify { expect(json_parse.fetch('status')).to eq 'unauthorized' }
+  end
+end
+
+RSpec.describe ApplicationController, '#redirect_to_login' do
+  controller do
+    def index
+      redirect_to_login
+    end
+  end
+
+  before do
+    get :index, format: format
+  end
+
+  context 'given an unauthenticated json request' do
+    let(:format) { :json }
+
+    specify { expect(response).to have_http_status :unauthorized }
+    specify { expect(json_parse.fetch('status')).to eq 'unauthenticated' }
+  end
+
+  shared_examples 'redirectable to html login page' do
+    specify { expect(flash[:warning]).to eq 'You must be logged in to access this page' }
+    specify { expect(session[:return_to]).to eq controller.clean_return_to(request.fullpath) }
+    specify { expect(response).to redirect_to login_url }
+    specify { expect(response).to have_http_status :found }
+    specify { expect(response.location).to eq login_url }
+  end
+
+  context 'given an unauthenticated html request' do
+    it_behaves_like 'redirectable to html login page' do
+      let(:format) { :html }
+    end
+  end
+
+  context 'given an unauthenticated pdf request' do
+    it_behaves_like 'redirectable to html login page' do
+      let(:format) { :pdf }
     end
   end
 end

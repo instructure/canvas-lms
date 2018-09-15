@@ -33,7 +33,6 @@ module SIS
       def process(csv, index=nil, count=nil)
         count = SIS::XlistImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv, index, count) do |row|
-            update_progress
             begin
               importer.add_crosslist(row['xlist_course_id'], row['section_id'], row['status'])
             rescue ImportError => e

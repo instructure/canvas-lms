@@ -231,11 +231,12 @@ class EnrollmentState < ActiveRecord::Base
       update_all(["lock_version = COALESCE(lock_version, 0) + 1, state_is_current = ?", false])
   end
 
-  def self.force_recalculation(enrollment_ids)
+  def self.force_recalculation(enrollment_ids, strand: nil)
     if enrollment_ids.any?
       EnrollmentState.where(:enrollment_id => enrollment_ids).
         update_all(["lock_version = COALESCE(lock_version, 0) + 1, state_is_current = ?", false])
-      EnrollmentState.send_later_if_production(:process_states_for_ids, enrollment_ids)
+      args = strand ? {n_strand: strand} : {}
+      EnrollmentState.send_later_if_production_enqueue_args(:process_states_for_ids, args, enrollment_ids)
     end
   end
 

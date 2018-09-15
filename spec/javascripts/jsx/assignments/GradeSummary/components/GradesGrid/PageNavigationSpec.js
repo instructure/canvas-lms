@@ -52,24 +52,24 @@ QUnit.module('GradeSummary PageNavigation', suiteHooks => {
 
   test('includes a button for "Next Page" when not on the last page', () => {
     mountComponent()
-    strictEqual(findButtons(button => button.prop('title') === 'Next Page').length, 1)
+    strictEqual(findButtons(button => button.text() === 'Next Page').length, 1)
   })
 
   test('excludes the button for "Next Page" when on the last page', () => {
     props.currentPage = 10
     mountComponent()
-    strictEqual(findButtons(button => button.prop('title') === 'Next Page').length, 0)
+    strictEqual(findButtons(button => button.text() === 'Next Page').length, 0)
   })
 
   test('includes a button for "Previous Page" when not on the first page', () => {
     props.currentPage = 5
     mountComponent()
-    strictEqual(findButtons(button => button.prop('title') === 'Previous Page').length, 1)
+    strictEqual(findButtons(button => button.text() === 'Previous Page').length, 1)
   })
 
   test('excludes the button for "Previous Page" when on the first page', () => {
     mountComponent()
-    strictEqual(findButtons(button => button.prop('title') === 'Previous Page').length, 0)
+    strictEqual(findButtons(button => button.text() === 'Previous Page').length, 0)
   })
 
   test('calls onPageClick when a page button is clicked', () => {
@@ -88,14 +88,14 @@ QUnit.module('GradeSummary PageNavigation', suiteHooks => {
   test('calls onPageClick when the "Next Page" button is clicked', () => {
     props.currentPage = 3
     mountComponent()
-    findButtons(button => button.prop('title') === 'Next Page').simulate('click')
+    findButtons(button => button.text() === 'Next Page').simulate('click')
     strictEqual(props.onPageClick.callCount, 1)
   })
 
   test('includes the next page number when calling onPageClick for "Next Page"', () => {
     props.currentPage = 3
     mountComponent()
-    findButtons(button => button.prop('title') === 'Next Page').simulate('click')
+    findButtons(button => button.text() === 'Next Page').simulate('click')
     const [page] = props.onPageClick.lastCall.args
     strictEqual(page, 4)
   })
@@ -103,14 +103,14 @@ QUnit.module('GradeSummary PageNavigation', suiteHooks => {
   test('calls onPageClick when the "Previous Page" button is clicked', () => {
     props.currentPage = 3
     mountComponent()
-    findButtons(button => button.prop('title') === 'Previous Page').simulate('click')
+    findButtons(button => button.text() === 'Previous Page').simulate('click')
     strictEqual(props.onPageClick.callCount, 1)
   })
 
   test('includes the previous page number when calling onPageClick for "Previous Page"', () => {
     props.currentPage = 3
     mountComponent()
-    findButtons(button => button.prop('title') === 'Previous Page').simulate('click')
+    findButtons(button => button.text() === 'Previous Page').simulate('click')
     const [page] = props.onPageClick.lastCall.args
     strictEqual(page, 2)
   })

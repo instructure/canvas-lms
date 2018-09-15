@@ -61,6 +61,7 @@ export default class BlueprintRouter {
   }
 
   stop () {
-    page.stop()
+    // it's possible that we're not the only thing using page
+    // page.stop()
   }
 }

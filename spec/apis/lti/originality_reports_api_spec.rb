@@ -124,13 +124,13 @@ module Lti
         ].freeze
 
         get @endpoints[:show], headers: request_headers
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(JSON.parse(response.body).keys).to match_array(expected_keys)
       end
 
       it "returns the specified originality report in the response" do
         get @endpoints[:show], headers: request_headers
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(JSON.parse(response.body)['id']).to eq @report.id
       end
 
@@ -214,13 +214,13 @@ module Lti
             'link_id'
           ].freeze
           get @endpoints[:alt_show], headers: request_headers
-          expect(response).to be_success
+          expect(response).to be_successful
           expect(JSON.parse(response.body).keys).to match_array(expected_keys)
         end
 
         it "returns the specified originality report in the response" do
           get @endpoints[:alt_show], headers: request_headers
-          expect(response).to be_success
+          expect(response).to be_successful
           expect(JSON.parse(response.body)['id']).to eq @report.id
         end
 
@@ -300,7 +300,7 @@ module Lti
 
         put @endpoints[:update], params: {originality_report: {originality_score: 0.3}}, headers: request_headers
 
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(OriginalityReport.find(@report.id).originality_score).to eq 0.3
       end
 
@@ -320,14 +320,14 @@ module Lti
         report_file.save!
 
         put @endpoints[:update], params: {originality_report: {originality_report_file_id: report_file.id}}, headers: request_headers
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(OriginalityReport.find(@report.id).originality_report_file_id).to eq report_file.id
       end
 
       it "updates originality report url" do
 
         put @endpoints[:update], params: {originality_report: {originality_report_url: "http://www.test.com"}}, headers: request_headers
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(OriginalityReport.find(@report.id).originality_report_url).to eq "http://www.test.com"
       end
 
@@ -342,7 +342,7 @@ module Lti
               }
             },
             headers: request_headers
-        expect(response).to be_success
+        expect(response).to be_successful
         tool_setting = OriginalityReport.find(@report.id).lti_link
         expect(tool_setting.resource_url).to eq "http://www.lti-test.com"
       end
@@ -359,7 +359,7 @@ module Lti
               }
             },
             headers: request_headers
-        expect(response).to be_success
+        expect(response).to be_successful
         lti_link_id = OriginalityReport.find(@report.id).lti_link.id
         put @endpoints[:update],
             params: {
@@ -368,7 +368,7 @@ module Lti
               }
             },
             headers: request_headers
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(Lti::Link.find_by(id: lti_link_id)).to eq OriginalityReport.find(@report.id).lti_link
       end
 
@@ -502,7 +502,7 @@ module Lti
         it "updates originality score" do
           put @endpoints[:update_alt], params: {originality_report: {originality_score: 0.3}}, headers: request_headers
 
-          expect(response).to be_success
+          expect(response).to be_successful
           expect(OriginalityReport.find(@report.id).originality_score).to eq 0.3
         end
 
@@ -521,13 +521,13 @@ module Lti
           report_file = @attachment.dup
           report_file.save!
           put @endpoints[:update_alt], params: {originality_report: {originality_report_file_id: report_file.id}}, headers: request_headers
-          expect(response).to be_success
+          expect(response).to be_successful
           expect(OriginalityReport.find(@report.id).originality_report_file_id).to eq report_file.id
         end
 
         it "updates originality report url" do
           put @endpoints[:update_alt], params: {originality_report: {originality_report_url: "http://www.test.com"}}, headers: request_headers
-          expect(response).to be_success
+          expect(response).to be_successful
           expect(OriginalityReport.find(@report.id).originality_report_url).to eq "http://www.test.com"
         end
 
@@ -542,7 +542,7 @@ module Lti
                 }
               },
               headers: request_headers
-          expect(response).to be_success
+          expect(response).to be_successful
           lti_link = OriginalityReport.find(@report.id).lti_link
           expect(lti_link.resource_url).to eq "http://www.lti-test.com"
         end
@@ -652,7 +652,7 @@ module Lti
         ].freeze
 
         post @endpoints[:create], params: {originality_report: {file_id: @attachment.id, originality_score: 0.4}}, headers: request_headers
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(JSON.parse(response.body).keys).to match_array(expected_keys)
       end
 
@@ -867,7 +867,7 @@ module Lti
         end
 
         it "sets the attachment" do
-          expect(response).to be_success
+          expect(response).to be_successful
           created_report = OriginalityReport.find(@response_hash['id'])
           expect(created_report.attachment).to eq @attachment
         end

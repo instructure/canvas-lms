@@ -20,24 +20,28 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import CoursesPane from 'jsx/account_course_user_search/components/CoursesPane';
 import CoursesStore from 'jsx/account_course_user_search/store/CoursesStore';
+import TermsStore from 'jsx/account_course_user_search/store/TermsStore';
+import AccountsTreeStore from 'jsx/account_course_user_search/store/AccountsTreeStore';
 
+const stores = [CoursesStore, TermsStore, AccountsTreeStore]
+
+let wrapper
 QUnit.module('Account Course User Search CoursesPane View', {
   setup () {
-    CoursesStore.reset({ accountId: '1' });
+    stores.forEach(store => store.reset({accountId: '1'}))
+    wrapper = shallow(
+      <CoursesPane
+        accountId="1"
+        roles={[{id: '1' }]}
+        queryParams={{}}
+        onUpdateQueryParams={function(){}}
+      />
+    )
   },
   teardown () {
-    CoursesStore.reset({});
+    stores.forEach(store => store.reset({}))
   }
 });
-
-const wrapper = shallow(
-  <CoursesPane
-    accountId="1"
-    roles={[{id: '1' }]}
-    queryParams={{}}
-    onUpdateQueryParams={function(){}}
-  />
-);
 
 test('onUpdateFilters calls debouncedApplyFilters after updating state', () => {
   const instance = wrapper.instance();

@@ -239,6 +239,15 @@
 #           "description": "The ID of the SIS Import that this import was diffed against",
 #           "example": 1,
 #           "type": "integer"
+#         },
+#         "csv_attachments": {
+#           "description": "An array of CSV files for processing",
+#           "example": [],
+#           "type": "array",
+#           "items": {
+#             "type": "array",
+#             "items": {"$ref": "File"}
+#           }
 #         }
 #       }
 #     }
@@ -594,5 +603,4 @@ class SisImportsApiController < ApplicationController
       render json: {aborted: true}
     end
   end
-
 end

@@ -336,7 +336,12 @@ describe SubmissionsController do
         @u1 = @user
         student_in_course(:course => @course)
         @u2 = @user
-        @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_text_entry", :group_category => GroupCategory.create!(:name => "groups", :context => @course), :grade_group_students_individually => true)
+        @assignment = @course.assignments.create!(
+          title: "some assignment",
+          submission_types: "online_text_entry",
+          group_category: GroupCategory.create!(:name => "groups", :context => @course),
+          grade_group_students_individually: false
+        )
         @group = @assignment.group_category.groups.create!(:name => 'g1', :context => @course)
         @group.users << @u1
         @group.users << @user
@@ -393,6 +398,27 @@ describe SubmissionsController do
         subs = @assignment.submissions
         expect(subs.size).to eq 2
         expect(subs.to_a.sum{ |s| s.submission_comments.size }).to eql 2
+      end
+
+      it "succeeds when commenting to the group from a student using PUT" do
+        user_session(@u1)
+        request.path = "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@u1.id}"
+        post(
+          :update,
+          params: {
+            course_id: @course.id,
+            assignment_id: @assignment.id,
+            id: @u1.id,
+            submission: {
+              assignment_id: @assignment.id,
+              user_id: @u1.id,
+              group_comment: '1',
+              comment: "some comment"
+            },
+          },
+          format: 'json')
+
+        expect(response).to be_successful
       end
     end
 
@@ -673,9 +699,9 @@ describe SubmissionsController do
   end
 
   describe 'POST resubmit_to_turnitin' do
-    it 'returns 400 if submission_id is not integer' do
+    it 'returns 400 if assignment_id is not integer' do
       assignment = assignment_model
-      post 'resubmit_to_turnitin', params: {:course_id => assignment.context_id, :assignment_id => assignment.id, :submission_id => '{ user_id }'}
+      post 'resubmit_to_turnitin', params: {course_id: assignment.context_id, assignment_id: 'assignment-id', submission_id: test_student.id}
       expect(response.response_code).to eq 400
     end
 
@@ -689,6 +715,17 @@ describe SubmissionsController do
       expect(Canvas::LiveEvents).to receive(:plagiarism_resubmit)
       post 'resubmit_to_turnitin', params: {course_id: assignment.context_id, assignment_id: assignment.id, submission_id: test_student.id}
     end
+  end
+
+  it "redirects to speed grader when an anonymous submission id is used" do
+    params = {
+      course_id: assignment.context_id,
+      assignment_id: assignment.id,
+      submission_id: assignment.submission_for_student(test_student).anonymous_id,
+      anonymous: true
+    }
+    post 'resubmit_to_turnitin', params: params
+    expect(response).to be_redirect
   end
 
   describe 'POST resubmit_to_vericite' do

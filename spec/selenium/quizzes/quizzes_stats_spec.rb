@@ -80,6 +80,7 @@ describe 'quizzes stats' do
         end
 
         it 'should download a csv when pressing #{report_type} button ', priority: "1", test_id: 270039 do
+          skip("QUIZ-5120")
           button = fj(".generate-report:contains('#{report_type}')")
           button.click
           wait_for_ajaximations
