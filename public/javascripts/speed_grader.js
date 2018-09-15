@@ -50,7 +50,8 @@ import SpeedgraderHelpers, {
   setupAnonymizableUserId,
   setupAnonymizableAuthorId,
   setupAnonymousGraders,
-  setupIsAnonymous
+  setupIsAnonymous,
+  setupIsModerated
 } from './speed_grader_helpers';
 import turnitinInfoTemplate from 'jst/_turnitinInfo';
 import turnitinScoreTemplate from 'jst/_turnitinScore';
@@ -87,6 +88,7 @@ let anonymizableId
 let anonymizableUserId
 let anonymizableStudentId
 let anonymizableAuthorId
+let isModerated
 
 let $window
 let $full_width_container
@@ -839,7 +841,10 @@ function handleSelectedRubricAssessmentChanged({validateEnteredData = true} = {}
     editingData
   );
 
-  const showEditButton = !selectedAssessment || assessmentBelongsToCurrentUser(selectedAssessment)
+  let showEditButton = true
+  if (isModerated) {
+    showEditButton = !selectedAssessment || assessmentBelongsToCurrentUser(selectedAssessment)
+  }
   $('#rubric_assessments_list_and_edit_button_holder .edit').showIf(showEditButton)
 }
 
@@ -1163,6 +1168,7 @@ EG = {
 
   jsonReady: function(){
     isAnonymous = setupIsAnonymous(jsonData)
+    isModerated = setupIsModerated(jsonData)
     anonymousGraders = setupAnonymousGraders(jsonData)
     anonymizableId = setupAnonymizableId(isAnonymous)
     anonymizableUserId = setupAnonymizableUserId(isAnonymous)

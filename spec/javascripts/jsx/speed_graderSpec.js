@@ -4530,6 +4530,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       }
 
       testJsonData = {
+        moderated_grading: true,
         context: {
           students: [student],
           enrollments: [{user_id: '10', workflow_state: 'active', course_setion_id: 1}],
@@ -4656,6 +4657,19 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         notOk($('#rubric_assessments_list_and_edit_button_holder .edit').is(':visible'))
       })
 
+      test('shows a button to edit', () => {
+        finishSetup()
+
+        ok($('#rubric_assessments_list_and_edit_button_holder .edit').is(':visible'))
+      })
+
+      test('shows a button to edit if moderated_grading disabled', () => {
+        testJsonData.moderated_grading = false
+        finishSetup()
+
+        ok($('#rubric_assessments_list_and_edit_button_holder .edit').is(':visible'))
+      })
+
       test('labels the moderator-submitted assessment as "Custom"', () => {
         finishSetup()
         strictEqual($('#rubric_assessments_select option[value="1"]').text(), 'Custom')
@@ -4728,7 +4742,12 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       `)
 
       fakeENV.setup({
-        current_user_id: '1'
+        current_user_id: '1',
+        assignment_id: '17',
+        course_id: '29',
+        grading_role: 'moderator',
+        help_url: 'example.com/support',
+        show_help_menu_item: false
       })
 
       submission = {
