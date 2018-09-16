@@ -258,7 +258,7 @@ class Quizzes::QuizStatisticsController < ApplicationController
       scope = @quiz.quiz_submissions.not_settings_only.completed
       updated = scope.order('updated_at DESC').limit(1).pluck(:updated_at).first
       cache_key = [
-        'quiz_statistics',
+        'quiz_statistics_1',
         @quiz.id,
         @quiz.updated_at,
         updated,
@@ -293,6 +293,7 @@ class Quizzes::QuizStatisticsController < ApplicationController
   def serialize(statistics)
     Canvas::APIArraySerializer.new([ statistics ], {
       controller: self,
+      scope: @current_user,
       each_serializer: Quizzes::QuizStatisticsSerializer,
       root: :quiz_statistics,
       include_root: false

@@ -36,5 +36,12 @@ define(function(require) {
       expect('a[href*=speed_grader]').toExist();
       expect(find('a[href*=speed_grader]').innerText).toContain('View in SpeedGrader');
     });
+
+    it('should not render if no link to speedgrader present', () => {
+      setProps({
+        speedGraderUrl: null
+      })
+      expect('a').not.toExist()
+    })
   });
 });
