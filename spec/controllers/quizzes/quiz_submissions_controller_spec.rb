@@ -230,6 +230,24 @@ describe Quizzes::QuizSubmissionsController do
         expect(json).to have_key('has_seen_results')
         expect(json['has_seen_results']).to eq false
       end
+
+      it "should require a valid user id" do
+        user_session(@teacher)
+        request.accept = "application/json"
+        post 'extensions', params: {quiz_id: quiz.id, course_id: @course, user_id: 'foo', extra_attempts: 12}
+        expect(response).to be_not_found
+      end
+
+      it "should allow updating inactive students" do
+        user_session(@teacher)
+        @student.enrollments.last.deactivate
+        request.accept = "application/json"
+        post 'extensions', params: {quiz_id: quiz.id, course_id: @course, user_id: @student.id, extra_attempts: 12}
+        expect(response).to be_successful
+        json = JSON.parse(response.body)
+        expect(json).to have_key('extra_attempts')
+        expect(json['extra_attempts']).to eq 12
+      end
     end
   end
 end
