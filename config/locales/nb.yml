@@ -95,10 +95,13 @@ nb:
         partner_id: "Partner ID"
         partner_key: Partnernøkkel
   accept_2fdd362e: Godta
+  accept_grades_4d56a3dd: "Aksepter karakterer"
   acceptable_use_policy_29a28124: "Retningslinjer om akseptabel bruk"
+  accepted_c9f8ab87: Akseptert
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "Godkjente formater: hex, rgba, rgb, hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "Godkjente formater: svg, png, jpg, gif"
   accepted_user_role_type_course_course_2ce91589: "Akseptert: %{user}, %{role_type}, emne, %{course}"
+  accepting_40ba3b70: Aksepterer
   access_report_80d28095: Tilgangsrapport
   access_token_3be22221: Tilgangssymbol
   access_token_count_access_token_count_dfb5463c: "Få tilgang til antall tegn: %{access_token_count}"
@@ -142,6 +145,7 @@ nb:
     tab_users: Brukere
     turnitin_pledge: "Denne oppgaveinnleveringen er mitt eget, originale arbeid"
   account_97b34646: Konto
+  account_account_b6b3746b: "Konto: %{account}"
   account_and_subaccount_40c6430: "Konto og underkonto"
   account_authorization_config: 
     default_delegated_login_handle_name: Innlogging
@@ -1553,6 +1557,7 @@ nb:
     add_topic_to: "Legg diskusjonsemner til %{module}"
   add_more_e1ffaa65: "Legg til flere"
   add_new_announcement_ddacd624: "Legg til ny kunngjøring"
+  add_new_domain_e097d4a0: "Legg til nytt domene"
   add_new_group_7ac49f31: "Legg til ny gruppe"
   add_new_set_of_due_dates_e8e240f: "Legg til nytt sett av forfallsdatoer"
   add_new_term_d2217c0d: "Legg til nytt semester"
@@ -1766,6 +1771,7 @@ nb:
   allows_user_to_access_the_view_notifications_tab_i_71995596: "Lar en bruker bruke 'Vis varslinger'-fanen i Administrasjonsverktøy."
   allows_user_to_act_as_other_users_in_the_account_195628ae: "Lar en bruker opptre som andre brukere i kontoen."
   allows_user_to_add_and_remove_other_account_admins_7834ea9a: "Lar en bruker legge til og fjerne andre kontoadministratorer."
+  allows_user_to_add_discussions_in_the_discussions__1b3d9a53: "Lar en bruker legge til diskusjoner på diskusjonssiden."
   allows_user_to_add_discussions_in_the_discussions__f5479e2c: |-
       Lar en bruker legge til diskusjoner på diskusjonssiden.
       Lar en bruker lukke kommentarfelt, flytte, feste/fjerne, redigere og slette diskusjonstemaer opprettet av andre brukere.
@@ -1777,6 +1783,10 @@ nb:
       Lar en bruker kryssliste avsnitt.
   allows_user_to_add_edit_and_delete_events_in_the_c_14413268: "Lar en bruker legge til, endre og slette hendelser i emnekalenderen."
   allows_user_to_add_edit_and_delete_global_announce_8463e383: "Lar en bruker legge til, endre og slette globale kunngjøringer."
+  allows_user_to_add_edit_and_update_grades_in_the_g_29a4068e: |-
+      Lar en bruker legge til, redigere og oppdatere karakterer i karakteroversikten.
+      Lar en bruker bruke karakteroversiktens historikk.
+      Lar en bruker bruke læringsmestrings karakteroversikt (om den er aktivert).
   allows_user_to_add_edit_and_update_grades_in_the_g_f9c62224: |-
       Lar en bruker legge til, endre og oppdatere karakterer i karakteroversikten og i SpeedGrader.
       Lar en bruker bruke karakteroversiktens historikk.
@@ -1846,6 +1856,10 @@ nb:
   allows_user_to_edit_blueprint_lock_settings_on_the_9f51663c: "Lar en bruker redigere låseinnstillingene på filer-siden i et blueprint master-emne."
   allows_user_to_edit_configurations_for_manually_ad_7e0f496c: "Lar en bruker redigere konfigurasjoner for eksterne apper som er lagt til manuelt."
   allows_user_to_edit_grades_and_add_comments_in_spe_dc18e3c0: "Lar en bruker redigere karakterer og legge inn kommentarer i SpeedGrader."
+  allows_user_to_edit_grades_in_the_gradebook_allows_74c2723: |-
+      Lar en bruker redigere karakterer i karakteroversikten.
+      Lar en bruker bruke karakteroversiktens historikk.
+      Lar en bruker bruke læringsmestrings karakteroversikt (om den er aktivert).
   allows_user_to_edit_grades_in_the_gradebook_allows_b1e33afc: "Lar en bruker redigere karakterer i karakteroversikten. Lar en bruker bruke karakteroversiktens historikk."
   allows_user_to_edit_grading_schemes_98c35117: "Lar en bruker redigere vurderingsskalaer."
   allows_user_to_edit_the_course_sis_id_e1eccee3: "Lar en bruker redigere emnets SIS-ID."
@@ -1880,6 +1894,8 @@ nb:
   allows_user_to_search_for_account_users_via_primar_7a58eb6e: |-
       Lar en bruker søke etter kontobrukere via primær e-postadresse på kontoens folk-side.
       Lar en bruker søke etter andre brukere via primær e-postadresse på emnets folk-side.
+  allows_user_to_search_for_other_users_by_login_id__2b0bd8c9: "Lar en bruker søke etter andre brukere etter innloggings-ID i emnets folk-side."
+  allows_user_to_search_for_other_users_by_login_id__3edb3702: "Lar en bruker søke etter andre brukere etter innloggings-ID i kontoens folk-side."
   allows_user_to_search_for_other_users_by_login_id__97d49785: |-
       Lar en bruker søke etter andre brukere etter innloggings-ID i kontoens folk-side.
       Lar en bruker vise innloggings-ID-er på et emnes folk-side.
@@ -1896,6 +1912,14 @@ nb:
   allows_user_to_share_a_quiz_to_commons_6746e0da: "Lar en bruker dele en test til Commons."
   allows_user_to_view_a_course_s_sis_id_5c4a4c50: "Lar en bruker vise et emnes SIS-ID."
   allows_user_to_view_a_link_to_speedgrader_from_ass_8ed9b342: "Lar en bruker vise en lenke til SpeedGrader fra oppgaver."
+  allows_user_to_view_a_link_to_the_faculty_journal__13b353a8: |-
+      Lar en bruker vise en lenke til lærerprotokollen i sidefeltets brukerdetalj-side.
+      Lar en bruker vise lærerprotokoll-informasjon til individuelle studenter.
+      Lar en bruker opprette nye innlegg i lærerprotokollen.
+  allows_user_to_view_a_link_to_the_faculty_journal__61d9560e: |-
+      Lar en bruker vise en lenke til lærerprotokollen i sidefeltets brukerdetalj-side.
+      Lar en bruker vise lærerprotokoll-informasjon til individuelle studenter.
+      Lar en bruker opprette nye innlegg i lærerprotokollen.
   allows_user_to_view_account_analytics_98fbc6ad: "Lar en bruker vise kontoanalyser."
   allows_user_to_view_all_course_groups_not_just_tho_bad6d687: "Lar en bruker vise alle emnegrupper, ikke kun de de er registrerte i, i 'Samarbeid med'-vinduet."
   allows_user_to_view_all_student_assignment_submiss_d8ee5830: "Lar en bruker vise alle innleveringene av studentoppgaver og legge til kommentarer."
@@ -1926,6 +1950,11 @@ nb:
       Lar en bruker vise, opprette, endre, slette og publisere/fjerne sider.
       Lar en bruker vise sidehistorie og angi forside.
   allows_user_to_view_enrollments_on_the_sections_ta_6279a03e: "Lar en bruker vise påmeldinger i seksjon-fanen."
+  allows_user_to_view_faculty_journal_entries_in_the_3f58f09c: "Lar en bruker vise lærerprotokoll-innlegg i studentens samspillsrapport."
+  allows_user_to_view_gradebook_allows_user_to_expor_8ed9dfa8: |-
+      Lar en bruker vise karakteroversikten.
+      Lar en bruker eksportere karakteroversikten til en CSV-fil (comma separated values).
+      Lar en bruker bruke læringsmestrings karakteroversikt (om den er aktivert).
   allows_user_to_view_gradebook_allows_user_to_expor_c454271d: |-
       Lar en bruker vise karakteroversikten.
       Lar en bruker eksportere karakteroversikten til en CSV-fil (comma separated values).
@@ -1956,6 +1985,7 @@ nb:
   allows_user_to_view_the_discussions_link_in_course_2604505d: |-
       Lar en bruker vise diskusjoner-lenken i emnenavigasjon.
       Lar en bruker vise emnediskusjoner.
+  allows_user_to_view_the_faculty_journal_link_in_gl_e3fd6889: "Lar en bruker vise lærerprotokollen i global navigering."
   allows_user_to_view_the_group_home_pages_of_all_st_9d747525: |-
       Lar en bruker vise gruppehjemmesidene til alle studentgrupper.
       Lar studenter bruke studentgrupper innenfor et gruppesett med en direkte lenke.
@@ -2258,10 +2288,12 @@ nb:
   are_you_sure_you_want_to_delete_this_assignment_88be6f5e: "Er du sikker på at du vil slette denne oppgaven?"
   are_you_sure_you_want_to_delete_this_comment_4ee386d: "Er du sikker på at du vil slette denne kommentaren?"
   are_you_sure_you_want_to_delete_this_developer_key_9937481a: "Er du sikker på at du vil slette denne utviklernøkkelen?"
+  are_you_sure_you_want_to_delete_this_discussion_334554e0: "Er du sikker på at du vil slette denne diskusjonen?"
   are_you_sure_you_want_to_delete_this_event_824b1e33: "Er du sikker på at du ønsker å slette denne hendelsen?"
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: "Er du sikker på at du ønsker å slette dette settet med vurderingsperiode?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Er du sikker på at du vil slette denne vurderingsperioden?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Er du sikker på at du vil slette denne vurderingsskala?"
+  are_you_sure_you_want_to_delete_this_page_2185844: "Er du sikker på at du vil slette denne siden?"
   are_you_sure_you_want_to_delete_this_recording_a4aab14b: "Er du sikker på at du vil slette dette opptaket?"
   are_you_sure_you_want_to_delete_this_rubric_any_co_29d7ac76: "Er du sikker på at du vil slette denne vurderingsveiledningen? Emner assosiert med denne rubrikken vil fortsatt ha tilgang, men ingen nye emner vil kunne bruke den."
   are_you_sure_you_want_to_delete_this_rubric_this_a_d4ff43c7: "Er du sikker på at du vil slette denne vurderingsveiledningen? Denne handlingen fjerner rubrikkens assosiasjon til alle vurderinger i emnet, og sletter eksisterende assosierte vurderinger."
@@ -2452,6 +2484,7 @@ nb:
   assignment_selection_6bff05c4: Oppgave-utvalg
   assignment_title_82b4422e: "Oppgavetittel:"
   assignment_title_8a707dd2: oppgavenavn
+  assignment_title_e3192978: "Oppgave: %{title}"
   assignment_url_37c849c6: "oppgave url"
   assignment_was_deleted_8320d26d: "Oppgave ble slettet"
   assignment_weights_d4bcf9ab: "Vekttall for oppgaven"
@@ -3074,10 +3107,12 @@ nb:
   assignments_api: 
     invalid_date_time: "Ugyldig datotid for %{attribute}"
     invalid_submission_types: "Ugyldige innleveringstyper"
+  assignments_gradebook_f57c164a: "Oppgaver, karakteroversikt"
   assignments_in_this_group_have_no_points_possible__3cd35922: "Oppgaver i denne gruppen har ingen oppnåelige poeng og kan ikke inkluderes i karakterberegningen"
   assignments_in_this_group_have_no_points_possible__ab0adb72: "Oppgaver i denne gruppen har ingen mulige poeng, og kan ikke medregnes i karakterberegningen."
   assignments_list_fe3e54be: Oppgaveliste
   assignments_settings_30613d0c: Oppgaveinnstillinger
+  assignments_speedgrader_2fbd6df4: "Oppgaver, SpeedGrader"
   assignments_tutorial_tray_4cc844b: "Lærebrett (Tutorial Tray) for oppgaver"
   associated_74756cc4: Tilknyttet
   associated_account_course_id_d87a01c5: "Tilknyttet konto/emne ID"
@@ -3335,6 +3370,7 @@ nb:
   blueprint_5cca2ef: Blueprint
   blueprint_course_associations_72c9609: "Malkurs assosiasjoner"
   blueprint_course_e16ed131: "Blueprint emne"
+  blueprint_course_id_9ee357fb: blueprint_course_id
   blueprint_course_information_term_course_10d5cf30: "Emnemalinformasjon: %{term} - %{course}"
   blueprint_course_sync_finished_80cd9509: "Synkronisering av Blueprintemne fullført"
   blueprint_course_sync_in_progress_a1e2622b: "Synkronisering av Blueprintemne pågår"
@@ -3388,6 +3424,15 @@ nb:
     default_title: "Ingen tittel"
   bookmark_this_question_bank_dc414a82: "Bokmerk denne spørsmålsbanken"
   bookmarks_5b5b81c9: Bokmerker
+  both_discussions_create_and_discussions_moderate_a_c238f67: |-
+      Både 'Diskusjoner - opprett' og 'Diskusjoner - moderér' lar en bruker lage en diskusjon på diskusjonsiden. Om tillatelser er aktivert, er ikke 'Diskusjoner - opprett' nødvendig.
+      For å vise diskusjoner i et emne må 'Diskusjoner - vis' være aktivert.
+      For å svare på diskusjoner må 'Diskusjoner - lag innlegg' også være aktivert. For å redigere oppgavedetaljer i en diskusjon må 'Oppgaver og tester - legg til / rediger / slett' også være aktivert.
+  both_discussions_create_and_discussions_moderate_a_f20cc937: |-
+      Både 'Diskusjoner - opprett' og 'Diskusjoner - moderér' lar en bruker lage en diskusjon på diskusjonsiden. Om tillatelser er aktivert, er ikke 'Diskusjoner - opprett' nødvendig.
+      For å vise diskusjoner i et emne må 'Diskusjoner - vis' være aktivert.
+      For å svare på diskusjoner må 'Diskusjoner - lag innlegg' også være aktivert.
+      For å redigere oppgavedetaljer i en diskusjon må 'Oppgaver og tester - legg til / rediger / slett' også være aktivert.
   bottom_15a2a9be: Bunn
   bounce_count_reset_c4c2218f: "Nullstill avvist telling!"
   bounce_reason_689ed4c6: "Årsak til avvisning"
@@ -3396,6 +3441,7 @@ nb:
   brazil_c1d6e73a: Brasil
   breadcrumb_1_cb3c504: "Navigasjonssti 1"
   breadcrumb_2_95ba94be: "Navigasjonssti 2"
+  brick_f2656265: Blokk
   bring_existing_content_from_another_course_or_cour_6e740692: "Hent et eksisterende emne eller emnebehandlingssystem inn i Canvas-emnet ditt."
   bring_existing_content_from_another_course_or_cour_9dc6453d: |-
       Ta med eksisterende innhold fra et annet emne eller emne-
@@ -3752,6 +3798,12 @@ nb:
     edit_planner_note: 
       calendar: "Kalender:"
       date: "Dato:"
+      time: "Klokken:"
+      title: "Tittel:"
+    edit_to_do_item: 
+      date: "Dato:"
+      links: 
+        more_options: "Flere alternativer"
       time: "Klokken:"
       title: "Tittel:"
     end_before_start_error: "Starttidspunkt må være før sluttidspunkt"
@@ -5597,6 +5649,7 @@ nb:
   course_copy_name: "Kopier Canvas-emne"
   course_copy_no_course_error: "Kilde-emnet ble ikke funnet."
   course_copy_not_allowed_error: "Du har ikke tillatelse til å kopiere kilde-emne."
+  course_course_d1c78210: "Emne: %{course}"
   course_discussions_38c0b74f: Emnediskusjoner
   course_ends_at_e8b166df: "Emne slutter på"
   course_export_from_date_expired_ebb0fe15: "Eksporter emne fra %{date} (utløpt)"
@@ -6413,6 +6466,7 @@ nb:
     ungrded_survey: "Ikke vurdert undersøkelse"
     url: URL
   create_new_course_e3ef9cd0: "Opprett nytt emne"
+  create_new_discussions_6ab69da2: "Opprette nye diskusjoner"
   create_new_e0946c49: "Opprett ny"
   create_slots_71dbb2f8: "Opprett tidsluker"
   create_theme_based_on_40651ed3: "Opprett tema basert på"
@@ -6798,6 +6852,8 @@ nb:
   delete_current_module_item_21fefc54: "Slett nåværende modul/element"
   delete_custom_help_link_814f0509: "Slett tilpasset hjelpelenke"
   delete_discussion_title_a28df8b6: "Slett diskusjon %{title}"
+  delete_domain_5ba75b7c: "Slette domene"
+  delete_domain_domain_c5b68f5: "Slette domene %{domain}"
   delete_entry_title_5e59727b: "Slett oppføring %{title}"
   delete_feedname_1ac9a4a4: "Slett %{feedName}"
   delete_grading_period_dba36e59: "Slett vurderingsperioden"
@@ -7361,6 +7417,7 @@ nb:
     unsubscribed: "Abonnument avsluttet"
     unsubscribed_hint: "Du abonnerer ikke på dette temaet. Klikk for å abonnere."
   discussions_a5f96392: Diskusjoner
+  discussions_create_94dff604: "'Diskusjoner - opprette'"
   discussions_moderate_d1e69c7e: "Diskusjoner - moderére"
   discussions_post_62f64091: "Diskusjoner - post"
   discussions_tutorial_tray_4ef79bcc: "Diskusjoner Tutorial Tray"
@@ -7414,10 +7471,12 @@ nb:
   download_report_77164f62: "Last ned rapport"
   download_scores_generated_on_date_ff5b9cd2: "Last ned resultater generert den %{date}"
   download_student_analysis_report_statuslabel_1471c8c2: "Last ned student analyserapport %{statusLabel}"
+  download_submission_comments_2a6c0395: "Laste ned innleveringskommentarer"
   download_submissions_7454665f: "Last ned innleveringer"
   download_the_complete_list_of_errors_and_warnings__7d993f7b: "Last ned den komplette listen over feil og advarsler her."
   download_this_file_669f9174: "Last ned denne filen"
   downloading_course_content_allows_access_to_conten_164d9336: "Nedlasting av innholdet for emne gir tilgang til innhold mens du er frakoblet. Innhold kan omfatte filer, sider, oppgaver, diskusjonstemaer eller tester. Klikk \"Generer ePub\" for hvert emne og åpne med en hvilken som helst eReader programvare for å vise."
+  draft_92507c72: (utkast)
   draft_comment_b2376ea4: "Kommentar til utkast"
   drag_and_drop_or_click_to_browse_your_computer_2b46a2b6: "Slipp og dra, eller klikk for å bla gjennom datamaskin"
   drag_and_drop_your_image_here_or_7fba7c14: "Dra og slipp bildet ditt her eller"
@@ -8332,6 +8391,7 @@ nb:
   extract_error_error_file_names_a4989ed0: "Ta ut feil, %{error}: %{file_names}"
   extreme_critical_emergency_80b3dbda: "EKSTREMT KRITISK NØDSITUASJON!"
   faculty_journal_5634938e: Lærerprotokoll
+  faculty_journal_manage_entries_efc09599: "Lærerprotokollen - administrer oppføringer"
   fail_62dbb06a: stryk
   failed_276786d: Feilet
   failed_307449e1: Mislyktes
@@ -8352,6 +8412,7 @@ nb:
   failed_to_export_some_tool_settings_c992fc56: "Klarte ikke å eksportere noen verktøyinnstillinger"
   failed_to_import_media_objects_4c1fcb4f: "Feil ved import av medieobjekter"
   failed_to_load_external_feeds_7ac8411d: "Kunne ikke laste ekstern informasjonsstrøm"
+  failed_to_load_recent_activity_d3e5adeb: "Klarte ikke å laste ned de siste aktivitetene"
   failed_to_log_in_7ceec561: "Logg inn mislyktes"
   failed_to_move_items_e043da6: "Kunne ikke Flytte elementer"
   failed_to_open_discussion_for_comments_87412434: "Kunne ikke åpne kommentarer for diskusjonen"
@@ -9024,6 +9085,7 @@ nb:
   gradebook_individual_view_8846598e: "Karakteroversikt: Individuell visning"
   gradebook_performance_764d8b3d: Karakteroversikt-ytelse
   gradebook_settings_b45c6df9: "Karakterbok innstillinger"
+  gradebook_speedgrader_66cb7a6a: "Karakteroversikt, SpeedGrader"
   gradebook_tutorial_tray_d835c750: "Lærebrett (Tutorial Tray) for karakteroversikt"
   gradebook_uploads: 
     new: 
@@ -9343,6 +9405,8 @@ nb:
   grader_count_cannot_be_0_9228afe4: "Karaktertelling kan ikke være 0"
   grader_count_is_required_45b6c85b: "Karaktertelling er påkrevd"
   grader_d1198a9c: Sensor
+  grader_details_table_b1bec24c: "Karakter tabelldetaljer"
+  grader_grader_number_e92327d3: "Sensor %{grader_number}"
   grader_graderindex_45e04e57: "Sensor %{graderIndex}"
   grader_gradernumber_fef5d5cf: "Sensor %{graderNumber}"
   grader_index_a55577a2: "Sensor %{index}"
@@ -9362,6 +9426,7 @@ nb:
   grades_moderate_317fce84: "Karakterer - moderére"
   grades_posted_c274d9f8: "Karakterer lagt ut"
   grades_posting_bc7cfc1a: "Karakterer blir lagt ut"
+  grades_saved_5954b0bb: "Karakterer lagret."
   grades_select_final_grade_for_moderation_c66284f4: "Karakterer - velg sluttkarakter for moderering"
   grades_view_all_grades_8bf9f8d3: "Karakterer - vis alle karakterer"
   grades_view_audit_trail_db7364b1: "Karakterer - vis revisjonslogg"
@@ -10434,6 +10499,7 @@ nb:
       enter_search_terms: "skriv inn søkeord"
   instructure_default_73317bb1: "Instructure standard"
   instructure_default_old_66ef6e9b: "Instructure standard (gammel)"
+  integration_id_8a20b328: Integrasjons-ID
   integration_id_a6977535: "Integrerings ID:"
   integration_id_int_id_is_already_in_use_f30f03b5: "Integrasjon ID \"%{int_id}\" er allerede i bruk"
   integration_id_integration_id_is_already_in_use_bd1bbb09: "Integrasjon ID \"%{integration_id}\" er allerede i bruk"
@@ -10836,6 +10902,7 @@ nb:
   link_to_url_52dd935c: "Lenke til URL"
   link_url_a213671c: "Lenke URL"
   link_url_cf96376: "Lenke Url"
+  link_validation_is_running_caf08ced: "Lenke-validering kjører"
   linked_assignment_message: "Lenket til oppgaven \"%{title}\""
   linked_discussion_topic_message: "Lenket til diskusjonstemaet \"%{title}\""
   linked_quiz_message: "Lenket til testen \"%{title}\""
@@ -11072,6 +11139,7 @@ nb:
   luxembourg_3bc645af: Luxembourg
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: Moodle-importør
+  magenta_4a65993c: Magenta
   main_navigation_3f080c80: Hovednavigasjon
   main_text_color_7d65ab1b: Hovedtekstfarge
   make_key_developername_invisible_212ecf72: "Gjør nøkkel %{developerName} usynlig"
@@ -13964,6 +14032,7 @@ nb:
   okay_got_it_d686d4e8: "Ok, fikk det"
   old_policy_39e4f77: "Gammel policy"
   oldest_newest_4de86803: "Eldste - nyeste"
+  olive_6a3e4d6b: Oliven
   oman_968_46f8d901: "Oman (+ 968)"
   on_8f7190e5: På
   on_paper_46d0ba36: "På papir"
@@ -15261,7 +15330,7 @@ nb:
       take_picture: "Ta bilde"
     upload_file_view: 
       choose_a_picture: "velg et bilde"
-      crop_instructions: "For å beskjære bildet, flytt det valgte området for deretter å klikke \"Lagre\" knappen nedenfor."
+      crop_instructions: "For å beskjære bildet må delen dras med musen eller bruk piltastene for å flytte delen og shift+piltast for å gå tilbake til utgangspunktet. Klikk deretter på knappen 'Lagre' under."
   progress_9de4af8f: Fremdrift
   progress_for_account_name_ef203250: "fremgang for %{account_name}"
   progress_loading_bar_a26b8861: Fremdriftsviser
@@ -15375,6 +15444,7 @@ nb:
   publishing_9890d50f: Publiserer...
   publishing_is_disabled_for_this_item_efa7803f: "Publisering er deaktivert for dette objektet"
   publishing_item_name_is_disabled_8207a9e7: "Publisering %{item_name} er deaktivert"
+  pumpkin_904428d5: Gresskar
   purchases: 
     new: 
       payment_info: Betalingsinformasjon
@@ -17260,6 +17330,7 @@ nb:
   rubrics_add_edit_delete_8299eff7: "Vurderingsveiledning - legg til / rediger / slett"
   rubrics_and_speedgrader_ececaed4: "Rubrikker og SpeedGrader"
   rubrics_b5ef369b: Rubrikker
+  rubrics_speedgrader_a6ebec57: "Vurderingsveiledning, SpeedGrader"
   running_c5a4998d: Kjører
   russia_7_87bc99d5: "Russland (+7)"
   rwanda_250_1a6b344b: "Rwanda (+250)"
@@ -17307,6 +17378,7 @@ nb:
   score_f7ac9e08: Resultat
   score_letter_grade_b3bb9e52: "%{score} bokstavkarakter"
   score_muted_82eef66: "Resultat: (skjult)"
+  score_n_a_34dfdcda: "Resultat: N/A"
   score_of_score_view_in_speedgrader_a7c1c954: "Resultat av %{score}. Se i SpeedGrader"
   score_out_of_points_84f44331: "(%{score} av %{points})"
   score_out_of_points_possible_88f370fd: "%{score} av %{points_possible}"
@@ -17640,6 +17712,7 @@ nb:
   select_one_of_the_options_c8b0c6e4: "Velg ett av alternativene:"
   select_prerequisite_module_57894963: "Velg forutsetningmodul"
   select_prerequite_module_e9042bb0: "Velg forutsetningmodul"
+  select_rubric_2aa2ffa2: "Velg rubrikk"
   select_student_name_caaff244: "Velg student %{name}"
   select_studentname_e7b7908d: "Velg %{studentName}"
   select_students_for_review_6e004a12: "Velg student som skal gjennomgåes"
@@ -17801,6 +17874,14 @@ nb:
       Del viktig informasjon med alle brukere i emnet ditt.
       Velg å motta en kopi av din egne kunngjøringer under varslinger.
   share_important_updates_with_users_97ec11ad: "Del viktige oppdateringer med brukere"
+  share_the_following_pairing_code_with_an_observer__44f50f99: |-
+      Del følgende paringskode med en observatør for å gi dem tillatelse
+      til å koble seg med %{name}. Denne koden vil utløpe om sju dager,
+      eller etter en gangs bruk.
+  share_the_following_pairing_code_with_an_observer__9b7c3667: |-
+      Del følgende paringskode med en observatør for å gi dem tillatelse
+      til å koble seg med deg. Denne koden vil utløpe om sju dager,
+      eller etter en gangs bruk.
   share_the_following_pairing_code_with_an_observer__9cd44f7e: |-
       Del følgende paringskode med en observatør for å gi dem tillatelse
       til å koble seg med deg. Denne koden vil utløpe om 24 timer,
@@ -18671,6 +18752,7 @@ nb:
   snapshots_are_backups_of_your_canvas_trial_taking__f18bd571: "Øyeblikksbilder er sikkerhetskopier av Canvas-prøveperioden din.  Ved å ta et øyeblikksbilde opprettes det en unik «versjon», og skaper et perfekt opptak av prøveperiodestatusen din i det øyeblikket bildet tas."
   some_assignments_could_not_be_created_because_they_d91f2f21: "Noen oppgaver kunne ikke opprettes fordi de ville vært i en lukket karaktersettingsperiode."
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Noen konferanser på denne siden er skjult på grunn av avvik ved henting sin status"
+  some_custom_columns_could_not_be_changed_because_t_88abc9be: "Noen kunde-kolonner kan ikke endres fordi de er skrivebeskyttet; endringer i disse kolonnene er ignorert."
   some_module_items_could_not_be_published_e4be3c0: "Noen moduler kunne ikke publiseres"
   some_settings_have_been_administratively_locked_9e3ee880: "Noen innstillinger har blitt låst av administrator."
   some_settings_have_been_disabled_because_the_assig_6b6cc3b4: "Noen innstillinger har blitt deaktivert fordi oppgaven er i en lukket karaktersettingsperiode."
@@ -18831,11 +18913,14 @@ nb:
   student_id_236970d8: student_id
   student_id_7cc45fb5: "student id"
   student_id_a61d78c7: Student-ID
+  student_interaction_report_3f3d2ff1: "Students samspillrapport"
   student_interactions_report_7717b685: "Student dialograpport"
   student_messages_b0a242d: Studentmeldinger
   student_must_complete_all_of_these_requirements_656771d6: "Student må møte alle disse kravene"
   student_must_complete_one_of_these_requirements_6046eb3a: "Studenten må fullføre ett av disse kravene"
+  student_n_a_30b1753f: "Student: N/A"
   student_name: "Studentens Navn"
+  student_name_a30d555e: "Student: %{name}"
   student_name_b446c661: studentnavn
   student_name_c45b2a7: "Studentens navn"
   student_name_hidden_b894d102: "student (navn skjult)"
@@ -19443,6 +19528,7 @@ nb:
   there_was_a_problem_posting_the_comment_75d15646: "Det oppstod et problem med å poste kommentaren"
   there_was_a_problem_publishing_grades_b0b9202f: "Kunne ikke publisere karakterene."
   there_was_a_problem_saving_the_grade_8ea5d2ac: "Kunne ikke lagre karakterer."
+  there_was_a_problem_saving_the_grades_5e61f9e2: "Det oppsto et problem ved lagring av karakterene."
   there_was_a_problem_saving_the_grading_period_243bed6c: "Det oppstod et problem under lagring av vurderingsperioden"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "Det oppstod et problem under lagring av vurderingsskala"
   there_was_a_problem_sending_your_message_22b249a5: "Det oppstod et problem under sendingen av meldingen din."
@@ -19813,6 +19899,7 @@ nb:
   timeline_of_messages_between_the_student_and_instr_6dbd9ad3: "Tidslinje for meldinger mellom instruktører og studenter"
   timeline_showing_when_assignments_were_turned_in_bb44c8a1: "Tidslinjen viser når oppgavene ble innlevert"
   timeout_when_searching_5c24ff9d: "Tidsavbrudd når du søker"
+  timestamp_65f3a0a: "(%{timestamp})"
   tinymce: 
     insert_update_image_view: 
       alt_help_text: "Beskriv bildet for å forbedre tilgjengeligheten"
@@ -19925,6 +20012,7 @@ nb:
       For å konfigurere en OpenID Connect tilbyder må du autentisere og symbol-URLer, og få Kunde ID og kundehemmelighet.
       
       Om tilbyderen kan konfigurere gyldig callback eller omdirigerings URL-adresser, bruk %{callback_url}.
+  to_create_announcements_discussions_manage_must_al_932ac38f: "For å lage kunngjøringer, 'Diskusjoner - administrer’ må også aktiveres."
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "For å kryssliste en seksjon må 'Emneseksjoner - legg til / rediger / slett' også være aktivert. For å redigere emnets SIS-ID må 'SIS-data - rediger' også være aktivert. For å tillate en bruker på kontonivå å slette et emne må 'Emnestatus - administrer' også være aktivert."
   to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "For å kryssliste en seksjon må 'Emneseksjoner - legg til / rediger / slett' også være aktivert. For å redigere emnets SIS-ID må 'SIS-data - rediger' også være aktivert. For å tillate en bruker på kontonivå å slette et emne må 'Emnestatus - administrer' også være aktivert."
   to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "For å kryssliste avsnitt må 'Emne - legg til / rediger / slett' også være aktivert."
@@ -19936,6 +20024,7 @@ nb:
   to_do_6ac7b2dc: "gjøremål:"
   to_do_date_d6b79bfd: "Gjøremål %{date}"
   to_do_date_ddfb582c: "Å gjøre dato:"
+  to_do_item_d76ecb78: "A-gjøre element"
   to_do_items_loading_d1cdfcd5: "Å gjøre-elementer laster"
   to_do_list_dashboard_d741f64e: "Gjøremålsliste instrumentpanel"
   to_do_time_a7e17623: "Å gjøre klokken"
@@ -20025,6 +20114,9 @@ nb:
   to_view_discussions_in_a_course_discussions_view_m_7c986cd2: |-
       For å vise diskusjoner i et emne må 'Diskusjoner - vis' være aktivert.
       For å svare på diskusjoner må 'Diskusjoner - lag innlegg' også være aktivert. For å redigere oppgavedetaljer i en diskusjon må 'Oppgaver og tester - legg til / rediger / slett' også være aktivert.
+  to_view_discussions_in_a_course_discussions_view_m_b7e742bd: |-
+      For å vise diskusjoner i et emne må 'Diskusjoner - vis' være aktivert.
+      Både 'Diskusjoner - opprett' og 'Diskusjoner - moderér' lar en bruker lage en diskusjon på diskusjonsiden. For å lage diskusjoner, 'Diskusjoner - administrer’ må også aktiveres.
   to_view_discussions_in_a_course_discussions_view_m_bf14b0e: |-
       For å vise diskusjoner i et emne må 'Diskusjoner - vis' også være aktivert.
       For å administrere diskusjoner må 'Diskusjoner - moderer' også være aktivert.
@@ -20070,6 +20162,7 @@ nb:
       For å vise Læringsmål-siden som skrivebeskyttet må 'Emneinnhold - vis' være aktivert.
       Brukere kan bruke individuelle oppgaverubrikker via oppgaver når 'Emneinnhold - vis' og 'Oppgaver og tester - legg til / rediger / slett' er aktiverte.
   to_view_the_reports_tab_courses_view_usage_reports_d371ec85: "For å vise rapporter-fanen må 'Emner - vis bruksrapporter' også være aktivert."
+  to_view_the_user_details_page_for_a_student_users__51d98047: "For å vise siden brukerdetaljer til en student, 'Brukere - legg til / fjern student i emner' må også være aktivert."
   to_view_user_page_views_users_view_list_must_also__f4246239: "For å vise brukersidevisninger må 'Brukere - vis liste' også være aktivert."
   to_view_users_and_user_account_details_users_view__99807b12: |-
       For å vise brukere og brukerkontodetaljer må 'Brukere - vis liste' være aktivert.
@@ -20381,6 +20474,7 @@ nb:
     cant_be_blank: "Canvas-bruker-ID kan ikke være tom"
     cant_come_before_from: "Til-datoen kan ikke være før fra-datoen"
     results_found: "%{length} resultat funnet"
+  user_details_2613c079: Brukerdetaljer
   user_details_e9aef9e5: Brukerdetaljer
   user_does_not_have_permission_to_select_final_grad_47560e75: "bruker har ikke tillatelse til å velge sluttkarakter"
   user_id_8256faeb: user_id
