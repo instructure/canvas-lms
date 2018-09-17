@@ -276,7 +276,7 @@ Canvas::Plugin.register('sessions', nil, {
   :version => '1.0.0',
   :settings_partial => 'plugins/sessions_timeout',
   :validator => 'SessionsValidator',
-  :settings => nil
+  :settings => { session_timeout: CanvasRails::Application.config.session_options[:expire_after].to_f / 60 }
 })
 
 Canvas::Plugin.register('assignment_freezer', nil, {
