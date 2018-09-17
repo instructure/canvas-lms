@@ -512,18 +512,20 @@ module Api
       protocol = HostUrl.protocol
     end
 
-    rewriter = UserContent::HtmlRewriter.new(context, user)
-    rewriter.set_handler('files') do |match|
-      UserContent::FilesHandler.new(
-        match: match,
-        context: context,
-        user: user,
-        preloaded_attachments: preloaded_attachments,
-        is_public: is_public,
-        in_app: (respond_to?(:in_app?, true) && in_app?)
-      ).processed_url
+    html = context.shard.activate do
+      rewriter = UserContent::HtmlRewriter.new(context, user)
+      rewriter.set_handler('files') do |match|
+        UserContent::FilesHandler.new(
+          match: match,
+          context: context,
+          user: user,
+          preloaded_attachments: preloaded_attachments,
+          is_public: is_public,
+          in_app: (respond_to?(:in_app?, true) && in_app?)
+        ).processed_url
+      end
+      rewriter.translate_content(html)
     end
-    html = rewriter.translate_content(html)
 
     url_helper = Html::UrlProxy.new(self,
                                     context,
