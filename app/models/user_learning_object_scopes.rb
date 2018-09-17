@@ -17,6 +17,7 @@
 #
 
 module UserLearningObjectScopes
+  include PlannerHelper
 
   def ignore_item!(asset, purpose, permanent = false)
     begin
@@ -182,11 +183,12 @@ module UserLearningObjectScopes
     opts[:due_after] ||= 2.weeks.ago
     opts[:due_before] ||= 2.weeks.from_now
     objects_needing('AssessmentRequest', 'peer_review', :student, 15.minutes, opts) do |ar_scope, options|
-      ar_scope = ar_scope.where(assessor_id: id)
+      ar_scope = ar_scope.joins(submission: :assignment).
+        joins("INNER JOIN #{Submission.quoted_table_name} AS assessor_asset ON assessment_requests.assessor_asset_id = assessor_asset.id").
+        where(assessor_id: id)
       ar_scope = ar_scope.incomplete unless options[:scope_only]
       ar_scope = ar_scope.not_ignored_by(self, 'reviewing') unless options[:include_ignored]
-      ar_scope = ar_scope.for_context_codes(options[:shard_course_ids].map { |course_id| "course_#{course_id}"}).
-        eager_load({submission: [:user, {assignment: :course}]})  # avoid n+1 query on the grants_right? check
+      ar_scope = ar_scope.for_context_codes(options[:shard_course_ids].map { |course_id| "course_#{course_id}"})
 
       # The below merging of scopes mimics a portion of the behavior for checking the access policy
       # for the submissions, ensuring that the user has access and can read & comment on them.
@@ -196,11 +198,11 @@ module UserLearningObjectScopes
         merge(Assignment.published.where(peer_reviews: true))
 
       if options[:due_before]
-        ar_scope = ar_scope.where("#{Assignment.quoted_table_name}.peer_reviews_due_at <= ?", options[:due_before])
+        ar_scope = ar_scope.where("COALESCE(assignments.peer_reviews_due_at, assessor_asset.cached_due_date) <= ?", options[:due_before])
       end
 
       if options[:due_after]
-        ar_scope = ar_scope.where("#{Assignment.quoted_table_name}.peer_reviews_due_at > ?", options[:due_after])
+        ar_scope = ar_scope.where("COALESCE(assignments.peer_reviews_due_at, assessor_asset.cached_due_date) > ?", options[:due_after])
       end
 
       if options[:scope_only]
@@ -213,24 +215,17 @@ module UserLearningObjectScopes
   end
 
   def assignments_needing_grading_count(opts={})
-    original_shard = Shard.current
-    as = shard.activate do
-      course_ids = course_ids_for_todo_lists(:instructor, opts)
-      Shard.partition_by_shard(course_ids) do |shard_course_ids|
-        next unless Shard.current == original_shard # only provide scope on current shard
-        Submission.active.
-          needs_grading.
-          joins(assignment: :course).
-          where(courses: { id: shard_course_ids }).
-          merge(Assignment.expecting_submission).
-          where("NOT EXISTS (?)",
-            Ignore.where(asset_type: 'Assignment',
-                       user_id: self,
-                       purpose: 'grading').where('asset_id=submissions.assignment_id'))
-      end
-    end
-
-    as.size
+    course_ids = course_ids_for_todo_lists(:instructor, opts)
+    Submission.active.
+      needs_grading.
+      joins(assignment: :course).
+      where(courses: { id: course_ids }).
+      merge(Assignment.expecting_submission).
+      merge(Assignment.published).
+      where("NOT EXISTS (?)",
+        Ignore.where(asset_type: 'Assignment',
+                     user_id: self,
+                     purpose: 'grading').where('asset_id=submissions.assignment_id')).count
   end
 
   def assignments_needing_grading(opts={})
@@ -288,7 +283,7 @@ module UserLearningObjectScopes
   end
 
   def submission_statuses(opts = {})
-    Rails.cache.fetch(['assignment_submission_statuses', self, opts].cache_key, :expires_in => 120.minutes) do
+    Rails.cache.fetch(['assignment_submission_statuses', self, get_planner_cache_id(self), opts].cache_key, :expires_in => 120.minutes) do
       opts[:due_after] ||= 2.weeks.ago
 
       {

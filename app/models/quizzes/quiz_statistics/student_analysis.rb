@@ -83,6 +83,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     stats[:submission_logged_out_users] = []
     stats[:submission_scores] = Hash.new(0)
     stats[:unique_submission_count] = 0
+    temp_users = {}
     correct_cnt = incorrect_cnt = total_duration = 0
     submissions.each_with_index do |sub, index|
       #check for temporary user submissions
@@ -91,6 +92,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
       else
         temp_user = TemporaryUser.new(sub.temporary_user_code, I18n.t(:logged_out_user, "Logged Out User %{user_counter}", :user_counter => index + 1))
         stats[:submission_logged_out_users] << temp_user
+        temp_users[sub.temporary_user_code] = temp_user
       end
       if !found_ids[sub.id]
         percentile = (sub.score.to_f / quiz_points * 100).round
@@ -136,7 +138,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
         q_id = a[:question_id]
         unless quiz.anonymous_survey?
           a[:user_id] = s.user_id || s.temporary_user_code
-          a[:user_name] = s.user.name
+          a[:user_name] = s.user&.name || temp_users[s.temporary_user_code]&.short_name
         end
         responses_for_question[q_id] ||= []
         responses_for_question[q_id] << a

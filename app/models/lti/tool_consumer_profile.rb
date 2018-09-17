@@ -49,7 +49,9 @@ module Lti
       ToolProxyRegistrationRequest
       Canvas.placements.accountNavigation
       Canvas.placements.courseNavigation
+      Canvas.placements.assignmentEdit
       Canvas.placements.assignmentSelection
+      Canvas.placements.assignmentView
       Canvas.placements.linkSelection
       Canvas.placements.postGrades
       Security.splitSecret

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - present Instructure, Inc.
+# Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,14 +14,13 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+require_relative '../../common'
 
-require File.expand_path(File.dirname(__FILE__) + '/../../common')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/basic/permissions_specs')
+module EditExistingUserModalPage
 
-describe "sub account permissions" do
-  describe "shared permission specs" do
-    let(:account) { Account.create(:name => 'sub account from default account', :parent_account => Account.default) }
-    let(:url) { "/accounts/#{account.id}/permissions?account_roles=1" }
-    include_examples "permission tests"
+  # ---------------------- Controls ----------------------
+  def edit_full_name_input
+    fj('label:contains("Full Name") input')
   end
+
 end

@@ -960,6 +960,6 @@ class EnrollmentsApiController < ApplicationController
   end
 
   def render_create_errors(errors)
-    render json: {message: errors.join(', ')}, status: 403
+    render json: {message: errors.join(', ')}, status: :bad_request
   end
 end

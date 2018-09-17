@@ -861,7 +861,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   def due_at
     return quiz.due_at if submission.blank?
 
-    quiz.overridden_for(submission.user, skip_clone: true).due_at
+    submission.cached_due_date
   end
 
   # same as the instance method, but with a hash of attributes, instead
@@ -873,7 +873,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     due_at = if submission.blank?
       quiz.due_at
     else
-      quiz.overridden_for(submission.user, skip_clone: true).due_at
+      submission.cached_due_date
     end
     return false if due_at.blank?
 

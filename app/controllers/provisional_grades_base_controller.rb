@@ -17,6 +17,7 @@
 #
 
 class ProvisionalGradesBaseController < ApplicationController
+  include GradebookSettingsHelpers
   include Api::V1::Submission
 
   before_action :require_user
@@ -52,7 +53,15 @@ class ProvisionalGradesBaseController < ApplicationController
 
     json[:provisional_grades] = []
     provisional_grades.order(:id).each do |pg|
-      pg_json = provisional_grade_json(pg, submission, @assignment, @current_user, %w(submission_comments rubric_assessment))
+      pg_json = provisional_grade_json(
+        course: @context,
+        assignment: @assignment,
+        submission: submission,
+        provisional_grade: pg,
+        current_user: @current_user,
+        avatars: service_enabled?(:avatars) && !@assignment.grade_as_group?,
+        includes: %w(submission_comments rubric_assessment)
+      )
       pg_json[:selected] = !!(selection && selection.selected_provisional_grade_id == pg.id)
       pg_json[:readonly] = !pg.final && (pg.scorer_id != @current_user.id)
       pg_json[:scorer_name] = pg.scorer.name if include_scorer_names

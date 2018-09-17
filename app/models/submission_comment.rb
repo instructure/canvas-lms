@@ -20,7 +20,22 @@ class SubmissionComment < ActiveRecord::Base
   include SendToStream
   include HtmlTextHelper
 
+  AUDITABLE_ATTRIBUTES = %w[
+    comment
+    author_id
+    provisional_grade_id
+    assessment_request_id
+    group_comment_id
+    attachment_ids
+    media_comment_id
+    media_comment_type
+    anonymous
+  ].freeze
+  private_constant :AUDITABLE_ATTRIBUTES
+
   alias_attribute :body, :comment
+
+  attr_writer :updating_user
 
   belongs_to :submission
   belongs_to :author, :class_name => 'User'
@@ -36,8 +51,10 @@ class SubmissionComment < ActiveRecord::Base
   before_save :set_edited_at
   after_save :update_participation
   after_save :check_for_media_object
+  after_save :record_save_audit_event
   after_update :publish_other_comments_in_this_group
   after_destroy :delete_other_comments_in_this_group
+  after_destroy :record_deletion_audit_event
   after_commit :update_submission
 
   serialize :cached_attachments
@@ -162,10 +179,12 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def can_read_author?(user, session)
-    (!self.anonymous? && !self.submission.assignment.anonymous_peer_reviews?) ||
-        self.author == user ||
-        self.submission.assignment.context.grants_right?(user, session, :view_all_grades) ||
-        self.submission.assignment.context.grants_right?(self.author, session, :view_all_grades)
+    RequestCache.cache('user_can_read_author', self, user, session) do
+      (!self.anonymous? && !self.submission.assignment.anonymous_peer_reviews?) ||
+          self.author == user ||
+          self.submission.assignment.context.grants_right?(user, session, :view_all_grades) ||
+          self.submission.assignment.context.grants_right?(self.author, session, :view_all_grades)
+    end
   end
 
   def reply_from(opts)
@@ -310,5 +329,61 @@ class SubmissionComment < ActiveRecord::Base
     if comment_changed? && comment_was.present?
       self.edited_at = Time.zone.now
     end
+  end
+
+  def record_save_audit_event
+    # For newly-created comments, the updating user is always the commenter
+    updating_user = saved_change_to_id? ? author : @updating_user
+    return unless updating_user && record_changes?
+
+    event_type = event_type_for_save
+    changes_to_save = auditable_changes(event_type: event_type)
+    return if changes_to_save.empty?
+
+    AnonymousOrModerationEvent.create!(
+      assignment: submission.assignment,
+      submission: submission,
+      user: updating_user,
+      event_type: event_type,
+      payload: changes_to_save.merge({id: id})
+    )
+  end
+
+  def event_type_for_save
+    # We don't track draft comments, so publishing a draft comment is
+    # considered to be a "creation" event.
+    publishing_draft = saved_change_to_draft? && !draft?
+    treat_as_created = saved_change_to_id? || publishing_draft
+    if treat_as_created
+      :submission_comment_created
+    else
+      :submission_comment_updated
+    end
+  end
+
+  def auditable_changes(event_type:)
+    if event_type == :submission_comment_created
+      AUDITABLE_ATTRIBUTES.each_with_object({}) do |attribute, map|
+        map[attribute] = attributes[attribute] unless attributes[attribute].nil?
+      end
+    else
+      saved_changes.slice(*AUDITABLE_ATTRIBUTES)
+    end
+  end
+
+  def record_deletion_audit_event
+    return unless @updating_user && record_changes?
+
+    AnonymousOrModerationEvent.create!(
+      assignment: submission.assignment,
+      submission: submission,
+      user: @updating_user,
+      event_type: :submission_comment_deleted,
+      payload: {id: id}
+    )
+  end
+
+  def record_changes?
+    !draft? && submission.assignment.auditable?
   end
 end

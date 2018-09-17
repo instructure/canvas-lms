@@ -882,7 +882,7 @@ To edit blueprint lock settings on an individual quiz, or on the Quizzes index p
     },
     {
       title: I18n.t('Grades'),
-      description: I18n.t('To manage moderated grading, Grades - moderate ​must also be enabled.')
+      description: I18n.t(`To moderate grades, Grades - Select final grade for moderation must also be enabled.`)
     },
     {
       title: I18n.t('Quizzes'),
@@ -945,7 +945,7 @@ To edit blueprint lock settings on an individual quiz, or on the Quizzes index p
     },
     {
       title: I18n.t('Grades'),
-      description: I18n.t('To manage moderated grading, Grades - moderate ​must also be enabled.')
+      description: I18n.t(`To moderate grades, Grades - Select final grade for moderation must also be enabled.`)
     },
     {
       title: I18n.t('Quizzes'),
@@ -1726,13 +1726,7 @@ const finalGradePermissions = generateActionTemplates(
       )
     }
   ],
-  [
-    {
-      title: I18n.t('Grades'),
-      description: I18n.t(`To manage moderated grading, Grades - moderate must also be enabled.
-NOTE: This permission will replace Grades - moderate, which is being deprecated.`)
-    }
-  ],
+  [],
   [
     {
       title: I18n.t('Grades'),
@@ -1741,13 +1735,7 @@ NOTE: This permission will replace Grades - moderate, which is being deprecated.
       )
     }
   ],
-  [
-    {
-      title: I18n.t('Grades'),
-      description: I18n.t(`To manage moderated grading, Grades - moderate must also be enabled.
-NOTE: This permission will replace Grades - moderate, which is being deprecated.`)
-    }
-  ]
+  []
 )
 
 const gradeAuditTrailPermissions = generateActionTemplates(

@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 import $ from 'jquery'
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
 import Modal from 'react-modal'
 import store from '../../external_apps/lib/ExternalAppsStore'
- 
+
 const modalOverrides = {
   overlay: {
     backgroundColor: 'rgba(0,0,0,0.5)'
@@ -38,27 +38,27 @@ const modalOverrides = {
     padding: '0'
   }
 }
- 
+
 export default class DeleteExternalToolButton extends React.Component {
   static propTypes = {
     tool: PropTypes.object.isRequired
   }
- 
+
   state = {
     modalIsOpen: false
   }
- 
+
   isDeleting = false
- 
+
   shouldComponentUpdate() {
     return !this.isDeleting
   }
- 
+
   openModal = e => {
     e.preventDefault()
     this.setState({modalIsOpen: true})
   }
- 
+
   closeModal = cb => {
     if (typeof cb === 'function') {
       this.setState({modalIsOpen: false}, cb)
@@ -66,7 +66,7 @@ export default class DeleteExternalToolButton extends React.Component {
       this.setState({modalIsOpen: false})
     }
   }
- 
+
   deleteTool = e => {
     e.preventDefault()
     this.isDeleting = true
@@ -75,7 +75,7 @@ export default class DeleteExternalToolButton extends React.Component {
       this.isDeleting = false
     })
   }
- 
+
   render() {
     if (this.props.canAddEdit) {
       return (
@@ -114,11 +114,11 @@ export default class DeleteExternalToolButton extends React.Component {
                   </button>
                 </div>
               </div>
- 
+
               <div className="ReactModal__Body">
                 {I18n.t('Are you sure you want to remove this tool?')}
               </div>
- 
+
               <div className="ReactModal__Footer">
                 <div className="ReactModal__Footer-Actions">
                   <button ref="btnClose" type="button" className="Button" onClick={this.closeModal}>

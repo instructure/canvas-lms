@@ -22,6 +22,37 @@ require 'csv'
 
 describe Quizzes::QuizStatistics::StudentAnalysis do
 
+  def temporary_user_code
+    "tmp_#{Digest::MD5.hexdigest("#{Time.now.to_i}_#{rand}")}"
+  end
+
+  def survey_with_logged_out_submission
+    course_with_teacher(:active_all => true)
+
+    @assignment = @course.assignments.create(:title => "Test Assignment")
+    @assignment.workflow_state = "available"
+    @assignment.submission_types = "online_quiz"
+    @assignment.save
+    @quiz = Quizzes::Quiz.where(assignment_id: @assignment).first
+    @quiz.anonymous_submissions = false
+    @quiz.quiz_type = "survey"
+
+    # make questions
+    questions = [{:question_data => { :name => "test 1" }},
+      {:question_data => { :name => "test 2" }},
+      {:question_data => { :name => "test 3" }},
+      {:question_data => { :name => "test 4" }}]
+
+    @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
+    @quiz.generate_quiz_data
+    @quiz.save!
+
+    @quiz_submission = @quiz.generate_submission(temporary_user_code)
+    @quiz_submission.mark_completed
+    Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
+    @quiz_submission.save!
+  end
+
   let(:report_type) { 'student_analysis' }
   include_examples "Quizzes::QuizStatistics::Report"
   before(:once) { course_factory }
@@ -116,39 +147,16 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     end.to_not raise_error
   end
 
+  it 'should create quiz statistics with logged out users' do
+    survey_with_logged_out_submission
+    expect do
+      @quiz.quiz_statistics.build(report_type: 'student_analysis',
+                                  includes_all_versions: true,
+                                  anonymous: false).report.generate(false)
+    end.to_not raise_error
+  end
+
   context "csv" do
-
-    def temporary_user_code
-      "tmp_#{Digest::MD5.hexdigest("#{Time.now.to_i}_#{rand}")}"
-    end
-
-    def survey_with_logged_out_submission
-      course_with_teacher(:active_all => true)
-
-      @assignment = @course.assignments.create(:title => "Test Assignment")
-      @assignment.workflow_state = "available"
-      @assignment.submission_types = "online_quiz"
-      @assignment.save
-      @quiz = Quizzes::Quiz.where(assignment_id: @assignment).first
-      @quiz.anonymous_submissions = false
-      @quiz.quiz_type = "survey"
-
-      # make questions
-      questions = [{:question_data => { :name => "test 1" }},
-        {:question_data => { :name => "test 2" }},
-        {:question_data => { :name => "test 3" }},
-        {:question_data => { :name => "test 4" }}]
-
-      @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
-      @quiz.generate_quiz_data
-      @quiz.save!
-
-      @quiz_submission = @quiz.generate_submission(temporary_user_code)
-      @quiz_submission.mark_completed
-      Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
-      @quiz_submission.save!
-    end
-
     before(:each) do
       student_in_course(:active_all => true)
       @quiz = @course.quizzes.create!

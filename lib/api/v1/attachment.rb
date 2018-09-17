@@ -43,6 +43,7 @@ module Api::V1::Attachment
       'folder_id' => attachment.folder_id,
       'display_name' => attachment.display_name,
       'filename' => attachment.filename,
+      'workflow_state' => attachment.workflow_state
     }
     return hash if options[:only] && options[:only].include?('names')
 

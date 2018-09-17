@@ -181,7 +181,7 @@ module Types
       description "submissions for this assignment"
       argument :filter, SubmissionFilterInputType, required: false
     end
-    def submissions_connection(filter:)
+    def submissions_connection(filter: nil)
       course = assignment.context
 
       submissions = assignment.submissions.where(

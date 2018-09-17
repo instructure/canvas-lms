@@ -17,7 +17,8 @@
  */
 
 import React from 'react';
-import { shallow, mount, ReactWrapper } from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme';
+import ReactDOM from 'react-dom'
+import { shallow, mount } from 'enzyme';
 import StatusesModal from 'jsx/gradezilla/default_gradebook/components/StatusesModal';
 import { statusColors } from 'jsx/gradezilla/default_gradebook/constants/colors';
 
@@ -223,26 +224,57 @@ QUnit.module('StatusesModal', function (suiteHooks) {
     }
   });
 
+  test('opens the color picker when clicking on a color picker trigger button', function () {
+    const { wrapper, instance } = this;
+    instance.open();
+    clock.tick(50); // wait for Modal to transition open
+
+    const $modalContainer = ReactDOM.findDOMNode(wrapper.instance().modalContentRef)
+    const $colorButton = [...$modalContainer.querySelectorAll('button')].find($button => (
+      $button.textContent === 'late Color Picker'
+    ))
+    $colorButton.click()
+
+    strictEqual(document.querySelectorAll('.ColorPicker__Container').length, 1)
+  });
+
   test('after clicking apply in the color picker, the color picker popover is closed', function () {
     const { wrapper, instance } = this;
     instance.open();
     clock.tick(50); // wait for Modal to transition open
-    const modalContent = new ReactWrapper(wrapper.node.modalContentRef, wrapper.node);
-    modalContent.find('StatusColorListItem PopoverTrigger Button').at(0).simulate('click');
-    const colorPickerContent = new ReactWrapper(wrapper.node.colorPickerContents.late, wrapper.node);
-    const applyButton = colorPickerContent.find('button').filterWhere(button => button.text() === 'Apply');
-    applyButton.simulate('click');
-    strictEqual(modalContent.find('StatusColorListItem Popover').at(0).prop('show'), false);
+
+    const $modalContainer = ReactDOM.findDOMNode(wrapper.instance().modalContentRef)
+    const $colorButton = [...$modalContainer.querySelectorAll('button')].find($button => (
+      $button.textContent === 'late Color Picker'
+    ))
+    $colorButton.click()
+
+    const $latePicker = wrapper.instance().colorPickerContents.late
+    const $applyButton = [...$latePicker.querySelectorAll('button')].find($button => (
+      $button.textContent === 'Apply'
+    ))
+    $applyButton.click()
+
+    strictEqual(document.querySelectorAll('.ColorPicker__Container').length, 0)
   });
 
   test('after clicking a color in the color picker, the status modal is not closed', function () {
     sinon.stub(this.instance, 'close');
     this.instance.open();
     clock.tick(50); // wait for Modal to transition open
-    const modalContent = new ReactWrapper(this.wrapper.node.modalContentRef, this.wrapper.node);
-    modalContent.find('StatusColorListItem PopoverTrigger Button').at(0).simulate('click');
-    const colorButton = document.querySelector("button[role='radio'][title='steel (#E9EDF5)']");
-    colorButton.click();
+
+    const $modalContainer = ReactDOM.findDOMNode(this.instance.modalContentRef)
+    const $colorButton = [...$modalContainer.querySelectorAll('button')].find($button => (
+      $button.textContent === 'late Color Picker'
+    ))
+    $colorButton.click()
+
+    const $latePicker = this.instance.colorPickerContents.late
+    const $applyButton = [...$latePicker.querySelectorAll('button')].find($button => (
+      $button.textContent === 'Apply'
+    ))
+    $applyButton.click()
+
     strictEqual(this.instance.close.callCount, 0);
   });
 
@@ -250,12 +282,20 @@ QUnit.module('StatusesModal', function (suiteHooks) {
     const { wrapper, instance } = this;
     instance.open();
     clock.tick(50); // wait for Modal to transition open
-    const modalContent = new ReactWrapper(wrapper.node.modalContentRef, wrapper.node);
-    modalContent.find('StatusColorListItem PopoverTrigger Button').at(0).simulate('click');
-    const colorPickerContent = new ReactWrapper(wrapper.node.colorPickerContents.late, wrapper.node);
-    const applyButton = colorPickerContent.find('button').filterWhere(button => button.text() === 'Cancel');
-    applyButton.simulate('click');
-    strictEqual(modalContent.find('StatusColorListItem Popover').at(0).prop('show'), false);
+
+    const $modalContainer = ReactDOM.findDOMNode(wrapper.instance().modalContentRef)
+    const $colorButton = [...$modalContainer.querySelectorAll('button')].find($button => (
+      $button.textContent === 'late Color Picker'
+    ))
+    $colorButton.click()
+
+    const $latePicker = wrapper.instance().colorPickerContents.late
+    const $cancelButton = [...$latePicker.querySelectorAll('button')].find($button => (
+      $button.textContent === 'Cancel'
+    ))
+    $cancelButton.click()
+
+    strictEqual(document.querySelectorAll('.ColorPicker__Container').length, 0)
   });
 
   QUnit.module('StatusesModal integration behavior with StatusColorListItem');
@@ -267,13 +307,24 @@ QUnit.module('StatusesModal', function (suiteHooks) {
     const instance = wrapper.instance();
     instance.open();
     clock.tick(50); // wait for Modal to transition open
-    const modalContent = new ReactWrapper(wrapper.node.modalContentRef, wrapper.node);
-    modalContent.find('StatusColorListItem PopoverTrigger Button').at(0).simulate('click');
-    const colorPickerContent = new ReactWrapper(wrapper.node.colorPickerContents.late, wrapper.node);
-    const whiteSwatch = colorPickerContent.find('button').findWhere(button => button.prop('title') === 'white (#FFFFFF)');
-    whiteSwatch.simulate('click');
-    const applyButton = colorPickerContent.find('button').filterWhere(button => button.text() === 'Apply');
-    applyButton.simulate('click');
+
+    const $modalContainer = ReactDOM.findDOMNode(instance.modalContentRef)
+    const $colorButton = [...$modalContainer.querySelectorAll('button')].find($button => (
+      $button.textContent === 'late Color Picker'
+    ))
+    $colorButton.click()
+
+    const $latePicker = instance.colorPickerContents.late
+    const $whiteButton = [...$latePicker.querySelectorAll('button')].find($button => (
+      $button.textContent === 'white (#FFFFFF)'
+    ))
+    $whiteButton.click()
+
+    const $applyButton = [...$latePicker.querySelectorAll('button')].find($button => (
+      $button.textContent === 'Apply'
+    ))
+    $applyButton.click()
+
     strictEqual(afterUpdateStatusColors.firstCall.args[0].late, '#FFFFFF');
     wrapper.unmount();
   });

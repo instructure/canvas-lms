@@ -190,15 +190,17 @@
       </fieldset>
     {{/if}}
 
-    <fieldset>
-      <div class="form-column-left">{{#t}}Anonymous Instructor Annotations{{/t}}</div>
-      <div class="form-column-right" style="margin-top: 14px;">
-        <label class="checkbox">
-          {{checkbox "anonymousInstructorAnnotations" id="assignment_anonymous_instructor_annotations" name="anonymous_instructor_annotations"}}
-          {{#t}}Anonymize all annotations made by instructors on submissions for this assignment in SpeedGrader{{/t}}
-        </label>
-      </div>
-    </fieldset>
+    {{#if anonymousInstructorAnnotationsEnabled}}
+      <fieldset>
+        <div class="form-column-left">{{#t}}Anonymous Instructor Annotations{{/t}}</div>
+        <div class="form-column-right" style="margin-top: 14px;">
+          <label class="checkbox">
+            {{checkbox "anonymousInstructorAnnotations" id="assignment_anonymous_instructor_annotations" name="anonymous_instructor_annotations"}}
+            {{#t}}Anonymize all annotations made by instructors on submissions for this assignment in SpeedGrader{{/t}}
+          </label>
+        </div>
+      </fieldset>
+    {{/if}}
 
   </div>
 
@@ -236,6 +238,8 @@
 {{/if}}
 
 <input type='hidden' id="secure_params" name="secure_params" value="{{secureParams}}" />
+
+<div id="assignment_external_tools"></div>
 
 <div class="form-actions" style="padding-left: 10px;">
   <div class="pull-left" style="min-width: 300px;">

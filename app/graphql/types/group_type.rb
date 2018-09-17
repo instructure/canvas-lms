@@ -17,22 +17,26 @@
 #
 
 module Types
-  GroupType = GraphQL::ObjectType.define do
-    name "Group"
+  class GroupType < ApplicationObjectType
+    graphql_name "Group"
 
-    interfaces [Interfaces::TimestampInterface]
+    alias :group :object
 
-    field :_id, !types.ID, "legacy canvas id", property: :id
-    field :name, types.String
+    implements GraphQL::Relay::Node.interface
+    implements Interfaces::TimestampInterface
 
-    connection :membersConnection, GroupMembershipType.connection_type, resolve: ->(group, _, ctx) {
-      if group.grants_right? ctx[:current_user], :read_roster
+    field :_id, ID, "legacy canvas id", method: :id, null: false
+    field :name, String, null: true
+
+    field :members_connection, GroupMembershipType.connection_type, null: true
+    def members_connection
+      if group.grants_right?(current_user, :read_roster)
         group.group_memberships.where(
           workflow_state: GroupMembershipsController::ALLOWED_MEMBERSHIP_FILTER
         )
       else
         nil
       end
-    }
+    end
   end
 end

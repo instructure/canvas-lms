@@ -57,6 +57,7 @@ export class Opportunity extends Component {
   static defaultProps = {
     registerAnimatable: () => {},
     deregisterAnimatable: () => {},
+    dismiss: () => {},
   }
 
   componentDidMount () {
@@ -81,6 +82,56 @@ export class Opportunity extends Component {
     return this.link;
   }
 
+  dismiss = () => {
+    if (this.props.dismiss) {
+      this.props.dismiss(this.props.id, this.props.plannerOverride)
+    }
+  }
+
+  renderButton () {
+    const isDismissed = this.props.plannerOverride && this.props.plannerOverride.dismissed;
+    return (
+      <div className={styles.close}>
+        {isDismissed ? null : (
+          <Button
+            onClick={this.dismiss}
+            variant="icon"
+            icon={IconXLine}
+            size="small"
+            title={formatMessage("Dismiss {opportunityName}", {opportunityName: this.props.opportunityTitle})}
+          >
+            <ScreenReaderContent>
+              {formatMessage("Dismiss {opportunityName}", {opportunityName: this.props.opportunityTitle})}
+            </ScreenReaderContent>
+          </Button>
+        )}
+      </div>
+    );
+  }
+
+  renderPoints () {
+    if (typeof this.props.points !== 'number') {
+      return (
+        <ScreenReaderContent>
+          {formatMessage('There are no points associated with this item')}
+        </ScreenReaderContent>
+      );
+    }
+    return (
+      <div className={styles.points}>
+        <ScreenReaderContent>
+            {formatMessage("{points} points", {points: this.props.points})}
+        </ScreenReaderContent>
+        <PresentationContent>
+          <span className={styles.pointsNumber}>
+            {this.props.points}
+          </span>
+          {formatMessage("points")}
+        </PresentationContent>
+      </div>
+    );
+  }
+
   render () {
     return (
       <div className={styles.root}>
@@ -100,31 +151,9 @@ export class Opportunity extends Component {
                 {formatMessage('Due:')}</span> {this.fullDate}
             </div>
           </div>
-          <div className={styles.points}>
-            <ScreenReaderContent>
-               {formatMessage("{points} points", {points: this.props.points})}
-            </ScreenReaderContent>
-            <PresentationContent>
-              <span className={styles.pointsNumber}>
-                {this.props.points}
-              </span>
-              {formatMessage("points")}
-            </PresentationContent>
-          </div>
+          {this.renderPoints()}
         </div>
-        <div className={styles.close}>
-            <Button
-              onClick={() => this.props.dismiss(this.props.id, this.props.plannerOverride)}
-              variant="icon"
-              icon={IconXLine}
-              size="small"
-              title={formatMessage("Dismiss {opportunityName}", {opportunityName: this.props.opportunityTitle})}
-            >
-              <ScreenReaderContent>
-                {formatMessage("Dismiss {opportunityName}", {opportunityName: this.props.opportunityTitle})}
-              </ScreenReaderContent>
-            </Button>
-          </div>
+        {this.renderButton()}
       </div>
     );
   }

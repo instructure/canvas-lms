@@ -642,17 +642,18 @@ class CalendarEvent < ActiveRecord::Base
         # We should only enter this block if a user has made an appointment, so
         # there is always at least one element in current_apts
         current_appts = user_events.select { |appointment| @event.id == appointment[:parent_id]}
+        if current_appts.any?
+          if !event.description.nil?
+            event.description.concat("\n\n" + current_appts[0][:course_name] + "\n\n")
+          else
+            event.description = current_appts[0][:course_name] + "\n\n"
+          end
 
-        if !event.description.nil?
-          event.description.concat("\n\n" + current_appts[0][:course_name] + "\n\n")
-        else
-          event.description = current_appts[0][:course_name] + "\n\n"
+          event.description.concat("Participants: ")
+          current_appts.each { |appt| event.description.concat("\n" + appt[:user]) }
+          comments = current_appts.map{ |appt| appt[:comments] }.join(",\n")
+          event.description.concat("\n\n" + comments)
         end
-
-        event.description.concat("Participants: ")
-        current_appts.each { |appt| event.description.concat("\n" + appt[:user]) }
-        comments = current_appts.map{ |appt| appt[:comments] }.join(",\n")
-        event.description.concat("\n\n" + comments)
       end
 
       event.location = loc_string
@@ -661,9 +662,15 @@ class CalendarEvent < ActiveRecord::Base
 
       tag_name = @event.class.name.underscore
 
+      # Covers the case for when personal calendar event is created so that HostUrl finds the correct UR:
+      url_context = @event.context
+      if url_context.is_a? User
+        url_context = url_context.account
+      end
+
       # This will change when there are other things that have calendars...
       # can't call calendar_url or calendar_url_for here, have to do it manually
-      event.url           "https://#{HostUrl.context_host(@event.context)}/calendar?include_contexts=#{@event.context.asset_string}&month=#{start_at.try(:strftime, "%m")}&year=#{start_at.try(:strftime, "%Y")}##{tag_name}_#{@event.id}"
+      event.url           "https://#{HostUrl.context_host(url_context)}/calendar?include_contexts=#{@event.context.asset_string}&month=#{start_at.try(:strftime, "%m")}&year=#{start_at.try(:strftime, "%Y")}##{tag_name}_#{@event.id}"
       event.uid           "event-#{tag_name.gsub('_', '-')}-#{@event.id}"
       event.sequence      0
 

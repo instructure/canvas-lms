@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,14 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../common')
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/basic/permissions_specs')
+class AddPublicJwkToDeveloperKeys < ActiveRecord::Migration[5.1]
+  tag :predeploy
 
-describe "account permissions" do
-
-  describe "shared permission specs" do
-    let(:url) { "/accounts/#{Account.default.id}/permissions?account_roles=1" }
-    let(:account) { Account.default }
-    include_examples "permission tests"
+  def change
+    add_column :developer_keys, :public_jwk, :jsonb
   end
 end

@@ -21,16 +21,7 @@ import 'compiled/jquery.rails_flash_notifications'
 import 'jquery.disableWhileLoading'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import newCourseForm from 'compiled/util/newCourseForm'
 import DashboardHeader from '../dashboard/DashboardHeader'
-
-if (ENV.DASHBOARD_SIDEBAR_URL) {
-  const rightSide = $('#right-side')
-  rightSide.disableWhileLoading($.get(ENV.DASHBOARD_SIDEBAR_URL, (html) => {
-    rightSide.html(html)
-    newCourseForm()
-  }))
-}
 
 const dashboardHeaderContainer = document.getElementById('dashboard_header_container');
 if (dashboardHeaderContainer) {

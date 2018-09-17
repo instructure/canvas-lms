@@ -20,33 +20,32 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'underscore'
 import I18n from 'i18n!grading_periods'
-import SearchHelpers from '../shared/helpers/searchHelpers'
 
-  let SearchGradingPeriodsField = React.createClass({
-    propTypes: {
-      changeSearchText: PropTypes.func.isRequired
-    },
+export default class SearchGradingPeriodsField extends React.Component {
+  static propTypes = {
+    changeSearchText: PropTypes.func.isRequired
+  }
 
-    onChange(event) {
-      let trimmedText = event.target.value.trim();
-      this.search(trimmedText);
-    },
+  onChange = event => {
+    const trimmedText = event.target.value.trim()
+    this.search(trimmedText)
+  }
 
-    search: _.debounce(function(trimmedText) {
-      this.props.changeSearchText(trimmedText);
-    }, 200),
+  search = _.debounce(function(trimmedText) {
+    this.props.changeSearchText(trimmedText)
+  }, 200)
 
-    render() {
-      return (
-        <div className="GradingPeriodSearchField ic-Form-control">
-          <input type="text"
-                 ref="input"
-                 className="ic-Input"
-                 placeholder={I18n.t("Search grading periods...")}
-                 onChange={this.onChange}/>
-        </div>
-      );
-    }
-  });
-
-export default SearchGradingPeriodsField
+  render() {
+    return (
+      <div className="GradingPeriodSearchField ic-Form-control">
+        <input
+          type="text"
+          ref="input"
+          className="ic-Input"
+          placeholder={I18n.t('Search grading periods...')}
+          onChange={this.onChange}
+        />
+      </div>
+    )
+  }
+}

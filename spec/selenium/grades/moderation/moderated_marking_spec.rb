@@ -148,11 +148,11 @@ describe 'Moderated Marking' do
       wait_for_ajaximations
 
       # go to gradebook
-      Gradebook::MultipleGradingPeriods.visit_gradebook(@moderated_course)
+      Gradebook.visit_gradebook(@moderated_course)
 
       # expect grades to be shown
-      expect(Gradebook::MultipleGradingPeriods.grading_cell_attributes(0, 0).text).to eq('15')
-      expect(Gradebook::MultipleGradingPeriods.grading_cell_attributes(0, 1).text).to eq('12')
+      expect(Gradebook.grading_cell_attributes(0, 0).text).to eq('15')
+      expect(Gradebook.grading_cell_attributes(0, 1).text).to eq('12')
     end
 
     it 'display to student allows viewing final grade as student', priority: '1', test_id: 3513992 do

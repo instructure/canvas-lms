@@ -16,41 +16,37 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-addons-test-utils',
-  'jsx/editor/SwitchEditorControl',
-  'jsx/shared/rce/RichContentEditor'
-], (React, TestUtils, SwitchEditorControl, RichContentEditor) => {
+import React from 'react'
+import ReactDOM from 'react-dom'
+import TestUtils from 'react-addons-test-utils'
+import SwitchEditorControl from 'jsx/editor/SwitchEditorControl'
+import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
 
-  QUnit.module("SwitchEditorControl", {
-    setup() {
-      sinon.stub(RichContentEditor, 'callOnRCE')
-    },
+QUnit.module('SwitchEditorControl', {
+  setup() {
+    sinon.stub(RichContentEditor, 'callOnRCE')
+  },
 
-    teardown() {
-      RichContentEditor.callOnRCE.restore()
-    }
-  });
+  teardown() {
+    RichContentEditor.callOnRCE.restore()
+  }
+})
 
-  test('changes text on each click', ()=>{
-    let textarea = {}
-    let element = React.createElement(SwitchEditorControl, {textarea: textarea})
-    let component = TestUtils.renderIntoDocument(element)
-    let link = TestUtils.findRenderedDOMComponentWithTag(component, 'a')
-    equal(link.props.className, "switch-views__link__html")
-    TestUtils.Simulate.click(link.getDOMNode())
-    equal(link.props.className, "switch-views__link__rce")
-  })
+test('changes text on each click', () => {
+  const textarea = {}
+  const element = React.createElement(SwitchEditorControl, {textarea})
+  const component = TestUtils.renderIntoDocument(element)
+  const link = TestUtils.findRenderedDOMComponentWithTag(component, 'a')
+  equal(link.className, 'switch-views__link__html')
+  TestUtils.Simulate.click(ReactDOM.findDOMNode(link))
+  equal(link.className, 'switch-views__link__rce')
+})
 
-  test("passes textarea through to editor for toggling", ()=>{
-    let textarea = {id: "the text area"}
-    let element = React.createElement(SwitchEditorControl, {textarea: textarea})
-    let component = TestUtils.renderIntoDocument(element)
-    let link = TestUtils.findRenderedDOMComponentWithTag(component, 'a')
-    TestUtils.Simulate.click(link.getDOMNode())
-    ok(RichContentEditor.callOnRCE.calledWith(textarea))
-  })
-
-
-});
+test('passes textarea through to editor for toggling', () => {
+  const textarea = {id: 'the text area'}
+  const element = React.createElement(SwitchEditorControl, {textarea})
+  const component = TestUtils.renderIntoDocument(element)
+  const link = TestUtils.findRenderedDOMComponentWithTag(component, 'a')
+  TestUtils.Simulate.click(ReactDOM.findDOMNode(link))
+  ok(RichContentEditor.callOnRCE.calledWith(textarea))
+})

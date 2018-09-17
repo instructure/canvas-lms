@@ -542,4 +542,18 @@ This text has a http://www.google.com link in it...
       end
     end
   end
+
+  describe 'audit event logging' do
+    before(:once) { @assignment.update!(anonymous_grading: true, grader_count: 2) }
+    it 'creates exactly one AnonymousOrModerationEvent on creation' do
+      expect { @submission.submission_comments.create!(author: @student, anonymous: false) }.
+        to change { AnonymousOrModerationEvent.count }.by(1)
+    end
+
+    it 'on creation of the comment, the payload of the event includes boolean values that were set to false' do
+      @submission.submission_comments.create!(author: @student, anonymous: false)
+      payload = AnonymousOrModerationEvent.where(assignment: @assignment).last.payload
+      expect(payload).to include('anonymous' => false)
+    end
+  end
 end

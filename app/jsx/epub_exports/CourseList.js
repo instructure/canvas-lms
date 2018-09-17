@@ -21,25 +21,14 @@ import PropTypes from 'prop-types'
 import _ from 'underscore'
 import CourseListItem from '../epub_exports/CourseListItem'
 
-const CourseList = React.createClass({
-  displayName: 'CourseList',
-  propTypes: {
-    courses: PropTypes.object,
-  },
+export default function CourseList(props) {
+  return (
+    <ul className="ig-list">
+      {_.map(props.courses, (course, key) => <CourseListItem key={key} course={course} />)}
+    </ul>
+  )
+}
 
-  //
-  // Rendering
-  //
-
-  render () {
-    return (
-      <ul className="ig-list">
-        {_.map(this.props.courses, function (course, key) {
-          return <CourseListItem key={key} course={course} />;
-        })}
-      </ul>
-    );
-  }
-});
-
-export default CourseList
+CourseList.propTypes = {
+  courses: PropTypes.object
+}

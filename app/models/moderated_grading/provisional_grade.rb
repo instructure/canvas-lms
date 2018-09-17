@@ -18,7 +18,11 @@
 class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   include Canvas::GradeValidations
 
-  attr_writer :force_save
+  AUDITABLE_ATTRIBUTES = %w[
+    score grade graded_at final source_provisional_grade_id graded_anonymously scorer_id
+  ].freeze
+
+  attr_writer :force_save, :current_user
 
   belongs_to :submission, inverse_of: :provisional_grades
   belongs_to :scorer, class_name: 'User'
@@ -33,25 +37,29 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   validates :scorer, presence: true
   validates :submission, presence: true
 
-  before_create :must_be_final_or_student_in_need_of_provisional_grade
-  before_create :must_have_non_final_provisional_grade_to_create_final
+  before_create :must_be_final_or_student_in_need_of_provisional_grade,
+    :must_have_non_final_provisional_grade_to_create_final
 
   after_create :touch_graders # to update grading counts
-  after_save :touch_submission
-  after_save :remove_moderation_ignores
+  after_save :touch_submission, :remove_moderation_ignores
+
+  with_options if: :auditable? do
+    after_create :create_provisional_grade_created_event
+    after_update :create_provisional_grade_updated_event
+  end
 
   scope :scored_by, ->(scorer) { where(scorer_id: scorer) }
   scope :final, -> { where(:final => true)}
   scope :not_final, -> { where(:final => false)}
 
   def must_be_final_or_student_in_need_of_provisional_grade
-    if !self.final && !self.submission.assignment.can_be_moderated_grader?(self.scorer)
+    if final.blank? && !submission.assignment_can_be_moderated_grader?(scorer)
       raise(Assignment::GradeError, "Student already has the maximum number of provisional grades")
     end
   end
 
   def must_have_non_final_provisional_grade_to_create_final
-    if self.final && !self.submission.provisional_grades.not_final.exists?
+    if final.present? && submission.provisional_grades.not_final.empty?
       raise(Assignment::GradeError, "Cannot give a final mark for a student with no other provisional grades")
     end
   end
@@ -108,9 +116,11 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
     self.submission.student
   end
 
-  def publish!
-    submission.grade_posting_in_progress = true
+  def publish!(skip_grade_calc: false)
+    original_skip_grade_calc = submission.skip_grade_calc
     previously_graded = submission.grade.present? || submission.excused?
+    submission.skip_grade_calc = skip_grade_calc
+    submission.grade_posting_in_progress = true
     submission.grade = grade
     submission.score = score
     submission.graded_anonymously = graded_anonymously
@@ -122,6 +132,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
     publish_rubric_assessments!
   ensure
     submission.grade_posting_in_progress = false
+    submission.skip_grade_calc = original_skip_grade_calc
   end
 
   def copy_to_final_mark!(scorer)
@@ -160,6 +171,12 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
       :canvadoc_url => attachment.canvadoc_available? &&
                        attachment.canvadoc_url(user, url_opts)
     }
+  end
+
+  def auditable?
+    @current_user.present? &&
+      (destroyed? || saved_auditable_changes.present? || auditable_changes.present?) &&
+      submission.assignment_auditable?
   end
 
   private
@@ -216,5 +233,31 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
 
   def set_graded_at
     self.graded_at = Time.zone.now
+  end
+
+  def create_provisional_grade_created_event
+    create_audit_event(event_type: :provisional_grade_created, payload: slice([:id].concat(AUDITABLE_ATTRIBUTES)))
+  end
+
+  def create_provisional_grade_updated_event
+    create_audit_event(event_type: :provisional_grade_updated, payload: saved_auditable_changes.merge({id: id}))
+  end
+
+  def create_audit_event(event_type:, payload:)
+    AnonymousOrModerationEvent.create!(
+      assignment: submission.assignment,
+      submission: submission,
+      user: @current_user,
+      event_type: event_type,
+      payload: payload
+    )
+  end
+
+  def saved_auditable_changes
+    saved_changes.slice(*AUDITABLE_ATTRIBUTES)
+  end
+
+  def auditable_changes
+    changes.slice(*AUDITABLE_ATTRIBUTES)
   end
 end

@@ -17,40 +17,45 @@
  */
 
 import React from 'react'
+import createReactClass from 'create-react-class'
 import PropTypes from 'prop-types'
 import InputMixin from '../../external_apps/mixins/InputMixin'
 
-export default React.createClass({
-    displayName: 'TextInput',
+export default createReactClass({
+  displayName: 'TextInput',
 
-    mixins: [InputMixin],
+  mixins: [InputMixin],
 
-    propTypes: {
-      defaultValue: PropTypes.string,
-      label:        PropTypes.string,
-      id:           PropTypes.string,
-      required:     PropTypes.bool,
-      hintText:     PropTypes.string,
-      placeholder:  PropTypes.string,
-      errors:       PropTypes.object,
-      name:         PropTypes.string
-    },
+  propTypes: {
+    defaultValue: PropTypes.string,
+    label: PropTypes.string,
+    id: PropTypes.string,
+    required: PropTypes.bool,
+    hintText: PropTypes.string,
+    placeholder: PropTypes.string,
+    errors: PropTypes.object,
+    name: PropTypes.string
+  },
 
-    render() {
-      return (
-        <div className={this.getClassNames()}>
-          <label>
-            {this.props.label}
-            <input ref="input" type="text" defaultValue={this.state.value}
-              className="form-control input-block-level"
-              placeholder={this.props.placeholder || this.props.label}
-              required={this.props.required ? "required" : null}
-              onChange={this.handleChange}
-              aria-invalid={!!this.getErrorMessage()}
-              name={this.props.name || null}/>
-            {this.renderHint()}
-          </label>
-        </div>
-      )
-    }
-  });
+  render() {
+    return (
+      <div className={this.getClassNames()}>
+        <label>
+          {this.props.label}
+          <input
+            ref="input"
+            type="text"
+            defaultValue={this.state.value}
+            className="form-control input-block-level"
+            placeholder={this.props.placeholder || this.props.label}
+            required={this.props.required ? 'required' : null}
+            onChange={this.handleChange}
+            aria-invalid={!!this.getErrorMessage()}
+            name={this.props.name || null}
+          />
+          {this.renderHint()}
+        </label>
+      </div>
+    )
+  }
+})

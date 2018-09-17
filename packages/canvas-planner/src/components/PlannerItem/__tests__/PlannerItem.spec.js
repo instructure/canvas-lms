@@ -71,7 +71,6 @@ function groupProps (option) {
       "type": "Group",
       "id": "9",
       "title": "Account-level group 1",
-      "inform_students_of_overdue_submissions": false,
       "color": "#F06291",
       "url": "/groups/9"
     },
@@ -213,6 +212,20 @@ it('renders Assignment correctly with just date', () => {
   );
   expect(wrapper).toMatchSnapshot();
 });
+
+it('renders assignment peer reviews correctly', () => {
+  const wrapper = shallow(
+    <PlannerItem {
+      ...defaultProps(
+        {
+          associated_item: 'Peer Review',
+          title: 'some reviewable assignment',
+        }
+      )
+    } />
+  );
+  expect(wrapper).toMatchSnapshot();
+})
 
 it('renders Discussion correctly with everything', () => {
   const wrapper = shallow(
@@ -624,6 +637,17 @@ it('renders the location if available', () => {
   expect(wrapper).toMatchSnapshot();
 })
 
+it('renders feedback anonymously according to the assignment settings', () => {
+  const props = defaultProps({
+    feedback: {
+      comment: 'Open the pod bay doors, HAL.'
+    },
+    location: "NYC"
+  });
+  const wrapper = shallow(<PlannerItem {...props} />);
+  expect(wrapper).toMatchSnapshot();
+})
+
 it('prefers to render feedback if it and the location are available', () => {
   // I don't believe this is possible, but it's how the code handles it.
   const props = defaultProps({
@@ -664,5 +688,5 @@ it('renders media feedback if available', () => {
     is_media: true,
   }});
   const wrapper = shallow(<PlannerItem {...props} />);
-  expect(wrapper).toMatchSnapshot(); 
+  expect(wrapper).toMatchSnapshot();
 });

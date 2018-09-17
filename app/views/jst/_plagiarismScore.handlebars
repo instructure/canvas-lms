@@ -1,0 +1,18 @@
+{{! note that the class below is always "turnitin_similarity_score", regardless of whether we're using turnitin or vericite }}
+{{#if reportUrl}}
+  <a class="turnitin_similarity_score {{state}}" href="{{reportUrl}}" title="{{tooltip}}" target="_blank">
+    {{#if icon}}
+      <img src="{{icon}}"></img>
+    {{else}}
+      {{score}}
+    {{/if}}
+  </a>
+{{else}}
+  <span class="turnitin_similarity_score {{state}}" title="{{tooltip}}">
+    {{#if icon}}
+      <img src="{{icon}}"></img>
+    {{else}}
+      {{score}}
+    {{/if}}
+  </span>
+{{/if}}

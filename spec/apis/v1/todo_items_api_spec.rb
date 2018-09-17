@@ -459,5 +459,12 @@ describe UsersController, type: :request do
                 :controller => "users", :action => "todo_item_count", :format => "json")
       expect(json['needs_grading_count']).to eq 1
     end
+
+    it "doesn't count submissions on deleted assignments" do
+      @teacher_course.assignments.last.destroy
+      json = api_call(:get, "/api/v1/users/self/todo_item_count",
+                :controller => "users", :action => "todo_item_count", :format => "json")
+      expect(json['needs_grading_count']).to eq 0
+    end
   end
 end

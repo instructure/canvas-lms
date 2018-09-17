@@ -608,7 +608,7 @@ class DiscussionTopicsController < ApplicationController
     else
       @headers = !params[:headless]
       # we still need the lock info even if the current user policies unlock the topic. check the policies manually later if you need to override the lockout.
-      @locked = @topic.locked_for?(@current_user, :check_policies => false, :deep_check_if_needed => true)
+      @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
       @unlock_at = @topic.available_from_for(@current_user)
       @topic.change_read_state('read', @current_user) unless @locked.is_a?(Hash) && !@locked[:can_view]
       if @topic.for_group_discussion?
@@ -705,6 +705,7 @@ class DiscussionTopicsController < ApplicationController
               :SORT_BY_RATING => @topic.sort_by_rating,
               :TODO_DATE => @topic.todo_date,
               :IS_ASSIGNMENT => @topic.assignment_id?,
+              :ASSIGNMENT_ID => @topic.assignment_id,
               :IS_GROUP => @topic.group_category_id?
             }
             if params[:hide_student_names]
@@ -730,7 +731,7 @@ class DiscussionTopicsController < ApplicationController
             js_hash = {:DISCUSSION => env_hash}
             if @context.is_a?(Course)
               js_hash[:TOTAL_USER_COUNT] = @topic.context.enrollments.not_fake.
-                active_or_pending_by_date_ignoring_access.count
+                active_or_pending_by_date_ignoring_access.distinct.count(:user_id)
             end
             js_hash[:COURSE_ID] = @context.id if @context.is_a?(Course)
             js_hash[:CONTEXT_ACTION_SOURCE] = :discussion_topic

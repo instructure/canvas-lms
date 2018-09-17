@@ -86,5 +86,11 @@ describe "discussions index" do
       DiscussionNewEdit.select_a_section("")
       expect(DiscussionNewEdit.section_error).to include("A section is required")
     end
+
+    it 'graded sections will not show SectionsAutocomplete' do
+      login_and_visit_edit_course(@teacher, @course)
+      DiscussionNewEdit.graded_checkbox.click
+      expect(DiscussionNewEdit.section_disabled_item).to be_truthy
+    end
   end
 end

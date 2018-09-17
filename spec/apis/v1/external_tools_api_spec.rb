@@ -740,6 +740,8 @@ describe ExternalToolsController, type: :request do
      "post_grades"=>nil,
      "collaboration"=>nil,
      "similarity_detection"=>nil,
+     "assignment_edit"=>nil,
+     "assignment_view"=>nil,
      "course_assignments_menu" => begin
        if et && et.course_assignments_menu
          {

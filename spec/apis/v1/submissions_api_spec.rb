@@ -1092,6 +1092,7 @@ describe 'Submissions API', type: :request do
              "url" => "http://www.example.com/files/#{sub1.attachments.first.id}/download?download_frd=1&verifier=#{sub1.attachments.first.uuid}",
              "filename" => "unknown.loser",
              "display_name" => "unknown.loser",
+             "workflow_state" => "pending_upload",
              "id" => sub1.attachments.first.id,
              "uuid" => sub1.attachments.first.uuid,
              "folder_id" => sub1.attachments.first.folder_id,
@@ -1186,6 +1187,7 @@ describe 'Submissions API', type: :request do
                 "url" => "http://www.example.com/files/#{sub1.attachments.first.id}/download?download_frd=1&verifier=#{sub1.attachments.first.uuid}",
                 "filename" => "unknown.loser",
                 "display_name" => "unknown.loser",
+                "workflow_state" => "pending_upload",
                 "id" => sub1.attachments.first.id,
                 "uuid" => sub1.attachments.first.uuid,
                 "folder_id" => sub1.attachments.first.folder_id,
@@ -1295,6 +1297,7 @@ describe 'Submissions API', type: :request do
               {"content-type" => "image/png",
                "display_name" => "snapshot.png",
                "filename" => "snapshot.png",
+               "workflow_state" => "pending_upload",
                "url" => "http://www.example.com/files/#{sub2a1.id}/download?download_frd=1&verifier=#{sub2a1.uuid}",
                "id" => sub2a1.id,
                "uuid" => sub2a1.uuid,
@@ -1331,6 +1334,7 @@ describe 'Submissions API', type: :request do
          [{"content-type" => "image/png",
            "display_name" => "snapshot.png",
            "filename" => "snapshot.png",
+           "workflow_state" => "pending_upload",
            "url" => "http://www.example.com/files/#{sub2a1.id}/download?download_frd=1&verifier=#{sub2a1.uuid}",
            "id" => sub2a1.id,
            "uuid" => sub2a1.uuid,
@@ -1737,7 +1741,7 @@ describe 'Submissions API', type: :request do
       @provisional_grade.save!
     end
 
-    context "when teacher has moderate_grades rights" do
+    context "when teacher can view provisional grades" do
       it "displays grades" do
         json = api_call(:get,
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json",
@@ -1787,7 +1791,7 @@ describe 'Submissions API', type: :request do
       end
     end
 
-    context "when a TA does not have moderate_grades rights" do
+    context "when a TA cannot view provisional grades" do
       before do
         course_with_ta(course: @course)
         user_session(@ta)
@@ -4499,6 +4503,8 @@ describe 'Submissions API', type: :request do
 
     describe "include[]=provisional_grades" do
       before(:once) do
+        @course.root_account.enable_service(:avatars)
+        @course.root_account.save!
         @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/gradeable_students?include[]=provisional_grades"
         @params = { :controller => 'submissions_api', :action => 'gradeable_students',
                     :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.to_param,

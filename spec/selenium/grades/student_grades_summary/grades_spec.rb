@@ -452,21 +452,21 @@ describe "grades" do
       StudentGradesPage.visit_as_student(@course)
 
       expect(f("#student_select_menu")).to be_displayed
-      expect(f("#student_select_menu option[selected]")).to include_text "Student 1"
+      expect(fj("#student_select_menu option:selected")).to include_text "Student 1"
       expect(f("#submission_#{@submission.assignment_id} .grade")).to include_text "3"
 
       click_option("#student_select_menu", "Student 2")
       expect_new_page_load { f('#apply_select_menus').click }
 
       expect(f("#student_select_menu")).to be_displayed
-      expect(f("#student_select_menu option[selected]")).to include_text "Student 2"
+      expect(fj("#student_select_menu option:selected")).to include_text "Student 2"
       expect(f("#submission_#{@submission.assignment_id} .grade")).to include_text "4"
 
       click_option("#student_select_menu", "Student 1")
       expect_new_page_load { f('#apply_select_menus').click }
 
       expect(f("#student_select_menu")).to be_displayed
-      expect(f("#student_select_menu option[selected]")).to include_text "Student 1"
+      expect(fj("#student_select_menu option:selected")).to include_text "Student 1"
       expect(f("#submission_#{@submission.assignment_id} .grade")).to include_text "3"
     end
   end

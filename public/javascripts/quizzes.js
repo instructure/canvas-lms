@@ -59,6 +59,7 @@ import './supercalc'
 import './vendor/jquery.scrollTo'
 import 'jqueryui/sortable'
 import 'jqueryui/tabs'
+import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
 
 var dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility, scoreValidation;
 
@@ -1585,6 +1586,14 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
     scoreValidation.init();
     ipFilterValidation.init();
     renderDueDates();
+
+    if ($('#assignment_external_tools').length) {
+      AssignmentExternalTools.attach(
+        $('#assignment_external_tools')[0],
+        "assignment_edit",
+        parseInt(ENV.COURSE_ID, 10),
+        parseInt(ENV.ASSIGNMENT_ID, 10));
+    }
 
     $('#quiz_tabs').tabs();
     $('#editor_tabs').show();

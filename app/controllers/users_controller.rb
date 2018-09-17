@@ -157,7 +157,7 @@ class UsersController < ApplicationController
     :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
     :user_dashboard, :toggle_hide_dashcard_color_overlays,
     :masquerade, :external_tool, :dashboard_sidebar, :settings, :activity_stream,
-    :activity_stream_summary, :pandata_events_token]
+    :activity_stream_summary, :pandata_events_token, :dashboard_cards]
   before_action :require_registered_user, :only => [:delete_user_service,
     :create_user_service]
   before_action :reject_student_view_student, :only => [:delete_user_service,
@@ -553,10 +553,13 @@ class UsersController < ApplicationController
     end
   end
 
-  def dashboard_cards
-    cancel_cache_buster
+  DASHBOARD_CARD_TABS = [
+    Course::TAB_DISCUSSIONS, Course::TAB_ASSIGNMENTS,
+    Course::TAB_ANNOUNCEMENTS, Course::TAB_FILES
+  ].freeze
 
-    dashboard_courses = map_courses_for_menu(@current_user.menu_courses, :include_section_tabs => true)
+  def dashboard_cards
+    dashboard_courses = map_courses_for_menu(@current_user.menu_courses, tabs: DASHBOARD_CARD_TABS)
     Rails.cache.write(['last_known_dashboard_cards_count', @current_user].cache_key, dashboard_courses.count)
     render json: dashboard_courses
   end

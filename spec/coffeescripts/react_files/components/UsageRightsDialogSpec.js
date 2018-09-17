@@ -40,9 +40,9 @@ test('clicking cancelXButton closes modal', () => {
     itemsToManage: [new File({thumbnail_url: 'blah', usage_rights})]
   }
   const uRD = TestUtils.renderIntoDocument(<UsageRightsDialog {...props} />)
-  TestUtils.Simulate.click(uRD.refs.cancelXButton.getDOMNode())
+  TestUtils.Simulate.click(uRD.refs.cancelXButton)
   ok(modalClosed)
-  ReactDOM.unmountComponentAtNode(uRD.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(uRD).parentNode)
 })
 
 test('clicking canel closes the modal', () => {
@@ -53,9 +53,9 @@ test('clicking canel closes the modal', () => {
     itemsToManage: [new File({thumbnail_url: 'blah', usage_rights})]
   }
   const uRD = TestUtils.renderIntoDocument(<UsageRightsDialog {...props} />)
-  TestUtils.Simulate.click(uRD.refs.cancelButton.getDOMNode())
+  TestUtils.Simulate.click(uRD.refs.cancelButton)
   ok(modalClosed)
-  ReactDOM.unmountComponentAtNode(uRD.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(uRD).parentNode)
 })
 
 test('render the file name with multiple items', () => {
@@ -68,8 +68,8 @@ test('render the file name with multiple items', () => {
     ]
   }
   const uRD = TestUtils.renderIntoDocument(<UsageRightsDialog {...props} />)
-  equal(uRD.refs.fileName.getDOMNode().innerHTML, '2 items selected', 'has correct message')
-  ReactDOM.unmountComponentAtNode(uRD.getDOMNode().parentNode)
+  equal(uRD.refs.fileName.innerHTML, '2 items selected', 'has correct message')
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(uRD).parentNode)
 })
 
 test('render the file name with one item', () => {
@@ -78,8 +78,8 @@ test('render the file name with one item', () => {
   file.displayName = () => 'cats'
   const props = {closeModal() {}, itemsToManage: [file]}
   const uRD = TestUtils.renderIntoDocument(<UsageRightsDialog {...props} />)
-  equal(uRD.refs.fileName.getDOMNode().innerHTML, 'cats', 'has correct message')
-  ReactDOM.unmountComponentAtNode(uRD.getDOMNode().parentNode)
+  equal(uRD.refs.fileName.innerHTML, 'cats', 'has correct message')
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(uRD).parentNode)
 })
 
 test('render different right message', () => {
@@ -95,11 +95,11 @@ test('render different right message', () => {
   }
   const uRD = TestUtils.renderIntoDocument(<UsageRightsDialog {...props} />)
   equal(
-    uRD.refs.differentRightsMessage.props.children[1],
+    uRD.refs.differentRightsMessage.innerText,
     'Items selected have different usage rights.',
     'displays correct message'
   )
-  ReactDOM.unmountComponentAtNode(uRD.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(uRD).parentNode)
 })
 
 test('do not render different rights message when they are the same', () => {
@@ -114,7 +114,7 @@ test('do not render different rights message when they are the same', () => {
   }
   const uRD = TestUtils.renderIntoDocument(<UsageRightsDialog {...props} />)
   ok(!uRD.refs.differentRightsMessage, 'does not show the message')
-  ReactDOM.unmountComponentAtNode(uRD.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(uRD).parentNode)
 })
 
 test('render folder message for one folder', () => {
@@ -127,11 +127,11 @@ test('render folder message for one folder', () => {
   }
   const uRD = TestUtils.renderIntoDocument(<UsageRightsDialog {...props} />)
   equal(
-    uRD.refs.folderBulletList.props.children[0].props.children,
+    uRD.refs.folderBulletList.innerText,
     'some folder',
     'shows display name'
   )
-  ReactDOM.unmountComponentAtNode(uRD.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(uRD).parentNode)
 })
 
 test('render folder tooltip for multiple folders', () => {
@@ -144,12 +144,12 @@ test('render folder tooltip for multiple folders', () => {
   }
   const uRD = TestUtils.renderIntoDocument(<UsageRightsDialog {...props} />)
   equal(
-    uRD.refs.folderTooltip.getDOMNode().getAttribute('data-html-tooltip-title'),
+    uRD.refs.folderTooltip.getAttribute('data-html-tooltip-title'),
     'hello<br />hello',
     'sets title for multple folders'
   )
-  equal(uRD.refs.folderTooltip.props.children[0], 'and 2 more\u2026', 'sets count text')
-  ReactDOM.unmountComponentAtNode(uRD.getDOMNode().parentNode)
+  ok(uRD.refs.folderTooltip.innerText.match('and 2 more\u2026'), 'sets count text')
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(uRD).parentNode)
 })
 
 QUnit.module('UploadProgress: Submitting')
@@ -165,5 +165,5 @@ test('validate they selected usage right', () => {
   const uRD = TestUtils.renderIntoDocument(<UsageRightsDialog {...props} />)
   uRD.refs.usageSelection.getValues = () => ({use_justification: 'choose'})
   equal(uRD.submit(), false, 'returns false')
-  ReactDOM.unmountComponentAtNode(uRD.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(uRD).parentNode)
 })

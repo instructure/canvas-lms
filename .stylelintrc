@@ -6,5 +6,6 @@
   ],
   "rules": {
     "color-no-invalid-hex": true,
+    "shorthand-property-no-redundant-values": true,
   }
 }

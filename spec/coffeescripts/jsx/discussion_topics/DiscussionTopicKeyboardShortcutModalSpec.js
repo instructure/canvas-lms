@@ -19,10 +19,8 @@
 import $ from 'jquery'
 import DiscussionTopicKeyboardShortcutModal from 'jsx/discussion_topics/DiscussionTopicKeyboardShortcutModal'
 import React from 'react'
-import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
+import {mount} from 'enzyme'
 import I18n from 'i18n!KeyboardShortcutModal'
-
 
 const SHORTCUTS = [
   {
@@ -51,21 +49,13 @@ const SHORTCUTS = [
   }
 ]
 
-QUnit.module('DiscussionTopicKeyboardShortcutModal#render', {
-  setup() {
-    return $('#fixtures').append('<div id="application" />')
-  },
-  teardown() {
-    ReactDOM.unmountComponentAtNode(this.component.getDOMNode().parentNode)
-    $('#fixtures').empty()
-  }
-})
+QUnit.module('DiscussionTopicKeyboardShortcutModal#render')
 
 test('renders shortcuts', function() {
   const DiscussionTopicKeyboardShortcutModalElement = (
     <DiscussionTopicKeyboardShortcutModal isOpen />
   )
-  this.component = TestUtils.renderIntoDocument(DiscussionTopicKeyboardShortcutModalElement)
+  const wrapper = mount(DiscussionTopicKeyboardShortcutModalElement)
   const list = $('.ReactModalPortal').find('.navigation_list li')
   equal(SHORTCUTS.length, list.length)
   ok(
@@ -81,4 +71,5 @@ test('renders shortcuts', function() {
       })
     )
   )
+  wrapper.unmount()
 })

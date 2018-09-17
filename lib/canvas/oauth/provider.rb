@@ -95,6 +95,10 @@ module Canvas::Oauth
       { :client_id => key.id, :redirect_uri => redirect_uri, :scopes => scopes, :purpose => purpose }
     end
 
+    def valid_scopes?
+      @scopes.present? && @scopes.all? { |scope| key.scopes.include?(scope) }
+    end
+
     def self.is_oob?(uri)
       uri == OAUTH2_OOB_URI
     end
@@ -130,10 +134,9 @@ module Canvas::Oauth
     end
 
     private
+
     def default_app_name
       I18n.translate('pseudonym_sessions.default_app_name', 'Third-Party Application')
     end
-
-
   end
 end

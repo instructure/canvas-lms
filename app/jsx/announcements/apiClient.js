@@ -32,7 +32,8 @@ export function getAnnouncements(
     {per_page: 40},
     {page: page || announcements.currentPage},
     {search_term: term || null},
-    {filter_by: filter || null}
+    {filter_by: filter || null},
+    {no_avatar_fallback: '1'}
   ]
 
   if (contextType === 'course') {

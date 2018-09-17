@@ -203,7 +203,7 @@ class Assignment
         if @assignment.grade_as_group?
           comments = comments.reject { |comment| comment.group_comment_id.nil? }
         end
-        json[:submission_comments] = anonymous_moderated_submission_comments(
+        json[:submission_comments] = anonymous_moderated_submission_comments_json(
           assignment: @assignment,
           course: @course,
           current_user: @current_user,
@@ -226,7 +226,8 @@ class Assignment
           moderated_grading_whitelist: sub.moderated_grading_whitelist(
             @current_user,
             loaded_attachments: attachments_for_submission[sub]
-          )
+          ),
+          submission_id: sub.id
         }
 
         if url_opts[:enable_annotations]

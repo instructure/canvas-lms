@@ -35,9 +35,9 @@ class ConversationParticipant < ActiveRecord::Base
   scope :archived, -> { where(:workflow_state => 'archived') }
   scope :starred, -> { where(:label => 'starred') }
   scope :sent, -> { where("visible_last_authored_at IS NOT NULL").order("visible_last_authored_at DESC, conversation_id DESC") }
-  scope :for_masquerading_user, lambda { |user|
+  scope :for_masquerading_user, lambda { |masquerading_user, user_being_viewed|
     # site admins can see everything
-    next all if user.account_users.active.map(&:account_id).include?(Account.site_admin.id)
+    next all if masquerading_user.account_users.active.map(&:account_id).include?(Account.site_admin.id)
 
     # we need to ensure that the user can access *all* of each conversation's
     # accounts (and that each conversation has at least one account). so given
@@ -54,7 +54,11 @@ class ConversationParticipant < ActiveRecord::Base
     # we're also counting on conversations being in the join
 
     own_root_account_ids = Shard.birth.activate do
-      accts = user.associated_root_accounts.shard(user.in_region_associated_shards).select{ |a| a.grants_right?(user, :become_user) }
+      # check the target user's accounts - the masquerader may still have rights even if they're not directly associated
+      accts = (
+          masquerading_user.associated_root_accounts.shard(masquerading_user.in_region_associated_shards).to_a +
+          user_being_viewed.associated_root_accounts.shard(user_being_viewed.in_region_associated_shards).to_a
+        ).uniq.select{ |a| a.grants_right?(masquerading_user, :become_user) }
       # we really shouldn't need the global id here, but we've got a lot of participants with
       # global id's in their root_account_ids for some reason
       accts.map(&:id) + accts.map(&:global_id)

@@ -24,4 +24,13 @@ class ModeratedGrading::Selection < ActiveRecord::Base
 
   validates :student_id, uniqueness: { scope: :assignment_id }
 
+  def create_moderation_event(user)
+    AnonymousOrModerationEvent.create!(
+      assignment_id: assignment_id,
+      user: user,
+      submission_id: provisional_grade&.submission_id,
+      event_type: :provisional_grade_selected,
+      payload: { id: selected_provisional_grade_id, student_id: student_id }
+    )
+  end
 end

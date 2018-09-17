@@ -23,16 +23,11 @@ import { makeEndOfDayIfMidnight } from './dateUtils';
 const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
   let { plannable, plannable_type, planner_override } = apiResponse;
   const plannableId = plannable.id || plannable.page_id;
-  const markedComplete = planner_override;
 
   const details = {
     course_id: plannable.course_id || apiResponse.course_id,
-    title: plannable.name || plannable.title,
-    // items are completed if the user marks it as complete or made a submission
-    completed: (markedComplete != null)
-      ? markedComplete.marked_complete
-      : (apiResponse.submissions && apiResponse.submissions.submitted
-    ),
+    title: plannable.title,
+    completed: isComplete(apiResponse),
     points: plannable.points_possible,
     html_url: apiResponse.html_url || plannable.html_url,
     overrideId: planner_override && planner_override.id,
@@ -71,6 +66,7 @@ const TYPE_MAPPING = {
   announcement: "Announcement",
   planner_note: "To Do",
   calendar_event: "Calendar Event",
+  assessment_request: "Peer Review",
 };
 
 const getItemType = (plannableType) => {
@@ -218,7 +214,6 @@ function getCourseContext(course) {
     id: course.id,
     title: course.shortName,
     image_url: course.image,
-    inform_students_of_overdue_submissions: course.informStudentsOfOverdueSubmissions,
     color: course.color,
     url: course.href
   };
@@ -231,8 +226,23 @@ function getGroupContext(apiResponse, group) {
     id: group.id,
     title: group.name,
     image_url: undefined,
-    inform_students_of_overdue_submissions: false,  // group items don't have submissions
     color: group.color,
     url: group.url
   };
+}
+
+// is the item complete?
+// either marked as complete by the user, or because the work was completed.
+function isComplete(apiResponse) {
+  const { plannable, plannable_type, planner_override, submissions } = apiResponse;
+
+  let complete = false;
+  if (planner_override) {
+    complete = planner_override.marked_complete
+  } else if (plannable_type === 'assessment_request') {
+    complete = plannable.workflow_state === 'completed';
+  } else if (submissions) {
+    complete = submissions.submitted
+  }
+  return complete;
 }

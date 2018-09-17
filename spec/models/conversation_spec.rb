@@ -1029,7 +1029,7 @@ describe Conversation do
 
           conversation.add_message(u1, 'ohai')
           admin = account_admin_user(:account => @account, :active_all => true)
-          expect(u1.conversations.for_masquerading_user(admin).first).to be_present
+          expect(u1.conversations.for_masquerading_user(admin, u1).first).to be_present
         end
       end
     end

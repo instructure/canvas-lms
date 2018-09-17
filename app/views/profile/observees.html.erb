@@ -16,5 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
+<%
+  js_env ga_page_title: "Students Being Observed"
+%>
 <% content_for :page_title, join_title(t(:page_title, 'Students Being Observed'), @user.name) %>
 <% js_bundle :user_observees %>

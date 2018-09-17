@@ -23,6 +23,12 @@ module Lti
         tools_options[:current_user] = options[:current_user]
         tools_options[:user] = options[:current_user]
       end
+      if options[:only_visible]
+        tools_options[:only_visible] = options[:only_visible]
+        tools_options[:session] = options[:session] if options[:session]
+        tools_options[:visibility_placements] = placements
+      end
+
       ContextExternalTool.all_tools_for(context, tools_options).placements(*placements)
     end
 

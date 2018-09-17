@@ -16,61 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* @styleguide Modal Dialog
-
-## Default Canvas modal
-
-React Modal comes with very few default classes to make it as themeable as possible. If you want plain-vanilla Canvas modal styles, be sure to specify `className: 'ReactModal__Content--canvas'` when you initialize the modal, as follows:
-
-<br/>
-
-```javascript
-ReactDOM.render(
-  ReactModalExample(
-    { className: 'ReactModal__Content--canvas'
-      overlayClassName: 'ReactModal__Overlay--canvas' }
-  ), document.getElementById('react-modal-example')
-);
-```
-
-```html
-<p>
-  <div id="react-modal-example"></div>
-</p>
-```
-
-See `app/jsx/styleguide/ReactModalExample.jsx` for complete example usage.
-
-<br />
-
-## Mini Canvas modal
-
-For small dialogs like Confirms, the default Canvas modal width might seem too much.
-
-The `.ReactModal__Content--mini-modal` class can be appended to the `.ReactModal__Content--canvas` class to render a less wide modal dialog.
-
-<br/>
-
-```javascript
-ReactDOM.render(
-  ReactModalExample(
-    { label: 'Trigger Confirm Dialog',
-      className: 'ReactModal__Content--canvas ReactModal__Content--mini-modal',
-      overlayClassName: 'ReactModal__Overlay--canvas' }
-  ), document.getElementById('react-modal-confirm-example')
-);
-```
-
-```html
-<p>
-  <div id="react-modal-confirm-example"></div>
-</p>
-```
-
-See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
-
-*/
-
 // Global styles for any React modal.
 // Do not change these or your name will be cursed for generations.
 .ReactModal__Overlay {

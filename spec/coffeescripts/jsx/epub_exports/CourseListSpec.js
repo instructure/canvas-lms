@@ -17,8 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
+import {mount} from 'enzyme'
 import CourseList from 'jsx/epub_exports/CourseList'
 
 QUnit.module('CourseListSpec', {
@@ -37,18 +36,15 @@ QUnit.module('CourseListSpec', {
 })
 
 test('render', function() {
-  let CourseListElement = <CourseList courses={{}} />
-  let component = TestUtils.renderIntoDocument(CourseListElement)
-  let node = component.getDOMNode()
-  equal(node.querySelectorAll('li').length, 0, 'should not render list items')
-  ReactDOM.unmountComponentAtNode(node.parentNode)
-  CourseListElement = <CourseList courses={this.props} />
-  component = TestUtils.renderIntoDocument(CourseListElement)
-  node = component.getDOMNode()
+  let component = mount(<CourseList courses={{}} />)
+  equal(component.find('li').length, 0, 'should not render list items')
+  component.unmount()
+
+  component = mount(<CourseList courses={this.props} />)
   equal(
-    node.querySelectorAll('li').length,
+    component.find('li').length,
     Object.keys(this.props).length,
     'should have an li element per course in @props'
   )
-  ReactDOM.unmountComponentAtNode(node.parentNode)
+  component.unmount()
 })

@@ -21,15 +21,9 @@ define(function (require) {
   var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
   var ScreenReaderContent = require('jsx!./screen_reader_content');
   var SightedUserContent = require('jsx!./sighted_user_content');
-  var Icon = React.createClass({
-    getDefaultProps: function () {
-      return {
-        icon: '',
-        alt: null
-      };
-    },
+  class Icon extends React.Component {
 
-    render: function () {
+    render() {
       var isAccessible = !!this.props.alt;
       var className = 'ic-Icon ' + this.props.icon;
 
@@ -47,7 +41,7 @@ define(function (require) {
 
       return content;
     }
-  });
+  }
 
   return Icon;
 });

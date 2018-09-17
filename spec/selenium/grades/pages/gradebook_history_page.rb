@@ -168,13 +168,11 @@ class GradeBookHistory
     end
 
     def start_date_textfield
-      element = grandparent_fxpath(fxpath("//*[contains(text(),'Start Date')]"))
-      find_from_element_fxpath(element, "following-sibling::span[1]/span/input")
+      driver.find_element(:id, fj('label:contains("Start Date")')[:for])
     end
 
     def end_date_textfield
-      element = grandparent_fxpath(fxpath("//*[contains(text(),'End Date')]"))
-      find_from_element_fxpath(element, "following-sibling::span[1]/span/input")
+      driver.find_element(:id, fj('label:contains("End Date")')[:for])
     end
 
     def error_text_invalid_dates

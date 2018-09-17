@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import {mount} from 'enzyme'
 import GradeInput from 'jsx/gradezilla/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/GradeInput'
 
 /* eslint-disable qunit/no-identical-names */
@@ -89,7 +89,7 @@ QUnit.module('GradeInput', suiteHooks => {
 
   QUnit.module('when the "enter grades as" setting is "passFail"', contextHooks => {
     const getInputValue = () =>
-      wrapper.find('.Grid__AssignmentRowCell__CompleteIncompleteValue').node.textContent
+      wrapper.find('.Grid__AssignmentRowCell__CompleteIncompleteValue').at(0).getDOMNode().textContent
 
     contextHooks.beforeEach(() => {
       props.enterGradesAs = 'passFail'
@@ -123,7 +123,7 @@ QUnit.module('GradeInput', suiteHooks => {
       strictEqual(getInputValue(), 'Complete')
     })
 
-    test('sets the value to "Incomplete" when the submission is inccomplete', () => {
+    test('sets the value to "Incomplete" when the submission is incomplete', () => {
       props.submission.enteredGrade = 'incomplete'
       props.submission.enteredScore = 0
       mountComponent()
@@ -140,7 +140,8 @@ QUnit.module('GradeInput', suiteHooks => {
 
     test('adds the PointsInput-suffix class to the container', () => {
       mountComponent()
-      strictEqual(wrapper.hasClass('Grid__AssignmentRowCell__PointsInput'), true)
+      const {classList} = wrapper.getDOMNode()
+      strictEqual(classList.contains('Grid__AssignmentRowCell__PointsInput'), true)
     })
 
     test('renders a text input', () => {
@@ -196,7 +197,8 @@ QUnit.module('GradeInput', suiteHooks => {
 
     test('adds the PercentInput-suffix class to the container', () => {
       mountComponent()
-      strictEqual(wrapper.hasClass('Grid__AssignmentRowCell__PercentInput'), true)
+      const {classList} = wrapper.getDOMNode()
+      strictEqual(classList.contains('Grid__AssignmentRowCell__PercentInput'), true)
     })
 
     test('renders a text input', () => {
@@ -261,7 +263,8 @@ QUnit.module('GradeInput', suiteHooks => {
       mountComponent()
       wrapper
         .find('input[type="text"]')
-        .get(0)
+        .at(0)
+        .getDOMNode()
         .focus()
       wrapper.setProps({submission: {...props.submission, enteredScore: 8.0, enteredGrade: '8.00'}})
       strictEqual(getTextInputValue(), '')
@@ -548,7 +551,7 @@ QUnit.module('GradeInput', suiteHooks => {
     test('sets focus on the input', () => {
       mountComponent()
       wrapper.instance().focus()
-      strictEqual(document.activeElement, wrapper.find('input[type="text"]').get(0))
+      strictEqual(document.activeElement, wrapper.find('input[type="text"]').at(0).getDOMNode())
     })
 
     test('selects the content of the input', () => {

@@ -34,7 +34,7 @@ QUnit.module('ExternalApps.ConfigurationFormLti2', {
 
 test('renders', () => {
   const component = renderComponent({registrationUrl: ''})
-  ok(component.isMounted())
+  ok(component)
   ok(TestUtils.isCompositeComponentWithType(component, ConfigurationFormLti2))
 })
 

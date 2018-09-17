@@ -1094,7 +1094,7 @@ class ConversationsController < ApplicationController
     end
 
     filters = param_array(:filter)
-    @conversations_scope = @conversations_scope.for_masquerading_user(@real_current_user) if @real_current_user
+    @conversations_scope = @conversations_scope.for_masquerading_user(@real_current_user, @current_user) if @real_current_user
     @conversations_scope = @conversations_scope.tagged(*filters, :mode => filter_mode) if filters.present?
     @set_visibility = true
   end

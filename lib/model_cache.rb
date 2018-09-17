@@ -126,7 +126,7 @@ module ModelCache
       def #{method}(*args)
         if cache = ModelCache[#{options[:cache_name].inspect}] and cache = cache[#{options[:key_lookup].inspect}]
           #{maybe_reset}
-          cache[#{key_value}]
+          cache[#{key_value}] ||= #{orig_method}
         else
           #{orig_method}
         end

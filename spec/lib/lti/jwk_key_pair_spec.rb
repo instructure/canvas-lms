@@ -27,4 +27,20 @@ describe Lti::JWKKeyPair do
       end
     end
   end
+
+  describe "public_jwk" do
+    it 'includes the public key in JWK format' do
+      Timecop.freeze(Time.zone.now) do
+        keys = Lti::RSAKeyPair.new
+        expect(keys.public_jwk).to include(keys.private_key.public_key.to_jwk(kid: Time.now.utc.iso8601))
+      end
+    end
+
+    it 'does not include the private key claims in JWK format' do
+      Timecop.freeze(Time.zone.now) do
+        keys = Lti::RSAKeyPair.new
+        expect(keys.public_jwk.keys).not_to include 'd', 'p', 'q', 'dp', 'dq', 'qi'
+      end
+    end
+  end
 end

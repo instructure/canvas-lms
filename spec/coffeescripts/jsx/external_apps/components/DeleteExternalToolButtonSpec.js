@@ -30,10 +30,7 @@ const createElement = data => <DeleteExternalToolButton tool={data.tool} canAddE
 const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
 const getDOMNodes = function(data) {
   const component = renderComponent(data)
-  const btnTriggerDelete =
-    component.refs.btnTriggerDelete != null
-      ? component.refs.btnTriggerDelete.getDOMNode()
-      : undefined
+  const btnTriggerDelete = component.refs.btnTriggerDelete
   return [component, btnTriggerDelete]
 }
 
@@ -69,7 +66,7 @@ QUnit.module('ExternalApps.DeleteExternalToolButton', {
 
 test('does not render when the canAddEdit permission is false', () => {
   const tool = {name: 'test tool'}
-  const component = renderComponent({ tool, canAddEdit: false })
+  const component = renderComponent({tool, canAddEdit: false})
   const node = ReactDOM.findDOMNode(component)
   notOk(node)
 })
@@ -81,7 +78,7 @@ test('open and close modal', function() {
   ok(component.state.modalIsOpen, 'modal is open')
   ok(component.refs.btnClose)
   ok(component.refs.btnDelete)
-  Simulate.click(component.refs.btnClose.getDOMNode())
+  Simulate.click(component.refs.btnClose)
   ok(!component.state.modalIsOpen, 'modal is not open')
   ok(!component.refs.btnClose)
   ok(!component.refs.btnDelete)

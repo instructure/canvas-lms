@@ -29,13 +29,10 @@ const createElement = () => <AppFilters />
 const renderComponent = () => ReactDOM.render(createElement(), wrapper)
 const getDOMNodes = function() {
   const component = renderComponent()
-  const tabAll = component.refs.tabAll != null ? component.refs.tabAll.getDOMNode() : undefined
-  const tabNotInstalled =
-    component.refs.tabNotInstalled != null ? component.refs.tabNotInstalled.getDOMNode() : undefined
-  const tabInstalled =
-    component.refs.tabInstalled != null ? component.refs.tabInstalled.getDOMNode() : undefined
-  const filterText =
-    component.refs.filterText != null ? component.refs.filterText.getDOMNode() : undefined
+  const tabAll = component.refs.tabAll
+  const tabNotInstalled = component.refs.tabNotInstalled
+  const tabInstalled = component.refs.tabInstalled
+  const filterText = component.refs.filterText
   return [component, tabAll, tabNotInstalled, tabInstalled, filterText]
 }
 
@@ -134,7 +131,7 @@ QUnit.module('ExternalApps.AppFilters', {
 
 test('renders', () => {
   const [component, tabAll, tabNotInstalled, tabInstalled, filterText] = Array.from(getDOMNodes())
-  ok(component.isMounted())
+  ok(component)
   ok(TestUtils.isCompositeComponentWithType(component, AppFilters))
 })
 

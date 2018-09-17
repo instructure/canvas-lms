@@ -20,52 +20,42 @@ import _ from 'underscore'
 import I18n from 'i18n!modules'
 import React from 'react'
 
-  var PostGradesDialogSummaryPage = React.createClass({
-    render () {
-      return (
-        <div
-          className="post-summary text-center"
-        >
-          <h1
-            className="lead"
-          >
-            <span className="assignments-to-post-count">
-              {I18n.t({
-                one: 'You are ready to sync 1 assignment.',
-                other: 'You are ready to sync %{count} assignments.'
-              }, { count: this.props.postCount })}
-            </span>
-          </h1>
+export default function PostGradesDialogSummaryPage(props) {
+  return (
+    <div className="post-summary text-center">
+      <h1 className="lead">
+        <span className="assignments-to-post-count">
+          {I18n.t(
+            {
+              one: 'You are ready to sync 1 assignment.',
+              other: 'You are ready to sync %{count} assignments.'
+            },
+            {count: props.postCount}
+          )}
+        </span>
+      </h1>
 
-          <h4
-            style={{color: "#AAAAAA"}}
-          >
-            {this.props.needsGradingCount > 0 ?
-              <button
-                className="btn btn-link"
-                onClick={this.props.advanceToNeedsGradingPage}
-              >
-                {I18n.t('assignments_to_grade', {
-                  one: '1 assignment has ungraded submissions',
-                  other: '%{count} assignments have ungraded submissions'
-                }, { count: this.props.needsGradingCount })}
-              </button> : null}
-          </h4>
-          <form className="form-horizontal form-dialog form-inline">
-            <div className="form-controls">
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={ this.props.postGrades }
-              >
-                {I18n.t('Sync Grades')}
-              </button>
-            </div>
-          </form>
-
+      <h4 style={{color: '#AAAAAA'}}>
+        {props.needsGradingCount > 0 ? (
+          <button className="btn btn-link" onClick={props.advanceToNeedsGradingPage}>
+            {I18n.t(
+              'assignments_to_grade',
+              {
+                one: '1 assignment has ungraded submissions',
+                other: '%{count} assignments have ungraded submissions'
+              },
+              {count: props.needsGradingCount}
+            )}
+          </button>
+        ) : null}
+      </h4>
+      <form className="form-horizontal form-dialog form-inline">
+        <div className="form-controls">
+          <button type="button" className="btn btn-primary" onClick={props.postGrades}>
+            {I18n.t('Sync Grades')}
+          </button>
         </div>
-      )
-    }
-  })
-
-export default PostGradesDialogSummaryPage
+      </form>
+    </div>
+  )
+}

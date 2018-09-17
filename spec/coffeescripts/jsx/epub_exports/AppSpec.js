@@ -52,5 +52,5 @@ test('handeCourseStoreChange', function() {
     CourseEpubExportStore.getState(),
     'CourseEpubExportStore.setState should trigger component setState'
   )
-  ReactDOM.unmountComponentAtNode(component.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })

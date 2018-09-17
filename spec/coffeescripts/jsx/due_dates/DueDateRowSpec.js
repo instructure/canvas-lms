@@ -55,7 +55,7 @@ QUnit.module('DueDateRow with empty props and canDelete true', {
 })
 
 test('renders', function() {
-  ok(this.dueDateRow.isMounted())
+  ok(this.dueDateRow)
 })
 
 test('returns a remove link if canDelete', function() {
@@ -117,7 +117,7 @@ QUnit.module('DueDateRow with realistic props and canDelete false', {
 })
 
 test('renders', function() {
-  ok(this.dueDateRow.isMounted())
+  ok(this.dueDateRow)
 })
 
 test('does not return remove link if not canDelete', function() {

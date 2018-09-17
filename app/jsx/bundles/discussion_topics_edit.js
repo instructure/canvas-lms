@@ -66,10 +66,11 @@ function renderSectionsAutocomplete (view) {
         }
       }
 
+      const sectionsAreDisabled = isGradedDiscussion || isGroupDiscussion
       ReactDOM.render(
         <SectionsAutocomplete
           selectedSections={ENV.SELECTED_SECTION_LIST}
-          disabled={isGradedDiscussion || isGroupDiscussion}
+          disabled={sectionsAreDisabled}
           disableDiscussionOptions={disableDiscussionOptions}
           enableDiscussionOptions={enableDiscussionOptions}
           sections={ENV.SECTION_LIST}

@@ -1,120 +1,60 @@
 {
-  "group_navigation_99f191a": {
-    "message": "Grup Gezinme Menüsü"
-  },
-  "cc_attribution_share_alike_669e7f16": {
-    "message": "CC Özelliği İlk lisans modeli korunacak"
-  },
-  "quizzes_7e598f57": {
-    "message": "Kısa sınavlar"
-  },
-  "cc_attribution_non_commercial_no_derivatives_9fe74c00": {
-    "message": "CC Özelliği Ticari kullanılamayacak Özgün hali korunacak"
-  },
-  "c_2001_acme_inc_283f7f80": {
-    "message": "(c) 2001 Acme Inc."
-  },
-  "upload_a_new_file_96e6d4ff": {
-    "message": "Yeni bir dosya yükle"
-  },
-  "file_upload_form_4aaad554": {
-    "message": "Dosya Yükleme Formu"
-  },
-  "folder_705fd2d7": {
-    "message": "Klasör"
-  },
-  "insert_equella_links_49a8dacd": {
-    "message": "Equella Bağlantısı Ekle"
-  },
-  "assignment_list_a833f59d": {
-    "message": "Ödev Listesi"
-  },
-  "discussions_a5f96392": {
-    "message": "Tartışmalar"
-  },
-  "cc_attribution_no_derivatives_b006744f": {
-    "message": "CC Özelliği Özgün hali korunacak"
-  },
-  "usage_right_ff96f3e2": {
-    "message": "Kullanım Şartları:"
-  },
-  "click_to_embed_image_33107dd8": {
-    "message": "Görsel eklemek için tıklayın"
-  },
-  "i_hold_the_copyright_71ee91b1": {
-    "message": "Telif hakkı bendedir"
-  },
-  "files_c300e900": {
-    "message": "Dosyalar"
-  },
-  "cancel_image_upload_2c771950": {
-    "message": "Görsel yüklemeyi iptal et"
-  },
-  "people_b4ebb13c": {
-    "message": "Katılımcılar"
-  },
-  "loading_25990131": {
-    "message": "Yükleniyor..."
+  "announcement_list_da155734": {
+    "message": "Duyuru Listesi"
   },
   "announcements_a4b8ed4a": {
     "message": "Duyurular"
   },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "Biçimlendirme, aşağı tuşa basın ve seçin"
+  "assignments_1e02582c": {
+    "message": "Ödevler"
   },
   "background_color_press_down_to_select_ef99fdac": {
     "message": "Arkaplan rengi, aşağı tuşa basın ve seçin"
   },
-  "files_index_af7c662b": {
-    "message": "Dosya Başlıkları"
+  "c_2001_acme_inc_283f7f80": {
+    "message": "(c) 2001 Acme Inc."
   },
   "cancel_file_upload_9903e7b9": {
     "message": "Dosya yüklemeyi iptal et"
   },
-  "the_material_is_subject_to_fair_use_exception_41bc6a4b": {
-    "message": "Bu malzeme adil kullanım istisnasına tabidir"
-  },
-  "link_to_other_content_in_the_group_3fe25379": {
-    "message": "Gruptaki diğer içeriğe bağla"
-  },
-  "discussions_index_6c36ced": {
-    "message": "Tartışma Başlıkları"
-  },
-  "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
-    "message": "Dosyayı indirmek için herhangi bir dosya bağlantısına tıklayınız."
-  },
-  "copyright_holder_66ee111": {
-    "message": "Telif Sahibi:"
-  },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Zengin Metin Alanı. Yardım için ALT+F8 e basın"
-  },
-  "enter_search_terms_e397b1f0": {
-    "message": "arama ifadelerini gir"
-  },
-  "pages_e5414c2c": {
-    "message": "Sayfalar"
+  "cancel_image_upload_2c771950": {
+    "message": "Görsel yüklemeyi iptal et"
   },
   "cc_attribution_f6de631f": {
     "message": "CC Özelliği"
   },
-  "insert_link_6dc23cae": {
-    "message": "Bağlantı Ekle"
+  "cc_attribution_no_derivatives_b006744f": {
+    "message": "CC Özelliği Özgün hali korunacak"
   },
-  "collaborations_5c56c15f": {
-    "message": "İşbirliğine Yönelik Çalışmalar"
+  "cc_attribution_non_commercial_39e0d30d": {
+    "message": "CC Özelliği Ticari Olmayan"
   },
-  "what_would_you_like_to_call_the_new_page_d7e4488a": {
-    "message": "Yeni sayfaya hangi ismi vermek istersiniz?"
+  "cc_attribution_non_commercial_no_derivatives_9fe74c00": {
+    "message": "CC Özelliği Ticari kullanılamayacak Özgün hali korunacak"
+  },
+  "cc_attribution_non_commercial_share_alike_c7edb1e5": {
+    "message": "CC Özelliği Ticari kullanılamayacak İlk lisans modeli korunacak"
+  },
+  "cc_attribution_share_alike_669e7f16": {
+    "message": "CC Özelliği İlk lisans modeli korunacak"
+  },
+  "choose_usage_rights_33683854": {
+    "message": "Kullanıcı haklarını seçin..."
+  },
+  "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
+    "message": "Dosyayı indirmek için herhangi bir dosya bağlantısına tıklayınız."
   },
   "click_any_image_to_embed_the_image_in_the_page_2cdd1136": {
     "message": "Bu sayfaya bir görsel yerleştirmek için tıklayın."
   },
-  "search_flickr_6884b518": {
-    "message": "Flickr''da ara"
-  },
   "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
     "message": "Herhangi bir sayfaya bağlantı eklemek için ilgili sayfaya tıklayın."
+  },
+  "click_to_embed_image_33107dd8": {
+    "message": "Görsel eklemek için tıklayın"
+  },
+  "click_to_embed_imagename_c41ea8df": {
+    "message": "{ imageName } görselini eklemek için tıklayınız"
   },
   "click_to_insert_a_link_into_the_editor_c19613aa": {
     "message": "Düzenleyiciye bağlantı eklemek için tıklayın."
@@ -122,32 +62,101 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Bu öğeye bağlantı eklemek için tıklayınız"
   },
-  "load_more_results_460f49a9": {
-    "message": "Daha fazla sonuç yükle"
+  "close_flickr_form_b32e600a": {
+    "message": "Flickr formunu kapat"
   },
-  "link_7262adec": {
-    "message": "Bağlantı"
+  "collaborations_5c56c15f": {
+    "message": "İşbirliğine Yönelik Çalışmalar"
+  },
+  "copyright_holder_66ee111": {
+    "message": "Telif Sahibi:"
+  },
+  "course_navigation_dd035109": {
+    "message": "Ders Gezinme Menüsü"
+  },
+  "creative_commons_license_725584ae": {
+    "message": "Creative Commons Lisansı:"
+  },
+  "discussions_a5f96392": {
+    "message": "Tartışmalar"
+  },
+  "discussions_index_6c36ced": {
+    "message": "Tartışma Başlıkları"
+  },
+  "embed_image_1080badc": {
+    "message": "Görsel Ekle"
+  },
+  "enter_search_terms_e397b1f0": {
+    "message": "arama ifadelerini gir"
+  },
+  "file_upload_form_4aaad554": {
+    "message": "Dosya Yükleme Formu"
+  },
+  "files_c300e900": {
+    "message": "Dosyalar"
+  },
+  "files_index_af7c662b": {
+    "message": "Dosya Başlıkları"
+  },
+  "folder_705fd2d7": {
+    "message": "Klasör"
+  },
+  "font_size_press_down_to_select_6c25dc2d": {
+    "message": "Yazı büyüklüğü, aşağı tuşa basın ve seçin"
+  },
+  "formatting_press_down_to_select_df728c30": {
+    "message": "Biçimlendirme, aşağı tuşa basın ve seçin"
   },
   "grades_a61eba0a": {
     "message": "Notlar"
   },
+  "group_navigation_99f191a": {
+    "message": "Grup Gezinme Menüsü"
+  },
+  "i_have_obtained_permission_to_use_this_file_6386f087": {
+    "message": "Bu dosyayı kullanmak için iznim var."
+  },
+  "i_hold_the_copyright_71ee91b1": {
+    "message": "Telif hakkı bendedir"
+  },
+  "image_upload_form_7b74079a": {
+    "message": "Görsel Yükleme Formu"
+  },
+  "images_7ce26570": {
+    "message": "Görseller"
+  },
+  "insert_equella_links_49a8dacd": {
+    "message": "Equella Bağlantısı Ekle"
+  },
+  "insert_link_6dc23cae": {
+    "message": "Bağlantı Ekle"
+  },
+  "insert_math_equation_57c6e767": {
+    "message": "Matematik Denklemi Ekle"
+  },
+  "link_7262adec": {
+    "message": "Bağlantı"
+  },
+  "link_to_a_new_page_6c4ad034": {
+    "message": "Yeni Sayfaya Bağlantı Ekle"
+  },
+  "link_to_other_content_in_the_course_879163b5": {
+    "message": "Ders içindeki başka bir içeriğe bağla."
+  },
+  "link_to_other_content_in_the_group_3fe25379": {
+    "message": "Gruptaki diğer içeriğe bağla"
+  },
   "links_14b70841": {
     "message": "Bağlantılar"
   },
+  "load_more_results_460f49a9": {
+    "message": "Daha fazla sonuç yükle"
+  },
+  "loading_25990131": {
+    "message": "Yükleniyor..."
+  },
   "loading_failed_b3524381": {
     "message": "Yükleme Başarısız..."
-  },
-  "click_to_embed_imagename_c41ea8df": {
-    "message": "{ imageName } görselini eklemek için tıklayınız"
-  },
-  "close_flickr_form_b32e600a": {
-    "message": "Flickr formunu kapat"
-  },
-  "course_syllabus_5de1b0af": {
-    "message": "Ders Programı"
-  },
-  "upload_8b403d05": {
-    "message": "Yükle"
   },
   "modules_c4325335": {
     "message": "Modüller"
@@ -155,70 +164,58 @@
   "no_results_940393cf": {
     "message": "Sonuç yok."
   },
-  "announcement_list_da155734": {
-    "message": "Duyuru Listesi"
+  "pages_e5414c2c": {
+    "message": "Sayfalar"
   },
-  "link_to_a_new_page_6c4ad034": {
-    "message": "Yeni Sayfaya Bağlantı Ekle"
+  "people_b4ebb13c": {
+    "message": "Katılımcılar"
   },
-  "insert_math_equation_57c6e767": {
-    "message": "Matematik Denklemi Ekle"
+  "quizzes_7e598f57": {
+    "message": "Kısa sınavlar"
   },
-  "i_have_obtained_permission_to_use_this_file_6386f087": {
-    "message": "Bu dosyayı kullanmak için iznim var."
-  },
-  "cc_attribution_non_commercial_share_alike_c7edb1e5": {
-    "message": "CC Özelliği Ticari kullanılamayacak İlk lisans modeli korunacak"
-  },
-  "wiki_home_9cd54d0": {
-    "message": "Wiki Ana Sayfası"
-  },
-  "upload_a_new_image_890df275": {
-    "message": "Yeni bir görsel yükleyin"
+  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
+    "message": "Zengin Metin Alanı. Yardım için ALT+F8 e basın"
   },
   "search_280d00bd": {
     "message": "Ara"
   },
-  "assignments_1e02582c": {
-    "message": "Ödevler"
-  },
-  "cc_attribution_non_commercial_39e0d30d": {
-    "message": "CC Özelliği Ticari Olmayan"
-  },
-  "image_upload_form_7b74079a": {
-    "message": "Görsel Yükleme Formu"
-  },
-  "the_material_is_licensed_under_creative_commons_3242cb5e": {
-    "message": "Bu malzeme Creative Commons a göre lisanslı"
-  },
-  "images_7ce26570": {
-    "message": "Görseller"
-  },
-  "link_to_other_content_in_the_course_879163b5": {
-    "message": "Ders içindeki başka bir içeriğe bağla."
-  },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "Yazı büyüklüğü, aşağı tuşa basın ve seçin"
+  "search_flickr_6884b518": {
+    "message": "Flickr''da ara"
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Dosyanızı yükleyeceğiniz bir klasör seçin"
   },
-  "course_navigation_dd035109": {
-    "message": "Ders Gezinme Menüsü"
-  },
-  "choose_usage_rights_33683854": {
-    "message": "Kullanıcı haklarını seçin..."
+  "syllabus_f191f65b": {
+    "message": "Ders Programı"
   },
   "text_color_press_down_to_select_8f5ad9b5": {
     "message": "Yazı rengi, aşağı tuşa basın ve seçin"
   },
-  "embed_image_1080badc": {
-    "message": "Görsel Ekle"
-  },
-  "creative_commons_license_725584ae": {
-    "message": "Creative Commons Lisansı:"
-  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Bu malzeme genel kullanıma açık"
+  },
+  "the_material_is_licensed_under_creative_commons_3242cb5e": {
+    "message": "Bu malzeme Creative Commons a göre lisanslı"
+  },
+  "the_material_is_subject_to_fair_use_exception_41bc6a4b": {
+    "message": "Bu malzeme adil kullanım istisnasına tabidir"
+  },
+  "upload_8b403d05": {
+    "message": "Yükle"
+  },
+  "upload_a_new_file_96e6d4ff": {
+    "message": "Yeni bir dosya yükle"
+  },
+  "upload_a_new_image_890df275": {
+    "message": "Yeni bir görsel yükleyin"
+  },
+  "usage_right_ff96f3e2": {
+    "message": "Kullanım Şartları:"
+  },
+  "what_would_you_like_to_call_the_new_page_d7e4488a": {
+    "message": "Yeni sayfaya hangi ismi vermek istersiniz?"
+  },
+  "wiki_home_9cd54d0": {
+    "message": "Wiki Ana Sayfası"
   }
 }

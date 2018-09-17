@@ -19,7 +19,7 @@
 /* eslint-disable qunit/no-identical-names */
 
 import React from 'react'
-import {mount, ReactWrapper} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import {mount} from 'enzyme'
 import GradeInput from 'jsx/gradezilla/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/GradeInput'
 
 QUnit.module('GradeInput using CompleteIncompleteGradeInput', suiteHooks => {
@@ -89,17 +89,13 @@ QUnit.module('GradeInput using CompleteIncompleteGradeInput', suiteHooks => {
   }
 
   function getRenderedOptions() {
-    return new ReactWrapper([...$menuContent.querySelectorAll('[role="menuitem"]')], $menuContent)
+    return [...$menuContent.querySelectorAll('[role="menuitem"]')]
   }
 
   function clickMenuItem(optionText) {
     return new Promise(resolve => {
       resolveClose = resolve
-      const matchingOptions = getRenderedOptions().filterWhere(
-        option => option.text() === optionText
-      )
-
-      matchingOptions.first().simulate('click')
+      getRenderedOptions().find($option => $option.textContent === optionText).click()
     })
   }
 
@@ -108,12 +104,14 @@ QUnit.module('GradeInput using CompleteIncompleteGradeInput', suiteHooks => {
   }
 
   function getTextValue() {
-    return wrapper.find('.Grid__AssignmentRowCell__CompleteIncompleteValue').node.textContent
+    const text = wrapper.find('.Grid__AssignmentRowCell__CompleteIncompleteValue').at(0)
+    return text.getDOMNode().textContent
   }
 
   test('adds the CompleteIncompleteInput-suffix class to the container', () => {
     mountComponent()
-    strictEqual(wrapper.hasClass('Grid__AssignmentRowCell__CompleteIncompleteInput'), true)
+    const classList = wrapper.getDOMNode().classList
+    strictEqual(classList.contains('Grid__AssignmentRowCell__CompleteIncompleteInput'), true)
   })
 
   test('renders a text container', () => {
@@ -125,7 +123,7 @@ QUnit.module('GradeInput using CompleteIncompleteGradeInput', suiteHooks => {
   test('optionally disables the menu button', () => {
     props.disabled = true
     mountComponent()
-    const button = wrapper.find('button').node
+    const button = wrapper.find('button').at(0).getDOMNode()
     strictEqual(button.disabled, true)
   })
 
@@ -350,7 +348,7 @@ QUnit.module('GradeInput using CompleteIncompleteGradeInput', suiteHooks => {
     test('sets focus on the button', () => {
       mountComponent()
       wrapper.instance().focus()
-      strictEqual(document.activeElement, wrapper.find('button').node)
+      strictEqual(document.activeElement, wrapper.find('button').at(0).getDOMNode())
     })
   })
 
@@ -361,7 +359,7 @@ QUnit.module('GradeInput using CompleteIncompleteGradeInput', suiteHooks => {
       mountComponent()
       const handleKeyDown = action => wrapper.instance().handleKeyDown({...action})
       // return false to allow the popover menu to open
-      wrapper.find('button').node.focus()
+      wrapper.find('button').at(0).getDOMNode().focus()
       strictEqual(handleKeyDown(ENTER), false)
     })
   })
@@ -406,7 +404,7 @@ QUnit.module('GradeInput using CompleteIncompleteGradeInput', suiteHooks => {
       const expectedLabels = ['Complete', 'Incomplete', 'Ungraded', 'Excused']
       mountComponent()
       return clickToOpen().then(() => {
-        const optionsText = getRenderedOptions().map(option => option.text())
+        const optionsText = getRenderedOptions().map($option => $option.textContent)
         deepEqual(optionsText, expectedLabels)
       })
     })

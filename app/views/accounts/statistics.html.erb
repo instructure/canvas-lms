@@ -33,6 +33,13 @@
 <% if @counts_report %>
   <h2><%= t(:general_numbers_title, "General Numbers") %></h2>
   <table class="numbers_table">
+    <thead class="screenreader-only">
+      <tr>
+        <th scope="col"><%= t("Category") %></th>
+        <th scope="col"><%= t("Value") %></th>
+        <th scope="col"><%= t("Actions") %></th>
+      </tr>
+    </thead>
     <tr>
       <th scope="row"><%= before_label(:generated_at, "Generated") %></th>
       <td><%= datetime_string(@counts_report['generated_at']) %></td>
@@ -41,28 +48,45 @@
     <tr>
       <th scope="row"><%= before_label(:courses, "Courses") %></th>
       <td><%= n(@counts_report['courses']) %></td>
-      <td style="font-size: 0.8em; padding-<%= direction('left') %>: 20px;"><a href="#" class="over_time_link" data-key="courses" data-name="<%= t('labels.courses', "Courses") %>"><%= t(:over_time_link, "over time") %></a></td>
+      <td style="font-size: 0.8em; padding-<%= direction('left') %>: 20px;">
+        <a aria-label="<%= t("courses over time") %>" href="#" class="over_time_link" data-key="courses" data-name="<%= t('labels.courses', "Courses") %>">
+          <span aria-hidden="true"><%= t(:over_time_link, "over time") %></span>
+        </a></td>
     </tr>
     <tr>
       <th scope="row"><%= before_label(:teachers, "Teachers") %></th>
       <td><%= n(@counts_report['teachers']) %></td>
-      <td style="font-size: 0.8em; padding-<%= direction('left') %>: 20px;"><a href="#" class="over_time_link" data-key="teachers" data-name="<%= t('labels.teachers', "Teachers") %>"><%= t(:over_time_link, "over time") %></a></td>
+      <td style="font-size: 0.8em; padding-<%= direction('left') %>: 20px;">
+        <a aria-label="<%= t("teachers over time") %>" href="#" class="over_time_link" data-key="teachers" data-name="<%= t('labels.teachers', "Teachers") %>">
+          <span aria-hidden="true"><%= t(:over_time_link, "over time") %></span>
+        </a></td>
     </tr>
     <tr>
       <th scope="row"><%= before_label(:students, "Students") %></th>
       <td><%= n(@counts_report['students']) %></td>
-      <td style="font-size: 0.8em; padding-<%= direction('left') %>: 20px;"><a href="#" class="over_time_link" data-key="students" data-name="<%= t('labels.students', "Students") %>"><%= t(:over_time_link, "over time") %></a></td>
+      <td style="font-size: 0.8em; padding-<%= direction('left') %>: 20px;">
+        <a aria-label="<%= t("students over time") %>" href="#" class="over_time_link" data-key="students" data-name="<%= t('labels.students', "Students") %>">
+          <span aria-hidden="true"><%= t(:over_time_link, "over time") %></span>
+        </a></td>
     </tr>
     <tr>
       <th scope="row"><%= before_label(:users, "Users") %></th>
       <td><%= n(@counts_report['users']) %></td>
-      <td style="font-size: 0.8em; padding-<%= direction('left') %>: 20px;"><a href="#" class="over_time_link" data-key="users" data-name="<%= t('labels.users', "Users") %>"><%= t(:over_time_link, "over time") %></a></td>
+      <td style="font-size: 0.8em; padding-<%= direction('left') %>: 20px;">
+        <a aria-label="<%= t("users over time") %>"href="#" class="over_time_link" data-key="users" data-name="<%= t('labels.users', "Users") %>">
+          <span aria-hidden="true"><%= t(:over_time_link, "over time") %></span>
+        </a></td>
     </tr>
-    <tr>
-      <th scope="col"><%= t(:file_storage_header, "File Storage") %></th>
-      <td></td>
-      <td></td>
-    </tr>
+  </table>
+  <h2><%= t("File Storage") %></h2>
+  <table class="numbers_table">
+    <thead class="screenreader-only">
+      <tr>
+        <th scope="col"><%= t("Category") %></th>
+        <th scope="col"><%= t("Value") %></th>
+        <th scope="col"><%= t("Actions") %></th>
+      </tr>
+    </thead>
     <tr>
       <th scope="row">&nbsp;&nbsp;<%= before_label(:uploaded_storage, "Uploaded") %></th>
       <td class='number'>
@@ -70,7 +94,11 @@
              :file_size => number_to_human_size(@counts_report['files_size'] || 0), :count => @counts_report['files'],
              :wrapper => '<span style="font-size: 0.8em;">\1</span>') %>
       </td>
-      <td style="font-size: 0.8em; padding-<%= direction('left') %>: 20px;"><a href="#" class="over_time_link" data-key="files_size" data-name="<%= t(:uploaded_file_storage_header, "Uploaded File Storage") %>"><%= t(:over_time_link, "over time") %></a></td>
+      <td style="font-size: 0.8em; padding-<%= direction('left') %>: 20px;">
+        <a aria-label="<%= t("uploaded over time") %>" href="#" class="over_time_link" data-key="files_size" data-name="<%= t(:uploaded_file_storage_header, "Uploaded File Storage") %>">
+          <span aria-hidden="true"><%= t(:over_time_link, "over time") %></span>
+        </a>
+      </td>
     </tr>
     <tr>
       <th scope="row">&nbsp;&nbsp;<%= before_label(:media_storage, "Media") %></th>
@@ -79,7 +107,11 @@
              :file_size => number_to_human_size(@counts_report['media_files_size'] || 0), :count => @counts_report['media_files'],
              :wrapper => '<span style="font-size: 0.8em;">\1</span>') %>
       </td>
-      <td style="font-size: 0.8em; padding-<%= direction('left') %>: 20px;"><a href="#" class="over_time_link" data-key="media_files_size" data-name="<%= t(:media_file_storage_header, "Media File Storage") %>"><%= t(:over_time_link, "over time") %></a></td>
+      <td style="font-size: 0.8em; padding-<%= direction('left') %>: 20px;">
+        <a aria-label="<%= t("media over time") %>" href="#" class="over_time_link" data-key="media_files_size" data-name="<%= t(:media_file_storage_header, "Media File Storage") %>">
+          <span aria-hidden="true"><%= t(:over_time_link, "over time") %></span>
+        </a>
+      </td>
     </tr>
   </table>
 <% end %>

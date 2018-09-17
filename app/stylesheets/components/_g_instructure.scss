@@ -1009,8 +1009,8 @@ $wizard-bg-color: $ic-color-dark;
 }
 
 .communication_message {
-  margin: 0 0.5em 0.5em 0.5em;
-  padding: 0 0 0.5em 0;
+  margin: 0 0.5em 0.5em;
+  padding: 0 0 0.5em;
   width: auto;
   color: #000;
   border-bottom: 1px solid #ddd;
@@ -1276,7 +1276,7 @@ $wizard-bg-color: $ic-color-dark;
     }
     li {
       padding: 2px 5px;
-      margin: 0 0 2px 0;
+      margin: 0 0 2px;
       list-style: none;
       background: #e8e8e8;
     }
@@ -1774,7 +1774,7 @@ form.user_content_post_form {
   }
   .fixed_warning {
     background-color: #FDD;
-    border-width: 2px 0 0 0;
+    border-width: 2px 0 0;
     border-style: solid;
     border-color: black;
     padding: 15px;

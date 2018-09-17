@@ -182,4 +182,26 @@ describe "/gradebooks/speed_grader" do
       expect(html.at_css('#grading-box-points-possible .score')).not_to be_present
     end
   end
+
+  context "hide student names checkbox" do
+    let(:html) do
+      render template: "gradebooks/speed_grader", locals: locals
+      Nokogiri::HTML.fragment(response.body)
+    end
+
+    before(:once) do
+      @assignment = @course.assignments.create!(assignment_valid_attributes)
+      assign(:assignment, @assignment)
+    end
+
+    it "is not rendered when anonymous grading is enabled" do
+      @assignment.update!(anonymous_grading: true)
+      expect(html.at_css("#hide_student_names")).not_to be_present
+    end
+
+    it "is rendered when anonymous grading is not enabled" do
+      @assignment.update!(anonymous_grading: false)
+      expect(html.at_css("#hide_student_names")).to be_present
+    end
+  end
 end

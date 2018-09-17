@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import {mount} from 'enzyme'
 import {Provider} from 'react-redux'
 
 import * as AssignmentActions from 'jsx/assignments/GradeSummary/assignment/AssignmentActions'
@@ -142,6 +142,7 @@ QUnit.module('GradeSummary Header', suiteHooks => {
     test('receives the unmuteAssignmentStatus as a prop', () => {
       mountComponent()
       store.dispatch(AssignmentActions.setPublishGradesStatus(AssignmentActions.STARTED))
+      wrapper.update()
       const button = wrapper.find('PostButton')
       equal(button.prop('publishGradesStatus'), AssignmentActions.STARTED)
     })
@@ -200,6 +201,7 @@ QUnit.module('GradeSummary Header', suiteHooks => {
     test('receives the unmuteAssignmentStatus as a prop', () => {
       mountComponent()
       store.dispatch(AssignmentActions.setUnmuteAssignmentStatus(AssignmentActions.STARTED))
+      wrapper.update()
       const button = wrapper.find('DisplayToStudentsButton')
       equal(button.prop('unmuteAssignmentStatus'), AssignmentActions.STARTED)
     })

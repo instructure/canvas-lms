@@ -28,7 +28,7 @@ QUnit.module('CurrentUploads', {
     this.uploads = ReactDOM.render(<CurrentUploads />, $('<div>').appendTo('#fixtures')[0])
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.uploads.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.uploads).parentNode)
     $('#fixtures').empty()
   },
   mockUploader(name, progress) {

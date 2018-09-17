@@ -77,7 +77,7 @@
     overflow-y: auto;
     position: relative;
     border: none;
-    border-radius: 0px 0px 5px 0px;
+    border-radius: 0px 0px 5px;
     background-color: $ic-color-light;
     .learning_outcome {
       label.span3 {
@@ -92,7 +92,7 @@
     }
     label {
       display: block;
-      padding: 5px 0 5px 0;
+      padding: 5px 0;
     }
     .outcome-calculation-method-form {
       .grid-row {
@@ -325,7 +325,7 @@ table.criterion .insert {
 }
 
 .no-outcomes-warning {
-  margin: 10px 40px 10px 40px;
+  margin: 10px 40px;
 }
 
 .outcomes_narrow_text_input {

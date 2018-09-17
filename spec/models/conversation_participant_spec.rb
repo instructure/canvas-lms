@@ -219,13 +219,13 @@ describe ConversationParticipant do
     it "should let site admins see everything" do
       Account.site_admin.account_users.create!(user: @admin_user)
       allow(Account.site_admin).to receive(:grants_right?).with(@admin_user, :become_user).and_return(false)
-      convos = @target_user.conversations.for_masquerading_user(@admin_user)
+      convos = @target_user.conversations.for_masquerading_user(@admin_user, @target_user)
       expect(convos.size).to eql 4
       expect(convos).to eq @target_user.conversations.to_a
     end
 
     it "should limit others to their associated root accounts" do
-      convos = @target_user.conversations.for_masquerading_user(@admin_user)
+      convos = @target_user.conversations.for_masquerading_user(@admin_user, @target_user)
       expect(convos.size).to eql 2
       expect(convos.sort_by(&:id)).to eql [@c1, @c2]
     end
@@ -502,13 +502,13 @@ describe ConversationParticipant do
           # not sure how this happens in prod, but it does
           @c1.update_attribute(:root_account_ids, [@a1.id, @a1.global_id].sort.join(","))
 
-          convos = @target_user.conversations.for_masquerading_user(@admin_user)
+          convos = @target_user.conversations.for_masquerading_user(@admin_user, @target_user)
           expect(convos.size).to eql 1
           expect(convos.sort_by(&:id)).to eql [@c1]
 
           @cross_shard_admin =  @shard1.activate { user_factory }
           @a1.account_users.create!(user: @cross_shard_admin)
-          convos = @target_user.conversations.for_masquerading_user(@cross_shard_admin)
+          convos = @target_user.conversations.for_masquerading_user(@cross_shard_admin, @target_user)
           expect(convos.size).to eql 1
         end
       end

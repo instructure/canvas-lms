@@ -29,9 +29,6 @@
   "insert_equella_links_49a8dacd": {
     "message": "Equella-Links einfügen"
   },
-  "assignment_list_a833f59d": {
-    "message": "Aufgabenliste"
-  },
   "alternative_text_a834dcad": {
     "message": "Alternativer Text:"
   },
@@ -161,9 +158,6 @@
   "close_flickr_form_b32e600a": {
     "message": "Flickr-Formular schließen"
   },
-  "course_syllabus_5de1b0af": {
-    "message": "Kurssyllabus"
-  },
   "upload_8b403d05": {
     "message": "Hochladen"
   },
@@ -205,9 +199,6 @@
   },
   "cc_attribution_non_commercial_39e0d30d": {
     "message": "CC Zuordnung, Nicht kommerziell"
-  },
-  "quizzes_list_d812caa6": {
-    "message": "Quizliste"
   },
   "image_upload_form_7b74079a": {
     "message": "Bild hochladen (Formular)"

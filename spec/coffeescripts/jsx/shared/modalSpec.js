@@ -29,7 +29,7 @@ QUnit.module('Modal', {
     return $('body').append('<div id=application />')
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.component.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.component).parentNode)
     return $('#application').remove()
   }
 })

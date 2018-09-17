@@ -363,7 +363,29 @@ describe LiveEventsObserver do
       end
     end
 
-    context "the tag_type is not context_module" do
+    context "the tag_type is context_module_progression" do
+      let(:context_module) { course.context_modules.create! }
+      let(:context_module_progression) { context_module.context_module_progressions.create!(user_id: user_model.id) }
+
+      it "posts update events if module and course are complete" do
+        expect(Canvas::LiveEvents).to receive(:course_completed).with(anything)
+        expect_any_instance_of(CourseProgress).to receive(:completed?).and_return(true)
+        context_module_progression.update_attribute(:workflow_state, 'completed')
+      end
+
+      it "does not post update events if module is not complete" do
+        expect(Canvas::LiveEvents).not_to receive(:course_completed).with(anything)
+        context_module_progression.update_attribute(:workflow_state, 'in_progress')
+      end
+
+      it "does not post update events if course is not complete" do
+        expect(Canvas::LiveEvents).not_to receive(:course_completed).with(anything)
+        expect_any_instance_of(CourseProgress).to receive(:completed?).and_return(false)
+        context_module_progression.update_attribute(:workflow_state, 'completed')
+      end
+    end
+
+    context "the tag_type is not context_module or context_module_progression" do
       it "does nothing" do
         expect(Canvas::LiveEvents).not_to receive(:module_item_created)
         expect(Canvas::LiveEvents).not_to receive(:module_item_updated)

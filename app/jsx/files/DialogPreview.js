@@ -23,47 +23,41 @@ import Folder from 'compiled/models/Folder'
 import filesEnv from 'compiled/react_files/modules/filesEnv'
 import FilesystemObjectThumbnail from '../files/FilesystemObjectThumbnail'
 
-  var MAX_THUMBNAILS_TO_SHOW = 5;
+const MAX_THUMBNAILS_TO_SHOW = 5
 
-  // This is used to show a preview inside of a modal dialog.
-  var DialogPreview = React.createClass({
-    displayName: 'DialogPreview',
+// This is used to show a preview inside of a modal dialog.
+class DialogPreview extends React.Component {
+  static displayName = 'DialogPreview'
 
-    propTypes: {
-      itemsToShow: PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired
-    },
+  static propTypes = {
+    itemsToShow: PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired
+  }
 
-    renderPreview () {
-      if (this.props.itemsToShow.length === 1) {
-        return (
-          <FilesystemObjectThumbnail
-            model={this.props.itemsToShow[0]}
-            className='DialogPreview__thumbnail'
-          />
-        );
-      } else {
-        return this.props.itemsToShow.slice(0, MAX_THUMBNAILS_TO_SHOW).map((model, index) => {
-          return (
-            <i
-              key={model.cid}
-              className='media-object ef-big-icon FilesystemObjectThumbnail mimeClass-file DialogPreview__thumbnail'
-              style={{
-                left: (10 * index),
-                top: (-140 * index)
-              }}
-            />
-          );
-        });
-      }
-    },
-
-    render () {
+  renderPreview = () => {
+    if (this.props.itemsToShow.length === 1) {
       return (
-        <div className='DialogPreview__container'>
-          {this.renderPreview()}
-        </div>
-      );
+        <FilesystemObjectThumbnail
+          model={this.props.itemsToShow[0]}
+          className="DialogPreview__thumbnail"
+        />
+      )
+    } else {
+      return this.props.itemsToShow.slice(0, MAX_THUMBNAILS_TO_SHOW).map((model, index) => (
+        <i
+          key={model.cid}
+          className="media-object ef-big-icon FilesystemObjectThumbnail mimeClass-file DialogPreview__thumbnail"
+          style={{
+            left: 10 * index,
+            top: -140 * index
+          }}
+        />
+      ))
     }
-  });
+  }
+
+  render() {
+    return <div className="DialogPreview__container">{this.renderPreview()}</div>
+  }
+}
 
 export default DialogPreview

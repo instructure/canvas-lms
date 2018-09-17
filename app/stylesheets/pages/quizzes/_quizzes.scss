@@ -103,7 +103,7 @@ li.quiz {
   #quiz_details {
     // display: none so jquery ui toggles correctly
     display: none;
-    margin: 0 auto 10px auto;
+    margin: 0 auto 10px;
     max-height: 500px;
     overflow: auto;
     .submitted_list {
@@ -203,7 +203,7 @@ li.quiz {
     min-width: 120px;
   }
   .button-container {
-    padding: 0 30px 0 30px;
+    padding: 0 30px;
     .previous-question,
     .next-question {
       position: relative;
@@ -254,7 +254,7 @@ li.quiz {
     .answers {
       .answer {
         clear: both;
-        margin: 0 0 8px 0;
+        margin: 0 0 8px;
         position: relative;
         @if $use_high_contrast {
           opacity: 0.7;
@@ -329,7 +329,7 @@ li.quiz {
 #questions.assessing, #questions.assessment_results {
   .question_holder {
     .question {
-      margin: 0.7em 30px 30px 30px;
+      margin: 0.7em 30px 30px;
       &.related {
         border-width: 2px;
       }
@@ -349,7 +349,7 @@ li.quiz {
   padding: 16px;
   min-height: 225px;
   .answer {
-    padding: 5px 5px;
+    padding: 5px;
     margin: 0;
     @include clearfix;
     &:last-child {
@@ -389,7 +389,7 @@ li.quiz {
   }
   .group_top {
     border: 1px solid #aaa;
-    padding: 8px 10px 3px 10px;
+    padding: 8px 10px 3px;
     background-color: #eee;
     clear: both;
     position: relative;
@@ -535,7 +535,7 @@ li.quiz {
 }
 
 #questions.assessment_results .question_holder .question {
-  margin: 0.7em auto 30px auto;
+  margin: 0.7em auto 30px;
   min-width: 415px;
   width: 80%;
 }
@@ -545,7 +545,7 @@ li.quiz {
   background-color: #fff;
   position: relative;
   min-height: 50px;
-  margin: 0.7em auto 30px auto;
+  margin: 0.7em auto 30px;
   _height: 10px;
   &.modified_but_not_saved {
     border-width: 2px;
@@ -557,7 +557,7 @@ li.quiz {
   .move {
     background: none !important;
     float: direction(left);
-    margin: 8px 8px 0 8px;
+    margin: 8px 8px 0;
     width: 16px;
     height: 16px;
     padding: 2px;
@@ -583,7 +583,7 @@ li.quiz {
   }
   .text {
     clear: direction(left);
-    padding: 5px 20px 20px 20px;
+    padding: 5px 20px 20px;
     .button-container {
       clear: both;
     }
@@ -643,7 +643,7 @@ li.quiz {
         word-wrap: break-word;
       }
       .answer {
-        padding: 8px 30px 0 30px;
+        padding: 8px 30px 0;
         .answer_list {
           margin: 5px;
           padding-#{direction(left)}: 0;
@@ -814,7 +814,7 @@ li.quiz {
     }
   }
   .answer_match {
-    padding: 0 0 10px 0;
+    padding: 0 0 10px;
     .answer_match_left, .answer_match_left_html {
       float: direction(left);
       width: 45%;
@@ -1331,7 +1331,7 @@ ul#quiz_versions {
       }
       .option-group {
         max-width: 478px;
-        padding: 10px 10px 0 10px;
+        padding: 10px 10px 0;
         border: 1px solid #ccc;
         border-radius: 4px;
         margin-bottom: 15px;
@@ -1831,7 +1831,7 @@ ul#quiz_versions {
 .answers {
   .quiz_comment {
     font-size: 0.9em;
-    margin: 16px 0 8px 0;
+    margin: 16px 0 8px;
     padding: 5px 10px;
   }
 }
@@ -1996,7 +1996,7 @@ ul#quiz_versions {
     vertical-align: top;
   }
   .file-upload-box-with-file {
-    padding: 5px 5px 5px 5px;
+    padding: 5px;
     .icon-end {
       color: grey;
       border-top-left-radius: 0;
@@ -2012,7 +2012,7 @@ ul#quiz_versions {
     border-bottom-left-radius: 5px;
   }
   .controls {
-    margin: 0 auto 30px auto;
+    margin: 0 auto 30px;
   }
 }
 
@@ -2121,11 +2121,11 @@ ul#quiz_versions {
 }
 
 .regraded-warning {
-  margin: 0 0 10px 0;
+  margin: 0 0 10px;
 }
 
 #quiz-submission-version-table {
-  margin: 30px 0 20px 0;
+  margin: 30px 0 20px;
   @include clearfix;
 
   .submission-pending-review {

@@ -17,11 +17,10 @@
 
 require_relative '../../common'
 
-class StudentContextTray
-  class << self
-    include SeleniumDependencies
+module StudentContextTray
+    #------------------------------ Selectors -----------------------------
 
-    # selectors
+    #------------------------------ Elements ------------------------------
     def student_tray_header
       f(".StudentContextTray-Header")
     end
@@ -34,9 +33,25 @@ class StudentContextTray
       f(".StudentContextTray-Header__NameLink a")
     end
 
-    # actions & methods
+    def todo_tray_course_selector
+      f("#to-do-item-course-select")
+    end
+
+    def todo_tray_course_suggestions
+      fj("ul[role=listbox]:contains('Optional: Add Course')")
+    end
+
+    def todo_tray_dropdown_select_course(course_name)
+      fj("li[role=option]:contains('#{course_name}')")
+    end
+
+    #------------------------ Actions & Methods ---------------------------
     def wait_for_student_tray
       wait_for(method: nil, timeout: 1) { student_name_link.displayed? }
     end
-  end
+
+    def todo_tray_select_course_from_dropdown(course_name='Optional: Add Course')
+      todo_tray_course_selector.click
+      todo_tray_dropdown_select_course(course_name).click
+    end
 end

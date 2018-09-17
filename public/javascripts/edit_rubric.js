@@ -501,6 +501,9 @@ import 'compiled/jquery/fixDialogButtons'
           }
           var $rating = $rating_template.clone(true);
           $rating.toggleClass('edge_rating', count === 1 || count === criterion.ratings.length);
+          if (count === criterion.ratings.length) {
+            $rating.find('.add_rating_link').remove()
+          }
           $rating.fillTemplateData({data: rating});
           $rating.find('.range_rating').showIf(criterion.criterion_use_range === true && rating.min_points !== rating.points);
           $criterion.find(".ratings").append($rating);

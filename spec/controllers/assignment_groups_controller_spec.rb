@@ -362,6 +362,22 @@ describe AssignmentGroupsController do
       expect(@quiz.assignment_group_id).to eq(@group1.id)
     end
 
+    it 'marks downstream_changes for master courses' do
+      @quiz = @course.quizzes.create!(title: 'teh quiz', quiz_type: 'assignment', assignment_group_id: @group1)
+      mc_course = Course.create!
+      @template = MasterCourses::MasterTemplate.set_as_master_course(mc_course)
+      sub = @template.add_child_course!(@course)
+      @course.reload.assignments.map{|a| sub.content_tag_for(a)}
+
+      user_session(@teacher)
+      post :reorder_assignments, params: {course_id: @course.id, assignment_group_id: @group2.id, order: @order + ",#{@quiz.assignment.id}"}
+      expect(response).to be_successful
+      [@assignment1, @assignment2, @quiz].each do |obj|
+        expect(sub.content_tag_for(obj).reload.downstream_changes).to include("assignment_group_id")
+      end
+      expect(sub.content_tag_for(@assignment3).reload.downstream_changes).to be_empty # already was in group2
+    end
+
     context 'with grading periods' do
       before :once do
         group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)

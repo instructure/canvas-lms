@@ -123,7 +123,7 @@ export function formatDateAtTimeWithoutYear (date, timeZone) {
 
   // If  we're not in canvas, then there's no monkey-patch. Use a fallback in the test environment.
   if (process.env.NODE_ENV === 'test' && !tz.format) {
-    return moment(date).format('lll') // includes the year, unfortunately
+    return moment(date).format('lll'); // includes the year, unfortunately
   } else {
     return tz.format(date, 'date.formats.date_at_time', timeZone);
   }

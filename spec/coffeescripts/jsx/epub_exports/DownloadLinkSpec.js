@@ -49,13 +49,13 @@ test('state showDownloadLink', function() {
   DownloadLinkElement = <DownloadLink {...this.props} />
   component = TestUtils.renderIntoDocument(DownloadLinkElement)
   ok(component.showDownloadLink(), 'should be true with permissions to download')
-  ReactDOM.unmountComponentAtNode(component.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })
 
 test('render', function() {
   let DownloadLinkElement = <DownloadLink {...this.props} />
   let component = TestUtils.renderIntoDocument(DownloadLinkElement)
-  let node = component.getDOMNode()
+  let node = ReactDOM.findDOMNode(component)
   ok(isNull(node))
   this.props.course.epub_export = {
     epub_attachment: {url: 'http://download.url'},
@@ -63,9 +63,9 @@ test('render', function() {
   }
   DownloadLinkElement = <DownloadLink {...this.props} />
   component = TestUtils.renderIntoDocument(DownloadLinkElement)
-  node = component.getDOMNode()
+  node = ReactDOM.findDOMNode(component)
   const link = node.querySelectorAll('a')[0]
   equal(link.tagName, 'A', 'tag should be link')
   ok(link.textContent.match(I18n.t('Download')), 'should show download text')
-  ReactDOM.unmountComponentAtNode(component.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })

@@ -28,7 +28,7 @@ describe('getBadgesForItem', () => {
   });
 
   it('returns missing status with a danger variant and "Missing" text', () => {
-    const item = { status: { missing: true }, context: { inform_students_of_overdue_submissions: true } };
+    const item = { status: { missing: true } };
     expect(getBadgesForItem(item)).toEqual([{
       id: 'missing',
       text: 'Missing',
@@ -37,7 +37,7 @@ describe('getBadgesForItem', () => {
   });
 
   it('returns late status with a danger variant and "Late" text', () => {
-    const item = { status: { late: true }, context: { inform_students_of_overdue_submissions: true } };
+    const item = { status: { late: true } };
     expect(getBadgesForItem(item)).toEqual([{
       id: 'late',
       text: 'Late',
@@ -141,8 +141,8 @@ describe('getBadgesForItems', () => {
 
   it('returns Missing object when at least one new activity item has a missing status', () => {
     const items = [
-      { status: { fake: true }, context: { inform_students_of_overdue_submissions: true } },
-      { newActivity: true, status: { missing: true }, context: { inform_students_of_overdue_submissions: true } }
+      { status: { fake: true } },
+      { newActivity: true, status: { missing: true } }
     ];
     expect(getBadgesForItems(items)).toContainEqual({
       id: 'missing',
@@ -153,8 +153,8 @@ describe('getBadgesForItems', () => {
 
   it('returns Late object when at least one new activity item has a missing status', () => {
     const items = [
-      { status: { fake: true }, context: { inform_students_of_overdue_submissions: true } },
-      { newActivity: true, status: { late: true }, context: { inform_students_of_overdue_submissions: true } }
+      { status: { fake: true } },
+      { newActivity: true, status: { late: true } }
     ];
     expect(getBadgesForItems(items)).toContainEqual({
       id: 'late',
@@ -170,12 +170,10 @@ describe('getBadgesForItems', () => {
     const items = [
       {
         status: { fake: true },
-        context: { inform_students_of_overdue_submissions: true }
       },
       {
         newActivity: true,
         status: { missing: true, late: true },
-        context: { inform_students_of_overdue_submissions: true }
       }
     ];
     expect(getBadgesForItems(items)).toEqual([{
@@ -222,7 +220,6 @@ describe('showPillForOverdueStatus', () => {
   beforeEach(() => {
     item = {
       status: { missing: true, late: false },
-      context: { inform_students_of_overdue_submissions: true }
     };
   });
 
@@ -230,16 +227,7 @@ describe('showPillForOverdueStatus', () => {
     expect(showPillForOverdueStatus.bind(this, 'wat', item)).toThrow();
   });
 
-  it(`returns true if the value is true for the requested status and the
-    course is set to inform students of overdue submissions`, () => {
-    expect(showPillForOverdueStatus('missing', item)).toEqual(true);
-  });
-
-  // inform_students_of_overdue_submissions is true if new_gradebook is enbled
-  // and we decided to show missing and late pills in planner regardless
-  it(`returns true if the value is true for the requested status even if the
-    course is set to not inform students of overdue submissions`, () => {
-    item.context.inform_students_of_overdue_submissions = false;
+  it(`returns true if the value is true for the requested status`, () => {
     expect(showPillForOverdueStatus('missing', item)).toEqual(true);
   });
 
@@ -250,11 +238,6 @@ describe('showPillForOverdueStatus', () => {
 
   it('returns false if the value is not true for the requested status', () => {
     item.status.missing = false;
-    expect(showPillForOverdueStatus('missing', item)).toEqual(false);
-  });
-
-  it('returns false if the "context" on the item is null', () => {
-    item.context = null;
     expect(showPillForOverdueStatus('missing', item)).toEqual(false);
   });
 });

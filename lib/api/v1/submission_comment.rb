@@ -52,7 +52,7 @@ module Api::V1::SubmissionComment
     submission_comments.map{ |submission_comment| submission_comment_json(submission_comment, user) }
   end
 
-  def anonymous_moderated_submission_comments(assignment:, submissions:, submission_comments:, current_user:, course:, avatars:)
+  def anonymous_moderated_submission_comments_json(assignment:, submissions:, submission_comments:, current_user:, course:, avatars:)
     @comment_methods ||= avatars ? [:avatar_path] : []
     @comment_fields ||= %i(attachments author_id author_name cached_attachments comment created_at
                            draft group_comment_id id media_comment_id media_comment_type)

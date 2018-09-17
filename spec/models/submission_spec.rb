@@ -44,6 +44,9 @@ describe Submission do
   it { is_expected.to validate_numericality_of(:seconds_late_override).is_greater_than_or_equal_to(0).allow_nil }
   it { is_expected.to validate_inclusion_of(:late_policy_status).in_array(["none", "missing", "late"]).allow_nil }
 
+  it { is_expected.to delegate_method(:auditable?).to(:assignment).with_prefix(true) }
+  it { is_expected.to delegate_method(:can_be_moderated_grader?).to(:assignment).with_prefix(true) }
+
   describe '#anonymous_id' do
     subject { submission.anonymous_id }
 
@@ -2511,6 +2514,87 @@ describe Submission do
     end
   end
 
+  describe "'view_turnitin_report' right" do
+    let(:teacher) do
+      user = User.create
+      @context.enroll_teacher(user)
+      user
+    end
+
+    before :once do
+      @assignment.update!(submission_types: "online_upload,online_text_entry")
+
+      @submission = @assignment.submit_homework(@user, {body: "hello there", submission_type: 'online_text_entry'})
+      @submission.turnitin_data = {
+        "submission_#{@submission.id}" => {
+          web_overlap: 92,
+          error: true,
+          publication_overlap: 0,
+          state: "failure",
+          object_id: "123456789",
+          student_overlap: 90,
+          similarity_score: 92
+        }
+      }
+      @submission.save!
+    end
+
+    it "is available when the plagiarism report is from turnitin" do
+      expect(@submission).to be_grants_right(teacher, nil, :view_turnitin_report)
+    end
+
+    it "is available when the plagiarism report is blank (defaults to turnitin)" do
+      @submission.turnitin_data.delete(:provider)
+      expect(@submission).to be_grants_right(teacher, nil, :view_turnitin_report)
+    end
+
+    it "is not available when the plagiarism report is from vericite" do
+      @submission.turnitin_data[:provider] = 'vericite'
+      expect(@submission).not_to be_grants_right(teacher, nil, :view_turnitin_report)
+    end
+  end
+
+  describe "'view_vericite_report' right" do
+    let(:teacher) do
+      user = User.create
+      @context.enroll_teacher(user)
+      user
+    end
+
+    before :once do
+      @assignment.update!(submission_types: "online_upload,online_text_entry")
+
+      @submission = @assignment.submit_homework(@user, {body: "hello there", submission_type: 'online_text_entry'})
+      @submission.turnitin_data = {
+        "submission_#{@submission.id}" => {
+          web_overlap: 92,
+          error: true,
+          publication_overlap: 0,
+          state: "failure",
+          object_id: "123456789",
+          student_overlap: 90,
+          similarity_score: 92
+        },
+        provider: 'vericite'
+      }
+      @submission.save!
+    end
+
+    it "is available when the plagiarism report is from vericite" do
+      expect(@submission).to be_grants_right(teacher, nil, :view_vericite_report)
+    end
+
+    it "is not available when the plagiarism report is from turnitin" do
+      @submission.turnitin_data[:provider] = 'turnitin'
+      expect(@submission).not_to be_grants_right(teacher, nil, :view_vericite_report)
+    end
+
+    it "is not available when the plagiarism report is blank (defaults to turnitin)" do
+      @submission.turnitin_data.delete(:provider)
+      expect(@submission).not_to be_grants_right(teacher, nil, :view_vericite_report)
+    end
+  end
+
   context '#external_tool_url' do
     let(:submission) { Submission.new }
     let(:lti_submission) { @assignment.submit_homework @user, submission_type: 'basic_lti_launch', url: 'http://www.example.com' }
@@ -3640,15 +3724,41 @@ describe Submission do
       @context.enroll_teacher(@teacher2)
     end
 
+    context "when force_save is true" do
+      it {
+        expect { @submission.find_or_create_provisional_grade!(@teacher, force_save: true) }.
+          to change { AnonymousOrModerationEvent.provisional_grade_created.count }.by(1)
+      }
+
+      it {
+        expect { @submission.find_or_create_provisional_grade!(@teacher, force_save: true) }.
+          to_not change { AnonymousOrModerationEvent.provisional_grade_updated.count }
+      }
+
+      context 'given an existing provisional grade' do
+        before(:once) { @submission.find_or_create_provisional_grade!(@teacher, force_save: true) }
+
+        it {
+          expect { @submission.find_or_create_provisional_grade!(@teacher, force_save: true) }.
+            to change { AnonymousOrModerationEvent.provisional_grade_updated.count }.by(1)
+        }
+
+        it {
+          expect { @submission.find_or_create_provisional_grade!(@teacher, force_save: true) }.
+            not_to change { AnonymousOrModerationEvent.provisional_grade_created.count }
+        }
+      end
+    end
+
     it "properly creates a provisional grade with all default values but scorer" do
       @submission.find_or_create_provisional_grade!(@teacher)
 
-      expect(@submission.provisional_grades.length).to eql 1
+      expect(@submission.provisional_grades.length).to be 1
 
       pg = @submission.provisional_grades.first
 
       expect(pg.scorer_id).to eql @teacher.id
-      expect(pg.final).to eql false
+      expect(pg.final).to be false
       expect(pg.graded_anonymously).to be_nil
       expect(pg.grade).to be_nil
       expect(pg.score).to be_nil
@@ -3657,21 +3767,22 @@ describe Submission do
 
     it "properly amends information to an existing provisional grade" do
       @submission.find_or_create_provisional_grade!(@teacher)
-      @submission.find_or_create_provisional_grade!(@teacher,
+      @submission.find_or_create_provisional_grade!(
+        @teacher,
         score: 15.0,
         grade: "20",
         graded_anonymously: true
       )
 
-      expect(@submission.provisional_grades.length).to eql 1
+      expect(@submission.provisional_grades.length).to be 1
 
       pg = @submission.provisional_grades.first
 
       expect(pg.scorer_id).to eql @teacher.id
-      expect(pg.final).to eql false
-      expect(pg.graded_anonymously).to eql true
+      expect(pg.final).to be false
+      expect(pg.graded_anonymously).to be true
       expect(pg.grade).to eql "20"
-      expect(pg.score).to eql 15.0
+      expect(pg.score).to be 15.0
       expect(pg.source_provisional_grade).to be_nil
     end
 
@@ -3698,8 +3809,8 @@ describe Submission do
     end
 
     it "raises an exception if final is true and user is not allowed to select final grade" do
-      expect{ @submission.find_or_create_provisional_grade!(@student, final: true) }
-        .to raise_error(Assignment::GradeError, "User not authorized to give final provisional grades")
+      expect{ @submission.find_or_create_provisional_grade!(@student, final: true) }.
+        to raise_error(Assignment::GradeError, "User not authorized to give final provisional grades")
     end
 
     it "raises an exception if grade is not final and student does not need a provisional grade" do
@@ -3707,14 +3818,26 @@ describe Submission do
       third_teacher = User.create!
       @course.enroll_teacher(third_teacher, enrollment_state: :active)
 
-      expect{ @submission.find_or_create_provisional_grade!(third_teacher, final: false) }
-        .to raise_error(Assignment::GradeError, "Student already has the maximum number of provisional grades")
+      expect{ @submission.find_or_create_provisional_grade!(third_teacher, final: false) }.
+        to raise_error(Assignment::GradeError, "Student already has the maximum number of provisional grades")
     end
 
     it "raises an exception if the grade is final and no non-final provisional grades exist" do
-      expect{ @submission.find_or_create_provisional_grade!(@teacher, final: true) }
-        .to raise_error(Assignment::GradeError,
+      expect{ @submission.find_or_create_provisional_grade!(@teacher, final: true) }.
+        to raise_error(Assignment::GradeError,
           "Cannot give a final mark for a student with no other provisional grades")
+    end
+
+    it 'sets the source provisional grade if one is provided' do
+      new_source = ModeratedGrading::ProvisionalGrade.new
+      provisional_grade = @submission.find_or_create_provisional_grade!(@teacher, source_provisional_grade: new_source)
+      expect(provisional_grade.source_provisional_grade).to be new_source
+    end
+
+    it 'does not wipe out the existing source provisional grade, if a source_provisional_grade is not provided' do
+      @submission.find_or_create_provisional_grade!(@teacher)
+      expect { @submission.find_or_create_provisional_grade!(@teacher, force_save: true) }.
+        not_to change { @submission.provisional_grades.last.source_provisional_grade }
     end
   end
 
@@ -4352,6 +4475,109 @@ describe Submission do
       comment = @submission.add_comment(comment: '42', skip_author: true)
 
       expect(comment.author).to be_nil
+    end
+
+    describe 'audit event logging' do
+      let(:course) { Course.create! }
+      let(:assignment) { course.assignments.create!(title: 'ok', anonymous_grading: true) }
+      let(:student) { course.enroll_student(User.create!, enrollment_state: 'active').user }
+      let(:teacher) { course.enroll_teacher(User.create!, enrollment_state: 'active').user }
+      let(:submission) { assignment.submission_for_student(student) }
+
+      let(:comment_params) { {comment: 'my great submission', author: student} }
+
+      let(:audit_events) do
+        AnonymousOrModerationEvent.where(assignment: assignment, submission: submission).reload
+      end
+      let(:last_event) { audit_events.last }
+
+      context 'for an auditable assignment' do
+        it 'creates an event when a non-draft comment is published' do
+          expect { submission.add_comment(comment_params) }.to change(audit_events, :count).by(1)
+        end
+
+        it 'sets "submission_comment_created" as the event type' do
+          submission.add_comment(comment_params)
+          expect(last_event.event_type).to eq 'submission_comment_created'
+        end
+
+        it 'sets the user ID to the author of the comment' do
+          submission.add_comment(comment_params)
+          expect(last_event.user_id).to eq student.id
+        end
+
+        it 'does not create events for draft comments' do
+          draft_params = comment_params.merge({draft_comment: true})
+          expect { submission.add_comment(draft_params) }.not_to change(audit_events, :count)
+        end
+
+        describe 'auditable attributes' do
+          it 'captures the value of the "comment" attribute' do
+            submission.add_comment(comment_params)
+            expect(last_event.payload['comment']).to eq 'my great submission'
+          end
+
+          it 'captures the value of the "author_id" attribute' do
+            submission.add_comment(comment_params)
+            expect(last_event.payload['author_id']).to eq student.id
+          end
+
+          it 'captures the value of the "media_comment_id" attribute' do
+            submission.add_comment(comment_params.merge({media_comment_id: 12}))
+            expect(last_event.payload['media_comment_id']).to eq '12'
+          end
+
+          it 'captures the value of the "media_comment_type" attribute' do
+            submission.add_comment(comment_params.merge({media_comment_type: 'audio'}))
+            expect(last_event.payload['media_comment_type']).to eq 'audio'
+          end
+
+          it 'captures the value of the "group_comment_id" attribute' do
+            submission.add_comment(comment_params.merge({group_comment_id: 12}))
+            expect(last_event.payload['group_comment_id']).to eq '12'
+          end
+
+          it 'captures the value of the "assessment_request" attribute' do
+            assessment_request = submission.assessment_requests.create!(
+              user: student,
+              assessor: student,
+              assessor_asset: submission
+            )
+            submission.add_comment(comment_params.merge({assessment_request: assessment_request}))
+            expect(last_event.payload['assessment_request_id']).to eq assessment_request.id
+          end
+
+          it 'captures the value of the "attachments" attribute' do
+            attachment = Attachment.create!(
+              filename: 'my_great_file.txt',
+              uploaded_data: StringIO.new('hello!'),
+              context: course
+            )
+            submission.add_comment(comment_params.merge({attachments: [attachment]}))
+            expect(last_event.payload['attachment_ids']).to eq attachment.id.to_s
+          end
+
+          it 'captures the value of the "anonymous" attribute' do
+            assignment.update!(anonymous_peer_reviews: true)
+            submission.add_comment(comment_params)
+            expect(last_event.payload['anonymous']).to eq true
+          end
+
+          it 'captures the value of the "provisional_grade_id" attribute' do
+            assignment.update!(moderated_grading: true, final_grader: teacher, grader_count: 1)
+            provisional_grade = submission.find_or_create_provisional_grade!(teacher)
+
+            provisional_comment_params = comment_params.merge({ provisional: true, author: teacher })
+            submission.add_comment(provisional_comment_params)
+            expect(last_event.payload['provisional_grade_id']).to eq provisional_grade.id
+          end
+        end
+      end
+
+      it 'does not create audit events when the assignment is not auditable' do
+        assignment.update!(anonymous_grading: false)
+        expect { submission.add_comment(comment_params) }.not_to change(audit_events, :count)
+      end
     end
   end
 
@@ -5101,27 +5327,6 @@ describe Submission do
         hash = { 'entered_grade' => 10 }
         expect(submission.filter_attributes_for_user(hash, user, session)).not_to have_key('entered_grade')
       end
-    end
-  end
-
-  describe '#update_provisional_grade' do
-    before(:once) do
-      @submission = @assignment.submissions.find_by!(user_id: @student)
-      @provisional_grade = ModeratedGrading::ProvisionalGrade.new
-      @source = ModeratedGrading::ProvisionalGrade.new
-      @provisional_grade.source_provisional_grade = @source
-      @scorer = User.new
-    end
-
-    it 'sets the source provisional grade if one is provided' do
-      new_source = ModeratedGrading::ProvisionalGrade.new
-      @submission.update_provisional_grade(@provisional_grade, @scorer, source_provisional_grade: new_source)
-      expect(@provisional_grade.source_provisional_grade).to be new_source
-    end
-
-    it 'does not wipe out the existing source provisional grade, if a source_provisional_grade is not provided' do
-      @submission.update_provisional_grade(@provisional_grade, @scorer)
-      expect(@provisional_grade.source_provisional_grade).to be @source
     end
   end
 

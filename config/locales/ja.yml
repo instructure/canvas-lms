@@ -95,10 +95,13 @@ ja:
         partner_id: "パートナー ID"
         partner_key: パートナーキー
   accept_2fdd362e: 受諾
+  accept_grades_4d56a3dd: 成績を受け入れる
   acceptable_use_policy_29a28124: 利用規約
+  accepted_c9f8ab87: 受け入れた
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "利用出来る形式: hex, rgba, rgb, hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "利用出来る形式: svg, png, jpg, gif"
   accepted_user_role_type_course_course_2ce91589: "受諾されました: %{user}, %{role_type}, コース, %{course}"
+  accepting_40ba3b70: 受け入れる
   access_report_80d28095: "アクセス レポート"
   access_token_3be22221: "アクセス トークン"
   access_token_count_access_token_count_dfb5463c: "アクセストークン数：%{access_token_count}"
@@ -142,6 +145,7 @@ ja:
     tab_users: ユーザ
     turnitin_pledge: この課題提出物は私自身のものであり、オリジナルの研究結果です
   account_97b34646: アカウント
+  account_account_b6b3746b: "アカウント：%{account}"
   account_and_subaccount_40c6430: "アカウントとサブアカウント "
   account_authorization_config: 
     default_delegated_login_handle_name: ログイン
@@ -1551,6 +1555,7 @@ ja:
     add_topic_to: "ディスカッション トピックを %{module} に追加"
   add_more_e1ffaa65: さらに追加
   add_new_announcement_ddacd624: 新しいアナウンスの追加
+  add_new_domain_e097d4a0: 新しいドメインを追加
   add_new_group_7ac49f31: 新規グループの追加
   add_new_set_of_due_dates_e8e240f: 新しい期日を追加
   add_new_term_d2217c0d: 新しい期間の追加
@@ -1764,6 +1769,7 @@ ja:
   allows_user_to_access_the_view_notifications_tab_i_71995596: ユーザーが管理ツールの通知の表示タブにアクセスできるようにします。
   allows_user_to_act_as_other_users_in_the_account_195628ae: ユーザーがアカウント内で他のユーザーとして操作できるようにします。
   allows_user_to_add_and_remove_other_account_admins_7834ea9a: ユーザーが他のアカウント管理者を追加したり削除したりできるようにします。
+  allows_user_to_add_discussions_in_the_discussions__1b3d9a53: ユーザーがディスカッションページにディスカッションを追加できるようにします。
   allows_user_to_add_discussions_in_the_discussions__f5479e2c: |-
       ユーザーがディスカッションページにディスカッションを追加できるようにします。
       ユーザーが、他のユーザーが作成したディスカッショントピックのコメント欄を閉じる、移動、ピンの固定/解除、編集、および削除できるようにします。
@@ -1775,6 +1781,10 @@ ja:
       ユーザーがセクションをクロスリストできるようにします。
   allows_user_to_add_edit_and_delete_events_in_the_c_14413268: ユーザーがコースカレンダーのイベントを追加、編集、削除できるようにします。
   allows_user_to_add_edit_and_delete_global_announce_8463e383: ユーザーがグローバルアナウンスを追加、編集、および削除できるようにします。
+  allows_user_to_add_edit_and_update_grades_in_the_g_29a4068e: |-
+      ユーザーがグレードブック内で成績を追加、編集、更新することがでるようにします。
+      ユーザーがグレードブック履歴にアクセスできるようにします。
+      ユーザーが学習習熟グレードブック履歴にアクセスできるようにします（対応している場合）。
   allows_user_to_add_edit_and_update_grades_in_the_g_f9c62224: |-
       ユーザーがグレードブックやSpeedGrader内で成績を追加、編集、更新することがでるようにします。
       ユーザーがグレードブック履歴にアクセスできるようにします。
@@ -1844,6 +1854,10 @@ ja:
   allows_user_to_edit_blueprint_lock_settings_on_the_9f51663c: "ユーザーが Blueprint マスターコースのファイルページの Blueprint ロックの設定を編集できるようにします。"
   allows_user_to_edit_configurations_for_manually_ad_7e0f496c: ユーザーが手動で追加された外部アプリの設定を編集できるようにします。
   allows_user_to_edit_grades_and_add_comments_in_spe_dc18e3c0: ユーザーがSpeedGrader内で成績を編集し、コメントを追加できるようにします。
+  allows_user_to_edit_grades_in_the_gradebook_allows_74c2723: |-
+      ユーザーがグレードブック内で成績を編集できるようにします。
+      ユーザーがグレードブック履歴にアクセスできるようにします。
+      ユーザーが学習習熟グレードブック履歴にアクセスできるようにします（対応している場合）。
   allows_user_to_edit_grades_in_the_gradebook_allows_b1e33afc: ユーザーがグレードブック内で成績を編集できるようにします。ユーザーがグレードブック履歴にアクセスできるようにします。
   allows_user_to_edit_grading_schemes_98c35117: ユーザーが採点スキームを編集できるようにします。
   allows_user_to_edit_the_course_sis_id_e1eccee3: "ユーザーがコースの SIS ID を編集できるようにします。"
@@ -1880,6 +1894,8 @@ ja:
   allows_user_to_search_for_account_users_via_primar_7a58eb6e: |-
       ユーザーがアカウントのユーザーページのプライマリ電子メールアドレスを使用してアカウントユーザーを検索することができるようにします。
       ユーザーがコースの人物のページのプライマリ電子メールアドレスを使用して他のユーザーを検索することができるようにします。
+  allows_user_to_search_for_other_users_by_login_id__2b0bd8c9: ユーザーがコースの人物のページのログインIDで他のユーザーを検索することができるようにします。
+  allows_user_to_search_for_other_users_by_login_id__3edb3702: ユーザーがアカウントの人物のページのログインIDで他のユーザーを検索することができるようにします。
   allows_user_to_search_for_other_users_by_login_id__97d49785: |-
       ユーザーがアカウントの人物のページのログインIDで他のユーザーを検索することができるようにします。
       ユーザーがコースの人物のページでログインIDを表示できるようにします。
@@ -1896,6 +1912,14 @@ ja:
   allows_user_to_share_a_quiz_to_commons_6746e0da: "ユーザーが Commons にクイズを共有できるようにします。"
   allows_user_to_view_a_course_s_sis_id_5c4a4c50: "ユーザーがコースの SIS ID を表示できるようにします。"
   allows_user_to_view_a_link_to_speedgrader_from_ass_8ed9b342: "ユーザーが課題から SpeedGraderへのリンクを表示できるようにします。"
+  allows_user_to_view_a_link_to_the_faculty_journal__13b353a8: |-
+      ユーザーがユーザー詳細のサイドバーで、学部日誌へのリンクを閲覧できるようにします。
+      ユーザーが個別の受講生の学部日誌を閲覧できるようにします。
+      ユーザーが新規の学部日誌エントリーを作成できるようにします。
+  allows_user_to_view_a_link_to_the_faculty_journal__61d9560e: |-
+      ユーザーがユーザー詳細のサイドバーで、学部日誌へのリンクを閲覧できるようにします。
+      ユーザーが個別の受講生の学部日誌を閲覧できるようにします。
+      ユーザーが新規の学部日誌エントリーを作成できるようにします。
   allows_user_to_view_account_analytics_98fbc6ad: ユーザーがアカウント分析を表示できるようにします。
   allows_user_to_view_all_course_groups_not_just_tho_bad6d687: "ユーザーが、自分が登録されているコースグループだけでなく、すべてのコースグループを[共編者]のウィンドウで表示できるようにします。"
   allows_user_to_view_all_student_assignment_submiss_d8ee5830: ユーザーがすべての受講生の課題提出を表示し、コメントを追加できるようにします。
@@ -1927,6 +1951,11 @@ ja:
       ユーザーがページを表示、作成、編集、削除、公開/非公開できるようにします。
       ユーザーがページの履歴を表示し、フロントページを設定できるようにします。
   allows_user_to_view_enrollments_on_the_sections_ta_6279a03e: ユーザーがセクションタブで登録を表示できるようにします。
+  allows_user_to_view_faculty_journal_entries_in_the_3f58f09c: ユーザーが受講生インタラクションレポート内に学部日誌を表示できるようにします。
+  allows_user_to_view_gradebook_allows_user_to_expor_8ed9dfa8: |-
+      ユーザーがページの履歴を表示し、フロントページを設定できるようにします。
+      ユーザーがグレードブックをコンマ区切り値（CSV）ファイルにエクスポート表示できるようにします。
+      ユーザーが学習習熟グレードブック履歴にアクセスできるようにします（対応している場合）。
   allows_user_to_view_gradebook_allows_user_to_expor_c454271d: |-
       ユーザーがページの履歴を表示し、フロントページを設定できるようにします。
       ユーザーがグレードブックをコンマ区切り値（CSV）ファイルにエクスポート表示できるようにします。
@@ -1957,6 +1986,7 @@ ja:
   allows_user_to_view_the_discussions_link_in_course_2604505d: |-
       ユーザーがコースナビゲーションでディスカッションリンクを表示できるようにします。
       ユーザーがコースのディスカッションを表示できるようにします。
+  allows_user_to_view_the_faculty_journal_link_in_gl_e3fd6889: ユーザーがグローバルナビゲーション内に学部日誌を表示できるようにします。
   allows_user_to_view_the_group_home_pages_of_all_st_9d747525: |-
       ユーザーがすべての受講生グループのグループホームページを表示できるようにします。
       ユーザーが、受講生が直接リンクしているグループ内の他の受講生グループにアクセスできるようにします。
@@ -2259,10 +2289,12 @@ ja:
   are_you_sure_you_want_to_delete_this_assignment_88be6f5e: この課題を削除してもよろしいですか?
   are_you_sure_you_want_to_delete_this_comment_4ee386d: このコメントを削除してもよろしいですか?
   are_you_sure_you_want_to_delete_this_developer_key_9937481a: この開発者鍵を削除してもよろしいですか?
+  are_you_sure_you_want_to_delete_this_discussion_334554e0: このディスカッションを削除してもよろしいですか?
   are_you_sure_you_want_to_delete_this_event_824b1e33: このイベントを削除してもよろしいですか?
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: この採点期間セットを削除しますか？
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: この採点期間を削除してもよろしいですか?
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: この採点スキームを削除してもよろしいですか?
+  are_you_sure_you_want_to_delete_this_page_2185844: このページを削除してもよろしいですか？
   are_you_sure_you_want_to_delete_this_recording_a4aab14b: この録音をほんとうに削除しますか？
   are_you_sure_you_want_to_delete_this_rubric_any_co_29d7ac76: この注釈を削除してもよろしいですか?このルーブリックに現在関連付けられているコースには引き続きアクセスできますが、新しいコースでは使用できません。
   are_you_sure_you_want_to_delete_this_rubric_this_a_d4ff43c7: この注釈を削除してもよろしいですか?このアクションを行うと、現在のコースのすべての課題からこのルーブリックの関連付けを削除し、既存の関連する評価を削除します。
@@ -2452,6 +2484,7 @@ ja:
   assignment_selection_6bff05c4: 課題の選択
   assignment_title_82b4422e: "課題タイトル:"
   assignment_title_8a707dd2: 課題のタイトル
+  assignment_title_e3192978: "課題：%{title}"
   assignment_url_37c849c6: "課題の URL"
   assignment_was_deleted_8320d26d: 課題は削除されました
   assignment_weights_d4bcf9ab: 課題の重み
@@ -3074,10 +3107,12 @@ ja:
   assignments_api: 
     invalid_date_time: "%{attribute} の日時が無効です"
     invalid_submission_types: 無効な提出物タイプ
+  assignments_gradebook_f57c164a: 課題、グレードブック
   assignments_in_this_group_have_no_points_possible__3cd35922: このグループの課題には配点がないので、採点の計算に含めることはできません
   assignments_in_this_group_have_no_points_possible__ab0adb72: このグループの課題には配点がないので、成績の計算に含めることができません。
   assignments_list_fe3e54be: 課題リスト
   assignments_settings_30613d0c: 課題設定
+  assignments_speedgrader_2fbd6df4: 課題、SpeedGrader
   assignments_tutorial_tray_4cc844b: 課題チュートリアルトレイ
   associated_74756cc4: 関連
   associated_account_course_id_d87a01c5: 関連するアカウント/コースID
@@ -3339,6 +3374,7 @@ ja:
   blueprint_5cca2ef: 青写真
   blueprint_course_associations_72c9609: ブループリントコース関連付け
   blueprint_course_e16ed131: 青写真コース
+  blueprint_course_id_9ee357fb: blueprint_course_id
   blueprint_course_information_term_course_10d5cf30: "青写真コース情報：%{term} -%{course}"
   blueprint_course_sync_finished_80cd9509: 青写真コースの同期が完了しました
   blueprint_course_sync_in_progress_a1e2622b: 青写真コースの同期が進行中です
@@ -3394,6 +3430,15 @@ ja:
     default_title: タイトルなし
   bookmark_this_question_bank_dc414a82: この問題バンクにブックマークを付ける
   bookmarks_5b5b81c9: ブックマーク
+  both_discussions_create_and_discussions_moderate_a_c238f67: |-
+      「ディスカッション - 作成」と「ディスカッション - 仲介」のどちらも、ディスカッションページにディスカッションを作成できるようにします。この権限が有効な場合、「ディスカッション - 作成」は必須ではありません。
+      コースでディスカッションを表示するには、ディスカッション - 表示も有効にされていなければなりません。
+      ディスカッションに返信するには、ディスカッション - 投稿も有効にされていなければなりません。ディスカッションの課題の詳細を編集するには、課題とクイズ - 追加/編集/削除も有効でなければなりません。
+  both_discussions_create_and_discussions_moderate_a_f20cc937: |-
+      「ディスカッション - 作成」と「ディスカッション - 仲介」のどちらも、ディスカッションページにディスカッションを作成できるようにします。この権限が有効な場合、「ディスカッション - 作成」は必須ではありません。
+      コースでディスカッションを表示するには、ディスカッション - 表示も有効にされていなければなりません。
+      ディスカッションに返信するには、ディスカッション - 投稿も有効にされていなければなりません。
+      ディスカッションの課題の詳細を編集するには、課題とクイズ - 追加/編集/削除も有効でなければなりません。
   bottom_15a2a9be: 下
   bounce_count_reset_c4c2218f: バウンスカウントをリセット！
   bounce_reason_689ed4c6: バウンスの理由
@@ -3402,6 +3447,7 @@ ja:
   brazil_c1d6e73a: ブラジル
   breadcrumb_1_cb3c504: ブレッドクラム1
   breadcrumb_2_95ba94be: ブレッドクラム2
+  brick_f2656265: ブロック
   bring_existing_content_from_another_course_or_cour_6e740692: 他のコースまたはコース管理システムの既存のコンテンツをCanvasコースに持ち込みます。
   bring_existing_content_from_another_course_or_cour_9dc6453d: 他のコースまたはコース管理システムの既存のコンテンツをCanvasコースに持ち込みます。
   bring_your_content_into_your_course_c0f3df7e: 自分のコンテンツを自分のコースに持ち込む
@@ -3759,6 +3805,12 @@ ja:
     edit_planner_note: 
       calendar: "カレンダー:"
       date: "日付:"
+      time: 時間：
+      title: タイトル：
+    edit_to_do_item: 
+      date: "日付:"
+      links: 
+        more_options: その他のオプション
       time: 時間：
       title: タイトル：
     end_before_start_error: 開始時刻は終了時刻より前である必要があります
@@ -5601,6 +5653,7 @@ ja:
   course_copy_name: "Canvas コースのコピー"
   course_copy_no_course_error: コピー元のコースが見つかりませんでした。
   course_copy_not_allowed_error: コピー元のコースのコピーが許可されていません。
+  course_course_d1c78210: "コース：%{course}"
   course_discussions_38c0b74f: コースのディスカッション
   course_ends_at_e8b166df: コースの終了は
   course_export_from_date_expired_ebb0fe15: "%{date} からコースをエクスポート(期限切れ)"
@@ -6417,6 +6470,7 @@ ja:
     ungrded_survey: 未採点のサーベイ
     url: URL
   create_new_course_e3ef9cd0: 新しいコースを作成する
+  create_new_discussions_6ab69da2: 新しいディスカッションを作成する
   create_new_e0946c49: 新規作成
   create_slots_71dbb2f8: スロットの作成
   create_theme_based_on_40651ed3: を基にテーマを作成
@@ -6802,6 +6856,8 @@ ja:
   delete_current_module_item_21fefc54: 現在のモジュール/アイテムを削除
   delete_custom_help_link_814f0509: "カスタム ヘルプ リンクを削除する"
   delete_discussion_title_a28df8b6: "ディスカッションを削除%{title}"
+  delete_domain_5ba75b7c: ドメインを削除する
+  delete_domain_domain_c5b68f5: "ドメインを削除する%{domain}"
   delete_entry_title_5e59727b: "エントリを削除する%{title}"
   delete_feedname_1ac9a4a4: "削除%{feedName}"
   delete_grading_period_dba36e59: 採点期間の削除
@@ -7363,6 +7419,7 @@ ja:
     unsubscribed: 購読中止済み
     unsubscribed_hint: このトピックを購読していません。購読するにはクリックします。
   discussions_a5f96392: ディスカッション
+  discussions_create_94dff604: "ディスカッション - 作成"
   discussions_moderate_d1e69c7e: "ディスカッション - 修正"
   discussions_post_62f64091: "ディスカッション - 掲示"
   discussions_tutorial_tray_4ef79bcc: ディスカッションチュートリアルトレイ
@@ -7418,10 +7475,12 @@ ja:
   download_report_77164f62: レポートをダウンロードする
   download_scores_generated_on_date_ff5b9cd2: "%{date}に生成されたスコアのダウンロード"
   download_student_analysis_report_statuslabel_1471c8c2: "受講生分析レポート%{statusLabel}をダウンロードします"
+  download_submission_comments_2a6c0395: 投稿コメントをダウンロード
   download_submissions_7454665f: 提出物のダウンロード
   download_the_complete_list_of_errors_and_warnings__7d993f7b: エラーと警告の完全なリストをここからダウンロードしてください。
   download_this_file_669f9174: このファイルをダウンロード
   downloading_course_content_allows_access_to_conten_164d9336: コースのコンテンツをダウンロードすることは、コンテンツがオフラインの間にコンテンツにアクセスすることを可能にします。コンテンツは、ファイル、ページ、課題、議論「のトピック、クイズを含む場合があります。各コースの「ePubを生成」をクリックし、いずれかのeリーダーソフトウェアを開き、閲覧してください。
+  draft_92507c72: (ドラフト)
   draft_comment_b2376ea4: コメントの下書き
   drag_and_drop_or_click_to_browse_your_computer_2b46a2b6: ドラッグアンドドロップまたはクリックしてコンピュータを参照
   drag_and_drop_your_image_here_or_7fba7c14: 画像をここにドラッグ＆ドロップするか
@@ -8338,6 +8397,7 @@ ja:
   extract_error_error_file_names_a4989ed0: "抽出エラー、%{error}：%{file_names}"
   extreme_critical_emergency_80b3dbda: 極めて重要な緊急事態
   faculty_journal_5634938e: 講師日誌
+  faculty_journal_manage_entries_efc09599: "学部日誌 - エントリーの管理"
   fail_62dbb06a: 失敗
   failed_276786d: 失敗
   failed_307449e1: "失敗しました:"
@@ -8358,6 +8418,7 @@ ja:
   failed_to_export_some_tool_settings_c992fc56: 一部のツール設定のエクスポートに失敗しました
   failed_to_import_media_objects_4c1fcb4f: "メディア オブジェクトのインポートに失敗しました"
   failed_to_load_external_feeds_7ac8411d: 外部フィードの読み込みに失敗しました
+  failed_to_load_recent_activity_d3e5adeb: 最近のアクティビティの読み込みに失敗しました
   failed_to_log_in_7ceec561: ログインに失敗しました
   failed_to_move_items_e043da6: 項目の移動に失敗しました
   failed_to_open_discussion_for_comments_87412434: コメントのディスカッションを開くことができませんでした
@@ -9026,6 +9087,7 @@ ja:
   gradebook_individual_view_8846598e: 成績ブック...個別ビュー
   gradebook_performance_764d8b3d: 成績表の成績
   gradebook_settings_b45c6df9: グレードブックの設定
+  gradebook_speedgrader_66cb7a6a: 成績表、SpeedGrader
   gradebook_tutorial_tray_d835c750: 成績ブック.チュートリアルトレイ
   gradebook_uploads: 
     new: 
@@ -9345,6 +9407,8 @@ ja:
   grader_count_cannot_be_0_9228afe4: グレーダーカウントは0にはできません
   grader_count_is_required_45b6c85b: グレーダーカウントの入力は必須です
   grader_d1198a9c: 評価者
+  grader_details_table_b1bec24c: 成績詳細表
+  grader_grader_number_e92327d3: "評価者%{grader_number}"
   grader_graderindex_45e04e57: "評価者%{graderIndex}"
   grader_gradernumber_fef5d5cf: "評価者%{graderNumber}"
   grader_index_a55577a2: "評価者%{index}"
@@ -9364,6 +9428,7 @@ ja:
   grades_moderate_317fce84: "成績 - 調整"
   grades_posted_c274d9f8: 成績掲示済み
   grades_posting_bc7cfc1a: 成績掲示中
+  grades_saved_5954b0bb: 成績が保存されました。
   grades_select_final_grade_for_moderation_c66284f4: "成績 - 調整する最終成績を選択"
   grades_view_all_grades_8bf9f8d3: "成績 - すべての成績を表示"
   grades_view_audit_trail_db7364b1: "成績 - 監査記録を表示"
@@ -10428,6 +10493,7 @@ ja:
       enter_search_terms: 検索語を入力
   instructure_default_73317bb1: 講師デフォルト
   instructure_default_old_66ef6e9b: 講師デフォルト（旧）
+  integration_id_8a20b328: "統合 ID"
   integration_id_a6977535: "統合 ID："
   integration_id_int_id_is_already_in_use_f30f03b5: "SIS ID \"%{int_id}\" は既に使用されています"
   integration_id_integration_id_is_already_in_use_bd1bbb09: "統合 ID \"%{integration_id}\" はすでに使用されています！"
@@ -10828,6 +10894,7 @@ ja:
   link_to_url_52dd935c: URLへのリンク
   link_url_a213671c: リンクURL
   link_url_cf96376: "リンク URL"
+  link_validation_is_running_caf08ced: リンク検証を実行中です
   linked_assignment_message: "課題 '%{title}' とリンクされています"
   linked_discussion_topic_message: "ディスカッション トピック '%{title}' とリンクされています"
   linked_quiz_message: "クイズ '%{title}' とリンクされています"
@@ -11065,6 +11132,7 @@ ja:
   luxembourg_3bc645af: ルクセンブルグ
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Moodle インポーター"
+  magenta_4a65993c: マジェンタ
   main_navigation_3f080c80: "メイン ナビゲーション"
   main_text_color_7d65ab1b: メインのテキストカラー
   make_key_developername_invisible_212ecf72: "%{developerName}キーを非表示にする"
@@ -13961,6 +14029,7 @@ ja:
   okay_got_it_d686d4e8: わかりました
   old_policy_39e4f77: 旧ポリシー
   oldest_newest_4de86803: "最古 - 最新"
+  olive_6a3e4d6b: オリーブ
   oman_968_46f8d901: オマーン（+968）
   on_8f7190e5: オン
   on_paper_46d0ba36: 筆記
@@ -15270,7 +15339,9 @@ ja:
       take_picture: 写真を撮影
     upload_file_view: 
       choose_a_picture: 画像の選択
-      crop_instructions: "画像の一部を切り出すには、選択枠をドラッグして、以下の [保存] ボタンをクリックします。"
+      crop_instructions: |-
+          画像をトリミングするには、マウスで選択範囲をドラッグするか、矢印キーを使用して選択範囲を移動し、Shift +矢印キーを使用して選択範囲のサイズを変更します。
+          次に、下の[保存]ボタンをクリックします。
   progress_9de4af8f: 向上する
   progress_for_account_name_ef203250: "%{account_name}の進歩"
   progress_loading_bar_a26b8861: プログレス/ローディングバー
@@ -15383,6 +15454,7 @@ ja:
   publishing_9890d50f: 公開中...
   publishing_is_disabled_for_this_item_efa7803f: このアイテムでは公開は無効になっています
   publishing_item_name_is_disabled_8207a9e7: "%{item_name} は公開は無効になっています"
+  pumpkin_904428d5: かぼちゃ
   purchases: 
     new: 
       payment_info: 支払情報
@@ -17272,6 +17344,7 @@ ja:
   rubrics_add_edit_delete_8299eff7: "ページ - 追加/編集/削除"
   rubrics_and_speedgrader_ececaed4: ルービックスとSpeedGrader
   rubrics_b5ef369b: 注釈
+  rubrics_speedgrader_a6ebec57: ルービック、SpeedGrader
   running_c5a4998d: 実行中
   russia_7_87bc99d5: ロシア（+7）
   rwanda_250_1a6b344b: "ルワンダ (+250)"
@@ -17319,6 +17392,7 @@ ja:
   score_f7ac9e08: スコア
   score_letter_grade_b3bb9e52: "%{score} レター グレード"
   score_muted_82eef66: "スコア: (ミュート)"
+  score_n_a_34dfdcda: スコア：N/A
   score_of_score_view_in_speedgrader_a7c1c954: "%{score}のスコア。SpeedGrader で表示"
   score_out_of_points_84f44331: "(%{score} / %{points})"
   score_out_of_points_possible_88f370fd: "%{score} (配点 %{points_possible})"
@@ -17652,6 +17726,7 @@ ja:
   select_one_of_the_options_c8b0c6e4: オプションを1つ選択
   select_prerequisite_module_57894963: 前提条件モジュールの選択
   select_prerequite_module_e9042bb0: 前提条件モジュールの選択
+  select_rubric_2aa2ffa2: ルービックを選択する
   select_student_name_caaff244: "受講生の選択%{name}"
   select_studentname_e7b7908d: "選択%{studentName}"
   select_students_for_review_6e004a12: レビューのために受講生を選択
@@ -17812,6 +17887,14 @@ ja:
       あなたのコースのすべてのユーザーと重要な情報を共有する。
       自分自身のアナウンスのコピーを通知で取得することを選択する。
   share_important_updates_with_users_97ec11ad: 重要な更新をユーザーと共有する
+  share_the_following_pairing_code_with_an_observer__44f50f99: |-
+      次のペアリングコードをオブザーバーと共有して
+      %{name}とコネクトさせます。このコードは7日間後または1回使用した後に
+      有効期限が切れます。
+  share_the_following_pairing_code_with_an_observer__9b7c3667: |-
+      次のペアリングコードをオブザーバーと共有して
+      あなたとコネクトさせます。このコードは7日間後または1回使用した後に
+      有効期限が切れます。
   share_the_following_pairing_code_with_an_observer__9cd44f7e: |-
       次のペアリングコードをオブザーバーと共有して
       あなたとコネクトさせます。このコードは24時間後または1回使用した後に
@@ -18684,6 +18767,7 @@ ja:
   snapshots_are_backups_of_your_canvas_trial_taking__f18bd571: "スナップショットは、Canvas トライアルのバックアップです。スナップショットを作成すると、スナップショットの瞬間のトライアルの状態を完全に記録する、一意の「バージョン」が作成されます。"
   some_assignments_could_not_be_created_because_they_d91f2f21: 締め切られた採点期間に当たるため、作成できない課題があります。
   some_conferences_on_this_page_are_hidden_because_o_789684fd: このページのいくつかのカンファレンスが、ステータスの取得中に、エラーのために非表示になります。
+  some_custom_columns_could_not_be_changed_because_t_88abc9be: "一部のカスタム列は読み取り専用なため変更できませんでした。 これらの列の変更は無視されました。"
   some_module_items_could_not_be_published_e4be3c0: 一部のモジュールアイテムを公開できませんでした
   some_settings_have_been_administratively_locked_9e3ee880: 一部の設定は管理上の理由でロックされています。
   some_settings_have_been_disabled_because_the_assig_6b6cc3b4: 一部の設定は、課題が閉じられた採点期間にあるため、無効となっています。
@@ -18845,11 +18929,14 @@ ja:
   student_id_236970d8: student_id
   student_id_7cc45fb5: "受講生 ID"
   student_id_a61d78c7: "受講生 IＤ"
+  student_interaction_report_3f3d2ff1: 受講生インタラクションレポート
   student_interactions_report_7717b685: 受講生の交流レポート
   student_messages_b0a242d: 受講生のメッセージ
   student_must_complete_all_of_these_requirements_656771d6: 学生は、これらすべての必要項目を完了する必要があります。
   student_must_complete_one_of_these_requirements_6046eb3a: 学生は、これらの必要項目のうちの1つを完了する必要があります。
+  student_n_a_30b1753f: 受講生：N/A
   student_name: 受講生名
+  student_name_a30d555e: "受講生：%{name}"
   student_name_b446c661: 受講生名
   student_name_c45b2a7: 受講者名
   student_name_hidden_b894d102: 受講生(名前は非表示)
@@ -19461,6 +19548,7 @@ ja:
   there_was_a_problem_posting_the_comment_75d15646: コメントを掲示中に問題がありました
   there_was_a_problem_publishing_grades_b0b9202f: 成績を送信する際に問題がありました。
   there_was_a_problem_saving_the_grade_8ea5d2ac: 成績を保存する際に問題がありました。
+  there_was_a_problem_saving_the_grades_5e61f9e2: 成績を保存する際に問題がありました。
   there_was_a_problem_saving_the_grading_period_243bed6c: "採点期間を保存する\b際に問題が発生しました"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: 採点スキームを保存する際に問題が発生しました
   there_was_a_problem_sending_your_message_22b249a5: メッセージを送信する際に問題がありました。
@@ -19829,6 +19917,7 @@ ja:
   timeline_of_messages_between_the_student_and_instr_6dbd9ad3: 受講生と講師間のメッセージのタイムライン
   timeline_showing_when_assignments_were_turned_in_bb44c8a1: 課題がいつ提出されたかを表示するタイムライン
   timeout_when_searching_5c24ff9d: 検索時のタイムアウト
+  timestamp_65f3a0a: "(%{timestamp})"
   tinymce: 
     insert_update_image_view: 
       alt_help_text: アクセシビリティを向上するための画像について説明します
@@ -19938,6 +20027,7 @@ ja:
       そしてクライアントIDとシークレットの取得が必要となります。
       
       プロバイダーが有効なコールバック、またはリダイレクトURIを設定できる場合は、%{callback_url}を使用してください。
+  to_create_announcements_discussions_manage_must_al_932ac38f: "アナウンスを追加するには、ディスカッション - 管理も有効にされていなければなりません。"
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "セクションをクロスリストするには、コースセクション - 追加/編集/削除も有効にされていなければなりません。コース SIS ID を編集するには、SIS データ - 管理も有効にされていなければなりません。アカウントレベルのユーザーがコースを削除できるようにするには、コース状態 - 管理も有効にされていなければなりません。"
   to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "セクションをクロスリストするには、コースセクション - 追加/編集/削除も有効にされていなければなりません。コース SIS ID を編集するには、SIS データ - 管理も有効にされていなければなりません。アカウントレベルのユーザーがコースを削除できるようにするには、コース状態 - 管理も有効にされていなければなりません。"
   to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "セクションをクロスリストするには、コース - 追加/編集/削除も有効にされていなければなりません。"
@@ -19949,6 +20039,7 @@ ja:
   to_do_6ac7b2dc: タスク：
   to_do_date_d6b79bfd: "タスク%{date}"
   to_do_date_ddfb582c: タスク日付：
+  to_do_item_d76ecb78: タスクのアイテム
   to_do_items_loading_d1cdfcd5: タスクの読み込み
   to_do_list_dashboard_d741f64e: タスクリストダッシュボード
   to_do_time_a7e17623: タスク時間
@@ -20038,6 +20129,9 @@ ja:
   to_view_discussions_in_a_course_discussions_view_m_7c986cd2: |-
       コースでディスカッションを表示するには、ディスカッション - 表示も有効にされていなければなりません。
       ディスカッションに返信するには、ディスカッション - 投稿も有効にされていなければなりません。ディスカッションの課題の詳細を編集するには、課題とクイズ - 追加/編集/削除も有効でなければなりません。
+  to_view_discussions_in_a_course_discussions_view_m_b7e742bd: |-
+      コースでディスカッションを表示するには、ディスカッション - 表示も有効にされていなければなりません。
+      「ディスカッション - 作成」と「ディスカッション - 仲介」のどちらも、ディスカッションページにディスカッションを作成できるようにします。ディスカッションを管理するには、ディスカッション - 管理も有効にされていなければなりません。
   to_view_discussions_in_a_course_discussions_view_m_bf14b0e: |-
       コースでディスカッションを表示するには、ディスカッション - 表示も有効にされていなければなりません。
       ディスカッションを管理するには、ディスカッション - 調整が有効にされていなければなりません。
@@ -20083,6 +20177,7 @@ ja:
       成果ページを読み取り専用として表示するには、コースの内容 - 表示が有効にされていなければなりません。
       ユーザーは、コースの内容（表示と課題とクイズ） - 追加/編集/削除も有効になっているときには、課題を介して個々の課題のルーブリックにアクセスすることができます。
   to_view_the_reports_tab_courses_view_usage_reports_d371ec85: "レポートタブを表示するには、コース - 使用状況レポートの表示も有効にされていなければなりません。"
+  to_view_the_user_details_page_for_a_student_users__51d98047: "受講生の「ユーザーの詳細」ページを表示するには、コースの「ユーザー - 受講生の追加/削除」も有効にする必要があります。"
   to_view_user_page_views_users_view_list_must_also__f4246239: "ユーザーページビューを表示するには、ユーザー - 表示リストも有効にされていなければなりません。"
   to_view_users_and_user_account_details_users_view__99807b12: |-
       ユーザーおよびユーザーアカウントの詳細を表示するには、ユーザー - 表示リストも有効にされていなければなりません。
@@ -20399,6 +20494,7 @@ ja:
     cant_be_blank: "Canvas ユーザ ID を空欄にはできません"
     cant_come_before_from: "'終了日付' を '開始日付' より前にすることはできません"
     results_found: "%{length} 件の結果が見つかりました"
+  user_details_2613c079: ユーザの詳細情報
   user_details_e9aef9e5: ユーザー詳細
   user_does_not_have_permission_to_select_final_grad_47560e75: ユーザーに最終グレードを選択する権限がありません
   user_id_8256faeb: user_id

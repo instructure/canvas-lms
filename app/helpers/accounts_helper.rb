@@ -39,6 +39,7 @@ module AccountsHelper
 
   def turnitin_originality_options
     [
+      [I18n.t('Use parent account setting'), nil],
       [I18n.t('#turnitin_settings.originality_report_visible_immediately', "Immediately"), 'immediate'],
       [I18n.t('#turnitin_settings.originality_report_visible_after_grading', "After the assignment is graded"), 'after_grading'],
       [I18n.t('#turnitin_settings.originality_report_visible_after_due_date', "After the Due Date"), 'after_due_date'],

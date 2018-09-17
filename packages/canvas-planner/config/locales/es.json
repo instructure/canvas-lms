@@ -62,12 +62,6 @@
   "close_d634289d": {
     "message": "Cerrar"
   },
-  "close_opportunities_popover_f4e50551": {
-    "message": "Cerrar ventana popover de oportunidades"
-  },
-  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
-    "message": "{ count, plural,\n     =0 {# oportunidades}\n    one {# oportunidad}\n  other {# oportunidades}\n}"
-  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Mostrar # elemento completado}\n  other {Mostrar # elementos completados}\n}"
   },
@@ -211,6 +205,9 @@
   },
   "no_grade_3b4d7f3e": {
     "message": "Sin calificación"
+  },
+  "nothing_for_now_e3e3ce2a": {
+    "message": "Nada por ahora"
   },
   "nothing_more_to_do_b665da42": {
     "message": "Nada más por hacer"

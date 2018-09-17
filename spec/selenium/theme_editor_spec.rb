@@ -83,7 +83,7 @@ describe 'Theme Editor' do
 
     expect_new_page_load do
       preview_your_changes
-      expect(fj('.ReactModal__Content:contains("Generating preview")')).to be_displayed
+      expect(fj('h2:contains("Generating preview")')).to be_displayed
       run_jobs
     end
 

@@ -50,7 +50,13 @@ describe Api::V1::Submission do
     describe 'speedgrader_url' do
       it "links to the speed grader for a student's submission" do
         expect(assignment).to receive(:can_view_student_names?).with(user).and_return true
-        json = fake_controller.provisional_grade_json(provisional_grade, submission, assignment, user)
+        json = fake_controller.provisional_grade_json(
+          course: course,
+          assignment: assignment,
+          submission: submission,
+          provisional_grade: provisional_grade,
+          current_user: user
+        )
         path = "/courses/#{course.id}/gradebook/speed_grader"
         query = { 'assignment_id' => assignment.id.to_s }
         fragment = { 'provisional_grade_id' => provisional_grade.id, 'student_id' => user.id }
@@ -59,7 +65,13 @@ describe Api::V1::Submission do
 
       it "links to the speed grader for a student's anonymous submission when grader cannot view student names" do
         expect(assignment).to receive(:can_view_student_names?).with(user).and_return false
-        json = fake_controller.provisional_grade_json(provisional_grade, submission, assignment, user)
+        json = fake_controller.provisional_grade_json(
+          course: course,
+          assignment: assignment,
+          submission: submission,
+          provisional_grade: provisional_grade,
+          current_user: user
+        )
         path = "/courses/#{course.id}/gradebook/speed_grader"
         query = { 'assignment_id' => assignment.id.to_s }
         fragment = { 'provisional_grade_id' => provisional_grade.id, 'anonymous_id' => submission.anonymous_id }

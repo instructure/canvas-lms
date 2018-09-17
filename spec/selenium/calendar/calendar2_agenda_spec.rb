@@ -180,9 +180,6 @@ describe "calendar2" do
         assignment_model(course: @course,
                          title: "super important",
                          due_at: Time.zone.now.beginning_of_day + 1.day - 1.minute)
-        calendar_events = @teacher.calendar_events_for_calendar.last
-
-        expect(calendar_events.title).to eq "super important"
         expect(@assignment.due_date).to eq (Time.zone.now.beginning_of_day + 1.day - 1.minute).to_date
 
         load_agenda_view

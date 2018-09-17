@@ -222,3 +222,22 @@
     background: $ic-color-medium;
   }
 }
+
+.roster-empty-state {
+  max-width: 400px;
+  margin: auto;
+  text-align: center;
+  font-size: $ic-font-size;
+
+  .empty-state-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    .empty-state-list-item {
+      display: inline;
+      margin-inline-start: 0.5rem;
+      margin-inline-end: 0.5rem;
+    }
+  }
+}

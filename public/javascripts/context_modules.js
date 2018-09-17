@@ -1073,6 +1073,7 @@ function scrollTo ($thing, time = 500) {
           // initModuleManagement is called.
           $('.delete_module_link').die()
           $('.duplicate_module_link').die()
+          $('.duplicate_item_link').die()
           $('.add_module_link').die()
           $('.edit_module_link').die()
           $("#add_context_module_form .add_prerequisite_link").off()
@@ -1437,7 +1438,7 @@ function scrollTo ($thing, time = 500) {
       }
     })
 
-    $('.duplicate_item_link').on('click', function(event) {
+    $('.duplicate_item_link').live('click', function(event) {
       event.preventDefault()
 
       const $module = $(this).closest('.context_module')
@@ -1471,6 +1472,7 @@ function scrollTo ($thing, time = 500) {
     $("#add_module_prerequisite_dialog .cancel_button").click(function() {
       $("#add_module_prerequisite_dialog").dialog('close');
     });
+
     $(".delete_prerequisite_link").live('click', function(event) {
       event.preventDefault();
       var $criterion = $(this).parents(".criterion");

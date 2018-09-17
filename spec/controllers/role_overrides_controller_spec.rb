@@ -209,16 +209,7 @@ describe RoleOverridesController do
     end
 
     describe "GET index" do
-      it "loads old bundle for old permissions flag" do
-        @account.root_account.disable_feature!(:permissions_v2_ui)
-        get 'index', params: {:account_id => @account.id}
-        expect(response).to be_successful
-        expect(assigns[:js_bundles].length).to eq 1
-        expect(assigns[:js_bundles].first).to include :roles
-      end
-
       it "loads new bundle for new permissions flag" do
-        @account.root_account.enable_feature!(:permissions_v2_ui)
         get 'index', params: {:account_id => @account.id}
         expect(response).to be_successful
         expect(assigns[:js_bundles].length).to eq 1

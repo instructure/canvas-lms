@@ -32,7 +32,7 @@ test('DP: single item rendered with FilesystemObjectThumbnail', function() {
   const fsObjStub = sandbox.stub(FilesystemObjectThumbnail.prototype, 'render').returns(<div />)
   const dialogPreview = TestUtils.renderIntoDocument(<DialogPreview itemsToShow={[file]} />)
   ok(fsObjStub.calledOnce)
-  ReactDOM.unmountComponentAtNode(dialogPreview.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(dialogPreview).parentNode)
 })
 
 test('DP: multiple file items rendered in i elements', () => {
@@ -43,9 +43,9 @@ test('DP: multiple file items rendered in i elements', () => {
   file2.url = url
   const dialogPreview = TestUtils.renderIntoDocument(<DialogPreview itemsToShow={[file, file2]} />)
   equal(
-    dialogPreview.getDOMNode().getElementsByTagName('i').length,
+    ReactDOM.findDOMNode(dialogPreview).getElementsByTagName('i').length,
     2,
     'there are two files rendered'
   )
-  ReactDOM.unmountComponentAtNode(dialogPreview.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(dialogPreview).parentNode)
 })

@@ -16,7 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-
 module PlannerHelper
   PLANNABLE_TYPES = {
     'discussion_topic' => 'DiscussionTopic',
@@ -31,8 +30,18 @@ module PlannerHelper
 
   class InvalidDates < StandardError; end
 
-  def planner_meta_cache_key
-    ['planner_items_meta', @current_user].cache_key
+  def planner_meta_cache_key(user = @current_user)
+    ['planner_items_meta', user].cache_key
+  end
+
+  def get_planner_cache_id(user = @current_user)
+    Rails.cache.fetch(planner_meta_cache_key(user), expires_in: 1.week) do
+      SecureRandom.uuid
+    end
+  end
+
+  def clear_planner_cache(user = @current_user)
+    Rails.cache.delete(planner_meta_cache_key(user))
   end
 
   def formatted_planner_date(input, val, default = nil, end_of_day: false)
@@ -95,31 +104,18 @@ module PlannerHelper
   # had no submission attribute pointing to a real Submission
   def complete_planner_override_for_quiz_submission(quiz_submission)
     return if quiz_submission.submission # handled by Submission model
-    planner_override = PlannerOverride.find_by(
+    planner_override = PlannerOverride.find_or_create_by(
       plannable_id: quiz_submission.quiz_id,
       plannable_type: PLANNABLE_TYPES['quiz'],
       user_id: quiz_submission.user_id
     )
-    if planner_override
-      complete_planner_override planner_override
-    else
-      planner_override = PlannerOverride.new(
-        plannable_type: PLANNABLE_TYPES['quiz'],
-        plannable_id: quiz_submission.quiz_id, 
-        marked_complete: true,
-        dismissed: false,
-        user_id: quiz_submission.user_id)
-      planner_override.save
-    end
+    complete_planner_override planner_override
   end
 
   def complete_planner_override(planner_override)
-    if planner_override&.is_a? PlannerOverride
-      planner_override.marked_complete = true
-      if planner_override.save
-        Rails.cache.delete(planner_meta_cache_key)
-      end
-    end
+    return unless planner_override.is_a? PlannerOverride
+    planner_override.update_attributes(marked_complete: true)
+    clear_planner_cache(planner_override&.user)
   end
 
   private

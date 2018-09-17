@@ -25,68 +25,76 @@ import ExternalToolsTableRow from '../../external_apps/components/ExternalToolsT
 import InfiniteScroll from '../../external_apps/components/InfiniteScroll'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
-export default React.createClass({
-    displayName: 'ExternalToolsTable',
+export default class ExternalToolsTable extends React.Component {
+  static propTypes = {
+    canAddEdit: PropTypes.bool.isRequired
+  }
 
-    propTypes: {
-      canAddEdit: PropTypes.bool.isRequired
-    },
+  state = store.getState()
 
-    getInitialState() {
-      return store.getState();
-    },
+  onChange = () => {
+    this.setState(store.getState())
+  }
 
-    onChange() {
-      this.setState(store.getState());
-    },
+  componentDidMount() {
+    store.addChangeListener(this.onChange)
+    store.fetch()
+  }
 
-    componentDidMount() {
-      store.addChangeListener(this.onChange);
-      store.fetch();
-    },
+  componentWillUnmount() {
+    store.removeChangeListener(this.onChange)
+  }
 
-    componentWillUnmount() {
-      store.removeChangeListener(this.onChange);
-    },
-
-    loadMore(page) {
-      if (store.getState().hasMore && !store.getState().isLoading) {
-        store.fetch();
-      }
-    },
-
-    loader() {
-      return <div className="loadingIndicator"></div>;
-    },
-
-    trs() {
-      if (store.getState().externalTools.length == 0) {
-        return null;
-      }
-      return store.getState().externalTools.map(function (tool, idx) {
-        return <ExternalToolsTableRow key={idx} tool={tool} canAddEdit={this.props.canAddEdit}/>
-      }.bind(this));
-    },
-
-    render() {
-      return (
-        <div className="ExternalToolsTable">
-          <InfiniteScroll pageStart={0} loadMore={this.loadMore} hasMore={store.getState().hasMore} loader={this.loader()}>
-            <table className="ic-Table ic-Table--striped ic-Table--condensed" id="external-tools-table">
-              <caption className="screenreader-only">{I18n.t('External Apps')}</caption>
-              <thead>
-                <tr>
-                  <th scope="col" width="5%"><ScreenReaderContent>{I18n.t('Status')}</ScreenReaderContent></th>
-                  <th scope="col" width="65%">{I18n.t('Name')}</th>
-                  <th scope="col" width="30%"><ScreenReaderContent>{I18n.t('Actions')}</ScreenReaderContent></th>
-                </tr>
-              </thead>
-              <tbody className="collectionViewItems">
-                {this.trs()}
-              </tbody>
-            </table>
-          </InfiniteScroll>
-        </div>
-      );
+  loadMore = page => {
+    if (store.getState().hasMore && !store.getState().isLoading) {
+      store.fetch()
     }
-  });
+  }
+
+  loader = () => <div className="loadingIndicator" />
+
+  trs = () => {
+    if (store.getState().externalTools.length == 0) {
+      return null
+    }
+    return store
+      .getState()
+      .externalTools.map((tool, idx) => (
+        <ExternalToolsTableRow key={idx} tool={tool} canAddEdit={this.props.canAddEdit} />
+      ))
+  }
+
+  render() {
+    return (
+      <div className="ExternalToolsTable">
+        <InfiniteScroll
+          pageStart={0}
+          loadMore={this.loadMore}
+          hasMore={store.getState().hasMore}
+          loader={this.loader()}
+        >
+          <table
+            className="ic-Table ic-Table--striped ic-Table--condensed"
+            id="external-tools-table"
+          >
+            <caption className="screenreader-only">{I18n.t('External Apps')}</caption>
+            <thead>
+              <tr>
+                <th scope="col" width="5%">
+                  <ScreenReaderContent>{I18n.t('Status')}</ScreenReaderContent>
+                </th>
+                <th scope="col" width="65%">
+                  {I18n.t('Name')}
+                </th>
+                <th scope="col" width="30%">
+                  <ScreenReaderContent>{I18n.t('Actions')}</ScreenReaderContent>
+                </th>
+              </tr>
+            </thead>
+            <tbody className="collectionViewItems">{this.trs()}</tbody>
+          </table>
+        </InfiniteScroll>
+      </div>
+    )
+  }
+}

@@ -537,4 +537,16 @@ module Canvas::LiveEvents
       workflow_state: context_module_item.workflow_state
     }
   end
+
+  def self.course_completed(context_module_progression)
+    post_event_stringified('course_completed', get_course_completed_data(context_module_progression.context_module.course, context_module_progression.user))
+  end
+
+  def self.get_course_completed_data(course, user)
+    {
+      progress: CourseProgress.new(course, user, read_only: true).to_json,
+      user: { id: user.id, name: user.name, email: user.email },
+      course: { id: course.id, name: course.name }
+    }
+  end
 end

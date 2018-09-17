@@ -128,8 +128,6 @@ class SearchController < ApplicationController
         {:user => true, :context => [:course, :section, :group]}
       end
 
-      @blank_fallback = !api_request?
-
       params[:per_page] = nil if params[:per_page].to_i <= 0
       exclude = params[:exclude] || []
 
@@ -261,7 +259,7 @@ class SearchController < ApplicationController
 
   def matching_contexts(options)
     context_name = options[:context]
-    avatar_url = avatar_url_for_group(blank_fallback)
+    avatar_url = avatar_url_for_group
     terms = options[:search].to_s.downcase.strip.split(/\s+/)
     exclude = options[:exclude_ids] || []
 
@@ -395,7 +393,7 @@ class SearchController < ApplicationController
         enrollment_counts[role] += 1
       end
     end
-    avatar_url = avatar_url_for_group(blank_fallback)
+    avatar_url = avatar_url_for_group
     result = []
     synthetic_context = {:avatar_url => avatar_url, :type => :context, :permissions => course[:permissions]}
     result << synthetic_context.merge({:id => "#{context}_teachers", :name => t(:enrollments_teachers, "Teachers"), :user_count => enrollment_counts['TeacherEnrollment']}) if enrollment_counts['TeacherEnrollment'].to_i > 0

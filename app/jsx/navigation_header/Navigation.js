@@ -260,7 +260,7 @@ export default class Navigation extends React.Component {
         return (
           <ProfileTray
             userDisplayName={window.ENV.current_user.display_name}
-            userAvatarURL={window.ENV.current_user.avatar_image_url}
+            userAvatarURL={window.ENV.current_user.avatar_is_fallback ? null : window.ENV.current_user.avatar_image_url}
             profileEnabled={window.ENV.SETTINGS.enable_profiles}
             eportfoliosEnabled={window.ENV.SETTINGS.eportfolios_enabled}
             closeTray={this.closeTray}

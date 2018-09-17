@@ -70,6 +70,22 @@ describe DeveloperKey do
   end
 
   describe 'callbacks' do
+    describe 'public_jwk validations' do
+      subject { developer_key_saved }
+
+      before { subject.public_jwk = {invalid: 'test'} }
+
+      it 'verifies public_jwk kty is "RSA"' do
+        expect(subject.save).to eq false
+      end
+
+      it 'adds an error message whn public_jwk is invalid' do
+        subject.public_jwk = {invalid: 'test'}
+        subject.save
+        expect(subject.errors[:public_jwk]).to include 'Must use RSA kty'
+      end
+    end
+
     it 'does not validate scopes' do
       expect do
         DeveloperKey.create!(
@@ -360,6 +376,65 @@ describe DeveloperKey do
     at = AccessToken.create!(:user => user_model, :developer_key => developer_key_saved)
     at.used!
     expect(developer_key_saved.last_used_at).not_to be_nil
+  end
+
+  describe '#generate_rsa_keypair!' do
+    context 'when "public_jwk" is already set' do
+      subject do
+        developer_key.generate_rsa_keypair!
+        developer_key
+      end
+
+      let(:developer_key) do
+        key = DeveloperKey.create!
+        key.generate_rsa_keypair!
+        key.save!
+        key
+      end
+      let(:public_jwk) { developer_key.public_jwk }
+
+      context 'when "override" is false' do
+        it 'does not change the "public_jwk"' do
+          expect(subject.public_jwk).to eq public_jwk
+        end
+
+        it 'does not change the "private_jwk" attribute' do
+          previous_private_key = developer_key.private_jwk
+          expect(subject.private_jwk).to eq previous_private_key
+        end
+      end
+
+      context 'when "override: is true' do
+        subject do
+          developer_key.generate_rsa_keypair!(overwrite: true)
+          developer_key
+        end
+
+        it 'does change the "public_jwk"' do
+          previous_public_key = developer_key.public_jwk
+          expect(subject.public_jwk).not_to eq previous_public_key
+        end
+
+        it 'does change the "private_jwk"' do
+          previous_private_key = developer_key.private_jwk
+          expect(subject.private_jwk).not_to eq previous_private_key
+        end
+      end
+    end
+
+    context 'when "public_jwk" is not set' do
+      subject { DeveloperKey.new }
+
+      before { subject.generate_rsa_keypair! }
+
+      it 'populates the "public_jwk" column with a public key' do
+        expect(subject.public_jwk['kty']).to eq Lti::RSAKeyPair::KTY
+      end
+
+      it 'populates the "private_jwk" attribute with a private key' do
+        expect(subject.private_jwk['kty']).to eq Lti::RSAKeyPair::KTY.to_sym
+      end
+    end
   end
 
   describe "#redirect_domain_matches?" do

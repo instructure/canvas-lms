@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../sharding_spec_helper'
+require 'spec_helper'
 require_relative '../selenium/helpers/groups_common'
 require_relative '../lti2_spec_helper'
 
@@ -993,7 +993,7 @@ describe Assignment do
       assmt = @course.assignments.create!(:title => "assmt", :points_possible => 3)
       rubric = @course.rubrics.new(:title => "rubric")
       rubric.update_with_association(@teacher, {
-        criteria: {"0" => {description: "correctness", points: 15, ratings: {"0" => {points: 15, description: "asdf"}}, }, },
+        criteria: {"0" => {description: "correctness", points: 15, ratings: {"0" => {points: 15, description: "a description"}}, }, },
       }, @course, {
         association_object: assmt, update_if_existing: true,
         use_for_grading: "1", purpose: "grading", skip_updating_points_possible: true
@@ -2260,7 +2260,7 @@ describe Assignment do
     context "group assignments" do
       before :once do
         @student1, @student2 = n_students_in_course(2, course: @course)
-        gc = @course.group_categories.create! name: "asdf"
+        gc = @course.group_categories.create! name: "a name"
         group = gc.groups.create! name: "zxcv", context: @course
         [@student1, @student2].each { |u|
           group.group_memberships.create! user: u, workflow_state: "accepted"
@@ -4554,7 +4554,7 @@ describe Assignment do
         :exclude_biblio => true,
         :exclude_quoted => false,
         :exclude_type => '3',
-        :exclude_value => 'asdf',
+        :exclude_value => 'poiuopiuuiop',
         :bogus => 'haha'
       }
       expect(assignment.turnitin_settings).to eql({
@@ -5203,12 +5203,7 @@ describe Assignment do
     end
 
     it "should not allow titles over 255 char" do
-      @assignment.title = 'qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
-                           qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
-                           qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
-                           qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
-                           qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm'
-
+      @assignment.title = 'a' * 256
       expect(errors[:title]).not_to be_empty
     end
   end
@@ -6200,6 +6195,7 @@ describe Assignment do
   end
 
   describe '.with_student_submission_count' do
+    require_relative '../sharding_spec_helper'
     specs_require_sharding
 
     it "doesn't reference multiple shards when accessed from a different shard" do
@@ -6589,7 +6585,7 @@ describe Assignment do
         end
 
         describe 'grader_section validation' do
-          let(:error_message) { 'Selected moderated grading section must be active and in same course as assignment' }
+          let(:error_message) { 'must be active and in same course as assignment' }
 
           it 'allows an active grader section from the course to be set' do
             @assignment.grader_section = @section1
@@ -6633,14 +6629,14 @@ describe Assignment do
             @assignment.final_grader = @section2_ta
             @assignment.valid?
 
-            expect(errors[:final_grader]).to eq ['Final grader must be enrolled in selected section']
+            expect(errors[:final_grader]).to eq ['must be enrolled in selected section']
           end
 
           it 'does not allow a non-instructor final grader' do
             @assignment.final_grader = @initial_student
             @assignment.valid?
 
-            expect(errors[:final_grader]).to eq ['Final grader must be an instructor in this course']
+            expect(errors[:final_grader]).to eq ['must be an instructor in this course']
           end
 
           it 'does not allow changing final grader to an inactive user' do
@@ -6662,7 +6658,7 @@ describe Assignment do
             @assignment.final_grader = other_course_ta
             @assignment.valid?
 
-            expect(errors[:final_grader]).to eq ['Final grader must be an instructor in this course']
+            expect(errors[:final_grader]).to eq ['must be an instructor in this course']
           end
         end
 
@@ -6682,7 +6678,8 @@ describe Assignment do
   end
 
   describe "after create callbacks" do
-    let(:event) { AnonymousOrModerationEvent.find_by!(assignment: assignment) }
+    subject(:event) { AnonymousOrModerationEvent.where(assignment: assignment).last }
+
     let(:course) { @course }
 
     it "does not create an AnonymousOrModerationEvent when assignment is neither anonymous nor moderated" do
@@ -6691,15 +6688,13 @@ describe Assignment do
 
     context "for an anonymous assignment" do
       let(:assignment) do
-        course.assignments.create!(anonymous_grading: true) do |assignment|
-          assignment.updating_user = @teacher
-        end
+        course.assignments.create!(anonymous_grading: true, updating_user: @teacher)
       end
 
-      it "creates an AnonymousOrModerationEvent on creation" do
+      it "creates only one AnonymousOrModerationEvent on creation" do
         expect {
           course.assignments.create!(anonymous_grading: true, updating_user: @teacher)
-        }.to change { AnonymousOrModerationEvent.count }.from(0).to(1)
+        }.to change { AnonymousOrModerationEvent.count }.by(1)
       end
 
       it "creates an AnonymousOrModerationEvent with event_type assignment_created on assignment creation" do
@@ -6708,8 +6703,7 @@ describe Assignment do
       end
 
       describe "event payload" do
-        let_once(:payload) { AnonymousOrModerationEvent.find_by!(assignment: assignment).payload }
-        subject() { payload }
+        subject { event.payload }
 
         it { is_expected.to include("anonymous_grading" => true) }
         it { is_expected.to include("anonymous_instructor_annotations" => false) }
@@ -6725,28 +6719,15 @@ describe Assignment do
 
     context "for a moderated assignment" do
       let(:assignment) do
-        course.assignments.create!(
-          moderated_grading: true,
-          final_grader: @teacher,
-          grader_count: 2
-        ) do |assignment|
-          assignment.updating_user = @teacher
-        end
+        course.assignments.create!(params)
       end
 
-      let(:params) do
-        {
-          moderated_grading: true,
-          final_grader: @teacher,
-          grader_count: 2,
-          updating_user: @teacher
-        }
-      end
+      let(:params) { { moderated_grading: true, final_grader: @teacher, grader_count: 2, updating_user: @teacher } }
 
-      it "creates an AnonymousOrModerationEvent on creation of a moderated assignment" do
+      it "creates exactly one AnonymousOrModerationEvent on creation " do
         expect {
           course.assignments.create!(params)
-        }.to change { AnonymousOrModerationEvent.count }.from(0).to(1)
+        }.to change { AnonymousOrModerationEvent.count }.by(1)
       end
 
       it "creates an AnonymousOrModerationEvent with event_type assignment_created on assignment creation" do
@@ -6755,8 +6736,7 @@ describe Assignment do
       end
 
       describe "event_payload" do
-        let_once(:payload) { AnonymousOrModerationEvent.find_by!(assignment: assignment).payload }
-        subject() { payload }
+        subject { event.payload }
 
         it { is_expected.to include("anonymous_grading" => false) }
         it { is_expected.to include("anonymous_instructor_annotations" => false) }
@@ -6773,23 +6753,18 @@ describe Assignment do
   end
 
   describe 'after save callbacks' do
-    subject(:event) { AnonymousOrModerationEvent.find_by!(assignment: assignment) }
-
-    before :once do
-      @ta = ta_in_course(course: @course, enrollment_state: :active).user
-    end
-
     let(:course) { @course }
+
+    before(:once) { @ta = ta_in_course(course: @course, enrollment_state: :active).user }
 
     context "non-anonymous and non-moderated assignments" do
       let(:assignment) { course.assignments.create!(updating_user: @teacher) }
 
       context "when becoming an anonymous assignment" do
-        let_once(:payload) do
+        subject do
           assignment.update!(anonymous_grading: true)
-          AnonymousOrModerationEvent.find_by!(assignment: assignment).payload
+          AnonymousOrModerationEvent.where(assignment: assignment).last.payload
         end
-        subject() { payload }
 
         it { is_expected.to include("anonymous_grading" => [false, true]) }
         it { is_expected.to include("anonymous_instructor_annotations" => [false, false]) }
@@ -6803,11 +6778,10 @@ describe Assignment do
       end
 
       context "when becoming a moderated assignment" do
-        let_once(:payload) do
+        subject(:payload) do
           assignment.update!(moderated_grading: true, grader_count: 1, final_grader: @ta)
-          AnonymousOrModerationEvent.find_by!(assignment: assignment).payload
+          AnonymousOrModerationEvent.where(assignment: assignment).last.payload
         end
-        subject() { payload }
 
         it { is_expected.to include("anonymous_grading" => [false, false]) }
         it { is_expected.to include("anonymous_instructor_annotations" => [false, false]) }
@@ -6823,86 +6797,101 @@ describe Assignment do
     end
 
     context 'given an anonymous assignment' do
-      let(:assignment) do
-        course.assignments.create!(anonymous_grading: true) do |assignment|
-          assignment.updating_user = @teacher
+      subject(:event) { AnonymousOrModerationEvent.where(assignment: assignment).last }
+
+      let(:assignment) { course.assignments.create!(anonymous_grading: true, updating_user: @teacher) }
+
+      describe 'create a grades_posted event' do
+        context "when grades were posted" do
+          let(:event_type) { :grades_posted }
+          let(:now) { Time.zone.now }
+
+          it "creates an AnonymousOrModerationEvent with an 'event_type' of 'grades_posted'" do
+            expect { assignment.update!(grades_published_at: now) }.to change {
+              AnonymousOrModerationEvent.where(assignment: assignment).count
+            }.by(1)
+          end
+
+          it "sets the event user to the 'updating_user' on the assignment" do
+            assignment.update!(grades_published_at: now, updating_user: @ta)
+            expect(event).to have_attributes(user_id: @ta.id)
+          end
+
+          it "includes the 'grades_published_at' attribute in the event data" do
+            assignment.update!(grades_published_at: now)
+            expect(event.payload).to include('grades_published_at' => [nil, now.iso8601])
+          end
+
+          it "has no other values in the payload" do
+            assignment.update!(grades_published_at: now)
+            expect(event.payload.keys).to eq ['grades_published_at']
+          end
         end
       end
 
-      it "creates an AnonymousOrModerationEvent with event_type assignment_updated on assignment update" do
-        assignment.update!(points_possible: 23)
-        expect(event.event_type).to eq "assignment_updated"
-      end
+      describe 'create an assignment_updated event' do
+        let(:event_type) { :assignment_updated }
 
-      it 'creates an AnonymousOrModerationEvent with assignment changes when muted is changed' do
-        assignment.update!(muted: false)
-        expect(event.payload.fetch('muted')).to eq [true, false]
-      end
-
-      it 'creates an AnonymousOrModerationEvent with assignment changes when due_at is changed' do
-        now = Time.zone.now
-        assignment.update!(due_at: now)
-        expect(event.payload.fetch('due_at')).to eq [nil, now.iso8601]
-      end
-
-      it 'creates an AnonymousOrModerationEvent with assignment changes when anonymous_grading is changed' do
-        assignment.update!(anonymous_grading: false)
-        expect(event.payload.fetch('anonymous_grading')).to eq [true, false]
-      end
-
-      it 'creates an AnonymousOrModerationEvent with assignment changes when omit_from_final_grade is changed' do
-        assignment.update!(omit_from_final_grade: true)
-        expect(event.payload.fetch('omit_from_final_grade')).to eq [false, true]
-      end
-
-      it 'creates an AnonymousOrModerationEvent with assignment changes when anonymous_instructor_annotations is changed' do
-        assignment.update!(anonymous_instructor_annotations: true)
-        expect(event.payload.fetch('anonymous_instructor_annotations')).to eq [false, true]
-      end
-
-      it "does not create an AnonymousOrModerationEvent when non-grading-related attributes are updated" do
-        expect { assignment.update!(title: "Different Name") }.not_to change {
-          AnonymousOrModerationEvent.where(assignment: assignment).count
-        }
-      end
-
-      context "when grades were posted" do
-        let(:now) { Time.zone.now }
-        let(:event) do
-          AnonymousOrModerationEvent.find_by!(
-            assignment: assignment,
-            event_type: 'grades_posted'
-          )
+        it 'creates only one AnonymousOrModerationEvent on update' do
+          assignment = course.assignments.create!(anonymous_grading: true, updating_user: @teacher)
+          expect {
+            assignment.update!(muted: false)
+          }.to change { AnonymousOrModerationEvent.count }.by(1)
         end
 
-        it "creates an AnonymousOrModerationEvent with an event_type of grades_posted" do
-          expect { assignment.update!(grades_published_at: now) }.to change {
-            AnonymousOrModerationEvent.where(assignment: assignment, event_type: 'grades_posted').count
-          }.from(0).to(1)
+        it 'creates an AnonymousOrModerationEvent with assignment changes when muted is changed' do
+          assignment.update!(muted: false)
+          expect(event.payload).to include('muted' => [true, false])
         end
 
-        it "sets the event user to the 'updating_user' on the assignment" do
-          assignment.updating_user = @teacher
-          assignment.update!(grades_published_at: now)
-          expect(event.user).to eql @teacher
+        it 'creates an AnonymousOrModerationEvent with assignment changes when due_at is changed' do
+          now = Time.zone.now
+          assignment.update!(due_at: now)
+          expect(event.payload).to include('due_at' => [nil, now.iso8601])
         end
 
-        it "includes the 'grades_published_at' attribute in the event data" do
-          assignment.update!(grades_published_at: now)
-          expect(event.payload.fetch("grades_published_at")).to eq [nil, now.iso8601]
+        it 'creates an AnonymousOrModerationEvent with assignment changes when anonymous_grading is changed' do
+          assignment.update!(anonymous_grading: false)
+          expect(event.payload).to include('anonymous_grading' => [true, false])
+        end
+
+        it 'creates an AnonymousOrModerationEvent with assignment changes when omit_from_final_grade is changed' do
+          assignment.update!(omit_from_final_grade: true)
+          expect(event.payload).to include('omit_from_final_grade' => [false, true])
+        end
+
+        it 'creates an AnonymousOrModerationEvent with assignment changes when anonymous_instructor_annotations is changed' do
+          assignment.update!(anonymous_instructor_annotations: true)
+          expect(event.payload).to include('anonymous_instructor_annotations' => [false, true])
+        end
+
+        it "does not create an AnonymousOrModerationEvent when non-grading-related attributes are updated" do
+          expect { assignment.update!(title: "Different Name") }.not_to change {
+            AnonymousOrModerationEvent.where(assignment: assignment).count
+          }
         end
       end
     end
 
     context 'given a moderated assignment' do
-      let(:assignment) do
-        course.assignments.create!(
+      subject(:event) { AnonymousOrModerationEvent.where(assignment: assignment).last }
+
+      let(:event_type) { :assignment_updated }
+      let(:assignment) { course.assignments.create!(params) }
+      let(:params) {
+        {
           moderated_grading: true,
           final_grader: @teacher,
-          grader_count: 2
-        ) do |assignment|
-          assignment.updating_user = @teacher
-        end
+          grader_count: 2,
+          updating_user: @teacher
+        }
+      }
+
+      it 'creates only one AnonymousOrModerationEvent on update' do
+        assignment = course.assignments.create!(params)
+        expect {
+          assignment.update!(muted: false)
+        }.to change { AnonymousOrModerationEvent.count }.by(1)
       end
 
       it "creates an AnonymousOrModerationEvent with event_type assignment_updated on assignment update" do
@@ -6912,37 +6901,37 @@ describe Assignment do
 
       it 'creates an AnonymousOrModerationEvent with assignment changes when points_possible is changed' do
         assignment.update!(points_possible: 23)
-        expect(event.payload.fetch('points_possible')).to eq [nil, 23.0]
+        expect(event.payload).to include('points_possible' => [nil, 23.0])
       end
 
       it 'creates an AnonymousOrModerationEvent with assignment changes when moderated_grading is changed' do
         assignment.update!(moderated_grading: false)
-        expect(event.payload.fetch('moderated_grading')).to eq [true, false]
+        expect(event.payload).to include('moderated_grading' => [true, false])
       end
 
       it 'creates an AnonymousOrModerationEvent with assignment changes when final_grader_id is changed' do
         assignment.update!(final_grader: @ta)
-        expect(event.payload.fetch('final_grader_id')).to eq [@teacher.id, @ta.id]
+        expect(event.payload).to include('final_grader_id' => [@teacher.id, @ta.id])
       end
 
       it 'creates an AnonymousOrModerationEvent with assignment changes when grader_count is changed' do
         assignment.update!(grader_count: 70)
-        expect(event.payload.fetch('grader_count')).to eq [2, 70]
+        expect(event.payload).to include('grader_count' => [2, 70])
       end
 
       it 'creates an AnonymousOrModerationEvent with assignment changes when grader_names_visible_to_final_grader is changed' do
         assignment.update!(grader_names_visible_to_final_grader: false)
-        expect(event.payload.fetch('grader_names_visible_to_final_grader')).to eq [true, false]
+        expect(event.payload).to include('grader_names_visible_to_final_grader' => [true, false])
       end
 
       it 'creates an AnonymousOrModerationEvent with assignment changes when grader_comments_visible_to_graders is changed' do
         assignment.update!(grader_comments_visible_to_graders: false)
-        expect(event.payload.fetch('grader_comments_visible_to_graders')).to eq [true, false]
+        expect(event.payload).to include('grader_comments_visible_to_graders' => [true, false])
       end
 
       it 'creates an AnonymousOrModerationEvent with assignment changes when graders_anonymous_to_graders is changed' do
         assignment.update!(graders_anonymous_to_graders: true)
-        expect(event.payload.fetch('graders_anonymous_to_graders')).to eq [false, true]
+        expect(event.payload).to include('graders_anonymous_to_graders' => [false, true])
       end
     end
   end

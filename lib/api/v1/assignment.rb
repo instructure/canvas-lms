@@ -334,9 +334,9 @@ module Api::V1::Assignment
     if submission = opts[:submission]
       if submission.is_a?(Array)
         ActiveRecord::Associations::Preloader.new.preload(submission, :quiz_submission) if assignment.quiz?
-        hash['submission'] = submission.map { |s| submission_json(s, assignment, user, session, params) }
+        hash['submission'] = submission.map { |s| submission_json(s, assignment, user, session, assignment.context, params) }
       else
-        hash['submission'] = submission_json(submission, assignment, user, session, params)
+        hash['submission'] = submission_json(submission, assignment, user, session, assignment.context, params)
       end
     end
 
@@ -478,12 +478,12 @@ module Api::V1::Assignment
 
     # Trying to change the "everyone" due date when the assignment is restricted to a specific section
     # creates an "everyone else" section
+    prepared_update = prepare_assignment_create_or_update(assignment, assignment_params, user, context)
+    return false unless prepared_update[:valid]
+
     if !(assignment_params["due_at"]).nil? && assignment["only_visible_to_overrides"]
       assignment["only_visible_to_overrides"] = false
     end
-
-    prepared_update = prepare_assignment_create_or_update(assignment, assignment_params, user, context)
-    return false unless prepared_update[:valid]
 
     cached_due_dates_changed = prepared_update[:assignment].update_cached_due_dates?
     response = :ok
@@ -820,6 +820,7 @@ module Api::V1::Assignment
     raise "needs strong params" unless assignment_params.is_a?(ActionController::Parameters)
 
     unless assignment.new_record?
+      assignment.restore_attributes
       old_assignment = assignment.clone
       old_assignment.id = assignment.id
     end

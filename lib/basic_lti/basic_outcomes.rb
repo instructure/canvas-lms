@@ -281,7 +281,7 @@ to because the assignment has no points possible.
           submission_hash[:grade] = (new_score >= 1 ? "pass" : "fail") if assignment.grading_type == "pass_fail"
           submission_hash[:grader_id] = -_tool.id
           @submission = assignment.grade_student(user, submission_hash).first
-          if @submission.submitted_at.blank? && submission_hash[:submission_type] == 'external_tool' && submitted_at_date.nil?
+          if submission_hash[:submission_type] == 'external_tool' && submitted_at_date.nil?
             @submission.submitted_at = Time.zone.now
           end
         end
@@ -291,6 +291,7 @@ to because the assignment has no points possible.
         end
 
         if @submission
+          @submission.attempt -= 1 if @submission.attempt.try(:'>', 0) && @submission.submitted_at_changed?
           @submission.save
         else
           self.code_major = 'failure'

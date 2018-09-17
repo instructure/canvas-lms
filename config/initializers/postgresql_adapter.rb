@@ -73,10 +73,6 @@ module PostgreSQLAdapterExtensions
     execute("ALTER TABLE #{quote_table_name(from_table)} VALIDATE CONSTRAINT #{quote_column_name(foreign_key_name)}") if options[:delay_validation]
   end
 
-  def rename_index(table_name, old_name, new_name)
-    return execute "ALTER INDEX #{quote_table_name(old_name)} RENAME TO #{quote_column_name(new_name)}";
-  end
-
   def set_standard_conforming_strings
     # not needed in PG 9.1+
   end

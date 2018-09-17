@@ -17,21 +17,17 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
-import $ from 'jquery'
+import {shallow} from 'enzyme'
 import NoResults from 'jsx/files/NoResults'
 
 QUnit.module('NoResults')
 
 test('displays search term in no results text', () => {
-  const noResults = React.createFactory(NoResults)
   const search_term = 'texas toast'
-  const rendered = TestUtils.renderIntoDocument(noResults({search_term}))
-  equal(
-    rendered.refs.yourSearch.props.children,
-    `Your search - \"${search_term}\" - did not match any files.`,
+  const wrapper = shallow(<NoResults search_term={search_term} />)
+
+  ok(
+    wrapper.text().match(`Your search - \"${search_term}\" - did not match any files.`),
     'has the right text'
   )
-  ReactDOM.unmountComponentAtNode(rendered.getDOMNode().parentNode)
 })

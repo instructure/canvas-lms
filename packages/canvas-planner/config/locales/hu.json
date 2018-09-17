@@ -56,11 +56,20 @@
   "missing_1a256b3b": {
     "message": "Hiányzik"
   },
+  "new_13daf639": {
+    "message": "Új"
+  },
   "next_month_749b1778": {
     "message": "Következő hónap"
   },
+  "nothing_for_now_e3e3ce2a": {
+    "message": "Egyelőre semmi"
+  },
   "page_50c4823d": {
     "message": "Oldal"
+  },
+  "peer_review_74f26a13": {
+    "message": "Társértékelés"
   },
   "points_bceb5005": {
     "message": "pontszám"

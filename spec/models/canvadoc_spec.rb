@@ -43,6 +43,20 @@ describe 'Canvadoc' do
     allow(Canvadocs).to receive(:enabled?).and_return false
   end
 
+  describe "#jwt_secret" do
+    it "returns the secret stored in DynamicSettings, base64 decoded" do
+      allow(Canvas::DynamicSettings).to receive(:find).with(service: "canvadoc", default_ttl: 5.minutes).and_return(
+        {"secret" => "c2Vrcml0"}
+      )
+      expect(Canvadoc.jwt_secret).to eq "sekrit"
+    end
+
+    it "returns nil if no secret found in DynamicSettings" do
+      allow(Canvas::DynamicSettings).to receive(:find).with(service: "canvadoc", default_ttl: 5.minutes).and_return({})
+      expect(Canvadoc.jwt_secret).to eq nil
+    end
+  end
+
   describe "#upload" do
     it "uploads" do
       @doc.upload

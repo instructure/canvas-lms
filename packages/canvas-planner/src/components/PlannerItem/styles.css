@@ -97,7 +97,7 @@
 .metrics {
   box-sizing: border-box;
   text-align: end;
-  flex: 0 0 7rem;
+  flex: 0 0 10rem;
   min-width: 1px;
   padding-inline-start: var(--metricsPadding);
   &.with_end_time {

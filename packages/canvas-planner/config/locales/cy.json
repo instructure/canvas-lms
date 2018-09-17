@@ -62,12 +62,6 @@
   "close_d634289d": {
     "message": "Cau"
   },
-  "close_opportunities_popover_f4e50551": {
-    "message": "Cau neidlen cyfleoedd"
-  },
-  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
-    "message": "{ count, plural,\n     =0 {# cyfle}\n    one {# cyfle}\n  other {# cyfle}\n}"
-  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Dangos # eitem wedi’i chwblhau }\n  other {Dangos # eitem wedi’u cwblhau}\n}"
   },
@@ -211,6 +205,9 @@
   },
   "no_grade_3b4d7f3e": {
     "message": "Dim Gradd"
+  },
+  "nothing_for_now_e3e3ce2a": {
+    "message": "Dim byd am nawr"
   },
   "nothing_more_to_do_b665da42": {
     "message": "Does Dim Byd Arall i''w Wneud"

@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`properly renders the UnassessedAssignment component 1`] = `
+"<ListItem>
+  <View padding=\\"small\\" display=\\"auto\\">
+    <ApplyTheme theme={{...}} immutable={false}>
+      <Link href=\\"www.example.com\\" variant=\\"default\\" as=\\"button\\" linkRef={[Function: linkRef]} ellipsis={false} iconPlacement=\\"start\\">
+        <Flex alignItems=\\"center\\" as=\\"span\\" direction=\\"row\\" justifyItems=\\"start\\" inline={false} visualDebug={false} wrapItems={false}>
+          <FlexItem padding=\\"0 0 0 small\\" as=\\"span\\" grow={false} shrink={false}>
+            <Text size=\\"medium\\" as=\\"span\\" letterSpacing=\\"normal\\">
+              <IconAssignment />
+            </Text>
+          </FlexItem>
+          <FlexItem padding=\\"0 x-small\\" as=\\"span\\" grow={false} shrink={false}>
+            <Text weight=\\"bold\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
+              example
+               (
+              Not yet assessed
+              )
+            </Text>
+          </FlexItem>
+        </Flex>
+      </Link>
+    </ApplyTheme>
+  </View>
+</ListItem>"
+`;

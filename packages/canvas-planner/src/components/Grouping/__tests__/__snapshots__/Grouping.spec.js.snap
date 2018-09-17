@@ -41,7 +41,6 @@ exports[`grouping contains link pointing to course url 1`] = `
           Object {
             "color": "#5678",
             "id": 256,
-            "inform_students_of_overdue_submissions": true,
             "url": "example.com",
           }
         }
@@ -68,7 +67,6 @@ exports[`grouping contains link pointing to course url 1`] = `
           Object {
             "color": "#5678",
             "id": 256,
-            "inform_students_of_overdue_submissions": true,
           }
         }
         courseName="Board Games"
@@ -131,7 +129,6 @@ exports[`renders a CompletedItemsFacade when completed items are present by defa
           Object {
             "color": "#5678",
             "id": 256,
-            "inform_students_of_overdue_submissions": true,
           }
         }
         courseName="Board Games"
@@ -214,7 +211,6 @@ exports[`renders the base component with required props 1`] = `
           Object {
             "color": "#5678",
             "id": 256,
-            "inform_students_of_overdue_submissions": true,
             "url": "example.com",
           }
         }
@@ -241,7 +237,6 @@ exports[`renders the base component with required props 1`] = `
           Object {
             "color": "#5678",
             "id": 256,
-            "inform_students_of_overdue_submissions": true,
           }
         }
         courseName="Board Games"

@@ -46,6 +46,11 @@
 #           "example": 1578941,
 #           "type": "integer"
 #         },
+#         "assignment_id": {
+#           "description": "The id of the plannable's associated assignment, if it has one",
+#           "example": 1578941,
+#           "type": "integer"
+#         },
 #         "workflow_state": {
 #           "description": "The current published state of the item, synced with the associated object",
 #           "example": "published",

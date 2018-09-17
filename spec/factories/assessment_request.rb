@@ -20,10 +20,10 @@ module Factories
   def assessment_request_model(opts={})
     @user = user_model
     @user2 = user_model
-    @user3 = user_model
     @submission = submission_model
+    @assessor_submission = submission_model
 
-    @assessment_request = AssessmentRequest.create!(:user => @user, :assessor_asset => @user2, :assessor => @user3, :asset => @submission)
+    @assessment_request = AssessmentRequest.create!(:user => @user, :assessor_asset => @assessor_submission, :assessor => @user, :asset => @submission)
 
     @assessment_request
   end

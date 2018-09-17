@@ -21,42 +21,34 @@ import PropTypes from 'prop-types'
 import FilesystemObjectThumbnail from '../files/FilesystemObjectThumbnail'
 import customPropTypes from 'compiled/react_files/modules/customPropTypes'
 
-  var MAX_THUMBNAILS_TO_SHOW = 10;
+const MAX_THUMBNAILS_TO_SHOW = 10
 
-  var DragFeedback = React.createClass({
-    displayName: 'DragFeedback',
+export default function DragFeedback(props) {
+  return (
+    <div
+      className="DragFeedback"
+      style={{
+        WebkitTransform: `translate3d(${props.pageX + 6}px, ${props.pageY + 6}px, 0)`,
+        transform: `translate3d(${props.pageX + 6}px, ${props.pageY + 6}px, 0)`
+      }}
+    >
+      {props.itemsToDrag.slice(0, MAX_THUMBNAILS_TO_SHOW).map((model, index) => (
+        <FilesystemObjectThumbnail
+          model={model}
+          key={model.id}
+          style={{
+            left: 10 + index * 5 - index,
+            top: 10 + index * 5 - index
+          }}
+        />
+      ))}
+      <span className="badge badge-important">{props.itemsToDrag.length}</span>
+    </div>
+  )
+}
 
-    propTypes: {
-      itemsToDrag: PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired,
-      pageX: PropTypes.number.isRequired,
-      pageY: PropTypes.number.isRequired
-    },
-
-    render () {
-      return (
-
-        <div className='DragFeedback' style={{
-          WebkitTransform: `translate3d(${this.props.pageX + 6}px, ${this.props.pageY + 6}px, 0)`,
-          transform: `translate3d(${this.props.pageX + 6}px, ${this.props.pageY + 6}px, 0)`
-        }}>
-
-        {this.props.itemsToDrag.slice(0, MAX_THUMBNAILS_TO_SHOW).map((model, index) => {
-          return (
-            <FilesystemObjectThumbnail
-              model={model}
-              key={model.id}
-              style={{
-                left: 10 + index * 5 - index,
-                top: 10 + index * 5 - index
-              }}
-            />
-          );
-        })}
-        <span className='badge badge-important'>{this.props.itemsToDrag.length}</span>
-
-        </div>
-      );
-    }
-  });
-
-export default DragFeedback
+DragFeedback.propTypes = {
+  itemsToDrag: PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired,
+  pageX: PropTypes.number.isRequired,
+  pageY: PropTypes.number.isRequired
+}

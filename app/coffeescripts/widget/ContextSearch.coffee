@@ -36,7 +36,6 @@ define [
         populator: @populator
         baseData:
           synthetic_contexts: 1
-          blank_avatar_fallback: false
         browser:
           data:
             types: ['context']

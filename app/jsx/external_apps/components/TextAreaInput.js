@@ -17,38 +17,44 @@
  */
 
 import React from 'react'
+import createReactClass from 'create-react-class'
 import PropTypes from 'prop-types'
 import InputMixin from '../../external_apps/mixins/InputMixin'
 
-export default React.createClass({
-    displayName: 'TextAreaInput',
+export default createReactClass({
+  displayName: 'TextAreaInput',
 
-    mixins: [InputMixin],
+  mixins: [InputMixin],
 
-    propTypes: {
-      defaultValue: PropTypes.string,
-      label:        PropTypes.string,
-      id:           PropTypes.string,
-      rows:         PropTypes.number,
-      required:     PropTypes.bool,
-      hintText:     PropTypes.string,
-      errors:       PropTypes.object
-    },
+  propTypes: {
+    defaultValue: PropTypes.string,
+    label: PropTypes.string,
+    id: PropTypes.string,
+    rows: PropTypes.number,
+    required: PropTypes.bool,
+    hintText: PropTypes.string,
+    errors: PropTypes.object
+  },
 
-    render() {
-      return (
-        <div className={this.getClassNames()}>
-          <label>
-            {this.props.label}
-            <textarea ref="input" rows={this.props.rows || 3} defaultValue={this.props.defaultValue}
-              className="form-control input-block-level"
-              placeholder={this.props.label} id={this.props.id}
-              required={this.props.required ? "required" : null}
-              onChange={this.handleChange}
-              aria-invalid={!!this.getErrorMessage()} />
-            {this.renderHint()}
-          </label>
-        </div>
-      )
-    }
-  });
+  render() {
+    return (
+      <div className={this.getClassNames()}>
+        <label>
+          {this.props.label}
+          <textarea
+            ref="input"
+            rows={this.props.rows || 3}
+            defaultValue={this.props.defaultValue}
+            className="form-control input-block-level"
+            placeholder={this.props.label}
+            id={this.props.id}
+            required={this.props.required ? 'required' : null}
+            onChange={this.handleChange}
+            aria-invalid={!!this.getErrorMessage()}
+          />
+          {this.renderHint()}
+        </label>
+      </div>
+    )
+  }
+})

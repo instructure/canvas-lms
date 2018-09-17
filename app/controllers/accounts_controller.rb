@@ -377,7 +377,10 @@ class AccountsController < ApplicationController
   # Returns permission information for the calling user and the given account.
   # You may use `self` as the account id to check permissions against the domain root account.
   # The caller must have an account role or admin (teacher/TA/designer) enrollment in a course
-  # in the account. See also {api:CoursesController#permissions the Course counterpart}.
+  # in the account.
+  #
+  # See also the {api:CoursesController#permissions Course} and {api:GroupsController#permissions Group}
+  # counterparts.
   #
   # @argument permissions[] [String]
   #   List of permissions to check against the authenticated user.
@@ -664,7 +667,9 @@ class AccountsController < ApplicationController
       @courses.each {|c| c.student_count = student_counts[c.id] || 0 }
     end
 
-    render :json => @courses.map { |c| course_json(c, @current_user, session, includes, nil) }
+    all_precalculated_permissions = @current_user.precalculate_permissions_for_courses(@courses, [:read_sis, :manage_sis])
+    render :json => @courses.map { |c| course_json(c, @current_user, session, includes, nil,
+      precalculated_permissions: all_precalculated_permissions&.dig(c.global_id)) }
   end
 
   # Delegated to by the update action (when the request is an api_request?)

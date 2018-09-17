@@ -72,7 +72,7 @@ module Api::V1::User
       end
 
       if includes.include?('avatar_url') && user.account.service_enabled?(:avatars)
-        json[:avatar_url] = avatar_url_for_user(user, blank_fallback)
+        json[:avatar_url] = avatar_url_for_user(user)
       end
       if enrollments
         json[:enrollments] = enrollments.map do |enrollment|
@@ -116,7 +116,7 @@ module Api::V1::User
       if includes.include?('permissions')
         json[:permissions] = {
           :can_update_name => user.user_can_edit_name?,
-          :can_update_avatar => service_enabled?(:avatars)
+          :can_update_avatar => service_enabled?(:avatars) && !user.avatar_locked?
         }
       end
 
@@ -165,7 +165,7 @@ module Api::V1::User
   #
   # if parent_context is :profile, the html_url will always be the user's
   # public profile url, regardless of @current_user permissions
-  def user_display_json(user, parent_context = nil)
+  def user_display_json(user, parent_context = nil, includes = [])
     return {} unless user
     participant_url = case parent_context
       when :profile
@@ -178,9 +178,10 @@ module Api::V1::User
     hash = {
       id: user.id,
       display_name: user.short_name,
-      avatar_image_url: avatar_url_for_user(user, blank_fallback),
+      avatar_image_url: avatar_url_for_user(user),
       html_url: participant_url
     }
+    hash[:avatar_is_fallback] = user.avatar_image_url.nil? if includes.include?(:avatar_is_fallback) && avatars_enabled_for_user?(user)
     hash[:fake_student] = true if user.fake_student?
     hash
   end

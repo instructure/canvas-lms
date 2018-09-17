@@ -38,7 +38,7 @@ class Oauth2ProviderController < ApplicationController
     raise Canvas::Oauth::RequestError, :invalid_client_id unless provider.has_valid_key?
     raise Canvas::Oauth::RequestError, :invalid_redirect unless provider.has_valid_redirect?
     if developer_key_management_and_scoping_enabled? provider
-      raise Canvas::Oauth::RequestError, :invalid_scope unless scopes.present? && scopes.all? { |scope| provider.key.scopes.include?(scope) }
+      raise Canvas::Oauth::RequestError, :invalid_scope unless provider.valid_scopes?
     end
 
     session[:oauth2] = provider.session_hash
@@ -95,8 +95,10 @@ class Oauth2ProviderController < ApplicationController
 
     granter = if grant_type == "authorization_code"
       Canvas::Oauth::GrantTypes::AuthorizationCode.new(client_id, secret, params)
-    elsif params[:grant_type] == "refresh_token"
+    elsif grant_type == "refresh_token"
       Canvas::Oauth::GrantTypes::RefreshToken.new(client_id, secret, params)
+    elsif grant_type == 'client_credentials'
+      Canvas::Oauth::GrantTypes::ClientCredentials.new(params, request.host)
     else
       Canvas::Oauth::GrantTypes::BaseType.new(client_id, secret, params)
     end

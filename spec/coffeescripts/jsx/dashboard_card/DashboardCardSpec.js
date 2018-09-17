@@ -47,7 +47,6 @@ QUnit.module('DashboardCard', {
       id: '1',
       backgroundColor: '#EF4437',
       image: null,
-      imagesEnabled: false
     }
     return sandbox.stub(CourseActivitySummaryStore, 'getStateForCourse').returns({})
   },
@@ -92,7 +91,6 @@ test('unreadCount', function() {
 })
 
 test('does not have image attribute when a url is not provided', function() {
-  this.props.imagesEnabled = true
   const DashCard = <DashboardCard {...this.props} />
   this.component = TestUtils.renderIntoDocument(DashCard)
   ok(
@@ -103,7 +101,6 @@ test('does not have image attribute when a url is not provided', function() {
 })
 
 test('has image attribute when url is provided', function() {
-  this.props.imagesEnabled = true
   this.props.image = 'http://coolUrl'
   const DashCard = <DashboardCard {...this.props} />
   this.component = TestUtils.renderIntoDocument(DashCard)

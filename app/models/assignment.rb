@@ -39,12 +39,9 @@ class Assignment < ActiveRecord::Base
   include LockedFor
 
   ALLOWED_GRADING_TYPES = %w(points percent letter_grade gpa_scale pass_fail not_graded).freeze
-
   OFFLINE_SUBMISSION_TYPES = %i(on_paper external_tool none not_graded wiki_page).freeze
   SUBMITTABLE_TYPES = %w(online_quiz discussion_topic wiki_page).freeze
-
   LTI_EULA_SERVICE = 'vnd.Canvas.Eula'.freeze
-
   AUDITABLE_ATTRIBUTES = %w[
     muted
     due_at
@@ -60,9 +57,9 @@ class Assignment < ActiveRecord::Base
     anonymous_instructor_annotations
   ].freeze
 
-  attr_accessor :previous_id, :updating_user, :copying, :user_submitted
-
+  attr_accessor :previous_id, :copying, :user_submitted
   attr_reader :assignment_changed
+  attr_writer :updating_user
 
   include MasterCourses::Restrictor
   restrict_columns :content, [:title, :description]
@@ -124,7 +121,7 @@ class Assignment < ActiveRecord::Base
   end
 
   with_options if: -> { moderated_grading? } do
-    validates :grader_count, numericality: { greater_than: 0, message: "Number of graders must be positive" }
+    validates :grader_count, numericality: { greater_than: 0 }
     validate :grader_section_ok?
     validate :final_grader_ok?
   end
@@ -177,13 +174,6 @@ class Assignment < ActiveRecord::Base
       wiki_titles = [].to_set
     end
     assignment_titles.union(wiki_titles)
-  end
-
-  def auditable?
-    anonymous_grading? ||
-      moderated_grading? ||
-      saved_change_to_anonymous_grading? ||
-      saved_change_to_moderated_grading?
   end
 
   # The relevant associations that are copied are:
@@ -473,9 +463,7 @@ class Assignment < ActiveRecord::Base
     write_attribute(:allowed_extensions, new_value)
   end
 
-  after_create :create_assignment_created_audit_event
-
-  after_update :create_assignment_updated_audit_event
+  after_create :create_assignment_created_audit_event!
 
   before_save :ensure_post_to_sis_valid,
               :process_if_quiz,
@@ -496,12 +484,16 @@ class Assignment < ActiveRecord::Base
               :delete_empty_abandoned_children,
               :update_cached_due_dates,
               :apply_late_policy,
-              :touch_submissions_if_muted_changed,
-              :create_audit_event_if_grades_posted
+              :touch_submissions_if_muted_changed
+
+  with_options if: :auditable? do
+    after_update :create_assignment_updated_audit_event!
+    after_save :create_grades_posted_audit_event!, if: :saved_change_to_grades_published_at
+  end
 
   has_a_broadcast_policy
 
-  def create_assignment_created_audit_event
+  def create_assignment_created_audit_event!
     return if @updating_user.nil?
     return unless auditable?
 
@@ -509,13 +501,12 @@ class Assignment < ActiveRecord::Base
       map[attribute] = attributes[attribute] unless attributes[attribute].nil?
     end
 
-    create_audit_event(event_type: :assignment_created, payload: auditable_changes)
+    create_audit_event!(event_type: :assignment_created, payload: auditable_changes)
   end
-  private :create_assignment_created_audit_event
+  private :create_assignment_created_audit_event!
 
-  def create_assignment_updated_audit_event
+  def create_assignment_updated_audit_event!
     return if @updating_user.nil?
-    return unless auditable? || became_auditable?
 
     auditable_changes = if became_auditable?
       AUDITABLE_ATTRIBUTES.each_with_object({}) do |attribute, map|
@@ -533,11 +524,11 @@ class Assignment < ActiveRecord::Base
 
     return if auditable_changes.empty?
 
-    create_audit_event(event_type: :assignment_updated, payload: auditable_changes)
+    create_audit_event!(event_type: :assignment_updated, payload: auditable_changes)
   end
-  private :create_assignment_updated_audit_event
+  private :create_assignment_updated_audit_event!
 
-  def create_audit_event(event_type:, payload:)
+  def create_audit_event!(event_type:, payload:)
     AnonymousOrModerationEvent.create!(
       assignment: self,
       user: @updating_user,
@@ -545,16 +536,26 @@ class Assignment < ActiveRecord::Base
       payload: payload
     )
   end
-  private :create_audit_event
+  private :create_audit_event!
 
+  # track events when an assignment is anonymous or moderated grading also track when save_changes includes
+  # anonymous_grading or moderated_grading grading see also: #became_auditable? for when an assignment's
+  # anonymous/moderated grading setting has gone from disabled to enabled
+  def auditable?
+    anonymous_grading? ||
+      moderated_grading? ||
+      saved_change_to_anonymous_grading? ||
+      saved_change_to_moderated_grading?
+  end
+
+  # saved_changes includes anonymous_grading or moderated grading changing from disabled to enabled
   def became_auditable?
     saved_change_to_anonymous_grading?(from: false, to: true) || saved_change_to_moderated_grading?(from: false, to: true)
   end
   private :became_auditable?
 
-  def create_audit_event_if_grades_posted
-    changes = saved_changes.slice(:grades_published_at)
-    return if changes.empty? || @updating_user.nil?
+  def create_grades_posted_audit_event!
+    return if @updating_user.nil?
 
     AnonymousOrModerationEvent.create!(
       assignment: self,
@@ -563,7 +564,7 @@ class Assignment < ActiveRecord::Base
       user: @updating_user
     )
   end
-  private :create_audit_event_if_grades_posted
+  private :create_grades_posted_audit_event!
 
   after_save :remove_assignment_updated_flag # this needs to be after has_a_broadcast_policy for the message to be sent
 
@@ -623,7 +624,7 @@ class Assignment < ActiveRecord::Base
       s.graded_at = graded_at
       s.assignment = self
       s.assignment_changed_not_sub = true
-      s.grade_change_event_author_id = updating_user&.id
+      s.grade_change_event_author_id = @updating_user&.id
 
       # Skip the grade calculation for now. We'll do it at the end.
       s.skip_grade_calc = true
@@ -2995,7 +2996,8 @@ class Assignment < ActiveRecord::Base
   # method will simply execute the provided block without any additional checks.
   def ensure_grader_can_adjudicate(grader:, provisional: false, occupy_slot:)
     unless provisional && moderated_grading?
-      yield and return
+      yield if block_given?
+      return
     end
 
     Assignment.transaction do
@@ -3013,7 +3015,7 @@ class Assignment < ActiveRecord::Base
         moderation_grader.update!(slot_taken: occupy_slot)
       end
 
-      yield
+      yield if block_given?
 
       # If we added a grader, attempt to handle a potential race condition:
       # multiple new graders could have tried to add themselves simultaneously
@@ -3108,7 +3110,7 @@ class Assignment < ActiveRecord::Base
     return if grader_section.blank?
 
     if grader_section.workflow_state != 'active' || grader_section.course_id != course.id
-      errors.add(:grader_section, 'Selected moderated grading section must be active and in same course as assignment')
+      errors.add(:grader_section, 'must be active and in same course as assignment')
     end
   end
 
@@ -3116,10 +3118,10 @@ class Assignment < ActiveRecord::Base
     return unless final_grader_id_changed?
     return if final_grader_id.blank?
 
-    if grader_section_id && grader_section.instructor_enrollments.where(user_id: final_grader_id, workflow_state: 'active').empty?
-      errors.add(:final_grader, 'Final grader must be enrolled in selected section')
-    elsif grader_section_id.nil? && course.participating_instructors.where(id: final_grader_id).empty?
-      errors.add(:final_grader, 'Final grader must be an instructor in this course')
+    if grader_section_id.present? && grader_section.instructor_enrollments.where(user_id: final_grader_id, workflow_state: 'active').empty?
+      errors.add(:final_grader, 'must be enrolled in selected section')
+    elsif course.participating_instructors.where(id: final_grader_id).empty?
+      errors.add(:final_grader, 'must be an instructor in this course')
     end
   end
 

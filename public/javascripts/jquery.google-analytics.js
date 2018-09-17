@@ -53,6 +53,9 @@ import $ from 'jquery'
     if (options.domain) {
       window._gaq.push(['_setDomainName', options.domain]);
     }
+    if (ENV.ga_page_title) {
+      window._gaq.push(['_set', 'title', ENV.ga_page_title]);
+    }
     window._gaq.push(['_trackPageview']);
     window._gaq.push(['_trackPageLoadTime']);
     if (options.status_code != 200) {

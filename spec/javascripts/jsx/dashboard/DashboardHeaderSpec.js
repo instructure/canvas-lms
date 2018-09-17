@@ -19,11 +19,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
-import { shallow } from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import { shallow } from 'enzyme'
 import moxios from 'moxios'
 import sinon from 'sinon'
 import $ from 'jquery'
 import DashboardHeader from 'jsx/dashboard/DashboardHeader'
+import { resetPlanner } from 'canvas-planner'
 
 const container = document.getElementById('fixtures')
 
@@ -39,6 +40,7 @@ const FakeDashboard = function (props) {
         planner_enabled={props.planner_enabled}
         dashboard_view={props.dashboard_view}
         showTodoList={showTodoList}
+        env={window.ENV}
       />
       <div
         id="flashalert_message_holder"
@@ -83,6 +85,9 @@ let plannerStub
 QUnit.module('Dashboard Header', {
   setup () {
     window.ENV = {
+      MOMENT_LOCALE: 'en',
+      TIMEZONE: 'UTC',
+      current_user: {},
       PREFERENCES: {},
       STUDENT_PLANNER_COURSES: [],
     }
@@ -91,6 +96,7 @@ QUnit.module('Dashboard Header', {
   },
 
   teardown () {
+    resetPlanner()
     moxios.uninstall()
     plannerStub.restore()
     ReactDOM.unmountComponentAtNode(container)
@@ -99,30 +105,64 @@ QUnit.module('Dashboard Header', {
 
 test('it renders', () => {
   const dashboardHeader = shallow(
-    <DashboardHeader planner_enabled planner_selected />
+    <DashboardHeader planner_enabled planner_selected env={window.ENV} />
   )
   ok(dashboardHeader)
 })
 
-test('it waits for the parent element to appear and then renders the the ToDoSidebar', () => {
-  const clock = sinon.useFakeTimers(new Date('2018-01-01'))
-  try {
-    ReactDOM.render(
-      <FakeDashboard
-        planner_enabled={false}
-        dashboard_view='activity'
-        showTodoList={null}
-      />, container)
-      clock.tick(510) // don't bork when the element isn't there
-      notOk(container.textContent.match(/Loading/), 'container should not contain "Loading"')
-      const todoContainer = document.createElement('div')
-      todoContainer.className = 'Sidebar__TodoListContainer'
-      container.appendChild(todoContainer)
-      clock.tick(510)
-      ok(todoContainer.textContent.match(/Loading/), 'container should contain "Loading"')
-    } finally {
-      clock.restore()
-    }
+test('it waits for the erb html to be injected before rendering the ToDoSidebar', assert => {
+  const done = assert.async()
+  ENV.STUDENT_PLANNER_ENABLED = true
+  ENV.DASHBOARD_SIDEBAR_URL = 'fake-dashboard-sidebar-url'
+  const $fakeRightSide = $('<div id="right-side">').appendTo(document.body)
+  const fakeServerResponse = Promise.resolve(`
+    <div class="Sidebar__TodoListContainer"></div>
+    This came from the server
+  `)
+
+  sandbox
+    .mock($)
+    .expects('get')
+    .once()
+    .withArgs('fake-dashboard-sidebar-url')
+    .returns(fakeServerResponse)
+
+  moxios.stubOnce('GET', '/api/v1/planner/items', {
+    status: 200,
+    responseText: {}
+  })
+  const promiseToGetNewCourseForm = import('compiled/util/newCourseForm')
+
+  ReactDOM.render(
+    <FakeDashboard planner_enabled={false} dashboard_view="activity" showTodoList={null} />,
+    container
+  )
+  notOk(
+    $fakeRightSide
+      .find('.Sidebar__TodoListContainer')
+      .text()
+      .includes('Loading'),
+    'container should not contain "Loading"'
+  )
+
+  Promise.all([promiseToGetNewCourseForm, promiseToGetNewCourseForm]).then(() => {
+    moxios.wait(() => {
+      ok(
+        $fakeRightSide.text().includes('This came from the server'),
+        'injects the server erb html where it should'
+      )
+
+      ok(
+        $fakeRightSide
+          .find('.Sidebar__TodoListContainer')
+          .text()
+          .includes('Loading'),
+        'container should contain "Loading"'
+      )
+      $fakeRightSide.remove()
+      done()
+    })
+  })
 })
 
 test('it should switch dashboard view appropriately when changeDashboard is called', () => {

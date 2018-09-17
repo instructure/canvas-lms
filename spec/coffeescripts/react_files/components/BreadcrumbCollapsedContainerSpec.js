@@ -39,26 +39,26 @@ QUnit.module('BreadcrumbsCollapsedContainer', {
     this.bcc = TestUtils.renderIntoDocument(React.createElement(bcc))
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.bcc.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.bcc).parentNode)
   }
 })
 
 test('BCC: opens breadcumbs on mouse enter', function() {
-  const $node = $(this.bcc.getDOMNode())
-  simulateNative.mouseOver(this.bcc.getDOMNode())
+  const $node = $(ReactDOM.findDOMNode(this.bcc))
+  simulateNative.mouseOver(ReactDOM.findDOMNode(this.bcc))
   equal($node.find('.open').length, 1, 'should have class of open')
 })
 
 test('BCC: opens breadcrumbs on focus', function() {
-  const $node = $(this.bcc.getDOMNode())
-  simulate.focus(this.bcc.getDOMNode())
+  const $node = $(ReactDOM.findDOMNode(this.bcc))
+  simulate.focus(ReactDOM.findDOMNode(this.bcc))
   equal($node.find('.open').length, 1, 'should have class of open')
 })
 
 test('BCC: closes breadcrumbs on mouse leave', function() {
   const clock = sinon.useFakeTimers()
-  const $node = $(this.bcc.getDOMNode())
-  simulateNative.mouseOut(this.bcc.getDOMNode())
+  const $node = $(ReactDOM.findDOMNode(this.bcc))
+  simulateNative.mouseOut(ReactDOM.findDOMNode(this.bcc))
   clock.tick(200)
   equal($node.find('.closed').length, 1, 'should have class of closed')
   clock.restore()
@@ -66,10 +66,10 @@ test('BCC: closes breadcrumbs on mouse leave', function() {
 
 test('BCC: closes breadcrumbs on blur', function() {
   const clock = sinon.useFakeTimers()
-  simulate.blur(this.bcc.getDOMNode())
+  simulate.blur(ReactDOM.findDOMNode(this.bcc))
   clock.tick(200)
-  const $node = $(this.bcc.getDOMNode())
-  simulateNative.mouseOut(this.bcc.getDOMNode())
+  const $node = $(ReactDOM.findDOMNode(this.bcc))
+  simulateNative.mouseOut(ReactDOM.findDOMNode(this.bcc))
   clock.tick(200)
   equal($node.find('.closed').length, 1, 'should have class of closed')
   clock.restore()

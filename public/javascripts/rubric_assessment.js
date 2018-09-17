@@ -404,7 +404,7 @@ window.rubricAssessment = {
       var assessment = data;
       var total = 0;
       let $criterion = null;
-      for(var idx in assessment.data) {
+      for (let idx = 0; idx < assessment.data.length; idx++) {
         var rating = assessment.data[idx];
         $criterion = $rubricSummary.find("#criterion_" + rating.criterion_id);
         if (editing_data && $criterion.hasClass('learning_outcome_criterion')) {

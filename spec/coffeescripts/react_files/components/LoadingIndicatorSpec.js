@@ -17,23 +17,23 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
-import $ from 'jquery'
+import {shallow} from 'enzyme'
 import LoadingIndicator from 'jsx/files/LoadingIndicator'
 
 QUnit.module('LoadingIndicator')
 
 test('display none if no props supplied', () => {
-  const loadingIndicator = React.createFactory(LoadingIndicator)
-  const rendered = TestUtils.renderIntoDocument(loadingIndicator())
-  equal($(rendered.getDOMNode()).css('display'), 'none', 'loading indicator not shown')
-  ReactDOM.unmountComponentAtNode(rendered.getDOMNode().parentNode)
+  equal(
+    shallow(<LoadingIndicator />).prop('style').display,
+    'none',
+    'loading indicator not shown'
+  )
 })
 
 test('if props supplied for loading', () => {
-  const loadingIndicator = React.createFactory(LoadingIndicator)
-  const rendered = TestUtils.renderIntoDocument(loadingIndicator({isLoading: true}))
-  equal($(rendered.getDOMNode()).css('display'), '', 'loading indicator is shown')
-  ReactDOM.unmountComponentAtNode(rendered.getDOMNode().parentNode)
+  equal(
+    shallow(<LoadingIndicator isLoading />).prop('style').display,
+    '',
+    'loading indicator is shown'
+  )
 })

@@ -30,7 +30,6 @@ const getDefaultProps = () => ({
       url: 'example.com',
       color: "#5678",
       id: 256,
-      inform_students_of_overdue_submissions: true
     }
   }, {
     id: "6",
@@ -40,7 +39,6 @@ const getDefaultProps = () => ({
     context: {
       color: "#5678",
       id: 256,
-      inform_students_of_overdue_submissions: true
     }
   }],
   timeZone: "America/Denver",
@@ -184,7 +182,6 @@ it(`does not render a danger activity notification when there is a missing item
   const props = getDefaultProps();
   const item = props.items[1];
   item.status = { missing: true };
-  item.context.inform_students_of_overdue_submissions = false;
   const wrapper = shallow(<Grouping {...props} />);
   expect(wrapper.find('Badge')).toHaveLength(0);
   expect(wrapper.find('ScreenReaderContent')).toHaveLength(0);
@@ -258,8 +255,8 @@ describe('toggleCompletion', () => {
 it('registers itself as animatable', () => {
   const fakeRegister = jest.fn();
   const fakeDeregister = jest.fn();
-  const firstItems = [{title: 'asdf', context: {id: 128, inform_students_of_overdue_submissions: true}, id: '1', uniqueId: 'first'}, {title: 'jkl', context: {id: 256, inform_students_of_overdue_submissions: true}, id: '2', uniqueId: 'second'}];
-  const secondItems = [{title: 'qwer', context: {id: 128, inform_students_of_overdue_submissions: true}, id: '3', uniqueId: 'third'}, {title: 'uiop', context: {id: 256, inform_students_of_overdue_submissions: true}, id: '4', uniqueId: 'fourth'}];
+  const firstItems = [{title: 'asdf', context: {id: 128}, id: '1', uniqueId: 'first'}, {title: 'jkl', context: {id: 256}, id: '2', uniqueId: 'second'}];
+  const secondItems = [{title: 'qwer', context: {id: 128}, id: '3', uniqueId: 'third'}, {title: 'uiop', context: {id: 256}, id: '4', uniqueId: 'fourth'}];
   const wrapper = mount(
     <Grouping
       {...getDefaultProps()}

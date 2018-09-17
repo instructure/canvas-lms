@@ -888,9 +888,7 @@ describe ExternalToolsController do
   end
 
   describe "POST 'create'" do
-
-    context 'tool duplication' do
-      let(:launch_url) { 'https://www.tool.com/launch' }
+    let(:launch_url) { 'https://www.tool.com/launch' }
       let(:consumer_key) { 'key' }
       let(:shared_secret) { 'seekret' }
       let(:xml) do
@@ -907,6 +905,53 @@ describe ExternalToolsController do
       end
       let(:xml_response) { OpenStruct.new({body: xml}) }
 
+    describe 'developer key id' do
+      subject { ContextExternalTool.find(JSON.parse(response.body)['id']).developer_key_id }
+
+      let_once(:user) { account_admin_user(account: account) }
+      let_once(:account) { account_model }
+      let(:params) do
+        {
+          account_id: account.id,
+          external_tool: {
+            name: 'tool name',
+            consumer_key: consumer_key,
+            shared_secret: shared_secret,
+            config_type: 'by_xml',
+            config_xml: xml,
+            developer_key_id: developer_key.id
+          }
+        }
+      end
+
+      before do
+        user_session(user)
+        post 'create', params: params, format: 'json'
+      end
+
+      context 'when the current user has rights' do
+        let(:developer_key) { DeveloperKey.create!(account: account) }
+
+        it { is_expected.to eq developer_key.id }
+      end
+
+      context 'when the current user does not have rights' do
+        let(:developer_key) { DeveloperKey.create!(account: account) }
+        let(:user) { account_admin_user(account: account_model) }
+
+        it 'sets the develoepr key id' do
+          expect(response).to be_unauthorized
+        end
+      end
+
+      context 'when the developer key account does not match' do
+        let(:developer_key) { DeveloperKey.create! }
+
+        it { is_expected.to be_nil }
+      end
+    end
+
+    context 'tool duplication' do
       shared_examples_for 'detects duplication in context' do
         let(:params) { raise "Override in specs" }
 

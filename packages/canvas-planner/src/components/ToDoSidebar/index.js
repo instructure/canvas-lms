@@ -27,7 +27,7 @@ import ListItem from '@instructure/ui-elements/lib/components/List/ListItem';
 import View from '@instructure/ui-layout/lib/components/View';
 import Spinner from '@instructure/ui-elements/lib/components/Spinner';
 import Button from '@instructure/ui-buttons/lib/components/Button';
-import Text from '@instructure/ui-elements/lib/components/Text'
+import Text from '@instructure/ui-elements/lib/components/Text';
 
 import { sidebarLoadInitialItems, sidebarCompleteItem } from '../../actions';
 import ToDoItem from './ToDoItem';
@@ -52,14 +52,25 @@ export class ToDoSidebar extends Component {
     forCourse: undefined,
   }
 
-  constructor () {
-    super();
+  constructor (props) {
+    super(props);
     this.dismissedItemIndex = null;
     this.titleFocus = null;
+
+    this.state = {
+      visibleToDos: this.getVisibleItems(props.items),
+    };
   }
 
   componentDidMount () {
     this.props.sidebarLoadInitialItems(moment.tz(this.props.timeZone).startOf('day'), this.props.forCourse);
+  }
+
+  componentWillReceiveProps (nextProps) {
+    const visibleToDos = this.getVisibleItems(nextProps.items);
+    this.setState({
+      visibleToDos,
+    });
   }
 
   componentDidUpdate () {
@@ -74,6 +85,14 @@ export class ToDoSidebar extends Component {
     }
   }
 
+  getVisibleItems (items) {
+    const incompletedFilter = (item) => {
+      if (!item) return false;
+      return !item.completed;
+    };
+    return items.filter(incompletedFilter).slice(0, 5);
+  }
+
   handleDismissClick (itemIndex, item) {
     this.dismissedItemIndex = itemIndex;
     this.props.sidebarCompleteItem(item)
@@ -81,7 +100,7 @@ export class ToDoSidebar extends Component {
   }
 
   renderShowAll () {
-    if (this.props.changeDashboardView) {
+    if (this.props.changeDashboardView && this.state.visibleToDos.length > 0) {
       return (
         <View as="div" textAlign="center">
           <Button variant="link" onClick={() => this.props.changeDashboardView('planner')}>
@@ -94,22 +113,16 @@ export class ToDoSidebar extends Component {
   }
 
   renderItems () {
-    const incompletedFilter = (item) => {
-      if (!item) return false;
-      return !item.completed;
-    };
-
-    const visibleTodos = this.props.items.filter(incompletedFilter).slice(0, 5);
     this.todoItemComponents = [];
 
-    if (visibleTodos.length === 0) {
+    if (this.state.visibleToDos.length === 0) {
       return <Text size="small">{formatMessage('Nothing for now')}</Text>
     }
 
     return (
-      <List variant="unstyled">
+      <List id="planner-todosidebar-item-list" variant="unstyled">
         {
-          visibleTodos.map((item, itemIndex) => (
+          this.state.visibleToDos.map((item, itemIndex) => (
             <ListItem key={item.uniqueId}>
               <ToDoItem
                 ref={component => {this.todoItemComponents[itemIndex] = component;}}

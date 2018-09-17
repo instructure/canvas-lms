@@ -25,7 +25,8 @@ RSpec.describe ApplicationController do
       host_with_port: "www.example.com",
       host: "www.example.com",
       headers: {},
-      format: double(:html? => true)
+      format: double(:html? => true),
+      user_agent: nil
     )
     allow(controller).to receive(:request).and_return(request_double)
   end
@@ -152,7 +153,13 @@ RSpec.describe ApplicationController do
     end
 
     it 'sets LTI_LAUNCH_FRAME_ALLOWANCES' do
-      expect(@controller.js_env[:LTI_LAUNCH_FRAME_ALLOWANCES]).to eq Lti::Launch::FRAME_ALLOWANCES
+      expect(@controller.js_env[:LTI_LAUNCH_FRAME_ALLOWANCES]).to match_array [
+        "geolocation *",
+        "microphone *",
+        "camera *",
+        "midi *",
+        "encrypted-media *"
+      ]
     end
 
     context "sharding" do
@@ -346,6 +353,22 @@ RSpec.describe ApplicationController do
       expect(controller.send(:require_course_context)).to be_truthy
       controller.instance_variable_set(:@context, Account.default)
       expect{controller.send(:require_course_context)}.to raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
+
+  describe 'log_participation' do
+    it "should find file's context instead of user" do
+      course_model
+      student_in_course
+      attachment_model(context: @course)
+      controller.instance_variable_set(:@domain_root_account, Account.default)
+      controller.instance_variable_set(:@context, @student)
+      controller.instance_variable_set(:@accessed_asset, {level: 'participate', code: @attachment.asset_string, category: 'files'})
+      allow(controller).to receive(:named_context_url).with(@attachment, :context_url).and_return("/files/#{@attachment.id}")
+      allow(controller).to receive(:params).and_return({file_id: @attachment.id, id: @attachment.id})
+      allow(controller.request).to receive(:path).and_return("/files/#{@attachment.id}")
+      controller.send(:log_participation, @student)
+      expect(AssetUserAccess.where(user: @student, asset_code: @attachment.asset_string).take.context).to eq @course
     end
   end
 

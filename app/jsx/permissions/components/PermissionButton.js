@@ -19,7 +19,6 @@
 import I18n from 'i18n!permission_button'
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
-import {renderToString} from 'react-dom/server'
 import {connect} from 'react-redux'
 
 import Text from '@instructure/ui-elements/lib/components/Text'
@@ -41,37 +40,6 @@ const MENU_ID_ENABLED = 2
 const MENU_ID_ENABLED_AND_LOCKED = 3
 const MENU_ID_DISABLED = 4
 const MENU_ID_DISABLED_AND_LOCKED = 5
-
-const BUTTONS = {
-  enabled: {
-    __html: renderToString(
-      <span disabled="true">
-        <Text color="success">
-          <IconPublish size="x-small" />
-        </Text>
-      </span>
-    )
-  },
-  disabled: {
-    __html: renderToString(
-      <span disabled="true">
-        <Text color="error">
-          <IconTrouble size="x-small" />
-        </Text>
-      </span>
-    )
-  }
-}
-
-const lockIcon = {
-  __html: renderToString(
-    <span disabled="true">
-      <Text color="primary">
-        <IconLock />
-      </Text>
-    </span>
-  )
-}
 
 export default class PermissionButton extends Component {
   static propTypes = {
@@ -163,8 +131,17 @@ export default class PermissionButton extends Component {
         onClick={this.state.showMenu ? this.closeMenu : this.openMenu}
         disabled={this.props.permission.readonly}
         onFocus={this.props.onFocus}
-        dangerouslySetInnerHTML={BUTTONS[this.props.permission.enabled ? 'enabled' : 'disabled']}
-      />
+      >
+        {this.props.permission.enabled ? (
+          <Text color="success">
+            <IconPublish size="x-small" />
+          </Text>
+        ) : (
+          <Text color="error">
+            <IconTrouble size="x-small" />
+          </Text>
+        )}
+      </button>
     )
   }
 
@@ -311,8 +288,11 @@ export default class PermissionButton extends Component {
               ? null
               : 'ic-hidden-button'
           }
-          dangerouslySetInnerHTML={lockIcon}
-        />
+        >
+          <Text color="primary">
+            <IconLock />
+          </Text>
+        </div>
       </div>
     )
   }

@@ -25,7 +25,8 @@ describe AssessmentRequest do
     @review_student = student_in_course(active_all: true, course: @course).user
     @assignment = @course.assignments.create!
     submission = @assignment.find_or_create_submission(@user)
-    @request = AssessmentRequest.create!(user: @submission_student, asset: submission, assessor_asset: @review_student, assessor: @review_student)
+    assessor_submission = @assignment.find_or_create_submission(@review_student)
+    @request = AssessmentRequest.create!(user: @submission_student, asset: submission, assessor_asset: assessor_submission, assessor: @review_student)
   end
 
   describe "workflow" do

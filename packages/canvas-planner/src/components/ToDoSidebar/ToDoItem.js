@@ -31,7 +31,7 @@ import DiscussionIcon from   '@instructure/ui-icons/lib/Line/IconDiscussion';
 import NoteIcon from         '@instructure/ui-icons/lib/Line/IconNote';
 import CalendarIcon from     '@instructure/ui-icons/lib/Line/IconCalendarMonth';
 import PageIcon from         '@instructure/ui-icons/lib/Line/IconMsWord';
-import XIcon from            '@instructure/ui-icons/lib/Line/IconX';
+import PeerReviewIcon from '@instructure/ui-icons/lib/Line/IconPeerReview';
 
 import { formatDateAtTimeWithoutYear } from '../../utilities/dateUtils';
 import formatMessage from '../../format-message';
@@ -51,6 +51,8 @@ const getIconComponent = (itemType) => {
       return <CalendarIcon label={formatMessage('Calendar Event')} className="ToDoSidebarItem__Icon" />;
     case 'Page':
       return <PageIcon label={formatMessage('Page')} className="ToDoSidebarItem__Icon" />;
+    case 'Peer Review':
+      return <PeerReviewIcon label={formatMessage('Peer Review')} className="ToDoSidebarItem__Icon" />;
     default:
       return <NoteIcon label={formatMessage('To Do')} className="ToDoSidebarItem__Icon" />;
   }

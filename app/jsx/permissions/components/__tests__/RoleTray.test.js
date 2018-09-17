@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {shallow} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import {shallow} from 'enzyme'
 
 import {getPermissionsWithLabels} from '../../helper/utils'
 import {ROLES, PERMISSIONS} from '../../__tests__/examples'
@@ -77,7 +77,7 @@ it('renders basedOn if it is set', () => {
   const tree = shallow(<RoleTray {...props} />)
   const node = tree.find('.role-tray-based-on')
   expect(node.exists()).toBeTruthy()
-  expect(node.dive('Text').text()).toEqual('Based on: Teacher')
+  expect(node.children().text()).toEqual('Based on: Teacher')
 })
 
 it('does not render basedOn if it is not set', () => {
@@ -147,12 +147,7 @@ it('renders the label', () => {
   const tree = shallow(<RoleTray {...props} />)
   const node = tree.find('Heading')
   expect(node.exists()).toBeTruthy()
-  expect(
-    node
-      .dive('Heading')
-      .dive('Container')
-      .text()
-  ).toEqual('Student')
+  expect(node.children().text()).toEqual('Student')
 })
 
 it('renders the last changed', () => {

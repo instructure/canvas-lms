@@ -205,7 +205,7 @@ describe('api actions', () => {
     Actions.dismissOpportunity('6', plannerOverride)(() => {});
     return moxiosWait((request) => {
       expect(request.config.method).toBe('put');
-      expect(request.url).toBe('api/v1/planner/overrides/10');
+      expect(request.url).toBe('/api/v1/planner/overrides/10');
       expect(JSON.parse(request.config.data)).toMatchObject(plannerOverride);
     });
   });
@@ -219,7 +219,7 @@ describe('api actions', () => {
     Actions.dismissOpportunity('10', plannerOverride)(() => {});
     return moxiosWait((request) => {
       expect(request.config.method).toBe('post');
-      expect(request.url).toBe('api/v1/planner/overrides');
+      expect(request.url).toBe('/api/v1/planner/overrides');
       expect(JSON.parse(request.config.data)).toMatchObject(plannerOverride);
     });
   });
@@ -311,7 +311,7 @@ describe('api actions', () => {
       Actions.savePlannerItem(plannerItem)(() => {}, () => {return {timeZone: 'America/Halifax'};});
       return moxiosWait((request) => {
         expect(request.config.method).toBe('post');
-        expect(request.url).toBe('api/v1/planner_notes');
+        expect(request.url).toBe('/api/v1/planner_notes');
         expect(JSON.parse(request.config.data)).toMatchObject({some: 'data', transformedToApi: true});
       });
     });
@@ -322,7 +322,7 @@ describe('api actions', () => {
       Actions.savePlannerItem(plannerItem)(() => {}, () => {return {timeZone: TZ};});
       return moxiosWait((request) => {
         expect(request.config.method).toBe('post');
-        expect(request.url).toBe('api/v1/planner_notes');
+        expect(request.url).toBe('/api/v1/planner_notes');
         expect(JSON.parse(request.config.data).transformedToApi).toBeTruthy();
         const result = moment(JSON.parse(request.config.data).date).tz(TZ);
         expect(result.hours()).toEqual(23);
@@ -336,7 +336,7 @@ describe('api actions', () => {
       Actions.savePlannerItem(plannerItem, )(() => {}, () => {return {timeZone: 'America/Halifax'};});
       return moxiosWait((request) => {
         expect(request.config.method).toBe('put');
-        expect(request.url).toBe('api/v1/planner_notes/42');
+        expect(request.url).toBe('/api/v1/planner_notes/42');
         expect(JSON.parse(request.config.data)).toMatchObject({id: '42', some: 'data', transformedToApi: true});
       });
     });
@@ -401,7 +401,7 @@ describe('api actions', () => {
       Actions.deletePlannerItem(plannerItem, )(() => {});
       return moxiosWait((request) => {
         expect(request.config.method).toBe('delete');
-        expect(request.url).toBe('api/v1/planner_notes/42');
+        expect(request.url).toBe('/api/v1/planner_notes/42');
       });
     });
 
@@ -464,7 +464,7 @@ describe('api actions', () => {
       Actions.togglePlannerItemCompletion(plannerItem)(mockDispatch, getBasicState);
       return moxiosWait((request) => {
         expect(request.config.method).toBe('post');
-        expect(request.url).toBe('api/v1/planner/overrides');
+        expect(request.url).toBe('/api/v1/planner/overrides');
         expect(JSON.parse(request.config.data)).toMatchObject({marked_complete: true, transformedToApiOverride: true});
       });
     });
@@ -475,7 +475,7 @@ describe('api actions', () => {
       Actions.togglePlannerItemCompletion(plannerItem)(mockDispatch, getBasicState);
       return moxiosWait((request) => {
         expect(request.config.method).toBe('put');
-        expect(request.url).toBe('api/v1/planner/overrides/5');
+        expect(request.url).toBe('/api/v1/planner/overrides/5');
         expect(JSON.parse(request.config.data)).toMatchObject({id: '5', marked_complete: true, transformedToApiOverride: true});
       });
     });

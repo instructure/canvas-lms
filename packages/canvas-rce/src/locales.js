@@ -21,6 +21,7 @@ import da from "../locales/da.json";
 import de from "../locales/de.json";
 import en_AU from "../locales/en-AU.json";
 import en_GB from "../locales/en-GB.json";
+import en_CY from '../locales/en_CY.json';
 import en_GB_x_lbs from "../locales/en-GB-x-lbs.json";
 import es from "../locales/es.json";
 import fa from "../locales/fa.json";
@@ -48,6 +49,7 @@ export default {
   "en-AU": en_AU,
   "en-GB": en_GB,
   "en-GB-x-lbs": en_GB_x_lbs,
+  "en-GB-x-ukhe": en_CY,
   es: es,
   fa: fa,
   fr: fr,

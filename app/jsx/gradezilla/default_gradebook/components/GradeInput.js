@@ -250,7 +250,7 @@ export default class GradeInput extends React.Component {
         {...inputProps}
         inline
         messages={messages}
-        onChange={this.handleTextChange}
+        onInput={this.handleTextChange}
         onBlur={this.handleTextBlur}
         placeholder="–"
         value={this.state.formattedGrade}

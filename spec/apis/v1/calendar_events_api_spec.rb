@@ -79,6 +79,22 @@ describe CalendarEventsApiController, type: :request do
       end
     end
 
+    it "should not allow user to create calendar events" do
+      testCourse = course_with_teacher(:active_all => true, :user => user_with_pseudonym(:active_user => true))
+      testCourse.context.destroy!
+      json = api_call(:post, "/api/v1/calendar_events.json", {
+          :controller => 'calendar_events_api', :action => 'create', :format => 'json'
+        }, {
+        :calendar_event => {
+          :context_code => "course_#{testCourse.course_id}",
+          :title => "API Test",
+          :start_at => "2018-09-19T21:00:00Z",
+          :end_at => "2018-09-19T22:00:00Z"
+        }}
+      );
+      expect(json.first[1]).to eql "cannot create event for deleted course"
+    end
+
     context "timezones" do
       before :once do
         @akst = ActiveSupport::TimeZone.new('Alaska')
@@ -2167,6 +2183,23 @@ describe CalendarEventsApiController, type: :request do
       @contexts = [@course.asset_string]
       @ctx_str = @contexts.join("&context_codes[]=")
       @me = @observer
+    end
+
+    context "as manually enrolled observer" do
+      before :once do
+        course_with_observer(course: @course, active_enrollment: true, associated_user_id: @student.id)
+      end
+
+      it "should return calendar events" do
+        3.times do |idx|
+          @course.calendar_events.create(title: "event #{idx}", workflow_state: 'active')
+        end
+        json = api_call(:get,
+          "/api/v1/users/#{@student.id}/calendar_events?all_events=true&context_codes[]=#{@ctx_str}", {
+          controller: 'calendar_events_api', action: 'user_index', format: 'json',
+          context_codes: @contexts, all_events: true, user_id: @student.id})
+        expect(json.length).to eql 3
+      end
     end
 
     it "should return observee's calendar events" do

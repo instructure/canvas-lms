@@ -1136,9 +1136,19 @@ class ExternalToolsController < ApplicationController
               :custom_fields, :custom_fields_string, :text, :config_type, :config_url, :config_xml, :not_selectable, :app_center_id,
               :oauth_compliant]
     attrs += [:allow_membership_service_access] if @context.root_account.feature_enabled?(:membership_service_for_lti_tools)
+    attrs += [:developer_key_id] if set_developer_key?(params)
+
     attrs.each do |prop|
       tool.send("#{prop}=", params[prop]) if params.has_key?(prop)
     end
+  end
+
+  def set_developer_key?(external_tool_params)
+    developer_key_id = external_tool_params[:developer_key_id]
+    return false if developer_key_id.blank?
+    return false unless DeveloperKey.find(developer_key_id).owner_account == @context
+    return false unless @context.grants_right?(@current_user, session, :manage_developer_keys)
+    true
   end
 
   def invalidate_nav_tabs_cache(tool)

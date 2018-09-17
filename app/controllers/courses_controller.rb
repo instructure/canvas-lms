@@ -145,6 +145,11 @@ require 'securerandom'
 #            "example": 25,
 #            "type": "integer"
 #         },
+#         "created_at": {
+#           "description": "the date the course was created.",
+#           "example": "2012-05-01T00:00:00-06:00",
+#           "type": "datetime"
+#         },
 #         "start_at": {
 #           "description": "the start date for the course, if applicable",
 #           "example": "2012-06-01T00:00:00-06:00",
@@ -2677,7 +2682,8 @@ class CoursesController < ApplicationController
 
   # @API Permissions
   # Returns permission information for the calling user in the given course.
-  # See also {api:AccountsController#permissions the Account counterpart}.
+  # See also the {api:AccountsController#permissions Account} and
+  # {api:GroupsController#permissions Group} counterparts.
   #
   # @argument permissions[] [String]
   #   List of permissions to check against the authenticated user.
@@ -2730,6 +2736,7 @@ class CoursesController < ApplicationController
       SubmissionComment.where(:provisional_grade_id => pg_scope).delete_all
       pg_scope.delete_all
       OriginalityReport.where(:submission_id => @fake_student.all_submissions).delete_all
+      AnonymousOrModerationEvent.where(submission: @fake_student.all_submissions).destroy_all
       @fake_student.all_submissions.preload(:all_submission_comments, :lti_result, :versions).destroy_all
       @fake_student.quiz_submissions.each{|qs| qs.events.destroy_all}
       @fake_student.quiz_submissions.destroy_all
@@ -2947,8 +2954,9 @@ class CoursesController < ApplicationController
       progressions = ContextModuleProgression.joins(:context_module).where(user: user, context_modules: { course: courses }).select("context_module_progressions.*, context_modules.context_id AS course_id").to_a.group_by { |cmp| cmp['course_id'] }
     end
 
-    all_precalculated_permissions = includes.include?('tabs') ?
-      user.precalculate_permissions_for_courses(courses, SectionTabHelper::PERMISSIONS_TO_PRECALCULATE) : nil
+    permissions_to_precalculate = [:read_sis, :manage_sis]
+    permissions_to_precalculate += SectionTabHelper::PERMISSIONS_TO_PRECALCULATE if includes.include?('tabs')
+    all_precalculated_permissions = @current_user.precalculate_permissions_for_courses(courses, permissions_to_precalculate)
 
     enrollments_by_course.each do |course_enrollments|
       course = course_enrollments.first.course

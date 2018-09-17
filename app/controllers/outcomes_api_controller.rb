@@ -120,11 +120,44 @@
 #       }
 #     }
 #
+# @model OutcomeAlignment
+#     {
+#       "id": "OutcomeAlignment",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "the id of the aligned learning outcome.",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "assignment_id": {
+#           "description": "the id of the aligned assignment.",
+#           "example": 2,
+#           "type": "integer"
+#         },
+#         "submission_types": {
+#           "description": "a string representing the different submission types of an aligned assignment.",
+#           "example": "online_text_entry,online_url",
+#           "type": "string"
+#         },
+#         "url": {
+#           "description": "the URL for the aligned assignment.",
+#           "example": "/courses/1/assignments/5",
+#           "type": "string"
+#         },
+#         "title": {
+#           "description": "the title of the aligned assignment.",
+#           "example": "Unit 1 test",
+#           "type": "string"
+#         }
+#       }
+#     }
+#
 class OutcomesApiController < ApplicationController
   include Api::V1::Outcome
 
   before_action :require_user
-  before_action :get_outcome
+  before_action :get_outcome, except: :outcome_alignments
 
   # @API Show an outcome
   #
@@ -232,6 +265,35 @@ class OutcomesApiController < ApplicationController
     else
       render :json => @outcome.errors, :status => :bad_request
     end
+  end
+
+  # @API Get aligned assignments for an outcome in a course for a particular student
+  #
+  # @argument course_id [Integer]
+  #   The id of the course
+  #
+  # @argument student_id [Integer]
+  #   The id of the student
+  #
+  # @returns [OutcomeAlignment]
+
+  def outcome_alignments
+    if !params[:student_id]
+      render json: { message: "student_id is required" }, status: :bad_request
+    else
+      course = Course.find(params[:course_id])
+      can_manage = course.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
+      student_id = can_manage ? params[:student_id].to_i : @current_user.id
+      alignments = ActiveRecord::Base.connection.exec_query(ContentTag.active.for_context(course).learning_outcome_alignments.
+        select("content_tags.learning_outcome_id, content_tags.title, content_tags.content_id as assignment_id, assignments.submission_types").
+        joins("INNER JOIN #{Assignment.quoted_table_name} assignments ON assignments.id = content_tags.content_id AND content_tags.content_type = 'Assignment' AND assignments.workflow_state <> 'deleted'").
+        joins("INNER JOIN #{Submission.quoted_table_name} submissions ON submissions.assignment_id = assignments.id AND submissions.user_id = #{student_id} AND submissions.workflow_state <> 'deleted'").
+        to_sql).to_hash
+      alignments.each{|a| a[:url] = "#{polymorphic_url([course, :assignments])}/#{a['assignment_id']}"}
+      render :json => alignments
+    end
+  rescue ActiveRecord::RecordNotFound => e
+    render json: { message: e.message }, status: :not_found
   end
 
   protected

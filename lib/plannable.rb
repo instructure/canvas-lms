@@ -44,6 +44,11 @@ module Plannable
   end
 
   def planner_override_for(user)
+    if self.respond_to? :submittable_object
+      submittable_override = self.submittable_object&.planner_override_for(user)
+      return submittable_override if submittable_override
+    end
+
     if self.association(:planner_overrides).loaded?
       self.planner_overrides.find{|po| po.user_id == user.id && po.workflow_state != 'deleted'}
     else
@@ -221,7 +226,8 @@ module Plannable
     # Joins the associated table & column together as a string to be used in a SQL query
     def associated_table_column_name(col)
       table, column = associated_table_column(col)
-      [table.to_s.classify.constantize.quoted_table_name, column].join(".")
+      table_name = Object.const_defined?(table.to_s.classify) ? table.to_s.classify.constantize.quoted_table_name : table.to_s
+      [table_name, column].join(".")
     end
 
     # Finds the relevant table & column name when a hash is passed by checking if

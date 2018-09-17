@@ -149,4 +149,16 @@ module DashboardHelper
     todo_ignore_dropdown_type?(activity_type) ? 'al-trigger disable_item_link' : 'disable_item_link disable-todo-item-link'
   end
 
+  def map_courses_for_menu(courses, opts={})
+    mapped = courses.map do |course|
+      presenter = CourseForMenuPresenter.new(course, @current_user, @domain_root_account, session, opts)
+      presenter.to_h
+    end
+
+    if @domain_root_account.feature_enabled?(:dashcard_reordering)
+      mapped = mapped.sort_by {|h| h[:position] || ::CanvasSort::Last}
+    end
+    mapped
+  end
+
 end

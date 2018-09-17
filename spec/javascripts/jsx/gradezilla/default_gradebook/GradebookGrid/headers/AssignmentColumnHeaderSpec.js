@@ -17,12 +17,12 @@
  */
 
 import React from 'react';
-import { mount, ReactWrapper } from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme';
+import { mount } from 'enzyme';
 import AssignmentColumnHeader from 'jsx/gradezilla/default_gradebook/GradebookGrid/headers/AssignmentColumnHeader'
 import CurveGradesDialogManager from 'jsx/gradezilla/default_gradebook/CurveGradesDialogManager';
 import AssignmentMuterDialogManager from 'jsx/gradezilla/shared/AssignmentMuterDialogManager';
 import SetDefaultGradeDialogManager from 'jsx/gradezilla/shared/SetDefaultGradeDialogManager';
-import {findFlyoutMenuContent, findMenuItem} from './columnHeaderHelpers'
+import {getMenuItem} from './columnHeaderHelpers'
 
 function createAssignmentProp ({ assignment } = {}) {
   return {
@@ -142,6 +142,10 @@ function mountAndOpenOptions (props, mountOptions = {}) {
   return wrapper;
 }
 
+function getOptionsMenuItem(wrapper, ...path) {
+  return getMenuItem(wrapper.instance().optionsMenuContent, ...path)
+}
+
 QUnit.module('AssignmentColumnHeader', {
   setup () {
     this.props = defaultProps({
@@ -220,7 +224,8 @@ test('calls onMenuDismiss prop on close', function () {
 test('adds a class to the action container when the Menu is opened', function () {
   const actionContainer = this.wrapper.find('.Gradebook__ColumnHeaderAction');
   actionContainer.find('button').simulate('click');
-  ok(actionContainer.hasClass('menuShown'));
+  const {classList} = actionContainer.getDOMNode()
+  ok(classList.contains('menuShown'));
 });
 
 test('renders a title for the More icon based on the assignment name', function () {
@@ -232,19 +237,12 @@ QUnit.module('AssignmentColumnHeader: "Enter Grades as" Settings', function (hoo
   let props;
   let wrapper;
 
-  function getMenuItem (text) {
-    const content = new ReactWrapper(wrapper.node.enterGradesAsMenuContent, wrapper.node);
-    return content.findWhere(component => component.name() === 'MenuItem' && component.text() === text);
-  }
-
-  function getMenuItemFlyout (text) {
-    const content = new ReactWrapper(wrapper.node.optionsMenuContent, wrapper.node);
-    return content.findWhere(component => component.name() === 'Menu' && component.text().trim() === text);
-  }
-
   function mountAndOpenMenu () {
     wrapper = mountAndOpenOptions(props);
-    getMenuItemFlyout('Enter Grades as').find('button').simulate('mouseOver');
+  }
+
+  function getEnterGradesAsOption(label) {
+    return getOptionsMenuItem(wrapper, 'Enter Grades as', label)
   }
 
   hooks.beforeEach(function () {
@@ -257,54 +255,54 @@ QUnit.module('AssignmentColumnHeader: "Enter Grades as" Settings', function (hoo
 
   test('renders when "hidden" is false', function () {
     wrapper = mountAndOpenOptions(props);
-    strictEqual(getMenuItemFlyout('Enter Grades as').length, 1);
+    ok(getMenuItem(wrapper.instance().optionsMenuContent, 'Enter Grades as'))
   });
 
   test('does not render when "hidden" is true', function () {
     props.enterGradesAsSetting.hidden = true;
     wrapper = mountAndOpenOptions(props);
-    strictEqual(getMenuItemFlyout('Enter Grades as').length, 0);
+    notOk(getMenuItem(wrapper.instance().optionsMenuContent, 'Enter Grades as'))
   });
 
   test('includes the "Points" option', function () {
     mountAndOpenMenu();
-    strictEqual(getMenuItem('Points').length, 1);
+    ok(getEnterGradesAsOption('Points'))
   });
 
   test('includes the "Percentage" option', function () {
     mountAndOpenMenu();
-    strictEqual(getMenuItem('Percentage').length, 1);
+    ok(getEnterGradesAsOption('Percentage'))
   });
 
   test('includes the "Grading Scheme" option when "showGradingSchemeOption" is true', function () {
     props.enterGradesAsSetting.showGradingSchemeOption = true;
     mountAndOpenMenu();
-    strictEqual(getMenuItem('Grading Scheme').length, 1);
+    ok(getEnterGradesAsOption('Grading Scheme'))
   });
 
   test('excludes the "Grading Scheme" option when "showGradingSchemeOption" is false', function () {
     props.enterGradesAsSetting.showGradingSchemeOption = false;
     mountAndOpenMenu();
-    strictEqual(getMenuItem('Grading Scheme').length, 0);
+    notOk(getEnterGradesAsOption('Grading Scheme'))
   });
 
   test('optionally renders the "Points" option as selected', function () {
     props.enterGradesAsSetting.selected = 'points';
     mountAndOpenMenu();
-    strictEqual(getMenuItem('Points').prop('selected'), true);
+    strictEqual(getEnterGradesAsOption('Points').getAttribute('aria-checked'), 'true');
   });
 
   test('optionally renders the "Percentage" option as selected', function () {
     props.enterGradesAsSetting.selected = 'percent';
     mountAndOpenMenu();
-    strictEqual(getMenuItem('Percentage').prop('selected'), true);
+    strictEqual(getEnterGradesAsOption('Percentage').getAttribute('aria-checked'), 'true');
   });
 
   test('optionally renders the "Grading Scheme" option as selected', function () {
     props.enterGradesAsSetting.showGradingSchemeOption = true;
     props.enterGradesAsSetting.selected = 'gradingScheme';
     mountAndOpenMenu();
-    strictEqual(getMenuItem('Grading Scheme').prop('selected'), true);
+    strictEqual(getEnterGradesAsOption('Grading Scheme').getAttribute('aria-checked'), 'true');
   });
 
   test('calls the onSelect callback with "points" when "Points" is selected', function () {
@@ -312,7 +310,7 @@ QUnit.module('AssignmentColumnHeader: "Enter Grades as" Settings', function (hoo
     props.enterGradesAsSetting.selected = 'percent';
     props.enterGradesAsSetting.onSelect = (value) => { selected = value };
     mountAndOpenMenu();
-    getMenuItem('Points').simulate('click');
+    getEnterGradesAsOption('Points').click();
     equal(selected, 'points');
   });
 
@@ -320,7 +318,7 @@ QUnit.module('AssignmentColumnHeader: "Enter Grades as" Settings', function (hoo
     let selected;
     props.enterGradesAsSetting.onSelect = (value) => { selected = value };
     mountAndOpenMenu();
-    getMenuItem('Percentage').simulate('click');
+    getEnterGradesAsOption('Percentage').click();
     equal(selected, 'percent');
   });
 
@@ -329,243 +327,258 @@ QUnit.module('AssignmentColumnHeader: "Enter Grades as" Settings', function (hoo
     props.enterGradesAsSetting.showGradingSchemeOption = true;
     props.enterGradesAsSetting.onSelect = (value) => { selected = value };
     mountAndOpenMenu();
-    getMenuItem('Grading Scheme').simulate('click');
+    getEnterGradesAsOption('Grading Scheme').click();
     equal(selected, 'gradingScheme');
   });
 });
 
 QUnit.module('AssignmentColumnHeader: Sort by Settings', {
-  setup () {
-    this.mountAndOpenOptions = mountAndOpenOptions;
-  },
-
   teardown () {
     this.wrapper.unmount();
   }
 });
 
-test('sort by does not allow multiple selects', function () {
-  const flyout = findFlyoutMenuContent.call(this, defaultProps(), 'Sort by');
-  strictEqual(flyout.find('MenuItemGroup').prop('allowMultiple'), false);
-});
-
 test('selects "Grade - Low to High" when sorting by grade ascending', function () {
   const props = defaultProps({ sortBySetting: { direction: 'ascending' } });
-  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Grade - Low to High');
-  strictEqual(menuItem.prop('selected'), true);
+  this.wrapper = mountAndOpenOptions(props);
+  const $menuItem = getOptionsMenuItem(this.wrapper, 'Sort by', 'Grade - Low to High');
+  strictEqual($menuItem.getAttribute('aria-checked'), 'true');
 });
 
 test('does not select "Grade - Low to High" when isSortColumn is false', function () {
   const props = defaultProps({ sortBySetting: { isSortColumn: false } });
-  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Grade - Low to High');
-  strictEqual(menuItem.prop('selected'), false);
+  this.wrapper = mountAndOpenOptions(props);
+  const $menuItem = getOptionsMenuItem(this.wrapper, 'Sort by', 'Grade - Low to High');
+  strictEqual($menuItem.getAttribute('aria-checked'), 'false');
 });
 
 test('clicking "Grade - Low to High" calls onSortByGradeAscending', function () {
   const onSortByGradeAscending = sinon.stub();
   const props = defaultProps({ sortBySetting: { onSortByGradeAscending } });
-  findMenuItem.call(this, props, 'Sort by', 'Grade - Low to High').simulate('click');
+  this.wrapper = mountAndOpenOptions(props)
+  getOptionsMenuItem(this.wrapper, 'Sort by', 'Grade - Low to High').click();
   strictEqual(onSortByGradeAscending.callCount, 1);
 });
 
 test('clicking "Grade - Low to High" focuses menu trigger', function () {
   const onSortByGradeAscending = sinon.stub();
   const props = defaultProps({ sortBySetting: { onSortByGradeAscending } });
-  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Grade - Low to High');
+  this.wrapper = mountAndOpenOptions(props)
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Sort by', 'Grade - Low to High');
   const focusStub = sandbox.stub(this.wrapper.instance(), 'focusAtEnd')
 
-  menuItem.simulate('click');
+  menuItem.click();
 
   equal(focusStub.callCount, 1);
 });
 
 test('"Grade - Low to High" is optionally disabled', function () {
   const props = defaultProps({ sortBySetting: { disabled: true } });
-  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Grade - Low to High');
-  strictEqual(menuItem.prop('disabled'), true);
+  this.wrapper = mountAndOpenOptions(props)
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Sort by', 'Grade - Low to High');
+  strictEqual(menuItem.getAttribute('aria-disabled'), 'true');
 });
 
 test('selects "Grade - High to Low" when sorting by grade descending', function () {
   const props = defaultProps({ sortBySetting: { direction: 'descending' } });
-  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Grade - High to Low');
-  strictEqual(menuItem.prop('selected'), true);
+  this.wrapper = mountAndOpenOptions(props)
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Sort by', 'Grade - High to Low');
+  strictEqual(menuItem.getAttribute('aria-checked'), 'true');
 });
 
 test('does not select "Grade - High to Low" when isSortColumn is false', function () {
   const props = defaultProps({ sortBySetting: { isSortColumn: false } });
-  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Grade - High to Low');
-  strictEqual(menuItem.prop('selected'), false);
+  this.wrapper = mountAndOpenOptions(props)
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Sort by', 'Grade - High to Low');
+  strictEqual(menuItem.getAttribute('aria-checked'), 'false');
 });
 
 test('clicking "Grade - High to Low" calls onSortByGradeDescending', function () {
   const onSortByGradeDescending = sinon.stub();
   const props = defaultProps({ sortBySetting: { onSortByGradeDescending } });
-  findMenuItem.call(this, props, 'Sort by', 'Grade - High to Low').simulate('click');
+  this.wrapper = mountAndOpenOptions(props)
+  getOptionsMenuItem(this.wrapper, 'Sort by', 'Grade - High to Low').click();
   strictEqual(onSortByGradeDescending.callCount, 1);
 });
 
 test('clicking "Grade - High to Low" focuses menu trigger', function () {
   const onSortByGradeDescending = sinon.stub();
   const props = defaultProps({ sortBySetting: { onSortByGradeDescending } });
-  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Grade - High to Low');
+  this.wrapper = mountAndOpenOptions(props)
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Sort by', 'Grade - High to Low');
   const focusStub = sandbox.stub(this.wrapper.instance(), 'focusAtEnd')
 
-  menuItem.simulate('click');
+  menuItem.click();
 
   equal(focusStub.callCount, 1);
 });
 
 test('"Grade - High to Low" is optionally disabled', function () {
   const props = defaultProps({ sortBySetting: { disabled: true } });
-  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Grade - High to Low');
-  strictEqual(menuItem.prop('disabled'), true);
+  this.wrapper = mountAndOpenOptions(props);
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Sort by', 'Grade - High to Low');
+  strictEqual(menuItem.getAttribute('aria-disabled'), 'true');
 });
 
 test('selects "Missing" when sorting by missing', function () {
   const props = defaultProps({ sortBySetting: { settingKey: 'missing' } });
-  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Missing');
-  strictEqual(menuItem.prop('selected'), true);
+  this.wrapper = mountAndOpenOptions(props);
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Sort by', 'Missing');
+  strictEqual(menuItem.getAttribute('aria-checked'), 'true');
 });
 
 test('does not select "Missing" when isSortColumn is false', function () {
   const props = defaultProps({ sortBySetting: { settingKey: 'missing', isSortColumn: false } });
-  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Grade - High to Low');
-  strictEqual(menuItem.prop('selected'), false);
+  this.wrapper = mountAndOpenOptions(props);
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Sort by', 'Grade - High to Low');
+  strictEqual(menuItem.getAttribute('aria-checked'), 'false');
 });
 
 test('clicking "Missing" calls onSortByMissing', function () {
   const onSortByMissing = sinon.stub();
   const props = defaultProps({ sortBySetting: { onSortByMissing } });
-  findMenuItem.call(this, props, 'Sort by', 'Missing').simulate('click');
+  this.wrapper = mountAndOpenOptions(props);
+  getOptionsMenuItem(this.wrapper, 'Sort by', 'Missing').click();
   strictEqual(onSortByMissing.callCount, 1);
 });
 
 test('clicking "Missing" focuses menu trigger', function () {
   const onSortByMissing = sinon.stub();
   const props = defaultProps({ sortBySetting: { onSortByMissing } });
-  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Missing');
+  this.wrapper = mountAndOpenOptions(props);
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Sort by', 'Missing');
   const focusStub = sandbox.stub(this.wrapper.instance(), 'focusAtEnd')
 
-  menuItem.simulate('click');
+  menuItem.click();
 
   equal(focusStub.callCount, 1);
 });
 
 test('"Missing" is optionally disabled', function () {
   const props = defaultProps({ sortBySetting: { disabled: true } });
-  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Missing');
-  strictEqual(menuItem.prop('disabled'), true);
+  this.wrapper = mountAndOpenOptions(props);
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Sort by', 'Missing');
+  strictEqual(menuItem.getAttribute('aria-disabled'), 'true');
 });
 
 test('selects "Late" when sorting by late', function () {
   const props = defaultProps({ sortBySetting: { settingKey: 'late' } });
-  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Late');
-  strictEqual(menuItem.prop('selected'), true);
+  this.wrapper = mountAndOpenOptions(props);
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Sort by', 'Late');
+  strictEqual(menuItem.getAttribute('aria-checked'), 'true');
 });
 
 test('does not select "Late" when isSortColumn is false', function () {
   const props = defaultProps({ sortBySetting: { settingKey: 'late', isSortColumn: false } });
-  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Grade - High to Low');
-  strictEqual(menuItem.prop('selected'), false);
+  this.wrapper = mountAndOpenOptions(props);
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Sort by', 'Grade - High to Low');
+  strictEqual(menuItem.getAttribute('aria-checked'), 'false');
 });
 
 test('clicking "Late" calls onSortByLate', function () {
   const onSortByLate = sinon.stub();
   const props = defaultProps({ sortBySetting: { onSortByLate } });
-  findMenuItem.call(this, props, 'Sort by', 'Late').simulate('click');
+  this.wrapper = mountAndOpenOptions(props);
+  getOptionsMenuItem(this.wrapper, 'Sort by', 'Late').click();
   strictEqual(onSortByLate.callCount, 1);
 });
 
 test('clicking "Late" focuses menu trigger', function () {
   const onSortByLate = sinon.stub();
   const props = defaultProps({ sortBySetting: { onSortByLate } });
-  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Late');
+  this.wrapper = mountAndOpenOptions(props);
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Sort by', 'Late');
   const focusStub = sandbox.stub(this.wrapper.instance(), 'focusAtEnd')
 
-  menuItem.simulate('click');
+  menuItem.click();
 
   equal(focusStub.callCount, 1);
 });
 
 test('"Late" is optionally disabled', function () {
   const props = defaultProps({ sortBySetting: { disabled: true } });
-  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Late');
-  strictEqual(menuItem.prop('disabled'), true);
+  this.wrapper = mountAndOpenOptions(props);
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Sort by', 'Late');
+  strictEqual(menuItem.getAttribute('aria-disabled'), 'true');
 });
 
 test('selects "Unposted" when sorting by unposted', function () {
   const props = defaultProps({ sortBySetting: { settingKey: 'unposted' } });
-  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Unposted');
-  strictEqual(menuItem.prop('selected'), true);
+  this.wrapper = mountAndOpenOptions(props);
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Sort by', 'Unposted');
+  strictEqual(menuItem.getAttribute('aria-checked'), 'true');
 });
 
 test('does not select "Unposted" when isSortColumn is false', function () {
   const props = defaultProps({ sortBySetting: { settingKey: 'unposted', isSortColumn: false } });
-  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Grade - High to Low');
-  strictEqual(menuItem.prop('selected'), false);
+  this.wrapper = mountAndOpenOptions(props);
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Sort by', 'Grade - High to Low');
+  strictEqual(menuItem.getAttribute('aria-checked'), 'false');
 });
 
 test('clicking "Unposted" calls onSortByUnposted', function () {
   const onSortByUnposted = sinon.stub();
   const props = defaultProps({ sortBySetting: { onSortByUnposted } });
-  findMenuItem.call(this, props, 'Sort by', 'Unposted').simulate('click');
+  this.wrapper = mountAndOpenOptions(props);
+  getOptionsMenuItem(this.wrapper, 'Sort by', 'Unposted').click();
   strictEqual(onSortByUnposted.callCount, 1);
 });
 
 test('clicking "Unposted" focuses menu trigger', function () {
   const onSortByUnposted = sinon.stub();
   const props = defaultProps({ sortBySetting: { onSortByUnposted } });
-  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Unposted');
+  this.wrapper = mountAndOpenOptions(props);
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Sort by', 'Unposted');
   const focusStub = sandbox.stub(this.wrapper.instance(), 'focusAtEnd')
 
-  menuItem.simulate('click');
+  menuItem.click();
 
   equal(focusStub.callCount, 1);
 });
 
 test('"Unposted" is optionally disabled', function () {
   const props = defaultProps({ sortBySetting: { disabled: true } });
-  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Unposted');
-  strictEqual(menuItem.prop('disabled'), true);
+  this.wrapper = mountAndOpenOptions(props);
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Sort by', 'Unposted');
+  strictEqual(menuItem.getAttribute('aria-disabled'), 'true');
 });
 
 test('"Unposted" menu item is optionally excluded from the menu', function () {
   const props = defaultProps({ props: { showUnpostedMenuItem: false } });
-  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Unposted');
+  this.wrapper = mountAndOpenOptions(props);
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Sort by', 'Unposted');
   notOk(menuItem);
 });
 
-QUnit.module('AssignmentColumnHeader: Curve Grades Dialog', {
+QUnit.module('AssignmentColumnHeader: Curve Grades', {
   teardown () {
     this.wrapper.unmount();
   }
 });
 
-test('menu item is present in the popover menu', function () {
+test('"Curve Grades" menu item is present in the options menu', function () {
   this.wrapper = mountAndOpenOptions(defaultProps());
-  const menuItem = document.querySelector('[data-menu-item-id="curve-grades"]');
-  equal(menuItem.textContent, 'Curve Grades');
-  notOk(menuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'));
+  ok(getOptionsMenuItem(this.wrapper, 'Curve Grades'));
 });
 
-test('Curve Grades menu item is disabled when isDisabled is true', function () {
+test('menu item is disabled when .curveGradesAction.isDisabled is true', function () {
   const props = defaultProps({ curveGradesAction: { isDisabled: true } });
   this.wrapper = mountAndOpenOptions(props);
-  const menuItem = document.querySelector('[data-menu-item-id="curve-grades"]');
-  ok(menuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'));
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Curve Grades');
+  strictEqual(menuItem.getAttribute('aria-disabled'), 'true');
 });
 
-test('Curve Grades menu item is enabled when isDisabled is false', function () {
+test('menu item is not disabled when .curveGradesAction.isDisabled is false', function () {
   this.wrapper = mountAndOpenOptions(defaultProps());
-  const menuItem = document.querySelector('[data-menu-item-id="curve-grades"]');
-  notOk(menuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'));
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Curve Grades');
+  strictEqual(menuItem.getAttribute('aria-disabled'), null);
 });
 
 test('clicking the menu item invokes onSelect with correct callback', function () {
   const onSelect = sinon.stub();
   const props = defaultProps({ curveGradesAction: { onSelect } });
   this.wrapper = mountAndOpenOptions(props);
-  const menuItem = document.querySelector('[data-menu-item-id="curve-grades"]');
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Curve Grades');
 
   menuItem.click();
 
@@ -587,8 +600,8 @@ test('the Curve Grades dialog has focus when it is invoked', function () {
   props.curveGradesAction.onSelect = curveGradesProps.onSelect;
   this.wrapper = mountAndOpenOptions(props, { attachTo: document.querySelector('#fixtures') });
 
-  const specificMenuItem = document.querySelector('[data-menu-item-id="curve-grades"]');
-  specificMenuItem.click();
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Curve Grades');
+  menuItem.click();
 
   const allDialogCloseButtons = document.querySelectorAll('.ui-dialog-titlebar-close.ui-state-focus');
   const dialogCloseButton = allDialogCloseButtons[allDialogCloseButtons.length - 1];
@@ -598,7 +611,7 @@ test('the Curve Grades dialog has focus when it is invoked', function () {
   dialogCloseButton.click();
 });
 
-QUnit.module('AssignmentColumnHeader: Message Students Who Action', {
+QUnit.module('AssignmentColumnHeader: Message Students Who', {
   setup () {
     this.props = defaultProps();
   },
@@ -608,28 +621,28 @@ QUnit.module('AssignmentColumnHeader: Message Students Who Action', {
   }
 });
 
-test('shows the menu item in an enabled state', function () {
+test('"Message Students Who" menu item in present in the options menu', function () {
   this.wrapper = mountAndOpenOptions(this.props);
-
-  const menuItem = document.querySelector('[data-menu-item-id="message-students-who"]');
-
-  equal(menuItem.textContent, 'Message Students Who');
-  notOk(menuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'));
+  ok(getOptionsMenuItem(this.wrapper, 'Message Students Who'));
 });
 
-test('disables the menu item when submissions are not loaded', function () {
+test('menu item is disabled when submissions are not loaded', function () {
   this.props.submissionsLoaded = false;
   this.wrapper = mountAndOpenOptions(this.props);
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Message Students Who');
+  strictEqual(menuItem.getAttribute('aria-disabled'), 'true');
+});
 
-  const menuItem = document.querySelector('[data-menu-item-id="message-students-who"]');
-
-  equal(menuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'), 'true');
+test('menu item is not disabled when submissions are loaded', function () {
+  this.wrapper = mountAndOpenOptions(this.props);
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Message Students Who');
+  strictEqual(menuItem.getAttribute('aria-disabled'), null);
 });
 
 test('clicking the menu item invokes the Message Students Who dialog with correct callback', function () {
   this.wrapper = mountAndOpenOptions(this.props);
   const messageStudents = sandbox.stub(window, 'messageStudents');
-  const menuItem = document.querySelector('[data-menu-item-id="message-students-who"]');
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Message Students Who');
 
   menuItem.click();
 
@@ -637,7 +650,7 @@ test('clicking the menu item invokes the Message Students Who dialog with correc
   equal(messageStudents.getCall(0).args[0].onClose, this.wrapper.instance().focusAtEnd);
 });
 
-QUnit.module('AssignmentColumnHeader: Mute/Unmute Assignment Action', {
+QUnit.module('AssignmentColumnHeader: Mute/Unmute Assignment', {
   setup () {
     this.props = defaultProps();
   },
@@ -647,40 +660,51 @@ QUnit.module('AssignmentColumnHeader: Mute/Unmute Assignment Action', {
   }
 });
 
-test('shows the enabled "Mute Assignment" option when assignment is not muted', function () {
+test('"Mute Assignment" menu item is present when the assignment is not muted', function () {
   this.wrapper = mountAndOpenOptions(this.props);
-
-  const specificMenuItem = document.querySelector('[data-menu-item-id="assignment-muter"]');
-
-  equal(specificMenuItem.textContent, 'Mute Assignment');
-  notOk(specificMenuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'));
+  ok(getOptionsMenuItem(this.wrapper, 'Mute Assignment'));
 });
 
-test('shows the enabled "Unmute Assignment" option when assignment is muted', function () {
-  this.props.assignment.muted = true;
-  this.wrapper = mountAndOpenOptions(this.props);
-
-  const specificMenuItem = document.querySelector('[data-menu-item-id="assignment-muter"]');
-
-  equal(specificMenuItem.textContent, 'Unmute Assignment');
-  notOk(specificMenuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'));
-});
-
-test('disables the option when prop muteAssignmentAction.disabled is truthy', function () {
+test('"Mute Assignment" menu item is disabled when .muteAssignmentAction.disabled is true', function () {
   this.props.muteAssignmentAction.disabled = true;
   this.wrapper = mountAndOpenOptions(this.props);
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Mute Assignment');
+  strictEqual(menuItem.getAttribute('aria-disabled'), 'true');
+});
 
-  const specificMenuItem = document.querySelector('[data-menu-item-id="assignment-muter"]');
+test('"Mute Assignment" menu item is not disabled when .muteAssignmentAction.disabled is false', function () {
+  this.wrapper = mountAndOpenOptions(this.props);
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Mute Assignment');
+  strictEqual(menuItem.getAttribute('aria-disabled'), null);
+});
 
-  equal(specificMenuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'), 'true');
+test('"Unmute Assignment" menu item is present when the assignment is muted', function () {
+  this.props.assignment.muted = true
+  this.wrapper = mountAndOpenOptions(this.props);
+  ok(getOptionsMenuItem(this.wrapper, 'Unmute Assignment'));
+});
+
+test('"Unmute Assignment" menu item is disabled when .muteAssignmentAction.disabled is true', function () {
+  this.props.assignment.muted = true
+  this.props.muteAssignmentAction.disabled = true;
+  this.wrapper = mountAndOpenOptions(this.props);
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Unmute Assignment');
+  strictEqual(menuItem.getAttribute('aria-disabled'), 'true');
+});
+
+test('"Unmute Assignment" menu item is not disabled when .muteAssignmentAction.disabled is false', function () {
+  this.props.assignment.muted = true
+  this.wrapper = mountAndOpenOptions(this.props);
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Unmute Assignment');
+  strictEqual(menuItem.getAttribute('aria-disabled'), null);
 });
 
 test('clicking the menu item invokes onSelect with correct callback', function () {
   this.props.muteAssignmentAction.onSelect = sinon.stub();
   this.wrapper = mountAndOpenOptions(this.props);
 
-  const specificMenuItem = document.querySelector('[data-menu-item-id="assignment-muter"]');
-  specificMenuItem.click();
+  const menuItem = document.querySelector('[data-menu-item-id="assignment-muter"]');
+  menuItem.click();
 
   equal(this.props.muteAssignmentAction.onSelect.callCount, 1);
   equal(this.props.muteAssignmentAction.onSelect.getCall(0).args[0], this.wrapper.instance().focusAtEnd);
@@ -692,8 +716,8 @@ test('the Assignment Muting dialog has focus when it is invoked', function () {
   this.props.muteAssignmentAction.onSelect = dialogManager.showDialog;
   this.wrapper = mountAndOpenOptions(this.props, { attachTo: document.querySelector('#fixtures') });
 
-  const specificMenuItem = document.querySelector('[data-menu-item-id="assignment-muter"]');
-  specificMenuItem.click();
+  const menuItem = document.querySelector('[data-menu-item-id="assignment-muter"]');
+  menuItem.click();
 
   const allDialogCloseButtons = document.querySelectorAll('.ui-dialog-titlebar-close.ui-state-focus');
   const dialogCloseButton = allDialogCloseButtons[allDialogCloseButtons.length - 1];
@@ -782,27 +806,27 @@ QUnit.module('AssignmentColumnHeader: Set Default Grade Action', {
 test('shows the menu item in an enabled state', function () {
   this.wrapper = mountAndOpenOptions(this.props);
 
-  const specificMenuItem = document.querySelector('[data-menu-item-id="set-default-grade"]');
+  const menuItem = document.querySelector('[data-menu-item-id="set-default-grade"]');
 
-  equal(specificMenuItem.textContent, 'Set Default Grade');
-  strictEqual(specificMenuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'), null);
+  equal(menuItem.textContent, 'Set Default Grade');
+  strictEqual(menuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'), null);
 });
 
 test('disables the menu item when the disabled prop is true', function () {
   this.props.setDefaultGradeAction.disabled = true;
   this.wrapper = mountAndOpenOptions(this.props);
 
-  const specificMenuItem = document.querySelector('[data-menu-item-id="set-default-grade"]');
+  const menuItem = document.querySelector('[data-menu-item-id="set-default-grade"]');
 
-  equal(specificMenuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'), 'true');
+  equal(menuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'), 'true');
 });
 
 test('clicking the menu item invokes onSelect with correct callback', function () {
   this.props.setDefaultGradeAction.onSelect = sinon.stub();
   this.wrapper = mountAndOpenOptions(this.props);
 
-  const specificMenuItem = document.querySelector('[data-menu-item-id="set-default-grade"]');
-  specificMenuItem.click();
+  const menuItem = document.querySelector('[data-menu-item-id="set-default-grade"]');
+  menuItem.click();
 
   equal(this.props.setDefaultGradeAction.onSelect.callCount, 1);
   equal(this.props.setDefaultGradeAction.onSelect.getCall(0).args[0], this.wrapper.instance().focusAtEnd);
@@ -815,8 +839,8 @@ test('the Set Default Grade dialog has focus when it is invoked', function () {
   this.props.setDefaultGradeAction.onSelect = dialogManager.showDialog;
   this.wrapper = mountAndOpenOptions(this.props, { attachTo: document.querySelector('#fixtures') });
 
-  const specificMenuItem = document.querySelector('[data-menu-item-id="set-default-grade"]');
-  specificMenuItem.click();
+  const menuItem = document.querySelector('[data-menu-item-id="set-default-grade"]');
+  menuItem.click();
 
   const allDialogCloseButtons = document.querySelectorAll('.ui-dialog-titlebar-close.ui-state-focus');
   const dialogCloseButton = allDialogCloseButtons[allDialogCloseButtons.length - 1];
@@ -839,27 +863,27 @@ QUnit.module('AssignmentColumnHeader: Download Submissions Action', {
 test('shows the menu item in an enabled state', function () {
   this.wrapper = mountAndOpenOptions(this.props);
 
-  const specificMenuItem = document.querySelector('[data-menu-item-id="download-submissions"]');
+  const menuItem = document.querySelector('[data-menu-item-id="download-submissions"]');
 
-  equal(specificMenuItem.textContent, 'Download Submissions');
-  notOk(specificMenuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'));
+  equal(menuItem.textContent, 'Download Submissions');
+  notOk(menuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'));
 });
 
 test('does not render the menu item when the hidden prop is true', function () {
   this.props.downloadSubmissionsAction.hidden = true;
   this.wrapper = mountAndOpenOptions(this.props);
 
-  const specificMenuItem = document.querySelector('[data-menu-item-id="download-submissions"]');
+  const menuItem = document.querySelector('[data-menu-item-id="download-submissions"]');
 
-  equal(specificMenuItem, null);
+  equal(menuItem, null);
 });
 
 test('clicking the menu item invokes onSelect with correct callback', function () {
   this.props.downloadSubmissionsAction.onSelect = sinon.stub();
   this.wrapper = mountAndOpenOptions(this.props);
 
-  const specificMenuItem = document.querySelector('[data-menu-item-id="download-submissions"]');
-  specificMenuItem.click();
+  const menuItem = document.querySelector('[data-menu-item-id="download-submissions"]');
+  menuItem.click();
 
   equal(this.props.downloadSubmissionsAction.onSelect.callCount, 1);
   equal(this.props.downloadSubmissionsAction.onSelect.getCall(0).args[0], this.wrapper.instance().focusAtEnd);
@@ -878,27 +902,27 @@ QUnit.module('AssignmentColumnHeader: Reupload Submissions Action', {
 test('shows the menu item in an enabled state', function () {
   this.wrapper = mountAndOpenOptions(this.props);
 
-  const specificMenuItem = document.querySelector('[data-menu-item-id="reupload-submissions"]');
+  const menuItem = document.querySelector('[data-menu-item-id="reupload-submissions"]');
 
-  equal(specificMenuItem.textContent, 'Re-Upload Submissions');
-  strictEqual(specificMenuItem.parentElement.getAttribute('aria-disabled'), null);
+  equal(menuItem.textContent, 'Re-Upload Submissions');
+  strictEqual(menuItem.parentElement.getAttribute('aria-disabled'), null);
 });
 
 test('does not render the menu item when the hidden prop is true', function () {
   this.props.reuploadSubmissionsAction.hidden = true;
   this.wrapper = mountAndOpenOptions(this.props);
 
-  const specificMenuItem = document.querySelector('[data-menu-item-id="reupload-submissions"]');
+  const menuItem = document.querySelector('[data-menu-item-id="reupload-submissions"]');
 
-  equal(specificMenuItem, null);
+  equal(menuItem, null);
 });
 
 test('clicking the menu item invokes the onSelect property with correct callback', function () {
   this.props.reuploadSubmissionsAction.onSelect = sinon.stub();
   this.wrapper = mountAndOpenOptions(this.props);
 
-  const specificMenuItem = document.querySelector('[data-menu-item-id="reupload-submissions"]');
-  specificMenuItem.click();
+  const menuItem = document.querySelector('[data-menu-item-id="reupload-submissions"]');
+  menuItem.click();
 
   equal(this.props.reuploadSubmissionsAction.onSelect.callCount, 1);
   equal(this.props.reuploadSubmissionsAction.onSelect.getCall(0).args[0], this.wrapper.instance().focusAtEnd);
@@ -915,18 +939,18 @@ QUnit.module('AssignmentColumnHeader#handleKeyDown', function (hooks) {
   });
 
   this.handleKeyDown = function (which, shiftKey = false) {
-    return this.wrapper.node.handleKeyDown({ which, shiftKey, preventDefault: this.preventDefault });
+    return this.wrapper.instance().handleKeyDown({ which, shiftKey, preventDefault: this.preventDefault });
   };
 
   QUnit.module('with focus on assignment link', {
     setup () {
-      this.wrapper.node.assignmentLink.focus();
+      this.wrapper.instance().assignmentLink.focus();
     }
   });
 
   test('Tab sets focus on options menu trigger', function () {
     this.handleKeyDown(9, false); // Tab
-    equal(document.activeElement, this.wrapper.node.optionsMenuTrigger);
+    equal(document.activeElement, this.wrapper.instance().optionsMenuTrigger);
   });
 
   test('prevents default behavior for Tab', function () {
@@ -948,13 +972,13 @@ QUnit.module('AssignmentColumnHeader#handleKeyDown', function (hooks) {
 
   QUnit.module('with focus on options menu trigger', {
     setup () {
-      this.wrapper.node.optionsMenuTrigger.focus();
+      this.wrapper.instance().optionsMenuTrigger.focus();
     }
   });
 
   test('Shift+Tab sets focus on assignment link', function () {
     this.handleKeyDown(9, true); // Shift+Tab
-    strictEqual(this.wrapper.node.assignmentLink.focused, true);
+    strictEqual(this.wrapper.instance().assignmentLink.focused, true);
   });
 
   test('prevents default behavior for Shift+Tab', function () {
@@ -977,7 +1001,7 @@ QUnit.module('AssignmentColumnHeader#handleKeyDown', function (hooks) {
   test('Enter opens the options menu', function () {
     this.handleKeyDown(13); // Enter
     const optionsMenu = this.wrapper.find('Menu');
-    strictEqual(optionsMenu.node.shown, true);
+    strictEqual(optionsMenu.instance().shown, true);
   });
 
   test('returns false for Enter on options menu', function () {
@@ -1015,19 +1039,20 @@ QUnit.module('AssignmentColumnHeader: focus', {
 });
 
 test('#focusAtStart sets focus on the assignment link', function () {
-  this.wrapper.node.focusAtStart();
-  strictEqual(this.wrapper.node.assignmentLink.focused, true);
+  this.wrapper.instance().focusAtStart();
+  strictEqual(this.wrapper.instance().assignmentLink.focused, true);
 });
 
 test('#focusAtEnd sets focus on the options menu trigger', function () {
-  this.wrapper.node.focusAtEnd();
-  equal(document.activeElement, this.wrapper.node.optionsMenuTrigger);
+  this.wrapper.instance().focusAtEnd();
+  equal(document.activeElement, this.wrapper.instance().optionsMenuTrigger);
 });
 
 test('applies the "focused" class when the assignment title has focus', function(assert) {
   const done = assert.async();
   this.wrapper.setState({ hasFocus: true }, () => {
-    ok(this.wrapper.hasClass('focused'));
+    const {classList} = this.wrapper.getDOMNode();
+    ok(classList.contains('focused'));
     done();
   });
 })
@@ -1036,7 +1061,8 @@ test('removes the "focused" class when the header blurs', function(assert) {
   const done = assert.async()
   this.wrapper.setState({ hasFocus: true }, () => {
     this.wrapper.setState({ hasFocus: false }, () => {
-      notOk(this.wrapper.hasClass('focused'));
+      const {classList} = this.wrapper.getDOMNode();
+      notOk(classList.contains('focused'));
       done();
     });
   });

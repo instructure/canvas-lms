@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {shallow} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import {shallow} from 'enzyme'
 
 import {ROLES} from '../../__tests__/examples'
 import RoleTrayTable from '../RoleTrayTable'
@@ -63,7 +63,7 @@ it('renders the title', () => {
   expect(
     node
       .at(0)
-      .dive()
+      .children()
       .text()
   ).toEqual('fruit')
 })

@@ -28,259 +28,251 @@ import accessibleDateFormat from '../shared/helpers/accessibleDateFormat'
 import numberHelper from '../shared/helpers/numberHelper'
 import round from 'compiled/util/round'
 
-  const Types = PropTypes;
+function roundWeight(val) {
+  const value = numberHelper.parse(val)
+  return isNaN(value) ? null : round(value, 2)
+}
 
-  function roundWeight (val) {
-    const value = numberHelper.parse(val);
-    return isNaN(value) ? null : round(value, 2);
-  };
+function buildPeriod(attr) {
+  return {
+    id: attr.id,
+    title: attr.title,
+    weight: roundWeight(attr.weight),
+    startDate: attr.startDate,
+    endDate: attr.endDate,
+    closeDate: attr.closeDate
+  }
+}
 
-  function buildPeriod (attr) {
-    return {
-      id:        attr.id,
-      title:     attr.title,
-      weight:    roundWeight(attr.weight),
-      startDate: attr.startDate,
-      endDate:   attr.endDate,
-      closeDate: attr.closeDate
-    };
-  };
+class GradingPeriodForm extends React.Component {
+  static propTypes = {
+    period: PropTypes.shape({
+      id: PropTypes.string,
+      title: PropTypes.string.isRequired,
+      weight: PropTypes.number,
+      startDate: PropTypes.instanceOf(Date).isRequired,
+      endDate: PropTypes.instanceOf(Date).isRequired,
+      closeDate: PropTypes.instanceOf(Date)
+    }),
+    weighted: PropTypes.bool.isRequired,
+    disabled: PropTypes.bool.isRequired,
+    onSave: PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired
+  }
 
-  let GradingPeriodForm = React.createClass({
-    propTypes: {
-      period:   Types.shape({
-        id:        Types.string,
-        title:     Types.string.isRequired,
-        weight:    Types.number,
-        startDate: Types.instanceOf(Date).isRequired,
-        endDate:   Types.instanceOf(Date).isRequired,
-        closeDate: Types.instanceOf(Date)
-      }),
-      weighted: Types.bool.isRequired,
-      disabled: Types.bool.isRequired,
-      onSave:   Types.func.isRequired,
-      onCancel: Types.func.isRequired
-    },
+  constructor(props, context) {
+    super(props, context)
+    const period = buildPeriod(props.period || {})
 
-    getInitialState: function() {
-      let period = buildPeriod(this.props.period || {});
-      return {
-        period: period,
-        preserveCloseDate: this.hasDistinctCloseDate(period)
-      };
-    },
+    this.state = {
+      period,
+      preserveCloseDate: this.hasDistinctCloseDate(period)
+    }
+  }
 
-    componentDidMount: function() {
-      this.hackTheDatepickers();
-      this.refs.title.focus();
-    },
+  componentDidMount() {
+    this.hackTheDatepickers()
+    this.refs.title.focus()
+  }
 
-    triggerSave: function() {
-      if (this.props.onSave) {
-        this.props.onSave(this.state.period);
+  triggerSave = () => {
+    if (this.props.onSave) {
+      this.props.onSave(this.state.period)
+    }
+  }
+
+  triggerCancel = () => {
+    if (this.props.onCancel) {
+      this.setState({period: buildPeriod({})}, this.props.onCancel)
+    }
+  }
+
+  hasDistinctCloseDate = ({endDate, closeDate}) => closeDate && !_.isEqual(endDate, closeDate)
+
+  mergePeriod = attr => update(this.state.period, {$merge: attr})
+
+  changeTitle = e => {
+    const period = this.mergePeriod({title: e.target.value})
+    this.setState({period})
+  }
+
+  changeWeight = e => {
+    const period = this.mergePeriod({weight: roundWeight(e.target.value)})
+    this.setState({period})
+  }
+
+  changeStartDate = date => {
+    const period = this.mergePeriod({startDate: date})
+    this.setState({period})
+  }
+
+  changeEndDate = date => {
+    const attr = {endDate: date}
+    if (!this.state.preserveCloseDate && !this.hasDistinctCloseDate(this.state.period)) {
+      attr.closeDate = date
+    }
+    const period = this.mergePeriod(attr)
+    this.setState({period})
+  }
+
+  changeCloseDate = date => {
+    const period = this.mergePeriod({closeDate: date})
+    this.setState({period, preserveCloseDate: !!date})
+  }
+
+  hackTheDatepickers = () => {
+    // This can be replaced when we have an extensible datepicker
+    const $form = ReactDOM.findDOMNode(this)
+    const $appends = $form.querySelectorAll('.input-append')
+    $appends.forEach($el => {
+      $el.classList.add('ic-Input-group')
+    })
+
+    const $dateFields = $form.querySelectorAll('.date_field')
+    $dateFields.forEach($el => {
+      $el.classList.remove('date_field')
+      $el.classList.add('ic-Input')
+    })
+
+    const $suggests = $form.querySelectorAll('.datetime_suggest')
+    $suggests.forEach($el => {
+      if (ENV.CONTEXT_TIMEZONE === ENV.TIMEZONE) {
+        $el.remove()
+      } else {
+        $el.innerHTML = $el.innerHTML.replace(/Course/, 'Account')
       }
-    },
+    })
 
-    triggerCancel: function() {
-      if (this.props.onCancel) {
-        this.setState({period: buildPeriod({})}, this.props.onCancel);
-      }
-    },
+    const $buttons = $form.querySelectorAll('.ui-datepicker-trigger')
+    $buttons.forEach($el => {
+      $el.classList.remove('btn')
+      $el.classList.add('Button')
+    })
+  }
 
-    hasDistinctCloseDate: function ({ endDate, closeDate }) {
-      return closeDate && !_.isEqual(endDate, closeDate);
-    },
+  renderSaveAndCancelButtons = () => (
+    <div className="ic-Form-actions below-line">
+      <Button ref="cancelButton" disabled={this.props.disabled} onClick={this.triggerCancel}>
+        {I18n.t('Cancel')}
+      </Button>
+      &nbsp;
+      <Button
+        variant="primary"
+        ref="saveButton"
+        aria-label={I18n.t('Save Grading Period')}
+        disabled={this.props.disabled}
+        onClick={this.triggerSave}
+      >
+        {I18n.t('Save')}
+      </Button>
+    </div>
+  )
 
-    mergePeriod: function (attr) {
-      return update(this.state.period, {$merge: attr});
-    },
-
-    changeTitle: function (e) {
-      const period = this.mergePeriod({title: e.target.value});
-      this.setState({period});
-    },
-
-    changeWeight: function (e) {
-      const period = this.mergePeriod({weight: roundWeight(e.target.value)});
-      this.setState({period});
-    },
-
-    changeStartDate: function (date) {
-      const period = this.mergePeriod({startDate: date});
-      this.setState({period});
-    },
-
-    changeEndDate: function (date) {
-      let attr = {endDate: date};
-      if (!this.state.preserveCloseDate && !this.hasDistinctCloseDate(this.state.period)) {
-        attr.closeDate = date;
-      }
-      const period = this.mergePeriod(attr);
-      this.setState({period});
-    },
-
-    changeCloseDate: function (date) {
-      const period = this.mergePeriod({closeDate: date});
-      this.setState({period: period, preserveCloseDate: !!date});
-    },
-
-    hackTheDatepickers: function() {
-      // This can be replaced when we have an extensible datepicker
-      let $form = ReactDOM.findDOMNode(this);
-      let $appends = $form.querySelectorAll('.input-append');
-      $appends.forEach(function($el) {
-        $el.classList.add('ic-Input-group');
-      });
-
-      let $dateFields = $form.querySelectorAll('.date_field');
-      $dateFields.forEach(function($el) {
-        $el.classList.remove('date_field');
-        $el.classList.add('ic-Input');
-      });
-
-      let $suggests = $form.querySelectorAll('.datetime_suggest');
-      $suggests.forEach(function($el) {
-        if(ENV.CONTEXT_TIMEZONE === ENV.TIMEZONE) {
-          $el.remove();
-        } else {
-          $el.innerHTML = $el.innerHTML.replace(/Course/, 'Account');
-        }
-      });
-
-      let $buttons = $form.querySelectorAll('.ui-datepicker-trigger');
-      $buttons.forEach(function($el) {
-        $el.classList.remove('btn');
-        $el.classList.add('Button');
-      });
-    },
-
-    renderSaveAndCancelButtons: function() {
-      return (
-        <div className="ic-Form-actions below-line">
-          <Button
-            ref       = "cancelButton"
-            disabled  = {this.props.disabled}
-            onClick   = {this.triggerCancel}
-          >
-            {I18n.t("Cancel")}
-          </Button>
-          &nbsp;
-          <Button
-            variant    = "primary"
-            ref        = "saveButton"
-            aria-label = {I18n.t("Save Grading Period")}
-            disabled   = {this.props.disabled}
-            onClick    = {this.triggerSave}
-          >
-            {I18n.t("Save")}
-          </Button>
+  renderWeightInput = () => {
+    if (!this.props.weighted) return null
+    return (
+      <div className="ic-Form-control">
+        <label className="ic-Label" htmlFor="weight">
+          {I18n.t('Grading Period Weight')}
+        </label>
+        <div className="input-append">
+          <input
+            id="weight"
+            ref={ref => {
+              this.weightInput = ref
+            }}
+            type="text"
+            className="span1"
+            defaultValue={I18n.n(this.state.period.weight)}
+            onChange={this.changeWeight}
+          />
+          <span className="add-on">%</span>
         </div>
-      );
-    },
+      </div>
+    )
+  }
 
-    renderWeightInput: function () {
-      if (!this.props.weighted) return null;
-      return (
-        <div className="ic-Form-control">
-          <label className="ic-Label" htmlFor="weight">
-            {I18n.t('Grading Period Weight')}
-          </label>
-          <div className="input-append">
-            <input
-              id="weight"
-              ref={(ref) => { this.weightInput = ref }}
-              type="text"
-              className="span1"
-              defaultValue={I18n.n(this.state.period.weight)}
-              onChange={this.changeWeight}
-            />
-            <span className="add-on">%</span>
-          </div>
-        </div>
-      );
-    },
-
-    render: function() {
-      return (
-        <div className='GradingPeriodForm'>
-          <div className="grid-row">
-            <div className="col-xs-12 col-lg-8">
-              <div className="ic-Form-group ic-Form-group--horizontal">
-                <div className="ic-Form-control">
-                  <label className="ic-Label" htmlFor="title">
-                    {I18n.t("Grading Period Title")}
-                  </label>
-                  <input
-                    id='title'
-                    ref='title'
-                    className='ic-Input'
-                    title={I18n.t('Grading Period Title')}
-                    defaultValue={this.state.period.title}
-                    onChange={this.changeTitle}
-                    type='text'
-                  />
-                </div>
-
-                <div className="ic-Form-control">
-                  <label id="start-date-label" htmlFor="start-date" className="ic-Label">
-                    {I18n.t("Start Date")}
-                  </label>
-                  <DueDateCalendarPicker
-                    disabled             = {false}
-                    inputClasses         = ''
-                    dateValue            = {this.state.period.startDate}
-                    ref                  = "startDate"
-                    dateType             = "due_at"
-                    handleUpdate         = {this.changeStartDate}
-                    rowKey               = "start-date"
-                    labelledBy           = "start-date-label"
-                    isFancyMidnight      = {false}
-                  />
-                </div>
-
-                <div className="ic-Form-control">
-                  <label id="end-date-label" htmlFor="end-date" className="ic-Label">
-                    {I18n.t("End Date")}
-                  </label>
-                  <DueDateCalendarPicker
-                    disabled             = {false}
-                    inputClasses         = ''
-                    dateValue            = {this.state.period.endDate}
-                    ref                  = "endDate"
-                    dateType             = "due_at"
-                    handleUpdate         = {this.changeEndDate}
-                    rowKey               = "end-date"
-                    labelledBy           = "end-date-label"
-                    isFancyMidnight      = {true}
-                  />
-                </div>
-
-                <div className="ic-Form-control">
-                  <label id="close-date-label" htmlFor="close-date" className="ic-Label">
-                    {I18n.t("Close Date")}
-                  </label>
-                  <DueDateCalendarPicker
-                    disabled             = {false}
-                    inputClasses         = ''
-                    dateValue            = {this.state.period.closeDate}
-                    ref                  = "closeDate"
-                    dateType             = "due_at"
-                    handleUpdate         = {this.changeCloseDate}
-                    rowKey               = "close-date"
-                    labelledBy           = "close-date-label"
-                    isFancyMidnight      = {true}
-                  />
-                </div>
-
-                {this.renderWeightInput()}
+  render() {
+    return (
+      <div className="GradingPeriodForm">
+        <div className="grid-row">
+          <div className="col-xs-12 col-lg-8">
+            <div className="ic-Form-group ic-Form-group--horizontal">
+              <div className="ic-Form-control">
+                <label className="ic-Label" htmlFor="title">
+                  {I18n.t('Grading Period Title')}
+                </label>
+                <input
+                  id="title"
+                  ref="title"
+                  className="ic-Input"
+                  title={I18n.t('Grading Period Title')}
+                  defaultValue={this.state.period.title}
+                  onChange={this.changeTitle}
+                  type="text"
+                />
               </div>
+
+              <div className="ic-Form-control">
+                <label id="start-date-label" htmlFor="start-date" className="ic-Label">
+                  {I18n.t('Start Date')}
+                </label>
+                <DueDateCalendarPicker
+                  disabled={false}
+                  inputClasses=""
+                  dateValue={this.state.period.startDate}
+                  ref="startDate"
+                  dateType="due_at"
+                  handleUpdate={this.changeStartDate}
+                  rowKey="start-date"
+                  labelledBy="start-date-label"
+                  isFancyMidnight={false}
+                />
+              </div>
+
+              <div className="ic-Form-control">
+                <label id="end-date-label" htmlFor="end-date" className="ic-Label">
+                  {I18n.t('End Date')}
+                </label>
+                <DueDateCalendarPicker
+                  disabled={false}
+                  inputClasses=""
+                  dateValue={this.state.period.endDate}
+                  ref="endDate"
+                  dateType="due_at"
+                  handleUpdate={this.changeEndDate}
+                  rowKey="end-date"
+                  labelledBy="end-date-label"
+                  isFancyMidnight
+                />
+              </div>
+
+              <div className="ic-Form-control">
+                <label id="close-date-label" htmlFor="close-date" className="ic-Label">
+                  {I18n.t('Close Date')}
+                </label>
+                <DueDateCalendarPicker
+                  disabled={false}
+                  inputClasses=""
+                  dateValue={this.state.period.closeDate}
+                  ref="closeDate"
+                  dateType="due_at"
+                  handleUpdate={this.changeCloseDate}
+                  rowKey="close-date"
+                  labelledBy="close-date-label"
+                  isFancyMidnight
+                />
+              </div>
+
+              {this.renderWeightInput()}
             </div>
           </div>
-
-          {this.renderSaveAndCancelButtons()}
         </div>
-      );
-    }
-  });
+
+        {this.renderSaveAndCancelButtons()}
+      </div>
+    )
+  }
+}
 
 export default GradingPeriodForm

@@ -1096,7 +1096,7 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to.start_at).to eq @copy_from.start_at
       expect(@copy_to.conclude_at).to eq @copy_from.conclude_at
       expect(@copy_to.restrict_enrollments_to_course_dates).to be_truthy
-      
+
       run_master_migration # selective without settings
       expect(@copy_to.reload.start_at).to_not be_nil # keep the dates
       expect(@copy_to.conclude_at).to_not be_nil
@@ -1224,7 +1224,7 @@ describe MasterCourses::MasterMigration do
       end
     end
 
-    it "propagates folder name changes" do
+    it "propagates folder name and state changes" do
       master_parent_folder = nil
       att_tag = nil
       @copy_to = course_factory
@@ -1238,13 +1238,14 @@ describe MasterCourses::MasterMigration do
         run_master_migration
       end
 
-      master_parent_folder.update_attribute(:name, "parent RENAMED")
+      master_parent_folder.update_attributes(:name => "parent RENAMED", :locked => true)
       master_parent_folder.sub_folders.create!(:name => "empty", :context => @copy_from)
 
       run_master_migration
 
       copied_att = @copy_to.attachments.where(:migration_id => att_tag.migration_id).first
       expect(copied_att.full_path).to eq "course files/parent RENAMED/child/file.txt"
+      expect(@copy_to.folders.where(:name => "parent RENAMED").first.locked).to eq true
     end
 
     it "should baleet assignment overrides when an admin pulls a bait-n-switch with date restrictions" do
@@ -1331,6 +1332,14 @@ describe MasterCourses::MasterMigration do
         run_master_migration
       end
       expect(assignment_to.reload.rubric).to eq nil
+
+      # create another rubric - it should leave alone
+      other_rubric = outcome_with_rubric(:course => @copy_to)
+      other_rubric.associate_with(assignment_to, @copy_to, purpose: 'grading', use_for_grading: true)
+
+      Assignment.where(:id => @assmt).update_all(:updated_at => 10.minutes.from_now)
+      run_master_migration
+      expect(assignment_to.reload.rubric).to eq other_rubric
     end
 
     it "shouldn't delete module items in associated courses" do
@@ -1752,6 +1761,28 @@ describe MasterCourses::MasterMigration do
       end
       run_master_migration
       expect(ag_to.reload.rules).to eq nil # set to empty if there are no dropping rules
+    end
+
+    it "doesn't clear external tool config on exception" do
+      @copy_to = course_factory
+      @sub = @template.add_child_course!(@copy_to)
+
+      a = @copy_from.assignments.create!(:title => "some assignment")
+      run_master_migration
+      a_to = @copy_to.assignments.where(:migration_id => mig_id(a)).first
+
+      Timecop.freeze(60.seconds.from_now) do
+        a.touch
+      end
+
+      tool = @copy_to.context_external_tools.create!(:name => 'some tool', :consumer_key => 'test_key',
+        :shared_secret => 'test_secret', :url => 'http://example.com/launch')
+      a_to.update_attributes(:submission_types => 'external_tool', :external_tool_tag_attributes => {:content => tool})
+      tag = a_to.external_tool_tag
+
+      run_master_migration
+
+      expect(a_to.reload.external_tool_tag).to eq tag # don't change
     end
 
     it "sends notifications", priority: "2", test_id: 3211103 do

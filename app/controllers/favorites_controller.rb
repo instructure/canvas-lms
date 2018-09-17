@@ -75,6 +75,7 @@ class FavoritesController < ApplicationController
       courses.reject!{|c| mc_ids.include?(c.id)}
     end
 
+    all_precalculated_permissions = @current_user.precalculate_permissions_for_courses(courses, [:read_sis, :manage_sis])
     render :json => courses.map { |course|
       enrollments = nil
       unless Array(params[:exclude]).include?('enrollments')
@@ -85,7 +86,8 @@ class FavoritesController < ApplicationController
         end
       end
 
-      course_json(course, @current_user, session, includes, enrollments)
+      course_json(course, @current_user, session, includes, enrollments,
+        precalculated_permissions: all_precalculated_permissions&.dig(course.global_id))
     }
   end
 

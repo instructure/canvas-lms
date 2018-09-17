@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
+import {mount} from 'enzyme'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-addons-test-utils'
 import GenerateLink from 'jsx/epub_exports/GenerateLink'
@@ -36,19 +37,16 @@ QUnit.module('GenerateLink', {
 })
 
 test('showGenerateLink', function() {
-  let GenerateLinkElement = <GenerateLink {...this.props} />
-  let component = TestUtils.renderIntoDocument(GenerateLinkElement)
-  ok(component.showGenerateLink(), 'should be true without epub_export object')
-  ReactDOM.unmountComponentAtNode(component.getDOMNode().parentNode)
+  let wrapper = mount(<GenerateLink {...this.props} />)
+  ok(wrapper.instance().showGenerateLink(), 'should be true without epub_export object')
+
   this.props.course.epub_export = {permissions: {regenerate: false}}
-  GenerateLinkElement = <GenerateLink {...this.props} />
-  component = TestUtils.renderIntoDocument(GenerateLinkElement)
-  ok(!component.showGenerateLink(), 'should be false without permissions to rengenerate')
+  wrapper = mount(<GenerateLink {...this.props} />)
+  notOk(wrapper.instance().showGenerateLink(), 'should be false without permissions to rengenerate')
+
   this.props.course.epub_export = {permissions: {regenerate: true}}
-  GenerateLinkElement = <GenerateLink {...this.props} />
-  component = TestUtils.renderIntoDocument(GenerateLinkElement)
-  ok(component.showGenerateLink(), 'should be true with permissions to rengenerate')
-  ReactDOM.unmountComponentAtNode(component.getDOMNode().parentNode)
+  wrapper = mount(<GenerateLink {...this.props} />)
+  ok(wrapper.instance().showGenerateLink(), 'should be true with permissions to rengenerate')
 })
 
 test('state triggered', function() {
@@ -56,41 +54,34 @@ test('state triggered', function() {
   sinon.stub(CourseEpubExportStore, 'create')
   const GenerateLinkElement = <GenerateLink {...this.props} />
   const component = TestUtils.renderIntoDocument(GenerateLinkElement)
-  const node = component.getDOMNode()
+  const node = ReactDOM.findDOMNode(component)
   TestUtils.Simulate.click(node)
   ok(component.state.triggered, 'should set state to triggered')
   clock.tick(1005)
   ok(!component.state.triggered, 'should toggle back to not triggered after 1000')
   clock.restore()
   CourseEpubExportStore.create.restore()
-  ReactDOM.unmountComponentAtNode(component.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })
 
 test('render', function() {
   const clock = sinon.useFakeTimers()
   sinon.stub(CourseEpubExportStore, 'create')
-  const GenerateLinkElement = <GenerateLink {...this.props} />
-  const component = TestUtils.renderIntoDocument(GenerateLinkElement)
-  let node = component.getDOMNode()
-  equal(node.tagName, 'BUTTON', 'tag should be a button')
-  ok(
-    node.querySelector('span').textContent.match(I18n.t('Generate ePub')),
-    'should show generate text'
-  )
-  TestUtils.Simulate.click(node)
-  node = component.getDOMNode()
-  equal(node.tagName, 'SPAN', 'tag should be span')
-  ok(node.textContent.match(I18n.t('Generating...')), 'should show generating text')
+
+  let wrapper = mount(<GenerateLink {...this.props} />)
+  equal(wrapper.children().type(), 'button', 'tag should be a button')
+  ok(wrapper.text().match(I18n.t('Generate ePub')),'should show generate text')
+
+  wrapper.simulate('click')
+  equal(wrapper.children().type(), 'span', 'tag should be span')
+  ok(wrapper.text().match(I18n.t('Generating...')), 'should show generating text')
+
   this.props.course.epub_export = {permissions: {regenerate: true}}
-  component.setProps(this.props)
+  wrapper = mount(<GenerateLink {...this.props} />)
   clock.tick(2000)
-  node = component.getDOMNode()
-  equal(node.tagName, 'BUTTON', 'tag should be a button')
-  ok(
-    node.querySelector('span').textContent.match(I18n.t('Regenerate ePub')),
-    'should show regenerate text'
-  )
+  equal(wrapper.children().type(), 'button', 'tag should be a button')
+  ok(wrapper.text().match(I18n.t('Regenerate ePub')), 'should show regenerate text')
+
   clock.restore()
   CourseEpubExportStore.create.restore()
-  ReactDOM.unmountComponentAtNode(component.getDOMNode().parentNode)
 })

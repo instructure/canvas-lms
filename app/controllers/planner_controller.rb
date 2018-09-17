@@ -122,28 +122,27 @@ class PlannerController < ApplicationController
   def index
     Shackles.activate(:slave) do
       # fetch a meta key so we can invalidate just this info and not the whole of the user's cache
-      planner_overrides_meta_key = Rails.cache.fetch(planner_meta_cache_key, expires_in: 120.minutes) do
-        SecureRandom.uuid
-      end
+      planner_overrides_meta_key = get_planner_cache_id(@current_user)
 
-      composite_cache_key = ['planner_items',
+      composite_cache_key = ['planner_items3',
                              planner_overrides_meta_key,
                              page,
                              params[:filter],
                              default_opts,
                              contexts_cache_key].cache_key
+      if stale?(etag: composite_cache_key, template: false)
+        items_response = Rails.cache.fetch(composite_cache_key, expires_in: 1.week) do
+          items = collection_for_filter(params[:filter])
+          items = Api.paginate(items, self, api_v1_planner_items_url)
+          {
+            json: planner_items_json(items, @current_user, session, {due_after: start_date, due_before: end_date}),
+            link: response.headers["Link"].to_s,
+          }
+        end
 
-      items_response = Rails.cache.fetch(composite_cache_key, expires_in: 120.minutes) do
-        items = collection_for_filter(params[:filter])
-        items = Api.paginate(items, self, api_v1_planner_items_url)
-        {
-          json: planner_items_json(items, @current_user, session, {due_after: start_date, due_before: end_date}),
-          link: response.headers["Link"].to_s,
-        }
+        response.headers["Link"] = items_response[:link]
+        render json: items_response[:json]
       end
-
-      response.headers["Link"] = items_response[:link]
-      render json: items_response[:json]
     end
   end
 
@@ -207,7 +206,7 @@ class PlannerController < ApplicationController
     # grading = @current_user.assignments_needing_grading(default_opts) if @domain_root_account.grants_right?(@current_user, :manage_grades)
     # moderation = @current_user.assignments_needing_moderation(default_opts)
     viewing = @current_user.assignments_for_student('viewing', default_opts).
-      preload({quiz: :assignment_overrides}, :discussion_topic, :wiki_page, :assignment_overrides, :external_tool_tag)
+      preload(:quiz, :discussion_topic, :wiki_page)
     scopes = {viewing: viewing}
     # TODO: Add when ready (see above comment)
     # scopes[:grading] = grading if grading
@@ -280,7 +279,7 @@ class PlannerController < ApplicationController
     item_collection('peer_reviews',
       @current_user.submissions_needing_peer_review(default_opts),
       AssessmentRequest, [{submission: {assignment: :peer_reviews_due_at}},
-                          {submission: :cached_due_date}, :created_at], :id)
+                          {assessor_asset: :cached_due_date}, :created_at], :id)
   end
 
   def item_collection(label, scope, base_model, *order_by)

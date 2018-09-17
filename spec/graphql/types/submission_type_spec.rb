@@ -26,12 +26,17 @@ describe Types::SubmissionType do
     @submission, _ = @assignment.grade_student(@student, score: 8, grader: @teacher)
   end
 
-  let(:submission_type) { GraphQLTypeTester.new(Types::SubmissionType, @submission) }
+  let(:submission_type) { GraphQLTypeTester.new(@submission, current_user: @teacher) }
 
   it "works" do
-    expect(submission_type.user).to eq @student
-    expect(submission_type.excused).to eq false
-    expect(submission_type.assignment).to eq @assignment
+    expect(submission_type.resolve("user { _id }")).to eq @student.id.to_s
+    expect(submission_type.resolve("excused")).to eq false
+    expect(submission_type.resolve("assignment { _id }")).to eq @assignment.id.to_s
+  end
+
+  it "requires read permission" do
+    other_student = student_in_course(active_all: true).user
+    expect(submission_type.resolve("_id", current_user: other_student)).to be_nil
   end
 
   describe "score and grade" do
@@ -39,60 +44,59 @@ describe Types::SubmissionType do
       before { @assignment.update_attribute(:muted, true) }
 
       it "returns score/grade for teachers when assignment is muted" do
-        expect(submission_type.score(current_user: @teacher)).to eq @submission.score
-        expect(submission_type.grade(current_user: @teacher)).to eq @submission.grade
-        expect(submission_type.enteredScore(current_user: @teacher)).to eq @submission.entered_score
-        expect(submission_type.enteredGrade(current_user: @teacher)).to eq @submission.entered_grade
-        expect(submission_type.deductedPoints(current_user: @teacher)).to eq @submission.points_deducted
+        expect(submission_type.resolve("score", current_user: @teacher)).to eq @submission.score
+        expect(submission_type.resolve("grade", current_user: @teacher)).to eq @submission.grade
+        expect(submission_type.resolve("enteredScore", current_user: @teacher)).to eq @submission.entered_score
+        expect(submission_type.resolve("enteredGrade", current_user: @teacher)).to eq @submission.entered_grade
+        expect(submission_type.resolve("deductedPoints", current_user: @teacher)).to eq @submission.points_deducted
       end
 
       it "doesn't return score/grade for students when assignment is muted" do
-        expect(submission_type.score(current_user: @student)).to be_nil
-        expect(submission_type.grade(current_user: @student)).to be_nil
-        expect(submission_type.enteredScore(current_user: @student)).to be_nil
-        expect(submission_type.enteredGrade(current_user: @student)).to be_nil
-        expect(submission_type.deductedPoints(current_user: @student)).to be_nil
+        expect(submission_type.resolve("score", current_user: @student)).to be_nil
+        expect(submission_type.resolve("grade", current_user: @student)).to be_nil
+        expect(submission_type.resolve("enteredScore", current_user: @student)).to be_nil
+        expect(submission_type.resolve("enteredGrade", current_user: @student)).to be_nil
+        expect(submission_type.resolve("deductedPoints", current_user: @student)).to be_nil
       end
     end
 
     context "regular assignment" do
       it "returns the score and grade for authorized users" do
-        expect(submission_type.score(current_user: @student)).to eq @submission.score
-        expect(submission_type.grade(current_user: @student)).to eq @submission.grade
-        expect(submission_type.enteredScore(current_user: @student)).to eq @submission.entered_score
-        expect(submission_type.enteredGrade(current_user: @student)).to eq @submission.entered_grade
-        expect(submission_type.deductedPoints(current_user: @student)).to eq @submission.points_deducted
+        expect(submission_type.resolve("score", current_user: @student)).to eq @submission.score
+        expect(submission_type.resolve("grade", current_user: @student)).to eq @submission.grade
+        expect(submission_type.resolve("enteredScore", current_user: @student)).to eq @submission.entered_score
+        expect(submission_type.resolve("enteredGrade", current_user: @student)).to eq @submission.entered_grade
+        expect(submission_type.resolve("deductedPoints", current_user: @student)).to eq @submission.points_deducted
       end
 
       it "returns nil for unauthorized users" do
         @student2 = student_in_course(active_all: true).user
-        expect(submission_type.score(current_user: @student2)).to be_nil
-        expect(submission_type.grade(current_user: @student2)).to be_nil
-        expect(submission_type.enteredScore(current_user: @student)).to be_nil
-        expect(submission_type.enteredGrade(current_user: @student)).to be_nil
-        expect(submission_type.deductedPoints(current_user: @student)).to be_nil
+        expect(submission_type.resolve("score", current_user: @student2)).to be_nil
+        expect(submission_type.resolve("grade", current_user: @student2)).to be_nil
+        expect(submission_type.resolve("enteredScore", current_user: @student)).to be_nil
+        expect(submission_type.resolve("enteredGrade", current_user: @student)).to be_nil
+        expect(submission_type.resolve("deductedPoints", current_user: @student)).to be_nil
       end
     end
   end
 
   describe "submission and grading status" do
     before do
-      @quiz_assignment = @course.assignments.create! name: "asdf", points_possible: 10
-      @quiz_submission, _ = @quiz_assignment.grade_student(@student, score: 0, grader: @teacher)
-      @quiz_submission.update_attribute(:submission_type, "online_quiz")
-      @quiz_submission.quiz_submission = Quizzes::QuizSubmission.new(quiz_id: 1)
+      quiz_with_submission
+      @quiz_assignment = @quiz.assignment
+      @quiz_submission = @quiz_assignment.submission_for_student(@student)
     end
 
-    let(:submission_type_quiz) { GraphQLTypeTester.new(Types::SubmissionType, @quiz_submission) }
+    let(:submission_type_quiz) { GraphQLTypeTester.new(@quiz_submission, current_user: @teacher) }
 
     it "should contain submissionStatus and gradingStatus fields" do
-      expect(submission_type.submissionStatus).to eq :unsubmitted
-      expect(submission_type.gradingStatus).to eq :graded
+      expect(submission_type.resolve("submissionStatus")).to eq "unsubmitted"
+      expect(submission_type.resolve("gradingStatus")).to eq "graded"
     end
 
     it "should preload quiz type assignments" do 
-      expect(submission_type_quiz.submissionStatus).to eq :unsubmitted
-      expect(submission_type_quiz.gradingStatus).to eq :graded
+      expect(submission_type_quiz.resolve("submissionStatus")).to eq "submitted"
+      expect(submission_type_quiz.resolve("gradingStatus")).to eq "graded"
     end
   end
 end

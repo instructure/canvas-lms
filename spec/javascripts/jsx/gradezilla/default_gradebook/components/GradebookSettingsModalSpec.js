@@ -17,7 +17,7 @@
  */
 
 import React from 'react';
-import { mount } from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme';
+import { mount } from 'enzyme';
 import GradebookSettingsModal from 'jsx/gradezilla/default_gradebook/components/GradebookSettingsModal';
 import GradebookSettingsModalApi from 'jsx/gradezilla/default_gradebook/apis/GradebookSettingsModalApi';
 import { destroyContainer } from 'jsx/shared/FlashAlert';
@@ -44,7 +44,7 @@ QUnit.module('GradebookSettingsModal', {
     };
     const props = { ...defaultProps, ...customProps };
     this.wrapper = mount(<GradebookSettingsModal {...props} />);
-    return this.wrapper.get(0);
+    return this.wrapper.instance();
   },
 
   stubLatePolicyFetchSuccess (component, customData) {
@@ -87,6 +87,7 @@ test('calling open causes the modal to be rendered', function () {
   const fetchLatePolicy = this.stubLatePolicyFetchSuccess(component);
   component.open();
   return fetchLatePolicy.then(() => {
+    this.wrapper.update()
     equal(this.wrapper.find('Modal').prop('open'), true);
   });
 });
@@ -96,8 +97,10 @@ test('calling close closes the modal', function () {
   const fetchLatePolicy = this.stubLatePolicyFetchSuccess(component);
   component.open();
   return fetchLatePolicy.then(() => {
+    this.wrapper.update()
     equal(this.wrapper.find('Modal').prop('open'), true, 'modal is open');
     component.close();
+    this.wrapper.update()
     equal(this.wrapper.find('Modal').prop('open'), false, 'modal is closed');
   });
 });
@@ -108,8 +111,10 @@ test('clicking cancel closes the modal', function () {
   component.open();
   clock.tick(50); // wait for Modal to transition open
   return fetchLatePolicy.then(() => {
+    this.wrapper.update()
     equal(this.wrapper.find('Modal').prop('open'), true);
     document.getElementById('gradebook-settings-cancel-button').click();
+    this.wrapper.update()
     equal(this.wrapper.find('Modal').prop('open'), false);
   });
 });
@@ -120,6 +125,7 @@ test('the "Update" button is disabled when the modal opens', function () {
   component.open();
   clock.tick(50); // wait for Modal to transition open
   return fetchLatePolicy.then(() => {
+    this.wrapper.update()
     const updateButton = document.getElementById('gradebook-settings-update-button')
     ok(updateButton.getAttribute('aria-disabled'));
   });
@@ -131,6 +137,7 @@ test('the "Update" button is enabled if a setting is changed', function () {
   component.open();
   clock.tick(50); // wait for Modal to transition open
   return fetchLatePolicy.then(() => {
+    this.wrapper.update()
     component.changeLatePolicy({ ...component.state.latePolicy, changes: { lateSubmissionDeductionEnabled: true } });
     const updateButton = document.getElementById('gradebook-settings-update-button');
     notOk(updateButton.getAttribute('aria-disabled'));
@@ -143,6 +150,7 @@ test('the "Update" button is disabled if a setting is changed, but there are val
   component.open();
   clock.tick(50); // wait for Modal to transition open
   return fetchLatePolicy.then(() => {
+    this.wrapper.update()
     component.changeLatePolicy({
       ...component.state.latePolicy,
       changes: { lateSubmissionDeductionEnabled: true },
@@ -160,6 +168,7 @@ test('clicking "Update" sends a request to update the late policy', function () 
   component.open();
   clock.tick(50); // wait for Modal to transition open
   return fetchLatePolicy.then(() => {
+    this.wrapper.update()
     const changes = { lateSubmissionDeductionEnabled: true };
     component.changeLatePolicy({ ...component.state.latePolicy, changes });
     const button = document.getElementById('gradebook-settings-update-button');
@@ -179,6 +188,7 @@ test('clicking "Update" sends a post request to create a late policy if one does
   clock.tick(50); // wait for Modal to transition open
 
   return fetchLatePolicy.then(() => {
+    this.wrapper.update()
     const changes = { lateSubmissionDeductionEnabled: true };
     component.changeLatePolicy({ ...component.state.latePolicy, changes});
     document.getElementById('gradebook-settings-update-button').click();

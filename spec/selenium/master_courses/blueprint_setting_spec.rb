@@ -52,12 +52,6 @@ describe "master courses - settings" do
     expect(f('input[name="course[blueprint]"]').attribute('checked')).to be_nil
   end
 
-  it "includes Blueprint Courses permission for local admin", priority: "1", test_id: 3138086 do
-    get "/accounts/#{@account.id}/permissions"
-    f('#account_role_link.ui-tabs-anchor').click()
-    expect(driver.find_element(:xpath, "//th[text()[contains(., 'Blueprint')]]")).not_to be nil
-  end
-
   it "prevents creating a blueprint course from associated course", priority: "2", test_id: 3097364 do
     @associated_course = @template.add_child_course!(course_factory(name: "ac1", active_all: true)).child_course
     get "/courses/#{@associated_course.id}/settings"

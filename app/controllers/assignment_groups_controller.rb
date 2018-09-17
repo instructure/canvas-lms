@@ -165,8 +165,25 @@ class AssignmentGroupsController < ApplicationController
 
       return render json: { message: t("Cannot move assignments due to closed grading periods") }, status: :unauthorized unless can_reorder_assignments?(assignments, @group)
 
-      assignments.update_all(assignment_group_id: @group.id, updated_at: Time.now.utc)
-      @context.active_quizzes.where(assignment_id: order).update_all(assignment_group_id: @group.id, updated_at: Time.now.utc)
+      assignment_ids_to_update = assignments.where.not(:assignment_group_id => @group.id).pluck(:id)
+      tags_to_update = []
+      if assignment_ids_to_update.any?
+        assignments.where(:id => assignment_ids_to_update).update_all(assignment_group_id: @group.id, updated_at: Time.now.utc)
+        tags_to_update += MasterCourses::ChildContentTag.where(:content_type => "Assignment", :content_id => assignment_ids_to_update).to_a
+      end
+      quizzes = @context.active_quizzes.where(assignment_id: order)
+      quiz_ids_to_update = quizzes.where.not(:assignment_group_id => @group.id).pluck(:id)
+      if quiz_ids_to_update.any?
+        quizzes.where(:id => quiz_ids_to_update).update_all(assignment_group_id: @group.id, updated_at: Time.now.utc)
+        tags_to_update += MasterCourses::ChildContentTag.where(:content_type => "Quizzes::Quiz", :content_id => quiz_ids_to_update).to_a
+      end
+      tags_to_update.each do |mc_tag|
+        unless mc_tag.downstream_changes.include?("assignment_group_id")
+          mc_tag.downstream_changes << "assignment_group_id"
+          mc_tag.save!
+        end
+      end
+
       @group.assignments.first.update_order(order) unless @group.assignments.empty?
       groups = AssignmentGroup.where(id: group_ids)
       groups.touch_all

@@ -16,7 +16,8 @@ USER root
 
 RUN mkdir -p $APP_HOME
 
-COPY package.json $APP_HOME/
+# The yarn.lock file doesn't exist in canvas-planner anymore and should be copied from canvas-lms before running this Docker build
+COPY package.json yarn.lock $APP_HOME/
 
 WORKDIR $APP_HOME
 

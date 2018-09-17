@@ -143,7 +143,7 @@ module Api::V1::Conversation
       result[:common_courses] = current_user.address_book.common_courses(user)
       result[:common_groups] = current_user.address_book.common_groups(user)
     end
-    result[:avatar_url] = avatar_url_for_user(user, blank_fallback) if options[:include_participant_avatars]
+    result[:avatar_url] = avatar_url_for_user(user) if options[:include_participant_avatars]
     result
   end
 

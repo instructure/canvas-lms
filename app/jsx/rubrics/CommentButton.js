@@ -22,40 +22,39 @@ import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import TextArea from '@instructure/ui-forms/lib/components/TextArea'
 import IconFeedback from '@instructure/ui-icons/lib/Line/IconFeedback'
-import Modal, { ModalBody, ModalFooter, ModalHeader } from '@instructure/ui-overlays/lib/components/Modal'
+import Modal, {
+  ModalBody,
+  ModalFooter,
+  ModalHeader
+} from '@instructure/ui-overlays/lib/components/Modal'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import I18n from 'i18n!edit_rubric'
 
-const CommentDialog = React.createClass({
-  propTypes: {
+class CommentDialog extends React.Component {
+  static propTypes = {
     comments: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
     finalize: PropTypes.func.isRequired,
     open: PropTypes.bool.isRequired,
     setComments: PropTypes.func.isRequired
-  },
+  }
 
   render() {
-    const { comments, description, finalize, open, setComments } = this.props
+    const {comments, description, finalize, open, setComments} = this.props
     const modalHeader = I18n.t('Additional Comments')
     const close = () => finalize(false)
 
     return (
       <Modal
-         open={open}
-         onDismiss={close}
-         size="medium"
-         label={modalHeader}
-         defaultFocusElement={() => this.textArea}
-         shouldCloseOnDocumentClick
+        open={open}
+        onDismiss={close}
+        size="medium"
+        label={modalHeader}
+        defaultFocusElement={() => this.textArea}
+        shouldCloseOnDocumentClick
       >
         <ModalHeader>
-          <CloseButton
-            placement="end"
-            offset="medium"
-            variant="icon"
-            onClick={close}
-          >
+          <CloseButton placement="end" offset="medium" variant="icon" onClick={close}>
             {I18n.t('Close')}
           </CloseButton>
           <Heading>{modalHeader}</Heading>
@@ -64,10 +63,12 @@ const CommentDialog = React.createClass({
         <ModalBody>
           <TextArea
             label={I18n.t('Comments')}
-            maxHeight='50rem'
-            onChange={(e) => setComments(e.target.value)}
+            maxHeight="50rem"
+            onChange={e => setComments(e.target.value)}
             value={comments}
-            ref={(node) => { this.textArea = node }}
+            ref={node => {
+              this.textArea = node
+            }}
           />
         </ModalBody>
         <ModalFooter>
@@ -82,11 +83,16 @@ const CommentDialog = React.createClass({
       </Modal>
     )
   }
-})
+}
 
-const CommentButton = ({ initialize, ...props }) => (
+const CommentButton = ({initialize, ...props}) => (
   <div>
-    <Button variant="icon" icon={<IconFeedback />} margin="0 x-small 0 0" onClick={() => initialize()}>
+    <Button
+      variant="icon"
+      icon={<IconFeedback />}
+      margin="0 x-small 0 0"
+      onClick={() => initialize()}
+    >
       <ScreenReaderContent>{I18n.t('Additional Comments')}</ScreenReaderContent>
     </Button>
     <CommentDialog {...props} />

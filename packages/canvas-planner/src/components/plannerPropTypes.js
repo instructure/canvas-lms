@@ -37,9 +37,7 @@ export const courseShape = {
 };
 
 export const itemShape = {
-  context: PropTypes.shape({
-    inform_students_of_overdue_submissions: PropTypes.bool
-  })
+  context: PropTypes.shape({})
 };
 
 export const opportunityShape = {

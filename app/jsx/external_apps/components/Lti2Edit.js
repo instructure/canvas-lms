@@ -22,44 +22,51 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import htmlEscape from 'str/htmlEscape'
 
-export default React.createClass({
-    displayName: 'Lti2Edit',
+export default class Lti2Edit extends React.Component {
+  static propTypes = {
+    tool: PropTypes.object.isRequired,
+    handleActivateLti2: PropTypes.func.isRequired,
+    handleDeactivateLti2: PropTypes.func.isRequired,
+    handleCancel: PropTypes.func.isRequired
+  }
 
-    propTypes: {
-      tool: PropTypes.object.isRequired,
-      handleActivateLti2: PropTypes.func.isRequired,
-      handleDeactivateLti2: PropTypes.func.isRequired,
-      handleCancel: PropTypes.func.isRequired
-    },
-
-    toggleButton() {
-      if (this.props.tool.enabled === false) {
-        return <button type="button" className="btn btn-primary" onClick={this.props.handleActivateLti2}>{I18n.t('Enable')}</button>;
-      } else {
-        return <button type="button" className="btn btn-primary" onClick={this.props.handleDeactivateLti2}>{I18n.t('Disable')}</button>;
-      }
-    },
-
-    render() {
-      var p1 = I18n.t(
-        '*name* is currently **status**.',
-        { wrappers: [
-          '<strong>' + htmlEscape(this.props.tool.name) + '</strong>',
-          (this.props.tool.enabled === false ? 'disabled' : 'enabled')
-        ]}
-      );
+  toggleButton = () => {
+    if (this.props.tool.enabled === false) {
       return (
-        <div className="Lti2Permissions">
-          <div className="ReactModal__Body">
-            <p dangerouslySetInnerHTML={{ __html: p1 }}></p>
-          </div>
-          <div className="ReactModal__Footer">
-            <div className="ReactModal__Footer-Actions">
-              {this.toggleButton()}
-              <button type="button" className="Button" onClick={this.props.handleCancel}>{I18n.t("Cancel")}</button>
-            </div>
-          </div>
-        </div>
+        <button type="button" className="btn btn-primary" onClick={this.props.handleActivateLti2}>
+          {I18n.t('Enable')}
+        </button>
+      )
+    } else {
+      return (
+        <button type="button" className="btn btn-primary" onClick={this.props.handleDeactivateLti2}>
+          {I18n.t('Disable')}
+        </button>
       )
     }
-  });
+  }
+
+  render() {
+    const p1 = I18n.t('*name* is currently **status**.', {
+      wrappers: [
+        `<strong>${htmlEscape(this.props.tool.name)}</strong>`,
+        this.props.tool.enabled === false ? 'disabled' : 'enabled'
+      ]
+    })
+    return (
+      <div className="Lti2Permissions">
+        <div className="ReactModal__Body">
+          <p dangerouslySetInnerHTML={{__html: p1}} />
+        </div>
+        <div className="ReactModal__Footer">
+          <div className="ReactModal__Footer-Actions">
+            {this.toggleButton()}
+            <button type="button" className="Button" onClick={this.props.handleCancel}>
+              {I18n.t('Cancel')}
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+}

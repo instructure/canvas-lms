@@ -269,7 +269,7 @@ i[class*=icon-].icon-messageRecipient--cancel {
 .ac-result {
 	cursor: pointer;
   line-height: 16px;
-  padding: 5px 8px 2px 8px;
+  padding: 5px 8px 2px;
 
   &:first-child {
     border-radius: direction-corners(10px 10px 0 0) !important;

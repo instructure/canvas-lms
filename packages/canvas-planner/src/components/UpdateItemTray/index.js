@@ -236,6 +236,7 @@ export class UpdateItemTray extends Component {
 
     return (
       <Select
+        id="to-do-item-course-select"
         label={formatMessage("Course")}
         selectedOption={selectedOption}
         onChange={this.handleCourseIdChange}

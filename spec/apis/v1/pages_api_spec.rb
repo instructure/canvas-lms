@@ -22,10 +22,6 @@ describe "Pages API", type: :request do
   include Api::V1::User
   include AvatarHelper
 
-  def blank_fallback
-    nil
-  end
-
   context 'locked api item' do
     let(:item_type) { 'page' }
 

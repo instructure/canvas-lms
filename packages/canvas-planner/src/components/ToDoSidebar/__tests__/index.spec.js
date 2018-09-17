@@ -120,8 +120,15 @@ it('initially renders out 5 ToDoItems', () => {
 
 it('invokes change dashboard view when link is clicked', () => {
   const changeDashboardView = jest.fn();
+  // becasue the show all button is only rendered if there are items
+  const items = [{
+    uniqueId: '1',
+    type: 'Assignment',
+    date: moment('2017-07-15T20:00:00Z'),
+    title: 'Glory to Rome',
+  }];
   const wrapper = shallow(
-    <ToDoSidebar {...defaultProps} changeDashboardView={changeDashboardView} />
+    <ToDoSidebar {...defaultProps} items={items} changeDashboardView={changeDashboardView} />
   );
   wrapper.find('Button').simulate('click');
   expect(changeDashboardView).toHaveBeenCalledWith('planner');

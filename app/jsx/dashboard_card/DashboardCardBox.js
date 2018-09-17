@@ -23,126 +23,118 @@ import DashboardCard from './DashboardCard'
 import DraggableDashboardCard from './DraggableDashboardCard'
 import DashboardCardBackgroundStore from './DashboardCardBackgroundStore'
 import MovementUtils from './MovementUtils'
-  const DashboardCardBox = React.createClass({
 
-    displayName: 'DashboardCardBox',
+export default class DashboardCardBox extends React.Component {
 
-    propTypes: {
-      courseCards: PropTypes.array,
-      reorderingEnabled: PropTypes.bool,
-      hideColorOverlays: PropTypes.bool,
-      connectDropTarget: PropTypes.func
-    },
+  static propTypes = {
+    courseCards: PropTypes.array,
+    reorderingEnabled: PropTypes.bool,
+    hideColorOverlays: PropTypes.bool,
+    connectDropTarget: PropTypes.func
+  }
 
-    componentWillMount () {
-      this.setState({
-        courseCards: this.props.courseCards
-      });
-    },
+  static defaultProps = {
+    courseCards: [],
+    hideColorOverlays: false
+  }
 
-    componentDidMount: function(){
-      DashboardCardBackgroundStore.addChangeListener(this.colorsUpdated);
-      DashboardCardBackgroundStore.setDefaultColors(this.allCourseAssetStrings());
-    },
+  componentWillMount() {
+    this.setState({
+      courseCards: this.props.courseCards
+    })
+  }
 
-    componentWillReceiveProps: function (newProps) {
-      DashboardCardBackgroundStore.setDefaultColors(this.allCourseAssetStrings());
+  componentDidMount() {
+    DashboardCardBackgroundStore.addChangeListener(this.colorsUpdated)
+    DashboardCardBackgroundStore.setDefaultColors(this.allCourseAssetStrings())
+  }
 
-      this.setState({
-        courseCards: newProps.courseCards
-      });
-    },
+  componentWillUnmount() {
+    DashboardCardBackgroundStore.removeChangeListener(this.colorsUpdated)
+  }
 
-    getDefaultProps: function () {
-      return {
-        courseCards: [],
-        hideColorOverlays: false
-      };
-    },
+  componentWillReceiveProps(newProps) {
+    DashboardCardBackgroundStore.setDefaultColors(this.allCourseAssetStrings())
 
-    colorsUpdated: function(){
-      if(this.isMounted()){
-        this.forceUpdate();
-      }
-    },
+    this.setState({
+      courseCards: newProps.courseCards
+    })
+  }
 
-    allCourseAssetStrings: function(){
-      return this.props.courseCards.map(card => card.assetString);
-    },
+  colorsUpdated = () => {
+    this.forceUpdate()
+  }
 
-    colorForCard: function(assetString){
-      return DashboardCardBackgroundStore.colorForCourse(assetString);
-    },
+  allCourseAssetStrings = () => this.props.courseCards.map(card => card.assetString)
 
-    handleColorChange: function(assetString, newColor){
-      DashboardCardBackgroundStore.setColorForCourse(assetString, newColor);
-    },
+  colorForCard = assetString => DashboardCardBackgroundStore.colorForCourse(assetString)
 
-    getOriginalIndex (assetString) {
-      return this.state.courseCards.findIndex(c => c.assetString === assetString);
-    },
+  handleColorChange = (assetString, newColor) => {
+    DashboardCardBackgroundStore.setColorForCourse(assetString, newColor)
+  }
 
-    moveCard (assetString, atIndex, cb) {
-      const cardIndex = this.state.courseCards.findIndex(card => card.assetString === assetString);
-      let newCards = this.state.courseCards.slice();
-      newCards.splice(atIndex, 0, newCards.splice(cardIndex, 1)[0]);
-      newCards = newCards.map((card, index) => {
-        const newCard = Object.assign({}, card);
-        newCard.position = index;
-        return newCard;
-      });
-      this.setState({
+  getOriginalIndex = assetString =>
+    this.state.courseCards.findIndex(c => c.assetString === assetString)
+
+  moveCard = (assetString, atIndex, cb) => {
+    const cardIndex = this.state.courseCards.findIndex(card => card.assetString === assetString)
+    let newCards = this.state.courseCards.slice()
+    newCards.splice(atIndex, 0, newCards.splice(cardIndex, 1)[0])
+    newCards = newCards.map((card, index) => {
+      const newCard = Object.assign({}, card)
+      newCard.position = index
+      return newCard
+    })
+    this.setState(
+      {
         courseCards: newCards
-      }, () => {
-        MovementUtils.updatePositions(this.state.courseCards, window.ENV.current_user_id);
+      },
+      () => {
+        MovementUtils.updatePositions(this.state.courseCards, window.ENV.current_user_id)
         if (typeof cb === 'function') {
           cb()
         }
-      });
-    },
-
-    render: function () {
-      const Component = (this.props.reorderingEnabled) ? DraggableDashboardCard : DashboardCard;
-      const cards = this.state.courseCards.map((card, index) => {
-        const position = (card.position != null) ? card.position : this.getOriginalIndex.bind(this, card.assetString)
-        return (
-          <Component
-            key={card.id}
-            shortName={card.shortName}
-            originalName={card.originalName}
-            courseCode={card.courseCode}
-            id={card.id}
-            href={card.href}
-            links={card.links}
-            term={card.term}
-            assetString={card.assetString}
-            backgroundColor={this.colorForCard(card.assetString)}
-            handleColorChange={this.handleColorChange.bind(this, card.assetString)}
-            image={card.image}
-            imagesEnabled={card.imagesEnabled}
-            reorderingEnabled={this.props.reorderingEnabled}
-            hideColorOverlays={this.props.hideColorOverlays}
-            position={position}
-            currentIndex={index}
-            moveCard={this.moveCard}
-            totalCards={this.state.courseCards.length}
-          />
-        );
-      });
-
-      const dashboardCardBox = (
-        <div className="ic-DashboardCard__box">
-          {cards}
-        </div>
-      );
-
-      if (this.props.reorderingEnabled) {
-        const { connectDropTarget } = this.props;
-        return connectDropTarget(dashboardCardBox);
       }
+    )
+  }
 
-      return dashboardCardBox;
+  render() {
+    const Component = this.props.reorderingEnabled ? DraggableDashboardCard : DashboardCard
+    const cards = this.state.courseCards.map((card, index) => {
+      const position =
+        card.position != null ? card.position : this.getOriginalIndex.bind(this, card.assetString)
+      return (
+        <Component
+          key={card.id}
+          shortName={card.shortName}
+          originalName={card.originalName}
+          courseCode={card.courseCode}
+          id={card.id}
+          href={card.href}
+          links={card.links}
+          term={card.term}
+          assetString={card.assetString}
+          backgroundColor={this.colorForCard(card.assetString)}
+          handleColorChange={this.handleColorChange.bind(this, card.assetString)}
+          image={card.image}
+          reorderingEnabled={this.props.reorderingEnabled}
+          hideColorOverlays={this.props.hideColorOverlays}
+          position={position}
+          currentIndex={index}
+          moveCard={this.moveCard}
+          totalCards={this.state.courseCards.length}
+        />
+      )
+    })
+
+    const dashboardCardBox = <div className="ic-DashboardCard__box">{cards}</div>
+
+    if (this.props.reorderingEnabled) {
+      const {connectDropTarget} = this.props
+      return connectDropTarget(dashboardCardBox)
     }
-  });
 
-export default DashboardCardBox
+    return dashboardCardBox
+  }
+}
+

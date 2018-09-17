@@ -123,6 +123,80 @@ describe "/submissions/show" do
     end
   end
 
+  describe "plagiarism report" do
+    let(:teacher) do
+      user = User.create
+      @course.enroll_teacher(user)
+      user
+    end
+
+    let(:html) do
+      render "submissions/show"
+      Nokogiri::HTML.fragment(response.body)
+    end
+
+    before :once do
+      @assignment = @course.assignments.create!(
+        assignment_valid_attributes.merge(submission_types: "online_upload,online_text_entry")
+      )
+
+      @submission = @assignment.submit_homework(@user, {body: "hello there", submission_type: 'online_text_entry'})
+      @submission.turnitin_data = {
+        "submission_#{@submission.id}" => {
+          web_overlap: 92,
+          error: true,
+          publication_overlap: 0,
+          state: "failure",
+          object_id: "123456789",
+          student_overlap: 90,
+          similarity_score: 92
+        }
+      }
+    end
+
+    before :each do
+      view_context(@course, teacher)
+      assign(:assignment, @assignment)
+      assign(:submission, @submission)
+    end
+
+    context "for turnitin" do
+      it "is present when the plagiarism report is from turnitin" do
+        expect(html.css('.turnitin_score_container_caret').size).to eq 1
+      end
+
+      it "is present when the plagiarism report is blank (defaults to turnitin)" do
+        @submission.turnitin_data.delete(:provider)
+        expect(html.css('.turnitin_score_container_caret').size).to eq 1
+      end
+
+      it "is not present when the plagiarism report is from vericite" do
+        @submission.turnitin_data[:provider] = 'vericite'
+        expect(html.css('.turnitin_score_container_caret').size).to eq 0
+      end
+    end
+
+    context "for vericite" do
+      before :each do
+        @submission.turnitin_data[:provider] = 'vericite'
+      end
+
+      it "is present when the plagiarism report is from vericite" do
+        expect(html.css('.vericite_score_container_caret').size).to eq 1
+      end
+
+      it "is not present when the plagiarism report is from turnitin" do
+        @submission.turnitin_data[:provider] = 'turnitin'
+        expect(html.css('.vericite_score_container_caret').size).to eq 0
+      end
+
+      it "is not present when the plagiarism report is blank (defaults to turnitin)" do
+        @submission.turnitin_data.delete(:provider)
+        expect(html.css('.vericite_score_container_caret').size).to eq 0
+      end
+    end
+  end
+
   context 'comments sidebar' do
     before :each do
       course_with_teacher
@@ -280,7 +354,7 @@ describe "/submissions/show" do
         @course.save!
         @assessment_request = @submission.assessment_requests.create!(
           assessor: @student,
-          assessor_asset: @submission.user,
+          assessor_asset: @submission,
           user: @submission.user
         )
       end

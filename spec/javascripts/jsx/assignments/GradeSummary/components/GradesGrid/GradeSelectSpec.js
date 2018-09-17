@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import {mount} from 'enzyme'
 
 import GradeSelect from 'jsx/assignments/GradeSummary/components/GradesGrid/GradeSelect'
 import {FAILURE, STARTED, SUCCESS} from 'jsx/assignments/GradeSummary/grades/GradeActions'
@@ -140,7 +140,7 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
   }
 
   function getTextInput() {
-    return wrapper.find('input').get(0)
+    return wrapper.find('input').at(0).instance()
   }
 
   function clickInputToOpenMenu() {
@@ -226,7 +226,7 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
 
   function setInputText(value) {
     const input = wrapper.find('input[type="text"]')
-    input.get(0).value = value
+    input.at(0).instance().value = value
     input.simulate('change', {target: {value}})
   }
 
@@ -743,7 +743,7 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
 
     test('sets focus on the input', () => {
       keyUpOnInput(keyCodes.ESCAPE)
-      strictEqual(document.activeElement, wrapper.find('input').get(0))
+      strictEqual(document.activeElement, getTextInput())
     })
 
     test('resets the input value when text was entered', () => {
@@ -774,7 +774,7 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
     test('sets focus on the input', () => {
       focusOption(labelForGrader('robin'))
       keyUpOnOption(labelForGrader('robin'), keyCodes.ESCAPE)
-      strictEqual(document.activeElement, wrapper.find('input').get(0))
+      strictEqual(document.activeElement, getTextInput())
     })
   })
 

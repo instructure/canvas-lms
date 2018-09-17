@@ -42,6 +42,7 @@ define [
   'jsx/shared/helpers/numberHelper'
   'jsx/due_dates/DueDateCalendarPicker'
   '../../util/SisValidationHelper'
+  'jsx/assignments/AssignmentExternalTools'
 ], (
     I18n,
     ValidatedFormView,
@@ -68,7 +69,8 @@ define [
     flashMessage,
     numberHelper,
     DueDateCalendarPicker,
-    SisValidationHelper) ->
+    SisValidationHelper,
+    AssignmentExternalTools) ->
 
   RichContentEditor.preloadRemoteModule()
 
@@ -95,6 +97,7 @@ define [
       '#allow_todo_date': '$allowTodoDate'
       '#allow_user_comments': '$allowUserComments'
       '#require_initial_post' : '$requireInitialPost'
+      '#assignment_external_tools' : '$AssignmentExternalTools'
 
     events: _.extend(@::events,
       'click .removeAttachment' : 'removeAttachment'
@@ -235,6 +238,13 @@ define [
 
     afterRender: =>
       @renderStudentTodoAtDate() if ENV.STUDENT_PLANNER_ENABLED && @$todoDateInput.length
+      [context, context_id] = ENV.context_asset_string.split("_")
+      if context == 'course'
+        @AssignmentExternalTools = AssignmentExternalTools.attach(
+          @$AssignmentExternalTools.get(0),
+          "assignment_edit",
+          parseInt(context_id),
+          parseInt(@assignment.id))
 
 
     attachKeyboardShortcuts: =>

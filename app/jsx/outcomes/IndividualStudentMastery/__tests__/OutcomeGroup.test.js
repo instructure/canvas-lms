@@ -24,6 +24,7 @@ import OutcomeGroup from '../OutcomeGroup'
 const outcome = (id, title) => ({
   id,
   title,
+  assignments: [],
   mastered: false,
   mastery_points: 3,
   points_possible: 5,

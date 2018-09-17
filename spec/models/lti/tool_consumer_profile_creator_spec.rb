@@ -182,6 +182,10 @@ module Lti
           expect(tcp_creator.create.capability_offered).to include 'Membership.role'
         end
 
+        it 'adds the Canvas.placements.assignmentEdit capability' do
+          expect(tcp_creator.create.capability_offered).to include 'Canvas.placements.assignmentEdit'
+        end
+
         it 'does not add the Canvas.placements.similarityDetection if developer key is false' do
           expect(tcp_creator.create.capability_offered).not_to include 'Canvas.placements.similarityDetection'
         end
