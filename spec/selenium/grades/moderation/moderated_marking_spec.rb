@@ -231,10 +231,14 @@ describe 'Moderated Marking' do
     context 'when a custom grade is entered' do
       before(:each) do
         ModeratePage.enter_custom_grade(@student1, 4)
+        wait_for_ajaximations
       end
       it 'selects the custom grade', priority: '1', test_id: 3505170 do
+        skip('unskip this in GRADE-1615 once this is not flaky using using the most recent InstUI')
         # the aria-activedescendant will be the id of the selected option
         selected_id = ModeratePage.grade_input(@student1).attribute("aria-activedescendant")
+
+        expect(selected_id).to be_present
         ModeratePage.grade_input(@student1).click
         expect(f("##{selected_id}").text).to eq "4 (Custom)"
       end

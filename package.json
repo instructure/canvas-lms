@@ -118,7 +118,7 @@
     "babel-register": "^6",
     "coffee-loader": "~0.7.2",
     "coffee-script": "^1",
-    "concurrently": "^3",
+    "concurrently": "^4",
     "core-js-builder": "^2",
     "css-loader": "^0.28",
     "ember-template-compiler": "^1.8.0",

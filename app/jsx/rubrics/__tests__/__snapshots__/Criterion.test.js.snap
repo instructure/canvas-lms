@@ -3,7 +3,7 @@
 exports[`Criterion can open and close the long description dialog 1`] = `"<div><p> a wild paragraph appears </p></div>"`;
 
 exports[`Free-form Rubric with a custom criterion by default renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
-"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}}>
+"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}} constrain=\\"window\\">
   <ModalHeader>
     <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
       Close
@@ -42,7 +42,7 @@ exports[`Free-form Rubric with a custom criterion by default renders the root co
 `;
 
 exports[`Free-form Rubric with a custom criterion when assessing renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
-"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}}>
+"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}} constrain=\\"window\\">
   <ModalHeader>
     <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
       Close
@@ -81,7 +81,7 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the roo
 `;
 
 exports[`Free-form Rubric with a custom criterion without an assessment renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
-"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}}>
+"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}} constrain=\\"window\\">
   <ModalHeader>
     <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
       Close
@@ -128,7 +128,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the LongDe
 `;
 
 exports[`Free-form Rubric with a outcome criterion by default renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
-"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}}>
+"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}} constrain=\\"window\\">
   <ModalHeader>
     <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
       Close
@@ -194,7 +194,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Lo
 `;
 
 exports[`Free-form Rubric with a outcome criterion when assessing renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
-"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}}>
+"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}} constrain=\\"window\\">
   <ModalHeader>
     <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
       Close
@@ -260,7 +260,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
 `;
 
 exports[`Free-form Rubric with a outcome criterion without an assessment renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
-"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}}>
+"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}} constrain=\\"window\\">
   <ModalHeader>
     <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
       Close
@@ -318,7 +318,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
 `;
 
 exports[`Point Rubric with a custom criterion by default renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
-"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}}>
+"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}} constrain=\\"window\\">
   <ModalHeader>
     <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
       Close
@@ -363,7 +363,7 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
 `;
 
 exports[`Point Rubric with a custom criterion when assessing renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
-"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}}>
+"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}} constrain=\\"window\\">
   <ModalHeader>
     <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
       Close
@@ -403,7 +403,7 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
 `;
 
 exports[`Point Rubric with a custom criterion without an assessment renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
-"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}}>
+"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}} constrain=\\"window\\">
   <ModalHeader>
     <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
       Close
@@ -450,7 +450,7 @@ exports[`Point Rubric with a outcome criterion by default renders the LongDescri
 `;
 
 exports[`Point Rubric with a outcome criterion by default renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
-"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}}>
+"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}} constrain=\\"window\\">
   <ModalHeader>
     <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
       Close
@@ -522,7 +522,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the LongDe
 `;
 
 exports[`Point Rubric with a outcome criterion when assessing renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
-"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}}>
+"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}} constrain=\\"window\\">
   <ModalHeader>
     <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
       Close
@@ -589,7 +589,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
 `;
 
 exports[`Point Rubric with a outcome criterion without an assessment renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
-"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}}>
+"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}} constrain=\\"window\\">
   <ModalHeader>
     <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
       Close

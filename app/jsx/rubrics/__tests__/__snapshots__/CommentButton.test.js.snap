@@ -12,7 +12,7 @@ exports[`The CommentButton component renders the root component as expected 1`] 
 `;
 
 exports[`The CommentButton component renders the root component as expected 2`] = `
-"<Modal open={false} onDismiss={[Function: close]} size=\\"medium\\" label=\\"Additional Comments\\" defaultFocusElement={[Function: defaultFocusElement]} shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true}>
+"<Modal open={false} onDismiss={[Function: close]} size=\\"medium\\" label=\\"Additional Comments\\" defaultFocusElement={[Function: defaultFocusElement]} shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} constrain=\\"window\\">
   <ModalHeader>
     <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function: close]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
       Close
