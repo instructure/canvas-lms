@@ -232,14 +232,21 @@ class CourseSection < ActiveRecord::Base
     old_course.course_sections.reset
     course.course_sections.reset
     assignment_overrides.active.destroy_all
-    user_ids = self.all_enrollments.map(&:user_id).uniq
+
+    enrollment_data = self.all_enrollments.pluck(:id, :user_id)
+    enrollment_ids = enrollment_data.map(&:first)
+    user_ids = enrollment_data.map(&:last).uniq
 
     all_attrs = { course_id: course.id }
     if self.root_account_id_changed?
       all_attrs[:root_account_id] = self.root_account_id
     end
     self.save!
-    self.all_enrollments.update_all all_attrs
+    if enrollment_ids.any?
+      self.all_enrollments.update_all all_attrs
+      Enrollment.send_later_if_production(:batch_add_to_favorites, enrollment_ids)
+    end
+
     Assignment.suspend_due_date_caching do
       Assignment.where(context: [old_course, self.course]).touch_all
     end
