@@ -166,7 +166,7 @@ export default class CoursesListRow extends React.Component {
         <td>{term.name}</td>
         <td>
           {(teachersToShow || []).map(teacher => (
-            <div>
+            <div key={teacher.id}>
               <UserLink
                 key={teacher.id}
                 href={teacher.html_url}
