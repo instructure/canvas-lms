@@ -25,8 +25,7 @@ module PlannerHelper
     'assignment' => 'Assignment',
     'wiki_page' => 'WikiPage',
     'planner_note' => 'PlannerNote',
-    'calendar_event' => 'CalendarEvent',
-    'assessment_request' => 'AssessmentRequest'
+    'calendar_event' => 'CalendarEvent'
   }.freeze
 
   class InvalidDates < StandardError; end

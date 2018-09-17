@@ -193,11 +193,11 @@ export class PlannerItem extends Component {
         if (this.props.dateStyle === 'todo') {
           return formatMessage("To Do: {date}", {date: this.props.date.format("LT")});
         } else {
-          return formatMessage("Due: {date}", {date: this.props.date.format("LT")});
+          return formatMessage("Due: {date}", {date: this.props.date.format("LT")});  
         }
       }
-
-
+      
+      
       return this.props.date.format("LT");
     }
     return null;
@@ -235,7 +235,7 @@ export class PlannerItem extends Component {
       }
 
       if (this.props.associated_item === "Announcement") {
-        return formatMessage('{assignmentType} {title} posted {datetime}.', params);
+        return formatMessage('{assignmentType} {title} posted {datetime}.', params);    
       }
     }
     return formatMessage('{assignmentType} {title}.', params);
