@@ -6607,7 +6607,7 @@ describe Assignment do
       expect(@assignment.can_view_speed_grader?(@teacher)).to be false
     end
 
-    it 'returns false when the user cannot view or managed grades' do
+    it 'returns false when the user cannot view or manage grades' do
       @course.root_account.role_overrides.create!(permission: 'manage_grades', enabled: false, role: teacher_role)
       @course.root_account.role_overrides.create!(permission: 'view_all_grades', enabled: false, role: teacher_role)
       expect(@assignment.context).to receive(:allows_speed_grader?).and_return true
@@ -6617,6 +6617,50 @@ describe Assignment do
     it 'returns true when the course allows speed grader and user can manage grades' do
       expect(@assignment.context).to receive(:allows_speed_grader?).and_return true
       expect(@assignment.can_view_speed_grader?(@teacher)).to be true
+    end
+  end
+
+  describe '#can_view_audit_trail?' do
+    before :once do
+      @admin = account_admin_user
+      @assignment = @course.assignments.create!(
+        final_grader: @teacher,
+        grader_count: 2,
+        grades_published_at: 2.days.ago,
+        moderated_grading: true
+      )
+      @assignment.update!(muted: false)
+    end
+
+    it 'returns true for an auditor when the assignment is moderated, not muted, and grades have been posted' do
+      expect(@assignment.can_view_audit_trail?(@admin)).to be true
+    end
+
+    it 'returns true for an auditor when the assignment is graded anonymously, not muted, and grades have been posted' do
+      @assignment.update!(anonymous_grading: true, moderated_grading: false)
+      @assignment.update!(muted: false)
+      expect(@assignment.can_view_audit_trail?(@admin)).to be true
+    end
+
+    it "returns false when the user's role does not allow viewing the assignment audit trail" do
+      @course.root_account.role_overrides.create!(enabled: false, permission: :view_audit_trail, role: admin_role)
+      expect(@assignment.can_view_audit_trail?(@admin)).to be false
+    end
+
+    it 'returns false when the assignment is neither moderated nor anonymous' do
+      @assignment.update!(moderated_grading: false)
+      @assignment.update!(muted: false)
+      expect(@assignment.can_view_audit_trail?(@admin)).to be false
+    end
+
+    it 'returns false when the assignment is muted' do
+      @assignment.update!(muted: true)
+      expect(@assignment.can_view_audit_trail?(@admin)).to be false
+    end
+
+    it 'returns false when the assignment grades have not been posted' do
+      @assignment.update!(grades_published_at: nil)
+      expect(@assignment.can_view_audit_trail?(@admin)).to be false
     end
   end
 

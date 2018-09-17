@@ -1762,14 +1762,51 @@ describe GradebooksController do
       expect(response).not_to be_redirect
     end
 
-    it 'includes the lti_retrieve_url in the js_env' do
-      get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
-      expect(assigns[:js_env][:lti_retrieve_url]).not_to be_nil
-    end
+    describe 'js_env' do
+      let(:js_env) { assigns[:js_env] }
 
-    it 'includes the grading_type in the js_env' do
-      get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
-      expect(assigns[:js_env][:grading_type]).to eq('percent')
+      it 'includes lti_retrieve_url' do
+        get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
+        expect(js_env[:lti_retrieve_url]).not_to be_nil
+      end
+
+      it 'includes the grading_type' do
+        get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
+        expect(js_env[:grading_type]).to eq('percent')
+      end
+
+      it 'sets new_gradebook_enabled to true if new gradebook is enabled' do
+        @course.enable_feature!(:new_gradebook)
+        get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
+        expect(js_env[:new_gradebook_enabled]).to eq true
+      end
+
+      it 'sets new_gradebook_enabled to false if new gradebook is not enabled' do
+        @course.disable_feature!(:new_gradebook)
+        get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
+        expect(js_env[:new_gradebook_enabled]).to eq false
+      end
+
+      it 'includes anonymous identities keyed by anonymous_id' do
+        @assignment.update!(moderated_grading: true, grader_count: 2)
+        anonymous_id = @assignment.create_moderation_grader(@teacher, occupy_slot: true).anonymous_id
+        get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
+        expect(js_env[:anonymous_identities]).to have_key anonymous_id
+      end
+
+      it 'sets can_view_audit_trail to true when the current user can view the assignment audit trail' do
+        @course.root_account.role_overrides.create!(permission: :view_audit_trail, enabled: true, role: teacher_role)
+        @assignment.update!(moderated_grading: true, grader_count: 2, grades_published_at: 2.days.ago)
+        @assignment.update!(muted: false) # must be updated separately for some reason
+        get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
+        expect(js_env[:can_view_audit_trail]).to be true
+      end
+
+      it 'sets can_view_audit_trail to false when the current user cannot view the assignment audit trail' do
+        @assignment.update!(moderated_grading: true, grader_count: 2, muted: true)
+        get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
+        expect(js_env[:can_view_audit_trail]).to be false
+      end
     end
 
     it 'sets disable_unmute_assignment to false if the assignment is not muted' do
@@ -1788,25 +1825,6 @@ describe GradebooksController do
       @assignment.update!(muted: true, grades_published_at: nil, moderated_grading: true, grader_count: 1)
       get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
       expect(assigns[:disable_unmute_assignment]).to eq true
-    end
-
-    it 'sets new_gradebook_enabled in ENV to true if new gradebook is enabled' do
-      @course.enable_feature!(:new_gradebook)
-      get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
-      expect(assigns[:js_env][:new_gradebook_enabled]).to eq true
-    end
-
-    it 'sets new_gradebook_enabled in ENV to false if new gradebook is not enabled' do
-      @course.disable_feature!(:new_gradebook)
-      get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
-      expect(assigns[:js_env][:new_gradebook_enabled]).to eq false
-    end
-
-    it 'includes anonymous identities keyed by anonymous_id in the ENV' do
-      @assignment.update!(moderated_grading: true, grader_count: 2)
-      anonymous_id = @assignment.create_moderation_grader(@teacher, occupy_slot: true).anonymous_id
-      get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
-      expect(assigns[:js_env][:anonymous_identities]).to have_key anonymous_id
     end
 
     describe 'current_anonymous_id' do

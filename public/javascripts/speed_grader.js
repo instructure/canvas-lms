@@ -28,6 +28,8 @@ import StatusPill from 'jsx/grading/StatusPill';
 import JQuerySelectorCache from 'jsx/shared/helpers/JQuerySelectorCache';
 import numberHelper from 'jsx/shared/helpers/numberHelper';
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
+import AssessmentAuditButton from 'jsx/speed_grader/AssessmentAuditTray/components/AssessmentAuditButton'
+import AssessmentAuditTray from 'jsx/speed_grader/AssessmentAuditTray'
 import SpeedGraderProvisionalGradeSelector from 'jsx/speed_grader/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderSettingsMenu from 'jsx/speed_grader/SpeedGraderSettingsMenu'
 import studentViewedAtTemplate from 'jst/speed_grader/student_viewed_at';
@@ -81,6 +83,8 @@ const selectors = new JQuerySelectorCache();
 const SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT = 'speed_grader_comment_textarea_mount_point';
 const SPEED_GRADER_SUBMISSION_COMMENTS_DOWNLOAD_MOUNT_POINT = 'speed_grader_submission_comments_download_mount_point';
 const SPEED_GRADER_SETTINGS_MOUNT_POINT = 'speed_grader_settings_mount_point';
+const ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT = 'speed_grader_assessment_audit_button_mount_point'
+const ASSESSMENT_AUDIT_TRAY_MOUNT_POINT = 'speed_grader_assessment_audit_tray_mount_point'
 
 let isAnonymous
 let anonymousGraders
@@ -1583,6 +1587,33 @@ EG = {
     } else {
       $grade.removeClass('ui-state-disabled').removeAttr('aria-disabled').removeAttr('readonly').removeProp('disabled');
     }
+  },
+
+  setUpAssessmentAuditTray() {
+    let auditTray
+
+    const bindRef = ref => {
+      auditTray = ref
+    }
+
+    const tray = <AssessmentAuditTray ref={bindRef} />
+    ReactDOM.render(tray, document.getElementById(ASSESSMENT_AUDIT_TRAY_MOUNT_POINT))
+
+    const onClick = () => {
+      auditTray.show({
+        assignmentId: ENV.assignment_id,
+        courseId: ENV.course_id,
+        submissionId: this.currentStudent.submission.id
+      })
+    }
+
+    const button = <AssessmentAuditButton onClick={onClick} />
+    ReactDOM.render(button, document.getElementById(ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT))
+  },
+
+  tearDownAssessmentAuditTray() {
+    ReactDOM.unmountComponentAtNode(document.getElementById(ASSESSMENT_AUDIT_TRAY_MOUNT_POINT))
+    ReactDOM.unmountComponentAtNode(document.getElementById(ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT))
   },
 
   setReadOnly: function(readonly) {
@@ -3291,6 +3322,10 @@ export default {
     setupSelectors()
     renderSettingsMenu()
 
+    if (ENV.can_view_audit_trail) {
+      EG.setUpAssessmentAuditTray()
+    }
+
     function registerQuizzesNext (overriddenShowSubmission) {
       showSubmissionOverride = overriddenShowSubmission;
     }
@@ -3310,6 +3345,10 @@ export default {
   },
 
   teardown() {
+    if (ENV.can_view_audit_trail) {
+      EG.tearDownAssessmentAuditTray()
+    }
+
     teardownHandleFragmentChanged()
     teardownBeforeLeavingSpeedgrader()
   },

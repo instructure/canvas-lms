@@ -2939,6 +2939,10 @@ class Assignment < ActiveRecord::Base
     context.allows_speed_grader? && context.grants_any_right?(user, :manage_grades, :view_all_grades)
   end
 
+  def can_view_audit_trail?(user)
+    auditable? && !muted? && grades_published? && context.grants_right?(user, :view_audit_trail)
+  end
+
   def can_view_other_grader_identities?(user)
     return false unless context.grants_any_right?(user, :manage_grades, :view_all_grades)
     return true unless moderated_grading? && !grades_published?

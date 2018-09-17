@@ -34,7 +34,9 @@ import 'jquery.ajaxJSON';
 const fixtures = document.getElementById('fixtures')
 const setupCurrentStudent = () => SpeedGrader.EG.handleStudentChanged()
 const requiredDOMFixtures = `
+  <div id="speed_grader_assessment_audit_tray_mount_point"></div>
   <span id="speed_grader_settings_mount_point"></span>
+  <div id="speed_grader_assessment_audit_button_mount_point"></div>
   <div id="speed_grader_submission_comments_download_mount_point"></div>
 `;
 
@@ -53,6 +55,30 @@ function setupFixtures (domStrings = '') {
 function teardownFixtures() {
   // fast remove
   while (fixtures.firstChild) fixtures.removeChild(fixtures.firstChild);
+}
+
+function waitForElement(query, timeout = 1000) {
+  const queryFn = typeof query === 'function' ?
+    query :
+    () => document.querySelector(query)
+
+  return new Promise((resolve, reject) => {
+    let timeoutId
+
+    const intervalId = setInterval(() => {
+      const $el = queryFn()
+      if ($el) {
+        clearInterval(intervalId)
+        clearTimeout(timeoutId)
+        resolve($el)
+      }
+    }, 10)
+
+    timeoutId = setTimeout(() => {
+      clearInterval(intervalId)
+      reject(new Error('Timeout waiting for element'))
+    }, timeout)
+  })
 }
 
 QUnit.module('SpeedGrader#showDiscussion', {
@@ -1621,6 +1647,63 @@ QUnit.module('SpeedGrader', suiteHooks => {
         const ids = window.jsonData.studentsWithSubmissions.map(student => student.anonymous_id)
         deepEqual(ids, ['12345', '23456', '45678', '34567'])
       })
+    })
+  })
+
+  QUnit.module('"Assessment Audit" button', hooks => {
+    hooks.beforeEach(() => {
+      ENV.can_view_audit_trail = true
+    })
+
+    hooks.afterEach(() => {
+      SpeedGrader.teardown()
+    })
+
+    function setUpSpeedGrader() {
+      SpeedGrader.EG.currentStudent = {
+        id: '1101',
+        name: 'Adam Jones',
+        submission_state: 'graded',
+        submission: {
+          score: 9.1,
+          grade: 'A',
+          submission_comments: []
+        }
+      }
+
+      SpeedGrader.setup()
+
+      window.jsonData = {
+        GROUP_GRADING_MODE: false,
+        anonymize_students: false,
+        gradingPeriods: {},
+        id: 27,
+        points_possible: 10,
+        submissions: []
+      }
+    }
+
+    function getAssessmentAuditButton() {
+      return [...fixtures.querySelectorAll('button')].find($button => (
+        $button.textContent === 'Assessment audit'
+      ))
+    }
+
+    test('is present when the current user can view the audit trail', () => {
+      setUpSpeedGrader()
+      ok(getAssessmentAuditButton())
+    })
+
+    test('is not present when the current user cannot view the audit trail', () => {
+      ENV.can_view_audit_trail = false
+      setUpSpeedGrader()
+      notOk(getAssessmentAuditButton())
+    })
+
+    test('opens the "Assessment Audit" tray when clicked', async () => {
+      setUpSpeedGrader()
+      getAssessmentAuditButton().click()
+      ok(await waitForElement('[role="dialog"][aria-label="Assessment audit tray"]'))
     })
   })
 })
