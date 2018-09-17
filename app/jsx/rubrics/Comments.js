@@ -37,7 +37,9 @@ const FreeFormComments = (props) => {
 
   const options = savedComments.map((comment, ix) => (
     // eslint-disable-next-line react/no-array-index-key
-    <option key={ix} value={ix.toString()}>{truncate(comment)}</option>
+    <option key={ix} value={ix.toString()} label={comment}>
+      {truncate(comment)}
+    </option>
   ))
   const selector = [
     (
