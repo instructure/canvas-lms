@@ -289,14 +289,14 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   # answered, provide comments for the student about their answer(s), or simply
   # fudge the total score by a specific amount of points.
   #
-  # @argument attempt [Required, Integer]
+  # @argument quiz_submissions[][attempt] [Required, Integer]
   #   The attempt number of the quiz submission that should be updated. This
   #   attempt MUST be already completed.
   #
-  # @argument fudge_points [Float]
+  # @argument quiz_submissions[][fudge_points] [Float]
   #   Amount of positive or negative points to fudge the total score by.
   #
-  # @argument questions [Hash]
+  # @argument quiz_submissions[][questions] [Hash]
   #   A set of scores and comments for each question answered by the student.
   #   The keys are the question IDs, and the values are hashes of `score` and
   #   `comment` entries. See {Appendix: Manual Scoring} for more on this
