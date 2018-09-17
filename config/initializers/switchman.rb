@@ -137,8 +137,11 @@ Rails.application.config.after_initialize do
 
     def self.send_in_each_region(klass, method, enqueue_args = {}, *args)
       run_current_region_asynchronously = enqueue_args.delete(:run_current_region_asynchronously)
+
+      return klass.send(method, *args) if DatabaseServer.all.all? { |db| !db.config[:region] }
+
       regions = Set.new
-      unless run_current_region_asynchronously
+      if !run_current_region_asynchronously
         klass.send(method, *args)
         regions << Shard.current.database_server.config[:region]
       end
