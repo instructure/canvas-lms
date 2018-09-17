@@ -645,8 +645,7 @@ END
       display_name: -> { I18n.t('Quizzes.Next Importing') },
       description: -> { I18n.t('Allow importing of QTI and Common Cartridge into Quizzes.Next.') },
       applies_to: 'RootAccount',
-      beta: true,
-      state: 'hidden'
+      state: 'allowed'
     },
     'common_cartridge_page_conversion' => {
       display_name: -> { I18n.t('Common Cartridge HTML File to Page Conversion') },
