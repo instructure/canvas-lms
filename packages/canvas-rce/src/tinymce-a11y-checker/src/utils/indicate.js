@@ -43,6 +43,8 @@ export default function indicate(editor, elem, margin = MARGIN) {
 
   const region = indicatorRegion(editorFrame, elem)
 
+  // The z-index below is set to be one below the Instructure UI tray
+  // that the a11y checker uses.  It may need to be updated in the future.
   el.setAttribute(
     "style",
     `
@@ -51,7 +53,7 @@ export default function indicate(editor, elem, margin = MARGIN) {
     position: absolute;
     display: block;
     borderRadius: 5px;
-    zIndex: 999999;
+    z-index: 9998;
     left: ${region.left - margin}px;
     top: ${region.top - margin}px;
     width: ${region.width + 2 * margin}px;
