@@ -199,6 +199,7 @@ class SubmissionsApiController < ApplicationController
 
   include Api::V1::Progress
   include Api::V1::Submission
+  include Submissions::ShowHelper
 
   # @API List assignment submissions
   #
@@ -607,11 +608,11 @@ class SubmissionsApiController < ApplicationController
     @user = get_user_considering_section(params[:user_id])
     permission = @assignment.submission_types.include?("online_upload") ? :submit : :nothing
     submit_assignment = params.key?(:submit_assignment) ? value_to_boolean(params[:submit_assignment]) : true
-    # rationale for allowing other user ids at all: eventually, you'll be able
-    # to use this api for uploading an attachment to a submission comment.
-    # teachers will be able to do that for any submission they can grade, so
-    # they need to be able to specify the target user.
-    permission = :nothing if @user != @current_user
+
+    # teachers can upload on behalf of students for a submission. eventually,
+    # you'll also be able to use this api for uploading an attachment to
+    # a submission comment.
+    permission = :grade if @user != @current_user
     if authorized_action(@assignment, @current_user, permission)
       api_attachment_preflight(
         @user, request,
@@ -1157,14 +1158,6 @@ class SubmissionsApiController < ApplicationController
     else
       render :json => result.try(:errors) || {}, :status => :bad_request
     end
-  end
-
-  def get_user_considering_section(user_id)
-    students = @context.students_visible_to(@current_user, include: :priors)
-    if @section
-      students = students.where(:enrollments => { :course_section_id => @section })
-    end
-    api_find(students, user_id)
   end
 
   def section_ids
