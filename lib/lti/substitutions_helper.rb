@@ -58,6 +58,18 @@ module Lti
 
     LIS_V2_ROLE_NONE = 'http://purl.imsglobal.org/vocab/lis/v2/person#None'
 
+    LIS_ADVANTAGE_ROLE_MAP = {
+      TaEnrollment => [
+        'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant',
+        'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor'
+      ].freeze,
+      StudentEnrollment => [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner' ].freeze,
+      TeacherEnrollment => [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor' ].freeze,
+      DesignerEnrollment => [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper' ].freeze,
+      ObserverEnrollment => [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor' ].freeze,
+      StudentViewEnrollment => [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner' ].freeze
+    }.freeze
+
     def initialize(context, root_account, user, tool = nil)
       @context = context
       @root_account = root_account

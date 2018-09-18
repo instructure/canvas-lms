@@ -2237,6 +2237,12 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/line_items/:line_item_id/results", action: :index
     end
 
+    # Names and Roles Provisioning (NRPS) v2 Service
+    scope(controller: 'lti/ims/names_and_roles') do
+      get "courses/:course_id/names_and_roles", controller: "lti/ims/names_and_roles", action: :course_index, as: :course_names_and_roles
+      get "groups/:group_id/names_and_roles", controller: "lti/ims/names_and_roles", action: :group_index, as: :group_names_and_roles
+    end
+
     # Security
     scope(controller: 'lti/ims/security') do
       get "security/jwks", action: :jwks, as: :jwks_show
