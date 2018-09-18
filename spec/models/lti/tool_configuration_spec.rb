@@ -193,6 +193,8 @@ module Lti
 
       let(:extensions) { settings['extensions'].first }
 
+      before { tool_configuration.developer_key = developer_key }
+
       shared_examples_for 'a new context external tool' do
         it 'uses the correct launch url' do
           expect(subject.url).to eq settings['launch_url']
@@ -232,6 +234,10 @@ module Lti
 
         it 'uses the correct text' do
           expect(subject.text).to eq extensions.dig('settings', 'text')
+        end
+
+        it 'sets the developer key' do
+          expect(subject.developer_key).to eq developer_key
         end
 
         context 'placements' do

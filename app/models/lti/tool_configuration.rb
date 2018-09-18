@@ -38,6 +38,7 @@ module Lti
         tool,
         false
       )
+      tool.developer_key = developer_key
       tool
     end
 
