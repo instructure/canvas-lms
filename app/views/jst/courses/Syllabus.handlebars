@@ -41,7 +41,7 @@
                 {{addIcon 'calendar-month'}}
               {{/ifEqual}}{{/ifEqual}}{{/ifEqual}}
             </td>
-            <td class="name{{#unless last}} not_last{{/unless}}">
+            <td class="name{{#unless last}} not_last{{/unless}}" data-workflow-state="{{workflow_state}}">
               {{#if html_url}}
                 <a href="{{html_url}}">{{title}}</a>
               {{else}}
@@ -51,7 +51,7 @@
                 <div class="special_date_title">({{override.title}})</div>
               {{/if}}
             </td>
-            <td class="dates{{#unless last}} not_last{{/unless}}">
+            <td class="dates{{#unless last}} not_last{{/unless}}" data-workflow-state="{{workflow_state}}">
               {{#if start_at}}
                 {{#if due_at}}
                   {{t "due by"}} <span {{contextSensitiveDatetimeTitle (unfudge due_at)}} >{{tTimeHours due_at}}</span>
