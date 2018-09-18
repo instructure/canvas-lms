@@ -190,7 +190,7 @@ define [
       RichContentEditor.callOnRCE(@$wikiPageBody, 'toggle')
       # hide the clicked link, and show the other toggle link.
       # todo: replace .andSelf with .addBack when JQuery is upgraded.
-      $(event.currentTarget).siblings('a').andSelf().toggle()
+      $(event.currentTarget).siblings('a').andSelf().toggle().focus()
 
     # Validate they entered in a title.
     # @api ValidatedFormView override
