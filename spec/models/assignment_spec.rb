@@ -6807,7 +6807,11 @@ describe Assignment do
     let(:course) { @course }
 
     it "does not create an AnonymousOrModerationEvent when assignment is neither anonymous nor moderated" do
-      expect{ course.assignments.create! }.not_to change{ AnonymousOrModerationEvent.count }
+      expect{ course.assignments.create!(updating_user: @teacher) }.not_to change{ AnonymousOrModerationEvent.count }
+    end
+
+    it "does not create an AnonymousOrModerationEvent when assignment does not have an updating user" do
+      expect{ course.assignments.create!(anonymous_grading: true) }.not_to change{ AnonymousOrModerationEvent.count }
     end
 
     context "for an anonymous assignment" do

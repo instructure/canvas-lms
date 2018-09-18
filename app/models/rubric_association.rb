@@ -44,14 +44,17 @@ class RubricAssociation < ActiveRecord::Base
   before_save :update_old_rubric
   after_destroy :update_rubric
   after_destroy :update_alignments
-  before_save :record_save_audit_event
-  before_destroy :record_deletion_audit_event
   after_save :assert_uniqueness
   after_save :update_alignments
 
   before_create :touch_association
   before_destroy :touch_association
   serialize :summary_data
+
+  with_options if: -> { auditable? && @updating_user.present? } do
+    before_save :record_save_audit_event
+    before_destroy :record_deletion_audit_event
+  end
 
   ValidAssociationModels = {
     'Course' => ::Course,
@@ -356,11 +359,13 @@ class RubricAssociation < ActiveRecord::Base
     assessment_to_return
   end
 
+  def auditable?
+    assignment&.auditable?
+  end
+
   private
 
   def record_save_audit_event
-    return unless @updating_user.present? && assignment&.auditable?
-
     existing_association = assignment.rubric_association
     event_type = existing_association.present? ? 'rubric_updated' : 'rubric_created'
     payload = if event_type == 'rubric_created'
@@ -378,8 +383,6 @@ class RubricAssociation < ActiveRecord::Base
   end
 
   def record_deletion_audit_event
-    return unless @updating_user.present? && assignment&.auditable?
-
     AnonymousOrModerationEvent.create!(
       assignment: assignment,
       event_type: 'rubric_deleted',

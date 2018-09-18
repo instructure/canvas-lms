@@ -463,8 +463,6 @@ class Assignment < ActiveRecord::Base
     write_attribute(:allowed_extensions, new_value)
   end
 
-  after_create :create_assignment_created_audit_event!
-
   before_save :ensure_post_to_sis_valid,
               :process_if_quiz,
               :default_values,
@@ -486,7 +484,8 @@ class Assignment < ActiveRecord::Base
               :apply_late_policy,
               :touch_submissions_if_muted_changed
 
-  with_options if: :auditable? do
+  with_options if: -> { auditable? && @updating_user.present? } do
+    after_create :create_assignment_created_audit_event!
     after_update :create_assignment_updated_audit_event!
     after_save :create_grades_posted_audit_event!, if: :saved_change_to_grades_published_at
   end
@@ -494,9 +493,6 @@ class Assignment < ActiveRecord::Base
   has_a_broadcast_policy
 
   def create_assignment_created_audit_event!
-    return if @updating_user.nil?
-    return unless auditable?
-
     auditable_changes = AUDITABLE_ATTRIBUTES.each_with_object({}) do |attribute, map|
       map[attribute] = attributes[attribute] unless attributes[attribute].nil?
     end
@@ -506,8 +502,6 @@ class Assignment < ActiveRecord::Base
   private :create_assignment_created_audit_event!
 
   def create_assignment_updated_audit_event!
-    return if @updating_user.nil?
-
     auditable_changes = if became_auditable?
       AUDITABLE_ATTRIBUTES.each_with_object({}) do |attribute, map|
         next if attributes[attribute].nil?
