@@ -229,6 +229,13 @@ describe CanvadocSessionsController do
         get :show, params: {blob: blob.to_json, hmac: hmac}
       end
 
+      it "passes user information based on the submission (if past submission / missing attachment assocation)" do
+        @submission.attachment_associations.destroy_all
+        expect(@attachment.canvadoc).to receive(:session_url).with(hash_including(user_id: @student.global_id.to_s))
+
+        get :show, params: {blob: blob.to_json, hmac: hmac}
+      end
+
       it "sends anonymous_instructor_annotations when true in the blob" do
         blob[:anonymous_instructor_annotations] = true
 

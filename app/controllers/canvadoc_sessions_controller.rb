@@ -35,6 +35,15 @@ class CanvadocSessionsController < ApplicationController
         enable_annotations: blob['enable_annotations']
       }
 
+
+      submission_id = blob["submission_id"]
+      if submission_id
+        submission = Submission.preload(:assignment).find(submission_id)
+        user_session_params = Canvadocs.user_session_params(@current_user, submission: submission)
+      else
+        user_session_params = Canvadocs.user_session_params(@current_user, attachment: attachment)
+      end
+
       if opts[:enable_annotations]
         # Docviewer only cares about the enrollment type when we're doing annotations
         opts[:enrollment_type] = blob["enrollment_type"]
@@ -50,7 +59,7 @@ class CanvadocSessionsController < ApplicationController
       # TODO: Remove the next line after the DocViewer Data Migration project RD-4702
       opts[:region] = attachment.shard.database_server.config[:region] || "none"
       attachment.submit_to_canvadocs(1, opts) unless attachment.canvadoc_available?
-      user_session_params = Canvadocs.user_session_params(attachment, @current_user)
+
       url = attachment.canvadoc.session_url(opts.merge(user_session_params))
       # For the purposes of reporting student viewership, we only
       # care if the original attachment owner is looking

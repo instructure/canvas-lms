@@ -210,11 +210,14 @@ module Canvadocs
     annotations_supported? && Canvas::Plugin.value_to_boolean(config["hijack_crocodoc_sessions"])
   end
 
-  def self.user_session_params(attachment, current_user)
-    submission = Submission.find_by(
-      id: AttachmentAssociation.where(context_type: 'Submission', attachment: attachment).select(:context_id)
-    )
-    return {} if submission.blank?
+  def self.user_session_params(current_user, attachment: nil, submission: nil)
+    if submission.nil?
+      return {} if attachment.nil?
+      submission = Submission.find_by(
+        id: AttachmentAssociation.where(context_type: 'Submission', attachment: attachment).select(:context_id)
+      )
+      return {} if submission.nil?
+    end
     assignment = submission.assignment
     enrollments = assignment.course.enrollments.index_by(&:user_id)
     session_params = current_user_session_params(submission, current_user, enrollments)
