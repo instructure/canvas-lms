@@ -708,13 +708,18 @@ class GradebooksController < ApplicationController
         params[:selected_section_id]
       end
 
-      gradebook_settings.deep_merge!({
+      settings = gradebook_settings(create_if_missing: true)
+      settings.deep_merge!({
         @context.id => {
           'filter_rows_by' => {
             'section_id' => section_to_show
           }
         }
       })
+
+      # Showing a specific section should always display the "Sections" filter
+      # in New Gradebook
+      ensure_section_view_filter_enabled if section_to_show.present?
       @current_user.save!
     end
 
@@ -1008,8 +1013,21 @@ class GradebooksController < ApplicationController
     )
   end
 
-  def gradebook_settings
-    @current_user.preferences.fetch(:gradebook_settings, {})
+  def gradebook_settings(create_if_missing: false)
+    preferences = @current_user.preferences
+    if !preferences.include?(:gradebook_settings) && create_if_missing
+      preferences[:gradebook_settings] = {}
+    end
+
+    preferences.fetch(:gradebook_settings, {})
+  end
+
+  def ensure_section_view_filter_enabled
+    context_settings = gradebook_settings.fetch(@context.id)
+    filter_settings = context_settings.fetch('selected_view_options_filters', [])
+    return if filter_settings&.include?('sections')
+
+    context_settings['selected_view_options_filters'] = filter_settings.append('sections')
   end
 
   def courses_with_grades_json
