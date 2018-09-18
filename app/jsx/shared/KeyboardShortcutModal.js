@@ -31,12 +31,12 @@ export default class KeyboardShortcutModal extends React.Component {
     )
   }
 
-  state = {
-    isOpen: false
+  static defaultProps = {
+    shortcuts: []
   }
 
-  defaultProps = {
-    shortcuts: []
+  state = {
+    isOpen: false
   }
 
   componentDidMount() {
