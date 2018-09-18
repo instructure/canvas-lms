@@ -211,7 +211,7 @@
     "test:jest:coverage": "yarn run test:jest --coverage",
     "test:jest:debug": "node --inspect node_modules/.bin/jest --runInBand --watch",
     "test:karma": "yarn run test:karma:watch --single-run",
-    "test:karma:concurrently": "concurrently --names \"coffee,js1,js2\" \"JSPEC_GROUP=coffee yarn test:karma:headless\" \"JSPEC_GROUP=js1 yarn test:karma:headless\" \"JSPEC_GROUP=js2 yarn test:karma:headless\"",
+    "test:karma:concurrently": "DISABLE_HAPPYPACK=1 concurrently --names \"coffee,js1,js2\" \"JSPEC_GROUP=coffee yarn test:karma:headless\" \"JSPEC_GROUP=js1 yarn test:karma:headless\" \"JSPEC_GROUP=js2 yarn test:karma:headless\"",
     "test:karma:headless": "yarn run test:karma --browsers ChromeHeadlessNoSandbox",
     "test:karma:watch": "node --max-old-space-size=4096 ./node_modules/.bin/karma start",
     "test:karma:watch:headless": "yarn run test:karma:watch --browsers ChromeHeadlessNoSandbox",
