@@ -73,9 +73,10 @@ module Canvas
         ].uniq
 
         fallback_keys = [
-          [tree, service, prefix, key].compact.join("/"), # for backcompat only
+          [tree, service, prefix, key].compact.join("/"),
           full_key(key, global: true),
-        ] - keys
+          ["global", tree, service, prefix, key].compact.join("/"),
+        ].uniq - keys
 
         # pre-cache an entire tree
         tree_key = [tree, service, environment].compact.join("/")
