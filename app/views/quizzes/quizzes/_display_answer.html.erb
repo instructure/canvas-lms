@@ -17,6 +17,7 @@
 %>
 
 <%
+  require 'sanitize'
   display_answer ||= nil
   answer = display_answer
   assessment_results ||= false
@@ -169,7 +170,7 @@
     <% if show_comment %>
       <div class="quiz_comment <%= "empty" unless has_answer_comment %>">
         <div class="answer_comment" <%= hidden(true) if hash_get(answer, :comments_html).present? %>><%= comment_get(answer, :comments) %></div>
-        <div class="answer_comment_html"><%= sanitize(hash_get(answer, :comments_html)) %></div>
+        <div class="answer_comment_html"><%= Sanitize.clean(hash_get(answer, :comments_html) || "", CanvasSanitize::SANITIZE).to_s.html_safe %></div>
       </div>
     <% end %>
 
