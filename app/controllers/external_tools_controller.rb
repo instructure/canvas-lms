@@ -29,7 +29,10 @@ class ExternalToolsController < ApplicationController
   skip_before_action :verify_authenticity_token, only: :resource_selection
   include Api::V1::ExternalTools
 
-  REDIS_PREFIX = 'external_tool:sessionless_launch:'
+  REDIS_PREFIX = 'external_tool:sessionless_launch:'.freeze
+  WHITELISTED_QUERY_PARAMS = [
+    :platform
+  ].freeze
 
   # @API List external tools
   # Returns the paginated list of external tools for the current context.
@@ -1089,6 +1092,8 @@ class ExternalToolsController < ApplicationController
       opts[:link_code] = @tool.opaque_identifier_for(options[:assignment].external_tool_tag)
     end
 
+    opts[:overrides] = whitelisted_query_params if whitelisted_query_params.any?
+
     adapter = Lti::LtiOutboundAdapter.new(
       @tool,
       @current_user,
@@ -1177,4 +1182,9 @@ class ExternalToolsController < ApplicationController
     params[:placement] || params[:launch_type] || "#{@context.class.base_class.to_s.downcase}_navigation"
   end
 
+  def whitelisted_query_params
+    @_whitelisted_query_params ||= WHITELISTED_QUERY_PARAMS.each_with_object({}) do |query_param, h|
+      h[query_param] = params[query_param] if params.key?(query_param)
+    end
+  end
 end

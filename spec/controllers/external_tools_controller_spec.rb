@@ -1490,6 +1490,34 @@ describe ExternalToolsController do
       expect(tool_settings["resource_link_id"]).to eq opaque_id(@assignment.external_tool_tag)
     end
 
+    it 'passes whitelisted `platform` query param to lti launch body' do
+      tool = new_valid_tool(@course)
+      assignment_model(:course => @course,
+                       :name => 'tool assignment',
+                       :submission_types => 'external_tool',
+                       :points_possible => 20,
+                       :grading_type => 'points')
+      tag = @assignment.build_external_tool_tag(:url => tool.url)
+      tag.content_type = 'ContextExternalTool'
+      tag.save!
+
+      get :generate_sessionless_launch, params: {
+        course_id: @course.id,
+        launch_type: 'assessment',
+        assignment_id: @assignment.id,
+        platform: 'mobile'
+      }
+      expect(response).to be_successful
+
+      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
+      redis_key = "#{@course.class.name}:#{ExternalToolsController::REDIS_PREFIX}#{verifier}"
+      launch_settings = JSON.parse(Canvas.redis.get(redis_key))
+      tool_settings = launch_settings['tool_settings']
+
+      expect(tool_settings['ext_platform']).to eq 'mobile'
+    end
+
     it "requires context_module_id for module_item launch type" do
       @tool = new_valid_tool(@course)
       @cm = ContextModule.create(context: @course)
