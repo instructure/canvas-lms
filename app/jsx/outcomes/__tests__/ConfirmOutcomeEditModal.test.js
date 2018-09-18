@@ -18,7 +18,7 @@
 import sinon from 'sinon'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { shallow } from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import { shallow } from 'enzyme'
 import { merge } from 'lodash'
 import ConfirmOutcomeEditModal, { showConfirmOutcomeEdit } from '../ConfirmOutcomeEditModal'
 import { ModalBody, ModalFooter } from '../../shared/components/InstuiModal'
@@ -60,7 +60,7 @@ it('renders the scoring method text if scoring method modified', () => {
 it('does not call onConfirm when canceled', () => {
   const onConfirm = jest.fn()
   const modal = shallow(<ConfirmOutcomeEditModal {...defaultProps({ hasUpdateableRubrics: true, onConfirm })} />)
-  modal.find(ModalFooter).shallow().find('#cancel-outcome-edit-modal').simulate('click')
+  modal.find(ModalFooter).find('#cancel-outcome-edit-modal').simulate('click')
   expect(modal.state('show')).toBe(false)
   expect(onConfirm).not.toBeCalled()
 })
