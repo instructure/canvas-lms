@@ -76,7 +76,7 @@ module SIS
 
         raise ImportError, "No section_id given for a section in course #{course_id}" if section_id.blank?
         raise ImportError, "No course_id given for a section #{section_id}" if course_id.blank?
-        raise ImportError, "No name given for section #{section_id} in course #{course_id}" if name.blank?
+        raise ImportError, "No name given for section #{section_id} in course #{course_id}" if name.blank? && status =~ /\Aactive/i
         raise ImportError, "Improper status \"#{status}\" for section #{section_id} in course #{course_id}" unless status =~ /\Aactive|\Adeleted/i
         return if @batch.skip_deletes? && status =~ /deleted/i
 
@@ -90,7 +90,8 @@ module SIS
         section.course = course if course.id == section.course_id
 
         # only update the name on new records, and ones that haven't been changed since the last sis import
-        section.name = name if section.new_record? || !section.stuck_sis_fields.include?(:name)
+        raise ImportError, "No name given for section #{section_id} in course #{course_id}" if name.blank? && section.new_record?
+        section.name = name if section.new_record? || !section.stuck_sis_fields.include?(:name) && name.present?
 
         # update the course id if necessary
         if section.course_id != course.id
