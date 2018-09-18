@@ -75,6 +75,39 @@ describe SIS::CSV::SectionImporter do
     expect(importer.errors).to eq []
   end
 
+  it 'should not require a name when section is being deleted' do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "C001,TC 101,Test Course 101,,,active"
+    )
+    importer = process_csv_data(
+      "section_id,course_id,name,start_date,end_date,status",
+      "section,C001,,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
+    )
+    expect(importer.errors.first.last).to eq "No name given for section section in course C001"
+    process_csv_data_cleanly(
+      "section_id,course_id,name,start_date,end_date,status",
+      "section,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
+    )
+    process_csv_data_cleanly(
+      "section_id,course_id,name,status",
+      "section,C001,,deleted"
+    )
+    expect(CourseSection.where(sis_source_id: 'section').take.workflow_state).to eq 'deleted'
+  end
+
+  it 'should still require a name for new deleted sections' do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "C001,TC 101,Test Course 101,,,active"
+    )
+    importer = process_csv_data(
+      "section_id,course_id,name,status",
+      "sec1,C001,Sec1,deleted"
+    )
+    expect(importer.errors).to eq []
+  end
+
   it 'should create rollback data' do
     batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(
