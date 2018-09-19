@@ -659,6 +659,12 @@ END
       description: -> { I18n.t('If enabled, the option will be presented to have non-scoring rubrics.') },
       applies_to: 'RootAccount',
       state: 'allowed'
+    },
+    'lti_1_3' => {
+      display_name: -> { I18n.t('LTI 1.3 and LTI Advantage')},
+      description: -> { I18n.t('If enabled, access to LTI 1.3 and LTI Advantage will be enabled.') },
+      applies_to: 'RootAccount',
+      state: 'allowed'
     }
   )
 
