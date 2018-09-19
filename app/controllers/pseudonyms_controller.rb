@@ -103,7 +103,7 @@ class PseudonymsController < ApplicationController
       @ccs.each do |cc|
         cc.forgot_password!
       end
-      format.html { redirect_to(login_url) }
+      format.html { redirect_to(canvas_login_url) }
       format.json { render :json => {:requested => true} }
       format.js { render :json => {:requested => true} }
     end
