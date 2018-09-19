@@ -84,7 +84,7 @@
     "react-immutable-proptypes": "^2.1.0",
     "react-lazy-load": "^3.0.13",
     "react-modal": "^3",
-    "react-redux": "4.4.5",
+    "react-redux": "^4.4.9",
     "react-tokeninput": "^2.5.0",
     "redux": "^3.5.2",
     "redux-actions": "0.11.0",
