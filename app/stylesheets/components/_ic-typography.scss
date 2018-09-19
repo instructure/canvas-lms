@@ -385,8 +385,9 @@ input[type=file] {
 ///////==============
 
 // gets rid of ugly border
-iframe#tool_content {
+iframe {
   border: none;
+  width: 100%;
 }
 
 // "ui.dialog you are so dumb. you are really dumb, for real"
