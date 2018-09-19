@@ -605,4 +605,86 @@ describe DiscussionEntry do
       expect(@student.stream_item_instances).to be_empty
     end
   end
+
+  context 'planner items cache' do
+    before(:once) do
+      course_with_student active_all: true
+      @topic = @course.discussion_topics.build(:title => "topic")
+      @topic.save
+      @topic.discussion_topic_participants.create!(user: @student, subscribed: true)
+    end
+
+    it 'should be cleared for top level replies on a todo discussion' do
+      @topic.todo_date = 1.day.from_now
+      @topic.save
+
+      cache_key = @student.cache_key
+      @topic.discussion_entries.build(parent_id: nil).save!
+      @student.reload
+      expect(@student.cache_key).not_to eql(cache_key)
+    end
+
+    it 'should not be cleared on nested replies for non-assignment non-todo discussions' do
+      entry = @topic.discussion_entries.build(parent_id: nil)
+      entry.save!
+
+      sub_entry = @topic.discussion_entries.build(parent_id: entry.id)
+      sub_entry.save!
+
+      @student.reload
+      cache_key = @student.cache_key
+      sub_entry2 = @topic.discussion_entries.build(parent_id: sub_entry.id)
+      sub_entry2.save!
+      @student.reload
+      expect(@student.cache_key).to eql(cache_key)
+    end
+
+    it 'should be cleared on top level and for graded discussions' do
+      assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => topic.title, :due_at => 1.day.from_now)
+      assignment.saved_by = :discussion_topic
+      @topic.assignment = assignment
+      @topic.save
+
+      cache_key = @student.cache_key
+      @topic.discussion_entries.build(parent_id: nil).save!
+      @student.reload
+      expect(@student.cache_key).not_to eql(cache_key)
+    end
+
+    it 'should be cleared on nested replies for graded discussions' do
+      assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => topic.title, :due_at => 1.day.from_now)
+      assignment.saved_by = :discussion_topic
+      @topic.assignment = assignment
+      @topic.save
+
+      entry = @topic.discussion_entries.build(parent_id: nil)
+      entry.save!
+
+      sub_entry1 = @topic.discussion_entries.build(parent_id: entry.id)
+      sub_entry1.save!
+
+      cache_key = @student.cache_key
+      sub_entry2 = @topic.discussion_entries.build(parent_id: sub_entry1.id)
+      sub_entry2.save!
+      @student.reload
+      expect(@student.cache_key).not_to eql(cache_key)
+    end
+
+    it 'should be cleared on nested replies for todo discussions' do
+      @topic.todo_date = 1.day.from_now
+      @topic.save
+
+      entry = @topic.discussion_entries.build(parent_id: nil)
+      entry.save!
+
+      sub_entry1 = @topic.discussion_entries.build(parent_id: entry.id)
+      sub_entry1.save!
+
+      cache_key = @student.cache_key
+      sub_entry2 = @topic.discussion_entries.build(parent_id: sub_entry1.id)
+      sub_entry2.save!
+      @student.reload
+      expect(@student.cache_key).not_to eql(cache_key)
+    end
+  end
 end

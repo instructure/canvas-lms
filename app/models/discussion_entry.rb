@@ -43,6 +43,7 @@ class DiscussionEntry < ActiveRecord::Base
   after_save :update_discussion
   after_save :context_module_action_later
   after_create :create_participants
+  after_create :clear_planner_cache_for_participants
   validates_length_of :message, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :discussion_topic_id
   before_validation :set_depth, :on => :create
@@ -382,6 +383,19 @@ class DiscussionEntry < ActiveRecord::Base
                                                                                          :unread_entry_count => new_count,
                                                                                          :workflow_state => "unread",
                                                                                          :subscribed => self.discussion_topic.subscribed?(self.user))
+        end
+      end
+    end
+  end
+
+  def clear_planner_cache_for_participants
+    # If this is a top level reply we do not need to clear the cache here,
+    # because the creation of this object will also create a stream item which
+    # takes care of clearing the cache
+    self.class.connection.after_transaction_commit do
+      if self.root_entry_id.present?
+        if self.discussion_topic.for_assignment? || self.discussion_topic.todo_date.present?
+          User.where(:id => self.discussion_topic.discussion_topic_participants.select(:user_id)).touch_all
         end
       end
     end
