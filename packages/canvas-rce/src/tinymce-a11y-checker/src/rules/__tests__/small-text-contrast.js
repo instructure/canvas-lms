@@ -12,7 +12,6 @@ describe("test", () => {
     elem.style.fontSize = "10px"
     elem.style.backgroundColor = "#fff"
     elem.style.color = "#fff"
-    elem.textContent = "  "
     expect(rule.test(elem)).toBe(true)
   })
 

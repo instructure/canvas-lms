@@ -12,7 +12,6 @@ describe("test", () => {
     elem.style.fontSize = "30px"
     elem.style.backgroundColor = "#fff"
     elem.style.color = "#fff"
-    elem.textContent = "  "
     expect(rule.test(elem)).toBe(true)
   })
 
@@ -22,7 +21,11 @@ describe("test", () => {
     elem.style.backgroundColor = "#fff"
     elem.style.color = "#fff"
     elem.textContent = "disabled"
-    expect(rule.test(elem, { disableContrastCheck: true })).toBe(true)
+    expect(
+      rule.test(elem, {
+        disableContrastCheck: true
+      })
+    ).toBe(true)
   })
 
   test("returns true if the only content of a text node is a link", () => {
