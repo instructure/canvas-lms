@@ -37,7 +37,7 @@ module Canvas::Migration::ExternalContent
         # retrieve_export(export_data)
         #   return the data that we need to save in the package
         #
-        # send_imported_content(course, imported_content)
+        # send_imported_content(course, content_migration, imported_content)
         #   gives back the translated data for importing to the service
         #   return information needed to verify import is complete
         #
@@ -48,7 +48,7 @@ module Canvas::Migration::ExternalContent
           :begin_export => 2,
           :export_completed? => 1,
           :retrieve_export => 1,
-          :send_imported_content => 2,
+          :send_imported_content => 3,
           :import_completed? => 1
         }
         methods.each do |method_name, arity|

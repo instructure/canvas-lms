@@ -1771,9 +1771,10 @@ describe MasterCourses::MasterMigration do
 
     context "master courses + external migrations" do
       class TestExternalContentService
-        cattr_reader :course, :imported_content
-        def self.send_imported_content(course, imported_content)
+        cattr_reader :course, :migration, :imported_content
+        def self.send_imported_content(course, migration, imported_content)
           @@course = course
+          @@migration = migration
           @@imported_content = imported_content
         end
       end
