@@ -89,7 +89,9 @@ function getProps (column, gradebook, options) {
     onHeaderKeyDown: (event) => {
       gradebook.handleHeaderKeyDown(event, columnId);
     },
-    onMenuDismiss: gradebook.handleColumnHeaderMenuClose,
+    onMenuDismiss() {
+      setTimeout(gradebook.handleColumnHeaderMenuClose)
+    },
     removeGradebookElement: gradebook.keyboardNav.removeGradebookElement,
     reuploadSubmissionsAction: gradebook.getReuploadSubmissionsAction(assignmentId),
     setDefaultGradeAction: gradebook.getSetDefaultGradeAction(assignmentId),

@@ -47,25 +47,22 @@ export default class ColumnHeader extends React.Component {
     }
   }
 
-  bindFlyoutMenu = (ref, savedRef) => {
+  bindFlyoutMenu = (ref, name) => {
     if (ref) {
+      this[name] = ref
       this.props.addGradebookElement(ref);
       ref.addEventListener('keydown', this.handleMenuKeyDown);
-    } else if (savedRef) {
-      this.props.removeGradebookElement(savedRef);
+    } else if (this[name]) {
+      this.props.removeGradebookElement(this[name]);
     }
   }
 
   bindSortByMenuContent = (ref) => {
-    this.bindFlyoutMenu(ref, this.sortByMenuContent);
-    this.sortByMenuContent = ref;
+    this.bindFlyoutMenu(ref, 'sortByMenuContent');
   };
 
   bindOptionsMenuContent = (ref) => {
-    if (ref) {
-      this.optionsMenuContent = ref;
-    }
-    this.bindFlyoutMenu(ref, this.optionsMenuContent);
+    this.bindFlyoutMenu(ref, 'optionsMenuContent');
   };
 
   focusAtStart = () => {
@@ -104,15 +101,7 @@ export default class ColumnHeader extends React.Component {
       newState.skipFocusOnClose = false;
     }
 
-    this.setState(newState, () => {
-      if (typeof callback === 'function') {
-        callback();
-      }
-
-      if (!menuShown) {
-        this.optionsMenuContent = null;
-      }
-    });
+    this.setState(newState, callback);
   };
 
   handleMenuKeyDown = (event) => {

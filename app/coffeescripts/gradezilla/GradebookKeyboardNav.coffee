@@ -70,6 +70,8 @@ define [
         @prevActiveElement.focus()
       else
         @gridSupport.state.setActiveLocation(@prevActiveLocation.region, @prevActiveLocation)
+        # return to the cell, but do not engage the editor
+        # (exit any existing editor)
         @gridSupport.helper.commitCurrentEdit() if @currentColumnType() == 'assignment'
         @gridSupport.helper.focus()
 
