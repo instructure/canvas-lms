@@ -360,6 +360,26 @@ describe Assignment::SpeedGrader do
       end
     end
 
+    it "passes submission id to DocViewer" do
+      course = student_in_course(active_all: true).course
+      assignment = assignment_model(course: course)
+      attachment = attachment_model(
+        context: @student,
+        uploaded_data: stub_png_data,
+        filename: "homework.png"
+      )
+      submission = assignment.submit_homework(@student, attachments: [attachment])
+      expect(Canvadocs).to receive(:enabled?).twice.and_return(true)
+      expect(Canvadocs).to receive(:config).and_return({ a: 1 })
+      expect(Canvadoc).to receive(:mime_types).and_return("image/png")
+
+      json = Assignment::SpeedGrader.new(assignment, @teacher).json
+      sub_json = json[:submissions].first[:submission_history].first[:submission]
+      canvadoc_url = sub_json[:versioned_attachments].first.fetch(:attachment).fetch(:canvadoc_url)
+
+      expect(canvadoc_url.include?("%22submission_id%22:#{submission.id}")).to be true
+    end
+
     it "includes submission late status in each submission history version" do
       json = Assignment::SpeedGrader.new(@assignment, @teacher).json
       json[:submissions].each do |submission|

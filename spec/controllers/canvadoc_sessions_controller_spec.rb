@@ -194,7 +194,9 @@ describe CanvadocSessionsController do
         @submission = submission_model(assignment: @assignment, user: @student)
         @attachment = attachment_model(content_type: 'application/pdf', user: @student)
         @attachment.associate_with(@submission)
+        Canvadoc.create!(attachment: @attachment)
 
+        allow(Attachment).to receive(:find).with(@attachment.global_id).and_return(@attachment)
         user_session(@student)
       end
 
@@ -204,7 +206,8 @@ describe CanvadocSessionsController do
           user_id: @student.global_id,
           type: "canvadoc",
           enable_annotations: true,
-          enrollment_type: 'student'
+          enrollment_type: 'student',
+          submission_id: @submission.id
         }
       end
       let(:hmac) { Canvas::Security.hmac_sha1(blob.to_json) }
