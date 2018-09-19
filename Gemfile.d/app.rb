@@ -46,10 +46,11 @@ gem 'folio-pagination', '0.0.12', require: 'folio/rails'
 
 gem 'addressable', '2.5.1', require: false
 gem "after_transaction_commit", '2.0.0'
-gem "aws-sdk-kinesis", '1.0.0.rc9', require: false
-gem "aws-sdk-s3", '1.0.0.rc13', require: false
-gem "aws-sdk-sns", '1.0.0.rc9', require: false
-gem "aws-sdk-sqs", '1.0.0.rc11', require: false
+gem 'aws-sdk-core', '3.27.0', require: false
+gem "aws-sdk-kinesis", require: false
+gem "aws-sdk-s3", require: false
+gem "aws-sdk-sns", require: false
+gem "aws-sdk-sqs", require: false
 gem 'barby', '0.6.5', require: false
   gem 'rqrcode', '0.10.1', require: false
   gem 'chunky_png', '1.3.8', require: false
