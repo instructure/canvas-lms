@@ -3,14 +3,15 @@ import contrast from "wcag-element-contrast"
 import {
   onlyContainsLink,
   createStyleString,
-  splitStyleAttribute
+  splitStyleAttribute,
+  hasTextNode
 } from "../utils/dom"
 import rgbHex from "../utils/rgb-hex"
 
 export default {
   test: (elem, config = {}) => {
     const disabled = config.disableContrastCheck == true
-    const noText = elem.textContent.replace(/\s/g, "") === ""
+    const noText = !hasTextNode(elem)
 
     if (
       disabled ||

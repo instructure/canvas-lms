@@ -113,3 +113,8 @@ export function createStyleString(styleObj) {
   }
   return styleString
 }
+
+export function hasTextNode(elem) {
+  const nodes = Array.from(elem.childNodes)
+  return nodes.some(x => x.nodeType === Node.TEXT_NODE)
+}
