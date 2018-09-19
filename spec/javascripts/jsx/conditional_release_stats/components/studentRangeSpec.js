@@ -38,10 +38,10 @@ define([
       size: 0,
       students: [
         {
-          user: { name: 'Foo Bar' },
+          user: { name: 'Foo Bar', id: 1 },
         },
         {
-          user: { name: 'Bar Foo' },
+          user: { name: 'Bar Foo', id: 2 },
         },
       ],
     },

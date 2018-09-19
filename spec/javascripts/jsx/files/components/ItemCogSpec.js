@@ -128,11 +128,12 @@ define([
       }
     }
 
-    const itemCogs = ReactDOM.render(<ContainerApp />, $('#fixtures')[0]);
+    const itemCogs = ReactDOM.render(<ContainerApp />, document.getElementById('fixtures'));
     const renderedCogs = TestUtils.scryRenderedComponentsWithType(itemCogs, ItemCog)
     Simulate.click(ReactDOM.findDOMNode(renderedCogs[1].refs.deleteLink));
     equal(document.activeElement, $(ReactDOM.findDOMNode(renderedCogs[0])).find('.al-trigger')[0], 'the cog has focus');
     window.confirm.restore();
+    ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
   });
 
   test('deleting a file returns focus to the name column header when there are no items left', () => {
@@ -154,11 +155,12 @@ define([
       }
     }
 
-    const container = ReactDOM.render(<ContainerApp />, $('#fixtures')[0]);
+    const container = ReactDOM.render(<ContainerApp />, document.getElementById('fixtures'));
     const renderedCog = TestUtils.findRenderedComponentWithType(container, ItemCog);
     Simulate.click(ReactDOM.findDOMNode(renderedCog.refs.deleteLink));
     equal(document.activeElement, $('.someFakeLink')[0], 'the name column has focus');
     window.confirm.restore();
+    ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
   });
 
 });

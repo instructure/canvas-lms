@@ -28,7 +28,7 @@ QUnit.module('StudentContextTray/Rating', () => {
   QUnit.module('formatValueText', hooks => {
     hooks.beforeEach(() => {
       subject = TestUtils.renderIntoDocument(
-        <Rating metric={{level: 1}} />
+        <Rating label="whatever" metric={{level: 1}} />
       )
     })
 

@@ -123,6 +123,7 @@ test('clicking message users button opens message students modal', () => {
   const messageModal = document.querySelector('#message_participants_form')
 
   ok(messageModal)
+  ReactDOM.unmountComponentAtNode(container)
   $(".ui-dialog").remove()
 })
 
