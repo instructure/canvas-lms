@@ -290,29 +290,6 @@ describe "student planner" do
     end
   end
 
-  context "Peer Reviews" do
-    before :once do
-      @reviewee = User.create!(name: 'Student 2')
-      @course.enroll_student(@reviewee).accept!
-      @assignment = @course.assignments.create({
-                                                 name: 'Peer Review Assignment',
-                                                 due_at: 1.day.from_now,
-                                                 submission_types: 'online_text_entry'
-                                               })
-      submission = @assignment.submit_homework(@reviewee, body: "review this")
-      @peer_review = AssessmentRequest.create!({
-                                                user: @reviewee,
-                                                asset: submission,
-                                                assessor_asset: @student1,
-                                                assessor: @student1
-                                              })
-    end
-
-    it "shows and navigates to peer review submissions from the student planner" do
-      skip("unskip with ADMIN-1306")
-    end
-  end
-
   context "Create To Do Sidebar" do
     before :each do
       user_session(@student1)

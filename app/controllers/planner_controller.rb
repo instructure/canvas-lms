@@ -168,8 +168,7 @@ class PlannerController < ApplicationController
                    planner_note_collection,
                    page_collection,
                    ungraded_discussion_collection,
-                   calendar_events_collection,
-                   peer_reviews_collection]
+                   calendar_events_collection]
     BookmarkedCollection.merge(*collections)
   end
 
@@ -271,16 +270,12 @@ class PlannerController < ApplicationController
   end
 
   def calendar_events_collection
-    item_collection('calendar_events', @current_user.calendar_events_for_contexts(@context_codes, start_at: start_date,
+    context_codes = @course_ids.map{|id| "course_#{id}"} || []
+    context_codes += @group_ids.map{|id| "group_#{id}"}
+    context_codes += @user_ids.map{|id| "user_#{id}"}
+    item_collection('calendar_events', @current_user.calendar_events_for_contexts(context_codes, start_at: start_date,
       end_at: end_date),
       CalendarEvent, [:start_at, :created_at], :id)
-  end
-
-  def peer_reviews_collection
-    item_collection('peer_reviews',
-      @current_user.submissions_needing_peer_review(default_opts),
-      AssessmentRequest, [{submission: {assignment: :peer_reviews_due_at}},
-                          {submission: :cached_due_date}, :created_at], :id)
   end
 
   def item_collection(label, scope, base_model, *order_by)
@@ -320,9 +315,6 @@ class PlannerController < ApplicationController
       @group_ids = @current_user.group_ids_for_todo_lists(default_opts)
       @user_ids = [@current_user.id]
     end
-    @context_codes = @course_ids.map{|id| "course_#{id}"} || []
-    @context_codes += @group_ids.map{|id| "group_#{id}"}
-    @context_codes += @user_ids.map{|id| "user_#{id}"}
   end
 
   def contexts_cache_key

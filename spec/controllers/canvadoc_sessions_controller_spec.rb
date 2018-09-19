@@ -194,7 +194,9 @@ describe CanvadocSessionsController do
         @submission = submission_model(assignment: @assignment, user: @student)
         @attachment = attachment_model(content_type: 'application/pdf', user: @student)
         @attachment.associate_with(@submission)
+        Canvadoc.create!(attachment: @attachment)
 
+        allow(Attachment).to receive(:find).with(@attachment.global_id).and_return(@attachment)
         user_session(@student)
       end
 
@@ -204,7 +206,8 @@ describe CanvadocSessionsController do
           user_id: @student.global_id,
           type: "canvadoc",
           enable_annotations: true,
-          enrollment_type: 'student'
+          enrollment_type: 'student',
+          submission_id: @submission.id
         }
       end
       let(:hmac) { Canvas::Security.hmac_sha1(blob.to_json) }
@@ -225,6 +228,13 @@ describe CanvadocSessionsController do
         # working with here, so unfortunately we can't mock them specifically.
         expect_any_instance_of(Canvadoc).to receive(:session_url).
           with(hash_including(enable_annotations: true))
+
+        get :show, params: {blob: blob.to_json, hmac: hmac}
+      end
+
+      it "passes user information based on the submission (if past submission / missing attachment assocation)" do
+        @submission.attachment_associations.destroy_all
+        expect(@attachment.canvadoc).to receive(:session_url).with(hash_including(user_id: @student.global_id.to_s))
 
         get :show, params: {blob: blob.to_json, hmac: hmac}
       end

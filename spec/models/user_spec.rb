@@ -1482,8 +1482,14 @@ describe User do
       end
 
       it "should include cross shard favorite courses" do
-        @user.favorites.by("Course").where("id % 2 = 0").destroy_all
-        expect(@user.menu_courses.size).to eql(@courses.length / 2)
+        expect(@user.menu_courses).to match_array(@courses)
+      end
+
+      it 'works for shadow records' do
+        @shard1.activate do
+          @shadow = User.create!(:id => @user.global_id)
+        end
+        expect(@shadow.favorites.exists?).to be_truthy
       end
     end
   end

@@ -169,19 +169,6 @@ describe PlannerController do
         expect(page_json['planner_override']['plannable_type']).to eq 'wiki_page'
       end
 
-      it "should show peer review tasks for the user" do
-        @current_user = @student
-        @reviewee = course_with_student(course: @course, active_all: true).user
-        assignment_model(course: @course, peer_reviews: true, only_visible_to_overrides: true)
-        @reviewee_submission = submission_model(assignment: @assignment, user: @reviewee)
-        @assessment_request = @assignment.assign_peer_review(@current_user, @reviewee)
-        get :index
-        response_json = json_parse(response.body)
-        peer_review = response_json.detect { |i| i["plannable_type"] == 'assessment_request' }
-        expect(peer_review["plannable"]["id"]).to eq @assessment_request.id
-        expect(peer_review["plannable"]["assignment"]["id"]).to eq @assignment.id
-      end
-
       context "include_concluded" do
         before :once do
           @u = User.create!
