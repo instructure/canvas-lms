@@ -133,7 +133,7 @@ module Context
 
     # if we're only asking for a subset but the full set is cached return that, but filtered with just what we want
     if only_check.present? && (cache_with_everything = Rails.cache.read(['active_record_types', nil, self].cache_key))
-      return @active_record_types[only_check] = cache_with_everything.select { |k,_v| opts[:only_check].include?(k) }
+      return @active_record_types[only_check] = cache_with_everything.select { |k,_v| only_check.include?(k) }
     end
 
     # otherwise compute it and store it in the cache
