@@ -93,7 +93,11 @@ module CC
         c_node.criterion_use_range criterion[:criterion_use_range] if criterion[:criterion_use_range].present?
         if criterion[:learning_outcome_id].present?
           if lo = @course.available_outcome(criterion[:learning_outcome_id])
-            c_node.learning_outcome_identifierref create_key(lo)
+            if lo.context_type == "Course" && lo.context_id == @course.id
+              c_node.learning_outcome_identifierref create_key(lo)
+            else
+              c_node.learning_outcome_external_identifier lo.id
+            end
           end
         end
 

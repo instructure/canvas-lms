@@ -545,6 +545,7 @@
                           <xs:element name="mastery_points" type="optional_float" minOccurs="0"/>
                           <xs:element name="ignore_for_scoring" type="xs:boolean" minOccurs="0"/>
                           <xs:element name="learning_outcome_identifierref" type="xs:string" minOccurs="0"/>
+                          <xs:element name="learning_outcome_external_identifier" type="xs:string" minOccurs="0"/>
                           <xs:element name="criterion_use_range" type="xs:boolean" minOccurs="0"/>
                           <xs:element name="ratings" type="ratingsType" minOccurs="0"/>
                         </xs:all>
