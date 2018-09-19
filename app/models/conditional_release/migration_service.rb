@@ -67,7 +67,7 @@ module ConditionalRelease
         end
       end
 
-      def send_imported_content(course, imported_content)
+      def send_imported_content(course, content_migration, imported_content)
         data = {:file => StringIO.new(imported_content.to_json)}
         response = CanvasHttp.post(ConditionalRelease::Service.content_imports_url, headers_for(course), form_data: data, multipart: true)
         if response.code =~ /^2/
