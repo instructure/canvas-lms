@@ -113,7 +113,7 @@ sv-x-k12:
     tab_faculty_journal: Lärarkårsjournal
     tab_grading_standards: Bedömningsschema
     tab_jobs: Jobb
-    tab_outcomes: Resultat
+    tab_outcomes: Lärandemål
     tab_permissions: Behörigheter
     tab_plugins: Tillägg
     tab_question_banks: Frågebanker
@@ -793,7 +793,7 @@ sv-x-k12:
           order: 
             label: Order
           outcome: 
-            radio: Resultat
+            radio: Lärandemål
           user: 
             radio: Användare
     ph_student_grades_csv_parameters: 
@@ -1413,7 +1413,7 @@ sv-x-k12:
   add_tas_to_the_course_2aac6e02: "Lägg till lärarassistenter till kursen"
   add_theme_32fa3d50: "Lägg till tema"
   add_to_course_481a51c4: "Lägg till kurs..."
-  add_to_student_to_do_58e66b4b: "Lägg till elever vad-göra"
+  add_to_student_to_do_58e66b4b: "Lägg till i elevers \"Att göra\"-lista"
   add_trigger_bc1a0fae: "Lägg till Trigger"
   add_user_e73e8e50: "Lägg till användare"
   add_user_s_by_b2549f89: "Lägg till användare efter"
@@ -1958,7 +1958,7 @@ sv-x-k12:
   anonymous_grading_cannot_be_enabled_for_group_assi_faa33494: "Anonym bedömning kan inte aktiveras för gruppuppgifter"
   anonymous_grading_ccb5045c: "Anonymt bedömning"
   anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonym bedömning döljer elevnamnet i SpeedGrader™"
-  anonymous_instructor_annotations_2b6c822: "Anonyma instruktörs annoteringar"
+  anonymous_instructor_annotations_2b6c822: "Anonyma lärarannoteringar"
   anonymous_mode_on_2dd9b94a: "Anonymt läge På"
   anonymous_mode_on_feb53729: "Anonymt läge På:"
   anonymous_moderated_assignments_cannot_be_unmuted__8f7b09e7: "Anonymt modererade uppgifter kan inte tystas förrän bedömningar postats"
@@ -3590,7 +3590,7 @@ sv-x-k12:
   cannot_create_an_appointment_group_for_a_concluded_f4da02e3: "kan inte skapa en mötesgrupp för en avslutad kurs"
   cannot_delete_a_file_that_has_been_submitted_as_pa_fda24c4: "Kan inte radera en fil som har lämnats in som en del av ett arbete"
   cannot_delete_an_override_with_a_due_date_within_a_fa94ca3b: "Kan inte radera ett inlämningsdatum med ett datum i en stängd bedömningsperiod"
-  cannot_give_outcomes_extra_credit_696208f0: "Kan inte ge resultat extra poäng"
+  cannot_give_outcomes_extra_credit_696208f0: "Kan inte ge lärandemål extra poäng"
   cannot_grade_at_this_time_489744b0: "Kan inte bedömas den här gången"
   cannot_have_a_blueprint_course_with_students_248e3e76: "Kan inte ha blueprint kurser med elever"
   cannot_modify_outcome_from_another_context_changes_a80561a4: "Kan inte ändra fält för resultat från ett annat sammanhang: %{changes}; resultatet måste ändras i %{context}"
@@ -3782,7 +3782,7 @@ sv-x-k12:
   close_move_tray_8609e988: "Stäng utragsbara facket"
   close_sidebar_10b0fbb4: "Stäng sidofältet"
   close_submission_tray_c4988fa8: "Stäng inlämningsfack"
-  closed_for_comments_e395b42f: "Stängd för kommentarer"
+  closed_for_comments_e395b42f: "Stängda för kommentarer"
   closes_5c6b4367: "Stänger:"
   code_is_case_sensitive_d8175cad: "Koden är skiftlägeskänslig"
   cog_icon_69bdffd5: Kugghjuls-ikon
@@ -5672,7 +5672,7 @@ sv-x-k12:
     media: Media
     messages: Meddelanden
     modules: Moduler
-    outcomes: Resultat
+    outcomes: Lärandemål
     people: Personer
     plugins: Tillägg
     prior_users: "Tidigare användare"
@@ -5804,9 +5804,9 @@ sv-x-k12:
     show_more_link: 
       show_less: "Visa mindre"
       show_more: "Visa mer"
-  dashboard_7f1dbf71: Meny
+  dashboard_7f1dbf71: Översikt
   dashboard_options_b240ed5a: "Instrumentbräda alternativ"
-  dashboard_view_d7d85969: "Panel vy"
+  dashboard_view_d7d85969: "Översikt vy"
   data_exports: "data exporter"
   data_point_over_time_8d0a54cc: "%{data_point} Över tid"
   data_set_identifier_data_set_id_c228b5df: "Datamängdsidentifierare: %{data_set_id}"
@@ -5961,13 +5961,13 @@ sv-x-k12:
   default_email_9efb7fbd: "Standard e-post"
   default_grade_cannot_be_set_to_ex_723caa59: "Förinställd bedömning kan inte ställas in som %{ex}"
   default_grading_scheme_894a0eb: "Förinställt bedömningsschema"
-  default_order_8c409051: "Standard beställning"
+  default_order_8c409051: "Förvald ordning"
   default_question_name: Fråga
   default_question_text: Frågetext
   default_sis_sync_for_assignments_quizzes_grade_dis_3b2b4878: "Standard SIS synkronisering för uppgifter, quiz, bedömningsdiskussioner"
   default_template_f2a759ed: Standardmall
   default_templates_are_used_as_starting_points_for__f06f9e33: "Standardmallarna används som utgångspunkter för nya teman och kan inte tas bort."
-  default_view_for_dashboard_ea91b60f: "Standardvisning för menyn"
+  default_view_for_dashboard_ea91b60f: "Standardvisning för översikt"
   define_general_settings_for_locked_objects_in_this_20da2981: "Definiera allmänna inställningar för låsta objekt i den här kursen."
   define_settings_by_type_for_locked_objects_in_this_676197bf: "Definiera inställningar efter typ för låsta objekt i den här kursen."
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Definiera texten för att föregå/eftergå rullgardningsmenyn och bygg en samling möjliga svar."
@@ -6769,7 +6769,7 @@ sv-x-k12:
   enabled_links_be110215: "Aktivera länkar"
   enabled_web_services_f620b2be: "Aktivera webbtjänster"
   encourage_class_participation_4e069479: "Uppmuntra klassens deltagande"
-  encrypted_sourcedids_for_basic_outcomes_87fa11ea: "Krypterade Sourcedids för grundläggande resultat"
+  encrypted_sourcedids_for_basic_outcomes_87fa11ea: "Krypterade Sourcedids för grundläggande lärandemål"
   end_course_set_up_tutorial_dialog_5b812ec6: "Slutkurs inställning handledningsdialog"
   end_course_set_up_tutorial_f358b85d: "Slutkurs ställ in handledning"
   end_date_cannot_be_before_start_date_eb62ed6d: "Slutdatum kan inte vara innan startdatumet"
@@ -7303,7 +7303,7 @@ sv-x-k12:
   failed_to_load_external_feeds_7ac8411d: "Misslyckades med att ladda externa flöden"
   failed_to_load_recent_activity_d3e5adeb: "Det gick inte att ladda ner senaste aktivitet"
   failed_to_log_in_7ceec561: "Misslyckades att logga in"
-  failed_to_save_dashboard_selection_32e71c72: "Misslyckades med att spara meny-alternativet"
+  failed_to_save_dashboard_selection_32e71c72: "Misslyckades med att spara översikt-alternativet"
   failed_to_save_please_try_again_later_bb7070fb: "Misslyckades att spara, vänligen försök igen senare"
   failed_to_submit_draft_comment_1de83451: "Kunde inte skicka in utkast kommentar"
   failed_to_update_discussion_23cc229a: "Misslyckades med att uppdatera diskussionen"
@@ -7741,8 +7741,8 @@ sv-x-k12:
     grades_filename: Bedömningar
   gradebook_export_failed_reason_2b0f6c53: "Bedömningsöversikt export misslyckades: %{reason}"
   gradebook_export_started_723461b9: "Bedömningsöversikt export påbörjades"
-  gradebook_history_a3e8e0b4: Bedömningsöversiktshistorik
-  gradebook_history_b03f8524: Bedömningsöversiktshistorik...
+  gradebook_history_a3e8e0b4: "Historik för bedömningar"
+  gradebook_history_b03f8524: "Historik för bedömningar..."
   gradebook_individual_view_8846598e: "Bedömningsöversikt: Individuell vy"
   gradebook_settings_b45c6df9: Bedömningsöversiktsinställningar
   gradebook_speedgrader_66cb7a6a: "Bedömningsöversikt, SpeedGrader"
@@ -7815,7 +7815,7 @@ sv-x-k12:
         click_to_view: "klicka för att visa"
         download: "Ladda ner %{attachment}"
       media_comment: "Det här är en mediakommentar,"
-      page_title: "Omdöme för %{student}"
+      page_title: "Bedömningar för %{student}"
       print_grades: "Skriv ut"
       score_details: Resultatdetaljer
       see_vericite_results: "Se VeriCite resultat"
@@ -7931,7 +7931,7 @@ sv-x-k12:
   grades_are_now_showing_what_if_scores_711a8be2: "Bedömningarna visar nu \"Ifall-att\" resultat"
   grades_cannot_be_modified_from_this_page_as_they_h_af66cd9f: "Bedömningar kan inte ändras från denna sida eftersom de redan har postats."
   grades_edit_773dfc24: "Bedömningar - redigera"
-  grades_for_student_aff00ba: "Omdöme för %{student}"
+  grades_for_student_aff00ba: "Bedömningar för %{student}"
   grades_for_this_assignment_are_now_visible_to_stud_623efda0: "Bedömningar för denna uppgift kan nu ses av elever."
   grades_moderate_317fce84: "Bedömningar - moderera"
   grades_posted_c274d9f8: "Bedömningar postade"
@@ -8564,10 +8564,10 @@ sv-x-k12:
   images_documents_and_more_dccb362f: "Bilder, dokument, och mer"
   immediately_c128ede6: Omedelbart
   import_1b31507: Importera
-  import_a_set_of_outcomes_6b782192: "Importera en uppsättning av resultat"
+  import_a_set_of_outcomes_6b782192: "Importera en uppsättning av lärandemål"
   import_content_b2fd6620: "Importera innehåll"
   import_learning_outcomes_36d28a2b: "Importera läranderesultat"
-  import_outcomes_7dda186b: "Importera resultat"
+  import_outcomes_7dda186b: "Importera lärandemål"
   import_sis_data_428cc803: "Importera SIS data"
   import_tutorial_tray_8b92e956: "Importera handledning"
   important_note_educational_institutions_have_an_ob_c9350304: "*Observera: Utbildningsinstitut bör göra sitt material så lättillgängligt som möjligt. Instructure rekommenderar minst ett 3:1 förhållande, text-till-bakgrund proportion för att göra er text läsbar. Testa dina kontrast proportioner enkelt med **WebAIM Color Contrast Checker***."
@@ -8599,7 +8599,7 @@ sv-x-k12:
       truncated_wiki_title: "Den följande wikisidans titel kapades: %{title}"
   importing_course_content_into_the_same_course_will_b09c69e: "Import av kursinnehållet in i samma kurs kommer att duplicera innehållet första gången och skriva över dubbletterna om det upprepas."
   importing_name_8f2b131d: "Importerar \"%{name}\""
-  importing_outcomes_e62a0375: "importera resultat"
+  importing_outcomes_e62a0375: "importera lärandemål"
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "För att slutföra processen kommer du bli omdirigerad till en inloggningssida där du måste logga in med ditt underkontos-inloggningsuppgifter."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "För att importera en stor mängd resultat på en gång, eller för att uppdatera dina befintliga resultat, vänligen *följ CSV-formatet*."
   in_progress_9d1ce8b9: Pågår
@@ -8879,7 +8879,7 @@ sv-x-k12:
   last_enrollment_activity_10fe15ba: "Senaste registreringsaktivitet"
   last_export_899a04c5: "Senaste export:"
   last_first_name_95a078f5: "Efter, Förnamn"
-  last_item_79583712: "Sista föremålet:"
+  last_item_79583712: "Sista objektet:"
   last_length_graded_items_6db7374e: "Senaste %{length} bedömda objekt"
   last_login_54565109: "Senaste inloggning"
   last_login_b7bc0479: "Senaste inloggning:"
@@ -8946,8 +8946,8 @@ sv-x-k12:
   learning_outcome_points_possible_628a9d55: "inlärningsresultat poäng möjliga"
   learning_outcome_rating_8143e88c: "inlärningsresultat betyg"
   learning_outcome_rating_points_c453bb8a: "betygsättning för inlärningspoäng"
-  learning_outcomes_add_edit_delete_b686457a: "Läranderesultat - lägg till / redigera / radera"
-  learning_outcomes_import_eca3a09c: "Läranderesultat - importera"
+  learning_outcomes_add_edit_delete_b686457a: "Lärandemål - lägg till / redigera / radera"
+  learning_outcomes_import_eca3a09c: "Lärandemål - importera"
   leave_5e852989: Lämna
   leave_a_comment_7991725b: "Lämna en kommentar"
   leave_group_group_name_6847c632: "Lämna gruppen %{group_name}"
@@ -11824,7 +11824,7 @@ sv-x-k12:
   outcome_path_mastery_points: "%{path} Måluppfyllelse-poäng"
   outcome_path_result: "%{path} resultat"
   outcome_results: 
-    outcomes_filename: Resultat
+    outcomes_filename: Lärandemål
   outcome_results_23a0a117: "Lärandemål resultat"
   outcome_results_title: "Lärandemål resultat"
   outcome_score_141cf00a: resultat
@@ -11952,12 +11952,12 @@ sv-x-k12:
         outcome: Lärandemål
   outcomes_and_rubrics_account_course_68d0bf1d: "Poäng och rubriker (konto/kurs)"
   outcomes_and_rubrics_f893d141: "Poäng och rubriker"
-  outcomes_are_created_here_to_track_mastery_in_a_co_2f487549: "Resultat skapas här för att spåra bemästring i en kurs. För att komma igång, se menyraden längst upp. Klicka på knappen för nytt resultat för att skapa ett nytt resultat, eller knappen för ny grupp för att skapa en ny grupp för att organisera dina resultat. Hitta-knappen tillåter dig att använda resultat som har skapats av din stat eller institution. När du skapar och använder resultat kan du använda panelen till vänster för att navigera genom dina resultat. Du kan dra och släppa resultat mellan de olika nivåerna för att skapa struktur."
-  outcomes_csv_format_9005acfb: "Resultat CSV-format"
-  outcomes_d1b18d33: Resultat
-  outcomes_import_completed_baff5cb0: "Resultat import slutförd"
-  outcomes_import_failed_77efcdf4: "Resultat import misslyckades"
-  outcomes_report_8887bd49: "Utfalls rapport"
+  outcomes_are_created_here_to_track_mastery_in_a_co_2f487549: "Lärandemål skapas här för att spåra måluppfyllelse i en kurs. För att komma igång, se menyraden längst upp. Klicka på knappen + Lärandemål för att skapa ett nytt lärandemål, eller knappen för ny grupp för att skapa en ny grupp för att organisera dina lärandemål. Hitta-knappen tillåter dig att använda lärandemål som har skapats av din skola eller organisation. När du skapar och använder lärandemål kan du använda panelen till vänster för att navigera genom dina dess. Du kan dra och släppa mellan de olika nivåerna för att skapa struktur."
+  outcomes_csv_format_9005acfb: "Lärandemål CSV-format"
+  outcomes_d1b18d33: Lärandemål
+  outcomes_import_completed_baff5cb0: "Lärandemål import slutförd"
+  outcomes_import_failed_77efcdf4: "Lärandemål import misslyckades"
+  outcomes_report_8887bd49: "Lärandemål rapport"
   over_time_bee1a733: "över tid"
   overrides: 
     everyone: Alla
@@ -12090,7 +12090,7 @@ sv-x-k12:
   pin_of_discussion_title_failed_6c2c32a5: "Fäst diskussion %{title} misslyckades"
   pin_of_discussion_title_succeeded_c7d59580: "Fäst diskussion %{title} lyckades"
   pink_68ad45cb: Rosa
-  pinned_discussions_a55c0cea: "Fästa diskussioner"
+  pinned_discussions_a55c0cea: "Fastnålade diskussioner"
   place_b128fa94: Plats
   place_section_before_5b45714e: "Placera ””%{section}” före:"
   place_title_2c183274: "Placera \"%{title}\""
@@ -15288,7 +15288,7 @@ sv-x-k12:
       start_a_new_course: "Starta en ny kurs"
     new_nav_header: 
       links: 
-        dashboard: Meny
+        dashboard: Översikt
         skip_to_content: "Hoppa över till innehåll"
     no_recent_activity: 
       empty_stream_message: "Du har inga meddelanden att visa i din ström. När du börjar delta i kurser kommer du märka att den här strömmen börjar fyllas med meddelanden från diskussioner, bedömningsuppdateringar, privata meddelanden mellan dig och andra användare, osv."
@@ -16203,7 +16203,7 @@ sv-x-k12:
     home: Hem
     modules: Moduler
     observees: Observerar
-    outcomes: Resultat
+    outcomes: Lärandemål
     pages: Sidor
     people: Personer
     quizzes: Quizzes
@@ -16412,7 +16412,7 @@ sv-x-k12:
   there_are_no_announcements_for_this_course_5ee649c3: "Det finns inga meddelanden för den här kursen"
   there_are_no_available_signups_for_this_course_26b05c56: "Det finns inte tillgängliga registreringar för denna kurs."
   there_are_no_discussions_to_show_in_this_section_e8f04ebd: "Det finns inga diskussioner att visa i det här avsnittet"
-  there_are_no_outcomes_in_the_course_1d36d9c6: "Det finns inga resultat i kursen."
+  there_are_no_outcomes_in_the_course_1d36d9c6: "Det finns inga lärandemål i kursen."
   there_are_no_unsaved_changes_9276e87c: "Det finns inga osparade ändringar"
   there_are_no_unsynced_changes_4e8f0838: "Det finns inga synkroniserade ändringar"
   there_is_currently_1_available_grader_758e4a21: "Det finns för närvarande 1 tillgänglig bedömare"
@@ -16561,7 +16561,7 @@ sv-x-k12:
   this_quiz_needs_review_50e014e: "Detta Quiz behöver bedömas"
   this_rating_is_selected_ca68fce6: "Denna bedömning har valts."
   this_recorder_uses_flash_as_a_result_you_may_find__427d2ddb: "Denna inspelaren använder Flash. Därför kan det vara enklare att föra din inspelning på din maskin och använda mediauppladdaren för att ladda upp den."
-  this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "Denna rapport visar alla läranderesultat som finns inom detta konto. Den resulterande csv-filen kommer att ha en rad per utfall, och kommer att visa detaljerna för alla associerade attribut med varje utfall."
+  this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "Denna rapport visar alla lärandemål som finns inom detta konto. Den resulterande csv-filen kommer att ha en rad per utfall, och kommer att visa detaljerna för alla associerade attribut med varje utfall."
   this_report_shows_all_the_courses_for_a_given_term_3cdc11e5: "Den här rapporten visar alla kurser under en given termin. Den resulterade csv-filen kommer att ha en rad per kurs och kommer att visa kurs-id, kurs sis-id, kortnamn för kursen, kursnamn, konto-id, sis-id för kontot, kontonamn, använt utrymme i MB, samt summa av alla filer i MB. Utrymmet som används reflekterar alla filer som använder kursens kvot. Summan av alla filer i kursen är summan av alla filer som finns i kursen oavsett vilken påverkan det har på kursens kvot."
   this_report_shows_grading_period_grades_and_overal_a86346a: "Den här rapporten visar bedömningsperioder (och kursbedömningar) för varje elev som är inskriven i en given termin. Den resulterade csv-filen kommer att ha en rad per inskrivning."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Denna sample-sidan inkluderar vanliga UI element i Canvas för att hjälpa dig bygga ditt eget märke. När du börjar ändra färg-värden och bilder i den vänstra menyn, kommer du se en *Förhandsvisa Dina Ändringar* -knapp. Klicka på den för att uppdatera sidan och se hur dina ändringar ser ut."
@@ -16900,7 +16900,7 @@ sv-x-k12:
   to_do_date_ddfb582c: "Att göra-datum:"
   to_do_item_d76ecb78: "Att göra-objekt"
   to_do_items_loading_d1cdfcd5: "Atta göra föremål laddar"
-  to_do_list_dashboard_d741f64e: "”To Do”-lista för panel"
+  to_do_list_dashboard_d741f64e: "”To Do”-lista för Översikt"
   to_do_time_a7e17623: "Att göra-tid"
   to_edit_a_grade_or_add_comments_in_speedgrader_or__ee4a36e: "Om du vill redigera en bedömning eller lägga till kommentarer i SpeedGrader eller i bedömningsöversikten, måste även Bedömningar – redigera vara aktiverad."
   to_edit_a_student_s_section_users_add_remove_stude_1f188d80: |-
@@ -17038,7 +17038,7 @@ sv-x-k12:
   toggle_alignment_details_for_title_944f605: "Växla justeringsinformation för %{title}"
   toggle_course_card_color_overlays_b5b8137a: "Växla färgöverlagringar för kurskort"
   toggle_editing_answer_text_as_html_9a93fe6: "Starta redigering av svarstext som HTML"
-  toggle_outcomes_for_title_6994b198: "Växla resultat för %{title}"
+  toggle_outcomes_for_title_6994b198: "Växla lärandemål för %{title}"
   toggle_select_course_name_310fdee4: "Toogle välj kurs %{name}"
   toggle_title_grading_period_visibility_462b2136: "Växla %{title} bedömningsperiods synlighet"
   tolerance_value_9e96573c: Toleransvärde
@@ -17240,7 +17240,7 @@ sv-x-k12:
   upload_gradebook_386a46c8: "Ladda upp bedömningsöversikt"
   upload_media_ce31135a: "Ladda upp media"
   upload_successful_ca47465f: "Laddades upp"
-  upload_your_outcomes_bceeadbe: "Ladda upp dina resultat!"
+  upload_your_outcomes_bceeadbe: "Ladda upp dina lärandemål!"
   upper_limit_of_range_c454a8f2: "Räckviddens övre gräns"
   upper_lower_56cad16c: "%{upper} - %{lower}"
   uri_redirect_uri_d4aad2b9: "URI: %{redirect_uri}"
@@ -17714,7 +17714,7 @@ sv-x-k12:
   view_file_8a1c62e5: "Visa fil"
   view_gradebook_history_a9272918: "Visa historik för bedömningsöversikt"
   view_grades_8d3bae6c: "Visa bedömningar"
-  view_grades_for_name_45aeb2f2: "Visa omdöme för %{name}"
+  view_grades_for_name_45aeb2f2: "Visa bedömningar för %{name}"
   view_login_ids_for_users_142bbe7a: "Visa inloggnings-id:er för användare"
   view_longer_description_6b762087: "visa längre beskrivning"
   view_name_app_62a2ad8e: "Visa %{name} appen"
@@ -18140,7 +18140,7 @@ sv-x-k12:
   your_message_has_been_sent_thank_you_e0284316: "Ditt meddelande har skickats. Tack!"
   your_message_was_sent_977f6583: "Ditt meddelande har skickats!"
   your_name_7665e1d8: "Ditt namn"
-  your_outcomes_were_successfully_imported_c5de884: "Dina resultat importerades framgångsrikt."
+  your_outcomes_were_successfully_imported_c5de884: "Dina lärandemål importerades framgångsrikt."
   your_password_has_been_changed_df0e72aa: "Ditt lösenord har ändrats."
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Din profilbild kunde inte uppdateras. Det kan vara så att du uppnått din uppdateringsgräns."
   your_score_a1fc2fcf: "Ditt resultat"
