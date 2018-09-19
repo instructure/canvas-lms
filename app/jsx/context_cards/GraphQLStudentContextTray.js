@@ -19,23 +19,9 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import React from 'react'
-import ApolloClient from "apollo-boost";
-import gql from "graphql-tag";
-import {ApolloProvider, Query} from "react-apollo";
-import StudentContextTray from '../context_cards/StudentContextTray'
+import StudentContextTray from './StudentContextTray'
+import {client, ApolloProvider, Query, gql} from '../canvas-apollo'
 
-const client = new ApolloClient({
-  uri: '/api/graphql',
-  request: operation => {
-    operation.setContext({
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        'GraphQL-Metrics': true,
-        'X-CSRF-Token': $.cookie('_csrf_token')
-      }
-    })
-  }
-})
 
 const SCC_QUERY = gql`
   query StudentContextCard($courseId: ID!, $studentId: ID!) {
