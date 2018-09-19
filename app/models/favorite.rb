@@ -20,4 +20,10 @@ class Favorite < ActiveRecord::Base
   belongs_to :user
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Group'].freeze
   scope :by, lambda { |type| where(:context_type => type) }
+
+  after_save :touch_user
+
+  def touch_user
+    self.class.connection.after_transaction_commit { user.touch }
+  end
 end

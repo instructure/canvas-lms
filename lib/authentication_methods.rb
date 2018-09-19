@@ -156,6 +156,7 @@ module AuthenticationMethods
         @current_pseudonym = Pseudonym.where(id: @policy_pseudonym_id).first
       elsif (@pseudonym_session = PseudonymSession.with_scope(find_options: Pseudonym.eager_load(:user)) { PseudonymSession.find })
         @current_pseudonym = @pseudonym_session.record
+        @current_pseudonym.user.reload if @current_pseudonym.shard != @current_pseudonym.user.shard
 
         # if the session was created before the last time the user explicitly
         # logged out (of any session for any of their pseudonyms), invalidate
