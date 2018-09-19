@@ -118,7 +118,7 @@ it('renders completed items when the facade is clicked', () => {
     <Grouping {...props} />
   );
 
-  wrapper.instance().handleFacadeClick();
+  wrapper.find('ToggleDetails button').simulate('click')
   expect(wrapper.find('Animatable(ResponsivePlannerItem)')).toHaveLength(2);
 });
 

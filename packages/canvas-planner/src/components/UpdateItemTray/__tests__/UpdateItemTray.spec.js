@@ -73,7 +73,7 @@ it('shows title inputs', () => {
   expect(wrapper.find('TextInput')).toHaveLength(2);
   const input = wrapper.find('TextInput').first();
   input.find('input').simulate('change', {target: {value: 'New Text'}});
-  expect(input.props().value).toEqual('New Text');
+  expect(input.instance().props.value).toEqual('New Text');
 });
 
 it('shows details inputs', () => {
@@ -82,7 +82,7 @@ it('shows details inputs', () => {
   );
   const input = wrapper.find('TextArea');
   input.find('textarea').simulate('change', {target: {value: 'New Details'}});
-  expect(input.props().value).toEqual('New Details');
+  expect(input.instance().props.value).toEqual('New Details');
 });
 
 it('disables the save button when title is empty', () => {

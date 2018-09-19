@@ -86,11 +86,13 @@ exports[`renders the item to update if provided 1`] = `
         visibleOptionsCount={8}
       >
         <option
+          key="none"
           value="none"
         >
           Optional: Add Course
         </option>
         <option
+          key="1"
           value="1"
         >
           a course
@@ -236,16 +238,19 @@ exports[`updates state when new note is passed in 1`] = `
         visibleOptionsCount={8}
       >
         <option
+          key="none"
           value="none"
         >
           Optional: Add Course
         </option>
         <option
+          key="1"
           value="1"
         >
           first course
         </option>
         <option
+          key="2"
           value="2"
         >
           second course
@@ -391,16 +396,19 @@ exports[`updates state when new note is passed in 2`] = `
         visibleOptionsCount={8}
       >
         <option
+          key="none"
           value="none"
         >
           Optional: Add Course
         </option>
         <option
+          key="1"
           value="1"
         >
           first course
         </option>
         <option
+          key="2"
           value="2"
         >
           second course

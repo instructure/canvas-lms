@@ -28,6 +28,7 @@ exports[`does not render caveat if no courses have grading periods 1`] = `
   <View
     as="div"
     display="auto"
+    key="1"
     margin="0 0 large 0"
   >
     <div
@@ -171,6 +172,7 @@ exports[`renders some course grades 1`] = `
   <View
     as="div"
     display="auto"
+    key="1"
     margin="0 0 large 0"
   >
     <div
@@ -212,6 +214,7 @@ exports[`renders some course grades 1`] = `
   <View
     as="div"
     display="auto"
+    key="2"
     margin="0 0 large 0"
   >
     <div
@@ -253,6 +256,7 @@ exports[`renders some course grades 1`] = `
   <View
     as="div"
     display="auto"
+    key="3"
     margin="0 0 large 0"
   >
     <div

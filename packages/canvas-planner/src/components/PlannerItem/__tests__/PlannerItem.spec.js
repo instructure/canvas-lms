@@ -581,7 +581,7 @@ it('disables the checkbox when toggleAPIPending is true', () => {
     />
   );
   wrapper.find('Checkbox').simulate('change');
-  expect(wrapper.find('Checkbox').node.props.disabled).toBe(true);
+  expect(wrapper.find('Checkbox').prop('disabled')).toBe(true);
 });
 
 it('registers itself as animatable', () => {

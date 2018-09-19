@@ -40,8 +40,8 @@ export class Day extends Component {
     timeZone: string.isRequired,
     toggleCompletion: func,
     updateTodo: func,
-    registerAnimatable: func,
-    deregisterAnimatable: func,
+    registerAnimatable: func.isRequired,
+    deregisterAnimatable: func.isRequired,
     currentUser: shape(userShape),
   };
   static defaultProps = {
@@ -69,7 +69,10 @@ export class Day extends Component {
     this.props.deregisterAnimatable('day', this, this.itemUniqueIds());
   }
 
-  itemUniqueIds (props = this.props) { return props.itemsForDay.map(item => item.uniqueId); }
+  itemUniqueIds (props) {
+    props = props || this.props
+    return (props.itemsForDay || []).map(item => item.uniqueId);
+  }
 
   hasItems () {
     return this.props.itemsForDay && this.props.itemsForDay.length > 0;
