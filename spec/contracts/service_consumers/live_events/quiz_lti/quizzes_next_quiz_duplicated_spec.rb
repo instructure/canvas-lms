@@ -58,7 +58,7 @@ RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
 
         # act
         exported_content = QuizzesNext::ExportService.begin_export(old_course, {})
-        QuizzesNext::ExportService.send_imported_content(new_course, exported_content)
+        QuizzesNext::ExportService.send_imported_content(new_course, ContentMigration.new, exported_content)
       end
 
       # assert

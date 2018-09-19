@@ -24,7 +24,7 @@ module Lti
         @original_tool_id = original_tool_id
       end
 
-      def send_imported_content(course, content)
+      def send_imported_content(course, _content_migration, content)
         @course = course
         @root_account = course.root_account
         load_tool!
