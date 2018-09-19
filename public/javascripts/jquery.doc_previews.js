@@ -75,7 +75,7 @@ import './jquery.loadingImg'
     return this.each(function(){
       var $this = $(this),
           opts = $.extend({
-            width: '100%'
+            width: '100%',
             height: '400px'
           }, $this.data(), options);
 
