@@ -49,7 +49,23 @@ module PlannerPageObject
     "div:contains('Nothing new needs attention.')"
   end
 
+  def peer_review_icon_selector
+    "svg[name='IconPeerReview']"
+  end
+
+  def peer_review_name_selector(course_name)
+    "span:contains('#{course_name} Peer Review')"
+  end
+
+  def peer_review_reminder_selector
+    "span:contains('Reminder:')"
+  end
+
   #------------------------- Elements --------------------------
+
+  def peer_review_item(course_name)
+    fj("li:contains('#{course_name} Peer Review')")
+  end
 
   def planner_app_div
     f('.PlannerApp')
@@ -160,7 +176,7 @@ module PlannerPageObject
     fj("button:contains('Load more')")
   end
 
-  def card_view_todo_item_list
+  def card_view_todo_items
     ff("ul.to-do-list li")
   end
 
@@ -172,7 +188,19 @@ module PlannerPageObject
     f(dismiss_opportunity_button_selector(item_name))
   end
 
+  def list_view_planner_items
+    ff('div.planner-item')
+  end
+
   #----------------------- Actions & Methods -------------------------
+
+  def mark_peer_review_as_complete(course)
+    f("span[aria-hidden='true']", peer_review_item(course)).click
+  end
+
+  def click_peer_review(course, assignment)
+    flnpt(assignment, peer_review_item(course)).click
+  end
 
   def click_opportunity(item_name)
     flnpt(item_name, opportunities_parent).click

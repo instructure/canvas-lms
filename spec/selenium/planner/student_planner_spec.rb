@@ -139,25 +139,38 @@ describe "student planner" do
 
   context "Peer Reviews" do
     before :once do
-      @reviewee = User.create!(name: 'Student 2')
+      @reviewee= user_factory(:active_all => true)
       @course.enroll_student(@reviewee).accept!
       @assignment = @course.assignments.create({
                                                  name: 'Peer Review Assignment',
                                                  due_at: 1.day.from_now,
+                                                 peer_reviews: true,
+                                                 automatic_peer_reviews: false,
                                                  submission_types: 'online_text_entry'
                                                })
-      submission = @assignment.submit_homework(@reviewee, body: "review this")
-      assessor_submission = @assignment.find_or_create_submission(@student1)
-      @peer_review = AssessmentRequest.create!({
-                                                 user: @reviewee,
-                                                 asset: submission,
-                                                 assessor_asset: assessor_submission,
-                                                 assessor: @student1
-                                               })
+      @assignment.assign_peer_review(@student1, @reviewee)
     end
 
-    it "shows and navigates to peer review submissions from the student planner" do
-      skip("unskip with ADMIN-1306")
+    it "shows peer review submissions" do
+      go_to_list_view
+
+      validate_object_displayed(@course.name,'Peer Review')
+      expect(list_view_planner_items.second).to contain_css(peer_review_icon_selector)
+      expect(list_view_planner_items.second).to contain_jqcss(peer_review_reminder_selector)
+    end
+
+    it "navigates to peer review submission when clicked" do
+      go_to_list_view
+      click_peer_review(@course.name, @assignment.name)
+
+      expect(driver.current_url).to include "courses/#{@course.id}/assignments/#{@assignment.id}/submissions"
+    end
+
+    it "marks peer review as completed" do
+      go_to_list_view
+      mark_peer_review_as_complete(@course.name)
+
+      expect(peer_review_item(@course.name)).to contain_jqcss("span:contains('Peer Review #{@assignment.name} is marked as done.')")
     end
   end
 
@@ -595,3 +608,4 @@ describe "student planner" do
     end
   end
 end
+
