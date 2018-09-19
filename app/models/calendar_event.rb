@@ -165,6 +165,10 @@ class CalendarEvent < ActiveRecord::Base
     SQL
   }
 
+  scope :not_hidden, -> {
+    where("NOT EXISTS (SELECT id FROM #{CalendarEvent.quoted_table_name} sub_events WHERE sub_events.parent_calendar_event_id=calendar_events.id)")
+  }
+
   scope :undated, -> { where(:start_at => nil, :end_at => nil) }
 
   scope :between, lambda { |start, ending| where(:start_at => start..ending) }

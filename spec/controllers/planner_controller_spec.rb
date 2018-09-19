@@ -116,6 +116,23 @@ describe PlannerController do
         expect(user_event['plannable']['title']).to eq 'user_event'
       end
 
+      it "shows the appropriate section-specific event for the user" do
+        other_section = @course.course_sections.create!(name: 'Other Section')
+        event = @course.calendar_events.build(:title => 'event', :child_event_data =>
+          {"0" => {:start_at => 1.hour.from_now.iso8601, :end_at => 2.hours.from_now.iso8601, :context_code => @course.default_section.asset_string},
+           "1" => {:start_at => 2.hours.from_now.iso8601, :end_at => 3.hours.from_now.iso8601, :context_code => other_section.asset_string}})
+        event.updating_user = @teacher
+        event.save!
+
+        get :index
+        json = json_parse(response.body)
+        event_ids = json.select { |thing| thing['plannable_type'] == 'calendar_event' }.map { |thing| thing['plannable_id'] }
+
+        my_event_id = @course.default_section.calendar_events.where(parent_calendar_event_id: event).pluck(:id).first
+        expect(event_ids).not_to include event.id
+        expect(event_ids).to include my_event_id
+      end
+
       it "should show appointment group reservations" do
         ag = appointment_group_model(title: 'appointment group')
         ap = appointment_participant_model(participant: @student, course: @course, appointment_group: ag)

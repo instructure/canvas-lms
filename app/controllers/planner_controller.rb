@@ -270,8 +270,9 @@ class PlannerController < ApplicationController
   end
 
   def calendar_events_collection
-    item_collection('calendar_events', @current_user.calendar_events_for_contexts(@context_codes, start_at: start_date,
-      end_at: end_date),
+    item_collection('calendar_events',
+      CalendarEvent.active.not_hidden.for_user_and_context_codes(@current_user, @context_codes).
+         between(@start_date, @end_date),
       CalendarEvent, [:start_at, :created_at], :id)
   end
 

@@ -1915,13 +1915,6 @@ class User < ActiveRecord::Base
     end
   end
 
-  def calendar_events_for_contexts(context_codes, opts={})
-    event_codes = context_codes
-    event_codes += AppointmentGroup.manageable_by(self, context_codes).intersecting(opts[:start_at], opts[:end_at]).map(&:asset_string)
-    CalendarEvent.active.for_user_and_context_codes(self, event_codes, []).between(opts[:start_at], opts[:end_at]).
-      updated_after(opts[:updated_at])
-  end
-
   def upcoming_events(opts={})
     context_codes = opts[:context_codes] || (opts[:contexts] ? setup_context_lookups(opts[:contexts]) : self.cached_context_codes)
     return [] if (!context_codes || context_codes.empty?)
