@@ -856,6 +856,25 @@ describe UserMerge do
       expect(new_user2_attachment2.content_type).to eq "text/plain"
     end
 
+    it "should mark cross-shard user submission attachments so they're still visible" do
+      user1 = User.create!
+      user1_attachment = Attachment.create!(:user => user1, :context => user1, :filename => "shared_name1.txt",
+        :uploaded_data => StringIO.new("shared_data"))
+      course_factory
+      a1 = assignment_model(:submission_types => "online_upload")
+      submission = a1.submit_homework(user1, attachments: [user1_attachment])
+
+      @shard1.activate do
+        new_account = Account.create!
+        @user2 = user_with_pseudonym(:account => new_account)
+      end
+
+      UserMerge.from(user1).into(@user2)
+      run_jobs
+
+      expect(Submission.find(submission.id).versioned_attachments).to eq [user1_attachment]
+    end
+
     context "manual invitation" do
       it "should not keep a temporary invitation in cache for an enrollment deleted after a user merge" do
         email = 'foo@example.com'
