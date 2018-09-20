@@ -67,6 +67,8 @@ class SubmissionComment < ActiveRecord::Base
   scope :for_provisional_grade, ->(id) { where(:provisional_grade_id => id) }
   scope :for_provisional_grades, -> { where.not(provisional_grade_id: nil) }
   scope :for_assignment_id, lambda { |assignment_id| where(:submissions => { :assignment_id => assignment_id }).joins(:submission) }
+  scope :for_groups, -> { where.not(group_comment_id: nil) }
+  scope :not_for_groups, -> { where(group_comment_id: nil) }
 
   def delete_other_comments_in_this_group
     update_other_comments_in_this_group(&:destroy)

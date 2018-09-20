@@ -17,6 +17,7 @@
 
 require 'spec_helper'
 require 'lti2_spec_helper'
+require_dependency 'assignment/speed_grader'
 
 describe Assignment::SpeedGrader do
   before :once do
@@ -108,35 +109,62 @@ describe Assignment::SpeedGrader do
         assignment.update_submission(first_student, comment_seven_private_params.dup)
       end
 
-      it "only shows group comments" do
-        json = Assignment::SpeedGrader.new(assignment, teacher).json
-        student_a_submission = json.fetch(:submissions).select { |s| s[:user_id] == first_student.id.to_s }.first
-        comments = student_a_submission.fetch(:submission_comments).map do |comment|
-          comment.slice(:author_id, :comment)
+      describe "only shows group comments" do
+        subject { @comments }
+
+        before do
+          json = Assignment::SpeedGrader.new(assignment, teacher).json
+          student_a_submission = json.fetch(:submissions).select { |s| s[:user_id] == first_student.id.to_s }.first
+          @comments = student_a_submission.fetch(:submission_comments).map do |comment|
+            comment.slice(:author_id, :comment)
+          end
         end
-        expect(comments).to include({
-          "author_id" => first_student.id.to_s,
-          "comment" => homework_params.fetch(:comment)
-        },{
-          "author_id" => comment_two_to_group_params.fetch(:user_id).to_s,
-          "comment" => comment_two_to_group_params.fetch(:comment)
-        },{
-          "author_id" => comment_three_to_group_params.fetch(:user_id).to_s,
-          "comment" => comment_three_to_group_params.fetch(:comment)
-        },{
-          "author_id" => comment_six_to_group_params.fetch(:user_id).to_s,
-          "comment" => comment_six_to_group_params.fetch(:comment)
-        })
-        expect(comments).not_to include({
-          "author_id" => comment_four_private_params.fetch(:user_id).to_s,
-          "comment" => comment_four_private_params.fetch(:comment)
-        },{
-          "author_id" => comment_five_private_params.fetch(:user_id).to_s,
-          "comment" => comment_five_private_params.fetch(:comment)
-        },{
-          "author_id" => comment_seven_private_params.fetch(:user_id).to_s,
-          "comment" => comment_seven_private_params.fetch(:comment)
-      })
+
+        it do
+          is_expected.to include({"author_id" => first_student.id.to_s, "comment" => homework_params.fetch(:comment)})
+        end
+
+        it do
+          is_expected.to include({
+            "author_id" => comment_two_to_group_params.fetch(:user_id).to_s,
+            "comment" => comment_two_to_group_params.fetch(:comment)
+          })
+        end
+
+        it do
+          is_expected.to include({
+            "author_id" => comment_three_to_group_params.fetch(:user_id).to_s,
+            "comment" => comment_three_to_group_params.fetch(:comment)
+          })
+        end
+
+        it do
+          is_expected.to include({
+            "author_id" => comment_six_to_group_params.fetch(:user_id).to_s,
+            "comment" => comment_six_to_group_params.fetch(:comment)
+          })
+        end
+
+        it do
+          is_expected.not_to include({
+            "author_id" => comment_four_private_params.fetch(:user_id).to_s,
+            "comment" => comment_four_private_params.fetch(:comment)
+          })
+        end
+
+        it do
+          is_expected.not_to include({
+            "author_id" => comment_five_private_params.fetch(:user_id).to_s,
+            "comment" => comment_five_private_params.fetch(:comment)
+          })
+        end
+
+        it do
+          is_expected.not_to include({
+            "author_id" => comment_seven_private_params.fetch(:user_id).to_s,
+            "comment" => comment_seven_private_params.fetch(:comment)
+          })
+        end
       end
     end
   end
@@ -248,6 +276,9 @@ describe Assignment::SpeedGrader do
 
       @assignment.submit_homework(@student_1, submission_type: 'online_text_entry', body: 'blah')
       @assignment.submit_homework(@student_2, submission_type: 'online_text_entry', body: 'blah')
+
+      allow(Canvadocs).to receive(:config).and_return({ a: 1 })
+      allow(Canvadoc).to receive(:mime_types).and_return("image/png")
     end
 
     it "returns submission lateness" do
@@ -288,10 +319,6 @@ describe Assignment::SpeedGrader do
       entry.save!
       topic.ensure_submission(@student)
 
-      expect(Canvadocs).to receive(:enabled?).twice.and_return(true)
-      expect(Canvadocs).to receive(:config).and_return({ a: 1 })
-      expect(Canvadoc).to receive(:mime_types).and_return("image/png")
-
       json = Assignment::SpeedGrader.new(assignment, @teacher).json
       sub = json[:submissions].first[:submission_history].first[:submission]
       canvadoc_url = sub[:versioned_attachments].first.dig(:attachment, :canvadoc_url)
@@ -312,10 +339,6 @@ describe Assignment::SpeedGrader do
       entry.attachment = attachment
       entry.save!
       topic.ensure_submission(@student)
-
-      expect(Canvadocs).to receive(:enabled?).twice.and_return(true)
-      expect(Canvadocs).to receive(:config).and_return({ a: 1 })
-      expect(Canvadoc).to receive(:mime_types).and_return("image/png")
 
       json = Assignment::SpeedGrader.new(assignment, @teacher).json
       sub = json[:submissions].first[:submission_history].first[:submission]
@@ -338,10 +361,6 @@ describe Assignment::SpeedGrader do
       entry.save!
       topic.ensure_submission(@student)
 
-      expect(Canvadocs).to receive(:enabled?).twice.and_return(true)
-      expect(Canvadocs).to receive(:config).and_return({ a: 1 })
-      expect(Canvadoc).to receive(:mime_types).and_return("image/png")
-
       json = Assignment::SpeedGrader.new(assignment, @teacher).json
       sub = json[:submissions].first[:submission_history].first[:submission]
       canvadoc_url = sub[:versioned_attachments].first.fetch(:attachment).fetch(:canvadoc_url)
@@ -358,10 +377,7 @@ describe Assignment::SpeedGrader do
         filename: "homework.png"
       )
       submission = assignment.submit_homework(@student, attachments: [attachment])
-      expect(Canvadocs).to receive(:enabled?).twice.and_return(true)
-      expect(Canvadocs).to receive(:config).and_return({ a: 1 })
-      expect(Canvadoc).to receive(:mime_types).and_return("image/png")
-
+      allow(Canvadocs).to receive(:enabled?).and_return(true)
       json = Assignment::SpeedGrader.new(assignment, @teacher).json
       sub_json = json[:submissions].first[:submission_history].first[:submission]
       canvadoc_url = sub_json[:versioned_attachments].first.fetch(:attachment).fetch(:canvadoc_url)
