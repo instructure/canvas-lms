@@ -290,6 +290,29 @@ class OutcomesApiController < ApplicationController
         joins("INNER JOIN #{Submission.quoted_table_name} submissions ON submissions.assignment_id = assignments.id AND submissions.user_id = #{student_id} AND submissions.workflow_state <> 'deleted'").
         to_sql).to_hash
       alignments.each{|a| a[:url] = "#{polymorphic_url([course, :assignments])}/#{a['assignment_id']}"}
+
+      quizzes = Quizzes::Quiz.active.
+        select(:title, :id, :assignment_id).preload(:quiz_questions).
+        joins(assignment: :submissions).
+        where(context: course).
+        where("submissions.user_id = ?", student_id).
+        where("submissions.workflow_state <> 'deleted'")
+      quiz_alignments = quizzes.map do |quiz|
+        bank_ids = quiz.quiz_questions.map{ |qq| qq.assessment_question.try(:assessment_question_bank_id) }.compact.uniq
+        outcome_ids = ContentTag.active.where(content_id: bank_ids, content_type: "AssessmentQuestionBank", tag: "explicit_mastery").pluck(:learning_outcome_id)
+        outcome_ids.map do |id|
+          {
+            learning_outcome_id: id,
+            title: quiz.title,
+            assignment_id: quiz.assignment_id,
+            submission_types: 'online_quiz',
+            url: "#{polymorphic_url([course, :quizzes])}/#{quiz.id}"
+          }
+        end
+      end.flatten
+
+      alignments.concat(quiz_alignments)
+
       render :json => alignments
     end
   rescue ActiveRecord::RecordNotFound => e
