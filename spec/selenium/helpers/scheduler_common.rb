@@ -135,7 +135,7 @@ module SchedulerCommon
   def open_select_courses_modal(course_name)
     f('#FindAppointmentButton').click
     click_option('.ic-Input', course_name)
-    f('.ReactModal__Footer-Actions .btn').click
+    f('[role="dialog"][aria-label="Select Course"] button[type="submit"]').click
   end
 
   # This method closes the modal only when it is already opened. If not, it will open the modal

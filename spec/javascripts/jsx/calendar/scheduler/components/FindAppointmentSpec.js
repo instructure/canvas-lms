@@ -72,13 +72,7 @@ test('selectCourse sets the proper selected course', () => {
     }
   }
 
-  const fakeEvent = {
-    target: {
-      value: 2
-    }
-  }
-
   const wrapper = mount(<FindAppointmentApp courses={courses} store={store} />)
-  wrapper.instance().selectCourse(fakeEvent);
+  wrapper.instance().selectCourse(2);
   deepEqual(wrapper.state('selectedCourse'), courses[1])
 })
