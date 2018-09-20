@@ -346,11 +346,11 @@
 
 var isOldIE = (navigator.userAgent.indexOf("MSIE") !== -1); // Detect IE10 and below
 
-  iFrameResize({
+iFrameResize({
     checkOrigin: false,
     heightCalculationMethod: isOldIE ? 'max' : 'lowestElement',
     scrolling: 'auto'
-  }, 'iframe')
+}, 'iframe');
 
 </script>
 <% if ENV['JIRA_COLLECTOR'] %>

@@ -825,7 +825,7 @@ import 'compiled/badge_counts'
             }
           });
           $sequence_footer.show();
-          // $(window).resize(); this will be helpful for things like $.fn.fillWindowWithMe so that it knows the dimensions of the page have changed.
+          $(window).resize(); //this will be helpful for things like $.fn.fillWindowWithMe so that it knows the dimensions of the page have changed.
         }
       });
     } else {
