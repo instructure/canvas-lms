@@ -123,7 +123,7 @@ module Canvas::Migration::ExternalContent
           service = import_service_for(key)
           if service
             begin
-              if import = service.send_imported_content(migration.context, content)
+              if import = service.send_imported_content(migration.context, migration, content)
                 pending_imports[key] = import
               end
             rescue => e
