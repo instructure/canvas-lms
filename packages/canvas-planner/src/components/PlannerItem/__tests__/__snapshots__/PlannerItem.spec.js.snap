@@ -2589,7 +2589,7 @@ exports[`renders Note correctly with Group 1`] = `
       }
     }
   >
-    <IconMsWord />
+    <IconDocument />
   </div>
   <div>
     <div>
@@ -3037,7 +3037,7 @@ exports[`renders Page correctly with everything 1`] = `
       }
     }
   >
-    <IconMsWord />
+    <IconDocument />
   </div>
   <div>
     <div>
@@ -3185,7 +3185,7 @@ exports[`renders Page correctly with just date 1`] = `
       }
     }
   >
-    <IconMsWord />
+    <IconDocument />
   </div>
   <div>
     <div>
@@ -3309,7 +3309,7 @@ exports[`renders Page correctly with just points 1`] = `
       }
     }
   >
-    <IconMsWord />
+    <IconDocument />
   </div>
   <div>
     <div>
@@ -3457,7 +3457,7 @@ exports[`renders Page correctly without right side content 1`] = `
       }
     }
   >
-    <IconMsWord />
+    <IconDocument />
   </div>
   <div>
     <div>

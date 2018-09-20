@@ -30,7 +30,7 @@ import AnnouncementIcon from '@instructure/ui-icons/lib/Line/IconAnnouncement';
 import DiscussionIcon from   '@instructure/ui-icons/lib/Line/IconDiscussion';
 import NoteIcon from         '@instructure/ui-icons/lib/Line/IconNote';
 import CalendarIcon from     '@instructure/ui-icons/lib/Line/IconCalendarMonth';
-import PageIcon from         '@instructure/ui-icons/lib/Line/IconMsWord';
+import PageIcon from         '@instructure/ui-icons/lib/Line/IconDocument';
 import PeerReviewIcon from '@instructure/ui-icons/lib/Line/IconPeerReview';
 
 import { formatDateAtTimeWithoutYear } from '../../utilities/dateUtils';

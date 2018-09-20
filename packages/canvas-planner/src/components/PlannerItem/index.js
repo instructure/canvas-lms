@@ -31,7 +31,7 @@ import Quiz from '@instructure/ui-icons/lib/Line/IconQuiz';
 import Announcement from '@instructure/ui-icons/lib/Line/IconAnnouncement';
 import Discussion from '@instructure/ui-icons/lib/Line/IconDiscussion';
 import Calendar from '@instructure/ui-icons/lib/Line/IconCalendarMonth';
-import Page from '@instructure/ui-icons/lib/Line/IconMsWord';
+import Page from '@instructure/ui-icons/lib/Line/IconDocument';
 import Edit from '@instructure/ui-icons/lib/Line/IconEdit';
 import PeerReview from '@instructure/ui-icons/lib/Line/IconPeerReview';
 import NotificationBadge, { MissingIndicator, NewActivityIndicator } from '../NotificationBadge';
