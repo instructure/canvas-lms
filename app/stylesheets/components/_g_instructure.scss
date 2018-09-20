@@ -1622,7 +1622,7 @@ body.padless-content .ic-Layout-contentMain,
 }
 
 #sequence_footer {
-  padding: $ic-sp $ic-sp*2 0;
+  padding: 0;
   .next, .prev {
     width: 150px;
     overflow: hidden;

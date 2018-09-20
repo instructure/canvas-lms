@@ -50,7 +50,7 @@ body:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
 }
 
 .ic-Layout-contentMain {
-  // padding: $ic-sp*2;
+  padding: 0 $ic-sp;
 
   body.is-inside-submission-frame & {
     padding-left: $ic-sp;
