@@ -580,16 +580,32 @@ class Submission < ActiveRecord::Base
       prev_percentage = prev_score.present? ? prev_score.to_f / self.assignment.points_possible * 100 : nil
       percentage = self.score.present? ? self.score.to_f / self.assignment.points_possible * 100 : nil
       next unless threshold.did_pass_threshold(prev_percentage, percentage)
-      next unless threshold.observer.enrollments.where(course_id: self.assignment.context_id).first.present?
 
-      ObserverAlert.create!(observer: threshold.observer, student: self.user,
-                            observer_alert_threshold: threshold,
-                            context: self.assignment, alert_type: threshold.alert_type, action_date: self.graded_at,
-                            title: I18n.t("Assignment graded: %{grade} on %{assignment_name} in %{course_code}", {
-                              grade: self.grade,
-                              assignment_name: self.assignment.title,
-                              course_code: self.assignment.course.course_code
-                            }))
+      observer = threshold.observer
+      next unless observer
+      next unless observer.observer_enrollments.active.
+          where(course_id: self.assignment.context_id, associated_user: self.user).any?
+
+      begin
+        ObserverAlert.create!(
+          observer: observer,
+          student: self.user,
+          observer_alert_threshold: threshold,
+          context: self.assignment,
+          alert_type: threshold.alert_type,
+          action_date: self.graded_at,
+          title: I18n.t("Assignment graded: %{grade} on %{assignment_name} in %{course_code}",
+            {
+              grade: self.grade,
+              assignment_name: self.assignment.title,
+              course_code: self.assignment.course.course_code
+            })
+        )
+      rescue ActiveRecord::RecordInvalid
+        Rails.logger.error(
+          "Couldn't create ObserverAlert for submission #{self.id} observer #{threshold.observer_id}"
+        )
+      end
     end
   end
 
