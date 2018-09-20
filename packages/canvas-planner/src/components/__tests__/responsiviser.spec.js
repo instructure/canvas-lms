@@ -91,6 +91,7 @@ it('renders medium', () => {
   const wrapper = mount(<ResponsiveComponent/>);
   expect(wrapper).toMatchSnapshot();   // large
   resizeWindow(700);
+  wrapper.update()
   expect(wrapper).toMatchSnapshot();  // medium
   wrapper.unmount();
 });

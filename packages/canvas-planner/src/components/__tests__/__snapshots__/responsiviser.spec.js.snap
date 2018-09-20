@@ -37,10 +37,10 @@ exports[`renders medium 2`] = `
   responsiveSize="large"
 >
   <SomeComponent
-    responsiveSize="large"
+    responsiveSize="medium"
   >
     <div
-      data-sz="large"
+      data-sz="medium"
     >
       hello world
     </div>
