@@ -308,6 +308,22 @@ describe DocviewerAuditEventsController do
     expect(type).to eq 'a type'
   end
 
+  it "saves the annotation_id in the payload" do
+    assignment = @course.assignments.create!(anonymous_grading: true, name: "anonymous")
+    @submission = assignment.submit_homework(@student, submission_type: "online_upload", attachments: [@attachment])
+    post :create, format: :json, params: default_params.deep_merge(docviewer_audit_event: { annotation_id: 23 })
+    event = AnonymousOrModerationEvent.find_by!(assignment: assignment, submission: @submission)
+    expect(event.payload.fetch("annotation_id")).to eq "23"
+  end
+
+  it "saves the context in the payload" do
+    assignment = @course.assignments.create!(anonymous_grading: true, name: "anonymous")
+    @submission = assignment.submit_homework(@student, submission_type: "online_upload", attachments: [@attachment])
+    post :create, format: :json, params: default_params.deep_merge(docviewer_audit_event: { context: "a context" })
+    event = AnonymousOrModerationEvent.find_by!(assignment: assignment, submission: @submission)
+    expect(event.payload.fetch("context")).to eq "a context"
+  end
+
   it 'saves the related_annotation_id in the payload' do
     assignment = Assignment.create!(course: @course, anonymous_grading: true, name: 'anonymous')
     @submission = assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
