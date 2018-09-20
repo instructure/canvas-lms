@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Rubrics
 class RubricsController < ApplicationController
   before_action :require_context
   before_action { |c| c.active_tab = "rubrics" }
