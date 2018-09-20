@@ -245,6 +245,16 @@
     "graphael": "https://github.com/ryankshaw/graphael.git",
     "karma": "2.0.2",
     "node-sass": "if we let node-sass upgrade to recent versions, it causes: SIS-3125",
-    "node-sass": "4.7.2"
+    "node-sass": "4.7.2",
+    "format-message-cli": "These are all because format-message-* 6.1+ use babel 7 and it screws up canvas-planner until @instructure/ui-presets also uses babel 7",
+    "babel-plugin-transform-format-message": "6.0.4",
+    "format-message-cli": "6.0.4",
+    "format-message-estree-util": "6.0.4",
+    "format-message-formats": "6.0.4",
+    "format-message-generate-id": "6.0.4",
+    "format-message-interpret": "6.0.4",
+    "format-message-parse": "6.0.4",
+    "format-message-print": "6.0.4",
+    "format-message": "6.0.4"
   }
 }
