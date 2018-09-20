@@ -17,7 +17,6 @@
 #
 
 require_relative '../../spec_helper'
-require_dependency 'speed_grader/submission'
 
 describe SpeedGrader::Submission do
   let(:submission) do

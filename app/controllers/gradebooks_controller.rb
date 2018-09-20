@@ -16,9 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency 'assignment/speed_grader'
-require_dependency 'speed_grader/submission'
-
 class GradebooksController < ApplicationController
   include ActionView::Helpers::NumberHelper
   include GradebooksHelper
@@ -686,7 +683,7 @@ class GradebooksController < ApplicationController
       end
 
       format.json do
-        render json: Assignment::SpeedGrader.new(
+        render json: SpeedGrader::Assignment.new(
           @assignment,
           @current_user,
           avatars: service_enabled?(:avatars),
@@ -1075,7 +1072,7 @@ class GradebooksController < ApplicationController
   end
 
   def preloaded_provisional_grades(assignment:)
-    @preloaded_provisional_grades ||= Assignment::SpeedGrader.new(
+    @preloaded_provisional_grades ||= SpeedGrader::Assignment.new(
       assignment,
       @current_user,
       avatars: service_enabled?(:avatars),

@@ -16,11 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency 'speed_grader/submission'
-
-# TODO: rename to SpeedGrader::Assignment and move to app/models/speed_grader
-class Assignment
-  class SpeedGrader
+module SpeedGrader
+  class Assignment
     include GradebookSettingsHelpers
     include CoursesHelper
     include Api::V1::SubmissionComment
@@ -144,14 +141,14 @@ class Assignment
       attachment_includes = %i(crocodoc_document canvadoc root_attachment)
       # Preload attachments for later looping
       attachments_for_submission =
-        Submission.bulk_load_attachments_for_submissions(@submissions, preloads: attachment_includes)
+        ::Submission.bulk_load_attachments_for_submissions(@submissions, preloads: attachment_includes)
 
       # Preloading submission history versioned attachments and originality reports
       submission_histories = @submissions.map(&:submission_history).flatten
-      Submission.bulk_load_versioned_attachments(submission_histories,
+      ::Submission.bulk_load_versioned_attachments(submission_histories,
                                                  preloads: attachment_includes)
-      Submission.bulk_load_versioned_originality_reports(submission_histories)
-      Submission.bulk_load_text_entry_originality_reports(submission_histories)
+      ::Submission.bulk_load_versioned_originality_reports(submission_histories)
+      ::Submission.bulk_load_text_entry_originality_reports(submission_histories)
 
       preloaded_provisional_selections =
         @grading_role == :moderator ? @assignment.moderated_grading_selections.index_by(&:student_id) : {}
@@ -181,7 +178,7 @@ class Assignment
           json.merge! provisional_grade_to_json(provisional_grade)
         end
 
-        comments = ::SpeedGrader::Submission.new(
+        comments = SpeedGrader::Submission.new(
           submission: sub,
           current_user: @current_user,
           provisional_grade: provisional_grade
@@ -319,11 +316,11 @@ class Assignment
           provisional_grades = if grader_comments_hidden?(current_user: @current_user, assignment: @assignment)
             provisional_grades.not_final.where(scorer: @current_user)
           else
-            select_fields = ::ModeratedGrading::GRADE_ATTRIBUTES_ONLY.dup.push(:id, :submission_id)
+            select_fields = ModeratedGrading::GRADE_ATTRIBUTES_ONLY.dup.push(:id, :submission_id)
             provisional_grades.select(select_fields)
           end
         elsif @grading_role == :grader
-          provisional_grades = ::ModeratedGrading::ProvisionalGrade.none
+          provisional_grades = ModeratedGrading::ProvisionalGrade.none
         end
         provisional_grades.order(:id).to_a.group_by(&:submission_id)
       end
