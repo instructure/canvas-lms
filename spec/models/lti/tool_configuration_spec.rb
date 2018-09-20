@@ -21,10 +21,21 @@ require_dependency 'lti/tool_configuration'
 
 module Lti
   describe ToolConfiguration do
+    let(:public_jwk) do
+      {
+        "kty" => "RSA",
+        "e" => "AQAB",
+        "n" => "2YGluUtCi62Ww_TWB38OE6wTaN...",
+        "kid" => "2018-09-18T21:55:18Z",
+        "alg" => "RS256",
+        "use" => "sig"
+      }
+    end
     let(:settings) do
       {
         'title' => 'LTI 1.3 Tool',
         'description' => '1.3 Tool',
+        'public_jwk' => public_jwk,
         'launch_url' => 'http://lti13testtool.docker/blti_launch',
         'custom_fields' => {'has_expansion' => '$Canvas.user.id', 'no_expansion' => 'foo'},
         'extensions' =>  [

@@ -83,6 +83,7 @@ gem 'i18nliner', '0.1.0'
   gem 'ruby_parser', '3.11.0', require: false
 gem 'icalendar', '1.5.4', require: false
 gem 'ims-lti', '2.2.3', require: 'ims'
+gem 'json_schemer', '0.1.7'
 gem 'simple_oauth', '0.3.1', require: false
 gem 'json', '2.1.0'
 gem 'oj', '3.3.9'

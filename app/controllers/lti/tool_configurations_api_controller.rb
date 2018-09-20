@@ -67,6 +67,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
       settings: tool_configuration_params[:settings],
       settings_url: tool_configuration_params[:settings_url]
     )
+    update_public_jwk!(tool_config)
     render json: tool_config
   end
 
@@ -96,6 +97,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
       settings: tool_configuration_params[:settings],
       settings_url: tool_configuration_params[:settings_url]
     )
+    update_public_jwk!(tool_config)
 
     render json: tool_config
   end
@@ -116,6 +118,10 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   end
 
   private
+
+  def update_public_jwk!(tool_config)
+    tool_config.developer_key.update!(public_jwk: tool_config.settings['public_jwk'])
+  end
 
   def require_tool_configuration
     return if developer_key.tool_configuration.present?

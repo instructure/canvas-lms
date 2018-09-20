@@ -36,12 +36,23 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       settings: settings
     )
   end
+  let(:public_jwk) do
+    {
+      "kty" => "RSA",
+      "e" => "AQAB",
+      "n" => "2YGluUtCi62Ww_TWB38OE6wTaN...",
+      "kid" => "2018-09-18T21:55:18Z",
+      "alg" => "RS256",
+      "use" => "sig"
+    }
+  end
   let(:settings) do
     {
       'title' => 'LTI 1.3 Tool',
       'description' => '1.3 Tool',
       'launch_url' => launch_url,
       'custom_fields' => {'has_expansion' => '$Canvas.user.id', 'no_expansion' => 'foo'},
+      'public_jwk' => public_jwk,
       'extensions' =>  [
         {
           'platform' => 'canvas.instructure.com',
@@ -78,6 +89,16 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       }
     }.compact
   end
+  let(:invalid_parameters) do
+    {
+      developer_key_id: dev_key_id,
+      tool_configuration: {
+        settings: invalid_settings
+      }
+    }
+  end
+
+  let(:invalid_settings) { settings.merge({ 'public_jwk' => invalid_public_jwk }) }
 
   before { user_session(admin) }
 
@@ -196,6 +217,63 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
     end
   end
 
+  shared_examples_for 'an endpoint that validates public_jwk' do
+    subject do
+      make_request
+      json_parse['errors'].first['message']
+    end
+
+    let(:make_request) { raise 'set in examples' }
+
+    context 'when the public jwk is missing' do
+      let(:invalid_public_jwk) { nil }
+
+      it { is_expected.to eq '"public_jwk" must be present' }
+    end
+
+    context 'when the public jwk is missing keys' do
+      let(:invalid_public_jwk) do
+        {
+          "e" => "AQAB",
+          "n" => "2YGluUtCi62Ww_TWB38OE6wTaN...",
+          "kid" => "2018-09-18T21:55:18Z"
+        }
+      end
+
+      it { is_expected.to eq 'The following fields are required: kty, e, n, kid, alg, use' }
+    end
+
+    context 'when the public jwk has an invalid alg' do
+      let(:invalid_public_jwk) do
+        {
+          "kty" => "RSA",
+          "e" => "AQAB",
+          "n" => "2YGluUtCi62Ww_TWB38OE6wTaN...",
+          "kid" => "2018-09-18T21:55:18Z",
+          "alg" => "invalid",
+          "use" => "sig"
+        }
+      end
+
+      it { is_expected.to eq "invalid /alg. Schema: {\"type\"=>\"string\", \"const\"=>\"RS256\"}" }
+    end
+
+    context 'when the public jwk has an invalid kty' do
+      let(:invalid_public_jwk) do
+        {
+          "kty" => "invalid",
+          "e" => "AQAB",
+          "n" => "2YGluUtCi62Ww_TWB38OE6wTaN...",
+          "kid" => "2018-09-18T21:55:18Z",
+          "alg" => "RS256",
+          "use" => "sig"
+        }
+      end
+
+      it { is_expected.to eq "invalid /kty. Schema: {\"type\"=>\"string\", \"const\"=>\"RSA\"}" }
+    end
+  end
+
   describe 'create' do
     subject { post :create, params: valid_parameters }
     let(:dev_key_id) { nil }
@@ -210,6 +288,10 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
 
     it_behaves_like 'an endpoint that accepts a settings_url' do
       let(:make_request) { post :create, params: valid_parameters }
+    end
+
+    it_behaves_like 'an endpoint that validates public_jwk' do
+      let(:make_request) { post :create, params: invalid_parameters }
     end
   end
 
@@ -234,6 +316,10 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
 
     it_behaves_like 'an endpoint that accepts a settings_url' do
       let(:make_request) { post :update, params: valid_parameters }
+    end
+
+    it_behaves_like 'an endpoint that validates public_jwk' do
+      let(:make_request) { put :update, params: invalid_parameters }
     end
 
     it_behaves_like 'an action that requires manage developer keys'

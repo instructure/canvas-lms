@@ -241,13 +241,10 @@ class DeveloperKey < ActiveRecord::Base
   def validate_public_jwk
     return true if public_jwk.blank?
 
-    if public_jwk['kty'] != Lti::RSAKeyPair::KTY
-      errors.add :public_jwk, "Must use #{Lti::RSAKeyPair::KTY} kty"
-    end
+    jwk_errors = Schemas::Lti::PublicJwk.simple_validation_errors(public_jwk)
+    return true if jwk_errors.blank?
 
-    if public_jwk['alg'] != Lti::RSAKeyPair::ALG
-      errors.add :public_jwk, "Must use #{Lti::RSAKeyPair::ALG} alg"
-    end
+    errors.add :public_jwk, jwk_errors
   end
 
   def invalidate_access_tokens_if_scopes_removed!

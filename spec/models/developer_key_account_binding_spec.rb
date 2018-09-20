@@ -22,6 +22,14 @@ settings = {
   'description' => '1.3 Tool',
   'launch_url' => 'http://lti13testtool.docker/blti_launch',
   'custom_fields' => {'has_expansion' => '$Canvas.user.id', 'no_expansion' => 'foo'},
+  'public_jwk' => {
+    "kty" => "RSA",
+    "e" => "AQAB",
+    "n" => "2YGluUtCi62Ww_TWB38OE6wTaN...",
+    "kid" => "2018-09-18T21:55:18Z",
+    "alg" => "RS256",
+    "use" => "sig"
+  },
   'extensions' =>  [
     {
       'platform' => 'canvas.instructure.com',

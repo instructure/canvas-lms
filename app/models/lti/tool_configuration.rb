@@ -46,6 +46,9 @@ module Lti
     private
 
     def valid_tool_settings?
+      errors.add(:settings, '"public_jwk" must be present') if settings['public_jwk'].blank?
+      return if errors[:settings].present?
+
       tool = new_external_tool(developer_key.owner_account)
       unless tool.valid?
         errors.add(:settings, tool.errors.to_h.map {|k, v| "Tool #{k} #{v}" })
