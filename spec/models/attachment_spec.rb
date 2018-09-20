@@ -879,6 +879,25 @@ describe Attachment do
       expect(a.grants_right?(nil, :download)).to eql(false)
       expect(a.grants_right?(nil, {'file_access_user_id' => student.id, 'file_access_expiration' => 1.minute.ago.to_i}, :read)).to eql(false)
     end
+
+    it "should allow students to download a file on an assessment question if it's part of a quiz they can read" do
+      @bank = @course.assessment_question_banks.create!(:title => "bank")
+      @a1 = attachment_with_context(@course, :display_name => "a1")
+      @a2 = attachment_with_context(@course, :display_name => "a2")
+
+      data1 = {'name' => "Hi", 'question_text' => "hey look <img src='/courses/#{@course.id}/files/#{@a1.id}/download'>", 'answers' => [{'id' => 1}, {'id' => 2}]}
+      @aquestion1 = @bank.assessment_questions.create!(:question_data => data1)
+      aq_att1 = @aquestion1.attachments.first
+      data2 = {'name' => "Hi", 'question_text' => "hey look <img src='/courses/#{@course.id}/files/#{@a2.id}/download'>", 'answers' => [{'id' => 1}, {'id' => 2}]}
+      @aquestion2 = @bank.assessment_questions.create!(:question_data => data2)
+      aq_att2 = @aquestion2.attachments.first
+
+      quiz = @course.quizzes.create!
+      AssessmentQuestion.find_or_create_quiz_questions([@aquestion1], quiz.id, nil)
+      quiz.publish!
+      expect(aq_att1.grants_right?(student, :download)).to eq true
+      expect(aq_att2.grants_right?(student, :download)).to eq false
+    end
   end
 
   context "duplicate handling" do
