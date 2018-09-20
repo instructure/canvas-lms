@@ -6,6 +6,84 @@ The Change Log Archive page displays previous API changes in the <a href="file.c
 
 <h2>Prior Updates</h2>
 
+<h2>2018-07-14</h2>
+  <h3>Changes</h3>
+<table class="changelog">
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td>Plagiarism Detection Platform APIs</td>
+<td></td>
+<td>In the API page sidebar, moved all API documentation for the plagiarism platform to the External Tools section</td>
+</tr>
+</table>
+
+<h3>Additions</h3>
+<table class="changelog">
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="api_token_scopes.html">API Token Scopes</a></td>
+<td></td>
+<td>Added API</td>
+</tr>
+<tr>
+<td><a href="proficiency_ratings.html">Proficiency Ratings API</a></td>
+<td></td>
+<td>Added API</td>
+</tr>
+</table>
+
+<h2>2018-06-23</h2>
+  <h3>Changes</h3>
+<table class="changelog">
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="users.html">Users API</a></td>
+<td>Get a Pandata JWT Token and its Expiration Date endpoint</td>
+<td>Changed endpoint to reflect use for current user only (/api/v1/users/self/pandata_token)<br><br>
+Clarified description in that endpoint is currently only available to the mobile developer keys</td>
+</tr>
+</table>
+<p></p>
+<table class="changelog">
+<tr>
+<th>API Responses</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="files.html">Files API</a></td>
+<td>File Object</td>
+<td>Updated file object example and ordering; object returns uuid, folder_id, display_name, and modified_at fields</td>
+</tr>
+</table>
+
+<h3>Additions</h3>
+<table class="changelog">
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="sis_imports.html">SIS Imports API</a></td>
+<td>Restore workflow_states of SIS imported items</td>
+<td>Restore states for sis_imports</td>
+</tr>
+</table>
+<p></p>
+
 <h2>2018-06-02</h2>
   <h3>Additions</h3>
 <table class="changelog">
