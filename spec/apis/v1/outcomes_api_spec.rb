@@ -705,6 +705,9 @@ describe "Outcomes API", type: :request do
         outcome_with_rubric
         @rubric.associate_with(@assignment1, @course, purpose: 'grading')
         @rubric.associate_with(@assignment2, @course, purpose: 'grading')
+        quiz_with_submission
+        bank = @quiz.quiz_questions[0].assessment_question.assessment_question_bank
+        @outcome.align(bank, @course, :mastery_score => 6.0)
       end
 
       it "should return aligned assignments for a student" do
@@ -714,7 +717,23 @@ describe "Outcomes API", type: :request do
                        :course_id => @course.id.to_s,
                        :student_id => @student.id.to_s,
                        :format => 'json')
-        expect(json.map{ |j| j["assignment_id"] }.sort).to eq([@assignment1.id, @assignment2.id].sort)
+        expect(json.map{ |j| j["assignment_id"] }.sort).to eq([@assignment1.id, @assignment2.id, @quiz.assignment_id].sort)
+      end
+
+      it "should not return outcomes aligned to quizzes in other courses" do
+        course = Course.create!(account: @account, name: '2nd course')
+        outcome = course.created_learning_outcomes.create!(valid_outcome_attributes)
+        quiz = generate_quiz(course)
+        bank = quiz.quiz_questions[0].assessment_question.assessment_question_bank
+        outcome.align(bank, course)
+        generate_quiz_submission(quiz, student: @student)
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/outcome_alignments?student_id=#{@student.id}",
+                       :controller => 'outcomes_api',
+                       :action => 'outcome_alignments',
+                       :course_id => @course.id.to_s,
+                       :student_id => @student.id.to_s,
+                       :format => 'json')
+        expect(json.map{|j| j['learning_outcome_id']}.uniq).to eq([@outcome.id])
       end
 
       it "should not return assignments that a student does not have visibility for" do
@@ -727,7 +746,7 @@ describe "Outcomes API", type: :request do
                        :course_id => @course.id.to_s,
                        :student_id => @student.id.to_s,
                        :format => 'json')
-        expect(json.map{ |j| j["assignment_id"] }.sort).to eq([@assignment1.id, @assignment2.id].sort)
+        expect(json.map{ |j| j["assignment_id"] }.sort).to eq([@assignment1.id, @assignment2.id, @quiz.assignment_id].sort)
       end
 
       it "requires a student_id to be present" do
