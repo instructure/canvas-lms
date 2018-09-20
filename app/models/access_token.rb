@@ -43,6 +43,7 @@ class AccessToken < ActiveRecord::Base
 
   scope :active, -> { not_deleted.where("expires_at IS NULL OR expires_at>?", DateTime.now.utc) }
   scope :not_deleted, -> { where(:workflow_state => "active") }
+  scope :visible, -> { joins(:developer_key).where('developer_keys.internal_service is not true') }
 
   TOKEN_SIZE = 64
 
