@@ -90,12 +90,18 @@ describe 'Moderated Marking' do
       @moderated_assignment.update(grader_count: 2)
 
       # grade both students provisionally with teacher 2
-      @moderated_assignment.grade_student(@student1, grade: 15, grader: @teacher2, provisional: true)
-      @moderated_assignment.grade_student(@student2, grade: 14, grader: @teacher2, provisional: true)
+      @submissions2 = []
+      sub = @moderated_assignment.grade_student(@student1, grade: 15, grader: @teacher2, provisional: true).first
+      @submissions2.push sub
+      sub = @moderated_assignment.grade_student(@student2, grade: 14, grader: @teacher2, provisional: true).first
+      @submissions2.push sub
 
       # grade both students provisionally with teacher 3
-      @moderated_assignment.grade_student(@student1, grade: 13, grader: @teacher3, provisional: true)
-      @moderated_assignment.grade_student(@student2, grade: 12, grader: @teacher3, provisional: true)
+      @submissions3 = []
+      @moderated_assignment.grade_student(@student1, grade: 13, grader: @teacher3, provisional: true).first
+      @submissions3.push sub
+      @moderated_assignment.grade_student(@student2, grade: 12, grader: @teacher3, provisional: true).first
+      @submissions3.push sub
     end
 
     before(:each) do
@@ -149,12 +155,14 @@ describe 'Moderated Marking' do
     end
 
     it 'displays comments from chosen grader', priority: "1", test_id: 3513994 do
-      skip('Unskip in GRADE-1326')
-      submissions = @moderated_assignment.find_or_create_submissions([@student1, @student2])
+      @submissions2.each do |submission|
+        submission.submission_comments.create!(comment: 'Just a comment by teacher 2', author: @teacher2)
+        submission.save!
+      end
 
-      submissions.each do |submission|
-        submission.add_comment(author: @teacher1, comment: 'Just a comment by teacher1')
-        submission.add_comment(author: @teacher2, comment: 'Just a comment by teacher2')
+      @submissions3.each do |submission|
+        submission.submission_comments.create!(comment: 'Just a comment by teacher 3', author: @teacher3)
+        submission.save!
       end
 
       # select a provisional grade for each student
@@ -182,7 +190,7 @@ describe 'Moderated Marking' do
       StudentGradesPage.comment_button.click
 
       expect(StudentGradesPage.comments(@moderated_assignment).count).to eq 1
-      expect(StudentGradesPage.comments(@moderated_assignment).first).to include_text 'Just a comment by teacher1'
+      expect(StudentGradesPage.comments(@moderated_assignment).first).to include_text 'Just a comment by teacher 2'
     end
 
     it 'display to students button disabled until grades are posted', priority: '1', test_id: 3513991 do
