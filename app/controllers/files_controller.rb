@@ -379,7 +379,6 @@ class FilesController < ApplicationController
       css_bundle :react_files
       js_env({
         :FILES_CONTEXTS => files_contexts,
-        :NEW_FOLDER_TREE => @context.feature_enabled?(:use_new_tree),
         :COURSE_ID => context.id.to_s
       })
       log_asset_access([ "files", @context ], "files", "other")

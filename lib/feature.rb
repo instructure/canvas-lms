@@ -432,15 +432,6 @@ END
       development: false,
       root_opt_in: false
     },
-    'use_new_tree' =>
-    {
-      display_name: -> { I18n.t('Use New Folder Tree in Files')},
-      description: -> {I18n.t('Replaces the current folder tree with a new accessible and more feature rich folder tree.')},
-      applies_to: 'Course',
-      state: 'hidden',
-      development: true,
-      root_opt_in: true
-    },
     'course_card_images' =>
     {
       display_name: -> { I18n.t('Enable Dashboard Images for Courses')},
