@@ -103,7 +103,7 @@ describe Types::CourseType do
       section1 = course.course_sections.create!(name: "Delete Me")
       expect(
         course_type.resolve("sectionsConnection { edges { node { _id } } }")
-      ).to match course.course_sections.map(&:to_param)
+      ).to match_array course.course_sections.map(&:to_param)
 
       section1.destroy
       expect(
