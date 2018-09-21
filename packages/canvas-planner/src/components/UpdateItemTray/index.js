@@ -224,10 +224,12 @@ export class UpdateItemTray extends Component {
       value: "none",
       label: formatMessage("Optional: Add Course")
     }
-    const courseOptions = (this.props.courses || []).map(course => ({
-      value: course.id,
-      label: course.longName
-    }))
+    const courseOptions = (this.props.courses || []).
+      filter(course => course.enrollmentType === 'StudentEnrollment').
+      map(course => ({
+        value: course.id,
+        label: course.longName
+      }))
 
     const courseId = this.findCurrentValue('courseId');
     const selectedOption = courseId
