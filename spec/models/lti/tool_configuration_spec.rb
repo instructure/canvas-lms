@@ -52,13 +52,24 @@ module Lti
         ]
       }
     end
-
-    let(:tool_configuration) { Lti::ToolConfiguration.new(settings: settings) }
-
-    let_once(:developer_key) { DeveloperKey.create }
+    let(:tool_configuration) { described_class.new(settings: settings) }
+    let(:developer_key) { DeveloperKey.create }
 
     describe 'validations' do
       subject { tool_configuration.save }
+
+      context 'when valid' do
+        before { tool_configuration.developer_key = developer_key }
+        it { is_expected.to eq true }
+      end
+
+      context 'when developer_key already has a tool_config' do
+        before do
+          described_class.create! settings: settings, developer_key: developer_key
+        end
+
+        it { is_expected.to eq false }
+      end
 
       context 'when "settings" is blank' do
         before do
@@ -124,10 +135,10 @@ module Lti
           expect(subject.settings).to eq settings
         end
 
-        context 'when a timout occurs' do
+        context 'when a timeout occurs' do
           before { allow_any_instance_of(Net::HTTP).to receive(:request).and_raise(Timeout::Error) }
 
-          it 'raises exeception if timeout occurs' do
+          it 'raises exception if timeout occurs' do
             expect(subject.errors[:settings_url]).to include 'Could not retrieve settings, the server response timed out.'
           end
         end

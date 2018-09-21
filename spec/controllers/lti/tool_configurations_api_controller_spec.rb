@@ -19,31 +19,28 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
-  let_once(:account) { account_model }
+  subject { response }
+  let_once(:account) { Account.default }
   let_once(:admin) { account_admin_user(account: account) }
   let_once(:student) do
     student_in_course
     @student
   end
-
   let(:developer_key) { DeveloperKey.create!(account: account) }
-
   let(:config_from_response) do
     Lti::ToolConfiguration.find(json_parse.dig('tool_configuration', 'id'))
   end
-
   let(:tool_configuration) do
     Lti::ToolConfiguration.create!(
       developer_key: developer_key,
       settings: settings
     )
   end
-
   let(:settings) do
     {
       'title' => 'LTI 1.3 Tool',
       'description' => '1.3 Tool',
-      'launch_url' => 'http://lti13testtool.docker/blti_launch',
+      'launch_url' => launch_url,
       'custom_fields' => {'has_expansion' => '$Canvas.user.id', 'no_expansion' => 'foo'},
       'extensions' =>  [
         {
@@ -70,227 +67,217 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       ]
     }
   end
-
   let(:new_url) { 'https://www.new-url.com/test' }
-
-  let(:changed_settings) do
-    changed_settings = settings
-    changed_settings['launch_url'] = new_url
-    changed_settings
-  end
-
+  let(:launch_url) { 'http://lti13testtool.docker/blti_launch' }
+  let(:dev_key_id) { developer_key.id }
   let(:valid_parameters) do
     {
-      developer_key_id: developer_key.id,
+      developer_key_id: dev_key_id,
       tool_configuration: {
-        settings: changed_settings
+        settings: settings
       }
-    }
+    }.compact
   end
 
   before { user_session(admin) }
 
-  shared_examples_for 'an action that requires manage developer keys' do
-    let(:response) { raise 'set in example' }
-
-    it 'does not render "unauthorized" if the user has manage_developer_keys' do
-      expect(response).to be_success
+  shared_examples_for 'an action that requires manage developer keys' do |skip_404|
+    context 'when the user has manage_developer_keys' do
+      it { is_expected.to be_success }
     end
 
     context 'when the user is not an admin' do
       before { user_session(student) }
 
-      it 'renders "unauthorized" if the user does not have manage_developer_keys' do
-        expect(response).to be_unauthorized
-      end
+      it { is_expected.to be_unauthorized }
     end
 
-    context 'when the developer key does not exist' do
-      before { developer_key.destroy! }
+    unless skip_404
+      context 'when the developer key does not exist' do
+        before { developer_key.destroy! }
 
-      it { is_expected.to be_not_found }
+        it { is_expected.to be_not_found }
+      end
     end
   end
 
-  shared_examples_for 'an endpoint that requires an existing tool configuraiton' do
-    let(:response) { raise 'set in example' }
-
+  shared_examples_for 'an endpoint that requires an existing tool configuration' do
     context 'when the tool configuration does not exist' do
       it { is_expected.to be_not_found }
     end
   end
 
-  describe 'create_or_update' do
-    subject { post :create_or_update, params: valid_parameters }
-
-    shared_examples_for 'an endpoint that accepts a settings_url' do
-      let(:ok_response) do
-        double(
-          body: settings.to_json,
-          is_a?: true,
-          '[]' => 'application/json'
-        )
-      end
-      let(:url) { 'https://www.mytool.com/config/json' }
-      let(:url_parameters) { {developer_key_id: developer_key.id, tool_configuration: {settings_url: url}} }
-
-      context 'when the request does not time out' do
-        before do
-          allow_any_instance_of(Net::HTTP).to receive(:request).and_return(ok_response)
-          post :create_or_update, params: url_parameters
-        end
-
-        it 'uses the tool configuration JSON from the settings_url' do
-          expect(config_from_response.settings['launch_url']).to eq settings['launch_url']
-        end
-      end
-
-      context 'when the request times out' do
-        before do
-          allow_any_instance_of(Net::HTTP).to receive(:request).and_raise(Timeout::Error)
-          post :create_or_update, params: url_parameters
-        end
-
-        it 'responds with 422' do
-          expect(response.code).to eq '422'
-        end
-
-        it 'responds with helpful error message' do
-          expect(json_parse['errors'].first['message']).to eq 'Could not retrieve settings, the server response timed out.'
-        end
-      end
-
-      context 'when the response is not a success' do
-        subject { json_parse['errors'].first['message'] }
-
-        let(:stubbed_response) { double() }
-
-        before do
-          allow(stubbed_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return false
-          allow(stubbed_response).to receive('[]').and_return('application/json')
-          allow_any_instance_of(Net::HTTP).to receive(:request).and_return(stubbed_response)
-        end
-
-        context 'when the response is "not found"' do
-          before do
-            allow(stubbed_response).to receive(:message).and_return('Not found')
-            allow(stubbed_response).to receive(:code).and_return('404')
-            post :create_or_update, params: url_parameters
-          end
-
-          it { is_expected.to eq 'Not found' }
-        end
-
-        context 'when the response is "unauthorized"' do
-          before do
-            allow(stubbed_response).to receive(:message).and_return('Unauthorized')
-            allow(stubbed_response).to receive(:code).and_return('401')
-            post :create_or_update, params: url_parameters
-          end
-
-          it { is_expected.to eq 'Unauthorized' }
-        end
-
-        context 'when the response is "internal server error"' do
-          before do
-            allow(stubbed_response).to receive(:message).and_return('Internal server error')
-            allow(stubbed_response).to receive(:code).and_return('500')
-            post :create_or_update, params: url_parameters
-          end
-
-          it { is_expected.to eq 'Internal server error' }
-        end
-
-        context 'when the response is not JSON' do
-          before do
-            allow(stubbed_response).to receive('[]').and_return('text/html')
-            allow(stubbed_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return true
-            post :create_or_update, params: url_parameters
-          end
-
-          it { is_expected.to eq 'Content type must be "application/json"' }
-        end
-      end
+  shared_examples_for 'an endpoint that accepts a settings_url' do
+    let(:ok_response) do
+      double(
+        body: settings.to_json,
+        is_a?: true,
+        '[]' => 'application/json'
+      )
     end
+    let(:url) { 'https://www.mytool.com/config/json' }
+    let(:valid_parameters) { {developer_key_id: developer_key.id, tool_configuration: {settings_url: url}} }
+    let(:make_request) { raise 'Override in spec' }
 
-    it_behaves_like 'an action that requires manage developer keys' do
-      let(:response) { subject }
-    end
-
-    context 'when the tool configuration does not exist' do
-      it { is_expected.to be_ok }
-
-      it_behaves_like 'an endpoint that accepts a settings_url'
-    end
-
-    context 'when the tool configuration already exists' do
+    context 'when the request does not time out' do
       before do
-        tool_configuration
-        post :create_or_update, params: valid_parameters
+        allow_any_instance_of(Net::HTTP).to receive(:request).and_return(ok_response)
       end
 
-      it { is_expected.to be_ok }
+      it 'uses the tool configuration JSON from the settings_url' do
+        subject
+        expect(config_from_response.settings['launch_url']).to eq settings['launch_url']
+      end
+    end
 
-      it_behaves_like 'an endpoint that accepts a settings_url'
+    context 'when the request times out' do
+      before do
+        allow_any_instance_of(Net::HTTP).to receive(:request).and_raise(Timeout::Error)
+      end
+
+      it { is_expected.to have_http_status :unprocessable_entity }
+
+      it 'responds with helpful error message' do
+        subject
+        expect(json_parse['errors'].first['message']).to eq 'Could not retrieve settings, the server response timed out.'
+      end
+    end
+
+    context 'when the response is not a success' do
+      subject { json_parse['errors'].first['message'] }
+
+      let(:stubbed_response) { double() }
+
+      before do
+        allow(stubbed_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return false
+        allow(stubbed_response).to receive('[]').and_return('application/json')
+        allow_any_instance_of(Net::HTTP).to receive(:request).and_return(stubbed_response)
+      end
+
+      context 'when the response is "not found"' do
+        before do
+          allow(stubbed_response).to receive(:message).and_return('Not found')
+          allow(stubbed_response).to receive(:code).and_return('404')
+          make_request
+        end
+
+        it { is_expected.to eq 'Not found' }
+      end
+
+      context 'when the response is "unauthorized"' do
+        before do
+          allow(stubbed_response).to receive(:message).and_return('Unauthorized')
+          allow(stubbed_response).to receive(:code).and_return('401')
+          make_request
+        end
+
+        it { is_expected.to eq 'Unauthorized' }
+      end
+
+      context 'when the response is "internal server error"' do
+        before do
+          allow(stubbed_response).to receive(:message).and_return('Internal server error')
+          allow(stubbed_response).to receive(:code).and_return('500')
+          make_request
+        end
+
+        it { is_expected.to eq 'Internal server error' }
+      end
+
+      context 'when the response is not JSON' do
+        before do
+          allow(stubbed_response).to receive('[]').and_return('text/html')
+          allow(stubbed_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return true
+          make_request
+        end
+
+        it { is_expected.to eq 'Content type must be "application/json"' }
+      end
+    end
+  end
+
+  describe 'create' do
+    subject { post :create, params: valid_parameters }
+    let(:dev_key_id) { nil }
+
+    it_behaves_like 'an action that requires manage developer keys', true
+
+    context 'when the tool configuration does not exist' do
+      let(:dev_key_id) { developer_key.id }
+
+      it { is_expected.to be_ok }
+    end
+
+    it_behaves_like 'an endpoint that accepts a settings_url' do
+      let(:make_request) { post :create, params: valid_parameters }
+    end
+  end
+
+  describe 'update' do
+    subject { put :update, params: valid_parameters }
+
+    let(:launch_url) { new_url }
+
+    before do
+      tool_configuration
+    end
+
+    context do
+      it { is_expected.to be_ok }
 
       it 'updates the tool configuration' do
+        subject
         new_settings = config_from_response.settings
         expect(new_settings['launch_url']).to eq new_url
       end
     end
+
+    it_behaves_like 'an endpoint that accepts a settings_url' do
+      let(:make_request) { post :update, params: valid_parameters }
+    end
+
+    it_behaves_like 'an action that requires manage developer keys'
   end
 
   describe 'show' do
     subject { get :show, params: valid_parameters.except(:tool_configuration) }
 
-    let(:show_response) do
+    before do
       tool_configuration
-      subject
     end
 
-    it_behaves_like 'an action that requires manage developer keys' do
-      let(:response) { show_response }
-    end
+    it_behaves_like 'an action that requires manage developer keys'
 
-    it_behaves_like 'an endpoint that requires an existing tool configuraiton' do
-      let(:response) { show_response }
+    context do
+      let(:tool_configuration) { nil }
+      it_behaves_like 'an endpoint that requires an existing tool configuration'
     end
 
     context 'when the tool configuration exists' do
-      before do
-        tool_configuration
-        subject
-      end
-
       it 'renders the tool configuration' do
+        subject
         expect(config_from_response).to eq tool_configuration
       end
     end
   end
 
   describe 'destroy' do
-    subject { delete :destroy, params: valid_parameters.except(:tool_configuration) }
+    subject {  delete :destroy, params: valid_parameters.except(:tool_configuration) }
 
-    let(:destroy_response) do
+    before do
       tool_configuration
-      subject
     end
 
-    it_behaves_like 'an action that requires manage developer keys' do
-      let(:response) { destroy_response }
-    end
+    it_behaves_like 'an action that requires manage developer keys'
 
-    it_behaves_like 'an endpoint that requires an existing tool configuraiton' do
-      let(:response) { destroy_response }
+    context do
+      let(:tool_configuration) { nil }
+      it_behaves_like 'an endpoint that requires an existing tool configuration'
     end
 
     context 'when the tool configuration exists' do
-      before do
-        tool_configuration
-        subject
-      end
-
       it 'destroys the tool configuration' do
+        subject
         expect(Lti::ToolConfiguration.find_by(id: tool_configuration.id)).to be_nil
       end
 

@@ -38,18 +38,18 @@
 class Lti::ToolConfigurationsApiController < ApplicationController
   before_action :require_user
   before_action :require_manage_developer_keys
-  before_action :require_tool_configuration, only: [:show, :destroy]
+  before_action :require_tool_configuration, only: [:show, :update, :destroy]
 
-  # @API Create or Update Tool configuration
-  # Creates tool configuration with the provided parameters if it does
-  # not exest. Otherwise updates the tool configuration with the provided
-  # parameters.
+  # @API Create Tool configuration
+  # Creates tool configuration with the provided parameters.
   #
   # Settings may be provided directly as JSON through the "settings"
   # parameter or indirectly through the "settings_url" parameter.
   #
-  # If both a the "settings" and "settings_url" parameters are set,
+  # If both the "settings" and "settings_url" parameters are set,
   # the "settings" parameter will be ignored.
+  #
+  # Use of this endpoint will create a new developer_key.
   #
   # @argument settings [Object]
   #   JSON representation of the tool configuration
@@ -57,13 +57,46 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   # @argument settings_url [String]
   #   URL of settings JSON
   #
+  # @argument developer_key_id [String]
+  #
+  #
   # @returns ToolConfiguration
-  def create_or_update
-    tool_config = Lti::ToolConfiguration.find_or_initialize_by(developer_key: developer_key).tap do |tc|
-      tc.settings = tool_configuration_params[:settings]
-      tc.settings_url = tool_configuration_params[:settings_url]
-    end
-    tool_config.save!
+  def create
+    tool_config = Lti::ToolConfiguration.create!(
+      developer_key: DeveloperKey.create!(account: account),
+      settings: tool_configuration_params[:settings],
+      settings_url: tool_configuration_params[:settings_url]
+    )
+    render json: tool_config
+  end
+
+  # @API Update Tool configuration
+  # Update tool configuration with the provided parameters.
+  #
+  # Settings may be provided directly as JSON through the "settings"
+  # parameter or indirectly through the "settings_url" parameter.
+  #
+  # If both the "settings" and "settings_url" parameters are set,
+  # the "settings" parameter will be ignored.
+  #
+  #
+  # @argument settings [Object]
+  #   JSON representation of the tool configuration
+  #
+  # @argument settings_url [String]
+  #   URL of settings JSON
+  #
+  # @argument developer_key_id [String]
+  #
+  #
+  # @returns ToolConfiguration
+  def update
+    tool_config = developer_key.tool_configuration
+    tool_config.update!(
+      settings: tool_configuration_params[:settings],
+      settings_url: tool_configuration_params[:settings_url]
+    )
+
     render json: tool_config
   end
 
@@ -89,13 +122,17 @@ class Lti::ToolConfigurationsApiController < ApplicationController
     head :not_found
   end
 
+  def account
+    return @domain_root_account if params[:action] == 'create'
+    developer_key.owner_account
+  end
+
   def require_manage_developer_keys
-    return if authorized_action(developer_key.owner_account, @current_user, :manage_developer_keys)
-    head :unauthorized
+    authorized_action(account, @current_user, :manage_developer_keys)
   end
 
   def developer_key
-    @_developer_key ||= DeveloperKey.nondeleted.find(params[:developer_key_id])
+    @_developer_key = DeveloperKey.nondeleted.find(params[:developer_key_id])
   end
 
   def tool_configuration_params

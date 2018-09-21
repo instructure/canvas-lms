@@ -25,6 +25,7 @@ module Lti
     before_save :normalize_settings
 
     validates :developer_key_id, :settings, presence: true
+    validates :developer_key_id, uniqueness: true
     validate :valid_tool_settings?, unless: Proc.new { |c| c.developer_key_id.blank? || c.settings.blank? }
 
     attr_accessor :settings_url

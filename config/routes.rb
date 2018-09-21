@@ -2148,7 +2148,8 @@ CanvasRails::Application.routes.draw do
   ApiRouteSet.draw(self, "/api/lti") do
 
     scope(controller: 'lti/tool_configurations_api') do
-      post 'developer_keys/:developer_key_id/tool_configuration', action: :create_or_update
+      put 'developer_keys/:developer_key_id/tool_configuration', action: :update
+      post 'developer_keys/tool_configuration', action: :create
       get 'developer_keys/:developer_key_id/tool_configuration', action: :show
       delete 'developer_keys/:developer_key_id/tool_configuration', action: :destroy
     end
