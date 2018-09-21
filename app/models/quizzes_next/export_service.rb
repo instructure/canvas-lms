@@ -50,16 +50,17 @@ module QuizzesNext
         export_data
       end
 
-      def send_imported_content(new_course, imported_content)
+      def send_imported_content(new_course, content_migration, imported_content)
         imported_content[:assignments].each do |assignment|
           next if QuizzesNext::Service.assignment_not_in_export?(assignment)
           next unless QuizzesNext::Service.assignment_duplicated?(assignment)
 
-          old_assignment_id = assignment.fetch(:original_assignment_id)
-          old_assignment = Assignment.find(old_assignment_id)
-
           new_assignment_id = assignment.fetch(:$canvas_assignment_id)
           new_assignment = Assignment.find(new_assignment_id)
+          next unless new_assignment.created_at > content_migration.started_at # no more recopies
+
+          old_assignment_id = assignment.fetch(:original_assignment_id)
+          old_assignment = Assignment.find(old_assignment_id)
 
           new_assignment.duplicate_of = old_assignment
           new_assignment.workflow_state = 'duplicating'

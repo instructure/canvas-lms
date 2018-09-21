@@ -23,6 +23,7 @@ RSpec.describe Lti::ContentMigrationService::Importer do
   include LtiSpecHelper
 
   let(:course) { course_model }
+  let(:content_migration) { ContentMigration.new }
   let(:tool) { course.context_external_tools.create!({
     name:          'a',
     domain:        'lti.example.com',
@@ -44,7 +45,7 @@ RSpec.describe Lti::ContentMigrationService::Importer do
     it 'must raise an error when the tool has been deleted and not replaced by another with the same domain' do
       tool.workflow_state = 'deleted'
       tool.save!
-      expect { importer.send_imported_content(course, content) }.
+      expect { importer.send_imported_content(course, content_migration, content) }.
         to raise_error "Unable to find external tool to import content."
     end
 
@@ -52,7 +53,7 @@ RSpec.describe Lti::ContentMigrationService::Importer do
       tool.workflow_state = 'deleted'
       tool.save!
       replacement_tool
-      expect { importer.send_imported_content(course, content) }.
+      expect { importer.send_imported_content(course, content_migration, content) }.
         to raise_error "Unable to find external tool to import content."
     end
 
@@ -78,7 +79,7 @@ RSpec.describe Lti::ContentMigrationService::Importer do
         stub_request(:post, import_url).
           to_return(:status => 200, :body => response_body, :headers => {})
 
-        @response = importer.send_imported_content(course, content)
+        @response = importer.send_imported_content(course, content_migration, content)
       end
 
       it 'must return the importer' do
@@ -153,7 +154,7 @@ RSpec.describe Lti::ContentMigrationService::Importer do
         }.to_json
         stub_request(:post, 'https://lti.example.com/begin_import_again').
           to_return(:status => 200, :body => response_body, :headers => {})
-        importer.send_imported_content(course, content)
+        importer.send_imported_content(course, content_migration, content)
         assert_requested(:post, 'https://lti.example.com/begin_import_again', {
           body: hash_including(context_id: Lti::Asset.opaque_identifier_for(course))
         })
