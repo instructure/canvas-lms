@@ -49,7 +49,7 @@ module Types
   class AssignmentOverrideType < ApplicationObjectType
     graphql_name "AssignmentOverride"
 
-    implements GraphQL::Relay::Node.interface
+    implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
 
     alias :override :object

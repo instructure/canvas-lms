@@ -20,7 +20,7 @@ module Types
   ModuleType = GraphQL::ObjectType.define do
     name "Module"
 
-    implements GraphQL::Relay::Node.interface
+    implements GraphQL::Types::Relay::Node
     interfaces [Interfaces::TimestampInterface]
 
     global_id_field :id

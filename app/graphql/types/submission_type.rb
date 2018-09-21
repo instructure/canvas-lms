@@ -20,7 +20,7 @@ module Types
   class SubmissionType < ApplicationObjectType
     graphql_name "Submission"
 
-    implements GraphQL::Relay::Node.interface
+    implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
 
     alias :submission :object
