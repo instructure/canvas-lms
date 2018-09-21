@@ -34,6 +34,10 @@ module Lti::Ims
       render_memberships
     end
 
+    def base_url
+      polymorphic_url([context, :names_and_roles])
+    end
+
     private
 
     def render_memberships
@@ -42,16 +46,11 @@ module Lti::Ims
     end
 
     def find_memberships_page
-      finder = new_finder
-      {
-        memberships: finder.find,
-        url: request.url,
-        context: finder.context
-      }
+      {url: request.url}.reverse_merge(new_finder.find)
     end
 
     def new_finder
-      Helpers.const_get("#{context.class}MembershipsFinder").new(context)
+      Helpers.const_get("#{context.class}MembershipsFinder").new(context, self)
     end
 
     def verify_nrps_v2_allowed

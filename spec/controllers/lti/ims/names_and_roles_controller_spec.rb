@@ -25,9 +25,8 @@ describe Lti::Ims::NamesAndRolesController do
 
   let_once(:course) { course_factory(active_course: true) }
   let_once(:group_record) { group(context: course) } # _record suffix to avoid conflict with group() factory mtd
-  let(:course_id) { course.id }
-  let(:group_id) { group_record.id }
-  let(:context_id) { raise 'Override in spec' }
+  let(:context) { raise 'Override in spec' }
+  let(:context_id) { context.id }
   let(:unknown_context_id) { raise 'Override in spec' }
   let(:context_param_name) { raise 'Override in spec' }
   let(:action) { raise 'Override in spec'}
@@ -72,10 +71,103 @@ describe Lti::Ims::NamesAndRolesController do
     end
   end
 
+  shared_examples 'page size check' do
+    # Needs all the same variables as 'multiple enrollments check', plus:
+    #
+    #   page_size_param_name - symbol naming the page size query param
+    #
+    let(:pagination_overrides) { { page_size_param_name => rqst_page_size } }
+    let(:params_overrides) { super().merge(pagination_overrides) }
+
+    it 'returns the first page of results, with the correct size and proper navigation links' do
+      send_request
+      expect_enrollment_response_page
+      expect(response_links).to have_correct_pagination_urls
+    end
+
+    context 'when the page size parameter is too large' do
+      let(:rqst_page_size) { 4611686018427387903 }
+      let(:rsp_page_size) { 50 } # system max
+
+      it 'defaults to the system maximum page size' do
+        send_request
+        expect_enrollment_response_page
+        expect(response_links).to have_correct_pagination_urls
+      end
+    end
+
+    context 'when a page index parameter is specified' do
+      let(:rqst_page) { 2 }
+      let(:rsp_page) { 2 }
+      let(:pagination_overrides) { super().merge(page: rqst_page) }
+
+      it 'returns the specified page of results, with the correct size and proper navigation links' do
+        send_request
+        expect_enrollment_response_page
+        expect(response_links).to have_correct_pagination_urls
+      end
+
+      context 'and when the page index parameter is too large ' do
+        let(:rqst_page) { total_items + 1 } # cant have more pages than there are items
+        let(:rsp_page) { rqst_page }
+        let(:rsp_page_size) { 30 } # don't know why, Api just does this
+
+        it 'returns an empty members array, with the correct size and proper navigation links' do
+          send_request
+          expect_empty_members_array
+          expect(response_links).to have_correct_pagination_urls
+        end
+      end
+    end
+  end
+
+  shared_examples 'multiple enrollments check' do
+    # When including, define the following:
+    #   enrollments: array of context enrollments
+    #   total_items: context's active enrollment count
+    #   rsp_page: expected response page index
+    #   rsp_page_size: expected response page size
+    #   pass_through_param: hash of query params to be written through to pagination links
+    #   params_overrides: hash of all request params
+
+    it 'returns all enrollments sorted by user id' do
+      send_request
+      expect_enrollment_response_page
+      expect(response_links).to have_correct_pagination_urls
+    end
+
+    context 'when a limit page size parameter is specified' do
+      let(:rqst_page_size) { 2 }
+      let(:rsp_page_size) { 2 }
+      let(:page_size_param_name) { :limit }
+
+      it_behaves_like 'page size check'
+    end
+
+    context 'when a per_page parameter is specified' do
+      let(:rqst_page_size) { 2 }
+      let(:rsp_page_size) { 2 }
+      let(:page_size_param_name) { :per_page }
+
+      it_behaves_like 'page size check'
+    end
+
+    context 'when a limit param overrides a per_page param' do
+      let(:rqst_page_size) { 2 }
+      let(:rsp_page_size) { 2 }
+      let(:page_size_param_name) { :limit }
+
+      # limit=2, per_page=3 ... latter should be ignored
+      let(:params_overrides) { super().merge(per_page: 3) }
+
+      it_behaves_like 'page size check'
+    end
+  end
+
   describe '#course_index' do
     let(:action) { :course_index }
+    let(:context) { course }
     let(:context_param_name) { :course_id }
-    let(:context_id) { course_id }
     let(:unknown_context_id) { Course.maximum(:id) + 1 }
 
     it_behaves_like 'response check'
@@ -198,30 +290,32 @@ describe Lti::Ims::NamesAndRolesController do
     end
 
     context 'when a course has multiple enrollments' do
-      it 'returns all enrollments sorted by user id' do
-        enrollments = [
+
+      let!(:enrollments) do
+        [
           teacher_in_course(course: course, active_all: true),
           student_in_course(course: course, active_all: true),
           ta_in_course(course: course, active_all: true),
           observer_in_course(course: course, active_all: true),
           designer_in_course(course: course, active_all: true)
         ]
-        send_request
-        enrollments.
-          sort_by { |e| e.user.id }.
-          each_with_index { |e,i| expect_member(e,i) }
-        expect_member_count(5)
       end
+      let(:total_items) { enrollments.length }
+      let(:rsp_page) { 1 }
+      let(:rsp_page_size) { 10 } # system default
+      let(:pass_thru_params) { { pass: 'thru' } }
+      let(:params_overrides) { super().merge(pass_thru_params) }
+
+      it_behaves_like 'multiple enrollments check'
+
     end
   end
 
   describe '#group_index' do
     let(:action) { :group_index }
+    let(:context) { group_record }
     let(:context_param_name) { :group_id }
-    let(:context_id) { group_id }
     let(:unknown_context_id) { Group.maximum(:id) + 1 }
-
-    it_behaves_like 'response check'
 
     context 'when a group has a single membership' do
       let(:group_record) { group_with_user(active_all: true).group }
@@ -256,20 +350,23 @@ describe Lti::Ims::NamesAndRolesController do
     end
 
     context 'when a group has multiple memberships' do
-      it 'returns all memberships sorted by user id' do
-        memberships = [
+
+      let!(:enrollments) do
+        [
           group_membership_model(group: group_record, user: user_model),
           group_membership_model(group: group_record, user: user_model),
           group_membership_model(group: group_record, user: user_model),
           group_membership_model(group: group_record, user: user_model),
-          group_membership_model(group: group_record, user: user_model),
+          group_membership_model(group: group_record, user: user_model)
         ]
-        send_request
-        memberships.
-          sort_by { |m| m.user.id }.
-          each_with_index { |m,i| expect_member(m,i) }
-        expect_member_count(5)
       end
+      let(:total_items) { enrollments.length }
+      let(:rsp_page) { 1 }
+      let(:rsp_page_size) { 10 } # system default
+      let(:pass_thru_params) { { pass: 'thru' } }
+      let(:params_overrides) { super().merge(pass_thru_params) }
+
+      it_behaves_like 'multiple enrollments check'
     end
   end
 
@@ -296,7 +393,7 @@ describe Lti::Ims::NamesAndRolesController do
   end
 
   def expect_member_count(count)
-    expect(json[:members].length).to equal(count)
+    expect(json[:members].length).to eq(count)
   end
 
   def custom_enrollment_in_course(base_type_name, opts={})
@@ -307,6 +404,45 @@ describe Lti::Ims::NamesAndRolesController do
 
   def match_enrollment(enrollment)
     enrollment.is_a?(Enrollment) ? be_lti_course_membership(enrollment) : be_lti_group_membership(enrollment)
+  end
+
+  def expect_enrollment_response_page
+    enrollments.
+      sort_by { |e| e.user.id }.
+      slice(rsp_page_size*(rsp_page-1), rsp_page_size).
+      each_with_index { |e,i| expect_member(e,i) }
+    expect_member_count([rsp_page_size,total_items].min)
+  end
+
+  def have_correct_pagination_urls
+    total_pages = page_count(total_items, rsp_page_size)
+    pass_thrus = as_query_params(pass_thru_params)
+
+    # rubocop:disable Metrics/LineLength
+    expected_links = [
+      "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{rsp_page}&per_page=#{rsp_page_size}>; rel=\"current\"",
+      "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{rsp_page+1}&per_page=#{rsp_page_size}>; rel=\"next\"",
+      "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{rsp_page-1}&per_page=#{rsp_page_size}>; rel=\"prev\"",
+      "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=1&per_page=#{rsp_page_size}>; rel=\"first\"",
+      "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{total_pages}&per_page=#{rsp_page_size}>; rel=\"last\""
+    ]
+    # rubocop:enable Metrics/LineLength
+    expected_links.reject! {|el| el.include?('rel="next"')} if rsp_page == total_pages
+    expected_links.reject! {|el| el.include?('rel="prev"')} if rsp_page <= 1
+    expected_links.reject! {|el| el.include?('rel="last"')} if rsp_page > total_pages
+    match_array(expected_links)
+  end
+
+  def as_query_params(params_hash)
+    params_hash.empty? ? '' : "#{params_hash.to_query}&"
+  end
+
+  def page_count(total_items, page_size)
+    (total_items / page_size) + (total_items % page_size > 0 ? 1 : 0)
+  end
+
+  def response_links
+    response.headers["Link"].split(",")
   end
 
 end
