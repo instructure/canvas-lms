@@ -43,7 +43,7 @@ const developerKey = {
   test_cluster_only: true
 }
 
-function formFieldOfTypeAndName(devKey, fieldType, name) {
+function formFieldOfTypeAndName(devKey, fieldType, name, ltiKey) {
   const component = TestUtils.renderIntoDocument(
     <DeveloperKeyFormFields
       availableScopes={{}}
@@ -51,6 +51,7 @@ function formFieldOfTypeAndName(devKey, fieldType, name) {
       developerKey={devKey}
       dispatch={ () => {} }
       listDeveloperKeyScopesSet={ () => {} }
+      ltiKey={ltiKey}
     />
   )
   return TestUtils.scryRenderedDOMComponentsWithTag(component, fieldType).
@@ -108,3 +109,40 @@ test('populates the key test_cluster_only', () => {
   equal(input.checked, developerKey.test_cluster_only)
   fakeENV.teardown()
 })
+
+test('does not include legacy redirect uri if lti key', () => {
+  notOk(formFieldOfTypeAndName(developerKey, 'input', 'redirect_uri', true))
+})
+
+test('does not include redirect uris if lti key', () => {
+  notOk(formFieldOfTypeAndName(developerKey, 'textarea', 'redirect_uris', true))
+})
+
+test('does not include vendor code if lti key', () => {
+  notOk(formFieldOfTypeAndName(developerKey, 'input', 'vendor_code', true))
+})
+
+test('does not include icon URL if lti key', () => {
+  notOk(formFieldOfTypeAndName(developerKey, 'input', 'icon_url', true))
+})
+
+test('populates the key name when lti key', () => {
+  const input = formFieldOfTypeAndName(developerKey, 'input', 'name', true)
+  equal(input.value, developerKey.name)
+})
+
+test('defaults name to "Unnamed Tool" when lti key', () => {
+  const input = formFieldOfTypeAndName({id: 123}, 'input', 'name', true)
+  equal(input.value, 'Unnamed Tool')
+})
+
+test('populates the key owner email when lti key', () => {
+  const input = formFieldOfTypeAndName(developerKey, 'input', 'email', true)
+  equal(input.value, developerKey.email)
+})
+
+test('populates the key notes when lti key', () => {
+  const textarea = formFieldOfTypeAndName(developerKey, 'textarea', 'notes', true)
+  equal(textarea.value, developerKey.notes)
+})
+
