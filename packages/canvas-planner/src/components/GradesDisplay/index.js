@@ -85,7 +85,7 @@ export class GradesDisplay extends React.Component {
         margin="0 0 large 0"
       >
         <div className={styles.course} style={courseNameStyles}>
-          <Link href={course.href}>
+          <Link href={`${course.href}/grades`}>
             <Text color="primary" size="small" transform="uppercase">
               {course.shortName}
             </Text>
