@@ -50,9 +50,11 @@ module Canvas
           @environment = conf_hash['environment']
           @kv_client = Imperium::KV.default_client
           @data_center = conf_hash.fetch('global_dc', nil)
+          @default_service = conf_hash.fetch('service', :canvas)
         else
           @environment = nil
           @kv_client = nil
+          @default_service = :canvas
         end
       end
 
@@ -90,11 +92,12 @@ module Canvas
       # @param data_center [String] location of the data_center the proxy is pointing to
       def find( prefix = nil,
                 tree: :config,
-                service: :canvas,
+                service: nil,
                 cluster: nil,
                 default_ttl: DynamicSettings::PrefixProxy::DEFAULT_TTL,
                 data_center: nil
               )
+        service ||= @default_service || :canvas
         if kv_client
           PrefixProxy.new(
             prefix,
