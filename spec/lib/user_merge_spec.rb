@@ -875,6 +875,28 @@ describe UserMerge do
       expect(Submission.find(submission.id).versioned_attachments).to eq [user1_attachment]
     end
 
+    it "should move cross-sharded conversations to the new user" do
+      user1 = user_factory
+      c1 = user1.initiate_conversation([user_factory, user_factory]) # group conversation
+      c1.add_message("hello")
+      c1.update_attribute(:workflow_state, 'unread')
+      c2 = user1.initiate_conversation([user_factory]) # private conversation
+      c2.add_message("hello")
+      c2.update_attribute(:workflow_state, 'unread')
+      old_private_hash = c2.conversation.private_hash
+
+      @shard1.activate do
+        new_account = Account.create!
+        @user2 = user_with_pseudonym(:account => new_account)
+      end
+
+      c3 = user1.initiate_conversation([user_factory, @user2]) # conversation where the target user already exists
+      c3.add_message("hello")
+
+      UserMerge.from(user1).into(@user2)
+      expect(@user2.all_conversations.pluck(:conversation_id)).to match_array([c1, c2, c3].map(&:conversation_id))
+    end
+
     context "manual invitation" do
       it "should not keep a temporary invitation in cache for an enrollment deleted after a user merge" do
         email = 'foo@example.com'
