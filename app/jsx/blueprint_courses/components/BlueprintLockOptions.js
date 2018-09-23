@@ -168,6 +168,7 @@ export default class BlueprintLockOptions extends React.Component {
         label={blueprintDescription}
         onChange={this.enableCourse}
         aria-label={this.props.disabledMessage}
+        value="on"
       />
     </div>)
     if (disabled) {
