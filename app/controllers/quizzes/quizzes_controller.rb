@@ -392,7 +392,7 @@ class Quizzes::QuizzesController < ApplicationController
       end
 
       if params[:post_to_sis]
-        @quiz.assignment.post_to_sis = params[:post_to_sis] == '1' ? true : false
+        @quiz.assignment.post_to_sis = params[:post_to_sis] == '1'
       end
 
 
@@ -460,7 +460,8 @@ class Quizzes::QuizzesController < ApplicationController
               old_assignment = @quiz.assignment.clone
               old_assignment.id = @quiz.assignment.id
 
-              @quiz.assignment.post_to_sis = params[:post_to_sis] == '1' ? true : false
+              @quiz.assignment.post_to_sis = params[:post_to_sis] == '1'
+              @quiz.assignment.validate_overrides_for_sis(overrides) unless overrides.nil?
             end
 
             auto_publish = @quiz.published?
