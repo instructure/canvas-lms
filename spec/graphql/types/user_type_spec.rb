@@ -34,7 +34,7 @@ describe Types::UserType do
     @teacher = teacher
   end
 
-  let(:user_type) { GraphQLTypeTester.new(@student, current_user: @teacher) }
+  let(:user_type) { GraphQLTypeTester.new(@student, current_user: @teacher, request: ActionDispatch::TestRequest.create ) }
   let(:user) { @student }
 
   context "node" do
@@ -61,6 +61,10 @@ describe Types::UserType do
   end
 
   context "avatarUrl" do
+    before(:once) do
+      @student.update_attributes! avatar_image_url: 'not-a-fallback-avatar.png'
+    end
+
     it "is nil when avatars are not enabled" do
       expect(user_type.resolve("avatarUrl")).to be_nil
     end
@@ -70,9 +74,10 @@ describe Types::UserType do
       expect(user_type.resolve("avatarUrl")).to match(/avatar.*png/)
     end
 
-    it "returns nil when a user has no avatar and use_fallback is false" do
+    it "returns nil when a user has no avatar" do
       user.account.enable_service(:avatars)
-      expect(user_type.resolve("avatarUrl(useFallback: false)")).to be_nil
+      user.update_attributes! avatar_image_url: nil
+      expect(user_type.resolve("avatarUrl")).to be_nil
     end
   end
 

@@ -64,7 +64,7 @@ const SCC_QUERY = gql`
       ... on User {
         _id
         short_name: shortName
-        avatar_url: avatarUrl(useFallback: false)
+        avatar_url: avatarUrl
         enrollments(courseId: $courseId) {
           last_activity_at: lastActivityAt
           section {
