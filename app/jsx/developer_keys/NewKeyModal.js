@@ -21,12 +21,14 @@ import $ from 'jquery'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Modal, {ModalHeader, ModalBody, ModalFooter} from '@instructure/ui-overlays/lib/components/Modal'
+import Modal, {ModalHeader, ModalBody} from '@instructure/ui-overlays/lib/components/Modal'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import View from '@instructure/ui-layout/lib/components/View'
 import React from 'react'
 import PropTypes from 'prop-types'
 import DeveloperKeyFormFields from './NewKeyForm'
+import NewKeyFooter from './NewKeyFooter'
+import LtiKeyFooter from './LtiKeyFooter'
 
 export default class DeveloperKeyModal extends React.Component {
   developerKeyUrl() {
@@ -84,11 +86,35 @@ export default class DeveloperKeyModal extends React.Component {
     )
   }
 
+  get isLtiKey() {
+    return this.props.createLtiKeyState.ltiKey
+  }
+
   modalBody() {
     if (this.props.createOrEditDeveloperKeyState.developerKeyCreateOrEditPending) {
       return this.spinner()
     }
     return this.developerKeyForm()
+  }
+
+  modalFooter() {
+    if (this.isLtiKey) {
+      return(
+        <LtiKeyFooter
+          onCancelClick={this.closeModal}
+          onSaveClick={this.submitForm}
+          customizing={this.props.createLtiKeyState.customizing}
+          ltiKeysSetCustomizing={this.props.actions.ltiKeysSetCustomizing}
+          dispatch={this.props.store.dispatch}
+        />
+      )
+    }
+    return(
+      <NewKeyFooter
+        onCancelClick={this.closeModal}
+        onSaveClick={this.submitForm}
+      />
+    )
   }
 
   spinner() {
@@ -116,6 +142,7 @@ export default class DeveloperKeyModal extends React.Component {
       availableScopesPending={availableScopesPending}
       dispatch={this.props.store.dispatch}
       listDeveloperKeyScopesSet={this.props.actions.listDeveloperKeyScopesSet}
+      ltiKey={this.isLtiKey}
     />
   }
 
@@ -147,12 +174,7 @@ export default class DeveloperKeyModal extends React.Component {
             <Heading>{I18n.t('Key Settings')}</Heading>
           </ModalHeader>
           <ModalBody>{this.modalBody()}</ModalBody>
-          <ModalFooter>
-            <Button onClick={this.closeModal}>{I18n.t('Cancel')}</Button>&nbsp;
-            <Button onClick={this.submitForm} variant="primary">
-              {I18n.t('Save Key')}
-            </Button>
-          </ModalFooter>
+          {this.modalFooter()}
         </Modal>
       </div>
     )
@@ -170,10 +192,15 @@ DeveloperKeyModal.propTypes = {
     dispatch: PropTypes.func.isRequired
   }).isRequired,
   actions: PropTypes.shape({
+    ltiKeysSetCustomizing: PropTypes.func.isRequired,
     createOrEditDeveloperKey: PropTypes.func.isRequired,
     developerKeysModalClose: PropTypes.func.isRequired,
     editDeveloperKey: PropTypes.func.isRequired,
     listDeveloperKeyScopesSet: PropTypes.func.isRequired
+  }).isRequired,
+  createLtiKeyState: PropTypes.shape({
+    ltiKey: PropTypes.bool.isRequired,
+    customizing: PropTypes.bool.isRequired
   }).isRequired,
   createOrEditDeveloperKeyState: PropTypes.shape({
     developerKeyCreateOrEditSuccessful: PropTypes.bool.isRequired,

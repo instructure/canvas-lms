@@ -46,6 +46,7 @@ function generateKeyList(numKeys = 10) {
 
 function initialApplicationState(list = null, inheritedList = null) {
   return {
+    createLtiKey: {ltiKey: false},
     createOrEditDeveloperKey: {},
     listDeveloperKeyScopes,
     listDeveloperKeys: {
@@ -234,6 +235,7 @@ test('displays the show more button', () => {
   const list = generateKeyList()
 
   const applicationState = {
+    createLtiKey: {ltiKey: false},
     listDeveloperKeyScopes,
     createOrEditDeveloperKey: {},
     listDeveloperKeys: {
@@ -252,6 +254,7 @@ test('displays the show more button', () => {
 
 test('renders the list of developer_keys when there are some', () => {
   const applicationState = {
+    createLtiKey: {ltiKey: false},
     listDeveloperKeyScopes,
     createOrEditDeveloperKey: {},
     listDeveloperKeys: {
@@ -274,6 +277,7 @@ test('renders the list of developer_keys when there are some', () => {
 
 test('displays the developer key on click of show key button', () => {
   const applicationState = {
+    createLtiKey: {ltiKey: false},
     listDeveloperKeyScopes,
     createOrEditDeveloperKey: {},
     listDeveloperKeys: {
@@ -309,6 +313,7 @@ test('displays the developer key on click of show key button', () => {
 
 test('renders the spinner', () => {
   const applicationState = {
+    createLtiKey: {ltiKey: false},
     listDeveloperKeyScopes,
     createOrEditDeveloperKey: {},
     listDeveloperKeys: {
@@ -335,6 +340,7 @@ test('opens the modal when the create button is clicked', () => {
 
   const overrides = {
     applicationState: {
+      createLtiKey: {ltiKey: false},
       listDeveloperKeyScopes,
       createOrEditDeveloperKey: {},
       listDeveloperKeys: {
@@ -367,6 +373,7 @@ test('does not have the create button on inherited tab', () => {
 
   const overrides = {
     applicationState: {
+      createLtiKey: {ltiKey: false},
       listDeveloperKeyScopes,
       createOrEditDeveloperKey: {},
       listDeveloperKeys: {

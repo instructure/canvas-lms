@@ -110,6 +110,7 @@ class DeveloperKeysApp extends React.Component {
           listDeveloperKeysPending,
           listInheritedDeveloperKeysPending
         },
+        createLtiKey,
         createOrEditDeveloperKey,
         listDeveloperKeyScopes
       },
@@ -147,6 +148,7 @@ class DeveloperKeysApp extends React.Component {
             <DeveloperKeyModal
               store={store}
               actions={actions}
+              createLtiKeyState={createLtiKey}
               createOrEditDeveloperKeyState={createOrEditDeveloperKey}
               availableScopes={listDeveloperKeyScopes.availableScopes}
               availableScopesPending={listDeveloperKeyScopes.listDeveloperKeyScopesPending}

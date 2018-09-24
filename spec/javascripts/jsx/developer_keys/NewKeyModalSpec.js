@@ -53,6 +53,11 @@ const developerKey = {
   test_cluster_only: false
 }
 
+const createLtiKeyState = {
+  ltiKey: false,
+  customizing: false
+}
+
 const createDeveloperKeyState = {
   developerKeyCreateOrEditSuccessful: false,
   developerKeyCreateOrEditFailed: false,
@@ -86,6 +91,7 @@ function modalMountNode() {
 test('it opens the modal if isOpen prop is true', () => {
   const wrapper = shallow(
     <DeveloperKeyModal
+      createLtiKeyState={createLtiKeyState}
       availableScopes={{}}
       availableScopesPending={false}
       closeModal={() => {}}
@@ -102,6 +108,7 @@ test('it opens the modal if isOpen prop is true', () => {
 test('it closes the modal if isOpen prop is false', () => {
   const wrapper = shallow(
     <DeveloperKeyModal
+      createLtiKeyState={createLtiKeyState}
       availableScopes={{}}
       availableScopesPending={false}
       closeModal={() => {}}
@@ -113,199 +120,6 @@ test('it closes the modal if isOpen prop is false', () => {
     />
   )
   equal(wrapper.find('Modal').prop('open'), false)
-})
-
-test('it dismisses the modal when the "cancel" button is pressed', () => {
-  const closeModalSpy = sinon.spy()
-
-  const fakeActions = {
-    createOrEditDeveloperKey: () => {},
-    developerKeysModalClose: closeModalSpy,
-    editDeveloperKey: () => {}
-  }
-
-  const wrapper = shallow(
-    <DeveloperKeyModal
-      availableScopes={{}}
-      availableScopesPending={false}
-      createOrEditDeveloperKeyState={createDeveloperKeyState}
-      actions={fakeActions}
-      store={{dispatch: () => {}}}
-      mountNode={modalMountNode}
-      selectedScopes={selectedScopes}
-    />
-  )
-  const cancelButton = wrapper.find('Button').filterWhere(n => n.prop('children') === 'Cancel')
-  cancelButton.simulate('click')
-
-  ok(closeModalSpy.called)
-})
-
-test('clear the active key when the cancel button is closed', () => {
-  const setKeySpy = sinon.spy()
-
-  const fakeActions = {
-    createOrEditDeveloperKey: () => {},
-    developerKeysModalClose: () => {},
-    editDeveloperKey: setKeySpy
-  }
-
-  const wrapper = shallow(
-    <DeveloperKeyModal
-      availableScopes={{}}
-      availableScopesPending={false}
-      createOrEditDeveloperKeyState={createDeveloperKeyState}
-      actions={fakeActions}
-      store={{dispatch: () => {}}}
-      mountNode={modalMountNode}
-      selectedScopes={selectedScopes}
-    />
-  )
-  const cancelButton = wrapper.find('Button').filterWhere(n => n.prop('children') === 'Cancel')
-  cancelButton.simulate('click')
-
-  ok(setKeySpy.called)
-  equal(setKeySpy.args[0].length, 0)
-})
-
-test('it uses the create URL if a key is being created', () => {
-  const createOrEditSpy = sinon.spy()
-  const dispatchSpy = sinon.spy()
-
-  const fakeActions = {
-    createOrEditDeveloperKey: createOrEditSpy,
-    developerKeysModalClose: () => {}
-  }
-  const fakeStore = {
-    dispatch: dispatchSpy
-  }
-  const ctx = {
-    params: {
-      contextId: 23
-    }
-  }
-
-  const wrapper = shallow(
-    <DeveloperKeyModal
-      availableScopes={{}}
-      availableScopesPending={false}
-      closeModal={() => {}}
-      createOrEditDeveloperKeyState={createDeveloperKeyState}
-      actions={fakeActions}
-      store={fakeStore}
-      ctx={ctx}
-      mountNode={modalMountNode}
-      selectedScopes={selectedScopes}
-    />
-  )
-
-  const saveButton = wrapper.find('Button').filterWhere(n => n.prop('children') === 'Save Key')
-  saveButton.simulate('click')
-
-  const url = createOrEditSpy.args[0][1]
-  equal(url, '/api/v1/accounts/23/developer_keys')
-})
-
-test('it uses POST if a key is being created', () => {
-  const createOrEditSpy = sinon.spy()
-  const dispatchSpy = sinon.spy()
-
-  const fakeActions = {
-    createOrEditDeveloperKey: createOrEditSpy,
-    developerKeysModalClose: () => {}
-  }
-  const fakeStore = {
-    dispatch: dispatchSpy
-  }
-  const ctx = {
-    params: {
-      contextId: 23
-    }
-  }
-
-  const wrapper = shallow(
-    <DeveloperKeyModal
-      availableScopes={{}}
-      availableScopesPending={false}
-      closeModal={() => {}}
-      createOrEditDeveloperKeyState={createDeveloperKeyState}
-      actions={fakeActions}
-      store={fakeStore}
-      ctx={ctx}
-      mountNode={modalMountNode}
-      selectedScopes={selectedScopes}
-    />
-  )
-
-  const saveButton = wrapper.find('Button').filterWhere(n => n.prop('children') === 'Save Key')
-  saveButton.simulate('click')
-
-  const method = createOrEditSpy.args[0][2]
-  equal(method, 'post')
-})
-
-test('it uses the edit URL if a key is being edited', () => {
-  const createOrEditSpy = sinon.spy()
-  const dispatchSpy = sinon.spy()
-
-  const fakeActions = {
-    createOrEditDeveloperKey: createOrEditSpy,
-    developerKeysModalClose: () => {}
-  }
-  const fakeStore = {
-    dispatch: dispatchSpy
-  }
-
-  const wrapper = shallow(
-    <DeveloperKeyModal
-      availableScopes={{}}
-      availableScopesPending={false}
-      closeModal={() => {}}
-      createOrEditDeveloperKeyState={editDeveloperKeyState}
-      actions={fakeActions}
-      store={fakeStore}
-      mountNode={modalMountNode}
-      selectedScopes={selectedScopes}
-    />
-  )
-
-  const saveButton = wrapper.find('Button').filterWhere(n => n.prop('children') === 'Save Key')
-  saveButton.simulate('click')
-
-  const url = createOrEditSpy.args[0][1]
-  equal(url, `/api/v1/developer_keys/${developerKey.id}`)
-})
-
-test('it uses PUT if a key is being edited', () => {
-  const createOrEditSpy = sinon.spy()
-  const dispatchSpy = sinon.spy()
-
-  const fakeActions = {
-    createOrEditDeveloperKey: createOrEditSpy
-  }
-  const fakeStore = {
-    dispatch: dispatchSpy
-  }
-
-  const wrapper = shallow(
-    <DeveloperKeyModal
-      availableScopes={{}}
-      availableScopesPending={false}
-      closeModal={() => {}}
-      createOrEditDeveloperKeyState={editDeveloperKeyState}
-      actions={fakeActions}
-      store={fakeStore}
-      mountNode={modalMountNode}
-      selectedScopes={selectedScopes}
-    />
-  )
-
-  const saveButton = wrapper.find('Button').filterWhere(n => n.prop('children') === 'Save Key')
-  saveButton.simulate('click')
-
-  ok(createOrEditSpy.called)
-  const method = createOrEditSpy.args[0][2]
-  equal(method, `put`)
 })
 
 test('it sends the contents of the form saving', () => {
@@ -323,6 +137,7 @@ test('it sends the contents of the form saving', () => {
 
   const wrapper = mount(
     <DeveloperKeyModal
+      createLtiKeyState={createLtiKeyState}
       availableScopes={{}}
       availableScopesPending={false}
       closeModal={() => {}}
@@ -365,6 +180,7 @@ test('sends form content without scopes and require_scopes set to false when not
 
   const wrapper = mount(
     <DeveloperKeyModal
+      createLtiKeyState={createLtiKeyState}
       availableScopes={{}}
       availableScopesPending={false}
       closeModal={() => {}}
@@ -402,6 +218,7 @@ test('it adds each selected scope to the form data', () => {
   const editDeveloperKeyState2 = Object.assign({}, editDeveloperKeyState, { developerKey: developerKey2 })
   const wrapper = mount(
     <DeveloperKeyModal
+      createLtiKeyState={createLtiKeyState}
       availableScopes={{}}
       availableScopesPending={false}
       closeModal={() => {}}
@@ -430,6 +247,7 @@ test('flashes an error if no scopes are selected', () => {
   const editDeveloperKeyState2 = Object.assign({}, editDeveloperKeyState, { developerKey: developerKey2 })
   const wrapper = mount(
     <DeveloperKeyModal
+      createLtiKeyState={createLtiKeyState}
       availableScopes={{}}
       availableScopesPending={false}
       closeModal={() => {}}
@@ -456,6 +274,7 @@ test('allows saving if the key previously had scopes', () => {
   const editKeyWithScopesState = Object.assign({}, editDeveloperKeyState, { developerKey: keyWithScopes })
   const wrapper = mount(
     <DeveloperKeyModal
+      createLtiKeyState={createLtiKeyState}
       availableScopes={{}}
       availableScopesPending={false}
       createOrEditDeveloperKeyState={editKeyWithScopesState}
@@ -470,5 +289,48 @@ test('allows saving if the key previously had scopes', () => {
   wrapper.instance().submitForm()
   notOk(flashStub.called)
   flashStub.restore()
+  wrapper.unmount()
+})
+
+test('renders the LTI footer if "ltiKey" is true', () => {
+  const createLtiKeyStateOn = {
+    ltiKey: true,
+    customizing: true
+  }
+
+  const wrapper = mount(
+    <DeveloperKeyModal
+      createLtiKeyState={createLtiKeyStateOn}
+      availableScopes={{}}
+      availableScopesPending={false}
+      closeModal={() => {}}
+      createOrEditDeveloperKeyState={createDeveloperKeyState}
+      actions={fakeActions}
+      store={{dispatch: () => {}}}
+      mountNode={modalMountNode}
+      selectedScopes={selectedScopes}
+    />
+  )
+
+  ok(wrapper.instance().modalFooter().props.customizing)
+  wrapper.unmount()
+})
+
+test('renders the non LTI footer if "ltiKey" is false', () => {
+  const wrapper = mount(
+    <DeveloperKeyModal
+      createLtiKeyState={createLtiKeyState}
+      availableScopes={{}}
+      availableScopesPending={false}
+      closeModal={() => {}}
+      createOrEditDeveloperKeyState={createDeveloperKeyState}
+      actions={fakeActions}
+      store={{dispatch: () => {}}}
+      mountNode={modalMountNode}
+      selectedScopes={selectedScopes}
+    />
+  )
+
+  notOk(wrapper.instance().modalFooter().props.customizing)
   wrapper.unmount()
 })
