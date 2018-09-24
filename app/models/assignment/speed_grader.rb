@@ -14,7 +14,11 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
+require_dependency 'speed_grader/submission'
+
+# TODO: rename to SpeedGrader::Assignment and move to app/models/speed_grader
 class Assignment
   class SpeedGrader
     include GradebookSettingsHelpers
@@ -26,7 +30,7 @@ class Assignment
       @assignment = assignment
       @course = @assignment.context
       @current_user = current_user
-      @avatars = avatars && !@assignment.grade_as_group?
+      @display_avatars = avatars && !@assignment.grade_as_group?
       @grading_role = grading_role
       account_context = @course.try(:account) || @course.try(:root_account)
       @should_migrate_to_canvadocs = account_context.present? && account_context.migrate_to_canvadocs?
@@ -64,7 +68,7 @@ class Assignment
       # between provisional and real comments (also in
       # SubmissionComment#serialization_methods)
       submission_comment_methods = []
-      submission_comment_methods << :avatar_path if avatars?
+      submission_comment_methods << :avatar_path if display_avatars?
 
       res[:context][:rep_for_student] = {}
 
@@ -149,22 +153,7 @@ class Assignment
       Submission.bulk_load_versioned_originality_reports(submission_histories)
       Submission.bulk_load_text_entry_originality_reports(submission_histories)
 
-      provisional_grades = @assignment.provisional_grades
-      provisional_grades = provisional_grades.preload(:scorer) unless anonymous_graders?(current_user: @current_user, assignment: @assignment)
-
-      if @grading_role == :provisional_grader
-        provisional_grades = if grader_comments_hidden?(current_user: @current_user, assignment: @assignment)
-          provisional_grades.not_final.where(scorer: @current_user)
-        else
-          select_fields = ::ModeratedGrading::GRADE_ATTRIBUTES_ONLY.dup.push(:id, :submission_id)
-          provisional_grades.select(select_fields)
-        end
-      elsif @grading_role == :grader
-        provisional_grades = ::ModeratedGrading::ProvisionalGrade.none
-      end
-      preloaded_prov_grades = provisional_grades.order(:id).to_a.group_by(&:submission_id)
-
-      preloaded_prov_selections =
+      preloaded_provisional_selections =
         @grading_role == :moderator ? @assignment.moderated_grading_selections.index_by(&:student_id) : {}
 
       res[:too_many_quiz_submissions] = too_many = @assignment.too_many_qs_versions?(@submissions)
@@ -188,26 +177,21 @@ class Assignment
         ).merge("from_enrollment_type" => enrollment_types_by_id[sub.user_id])
 
         if provisional_grader_or_moderator?
-          provisional_grade = sub.provisional_grade(@current_user, preloaded_grades: preloaded_prov_grades)
+          provisional_grade = sub.provisional_grade(@current_user, preloaded_grades: preloaded_provisional_grades)
           json.merge! provisional_grade_to_json(provisional_grade)
         end
 
-        comments = if @assignment.grades_published?
-          sub.submission_comments
-        elsif grader_comments_hidden
-          (provisional_grade || sub).submission_comments
-        else
-          sub.all_submission_comments
-        end
+        comments = ::SpeedGrader::Submission.new(
+          submission: sub,
+          current_user: @current_user,
+          provisional_grade: provisional_grade
+        ).comments
 
-        if @assignment.grade_as_group?
-          comments = comments.reject { |comment| comment.group_comment_id.nil? }
-        end
-        json[:submission_comments] = anonymous_moderated_submission_comments(
+        json[:submission_comments] = anonymous_moderated_submission_comments_json(
           assignment: @assignment,
           course: @course,
           current_user: @current_user,
-          avatars: avatars?,
+          avatars: display_avatars?,
           submission_comments: comments,
           submissions: @submissions
         )
@@ -291,8 +275,8 @@ class Assignment
         end
 
         if provisional_grader_or_moderator?
-          pgs = preloaded_prov_grades[sub.id] || []
-          selection = preloaded_prov_selections[sub.user.id]
+          pgs = preloaded_provisional_grades[sub.id] || []
+          selection = preloaded_provisional_selections[sub.user.id]
           unless pgs.count == 0 || (pgs.count == 1 && pgs.first.scorer_id == @current_user.id)
             json['provisional_grades'] = []
             pgs.each do |pg|
@@ -322,6 +306,27 @@ class Assignment
       StringifyIds.recursively_stringify_ids(res)
     ensure
       Attachment.skip_thumbnails = nil
+    end
+
+    def preloaded_provisional_grades
+      @preloaded_provisional_grades ||= begin
+        provisional_grades = @assignment.provisional_grades
+        unless anonymous_graders?(current_user: @current_user, assignment: @assignment)
+          provisional_grades = provisional_grades.preload(:scorer)
+        end
+
+        if @grading_role == :provisional_grader
+          provisional_grades = if grader_comments_hidden?(current_user: @current_user, assignment: @assignment)
+            provisional_grades.not_final.where(scorer: @current_user)
+          else
+            select_fields = ::ModeratedGrading::GRADE_ATTRIBUTES_ONLY.dup.push(:id, :submission_id)
+            provisional_grades.select(select_fields)
+          end
+        elsif @grading_role == :grader
+          provisional_grades = ::ModeratedGrading::ProvisionalGrade.none
+        end
+        provisional_grades.order(:id).to_a.group_by(&:submission_id)
+      end
     end
 
     private
@@ -371,8 +376,8 @@ class Assignment
       @grading_role == :provisional_grader || @grading_role == :moderator
     end
 
-    def avatars?
-      @avatars
+    def display_avatars?
+      @display_avatars
     end
 
     def grader_comments_hidden_or_other_grader?(assessor_id)
