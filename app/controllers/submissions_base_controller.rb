@@ -140,7 +140,7 @@ class SubmissionsBaseController < ApplicationController
 
           submissions_json = @submissions.map do |submission|
             submission_json = submission.as_json(json_args)
-            submission_json[:submission][:submission_comments] = anonymous_moderated_submission_comments(
+            submission_json[:submission][:submission_comments] = anonymous_moderated_submission_comments_json(
               assignment: @assignment,
               avatars: service_enabled?(:avatars),
               submissions: @submissions,
