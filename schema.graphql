@@ -370,6 +370,7 @@ type Course implements AssignmentsConnectionInterface & Node & Timestamped {
     # Only return submissions for the given students.
     studentIds: [ID!]!
   ): SubmissionConnection
+  term: Term
   updatedAt: DateTime
   usersConnection(
     # Returns the elements in the list that come after the specified cursor.
@@ -935,6 +936,14 @@ type TardinessBreakdown {
   missing: Float
   onTime: Float
   total: Int
+}
+
+type Term {
+  # legacy canvas id
+  _id: ID!
+  endAt: DateTime
+  name: String
+  startAt: DateTime
 }
 
 # Contains timestamp metadata

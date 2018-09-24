@@ -306,4 +306,22 @@ describe Types::CourseType do
       ).to eq [@project_groups.id.to_s]
     end
   end
+
+  describe "term" do
+    before(:once) do
+      course.enrollment_term.update_attributes(start_at: 1.month.ago)
+    end
+
+    it "works" do
+      expect(
+        course_type.resolve("term { _id }")
+      ).to eq course.enrollment_term.id.to_s
+      expect(
+        course_type.resolve("term { name }")
+      ).to eq course.enrollment_term.name
+      expect(
+        course_type.resolve("term { startAt }")
+      ).to eq course.enrollment_term.start_at.iso8601
+    end
+  end
 end

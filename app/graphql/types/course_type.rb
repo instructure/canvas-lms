@@ -186,6 +186,11 @@ module Types
       end
     end
 
+    field :term, TermType, null: true
+    def term
+      load_association(:enrollment_term)
+    end
+
     field :permissions, CoursePermissionsType,
       "returns permission information for the current user in this course",
       null: true
