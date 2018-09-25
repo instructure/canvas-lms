@@ -76,7 +76,7 @@ test('shows creative commons options when set up', () => {
   ])
 
   equal(
-    wrapper.instance().refs.creativeCommons.value,
+    wrapper.instance().creativeCommons.value,
     'cc_some_option',
     'shows creative commons option'
   )

@@ -76,6 +76,7 @@ class ItemCog extends React.Component {
   openUsageRightsDialog = event => {
     const contents = (
       <UsageRightsDialog
+        isOpen
         closeModal={this.props.modalOptions.closeModal}
         itemsToManage={[this.props.model]}
         userCanRestrictFilesForContext={this.props.userCanRestrictFilesForContext}

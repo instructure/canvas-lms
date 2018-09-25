@@ -23,11 +23,6 @@
 //============================
 $ic-wizard-color-dark-neutral: $ic-color-dark;
 
-.ReactModal__Overlay.CourseWizard__modalOverlay {
-  transition: none;
-  background: transparent;
-}
-
 .ic-wizard-box {
   transition: all 1s $ic-transition;
   width: 100%;
@@ -44,7 +39,7 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   opacity: 0;
   @include breakpoint(desktop) { flex-direction: row; }
 
-  .ReactModal__Overlay.ReactModal__Overlay--after-open & {
+  &.ic-wizard-box--is-open {
     transform: translate3d(0,0,0);
     opacity: 1;
   }

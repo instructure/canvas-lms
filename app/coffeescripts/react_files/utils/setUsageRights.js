@@ -52,7 +52,7 @@ export default function setUsageRights(items, usageRights, callback) {
   const folder_ids = []
   const file_ids = []
 
-  items.forEach(function(item) {
+  items.forEach(item => {
     if (item instanceof Folder) {
       folder_ids.push(item.get('id'))
     } else {

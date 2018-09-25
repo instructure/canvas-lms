@@ -334,8 +334,8 @@ describe "better_file_browsing" do
         set_value f('.UsageRightsSelectBox__creativeCommons'), 'cc_by'
       end
       set_value f('#copyrightHolder'), 'Test User'
-      f('.ReactModal__Footer-Actions .btn-primary').click
-      expect(f("body")).not_to contain_css('.ReactModal__Content')
+      f('.UsageRightsDialog__Footer-Actions button[type="submit"]').click
+      expect(f("body")).not_to contain_css('.UsageRightsDialog__Content')
     end
 
     def verify_usage_rights_ui_updates(iconClass = 'icon-files-creative-commons')
