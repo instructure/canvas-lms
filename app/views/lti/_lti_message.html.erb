@@ -29,9 +29,8 @@
         <p id="load_failure" class="hide"><%= t('It looks like your content might not load.  You can use this button to try launching it in a new tab.') %></p>
     </div>
 <% end %>
-
-<div class="tool_content_wrapper
-  <%= 'custom_height' unless @lti_launch.tool_dimensions[:selection_height] == '100%' %>"
+<!-- class="tool_content_wrapper" -->
+<div class="<%= 'custom_height' unless @lti_launch.tool_dimensions[:selection_height] == '100%' %>"
   data-tool-wrapper-id="<%= @lti_launch.post_message_token %>">
 <form action="<%= @lti_launch.resource_url %>"
       class="hide"
