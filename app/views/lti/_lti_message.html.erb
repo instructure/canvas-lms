@@ -29,8 +29,9 @@
         <p id="load_failure" class="hide"><%= t('It looks like your content might not load.  You can use this button to try launching it in a new tab.') %></p>
     </div>
 <% end %>
-<!-- class="tool_content_wrapper" -->
-<div class="<%= 'custom_height' unless @lti_launch.tool_dimensions[:selection_height] == '100%' %>"
+
+<div class="tool_content_wrapper
+<%= 'custom_height' unless @lti_launch.tool_dimensions[:selection_height] == '100%' %>"
   data-tool-wrapper-id="<%= @lti_launch.post_message_token %>">
 <form action="<%= @lti_launch.resource_url %>"
       class="hide"
@@ -67,10 +68,9 @@
       <%= t('The following content is partner provided') %>
     </div>
   </div>
-  <%= iframe("about:blank", :name => 'tool_content', :id => 'tool_content', :class => "tool_launch",
+  <%= iframe("about:blank", :name => 'tool_content', :id => 'tool_content', :class => "tool_launch sm_iframe",
              allowfullscreen: "true", webkitallowfullscreen: "true", allow:"microphone *;", mozallowfullscreen: "true",
-             tabindex:"0", title:t('Tool Content'),
-             style: "height:#{@lti_launch.tool_dimensions[:selection_height]};width:#{@lti_launch.tool_dimensions[:selection_width]};") %>
+             tabindex:"0", title:t('Tool Content')) %>
 
   <div class="after_external_content_info_alert screenreader-only" tabindex="0">
     <div class="ic-flash-info">

@@ -132,11 +132,16 @@ iframe.info_alert_outline {
   border: 2px solid #008EE2 !important;
 }
 
-iframe.tool_launch {
-  min-height: 450px;
-  width: 100%;
-  height: 100%;
+// gets rid of ugly border
+iframe {
   border: none;
+  height: 100%;
+  width: 100%;
+
+  &#file_content,
+  &.tool_launch {
+      min-height: calc(100vh - 170px); // This is for when the iframeResizer isn't supported
+  }
 }
 
 #skip_navigation_link {
