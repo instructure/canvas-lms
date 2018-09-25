@@ -1161,7 +1161,10 @@ class Attachment < ActiveRecord::Base
     can :read_as_admin
 
     given { |user, session|
-      self.context.grants_right?(user, session, :read) && !self.locked_for?(user, :check_policies => true)
+      (
+        self.context.grants_right?(user, session, :read) ||
+        (self.context.is_a?(AssessmentQuestion) && self.context.user_can_see_through_quiz_question?(user, session))
+      ) && !self.locked_for?(user, :check_policies => true)
     }
     can :download
 
@@ -1920,12 +1923,17 @@ class Attachment < ActiveRecord::Base
           og_attachment = attachment
           og_attachment.context = to_context
           og_attachment.folder = Folder.assert_path(attachment.folder_path, to_context)
+          og_attachment.user_id = to_context.id if to_context.is_a? User
           og_attachment.save_without_broadcasting!
           if match
             og_attachment.folder.reload
             og_attachment.handle_duplicates(:rename)
           end
         else
+          if to_context.is_a? User
+            attachment.user_id = to_context.id
+            attachment.save_without_broadcasting!
+          end
           new_attachment = Attachment.new
           new_attachment.assign_attributes(attachment.attributes.except(*EXCLUDED_COPY_ATTRIBUTES))
 

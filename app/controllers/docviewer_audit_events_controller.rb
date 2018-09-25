@@ -38,15 +38,18 @@ class DocviewerAuditEventsController < ApplicationController
       end
     end
 
+    event_params = docviewer_audit_event_params
     event = AnonymousOrModerationEvent.new(
       assignment: assignment,
       canvadoc: canvadoc,
-      event_type: "docviewer_#{docviewer_audit_event_params[:event_type]}",
+      event_type: "docviewer_#{event_params[:event_type]}",
       submission: submission,
       user: user,
       payload: {
-        annotation_body: docviewer_audit_event_params[:annotation_body],
-        related_annotation_id: docviewer_audit_event_params[:related_annotation_id]
+        annotation_body: event_params[:annotation_body],
+        annotation_id: event_params[:annotation_id],
+        context: event_params[:context],
+        related_annotation_id: event_params[:related_annotation_id]
       },
     )
 
@@ -75,6 +78,8 @@ class DocviewerAuditEventsController < ApplicationController
 
   def docviewer_audit_event_params
     params.require(:docviewer_audit_event).permit(
+      :annotation_id,
+      :context,
       :event_type,
       :related_annotation_id,
       annotation_body: %i[color content created_at modified_at page type]

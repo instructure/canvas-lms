@@ -49,6 +49,14 @@ class AssessmentQuestion < ActiveRecord::Base
     can :read and can :create and can :update and can :delete
   end
 
+  def user_can_see_through_quiz_question?(user, session=nil)
+    self.shard.activate do
+      quiz_ids = self.quiz_questions.distinct.pluck(:quiz_id)
+      quiz_ids.any? && Quizzes::Quiz.where(:id => quiz_ids, :context_type => "Course",
+        :context_id => Enrollment.where(user_id: user).active.select(:course_id)).to_a.any?{|q| q.grants_right?(user, session, :read)}
+    end
+  end
+
   def infer_defaults
     self.question_data ||= HashWithIndifferentAccess.new
     if self.question_data.is_a?(Hash)
