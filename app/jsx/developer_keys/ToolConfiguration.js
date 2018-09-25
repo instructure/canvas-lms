@@ -19,11 +19,12 @@ import PropTypes from 'prop-types'
 import React from 'react'
 
 import {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
+import CustomizationForm from './CustomizationForm'
 import ToolConfigurationForm from './ToolConfigurationForm'
 
 export default class ToolConfiguration extends React.Component {
   body() {
-    if (!this.props.customizing) {
+    if (!this.props.createLtiKeyState.customizing) {
       return (
         <ToolConfigurationForm
           toolConfiguration={this.props.toolConfiguration}
@@ -31,6 +32,13 @@ export default class ToolConfiguration extends React.Component {
         />
       )
     }
+    return (
+      <CustomizationForm
+        toolConfiguration={this.props.createLtiKeyState.toolConfiguration}
+        validScopes={this.props.createLtiKeyState.validScopes}
+        validPlacements={this.props.createLtiKeyState.validPlacements}
+      />
+    )
   }
 
   render() {
@@ -48,7 +56,12 @@ ToolConfiguration.defaultProps = {
 }
 
 ToolConfiguration.propTypes = {
-  customizing: PropTypes.bool.isRequired,
   toolConfiguration: PropTypes.object,
-  configurationUrl: PropTypes.string
+  configurationUrl: PropTypes.string,
+  createLtiKeyState: PropTypes.shape({
+    customizing: PropTypes.bool.isRequired,
+    toolConfiguration: PropTypes.object.isRequired,
+    validScopes: PropTypes.arrayOf(PropTypes.string).isRequired,
+    validPlacements: PropTypes.arrayOf(PropTypes.string).isRequired
+  }).isRequired
 }

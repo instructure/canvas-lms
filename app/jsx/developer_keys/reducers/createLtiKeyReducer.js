@@ -20,7 +20,10 @@ import ACTION_NAMES from '../actions/developerKeysActions'
 
 const initialState = {
   isLtiKey: false,
-  customizing: false
+  customizing: false,
+  toolConfiguration: {},
+  validScopes: [],
+  validPlacements: []
 }
 
 const ltiKeysHandlers = {

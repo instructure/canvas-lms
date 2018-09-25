@@ -98,7 +98,7 @@ export default class DeveloperKeyFormFields extends React.Component {
       />
     }
     return <ToolConfiguration
-      customizing={createLtiKeyState.customizing}
+      createLtiKeyState={createLtiKeyState}
     />
   }
 

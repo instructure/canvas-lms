@@ -55,7 +55,10 @@ const developerKey = {
 
 const createLtiKeyState = {
   isLtiKey: false,
-  customizing: false
+  customizing: false,
+  toolConfiguration: {},
+  validScopes: [],
+  validPlacements: []
 }
 
 const createDeveloperKeyState = {
@@ -295,7 +298,10 @@ test('allows saving if the key previously had scopes', () => {
 test('renders the LTI footer if "ltiKey" is true', () => {
   const createLtiKeyStateOn = {
     isLtiKey: true,
-    customizing: true
+    customizing: true,
+    toolConfiguration: {},
+    validScopes: [],
+    validPlacements: []
   }
 
   const wrapper = mount(

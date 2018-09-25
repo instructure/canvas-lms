@@ -22,7 +22,10 @@ import reducer from 'jsx/developer_keys/reducers/createLtiKeyReducer'
 function freshState() {
   return {
     isLtiKey: false,
-    customizing: false
+    customizing: false,
+    toolConfiguration: {},
+    validScopes: [],
+    validPlacements: []
   }
 }
 
@@ -30,6 +33,9 @@ it('sets the defaults', () => {
   const defaults = reducer(undefined, {})
   expect(defaults.isLtiKey).toEqual(false)
   expect(defaults.customizing).toEqual(false)
+  expect(defaults.toolConfiguration).toEqual({})
+  expect(defaults.validScopes).toEqual([])
+  expect(defaults.validPlacements).toEqual([])
 })
 
 it('handles "LTI_KEYS_SET_LTI_KEY"', () => {

@@ -18,18 +18,14 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import ToolConfiguration from '../ToolConfiguration'
+import CustomizationTable from '../CustomizationTable'
 
-function newProps(customizing = false) {
+function newProps() {
   return {
-    toolConfiguration: {name: 'Test Tool', url: 'https://www.test.com/launch'},
-    configurationUrl: 'https://www.test.com/config.json',
-    createLtiKeyState: {
-      customizing,
-      toolConfiguration: {},
-      validScopes: [],
-      validPlacements: []
-    }
+    name: 'Scopes',
+    type: 'scope',
+    options: ['Manage Line Items', 'Create Line Items'],
+    onOptionToggle: () => {}
   }
 }
 
@@ -39,12 +35,17 @@ afterEach(() => {
   wrapper.unmount()
 })
 
-it("renders the tool configuration form if 'customizing' is false", () => {
-  wrapper = mount(<ToolConfiguration {...newProps()} />)
-  expect(wrapper.find('ToolConfigurationForm').exists()).toBeTruthy()
+it('renders the correct name', () => {
+  wrapper = mount(<CustomizationTable {...newProps()} />)
+  expect(
+    wrapper
+      .find('ScreenReaderContent')
+      .first()
+      .text()
+  ).toBeTruthy()
 })
 
-it("renders the customization form if 'customizing' is true", () => {
-  wrapper = mount(<ToolConfiguration {...newProps(true)} />)
-  expect(wrapper.find('CustomizationForm').exists()).toBeTruthy()
+it('renders a customization option for each options', () => {
+  wrapper = mount(<CustomizationTable {...newProps()} />)
+  expect(wrapper.find('CustomizationOption')).toHaveLength(2)
 })
