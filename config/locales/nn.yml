@@ -1489,7 +1489,7 @@ nn:
   add_tas_to_the_course_2aac6e02: "Legg til undervisingsassistentar på emnet"
   add_theme_32fa3d50: "Legg til tema"
   add_to_course_481a51c4: "Legg til emnet..."
-  add_to_student_to_do_58e66b4b: "Legg til studentens å gjere-liste"
+  add_to_student_to_do_58e66b4b: "Legg til studentens gjeremål"
   add_trigger_bc1a0fae: "Legg til utløysar"
   add_user_by_email_address_login_id_or_sis_id_7dd370dd: "Legg til brukar med e-postadresse, Login-ID eller SIS-ID"
   add_user_e73e8e50: "Legg til brukar"
@@ -1860,7 +1860,7 @@ nn:
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: "Er du sikker på at du vil slette settet med karaktersetjingsperiodar?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Er du sikker på at du vil slette karaktersetjingsperioden?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Er du sikker på at du vil slette karaktersetjingsskjemaet?"
-  are_you_sure_you_want_to_delete_this_to_do_item_497016ea: "Er du sikker på at du vil slette dette å gjere-elementet?"
+  are_you_sure_you_want_to_delete_this_to_do_item_497016ea: "Er du sikker på at du vil slette dette gjeremålet?"
   are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
     one: "Er du sikker på at du vil slette din kopi av samtalen? Du kan ikkje angre handlinga."
     other: "Er du sikker på at du vil slette din kopi av meldingane? Du kan ikkje angre handlinga."
@@ -3065,7 +3065,7 @@ nn:
         appointment_group: Avtalegruppe
         assignment: Oppgåve
         event: Hending
-        todo: "Å gjere"
+        todo: Gjeremål
     edit_planner_note: 
       calendar: "Kalender:"
       date: "Dato:"
@@ -5373,7 +5373,7 @@ nn:
       rss_feed: "%{course} straum"
     to_do_list: 
       headings: 
-        to_do: "Å gjere"
+        to_do: Gjeremål
       links: 
         show_more: "%{count} fleire"
     unauthorized: 
@@ -5960,7 +5960,7 @@ nn:
   discussion_topic_menu_3d4684c6: "Meny diskusjonsemne"
   discussion_topic_will_be_available_starting_at_46aa7477: "Diskusjonsemne startar den"
   discussion_topic_will_be_available_until_f5e3abc8: "Diskusjonsemne er tilgjengeleg til"
-  discussion_topic_will_show_on_student_to_do_list_f_1c9e6286: "Diskusjonsemne viser på studentane sin å gjere-liste den"
+  discussion_topic_will_show_on_student_to_do_list_f_1c9e6286: "Diskusjonsemne viser på studentane si gjeremålsliste den"
   discussion_topics: 
     assignment_details: 
       available_from: "Tilgjengeleg frå"
@@ -6051,7 +6051,7 @@ nn:
     error_group_announcement: "Du kan ikkje bruke gruppediskusjonar for ei kunngjering."
     error_group_change: "Du kan ikkje endre gruppering for ein diskusjon som inneheld svar."
     error_todo_date_assignment: "Kan ikkje leggje til dato om diskusjonsemne er karaktersett"
-    error_todo_date_unauthorized: "Du har ikkje løyve til å leggje til tema til studentane sin å-gjere-liste. "
+    error_todo_date_unauthorized: "Du har ikkje løyve til å leggje til denne diskusjonen til studentane si gjeremålsliste. "
     flash: 
       fail: "Sletting av kunngjering mislukkast"
       removed: "Kunngjering er sletta."
@@ -13073,7 +13073,7 @@ nn:
   provide_tutorial_information_for_new_users_in_a_fl_c23462ac: "Legg til opplæringsinformasjon for nye brukarar i ein undermeny"
   provider_attribute_b1cad655: Tilbyderattributt
   provider_icon_5064fa6e: Leverandørikon
-  provides_users_with_a_to_do_list_dashboard_option_9334f9fa: "Gi brukarane å gjere-liste som dashbordval."
+  provides_users_with_a_to_do_list_dashboard_option_9334f9fa: "Gi brukarane gjeremålsliste som dashbordval."
   provision_a_catalog_account_8cea67f6: "Klargjer ein Canvas Catalog-konto"
   provision_a_quiz_next_service_c7c6bd87: "Sett opp Quiz.Next-teneste"
   provisioned_catalog_account_26339afd: "Klargjord Canvas Catalog-konto"
@@ -17040,10 +17040,10 @@ nn:
       
       Om leverandøren kan konfigurere gyldig tilbakeringing eller omdirigere URI-ar, bruk %{callback_url}.
   to_date_can_t_come_before_from_date_cf9e18aa: "Til-dato kan ikkje vere før Frå-dato"
-  to_do_1d554f36: "Å gjere"
-  to_do_5526f10a: "Å gjere: "
-  to_do_items_loading_d1cdfcd5: "Lastar innhald i Å gjere-oversikta"
-  to_do_list_dashboard_d741f64e: "Dashbord for Å gjere-oversikta"
+  to_do_1d554f36: Gjeremål
+  to_do_5526f10a: "Gjeremål: "
+  to_do_items_loading_d1cdfcd5: "Lastar innhald i gjeremålslista"
+  to_do_list_dashboard_d741f64e: "Dashbord for gjeremål"
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Om du vil lenke emneobservatøren *%{name}* til ein student, kan du skrive og finne studenten sitt namn nedanfor og deretter klikke på Oppdater."
   to_minscore_43e5452e: "to %{minScore}%"
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "For å førehandvise endringar i temaredigeringsprogrammet, må du *slå av høgkontrast-UI*."
