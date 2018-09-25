@@ -21,6 +21,13 @@ require 'canvas_mimetype_fu'
 require 'rubygems/package'
 require 'zlib'
 
+module SkipStrictOctCheck
+  def strict_oct(str)
+    str.oct
+  end
+end
+Gem::Package::TarHeader.singleton_class.prepend(SkipStrictOctCheck) # jeez who the heck thought it was a good idea to use rubygems code for this
+
 class CanvasUnzip
 
   class CanvasUnzipError < ::StandardError; end
