@@ -28,7 +28,7 @@ describe Lti::Ims::NamesAndRolesSerializer do
   describe '#as_json' do
     context 'with course enrollment' do
       let(:enrollment) { teacher_in_course(course: course, active_all: true) }
-      let(:decorated_enrollment) { Lti::Ims::Helpers::CourseMembershipsFinder::CourseMembershipDecorator.new(enrollment) }
+      let(:decorated_enrollment) { Lti::Ims::Helpers::CourseMembershipsFinder::CourseEnrollmentsDecorator.new([enrollment]) }
       let(:page) do
         {
           memberships: [decorated_enrollment],

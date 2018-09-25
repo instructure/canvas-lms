@@ -24,16 +24,25 @@ module Lti::Ims::Helpers
 
     protected
 
-    def memberships_scope
-      context.participating_group_memberships.order(:user_id).preload(:user)
-    end
-
-    def membership(membership)
-      GroupMembershipDecorator.new(membership)
+    def find_memberships
+      scope = context.participating_group_memberships.order(:user_id).preload(:user)
+      enrollments, metadata =
+        Api.jsonapi_paginate(scope, controller, base_url, pagination_args)
+      user_json_preloads(enrollments.map(&:user), true, { accounts: false })
+      memberships = enrollments.map { |e| GroupMembershipDecorator.new(e) }
+      [ memberships, metadata ]
     end
 
     # *Decorators fix up models to conforms to interface expected by Lti::Ims::NamesAndRolesSerializer
     class GroupMembershipDecorator < SimpleDelegator
+      def context
+        GroupContextDecorator.new(super)
+      end
+
+      def group
+        GroupContextDecorator.new(super)
+      end
+
       def lti_roles
         # TODO: these URNs should be constantized somewhere... probably when we implement the 'role' query param
         roles = ["http://purl.imsglobal.org/vocab/lis/v2/membership#Member"]

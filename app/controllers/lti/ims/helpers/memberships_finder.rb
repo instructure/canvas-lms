@@ -27,13 +27,13 @@ module Lti::Ims::Helpers
     end
 
     def find
-      collection, api_metadata = find_memberships
+      memberships, api_metadata = find_memberships
       # NB Api#jsonapi_paginate has already written the Link header into the response.
       # That makes the `api_metadata` field here redundant, but we include it anyway
       # in case response serialization should ever need it. E.g. in NRPS v1, pagination
       # links went in the response body.
       {
-          memberships: memberships(collection),
+          memberships: memberships,
           context: context,
           api_metadata: api_metadata
       }
@@ -42,11 +42,7 @@ module Lti::Ims::Helpers
     protected
 
     def find_memberships
-      # jsonapi_paginate even tho response type isn't application/vnd.api+json since resulting pagination metadata is
-      # somewhat richer, i.e. actual page size and other metrics, not just a collection of links
-      memberships, api_metadata = Api.jsonapi_paginate(memberships_scope, controller, base_url, pagination_args)
-      user_json_preloads(memberships.map(&:user), true, { accounts: false })
-      [ memberships, api_metadata ]
+      throw 'Abstract Method'
     end
 
     def base_url
@@ -73,17 +69,5 @@ module Lti::Ims::Helpers
       controller.request.query_parameters.delete param
     end
 
-    def memberships_scope
-      throw 'Abstract Method'
-    end
-
-    def memberships(memberships)
-      memberships.map { |m| membership(m) }
-    end
-
-    # Fix up the membership so it conforms to a std interface expected by Lti::Ims::NamesAndRolesSerializer
-    def membership(membership)
-      membership
-    end
   end
 end

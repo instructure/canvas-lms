@@ -237,6 +237,15 @@ describe Lti::Ims::NamesAndRolesController do
       end
     end
 
+    context 'when a course has a user with multiple active enrollments' do
+      it 'returns both enrollments in the same NRPS membership' do
+        teacher_enrollment = teacher_in_course(course: course, active_all: true)
+        student_enrollment = student_in_course(course: course, user: teacher_enrollment.user, active_all: true)
+        send_request
+        expect_single_member(teacher_enrollment, student_enrollment)
+      end
+    end
+
     context 'when a course has a concluded enrollment' do
       it 'does not return the concluded enrollment' do
         enrollment = teacher_in_course(course: course, active_all: true)
@@ -374,16 +383,16 @@ describe Lti::Ims::NamesAndRolesController do
     get action, params: { context_param_name => context_id }.merge(params_overrides)
   end
 
-  def expect_single_member(enrollment)
-    expect_member(enrollment)
+  def expect_single_member(*enrollment)
+    expect_member(*enrollment)
     expect_member_count(1)
     enrollment
   end
 
-  def expect_member(enrollment, index=0)
+  def expect_member(*enrollment, index: 0)
     # Not doing contain_exactly() b/c it's impossible to see which specific field is problematic in
     # any given bad element.
-    expect(json[:members][index]).to match_enrollment(enrollment)
+    expect(json[:members][index]).to match_enrollment(*enrollment)
     enrollment
   end
 
@@ -402,15 +411,15 @@ describe Lti::Ims::NamesAndRolesController do
     course_with_user(base_type_name, opts)
   end
 
-  def match_enrollment(enrollment)
-    enrollment.is_a?(Enrollment) ? be_lti_course_membership(enrollment) : be_lti_group_membership(enrollment)
+  def match_enrollment(*enrollment)
+    enrollment.first.is_a?(Enrollment) ? be_lti_course_membership(*enrollment) : be_lti_group_membership(*enrollment)
   end
 
   def expect_enrollment_response_page
     enrollments.
       sort_by { |e| e.user.id }.
       slice(rsp_page_size*(rsp_page-1), rsp_page_size).
-      each_with_index { |e,i| expect_member(e,i) }
+      each_with_index { |e,i| expect_member(e, index: i) }
     expect_member_count([rsp_page_size,total_items].min)
   end
 

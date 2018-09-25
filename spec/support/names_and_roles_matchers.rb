@@ -21,7 +21,22 @@ module Lti::Ims::NamesAndRolesMatchers
     Lti::Asset.opaque_identifier_for(entity)
   end
 
-  def expected_course_lti_roles(enrollment)
+  def expected_course_lti_roles(*enrollment)
+    lti_roles = []
+    # Try to accommodate 'naked' Enrollment AR models and CourseEnrollmentsDecorators that
+    # wrap multiple Enrollments
+    enrollment.each do |e|
+      if e.respond_to?(:enrollments)
+        e.enrollments.each do |ee|
+          lti_roles += map_course_enrollment_role(ee)
+        end
+      else lti_roles += map_course_enrollment_role(e)
+      end
+    end
+    lti_roles.uniq
+  end
+
+  def map_course_enrollment_role(enrollment)
     case enrollment.role.base_role_type
     when 'TeacherEnrollment'
       [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor' ]
@@ -48,20 +63,20 @@ module Lti::Ims::NamesAndRolesMatchers
     membership.group.leader_id == membership.user.id
   end
 
-  RSpec::Matchers.define :be_lti_course_membership do |expected|
+  RSpec::Matchers.define :be_lti_course_membership do |*expected|
     match do |actual|
       @expected = {
         'status' => 'Active',
-        'context_id' => expected_lti_id(expected.course),
-        'context_label' => expected.course.course_code,
-        'context_title' => expected.course.name,
-        'name' => expected.user.name,
-        'picture' => expected.user.avatar_image_url,
-        'given_name' => expected.user.first_name,
-        'family_name' => expected.user.last_name,
-        'email' => expected.user.email,
-        'user_id' => expected_lti_id(expected.user),
-        'roles' => expected_course_lti_roles(expected)
+        'context_id' => expected_lti_id(expected.first.context),
+        'context_label' => expected.first.context.course_code,
+        'context_title' => expected.first.context.name,
+        'name' => expected.first.user.name,
+        'picture' => expected.first.user.avatar_image_url,
+        'given_name' => expected.first.user.first_name,
+        'family_name' => expected.first.user.last_name,
+        'email' => expected.first.user.email,
+        'user_id' => expected_lti_id(expected.first.user),
+        'roles' => match_array(expected_course_lti_roles(*expected))
       }.compact
 
       values_match? @expected, actual
@@ -77,15 +92,15 @@ module Lti::Ims::NamesAndRolesMatchers
     match do |actual|
       @expected = {
         'status' => 'Active',
-        'context_id' => expected_lti_id(expected.group),
-        'context_title' => expected.group.name,
+        'context_id' => expected_lti_id(expected.context),
+        'context_title' => expected.context.name,
         'name' => expected.user.name,
         'picture' => expected.user.avatar_image_url,
         'given_name' => expected.user.first_name,
         'family_name' => expected.user.last_name,
         'email' => expected.user.email,
         'user_id' => expected_lti_id(expected.user),
-        'roles' => expected_group_lti_roles(expected)
+        'roles' => match_array(expected_group_lti_roles(expected))
       }.compact
 
       values_match? @expected, actual
