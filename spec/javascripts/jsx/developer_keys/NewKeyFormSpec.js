@@ -44,7 +44,7 @@ const developerKey = {
   test_cluster_only: true
 }
 
-function formFieldOfTypeAndName(devKey, fieldType, name, ltiKey, customizing) {
+function formFieldOfTypeAndName(devKey, fieldType, name, isLtiKey, customizing) {
   const component = TestUtils.renderIntoDocument(
     <DeveloperKeyFormFields
       availableScopes={{}}
@@ -52,7 +52,7 @@ function formFieldOfTypeAndName(devKey, fieldType, name, ltiKey, customizing) {
       developerKey={devKey}
       dispatch={ () => {} }
       listDeveloperKeyScopesSet={ () => {} }
-      createLtiKeyState={ {customizing, ltiKey} }
+      createLtiKeyState={ {customizing, isLtiKey} }
     />
   )
   return TestUtils.scryRenderedDOMComponentsWithTag(component, fieldType).
@@ -147,7 +147,7 @@ test('populates the key notes when lti key', () => {
   equal(textarea.value, developerKey.notes)
 })
 
-test('renders the tool configuration form if ltiKey is true', () => {
+test('renders the tool configuration form if isLtiKey is true', () => {
   const wrapper = mount(
     <DeveloperKeyFormFields
       availableScopes={{}}
@@ -155,13 +155,13 @@ test('renders the tool configuration form if ltiKey is true', () => {
       developerKey={developerKey}
       dispatch={ () => {} }
       listDeveloperKeyScopesSet={ () => {} }
-      createLtiKeyState={ {customizing: false, ltiKey: true} }
+      createLtiKeyState={ {customizing: false, isLtiKey: true} }
     />
   )
   ok(wrapper.find('ToolConfiguration').exists())
 })
 
-test('renders the developer key scopes form if ltiKey is false', () => {
+test('renders the developer key scopes form if isLtiKey is false', () => {
   const wrapper = mount(
     <DeveloperKeyFormFields
       availableScopes={{}}
@@ -169,7 +169,7 @@ test('renders the developer key scopes form if ltiKey is false', () => {
       developerKey={developerKey}
       dispatch={ () => {} }
       listDeveloperKeyScopesSet={ () => {} }
-      createLtiKeyState={ {customizing: false, ltiKey: false} }
+      createLtiKeyState={ {customizing: false, isLtiKey: false} }
     />
   )
   ok(wrapper.find('DeveloperKeyScopes').exists())

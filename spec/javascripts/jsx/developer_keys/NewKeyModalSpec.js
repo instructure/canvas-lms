@@ -54,7 +54,7 @@ const developerKey = {
 }
 
 const createLtiKeyState = {
-  ltiKey: false,
+  isLtiKey: false,
   customizing: false
 }
 
@@ -294,7 +294,7 @@ test('allows saving if the key previously had scopes', () => {
 
 test('renders the LTI footer if "ltiKey" is true', () => {
   const createLtiKeyStateOn = {
-    ltiKey: true,
+    isLtiKey: true,
     customizing: true
   }
 

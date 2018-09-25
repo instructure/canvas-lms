@@ -21,14 +21,14 @@ import reducer from 'jsx/developer_keys/reducers/createLtiKeyReducer'
 
 function freshState() {
   return {
-    ltiKey: false,
+    isLtiKey: false,
     customizing: false
   }
 }
 
 it('sets the defaults', () => {
   const defaults = reducer(undefined, {})
-  expect(defaults.ltiKey).toEqual(false)
+  expect(defaults.isLtiKey).toEqual(false)
   expect(defaults.customizing).toEqual(false)
 })
 
@@ -37,7 +37,7 @@ it('handles "LTI_KEYS_SET_LTI_KEY"', () => {
   const action = actions.ltiKeysSetLtiKey(true)
   const newState = reducer(state, action)
 
-  expect(newState.ltiKey).toEqual(true)
+  expect(newState.isLtiKey).toEqual(true)
   expect(newState.customizing).toEqual(false)
 })
 
@@ -46,6 +46,6 @@ it('handles "LTI_KEYS_SET_CUSTOMIZING"', () => {
   const action = actions.ltiKeysSetCustomizing(true)
   const newState = reducer(state, action)
 
-  expect(newState.ltiKey).toEqual(false)
+  expect(newState.isLtiKey).toEqual(false)
   expect(newState.customizing).toEqual(true)
 })

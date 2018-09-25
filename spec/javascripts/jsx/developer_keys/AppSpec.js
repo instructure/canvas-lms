@@ -46,7 +46,7 @@ function generateKeyList(numKeys = 10) {
 
 function initialApplicationState(list = null, inheritedList = null) {
   return {
-    createLtiKey: {ltiKey: false},
+    createLtiKey: {isLtiKey: false},
     createOrEditDeveloperKey: {},
     listDeveloperKeyScopes,
     listDeveloperKeys: {
@@ -235,7 +235,7 @@ test('displays the show more button', () => {
   const list = generateKeyList()
 
   const applicationState = {
-    createLtiKey: {ltiKey: false},
+    createLtiKey: {isLtiKey: false},
     listDeveloperKeyScopes,
     createOrEditDeveloperKey: {},
     listDeveloperKeys: {
@@ -254,7 +254,7 @@ test('displays the show more button', () => {
 
 test('renders the list of developer_keys when there are some', () => {
   const applicationState = {
-    createLtiKey: {ltiKey: false},
+    createLtiKey: {isLtiKey: false},
     listDeveloperKeyScopes,
     createOrEditDeveloperKey: {},
     listDeveloperKeys: {
@@ -277,7 +277,7 @@ test('renders the list of developer_keys when there are some', () => {
 
 test('displays the developer key on click of show key button', () => {
   const applicationState = {
-    createLtiKey: {ltiKey: false},
+    createLtiKey: {isLtiKey: false},
     listDeveloperKeyScopes,
     createOrEditDeveloperKey: {},
     listDeveloperKeys: {
@@ -313,7 +313,7 @@ test('displays the developer key on click of show key button', () => {
 
 test('renders the spinner', () => {
   const applicationState = {
-    createLtiKey: {ltiKey: false},
+    createLtiKey: {isLtiKey: false},
     listDeveloperKeyScopes,
     createOrEditDeveloperKey: {},
     listDeveloperKeys: {
@@ -335,12 +335,55 @@ test('renders the spinner', () => {
   ok(spinner)
 })
 
+test('opens the key selection menu when the create button is clicked', () => {
+  window.ENV = {
+    LTI_1_3_ENABLED: true
+  }
+
+  const applicationState = {
+    listDeveloperKeyScopes,
+    createOrEditDeveloperKey: {},
+    createLtiKey: {isLtiKey: false},
+    listDeveloperKeys: {
+      listDeveloperKeysPending: true,
+      listDeveloperKeysSuccessful: false,
+      list: [
+        {
+          id: "111",
+          api_key: "abc12345678",
+          created_at: "2012-06-07T20:36:50Z"
+        }
+      ]
+    }
+  }
+
+  const props = {
+    applicationState,
+    actions: { developerKeysModalOpen: () => {} },
+    store: fakeStore(),
+    ctx: {
+      params: {
+        contextId: ""
+      }
+    }
+  }
+  const wrapper = mount(
+    <DeveloperKeysApp {...props} />
+  )
+
+  notOk(wrapper.find('Menu').first().find('Portal').exists())
+  wrapper.find('Button').first().simulate('click')
+  ok(wrapper.find('Menu').first().find('Portal').prop('open'))
+  wrapper.unmount()
+  window.ENV = {}
+})
+
 test('does not have the create button on inherited tab', () => {
   const openSpy = sinon.spy()
 
   const overrides = {
     applicationState: {
-      createLtiKey: {ltiKey: false},
+      createLtiKey: {isLtiKey: false},
       listDeveloperKeyScopes,
       createOrEditDeveloperKey: {},
       listDeveloperKeys: {

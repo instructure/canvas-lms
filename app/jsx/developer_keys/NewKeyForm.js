@@ -86,7 +86,7 @@ export default class DeveloperKeyFormFields extends React.Component {
   formBody() {
     const { createLtiKeyState } = this.props
 
-    if (!createLtiKeyState.ltiKey) {
+    if (!createLtiKeyState.isLtiKey) {
       return <DeveloperKeyScopes
         availableScopes={this.props.availableScopes}
         availableScopesPending={this.props.availableScopesPending}
@@ -123,7 +123,7 @@ export default class DeveloperKeyFormFields extends React.Component {
                   name="developer_key[email]"
                   defaultValue={this.fieldValue('email')}
                 />
-                {!this.props.createLtiKeyState.ltiKey &&
+                {!this.props.createLtiKeyState.isLtiKey &&
                   <div>
                     <TextInput
                       label={I18n.t('Redirect URI (Legacy):')}
@@ -176,7 +176,7 @@ DeveloperKeyFormFields.propTypes = {
   dispatch: PropTypes.func.isRequired,
   listDeveloperKeyScopesSet: PropTypes.func.isRequired,
   createLtiKeyState: PropTypes.shape({
-    ltiKey: PropTypes.bool.isRequired,
+    isLtiKey: PropTypes.bool.isRequired,
     customizing: PropTypes.bool.isRequired
   }).isRequired,
   developerKey: PropTypes.shape({

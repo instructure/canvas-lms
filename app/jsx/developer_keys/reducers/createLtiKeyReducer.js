@@ -19,14 +19,14 @@
 import ACTION_NAMES from '../actions/developerKeysActions'
 
 const initialState = {
-  ltiKey: false,
+  isLtiKey: false,
   customizing: false
 }
 
 const ltiKeysHandlers = {
   [ACTION_NAMES.LTI_KEYS_SET_LTI_KEY]: (state, action) => ({
     ...state,
-    ltiKey: action.payload
+    isLtiKey: action.payload
   }),
   [ACTION_NAMES.LTI_KEYS_SET_CUSTOMIZING]: (state, action) => ({
     ...state,

@@ -87,7 +87,7 @@ export default class DeveloperKeyModal extends React.Component {
   }
 
   get isLtiKey() {
-    return this.props.createLtiKeyState.ltiKey
+    return this.props.createLtiKeyState.isLtiKey
   }
 
   modalBody() {
@@ -203,7 +203,7 @@ DeveloperKeyModal.propTypes = {
     listDeveloperKeyScopesSet: PropTypes.func.isRequired
   }).isRequired,
   createLtiKeyState: PropTypes.shape({
-    ltiKey: PropTypes.bool.isRequired,
+    isLtiKey: PropTypes.bool.isRequired,
     customizing: PropTypes.bool.isRequired
   }).isRequired,
   createOrEditDeveloperKeyState: PropTypes.shape({
