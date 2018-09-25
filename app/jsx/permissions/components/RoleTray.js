@@ -155,7 +155,20 @@ export default class RoleTray extends Component {
         editRoleLabelErrorMessages: [],
         roleDeleted: false
       },
-      callback
+      /*
+      The setTimeout here is to ensure that the callback gets called AFTER react
+      is done rendering everything in response to the setState. that is what it
+      did even without the setTimout in react <=15.
+
+      In react 16+ setState callbacks (second argument) now fire immediately
+      after componentDidMount / componentDidUpdate instead of after all components
+      have rendered.
+      (see: https://reactjs.org/blog/2017/09/26/react-v16.0.html#breaking-changes)
+      so unless we put this in a setTimeout the refs that we try to focus in this
+      file may not be set up yet. By putting it in a setTimeout it works the same
+      pre and post react 16 and calls the callback AFTER everything has rerendered
+      */
+      () => setTimeout(callback)
     )
   }
 

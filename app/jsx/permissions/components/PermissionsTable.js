@@ -33,6 +33,13 @@ import actions from '../actions'
 import {ConnectedPermissionButton} from './PermissionButton'
 import propTypes from '../propTypes'
 
+const rowTypes = {
+  create: I18n.t('create'),
+  read: I18n.t('read'),
+  update: I18n.t('update'),
+  delete: I18n.t('delete')
+}
+
 export default class PermissionsTable extends Component {
   static propTypes = {
     roles: arrayOf(propTypes.role).isRequired,
@@ -45,7 +52,13 @@ export default class PermissionsTable extends Component {
     expanded: {}
   }
 
+  // just a heads up: these likely break in RTL. the best thing would be to
+  // change the css so you don't manually have to scroll the table in JS but
+  // if you do have to do this in JS, you need to use something like
+  // 'normalize-scroll-left' from npm (grep for where we use it in the graebook)
+  // so that it works cross browser in RTL
   fixScroll = (leftOffset, leftScroll) => {
+    if (!this.contentWrapper) return
     const sidebarWidth = 300
     if (leftOffset - sidebarWidth < leftScroll) {
       const newScroll = Math.max(0, leftScroll - sidebarWidth)
@@ -54,12 +67,14 @@ export default class PermissionsTable extends Component {
   }
 
   fixScrollButton = e => {
+    if (!this.contentWrapper) return
     const leftOffset = e.target.offsetParent.offsetLeft
     const leftScroll = this.contentWrapper.scrollLeft
     this.fixScroll(leftOffset, leftScroll)
   }
 
   fixScrollHeader = e => {
+    if (!this.contentWrapper) return
     const leftOffset = e.target.offsetParent.offsetParent.offsetLeft
     const leftScroll = this.contentWrapper.scrollLeft
     this.fixScroll(leftOffset, leftScroll)
@@ -164,13 +179,6 @@ export default class PermissionsTable extends Component {
   }
 
   renderExapndedRows() {
-    const rowTypes = {
-      create: I18n.t('create'),
-      read: I18n.t('read'),
-      update: I18n.t('update'),
-      delete: I18n.t('delete')
-    }
-
     return Object.keys(rowTypes).map(rowType => (
       <tr key={rowType}>
         <th scope="row" className="ic-permissions__left-header__expanded">
@@ -226,9 +234,7 @@ export default class PermissionsTable extends Component {
     return (
       <div
         className="ic-permissions__table-container"
-        ref={c => {
-          this.contentWrapper = c
-        }}
+        ref={c => (this.contentWrapper = c)}
       >
         {this.renderTable()}
       </div>
