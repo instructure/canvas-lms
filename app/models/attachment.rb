@@ -1474,6 +1474,7 @@ class Attachment < ActiveRecord::Base
     return unless root
     self.root_attachment_id = nil
     root.copy_attachment_content(self)
+    self.run_after_attachment_saved
   end
 
   def restore

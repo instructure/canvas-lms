@@ -703,7 +703,19 @@ describe Attachment do
       allow(Attachment).to receive(:s3_storage?).and_return(true)
       expect_any_instance_of(Attachment).to receive(:make_rootless).once
       expect_any_instance_of(Attachment).to receive(:change_namespace).once
-      a.clone_for(c2)
+      a2 = a.clone_for(c2)
+    end
+
+    it "should create thumbnails for images on clone" do
+      c = course_factory
+      a = attachment_model(filename: "blech.jpg", context: c, content_type: 'image/jpg')
+      new_account = Account.create
+      c2 = course_factory(account: new_account)
+      allow(Attachment).to receive(:s3_storage?).and_return(true)
+      expect_any_instance_of(Attachment).to receive(:copy_attachment_content).once
+      expect_any_instance_of(Attachment).to receive(:change_namespace).once
+      expect_any_instance_of(Attachment).to receive(:create_thumbnail_size).once
+      a2 = a.clone_for(c2)
     end
 
     it "should link the thumbnail" do
