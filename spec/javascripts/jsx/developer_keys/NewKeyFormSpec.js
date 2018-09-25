@@ -20,6 +20,7 @@ import React from 'react'
 import TestUtils from 'react-dom/test-utils'
 import DeveloperKeyFormFields from 'jsx/developer_keys/NewKeyForm'
 import fakeENV from 'helpers/fakeENV'
+import { mount } from 'enzyme'
 
 QUnit.module('NewKeyForm')
 
@@ -43,7 +44,7 @@ const developerKey = {
   test_cluster_only: true
 }
 
-function formFieldOfTypeAndName(devKey, fieldType, name, ltiKey) {
+function formFieldOfTypeAndName(devKey, fieldType, name, ltiKey, customizing) {
   const component = TestUtils.renderIntoDocument(
     <DeveloperKeyFormFields
       availableScopes={{}}
@@ -51,7 +52,7 @@ function formFieldOfTypeAndName(devKey, fieldType, name, ltiKey) {
       developerKey={devKey}
       dispatch={ () => {} }
       listDeveloperKeyScopesSet={ () => {} }
-      ltiKey={ltiKey}
+      createLtiKeyState={ {customizing, ltiKey} }
     />
   )
   return TestUtils.scryRenderedDOMComponentsWithTag(component, fieldType).
@@ -146,3 +147,31 @@ test('populates the key notes when lti key', () => {
   equal(textarea.value, developerKey.notes)
 })
 
+test('renders the tool configuration form if ltiKey is true', () => {
+  const wrapper = mount(
+    <DeveloperKeyFormFields
+      availableScopes={{}}
+      availableScopesPending={false}
+      developerKey={developerKey}
+      dispatch={ () => {} }
+      listDeveloperKeyScopesSet={ () => {} }
+      createLtiKeyState={ {customizing: false, ltiKey: true} }
+    />
+  )
+  ok(wrapper.find('ToolConfiguration').exists())
+})
+
+test('renders the developer key scopes form if ltiKey is false', () => {
+  const wrapper = mount(
+    <DeveloperKeyFormFields
+      availableScopes={{}}
+      availableScopesPending={false}
+      developerKey={developerKey}
+      dispatch={ () => {} }
+      listDeveloperKeyScopesSet={ () => {} }
+      createLtiKeyState={ {customizing: false, ltiKey: false} }
+    />
+  )
+  ok(wrapper.find('DeveloperKeyScopes').exists())
+  wrapper.unmount()
+})

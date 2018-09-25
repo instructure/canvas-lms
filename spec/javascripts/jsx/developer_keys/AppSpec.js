@@ -335,39 +335,6 @@ test('renders the spinner', () => {
   ok(spinner)
 })
 
-test('opens the modal when the create button is clicked', () => {
-  const openSpy = sinon.spy()
-
-  const overrides = {
-    applicationState: {
-      createLtiKey: {ltiKey: false},
-      listDeveloperKeyScopes,
-      createOrEditDeveloperKey: {},
-      listDeveloperKeys: {
-        listDeveloperKeysPending: true,
-        listDeveloperKeysSuccessful: false,
-        list: [
-          {
-            id: "111",
-            api_key: "abc12345678",
-            created_at: "2012-06-07T20:36:50Z"
-          }
-        ]
-      }
-    },
-    actions: {
-      developerKeysModalOpen: openSpy
-    }
-  }
-
-  const component = renderComponent(overrides)
-  const componentNode = ReactDOM.findDOMNode(component)
-  const button = componentNode.querySelector('button')
-  TestUtils.Simulate.click(button)
-
-  ok(openSpy.called)
-})
-
 test('does not have the create button on inherited tab', () => {
   const openSpy = sinon.spy()
 

@@ -27,6 +27,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import DeveloperKeyScopes from './Scopes'
+import ToolConfiguration from './ToolConfiguration'
 
 export default class DeveloperKeyFormFields extends React.Component {
   constructor (props) {
@@ -82,6 +83,25 @@ export default class DeveloperKeyFormFields extends React.Component {
     }
   }
 
+  formBody() {
+    const { createLtiKeyState } = this.props
+
+    if (!createLtiKeyState.ltiKey) {
+      return <DeveloperKeyScopes
+        availableScopes={this.props.availableScopes}
+        availableScopesPending={this.props.availableScopesPending}
+        developerKey={this.props.developerKey}
+        requireScopes={this.state.requireScopes}
+        onRequireScopesChange={this.handleRequireScopesChange}
+        dispatch={this.props.dispatch}
+        listDeveloperKeyScopesSet={this.props.listDeveloperKeyScopesSet}
+      />
+    }
+    return <ToolConfiguration
+      customizing={createLtiKeyState.customizing}
+    />
+  }
+
   render() {
     return (
       <form ref={this.setKeyFormRef}>
@@ -103,7 +123,7 @@ export default class DeveloperKeyFormFields extends React.Component {
                   name="developer_key[email]"
                   defaultValue={this.fieldValue('email')}
                 />
-                {!this.props.ltiKey &&
+                {!this.props.createLtiKeyState.ltiKey &&
                   <div>
                     <TextInput
                       label={I18n.t('Redirect URI (Legacy):')}
@@ -138,15 +158,7 @@ export default class DeveloperKeyFormFields extends React.Component {
               </FormFieldGroup>
             </GridCol>
             <GridCol width={8}>
-              <DeveloperKeyScopes
-                availableScopes={this.props.availableScopes}
-                availableScopesPending={this.props.availableScopesPending}
-                developerKey={this.props.developerKey}
-                requireScopes={this.state.requireScopes}
-                onRequireScopesChange={this.handleRequireScopesChange}
-                dispatch={this.props.dispatch}
-                listDeveloperKeyScopesSet={this.props.listDeveloperKeyScopesSet}
-              />
+              {this.formBody()}
             </GridCol>
           </GridRow>
         </Grid>
@@ -163,7 +175,10 @@ DeveloperKeyFormFields.defaultProps = {
 DeveloperKeyFormFields.propTypes = {
   dispatch: PropTypes.func.isRequired,
   listDeveloperKeyScopesSet: PropTypes.func.isRequired,
-  ltiKey: PropTypes.bool,
+  createLtiKeyState: PropTypes.shape({
+    ltiKey: PropTypes.bool.isRequired,
+    customizing: PropTypes.bool.isRequired
+  }).isRequired,
   developerKey: PropTypes.shape({
     notes: PropTypes.string,
     icon_url: PropTypes.string,

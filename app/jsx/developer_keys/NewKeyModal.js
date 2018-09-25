@@ -130,6 +130,7 @@ export default class DeveloperKeyModal extends React.Component {
 
   developerKeyForm() {
     const {
+      createLtiKeyState,
       availableScopes,
       availableScopesPending,
       createOrEditDeveloperKeyState: { developerKey }
@@ -142,7 +143,7 @@ export default class DeveloperKeyModal extends React.Component {
       availableScopesPending={availableScopesPending}
       dispatch={this.props.store.dispatch}
       listDeveloperKeyScopesSet={this.props.actions.listDeveloperKeyScopesSet}
-      ltiKey={this.isLtiKey}
+      createLtiKeyState={createLtiKeyState}
     />
   }
 
@@ -154,8 +155,11 @@ export default class DeveloperKeyModal extends React.Component {
   }
 
   closeModal = () => {
-    this.props.store.dispatch(this.props.actions.developerKeysModalClose())
-    this.props.store.dispatch(this.props.actions.editDeveloperKey())
+    const { actions, store } = this.props
+
+    store.dispatch(actions.ltiKeysSetCustomizing(false))
+    store.dispatch(actions.developerKeysModalClose())
+    store.dispatch(actions.editDeveloperKey())
   }
 
   render() {
