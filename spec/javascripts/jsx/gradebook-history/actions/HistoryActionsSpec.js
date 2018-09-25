@@ -54,7 +54,16 @@ function defaultResponse () {
         }
       ],
       linked: {
-        assignments: [{ id: 1, name: 'Rustic Rubber Duck', grading_type: 'points', points_possible: 26 }],
+        assignments: [
+          {
+            anonymous_grading: false,
+            grading_type: 'points',
+            id: 1,
+            muted: false,
+            name: 'Rustic Rubber Duck',
+            points_possible: 26
+          }
+        ],
         users: [{ id: 100, name: 'Ms. Twillie Jones' }, { id: 110, name: 'Norval Abbott' }]
       }
     },
@@ -82,10 +91,15 @@ test('fetchHistorySuccess creates an action with history items in payload', func
   const response = defaultResponse();
   const expectedItems = [
     {
-      anonymous: false,
-      assignment: 'Rustic Rubber Duck',
+      assignment: {
+        anonymousGrading: false,
+        gradingType: 'points',
+        muted: false,
+        name: 'Rustic Rubber Duck'
+      },
       date: '2017-05-30T23:16:59Z',
       displayAsPoints: true,
+      gradedAnonymously: false,
       grader: 'Ms. Twillie Jones',
       gradeAfter: '21',
       gradeBefore: '19',
@@ -185,10 +199,15 @@ test('fetchHistoryNextPageSuccess creates an action with history items in payloa
   const response = defaultResponse();
   const expectedItems = [
     {
-      anonymous: false,
-      assignment: 'Rustic Rubber Duck',
+      assignment: {
+        anonymousGrading: false,
+        gradingType: 'points',
+        muted: false,
+        name: 'Rustic Rubber Duck'
+      },
       date: '2017-05-30T23:16:59Z',
       displayAsPoints: true,
+      gradedAnonymously: false,
       grader: 'Ms. Twillie Jones',
       gradeAfter: '21',
       gradeBefore: '19',

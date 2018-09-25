@@ -28,8 +28,8 @@ import IconOffLine from '@instructure/ui-icons/lib/Line/IconOff';
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip';
 
-function anonymouslyGraded (anonymous) {
-  return anonymous ? (
+function anonymouslyGraded (gradedAnonymously) {
+  return gradedAnonymously ? (
     <div>
       <Tooltip tip={I18n.t('Anonymously graded')} on={['focus', 'hover']}>
         <span role="presentation" tabIndex="0">
@@ -53,28 +53,58 @@ function displayGrade (grade, possible, displayAsPoints) {
   return GradeFormatHelper.formatGrade(grade, { defaultValue: '–' });
 }
 
+function displayStudentName (studentName, assignment) {
+  if (assignment.anonymousGrading && assignment.muted) {
+    return I18n.t('Not available; assignment is anonymous');
+  }
+
+  if (!studentName) {
+    return I18n.t('Not available');
+  }
+
+  return studentName;
+}
+
 function SearchResultsRow (props) {
-  const item = props.item;
+  const {
+    assignment,
+    date,
+    displayAsPoints,
+    gradedAnonymously,
+    grader,
+    gradeAfter,
+    gradeBefore,
+    gradeCurrent,
+    pointsPossibleAfter,
+    pointsPossibleBefore,
+    pointsPossibleCurrent,
+    student
+  } = props.item;
+
   return (
     <tr>
-      <td>{$.datetimeString(new Date(item.date), { format: 'medium', timezone: environment.timezone() })}</td>
-      <td>{anonymouslyGraded(item.anonymous)}</td>
-      <td>{item.student || I18n.t('Not available')}</td>
-      <td>{item.grader || I18n.t('Not available')}</td>
-      <td>{item.assignment || I18n.t('Not available')}</td>
-      <td>{displayGrade(item.gradeBefore, item.pointsPossibleBefore, item.displayAsPoints)}</td>
-      <td>{displayGrade(item.gradeAfter, item.pointsPossibleAfter, item.displayAsPoints)}</td>
-      <td>{displayGrade(item.gradeCurrent, item.pointsPossibleCurrent, item.displayAsPoints)}</td>
+      <td>{$.datetimeString(new Date(date), { format: 'medium', timezone: environment.timezone() })}</td>
+      <td>{anonymouslyGraded(gradedAnonymously)}</td>
+      <td>{displayStudentName(student, assignment)}</td>
+      <td>{grader || I18n.t('Not available')}</td>
+      <td>{assignment.name || I18n.t('Not available')}</td>
+      <td>{displayGrade(gradeBefore, pointsPossibleBefore, displayAsPoints)}</td>
+      <td>{displayGrade(gradeAfter, pointsPossibleAfter, displayAsPoints)}</td>
+      <td>{displayGrade(gradeCurrent, pointsPossibleCurrent, displayAsPoints)}</td>
     </tr>
   );
 }
 
 SearchResultsRow.propTypes = {
   item: shape({
-    anonymous: bool.isRequired,
-    assignment: string.isRequired,
+    assignment: shape({
+      anonymousGrading: bool.isRequired,
+      muted: bool.isRequired,
+      name: string.isRequired
+    }),
     date: string.isRequired,
     displayAsPoints: bool.isRequired,
+    gradedAnonymously: bool.isRequired,
     grader: string.isRequired,
     gradeAfter: string.isRequired,
     gradeBefore: string.isRequired,

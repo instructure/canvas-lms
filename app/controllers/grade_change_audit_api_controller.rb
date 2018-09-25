@@ -194,7 +194,7 @@ class GradeChangeAuditApiController < AuditorApiController
     end
 
     events = Auditors::GradeChange.for_root_account_student(@domain_root_account, @student, query_options)
-    render_events(events, api_v1_audit_grade_change_student_url(@student))
+    render_events(events, api_v1_audit_grade_change_student_url(@student), remove_anonymous: true)
   end
 
   # @API Query by grader.
@@ -253,7 +253,7 @@ class GradeChangeAuditApiController < AuditorApiController
     end
 
     events = Auditors::GradeChange.for_course_and_other_arguments(course, args, query_options)
-    render_events(events, send(url_method, args), course: course)
+    render_events(events, send(url_method, args), course: course, remove_anonymous: params[:student_id].present?)
   end
 
   private
@@ -266,7 +266,7 @@ class GradeChangeAuditApiController < AuditorApiController
     course.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
   end
 
-  def render_events(events, route, course: nil)
+  def render_events(events, route, course: nil, remove_anonymous: false)
     events = Api.paginate(events, self, route)
 
     if params.fetch(:include, []).include?("current_grade")
@@ -278,7 +278,42 @@ class GradeChangeAuditApiController < AuditorApiController
       events = events_visible_to_current_user(course, events)
     end
 
+    # In the case of for_student, simply anonymizing the data would continue
+    # to leak information, so just drop the event completely while the
+    # assignment is still anonymous and muted.
+    events = remove_anonymous ? remove_anonymous_events(events) : anonymize_events(events)
     render :json => grade_change_events_compound_json(events, @current_user, session)
+  end
+
+  def remove_anonymous_events(events)
+    assignments_anonymous_and_muted = anonymous_and_muted(events)
+
+    events.reject do |event|
+      assignment_id = event["attributes"].fetch("assignment_id")
+      assignments_anonymous_and_muted[assignment_id]
+    end
+  end
+
+  def anonymize_events(events)
+    assignments_anonymous_and_muted = anonymous_and_muted(events)
+
+    events.each do |event|
+      attributes = event["attributes"]
+      assignment_id = attributes.fetch("assignment_id")
+      attributes["student_id"] = nil if assignments_anonymous_and_muted[assignment_id]
+    end
+  end
+
+  def anonymous_and_muted(events)
+    assignment_ids = events.map { |event| event["attributes"].fetch("assignment_id") }.compact
+    assignments = Assignment.find(assignment_ids)
+    assignments_anonymous_and_muted = {}
+
+    assignments.each do |assignment|
+      assignments_anonymous_and_muted[assignment.global_id] = assignment.anonymous_grading? && assignment.muted?
+    end
+
+    assignments_anonymous_and_muted
   end
 
   def events_visible_to_current_user(course, events)
