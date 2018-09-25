@@ -33,9 +33,9 @@ describe AssignmentsHelper do
       expect(assignment_publishing_enabled?(@assignment, @student)).to be_falsey
     end
 
-    it "is false if the assignment already has submissions" do
+    it "is true if the assignment already has submissions and is unpublished" do
       @assignment.submissions.find_by!(user_id: @student).update!(submission_type: 'online_url')
-      expect(assignment_publishing_enabled?(@assignment, @teacher)).to be_falsey
+      expect(assignment_publishing_enabled?(@assignment, @teacher)).to be_truthy
     end
 
     it "is true otherwise" do
