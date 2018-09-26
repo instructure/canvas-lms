@@ -51,7 +51,7 @@
     "message": "{ assignmentType } { title }, påminning om frist den { datetime }."
   },
   "beginning_of_your_to_do_history_61ef2dce": {
-    "message": "Starten på gjeremålhistorikken din"
+    "message": "Starten på gjeremålshistorikken din"
   },
   "calendar_event_89aadc1c": {
     "message": "Kalenderhending"
@@ -72,7 +72,7 @@
     "message": "Emne"
   },
   "course_to_do_bcbbab54": {
-    "message": "{ course } GJEREMÅL"
+    "message": "{ course } Gjeremål"
   },
   "date_at_time_dbdb1b99": {
     "message": "{ date } klokka { time }"
@@ -303,7 +303,7 @@
     "message": "Innlevert"
   },
   "success_to_do_created_e34ed395": {
-    "message": "Vellukka: Å gjere-oversikt er oppretta"
+    "message": "Vellukka: Gjeremålsliste er oppretta"
   },
   "task_16b0ef38": {
     "message": "Oppgåve"
@@ -330,7 +330,7 @@
     "message": "Gjeremål: { date }"
   },
   "to_do_items_loading_d1cdfcd5": {
-    "message": "Lastar innhald i Å gjere-oversikta"
+    "message": "Lastar innhald i gjeremålslista"
   },
   "today_76e10f9c": {
     "message": "I dag"
