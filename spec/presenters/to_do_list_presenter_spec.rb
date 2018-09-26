@@ -47,4 +47,62 @@ describe 'ToDoListPresenter' do
       expect(presenter.needs_moderation).to be_empty
     end
   end
+
+  context 'grading assignments' do
+    let(:course1) { Course.create! }
+    let(:course2) { Course.create! }
+    let(:student) { user_with_multiple_enrollments('StudentEnrollment') }
+    let(:grader) { user_with_multiple_enrollments('TeacherEnrollment') }
+    let(:final_grader) { user_with_multiple_enrollments('TeacherEnrollment') }
+
+    def user_with_multiple_enrollments(enrollment_type)
+      result = course_with_user(enrollment_type, course: course1, active_all: true).user
+      course_with_user(enrollment_type, user: result, course: course2, active_all: true).user
+    end
+
+    before :each do
+      Assignment.create!(
+        context: course1,
+        title: 'assignment1',
+        submission_types: 'online_text_entry',
+        moderated_grading: true,
+        grader_count: 2,
+        final_grader: final_grader
+      ).submit_homework(student, body: 'biscuits!!! and potatoes')
+      Assignment.create!(
+        context: course2,
+        title: 'assignment2',
+        submission_types: 'online_text_entry',
+        moderated_grading: true,
+        grader_count: 2,
+        final_grader: final_grader
+      ).submit_homework(student, body: 'i really like potatoes')
+    end
+
+    it 'returns for assignments that need grading for a teacher that is a grader' do
+      presenter = ToDoListPresenter.new(nil, grader, nil)
+      expect(presenter.needs_grading.map(&:title)).to contain_exactly('assignment1', 'assignment2')
+    end
+
+    it 'doesnt returns for assignments that need grading for a teacher that isnt a grader' do
+      RoleOverride.create!(:context => course1.account,
+                           :permission => 'manage_grades',
+                           :role => teacher_role,
+                           :enabled => false)
+
+      presenter = ToDoListPresenter.new(nil, grader, nil)
+      expect(presenter.needs_grading.size).to eq(0)
+    end
+
+    it 'returns assignments from multiple types' do
+      grading = Assignment.where(:title => 'assignment1').first
+      grading.grade_student(student, grade: '1', grader: grader, provisional: true)
+
+      presenter = ToDoListPresenter.new(nil, grader, nil)
+      expect(presenter.needs_grading.map(&:title)).to contain_exactly('assignment2')
+
+      presenter = ToDoListPresenter.new(nil, final_grader, nil)
+      expect(presenter.needs_moderation.map(&:title)).to contain_exactly('assignment1')
+    end
+  end
 end
