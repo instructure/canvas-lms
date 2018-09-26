@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import jQuery from 'jquery'
-import './jquery.instructure_misc_plugins' /* fillWindowWithMe */
+// import jQuery from 'jquery'
+// import './jquery.instructure_misc_plugins' /* fillWindowWithMe */
 
-jQuery(function($) {
-  $("#file_content").css('width', '100%').fillWindowWithMe();
-});
+/* Strongmind's iFrameResizer needed to shut this foo' down! */
+// jQuery(function($) {
+//   $("#file_content").css('width', '100%').fillWindowWithMe();
+// });

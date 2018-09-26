@@ -43,20 +43,9 @@
         </p>
       </div>
     <% end %>
-    <ul style="margin-top:0" class="ui-listview ui-listview-no-rounded-bottom">
-      <li class="active">
-        <span style="font-size:18px; text-align: center; padding: .2em" class="ui-listview-text">
-          <a href="<%= @tag.url %>"><%= @tag.title %></a>
-        </span>
-      </li>
-      <li>
-        <span style="padding:0" class="ui-listview-text">
-          <%= iframe(@tag.url, :id => 'file_content', :style => "width:100%; height: 400px; float:left;") %>
-          <!-- had to float then clear this because there was a space below the iframe I couldnt figure out how to get to go away -->
-          <div class="clear"></div>
-        </span>
-      </li>
-    </ul>
+
+<!-- Content iFrame -->
+      <%= iframe(@tag.url, :id => 'file_content') %>
   <% end %>
 
 <%= render :partial => 'shared/sequence_footer', :locals => {:asset => @tag} %>
