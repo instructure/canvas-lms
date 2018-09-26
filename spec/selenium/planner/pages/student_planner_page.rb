@@ -206,6 +206,10 @@ module PlannerPageObject
     flnpt(item_name, opportunities_parent).click
   end
 
+  def click_item_button(item_name)
+    fj("button:contains('#{item_name}')").click
+  end
+
   def dismiss_todo_item(todo_title)
     dismiss_todo_item_button(todo_title).click
   end
@@ -227,6 +231,13 @@ module PlannerPageObject
   def navigate_to_course_object(object)
     expect_new_page_load do
       flnpt(object.title.to_s).click
+    end
+  end
+
+  def navigate_to_calendar_event(object)
+    expect_new_page_load do
+      click_item_button(object.title)
+      flnpt(object.title).click
     end
   end
 
@@ -305,6 +316,11 @@ module PlannerPageObject
     object.is_a?(CalendarEvent) ? validate_calendar_url(object) : validate_url(url_type, object)
   end
 
+  def validate_link_to_calendar(object)
+    navigate_to_calendar_event(object)
+    validate_calendar_url(object)
+  end
+
   def validate_link_to_submissions(object, user, url_type)
     navigate_to_course_object(object)
     validate_submissions_url(url_type, object, user)
@@ -314,7 +330,7 @@ module PlannerPageObject
     @student_to_do = @student1.planner_notes.create!(todo_date: Time.zone.now,
                                                      title: "Student to do", course_id: @course.id)
     go_to_list_view
-    flnpt(@student_to_do.title).click
+    click_item_button(@student_to_do.title)
     @modal = todo_sidebar_modal(@student_to_do.title)
   end
 

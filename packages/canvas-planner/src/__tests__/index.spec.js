@@ -36,6 +36,7 @@ function defaultPlannerOptions () {
     flashError: jest.fn(),
     flashMessage: jest.fn(),
     srFlashMessage: jest.fn(),
+    convertApiUserContent: jest.fn(),
   };
 }
 
@@ -74,6 +75,12 @@ describe('with mock api', () => {
         options[flash] = null;
         expect(() => initializePlanner(options)).toThrow();
       });
+    });
+
+    it('requires convertApiUserContent', () => {
+      const options = defaultPlannerOptions();
+      options.convertApiUserContent = null;
+      expect(() => initializePlanner(options)).toThrow();
     });
 
     it('requires timezone', () => {

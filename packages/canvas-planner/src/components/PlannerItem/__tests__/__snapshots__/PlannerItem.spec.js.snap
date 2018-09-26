@@ -71,9 +71,9 @@ exports[`does not render end time if the same as start time 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
             iconPlacement="start"
             linkRef={[Function]}
+            onClick={[Function]}
             variant="default"
           >
             <ScreenReaderContent
@@ -93,6 +93,25 @@ exports[`does not render end time if the same as start time 1`] = `
                 This Assignment is about awesome stuff
               </Text>
             </PresentationContent>
+            <CalendarEventModal
+              allDay={false}
+              courseName="A Course about being Diffrient"
+              currentUser={
+                Object {
+                  "avatarUrl": "/picture/is/here",
+                  "color": "#00AC18",
+                  "displayName": "Jane",
+                  "id": "1",
+                }
+              }
+              endTime={"2011-12-17T11:30:00.000Z"}
+              html_url="http://example.com"
+              open={false}
+              requestClose={[Function]}
+              startTime={"2011-12-17T11:30:00.000Z"}
+              timeZone="America/Denver"
+              title="This Assignment is about awesome stuff"
+            />
           </Link>
         </div>
       </div>
@@ -195,7 +214,7 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -340,7 +359,7 @@ exports[`renders Announcement correctly with everything 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -488,7 +507,7 @@ exports[`renders Announcement correctly with just date 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -612,7 +631,7 @@ exports[`renders Announcement correctly with just points 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -760,7 +779,7 @@ exports[`renders Announcement correctly without right side content 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -1032,7 +1051,7 @@ exports[`renders Assignment correctly with just date 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -1156,7 +1175,7 @@ exports[`renders Assignment correctly with just points 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -1304,7 +1323,7 @@ exports[`renders Assignment correctly without right side content 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -1428,9 +1447,9 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
             iconPlacement="start"
             linkRef={[Function]}
+            onClick={[Function]}
             variant="default"
           >
             <ScreenReaderContent
@@ -1450,6 +1469,24 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
                 I am a Calendar Event
               </Text>
             </PresentationContent>
+            <CalendarEventModal
+              allDay={true}
+              courseName="A Course about being Diffrient"
+              currentUser={
+                Object {
+                  "avatarUrl": "/picture/is/here",
+                  "color": "#00AC18",
+                  "displayName": "Jane",
+                  "id": "1",
+                }
+              }
+              html_url="http://example.com"
+              open={false}
+              requestClose={[Function]}
+              startTime={"2011-12-17T11:30:00.000Z"}
+              timeZone="America/Denver"
+              title="I am a Calendar Event"
+            />
           </Link>
         </div>
       </div>
@@ -1552,9 +1589,9 @@ exports[`renders Calendar Event correctly with everything 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
             iconPlacement="start"
             linkRef={[Function]}
+            onClick={[Function]}
             variant="default"
           >
             <ScreenReaderContent
@@ -1574,6 +1611,24 @@ exports[`renders Calendar Event correctly with everything 1`] = `
                 I am a Calendar Event
               </Text>
             </PresentationContent>
+            <CalendarEventModal
+              allDay={false}
+              courseName="A Course about being Diffrient"
+              currentUser={
+                Object {
+                  "avatarUrl": "/picture/is/here",
+                  "color": "#00AC18",
+                  "displayName": "Jane",
+                  "id": "1",
+                }
+              }
+              html_url="http://example.com"
+              open={false}
+              requestClose={[Function]}
+              startTime={"2011-12-17T11:30:00.000Z"}
+              timeZone="America/Denver"
+              title="I am a Calendar Event"
+            />
           </Link>
         </div>
       </div>
@@ -1700,9 +1755,9 @@ exports[`renders Calendar Event correctly with just date 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
             iconPlacement="start"
             linkRef={[Function]}
+            onClick={[Function]}
             variant="default"
           >
             <ScreenReaderContent
@@ -1722,6 +1777,24 @@ exports[`renders Calendar Event correctly with just date 1`] = `
                 I am a Calendar Event
               </Text>
             </PresentationContent>
+            <CalendarEventModal
+              allDay={false}
+              courseName="A Course about being Diffrient"
+              currentUser={
+                Object {
+                  "avatarUrl": "/picture/is/here",
+                  "color": "#00AC18",
+                  "displayName": "Jane",
+                  "id": "1",
+                }
+              }
+              html_url="http://example.com"
+              open={false}
+              requestClose={[Function]}
+              startTime={"2011-12-17T11:30:00.000Z"}
+              timeZone="America/Denver"
+              title="I am a Calendar Event"
+            />
           </Link>
         </div>
       </div>
@@ -1824,9 +1897,9 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
             iconPlacement="start"
             linkRef={[Function]}
+            onClick={[Function]}
             variant="default"
           >
             <ScreenReaderContent
@@ -1846,6 +1919,25 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
                 I am a Calendar Event
               </Text>
             </PresentationContent>
+            <CalendarEventModal
+              allDay={false}
+              courseName="A Course about being Diffrient"
+              currentUser={
+                Object {
+                  "avatarUrl": "/picture/is/here",
+                  "color": "#00AC18",
+                  "displayName": "Jane",
+                  "id": "1",
+                }
+              }
+              endTime={"2011-12-17T13:30:00.000Z"}
+              html_url="http://example.com"
+              open={false}
+              requestClose={[Function]}
+              startTime={"2011-12-17T11:30:00.000Z"}
+              timeZone="America/Denver"
+              title="I am a Calendar Event"
+            />
           </Link>
         </div>
       </div>
@@ -1948,9 +2040,9 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
             iconPlacement="start"
             linkRef={[Function]}
+            onClick={[Function]}
             variant="default"
           >
             <ScreenReaderContent
@@ -1970,6 +2062,24 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
                 I am a Calendar Event
               </Text>
             </PresentationContent>
+            <CalendarEventModal
+              allDay={false}
+              courseName="A Course about being Diffrient"
+              currentUser={
+                Object {
+                  "avatarUrl": "/picture/is/here",
+                  "color": "#00AC18",
+                  "displayName": "Jane",
+                  "id": "1",
+                }
+              }
+              html_url="http://example.com"
+              open={false}
+              requestClose={[Function]}
+              startTime={"2011-12-17T11:30:00.000Z"}
+              timeZone="America/Denver"
+              title="I am a Calendar Event"
+            />
           </Link>
         </div>
       </div>
@@ -2072,7 +2182,7 @@ exports[`renders Discussion correctly with everything 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -2220,7 +2330,7 @@ exports[`renders Discussion correctly with just date 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -2344,7 +2454,7 @@ exports[`renders Discussion correctly with just points 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -2492,7 +2602,7 @@ exports[`renders Discussion correctly without right side content 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -2746,7 +2856,6 @@ exports[`renders Note correctly with everything 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
             iconPlacement="start"
             linkRef={[Function]}
             onClick={[Function]}
@@ -2908,7 +3017,6 @@ exports[`renders Note correctly without Course 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
             iconPlacement="start"
             linkRef={[Function]}
             onClick={[Function]}
@@ -3064,7 +3172,7 @@ exports[`renders Page correctly with everything 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -3212,7 +3320,7 @@ exports[`renders Page correctly with just date 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -3336,7 +3444,7 @@ exports[`renders Page correctly with just points 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -3484,7 +3592,7 @@ exports[`renders Page correctly without right side content 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -3608,7 +3716,7 @@ exports[`renders Quiz correctly with everything 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -3756,7 +3864,7 @@ exports[`renders Quiz correctly with just date 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -3880,7 +3988,7 @@ exports[`renders Quiz correctly with just points 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -4028,7 +4136,7 @@ exports[`renders Quiz correctly without right side content 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -4152,7 +4260,7 @@ exports[`renders assignment peer reviews correctly 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -4276,7 +4384,7 @@ exports[`renders correctly 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -4424,7 +4532,7 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -4568,7 +4676,7 @@ exports[`renders feedback if available 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -4713,7 +4821,7 @@ exports[`renders media feedback if available 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -4858,9 +4966,9 @@ exports[`renders the end time if available 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
             iconPlacement="start"
             linkRef={[Function]}
+            onClick={[Function]}
             variant="default"
           >
             <ScreenReaderContent
@@ -4880,6 +4988,25 @@ exports[`renders the end time if available 1`] = `
                 This Assignment is about awesome stuff
               </Text>
             </PresentationContent>
+            <CalendarEventModal
+              allDay={false}
+              courseName="A Course about being Diffrient"
+              currentUser={
+                Object {
+                  "avatarUrl": "/picture/is/here",
+                  "color": "#00AC18",
+                  "displayName": "Jane",
+                  "id": "1",
+                }
+              }
+              endTime={"2011-12-17T13:30:00.000Z"}
+              html_url="http://example.com"
+              open={false}
+              requestClose={[Function]}
+              startTime={"2011-12-17T11:30:00.000Z"}
+              timeZone="America/Denver"
+              title="This Assignment is about awesome stuff"
+            />
           </Link>
         </div>
       </div>
@@ -4982,7 +5109,7 @@ exports[`renders the location if available 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -5122,7 +5249,7 @@ exports[`renders user-created Todo correctly 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"

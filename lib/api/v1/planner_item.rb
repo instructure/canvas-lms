@@ -31,7 +31,7 @@ module Api::V1::PlannerItem
 
   API_PLANNABLE_FIELDS = [:id, :title, :course_id, :location_name, :todo_date, :details, :url, :unread_count,
                           :read_state, :created_at, :updated_at].freeze
-  CALENDAR_PLANNABLE_FIELDS = [:all_day, :description, :start_at, :end_at].freeze
+  CALENDAR_PLANNABLE_FIELDS = [:all_day, :location_address, :description, :start_at, :end_at].freeze
   GRADABLE_FIELDS = [:assignment_id, :points_possible, :due_at].freeze
   PLANNER_NOTE_FIELDS = [:user_id].freeze
   ASSESSMENT_REQUEST_FIELDS = [:workflow_state].freeze

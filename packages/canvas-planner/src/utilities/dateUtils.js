@@ -18,13 +18,12 @@
 import moment from 'moment-timezone';
 import formatMessage from '../format-message';
 
-// NOTE: Canvas monkey-patches the timezone package to support the Canvas localized formats, and
-// we're counting on that behavior in this file. The version of the timezone package that planner
-// has in its package.json must stay in sync with package.json in Canvas so we don't lose the
-// monkey-patch. The reason we're doing this is because moment.js doesn't support the format that we
-// want to use in the todo sidebar, and Intl.DateTimeFormat doesn't support timezones in IE11. Using
-// the formatter from Canvas seemed like the best remaining option.
-import tz from 'timezone';
+let dateTimeFormatters = {};
+
+export function initializeDateTimeFormatters (formatters) {
+  dateTimeFormatters = formatters;
+}
+
 
 function getTodaysDetails () {
   const today = moment();
@@ -115,17 +114,43 @@ export function getFullDateAndTime (date) {
   }
 }
 
-    // NOTE: this is where we're using a canvas specific format from the monkey-patched timezone
-    // package. See comment above on the timezone package import.
-export function formatDateAtTimeWithoutYear (date, timeZone) {
-  // fancy conversion so we can support both Date and moment objects
-  date = new Date(date.toISOString());
-
-  // If  we're not in canvas, then there's no monkey-patch. Use a fallback in the test environment.
-  if (process.env.NODE_ENV === 'test' && !tz.format) {
-    return moment(date).format('lll'); // includes the year, unfortunately
+export function dateString (date, timeZone) {
+  if (dateTimeFormatters.dateString) {
+    return dateTimeFormatters.dateString(date.toISOString(), {timezone: timeZone});
   } else {
-    return tz.format(date, 'date.formats.date_at_time', timeZone);
+    return date.format('ll'); // always includes year
+  }
+}
+
+export function timeString (date, timeZone) {
+  if (dateTimeFormatters.timeString) {
+    return dateTimeFormatters.timeString(date.toISOString(), {timezone: timeZone});
+  } else {
+    return date.format('LT');
+  }
+}
+
+export function dateTimeString (date, timeZone) {
+  if (dateTimeFormatters.datetimeString) {
+    return dateTimeFormatters.datetimeString(date.toISOString(), {timezone: timeZone});
+  } else {
+    return date.format('lll'); // always includes year
+  }
+}
+
+export function dateRangeString (startDate, endDate, timeZone) {
+  if (startDate.isSame(endDate)) {
+    return dateTimeString(startDate, timeZone);
+  } else if (startDate.dayOfYear() === endDate.dayOfYear()) {
+    return formatMessage('{startDateTime} - {endTime}', {
+      startDateTime: dateTimeString(startDate, timeZone),
+      endTime: timeString(endDate, timeZone),
+    });
+  } else {
+    return formatMessage('{startDateTime} - {endDateTime}', {
+      startDateTime: dateTimeString(startDate, timeZone),
+      endDateTime: dateTimeString(endDate, timeZone),
+    });
   }
 }
 

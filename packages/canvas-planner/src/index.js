@@ -33,6 +33,8 @@ import {
  } from './actions';
 import { registerScrollEvents } from './utilities/scrollUtils';
 import { initialize as initializeAlerts } from './utilities/alertUtils';
+import { initializeContent } from './utilities/contentUtils';
+import { initializeDateTimeFormatters } from './utilities/dateUtils';
 import moment from 'moment-timezone';
 import {DynamicUiManager, DynamicUiProvider, specialFallbackFocusId} from './dynamic-ui';
 
@@ -112,6 +114,12 @@ function initializeCourseAndGroupColors (options) {
 // flashError,                  <required>
 // flashMessage,                <required>
 // srFlashMessage,              <required>
+// convertApiUserContent,       <required - conversion to make user content from api work properly>
+// dateTimeFormatters: {        <optional - canvas methods for date and time formatting>
+//   dateString,                <optional>
+//   timeString,                <optional>
+//   datetimeString,            <optional>
+// },
 // externalFallbackFocusable,   <optional - element where focus goes when it should go before planner>
 // getActiveApp,                <optional - method to get the current dashboard>
 // changeDashboardView,         <optional - method to change the current dashboard>
@@ -131,6 +139,10 @@ export function initializePlanner (options) {
     throw new Error('flash message callbacks are required options for initializePlanner');
   }
 
+  if (!options.convertApiUserContent) {
+    throw new Error('convertApiUserContent is a required option for initializePlanner');
+  }
+
   externalPlannerActive = () => options.getActiveApp() === 'planner';
 
   i18n.init(options.env.MOMENT_LOCALE);
@@ -141,6 +153,8 @@ export function initializePlanner (options) {
     visualErrorCallback: flashError,
     srAlertCallback: srFlashMessage,
   });
+  initializeContent(options);
+  initializeDateTimeFormatters(options.dateTimeFormatters);
 
   const stickyElement = document.getElementById('dashboard_header_container');
   if (stickyElement) {

@@ -26,8 +26,9 @@ import axios from 'axios'
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
-import { initializePlanner, renderToDoSidebar } from 'canvas-planner';
-import { showFlashAlert } from '../shared/FlashAlert';
+import { initializePlanner, renderToDoSidebar } from 'canvas-planner'
+import { showFlashAlert } from '../shared/FlashAlert'
+import apiUserContent from 'compiled/str/apiUserContent'
 
 const defaultViewStore = createStore({
   selectedDefaultView: ENV.COURSE.default_view,
@@ -139,6 +140,12 @@ const addToDoSidebar = (parent) => {
     flashError: message => showFlashAlert({message, type: 'error'}),
     flashMessage: message => showFlashAlert({message, type: 'info'}),
     srFlashMessage: $.screenReaderFlashMessage,
+    convertApiUserContent: apiUserContent.convert,
+    dateTimeFormatters: {
+      dateString: $.dateString,
+      timeString: $.timeString,
+      datetimeString: $.datetimeString,
+    },
     forCourse: ENV.COURSE.id
   })
   renderToDoSidebar(parent)

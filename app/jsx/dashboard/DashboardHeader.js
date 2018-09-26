@@ -22,11 +22,11 @@ import axios from 'axios';
 import { bool, func, string, object } from 'prop-types';
 import { initializePlanner, loadPlannerDashboard, renderToDoSidebar } from 'canvas-planner';
 import { showFlashAlert, showFlashError } from '../shared/FlashAlert'
+import apiUserContent from 'compiled/str/apiUserContent'
 import DashboardOptionsMenu from '../dashboard_card/DashboardOptionsMenu';
 import loadCardDashboard from '../bundles/dashboard_card'
 import $ from 'jquery'
 import 'jquery.disableWhileLoading'
-
 
 const [show, hide] = ['block', 'none'].map(displayVal => id => {
   const el = document.getElementById(id)
@@ -61,6 +61,12 @@ export default class DashboardHeader extends React.Component {
         flashError: (message) => showFlashAlert({message, type: 'error'}),
         flashMessage: (message) => showFlashAlert({message, type: 'info'}),
         srFlashMessage: this.props.screenReaderFlashMessage,
+        convertApiUserContent: apiUserContent.convert,
+        dateTimeFormatters: {
+          dateString: $.dateString,
+          timeString: $.timeString,
+          datetimeString: $.datetimeString,
+        },
         externalFallbackFocusable: this.menuButtonFocusable,
         env: this.props.env,
       })

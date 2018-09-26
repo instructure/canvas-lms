@@ -55,6 +55,7 @@ exports[`grouping contains link pointing to course url 1`] = `
             "iconColor": "#5678",
           }
         }
+        timeZone="America/Denver"
         title="San Juan"
         toggleCompletion={[Function]}
         uniqueId="five"
@@ -82,6 +83,7 @@ exports[`grouping contains link pointing to course url 1`] = `
             "iconColor": "#5678",
           }
         }
+        timeZone="America/Denver"
         title="Roll for the Galaxy"
         toggleCompletion={[Function]}
         uniqueId="six"
@@ -146,6 +148,7 @@ exports[`renders a CompletedItemsFacade when completed items are present by defa
             "iconColor": "#5678",
           }
         }
+        timeZone="America/Denver"
         title="Roll for the Galaxy"
         toggleCompletion={[Function]}
         uniqueId="six"
@@ -233,6 +236,7 @@ exports[`renders the base component with required props 1`] = `
             "iconColor": "#5678",
           }
         }
+        timeZone="America/Denver"
         title="San Juan"
         toggleCompletion={[Function]}
         uniqueId="five"
@@ -260,6 +264,7 @@ exports[`renders the base component with required props 1`] = `
             "iconColor": "#5678",
           }
         }
+        timeZone="America/Denver"
         title="Roll for the Galaxy"
         toggleCompletion={[Function]}
         uniqueId="six"
@@ -311,6 +316,7 @@ exports[`renders to do items correctly 1`] = `
             "iconColor": null,
           }
         }
+        timeZone="America/Denver"
         title="To Do 700"
         toggleCompletion={[Function]}
         uniqueId="seven hundred"

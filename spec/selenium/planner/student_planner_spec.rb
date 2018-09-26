@@ -61,7 +61,7 @@ describe "student planner" do
     event.save!
     go_to_list_view
     validate_object_displayed(@course.name,'Calendar Event')
-    validate_link_to_url(event, 'calendar_events')
+    validate_link_to_calendar(event)
   end
 
   it "shows course images when the feature is enabled", priority: "1", test_id: 3306206 do
@@ -254,7 +254,7 @@ describe "student planner" do
       todo_item =todo_info_holder
       expect(todo_item).to include_text("To Do")
       expect(todo_item).to include_text("Title Text")
-      fj("a:contains('Title Text')", todo_item).click
+      click_item_button("Title Text")
 
       # gives the To Do a new name and saves it
       element = title_input("Title Text")
@@ -285,7 +285,7 @@ describe "student planner" do
       todo_item =todo_info_holder
       expect(todo_item).to include_text("To Do")
       expect(todo_item).to include_text("Title Text")
-      fj("a:contains('Title Text')", todo_item).click
+      click_item_button('Title Text')
 
       # gives the To Do a new name and saves it
       element = title_input("Title Text")
@@ -308,7 +308,7 @@ describe "student planner" do
       todo_item =todo_info_holder
       expect(todo_item).to include_text("To Do")
       expect(todo_item).to include_text("Title Text")
-      fj("a:contains('Title Text')", todo_item).click
+      click_item_button('Title Text')
       fj("button:contains('Delete')").click
       alert = driver.switch_to.alert
       expect(alert.text).to eq("Are you sure you want to delete this planner item?")
@@ -384,7 +384,7 @@ describe "student planner" do
       expect(title_input[:value]).to eq(@student_to_do.title)
       expect(course_name_dropdown[:value]).to eq("#{@course.name} - #{@course.short_name}")
 
-      flnpt(student_to_do2.title).click
+      click_item_button(student_to_do2.title)
       expect(title_input[:value]).to eq(student_to_do2.title)
       expect(course_name_dropdown[:value]).to eq("Optional: Add Course")
     end
@@ -409,15 +409,13 @@ describe "student planner" do
                                                      title: "Title Text")
       go_to_list_view
       # Opens the To Do edit sidebar
-      expect(planner_app_div).to contain_link_partial_text(planner_note.title)
-      flnpt(planner_note.title).click
+      click_item_button(planner_note.title)
       @modal = todo_sidebar_modal(planner_note.title)
       expect(ff('input', @modal)[1][:value]).to eq format_date_for_view(planner_note.todo_date, :long)
       @student1.time_zone = 'Minsk'
       @student1.save!
       refresh_page
-      expect(planner_app_div).to contain_link_partial_text(planner_note.title)
-      flnpt(planner_note.title).click
+      click_item_button(planner_note.title)
       @modal = todo_sidebar_modal(planner_note.title)
       expect(ff('input', @modal)[1][:value]).to eq format_date_for_view(planner_note.todo_date, :long)
     end

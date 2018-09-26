@@ -36,6 +36,7 @@ import Edit from '@instructure/ui-icons/lib/Line/IconEdit';
 import PeerReview from '@instructure/ui-icons/lib/Line/IconPeerReview';
 import NotificationBadge, { MissingIndicator, NewActivityIndicator } from '../NotificationBadge';
 import BadgeList from '../BadgeList';
+import CalendarEventModal from '../CalendarEventModal';
 import responsiviser from '../responsiviser';
 import styles from './styles.css';
 import theme from './theme.js';
@@ -56,6 +57,7 @@ export class PlannerItem extends Component {
     title: string.isRequired,
     points: number,
     date: momentObj,
+    dateStyle: string,
     details: string,
     courseName: string,
     completed: bool,
@@ -78,6 +80,7 @@ export class PlannerItem extends Component {
     feedback: shape(feedbackShape),
     location: string,
     endTime: momentObj,
+    timeZone: string.isRequired,
   };
 
   static defaultProps = {
@@ -89,6 +92,7 @@ export class PlannerItem extends Component {
   constructor (props) {
     super(props);
     this.state = {
+      calendarEventModalOpen: false,
       completed: props.completed,
     };
   }
@@ -145,11 +149,11 @@ export class PlannerItem extends Component {
   showEndTime () {
     return this.props.date &&
           !this.props.allDay &&
-           this.props.endTime && !this.props.endTime.isSame(this.props.date)
+           this.props.endTime && !this.props.endTime.isSame(this.props.date);
   }
 
   hasBadges () {
-    return this.props.badges && this.props.badges.length && this.props.badges.length > 0
+    return this.props.badges && this.props.badges.length && this.props.badges.length > 0;
   }
 
   assignmentType () {
@@ -169,7 +173,7 @@ export class PlannerItem extends Component {
       case 'Calendar Event':
         return formatMessage('Calendar Event');
       case 'Peer Review':
-        return formatMessage('Peer Review')
+        return formatMessage('Peer Review');
       default:
         return formatMessage('Task');
     }
@@ -248,6 +252,14 @@ export class PlannerItem extends Component {
     return formatMessage('{assignmentType} {title}.', params);
   }
 
+  openCalendarEventModal = () => {
+    this.setState({calendarEventModalOpen: true});
+  }
+
+  closeCalendarEventModal = () => {
+    this.setState({calendarEventModalOpen: false});
+  }
+
   renderIcon = () => {
     const currentUser = this.props.currentUser || {};
 
@@ -269,6 +281,49 @@ export class PlannerItem extends Component {
         default:
           return <Avatar name={currentUser.displayName || '?'} src={currentUser.avatarUrl} size="small" />;
     }
+  }
+
+  renderCalendarEventModal () {
+    if (this.props.associated_item !== 'Calendar Event') return null;
+    return <CalendarEventModal
+      open={this.state.calendarEventModalOpen}
+      requestClose={this.closeCalendarEventModal}
+      title={this.props.title}
+      html_url={this.props.html_url}
+      courseName={this.props.courseName}
+      currentUser={this.props.currentUser}
+      location={this.props.location}
+      address={this.props.address}
+      details={this.props.details}
+      startTime={this.props.date}
+      endTime={this.props.endTime}
+      allDay={!!this.props.allDay}
+      timeZone={this.props.timeZone}
+    />;
+  }
+
+  renderTitle () {
+    const linkProps = {};
+    if (this.props.associated_item === 'To Do') {
+      linkProps.onClick = this.toDoLinkClick;
+    }
+    if (this.props.associated_item === 'Calendar Event') {
+      linkProps.onClick = this.openCalendarEventModal;
+    } else {
+      linkProps.href = this.props.html_url;
+    }
+
+    return <div className={styles.title} style={{position: 'relative'}}>
+      <Link
+        linkRef={(link) => {this.itemLink = link;}}
+        ellipsis={true}
+        {...linkProps}
+      >
+        <ScreenReaderContent>{this.linkLabel()}</ScreenReaderContent>
+        <PresentationContent><Text color="primary">{this.props.title}</Text></PresentationContent>
+        {this.renderCalendarEventModal()}
+      </Link>
+    </div>;
   }
 
   renderBadges = () => {
@@ -353,16 +408,7 @@ export class PlannerItem extends Component {
             {this.renderType()}
           </Text>
         </div>
-        <div className={styles.title} style={{position: 'relative'}}>
-          <Link
-            linkRef={(link) => {this.itemLink = link;}}
-            ellipsis={true}
-            {...this.props.associated_item === "To Do" ? {onClick: this.toDoLinkClick} : {}}
-            href={this.props.html_url || "#" }>
-            <ScreenReaderContent>{this.linkLabel()}</ScreenReaderContent>
-            <PresentationContent><Text color="primary">{this.props.title}</Text></PresentationContent>
-          </Link>
-        </div>
+        {this.renderTitle()}
       </div>
     );
   }
@@ -424,7 +470,7 @@ export class PlannerItem extends Component {
         <div className={styles.location}>
           <Text color="secondary">{location}</Text>
         </div>
-      )
+      );
     }
     return null;
   }
