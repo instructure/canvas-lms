@@ -585,7 +585,7 @@ RSpec.describe ApplicationController do
 
           before do
             tool.developer_key = developer_key
-            tool.settings['use_1_3'] = true
+            tool.use_1_3 = true
             tool.save!
           end
 

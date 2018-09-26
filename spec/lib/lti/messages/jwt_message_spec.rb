@@ -81,7 +81,7 @@ describe Lti::Messages::JwtMessage do
         no_expansion: 'foo'
       }
     }
-    tool.settings['use_1_3'] = true
+    tool.use_1_3 = true
     tool.save!
     tool
   end

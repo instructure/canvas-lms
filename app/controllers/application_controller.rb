@@ -1595,7 +1595,7 @@ class ApplicationController < ActionController::Base
                                                         launch: @lti_launch,
                                                         tool: @tool})
 
-        adapter = if @tool.settings.fetch('use_1_3', false)
+        adapter = if @tool.use_1_3?
           Lti::LtiAdvantageAdapter.new(
             tool: @tool,
             user: @current_user,

@@ -66,7 +66,8 @@ module Lti
                                    has_update: nil,
                                    enabled: true,
                                    tool_configuration: nil,
-                                   reregistration_url: nil
+                                   reregistration_url: nil,
+                                   lti_version: '2.0'
                                  })
 
       end
@@ -89,8 +90,36 @@ module Lti
                                     has_update: nil,
                                     enabled: true,
                                     tool_configuration: nil,
-                                    reregistration_url: nil
+                                    reregistration_url: nil,
+                                    lti_version: '1.1'
                                   })
+      end
+
+      context 'with 1.3 tool' do
+        it 'returns an external tool app definition' do
+          external_tool = new_valid_external_tool(account)
+          external_tool.use_1_3 = true
+          external_tool.save!
+          tools_collection = subject.bookmarked_collection.paginate(per_page: 100).to_a
+
+          definitions = subject.app_definitions(tools_collection)
+          expect(definitions.count).to eq 1
+          definition = definitions.first
+          expect(definition).to eq({
+                                      app_type: external_tool.class.name,
+                                      app_id: external_tool.id,
+                                      :context => external_tool.context_type,
+                                      :context_id => account.id,
+                                      name: external_tool.name,
+                                      description: external_tool.description,
+                                      installed_locally: true,
+                                      has_update: nil,
+                                      enabled: true,
+                                      tool_configuration: nil,
+                                      reregistration_url: nil,
+                                      lti_version: '1.3'
+                                    })
+        end
       end
 
       it 'returns an external tool and a tool proxy' do
@@ -158,7 +187,8 @@ module Lti
                                      has_update: false,
                                      enabled: true,
                                      tool_configuration: nil,
-                                     reregistration_url: nil
+                                     reregistration_url: nil,
+                                     lti_version: '2.0'
                                  })
       end
 
@@ -185,7 +215,8 @@ module Lti
                                      has_update: true,
                                      enabled: true,
                                      tool_configuration: nil,
-                                     reregistration_url: nil
+                                     reregistration_url: nil,
+                                     lti_version: '2.0'
                                  })
       end
 

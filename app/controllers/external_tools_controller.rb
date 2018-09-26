@@ -491,7 +491,7 @@ class ExternalToolsController < ApplicationController
     assignment = @context.assignments.active.find(params[:assignment_id]) if params[:assignment_id]
     expander = variable_expander(assignment: assignment, tool: tool, launch: lti_launch, post_message_token: opts[:launch_token])
 
-    adapter = if tool.settings.fetch('use_1_3', false)
+    adapter = if tool.use_1_3?
       Lti::LtiAdvantageAdapter.new(
         tool: tool,
         user: @current_user,

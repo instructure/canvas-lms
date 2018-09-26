@@ -59,7 +59,7 @@ describe Lti::LtiAdvantageAdapter do
       url: 'http://www.example.com/basic_lti'
     )
     tool.course_navigation = { enabled: true, message_type: 'ResourceLinkRequest' }
-    tool.settings['use_1_3'] = true
+    tool.use_1_3 = true
     tool.developer_key = DeveloperKey.create!
     tool.save!
     tool

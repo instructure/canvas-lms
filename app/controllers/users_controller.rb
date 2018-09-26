@@ -1269,7 +1269,7 @@ class UsersController < ApplicationController
                                                                         current_user: @current_user,
                                                                         current_pseudonym: @current_pseudonym,
                                                                         tool: @tool})
-    adapter = if @tool.settings.fetch('use_1_3', false)
+    adapter = if @tool.use_1_3?
       Lti::LtiAdvantageAdapter.new(
         tool: @tool,
         user: @current_user,

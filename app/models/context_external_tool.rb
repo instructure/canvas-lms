@@ -290,6 +290,14 @@ class ContextExternalTool < ActiveRecord::Base
     @config_errors += Array(e.record.errors)
   end
 
+  def use_1_3?
+    settings.fetch(:use_1_3, settings['use_1_3'])
+  end
+
+  def use_1_3=(bool)
+    settings[:use_1_3] = bool
+  end
+
   def custom_fields_string=(str)
     hash = {}
     str.split(/[\r\n]+/).each do |line|
