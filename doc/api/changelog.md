@@ -7,6 +7,99 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 <li>This page documents API changes for the last four releases. For prior releases, view the <a href="file.changelog_archive.html">API Change Log archive page</a>.</li>
 </ul>
 
+<h2>2018-10-06</h2>
+
+<h3>Changes</h3>
+<table class="changelog">
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="accounts.html">Accounts API</a></td>
+<td>Permissions Endpoint</td>
+<td>Added links to Course and Group permissions</td>
+</tr>
+<tr>
+<td><a href="courses.html">Courses API</a></td>
+<td>Permissions Endpoint</td>
+<td>Added links to Account and Group permissions</td>
+</tr>
+</table>
+<p></p>
+<table class="changelog">
+<tr>
+<th>Basics</th>
+<th>File</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="file.file_uploads.html">Uploading Files</td>
+<td>Uploading via URL</td>
+<td>Explains file management system transition and clarifies newer file upload process
+</td>
+</tr>
+</table>
+<p></p>
+<table class="changelog">
+<tr>
+<th>OAuth2</th>
+<th>Endpoint</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="file.oauth_endpoints.html">OAuth2 Endpoints</td>
+<td>Get login/oauth2/auth</td>
+<td>Below parameters table, clarified info on scopes for oath2 endpoint
+</td>
+</tr>
+</table>
+
+<h3>Additions</h3>
+<table class="changelog">
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="groups.html">Groups API</a></td>
+<td>Permissions Endpoint</td>
+<td>Added endpoint
+</td>
+</tr>
+</table>
+<p></p>
+<table class="changelog">
+<tr>
+<th>API Responses</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="courses.html">Courses API</a></td>
+<td>Course Object</td>
+<td>Created_at parameter: Returns the date the course was created
+</td>
+</tr>
+</table>
+
+<h3>Removals</h3>
+<table class="changelog">
+<tr>
+<th>Basics</th>
+<th>File</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="file.file_uploads.html">Uploading Files</td>
+<td>Uploading via URL</td>
+<td>Explains file management system transition and identifies deprecated behavior
+</td>
+</tr>
+</table>
+
 <h2>2018-09-15</h2>
 
 <h3>Additions</h3>
@@ -100,81 +193,3 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 </td>
 </tr>
 </table>
-
-<h2>2018-07-14</h2>
-  <h3>Changes</h3>
-<table class="changelog">
-<tr>
-<th>API Calls</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td>Plagiarism Detection Platform APIs</td>
-<td></td>
-<td>In the API page sidebar, moved all API documentation for the plagiarism platform to the External Tools section</td>
-</tr>
-</table>
-
-<h3>Additions</h3>
-<table class="changelog">
-<tr>
-<th>API Calls</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="api_token_scopes.html">API Token Scopes</a></td>
-<td></td>
-<td>Added API</td>
-</tr>
-<tr>
-<td><a href="proficiency_ratings.html">Proficiency Ratings API</a></td>
-<td></td>
-<td>Added API</td>
-</tr>
-</table>
-
-<h2>2018-06-23</h2>
-  <h3>Changes</h3>
-<table class="changelog">
-<tr>
-<th>API Calls</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="users.html">Users API</a></td>
-<td>Get a Pandata JWT Token and its Expiration Date endpoint</td>
-<td>Changed endpoint to reflect use for current user only (/api/v1/users/self/pandata_token)<br><br>
-Clarified description in that endpoint is currently only available to the mobile developer keys</td>
-</tr>
-</table>
-<p></p>
-<table class="changelog">
-<tr>
-<th>API Responses</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="files.html">Files API</a></td>
-<td>File Object</td>
-<td>Updated file object example and ordering; object returns uuid, folder_id, display_name, and modified_at fields</td>
-</tr>
-</table>
-
-<h3>Additions</h3>
-<table class="changelog">
-<tr>
-<th>API Calls</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="sis_imports.html">SIS Imports API</a></td>
-<td>Restore workflow_states of SIS imported items</td>
-<td>Restore states for sis_imports</td>
-</tr>
-</table>
-<p></p>
