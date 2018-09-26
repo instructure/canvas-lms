@@ -173,13 +173,13 @@ describe "course rubrics" do
 
     get "/courses/#{@course.id}/grades"
     f('.toggle_rubric_assessments_link').click
-    expect(f('.rubric .criterion .custom_rating_comments')).to include_text comment
-    expect(f('.rubric .criterion .custom_rating_comments a')).to have_attribute('href', 'http://www.example.com/')
+    expect(f('.rubric-freeform')).to include_text comment
+    expect(f('.rubric-freeform a')).to have_attribute('href', 'http://www.example.com/')
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
     f('.assess_submission_link').click
-    expect(f('.rubric .criterion .custom_rating_comments')).to include_text comment
-    expect(f('.rubric .criterion .custom_rating_comments a')).to have_attribute('href', 'http://www.example.com/')
+    expect(f('.rubric-freeform')).to include_text comment
+    expect(f('.rubric-freeform a')).to have_attribute('href', 'http://www.example.com/')
   end
 
   it "should highlight a criterion level if score is 0" do
@@ -203,7 +203,7 @@ describe "course rubrics" do
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
     f('.assess_submission_link').click
     wait_for_ajaximations
-    expect(f('table .ratings tbody td:nth-child(3)')).to have_class('original_selected')
+    expect(ff('.rubric-criterion:nth-of-type(1) .rating-tier').third).to have_class('selected')
   end
 
   it "should not highlight a criterion level if score is nil" do
@@ -227,6 +227,8 @@ describe "course rubrics" do
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
     f('.assess_submission_link').click
     wait_for_ajaximations
-    expect(f('table .ratings tbody td:nth-child(3)')).not_to have_class('original_selected')
+    ff('.rubric-criterion:nth-of-type(1) .rating-tier').each do |criterion|
+      expect(criterion).not_to have_class('selected')
+    end
   end
 end

@@ -62,6 +62,7 @@ class CommentDialog extends React.Component {
         </ModalHeader>
         <ModalBody>
           <TextArea
+            data-selenium="criterion_comments_text"
             label={I18n.t('Comments')}
             maxHeight="50rem"
             onChange={e => setComments(e.target.value)}

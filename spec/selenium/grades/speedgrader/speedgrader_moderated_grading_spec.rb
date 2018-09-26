@@ -46,13 +46,18 @@ describe "speed grader" do
       f('.toggle_full_rubric').click
       expect(f('#rubric_full')).to be_displayed
       expand_right_pane
-      f('#rubric_full tr.learning_outcome_criterion .criterion_comments img').click
-
-      f('textarea.criterion_comments').send_keys(comment)
-      f('#rubric_criterion_comments_dialog .save_button').click
-      f('#rubric_full input.criterion_points').send_keys(score.to_s)
+      wait_for_ajaximations
+      f('svg[name="IconFeedback"]').find_element(:xpath, '../../parent::button').click
+      f("textarea[data-selenium='criterion_comments_text']").send_keys(comment)
+      fj("button:contains('Update Comment'):visible").click
+      wait_for_ajaximations
+      f('.criterion_points input').send_keys(score.to_s)
+      f('.criterion_points input').send_keys(:tab)
+      sleep 0.5
+      wait_for_ajaximations
       scroll_into_view('.save_rubric_button')
-      f('#rubric_full .save_rubric_button').click
+      save_rubric_button = f('#rubric_full .save_rubric_button')
+      save_rubric_button.click
       wait_for_ajaximations
     end
 
@@ -66,8 +71,9 @@ describe "speed grader" do
 
       time = 5.minutes.from_now
       Timecop.freeze(time) do
-        replace_content f('#grading-box-extended'), "8", tab_out: true
+        replace_content f('#grading-box-extended'), "8", tab_out: false
         wait_for_ajaximations
+        f('.gradebookHeader--rightside').click
       end
       provisional_grade = @submission.provisional_grades.find_by!(scorer: @user)
       expect(provisional_grade.grade).to eq '8'
@@ -94,8 +100,8 @@ describe "speed grader" do
       time = 5.minutes.from_now
       Timecop.freeze(time) do
         add_rubric_assessment(3, comment)
-        expect(f('#rubric_summary_container')).to include_text(@rubric.title)
-        expect(f('#rubric_summary_container')).to include_text(comment)
+        expect(f('#rubric_summary_container caption')).to include_text(@rubric.title)
+        expect(fj('.rating-tier.selected:visible')).to include_text(comment)
       end
 
       @submission.reload
