@@ -34,5 +34,6 @@ export default class ToolLaunchResizer {
   resize_tool_content_wrapper (height, container) {
     const toolWrapper = container || this.tool_content_wrapper();
     toolWrapper.height(!height || this.minToolHeight > height ? this.minToolHeight : height);
+    console.log(height, container);
   }
 }

@@ -139,6 +139,7 @@ iframe {
   width: 100%;
 
   &#file_content,
+  &#tool_content,
   &.tool_launch {
       height: calc(100vh - 170px); // This is for when the iframeResizer isn't supported. The iframeResizer will override this via inline styles.
   }
