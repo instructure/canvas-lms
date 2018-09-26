@@ -561,16 +561,6 @@ class GradebooksController < ApplicationController
       }
       json = submission.as_json(Submission.json_serialization_full_parameters.merge(json_params))
 
-      provisional_grade = if provisional_grader_or_moderator?(assignment: assignment)
-        submission.provisional_grade(@current_user, preloaded_grades: preloaded_provisional_grades(assignment: assignment))
-      end
-
-      comments = SpeedGrader::Submission.new(
-        submission: submission,
-        current_user: @current_user,
-        provisional_grade: provisional_grade
-      ).comments
-
       json[:submission].tap do |submission_json|
         submission_json[:assignment_visible] = submission.assignment_visible_to_user?(submission.user)
         submission_json[:provisional_grade_id] = submission.provisional_grade_id if submission.provisional_grade_id
@@ -578,7 +568,7 @@ class GradebooksController < ApplicationController
           assignment: submission.assignment,
           avatars: service_enabled?(:avatars),
           submissions: submissions,
-          submission_comments: comments,
+          submission_comments: submission.visible_submission_comments_for(@current_user),
           current_user: @current_user,
           course: @context
         ).map { |c| {submission_comment: c} }
@@ -1075,10 +1065,6 @@ class GradebooksController < ApplicationController
     end
   end
 
-  def provisional_grader_or_moderator?(assignment:)
-    [:provisional_grader, :moderator].include?(grading_role(assignment: assignment))
-  end
-
   def grading_role(assignment:)
     if moderated_grading_enabled_and_no_grades_published?
       if assignment.permits_moderation?(@current_user)
@@ -1089,14 +1075,5 @@ class GradebooksController < ApplicationController
     else
       :grader
     end
-  end
-
-  def preloaded_provisional_grades(assignment:)
-    @preloaded_provisional_grades ||= SpeedGrader::Assignment.new(
-      assignment,
-      @current_user,
-      avatars: service_enabled?(:avatars),
-      grading_role: grading_role(assignment: assignment)
-    ).preloaded_provisional_grades
   end
 end

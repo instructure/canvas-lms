@@ -866,11 +866,11 @@ describe SpeedGrader::Assignment do
         expect(comment_ids).to include(final_grader_provisional_comment.id.to_s)
       end
 
-      it "includes provisional grade submission comments from other graders such as the teacher" do
+      it "includes submission comments from other graders such as the teacher" do
         expect(comment_ids).to include(teacher_comment.id.to_s)
       end
 
-      it "includes provisional grade submission comments from other graders such as the techer" do
+      it "includes provisional grade submission comments from other graders such as the teacher" do
         expect(comment_ids).to include(teacher_provisional_comment.id.to_s)
       end
 
@@ -953,11 +953,18 @@ describe SpeedGrader::Assignment do
 
   describe "moderated grading" do
     let(:course) { Course.create! }
-    let(:ta) { course_with_ta(course: course, active_all: true).user }
-    let(:teacher) { course_with_teacher(course: course, active_all: true).user }
+    let(:ta) { course_with_ta(course: course, name: 'Ta', active_all: true).user }
+    let(:second_ta) { course_with_user('TaEnrollment', course: course, active_all: true, name: 'Second Ta').user }
+    let(:third_ta) { course_with_user('TaEnrollment', course: course, active_all: true, name: 'Third Ta').user }
+    let(:teacher) { course_with_teacher(course: course, name: 'Teacher', active_all: true).user }
     let(:student) { course_with_student(course: course, name: 'student', active_all: true).user }
     let(:assignment) do
-      course.assignments.create!(submission_types: 'online_text_entry', moderated_grading: true, grader_count: 2)
+      course.assignments.create!(
+        submission_types: 'online_text_entry',
+        moderated_grading: true,
+        grader_count: 2,
+        final_grader: teacher
+      )
     end
     let(:rubric_association) do
       rubric = rubric_model
@@ -993,6 +1000,8 @@ describe SpeedGrader::Assignment do
         submission.add_comment(comment: 'student comment', commenter: student)
         submission.add_comment(author: teacher, comment: 'teacher provisional comment', provisional: true)
         submission.add_comment(author: ta, comment: 'ta provisional comment', provisional: true)
+        submission.add_comment(author: second_ta, comment: 'Second Ta provisional comment', provisional: true)
+        submission.add_comment(author: third_ta, comment: 'Third Ta provisional comment', provisional: true)
       end
     end
 
@@ -1020,17 +1029,44 @@ describe SpeedGrader::Assignment do
       json.fetch('submissions').find { |s| s.fetch('workflow_state') != 'unsubmitted' }
     end
 
-    it "includes provisional comments when grades have not been posted" do
-      json = SpeedGrader::Assignment.new(assignment, ta, grading_role: :provisional_grader).json
+    it "includes all provisional comments when grades have not been posted" do
+      json = SpeedGrader::Assignment.new(assignment, second_ta, grading_role: :provisional_grader).json
       comments = find_real_submission(json).fetch('submission_comments').map { |comment| comment.fetch('comment') }
-      expect(comments).to match_array ['student comment', 'teacher provisional comment', 'ta provisional comment']
+      expect(comments).to match_array [
+        'student comment',
+        'teacher provisional comment',
+        'ta provisional comment',
+        'Second Ta provisional comment',
+        'Third Ta provisional comment'
+      ]
     end
 
-    it "excludes provisional comments when grades have been posted" do
-      assignment.update(grades_published_at: Date.yesterday)
-      json = SpeedGrader::Assignment.new(assignment, ta, grading_role: :provisional_grader).json
-      comments = find_real_submission(json).fetch('submission_comments').map { |comment| comment.fetch('comment') }
-      expect(comments).to match_array ['student comment']
+    context "when graders cannot view other grader's comments" do
+      before(:each) do
+        assignment.update!(grader_comments_visible_to_graders: false)
+      end
+
+      it "includes own and student's comments when grades have not been posted" do
+        json = SpeedGrader::Assignment.new(assignment, second_ta, grading_role: :provisional_grader).json
+        comments = find_real_submission(json).fetch("submission_comments").map { |comment| comment.fetch("comment") }
+        expect(comments).to match_array([
+          "student comment",
+          "Second Ta provisional comment"
+        ])
+      end
+
+      it "includes own, chosen grader's, final grader's, and student's comments when grades have posted" do
+        ta_pg.publish!
+        assignment.update!(grades_published_at: 1.hour.ago)
+        json = SpeedGrader::Assignment.new(assignment, second_ta, grading_role: :provisional_grader).json
+        comments = find_real_submission(json).fetch("submission_comments").map { |comment| comment.fetch("comment") }
+        expect(comments).to match_array([
+          "student comment",
+          "ta provisional comment",
+          "Second Ta provisional comment",
+          "teacher provisional comment"
+        ])
+      end
     end
 
     it "creates a non-annotatable DocViewer session when the user cannot adjudicate" do
@@ -1070,12 +1106,7 @@ describe SpeedGrader::Assignment do
       it "includes all provisional grades" do
         submission = find_real_submission(json)
         scorer_ids = submission['provisional_grades'].map {|pg| pg.fetch('scorer_id')}
-        expect(scorer_ids).to contain_exactly(teacher_pg.scorer_id.to_s, ta_pg.scorer_id.to_s)
-      end
-
-      it "includes all comments" do
-        comments = find_real_submission(json)['submission_comments'].map { |comment| comment['comment'] }
-        expect(comments).to match_array ['student comment', 'teacher provisional comment', 'ta provisional comment']
+        expect(scorer_ids).to contain_exactly(teacher.id.to_s, ta.id.to_s, second_ta.id.to_s, third_ta.id.to_s)
       end
 
       it "only includes the grader's provisional rubric assessments" do
@@ -1092,7 +1123,13 @@ describe SpeedGrader::Assignment do
         s = find_real_submission(json)
         expect(s['score']).to eq 2
         comments = s['submission_comments'].map { |comment| comment['comment'] }
-        expect(comments).to match_array ['student comment', 'teacher provisional comment', 'ta provisional comment']
+        expect(comments).to match_array [
+          'student comment',
+          'teacher provisional comment',
+          'ta provisional comment',
+          'Second Ta provisional comment',
+          'Third Ta provisional comment'
+        ]
       end
 
       it "includes the final grader's provisional rubric assessments" do
@@ -1103,8 +1140,12 @@ describe SpeedGrader::Assignment do
 
       it "lists all provisional grades" do
         pgs = find_real_submission(json)['provisional_grades']
-        expect(pgs.size).to eq 2
-        expect(pgs.map { |pg| [pg['score'], pg['scorer_id']] }).to match_array([[2.0, teacher.id.to_s], [3.0, ta.id.to_s]])
+        expect(pgs.map { |pg| [pg.fetch('score'), pg.fetch('scorer_id')] }).to match_array([
+          [2.0, teacher.id.to_s],
+          [3.0, ta.id.to_s],
+          [nil, second_ta.id.to_s],
+          [nil, third_ta.id.to_s]
+        ])
       end
 
       it "includes all the other provisional rubric assessments in their respective grades" do

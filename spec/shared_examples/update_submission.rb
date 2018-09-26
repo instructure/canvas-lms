@@ -255,6 +255,116 @@ RSpec.shared_examples 'a submission update action' do |controller|
         expect(body['published_grade']).to be nil
         expect(body['published_score']).to be nil
       end
+
+      describe "comments" do
+        before(:once) do
+          @course = Course.create!
+          @student = course_with_user("StudentEnrollment", course: @course, name: "Student", active_all: true).user
+          @teacher = course_with_user("TeacherEnrollment", course: @course, name: "Teacher", active_all: true).user
+          @first_ta = course_with_user("TaEnrollment", course: @course, name: "First Ta", active_all: true).user
+          @second_ta = course_with_user("TaEnrollment", course: @course, name: "Second Ta", active_all: true).user
+          @third_ta = course_with_user("TaEnrollment", course: @course, name: "Third Ta", active_all: true).user
+          @admin = account_admin_user(account: @course.account)
+          @assignment = @course.assignments.create!(
+            name: "moderated assignment",
+            moderated_grading: true,
+            grader_count: 2,
+            final_grader: @teacher
+          )
+          @assignment.grade_student(@student, grade: 1, grader: @first_ta, provisional: true)
+          @assignment.grade_student(@student, grade: 1, grader: @second_ta, provisional: true)
+          @assignment.grade_student(@student, grade: 1, grader: @teacher, provisional: true)
+          @submission = @assignment.submissions.find_by(user: @student)
+          submission_comments = @submission.submission_comments
+          @student_comment = submission_comments.create!(author: @student, comment: "Student comment")
+          @first_ta_comment = submission_comments.create!(author: @first_ta, comment: "First Ta comment")
+          @second_ta_comment = submission_comments.create!(author: @second_ta, comment: "Second Ta comment")
+          @third_ta_comment = submission_comments.create!(author: @third_ta, comment: "Third Ta comment")
+          @final_grader_comment = submission_comments.create!(author: @teacher, comment: "Final Grader comment")
+        end
+
+        before(:each) { user_session(@first_ta) }
+
+        let(:params) do
+          resource_pair = if controller == :anonymous_submissions
+            { anonymous_id: @submission.anonymous_id }
+          else
+            { id: @student.id }
+          end
+
+          return {
+            course_id: @course.id,
+            assignment_id: @assignment.id,
+            id: @student.id,
+            submission: {
+              assignment_id: @assignment.id,
+              comment: "another First Ta comment",
+              provisional: true
+            }
+          }.merge(resource_pair)
+        end
+
+        let(:submission_comments) do
+          submission = JSON.parse(response.body).first.fetch("submission")
+          submission.fetch("submission_comments").map { |comment| comment.fetch("comment") }
+        end
+
+        context "after creating a comment, when graders can view other graders' comments" do
+          it "returns all submission comments" do
+            put :update, params: params, format: :json
+            expect(submission_comments).to match_array([
+              "Student comment",
+              "First Ta comment",
+              "Second Ta comment",
+              "Third Ta comment",
+              "Final Grader comment",
+              "another First Ta comment"
+            ])
+          end
+
+          it "returns all submission comments after grades have posted" do
+            @assignment.update!(grades_published_at: 1.day.ago)
+            put :update, params: params, format: :json
+            expect(submission_comments).to match_array([
+              "Student comment",
+              "First Ta comment",
+              "Second Ta comment",
+              "Third Ta comment",
+              "Final Grader comment",
+              "another First Ta comment"
+            ])
+          end
+        end
+
+        context "after creating a comment, when graders cannot view other graders' comments" do
+          before(:once) do
+            @assignment.update!(grader_comments_visible_to_graders: false)
+          end
+
+          it "returns own and student's comments" do
+            put :update, params: params, format: :json
+            expect(submission_comments).to match_array([
+              "Student comment",
+              "First Ta comment",
+              "another First Ta comment"
+            ])
+          end
+
+          it "returns own, chosen grader's, final grader's, and student's comments" do
+            ModeratedGrading::ProvisionalGrade.find_by(submission: @submission, scorer: @second_ta).publish!
+            @assignment.update!(grades_published_at: 1.day.ago)
+            @submission.reload
+            put :update, params: params, format: :json
+            expect(submission_comments).to match_array([
+              "Student comment",
+              "First Ta comment",
+              "Second Ta comment",
+              "Final Grader comment",
+              "another First Ta comment"
+            ])
+          end
+        end
+      end
     end
 
     it "should allow setting 'student_entered_grade'" do

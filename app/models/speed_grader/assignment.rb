@@ -96,14 +96,7 @@ module SpeedGrader
       ActiveRecord::Associations::Preloader.new.preload(@assignment, :moderated_grading_selections) if provisional_grader_or_moderator?
 
       includes = [{ versions: :versionable }, :quiz_submission, :user, :attachment_associations, :assignment, :originality_reports]
-      grader_comments_hidden = grader_comments_hidden?(current_user: @current_user, assignment: @assignment)
-      key = if @assignment.grades_published? || grader_comments_hidden
-        :submission_comments
-      else
-        :all_submission_comments
-      end
-
-      includes << {key => {submission: {assignment: { context: :root_account }}}}
+      includes << {all_submission_comments: {submission: {assignment: { context: :root_account }}}}
       @submissions = @assignment.submissions.where(:user_id => @students).preload(*includes)
 
       student_json_fields = anonymous_students?(current_user: @current_user, assignment: @assignment) ? [] : %i(name id sortable_name)
@@ -178,18 +171,12 @@ module SpeedGrader
           json.merge! provisional_grade_to_json(provisional_grade)
         end
 
-        comments = SpeedGrader::Submission.new(
-          submission: sub,
-          current_user: @current_user,
-          provisional_grade: provisional_grade
-        ).comments
-
         json[:submission_comments] = anonymous_moderated_submission_comments_json(
           assignment: @assignment,
           course: @course,
           current_user: @current_user,
           avatars: display_avatars?,
-          submission_comments: comments,
+          submission_comments: sub.visible_submission_comments_for(@current_user),
           submissions: @submissions
         )
 

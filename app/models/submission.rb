@@ -2076,6 +2076,50 @@ class Submission < ActiveRecord::Base
     res
   end
 
+  def visible_submission_comments_for(current_user)
+    return all_submission_comments.for_groups if assignment.grade_as_group?
+    visible_users = users_with_visible_submission_comments(current_user)
+
+    all_submission_comments.select do |submission_comment|
+      if assignment.muted? && user == current_user
+        submission_comment.author == user
+      elsif assignment.grades_published? && grader == submission_comment.author
+        submission_comment.provisional_grade_id.nil?
+      else
+        visible_users.include?(submission_comment.author)
+      end
+    end
+  end
+
+  def users_with_visible_submission_comments(current_user)
+    comment_authors = all_submission_comments.map(&:author).compact.uniq
+    is_student = current_user == user
+    is_admin = assignment.course.account_membership_allows(current_user)
+
+    # If the user is the final grader or an admin, they see every comment.
+    return comment_authors if current_user == assignment.final_grader || is_admin
+    # Students only see their own comments when assignment is muted.
+    return [user] if is_student && assignment.muted?
+
+    if assignment.moderated_grading?
+      if assignment.grades_published?
+        return [user] if assignment.muted? && is_student
+        return [grader, assignment.final_grader, user].compact.uniq if is_student
+
+        if assignment.grader_comments_visible_to_graders?
+          return comment_authors
+        else
+          return [user, current_user, assignment.final_grader, grader].compact.uniq
+        end
+      end
+
+      return [user, current_user].compact.uniq unless assignment.grader_comments_visible_to_graders?
+    end
+
+    comment_authors
+  end
+  private :users_with_visible_submission_comments
+
   def assessment_request_count
     @assessment_requests_count ||= self.assessment_requests.length
   end

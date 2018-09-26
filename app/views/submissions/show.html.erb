@@ -21,6 +21,7 @@
 %>
 <%
   currently_peer_reviewing = @assessment_request.try(:assigned?)
+  submission_comments = @submission.visible_submission_comments_for(@current_user)
   js_bundle :submissions
   css_bundle :submission
   js_env({
@@ -261,7 +262,7 @@
     </div>
     <div class="submission-details-comments" style="word-wrap: break-word; min-width: 1%;">
       <div style="background-color: #fff;">
-        <a href="#" class="comments_link" style="display: none; <%= 'font-weight: bold;' unless @submission.submission_comments.empty? %>">Comments <% unless @submission.submission_comments.empty? %>(<%= @submission.submission_comments.length %>)<% end %></a>
+        <a href="#" class="comments_link" style="display: none; <%= 'font-weight: bold;' unless submission_comments.empty? %>">Comments <% unless submission_comments.empty? %>(<%= submission_comments.length %>)<% end %></a>
         <div class="comments">
           <button type="button" class="btn button-secondary cancel_comment_button" style="display: none; float: <%= direction('right') %>; margin-<%= direction('right') %>:0 !important;"><%= image_tag("delete_circle.png", :alt => t('Delete')) %></button>
           <div class="comment_list" aria-live="polite" style="padding: 10px; clear:right;">
@@ -273,7 +274,7 @@
               <% end %>
               <br/><br/>
             <% end %>
-            <% @submission.submission_comments.each do |comment| %>
+            <% submission_comments.each do |comment| %>
               <% if can_do(comment, @current_user, :read) %>
               <div class="comment <%= 'draft' if comment.draft? %>" id="submission_comment_<%= comment.id %>" style="margin-bottom: 10px;">
                 <div class="comment" style="color: #444;">
