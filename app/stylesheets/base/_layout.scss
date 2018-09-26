@@ -140,7 +140,7 @@ iframe {
 
   &#file_content,
   &.tool_launch {
-      min-height: calc(100vh - 170px); // This is for when the iframeResizer isn't supported
+      height: calc(100vh - 170px); // This is for when the iframeResizer isn't supported. The iframeResizer will override this via inline styles.
   }
 }
 
