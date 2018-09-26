@@ -1673,14 +1673,7 @@ describe Account do
       expect { @account.save! }.not_to change { @account.default_dashboard_view }
     end
 
-    it "should not contain planner if feature is disabled" do
-      @account.default_dashboard_view = "planner"
-      @account.save!
-      expect(@account.default_dashboard_view).not_to eq "planner"
-    end
-
-    it "should contain planner if feature is enabled" do
-      @account.enable_feature! :student_planner
+    it "should contain planner" do
       @account.default_dashboard_view = "planner"
       @account.save!
       expect(@account.default_dashboard_view).to eq "planner"

@@ -49,13 +49,7 @@ describe DashboardHelper do
       expect(user_dashboard_view).to eq 'activity'
     end
 
-    it "should default to 'cards' if 'planner' was set but the feature flag is disabled" do
-      @current_user.dashboard_view = 'planner'
-      @current_user.save!
-      expect(user_dashboard_view).to eq 'cards'
-    end
-
-    it "should return 'planner' if set and feature is enabled" do
+    it "should return 'planner' if set" do
       @course.root_account.enable_feature!(:student_planner)
       @current_user.dashboard_view = 'planner'
       @current_user.save!

@@ -305,7 +305,8 @@ describe "Pages API", type: :request do
                      "published" => true,
                      "front_page" => false,
                      "locked_for_user" => false,
-                     "page_id" => @hidden_page.id
+                     "page_id" => @hidden_page.id,
+                     "todo_date" => nil
         }
         expect(json).to eq expected
       end
@@ -328,7 +329,8 @@ describe "Pages API", type: :request do
                      "published" => true,
                      "front_page" => true,
                      "locked_for_user" => false,
-                     "page_id" => page.id
+                     "page_id" => page.id,
+                     "todo_date" => nil,
         }
         expect(json).to eq expected
       end

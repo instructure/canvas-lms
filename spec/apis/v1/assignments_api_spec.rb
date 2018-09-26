@@ -4070,6 +4070,7 @@ describe AssignmentsApiController, type: :request do
           'allow_rating' => false,
           'only_graders_can_rate' => false,
           'sort_by_rating' => false,
+          'todo_date' => nil,
         })
       end
 

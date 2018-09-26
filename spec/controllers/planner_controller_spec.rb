@@ -43,17 +43,6 @@ describe PlannerController do
     end
   end
 
-  context "feature disabled" do
-    before :each do
-      user_session(@student)
-    end
-
-    it "should return forbidden" do
-      get :index
-      assert_forbidden
-    end
-  end
-
   context "as student" do
     before :each do
       user_session(@student)
@@ -576,7 +565,7 @@ describe PlannerController do
           it "should order graded discussions with overridden due dates correctly" do
             topic1 = discussion_topic_model(context: @course, todo_date: Time.zone.now)
             topic2 = group_assignment_discussion(course: @course)
-            topic2_override_due_at = 2.days.from_now
+            topic2_override_due_at = 2.days.from_now.change(min: 1)
             create_group_override_for_assignment(topic2.assignment, {user: @student, group: @group, due_at: topic2_override_due_at})
             topic2_assign = topic2.assignment
             topic2_assign.due_at = 2.days.ago
