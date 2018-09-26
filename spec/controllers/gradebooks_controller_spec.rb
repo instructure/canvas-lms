@@ -1796,6 +1796,7 @@ describe GradebooksController do
       end
 
       it 'sets can_view_audit_trail to true when the current user can view the assignment audit trail' do
+        @course.account.enable_feature!(:anonymous_moderated_marking_audit_trail)
         @course.root_account.role_overrides.create!(permission: :view_audit_trail, enabled: true, role: teacher_role)
         @assignment.update!(moderated_grading: true, grader_count: 2, grades_published_at: 2.days.ago)
         @assignment.update!(muted: false) # must be updated separately for some reason

@@ -2944,6 +2944,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def can_view_audit_trail?(user)
+    return false unless context.account.feature_enabled?(:anonymous_moderated_marking_audit_trail)
     auditable? && !muted? && grades_published? && context.grants_right?(user, :view_audit_trail)
   end
 

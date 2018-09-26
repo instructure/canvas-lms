@@ -41,5 +41,18 @@ Feature.register(
     state: 'allowed',
     root_opt_in: true,
     beta: true
+  },
+  anonymous_moderated_marking_audit_trail: {
+    display_name: -> { I18n.t('Anonymous Moderated Marking Audit Trail') },
+    description: -> {
+      I18n.t <<~DESCRIPTION
+        Allows assessors to view the assessment audit tray in SpeedGrader for anonymous or moderated assignments.
+      DESCRIPTION
+    },
+    applies_to: 'Account',
+    state: 'hidden',
+    root_opt_in: true,
+    beta: true,
+    development: true
   }
 )
