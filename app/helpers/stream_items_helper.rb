@@ -72,13 +72,22 @@ module StreamItemsHelper
     # need to store stream item id relative to the user's shard, since we'll
     # use it later to look up the user's StreamItemInstances for deletion
     presenter.stream_item_id = user.shard.activate{ item.id }
-    presenter.updated_at = item.data.respond_to?(:updated_at) ? item.data.updated_at : nil
+    presenter.updated_at = extract_updated_at(category, item, user)
     presenter.updated_at ||= item.updated_at
     presenter.unread = item.unread
     presenter.path = extract_path(category, item)
     presenter.context = extract_context(category, item)
     presenter.summary = extract_summary(category, item, user)
     presenter
+  end
+
+  def extract_updated_at(category, item, user)
+    case category
+    when "Conversation"
+      item.data.conversation_participants.find_by(user: user)&.last_message_at
+    else
+      item.data.respond_to?(:updated_at) ? item.data.updated_at : nil
+    end
   end
 
   def extract_path(category, item)
