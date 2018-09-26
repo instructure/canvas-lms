@@ -26,17 +26,38 @@ module Lti::Ims::Helpers
 
     def find_memberships
       # Users can have more than once active Enrollment in a Course. So first find all Users with such an
-      # Enrollment, page on *those*, then find and flatten the enrollments for each.
-      user_ids, users_metadata =
-        Api.jsonapi_paginate(context.active_users.order(:id).select(:id), controller, base_url, pagination_args)
+      # Enrollment, page on *those*, then find and group the enrollments for each.
+      scope = base_users_scope
+      scope = apply_role_param(scope) if controller.params.key?(:role)
+      user_ids, users_metadata = paginate(scope)
 
-      enrollments = context.participating_enrollments.where(user_id: user_ids).order(:user_id)
-      user_json_preloads(enrollments.map(&:user), true, { accounts: false })
-      memberships = enrollments.
+      enrollments = base_enrollments_scope(user_ids)
+      enrollments = preload_enrollments(enrollments)
+
+      memberships = to_memberships(enrollments)
+      [ memberships, users_metadata ]
+    end
+
+    private
+
+    def base_users_scope
+      context.active_users.order(:id).select(:id)
+    end
+
+    def apply_role_param(users_scope)
+      enrollment_type = Lti::SubstitutionsHelper::INVERTED_LIS_ADVANTAGE_ROLE_MAP[controller.params[:role]]
+      enrollment_type ? users_scope.where(enrollments: { type: enrollment_type }) : users_scope.none
+    end
+
+    def base_enrollments_scope(user_ids)
+      context.participating_enrollments.where(user_id: user_ids).order(:user_id)
+    end
+
+    def to_memberships(enrollments)
+      enrollments.
         group_by(&:user_id).
         values.
         map { |user_enrollments| CourseEnrollmentsDecorator.new(user_enrollments) }
-      [ memberships, users_metadata ]
     end
 
     # *Decorators fix up models to conforms to interfaces expected by Lti::Ims::NamesAndRolesSerializer

@@ -49,6 +49,15 @@ module Lti::Ims::Helpers
       controller.base_url
     end
 
+    def preload_enrollments(enrollments)
+      user_json_preloads(enrollments.map(&:user), true, { accounts: false })
+      enrollments
+    end
+
+    def paginate(scope)
+      Api.jsonapi_paginate(scope, controller, base_url, pagination_args)
+    end
+
     def pagination_args
       # Treat LTI's `limit` param as override of std `per_page` API pagination param. Is no LTI override for `page`.
       pagination_args = {}

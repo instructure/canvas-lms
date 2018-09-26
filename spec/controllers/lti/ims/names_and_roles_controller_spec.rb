@@ -300,13 +300,18 @@ describe Lti::Ims::NamesAndRolesController do
 
     context 'when a course has multiple enrollments' do
 
+      let!(:teacher_enrollment) { teacher_in_course(course: course, active_all: true) }
+      let!(:student_enrollment) { student_in_course(course: course, active_all: true) }
+      let!(:ta_enrollment) { ta_in_course(course: course, active_all: true) }
+      let!(:observer_enrollment) { observer_in_course(course: course, active_all: true) }
+      let!(:designer_enrollment) { designer_in_course(course: course, active_all: true) }
       let!(:enrollments) do
         [
-          teacher_in_course(course: course, active_all: true),
-          student_in_course(course: course, active_all: true),
-          ta_in_course(course: course, active_all: true),
-          observer_in_course(course: course, active_all: true),
-          designer_in_course(course: course, active_all: true)
+          teacher_enrollment,
+          student_enrollment,
+          ta_enrollment,
+          observer_enrollment,
+          designer_enrollment
         ]
       end
       let(:total_items) { enrollments.length }
@@ -317,6 +322,124 @@ describe Lti::Ims::NamesAndRolesController do
 
       it_behaves_like 'multiple enrollments check'
 
+      context 'and the role param specifies the LIS Instructor role' do
+        let(:total_items) { 2 }
+        let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor')}
+
+        it 'limits results to Canvas Teachers and TAs' do
+          send_request
+          expect_enrollment_response_page_of([teacher_enrollment, ta_enrollment])
+        end
+      end
+
+      context 'and the role param specifies the LIS Learner role' do
+        let(:total_items) { 1 }
+        let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner')}
+
+        it 'limits results to Canvas Students' do
+          send_request
+          expect_enrollment_response_page_of([student_enrollment])
+        end
+      end
+
+      context 'and the role param specifies the LIS TeachingAssistant role' do
+        let(:total_items) { 1 }
+        let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant')}
+
+        it 'limits results to Canvas TAs' do
+          send_request
+          expect_enrollment_response_page_of([ta_enrollment])
+        end
+      end
+
+      context 'and the role param specifies the LIS Mentor role' do
+        let(:total_items) { 1 }
+        let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor')}
+
+        it 'limits results to Canvas Observers' do
+          send_request
+          expect_enrollment_response_page_of([observer_enrollment])
+        end
+      end
+
+      context 'and the role param specifies the LIS ContentDeveloper role' do
+        let(:total_items) { 1 }
+        let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper')}
+
+        it 'limits results to Canvas Designers' do
+          send_request
+          expect_enrollment_response_page_of([designer_enrollment])
+        end
+      end
+
+      context 'and the role param specifies an unknown value' do
+        let(:params_overrides) { super().merge(role: 'http://purl.imsglobal.org/total/nonsense')}
+
+        it 'returns no course members' do
+          send_request
+          expect_empty_members_array
+        end
+      end
+
+      context 'and a course has a user with multiple active enrollments' do
+        let(:student_enrollment_2) { student_in_course(course: course, user: teacher_enrollment.user, active_all: true) }
+        let(:enrollments) { super().push(student_enrollment_2) }
+
+        context 'and the role parameter specifies the first enrollment role' do
+          let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor') }
+
+          it 'returns matching NRPS memberships grouped by user' do
+            send_request
+            expect_member(teacher_enrollment, student_enrollment_2, index: 0)
+            expect_member(ta_enrollment, index: 1)
+            expect_member_count(2)
+          end
+        end
+
+        context 'and the role parameter specifies the second enrollment role' do
+          let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner') }
+
+          it 'returns matching NRPS memberships grouped by user' do
+            send_request
+            expect_member(teacher_enrollment, student_enrollment_2, index: 0)
+            expect_member(student_enrollment, index: 1)
+            expect_member_count(2)
+          end
+        end
+      end
+
+      context 'and role and pagination parameters are specified' do
+        let(:total_items) { 2 }
+        let(:rsp_page_size) { 1 }
+        let(:rqst_page_size) { 1 }
+        let(:rqst_page) { 1 }
+        let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor') }
+        let(:params_overrides) do
+          super().merge(
+            limit: rqst_page_size,
+            page: rqst_page
+          )
+        end
+
+        context 'and the first page of results are requested' do
+          it 'returns the correct first page of results' do
+            send_request
+            expect_enrollment_response_page_of([teacher_enrollment])
+            expect(response_links).to have_correct_pagination_urls
+          end
+        end
+
+        context 'and the second page of results are requested' do
+          let(:rqst_page) { 2 }
+          let(:rsp_page) { 2 }
+
+          it 'returns the correct second page of results' do
+            send_request
+            expect_enrollment_response_page_of([ta_enrollment])
+            expect(response_links).to have_correct_pagination_urls
+          end
+        end
+      end
     end
   end
 
@@ -360,13 +483,23 @@ describe Lti::Ims::NamesAndRolesController do
 
     context 'when a group has multiple memberships' do
 
+      let!(:group_leadership) do
+        leader = group_membership_model(group: group_record, user: user_model)
+        group_record.leader = leader.user
+        group_record.save
+        leader
+      end
+      let!(:group_membership_1) { group_membership_model(group: group_record, user: user_model) }
+      let!(:group_membership_2) { group_membership_model(group: group_record, user: user_model) }
+      let!(:group_membership_3) { group_membership_model(group: group_record, user: user_model) }
+      let!(:group_membership_4) { group_membership_model(group: group_record, user: user_model) }
       let!(:enrollments) do
         [
-          group_membership_model(group: group_record, user: user_model),
-          group_membership_model(group: group_record, user: user_model),
-          group_membership_model(group: group_record, user: user_model),
-          group_membership_model(group: group_record, user: user_model),
-          group_membership_model(group: group_record, user: user_model)
+          group_leadership,
+          group_membership_1,
+          group_membership_2,
+          group_membership_3,
+          group_membership_4
         ]
       end
       let(:total_items) { enrollments.length }
@@ -376,6 +509,80 @@ describe Lti::Ims::NamesAndRolesController do
       let(:params_overrides) { super().merge(pass_thru_params) }
 
       it_behaves_like 'multiple enrollments check'
+
+      context 'and the role param specifies the LIS Manager role' do
+        let(:total_items) { 1 }
+        let(:params_overrides) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Manager')}
+
+        it 'limits results to the Canvas group leader' do
+          send_request
+          expect_enrollment_response_page_of([group_leadership])
+        end
+      end
+
+      context 'and the role param specifies the LIS Member role' do
+        let(:params_overrides) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Member')}
+
+        it 'returns all group members' do
+          send_request
+          expect_enrollment_response_page
+        end
+      end
+
+      context 'and the role param specifies an unknown value' do
+        let(:params_overrides) { super().merge(role: 'http://purl.imsglobal.org/total/nonsense')}
+
+        it 'returns no group members' do
+          send_request
+          expect_empty_members_array
+        end
+      end
+
+      # Somewhat redundant for groups which just have two roles, one of which everyone in the group shares. But
+      # still useful for anti-regression purposes to at least verify that combining role + pagination params doesn't
+      # break anything
+      context 'and role and pagination parameters are specified' do
+        let(:rsp_page_size) { 1 }
+        let(:rqst_page_size) { 1 }
+        let(:rqst_page) { 1 }
+        let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Member') }
+        let(:params_overrides) do
+          super().merge(
+            limit: rqst_page_size,
+            page: rqst_page
+          )
+        end
+
+        context 'and the first page of results are requested' do
+          it 'returns the correct first page of results' do
+            send_request
+            expect_enrollment_response_page_of([group_leadership])
+            expect(response_links).to have_correct_pagination_urls
+          end
+        end
+
+        context 'and the second page of results are requested' do
+          let(:rqst_page) { 2 }
+          let(:rsp_page) { 2 }
+
+          it 'returns the correct second page of results' do
+            send_request
+            expect_enrollment_response_page_of([group_membership_1])
+            expect(response_links).to have_correct_pagination_urls
+          end
+        end
+
+        context 'and the role param limits results to the group leader' do
+          let(:total_items) { 1 }
+          let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Manager') }
+
+          it 'returns the group leader' do
+            send_request
+            expect_enrollment_response_page_of([group_leadership])
+            expect(response_links).to have_correct_pagination_urls
+          end
+        end
+      end
     end
   end
 
@@ -416,10 +623,13 @@ describe Lti::Ims::NamesAndRolesController do
   end
 
   def expect_enrollment_response_page
-    enrollments.
+    expect_enrollment_response_page_of(enrollments.
       sort_by { |e| e.user.id }.
-      slice(rsp_page_size*(rsp_page-1), rsp_page_size).
-      each_with_index { |e,i| expect_member(e, index: i) }
+      slice(rsp_page_size*(rsp_page-1), rsp_page_size))
+  end
+
+  def expect_enrollment_response_page_of(scoped_enrollments)
+    scoped_enrollments.each_with_index { |e,i| expect_member(e, index: i) }
     expect_member_count([rsp_page_size,total_items].min)
   end
 

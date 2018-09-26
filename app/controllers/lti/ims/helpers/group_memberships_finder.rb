@@ -25,12 +25,32 @@ module Lti::Ims::Helpers
     protected
 
     def find_memberships
-      scope = context.participating_group_memberships.order(:user_id).preload(:user)
-      enrollments, metadata =
-        Api.jsonapi_paginate(scope, controller, base_url, pagination_args)
-      user_json_preloads(enrollments.map(&:user), true, { accounts: false })
-      memberships = enrollments.map { |e| GroupMembershipDecorator.new(e) }
+      scope = base_scope
+      scope = apply_role_param(scope) if controller.params.key?(:role)
+      enrollments, metadata = paginate(scope)
+      enrollments = preload_enrollments(enrollments)
+
+      memberships = to_memberships(enrollments)
       [ memberships, metadata ]
+    end
+
+    private
+
+    def base_scope
+      context.participating_group_memberships.order(:user_id).preload(:user)
+    end
+
+    def apply_role_param(scope)
+      enrollment_type = Lti::SubstitutionsHelper::INVERTED_LIS_ADVANTAGE_ROLE_MAP[controller.params[:role]]
+      if enrollment_type
+        # using context.leader_id instead of context.leader saves one redundant User query
+        (enrollment_type == [:group_leader] ? scope.where(user: context.leader_id) : scope)
+      else scope.none
+      end
+    end
+
+    def to_memberships(enrollments)
+      enrollments.map { |e| GroupMembershipDecorator.new(e) }
     end
 
     # *Decorators fix up models to conforms to interface expected by Lti::Ims::NamesAndRolesSerializer
@@ -44,10 +64,17 @@ module Lti::Ims::Helpers
       end
 
       def lti_roles
-        # TODO: these URNs should be constantized somewhere... probably when we implement the 'role' query param
-        roles = ["http://purl.imsglobal.org/vocab/lis/v2/membership#Member"]
-        roles << "http://purl.imsglobal.org/vocab/lis/v2/membership#Manager" if user.id == context.leader_id
-        roles
+        user.id == context.leader_id ? group_leader_role_urns : group_member_role_urns
+      end
+
+      private
+
+      def group_leader_role_urns
+        Lti::SubstitutionsHelper::LIS_ADVANTAGE_ROLE_MAP[:group_leader]
+      end
+
+      def group_member_role_urns
+        Lti::SubstitutionsHelper::LIS_ADVANTAGE_ROLE_MAP[:group_member]
       end
     end
 
