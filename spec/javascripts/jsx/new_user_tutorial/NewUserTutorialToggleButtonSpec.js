@@ -17,54 +17,42 @@
  */
 
 /* global QUnit */
-define([
-  'react',
-  'enzyme',
-  'jsx/new_user_tutorial/NewUserTutorialToggleButton',
-  '@instructure/ui-icons/lib/Line/IconMoveLeft',
-  '@instructure/ui-icons/lib/Line/IconMoveRight',
-  'jsx/new_user_tutorial/utils/createTutorialStore'
-], (React, { shallow }, NewUserTutorialToggleButton, { default: IconMoveLeftLine }, { default: IconMoveRightLine }, createTutorialStore) => {
-  QUnit.module('NewUserTutorialToggleButton Spec');
+import React from 'react'
+import {shallow} from 'enzyme'
+import NewUserTutorialToggleButton from 'jsx/new_user_tutorial/NewUserTutorialToggleButton'
+import createTutorialStore from 'jsx/new_user_tutorial/utils/createTutorialStore'
 
-  test('Deafaults to expanded', () => {
-    const store = createTutorialStore();
-    const wrapper = shallow(
-      <NewUserTutorialToggleButton store={store} />
-    );
+QUnit.module('NewUserTutorialToggleButton Spec')
 
-    ok(!wrapper.state('isCollapsed'))
-  });
+test('Deafaults to expanded', () => {
+  const store = createTutorialStore()
+  const wrapper = shallow(<NewUserTutorialToggleButton store={store} />)
 
-  test('Toggles isCollapsed when clicked', () => {
-    const fakeEvent = {
-      preventDefault () {}
-    }
+  ok(!wrapper.state('isCollapsed'))
+})
 
-    const store = createTutorialStore();
-    const wrapper = shallow(
-      <NewUserTutorialToggleButton store={store} />
-    );
+test('Toggles isCollapsed when clicked', () => {
+  const fakeEvent = {
+    preventDefault() {}
+  }
 
-    wrapper.simulate('click', fakeEvent);
-    ok(wrapper.state('isCollapsed'))
-  });
+  const store = createTutorialStore()
+  const wrapper = shallow(<NewUserTutorialToggleButton store={store} />)
 
-  test('shows IconMoveLeftLine when isCollapsed is true', () => {
-    const store = createTutorialStore({ isCollapsed: true });
-    const wrapper = shallow(
-      <NewUserTutorialToggleButton store={store} />
-    );
+  wrapper.simulate('click', fakeEvent)
+  ok(wrapper.state('isCollapsed'))
+})
 
-    ok(wrapper.find(IconMoveLeftLine).exists())
-  });
+test('shows IconMoveStart when isCollapsed is true', () => {
+  const store = createTutorialStore({isCollapsed: true})
+  const wrapper = shallow(<NewUserTutorialToggleButton store={store} />)
 
-  test('shows IconMoveRightLine when isCollapsed is false', () => {
-    const store = createTutorialStore({ isCollapsed: false });
-    const wrapper = shallow(
-      <NewUserTutorialToggleButton store={store} />
-    );
+  ok(wrapper.find('IconMoveStart').exists())
+})
 
-    ok(wrapper.find(IconMoveRightLine).exists())
-  })
-});
+test('shows IconMoveEnd when isCollapsed is false', () => {
+  const store = createTutorialStore({isCollapsed: false})
+  const wrapper = shallow(<NewUserTutorialToggleButton store={store} />)
+
+  ok(wrapper.find('IconMoveEnd').exists())
+})
