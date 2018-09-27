@@ -142,6 +142,8 @@ class FilesController < ApplicationController
     :api_create, :api_create_success, :api_create_success_cors, :show_thumbnail
   ]
 
+  before_action :open_limited_cors, only: [:show]
+
   prepend_around_action :load_pseudonym_from_policy, only: :create
   skip_before_action :verify_authenticity_token, only: :api_create
   before_action :verify_api_id, only: [
@@ -1196,6 +1198,11 @@ class FilesController < ApplicationController
     headers['Access-Control-Allow-Methods'] = 'POST, PUT, DELETE, GET, OPTIONS'
     headers['Access-Control-Request-Method'] = '*'
     headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Accept-Encoding'
+  end
+
+  def open_limited_cors
+    headers['Access-Control-Allow-Origin'] = '*'
+    headers['Access-Control-Allow-Methods'] = 'GET, HEAD'
   end
 
   def read_allowed(attachment, user, session, params)
