@@ -23,6 +23,7 @@ import { string, func, arrayOf } from 'prop-types'
 import Tray from '@instructure/ui-overlays/lib/components/Tray'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import View from '@instructure/ui-layout/lib/components/View'
+import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
 
 import { showFlashError } from '../shared/FlashAlert'
 import { itemShape, moveOptionsType } from './propTypes'
@@ -88,11 +89,16 @@ export default class MoveItemTray extends React.Component {
         open={this.state.open}
         onDismiss={this.close}
         onExited={this.onExited}
-        closeButtonLabel={I18n.t('close move tray')}
         placement="end"
         closeButtonVariant="icon"
-        shouldContainFocus>
-        <Heading margin="small xx-large" level="h4">{this.props.title}</Heading>
+        shouldContainFocus
+      >
+        <CloseButton placement="start" onClick={this.handleRequestClose}>
+          {I18n.t('close move tray')}
+        </CloseButton>
+        <Heading margin="small xx-large" level="h4">
+          {this.props.title}
+        </Heading>
         <View display="block" padding="medium medium large">
           <MoveSelect
             items={this.props.items}
