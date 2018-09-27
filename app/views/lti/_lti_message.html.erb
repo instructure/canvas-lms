@@ -30,9 +30,9 @@
     </div>
 <% end %>
 
-<div
-    class="tool_content_wrapper <%= 'custom_height' unless @lti_launch.tool_dimensions[:selection_height] == '100%' %>"
-    data-tool-wrapper-id="<%= @lti_launch.post_message_token %>">
+<div class="tool_content_wrapper
+  <%= 'custom_height' unless @lti_launch.tool_dimensions[:selection_height] == '100%' %>"
+  data-tool-wrapper-id="<%= @lti_launch.post_message_token %>">
 <form action="<%= @lti_launch.resource_url %>"
       class="hide"
       method="POST" target="tool_content"
@@ -68,9 +68,10 @@
       <%= t('The following content is partner provided') %>
     </div>
   </div>
-  <%= iframe("about:blank", :name => 'tool_content', :id => 'tool_content', :class => "tool_launch sm_iframe",
+  <%= iframe("about:blank", :name => 'tool_content', :id => 'tool_content', :class => "tool_launch",
              allowfullscreen: "true", webkitallowfullscreen: "true", allow:"microphone *;", mozallowfullscreen: "true",
-             tabindex:"0", title:t('Tool Content')) %>
+             tabindex:"0", title:t('Tool Content'),
+             style: "height:#{@lti_launch.tool_dimensions[:selection_height]};width:#{@lti_launch.tool_dimensions[:selection_width]};") %>
 
   <div class="after_external_content_info_alert screenreader-only" tabindex="0">
     <div class="ic-flash-info">
