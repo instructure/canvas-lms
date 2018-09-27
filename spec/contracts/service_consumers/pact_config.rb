@@ -34,6 +34,7 @@ module PactConfig
     if my_broker_host.include?(EXTERNAL_BROKER_HOST)
       # external consumers
       GENERIC_CONSUMER = 'Generic Consumer'.freeze
+      FIU = 'lmsAPI'.freeze
     else
       # internal consumers
       GENERIC_CONSUMER = 'Generic Consumer'.freeze
