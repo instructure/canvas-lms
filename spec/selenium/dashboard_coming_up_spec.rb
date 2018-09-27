@@ -20,9 +20,9 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "dashboard" do
   include_context "in-process server selenium tests"
 
-  context "as a student" do
+  context "as a teacher" do
     before (:each) do
-      course_with_student_logged_in(:active_all => true)
+      course_with_teacher_logged_in(:active_all => true)
     end
 
     it "should display calendar events in the coming up list", priority: "1", test_id: 216392 do

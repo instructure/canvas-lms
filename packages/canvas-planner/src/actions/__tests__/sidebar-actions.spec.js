@@ -81,7 +81,6 @@ describe('load items', () => {
     expect(fakeDispatch).toHaveBeenCalledWith(expect.objectContaining(expected));
     const action = fakeDispatch.mock.calls[0][0];
     expect(action.payload.firstMoment.toISOString()).toBe(today.clone().add(-2, 'weeks').toISOString());
-    expect(action.payload.lastMoment.toISOString()).toBe(today.clone().add(2, 'weeks').toISOString());
   });
 
   it('dispatches SIDEBAR_ITEMS_LOADED with the proper payload on success', (done) => {
@@ -155,13 +154,15 @@ describe('load items', () => {
     });
   });
 
-  it('continues to load if there are less than 10 incomplete items loaded', (done) => {
+  it('continues to load if there are less than 14 incomplete items loaded', (done) => {
     expect.hasAssertions();
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'));
     const fakeDispatch = jest.fn();
     const fetchPromise = thunk(fakeDispatch, mockGetState({
       items: [
         {completed: true},
+        {completed: false},
+        {completed: false},
         {completed: false},
         {completed: false},
         {completed: false},
@@ -189,6 +190,13 @@ describe('load items', () => {
           {completed: true},
           {completed: false},
           {completed: false},
+          {completed: false},
+          {completed: false},
+          {completed: false},
+          {completed: false},
+          {completed: false},
+          {completed: false},
+          {completed: false},
           {completed: true},
           {completed: true},
         ],
@@ -201,12 +209,16 @@ describe('load items', () => {
     });
   });
 
-  it('stops loading when it gets 10 incomplete items', () => {
+  it('stops loading when it gets 14 incomplete items', () => {
     expect.hasAssertions();
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'));
     const fakeDispatch = jest.fn();
     const fetchPromise = thunk(fakeDispatch, mockGetState({
       items: [
+        {completed: false},
+        {completed: false},
+        {completed: false},
+        {completed: false},
         {completed: false},
         {completed: false},
         {completed: false},
@@ -269,7 +281,7 @@ describe('fetch more items', () => {
   it('resumes loading when there are less than the desired number of incomplete items', () => {
     expect.hasAssertions();
     const mockDispatch = jest.fn();
-    const mockGs = mockGetState({nextUrl: '/', items: generateItems(9)});
+    const mockGs = mockGetState({nextUrl: '/', items: generateItems(13)});
     const savedItemPromise = new Promise(res => res({item: {completed: true}}));
     return Actions.maybeUpdateTodoSidebar(savedItemPromise)(mockDispatch, mockGs).then(() => {
       expect(mockDispatch).toHaveBeenCalledWith(Actions.sidebarLoadNextItems);
@@ -279,7 +291,7 @@ describe('fetch more items', () => {
   it('will not resume loading if desired number of items is loaded', () => {
     expect.hasAssertions();
     const mockDispatch = jest.fn();
-    const gs = mockGetState({nextUrl: '/', items: generateItems(10)});
+    const gs = mockGetState({nextUrl: '/', items: generateItems(14)});
     const savedItemPromise = new Promise(res => res({item: {completed: true}}));
     return Actions.maybeUpdateTodoSidebar(savedItemPromise)(mockDispatch, gs).then(() => {
       expect(mockDispatch).not.toHaveBeenCalledWith(Actions.sidebarLoadNextItems);

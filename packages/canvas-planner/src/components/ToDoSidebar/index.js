@@ -90,7 +90,7 @@ export class ToDoSidebar extends Component {
       if (!item) return false;
       return !item.completed;
     };
-    return items.filter(incompletedFilter).slice(0, 5);
+    return items.filter(incompletedFilter).slice(0, 7);
   }
 
   handleDismissClick (itemIndex, item) {

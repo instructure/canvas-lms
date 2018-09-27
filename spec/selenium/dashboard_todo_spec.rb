@@ -34,7 +34,7 @@ describe "dashboard" do
 
       get "/"
       wait_for_ajaximations
-      expect(ff("#planner-todosidebar-item-list>li")).to have_size(5)
+      expect(ff("#planner-todosidebar-item-list>li")).to have_size(7)
       fj(".Sidebar__TodoListContainer button:contains('Show All')").click
       wait_for_ajaximations
       expect(ff("#dashboard-planner-header button")).to have_size(3)
@@ -57,7 +57,6 @@ describe "dashboard" do
       expect(f('#assignment-details')).to include_text('Assignment Due Date Changed')
       # verify assignment is in to do list
       expect(f('#planner-todosidebar-item-list>li')).to include_text(assignment.title)
-      expect(f('.coming_up')).to include_text(assignment.title)
     end
 
     it "should not display assignments for soft-concluded courses in to do list for a student", priority: "1", test_id: 216407 do
@@ -76,7 +75,6 @@ describe "dashboard" do
       get "/"
 
       expect(f("#content")).not_to contain_css('.to-do-list')
-      expect(f('.coming_up')).to_not include_text(assignment.title)
     end
 
     it "should allow to do list items to be hidden", priority: "1", test_id: 216408 do

@@ -923,8 +923,7 @@ class UsersController < ApplicationController
   include Api::V1::CalendarEvent
 
   # @API List upcoming assignments, calendar events
-  # A paginated list of the current user's upcoming events, i.e. the same things shown
-  # in the dashboard 'Coming Up' sidebar.
+  # A paginated list of the current user's upcoming events.
   #
   # @example_response
   #   [

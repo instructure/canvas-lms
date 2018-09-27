@@ -121,6 +121,14 @@
         </div>
       </div>
     <% end %>
+
+    <% if @context_enrollment&.student? %>
+      <a class="btn button-sidebar-wide" href="<%= calendar_url_for(@context) %>">
+        <i class="icon-calendar-day"></i>
+        <%= t('links.view_course_calendar', %{View Course Calendar}) %>
+      </a>
+    <% end %>
+
     <%= render :partial => 'to_do_list', :locals => {:contexts => [@context], :show_legacy_todo_list => !@context_enrollment&.student?} %>
     <%= render :partial => "group_list", :locals => {:group_list => @user_groups} %>
     <%= nbsp unless @current_user %>
@@ -129,7 +137,7 @@
     <%= render :partial => 'assignments/assignments_list_right_side', :locals => {:course_home => true} %>
   <% elsif @course_home_view == 'syllabus' %>
     <%= render :partial => 'assignments/syllabus_right_side', :locals => {:course_home => true} %>
-  <% else %>
+  <% elsif !@context_enrollment&.student? %>
     <% locals = {:title => t("Coming Up"), :contexts_to_link_to => @context, :upcoming => true, :period => :one_week} %>
     <% if @current_user %>
       <% cache([@current_user, safe_cache_key(@contexts), 'course_upcoming_events' ].cache_key) do %>
