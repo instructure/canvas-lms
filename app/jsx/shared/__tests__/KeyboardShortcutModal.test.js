@@ -42,27 +42,27 @@ describe(KeyboardShortcutModal, () => {
     component.unmount()
   })
 
-  test('appears when comma key is pressed', () => {
+  test('appears when comma key is pressed', async () => {
     expect(document.querySelector('.keyboard_navigation')).toBeNull()
     const e = new Event('keydown')
     e.which = 188
     document.dispatchEvent(e)
 
-    return waitForInstUIModalCssTransitions().then(() => {
-      expect(document.querySelector('.keyboard_navigation')).toBeTruthy()
-    })
+    await waitForInstUIModalCssTransitions()
+
+    expect(document.querySelector('.keyboard_navigation')).toBeTruthy()
   })
 
-  test('appears when shift + ? is pressed', () => {
+  test('appears when shift + ? is pressed', async () => {
     expect(document.querySelector('.keyboard_navigation')).toBeNull()
     const e = new Event('keydown')
     e.which = 191
     e.shiftKey = true
     document.dispatchEvent(e)
 
-    return waitForInstUIModalCssTransitions().then(() => {
-      expect(document.querySelector('.keyboard_navigation')).toBeTruthy()
-    })
+    await waitForInstUIModalCssTransitions()
+
+    expect(document.querySelector('.keyboard_navigation')).toBeTruthy()
   })
 
 

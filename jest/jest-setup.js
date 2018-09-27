@@ -35,3 +35,8 @@ if (process.env.DEPRECATION_SENTRY_DSN) {
   const setupRavenConsoleLoggingPlugin = require('../app/jsx/shared/helpers/setupRavenConsoleLoggingPlugin');
   setupRavenConsoleLoggingPlugin(Raven, { loggerName: 'console-jest' });
 }
+
+// set up mocks for native APIs
+if (!('MutationObserver' in window)) {
+  Object.defineProperty(window, 'MutationObserver', { value: require('mutation-observer') })
+}
