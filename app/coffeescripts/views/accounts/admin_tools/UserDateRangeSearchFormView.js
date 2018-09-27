@@ -1,163 +1,205 @@
-#
-# Copyright (C) 2013 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Copyright (C) 2013 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'jquery'
-  'i18n!user_date_range_search'
-  'jst/accounts/admin_tools/userDateRangeSearchForm'
-  '../../ValidatedMixin'
-  'jquery.ajaxJSON'
-  'jquery.instructure_date_and_time'
-  'jqueryui/dialog'
-  '../../../jquery.rails_flash_notifications'
-], (Backbone, $, I18n, template, ValidatedMixin) ->
-  class UserDateRangeSearchFormView extends Backbone.View
-    @mixin ValidatedMixin
+import Backbone from 'Backbone'
+import $ from 'jquery'
+import I18n from 'i18n!user_date_range_search'
+import template from 'jst/accounts/admin_tools/userDateRangeSearchForm'
+import ValidatedMixin from '../../ValidatedMixin'
+import 'jquery.ajaxJSON'
+import 'jquery.instructure_date_and_time'
+import 'jqueryui/dialog'
+import '../../../jquery.rails_flash_notifications'
 
-    @child 'inputFilterView', '[data-view=inputFilter]'
-    @child 'usersView', '[data-view=users]'
+export default class UserDateRangeSearchFormView extends Backbone.View {
+  static initClass() {
+    this.mixin(ValidatedMixin)
 
-    tagName: 'form'
+    this.child('inputFilterView', '[data-view=inputFilter]')
+    this.child('usersView', '[data-view=users]')
 
-    template: template
+    this.prototype.tagName = 'form'
 
-    events:
-      'submit': 'submit'
+    this.prototype.template = template
 
-    els:
-      '.userIdField':          '$userIdField'
-      '.hiddenDateStart':      '$hiddenDateStart'
-      '.hiddenDateEnd':        '$hiddenDateEnd'
-      '.dateStartSearchField': '$dateStartSearchField'
-      '.dateEndSearchField':   '$dateEndSearchField'
-      '.search-controls':      '$searchControls'
+    this.prototype.events = {submit: 'submit'}
+
+    this.prototype.els = {
+      '.userIdField': '$userIdField',
+      '.hiddenDateStart': '$hiddenDateStart',
+      '.hiddenDateEnd': '$hiddenDateEnd',
+      '.dateStartSearchField': '$dateStartSearchField',
+      '.dateEndSearchField': '$dateEndSearchField',
+      '.search-controls': '$searchControls',
       '.search-people-status': '$searchPeopleStatus'
+    }
 
-    @optionProperty 'formName'
+    this.optionProperty('formName')
+  }
 
-    toJSON: -> @options
+  toJSON() {
+    return this.options
+  }
 
-    initialize: (options) ->
-      @model = new Backbone.Model
-      super(options)
+  initialize(options) {
+    this.model = new Backbone.Model()
+    return super.initialize(options)
+  }
 
-    # Setup the date inputs for javascript use.
-    afterRender: ->
-      @$dateStartSearchField.datetime_field()
-      @$dateEndSearchField.datetime_field()
-      @$searchControls.hide()
+  // Setup the date inputs for javascript use.
+  afterRender() {
+    this.$dateStartSearchField.datetime_field()
+    this.$dateEndSearchField.datetime_field()
+    return this.$searchControls.hide()
+  }
 
-    attach: ->
-      @inputFilterView.collection.on 'setParam deleteParam', @fetchUsers
-      @usersView.collection.on 'selectedModelChange', @selectUser
-      @usersView.collection.on 'sync', @resultsFound
-      @collection.on 'sync', @notificationsFound
+  attach() {
+    this.inputFilterView.collection.on('setParam deleteParam', this.fetchUsers.bind(this))
+    this.usersView.collection.on('selectedModelChange', this.selectUser.bind(this))
+    this.usersView.collection.on('sync', this.resultsFound.bind(this))
+    return this.collection.on('sync', this.notificationsFound.bind(this))
+  }
 
-    resultsFound: =>
-      setTimeout(() =>
-        $.screenReaderFlashMessageExclusive(I18n.t('%{length} results found', { length: @usersView.collection.length }))
-      , 500)
+  resultsFound() {
+    return setTimeout(
+      () =>
+        $.screenReaderFlashMessageExclusive(
+          I18n.t('%{length} results found', {length: this.usersView.collection.length})
+        ),
+      500
+    )
+  }
 
-    notificationsFound: =>
-      $.screenReaderFlashMessage(I18n.t('%{length} notifications found', { length: @collection.length }))
+  notificationsFound() {
+    return $.screenReaderFlashMessage(
+      I18n.t('%{length} notifications found', {length: this.collection.length})
+    )
+  }
 
-    fetchUsers: =>
-      @selectUser null
-      @lastRequest?.abort()
-      @lastRequest = @inputFilterView.collection.fetch()
+  fetchUsers() {
+    this.selectUser(null)
+    if (this.lastRequest != null) {
+      this.lastRequest.abort()
+    }
+    return (this.lastRequest = this.inputFilterView.collection.fetch())
+  }
 
-    selectUser: (e) =>
-      @usersView.$el.find('tr').each () -> $(this).removeClass('selected')
-      if e
-        @model.set e.attributes
-        id = e.get 'id'
-        @$userIdField.val(id)
-        self = this
-        @$searchControls.show().dialog
-          title:  I18n.t('Generate Activity for %{user}', user: e.get 'name')
-          resizable: false
-          height: 'auto'
-          width: 400
-          modal: true
-          dialogClass: 'userDateRangeSearchModal'
-          close: ->
-            self.$el.find('.roster_user_name[data-user-id=' +id + ']').focus()
-          buttons: [
-            {
-              text: I18n.t('Cancel')
-              click: ->
-                $(this).dialog('close')
+  selectUser(e) {
+    this.usersView.$el.find('tr').each(function() {
+      $(this).removeClass('selected')
+    })
+    if (e) {
+      this.model.set(e.attributes)
+      const id = e.get('id')
+      this.$userIdField.val(id)
+      const self = this
+      return this.$searchControls.show().dialog({
+        title: I18n.t('Generate Activity for %{user}', {user: e.get('name')}),
+        resizable: false,
+        height: 'auto',
+        width: 400,
+        modal: true,
+        dialogClass: 'userDateRangeSearchModal',
+        close() {
+          return self.$el.find(`.roster_user_name[data-user-id=${id}]`).focus()
+        },
+        buttons: [
+          {
+            text: I18n.t('Cancel'),
+            click() {
+              $(this).dialog('close')
             }
-            {
-              text: I18n.t('Find')
-              'class': 'btn btn-primary userDateRangeSearchBtn'
-              'id': "#{self.formName}-find-button"
-              click: ->
-                errors = self.datesValidation()
-                if Object.keys(errors).length != 0
-                  self.showErrors(errors, true)
-                  return
+          },
+          {
+            text: I18n.t('Find'),
+            class: 'btn btn-primary userDateRangeSearchBtn',
+            id: `${self.formName}-find-button`,
+            click() {
+              const errors = self.datesValidation()
+              if (Object.keys(errors).length !== 0) {
+                self.showErrors(errors, true)
+                return
+              }
 
-                self.$hiddenDateStart.val(self.$dateStartSearchField.val())
-                self.$hiddenDateEnd.val(self.$dateEndSearchField.val())
-                self.$el.submit()
-                $(this).dialog('close')
+              self.$hiddenDateStart.val(self.$dateStartSearchField.val())
+              self.$hiddenDateEnd.val(self.$dateEndSearchField.val())
+              self.$el.submit()
+              $(this).dialog('close')
             }
-          ]
-      else
-        @$userIdField.val('')
+          }
+        ]
+      })
+    } else {
+      return this.$userIdField.val('')
+    }
+  }
 
-    dateIsValid: (dateField) ->
-      if dateField.val() == ''
-        return true
-      date = dateField.data('unfudged-date')
-      return (date instanceof Date && !isNaN(date.valueOf()))
+  dateIsValid(dateField) {
+    if (dateField.val() === '') {
+      return true
+    }
+    const date = dateField.data('unfudged-date')
+    return date instanceof Date && !isNaN(date.valueOf())
+  }
 
-    datesValidation: ->
-      errors = {}
-      startDateField = @$dateStartSearchField
-      endDateField = @$dateEndSearchField
-      startDate = startDateField.data('unfudged-date')
-      endDate = endDateField.data('unfudged-date')
+  datesValidation() {
+    const errors = {}
+    const startDateField = this.$dateStartSearchField
+    const endDateField = this.$dateEndSearchField
+    const startDate = startDateField.data('unfudged-date')
+    const endDate = endDateField.data('unfudged-date')
 
-      if startDate && endDate && (startDate > endDate)
-        errors["#{@formName}_end_time"] = [{
+    if (startDate && endDate && startDate > endDate) {
+      errors[`${this.formName}_end_time`] = [
+        {
           message: I18n.t('To Date cannot come before From Date')
-        }]
-      else
-        if !@dateIsValid(startDateField)
-          errors["#{@formName}_start_time"] = [{
+        }
+      ]
+    } else {
+      if (!this.dateIsValid(startDateField)) {
+        errors[`${this.formName}_start_time`] = [
+          {
             message: I18n.t('Not a valid date')
-          }]
-        if !@dateIsValid(endDateField)
-          errors["#{@formName}_end_time"] = [{
+          }
+        ]
+      }
+      if (!this.dateIsValid(endDateField)) {
+        errors[`${this.formName}_end_time`] = [
+          {
             message: I18n.t('Not a valid date')
-          }]
-      return errors
+          }
+        ]
+      }
+    }
+    return errors
+  }
 
-    submit: (event) ->
-      event.preventDefault()
-      @updateCollection()
+  submit(event) {
+    event.preventDefault()
+    return this.updateCollection()
+  }
 
-    updateCollection: ->
-      # Update the params (which fetches the collection)
-      json = @$el.toJSON()
-      delete json['search_term']
-      json.start_time = '' unless json.start_time
-      json.end_time = '' unless json.end_time
-      @collection.setParams json
+  updateCollection() {
+    // Update the params (which fetches the collection)
+    const json = this.$el.toJSON()
+    delete json.search_term
+    if (!json.start_time) json.start_time = ''
+    if (!json.end_time) json.end_time = ''
+    return this.collection.setParams(json)
+  }
+}
+UserDateRangeSearchFormView.initClass()

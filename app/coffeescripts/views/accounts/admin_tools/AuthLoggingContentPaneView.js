@@ -1,78 +1,86 @@
-#
-# Copyright (C) 2013 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Copyright (C) 2013 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'jquery' 
-  '../../PaginatedCollectionView'  
-  '../../InputFilterView'
-  '../UserView'
-  './UserDateRangeSearchFormView'
-  '../../../collections/AuthLoggingCollection'
-  './AuthLoggingItemView'
-  'jst/accounts/admin_tools/authLoggingSearchResults'
-  'jst/accounts/usersList'
-  'jst/accounts/admin_tools/authLoggingContentPane'
-], (
-  Backbone,
-  $,
-  PaginatedCollectionView,
-  InputFilterView,
-  UserView,
-  UserDateRangeSearchFormView,
-  AuthLoggingCollection,
-  AuthLoggingItemView,
-  authLoggingResultsTemplate,
-  usersTemplate,
-  template
-) ->
-  class AuthLoggingContentPaneView extends Backbone.View
-    @child 'searchForm', '#authLoggingSearchForm'
-    @child 'resultsView', '#authLoggingSearchResults'
+import Backbone from 'Backbone'
+import PaginatedCollectionView from '../../PaginatedCollectionView'
+import InputFilterView from '../../InputFilterView'
+import UserView from '../UserView'
+import UserDateRangeSearchFormView from './UserDateRangeSearchFormView'
+import AuthLoggingCollection from '../../../collections/AuthLoggingCollection'
+import AuthLoggingItemView from './AuthLoggingItemView'
+import authLoggingResultsTemplate from 'jst/accounts/admin_tools/authLoggingSearchResults'
+import usersTemplate from 'jst/accounts/usersList'
+import template from 'jst/accounts/admin_tools/authLoggingContentPane'
 
-    template: template
+export default class AuthLoggingContentPaneView extends Backbone.View {
+  static initClass() {
+    this.child('searchForm', '#authLoggingSearchForm')
+    this.child('resultsView', '#authLoggingSearchResults')
 
-    constructor: (@options) ->
-      @collection = new AuthLoggingCollection null
-      super
+    this.prototype.template = template
+  }
 
-      @searchForm = new UserDateRangeSearchFormView
-        formName: 'logging'
-        inputFilterView: new InputFilterView
-          collection: @options.users
-        usersView: new PaginatedCollectionView
-          collection: @options.users
-          itemView: UserView
-          buffer: 1000
-          template: usersTemplate
-        collection: @collection
-      @resultsView = new PaginatedCollectionView
-        template: authLoggingResultsTemplate
-        itemView: AuthLoggingItemView
-        collection: @collection
+  constructor(options) {
+    {
+      // Hack: trick Babel/TypeScript into allowing this before super.
+      if (false) { super(); }
+      let thisFn = (() => { return this; }).toString();
+      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.indexOf(';')).trim();
+      eval(`${thisName} = this;`);
+    }
+    this.fetch = this.fetch.bind(this)
+    this.onFail = this.onFail.bind(this)
+    this.options = options
+    this.collection = new AuthLoggingCollection(null)
+    super(...arguments)
 
-    attach: ->
-      @collection.on 'setParams', @fetch
+    this.searchForm = new UserDateRangeSearchFormView({
+      formName: 'logging',
+      inputFilterView: new InputFilterView({
+        collection: this.options.users
+      }),
+      usersView: new PaginatedCollectionView({
+        collection: this.options.users,
+        itemView: UserView,
+        buffer: 1000,
+        template: usersTemplate
+      }),
+      collection: this.collection
+    })
+    this.resultsView = new PaginatedCollectionView({
+      template: authLoggingResultsTemplate,
+      itemView: AuthLoggingItemView,
+      collection: this.collection
+    })
+  }
 
-    fetch: =>
-      @collection.fetch().fail @onFail
+  attach() {
+    return this.collection.on('setParams', this.fetch)
+  }
 
-    onFail: =>
-      # Received a 404, empty the collection and don't let the paginated
-      # view try to fetch more.
-      @collection.reset()
-      @resultsView.detachScroll()
+  fetch() {
+    return this.collection.fetch().fail(this.onFail)
+  }
+
+  onFail() {
+    // Received a 404, empty the collection and don't let the paginated
+    // view try to fetch more.
+    this.collection.reset()
+    return this.resultsView.detachScroll()
+  }
+}
+AuthLoggingContentPaneView.initClass()

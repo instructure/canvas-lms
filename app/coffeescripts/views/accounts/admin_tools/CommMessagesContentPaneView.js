@@ -1,64 +1,75 @@
-#
-# Copyright (C) 2013 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Copyright (C) 2013 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'jquery'
-  'i18n!comm_messages'
-  'jst/accounts/admin_tools/commMessagesContentPane'
-  'jst/accounts/admin_tools/commMessagesSearchOverview'
-  'jquery.instructure_date_and_time'
-], (Backbone, $, I18n, template, overviewTemplate) ->
-  class CommMessagesContentPaneView extends Backbone.View
-    @child 'searchForm', '#commMessagesSearchForm'
-    @child 'resultsView', '#commMessagesSearchResults'
+import Backbone from 'Backbone'
+import $ from 'jquery'
+import I18n from 'i18n!comm_messages'
+import template from 'jst/accounts/admin_tools/commMessagesContentPane'
+import overviewTemplate from 'jst/accounts/admin_tools/commMessagesSearchOverview'
+import 'jquery.instructure_date_and_time'
 
-    template: template
+export default class CommMessagesContentPaneView extends Backbone.View {
+  static initClass() {
+    this.child('searchForm', '#commMessagesSearchForm')
+    this.child('resultsView', '#commMessagesSearchResults')
 
-    els:
-      '#commMessagesSearchOverview': '$overview'
+    this.prototype.template = template
 
-    attach: ->
-      @collection.on 'setParams', @fetchMessages
+    this.prototype.els = {'#commMessagesSearchOverview': '$overview'}
+  }
 
-    fetchMessages: =>
-      @buildOverviewText()
-      @collection.fetch().fail @onFail
+  attach() {
+    return this.collection.on('setParams', this.fetchMessages.bind(this))
+  }
 
-    onFail: =>
-      # Received a 404, empty the collection and don't let the paginated
-      # view try to fetch more.
-      @collection.reset()
-      @resultsView.detachScroll()
+  fetchMessages() {
+    this.buildOverviewText()
+    return this.collection.fetch().fail(this.onFail.bind(this))
+  }
 
-    buildOverviewText: =>
-      dates = $(@searchForm.el).toJSON()
-      @$overview.hide()
-      @$overview.html(overviewTemplate(
-        user: @searchForm.model.get('name')
-        start_date: @getDisplayDateText(dates.start_time,
-                                        I18n.t('from_beginning', "the beginning"))
-        end_date: @getDisplayDateText(dates.end_time,
-                                      I18n.t('to_now', "now"))
-      ))
-      @$overview.show()
+  onFail() {
+    // Received a 404, empty the collection and don't let the paginated
+    // view try to fetch more.
+    this.collection.reset()
+    return this.resultsView.detachScroll()
+  }
 
-    getDisplayDateText: (dateInfo, fallbackText) =>
-      if dateInfo
-        $.datetimeString($.unfudgeDateForProfileTimezone(dateInfo))
-      else
-        fallbackText
+  buildOverviewText() {
+    const dates = $(this.searchForm.el).toJSON()
+    this.$overview.hide()
+    this.$overview.html(
+      overviewTemplate({
+        user: this.searchForm.model.get('name'),
+        start_date: this.getDisplayDateText(
+          dates.start_time,
+          I18n.t('from_beginning', 'the beginning')
+        ),
+        end_date: this.getDisplayDateText(dates.end_time, I18n.t('to_now', 'now'))
+      })
+    )
+    return this.$overview.show()
+  }
+
+  getDisplayDateText(dateInfo, fallbackText) {
+    if (dateInfo) {
+      return $.datetimeString($.unfudgeDateForProfileTimezone(dateInfo))
+    } else {
+      return fallbackText
+    }
+  }
+}
+CommMessagesContentPaneView.initClass()
