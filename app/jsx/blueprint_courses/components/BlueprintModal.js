@@ -17,12 +17,11 @@
  */
 
 import I18n from 'i18n!blueprint_settings'
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
 
-import Modal, { ModalHeader, ModalBody, ModalFooter } from '@instructure/ui-overlays/lib/components/Modal'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
+import Modal, {ModalBody, ModalFooter} from '../../shared/components/InstuiModal'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 
 export default class BlueprintModal extends Component {
@@ -35,7 +34,7 @@ export default class BlueprintModal extends Component {
     hasChanges: PropTypes.bool,
     isSaving: PropTypes.bool,
     saveButton: PropTypes.element,
-    wide: PropTypes.bool,
+    wide: PropTypes.bool
   }
 
   static defaultProps = {
@@ -45,20 +44,20 @@ export default class BlueprintModal extends Component {
     onSave: () => {},
     onCancel: () => {},
     saveButton: null,
-    wide: false,
+    wide: false
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.fixBodyScroll(this.props.isOpen)
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (nextProps.isOpen !== this.props.isOpen) {
       this.fixBodyScroll(nextProps.isOpen)
     }
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     // if just started saving, then the save button was just clicked
     // and it is about to disappear, so focus on the done button
     // that replaces it
@@ -71,7 +70,7 @@ export default class BlueprintModal extends Component {
   }
 
   bodyOverflow = ''
-  fixBodyScroll (isOpen) {
+  fixBodyScroll(isOpen) {
     if (isOpen) {
       this.bodyOverflow = document.body.style.overflowY
       document.body.style.overflowY = 'hidden'
@@ -80,40 +79,44 @@ export default class BlueprintModal extends Component {
     }
   }
 
-  render () {
-    const classes = cx('bcs__modal-content-wrapper',
-      { 'bcs__modal-content-wrapper__wide': this.props.wide })
+  render() {
+    const classes = cx('bcs__modal-content-wrapper', {
+      'bcs__modal-content-wrapper__wide': this.props.wide
+    })
 
     return (
       <Modal
         open={this.props.isOpen}
         onDismiss={this.props.onCancel}
         onClose={this.handleModalClose}
-        transition="fade"
         size="fullscreen"
         label={this.props.title}
-        closeButtonLabel={I18n.t('Close')}
       >
-        <ModalHeader>
-          <Heading level="h3">{this.props.title}</Heading>
-        </ModalHeader>
         <ModalBody>
-          <div className={classes}>
-            {this.props.children}
-          </div>
+          <div className={classes}>{this.props.children}</div>
         </ModalBody>
-        <ModalFooter ref={(c) => { this.footer = c }}>
-          {this.props.hasChanges && !this.props.isSaving ? [
-            <Button key="cancel" onClick={this.props.onCancel}>{I18n.t('Cancel')}</Button>,
-            <span key="space">&nbsp;</span>,
-            this.props.saveButton
-              ? this.props.saveButton
-              : <Button key="save" onClick={this.props.onSave} variant="primary">{I18n.t('Save')}</Button>
-          ] : (
-            <Button ref={(c) => { this.doneBtn = c }} onClick={this.props.onCancel} variant="primary">{I18n.t('Done')}</Button>
+        <ModalFooter ref={c => (this.footer = c)}>
+          {this.props.hasChanges && !this.props.isSaving ? (
+            [
+              <Button key="cancel" onClick={this.props.onCancel}>
+                {I18n.t('Cancel')}
+              </Button>,
+              <span key="space">&nbsp;</span>,
+              this.props.saveButton ? (
+                this.props.saveButton
+              ) : (
+                <Button key="save" onClick={this.props.onSave} variant="primary">
+                  {I18n.t('Save')}
+                </Button>
+              )
+            ]
+          ) : (
+            <Button ref={c => (this.doneBtn = c)} onClick={this.props.onCancel} variant="primary">
+              {I18n.t('Done')}
+            </Button>
           )}
         </ModalFooter>
       </Modal>
-    );
+    )
   }
 }
