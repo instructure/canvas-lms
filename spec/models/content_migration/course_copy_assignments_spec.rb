@@ -212,6 +212,27 @@ describe ContentMigration do
       expect(new_assignment.only_visible_to_overrides).to be_falsey
     end
 
+    it "should copy other feature-dependent assignment attributes" do
+      assignment_model(:course => @copy_from)
+      @assignment.moderated_grading = true
+      @assignment.grader_count = 2
+      @assignment.grader_comments_visible_to_graders = true
+      @assignment.anonymous_grading = true
+      @assignment.graders_anonymous_to_graders = true
+      @assignment.grader_names_visible_to_final_grader = true
+      @assignment.anonymous_instructor_annotations = true
+      @assignment.save!
+
+      run_course_copy
+
+      new_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
+      [:moderated_grading, :grader_count, :grader_comments_visible_to_graders,
+        :anonymous_grading, :graders_anonymous_to_graders, :grader_names_visible_to_final_grader,
+        :anonymous_instructor_annotations].each do |attr|
+        expect(new_assignment.send(attr)).to eq @assignment.send(attr)
+      end
+    end
+
     it "shouldn't copy turnitin/vericite_enabled if it's not enabled on the copyee's account" do
       assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'file_upload', :grading_type => 'points')
       @assignment.turnitin_enabled = true
