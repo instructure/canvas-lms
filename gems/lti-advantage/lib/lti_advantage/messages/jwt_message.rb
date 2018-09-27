@@ -25,6 +25,7 @@ module LtiAdvantage::Messages
       extensions: Hash,
       launch_presentation: LtiAdvantage::Claims::LaunchPresentation,
       lis: LtiAdvantage::Claims::Lis,
+      names_and_roles_service: LtiAdvantage::Claims::NamesAndRolesService,
       tool_platform: LtiAdvantage::Claims::Platform,
       roles: Array,
       role_scope_mentor: Array
@@ -70,6 +71,10 @@ module LtiAdvantage::Messages
 
     def launch_presentation
       @launch_presentation ||= TYPED_ATTRIBUTES[:launch_presentation].new
+    end
+
+    def names_and_roles_service
+      @names_and_roles_service ||= TYPED_ATTRIBUTES[:names_and_roles_service].new
     end
 
     def lis

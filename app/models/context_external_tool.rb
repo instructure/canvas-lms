@@ -88,6 +88,10 @@ class ContextExternalTool < ActiveRecord::Base
       settings['content_migration'].key?('import_start_url')
   end
 
+  def names_and_roles_service_enabled?
+    use_1_3? && context.root_account.feature_enabled?(:lti_1_3)
+  end
+
   def extension_setting(type, property = nil)
     return settings[property] unless type
     type = type.to_sym

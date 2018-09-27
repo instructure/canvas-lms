@@ -56,6 +56,9 @@ module Lti::Ims
     def verify_nrps_v2_allowed
       # TODO: Add 'real' 1.3 security checks. See same hack in Lti::Ims::Concerns::GradebookServices.
       render_unauthorized_action if Rails.env.production?
+
+      # TODO: This will become one of the 'real' security checks once NRPS invocations can be associated with a Tool
+      # render_unauthorized_action unless tool && tool.names_and_roles_service_enabled?
       true
     end
 
