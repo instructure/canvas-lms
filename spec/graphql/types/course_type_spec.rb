@@ -282,4 +282,18 @@ describe Types::CourseType do
       ).to eq course.groups.map(&:to_param)
     end
   end
+
+  describe "GroupSetsConnection" do
+    before(:once) do
+      @project_groups = course.group_categories.create! name: "Project Groups"
+      @student_groups = GroupCategory.student_organized_for(course)
+    end
+
+    it "returns project groups" do
+      expect(
+        course_type.resolve("groupSetsConnection { edges { node { _id } } }",
+                            current_user: @teacher)
+      ).to eq [@project_groups.id.to_s]
+    end
+  end
 end

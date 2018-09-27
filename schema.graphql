@@ -28,6 +28,7 @@ type Assignment implements Node & Timestamped {
   # when this assignment is due
   dueAt: DateTime
   gradingType: GradingType
+  groupSet: GroupSet
   htmlUrl: URL
   id: ID!
   lockAt: DateTime
@@ -239,6 +240,15 @@ interface AssignmentsConnectionInterface {
   ): AssignmentConnection
 }
 
+# Determines if/how a leader is chosen for each group
+enum AutoLeaderPolicy {
+  # the first student assigned to the group is the leader
+  first
+
+  # a leader is chosen at random
+  random
+}
+
 type Course implements AssignmentsConnectionInterface & Node & Timestamped {
   # legacy canvas id
   _id: ID!
@@ -293,6 +303,21 @@ type Course implements AssignmentsConnectionInterface & Node & Timestamped {
     # Returns the last _n_ elements from the list.
     last: Int
   ): GradingPeriodConnection
+
+  # Project group sets for this course.
+  groupSetsConnection(
+    # Returns the elements in the list that come after the specified cursor.
+    after: String
+
+    # Returns the elements in the list that come before the specified cursor.
+    before: String
+
+    # Returns the first _n_ elements from the list.
+    first: Int
+
+    # Returns the last _n_ elements from the list.
+    last: Int
+  ): GroupSetConnection
   groupsConnection(
     # Returns the elements in the list that come after the specified cursor.
     after: String
@@ -590,6 +615,53 @@ enum GroupMembershipState {
   requested
 }
 
+type GroupSet implements Node {
+  # legacy canvas id
+  _id: ID!
+  autoLeader: AutoLeaderPolicy
+  groupsConnection(
+    # Returns the elements in the list that come after the specified cursor.
+    after: String
+
+    # Returns the elements in the list that come before the specified cursor.
+    before: String
+
+    # Returns the first _n_ elements from the list.
+    first: Int
+
+    # Returns the last _n_ elements from the list.
+    last: Int
+  ): GroupConnection
+  id: ID!
+
+  # Sets a cap on the number of members in the group.  Only applies when
+  # self-signup is enabled.
+  memberLimit: Int
+  name: String
+  selfSignup: SelfSignupPolicy!
+}
+
+# The connection type for GroupSet.
+type GroupSetConnection {
+  # A list of edges.
+  edges: [GroupSetEdge]
+
+  # A list of nodes.
+  nodes: [GroupSet]
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+}
+
+# An edge in a connection.
+type GroupSetEdge {
+  # A cursor for use in pagination.
+  cursor: String!
+
+  # The item at the end of the edge.
+  node: GroupSet
+}
+
 type LockInfo {
   canView: Boolean
   isLocked: Boolean
@@ -625,6 +697,7 @@ enum NodeType {
   Enrollment
   GradingPeriod
   Group
+  GroupSet
   Module
   Page
   Section
@@ -718,6 +791,19 @@ type SectionEdge {
 
   # The item at the end of the edge.
   node: Section
+}
+
+# Determines if/how a student may join a group. A student can belong to
+# only one group per group set at a time.
+enum SelfSignupPolicy {
+  # self signup is not allowed
+  disabled
+
+  # students may join any group
+  enabled
+
+  # students may join a group in their section
+  restricted
 }
 
 # basic information about a students activity in a course
