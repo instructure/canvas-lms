@@ -35,9 +35,6 @@ function defaultProps (props = {}) {
 
 QUnit.module('StatusesModal', function (suiteHooks) {
   suiteHooks.beforeEach(function () {
-    const applicationElement = document.createElement('div');
-    applicationElement.id = 'application';
-    document.getElementById('fixtures').appendChild(applicationElement);
     clock = sinon.useFakeTimers();
   });
 
@@ -46,65 +43,66 @@ QUnit.module('StatusesModal', function (suiteHooks) {
     clock.restore();
   });
 
+  let wrapper, modal, instance
+
   QUnit.module('StatusesModal', {
     setup () {
-      this.wrapper = shallow(
-        <StatusesModal {...defaultProps()} />
-      );
+      wrapper = shallow(<StatusesModal {...defaultProps()} />)
+      instance = wrapper.instance()
+      modal = wrapper.dive()
     },
 
     teardown () {
-      this.wrapper.unmount();
+      wrapper.unmount();
       document.getElementById('fixtures').innerHTML = '';
     }
   });
 
   test('modal is initially closed', function () {
-    strictEqual(this.wrapper.find('Modal').prop('open'), false);
+    strictEqual(modal.prop('open'), false);
   });
 
   test('modal has a label of "Statuses"', function () {
-    equal(this.wrapper.find('Modal').prop('label'), 'Statuses');
+    equal(modal.prop('label'), 'Statuses');
   });
 
   test('modal has a close button label of "Close"', function () {
-    equal(this.wrapper.find('Modal').prop('closeButtonLabel'), 'Close');
+    equal(modal.find('CloseButton').prop('children'), 'Close');
   });
 
   test('modal has an onDismiss function', function () {
-    equal(typeof this.wrapper.find('Modal').prop('onDismiss'), 'function');
+    equal(typeof modal.prop('onDismiss'), 'function');
   });
 
   test('modal has an onExited function', function () {
-    equal(typeof this.wrapper.find('Modal').prop('onExited'), 'function');
+    equal(typeof modal.prop('onExited'), 'function');
   });
 
   test('modal has a "Statuses" header', function () {
-    equal(this.wrapper.find('Heading').children().text(), 'Statuses');
+    equal(modal.find('Heading').prop('children'), 'Statuses');
   });
 
   test('modal has a "Done" button', function () {
-    equal(this.wrapper.find('Button').children().text(), 'Done');
+    equal(modal.find('Button').children().text(), 'Done');
   });
 
   test('modal opens', function () {
-    this.wrapper.instance().open();
-    strictEqual(this.wrapper.find('Modal').prop('open'), true);
+    instance.open();
+    strictEqual(wrapper.dive().find('Modal').prop('open'), true);
   });
 
   test('modal closes', function () {
-    const statusModal = this.wrapper.instance();
-    statusModal.open();
+    instance.open();
     clock.tick(50); // wait for Modal to transition open
-    statusModal.close();
+    instance.close();
     clock.tick(50); // wait for Modal to transition closed
-    strictEqual(this.wrapper.find('Modal').prop('open'), false);
+    strictEqual(wrapper.dive().find('Modal').prop('open'), false);
   });
 
   test('on close prop is passed to Modal onExit', function () {
     const onClose = sinon.stub();
     const wrapper = shallow(<StatusesModal {...defaultProps({ onClose })} />);
-    equal(wrapper.find('Modal').prop('onExited'), onClose);
+    equal(wrapper.dive().find('Modal').prop('onExited'), onClose);
   });
 
   QUnit.module('StatusesModal#isPopoverShown', {
@@ -204,7 +202,7 @@ QUnit.module('StatusesModal', function (suiteHooks) {
     const { wrapper, instance } = this;
     instance.open();
     wrapper.find('Button').simulate('click');
-    strictEqual(wrapper.find('Modal').prop('open'), false);
+    strictEqual(wrapper.dive().find('Modal').prop('open'), false);
   });
 
   test('renders five StatusColorListItems', function () {
