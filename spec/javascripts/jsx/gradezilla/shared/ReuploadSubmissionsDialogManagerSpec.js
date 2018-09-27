@@ -16,62 +16,63 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jsx/gradezilla/shared/ReuploadSubmissionsDialogManager'
-], (ReuploadSubmissionsDialogManager) => {
-  QUnit.module('ReuploadSubmissionsDialogManager#constructor');
+import ReuploadSubmissionsDialogManager from 'jsx/gradezilla/shared/ReuploadSubmissionsDialogManager'
 
-  test('constructs reupload url from given assignment data and url template', () => {
-    const manager = new ReuploadSubmissionsDialogManager({
+QUnit.module('ReuploadSubmissionsDialogManager#constructor')
+
+test('constructs reupload url from given assignment data and url template', () => {
+  const manager = new ReuploadSubmissionsDialogManager(
+    {
       id: 'the_id'
-    }, 'the_{{ assignment_id }}_url');
+    },
+    'the_{{ assignment_id }}_url'
+  )
 
-    strictEqual(manager.reuploadUrl, 'the_the_id_url');
-  });
+  strictEqual(manager.reuploadUrl, 'the_the_id_url')
+})
 
-  QUnit.module('ReuploadSubmissionsDialogManager#isDialogEnabled');
+QUnit.module('ReuploadSubmissionsDialogManager#isDialogEnabled')
 
-  test('returns true when assignment submssions have been downloaded', () => {
-    const manager = new ReuploadSubmissionsDialogManager(
-      { hasDownloadedSubmissions: true },
-      'the_url'
-    );
+test('returns true when assignment submssions have been downloaded', () => {
+  const manager = new ReuploadSubmissionsDialogManager({hasDownloadedSubmissions: true}, 'the_url')
 
-    strictEqual(manager.isDialogEnabled(), true);
-  });
+  strictEqual(manager.isDialogEnabled(), true)
+})
 
-  test('returns false when assignment submssions have not been downloaded', () => {
-    const manager = new ReuploadSubmissionsDialogManager(
-      { hasDownloadedSubmissions: true },
-      'the_url'
-    );
+test('returns false when assignment submssions have not been downloaded', () => {
+  const manager = new ReuploadSubmissionsDialogManager({hasDownloadedSubmissions: true}, 'the_url')
 
-    strictEqual(manager.isDialogEnabled(), true);
-  });
+  strictEqual(manager.isDialogEnabled(), true)
+})
 
-  QUnit.module('ReuploadSubmissionsDialogManager#showDialog');
+QUnit.module('ReuploadSubmissionsDialogManager#showDialog')
 
-  test('sets form action to reupload url', function () {
-    const manager = new ReuploadSubmissionsDialogManager({
+test('sets form action to reupload url', function() {
+  const manager = new ReuploadSubmissionsDialogManager(
+    {
       id: 'the_id'
-    }, 'the_{{ assignment_id }}_url');
-    const dialog = sinon.stub();
-    const attr = sinon.stub().returns({ dialog });
-    sandbox.stub(manager, 'getReuploadForm').returns({ attr });
-    manager.showDialog();
+    },
+    'the_{{ assignment_id }}_url'
+  )
+  const dialog = sinon.stub()
+  const attr = sinon.stub().returns({dialog})
+  sandbox.stub(manager, 'getReuploadForm').returns({attr})
+  manager.showDialog()
 
-    ok(attr.calledWith('action', 'the_the_id_url'));
-  });
+  ok(attr.calledWith('action', 'the_the_id_url'))
+})
 
-  test('opens dialog', function () {
-    const manager = new ReuploadSubmissionsDialogManager({
+test('opens dialog', function() {
+  const manager = new ReuploadSubmissionsDialogManager(
+    {
       id: 'the_id'
-    }, 'the_{{ assignment_id }}_url');
-    const dialog = sinon.stub();
-    const attr = sinon.stub().returns({ dialog });
-    sandbox.stub(manager, 'getReuploadForm').returns({ attr });
-    manager.showDialog();
+    },
+    'the_{{ assignment_id }}_url'
+  )
+  const dialog = sinon.stub()
+  const attr = sinon.stub().returns({dialog})
+  sandbox.stub(manager, 'getReuploadForm').returns({attr})
+  manager.showDialog()
 
-    strictEqual(dialog.callCount, 1);
-  });
-});
+  strictEqual(dialog.callCount, 1)
+})

@@ -16,132 +16,129 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-dom',
-  'jsx/custom_help_link_settings/CustomHelpLinkSettings',
-  'jquery'
-], (React, ReactDOM, CustomHelpLinkSettings, $) => {
+import React from 'react'
 
-  const container = document.getElementById('fixtures')
+import ReactDOM from 'react-dom'
+import CustomHelpLinkSettings from 'jsx/custom_help_link_settings/CustomHelpLinkSettings'
+import $ from 'jquery'
 
-  QUnit.module('<CustomHelpLinkSettings/>', {
-    render(overrides={}) {
-      const props = {
-        name: 'Help',
-        icon: 'help',
-        links: [],
-        defaultLinks: [
-          {
-            available_to: ['student'],
-            text: 'Ask Your Instructor a Question',
-            subtext: 'Questions are submitted to your instructor',
-            url: '#teacher_feedback',
-            type: 'default'
-          },
-          {
-            available_to: ['user','student','teacher','admin'],
-            text: 'Search the Canvas Guides',
-            subtext: 'Find answers to common questions',
-            url: 'http://community.canvaslms.com/community/answers/guides',
-            type: 'default'
-          },
-          {
-            available_to: ['user','student','teacher','admin'],
-            text: 'Report a Problem',
-            subtext: 'If Canvas misbehaves, tell us about it',
-            url: '#create_ticket',
-            type: 'default'
-          }
-        ],
-        ...overrides
-      }
+const container = document.getElementById('fixtures')
 
-      return ReactDOM.render(<CustomHelpLinkSettings {...props} />, container)
-    },
-    teardown() {
-      ReactDOM.unmountComponentAtNode(container)
-    }
-  })
-
-  test('render()', function () {
-    const subject = this.render()
-    ok(ReactDOM.findDOMNode(subject))
-  })
-
-  test('accepts properly formatted urls', function () {
-    const subject = this.render()
-
-    let link = {
-      text: 'test link',
-      available_to: ['user', 'student', 'teacher', 'admin'],
-      url: ''
-    }
-
-    link.url = 'http://testurl.com'
-    ok(subject.validate(link))
-
-    link.url = 'https://testurl.com'
-    ok(subject.validate(link))
-
-    link.url = 'ftp://test.url/.test'
-    ok(subject.validate(link))
-
-    link.url = 'tel:1-999-999-9999'
-    ok(subject.validate(link))
-
-    link.url = 'mailto:test@test.com'
-    ok(subject.validate(link))
-  })
-
-  test('assigns unique link ids', function() {
-    const subject = this.render({
-      links: [
+QUnit.module('<CustomHelpLinkSettings/>', {
+  render(overrides = {}) {
+    const props = {
+      name: 'Help',
+      icon: 'help',
+      links: [],
+      defaultLinks: [
         {
-          id: 'link1',
           available_to: ['student'],
-          text: 'Blah',
-          url: '#blah',
-          type: 'custom'
+          text: 'Ask Your Instructor a Question',
+          subtext: 'Questions are submitted to your instructor',
+          url: '#teacher_feedback',
+          type: 'default'
         },
         {
-          id: 'link3',
-          available_to: ['student'],
-          text: 'Bleh',
-          url: '#bleh',
-          type: 'custom'
+          available_to: ['user', 'student', 'teacher', 'admin'],
+          text: 'Search the Canvas Guides',
+          subtext: 'Find answers to common questions',
+          url: 'http://community.canvaslms.com/community/answers/guides',
+          type: 'default'
+        },
+        {
+          available_to: ['user', 'student', 'teacher', 'admin'],
+          text: 'Report a Problem',
+          subtext: 'If Canvas misbehaves, tell us about it',
+          url: '#create_ticket',
+          type: 'default'
         }
-      ]
-    })
-    subject.add({text: 'eh', url: 'ftp://eh', available_to: ['student']})
-    equal(subject.state.links.find(link => link.text === 'eh').id, 'link4')
+      ],
+      ...overrides
+    }
+
+    return ReactDOM.render(<CustomHelpLinkSettings {...props} />, container)
+  },
+  teardown() {
+    ReactDOM.unmountComponentAtNode(container)
+  }
+})
+
+test('render()', function() {
+  const subject = this.render()
+  ok(ReactDOM.findDOMNode(subject))
+})
+
+test('accepts properly formatted urls', function() {
+  const subject = this.render()
+
+  const link = {
+    text: 'test link',
+    available_to: ['user', 'student', 'teacher', 'admin'],
+    url: ''
+  }
+
+  link.url = 'http://testurl.com'
+  ok(subject.validate(link))
+
+  link.url = 'https://testurl.com'
+  ok(subject.validate(link))
+
+  link.url = 'ftp://test.url/.test'
+  ok(subject.validate(link))
+
+  link.url = 'tel:1-999-999-9999'
+  ok(subject.validate(link))
+
+  link.url = 'mailto:test@test.com'
+  ok(subject.validate(link))
+})
+
+test('assigns unique link ids', function() {
+  const subject = this.render({
+    links: [
+      {
+        id: 'link1',
+        available_to: ['student'],
+        text: 'Blah',
+        url: '#blah',
+        type: 'custom'
+      },
+      {
+        id: 'link3',
+        available_to: ['student'],
+        text: 'Bleh',
+        url: '#bleh',
+        type: 'custom'
+      }
+    ]
   })
+  subject.add({text: 'eh', url: 'ftp://eh', available_to: ['student']})
+  equal(subject.state.links.find(link => link.text === 'eh').id, 'link4')
+})
 
+test('calls flashScreenreaderAlert when appropriate', function() {
+  sinon.spy($, 'screenReaderFlashMessage')
+  const subject = this.render({name: ''})
+  subject.validateName({target: subject})
+  // flash message when transitions to invalid
+  equal($.screenReaderFlashMessage.callCount, 1)
 
-  test('calls flashScreenreaderAlert when appropriate', function() {
-    sinon.spy($, 'screenReaderFlashMessage')
-    const subject = this.render({name: ''});
-    subject.validateName({target: subject})
-    // flash message when transitions to invalid
-    equal($.screenReaderFlashMessage.callCount, 1)
+  // no flash message as long as is invalid
+  subject.validateName({target: subject})
+  equal($.screenReaderFlashMessage.callCount, 1)
+  equal(subject.state.isNameValid, false)
 
-    // no flash message as long as is invalid
-    subject.validateName({target: subject})
-    equal($.screenReaderFlashMessage.callCount, 1)
-    equal(subject.state.isNameValid, false)
+  // it's valid now
+  subject.value = 'foo'
+  subject.validateName({target: subject})
+  equal($.screenReaderFlashMessage.callCount, 1)
+  equal(subject.state.isNameValid, true)
 
-    // it's valid now
-    subject.value = "foo"
-    subject.validateName({target: subject})
-    equal($.screenReaderFlashMessage.callCount, 1)
-    equal(subject.state.isNameValid, true)
+  // and invalid again, show message
+  subject.value = ''
+  subject.validateName({target: subject})
+  equal($.screenReaderFlashMessage.callCount, 2)
+  equal(subject.state.isNameValid, false)
 
-    // and invalid again, show message
-    subject.value = ""
-    subject.validateName({target: subject})
-    equal($.screenReaderFlashMessage.callCount, 2)
-    equal(subject.state.isNameValid, false)
-
-    $.screenReaderFlashMessage.restore()
-  })
+  $.screenReaderFlashMessage.restore()
 })

@@ -16,60 +16,59 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jsx/collaborations/reducers/listCollaborationsReducer',
-  'jsx/collaborations/actions/collaborationsActions'
-], (reducer, actions) => {
-  QUnit.module('collaborationsReducer');
+import reducer from 'jsx/collaborations/reducers/listCollaborationsReducer'
 
-  const defaults = reducer(undefined, {})
+import actions from 'jsx/collaborations/actions/collaborationsActions'
 
-  test('there are defaults', () => {
-    equal(Array.isArray(defaults.list), true);
-    equal(defaults.list.length, 0);
-    equal(defaults.listCollaborationsPending, false);
-    equal(defaults.listCollaborationsSuccessful, false);
-    equal(defaults.listCollaborationsError, null);
-  });
+QUnit.module('collaborationsReducer')
 
-  test('responds to listCollaborationsStart', () => {
-    let state = {
-      listCollaborationsPending: false,
-      listCollaborationsSuccessful: true,
-      listCollaborationsError: {}
-    };
+const defaults = reducer(undefined, {})
 
-    let action = actions.listCollaborationsStart();
-    let newState = reducer(state, action);
-    equal(newState.listCollaborationsPending, true);
-    equal(newState.listCollaborationsSuccessful, false);
-    equal(newState.listCollaborationsError, null);
-  });
+test('there are defaults', () => {
+  equal(Array.isArray(defaults.list), true)
+  equal(defaults.list.length, 0)
+  equal(defaults.listCollaborationsPending, false)
+  equal(defaults.listCollaborationsSuccessful, false)
+  equal(defaults.listCollaborationsError, null)
+})
 
-  test('responds to listCollaborationsSuccessful', () => {
-    let state = {
-      listCollaborationsPending: true,
-      listCollaborationsSuccessful: false,
-      list: []
-    };
-    let payload = {collaborations: []};
-    let action = actions.listCollaborationsSuccessful(payload);
-    let newState = reducer(state, action);
-    equal(newState.listCollaborationsPending, false);
-    equal(newState.listCollaborationsSuccessful, true);
-    equal(newState.list.length, payload.collaborations.length);
-  });
+test('responds to listCollaborationsStart', () => {
+  const state = {
+    listCollaborationsPending: false,
+    listCollaborationsSuccessful: true,
+    listCollaborationsError: {}
+  }
 
-  test('responds to listCollaborationsFailed', () => {
-    let state = {
-      listCollaborationsPending: true,
-      listCollaborationsError: null
-    };
-    let error = {};
+  const action = actions.listCollaborationsStart()
+  const newState = reducer(state, action)
+  equal(newState.listCollaborationsPending, true)
+  equal(newState.listCollaborationsSuccessful, false)
+  equal(newState.listCollaborationsError, null)
+})
 
-    let action = actions.listCollaborationsFailed(error);
-    let newState = reducer(state, action);
-    equal(newState.listCollaborationsPending, false);
-    equal(newState.listCollaborationsError, error);
-  });
-});
+test('responds to listCollaborationsSuccessful', () => {
+  const state = {
+    listCollaborationsPending: true,
+    listCollaborationsSuccessful: false,
+    list: []
+  }
+  const payload = {collaborations: []}
+  const action = actions.listCollaborationsSuccessful(payload)
+  const newState = reducer(state, action)
+  equal(newState.listCollaborationsPending, false)
+  equal(newState.listCollaborationsSuccessful, true)
+  equal(newState.list.length, payload.collaborations.length)
+})
+
+test('responds to listCollaborationsFailed', () => {
+  const state = {
+    listCollaborationsPending: true,
+    listCollaborationsError: null
+  }
+  const error = {}
+
+  const action = actions.listCollaborationsFailed(error)
+  const newState = reducer(state, action)
+  equal(newState.listCollaborationsPending, false)
+  equal(newState.listCollaborationsError, error)
+})

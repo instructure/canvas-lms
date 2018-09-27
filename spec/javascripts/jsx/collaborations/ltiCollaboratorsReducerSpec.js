@@ -16,62 +16,60 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jsx/collaborations/reducers/ltiCollaboratorsReducer',
-  'jsx/collaborations/actions/collaborationsActions'
-], (reducer, actions) => {
+import reducer from 'jsx/collaborations/reducers/ltiCollaboratorsReducer'
 
-  QUnit.module('ltiCollaboratorsReducer');
+import actions from 'jsx/collaborations/actions/collaborationsActions'
 
-  const defaults = reducer(undefined, {})
+QUnit.module('ltiCollaboratorsReducer')
 
-  test('there are defaults', () => {
-    equal(Array.isArray(defaults.ltiCollaboratorsData), true);
-    equal(defaults.ltiCollaboratorsData.length, 0);
-    equal(defaults.listLTICollaboratorsPending, false);
-    equal(defaults.listLTICollaboratorsSuccessful, false);
-    equal(defaults.listLTICollaboratorsError, null);
-  });
+const defaults = reducer(undefined, {})
 
-  test('responds to listCollaborationsStart', () => {
-    let state = {
-      listLTICollaboratorsPending: false,
-      listLTICollaboratorsSuccessful: true,
-      listLTICollaboratorsError: {}
-    };
+test('there are defaults', () => {
+  equal(Array.isArray(defaults.ltiCollaboratorsData), true)
+  equal(defaults.ltiCollaboratorsData.length, 0)
+  equal(defaults.listLTICollaboratorsPending, false)
+  equal(defaults.listLTICollaboratorsSuccessful, false)
+  equal(defaults.listLTICollaboratorsError, null)
+})
 
-    let action = actions.listLTICollaborationsStart();
-    let newState = reducer(state, action);
-    equal(newState.listLTICollaboratorsPending, true);
-    equal(newState.listLTICollaboratorsSuccessful, false);
-    equal(newState.listLTICollaboratorsError, null);
-  });
+test('responds to listCollaborationsStart', () => {
+  const state = {
+    listLTICollaboratorsPending: false,
+    listLTICollaboratorsSuccessful: true,
+    listLTICollaboratorsError: {}
+  }
 
-  test('responds to listLTICollaborationsSuccessful', () => {
-    let state = {
-      listLTICollaboratorsPending: true,
-      listLTICollaboratorsSuccessful: false,
-      ltiCollaboratorsData: []
-    };
-    let ltiCollaboratorsData = [];
+  const action = actions.listLTICollaborationsStart()
+  const newState = reducer(state, action)
+  equal(newState.listLTICollaboratorsPending, true)
+  equal(newState.listLTICollaboratorsSuccessful, false)
+  equal(newState.listLTICollaboratorsError, null)
+})
 
-    let action = actions.listLTICollaborationsSuccessful(ltiCollaboratorsData);
-    let newState = reducer(state, action);
-    equal(newState.listLTICollaboratorsPending, false);
-    equal(newState.listLTICollaboratorsSuccessful, true);
-    equal(newState.ltiCollaboratorsData, ltiCollaboratorsData);
-  });
+test('responds to listLTICollaborationsSuccessful', () => {
+  const state = {
+    listLTICollaboratorsPending: true,
+    listLTICollaboratorsSuccessful: false,
+    ltiCollaboratorsData: []
+  }
+  const ltiCollaboratorsData = []
 
-  test('responds to listLTICollaborationsFailed', () => {
-    let state = {
-      listLTICollaboratorsPending: true,
-      listLTICollaboratorsError: null
-    };
-    let error = {};
+  const action = actions.listLTICollaborationsSuccessful(ltiCollaboratorsData)
+  const newState = reducer(state, action)
+  equal(newState.listLTICollaboratorsPending, false)
+  equal(newState.listLTICollaboratorsSuccessful, true)
+  equal(newState.ltiCollaboratorsData, ltiCollaboratorsData)
+})
 
-    let action = actions.listLTICollaborationsFailed(error);
-    let newState = reducer(state, action);
-    equal(newState.listLTICollaboratorsPending, false);
-    equal(newState.listLTICollaboratorsError, error);
-  });
-});
+test('responds to listLTICollaborationsFailed', () => {
+  const state = {
+    listLTICollaboratorsPending: true,
+    listLTICollaboratorsError: null
+  }
+  const error = {}
+
+  const action = actions.listLTICollaborationsFailed(error)
+  const newState = reducer(state, action)
+  equal(newState.listLTICollaboratorsPending, false)
+  equal(newState.listLTICollaboratorsError, error)
+})

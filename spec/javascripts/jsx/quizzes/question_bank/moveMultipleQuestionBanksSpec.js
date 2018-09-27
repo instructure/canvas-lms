@@ -16,40 +16,38 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jsx/quizzes/question_bank/moveMultipleQuestionBanks'
-  ], (moveMultipleQuestionBanks) => {
-  var $modal = null
+import moveMultipleQuestionBanks from 'jsx/quizzes/question_bank/moveMultipleQuestionBanks'
+import $ from 'jquery'
 
-  QUnit.module("Move Multiple Question Banks", {
-    setup() {
-      $modal = $('#fixtures').html(
-        "<div id='parent'>"                                +
-        "  <div id='move_question_dialog'>"                +
-        "  </div>"                                         +
-        "  <a class='ui-dialog-titlebar-close' href='#'>"  +
-        "  </a>"                                           +
-        "  </div>"                                         +
-        "</div>"
-      )
-    },
+let $modal = null
 
-    teardown() {
-      $('#fixtures').empty()
-    }
-  })
+QUnit.module('Move Multiple Question Banks', {
+  setup() {
+    $modal = $('#fixtures').html(
+      "<div id='parent'>" +
+        "  <div id='move_question_dialog'>" +
+        '  </div>' +
+        "  <a class='ui-dialog-titlebar-close' href='#'>" +
+        '  </a>' +
+        '  </div>' +
+        '</div>'
+    )
+  },
 
+  teardown() {
+    $('#fixtures').empty()
+  }
+})
 
-  test('is an object', () => {
-    ok(typeof moveMultipleQuestionBanks === 'object')
-  })
+test('is an object', () => {
+  ok(typeof moveMultipleQuestionBanks === 'object')
+})
 
-  test('set focus to the delete button when dialog opens', () => {
-    sinon.stub(moveMultipleQuestionBanks, 'prepDialog')
-    sinon.stub(moveMultipleQuestionBanks, 'showDialog')
-    sinon.stub(moveMultipleQuestionBanks, 'loadData')
-    let focusesButton = $modal.find('.ui-dialog-titlebar-close')[0]
-    moveMultipleQuestionBanks.onClick({preventDefault: e => e})
-    ok(focusesButton === document.activeElement)
-  })
-});
+test('set focus to the delete button when dialog opens', () => {
+  sinon.stub(moveMultipleQuestionBanks, 'prepDialog')
+  sinon.stub(moveMultipleQuestionBanks, 'showDialog')
+  sinon.stub(moveMultipleQuestionBanks, 'loadData')
+  const focusesButton = $modal.find('.ui-dialog-titlebar-close')[0]
+  moveMultipleQuestionBanks.onClick({preventDefault: e => e})
+  ok(focusesButton === document.activeElement)
+})

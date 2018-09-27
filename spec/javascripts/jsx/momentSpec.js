@@ -16,18 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'moment',
+import moment from 'moment'
 
-], (moment) => {
-  QUnit.module('moment module test');
+QUnit.module('moment module test');
 
-  test('moment should include the locale mi-nz', () => {
+test('moment should include the locale mi-nz', () => {
 
-    // webpack does not load up all locales by default.
-    // we have to ask for it specifically
-    require('custom_moment_locales/mi_nz');
+  // webpack does not load up all locales by default.
+  // we have to ask for it specifically
+  require('custom_moment_locales/mi_nz');
 
-    notEqual(moment.localeData('mi-nz'), null, 'locale data for mi-nz is not null');
-  });
+  notEqual(moment.localeData('mi-nz'), null, 'locale data for mi-nz is not null');
 });

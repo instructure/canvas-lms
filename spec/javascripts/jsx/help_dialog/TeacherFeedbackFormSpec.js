@@ -16,46 +16,46 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-dom',
-  'jquery',
-  'jsx/help_dialog/TeacherFeedbackForm',
-  'jquery.ajaxJSON'
-], (React, ReactDOM, jQuery, TeacherFeedbackForm) => {
+import React from 'react'
 
-  const container = document.getElementById('fixtures')
-  let server
+import ReactDOM from 'react-dom'
+import jQuery from 'jquery'
+import TeacherFeedbackForm from 'jsx/help_dialog/TeacherFeedbackForm'
+import 'jquery.ajaxJSON'
 
-  QUnit.module('<TeacherFeedbackForm/>', {
-    setup () {
-      server = sinon.fakeServer.create()
+const container = document.getElementById('fixtures')
+let server
 
-      // This is a POST rather than a PUT because of the way our $.getJSON converts
-      // non-GET requests to posts anyways.
-      server.respondWith('GET', /api\/v1\/courses.json/,
-        [200, { "Content-Type": "application/json" }, JSON.stringify([])]
-      );
+QUnit.module('<TeacherFeedbackForm/>', {
+  setup() {
+    server = sinon.fakeServer.create()
 
-      sandbox.stub(jQuery, 'ajaxJSON')
-    },
-    render (overrides={}) {
-      const props = {
-        ...overrides
-      }
+    // This is a POST rather than a PUT because of the way our $.getJSON converts
+    // non-GET requests to posts anyways.
+    server.respondWith('GET', /api\/v1\/courses.json/, [
+      200,
+      {'Content-Type': 'application/json'},
+      JSON.stringify([])
+    ])
 
-      return ReactDOM.render(<TeacherFeedbackForm {...props} />, container)
-    },
-    teardown() {
-      ReactDOM.unmountComponentAtNode(container)
-      server.restore()
+    sandbox.stub(jQuery, 'ajaxJSON')
+  },
+  render(overrides = {}) {
+    const props = {
+      ...overrides
     }
-  })
 
-  test('render()', function () {
-    const subject = this.render()
-    ok(ReactDOM.findDOMNode(subject))
+    return ReactDOM.render(<TeacherFeedbackForm {...props} />, container)
+  },
+  teardown() {
+    ReactDOM.unmountComponentAtNode(container)
+    server.restore()
+  }
+})
 
-    server.respond()
-  })
+test('render()', function() {
+  const subject = this.render()
+  ok(ReactDOM.findDOMNode(subject))
+
+  server.respond()
 })
