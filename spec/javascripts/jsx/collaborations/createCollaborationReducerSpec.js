@@ -16,58 +16,56 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jsx/collaborations/reducers/createCollaborationReducer',
-  'jsx/collaborations/actions/collaborationsActions'
-], (reducer, actions) => {
-  QUnit.module('createCollaborationReducer');
+import reducer from 'jsx/collaborations/reducers/createCollaborationReducer'
+import actions from 'jsx/collaborations/actions/collaborationsActions'
 
-  const defaults = reducer(undefined, {})
+QUnit.module('createCollaborationReducer')
 
-  test('there are defaults', () => {
-    equal(defaults.createCollaborationPending, false);
-    equal(defaults.createCollaborationSuccessful, false);
-    equal(defaults.createCollaborationError, null);
-  });
+const defaults = reducer(undefined, {})
 
-  test('responds to createCollaborationStart', () => {
-    let state = {
-      createCollaborationPending: false,
-      createCollaborationSuccessful: true,
-      createCollaborationError: {}
-    };
+test('there are defaults', () => {
+  equal(defaults.createCollaborationPending, false)
+  equal(defaults.createCollaborationSuccessful, false)
+  equal(defaults.createCollaborationError, null)
+})
 
-    let action = actions.createCollaborationStart();
-    let newState = reducer(state, action);
-    equal(newState.createCollaborationPending, true);
-    equal(newState.createCollaborationSuccessful, false);
-    equal(newState.createCollaborationError, null);
-  });
+test('responds to createCollaborationStart', () => {
+  const state = {
+    createCollaborationPending: false,
+    createCollaborationSuccessful: true,
+    createCollaborationError: {}
+  }
 
-  test('responds to createCollaborationSuccessful', () => {
-    let state = {
-      createCollaborationPending: true,
-      createCollaborationSuccessful: false,
-      collaborations: []
-    };
-    let collaborations = [{}];
+  const action = actions.createCollaborationStart()
+  const newState = reducer(state, action)
+  equal(newState.createCollaborationPending, true)
+  equal(newState.createCollaborationSuccessful, false)
+  equal(newState.createCollaborationError, null)
+})
 
-    let action = actions.createCollaborationSuccessful(collaborations);
-    let newState = reducer(state, action);
-    equal(newState.createCollaborationPending, false);
-    equal(newState.createCollaborationSuccessful, true);
-  });
+test('responds to createCollaborationSuccessful', () => {
+  const state = {
+    createCollaborationPending: true,
+    createCollaborationSuccessful: false,
+    collaborations: []
+  }
+  const collaborations = [{}]
 
-  test('responds to createCollaborationFailed', () => {
-    let state = {
-      createCollaborationPending: true,
-      createCollaborationError: null
-    };
-    let error = {};
+  const action = actions.createCollaborationSuccessful(collaborations)
+  const newState = reducer(state, action)
+  equal(newState.createCollaborationPending, false)
+  equal(newState.createCollaborationSuccessful, true)
+})
 
-    let action = actions.createCollaborationFailed(error);
-    let newState = reducer(state, action);
-    equal(newState.createCollaborationPending, false);
-    equal(newState.createCollaborationError, error);
-  });
-});
+test('responds to createCollaborationFailed', () => {
+  const state = {
+    createCollaborationPending: true,
+    createCollaborationError: null
+  }
+  const error = {}
+
+  const action = actions.createCollaborationFailed(error)
+  const newState = reducer(state, action)
+  equal(newState.createCollaborationPending, false)
+  equal(newState.createCollaborationError, error)
+})

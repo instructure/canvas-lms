@@ -16,34 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-dom',
-  'jsx/authentication_providers/AuthTypePicker',
-  'enzyme'
-], (React, ReactDOM, AuthTypePicker, enzyme) => {
-  const authTypes = [
-    {name: 'TypeOne', value: '1'},
-    {name: 'TypeTwo', value: '2'}
-  ];
-  const { mount } = enzyme;
+import React from 'react'
+import AuthTypePicker from 'jsx/authentication_providers/AuthTypePicker'
+import {mount} from 'enzyme'
 
-  QUnit.module('AuthTypePicker');
+const authTypes = [{name: 'TypeOne', value: '1'}, {name: 'TypeTwo', value: '2'}]
 
-  test('rendered structure', () => {
-    const wrapper = mount(<AuthTypePicker authTypes={authTypes} />)
-    equal(wrapper.find('option').length, 2)
-  });
+QUnit.module('AuthTypePicker')
 
-  test('choosing an auth type fires the provided callback', () => {
-    const spy = sinon.spy();
-    const wrapper = mount(
-      <AuthTypePicker
-        authTypes={authTypes}
-        onChange={spy}
-      />
-    );
-    wrapper.find('select').simulate('change');
-    ok(spy.called)
-  });
-});
+test('rendered structure', () => {
+  const wrapper = mount(<AuthTypePicker authTypes={authTypes} />)
+  equal(wrapper.find('option').length, 2)
+})
+
+test('choosing an auth type fires the provided callback', () => {
+  const spy = sinon.spy()
+  const wrapper = mount(<AuthTypePicker authTypes={authTypes} onChange={spy} />)
+  wrapper.find('select').simulate('change')
+  ok(spy.called)
+})
