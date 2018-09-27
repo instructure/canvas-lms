@@ -22,6 +22,13 @@ class TokenScopes
     verb: "GET",
     scope: "#{OAUTH2_SCOPE_NAMESPACE}userinfo"
   }.freeze
+  LTI_SCOPES = {
+    manageLineItems: "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
+    readLineItems: "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly",
+    readLineItemResults: "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly",
+    updateLineItemScores: "https://purl.imsglobal.org/spec/lti-ags/scope/score",
+    queryContextEnrollment: "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly"
+  }.freeze
 
   def self.named_scopes
     return @_named_scopes if @_named_scopes
