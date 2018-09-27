@@ -385,10 +385,8 @@ input[type=file] {
 ///////==============
 
 // gets rid of ugly border
-iframe {
+iframe#tool_content {
   border: none;
-  min-height: calc(100vh - 150px); // This is for when the iframeResizer isn't supported
-  width: 100%;
 }
 
 // "ui.dialog you are so dumb. you are really dumb, for real"
