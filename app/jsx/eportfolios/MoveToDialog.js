@@ -18,15 +18,9 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import $ from 'jquery'
 import I18n from 'i18n!eportfolio'
-import Modal, {
-  ModalHeader,
-  ModalBody,
-  ModalFooter
-} from '@instructure/ui-overlays/lib/components/Modal'
+import Modal, {ModalBody, ModalFooter} from '../shared/components/InstuiModal'
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
 import Select from '@instructure/ui-core/lib/components/Select'
 
 class MoveToDialog extends React.Component {
@@ -95,24 +89,16 @@ class MoveToDialog extends React.Component {
   }
 
   render() {
-    const dialogLabel = I18n.t('Modal dialog: %{header} %{source}', {
-      header: this.props.header,
-      source: this.props.source.label
-    })
     return (
       <Modal
         ref="modal"
         open={this.state.isOpen}
         modalSize="small"
-        label={dialogLabel}
-        closeButtonLabel={I18n.t('Cancel')}
+        label={this.props.header}
         onOpen={this.handleReady}
         onDismiss={this.handleRequestClose}
         onClose={this.handleClose}
       >
-        <ModalHeader>
-          <Heading>{this.props.header}</Heading>
-        </ModalHeader>
         <ModalBody>{this.renderBody()}</ModalBody>
         <ModalFooter>
           <Button id="MoveToDialog__cancel" onClick={this.handleRequestClose}>
