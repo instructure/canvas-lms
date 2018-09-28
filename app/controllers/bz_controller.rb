@@ -38,6 +38,7 @@ class BzController < ApplicationController
 
     ul = UserList.new(email)
     ul.users.each do |u|
+      result["user_id"] = u.id
       u.enrollments.active.each do |e|
         result["course_ids"] << e.course_id
       end
