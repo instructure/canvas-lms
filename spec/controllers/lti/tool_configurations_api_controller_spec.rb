@@ -21,6 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
   subject { response }
   let_once(:account) { Account.default }
+  let_once(:sub_account) { account_model(root_account: account) }
   let_once(:admin) { account_admin_user(account: account) }
   let_once(:student) do
     student_in_course
@@ -44,6 +45,16 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       "kid" => "2018-09-18T21:55:18Z",
       "alg" => "RS256",
       "use" => "sig"
+    }
+  end
+  let(:dev_key_params) do
+    {
+      name: "Test Dev Key",
+      email: "test@test.com",
+      notes: "Some cool notes",
+      test_cluster_only: true,
+      scopes: ['https://purl.imsglobal.org/spec/lti-ags/scope/lineitem'],
+      require_scopes: true
     }
   end
   let(:settings) do
@@ -83,6 +94,8 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
   let(:dev_key_id) { developer_key.id }
   let(:valid_parameters) do
     {
+      developer_key: dev_key_params,
+      account_id: sub_account.id,
       developer_key_id: dev_key_id,
       tool_configuration: {
         settings: settings
@@ -92,6 +105,8 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
   let(:invalid_parameters) do
     {
       developer_key_id: dev_key_id,
+      account_id: sub_account.id,
+      developer_key: dev_key_params,
       tool_configuration: {
         settings: invalid_settings
       }
@@ -137,7 +152,14 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       )
     end
     let(:url) { 'https://www.mytool.com/config/json' }
-    let(:valid_parameters) { {developer_key_id: developer_key.id, tool_configuration: {settings_url: url}} }
+    let(:valid_parameters) do
+      {
+        developer_key: dev_key_params,
+        account_id: sub_account.id,
+        developer_key_id: developer_key.id,
+        tool_configuration: {settings_url: url}
+      }
+    end
     let(:make_request) { raise 'Override in spec' }
 
     context 'when the request does not time out' do
@@ -217,13 +239,60 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
     end
   end
 
+  shared_examples_for 'an endpoint that accepts developer key parameters' do
+    subject do
+      make_request
+      DeveloperKey.find(json_parse.dig('tool_configuration', 'developer_key_id'))
+    end
+
+    let(:make_request) { raise 'set in example' }
+    let(:bad_scope_request) { raise 'set in example' }
+
+    it 'sets the developer key name' do
+      expect(subject.name).to eq dev_key_params[:name]
+    end
+
+    it 'sets the developer key email' do
+      expect(subject.email).to eq dev_key_params[:email]
+    end
+
+    it 'sets the developer key notes' do
+      expect(subject.notes).to eq dev_key_params[:notes]
+    end
+
+    it 'sets the developer key test_cluster_only' do
+      expect(subject.test_cluster_only).to eq dev_key_params[:test_cluster_only]
+    end
+
+    it 'sets the developer key scopes' do
+      expect(subject.scopes).to eq dev_key_params[:scopes]
+    end
+
+    it 'sets the developer key require_scopes' do
+      expect(subject.require_scopes).to eq dev_key_params[:require_scopes]
+    end
+
+    context 'when scopes are invalid' do
+      subject do
+        bad_scope_request
+        json_parse['errors'].first['message']
+      end
+
+      before do
+        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(true)
+      end
+
+      it { is_expected.to eq 'cannot contain invalid scope' }
+    end
+  end
+
   shared_examples_for 'an endpoint that validates public_jwk' do
+    let(:make_request) { raise 'set in examples' }
+
     subject do
       make_request
       json_parse['errors'].first['message']
     end
-
-    let(:make_request) { raise 'set in examples' }
 
     context 'when the public jwk is missing' do
       let(:invalid_public_jwk) { nil }
@@ -284,6 +353,12 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       let(:dev_key_id) { developer_key.id }
 
       it { is_expected.to be_ok }
+
+      it 'creates a developer key on the correct account' do
+        subject
+        key = DeveloperKey.find(json_parse.dig('tool_configuration', 'developer_key_id'))
+        expect(key.account).to eq sub_account
+      end
     end
 
     it_behaves_like 'an endpoint that accepts a settings_url' do
@@ -292,6 +367,12 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
 
     it_behaves_like 'an endpoint that validates public_jwk' do
       let(:make_request) { post :create, params: invalid_parameters }
+    end
+
+    it_behaves_like 'an endpoint that accepts developer key parameters' do
+      let(:bad_scope_params) {{ account_id: sub_account.id, developer_key: dev_key_params.merge(scopes: ['invalid scope']) }}
+      let(:make_request) { post :create, params: valid_parameters.merge({developer_key: dev_key_params}) }
+      let(:bad_scope_request) { post :create, params: valid_parameters.merge(bad_scope_params) }
     end
   end
 
@@ -323,6 +404,12 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
     end
 
     it_behaves_like 'an action that requires manage developer keys'
+
+    it_behaves_like 'an endpoint that accepts developer key parameters' do
+      let(:bad_scope_params) {{ developer_key: dev_key_params.merge(scopes: ['invalid scope']) }}
+      let(:make_request) { put :update, params: valid_parameters.merge({developer_key: dev_key_params}) }
+      let(:bad_scope_request) { put :update, params: valid_parameters.merge(bad_scope_params) }
+    end
   end
 
   describe 'show' do

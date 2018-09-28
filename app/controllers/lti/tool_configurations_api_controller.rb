@@ -57,8 +57,12 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   # @argument settings_url [String]
   #   URL of settings JSON
   #
-  # @argument developer_key_id [String]
-  #
+  # @argument developer_key [Object]
+  #   JSON representation of the developer key fields
+  #   to use when creating the developer key for the
+  #   tool configuraiton. Valid fields are: "name",
+  #   "email", "notes", "test_cluster_only", "scopes",
+  #   "require_scopes".
   #
   # @returns ToolConfiguration
   def create
@@ -67,7 +71,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
       settings: tool_configuration_params[:settings],
       settings_url: tool_configuration_params[:settings_url]
     )
-    update_public_jwk!(tool_config)
+    update_developer_key!(tool_config)
     render json: tool_config
   end
 
@@ -89,6 +93,12 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #
   # @argument developer_key_id [String]
   #
+  # @argument developer_key [Object]
+  #   JSON representation of the developer key fields
+  #   to use when updating the developer key for the
+  #   tool configuraiton. Valid fields are: "name",
+  #   "email", "notes", "test_cluster_only", "scopes",
+  #   "require_scopes".
   #
   # @returns ToolConfiguration
   def update
@@ -97,7 +107,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
       settings: tool_configuration_params[:settings],
       settings_url: tool_configuration_params[:settings_url]
     )
-    update_public_jwk!(tool_config)
+    update_developer_key!(tool_config)
 
     render json: tool_config
   end
@@ -119,8 +129,10 @@ class Lti::ToolConfigurationsApiController < ApplicationController
 
   private
 
-  def update_public_jwk!(tool_config)
-    tool_config.developer_key.update!(public_jwk: tool_config.settings['public_jwk'])
+  def update_developer_key!(tool_config)
+    developer_key = tool_config.developer_key
+    developer_key.public_jwk = tool_config.settings['public_jwk']
+    developer_key.update!(developer_key_params)
   end
 
   def require_tool_configuration
@@ -129,7 +141,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   end
 
   def account
-    return @domain_root_account if params[:action] == 'create'
+    return Account.find(params[:account_id]) if params[:action] == 'create'
     developer_key.owner_account
   end
 
@@ -145,5 +157,10 @@ class Lti::ToolConfigurationsApiController < ApplicationController
     params.require(:tool_configuration).permit(:settings_url).merge(
       { settings: params.require(:tool_configuration)[:settings]&.to_unsafe_h }
     )
+  end
+
+  def developer_key_params
+    return {} unless params.key? :developer_key
+    params.require(:developer_key).permit(:name, :email, :notes, :test_cluster_only, :require_scopes, scopes: [])
   end
 end
