@@ -344,13 +344,24 @@
 <script type="text/javascript" src="https://cdn.flipswitch.com/cdn/lib/iFrame-Resizer/javascript/iframeResizer.min.latest.js"></script>
 <script type="text/javascript">
 
-var isOldIE = (navigator.userAgent.indexOf("MSIE") !== -1); // Detect IE10 and below
+    const isOldIE = (navigator.userAgent.indexOf("MSIE") !== -1); // Detect IE10 and below
 
-iFrameResize({
-    checkOrigin: false,
-    heightCalculationMethod: isOldIE ? 'max' : 'lowestElement',
-    scrolling: 'auto'
-}, '.sm_iframe');
+    function onInit() {
+        var removeScrollbars = function(e) {
+            console.log(1, e.scrolling, "should be YES");
+            e.scrolling = "no";
+            console.log(1, e.scrolling, "should be NO");
+        };
+
+        return removeScrollbars;
+    }
+
+    iFrameResize({
+        checkOrigin: false,
+        heightCalculationMethod: isOldIE ? 'max' : 'lowestElement',
+        initCallback: onInit(), // Only runs if "parent" iFrameResizer detects a "child"...
+        scrolling: true // Enable scrollbars for non-iframeResizer content...
+    }, '.sm_iframe');
 
 </script>
 <% if ENV['JIRA_COLLECTOR'] %>
