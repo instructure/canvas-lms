@@ -46,11 +46,30 @@ module Lti
           hash
         when ToolProxy
           tool_proxy_definition(o)
+        when Hash
+          tool_config_definition(o)
         end
       end
     end
 
     private
+
+    def tool_config_definition(tool_configuration)
+      config = tool_configuration[:config]
+      {
+        app_type: config.class.name,
+        app_id: config.id,
+        name: config[:settings][:name],
+        description:config[:settings][:description],
+        installed_locally: tool_configuration[:enabled],
+        enabled: tool_configuration[:enabled],
+        tool_configuration: nil,
+        context: 'Account',
+        context_id: config.developer_key.account_id,
+        reregistration_url: nil,
+        has_update: nil
+      }
+    end
 
     def external_tool_definition(external_tool)
       {
