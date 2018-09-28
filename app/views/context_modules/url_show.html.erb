@@ -45,7 +45,7 @@
     <% end %>
 
 <!-- Content iFrame -->
-      <%= iframe(@tag.url, :id => 'file_content', :class => 'sm_iframe') %>
+      <%= iframe(@tag.url, :id => 'file_content') %>
   <% end %>
 
 <%= render :partial => 'shared/sequence_footer', :locals => {:asset => @tag} %>
