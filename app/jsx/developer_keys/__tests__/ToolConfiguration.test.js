@@ -35,6 +35,17 @@ function newProps(customizing = false) {
 
 let wrapper = 'empty wrapper'
 
+beforeAll(() => {
+  window.ENV = window.ENV || {}
+  window.ENV.validLtiScopes = {}
+  window.ENV.validLtiPlacements = []
+})
+
+afterAll(() => {
+  window.ENV.validLtiScopes = undefined
+  window.ENV.validLtiPlacements = undefined
+})
+
 afterEach(() => {
   wrapper.unmount()
 })

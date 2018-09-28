@@ -27,19 +27,20 @@ import CustomizationTable from './CustomizationTable'
 export default class CustomizationForm extends React.Component {
   propTypes = {
     toolConfiguration: PropTypes.object.isRequired,
-    validScopes: PropTypes.arrayOf(PropTypes.string).isRequired,
+    validScopes: PropTypes.object.isRequired,
     validPlacements: PropTypes.arrayOf(PropTypes.string).isRequired
   }
 
   get scopes() {
     const {toolConfiguration, validScopes} = this.props
+    const validScopeNames = Object.keys(validScopes)
 
     if (!toolConfiguration.scopes) {
       return []
     }
 
     // Intersection of requested scopes and valid scopes
-    return toolConfiguration.scopes.filter(scope => validScopes.includes(scope))
+    return toolConfiguration.scopes.filter(scope => validScopeNames.includes(scope)).map(s => validScopes[s])
   }
 
   get placements() {

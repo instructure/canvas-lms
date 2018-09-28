@@ -49,10 +49,10 @@ function newProps() {
         }
       ]
     },
-    validScopes: [
-      'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem',
-      'https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly'
-    ],
+    validScopes: {
+      'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem': 'Line Item',
+      'https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly': 'Result'
+    },
     validPlacements: ['file_menu']
   }
 }
@@ -77,10 +77,10 @@ it('renders an option for each valid scope', () => {
   wrapper = mount(<CustomizationForm {...newProps()} />)
   const options = renderedOptions()
   expect(options).toContain(
-    'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem'
+    'Line Item'
   )
   expect(options).toContain(
-    'https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly'
+    'Result'
   )
 })
 

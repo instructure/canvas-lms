@@ -296,6 +296,10 @@ test('allows saving if the key previously had scopes', () => {
 })
 
 test('renders the LTI footer if "ltiKey" is true', () => {
+  window.ENV = window.ENV || {}
+  window.ENV.validLtiScopes = {}
+  window.ENV.validLtiPlacements = []
+
   const createLtiKeyStateOn = {
     isLtiKey: true,
     customizing: true,
@@ -320,6 +324,8 @@ test('renders the LTI footer if "ltiKey" is true', () => {
 
   ok(wrapper.instance().modalFooter().props.customizing)
   wrapper.unmount()
+  window.ENV.validLtiScopes = undefined
+  window.ENV.validLtiPlacements = undefined
 })
 
 test('renders the non LTI footer if "ltiKey" is false', () => {

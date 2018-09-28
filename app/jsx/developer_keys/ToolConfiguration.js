@@ -35,8 +35,8 @@ export default class ToolConfiguration extends React.Component {
     return (
       <CustomizationForm
         toolConfiguration={this.props.createLtiKeyState.toolConfiguration}
-        validScopes={this.props.createLtiKeyState.validScopes}
-        validPlacements={this.props.createLtiKeyState.validPlacements}
+        validScopes={ENV.validLtiScopes}
+        validPlacements={ENV.validLtiPlacements}
       />
     )
   }
@@ -60,8 +60,6 @@ ToolConfiguration.propTypes = {
   configurationUrl: PropTypes.string,
   createLtiKeyState: PropTypes.shape({
     customizing: PropTypes.bool.isRequired,
-    toolConfiguration: PropTypes.object.isRequired,
-    validScopes: PropTypes.arrayOf(PropTypes.string).isRequired,
-    validPlacements: PropTypes.arrayOf(PropTypes.string).isRequired
+    toolConfiguration: PropTypes.object.isRequired
   }).isRequired
 }

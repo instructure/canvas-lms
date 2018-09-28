@@ -33,7 +33,8 @@ class DeveloperKeysController < ApplicationController
           accountEndpoint: api_v1_account_developer_keys_path(@context),
           enableTestClusterChecks: DeveloperKey.test_cluster_checks_enabled?,
           LTI_1_3_ENABLED: @context.root_account.feature_enabled?(:lti_1_3),
-          validLtiScopes: TokenScopes::LTI_SCOPES
+          validLtiScopes: TokenScopes::LTI_SCOPES,
+          validLtiPlacements: Lti::ResourcePlacement::PLACEMENTS
         )
 
         if use_new_dev_key_features?

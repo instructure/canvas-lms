@@ -34,8 +34,6 @@ it('sets the defaults', () => {
   expect(defaults.isLtiKey).toEqual(false)
   expect(defaults.customizing).toEqual(false)
   expect(defaults.toolConfiguration).toEqual({})
-  expect(defaults.validScopes).toEqual([])
-  expect(defaults.validPlacements).toEqual([])
 })
 
 it('handles "LTI_KEYS_SET_LTI_KEY"', () => {
