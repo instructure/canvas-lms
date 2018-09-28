@@ -54,7 +54,7 @@ describe "new account user search" do
     end
 
     it "should bring up user page when clicking name", priority: "1", test_id: 3399648 do
-      click_user_link(@user.name)
+      click_user_link(@user.sortable_name)
       expect(f("#content h2")).to include_text @user.name
     end
 
@@ -125,23 +125,25 @@ describe "new account user search" do
     end
 
     it "should paginate" do
+      @user.update_attribute(:sortable_name, "Admin")
       ('A'..'Z').each do |letter|
-        user_with_pseudonym(:account => @account, :name => "Test User #{letter}")
+        user_with_pseudonym(:account => @account, :name => "Test User#{letter}")
       end
       visit_users(@account)
 
       expect(get_rows.count).to eq 15
-      expect(get_rows.first).to include_text("Test User A")
-      expect(all_results_users).to_not include_text("Test User O")
+      expect(get_rows.first).to include_text("Admin")
+      expect(get_rows[1]).to include_text("UserA, Test")
+      expect(all_results_users).to_not include_text("UserO, Test")
       expect(results_body).not_to contain_jqcss(page_previous_jqcss)
 
       click_page_number_button("2")
       wait_for_ajaximations
 
       expect(get_rows.count).to eq 12
-      expect(get_rows.first).to include_text("Test User O")
-      expect(get_rows.last).to include_text("Test User Z")
-      expect(all_results_users).not_to include_text("Test User A")
+      expect(get_rows.first).to include_text("UserO, Test")
+      expect(get_rows.last).to include_text("UserZ, Test")
+      expect(all_results_users).not_to include_text("UserA, Test")
     end
 
     it "should be able to toggle between 'People' and 'Courses' tabs" do
@@ -158,7 +160,7 @@ describe "new account user search" do
         expect(driver.current_url).to include("/accounts/#{@account.id}/users")
         expect(breadcrumbs).to include_text("People")
         expect(breadcrumbs).not_to include_text("Courses")
-        expect(all_results_users).to include_text("Test User")
+        expect(all_results_users).to include_text("User, Test")
 
         click_left_nav_courses
       end
@@ -183,7 +185,7 @@ describe "new account user search" do
       expect(new_pseudonym.user.name).to eq name
 
       # should refresh the users list
-      expect(all_results_users).to include_text(name)
+      expect(all_results_users).to include_text(new_pseudonym.user.sortable_name)
       expect(get_rows.count).to eq 2 # the first user is the admin
       expect(user_row(name)).to include_text(email)
 
