@@ -65,6 +65,9 @@
   "close_opportunity_center_popup_9907d981": {
     "message": "Lukk popup-menyen med val"
   },
+  "count_plural_0_opportunities_one_opportunity_other_bb1698f6": {
+    "message": "{ count, plural,\n     =0 {# opportunities}\n    one {# opportunity}\n  other {# opportunities}\n}. Klikk for å opne popup-meny med val. "
+  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Vis # fullført element}\n  other {Vis # fullførte elementer}\n}"
   },
