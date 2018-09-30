@@ -1989,6 +1989,18 @@ el:
       submission_url: "Υποβολή:"
       titles: 
         media_recordings_disabled: "Εγγραφές πολυμέσων δεν έχουν ενεργοποιηθεί για αυτή την ιστοσελίδα Canvas"
+    submit_online_text_entry: 
+      additional_comments: "Πρόσθετα σχόλια"
+      buttons: 
+        submit_assignment: "Υποβάλετε την εργασία"
+      comments_placeholder: Σχόλια...
+    submit_online_upload: 
+      additional_comments: "Πρόσθετα σχόλια"
+      buttons: 
+        submit_assignment: "Υποβάλετε την εργασία"
+      comments_placeholder: Σχόλια...
+      labels: 
+        uploaded_data: Αρχείο
     syllabus: 
       page_title: "Αναλυτικό Πρόγραμμα για το μάθημα %{course}"
     syllabus_content: 
@@ -13805,8 +13817,10 @@ el:
       <mrk mid="4705" mtype="seg">Θα πρέπει να [καταχωρίσετε μια εφαρμογή στο Twitter](%{twitter_url}).</mrk>
       <mrk mid="4706" mtype="seg">Θα πρέπει να θέσετε το %{callback_url} ως το URL επανάκλησης και να ορίσετε το Επίπεδο Πρόσβασης σε Ανάγνωση (Read), Επεξεργασία (Write) και Πρόσβαση σε άμεσα μηνύματα (Access direct messages)
       Μόλις δημιουργήσετε την εφαρμογή, σημειώστε το Κλειδί Καταναλωτή και το Μυστικό Καταναλωτή και εισαγάγετέ τα εδώ.</mrk>
+  you_will_not_be_able_to_preview_your_changes_f7b868fb: "Δεν θα μπορείτε να κάνετε προεπισκόπηση των αλλαγών σας"
   your_answer_8dad6ea4: "Η Απάντησή σας:"
   your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "Ο browser σας δεν πληροί τις ελάχιστες απαιτήσεις για το Canvas. Παρακαλούμε επισκευθείτε την *Κοινότητα Canvas* για μια λίστα με όλους τους υποστηριζόμενους browsers."
+  your_comment_was_auto_saved_as_a_draft_c49d3510: "Το σχόλιο σας αποθηκεύτηκε αυτόματα σαν προσχέδιο"
   your_content_has_been_exported_bbb57764: "Το περιεχόμενο σας έχει εξαχθεί."
   your_course_db806851: "Το Μάθημά σας"
   your_custom_theme_has_been_successfully_applied_eaa0fc82: "To προσαρμοσμένο θέμα σας έχει εφαρμοστεί επιτυχώς."
