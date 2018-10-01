@@ -354,7 +354,11 @@ module PlannerPageObject
   end
 
   def wait_for_spinner
-    fj("title:contains('Loading')", planner_app_div) # the loading spinner appears
+    begin
+      fj("title:contains('Loading')", planner_app_div) # the loading spinner appears
+    rescue Selenium::WebDriver::Error::NoSuchElementError
+      # ignore - sometimes spinner is too quick
+    end
     expect(planner_app_div).not_to contain_jqcss("title:contains('Loading')")
   end
 
