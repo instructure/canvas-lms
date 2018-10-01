@@ -243,7 +243,7 @@ RSpec.describe ApplicationController do
 
     before :each do
       # safe_domain_file_url wants to use request.protocol
-      allow(controller).to receive(:request).and_return(double(:protocol => '', :host_with_port => ''))
+      allow(controller).to receive(:request).and_return(double("request", :protocol => '', :host_with_port => ''))
 
       @common_params = { :only_path => true }
     end
@@ -277,6 +277,15 @@ RSpec.describe ApplicationController do
         with(@attachment, @common_params.merge(:download_frd => 1)).
         and_return('')
       controller.send(:safe_domain_file_url, @attachment, nil, nil, true)
+    end
+
+    it "prepends a unique file subdomain if configured" do
+      override_dynamic_settings(private: { canvas: { attachment_specific_file_domain: true } }) do
+        expect(controller).to receive(:file_download_url).
+          with(@attachment, @common_params.merge(:inline => 1)).
+          and_return("/files/#{@attachment.id}")
+        expect(controller.send(:safe_domain_file_url, @attachment, ['canvasfiles.com', Shard.default], nil, false)).to eq "a#{@attachment.shard.id}-#{@attachment.id}.canvasfiles.com/files/#{@attachment.id}"
+      end
     end
   end
 
