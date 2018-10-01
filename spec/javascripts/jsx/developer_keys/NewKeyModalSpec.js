@@ -340,3 +340,29 @@ test('renders the non LTI footer if "ltiKey" is false', () => {
   notOk(wrapper.instance().modalFooter().props.customizing)
   wrapper.unmount()
 })
+
+test('clears the lti key state when modal is closed', () => {
+  const ltiStub = sinon.spy()
+  const actions = Object.assign(fakeActions, {
+    developerKeysModalClose: () => {},
+    ltiKeysSetCustomizing: () => {},
+    ltiKeysSetLtiKey: ltiStub
+  })
+
+  const wrapper = mount(
+    <DeveloperKeyModal
+      createLtiKeyState={createLtiKeyState}
+      availableScopes={{}}
+      availableScopesPending={false}
+      closeModal={() => {}}
+      createOrEditDeveloperKeyState={createDeveloperKeyState}
+      actions={actions}
+      store={{dispatch: () => {}}}
+      mountNode={modalMountNode}
+      selectedScopes={selectedScopes}
+    />
+  )
+  wrapper.instance().closeModal()
+  ok(ltiStub.called)
+  wrapper.unmount()
+})

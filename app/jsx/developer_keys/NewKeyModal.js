@@ -156,9 +156,9 @@ export default class DeveloperKeyModal extends React.Component {
 
   closeModal = () => {
     const { actions, store } = this.props
-
     store.dispatch(actions.developerKeysModalClose())
     store.dispatch(actions.ltiKeysSetCustomizing(false))
+    store.dispatch(actions.ltiKeysSetLtiKey(false))
     store.dispatch(actions.editDeveloperKey())
   }
 
