@@ -450,16 +450,6 @@ END
       root_opt_in: true,
       beta: true
     },
-    'dashcard_reordering' =>
-    {
-      display_name: -> { I18n.t('Allow Reorder Dashboard Cards') },
-      description: -> { I18n.t('Allow dashboard cards to be reordered for each user.') },
-      applies_to: 'RootAccount',
-      state: 'hidden',
-      beta: true,
-      development: true,
-      root_opt_in: false
-    },
     'responsive_layout' =>
     {
       display_name: -> { I18n.t('Responsive Layout') },

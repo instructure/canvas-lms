@@ -74,10 +74,9 @@ describe DashboardHelper do
   end
 
   describe "map_courses_for_menu" do
-    context "with Dashcard Reordering feature enabled" do
+    context "Dashcard Reordering" do
       before(:each) do
         @account = Account.default
-        @account.enable_feature! :dashcard_reordering
         @domain_root_account = @account
       end
 

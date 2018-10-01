@@ -19,7 +19,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import DashboardCardBox from 'jsx/dashboard_card/DashboardCardBox'
+import ReactDndTestBackend from 'react-dnd-test-backend'
+import getDroppableDashboardCardBox from 'jsx/dashboard_card/getDroppableDashboardCardBox'
 import CourseActivitySummaryStore from 'jsx/dashboard_card/CourseActivitySummaryStore'
 
 QUnit.module('DashboardCardBox', {
@@ -45,7 +46,8 @@ QUnit.module('DashboardCardBox', {
 })
 
 test('should render div.ic-DashboardCard per provided courseCard', function() {
-  const CardBox = <DashboardCardBox courseCards={this.courseCards} />
+  const Box = getDroppableDashboardCardBox(ReactDndTestBackend)
+  const CardBox = <Box connectDropTarget={el => el} courseCards={this.courseCards} />
   this.component = TestUtils.renderIntoDocument(CardBox)
   const $html = $(ReactDOM.findDOMNode(this.component))
   equal($html.children('div.ic-DashboardCard').length, this.courseCards.length)

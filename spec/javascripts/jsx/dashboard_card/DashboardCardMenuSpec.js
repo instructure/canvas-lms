@@ -35,7 +35,6 @@ const defaultProps = () => ({
 })
 
 const defaultMovementMenuProps = () => ({
-  reorderingEnabled: true,
   menuOptions: {
     canMoveLeft: false,
     canMoveRight: true,
@@ -49,31 +48,7 @@ const getTabWithText = (text) => {
   return tabs.filter(tab => tab.textContent.trim() === text)[0]
 }
 
-QUnit.module('DashboardCardMenu - reordering disabled', {
-  setup () {
-    this.wrapper = mount(<DashboardCardMenu {...defaultProps()} />)
-  },
-
-  teardown () {
-    this.wrapper.unmount()
-  }
-})
-
-test('it should render with only a color picker if reordering is not enabled', function (assert) {
-  const done = assert.async()
-
-  const handleShow = () => {
-    ok(this.wrapper.instance()._colorPicker)
-    notOk(this.wrapper.instance()._tabList)
-    done()
-  }
-
-  this.wrapper.setProps({ handleShow }, () => {
-    this.wrapper.find('button').simulate('click')
-  })
-})
-
-QUnit.module('DashboardCardMenu - reordering enabled', {
+QUnit.module('DashboardCardMenu - reordering', {
   setup () {
     this.wrapper = mount(<DashboardCardMenu {...defaultProps()} {...defaultMovementMenuProps()} />)
   },
@@ -83,7 +58,7 @@ QUnit.module('DashboardCardMenu - reordering enabled', {
   }
 })
 
-test('it should render a tabList with colorpicker and movement menu with reordering enabled', function (assert) {
+test('it should render a tabList with colorpicker and movement menu', function (assert) {
   const done = assert.async()
 
   const handleShow = () => {
