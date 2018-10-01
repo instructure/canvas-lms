@@ -860,12 +860,10 @@ class ApplicationController < ActionController::Base
       case state
       when :invited
         if @context_enrollment.available_at
-          flash[:html_notice] = mt "#application.notices.need_to_accept_future_enrollment",
-            "You'll need to accept the enrollment invitation before you can fully participate in this course, starting on %{date}.",
+          flash[:html_notice] = mt "You'll need to accept the enrollment invitation before you can fully participate in this course, starting on %{date}.",
             :date => datetime_string(@context_enrollment.available_at)
         else
-          flash[:html_notice] = mt "#application.notices.need_to_accept_enrollment",
-            "You'll need to accept the enrollment invitation before you can fully participate in this course."
+          flash[:html_notice] = mt "You'll need to accept the enrollment invitation before you can fully participate in this course."
         end
       when :accepted
         flash[:html_notice] = t("This course hasn’t started yet. You will not be able to participate in this course until %{date}.", :date => datetime_string(@context_enrollment.available_at))
