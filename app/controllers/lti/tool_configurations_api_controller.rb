@@ -67,12 +67,18 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #   "email", "notes", "test_cluster_only", "scopes",
   #   "require_scopes".
   #
+  # @argument disabled_placements [Array]
+  #   An array of strings indicating which Canvas
+  #   placements should be excluded from the
+  #   tool configuration.
+  #
   # @returns ToolConfiguration
   def create
     tool_config = Lti::ToolConfiguration.create!(
       developer_key: DeveloperKey.create!(account: account),
       settings: tool_configuration_params[:settings],
-      settings_url: tool_configuration_params[:settings_url]
+      settings_url: tool_configuration_params[:settings_url],
+      disabled_placements: tool_configuration_params[:disabled_placements]
     )
     update_developer_key!(tool_config)
     render json: tool_config
@@ -127,12 +133,18 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #   "email", "notes", "test_cluster_only", "scopes",
   #   "require_scopes".
   #
+  # @argument disabled_placements [Array]
+  #   An array of strings indicating which Canvas
+  #   placements should be excluded from the
+  #   tool configuration.
+  #
   # @returns ToolConfiguration
   def update
     tool_config = developer_key.tool_configuration
     tool_config.update!(
       settings: tool_configuration_params[:settings],
-      settings_url: tool_configuration_params[:settings_url]
+      settings_url: tool_configuration_params[:settings_url],
+      disabled_placements: tool_configuration_params[:disabled_placements]
     )
     update_developer_key!(tool_config)
 
@@ -189,7 +201,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   end
 
   def tool_configuration_params
-    params.require(:tool_configuration).permit(:settings_url).merge(
+    params.require(:tool_configuration).permit(:settings_url, disabled_placements: []).merge(
       { settings: params.require(:tool_configuration)[:settings]&.to_unsafe_h }
     )
   end

@@ -27,6 +27,7 @@ module Lti
     validates :developer_key_id, :settings, presence: true
     validates :developer_key_id, uniqueness: true
     validate :valid_tool_settings?, unless: Proc.new { |c| c.developer_key_id.blank? || c.settings.blank? }
+    validate :valid_placements
 
     attr_accessor :settings_url
 
@@ -55,6 +56,12 @@ module Lti
       end
     end
 
+    def valid_placements
+      return if disabled_placements.blank?
+      invalid = disabled_placements.reject { |p| Lti::ResourcePlacement::PLACEMENTS.include?(p.to_sym) }
+      errors.add(:disabled_placements, "Invalid placements: #{invalid.join(', ')}") if invalid.present?
+    end
+
     def importable_settings
       settings&.merge(canvas_extensions)&.merge(settings_map)
     end
@@ -65,7 +72,9 @@ module Lti
 
     def canvas_extensions
       return {} if settings.blank?
-      settings['extensions']&.find { |e| e['platform'] == CANVAS_EXTENSION_LABEL } || {}
+      extension = settings['extensions']&.find { |e| e['platform'] == CANVAS_EXTENSION_LABEL } || {}
+      extension['settings'].delete_if { |placement| disabled_placements&.include?(placement.to_s) }
+      extension
     end
 
     def store_settings_from_url

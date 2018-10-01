@@ -157,7 +157,10 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
         developer_key: dev_key_params,
         account_id: sub_account.id,
         developer_key_id: developer_key.id,
-        tool_configuration: {settings_url: url}
+        tool_configuration: {
+          settings_url: url,
+          disabled_placements: ['course_navigation', 'account_navigation']
+        }
       }
     end
     let(:make_request) { raise 'Override in spec' }
@@ -170,6 +173,13 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       it 'uses the tool configuration JSON from the settings_url' do
         subject
         expect(config_from_response.settings['launch_url']).to eq settings['launch_url']
+      end
+
+      it 'sets the "disabled_placements"' do
+        subject
+        expect(config_from_response.disabled_placements).to match_array(
+          valid_parameters.dig(:tool_configuration, :disabled_placements)
+        )
       end
     end
 

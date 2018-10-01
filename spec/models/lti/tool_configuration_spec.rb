@@ -57,6 +57,13 @@ module Lti
                 'url' =>
                 'http://lti13testtool.docker/launch?placement=course_navigation',
                 'enabled' => true
+              },
+              'account_navigation' =>  {
+                'message_type' => 'LtiResourceLinkRequest',
+                'canvas_icon_class' => 'icon-lti',
+                'icon_url' => 'https://static.thenounproject.com/png/131630-211.png',
+                'text' => 'LTI 1.3 Test Tool Course Navigation',
+                'enabled' => true
               }
             }
           }
@@ -70,7 +77,11 @@ module Lti
       subject { tool_configuration.save }
 
       context 'when valid' do
-        before { tool_configuration.developer_key = developer_key }
+        before do
+          tool_configuration.developer_key = developer_key
+          tool_configuration.disabled_placements = ['account_navigation']
+        end
+
         it { is_expected.to eq true }
       end
 
@@ -116,6 +127,12 @@ module Lti
 
           it { is_expected.to eq false }
         end
+      end
+
+      context 'when "disabled_placements" contains invalid placements' do
+        before { tool_configuration.disabled_placements = ['invalid_placement', 'account_navigation'] }
+
+        it { is_expected.to eq false }
       end
     end
 
@@ -218,6 +235,23 @@ module Lti
       before { tool_configuration.developer_key = developer_key }
 
       shared_examples_for 'a new context external tool' do
+        context 'when "disabled_placements" is set' do
+          before { tool_configuration.disabled_placements = ['course_navigation'] }
+
+          it 'does not set the disabled placements' do
+            expect(subject.settings.keys).not_to include 'course_navigation'
+          end
+
+          it 'does set placements that are not disabled' do
+            expect(subject.settings.keys).to include 'account_navigation'
+          end
+        end
+
+        it 'sets the correct placements' do
+          expect(subject.settings.keys).to include 'account_navigation'
+          expect(subject.settings.keys).to include 'course_navigation'
+        end
+
         it 'uses the correct launch url' do
           expect(subject.url).to eq settings['launch_url']
         end
