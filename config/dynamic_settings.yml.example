@@ -41,6 +41,10 @@ development:
 
   private:
     canvas:
+      # use a unique subdomain per attachment, so that browsers will enforce security
+      # permissions (such as microphone/camera access) per-file. You must have wildcard
+      # DNS set up for this to work.
+      attachment_specific_file_domain: true
       ha_cache.yml: |
         cache_store: ha_store
         servers:

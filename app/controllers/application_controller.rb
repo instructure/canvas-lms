@@ -1696,6 +1696,11 @@ class ApplicationController < ActionController::Base
       host_and_shard = HostUrl.file_host_with_shard(@domain_root_account || Account.default, request.host_with_port)
     end
     host, shard = host_and_shard
+    config = Canvas::DynamicSettings.find(tree: :private, cluster: attachment.shard.database_server.id)
+    if config['attachment_specific_file_domain'] == 'true'
+      separator = config['attachment_specific_file_domain_separator'] || '.'
+      host = "a#{attachment.shard.id}-#{attachment.local_id}#{separator}#{host}"
+    end
     res = "#{request.protocol}#{host}"
 
     shard.activate do
