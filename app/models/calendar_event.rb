@@ -248,11 +248,8 @@ class CalendarEvent < ActiveRecord::Base
     if self.all_day_changed? && self.all_day?
       self.start_at = zoned_start_at.beginning_of_day rescue nil
       self.end_at = zoned_end_at.beginning_of_day rescue nil
-
     elsif self.start_at_changed? || self.end_at_changed?
-      if self.start_at && self.start_at == self.end_at && zoned_start_at.strftime("%H:%M") == '00:00'
-        self.all_day = true
-      end
+      self.all_day = self.start_at && self.start_at == self.end_at && zoned_start_at.strftime("%H:%M") == '00:00'
     end
 
     if self.all_day && (!self.all_day_date || self.start_at_changed? || self.all_day_date_changed?)
