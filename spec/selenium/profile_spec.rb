@@ -32,8 +32,7 @@ describe "profile" do
     f('#unregistered_service_skype > a').click
     skype_dialog = f('#unregistered_service_skype_dialog')
     skype_dialog.find_element(:id, 'skype_user_service_user_name').send_keys("jakesorce")
-    submit_dialog(skype_dialog, '.btn')
-    wait_for_ajaximations
+    wait_for_new_page_load { submit_dialog(skype_dialog, '.btn') }
     expect(f('#registered_services')).to include_text("Skype")
   end
 
