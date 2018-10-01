@@ -894,6 +894,16 @@ define [
     ## Course Content Event Handlers
 
     handleAssignmentMutingChange: (assignment) =>
+      if assignment.anonymize_students
+        anonymousColumnIds = [
+          @getAssignmentColumnId(assignment.id),
+          @getAssignmentGroupColumnId(assignment.assignment_group_id),
+          'total_grade'
+        ]
+
+        if @getSortRowsBySetting().columnId in anonymousColumnIds
+          @setSortRowsBySetting('student', 'sortable_name', 'ascending')
+
       @gradebookGrid.gridSupport.columns.updateColumnHeaders([@getAssignmentColumnId(assignment.id)])
       @updateFilteredContentInfo()
       @resetGrading()

@@ -8720,10 +8720,13 @@ QUnit.module('Gradebook#setAssignmentGroupsLoaded', (hooks) => {
 })
 
 QUnit.module('Gradebook#handleAssignmentMutingChange', (hooks) => {
+  let columnId
   let gradebook
+  const sortByStudentNameSettings = { columnId: 'student', settingKey: 'sortable_name', direction: 'ascending' }
 
   hooks.beforeEach(() => {
     gradebook = createGradebook()
+    columnId = gradebook.getAssignmentColumnId('2301')
   })
 
   test('resets grading', () => {
@@ -8731,5 +8734,38 @@ QUnit.module('Gradebook#handleAssignmentMutingChange', (hooks) => {
     gradebook.handleAssignmentMutingChange({ id: '2301' })
     strictEqual(gradebook.resetGrading.callCount, 1)
     gradebook.resetGrading.restore()
+  })
+
+  test('when sorted by an anonymous assignment, gradebook changes sort', () => {
+    gradebook.setSortRowsBySetting(columnId, 'grade', 'ascending')
+    gradebook.handleAssignmentMutingChange({ id: '2301', anonymize_students: true })
+    deepEqual(gradebook.getSortRowsBySetting(), sortByStudentNameSettings)
+  })
+
+  test('when sorted by assignment group of an anonymous assignment, gradebook changes sort', () => {
+    const groupId = '7'
+    gradebook.setSortRowsBySetting(gradebook.getAssignmentGroupColumnId(groupId), 'grade', 'ascending')
+    gradebook.handleAssignmentMutingChange({ id: '2301', anonymize_students: true, assignment_group_id: groupId })
+    deepEqual(gradebook.getSortRowsBySetting(), sortByStudentNameSettings)
+  })
+
+  test('when sorted by total grade, gradebook changes sort', () => {
+    gradebook.setSortRowsBySetting('total_grade', 'grade', 'ascending')
+    gradebook.handleAssignmentMutingChange({ id: '2301', anonymize_students: true })
+    deepEqual(gradebook.getSortRowsBySetting(), sortByStudentNameSettings)
+  })
+
+  test('when assignment is not anonymous, gradebook does not change sort', () => {
+    gradebook.setSortRowsBySetting(columnId, 'grade', 'ascending')
+    const sortSettings = gradebook.getSortRowsBySetting()
+    gradebook.handleAssignmentMutingChange({ id: '2301', anonymize_students: false })
+    deepEqual(gradebook.getSortRowsBySetting(), sortSettings)
+  })
+
+  test('when gradebook is sorted by an unrelated column, gradebook does not change sort', () => {
+    gradebook.setSortRowsBySetting(gradebook.getAssignmentColumnId('2222'), 'grade', 'ascending')
+    const sortSettings = gradebook.getSortRowsBySetting()
+    gradebook.handleAssignmentMutingChange({ id: '2301', anonymize_students: true })
+    deepEqual(gradebook.getSortRowsBySetting(), sortSettings)
   })
 })

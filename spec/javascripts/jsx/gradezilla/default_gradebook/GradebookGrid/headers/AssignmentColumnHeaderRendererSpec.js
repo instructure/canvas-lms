@@ -436,6 +436,15 @@ QUnit.module('AssignmentColumnHeaderRenderer', function (suiteHooks) {
       strictEqual(component.props.sortBySetting.disabled, true);
     });
 
+    test('sets the "Sort by" disabled setting to true when anonymize_students is true', function () {
+      gradebook.setAssignmentsLoaded(true);
+      gradebook.setStudentsLoaded(true);
+      gradebook.setSubmissionsLoaded(true);
+      assignment.anonymize_students = true
+      render()
+      strictEqual(component.props.sortBySetting.disabled, true);
+    });
+
     test('sets the "Sort by" disabled setting to true when students are not loaded', function () {
       gradebook.setAssignmentsLoaded(true);
       gradebook.setStudentsLoaded(false);
