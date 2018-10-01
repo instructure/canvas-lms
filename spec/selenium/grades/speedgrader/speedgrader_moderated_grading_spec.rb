@@ -72,9 +72,9 @@ describe "speed grader" do
       time = 5.minutes.from_now
       Timecop.freeze(time) do
         replace_content f('#grading-box-extended'), "8", tab_out: false
-        wait_for_ajaximations
         f('.gradebookHeader--rightside').click
       end
+      wait_for_ajaximations
       provisional_grade = @submission.provisional_grades.find_by!(scorer: @user)
       expect(provisional_grade.grade).to eq '8'
 
