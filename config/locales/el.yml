@@ -1416,6 +1416,7 @@ el:
   answer_text_909894d6: "Απάντηση σε κείμενο"
   answer_weight_43420dc5: "Βαθμολογική Βαρύτητα Απάντησης"
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Οι απαντήσεις θα εμφανιστούν μετά την τελευταία σας προσπάθεια"
+  any_term_d49af19f: "Οποιαδήποτε Ακαδημαϊκή Περίοδο"
   app_b157c2b3: Εφαρμογή
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "Το Κέντρο Εφαρμογών θα εμφανιστεί στην καρτέλα «Εφαρμογές» στη σελίδα των ρυθμίσεων μαθήματος ή λογαριασμού. Το URL που παρέχεται παρακάτω θα πρέπει να οδηγεί σε κάποιο έγκυρο τελικό σημείο του Κέντρου Εφαρμογών (για παράδειγμα, %{url} -- βεβαιωθείτε ότι παραλείπετε την τελική κάθετο"
   app_placements_6d877225: "Τοποθετήσεις Εφαρμογών"
@@ -1594,6 +1595,7 @@ el:
     unmute_button: "Επαναφορά Εργασίας από Σίγαση"
     unmuting_assignment: "Γίνεται Επαναφορά Εργασίας από Σίγαση..."
   assignment_name_b2d87383: "Όνομα Εργασίας"
+  assignment_options_1e5b7074: "Επιλογές Εργασίας"
   assignment_override: 
     student_count: 
       one: "%{count} σπουδαστής"
@@ -2001,6 +2003,12 @@ el:
       comments_placeholder: Σχόλια...
       labels: 
         uploaded_data: Αρχείο
+      links: 
+        add_another_file: "Προσθέστε και άλλο αρχείο"
+      messages: 
+        submitting: "Γίνεται υποβολή..."
+      no_files: "Δεν υπάρχουν αρχεία"
+      upload_or_choose_file: "Μεταφορτώστε ένα αρχείο, ή επιλέξτε ένα αρχείο που έχει ήδη μεταφορτώσει."
     syllabus: 
       page_title: "Αναλυτικό Πρόγραμμα για το μάθημα %{course}"
     syllabus_content: 
@@ -5698,6 +5706,8 @@ el:
       saving_settings: "Αποθήκευση Ρυθμίσεων..."
       submitting: Υποβάλεται...
     cancel_button: Ακύρωση
+    column_header: 
+      assignment_options: "Επιλογές Εργασίας"
     confirms: 
       unsaved_changes: |-
           <mrk mid="1043" mtype="seg">Οι παρακάτω σπουδαστές έχουν μη αποθηκευμένες αλλαγές στις υποβολές των κουίζ τους:</mrk>
@@ -5938,6 +5948,7 @@ el:
     grade_display_warning: 
       cancel: Ακύρωση
       continue: Συνέχεια
+      percent_text: "Οι σπουδαστές θα μπορούν επίσης να δουν τον τελικό βαθμό τους σε μορφή τοις εκατό. Είσαστε σίγουροι πως θέλετε να συνεχίσετε;"
     header_filter: 
       course_average: "Μέσος Όρος Μαθήματος"
       course_median: "Διάμεσος μαθήματος"
@@ -13418,6 +13429,7 @@ el:
         last_login: "Τελευταία Σύνδεση"
         last_request: "Τελευταίο αίτημα"
         password: "Κωδικός πρόσβασης"
+        password_confirmation: "Επικύρωση Συνθηματικού"
         sis_id: "SIS ID"
         sis_user_id: "SIS ID"
         unique_id: Είσοδος
@@ -13520,6 +13532,7 @@ el:
           <mrk mid="3805" mtype="seg">Μόλις δημιουργήσετε ή εγγραφείτε σε μαθήματα, θα αρχίσετε να βλέπετε
           συνομιλίες σας από όλες τις τάξεις σας.</mrk>
       welcome_to_happiness: "Καλώς ορίσατε στο Canvas!"
+  users_d1b60cb0: Χρήστες
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Οι χρήστες λογισμικών ανάγνωσης οθόνης ενδέχεται να χρειαστεί να απενεργοποιήσουν τον εικονικό κέρσορα προκειμένου να μπορέσουν να χρησιμοποιήσουν αυτές τις συντομεύσεις πληκτρολογίου"
   validate: 
     is_required: "Αυτό το πεδίο είναι υποχρεωτικό"
