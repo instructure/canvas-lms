@@ -2152,6 +2152,8 @@ CanvasRails::Application.routes.draw do
     scope(controller: 'lti/tool_configurations_api') do
       put 'developer_keys/:developer_key_id/tool_configuration', action: :update
       post 'accounts/:account_id/developer_keys/tool_configuration', action: :create
+      post 'accounts/:account_id/developer_keys/:developer_key_id/create_tool', action: :create_context_external_tool
+      post 'courses/:course_id/developer_keys/:developer_key_id/create_tool', action: :create_context_external_tool
       get 'developer_keys/:developer_key_id/tool_configuration', action: :show
       delete 'developer_keys/:developer_key_id/tool_configuration', action: :destroy
     end

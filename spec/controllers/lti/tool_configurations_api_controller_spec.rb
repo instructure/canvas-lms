@@ -343,7 +343,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
     end
   end
 
-  describe 'create' do
+  describe '#create' do
     subject { post :create, params: valid_parameters }
     let(:dev_key_id) { nil }
 
@@ -376,7 +376,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
     end
   end
 
-  describe 'update' do
+  describe '#update' do
     subject { put :update, params: valid_parameters }
 
     let(:launch_url) { new_url }
@@ -412,7 +412,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
     end
   end
 
-  describe 'show' do
+  describe '#show' do
     subject { get :show, params: valid_parameters.except(:tool_configuration) }
 
     before do
@@ -434,7 +434,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
     end
   end
 
-  describe 'destroy' do
+  describe '#destroy' do
     subject {  delete :destroy, params: valid_parameters.except(:tool_configuration) }
 
     before do
@@ -455,6 +455,77 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       end
 
       it { is_expected.to be_no_content }
+    end
+  end
+
+  describe '#create_context_external_tool' do
+    subject {  delete :create_context_external_tool, params: params }
+
+    let(:params) { { account_id: sub_account.id, developer_key_id: dev_key_id } }
+
+    before do
+      tool_configuration
+    end
+
+    it_behaves_like 'an action that requires manage developer keys'
+
+    context do
+      let(:tool_configuration) { nil }
+      it_behaves_like 'an endpoint that requires an existing tool configuration'
+    end
+
+    shared_examples_for 'reuses an exisiting ContextExternalTool' do
+      let(:tool_context) { raise 'Override in spec' }
+      let(:cet) do
+        cet = tool_configuration.new_external_tool(tool_context)
+        cet.save!
+        cet
+      end
+
+      before do
+        cet
+        subject
+      end
+
+      it 'returns the existing tool' do
+        expect(json_parse['id']).to eq cet.id
+      end
+    end
+
+    shared_examples_for 'a context that can create a tool' do
+      let(:context) { raise 'Override in spec' }
+
+      it 'creates a ContextExternalTool' do
+        expect { subject }.to change { ContextExternalTool.count }.by(1)
+        expect(ContextExternalTool.first.context_id).to eq context.id
+      end
+
+      it_behaves_like 'reuses an exisiting ContextExternalTool' do
+        let(:tool_context) { context }
+      end
+    end
+
+    context 'when an account' do
+      it_behaves_like 'a context that can create a tool' do
+        let(:context) { sub_account }
+      end
+    end
+
+    context 'when a course' do
+      let_once(:course) { course_model account: sub_account }
+
+      it_behaves_like 'a context that can create a tool' do
+        let(:params) { { course_id: course.id, developer_key_id: dev_key_id } }
+        let(:context) { course }
+      end
+
+      it_behaves_like 'reuses an exisiting ContextExternalTool' do
+        let(:tool_context) { sub_account }
+      end
+
+      it_behaves_like 'reuses an exisiting ContextExternalTool' do
+        let(:tool_context) { account }
+      end
     end
   end
 end
