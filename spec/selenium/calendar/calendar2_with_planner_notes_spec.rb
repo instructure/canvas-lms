@@ -231,6 +231,7 @@ describe "calendar2" do
       wait_for_ajax_requests
       fj('.fc-title:contains("Page1")').click
       expect(f('.event-details')).to contain_css('.edit_event_link')
+      driver.action.send_keys(:escape).perform
       fj('.fc-title:contains("Page2")').click
       expect(f('.event-details')).not_to contain_css('.edit_event_link')
     end
