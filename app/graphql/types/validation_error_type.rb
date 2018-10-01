@@ -16,8 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Types::MutationType < Types::ApplicationObjectType
-  graphql_name "Mutation"
+class Types::ValidationErrorType < Types::ApplicationObjectType
+  field :attribute, String, null: true
+  field :message, String, null: false
 
-  field :create_group_in_set, mutation: Mutations::CreateGroupInSet
+  def object
+    attribute, message = super
+    {attribute: attribute, message: message}
+  end
 end
