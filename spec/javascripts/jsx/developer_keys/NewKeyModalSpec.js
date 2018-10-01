@@ -354,7 +354,7 @@ test('clears the lti key state when modal is closed', () => {
   const actions = Object.assign(fakeActions, {
     developerKeysModalClose: () => {},
     ltiKeysSetCustomizing: () => {},
-    ltiKeysSetLtiKey: ltiStub
+    resetLtiState: ltiStub
   })
 
   const wrapper = mount(

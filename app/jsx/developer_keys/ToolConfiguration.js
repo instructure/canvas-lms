@@ -27,8 +27,8 @@ export default class ToolConfiguration extends React.Component {
     if (!this.props.createLtiKeyState.customizing) {
       return (
         <ToolConfigurationForm
-          toolConfiguration={this.props.toolConfiguration}
-          configurationUrl={this.props.configurationUrl}
+          toolConfiguration={this.props.createLtiKeyState.toolConfiguration}
+          toolConfigurationUrl={this.props.createLtiKeyState.toolConfigurationUrl}
         />
       )
     }
@@ -55,20 +55,14 @@ export default class ToolConfiguration extends React.Component {
   }
 }
 
-ToolConfiguration.defaultProps = {
-  toolConfiguration: undefined,
-  configurationUrl: undefined
-}
-
 ToolConfiguration.propTypes = {
   dispatch: PropTypes.func.isRequired,
   setEnabledScopes: PropTypes.func.isRequired,
   setDisabledPlacements: PropTypes.func.isRequired,
-  toolConfiguration: PropTypes.object,
-  configurationUrl: PropTypes.string,
   createLtiKeyState: PropTypes.shape({
     customizing: PropTypes.bool.isRequired,
     toolConfiguration: PropTypes.object.isRequired,
+    toolConfigurationUrl: PropTypes.string.isRequired,
     enabledScopes: PropTypes.arrayOf(PropTypes.string).isRequired,
     disabledPlacements: PropTypes.arrayOf(PropTypes.string).isRequired
   }).isRequired

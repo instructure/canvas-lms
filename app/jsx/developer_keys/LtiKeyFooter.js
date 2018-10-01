@@ -26,6 +26,7 @@ import {ModalFooter} from '@instructure/ui-overlays/lib/components/Modal'
 export default class LtiKeyFooter extends React.Component {
   onAdvanceToCustomization = () => {
     this.props.dispatch(this.props.ltiKeysSetCustomizing(true))
+    this.props.onAdvanceToCustomization()
   }
 
   onSave = e => {
@@ -53,7 +54,8 @@ export default class LtiKeyFooter extends React.Component {
   render() {
     return (
       <ModalFooter>
-        <Button onClick={this.onCancel}>{I18n.t('Cancel')}</Button>&nbsp;
+        <Button onClick={this.onCancel}>{I18n.t('Cancel')}</Button>
+        &nbsp;
         {this.nextOrSaveButton()}
       </ModalFooter>
     )
@@ -65,5 +67,6 @@ LtiKeyFooter.propTypes = {
   ltiKeysSetCustomizing: PropTypes.func.isRequired,
   onCancelClick: PropTypes.func.isRequired,
   onSaveClick: PropTypes.func.isRequired,
+  onAdvanceToCustomization: PropTypes.func.isRequired,
   customizing: PropTypes.bool.isRequired
 }

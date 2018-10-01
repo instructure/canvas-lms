@@ -45,13 +45,20 @@ export default class ToolConfigurationForm extends React.Component {
     if (this.state.configurationType === 'json') {
       return (
         <TextArea
+          name="tool_configuration"
           defaultValue={this.toolConfiguration}
           label={I18n.t('LTI 1.3 Configuration')}
           maxHeight="20rem"
         />
       )
     }
-    return <TextInput defaultValue={this.props.configurationUrl} label={I18n.t('JSON URL')} />
+    return (
+      <TextInput
+        name="tool_configuration_url"
+        defaultValue={this.props.toolConfigurationUrl}
+        label={I18n.t('JSON URL')}
+      />
+    )
   }
 
   render() {
@@ -75,12 +82,7 @@ export default class ToolConfigurationForm extends React.Component {
   }
 }
 
-ToolConfigurationForm.defaultProps = {
-  toolConfiguration: undefined,
-  configurationUrl: undefined
-}
-
 ToolConfigurationForm.propTypes = {
-  toolConfiguration: PropTypes.object,
-  configurationUrl: PropTypes.string
+  toolConfiguration: PropTypes.object.isRequired,
+  toolConfigurationUrl: PropTypes.string.isRequired
 }

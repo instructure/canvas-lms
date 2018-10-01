@@ -23,7 +23,11 @@ function freshState() {
   return {
     isLtiKey: false,
     customizing: false,
+    saveToolConfigurationPending: false,
+    saveToolConfigurationSuccessful: false,
+    saveToolConfigurationError: null,
     toolConfiguration: {},
+    toolConfigurationUrl: '',
     enabledScopes: [],
     disabledPlacements: []
   }
@@ -84,4 +88,49 @@ it('handles "LTI_KEYS_SET_DISABLED_PLACEMENTS"', () => {
   expect(newState.toolConfiguration).toEqual({})
   expect(newState.disabledPlacements).toEqual(['account_navigation'])
   expect(newState.enabledScopes).toEqual([])
+})
+
+it('handles "SET_LTI_TOOL_CONFIGURATION"', () => {
+  const state = freshState()
+  const config = {test: 'config'}
+  const action = actions.setLtiToolConfiguration(config)
+  const newState = reducer(state, action)
+
+  expect(newState.toolConfiguration).toEqual(config)
+})
+
+it('handles "SET_LTI_TOOL_CONFIGURATION_URL"', () => {
+  const state = freshState()
+  const configUrl = 'config.url'
+  const action = actions.setLtiToolConfigurationUrl(configUrl)
+  const newState = reducer(state, action)
+
+  expect(newState.toolConfigurationUrl).toEqual(configUrl)
+})
+it('handles "SAVE_LTI_TOOL_CONFIGURATION_START"', () => {
+  const state = freshState()
+  const action = actions.saveLtiToolConfigurationStart()
+  const newState = reducer(state, action)
+
+  expect(newState.saveToolConfigurationPending).toEqual(true)
+})
+
+it('handles "SAVE_LTI_TOOL_CONFIGURATION_ERROR"', () => {
+  const state = freshState()
+  const error = new Error('error')
+  const action = actions.saveLtiToolConfigurationFailed(error)
+  const newState = reducer(state, action)
+
+  expect(newState.saveToolConfigurationPending).toEqual(false)
+  expect(newState.saveToolConfigurationError).toEqual(error)
+})
+
+it('handles "SAVE_LTI_TOOL_CONFIGURATION_SUCCESSFUL"', () => {
+  const state = freshState()
+  const action = actions.saveLtiToolConfigurationSuccessful()
+  const newState = reducer(state, action)
+
+  expect(newState.saveToolConfigurationPending).toEqual(false)
+  expect(newState.saveToolConfigurationError).toBeNull()
+  expect(newState.saveToolConfigurationSuccessful).toEqual(true)
 })

@@ -86,12 +86,31 @@ export default class DeveloperKeyModal extends React.Component {
     )
   }
 
+  saveLtiToolConfiguration = () => {
+    const formData = new FormData(this.submissionForm)
+    this.props.store.dispatch(this.props.actions.saveLtiToolConfiguration({
+      account_id: this.props.ctx.params.contextId,
+      developer_key: {
+        name: formData.get("developer_key[name]"),
+        email: formData.get("developer_key[email]"),
+        notes: formData.get("developer_key[notes]"),
+        test_cluster_only: this.testClusterOnly
+      },
+      settings: JSON.parse(formData.get("tool_configuration")),
+      settings_url: formData.get("tool_configuration_url"),
+    }))
+  }
+
   get isLtiKey() {
     return this.props.createLtiKeyState.isLtiKey
   }
 
   modalBody() {
-    if (this.props.createOrEditDeveloperKeyState.developerKeyCreateOrEditPending) {
+    const isSavingDeveloperKey = this.props.createOrEditDeveloperKeyState.developerKeyCreateOrEditPending
+    const isSavingLtiToolConfig = this.props.createLtiKeyState.saveToolConfigurationPending
+    if (
+      isSavingDeveloperKey || isSavingLtiToolConfig
+    ) {
       return this.spinner()
     }
     return this.developerKeyForm()
@@ -103,6 +122,7 @@ export default class DeveloperKeyModal extends React.Component {
         <LtiKeyFooter
           onCancelClick={this.closeModal}
           onSaveClick={this.submitForm}
+          onAdvanceToCustomization={this.saveLtiToolConfiguration}
           customizing={this.props.createLtiKeyState.customizing}
           ltiKeysSetCustomizing={this.props.actions.ltiKeysSetCustomizing}
           dispatch={this.props.store.dispatch}
@@ -160,8 +180,7 @@ export default class DeveloperKeyModal extends React.Component {
   closeModal = () => {
     const { actions, store } = this.props
     store.dispatch(actions.developerKeysModalClose())
-    store.dispatch(actions.ltiKeysSetCustomizing(false))
-    store.dispatch(actions.ltiKeysSetLtiKey(false))
+    store.dispatch(actions.resetLtiState())
     store.dispatch(actions.editDeveloperKey())
   }
 
@@ -203,11 +222,16 @@ DeveloperKeyModal.propTypes = {
     createOrEditDeveloperKey: PropTypes.func.isRequired,
     developerKeysModalClose: PropTypes.func.isRequired,
     editDeveloperKey: PropTypes.func.isRequired,
-    listDeveloperKeyScopesSet: PropTypes.func.isRequired
+    listDeveloperKeyScopesSet: PropTypes.func.isRequired,
+    saveLtiToolConfiguration: PropTypes.func.isRequired,
+    resetLtiState: PropTypes.func.isRequired
   }).isRequired,
   createLtiKeyState: PropTypes.shape({
     isLtiKey: PropTypes.bool.isRequired,
-    customizing: PropTypes.bool.isRequired
+    customizing: PropTypes.bool.isRequired,
+    toolConfiguration: PropTypes.object.isRequired,
+    toolConfigurationUrl: PropTypes.string.isRequired,
+    saveToolConfigurationPending: PropTypes.bool.isRequired
   }).isRequired,
   createOrEditDeveloperKeyState: PropTypes.shape({
     developerKeyCreateOrEditSuccessful: PropTypes.bool.isRequired,

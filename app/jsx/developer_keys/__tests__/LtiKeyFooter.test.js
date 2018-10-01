@@ -24,6 +24,7 @@ function newProps(customizing = false) {
   return {
     onCancelClick: jest.fn(),
     onSaveClick: jest.fn(),
+    onAdvanceToCustomization: jest.fn(),
     customizing,
     dispatch: jest.fn(),
     ltiKeysSetCustomizing: jest.fn()
@@ -64,6 +65,7 @@ it("Advances to the 'customizing' state when 'next' is clicked", () => {
     .at(1)
     .simulate('click')
   expect(props.ltiKeysSetCustomizing).toHaveBeenCalledWith(true)
+  expect(props.onAdvanceToCustomization).toHaveBeenCalled()
 })
 
 it("Renders the 'Next' button if not customizing", () => {

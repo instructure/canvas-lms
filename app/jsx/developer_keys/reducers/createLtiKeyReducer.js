@@ -16,12 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ACTION_NAMES from '../actions/developerKeysActions'
+import ACTION_NAMES from '../actions/ltiKeyActions'
 
 const initialState = {
   isLtiKey: false,
   customizing: false,
+  saveToolConfigurationPending: false,
+  saveToolConfigurationSuccessful: false,
+  saveToolConfigurationError: null,
   toolConfiguration: {},
+  toolConfigurationUrl: '',
   enabledScopes: [],
   disabledPlacements: []
 }
@@ -42,6 +46,36 @@ const ltiKeysHandlers = {
   [ACTION_NAMES.LTI_KEYS_SET_DISABLED_PLACEMENTS]: (state, action) => ({
     ...state,
     disabledPlacements: action.payload
+  }),
+  [ACTION_NAMES.SET_LTI_TOOL_CONFIGURATION]: (state, action) => ({
+    ...state,
+    toolConfiguration: action.payload
+  }),
+  [ACTION_NAMES.SET_LTI_TOOL_CONFIGURATION_URL]: (state, action) => ({
+    ...state,
+    toolConfigurationUrl: action.payload
+  }),
+  [ACTION_NAMES.SAVE_LTI_TOOL_CONFIGURATION_START]: state => ({
+    ...state,
+    saveToolConfigurationPending: true
+  }),
+  [ACTION_NAMES.SAVE_LTI_TOOL_CONFIGURATION_FAILED]: (state, action) => ({
+    ...state,
+    saveToolConfigurationPending: false,
+    saveToolConfigurationError: action.payload
+  }),
+  [ACTION_NAMES.SAVE_LTI_TOOL_CONFIGURATION_SUCCESSFUL]: state => ({
+    ...state,
+    saveToolConfigurationPending: false,
+    saveToolConfigurationError: null,
+    saveToolConfigurationSuccessful: true
+  }),
+  [ACTION_NAMES.RESET_LTI_STATE]: state => ({
+    ...state,
+    isLtiKey: false,
+    customizing: false,
+    toolConfiguration: {},
+    toolConfigurationUrl: ''
   })
 }
 

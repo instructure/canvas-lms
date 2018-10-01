@@ -23,7 +23,7 @@ import ToolConfigurationForm from '../ToolConfigurationForm'
 function newProps() {
   return {
     toolConfiguration: {name: 'Test Tool', url: 'https://www.test.com/launch'},
-    configurationUrl: 'https://www.test.com/config.json'
+    toolConfigurationUrl: 'https://www.test.com/config.json'
   }
 }
 
@@ -60,7 +60,7 @@ describe('when configuration method is by URL', () => {
 
   it('renders the tool configuration URL in a text input', () => {
     const textInput = wrapper.find('TextInput')
-    const expectedString = newProps().configurationUrl
+    const expectedString = newProps().toolConfigurationUrl
     expect(textInput.html()).toEqual(expect.stringContaining(expectedString))
   })
 
