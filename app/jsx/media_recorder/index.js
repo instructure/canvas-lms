@@ -21,8 +21,29 @@
  */
 
 import React from 'react'
-import {MediaCapture, canUseMediaCapture, mediaCaptureStates} from '@instructure/media-capture'
-import {func} from 'prop-types'
+import I18n from 'i18n!media_recorder'
+import { MediaCapture, canUseMediaCapture } from '@instructure/media-capture'
+import { func } from 'prop-types'
+
+const translations = {
+  ARIA_VIDEO_LABEL: I18n.t('Video Player'),
+  ARIA_VOLUME: I18n.t('Current Volume Level'),
+  ARIA_RECORDING: I18n.t('Recording'),
+  DEFAULT_ERROR: I18n.t('Something went wrong accessing your webcam.'),
+  DEVICE_AUDIO: I18n.t('Mic'),
+  DEVICE_VIDEO: I18n.t('Webcam'),
+  FILE_PLACEHOLDER: I18n.t('Untitled'),
+  FINISH: I18n.t('Finish'),
+  NOT_ALLOWED_ERROR: I18n.t('Please allow Arc to access your webcam.'),
+  NOT_READABLE_ERROR: I18n.t('Your webcam may already be in use.'),
+  PLAYBACK_PAUSE: I18n.t('Pause'),
+  PLAYBACK_PLAY: I18n.t('Play'),
+  PREVIEW: I18n.t('PREVIEW'),
+  SAVE: I18n.t('Save'),
+  SR_FILE_INPUT: I18n.t('File name'),
+  START: I18n.t('Start Recording'),
+  START_OVER: I18n.t('Start Over')
+}
 
 export default class CanvasMediaRecorder extends React.Component {
   static propTypes = {
@@ -37,6 +58,6 @@ export default class CanvasMediaRecorder extends React.Component {
   }
 
   render() {
-    return <div>{canUseMediaCapture() ? <MediaCapture onCompleted={this.saveFile} /> : null}</div>
+    return <div>{canUseMediaCapture() ? <MediaCapture translations={translations} onCompleted={this.saveFile} /> : null}</div>
   }
 }
