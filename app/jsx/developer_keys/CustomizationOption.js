@@ -34,8 +34,9 @@ export default class CustomizationOption extends React.Component {
           variant="toggle"
           size="medium"
           name={this.props.name}
+          value={this.props.name}
           onChange={this.props.onChange}
-          checked
+          checked={this.props.checked}
         />
       </FormFieldGroup>
     )
@@ -54,5 +55,6 @@ export default class CustomizationOption extends React.Component {
 CustomizationOption.propTypes = {
   name: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired
+  onChange: PropTypes.func.isRequired,
+  checked: PropTypes.bool.isRequired
 }

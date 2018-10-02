@@ -37,6 +37,11 @@ export default class ToolConfiguration extends React.Component {
         toolConfiguration={this.props.createLtiKeyState.toolConfiguration}
         validScopes={ENV.validLtiScopes}
         validPlacements={ENV.validLtiPlacements}
+        enabledScopes={this.props.createLtiKeyState.enabledScopes}
+        disabledPlacements={this.props.createLtiKeyState.disabledPlacements}
+        dispatch={this.props.dispatch}
+        setEnabledScopes={this.props.setEnabledScopes}
+        setDisabledPlacements={this.props.setDisabledPlacements}
       />
     )
   }
@@ -56,10 +61,15 @@ ToolConfiguration.defaultProps = {
 }
 
 ToolConfiguration.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+  setEnabledScopes: PropTypes.func.isRequired,
+  setDisabledPlacements: PropTypes.func.isRequired,
   toolConfiguration: PropTypes.object,
   configurationUrl: PropTypes.string,
   createLtiKeyState: PropTypes.shape({
     customizing: PropTypes.bool.isRequired,
-    toolConfiguration: PropTypes.object.isRequired
+    toolConfiguration: PropTypes.object.isRequired,
+    enabledScopes: PropTypes.arrayOf(PropTypes.string).isRequired,
+    disabledPlacements: PropTypes.arrayOf(PropTypes.string).isRequired
   }).isRequired
 }

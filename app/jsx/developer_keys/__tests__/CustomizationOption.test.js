@@ -43,7 +43,7 @@ it("uses the 'name' prop for the checkbox", () => {
 })
 
 it("checks the checkbox when 'checked' is true", () => {
-  wrapper = mount(<CustomizationOption {...newProps()} />)
+  wrapper = mount(<CustomizationOption {...newProps(true)} />)
   expect(wrapper.find('Checkbox').instance().props.checked).toBeTruthy()
 })
 

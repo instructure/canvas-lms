@@ -21,7 +21,9 @@ import ACTION_NAMES from '../actions/developerKeysActions'
 const initialState = {
   isLtiKey: false,
   customizing: false,
-  toolConfiguration: {}
+  toolConfiguration: {},
+  enabledScopes: [],
+  disabledPlacements: []
 }
 
 const ltiKeysHandlers = {
@@ -32,6 +34,14 @@ const ltiKeysHandlers = {
   [ACTION_NAMES.LTI_KEYS_SET_CUSTOMIZING]: (state, action) => ({
     ...state,
     customizing: action.payload
+  }),
+  [ACTION_NAMES.LTI_KEYS_SET_ENABLED_SCOPES]: (state, action) => ({
+    ...state,
+    enabledScopes: action.payload
+  }),
+  [ACTION_NAMES.LTI_KEYS_SET_DISABLED_PLACEMENTS]: (state, action) => ({
+    ...state,
+    disabledPlacements: action.payload
   })
 }
 

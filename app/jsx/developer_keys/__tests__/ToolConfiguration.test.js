@@ -24,11 +24,16 @@ function newProps(customizing = false) {
   return {
     toolConfiguration: {name: 'Test Tool', url: 'https://www.test.com/launch'},
     configurationUrl: 'https://www.test.com/config.json',
+    dispatch: jest.fn(),
+    setEnabledScopes: jest.fn(),
+    setDisabledPlacements: jest.fn(),
     createLtiKeyState: {
       customizing,
       toolConfiguration: {},
       validScopes: [],
-      validPlacements: []
+      validPlacements: [],
+      enabledScopes: [],
+      disabledPlacements: []
     }
   }
 }

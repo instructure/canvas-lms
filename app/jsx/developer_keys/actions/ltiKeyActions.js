@@ -30,4 +30,16 @@ actions.ltiKeysSetCustomizing = payload => ({
   payload
 })
 
+actions.LTI_KEYS_SET_ENABLED_SCOPES = 'LTI_KEYS_SET_ENABLED_SCOPES'
+actions.ltiKeysSetEnabledScopes = payload => ({
+  type: actions.LTI_KEYS_SET_ENABLED_SCOPES,
+  payload
+})
+
+actions.LTI_KEYS_SET_DISABLED_PLACEMENTS = 'LTI_KEYS_SET_DISABLED_PLACEMENTS'
+actions.ltiKeysSetDisabledPlacements = payload => ({
+  type: actions.LTI_KEYS_SET_DISABLED_PLACEMENTS,
+  payload
+})
+
 export default actions

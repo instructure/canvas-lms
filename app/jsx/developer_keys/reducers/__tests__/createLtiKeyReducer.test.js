@@ -24,8 +24,8 @@ function freshState() {
     isLtiKey: false,
     customizing: false,
     toolConfiguration: {},
-    validScopes: [],
-    validPlacements: []
+    enabledScopes: [],
+    disabledPlacements: []
   }
 }
 
@@ -34,6 +34,8 @@ it('sets the defaults', () => {
   expect(defaults.isLtiKey).toEqual(false)
   expect(defaults.customizing).toEqual(false)
   expect(defaults.toolConfiguration).toEqual({})
+  expect(defaults.disabledPlacements).toEqual([])
+  expect(defaults.enabledScopes).toEqual([])
 })
 
 it('handles "LTI_KEYS_SET_LTI_KEY"', () => {
@@ -43,6 +45,9 @@ it('handles "LTI_KEYS_SET_LTI_KEY"', () => {
 
   expect(newState.isLtiKey).toEqual(true)
   expect(newState.customizing).toEqual(false)
+  expect(newState.toolConfiguration).toEqual({})
+  expect(newState.disabledPlacements).toEqual([])
+  expect(newState.enabledScopes).toEqual([])
 })
 
 it('handles "LTI_KEYS_SET_CUSTOMIZING"', () => {
@@ -52,4 +57,31 @@ it('handles "LTI_KEYS_SET_CUSTOMIZING"', () => {
 
   expect(newState.isLtiKey).toEqual(false)
   expect(newState.customizing).toEqual(true)
+  expect(newState.toolConfiguration).toEqual({})
+  expect(newState.disabledPlacements).toEqual([])
+  expect(newState.enabledScopes).toEqual([])
+})
+
+it('handles "LTI_KEYS_SET_ENABLED_SCOPES"', () => {
+  const state = freshState()
+  const action = actions.ltiKeysSetEnabledScopes(['cool scope'])
+  const newState = reducer(state, action)
+
+  expect(newState.isLtiKey).toEqual(false)
+  expect(newState.customizing).toEqual(false)
+  expect(newState.toolConfiguration).toEqual({})
+  expect(newState.disabledPlacements).toEqual([])
+  expect(newState.enabledScopes).toEqual(['cool scope'])
+})
+
+it('handles "LTI_KEYS_SET_DISABLED_PLACEMENTS"', () => {
+  const state = freshState()
+  const action = actions.ltiKeysSetDisabledPlacements(['account_navigation'])
+  const newState = reducer(state, action)
+
+  expect(newState.isLtiKey).toEqual(false)
+  expect(newState.customizing).toEqual(false)
+  expect(newState.toolConfiguration).toEqual({})
+  expect(newState.disabledPlacements).toEqual(['account_navigation'])
+  expect(newState.enabledScopes).toEqual([])
 })

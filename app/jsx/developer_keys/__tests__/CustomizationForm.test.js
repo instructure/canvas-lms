@@ -53,7 +53,12 @@ function newProps() {
       'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem': 'Line Item',
       'https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly': 'Result'
     },
-    validPlacements: ['file_menu']
+    validPlacements: ['file_menu'],
+    enabledScopes: [],
+    disabledPlacements: [],
+    dispatch: jest.fn(),
+    setEnabledScopes: jest.fn(),
+    setDisabledPlacements: jest.fn()
   }
 }
 
@@ -106,4 +111,71 @@ it('does not render tables if no options are provided', () => {
   const props = Object.assign(newProps(), {validScopes: [], validPlacements: []})
   wrapper = mount(<CustomizationForm {...props} />)
   expect(renderedOptions()).toHaveLength(0)
+})
+
+it('enables all valid scopes by default', () => {
+  const props = newProps()
+  wrapper = mount(<CustomizationForm {...props} />)
+  expect(props.setEnabledScopes).toHaveBeenCalledWith([
+    'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem',
+    'https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly'
+  ])
+})
+
+it('removes a scope from "selectedScopes" when it is toggled off', () => {
+  const props = Object.assign(newProps(), {enabledScopes: ['https://purl.imsglobal.org/spec/lti-ags/scope/lineitem']})
+  const event = {
+    target: {
+      value: 'Line Item'
+    }
+  }
+
+  wrapper = mount(<CustomizationForm {...props} />)
+  wrapper.instance().handleScopeChange(event)
+
+  expect(props.setEnabledScopes).toHaveBeenCalledWith([])
+})
+
+it('adds a scope to "selectedScopes" when it is toggled on', () => {
+  const props = newProps()
+  const event = {
+    target: {
+      value: 'Line Item'
+    }
+  }
+
+  wrapper = mount(<CustomizationForm {...props} />)
+  wrapper.instance().handleScopeChange(event)
+
+  expect(props.setEnabledScopes).toHaveBeenCalledWith([
+    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"
+  ])
+})
+
+it('removes a placement from "disabledPlacements" when it is toggled off', () => {
+  const props = Object.assign(newProps(), {disabledPlacements: ['account_navigation']})
+  const event = {
+    target: {
+      value: 'account_navigation'
+    }
+  }
+
+  wrapper = mount(<CustomizationForm {...props} />)
+  wrapper.instance().handlePlacementChange(event)
+
+  expect(props.setDisabledPlacements).toHaveBeenCalledWith([])
+})
+
+it('adds a placement from "disabledPlacements" when it is toggled on', () => {
+  const props = newProps()
+  const event = {
+    target: {
+      value: 'account_navigation'
+    }
+  }
+
+  wrapper = mount(<CustomizationForm {...props} />)
+  wrapper.instance().handlePlacementChange(event)
+
+  expect(props.setDisabledPlacements).toHaveBeenCalledWith(['account_navigation'])
 })

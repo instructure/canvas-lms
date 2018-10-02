@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import invert from 'lodash/invert'
 import I18n from 'i18n!react_developer_keys'
 import PropTypes from 'prop-types'
 import React from 'react'
@@ -25,10 +26,20 @@ import View from '@instructure/ui-layout/lib/components/View'
 import CustomizationTable from './CustomizationTable'
 
 export default class CustomizationForm extends React.Component {
-  propTypes = {
+  static propTypes = {
     toolConfiguration: PropTypes.object.isRequired,
     validScopes: PropTypes.object.isRequired,
-    validPlacements: PropTypes.arrayOf(PropTypes.string).isRequired
+    validPlacements: PropTypes.arrayOf(PropTypes.string).isRequired,
+    enabledScopes: PropTypes.arrayOf(PropTypes.string).isRequired,
+    disabledPlacements: PropTypes.arrayOf(PropTypes.string).isRequired,
+    dispatch: PropTypes.func.isRequired,
+    setEnabledScopes: PropTypes.func.isRequired,
+    setDisabledPlacements: PropTypes.func.isRequired
+  }
+
+  constructor(props) {
+    super(props)
+    this.invertedScopes = invert(this.props.validScopes)
   }
 
   get scopes() {
@@ -63,17 +74,52 @@ export default class CustomizationForm extends React.Component {
     return Object.keys(extension.settings).filter(placement => validPlacements.includes(placement))
   }
 
+  componentDidMount() {
+    const { dispatch, setEnabledScopes } = this.props
+    const initialScopes = this.scopes.map((s) => this.invertedScopes[s])
+
+    dispatch(setEnabledScopes(initialScopes))
+  }
+
+  handleScopeChange = (e) => {
+    const {dispatch, setEnabledScopes} = this.props
+    const value = this.invertedScopes[e.target.value]
+    const newEnabledScopes = this.props.enabledScopes.slice()
+
+    dispatch(setEnabledScopes(this.toggleArrayItem(newEnabledScopes, value)))
+  }
+
+  handlePlacementChange = (e) => {
+    const { dispatch, setDisabledPlacements, validPlacements } = this.props
+    const value = e.target.value
+    const newDisabledPlacements = this.props.disabledPlacements.slice()
+
+    dispatch(setDisabledPlacements(this.toggleArrayItem(newDisabledPlacements, value)))
+  }
+
+  toggleArrayItem(array, value) {
+    if (array.includes(value)) {
+      const removeAtIndex = array.indexOf(value)
+      array.splice(removeAtIndex, 1)
+    } else {
+      array.push(value)
+    }
+    return array
+  }
+
   scopeTable() {
     const scopes = this.scopes
     if (scopes.length === 0) {
       return null
     }
+
     return (
       <CustomizationTable
         name={I18n.t('Services')}
-        type="service"
         options={scopes}
-        onOptionToggle={() => {}}
+        onOptionToggle={this.handleScopeChange}
+        selectedOptions={this.props.enabledScopes.map((s) => (this.props.validScopes[s]))}
+        type="scope"
       />
     )
   }
@@ -86,9 +132,10 @@ export default class CustomizationForm extends React.Component {
     return (
       <CustomizationTable
         name={I18n.t('Placements')}
-        type="placement"
         options={placements}
-        onOptionToggle={() => {}}
+        onOptionToggle={this.handlePlacementChange}
+        selectedOptions={this.props.disabledPlacements}
+        type="placement"
       />
     )
   }

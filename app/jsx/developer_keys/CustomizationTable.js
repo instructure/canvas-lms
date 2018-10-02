@@ -30,6 +30,13 @@ export default class CustomizationTable extends React.Component {
     }
   }
 
+  optionIsChecked(option) {
+    if (this.props.type === 'scope') {
+      return this.props.selectedOptions.includes(option)
+    }
+    return !this.props.selectedOptions.includes(option)
+  }
+
   render() {
     return (
       <Table
@@ -51,7 +58,7 @@ export default class CustomizationTable extends React.Component {
               label={option}
               onChange={this.props.onOptionToggle}
               type={this.props.type}
-              defaultChecked
+              checked={this.optionIsChecked(option)}
               key={`customization:${option}`}
             />
           ))}
@@ -65,5 +72,6 @@ CustomizationTable.propTypes = {
   name: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
   options: PropTypes.arrayOf(PropTypes.string),
+  selectedOptions: PropTypes.arrayOf(PropTypes.string),
   onOptionToggle: PropTypes.func.isRequired
 }

@@ -30,7 +30,9 @@ const selectedScopes = [
 
 const fakeActions = {
   createOrEditDeveloperKey: () => {},
-  editDeveloperKey: () => {}
+  editDeveloperKey: () => {},
+  ltiKeysSetDisabledPlacements: () => {},
+  ltiKeysSetEnabledScopes: () => {}
 }
 
 const developerKey = {
@@ -57,8 +59,8 @@ const createLtiKeyState = {
   isLtiKey: false,
   customizing: false,
   toolConfiguration: {},
-  validScopes: [],
-  validPlacements: []
+  enabledScopes: [],
+  disabledPlacements: [],
 }
 
 const createDeveloperKeyState = {

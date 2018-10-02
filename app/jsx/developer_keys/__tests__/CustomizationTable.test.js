@@ -20,13 +20,14 @@ import React from 'react'
 import {mount} from 'enzyme'
 import CustomizationTable from '../CustomizationTable'
 
-function newProps() {
-  return {
+function newProps(overrides = {}) {
+  return Object.assign({
     name: 'Scopes',
     type: 'scope',
     options: ['Manage Line Items', 'Create Line Items'],
-    onOptionToggle: () => {}
-  }
+    onOptionToggle: () => {},
+    selectedOptions: []
+  }, overrides)
 }
 
 let wrapper = 'empty wrapper'
@@ -48,4 +49,27 @@ it('renders the correct name', () => {
 it('renders a customization option for each options', () => {
   wrapper = mount(<CustomizationTable {...newProps()} />)
   expect(wrapper.find('CustomizationOption')).toHaveLength(2)
+})
+
+it('checks the option if scope and scope is selected', () => {
+  const props = newProps({selectedOptions: ['cool scope']})
+  wrapper = mount(<CustomizationTable {...props} />)
+  expect(wrapper.instance().optionIsChecked('cool scope')).toBeTruthy()
+})
+
+it('does not check the option if scope and scope is not selected', () => {
+  wrapper = mount(<CustomizationTable {...newProps()} />)
+  expect(wrapper.instance().optionIsChecked('cool scope')).not.toBeTruthy()
+})
+
+it('checks the option if placement and placement is not in array', () => {
+  const props = newProps({type: 'placement'})
+  wrapper = mount(<CustomizationTable {...props} />)
+  expect(wrapper.instance().optionIsChecked('account_navigation')).toBeTruthy()
+})
+
+it('does not check the option if placement and placement is in array', () => {
+  const props = newProps({type: 'placement', selectedOptions: ['account_navigation']})
+  wrapper = mount(<CustomizationTable {...props} />)
+  expect(wrapper.instance().optionIsChecked('account_navigation')).not.toBeTruthy()
 })

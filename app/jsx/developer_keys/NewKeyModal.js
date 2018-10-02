@@ -133,7 +133,8 @@ export default class DeveloperKeyModal extends React.Component {
       createLtiKeyState,
       availableScopes,
       availableScopesPending,
-      createOrEditDeveloperKeyState: { developerKey }
+      createOrEditDeveloperKeyState: { developerKey },
+      actions
     } = this.props;
 
     return <DeveloperKeyFormFields
@@ -142,7 +143,9 @@ export default class DeveloperKeyModal extends React.Component {
       availableScopes={availableScopes}
       availableScopesPending={availableScopesPending}
       dispatch={this.props.store.dispatch}
-      listDeveloperKeyScopesSet={this.props.actions.listDeveloperKeyScopesSet}
+      listDeveloperKeyScopesSet={actions.listDeveloperKeyScopesSet}
+      setEnabledScopes={actions.ltiKeysSetEnabledScopes}
+      setDisabledPlacements={actions.ltiKeysSetDisabledPlacements}
       createLtiKeyState={createLtiKeyState}
     />
   }
