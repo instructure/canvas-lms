@@ -36,9 +36,16 @@ QUnit.module('AssessmentAuditTray', suiteHooks => {
     onExited = promiseProp('onExited')
 
     context = {
-      assignmentId: '2301',
+      assignment: {
+        gradesPublishedAt: '2015-05-04T12:00:00.000Z',
+        id: '2301',
+        pointsPossible: 10
+      },
       courseId: '1201',
-      submissionId: '2501'
+      submission: {
+        id: '2501',
+        score: 9.5
+      }
     }
 
     renderTray()

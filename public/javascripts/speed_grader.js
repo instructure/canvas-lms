@@ -1621,20 +1621,27 @@ EG = {
   },
 
   setUpAssessmentAuditTray() {
-    let auditTray
-
     const bindRef = ref => {
-      auditTray = ref
+      EG.assessmentAuditTray = ref
     }
 
     const tray = <AssessmentAuditTray ref={bindRef} />
     ReactDOM.render(tray, document.getElementById(ASSESSMENT_AUDIT_TRAY_MOUNT_POINT))
 
     const onClick = () => {
-      auditTray.show({
-        assignmentId: ENV.assignment_id,
+      const {submission} = this.currentStudent
+
+      EG.assessmentAuditTray.show({
+        assignment: {
+          gradesPublishedAt: jsonData.grades_published_at,
+          id: ENV.assignment_id,
+          pointsPossible: jsonData.points_possible
+        },
         courseId: ENV.course_id,
-        submissionId: this.currentStudent.submission.id
+        submission: {
+          id: submission.id,
+          score: submission.score
+        }
       })
     }
 
@@ -1645,6 +1652,7 @@ EG = {
   tearDownAssessmentAuditTray() {
     ReactDOM.unmountComponentAtNode(document.getElementById(ASSESSMENT_AUDIT_TRAY_MOUNT_POINT))
     ReactDOM.unmountComponentAtNode(document.getElementById(ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT))
+    EG.assessmentAuditTray = null
   },
 
   setReadOnly: function(readonly) {

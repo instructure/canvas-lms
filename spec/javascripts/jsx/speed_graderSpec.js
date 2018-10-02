@@ -1668,8 +1668,9 @@ QUnit.module('SpeedGrader', suiteHooks => {
         name: 'Adam Jones',
         submission_state: 'graded',
         submission: {
-          score: 9.1,
           grade: 'A',
+          id: '2501',
+          score: 9.1,
           submission_comments: []
         }
       }
@@ -1679,6 +1680,7 @@ QUnit.module('SpeedGrader', suiteHooks => {
       window.jsonData = {
         GROUP_GRADING_MODE: false,
         anonymize_students: false,
+        grades_published_at: '2015-05-04T12:00:00.000Z',
         gradingPeriods: {},
         id: 27,
         points_possible: 10,
@@ -1703,10 +1705,46 @@ QUnit.module('SpeedGrader', suiteHooks => {
       notOk(getAssessmentAuditButton())
     })
 
-    test('opens the "Assessment Audit" tray when clicked', async () => {
+    test('opens the "Assessment Audit" tray when clicked', () => {
       setUpSpeedGrader()
+      sandbox.stub(SpeedGrader.EG.assessmentAuditTray, 'show')
       getAssessmentAuditButton().click()
-      ok(await waitForElement('[role="dialog"][aria-label="Assessment audit tray"]'))
+      strictEqual(SpeedGrader.EG.assessmentAuditTray.show.callCount, 1)
+    })
+
+    QUnit.module('when opening the "Assessment Audit" tray', contextHooks => {
+      let context
+
+      contextHooks.beforeEach(() => {
+        setUpSpeedGrader()
+        sandbox.stub(SpeedGrader.EG.assessmentAuditTray, 'show')
+        getAssessmentAuditButton().click()
+        context = SpeedGrader.EG.assessmentAuditTray.show.lastCall.args[0]
+      })
+
+      test('includes .assignment.gradesPublishedAt in the context', () => {
+        equal(context.assignment.gradesPublishedAt, '2015-05-04T12:00:00.000Z')
+      })
+
+      test('includes .assignment.id in the context', () => {
+        strictEqual(context.assignment.id, '2301')
+      })
+
+      test('includes .assignment.pointsPossible in the context', () => {
+        strictEqual(context.assignment.pointsPossible, 10)
+      })
+
+      test('includes .courseId in the context', () => {
+        strictEqual(context.courseId, '1201')
+      })
+
+      test('includes .submission.id in the context', () => {
+        strictEqual(context.submission.id, '2501')
+      })
+
+      test('includes .submission.score in the context', () => {
+        strictEqual(context.submission.score, 9.1)
+      })
     })
   })
 })

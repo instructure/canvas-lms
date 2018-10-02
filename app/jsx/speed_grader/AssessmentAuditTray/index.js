@@ -25,6 +25,8 @@ import Tray from '@instructure/ui-overlays/lib/components/Tray'
 import View from '@instructure/ui-layout/lib/components/View'
 import I18n from 'i18n!speed_grader'
 
+import AssessmentSummary from './components/AssessmentSummary'
+
 export default class AssessmentAuditTray extends Component {
   static propTypes = {
     onEntered: func,
@@ -59,6 +61,10 @@ export default class AssessmentAuditTray extends Component {
   }
 
   render() {
+    if (!this.state.assignment) {
+      return null
+    }
+
     const {onEntered, onExited} = this.props
 
     return (
@@ -70,7 +76,7 @@ export default class AssessmentAuditTray extends Component {
         placement="end"
       >
         <View as="div" padding="small">
-          <Flex as="div" margin="0 0 small 0">
+          <Flex as="div" margin="0 0 medium 0">
             <FlexItem>
               <CloseButton onClick={this.dismiss}>{I18n.t('Close')}</CloseButton>
             </FlexItem>
@@ -81,6 +87,13 @@ export default class AssessmentAuditTray extends Component {
               </Heading>
             </FlexItem>
           </Flex>
+
+          <View as="div" margin="small">
+            <AssessmentSummary
+              assignment={this.state.assignment}
+              submission={this.state.submission}
+            />
+          </View>
         </View>
       </Tray>
     )
