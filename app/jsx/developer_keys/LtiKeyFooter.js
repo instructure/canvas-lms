@@ -25,7 +25,6 @@ import {ModalFooter} from '@instructure/ui-overlays/lib/components/Modal'
 
 export default class LtiKeyFooter extends React.Component {
   onAdvanceToCustomization = () => {
-    this.props.dispatch(this.props.ltiKeysSetCustomizing(true))
     this.props.onAdvanceToCustomization()
   }
 
@@ -42,7 +41,7 @@ export default class LtiKeyFooter extends React.Component {
   nextOrSaveButton() {
     const {customizing} = this.props
     const clickHandler = customizing ? this.onSave : this.onAdvanceToCustomization
-    const buttonText = customizing ? I18n.t('Save Key') : I18n.t('Next')
+    const buttonText = customizing ? I18n.t('Save Customizations') : I18n.t('Save and Customize')
 
     return (
       <Button onClick={clickHandler} variant="primary">

@@ -27,7 +27,10 @@ const initialState = {
   toolConfiguration: {},
   toolConfigurationUrl: '',
   enabledScopes: [],
-  disabledPlacements: []
+  disabledPlacements: [],
+  updateCustomizationsPending: false,
+  updateCustomizationsSuccessful: false,
+  updateCustomizationsError: null,
 }
 
 const ltiKeysHandlers = {
@@ -75,7 +78,24 @@ const ltiKeysHandlers = {
     isLtiKey: false,
     customizing: false,
     toolConfiguration: {},
-    toolConfigurationUrl: ''
+    toolConfigurationUrl: '',
+    disabledPlacements: [],
+    enabledScopes: []
+  }),
+  [ACTION_NAMES.LTI_KEYS_UPDATE_CUSTOMIZATIONS_START]: state => ({
+    ...state,
+    updateCustomizationsPending: true
+  }),
+  [ACTION_NAMES.LTI_KEYS_UPDATE_CUSTOMIZATIONS_FAILED]: (state, action) => ({
+    ...state,
+    updateCustomizationsPending: false,
+    updateCustomizationsError: action.payload
+  }),
+  [ACTION_NAMES.LTI_KEYS_UPDATE_CUSTOMIZATIONS_SUCCESSFUL]: state => ({
+    ...state,
+    updateCustomizationsPending: false,
+    updateCustomizationsError: null,
+    updateCustomizationsSuccessful: true
   })
 }
 

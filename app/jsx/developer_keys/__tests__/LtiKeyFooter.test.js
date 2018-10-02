@@ -57,17 +57,6 @@ it("Calls 'onSaveClick' when the save button is clicked", () => {
   expect(props.onSaveClick).toHaveBeenCalled()
 })
 
-it("Advances to the 'customizing' state when 'next' is clicked", () => {
-  const props = newProps()
-  wrapper = mount(<LtiKeyFooter {...props} />)
-  wrapper
-    .find('Button')
-    .at(1)
-    .simulate('click')
-  expect(props.ltiKeysSetCustomizing).toHaveBeenCalledWith(true)
-  expect(props.onAdvanceToCustomization).toHaveBeenCalled()
-})
-
 it("Renders the 'Next' button if not customizing", () => {
   wrapper = mount(<LtiKeyFooter {...newProps()} />)
   expect(
@@ -75,7 +64,7 @@ it("Renders the 'Next' button if not customizing", () => {
       .find('Button')
       .at(1)
       .text()
-  ).toEqual('Next')
+  ).toEqual('Save and Customize')
 })
 
 it("Renders the 'Save' button if not customizing", () => {
@@ -85,5 +74,5 @@ it("Renders the 'Save' button if not customizing", () => {
       .find('Button')
       .at(1)
       .text()
-  ).toEqual('Save Key')
+  ).toEqual('Save Customizations')
 })

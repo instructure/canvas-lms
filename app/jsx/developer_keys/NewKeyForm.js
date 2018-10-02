@@ -78,6 +78,7 @@ export default class DeveloperKeyFormFields extends React.Component {
           name="developer_key[test_cluster_only]"
           checked={this.state.testClusterOnly}
           onChange={this.handleTestClusterOnlyChange}
+          disabled={this.props.createLtiKeyState.customizing}
         />
       )
     }
@@ -120,11 +121,13 @@ export default class DeveloperKeyFormFields extends React.Component {
                   label={I18n.t('Key Name:')}
                   name="developer_key[name]"
                   defaultValue={this.fieldValue('name', 'Unnamed Tool')}
+                  disabled={this.props.createLtiKeyState.customizing}
                 />
                 <TextInput
                   label={I18n.t('Owner Email:')}
                   name="developer_key[email]"
                   defaultValue={this.fieldValue('email')}
+                  disabled={this.props.createLtiKeyState.customizing}
                 />
                 {!this.props.createLtiKeyState.isLtiKey &&
                   <div>
@@ -156,6 +159,7 @@ export default class DeveloperKeyFormFields extends React.Component {
                   name="developer_key[notes]"
                   defaultValue={this.fieldValue('notes')}
                   resize="both"
+                  disabled={this.props.createLtiKeyState.customizing}
                 />
                 {this.renderTestClusterOnlyCheckbox()}
               </FormFieldGroup>

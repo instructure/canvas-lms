@@ -59,15 +59,15 @@ const createLtiKeyState = {
   isLtiKey: false,
   customizing: false,
   toolConfiguration: {},
-  enabledScopes: [],
-  disabledPlacements: [],
+  enabledScopes: ['https://www.test.com/lineitem'],
+  disabledPlacements: ['account_navigation'],
 }
 
 const createDeveloperKeyState = {
   developerKeyCreateOrEditSuccessful: false,
   developerKeyCreateOrEditFailed: false,
   developerKeyModalOpen: true,
-  developerKey: undefined
+  developerKey: {id: 22}
 }
 
 const editDeveloperKeyState = {
@@ -373,5 +373,29 @@ test('clears the lti key state when modal is closed', () => {
   )
   wrapper.instance().closeModal()
   ok(ltiStub.called)
+  wrapper.unmount()
+})
+
+test('saves customizations', () => {
+  const ltiStub = sinon.spy()
+  const actions = Object.assign(fakeActions, {
+    ltiKeysUpdateCustomizations: ltiStub
+  })
+
+  const wrapper = mount(
+    <DeveloperKeyModal
+      createLtiKeyState={createLtiKeyState}
+      availableScopes={{}}
+      availableScopesPending={false}
+      closeModal={() => {}}
+      createOrEditDeveloperKeyState={createDeveloperKeyState}
+      actions={actions}
+      store={{dispatch: () => {}}}
+      mountNode={modalMountNode}
+      selectedScopes={selectedScopes}
+    />
+  )
+  wrapper.instance().saveCustomizations()
+  ok(ltiStub.calledWith(['https://www.test.com/lineitem'], ['account_navigation'], 22, {}))
   wrapper.unmount()
 })
