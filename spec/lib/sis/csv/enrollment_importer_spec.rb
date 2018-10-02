@@ -364,6 +364,22 @@ describe SIS::CSV::EnrollmentImporter do
     expect(@enrollment.reload).to be_active
   end
 
+  it "should count re-deletions" do
+    # because people get confused otherwise
+    course_model(:account => @account, :sis_source_id => 'C001')
+    user_with_managed_pseudonym(:account => @account, :sis_user_id => 'U001')
+
+    process_csv_data_cleanly(
+      "course_id,user_id,role,status",
+      "C001,U001,student,deleted"
+    )
+    importer = process_csv_data_cleanly(
+      "course_id,user_id,role,status",
+      "C001,U001,student,deleted"
+    )
+    expect(importer.batch.data[:counts][:enrollments]).to eq 1
+  end
+
   it "should allow one user multiple enrollment types in the same section" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
