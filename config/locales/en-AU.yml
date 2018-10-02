@@ -47,6 +47,7 @@ en-AU:
   LongTextEditor: 
     cancel: Cancel
     save: Save
+  _2d4c0d31: …
   _at_the_bottom__4360f2b4: "-- At the bottom --"
   _at_the_bottom__d2cf682a: "--At the bottom--"
   _b4455c8b: "%"
@@ -96,6 +97,7 @@ en-AU:
         partner_key: "Partner Key"
   accept_2fdd362e: Accept
   accept_grades_4d56a3dd: "Accept Grades"
+  accept_grades_by_gradername_7a98b969: "Accept grades by %{graderName}"
   acceptable_use_policy_29a28124: "Acceptable use Policy"
   accepted_c9f8ab87: Accepted
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "accepted formats: hex, rgba, rgb, hsl"
@@ -1848,6 +1850,7 @@ en-AU:
       Allows user to manage Blueprint Course settings in Course Settings.
       Allows user to add associated courses.
   allows_user_to_differentiate_assignments_to_indivi_37f701a5: "Allows user to differentiate assignments to individual students."
+  allows_user_to_download_all_comments_in_a_student__33b36d0a: "Allows user to download all comments in a student’s submission."
   allows_user_to_edit_assignment_details_on_individu_3e50993a: "Allows user to edit assignment details on individual discussions. Modules: Allows user to add new assignments to a module."
   allows_user_to_edit_assignment_details_on_individu_ecf19e63: "Allows user to edit assignment details on individual discussions."
   allows_user_to_edit_blueprint_content_lock_setting_25128c82: "Allows user to edit blueprint content lock settings on individual discussions."
@@ -1888,6 +1891,7 @@ en-AU:
   allows_user_to_manage_observers_associated_with_st_4b45f2be: "Allows user to manage observers associated with students in the account."
   allows_user_to_manage_rubrics_326eedc2: "Allows user to manage rubrics."
   allows_user_to_manually_add_an_app_in_account_sett_c5ce3789: "Allows user to manually add an app in Account Settings."
+  allows_user_to_manually_add_and_delete_an_app_in_a_402d3d91: "Allows user to manually add and delete an app in Account Settings."
   allows_user_to_manually_add_and_delete_an_app_in_c_18250cad: "Allows user to manually add and delete an app in Course Settings."
   allows_user_to_moderate_a_quiz_6953d369: "Allows user to moderate a quiz."
   allows_user_to_moderate_a_quiz_settings_allows_use_e454b94e: "Allows user to moderate a quiz. Settings: Allows user to edit grading schemes."
@@ -2168,6 +2172,9 @@ en-AU:
   anonymous_grading_ccb5045c: "Anonymous Grading"
   anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonymous grading forces student names to be hidden in SpeedGrader™"
   anonymous_instructor_annotations_2b6c822: "Anonymous Instructor Annotations"
+  anonymous_instructor_annotations_is_a_setting_on_a_f7a2e36a: |-
+      Anonymous Instructor Annotations is a setting on assignments allowing
+      instructors to leave annotations that are anonymous to students.
   anonymous_marking_92a4d623: "Anonymous Marking"
   anonymous_mode_on_2dd9b94a: "Anonymous Mode On"
   anonymous_mode_on_feb53729: "Anonymous Mode On:"
@@ -2430,6 +2437,7 @@ en-AU:
     total_graded_submissions: "Total Marked Submissions:"
   assignment_details_expanded_20c6f0c7: "assignment details expanded"
   assignment_does_not_exist_74178c34: "assignment does not exist"
+  assignment_edit_6dced39f: "Assignment Edit"
   assignment_excused_eb6c08fa: "Assignment Excused"
   assignment_graded_grade_on_assignment_name_in_cour_5082fd1: "Assignment graded: %{grade} on %{assignment_name} in %{course_code}"
   assignment_graded_score_on_assignmentname_in_cours_1acbf85f: "Assignment graded: %{score} on %{assignmentName} in %{courseName}"
@@ -2496,6 +2504,7 @@ en-AU:
   assignment_title_8a707dd2: "assignment title"
   assignment_title_e3192978: "Assignment: %{title}"
   assignment_url_37c849c6: "assignment url"
+  assignment_view_1206a60b: "Assignment View"
   assignment_was_deleted_8320d26d: "Assignment was deleted"
   assignment_weights_d4bcf9ab: "Assignment Weights"
   assignments: 
@@ -2871,7 +2880,7 @@ en-AU:
       reviews_per_user: "Reviews Per User"
     points_possible_number: "Points possible must be a number"
     positive_number: "You must use a positive number"
-    processing_submission: "Canvas is currently processing your submission. You can safely navigate away from this page and we will email you when the submission has processed."
+    processing_submission: "Canvas is currently processing your submission. You can safely navigate away from this page and we will email you if the submission fails to process."
     redirect_page: 
       redirect_message: |-
           This submission was a url, we're taking you to the url link now.
@@ -4053,6 +4062,7 @@ en-AU:
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "Cannot change the due date to a date within a closed grading period"
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: "Cannot change the due date when due in a closed grading period"
   cannot_create_an_appointment_group_for_a_concluded_f4da02e3: "cannot create an appointment group for a concluded course"
+  cannot_create_event_for_deleted_course_c800f310: "cannot create event for deleted course"
   cannot_delete_a_file_that_has_been_submitted_as_pa_fda24c4: "You cannot delete a file that has been submitted as part of an assignment."
   cannot_delete_an_override_with_a_due_date_within_a_fa94ca3b: "Cannot delete an override with a due date within a closed grading period"
   cannot_give_outcomes_extra_credit_696208f0: "Cannot give outcomes extra credit"
@@ -4067,6 +4077,7 @@ en-AU:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "Cannot set override due date to a date within a closed grading period"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Cannot set sis_account_id on a root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Cannot set the due date to a date within a closed grading period"
+  cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "Cannot view detailed reports for anonymous assignments until grades are unmuted."
   canvas: 
     migration: 
       errors: 
@@ -6454,6 +6465,7 @@ en-AU:
   courses_account_navigation_f84fdec3: "Courses (Account Navigation)"
   courses_add_edit_delete_aa2b55d3: "Courses - add / edit / delete"
   courses_navigation_menu_b3638384: "Courses Navigation Menu"
+  courses_over_time_41dc0428: "courses over time"
   courses_people_680bb173: "Courses & People"
   courses_undelete_1f689a97: "Courses - undelete"
   courses_view_change_logs_25af6a45: "Courses - view change logs"
@@ -7876,6 +7888,7 @@ en-AU:
   enter_or_find_an_external_tool_url_6aebbd0d: "Enter or find an External Tool URL"
   enter_specific_phrase_9b686755: "Enter specific phrase"
   enter_the_access_token_for_your_organization_from__cc77493d: "Enter the access token for your organisation from *eduappcenter.com*. Once applied, only apps your organisation has approved in the EduAppCenter will be listed on the External Apps page.                         Learn how to **generate an access token**."
+  enter_the_access_token_for_your_organization_from__f1c71941: "Enter the access token for your organisation from                       *eduappcenter.com*. Once applied, only apps your organisation has approved in the                       EduAppCenter will be listed on the External Apps page.                       Learn how to **generate an access token**."
   enter_the_email_addresses_of_the_users_you_would_l_17cef6a0: "Enter the Email addresses of the users you would like to add, separated by commas"
   enter_the_email_addresses_of_the_users_you_would_l_f76448a6: "Enter the email addresses of the users you would like to add, separated by commas or line breaks"
   enter_the_login_ids_of_the_users_you_would_like_to_502fcbc5: "Enter the login IDs of the users you would like to add, separated by commas or line breaks"
@@ -8162,6 +8175,7 @@ en-AU:
   error_rendering_duplicated_module_db821097: "Error rendering duplicated module"
   error_reports_7d6c8b1e: "Error Reports"
   error_retrieving_assignment_configuration_tools_f7d75303: "Error retrieving assignment configuration tools"
+  error_retrieving_assignment_external_tools_9102d343: "Error retrieving assignment external tools"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Error retrieving similarity detection tools"
   error_running_quizzes_2_export_cfecedba: "Error running Quizzes 2 export."
   error_saving_discussion_settings_3360661d: "Error saving discussion settings"
@@ -8321,6 +8335,7 @@ en-AU:
   external_feeds_77f57c7d: "External feeds"
   external_integration_keys_8b4f4548: "External Integration Keys"
   external_tool_c5a6410a: "External Tool"
+  external_tool_tool_id_6028b3b1: "External Tool %{tool_id}"
   external_tool_url_cannot_be_left_blank_a34b6bb2: "External Tool URL cannot be left blank"
   external_tools: 
     account_navigation_configured: "Account navigation configured"
@@ -8586,6 +8601,7 @@ en-AU:
     published_status: Published
     restricted_status: "Available from %{from_date} until %{until_date}"
     unpublished_status: Unpublished
+  file_storage_32477f6: "File Storage"
   file_upload_submission_740711f: "File Upload Submission"
   filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filename} has been published with the following usage right: %{usage_right}"
   filename_is_hidden_available_with_a_link_click_to__3e328e8f: "%{fileName} is Hidden. Available with a link - Click to modify"
@@ -8755,6 +8771,7 @@ en-AU:
   full_name_is_required_8efbdc84: "Full name is required"
   future_5416ea92: Future
   future_terms_7fba2ae6: "Future Terms"
+  gathering_files_933551d9: "Gathering Files..."
   general_locked_objects_6a9adafb: "General Locked Objects"
   generate_activity_for_user_2b0af749: "Generate Activity for %{user}"
   generate_epub_80e89ea4: "Generate ePub"
@@ -9702,6 +9719,7 @@ en-AU:
   group_settings: 
     invitation_sent: "Invitation sent"
   group_weight_for_d46c5db4: "Group weight for:"
+  group_with_id_guid_already_exists_in_another_unrel_be1baf71: "Group with ID %{guid} already exists in another unrelated course or account (%{name})"
   groups: 
     add_group: "Add Group"
     add_group_category: 
@@ -10045,6 +10063,12 @@ en-AU:
   groups_6c90e26a: Groups
   groups_add_edit_delete_1536bbb4: "Groups - add / edit / delete"
   groups_are_a_good_place_to_collaborate_on_projects_7386830f: |-
+      Groups are a good place to collaborate on projects or to figure out schedules for study sessions
+      and the like.  Every group gets a calendar, a wiki, discussions, and a little bit of space to store
+      files.  Groups can collaborate on documents, or even schedule web conferences.
+      It's really like a mini-course where you can work with a smaller number of students on a
+      more focused project.
+  groups_are_a_good_place_to_collaborate_on_projects_fdfe57a9: |-
       Groups are a good place to collaborate on projects or to figure out schedules for study sessions
       and the like.  Every group gets a calendar, a wiki, discussions, and a little bit of space to store
       files.  Groups can collaborate on documents, or even schedule web conferences.
@@ -10670,6 +10694,7 @@ en-AU:
         original_job_id: "Original Job ID"
         priority: Priority
         run_at: "Run At"
+        shard: shard
         source: Source
         strand: strand
         tag: tag
@@ -11315,6 +11340,7 @@ en-AU:
     upload: Upload
     uploading: Uploading...
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: "Media has been queued for conversion; please try again in a short time."
+  media_over_time_d9332e25: "media over time"
   media_recording_77cddc52: "Media Recording"
   media_recording_submission_b7fd1491: "Media Recording Submission"
   media_recordings_749aef6d: "Media Recordings"
@@ -13711,6 +13737,7 @@ en-AU:
   not_submitted_7d05fdb4: "Not Submitted"
   not_synced_529cbf29: "Not Synced"
   not_synced_message_a343fe5e: "Not Synced: %{message}"
+  not_yet_assessed_9362f199: "Not yet assessed"
   not_yet_completed_345a0bca: "Not yet completed"
   note_8b73ce09: Note
   note_for_differentiated_group_topics_some_threads__90adbb21: "Note: for differentiated group topics, some threads may not have any students assigned."
@@ -14218,6 +14245,7 @@ en-AU:
   outcome_score_141cf00a: "outcome score"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Outcome: %{title} has a status of %{statusTooltip}"
   outcome_with_canvas_id_id_not_found_215c5227: "Outcome with canvas id \"%{id}\" not found"
+  outcome_with_id_guid_already_exists_in_another_unr_ee551c9d: "Outcome with ID %{guid} already exists in another unrelated course or account (%{name})"
   outcomes: 
     account_standards: "Account Standards"
     account_standards_description: "To the left you'll notice the standards your institution has created for you to use in your courses."
@@ -18721,6 +18749,7 @@ en-AU:
   similarity_detection_dcada48: "Similarity Detection"
   similarity_detection_platform_9e424d70: "Similarity Detection Platform"
   similarity_score_more_information_b7010a87: "Similarity score -- more information"
+  similarity_score_see_detailed_report_a113dac0: "Similarity Score - See detailed report"
   simple_tls_45df2648: "Simple TLS"
   singapore_65_b4927585: "Singapore (+65)"
   singapore_a145e422: Singapore
@@ -19054,6 +19083,7 @@ en-AU:
   students_have_either_already_taken_or_started_taki_a076336: "Students have either already taken or started taking this quiz, so be careful about editing it. If you change any quiz questions in a significant way, you may want to consider regrading students who took the old version of the quiz."
   students_must_complete_all_of_these_requirements_15fa97f7: "Students must complete all of these requirements."
   students_must_sign_up_in_groups_681206ac: "Students must sign up in groups"
+  students_over_time_7ec52f7a: "students over time"
   students_who_have_taken_the_quiz_count_69dbbda0: 
     one: "Students who have taken the quiz (%{count})"
     other: "Students who have taken the quiz (%{count})"
@@ -19389,6 +19419,7 @@ en-AU:
   teacher_s_fdefb2c: Teacher(s)
   teacher_view_b2047bc6: "Teacher View"
   teachers_52e2423f: Teachers
+  teachers_over_time_1905603b: "teachers over time"
   teal_f729a294: Teal
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Please tell us how and when you would like to be notified of events in Canvas."
   templates_4ca13d07: Templates
@@ -20113,6 +20144,7 @@ en-AU:
       
       If the provider can configure valid callback or redirect URIs, use %{callback_url}.
   to_create_announcements_discussions_manage_must_al_932ac38f: "To create announcements, Discussions - manage must also be enabled."
+  to_create_announcements_discussions_moderate_must__8a8278f2: "To create announcements, Discussions - moderate must also be enabled."
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "To cross-list a section, Course Sections - add / edit / delete must also be enabled. To edit the course SIS ID, SIS Data - manage must also be enabled. To allow an account-level user to delete a course, Course State - manage must also be enabled."
   to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "To cross-list a section, Course Sections - add / edit / delete ​must also be enabled. To edit the course SIS ID, SIS Data - manage​ must also be enabled. To allow an account-level user to delete a course, Course State - manage​ must also be enabled."
   to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "To cross-list sections, Course - add / edit / delete must also be enabled."
@@ -20169,6 +20201,7 @@ en-AU:
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_9747d5fb: "To moderate a quiz, Assignments and Quizzes - add / edit / delete​ must also be enabled."
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_ebdecaf8: "To moderate a quiz, Assignments and Quizzes - add / edit / delete must also be enabled."
   to_moderate_a_quiz_grades_edit_must_also_be_enable_72ca6ca1: "To moderate a quiz, Grades - edit​ must also be enabled."
+  to_moderate_grades_grades_select_final_grade_for_m_8c605763: "To moderate grades, Grades - Select final grade for moderation must also be enabled."
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "To pin a discussion to the top of the page, drag a discussion here, or select Pin from the discussion settings menu."
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "To preview Theme Editor branding, you will need to *turn off High Contrast UI*."
   to_publish_and_unpublish_module_content_courses_ad_4c7fc3c9: |-
@@ -20214,6 +20247,9 @@ en-AU:
   to_view_discussions_in_a_course_discussions_view_m_7c986cd2: |-
       To view discussions in a course, Discussions - view​ must be enabled.
       To reply to a discussion, Discussions - post​ must also be enabled. To edit assignment details on a discussion, Assignments and Quizzes - add / edit / delete must also be enabled.
+  to_view_discussions_in_a_course_discussions_view_m_aa57dee7: |-
+      To view discussions in a course, Discussions - view must be enabled.
+      Both Discussions - create and Discussions - moderate allow a user to create a discussion in the Discussions page. To manage discussions, Discussions - moderate must also be enabled.
   to_view_discussions_in_a_course_discussions_view_m_b7e742bd: |-
       To view discussions in a course, Discussions - view must be enabled.
       Both Discussions - create and Discussions - moderate allow a user to create a discussion in the Discussions page. To manage discussions, Discussions - manage must also be enabled.
@@ -20486,6 +20522,7 @@ en-AU:
   update_link_b7cab181: "Update link"
   update_rating_6d29c2ef: "Update Rating"
   update_tool_7d48ef2a: "Update %{tool}"
+  update_your_notification_settings_ed9564f3: "Update your notification settings"
   updated_2c1e8615: Updated
   updated_current_grade_to_be_empty_c2ce1d13: "Updated current grade to be empty"
   updated_current_grade_to_currentgrade_bfe2ea14: "Updated current grade to %{currentGrade}"
@@ -20519,6 +20556,7 @@ en-AU:
   upload_media_ce31135a: "Upload Media"
   upload_successful_ca47465f: "Upload successful"
   upload_your_outcomes_bceeadbe: "Upload your Outcomes!"
+  uploaded_over_time_d59abb68: "uploaded over time"
   upper_limit_of_range_c454a8f2: "Upper limit of range"
   upper_lower_56cad16c: "%{upper} - %{lower}"
   uri_redirect_uri_d4aad2b9: "URI: %{redirect_uri}"
@@ -20543,6 +20581,7 @@ en-AU:
   use_new_folder_tree_in_files_eb5a451b: "Use new folder tree in Files"
   use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: "Use new rich content editor with enhanced sidebar everywhere"
   use_pairing_code_for_parent_sign_up_10b091f8: "Use pairing code for parent sign up"
+  use_parent_account_setting_f25a721f: "Use parent account setting"
   use_remote_service_for_notifications_9fe667c6: "Use remote service for notifications"
   use_remote_version_of_rich_content_editor_52f7fc4b: "Use remote version of Rich Content Editor"
   use_remote_version_of_rich_content_editor_and_side_a058a664: "Use remote version of Rich Content Editor AND sidebar"
@@ -21023,6 +21062,7 @@ en-AU:
   users_manage_login_details_9462b30f: "Users - manage login details"
   users_matching_search_term_c604db9e: "Users Matching \"%{search_term}\""
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Users of screen readers may need to turn off the virtual cursor in order to use these keyboard shortcuts"
+  users_over_time_9a2ee74a: "users over time"
   users_view_list_861c7a3f: "Users - view list"
   users_view_login_ids_a2e6a85: "Users - view login IDs"
   users_view_primary_email_address_14f4978f: "Users - view primary email address"
@@ -21040,6 +21080,7 @@ en-AU:
   vericite_info: 
     buttons: 
       resubmit_to_vericite: "Resubmit to VeriCite"
+  vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Similarity Score - See detailed report"
   video_b9f27375: Video
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Video content is not supported by your device or app."
   video_player_b371005: "Video Player"
