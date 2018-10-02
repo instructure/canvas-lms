@@ -17,7 +17,7 @@
 #
 
 module Schemas::Lti
-  class PublicJwk < Base
+  class PublicJwk < Schemas::Base
     SCHEMA = {
       'type' => 'object',
       'required' => %w[kty e n kid alg use].freeze,
