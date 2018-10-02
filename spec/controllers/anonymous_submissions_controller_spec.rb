@@ -24,6 +24,7 @@ RSpec.describe AnonymousSubmissionsController do
   describe "GET show" do
     before do
       course_with_student_and_submitted_homework
+      @course.account.enable_service(:avatars)
       @context = @course
       @assignment.update!(anonymous_grading: true)
       @submission.update!(score: 10)
@@ -107,6 +108,7 @@ RSpec.describe AnonymousSubmissionsController do
 
     it "should show rubric assessments to peer reviewers" do
       course_with_student(active_all: true)
+      @course.account.enable_service(:avatars)
       @assessor = @student
       outcome_with_rubric
       @association = @rubric.associate_with @assignment, @context, :purpose => 'grading'

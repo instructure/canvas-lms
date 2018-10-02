@@ -24,6 +24,7 @@ describe SubmissionsController do
   describe "POST create" do
     it "should require authorization" do
       course_with_student(:active_all => true)
+      @course.account.enable_service(:avatars)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
       post 'create', params: {:course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_url", :url => "url"}}
       assert_unauthorized
@@ -31,6 +32,7 @@ describe SubmissionsController do
 
     it "should allow submitting homework" do
       course_with_student_logged_in(:active_all => true)
+      @course.account.enable_service(:avatars)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
       post 'create', params: {:course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_url", :url => "url"}}
       expect(response).to be_redirect
@@ -45,12 +47,14 @@ describe SubmissionsController do
       expect(Canvas::LiveEvents).to receive(:submission_created).once
       expect(Canvas::LiveEvents).not_to receive(:submission_updated)
       course_with_student_logged_in(:active_all => true)
+      @course.account.enable_service(:avatars)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
       post 'create', params: {:course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_url", :url => "url"}}
     end
 
     it "should not double-send notifications to a teacher" do
       course_with_student_logged_in(:active_all => true)
+      @course.account.enable_service(:avatars)
       @teacher = user_with_pseudonym(username: 'teacher@example.com', active_all: 1)
       teacher_in_course(course: @course, user: @teacher, active_all: 1)
       n = Notification.create!(name: 'Assignment Submitted', category: 'TestImmediately')
@@ -64,6 +68,7 @@ describe SubmissionsController do
 
     it "should allow submitting homework as attachments" do
       course_with_student_logged_in(:active_all => true)
+      @course.account.enable_service(:avatars)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_upload")
       att = attachment_model(:context => @user, :uploaded_data => stub_file_data('test.txt', 'asdf', 'text/plain'))
       post 'create', params: {:course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_upload", :attachment_ids => att.id}, :attachments => { "0" => { :uploaded_data => "" }, "-1" => { :uploaded_data => "" } }}
@@ -81,6 +86,7 @@ describe SubmissionsController do
 
       it "accepts 'eula_agreement_timestamp' params and persists it in the 'turnitin_data'" do
         course_with_student_logged_in(:active_all => true)
+        @course.account.enable_service(:avatars)
         @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => submission_type)
         a1 = attachment_model(:context => @user)
         post 'create',
@@ -128,6 +134,7 @@ describe SubmissionsController do
 
     it "should copy attachments to the submissions folder if that feature is enabled" do
       course_with_student_logged_in(:active_all => true)
+      @course.account.enable_service(:avatars)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_upload")
       att = attachment_model(:context => @user, :uploaded_data => stub_file_data('test.txt', 'asdf', 'text/plain'))
       post 'create', params: {:course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_upload", :attachment_ids => att.id}, :attachments => { "0" => { :uploaded_data => "" }, "-1" => { :uploaded_data => "" } }}
@@ -142,6 +149,7 @@ describe SubmissionsController do
 
     it "should reject illegal file extensions from submission" do
       course_with_student_logged_in(:active_all => true)
+      @course.account.enable_service(:avatars)
       @assignment = @course.assignments.create!(:title => "an additional assignment", :submission_types => "online_upload", :allowed_extensions => ['txt'])
       att = attachment_model(:context => @student, :uploaded_data => stub_file_data('test.m4v', 'asdf', 'video/mp4'))
       post 'create', params: {:course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_upload", :attachment_ids => att.id}, :attachments => { "0" => { :uploaded_data => "" }, "-1" => { :uploaded_data => "" } }}
@@ -153,6 +161,7 @@ describe SubmissionsController do
 
     it "should use the appropriate group based on the assignment's category and the current user" do
       course_with_student_logged_in(:active_all => true)
+      @course.account.enable_service(:avatars)
       group_category = @course.group_categories.create(:name => "Category")
       @group = @course.groups.create(:name => "Group", :group_category => group_category)
       @group.add_user(@user)
@@ -166,6 +175,7 @@ describe SubmissionsController do
 
     it "should not use a group if the assignment has no category" do
       course_with_student_logged_in(:active_all => true)
+      @course.account.enable_service(:avatars)
       group_category = @course.group_categories.create(:name => "Category")
       @group = @course.groups.create(:name => "Group", :group_category => group_category)
       @group.add_user(@user)
@@ -178,6 +188,7 @@ describe SubmissionsController do
 
     it "should allow attaching multiple files to the submission" do
       course_with_student_logged_in(:active_all => true)
+      @course.account.enable_service(:avatars)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
       att1 = attachment_model(:context => @user, :uploaded_data => fixture_file_upload("docs/doc.doc", "application/msword", true))
       att2 = attachment_model(:context => @user, :uploaded_data => fixture_file_upload("docs/txt.txt", "application/vnd.ms-excel", true))
@@ -197,6 +208,7 @@ describe SubmissionsController do
 
     it "should fail but not raise when the submission is invalid" do
       course_with_student_logged_in(:active_all => true)
+      @course.account.enable_service(:avatars)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url")
       post 'create', params: {:course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_url", :url => ""}} # blank url not allowed
       expect(response).to be_redirect
@@ -206,6 +218,7 @@ describe SubmissionsController do
 
     it "should strip leading/trailing whitespace off url submissions" do
       course_with_student_logged_in(:active_all => true)
+      @course.account.enable_service(:avatars)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url")
       post 'create', params: {:course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_url", :url => " http://www.google.com "}}
       expect(response).to be_redirect
@@ -215,6 +228,7 @@ describe SubmissionsController do
 
     it 'must accept a basic_lti_launch url when any online submission type is allowed' do
       course_with_student_logged_in(:active_all => true)
+      @course.account.enable_service(:avatars)
       @assignment = @course.assignments.create!(:title => 'some assignment', :submission_types => 'online_url')
       request.path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions"
       post 'create', params: {:course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => 'basic_lti_launch', :url => 'http://www.google.com'}}
@@ -227,6 +241,7 @@ describe SubmissionsController do
     it 'accepts eula agreement timestamp when api submission' do
       timestamp = Time.zone.now.to_i.to_s
       course_with_student_logged_in(:active_all => true)
+      @course.account.enable_service(:avatars)
       attachment = attachment_model(context: @student)
       @assignment = @course.assignments.create!(:title => 'some assignment', :submission_types => 'online_upload')
       request.path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions"
@@ -248,6 +263,7 @@ describe SubmissionsController do
         now = Time.now.utc
         Timecop.freeze(now) do
           course_with_student_logged_in(:active_all => true)
+          @course.account.enable_service(:avatars)
           @assignment = @course.assignments.create!(
             :title => "some assignment",
             :submission_types => "online_url",
@@ -280,6 +296,7 @@ describe SubmissionsController do
       before do
         Setting.set('enable_page_views', 'db')
         course_with_student_logged_in :active_all => true
+        @course.account.enable_service(:avatars)
         post 'create', params: {:course_id => @course.id, :assignment_id => assignment.id, :submission => submission_params}
       end
 
@@ -315,6 +332,7 @@ describe SubmissionsController do
 
     it 'rejects an empty text response' do
       course_with_student_logged_in(:active_all => true)
+      @course.account.enable_service(:avatars)
       assignment = @course.assignments.create!(
         :title => 'some assignment',
         :submission_types => 'online_text_entry'
@@ -333,6 +351,7 @@ describe SubmissionsController do
     context "group comments" do
       before do
         course_with_student_logged_in(:active_all => true)
+        @course.account.enable_service(:avatars)
         @u1 = @user
         student_in_course(:course => @course)
         @u2 = @user
@@ -425,6 +444,7 @@ describe SubmissionsController do
     context "google doc" do
       before(:each) do
         course_with_student_logged_in(active_all: true)
+        @course.account.enable_service(:avatars)
         @assignment = @course.assignments.create!(title: 'some assignment', submission_types: 'online_upload')
       end
 
@@ -468,6 +488,7 @@ describe SubmissionsController do
     it "should zip and download" do
       local_storage!
       course_with_student_and_submitted_homework
+      @course.account.enable_service(:avatars)
 
       get 'index', params: {:course_id => @course.id, :assignment_id => @assignment.id, :zip => '1'}, format: 'json'
       expect(response).to be_successful
@@ -490,6 +511,7 @@ describe SubmissionsController do
   describe "GET show" do
     before do
       course_with_student_and_submitted_homework
+      @course.account.enable_service(:avatars)
       @context = @course
       @submission.update!(score: 10)
     end
@@ -615,6 +637,7 @@ describe SubmissionsController do
     context "with user id not present in course" do
       before(:once) do
         course_with_student(active_all: true)
+        @course.account.enable_service(:avatars)
       end
 
       it "sets flash error" do
@@ -630,6 +653,7 @@ describe SubmissionsController do
 
     it "should show rubric assessments to peer reviewers" do
       course_with_student(active_all: true)
+      @course.account.enable_service(:avatars)
       @assessor = @student
       outcome_with_rubric
       @association = @rubric.associate_with @assignment, @context, :purpose => 'grading'
@@ -650,6 +674,7 @@ describe SubmissionsController do
  context 'originality report' do
   let(:test_course) do
     test_course = course_factory(active_course: true)
+    test_course.account.enable_service(:avatars)
     test_course.enroll_teacher(test_teacher, enrollment_state: 'active')
     test_course.enroll_student(test_student, enrollment_state: 'active')
     test_course
@@ -747,6 +772,7 @@ describe SubmissionsController do
   describe "GET audit_events" do
     before(:once) do
       @course = Course.create!
+      @course.account.enable_service(:avatars)
       first_student = course_with_user("StudentEnrollment", course: @course, name: "First", active_all: true).user
       second_student = course_with_user("StudentEnrollment", course: @course, name: "Second", active_all: true).user
       @teacher = course_with_user("TeacherEnrollment", course: @course, name: "Teacher", active_all: true).user
@@ -817,6 +843,7 @@ describe SubmissionsController do
   describe "copy_attachments_to_submissions_folder" do
     before(:once) do
       course_with_student
+      @course.account.enable_service(:avatars)
       attachment_model(context: @student)
     end
 

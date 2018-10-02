@@ -22,7 +22,12 @@ describe 'Provisional Grades API', type: :request do
   it_behaves_like 'a provisional grades status action', :provisional_grades
 
   describe "bulk_select" do
-    let_once(:course) { course_factory }
+    let_once(:course) do
+      course = course_factory
+      course.account.enable_service(:avatars)
+      course
+    end
+
     let_once(:teacher) { teacher_in_course(active_all: true, course: course).user }
     let_once(:ta_1) { ta_in_course(active_all: true, course: course).user }
     let_once(:ta_2) { ta_in_course(active_all: true, course: course).user }
@@ -197,6 +202,7 @@ describe 'Provisional Grades API', type: :request do
   describe "select" do
     before(:once) do
       course_with_student :active_all => true
+      @course.account.enable_service(:avatars)
       ta_in_course :active_all => true
       @assignment = @course.assignments.build
       @assignment.grader_count = 1
@@ -250,6 +256,7 @@ describe 'Provisional Grades API', type: :request do
   describe "copy_to_final_mark" do
     before(:once) do
       course_with_student :active_all => true
+      @course.account.enable_service(:avatars)
       ta_in_course :active_all => true
       @assignment = @course.assignments.create!(
         submission_types: 'online_text_entry',
@@ -301,6 +308,7 @@ describe 'Provisional Grades API', type: :request do
   describe "publish" do
     before :once do
       course_with_student :active_all => true
+      @course.account.enable_service(:avatars)
       course_with_ta :course => @course, :active_all => true
       @assignment = @course.assignments.create!
       @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/provisional_grades/publish"
@@ -419,6 +427,7 @@ describe 'Provisional Grades API', type: :request do
       context "with one provisional grade" do
         it "publishes the only provisional grade if none have been explicitly selected" do
           course_with_user("TaEnrollment", course: @course, active_all: true)
+          @course.account.enable_service(:avatars)
           @submission = @assignment.submit_homework(@student, body: "hello")
           @assignment.grade_student(@student, grader: @ta, score: 72, provisional: true)
 
