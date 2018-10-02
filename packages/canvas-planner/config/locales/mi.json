@@ -50,6 +50,9 @@
   "assignmenttype_title_posted_datetime_cab69444": {
     "message": "{ assignmentType } { title } whakairi { datetime }."
   },
+  "assignmenttype_title_reminder_datetime_33fa66d5": {
+    "message": "{ assignmentType } { title }, maumahara { datetime }."
+  },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Te timatatanga o tō hītori Hei-Mahi"
   },
@@ -61,6 +64,12 @@
   },
   "close_d634289d": {
     "message": "Katia"
+  },
+  "close_opportunity_center_popup_9907d981": {
+    "message": "Katihia te Mea Angitu Pōkapu Pakūake"
+  },
+  "count_plural_0_opportunities_one_opportunity_other_bb1698f6": {
+    "message": "{ count, plural,\n     =0 {# ngā mea angitu}\n    one {# mea angitu}\n  other {# ngā mea angitu}\n}. Pākiri ki te huaki Mea Angitu Pōkapu pakūake."
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Whakātu # tūemi kua oti}\n  other {Whakātu # ngā tūemi kua oti}\n}"
@@ -97,6 +106,12 @@
   },
   "dismiss_opportunityname_5995176f": {
     "message": "Whakakore { opportunityName }"
+  },
+  "dismissed_8b0b1fc9": {
+    "message": "Kau panaia"
+  },
+  "dismissed_opportunities_f0826640": {
+    "message": "Ngā mea angitu kua panaia"
   },
   "due_5d7267be": {
     "message": "E tika ana:"
@@ -191,11 +206,17 @@
   "my_grades_98834476": {
     "message": "Aku Kōeke"
   },
+  "new_13daf639": {
+    "message": "hou"
+  },
   "new_activity_8b84847d": {
     "message": "Mahi hou"
   },
   "new_activity_for_title_14c9c3af": {
     "message": "Ngā mahi hou mo te { title }"
+  },
+  "new_opportunities_7d349c4d": {
+    "message": "Ngā mea angitu hou"
   },
   "next_month_749b1778": {
     "message": "Tērā marama"
@@ -208,6 +229,9 @@
   },
   "nothing_for_now_e3e3ce2a": {
     "message": "Kaore ngā mea mō ināianei"
+  },
+  "nothing_here_needs_attention_c4eaded6": {
+    "message": "Kaore he mea e hiahia ana ki konei."
   },
   "nothing_more_to_do_b665da42": {
     "message": "Kaore he mahi atu"
@@ -236,6 +260,9 @@
   "page_50c4823d": {
     "message": "Whārangi"
   },
+  "peer_review_74f26a13": {
+    "message": "Hoa arotake"
+  },
   "points_bceb5005": {
     "message": "Ngā koinga"
   },
@@ -250,6 +277,9 @@
   },
   "quiz_e0dcce8f": {
     "message": "Quiz"
+  },
+  "reminder_date_4564d12d": {
+    "message": "Maumahara: { date }"
   },
   "replies_4a8577c8": {
     "message": "Ngā whakautu"
@@ -286,6 +316,9 @@
   },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "Te rā me te wā hei mahi tēnei"
+  },
+  "there_are_no_points_associated_with_this_item_449c712a": {
+    "message": "Kaore ngā koinga e hono ana ki tenei tūemi"
   },
   "time_2b5aac58": {
     "message": "Wā"

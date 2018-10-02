@@ -50,6 +50,9 @@
   "assignmenttype_title_posted_datetime_cab69444": {
     "message": "{ assignmentType } { title } birti { datetime }."
   },
+  "assignmenttype_title_reminder_datetime_33fa66d5": {
+    "message": "{ assignmentType } { title }, áminning { datetime }."
+  },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Upphaf verkefnasögu þinnar"
   },
@@ -61,6 +64,12 @@
   },
   "close_d634289d": {
     "message": "Loka"
+  },
+  "close_opportunity_center_popup_9907d981": {
+    "message": "Loka sprettiglugga Tækifærismiðstöðvar"
+  },
+  "count_plural_0_opportunities_one_opportunity_other_bb1698f6": {
+    "message": "{ count, plural,\n     =0 {# tækifæri}\n    one {# tækifæri}\n  other {# tækifæri}\n}. Smelltu til að opna sprettiglugga Tækifærismiðstöðvar"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Sýna # fullklárað atriði}\n  other {Sýna # fullkláruð atriði}\n}"
@@ -97,6 +106,12 @@
   },
   "dismiss_opportunityname_5995176f": {
     "message": "Hafna { opportunityName }"
+  },
+  "dismissed_8b0b1fc9": {
+    "message": "Vísað frá"
+  },
+  "dismissed_opportunities_f0826640": {
+    "message": "Tækifæri sem voru vísuð frá"
   },
   "due_5d7267be": {
     "message": "Skil:"
@@ -191,11 +206,17 @@
   "my_grades_98834476": {
     "message": "Einkunnir mínar"
   },
+  "new_13daf639": {
+    "message": "Nýtt"
+  },
   "new_activity_8b84847d": {
     "message": "Ný virkni"
   },
   "new_activity_for_title_14c9c3af": {
     "message": "Ný virkni fyrir { title }"
+  },
+  "new_opportunities_7d349c4d": {
+    "message": "Ný tækifæri"
   },
   "next_month_749b1778": {
     "message": "Næsti mánuður"
@@ -208,6 +229,9 @@
   },
   "nothing_for_now_e3e3ce2a": {
     "message": "Ekkert núna"
+  },
+  "nothing_here_needs_attention_c4eaded6": {
+    "message": "Ekkert hérna þarfnast athygli"
   },
   "nothing_more_to_do_b665da42": {
     "message": "Ekkert annað á dagskrá"
@@ -236,6 +260,9 @@
   "page_50c4823d": {
     "message": "Síða"
   },
+  "peer_review_74f26a13": {
+    "message": "Jafningjamat"
+  },
   "points_bceb5005": {
     "message": "punktar"
   },
@@ -250,6 +277,9 @@
   },
   "quiz_e0dcce8f": {
     "message": "Próf"
+  },
+  "reminder_date_4564d12d": {
+    "message": "Áminning: { date }"
   },
   "replies_4a8577c8": {
     "message": "Svör"
@@ -286,6 +316,9 @@
   },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "Dagsetning og tími skilafrests þessa verkefnis"
+  },
+  "there_are_no_points_associated_with_this_item_449c712a": {
+    "message": "Það eru engin atriði tengd við þennan hlut"
   },
   "time_2b5aac58": {
     "message": "Tími"

@@ -50,6 +50,9 @@
   "assignmenttype_title_posted_datetime_cab69444": {
     "message": "{ assignmentType } { title } publicado { datetime }."
   },
+  "assignmenttype_title_reminder_datetime_33fa66d5": {
+    "message": "{ assignmentType } { title }, recordatorio { datetime }."
+  },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Inicio de su Historial de cosas por hacer"
   },
@@ -61,6 +64,12 @@
   },
   "close_d634289d": {
     "message": "Cerrar"
+  },
+  "close_opportunity_center_popup_9907d981": {
+    "message": "Cerrar ventana emergente del Centro de oportunidades"
+  },
+  "count_plural_0_opportunities_one_opportunity_other_bb1698f6": {
+    "message": "{ count, plural,\n     =0 {# oportunidades}\n    one {# oportunidad}\n  other {# oportunidades}\n}. Haga clic para abrir la ventana emergente del Centro de oportunidades."
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Mostrar # elemento completado}\n  other {Mostrar # elementos completados}\n}"
@@ -97,6 +106,12 @@
   },
   "dismiss_opportunityname_5995176f": {
     "message": "Descartar { opportunityName }"
+  },
+  "dismissed_8b0b1fc9": {
+    "message": "Descartado"
+  },
+  "dismissed_opportunities_f0826640": {
+    "message": "Oportunidades descartadas"
   },
   "due_5d7267be": {
     "message": "Fecha límite:"
@@ -191,11 +206,17 @@
   "my_grades_98834476": {
     "message": "Mis calificaciones"
   },
+  "new_13daf639": {
+    "message": "Nuevo"
+  },
   "new_activity_8b84847d": {
     "message": "Nueva actividad"
   },
   "new_activity_for_title_14c9c3af": {
     "message": "Nueva actividad para { title }"
+  },
+  "new_opportunities_7d349c4d": {
+    "message": "Nuevas oportunidades"
   },
   "next_month_749b1778": {
     "message": "Mes siguiente"
@@ -208,6 +229,9 @@
   },
   "nothing_for_now_e3e3ce2a": {
     "message": "Nada por ahora"
+  },
+  "nothing_here_needs_attention_c4eaded6": {
+    "message": "No hay nada aquí que requiera atención."
   },
   "nothing_more_to_do_b665da42": {
     "message": "Nada más por hacer"
@@ -236,6 +260,9 @@
   "page_50c4823d": {
     "message": "Página"
   },
+  "peer_review_74f26a13": {
+    "message": "Revisión entre pares"
+  },
   "points_bceb5005": {
     "message": "puntos"
   },
@@ -250,6 +277,9 @@
   },
   "quiz_e0dcce8f": {
     "message": "Evaluación"
+  },
+  "reminder_date_4564d12d": {
+    "message": "Recordatorio: { date }"
   },
   "replies_4a8577c8": {
     "message": "Respuestas"
@@ -286,6 +316,9 @@
   },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "Se vence la fecha y la hora límite para hacer esto"
+  },
+  "there_are_no_points_associated_with_this_item_449c712a": {
+    "message": "No hay puntos asociados con este elemento"
   },
   "time_2b5aac58": {
     "message": "Hora"
