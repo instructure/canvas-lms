@@ -28,8 +28,7 @@ RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
       )
     end
 
-    xit 'keeps the contract' do
-      pending('this test fails because ContentMigraiton.new needs to be persisted CNVS-43910')
+    it 'keeps the contract' do
       live_event.emit_with do
         # arrange
         params = {
@@ -58,8 +57,16 @@ RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
         new_course.enable_feature!(:quizzes_next)
 
         # act
+
+        migration = ContentMigration.create!(
+          context: Account.default,
+          user: @teacher
+        )
+        migration.started_at=Time.now.utc - 1.hour
+        migration.save!
+
         exported_content = QuizzesNext::ExportService.begin_export(old_course, {})
-        QuizzesNext::ExportService.send_imported_content(new_course, ContentMigration.new, exported_content)
+        QuizzesNext::ExportService.send_imported_content(new_course, migration, exported_content)
       end
 
       # assert
