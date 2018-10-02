@@ -156,6 +156,7 @@ define [
           'last': true
           'override': override
           'json': json
+          'workflow_state': json['workflow_state']
 
         lastDate['events'].push lastEvent
 
