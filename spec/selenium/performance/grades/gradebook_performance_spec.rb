@@ -30,6 +30,7 @@ describe 'Gradebook performance' do
   include_context 'in-process server selenium tests'
 
   before :once do
+    skip("These specs are causing timeouts on jenkins, skipping all")
     grades_sample = (60.0..100.0).step(0.01).map { |x| x.round(2) }
 
     @courses = []
