@@ -593,6 +593,18 @@ describe ContentMigration do
         expect(to_override.due_at_overridden).to eq true
         expect(to_override.unlock_at_overridden).to eq false
       end
+
+      it "preserves only_visible_to_overrides for page assignments" do
+        a1 = assignment_model(context: @copy_from, title: 'a1', submission_types: 'wiki_page', only_visible_to_overrides: true)
+        a1.build_wiki_page(title: a1.title, context: a1.context).save!
+        a2 = assignment_model(context: @copy_from, title: 'a2', submission_types: 'wiki_page', only_visible_to_overrides: false)
+        a2.build_wiki_page(title: a2.title, context: a2.context).save!
+        run_course_copy
+        a1_to = @copy_to.assignments.where(migration_id: mig_id(a1)).take
+        expect(a1_to.only_visible_to_overrides).to eq true
+        a2_to = @copy_to.assignments.where(migration_id: mig_id(a2)).take
+        expect(a2_to.only_visible_to_overrides).to eq false
+      end
     end
 
     context 'external tools' do
