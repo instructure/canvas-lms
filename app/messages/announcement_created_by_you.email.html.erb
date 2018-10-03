@@ -14,7 +14,13 @@ You created this Announcement:
   </a>
 <% end %>
 
-<%= html_to_simple_html(asset.message, :base_url => dashboard_url) %>
+<%= html_to_simple_html(asset.message,
+    :base_url => dashboard_url,
+    :tags => ['tr', 'td', 'table', 'tbody', 'caption', 'span'],
+    :attributes => {
+        'table' => [ 'border', 'style', 'cellspacing', 'cellpadding' ],
+        'span' => ['style']
+    }) %>
 
 <% if asset.attachment %>
 <div style="margin-top: 20px; padding: 10px; border: 1px solid #f1f1f1; background-color: #f3f3f3;">
