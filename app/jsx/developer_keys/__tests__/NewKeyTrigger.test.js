@@ -31,7 +31,7 @@ const actions = {
 
 let wrapper = 'empty wrapper'
 
-const menuContentsNode = () => wrapper.find('Portal').instance()._node
+const menuContentsNode = () => wrapper.find('Portal').instance()._portalContentNode
 
 beforeEach(() => {
   window.ENV = {
