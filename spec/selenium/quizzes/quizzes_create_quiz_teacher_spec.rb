@@ -202,8 +202,7 @@ describe 'creating a quiz' do
       end
 
       def submit_page
-        save_button.click
-        wait_for_ajaximations
+        wait_for_new_page_load { save_button.click }
         expect(driver.current_url).not_to include("edit")
       end
 

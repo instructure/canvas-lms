@@ -106,8 +106,7 @@ describe "course settings" do
       wait_for_ajaximations
       f('#course_self_enrollment').click
       wait_for_ajaximations
-      submit_form('#course_form')
-      wait_for_ajaximations
+      wait_for_new_page_load { submit_form('#course_form') }
 
       code = @course.reload.self_enrollment_code
       expect(code).not_to be_nil
@@ -164,8 +163,7 @@ describe "course settings" do
       f('.course_form_more_options_link').click
       wait_for_ajaximations
       expect(f('.course_form_more_options')).to be_displayed
-      submit_form(course_form)
-      wait_for_ajaximations
+      wait_for_new_page_load { submit_form(course_form) }
 
       @course.reload
       expect(@course.name).to eq course_name

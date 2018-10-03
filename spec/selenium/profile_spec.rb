@@ -66,8 +66,7 @@ describe "profile" do
     edit_form.find_element(:id, 'old_password').send_keys(old_password)
     edit_form.find_element(:id, 'pseudonym_password').send_keys(new_password)
     edit_form.find_element(:id, 'pseudonym_password_confirmation').send_keys(new_password)
-    submit_form(edit_form)
-    wait_for_ajaximations
+    wait_for_new_page_load { submit_form(edit_form) }
   end
 
   it "should give error - wrong old password" do
@@ -156,8 +155,7 @@ describe "profile" do
       get "/profile/settings"
       edit_form = click_edit
       replace_content(edit_form.find_element(:id, 'user_name'), new_user_name)
-      submit_form(edit_form)
-      wait_for_ajaximations
+      wait_for_new_page_load { submit_form(edit_form) }
       expect(f('.full_name')).to include_text new_user_name
     end
 
