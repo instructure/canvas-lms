@@ -301,7 +301,7 @@ export default class Navigation extends React.Component {
         mountNode={document.getElementById('nav-tray-portal')}
         theme={{smallWidth: '28em'}}
       >
-        <CloseButton placement="end" onClick={this.handleRequestClose}>
+        <CloseButton placement="end" onClick={this.closeTray}>
           {I18n.t('Close')}
         </CloseButton>
         <div className="tray-with-space-for-global-nav">{this.renderTrayContent()}</div>
