@@ -17,12 +17,19 @@
 
 module Lti::Ims
   class NamesAndRolesController < ApplicationController
+    include Lti::Ims::AccessTokenHelper
+    include Lti::Ims::Concerns::AdvantageServices
 
     skip_before_action :load_user
-    before_action(
-      :require_context,
-      :verify_nrps_v2_allowed
-    )
+
+    # TODO: When Group authZ support added (LTIA-27), take out all the `only:` conditions
+    before_action :verify_environment
+    before_action :verify_access_token, only: :course_index
+    before_action :verify_permissions, only: :course_index
+    before_action :verify_developer_key, only: :course_index
+    before_action :verify_context
+    before_action :verify_tool, only: :course_index
+    before_action :verify_lti_advantage_enabled, only: :course_index
 
     MIME_TYPE = 'application/vnd.ims.lis.v2.membershipcontainer+json'.freeze
 
@@ -53,14 +60,68 @@ module Lti::Ims
       Helpers.const_get("#{context.class}MembershipsFinder").new(context, self)
     end
 
-    def verify_nrps_v2_allowed
-      # TODO: Add 'real' 1.3 security checks. See same hack in Lti::Ims::Concerns::GradebookServices.
+    def verify_environment
+      # TODO: Take out when 1.3/Advantage fully baked. See same hack in Lti::Ims::Concerns::GradebookServices.
       render_unauthorized_action if Rails.env.production?
-
-      # TODO: This will become one of the 'real' security checks once NRPS invocations can be associated with a Tool
-      # render_unauthorized_action unless tool && tool.names_and_roles_service_enabled?
-      true
     end
 
+    def verify_access_token
+      # TODO: this needs to change to use either Lti::Oauth2::AuthorizationValidator#validate! or
+      # Lti::Ims::AccessTokenHelper#validate_access_token!. Currently can't use former b/c it expects JWTs to be signed
+      # by DeveloperKey#api_key, whereas current Client Credentials Grant support uses the system-wide encryption key.
+      # Currently can't use latter (#validate_access_token!) b/c of a variety of mismatched expectations around `aud`
+      # and `iss` claims
+      render_error("Missing Access Token", :unauthorized) if access_token.blank?
+    end
+
+    def verify_permissions
+      render_error("NRPS v2 scope not granted", :unauthorized) unless nrps_scope_granted
+    end
+
+    def nrps_scope_granted
+      access_token&.claim('scopes')&.split(' ')&.include?(TokenScopes::LTI_NRPS_V2_SCOPE)
+    end
+
+    def verify_developer_key
+      render_error("Unknown or inactive Developer Key", :unauthorized) unless developer_key&.active?
+    end
+
+    def verify_context
+      require_context
+    end
+
+    def verify_tool
+      render_error("Access Token not linked to a Tool associated with this Context", :unauthorized) if tool.blank?
+    end
+
+    def verify_lti_advantage_enabled
+      render_error("LTI 1.3/Advantage features not enabled", :unauthorized) unless tool&.names_and_roles_service_enabled?
+    end
+
+    def tool
+      @_tool ||= begin
+        return nil unless context
+        return nil if (tools = developer_key&.active_context_external_tools).blank?
+        # DeveloperKeys have n-many ContextExternalTools. Limit that list to just the
+        # active ones, then try to find the first CET with a direct association w the requested
+        # Context. Failing that, walk the Context's Account chain and find the first CET
+        # directly associated with such an Account.
+        tools.find(-> {find_account_tool(tools)}, &method(:context_tool?))
+      end
+    end
+
+    def find_account_tool(tools)
+      # TODO: Add group support
+      context.account_chain.each do |acct|
+        tool = tools.find { |t| t.context.is_a?(Account) && t.context == acct}
+        return tool if tool
+      end
+      nil
+    end
+
+    def context_tool?(tool)
+      # TODO: Add group support
+      tool.context == context ? tool : nil
+    end
   end
 end

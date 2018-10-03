@@ -22,12 +22,17 @@ class TokenScopes
     verb: "GET",
     scope: "#{OAUTH2_SCOPE_NAMESPACE}userinfo"
   }.freeze
+  LTI_AGS_LINE_ITEM_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem".freeze
+  LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly".freeze
+  LTI_AGS_RESULT_READ_ONLY_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly".freeze
+  LTI_AGS_SCORE_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/score".freeze
+  LTI_NRPS_V2_SCOPE = "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly".freeze
   LTI_SCOPES = {
-    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem" => I18n.t("Manage Line Items"),
-    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly" => I18n.t("Read Line Items"),
-    "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly" => I18n.t("Read Line Item Results"),
-    "https://purl.imsglobal.org/spec/lti-ags/scope/score" => I18n.t("Create/Edit Line Item Scores"),
-    "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly" => I18n.t("Read Context Membership")
+    LTI_AGS_LINE_ITEM_SCOPE => I18n.t("Manage Line Items"),
+    LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE => I18n.t("Read Line Items"),
+    LTI_AGS_RESULT_READ_ONLY_SCOPE => I18n.t("Read Line Item Results"),
+    LTI_AGS_SCORE_SCOPE => I18n.t("Create/Edit Line Item Scores"),
+    LTI_NRPS_V2_SCOPE => I18n.t("Read Context Membership")
   }.freeze
 
   def self.named_scopes

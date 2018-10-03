@@ -18,6 +18,7 @@
 module Lti::Ims::Concerns
   module GradebookServices
     extend ActiveSupport::Concern
+    include AdvantageServices
 
     included do
       before_action :verify_tool_in_context, :verify_tool_permissions

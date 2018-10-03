@@ -111,6 +111,24 @@ module Lti::Ims::NamesAndRolesMatchers
     # Make sure a failure diffs the two JSON structs (w/o this will compare 'actual' JSON to 'expected' AR model)
     attr_reader :actual, :expected
   end
+
+  RSpec::Matchers.define :be_nrps_error_response_body do |expected_type, expected_message|
+    match do |actual|
+      @expected = {
+        'errors' => {
+          'type' => expected_type,
+          'message' => expected_message
+        }
+      }.compact
+
+      values_match? @expected, actual
+    end
+
+    diffable
+
+    # Make sure a failure diffs the two JSON structs
+    attr_reader :actual, :expected
+  end
 end
 
 
