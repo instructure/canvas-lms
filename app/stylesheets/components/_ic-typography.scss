@@ -383,12 +383,6 @@ input[type=file] {
 ///////==============
 /// Misc Type Settings
 ///////==============
-
-// gets rid of ugly border
-iframe#tool_content {
-  border: none;
-}
-
 // "ui.dialog you are so dumb. you are really dumb, for real"
 // ui.dialog cancels input events for any positioned element w/ a lower
 // z-index, even if the element is inside the dialog (in which case the

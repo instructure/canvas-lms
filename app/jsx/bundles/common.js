@@ -95,7 +95,7 @@ $(resetMenuItemTabIndexes)
 $(window).on('resize', _.debounce(resetMenuItemTabIndexes, 50))
 $('body').on('click', '#distractionFreeToggle', () => {
   $('body').toggleClass('no-headers distraction-free')
-  
+
   if($('body').hasClass('no-headers distraction-free')){
     window.localStorage.setItem("distraction_free", true)
   }else{
@@ -112,7 +112,7 @@ $('body').on('click', '#distractionFreeToggle', () => {
   }
 
   if (!$tool_content_wrapper.data('height_overridden')) {
-    toolResizer.resize_tool_content_wrapper($(window).height() - canvas_chrome_height - $('#sequence_footer').outerHeight(true));
+    // toolResizer.resize_tool_content_wrapper($(window).height() - canvas_chrome_height - $('#sequence_footer').outerHeight(true));
   }
 })
 
@@ -167,7 +167,7 @@ $(document).ready(() => {
     $('body').toggleClass('no-headers distraction-free')
   }
   $('body').fadeIn(500)
-  
+
 
 
 })
