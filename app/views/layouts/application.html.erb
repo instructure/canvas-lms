@@ -105,12 +105,7 @@
 
   <div id="wrapper" class="ic-Layout-wrapper">
   <div class="ic-app-nav-toggle-and-crumbs no-print">
-      <% if true %>
-          <% if true %>
-          <button type="button" id="distractionFreeToggle" class="Button Button--link ic-app-course-nav-toggle" aria-live="polite" aria-label="Distraction Free Toggle" title="Distraction Free Toggle">
-            <i class="icon-hamburger" aria-hidden="true"></i>
-          </button>
-          <% end %>
+      <% if crumbs.length > 1 %>
           <div class="ic-app-crumbs">
           <%= render_crumbs %>
           </div>
