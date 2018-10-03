@@ -124,6 +124,12 @@ test('replaceTextArea', function() {
   ok($.fn.detach.calledOn(et.textAreaContainer), 'removes container')
 })
 
+test('getContent removes MathML', () => {
+  containerDiv.append($('<div>Math image goes here</div><div class="hidden-readable">MathML goes here</div>'))
+  const et = new EditorToggle(containerDiv)
+  equal(et.getContent(), '<div>Math image goes here</div>')
+})
+
 test('edit', function() {
   const fresh = {}
   const content = 'content'
@@ -134,6 +140,7 @@ test('edit', function() {
     textArea,
     done: $('<div/>'),
     getContent() {
+
       return content
     },
     getRceOptions() {},

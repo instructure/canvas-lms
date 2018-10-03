@@ -513,4 +513,24 @@ describe QuizzesHelper do
       end
     end
   end
+
+  context "#comment_get" do
+    it 'returns _html field if present' do
+      comment = comment_get({ foo_html: '<div>Foo</div>', foo: 'Bar' }, 'foo')
+      expect(comment).to eq '<div>Foo</div>'
+    end
+
+    it 'returns raw field if _html field not present' do
+      comment = comment_get({ foo: 'Bar' }, 'foo')
+      expect(comment).to eq 'Bar'
+    end
+
+    it 'adds MathML if appropriate' do
+      comment = comment_get({
+        foo_html: '<img class="equation_image" data-equation-content="\coprod"></img>'
+      }, 'foo')
+      expect(comment).to match(/MathML/)
+      expect(comment).to match(/&amp;coprod/)
+    end
+  end
 end

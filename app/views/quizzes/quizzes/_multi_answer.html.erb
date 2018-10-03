@@ -19,10 +19,10 @@
 <% multi_answer ||= nil %>
 <% answer = multi_answer %>
 <% question ||= {} %>
-<% answer_text = (hash_get(answer, :html).present? ? hash_get(answer, :html).html_safe : hash_get(answer, :text)) || '' %>
-<% answer_label = html_to_text(answer_text + ' ' + (hash_get(question, 'question_text') || '')) %>
 <div class="answer">
   <% if question_type.entry_type == "radio" || question_type.entry_type == "select" || question_type.entry_type == "checkbox" %>
+    <% answer_text = (hash_get(answer, :html).present? ? user_content(hash_get(answer, :html)) : hash_get(answer, :text)) || '' %>
+    <% answer_label = html_to_text(answer_text + ' ' + (hash_get(question, 'question_text') || '')) %>
     <table style="width: 100%">
       <tr>
         <td class="answer_input">
@@ -42,9 +42,13 @@
       </tr>
     </table>
   <% elsif question_type.entry_type == "matching" %>
+    <% html_answer = hash_get(answer, :left_html) || hash_get(answer, :html) %>
+    <% text_answer = hash_get(answer, :left) || hash_get(answer, :text) || '' %>
+    <% answer_text = html_answer.present? ? user_content(html_answer) : text_answer %>
+    <% answer_label = html_to_text(answer_text + ' ' + (hash_get(question, 'question_text') || '')) %>
     <div class="pull-left" style="width: 40%; margin-top: 10px;">
       <% if answer %>
-        <label for="question_<%= hash_get(question, :id) %>_answer_<%= hash_get(answer, :id) %>" aria-label="<%= answer_label %>"><%= (hash_get(answer, :left_html) || hash_get(answer, :html)).present? ? (hash_get(answer, :left_html) || hash_get(answer, :html)).html_safe : (hash_get(answer, :left) || hash_get(answer, :text)) %></label>
+        <label for="question_<%= hash_get(question, :id) %>_answer_<%= hash_get(answer, :id) %>" aria-label="<%= answer_label %>"><%= answer_text %></label>
         <% if !user_answer %>
           <br/>
           <div style="margin-<%= direction('left') %>: 20px;">

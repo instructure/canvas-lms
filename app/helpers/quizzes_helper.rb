@@ -399,7 +399,7 @@ module QuizzesHelper
     html = hash_get(hash, "#{field}_html".to_sym)
 
     if html
-      sanitize(html)
+      UserContent.escape(Sanitize.clean(html, CanvasSanitize::SANITIZE))
     else
       hash_get(hash, field)
     end
