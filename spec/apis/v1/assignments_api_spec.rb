@@ -252,6 +252,27 @@ describe AssignmentsApiController, type: :request do
                           assignment8)
     end
 
+    it "returns assignments by assignment group" do
+      group1 = @course.assignment_groups.create!(:name => 'group1')
+      group2 = @course.assignment_groups.create!(:name => 'group2')
+      @course.assignments.create!(:title => 'assignment1',
+                                  :assignment_group => group2)
+      @course.assignments.create!(:title => 'assignment2',
+                                  :assignment_group => group2)
+      @course.assignments.create!(:title => 'assignment3',
+                                  :assignment_group => group1)
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignment_groups/#{group2.id}/assignments",
+                      {
+                        controller: 'assignments_api',
+                        action: 'index',
+                        format: 'json',
+                        course_id: @course.to_param,
+                        assignment_group_id: group2.to_param
+                      })
+      expect(json.map { |a| a['name'] }).to match_array(['assignment1', 'assignment2'])
+    end
+
     it "should search for assignments by title" do
       2.times {|i| @course.assignments.create!(:title => "First_#{i}") }
       ids = @course.assignments.map(&:id)
