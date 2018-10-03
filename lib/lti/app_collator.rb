@@ -59,8 +59,8 @@ module Lti
       {
         app_type: config.class.name,
         app_id: config.id,
-        name: config[:settings][:name],
-        description:config[:settings][:description],
+        name: config[:settings]['title'],
+        description: config[:settings]['description'],
         installed_locally: tool_configuration[:enabled],
         enabled: tool_configuration[:enabled],
         tool_configuration: nil,

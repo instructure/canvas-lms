@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import I18n from 'i18n!external_tools'
 import _ from 'underscore'
 import createStore from '../../shared/helpers/createStore'
 import ExternalAppsStore from '../../external_apps/lib/ExternalAppsStore'
@@ -39,26 +40,22 @@ import 'compiled/jquery.rails_flash_notifications'
     }
   };
 
-  var store = createStore({
+  const defaultState = {
     isLoading: false,    // flag to indicate fetch is in progress
     isLoaded: false,     // flag to indicate if fetch should re-pull if already pulled
     apps: [],
+    lti13Tools: [],
+    lti13LoadStatus: 'pending',
     links: {},
     filter: 'all',
     filterText: '',
     hasMore: false       // flag to indicate if there are more pages of external tools
-  });
+  }
+
+  var store = createStore(defaultState);
 
   store.reset = function() {
-    this.setState({
-      isLoading: false,
-      isLoaded: false,
-      apps: [],
-      links: {},
-      filter: 'all',
-      filterText: '',
-      hasMore: false
-    })
+    this.setState(defaultState)
   };
 
   store.fetch = function () {
@@ -72,27 +69,38 @@ import 'compiled/jquery.rails_flash_notifications'
     });
   };
 
-  store.filteredApps = function () {
-    var filter = this.getState().filter
-      , filterText = new RegExp(this.getState().filterText, 'i');
+  store.fetch13Tools = function() {
+    const url = `/api/v1${ENV.CONTEXT_BASE_URL}/lti_apps?lti_1_3_tool_configurations=true`;
+    this.setState({ lti13LoadStatus: true });
+    $.ajax({
+      url,
+      type: 'GET',
+      success: this._fetch13ToolsSuccessHandler.bind(this),
+      error: this._fetch13ToolsErrorHandler.bind(this)
+    });
+  };
 
-    return _.filter(this.getState().apps, function (app) {
+  store.filteredApps = function (toFilter = this.getState().apps) {
+    const filter = this.getState().filter
+    const filterText = new RegExp(this.getState().filterText, 'i');
+
+    return _.filter(toFilter, (app) => {
       if (!app.name) {
         return false;
       }
 
-      var isInstalled = !!app.is_installed
-        , name = app.name
-        , categories = app.categories || [];
+      const isInstalled = !!app.is_installed
+      const name = app.name
+      const categories = app.categories || [];
 
-      if (filter == 'installed' && !isInstalled) {
+      if (filter === 'installed' && !isInstalled) {
         return false;
-      } else if (filter == 'not_installed' && isInstalled) {
+      } else if (filter === 'not_installed' && isInstalled) {
         return false;
       }
 
       return (name.match(filterText) || categories.join().match(filterText));
-    }.bind(this));
+    });
   };
 
   store.findAppByShortName = function (shortName) {
@@ -108,6 +116,14 @@ import 'compiled/jquery.rails_flash_notifications'
       }
     });
   };
+
+  store.installTool = function () {
+    console.log('i did something')
+  }
+
+  store.removeTool = function () {
+    console.log('i tried to did something')
+  }
 
   //*** CALLBACK HANDLERS ***/
 
@@ -135,6 +151,20 @@ import 'compiled/jquery.rails_flash_notifications'
       isLoaded: false,
       apps: [],
       hasMore: true
+    });
+  };
+
+  store._fetch13ToolsSuccessHandler = function(tools, status, xhr) {
+    this.setState({
+      lti13LoadStatus: 'success',
+      lti13Tools: sort(tools)
+    });
+  };
+
+  store._fetch13ToolsErrorHandler = function() {
+    $.flashError(I18n.t('Unable to load Lti 1.3 Tools'));
+    this.setState({
+      lti13LoadStatus: 'error'
     });
   };
 

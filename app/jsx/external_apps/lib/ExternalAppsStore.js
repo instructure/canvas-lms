@@ -23,11 +23,11 @@ import createStore from '../../shared/helpers/createStore'
 import parseLinkHeader from 'compiled/fn/parseLinkHeader'
 import 'compiled/jquery.rails_flash_notifications'
 
-  var PER_PAGE = 50;
+  const PER_PAGE = 50;
 
-  var sort = function(tools) {
+  const sort = function(tools) {
     if (tools) {
-      return _.sortBy(tools, function (tool) {
+      return _.sortBy(tools, (tool) => {
         if (tool.name) {
           return tool.name.toUpperCase();
         } else {
@@ -39,7 +39,7 @@ import 'compiled/jquery.rails_flash_notifications'
     }
   };
 
-  var store = createStore({
+  const store = createStore({
     externalTools: [],
     links: {},
     isLoading: false,    // flag to indicate fetch is in progress
@@ -61,7 +61,7 @@ import 'compiled/jquery.rails_flash_notifications'
     var url = this.getState().links.next || '/api/v1' + ENV.CONTEXT_BASE_URL + '/lti_apps?per_page=' + PER_PAGE;
     this.setState({ isLoading: true });
     $.ajax({
-      url: url,
+      url,
       type: 'GET',
       success: this._fetchSuccessHandler.bind(this),
       error: this._fetchErrorHandler.bind(this)

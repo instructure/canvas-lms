@@ -16,12 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
+import ReactDOM from 'react-dom'
+import TestUtils from 'react-dom/test-utils'
 import store from 'jsx/external_apps/lib/AppCenterStore'
+import AppFilters from 'jsx/external_apps/components/AppFilters'
 
-QUnit.module('ExternalApps.AppCenterStore', {
+const {Simulate} = TestUtils
+const wrapper = document.getElementById('fixtures')
+const createElement = () => <AppFilters />
+const renderComponent = () => ReactDOM.render(createElement(), wrapper)
+const getDOMNodes = function() {
+  const component = renderComponent()
+  const tabAll = component.refs.tabAll
+  const tabNotInstalled = component.refs.tabNotInstalled
+  const tabInstalled = component.refs.tabInstalled
+  const filterText = component.refs.filterText
+  const lti13tools = component.refs.tabLti13Tools
+  return [component, tabAll, tabNotInstalled, tabInstalled, lti13tools, filterText]
+}
+
+QUnit.module('ExternalApps.AppFilters', {
   setup() {
-    this.server = sinon.fakeServer.create()
-    store.reset()
     this.apps = [
       {
         app_type: null,
@@ -104,44 +120,29 @@ QUnit.module('ExternalApps.AppCenterStore', {
         total_ratings: 1
       }
     ]
-    this.response = [200, {'Content-Type': 'application/json'}, JSON.stringify(this.apps)]
+    store.reset()
+    window.ENV.LTI_13_TOOLS_FEATURE_FLAG_ENABLED = true
+    return store.setState({apps: this.apps})
   },
   teardown() {
-    this.server.restore()
-    return store.reset()
+    store.reset()
+    ReactDOM.unmountComponentAtNode(wrapper)
   }
 })
 
-test('findAppByShortName', function() {
-  store.setState({apps: this.apps})
-  equal(store.getState().apps.length, 3)
-  const thisApp = store.findAppByShortName('aleks')
-  equal(thisApp.id, 66)
+test('renders', () => {
+  const [component, tabAll, tabNotInstalled, tabInstalled, lti13tools, filterText] = Array.from(getDOMNodes())
+  ok(component)
+  ok(TestUtils.isCompositeComponentWithType(component, AppFilters))
 })
 
-test('flagAppAsInstalled', function() {
-  store.setState({apps: this.apps})
-  ok(!store.findAppByShortName('apprennet').is_installed)
-  store.flagAppAsInstalled('apprennet')
-  ok(store.findAppByShortName('apprennet').is_installed)
-})
-
-test('filteredApps', function() {
-  store.setState({apps: this.apps})
-  equal(store.filteredApps().length, 3)
-  store.setState({filterText: 'e'})
-  equal(store.filteredApps().length, 2)
-  store.setState({filter: 'not_installed'})
-  equal(store.filteredApps().length, 1)
-})
-
-test('fetch', function() {
-  this.server.respondWith('GET', /\/app_center\/apps/, [
-    200,
-    {'Content-Type': 'application/json'},
-    JSON.stringify(this.apps)
-  ])
-  store.fetch()
-  this.server.respond()
-  equal(store.getState().apps.length, 3)
+test('sets filter on click', () => {
+  const [component, tabAll, tabNotInstalled, tabInstalled, lti13tools, filterText] = Array.from(getDOMNodes())
+  equal(store.getState().filter, 'all')
+  Simulate.click(tabNotInstalled)
+  equal(store.getState().filter, 'not_installed')
+  Simulate.click(tabInstalled)
+  equal(store.getState().filter, 'installed')
+  Simulate.click(lti13tools)
+  equal(store.getState().filter, 'lti_1_3_tools')
 })
