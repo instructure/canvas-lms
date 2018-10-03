@@ -33,6 +33,7 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
 
   let assignmentGroups;
   let assignments;
+  let contextModules;
   let customColumns;
 
   function createAssignments () {
@@ -72,6 +73,13 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
     ];
   }
 
+  function createContextModules () {
+    contextModules = [
+      { id: '2601', name: 'Science', position: 1 },
+      { id: '2602', name: 'Math', position: 2 }
+    ];
+  }
+
   function createCustomColumns () {
     customColumns = [
       { id: '2401', teacher_notes: true, hidden: false, title: 'Notes' },
@@ -94,6 +102,10 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
     });
   }
 
+  function addContextModules () {
+    dataLoader.gotContextModules.resolve(contextModules);
+  }
+
   function addCustomColumns () {
     dataLoader.gotCustomColumns.resolve(customColumns);
   }
@@ -104,6 +116,7 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
 
   function addGridData () {
     addStudentIds();
+    addContextModules();
     addCustomColumns();
     addAssignmentGroups();
     addGradingPeriodAssignments();
@@ -142,6 +155,7 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
 
     createAssignments();
     createAssignmentGroups();
+    createContextModules();
     createCustomColumns();
   });
 

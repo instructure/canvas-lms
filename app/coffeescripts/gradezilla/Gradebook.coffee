@@ -413,6 +413,7 @@ define [
 
       @renderedGrid = $.when(
         dataLoader.gotStudentIds,
+        dataLoader.gotContextModules,
         dataLoader.gotCustomColumns,
         dataLoader.gotAssignmentGroups,
         dataLoader.gotGradingPeriodAssignments
