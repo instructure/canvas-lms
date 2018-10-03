@@ -98,6 +98,15 @@ describe DocviewerAuditEventsController do
       expect(JSON.parse(response.body).fetch('message')).to eq 'Assignment is neither anonymous nor moderated'
     end
 
+    it 'renders status unprocessable_entity if passed an invalid event type' do
+      assignment = Assignment.create!(course: @course, name: 'generally reasonable', anonymous_grading: true)
+      @submission = assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
+
+      default_params[:docviewer_audit_event][:event_type] = 'miscellaneous_annotation_created'
+      post :create, format: :json, params: default_params
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
+
     context 'for a moderated assignment' do
       it 'renders status ok if assignment has an open slot for moderating' do
         assignment = Assignment.create!(
@@ -345,5 +354,20 @@ describe DocviewerAuditEventsController do
     @submission = assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
     post :create, format: :json, params: default_params.except(:related_annotation_id)
     expect(response).to have_http_status(:ok)
+  end
+
+  it "creates an event with 'docviewer_' prepended to the supplied event type" do
+    assignment = Assignment.create!(course: @course, anonymous_grading: true, name: 'zzzzz')
+    @submission = assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@attachment])
+
+    expect {
+      post :create, format: :json, params: default_params
+    }.to change {
+      AnonymousOrModerationEvent.where(
+        assignment: assignment,
+        submission: @submission,
+        event_type: 'docviewer_highlight_created'
+      ).count
+    }.by 1
   end
 end
