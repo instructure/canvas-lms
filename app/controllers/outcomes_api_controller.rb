@@ -89,7 +89,7 @@
 #         },
 #         "calculation_int": {
 #           "description": "this defines the variable value used by the calculation_method. included only if calculation_method uses it",
-#           "example": 75,
+#           "example": 65,
 #           "type": "integer"
 #         },
 #         "ratings": {
@@ -227,7 +227,7 @@ class OutcomesApiController < ApplicationController
   #        -F 'vendor_guid=customid9001' \
   #        -F 'mastery_points=3' \
   #        -F 'calculation_method=decaying_average' \
-  #        -F 'calculation_int=75' \
+  #        -F 'calculation_int=65' \
   #        -F 'ratings[][description]=Exceeds Expectations' \
   #        -F 'ratings[][points]=5' \
   #        -F 'ratings[][description]=Meets Expectations' \

@@ -169,7 +169,7 @@ describe Outcomes::CsvImporter do
       methods = LearningOutcome::CALCULATION_METHODS.keys.sort
       expect(by_method.keys.sort).to eq(methods)
 
-      expect(by_method['decaying_average'][0].calculation_int).to eq(40)
+      expect(by_method['decaying_average'].map(&:calculation_int)).to include(40)
       expect(by_method['n_mastery'][0].calculation_int).to eq(3)
     end
 

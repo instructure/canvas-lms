@@ -132,8 +132,8 @@ module Outcomes
       model.title = outcome[:title]
       model.description = infer_nil_value(model, :description, outcome)
       model.display_name = infer_nil_value(model, :display_name, outcome)
-      model.calculation_method = outcome[:calculation_method].presence || 'highest'
-      model.calculation_int = outcome[:calculation_int]
+      model.calculation_method = outcome[:calculation_method].presence || model.default_calculation_method
+      model.calculation_int = outcome[:calculation_int].presence || model.default_calculation_int
       # let removing the outcome_links content tags delete the underlying outcome
       model.workflow_state = 'active' if outcome[:workflow_state] == 'active'
 
