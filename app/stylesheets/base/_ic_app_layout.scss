@@ -153,25 +153,30 @@ body:not(.course-menu-expanded) {
 
 .ic-Layout-wrapper {
   box-sizing: border-box;
+  max-width: calc(100% - 200px);
   min-height: 100vh;
+  transform: translateX(100px);
+  transition-duration: .24s;
+  transition-property: transform;
+  transition-timing-function: ease-in;
 
-  body:not(.full-width):not(.outcomes) & {
+  // body:not(.full-width):not(.outcomes) & {
     // We want to add a max size to most pages in canvas
     // unless it's a full-width app
-    max-width: 100%;
-  }
+    // max-width: calc(100% - 200px);
+  // }
 
   body:not(.ic-no-flex-layout):not(.embedded) & {
     display: flex;
     flex-direction: column;
   }
 
-  body:not(.no-headers) & {
-    margin-left: $ic-header-primary-width;
-  }
+  // body:not(.no-headers) & {
+  //   margin-left: $ic-header-primary-width;
+  // }
 
   body:not(.no-headers).primary-nav-expanded & {
-    margin-left: $ic-header-primary-width;
+    transform: translateX(200px);
   }
 
   body.embedded & {
@@ -249,28 +254,28 @@ body:not(.course-menu-expanded) {
 }
 
 .sm-course-menu.list-view{
-  padding: 0 1%;
+  padding: 12px 0;
   position: relative;
   border-bottom: $sm-course-nav-hover-color;
 
-  ul{
-    li{
+  ul {
+
+    li {
       float: left;
 
-      a{
+      a {
         border-radius: 0px;
-        padding: 20px 15px;
+        padding: 16px 24px;
 
-        &:hover{
+        &:hover {
           background-color: transparent;
         }
 
-       &.active{
-
+       &.active {
           color: var(--ic-brand-primary);
           font-weight: 500;
           background-color: transparent;
-          padding-bottom: 16px;
+          padding-bottom: 12px;
           border-bottom: 4px solid var(--ic-brand-tertiary);
         }
       }
@@ -280,7 +285,7 @@ body:not(.course-menu-expanded) {
 
 .sm-course-menu.list-view > nav > ul > li > a:hover,
 .sm-course-menu.list-view > nav > ul > li > a:focus {
-  padding-bottom: 16px;
+  padding-bottom: 12px;
   border-bottom: 4px solid $sm-course-nav-hover-color;
 }
 
@@ -390,7 +395,6 @@ body:not(.course-menu-expanded) {
   background: $sm-body-background-color;
   position: absolute;
   bottom: 0px;
-  width: 98%;
 
   ul > li > a:active {
     background: $sm-body-background-color;
@@ -407,7 +411,6 @@ body:not(.course-menu-expanded) {
   align-items: center;
   border-bottom: 1px solid $ic-border-light;
   padding: $ic-sp/2 $ic-sp*2;
-  background-color: #FFFFFF;
 }
 
 .ic-app-course-nav-toggle {
