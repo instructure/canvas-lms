@@ -265,7 +265,7 @@ body:not(.course-menu-expanded) {
 
       a {
         border-radius: 0px;
-        padding: 12px 24px 20px;
+        padding: 16px 24px;
 
         &:hover {
           background-color: transparent;
@@ -275,7 +275,7 @@ body:not(.course-menu-expanded) {
           color: var(--ic-brand-primary);
           font-weight: 500;
           background-color: transparent;
-          padding-bottom: 16px;
+          padding-bottom: 12px;
           border-bottom: 4px solid var(--ic-brand-tertiary);
         }
       }

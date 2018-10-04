@@ -108,12 +108,8 @@ $('body').on('click', '#distractionFreeToggle', () => {
   resetMenuItemTabIndexes()
   var $tool_content_wrapper = $('.tool_content_wrapper');
 
-  var min_tool_height, canvas_chrome_height;
+  var min_tool_height;
   const toolResizer = new ToolLaunchResizer(min_tool_height);
-
-  if ( !$('body').hasClass('ic-full-screen-lti-tool') ) {
-    canvas_chrome_height = $tool_content_wrapper.offset().top + $('#footer').outerHeight(true);
-  }
 })
 
 // Backbone routes

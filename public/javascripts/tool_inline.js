@@ -87,7 +87,7 @@ $.trackEvent(messageType, toolName, toolPath);
 
 //Iframe resize handler
 var $tool_content_wrapper;
-var min_tool_height, canvas_chrome_height;
+var min_tool_height;
 
 $(function() {
   var $window = $(window);
@@ -107,10 +107,6 @@ $(function() {
     $tool_content_wrapper.find('iframe').css('border', 'none');
     $(this).addClass('screenreader-only');
   })
-
-  if ( !$('body').hasClass('ic-full-screen-lti-tool') ) {
-    canvas_chrome_height = $tool_content_wrapper.offset().top + $('#footer').outerHeight(true);
-  }
 
   if (ENV.LTI != null && ENV.LTI.SEQUENCE != null) {
     $('#module_sequence_footer').moduleSequenceFooter({
