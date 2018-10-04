@@ -677,7 +677,6 @@ describe "Users API", type: :request do
       p.save!
 
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param }, { include: ['last_login'], search_term: u.id.to_s })
-
       expect(json.count).to eq 1
       expect(json.first['last_login']).to eq p.current_login_at.iso8601
 
@@ -686,6 +685,19 @@ describe "Users API", type: :request do
         { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param },
         { include: ['last_login'], sort: "last_login", order: 'desc'})
       expect(json.first['last_login']).to eq p.current_login_at.iso8601
+    end
+
+    it "does return a next header on the last page" do
+      @account = Account.default
+      u = User.create!(name: 'test user')
+      p = u.pseudonyms.create!(account: @account, unique_id: 'user')
+
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param }, { search_term: u.id.to_s, per_page: '1', page: '1' })
+      expect(json.length).to eq 1
+      expect(response.headers['Link']).to include("rel=\"next\"")
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param }, { search_term: u.id.to_s, per_page: '1', page: '2' })
+      expect(json).to be_empty
+      expect(response.headers['Link']).to_not include("rel=\"next\"")
     end
   end
 
