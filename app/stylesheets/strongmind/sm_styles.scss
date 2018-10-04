@@ -1,9 +1,10 @@
 #distractionFreeToggle {
     background-color: #33373F;
-    border-radius: 50%;
+    border-radius: 4px;
     bottom: 0;
     height: 48px;
     margin: auto;
+    padding: 4px;
     position: absolute;
     right: -24px;
     text-align: right;
@@ -12,6 +13,10 @@
 
     i {
         color: #F5F5F6;
+
+        &::before {
+            font-size: 1.2rem;
+        }
     }
 }
 
@@ -20,4 +25,15 @@
     transition-duration: .24s;
     transition-property: transform;
     transition-timing-function: ease-in;
+}
+
+.user_content {
+    backgroud-color: #ECECED;
+    border-radius: 4px;
+    margin: 12px 7px;
+    text-align: center;
+
+    p {
+        font-size: .75rem;
+    }
 }

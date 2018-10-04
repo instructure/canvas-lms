@@ -24,9 +24,10 @@
     padding: 0;
     > li {
       display: inline-block;
+      font-size: .875rem;
+      font-weight: 300;
       white-space: nowrap;
-      vertical-align: top;
-      @include fontSize(18px);
+      vertical-align: middle;
       // temporary solution for new styles before crumbs are re-done:
       // we do not want to see the home link
       &:first-of-type { display: none; }

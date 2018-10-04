@@ -32,15 +32,11 @@ body {
 
   &.no-headers, &.embedded {
     #header { transform: translateX(-200px); }
-
-    .ic-app-nav-toggle-and-crumbs { display: none; }
     #footer { display: none; }
   }
 
   &.no-headers.distraction-free {
     #header { transform: translateX(-200px); }
-
-    .ic-app-nav-toggle-and-crumbs { display: flex !important; margin-bottom: 20px; }
   }
 
   &.embedded {
