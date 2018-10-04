@@ -338,15 +338,19 @@
 </script>
 <script type="text/javascript" src="https://cdn.flipswitch.com/cdn/lib/iFrame-Resizer/javascript/iframeResizer.min.latest.js"></script>
 <script type="text/javascript">
-
-var isOldIE = (navigator.userAgent.indexOf("MSIE") !== -1); // Detect IE10 and below
-
+const isOldIE = (navigator.userAgent.indexOf("MSIE") !== -1); // Detect IE10 and below
+function onResize() {
+    var removeScrollbars = function(e) {
+        e.iframe.scrolling = "no";
+    };
+    return removeScrollbars;
+}
 iFrameResize({
     checkOrigin: false,
-    heightCalculationMethod: isOldIE ? 'max' : 'documentElementScroll',
-    scrolling: 'auto'
-}, 'iframe');
-
+    heightCalculationMethod: isOldIE ? 'max' : 'lowestElement',
+    scrolling: true, // Enable scrollbars for non-iframeResizer content...
+    resizedCallback: onResize() // Only runs if parent iFrameResizer detects a "resize" event from child...
+}, '.sm_iframe');
 </script>
 <% if ENV['JIRA_COLLECTOR'] %>
 <script type="text/javascript" src="https://strongmind.atlassian.net/s/d41d8cd98f00b204e9800998ecf8427e-T/wy1zps/b/20/a44af77267a987a660377e5c46e0fb64/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?locale=en-UK&collectorId=c6509dcb"></script>
