@@ -254,7 +254,7 @@ body:not(.course-menu-expanded) {
 }
 
 .sm-course-menu.list-view{
-  padding: 0 1%;
+  padding: 12px 0;
   position: relative;
   border-bottom: $sm-course-nav-hover-color;
 
@@ -395,7 +395,6 @@ body:not(.course-menu-expanded) {
   background: $sm-body-background-color;
   position: absolute;
   bottom: 0px;
-  width: 98%;
 
   ul > li > a:active {
     background: $sm-body-background-color;
