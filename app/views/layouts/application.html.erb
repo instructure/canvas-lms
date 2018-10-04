@@ -343,7 +343,7 @@ var isOldIE = (navigator.userAgent.indexOf("MSIE") !== -1); // Detect IE10 and b
 
 iFrameResize({
     checkOrigin: false,
-    heightCalculationMethod: isOldIE ? 'max' : 'lowestElement',
+    heightCalculationMethod: isOldIE ? 'max' : 'documentElementScroll',
     scrolling: 'auto'
 }, 'iframe');
 
