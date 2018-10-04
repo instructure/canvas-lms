@@ -249,10 +249,8 @@ class User < ActiveRecord::Base
     end
   }
 
-  scope :linked_through_root_accounts, lambda {|root_accounts|
-    root_accounts = Array(root_accounts)
-    root_accounts << nil # TODO: remove after root_account_id is populated and is not-nulled (a)
-    where(UserObservationLink.table_name => {:root_account_id => root_accounts})
+  scope :linked_through_root_account, lambda {|root_account|
+    where(UserObservationLink.table_name => {:root_account_id => [root_account.id, nil] + root_account.trusted_account_ids})
   }
 
   def reload(*)
