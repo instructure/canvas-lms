@@ -553,6 +553,12 @@ describe GradebookImporter do
   end
 
   context "custom gradebook columns" do
+    let(:uploaded_custom_columns) { @gi.upload.gradebook["custom_columns"] }
+    let(:uploaded_student_custom_column_data) do
+      student_data = @gi.upload.gradebook["students"].first
+      student_data["custom_column_data"]
+    end
+
     before do
       @student = User.create!
       course_with_student(course: @course, user: @student, active_enrollment: true)
@@ -588,6 +594,80 @@ describe GradebookImporter do
       )
       col = @gi.upload.gradebook.fetch('students').first.fetch('custom_column_data').map { |custom_column| custom_column.fetch('new_content') }
       expect(col).to eq ['test 1', 'test 2']
+    end
+
+    it "does not capture custom columns that are not included in the import" do
+      importer_with_rows(
+        "Student,ID,Section,CustomColumn2,Assignment 1",
+        ",#{@student.id},,test 2,10"
+      )
+      expect(uploaded_custom_columns).not_to include(hash_including(title: "CustomColumn1"))
+    end
+
+    it "does not attempt to change the values of custom columns that are not included in the import" do
+      importer_with_rows(
+        "Student,ID,Section,CustomColumn2,Assignment 1",
+        ",#{@student.id},,test 2,10"
+      )
+
+      column = @course.custom_gradebook_columns.find_by(title: 'CustomColumn1')
+      expect(uploaded_student_custom_column_data).not_to include(hash_including(column_id: column.id))
+    end
+
+    it "captures new values even if custom columns are in different positions" do
+      importer_with_rows(
+        "Student,ID,Section,CustomColumn2,CustomColumn1,Assignment 1",
+        ",#{@student.id},,test 2,test 1,10"
+      )
+
+      column = @course.custom_gradebook_columns.find_by(title: 'CustomColumn2')
+      column_datum = uploaded_student_custom_column_data.detect { |datum| datum['column_id'] == column.id }
+      expect(column_datum["new_content"]).to eq "test 2"
+    end
+
+    context "with a deleted custom column" do
+      before(:each) do
+        @course.custom_gradebook_columns.find_by(title: "CustomColumn1").destroy
+      end
+
+      it "omits deleted custom columns when they are included in the import" do
+        importer_with_rows(
+          "Student,ID,Section,CustomColumn1,CustomColumn2,Assignment 1",
+          ",#{@student.id},,test 1,test 2,10"
+        )
+
+        expect(uploaded_custom_columns.pluck(:title)).not_to include("CustomColumn1")
+      end
+
+      it "ignores deleted custom columns when they are not included in the import" do
+        importer_with_rows(
+          "Student,ID,Section,CustomColumn2,Assignment 1",
+          ",#{@student.id},,test 2,10"
+        )
+
+        expect(uploaded_custom_columns.pluck(:title)).not_to include("CustomColumn1")
+      end
+
+      it "supplies the expected new values for non-deleted columns" do
+        importer_with_rows(
+          "Student,ID,Section,CustomColumn2,Assignment 1",
+          ",#{@student.id},,NewCustomColumnValue,10"
+        )
+
+        expect(uploaded_student_custom_column_data.first["new_content"]).to eq "NewCustomColumnValue"
+      end
+
+      it "supplies the expected current values for non-deleted columns" do
+        active_column = @course.custom_gradebook_columns.find_by(title: "CustomColumn2")
+        active_column.custom_gradebook_column_data.create!(user_id: @student.id, content: "OldCustomColumnValue")
+
+        importer_with_rows(
+          "Student,ID,Section,CustomColumn2,Assignment 1",
+          ",#{@student.id},,NewCustomColumnValue,10"
+        )
+
+        expect(uploaded_student_custom_column_data.first["current_content"]).to eq "OldCustomColumnValue"
+      end
     end
   end
 
