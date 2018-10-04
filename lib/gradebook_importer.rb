@@ -113,7 +113,7 @@ class GradebookImporter
       prevented_grading_ungradeable_submission: false,
       prevented_changing_read_only_column: false
     }
-    @custom_column_titles_and_indexes = []
+    @parsed_custom_column_data = {}
     @gradebook_importer_assignments = {}
     @gradebook_importer_custom_columns = {}
 
@@ -194,8 +194,8 @@ class GradebookImporter
           )
         end
       end
-      @gradebook_importer_custom_columns[student.id].each do |student_custom_column_cell|
-        custom_column = custom_gradebook_columns.detect {|custom_col| custom_col.id == student_custom_column_cell['column_id']}
+      @gradebook_importer_custom_columns[student.id].each do |column_id, student_custom_column_cell|
+        custom_column = custom_gradebook_columns.detect {|custom_col| custom_col.id == column_id}
         datum = custom_column.custom_gradebook_column_data.detect {|custom_column_datum| custom_column_datum.user_id == student.id}
         student_custom_column_cell['current_content'] = datum&.content
       end
@@ -225,18 +225,17 @@ class GradebookImporter
       end
 
       custom_column_ids_to_skip_on_import = []
-      custom_gradebook_columns.each_with_index do |custom_column, index|
-        exclude_custom_column_on_import = @students.all? do |student|
-          custom_column_datum = @gradebook_importer_custom_columns[student.id][index]
-          no_change = (custom_column_datum['current_content'] == custom_column_datum['new_content']) ||
-            (custom_column_datum['current_content'].blank? && custom_column_datum['new_content'].blank?)
+      custom_gradebook_columns.each do |custom_column|
+        no_change = true
+        if @parsed_custom_column_data.include?(custom_column.id) && !custom_column.deleted?
+          no_change = no_change_to_column_values?(column_id: custom_column.id)
 
           @warning_messages[:prevented_changing_read_only_column] = true if !no_change && custom_column.read_only
-
-          no_change
         end
 
-        custom_column_ids_to_skip_on_import << custom_column.id if exclude_custom_column_on_import || custom_column.read_only
+        if no_change || exclude_custom_column_on_import(column: custom_column)
+          custom_column_ids_to_skip_on_import << custom_column.id
+        end
       end
 
       indexes_to_delete.reverse_each do |index|
@@ -248,8 +247,8 @@ class GradebookImporter
 
       @custom_gradebook_columns = @custom_gradebook_columns.reject { |custom_col| custom_column_ids_to_skip_on_import.include?(custom_col.id) }
       @students.each do |student|
-        @gradebook_importer_custom_columns[student.id] = @gradebook_importer_custom_columns[student.id].reject do |custom_col|
-          custom_column_ids_to_skip_on_import.include?(custom_col.fetch('column_id'))
+        @gradebook_importer_custom_columns[student.id].reject! do |column_id, _custom_col|
+          custom_column_ids_to_skip_on_import.include?(column_id)
         end
       end
 
@@ -300,18 +299,21 @@ class GradebookImporter
     end
   end
 
-  def process_custom_columns_headers(row)
-    custom_columns = custom_gradebook_columns
+  def process_custom_column_headers(row)
     row.each_with_index do |header_column, index|
-      cc = custom_columns.detect { |column| column.title == header_column }
-      if cc.present?
-        @custom_column_titles_and_indexes << {title: header_column, index: index, read_only: cc.read_only}
-      end
+      gradebook_column = custom_gradebook_columns.detect { |column| column.title == header_column }
+      next if gradebook_column.blank?
+
+      @parsed_custom_column_data[gradebook_column.id] = {
+        title: header_column,
+        index: index,
+        read_only: gradebook_column.read_only
+      }
     end
   end
 
   def strip_custom_columns(stripped_row)
-    @custom_column_titles_and_indexes.each do |column|
+    @parsed_custom_column_data.each_value do |column|
       stripped_row.delete(column[:title])
     end
     stripped_row
@@ -327,8 +329,8 @@ class GradebookImporter
   def header?(row)
     return false unless row_has_student_headers? row
 
-    # this is here instead of in process_header() because @custom_column_titles_and_indexes needs to be updated before update_column_count()
-    process_custom_columns_headers(row)
+    # this is here instead of in process_header() because @parsed_custom_column_data needs to be updated before update_column_count()
+    process_custom_column_headers(row)
 
     update_column_count row
 
@@ -339,7 +341,7 @@ class GradebookImporter
 
   def last_student_info_column(row)
     # Custom Columns are between section and assignments
-    row[@student_columns - (1 + @custom_column_titles_and_indexes.length)]
+    row[@student_columns - (1 + @parsed_custom_column_data.length)]
   end
 
   def row_has_student_headers?(row)
@@ -364,7 +366,7 @@ class GradebookImporter
     end
 
     # For Custom Columns
-    @student_columns += @custom_column_titles_and_indexes.length
+    @student_columns += @parsed_custom_column_data.length
   end
 
   def strip_non_assignment_columns(stripped_row)
@@ -466,16 +468,15 @@ class GradebookImporter
     end
 
     # custom columns
-    first_custom_column_index = @student_columns - custom_gradebook_columns.length
-    importer_custom_columns = []
+    importer_custom_columns = {}
 
-    custom_gradebook_columns.each_with_index do |cc, index|
-      col_index = index + first_custom_column_index
+    @parsed_custom_column_data.each do |id, custom_column|
+      column_index = custom_column[:index]
       new_custom_column_data = {
-        'new_content' => row[col_index],
-        'column_id' => cc.id,
+        'new_content' => row[column_index],
+        'column_id' => id
       }
-      importer_custom_columns << new_custom_column_data
+      importer_custom_columns[id] = new_custom_column_data
     end
 
     @gradebook_importer_custom_columns[student.id] = importer_custom_columns
@@ -613,7 +614,7 @@ class GradebookImporter
       :previous_id => student.previous_id,
       :id => student.id,
       :submissions => @gradebook_importer_assignments[student.id],
-      :custom_column_data => @gradebook_importer_custom_columns[student.id]
+      :custom_column_data => @gradebook_importer_custom_columns[student.id]&.values
     }
   end
 
@@ -649,5 +650,18 @@ class GradebookImporter
     # is an admin, but if we've pre-loaded that value already
     # to avoid an N+1, check that first.
     is_admin || submission.grants_right?(@user, :grade)
+  end
+
+  def no_change_to_column_values?(column_id:)
+    @students.all? do |student|
+      custom_column_datum = @gradebook_importer_custom_columns[student.id][column_id]
+
+      return true if custom_column_datum['current_content'].blank? && custom_column_datum['new_content'].blank?
+      custom_column_datum['current_content'] == custom_column_datum['new_content']
+    end
+  end
+
+  def exclude_custom_column_on_import(column:)
+    column.deleted? || column.read_only
   end
 end
