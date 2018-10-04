@@ -98,11 +98,11 @@ $('body').on('click', '#distractionFreeToggle', () => {
 
   if($('body').hasClass('no-headers distraction-free')){
     window.localStorage.setItem("distraction_free", true);
-    $('#distraction-free-toggle-icon-state').toggleClass('icon-arrow-open-right');
+    $('#distraction-free-toggle-icon-state').removeClass('icon-arrow-open-left').addClass('icon-arrow-open-right');
   }
   else{
     window.localStorage.removeItem("distraction_free");
-    $('#distraction-free-toggle-icon-state').toggleClass('icon-arrow-open-left');
+    $('#distraction-free-toggle-icon-state').removeClass('icon-arrow-open-right').addClass('icon-arrow-open-left');
   }
 
   resetMenuItemTabIndexes()
