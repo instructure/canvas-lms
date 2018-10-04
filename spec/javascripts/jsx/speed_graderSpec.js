@@ -59,30 +59,6 @@ function teardownFixtures() {
   while (fixtures.firstChild) fixtures.removeChild(fixtures.firstChild);
 }
 
-function waitForElement(query, timeout = 1000) {
-  const queryFn = typeof query === 'function' ?
-    query :
-    () => document.querySelector(query)
-
-  return new Promise((resolve, reject) => {
-    let timeoutId
-
-    const intervalId = setInterval(() => {
-      const $el = queryFn()
-      if ($el) {
-        clearInterval(intervalId)
-        clearTimeout(timeoutId)
-        resolve($el)
-      }
-    }, 10)
-
-    timeoutId = setTimeout(() => {
-      clearInterval(intervalId)
-      reject(new Error('Timeout waiting for element'))
-    }, timeout)
-  })
-}
-
 QUnit.module('SpeedGrader#showDiscussion', {
   setup () {
     fakeENV.setup({

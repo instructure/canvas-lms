@@ -16,12 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const MENU_CONTENT_REF_MAP = {
-  'Sort by': 'sortByMenuContent',
-  'Display as': 'displayAsMenuContent',
-  'Secondary info': 'secondaryInfoMenuContent',
-};
-
 function mouseover($el) {
   const event = new MouseEvent('mouseover', {
     bubbles: true,
@@ -45,6 +39,14 @@ function getSubmenu($menuItem) {
   return document.querySelector(`[aria-labelledby="${$menuItem.id}"]`)
 }
 
+export function getMenuContent($menu, ...path) {
+  return path.reduce(($el, label) => {
+    const $next = getFlyoutWithLabel($el, label)
+    mouseover($next)
+    return getSubmenu($next)
+  }, $menu)
+}
+
 export function getMenuItem($menu, ...path) {
   return path.reduce(($el, label, index) => {
     if (index < path.length - 1) {
@@ -57,10 +59,8 @@ export function getMenuItem($menu, ...path) {
   }, $menu)
 }
 
-// the only requirement is that the individual spec files define their own
-// `mountAndOpenOptions` function on `this`.
-export function findMenuItem (props, ...path) {
-  this.wrapper = this.mountAndOpenOptions(props);
-  const $el = this.wrapper.instance().optionsMenuContent
-  return getMenuItem($el, ...path)
+export function blurElement($el) {
+  $el.blur()
+  const event = new Event('blur', {bubbles: true, cancelable: true})
+  $el.dispatchEvent(event)
 }
