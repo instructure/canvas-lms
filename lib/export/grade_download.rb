@@ -6,7 +6,7 @@ module Export
 
         students = []
 
-        unless params[:assignment_id].blank?
+        if !params[:assignment_id].blank?
           assignments_info << get_assignment_info(user, params[:assignment_id])
           students = Course.find(Assignment.find(params[:assignment_id]).context_id).students.active
         elsif params[:course_id]
