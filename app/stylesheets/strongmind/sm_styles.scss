@@ -2,14 +2,22 @@
     background-color: #33373F;
     border-radius: 50%;
     bottom: 0;
-    height: 50px;
+    height: 48px;
     margin: auto;
     position: absolute;
-    right: -25px;
+    right: -24px;
+    text-align: right;
     top: 0;
-    width: 50px;
+    width: 48px;
 
     i {
         color: #F5F5F6;
     }
+}
+
+#header {
+    transform: translateX(0);
+    transition-duration: .24s;
+    transition-property: transform;
+    transition-timing-function: ease-in;
 }
