@@ -686,7 +686,7 @@ describe SpeedGrader::Assignment do
 
     context "with quiz_submissions" do
       before :once do
-        quiz_with_graded_submission [], :course => @course, :user => @student
+        @quiz_submission = quiz_with_graded_submission [], :course => @course, :user => @student
       end
 
       it "doesn't include quiz_submissions when there are too many attempts" do
@@ -733,6 +733,12 @@ describe SpeedGrader::Assignment do
         Version.where("versionable_type = 'QuizSubmission'").update_all("versionable_type = 'Quizzes::QuizSubmission'")
         json = SpeedGrader::Assignment.new(@assignment.reload, @teacher).json
         expect(json[:submissions].first['submission_history'].size).to eq 1
+      end
+
+      it "includes the Submission id in the submission history" do
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        submission_id = json.fetch(:submissions).first.fetch(:submission_history).first.fetch(:submission).fetch(:id)
+        expect(submission_id).to eq @quiz_submission.submission_id.to_s
       end
     end
   end

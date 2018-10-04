@@ -248,8 +248,12 @@ module SpeedGrader
             # to instantiate an actual AR object deserializing and reserializing the inner YAML
             qs = YAML.load(v.yaml)
 
+            # Returns the id of the Submission, but this may be too ambiguous.
+            # In the future, we may want to return both a quiz_id and a
+            # submission_id and let clients handle it themselves.
             {submission: {
                 grade: qs['score'],
+                id: sub.id,
                 show_grade_in_dropdown: true,
                 submitted_at: qs['finished_at'],
                 late: Quizzes::QuizSubmission.late_from_attributes?(qs, @assignment.quiz, sub),
