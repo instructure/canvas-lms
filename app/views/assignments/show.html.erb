@@ -246,6 +246,8 @@
 <% end %>
 <%= render(:partial => "assignment_sidebar") %>
 <%= render :partial => "shared/sequence_footer", :locals => {:asset => @assignment} if !@assignment.context_module_tags.empty? %>
+
+<%= render :partial => 'bz/browser_warning' %>
 <script>
   bzRetainedInfoSetup();
 </script>

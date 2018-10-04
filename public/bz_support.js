@@ -330,6 +330,11 @@ function bzRetainedInfoSetup(readonly) {
         console.log("THE MAGIC HAPPENS");
       }
     }
+
+    // disable the unsupported browser warning since this was successful
+    var nsb = document.getElementById("bz-non-supported-browser");
+    if(nsb)
+      nsb.style.display = "none";
   });
   // old one, w don't need all that info though so cutting it off while batching to optimize network use
   // http.open("GET", "/bz/user_retained_data?name=" + encodeURIComponent(name) + "&value=" + encodeURIComponent(el.value) + "&type=" + el.getAttribute("type"), true);
@@ -339,7 +344,6 @@ if(window != window.top) {
   // we are in an iframe... strip off magic
   document.getElementsByTagName("html")[0].className += " bz-in-iframe";
 }
-
 
 function getInnerHtmlWithMagicFieldsReplaced(ele) {
 
@@ -395,6 +399,7 @@ function copyAssignmentDescriptionIntoAssignmentSubmission() {
   bod.value = html;
 }
 
+var firstValidateMagicFieldsTest = null;
 // this is called in the canvas file public/javascripts/submit_assignment.js
 // to be a custom validator
 function validateMagicFields() {
@@ -409,9 +414,20 @@ function validateMagicFields() {
   var list = document.querySelectorAll("#assignment_show .description input[type=text][data-bz-retained], #assignment_show .description input[type=url][data-bz-retained], #assignment_show .description textarea[data-bz-retained]");
   for(var a = 0; a < list.length; a++) {
     if(list[a].value == "" && !list[a].classList.contains("bz-optional-magic-field")) {
-      alert('You have incomplete fields in this project. Go back and complete them before submitting.');
-      list[a].focus();
-      return false;
+      if(firstValidateMagicFieldsTest == null || firstValidateMagicFieldsTest != list[a]) {
+        firstValidateMagicFieldsTest = list[a];
+        alert('You have incomplete fields in this project. Go back and complete them before submitting.');
+        list[a].focus();
+        return false;
+      } else {
+        firstValidateMagicFieldsTest = list[a];
+        if(confirm("You still have an incomplete field. Do you want to submit now anyway?")) {
+          return true;
+        } else {
+          list[a].focus();
+          return false;
+        }
+      }
     }
   }
 
