@@ -191,6 +191,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
   }
 
   showMessageStudentsWhoDialog = () => {
+    this.state.skipFocusOnClose = true
     this.setState({ skipFocusOnClose: true });
     const settings = MessageStudentsWhoHelper.settings(this.props.assignment, this.activeStudentDetails());
     settings.onClose = this.focusAtEnd;

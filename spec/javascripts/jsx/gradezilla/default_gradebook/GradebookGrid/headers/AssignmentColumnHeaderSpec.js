@@ -650,6 +650,17 @@ test('clicking the menu item invokes the Message Students Who dialog with correc
   equal(messageStudents.getCall(0).args[0].onClose, this.wrapper.instance().focusAtEnd);
 });
 
+test('clicking the menu item does not focus the menu trigger', function () {
+  this.wrapper = mountAndOpenOptions(this.props);
+  sandbox.stub(window, 'messageStudents');
+  const menuItem = getOptionsMenuItem(this.wrapper, 'Message Students Who');
+  const focusStub = sandbox.stub(this.wrapper.instance(), 'focusAtEnd')
+
+  menuItem.click();
+
+  equal(focusStub.callCount, 0);
+});
+
 QUnit.module('AssignmentColumnHeader: Mute/Unmute Assignment', {
   setup () {
     this.props = defaultProps();
