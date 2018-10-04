@@ -26,15 +26,6 @@ class ErrorReport < ActiveRecord::Base
   serialize :data, Hash
 
   before_save :guess_email
-  before_save :notify_airbrake
-
-  def notify_airbrake
-    Airbrake.notify(
-      "#{category}: #{message}",
-      backtrace: backtrace,
-      data: data.merge(canvas_domain: ENV['CANVAS_DOMAIN'])
-    )
-  end
 
   # Define a custom callback for external notification of an error report.
   define_callbacks :on_send_to_external
