@@ -23,6 +23,8 @@
 # NOTE: Placements not documented here should be considered beta features and are not officially supported.
 class ExternalToolsController < ApplicationController
   before_action :require_context
+  before_action :require_tool_create_rights, only: [:create, :create_tool_from_tool_config]
+  before_action :require_tool_configuration, only: [:create_tool_from_tool_config]
   before_action :require_access_to_context, except: [:index, :sessionless_launch]
   before_action :require_user, only: [:generate_sessionless_launch]
   before_action :get_context, :only => [:retrieve, :show, :resource_selection]
@@ -853,26 +855,24 @@ class ExternalToolsController < ApplicationController
   #        -F 'config_type=by_url' \
   #        -F 'config_url=https://example.com/ims/lti/tool_config.xml'
   def create
-    if authorized_action(@context, @current_user, :create_tool_manually)
-      external_tool_params = (params[:external_tool] || params).to_unsafe_h
-      @tool = @context.context_external_tools.new
-      if request.content_type == 'application/x-www-form-urlencoded'
-        custom_fields = Lti::AppUtil.custom_params(request.raw_post)
-        external_tool_params[:custom_fields] = custom_fields if custom_fields.present?
-      end
-      set_tool_attributes(@tool, external_tool_params)
-      check_for_duplication(@tool)
-      if @tool.errors.blank? && @tool.save
-        invalidate_nav_tabs_cache(@tool)
-        if api_request?
-          render :json => external_tool_json(@tool, @context, @current_user, session)
-        else
-          render :json => @tool.as_json(:methods => [:readable_state, :custom_fields_string, :vendor_help_link], :include_root => false)
-        end
+    external_tool_params = (params[:external_tool] || params).to_unsafe_h
+    @tool = @context.context_external_tools.new
+    if request.content_type == 'application/x-www-form-urlencoded'
+      custom_fields = Lti::AppUtil.custom_params(request.raw_post)
+      external_tool_params[:custom_fields] = custom_fields if custom_fields.present?
+    end
+    set_tool_attributes(@tool, external_tool_params)
+    check_for_duplication(@tool)
+    if @tool.errors.blank? && @tool.save
+      invalidate_nav_tabs_cache(@tool)
+      if api_request?
+        render :json => external_tool_json(@tool, @context, @current_user, session)
       else
-        render :json => @tool.errors, :status => :bad_request
-        @tool.destroy if @tool.persisted?
+        render :json => @tool.as_json(:methods => [:readable_state, :custom_fields_string, :vendor_help_link], :include_root => false)
       end
+    else
+      render :json => @tool.errors, :status => :bad_request
+      @tool.destroy if @tool.persisted?
     end
   end
 
@@ -920,6 +920,31 @@ class ExternalToolsController < ApplicationController
         end
       end
     end
+  end
+
+  # @API Create Tool from ToolConfiguration
+  # Creates context_external_tool from attached tool_configuration of
+  # the provided developer_key if not already present in context.
+  # DeveloperKey must have a ToolConfiguration to create tool or 404 will be raised.
+  # Will return an existing ContextExternalTool if one already exists.
+  #
+  # @argument account_id [String]
+  #    if account
+  #
+  # @argument course_id [String]
+  #    if course
+  #
+  # @argument developer_key_id [String]
+  #
+  # @returns ContextExternalTool
+  def create_tool_from_tool_config
+    cet = fetch_existing_tool_in_context_chain
+    if cet.nil?
+      cet = developer_key.tool_configuration.new_external_tool(@context)
+      cet.save!
+      invalidate_nav_tabs_cache(cet)
+    end
+    render json: external_tool_json(cet, @context, @current_user, session)
   end
 
   # @API Edit an external tool
@@ -1178,6 +1203,23 @@ class ExternalToolsController < ApplicationController
       current_pseudonym: @current_pseudonym,
       tool: @tool }
     Lti::VariableExpander.new(@domain_root_account, @context, self, default_opts.merge(opts))
+  end
+
+  def require_tool_create_rights
+    authorized_action(@context, @current_user, :create_tool_manually)
+  end
+
+  def require_tool_configuration
+    return if developer_key.tool_configuration.present?
+    head :not_found
+  end
+
+  def fetch_existing_tool_in_context_chain
+    ContextExternalTool.all_tools_for(@context).where(developer_key: developer_key).take
+  end
+
+  def developer_key
+    @_developer_key = DeveloperKey.nondeleted.find(params[:developer_key_id])
   end
 
   def placement_from_params

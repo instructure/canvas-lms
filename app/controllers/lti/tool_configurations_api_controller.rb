@@ -38,10 +38,10 @@
 class Lti::ToolConfigurationsApiController < ApplicationController
   include Api::V1::ExternalTools
 
-  before_action :require_context, only: [:create_context_external_tool, :create]
+  before_action :require_context, only: [:create]
   before_action :require_user
   before_action :require_manage_developer_keys
-  before_action :require_tool_configuration, only: [:show, :update, :destroy, :create_context_external_tool]
+  before_action :require_tool_configuration, only: [:show, :update, :destroy]
 
   # @API Create Tool configuration
   # Creates tool configuration with the provided parameters.
@@ -82,30 +82,6 @@ class Lti::ToolConfigurationsApiController < ApplicationController
     )
     update_developer_key!(tool_config)
     render json: tool_config
-  end
-
-  # @API Create Tool configuration
-  # Creates context_external_tool from attached tool_configuration of
-  # the provided developer_key if not already present in context.
-  # DeveloperKey must have a ToolConfiguration to create tool or 404 will be raised.
-  # Will return an existing ContextExternalTool if one already exists.
-  #
-  # @argument account_id [String]
-  #    if account
-  #
-  # @argument course_id [String]
-  #    if course
-  #
-  # @argument developer_key_id [String]
-  #
-  # @returns ContextExternalTool
-  def create_context_external_tool
-    cet = fetch_existing_tool_in_context_chain
-    if cet.nil?
-      cet = developer_key.tool_configuration.new_external_tool(@context)
-      cet.save!
-    end
-    render json: external_tool_json(cet, @context, @current_user, session)
   end
 
   # @API Update Tool configuration
@@ -188,16 +164,8 @@ class Lti::ToolConfigurationsApiController < ApplicationController
     authorized_action(account, @current_user, :manage_developer_keys)
   end
 
-  def require_create_external_tool
-    authorized_action(@context, @current_user, :create_tool_manually)
-  end
-
   def developer_key
     @_developer_key = DeveloperKey.nondeleted.find(params[:developer_key_id])
-  end
-
-  def fetch_existing_tool_in_context_chain
-    ContextExternalTool.all_tools_for(@context).where(developer_key: developer_key).take
   end
 
   def tool_configuration_params
