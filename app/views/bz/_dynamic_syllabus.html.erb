@@ -79,6 +79,10 @@
             # skip anything that is significantly past due
             # because it ought to be already done
             next if overridden.due_at < (DateTime.now - 2.days)
+
+            # also skip anything more than a month out, no need to display that yet
+            next if overridden.due_at > (DateTime.now + 30.days)
+
             magic = {}
             magic[:obj] = obj
             magic[:text] = "#{text} #{tag.title}"
@@ -148,7 +152,13 @@
           # skip anything that is significantly past due
           # because it ought to be already done
           next if overridden.due_at < (DateTime.now - 2.days)
-          next if !mod.nil? && !mod.unlock_at.nil? && mod.unlock_at > DateTime.now # skip locked modules
+
+          # also skip anything more than a month out, no need to display that yet
+          next if overridden.due_at > (DateTime.now + 30.days)
+
+          # skip locked modules
+          next if !mod.nil? && !mod.unlock_at.nil? && mod.unlock_at > DateTime.now
+
           magic = {}
           magic[:obj] = obj
           magic[:text] = "#{text} #{disp_name}"
