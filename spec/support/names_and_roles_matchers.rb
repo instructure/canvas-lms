@@ -75,7 +75,7 @@ module Lti::Ims::NamesAndRolesMatchers
         'given_name' => expected.first.user.first_name,
         'family_name' => expected.first.user.last_name,
         'email' => expected.first.user.email,
-        'user_id' => expected_lti_id(expected.first.user),
+        'user_id' => expected_lti_id(expected.first.user.respond_to?(:user) ? expected.first.user.user : expected.first.user),
         'roles' => match_array(expected_course_lti_roles(*expected))
       }.compact
 
@@ -99,7 +99,7 @@ module Lti::Ims::NamesAndRolesMatchers
         'given_name' => expected.user.first_name,
         'family_name' => expected.user.last_name,
         'email' => expected.user.email,
-        'user_id' => expected_lti_id(expected.user),
+        'user_id' => expected_lti_id(expected.user.respond_to?(:user) ? expected.user.user : expected.user),
         'roles' => match_array(expected_group_lti_roles(expected))
       }.compact
 

@@ -57,19 +57,20 @@ module Lti::Ims::Providers
       enrollments.
         group_by(&:user_id).
         values.
-        map { |user_enrollments| CourseEnrollmentsDecorator.new(user_enrollments) }
+        map { |user_enrollments| CourseEnrollmentsDecorator.new(user_enrollments, tool) }
     end
 
     # *Decorators fix up models to conforms to interfaces expected by Lti::Ims::NamesAndRolesSerializer
     class CourseEnrollmentsDecorator
       attr_reader :enrollments
 
-      def initialize(enrollments)
+      def initialize(enrollments, tool)
         @enrollments = enrollments
+        @tool = tool
       end
 
       def user
-        enrollments.first.user
+        MembershipsProvider::UserDecorator.new(enrollments.first.user, @tool)
       end
 
       def context

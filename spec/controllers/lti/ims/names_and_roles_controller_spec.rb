@@ -70,7 +70,8 @@ describe Lti::Ims::NamesAndRolesController do
       name: 'test tool',
       url: 'http://www.tool.com/launch',
       developer_key: developer_key,
-      settings: { use_1_3: true }
+      settings: { use_1_3: true },
+      workflow_state: 'public'
     )
   end
 
@@ -257,7 +258,8 @@ describe Lti::Ims::NamesAndRolesController do
           name: 'test tool 2',
           url: 'http://www.tool2.com/launch',
           developer_key: developer_key,
-          settings: { use_1_3: true }
+          settings: { use_1_3: true },
+          workflow_state: 'public'
         )
       end
 
@@ -288,7 +290,8 @@ describe Lti::Ims::NamesAndRolesController do
           name: 'test tool 2',
           url: 'http://www.tool2.com/launch',
           developer_key: developer_key,
-          settings: { use_1_3: true }
+          settings: { use_1_3: true },
+          workflow_state: 'public'
         )
       end
 
@@ -319,7 +322,8 @@ describe Lti::Ims::NamesAndRolesController do
           name: 'test tool 2',
           url: 'http://www.tool2.com/launch',
           developer_key: developer_key,
-          settings: { use_1_3: true }
+          settings: { use_1_3: true },
+          workflow_state: 'public'
         )
       end
 
@@ -352,7 +356,8 @@ describe Lti::Ims::NamesAndRolesController do
           name: 'test tool 2',
           url: 'http://www.tool2.com/launch',
           developer_key: developer_key,
-          settings: { use_1_3: true }
+          settings: { use_1_3: true },
+          workflow_state: 'public'
         )
       end
 
@@ -384,7 +389,8 @@ describe Lti::Ims::NamesAndRolesController do
           name: 'test tool 2',
           url: 'http://www.tool2.com/launch',
           developer_key: developer_key,
-          settings: { use_1_3: true }
+          settings: { use_1_3: true },
+          workflow_state: 'public'
         )
       end
 
@@ -409,7 +415,8 @@ describe Lti::Ims::NamesAndRolesController do
           name: 'test tool 2',
           url: 'http://www.tool2.com/launch',
           developer_key: developer_key,
-          settings: { use_1_3: true }
+          settings: { use_1_3: true },
+          workflow_state: 'public'
         )
       end
 
@@ -451,7 +458,8 @@ describe Lti::Ims::NamesAndRolesController do
           name: 'test tool 2',
           url: 'http://www.tool2.com/launch',
           developer_key: developer_key_that_should_not_be_resolved_from_nrps_request,
-          settings: { use_1_3: true }
+          settings: { use_1_3: true },
+          workflow_state: 'public'
         )
       end
 

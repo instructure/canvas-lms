@@ -59,7 +59,7 @@ module Lti::Ims
     end
 
     def new_provider
-      Providers.const_get("#{context.class}MembershipsProvider").new(context, self)
+      Providers.const_get("#{context.class}MembershipsProvider").new(context, self, tool)
     end
 
     def verify_environment

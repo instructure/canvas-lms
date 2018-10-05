@@ -19,11 +19,12 @@ module Lti::Ims::Providers
   class MembershipsProvider
     include Api::V1::User
 
-    attr_reader :context, :controller
+    attr_reader :context, :controller, :tool
 
-    def initialize(context, controller)
+    def initialize(context, controller, tool)
       @context = context
       @controller = controller
+      @tool = tool
     end
 
     def find
@@ -78,5 +79,40 @@ module Lti::Ims::Providers
       controller.request.query_parameters.delete param
     end
 
+    # Purposefully conservative and limiting in what we allow to be output into NRPS v2 responses. Obviously
+    # has to change if more custom param support is added in the future. But that day may never come, so err on the
+    # side of making it very hard to leak user attributes.
+    class UserDecorator
+      attr_reader :user # Intentional backdoor. See Lti::Ims::NamesAndRolesSerializer for use case/s.
+
+      def initialize(user, tool)
+        @user = user
+        @tool = tool
+      end
+
+      def id
+        user.id
+      end
+
+      def name
+        user.name if @tool.include_name?
+      end
+
+      def first_name
+        user.first_name if @tool.include_name?
+      end
+
+      def last_name
+        user.last_name if @tool.include_name?
+      end
+
+      def email
+        user.email if @tool.include_email?
+      end
+
+      def avatar_image_url
+        user.avatar_image_url if @tool.public?
+      end
+    end
   end
 end

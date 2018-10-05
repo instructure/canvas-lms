@@ -48,7 +48,9 @@ module Lti::Ims
         given_name: enrollment.user.first_name,
         family_name: enrollment.user.last_name,
         email: enrollment.user.email,
-        user_id: lti_id_for(enrollment.user),
+        # enrollment.user often wrapped for privacy policy reasons, but calculating the LTI ID really needs
+        # access to underlying AR model.
+        user_id: lti_id_for(enrollment.user.respond_to?(:user) ? enrollment.user.user : enrollment.user),
         roles: enrollment.lti_roles
       }.compact
     end
