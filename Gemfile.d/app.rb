@@ -116,7 +116,7 @@ gem 'saml2', '3.0.1'
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.2.1', require: 'zip'
 gem 'safe_yaml', '1.0.4', require: false
-gem 'sanitize', '2.1.0', require: false
+gem 'sanitize', '2.1.1', require: false
 gem 'shackles', '1.4.1'
 
 gem 'useragent', '0.16.10', require: false
