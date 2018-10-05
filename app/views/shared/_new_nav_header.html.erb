@@ -113,14 +113,9 @@
           </li>
           <% end %>
         </ul>
-      </div>
 
-      <button type="button" id="distractionFreeToggle" class="Button Button--link ic-app-course-nav-toggle sm-btn-distraction-free" aria-live="polite" aria-label="Distraction Free Toggle" title="Distraction Free Toggle">
-        <i id="distraction-free-toggle-icon-state" class="icon-arrow-open-left" aria-hidden="true"></i>
-      </button>
-
-      <div class="ic-app-header__secondary-navigation">
         <% if @current_user %>
+        <hr class="sm-divider" />
           <ul class="ic-app-header__menu-list">
             <li class="menu-item ic-app-header__menu-list-item">
               <a id="global_nav_pendo_feedback_link" href="#feedback" class="ic-app-header__menu-list-link">
@@ -133,5 +128,10 @@
           </ul>
         <%end%>
       </div>
+
+      <button type="button" id="distractionFreeToggle" class="Button Button--link ic-app-course-nav-toggle sm-btn-distraction-free" aria-live="polite" aria-label="Distraction Free Toggle" title="Distraction Free Toggle">
+        <i id="distraction-free-toggle-icon-state" class="icon-arrow-open-left" aria-hidden="true"></i>
+      </button>
+
     <div id="global_nav_tray_container"></div>
   </header>
