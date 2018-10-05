@@ -174,6 +174,7 @@ module Canvas::LiveEvents
       assignment_id: assignment.global_id,
       context_id: assignment.global_context_id,
       context_type: assignment.context_type,
+      assignment_group_id: assignment.global_assignment_group_id,
       workflow_state: assignment.workflow_state,
       title: LiveEvents.truncate(assignment.title),
       description: LiveEvents.truncate(assignment.description),
@@ -194,6 +195,10 @@ module Canvas::LiveEvents
 
   def self.assignment_updated(assignment)
     post_event_stringified('assignment_updated', get_assignment_data(assignment))
+  end
+
+  def self.assignments_bulk_updated(assignment_ids)
+    Assignment.where(:id => assignment_ids).each{|a| assignment_updated(a)}
   end
 
   def self.get_submission_data(submission)

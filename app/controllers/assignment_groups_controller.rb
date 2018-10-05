@@ -170,6 +170,7 @@ class AssignmentGroupsController < ApplicationController
       if assignment_ids_to_update.any?
         assignments.where(:id => assignment_ids_to_update).update_all(assignment_group_id: @group.id, updated_at: Time.now.utc)
         tags_to_update += MasterCourses::ChildContentTag.where(:content_type => "Assignment", :content_id => assignment_ids_to_update).to_a
+        Canvas::LiveEvents.send_later_if_production(:assignments_bulk_updated, assignment_ids_to_update)
       end
       quizzes = @context.active_quizzes.where(assignment_id: order)
       quiz_ids_to_update = quizzes.where.not(:assignment_group_id => @group.id).pluck(:id)
