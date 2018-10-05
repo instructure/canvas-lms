@@ -346,7 +346,6 @@ import './rubric_assessment' /*global rubricAssessment*/
       }).change();
       $(".media_comment_link").click(function(event) {
         event.preventDefault();
-        $("#add_comment_form").hide();
         $("#media_media_recording").show();
         var $recording = $("#media_media_recording").find(".media_recording");
         $recording.mediaComment('create', 'any', function(id, type) {
