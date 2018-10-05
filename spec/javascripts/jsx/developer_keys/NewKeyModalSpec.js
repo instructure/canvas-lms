@@ -137,7 +137,7 @@ test('it sends the contents of the form saving', () => {
   const fakeStore = {
     dispatch: dispatchSpy
   }
-  const developerKey2 = Object.assign({}, developerKey, { require_scopes: true, scopes: ['test'] })
+  const developerKey2 = Object.assign({}, developerKey, { require_scopes: true, scopes: ['test'], test_cluster_only: true })
   const editDeveloperKeyState2 = Object.assign({}, editDeveloperKeyState, { developerKey: developerKey2 })
 
   const wrapper = mount(
@@ -167,7 +167,7 @@ test('it sends the contents of the form saving', () => {
   equal(sentFormData.get('developer_key[icon_url]'), developerKey.icon_url)
   equal(sentFormData.get('developer_key[notes]'), developerKey.notes)
   equal(sentFormData.get('developer_key[require_scopes]'), 'true')
-  equal(sentFormData.get('developer_key[test_cluster_only]'), 'false')
+  equal(sentFormData.get('developer_key[test_cluster_only]'), 'true')
 
   wrapper.unmount()
 })
@@ -210,6 +210,7 @@ test('sends form content without scopes and require_scopes set to false when not
   equal(sentFormData.get('developer_key[icon_url]'), developerKey.icon_url)
   equal(sentFormData.get('developer_key[notes]'), developerKey.notes)
   equal(sentFormData.get('developer_key[require_scopes]'), 'false')
+  equal(sentFormData.get('developer_key[test_cluster_only]'), 'false')
 
   wrapper.unmount()
 })
