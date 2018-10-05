@@ -532,8 +532,8 @@ class ExternalToolsController < ApplicationController
       media_types.to_unsafe_h,
       params["export_type"]
     )
-    params = Lti::ContentItemSelectionRequest.default_lti_params(@context, @domain_root_account, @current_user).merge(
-      {
+    params = Lti::ContentItemSelectionRequest.default_lti_params(@context, @domain_root_account, @current_user).
+      merge({
         #required params
         lti_message_type: message_type,
         lti_version: 'LTI-1p0',
@@ -543,7 +543,9 @@ class ExternalToolsController < ApplicationController
         context_title: @context.name,
         tool_consumer_instance_name: @domain_root_account.name,
         tool_consumer_instance_contact_email: HostUrl.outgoing_email_address,
-      }).merge(variable_expander(tool: tool, attachment: content_item_response.file).expand_variables!(tool.set_custom_fields(placement)))
+      }).
+      merge(variable_expander(tool: tool, attachment: content_item_response.file).
+      expand_variables!(tool.set_custom_fields(placement)))
 
     lti_launch = @tool.settings['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
     lti_launch.resource_url = opts[:launch_url] || tool.extension_setting(placement, :url)
