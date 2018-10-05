@@ -72,13 +72,19 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #   placements should be excluded from the
   #   tool configuration.
   #
+  # @argument custom_fields [String]
+  #   A new line seperated string of key/value pairs
+  #   to be used as custom fields in the LTI launch.
+  #   Example: foo=bar\ncourse=$Canvas.course.id
+  #
   # @returns ToolConfiguration
   def create
     tool_config = Lti::ToolConfiguration.create!(
       developer_key: DeveloperKey.create!(account: account),
       settings: tool_configuration_params[:settings],
       settings_url: tool_configuration_params[:settings_url],
-      disabled_placements: tool_configuration_params[:disabled_placements]
+      disabled_placements: tool_configuration_params[:disabled_placements],
+      custom_fields: tool_configuration_params[:custom_fields]
     )
     update_developer_key!(tool_config)
     render json: tool_config
@@ -113,6 +119,10 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #   An array of strings indicating which Canvas
   #   placements should be excluded from the
   #   tool configuration.
+  # @argument custom_fields [String]
+  #   A new line seperated string of key/value pairs
+  #   to be used as custom fields in the LTI launch.
+  #   Example: foo=bar\ncourse=$Canvas.course.id
   #
   # @returns ToolConfiguration
   def update
@@ -120,7 +130,8 @@ class Lti::ToolConfigurationsApiController < ApplicationController
     tool_config.update!(
       settings: tool_configuration_params[:settings],
       settings_url: tool_configuration_params[:settings_url],
-      disabled_placements: tool_configuration_params[:disabled_placements]
+      disabled_placements: tool_configuration_params[:disabled_placements],
+      custom_fields: tool_configuration_params[:custom_fields]
     )
     update_developer_key!(tool_config)
 
@@ -169,8 +180,8 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   end
 
   def tool_configuration_params
-    params.require(:tool_configuration).permit(:settings_url, disabled_placements: []).merge(
-      { settings: params.require(:tool_configuration)[:settings]&.to_unsafe_h }
+    params.require(:tool_configuration).permit(:settings_url, :custom_fields, disabled_placements: []).merge(
+      {settings: params.require(:tool_configuration)[:settings]&.to_unsafe_h}
     )
   end
 

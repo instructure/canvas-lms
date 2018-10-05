@@ -232,7 +232,10 @@ module Lti
 
       let(:extensions) { settings['extensions'].first }
 
-      before { tool_configuration.developer_key = developer_key }
+      before do
+        tool_configuration.developer_key = developer_key
+        tool_configuration.custom_fields = "key=value\nfoo=bar"
+      end
 
       shared_examples_for 'a new context external tool' do
         context 'when "disabled_placements" is set' do
@@ -273,7 +276,7 @@ module Lti
         end
 
         it 'uses the correct top-level custom params' do
-          expect(subject.custom_fields).to eq settings['custom_fields']
+          expect(subject.custom_fields).to eq({"has_expansion"=>"$Canvas.user.id", "no_expansion"=>"foo", "key"=>"value", "foo"=>"bar"})
         end
 
         it 'uses the correct icon url' do

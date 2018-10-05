@@ -59,12 +59,15 @@ export default class DeveloperKeyModal extends React.Component {
   }
 
   saveCustomizations = () => {
+    const customFields = new FormData(this.submissionForm).get('custom_fields')
     const { store, actions, createLtiKeyState, createOrEditDeveloperKeyState } = this.props
+
     store.dispatch(actions.ltiKeysUpdateCustomizations(
       createLtiKeyState.enabledScopes,
       createLtiKeyState.disabledPlacements,
       createOrEditDeveloperKeyState.developerKey.id,
-      createLtiKeyState.toolConfiguration
+      createLtiKeyState.toolConfiguration,
+      customFields
     ))
     this.closeModal()
   }

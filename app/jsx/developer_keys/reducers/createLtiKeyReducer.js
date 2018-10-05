@@ -30,7 +30,7 @@ const initialState = {
   disabledPlacements: [],
   updateCustomizationsPending: false,
   updateCustomizationsSuccessful: false,
-  updateCustomizationsError: null,
+  updateCustomizationsError: null
 }
 
 const ltiKeysHandlers = {

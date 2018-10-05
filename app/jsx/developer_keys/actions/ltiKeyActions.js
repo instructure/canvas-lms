@@ -137,7 +137,7 @@ actions.ltiKeysUpdateCustomizationsSuccessful = payload => ({
 })
 
 actions.LTI_KEYS_UPDATE_CUSTOMIZATIONS = 'LTI_KEYS_UPDATE_CUSTOMIZATIONS'
-actions.ltiKeysUpdateCustomizations = (scopes, disabled_placements, developerKeyId, toolConfiguration) => dispatch => {
+actions.ltiKeysUpdateCustomizations = (scopes, disabled_placements, developerKeyId, toolConfiguration, customFields) => dispatch => {
   dispatch(actions.ltiKeysUpdateCustomizationsStart())
   const url = `/api/lti/developer_keys/${developerKeyId}/tool_configuration`
 
@@ -147,6 +147,7 @@ actions.ltiKeysUpdateCustomizations = (scopes, disabled_placements, developerKey
         scopes
       },
       tool_configuration: {
+        custom_fields: customFields,
         disabled_placements,
         settings: toolConfiguration
       }

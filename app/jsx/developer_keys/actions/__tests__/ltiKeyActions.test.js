@@ -74,13 +74,15 @@ describe('ltiKeysUpdateCustomizations', () => {
   const disabledPlacements = ['account_navigation', 'course_navigaiton']
   const developerKeyId = 123
   const toolConfiguration = {}
+  const customFields = "foo=bar\r\nkey=value"
 
   const update = (dispatch) => {
     actions.ltiKeysUpdateCustomizations(
       scopes,
       disabledPlacements,
       developerKeyId,
-      toolConfiguration
+      toolConfiguration,
+      customFields
     )(dispatch)
   }
 
@@ -95,7 +97,8 @@ describe('ltiKeysUpdateCustomizations', () => {
         },
         tool_configuration: {
           disabled_placements: disabledPlacements,
-          settings: toolConfiguration
+          settings: toolConfiguration,
+          custom_fields: customFields
         }
       }
     )

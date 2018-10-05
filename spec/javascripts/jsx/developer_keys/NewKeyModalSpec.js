@@ -396,6 +396,6 @@ test('saves customizations', () => {
     />
   )
   wrapper.instance().saveCustomizations()
-  ok(ltiStub.calledWith(['https://www.test.com/lineitem'], ['account_navigation'], 22, {}))
+  ok(ltiStub.calledWith(['https://www.test.com/lineitem'], ['account_navigation'], 22, {}, null))
   wrapper.unmount()
 })

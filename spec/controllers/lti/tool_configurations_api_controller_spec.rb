@@ -159,7 +159,8 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
         developer_key_id: developer_key.id,
         tool_configuration: {
           settings_url: url,
-          disabled_placements: ['course_navigation', 'account_navigation']
+          disabled_placements: ['course_navigation', 'account_navigation'],
+          custom_fields: "foo=bar\r\nkey=value"
         }
       }
     end
@@ -180,6 +181,11 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
         expect(config_from_response.disabled_placements).to match_array(
           valid_parameters.dig(:tool_configuration, :disabled_placements)
         )
+      end
+
+      it 'sets the "custom_fields"' do
+        subject
+        expect(config_from_response.custom_fields).to eq valid_parameters.dig(:tool_configuration, :custom_fields)
       end
     end
 
