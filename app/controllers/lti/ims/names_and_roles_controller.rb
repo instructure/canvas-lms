@@ -23,13 +23,15 @@ module Lti::Ims
     skip_before_action :load_user
 
     # TODO: When Group authZ support added (LTIA-27), take out all the `only:` conditions
-    before_action :verify_environment
-    before_action :verify_access_token, only: :course_index
-    before_action :verify_permissions, only: :course_index
-    before_action :verify_developer_key, only: :course_index
-    before_action :verify_context
-    before_action :verify_tool, only: :course_index
-    before_action :verify_lti_advantage_enabled, only: :course_index
+    before_action(
+      :verify_environment,
+      :verify_access_token,
+      :verify_permissions,
+      :verify_developer_key,
+      :verify_context,
+      :verify_tool,
+      :verify_lti_advantage_enabled
+    )
 
     MIME_TYPE = 'application/vnd.ims.lis.v2.membershipcontainer+json'.freeze
 
@@ -111,7 +113,6 @@ module Lti::Ims
     end
 
     def find_account_tool(tools)
-      # TODO: Add group support
       context.account_chain.each do |acct|
         tool = tools.find { |t| t.context.is_a?(Account) && t.context == acct}
         return tool if tool
@@ -120,8 +121,8 @@ module Lti::Ims
     end
 
     def context_tool?(tool)
-      # TODO: Add group support
-      tool.context == context ? tool : nil
+      tool_bindable_context = context.is_a?(Group) ? context.course : context
+      tool.context == tool_bindable_context ? tool : nil
     end
   end
 end

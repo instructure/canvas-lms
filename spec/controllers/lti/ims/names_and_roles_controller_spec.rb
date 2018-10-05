@@ -88,8 +88,12 @@ describe Lti::Ims::NamesAndRolesController do
     end
   end
 
-  shared_examples 'response check' do
+  shared_examples 'common request and response check' do
+    # #around and #before(:context) don't have access to the right scope, #before(:example) runs too late,
+    # so hack our own lifecycle hook
+    let(:before_send_request) { ->{} }
     before do
+      before_send_request.call
       send_request
     end
 
@@ -118,20 +122,6 @@ describe Lti::Ims::NamesAndRolesController do
         expect(response).to have_http_status :not_found
       end
     end
-  end
-
-  # split out from 'response check' b/c currently only supported for course contexts. group contexts can still
-  # pass 'response check' but would fail these tests
-  shared_examples 'access token check' do
-    # #around and #before(:context) don't have access to the right scope, #before(:example) runs too late,
-    # so hack our own lifecycle hook
-    let(:before_send_request) { ->{} }
-    before do
-      before_send_request.call
-      send_request
-    end
-
-    it_behaves_like 'response check'
 
     context 'with no access token' do
       let(:access_token_jwt_hash) { nil }
@@ -435,6 +425,18 @@ describe Lti::Ims::NamesAndRolesController do
 
   end
 
+  shared_examples 'extra developer key and account tool check' do
+    let(:extra_tool_context) { course_account }
+
+    it_behaves_like 'extra developer key and tool check'
+  end
+
+  shared_examples 'extra developer key and course tool check' do
+    let(:extra_tool_context) { course }
+
+    it_behaves_like 'extra developer key and tool check'
+  end
+
   shared_examples 'extra developer key and tool check' do
     # When including, define the following:
     #   extra_tool_context: context into which to place a Tool associated with the "extra" developer key
@@ -480,18 +482,6 @@ describe Lti::Ims::NamesAndRolesController do
         end
       end
     end
-  end
-
-  shared_examples 'extra developer key and account tool check' do
-    let(:extra_tool_context) { course_account }
-
-    it_behaves_like 'extra developer key and tool check'
-  end
-
-  shared_examples 'extra developer key and course tool check' do
-    let(:extra_tool_context) { course }
-
-    it_behaves_like 'extra developer key and tool check'
   end
 
   shared_examples 'page size check' do
@@ -593,7 +583,7 @@ describe Lti::Ims::NamesAndRolesController do
     let(:context_param_name) { :course_id }
     let(:unknown_context_id) { course && Course.maximum(:id) + 1 }
 
-    it_behaves_like 'access token check'
+    it_behaves_like 'common request and response check'
 
     # Bunch of single-enrollment tests b/c they're just so much easier to
     # debug as compared to multi-enrollment tests
@@ -870,7 +860,9 @@ describe Lti::Ims::NamesAndRolesController do
     let(:action) { :group_index }
     let(:context) { group_record }
     let(:context_param_name) { :group_id }
-    let(:unknown_context_id) { Group.maximum(:id) + 1 }
+    let(:unknown_context_id) { group_record && Group.maximum(:id) + 1 }
+
+    it_behaves_like 'common request and response check'
 
     context 'when a group has a single membership' do
       let(:group_record) { group_with_user(active_all: true).group }
