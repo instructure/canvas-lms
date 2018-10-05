@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import gql from 'graphql-tag'
 import ApolloClient from 'apollo-boost'
+import {InMemoryCache} from 'apollo-cache-inmemory'
 import {ApolloProvider, Query} from 'react-apollo'
 
 const client = new ApolloClient({
@@ -31,7 +32,11 @@ const client = new ApolloClient({
         'X-CSRF-Token': $.cookie('_csrf_token')
       }
     })
-  }
+  },
+  cache: new InMemoryCache({
+    addTypename: true,
+    dataIdFromObject: object => object.id || null
+  })
 })
 
 export {client, gql, ApolloProvider, Query}
