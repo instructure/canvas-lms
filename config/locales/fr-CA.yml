@@ -47,6 +47,7 @@ fr-CA:
   LongTextEditor: 
     cancel: Annuler
     save: Enregistrer
+  _2d4c0d31: …
   _at_the_bottom__4360f2b4: "-- Tout en bas --"
   _at_the_bottom__d2cf682a: "--Au bas--"
   _b4455c8b: "%"
@@ -88,6 +89,7 @@ fr-CA:
         partner_key: "Clé du partenaire"
   accept_2fdd362e: Accepter
   accept_grades_4d56a3dd: "Accepter les notes"
+  accept_grades_by_gradername_7a98b969: "Accepter les notes par %{graderName}"
   acceptable_use_policy_29a28124: "Politique d'utilisation acceptable"
   accepted_c9f8ab87: Accepté
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "Formats acceptés : HEX, RGBA, RGB et HSL"
@@ -1774,6 +1776,7 @@ fr-CA:
       Permet à l'utilisateur de gérer les paramètres de Cours modèle dans les paramètres de cours.
       Permet à l'utilisateur d'ajouter les cours associés.
   allows_user_to_differentiate_assignments_to_indivi_37f701a5: "Permet à l'utilisateur de différencier les tâches à des étudiants à titre individuel."
+  allows_user_to_download_all_comments_in_a_student__33b36d0a: "Permet à l'utilisateur de télécharger tous les commentaires dans un envoi de l'étudiant."
   allows_user_to_edit_assignment_details_on_individu_3e50993a: "Permet à l'utilisateur de modifier les détails de la tâche sur les discussions individuelles. Modules : Permet à l'utilisateur d'ajouter de nouvelles tâches à un module."
   allows_user_to_edit_assignment_details_on_individu_ecf19e63: "Permet à l'utilisateur de modifier les détails de la tâche sur les discussions individuelles."
   allows_user_to_edit_blueprint_content_lock_setting_25128c82: "Permet à l'utilisateur de modifier les paramètres de verrouillage de contenu de Modèle sur les discussions individuelles."
@@ -1814,6 +1817,7 @@ fr-CA:
   allows_user_to_manage_observers_associated_with_st_4b45f2be: "Permet à l'utilisateur de gérer des observateurs associés aux étudiants dans le compte."
   allows_user_to_manage_rubrics_326eedc2: "Permet à l'utilisateur de gérer les rubriques."
   allows_user_to_manually_add_an_app_in_account_sett_c5ce3789: "Permet à l'utilisateur d'ajouter manuellement une application dans les paramètres de compte."
+  allows_user_to_manually_add_and_delete_an_app_in_a_402d3d91: "Permet à l'utilisateur d'ajouter/supprimer manuellement une application dans les paramètres du compte."
   allows_user_to_manually_add_and_delete_an_app_in_c_18250cad: "Permet à l'utilisateur d'ajouter/supprimer manuellement une application dans les paramètres du cours."
   allows_user_to_moderate_a_quiz_6953d369: "Permet à l'utilisateur de modérer un questionnaire."
   allows_user_to_moderate_a_quiz_settings_allows_use_e454b94e: "Permet à l'utilisateur de modérer un questionnaire. Paramètres : Permet à l'utilisateur de modifier les systèmes de notation."
@@ -2079,6 +2083,9 @@ fr-CA:
   anonymous_grading_ccb5045c: "Notation anonyme"
   anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "La notation anonyme oblige le masquage des noms des étudiants dans SpeedGrader™"
   anonymous_instructor_annotations_2b6c822: "Annotations du formateur anonyme"
+  anonymous_instructor_annotations_is_a_setting_on_a_f7a2e36a: |-
+      Les annotations anonymes de l’instructeur sont un paramètre des tâches
+      permettant aux instructeurs de laisser des annotations anonymes aux étudiants.
   anonymous_marking_92a4d623: "Notation anonyme"
   anonymous_mode_on_2dd9b94a: "Mode Anonyme activé"
   anonymous_mode_on_feb53729: "Mode Anonyme activé :"
@@ -2330,6 +2337,7 @@ fr-CA:
     total_graded_submissions: "Total des envois notés :"
   assignment_details_expanded_20c6f0c7: "détails de la tâche maximisés"
   assignment_does_not_exist_74178c34: "travail non existant"
+  assignment_edit_6dced39f: "Modifier la tâche "
   assignment_excused_eb6c08fa: "Tâche exemptée"
   assignment_graded_grade_on_assignment_name_in_cour_5082fd1: "Tâche notée : %{grade} sur %{assignment_name} dans %{course_code}"
   assignment_graded_score_on_assignmentname_in_cours_1acbf85f: "Tâche notée : %{score} sur %{assignmentName} dans %{courseName}"
@@ -2396,6 +2404,7 @@ fr-CA:
   assignment_title_8a707dd2: "Titre de la tâche"
   assignment_title_e3192978: "Tâche : %{title}"
   assignment_url_37c849c6: "URL de la tâche"
+  assignment_view_1206a60b: "Voir l’évaluation"
   assignment_was_deleted_8320d26d: "Le tâche a été supprimé"
   assignment_weights_d4bcf9ab: "Importance des tâches"
   assignments: 
@@ -2683,7 +2692,7 @@ fr-CA:
       reviews_per_user: "Révisions par utilisateur"
     points_possible_number: "Les points possibles doivent être spécifiés par un nombre"
     positive_number: "Vous devez utiliser un nombre positif"
-    processing_submission: "Canvas est en train de traiter votre envoi. Vous pouvez naviguer en toute sécurité loin de cette page et nous vous enverrons un courrier électronique lorsque l’envoi sera traité."
+    processing_submission: "Canvas est en train de traiter votre envoi. Vous pouvez naviguer en toute sécurité loin de cette page et nous vous enverrons un courrier électronique si une erreur est survenue lors du traitement de l’envoi."
     redirect_page: 
       redirect_message: |-
           Cet envoi était une URL; nous vous dirigeons maintenant vers le lien de l’URL.
@@ -3808,6 +3817,7 @@ fr-CA:
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "Ne peut pas changer une date d’échéance en une date au cours d'une période de notation fermée"
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: "Ne peut pas changer la date d’échéance lors de l’échéance au cours d'une période de notation fermée"
   cannot_create_an_appointment_group_for_a_concluded_f4da02e3: "impossible de créer un groupe de rendez-vous pour un cours achevé"
+  cannot_create_event_for_deleted_course_c800f310: "impossible de créer un événement pour un cours supprimé"
   cannot_delete_a_file_that_has_been_submitted_as_pa_fda24c4: "Ne peut supprimer un fichier qui a été envoyé et qui fait partie d'une évaluation"
   cannot_delete_an_override_with_a_due_date_within_a_fa94ca3b: "Ne peut pas supprimer un surclassement avec une date d’échéance au cours d'une période de notation fermée"
   cannot_give_outcomes_extra_credit_696208f0: "Impossible de donner des crédits supplémentaires aux acquis."
@@ -3822,6 +3832,7 @@ fr-CA:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "Ne peut pas définir un surclassement de date d’échéance à une date au cours d'une période de notation fermée"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Impossible de définir sis_account_id sur un root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Ne peut pas définir la date d’échéance à une date au cours d'une période de notation fermée"
+  cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "Impossible d'afficher des rapports détaillés pour les tâches anonymes jusqu'à ce que les notes des tâches soient activées."
   canvas: 
     migration: 
       errors: 
@@ -6030,6 +6041,7 @@ fr-CA:
   courses_account_navigation_f84fdec3: "Cours (Navigation du compte)"
   courses_add_edit_delete_aa2b55d3: "Cours- ajouter/modifier/supprimer"
   courses_navigation_menu_b3638384: "Menu de navigation des cours"
+  courses_over_time_41dc0428: "cours au fil du temps"
   courses_people_680bb173: "Cours et Personnes"
   courses_undelete_1f689a97: "Cours - annuler la suppression"
   courses_view_change_logs_25af6a45: "Cours - voir les journaux des modifications"
@@ -7333,6 +7345,7 @@ fr-CA:
   enter_or_find_an_external_tool_url_6aebbd0d: "Saisir ou trouver une URL d’outil externe"
   enter_specific_phrase_9b686755: "Saisir une phrase spécifique"
   enter_the_access_token_for_your_organization_from__cc77493d: "Saisir le jeton d'accès pour votre organisation depuis *eduappcenter.com*. Une fois appliqué, seules les applications approuvées par votre organisation dans le EduAppCenter seront listées sur la page des applications externes. Apprendre comment  **générer un jeton d'accès**."
+  enter_the_access_token_for_your_organization_from__f1c71941: "Saisir le jeton d'accès de votre organisation depuis                       *eduappcenter.com*. Une fois appliqué, uniquement les applications que votre organisation a approuvées dans                        EduAppCenter seront répertoriées sur la page des applications externes.                       Apprenez à **générer un jeton d'accès**."
   enter_the_email_addresses_of_the_users_you_would_l_17cef6a0: "Saisir les adresses courriel des utilisateurs que vous souhaitez ajouter, séparés par des virgules"
   enter_the_email_addresses_of_the_users_you_would_l_f76448a6: "Entrez les adresses courriel des utilisateurs que vous souhaitez ajouter, séparées par des virgules ou des sauts de ligne"
   enter_the_login_ids_of_the_users_you_would_like_to_502fcbc5: "Entrez les ID de connexion des utilisateurs que vous souhaitez ajouter, séparés par des virgules ou des sauts de ligne"
@@ -7607,6 +7620,7 @@ fr-CA:
   error_rendering_duplicated_module_db821097: "Erreur lors du rendu de module dupliqué"
   error_reports_7d6c8b1e: "Rapports d’erreur"
   error_retrieving_assignment_configuration_tools_f7d75303: "Erreur lors de la récupération des outils de configuration des tâches"
+  error_retrieving_assignment_external_tools_9102d343: "Erreur lors de la récupération des outils externes des tâches"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Erreur lors de la récupération des outils de détection de similarité"
   error_running_quizzes_2_export_cfecedba: "Erreur lors de l’exportation des questionnaires 2."
   error_saving_discussion_settings_3360661d: "Une erreur est survenue lors de la sauvegarde des paramètres de discussion"
@@ -7762,6 +7776,7 @@ fr-CA:
   external_feeds_77f57c7d: "Flux externes"
   external_integration_keys_8b4f4548: "Codes d’intégration externe"
   external_tool_c5a6410a: "Outil externe"
+  external_tool_tool_id_6028b3b1: "Outil externe %{tool_id}"
   external_tool_url_cannot_be_left_blank_a34b6bb2: "L'URL de l'outil externe doit être précisée"
   external_tools: 
     cannot_locate_launch_request: "Impossible de localiser la demande de lancement. Veuillez recommencer."
@@ -7907,6 +7922,7 @@ fr-CA:
     published_status: "Date de publication"
     restricted_status: "Disponible du %{from_date} au %{until_date}"
     unpublished_status: "Non publié"
+  file_storage_32477f6: "Stockage de fichier"
   file_upload_submission_740711f: "Envoi d'un fichier mis en ligne"
   filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filename} a été publié avec le droit d’utilisation suivant : %{usage_right}"
   filename_is_hidden_available_with_a_link_click_to__3e328e8f: "%{fileName} Est masqué. Disponible avec un lien - Cliquez pour modifier"
@@ -8047,6 +8063,7 @@ fr-CA:
   full_name_is_required_8efbdc84: "Le nom complet est requis"
   future_5416ea92: Futur
   future_terms_7fba2ae6: "Trimestres futurs"
+  gathering_files_933551d9: "Collecte des fichiers..."
   general_locked_objects_6a9adafb: "Objets verrouillés généraux"
   generate_activity_for_user_2b0af749: "Générer de l'activité pour %{user}"
   generate_epub_80e89ea4: "Générer au format ePub"
@@ -8870,6 +8887,7 @@ fr-CA:
   group_select_330df8bd: "Sélection d'un groupe"
   group_set_name_2aed2347: "Nom de l'ensemble de groupes"
   group_weight_for_d46c5db4: "Poids du groupe pour :"
+  group_with_id_guid_already_exists_in_another_unrel_be1baf71: "Le groupe avec l'identifiant %{guid} existe déjà dans un autre cours ou compte (%{name})"
   groups: 
     add_group: "Ajouter un groupe"
     add_group_category: 
@@ -9178,6 +9196,12 @@ fr-CA:
   groups_6c90e26a: Groupes
   groups_add_edit_delete_1536bbb4: "Groupes- ajouter/modifier/supprimer"
   groups_are_a_good_place_to_collaborate_on_projects_7386830f: "Les groupes sont un bon moyen de collaborer sur des projets ou de déterminer des calendriers de sessions d’étude par exemple. Chaque groupe a un calendrier, une page Wiki, des discussions et un peu d’espace pour stocker des fichiers. Les groupes peuvent travailler en commun sur des documents ou même programmer des conférences sur le Web. C’est un peu comme un minicours où vous pouvez travailler avec moins d’étudiants sur un sujet plus précis."
+  groups_are_a_good_place_to_collaborate_on_projects_fdfe57a9: |-
+      Les groupes sont un bon endroit pour collaborer à des projets ou pour déterminer des calendriers
+      pour les sessions d'étude et autres.  Chaque groupe reçoit un calendrier, un wiki, des discussions,
+      et un peu d'espace pour stocker des fichiers.  Les groupes peuvent collaborer sur des documents,
+      ou même planifier des conférences Web. C'est vraiment comme un mini-cours où vous pouvez travailler
+      avec un plus petit nombre d'étudiants sur un projet plus ciblé.
   groups_cannot_have_size_restrictions_to_assign_by__7d36fa32: "Les groupes ne peuvent avoir de limites de taille lors de l’affectation par section"
   groups_course_c73e4c2c: "Groupes (cours)"
   groups_must_be_empty_to_assign_by_section_a9fafa72: "Les groupes doivent être vides lors de l’affectation par section"
@@ -9754,6 +9778,7 @@ fr-CA:
         original_job_id: "ID de tâche initial"
         priority: Priorité
         run_at: "Exécuter à"
+        shard: shard
         source: Source
         strand: élément
         tag: étiquette
@@ -10350,6 +10375,7 @@ fr-CA:
     upload: Téléverser
     uploading: Chargement...
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: "Le média est en attente de conversion, veuillez essayer à nouveau dans un court instant."
+  media_over_time_d9332e25: "média au fil du temps"
   media_recording_77cddc52: "Enregistrement Multimédia"
   media_recording_submission_b7fd1491: "Envoi d'un enregistrement multimédia"
   media_recordings_749aef6d: "Enregistrements multimédias"
@@ -12438,6 +12464,7 @@ fr-CA:
   not_submitted_7d05fdb4: "Non soumis"
   not_synced_529cbf29: "Non synchronisé"
   not_synced_message_a343fe5e: "Non synchronisé : %{message}"
+  not_yet_assessed_9362f199: "Pas encore évalué"
   not_yet_completed_345a0bca: "Pas encore terminé"
   note_8b73ce09: Remarque
   note_for_differentiated_group_topics_some_threads__90adbb21: "Remarque : Pour des sujets de groupe distincts, certains fils de discussion pourraient n'avoir aucun étudiant y étant affecté."
@@ -12909,6 +12936,7 @@ fr-CA:
   outcome_score_141cf00a: "Résultats des acquis"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Résultat : %{title} a le statut %{statusTooltip}"
   outcome_with_canvas_id_id_not_found_215c5227: "Acquis avec ID Canvas « %{id} » non trouvé"
+  outcome_with_id_guid_already_exists_in_another_unr_ee551c9d: "L’acquis avec l'identifiant %{guid} existe déjà dans un autre cours ou compte (%{name})"
   outcomes: 
     account_standards: "Critères du compte"
     account_standards_description: "Sur la gauche, vous voyez les critères que votre institution a établis et que vous devez utiliser dans vos cours."
@@ -16976,6 +17004,7 @@ fr-CA:
   similarity_detection_dcada48: "Détection de similarité"
   similarity_detection_platform_9e424d70: "Plateforme de détection de similarité"
   similarity_score_more_information_b7010a87: "Score de similarité – plus d'informations"
+  similarity_score_see_detailed_report_a113dac0: "Score de similarité – Voir rapport détaillé"
   simple_tls_45df2648: "TLS simple"
   singapore_65_b4927585: "Singapour (+65)"
   sis_2164965: SIS
@@ -17266,6 +17295,7 @@ fr-CA:
   students_have_either_already_taken_or_started_taki_a076336: "Des étudiants ont déjà commencé ou terminé ce questionnaire, soyez donc prudent lorsque vous désirez le modifier. Si vous modifiez l'une des questions d'une manière importante, pensez éventuellement à réévaluer les étudiants qui auraient complété l’ancienne version de ce questionnaire."
   students_must_complete_all_of_these_requirements_15fa97f7: "Les étudiants doivent remplir toutes ces exigences"
   students_must_sign_up_in_groups_681206ac: "Les étudiants doivent s'inscrire en groupes"
+  students_over_time_7ec52f7a: "les étudiants au fil du temps"
   students_who_have_taken_the_quiz_count_69dbbda0: 
     one: "Étudiants ayant répondu au questionnaire (%{count})"
     other: "Étudiants ayant répondu au questionnaire (%{count})"
@@ -17584,6 +17614,7 @@ fr-CA:
   teacher_s_fdefb2c: Instructeur(s)
   teacher_view_b2047bc6: "Vue de l’enseignant"
   teachers_52e2423f: Enseignants
+  teachers_over_time_1905603b: "les enseignants au fil du temps"
   teal_f729a294: Sarcelle
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Dîtes-nous quand et comment vous souhaitez être informé des événements dans Canvas."
   templates_4ca13d07: Modèles
@@ -18276,6 +18307,7 @@ fr-CA:
       
       Si le fournisseur peut configurer des URL valides de redirection ou de rappel, utilisez alors %{callback_url}.
   to_create_announcements_discussions_manage_must_al_932ac38f: "Pour créer des annonces, « Discussions - gérer » doit également être activé."
+  to_create_announcements_discussions_moderate_must__8a8278f2: "Pour créer des annonces, « Discussions - modérer » doit également être activé."
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "Pour transférer une section, « Sections de cours - ajouter/modifier/supprimer » doit également être activé. Pour modifier l’ID SIS du cours, « Données SIS - gérer » doit également être activé. Pour permettre à un utilisateur de niveau de compte à supprimer un cours, « État du cours - gérer » doit également être activé."
   to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "Pour transférer une section, « Sections de cours - ajouter/modifier/supprimer » doit également être activé. Pour modifier l’ID SIS du cours, « Données SIS - gérer » doit également être activé. Pour permettre à un utilisateur de niveau de compte à supprimer un cours, « État du cours - gérer » doit également être activé."
   to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "Pour transférer des sections, « Cours - ajouter/modifier/supprimer » doit également être activé."
@@ -18332,6 +18364,7 @@ fr-CA:
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_9747d5fb: "Pour modérer un questionnaire, « Tâches et questionnaires - ajouter/modifier/supprimer » doit également être activé."
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_ebdecaf8: "Pour modérer un questionnaire, « Tâches et questionnaires - ajouter/modifier/supprimer » doit également être activé."
   to_moderate_a_quiz_grades_edit_must_also_be_enable_72ca6ca1: "Pour modérer un questionnaire, « Notation - modifier » doit également être activé."
+  to_moderate_grades_grades_select_final_grade_for_m_8c605763: "Pour modérer les notes, « Notation - sélectionner la note finale pour la modération » doit également être activé."
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "Faites glisser une discussion ici pour l’épingler en haut de la page, ou sélectionnez Épingler dans le menu des paramètres de discussion."
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "Pour prévisualiser la démarque de l'éditeur de thèmes, vous allez devoir *éteindre l'IU à contraste élevé*."
   to_publish_and_unpublish_module_content_courses_ad_4c7fc3c9: |-
@@ -18376,6 +18409,9 @@ fr-CA:
   to_view_discussions_in_a_course_discussions_view_m_7c986cd2: |-
       Pour voir les discussions dans un cours, « Discussions - voir » doit être activé.
       Pour répondre à une discussion, « Discussions - publier » doit également être activé. Pour modifier les détails de la tâche sur une discussion, « Tâches et questionnaires - ajouter/modifier/supprimer » doit également être activé.
+  to_view_discussions_in_a_course_discussions_view_m_aa57dee7: |-
+      Pour voir les discussions dans un cours, « Discussions - voir » doit être activé.
+      Ces deux discussions - créer et discussions - modérées permettent à un utilisateur de créer une discussion dans la page de Discussions. Pour gérer les discussions, « Discussions - modérer »  doit également être activé.
   to_view_discussions_in_a_course_discussions_view_m_b7e742bd: |-
       Pour voir les discussions dans un cours, « Discussions - voir » doit être activé.
       Ces deux discussions - créer et discussions - modérées permettent à un utilisateur de créer une discussion dans la page de Discussions. Pour gérer les discussions, « Discussions - gérer » doit également être activé.
@@ -18635,6 +18671,7 @@ fr-CA:
   update_link_b7cab181: "Mettre le lien à jour"
   update_rating_6d29c2ef: "Mise à jour du classement"
   update_tool_7d48ef2a: "Actualiser %{tool}"
+  update_your_notification_settings_ed9564f3: "Mettre à jour vos paramètres de notification"
   updated_2c1e8615: "Mis à jour"
   updated_current_grade_to_be_empty_c2ce1d13: "La note mise à jour doit être vide."
   updated_current_grade_to_currentgrade_bfe2ea14: "La note actuelle a été mise à jour à %{currentGrade}"
@@ -18662,6 +18699,7 @@ fr-CA:
   upload_media_ce31135a: "Téléverser un fichier multimédia"
   upload_successful_ca47465f: "Téléversement réussi"
   upload_your_outcomes_bceeadbe: "Téléverser vos acquis!"
+  uploaded_over_time_d59abb68: "téléversé au fil du temps"
   upper_limit_of_range_c454a8f2: "Limite supérieure de la plage"
   upper_lower_56cad16c: "%{upper} – %{lower}"
   uri_redirect_uri_d4aad2b9: "URL : %{redirect_uri}"
@@ -18684,6 +18722,7 @@ fr-CA:
   use_new_folder_tree_in_files_bc0ea09f: "Utiliser une nouvelle arborescence de dossiers pour les fichiers"
   use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: "Utiliser l’Éditeur de texte enrichi avec la barre latérale améliorée partout"
   use_pairing_code_for_parent_sign_up_10b091f8: "Utiliser le code de jumelage pour l’inscription de parent"
+  use_parent_account_setting_f25a721f: "Utiliser le paramètre du compte parent"
   use_remote_service_for_notifications_9fe667c6: "Utiliser un service à distance pour les notifications"
   use_remote_version_of_rich_content_editor_52f7fc4b: "Utiliser une version à distance de l'éditeur de texte enrichi"
   use_remote_version_of_rich_content_editor_and_side_a058a664: "Utiliser une version à distance de l'éditeur de texte enrichi ET de barre latérale"
@@ -19124,6 +19163,7 @@ fr-CA:
   users_manage_login_details_9462b30f: "Utilisateurs - gérer les détails de connexion"
   users_matching_search_term_c604db9e: "Les utilisateurs correspondant à « %{search_term} »"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Les utilisateurs de lecteurs d'écran devront peut-être désactiver le curseur virtuel afin de pouvoir utiliser ces raccourcis clavier"
+  users_over_time_9a2ee74a: "les utilisateurs au fil du temps"
   users_view_list_861c7a3f: "Utilisateurs - voir la liste"
   users_view_login_ids_a2e6a85: "Utilisateurs - voir les ID de connexion"
   users_view_primary_email_address_14f4978f: "Utilisateurs - voir l’adresse de courriel principale"
@@ -19141,6 +19181,7 @@ fr-CA:
   vericite_info: 
     buttons: 
       resubmit_to_vericite: "Resoumis à VeriCite"
+  vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Score de similarité – Voir rapport détaillé"
   video_b9f27375: Vidéo
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Le contenu de la vidéo n'est pas pris en charge par votre appareil ou par votre application."
   video_player_b371005: "Lecteur vidéo"
