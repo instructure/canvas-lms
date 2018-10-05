@@ -87,7 +87,6 @@
 
 class PlannerNotesController < ApplicationController
   include Api::V1::PlannerNote
-  include PlannerHelper
 
   before_action :require_user
   before_action :require_planner_enabled

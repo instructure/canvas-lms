@@ -86,7 +86,6 @@
 #
 class PlannerOverridesController < ApplicationController
   include Api::V1::PlannerOverride
-  include PlannerHelper
 
   before_action :require_user
   before_action :require_planner_enabled

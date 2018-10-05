@@ -22,7 +22,6 @@
 
 class PlannerController < ApplicationController
   include Api::V1::PlannerItem
-  include PlannerHelper
 
   before_action :require_user
   before_action :require_planner_enabled
