@@ -21,12 +21,12 @@
 // back a Backbone with all of our instructure specific patches to it.
 
 // Get the unpatched Backbone
-import Backbone from 'node_modules-version-of-backbone'
+const Backbone = require('node_modules-version-of-backbone')
 
 // Apply all of our patches
-import 'compiled/backbone-ext/Backbone.syncWithMultipart'
-import 'compiled/backbone-ext/Model'
-import 'compiled/backbone-ext/View'
-import 'compiled/backbone-ext/Collection'
+require('compiled/backbone-ext/Backbone.syncWithMultipart')
+require('compiled/backbone-ext/Model')
+require('compiled/backbone-ext/View')
+require('compiled/backbone-ext/Collection')
 
-export default Backbone
+module.exports = Backbone

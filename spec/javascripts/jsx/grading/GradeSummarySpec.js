@@ -24,7 +24,7 @@ import fakeENV from 'helpers/fakeENV'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
 import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator'
 import GradeSummary from 'jsx/grading/GradeSummary'
-import GradeCalculatorSpecHelper from '../gradebook/GradeCalculatorSpecHelper'
+import {createCourseGradesWithGradingPeriods} from '../gradebook/GradeCalculatorSpecHelper'
 
 const $fixtures = $('#fixtures')
 
@@ -473,7 +473,7 @@ QUnit.module('GradeSummary.calculateGrades', {
     }
     ENV.effective_due_dates = {201: {101: {grading_period_id: '701'}}}
     ENV.student_id = '101'
-    exampleGrades = GradeCalculatorSpecHelper.createCourseGradesWithGradingPeriods()
+    exampleGrades = createCourseGradesWithGradingPeriods()
     sandbox.stub(CourseGradeCalculator, 'calculate').returns(exampleGrades)
   },
 

@@ -24,7 +24,7 @@ import Button from '@instructure/ui-buttons/lib/components/Button'
 import Menu, { MenuItem, MenuItemSeparator } from '@instructure/ui-menu/lib/components/Menu'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import GradebookExportManager from '../../../gradezilla/shared/GradebookExportManager'
-import { AppLaunch } from '../../../gradezilla/SISGradePassback/PostGradesApp'
+import PostGradesApp from '../../../gradezilla/SISGradePassback/PostGradesApp'
 import tz from 'timezone'
 import DateHelper from '../../../shared/helpers/dateHelper'
 import I18n from 'i18n!gradebook'
@@ -195,7 +195,7 @@ const { arrayOf, bool, func, object, shape, string } = PropTypes;
 
     launchPostGrades () {
       const { store, returnFocusTo } = this.props.postGradesFeature;
-      setTimeout(() => AppLaunch(store, returnFocusTo), 10);
+      setTimeout(() => PostGradesApp.AppLaunch(store, returnFocusTo), 10);
     }
 
     renderPostGradesTools () {

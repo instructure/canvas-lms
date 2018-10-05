@@ -16,7 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import htmlEscape, {unescape} from 'str/htmlEscape'
+import htmlEscape from 'str/htmlEscape'
+
+const {unescape} = htmlEscape
 
 QUnit.module('htmlEscape', () => {
   QUnit.module('.htmlEscape()', () => {

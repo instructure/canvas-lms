@@ -21,7 +21,7 @@ import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import Collaboration from './Collaboration'
 import LoadMore from '../shared/load-more'
-import { dispatch } from './store/store'
+import store from './store/store'
 
   class CollaborationsList extends React.Component {
 
@@ -32,7 +32,7 @@ import { dispatch } from './store/store'
 
     loadMoreCollaborations () {
       ReactDOM.findDOMNode(this.refs[`collaboration-${this.props.collaborationsState.list.length - 1}`]).focus();
-      dispatch(this.props.getCollaborations(this.props.collaborationsState.nextPage));
+      store.dispatch(this.props.getCollaborations(this.props.collaborationsState.nextPage));
     }
 
     render () {

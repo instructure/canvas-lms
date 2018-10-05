@@ -22,7 +22,7 @@ import ajax from 'ic-ajax'
 import startApp from '../start_app'
 import Ember from 'ember'
 import fixtures from '../shared_ajax_fixtures'
-import GradeCalculatorSpecHelper from 'spec/jsx/gradebook/GradeCalculatorSpecHelper'
+import {createCourseGradesWithGradingPeriods} from 'spec/jsx/gradebook/GradeCalculatorSpecHelper'
 import SRGBController from '../../controllers/screenreader_gradebook_controller'
 import userSettings from '../../../../userSettings'
 import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator'
@@ -713,7 +713,7 @@ QUnit.module 'ScreenReader Gradebook', (suiteHooks) ->
           }
         ]
         weighted: true
-      exampleGrades = GradeCalculatorSpecHelper.createCourseGradesWithGradingPeriods()
+      exampleGrades = createCourseGradesWithGradingPeriods()
       initializeApp()
       asyncHelper.waitForRequests().then ->
         sinon.stub(CourseGradeCalculator, 'calculate').returns(exampleGrades)

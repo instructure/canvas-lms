@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!gradebook';
 
-const statuses = [
+export const statuses = [
   'late',
   'missing',
   'resubmitted',
@@ -26,7 +26,7 @@ const statuses = [
   'excused'
 ];
 
-const statusesTitleMap = {
+export const statusesTitleMap = {
   late: I18n.t('Late'),
   missing: I18n.t('Missing'),
   resubmitted: I18n.t('Resubmitted'),
@@ -34,8 +34,3 @@ const statusesTitleMap = {
   excused: I18n.t('Excused')
 };
 
-
-export default {
-  statuses,
-  statusesTitleMap
-};

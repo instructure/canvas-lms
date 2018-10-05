@@ -22,7 +22,6 @@ import GettingStartedCollaborations from '../collaborations/GettingStartedCollab
 import CollaborationsNavigation from '../collaborations/CollaborationsNavigation'
 import CollaborationsList from './CollaborationsList'
 import LoadingSpinner from './LoadingSpinner'
-import { dispatch } from './store/store'
 
   class CollaborationsApp extends React.Component {
     constructor (props) {

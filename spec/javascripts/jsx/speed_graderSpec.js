@@ -27,7 +27,9 @@ import fakeENV from 'helpers/fakeENV';
 import natcompare from 'compiled/util/natcompare';
 import numberHelper from 'jsx/shared/helpers/numberHelper';
 import userSettings from 'compiled/userSettings';
-import {unescape} from 'str/htmlEscape';
+import htmlEscape from 'str/htmlEscape';
+
+const {unescape} = htmlEscape;
 
 import 'jquery.ajaxJSON';
 

@@ -18,8 +18,7 @@
 
 import ReactDOM from 'react-dom';
 import { createGradebook, setFixtureHtml } from '../../GradebookSpecHelper';
-import AssignmentColumnHeaderRenderer
-from 'jsx/gradezilla/default_gradebook/GradebookGrid/headers/AssignmentColumnHeaderRenderer'
+import AssignmentColumnHeaderRenderer from 'jsx/gradezilla/default_gradebook/GradebookGrid/headers/AssignmentColumnHeaderRenderer'
 
 QUnit.module('AssignmentColumnHeaderRenderer', function (suiteHooks) {
   let $container;
