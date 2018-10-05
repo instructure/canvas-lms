@@ -22,6 +22,7 @@ import TestUtils from 'react-dom/test-utils'
 import Modal from 'react-modal'
 import DeleteExternalToolButton from 'jsx/external_apps/components/DeleteExternalToolButton'
 import store from 'jsx/external_apps/lib/ExternalAppsStore'
+import {mount} from 'enzyme'
 
 const {Simulate} = TestUtils
 const wrapper = document.getElementById('fixtures')
@@ -78,4 +79,13 @@ test('open and close modal', function() {
   ok(component.state.modalIsOpen, 'modal is open')
   component.closeModal()
   ok(!component.state.modalIsOpen, 'modal is not open')
+})
+
+test('deletes a tool', function() {
+  sinon.spy(store, 'delete')
+  const wrapper = mount(<DeleteExternalToolButton tool={this.tools[0]} canAddEdit />)
+  wrapper.instance().deleteTool({preventDefault: () => {}})
+  ok(store.delete.called)
+  store.delete.restore()
+  wrapper.unmount()
 })
