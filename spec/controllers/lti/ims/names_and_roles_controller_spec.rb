@@ -17,8 +17,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require_dependency "lti/ims/names_and_roles_controller.rb"
-require_dependency "lti/ims/helpers/course_memberships_finder.rb"
-require_dependency "lti/ims/helpers/group_memberships_finder.rb"
+require_dependency "lti/ims/providers/course_memberships_provider.rb"
+require_dependency "lti/ims/providers/group_memberships_provider.rb"
 
 describe Lti::Ims::NamesAndRolesController do
   include Lti::Ims::NamesAndRolesMatchers

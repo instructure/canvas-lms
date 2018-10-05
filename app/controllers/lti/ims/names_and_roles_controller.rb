@@ -55,11 +55,11 @@ module Lti::Ims
     end
 
     def find_memberships_page
-      {url: request.url}.reverse_merge(new_finder.find)
+      {url: request.url}.reverse_merge(new_provider.find)
     end
 
-    def new_finder
-      Helpers.const_get("#{context.class}MembershipsFinder").new(context, self)
+    def new_provider
+      Providers.const_get("#{context.class}MembershipsProvider").new(context, self)
     end
 
     def verify_environment

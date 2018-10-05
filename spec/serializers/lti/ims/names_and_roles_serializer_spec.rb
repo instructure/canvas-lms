@@ -28,12 +28,12 @@ describe Lti::Ims::NamesAndRolesSerializer do
   describe '#as_json' do
     context 'with course enrollment' do
       let(:enrollment) { teacher_in_course(course: course, active_all: true) }
-      let(:decorated_enrollment) { Lti::Ims::Helpers::CourseMembershipsFinder::CourseEnrollmentsDecorator.new([enrollment]) }
+      let(:decorated_enrollment) { Lti::Ims::Providers::CourseMembershipsProvider::CourseEnrollmentsDecorator.new([enrollment]) }
       let(:page) do
         {
           memberships: [decorated_enrollment],
           url: url,
-          context: Lti::Ims::Helpers::CourseMembershipsFinder::CourseContextDecorator.new(course)
+          context: Lti::Ims::Providers::CourseMembershipsProvider::CourseContextDecorator.new(course)
         }
       end
 
@@ -47,12 +47,12 @@ describe Lti::Ims::NamesAndRolesSerializer do
     context 'with group membership' do
       let(:group_record) { group_with_user(active_all: true).group }
       let(:group_member) { group_record.group_memberships.first }
-      let(:decorated_group_member) { Lti::Ims::Helpers::GroupMembershipsFinder::GroupMembershipDecorator.new(group_member) }
+      let(:decorated_group_member) { Lti::Ims::Providers::GroupMembershipsProvider::GroupMembershipDecorator.new(group_member) }
       let(:page) do
         {
           memberships: [decorated_group_member],
           url: url,
-          context: Lti::Ims::Helpers::GroupMembershipsFinder::GroupContextDecorator.new(group_record)
+          context: Lti::Ims::Providers::GroupMembershipsProvider::GroupContextDecorator.new(group_record)
         }
       end
 
