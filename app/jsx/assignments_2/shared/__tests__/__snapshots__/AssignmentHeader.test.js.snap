@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders normally 1`] = `
+<div>
+  <h1>
+    an assignment
+  </h1>
+  <div>
+    <Text
+      as="span"
+      letterSpacing="normal"
+      size="medium"
+    >
+      Points Possible: 
+      42
+    </Text>
+  </div>
+  <div>
+    <Text
+      as="span"
+      letterSpacing="normal"
+      size="medium"
+    >
+      Due: 
+      some time
+    </Text>
+  </div>
+</div>
+`;

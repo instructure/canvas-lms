@@ -140,6 +140,10 @@ class AssignmentsController < ApplicationController
         @external_tools = []
       end
 
+      permissions = {
+        context: @context.rights_status(@current_user, session, :read_as_admin, :manage_assignments),
+        assignment: @assignment.rights_status(@current_user, session, :update, :submit),
+      }
       js_env({
         :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session),
         :COURSE_ID => @context.id,
@@ -147,6 +151,7 @@ class AssignmentsController < ApplicationController
         :EXTERNAL_TOOLS => external_tools_json(@external_tools, @context, @current_user, session),
         :EULA_URL => tool_eula_url,
         ARC_RECORDING_FEATURE_ENABLED: @context.root_account.feature_enabled?(:integrate_arc_rce),
+        PERMISSIONS: permissions,
       })
       set_master_course_js_env_data(@assignment, @context)
       conditional_release_js_env(@assignment, includes: :rule)

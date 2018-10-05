@@ -36,6 +36,103 @@ describe "/assignments/show" do
     expect(response).not_to be_nil # have_tag()
   end
 
+  describe "assignments_2 feature flag" do
+    describe "as a teacher" do
+      before :each do
+        course_with_teacher(active_all: true)
+        view_context(@course, @user)
+        a = @course.assignments.create!(title: "some assignment")
+        assign(:assignment, a)
+        allow(view).to receive(:show_moderation_link).and_return(false)
+      end
+
+      describe "with feature disabled" do
+        it "does not show the new assignments_2 toggle button" do
+          render 'assignments/show'
+          expect(response).to have_tag("div#assignment_show")
+          expect(response).not_to have_tag("a#toggle_assignments_2")
+          expect(response).not_to have_tag("div#assignments_2")
+        end
+
+        it "shows the old assignments page even with query parameter" do
+          allow(view).to receive(:params).and_return({assignments_2: "1"})
+          render 'assignments/show'
+          expect(response).to have_tag("div#assignment_show")
+          expect(response).not_to have_tag("div#assignments_2")
+          expect(response).not_to have_tag("a#toggle_assignments_2")
+        end
+      end
+
+      describe "with feature enabled" do
+        before :once do
+          Account.default.enable_feature! :assignments_2
+        end
+
+        it "it shows old assignments with assignments_2 toggle button" do
+          render 'assignments/show'
+          expect(response).to have_tag("a#toggle_assignments_2")
+          expect(response).to have_tag("div#assignment_show")
+          expect(response).not_to have_tag("div#assignments_2")
+        end
+
+        it "shows the assignments_2 page when the query parameter is present" do
+          allow(view).to receive(:params).and_return({assignments_2: "1"})
+          render 'assignments/show'
+          expect(response).to have_tag("div#assignments_2")
+          expect(response).not_to have_tag("div#assignment_show")
+        end
+      end
+    end
+
+    describe "as a student" do
+      before :each do
+        course_with_student(active_all: true)
+        view_context(@course, @user)
+        a = @course.assignments.create!(title: "some assignment")
+        # mocking this method seems to be the easiest thing to do
+        allow(a).to receive(:multiple_due_dates?).and_return(false)
+        assign(:assignment, a)
+      end
+
+      describe "with feature disabled" do
+        it "does not show the new assignments toggle button" do
+          render 'assignments/show'
+          expect(response).to have_tag("div#assignment_show")
+          expect(response).not_to have_tag("a#toggle_assignments_2")
+          expect(response).not_to have_tag("div#assignments_2")
+        end
+
+        it "shows the old assignments page even with query parameter" do
+          allow(view).to receive(:params).and_return({assignments_2: "1"})
+          render 'assignments/show'
+          expect(response).to have_tag("div#assignment_show")
+          expect(response).not_to have_tag("div#assignments_2")
+          expect(response).not_to have_tag("a#toggle_assignments_2")
+        end
+      end
+
+      describe "with feature enabled" do
+        before :once do
+          Account.default.enable_feature! :assignments_2
+        end
+
+        it "shows the new assignments toggle button" do
+          render 'assignments/show'
+          expect(response).to have_tag("a#toggle_assignments_2")
+          expect(response).to have_tag("div#assignment_show")
+          expect(response).not_to have_tag("div#assignments_2")
+        end
+
+        it "shows the assignments 2 page when the query parameter is present" do
+          allow(view).to receive(:params).and_return({assignments_2: "1"})
+          render 'assignments/show'
+          expect(response).to have_tag("div#assignments_2")
+          expect(response).not_to have_tag("div#assignment_show")
+        end
+      end
+    end
+  end
+
   describe "moderation page link" do
     before :each do
       course_with_teacher(active_all: true)

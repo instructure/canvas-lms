@@ -666,6 +666,14 @@ END
       applies_to: 'RootAccount',
       development: true,
       state: 'allowed'
+    },
+    'assignments_2' => {
+      display_name: -> { I18n.t('Assignments 2') },
+      description: -> { I18n.t('Allow switching to the new assignments page') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      development: true,
+      beta: true
     }
   )
 
