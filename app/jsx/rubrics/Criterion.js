@@ -192,7 +192,10 @@ export default class Criterion extends React.Component {
     const finalize = (update) => {
       const common = { commentsOpen: false }
       if (update) {
-        onAssessmentChange({ ...common, comments: assessment.partialComments })
+        onAssessmentChange({
+          ...common,
+          comments: assessment.partialComments || assessment.comments
+        })
       } else {
         onAssessmentChange({ ...common, partialComments: undefined })
       }
