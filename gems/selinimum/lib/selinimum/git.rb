@@ -27,7 +27,7 @@ module Selinimum
       end
 
       def recent_shas
-        `git log --oneline --first-parent --pretty=format:'%H'|head -n 100`.split(/\n/)
+        `git log --oneline --first-parent --pretty=format:'%H'|head -n 500`.split(/\n/)
       end
 
       def head
