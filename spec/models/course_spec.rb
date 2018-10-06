@@ -2144,18 +2144,18 @@ describe Course, "tabs_available" do
     end
 
     it "should handle hidden_unused correctly for discussions" do
-      tabs = @course.uncached_tabs_available(@teacher, include_hidden_unused: true)
+      tabs = @course.uncached_tabs_available(@teacher, {})
       dtab = tabs.detect{|t| t[:id] == Course::TAB_DISCUSSIONS}
       expect(dtab[:hidden_unused]).to be_falsey
 
       @course.allow_student_discussion_topics = false
-      tabs = @course.uncached_tabs_available(@teacher, include_hidden_unused: true)
+      tabs = @course.uncached_tabs_available(@teacher, {})
       dtab = tabs.detect{|t| t[:id] == Course::TAB_DISCUSSIONS}
       expect(dtab[:hidden_unused]).to be_truthy
 
       @course.allow_student_discussion_topics = true
       discussion_topic_model
-      tabs = @course.uncached_tabs_available(@teacher, include_hidden_unused: true)
+      tabs = @course.uncached_tabs_available(@teacher, {})
       dtab = tabs.detect{|t| t[:id] == Course::TAB_DISCUSSIONS}
       expect(dtab[:hidden_unused]).to be_falsey
     end
@@ -2168,7 +2168,7 @@ describe Course, "tabs_available" do
 
     it "should not include Announcements without read_announcements rights" do
       @course.account.role_overrides.create!(:role => teacher_role, :permission => 'read_announcements', :enabled => false)
-      tab_ids = @course.uncached_tabs_available(@teacher, include_hidden_unused: true).map{|t| t[:id] }
+      tab_ids = @course.uncached_tabs_available(@teacher, {}).map{|t| t[:id] }
       expect(tab_ids).to_not include(Course::TAB_ANNOUNCEMENTS)
     end
   end
